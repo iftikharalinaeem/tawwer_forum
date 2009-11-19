@@ -37,11 +37,11 @@ if [ ! -d "$PATH" ]; then
     
     # Core Package Plugins
     /bin/ln -s "${SOURCE}plugins/VanillaInThisDiscussion" "${PATH}plugins/VanillaInThisDiscussion"
-    /bin/ln -s "${SOURCE}plugins/GettingStarted" "${PATH}plugins/GettingStarted"
     /bin/ln -s "${SOURCE}plugins/HtmlPurifier" "${PATH}plugins/HtmlPurifier"
     # End Core Package Plugins
     
     # Custom VF.com Plugins
+    /bin/ln -s "${PLUGINS}GettingStarted" "${PATH}plugins/GettingStarted"
     /bin/ln -s "${PLUGINS}googleadsense" "${PATH}plugins/googleadsense"
     /bin/ln -s "${PLUGINS}vfoptions" "${PATH}plugins/vfoptions"
     # End Custom VF.com Plugins
