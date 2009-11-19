@@ -5,6 +5,7 @@
 # Variables
 PATH=/srv/www/subdomains/${1}/
 SOURCE=/srv/www/vanilla_stage/
+PLUGINS=/srv/www/misc/plugins/
 	
 echo "Creating new subdomain: ${PATH}"
 
@@ -39,6 +40,7 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${SOURCE}plugins/GettingStarted" "${PATH}plugins/GettingStarted"
     /bin/ln -s "${SOURCE}plugins/HtmlPurifier" "${PATH}plugins/HtmlPurifier"
     /bin/ln -s "${SOURCE}plugins/googleadsense" "${PATH}plugins/googleadsense"
+    /bin/ln -s "${PLUGINS}vfoptions" "${PATH}plugins/vfoptions"
     # End Plugins
 
     # Themes
