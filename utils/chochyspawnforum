@@ -47,8 +47,8 @@ if [ ! -d "$PATH" ]; then
     # End Custom VF.com Plugins
 
     # Themes
-    /bin/ln -s "${SOURCE}themes/vanillaforumscom" "${PATH}themes/default"
-    /bin/ln -s "${SOURCE}themes/vanillaforumscom" "${PATH}themes/vanillaforumscom"
+    /bin/ln -s "${SOURCE}themes/vfcom" "${PATH}themes/default"
+    /bin/ln -s "${SOURCE}themes/vfcom" "${PATH}themes/vfcom"
     # End Themes
         
     # Misc Symlinks
