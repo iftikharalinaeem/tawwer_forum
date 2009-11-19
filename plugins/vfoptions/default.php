@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 // Define the plugin:
-$PluginInfo['VFOptions'] = array(
+$PluginInfo['vfoptions'] = array(
    'Name' => 'VF.com Admin Options',
    'Description' => 'Adds global admin options to the admin screens at VanillaForums.com, allowing administrators to add, edit, and purchase premium upgrades for their hosted forums.',
    'Version' => '1',
@@ -23,8 +23,6 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    6. Show the form that allows users to delete a forum
    7. Show the domain name form (if purchased)
 */    
-    
-    
     
    // Adds a "My Forums" menu option to the dashboard area
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
