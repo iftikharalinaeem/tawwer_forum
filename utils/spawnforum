@@ -1,0 +1,66 @@
+#!/bin/sh
+# Generates a new forum structure in /srv/www/subdomains/
+# This script assumes 1 argument is passed: the name of the subdomain to create.
+
+# Variables
+PATH=/srv/www/subdomains/${1}/
+SOURCE=/srv/www/vanilla_source/
+	
+echo "Creating new subdomain: ${PATH}"
+
+# Don't do anything if the directory already exists
+if [ ! -d "$PATH" ]; then
+
+    # Create the new subdomain folder
+    /bin/mkdir $PATH
+    
+    # Create subfolders
+    /bin/mkdir ${PATH}applications
+    /bin/mkdir ${PATH}cache
+    /bin/mkdir ${PATH}cache/Smarty
+    /bin/mkdir ${PATH}cache/Smarty/cache
+    /bin/mkdir ${PATH}cache/Smarty/compile
+    /bin/mkdir ${PATH}cache/HtmlPurifier
+    /bin/mkdir ${PATH}conf
+    /bin/mkdir ${PATH}plugins
+    /bin/mkdir ${PATH}themes
+    /bin/mkdir ${PATH}uploads
+    
+    # Fill it out the symbolic links to the vanilla source code
+    
+    #Applications
+    /bin/ln -s "${SOURCE}applications/conversations" "${PATH}applications/conversations"
+    /bin/ln -s "${SOURCE}applications/garden" "${PATH}applications/garden"
+    /bin/ln -s "${SOURCE}applications/vanilla" "${PATH}applications/vanilla"
+    #End Applications
+    
+    # Plugins
+    /bin/ln -s "${SOURCE}plugins/VanillaInThisDiscussion" "${PATH}plugins/VanillaInThisDiscussion"
+    /bin/ln -s "${SOURCE}plugins/HtmlPurifier" "${PATH}plugins/HtmlPurifier"
+    /bin/ln -s "${SOURCE}plugins/googleadsense" "${PATH}plugins/googleadsense"
+    # End Plugins
+
+    # Themes
+    /bin/ln -s "${SOURCE}themes/vanillaforumscom" "${PATH}themes/default"
+    /bin/ln -s "${SOURCE}themes/vanillaforumscom" "${PATH}themes/vanillaforumscom"
+    # End Themes
+        
+    # Misc Symlinks
+    /bin/ln -s "${SOURCE}conf/config-defaults.php" "${PATH}conf/config-defaults.php"                                                                                                                 
+    /bin/ln -s "${SOURCE}conf/constants.php" "${PATH}conf/constants.php"
+    /bin/ln -s "${SOURCE}conf/locale.php" "${PATH}conf/locale.php"                                                                                                                             
+    /bin/ln -s "${SOURCE}js" "${PATH}js"                                                                                                                                                             		
+    /bin/ln -s "${SOURCE}library" "${PATH}library"
+    /bin/ln -s "${SOURCE}.htaccess" "${PATH}.htaccess"
+    /bin/ln -s "${SOURCE}bootstrap.php" "${PATH}bootstrap.php"
+    # End Misc
+    
+    # Need to copy the index.php file because it defines the PATH_ROOT and the symbolic link will treat it as though it were in ${SOURCE}
+    /bin/cp "${SOURCE}index.php" "${PATH}index.php"
+    
+    # Create a new config file
+    /usr/bin/touch ${PATH}conf/config.php
+    
+fi
+
+exit
