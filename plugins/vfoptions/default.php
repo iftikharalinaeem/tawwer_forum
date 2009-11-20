@@ -148,7 +148,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
                // If we are in that forum right now, Redirect to the new forum
                // domain, and make sure that the view is loaded properly
                if ($SiteID = Gdn::Config('VanillaForums.SiteID', -1)) {
-                  $Sender->RedirectUrl = 'http://'.$Subdomain.'.vanillaforums.com/plugin/myforums';
+                  $Sender->RedirectUrl = 'http://'.$Subdomain.'.'.$Domain.'.com/plugin/myforums';
                   $PathPlugins = '/srv/www/subdomains/'.$Subdomain.'/plugins';
                }
             }
