@@ -1,5 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
+$HostingDomain = strpos(Gdn::Config('Garden.Domain'), 'chochy') > 0 ? '.chochy.com' : '.vanillaforums.com';
 ?>
 <h1><?php echo Gdn::Translate('My Forums'); ?></h1>
 <div class="FilterMenu"><?php echo Anchor('Create a New Forum', 'garden/plugin/createforum', 'CreateForum Button Popup'); ?></div>
@@ -14,7 +15,7 @@ $Session = Gdn::Session();
    <?php
    $Alt = FALSE;
    foreach ($this->SiteData->Result('Text') as $Site) {
-      $Domain = $Site->Domain == '' ? $Site->Name.'.vanillaforums.com' : $Site->Domain;
+      $Domain = $Site->Domain == '' ? $Site->Name.$HostingDomain : $Site->Domain;
       $Alt = $Alt ? FALSE : TRUE;
       ?>
       <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
