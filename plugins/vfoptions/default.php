@@ -22,14 +22,27 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    5. Show the form that allows upgrades
    6. Show the form that allows users to delete a forum
    7. Show the domain name form (if purchased)
-*/    
-    
+*/
+
    // Adds a "My Forums" menu option to the dashboard area
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Dashboard', 'My Forums', 'garden/plugin/myforums', 'Garden.Settings.GlobalPrivs');
       $Menu->AddLink('Dashboard', 'Premium Upgrades', 'garden/plugin/upgrades', 'Garden.Settings.GlobalPrivs', array('class' => 'HighlightButton'));
+      
+      // Remove the addons menu items
+      $Menu->RemoveGroup('Add-ons');
    }
+   
+   // Don't let the users access applications, plugins, or themes
+   public function SettingsController_Render_Before(&$Sender) {
+      if (
+         strcasecmp($Sender->RequestMethod, 'plugins') == 0
+         || strcasecmp($Sender->RequestMethod, 'applications') == 0
+         || strcasecmp($Sender->RequestMethod, 'themes') == 0
+      ) Redirect($Sender->Routes['DefaultPermission']);
+   }
+   
 
    public function PluginController_MyForums_Create(&$Sender, $EventArguments) {
       $Sender->Title('My Forums');
