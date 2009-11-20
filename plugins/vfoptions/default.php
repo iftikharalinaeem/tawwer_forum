@@ -97,6 +97,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    public function PluginController_RenameForum_Create(&$Sender, $EventArguments) {
       $Sender->Title('Rename Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
+      $PathPlugins = PATH_PLUGINS;
       
       $Session = Gdn::Session();
       $SiteID = ArrayValue(0, $EventArguments, '');
@@ -144,14 +145,17 @@ class VFOptionsPlugin implements Gdn_IPlugin {
                $Sender->StatusMessage = Translate("The forum was renamed successfully.");
                $Sender->RedirectUrl = Url('plugin/myforums');
             
-               // If we are in that forum right now, Redirect to the new forum domain
-               if ($SiteID = Gdn::Config('VanillaForums.SiteID', -1))
+               // If we are in that forum right now, Redirect to the new forum
+               // domain, and make sure that the view is loaded properly
+               if ($SiteID = Gdn::Config('VanillaForums.SiteID', -1)) {
                   $Sender->RedirectUrl = 'http://'.$Subdomain.'.vanillaforums.com/plugin/myforums';
+                  $PathPlugins = '/srv/www/subdomains/'.$Subdomain.'/plugins';
+               }
             }
          }
          
          $this->GetDatabase()->CloseConnection();
-         $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'renameforum.php');
+         $Sender->Render($PathPlugins . DS . 'vfoptions' . DS . 'views' . DS . 'renameforum.php');
       }
    }
 
