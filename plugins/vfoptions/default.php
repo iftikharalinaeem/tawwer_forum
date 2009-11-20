@@ -81,7 +81,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             // $HostingDomain - the domain that the new forum will be hosted on (Not required, Defaults to .vanillaforums.com)
             $HostingDomain = '.'.$Domain.'.com';
             // $SpawnForum - The path to the spawn forum script (Not required, Defaults to /srv/www/spawnforum)
-            $SpawnForum = '/srv/www/utils/'.($Domain == 'chochy' ? 'chochy' : '').'spawnforum';
+            $SpawnForum = '/srv/www/misc/utils/'.($Domain == 'chochy' ? 'chochy' : '').'spawnforum';
             include('/srv/www/'.$Domain.'/applications/vfcom/utils/createforum.php');
 
             if ($Form->ErrorCount() == 0) {
