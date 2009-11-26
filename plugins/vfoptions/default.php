@@ -215,6 +215,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
                   ->From('Site')
                   ->Where('AccountID', Gdn::Config('VanillaForums.AccountID'))
                   ->Where('SiteID <>', $SiteID)
+                  ->Where('Path <>', '')
                   ->Get()
                   ->FirstRow();
                
