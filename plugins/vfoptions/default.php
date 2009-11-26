@@ -347,9 +347,6 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    // Save the specified fields to the appropriate vf.com GDN_User row, as well
    // as all of the related forums for GDN_User.UserID = 1
    private function _SaveAcrossForums($FieldsToSave, $VFUserID) {
-      echo 'saving';
-      print_r($FieldsToSave);
-      die();
       // Retrieve all of the user's sites
       $SiteData = $this->_GetDatabase()->SQL()
          ->Select('DatabaseName')
