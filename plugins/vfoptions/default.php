@@ -241,6 +241,9 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    public function Gdn_UserModel_BeforeSave_Handler(&$Sender, $EventArguments = '') {
       $Fields = ArrayValue('Fields', $EventArguments);
       $UserID = ArrayValue('UserID', $Fields, -1);
+      if ($UserID == -1)
+         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
+
       $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
       $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
       $Email = ArrayValue('Email', $Fields);
@@ -290,13 +293,16 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    public function Gdn_UserModel_AfterSave_Handler(&$Sender, $EventArguments = '') {
       $Fields = ArrayValue('Fields', $EventArguments);
       $UserID = ArrayValue('UserID', $Fields, -1);
+      if ($UserID == -1)
+         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
+
       $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
       $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
       $Email = ArrayValue('Email', $Fields);
       $Password = ArrayValue('Password', $Fields); // <-- This was encrypted in the model
       $SaveFields = array();
-      print_r($Fields);
       echo 'UserID: '.$UserID.'; VFUserID: '.$VFUserID;
+      if ($UserID == -1)
       if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
          echo 'in';
          // If a new password was specified, save it
@@ -332,6 +338,12 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       }
          
       return $this->_Database;
+   }
+   
+   private function _GetUserIDByName($Name) {
+      $UserModel = Gdn::UserModel();
+      $User = $UserModel->Get($Name);
+      return (is_object($User) && property_exists($User, 'UserID')) ? $User->UserID : -1;
    }
    
    // Save the specified fields to the appropriate vf.com GDN_User row, as well
