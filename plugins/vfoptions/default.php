@@ -287,7 +287,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
                }
             }
          }
-         $this->_GetDatabase()->CloseConnection();
+         // $this->_GetDatabase()->CloseConnection();
       }
    }
    
