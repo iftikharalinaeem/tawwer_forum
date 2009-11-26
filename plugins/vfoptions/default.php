@@ -312,7 +312,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          if ($Email !== FALSE)
             $SaveFields['Email'] = $Email;
             
-         $this->_SaveAcrossForums($SaveFields, $VFUserID);
+         $this->_SaveAcrossForums($SaveFields, $VFUserID, $VFAccountID);
       }
    }
 
@@ -346,12 +346,12 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    
    // Save the specified fields to the appropriate vf.com GDN_User row, as well
    // as all of the related forums for GDN_User.UserID = 1
-   private function _SaveAcrossForums($FieldsToSave, $VFUserID) {
+   private function _SaveAcrossForums($FieldsToSave, $VFUserID, $VFAccountID) {
       // Retrieve all of the user's sites
       $SiteData = $this->_GetDatabase()->SQL()
          ->Select('DatabaseName')
          ->From('Site')
-         ->Where('AccountID', $AccountID)
+         ->Where('AccountID', $VFAccountID)
          ->Get();
 
       // Save to VF.com db.
