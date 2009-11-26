@@ -22,6 +22,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    5. Show the form that allows upgrades
    6. Show the form that allows users to delete a forum
    7. Show the domain name form (if purchased)
+   8. Don't allow email to be changed to one that is already being used in master db.
 */
 
    // Adds a "My Forums" menu option to the dashboard area
@@ -43,12 +44,12 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       ) Redirect($Sender->Routes['DefaultPermission']);
    }
    
-
+   // "My Forums" mgmt screen
    public function PluginController_MyForums_Create(&$Sender, $EventArguments) {
       $Sender->Title('My Forums');
       $Sender->AddSideMenu('garden/plugin/myforums');
 
-      $Database = $this->GetDatabase();
+      $Database = $this->_GetDatabase();
       $Sender->SiteData = $Database->SQL()->Select('s.*')
          ->From('Site s')
          ->Where('AccountID', Gdn::Config('VanillaForums.AccountID', -1))
@@ -60,12 +61,14 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'myforums.php');
    }
 
+   // "Premium Upgrades" mgmt screen
    public function PluginController_Upgrades_Create(&$Sender, $EventArguments) {
       $Sender->Title('Premium Upgrades');
       $Sender->AddSideMenu('garden/plugin/upgrades');
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'upgrades.php');
    }
    
+   // Create a New Forum screen
    public function PluginController_CreateForum_Create(&$Sender, $EventArguments) {
       $Sender->Title('Create a New Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
@@ -81,7 +84,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             // $Subdomain - the name of the subdomain to create
             $Subdomain = strtolower($Sender->Form->GetFormValue('Name'));
             // $VFSQL - A SQL object for the vfcom database
-            $VFSQL = &$this->GetDatabase()->SQL();
+            $VFSQL = &$this->_GetDatabase()->SQL();
             $UserID = Gdn::Config('VanillaForums.UserID', -1);
             // $User - the user creating the forum (FALSE if creating a new user)
             $User = $VFSQL->Select()->From('User')->Where('UserID', $UserID)->Get()->FirstRow();
@@ -107,6 +110,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       }
    }
 
+   // Rename forum screen
    public function PluginController_RenameForum_Create(&$Sender, $EventArguments) {
       $Sender->Title('Rename Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
@@ -117,7 +121,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $TransientKey = ArrayValue(1, $EventArguments, '');
       $Site = FALSE;
       if (is_numeric($SiteID) && $SiteID > 0) {
-         $Site = $this->GetDatabase()->SQL()->Select('s.*')
+         $Site = $this->_GetDatabase()->SQL()->Select('s.*')
             ->From('Site s')
             ->Where('SiteID', $SiteID)
             ->Where('InsertUserID', Gdn::Config('VanillaForums.UserID', -1))
@@ -129,7 +133,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
           || !$Session->CheckPermission('Garden.Settings.GlobalPrivs')
           || !$Site
          ) {
-         $this->GetDatabase()->CloseConnection();
+         $this->_GetDatabase()->CloseConnection();
          $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'permission.php');
       } else {
          $Sender->Form = new Gdn_Form();
@@ -142,7 +146,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             // $Subdomain - the name of the subdomain to rename to
             $Subdomain = strtolower($Sender->Form->GetFormValue('Name'));
             // $VFSQL - A SQL object for the vfcom database
-            $VFSQL = &$this->GetDatabase()->SQL();
+            $VFSQL = &$this->_GetDatabase()->SQL();
             // $Site - the old site record
             // (loaded above)
             
@@ -167,11 +171,12 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             }
          }
          
-         $this->GetDatabase()->CloseConnection();
+         $this->_GetDatabase()->CloseConnection();
          $Sender->Render($PathPlugins . DS . 'vfoptions' . DS . 'views' . DS . 'renameforum.php');
       }
    }
 
+   // Delete forum screen
    public function PluginController_DeleteForum_Create(&$Sender, $EventArguments) {
       $Sender->Title('Delete Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
@@ -181,7 +186,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $TransientKey = ArrayValue(1, $EventArguments, '');
       $Site = FALSE;
       if (is_numeric($SiteID) && $SiteID > 0) {
-         $Site = $this->GetDatabase()->SQL()->Select('s.*')
+         $Site = $this->_GetDatabase()->SQL()->Select('s.*')
             ->From('Site s')
             ->Where('SiteID', $SiteID)
             ->Where('InsertUserID', Gdn::Config('VanillaForums.UserID', -1))
@@ -194,7 +199,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
           || !$Session->CheckPermission('Garden.Settings.GlobalPrivs')
           || !$Site
          ) {
-         $this->GetDatabase()->CloseConnection();
+         $this->_GetDatabase()->CloseConnection();
          $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'permission.php');
       } else {
          $Sender->Form = new Gdn_Form();
@@ -204,7 +209,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             
             // If we are in that forum right now, redirect to another forum the user owns
             if ($SiteID == Gdn::Config('VanillaForums.SiteID', -1)) {
-               $NewSite = $this->GetDatabase()->SQL()
+               $NewSite = $this->_GetDatabase()->SQL()
                   ->Select()
                   ->From('Site')
                   ->Where('AccountID', Gdn::Config('VanillaForums.AccountID'))
@@ -220,21 +225,93 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             // We delete the forum *after* the redirects have been defined so we
             // can use the conf file to determine somethings.
             $SiteID = $Site->SiteID;
-            $VFSQL = &$this->GetDatabase()->SQL();
+            $VFSQL = &$this->_GetDatabase()->SQL();
             include('/srv/www/chochy/applications/vfcom/utils/deleteforum.php');
          }
          
-         $this->GetDatabase()->CloseConnection();
+         $this->_GetDatabase()->CloseConnection();
          $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'deleteforum.php');
       }
    }
    
+   // Before UserID 1 saves are processed, validate the email address across forums.
+   public function UserModel_BeforeSave_Handler(&$Sender, $EventArguments = '') {
+      $Fields = ArrayValue('Fields', $EventArguments);
+      $UserID = ArrayValue('UserID', $Fields, -1);
+      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
+      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
+      $Email = ArrayValue('Email', $Fields);
+      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
+         // Retrieve all of the user's sites
+         $SiteData = $this->_GetDatabase()->SQL()
+            ->Select('DatabaseName')
+            ->From('Site')
+            ->Where('AccountID', $AccountID)
+            ->Get();
+
+         // If the user is trying to change the email address...
+         if ($this->_GetDatabase()->SQL()
+            ->Select('UserID')
+            ->From('User')
+            ->Where('UserID <> ', $VFUserID)
+            ->Where('Email', $Email)
+            ->Get()
+            ->NumRows() > 0) {
+            $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
+         } else {
+            // Now check it against all forums the user owns, as well
+            if (is_numeric($VFAccountID) && $VFAccountID > 0) {
+               $Cnn = @mysql_connect(
+                  Gdn::Config('Database.Host', ''),
+                  Gdn::Config('Database.User', ''),
+                  Gdn::Config('Database.Password', '')
+               );
+               if ($Cnn) {
+                  foreach ($SiteData as $Site) {
+                     mysql_select_db($Site->DatabaseName, $Cnn);
+                     $Result = mysql_query("select UserID from GDN_User where UserID <> 1 and Email = '".mysql_real_escape_string($Email, $Cnn)."'");
+                     if (mysql_num_rows($Result) > 0) {
+                        $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
+                        break;
+                     }
+                  }
+                  mysql_close($Cnn);
+               }
+            }
+         }
+         $this->_GetDatabase()->CloseConnection();
+      }
+   }
+   
+   // Save UserID 1 password & email changes across all user's forums (including vanillaforums.com db)
+   public function UserModel_AfterSave_Handler(&$Sender, $EventArguments = '') {
+      $Fields = ArrayValue('Fields', $EventArguments);
+      $UserID = ArrayValue('UserID', $Fields, -1);
+      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
+      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
+      $Email = ArrayValue('Email', $Fields);
+      $Password = ArrayValue('Password', $Fields); // <-- This was encrypted in the model
+      $SaveFields = array();
+      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
+         // If a new password was specified, save it
+         if ($Password !== FALSE)
+            $SaveFields['Password'] = $Password;
+            
+         // If a new email was specified, save that too
+         if ($Email !== FALSE)
+            $SaveFields['Email'] = $Email;
+            
+         $this->_SaveAcrossForums($SaveFields, $VFUserID);
+      }
+   }
+
    public function Setup() {
       // No setup required.
    }
    
+   // Main VanillaForums.com database connection
    private $_Database = FALSE;
-   private function GetDatabase() {
+   private function _GetDatabase() {
       if (!$this->_Database) {
          // Depending on the domain of the forum this plugin resides in, use a different database (chochy is for testing)
          $DbName = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'chochy') > 0 ? 'chochy' : 'vanillaforumscom';
@@ -250,4 +327,37 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       return $this->_Database;
    }
    
+   // Save the specified fields to the appropriate vf.com GDN_User row, as well
+   // as all of the related forums for GDN_User.UserID = 1
+   private function _SaveAcrossForums($FieldsToSave, $VFUserID) {
+      // Retrieve all of the user's sites
+      $SiteData = $this->_GetDatabase()->SQL()
+         ->Select('DatabaseName')
+         ->From('Site')
+         ->Where('AccountID', $AccountID)
+         ->Get();
+
+      // Save to VF.com db.
+      $this->_GetDatabase()->SQL()->Put('User', $FieldsToSave, array('UserID', $VFUserID));
+      
+      // Save to all user's forums
+      $Cnn = @mysql_connect(
+         Gdn::Config('Database.Host', ''),
+         Gdn::Config('Database.User', ''),
+         Gdn::Config('Database.Password', '')
+      );
+      if ($Cnn) {
+         foreach ($SiteData as $Site) {
+            mysql_select_db($Site->DatabaseName, $Cnn);
+            $Query = 'update GDN_User set ';
+            foreach ($FieldsToSave as $Field => $Value) {
+               $Query .= $Field." = '".mysql_real_escape_string($Value, $Cnn)."' ";
+            }
+            $Query .= 'where UserID = 1';
+            mysql_query($Query, $Cnn);
+         }
+         mysql_close($Cnn);
+      }
+      $this->_GetDatabase()->CloseConnection();
+   }
 }

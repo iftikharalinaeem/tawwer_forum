@@ -24,7 +24,7 @@ $HostingDomain = strpos(Gdn::Config('Garden.Domain'), 'chochy') > 0 ? '.chochy.c
             <div>
                <?php echo Anchor('Visit', 'http://'.$Domain); ?>
                <span>|</span>
-               <?php echo Anchor('Rename', '/plugin/renameforum/'.$Site->SiteID.'/'.$Session->TransientKey(), 'RenameSite Popup'); ?>
+               <?php echo Anchor('Rename', 'http://www'.$HostingDomain.'/manage/rename/'.$Site->SiteID.'/'.$Session->TransientKey(), 'RenameSite Popup'); ?>
                <span>|</span>
                <?php echo Anchor('Delete', '/plugin/deleteforum/'.$Site->SiteID.'/'.$Session->TransientKey(), 'DeleteSite Popup'); ?>
             </div>
