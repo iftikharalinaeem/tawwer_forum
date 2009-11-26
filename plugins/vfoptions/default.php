@@ -252,7 +252,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          $SiteData = $this->_GetDatabase()->SQL()
             ->Select('DatabaseName')
             ->From('Site')
-            ->Where('AccountID', $AccountID)
+            ->Where('AccountID', $VFAccountID)
             ->Get();
 
          // If the user is trying to change the email address...
