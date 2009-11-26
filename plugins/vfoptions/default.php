@@ -180,6 +180,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    public function PluginController_DeleteForum_Create(&$Sender, $EventArguments) {
       $Sender->Title('Delete Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
+      $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'chochy') > 0 ? 'chochy' : 'vanillaforums';
       
       $Session = Gdn::Session();
       $SiteID = ArrayValue(0, $EventArguments, '');
@@ -223,14 +224,14 @@ class VFOptionsPlugin implements Gdn_IPlugin {
                   $this->RedirectUrl = 'http://'.$NewSite->Name.'.vanillaforums.com/plugin/myforums';
             }
             // We delete the forum *after* the redirects have been defined so we
-            // can use the conf file to determine somethings.
+            // can use the conf file to determine some things.
             $SiteID = $Site->SiteID;
             $VFSQL = &$this->_GetDatabase()->SQL();
-            include('/srv/www/chochy/applications/vfcom/utils/deleteforum.php');
+            include('/srv/www/'.$Domain.'/applications/vfcom/utils/deleteforum.php');
          }
          
          $this->_GetDatabase()->CloseConnection();
-         $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'deleteforum.php');
+         $Sender->Render('/srv/www/'.$Domain.'/applications/vfcom/views/manage/delete.php');
       }
    }
    
