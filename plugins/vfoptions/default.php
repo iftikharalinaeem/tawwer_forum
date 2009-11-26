@@ -222,13 +222,13 @@ class VFOptionsPlugin implements Gdn_IPlugin {
                if (!$NewSite)
                   $this->RedirectUrl = 'http://'.$Domain.'.com';
                else
-                  $this->RedirectUrl = 'http://'.$NewSite->Name.'.vanillaforums.com/plugin/myforums';
+                  $this->RedirectUrl = 'http://'.$NewSite->Name.'.'.$Domain.'.com/plugin/myforums';
             }
             // We delete the forum *after* the redirects have been defined so we
             // can use the conf file to determine some things.
-            $SiteID = $Site->SiteID;
-            $VFSQL = &$this->_GetDatabase()->SQL();
-            include('/srv/www/'.$Domain.'/applications/vfcom/utils/deleteforum.php');
+            // $SiteID = $Site->SiteID;
+            // $VFSQL = &$this->_GetDatabase()->SQL();
+            // include('/srv/www/'.$Domain.'/applications/vfcom/utils/deleteforum.php');
          }
          
          $this->_GetDatabase()->CloseConnection();
