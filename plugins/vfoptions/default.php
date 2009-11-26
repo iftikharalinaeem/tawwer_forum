@@ -220,9 +220,9 @@ class VFOptionsPlugin implements Gdn_IPlugin {
                
                // If the user doesn't own any other forums, send them back out to the homepage
                if (!$NewSite)
-                  $this->RedirectUrl = 'http://'.$Domain.'.com';
+                  $Sender->RedirectUrl = 'http://'.$Domain.'.com';
                else
-                  $this->RedirectUrl = 'http://'.$NewSite->Name.'.'.$Domain.'.com/plugin/myforums';
+                  $Sender->RedirectUrl = 'http://'.$NewSite->Name.'.'.$Domain.'.com/plugin/myforums';
             }
             // We delete the forum *after* the redirects have been defined so we
             // can use the conf file to determine some things.
