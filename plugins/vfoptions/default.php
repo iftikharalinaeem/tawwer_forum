@@ -288,7 +288,6 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    
    // Save UserID 1 password & email changes across all user's forums (including vanillaforums.com db)
    public function Gdn_UserModel_AfterSave_Handler(&$Sender, $EventArguments = '') {
-      echo 'saving';
       $Fields = ArrayValue('Fields', $EventArguments);
       $UserID = ArrayValue('UserID', $Fields, -1);
       $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
@@ -296,6 +295,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $Email = ArrayValue('Email', $Fields);
       $Password = ArrayValue('Password', $Fields); // <-- This was encrypted in the model
       $SaveFields = array();
+      echo 'UserID: '.$UserID.'; VFUserID: '.$VFUserID;
       if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
          echo 'in';
          // If a new password was specified, save it
