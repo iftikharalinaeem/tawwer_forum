@@ -238,7 +238,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    }
    
    // Before UserID 1 saves are processed, validate the email address across forums.
-   public function UserModel_BeforeSave_Handler(&$Sender, $EventArguments = '') {
+   public function Gdn_UserModel_BeforeSave_Handler(&$Sender, $EventArguments = '') {
       echo 'test';
       die();
       $Fields = ArrayValue('Fields', $EventArguments);
@@ -289,7 +289,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    }
    
    // Save UserID 1 password & email changes across all user's forums (including vanillaforums.com db)
-   public function UserModel_AfterSave_Handler(&$Sender, $EventArguments = '') {
+   public function Gdn_UserModel_AfterSave_Handler(&$Sender, $EventArguments = '') {
       $Fields = ArrayValue('Fields', $EventArguments);
       $UserID = ArrayValue('UserID', $Fields, -1);
       $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
