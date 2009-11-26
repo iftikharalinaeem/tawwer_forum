@@ -303,10 +303,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $Email = ArrayValue('Email', $Fields);
       $Password = ArrayValue('Password', $Fields); // <-- This was encrypted in the model
       $SaveFields = array();
-      echo 'UserID: '.$UserID.'; VFUserID: '.$VFUserID;
-      if ($UserID == -1)
       if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
-         echo 'in';
          // If a new password was specified, save it
          if ($Password !== FALSE)
             $SaveFields['Password'] = $Password;
@@ -317,7 +314,6 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             
          $this->_SaveAcrossForums($SaveFields, $VFUserID);
       }
-      die();
    }
 
    public function Setup() {
