@@ -274,11 +274,13 @@ class VFOptionsPlugin implements Gdn_IPlugin {
                );
                if ($Cnn) {
                   foreach ($SiteData as $Site) {
-                     mysql_select_db($Site->DatabaseName, $Cnn);
-                     $Result = mysql_query("select UserID from GDN_User where UserID <> 1 and Email = '".mysql_real_escape_string($Email, $Cnn)."'");
-                     if (mysql_num_rows($Result) > 0) {
-                        $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
-                        break;
+                     if ($Site->Path != '') {
+                        mysql_select_db($Site->DatabaseName, $Cnn);
+                        $Result = mysql_query("select UserID from GDN_User where UserID <> 1 and Email = '".mysql_real_escape_string($Email, $Cnn)."'");
+                        if (mysql_num_rows($Result) > 0) {
+                           $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
+                           break;
+                        }
                      }
                   }
                   mysql_close($Cnn);
