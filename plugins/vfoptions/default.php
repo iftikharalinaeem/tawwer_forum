@@ -239,8 +239,6 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    
    // Before UserID 1 saves are processed, validate the email address across forums.
    public function Gdn_UserModel_BeforeSave_Handler(&$Sender, $EventArguments = '') {
-      echo 'test';
-      die();
       $Fields = ArrayValue('Fields', $EventArguments);
       $UserID = ArrayValue('UserID', $Fields, -1);
       $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
@@ -335,8 +333,6 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    // Save the specified fields to the appropriate vf.com GDN_User row, as well
    // as all of the related forums for GDN_User.UserID = 1
    private function _SaveAcrossForums($FieldsToSave, $VFUserID) {
-      echo 'saving';
-      die();
       // Retrieve all of the user's sites
       $SiteData = $this->_GetDatabase()->SQL()
          ->Select('DatabaseName')
