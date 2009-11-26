@@ -220,7 +220,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
                
                // If the user doesn't own any other forums, send them back out to the homepage
                if (!$NewSite)
-                  $this->RedirectUrl = 'http://vanillaforums.com';
+                  $this->RedirectUrl = 'http://'.$Domain.'.com';
                else
                   $this->RedirectUrl = 'http://'.$NewSite->Name.'.vanillaforums.com/plugin/myforums';
             }
