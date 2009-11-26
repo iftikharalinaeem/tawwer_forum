@@ -375,6 +375,6 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          }
          mysql_close($Cnn);
       }
-      $this->_GetDatabase()->CloseConnection();
+      // $this->_GetDatabase()->CloseConnection();
    }
 }
