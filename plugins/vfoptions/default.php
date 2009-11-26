@@ -250,7 +250,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
          // Retrieve all of the user's sites
          $SiteData = $this->_GetDatabase()->SQL()
-            ->Select('DatabaseName')
+            ->Select('DatabaseName, Path')
             ->From('Site')
             ->Where('AccountID', $VFAccountID)
             ->Get();
