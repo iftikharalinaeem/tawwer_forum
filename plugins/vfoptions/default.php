@@ -214,6 +214,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
                   ->Select()
                   ->From('Site')
                   ->Where('AccountID', Gdn::Config('VanillaForums.AccountID'))
+                  ->Where('SiteID <>', $SiteID)
                   ->Get()
                   ->FirstRow();
                
