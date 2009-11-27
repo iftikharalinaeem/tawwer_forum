@@ -14,12 +14,14 @@ echo $DIR
    /bin/rm ${PATH}${DIR}/themes/vanillaforumscom
    /bin/rm ${PATH}${DIR}/themes/vfcom
    /bin/rm ${PATH}${DIR}/themes/default
+   /bin/rm ${PATH}${DIR}/plugins/vfcom
+   /bin/rm ${PATH}${DIR}/plugins/default
    
    # Add new symlinks
    /bin/ln -s /srv/www/misc/plugins/GettingStarted ${PATH}${DIR}/plugins/GettingStarted
    /bin/ln -s /srv/www/misc/plugins/googleadsense ${PATH}${DIR}/plugins/googleadsense
    /bin/ln -s /srv/www/misc/plugins/vfoptions ${PATH}${DIR}/plugins/vfoptions
-   /bin/ln -s /srv/www/misc/themes/vfcom ${PATH}${DIR}/plugins/vfcom
-   /bin/ln -s /srv/www/misc/themes/vfcom ${PATH}${DIR}/plugins/default
+   /bin/ln -s /srv/www/misc/themes/vfcom ${PATH}${DIR}/themes/vfcom
+   /bin/ln -s /srv/www/misc/themes/vfcom ${PATH}${DIR}/themes/default
 
 done
