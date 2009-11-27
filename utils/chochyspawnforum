@@ -5,7 +5,7 @@
 # Variables
 PATH=/srv/www/subdomains/${1}/
 SOURCE=/srv/www/vanilla_stage/
-PLUGINS=/srv/www/misc/plugins/
+PLUGINS=/srv/www/misc_stage/plugins/
 	
 echo "Creating new subdomain: ${PATH}"
 

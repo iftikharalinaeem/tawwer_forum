@@ -5,6 +5,7 @@
 # Variables
 PATH=/srv/www/subdomains/${1}/
 SOURCE=/srv/www/vanilla_source/
+PLUGINS=/srv/www/misc/plugins/
 	
 echo "Creating new subdomain: ${PATH}"
 
@@ -34,15 +35,20 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${SOURCE}applications/vanilla" "${PATH}applications/vanilla"
     #End Applications
     
-    # Plugins
+    # Core Package Plugins
     /bin/ln -s "${SOURCE}plugins/VanillaInThisDiscussion" "${PATH}plugins/VanillaInThisDiscussion"
     /bin/ln -s "${SOURCE}plugins/HtmlPurifier" "${PATH}plugins/HtmlPurifier"
-    /bin/ln -s "${SOURCE}plugins/googleadsense" "${PATH}plugins/googleadsense"
-    # End Plugins
+    # End Core Package Plugins
+    
+    # Custom VF.com Plugins
+    /bin/ln -s "${PLUGINS}GettingStarted" "${PATH}plugins/GettingStarted"
+    /bin/ln -s "${PLUGINS}googleadsense" "${PATH}plugins/googleadsense"
+    /bin/ln -s "${PLUGINS}vfoptions" "${PATH}plugins/vfoptions"
+    # End Custom VF.com Plugins
 
     # Themes
-    /bin/ln -s "${SOURCE}themes/vanillaforumscom" "${PATH}themes/default"
-    /bin/ln -s "${SOURCE}themes/vanillaforumscom" "${PATH}themes/vanillaforumscom"
+    /bin/ln -s "${SOURCE}themes/vfcom" "${PATH}themes/default"
+    /bin/ln -s "${SOURCE}themes/vfcom" "${PATH}themes/vfcom"
     # End Themes
         
     # Misc Symlinks
