@@ -5,7 +5,7 @@
 
 if ($DirectoryHandle = opendir('/srv/www/subdomains')) {
     while (($Item = readdir($DirectoryHandle)) !== FALSE) {
-		  if (in_array($Item, array('dodgeball', 'carsonified'))) {
+//		  if (in_array($Item, array('dodgeball', 'carsonified'))) {
 				$File = '/srv/www/subdomains/' . $Item . '/conf/config.php';
 				if (file_exists($File)) {
 					 $Contents = file_get_contents($File);
@@ -35,7 +35,7 @@ if ($DirectoryHandle = opendir('/srv/www/subdomains')) {
 					 file_put_contents($File, $Contents);
 					 echo 'Updating: '.$File."\n";
 				}
-		  }
+//		  }
     }
     closedir($DirectoryHandle);
 }
