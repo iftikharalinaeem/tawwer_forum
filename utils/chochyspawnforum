@@ -6,6 +6,7 @@
 PATH=/srv/www/subdomains/${1}/
 SOURCE=/srv/www/vanilla_stage/
 PLUGINS=/srv/www/misc_stage/plugins/
+THEMES=/srv/www/misc_stage/themes/	
 	
 echo "Creating new subdomain: ${PATH}"
 
@@ -47,8 +48,8 @@ if [ ! -d "$PATH" ]; then
     # End Custom VF.com Plugins
 
     # Themes
-    /bin/ln -s "${SOURCE}themes/vfcom" "${PATH}themes/default"
-    /bin/ln -s "${SOURCE}themes/vfcom" "${PATH}themes/vfcom"
+    /bin/ln -s "${THEMES}themes/vfcom" "${PATH}themes/default"
+    /bin/ln -s "${THEMES}themes/vfcom" "${PATH}themes/vfcom"
     # End Themes
         
     # Misc Symlinks
