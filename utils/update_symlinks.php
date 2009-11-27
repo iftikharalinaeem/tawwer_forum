@@ -6,16 +6,17 @@
 
 function RemoveSymLink($Link) {
 	 if (file_exists($Link)) {
-		  echo '/bin/rm "'.$Link.'"'."\n";
- 		  exec('/bin/rm "'.$Link.'"');
+		  // echo '/bin/rm "'.$Link.'"'."\n";
+ 		  // exec('/bin/rm "'.$Link.'"');
+		  unlink($Link);
 	 }
 }
 function CreateSymLink($Folder, $LinkSuffix, $AltSuffix = '') {
 	 if ($AltSuffix == '')
 		  $AltSuffix = $LinkSuffix;
 		  
-	 echo('/bin/ln -s "/srv/www/misc'.$LinkSuffix.'" "'.$Folder.$AltSuffix.'"'."\n");
-	 exec('/bin/ln -s "/srv/www/misc'.$LinkSuffix.'" "'.$Folder.$AltSuffix.'"');
+	 // echo('/bin/ln -s "/srv/www/misc'.$LinkSuffix.'" "'.$Folder.$AltSuffix.'"'."\n");
+	 // exec('/bin/ln -s "/srv/www/misc'.$LinkSuffix.'" "'.$Folder.$AltSuffix.'"');
 }
 
 if ($DirectoryHandle = opendir('/srv/www/subdomains')) {
