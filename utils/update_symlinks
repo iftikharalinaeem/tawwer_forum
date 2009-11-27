@@ -2,7 +2,7 @@
 
 PATH=/srv/www/subdomains/
 
-for DIR in `ls /srv/www/subdomains`
+for DIR in `/bin/ls /srv/www/subdomains`
 do
 
 echo $DIR
