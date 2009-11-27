@@ -3,7 +3,7 @@
 // Sets a cookie value that, when set, allows you to view sites under maintenance
 
 /*
-You must drop the following code in the garden installation's index.php file
+You must drop the following code in the garden installation's bootstrap.php file
 in order to prevent others from seeing the site under maintenance, specifically:
 /srv/www/vanilla_source and /srv/www/vanillaforumscom
 
