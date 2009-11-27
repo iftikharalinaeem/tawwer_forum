@@ -1,0 +1,9 @@
+<?php if (!defined('APPLICATION')) exit();
+
+$ThemeInfo['VanillaForums.org'] = array(
+   'Description' => "A custom theme for VanillaForums.org. Used to customize the heading banner for the forum.",
+   'Version' => '1.0',
+   'Author' => "Mark O'Sullivan",
+   'AuthorEmail' => 'mark@lussumo.com',
+   'AuthorUrl' => 'http://markosullivan.ca'
+);
