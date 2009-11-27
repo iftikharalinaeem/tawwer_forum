@@ -1,23 +1,25 @@
 #!/bin/bash
 
+PATH=/srv/www/subdomains/
+
 for DIR in `ls /srv/www/subdomains`
 do
 
 echo $DIR
    # Remove existing symlinks
-   # /bin/rm ${DIR}/plugins/GettingStarted
-   # /bin/rm ${DIR}/plugins/googleadsense
-   # /bin/rm ${DIR}/plugins/vfoptions
-   # /bin/rm ${DIR}/plugins/downtime
-   # /bin/rm ${DIR}/themes/vanillaforumscom
-   # /bin/rm ${DIR}/themes/vfcom
-   # /bin/rm ${DIR}/themes/default
+   /bin/rm ${PATH}${DIR}/plugins/GettingStarted
+   /bin/rm ${PATH}${DIR}/plugins/googleadsense
+   /bin/rm ${PATH}${DIR}/plugins/vfoptions
+   /bin/rm ${PATH}${DIR}/plugins/downtime
+   /bin/rm ${PATH}${DIR}/themes/vanillaforumscom
+   /bin/rm ${PATH}${DIR}/themes/vfcom
+   /bin/rm ${PATH}${DIR}/themes/default
    
    # Add new symlinks
-   # /bin/ln -s /srv/www/misc/plugins/GettingStarted ${DIR}/plugins/GettingStarted
-   # /bin/ln -s /srv/www/misc/plugins/googleadsense ${DIR}/plugins/googleadsense
-   # /bin/ln -s /srv/www/misc/plugins/vfoptions ${DIR}/plugins/vfoptions
-   # /bin/ln -s /srv/www/misc/themes/vfcom ${DIR}/plugins/vfcom
-   # /bin/ln -s /srv/www/misc/themes/vfcom ${DIR}/plugins/default
+   /bin/ln -s /srv/www/misc/plugins/GettingStarted ${PATH}${DIR}/plugins/GettingStarted
+   /bin/ln -s /srv/www/misc/plugins/googleadsense ${PATH}${DIR}/plugins/googleadsense
+   /bin/ln -s /srv/www/misc/plugins/vfoptions ${PATH}${DIR}/plugins/vfoptions
+   /bin/ln -s /srv/www/misc/themes/vfcom ${PATH}${DIR}/plugins/vfcom
+   /bin/ln -s /srv/www/misc/themes/vfcom ${PATH}${DIR}/plugins/default
 
 done
