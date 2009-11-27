@@ -17,6 +17,7 @@ function CreateSymLink($Folder, $LinkSuffix, $AltSuffix = '') {
 
 if ($DirectoryHandle = opendir('/srv/www/subdomains')) {
     while (($Item = readdir($DirectoryHandle)) !== FALSE) {
+		  echo $Item."\n";
 		  if (in_array($Item, array('/marktest', '/carsonified'))) {
 				$Folder = '/srv/www/subdomains' . $Item . '/';
 				echo "Working: $Folder \n";
