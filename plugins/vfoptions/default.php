@@ -356,8 +356,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          ->Get();
 
       // Save to VF.com db.
-      $this->_GetDatabase()->SQL()->Reset();
-      $this->_GetDatabase()->SQL()->Put('User', $FieldsToSave, array('UserID', $VFUserID));
+      $this->_GetDatabase()->SQL()->Put('User', $FieldsToSave, array('UserID' => $VFUserID));
       
       // Save to all user's forums
       $Cnn = @mysql_connect(
