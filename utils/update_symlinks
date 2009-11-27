@@ -1,0 +1,21 @@
+#!/bin/bash
+
+for DIR in /srv/www/subdomains; do
+
+   # Remove existing symlinks
+   /bin/rm ${DIR}/plugins/GettingStarted
+   /bin/rm ${DIR}/plugins/googleadsense
+   /bin/rm ${DIR}/plugins/vfoptions
+   /bin/rm ${DIR}/plugins/downtime
+   /bin/rm ${DIR}/themes/vanillaforumscom
+   /bin/rm ${DIR}/themes/vfcom
+   /bin/rm ${DIR}/themes/default
+   
+   # Add new symlinks
+   /bin/ln -s /srv/www/misc/plugins/GettingStarted ${DIR}/plugins/GettingStarted
+   /bin/ln -s /srv/www/misc/plugins/googleadsense ${DIR}/plugins/googleadsense
+   /bin/ln -s /srv/www/misc/plugins/vfoptions ${DIR}/plugins/vfoptions
+   /bin/ln -s /srv/www/misc/themes/vfcom ${DIR}/plugins/vfcom
+   /bin/ln -s /srv/www/misc/themes/vfcom ${DIR}/plugins/default
+
+done
