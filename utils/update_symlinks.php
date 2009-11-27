@@ -18,7 +18,7 @@ function CreateSymLink($Folder, $LinkSuffix, $AltSuffix = '') {
 if ($DirectoryHandle = opendir('/srv/www/subdomains')) {
     while (($Item = readdir($DirectoryHandle)) !== FALSE) {
 		  if (in_array($Item, array('marktest', 'carsonified'))) {
-				$Folder = '/srv/www/subdomains/' . $Item . '/';
+				$Folder = '/srv/www/subdomains/' . $Item;
 				echo "Working: $Folder \n";
 				
 				// Delete existing symlinks first
