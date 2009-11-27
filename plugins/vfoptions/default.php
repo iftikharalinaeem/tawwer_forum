@@ -91,14 +91,15 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             
             // Depending on the domain of the forum this plugin resides in, use a different hosting domain & codebase (chochy is for testing)
             $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'chochy') > 0 ? 'chochy' : 'vanillaforums';
+            $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'chochy';
 
             // $VanillaForumsPath - The path to the main VanillaForums.com garden installation (Not required, Defaults to /srv/www/vanillaforumscom)
-            $VanillaForumsPath = '/srv/www/'.$Domain;
+            $VanillaForumsPath = '/srv/www/'.$Folder;
             // $HostingDomain - the domain that the new forum will be hosted on (Not required, Defaults to .vanillaforums.com)
             $HostingDomain = '.'.$Domain.'.com';
             // $SpawnForum - The path to the spawn forum script (Not required, Defaults to /srv/www/spawnforum)
             $SpawnForum = '/srv/www/misc/utils/'.($Domain == 'chochy' ? 'chochy' : '').'spawnforum';
-            include('/srv/www/'.$Domain.'/applications/vfcom/utils/createforum.php');
+            include('/srv/www/'.$Folder.'/applications/vfcom/utils/createforum.php');
 
             if ($Form->ErrorCount() == 0) {
                $Sender->StatusMessage = Translate("The forum was created successfully.");
@@ -152,11 +153,13 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             
             // Depending on the domain of the forum this plugin resides in, use a different hosting domain & codebase (chochy is for testing)
             $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'chochy') > 0 ? 'chochy' : 'vanillaforums';
+            $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'chochy';
+
             // $VanillaForumsPath - The path to the main VanillaForums.com garden installation (Not required, Defaults to /srv/www/vanillaforumscom)
-            $VanillaForumsPath = '/srv/www/'.$Domain;
+            $VanillaForumsPath = '/srv/www/'.$Folder;
             // $HostingDomain - the domain that the new forum will be hosted on (Not required, Defaults to .vanillaforums.com)
             $HostingDomain = '.'.$Domain.'.com';
-            include('/srv/www/'.$Domain.'/applications/vfcom/utils/renameforum.php');
+            include('/srv/www/'.$Folder.'/applications/vfcom/utils/renameforum.php');
 
             if ($Sender->Form->ErrorCount() == 0) {
                $Sender->StatusMessage = Translate("The forum was renamed successfully.");
@@ -181,6 +184,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $Sender->Title('Delete Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
       $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'chochy') > 0 ? 'chochy' : 'vanillaforums';
+      $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'chochy';
       
       $Session = Gdn::Session();
       $SiteID = ArrayValue(0, $EventArguments, '');
@@ -229,11 +233,11 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             // can use the conf file to determine some things.
             $SiteID = $Site->SiteID;
             $VFSQL = &$this->_GetDatabase()->SQL();
-            include('/srv/www/'.$Domain.'/applications/vfcom/utils/deleteforum.php');
+            include('/srv/www/'.$Folder.'/applications/vfcom/utils/deleteforum.php');
          }
          
          $this->_GetDatabase()->CloseConnection();
-         $Sender->Render('/srv/www/'.$Domain.'/applications/vfcom/views/manage/delete.php');
+         $Sender->Render('/srv/www/'.$Folder.'/applications/vfcom/views/manage/delete.php');
       }
    }
    
