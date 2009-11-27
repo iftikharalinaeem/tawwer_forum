@@ -12,6 +12,7 @@ if ($DirectoryHandle = opendir('/srv/www/subdomains')) {
 					 $Contents = str_replace(
 						  array(
 								"\$Configuration['EnabledPlugins']['GettingStarted'] = 'GettingStarted';\n",
+								"\$Configuration['EnabledPlugins']['vfoptions'] = 'vfoptions';\n",
 								"\$Configuration['EnabledPlugins']['downtime'] = 'downtime';\n",
 								"\$Configuration['EnabledPlugins']['CssThemes'] = 'cssthemes';\n",
 								"// EnabledPlugins",
@@ -19,6 +20,7 @@ if ($DirectoryHandle = opendir('/srv/www/subdomains')) {
 								"\$Configuration['Garden']['Theme'] = 'default';"
 						  ),
 						  array(
+								"",
 								"",
 								"",
 								"",
