@@ -347,6 +347,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          $Session = Gdn::Session();
          $UserID = $Session->UserID;
       }
+      return $UserID;
    }
    
    // Save the specified fields to the appropriate vf.com GDN_User row, as well
