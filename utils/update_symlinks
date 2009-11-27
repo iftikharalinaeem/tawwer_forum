@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for DIR in `ls -l /srv/www/subdomains`
+for DIR in `ls /srv/www/subdomains`
 do
 
 echo $DIR
