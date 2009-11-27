@@ -352,6 +352,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          ->Select('DatabaseName')
          ->From('Site')
          ->Where('AccountID', $VFAccountID)
+         ->Where('Path <>', '')
          ->Get();
 
       // Save to VF.com db.
