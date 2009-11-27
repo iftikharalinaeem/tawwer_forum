@@ -14,18 +14,22 @@ if ($DirectoryHandle = opendir('/srv/www/subdomains')) {
 					 $Contents = file_get_contents($File);
 					 $Contents = str_replace(
 						  array(
-								"// EnabledPlugins",
+								"\$Configuration['EnabledPlugins']['GettingStarted'] = 'GettingStarted';\n",
 								"\$Configuration['EnabledPlugins']['downtime'] = 'downtime';\n",
 								"\$Configuration['EnabledPlugins']['CssThemes'] = 'cssthemes';\n",
-								"\$Configuration['Garden']['Theme'] = 'vanillaforumscom';"
+								"// EnabledPlugins",
+								"\$Configuration['Garden']['Theme'] = 'vanillaforumscom';",
+								"\$Configuration['Garden']['Theme'] = 'default';"
 						  ),
 						  array(
+								"",
+								"",
+								"",
 								"// EnabledPlugins
-\$Configuration['EnabledPlugins']['GettingStarted'] = 'GettingStarted';",
-								"",
-								"",
+\$Configuration['EnabledPlugins']['GettingStarted'] = 'GettingStarted';
+\$Configuration['EnabledPlugins']['vfoptions'] = 'vfoptions';",
+								"\$Configuration['Garden']['Theme'] = 'vfcom';",
 								"\$Configuration['Garden']['Theme'] = 'vfcom';"
-								
 						  ),
 						  $Contents
 					 );
