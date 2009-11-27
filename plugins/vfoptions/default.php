@@ -297,7 +297,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $UserID = ArrayValue('UserID', $Fields, -1);
       if ($UserID == -1)
          $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
-
+         
       $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
       $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
       $Email = ArrayValue('Email', $Fields);
@@ -341,7 +341,12 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    private function _GetUserIDByName($Name) {
       $UserModel = Gdn::UserModel();
       $User = $UserModel->Get($Name);
-      return (is_object($User) && property_exists($User, 'UserID')) ? $User->UserID : -1;
+      $UserID = (is_object($User) && property_exists($User, 'UserID')) ? $User->UserID : -1;
+      // If the user id still isn't defined, assume that they are editing their own stuff, and get it from the session.
+      if ($UserID == -1) {
+         $Session = Gdn::Session();
+         $UserID = $Session->UserID;
+      }
    }
    
    // Save the specified fields to the appropriate vf.com GDN_User row, as well
