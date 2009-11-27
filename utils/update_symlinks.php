@@ -5,13 +5,16 @@
 */
 
 function RemoveSymLink($Link) {
-	 if (file_exists($Link))
+	 if (file_exists($Link)) {
+		  echo '/bin/rm "'.$Link.'"'."\n";
  		  exec('/bin/rm "'.$Link.'"');
+	 }
 }
 function CreateSymLink($Folder, $LinkSuffix, $AltSuffix = '') {
 	 if ($AltSuffix == '')
 		  $AltSuffix = $LinkSuffix;
 		  
+	 echo('/bin/ln -s "/srv/www/misc'.$LinkSuffix.'" "'.$Folder.$AltSuffix.'"'."\n");
 	 exec('/bin/ln -s "/srv/www/misc'.$LinkSuffix.'" "'.$Folder.$AltSuffix.'"');
 }
 
@@ -23,10 +26,13 @@ if ($DirectoryHandle = opendir('/srv/www/subdomains')) {
 				
 				// Delete existing symlinks first
 				// WARNING: Do not use a trailing slash on symlinked folders when rm'ing, or it will remove the source!
-				RemoveSymLink($Folder.'/plugins/downtime');
+				RemoveSymLink($Folder.'/plugins/GettingStarted');
 				RemoveSymLink($Folder.'/plugins/googleadsense');
-				RemoveSymLink($Folder.'/themes/default');
+				RemoveSymLink($Folder.'/plugins/vfoptions');
+				RemoveSymLink($Folder.'/plugins/downtime');
 				RemoveSymLink($Folder.'/themes/vanillaforumscom');
+				RemoveSymLink($Folder.'/themes/vfcom');
+				RemoveSymLink($Folder.'/themes/default');
 				
 				// Add correct symlinks
 				CreateSymLink($Folder, '/plugins/GettingStarted');
