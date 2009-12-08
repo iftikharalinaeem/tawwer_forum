@@ -36,7 +36,7 @@
 		  VirtualDocumentRoot /srv/www/vhosts/%0/
 		  VirtualScriptAlias /srv/www/vhosts/%0/
 		  <IfModule mod_rewrite.c>
-					 RewriteBase /
+					 # RewriteBase /
 					 RewriteEngine On
 					 RewriteCond %{REQUEST_FILENAME} !-d
 					 RewriteCond %{REQUEST_FILENAME} !-f
