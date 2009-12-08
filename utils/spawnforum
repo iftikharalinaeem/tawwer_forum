@@ -6,7 +6,8 @@
 PATH=/srv/www/vhosts/${1}/
 SOURCE=/srv/www/vanilla_source/
 PLUGINS=/srv/www/misc/plugins/
-THEMES=/srv/www/misc/themes/	
+THEMES=/srv/www/misc/themes/
+UTILS=/srv/www/misc/utils/
    
 echo "Creating new vhost: ${PATH}"
 
@@ -59,6 +60,7 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${SOURCE}conf/locale.php" "${PATH}conf/locale.php"
     /bin/ln -s "${SOURCE}js" "${PATH}js"
     /bin/ln -s "${SOURCE}library" "${PATH}library"
+    /bin/ln -s "${UTILS}.htaccess" "${PATH}.htaccess"
     /bin/ln -s "${SOURCE}bootstrap.php" "${PATH}bootstrap.php"
     # End Misc
     
