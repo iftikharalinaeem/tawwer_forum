@@ -12,10 +12,10 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['VanillaForums.com'] = array(
-   'Name' => 'VanillaForums.com',
-   'Description' => "The VanillaForums.com theme.",
+   'Name' => 'Vanilla',
+   'Description' => "The default theme for Vanilla.",
    'Version' => '1.0',
    'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@lussumo.com',
-   'AuthorUrl' => 'http://lussumo.com'
+   'AuthorEmail' => 'mark@vanillaforums.com',
+   'AuthorUrl' => 'http://markosullivan.ca'
 );
