@@ -3,7 +3,7 @@
         ServerName vanilladev.com
 		  ServerAlias www.vanilladev.com
 		  DocumentRoot /srv/www/vanilladev/
-		  <Directory /srv/www/vanilladev/
+		  <Directory /srv/www/vanilladev/>
 					 Options FollowSymLinks MultiViews
 					 AllowOverride All
 					 AuthUserFile /home/mark/.htpasswd                                                                                                                                                       
