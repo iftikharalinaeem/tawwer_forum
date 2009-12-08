@@ -33,6 +33,10 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       
       // Remove the addons menu items
       $Menu->RemoveGroup('Add-ons');
+      
+      // Add the "Appearance" menu group & items
+      $Menu->AddItem('Appearance', 'Appearance');
+      $Menu->AddLink('Appearance', 'Themes', 'settings/themes', 'Garden.Themes.Manage');
    }
    
    // Don't let the users access applications, plugins, or themes
@@ -40,10 +44,9 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       if (
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
-         || strcasecmp($Sender->RequestMethod, 'themes') == 0
       ) Redirect($Sender->Routes['DefaultPermission']);
    }
-   
+
    // "My Forums" mgmt screen
    public function PluginController_MyForums_Create(&$Sender, $EventArguments) {
       $Sender->Title('My Forums');
@@ -237,7 +240,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          }
          
          $this->_GetDatabase()->CloseConnection();
-         $Sender->Render('/srv/www/'.$Folder.'/applications/vfcom/views/manage/delete.php');
+         $Sender->Render($PathPlugins . DS . 'vfoptions' . DS . 'views' . DS . 'deleteforum.php');
       }
    }
    
