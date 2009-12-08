@@ -140,9 +140,13 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'permission.php');
       } else {
          $Sender->Form = new Gdn_Form();
+         $Parts = explode('.', $Site->Name);
+         $Name = array_shift($Parts);
+         $Sender->HostingDomain = implode('.', $Parts);
+
          // Assign the site name from the db if the page has not yet been posted back
          if (!$Sender->Form->AuthenticatedPostback()) {
-            $Sender->Form->SetFormValue('Name', $Site->Name);
+            $Sender->Form->SetFormValue('Name', $Name);
          } else {
             // $Form - so we can add errors to it if they are encountered
             $Form = &$Sender->Form;
