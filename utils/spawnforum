@@ -1,14 +1,14 @@
 #!/bin/sh
-# Generates a new forum structure in /srv/www/subdomains/
-# This script assumes 1 argument is passed: the name of the subdomain to create.
+# Generates a new forum structure in /srv/www/vhosts/
+# This script assumes 1 argument is passed: the name of the vhost to create.
 
 # Variables
-PATH=/srv/www/subdomains/${1}/
+PATH=/srv/www/vhosts/${1}/
 SOURCE=/srv/www/vanilla_source/
 PLUGINS=/srv/www/misc/plugins/
 THEMES=/srv/www/misc/themes/	
    
-echo "Creating new subdomain: ${PATH}"
+echo "Creating new vhost: ${PATH}"
 
 # Don't do anything if the directory already exists
 if [ ! -d "$PATH" ]; then
