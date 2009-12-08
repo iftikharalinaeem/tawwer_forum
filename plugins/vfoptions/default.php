@@ -92,16 +92,16 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             // $User - the user creating the forum (FALSE if creating a new user)
             $User = $VFSQL->Select()->From('User')->Where('UserID', $UserID)->Get()->FirstRow();
             
-            // Depending on the domain of the forum this plugin resides in, use a different hosting domain & codebase (chochy is for testing)
-            $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'chochy') > 0 ? 'chochy' : 'vanillaforums';
-            $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'chochy';
+            // Depending on the domain of the forum this plugin resides in, use a different hosting domain & codebase (vanilladev is for testing)
+            $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforums';
+            $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'vanilladev';
 
             // $VanillaForumsPath - The path to the main VanillaForums.com garden installation (Not required, Defaults to /srv/www/vanillaforumscom)
             $VanillaForumsPath = '/srv/www/'.$Folder;
             // $HostingDomain - the domain that the new forum will be hosted on (Not required, Defaults to .vanillaforums.com)
             $HostingDomain = '.'.$Domain.'.com';
             // $SpawnForum - The path to the spawn forum script (Not required, Defaults to /srv/www/spawnforum)
-            $SpawnForum = '/srv/www/misc/utils/'.($Domain == 'chochy' ? 'chochy' : '').'spawnforum';
+            $SpawnForum = '/srv/www/misc/utils/spawnforum';
             include('/srv/www/'.$Folder.'/applications/vfcom/utils/createforum.php');
 
             if ($Form->ErrorCount() == 0) {
@@ -154,9 +154,9 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             // $Site - the old site record
             // (loaded above)
             
-            // Depending on the domain of the forum this plugin resides in, use a different hosting domain & codebase (chochy is for testing)
-            $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'chochy') > 0 ? 'chochy' : 'vanillaforums';
-            $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'chochy';
+            // Depending on the domain of the forum this plugin resides in, use a different hosting domain & codebase (vanilladev is for testing)
+            $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforums';
+            $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'vanilladev';
 
             // $VanillaForumsPath - The path to the main VanillaForums.com garden installation (Not required, Defaults to /srv/www/vanillaforumscom)
             $VanillaForumsPath = '/srv/www/'.$Folder;
@@ -186,8 +186,8 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    public function PluginController_DeleteForum_Create(&$Sender, $EventArguments) {
       $Sender->Title('Delete Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
-      $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'chochy') > 0 ? 'chochy' : 'vanillaforums';
-      $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'chochy';
+      $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforums';
+      $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'vanilladev';
       
       $Session = Gdn::Session();
       $SiteID = ArrayValue(0, $EventArguments, '');
@@ -331,8 +331,8 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    private $_Database = FALSE;
    private function _GetDatabase() {
       if (!$this->_Database) {
-         // Depending on the domain of the forum this plugin resides in, use a different database (chochy is for testing)
-         $DbName = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'chochy') > 0 ? 'chochy' : 'vanillaforumscom';
+         // Depending on the domain of the forum this plugin resides in, use a different database (vanilladev is for testing)
+         $DbName = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforumscom';
 
          $this->_Database = new Gdn_Database(array(
             'Name' => $DbName,
