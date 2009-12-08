@@ -235,11 +235,11 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             // can use the conf file to determine some things.
             $SiteID = $Site->SiteID;
             $VFSQL = &$this->_GetDatabase()->SQL();
-            include('/srv/www/misc/plugins/vfoptions/views/deleteforum.php');
+            include('/srv/www/'.$Folder.'/applications/vfcom/utils/deleteforum.php');
          }
          
          $this->_GetDatabase()->CloseConnection();
-         $Sender->Render($View);
+         $Sender->Render('/srv/www/misc/plugins/vfoptions/views/deleteforum.php');
       }
    }
    
