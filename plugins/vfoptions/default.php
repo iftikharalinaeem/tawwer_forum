@@ -118,7 +118,6 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    public function PluginController_RenameForum_Create(&$Sender, $EventArguments) {
       $Sender->Title('Rename Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
-      $PathPlugins = PATH_PLUGINS;
       
       $Session = Gdn::Session();
       $SiteID = ArrayValue(0, $EventArguments, '');
@@ -170,15 +169,14 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             
                // If we are in that forum right now, Redirect to the new forum
                // domain, and make sure that the view is loaded properly
-               if ($SiteID == Gdn::Config('VanillaForums.SiteID', -1)) {
+               if ($SiteID == Gdn::Config('VanillaForums.SiteID', -1))
                   $Sender->RedirectUrl = 'http://'.$Subdomain.'.'.$Domain.'.com/plugin/myforums';
-                  $PathPlugins = '/srv/www/subdomains/'.$Subdomain.'/plugins';
-               }
+
             }
          }
          
          $this->_GetDatabase()->CloseConnection();
-         $Sender->Render($PathPlugins . DS . 'vfoptions' . DS . 'views' . DS . 'renameforum.php');
+         $Sender->Render('/srv/www/misc/plugins/vfoptions/views/renameforum.php');
       }
    }
 
@@ -227,20 +225,21 @@ class VFOptionsPlugin implements Gdn_IPlugin {
                   ->FirstRow();
                
                // If the user doesn't own any other forums, send them back out to the homepage
-               if (!$NewSite)
+               if (!$NewSite) {
                   $Sender->RedirectUrl = 'http://'.$Domain.'.com';
-               else
+               } else {
                   $Sender->RedirectUrl = 'http://'.$NewSite->Name.'.'.$Domain.'.com/plugin/myforums';
+               }
             }
             // We delete the forum *after* the redirects have been defined so we
             // can use the conf file to determine some things.
             $SiteID = $Site->SiteID;
             $VFSQL = &$this->_GetDatabase()->SQL();
-            include('/srv/www/'.$Folder.'/applications/vfcom/utils/deleteforum.php');
+            include('/srv/www/misc/plugins/vfoptions/views/deleteforum.php');
          }
          
          $this->_GetDatabase()->CloseConnection();
-         $Sender->Render($PathPlugins . DS . 'vfoptions' . DS . 'views' . DS . 'deleteforum.php');
+         $Sender->Render($View);
       }
    }
    
