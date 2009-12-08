@@ -59,7 +59,6 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${SOURCE}conf/locale.php" "${PATH}conf/locale.php"
     /bin/ln -s "${SOURCE}js" "${PATH}js"
     /bin/ln -s "${SOURCE}library" "${PATH}library"
-    /bin/ln -s "${SOURCE}.htaccess" "${PATH}.htaccess"
     /bin/ln -s "${SOURCE}bootstrap.php" "${PATH}bootstrap.php"
     # End Misc
     
