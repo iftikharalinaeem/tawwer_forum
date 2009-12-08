@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$HostingDomain = strpos(Gdn::Config('Garden.Domain'), 'chochy') > 0 ? '.chochy.com' : '.vanillaforums.com';
+$HostingDomain = strpos(Gdn::Config('Garden.Domain'), 'vanilladev') > 0 ? '.vanilladev.com' : '.vanillaforums.com';
 ?>
 <h1><?php echo Gdn::Translate('My Forums'); ?></h1>
 <div class="FilterMenu"><?php echo Anchor('Create a New Forum', 'garden/plugin/createforum', 'CreateForum Button Popup'); ?></div>
@@ -22,7 +22,7 @@ $HostingDomain = strpos(Gdn::Config('Garden.Domain'), 'chochy') > 0 ? '.chochy.c
          <td class="Info nowrap">
             <strong><?php echo $Domain; ?></strong>
             <div>
-               <?php echo Anchor('Visit', 'http://'.$Domain); ?>
+               <?php echo Anchor('Visit', 'http://'.$Domain.'/plugin/myforums'); ?>
                <span>|</span>
                <?php echo Anchor('Rename', '/plugin/renameforum/'.$Site->SiteID.'/'.$Session->TransientKey(), 'RenameSite Popup'); ?>
                <span>|</span>
