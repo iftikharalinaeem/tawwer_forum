@@ -331,11 +331,8 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    private $_Database = FALSE;
    private function _GetDatabase() {
       if (!$this->_Database) {
-         // Depending on the domain of the forum this plugin resides in, use a different database (vanilladev is for testing)
-         $DbName = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforumscom';
-
          $this->_Database = new Gdn_Database(array(
-            'Name' => $DbName,
+            'Name' => 'vanillaforumscom',
             'Host' => Gdn::Config('Database.Host'),
             'User' => Gdn::Config('Database.User'),
             'Password' => Gdn::Config('Database.Password')
