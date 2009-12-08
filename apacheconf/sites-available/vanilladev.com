@@ -24,6 +24,7 @@
 		  ServerAlias *
 		  UseCanonicalName Off
 		  LogFormat "%V %h %l %u %t \"%r\" %s %b" vcommon
+		  LogLevel debug
 		  ErrorLog /srv/log/vhosts/error.log
 		  CustomLog /srv/log/vhosts/access.log vcommon
 		  VirtualDocumentRoot /srv/www/vhosts/%0/
