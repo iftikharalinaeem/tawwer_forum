@@ -18,12 +18,10 @@
         LogLevel warn
         CustomLog /srv/log/vanilladev/access.log combined
         ServerSignature Off
-		  #<IfModule mod_rewrite.c>
-			#		 RewriteEngine On
-			#		 RewriteCond %{REQUEST_FILENAME} !-d
-			#		 RewriteCond %{REQUEST_FILENAME} !-f
-			#		 RewriteRule ^(.*)$ index.php/$1 [QSA,L]
-		  #</IfModule>
+		  # RewriteEngine On
+		  # RewriteCond %{REQUEST_FILENAME} !-d
+		  # RewriteCond %{REQUEST_FILENAME} !-f
+		  # RewriteRule ^(.*)$ index.php/$1 [QSA,L]
 </VirtualHost>
 
 <VirtualHost *:80>
@@ -35,11 +33,8 @@
 		  CustomLog /srv/log/vhosts/access.log vcommon
 		  VirtualDocumentRoot /srv/www/vhosts/%0/
 		  VirtualScriptAlias /srv/www/vhosts/%0/
-		  <IfModule mod_rewrite.c>
-					 # RewriteBase /
-					 RewriteEngine On
-					 RewriteCond %{REQUEST_FILENAME} !-d
-					 RewriteCond %{REQUEST_FILENAME} !-f
-					 RewriteRule ^(.*)$ index.php/$1 [QSA,L]
-		  </IfModule>
+		  RewriteEngine On
+		  RewriteCond %{REQUEST_FILENAME} !-d
+		  RewriteCond %{REQUEST_FILENAME} !-f
+		  RewriteRule ^(.*)$ index.php/$1 [QSA,L]
 </VirtualHost>
