@@ -13,7 +13,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 $ThemeInfo['VanillaForums.com'] = array(
    'Name' => 'Vanilla',
-   'Description' => "The default theme for Vanilla.",
+   'Description' => "A custom theme for VanillaForums.com.",
    'Version' => '1.0',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',

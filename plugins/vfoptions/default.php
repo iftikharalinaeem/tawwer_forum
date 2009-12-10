@@ -67,8 +67,13 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    // "Premium Upgrades" mgmt screen
    public function PluginController_Upgrades_Create(&$Sender, $EventArguments) {
       $Sender->Title('Premium Upgrades');
+      $Sender->AddCssFile('/plugins/vfoptions/style.css');
       $Sender->AddSideMenu('garden/plugin/upgrades');
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'upgrades.php');
+   }
+   
+   public function PluginController_MoreInfo_Create(&$Sender, $EventArguments) {
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'moreinfo.php');
    }
    
    // Create a New Forum screen
