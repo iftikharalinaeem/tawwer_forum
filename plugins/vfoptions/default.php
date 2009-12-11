@@ -73,6 +73,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    }
    
    public function PluginController_MoreInfo_Create(&$Sender, $EventArguments) {
+      $Sender->Form = new Gdn_Form();
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'moreinfo.php');
    }
    

@@ -7,7 +7,7 @@
       <tbody>
          <tr>
             <td class="FirstCol">
-               <h4>Add a Domain</h4>
+               <h4>Custom Domain Name</h4>
                <em>Customize your forum's address.</em>
                <div class="Price">
                   <strong>$2</strong>
@@ -16,8 +16,8 @@
                </div>
                <div class="Buttons">
                   <?php
-                  echo Anchor('Learn More', '/plugin/moreinfo/addadomain', 'Popup Button');
-                  echo Anchor('Buy Now', '/plugin/moreinfo/addadomain', 'Popup Button');
+                  echo Anchor('Learn More', '/plugin/moreinfo/customdomain', 'Popup Button');
+                  echo Anchor('Buy Now', '/plugin/moreinfo/customdomain', 'Popup Button');
                   ?>
                </div>
             </td>
@@ -37,21 +37,6 @@
                </div>
             </td>
             <td class="LastCol">
-               <h4>Single Sign-on</h4>
-               <em>Let your existing users access the forum without signing in or registering again.</em>
-               <div class="Price">
-                  <strong>$49</strong>
-                  per month
-                  <span>$1.61 per day</span>
-               </div>
-               <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/moreinfo/singlesignon', 'Popup Button'); ?>
-                  Coming Soon!
-               </div>
-            </td>
-         </tr>
-         <tr>
-            <td class="FirstCol">
                <h4>Custom CSS</h4>
                <em>Have complete control over the appearance of your forum.</em>
                <div class="Price">
@@ -64,7 +49,9 @@
                   Coming Soon!
                </div>
             </td>
-            <td class="MiddleCol">
+         </tr>
+         <tr>
+            <td class="FirstCol">
                <h4>File Uploading</h4>
                <em>Let your users upload files with their discussions.</em>
                <div class="PriceOptions">
@@ -86,6 +73,19 @@
                   Coming Soon!
                </div>
             </td>
+            <td class="MiddleCol">
+               <h4>Single Sign-on</h4>
+               <em>Let your existing users access the forum without signing in or registering again.</em>
+               <div class="Price">
+                  <strong>$49</strong>
+                  per month
+                  <span>$1.61 per day</span>
+               </div>
+               <div class="Buttons">
+                  <?php echo Anchor('Learn More', '/plugin/moreinfo/singlesignon', 'Popup Button'); ?>
+                  Coming Soon!
+               </div>
+            </td>
             <td class="LastCol">
                <h4>Data Transfer</h4>
                <em>Get your existing data into our system, or take it out and put it elsewhere.</em>
@@ -97,6 +97,22 @@
                   Coming Soon!
                </div>
             </td>
+         </tr>
+         <tr>
+            <td class="FirstCol">
+               <h4>Daily Backups</h4>
+               <em>Rest easy knowing that your data is backed up and ready to be restored should the need arise.</em>
+               <div class="Price">
+                  <strong>$5</strong>
+                  per month
+                  <span>$0.16 per day</span>
+               </div>
+               <div class="Buttons">
+                  <?php echo Anchor('Learn More', '/plugin/moreinfo/dailybackups', 'Popup Button'); ?>
+                  Coming Soon!
+               </div>
+            </td>
+            <td class="EmptyCol" colspan="2">&nbsp;</td>
          </tr>
       </tbody>
    </table>

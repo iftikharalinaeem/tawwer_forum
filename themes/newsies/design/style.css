@@ -24,7 +24,7 @@ Welcome to the Generic Style CSS File! Some things you should know:
 /* ============================================== General Styles & Typography */
 body {
    color: #000;
-   font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
+   font-family: Georgia, serif;
    background: #fff;
    margin: 0;
    padding: 0;
@@ -32,7 +32,7 @@ body {
    font-size: small;
 }
 #Body {
-   width: 960px;
+   width: 780px;
    text-align: left;
    margin: 0 auto;
 }
@@ -41,7 +41,7 @@ body {
 }
 #Content {
    float: left;
-   width: 680px;
+   width: 550px;
    margin: 0 0 40px;
 }
 .Hidden {
@@ -57,43 +57,38 @@ body {
 	text-align: right;
 }
 h1, h2, h3, h4, h5, h6 {
-   color: #000;
-   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
    font-weight: normal;
    margin: 0;
 }
 p {
    margin: 0.5em 0 0 0;
    line-height: 1.6em;
-   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
 }
 h1, h2 {
    border-bottom:1px solid #bbb;
    font-size:140%;
-   font-weight:bold;
    margin-bottom:10px;
+	padding: 0 0 4px 6px;
 }
 h3 {
    font-size:140%;
 }
 h4 {
    font-size: 120%;
-   color: #6C6C6C;
 }
 h5 {
    font-size: 120%;
-   color: #6C6C6C;
 }
 a,
 a:link,
 a:visited,
 a:active {
    text-decoration: none;
-   color: #3B5998;
+   color: #2786c2;
 }
 a:hover {
-   text-decoration: underline;
-   color: #3B5998;
+   text-decoration: none;
+   color: #ff0084;
 }
 input.DateBox,
 input.InputBox,
@@ -106,14 +101,14 @@ textarea {
    margin: 0;
    width: 250px;
    border: 1px solid #ccc;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
+	-moz-border-radius: 1px;
+	-webkit-border-radius: 1px;
 }
 textarea.TextBox {
-   width: 500px;
+   width: 480px;
    height: 100px;
    min-height: 100px;
-   max-height: 500px;
+   max-height: 480px;
 }
 #Popup textarea.TextBox {
    width: 465px;
@@ -127,7 +122,6 @@ input.SmallInput:focus,
 input.InputBox:focus,
 textarea:focus {
    background: #ffe;
-	border: 1px solid #aaa;
 }
 textarea {
    line-height: 128%;
@@ -139,27 +133,24 @@ select {
    margin: 0;
    padding: 3px;
    }
-.Button {
+.Button,
+a.Button {
    cursor: pointer;
    margin: 0;
-   font-family: 'lucida grande', Tahoma, 'Trebuchet MS', Arial, Verdana;
-   padding: 4px;
+   font-family: 'lucida grande', Tahoma, sans-serif;
    font-size: 11px;
+   padding: 4px 8px;
+   background: #44c7f4;
+   color: #fff;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   border: 1px solid #29447E;
-   background: url('header_highlight.png') center center no-repeat;
-   color: #fff;
-   text-shadow: 0 1px 0 #29447E;
    }
-a.Button {
-   color: #fff !important;
-}
 input.Button {
    font-weight: bold;
 }
 .Button:hover {
-   border: 1px solid #4976b6;
+   color: #fff;
+   background: #28bcef;
 }
 .Loading {
    height: 100px;
@@ -215,7 +206,6 @@ div.Messages ul li {
    color: #000 !important;
    padding: 0 !important;
    margin: 0 !important;
-	font-size: 120%;
    list-style-position: outside;
 }
 div.Errors ul {
@@ -251,11 +241,9 @@ div.Errors ul li {
 div.Info {
    font-size: 13px;
    background: #fafafa;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-	background-color:#EDEFF4;
-	border:1px solid #D4DAE8;
-	color: #333;
+   border: 1px solid #eee;
+   color: #888;
+   -moz-border-radius: 4px;
    padding: 6px;
    margin: 0 0 10px;
 }
@@ -271,16 +259,18 @@ div.DismissMessage p {
    margin: 2px 0;
 }
 div.DismissMessage a.Dismiss {
-	font-family: 'lucida console', arial;
    float: right;
-	font-size: 22px;
-	font-weight: bold;
    line-height: 120%;
    color: #999;
+	padding: 2px 4px;
 }
 div.DismissMessage a.Dismiss:hover {
-   color: #555;
-	text-decoration: none;
+   background: #fafafa;
+   border: 1px solid #ccc;
+   color: #333;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	padding: 1px 3px;
 }
 /* Note: The close class is used on the "close" anchor in popups. */
 a.Close {
@@ -293,7 +283,6 @@ a.Close {
 }
 a.Close:hover {
 	color: #333;
-	text-decoration: none;
 }
 /* Note: MorePager is related to the /applications/garden/modules/MorePagerModule. */
 .MorePager {
@@ -309,6 +298,7 @@ a.Close:hover {
    text-align: right;
 }
 .MorePager a:hover {
+   color: #2786c2 !important;
    text-decoration: underline;
 }
 #PagerLess {
@@ -326,38 +316,40 @@ tr#PagerMore td {
    margin-bottom: 1px;
 }
 .NumberedPager {
-   margin: 1px 0 0;
+	background: #44c7f4;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	padding: 4px 6px;
+	font-family: 'lucida grande', arial;
+   margin: 6px 0 0;
 	text-align: right;
 	font-weight: bold;
-	font-size: 120%;
+	font-size: 11px;
+	line-height: 12px;
 }
 #PagerBefore {
    margin: 1px 0;
+}
+.NumberedPager a {
+	color: #fff;
+	padding: 4px 0;
+}
+.NumberedPager a:hover {
+	background: #28bcef;
 }
 .NumberedPager a,
 .NumberedPager span {
 	padding: 0 4px;
 }
-.NumberedPager a:hover {
-	background: #3B5998;
-	color: #fff;
-	text-decoration: none;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-}
 .NumberedPager span,
 .NumberedPager a.Highlight {
-	background: none;
-	text-decoration: none;
-	color: #777;
+	color: #ddd;
 }
 .NumberedPager a.Next,
 .NumberedPager span.Next,
 .NumberedPager a.Previous,
 .NumberedPager span.Previous {
-	font-family: 'lucida grande';
-	font-size: 120%;
-	line-height: 10px;
+	font-size: 16px;
 }
 .NumberedPager a.Next,
 .NumberedPager span.Next {
@@ -367,56 +359,44 @@ tr#PagerMore td {
 .NumberedPager span.Previous {
 	margin-right: 6px;
 }
-.NumberedPager a.Next:hover,
-.NumberedPager a.Previous:hover {
-	background: none;
-	color: #3B5998;
-}
 
 
 /* =================================================================== Header */
 #Head {
-   background: url('header_bg.png') center center repeat-x;
    padding: 0;
-   text-align: right;
-   height: 40px;
-}
-div.Menu {
-   text-align: right;
-   width: 960px;
-   margin: 0 auto;
-	background: url('header_highlight.png') center center no-repeat;
-	height: 40px;
 }
 body #Head h1 {
    display: block;
    font-weight: bold;
    margin: 0;
-   padding: 11px 7px 0 0;
+   padding: 21px 7px 0 0;
    border: 0;
-   float: left;
    line-height: 1;
 }
 #Head h1 a span {
-	/* font-family: "lucida grande"; */
-   font-size: 24px;
-   /* color:#DFEFF9; */
-   color:#fff;
-   text-shadow:0 1px 0 #3B5998;
+	font-weight: normal;
+   font-size: 50px;
+	color: #000;
 }
-#Head form {
+#Head h1 a:hover span {
+   color:#000;
+}
+#Search {
+	position: absolute;
    float: right;
-   width: 250px;
+	top: 70px;
+   width: 197px;
    background: #fff;
    padding: 0;
-   margin: 6px 0 0;
+   margin: 15px 0 0 579px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 }
-#Head form input.InputBox {
-   width: 204px;
+#Search input.InputBox {
+	font-family: 'lucida grande', arial;
+   width: 154px;
    border: 0;
-   padding: 4px 2px 4px 0;
+   padding: 3px 2px 2px 3px;
    background: #fff;
    margin: 0;
    -moz-border-radius-topleft: 2px;
@@ -424,41 +404,47 @@ body #Head h1 {
    -webkit-border-top-left-radius: 2px;
    -webkit-border-bottom-left-radius: 2px;
    color: #969696;
-   font-size: 13px;
+   font-size: 11px;
 }
-#Head form input.Button,
-#Head form input.Button:hover {
+#Search input.Button {
    border: 0;
    width: 38px;
-   height: 26px;
-   background: #DFEFF9;
-   color: #02455B;
-   padding: 3px 0 4px;
+   height: 20px;
+   background: #E9F9FF;
+   color: #2786C2;
+   padding: 3px 0 3px;
    margin: 0;
-	font-family: 'lucida grande';
    -moz-border-radius: 0;
    -webkit-border-radius: 0;
    -moz-border-radius-topright: 2px;
    -moz-border-radius-bottomright: 2px;
    -webkit-border-top-right-radius: 2px;
    -webkit-border-bottom-right-radius: 2px;
-	text-shadow: none;
+}
+
+
+/* ================================================================ Main Menu */
+div.Menu {
+	text-align: left;
+   width: 780px;
+   margin: 0 auto;
 }
 ul#Menu {
-   float: left;
-   margin: 0 auto;
-   padding: 12px 0 0 10px;
+	background: #44c7f4;
+   margin: 10px auto 0;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
 }
 #Menu ul,
 #Menu li.Active {
-   background: #31599e;
+   background: #44c7f4;
 }
 #Menu a,
 #Menu li.Active a {
    color: #fff;
 }
 #Menu a:hover {
-   background: #21498e;
+   background: #28bcef;
 }
 #Menu a:hover,
 #Menu li.NonTab a:hover {
@@ -469,10 +455,10 @@ ul#Menu {
 #Menu li.Active a span,
 #Menu li.Highlight a:hover span {
    background: #f2fcff;
-   color: #21498e;
+   color: #299fc7;
 }
 #Menu * {
-   font-family: "lucida grande", tahoma;
+   font-family: 'lucida grande', tahoma, sans-serif;
 }
 #Menu {
    height: 28px;
@@ -550,7 +536,7 @@ ul#Menu {
    text-decoration: none;
    display: block;
    position: relative;
-   padding: 0 8px;
+   padding: 0 10px;
    white-space: nowrap;
    font-size: 11px;
    height: 28px;
@@ -564,8 +550,6 @@ ul#Menu {
 }
 #Menu li.NonTab,
 #Menu li.NonTab a {
-   background: transparent;
-   border: 0;
    font-weight: normal;
 }
 #Menu a span,
@@ -579,7 +563,6 @@ ul#Menu {
    line-height: 12px;
    font-weight: normal;
 }
-
 
 /* Option (dropdown) Menus
 
@@ -642,35 +625,28 @@ ul.Options ul li {
 }
 
 
+
+
 /* ======================================================== Panels / Sidebars */
 #Panel {
-   width: 250px;
+   width: 200px;
    float: right;
 }
 div.Box {
-   -moz-border-radius: 1px;
-   -webkit-border-radius: 1px;
-   background: #E1F0FF;
    color: #999;
-   padding: 6px 10px;
    margin: 0 0 10px;
 }
 div.Box h4 {
    font-size: 110%;
-   color: #324479;
-   font-weight: bold;
+	color: #000;
    margin: 0;
-   padding: 0 0 1px;
-   /* border-bottom: 1px solid #caf0fe; <-- This caused a 2px underline where it was above PanelInfo */
+   padding: 0 0 4px;
 }
 div.Box dl {
-   border-top: 1px solid #AABBCE;
-   border-bottom: 1px solid #AABBCE;
-   background: #F5FCFF;
+   border-top: 1px solid #ccc;
+   border-bottom: 1px solid #ccc;
    padding: 3px;
    overflow: hidden;
-	font-family: 'lucida grande';
-	font-size: 90%;
 }
 div.Box dl dt {
    float: left;
@@ -686,27 +662,12 @@ div.Box p {
    color: #555;
 }
 ul.PanelInfo li {
-	font-family: 'lucida grande';
-   background: #f5fcff;
-   border-bottom: 1px solid #cAdBeE;
-   padding: 2px 4px;
-   text-align: right;
-}
-ul.PanelInfo {
-   border-top: 1px solid #cAdBeE;
-	border-bottom: 0;
+   padding: 4px 0;
 }
 ul.PanelInfo li strong {
    font-weight: normal;
-   text-align: left;
-   margin-right: 12px;
+   padding-right: 10px;
    font-weight: normal;
-}
-ul.PanelInfo li a {
-   float: left;
-}
-ul.PanelInfo div.Meta {
-	font-family: 'lucida grande', tahoma;
 }
 ul.PanelInfo div.Meta span,
 ul.PanelInfo div.Meta strong {
@@ -726,24 +687,8 @@ ul.PanelInfo div.Meta strong {
 ul.PanelDiscussions li {
    text-align: left;
 }
-ul.PanelDiscussions li a {
-   float: none;
-}
-ul.PanelDiscussions li strong {
-   display: block;
-}
-ul.PanelInfo li.Active {
-   background: #fff /* Panel Selected Background Color */;
-}
-body.Profile ul.PanelInfo {
-   border-bottom: 1px solid #caf0fe;
-}
-body.Profile ul.PanelInfo li {
-	border-bottom: 0;
-	text-align: left;
-}
-body.Profile ul.PanelInfo li a {
-   float: none;
+ul.PanelDiscussions strong {
+	display: block;
 }
 
 
@@ -783,11 +728,14 @@ body.Entry #Register,
 body.Entry #Handshake {
    text-align: left;
    float: left;
-   background: #E1F0FF /* Panel Background Color */;
+   background: #E9F9FF /* Panel Background Color */;
    -moz-border-radius: 1px;
    -webkit-border-radius: 2px;
    padding: 10px;
    margin: 0 0 15px;
+}
+body.Entry #Register {
+	max-width: 354px;
 }
 body.Entry #SignIn,
 body.Entry #Password {
@@ -798,8 +746,8 @@ body.Entry #Password p {
    overflow: hidden;
 }
 body.Entry #Content h1 {
-   border: 0;
-   color: #324479;
+   border-bottom:1px solid #CAF0FE;
+   color: #2786C2 /* Panel Font Color */;
    font-size:110%;
    font-weight:bold;
    margin: 0;
@@ -843,12 +791,10 @@ ul.Activities {
 	margin-bottom: 6px;
 }
 ul.Activities li {
-	font-family: 'lucida grande';
    border-bottom: 1px solid #ddd;
    padding: 8px 0 6px;
    color: #454545;
    clear: left;
-   font-size: 105%;
 }
 ul.Activities div span {
    padding: 0 6px 0 0;
@@ -888,7 +834,6 @@ ul.Activities li a.Delete {
    width: auto;
    padding: 5px;
    margin: 0 1px 0 0;
-	font-family: 'lucida grande', arial;
    font-size: 11px;
    font-weight: bold;
    -moz-border-radius: 2px;
@@ -902,19 +847,18 @@ ul.Activities li a.Delete:hover {
    color: #333;
    border: 1px solid #888;
    background: url('button_bg2.png') repeat-x center left #f8f8f8;
-	text-decoration: none;
 }
 ul.Activities li div.Story {
+   border: 1px solid #eee;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-	background-color:#EDEFF4;
-	border:1px solid #D4DAE8;
-	margin: 4px 0;
+   background: #fafafa;
+   margin: 4px 0;
    padding: 4px 6px;
    line-height: 130%;
-	font-size: 110%;
-   color: #333;
+   color: #2b3033;
    display: block;
+	font-size: 110%;
 }
 ul.Activities li.PictureChange div.Story {
 	border: 0;
@@ -947,11 +891,14 @@ ul.Activities ul.Comments {
    clear: left;
 }
 ul.Activities ul.Comments li {
-   background: #E1F0FF /* Panel Background Color */;
+   background: #e9f9ff /* Panel Background Color */;
    margin-bottom: 1px;
    border-bottom: 0;
    padding: 6px;
    line-height: 1;
+}
+ul.Activities ul.Comments li * {
+	font-family: 'lucida grande', tahoma, sans-serif;
 }
 ul.Activities li.HasPhoto div {
    margin-left: 46px;
@@ -1014,7 +961,6 @@ ul.Activities li.CommentForm textarea.TextBox {
 	min-height: 40px;
    height: 40px;
    margin-bottom: 2px;
-	font-size: 14px;
 }
 body.Profile ul.Activities {
    margin-top: 10px;
@@ -1026,6 +972,70 @@ div.EmptyInfo {
 ul.Notifications {
    margin-top: 0;
    border: 0;
+}
+
+/* ================================================ DataList (Search Results) */
+body.Search h1 {
+   margin:0;
+}
+ul.DataList li {
+   margin: 0;
+   padding: 0 0 4px 0;
+   border-bottom: 1px solid #dbe3e6;
+}
+ul.DataList li li {
+   border: 0;
+   padding: 0;
+}
+ul.DataList,
+ul.DataList li ul {
+   list-style: none;
+   margin: 0;
+   padding: 0;
+}
+ul.DataList li ul li.Title a {
+   border: 1px solid #eee;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #fafafa;
+   margin: 4px 0;
+   padding: 2px 8px;
+   line-height: 130%;
+   color: #2b3033;
+   font-size: 105%;
+   display: block;
+}
+ul.DataList li ul li.Title strong {
+	display: block;
+   padding: 6px 0 0 6px;
+   margin: 0;
+   font-size: 110%;
+   font-weight: bold;
+}
+ul.DataList li ul li.Title strong a {
+   display: inline;
+   border: 0;
+   padding: 0;
+   margin: 0;
+   color: #2d7bb2 /* Body Link Font Color */;
+   background: none;
+}
+ul.DataList li ul li.Meta {
+   margin-left: 5px;
+   font-size: 80%;
+   color: #80828c /* Meta Label Font Color */;
+}
+ul.DataList li ul li.Meta span,
+ul.DataList li ul li.Meta span a,
+ul.DataList li ul li.Meta strong {
+   margin-right: 12px;
+}
+ul.DataList li ul li.Meta strong {
+   background: #ff0;
+   padding: 0 2px;
+}
+ul.DataList li ul li.Meta a {
+   color: #2b2d33;
 }
 
 /* ============================================================= Profile Page */
@@ -1081,7 +1091,7 @@ div.User h1 {
    -moz-border-radius-topright: 2px;
    -webkit-border-top-left-radius: 2px;
    -webkit-border-top-right-radius: 2px;
-   background: #E1F0FF;
+   background: #e9f9ff;
    margin: 0;
    padding: 8px 8px 0;
    color: #999;
@@ -1139,10 +1149,10 @@ ul.Tabs li {
 ul.Tabs {
    clear: left;
    display: block;
-   border-bottom: 1px solid #c1d0dF /* Panel Inlay Border Color */;
+   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
    padding: 10px 0 0 10px;
    margin: 0;
-   background: #E1F0FF /* Panel Background Color */;
+   background: #e9f9ff /* Panel Background Color */;
 }
 ul.Tabs li {
    padding: 5px 0;
@@ -1154,7 +1164,7 @@ ul.Tabs li {
    -webkit-border-top-right-radius: 3px;
 }
 ul.Tabs li.Active {
-   border: 1px solid #c1d0dF /* Panel Inlay Border Color */;
+   border: 1px solid #caf0fe /* Panel Inlay Border Color */;
    border-bottom: 0;
    background: #fff /* Panel Selected Background Color */;
 }
@@ -1168,7 +1178,7 @@ ul.Tabs li a:visited {
    -webkit-border-top-left-radius: 3px;
    -webkit-border-top-right-radius: 3px;
    display: inline;
-   background: #f3fcff /* Panel Inlay Background Color */;
+   background: #daf4fd /* Panel Inlay Background Color */;
    font-weight: bold;
    color: #2786C2 /* Panel Inlay Font Color */ !important;
    text-decoration: none;
@@ -1176,8 +1186,7 @@ ul.Tabs li a:visited {
    margin: 1px 0 0;
 }
 ul.Tabs li a:hover {
-	color: #fff !important;
-   background: #3B5998 /* Panel Inlay Background Color */;
+   background: #f3fcff /* Panel Inlay Background Color */;
 }
 ul.Tabs li.Active a {
    background: #fff /* Panel Selected Background Color */ !important;
@@ -1263,7 +1272,6 @@ div.Popup div.Messages {
    left: auto;
    z-index: auto;
 	margin: 10px 0 !important;
-	font-family: 'lucida grande';
 }
 div.Popup div.Messages ul {
 	display: block;
@@ -1300,7 +1308,7 @@ div.Popup div.Body {
   text-align: left;
   position: relative;
   padding: 0px;
-  background: #F2FBFF;
+  background: #fff;
   max-width: 500px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
@@ -1318,42 +1326,44 @@ div.Popup .Content form {
 div.Popup .Loading {
   text-align: center;
 }
+div.Popup h1,
+div.Popup h2 {
+	font-size:120%;
+	font-weight:bold;
+	margin-bottom: 0;
+	color: #fff;
+	background: #44C7F4;
+	border-bottom: 1px solid #3DB9E5;
+	text-shadow: none;
+	padding: 6px 9px 4px;
+}
 div.Popup .Footer {
-  background: #E1F0FF;
+  background: #E9F9FF;
   text-align: right;
   padding: 0 6px 2px 0;
-  border-top:1px solid #C0E7F5;
+  border-top:1px solid #CAF0FE;
   -moz-border-radius-bottomleft: 5px;
   -moz-border-radius-bottomright: 5px;
   -webkit-border-bottom-left-radius: 5px;
   -webkit-border-bottom-right-radius: 5px;
 }
-div.Popup h1,
-div.Popup h2 {
-	font-family: 'lucida grande';
-	font-size:120%;
-	font-weight:bold;
-	margin-bottom: 0;
-	color: #fff;
-	background: #5b79b8;
-	border-bottom: 1px solid #3b5998;
-	/* border-bottom: 1px solid #fff; */
-	text-shadow: none;
-	padding: 6px 9px 4px;
+div.Popup h3 {
+	font-size: 120%;
+	font-weight: bold;
+	padding: 20px 0 10px;
 }
 div.Popup p {
 	padding: 6px 10px 10px;
-	font-family: 'lucida grande';
 }
 div.Popup div.Legal * {
-	font-family: 'lucida grande';
+	font-family: 'lucida grande', tahoma, sans-serif;
 }
 div.Popup div.Legal p {
 	padding: 6px 0 10px;
 }
 div.Popup small {
-	font-family: 'lucida grande';
-	font-size: 80%;
+	font-family: 'lucida grande', tahoma, sans-serif;
+	font-size: 11px;
 }
 div.Popup form p {
 	padding: 0;
@@ -1407,21 +1417,21 @@ div.Legal strong {
    clear: both;
    text-align: center;
    margin: 2px 0;
-   font-family: 'lucida grande','helvetica neue',helvetica,arial,sans-serif;
    padding: 4px 9px;
    font-size: 13px;
-   color: #777;
+   color: #ddd;
    line-height: 1;
 }
+#Foot a {
+   color: #ccc;
+}
+#Foot a:hover {
+   color: #aaa;
+}
 #Foot div {
-	font-size: 11px;
-	width: 960px;
+	width: 780px;
 	border-top: 1px solid #ddd;
 	padding: 6px 0;
-	margin: auto;
-	font-family: 'lucida grande', tahoma;
+	margin: 20px auto 0;
 	text-align: left;
-}
-#Foot a {
-	color: #555;
 }
