@@ -14,6 +14,8 @@ else if ($About == 'fileuploading')
    echo 'File Uploading';
 else if ($About == 'datatransfer')
    echo 'Data Transfer';
+else if ($About == 'dailybackups')
+   echo 'Daily Backups';
 else 
    echo 'More Info?';
 ?></h1>

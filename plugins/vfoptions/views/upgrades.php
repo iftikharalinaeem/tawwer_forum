@@ -98,6 +98,7 @@
                </div>
             </td>
          </tr>
+         <!--
          <tr>
             <td class="FirstCol">
                <h4>Daily Backups</h4>
@@ -114,6 +115,7 @@
             </td>
             <td class="EmptyCol" colspan="2">&nbsp;</td>
          </tr>
+         -->
       </tbody>
    </table>
 </div>
