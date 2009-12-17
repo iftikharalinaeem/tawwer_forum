@@ -46,10 +46,9 @@
          <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
       </div>
       <div id="Foot">
-			<div>
-				Powered by <a href="http://vanillaforums.com"><span>Vanilla</span></a>
-				| Problems? support [at] vanillaforums [dot] com
-			</div>
+			<div><?php
+				printf(Gdn::Translate('Powered by %s'), '<a href="http://vanillaforums.com"><span>Vanilla</span></a>');
+			?></div>
 		</div>
    </div>
 	<?php $this->FireEvent('AfterBody'); ?>

@@ -30,9 +30,10 @@
          <div id="Content"><?php $this->RenderAsset('Content'); ?></div>
       </div>
       <div id="Foot">
-			<div><?php
-				printf(Gdn::Translate('Powered by %s'), '<a href="http://vanillaforums.com"><span>Vanilla</span></a>');
-			?></div>
+			<div>
+				Powered by <a href="http://vanillaforums.com"><span>Vanilla</span></a>
+				- Problems? <?php echo Format::Email('support@vanillaforums.com'); ?>
+			</div>
 		</div>
    </div>
 	<?php $this->FireEvent('AfterBody'); ?>

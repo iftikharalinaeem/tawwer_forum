@@ -173,7 +173,7 @@ mysql> show columns from GDN_User;
 
 insert into GDN_User
 (UserID, Name, Password, Email, DateInserted)
-select SQL_BIG_RESULT DISTINCT user_id, 'User_' + user_id, 'letmein', 'etsyuser_' + user_id + '@vanilladev.com', now()
-from forums_posts_threads
-where user_id <> 1
-order by user_id asc
+select SQL_BIG_RESULT DISTINCT InsertUserID, 'User_' + InsertUserID, 'letmein', 'etsyuser_' + InsertUserID + '@vanilladev.com', now()
+from GDN_Comment
+where InsertUserID <> 1
+order by InsertUserID asc

@@ -1,23 +1,6 @@
 .Upgrades td {
    min-width: 235px;
 }
-.Upgrades td:hover {
-   background: #F2FBFF;
-}
-.Upgrades td.EmptyCol:hover {
-   background: none;
-}
-.Upgrades h4 {
-   font-size: 16px;
-   color: #02455B;
-   text-shadow: 0 1px 0 #fff;
-}
-.Upgrades em {
-   display: block;
-   padding: 3px 0 5px;
-   font-style: oblique;
-   min-height: 50px;
-}
 .Price {
    padding: 8px 0 0;
    width: 110px;
@@ -53,13 +36,10 @@
    border-right: 1px solid #C0E7F5;
    padding: 4px 6px 4px 0;
 }
-div.Buttons {
-   float: right;
+table.SelectionGrid em {
+   min-height: 40px;
+}
+.Upgrades table div.Buttons {
    width: 100px;
-   text-align: center;
 }
-div.Buttons a {
-   display: block;
-   padding: 2px 4px;
-   margin: 4px 0;
-}
+
