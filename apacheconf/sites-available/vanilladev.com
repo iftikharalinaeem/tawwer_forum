@@ -3,7 +3,7 @@
         ServerName vanilladev.com
 		  ServerAlias www.vanilladev.com
 		  DocumentRoot /srv/www/vanilladev
-		  ErrorDocument 404 /index.php/garden/home/filenotfound
+		  ErrorDocument 404 http://vanillaforums.com/filenotfound
 		  <Directory /srv/www/vanilladev/>
 					 Options FollowSymLinks MultiViews
 					 AllowOverride All
