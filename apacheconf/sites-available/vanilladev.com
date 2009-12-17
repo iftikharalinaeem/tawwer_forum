@@ -28,6 +28,8 @@
 		  LogLevel debug
 		  ErrorLog /srv/log/vhosts/error.log
 		  CustomLog /srv/log/vhosts/access.log vcommon
+		  DocumentRoot /srv/www/vanilladev
+		  ErrorDocument 404 /index.php/garden/home/filenotfound
 		  VirtualDocumentRoot /srv/www/vhosts/%0/
 		  # VirtualScriptAlias /srv/www/vhosts/%0/
 </VirtualHost>
