@@ -10,6 +10,6 @@ echo $DIR
    /bin/rm ${PATH}${DIR}/.htaccess
    
    # Add new symlink
-   /bin/ln -s /srv/www/utils/.htaccess ${PATH}${DIR}/.htaccess
+   /bin/ln -s /srv/www/misc/utils/.htaccess ${PATH}${DIR}/.htaccess
 
 done
