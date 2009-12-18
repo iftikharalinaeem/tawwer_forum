@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1>Premium Upgrades</h1>
-<div class="Info">In addition to all of the free features at VanillaForums.com, we also offer these premium upgrades for enhanced functionality.</div>
+<div class="Info">In addition to all of the free features at VanillaForums.com, we will soon offer these premium upgrades for enhanced functionality.</div>
 
 <div class="Upgrades">
    <table class="SelectionGrid">
