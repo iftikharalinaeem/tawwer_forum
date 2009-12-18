@@ -1,0 +1,12 @@
+#!/bin/bash
+
+PATH=/srv/www/vhosts/
+
+for DIR in `/bin/ls /srv/www/vhosts`
+do
+
+echo $DIR
+   # Rename folders
+   /bin/mv ${PATH}${DIR} ${PATH}${DIR}.vanillaforums.com
+
+done
