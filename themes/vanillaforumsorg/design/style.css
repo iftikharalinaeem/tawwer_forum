@@ -1548,10 +1548,6 @@ a:hover {
 	text-align: center;
 	height: 120px;
 }
-#Frame {
-	border-top: 1px solid #fff;
-	background: url('fade.jpg') top left repeat-x;
-}
 .BannerWrapper {
 	width: 960px;
 	margin: 0 auto;
@@ -1583,7 +1579,6 @@ a:hover {
 	font-weight: normal;
 	font-family: 'Lucida Grande', Arial;
 	text-shadow: none;
-	
 }
 .Banner h1 {
    border: 0;
@@ -1635,6 +1630,15 @@ a:hover {
 .Banner ul li.Home a {
 	background: url('tab_right.png') right center no-repeat;
 }
+#Frame {
+	border-top: 1px solid #fff;
+	background: #e4f0fc;
+	background: url('fade.jpg') top left repeat-x;
+}
+#Body {
+   margin: 30px auto 0;
+}
+
 div.Box {
 	-moz-border-radius: 0;
 	background: none;
@@ -1667,20 +1671,46 @@ body a.DraftCommentLink {
 	color: #80828C;
 	text-decoration: none;
 }
+
+/* Pagers */
+.MorePager {
+	background: none;
+	margin: 0;
+	padding: 4px 0;
+	text-align:right;
+}
 .NumberedPager {
 	padding: 4px 0 0;
 }
+.MorePager a,
 .NumberedPager a,
 .NumberedPager a:hover {
-	background:#ECF0F9 url('grey_fade.png') repeat-x left top;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	border: 1px solid #9CA7B8;
 	padding:0 4px;
 	margin: 0 2px;
 	text-decoration: none;
+	font-size: 16px;
 }
-.NumberedPager a.Next {
+.MorePager a:hover,
+.NumberedPager a:hover {
+	text-decoration: none;
+	padding:0 3px;
+	-moz-border-radius: 2px;
+	border: 1px solid #6C7788;
+	background: #f5f9ff;
+	color: #2a529a !important;
+}
+.MorePager a {
+	margin: 0;
+	padding-left: 50px;
+}
+.NumberedPager a.Highlight:hover,
+.NumberedPager a.Next, .NumberedPager a.Next:hover,
+.NumberedPager a.Previous, .NumberedPager a.Previous:hover {
+	padding:0 4px;
+	border: 0;
+	background: none;
+}
+.NumberedPager a.Next{
 	margin-left: 6px;
 }
 .NumberedPager a.Previous {
@@ -1688,4 +1718,69 @@ body a.DraftCommentLink {
 }
 .NumberedPager a:hover {
 	border: 1px solid #7C8798;
+}
+div#Content,
+div#Panel {
+	margin-bottom: 40px;
+}
+div#Foot {
+	margin: 0;
+	padding: 0;
+	background: url('hr.png') repeat-x top left #e4f0fc;
+}
+div#Foot div {
+	padding: 12px 0 10px;
+	border: 0;
+}
+div#Foot div,
+div#Foot div a {
+	color: #80828C;
+}
+div#Foot div a:hover {
+	text-decoration: none;
+	color: #40424C;
+}
+a.NewDiscussion,
+a.NewDiscussion:hover,
+a.NewConversation,
+a.NewConversation:hover {
+   height: 39px !important;
+   line-height: 39px !important;
+   display: block !important;
+   font-family:'Trebuchet MS', 'helvetica nueue', helvetica !important;
+   font-size:15px !important;
+   font-weight:bold !important;
+   text-decoration: none !important;
+   color: #fff !important;
+   text-shadow: 1px 1px 1px #000 !important;
+   background: url('big_button_hover.png') center center no-repeat !important;
+   padding: 0 !important;
+   margin: 0 0 10px !important;
+}
+a.NewDiscussion:hover,
+a.NewConversation:hover {
+   background: url('big_button_hover_more.png') center center no-repeat !important;
+}
+form.Activity {
+	background: #fff;
+	padding: 10px;
+}
+body.Profile ul.Activities {
+	border-top: 1px dashed #ddd;
+	margin-top:0;
+}
+ul.Activities li {
+	border-bottom:1px dashed #ddd;
+}
+#Status {
+	border: 1px solid #9CA7B8;
+	border-bottom: 0;
+}
+ul.Tabs {
+	border: 1px solid #9CA7B8;
+	border-top: 0;
+}
+ul.Tabs li.Active {
+	border: 1px solid #9CA7B8;
+	border-bottom: 0;
 }

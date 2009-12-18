@@ -603,6 +603,9 @@ ul.DataList {
    -moz-border-radius-bottomleft: 3px;
    -moz-border-radius-bottomright: 3px;
 }
+ul#Discussion {
+   background: #fff;
+}
 ul#Discussion,
 #CommentForm {
    border: 1px solid #9CA7B8;
@@ -642,6 +645,7 @@ ul#Discussion,
 body.Discussion #Content #CommentForm h2 {
    background: none;
    border: 0;
+   color: #000;
 }
 ul.DataList li ul li.Title {
    font-family: 'Trebuchet MS';
@@ -655,26 +659,9 @@ ul.DataList li ul li.Title strong a {
 ul.DataList li.DiscussionRow {
    background: #f9fcff;
 }
-ul.DataList li.Mine, .Mine { background: url('blue_fade.jpg') top left repeat-x #e8f8ff; }
+ul.DataList li.Mine { background: url('blue_fade.jpg') top left repeat-x #e8f8ff; }
+ul#Discussion li.Mine { background: #E9F9FF; }
 ul.DataList li.New, li.New { background: url('ylw_fade.jpg') top left repeat-x #ffd; }
 ul.DataList li ul li.Meta strong {
    color:#555;
-}
-a.NewDiscussion,
-a.NewDiscussion:hover {
-   height: 39px;
-   line-height: 39px;
-   display: block;
-   font-family:'Trebuchet MS', 'helvetica nueue', helvetica;
-   font-size:15px;
-   font-weight:bold;
-   text-decoration: none;
-   color: #fff;
-   text-shadow: 1px 1px 1px #000;
-   background: url('big_button_hover.png') center center no-repeat;
-   padding: 0;
-   margin: 0 0 10px;
-}
-a.NewDiscussion:hover {
-   background: url('big_blue.png') center center no-repeat;
 }
