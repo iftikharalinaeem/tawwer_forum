@@ -23,6 +23,10 @@ else
 if ($About == 'customdomain') {
    ?>
    <div class="Legal">
+      <p>With the Custom Domain upgrade you'll be able to point your own domain name at your Vanilla forum. This will enable your users to get at your forum by typing www.yourdomainname.com in their web browser!</p>
+      <p><strong>Coming Soon!</strong></p>
+      <?php
+      /*
       <p>Point your own custom domain name at your Vanilla forum. Here's how:</p>
       <ol>
          <li>Register a domain name you like using your favourite domain name registrar. We like using <a href="http://godaddy.com">GoDaddy.com</a>. This should cost about $10 per year, and you can avoid all extra fees for web hosting and other services since you'll be pointing it at us. All you need is a domain name registration for a period of 1 year or more.</li>
@@ -51,15 +55,20 @@ if ($About == 'customdomain') {
    </ul>
    <?php
    echo $this->Form->Close('Continue →');
+   */
 } else if ($About == 'adremoval') {
    ?>
    <div class="Legal">
-      <p>We place Google Adsense advertisements on our forums to help pay the hosting bills. If you don't want those advertisements cluttering up the appearance of your sweet Vanilla forum, you can remove them for just a few bucks a month. Click the button below to get started.</p>
+      <p>We place Google Adsense advertisements on our forums to help pay the hosting bills. If you don't want those advertisements cluttering up the appearance of your sweet Vanilla forum, soon you will be able to remove them for just a few bucks a month.</p>
+      <p><strong>Coming Soon!</strong></p>
+      <?php // Click the button below to get started.</p> ?>
    </div>
    <?php
+   /*
    echo $this->Form->Errors();
    echo $this->Form->Open();
    echo $this->Form->Close('No More Ads! →');
+   */
 } else if ($About == 'singlesignon') {
    ?>
    <div class="Legal">
@@ -72,11 +81,14 @@ if ($About == 'customdomain') {
    <div class="Legal">
       <p>The Custom CSS upgrade allows you to completely change the appearance of your forum using css code. You can change banners, colors, fonts, and the layout of your forum.</p>
       <p>You will be able to test changes before they are applied for everyone to see, and you can quickly and easily revert to previous revisions, or revert right back to our default style. <strong>Please note that the Custom CSS upgrade does not allow you to upload templates or custom themes.</strong></p>
+      <p><strong>Coming Soon!</strong></p>
    </div>
    <?php
+   /*
    echo $this->Form->Errors();
    echo $this->Form->Open();
    echo $this->Form->Close('Get Started →');
+   */
 } else if ($About == 'fileuploading') {
    ?>
    <div class="Legal">

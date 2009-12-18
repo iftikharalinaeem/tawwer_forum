@@ -1530,6 +1530,18 @@ div.Legal strong {
 
 
 /* ========================================= VanillaForums.org Customizations */
+a,
+a:link,
+a:visited,
+a:active {
+   text-decoration: none;
+   color: #2a529a;
+}
+a:hover {
+   text-decoration: none;
+   color: #2a529a;
+	text-decoration: underline;
+}
 .Banner {
 	background: url('shine.jpg') top center no-repeat #2a529a;
    border-bottom: 1px solid #183a7c;
@@ -1623,41 +1635,57 @@ div.Legal strong {
 .Banner ul li.Home a {
 	background: url('tab_right.png') right center no-repeat;
 }
-body.hosting .Header ul li.Hosting a,
-body.hosting .Header ul li.Hosting a:hover,
-.Header ul li.Active a,
-.Header ul li a:hover {
-   text-shadow:1px 1px 1px #148eb8; 
-   color:#fff;
-   background: #44c7f4;   
+div.Box {
+	-moz-border-radius: 0;
+	background: none;
+	padding: 0;
+	margin:0 0 10px;
 }
-.Header ul li.Download a {
-   text-shadow:1px 1px 1px #00c400; 
-   color:#fff;
-   background: #11e420;
+div.Box h4 {
+	font-family:"Helvetica Neue (TT)","Helvetica Neue","Helvetica","Arial",sans-serif;
+	font-size:15px;
+	color: #0350A6;
+	background: url('hr.png') bottom left repeat-x;
 }
-.Header ul li.Download a:hover {
-   background: #00d410;
+ul.PanelInfo {
+	border: 0;
 }
-body.Discussions .Header h1,
-body.Categories .Header h1,
-body.Categories .Header h2 {
-   padding: 0 !important;
-   margin: 0 !important;
-   border: 0 !important;
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+	background: none;
+	border-bottom: 1px dashed #c5d1e2;
+	padding: 2px;
+	font-size: 11px;
+	color: #80828C;
+	/* line-height: 120%; */
 }
-#Head {
-   height: 34px !important;
+ul.PanelInfo li strong {
+	font-size: 13px;
 }
-#Head h1 {
-   display: none !important;
+body a.DraftCommentLink {
+	display: block;
+	color: #80828C;
+	text-decoration: none;
 }
-ul#Menu {
-   padding: 6px 0 0 !important;
+.NumberedPager {
+	padding: 4px 0 0;
 }
-#Head form {
-   margin: 4px 0 0 !important;
+.NumberedPager a,
+.NumberedPager a:hover {
+	background:#ECF0F9 url('grey_fade.png') repeat-x left top;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border: 1px solid #9CA7B8;
+	padding:0 4px;
+	margin: 0 2px;
+	text-decoration: none;
 }
-body.Activity .SubTitle h1 {
-	margin: 0 auto;
+.NumberedPager a.Next {
+	margin-left: 6px;
+}
+.NumberedPager a.Previous {
+	margin-right: 6px;
+}
+.NumberedPager a:hover {
+	border: 1px solid #7C8798;
 }
