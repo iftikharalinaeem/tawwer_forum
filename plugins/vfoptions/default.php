@@ -238,7 +238,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
                if (!$NewSite) {
                   $Sender->RedirectUrl = 'http://'.$Domain.'.com';
                } else {
-                  $Sender->RedirectUrl = 'http://'.$NewSite->Name.'.'.$Domain.'.com/plugin/myforums';
+                  $Sender->RedirectUrl = 'http://'.$NewSite->Name.'.com/plugin/myforums';
                }
             }
             // We delete the forum *after* the redirects have been defined so we
