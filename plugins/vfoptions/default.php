@@ -25,6 +25,26 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    8. Don't allow email to be changed to one that is already being used in master db.
 */
 
+   public function Base_Render_Before(&$Sender) {
+      $TrackerCode = Gdn::Config('Plugins.GoogleAnalytics.TrackerCode');
+      if (is_string($TrackerCode))
+         $TrackerCode = array($TrackerCode);
+      
+      if (is_array($TrackerCode)) {
+         foreach ($TrackerCode as $Code) {
+            $Sender->AddAsset('Content', "<script type=\"text/javascript\">
+var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");
+document.write(unescape(\"%3Cscript src='\" + gaJsHost + \"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E\"));
+</script>
+<script type=\"text/javascript\">
+try {
+var pageTracker = _gat._getTracker(\"".$Code."\");
+pageTracker._trackPageview();
+} catch(err) {}</script>");
+         }
+      }
+   }
+
    // Adds a "My Forums" menu option to the dashboard area
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
