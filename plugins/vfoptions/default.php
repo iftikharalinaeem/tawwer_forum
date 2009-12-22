@@ -93,12 +93,18 @@ pageTracker._trackPageview();
       $Sender->Title('Premium Upgrades');
       $Sender->AddCssFile('/plugins/vfoptions/style.css');
       $Sender->AddSideMenu('garden/plugin/upgrades');
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'upgrades.php');
+      $View = Gdn::Config('Plugins.VFOptions.UpgradeView', 'upgrades.php');
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . $View);
    }
    
    public function PluginController_MoreInfo_Create(&$Sender, $EventArguments) {
       $Sender->Form = new Gdn_Form();
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'moreinfo.php');
+   }
+   
+   public function PluginController_LearnMore_Create(&$Sender, $EventArguments) {
+      $Sender->Form = new Gdn_Form();
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'learnmore.php');
    }
    
    // Create a New Forum screen

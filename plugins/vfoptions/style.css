@@ -1,6 +1,9 @@
 .Upgrades td {
    min-width: 235px;
 }
+.Upgrades h3 {
+   margin-top: 30px;
+}
 .Price {
    padding: 8px 0 0;
    width: 110px;
@@ -23,14 +26,14 @@
    padding-top: 3px;
    display: block;
 }
-.PriceOptions {
+div.PriceOptions {
    padding: 0;
    width: 120px;
    float: left;
    color: #777;
    font-size: 11px;
 }
-.PriceOptions strong {
+div.PriceOptions strong {
    color: #000;
    font-size: 12px;
    border-right: 1px solid #C0E7F5;
@@ -42,4 +45,36 @@ table.SelectionGrid em {
 .Upgrades table div.Buttons {
    width: 100px;
 }
-
+table.PriceOptions {
+   float: left;
+   width: auto;
+   margin: 0;
+   border: 0;
+   background: none;
+}
+table.PriceOptions th,
+table.PriceOptions td {
+   width: auto;
+   height: auto;
+   border: 0;
+   min-width: 0;
+   padding: 1px 0;
+   margin: 0;
+}
+table.PriceOptions th {
+   text-align: right;
+   border-right: 1px solid #C0E7F5;
+   padding-right: 8px;
+}
+table.PriceOptions td {
+   padding-left: 6px;
+   font-size: 11px;
+   color: #777;
+   vertical-align: baseline;
+}
+table.PriceOptions em {
+   display: inline;
+   min-height: 0;
+   font-style: normal;
+   padding: 0;
+}
