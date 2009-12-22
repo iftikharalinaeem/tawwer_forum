@@ -28,8 +28,9 @@
 	<div id="header">
 		<div class="wrapper">
 			<div  id="logo">
-				<img src="http://www.techstars.org/wordpress/wp-content/themes/techstars_2009/images/layout/logo.png" alt="Techstars" sm:iepng="true" />
-				<a href="http://www.techstars.org/" class="logo_icon" title="Techstars homepage"><img src="http://www.techstars.org/wordpress/wp-content/themes/techstars_2009/images/layout/logo_sm.jpg" alt="Techstars" /></a>
+				<a href="http://techstars.org">
+					<img sm:iepng="true" alt="Techstars" src="http://www.techstars.org/wordpress/wp-content/themes/techstars_2009/images/layout/logo.png"/>
+				</a>
 			</div>
 			<a href="#" id="subscribe_btn"><img src="http://www.techstars.org/wordpress/wp-content/themes/techstars_2009/images/layout/subscribe.gif"alt="subscribe to our blog"/></a>
 			<ul id="toolbar">
