@@ -27,21 +27,25 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 
    public function Base_Render_Before(&$Sender) {
       $TrackerCode = Gdn::Config('Plugins.GoogleAnalytics.TrackerCode');
-      if (is_string($TrackerCode))
-         $TrackerCode = array($TrackerCode);
+      $TrackerDomain = Gdn::Config('Plugins.GoogleAnalytics.TrackerDomain');
       
-      if (is_array($TrackerCode)) {
-         foreach ($TrackerCode as $Code) {
-            $Sender->AddAsset('Content', "<script type=\"text/javascript\">
+      if ($TrackerCode && $TrackerCode != '') {
+         $Script = "<script type=\"text/javascript\">
 var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");
 document.write(unescape(\"%3Cscript src='\" + gaJsHost + \"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E\"));
 </script>
 <script type=\"text/javascript\">
 try {
-var pageTracker = _gat._getTracker(\"".$Code."\");
+var pageTracker = _gat._getTracker(\"".$TrackerCode."\");";
+         if ($TrackerDomain)
+            $Script .= '
+pageTracker._setDomainName("'.$TrackerDomain.'");';
+         
+         $Script .= "
 pageTracker._trackPageview();
-} catch(err) {}</script>");
-         }
+} catch(err) {}</script>";
+
+         $Sender->AddAsset('Content', $Script);
       }
    }
 
