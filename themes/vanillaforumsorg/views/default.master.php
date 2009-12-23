@@ -19,7 +19,7 @@
 								
 							echo Anchor($Name, '/profile/'.$Session->UserID.'/'.$Session->User->Name, 'Username');
 	
-							$Inbox = 'Inbox';
+							$Inbox = '<em>Inbox</em>';
 							$CountUnreadConversations = $Session->User->CountUnreadConversations;
 							if (is_numeric($CountUnreadConversations) && $CountUnreadConversations > 0)
 								$Inbox .= '<span>'.$CountUnreadConversations.'</span>';
@@ -29,7 +29,7 @@
 							if ($Session->CheckPermission('Garden.Settings.Manage'))
 								echo Anchor('Dashboard', '/garden/settings', 'Dashboard');
 							
-							echo Anchor('Sign Out', $Authenticator->SignOutUrl(), 'Leave');
+							echo Anchor('Sign Out', str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()), 'Leave');
 						} else {
 							echo Anchor('Sign In', $Authenticator->SignInUrl($this->SelfUrl), 'SignIn Popup');
 							echo Anchor('Register', $Authenticator->RegisterUrl($this->SelfUrl), 'Register');

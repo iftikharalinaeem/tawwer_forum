@@ -110,7 +110,7 @@ if ($About == 'customdomain') {
 } else {
    ?>
    <div class="Legal">
-      <p>You are looking for more information, but we don't seem to have what you're looking for. Contact us for help! support [at] vanillaforums [dot] com</p>
+      <p>You are looking for more information, but we don't seem to have what you're looking for. Contact us for help! <?php echo Format::Email('support@vanillaforums.com'); ?></p>
    </div>
    <?php
 }

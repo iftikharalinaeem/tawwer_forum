@@ -376,11 +376,19 @@ ul.DataList li.New, li.New { background: url('ylw_fade.jpg') top left repeat-x #
 ul.DataList li ul li.Meta strong {
    color:#555;
 }
-#Conversation li a.Photo img, #Conversations li a.Photo img {
+#Conversation li a.Photo img,
+#Conversations li a.Photo img {
 	background: url('grey_fade.png') top left repeat-x #Ecf0f9;
    border: 1px solid #9ca7b8;
    padding: 5px;
    height: 32px;
    width: 32px;
    -moz-border-radius: 3px;
+}
+#Conversations li,
+#Conversations li.New {
+	background: #fff;
+}
+#Conversations li a.Message {
+	text-decoration: none;
 }

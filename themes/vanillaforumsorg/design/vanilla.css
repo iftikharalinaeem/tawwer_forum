@@ -56,6 +56,16 @@ a.NewDiscussion:hover {
 #Panel ul.Discussions {
    border: 0;
 }
+ul.PanelDiscussions li {
+   text-align: left;
+}
+ul.PanelDiscussions li a {
+   float: none;
+}
+ul.PanelDiscussions li strong {
+   display: block;
+}
+
 
 /* ============================================================== Discussions */
 
@@ -131,7 +141,7 @@ ul.DataList li ul li.Meta a {
    color: #2b2d33 /* Meta Font Color */;
 }
 body.Discussions h1 {
-   margin:0;
+   margin: 0;
 }
 li.DiscussionRow ul.Discussion {
    /* Fixes an IE7 Spacing issue */
@@ -400,7 +410,7 @@ ul.Options li.Parent strong {
    display: block;
    padding: 4px;
    margin: 3px 4px 0 0;
-   font-family: 'lucida grande', Tahoma, sans-serif;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    font-size: 10px;
    font-weight: normal;
    background: url('button_bg2.png') repeat-x center left #f8f8f8;
@@ -441,6 +451,7 @@ ul.Options li.Active ul {
 }
 ul.Options li.Active ul li a {
    background: none;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
 }
 ul.Options li.Active a {
    background: #efefef;
@@ -487,7 +498,7 @@ ul.Drafts li ul li.Title a.DeleteDraft {
    cursor: pointer;
    line-height: 100%;
 }
-ul.Drafts li ul li.Topic a.DeleteDraft:hover {
+ul.Drafts li ul li.Title a.DeleteDraft:hover {
    color: #333;
    border: 1px solid #888;
 }
@@ -587,6 +598,7 @@ a.Cancel {
 }
 
 
+
 /* ==================================================== VF.org Customizations */
 body.Discussion #Content h2,
 body.Discussions #Content h1 {
@@ -617,10 +629,10 @@ ul#Discussion,
 #Discussion li ul.Info li.Author img {
    background: url('grey_fade.png') top left repeat-x #Ecf0f9;
    border: 1px solid #9ca7b8;
-   padding: 5px;
-   height: 32px;
-   width: 32px;
-   -moz-border-radius: 3px;
+   padding: 3px;
+   height: 34px;
+   width: 34px;
+   -moz-border-radius: 2px;
 }
 .Preview li ul.Info li,
 #Discussion li ul.Info li {
@@ -665,3 +677,33 @@ ul.DataList li.New, li.New { background: url('ylw_fade.jpg') top left repeat-x #
 ul.DataList li ul li.Meta strong {
    color:#555;
 }
+ul.Options li.Parent strong {
+   background: none;
+   border: 0;
+   padding: 5px;
+}
+ul.Options li.Parent strong:hover {
+   -moz-border-radius:2px;
+   background:#F8F8F8 url(button_bg2.png) repeat-x scroll left center;
+   border:1px solid #BBBBBB;
+   padding:4px;
+}
+ul.Options li.Active strong:hover {
+   -moz-border-radius-bottomleft: 0;
+   -moz-border-radius-bottomright: 0;
+   -webkit-border-bottom-left-radius: 0;
+   -webkit-border-bottom-right-radius: 0;
+   border: 0;
+   padding: 5px;
+}
+a.Bookmarked, a.Bookmark, a.Bookmarking {
+	margin: 4px;
+}
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+	font-size: 11px;
+}
+ul.PanelInfo li strong {
+	font-size: 13px;
+}
+
