@@ -3,9 +3,7 @@ $About = ArrayValue(0, $this->RequestArgs, '');
 $Domain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', 'your_forum_name.vanillaforums.com'));
 ?>
 <h1><?php
-if ($About == 'customdomain')
-   echo 'Custom Domain Name';
-else if ($About == 'adremoval')
+if ($About == 'adremoval')
    echo 'Ad Removal';
 else if ($About == 'singlesignon')
    echo 'Single Sign-on';
@@ -23,32 +21,7 @@ else
    echo 'More Info?';
 ?></h1>
 <?php
-if ($About == 'customdomain') {
-   ?>
-   <div class="Legal">
-      <p>With the Custom Domain upgrade you'll be able to point your own domain name at your Vanilla forum. Here's how:</p>
-      <ol>
-         <li>Register a domain name you like using your favourite domain name registrar. We like using <a href="http://godaddy.com">GoDaddy.com</a>. This should cost about $10 per year, and you can avoid all extra fees for web hosting and other services since you'll be pointing it at us. All you need is a domain name registration for a period of 1 year or more.</li>
-         <li>Create a <strong>C record</strong> for your domain, pointing at your Vanilla forum's address: <strong><?php echo $Domain; ?></strong>
-         <?php echo Anchor('→ get more help with this step', 'http://vanillaforums.com/help#FAQ1'); ?></li>
-         <li>Enter your custom domain name below and click continue to complete the process.</li>
-      </ol>
-   </div>
-   <?php
-   echo $this->Form->Errors();
-   echo $this->Form->Open();
-   ?>
-   <ul>
-      <li>
-         <?php
-         echo $this->Form->Label('Your Custom Domain Name', 'CustomDomain');
-         echo $this->Form->TextBox('CustomDomain');
-         ?>
-      </li>
-   </ul>
-   <?php
-   echo $this->Form->Close('Continue →');
-} else if ($About == 'adremoval') {
+if ($About == 'adremoval') {
    ?>
    <div class="Legal">
       <p>We place Google Adsense advertisements on our forums to help pay the hosting bills. If you don't want those advertisements cluttering up the appearance of your sweet Vanilla forum, soon you will be able to remove them for just a few bucks a month.</p>

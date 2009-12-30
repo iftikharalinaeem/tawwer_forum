@@ -181,6 +181,7 @@ div.Messages {
    font-size: 12px;
    display: block;
    width: 100%;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;	
 }
 * html div.Messages {
   position: absolute;
@@ -1391,6 +1392,9 @@ div.Popup div.Body {
   -webkit-border-radius: 5px;
   border: 8px solid #555;
 }
+div.SignInPopup div.Body {
+	max-width: 280px;
+}
 div.Popup div.Body div.Body {
    border: 0;
 }
@@ -1598,10 +1602,12 @@ div#Foot div a:hover {
 	font-family: 'Trebuchet MS', Arial;
 	font-size: 11px;
 }
+.Banner div.UserOptions a.Username:hover,
 .Banner div.UserOptions a.Inbox:hover {
 	text-decoration: none;
 }
-.Banner div.UserOptions a.Inbox em:hover {
+.Banner div.UserOptions a.Username:hover em,
+.Banner div.UserOptions a.Inbox:hover em {
 	text-decoration: underline;
 }
 .Banner div.UserOptions a span {
@@ -1708,6 +1714,8 @@ body a.DraftCommentLink {
 	color: #80828C;
 	text-decoration: none;
 }
+a.ClearConversation,
+a.ClearConversation:hover,
 a.NewDiscussion,
 a.NewDiscussion:hover,
 a.NewConversation,
@@ -1728,6 +1736,12 @@ a.NewConversation:hover {
 a.NewDiscussion:hover,
 a.NewConversation:hover {
    background: url('big_button_hover_more.png') center center no-repeat !important;
+}
+a.ClearConversation {
+   background: url('big_blue.png') center center no-repeat !important;
+}
+a.ClearConversation:hover {
+   background: url('big_red.png') center center no-repeat !important;
 }
 div.Box dl {
 	background: none;

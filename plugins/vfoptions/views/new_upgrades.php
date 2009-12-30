@@ -1,4 +1,8 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
+echo 'PATH_ROOT: '.PATH_ROOT;
+$CustomDomainPurchased = Gdn::Config('Garden.Domain', '') == basename(PATH_ROOT) ? FALSE : TRUE;
+$AdRemovalPurchased = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
+?>
 <h1>Premium & Enterprise Upgrades</h1>
 
 <div class="Info">In addition to all of the free features at VanillaForums.com, we will soon offer these premium & enterprise upgrades for enhanced functionality.</div>
@@ -18,8 +22,8 @@
                </div>
                <div class="Buttons">
                   <?php
-                  echo Anchor('Learn More', '/plugin/learnmore/customdomain', 'Popup Button');
-                  echo Anchor('Buy Now', '/plugin/learnmore/customdomain', 'Popup Button');
+                  echo Anchor('Learn More', '/plugin/learnmore/customdomain', 'Popdown Button');
+                  echo Anchor('Buy Now', '/plugin/learnmore/customdomain', 'Popdown Button');
                   ?>
                </div>
             </td>
@@ -33,8 +37,8 @@
                </div>
                <div class="Buttons">
                   <?php
-                  echo Anchor('Learn More', '/plugin/learnmore/adremoval', 'Popup Button');
-                  echo Anchor('Buy Now', '/plugin/learnmore/adremoval', 'Popup Button');
+                  echo Anchor('Learn More', '/plugin/learnmore/adremoval', 'Popdown Button');
+                  echo Anchor('Buy Now', '/plugin/learnmore/adremoval', 'Popdown Button');
                   ?>
                </div>
             </td>
@@ -47,7 +51,7 @@
                   <span>$0.16 per day</span>
                </div>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/customcss', 'Popup Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/customcss', 'Popdown Button'); ?>
                   Coming Soon!
                </div>
             </td>
@@ -71,7 +75,7 @@
                   </tr>
                </table>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/fileuploading', 'Popup Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/fileuploading', 'Popdown Button'); ?>
                   Coming Soon!
                </div>
             </td>
@@ -87,7 +91,7 @@
                   <span>$0.32 per day</span>
                </div>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/ssl', 'Popup Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/ssl', 'Popdown Button'); ?>
                   Coming Soon!
                </div>
             </td>
@@ -98,7 +102,7 @@
                   <strong>FREE</strong>
                </div>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/datatransfer', 'Popup Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/datatransfer', 'Popdown Button'); ?>
                   Coming Soon!
                </div>
             </td>
@@ -128,7 +132,7 @@
                   </tr>
                </table>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/extrabandwidth', 'Popup Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/extrabandwidth', 'Popdown Button'); ?>
                   Coming Soon!
                </div>
             </td>
@@ -141,7 +145,7 @@
                   <span>$1.61 per day</span>
                </div>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/singlesignon', 'Popup Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/singlesignon', 'Popdown Button'); ?>
                   Coming Soon!
                </div>
             </td>
@@ -154,7 +158,7 @@
                   <span>$0.42 per day</span>
                </div>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/dailybackups', 'Popup Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/dailybackups', 'Popdown Button'); ?>
                   Coming Soon!
                </div>
             </td>

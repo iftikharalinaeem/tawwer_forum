@@ -706,4 +706,9 @@ ul.PanelInfo li.Active {
 ul.PanelInfo li strong {
 	font-size: 13px;
 }
+.CommentOption {
+   border-left: 1px solid #9CA7B8;
+   border-right: 1px solid #9CA7B8;
+   margin: 0;
+}
 

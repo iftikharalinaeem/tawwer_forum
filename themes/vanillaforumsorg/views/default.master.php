@@ -12,7 +12,7 @@
 						$Session = Gdn::Session();
 						$Authenticator = Gdn::Authenticator();
 						if ($Session->IsValid()) {
-							$Name = $Session->User->Name;
+							$Name = '<em>'.$Session->User->Name.'</em>';
 							$CountNotifications = $Session->User->CountNotifications;
 							if (is_numeric($CountNotifications) && $CountNotifications > 0)
 								$Name .= '<span>'.$CountNotifications.'</span>';
@@ -31,8 +31,8 @@
 							
 							echo Anchor('Sign Out', str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()), 'Leave');
 						} else {
-							echo Anchor('Sign In', $Authenticator->SignInUrl($this->SelfUrl), 'SignIn Popup');
-							echo Anchor('Register', $Authenticator->RegisterUrl($this->SelfUrl), 'Register');
+							echo Anchor('Sign In', $Authenticator->SignInUrl($this->SelfUrl), 'SignInPopup');
+							echo Anchor('Apply for Membership', $Authenticator->RegisterUrl($this->SelfUrl), 'Register');
 						}
 					?>
 				</div>

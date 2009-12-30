@@ -39,6 +39,12 @@ div.PriceOptions strong {
    border-right: 1px solid #C0E7F5;
    padding: 4px 6px 4px 0;
 }
+table.SelectionGrid td {
+   background: #f2fbff;
+}
+table.SelectionGrid td:hover {
+   background: #fff;
+}
 table.SelectionGrid em {
    min-height: 40px;
 }

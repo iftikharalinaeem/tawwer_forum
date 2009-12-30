@@ -97,14 +97,50 @@ pageTracker._trackPageview();
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . $View);
    }
    
-   public function PluginController_MoreInfo_Create(&$Sender, $EventArguments) {
+   public function PluginController_CustomDomain_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Premium Upgrades &raquo; Custom Domain Name');
+      $Sender->AddSideMenu('garden/plugin/upgrades');
+
+      // Send a request to the specified domain, and see if it hits our
+      // server (it should return our custom 404 error if it is pointed at
+      // us).
       $Sender->Form = new Gdn_Form();
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'moreinfo.php');
+      $Domain = $Sender->Form->GetValue('CustomDomain', '');
+      $Response = '';
+      if ($Domain != '') {
+         $Domain = PrefixString('http://', $Domain);
+         $Response = ProxyRequest($Domain);
+         $ExpectedResponse = ProxyRequest('http://reserved.vanillaforums.com');
+         if ($Response != $ExpectedResponse) {
+            $Sender->Form->AddError("We were unable to verify that ".$Domain." is pointing at VanillaForums.com.");
+         }
+      }
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'customdomain.php');
+   }
+
+   public function PluginController_ThankYou_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Premium Upgrades &raquo; Thank You!');
+      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'thankyou.php');
    }
    
    public function PluginController_LearnMore_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Premium Upgrades &raquo; Learn More');
+      $Sender->AddSideMenu('garden/plugin/upgrades');
       $Sender->Form = new Gdn_Form();
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'learnmore.php');
+      $About = ArrayValue(0, $Sender->RequestArgs, '');
+      if ($About == 'customdomain')
+         return $this->PluginController_CustomDomain_Create($Sender, $EventArguments);
+         
+      if ($Sender->Form->IsPostBack()) {
+         if ($About == 'adremoval') {
+            $PluginManager = Gdn::Factory('PluginManager');
+            $PluginManager->DisablePlugin('GoogleAdSense');
+         }
+         $this->PluginController_ThankYou_Create($Sender, $EventArguments);
+      } else {
+         $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'learnmore.php');
+      }
    }
    
    // Create a New Forum screen
