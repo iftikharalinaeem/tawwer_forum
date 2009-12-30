@@ -135,9 +135,9 @@ pageTracker._trackPageview();
                $Contents
             );
             $Contents = str_replace(
-               "\\ EnabledPlugins",
-               "\\ EnabledPlugins
-\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';\n",
+               "// EnabledPlugins",
+               "// EnabledPlugins
+\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';",
                $Contents
             );
             
