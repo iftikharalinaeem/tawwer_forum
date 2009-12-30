@@ -2,6 +2,10 @@
 echo 'PATH_ROOT: '.PATH_ROOT;
 $CustomDomainPurchased = Gdn::Config('Garden.Domain', '') == basename(PATH_ROOT) ? FALSE : TRUE;
 $AdRemovalPurchased = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
+
+function Css($Bool) {
+   echo $Bool ? ' Enabled' : '';
+}
 ?>
 <h1>Premium & Enterprise Upgrades</h1>
 
@@ -12,7 +16,7 @@ $AdRemovalPurchased = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TR
    <table class="SelectionGrid">
       <tbody>
          <tr>
-            <td class="FirstCol">
+            <td class="FirstCol<?php Css($CustomDomainPurchased); ?>">
                <h4>Custom Domain Name</h4>
                <em>Customize your forum's address.</em>
                <div class="Price">
@@ -22,12 +26,16 @@ $AdRemovalPurchased = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TR
                </div>
                <div class="Buttons">
                   <?php
-                  echo Anchor('Learn More', '/plugin/learnmore/customdomain', 'Popdown Button');
-                  echo Anchor('Buy Now', '/plugin/learnmore/customdomain', 'Popdown Button');
+                  if (!$AdRemovalPurchased) {
+                     echo Anchor('Learn More', '/plugin/learnmore/customdomain', 'Popdown Button');
+                     echo Anchor('Buy Now', '/plugin/learnmore/customdomain', 'Popdown Button');
+                  } else {
+                     echo Anchor('Remove Upgrade', '/plugin/remove/customdomain', 'Popdown Button');
+                  }
                   ?>
                </div>
             </td>
-            <td class="MiddleCol">
+            <td class="MiddleCol<?php Css($AdRemovalPurchased); ?>">
                <h4>Ad Removal</h4>
                <em>Get those ugly advertisements off your forum.</em>
                <div class="Price">
@@ -37,8 +45,12 @@ $AdRemovalPurchased = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TR
                </div>
                <div class="Buttons">
                   <?php
-                  echo Anchor('Learn More', '/plugin/learnmore/adremoval', 'Popdown Button');
-                  echo Anchor('Buy Now', '/plugin/learnmore/adremoval', 'Popdown Button');
+                  if (!$AdRemovalPurchased) {
+                     echo Anchor('Learn More', '/plugin/learnmore/adremoval', 'Popdown Button');
+                     echo Anchor('Buy Now', '/plugin/learnmore/adremoval', 'Popdown Button');
+                  } else {
+                     echo Anchor('Remove Upgrade', '/plugin/remove/adremoval', 'Popdown Button');
+                  }
                   ?>
                </div>
             </td>

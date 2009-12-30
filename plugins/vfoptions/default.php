@@ -113,6 +113,8 @@ pageTracker._trackPageview();
          $ExpectedResponse = ProxyRequest('http://reserved.vanillaforums.com');
          if ($Response != $ExpectedResponse) {
             $Sender->Form->AddError("We were unable to verify that ".$Domain." is pointing at VanillaForums.com.");
+         } else {
+            // It is pointing at the correct place, so change the name and create a symlink folder.
          }
       }
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'customdomain.php');
