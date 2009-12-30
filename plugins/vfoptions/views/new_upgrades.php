@@ -1,6 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-echo 'PATH_ROOT: '.PATH_ROOT;
-$CustomDomainPurchased = Gdn::Config('Garden.Domain', '') == basename(PATH_ROOT) ? FALSE : TRUE;
+$CustomDomainPurchased = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', '')) == basename(PATH_ROOT) ? FALSE : TRUE;
 $AdRemovalPurchased = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
 
 function Css($Bool) {
