@@ -19,7 +19,3 @@
    </div>
 </body>
 </html>
-<?php
-$Database = Gdn::Database();
-@$Database->CloseConnection();
-die();
