@@ -127,9 +127,21 @@ pageTracker._trackPageview();
       $Sender->Form = new Gdn_Form();
       if ($Sender->Form->IsPostBack()) {
          if ($About == 'adremoval') {
-            $Validation = new Gdn_Validation();
-            $PluginManager = Gdn::Factory('PluginManager');
-            $PluginManager->EnablePlugin('GoogleAdSense', $Validation);
+            $Conf = PATH_CONF . DS . 'config.php';
+            $Contents = file_get_contents($Conf);
+            $Contents = str_replace(
+               "\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';\n",
+               '',
+               $Contents
+            );
+            $Contents = str_replace(
+               "\\ EnabledPlugins",
+               "\\ EnabledPlugins
+\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';\n",
+               $Contents
+            );
+            
+            file_put_contents($Conf, $Contents);
             Redirect('garden/plugin/upgrades');
          }
       }
