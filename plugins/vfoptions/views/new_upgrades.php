@@ -18,7 +18,7 @@ function Css($Bool) {
       <tbody>
          <tr>
             <td class="FirstCol<?php Css($CustomDomainPurchased); ?>">
-               <h4>Custom Domain Name</h4>
+               <h4>Custom Domain Name <span>Purchased!</span></h4>
                <em>Customize your forum's address.</em>
                <div class="Price">
                   <strong>$2</strong>
@@ -37,7 +37,7 @@ function Css($Bool) {
                </div>
             </td>
             <td class="MiddleCol<?php Css($AdRemovalPurchased); ?>">
-               <h4>Ad Removal</h4>
+               <h4>Ad Removal <span>Purchased!</span></h4>
                <em>Get those ugly advertisements off your forum.</em>
                <div class="Price">
                   <strong>$5</strong>
@@ -56,7 +56,7 @@ function Css($Bool) {
                </div>
             </td>
             <td class="LastCol">
-               <h4>Custom CSS</h4>
+               <h4>Custom CSS <span>Purchased!</span></h4>
                <em>Have complete control over the appearance of your forum.</em>
                <div class="Price">
                   <strong>$5</strong>
@@ -71,7 +71,7 @@ function Css($Bool) {
          </tr>
          <tr>
             <td class="FirstCol">
-               <h4>File Uploading</h4>
+               <h4>File Uploading <span>Purchased!</span></h4>
                <em>Let your users upload files with their discussions.</em>
                <table class="PriceOptions">
                   <tr>
@@ -93,7 +93,7 @@ function Css($Bool) {
                </div>
             </td>
             <td class="MiddleCol">
-               <h4>Secure Login</h4>
+               <h4>Secure Login <span>Purchased!</span></h4>
                <em>Use SSL when signing into your <?php echo str_replace(
                array('http://', '/'),
                array('', ''),
@@ -128,7 +128,7 @@ function Css($Bool) {
       <tbody>
          <tr>
             <td class="FirstCol">
-               <h4>Extra Bandwidth</h4>
+               <h4>Extra Bandwidth <span>Purchased!</span></h4>
                <em>For heavy-traffic forums, move past the free 1,000,000 pageviews per month.</em>
                <table class="PriceOptions">
                   <tr>
@@ -150,7 +150,7 @@ function Css($Bool) {
                </div>
             </td>
             <td class="MiddleCol">
-               <h4>Single Sign-on</h4>
+               <h4>Single Sign-on <span>Purchased!</span></h4>
                <em>Let your existing users access the forum without signing in or registering again.</em>
                <div class="Price">
                   <strong>$49</strong>
@@ -163,7 +163,7 @@ function Css($Bool) {
                </div>
             </td>
             <td class="LastCol">
-               <h4>Daily Backups</h4>
+               <h4>Daily Backups <span>Purchased!</span></h4>
                <em>Rest easy knowing that your data is backed up and ready to be restored should the need arise.</em>
                <div class="Price">
                   <strong>$19</strong>
