@@ -120,6 +120,21 @@ pageTracker._trackPageview();
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'customdomain.php');
    }
 
+   public function PluginController_Remove_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
+      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $About = ArrayValue(0, $Sender->RequestArgs, '');
+      if ($Sender->Form->IsPostBack()) {
+         if ($About == 'adremoval') {
+            $PluginManager = Gdn::Factory('PluginManager');
+            $PluginManager->EnablePlugin('GoogleAdSense');
+            Redirect('garden/plugin/upgrades');
+         }
+      }
+
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'remove.php');
+   }
+   
    public function PluginController_ThankYou_Create(&$Sender, $EventArguments) {
       $Sender->Title('Premium Upgrades &raquo; Thank You!');
       $Sender->AddSideMenu('garden/plugin/upgrades');

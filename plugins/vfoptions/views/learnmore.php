@@ -87,4 +87,3 @@ if ($About == 'adremoval') {
    </div>
    <?php
 }
-?></div>
