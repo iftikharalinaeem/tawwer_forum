@@ -1,8 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $GardenDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', ''));
 $FolderName = basename(PATH_ROOT);
-echo $GardenDomain;
-echo $FolderName;
 $CustomDomainPurchased = $GardenDomain == $FolderName ? FALSE : TRUE;
 $AdRemovalPurchased = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
 
@@ -29,7 +27,7 @@ function Css($Bool) {
                </div>
                <div class="Buttons">
                   <?php
-                  if (!$AdRemovalPurchased) {
+                  if (!$CustomDomainPurchased) {
                      echo Anchor('Learn More', '/plugin/learnmore/customdomain', 'Popdown Button');
                      echo Anchor('Buy Now', '/plugin/learnmore/customdomain', 'Popdown Button');
                   } else {
