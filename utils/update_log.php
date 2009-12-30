@@ -3,10 +3,10 @@
  Used for updating conf files in all forums so they all log garden errors. Run 2009-12-30.
 */
 
-if ($DirectoryHandle = opendir('/srv/www/subdomains')) {
+if ($DirectoryHandle = opendir('/srv/www/vhosts')) {
     while (($Item = readdir($DirectoryHandle)) !== FALSE) {
 		  if ($Item == 'mark.vanillaforums.com') {
-				$File = '/srv/www/subdomains/' . $Item . '/conf/config.php';
+				$File = '/srv/www/vhosts/' . $Item . '/conf/config.php';
 				if (file_exists($File)) {
 					 $Contents = file_get_contents($File);
 					 // Remove existing log entries
