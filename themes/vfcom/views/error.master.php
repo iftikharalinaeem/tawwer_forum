@@ -1,3 +1,6 @@
+<?php
+@ob_end_clean();
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
 <head>
@@ -10,9 +13,13 @@
 <body>
    <div id="Content">
       <div class="SplashInfo">
-         <h1>Boing</h1>
+         <h1>Bonk</h1>
          <p>Something funky happened. We've logged the issue and we will take care of it!</p>
       </div>
    </div>
 </body>
 </html>
+<?php
+$Database = Gdn::Database();
+@$Database->CloseConnection();
+die();
