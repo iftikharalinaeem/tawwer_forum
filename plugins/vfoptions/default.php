@@ -127,8 +127,9 @@ pageTracker._trackPageview();
       $Sender->Form = new Gdn_Form();
       if ($Sender->Form->IsPostBack()) {
          if ($About == 'adremoval') {
+            $Validation = new Gdn_Validation();
             $PluginManager = Gdn::Factory('PluginManager');
-            $PluginManager->EnablePlugin('GoogleAdSense');
+            $PluginManager->EnablePlugin('GoogleAdSense', $Validation);
             Redirect('garden/plugin/upgrades');
          }
       }
