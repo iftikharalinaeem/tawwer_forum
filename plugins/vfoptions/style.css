@@ -11,7 +11,10 @@
    display: inline;
    background: yellow;
    color: #000;
-   font-size: 90%;
+   font-size: 11px;
+   font-weight:normal;
+   padding: 2px 4px;
+   text-shadow: none;
 }
 .Price {
    padding: 8px 0 0;
