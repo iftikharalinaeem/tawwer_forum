@@ -5,7 +5,7 @@
 
 if ($DirectoryHandle = opendir('/srv/www/vhosts')) {
     while (($Item = readdir($DirectoryHandle)) !== FALSE) {
-		  if ($Item == 'mark.vanillaforums.com') {
+		  // if ($Item == 'mark.vanillaforums.com') {
 				$File = '/srv/www/vhosts/' . $Item . '/conf/config.php';
 				if (file_exists($File)) {
 					 $Contents = file_get_contents($File);
@@ -27,7 +27,7 @@ if ($DirectoryHandle = opendir('/srv/www/vhosts')) {
 					 file_put_contents($File, $Contents);
 					 echo 'Updating: '.$File."\n";
 				}
-		  }
+		  // }
 	 }
     closedir($DirectoryHandle);
 }
