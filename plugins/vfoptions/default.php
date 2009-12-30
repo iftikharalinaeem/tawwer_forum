@@ -124,6 +124,7 @@ pageTracker._trackPageview();
       $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
       $Sender->AddSideMenu('garden/plugin/upgrades');
       $About = ArrayValue(0, $Sender->RequestArgs, '');
+      $Sender->Form = new Gdn_Form();
       if ($Sender->Form->IsPostBack()) {
          if ($About == 'adremoval') {
             $PluginManager = Gdn::Factory('PluginManager');
