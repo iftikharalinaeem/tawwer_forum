@@ -1,5 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
-$CustomDomainPurchased = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', '')) == basename(PATH_ROOT) ? FALSE : TRUE;
+$GardenDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', ''));
+$FolderName = basename(PATH_ROOT);
+echo $GardenDomain;
+echo $FolderName;
+$CustomDomainPurchased = $GardenDomain == $FolderName ? FALSE : TRUE;
 $AdRemovalPurchased = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
 
 function Css($Bool) {
