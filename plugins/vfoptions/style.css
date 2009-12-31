@@ -33,7 +33,7 @@
    font-weight: bold;
 }
 .Price span {
-   border-top: 1px solid #C0E7F5;
+   border-top: 1px solid #a5d0e7;
    margin-top: 3px;
    padding-top: 3px;
    display: block;
@@ -48,11 +48,11 @@ div.PriceOptions {
 div.PriceOptions strong {
    color: #000;
    font-size: 12px;
-   border-right: 1px solid #C0E7F5;
+   border-right: 1px solid #e0f4ff;
    padding: 4px 6px 4px 0;
 }
 table.SelectionGrid td {
-   background: #f2fbff;
+   background: #e0f4ff;
 }
 table.SelectionGrid td:hover {
    background: #fff;
@@ -84,7 +84,7 @@ table.PriceOptions td {
 }
 table.PriceOptions th {
    text-align: right;
-   border-right: 1px solid #C0E7F5;
+   border-right: 1px solid #A5D0E7;
    padding-right: 8px;
 }
 table.PriceOptions td {
@@ -98,4 +98,8 @@ table.PriceOptions em {
    min-height: 0;
    font-style: normal;
    padding: 0;
+}
+table.SelectionGrid td:hover,
+table.SelectionGrid td:hover table.PriceOptions td {
+   background: #f2fbff;
 }
