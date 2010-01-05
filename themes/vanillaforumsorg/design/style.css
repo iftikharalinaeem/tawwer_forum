@@ -121,7 +121,6 @@ textarea.TextBox {
 }
 input.SmallInput,
 input.InputBox {
-   font-size: 15px;
    padding: 6px 3px;
 }
 input.SmallInput:focus,
@@ -1681,12 +1680,14 @@ div#Foot div a:hover {
 .Banner ul li.Download a {
 	background: url('dl_right.png') right center no-repeat;
 }
+body.Wiki .Banner ul li.Documentation,
 body.Addons .Banner ul li.Addons,
 body.Profile .Banner ul li.Community,
 body.Vanilla .Banner ul li.Community,
 body.Conversations .Banner ul li.Community {
 	background: url('tab_left.png') left center no-repeat;	
 }
+body.Wiki .Banner ul li.Documentation a,
 body.Addons .Banner ul li.Addons a,
 body.Profile .Banner ul li.Community a,
 body.Vanilla .Banner ul li.Community a,

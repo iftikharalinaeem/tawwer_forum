@@ -1,0 +1,237 @@
+#Body {
+   margin: 0 auto;
+}
+#Panel {
+   display: none;
+}
+#Content {
+   width: auto;
+}
+#PageForm,
+div#Content {
+   font-size: 120%;
+   margin-bottom: 0;
+}
+#Content h1 {
+   font-size: 130%;
+   border-bottom: 1px solid #ddd;
+   font-weight: bold;
+   padding: 20px 6px 0;
+}
+#Content h2 {
+   color: #333;
+   font-weight: bold;
+   font-size: 115%;
+   border-bottom: 1px solid #eee;
+   padding: 0 6px;
+   margin: 20px 0 0;
+}
+#Content h3 {
+   color: #555;
+   font-weight: bold;
+   font-size: 100%;
+   border-bottom: 1px solid #eee;
+   margin: 20px 0 0;
+   padding: 0 6px;
+   -moz-border-radius-topleft: 2px;
+   -moz-border-radius-topright: 2px;
+   -webkit-border-top-left-radius: 2px;
+   -webkit-border-top-right-radius: 2px;
+}
+#Content p {
+   padding: 2px 6px 10px;
+}
+#Content p strong {
+   font-weight: bold;
+}
+#Content p em {
+   font-style: italic;
+}
+#Content ol {
+   padding: 2px 28px 10px;
+}
+#Content ul {
+   padding: 2px 32px 10px;
+}
+#Content ul li {
+   list-style: disc;
+   padding-left: 6px;
+   margin: 0;
+}
+#Content li strong {
+   font-weight: bold;
+}
+#Content ol li {
+   list-style: decimal;
+}
+#Content blockquote {
+   color: #555;
+   margin: 10px 10px 20px;
+   padding: 4px 8px;
+   background: #fafafa;
+   border: 1px solid #eee;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+}
+#Content blockquote p {
+   padding: 4px 0;
+   margin: 0;
+}
+#Content code,
+#Content pre {
+   border: 1px solid #ff5;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #ffc;
+   font-family:Monaco,Verdana,Sans-serif;
+   overflow:auto;
+   padding:4px 8px;
+   white-space:pre;
+   font-size: 80%;
+   color: #333;
+}
+#Content pre {
+   margin: 10px 10px 20px;
+   display:block;
+   line-height: 140%;
+}
+#Content img.Border {
+   padding: 6px;
+   border: 1px solid #ddd;
+}
+#Content dl {
+   margin: 0;
+   padding: 2px 6px 10px;
+}
+#Content dl dt {
+   color: #999;
+}
+#Content dl dt strong {
+   font-family: Monaco,Verdana,Sans-serif;
+   font-size: 85%;
+   font-weight: bold;
+   padding: 0 8px 0 0;
+   color: #000;
+}
+#Content dd {
+   padding: 0 0 0 40px;
+}
+#PageForm {
+   background: #e9f9ff;
+   border-top: 1px solid #eee;
+   margin: 20px 0;
+   border: 0px;
+   background: #daf4fd;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   padding: 8px 10px 10px;
+}
+#PageForm h3 {
+   font-size: 115%;
+   color: #2786C2;
+   font-weight: bold;
+}
+#PageForm input.Button {
+   margin-right: 6px;
+}
+#PageForm label.Heading {
+   font-weight: bold;
+   font-size: 120%;
+   color: #2786c2;
+   line-height: 100%;
+   display: block;
+   margin-bottom: 4px;
+}
+#PageForm textarea {
+   width: 930px;
+   height: 400px;
+   min-height: 400px;
+   max-height: 800px;
+   margin: 0px 0px 6px;
+}
+a.Cancel {
+   margin-left: 20px;
+}
+.Breadcrumb {
+   font-size: 90%;
+   -moz-border-radius-bottomleft: 4px;
+   -moz-border-radius-bottomright: 4px;
+   -webkit-border-bottom-right-radius: 4px;
+   -webkit-border-bottom-left-radius: 4px;
+   background: #e9f9ff;
+   border: 1px solid #ccc;
+   border-top: 0px;
+   color: #777;
+   padding: 8px 10px 6px;
+   margin: 0px;  
+}
+.Breadcrumb span {
+   font-size: 10px;
+   padding: 0 4px;
+   color: #aaa;
+}
+a.toc {
+   float: right;
+}
+body.Index .PageInfo,
+body.index .PageInfo {
+   font-size: 90%;
+   -moz-border-radius-topleft: 4px;
+   -moz-border-radius-topright: 4px;
+   -webkit-border-top-right-radius: 4px;
+   -webkit-border-top-left-radius: 4px;
+   background: #e9f9ff;
+   border: 1px solid #d9e9ef;
+   border-bottom: 0px;
+   color: #999;
+   padding: 8px 10px 6px;
+   margin: 20px 0 0;
+}
+.PageInfo table {
+   margin: 0;
+}
+div#Foot div#TableOfContents {
+   padding: 12px 0 15px;
+   background: url('hr.png') repeat-x bottom left;
+   margin: 0 0 20px;
+}
+#TableOfContents ul,
+#TableOfContents li {
+   list-style: none;
+   margin: 0;
+}
+#TableOfContents ul {
+   padding: 10px 0 14px;
+}
+#TableOfContents table {
+   margin: 0 auto;
+   width: 960px;
+}
+#TableOfContents table td {
+   width: 25%;
+   font-size: 90%;
+   color: #999;
+}
+#TableOfContents table td ul li {
+   line-height: normal;
+   padding: 5px 0;
+}
+#TableOfContents table td ul li a {
+   padding: 0 20px 0 0;
+}
+#TableOfContents table strong {
+   font-weight: bold;
+   font-size: 110%;
+   color: #555;
+}
+div#Foot div#TableOfContents a,
+div#Foot div#TableOfContents a:link,
+div#Foot div#TableOfContents a:visited,
+div#Foot div#TableOfContents a:active {
+   text-decoration: none;
+   color: #2786c2 !important;
+}
+div#Foot div#TableOfContents a:hover {
+   text-decoration: none;
+   color: #ff0084;
+}

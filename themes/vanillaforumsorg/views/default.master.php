@@ -56,6 +56,7 @@
       </div>
       <div id="Foot">
 			<div><?php
+				$this->RenderAsset('Foot');
 				printf(Gdn::Translate('Powered by %s'), '<a href="http://vanillaforums.org"><span>Vanilla</span></a>');
 			?></div>
 		</div>

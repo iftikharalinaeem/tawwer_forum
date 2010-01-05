@@ -23,13 +23,38 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    6. Show the form that allows users to delete a forum
    7. Show the domain name form (if purchased)
    8. Don't allow email to be changed to one that is already being used in master db.
+   9. Show upgrade offerings & more info on each
+   10. Allow purchase & enabling of upgrade offerings
+   11. Include Google analytics code if the appropriate settings are in their conf file (see Base_Render_Before)
 */
 
+   /**
+    * Adds "My Forums", "Premium Upgrades", and "Appearance" menu options to the
+    * dashboard. Removes the "Add-ons" menu option from the dashboard area.
+    */
+   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+      $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Dashboard', 'My Forums', 'garden/plugin/myforums', 'Garden.Settings.GlobalPrivs');
+      $Menu->AddLink('Dashboard', 'Premium Upgrades', 'garden/plugin/upgrades', 'Garden.Settings.GlobalPrivs', array('class' => 'HighlightButton'));
+      
+      // Remove the addons menu items
+      $Menu->RemoveGroup('Add-ons');
+      
+      // Add the "Appearance" menu group & items
+      $Menu->AddItem('Appearance', 'Appearance');
+      $Menu->AddLink('Appearance', 'Themes', 'settings/themes', 'Garden.Themes.Manage');
+   }
+   
+   /**
+    * Include Google Analytics on all pages if the conf file contains
+    * Plugins.GoogleAnalytics.TrackerCode &
+    * Plugins.GoogleAnalytics.TrackerDomain
+    */
    public function Base_Render_Before(&$Sender) {
       $TrackerCode = Gdn::Config('Plugins.GoogleAnalytics.TrackerCode');
       $TrackerDomain = Gdn::Config('Plugins.GoogleAnalytics.TrackerDomain');
       
-      if ($TrackerCode && $TrackerCode != '') {
+      if ($TrackerCode && $TrackerCode != '' && $Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          $Script = "<script type=\"text/javascript\">
 var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");
 document.write(unescape(\"%3Cscript src='\" + gaJsHost + \"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E\"));
@@ -49,132 +74,96 @@ pageTracker._trackPageview();
       }
    }
 
-   // Adds a "My Forums" menu option to the dashboard area
-   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
-      $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Dashboard', 'My Forums', 'garden/plugin/myforums', 'Garden.Settings.GlobalPrivs');
-      $Menu->AddLink('Dashboard', 'Premium Upgrades', 'garden/plugin/upgrades', 'Garden.Settings.GlobalPrivs', array('class' => 'HighlightButton'));
-      
-      // Remove the addons menu items
-      $Menu->RemoveGroup('Add-ons');
-      
-      // Add the "Appearance" menu group & items
-      $Menu->AddItem('Appearance', 'Appearance');
-      $Menu->AddLink('Appearance', 'Themes', 'settings/themes', 'Garden.Themes.Manage');
-   }
-   
-   // Don't let the users access applications, plugins, or themes
-   public function SettingsController_Render_Before(&$Sender) {
-      if (
-         strcasecmp($Sender->RequestMethod, 'plugins') == 0
-         || strcasecmp($Sender->RequestMethod, 'applications') == 0
-      ) Redirect($Sender->Routes['DefaultPermission']);
-   }
-
-   // "My Forums" mgmt screen
-   public function PluginController_MyForums_Create(&$Sender, $EventArguments) {
-      $Sender->Title('My Forums');
-      $Sender->AddSideMenu('garden/plugin/myforums');
-
-      $Database = $this->_GetDatabase();
-      $Sender->SiteData = $Database->SQL()->Select('s.*')
-         ->From('Site s')
-         ->Where('AccountID', Gdn::Config('VanillaForums.AccountID', -1))
-         ->Where('InsertUserID', Gdn::Config('VanillaForums.UserID', -1))
-         ->Where('Path <>', '') // Make sure default site or buggy rows are excluded
-         ->Get();
-      $Database->CloseConnection();
-      
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'myforums.php');
-   }
-
-   // "Premium Upgrades" mgmt screen
-   public function PluginController_Upgrades_Create(&$Sender, $EventArguments) {
-      $Sender->Title('Premium Upgrades');
-      $Sender->AddCssFile('/plugins/vfoptions/style.css');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
-      $View = Gdn::Config('Plugins.VFOptions.UpgradeView', 'upgrades.php');
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . $View);
-   }
-   
-   public function PluginController_CustomDomain_Create(&$Sender, $EventArguments) {
-      $Sender->Title('Premium Upgrades &raquo; Custom Domain Name');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
-
-      // Send a request to the specified domain, and see if it hits our
-      // server (it should return our custom 404 error if it is pointed at
-      // us).
-      $Sender->Form = new Gdn_Form();
-      $Domain = $Sender->Form->GetValue('CustomDomain', '');
-      $Response = '';
-      if ($Domain != '') {
-         $Domain = PrefixString('http://', $Domain);
-         $Response = ProxyRequest($Domain);
-         $ExpectedResponse = ProxyRequest('http://reserved.vanillaforums.com');
-         if ($Response != $ExpectedResponse) {
-            $Sender->Form->AddError("We were unable to verify that ".$Domain." is pointing at VanillaForums.com.");
-         } else {
-            // It is pointing at the correct place, so change the name and create a symlink folder.
-         }
-      }
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'customdomain.php');
-   }
-
-   public function PluginController_Remove_Create(&$Sender, $EventArguments) {
-      $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
-      $About = ArrayValue(0, $Sender->RequestArgs, '');
-      $Sender->Form = new Gdn_Form();
-      if ($Sender->Form->IsPostBack()) {
-         if ($About == 'adremoval') {
-            $Conf = PATH_CONF . DS . 'config.php';
-            $Contents = file_get_contents($Conf);
-            $Contents = str_replace(
-               "\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';\n",
-               '',
-               $Contents
-            );
-            $Contents = str_replace(
-               "// EnabledPlugins",
-               "// EnabledPlugins
-\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';",
-               $Contents
-            );
-            
-            file_put_contents($Conf, $Contents);
-            Redirect('garden/plugin/upgrades');
-         }
-      }
-
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'remove.php');
-   }
-   
-   public function PluginController_ThankYou_Create(&$Sender, $EventArguments) {
-      $Sender->Title('Premium Upgrades &raquo; Thank You!');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'thankyou.php');
-   }
-   
-   public function PluginController_LearnMore_Create(&$Sender, $EventArguments) {
-      $Sender->Title('Premium Upgrades &raquo; Learn More');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
-      $Sender->Form = new Gdn_Form();
-      $About = ArrayValue(0, $Sender->RequestArgs, '');
-      if ($About == 'customdomain')
-         return $this->PluginController_CustomDomain_Create($Sender, $EventArguments);
+   /**
+    * When an administrative user (UserID == 1) is saved, make sure to save the
+    * changes across all of the user's forums, including the VanillaForums.com
+    * database.
+    */
+   public function Gdn_UserModel_AfterSave_Handler(&$Sender, $EventArguments = '') {
+      $Fields = ArrayValue('Fields', $EventArguments);
+      $UserID = ArrayValue('UserID', $Fields, -1);
+      if ($UserID == -1)
+         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
          
-      if ($Sender->Form->IsPostBack()) {
-         if ($About == 'adremoval') {
-            $PluginManager = Gdn::Factory('PluginManager');
-            $PluginManager->DisablePlugin('GoogleAdSense');
+      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
+      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
+      $Email = ArrayValue('Email', $Fields);
+      $Password = ArrayValue('Password', $Fields); // <-- This was encrypted in the model
+      $SaveFields = array();
+      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
+         // If a new password was specified, save it
+         if ($Password !== FALSE)
+            $SaveFields['Password'] = $Password;
+            
+         // If a new email was specified, save that too
+         if ($Email !== FALSE)
+            $SaveFields['Email'] = $Email;
+            
+         $this->_SaveAcrossForums($SaveFields, $VFUserID, $VFAccountID);
+      }
+   }
+
+   /**
+    * Before any forum's administrative user (UserID == 1) is saved, validate
+    * that the email address being saved isn't being used by any other user in
+    * any of their forums, or in the VanillaForums.com database.
+    */
+   public function Gdn_UserModel_BeforeSave_Handler(&$Sender, $EventArguments = '') {
+      $Fields = ArrayValue('Fields', $EventArguments);
+      $UserID = ArrayValue('UserID', $Fields, -1);
+      if ($UserID == -1)
+         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
+
+      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
+      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
+      $Email = ArrayValue('Email', $Fields);
+      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
+         // Retrieve all of the user's sites
+         $SiteData = $this->_GetDatabase()->SQL()
+            ->Select('DatabaseName, Path')
+            ->From('Site')
+            ->Where('AccountID', $VFAccountID)
+            ->Get();
+
+         // If the user is trying to change the email address...
+         if ($this->_GetDatabase()->SQL()
+            ->Select('UserID')
+            ->From('User')
+            ->Where('UserID <> ', $VFUserID)
+            ->Where('Email', $Email)
+            ->Get()
+            ->NumRows() > 0) {
+            $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
+         } else {
+            // Now check it against all forums the user owns, as well
+            if (is_numeric($VFAccountID) && $VFAccountID > 0) {
+               $Cnn = @mysql_connect(
+                  Gdn::Config('Database.Host', ''),
+                  Gdn::Config('Database.User', ''),
+                  Gdn::Config('Database.Password', '')
+               );
+               if ($Cnn) {
+                  foreach ($SiteData as $Site) {
+                     if ($Site->Path != '') {
+                        mysql_select_db($Site->DatabaseName, $Cnn);
+                        $Result = mysql_query("select UserID from GDN_User where UserID <> 1 and Email = '".mysql_real_escape_string($Email, $Cnn)."'");
+                        if ($Result && mysql_num_rows($Result) > 0) {
+                           $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
+                           break;
+                        }
+                     }
+                  }
+                  mysql_close($Cnn);
+               }
+            }
          }
-         $this->PluginController_ThankYou_Create($Sender, $EventArguments);
-      } else {
-         $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'learnmore.php');
+         $this->_GetDatabase()->CloseConnection();
       }
    }
    
-   // Create a New Forum screen
+   /**
+    * Creates a "Create a New Forum" page where users can do just that.
+    */
    public function PluginController_CreateForum_Create(&$Sender, $EventArguments) {
       $Sender->Title('Create a New Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
@@ -217,7 +206,217 @@ pageTracker._trackPageview();
       }
    }
 
-   // Rename forum screen
+   /**
+    * Creates a "Custom Domain" upgrade offering screen where users can purchase
+    * & implement a custom domain.
+    */
+   public function PluginController_CustomDomain_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Premium Upgrades &raquo; Custom Domain Name');
+      $Sender->AddSideMenu('garden/plugin/upgrades');
+
+      // Send a request to the specified domain, and see if it hits our
+      // server (it should return our custom 404 error if it is pointed at
+      // us).
+      $Sender->Form = new Gdn_Form();
+      $Domain = $Sender->Form->GetValue('CustomDomain', '');
+      $Response = '';
+      if ($Domain != '') {
+         $FQDN = PrefixString('http://', $Domain);
+         $Response = ProxyRequest($FQDN);
+         $ExpectedResponse = ProxyRequest('http://reserved.vanillaforums.com');
+         if ($Response != $ExpectedResponse) {
+            $Sender->Form->AddError("We were unable to verify that ".$Domain." is pointing at VanillaForums.com.");
+         } else {
+            $OldDomain = str_replace(array('http://', ''), array('', ''), Gdn::Config('Domain'));
+            // It is pointing at the correct place, so...
+            // Create the symlink folder
+            exec('/bin/ln -s /srv/www/vhosts/'.$OldDomain.' /srv/www/vhosts/'.$Domain);
+            // Make sure it exists
+            if (!file_exists('/srv/www/vhosts/'.$Domain)) {
+               $Sender->Form->AddError('Failed to create custom domain. Please contact support@vanillaforums.com for assistance.');
+            } else {
+               // Change the domain in the conf file
+               $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
+               $Contents = str_replace(
+                  array(
+                     "\$Configuration['Garden']['Cookie']['Domain'] = '".Gdn::Config('Garden.Cookie.Domain')."';",
+                     "\$Configuration['Garden']['Domain'] = '".$OldDomain."';"
+                  ),
+                  array(
+                     "\$Configuration['Garden']['Cookie']['Domain'] = '$Domain';",
+                     "\$Configuration['Garden']['Domain'] = '$Domain';"
+                  ),
+                  $Contents
+               );
+               file_put_contents(PATH_CONF . DS . 'config.php');
+               
+               // Update the domain in the VanillaForums.GDN_Site table
+               $this->_GetDatabase()->SQL->Put(
+                  'Site',
+                  array(
+                     'Name' => $Domain,
+                     'Domain' => $Domain,
+                     'Path' => '/srv/www/vhosts/'.$Domain
+                  ),
+                  array('SiteID' => Gdn::Config('VanillaForums.SiteID'))
+               );
+               
+               $this->_GetDatabase()->CloseConnection();
+               
+               // Redirect to the new domain
+               Redirect($FQDN.'/garden/plugin/thankyou');
+            }
+         }
+      }
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'customdomain.php');
+   }
+
+   /**
+    * Creates a "Delete Forum" page where users can completely remove their
+    * forum.
+    */
+   public function PluginController_DeleteForum_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Delete Forum');
+      $Sender->AddSideMenu('garden/plugin/myforums');
+      $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforums';
+      $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'vanilladev';
+      
+      $Session = Gdn::Session();
+      $SiteID = ArrayValue(0, $EventArguments, '');
+      $TransientKey = ArrayValue(1, $EventArguments, '');
+      $Site = FALSE;
+      if (is_numeric($SiteID) && $SiteID > 0) {
+         $Site = $this->_GetDatabase()->SQL()->Select('s.*')
+            ->From('Site s')
+            ->Where('SiteID', $SiteID)
+            ->Where('InsertUserID', Gdn::Config('VanillaForums.UserID', -1))
+            ->Get()
+            ->FirstRow();
+         $Sender->Site = $Site;
+      }
+      
+      if (!$Session->ValidateTransientKey($TransientKey)
+          || !$Session->CheckPermission('Garden.Settings.GlobalPrivs')
+          || !$Site
+         ) {
+         $this->_GetDatabase()->CloseConnection();
+         $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'permission.php');
+      } else {
+         $Sender->Form = new Gdn_Form();
+         if ($Sender->Form->AuthenticatedPostback()) {
+            $Sender->StatusMessage = Translate("The forum has been deleted.");
+            $Sender->RedirectUrl = Url('plugin/myforums');
+            
+            // If we are in that forum right now, redirect to another forum the user owns
+            if ($SiteID == Gdn::Config('VanillaForums.SiteID', -1)) {
+               $NewSite = $this->_GetDatabase()->SQL()
+                  ->Select()
+                  ->From('Site')
+                  ->Where('AccountID', Gdn::Config('VanillaForums.AccountID'))
+                  ->Where('SiteID <>', $SiteID)
+                  ->Where('Path <>', '')
+                  ->Get()
+                  ->FirstRow();
+               
+               // If the user doesn't own any other forums, send them back out to the homepage
+               if (!$NewSite) {
+                  $Sender->RedirectUrl = 'http://'.$Domain.'.com';
+               } else {
+                  $Sender->RedirectUrl = 'http://'.$NewSite->Name.'/plugin/myforums';
+               }
+            }
+            // We delete the forum *after* the redirects have been defined so we
+            // can use the conf file to determine some things.
+            $SiteID = $Site->SiteID;
+            $VFSQL = &$this->_GetDatabase()->SQL();
+            include('/srv/www/'.$Folder.'/applications/vfcom/utils/deleteforum.php');
+         }
+         
+         $this->_GetDatabase()->CloseConnection();
+         $Sender->Render('/srv/www/misc/plugins/vfoptions/views/deleteforum.php');
+      }
+   }
+   
+   /**
+    * Creates a "Learn More" screen that contains more info on upgrade
+    * offerings.
+    */
+   public function PluginController_LearnMore_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Premium Upgrades &raquo; Learn More');
+      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $Sender->Form = new Gdn_Form();
+      $About = ArrayValue(0, $Sender->RequestArgs, '');
+      if ($About == 'customdomain')
+         return $this->PluginController_CustomDomain_Create($Sender, $EventArguments);
+         
+      if ($Sender->Form->IsPostBack()) {
+         if ($About == 'adremoval') {
+            $PluginManager = Gdn::Factory('PluginManager');
+            $PluginManager->DisablePlugin('GoogleAdSense');
+         }
+         $this->PluginController_ThankYou_Create($Sender, $EventArguments);
+      } else {
+         $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'learnmore.php');
+      }
+   }
+   
+   /**
+    * Creates a "My Forums" management screen where users can review, add, and
+    * rename their forums.
+    */
+   public function PluginController_MyForums_Create(&$Sender, $EventArguments) {
+      $Sender->Title('My Forums');
+      $Sender->AddSideMenu('garden/plugin/myforums');
+
+      $Database = $this->_GetDatabase();
+      $Sender->SiteData = $Database->SQL()->Select('s.*')
+         ->From('Site s')
+         ->Where('AccountID', Gdn::Config('VanillaForums.AccountID', -1))
+         ->Where('InsertUserID', Gdn::Config('VanillaForums.UserID', -1))
+         ->Where('Path <>', '') // Make sure default site or buggy rows are excluded
+         ->Get();
+      $Database->CloseConnection();
+      
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'myforums.php');
+   }
+
+   /**
+    * Creates a "Remove Upgrade" screen where users can remove previously
+    * purchased upgrade offerings.
+    */
+   public function PluginController_Remove_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
+      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $About = ArrayValue(0, $Sender->RequestArgs, '');
+      $Sender->Form = new Gdn_Form();
+      if ($Sender->Form->IsPostBack()) {
+         if ($About == 'adremoval') {
+            $Conf = PATH_CONF . DS . 'config.php';
+            $Contents = file_get_contents($Conf);
+            $Contents = str_replace(
+               "\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';\n",
+               '',
+               $Contents
+            );
+            $Contents = str_replace(
+               "// EnabledPlugins",
+               "// EnabledPlugins
+\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';",
+               $Contents
+            );
+            
+            file_put_contents($Conf, $Contents);
+            Redirect('garden/plugin/upgrades');
+         }
+      }
+
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'remove.php');
+   }
+   
+   /**
+    * Creates a "Rename Forum" page where users can rename their forum's
+    * VanillaForums.com subdomain.
+    */
    public function PluginController_RenameForum_Create(&$Sender, $EventArguments) {
       $Sender->Title('Rename Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
@@ -287,156 +486,51 @@ pageTracker._trackPageview();
       }
    }
 
-   // Delete forum screen
-   public function PluginController_DeleteForum_Create(&$Sender, $EventArguments) {
-      $Sender->Title('Delete Forum');
-      $Sender->AddSideMenu('garden/plugin/myforums');
-      $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforums';
-      $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'vanilladev';
-      
-      $Session = Gdn::Session();
-      $SiteID = ArrayValue(0, $EventArguments, '');
-      $TransientKey = ArrayValue(1, $EventArguments, '');
-      $Site = FALSE;
-      if (is_numeric($SiteID) && $SiteID > 0) {
-         $Site = $this->_GetDatabase()->SQL()->Select('s.*')
-            ->From('Site s')
-            ->Where('SiteID', $SiteID)
-            ->Where('InsertUserID', Gdn::Config('VanillaForums.UserID', -1))
-            ->Get()
-            ->FirstRow();
-         $Sender->Site = $Site;
-      }
-      
-      if (!$Session->ValidateTransientKey($TransientKey)
-          || !$Session->CheckPermission('Garden.Settings.GlobalPrivs')
-          || !$Site
-         ) {
-         $this->_GetDatabase()->CloseConnection();
-         $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'permission.php');
-      } else {
-         $Sender->Form = new Gdn_Form();
-         if ($Sender->Form->AuthenticatedPostback()) {
-            $Sender->StatusMessage = Translate("The forum has been deleted.");
-            $Sender->RedirectUrl = Url('plugin/myforums');
-            
-            // If we are in that forum right now, redirect to another forum the user owns
-            if ($SiteID == Gdn::Config('VanillaForums.SiteID', -1)) {
-               $NewSite = $this->_GetDatabase()->SQL()
-                  ->Select()
-                  ->From('Site')
-                  ->Where('AccountID', Gdn::Config('VanillaForums.AccountID'))
-                  ->Where('SiteID <>', $SiteID)
-                  ->Where('Path <>', '')
-                  ->Get()
-                  ->FirstRow();
-               
-               // If the user doesn't own any other forums, send them back out to the homepage
-               if (!$NewSite) {
-                  $Sender->RedirectUrl = 'http://'.$Domain.'.com';
-               } else {
-                  $Sender->RedirectUrl = 'http://'.$NewSite->Name.'/plugin/myforums';
-               }
-            }
-            // We delete the forum *after* the redirects have been defined so we
-            // can use the conf file to determine some things.
-            $SiteID = $Site->SiteID;
-            $VFSQL = &$this->_GetDatabase()->SQL();
-            include('/srv/www/'.$Folder.'/applications/vfcom/utils/deleteforum.php');
-         }
-         
-         $this->_GetDatabase()->CloseConnection();
-         $Sender->Render('/srv/www/misc/plugins/vfoptions/views/deleteforum.php');
-      }
+   /**
+    * Creates a "Thank You" page that users can be directed to after they have
+    * purchased upgrades.
+    */
+   public function PluginController_ThankYou_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Premium Upgrades &raquo; Thank You!');
+      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'thankyou.php');
    }
    
-   // Before UserID 1 saves are processed, validate the email address across forums.
-   public function Gdn_UserModel_BeforeSave_Handler(&$Sender, $EventArguments = '') {
-      $Fields = ArrayValue('Fields', $EventArguments);
-      $UserID = ArrayValue('UserID', $Fields, -1);
-      if ($UserID == -1)
-         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
-
-      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
-      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
-      $Email = ArrayValue('Email', $Fields);
-      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
-         // Retrieve all of the user's sites
-         $SiteData = $this->_GetDatabase()->SQL()
-            ->Select('DatabaseName, Path')
-            ->From('Site')
-            ->Where('AccountID', $VFAccountID)
-            ->Get();
-
-         // If the user is trying to change the email address...
-         if ($this->_GetDatabase()->SQL()
-            ->Select('UserID')
-            ->From('User')
-            ->Where('UserID <> ', $VFUserID)
-            ->Where('Email', $Email)
-            ->Get()
-            ->NumRows() > 0) {
-            $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
-         } else {
-            // Now check it against all forums the user owns, as well
-            if (is_numeric($VFAccountID) && $VFAccountID > 0) {
-               $Cnn = @mysql_connect(
-                  Gdn::Config('Database.Host', ''),
-                  Gdn::Config('Database.User', ''),
-                  Gdn::Config('Database.Password', '')
-               );
-               if ($Cnn) {
-                  foreach ($SiteData as $Site) {
-                     if ($Site->Path != '') {
-                        mysql_select_db($Site->DatabaseName, $Cnn);
-                        $Result = mysql_query("select UserID from GDN_User where UserID <> 1 and Email = '".mysql_real_escape_string($Email, $Cnn)."'");
-                        if ($Result && mysql_num_rows($Result) > 0) {
-                           $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
-                           break;
-                        }
-                     }
-                  }
-                  mysql_close($Cnn);
-               }
-            }
-         }
-         // $this->_GetDatabase()->CloseConnection();
-      }
+   /**
+    * Creates a "Premium Upgrades" management screen where users can review &
+    * purchase upgrade offerings.
+    */
+   public function PluginController_Upgrades_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Premium Upgrades');
+      $Sender->AddCssFile('/plugins/vfoptions/style.css');
+      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $View = Gdn::Config('Plugins.VFOptions.UpgradeView', 'upgrades.php');
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . $View);
    }
    
-   // Save UserID 1 password & email changes across all user's forums (including vanillaforums.com db)
-   public function Gdn_UserModel_AfterSave_Handler(&$Sender, $EventArguments = '') {
-      $Fields = ArrayValue('Fields', $EventArguments);
-      $UserID = ArrayValue('UserID', $Fields, -1);
-      if ($UserID == -1)
-         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
-         
-      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
-      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
-      $Email = ArrayValue('Email', $Fields);
-      $Password = ArrayValue('Password', $Fields); // <-- This was encrypted in the model
-      $SaveFields = array();
-      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
-         // If a new password was specified, save it
-         if ($Password !== FALSE)
-            $SaveFields['Password'] = $Password;
-            
-         // If a new email was specified, save that too
-         if ($Email !== FALSE)
-            $SaveFields['Email'] = $Email;
-            
-         $this->_SaveAcrossForums($SaveFields, $VFUserID, $VFAccountID);
-      }
+   /**
+    * Don't let the users access the items under the "Add-ons" menu section of
+    * the dashboard: applications & plugins (themes was moved to the "
+    * Appearance" section.
+    */
+   public function SettingsController_Render_Before(&$Sender) {
+      if (
+         strcasecmp($Sender->RequestMethod, 'plugins') == 0
+         || strcasecmp($Sender->RequestMethod, 'applications') == 0
+      ) Redirect($Sender->Routes['DefaultPermission']);
    }
 
-   public function Setup() {
-      // No setup required.
-   }
+   /**
+    * No setup required.
+    */
+   public function Setup() {}
    
-   // Main VanillaForums.com database connection
+   /**
+    * Opens a connection to the VanillaForums.com database.
+    */
    private $_Database = FALSE;
    private function _GetDatabase() {
-      if (!$this->_Database) {
+      if (!$this->_Database || is_null($this->_Database)) {
          $this->_Database = new Gdn_Database(array(
             'Name' => 'vanillaforumscom',
             'Host' => Gdn::Config('Database.Host'),
@@ -448,14 +542,19 @@ pageTracker._trackPageview();
       return $this->_Database;
    }
    
+   /**
+    * Retrieves a User record by Name from the current database.
+    */
    private function _GetUserIDByName($Name) {
       $UserModel = Gdn::UserModel();
       $User = $UserModel->Get($Name);
       return (is_object($User) && property_exists($User, 'UserID')) ? $User->UserID : -1;
    }
    
-   // Save the specified fields to the appropriate vf.com GDN_User row, as well
-   // as all of the related forums for GDN_User.UserID = 1
+   /**
+    * Save $FieldsToSave to all of the admin users across databases for
+    * $VFAccountID, as well as the appropriate VanillaForums.GDN_User row.
+    */
    private function _SaveAcrossForums($FieldsToSave, $VFUserID, $VFAccountID) {
       // Retrieve all of the user's sites
       $SiteData = $this->_GetDatabase()->SQL()
@@ -486,6 +585,6 @@ pageTracker._trackPageview();
          }
          mysql_close($Cnn);
       }
-      // $this->_GetDatabase()->CloseConnection();
+      $this->_GetDatabase()->CloseConnection();
    }
 }
