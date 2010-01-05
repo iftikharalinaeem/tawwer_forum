@@ -23,7 +23,7 @@ $Session = Gdn::Session();
             <?php
             if ($UsesCustomDomain) {
                echo $Site->Name
-                  .' <span class="Arrow">↬</span> Visitors will be redirected to your custom domain →';
+                  .' <span style="font-size: 18px;">↬</span> Visitors will be redirected to your custom domain →';
             } else {
                echo '<strong>'.Anchor($Site->Name, 'http://'.$Site->Name).'</strong>';
             }
@@ -44,6 +44,11 @@ $Session = Gdn::Session();
             if ($UsesCustomDomain) {
                // Otherwise, show the custom domain
                echo '<strong>'.Anchor($Site->Domain, 'http://'.$Site->Domain).'</strong>';
+               ?>
+               <div>
+                  <?php echo Anchor('Remove Custom Domain', '/plugin/removecustomdomain/', 'RemoveCustomDomain Popup'); ?>
+               </div>
+               <?php
             } else {
                // Offer for them to set up a custom domain
                echo Anchor('Add a custom domain', 'http://'.$Site->Name.'/plugin/upgrades', 'Button');
