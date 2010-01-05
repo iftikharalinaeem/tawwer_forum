@@ -157,7 +157,7 @@ pageTracker._trackPageview();
                }
             }
          }
-         $this->_GetDatabase()->CloseConnection();
+         $this->_CloseDatabase();
       }
    }
    
@@ -261,7 +261,7 @@ pageTracker._trackPageview();
                   array('SiteID' => Gdn::Config('VanillaForums.SiteID'))
                );
                
-               $this->_GetDatabase()->CloseConnection();
+               $this->_CloseDatabase();
                
                // Redirect to the new domain
                Redirect($FQDN.'/garden/plugin/thankyou');
@@ -299,7 +299,7 @@ pageTracker._trackPageview();
           || !$Session->CheckPermission('Garden.Settings.GlobalPrivs')
           || !$Site
          ) {
-         $this->_GetDatabase()->CloseConnection();
+         $this->_CloseDatabase();
          $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'permission.php');
       } else {
          $Sender->Form = new Gdn_Form();
@@ -332,7 +332,7 @@ pageTracker._trackPageview();
             include('/srv/www/'.$Folder.'/applications/vfcom/utils/deleteforum.php');
          }
          
-         $this->_GetDatabase()->CloseConnection();
+         $this->_CloseDatabase();
          $Sender->Render('/srv/www/misc/plugins/vfoptions/views/deleteforum.php');
       }
    }
@@ -368,14 +368,13 @@ pageTracker._trackPageview();
       $Sender->Title('My Forums');
       $Sender->AddSideMenu('garden/plugin/myforums');
 
-      $Database = $this->_GetDatabase();
-      $Sender->SiteData = $Database->SQL()->Select('s.*')
+      $Sender->SiteData = $this->_GetDatabase()->SQL()->Select('s.*')
          ->From('Site s')
          ->Where('AccountID', Gdn::Config('VanillaForums.AccountID', -1))
          ->Where('InsertUserID', Gdn::Config('VanillaForums.UserID', -1))
          ->Where('Path <>', '') // Make sure default site or buggy rows are excluded
          ->Get();
-      $Database->CloseConnection();
+      $this->_CloseDatabase();
       
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'myforums.php');
    }
@@ -438,7 +437,7 @@ pageTracker._trackPageview();
           || !$Session->CheckPermission('Garden.Settings.GlobalPrivs')
           || !$Site
          ) {
-         $this->_GetDatabase()->CloseConnection();
+         $this->_CloseDatabase();
          $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'permission.php');
       } else {
          $Sender->Form = new Gdn_Form();
@@ -481,7 +480,7 @@ pageTracker._trackPageview();
             }
          }
          
-         $this->_GetDatabase()->CloseConnection();
+         $this->_CloseDatabase();
          $Sender->Render('/srv/www/misc/plugins/vfoptions/views/renameforum.php');
       }
    }
@@ -530,7 +529,7 @@ pageTracker._trackPageview();
     */
    private $_Database = FALSE;
    private function _GetDatabase() {
-      if (!$this->_Database || is_null($this->_Database)) {
+      if (!is_object($this->_Database)) {
          $this->_Database = new Gdn_Database(array(
             'Name' => 'vanillaforumscom',
             'Host' => Gdn::Config('Database.Host'),
@@ -540,6 +539,10 @@ pageTracker._trackPageview();
       }
          
       return $this->_Database;
+   }
+   private function _CloseDatabase() {
+      $this->_Database->CloseConnection();
+      $this->_Database = FALSE;
    }
    
    /**
@@ -585,6 +588,6 @@ pageTracker._trackPageview();
          }
          mysql_close($Cnn);
       }
-      $this->_GetDatabase()->CloseConnection();
+      $this->_CloseDatabase();
    }
 }
