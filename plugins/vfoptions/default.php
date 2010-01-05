@@ -181,6 +181,7 @@ pageTracker._trackPageview();
     * Creates a "Create a New Forum" page where users can do just that.
     */
    public function PluginController_CreateForum_Create(&$Sender, $EventArguments) {
+      $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Create a New Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
       
@@ -227,6 +228,7 @@ pageTracker._trackPageview();
     * & implement a custom domain.
     */
    public function PluginController_CustomDomain_Create(&$Sender, $EventArguments) {
+      $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades &raquo; Custom Domain Name');
       $Sender->AddSideMenu('garden/plugin/upgrades');
 
@@ -298,6 +300,7 @@ pageTracker._trackPageview();
     * forum.
     */
    public function PluginController_DeleteForum_Create(&$Sender, $EventArguments) {
+      $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Delete Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
       $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforums';
@@ -364,6 +367,7 @@ pageTracker._trackPageview();
     * offerings.
     */
    public function PluginController_LearnMore_Create(&$Sender, $EventArguments) {
+      $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades &raquo; Learn More');
       $Sender->AddSideMenu('garden/plugin/upgrades');
       $Sender->Form = new Gdn_Form();
@@ -387,6 +391,7 @@ pageTracker._trackPageview();
     * rename their forums.
     */
    public function PluginController_MyForums_Create(&$Sender, $EventArguments) {
+      $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('My Forums');
       $Sender->AddSideMenu('garden/plugin/myforums');
 
@@ -406,6 +411,7 @@ pageTracker._trackPageview();
     * purchased upgrade offerings.
     */
    public function PluginController_Remove_Create(&$Sender, $EventArguments) {
+      $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
       $Sender->AddSideMenu('garden/plugin/upgrades');
       $About = ArrayValue(0, $Sender->RequestArgs, '');
@@ -440,6 +446,7 @@ pageTracker._trackPageview();
     * and it will cause symlinks to break on custom-domains if used.
     */
    public function PluginController_RenameForum_Create(&$Sender, $EventArguments) {
+      $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Rename Forum');
       $Sender->AddSideMenu('garden/plugin/myforums');
       
@@ -546,6 +553,7 @@ pageTracker._trackPageview();
     * purchase upgrade offerings.
     */
    public function PluginController_Upgrades_Create(&$Sender, $EventArguments) {
+      $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades');
       $Sender->AddCssFile('/plugins/vfoptions/style.css');
       $Sender->AddSideMenu('garden/plugin/upgrades');
