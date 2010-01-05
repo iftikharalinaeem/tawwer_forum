@@ -252,7 +252,7 @@ pageTracker._trackPageview();
                file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
                
                // Update the domain in the VanillaForums.GDN_Site table
-               $this->_GetDatabase()->SQL->Put(
+               $this->_GetDatabase()->SQL()->Put(
                   'Site',
                   array(
                      'Name' => $Domain,
