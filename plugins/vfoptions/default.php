@@ -458,7 +458,7 @@ pageTracker._trackPageview();
                );
                
                // Update the config file
-               $CookieDomain = substr($Site->Domain, strpos($Site->Domain, '.'));
+               $CookieDomain = substr($Site->Name, strpos($Site->Name, '.'));
                $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
                $Contents = str_replace(
                   array(
@@ -467,7 +467,7 @@ pageTracker._trackPageview();
                   ),
                   array(
                      "\$Configuration['Garden']['Cookie']['Domain'] = '$CookieDomain';",
-                     "\$Configuration['Garden']['Domain'] = '".$Site->Domain."';"
+                     "\$Configuration['Garden']['Domain'] = '".$Site->Name."';"
                   ),
                   $Contents
                );
