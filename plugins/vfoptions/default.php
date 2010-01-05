@@ -693,6 +693,7 @@ pageTracker._trackPageview();
             'Domain' => Gdn::Config('Garden.Cookie.Domain')
          ));
          $Identity->SetIdentity($UserIDToSpoof, TRUE);
+         Redirect('settings');
       }
    }
    
