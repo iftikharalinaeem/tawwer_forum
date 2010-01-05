@@ -244,9 +244,15 @@ pageTracker._trackPageview();
             $Sender->Form->AddError('The requested domain is already assigned.');
          } else {
             $FQDN = PrefixString('http://', $Domain);
-            $Response = ProxyRequest($FQDN);
-            $ExpectedResponse = ProxyRequest('http://reserved.vanillaforums.com');
-            if ($Response != $ExpectedResponse) {
+            $Error = FALSE;
+            try {
+               $Response = ProxyRequest($FQDN);
+               $ExpectedResponse = ProxyRequest('http://reserved.vanillaforums.com');               
+            } catch(Exception $e) {
+               $Error = TRUE;
+               // Don't do anything with the exception
+            }
+            if ($Error || $Response != $ExpectedResponse) {
                $Sender->Form->AddError("We were unable to verify that ".$Domain." is pointing at VanillaForums.com.");
             } else {
                $OldDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', ''));
