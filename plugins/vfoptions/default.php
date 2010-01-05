@@ -268,17 +268,9 @@ pageTracker._trackPageview();
                   
                   $this->_CloseDatabase();
                   
-                  // Authenticate the user on the custom domain
-                  $Identity = new Gdn_CookieIdentity();
-                  $Identity->Init(array(
-                     'Salt' => Gdn::Config('Garden.Cookie.Salt'),
-                     'Name' => Gdn::Config('Garden.Cookie.Name'),
-                     'Domain' => $Domain
-                  ));
-                  $Identity->SetIdentity(1, TRUE);
-                  
                   // Redirect to the new domain
-                  Redirect($FQDN.'/garden/plugin/thankyou');
+                  $Session = Gdn::Session();
+                  Redirect($FQDN.'/garden/plugin/thankyou/authenticate/'.$Session->TransientKey());
                }
             }
          }
@@ -507,6 +499,26 @@ pageTracker._trackPageview();
    public function PluginController_ThankYou_Create(&$Sender, $EventArguments) {
       $Sender->Title('Premium Upgrades &raquo; Thank You!');
       $Sender->AddSideMenu('garden/plugin/upgrades');
+      
+      // If there was a request to reauthenticate (ie. we've been shifted to a custom domain and the user needs to reauthenticate)
+      // Check the user's transientkey to make sure they're not a spoofer, and then authenticate them.
+      if (ArrayValue(0, $Sender->RequestArgs, '') == 'authenticate') {
+         $PostBackKey = ArrayValue(1, $Sender->RequestArgs, '');
+         $UserModel = Gdn::UserModel();
+         $AdminUser = $UserModel->GetSession(1);
+         $Attributes = Format::Unserialize($AdminUser->Attributes);
+         $TransientKey = is_array($Attributes) ? ArrayValue('TransientKey', $Attributes) : FALSE;
+         if ($TransientKey == $PostBackKey) {
+            $Identity = new Gdn_CookieIdentity();
+            $Identity->Init(array(
+               'Salt' => Gdn::Config('Garden.Cookie.Salt'),
+               'Name' => Gdn::Config('Garden.Cookie.Name'),
+               'Domain' => Gdn::Config('Garden.Cookie.Domain')
+            ));
+            $Identity->SetIdentity(1, TRUE);
+         }
+      }
+      
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'thankyou.php');
    }
    
