@@ -227,10 +227,10 @@ pageTracker._trackPageview();
          if ($Response != $ExpectedResponse) {
             $Sender->Form->AddError("We were unable to verify that ".$Domain." is pointing at VanillaForums.com.");
          } else {
-            $OldDomain = str_replace(array('http://', ''), array('', ''), Gdn::Config('Domain'));
+            $OldDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', ''));
             // It is pointing at the correct place, so...
             // Create the symlink folder
-            exec('/srv/www/misc/utils/symlink "/srv/www/vhosts/'.$OldDomain.'" "/srv/www/vhosts/'.$Domain.'"');
+            exec('/bin/ln -s "/srv/www/vhosts/'.$OldDomain.'" "/srv/www/vhosts/'.$Domain.'"');
             
             // Make sure it exists
             if (!file_exists('/srv/www/vhosts/'.$Domain)) {
