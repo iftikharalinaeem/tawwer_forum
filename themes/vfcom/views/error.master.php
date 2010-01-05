@@ -16,7 +16,7 @@
          <h1>Bonk</h1>
          <p>
             Something funky happened. We've logged the issue and we will take care of it!
-            <span style="text-shadow: none; font-size: 14px;">Please contact us if you require immediate assistance: <?php echo Format::Email('support@vanillaforums.com'); ?></span>
+            <span style="text-shadow: none; font-size: 14px; display: block;">Please contact us if you require immediate assistance: <?php echo Format::Email('support@vanillaforums.com'); ?></span>
          </p>
       </div>
    </div>
