@@ -6,6 +6,7 @@ $CustomDomain = str_replace(array('http://', '/'), array('', ''), $this->Form->G
 <div class="Legal">
    <?php
    if ($this->Form->ErrorCount() > 0) {
+      echo $this->Form->Errors();
    ?>
    <h3>Possible problem with <?php echo $CustomDomain; ?></h3>
    <p>We were unable to verify that <?php echo $CustomDomain; ?> is pointing at VanillaForums.com. Try the troubleshooting steps below to get it going.</p>

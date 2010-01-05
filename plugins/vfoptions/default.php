@@ -221,51 +221,65 @@ pageTracker._trackPageview();
       $Domain = $Sender->Form->GetValue('CustomDomain', '');
       $Response = '';
       if ($Domain != '') {
-         $FQDN = PrefixString('http://', $Domain);
-         $Response = ProxyRequest($FQDN);
-         $ExpectedResponse = ProxyRequest('http://reserved.vanillaforums.com');
-         if ($Response != $ExpectedResponse) {
-            $Sender->Form->AddError("We were unable to verify that ".$Domain." is pointing at VanillaForums.com.");
+         // Make sure it isn't already in use
+         if (file_exists('/srv/www/vhosts/'.$Domain)) {
+            $Sender->Form->AddError('The requested domain is already assigned.');
          } else {
-            $OldDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', ''));
-            // It is pointing at the correct place, so...
-            // Create the symlink folder
-            exec('/bin/ln -s "/srv/www/vhosts/'.$OldDomain.'" "/srv/www/vhosts/'.$Domain.'"');
-            
-            // Make sure it exists
-            if (!file_exists('/srv/www/vhosts/'.$Domain)) {
-               $Sender->Form->AddError('Failed to create custom domain. Please contact support@vanillaforums.com for assistance.');
+            $FQDN = PrefixString('http://', $Domain);
+            $Response = ProxyRequest($FQDN);
+            $ExpectedResponse = ProxyRequest('http://reserved.vanillaforums.com');
+            if ($Response != $ExpectedResponse) {
+               $Sender->Form->AddError("We were unable to verify that ".$Domain." is pointing at VanillaForums.com.");
             } else {
-               // Change the domain in the conf file
-               $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
-               $Contents = str_replace(
-                  array(
-                     "\$Configuration['Garden']['Cookie']['Domain'] = '".Gdn::Config('Garden.Cookie.Domain')."';",
-                     "\$Configuration['Garden']['Domain'] = '".$OldDomain."';"
-                  ),
-                  array(
-                     "\$Configuration['Garden']['Cookie']['Domain'] = '$Domain';",
-                     "\$Configuration['Garden']['Domain'] = '$Domain';"
-                  ),
-                  $Contents
-               );
-               file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
+               $OldDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', ''));
+               // It is pointing at the correct place, so...
+               // Create the symlink folder
+               exec('/bin/ln -s "/srv/www/vhosts/'.$OldDomain.'" "/srv/www/vhosts/'.$Domain.'"');
                
-               // Update the domain in the VanillaForums.GDN_Site table
-               $this->_GetDatabase()->SQL()->Put(
-                  'Site',
-                  array(
-                     'Name' => $Domain,
-                     'Domain' => $Domain,
-                     'Path' => '/srv/www/vhosts/'.$Domain
-                  ),
-                  array('SiteID' => Gdn::Config('VanillaForums.SiteID'))
-               );
-               
-               $this->_CloseDatabase();
-               
-               // Redirect to the new domain
-               Redirect($FQDN.'/garden/plugin/thankyou');
+               // Make sure it exists
+               if (!file_exists('/srv/www/vhosts/'.$Domain)) {
+                  $Sender->Form->AddError('Failed to create custom domain. Please contact support@vanillaforums.com for assistance.');
+               } else {
+                  // Change the domain in the conf file
+                  $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
+                  $Contents = str_replace(
+                     array(
+                        "\$Configuration['Garden']['Cookie']['Domain'] = '".Gdn::Config('Garden.Cookie.Domain')."';",
+                        "\$Configuration['Garden']['Domain'] = '".$OldDomain."';"
+                     ),
+                     array(
+                        "\$Configuration['Garden']['Cookie']['Domain'] = '$Domain';",
+                        "\$Configuration['Garden']['Domain'] = '$Domain';"
+                     ),
+                     $Contents
+                  );
+                  file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
+                  
+                  // Update the domain in the VanillaForums.GDN_Site table
+                  $this->_GetDatabase()->SQL()->Put(
+                     'Site',
+                     array(
+                        'Name' => $Domain,
+                        'Domain' => $Domain,
+                        'Path' => '/srv/www/vhosts/'.$Domain
+                     ),
+                     array('SiteID' => Gdn::Config('VanillaForums.SiteID'))
+                  );
+                  
+                  $this->_CloseDatabase();
+                  
+                  // Authenticate the user on the custom domain
+                  $Identity = new Gdn_CookieIdentity();
+                  $Identity->Init(array(
+                     'Salt' => Gdn::Config('Garden.Cookie.Salt'),
+                     'Name' => Gdn::Config('Garden.Cookie.Name'),
+                     'Domain' => $Domain
+                  ));
+                  $Identity->SetIdentity(1, TRUE);
+                  
+                  // Redirect to the new domain
+                  Redirect($FQDN.'/garden/plugin/thankyou');
+               }
             }
          }
       }
