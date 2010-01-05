@@ -478,7 +478,7 @@ pageTracker._trackPageview();
                // Remove the symlinked folder
                // WARNING: Do not use a trailing slash on symlinked folders when rm'ing, or it will remove the source!
                $SymLinkedFolder = substr(PATH_ROOT, -1, 1) == '/' ? substr(PATH_ROOT, 0, -1) : PATH_ROOT;
-               unlink($SymLinkedFolder);
+               rmdir($SymLinkedFolder);
                
                // Redirect to the new domain
                $Session = Gdn::Session();
