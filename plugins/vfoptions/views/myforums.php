@@ -23,7 +23,7 @@ $Session = Gdn::Session();
             <?php
             if ($UsesCustomDomain) {
                echo Anchor($Site->Name, 'http://'.$Site->Name);
-               echo '<span style="font-size: 18px; margin-left: 10px;">↬</span> Visitors redirected to your custom domain.';
+               echo '<span style="font-size: 18px; margin-left: 10px;">↬</span> Visitors will be redirected to '.$Site->Domain;
             } else {
                echo '<strong>'.Anchor($Site->Name, 'http://'.$Site->Name).'</strong>';
             }
