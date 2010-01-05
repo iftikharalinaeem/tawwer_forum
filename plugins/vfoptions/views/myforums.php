@@ -31,12 +31,10 @@ $Session = Gdn::Session();
             <div>
                <?php
                if (!$UsesCustomDomain) {
-                  echo Anchor('Rename Domain', '/plugin/renameforum/'.$Site->SiteID.'/'.$Session->TransientKey(), 'RenameSite Popup');
-                  ?>
-                  <span>|</span>
-                  <?php
+                  echo Anchor('Rename Domain', '/plugin/renameforum/'.$Site->SiteID.'/'.$Session->TransientKey(), 'RenameSite Popup Button');
+                  echo ' ';
                }
-               echo Anchor('Delete Forum', '/plugin/deleteforum/'.$Site->SiteID.'/'.$Session->TransientKey(), 'DeleteSite Popup'); ?>
+               echo Anchor('Delete Forum', '/plugin/deleteforum/'.$Site->SiteID.'/'.$Session->TransientKey(), 'DeleteSite Popup Button'); ?>
             </div>
          </td>
          <td>
