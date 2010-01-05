@@ -58,7 +58,7 @@ table.SelectionGrid td:hover {
    background: #fff;
 }
 table.SelectionGrid td.Enabled {
-   background: none;
+   background: #f2fbff;
 }
 table.SelectionGrid em {
    min-height: 40px;
