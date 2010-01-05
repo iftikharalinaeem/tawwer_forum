@@ -7,7 +7,8 @@ $Session = Gdn::Session();
 <table id="Forums" class="AltRows">
    <thead>
       <tr>
-         <th>Name</th>
+         <th>Forum Domain</th>
+         <th>Custom Domain</th>
       </tr>
    </thead>
    <tbody>
@@ -15,17 +16,38 @@ $Session = Gdn::Session();
    $Alt = FALSE;
    foreach ($this->SiteData->Result('Text') as $Site) {
       $Alt = $Alt ? FALSE : TRUE;
+      $UsesCustomDomain = $Site->Domain != $Site->Name && $Site->Domain != '';
       ?>
       <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
          <td class="Info nowrap">
-            <strong><?php echo $Site->Name; ?></strong>
+            <?php
+            if ($UsesCustomDomain) {
+               echo Anchor($Site->Name, 'http://'.$Site->Name);
+            } else {
+               echo '<strong>'.Anchor($Site->Name, 'http://'.$Site->Name).'</strong>';
+            }
+            ?>
             <div>
-               <?php echo Anchor('Visit', 'http://'.$Site->Name.'/plugin/myforums'); ?>
-               <span>|</span>
-               <?php echo Anchor('Rename', '/plugin/renameforum/'.$Site->SiteID.'/'.$Session->TransientKey(), 'RenameSite Popup'); ?>
-               <span>|</span>
-               <?php echo Anchor('Delete', '/plugin/deleteforum/'.$Site->SiteID.'/'.$Session->TransientKey(), 'DeleteSite Popup'); ?>
+               <?php
+               if (!$UsesCustomDomain) {
+                  echo Anchor('Rename Domain', '/plugin/renameforum/'.$Site->SiteID.'/'.$Session->TransientKey(), 'RenameSite Popup');
+                  ?>
+                  <span>|</span>
+                  <?php
+               }
+               echo Anchor('Delete Forum', '/plugin/deleteforum/'.$Site->SiteID.'/'.$Session->TransientKey(), 'DeleteSite Popup'); ?>
             </div>
+         </td>
+         <td>
+            <?php
+            if ($UsesCustomDomain) {
+               // Offer for them to set up a custom domain
+               echo Anchor('Add a custom domain', 'plugins/upgrades', 'Button');
+            } else {
+               // Otherwise, show the custom domain
+               echo '<strong>'.Anchor($Site->Domain, 'http://'.$Site->Domain).'</strong> ← <span>Use this address when accessing your forum</span>';
+            }
+            ?>
          </td>
       </tr>
    <?php
