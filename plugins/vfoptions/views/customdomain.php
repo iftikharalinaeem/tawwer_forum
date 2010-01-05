@@ -3,10 +3,10 @@ $Domain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.
 $CustomDomain = str_replace(array('http://', '/'), array('', ''), $this->Form->GetValue('CustomDomain', ''));
 ?>
 <h1>Custom Domain Name</h1>
+<?php echo $this->Form->Errors(); ?>
 <div class="Legal">
    <?php
    if ($this->Form->ErrorCount() > 0) {
-      echo $this->Form->Errors();
    ?>
    <h3>Possible problem with <?php echo $CustomDomain; ?></h3>
    <p>We were unable to verify that <?php echo $CustomDomain; ?> is pointing at VanillaForums.com. Try the troubleshooting steps below to get it going.</p>
