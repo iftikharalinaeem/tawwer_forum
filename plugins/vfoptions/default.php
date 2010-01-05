@@ -270,7 +270,7 @@ pageTracker._trackPageview();
                   
                   // Redirect to the new domain
                   $Session = Gdn::Session();
-                  Redirect($FQDN.'/garden/plugin/thankyou/authenticate/'.$Session->TransientKey());
+                  Redirect($FQDN.'/garden/plugin/thankyou/auth/'.$Session->TransientKey());
                }
             }
          }
@@ -502,7 +502,7 @@ pageTracker._trackPageview();
       
       // If there was a request to reauthenticate (ie. we've been shifted to a custom domain and the user needs to reauthenticate)
       // Check the user's transientkey to make sure they're not a spoofer, and then authenticate them.
-      if (ArrayValue(0, $Sender->RequestArgs, '') == 'authenticate') {
+      if (ArrayValue(0, $Sender->RequestArgs, '') == 'auth') {
          $PostBackKey = ArrayValue(1, $Sender->RequestArgs, '');
          $UserModel = Gdn::UserModel();
          $AdminUser = $UserModel->GetSession(1);
