@@ -17,12 +17,12 @@ if ($DirectoryHandle = opendir('/srv/www/vhosts')) {
 						  "",
 						  $Contents
 					 );
+					 
 					 // Implement new log entries
 					 $Contents = str_replace(
 					 "// Garden",
 					 "// Garden
-\$Configuration['Garden']['Errors']['LogEnabled'] = TRUE;
-\$Configuration['Garden']['Errors']['LogFile'] = '/srv/log/vhosts/garden.log';", $Contents);
+\$Configuration['Garden']['Errors']['LogEnabled'] = TRUE;", $Contents);
 				
 					 file_put_contents($File, $Contents);
 					 echo 'Updating: '.$File."\n";
