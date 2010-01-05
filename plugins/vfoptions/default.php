@@ -516,6 +516,9 @@ pageTracker._trackPageview();
                'Domain' => Gdn::Config('Garden.Cookie.Domain')
             ));
             $Identity->SetIdentity(1, TRUE);
+            
+            // Now that the identity has been set, redirect again so that the page loads properly
+            Redirect('garden/plugin/thankyou');
          }
       }
       
