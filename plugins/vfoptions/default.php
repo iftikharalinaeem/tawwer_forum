@@ -482,7 +482,7 @@ pageTracker._trackPageview();
                
                // Redirect to the new domain
                $Session = Gdn::Session();
-               Redirect('http://'.$Site->Name.'/garden/plugin/thankyou/auth/'.$Session->TransientKey());
+               Redirect('http://'.$Site->Name.'/garden/plugin/upgrades/auth/'.$Session->TransientKey());
             }
          }
       }
@@ -570,31 +570,9 @@ pageTracker._trackPageview();
     * purchased upgrades.
     */
    public function PluginController_ThankYou_Create(&$Sender, $EventArguments) {
+      $this->_ReAuthenticate($Sender, 'garden/plugin/thankyou');
       $Sender->Title('Premium Upgrades &raquo; Thank You!');
       $Sender->AddSideMenu('garden/plugin/upgrades');
-      
-      // If there was a request to reauthenticate (ie. we've been shifted to a custom domain and the user needs to reauthenticate)
-      // Check the user's transientkey to make sure they're not a spoofer, and then authenticate them.
-      if (ArrayValue(0, $Sender->RequestArgs, '') == 'auth') {
-         $PostBackKey = ArrayValue(1, $Sender->RequestArgs, '');
-         $UserModel = Gdn::UserModel();
-         $AdminUser = $UserModel->GetSession(1);
-         $Attributes = Format::Unserialize($AdminUser->Attributes);
-         $TransientKey = is_array($Attributes) ? ArrayValue('TransientKey', $Attributes) : FALSE;
-         if ($TransientKey == $PostBackKey) {
-            $Identity = new Gdn_CookieIdentity();
-            $Identity->Init(array(
-               'Salt' => Gdn::Config('Garden.Cookie.Salt'),
-               'Name' => Gdn::Config('Garden.Cookie.Name'),
-               'Domain' => Gdn::Config('Garden.Cookie.Domain')
-            ));
-            $Identity->SetIdentity(1, TRUE);
-            
-            // Now that the identity has been set, redirect again so that the page loads properly
-            Redirect('garden/plugin/thankyou');
-         }
-      }
-      
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'thankyou.php');
    }
    
@@ -603,6 +581,7 @@ pageTracker._trackPageview();
     * purchase upgrade offerings.
     */
    public function PluginController_Upgrades_Create(&$Sender, $EventArguments) {
+      $this->_ReAuthenticate($Sender, 'garden/plugin/upgrades');
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades');
       $Sender->AddCssFile('/plugins/vfoptions/style.css');
@@ -656,6 +635,34 @@ pageTracker._trackPageview();
       $UserModel = Gdn::UserModel();
       $User = $UserModel->Get($Name);
       return (is_object($User) && property_exists($User, 'UserID')) ? $User->UserID : -1;
+   }
+   
+   /**
+    * Re-authenticates a user with the current configuration.
+    */
+   private function _ReAuthenticate(&$Sender, $RedirectTo = '') {
+      // If there was a request to reauthenticate (ie. we've been shifted to a custom domain and the user needs to reauthenticate)
+      // Check the user's transientkey to make sure they're not a spoofer, and then authenticate them.
+      if (ArrayValue(0, $Sender->RequestArgs, '') == 'auth') {
+         $PostBackKey = ArrayValue(1, $Sender->RequestArgs, '');
+         $UserModel = Gdn::UserModel();
+         $AdminUser = $UserModel->GetSession(1);
+         $Attributes = Format::Unserialize($AdminUser->Attributes);
+         $TransientKey = is_array($Attributes) ? ArrayValue('TransientKey', $Attributes) : FALSE;
+         if ($TransientKey == $PostBackKey) {
+            $Identity = new Gdn_CookieIdentity();
+            $Identity->Init(array(
+               'Salt' => Gdn::Config('Garden.Cookie.Salt'),
+               'Name' => Gdn::Config('Garden.Cookie.Name'),
+               'Domain' => Gdn::Config('Garden.Cookie.Domain')
+            ));
+            $Identity->SetIdentity(1, TRUE);
+            
+            // Now that the identity has been set, redirect again so that the page loads properly
+            if ($RedirectTo != '')
+               Redirect($RedirectTo);
+         }
+      }
    }
    
    /**
