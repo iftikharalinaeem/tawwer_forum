@@ -22,8 +22,9 @@ $Session = Gdn::Session();
          <td class="Info nowrap">
             <?php
             if ($UsesCustomDomain) {
-               echo Anchor($Site->Name, 'http://'.$Site->Name);
-               echo '<span style="font-size: 18px; margin-left: 10px;">↬</span> Visitors will be redirected to '.$Site->Domain;
+               echo $Site->Name
+                  .'<span style="font-size: 18px; margin-left: 10px;">↬</span> Visitors will be redirected to '.
+                  Anchor($Site->Domain, 'http://'.$Site->Domain);
             } else {
                echo '<strong>'.Anchor($Site->Name, 'http://'.$Site->Name).'</strong>';
             }
