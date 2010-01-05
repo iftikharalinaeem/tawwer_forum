@@ -7,8 +7,8 @@ $Session = Gdn::Session();
 <table id="Forums" class="AltRows">
    <thead>
       <tr>
-         <th>Forum Domain</th>
-         <th>Custom Domain</th>
+         <th style="width: 50%">Forum Domain</th>
+         <th style="width: 50%">Custom Domain</th>
       </tr>
    </thead>
    <tbody>
