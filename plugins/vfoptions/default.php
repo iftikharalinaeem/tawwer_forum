@@ -393,6 +393,17 @@ pageTracker._trackPageview();
    }
    
    /**
+    * Creates a "Learn More" screen that contains more info on upgrade
+    * offerings.
+    */
+   public function PluginController_MoreInfo_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Premium Upgrades &raquo; Learn More');
+      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $Sender->Form = new Gdn_Form();
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'learnmore.php');
+   }
+
+   /**
     * Creates a "My Forums" management screen where users can review, add, and
     * rename their forums.
     */
