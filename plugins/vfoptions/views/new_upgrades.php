@@ -19,7 +19,12 @@ function Css($Bool) {
          <tr>
             <td class="FirstCol<?php Css($CustomDomainPurchased); ?>">
                <h4>Custom Domain Name <span>Purchased!</span></h4>
-               <em>Customize your forum's address.</em>
+               <em><?php
+               if ($CustomDomainPurchased)
+                  echo "You've set up the custom domain: ".$GardenDomain;
+               else
+                  echo "Customize your forum's address.";
+               ?></em>
                <div class="Price">
                   <strong>$2</strong>
                   per month
