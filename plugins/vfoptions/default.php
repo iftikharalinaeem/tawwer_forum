@@ -400,7 +400,7 @@ pageTracker._trackPageview();
       $Sender->Title('Premium Upgrades &raquo; Learn More');
       $Sender->AddSideMenu('garden/plugin/upgrades');
       $Sender->Form = new Gdn_Form();
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'learnmore.php');
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'moreinfo.php');
    }
 
    /**
