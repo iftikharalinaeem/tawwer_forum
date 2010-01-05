@@ -46,7 +46,7 @@ $Session = Gdn::Session();
                echo '<strong>'.Anchor($Site->Domain, 'http://'.$Site->Domain).'</strong>';
             } else {
                // Offer for them to set up a custom domain
-               echo Anchor('Add a custom domain', 'plugins/upgrades', 'Button');
+               echo Anchor('Add a custom domain', 'http://'.$Site->Name.'/plugin/upgrades', 'Button');
             }
             ?>
          </td>
