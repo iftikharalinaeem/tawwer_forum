@@ -52,11 +52,20 @@ class VFOptionsPlugin implements Gdn_IPlugin {
     * and Plugins.GoogleAnalytics.TrackerDomain.
     */
    public function Base_Render_Before(&$Sender) {
-      ob_start();
-      var_dump($_SERVER);
-      $ServerVars = ob_get_contents();
-      @ob_end_clean();
-      $Sender->AddAsset('Content', $ServerVars);
+      // Redirect if the domain in the url doesn't match that in the config (so
+      // custom domains can't be accessed from their original subdomain).
+      $Domain = Gdn::Config('Garden.Domain', '');
+      $ServerName = ArrayValue('SERVER_NAME', $_SERVER, '');
+      if ($ServerName == '')
+         $ServerName = ArrayValue('HTTP_HOST', $_SERVER, '');
+         
+      if ($ServerName != '' && $Domain != '') {
+         $Domain = str_replace(array('http://', '/'), array('', ''), $Domain);
+         $ServerName = str_replace(array('http://', '/'), array('', ''), $ServerName);
+         if ($ServerName != $Domain)
+            Redirect(Gdn_Url::Request(TRUE, TRUE));
+         
+      }
       
       $TrackerCode = Gdn::Config('Plugins.GoogleAnalytics.TrackerCode');
       $TrackerDomain = Gdn::Config('Plugins.GoogleAnalytics.TrackerDomain');
