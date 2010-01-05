@@ -46,7 +46,7 @@ $Session = Gdn::Session();
                echo '<strong>'.Anchor($Site->Domain, 'http://'.$Site->Domain).'</strong>';
                ?>
                <div>
-                  <?php echo Anchor('Remove Custom Domain', 'http://'.$Site->Domain.'/plugin/removecustomdomain/', 'RemoveCustomDomain Popup'); ?>
+                  <?php echo Anchor('Remove Custom Domain', 'http://'.$Site->Domain.'/plugin/removecustomdomain/', 'RemoveCustomDomain'); ?>
                </div>
                <?php
             } else {
