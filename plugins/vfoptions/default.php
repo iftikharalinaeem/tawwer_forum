@@ -434,6 +434,56 @@ pageTracker._trackPageview();
             
             file_put_contents($Conf, $Contents);
             Redirect('garden/plugin/upgrades');
+         } else if ($About == 'customdomain') {
+            // Grab the Site record for information about this site
+            $SiteID = Gdn::Config('VanillaForums.SiteID', -1);
+            $Site = $this->_GetDatabase()->SQL()
+               ->Select()
+               ->From('Site')
+               ->Where('SiteID', $SiteID)
+               ->Get()
+               ->FirstRow();
+               
+            if (!is_object($Site)) {
+               $Sender->Form->AddError('Failed to identify custom domain for removal');
+            } else {
+               // Update the Site record to remove the domain entry & revert the path
+               $this->_GetDatabase()->SQL()->Put(
+                  'Site',
+                  array(
+                     'Domain' => '',
+                     'Path' => '/srv/www/vhosts/'.$Site->Name
+                  ),
+                  array('SiteID' => $SiteID)
+               );
+               
+               // Update the config file
+               $CookieDomain = substr($Site->Domain, strpos($Site->Domain, '.'));
+               $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
+               $Contents = str_replace(
+                  array(
+                     "\$Configuration['Garden']['Cookie']['Domain'] = '".Gdn::Config('Garden.Cookie.Domain')."';",
+                     "\$Configuration['Garden']['Domain'] = '".Gdn::Config('Garden.Domain')."';"
+                  ),
+                  array(
+                     "\$Configuration['Garden']['Cookie']['Domain'] = '$CookieDomain';",
+                     "\$Configuration['Garden']['Domain'] = '".$Site->Domain."';"
+                  ),
+                  $Contents
+               );
+               file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
+               
+               $this->_CloseDatabase();
+                  
+               // Remove the symlinked folder
+               // WARNING: Do not use a trailing slash on symlinked folders when rm'ing, or it will remove the source!
+               $SymLinkedFolder = substr(PATH_ROOT, -1, 1) == '/' ? substr(PATH_ROOT, 0, -1) : PATH_ROOT;
+               exec('/bin/rm "'.$SymLinkedFolder.'"');
+               
+               // Redirect to the new domain
+               $Session = Gdn::Session();
+               Redirect('http://'.$Site->Name.'/garden/plugin/thankyou/auth/'.$Session->TransientKey());
+            }
          }
       }
 
