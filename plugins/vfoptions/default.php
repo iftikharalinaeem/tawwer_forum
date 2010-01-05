@@ -46,11 +46,18 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    }
    
    /**
-    * Include Google Analytics on all pages if the conf file contains
-    * Plugins.GoogleAnalytics.TrackerCode &
-    * Plugins.GoogleAnalytics.TrackerDomain
+    * If the domain in the config doesn't match that in the url, this will
+    * redirect to the domain in the config. Also includes Google Analytics on
+    * all pages if the conf file contains Plugins.GoogleAnalytics.TrackerCode
+    * and Plugins.GoogleAnalytics.TrackerDomain.
     */
    public function Base_Render_Before(&$Sender) {
+      ob_start();
+      var_dump($_SERVER);
+      $ServerVars = ob_get_contents();
+      @ob_end_clean();
+      $Sender->AddAsset('Content', $ServerVars);
+      
       $TrackerCode = Gdn::Config('Plugins.GoogleAnalytics.TrackerCode');
       $TrackerDomain = Gdn::Config('Plugins.GoogleAnalytics.TrackerDomain');
       
@@ -259,7 +266,6 @@ pageTracker._trackPageview();
                   $this->_GetDatabase()->SQL()->Put(
                      'Site',
                      array(
-                        'Name' => $Domain,
                         'Domain' => $Domain,
                         'Path' => '/srv/www/vhosts/'.$Domain
                      ),
@@ -421,7 +427,8 @@ pageTracker._trackPageview();
    
    /**
     * Creates a "Rename Forum" page where users can rename their forum's
-    * VanillaForums.com subdomain.
+    * VanillaForums.com subdomain. Note: this ONLY works for vf.com subdomains,
+    * and it will cause symlinks to break on custom-domains if used.
     */
    public function PluginController_RenameForum_Create(&$Sender, $EventArguments) {
       $Sender->Title('Rename Forum');
