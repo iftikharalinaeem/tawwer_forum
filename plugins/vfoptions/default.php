@@ -685,40 +685,44 @@ pageTracker._trackPageview();
                }
             } else {
                // ---- DISABLE ----
-               // Update the Site record to remove the domain entry & revert the path
-               $this->_GetDatabase()->SQL()->Put(
-                  'Site',
-                  array(
-                     'Domain' => '',
-                     'Path' => '/srv/www/vhosts/'.$Site->Name
-                  ),
-                  array('SiteID' => $SiteID)
-               );
+               $Site = $this->_GetDatabase()->SQL()->Select()->From('Site')->Where('SiteID', $SiteID)->Get()->FirstRow();
                
-               // Update the config file
-               $CookieDomain = substr($Site->Name, strpos($Site->Name, '.'));
-               $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
-               $Contents = str_replace(
-                  array(
-                     "\$Configuration['Garden']['Cookie']['Domain'] = '".Gdn::Config('Garden.Cookie.Domain')."';",
-                     "\$Configuration['Garden']['Domain'] = '".Gdn::Config('Garden.Domain')."';"
-                  ),
-                  array(
-                     "\$Configuration['Garden']['Cookie']['Domain'] = '$CookieDomain';",
-                     "\$Configuration['Garden']['Domain'] = '".$Site->Name."';"
-                  ),
-                  $Contents
-               );
-               file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
-               
-               // Remove the symlinked folder
-               // WARNING: Do not use a trailing slash on symlinked folders when rm'ing, or it will remove the source!
-               $SymLinkedFolder = '/srv/www/vhosts/'.$Site->Domain;
-               unlink($SymLinkedFolder);
-               
-               // Redirect to the new domain
-               $Session = Gdn::Session();
-               $Redirect = 'http://'.$Site->Name.'/garden/plugin/upgrades/auth/'.$Session->TransientKey();
+               if (is_object($Site)) {
+                  // Update the Site record to remove the domain entry & revert the path
+                  $this->_GetDatabase()->SQL()->Put(
+                     'Site',
+                     array(
+                        'Domain' => '',
+                        'Path' => '/srv/www/vhosts/'.$Site->Name
+                     ),
+                     array('SiteID' => $SiteID)
+                  );
+                  
+                  // Update the config file
+                  $CookieDomain = substr($Site->Name, strpos($Site->Name, '.'));
+                  $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
+                  $Contents = str_replace(
+                     array(
+                        "\$Configuration['Garden']['Cookie']['Domain'] = '".Gdn::Config('Garden.Cookie.Domain')."';",
+                        "\$Configuration['Garden']['Domain'] = '".Gdn::Config('Garden.Domain')."';"
+                     ),
+                     array(
+                        "\$Configuration['Garden']['Cookie']['Domain'] = '$CookieDomain';",
+                        "\$Configuration['Garden']['Domain'] = '".$Site->Name."';"
+                     ),
+                     $Contents
+                  );
+                  file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
+                  
+                  // Remove the symlinked folder
+                  // WARNING: Do not use a trailing slash on symlinked folders when rm'ing, or it will remove the source!
+                  $SymLinkedFolder = '/srv/www/vhosts/'.$Site->Domain;
+                  unlink($SymLinkedFolder);
+                  
+                  // Redirect to the new domain
+                  $Session = Gdn::Session();
+                  $Redirect = 'http://'.$Site->Name.'/garden/plugin/upgrades/auth/'.$Session->TransientKey();
+               }
             }
          }
       }
