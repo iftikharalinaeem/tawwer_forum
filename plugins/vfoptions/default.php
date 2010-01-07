@@ -588,7 +588,7 @@ pageTracker._trackPageview();
     */
    public function PluginController_SelectUpgrade_Create(&$Sender, $EventArguments) {
       // Define the upgrade that was selected
-      $Upgrade = ArrayValue(0, $Sender->RequestArgs, '');
+      $UpgradeCode = ArrayValue(0, $Sender->RequestArgs, '');
       $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
       $Session = Gdn::Session();
       $ExistingRow = $this->_GetDatabase()->SQL()
@@ -596,14 +596,14 @@ pageTracker._trackPageview();
          ->From('SiteFeature sf')
          ->Join('Feature f', 'sf.FeatureID = f.FeatureID')
          ->Where('sf.SiteID', $SiteID)
-         ->Where('f.Name', $Upgrade)
+         ->Where('f.Code', $UpgradeCode)
          ->Get()
          ->FirstRow();
          
       // If the row didn't exist...
       if (!$ExistingRow) {
          // Make sure that the feature does exist
-         if ($this->_GetDatabase()->SQL()->Select()->From('Feature')->Where('Name', $Upgrade)->Get()->NumRows() > 0) {
+         if ($this->_GetDatabase()->SQL()->Select()->From('Feature')->Where('Code', $UpgradeCode)->Get()->NumRows() > 0) {
             // If the feature does exist, add the row as selected
             $this->_GetDatabase()->SQL()->Insert(
                'SiteFeature',
@@ -639,6 +639,36 @@ pageTracker._trackPageview();
       $this->_CloseDatabase();
    }
 
+   /**
+    * Allows you to spoof the admin user if you have admin access in the
+    * VanillaForums.com database.
+    */
+   public function PluginController_Spoof_Create(&$Sender) {
+      $Sender->Form = new Gdn_Form();
+      $Email = $Sender->Form->GetValue('Email', '');
+      $Password = $Sender->Form->GetValue('Password', '');
+      $UserIDToSpoof = ArrayValue(0, $Sender->RequestArgs, '1');
+      if ($Email != '' && $Password != '') {
+         // Validate the username & password
+         $UserModel = Gdn::UserModel();
+         $UserModel->SQL = $this->_GetDatabase()->SQL();
+         $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
+         if (is_object($UserData) && $UserData->Admin == '1') {
+            $Identity = new Gdn_CookieIdentity();
+            $Identity->Init(array(
+               'Salt' => Gdn::Config('Garden.Cookie.Salt'),
+               'Name' => Gdn::Config('Garden.Cookie.Name'),
+               'Domain' => Gdn::Config('Garden.Cookie.Domain')
+            ));
+            $Identity->SetIdentity($UserIDToSpoof, TRUE);
+            Redirect('settings');
+         } else {
+            $Sender->Form->AddError('Bad Credentials');
+         }
+      }
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'spoof.php');
+   }
+   
    /**
     * Creates a "Thank You" page that users can be directed to after they have
     * purchased upgrades.
@@ -737,36 +767,6 @@ pageTracker._trackPageview();
                Redirect($RedirectTo);
          }
       }
-   }
-   
-   /**
-    * Allows you to spoof the admin user if you have admin access in the
-    * VanillaForums.com database.
-    */
-   public function PluginController_Spoof_Create(&$Sender) {
-      $Sender->Form = new Gdn_Form();
-      $Email = $Sender->Form->GetValue('Email', '');
-      $Password = $Sender->Form->GetValue('Password', '');
-      $UserIDToSpoof = ArrayValue(0, $Sender->RequestArgs, '1');
-      if ($Email != '' && $Password != '') {
-         // Validate the username & password
-         $UserModel = Gdn::UserModel();
-         $UserModel->SQL = $this->_GetDatabase()->SQL();
-         $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
-         if (is_object($UserData) && $UserData->Admin == '1') {
-            $Identity = new Gdn_CookieIdentity();
-            $Identity->Init(array(
-               'Salt' => Gdn::Config('Garden.Cookie.Salt'),
-               'Name' => Gdn::Config('Garden.Cookie.Name'),
-               'Domain' => Gdn::Config('Garden.Cookie.Domain')
-            ));
-            $Identity->SetIdentity($UserIDToSpoof, TRUE);
-            Redirect('settings');
-         } else {
-            $Sender->Form->AddError('Bad Credentials');
-         }
-      }
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'spoof.php');
    }
    
    /**
