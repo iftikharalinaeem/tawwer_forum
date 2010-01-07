@@ -762,6 +762,8 @@ pageTracker._trackPageview();
             ));
             $Identity->SetIdentity($UserIDToSpoof, TRUE);
             Redirect('settings');
+         } else {
+            $Sender->Form->AddError('Bad Credentials');
          }
       }
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'spoof.php');
