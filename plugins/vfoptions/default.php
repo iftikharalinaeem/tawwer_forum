@@ -765,6 +765,8 @@ pageTracker._trackPageview();
          } else {
             $Sender->Form->AddError('Bad Credentials');
          }
+      } else {
+         $Sender->Form->AddError('You must enter both email and password');
       }
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'spoof.php');
    }
