@@ -406,6 +406,7 @@ pageTracker._trackPageview();
       $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
       $Sender->AddSideMenu('garden/plugin/upgrades');
       $UpgradeToRemove = ArrayValue(0, $Sender->RequestArgs, '');
+      $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
       $Sender->Form = new Gdn_Form();
       if ($Sender->Form->IsPostBack()) {
          $Feature = $this->_GetDatabase()->SQL()->Select('FeatureID')->From('Feature')->Where('Code', $UpgradeToRemove)->Get()->FirstRow();
