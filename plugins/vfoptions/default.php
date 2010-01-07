@@ -547,6 +547,13 @@ pageTracker._trackPageview();
       $Sender->Title('Premium Upgrades &raquo; Thank You!');
       $Sender->AddSideMenu('garden/plugin/upgrades');
       
+      // Update the SiteFeature table so that all selected items are now marked active
+      // NOTE: THERE IS A SECURITY ISSUE HERE WHERE USERS CAN SELECT AN ITEM, AND THEN JUST VISIT THIS PAGE TO ENABLE IT WITHOUT PAYING.
+      $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
+      $this->_GetDatabase()->SQL()->Put('SiteFeature', array('Active' => '1'), array('SiteID' => $SiteID, 'Selected' => '1'));
+      
+      // Now apply upgrades
+      $this->_ApplyUpgrades();
       
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'thankyou.php');
    }
