@@ -412,7 +412,7 @@ pageTracker._trackPageview();
          $Feature = $this->_GetDatabase()->SQL()->Select('FeatureID')->From('Feature')->Where('Code', $UpgradeToRemove)->Get()->FirstRow();
          $FeatureID = is_object($Feature) ? $Feature->FeatureID : 0;
          if ($FeatureID > 0) {
-            $this->_GetDatabase()->SQL()->Put(
+            $this->_GetDatabase()->SQL()->Replace(
                'SiteFeature',
                array('Active' => '0', 'Selected' => '0'),
                array('SiteID' => $SiteID, 'FeatureID' => $FeatureID)
