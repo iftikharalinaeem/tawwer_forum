@@ -749,8 +749,10 @@ pageTracker._trackPageview();
       return $this->_Database;
    }
    private function _CloseDatabase() {
-      $this->_Database->CloseConnection();
-      $this->_Database = FALSE;
+      if (is_object($this->_Database)) {
+         $this->_Database->CloseConnection();
+         $this->_Database = FALSE;
+      }
    }
    
    /**
