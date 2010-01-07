@@ -612,11 +612,12 @@ pageTracker._trackPageview();
 // --== AD REMOVAL ==--
 
          if ($Feature->Code == 'adremoval') {
-            if ($Feature->Active == '1') {
+            $IsEnabled = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
+            if ($Feature->Active == '1' && !$Enabled) {
                // ---- ENABLE ----
                $PluginManager = Gdn::Factory('PluginManager');
                $PluginManager->DisablePlugin('GoogleAdSense');
-            } else {
+            } else if ($Feature->Active == '0' && $Enabled) {
                // ---- DISABLE ----
                $Conf = PATH_CONF . DS . 'config.php';
                $Contents = file_get_contents($Conf);
@@ -638,10 +639,12 @@ pageTracker._trackPageview();
 // --== CUSTOM DOMAINS ==--
 
          } else if ($Feature->Code == 'customdomain') {
-            if ($Feature->Active == '1') {
+            $Attributes = Format::Unserialize($Feature->Attributes);
+            $Domain = ArrayValue('Domain', $Attributes, '');
+            $OldDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', ''));
+            $IsEnabled = $Domain == $OldDomain ? TRUE : FALSE;
+            if ($Feature->Active == '1' && !$IsEnabled) {
                // ---- ENABLE ----
-               $Attributes = Format::Unserialize($Feature->Attributes);
-               $Domain = ArrayValue('Domain', $Attributes, '');
                if ($Domain != '' && !file_exists('/srv/www/vhosts/'.$Domain)) {
                   $FQDN = PrefixString('http://', $Domain);
                   $Error = FALSE;
@@ -653,7 +656,6 @@ pageTracker._trackPageview();
                      // Don't do anything with the exception
                   }
                   if (!$Error && $Response == $ExpectedResponse) {
-                     $OldDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', ''));
                      // It is pointing at the correct place, so...
                      // Create the symlink folder
                      exec('/bin/ln -s "/srv/www/vhosts/'.$OldDomain.'" "/srv/www/vhosts/'.$Domain.'"');
@@ -691,11 +693,11 @@ pageTracker._trackPageview();
                      }
                   }
                }
-            } else {
+            } else if ($Feature->Active == '0' && $IsEnabled) {
                // ---- DISABLE ----
                $Site = $this->_GetDatabase()->SQL()->Select()->From('Site')->Where('SiteID', $SiteID)->Get()->FirstRow();
                
-               if (is_object($Site)) {
+               if (is_object($Site) && $Site->Domain != '') {
                   // Update the Site record to remove the domain entry & revert the path
                   $this->_GetDatabase()->SQL()->Put(
                      'Site',
@@ -725,7 +727,8 @@ pageTracker._trackPageview();
                   // Remove the symlinked folder
                   // WARNING: Do not use a trailing slash on symlinked folders when rm'ing, or it will remove the source!
                   $SymLinkedFolder = '/srv/www/vhosts/'.$Site->Domain;
-                  unlink($SymLinkedFolder);
+                  if (file_exists($SymLinkedFolder))
+                     unlink($SymLinkedFolder);
                   
                   // Redirect to the new domain
                   $Session = Gdn::Session();
