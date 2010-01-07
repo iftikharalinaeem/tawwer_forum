@@ -408,7 +408,7 @@ pageTracker._trackPageview();
       $UpgradeToRemove = ArrayValue(0, $Sender->RequestArgs, '');
       $Sender->Form = new Gdn_Form();
       if ($Sender->Form->IsPostBack()) {
-         $Feature = $this->_GetDatabase()->SQL()->Select('FeatureID')-From('Feature')->Where('Code', $UpgradeToRemove)->Get()->FirstRow();
+         $Feature = $this->_GetDatabase()->SQL()->Select('FeatureID')->From('Feature')->Where('Code', $UpgradeToRemove)->Get()->FirstRow();
          $FeatureID = is_object($Feature) ? $Feature->FeatureID : 0;
          if ($FeatureID > 0) {
             $this->_GetDatabase()->SQL()->Put(
