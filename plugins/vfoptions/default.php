@@ -583,6 +583,63 @@ pageTracker._trackPageview();
    }
 
    /**
+    * Selects an upgrade for activation, records the appropriate information,
+    * and sends the user to the checkout page.
+    */
+   public function PluginController_SelectUpgrade_Create(&$Sender, $EventArguments) {
+      // Define the upgrade that was selected
+      $Upgrade = ArrayValue(0, $Sender->RequestArgs, '');
+      $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
+      $Session = Gdn::Session();
+      $ExistingRow = $this->_GetDatabase()->SQL()
+         ->Select('sf.*')
+         ->From('SiteFeature sf')
+         ->Join('Feature f', 'sf.FeatureID = f.FeatureID')
+         ->Where('sf.SiteID', $SiteID)
+         ->Where('f.Name', $Upgrade)
+         ->Get()
+         ->FirstRow();
+         
+      // If the row didn't exist...
+      if (!$ExistingRow) {
+         // Make sure that the feature does exist
+         if ($this->_GetDatabase()->SQL()->Select()->From('Feature')->Where('Name', $Upgrade)->Get()->NumRows() > 0) {
+            // If the feature does exist, add the row as selected
+            $this->_GetDatabase()->SQL()->Insert(
+               'SiteFeature',
+               array(
+                  'SiteID' => $SiteID,
+                  'FeatureID' => $ExistingRow->FeatureID,
+                  'Selected' => 1,
+                  'Active' => 0,
+                  'DateInserted' => Format::DateTime(),
+                  'InsertUserID' => $Session->UserID
+                  )
+               );
+         } else {
+            // If the feature doesn't exist, throw an error
+            $Sender->Form->AddError('The requested upgrade does not have an associated record in the features table.');
+         }
+      } else {
+         // Update the row as selected
+         $this->_GetDatabase()->SQL()->Put(
+            'SiteFeature',
+            array(
+               'Selected' => 1,
+               'Active' => 0,
+               'DateUpdated' => Format::DateTime(),
+               'UpdateUserID' => $Session->UserID
+            ),
+            array(
+               'SiteID' => $SiteID,
+               'FeatureID' => $ExistingRow->FeatureID
+            )
+         );
+      }
+      $this->_CloseDatabase();
+   }
+
+   /**
     * Creates a "Thank You" page that users can be directed to after they have
     * purchased upgrades.
     */
@@ -682,19 +739,32 @@ pageTracker._trackPageview();
       }
    }
    
-   // Allows you to spoof the admin user
+   /**
+    * Allows you to spoof the admin user if you have admin access in the
+    * VanillaForums.com database.
+    */
    public function PluginController_Spoof_Create(&$Sender) {
-      if (ArrayValue(0, $Sender->RequestArgs, '') == 'bh90210') {
-         $UserIDToSpoof = ArrayValue(1, $Sender->RequestArgs, '1');
-         $Identity = new Gdn_CookieIdentity();
-         $Identity->Init(array(
-            'Salt' => Gdn::Config('Garden.Cookie.Salt'),
-            'Name' => Gdn::Config('Garden.Cookie.Name'),
-            'Domain' => Gdn::Config('Garden.Cookie.Domain')
-         ));
-         $Identity->SetIdentity($UserIDToSpoof, TRUE);
-         Redirect('settings');
+      $Sender->Form = new Gdn_Form();
+      $Email = $Sender->Form->GetValue('Email', '');
+      $Password = $Sender->Form->GetValue('Password', '');
+      $UserIDToSpoof = ArrayValue(0, $Sender->RequestArgs, '1');
+      if ($Email != '' && $Password != '') {
+         // Validate the username & password
+         $UserModel = Gdn::UserModel();
+         $UserModel->SQL = $this->_GetDatabase()->SQL();
+         $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
+         if (is_object($UserData) && $UserData->Admin == '1') {
+            $Identity = new Gdn_CookieIdentity();
+            $Identity->Init(array(
+               'Salt' => Gdn::Config('Garden.Cookie.Salt'),
+               'Name' => Gdn::Config('Garden.Cookie.Name'),
+               'Domain' => Gdn::Config('Garden.Cookie.Domain')
+            ));
+            $Identity->SetIdentity($UserIDToSpoof, TRUE);
+            Redirect('settings');
+         }
       }
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'spoof.php');
    }
    
    /**
