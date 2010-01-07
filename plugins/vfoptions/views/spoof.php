@@ -12,7 +12,7 @@ echo $this->Form->Errors();
    <li>
       <?php
       echo $this->Form->Label('VF.com Admin Email', 'Email');
-      echo $this->Form->TextBox('CustomDomain');
+      echo $this->Form->TextBox('Email');
       ?>
    </li>
    <li>
