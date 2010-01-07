@@ -3,3 +3,5 @@
 <div class="Legal">
    <p>Your upgrade has been removed.</p>
 </div>
+<?php
+echo Anchor('← Back to Upgrades', '/plugin/upgrades', 'Button');
