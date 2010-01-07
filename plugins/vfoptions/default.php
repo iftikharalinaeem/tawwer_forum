@@ -587,6 +587,8 @@ pageTracker._trackPageview();
     * and sends the user to the checkout page.
     */
    public function PluginController_SelectUpgrade_Create(&$Sender, $EventArguments) {
+      $Sender->Form = new Gdn_Form();
+      
       // Define the upgrade that was selected
       $UpgradeCode = ArrayValue(0, $Sender->RequestArgs, '');
       $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
@@ -600,7 +602,7 @@ pageTracker._trackPageview();
          ->Get()
          ->FirstRow();
          
-      // If the row didn't exist...
+      // If the row didn't exist for this site...
       if (!$ExistingRow) {
          // Make sure that the feature does exist
          if ($this->_GetDatabase()->SQL()->Select()->From('Feature')->Where('Code', $UpgradeCode)->Get()->NumRows() > 0) {
@@ -637,6 +639,8 @@ pageTracker._trackPageview();
          );
       }
       $this->_CloseDatabase();
+      
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'vfproblem.php');
    }
 
    /**
