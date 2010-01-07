@@ -613,11 +613,11 @@ pageTracker._trackPageview();
 
          if ($Feature->Code == 'adremoval') {
             $IsEnabled = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
-            if ($Feature->Active == '1' && !$Enabled) {
+            if ($Feature->Active == '1' && !$IsEnabled) {
                // ---- ENABLE ----
                $PluginManager = Gdn::Factory('PluginManager');
                $PluginManager->DisablePlugin('GoogleAdSense');
-            } else if ($Feature->Active == '0' && $Enabled) {
+            } else if ($Feature->Active == '0' && $IsEnabled) {
                // ---- DISABLE ----
                $Conf = PATH_CONF . DS . 'config.php';
                $Contents = file_get_contents($Conf);
