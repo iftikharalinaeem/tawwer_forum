@@ -587,6 +587,8 @@ pageTracker._trackPageview();
     * and sends the user to the checkout page.
     */
    public function PluginController_SelectUpgrade_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Rename Forum');
+      $Sender->AddSideMenu('garden/plugin/myforums');
       $Sender->Form = new Gdn_Form();
       
       // Define the upgrade that was selected
@@ -648,6 +650,8 @@ pageTracker._trackPageview();
     * VanillaForums.com database.
     */
    public function PluginController_Spoof_Create(&$Sender) {
+      $Sender->Title('Spoof User');
+      $Sender->AddSideMenu('garden/user');
       $Sender->Form = new Gdn_Form();
       $Email = $Sender->Form->GetValue('Email', '');
       $Password = $Sender->Form->GetValue('Password', '');
