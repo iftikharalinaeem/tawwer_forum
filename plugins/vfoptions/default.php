@@ -176,6 +176,13 @@ pageTracker._trackPageview();
          $this->_CloseDatabase();
       }
    }
+
+   /**
+    * This is just a placeholder until I know where to send users to check out.
+    */
+   public function PluginController_Checkout_Create(&$Sender, $EventArguments) {
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'checkout.php');
+   }
    
    /**
     * Creates a "Create a New Forum" page where users can do just that.
@@ -255,46 +262,12 @@ pageTracker._trackPageview();
             if ($Error || $Response != $ExpectedResponse) {
                $Sender->Form->AddError("We were unable to verify that ".$Domain." is pointing at VanillaForums.com.");
             } else {
-               $OldDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', ''));
-               // It is pointing at the correct place, so...
-               // Create the symlink folder
-               exec('/bin/ln -s "/srv/www/vhosts/'.$OldDomain.'" "/srv/www/vhosts/'.$Domain.'"');
+               // Everything is set up properly, so select the upgrade
+               $this->_SelectUpgrade('customdomain', array('Domain' => $Domain));
                
-               // Make sure it exists
-               if (!file_exists('/srv/www/vhosts/'.$Domain)) {
-                  $Sender->Form->AddError('Failed to create custom domain. Please contact support@vanillaforums.com for assistance.');
-               } else {
-                  // Change the domain in the conf file
-                  $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
-                  $Contents = str_replace(
-                     array(
-                        "\$Configuration['Garden']['Cookie']['Domain'] = '".Gdn::Config('Garden.Cookie.Domain')."';",
-                        "\$Configuration['Garden']['Domain'] = '".$OldDomain."';"
-                     ),
-                     array(
-                        "\$Configuration['Garden']['Cookie']['Domain'] = '$Domain';",
-                        "\$Configuration['Garden']['Domain'] = '$Domain';"
-                     ),
-                     $Contents
-                  );
-                  file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
-                  
-                  // Update the domain in the VanillaForums.GDN_Site table
-                  $this->_GetDatabase()->SQL()->Put(
-                     'Site',
-                     array(
-                        'Domain' => $Domain,
-                        'Path' => '/srv/www/vhosts/'.$Domain
-                     ),
-                     array('SiteID' => Gdn::Config('VanillaForums.SiteID'))
-                  );
-                  
-                  $this->_CloseDatabase();
-                  
-                  // Redirect to the new domain
-                  $Session = Gdn::Session();
-                  Redirect($FQDN.'/garden/plugin/thankyou/auth/'.$Session->TransientKey());
-               }
+               // And redirect to the checkout
+               $this->_CloseDatabase();
+               Redirect('plugin/checkout');
             }
          }
       }
@@ -377,16 +350,17 @@ pageTracker._trackPageview();
       $Sender->Title('Premium Upgrades &raquo; Learn More');
       $Sender->AddSideMenu('garden/plugin/upgrades');
       $Sender->Form = new Gdn_Form();
-      $About = ArrayValue(0, $Sender->RequestArgs, '');
-      if ($About == 'customdomain')
+      $FeatureCode = ArrayValue(0, $Sender->RequestArgs, '');
+      if ($FeatureCode == 'customdomain')
          return $this->PluginController_CustomDomain_Create($Sender, $EventArguments);
          
       if ($Sender->Form->IsPostBack()) {
-         if ($About == 'adremoval') {
-            $PluginManager = Gdn::Factory('PluginManager');
-            $PluginManager->DisablePlugin('GoogleAdSense');
-         }
-         $this->PluginController_ThankYou_Create($Sender, $EventArguments);
+         // Select the feature
+         $this->_SelectUpgrade($FeatureCode);
+         
+         // And redirect to the checkout
+         $this->_CloseDatabase();
+         Redirect('plugin/checkout');
       } else {
          $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'learnmore.php');
       }
@@ -431,76 +405,24 @@ pageTracker._trackPageview();
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
       $Sender->AddSideMenu('garden/plugin/upgrades');
-      $About = ArrayValue(0, $Sender->RequestArgs, '');
+      $UpgradeToRemove = ArrayValue(0, $Sender->RequestArgs, '');
       $Sender->Form = new Gdn_Form();
       if ($Sender->Form->IsPostBack()) {
-         if ($About == 'adremoval') {
-            $Conf = PATH_CONF . DS . 'config.php';
-            $Contents = file_get_contents($Conf);
-            $Contents = str_replace(
-               "\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';\n",
-               '',
-               $Contents
-            );
-            $Contents = str_replace(
-               "// EnabledPlugins",
-               "// EnabledPlugins
-\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';",
-               $Contents
+         $Feature = $this->_GetDatabase()->SQL()->Select('FeatureID')-From('Feature')->Where('Code', $UpgradeToRemove)->Get()->FirstRow();
+         $FeatureID = is_object($Feature) ? $Feature->FeatureID : 0;
+         if ($FeatureID > 0) {
+            $this->_GetDatabase()->SQL()->Put(
+               'SiteFeature',
+               array('Active' => '0', 'Selected' => '0'),
+               array('SiteID' => $SiteID, 'FeatureID' => $FeatureID)
             );
             
-            file_put_contents($Conf, $Contents);
-            Redirect('garden/plugin/upgrades');
-         } else if ($About == 'customdomain') {
-            // Grab the Site record for information about this site
-            $SiteID = Gdn::Config('VanillaForums.SiteID', -1);
-            $Site = $this->_GetDatabase()->SQL()
-               ->Select()
-               ->From('Site')
-               ->Where('SiteID', $SiteID)
-               ->Get()
-               ->FirstRow();
-               
-            if (!is_object($Site)) {
-               $Sender->Form->AddError('Failed to identify custom domain for removal');
-            } else {
-               // Update the Site record to remove the domain entry & revert the path
-               $this->_GetDatabase()->SQL()->Put(
-                  'Site',
-                  array(
-                     'Domain' => '',
-                     'Path' => '/srv/www/vhosts/'.$Site->Name
-                  ),
-                  array('SiteID' => $SiteID)
-               );
-               
-               // Update the config file
-               $CookieDomain = substr($Site->Name, strpos($Site->Name, '.'));
-               $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
-               $Contents = str_replace(
-                  array(
-                     "\$Configuration['Garden']['Cookie']['Domain'] = '".Gdn::Config('Garden.Cookie.Domain')."';",
-                     "\$Configuration['Garden']['Domain'] = '".Gdn::Config('Garden.Domain')."';"
-                  ),
-                  array(
-                     "\$Configuration['Garden']['Cookie']['Domain'] = '$CookieDomain';",
-                     "\$Configuration['Garden']['Domain'] = '".$Site->Name."';"
-                  ),
-                  $Contents
-               );
-               file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
-               
-               $this->_CloseDatabase();
-                  
-               // Remove the symlinked folder
-               // WARNING: Do not use a trailing slash on symlinked folders when rm'ing, or it will remove the source!
-               $SymLinkedFolder = '/srv/www/vhosts/'.$Site->Domain;
-               unlink($SymLinkedFolder);
-               
-               // Redirect to the new domain
-               $Session = Gdn::Session();
-               Redirect('http://'.$Site->Name.'/garden/plugin/upgrades/auth/'.$Session->TransientKey());
-            }
+            $this->_ApplyUpgrades();
+            
+            $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'removecomplete.php');
+            return;
+         } else {
+            $Sender->Form->AddError('Failed to remove upgrade. Please contact support@vanillaforums.com for assistance.');
          }
       }
 
@@ -583,69 +505,6 @@ pageTracker._trackPageview();
    }
 
    /**
-    * Selects an upgrade for activation, records the appropriate information,
-    * and sends the user to the checkout page.
-    */
-   public function PluginController_SelectUpgrade_Create(&$Sender, $EventArguments) {
-      $Sender->Title('Rename Forum');
-      $Sender->AddSideMenu('garden/plugin/myforums');
-      $Sender->Form = new Gdn_Form();
-      
-      // Define the upgrade that was selected
-      $UpgradeCode = ArrayValue(0, $Sender->RequestArgs, '');
-      $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
-      $Session = Gdn::Session();
-      $ExistingRow = $this->_GetDatabase()->SQL()
-         ->Select('sf.*')
-         ->From('SiteFeature sf')
-         ->Join('Feature f', 'sf.FeatureID = f.FeatureID')
-         ->Where('sf.SiteID', $SiteID)
-         ->Where('f.Code', $UpgradeCode)
-         ->Get()
-         ->FirstRow();
-         
-      // If the row didn't exist for this site...
-      if (!$ExistingRow) {
-         // Make sure that the feature does exist
-         if ($this->_GetDatabase()->SQL()->Select()->From('Feature')->Where('Code', $UpgradeCode)->Get()->NumRows() > 0) {
-            // If the feature does exist, add the row as selected
-            $this->_GetDatabase()->SQL()->Insert(
-               'SiteFeature',
-               array(
-                  'SiteID' => $SiteID,
-                  'FeatureID' => $ExistingRow->FeatureID,
-                  'Selected' => 1,
-                  'Active' => 0,
-                  'DateInserted' => Format::DateTime(),
-                  'InsertUserID' => $Session->UserID
-                  )
-               );
-         } else {
-            // If the feature doesn't exist, throw an error
-            $Sender->Form->AddError('The requested upgrade does not have an associated record in the features table.');
-         }
-      } else {
-         // Update the row as selected
-         $this->_GetDatabase()->SQL()->Put(
-            'SiteFeature',
-            array(
-               'Selected' => 1,
-               'Active' => 0,
-               'DateUpdated' => Format::DateTime(),
-               'UpdateUserID' => $Session->UserID
-            ),
-            array(
-               'SiteID' => $SiteID,
-               'FeatureID' => $ExistingRow->FeatureID
-            )
-         );
-      }
-      $this->_CloseDatabase();
-      
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'vfproblem.php');
-   }
-
-   /**
     * Allows you to spoof the admin user if you have admin access in the
     * VanillaForums.com database.
     */
@@ -669,6 +528,7 @@ pageTracker._trackPageview();
                'Domain' => Gdn::Config('Garden.Cookie.Domain')
             ));
             $Identity->SetIdentity($UserIDToSpoof, TRUE);
+            $this->_CloseDatabase();
             Redirect('settings');
          } else {
             $Sender->Form->AddError('Bad Credentials');
@@ -685,6 +545,8 @@ pageTracker._trackPageview();
       $this->_ReAuthenticate($Sender, 'garden/plugin/thankyou');
       $Sender->Title('Premium Upgrades &raquo; Thank You!');
       $Sender->AddSideMenu('garden/plugin/upgrades');
+      
+      
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'thankyou.php');
    }
    
@@ -718,6 +580,152 @@ pageTracker._trackPageview();
     * No setup required.
     */
    public function Setup() {}
+   
+   /**
+    * Grabs the features for this site from the vfcom database and makes sure
+    * that their db status matches their actual status (enables or disables
+    * them). This may redirect away if required (ie. the domain has been changed).
+    */
+   private function _ApplyUpgrades() {
+      $Redirect = '';
+      
+      // Get all upgrades for this site
+      $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
+      $FeatureData = $this->_GetDatabase()->SQL()
+         ->Select('sf.*, f.Name, f.Code')
+         ->From('SiteFeature sf')
+         ->Join('Feature f', 'sf.FeatureID = f.FeatureID')
+         ->Where('sf.SiteID', $SiteID)
+         ->Get();
+         
+      foreach ($FeatureData as $Feature) {
+
+// --== AD REMOVAL ==--
+
+         if ($Feature->Code == 'adremoval') {
+            if ($Feature->Active == '1') {
+               // ---- ENABLE ----
+               $PluginManager = Gdn::Factory('PluginManager');
+               $PluginManager->DisablePlugin('GoogleAdSense');
+            } else {
+               // ---- DISABLE ----
+               $Conf = PATH_CONF . DS . 'config.php';
+               $Contents = file_get_contents($Conf);
+               $Contents = str_replace(
+                  "\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';\n",
+                  '',
+                  $Contents
+               );
+               $Contents = str_replace(
+                  "// EnabledPlugins",
+                  "// EnabledPlugins
+\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';",
+                  $Contents
+               );
+               
+               file_put_contents($Conf, $Contents);
+            }
+            
+// --== CUSTOM DOMAINS ==--
+
+         } else if ($Feature->Code == 'customdomain') {
+            if ($Feature->Active == '1') {
+               // ---- ENABLE ----
+               $Attributes = Format::Unserialize($Feature->Attributes);
+               $Domain = ArrayValue('Domain', $Attributes, '');
+               if ($Domain != '' && !file_exists('/srv/www/vhosts/'.$Domain)) {
+                  $FQDN = PrefixString('http://', $Domain);
+                  $Error = FALSE;
+                  try {
+                     $Response = ProxyRequest($FQDN);
+                     $ExpectedResponse = ProxyRequest('http://reserved.vanillaforums.com');               
+                  } catch(Exception $e) {
+                     $Error = TRUE;
+                     // Don't do anything with the exception
+                  }
+                  if (!$Error && $Response == $ExpectedResponse) {
+                     $OldDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', ''));
+                     // It is pointing at the correct place, so...
+                     // Create the symlink folder
+                     exec('/bin/ln -s "/srv/www/vhosts/'.$OldDomain.'" "/srv/www/vhosts/'.$Domain.'"');
+                     
+                     // Make sure it exists
+                     if (file_exists('/srv/www/vhosts/'.$Domain)) {
+                        // Change the domain in the conf file
+                        $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
+                        $Contents = str_replace(
+                           array(
+                              "\$Configuration['Garden']['Cookie']['Domain'] = '".Gdn::Config('Garden.Cookie.Domain')."';",
+                              "\$Configuration['Garden']['Domain'] = '".$OldDomain."';"
+                           ),
+                           array(
+                              "\$Configuration['Garden']['Cookie']['Domain'] = '$Domain';",
+                              "\$Configuration['Garden']['Domain'] = '$Domain';"
+                           ),
+                           $Contents
+                        );
+                        file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
+                        
+                        // Update the domain in the VanillaForums.GDN_Site table
+                        $this->_GetDatabase()->SQL()->Put(
+                           'Site',
+                           array(
+                              'Domain' => $Domain,
+                              'Path' => '/srv/www/vhosts/'.$Domain
+                           ),
+                           array('SiteID' => Gdn::Config('VanillaForums.SiteID'))
+                        );
+                        
+                        // Redirect to the new domain
+                        $Session = Gdn::Session();
+                        $Redirect = $FQDN.'/garden/plugin/thankyou/auth/'.$Session->TransientKey();
+                     }
+                  }
+               }
+            } else {
+               // ---- DISABLE ----
+               // Update the Site record to remove the domain entry & revert the path
+               $this->_GetDatabase()->SQL()->Put(
+                  'Site',
+                  array(
+                     'Domain' => '',
+                     'Path' => '/srv/www/vhosts/'.$Site->Name
+                  ),
+                  array('SiteID' => $SiteID)
+               );
+               
+               // Update the config file
+               $CookieDomain = substr($Site->Name, strpos($Site->Name, '.'));
+               $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
+               $Contents = str_replace(
+                  array(
+                     "\$Configuration['Garden']['Cookie']['Domain'] = '".Gdn::Config('Garden.Cookie.Domain')."';",
+                     "\$Configuration['Garden']['Domain'] = '".Gdn::Config('Garden.Domain')."';"
+                  ),
+                  array(
+                     "\$Configuration['Garden']['Cookie']['Domain'] = '$CookieDomain';",
+                     "\$Configuration['Garden']['Domain'] = '".$Site->Name."';"
+                  ),
+                  $Contents
+               );
+               file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
+               
+               // Remove the symlinked folder
+               // WARNING: Do not use a trailing slash on symlinked folders when rm'ing, or it will remove the source!
+               $SymLinkedFolder = '/srv/www/vhosts/'.$Site->Domain;
+               unlink($SymLinkedFolder);
+               
+               // Redirect to the new domain
+               $Session = Gdn::Session();
+               $Redirect = 'http://'.$Site->Name.'/garden/plugin/upgrades/auth/'.$Session->TransientKey();
+            }
+         }
+      }
+      if ($Redirect != '') {
+         $this->_CloseDatabase();
+         Redirect($Redirect);
+      }
+   }
    
    /**
     * Opens a connection to the VanillaForums.com database.
@@ -771,8 +779,10 @@ pageTracker._trackPageview();
             $Identity->SetIdentity(1, TRUE);
             
             // Now that the identity has been set, redirect again so that the page loads properly
-            if ($RedirectTo != '')
+            if ($RedirectTo != '') {
+               $this->_CloseDatabase();
                Redirect($RedirectTo);
+            }
          }
       }
    }
@@ -810,6 +820,64 @@ pageTracker._trackPageview();
             mysql_query($Query, $Cnn);
          }
          mysql_close($Cnn);
+      }
+      $this->_CloseDatabase();
+   }
+
+   /**
+    * Selects an upgrade for activation, records the appropriate information,
+    * and sends the user to the checkout page.
+    */
+   private function _SelectUpgrade($FeatureCode, $Attributes = '') {
+      // Define the feature that was selected
+      $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
+      $Session = Gdn::Session();
+      $ExistingRow = $this->_GetDatabase()->SQL()
+         ->Select('sf.*')
+         ->From('SiteFeature sf')
+         ->Join('Feature f', 'sf.FeatureID = f.FeatureID')
+         ->Where('sf.SiteID', $SiteID)
+         ->Where('f.Code', $FeatureCode)
+         ->Get()
+         ->FirstRow();
+         
+      // If the row didn't exist for this site...
+      if (!$ExistingRow) {
+         // Make sure that the feature does exist
+         if ($this->_GetDatabase()->SQL()->Select()->From('Feature')->Where('Code', $FeatureCode)->Get()->NumRows() > 0) {
+            // If the feature does exist, add the row as selected
+            $this->_GetDatabase()->SQL()->Insert(
+               'SiteFeature',
+               array(
+                  'SiteID' => $SiteID,
+                  'FeatureID' => $ExistingRow->FeatureID,
+                  'Selected' => 1,
+                  'Active' => 0,
+                  'DateInserted' => Format::DateTime(),
+                  'InsertUserID' => $Session->UserID,
+                  'Attributes' => Format::Serialize($Attributes)
+                  )
+               );
+         } else {
+            // If the feature doesn't exist, throw an error
+            $Sender->Form->AddError('The requested upgrade does not have an associated record in the features table.');
+         }
+      } else {
+         // Update the row as selected
+         $this->_GetDatabase()->SQL()->Put(
+            'SiteFeature',
+            array(
+               'Selected' => 1,
+               'Active' => 0,
+               'Attributes' => Format::Serialize($Attributes),
+               'DateUpdated' => Format::DateTime(),
+               'UpdateUserID' => $Session->UserID
+            ),
+            array(
+               'SiteID' => $SiteID,
+               'FeatureID' => $ExistingRow->FeatureID
+            )
+         );
       }
       $this->_CloseDatabase();
    }
