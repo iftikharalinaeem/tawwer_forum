@@ -860,7 +860,7 @@ pageTracker._trackPageview();
                   'FeatureID' => $ExistingRow->FeatureID,
                   'Selected' => 1,
                   'Active' => 0,
-                  'DateInserted' => Format::DateTime(),
+                  'DateInserted' => Format::ToDateTime(),
                   'InsertUserID' => $Session->UserID,
                   'Attributes' => Format::Serialize($Attributes)
                   )
@@ -877,7 +877,7 @@ pageTracker._trackPageview();
                'Selected' => 1,
                'Active' => 0,
                'Attributes' => Format::Serialize($Attributes),
-               'DateUpdated' => Format::DateTime(),
+               'DateUpdated' => Format::ToDateTime(),
                'UpdateUserID' => $Session->UserID
             ),
             array(
