@@ -851,13 +851,14 @@ pageTracker._trackPageview();
       // If the row didn't exist for this site...
       if (!$ExistingRow) {
          // Make sure that the feature does exist
-         if ($this->_GetDatabase()->SQL()->Select()->From('Feature')->Where('Code', $FeatureCode)->Get()->NumRows() > 0) {
+         $Feature = $this->_GetDatabase()->SQL()->Select('FeatureID')->From('Feature')->Where('Code', $FeatureCode)->Get()->FirstRow();
+         if (is_object($Feature)) {
             // If the feature does exist, add the row as selected
             $this->_GetDatabase()->SQL()->Insert(
                'SiteFeature',
                array(
                   'SiteID' => $SiteID,
-                  'FeatureID' => $ExistingRow->FeatureID,
+                  'FeatureID' => $Feature->FeatureID,
                   'Selected' => 1,
                   'Active' => 0,
                   'DateInserted' => Format::ToDateTime(),
