@@ -1,6 +1,13 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1>Premium Upgrades</h1>
+<h1>
+   Premium Upgrades
+   <div style="float: right"><?php echo Anchor('Checkout Now', '/payment/pay');?></div>
+</h1>
 <div class="Info">In addition to all of the free features at VanillaForums.com, we will soon offer these premium upgrades for enhanced functionality.</div>
+
+<div>
+   <b>Note:</b> All prices are in US dollars. Prices are in Canadian dollars for Canadian residents and are subject to GST and QST.
+</div>
 
 <div class="Upgrades">
    <table class="SelectionGrid">
@@ -140,4 +147,15 @@
          -->
       </tbody>
    </table>
+</div>
+<div style="text-align: center">
+<?php
+echo Anchor('Terms of Service', '/plugin/termsofservice/?iframe=true&width=600&height=300', '', array('rel' => 'popup', 'target' => '_New'));
+echo '  | ';
+echo Anchor('Privacy Policy', '/plugin/privacy/?iframe=true&width=600&height=300', '', array('rel' => 'popup', 'target' => '_New'));
+echo '  | ';
+echo Anchor('Refund Policy', '/plugin/refund/?iframe=true&width=600&height=300', '', array('rel' => 'popup', 'target' => '_New'));
+echo '  | ';
+echo Anchor('Contact', '/plugin/contact/?iframe=true&width=600&height=300', '', array('rel' => 'popup', 'target' => '_New'));
+?>
 </div>

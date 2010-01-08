@@ -900,4 +900,28 @@ pageTracker._trackPageview();
       }
       $this->_CloseDatabase();
    }
+   
+   public function PluginController_TermsOfService_Create($Sender, $Args) {
+      $Sender->Render(dirname(__FILE__) . DS . 'views' . DS . 'termsofservice.php');
+   }
+   
+   public function PluginController_Privacy_Create($Sender, $Args) {
+      $Sender->Render(dirname(__FILE__) . DS . 'views' . DS . 'privacy.php');
+   }
+   
+   public function DMCA() {
+      $this->Render();
+   }
+   
+   public function Complaints() {
+      $this->Render();
+   }
+   
+   public function PluginController_Refund_Create($Sender, $Args) {
+      $Sender->Render(dirname(__FILE__) . DS . 'views' . DS . 'refund.php');
+   }
+   
+   public function PluginController_Contact_Create($Sender, $Args) {
+      $Sender->Render(dirname(__FILE__) . DS . 'views' . DS . 'contact.php');
+   }
 }
