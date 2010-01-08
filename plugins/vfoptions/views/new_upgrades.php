@@ -8,7 +8,9 @@ function Css($Bool) {
    echo $Bool ? ' Enabled' : '';
 }
 ?>
-<h1>Premium & Enterprise Upgrades</h1>
+<h1>Premium & Enterprise Upgrades
+<div style="float: right"><?php echo Anchor('Checkout Now', '/payment/pay');?></div>
+</h1>
 
 <div class="Info">In addition to all of the free features at VanillaForums.com, we will soon offer these premium & enterprise upgrades for enhanced functionality.</div>
 
