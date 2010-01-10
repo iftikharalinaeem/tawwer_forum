@@ -35,7 +35,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Dashboard', 'My Forums', 'garden/plugin/myforums', 'Garden.Settings.GlobalPrivs');
-      $Menu->AddLink('Dashboard', 'Premium Upgrades', 'garden/plugin/upgrades', 'Garden.Settings.GlobalPrivs', array('class' => 'HighlightButton'));
+      $Menu->AddLink('Dashboard', 'Premium Upgrades ↪', 'garden/plugin/upgrades', 'Garden.Settings.GlobalPrivs', array('class' => 'HighlightButton'));
       
       // Remove the addons menu items
       $Menu->RemoveGroup('Add-ons');
