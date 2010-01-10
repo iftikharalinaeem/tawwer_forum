@@ -3,7 +3,7 @@ $Domain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.
 $CustomDomain = str_replace(array('http://', '/'), array('', ''), $this->Form->GetValue('CustomDomain', ''));
 ?>
 <h1>Custom Domain Name</h1>
-<?php echo $this->Form->Errors(); ?>
+<?php // echo $this->Form->Errors(); ?>
 <div class="Legal">
    <?php
    if ($this->Form->ErrorCount() > 0) {

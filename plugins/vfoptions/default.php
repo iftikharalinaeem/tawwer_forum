@@ -270,12 +270,8 @@ pageTracker._trackPageview();
             if ($Error || $Response != $ExpectedResponse) {
                $Sender->Form->AddError("We were unable to verify that ".$Domain." is pointing at VanillaForums.com.");
             } else {
-               // Everything is set up properly, so select the upgrade
-               $this->_SelectUpgrade('customdomain', array('Domain' => $Domain));
-               
-               // And redirect to the checkout
-               $this->_CloseDatabase();
-               Redirect('plugin/checkout');
+               // Everything is set up properly, so select the upgrade and go to checkout
+               $this->_SetSelectionGoToCheckout('customdomain', array('Domain' => $Domain));
             }
          }
       }
@@ -919,9 +915,9 @@ pageTracker._trackPageview();
    /**
     * Applies a selection and redirects to the checkout.
     */
-   private function _SetSelectionGoToCheckout($FeatureCode) {
+   private function _SetSelectionGoToCheckout($FeatureCode, $Attributes = '') {
       $Session = Gdn::Session();
-      $this->_SelectUpgrade($FeatureCode);
+      $this->_SelectUpgrade($FeatureCode, $Attributes);
       
       // Figure out which checkout to send them to (dev or production):
       $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
