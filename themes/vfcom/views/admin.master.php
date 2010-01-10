@@ -30,8 +30,19 @@
          <div id="Content"><?php $this->RenderAsset('Content'); ?></div>
       </div>
       <div id="Foot">
+			<div style="float: right">
+				<?php
+				echo Anchor('Terms of Service', 'http://vanillaforums.com/info/termsofservice', '', array('target' => '_New'));
+				echo ' | ';
+				echo Anchor('Privacy Policy', 'http://vanillaforums.com/info/privacy', '', array('target' => '_New'));
+				echo ' | ';
+				echo Anchor('Refund Policy', 'http://vanillaforums.com/info/refund', '', array('target' => '_New'));
+				echo ' | ';
+				echo Anchor('Contact', 'http://vanillaforums.com/info/contact', '', array('target' => '_New'));
+				?>
+			</div>
 			<div>
-				Powered by <a href="http://vanillaforums.com"><span>Vanilla</span></a>
+				Powered by <a href="http://vanillaforums.com"><span>VanillaForums.com</span></a>
 				- Problems? <?php echo Format::Email('support@vanillaforums.com'); ?>
 			</div>
 		</div>

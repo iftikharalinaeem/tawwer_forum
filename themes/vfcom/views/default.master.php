@@ -47,7 +47,7 @@
       </div>
       <div id="Foot">
 			<div><?php
-				printf(Gdn::Translate('Powered by %s'), '<a href="http://vanillaforums.com"><span>Vanilla</span></a>');
+				printf(Gdn::Translate('Powered by %s'), '<a href="http://vanillaforums.com"><span>VanillaForums.com</span></a>');
 			?></div>
 		</div>
    </div>
