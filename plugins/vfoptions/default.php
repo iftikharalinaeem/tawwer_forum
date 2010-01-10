@@ -674,6 +674,7 @@ pageTracker._trackPageview();
                      // Make sure it exists
                      if (file_exists('/srv/www/vhosts/'.$Domain)) {
                         // Change the domain in the conf file
+                        $CookieDomain = substr($Domain, strpos($Domain, '.'));
                         $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
                         $Contents = str_replace(
                            array(
@@ -681,7 +682,7 @@ pageTracker._trackPageview();
                               "\$Configuration['Garden']['Domain'] = '".$OldDomain."';"
                            ),
                            array(
-                              "\$Configuration['Garden']['Cookie']['Domain'] = '$Domain';",
+                              "\$Configuration['Garden']['Cookie']['Domain'] = '$CookieDomain';",
                               "\$Configuration['Garden']['Domain'] = '$Domain';"
                            ),
                            $Contents
