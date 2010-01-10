@@ -1,5 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 $About = ArrayValue(0, $this->RequestArgs, '');
+$SiteID = Gdn::Config('VanillaForums.SiteID', 0);
+if ($SiteID <= 0)
+   $About = 'error';
+
 $Domain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', 'your_forum_name.vanillaforums.com'));
 ?>
 <h1><?php
@@ -17,6 +21,8 @@ else if ($About == 'dailybackups')
    echo 'Daily Backups';
 else if ($About == 'ssl')
    echo 'Secure Login';
+else if ($About == 'error')
+   echo 'Upgrade Problem';
 else 
    echo 'More Info?';
 ?></h1>
@@ -78,6 +84,12 @@ if ($About == 'adremoval') {
    <div class="Legal">
       <p>The Secure Login upgrade allows you to use our secure socket layer (SSL) certificate when signing into your <?php echo $Domain; ?> domain.</p>
       <p><strong>Coming Soon!</strong></p>
+   </div>
+   <?php
+} else if ($About == 'error') {
+   ?>
+   <div class="Legal">
+      <p>There is a problem with your forum's configuration, so you cannot currently purchase upgrades. Please contact support for assistance: <?php echo Format::Email('support@vanillaforums.com'); ?></p>
    </div>
    <?php
 } else {

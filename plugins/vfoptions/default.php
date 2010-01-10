@@ -178,10 +178,18 @@ pageTracker._trackPageview();
    }
 
    /**
-    * This is just a placeholder until I know where to send users to check out.
+    * Creates a "Buy Now" url that sends the user directly to checkout for an upgrade.
     */
-   public function PluginController_Checkout_Create(&$Sender, $EventArguments) {
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'checkout.php');
+   public function PluginController_BuyNow_Create(&$Sender, $EventArguments) {
+      $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
+      $Sender->Permission('Garden.AdminUser.Only');
+      $FeatureCode = ArrayValue(0, $Sender->RequestArgs, '');
+      if ($SiteID <= 0 || $FeatureCode == '') {
+         $this->PluginController_LearnMore_Create($Sender, $EventArguments);
+      } else {
+         // Select the feature and redirect to the checkout
+         $this->_SetSelectionGoToCheckout($FeatureCode);
+      }
    }
    
    /**
@@ -346,21 +354,22 @@ pageTracker._trackPageview();
     * offerings.
     */
    public function PluginController_LearnMore_Create(&$Sender, $EventArguments) {
+      $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades &raquo; Learn More');
       $Sender->AddSideMenu('garden/plugin/upgrades');
       $Sender->Form = new Gdn_Form();
+      $Sender->Form->AddHidden('SiteID', $SiteID);
       $FeatureCode = ArrayValue(0, $Sender->RequestArgs, '');
+      if ($SiteID <= 0)
+         $FeatureCode = 'error';
+      
       if ($FeatureCode == 'customdomain')
          return $this->PluginController_CustomDomain_Create($Sender, $EventArguments);
          
       if ($Sender->Form->IsPostBack()) {
-         // Select the feature
-         $this->_SelectUpgrade($FeatureCode);
-         
-         // And redirect to the checkout
-         $this->_CloseDatabase();
-         Redirect('plugin/checkout');
+         // Select the feature and redirect to the checkout
+         $this->_SetSelectionGoToCheckout($FeatureCode);
       } else {
          $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'learnmore.php');
       }
@@ -569,6 +578,13 @@ pageTracker._trackPageview();
       $Sender->Title('Premium Upgrades');
       $Sender->AddCssFile('/plugins/vfoptions/style.css');
       $Sender->AddSideMenu('garden/plugin/upgrades');
+      $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
+      // Reset upgrade selections
+      $SiteFeatureData = $this->_GetDatabase()->SQL()->Select('SiteFeatureID, Active')->From('SiteFeature')->Where('SiteID', $SiteID)->Get();
+      foreach ($SiteFeatureData as $SiteFeature) {
+         $this->_GetDatabase()->SQL()->Put('SiteFeature', array('Selected' => $SiteFeature->Active), array('SiteFeatureID' => $SiteFeature->SiteFeatureID));
+      }
+      
       $View = Gdn::Config('Plugins.VFOptions.UpgradeView', 'upgrades.php');
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . $View);
    }
@@ -901,27 +917,38 @@ pageTracker._trackPageview();
       $this->_CloseDatabase();
    }
    
-   public function PluginController_TermsOfService_Create($Sender, $Args) {
-      $Sender->Render(dirname(__FILE__) . DS . 'views' . DS . 'termsofservice.php');
-   }
-   
-   public function PluginController_Privacy_Create($Sender, $Args) {
-      $Sender->Render(dirname(__FILE__) . DS . 'views' . DS . 'privacy.php');
-   }
-   
-   public function DMCA() {
-      $this->Render();
-   }
-   
-   public function Complaints() {
-      $this->Render();
-   }
-   
-   public function PluginController_Refund_Create($Sender, $Args) {
-      $Sender->Render(dirname(__FILE__) . DS . 'views' . DS . 'refund.php');
-   }
-   
-   public function PluginController_Contact_Create($Sender, $Args) {
-      $Sender->Render(dirname(__FILE__) . DS . 'views' . DS . 'contact.php');
-   }
+   /**
+    * Applies a selection and redirects to the checkout.
+    */
+   private function _SetSelectionGoToCheckout($FeatureCode) {
+      $Session = Gdn::Session();
+      $this->_SelectUpgrade($FeatureCode);
+      
+      // Figure out which checkout to send them to (dev or production):
+      $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
+      $Site = $this->_GetDatabase()->SQL()
+         ->Select()
+         ->From('Site')
+         ->Where('SiteID', $SiteID)
+         ->Get()
+         ->FirstRow();
+      
+      $CheckoutUrl = 'http://vanillaforums.com/payment/pay/';
+      if (is_object($Site)) {
+         // Point at vanilladev.com if that's where this site is managed
+         if (strpos($Site->Name, 'vanilladev') !== FALSE)
+            $CheckoutUrl = 'http://vanilladev.com/payment/pay/';
+
+         // Update the site attributes with the user's transientkey so we can authenticate them at the checkout
+         $Attributes = Format::Unserialize($Site);
+         if (!is_array($Attributes))
+            $Attributes = array();
+            
+         $Attributes['UserTransientKey'] = $Session->TransientKey();
+         $this->_GetDatabase()->SQL()->Put('Site', array('Attributes' => Format::Serialize($Attributes)), array('SiteID' => $SiteID));
+      }
+      
+      $this->_CloseDatabase();
+      Redirect($CheckoutUrl.$SiteID.'/'.$Session->TransientKey());
+   }   
 }

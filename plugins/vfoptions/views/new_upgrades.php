@@ -27,9 +27,9 @@ function Css($Bool) {
                   echo "Customize your forum's address.";
                ?></em>
                <div class="Price">
-                  <strong>$2</strong>
+                  <strong>$3</strong>
                   per month
-                  <span>$0.06 per day</span>
+                  <span>$0.10 per day</span>
                </div>
                <div class="Buttons">
                   <?php
@@ -46,15 +46,15 @@ function Css($Bool) {
                <h4>Ad Removal <span>Purchased!</span></h4>
                <em>Get those ugly advertisements off your forum.</em>
                <div class="Price">
-                  <strong>$5</strong>
+                  <strong>$6</strong>
                   per month
-                  <span>$0.16 per day</span>
+                  <span>$0.20 per day</span>
                </div>
                <div class="Buttons">
                   <?php
                   if (!$AdRemovalPurchased) {
                      echo Anchor('Learn More', '/plugin/learnmore/adremoval', 'Popdown Button');
-                     echo Anchor('Buy Now', '/plugin/learnmore/adremoval', 'Popdown Button');
+                     echo Anchor('Buy Now', '/plugin/buynow/adremoval', 'Button');
                   } else {
                      echo Anchor('Remove Upgrade', '/plugin/remove/adremoval', 'Popdown Button');
                   }
@@ -64,11 +64,15 @@ function Css($Bool) {
             <td class="LastCol">
                <h4>Custom CSS <span>Purchased!</span></h4>
                <em>Have complete control over the appearance of your forum.</em>
+               <?php
+               /*
                <div class="Price">
-                  <strong>$5</strong>
+                  <strong>$6</strong>
                   per month
-                  <span>$0.16 per day</span>
+                  <span>$0.20 per day</span>
                </div>
+               */
+               ?>
                <div class="Buttons">
                   <?php echo Anchor('Learn More', '/plugin/learnmore/customcss', 'Popdown Button'); ?>
                   Coming Soon!
@@ -79,6 +83,8 @@ function Css($Bool) {
             <td class="FirstCol">
                <h4>File Uploading <span>Purchased!</span></h4>
                <em>Let your users upload files with their discussions.</em>
+               <?php
+               /*
                <table class="PriceOptions">
                   <tr>
                      <th>1GB</th>
@@ -93,6 +99,8 @@ function Css($Bool) {
                      <td>$15 <em>per month</em></td>
                   </tr>
                </table>
+               */
+               ?>
                <div class="Buttons">
                   <?php echo Anchor('Learn More', '/plugin/learnmore/fileuploading', 'Popdown Button'); ?>
                   Coming Soon!
@@ -104,11 +112,15 @@ function Css($Bool) {
                array('http://', '/'),
                array('', ''),
                Gdn::Config('Garden.Domain', 'your_forum_name.vanillaforums.com')); ?> domain.</em>
+               <?php
+               /*
                <div class="Price">
                   <strong>$9</strong>
                   per month
-                  <span>$0.32 per day</span>
+                  <span>$0.30 per day</span>
                </div>
+               */
+               ?>
                <div class="Buttons">
                   <?php echo Anchor('Learn More', '/plugin/learnmore/ssl', 'Popdown Button'); ?>
                   Coming Soon!
@@ -136,6 +148,8 @@ function Css($Bool) {
             <td class="FirstCol">
                <h4>Extra Bandwidth <span>Purchased!</span></h4>
                <em>For heavy-traffic forums, move past the free 1,000,000 pageviews per month.</em>
+               <?php
+               /*
                <table class="PriceOptions">
                   <tr>
                      <th>10M</th>
@@ -150,6 +164,8 @@ function Css($Bool) {
                      <td><a href="mailto:support@vanillaforums.com?subject=Extra Bandwidth">Contact Us</a></td>
                   </tr>
                </table>
+               */
+               ?>
                <div class="Buttons">
                   <?php echo Anchor('Learn More', '/plugin/learnmore/extrabandwidth', 'Popdown Button'); ?>
                   Coming Soon!
@@ -158,11 +174,15 @@ function Css($Bool) {
             <td class="MiddleCol">
                <h4>Single Sign-on <span>Purchased!</span></h4>
                <em>Let your existing users access the forum without signing in or registering again.</em>
+               <?php
+               /*
                <div class="Price">
                   <strong>$49</strong>
                   per month
                   <span>$1.61 per day</span>
                </div>
+               */
+               ?>
                <div class="Buttons">
                   <?php echo Anchor('Learn More', '/plugin/learnmore/singlesignon', 'Popdown Button'); ?>
                   Coming Soon!
@@ -171,11 +191,15 @@ function Css($Bool) {
             <td class="LastCol">
                <h4>Daily Backups <span>Purchased!</span></h4>
                <em>Rest easy knowing that your data is backed up and ready to be restored should the need arise.</em>
+               <?php
+               /*
                <div class="Price">
                   <strong>$19</strong>
                   per month
-                  <span>$0.42 per day</span>
+                  <span>$0.63 per day</span>
                </div>
+               */
+               ?>
                <div class="Buttons">
                   <?php echo Anchor('Learn More', '/plugin/learnmore/dailybackups', 'Popdown Button'); ?>
                   Coming Soon!
