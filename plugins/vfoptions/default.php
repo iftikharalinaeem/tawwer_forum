@@ -558,7 +558,6 @@ pageTracker._trackPageview();
       $Sender->AddSideMenu('garden/plugin/upgrades');
       
       // Update the SiteFeature table so that all selected items are now marked active
-      // NOTE: THERE IS A SECURITY ISSUE HERE WHERE USERS CAN SELECT AN ITEM, AND THEN JUST VISIT THIS PAGE TO ENABLE IT WITHOUT PAYING.
       $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
       $this->_GetDatabase()->SQL()->Put('SiteFeature', array('Active' => '1'), array('SiteID' => $SiteID, 'Selected' => '1'));
       
@@ -766,7 +765,7 @@ pageTracker._trackPageview();
    private function _GetDatabase() {
       if (!is_object($this->_Database)) {
          $this->_Database = new Gdn_Database(array(
-            'Name' => 'vanillaforumscom',
+            'Name' => Gdn::Config('VanillaForums.Database.Name', 'vanillaforumscom'),
             'Host' => Gdn::Config('Database.Host'),
             'User' => Gdn::Config('Database.User'),
             'Password' => Gdn::Config('Database.Password')
