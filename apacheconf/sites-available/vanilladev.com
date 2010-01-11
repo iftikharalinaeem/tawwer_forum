@@ -7,13 +7,13 @@
 		  <Directory /srv/www/vanilladev/>
 					 Options FollowSymLinks MultiViews
 					 AllowOverride All
-					 AuthUserFile /home/mark/.htpasswd                                                                                                                                                       
-					 AuthGroupFile /dev/null                                                                                                                                                                 
-					 AuthName "Private!"                                                                                                                                                         
-					 AuthType Basic                                                                                                                                                                          
-					 <Limit GET>                                                                                                                                                                             
-		  					 require valid-user                                                                                                                                                                      
-					 </Limit>
+					 # AuthUserFile /home/mark/.htpasswd                                                                                                                                                       
+					 # AuthGroupFile /dev/null                                                                                                                                                                 
+					 # AuthName "Private!"                                                                                                                                                         
+					 # AuthType Basic                                                                                                                                                                          
+					 # <Limit GET>                                                                                                                                                                             
+					 #		require valid-user                                                                                                                                                                      
+					 #</Limit>
 		  </Directory>
         ErrorLog /srv/log/vanilladev/error.log
         LogLevel warn
