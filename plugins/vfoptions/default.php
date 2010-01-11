@@ -417,15 +417,13 @@ pageTracker._trackPageview();
          $Feature = $this->_GetDatabase()->SQL()->Select('FeatureID')->From('Feature')->Where('Code', $UpgradeToRemove)->Get()->FirstRow();
          $FeatureID = is_object($Feature) ? $Feature->FeatureID : 0;
          if ($FeatureID > 0) {
+            // Mark the feature for removal
             $Session = Gdn::Session();
             $this->_GetDatabase()->SQL()->Replace(
                'SiteFeature',
                array('Selected' => '0', 'UpdateUserID' => $Session->UserID, 'DateUpdated' => Format::ToDateTime()),
                array('SiteID' => $SiteID, 'FeatureID' => $FeatureID)
             );
-            
-            // Remove the feature from the forum
-            $this->_ApplyUpgrades();
             
             // Figure out where to send the user for subscription update
             $Site = $this->_GetDatabase()->SQL()
@@ -464,6 +462,8 @@ pageTracker._trackPageview();
    public function PluginController_RemoveComplete_Create(&$Sender, $EventArguments) {
       $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
       $Sender->AddSideMenu('garden/plugin/upgrades');
+      // Remove the feature from the forum
+      $this->_ApplyUpgrades();
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'removecomplete.php');
    }
    
