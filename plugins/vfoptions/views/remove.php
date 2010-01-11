@@ -9,4 +9,4 @@ $Domain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.
 <?php
 echo $this->Form->Errors();
 echo $this->Form->Open();
-echo $this->Form->Close('Remove My Upgrade ↯');
+echo $this->Form->Close('Remove My Upgrade ↯', '', array('class' => 'Button SpinOnClick'));

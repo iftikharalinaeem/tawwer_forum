@@ -420,13 +420,38 @@ pageTracker._trackPageview();
             $Session = Gdn::Session();
             $this->_GetDatabase()->SQL()->Replace(
                'SiteFeature',
-               array('Active' => '0', 'Selected' => '0', 'UpdateUserID' => $Session->UserID, 'DateUpdated' => Format::ToDateTime()),
+               array('Selected' => '0', 'UpdateUserID' => $Session->UserID, 'DateUpdated' => Format::ToDateTime()),
                array('SiteID' => $SiteID, 'FeatureID' => $FeatureID)
             );
             
+            // Remove the feature from the forum
             $this->_ApplyUpgrades();
             
-            $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'removecomplete.php');
+            // Figure out where to send the user for subscription update
+            $Site = $this->_GetDatabase()->SQL()
+               ->Select()
+               ->From('Site')
+               ->Where('SiteID', $SiteID)
+               ->Get()
+               ->FirstRow();
+      
+            $UpdateUrl = 'http://vanillaforums.com/payment/synch/';
+            if (is_object($Site)) {
+               // Point at vanilladev.com if that's where this site is managed
+               if (strpos($Site->Name, 'vanilladev') !== FALSE)
+                  $UpdateUrl = 'http://vanilladev.com/payment/synch/';
+            }
+            
+            // Set the transient key for authentication on the other side
+            $this->_SetTransientKey($Site);
+            
+            // Close any open db connections
+            $this->_CloseDatabase();
+            
+            // Redirect
+            $SiteUrl = $Site->Domain == '' ? $Site->Name : $Site->Domain;
+            $Session = Gdn::Session();
+            Redirect($UpdateUrl.$SiteID.'/'.$Session->TransientKey().'/?Redirect=http://'.$SiteUrl.'/plugin/removecomplete/');
             return;
          } else {
             $Sender->Form->AddError('Failed to remove upgrade. Please contact support@vanillaforums.com for assistance.');
@@ -434,6 +459,12 @@ pageTracker._trackPageview();
       }
 
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'remove.php');
+   }
+   
+   public function PluginController_RemoveComplete_Create(&$Sender, $EventArguments) {
+      $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
+      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'removecomplete.php');
    }
    
    /**
@@ -917,7 +948,6 @@ pageTracker._trackPageview();
     * Applies a selection and redirects to the checkout.
     */
    private function _SetSelectionGoToCheckout($FeatureCode, $Attributes = '') {
-      $Session = Gdn::Session();
       $this->_SelectUpgrade($FeatureCode, $Attributes);
       
       // Figure out which checkout to send them to (dev or production):
@@ -934,7 +964,32 @@ pageTracker._trackPageview();
          // Point at vanilladev.com if that's where this site is managed
          if (strpos($Site->Name, 'vanilladev') !== FALSE)
             $CheckoutUrl = 'http://vanilladev.com/payment/pay/';
-
+            
+         $this->_SetTransientKey($Site);
+      }
+      
+      $this->_CloseDatabase();
+      Redirect($CheckoutUrl.$SiteID.'/'.$Session->TransientKey());
+   }
+   
+   /**
+    * When going to the home site for a payment transaction
+    * (increasing/decreasing subscription amounts, updating cc info, etc) it is
+    * necessary to call this method so that the user's transient key can be used
+    * to authenticate them in relation to their site.
+    */
+   private function _SetTransientKey($Site = FALSE) {
+      $Session = Gdn::Session();
+      $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
+      if (!is_object($Site)) {
+         $Site = $this->_GetDatabase()->SQL()
+            ->Select()
+            ->From('Site')
+            ->Where('SiteID', $SiteID)
+            ->Get()
+            ->FirstRow();
+      }
+      if (is_object($Site)) {
          // Update the site attributes with the user's transientkey so we can authenticate them at the checkout
          $Attributes = Format::Unserialize($Site);
          if (!is_array($Attributes))
@@ -942,9 +997,6 @@ pageTracker._trackPageview();
             
          $Attributes['UserTransientKey'] = $Session->TransientKey();
          $this->_GetDatabase()->SQL()->Put('Site', array('Attributes' => Format::Serialize($Attributes)), array('SiteID' => $SiteID));
-      }
-      
-      $this->_CloseDatabase();
-      Redirect($CheckoutUrl.$SiteID.'/'.$Session->TransientKey());
-   }   
+      }      
+   }
 }
