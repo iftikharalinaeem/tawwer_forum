@@ -969,6 +969,7 @@ pageTracker._trackPageview();
       }
       
       $this->_CloseDatabase();
+      $Session = Gdn::Session();
       Redirect($CheckoutUrl.$SiteID.'/'.$Session->TransientKey());
    }
    
