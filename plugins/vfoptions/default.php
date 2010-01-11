@@ -433,11 +433,11 @@ pageTracker._trackPageview();
                ->Get()
                ->FirstRow();
       
-            $UpdateUrl = 'http://vanillaforums.com/payment/synch/';
+            $UpdateUrl = 'https://vanillaforums.com/payment/synch/';
             if (is_object($Site)) {
                // Point at vanilladev.com if that's where this site is managed
                if (strpos($Site->Name, 'vanilladev') !== FALSE)
-                  $UpdateUrl = 'http://vanilladev.com/payment/synch/';
+                  $UpdateUrl = 'https://vanilladev.com/payment/synch/';
             }
             
             // Set the transient key for authentication on the other side
@@ -959,11 +959,11 @@ pageTracker._trackPageview();
          ->Get()
          ->FirstRow();
       
-      $CheckoutUrl = 'http://vanillaforums.com/payment/pay/';
+      $CheckoutUrl = 'https://vanillaforums.com/payment/pay/';
       if (is_object($Site)) {
          // Point at vanilladev.com if that's where this site is managed
          if (strpos($Site->Name, 'vanilladev') !== FALSE)
-            $CheckoutUrl = 'http://vanilladev.com/payment/pay/';
+            $CheckoutUrl = 'https://vanilladev.com/payment/pay/';
             
          $this->_SetTransientKey($Site);
       }
