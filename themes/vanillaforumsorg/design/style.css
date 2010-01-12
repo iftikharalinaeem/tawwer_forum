@@ -1557,10 +1557,13 @@ a:hover {
    color: #2a529a;
 	text-decoration: underline;
 }
+body {
+	background: #E9F9FF;
+}
 #Frame {
 	border-top: 1px solid #fff;
 	background: #e4f0fc;
-	background: url('fade.jpg') top left repeat-x;
+	background: url('fade.jpg') top left repeat-x #fff;
 }
 #Body {
    margin: 30px auto 0;
@@ -1633,7 +1636,7 @@ div#Foot div a:hover {
 	color: #fff;
 	padding: 0 2px;
 	font-weight: normal;
-	font-family: 'Lucida Grande', Arial;
+	font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
 	text-shadow: 0 1px 0 #000;;
 }
 .Banner h1 {
@@ -1680,6 +1683,8 @@ div#Foot div a:hover {
 .Banner ul li.Download a {
 	background: url('dl_right.png') right center no-repeat;
 }
+body#vforg_home_index .Banner ul li.Home,
+body.hosting .Banner ul li.Hosting,
 body.Wiki .Banner ul li.Documentation,
 body.Addons .Banner ul li.Addons,
 body.Profile .Banner ul li.Community,
@@ -1687,6 +1692,8 @@ body.Vanilla .Banner ul li.Community,
 body.Conversations .Banner ul li.Community {
 	background: url('tab_left.png') left center no-repeat;	
 }
+body#vforg_home_index .Banner ul li.Home a,
+body.hosting .Banner ul li.Hosting a,
 body.Wiki .Banner ul li.Documentation a,
 body.Addons .Banner ul li.Addons a,
 body.Profile .Banner ul li.Community a,
@@ -1882,4 +1889,32 @@ div.Popup h1, div.Popup h2 {
 }
 div.Popup a.Close {
 	text-decoration: none;
+}
+
+/* ---- Big Chunky Buttons ---- */
+.ChunkyButton {
+   width: 190px;
+   margin: 20px 0 0;
+   background: url('left_bluegreen.png') bottom left no-repeat;
+   cursor: pointer;
+}
+.ChunkyButton a {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-weight: bold;
+   color: #fff;
+   text-shadow: 0 -1px 0 #000;
+   font-size: 20px;
+   text-align: center;
+   line-height: 2.2;
+   display: block;
+   height: 46px;
+   margin: 0 0 0 5px;
+   padding: 0 3px 0 0;
+   background: url('right_bluegreen.png') bottom right no-repeat;
+}
+.ChunkyButton:hover {
+   background: url('left_bluegreen.png') top left no-repeat;
+}
+.ChunkyButton:hover a {
+   background: url('right_bluegreen.png') top right no-repeat;
 }

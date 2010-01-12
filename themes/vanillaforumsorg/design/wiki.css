@@ -235,3 +235,21 @@ div#Foot div#TableOfContents a:hover {
    text-decoration: none;
    color: #ff0084;
 }
+
+
+/* ==================================================== VF.org Customizations */
+div.Breadcrumb,
+div.PageInfo {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+}
+div#Foot div#TableOfContents a:hover {
+   text-decoration: underline;
+}
+#Content {
+   width: auto;
+   float: none;
+   margin: 0;
+}
+#Foot div {
+   margin: 0 auto;
+}

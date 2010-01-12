@@ -1,0 +1,185 @@
+div.Host {
+   padding: 8px 12px;
+   margin: 0 0 10px;
+}
+div.Featured {
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   border: 1px solid #ccc;
+   background: #ffc;
+}
+div.Host h4 {
+   font-weight: bold;
+   margin: 0 0 6px;
+}
+div.DownloadInfo p,
+div.Host p {
+   font-size: 100%;
+   margin: 0 !important;
+   padding: 0 !important;
+}
+div.Host img {
+   float: right;
+   margin: 0 0 2px 8px;
+}
+#vforg_home_index #Panel,
+body.download #Panel,
+body.hosting #Panel {
+   display: none;
+}
+#vforg_home_index #Content,
+body.download #Content,
+body.hosting #Content {
+   float: none;
+   width: auto;
+}
+body.hosting div.HostingInfo {
+   float: left;
+   width: 400px;
+}
+body.hosting div.Hosts {
+   float: right;
+   width: 540px;
+}
+body.hosting div.HostingInfo h1 {
+   font-size: 160%;
+   border: 0;
+   text-shadow: 0 1px 0 #fff;
+}
+body.download div.DownloadInfo p,
+body.hosting div.HostingInfo p,
+body.hosting div.Host p {
+   color: #444;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+}
+body.hosting div.HostingInfo p {
+   font-size: 103%;
+}
+body.hosting div.HostingInfo p strong {
+   font-weight: bold;
+}
+body.hosting .ChunkyButton {
+   width: 275px;
+}
+body.hosting .ChunkyButton a {
+   font-family: arial;
+   font-size: 17px;
+   line-height: 2.7;
+}
+body.download .ChunkyButton a {
+   font-family: arial;
+}
+body.download .ChunkyButton a:hover,
+body.hosting .ChunkyButton a:hover {
+   text-decoration: none;
+}
+body.download div.DownloadOptions {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 100%;
+   font-weight: bold;
+   line-height: 160%;
+   width: 230px;
+   float: left;
+   border: 1px solid #aaa;
+   background: #eee;
+   -moz-border-radius: 3px;
+   padding: 8px 0;
+}
+body.download div.DownloadOptions ul.SideMenu {
+   padding: 0;
+   margin: 0;
+}
+body.download div.DownloadOptions ul.SideMenu li {
+   padding: 2px 8px;
+}
+
+body.download div.DownloadOptions ul.SideMenu li.Highlight {
+   text-align: right;
+   font-weight: bold;
+   background: #fafafa;
+}
+body.download div.DownloadOptions ul.SideMenu li.Highlight a {
+   float: left;
+}
+body.download div.DownloadInfo {
+   float: right;
+   width: 690px;
+   padding-bottom: 40px;
+}
+body.download p.ChunkyButton {
+   margin: 20px 0 !important;
+	width: 240px;
+}
+div.DownloadInfo h4 {
+   font-weight: bold;
+   color: #000;
+}
+body.download div.DownloadInfo p {
+   font-size: 101%;
+}
+body.download div.DownloadInfo p strong {
+   font-weight: bold;
+   font-size: 101%;
+}
+
+/* ---- Splash Page ---- */
+body#vforg_home_index {
+	background: url('shine.jpg') top center no-repeat #2a529a;
+}
+#vforg_home_index #Frame {
+   background: none;
+	border: 0;
+}
+#vforg_home_index #Body {
+	margin-top: 0;
+}
+#vforg_home_index #Content {
+	margin-bottom: 20px;
+}
+#vforg_home_index #Foot {
+   display: none;
+}
+#vforg_home_index .Banner {
+   background: none;
+   border: 0;
+}
+div.Splash {
+	height: 500px;
+	background: url('splash_bg.png') center center no-repeat;
+}
+div.Splash img {
+	float: right;
+	padding: 55px 32px 0 0;
+}
+div.Splash div {
+	padding: 60px 0 0 60px;
+	margin-right: 480px;
+}
+div.Splash h2 {
+	text-shadow: 0 1px 0 #fff;
+	border: 0;
+	padding: 0 0 25px;
+	margin: 0;
+}
+div.Splash p {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+	font-size: 110%;
+	padding: 0 0 25px;
+	margin: 0;
+}
+div.Splash p a {
+	color: #2A529A;
+}
+div.Splash p.ChunkyButton {
+   margin: 45px 0 0 95px;
+	padding: 0;
+	width: 210px;
+}
+div.Splash p.ChunkyButton a {
+   margin: 0 0 0 5px;
+   padding: 0 3px 0 0;
+	color: #fff;
+}
+div.Splash p.ChunkyButton a:hover {
+	text-decoration: none;
+}
