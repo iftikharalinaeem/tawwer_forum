@@ -32,13 +32,15 @@
       <div id="Foot">
 			<div style="float: right">
 				<?php
-				echo Anchor('Terms of Service', 'http://vanillaforums.com/info/termsofservice', '', array('target' => '_New'));
+				$Domain = Gdn::Config('Garden.Domain', '');
+				$Url = strpos($Domain, 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforums';
+				echo Anchor('Terms of Service', 'http://'.$Url.'.com/info/termsofservice', '', array('target' => '_New'));
 				echo ' | ';
-				echo Anchor('Privacy Policy', 'http://vanillaforums.com/info/privacy', '', array('target' => '_New'));
+				echo Anchor('Privacy Policy', 'http://'.$Url.'.com/info/privacy', '', array('target' => '_New'));
 				echo ' | ';
-				echo Anchor('Refund Policy', 'http://vanillaforums.com/info/refund', '', array('target' => '_New'));
+				echo Anchor('Refund Policy', 'http://'.$Url.'.com/info/refund', '', array('target' => '_New'));
 				echo ' | ';
-				echo Anchor('Contact', 'http://vanillaforums.com/info/contact', '', array('target' => '_New'));
+				echo Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New'));
 				?>
 			</div>
 			<div>
