@@ -7,6 +7,14 @@ $AdRemovalPurchased = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TR
 function Css($Bool) {
    echo $Bool ? ' Enabled' : '';
 }
+
+function __FormatPrice($PerMonth) {
+	$Format = $Format = Gdn::Translate('PriceFormat', '<div class="Price"><strong>$%.0f</strong> per month <span>$%.2f per day</span></div>');
+	$PerDay = $PerMonth / (365 / 12);
+	$Result = sprintf($Format, $PerMonth, $PerDay);
+					
+	return $Result;
+}
 ?>
 <h1>Premium & Enterprise Upgrades</h1>
 
@@ -26,11 +34,7 @@ function Css($Bool) {
                else
                   echo "Customize your forum's address.";
                ?></em>
-               <div class="Price">
-                  <strong>$3</strong>
-                  per month
-                  <span>$0.10 per day</span>
-               </div>
+					<?php echo __FormatPrice(ArrayValue('customdomain', $this->Data['Prices'])); ?>
                <div class="Buttons">
                   <?php
                   if (!$CustomDomainPurchased) {
@@ -45,11 +49,7 @@ function Css($Bool) {
             <td class="MiddleCol<?php Css($AdRemovalPurchased); ?>">
                <h4>Ad Removal <span>Purchased!</span></h4>
                <em>Get those ugly advertisements off your forum.</em>
-               <div class="Price">
-                  <strong>$6</strong>
-                  per month
-                  <span>$0.20 per day</span>
-               </div>
+               <?php echo __FormatPrice(ArrayValue('adremoval', $this->Data['Prices'])); ?>
                <div class="Buttons">
                   <?php
                   if (!$AdRemovalPurchased) {

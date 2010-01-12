@@ -610,6 +610,11 @@ pageTracker._trackPageview();
       foreach ($SiteFeatureData as $SiteFeature) {
          $this->_GetDatabase()->SQL()->Put('SiteFeature', array('Selected' => $SiteFeature->Active), array('SiteFeatureID' => $SiteFeature->SiteFeatureID));
       }
+		
+		// Load all of the features for price comparison.
+		$Prices = $this->_GetDatabase()->SQL()->Select('Code, Price')->From('Feature')->Get()->ResultArray();
+		$Prices = ConsolidateArrayValuesByKey($Prices, 'Code', 'Price');
+		$Sender->SetData('Prices', $Prices);
       
       $View = Gdn::Config('Plugins.VFOptions.UpgradeView', 'upgrades.php');
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . $View);
