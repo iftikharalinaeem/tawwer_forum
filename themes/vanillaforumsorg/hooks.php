@@ -13,6 +13,11 @@ class ThemeHooks implements Gdn_IPlugin {
       return TRUE;
    }
    
+   public function Base_Render_Before(&$Sender) {
+      if ($Sender->Head->Title() == Gdn::Config('Garden.Title'))
+         $Sender->Head->Title('Vanilla - Free, Open-Source Forum Software');
+   }
+   
    public function DiscussionsController_AfterDiscussionTitle_Handler(&$Sender) {
       $Discussion = ArrayValue('Discussion', $Sender->EventArguments);
       if ($Discussion) {
