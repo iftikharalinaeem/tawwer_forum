@@ -28,8 +28,11 @@
 						
 								echo Anchor($Inbox, '/messages/all', 'Inbox');
 		
-								if ($Session->CheckPermission('Garden.Settings.Manage'))
+								if ($Session->CheckPermission('Garden.Settings.Manage')) {
 									echo Anchor('Dashboard', '/garden/settings', 'Dashboard');
+								} else if ($Session->CheckPermission(array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'))) {
+									echo Anchor('Users', '/user/browse', 'Dashboard');
+								}
 								
 								echo Anchor('Sign Out', str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()), 'Leave');
 							} else {
