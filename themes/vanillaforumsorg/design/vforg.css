@@ -131,6 +131,7 @@ body#vforg_home_index {
 	border: 0;
 }
 #vforg_home_index #Body {
+	padding-top: 0;
 	margin-top: 0;
 }
 #vforg_home_index #Content {
