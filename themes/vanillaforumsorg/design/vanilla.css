@@ -747,9 +747,4 @@ ul.PanelInfo li strong {
    border-right: 1px solid #9CA7B8;
    margin: 0;
 }
-ul.PanelInfo li.ShowAll {
-   font-weight: bold;
-   border: 0;
-   text-align: right;
-}
 

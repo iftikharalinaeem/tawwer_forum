@@ -121,6 +121,7 @@ textarea.TextBox {
 }
 input.SmallInput,
 input.InputBox {
+   font-size: 15px;
    padding: 6px 3px;
 }
 input.SmallInput:focus,
@@ -664,6 +665,33 @@ div.Box p {
    padding: 0 0 4px;
    color: #555;
 }
+ul.PanelActivity {
+   border-top: 1px solid #caf0fe;
+	border-bottom: 0;
+}
+ul.PanelActivity li {
+   background: #f5fcff;
+   border-bottom: 1px solid #caf0fe;
+   padding: 2px 4px;
+   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	color: #555;
+}
+ul.PanelActivity span {
+	padding: 0 4px;
+}
+ul.PanelActivity p {
+	padding: 0 4px;
+	display: inline;
+	font-size: 90%;
+}
+ul.PanelActivity li em {
+	padding-left: 5px;
+	color: #777;
+	font-size: 80%;
+}
+ul.PanelActivity li div.Story {
+	font-size: 85%;
+}
 ul.PanelInfo li {
    background: #f5fcff;
    border-bottom: 1px solid #caf0fe;
@@ -708,6 +736,13 @@ ul.PanelInfo li.Active {
 }
 ul.PanelInfo li.Active a {
    color: #2786C2;
+}
+ul.PanelActivity li.ShowAll,
+ul.PanelInfo li.ShowAll {
+   font-weight: bold;
+   border: 0;
+   text-align: right;
+	background: none;
 }
 body.Profile ul.PanelInfo {
    border-bottom: 1px solid #caf0fe;
@@ -1725,10 +1760,12 @@ div.Box h4 {
 	color: #444;
 	background: url('hr.png') bottom left repeat-x;
 }
+ul.PanelActivity,
 ul.PanelInfo,
 body.Profile ul.PanelInfo {
 	border: none;
 }
+ul.PanelActivity li,
 ul.PanelInfo li,
 ul.PanelInfo li.Active,
 body.Profile ul.PanelInfo li {
@@ -1736,6 +1773,9 @@ body.Profile ul.PanelInfo li {
 	border-bottom: 1px dotted #c5d1e2;
 	padding: 2px;
 	color: #80828C;
+}
+ul.PanelActivity li {
+	font-size: 12px;
 }
 body a.DraftCommentLink {
 	display: block;
@@ -1921,4 +1961,21 @@ div.Popup a.Close {
 }
 .ChunkyButton:hover a {
    background: url('right_bluegreen.png') top right no-repeat;
+}
+
+/* ---- Activities ---- */
+body.Activity #Content h1 {
+   -moz-border-radius-topleft: 3px;
+   -moz-border-radius-topright: 3px;
+	background: url('grey_fade.png') top left repeat-x #ECF0F9;
+   border:1px solid #9CA7B8;
+   padding:4px 8px;
+   text-shadow: 0 1px 0 #fff;
+}
+ul.Activities {
+	background: #fff;
+   border: 1px solid #9CA7B8;
+   border-top: 0;
+   -moz-border-radius-bottomleft: 3px;
+   -moz-border-radius-bottomright: 3px;
 }

@@ -18,6 +18,12 @@ class ThemeHooks implements Gdn_IPlugin {
          $Sender->Head->Title('Vanilla - Free, Open-Source Forum Software');
    }
    
+   public function DiscussionsController_Render_Before(&$Sender) {
+      $RecentActivityModule = new RecentActivityModule();
+      $RecentActivityModule->GetData();
+      $Sender->AddModule($RecentActivityModule);
+   }
+   
    public function DiscussionsController_AfterDiscussionTitle_Handler(&$Sender) {
       $Discussion = ArrayValue('Discussion', $Sender->EventArguments);
       if ($Discussion) {
