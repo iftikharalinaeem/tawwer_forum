@@ -1,5 +1,6 @@
 #Body {
    margin: 0 auto;
+   padding: 0;
 }
 #Panel {
    display: none;

@@ -1566,10 +1566,10 @@ body {
 	background: url('fade.jpg') top left repeat-x #fff;
 }
 #Body {
-   margin: 30px auto 0;
+   margin: 0 auto;
+	padding: 30px 0;
 }
-div#Content,
-div#Panel {
+div#Content {
 	margin-bottom: 40px;
 }
 div#Foot {
@@ -1580,6 +1580,7 @@ div#Foot {
 div#Foot div {
 	padding: 12px 0 10px;
 	border: 0;
+	margin: 0 auto;
 }
 div#Foot div,
 div#Foot div a {
@@ -1603,6 +1604,9 @@ div#Foot div a:hover {
 	width: 960px;
 	margin: 0 auto;
 	text-align: right;
+}
+.Banner div.Buttons {
+	float: right;
 }
 .Banner div.UserOptions {
 	float: right;
@@ -1657,7 +1661,7 @@ div#Foot div a:hover {
 }
 .Banner ul {
    list-style: none;
-   padding: 50px 0 0;
+   margin: 50px 0 0;
 }
 .Banner ul li {
 	float: right;
