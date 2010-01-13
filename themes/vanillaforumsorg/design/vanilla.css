@@ -485,22 +485,22 @@ ul.Drafts li ul li.Title a.DraftCommentLink {
 ul.Drafts li ul li.Title a.DeleteDraft {
    float: right;
    width: auto;
-   padding: 4px;
+   padding: 5px;
    margin: 3px 1px 0 0;
-   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
    font-size: 11px;
    font-weight: normal;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
-   border: 1px solid #bbb;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
    color: #555 /* Body Text Font Color */;
    cursor: pointer;
    line-height: 100%;
 }
 ul.Drafts li ul li.Title a.DeleteDraft:hover {
    color: #333;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
    border: 1px solid #888;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   padding: 4px;
+   text-decoration: none;
 }
 
 
@@ -614,6 +614,7 @@ a.Cancel {
 
 
 /* ==================================================== VF.org Customizations */
+body.Drafts #Content h1,
 body.Discussion #Content h2,
 body.Discussions #Content h1 {
    -moz-border-radius-topleft: 3px;
@@ -673,10 +674,31 @@ body.Discussion #Content #CommentForm h2 {
    border: 0;
    color: #000;
 }
+ul.DataList li ul li.Title a {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   background: transparent;
+   border: 0;
+   color:#2B3033;
+   display:block;
+   font-size:105%;
+   padding:2px 6px;
+}
+ul.DataList li ul li.Title a:hover {
+   text-decoration: none;
+}
+ul.DataList li ul li.Title strong a:hover {
+   text-decoration: underline;
+}
 ul.DataList li ul li.Title {
    font-family: 'Trebuchet MS';
    float: left;
    width: 558px;
+}
+ul.Drafts li ul li.Title {
+   float:none;
+   width:auto;
 }
 ul.DataList li ul li.Title strong a {
    color:#2A529A;
@@ -724,5 +746,10 @@ ul.PanelInfo li strong {
    border-left: 1px solid #9CA7B8;
    border-right: 1px solid #9CA7B8;
    margin: 0;
+}
+ul.PanelInfo li.ShowAll {
+   font-weight: bold;
+   border: 0;
+   text-align: right;
 }
 
