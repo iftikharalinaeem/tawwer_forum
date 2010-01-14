@@ -21,6 +21,8 @@ else if ($About == 'dailybackups')
    echo 'Daily Backups';
 else if ($About == 'ssl')
    echo 'Secure Login';
+else if ($About == 'extrabandwidth')
+   echo 'Extra Bandwidth';
 else if ($About == 'error')
    echo 'Upgrade Problem';
 else 
@@ -90,6 +92,13 @@ if ($About == 'adremoval') {
    ?>
    <div class="Legal">
       <p>There is a problem with your forum's configuration, so you cannot currently purchase upgrades. Please contact support for assistance: <?php echo Format::Email('support@vanillaforums.com'); ?></p>
+   </div>
+   <?php
+} else if ($About == 'extrabandwidth') {
+   ?>
+   <div class="Legal">
+      <p>Purchase the extra bandwidth upgrade if your forum has extreme requirements.</p>
+      <p><strong>Coming Soon!</strong></p>
    </div>
    <?php
 } else {
