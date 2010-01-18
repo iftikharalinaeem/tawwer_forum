@@ -149,7 +149,7 @@ Have fun!!
 					SaveToConfig('Plugins.CustomCSS.PreviewFile', $FileName);
 				
 					// Only keep the last 20 revs
-					@unlink(PATH_CACHE . DS . 'CustomCSS' . DS . $CurrentTheme. DS . 'rev_' . ($CurrentRevision - 4) . '.css');
+					@unlink(PATH_CACHE . DS . 'CustomCSS' . DS . $CurrentTheme. DS . 'rev_' . ($CurrentRevision - 19) . '.css');
 				}
 			}
 
