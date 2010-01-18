@@ -588,6 +588,9 @@ pageTracker._trackPageview();
       $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
       $this->_GetDatabase()->SQL()->Put('SiteFeature', array('Active' => '1'), array('SiteID' => $SiteID, 'Selected' => '1'));
       
+      // For the "Getting Started" Plugin. Record that they've purchased an upgrade.
+      SaveToConfig('Plugins.GettingStarted.Upgrades', '1');
+      
       // Now apply upgrades
       $this->_ApplyUpgrades();
       
