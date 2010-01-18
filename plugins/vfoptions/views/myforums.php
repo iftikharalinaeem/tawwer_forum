@@ -51,8 +51,7 @@ $Session = Gdn::Session();
                <?php
             } else {
                // Offer for them to set up a custom domain
-               // echo Anchor('Add a custom domain', 'http://'.$Site->Name.'/plugin/upgrades', 'Button');
-               echo 'N/A';
+               echo Anchor('Add a custom domain', 'http://'.$Site->Name.'/plugin/upgrades', 'Button');
             }
             ?>
          </td>
