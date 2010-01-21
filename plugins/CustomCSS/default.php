@@ -27,29 +27,44 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 		$Preview = $Session->GetPreference('PreviewCustomCSS', FALSE);
 		$Live = Gdn::Config('Plugins.CustomCSS.Enabled');
 		$CurrentTheme = Gdn::Config('Garden.Theme', 'default');
-		$FileName = Gdn::Config('Plugins.CustomCSS.PreviewFile', '');
+		$CustomFile = Gdn::Config('Plugins.CustomCSS.File', '');
+		$PreviewFile = Gdn::Config('Plugins.CustomCSS.PreviewFile', '');
 		if (($Sender->MasterView == 'default' || $Sender->MasterView == '')) {
-			if ($FileName != '' && $Preview)
-				$Sender->AddCSSFile('/cache/CustomCSS/'.$CurrentTheme.'/'.$FileName);
-			else if ($Live)
-				$Sender->AddCSSFile('/cache/CustomCSS/'.$CurrentTheme.'/custom.css');
+			if (($PreviewFile != '' && $Preview) || $Live) {
+				// If there is custom css, and we are not supposed to include theme-based css files...
+				if (Gdn::Config('Plugins.CustomCSS.IncludeTheme', 'Yes') == 'No') {
+					// ... remove them
+					$Sender->ClearCssFiles();
+				}
+			}
+			
+			if ($PreviewFile != '' && $Preview)
+				$Sender->AddCssFile('/cache/CustomCSS/'.$CurrentTheme.'/'.$PreviewFile);
+			else if ($CustomFile != '' && $Live)
+				$Sender->AddCssFile('/cache/CustomCSS/'.$CurrentTheme.'/'.$CustomFile);
 		}
 		if ($Preview) {
 			$Sender->AddAsset('Content', $Sender->FetchView(PATH_PLUGINS . DS . 'CustomCSS' . DS . 'views' . DS . 'preview.php'));
-			$Sender->AddCSSFile('previewtheme.css', 'garden');
+			$Sender->AddCssFile('previewtheme.css', 'garden');
 		}
 	}
 	
    public function PluginController_CustomCSS_Create(&$Sender, $EventArguments) {
 		require_once('kses.php');
 		$Session = Gdn::Session();
+		$UserModel = Gdn::UserModel();
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Custom CSS');
       $Sender->AddSideMenu('plugin/customcss');
       $Sender->Form = new Gdn_Form();
 		$Sender->AddJsFile('/js/library/jquery.autogrow.js');
+		// $Sender->AddJsFile('/plugins/CustomCSS/jquery.floatobject-1.3.js');
+		// $Sender->AddJsFile('/plugins/CustomCSS/customcss.js');
+		$Sender->AddCssFile('/plugins/CustomCSS/customcss.css');
 		
 		$CurrentTheme = Gdn::Config('Garden.Theme', '');
+		$ThemeManager = new Gdn_ThemeManager();
+		$Sender->CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
 		$Folder = PATH_CACHE . DS . 'CustomCSS';
 
 		// Create the CustomCSS cache folder
@@ -61,34 +76,38 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 			@mkdir($Folder);
 
 		$FileName = Gdn::Config('Plugins.CustomCSS.PreviewFile', 'rev_0.css');
+		if (!$Sender->Form->AuthenticatedPostBack()) {
+			$LoadFile = ArrayValue(0, $Sender->RequestArgs);
+			if ($LoadFile !== FALSE && strpos($LoadFile, 'rev_') !== FALSE) {
+				$LoadFile .= '.css';
+				if (file_exists($Folder . DS . $LoadFile))
+					$FileName = $LoadFile;
+			}
+		}
+			
 		if (!file_exists($Folder . DS . $FileName))
 			$FileName = 'rev_0.css';
 			
 		$CurrentRevision = str_replace(array('rev_', '.css'), array('', ''), $FileName);
 		$CurrentRevision = is_numeric($CurrentRevision) ? $CurrentRevision : 1;
-		$Contents = $FileName == 'rev_0.css' ? '/*
-Custom CSS
-==========
+		$Contents = $FileName == 'rev_0.css' ? '/* ---- Custom CSS ----
 
-CSS (Cascading Stylesheets) allow you to change the colors, fonts, images, and
-layout of your forum. 
+If you are unfamiliar with CSS, learning can be fun and easy. There are some
+learning resources in the help section on the right-hand side of the page.
 
-If you are unfamiliar with CSS, learning can be fun and easy. Here is a tutorial
-for css beginners to help you get started: http://htmldog.com/guides/cssbeginner
-
-If you *are* familiar with CSS, here are some things you should know before you
-begin:
+Here are some things you should know before you begin:
 
 1. Any definitions you enter here will be related to the currently enabled
    theme. If you change to a different theme, these definitions will no longer
    be included and will not be visible here. If you change back to this theme,
    you will see these definitions again.
 	
-2. Your custom css definitions will be included *after* the theme css files. So,
-   your definitions will take precedence over the theme ones.
+2. By default, your custom css definitions will be included *after* the theme
+   css files. So, your definitions will take precedence over the theme ones.
 
 3. You can choose to not include the theme css files at all, and instead only
-   include your custom css definitions.
+   include your custom css definitions with the "Revision Options" to the
+   top-right.
 	
 4. We strip comments, invalid code, expressions, @imports, and unsafe or
    potentially malicious code from your css before saving it.
@@ -101,13 +120,19 @@ Have fun!!
 		if (!$Sender->Form->AuthenticatedPostBack()) {
 			$Sender->Form->SetFormValue('CustomCSS', $Contents);
 		} else {
-			$IsSave = $Sender->Form->GetFormValue('Save') == 'Save' ? TRUE : FALSE;
-			$IsApply = $Sender->Form->GetFormValue('Apply_Changes') == 'Apply Changes' ? TRUE : FALSE;
-			$IsPreview = $Sender->Form->GetFormValue('Preview') == 'Preview' ? TRUE : FALSE;
-			$IsExitPreview = $Sender->Form->GetFormValue('Exit_Preview') == 'Exit Preview' ? TRUE : FALSE;
+			$IsSave = $Sender->Form->GetFormValue('Apply') ? TRUE : FALSE;
+			$IsApply = $Sender->Form->GetFormValue('ApplyChanges') ? TRUE : FALSE;
+			$IsPreview = $Sender->Form->GetFormValue('Preview') ? TRUE : FALSE;
+			$IsExitPreview = $Sender->Form->GetFormValue('ExitPreview') ? TRUE : FALSE;
+			$IncludeTheme = $Sender->Form->GetFormValue('IncludeTheme');
+			
+			if ($IsApply || $IsSave)
+				$Sender->StatusMessage = "Your changes have been applied.";
+			
 			if ($IsApply) {
-				file_put_contents($Folder . DS . 'custom.css', $Contents); // <-- This is the file that gets included.
+				SaveToConfig('Plugins.CustomCSS.File', $FileName);
 				$Sender->Form->SetFormValue('CustomCSS', $Contents);
+				$UserModel->SavePreference($Session->UserID, 'PreviewCustomCSS', FALSE);
 			} else if ($IsPreview || $IsSave) {
 				$NewCSS = $Sender->Form->GetFormValue('CustomCSS', '');
 				
@@ -139,8 +164,8 @@ Have fun!!
 				$csstidy->parse($NewCSS);
 				$NewCSS = $csstidy->print->plain();
 				
-				if ($IsSave)
-					file_put_contents($Folder . DS . 'custom.css', $NewCSS); // <-- This is the file that gets included.
+				if (in_array($IncludeTheme, array('Yes', 'No'))) 
+					SaveToConfig('Plugins.CustomCSS.IncludeTheme', $IncludeTheme);
 
 				if ($Contents != $NewCSS) {
 					$FileName = 'rev_'.($CurrentRevision + 1).'.css';
@@ -149,11 +174,27 @@ Have fun!!
 					SaveToConfig('Plugins.CustomCSS.PreviewFile', $FileName);
 				
 					// Only keep the last 20 revs
-					@unlink(PATH_CACHE . DS . 'CustomCSS' . DS . $CurrentTheme. DS . 'rev_' . ($CurrentRevision - 19) . '.css');
+					$ActiveRevision = str_replace(array('rev_', '.css'), '', Gdn::Config('Plugins.CustomCSS.File', ''));
+					$ActiveRevision = is_numeric($ActiveRevision) ? $ActiveRevision : 0;
+					if ($Handle = opendir($Folder)) {
+                  while (FALSE !== ($File = readdir($Handle))) {
+                     if (substr($File, 0, 4) == 'rev_') {
+								$Revision = str_replace(array('rev_', '.css'), '', $File);
+								if (is_numeric($Revision) && $Revision != $ActiveRevision && $Revision < $CurrentRevision - 19) {
+									@unlink(PATH_CACHE . DS . 'CustomCSS' . DS . $CurrentTheme. DS . 'rev_' . $Revision . '.css');	
+								}
+							}
+						}
+					}
 				}
+
+				if ($IsSave)
+					SaveToConfig('Plugins.CustomCSS.File', $FileName); // <-- Update the name of the file that will be included.
+				
+				$Sender->Form->SetFormValue('CustomCSS', $NewCSS);
+				$Sender->Form->SetFormValue('IncludeTheme', $IncludeTheme);
 			}
 
-			$UserModel = Gdn::UserModel();
 			if ($IsPreview) {
 				$UserModel->SavePreference($Session->UserID, 'PreviewCustomCSS', TRUE);
 				Redirect('/');
@@ -175,15 +216,16 @@ Have fun!!
 
 function safecss_class() {
 	// Wrapped so we don't need the parent class just to load the plugin
-	if ( class_exists('safecss') )
+	if (class_exists('safecss'))
 		return;
-	require_once('csstidy-1.3/class.csstidy.php');
+
+	require_once('csstidy/class.csstidy.php');
 	class safecss extends csstidy_optimise {
 		var $tales = array();
 		var $props_w_urls = array('background', 'background-image', 'list-style', 'list-style-image');
 		var $allowed_protocols = array('http');
 
-		function safecss(&$css) {
+		function __construct(&$css) {
 			return $this->csstidy_optimise($css);
 		}
 

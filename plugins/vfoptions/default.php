@@ -681,6 +681,18 @@ pageTracker._trackPageview();
                file_put_contents($Conf, $Contents);
             }
             
+// --== Custom CSS ==--
+
+         } else if ($Feature->Code == 'customcss') {
+            $IsEnabled = Gdn::Config('Plugins.CustomCSS.Enabled');
+            if ($Feature->Active == '1' && !$IsEnabled) {
+               // ---- ENABLE ----
+               SaveToConfig('Plugins.CustomCSS.Enabled', TRUE);
+            } else if ($Feature->Active == '0' && $IsEnabled) {
+               // ---- DISABLE ----
+               SaveToConfig('Plugins.CustomCSS.Enabled', FALSE);
+            }
+
 // --== CUSTOM DOMAINS ==--
 
          } else if ($Feature->Code == 'customdomain') {
