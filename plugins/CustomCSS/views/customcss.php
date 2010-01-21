@@ -35,9 +35,10 @@ echo $this->Form->Errors();
                </li>
             </ul>
             <?php
-            echo $this->Form->Button('Preview ⇡', array('Name' => 'Form/Preview'));
             if (Gdn::Config('Plugins.CustomCSS.Enabled'))
                echo $this->Form->Button('Apply ⇥', array('Name' => 'Form/Apply'));
+
+            echo $this->Form->Button('Preview ⇡', array('Name' => 'Form/Preview'));
             ?>
          </div>
          <strong>Help</strong>

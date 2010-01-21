@@ -1,3 +1,7 @@
+#Content {
+   margin: 0;
+   padding: 15px 15px 15px 185px;
+}
 div.CustomCSSForm {
    float: left;
    width: 70%;
@@ -9,11 +13,14 @@ textarea.CustomCSSBox {
    font-family: monospace;
    font-size: 12px;
    color: #000;
-   margin-bottom: 20px;
+   margin: 0 0 20px;
 }
 div.CustomCSSOptions {
    margin-left: 73%;
+/* IE7 Hack */
+   ^margin-left: 60%;
 }
+
 div.CustomCSSOptions div.RevisionOptions ul {
    margin: 0 0 10px;
    border-bottom: 1px dotted #aaa;
