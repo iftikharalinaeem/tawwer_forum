@@ -58,8 +58,6 @@ class CustomCSSPlugin implements Gdn_IPlugin {
       $Sender->AddSideMenu('plugin/customcss');
       $Sender->Form = new Gdn_Form();
 		$Sender->AddJsFile('/js/library/jquery.autogrow.js');
-		// $Sender->AddJsFile('/plugins/CustomCSS/jquery.floatobject-1.3.js');
-		// $Sender->AddJsFile('/plugins/CustomCSS/customcss.js');
 		$Sender->AddCssFile('/plugins/CustomCSS/customcss.css');
 		
 		$CurrentTheme = Gdn::Config('Garden.Theme', '');
