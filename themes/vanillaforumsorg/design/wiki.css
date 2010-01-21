@@ -118,14 +118,8 @@ div#Content {
    padding: 0 0 0 40px;
 }
 #PageForm {
-   background: #e9f9ff;
-   border-top: 1px solid #eee;
-   margin: 20px 0;
    border: 0px;
-   background: #daf4fd;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   padding: 8px 10px 10px;
+   padding: 20px 0;
 }
 #PageForm h3 {
    font-size: 115%;
@@ -137,20 +131,26 @@ div#Content {
 }
 #PageForm label.Heading {
    font-weight: bold;
-   font-size: 120%;
-   color: #2786c2;
+   font-size: 100%;
+   color: #02475A;
    line-height: 100%;
    display: block;
-   margin-bottom: 4px;
+   margin: 0 0 4px;
+   text-shadow: 0 1px 0 #fff;
 }
 #PageForm textarea {
-   width: 930px;
-   height: 400px;
+   font-family: monospace;
+   color: #000;
+   font-size: 13px;
+   line-height: normal;
+   width: 99%;
    min-height: 400px;
-   max-height: 800px;
+   max-height: none;
    margin: 0px 0px 6px;
 }
 a.Cancel {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 12px;
    margin-left: 20px;
 }
 .Breadcrumb {
