@@ -1155,7 +1155,8 @@ function safecss_filter_attr( $css, $deprecated = '' ) {
 		return '';
 
 	$css_array = split( ';', trim( $css ) );
-	$allowed_attr = apply_filters( 'safe_style_css', array( 'text-align', 'margin', 'color', 'float', 
+	$allowed_attr = // apply_filters( 'safe_style_css',
+		array( 'text-align', 'margin', 'color', 'float', 
 	'border', 'background', 'background-color', 'border-bottom', 'border-bottom-color', 
 	'border-bottom-style', 'border-bottom-width', 'border-collapse', 'border-color', 'border-left',
 	'border-left-color', 'border-left-style', 'border-left-width', 'border-right', 'border-right-color', 
@@ -1165,7 +1166,7 @@ function safecss_filter_attr( $css, $deprecated = '' ) {
 	'font-variant', 'font-weight', 'height', 'letter-spacing', 'line-height', 'margin-bottom', 
 	'margin-left', 'margin-right', 'margin-top', 'overflow', 'padding', 'padding-bottom', 
 	'padding-left', 'padding-right', 'padding-top', 'text-decoration', 'text-indent', 'vertical-align', 
-	'width' ) );
+	'width' ); // );
 
 	if ( empty($allowed_attr) )
 		return $css;
