@@ -10,8 +10,10 @@ while ($Row = mysql_fetch_assoc($Data)) {
 	 $MData = mysql_query('select * from GDN_Message', $Cnn);
 	 if (mysql_num_rows($MData) > 0) {
 		  while ($M = mysql_fetch_array($MData)) {
-				if (substr($M['Content'], 0, 46) == "<p>Here's some stuff you might want to do:</p>")
+				if (substr($M['Content'], 0, 46) == "<p>Here's some stuff you might want to do:</p>") {
 					 echo 'DB: '.$DBName.'; MessageID: '.$M['MessageID']."\n";
+					 mysql_query('delete from GDN_Message where MessageID = '.$M['MessageID'], $Cnn);
+				}
 		  }
 	 }
 	 mysql_free_result($MData);
