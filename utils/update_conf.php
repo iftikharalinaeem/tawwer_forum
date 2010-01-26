@@ -9,9 +9,13 @@ if ($DirectoryHandle = opendir('/srv/www/vhosts')) {
 		  if (file_exists($File)) {
 				$Contents = file_get_contents($File);
 				$Contents = str_replace(
-					 "// EnabledPlugins",
-					 "// EnabledPlugins
-\$Configuration['EnabledPlugins']['CustomCSS'] = 'CustomCSS';",
+					 "// Modules
+\$Configuration['Modules']['Vanilla']['Panel'] = array('NewDiscussionModule', 'GuestModule', 'Ads');
+\$Configuration['Modules']['Vanilla']['Content'] = array('Content', 'Ads');
+\$Configuration['Modules']['Garden']['Content'] = array('Content', 'Ads');
+\$Configuration['Modules']['Conversations']['Content'] = array('Content', 'Ads');
+",
+					 "",
 					 $Contents
 				);
 				file_put_contents($File, $Contents);
