@@ -125,7 +125,7 @@ document.write(unescape('%3Cscript src=\'http://input.insights.gravity.com/pigeo
 	public function Gdn_SearchModel_AfterBuildSearchQuery_Handler(&$Sender) {
 		$Session = Gdn::Session();
 		$this->_InsightsSendPost(array(
-			'site_guid' => $this->_GetGravitySetting('InsightsSiteGuid'),
+			'site_guid' => $this->_GetGravitySetting('site_guid'),
 			'action' => 'search_process_fullsearch',
 			'user_id' => $Session->UserID,
 			'user_name' => urlencode(ObjectValue('Name', $Session->User, '')),
