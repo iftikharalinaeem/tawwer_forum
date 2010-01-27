@@ -242,10 +242,12 @@ pageTracker._trackPageview();
     * Creates a "Custom Domain" upgrade offering screen where users can purchase
     * & implement a custom domain.
     */
+   public $AddSideMenu = TRUE;
    public function PluginController_CustomDomain_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades &raquo; Custom Domain Name');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
+      if ($this->AddSideMenu)
+         $Sender->AddSideMenu('garden/plugin/upgrades');
 
       // Send a request to the specified domain, and see if it hits our
       // server (it should return our custom 404 error if it is pointed at
@@ -360,8 +362,10 @@ pageTracker._trackPageview();
       if ($SiteID <= 0)
          $FeatureCode = 'error';
       
-      if ($FeatureCode == 'customdomain')
+      if ($FeatureCode == 'customdomain') {
+         $this->AddSideMenu = FALSE;
          return $this->PluginController_CustomDomain_Create($Sender, $EventArguments);
+      }
          
       if ($Sender->Form->IsPostBack()) {
          // Select the feature and redirect to the checkout
