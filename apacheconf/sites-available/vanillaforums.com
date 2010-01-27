@@ -8,6 +8,9 @@
 					 Options FollowSymLinks MultiViews
 					 AllowOverride All
 		  </Directory>
+		  <Directory /srv/www/vanillaforumscom/awstats/>
+					 Options ExecCGI -MultiViews +SymLinksIfOwnerMatch
+		  </Directory>
         ErrorLog /srv/log/vanillaforumscom/error.log
         LogLevel warn
         CustomLog /srv/log/vanillaforumscom/access.log combined
