@@ -51,7 +51,7 @@ class GravityInsights implements Gdn_IPlugin {
 			
 			$Sender->AddAsset('Content', "<div id='insights_div_x99'></div>
 <script language='javascript'>
-vb_a_stracker='{".$this->_GetGravitySetting('site_guid')."}';
+vb_a_stracker='".$this->_GetGravitySetting('site_guid')."';
 vb_a_threadid={$tmp_threadid};
 vb_a_postid={$tmp_postid};
 vb_a_forumid={$tmp_forumid};
