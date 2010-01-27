@@ -51,7 +51,7 @@ class GravityInsights implements Gdn_IPlugin {
 			
 			$Sender->AddAsset('Content', "<div id='insights_div_x99'></div>
 <script language='javascript'>
-vb_a_stracker='{".$this->_GetGravitySetting('InsightsSiteGuid')."}';
+vb_a_stracker='{".$this->_GetGravitySetting('site_guid')."}';
 vb_a_threadid={$tmp_threadid};
 vb_a_postid={$tmp_postid};
 vb_a_forumid={$tmp_forumid};
@@ -92,7 +92,7 @@ document.write(unescape('%3Cscript src=\'http://input.insights.gravity.com/pigeo
 			return false;
 
 		$Post = array(
-			'site_guid' => $this->_GetGravitySetting('InsightsSiteGuid'),
+			'site_guid' => $this->_GetGravitySetting('site_guid'),
 			'thread_id' => $PostObject->DiscussionID,
 			'post_id' => 0,
 			'forum_id' => $PostObject->CategoryID,
@@ -141,7 +141,7 @@ document.write(unescape('%3Cscript src=\'http://input.insights.gravity.com/pigeo
 		$InsertFields = ArrayValue('InsertFields', $Sender->EventArguments, array());
 		if ($InsertUserID > 0)
 			$this->_InsightsSendPost(array(
-				'site_guid' => $this->_GetGravitySetting('InsightsSiteGuid'),
+				'site_guid' => $this->_GetGravitySetting('site_guid'),
 				'action' => 'register_addmember_complete',
 				'user_id' => $InsertUserID,
 				'user_name' => urlencode(ArrayValue('Name', $InsertFields, ''))
@@ -204,7 +204,7 @@ document.write(unescape('%3Cscript src=\'http://input.insights.gravity.com/pigeo
 	 * @param int $ForumID
 	 */
 	private function _InsightsNotHiddenForum($ForumID) {
-		$HiddenForums = $this->_GetGravitySetting('InsightsHiddenForums');
+		$HiddenForums = $this->_GetGravitySetting('hidden_forums');
 		if (is_array($HiddenForums) && !empty($HiddenForums)) {
 			if (in_array($ForumID, array_map('trim', explode(',',$HiddenForums))))
 				return FALSE;
