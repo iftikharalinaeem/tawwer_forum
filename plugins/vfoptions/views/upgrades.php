@@ -3,6 +3,7 @@ $GardenDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('G
 $FolderName = basename(PATH_ROOT);
 $CustomDomainPurchased = $GardenDomain == $FolderName ? FALSE : TRUE;
 $AdRemovalPurchased = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
+$CustomCssPurchased = Gdn::Config('Plugins.CustomCSS.Enabled');
 
 function Css($Bool) {
    echo $Bool ? ' Enabled' : '';
@@ -18,7 +19,7 @@ function __FormatPrice($PerMonth) {
 ?>
 <h1>Premium & Enterprise Upgrades</h1>
 
-<div class="Info">In addition to all of the free features at VanillaForums.com, we will soon offer these premium & enterprise upgrades for enhanced functionality.</div>
+<div class="Info">In addition to all of the free features at VanillaForums.com, we offer these premium & enterprise upgrades for enhanced functionality.</div>
 
 <div class="Upgrades">
    
@@ -61,21 +62,23 @@ function __FormatPrice($PerMonth) {
                   ?>
                </div>
             </td>
-            <td class="LastCol">
+            <td class="LastCol<?php Css($CustomCssPurchased); ?>">
                <h4>Custom CSS <span>Purchased!</span></h4>
                <em>Have complete control over the appearance of your forum.</em>
-               <?php
-               /*
                <div class="Price">
                   <strong>$6</strong>
                   per month
                   <span>$0.20 per day</span>
                </div>
-               */
-               ?>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/customcss', 'Popdown Button'); ?>
-                  Coming Soon!
+                  <?php
+                  if (!$CustomCssPurchased) {
+                     echo Anchor('Learn More', '/plugin/learnmore/customcss', 'Popdown Button');
+                     echo Anchor('Buy Now', '/plugin/buynow/customcss', 'Button');
+                  } else {
+                     echo Anchor('Remove Upgrade', '/plugin/remove/customcss', 'Popdown Button');
+                  }
+                  ?>
                </div>
             </td>
          </tr>

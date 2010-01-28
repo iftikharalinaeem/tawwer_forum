@@ -43,11 +43,11 @@ class GettingStartedPlugin implements Gdn_IPlugin {
             .Anchor('×', '/garden/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
    ."<p>Here's how to get started:</p>"
    .'<ul>
-      <li class="One'.(Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Define how users register for your forum'), '/settings/registration').'</li>'
-      // <li class="Two'.(Gdn::Config('Plugins.GettingStarted.Plugins', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Manage your plugins'), 'settings/plugins').'</li>
-      .'<li class="Three'.(Gdn::Config('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Organize your discussion categories'), 'vanilla/settings/managecategories').'</li>
-      <li class="Four'.(Gdn::Config('Plugins.GettingStarted.Profile', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Customize your profile'), 'profile').'</li>
-      <li class="Five'.(Gdn::Config('Plugins.GettingStarted.Discussion', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Start your first discussion'), 'post/discussion').'</li>
+      <li class="One'.(Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Define how users register for your forum'), '/settings/registration').'</li>
+      <li class="Two'.(Gdn::Config('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Organize your discussion categories'), 'vanilla/settings/managecategories').'</li>
+      <li class="Three'.(Gdn::Config('Plugins.GettingStarted.Profile', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Customize your profile'), 'profile').'</li>
+      <li class="Four'.(Gdn::Config('Plugins.GettingStarted.Discussion', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Start your first discussion'), 'post/discussion').'</li>
+      <li class="Five'.(Gdn::Config('Plugins.GettingStarted.Upgrades', '0') == '1' ? ' Done' : '').'">'.Anchor(Gdn::Translate('Purchase some upgrades'), 'plugin/upgrades').'</li>
    </ul>
 </div>';
          $Sender->AddAsset('Messages', $WelcomeMessage, 'WelcomeMessage');
@@ -61,7 +61,7 @@ class GettingStartedPlugin implements Gdn_IPlugin {
       // If all of the steps are now completed, disable this plugin
       if (
          Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1'
-         // && Gdn::Config('Plugins.GettingStarted.Plugins', '0') == '1'
+         && Gdn::Config('Plugins.GettingStarted.Upgrades', '0') == '1'
          && Gdn::Config('Plugins.GettingStarted.Categories', '0') == '1'
          && Gdn::Config('Plugins.GettingStarted.Profile', '0') == '1'
          && Gdn::Config('Plugins.GettingStarted.Discussion', '0') == '1'

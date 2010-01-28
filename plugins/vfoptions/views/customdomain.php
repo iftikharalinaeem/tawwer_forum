@@ -13,7 +13,7 @@ $CustomDomain = str_replace(array('http://', '/'), array('', ''), $this->Form->G
    
    <h3>How to set up <?php echo $CustomDomain; ?></h3>
    <p>Create a <strong>C NAME</strong> record for <strong><?php echo $CustomDomain; ?></strong>, pointing at your Vanilla forum's address: <strong><?php echo $Domain; ?></strong>
-      <br /><?php echo Anchor('→ get more help with this step', 'http://vanillaforums.com/info/faq/#customdomain'); ?></p>
+      <br /><?php echo Anchor('→ get more help with this step', 'http://vanillaforums.com/help/customdomain'); ?></p>
    
    <p>Once your C NAME record is set up, come back here and try again. It may take several hours for our system to recognize your changes.</p>
    
@@ -25,7 +25,7 @@ $CustomDomain = str_replace(array('http://', '/'), array('', ''), $this->Form->G
    <ol>
       <li>Register a domain name you like using your favourite domain name registrar. We like using <a href="http://godaddy.com">GoDaddy.com</a>. This should cost about $10 per year, and you can avoid all extra fees for web hosting and other services since you'll be pointing it at us. All you need is a domain name registration for a period of 1 year or more.</li>
       <li>Create a <strong>C NAME</strong> record for your domain, pointing at your Vanilla forum's address: <strong><?php echo $Domain; ?></strong>
-      <?php echo Anchor('→ get more help with this step', 'http://vanillaforums.com/info/faq/#customdomain'); ?></li>
+      <?php echo Anchor('→ get more help with this step', 'http://vanillaforums.com/help/customdomain'); ?></li>
       <li>Enter your custom domain name below and click continue to complete the process.</li>
    </ol>
    <?php

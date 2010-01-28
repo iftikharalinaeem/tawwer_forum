@@ -21,6 +21,8 @@ else if ($About == 'dailybackups')
    echo 'Daily Backups';
 else if ($About == 'ssl')
    echo 'Secure Login';
+else if ($About == 'extrabandwidth')
+   echo 'Extra Bandwidth';
 else if ($About == 'error')
    echo 'Upgrade Problem';
 else 
@@ -48,15 +50,13 @@ if ($About == 'adremoval') {
    ?>
    <div class="Legal">
       <p>The Custom CSS upgrade allows you to completely change the appearance of your forum using css code. You can change banners, colors, fonts, and the layout of your forum.</p>
-      <p>You will be able to test changes before they are applied for everyone to see, and you can quickly and easily revert to previous revisions, or revert right back to our default style. <strong>Please note that the Custom CSS upgrade does not allow you to upload templates or custom themes.</strong></p>
-      <p><strong>Coming Soon!</strong></p>
+      <p>You can preview changes before they are applied for everyone to see, and you can quickly and easily revert to previous revisions, or revert right back to our default style. <strong>Please note that the Custom CSS upgrade does not allow you to upload templates or custom themes.</strong></p>
+      <p><?php echo Anchor('Try it out before you purchase', 'plugin/customcss'); ?>, and <?php echo Anchor('read our documentation', 'http://vanillaforums.com/help/customcss'); ?> for help with common questions and requests.</p>
    </div>
    <?php
-   /*
    echo $this->Form->Errors();
    echo $this->Form->Open();
-   echo $this->Form->Close('Get Started →');
-   */
+   echo $this->Form->Close('Buy Now →');
 } else if ($About == 'fileuploading') {
    ?>
    <div class="Legal">
@@ -90,6 +90,13 @@ if ($About == 'adremoval') {
    ?>
    <div class="Legal">
       <p>There is a problem with your forum's configuration, so you cannot currently purchase upgrades. Please contact support for assistance: <?php echo Format::Email('support@vanillaforums.com'); ?></p>
+   </div>
+   <?php
+} else if ($About == 'extrabandwidth') {
+   ?>
+   <div class="Legal">
+      <p>Purchase the extra bandwidth upgrade if your forum has extreme requirements.</p>
+      <p><strong>Coming Soon!</strong></p>
    </div>
    <?php
 } else {

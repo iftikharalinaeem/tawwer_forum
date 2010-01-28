@@ -46,6 +46,7 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${PLUGINS}GettingStarted" "${PATH}plugins/GettingStarted"
     /bin/ln -s "${PLUGINS}googleadsense" "${PATH}plugins/googleadsense"
     /bin/ln -s "${PLUGINS}vfoptions" "${PATH}plugins/vfoptions"
+    /bin/ln -s "${PLUGINS}CustomCSS" "${PATH}plugins/CustomCSS"
     # End Custom VF.com Plugins
 
     # Themes

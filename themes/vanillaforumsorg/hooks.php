@@ -13,10 +13,57 @@ class ThemeHooks implements Gdn_IPlugin {
       return TRUE;
    }
    
+   public function Base_Render_Before(&$Sender) {
+      if ($Sender->Head->Title() == Gdn::Config('Garden.Title'))
+         $Sender->Head->Title('Vanilla - Free, Open-Source Forum Software');
+   }
+   
+   public function DiscussionsController_Render_Before(&$Sender) {
+      $RecentActivityModule = new RecentActivityModule();
+      $RecentActivityModule->GetData();
+      $Sender->AddModule($RecentActivityModule);
+   }
+   
    public function DiscussionsController_AfterDiscussionTitle_Handler(&$Sender) {
       $Discussion = ArrayValue('Discussion', $Sender->EventArguments);
       if ($Discussion) {
          echo '<div id="FirstComment" style="display: none;">'.Format::To($Discussion->FirstComment, $Discussion->FirstCommentFormat).'</div>';
       }
+   }
+   
+   public function PluginController_VFOrgUserInfo_Create(&$Sender) {
+      ?>
+      <div class="UserOptions">
+         <div>
+            <?php
+               $Session = Gdn::Session();
+               $Authenticator = Gdn::Authenticator();
+               if ($Session->IsValid()) {
+                  $Name = '<em>'.$Session->User->Name.'</em>';
+                  $CountNotifications = $Session->User->CountNotifications;
+                  if (is_numeric($CountNotifications) && $CountNotifications > 0)
+                     $Name .= '<span>'.$CountNotifications.'</span>';
+                     
+                  echo Anchor($Name, '/profile/'.$Session->UserID.'/'.$Session->User->Name, 'Username');
+
+                  $Inbox = '<em>Inbox</em>';
+                  $CountUnreadConversations = $Session->User->CountUnreadConversations;
+                  if (is_numeric($CountUnreadConversations) && $CountUnreadConversations > 0)
+                     $Inbox .= '<span>'.$CountUnreadConversations.'</span>';
+            
+                  echo Anchor($Inbox, '/messages/all', 'Inbox');
+
+                  if ($Session->CheckPermission('Garden.Settings.Manage'))
+                     echo Anchor('Dashboard', '/garden/settings', 'Dashboard');
+                  
+                  echo Anchor('Sign Out', str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()), 'Leave');
+               } else {
+                  echo Anchor('Sign In', $Authenticator->SignInUrl($this->SelfUrl), 'SignInPopup');
+                  echo Anchor('Apply for Membership', $Authenticator->RegisterUrl($this->SelfUrl), 'Register');
+               }
+            ?>
+         </div>
+      </div>
+      <?php   
    }
 }

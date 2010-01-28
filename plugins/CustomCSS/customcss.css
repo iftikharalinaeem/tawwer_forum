@@ -1,0 +1,48 @@
+#Content {
+   margin: 0;
+   padding: 15px 15px 15px 185px;
+}
+div.CustomCSSForm {
+   float: left;
+   width: 70%;
+}
+textarea.CustomCSSBox {
+   width: 99%;
+   min-height: 400px;
+   max-height: none;
+   font-family: monospace;
+   font-size: 12px;
+   color: #000;
+   margin: 0 0 20px;
+}
+div.CustomCSSOptions {
+   margin-left: 73%;
+/* IE7 Hack */
+   ^margin-left: 60%;
+}
+
+div.CustomCSSOptions div.RevisionOptions ul {
+   margin: 0 0 10px;
+   border-bottom: 1px dotted #aaa;
+}
+div.CustomCSSOptions div.RevisionOptions ul li {
+   margin-bottom: 6px;
+}
+div.CustomCSSOptions div.RevisionOptions ul li label {
+   display: block;
+   font-size: 11px;
+   color: #555;
+}
+input#Form_Apply {
+   float: right;
+}
+div.RecentRevisions div.NewDay {
+   font-weight: bold;
+}
+div.RecentRevisions div.Revision a {
+   padding-left: 6px;
+   margin-right: 6px;
+}
+div.RecentRevisions div.LiveRevision {
+   font-weight: bold;
+}

@@ -1,63 +1,39 @@
-#Content {
-   float: none;
-   margin: 0;
-   width: auto;
-}
-div.AddonContent {
-   float: left;
-   width: 680px;
-   margin: 0 40px 0 0;
-}
-div.AddonPanel {
-   width: 240px;
-   float: right;
-}
 body.Addon #Content img.Icon {
    float: left;
    margin: 6px 12px 12px 6px;
    padding: 8px;
    border: 1px solid #ddd;
 }
-.Panel {
-   display: none;
-}
-.DownloadBox {
-   background: #FFFFCC;
+div.RequirementBox,
+div.DownloadBox {
+   background: #fafafa;
    color: #555;
-   border: 1px solid #FFFF55;
+   border: 1px solid #aaa;
    padding: 6px;
-   margin: 6px 0 0;
-   font-size: 96%;
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
+   margin: 0;
+   font-size: 80%;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   float: left;
+   width: 270px;
 }
-.DownloadBox a.Download,
-.DownloadBox a.Download:link,
-.DownloadBox a.Download:active,
-.DownloadBox a.Download:visited {
-   line-height: 1;
-   display: block;
-   -moz-border-radius:4px;
-   -webkit-border-radius: 4px;
-   background: #11e420;
-   color: #fff;
-   font-size:20px;
+div.RequirementBox {
+   float: none;
+   width: auto;
+   margin-left: 300px;
+   min-height: 180px;
+}
+div.RequirementBox h3 {
    font-weight: bold;
-   margin:0;
-   padding:10px 10px 6px;
-   text-align: center;
-   text-shadow: 1px 1px 1px #00C400;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 14px;
 }
-.DownloadBox a.Download:hover {
-   background: #00c80e;
-   text-shadow: 1px 1px 1px #00a400;
+div.DownloadBox dl {
+   padding: 0 !important;
 }
-.DownloadBox dl {
-   padding: 10px 0 0 !important;
-}
-.DownloadBox dl dt {
+div.DownloadBox dl dt {
    color: #000;
-   width: 90px;
+   width: 100px;
    float: left;
 }
 .DownloadBox dl dd {
@@ -84,28 +60,30 @@ div.Testing h3 {
    font-size: 120%;
 }
 #Content h1 {
-   font-size: 130%;
-   border-bottom: 1px solid #ddd;
-   font-weight: bold;
-   padding: 20px 6px 0;
+   padding: 0 0 4px;
+   text-shadow: 0 1px 0 #fff;
+   border-bottom: 1px dotted #999;
 }
 #Content h2 {
-   color: #333;
-   font-weight: bold;
-   font-size: 105%;
-   border-bottom: 1px solid #ddd;
-   padding: 0 6px;
+   font-size: 18px;
+   border-bottom: 1px dotted #bbb;
    margin: 20px 0 0;
 }
 #addons_addon_index #Content h2 {
    margin: 40px 0 0;
+   padding: 0 0 3px;
+   font-size: 120%;
+}
+#addons_addon_index #Content .Legal {
+   margin-bottom: 20px;
 }
 #addons_addon_index #Content .Warning {
-   background: #FF0063;
+   border: 0;
+   background: #d00;
    color: #fff;
    padding: 8px;
    line-height: 1.5;
-   margin: 10px 0;
+   margin: 10px 0 20px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 }
@@ -116,6 +94,23 @@ div.Testing h3 {
 #Content img.Border {
    padding: 6px;
    border: 1px solid #ddd;
+}
+.AddonOptions {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 12px;
+   font-weight: bold;
+   text-align: center;
+   background: #fafafa;
+   padding: 3px 0;
+   border: 1px solid #eee;
+   border-top: 0;
+   -moz-border-radius-bottomleft: 2px;
+   -moz-border-radius-bottomright: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+}
+.AddonOptions a {
+   margin: 0 6px;
 }
 
 /* Side Menu */
@@ -145,7 +140,6 @@ div.Testing h3 {
 }
 
 /* Form Stuff */
-
 form ul {
    list-style: none;
    margin: 0px;
@@ -170,9 +164,7 @@ form ul li div.Info {
 }
 form ul li label {
    color: #222;
-   float: left;
    display: block;
-   width: 250px;
    font-size: 150%;
    padding: 6px 6px 0px 4px;
    }
@@ -204,15 +196,10 @@ input.SmallButton {
 input.SmallInput {
    width: 80px;
 }
-div.Form h2 {
-   clear: left;
-   color: #333;
-   font-weight: bold;
-   font-size: 130%;
-   border-bottom: 1px solid #ddd;
-   margin: 0 0 10px;
-   padding:20px 6px 0;
+#Popup textarea.TextBox {
+   width: 455px;
 }
+
 
 /* Common formatting for form inputs */
 input.File {
@@ -334,7 +321,7 @@ li.Empty,
    font-weight: bold;
 }
 #CommentForm textarea {
-   width: 670px;
+   width: 655px;
    height: 100px;
    min-height: 100px;
    margin: 0px 0px 6px;
@@ -364,14 +351,12 @@ li.Empty,
 }
 /* Search Form */
 div.SearchForm {
-   margin: 0 40px 0 0;
+   margin: 0;
    -moz-border-radius: 6px;
-   background: #e9f9ff;
-   border: 1px solid #C0E7F5;
-   border: 1px solid #e0f7f5;
+   -webkit-border-radius: 6px;
+   background: #fafafa;
+   border: 1px solid #aaa;
    padding: 8px 8px 6px;   
-   float: left;
-   width: 664px;
 }
 div.SearchForm input.InputBox {
    width: 515px;
@@ -382,14 +367,15 @@ div.SearchForm input.Button {
    padding: 8px 4px;
 }
 div.SearchForm div.Options {
-   font-size: 100%;
-   padding: 8px 0 0;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 12px;
+   padding: 8px 0 0 8px;
 }
 div.SearchForm a {
-   padding: 3px 4px 2px;
-   margin: 0 2px;
+   margin: 0 4px 0 0;
 }
 div.SearchForm a.Active {
+   padding: 3px 4px 2px;
    background: #076C8E;
    border-bottom: 1px solid #fff;
    color: #fff;
@@ -399,48 +385,63 @@ div.SearchForm a.Active {
 }
 
 /* User Info Box */
-CANTdiv.UserOptions {
-   margin: 20px 0 0;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   background: #44C7F4;
-   padding: 8px;
-   color: #fff;
-}
-#AddonPage div.UserOptions,
-#AddonHome div.UserOptions {
-   margin: 10px 0 0;
+#Content div.UserOptions {
+   margin: 0;
+   width: 250px;
+   float: right;
 }
 div.UserOptions h3 {
+   background: url(hr.png) repeat-x left bottom;
+   color:#444;
+   font-family:"Helvetica Neue (TT)","Helvetica Neue","Helvetica","Arial",sans-serif;
+   font-size:18px;
    font-weight: bold;
-   font-size: 16px;
    margin: 0;
-   padding: 0;
-   text-shadow:1px 1px 1px #148EB8;
+   padding: 0 0 2px;
+   text-shadow: 0 1px 0 #fff;
 }
 div.UserOptions ul {
    margin: 0;
    padding: 0;
 }
 div.UserOptions ul li {
-   list-style-image: url(arrow.gif);
-   margin: 0 0 0 20px;
-   padding: 0 0 0 2px;
-}
-div.UserOptions ul li:hover {
-   margin: 0 0 0 22px;
-   padding: 0 0 0 0;   
-}
-div.UserOptions a {
-   color: #fff;
+   margin: 0;
+   padding: 6px 2px 0;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 13px;
+   font-weight: bold;
 }
 div.UserOptions a:hover {
    text-decoration: underline;
 }
+div.Box p {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+}
+div.Box p.ChunkyButton {
+   width: 190px;
+   padding: 0;
+}
+div.DownloadBox p.ChunkyButton {
+   width: 270px;
+}
+#Panel p.ChunkyButton {
+   width: auto;
+   margin: 10px 0 0 0;
+   padding: 0;
+}
+#Panel p.ChunkyButton a {
+   font-size: 18px;
+   line-height: 2.6;
+}
+p.ChunkyButton a:hover {
+   text-decoration: none !important;
+}
+
 
 /* DataList */
 
 ul.DataList li {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    margin: 0;
    padding: 6px;
    border-bottom: 1px solid #ddd;
@@ -462,9 +463,9 @@ ul.DataList a.Icon {
 ul.DataList li a {
    margin: 0;
    padding: 0;
-   line-height: 130%;
-   color: #777;
-   font-size: 105%;
+   line-height: 160%;
+   color: #444;
+   font-size: 80%;
    display: block;
 }
 ul.DataList li h3 {
@@ -474,6 +475,7 @@ ul.DataList li h3 {
    font-weight: bold;
 }
 ul.DataList li h3 a {
+   font-size: 90%;
    display: inline;
    border: 0;
    padding: 0;
@@ -485,15 +487,12 @@ ul.DataList li h3 a:hover {
 }
 ul.DataList li a:hover {
    color: #111;
+   text-decoration: none;
 }
 ul.DataList li ul.Meta {
-   /* background: #f5f5f5; */
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
    clear: left;
-   font-family: tahoma;
-   font-size: 90%;
-   color: #777;
+   font-size: 70%;
+   color: #333;
    padding: 4px 0;
 }
 ul.DataList li ul.Meta li {
@@ -505,7 +504,7 @@ ul.DataList li ul.Meta li span {
    color: #333;
    padding: 2px 4px;
    margin-left: 6px;
-   background: #fafafa;
+   background: #ffa;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
 }
@@ -525,7 +524,7 @@ ul.DataList li ul.Meta li.Vanilla1 span {
 }
 ul.DataList li ul.Meta li.Vanilla2 span {
    color: #fff;
-   background: #44c7f4;
+   background: #2A529A;
    margin: 0 0 0 4px;
 }
 div.Vanilla1,

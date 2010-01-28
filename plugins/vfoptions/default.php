@@ -35,7 +35,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Dashboard', 'My Forums', 'garden/plugin/myforums', 'Garden.Settings.GlobalPrivs');
-      $Menu->AddLink('Dashboard', 'Premium Upgrades ↪', 'garden/plugin/upgrades', 'Garden.Settings.GlobalPrivs', array('class' => 'HighlightButton'));
+      $Menu->AddLink('Dashboard', 'Premium Upgrades ♥', 'garden/plugin/upgrades', 'Garden.Settings.GlobalPrivs', array('class' => 'HighlightButton'));
       
       // Remove the addons menu items
       $Menu->RemoveGroup('Add-ons');
@@ -242,10 +242,12 @@ pageTracker._trackPageview();
     * Creates a "Custom Domain" upgrade offering screen where users can purchase
     * & implement a custom domain.
     */
+   public $AddSideMenu = TRUE;
    public function PluginController_CustomDomain_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades &raquo; Custom Domain Name');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
+      if ($this->AddSideMenu)
+         $Sender->AddSideMenu('garden/plugin/upgrades');
 
       // Send a request to the specified domain, and see if it hits our
       // server (it should return our custom 404 error if it is pointed at
@@ -360,8 +362,10 @@ pageTracker._trackPageview();
       if ($SiteID <= 0)
          $FeatureCode = 'error';
       
-      if ($FeatureCode == 'customdomain')
+      if ($FeatureCode == 'customdomain') {
+         $this->AddSideMenu = FALSE;
          return $this->PluginController_CustomDomain_Create($Sender, $EventArguments);
+      }
          
       if ($Sender->Form->IsPostBack()) {
          // Select the feature and redirect to the checkout
@@ -433,11 +437,11 @@ pageTracker._trackPageview();
                ->Get()
                ->FirstRow();
       
-            $UpdateUrl = 'https://vanillaforums.com/payment/synch/';
+            $UpdateUrl = 'https://www.vanillaforums.com/payment/synch/';
             if (is_object($Site)) {
                // Point at vanilladev.com if that's where this site is managed
                if (strpos($Site->Name, 'vanilladev') !== FALSE)
-                  $UpdateUrl = 'https://vanilladev.com/payment/synch/';
+                  $UpdateUrl = 'https://www.vanilladev.com/payment/synch/';
             }
             
             // Set the transient key for authentication on the other side
@@ -588,6 +592,9 @@ pageTracker._trackPageview();
       $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
       $this->_GetDatabase()->SQL()->Put('SiteFeature', array('Active' => '1'), array('SiteID' => $SiteID, 'Selected' => '1'));
       
+      // For the "Getting Started" Plugin. Record that they've purchased an upgrade.
+      SaveToConfig('Plugins.GettingStarted.Upgrades', '1');
+      
       // Now apply upgrades
       $this->_ApplyUpgrades();
       
@@ -683,6 +690,18 @@ pageTracker._trackPageview();
                file_put_contents($Conf, $Contents);
             }
             
+// --== Custom CSS ==--
+
+         } else if ($Feature->Code == 'customcss') {
+            $IsEnabled = Gdn::Config('Plugins.CustomCSS.Enabled');
+            if ($Feature->Active == '1' && !$IsEnabled) {
+               // ---- ENABLE ----
+               SaveToConfig('Plugins.CustomCSS.Enabled', TRUE);
+            } else if ($Feature->Active == '0' && $IsEnabled) {
+               // ---- DISABLE ----
+               SaveToConfig('Plugins.CustomCSS.Enabled', FALSE);
+            }
+
 // --== CUSTOM DOMAINS ==--
 
          } else if ($Feature->Code == 'customdomain') {
@@ -964,11 +983,11 @@ pageTracker._trackPageview();
          ->Get()
          ->FirstRow();
       
-      $CheckoutUrl = 'https://vanillaforums.com/payment/pay/';
+      $CheckoutUrl = 'https://www.vanillaforums.com/payment/pay/';
       if (is_object($Site)) {
          // Point at vanilladev.com if that's where this site is managed
          if (strpos($Site->Name, 'vanilladev') !== FALSE)
-            $CheckoutUrl = 'https://vanilladev.com/payment/pay/';
+            $CheckoutUrl = 'https://www.vanilladev.com/payment/pay/';
             
          $this->_SetTransientKey($Site);
       }
