@@ -19,7 +19,11 @@
 								if (is_numeric($CountNotifications) && $CountNotifications > 0)
 									$Name .= '<span>'.$CountNotifications.'</span>';
 									
-								echo Anchor($Name, '/profile/'.$Session->UserID.'/'.$Session->User->Name, 'Username');
+								echo Anchor(
+									$Name,
+									$CountNotifications > 0 ? '/profile/notifications' : '/profile/'.$Session->UserID.'/'.$Session->User->Name,
+									'Username'
+								);
 		
 								$Inbox = '<em>Inbox</em>';
 								$CountUnreadConversations = $Session->User->CountUnreadConversations;
