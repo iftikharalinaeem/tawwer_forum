@@ -17,9 +17,12 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
     * Plugins.GoogleAnalytics.TrackerDomain.
     */
    public function Base_Render_Before(&$Sender) {
+      $Blacklist = Gdn::Config('Plugins.GoogleAnalytics.ControllerBlacklist', array());
+      if (is_array($Blacklist) && InArrayI($Sender->ControllerName, $Blacklist))
+         return;
+      
       $TrackerCode = Gdn::Config('Plugins.GoogleAnalytics.TrackerCode');
       $TrackerDomain = Gdn::Config('Plugins.GoogleAnalytics.TrackerDomain');
-      
       if ($TrackerCode && $TrackerCode != '' && $Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          $Script = "<script type=\"text/javascript\">
 var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");
