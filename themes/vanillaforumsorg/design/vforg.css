@@ -168,16 +168,22 @@ body#vforg_home_index {
    border: 0;
 }
 div.Splash {
-	height: 500px;
-	background: url('splash_bg.png') center center no-repeat;
+	margin: 30px 30px 0;
+	box-shadow: 1px 1px 20px #000;
+	-moz-box-shadow: 1px 1px 20px #000;
+	-webkit-box-shadow: 1px 1px 20px #000;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	height: 440px;
+	background: url('splash_bg2.jpg') center center no-repeat #eee;
 }
 div.Splash img {
 	float: right;
-	padding: 55px 32px 0 0;
+	padding: 26px 0 0;
 }
 div.Splash div {
-	padding: 60px 0 0 60px;
-	margin-right: 480px;
+	padding: 30px 0 0 30px;
+	margin-right: 440px;
 }
 div.Splash h1,
 div.Splash h2 {
@@ -191,6 +197,7 @@ div.Splash h1 {
 }
 div.Splash h1 em {
 	color: #FF8000;
+	font-style: normal;
 }
 div.Splash p {
    font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
