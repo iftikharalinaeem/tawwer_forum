@@ -657,6 +657,11 @@ body.Discussion #CommentForm {
    background:#E9F9FF none repeat scroll 0 0;
    padding:8px;
 }
+body.Discussion div.Popup #CommentForm {
+   background: #fff;
+   padding: 0;
+   border: 0;
+}
 .Back {
    border: 1px solid #9CA7B8;
    border-top: 0;

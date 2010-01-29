@@ -122,6 +122,29 @@ body.download div.DownloadInfo p strong {
    font-size: 101%;
 }
 
+/* ---- Contributors Agreement ---- */
+body.Contributors #Content h1 {
+   -moz-border-radius-topleft: 3px;
+   -moz-border-radius-topright: 3px;
+	background: url('grey_fade.png') top left repeat-x #ECF0F9;
+   border:1px solid #9CA7B8;
+   padding:4px 8px;
+   text-shadow: 0 1px 0 #fff;
+	margin: 0;
+}
+body.Contributors div.Legal {
+	margin: 0;
+	padding: 10px 10px 0;
+	font-size: 110%;
+	background: #fff;
+   border: 1px solid #9CA7B8;
+   border-top: 0;
+   -moz-border-radius-bottomleft: 3px;
+   -moz-border-radius-bottomright: 3px;
+}
+
+
+
 /* ---- Splash Page ---- */
 body#vforg_home_index {
 	background: url('shine.jpg') top center no-repeat #2a529a;
