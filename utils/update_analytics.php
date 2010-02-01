@@ -19,18 +19,27 @@ if ($DirectoryHandle = opendir('/srv/www/vhosts')) {
 		  $File = '/srv/www/vhosts/' . $Item . '/conf/config.php';
 		  if (file_exists($File)) {
 				$Contents = file_get_contents($File);
-				if (strpos($Contents, "\$Configuration['Plugins']['GoogleAnalytics']['TrackerCode'])") === 0) {
+				if (strpos($Contents, "\$Configuration['Plugins']['GoogleAnalytics']['TrackerCode'])") === false) {
 					 echo 'Updating: '.$File."\n";
-					 break;
-
+					 
+					 $Find = '// Plugins';
+					 if (strpos($Contents, $Find === FALSE))
+						  $Find = '// Adsense.';
+						  
+					 if (strpos($Contents, $Find === FALSE)) {
+						  echo "No insertion point.\n";
+						  break;
+					 }
+					 
 	 				$Contents = str_replace(
-	 					 "// Plugins",
-	 					 "// Plugins
+	 					 $Find,
+	 					 $Find . "
 \$Configuration['Plugins']['GoogleAnalytics']['TrackerCode'] = 'UA-12713112-1';                                                                                            
 \$Configuration['Plugins']['GoogleAnalytics']['TrackerDomain'] = '.vanillaforums.com';",
 	 					 $Contents
 	 				);
 	 				file_put_contents($File, $Contents);
+					 break;
 				}
 				
 		  }
