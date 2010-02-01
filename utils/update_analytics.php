@@ -23,10 +23,10 @@ if ($DirectoryHandle = opendir('/srv/www/vhosts')) {
 					 echo 'Updating: '.$File."\n";
 					 
 					 $Find = '// Plugins';
-					 if (strpos($Contents, $Find === FALSE))
+					 if (strpos($Contents, $Find) === FALSE)
 						  $Find = '// Adsense.';
 						  
-					 if (strpos($Contents, $Find === FALSE)) {
+					 if (strpos($Contents, $Find) === FALSE) {
 						  echo "No insertion point.\n";
 						  break;
 					 }
