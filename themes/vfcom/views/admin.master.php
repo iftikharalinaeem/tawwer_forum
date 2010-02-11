@@ -27,7 +27,13 @@
       </div>
       <div id="Body">
          <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
-         <div id="Content"><?php $this->RenderAsset('Content'); ?></div>
+         <div id="Content"><?php
+			if (Format::ToTimestamp('2010-02-13 08:00:00') > time()) {
+				?>
+			<div class="Warning" style="margin-bottom: 20px;"><span style="font-weight: bold;">Notice:</span> VanillaForums.com may experience downtime for scheduled maintenance on Feb 13th between 12AM and 4AM CST. <a href="http://vanillaforums.com/blog">More info here</a>.</div>
+			<?php
+			}
+			$this->RenderAsset('Content'); ?></div>
       </div>
       <div id="Foot">
 			<div style="float: right">
