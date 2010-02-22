@@ -40,7 +40,12 @@
 		<table class="EtsyInfo">
 			<tr>
 				<td colspan="2" class="Breadcrumb">
-					<a href="index.php">Home</a> &gt; <a href="community.php">Community</a> &gt; Forums
+					<a href="index.php">Home</a> &gt; <a href="community.php">Community</a> &gt; <?php
+					if (property_exists($this, 'CategoryID') && is_numeric($this->CategoryID)) {
+						echo Anchor('Forums', '/'). ' &gt; '.$this->Category->Name;
+					} else {
+						echo 'Forums';
+					?>
 				</td>
 			</tr>
 			<tr>
@@ -57,6 +62,9 @@
 					<br />
 					<br />
 					<a href="http://mailinglist.etsy.com/">Sign up for Etsy Emails to keep up<br>with Etsy news and announcements</a>
+					<?php
+					}
+					?>
 				</td>
 			</tr>
 		</table>
@@ -70,9 +78,6 @@
 	-->
 	<div id="Body">
 		<div id="Content"><?php $this->RenderAsset('Content'); ?></div>
-		<div id="Panel">
-			<?php $this->RenderAsset('Panel'); ?>
-		</div>
 	</div>
 	<div id="Foot" class="EtsyWrapper">
 		<table>
