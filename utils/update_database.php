@@ -7,6 +7,7 @@ $Cnn = mysql_connect('vfdb1', 'root', 'Va2aWu5A');
 $Data = mysql_query('show databases', $Cnn);
 while ($Row = mysql_fetch_assoc($Data)) {
 	 if (substr($Row['Database'], 0, 3) == 'vf_') {
+		  echo $Row['Database']."\n";
 		  mysql_select_db($Row['Database'], $Cnn);
 	 
 		  // Drop obselete tables
