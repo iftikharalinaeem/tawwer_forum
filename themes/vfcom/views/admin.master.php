@@ -28,7 +28,7 @@
       <div id="Body">
          <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
          <div id="Content"><?php
-			if (Format::ToTimestamp('2010-02-24 08:00:00') > time()) {
+			if (Format::ToTimestamp('2010-02-20 08:00:00') > time()) {
 				?>
 			<div class="Warning" style="margin-bottom: 20px;"><span style="font-weight: bold;">Notice:</span> VanillaForums.com will go offline for scheduled maintenance at 1pm EST on Tuesday February 23rd. <a href="http://vanillaforums.com/blog">More info here</a>.</div>
 			<?php
