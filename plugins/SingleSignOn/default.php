@@ -28,6 +28,7 @@ class SingleSignOnPlugin implements Gdn_IPlugin {
    }
 
    public function PluginController_SingleSignOn_Create($Sender, $EventArguments) {
+      $Sender->Permission('Garden.Admin.Only');
       $Sender->Title('Single Sign-on');
       $Sender->AddSideMenu('garden/plugin/singlesignon');
       $Validation = new Gdn_Validation();
@@ -39,7 +40,9 @@ class SingleSignOnPlugin implements Gdn_IPlugin {
          'Garden.Authenticator.SignInUrl',
          'Garden.Authenticator.SignOutUrl',
          'Garden.Authenticator.RegisterUrl',
-         'Garden.Cookie.Path'
+         'Garden.Cookie.Path',
+         'Garden.SignIn.Popup',
+         'Garden.UserAccount.AllowEdit'
       ));
 
       // Set the model on the form.
@@ -52,12 +55,31 @@ class SingleSignOnPlugin implements Gdn_IPlugin {
          $Sender->Form->SetData($ConfigurationModel->Data);
          $Sender->Form->SetValue('EnableSSO', Gdn::Config('Garden.Authenticator.Type') == 'Handshake' ? 'TRUE' : '');
       } else {
+         $Enabled = $Sender->Form->GetFormValue('EnableSSO', '') == 'TRUE';
          // Make sure to force some values
-         $Sender->Form->SetFormValue('Garden.Authenticator.Type', $Sender->Form->GetFormValue('EnableSSO', '') == 'TRUE' ? 'Handshake' : 'Password');
+         $Sender->Form->SetFormValue('Garden.Authenticator.Type', $Enabled ? 'Handshake' : 'Password');
          $Sender->Form->SetFormValue('Garden.Authenticator.Encoding', 'ini');
-         $Sender->Form->SetFormValue('Garden.Cookie.Path', '/'); // <-- Make sure that Vanilla's cookies don't have a path
+         $Sender->Form->SetFormValue('Garden.Cookie.Path', '/'); // <-- Make sure that Vanilla's cookies don't have a path.
+         $Sender->Form->SetFormValue('Garden.SignIn.Popup', $Enabled ? FALSE : TRUE); // <-- Make sure that sign in links don't ajaxy popup.
+         $Sender->Form->SetFormValue('Garden.UserAccount.AllowEdit', $Enabled ? FALSE : TRUE); // <-- Make sure that users cannot edit their account information through garden.
          if ($Sender->Form->Save() !== FALSE)
             $Sender->StatusMessage = Translate("Your changes have been saved successfully.");
+            $Sender->RedirectUrl = Url('/plugin/singlesignon');
+
+         // If SSO has been enabled, redirect the user to the external site's
+         // login url (this will force the currently authenticated user to link
+         // their account with one in the other system).
+         if ($Enabled) {
+            // De-authenticate the currently signed in user, and redirect to the external system.
+            $Password = new Gdn_PasswordAuthenticator();
+            $Password->DeAuthenticate();
+            $Password->SetIdentity(NULL);
+            // Once signed in, we need to come back here to make sure there was no problem with the handshake.
+            $Target = Url('/entry/handshake/?Target=/', TRUE);
+            // Redirect to the external server to sign in.
+            $Handshake = new Gdn_HandshakeAuthenticator(Gdn::Config('Garden.Authenticator'));
+            Redirect($Handshake->RemoteSignInUrl($Target));
+         }
       }
 
       $Sender->Render(PATH_PLUGINS . DS . 'SingleSignOn' . DS . 'views' . DS . 'index.php');

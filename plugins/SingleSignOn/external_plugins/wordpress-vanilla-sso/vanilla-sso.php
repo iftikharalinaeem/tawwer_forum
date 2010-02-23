@@ -70,7 +70,6 @@ function vanilla_sso_options() {
       }
 		update_option('vanilla_sso_key', $Key);
 	}
-	$VanillaSignoutUrl = get_option('vanilla_signout_url');
 ?>
 <div class="wrap">
 	<div id="icon-options-general" class="icon32"><br /></div>
