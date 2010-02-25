@@ -52,12 +52,15 @@
 			<tr>
 				<td colspan="2" class="Breadcrumb">
 					<a href="index.php">Home</a> &gt; <a href="community.php">Community</a> &gt; <?php
-					if (property_exists($this, 'CategoryID') && is_numeric($this->CategoryID)) {
-						echo Anchor('Forums', '/'). ' &gt; '.$this->Category->Name;
+					if (strtolower($this->ControllerName) != 'categoriescontroller') {
+						if (property_exists($this, 'Category') && is_object($this->Category)) {
+							echo Anchor('Forums', '/'). ' &gt; '.$this->Category->Name;
+						} else {
+							echo Anchor('Forums', '/');
+						}
 					} else {
-						echo 'Forums';
 					?>
-				</td>
+				Forums</td>
 			</tr>
 			<tr>
 				<td class="SectionTitle">Etsy Forums</td>
