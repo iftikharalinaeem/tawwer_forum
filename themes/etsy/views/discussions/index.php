@@ -17,7 +17,7 @@ if ($this->DiscussionData->NumRows() > 0) {
    if (is_object($this->Category))
       echo sprintf($this->Category->Name);
       
-   echo Anchor('Start a new discussion', '/post/discussion/'.$this->Category->CategoryID);
+   echo Anchor('Start a new discussion', '/post/discussion/'.(is_object($this->Category) ? $this->Category->CategoryID : ''));
 ?></h1>
 <ul class="DataList Discussions">
    <?php include($this->FetchViewLocation('discussions')); ?>
