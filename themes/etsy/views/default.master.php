@@ -12,7 +12,7 @@
 			<a href="/register.php" title="Register">Register</a> <span>|</span>
 			<a href="http://www.etsy.com/login.php?from_page=http%3A%2F%2Fwww.etsy.com%2Fforums_main.php" title="Sign In">Sign In</a>
 		</div>
-		<a href="/" class="Etsy" title="Etsy"><img src="<?php echo Asset('themes/etsy/design/logo.gif'); ?>" alt="Etsy" width="154" height="80" /></a>
+		<a href="/" class="Etsy" title="Etsy"><img src="<?php echo Asset('themes/etsy/design/logo2.gif'); ?>" alt="Etsy" width="154" height="80" /></a>
 		<div class="EtsyMenu">
 			<a href="/buy.php" title="Buy">Buy</a>
 			<a href="/how_selling_works.php" title="Sell">Sell</a>
