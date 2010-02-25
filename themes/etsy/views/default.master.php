@@ -8,9 +8,20 @@
 	<div class="EtsyWrapper">
 		<div class="Tools">
 			<a href="/cart1.php" title="Cart" class="Cart">Cart <span class="Orange">0 items</span></a>
-			<a href="/faq.php" title="Help">Help</a> <span>|</span>
-			<a href="/register.php" title="Register">Register</a> <span>|</span>
-			<a href="http://www.etsy.com/login.php?from_page=http%3A%2F%2Fwww.etsy.com%2Fforums_main.php" title="Sign In">Sign In</a>
+			<?php
+				$Session = Gdn::Session();
+				$Authenticator = Gdn::Authenticator();
+				if ($Session->IsValid()) {
+					echo '<span class="Username">'.$Session->User->Name.': </span>';
+					echo '<a href="/your_etsy.php">Your Etsy</a> <span>|</span>';
+					echo '<a href="http://help.etsy.com">Help</a> <span>|</span>';
+					echo Anchor('Sign Out', str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()), 'Leave');
+				} else {
+					echo Anchor('Register', $Authenticator->RegisterUrl($this->SelfUrl), 'Register').' <span>|</span>';
+					echo '<a href="http://help.etsy.com">Help</a> <span>|</span>';
+					echo Anchor('Sign In', $Authenticator->SignInUrl($this->SelfUrl), 'SignInPopup');
+				}
+			?>
 		</div>
 		<a href="/" class="Etsy" title="Etsy"><img src="<?php echo Asset('themes/etsy/design/logo.gif'); ?>" alt="Etsy" width="154" height="80" /></a>
 		<div class="EtsyMenu">

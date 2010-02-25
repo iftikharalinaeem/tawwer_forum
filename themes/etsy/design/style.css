@@ -1691,6 +1691,9 @@ div.Tools a {
 div.Tools span {
 	padding: 0 4px;
 }
+div.Tools span.Username {
+	color: #000;
+}
 div.Tools span.Orange {
 	padding: 0;
 }
