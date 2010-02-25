@@ -29,6 +29,28 @@ class ThemeHooks implements Gdn_IPlugin {
       // Discussions from deleted categories are placed in the Questions category.
    }
    
+   public function Gdn_SettingsController_Index_Create(&$Sender) {
+      $Sender->AddJsFile('settings.js');
+      $Sender->Title(Translate('Dashboard'));
+         
+      $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Applications.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Applicants.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
+      $Sender->FireEvent('DefineAdminPermissions');
+      $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
+      $Sender->AddSideMenu('garden/settings');
+      $Sender->Render();
+   }
+   
    public function Base_Render_Before(&$Sender) {
       // do nothing
    }

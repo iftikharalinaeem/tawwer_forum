@@ -13,7 +13,7 @@ Contact Mark O'Sullivan at mark [at] vanillaforums [dot] com
 $PluginInfo['SingleSignOn'] = array(
    'Name' => 'Single Sign-on',
    'Description' => 'Allows users to sign in through existing sign-in pages in external applications.',
-   'Version' => '1.0',
+   'Version' => '1.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca'
