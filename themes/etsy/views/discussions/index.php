@@ -14,9 +14,7 @@ $this->DiscussionData = $DiscussionData;
 if ($this->DiscussionData->NumRows() > 0) {
 ?>
 <h1><?php
-   if (is_object($this->Category))
-      echo sprintf($this->Category->Name);
-      
+   echo is_object($this->Category) ? $this->Category->Name : 'All Discussions';      
    echo Anchor('Start a new discussion', '/post/discussion/'.(is_object($this->Category) ? $this->Category->CategoryID : ''));
 ?></h1>
 <ul class="DataList Discussions">
