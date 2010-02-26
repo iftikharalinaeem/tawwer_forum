@@ -9,7 +9,7 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
    ?>
    <li>
       <h1><?php
-         echo Anchor($Category->Name, '/discussions/0/'.$Category->CategoryID.'/'.Format::Url($Category->Name));
+         echo Anchor($Category->Name, '/discussions/0/'.$Category->CategoryID.'/'.$Category->UrlCode);
       ?></h1>
       <ul class="DataList Discussions">
          <?php include($this->FetchViewLocation('discussions', 'discussions')); ?>
@@ -17,7 +17,7 @@ $ViewLocation = $this->FetchViewLocation('discussions', 'discussions');
       <?php
       if ($this->DiscussionData->NumRows() == $this->DiscussionsPerCategory) {
       ?>
-      <div class="More"><?php echo Anchor('View all discussions in '.$this->Category->Name, '/categories/'.urlencode($this->Category->Name)); ?> | <?php echo Anchor('Start a new discussion', '/post/discussion/'.$this->Category->CategoryID); ?></div>
+      <div class="More"><?php echo Anchor('View all discussions in '.$this->Category->Name, '/categories/'.$this->Category->UrlCode); ?> | <?php echo Anchor('Start a new discussion', '/post/discussion/'.$this->Category->CategoryID); ?></div>
       <?php
       }
       ?>

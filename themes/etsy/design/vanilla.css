@@ -633,3 +633,25 @@ body.Discussions h1 a:hover {
 body.Discussions #Body {
 	margin: 0 auto;
 }
+#DiscussionForm ul.PostOptions label,
+#DiscussionForm label {
+   color: #000;
+}
+body.Discussion #Content #CommentForm h2,
+body.Post #CommentForm h2,
+#DiscussionForm h2 {
+   color: #D35701;
+}
+.Back,
+body.Discussion #CommentForm,
+body.Post #CommentForm form,
+#DiscussionForm form {
+   background: #F5F6F1;
+   border: none;
+}
+div.Popup #CommentForm {
+   background: none;
+}
+div.Popup #CommentForm textarea {
+   max-height: 380px;
+}

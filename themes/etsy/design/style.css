@@ -1633,6 +1633,9 @@ div.Legal strong {
 body {
 	text-align: center;
 }
+a:hover {
+	color: #D35701;
+}
 #Frame {
 	text-align: left;
 	width: 760px;
@@ -1827,4 +1830,14 @@ td.Breadcrumb {
 #Foot a:hover {
    color: #0192B5;
 	text-decoration: underline;
+}
+div.Popup h1,
+div.Popup h2 {
+	color: #D35701;
+	background: #F5F6F1;
+	border-bottom: 1px solid #DCDDD7;
+}
+div.Popup .Footer {
+  background: #F5F6F1;
+  border-top:1px solid #DCDDD7;
 }
