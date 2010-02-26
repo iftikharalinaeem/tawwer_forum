@@ -30,4 +30,15 @@
 		  CustomLog /srv/log/vhosts/access.log vcommon
 		  VirtualDocumentRoot /srv/www/vhosts/%0/
 		  ErrorDocument 404 http://vanillaforums.com/filenotfound
+		  <Directory /srv/www/vhosts/etsy.vanilladev.com/>
+					 Options FollowSymLinks MultiViews
+					 AllowOverride All
+					 AuthUserFile /home/mark/.htpasswd                                                                                                                                                       
+					 AuthGroupFile /dev/null                                                                                                                                                                 
+					 AuthName "Private!"                                                                                                                                                         
+					 AuthType Basic                                                                                                                                                                          
+					 <Limit GET>                                                                                                                                                                             
+					 		require valid-user                                                                                                                                                                      
+					 </Limit>
+		  </Directory>
 </VirtualHost>
