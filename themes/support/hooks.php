@@ -12,25 +12,73 @@ class ThemeHooks implements Gdn_IPlugin {
    public function Setup() {
       // Add some fields to the database
       // Treat bookmarks as "follows" (they count as "likes")
+      $Structure = Gdn::Structure();
       
       // Count "Likes" (bookmarks) on discussions
-      // -> Discussion.CountLikes int
-      // Allow comments to be "Liked"
-      // -> Comment.CountLikes int
-      
+      // -> Discussion.Score int
+
       // Questions are "Unanswered" or "Answered"
       // Ideas are "Suggested", "Planned", "Not Planned" or "Completed"
       // Problems are "Unsolved" or "Solved"
       // Praise is -
       // Announcements are -
-      // -> Discussion.State varchar(20)
+      // -> Discussion.State varchar(30)
+      $Structure->Table('Discussion')
+         ->Column('State', 'varchar(30)', TRUE)
+         ->Column('Score', 'int', 0)
+         ->Set(FALSE, FALSE); 
+      
+      // Allow comments to be "Liked"
+      // -> Comment.Score int
+      $Structure->Table('Comment')
+         ->Column('Score', 'int', 0)
+         ->Set(FALSE, FALSE);
+         
+      $SQL = Gdn::Database()->SQL();
       
       // Add new categories and remove old ones (unless they are already appropriately named).
+      if ($SQL->Select('CategoryID')->From('Category')->Where('Name', 'Question')->Get()->NumRows() == 0)
+         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Question', 'Description' => 'Ask a question', 'Sort' => '1'));
+      
+      if ($SQL->Select('CategoryID')->From('Category')->Where('Name', 'Idea')->Get()->NumRows() == 0)
+         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Idea', 'Description' => 'Share an idea', 'Sort' => '1'));
+
+      if ($SQL->Select('CategoryID')->From('Category')->Where('Name', 'Problem')->Get()->NumRows() == 0)
+         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Problem', 'Description' => 'Report a problem', 'Sort' => '1'));
+
+      if ($SQL->Select('CategoryID')->From('Category')->Where('Name', 'Kudos')->Get()->NumRows() == 0)
+         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Kudos', 'Description' => 'Give some kudos', 'Sort' => '1'));
+      
+      if ($SQL->Select('CategoryID')->From('Category')->Where('Name', 'Announcement')->Get()->NumRows() == 0)
+         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Announcement', 'Description' => 'Administrative announcements', 'Sort' => '1'));
+         
+      // Delete old categories
+      $SQL->WhereNotIn('Name', array('Question', 'Idea', 'Problem', 'Kudos', 'Announcement'))->Delete('Category');
+      
       // Discussions from deleted categories are placed in the Questions category.
+      $CategoryID = $SQL->Select('CategoryID')->From('Category')->Where('Name', 'Question')->Get()->FirstRow()->CategoryID;
+      $SQL->Update('Discussion', array('CategoryID' => $CategoryID))->Put();
    }
    
-   public function Base_Render_Before(&$Sender) {
-      // do nothing
+   /**
+    * Grab the score field whenever the discussions are queried.
+    */
+   public function Gdn_DiscussionModel_AfterDiscussionSummaryQuery_Handler(&$Sender) {
+      $Sender->SQL->Select('d.Score')
+         ->Select('iu.Email', '', 'FirstEmail')
+         ->Select('lcu.Email', '', 'LastEmail');
+   }
+   
+   /**
+    * When a discussion is bookmarked or unbookmarked, increase or decrease it's score.
+    */
+   public function Gdn_DiscussionModel_AfterBookmarkDiscussion_Handler($Sender) {
+      $Discussion = $Sender->EventArguments['Discussion'];
+      $State = $Sender->EventArguments['State'];
+      if (is_object($Discussion)) {
+         $Math = 'Score ' . ($State == '1' ? '+ 1' : '- 1');
+         $Sender->SQL->Update('Discussion')->Set('Score', $Math, FALSE)->Where('DiscussionID', $Discussion->DiscussionID)->Put();
+      }
    }
    
    /**
@@ -47,13 +95,6 @@ class ThemeHooks implements Gdn_IPlugin {
    public function SettingsController_Render_Before(&$Sender) {
       if (strpos(strtolower($Sender->RequestMethod), 'categor') > 0)
          Redirect($Sender->Routes['DefaultPermission']);
-   }
-   
-   public function DiscussionsController_AfterDiscussionTitle_Handler(&$Sender) {
-      $Discussion = ArrayValue('Discussion', $Sender->EventArguments);
-      if ($Discussion) {
-         echo '<div id="FirstComment" style="display: none;">'.Format::To($Discussion->FirstComment, $Discussion->FirstCommentFormat).'</div>';
-      }
    }
    
 }
