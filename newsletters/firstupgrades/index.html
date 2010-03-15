@@ -4,7 +4,7 @@
    <title>VanillaForums.com Newsletter</title>
    <style type="text/css" media="screen">
       body {
-         background-color: #2e5699;
+         background-color: #fff;
          margin: 0;
          padding: 0;
       }
@@ -13,86 +13,123 @@
          border: none;
       }
 
-		td.actionbar,
-      td.mainbar {
-      	padding: 0;
-      	text-align: left;
-      }
+		.header {
+			padding: 10px 0 5px;
+		}
+		
+		.header img {
+			float: left;
+		}
+		
+		.header a {
+			text-decoration: none;
+			color: #444;
+		}
+		.header a p {
+			font-family: "Lucida Grande", 'Lucida Sans Unicode', Arial;
+			font-size: 25px;
+			font-weight: bold;
+			padding: 85px 0 0;
+			margin: 0;
+		}
 
-		.actionbar,
-		.mainbar {
+		.body {
       	font-family: "Lucida Grande", 'Lucida Sans Unicode', Arial;
       	color: #333333;
       	font-size: 13px;
 			line-height: 1.5;
-			background-color: #ebeef6;
 		}
-		.mainbar img {
+		.body table {
+			border-top: 1px solid #ccc;
+			padding-top: 40px;
+		}
+		.body img {
 			padding: 0 0 0 8px;
 		}
 
-		.mainbar h1 {
-			font-family: arial, 'Lucida Grande', 'Lucida Sans Unicode';
-			font-size: 19px;
+		.body h1 {
+			color: #222;
+			font-family: "Lucida Grande", 'Lucida Sans Unicode', Arial;
+			font-size: 23px;
 			font-weight: bold;
-			padding: 0 20px;
+			padding: 0;
 			margin: 0 0 14px;
 			line-height: 1.2;
 		}
 		
-		.actionbar p,
-      .mainbar p {
+		.body p,
+		.body li {
       	color: #333333;
       	font-size: 13px;
       	text-align: left;
-			padding: 0 20px;
-      }
-		.mainbar p {
+			padding: 0;
 			margin: 12px 0;
+			line-height: 1.4;
 		}
-
-      .mainbar p strong {
-			font-weight: bold;
-			color: #777777;
-      }
-
-		p.Signature {
-			font-size: 12px;
-			padding: 0 20px;
+		
+		.body ul {
 			margin: 0;
-			color: #777777;
+			padding: 0 30px;
 		}
-		.actionbar p {
-      	text-align: left;
-			margin: 10px 0 6px;
-			padding: 0 20px;
+		.body li {
+			font-weight: bold;
+			padding: 0;
+			margin: 0;
 		}
-      .actionbar a {
+
+      .body p strong {
+			font-weight: bold;
+			color: #777;
+      }
+		.body p.signature {
+			font-weight: bold;
+			color: #444;
+      }
+		body p.signature img {
+			padding: 8px 0;
+		}
+
+		.body table {
+			margin: 0 0 40px 0;
+		}
+
+		.action {
+			padding: 16px 0 0;
+			font-family: "Lucida Grande", 'Lucida Sans Unicode', Arial;
+      	text-align: center;
+			height: 90px;
+		}
+      .action a {
+			background: url('button.png') center center no-repeat;
+			display: block;
+      	text-align: center;
 			font-size: 20px;
 			font-weight: bold;
-      	color: #2679b9;
+      	color: #fff;
+			padding: 29px 0;
+			text-shadow: 0 1px 1px #444;
+			text-decoration: none;
       }
-		
+      .action a:hover {
+			text-decoration: underline;
+      }
 
-		.header,
       .footer {
+			background: #333;
 			font-family: "Lucida Grande", 'Lucida Sans Unicode', Arial;
-			color: #d5e5ff;
       	font-size: 11px;
-			padding: 10px 0;
+			padding: 40px 0;
+			margin: 40px 0 0;
       }
-		
-		.header p,
 		.footer p {
+			color: #bbb;
 			padding: 2px 0;
 			margin: 0;
-		}
-
-		.header a,
-      .footer a {
-      	font-family: 'Lucida Grande';
       	font-size: 11px;
-      	color: #fff;
+		}
+      .footer a {
+			font-family: "Lucida Grande", 'Lucida Sans Unicode', Arial;
+      	color: #eee;
       }
    </style>
 
@@ -100,73 +137,66 @@
 <body>
 <table width="100%" cellspacing="0" cellpadding="0">
    <tr>
-      <td align="center">
-         <table width="600" cellspacing="0" cellpadding="0">
+      <td align="center" class="header">
+         <table width="650" cellspacing="0" cellpadding="0">
             <tr>
-               <td align="center" class="header">
-                  <p>Hi, you're receiving this email because you created a forum at VanillaForums.com.</p>
-                  <p>Not interested anymore? <unsubscribe>Unsubscribe</unsubscribe>. Having trouble viewing this email? <webversion>View it in your browser</webversion>.</p>
-               </td>
-            </tr>
-         </table>
-      </td>
-   </tr>
-   <tr>
-      <td align="center">
-         <table width="600" cellspacing="0" cellpadding="0">
-            <tr>
-               <td height="120" align="center" class="header">
-                  <a href="http://vanillaforums.com/newsletters/firstupgrades/"><img src="vanilla_logo.jpg" width="232" height="100" border="0" alt="Vanilla Newsletter" /></a>
-               </td>
-            </tr>
-         </table>
-      </td>
-   </tr>
-   <tr>
-      <td align="center">
-         <table width="600" cellspacing="0" cellpadding="0" class="body">
-            <tr>               
-               <td align="center" valign="top" class="head">
-						<img src="bg_top.jpg" height="22" width="600" />
-					</td>
-				</tr>
-            <tr>               
-               <td align="center" valign="top" class="mainbar" bgcolor="#ebeef6">
-						<a href="http://vanillaforums.com/newsletters/firstupgrades/">
-							<img src="carsonified.png" height="375" width="304" align="right" alt="Upgrades" />
+               <td>
+                  <a href="http://vanillaforums.com/newsletters/firstupgrades/">
+							<img src="logo_header4.png" width="264" height="126" border="0" alt="Vanilla Newsletter" />
+							<p>Newsletter</p>
 						</a>
-						<h1>Premium Features Available Now at VanillaForums.com</h1>
-						<p><strong>Many of you have been asking for feature upgrades for your forums. We are pleased to announce there are now three premium upgrades available: domain hosting, ad-removal, and custom css.</strong></p>
-						<p>These upgrades are just the first of many features that allow you to seamlessly integrate your Vanilla forum with your existing website & brand. We'll be notifying you by email as more upgrades become available.</p>
-						<p class="Signature">See you on the forums!
-						<br />Mark / mark@vanillaforums.com</p>
-					</td>
-				</tr>
-				<tr class="actionbar">
-					<td align="center" bgcolor="#ebeef6">
-                  <p class="Action"><a href="http://vanillaforums.com/newsletter/">Check out these upgrades in your forum's dashboard</a></p>
                </td>
             </tr>
-            <tr>               
-               <td align="center" valign="top" class="foot">
-						<img src="bg_bottom.jpg" height="10" width="600" />
-					</td>
-            </tr>               
          </table>
       </td>
    </tr>
    <tr>
-      <td align="center">
-         <table width="600" cellspacing="0" cellpadding="0">
+      <td align="center" class="body">
+         <table width="650" cellspacing="0" cellpadding="0">
+            <tr>               
+               <td>
+						<a href="http://vanillaforums.com/newsletters/firstupgrades/">
+							<img src="carsonified2.png" height="375" width="304" align="right" alt="Upgrades" />
+						</a>
+						<h1>Premium features available now at Vanilla Forums.</h1>
+						<p><strong>Many of you have been asking for feature upgrades for your forums. We are pleased to announce there are now three premium upgrades available:</strong></p>
+						<ul>
+							<li>Domain Hosting</li>
+							<li>Ad-Removal</li>
+							<li>Custom CSS</li>
+						</ul>
+						<p>These upgrades are just the first of many that allow you to seamlessly integrate your Vanilla forum with your existing website & brand. We'll be notifying you by email as more upgrades become available.</p>
+						<p class="signature">
+							See you on the forums!
+							<br /><img src="signature3.png" border="0" alt="Mark O'Sullivan" />
+							<br />Mark O'Sullivan, CEO
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<td class="action">
+                  <p><a href="http://vanillaforums.com/newsletter/[email]">Check out these upgrades in your forum's dashboard</a></p>
+               </td>
+            </tr>
+         </table>
+      </td>
+   </tr>
+   <tr>
+      <td align="center" class="footer">
+         <table width="650" cellspacing="0" cellpadding="0">
             <tr>
-               <td align="center" class="footer">
+               <td>
 						<p><a href="http://twitter.com/vanilla">Follow us on Twitter</a></p>
+                  <p>
+							You're receiving this email because you created a forum at VanillaForums.com.
+							View it <webversion>in your browser</webversion> and share the link.
+							If you don't want to receive this newsletter anymore, you can <unsubscribe>unsubscribe</unsubscribe>.
+						</p>
                </td>
             </tr>
          </table>
       </td>
    </tr>
 </table>
-
 </body>
 </html>
