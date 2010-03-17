@@ -5,49 +5,82 @@
 </head>
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
 <div id="Frame">
-	<div class="EtsyWrapper">
-		<div class="Tools">
-			<a href="/cart1.php" title="Cart" class="Cart">Cart <span class="Orange">0 items</span></a>
+
+<!-- Header -->
+<div id="header">
+   <!-- Logo -->
+   <h1 id="etsy"><a href="/">Etsy</a></h1>
+   <!-- Begin site nav. -->
+   <div id="meta-group" class="clear">
+      <ul id="meta-nav">
+         <li class="first" id="meta-cart"><a href="/cartcheckout.php" title="Your shopping cart">Cart <em>0</em></a></li>
+         <li class="last"><a href="/favorite_listings.php" title="Your favorites">Favorites</a></li>
+      </ul>
+      <!-- User Navigation -->
+      <ul id="user-nav">
 			<?php
 				$Session = Gdn::Session();
 				$Authenticator = Gdn::Authenticator();
 				if ($Session->IsValid()) {
-					echo '<span class="Username">'.$Session->User->Name.': </span>';
-					echo '<a href="/your_etsy.php">Your Etsy</a> <span>|</span>';
-					echo '<a href="http://help.etsy.com">Help</a> <span>|</span>';
-					echo Anchor('Sign Out', str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()), 'Leave');
-				} else {
-					echo Anchor('Register', $Authenticator->RegisterUrl($this->SelfUrl), 'Register').' <span>|</span>';
-					echo '<a href="http://help.etsy.com">Help</a> <span>|</span>';
-					echo Anchor('Sign In', $Authenticator->SignInUrl($this->SelfUrl), 'SignInPopup');
-				}
 			?>
-		</div>
-		<a href="/" class="Etsy" title="Etsy"><img src="<?php echo Asset('themes/etsy/design/logo.gif'); ?>" alt="Etsy" width="154" height="80" /></a>
-		<div class="EtsyMenu">
-			<a href="/buy.php" title="Buy">Buy</a>
-			<a href="/how_selling_works.php" title="Sell">Sell</a>
-			<a href="/alchemy/" title="Custom">Custom</a>
-			<a href="/community.php" title="Community">Community</a>
-			<a href="/storque/" title="Blog">Blog</a>
-			<a href="/your_etsy.php" title="Your Etsy" class="YourEtsy">Your Etsy</a>
-		</div>
-		<div class="EtsyForm">
-			<form action="/search.php" method="GET" id="search-bar">
-				<select name="search_type" id="search_select" class="select">
-					<option value="forum_title">Forum titles</option>
-					<option value="forum_thread">Forum posts</option>
-					<option value="handmade">Handmade</option>
-					<option value="vintage">Vintage</option>
-					<option value="supplies">Supplies</option>
-					<option value="all">All Items</option>
-					<option value="seller_usernames">Sellers</option>
-				</select>
-				<input type="text" class="text" id="search-query" name="search_query" value=""/>
-				<input type="image" id="search_submit" value="Search" src="<?php echo Asset('/themes/etsy/design/button_search.gif'); ?>" alt="search" class="submit"/>
-				<p class="advanced-search"><a href="/search_advanced.php" title="Advanced Search">Advanced Search</a></p>
-			</form>
-		</div>
+         <li>
+            <span> Hi, <?php echo $Session->User->Name; ?>.</span> <a href="/your_etsy.php" title="Your Etsy">Your Etsy</a>
+         </li>
+         <li><a href="/convo_main.php" title="Your conversations">Conversations <strong >0</strong></a></li>
+         <li><a href="http://help.etsy.com/app/home" title="Help">Help</a></li>
+         <li class="last"><?php echo Anchor('Sign Out', str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()), 'Leave'); ?></li>
+		<?php } else { ?>
+			<li><a href="/your_etsy.php" title="Your Etsy">Your Etsy</a></li>
+			<li><a href="http://help.etsy.com/app/home" title="Help">Help</a></li>
+			<li><a href="/register.php" title="Register">Register</a></li>
+			<li class="last"><a href="http://www.etsy.com/login.php?from_page=http%3A%2F%2Fwww.etsy.com%2F" title="Sign in to your Etsy account">Sign In</a></li>
+		<?php } ?>
+      </ul>
+    </div>
+    <div id="navigation-group" class="clear">
+      <!-- Main Navigation -->
+      <ul id="main-nav">
+         <li class="first"><a href="/buy.php" title="Buy handmade">Buy</a></li>
+         <li><a href="/how_selling_works.php" title="Sell handmade">Sell</a></li>
+         <li><a href="/alchemy/" title="Request">Request</a></li>
+         <li><a href="/community.php" title="Participate in our community">Community</a></li>
+         <li class="last"><a href="/storque/" title="Check out the latest Etsy news at the Storque">Blog</a></li>
+      </ul>
+      <!-- Search -->
+      <form action="/search.php" id="search-bar" >
+         <div class="input-group">
+            <input type="text" value="" name="search_query" id="search-query" class="text"><button id="search_submit" type="submit">
+	            <span>Search</span>
+	         </button>
+         </div>
+			<input type="hidden" value="forum_title" name="search_type" id="search-type" /> 
+			<div id="search-facet">
+				<ul class="closed">
+					<li class="forum_title selected">Forum Titles</li>
+					<li class="forum_thread">Forum Posts</li>
+					<li class="handmade">Handmade</li>
+					<li class="vintage">Vintage</li>
+					<li class="supplies">Supplies</li>
+					<li class="all">All Items</li>
+					<li class="seller_usernames">Sellers</li>
+				</ul>
+			</div>
+			<link rel="stylesheet" type="text/css" href="/assets/css/autosuggest.css?v=30166670" />
+			<script language='javascript' src="/assets/30166670/js/etsy.as.suggestions.etsy.autosuggest.etsy.template.js"></script>
+			<script type="text/javascript">jQuery(function(){ jQuery('#search-query').autosuggest('/suggestions_ajax.php', {"container":"#search-suggestions"} , 'Suggestions');});</script>
+		</form>
+	</div>
+</div>
+<script>
+if (this.jQuery) {
+	 (function($){
+		  $("#search-facet").searchDropDown();
+		  /*@cc_on 
+		  $("#etsy, #main-nav, #search-bar").corner();
+		  @*/
+	 })(jQuery);
+}
+</script>
 		<table class="EtsyInfo">
 			<tr>
 				<td colspan="2" class="Breadcrumb">
@@ -82,7 +115,7 @@
 				</td>
 			</tr>
 		</table>
-	</div>
+	
 	<!--
 	<div id="Head">
 		<div class="Menu">

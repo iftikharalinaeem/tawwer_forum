@@ -11,12 +11,17 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class ThemeHooks implements Gdn_IPlugin {
    public function Setup() {
       // Add some fields to the database
-      // Treat bookmarks as "follows" (they count as "likes")
+
+      // Add Likes to UserDiscussion
+      // -> UserDiscussion->Like enum('1','0') not null default '0';
       
-      // Count "Likes" (bookmarks) on discussions
+      // Count "Likes" on discussions
       // -> Discussion.CountLikes int
+
       // Allow comments to be "Liked"
       // -> Comment.CountLikes int
+      
+      // -> Place who "liked" a comment in it's attributes field.
       
       // Questions are "Unanswered" or "Answered"
       // Ideas are "Suggested", "Planned", "Not Planned" or "Completed"
