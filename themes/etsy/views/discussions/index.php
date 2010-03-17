@@ -2,8 +2,8 @@
 $DiscussionData = $this->DiscussionData;
 $this->DiscussionData = $this->AnnounceData;
 $HasAnnouncements = $this->AnnounceData && $this->AnnounceData->NumRows() > 0;
-if ($HasAnnouncements) {
 ?>
+<?php if ($HasAnnouncements) { ?>
 <h1 id="AnnouncementsHeading"><?php echo Gdn::Translate('Announcements'); ?></h1>
 <ul class="DataList Announcements">
    <?php include($this->FetchViewLocation('discussions')); ?>
@@ -14,8 +14,11 @@ $this->DiscussionData = $DiscussionData;
 if ($this->DiscussionData->NumRows() > 0) {
 ?>
 <h1><?php
-   echo is_object($this->Category) ? $this->Category->Name : 'All Discussions';      
-   echo Anchor('Start a new discussion', '/post/discussion/'.(is_object($this->Category) ? $this->Category->CategoryID : ''));
+if (is_object($this->Category))
+   echo sprintf(Gdn::Translate('Discussions <span>&bull;</span> %s'), $this->Category->Name);
+else
+   echo Gdn::Translate('Discussions');
+
 ?></h1>
 <ul class="DataList Discussions">
    <?php include($this->FetchViewLocation('discussions')); ?>

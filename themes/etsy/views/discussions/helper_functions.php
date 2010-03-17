@@ -6,16 +6,19 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    $CssClass .= $Alt.' ';
    $CssClass .= $Discussion->Announce == '1' ? ' Announcement' : '';
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
+   $CssClass .= ' ' . $Discussion->Category;
    $CountUnreadComments = $Discussion->CountComments - $Discussion->CountCommentWatch;
    $CssClass .= ($CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
    $Sender->EventArguments['Discussion'] = &$Discussion;
+   $First = UserBuilder($Discussion, 'First');
+   $Last = UserBuilder($Discussion, 'Last');
 ?>
 <li class="<?php echo $CssClass; ?>">
-   <ul class="Discussion">
-      <?php
+   <?php
+   echo UserPhoto($First, 'AuthorPhoto');
       if ($Sender->ShowOptions) {
       ?>
-      <li class="Options">
+      <div class="Options">
          <?php
             // Build up the options that the user has for each discussion
             if ($Session->IsValid()) {
@@ -24,14 +27,14 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
                   '<span>*</span>',
                   '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
                   'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-                  array('title' => Gdn::Translate($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
+                  array('title' => Gdn::Translate($Discussion->Bookmarked == '1' ? 'Undo Vote' : 'Vote'))
                );
                
                $Sender->Options = '';
                
                // Dismiss an announcement
-               if ($Discussion->Announce == '1' && $Discussion->Dismissed != '1')
-                  $Sender->Options .= '<li>'.Anchor('Dismiss', 'vanilla/discussion/dismissannouncement/'.$Discussion->DiscussionID.'/'.$Session->TransientKey(), 'DismissAnnouncement') . '</li>';
+               // if ($Discussion->Announce == '1' && $Discussion->Dismissed != '1')
+               //    $Sender->Options .= '<li>'.Anchor('Dismiss', 'vanilla/discussion/dismissannouncement/'.$Discussion->DiscussionID.'/'.$Session->TransientKey(), 'DismissAnnouncement') . '</li>';
                
                // Edit discussion
                if ($Discussion->FirstUserID == $Session->UserID || $Session->CheckPermission('Vanilla.Discussions.Edit', $Discussion->CategoryID))
@@ -69,38 +72,37 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
                }
             }          
          ?>
-      </li>
+      </div>
       <?php
       }
       ?>
-      <li class="Title">
-         <strong><?php
-            echo Anchor(Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
-         ?></strong>
-      </li>
+   <div class="Discussion">
+      <strong><?php
+         echo Anchor(Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
+      ?></strong>
       <?php
          $Sender->FireEvent('AfterDiscussionTitle');
       ?>
-      <li class="Meta">
+      <div class="Meta">
+         <span><b>
          <?php
-            echo '<span>';
-            echo sprintf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
+            echo UserAnchor($First);
+            echo '</b>';
             echo '</span>';
-            if ($CountUnreadComments > 0 && $Session->IsValid())
-               echo '<strong>',sprintf(Gdn::Translate('%s new'), $CountUnreadComments),'</strong>';
-               
             echo '<span>';
-            $Last = new stdClass();
-            $Last->UserID = $Discussion->LastUserID;
-            $Last->Name = $Discussion->LastName;
-            printf(Gdn::Translate('Most recent by %1$s %2$s'), UserAnchor($Last), Format::Date($Discussion->LastDate));
+            if ($CountUnreadComments > 0 && $Session->IsValid())
+               echo '<strong>',sprintf(Plural($CountUnreadComments, '%s new comment', '%s new comments'), $CountUnreadComments),'</strong>';
+            else 
+               printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
+            echo '</span>';
+            echo '<span>';
+            printf(Gdn::Translate($Discussion->CountComments > 0 ? 'Most recent by %1$s %2$s' : 'Posted by %2$s'), UserAnchor($Last), Format::Date($Discussion->LastDate));
             echo '</span>';
 
-            echo Anchor($Discussion->Category, '/categories/'.urlencode($Discussion->Category), 'Category');
             $Sender->FireEvent('DiscussionMeta');
          ?>
-      </li>
-   </ul>
+      </div>
+   </div>
 </li>
 <?php
 }

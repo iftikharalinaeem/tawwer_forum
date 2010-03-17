@@ -55,6 +55,11 @@ class ThemeHooks implements Gdn_IPlugin {
       $Sender->AddSideMenu('garden/settings');
       $Sender->Render();
    }
+
+   public function Gdn_DiscussionModel_AfterDiscussionSummaryQuery_Handler(&$Sender) {
+      $Sender->SQL->Select('iu.Email', '', 'FirstEmail')
+         ->Select('lcu.Email', '', 'LastEmail');
+   }
    
    public function Base_Render_Before(&$Sender) {
       // do nothing
