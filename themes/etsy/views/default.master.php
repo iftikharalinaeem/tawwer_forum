@@ -33,7 +33,7 @@
 			<li><a href="/your_etsy.php" title="Your Etsy">Your Etsy</a></li>
 			<li><a href="http://help.etsy.com/app/home" title="Help">Help</a></li>
 			<li><a href="/register.php" title="Register">Register</a></li>
-			<li class="last"><a href="http://www.etsy.com/login.php?from_page=http%3A%2F%2Fwww.etsy.com%2F" title="Sign in to your Etsy account">Sign In</a></li>
+			<li class="last"><?php echo Anchor('Sign In', $Authenticator->SignInUrl()); ?></li>
 		<?php } ?>
       </ul>
     </div>
