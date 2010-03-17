@@ -26,23 +26,36 @@ Welcome to the Vanilla CSS File! Some things you should know:
 
 /* ======================================================== Panels / Sidebars */
 a.NewDiscussion {
-   padding: 6px 0;
-   display: block;
    text-align: center;
-   font-size: 16px;
+   display: block;
+   cursor: pointer;
+   margin: 0 0 10px;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 15px;
    font-weight: bold;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #44c7f4 /* Banner Background Color */;
-   color: #fff /* Banner Font Color */;
-   text-decoration: none;
-   margin: 0 0 10px 0;
-   text-shadow: 0 1px 0 #30ACD6;
-}
+   padding: 8px 0;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   color: #02475A;
+	text-shadow: 0 1px 0 #fff;
+   border: 1px solid #999;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
+   }
 a.NewDiscussion:hover {
-   background: #11e420 /* Menu Hover Background Color */;
-   color: #fff /* Menu Hover Font Color */;
-   text-shadow: 0 1px 0 #01c400;
+   color: #111;
+   border: 1px solid #666;
+	box-shadow: 0px 0px 5px #aaa;
+	-moz-box-shadow: 0px 0px 5px #aaa;
+	-webkit-box-shadow: 0px 0px 5px #aaa;  
+}
+a.NewDiscussion:focus {
+   background: #eee;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
 }
 #Panel ul.Discussions {
    border: 0;
@@ -55,6 +68,7 @@ ul.PanelDiscussions li a {
 }
 ul.PanelDiscussions li strong {
    display: block;
+   line-height: 1.5;
 }
 
 
@@ -456,6 +470,14 @@ ul.Options li.Active a:hover {
    background: #8d8d8d;
    color: #fff;
 }
+ul.Options li.Parent strong:hover,
+ul.Options li.Active strong:hover,
+ul.Options li.Active strong,
+ul.Options li.Active ul {
+  	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0 0 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;     
+}
 
 
 /* =================================================================== Drafts */
@@ -625,7 +647,7 @@ ul.DataList li.DiscussionRow {
 }
 ul.DataList li.DiscussionRow a.AuthorPhoto {
    float: left;
-   margin: 6px 10px 0 6px;
+   margin: 6px 6px 0;
    width: 40px;
    height: 40px;
    overflow: hidden;
@@ -634,6 +656,9 @@ ul.DataList li.DiscussionRow a.AuthorPhoto img {
    height: 40px;
    width: 40px;
    overflow: hidden;
+}
+ul.DataList .Discussion {
+   margin-left: 56px;
 }
 ul.DataList li div.Meta {
    font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
@@ -645,11 +670,10 @@ ul.DataList li div.Meta span a {
    margin-right: 12px;
 }
 ul.DataList li div.Meta strong {
-   background: #ff6;
+   background: #ffc;
    padding: 1px 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
-   border: 1px solid #ffd;
 	box-shadow: 0px 0px 3px #999;
 	-moz-box-shadow: 0px 0px 3px #999;
 	-webkit-box-shadow: 0px 0px 3px #999;     
@@ -718,10 +742,14 @@ li.New {
    font-size: 100%;
 }
 div.FirstComment {
-   -moz-border-radius: 10px;
+   -moz-border-radius: 8px;
+   -webkit-border-radius: 8px;
    background: #ffc;
    padding: 12px;
    margin: 0 0 18px;
+	box-shadow: 0px 0px 3px #999;
+	-moz-box-shadow: 0px 0px 3px #999;
+	-webkit-box-shadow: 0px 0px 3px #999;
 }
 div.FirstComment a.AuthorPhoto {
    float: left;
@@ -732,6 +760,7 @@ div.FirstComment a.AuthorPhoto {
 div.FirstComment div.Title {
    font-size: 24px;
    font-weight: bold;
+   color: #333;
 }
 div.FirstComment div.Meta {
    font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
@@ -746,14 +775,16 @@ div.FirstComment div.Meta span.Author {
 div.FirstComment div.Meta span {
    margin-right: 12px;
 }
-
 #Discussion,
 body.Discussion #CommentForm,
 .Back {
-   margin-left: 30px;
+   margin: 0 8px;
+}
+body.Discussion div.Popup #CommentForm {
+   margin: 0;
 }
 #CommentForm textarea {
-   width: 624px;
+   width: 640px;
 }
 div.Voter {
    background: #fffff5;
@@ -761,26 +792,18 @@ div.Voter {
    padding: 6px 10px;
    -moz-border-radius: 4px;
    -webkit-border-radius: 4px;
-	box-shadow: 0px 0px 3px #999;
-	-moz-box-shadow: 0px 0px 3px #999;
-	-webkit-box-shadow: 0px 0px 3px #999;
+   border: 1px solid #dfdfd5;
 }
 div.Voter span strong {
    display: block;
    font-weight: bold;
 }
 a.Vote {
-   font-weight: bold;
+   display: block;
    font-size: 15px;
-   background: #ffa;
-   padding: 8px 9px;
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
-   text-shadow: 0 1px 0 #fff;
-   border: 1px solid #ffd;
-	box-shadow: 0px 0px 3px #999;
-	-moz-box-shadow: 0px 0px 3px #999;
-	-webkit-box-shadow: 0px 0px 3px #999;
+   font-weight: bold;
+   color: #02475A;
    float: left;
    margin: 2px 20px 0 0;
+   padding: 8px 10px;
 }

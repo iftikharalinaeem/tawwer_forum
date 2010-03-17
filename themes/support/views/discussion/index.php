@@ -116,7 +116,7 @@ if ($this->Pager->FirstPage()) {
             echo Anchor(
                $Message,
                '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
-               'Vote',
+               'Vote Button',
                array('title' => Gdn::Translate($Message))
             );
 
@@ -145,10 +145,10 @@ if ($this->Pager->FirstPage()) {
                echo 'You will be notified when this problem is solved.';
 
             echo ' '.Anchor(
-               'Stop following this topic.',
+               'Stop following this discussion.',
                '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
                'UnVote',
-               array('title' => Gdn::Translate('Stop following this topic.'))
+               array('title' => Gdn::Translate('Stop following this discussion'))
             );
             echo '</span>';
          }

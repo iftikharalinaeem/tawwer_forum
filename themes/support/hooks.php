@@ -88,7 +88,7 @@ class ThemeHooks implements Gdn_IPlugin {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->RemoveLink('Forum', Gdn::Translate('Categories'));
    }
-
+   
    /**
    * Don't let the users access the category management screens.
    */
