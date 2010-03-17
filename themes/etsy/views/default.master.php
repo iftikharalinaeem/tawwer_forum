@@ -125,6 +125,7 @@ if (this.jQuery) {
 	-->
 	<div id="Body">
 		<div id="Content"><?php $this->RenderAsset('Content'); ?></div>
+		<div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
 	</div>
 	<div id="Foot" class="EtsyWrapper">
 		<table>

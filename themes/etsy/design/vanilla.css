@@ -25,33 +25,37 @@ Welcome to the Vanilla CSS File! Some things you should know:
 
 
 /* ======================================================== Panels / Sidebars */
-#Panel a.Bookmark,
-a.NewDiscussion {
-   padding: 6px 0;
-   display: block;
+.NewDiscussion {
    text-align: center;
-   font-size: 16px;
+   display: block;
+   cursor: pointer;
+   margin: 0 0 10px;
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 13px;
    font-weight: bold;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #44c7f4 /* Banner Background Color */;
-   color: #fff /* Banner Font Color */;
-   text-decoration: none;
-   margin: 0 0 10px 0;
-   text-shadow: 0 1px 0 #30ACD6;
+   padding: 5px 0;
+   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   color: #02475A;
+	text-shadow: 0 1px 0 #fff;
+   border: 1px solid #999;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
+   }
+.NewDiscussion:hover {
+   color: #111;
+   border: 1px solid #666;
+	box-shadow: 0px 0px 5px #aaa;
+	-moz-box-shadow: 0px 0px 5px #aaa;
+	-webkit-box-shadow: 0px 0px 5px #aaa;  
 }
-a.NewDiscussion:hover {
-   background: #11e420 /* Menu Hover Background Color */;
-   color: #fff /* Menu Hover Font Color */;
-   text-shadow: 0 1px 0 #01c400;
-}
-#Panel a.Bookmark {
-   background: #9f0;
-   color: #fff;
-}
-#Panel a.Bookmark:hover {
-   background: #ff6b39;
-   color: #fff;
+.NewDiscussion:focus {
+   background: #eee;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
 }
 #Panel ul.Discussions {
    border: 0;
@@ -64,6 +68,7 @@ ul.PanelDiscussions li a {
 }
 ul.PanelDiscussions li strong {
    display: block;
+   line-height: 1.5;
 }
 
 
@@ -291,6 +296,10 @@ body.Discussion #Content h2 span {
    line-height: 140%;
    font-size: 100%;
 }
+div.Popup .Preview li .Body {
+   -moz-border-radius: 0;
+   -moz-box-shadow: none;
+}
 .Body p {
    font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
    margin: 8px 0;
@@ -386,7 +395,7 @@ a.Bookmark,
 a.Bookmarking {
    float: right;
    display: block;
-   background: url('star_light.png') center center no-repeat;
+   background: url('star_sprite.png') top center no-repeat;
    height: 22px;
    width: 22px;
    margin: 2px 2px 0 4px;
@@ -396,10 +405,10 @@ a.Bookmarking span {
    display: none;
 }
 a.Bookmarked {
-   background: url('star_yellow.png') center center no-repeat;
+   background: url('star_sprite.png') center center no-repeat;
 }
 a.Bookmarking {
-   background: url('star_blue.png') center center no-repeat;
+   background: url('star_sprite.png') bottom center no-repeat;
 }
 ul.Discussion li.Options {
    float: right;
@@ -421,6 +430,7 @@ ul.Options li.Parent strong {
    cursor: pointer;
    line-height: 100%;
 }
+ul.Options li.Parent strong:focus,
 ul.Options li.Parent strong:hover {
    color: #333;
    border: 1px solid #888;
@@ -434,6 +444,9 @@ ul.Options li.Active strong {
    -moz-border-radius-bottomright: 0;
    -webkit-border-bottom-left-radius: 0;
    -webkit-border-bottom-right-radius: 0;
+}
+ul.Options li.Parent strong:focus {
+   background: #eee;
 }
 ul.Options li {
    float: right;
@@ -460,6 +473,14 @@ ul.Options li.Active a {
 ul.Options li.Active a:hover {
    background: #8d8d8d;
    color: #fff;
+}
+ul.Options li.Parent strong:hover,
+ul.Options li.Active strong:hover,
+ul.Options li.Active strong,
+ul.Options li.Active ul {
+  	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0 0 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;     
 }
 
 
@@ -522,7 +543,7 @@ div.Popup #CommentForm h3 {
    color: #000;
 }
 #CommentForm textarea {
-   width: 734px;
+   width: 650px;
    height: 100px;
    min-height: 100px;
    margin: 0 0 6px;
@@ -577,14 +598,14 @@ body.Discussion div.Popup #CommentForm textarea {
 }
 body.Post #CommentForm textarea,
 #DiscussionForm textarea {
-   width: 710px;
+   width: 930px;
    height: 100px;
    min-height: 100px;
    max-height: 400px;
    margin: 0 0 6px;
 }
 #DiscussionForm input.InputBox {
-   width: 710px;
+   width: 930px;
    margin-bottom: 10px;
 }
 #DiscussionForm div.Category {
@@ -609,6 +630,11 @@ a.Cancel {
    font-size: 95%;
    color: #555 /* Body Text Font Color */;
 }
+span.DraftInfo {
+   color: #80828C;
+   padding: 0 0 0 20px;
+}
+
 
 
 /* ================================================= Etsy Customizations */
@@ -619,7 +645,11 @@ body.Discussions h2 {
 	background: #F5F6F1;
 	font-weight: normal;
 	font-size: 130%;
-	padding: 10px;
+	padding: 6px 8px;
+   -moz-border-radius-topleft: 3px;
+   -moz-border-radius-topright: 3px;
+   -webkit-border-top-left-radius: 3px;
+   -webkit-border-top-right-radius: 3px;
 }
 body.Discussions h1 a {
 	float: right;
@@ -649,9 +679,195 @@ body.Post #CommentForm form,
    background: #F5F6F1;
    border: none;
 }
+body.Post #CommentForm form,
+#DiscussionForm form {
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   margin: 0 0 20px;
+}
 div.Popup #CommentForm {
    background: none;
 }
 div.Popup #CommentForm textarea {
    max-height: 380px;
 }
+body.Post #CommentForm textarea,
+#DiscussionForm textarea,
+#DiscussionForm input.InputBox {
+   display: block;
+   width: 710px;
+}
+ul.DataList {
+   margin-bottom: 40px;
+}
+
+/* ============================================= Support Theme Customizations */
+ul.DataList li.DiscussionRow div.Discussion strong a.DiscussionLink {
+   display: block;
+   padding: 6px 0 0;
+   margin: 0;
+   max-width: 380px;
+   font-size: 120%;
+   font-weight: bold;
+}
+ul.DataList li.DiscussionRow {
+   clear: both;
+}
+ul.DataList li.DiscussionRow a.AuthorPhoto {
+   float: left;
+   margin: 6px 6px 0 6px;
+   width: 40px;
+   height: 40px;
+   overflow: hidden;
+}
+ul.DataList li.DiscussionRow a.AuthorPhoto img {
+   height: 40px;
+   width: 40px;
+   overflow: hidden;
+}
+ul.Discussions div.Discussion {
+	margin-left: 55px;
+}
+ul.DataList li div.Meta {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 11px;
+   color: #80828c /* Meta Label Font Color */;
+}
+ul.DataList li div.Meta span,
+ul.DataList li div.Meta span a {
+   margin-right: 12px;
+}
+ul.DataList li div.Meta strong {
+   background: #ffc;
+   padding: 1px 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0 0 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;     
+}
+ul.DataList li div.Meta a {
+   color: #60626C;
+}
+ul.DataList li div.Meta a:hover {
+   text-decoration: underline;
+}
+
+ul.DataList li div.Meta span b a {
+   margin: 0;
+}
+ul.Options li.Parent strong {
+   padding: 5px;
+   background: none;
+   border: 0;
+   color: #555;
+   cursor: pointer;
+   line-height: 100%;
+}
+ul.Options li.Parent strong:hover {
+   padding: 4px;
+   background: url('button_bg2.png') no-repeat center center #f8f8f8;
+   color: #333;
+   border: 1px solid #888;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   text-shadow: 0 1px 0 #fff;
+}
+ul.Options li.Active strong:hover,
+ul.Options li.Active strong {
+   padding: 4px;
+   color: #fff;
+   background: #9c9c9c !important;
+   border: 1px solid #9c9c9c;
+   -moz-border-radius-bottomleft: 0;
+   -moz-border-radius-bottomright: 0;
+   -webkit-border-bottom-left-radius: 0;
+   -webkit-border-bottom-right-radius: 0;
+   text-shadow: none;
+}
+li.New {
+   background: inherit;
+}
+.Preview li ul.Info li.Author img,
+#Discussion li ul.Info li.Author img {
+   height: 50px;
+   width: 50px;
+   border: 0;
+   margin: 0 10px 0 0;
+   float: left;
+   overflow: hidden;
+   background: #eee;
+}
+.Preview li ul.Info li,
+#Discussion li ul.Info li {
+   line-height: 1.5;
+}
+.Preview li .Body,
+#Discussion li .Body {
+   clear: none;
+   padding: 1px 8px 2px 70px;
+   line-height: 140%;
+   font-size: 100%;
+}
+div.FirstComment {
+   -moz-border-radius: 10px;
+   background: #ffc;
+   padding: 12px;
+   margin: 0 0 18px;
+}
+div.FirstComment a.AuthorPhoto {
+   float: left;
+   height: 50px;
+   width: 50px;
+   margin: 0 12px 0 0;
+}
+div.FirstComment div.Title {
+   font-size: 24px;
+   font-weight: bold;
+}
+div.FirstComment div.Meta {
+   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+   font-size: 11px;
+   color: #777;
+   padding: 4px 0 0 8px;
+}
+div.FirstComment div.Meta span.Author {
+   font-size: 130%;
+   font-weight: bold;
+}
+div.FirstComment div.Meta span {
+   margin-right: 12px;
+}
+div.Voter {
+   background: #fffff5;
+   margin: 30px 0 0;
+   padding: 6px 10px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+	box-shadow: 0px 0px 3px #999;
+	-moz-box-shadow: 0px 0px 3px #999;
+	-webkit-box-shadow: 0px 0px 3px #999;
+}
+div.Voter span strong {
+   display: block;
+   font-weight: bold;
+}
+a.Vote {
+   font-weight: bold;
+   font-size: 15px;
+   background: #ffa;
+   padding: 8px 9px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   text-shadow: 0 1px 0 #fff;
+   border: 1px solid #ffd;
+	box-shadow: 0px 0px 3px #999;
+	-moz-box-shadow: 0px 0px 3px #999;
+	-webkit-box-shadow: 0px 0px 3px #999;
+   float: left;
+   margin: 2px 20px 0 0;
+}
+#CommentForm textarea {
+	width:505px;
+}
+

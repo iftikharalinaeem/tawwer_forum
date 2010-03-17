@@ -150,6 +150,11 @@ select {
    border: 1px solid #999;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
    }
 input.Button {
 	font-size: 14px;
@@ -158,6 +163,9 @@ input.Button {
 .Button:hover {
    color: #111;
    border: 1px solid #666;
+}
+.Button:focus {
+   background: #eee;
 }
 .Loading {
    height: 100px;
@@ -662,6 +670,9 @@ div.Box {
    color: #999;
    padding: 6px 10px;
    margin: 0 0 10px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
 }
 div.Box h4 {
    font-size: 110%;
@@ -795,6 +806,20 @@ body.Entry #Content {
    margin: 0 auto;
    width: 360px;
    text-align: center;
+}
+body#garden_entry_handshake #Content {
+	width: 720px;
+}
+body#garden_entry_handshake ul.LinkAccount {
+	float: left;
+	width: 330px;
+	margin-right: 29px;
+	border-right: 1px solid #A5D0E7;
+}
+body#garden_entry_handshake div.Info {
+	border: 1px solid #A5D0E7;
+	background: #D3F0FF;
+	color: #02475A;
 }
 body.Entry #Content div.Box {
    background: #E2F4FF;
@@ -1629,7 +1654,6 @@ div.Legal strong {
 
 /* ====================================================== Etsy Customizations */
 
-/* Widths */
 body {
 	text-align: center;
 }
@@ -1646,8 +1670,7 @@ a:hover {
 }
 #Content {
 	margin: 0;
-	width: auto;
-	float: none;
+	width: 530px;
 }
 #Panel {
 	width: 220px;
@@ -1670,6 +1693,7 @@ div.EtsyWrapper a:hover {
    color: #0192B5;
 }
 #Foot {
+	clear: both;
 	font-size: 11px;
 	padding: 10px 0;
 	margin-top: 60px !important;
@@ -1689,15 +1713,26 @@ div.EtsyWrapper a:hover {
    color: #0192B5;
 	text-decoration: underline;
 }
+div.Popup div.Body {
+	background: #F5F6F1;
+	border: none;
+	box-shadow: 0 0 10px #000;
+	-moz-box-shadow: 0 0 10px #000;
+	-webkit-box-shadow: 0 0 10px #000;  
+}
 div.Popup h1,
 div.Popup h2 {
 	color: #D35701;
-	background: #F5F6F1;
-	border-bottom: 1px solid #DCDDD7;
+	background: none;
+	border: none;
 }
 div.Popup .Footer {
-  background: #F5F6F1;
-  border-top:1px solid #DCDDD7;
+	float: right;
+	position: relative;
+	top: -34px;
+	margin-right: 5px;
+  background: none;
+  border: none;
 }
 .Breadcrumb,
 #header * {
@@ -1708,175 +1743,6 @@ div.Popup .Footer {
 .Breadcrumb {
 	padding: 8px 2px;
 }
-
-/* ============================================= Support Theme Customizations */
-ul.DataList li.DiscussionRow div.Discussion strong a.DiscussionLink {
-   display: block;
-   padding: 6px 0 0;
-   margin: 0;
-   max-width: 598px;
-   font-size: 120%;
-   font-weight: bold;
-}
-ul.DataList li.DiscussionRow {
-   clear: both;
-}
-ul.DataList li.DiscussionRow a.AuthorPhoto {
-   float: left;
-   margin: 6px 10px 0 6px;
-   width: 40px;
-   height: 40px;
-   overflow: hidden;
-}
-ul.DataList li.DiscussionRow a.AuthorPhoto img {
-   height: 40px;
-   width: 40px;
-   overflow: hidden;
-}
-ul.DataList li div.Meta {
-   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
-   font-size: 11px;
-   color: #80828c /* Meta Label Font Color */;
-}
-ul.DataList li div.Meta span,
-ul.DataList li div.Meta span a {
-   margin-right: 12px;
-}
-ul.DataList li div.Meta strong {
-   background: #ff6;
-   padding: 1px 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   border: 1px solid #ffd;
-	box-shadow: 0px 0px 3px #999;
-	-moz-box-shadow: 0px 0px 3px #999;
-	-webkit-box-shadow: 0px 0px 3px #999;     
-}
-ul.DataList li div.Meta a {
-   color: #60626C;
-}
-ul.DataList li div.Meta a:hover {
-   text-decoration: underline;
-}
-
-ul.DataList li div.Meta span b a {
-   margin: 0;
-}
-ul.Options li.Parent strong {
-   padding: 5px;
-   background: none;
-   border: 0;
-   color: #555;
-   cursor: pointer;
-   line-height: 100%;
-}
-ul.Options li.Parent strong:hover {
-   padding: 4px;
-   background: url('button_bg2.png') no-repeat center center #f8f8f8;
-   color: #333;
-   border: 1px solid #888;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   text-shadow: 0 1px 0 #fff;
-}
-ul.Options li.Active strong:hover,
-ul.Options li.Active strong {
-   padding: 4px;
-   color: #fff;
-   background: #9c9c9c !important;
-   border: 1px solid #9c9c9c;
-   -moz-border-radius-bottomleft: 0;
-   -moz-border-radius-bottomright: 0;
-   -webkit-border-bottom-left-radius: 0;
-   -webkit-border-bottom-right-radius: 0;
-   text-shadow: none;
-}
-li.New {
-   background: inherit;
-}
-.Preview li ul.Info li.Author img,
-#Discussion li ul.Info li.Author img {
-   height: 50px;
-   width: 50px;
-   border: 0;
-   margin: 0 10px 0 0;
-   float: left;
-   overflow: hidden;
-   background: #eee;
-}
-.Preview li ul.Info li,
-#Discussion li ul.Info li {
-   line-height: 1.5;
-}
-.Preview li .Body,
-#Discussion li .Body {
-   clear: none;
-   padding: 1px 8px 2px 70px;
-   line-height: 140%;
-   font-size: 100%;
-}
-div.FirstComment {
-   -moz-border-radius: 10px;
-   background: #ffc;
-   padding: 12px;
-   margin: 0 0 18px;
-}
-div.FirstComment a.AuthorPhoto {
-   float: left;
-   height: 50px;
-   width: 50px;
-   margin: 0 12px 0 0;
-}
-div.FirstComment div.Title {
-   font-size: 24px;
-   font-weight: bold;
-}
-div.FirstComment div.Meta {
-   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
-   font-size: 11px;
-   color: #777;
-   padding: 4px 0 0 8px;
-}
-div.FirstComment div.Meta span.Author {
-   font-size: 130%;
-   font-weight: bold;
-}
-div.FirstComment div.Meta span {
-   margin-right: 12px;
-}
-
-div.Voter {
-   background: #fffff5;
-   margin: 30px 0 0;
-   padding: 6px 10px;
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
-	box-shadow: 0px 0px 3px #999;
-	-moz-box-shadow: 0px 0px 3px #999;
-	-webkit-box-shadow: 0px 0px 3px #999;
-}
-div.Voter span strong {
-   display: block;
-   font-weight: bold;
-}
-a.Vote {
-   font-weight: bold;
-   font-size: 15px;
-   background: #ffa;
-   padding: 8px 9px;
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
-   text-shadow: 0 1px 0 #fff;
-   border: 1px solid #ffd;
-	box-shadow: 0px 0px 3px #999;
-	-moz-box-shadow: 0px 0px 3px #999;
-	-webkit-box-shadow: 0px 0px 3px #999;
-   float: left;
-   margin: 2px 20px 0 0;
-}
-
-
-
 
 /* Copied from etsy.com */
 
