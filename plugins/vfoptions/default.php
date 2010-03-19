@@ -628,7 +628,7 @@ pageTracker._trackPageview();
             //Optional statement to include debugging information in the result
             //$cm->debug_level = 1;
             //This is the actual call to the method, passing email address, name.
-            $result = $FirstArg == 'subscribe' ? $cm->subscriberAdd($Email, Gdn::Session()->User->Name) : $cm->subscriberUnsubscribe($Email);
+            $result = $FirstArg == 'subscribe' ? $CM->subscriberAdd($Email, Gdn::Session()->User->Name) : $CM->subscriberUnsubscribe($Email);
             /*
                Fail Quietly: 
                if($result['Result']['Code'] == 0)
