@@ -609,6 +609,7 @@ pageTracker._trackPageview();
       $FirstArg = ArrayValue('0', $Sender->RequestArgs, '');
       $SecondArg = ArrayValue('1', $Sender->RequestArgs, '');
       $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
+      $VFUser = FALSE;
       if (in_array($FirstArg, array('unsubscribe', 'subscribe')) && Gdn::Session()->ValidateTransientKey($SecondArg)) {
          $this->_GetDatabase()->SQL()
             ->Update('User')
@@ -618,25 +619,27 @@ pageTracker._trackPageview();
             
          // Update the record at campaign monitor
          try {
-            require_once(PATH_PLUGINS . DS . 'vfoptions' . DS . 'vendors' . DS . 'campaignmonitor-php-1.4.5' . DS . 'CMBase.php');
-            //Your API Key. Go to http://www.campaignmonitor.com/api/required/ to see where to find this and other required keys
-            $ApiKey = '32d4abc2fcdfa50e8358f221789df6b6';
-            $ClientID = NULL;
-            $CampaignID = NULL;
-            $ListID = 'c0238d79753b05c04383c9dacef81446';
-            $CM = new CampaignMonitor($ApiKey, $ClientID, $CampaignID, $ListID);
-            //Optional statement to include debugging information in the result
-            //$cm->debug_level = 1;
-            //This is the actual call to the method, passing email address, name.
-            $Session = Gdn::Session();
-            $result = $FirstArg == 'subscribe' ? $CM->subscriberAdd($Session->User->Email, $Session->User->Name) : $CM->subscriberUnsubscribe($Session->User->Email);
-            /*
-               Fail Quietly: 
-               if($result['Result']['Code'] == 0)
-                  echo 'Success';
-               else
-                  echo 'Error : ' . $result['Result']['Message'];
-            */
+            $VFUser = $this->_GetDatabase()->SQL()->Select('Name, Email, Newsletter')->From('User')->Where('UserID', $VFUserID)->Get()->FirstRow();
+            if ($VFUser) {
+               require_once(PATH_PLUGINS . DS . 'vfoptions' . DS . 'vendors' . DS . 'campaignmonitor-php-1.4.5' . DS . 'CMBase.php');
+               //Your API Key. Go to http://www.campaignmonitor.com/api/required/ to see where to find this and other required keys
+               $ApiKey = '32d4abc2fcdfa50e8358f221789df6b6';
+               $ClientID = NULL;
+               $CampaignID = NULL;
+               $ListID = 'c0238d79753b05c04383c9dacef81446';
+               $CM = new CampaignMonitor($ApiKey, $ClientID, $CampaignID, $ListID);
+               //Optional statement to include debugging information in the result
+               //$cm->debug_level = 1;
+               //This is the actual call to the method, passing email address, name.
+               $result = $FirstArg == 'subscribe' ? $CM->subscriberAdd($VFUser->Email, $VFUser->Name) : $CM->subscriberUnsubscribe($VFUser->Email);
+               /*
+                  Fail Quietly: 
+                  if($result['Result']['Code'] == 0)
+                     echo 'Success';
+                  else
+                     echo 'Error : ' . $result['Result']['Message'];
+               */
+            }
          } catch (Exception $Ex) {
             // Do nothing with the exception (fail quietly)
          }
@@ -661,7 +664,9 @@ pageTracker._trackPageview();
 		$Sender->SetData('Prices', $Prices);
       
       // See if the admin is subscribed to the newsletter
-      $VFUser = $this->_GetDatabase()->SQL()->Select('Newsletter')->From('User')->Where('UserID', $VFUserID)->Get()->FirstRow();
+      if (!$VFUser)
+         $VFUser = $this->_GetDatabase()->SQL()->Select('Newsletter')->From('User')->Where('UserID', $VFUserID)->Get()->FirstRow();
+         
       $Sender->Newsletter = $VFUser ? $VFUser->Newsletter : '0';
       
       $View = Gdn::Config('Plugins.VFOptions.UpgradeView', 'upgrades.php');
