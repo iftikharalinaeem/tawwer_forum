@@ -19,7 +19,21 @@ function __FormatPrice($PerMonth) {
 ?>
 <h1>Premium & Enterprise Upgrades</h1>
 
-<div class="Info">In addition to all of the free features at VanillaForums.com, we offer these premium & enterprise upgrades for enhanced functionality.</div>
+<div class="Info">
+	In addition to all of the free features at VanillaForums.com, we offer these premium & enterprise upgrades for enhanced functionality.
+	<div class="NewsletterBox">
+	<?php
+	$Session = Gdn::Session();
+	if ($this->Newsletter == '1') {
+			echo 'You will be notified by email as new features & upgrades become available. '
+			.Anchor('Unsubscribe', '/plugin/upgrades/unsubscribe/'.$Session->TransientKey())
+			.'.';
+	} else {
+		echo Anchor('Notify me as new features & upgrades become available', '/plugin/upgrades/subscribe/'.$Session->TransientKey(), 'Button');
+	}
+	?>
+	</div>
+</div>
 
 <div class="Upgrades">
    

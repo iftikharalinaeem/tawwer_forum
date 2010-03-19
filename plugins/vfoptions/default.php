@@ -176,7 +176,7 @@ pageTracker._trackPageview();
          $this->_CloseDatabase();
       }
    }
-
+   
    /**
     * Creates a "Buy Now" url that sends the user directly to checkout for an upgrade.
     */
@@ -606,6 +606,42 @@ pageTracker._trackPageview();
     * purchase upgrade offerings.
     */
    public function PluginController_Upgrades_Create(&$Sender, $EventArguments) {
+      $FirstArg = ArrayValue('0', $Sender->RequestArgs, '');
+      $SecondArg = ArrayValue('1', $Sender->RequestArgs, '');
+      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
+      if (in_array($FirstArg, array('unsubscribe', 'subscribe')) && Gdn::Session()->ValidateTransientKey($SecondArg)) {
+         $this->_GetDatabase()->SQL()
+            ->Update('User')
+            ->Set('Newsletter', $FirstArg == 'subscribe' ? '1' : '0')
+            ->Where('UserID', $VFUserID)
+            ->Put();
+            
+         // Update the record at campaign monitor
+         try {
+            require_once(PATH_PLUGINS . DS . 'vfoptions' . DS . 'vendors' . DS . 'campaignmonitor-php-1.4.5' . DS . 'CMBase.php');
+            //Your API Key. Go to http://www.campaignmonitor.com/api/required/ to see where to find this and other required keys
+            $ApiKey = '32d4abc2fcdfa50e8358f221789df6b6';
+            $ClientID = NULL;
+            $CampaignID = NULL;
+            $ListID = 'c0238d79753b05c04383c9dacef81446';
+            $CM = new CampaignMonitor($ApiKey, $ClientID, $CampaignID, $ListID);
+            //Optional statement to include debugging information in the result
+            //$cm->debug_level = 1;
+            //This is the actual call to the method, passing email address, name.
+            $result = $FirstArg == 'subscribe' ? $cm->subscriberAdd($Email, Gdn::Session()->User->Name) : $cm->subscriberUnsubscribe($Email);
+            /*
+               Fail Quietly: 
+               if($result['Result']['Code'] == 0)
+                  echo 'Success';
+               else
+                  echo 'Error : ' . $result['Result']['Message'];
+            */
+         } catch (Exception $Ex) {
+            // Do nothing with the exception (fail quietly)
+         }
+            
+         Redirect('plugin/upgrades');
+      }
       $this->_ReAuthenticate($Sender, 'garden/plugin/upgrades');
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades');
@@ -622,6 +658,10 @@ pageTracker._trackPageview();
 		$Prices = $this->_GetDatabase()->SQL()->Select('Code, Price')->From('Feature')->Get()->ResultArray();
 		$Prices = ConsolidateArrayValuesByKey($Prices, 'Code', 'Price');
 		$Sender->SetData('Prices', $Prices);
+      
+      // See if the admin is subscribed to the newsletter
+      $VFUser = $this->_GetDatabase()->SQL()->Select('Newsletter')->From('User')->Where('UserID', $VFUserID)->Get()->FirstRow();
+      $Sender->Newsletter = $VFUser ? $VFUser->Newsletter : '0';
       
       $View = Gdn::Config('Plugins.VFOptions.UpgradeView', 'upgrades.php');
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . $View);

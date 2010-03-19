@@ -103,3 +103,12 @@ table.SelectionGrid td:hover,
 table.SelectionGrid td:hover table.PriceOptions td {
    background: #f2fbff;
 }
+.NewsletterBox {
+   padding: 14px 0 6px;
+}
+.NewsletterBox a.Button {
+   font-size: 14px;
+   font-weight: bold;
+   color: #333;
+   padding: 6px 10px;
+}
