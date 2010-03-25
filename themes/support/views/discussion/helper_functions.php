@@ -80,6 +80,21 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
    </ul>
    <div class="Body"><?php echo Format::To($Comment->Body, $Comment->Format); ?></div>
    <?php
+      $LinkText = '';
+      if ($Sender->Discussion->Category == 'Question')
+         $LinkText = '✔ This answers the question';
+      elseif ($Sender->Discussion->Category == 'Idea')
+         $LinkText = '✔ I agree with this comment';
+      elseif ($Sender->Discussion->Category == 'Problem')
+         $LinkText = '✔ This fixes the problem';
+      
+      if ($LinkText != '') {
+   ?>
+   <div class="Voter">
+      <?php echo Anchor($LinkText, '#', 'Button Vote'); ?>
+   </div>
+   <?php
+      }
       $Sender->FireEvent('AfterCommentBody');
    ?>
 </li>

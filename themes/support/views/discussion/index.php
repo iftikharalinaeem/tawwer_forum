@@ -98,16 +98,16 @@ if ($this->Pager->FirstPage()) {
       $Message = '';
       switch ($this->Discussion->Category) {
          case 'Question':
-            $Message = 'I have this question, too!';
+            $Message = '✔ I have this question, too!';
             break;
          case 'Idea':
-            $Message = 'I have this problem, too!';
+            $Message = '✔ I have this problem, too!';
             break;
          case 'Problem':
-            $Message = 'I like this idea!';
+            $Message = '✔ I like this idea!';
             break;
          case 'Kudos':
-            $Message = 'I agree!';
+            $Message = '✔ I agree!';
             break;
       }
       if ($Message != '') {
@@ -138,11 +138,11 @@ if ($this->Pager->FirstPage()) {
          } else {
             echo '<span>';
             if ($this->Discussion->Category == 'Question')
-               echo 'You will be notified when this question gets answered.';
+               echo 'You will be notified when there is activity on this question.';
             elseif ($this->Discussion->Category == 'Idea')
-               echo 'You will be notified when this question gets attention.';
+               echo 'You will be notified when there is activity on this idea.';
             elseif ($this->Discussion->Category == 'Problem')
-               echo 'You will be notified when this problem is solved.';
+               echo 'You will be notified when there is activity on this problem.';
 
             echo ' '.Anchor(
                'Stop following this discussion.',
@@ -153,11 +153,54 @@ if ($this->Pager->FirstPage()) {
             echo '</span>';
          }
          echo '</div>';
+         // If the user has permission, let them change the state of the discussion
+         if (
+            $this->Discussion->State != ''
+            || (in_array($this->Discussion->Category, array('Question', 'Idea', 'Problem'))
+               && $Session->CheckPermission('Vanilla.Discussions.Edit', $this->Discussion->CategoryID))
+            ) {
+            echo '<div class="State">
+               <strong>';
+               if ($this->Discussion->State != '') {
+                  printf(Gdn::Translate('The company has marked this discussion as %s.'), strtolower($this->Discussion->State));
+               } else {
+                  if ($this->Discussion->Category == 'Question')
+                     $this->Discussion->State = 'unanswered';
+                  elseif ($this->Discussion->Category == 'Idea')
+                     $this->Discussion->State = 'suggested';
+                  else
+                     $this->Discussion->State = 'unsolved';
+                  
+                  printf(Gdn::Translate('This %1$s is %2$s.'), strtolower($this->Discussion->Category), strtolower($this->Discussion->State));
+               }
+               echo '</strong>';
+
+               // Questions are "Unanswered" or "Answered"
+               // Ideas are "Suggested", "Planned", "Not Planned" or "Completed"
+               // Problems are "Unsolved" or "Solved"
+               echo 'Mark this discussion as ';
+               $Options = array();
+               if ($this->Discussion->Category == 'Question') {
+                  $Options = array('answered', 'unanswered');
+               } else if ($this->Discussion->Category == 'Idea') {
+                  $Options = array('suggested', 'planned', 'not planned', 'completed');
+               } else {
+                  $Options = array('solved', 'unsolved');
+               }
+               if (InArrayI($this->Discussion->State, $Options)) {
+                  unset($Options[array_search(strtolower($this->Discussion->State), $Options)]);
+               }
+               $i = 0;
+               foreach ($Options as $Option) {
+                  if ($i > 0)
+                     echo ', ';
+                  echo Anchor($Option, '#');
+                  $i++;
+               }
+            echo '.</div>';
+         }
       }
    }
-
-   
-   
    ?>
 </div>
 <?php

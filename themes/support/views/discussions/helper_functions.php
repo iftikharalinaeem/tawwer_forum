@@ -39,11 +39,19 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             // Build up the options that the user has for each discussion
             if ($Session->IsValid()) {
                // Bookmark link
+               $Score = 0;
+               if (is_numeric($Discussion->Score) && $Discussion->Score > 0)
+                  $Score = $Discussion->Score;
+                  
+               $Title = Gdn::Translate($Discussion->Bookmarked == '1' ? 'Undo Vote' : 'Vote');
                echo Anchor(
-                  '<span>*</span>',
+                  '<span class="Star">'
+                     .Img('themes/support/design/pixel.png', array('alt' => $Title))
+                  .'</span>'
+                  .'<span class="Votes">'.$Score.'</span>',
                   '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
                   'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-                  array('title' => Gdn::Translate($Discussion->Bookmarked == '1' ? 'Undo Vote' : 'Vote'))
+                  array('title' => $Title)
                );
                
                $Sender->Options = '';
@@ -134,7 +142,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             
             if ($Discussion->State != '')
                echo '<span class="State">'.$Discussion->State.'</span>';
-
+               
             $Sender->FireEvent('DiscussionMeta');
          ?>
       </div>

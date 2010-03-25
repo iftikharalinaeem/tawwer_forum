@@ -38,19 +38,19 @@ class ThemeHooks implements Gdn_IPlugin {
       
       // Add new categories and remove old ones (unless they are already appropriately named).
       if ($SQL->Select('CategoryID')->From('Category')->Where('Name', 'Question')->Get()->NumRows() == 0)
-         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Question', 'Description' => 'Ask a question', 'Sort' => '1'));
+         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Question', 'UrlCode' => 'questions', 'Description' => 'Ask a question', 'Sort' => '1'));
       
       if ($SQL->Select('CategoryID')->From('Category')->Where('Name', 'Idea')->Get()->NumRows() == 0)
-         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Idea', 'Description' => 'Share an idea', 'Sort' => '1'));
+         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Idea', 'UrlCode' => 'ideas', 'Description' => 'Share an idea', 'Sort' => '1'));
 
       if ($SQL->Select('CategoryID')->From('Category')->Where('Name', 'Problem')->Get()->NumRows() == 0)
-         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Problem', 'Description' => 'Report a problem', 'Sort' => '1'));
+         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Problem', 'UrlCode' => 'problems', 'Description' => 'Report a problem', 'Sort' => '1'));
 
       if ($SQL->Select('CategoryID')->From('Category')->Where('Name', 'Kudos')->Get()->NumRows() == 0)
-         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Kudos', 'Description' => 'Give some kudos', 'Sort' => '1'));
+         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Kudos', 'UrlCode' => 'kudos', 'Description' => 'Give some kudos', 'Sort' => '1'));
       
       if ($SQL->Select('CategoryID')->From('Category')->Where('Name', 'Announcement')->Get()->NumRows() == 0)
-         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Announcement', 'Description' => 'Administrative announcements', 'Sort' => '1'));
+         $SQL->Insert('Category', array('InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Format::ToDateTime(), 'DateUpdated' => Format::ToDateTime(), 'Name' => 'Announcement', 'UrlCode' => 'announcements', 'Description' => 'Administrative announcements', 'Sort' => '1'));
          
       // Delete old categories
       $SQL->WhereNotIn('Name', array('Question', 'Idea', 'Problem', 'Kudos', 'Announcement'))->Delete('Category');
@@ -68,7 +68,7 @@ class ThemeHooks implements Gdn_IPlugin {
          ->Select('iu.Email', '', 'FirstEmail')
          ->Select('lcu.Email', '', 'LastEmail');
    }
-   
+
    /**
     * When a discussion is bookmarked or unbookmarked, increase or decrease it's score.
     */
