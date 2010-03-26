@@ -613,7 +613,8 @@ span.DraftInfo {
 /* ==================================================== VF.org Customizations */
 body.Drafts #Content h1,
 body.Discussion #Content h2,
-body.Discussions #Content h1 {
+body.Discussions #Content h1,
+body.Categories #Content h1 {
    -moz-border-radius-topleft: 3px;
    -moz-border-radius-topright: 3px;
 	background: url('grey_fade.png') top left repeat-x #ECF0F9;
@@ -621,6 +622,9 @@ body.Discussions #Content h1 {
    padding:4px 8px;
    text-shadow: 0 1px 0 #fff;
 }
+.More {
+   background: none;
+   }
 ul.DataList {
    border: 1px solid #9CA7B8;
    border-top: 0;
