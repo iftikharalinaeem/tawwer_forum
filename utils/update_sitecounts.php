@@ -25,11 +25,11 @@ while ($Row = mysql_fetch_assoc($Data)) {
 		  $CountComments = $CommentData['CountComments'];
 		  
 		  // Save them to the Site table
-		  @mysql_query('update GDN_Site set CountUsers = '.$CountUsers
+		  mysql_query('update GDN_Site set CountUsers = '.$CountUsers
 				.', CountCategories = '.$CountCategories
 				.', CountDiscussions = '.$CountDiscussions
 				.', CountComments = '.$CountComments
-				.' where DatabaseName = `'.$Row['Database'].'`'
+				." where DatabaseName = '".$Row['Database']."' "
 				, $VFCnn
 		  );
 
