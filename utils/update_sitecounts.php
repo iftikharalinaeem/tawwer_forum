@@ -33,7 +33,10 @@ while ($Row = mysql_fetch_assoc($Data)) {
 				, $VFCnn
 		  );
 
-		  echo '['.$Row['Database'].'] Users: '.$UserCount.'; Categories: '.$CategoryCount.'; Discussions: '.$DiscussionCount.'; Comments: '.$CommentCount.";\n";
+		  echo '['.$Row['Database'].'] Users: '.$CountUsers
+				.'; Categories: '.$CountCategories
+				.'; Discussions: '.$CountDiscussions
+				.'; Comments: '.$CountComments.";\n";
 	 }
 }
 mysql_close($Cnn);
