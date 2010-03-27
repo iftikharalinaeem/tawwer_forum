@@ -25,18 +25,14 @@ while ($Row = mysql_fetch_assoc($Data)) {
 		  $CountComments = $CommentData['CountComments'];
 		  
 		  // Save them to the Site table
-		  mysql_query('update GDN_Site set CountUsers = '.$CountUsers
+		  $Query = 'update GDN_Site set CountUsers = '.$CountUsers
 				.', CountCategories = '.$CountCategories
 				.', CountDiscussions = '.$CountDiscussions
 				.', CountComments = '.$CountComments
-				." where DatabaseName = '".$Row['Database']."' "
-				, $VFCnn
-		  );
-
-		  echo '['.$Row['Database'].'] Users: '.$CountUsers
-				.'; Categories: '.$CountCategories
-				.'; Discussions: '.$CountDiscussions
-				.'; Comments: '.$CountComments.";\n";
+				." where DatabaseName = '".$Row['Database']."'";
+		  mysql_query($Query, $VFCnn);
+		  
+		  echo $Query."\n";
 	 }
 }
 mysql_close($Cnn);
