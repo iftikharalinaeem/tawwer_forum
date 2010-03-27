@@ -3,9 +3,6 @@
  Used for updating every database during the update of 2010-02-23
 */
 
-$VFCnn = mysql_connect('vfdb1', 'root', 'Va2aWu5A');
-mysql_select_db('vanillaforumscom', $VFCnn);
-
 $Cnn = mysql_connect('vfdb1', 'root', 'Va2aWu5A');
 $Data = mysql_query('show databases', $Cnn);
 while ($Row = mysql_fetch_assoc($Data)) {
@@ -30,10 +27,10 @@ while ($Row = mysql_fetch_assoc($Data)) {
 				.', CountDiscussions = '.$CountDiscussions
 				.', CountComments = '.$CountComments
 				." where DatabaseName = '".$Row['Database']."'";
-		  mysql_query($Query, $VFCnn);
 		  
+		  mysql_select_db('vanillaforumscom', $Cnn);
+		  mysql_query($Query, $Cnn);
 		  echo $Query."\n";
 	 }
 }
 mysql_close($Cnn);
-mysql_close($VFCnn);
