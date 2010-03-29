@@ -1,0 +1,55 @@
+body {
+	background: url('shine.jpg') top center no-repeat #2a529a;
+	text-align: center;
+}
+#Frame {
+	width: 700px;
+	margin: 0 auto;
+	text-align: left;
+}
+#Head h1 a {
+	margin: 10px 0 0;
+   display: block;
+   height: 100px;
+   width: 236px;
+   background: url('vanilla_logo.png') center center no-repeat;
+}
+#Head h1 a span {
+   display: none;
+}
+#Content {
+	font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+}
+#Content h1 {
+	font-family: arial;
+	font-size: 34px;
+	color: #ffd;
+	text-shadow: 0 0 6px #333;
+}
+#Content h1 em {
+	font-style: normal;
+	color: #ff8000;
+}
+#Content h2 {
+	font-size: 25px;
+	color: #eee;
+	text-shadow: 0 0 6px #111;
+}
+#Content h3 {
+	font-size: 16px;
+	color: #eee;
+	text-shadow: 0 0 6px #111;
+}
+#Content a {
+	display: block;
+	width: 300px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	background: #f5feff;
+	text-decoration: none;
+	padding: 8px;
+	float: left;
+}
+#Content a.Host {
+	float: right;
+}
