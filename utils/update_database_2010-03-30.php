@@ -1,0 +1,36 @@
+<?php
+/*
+ Used for updating every database during the update of 2010-03-30
+*/
+
+function CleanForUrl($Mixed) {
+	 $Mixed = utf8_decode($Mixed);
+	 $Mixed = preg_replace('/-+/', '-', str_replace(' ', '-', trim(preg_replace('/([^\w\d_:.])/', ' ', $Mixed))));
+	 $Mixed = utf8_encode($Mixed);
+	 return strtolower($Mixed);	 
+}
+
+$Cnn = mysql_connect('vfdb1', 'root', 'Va2aWu5A');
+$Data = mysql_query('show databases', $Cnn);
+while ($Row = mysql_fetch_assoc($Data)) {
+	 if (substr($Row['Database'], 0, 3) == 'vf_') {
+		  echo $Row['Database']."\n";
+		  mysql_select_db($Row['Database'], $Cnn);
+	 
+		  // Add UrlCode
+		  mysql_query('alter table `GDN_Category` add `UrlCode` varchar(30)', $Cnn);
+		  
+		  // Populate UrlCode with properly formatted strings
+		  $Data = mysql_query('select CategoryID, Name from GDN_Category', $Cnn);
+		  while ($Row = mysql_fetch_assoc($Data)) {
+				mysql_query("update GDN_Category set UrlCode = '".CleanForUrl($Row['Name'])."' where CategoryID = ".$Row['CategoryID'], $Cnn);
+		  }
+		  
+		  // Add BookmarkComment activity type
+		  $Data = mysql_query("select ActivityTypeID from GDN_ActivityType where Name = 'BookmarkComment'", $Cnn);
+		  if (mysql_num_rows($Data) == 0) {
+				mysql_query("insert into GDN_ActivityType (AllowComments, Name, FullHeadline, ProfileHeadline, RouteCode, Notify, Public) values ('0', 'BookmarkComment', '%1\$s commented on your %8\$s.', '%1\$s commented on your %8\$s.', 'bookmarked discussion', '1', '0')", $Cnn);
+		  }
+	 }
+}
+mysql_close($Cnn);
