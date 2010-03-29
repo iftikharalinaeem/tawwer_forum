@@ -22,8 +22,8 @@ while ($Row = mysql_fetch_assoc($Data)) {
 		  
 		  // Populate UrlCode with properly formatted strings
 		  $Data = mysql_query('select CategoryID, Name from GDN_Category', $Cnn);
-		  while ($Row = mysql_fetch_assoc($Data)) {
-				mysql_query("update GDN_Category set UrlCode = '".CleanForUrl($Row['Name'])."' where CategoryID = ".$Row['CategoryID'], $Cnn);
+		  while ($Category = mysql_fetch_assoc($Data)) {
+				mysql_query("update GDN_Category set UrlCode = '".CleanForUrl($Category['Name'])."' where CategoryID = ".$Category['CategoryID'], $Cnn);
 		  }
 		  
 		  // Add BookmarkComment activity type
