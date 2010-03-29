@@ -21,14 +21,14 @@ while ($Row = mysql_fetch_assoc($Data)) {
 		  mysql_query('alter table `GDN_Category` add `UrlCode` varchar(30)', $Cnn);
 		  
 		  // Populate UrlCode with properly formatted strings
-		  $Data = mysql_query('select CategoryID, Name from GDN_Category', $Cnn);
-		  while ($Category = mysql_fetch_assoc($Data)) {
+		  $CatData = mysql_query('select CategoryID, Name from GDN_Category', $Cnn);
+		  while ($Category = mysql_fetch_assoc($CatData)) {
 				mysql_query("update GDN_Category set UrlCode = '".CleanForUrl($Category['Name'])."' where CategoryID = ".$Category['CategoryID'], $Cnn);
 		  }
 		  
 		  // Add BookmarkComment activity type
-		  $Data = mysql_query("select ActivityTypeID from GDN_ActivityType where Name = 'BookmarkComment'", $Cnn);
-		  if (mysql_num_rows($Data) == 0) {
+		  $BData = mysql_query("select ActivityTypeID from GDN_ActivityType where Name = 'BookmarkComment'", $Cnn);
+		  if (mysql_num_rows($BData) == 0) {
 				mysql_query("insert into GDN_ActivityType (AllowComments, Name, FullHeadline, ProfileHeadline, RouteCode, Notify, Public) values ('0', 'BookmarkComment', '%1\$s commented on your %8\$s.', '%1\$s commented on your %8\$s.', 'bookmarked discussion', '1', '0')", $Cnn);
 		  }
 	 }
