@@ -13,6 +13,7 @@ body {
    height: 100px;
    width: 236px;
    background: url('vanilla_logo.png') center center no-repeat;
+	float: left;
 }
 #Head h1 a span {
    display: none;
@@ -22,11 +23,11 @@ body {
 }
 #Content h1 {
 	font-family: arial;
-	font-size: 34px;
-	color: #ffd;
-	text-shadow: 0 0 6px #333;
+	font-size: 28px;
+	color: #fff;
+	text-shadow: 0 2px 4px #333;
 	margin: 0;
-	padding: 0;
+	padding: 72px 0 0 250px;
 }
 #Content h1 em {
 	font-style: normal;
@@ -34,14 +35,14 @@ body {
 }
 #Content h2 {
 	font-size: 25px;
-	color: #eee;
+	color: #ffd;
 	text-shadow: 0 0 6px #111;
 	margin: 40px 0 20px;
 	padding: 0;
 }
 #Content h3 {
 	font-size: 16px;
-	color: #eee;
+	color: #eec;
 	text-shadow: 0 0 6px #111;
 	margin: 0 0 50px;
 	padding: 0;
