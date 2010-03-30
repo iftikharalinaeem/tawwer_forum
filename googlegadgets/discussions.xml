@@ -36,13 +36,13 @@
     var html = "";
 
     // Display the feed title and description
-    html += "<div><b>" + feed.Title + "</b></div>";
-    html += "<div>" + feed.Description + "</div><br>";
+    html += "<div class="discussions">"
+    html += "<strong>" + feed.Title + "</strong>";
       
     // Access the data for a given entry
     if (feed.Entry) {
       for (var i = 0; i < feed.Entry.length; i++) {
-        html += "<div>"
+        html += "<div class="discussion">"
           + "<a target='_blank' href='" + feed.Entry[i].Link + "'>"
           + feed.Entry[i].Title
           + "</a> ";
@@ -54,16 +54,17 @@
           // multiply by 1000.
           var milliseconds = (feed.Entry[i].Date) * 1000; 
           var date = new Date(milliseconds); 
-          html += date.toLocaleDateString();
+          html += '<em>' + date.toLocaleDateString();
           html += " ";
-          html += date.toLocaleTimeString(); 
+          html += date.toLocaleTimeString() + "</em>"; 
         }
         if (summaries==true) { 
-          html += "<br><i>" + feed.Entry[i].Summary + "</i>";
+          html += "<div class="summary">" + feed.Entry[i].Summary + "</div>";
         }
         html += "</div>";
       }
-    }        
+    }
+    html += '</div>';
     document.getElementById('content_div').innerHTML = html;
   };
   gadgets.util.registerOnLoadHandler(getFeed);
