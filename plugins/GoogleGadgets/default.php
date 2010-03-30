@@ -21,3 +21,12 @@ class GoogleGadgetsPlugin implements Gdn_IPlugin {
       // No setup required.
    }   
 }
+
+if (!function_exists('UserAnchor')) {
+   function UserAnchor($User, $CssClass = '') {
+      if ($CssClass != '')
+         $CssClass = ' class="'.$CssClass.'"';
+
+      return '<a href="'.Url('/profile/'.$User->UserID.'/'.urlencode($User->Name), TRUE).'"'.$CssClass.'>'.$User->Name.'</a>';
+   }
+}

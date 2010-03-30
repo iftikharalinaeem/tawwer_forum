@@ -14,7 +14,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    <div class="Discussion">
       <div class="Title">
          <strong><?php
-            echo Anchor(Format::Text($Discussion->Name), Gdn_Url::Request(TRUE).'/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
+            echo Anchor(Format::Text($Discussion->Name), Gdn_Url::WebRoot(TRUE).'/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
          ?></strong>
       </div>
       <?php
@@ -35,7 +35,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
             printf(Gdn::Translate('Most recent by %1$s %2$s'), UserAnchor($Last), Format::Date($Discussion->LastDate));
             echo '</span>';
 
-            echo Anchor($Discussion->Category, '/categories/'.$Discussion->CategoryUrlCode, 'Category');
+            echo Anchor($Discussion->Category, Gdn_Url::WebRoot(TRUE).'/categories/'.$Discussion->CategoryUrlCode, 'Category');
             $Sender->FireEvent('DiscussionMeta');
          ?>
       </div>
