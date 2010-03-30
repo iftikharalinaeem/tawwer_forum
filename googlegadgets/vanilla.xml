@@ -4,13 +4,10 @@
     title_url="http://vanillaforums.org/discussions" 
     scrolling="true"
     author="Mark O'Sullivan" 
-    author_email="mark@vanillaforums.com">
-  </ModulePrefs>
-  <ModulePrefs title="Dynamic Height" 
-    height="500"> 
+    author_email="mark@vanillaforums.com"
+    height="500">
     <Require feature="dynamic-height"/>
   </ModulePrefs>
-  
   <Content type="html">
   <![CDATA[
   <div id="content_div"></div>
