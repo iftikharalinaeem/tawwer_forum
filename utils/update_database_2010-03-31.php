@@ -1,6 +1,6 @@
 <?php
 /*
- Used for updating every database during the update of 2010-03-30
+ Used for updating every database during the update of 2010-03-31
 */
 
 $Cnn = mysql_connect('vfdb1', 'root', 'Va2aWu5A');
