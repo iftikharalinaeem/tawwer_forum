@@ -16,7 +16,7 @@
   function getDiscussions() {
    var params = {};
    params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.GET;
-   gadgets.io.makeRequest('http://vanillaforums.org/discussions/?DeliveryType=VIEW', response, params); 
+   gadgets.io.makeRequest('http://vanillaforums.org/discussions/?DeliveryType=VIEW&Gadget=1', response, params); 
   };
 
   function response(obj) { 
