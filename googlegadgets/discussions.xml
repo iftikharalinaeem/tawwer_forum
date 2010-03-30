@@ -11,7 +11,7 @@
   <UserPref name="show_summ" display_name="Show Summaries?" datatype="bool" default_value="false"/>
   <Content type="html">
   <![CDATA[
-  <style> #content_div { font-size: 80%;  margin: 5px; background-color: #FFFFBF;} </style>
+  <style> #content_div { font-size: 12px; color: #555; } div.discussion { padding: 0 2px; border-bottom: 1px solid #7AA5D6; margin: 0 2px; } </style>
   <div id="content_div"></div>
   <script type="text/javascript">
 
@@ -35,10 +35,6 @@
     var feed = obj.data;
     var html = '';
 
-    // Display the feed title and description
-    html += '<div class="discussions">'
-    html += '<strong>' + feed.Title + '</strong>';
-      
     // Access the data for a given entry
     if (feed.Entry) {
       for (var i = 0; i < feed.Entry.length; i++) {
@@ -68,7 +64,6 @@
         html += '</div>';
       }
     }
-    html += '</div>';
     document.getElementById('content_div').innerHTML = html;
   };
   gadgets.util.registerOnLoadHandler(getFeed);
