@@ -7,7 +7,7 @@
     author_email="mark@vanillaforums.com">
   </ModulePrefs>
   <UserPref name="show_date" display_name="Show Dates?" datatype="bool" default_value="false"/>
-  <UserPref name="num_entries" display_name="Number of Entries:" datatype="int" default_value="5"/>
+  <UserPref name="num_entries" display_name="Number of Entries:" datatype="string" default_value="5"/>
   <UserPref name="show_summ" display_name="Show Summaries?" datatype="bool" default_value="false"/>
   <Content type="html">
   <![CDATA[
