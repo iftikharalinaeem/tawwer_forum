@@ -15,5 +15,9 @@ class GoogleGadgetsPlugin implements Gdn_IPlugin {
    public function DiscussionsController_Render_Before(&$Sender) {
       if (GetIncomingValue('Gadget') !== FALSE)
          $Sender->View = PATH_PLUGINS . DS . 'GoogleGadgets' . DS . 'views' . DS . strtolower($Sender->RequestMethod) . '.php';
+   }
+   
+   public function Setup() {
+      // No setup required.
    }   
 }
