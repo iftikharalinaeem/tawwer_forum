@@ -1,25 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
-$DiscussionData = $this->DiscussionData;
-$this->DiscussionData = $this->AnnounceData;
-$HasAnnouncements = $this->AnnounceData && $this->AnnounceData->NumRows() > 0;
-if ($HasAnnouncements) {
-?>
-<h1 id="AnnouncementsHeading"><?php echo Gdn::Translate('Announcements'); ?></h1>
-<div class="DataList Announcements">
-   <?php include(PATH_PLUGINS . DS . 'GoogleGadgets' . DS . 'views' . DS . 'discussions.php'); ?>
-</div>
-<?php
-}
-$this->DiscussionData = $DiscussionData;
 if ($this->DiscussionData->NumRows() > 0) {
 ?>
-<div><?php
+<h1><?php
 if (is_object($this->Category))
    echo sprintf(Gdn::Translate('Discussions <span>&bull;</span> %s'), $this->Category->Name);
 else
    echo Gdn::Translate('Discussions');
 
-?></div>
+?></h1>
 <div class="DataList Discussions">
    <?php include(PATH_PLUGINS . DS . 'GoogleGadgets' . DS . 'views' . DS . 'discussions.php'); ?>
 </div>
