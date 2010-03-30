@@ -6,9 +6,25 @@
     author="Mark O'Sullivan" 
     author_email="mark@vanillaforums.com">
   </ModulePrefs>
+  <ModulePrefs title="Dynamic Height" 
+    height="500"> 
+    <Require feature="dynamic-height"/>
+  </ModulePrefs>
+  
   <Content type="html">
   <![CDATA[
-  <style> 
+  <div id="content_div"></div>
+  <script type="text/javascript">
+
+  function getDiscussions() {
+   var params = {};
+   params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.GET;
+   gadgets.io.makeRequest('http://vanillaforums.org/discussions/?DeliveryType=VIEW', response, params); 
+  };
+
+  function response(obj) { 
+    // obj.data contains the feed data
+    var html = "<style> 
 ul.DataList li { margin: 0; padding: 0 0 4px; border-bottom: 1px solid #dbe3e6; }
 ul.DataList li li { border: 0; padding: 0; }
 ul.DataList, ul.DataList li ul { list-style: none; margin: 0; padding: 0; }
@@ -30,20 +46,11 @@ ul.DataList li ul li.Meta a.Category { background: #fafafa; padding: 2px 4px; -m
 ul.DataList li.Mine ul li.Meta a.Category { background: #fafdff; }
 ul.DataList li.New ul li.Meta a.Category { background: #ffe; }
 ul.Discussion li.Options { display: none; }
-  </style>
-  <div id="content_div"></div>
-  <script type="text/javascript">
-
-  function getDiscussions() {
-   var params = {};
-   params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.GET;
-   gadgets.io.makeRequest('http://vanillaforums.org/discussions/?DeliveryType=VIEW', response, params); 
-  };
-
-  function response(obj) { 
-    // obj.data contains the feed data
-    var html = obj.text;
-    document.getElementById('content_div').innerHTML = 'test2' + html;
+</style>";
+  
+    html += obj.text;
+    document.getElementById('content_div').innerHTML = 'test3' + html;
+    gadgets.window.adjustHeight();
   };
 
   gadgets.util.registerOnLoadHandler(getDiscussions);
