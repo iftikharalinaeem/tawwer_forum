@@ -21,7 +21,7 @@
   function response(obj) { 
     // obj.data contains the feed data
     var html = obj.text;
-    document.getElementById('content_div').innerHTML = html;
+    document.getElementById('content_div').innerHTML = 'test' + html;
   };
 
   gadgets.util.registerOnLoadHandler(getDiscussions);
