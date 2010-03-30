@@ -14,7 +14,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    <div class="Discussion">
       <div class="Title">
          <strong><?php
-            echo Anchor(Format::Text($Discussion->Name), Url::Request(TRUE).'/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
+            echo Anchor(Format::Text($Discussion->Name), Gdn_Url::Request(TRUE).'/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
          ?></strong>
       </div>
       <?php
