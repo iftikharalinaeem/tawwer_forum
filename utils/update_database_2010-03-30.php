@@ -14,7 +14,7 @@ $Cnn = mysql_connect('vfdb1', 'root', 'Va2aWu5A');
 $Data = mysql_query('show databases', $Cnn);
 while ($Row = mysql_fetch_assoc($Data)) {
 	 if (substr($Row['Database'], 0, 3) == 'vf_') {
-		  if (in_array($Row['Database'], array('vf_mark_E3G83', 'vf_dev_C344M'))) {
+		  // if (in_array($Row['Database'], array('vf_mark_E3G83', 'vf_dev_C344M'))) {
 				echo $Row['Database']."\n";
 				mysql_select_db($Row['Database'], $Cnn);
 		  
@@ -32,7 +32,7 @@ while ($Row = mysql_fetch_assoc($Data)) {
 				if (mysql_num_rows($BData) == 0) {
 					 mysql_query("insert into GDN_ActivityType (AllowComments, Name, FullHeadline, ProfileHeadline, RouteCode, Notify, Public) values ('0', 'BookmarkComment', '%1\$s commented on your %8\$s.', '%1\$s commented on your %8\$s.', 'bookmarked discussion', '1', '0')", $Cnn);
 				}
-		  }
+		  // }
 	 }
 }
 mysql_close($Cnn);
