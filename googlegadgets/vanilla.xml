@@ -22,7 +22,7 @@
   function response(obj) { 
     // obj.data contains the feed data
     var html = obj.text;
-    document.getElementById('content_div').innerHTML = 'test3' + html;
+    document.getElementById('content_div').innerHTML = 'test4' + html;
     gadgets.window.adjustHeight();
   };
 
