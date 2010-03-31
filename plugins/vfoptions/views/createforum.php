@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo Gdn::Translate('Create a New Forum'); ?></h1>
+<h1><?php echo T('Create a New Forum'); ?></h1>
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
 <ul>
    <li>
-      <div class="Info"><?php echo Gdn::Translate("Enter the name of the new forum you want to create below."); ?></div>
+      <div class="Info"><?php echo T("Enter the name of the new forum you want to create below."); ?></div>
    </li>
    <li>
       <?php

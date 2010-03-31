@@ -27,7 +27,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
                   '<span>*</span>',
                   '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
                   'Bookmark' . ($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-                  array('title' => Gdn::Translate($Discussion->Bookmarked == '1' ? 'Undo Vote' : 'Vote'))
+                  array('title' => T($Discussion->Bookmarked == '1' ? 'Undo Vote' : 'Vote'))
                );
                
                $Sender->Options = '';
@@ -62,7 +62,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
                if ($Sender->Options != '') {
                ?>
                <ul class="Options">
-                  <li><strong><?php echo Gdn::Translate('Options'); ?></strong>
+                  <li><strong><?php echo T('Options'); ?></strong>
                      <ul>
                         <?php echo $Sender->Options; ?>
                      </ul>
@@ -96,7 +96,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
                printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
             echo '</span>';
             echo '<span>';
-            printf(Gdn::Translate($Discussion->CountComments > 0 ? 'Most recent by %1$s %2$s' : 'Posted by %2$s'), UserAnchor($Last), Format::Date($Discussion->LastDate));
+            printf(T($Discussion->CountComments > 0 ? 'Most recent by %1$s %2$s' : 'Posted by %2$s'), UserAnchor($Last), Format::Date($Discussion->LastDate));
             echo '</span>';
 
             $Sender->FireEvent('DiscussionMeta');

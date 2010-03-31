@@ -229,7 +229,7 @@ pageTracker._trackPageview();
             include('/srv/www/'.$Folder.'/applications/vfcom/utils/createforum.php');
 
             if ($Form->ErrorCount() == 0) {
-               $Sender->StatusMessage = Translate("The forum was created successfully.");
+               $Sender->StatusMessage = T("The forum was created successfully.");
                $Sender->RedirectUrl = 'http://'.$Subdomain.$HostingDomain.'/gardensetup/first';
             }
          }
@@ -314,7 +314,7 @@ pageTracker._trackPageview();
       } else {
          $Sender->Form = new Gdn_Form();
          if ($Sender->Form->AuthenticatedPostback()) {
-            $Sender->StatusMessage = Translate("The forum has been deleted.");
+            $Sender->StatusMessage = T("The forum has been deleted.");
             $Sender->RedirectUrl = Url('plugin/myforums');
             
             // If we are in that forum right now, redirect to another forum the user owns
@@ -530,7 +530,7 @@ pageTracker._trackPageview();
             include('/srv/www/'.$Folder.'/applications/vfcom/utils/renameforum.php');
 
             if ($Sender->Form->ErrorCount() == 0) {
-               $Sender->StatusMessage = Translate("The forum was renamed successfully.");
+               $Sender->StatusMessage = T("The forum was renamed successfully.");
                $Sender->RedirectUrl = Url('plugin/myforums');
             
                // If we are in that forum right now, Redirect to the new forum

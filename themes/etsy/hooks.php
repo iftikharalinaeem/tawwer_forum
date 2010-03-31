@@ -36,7 +36,7 @@ class ThemeHooks implements Gdn_IPlugin {
    
    public function SettingsController_Index_Create(&$Sender) {
       $Sender->AddJsFile('settings.js');
-      $Sender->Title(Translate('Dashboard'));
+      $Sender->Title(T('Dashboard'));
          
       $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';

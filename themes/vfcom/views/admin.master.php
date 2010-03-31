@@ -6,7 +6,7 @@
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
    <div id="Frame">
       <div id="Head">
-			<h1><?php echo Anchor(str_replace(array('http://', '/'), array('',''), Gdn::Config('Garden.Domain')).' <span>'.Gdn::Translate('← Visit Site').'</span>', '/'); ?></h1>
+			<h1><?php echo Anchor(str_replace(array('http://', '/'), array('',''), Gdn::Config('Garden.Domain')).' <span>'.T('← Visit Site').'</span>', '/'); ?></h1>
          <div class="User">
             <?php
 			      $Session = Gdn::Session();
@@ -18,9 +18,9 @@
 							$Name .= '<span>'.$CountNotifications.'</span>';
 							
 						echo Anchor($Name, '/profile/'.$Session->User->UserID.'/'.$Session->User->Name);
-						echo Anchor(Gdn::Translate('Sign Out'), str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()));
+						echo Anchor(T('Sign Out'), str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()));
 					} else {
-						echo Anchor(Gdn::Translate('Sign In'), $Authenticator->SignInUrl($this->SelfUrl));
+						echo Anchor(T('Sign In'), $Authenticator->SignInUrl($this->SelfUrl));
 					}
 				?>
          </div>

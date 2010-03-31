@@ -4,15 +4,15 @@ $this->Form->AddHidden('Garden.Registration.CaptchaPrivateKey', Gdn::Config('Gar
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
-<h1><?php echo Gdn::Translate('User Registration Settings'); ?></h1>
+<h1><?php echo T('User Registration Settings'); ?></h1>
 <ul>
    <li id="RegistrationMethods">
-      <div class="Info"><?php echo Gdn::Translate('Choose the registration method for new users:'); ?></div>
+      <div class="Info"><?php echo T('Choose the registration method for new users:'); ?></div>
       <table class="Label AltColumns">
          <thead>
             <tr>
-               <th><?php echo Gdn::Translate('Method'); ?></th>
-               <th class="Alt"><?php echo Gdn::Translate('Description'); ?></th>
+               <th><?php echo T('Method'); ?></th>
+               <th class="Alt"><?php echo T('Description'); ?></th>
             </tr>
          </thead>
          <tbody>
@@ -33,7 +33,7 @@ echo $this->Form->Errors();
                   <th><?php
                      echo $this->Form->Radio('Garden.Registration.Method', $Method, array('value' => $Method));
                   ?></th>
-                  <td class="Alt"><?php echo Translate($Description); ?></td>
+                  <td class="Alt"><?php echo T($Description); ?></td>
                </tr>
                <?php
             }
@@ -42,7 +42,7 @@ echo $this->Form->Errors();
       </table>
    </li>
    <li id="NewUserRoles">
-      <div class="Info"><?php echo Gdn::Translate('Check all roles that should be applied to new/approved users:'); ?></div>
+      <div class="Info"><?php echo T('Check all roles that should be applied to new/approved users:'); ?></div>
       <?php echo $this->Form->CheckBoxList('Garden.Registration.DefaultRoles', $this->RoleData, $this->ExistingRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID')); ?>
    </li>
    <li id="InvitationExpiration">
@@ -52,12 +52,12 @@ echo $this->Form->Errors();
       ?>
    </li>
    <li id="InvitationSettings">
-      <div class="Info"><?php echo Gdn::Translate('Choose who can send out invitations to new members:'); ?></div>
+      <div class="Info"><?php echo T('Choose who can send out invitations to new members:'); ?></div>
       <table class="Label AltColumns">
          <thead>
             <tr>
-               <th><?php echo Gdn::Translate('Role'); ?></th>
-               <th class="Alt"><?php echo Gdn::Translate('Invitations per month'); ?></th>
+               <th><?php echo T('Role'); ?></th>
+               <th class="Alt"><?php echo T('Invitations per month'); ?></th>
             </tr>
          </thead>
          <tbody>

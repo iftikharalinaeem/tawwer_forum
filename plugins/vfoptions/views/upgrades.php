@@ -10,7 +10,7 @@ function Css($Bool) {
 }
 
 function __FormatPrice($PerMonth) {
-	$Format = $Format = Gdn::Translate('PriceFormat', '<div class="Price"><strong>$%.0f</strong> per month <span>$%.2f per day</span></div>');
+	$Format = $Format = T('PriceFormat', '<div class="Price"><strong>$%.0f</strong> per month <span>$%.2f per day</span></div>');
 	$PerDay = $PerMonth / (365 / 12);
 	$Result = sprintf($Format, $PerMonth, $PerDay);
 					

@@ -9,7 +9,7 @@ $this->Form->AddHidden('Garden.Email.SmtpPort', Gdn::Config('Garden.Email.SmtpPo
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
-<h1><?php echo Gdn::Translate('General Settings'); ?></h1>
+<h1><?php echo T('General Settings'); ?></h1>
 <ul>
    <li>
       <?php
@@ -18,7 +18,7 @@ echo $this->Form->Errors();
       ?>
    </li>
    <li>
-      <div class="Info"><?php echo Translate("Email sent from Garden will be addressed from the following name and address"); ?></div>
+      <div class="Info"><?php echo T("Email sent from Garden will be addressed from the following name and address"); ?></div>
    </li>
    <li>
       <?php

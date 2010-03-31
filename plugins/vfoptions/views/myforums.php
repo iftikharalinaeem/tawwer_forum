@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 ?>
-<h1><?php echo Gdn::Translate('My Forums'); ?></h1>
+<h1><?php echo T('My Forums'); ?></h1>
 <div class="FilterMenu"><?php echo Anchor('Create a New Forum', 'garden/plugin/createforum', 'CreateForum Button Popup'); ?></div>
-<div class="Info"><?php echo Gdn::Translate('Below is a list of all of your forums. Each forum is an "island": not sharing upgrades, discussions, or users. Use this screen to manage your forums.'); ?></div>
+<div class="Info"><?php echo T('Below is a list of all of your forums. Each forum is an "island": not sharing upgrades, discussions, or users. Use this screen to manage your forums.'); ?></div>
 <table id="Forums" class="AltRows">
    <thead>
       <tr>
