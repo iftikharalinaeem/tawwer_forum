@@ -33,6 +33,13 @@ class ThemeHooks implements Gdn_IPlugin {
       $Structure->Table('Comment')
          ->Column('Score', 'int', 0)
          ->Set(FALSE, FALSE);
+
+      // Add a column in the UserDiscussion table to record serialized
+      // information about user activity. Specifically: which comments within a
+      // discussion that a user has scored.
+      $Structure->Table('UserDiscussion')
+         ->Column('Attributes', 'text')
+         ->Set(FALSE, FALSE);
          
       $SQL = Gdn::Database()->SQL();
       
@@ -95,6 +102,14 @@ class ThemeHooks implements Gdn_IPlugin {
    public function SettingsController_Render_Before(&$Sender) {
       if (strpos(strtolower($Sender->RequestMethod), 'categor') > 0)
          Redirect($Sender->Routes['DefaultPermission']);
+   }
+   
+   /**
+    * Make sure to pull UserDiscussion serialized information from the db when loading
+    * a discussion.
+    */
+   public function Gdn_DiscussionModel_BeforeGetID_Handler(&$Sender) {
+      $Sender->SQL->Select('w.Attributes', '', 'UserDiscussionAttributes');
    }
    
 }

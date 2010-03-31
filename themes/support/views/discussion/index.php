@@ -3,6 +3,12 @@ $Session = Gdn::Session();
 $CurrentOffset = $this->Offset;
 if (!function_exists('WriteComment'))
    include($this->FetchViewLocation('helper_functions', 'discussion'));
+   
+// Unserialize Discussion Attributes
+if (is_object($this->Discussion) && property_exists($this->Discussion, 'UserDiscussionAttributes'))
+   $this->Discussion->UserDiscussionAttributes = Format::Unserialize($this->Discussion->UserDiscussionAttributes);
+
+
 if ($this->Pager->FirstPage()) {
 ?>
 <div class="Discussion FirstComment <?php echo $this->Discussion->Category; ?>">
