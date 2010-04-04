@@ -4,27 +4,29 @@ Welcome to the Generic Style CSS File! Some things you should know:
 
 1. The reset.css file imported above breaks all elements down to a base style.
 
-2. This file is included on all front-end/user-facing pages. Individual
-   applications can override this file in their own custom files
-   (ie. vanilla.css or conversations.css).
+2. This file is included on all front-end/user-facing pages. Applications can
+   override this file in their own custom files (ie. vanilla.css or
+   conversations.css).
 
 3. This file is broken down into the following sections:
-   + Line 24:     General Styles & Typography
-   + Line 325:    Header
-   + Line 556:    Main Menu
-   + Line 591:    Panels / Sidebars
-   + Line 782:    Activities
-   + Line 971:    Profile Page
-   + Line 1072:   Profile Tab Menu
-   + Line 1194:   Thumbnail Cropper
-   + Line 1244:   Footer
+   + General Styles & Typography
+   + Header
+   + Main Menu
+   + Panels / Sidebars
+   + Activities
+   + Profile Page
+   + Profile Tab Menu
+   + Thumbnail Cropper
+   + Footer
 */
    
    
 /* ============================================== General Styles & Typography */
 body {
    color: #000;
-   font: 75%/1.7em "Helvetica Neue",Helvetica,arial,sans-serif;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	font-size: 75%;
+	line-height: 1.7em;
    background: #fff;
    margin: 0;
    padding: 0;
@@ -65,7 +67,6 @@ h1, h2, h3, h4, h5, h6 {
 p {
    margin: 0.5em 0 0 0;
    line-height: 1.6em;
-   font-family: "Helvetica Neue",Helvetica,arial,sans-serif;
 }
 h1, h2 {
    border-bottom:1px solid #bbb;
@@ -99,9 +100,9 @@ input.DateBox,
 input.InputBox,
 input.SmallInput,
 textarea {
-   font-family: arial;
-   color: #555;
-   font-size: 16px;
+   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+   color: #333;
+   font-size: 15px;
    padding: 3px;
    margin: 0;
    width: 250px;
@@ -113,14 +114,12 @@ textarea.TextBox {
    width: 500px;
    height: 100px;
    min-height: 100px;
-   max-height: 500px;
 }
 #Popup textarea.TextBox {
    width: 465px;
 }
 input.SmallInput,
 input.InputBox {
-   font-size: 15px;
    padding: 6px 3px;
 }
 input.SmallInput:focus,
@@ -138,33 +137,41 @@ select {
    margin: 0;
    padding: 3px;
    }
+a.Button,
 .Button {
    cursor: pointer;
    margin: 0;
-   font-family: Tahoma, 'Trebuchet MS', Arial, Verdana;
-   padding: 4px;
    font-size: 11px;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
-   color: #555;
-   border: 1px solid #bbb;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
+   padding: 4px;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+   color: #02475A;
+	text-shadow: 0 1px 0 #fff;
+   border: 1px solid #999;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
    }
 input.Button {
+	font-size: 14px;
    font-weight: bold;
 }
 .Button:hover {
-   color: #333;
-   border: 1px solid #888;
+   color: #111;
+   border: 1px solid #666;
+}
+.Button:focus {
+   background: #eee;
 }
 .Loading {
    height: 100px;
    padding: 0 20px;
-   background: url('progress.gif') center center no-repeat;
+   background: url('images/progress.gif') center center no-repeat;
 }
 .Progress {
    padding: 10px 40px 10px 0;
-   background: url('progress.gif') center center no-repeat;
+   background: url('images/progress.gif') center center no-repeat;
 }
 /* Note: Messages are the yellow notices that appear at the top/center of the
   page to notify users of things like drafts being saved, etc. */
@@ -204,6 +211,9 @@ div.Messages ul {
    display:inline-block;
    zoom:1;
    *display:inline;
+	box-shadow: 0px 0px 2px #333;
+	-moz-box-shadow: 0px 0px 2px #333;
+	-webkit-box-shadow: 0px 0px 2px #333;  
 }
 div.Messages ul li {
    text-align: left !important;
@@ -252,36 +262,31 @@ div.Info {
    padding: 6px;
    margin: 0 0 10px;
 }
-div.EmptyInfo {
-   margin: 10px 0;
-}
 /* Note: The MessageModule (in /applications/garden/modules) wraps all messages
   that it renders in a div with this DismissMessage class. */
 div.DismissMessage {
    margin: 6px 0 10px;
+	text-align: left;
 }
 div.DismissMessage p {
    margin: 2px 0;
 }
 div.DismissMessage a.Dismiss {
+	font-family: arial;
    float: right;
+	font-size: 22px;
+	font-weight: bold;
    line-height: 120%;
    color: #999;
-	padding: 2px 4px;
 }
 div.DismissMessage a.Dismiss:hover {
-   background: #fafafa;
-   border: 1px solid #ccc;
-   color: #333;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	padding: 1px 3px;
+	color: #ff0084;
 }
 /* Note: The close class is used on the "close" anchor in popups. */
 a.Close {
 	color:#777;
-	font-family:monaco;
-	font-size:14px;
+	font-family:arial;
+	font-size:20px;
 	font-weight:bold;
 	cursor:pointer;
 	padding: 0 2px;
@@ -289,33 +294,18 @@ a.Close {
 a.Close:hover {
 	color: #333;
 }
-/* Note: MorePager is related to the /applications/garden/modules/MorePagerModule. */
-.MorePager {
-   list-style: none;
-   margin: 1px 0 0;
-   padding: 3px 6px;
-   text-align: right;
-   background: #e9f9ff;
-   }
-.MorePager a {
-   font-size: 13px;
-   font-weight: bold;
-   text-align: right;
-}
-.MorePager a:hover {
-   color: #2786c2 !important;
-   text-decoration: underline;
-}
 #PagerLess {
    -moz-border-radius-topright: 2px;
    -moz-border-radius-topleft: 2px;
    -webkit-border-top-right-radius: 2px;
    -webkit-border-top-left-radius: 2px;
    margin-bottom: 1px;
+	text-align: left;
 }
-tr#PagerMore td {
-   border: 0;
-   text-align: right;
+div.MorePager a.Loading {
+	border: 0 !important;
+   padding: 0 20px !important;
+   background: url('images/progress.gif') center center no-repeat !important;
 }
 #PagerMore {
    margin-bottom: 1px;
@@ -324,7 +314,7 @@ tr#PagerMore td {
    margin: 1px 0 0;
 	text-align: right;
 	font-weight: bold;
-	font-size: 120%;
+	font-size: 16px;
 }
 #PagerBefore {
    margin: 1px 0;
@@ -341,8 +331,7 @@ tr#PagerMore td {
 .NumberedPager span.Next,
 .NumberedPager a.Previous,
 .NumberedPager span.Previous {
-	font-family: 'lucida grande';
-	font-size: 120%;
+	font-size: 16px;
 	line-height: 10px;
 }
 .NumberedPager a.Next,
@@ -360,7 +349,13 @@ tr#PagerMore td {
    background: #44c7f4;
    padding: 0;
    text-align: right;
-   height: 50px;
+}
+div#Search:after {
+   content: ".";
+   display: block;
+   height: 0;
+   clear: both;
+   visibility: hidden;
 }
 body #Head h1 {
    display: block;
@@ -415,9 +410,9 @@ body #Head h1 {
    -moz-border-radius-bottomright: 2px;
    -webkit-border-top-right-radius: 2px;
    -webkit-border-bottom-right-radius: 2px;
-}
-#Menu * {
-   font-family: tahoma;
+  	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;     	
 }
 #Menu {
    height: 28px;
@@ -448,11 +443,23 @@ body #Head h1 {
    float: left;
    position: relative;
    display: block;
-   list-style: none outside none;
+   list-style: none;
    padding: 0;
-   margin: 0 10px 0 0;
+   margin: 0 4px 0 0;
    font-weight: bold;
    text-align: left;
+}
+* html #Menu li {
+	display: inline;
+}
+* html #Menu ul  {
+	left: 0;
+	top: 27px;
+}
+* html #Menu ul li  {
+	display: block;
+	height: 1%;
+	width: 85px;
 }
 #Menu li
 #Menu li a,
@@ -493,19 +500,28 @@ body #Head h1 {
 #Menu a {
    border: 0;
    text-decoration: none;
-   display: block;
    position: relative;
-   padding: 0 10px;
+	display: block;
+   padding: 0 7px;
    white-space: nowrap;
    font-size: 11px;
    height: 28px;
 }
+* html #Menu a  {
+   display: inline;
+   padding: 6px 10px;
+}
+* html #Menu ul li a  {
+   display: block;
+   padding: 3px 10px;
+   width: 85px;
+}
 #Menu ul li {
- display: block;
- float: none;
+	display: block;
+	float: none;
 }
 #Menu ul .Active .First {
- padding-left: 1px;
+	padding-left: 1px;
 }
 #Menu li.NonTab,
 #Menu li.NonTab a {
@@ -545,7 +561,7 @@ ul.Options ul {
    position: absolute;
 }
 ul.Options li {
-   float: left;
+   float: right;
    position: relative;
    display: block;
    list-style: none outside none;
@@ -580,6 +596,68 @@ ul.Options a {
 ul.Options ul li {
    display: block;
    float: none;
+}
+ul.Options li.Parent strong {
+   display: block;
+   padding: 4px;
+   margin: 3px 4px 0 0;
+   font-size: 10px;
+   font-weight: normal;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+   border: 1px solid #bbb;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   color: #555;
+   cursor: pointer;
+   line-height: 100%;
+}
+ul.Options li.Parent strong:focus,
+ul.Options li.Parent strong:hover {
+   color: #333;
+   border: 1px solid #888;
+}
+ul.Options li.Parent strong:focus {
+   background: #eee;
+}
+ul.Options li.Active strong:hover,
+ul.Options li.Active strong {
+   color: #fff;
+   background: #9c9c9c !important;
+   border: 1px solid #9c9c9c;
+   -moz-border-radius-bottomleft: 0;
+   -moz-border-radius-bottomright: 0;
+   -webkit-border-bottom-left-radius: 0;
+   -webkit-border-bottom-right-radius: 0;
+}
+ul.Options li.Active {
+   background: none;
+}
+ul.Options li.Active ul {
+   border: 1px solid #9c9c9c;
+   background: #fafafa;
+   -moz-border-radius-bottomleft: 2px;
+   -moz-border-radius-bottomright: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+}
+ul.Options li.Active ul li a {
+   background: none;
+}
+ul.Options li.Active a {
+   background: #efefef;
+   color: #595959;
+}
+ul.Options li.Active a:hover {
+   background: #8d8d8d;
+   color: #fff;
+}
+ul.Options li.Parent strong:hover,
+ul.Options li.Active strong:hover,
+ul.Options li.Active strong,
+ul.Options li.Active ul {
+  	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0 0 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;     
 }
 .Center {
    text-align: center;
@@ -633,6 +711,9 @@ div.Box {
    color: #999;
    padding: 6px 10px;
    margin: 0 0 10px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
 }
 div.Box h4 {
    font-size: 110%;
@@ -640,7 +721,6 @@ div.Box h4 {
    font-weight: bold;
    margin: 0;
    padding: 0 0 1px;
-   /* border-bottom: 1px solid #caf0fe; <-- This caused a 2px underline where it was above PanelInfo */
 }
 div.Box dl {
    border-top: 1px solid #caf0fe;
@@ -652,7 +732,7 @@ div.Box dl {
 div.Box dl dt {
    float: left;
    width: 80px;
-   color: #2786C2;
+   color: #555;
 }
 div.Box dl dd {
    margin-left: 80px;
@@ -662,11 +742,36 @@ div.Box p {
    padding: 0 0 4px;
    color: #555;
 }
+ul.PanelActivity {
+   border-top: 1px solid #caf0fe;
+	border-bottom: 0;
+}
+ul.PanelActivity li {
+   background: #f5fcff;
+   border-bottom: 1px solid #caf0fe;
+   padding: 2px 4px;
+	color: #555;
+}
+ul.PanelActivity span {
+	padding: 0 4px;
+}
+ul.PanelActivity p {
+	padding: 0 4px;
+	display: inline;
+	font-size: 90%;
+}
+ul.PanelActivity li em {
+	padding-left: 5px;
+	color: #777;
+	font-size: 80%;
+}
+ul.PanelActivity li div.Story {
+	font-size: 85%;
+}
 ul.PanelInfo li {
    background: #f5fcff;
    border-bottom: 1px solid #caf0fe;
    padding: 2px 4px;
-   font-family: tahoma;
    text-align: right;
 }
 ul.PanelInfo {
@@ -683,7 +788,7 @@ ul.PanelInfo li a {
    float: left;
 }
 ul.PanelInfo div.Meta {
-   font-size: 90%;
+   font-size: 11px;
 }
 ul.PanelInfo div.Meta span,
 ul.PanelInfo div.Meta strong {
@@ -694,27 +799,26 @@ ul.PanelInfo div.Meta span a {
 }
 ul.PanelInfo div.Meta strong {
    font-weight: normal;
-	font-size: 100%;
    display: inline;
-   color: #80828C;
-   background: #ff6;
-   padding: 0 2px;
-}
-ul.PanelDiscussions li {
-   text-align: left;
-}
-ul.PanelDiscussions li a {
-   float: none;
-}
-ul.PanelDiscussions li strong {
-   display: block;
+   padding: 1px 3px;
+	-moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	background: #FFFF00;
+	padding:2px 4px;
 }
 ul.PanelInfo li.Active {
-   background: #fff /* Panel Selected Background Color */;
-   border-bottom: 1px solid #a3e6ff /* Panel Inlay Border Color */;
+   background: #fff;
+   border-bottom: 1px solid #a3e6ff;
 }
 ul.PanelInfo li.Active a {
-   color: #2786C2 /* Panel Selected Font Color */;
+   color: #2786C2;
+}
+ul.PanelActivity li.ShowAll,
+ul.PanelInfo li.ShowAll {
+   font-weight: bold;
+   border: 0;
+   text-align: right;
+	background: none;
 }
 body.Profile ul.PanelInfo {
    border-bottom: 1px solid #caf0fe;
@@ -725,6 +829,37 @@ body.Profile ul.PanelInfo li {
 }
 body.Profile ul.PanelInfo li a {
    float: none;
+}
+a.BigButton {
+   text-align: center;
+   display: block;
+   cursor: pointer;
+   margin: 0 0 10px;
+   font-size: 15px;
+   font-weight: bold;
+   padding: 8px 0;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+   color: #02475A;
+	text-shadow: 0 1px 0 #fff;
+   border: 1px solid #999;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
+   }
+a.BigButton:hover {
+   color: #111;
+   border: 1px solid #666;
+	box-shadow: 0px 0px 5px #aaa;
+	-moz-box-shadow: 0px 0px 5px #aaa;
+	-webkit-box-shadow: 0px 0px 5px #aaa;  
+}
+a.BigButton:focus {
+   background: #eee;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
 }
 
 
@@ -737,253 +872,292 @@ body.Entry div.Panel {
 }
 body.Entry #Content {
    float: none;
-   margin: 0;
-   width: auto;
+   margin: 0 auto;
+   width: 360px;
    text-align: center;
 }
-body.Entry #Leave {
-   width: 400px;
-   margin: 0 auto;
-   background: #E9F9FF;
-   -moz-border-radius: 1px;
-   -webkit-border-radius: 1px;
-   padding: 10px 10px 0 10px;
-   text-align: left;
+body#garden_entry_handshake #Content {
+	width: 720px;
 }
-body.Entry p.Leaving {
-   background: url('progress.gif') left top no-repeat;
-   padding-left: 50px;
+body#garden_entry_handshake ul.LinkAccount {
+	float: left;
+	width: 330px;
+	margin-right: 29px;
+	border-right: 1px solid #A5D0E7;
 }
-body.register #Content,
-body.signin #Content,
-body.passwordrequest #Content,
-body.passwordreset #Content,
-body.Entry #SignIn,
-body.Entry #Password,
-body.Entry #Register,
-body.Entry #Handshake {
-   text-align: left;
-   float: left;
-   background: #E9F9FF /* Panel Background Color */;
-   -moz-border-radius: 1px;
+body#garden_entry_handshake div.Info {
+	border: 1px solid #A5D0E7;
+	background: #D3F0FF;
+	color: #02475A;
+}
+body.Entry #Content div.Box {
+   background: #E2F4FF;
+   -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   padding: 10px;
-   margin: 0 0 15px;
-}
-body.Entry #Register {
-	max-width: 354px;
-}
-body.Entry #SignIn,
-body.Entry #Password {
-   margin: 0 15px 15px 0;
-}
-body.Entry #Password p {
-   width: 242px;
-   overflow: hidden;
-}
-body.Entry #Content h1 {
-   border-bottom:1px solid #CAF0FE;
-   color: #2786C2 /* Panel Font Color */;
-   font-size:110%;
-   font-weight:bold;
-   margin: 0;
-   padding:0 0 1px;
+	border: 1px solid #A5D0E7;
+	margin: 0;
+	padding: 0;
 }
 body.Entry p {
-   padding:0 0 10px;
-   color: #999999;
+	text-align: left;
+	padding: 0 10px;
+	margin: 10px 0 10px;
 }
-body.Entry form ul li {
-   border: 0;
+body.Entry p.Leaving {
+	margin-left: 43px;
+   background: url('images/progress.gif') left center no-repeat;
+   padding-left: 50px;
+}
+body.Entry #Content h1 {
+   border: none;
+   color: #02475A;
+   font-size:140%;
+   font-weight:bold;
+   padding: 6px;
+	margin: 0;
+	text-align: left;
+}
+body.Entry #Content form {
+	text-align: left;
+	padding: 10px 30px 20px;
 }
 body.Entry form ul li label {
+	font-size: 14px;
+	color: #555;
+	font-weight: bold;
 	padding: 6px 0 0;
 	display: block;
 }
-body.Entry #SignIn form ul li label.CheckBoxLabel,
-body.Entry #Register form ul li label.CheckBoxLabel {
+body.Entry form ul li label.CheckBoxLabel,
+body.Entry form ul li label.RadioLabel {
+	font-size: 12px;
+	font-weight: normal;
    width: auto;
 }
 body.Entry input.DateBox,
 body.Entry input.InputBox,
 body.Entry textarea {
+   width: 290px;
+}
+body.Entry div.Popup input.DateBox,
+body.Entry div.Popup input.InputBox,
+body.Entry div.Popup textarea {
    width: 250px;
 }
 span.Incorrect {
    display: block;
    color: red;
 }
-form#Form_User_SignIn input.Button,
-form#Form_User_Password input.Button,
-form#Form_User_Register input.Button {
+body.Entry input.Button {
 	margin: 10px 0 0;
 }
+#Form_User_SignIn li.Buttons span {
+	padding: 0 6px;
+}
+#Form_User_SignIn li.Buttons input.Button,
+body.Entry li.Buttons input.Button {
+	margin: 10px 0;
+}
+#Form_User_Password,
+body.Entry #Content #Form_User_Password {
+	padding-top: 0;
+}
+#garden_entry_index #Form_User_Password ul li label,
+#garden_entry_signin #Form_User_Password ul li label {
+	padding: 0;
+}
 
-/* =============================================================== Activities */
-body.Activity h1 {
+/* ================================================ DataList (Search Results) */
+/* Note: DataList is used in search results, vanilla discussions & drafts */
+div.Empty {
+   margin: 10px 0;
+}
+ul.DataList li.Item {
    margin: 0;
+   padding: 4px 0;
+   border-bottom: 1px solid #dbe3e6;
 }
-ul.Activities {
-	margin-bottom: 6px;
-}
-ul.Activities li {
-	font-family: 'lucida grande';
-   border-bottom: 1px solid #ddd;
-   padding: 8px 0 6px;
-   color: #454545;
-   clear: left;
-   font-size: 105%;
-}
-ul.Activities div span {
-   padding: 0 6px 0 0;
-}
-ul.Activities li a.Photo {
-   float: left;
-}
-ul.Activities li img {
-   margin: 0;
+ul.DataList li {
    border: 0;
-   height: 40px;
-   width: 40px;
-}
-ul.Activities li.ActivityComment img {
-   height: 32px;
-   width: 32px;
-}
-ul.Activities li h3 {
-   display: inline;
    padding: 0;
-   font-size: 100%;
-   font-weight: normal;
 }
-ul.Activities li h3 em {
-   font-weight: normal;
-   font-style: normal;
-   color: #33afda;
-   font-size: 10px;
-   margin: 0 10px;
-}
-ul.Activities li h3 a.CommentOption {
-   font-size: 10px;
-   font-weight: normal;
-}
-ul.Activities li a.Delete {
+ul.DataList div.Options {
+	width: 100px;
    float: right;
+}
+ul.DataList div.OptionButton {
+	float: right;
+	*padding: 7px 0; /* IE 7 Fix */
+}
+ul.DataList a.Title {
+   display: block;
+   margin: 0;
+   font-size: 14px;
+   font-weight: bold;
+}
+ul.DataList div.Title {
+   display: block;
+   margin: 0;
+}
+ul.DataList div.Title a {
+   font-size: 120%;
+   font-weight: bold;
+}
+ul.DataList div.Meta {
+   font-size: 11px;
+   color: #80828c;
+}
+ul.DataList div.Excerpt {
+   font-size: 12px;
+	line-height: 1.4;
+}
+ul.DataList div.Excerpt a {
+   color: #333;
+	display: block;
+}
+ul.DataList div.Excerpt p {
+	display: inline;
+	padding: 0;
+}
+ul.DataList div.Meta span,
+ul.DataList div.Meta span a,
+ul.DataList div.Meta strong {
+   margin-right: 12px;
+}
+ul.DataList div.Meta strong {
+   background: #ff0;
+   padding: 2px 4px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+ul.DataList div.Meta a {
+   color: #2b2d33;
+}
+ul.DataList a.Delete {
    width: auto;
-   padding: 5px;
+   padding: 0 5px;
    margin: 0 1px 0 0;
    font-size: 11px;
-   font-weight: bold;
+   font-weight: normal;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    color: #555;
    cursor: pointer;
-   line-height: 100%;
+   line-height: 1;
 }
-ul.Activities li a.Delete:hover {
+ul.DataList a.Delete:hover {
 	padding: 4px;
    color: #333;
    border: 1px solid #888;
-   background: url('button_bg2.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
 }
-ul.Activities li div.Story {
-   border: 1px solid #eee;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #fafafa;
-   margin: 4px 0;
-   padding: 4px 6px;
-   line-height: 130%;
-   color: #2b3033;
-   display: block;
-	font-size: 110%;
+ul.DataList a.Delete:focus {
+   background: #f8f8f8;
 }
-ul.Activities li.PictureChange div.Story {
-	border: 0;
-   background: none;
-   margin: 4px 0 0;
-   padding: 0 8px;
+/* Condensed datalists make the main link & excerpt inline. */
+ul.DataList div.Photo {
+	float: left;
+	padding: 0 10px 0 0;
 }
-ul.Activities li div.Story blockquote {
-   margin: 2px 0 0;
-   padding: 0;
-   background: none;
-	border: 0;
-   color: #999;
+ul.DataList div.Photo img {
+	display: block;
+	height: 43px;
+	width: 43px;
+	overflow: hidden;
 }
-ul.Activities li div.Story img {
-   height: auto;
-   width: auto;
-   background: #fff;
-   padding: 2px;
-   border: 1px solid #ccc;
-   float: none;
-   margin: 0 4px 0 0;
+ul.Condensed li,
+li.Condensed {
+	clear: left;
 }
-ul.Activities ul.Comments {
-   background: #fff;
-   margin: 0 0 0 46px;
-   padding: 1px 0 0;
-   list-style: none;
-   font-size: 85%;
-   clear: left;
+ul.Condensed a.Title,
+li.Condensed a.Title,
+ul.Condensed div.Title,
+li.Condensed div.Title {
+	display: inline;
+	padding: 0;
 }
-ul.Activities ul.Comments li {
-   background: #e9f9ff /* Panel Background Color */;
-   margin-bottom: 1px;
-   border-bottom: 0;
-   padding: 6px;
-   line-height: 1;
-}
-ul.Activities ul.Comments li * {
-	font-family: 'lucida grande';
-}
-ul.Activities li.HasPhoto div {
-   margin-left: 46px;
-}
-ul.Activities li.HasPhoto ul.Comments div {
-   margin: 0;
-}
-ul.Activities ul.Comments li.HasPhoto div {
-   margin-left: 40px;
-}
-ul.Activities a.Name,
-ul.Activities a.Photo {
-   font-weight: bold;
-   padding-right: 6px;
-}
-ul.Activities p {
-   display: inline;
-   margin: 0;
-   line-height: 1.4;
-}
-ul.Activities div.Meta {
-   line-height: 1;
-   color: #888;
-   padding: 4px 0 0 6px;
-  	margin: 0 !important;
-   font-size: 80%;
+ul.Condensed div.Excerpt,
+li.Condensed div.Excerpt,
+ul.Condensed div.Excerpt a,
+li.Condensed div.Excerpt a {
 	display: inline;
 }
-ul.Activities li.AboutUpdate div.Meta,
-ul.Activities li.WallComment div.Meta,
-ul.Activities ul.Comments div.Meta {
-   display: block;
-   padding: 4px 0 4px;
+
+/* =============================================================== Activities */
+
+body.Activity h1 {
+   margin: 0;
 }
+body.Profile ul.Activities {
+   margin-top: 10px;
+   border-top: 1px solid #ddd;
+}
+ul.Activities li.HasPhoto div.Title {
+	padding: 0;
+}
+ul.Activities a.Title,
+ul.Activities div.Title,
+ul.Activities div.Title a {
+	font-size: 14px;
+}
+ul.Activities div.Excerpt {
+	color: #80828C;
+}
+ul.Activities li.Condensed div.Excerpt {
+	color: #000;
+	font-size: 13px;
+	padding: 0 0 0 4px;
+}
+ul.Activities div.Excerpt a,
 ul.Activities div.Meta a {
-   font-weight: normal;
+   color: #2786c2;
 }
-ul.Activities div.Meta span {
-   padding: 0 6px;
-   font-size: 8px;
+ul.Activities div.Excerpt a:hover,
+ul.Activities div.Meta a:hover {
+   color: #ff0084;
 }
-ul.Activities ul.Comments li.CommentForm {
-   clear: left;
-   padding: 8px;
+ul.Activities div.Excerpt img {
+	padding: 2px;
+	border: 1px solid #999;
 }
-ul.Activities ul.Comments li.CommentForm a.CommentLink,
-ul.Activities ul.Comments li.CommentForm a.CommentLink:hover {
+ul.Activities ul.DataList {
+	margin-left: 50px;
+	width: 400px;
+}
+ul.Activities div.ItemContent {
+	width: 631px;
+}
+ul.Activities li.HasPhoto div.ItemContent {
+	margin-left: 53px;
+	width: 578px;
+}
+ul.Activities li.Item li.HasPhoto div.ItemContent {
+	width: auto;
+	margin-left: 42px;
+}
+ul.Activities ul.DataList li {
+	background: #D7E7FF;
+	margin-bottom: 2px;
+	padding: 6px;
+}
+ul.Activities ul.DataList a.Title,
+ul.Activities ul.DataList div.Title,
+ul.Activities ul.DataList div.Title a,
+ul.Activities ul.DataList div.Excerpt p {
+	font-size: 13px;
+	line-height: 1;
+}
+ul.Activities ul.DataList .HasPhoto div.Meta {
+	padding: 2px 0 0;
+	line-height: 1;
+}
+ul.Activities ul.DataList div.Photo img {
+	height: 32px;
+	width: 32px;
+}
+ul.Activities a.CommentLink,
+ul.Activities a.CommentLink:hover {
+	font-size: 12px;
    cursor: text;
    background: #fff;
    color: #bbb !important;
@@ -994,88 +1168,127 @@ ul.Activities ul.Comments li.CommentForm a.CommentLink:hover {
    line-height: 100%;
    font-weight: normal;
 }
+ul.Activities li.CommentForm form div {
+	text-align: right;
+}
 ul.Activities li.CommentForm textarea.TextBox {
-   width: 610px;
+   width: 380px;
 	min-height: 40px;
    height: 40px;
    margin-bottom: 2px;
+	font-size: 12px;
 }
-body.Profile ul.Activities {
-   margin-top: 10px;
-   border-top: 1px solid #ddd;
-}
-div.EmptyInfo {
-   margin: 10px;
-}
-ul.Notifications {
-   margin-top: 0;
-   border: 0;
+ul.Activities li.CommentForm input.Button {
+	font-size: 12px;
+	box-shadow: 0 0 1px #999;
+	-moz-box-shadow: 0 0 1px #999;
+	-webkit-box-shadow: 0 0 1px #999;  
 }
 
-/* ================================================ DataList (Search Results) */
-body.Search h1 {
-   margin:0;
-}
-ul.DataList li {
-   margin: 0;
-   padding: 0 0 4px 0;
-   border-bottom: 1px solid #dbe3e6;
-}
-ul.DataList li li {
-   border: 0;
-   padding: 0;
-}
-ul.DataList,
-ul.DataList li ul {
+
+/* ============================================================== MessageList */
+/* used for lists of message-based content (discussion comments, private
+conversation messages, etc). */
+
+ul.MessageList,
+ul.MessageList li {
    list-style: none;
    margin: 0;
    padding: 0;
 }
-ul.DataList li ul li.Title a {
-   border: 1px solid #eee;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #fafafa;
-   margin: 4px 0;
-   padding: 2px 8px;
-   line-height: 130%;
-   color: #2b3033;
-   font-size: 105%;
-   display: block;
+ul.MessageList li.Item {
+   border-bottom: 1px solid #ddd;
+	padding: 4px;
 }
-ul.DataList li ul li.Title strong {
-	display: block;
-   padding: 6px 0 0 6px;
-   margin: 0;
-   font-size: 110%;
+ul.MessageList div.Meta {
+   font-size: 11px;
+   color: #777;
+}
+ul.MessageList div.Meta span.Author img {
+   height: 40px;
+   width: 40px;
+   border: 0;
+   margin: 0 10px 0 0;
+   float: left;
+   overflow: hidden;
+   background: #eee;
+}
+ul.MessageList div.Meta span {
+   line-height: 2.5;
+   padding-left: 10px;
+}
+ul.MessageList div.Meta span.Author {
+	padding: 0;
+}
+ul.MessageList div.Meta span.Author a {
+   font-size: 15px;
    font-weight: bold;
 }
-ul.DataList li ul li.Title strong a {
-   display: inline;
-   border: 0;
-   padding: 0;
-   margin: 0;
-   color: #2d7bb2 /* Body Link Font Color */;
-   background: none;
+ul.MessageList div.Message {
+   clear: both;
+   line-height: 140%;
+   font-size: 100%;
 }
-ul.DataList li ul li.Meta {
-   font-family: tahoma;
-   margin-left: 5px;
-   font-size: 80%;
-   color: #80828c /* Meta Label Font Color */;
+ul.MessageList div.Message p {
+   margin: 8px 0;
 }
-ul.DataList li ul li.Meta span,
-ul.DataList li ul li.Meta span a,
-ul.DataList li ul li.Meta strong {
-   margin-right: 12px;
+ul.MessageList div.Message blockquote {
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   padding: 4px 16px;
+   margin: 4px 0;
+   background: #ffc;
 }
-ul.DataList li ul li.Meta strong {
-   background: #ff0;
-   padding: 0 2px;
+ul.MessageList div.Message code,
+ul.MessageList div.Message pre {
+   display: block;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #ff9;
+   padding: 4px 8px;
+   white-space: pre;
+   font-family: monospace;
+   overflow: auto;
 }
-ul.DataList li ul li.Meta a {
-   color: #2b2d33;
+ul.MessageList div.Message strong {
+   font-weight: bold;
 }
+ul.MessageList div.Message em {
+   font-style: oblique;
+}
+ul.MessageList div.Message ul,
+ul.MessageList div.Message ol {
+   margin-left: 3em ! important;
+}
+ul.MessageList div.Message ol li {
+  list-style: decimal ! important;
+}
+ul.MessageList div.Message ul li {
+  list-style: disc ! important;
+}
+
+/* The "Foot" is at the bottom of the #Content section. Used for more results
+links, sign in buttons, etc */
+.Foot {
+	border-bottom: 1px solid #caf0fe;
+   padding: 6px;
+   background: #e9f9ff;
+   text-align: right;
+   -moz-border-radius-bottomright: 2px;
+   -moz-border-radius-bottomleft: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+   }
+.Foot a.TabLink {
+	margin-left: 10px;
+}
+.Foot .Note {
+	line-height: 2.6;
+	float: left;
+	padding: 0 0 0 8px;
+	font-weight: bold;
+}
+
 
 /* ============================================================= Profile Page */
 body.Profile #Content {
@@ -1102,7 +1315,7 @@ ul.SideMenu li ul {
    background: none;
 }
 ul.SideMenu li ul li {
-   border-bottom: 1px solid #dbe3e6 /* Panel Inlay Border Color */;
+   border-bottom: 1px solid #dbe3e6;
 }
 ul.SideMenu li ul li a {
    padding: 0 8px;
@@ -1110,7 +1323,7 @@ ul.SideMenu li ul li a {
 }
 ul.SideMenu li ul li a:hover {
    text-decoration: none;
-   background: #e9f9ff /* Panel Hover Font Color */;
+   background: #e9f9ff;
 }
 div.User {
    line-height: 150%;
@@ -1168,72 +1381,119 @@ div.User form input.InputBox {
 form.Activity {
    display: block;
    padding: 10px 10px 0 10px;
+	text-align: right;
 }
 form.Activity textarea {
    width: 660px;
    margin-bottom: 2px;
    height: 60px;
    min-height: 60px;
-   max-height: 300px;
 }
-
-
-/* ========================================================= Profile Tab Menu */
-ul.Tabs,
-ul.Tabs li {
-   float: none;
-   display: inline;
-   border-bottom: 0;
+/* Invitations Form */
+#Form_Invitation table {
+   width: 100%;
+   border-collapse: collapse;
+   margin: 10px 0;
+	background: #F2FBFF;
+	border: 1px solid #C0E7F5;
 }
-ul.Tabs {
-   clear: left;
-   display: block;
-   border-bottom: 1px solid #caf0fe /* Panel Inlay Border Color */;
-   padding: 10px 0 0 10px;
-   margin: 0;
-   background: #e9f9ff /* Panel Background Color */;
+#Form_Invitation table label {
+   font-size: 12px;
+   padding: 0px;
 }
-ul.Tabs li {
-   padding: 5px 0;
-   margin: 0;
-   line-height: 24px;
-   -moz-border-radius-topleft: 3px;
-   -moz-border-radius-topright: 3px;
-   -webkit-border-top-left-radius: 3px;
-   -webkit-border-top-right-radius: 3px;
+#Form_Invitation table tr.Last td,
+#Form_Invitation table tr.Last th {
+   border-bottom: 0px;
 }
-ul.Tabs li.Active {
-   border: 1px solid #caf0fe /* Panel Inlay Border Color */;
-   border-bottom: 0;
-   background: #fff /* Panel Selected Background Color */;
+#Form_Invitation table th,
+#Form_Invitation table td {
+   font-weight: normal;
+   color: #555;
+   padding: 6px;
 }
-ul.Tabs li a,
-ul.Tabs li a:link,
-ul.Tabs li a:hover,
-ul.Tabs li a:active,
-ul.Tabs li a:visited {
-   -moz-border-radius-topleft: 3px;
-   -moz-border-radius-topright: 3px;
-   -webkit-border-top-left-radius: 3px;
-   -webkit-border-top-right-radius: 3px;
-   display: inline;
-   background: #daf4fd /* Panel Inlay Background Color */;
+#Form_Invitation table thead th,
+#Form_Invitation table thead td {
+   border-bottom: 1px solid #C0E7F5;
+}
+#Form_Invitation table tbody th {
    font-weight: bold;
-   color: #2786C2 /* Panel Inlay Font Color */ !important;
+   color: #000;
+}
+#Form_Invitation table tbody th,
+#Form_Invitation table tbody td {
+   border-bottom: 1px solid #C0E7F5;
+   line-height: 150%;
+}
+#Form_Invitation table thead th {
+   font-weight: bold;
+   font-size: 13px;
+   color: #000;
+}
+#Form_Invitation table.AltRows tr.Alt th,
+#Form_Invitation table.AltRows tr.Alt td,
+#Form_Invitation table.AltColumns th.Alt,
+#Form_Invitation table.AltColumns td.Alt {
+   background: #E9F9FF;
+}
+#Form_Invitation table.AltColumns tr.Alt {
+   background: none;
+}
+body.Profile ul.Notifications {
+	border-top: 0;
+	margin-top: 0;
+}
+
+
+/* ================================================================= Tab Menu */
+div.Tabs {
+	display: block;
+   border-bottom: 1px solid #caf0fe;
+   padding: 8px;
+   margin: 0;
+   background: #e9f9ff;
+}
+div.Tabs li {
+   display: inline;
+   margin: 0;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited,
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   margin: 0;
+   border: 1px solid #caf0fe;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #daf4fd;
+   display: inline;
+   font-weight: bold;
+   color: #2786C2;
    text-decoration: none;
-   padding: 5px 10px 4px 10px;
-   margin: 1px 0 0;
+   padding: 5px 10px;
+	line-height: 2.6;
 }
-ul.Tabs li a:hover {
-   background: #f3fcff /* Panel Inlay Background Color */;
+div.MorePager a:hover,
+a.TabLink:hover,
+div.Tabs li a:hover {
+   background: #f3fcff;
 }
-ul.Tabs li.Active a {
-   background: #fff /* Panel Selected Background Color */ !important;
-   color: #454545 /* Panel Selected Font Color */ !important;
-   text-decoration: none;
-   padding: 5px 10px 4px 10px;
+a.Active,
+div.Tabs li.Active a {
+   background: #fff;
+   color: #454545;
 }
-ul.Tabs li a span {
+div.Tabs li a span {
    line-height: 1;
    font-size: 80%;
    padding: 0 3px;
@@ -1243,6 +1503,32 @@ ul.Tabs li a span {
    background: #2786C2;
    color: #eaf4fd;
    margin: 0 0 0 4px;
+}
+div.Tabs div.SubTab {
+	margin: 10px 0 0;
+	padding: 4px 8px;
+	background: #f3fcff;
+   -webkit-border-radius: 2px;
+   -moz-border-radius: 2px;
+}
+div.HeadingTabs {
+	padding: 8px 8px 8px 12px;
+}
+div.HeadingTabs ul {
+	display: inline;
+	float: right;
+}
+div.HeadingTabs div.SubTab {
+	font-size: 14px;
+	display: inline;
+	font-weight: bold;
+	background: none;
+	padding: 0;
+	line-height: 2.4;
+}
+div.SearchTabs input.InputBox {
+	width: 560px;
+	margin-right: 10px;
 }
 
 
@@ -1265,7 +1551,7 @@ form.Thumbnail table tr td {
 .jcrop-vline, .jcrop-hline {
    font-size: 0;
    position: absolute;
-   background: white url('jcrop.gif') top left repeat;
+   background: white url('images/jcrop.gif') top left repeat;
 }
 .jcrop-vline { height: 100%; width: 1px !important; }
 .jcrop-hline { width: 100%; height: 1px !important; }
@@ -1311,7 +1597,6 @@ div.Popup div.Messages {
    left: auto;
    z-index: auto;
 	margin: 10px 0 !important;
-	font-family: 'lucida grande';
 }
 div.Popup div.Messages ul {
 	display: block;
@@ -1324,6 +1609,9 @@ div.Popup div.Messages ul {
   top: auto;
   left: auto;
   overflow: auto; 
+}
+div.Popup .Info {
+	margin-top: 10px;
 }
 div.Popup .Loading {
    display: block;
@@ -1353,6 +1641,9 @@ div.Popup div.Body {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border: 8px solid #555;
+	box-shadow: 0px 0px 10px #333;
+	-moz-box-shadow: 0px 0px 10px #333;
+	-webkit-box-shadow: 0px 0px 10px #333;  
 }
 div.Popup div.Body div.Body {
    border: 0;
@@ -1366,27 +1657,25 @@ div.Popup .Content form {
 div.Popup .Loading {
   text-align: center;
 }
-div.Popup .Footer {
-  background: #E9F9FF;
-  text-align: right;
-  padding: 0 6px 2px 0;
-  border-top:1px solid #CAF0FE;
-  -moz-border-radius-bottomleft: 5px;
-  -moz-border-radius-bottomright: 5px;
-  -webkit-border-bottom-left-radius: 5px;
-  -webkit-border-bottom-right-radius: 5px;
-}
 div.Popup h1,
 div.Popup h2 {
-	font-family: 'lucida grande';
 	font-size:120%;
 	font-weight:bold;
 	margin-bottom: 0;
 	color: #fff;
 	background: #44C7F4;
 	border-bottom: 1px solid #3DB9E5;
-	text-shadow: none;
 	padding: 6px 9px 4px;
+}
+div.Popup .Footer {
+  background: #E9F9FF;
+  text-align: right;
+  padding: 2px 6px 0 0;
+  border-top:1px solid #CAF0FE;
+  -moz-border-radius-bottomleft: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+  -webkit-border-bottom-right-radius: 5px;
 }
 div.Popup h3 {
 	font-size: 120%;
@@ -1395,21 +1684,18 @@ div.Popup h3 {
 }
 div.Popup p {
 	padding: 6px 10px 10px;
-	font-family: 'lucida grande';
-}
-div.Popup div.Legal * {
-	font-family: 'lucida grande';
 }
 div.Popup div.Legal p {
 	padding: 6px 0 10px;
 }
 div.Popup small {
-	font-family: 'lucida grande';
-	font-size: 80%;
+	font-size: 11px;
 }
 div.Popup form p {
 	padding: 0;
 }
+body.Profile #Form_Invitation ul li label,
+body.Profile #Form_User ul li label,
 div.Popup form ul li label {
 	color:#000;
 	display:block;
@@ -1417,17 +1703,44 @@ div.Popup form ul li label {
 	font-weight:bold;
 	margin: 10px 0 0;
 }
+body.Entry form ul li.Gender label.RadioLabel,
+body.Profile #Form_User ul li.Gender label.RadioLabel,
+div.Popup form ul li.Gender label.RadioLabel {
+	display: inline;
+	padding-right: 20px;
+}
+li.Gender {
+	margin-bottom: 10px;
+}
+body.Profile #Form_User ul li label.RadioLabel,
+body.Profile #Form_User ul li label.CheckBoxLabel,
 div.Popup form ul li label.RadioLabel,
 div.Popup form ul li label.CheckBoxLabel {
 	font-weight: normal;
 }
+div.Profile #Form_User input.Button,
 div.Popup input.Button {
 	margin: 4px 0 2px;
 }
 body.Entry div.Popup p {
 	color: #000;
 }
-
+div.Popup #Form_User div.Warning,
+#garden_profile_picture #Form_User div.Warning {
+	margin: 6px 0;
+}
+div.SignInPopup div.Body {
+	max-width: 320px;
+}
+div.SignInPopup .Content form {
+	padding: 0 30px 10px;
+}
+div.SignInPopup div.Box {
+	margin: 0;
+	padding: 0;
+	background: none;
+	border: 0;
+}
 
 /* ==================================================================== Legal */
 div.Legal h3 {
@@ -1472,10 +1785,8 @@ div.Legal strong {
 }
 #Foot div {
 	width: 960px;
-	border-top: 1px solid #ddd;
 	padding: 6px 0;
 	margin: 20px auto 0;
-   font-family: 'lucida grande','helvetica neue',helvetica,arial,sans-serif;
 	text-align: left;
 }
 
@@ -1491,12 +1802,16 @@ div.Popup .Content {
 div.Popup .Footer {
 	background: #F8F7E7;
 }
+ul.Activities div.Excerpt a,
+ul.Activities div.Meta a,
 a,
 a:link,
 a:visited,
 a:active {
    color: #e62727;
 }
+ul.Activities div.Excerpt a:hover,
+ul.Activities div.Meta a:hover,
 a:hover {
    color: #e62727;
    text-decoration: underline;
@@ -1507,7 +1822,7 @@ a:hover {
 }
 body #Head h1 {
    position: absolute;
-   background: url('carsonified.png') center center no-repeat;
+   background: url('images/carsonified.png') center center no-repeat;
    display: block;
    height: 112px;
    width: 232px;
@@ -1587,7 +1902,8 @@ a.NewDiscussion:hover {
 }
 .MorePager,
 div.Box {
-   background: #e8e7d7;
+   background: #e8e7d7 !important;
+	border: 0 !important;
 }
 div.Box h4 {
    border: 0;
@@ -1632,28 +1948,8 @@ input.SmallInput:focus,
 textarea:focus {
    background: #fff;
 }
-ul.Tabs,
 #Status {
 	background: #e8e7d7;
-}
-ul.Tabs {
-	border-bottom: 1px solid #D8D7C7;
-}
-ul.Tabs li a,
-ul.Tabs li a:link,
-ul.Tabs li a:active,
-ul.Tabs li a:visited,
-ul.Tabs li a:hover {
-	color: #1b1a00 !important;
-	background: none !important;
-}
-ul.Tabs li.Active {
-	border: 1px solid #D8D7C7;
-	border-bottom: 0;
-	background: #fffeef;
-}
-ul.Tabs li.Active a {
-	background: #fffeef !important;
 }
 ul.Activities ul.Comments li {
 	background: #e8e7d7;
@@ -1673,10 +1969,6 @@ ul.SideMenu li ul li a:hover {
 }
 a.Close {
 	color: #aaa;
-}
-ul.Tabs li a span {
-   background: #1B1A00;
-   color: #FFFEEF;
 }
 body.Profile ul.PanelInfo {
 	border-bottom: 0;
@@ -1702,4 +1994,70 @@ div.Popup .Footer {
   -moz-border-radius-bottomright: 5px;
   -webkit-border-bottom-left-radius: 5px;
   -webkit-border-bottom-right-radius: 5px;
+}
+div.Tabs {
+   background: #E8E7D7;
+   border-bottom: 1px solid #D8D7C7;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited,
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   color: #5B5A40;
+   border: 1px solid #D8D7C7;
+   background: #EEEEDE;
+}
+div.MorePager a:hover,
+a.TabLink:hover,
+div.Tabs li a:hover {
+   background: #fEfEeE;
+}
+a.Active,
+div.Tabs li.Active a {
+   background: #fff;
+   color: #454545;
+}
+div.Tabs li a span {
+   background: #5B5A40;
+   color: #eee;
+}
+div.Tabs div.SubTab {
+	background: none;
+}
+a.BigButton {
+   color: #fff;
+   background: #e62727;
+	text-shadow: 0 1px 0 #000;
+   border: 0;
+	box-shadow: 0px 0px 2px #333;
+	-moz-box-shadow: 0px 0px 2px #333;
+	-webkit-box-shadow: 0px 0px 2px #333;  
+}
+a.BigButton:hover {
+   text-decoration: none;
+	color: #fff;
+   border: 0;
+	box-shadow: 0px 0px 5px #666;
+	-moz-box-shadow: 0px 0px 5px #666;
+	-webkit-box-shadow: 0px 0px 5px #666;  
+}
+a.BigButton:focus {
+   background: #D32424;
+}
+ul.Activities ul.DataList li {
+	background: #E8E7D7;
+}
+.Foot {
+	border: 0;
 }

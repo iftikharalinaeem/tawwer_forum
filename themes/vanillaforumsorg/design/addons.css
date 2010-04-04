@@ -385,10 +385,8 @@ div.SearchForm a.Active {
 }
 
 /* User Info Box */
-#Content div.UserOptions {
-   margin: 0;
-   width: 250px;
-   float: right;
+div.UserOptions {
+   margin: 0 0 20px;
 }
 div.UserOptions h3 {
    background: url(hr.png) repeat-x left bottom;

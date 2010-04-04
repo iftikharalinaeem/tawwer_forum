@@ -2,8 +2,8 @@
 
 $ThemeInfo['VanillaForums.org'] = array(
    'Description' => "A custom theme for VanillaForums.org. Used to customize the heading banner for the forum.",
-   'Version' => '1.0',
+   'Version' => '1.0.2',
    'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@lussumo.com',
+   'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca'
 );
