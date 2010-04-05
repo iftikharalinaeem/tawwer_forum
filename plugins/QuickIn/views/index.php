@@ -14,12 +14,6 @@ echo $this->Form->Errors();
 <ul>
    <li>
       <?php
-         echo $this->Form->Label('Registration Url', 'Garden.Authenticator.RegisterUrl');
-         echo $this->Form->TextBox('Garden.Authenticator.RegisterUrl', array('style' => 'width: 500px;'));
-      ?>
-   </li>
-   <li>
-      <?php
          echo $this->Form->Label('Sign-in Url', 'Garden.Authenticator.SignInUrl');
          echo $this->Form->TextBox('Garden.Authenticator.SignInUrl', array('style' => 'width: 500px;'));
       ?>
@@ -28,6 +22,12 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->Label('Sign-out Url', 'Garden.Authenticator.SignOutUrl');
          echo $this->Form->TextBox('Garden.Authenticator.SignOutUrl', array('style' => 'width: 500px;'));
+      ?>
+   </li>
+   <li>
+      <?php
+         echo $this->Form->Label('Registration Url', 'Garden.Authenticator.RegisterUrl');
+         echo $this->Form->TextBox('Garden.Authenticator.RegisterUrl', array('style' => 'width: 500px;'));
       ?>
    </li>
 </ul>

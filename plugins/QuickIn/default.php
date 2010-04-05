@@ -28,31 +28,55 @@ class QuickInPlugin implements Gdn_IPlugin {
    }
 
    /**
-    * A url through which users can be signed in automatigically.
+    * A url through which external apps can call via js to share user information.
     */
    public function EntryController_QuickIn_Create($Sender, $EventArguments) {
-      // Retrieve information about the user from the url.
-      $UserInfo = array(
-         'UniqueID' => GetIncomingValue('UniqueID'),
-         'Email' => GetIncomingValue('Email'),
-         'Name' => GetIncomingValue('Name'),
-         'Attributes' => GetIncomingValue('Attributes')
-      );
-      
-      // TODO: Check these are valid before setting the cookie.
-      
-      // Store this information in a cookie
-      setcookie('QuickIn', Format::Serialize($UserInfo));
+      $QuickIn = $this->_QuickInGet();
+      if ($QuickIn) {
+         // Store this information in a cookie
+         setcookie(
+            'QuickIn',
+            Format::Serialize($QuickIn),
+            0, // Setting $Expire to 0 will cause the cookie to die when the browser closes.
+            C('Garden.Cookie.Path', '/'),
+            C('Garden.Cookie.Domain', '')
+         );
+      }
+   }
+   
+   /**
+    * Checks the $_GET collection for a "QuickIn" param. Returns the contained values if they are valid.
+    */
+   private function _QuickInGet() {
+      if (C('Garden.Authenticator.Type') == 'Handshake' && array_key_exists('QuickIn', $_GET)) {
+         // $Session = Gdn::Session();
+         // if (!$Session->IsValid()) {
+            $QuickIn = Format::Unserialize(stripslashes($_GET['QuickIn']));
+
+            // Make sure required values are present
+            if (array_key_exists('UniqueID', $QuickIn) && array_key_exists('Email', $QuickIn) && array_key_exists('Name', $QuickIn))
+               return $QuickIn;
+         // }
+      }
+      return FALSE;
    }
    
    /**
     * If the user does not have an active session, but they do have a quickin cookie, send them to handshake.
     */
    public function Base_Render_Before(&$Sender) {
-      $Session = Gdn::Session();
-      $QuickIn = ArrayValue('QuickIn', $_COOKIE);
-      if (!$Session->IsValid() && $QuickIn) {
+      if (C('Garden.Authenticator.Type') == 'Handshake') {
+         $Session = Gdn::Session();
+
+         // Check the $_GET collection for QuickIn information
+         $QuickIn = $this->_QuickInGet();
+         if ($QuickIn)
+            Redirect('entry/handshake/?Target='.$Sender->SelfUrl);
          
+         // Check the $_COOKIE collection for QuickIn information
+         $QuickIn = array_key_exists('QuickIn', $_COOKIE);
+         if (!$Session->IsValid() && $QuickIn && strtolower($Sender->ControllerName) != 'entrycontroller')
+            Redirect('entry/handshake/?Target='.$Sender->SelfUrl);
       }
    }
 
@@ -80,7 +104,7 @@ class QuickInPlugin implements Gdn_IPlugin {
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
          // Apply the config settings to the form.
          $Sender->Form->SetData($ConfigurationModel->Data);
-         $Sender->Form->SetValue('EnableQuickIn', Gdn::Config('Garden.Authenticator.Type') == 'Handshake' ? 'TRUE' : '');
+         $Sender->Form->SetValue('EnableQuickIn', C('Garden.Authenticator.Type') == 'Handshake' ? 'TRUE' : '');
       } else {
          $Enabled = $Sender->Form->GetFormValue('EnableQuickIn', '') == 'TRUE';
          // Make sure to force some values

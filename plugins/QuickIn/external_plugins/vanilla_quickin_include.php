@@ -12,12 +12,12 @@ Include this file in your external application above your calls to VanillaQuickI
 
 function VanillaQuickIn($VanillaUrl, $UniqueID, $Email, $Name, $Attributes) {
    $VanillaUrl .= substr($VanillaUrl, -1, 1) == '/' ? '' : '/';
-   $VanillaUrl .= 'plugin/authuser/';
+   $VanillaUrl .= 'plugin/quickin/';
    $VanillaUrl .= '?UniqueID='.$UniqueID;
-   $VanillaUrl .= '?Email='.$Email;
-   $VanillaUrl .= '?Name='.$Name;
+   $VanillaUrl .= '&Email='.$Email;
+   $VanillaUrl .= '&Name='.$Name;
    if (is_array($Attributes))
-      $VanillaUrl .= '?Attributes=arr:'.json_encode($Attributes);
+      $VanillaUrl .= '&Attributes=arr:'.json_encode($Attributes);
    
    ?>
    <script type="text/javascript">

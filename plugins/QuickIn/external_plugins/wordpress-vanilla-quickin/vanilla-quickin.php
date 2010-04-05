@@ -18,8 +18,7 @@ Contact Mark O'Sullivan at mark [at] vanillaforums [dot] com
 */
 
 add_action('wp_head', 'vanilla_quickin');
-add_action('admin_menu', 'vanilla_quickin_menu');
-
+add_action('admin_head', 'vanilla_quickin');
 function vanilla_quickin() {
 	global $current_user;
 	if (!function_exists('get_currentuserinfo'))
@@ -30,30 +29,36 @@ function vanilla_quickin() {
 	$QuickInDomain = get_option('vanilla_quickin_domain');
 	if ($current_user->ID != '' && $QuickInDomain != '') {
 // TODO: SET A COOKIE OR CONF SETTING SO WE KNOW THAT THIS VALUE HAS BEEN SENT AND WE DON'T KEEP HAMMERING VANILLA WITH THE INFORMATION.
+		$QuickInUrl = $QuickInDomain;
 		$QuickInUrl .= substr($QuickInDomain, -1, 1) == '/' ? '' : '/';
-		$QuickInUrl .= 'entry/quickin/';
-		$QuickInUrl .= '?UniqueID='.$current_user->ID;
-		$QuickInUrl .= '?Email='.$current_user->user_email;
-		$QuickInUrl .= '?Name='.$current_user->display_name;
-		$Attributes = array(
-			'TransientKey' => wp_create_nonce('log-out') // Vanilla's "TransientKey" is the equivalent of WordPress' "wpnonce".
+		$QuickInUrl .= 'entry/quickin/?QuickIn=';
+		$QuickIn = array(
+			'UniqueID' => $current_user->ID,
+			'Email' => $current_user->user_email,
+			'Name' => $current_user->display_name,
+			'Attributes' => array(
+				'TransientKey' => wp_create_nonce('log-out') // Vanilla's "TransientKey" is the equivalent of WordPress' "wpnonce".
+			)
 		);
-		$QuickInUrl .= '?Attributes=arr:'.json_encode($Attributes);
+		$QuickInUrl .= urlencode('arr:'.json_encode($QuickIn));
+		// echo '<script type="text/javascript" src="'.$QuickInUrl.'"></script>';
+		echo '<a href="http://gunn.local/vanilla2/?QuickIn='.urlencode('arr:'.json_encode($QuickIn)).'">Vanilla</a>';
+		/*
 		?>
 		<script type="text/javascript">
 			var ajax = new XMLHttpRequest();
 			ajax.open('GET', '<?php echo $QuickInUrl; ?>', false);
 			ajax.send(null);
 		</script>
-		<?php			
+		<?php
+		*/
 	}
 }
 
+add_action('admin_menu', 'vanilla_quickin_menu');
 function vanilla_quickin_menu() {
-  add_options_page('Vanilla QuickIn', 'Vanilla QuickIn', 8, 'vanilla-quickin', 'vanilla_quickin_options');
-  add_submenu_page('VQI', 'VQI', 'VQI', 8, 'vanilla-quickin-info', 'vanilla_quickin_info');
+  add_submenu_page('plugins.php', 'Vanilla QuickIn', 'Vanilla QuickIn', 'administrator', 'vanilla-quickin', 'vanilla_quickin_options');
 }
-
 function vanilla_quickin_options() {
 	if (isset($_POST['save'])) {
 		if (function_exists('current_user_can') && !current_user_can('manage_options'))
@@ -67,7 +72,6 @@ function vanilla_quickin_options() {
 	}
 	if ($QuickInDomain == '')
 		$QuickInDomain = 'http://domain.com/vanilla';
-}
 ?>
 <div class="wrap">
 	<div id="icon-options-general" class="icon32"><br /></div>
@@ -77,7 +81,7 @@ function vanilla_quickin_options() {
 		<table class="form-table">
 			<tr>
 				<th>Vanilla's Web Address</th>
-				<td><input type="text" name="vanilla_quickin_domain" value="<?php echo $QuickInDomain; ?>" /></td>
+				<td><input type="text" name="vanilla_quickin_domain" value="<?php echo $QuickInDomain; ?>" style="width: 400px;" /></td>
 			</tr>
 		</table>
 		<p class="submit"><input type="submit" name="save" value="<?php _e('Save &raquo;'); ?>" /></p>
@@ -85,9 +89,10 @@ function vanilla_quickin_options() {
 	<?php
 	$QuickInAnchor = 'the QuickIn page';
 	if ($QuickInDomain != 'http://domain.com/vanilla') {
+		$QuickInUrl = $QuickInDomain;
 		$QuickInUrl .= substr($QuickInDomain, -1, 1) == '/' ? '' : '/';
 		$QuickInUrl .= 'settings/quickin/';
-		$QuickInAnchor = '<a href="'.$QuickInUrl.'">'.$QuickInAnchor.'</a>';
+		$QuickInAnchor = '<a href="'.$QuickInUrl.'" target="Vanilla">'.$QuickInAnchor.'</a>';
 	}
 	?>
 	<p>Copy & paste these login definitions into <?php echo $QuickInAnchor; ?> in your Vanilla installation:</p>
@@ -98,7 +103,7 @@ function vanilla_quickin_options() {
 		</tr>
 		<tr>
 			<th>Sign-in Url</th>
-			<td><span class="description"><?php echo wp_login_url(); ?>?redirect_to=%s</span></td>
+			<td><span class="description"><?php echo wp_login_url(); ?></span></td>
 		</tr>
 		<tr>
 			<th>Sign-out Url</th>
