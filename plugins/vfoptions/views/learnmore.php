@@ -89,7 +89,7 @@ if ($About == 'adremoval') {
 } else if ($About == 'error') {
    ?>
    <div class="Legal">
-      <p>There is a problem with your forum's configuration, so you cannot currently purchase upgrades. Please contact support for assistance: <?php echo Format::Email('support@vanillaforums.com'); ?></p>
+      <p>There is a problem with your forum's configuration, so you cannot currently purchase upgrades. Please contact support for assistance: <?php echo Gdn_Format::Email('support@vanillaforums.com'); ?></p>
    </div>
    <?php
 } else if ($About == 'extrabandwidth') {
@@ -102,7 +102,7 @@ if ($About == 'adremoval') {
 } else {
    ?>
    <div class="Legal">
-      <p>You are looking for more information, but we don't seem to have what you're looking for. Contact us for help! <?php echo Format::Email('support@vanillaforums.com'); ?></p>
+      <p>You are looking for more information, but we don't seem to have what you're looking for. Contact us for help! <?php echo Gdn_Format::Email('support@vanillaforums.com'); ?></p>
    </div>
    <?php
 }

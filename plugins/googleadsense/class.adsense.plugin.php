@@ -12,7 +12,7 @@ Copyright 2008, 2009 Mark O'Sullivan
 //   'RequiredPlugins' => FALSE,
 //   'HasLocale' => TRUE,
 //   'RegisterPermissions' => FALSE,
-//   //'SettingsUrl' => '/garden/plugin/cssthemes', // Url of the plugin's settings page.
+//   //'SettingsUrl' => '/dashboard/plugin/cssthemes', // Url of the plugin's settings page.
 //   //'SettingsPermission' => 'Garden.Themes.Manage', // The permission required to view the SettingsUrl.
 //   'Author' => "Todd Burry",
 //   'AuthorEmail' => 'todd@vanillaforums.com',
@@ -40,7 +40,7 @@ class Gdn_AdSensePlugin implements Gdn_IPlugin {
 			if(in_array(strtolower($Sender->ControllerName), ArrayValue('Controllers', $AdConfig, array()))) {
 				$Content = ArrayValue('Html', $AdConfig, '');
 				if(!empty($Content)) {
-					$Panel = new Gdn_AdSenseModule();
+					$Panel = new AdSenseModule();
 					$Panel->Content = $Content;
 					$Sender->AddAsset($AssetName, $Panel, 'Ads');
 				}
@@ -51,7 +51,7 @@ class Gdn_AdSensePlugin implements Gdn_IPlugin {
 		//if(in_array(strtolower($Sender->ControllerName), $this->PanelAds)) {
 		//	$Content = Gdn::Config('Plugins.GoogleAdSense.PanelContent', '');
 		//	if(!empty($Content)) {
-		//		$Panel = new Gdn_AdSenseModule();
+		//		$Panel = new AdSenseModule();
 		//		$Panel->Content = $Content;
 		//		$Sender->AddAsset('Panel', $Panel, 'Ads');
 		//	}
@@ -59,7 +59,7 @@ class Gdn_AdSensePlugin implements Gdn_IPlugin {
 		//if(in_array(strtolower($Sender->ControllerName), $this->BannerAds)) {
 		//	$Content = Gdn::Config('Plugins.GoogleAdSense.BannerContent', '');
 		//	if(!empty($Content)) {
-		//		$Panel = new Gdn_AdSenseModule();
+		//		$Panel = new AdSenseModule();
 		//		$Panel->Content = $Content;
 		//		$Sender->AddAsset('Foot', $Panel, 'Ads');
 		//	}

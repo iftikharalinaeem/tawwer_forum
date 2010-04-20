@@ -24,7 +24,7 @@ class QuickInPlugin implements Gdn_IPlugin {
    // Adds a "Quick-in" menu option to the dashboard
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Site Settings', 'QuickIn', 'garden/settings/quickin', 'Garden.Settings.Manage');
+      $Menu->AddLink('Site Settings', 'QuickIn', 'dashboard/settings/quickin', 'Garden.Settings.Manage');
    }
 
    /**

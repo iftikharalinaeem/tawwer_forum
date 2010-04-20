@@ -1,0 +1,52 @@
+/* ===================================================== Theme Customizations */
+
+ul#Menu {
+padding:0;
+}
+
+#Head h1 a span {
+color:#fff;
+font-size:24px;
+text-shadow:none;
+}
+
+#Menu a:hover {
+background:#5c75aa;
+color:#fff!important;
+}
+
+#Menu li.NonTab a:hover {
+color:#fff!important;
+}
+
+#Head form input.Button {
+background:#6D84B4;
+color:#fff;
+}
+
+#Head {
+height:28px;
+background:#3B5998;
+}
+
+#Menu li a:hover,#Menu li.Active a:hover {
+-moz-border-radius:0;
+-webkit-border-radius:0;
+}
+
+body #Head h1,#Search {
+display:none;
+}
+
+#Menu ul,#Menu li.Active {
+background:#3B5998;
+}
+
+#Menu a,#Menu li.Active a {
+color:#fff;
+}
+
+#Menu a span,#Menu li.Active a span,#Menu li.Highlight a:hover span {
+background:#889dc3;
+color:#fff;
+}

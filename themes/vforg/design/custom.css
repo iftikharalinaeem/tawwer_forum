@@ -1,0 +1,299 @@
+/* ========================================= VanillaForums.org Customizations */
+
+/* ---- General Styles ---- */
+a,
+a:link,
+a:visited,
+a:active {
+   text-decoration: none;
+   color: #2a529a;
+}
+a:hover {
+   text-decoration: none;
+   color: #2a529a;
+	text-decoration: underline;
+}
+.Button:hover {
+	text-decoration: none;
+}
+body {
+	background: #E9F9FF;
+}
+#Frame {
+	border-top: 1px solid #fff;
+	background: #e4f0fc;
+	background: url('images/fade.jpg') top left repeat-x #fff;
+}
+#Body {
+   margin: 0 auto;
+	padding: 30px 0;
+}
+div#Content {
+	margin-bottom: 40px;
+}
+div#Foot {
+	margin: 0;
+	padding: 0;
+	background: url('images/hr.png') repeat-x top left #E9F9FF;
+}
+div#Foot div {
+	padding: 12px 0 10px;
+	border: 0;
+	margin: 0 auto;
+}
+div#Foot div,
+div#Foot div a {
+	color: #80828C;
+}
+div#Foot div a:hover {
+	text-decoration: none;
+	color: #40424C;
+}
+
+
+/* ---- Banner ---- */
+
+.Banner {
+	background: url('images/shine.jpg') top center no-repeat #2a529a;
+   border-bottom: 1px solid #183a7c;
+	text-align: center;
+	height: 120px;
+}
+.BannerWrapper {
+	width: 960px;
+	margin: 0 auto;
+	text-align: right;
+}
+.Banner div.Buttons {
+	float: right;
+}
+.Banner div.UserOptions {
+	float: right;
+	background: url('images/userinfo_left.png') left bottom no-repeat;
+}
+.Banner div.UserOptions div {
+	background: url('images/userinfo_right.png') right bottom no-repeat;
+	padding: 0 10px 4px 4px;
+	margin-left: 6px;
+}
+.Banner div.UserOptions a {
+	color: #fff;
+	text-shadow: 0 1px 0 #000;
+	margin: 0 8px;
+	font-family: 'Trebuchet MS', Arial;
+	font-size: 11px;
+}
+.Banner div.UserOptions a.Username:hover,
+.Banner div.UserOptions a.Inbox:hover {
+	text-decoration: none;
+}
+.Banner div.UserOptions a.Username:hover em,
+.Banner div.UserOptions a.Inbox:hover em {
+	text-decoration: underline;
+}
+.Banner div.UserOptions a span {
+	margin: 0 0 0 6px;
+	background: #8b8bff;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	color: #fff;
+	padding: 0 2px;
+	font-weight: normal;
+	font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+	text-shadow: 0 1px 0 #000;;
+}
+.Banner h1 {
+   border: 0;
+   margin: 0;
+   padding: 0;
+}
+.Banner h1 a {
+	margin: 10px 0 0;
+	float: left;
+   display: block;
+   height: 100px;
+   width: 236px;
+   background: url('images/vanilla_logo.png') center center no-repeat;
+}
+.Banner h1 a span {
+   display: none;
+}
+.Banner ul {
+   list-style: none;
+   margin: 50px 0 0;
+}
+.Banner ul li {
+	float: right;
+	height: 46px;
+	padding-left: 4px;
+	margin-left: 4px;
+}
+.Banner ul li a {
+   display: block;
+   font-family:'Trebuchet MS', 'helvetica nueue', helvetica;
+   font-size:15px;
+   font-weight:bold;
+   text-decoration: none;
+   color: #fff;
+   text-shadow:1px 1px 1px #000;
+	height: 46px;
+	line-height: 46px;
+	padding: 0 14px 0 10px;
+}
+.Banner ul li.Download {
+	background: url('images/dl_left.png') left center no-repeat;	
+}
+.Banner ul li.Download a {
+	background: url('images/dl_right.png') right center no-repeat;
+}
+body#dashboard_search_index .Banner ul li.Community,
+body#vforg_home_index .Banner ul li.Home,
+body.hosting .Banner ul li.Hosting,
+body.Wiki .Banner ul li.Documentation,
+body.Addons .Banner ul li.Addons,
+body.Profile .Banner ul li.Community,
+body.Vanilla .Banner ul li.Community,
+body.Conversations .Banner ul li.Community,
+body.Activity .Banner ul li.Community {
+	background: url('images/tab_left.png') left center no-repeat;	
+}
+body#dashboard_search_index .Banner ul li.Community a,
+body#vforg_home_index .Banner ul li.Home a,
+body.hosting .Banner ul li.Hosting a,
+body.Wiki .Banner ul li.Documentation a,
+body.Addons .Banner ul li.Addons a,
+body.Profile .Banner ul li.Community a,
+body.Vanilla .Banner ul li.Community a,
+body.Conversations .Banner ul li.Community a,
+body.Activity .Banner ul li.Community a {
+	background: url('images/tab_right.png') right center no-repeat;
+}
+
+/* --- Profile Page --- */
+form.Activity,
+ul.Activities {
+	background: #fff;
+}
+ul.Activities li.Item {
+	padding: 4px; 
+}
+ul.Discussions {
+	background: #fff;
+}
+
+a.BigButton:hover {
+	text-decoration: none;
+}
+
+/* ==================================================== VF.org Customizations */
+body.Conversations #Content h2 {
+   -moz-border-radius-topleft: 3px;
+   -moz-border-radius-topright: 3px;
+	background: url('images/grey_fade.png') top left repeat-x #ECF0F9;
+   border:1px solid #9CA7B8;
+   padding:4px 8px;
+   text-shadow: 0 1px 0 #fff;
+}
+body.Conversations #Content #MessageForm h2 {
+   background: none;
+   border: 0;
+   color: #000;
+	padding: 0 0 4px;
+	font-size: 120%;
+}
+ul#Conversations {
+   border: 1px solid #9CA7B8;
+   border-top: 0;
+   -moz-border-radius-bottomleft: 3px;
+   -moz-border-radius-bottomright: 3px;
+}
+ul#Conversation {
+   background: #fff;
+   border: 1px solid #9CA7B8;
+   border-top: 0;
+   border-bottom: 0;
+   margin: 0;
+}
+#MessageForm {
+   border: 1px solid #9CA7B8;
+   border-top: 0;
+   margin: 0;
+}
+.Preview li ul.Info li.Author img,
+#Discussion li ul.Info li.Author img {
+   background: url('images/grey_fade.png') top left repeat-x #Ecf0f9;
+   border: 1px solid #9ca7b8;
+   padding: 5px;
+   height: 32px;
+   width: 32px;
+   -moz-border-radius: 3px;
+}
+.Preview li ul.Info li,
+#Discussion li ul.Info li {
+   line-height:2.8;
+}
+#CommentForm {
+   background:#E9F9FF none repeat scroll 0 0;
+   padding:8px;
+}
+.Back {
+   border: 1px solid #9CA7B8;
+   border-top: 0;
+   margin: 0 0 6px;
+   padding: 3px 6px;
+   background: #e9f9ff /* Panel Background Color */;
+   text-align: left;
+   -moz-border-radius-bottomright: 2px;
+   -moz-border-radius-bottomleft: 2px;
+   -webkit-border-bottom-right-radius: 2px;
+   -webkit-border-bottom-left-radius: 2px;
+}
+body.Discussion #Content #CommentForm h2 {
+   background: none;
+   border: 0;
+   color: #000;
+}
+ul.DataList li ul li.Title {
+   font-family: 'Trebuchet MS';
+   float: left;
+   width: 558px;
+}
+ul.DataList li ul li.Title strong a {
+   color:#2A529A;
+   text-shadow: 0 1px 0 #fff;
+}
+ul.DataList li.DiscussionRow {
+   background: #f9fcff;
+}
+ul.DataList li.Mine { background: url('images/blue_fade.jpg') top left repeat-x #e8f8ff; }
+ul#Discussion li.Mine { background: #E9F9FF; }
+ul.DataList li.New, li.New { background: url('images/ylw_fade.jpg') top left repeat-x #ffd; }
+ul.DataList li ul li.Meta strong {
+   color:#555;
+}
+#Conversation li a.Photo img,
+#Conversations li a.Photo img {
+	background: url('images/grey_fade.png') top left repeat-x #Ecf0f9;
+   border: 1px solid #9ca7b8;
+   padding: 5px;
+   height: 32px;
+   width: 32px;
+   -moz-border-radius: 3px;
+}
+#Conversation li {
+	border-bottom: 1px solid #ddd;
+}
+#Conversations li,
+#Conversations li.New {
+	background: #fff;
+}
+#Conversations li.Active {
+	background: #ffe;
+}
+#Conversations li a.Message {
+	text-decoration: none;
+}
+div.AddPeople textarea.MultiComplete {
+  width: 248px;
+  margin: 2px 0;
+}

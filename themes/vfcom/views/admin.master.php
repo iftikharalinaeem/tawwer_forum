@@ -28,7 +28,7 @@
       <div id="Body">
          <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
          <div id="Content"><?php
-			if (Format::ToTimestamp('2010-02-20 08:00:00') > time()) {
+			if (Gdn_Format::ToTimestamp('2010-02-20 08:00:00') > time()) {
 				?>
 			<div class="Warning" style="margin-bottom: 20px;"><span style="font-weight: bold;">Notice:</span> VanillaForums.com will go offline for scheduled maintenance at 1pm EST on Tuesday February 23rd. <a href="http://vanillaforums.com/blog">More info here</a>.</div>
 			<?php
@@ -51,7 +51,7 @@
 			</div>
 			<div>
 				Powered by <a href="http://vanillaforums.com"><span>VanillaForums.com</span></a>
-				- Problems? <?php echo Format::Email('support@vanillaforums.com'); ?>
+				- Problems? <?php echo Gdn_Format::Email('support@vanillaforums.com'); ?>
 			</div>
 		</div>
    </div>

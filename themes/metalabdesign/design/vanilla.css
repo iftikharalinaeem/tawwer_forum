@@ -380,7 +380,7 @@ div.Popup ul.Preview li.Comment div.Body {
 }
 /*
   Note: Discussion & Comment Option (dropdown) Menu customizations. The layout
-  css for these is in /applications/garden/design/menu.css. Override them here.
+  css for these is in /applications/dashboard/design/menu.css. Override them here.
 */
 a.Bookmark,
 a.Bookmarking {

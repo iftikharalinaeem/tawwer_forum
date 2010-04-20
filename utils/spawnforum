@@ -33,7 +33,7 @@ if [ ! -d "$PATH" ]; then
     
     #Applications
     /bin/ln -s "${SOURCE}applications/conversations" "${PATH}applications/conversations"
-    /bin/ln -s "${SOURCE}applications/garden" "${PATH}applications/garden"
+    /bin/ln -s "${SOURCE}applications/dashboard" "${PATH}applications/dashboard"
     /bin/ln -s "${SOURCE}applications/vanilla" "${PATH}applications/vanilla"
     #End Applications
     

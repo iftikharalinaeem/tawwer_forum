@@ -11,7 +11,7 @@ echo "Updating symlinks for: ${PATH} to ${SOURCE}"
 # Delete all existing symlinks first
 # WARNING: Do not use a trailing slash on symlinked folders when rm'ing, or it will remove the source!
 /bin/rm "${PATH}applications/conversations"
-/bin/rm "${PATH}applications/garden"
+/bin/rm "${PATH}applications/dashboard"
 /bin/rm "${PATH}applications/vanilla"
 /bin/rm "${PATH}plugins/VanillaInThisDiscussion"
 /bin/rm "${PATH}plugins/HtmlPurifier"
@@ -28,7 +28,7 @@ echo "Updating symlinks for: ${PATH} to ${SOURCE}"
 
 # Now relink to the new place
 /bin/ln -s "${SOURCE}applications/conversations" "${PATH}applications/conversations"
-/bin/ln -s "${SOURCE}applications/garden" "${PATH}applications/garden"
+/bin/ln -s "${SOURCE}applications/dashboard" "${PATH}applications/dashboard"
 /bin/ln -s "${SOURCE}applications/vanilla" "${PATH}applications/vanilla"
 /bin/ln -s "${SOURCE}plugins/VanillaInThisDiscussion" "${PATH}plugins/VanillaInThisDiscussion"
 /bin/ln -s "${SOURCE}plugins/HtmlPurifier" "${PATH}plugins/HtmlPurifier"

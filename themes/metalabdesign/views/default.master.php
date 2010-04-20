@@ -11,7 +11,7 @@
             <?php
 			      $Session = Gdn::Session();
 					if ($this->Menu) {
-						$this->Menu->AddLink('Dashboard', T('Dashboard'), '/garden/settings', array('Garden.Settings.Manage'));
+						$this->Menu->AddLink('Dashboard', T('Dashboard'), '/dashboard/settings', array('Garden.Settings.Manage'));
 						$this->Menu->AddLink('Dashboard', T('Users'), '/user/browse', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
 						$this->Menu->AddLink('Activity', T('Activity'), '/activity');
 			         $Authenticator = Gdn::Authenticator();

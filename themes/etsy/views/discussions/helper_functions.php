@@ -78,7 +78,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
       ?>
    <div class="Discussion">
       <strong><?php
-         echo Anchor(Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
+         echo Anchor(Gdn_Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
       ?></strong>
       <?php
          $Sender->FireEvent('AfterDiscussionTitle');
@@ -96,7 +96,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
                printf(Plural($Discussion->CountComments, '%s comment', '%s comments'), $Discussion->CountComments);
             echo '</span>';
             echo '<span>';
-            printf(T($Discussion->CountComments > 0 ? 'Most recent by %1$s %2$s' : 'Posted by %2$s'), UserAnchor($Last), Format::Date($Discussion->LastDate));
+            printf(T($Discussion->CountComments > 0 ? 'Most recent by %1$s %2$s' : 'Posted by %2$s'), UserAnchor($Last), Gdn_Format::Date($Discussion->LastDate));
             echo '</span>';
 
             $Sender->FireEvent('DiscussionMeta');

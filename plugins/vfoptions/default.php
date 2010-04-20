@@ -34,8 +34,8 @@ class VFOptionsPlugin implements Gdn_IPlugin {
     */
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Dashboard', 'My Forums', 'garden/plugin/myforums', 'Garden.Settings.GlobalPrivs');
-      $Menu->AddLink('Dashboard', 'Premium Upgrades ♥', 'garden/plugin/upgrades', 'Garden.Settings.GlobalPrivs', array('class' => 'HighlightButton'));
+      $Menu->AddLink('Dashboard', 'My Forums', 'dashboard/plugin/myforums', 'Garden.Settings.GlobalPrivs');
+      $Menu->AddLink('Dashboard', 'Premium Upgrades ♥', 'dashboard/plugin/upgrades', 'Garden.Settings.GlobalPrivs', array('class' => 'HighlightButton'));
       
       // Remove the addons menu items
       $Menu->RemoveGroup('Add-ons');
@@ -89,93 +89,6 @@ pageTracker._trackPageview();
          $Sender->AddAsset('Content', $Script);
       }
    }
-
-   /**
-    * When an administrative user (UserID == 1) is saved, make sure to save the
-    * changes across all of the user's forums, including the VanillaForums.com
-    * database.
-    */
-   public function Gdn_UserModel_AfterSave_Handler(&$Sender, $EventArguments = '') {
-      $Fields = ArrayValue('Fields', $EventArguments);
-      $UserID = ArrayValue('UserID', $Fields, -1);
-      if ($UserID == -1)
-         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
-         
-      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
-      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
-      $Email = ArrayValue('Email', $Fields);
-      $Password = ArrayValue('Password', $Fields); // <-- This was encrypted in the model
-      $SaveFields = array();
-      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
-         // If a new password was specified, save it
-         if ($Password !== FALSE)
-            $SaveFields['Password'] = $Password;
-            
-         // If a new email was specified, save that too
-         if ($Email !== FALSE)
-            $SaveFields['Email'] = $Email;
-            
-         $this->_SaveAcrossForums($SaveFields, $VFUserID, $VFAccountID);
-      }
-   }
-
-   /**
-    * Before any forum's administrative user (UserID == 1) is saved, validate
-    * that the email address being saved isn't being used by any other user in
-    * any of their forums, or in the VanillaForums.com database.
-    */
-   public function Gdn_UserModel_BeforeSave_Handler(&$Sender, $EventArguments = '') {
-      $Fields = ArrayValue('Fields', $EventArguments);
-      $UserID = ArrayValue('UserID', $Fields, -1);
-      if ($UserID == -1)
-         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
-
-      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
-      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
-      $Email = ArrayValue('Email', $Fields);
-      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
-         // Retrieve all of the user's sites
-         $SiteData = $this->_GetDatabase()->SQL()
-            ->Select('DatabaseName, Path')
-            ->From('Site')
-            ->Where('AccountID', $VFAccountID)
-            ->Get();
-
-         // If the user is trying to change the email address...
-         if ($this->_GetDatabase()->SQL()
-            ->Select('UserID')
-            ->From('User')
-            ->Where('UserID <> ', $VFUserID)
-            ->Where('Email', $Email)
-            ->Get()
-            ->NumRows() > 0) {
-            $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
-         } else {
-            // Now check it against all forums the user owns, as well
-            if (is_numeric($VFAccountID) && $VFAccountID > 0) {
-               $Cnn = @mysql_connect(
-                  Gdn::Config('Database.Host', ''),
-                  Gdn::Config('Database.User', ''),
-                  Gdn::Config('Database.Password', '')
-               );
-               if ($Cnn) {
-                  foreach ($SiteData as $Site) {
-                     if ($Site->Path != '') {
-                        mysql_select_db($Site->DatabaseName, $Cnn);
-                        $Result = mysql_query("select UserID from GDN_User where UserID <> 1 and Email = '".mysql_real_escape_string($Email, $Cnn)."'");
-                        if ($Result && mysql_num_rows($Result) > 0) {
-                           $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
-                           break;
-                        }
-                     }
-                  }
-                  mysql_close($Cnn);
-               }
-            }
-         }
-         $this->_CloseDatabase();
-      }
-   }
    
    /**
     * Creates a "Buy Now" url that sends the user directly to checkout for an upgrade.
@@ -198,7 +111,7 @@ pageTracker._trackPageview();
    public function PluginController_CreateForum_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Create a New Forum');
-      $Sender->AddSideMenu('garden/plugin/myforums');
+      $Sender->AddSideMenu('dashboard/plugin/myforums');
       
       $Session = Gdn::Session();
       if (!$Session->CheckPermission('Garden.Settings.GlobalPrivs')) {
@@ -247,7 +160,7 @@ pageTracker._trackPageview();
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades &raquo; Custom Domain Name');
       if ($this->AddSideMenu)
-         $Sender->AddSideMenu('garden/plugin/upgrades');
+         $Sender->AddSideMenu('dashboard/plugin/upgrades');
 
       // Send a request to the specified domain, and see if it hits our
       // server (it should return our custom 404 error if it is pointed at
@@ -287,7 +200,7 @@ pageTracker._trackPageview();
    public function PluginController_DeleteForum_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Delete Forum');
-      $Sender->AddSideMenu('garden/plugin/myforums');
+      $Sender->AddSideMenu('dashboard/plugin/myforums');
       $Domain = strpos(Gdn::Config('Garden.Domain', '.vanillaforums.com'), 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforums';
       $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'vanilladev';
       
@@ -355,7 +268,7 @@ pageTracker._trackPageview();
       $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades &raquo; Learn More');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $Sender->AddSideMenu('dashboard/plugin/upgrades');
       $Sender->Form = new Gdn_Form();
       $Sender->Form->AddHidden('SiteID', $SiteID);
       $FeatureCode = ArrayValue(0, $Sender->RequestArgs, '');
@@ -381,7 +294,7 @@ pageTracker._trackPageview();
     */
    public function PluginController_MoreInfo_Create(&$Sender, $EventArguments) {
       $Sender->Title('Premium Upgrades &raquo; Learn More');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $Sender->AddSideMenu('dashboard/plugin/upgrades');
       $Sender->Form = new Gdn_Form();
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'moreinfo.php');
    }
@@ -393,7 +306,7 @@ pageTracker._trackPageview();
    public function PluginController_MyForums_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('My Forums');
-      $Sender->AddSideMenu('garden/plugin/myforums');
+      $Sender->AddSideMenu('dashboard/plugin/myforums');
 
       $Sender->SiteData = $this->_GetDatabase()->SQL()->Select('s.*')
          ->From('Site s')
@@ -413,7 +326,7 @@ pageTracker._trackPageview();
    public function PluginController_Remove_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $Sender->AddSideMenu('dashboard/plugin/upgrades');
       $UpgradeToRemove = ArrayValue(0, $Sender->RequestArgs, '');
       $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
       $Sender->Form = new Gdn_Form();
@@ -425,7 +338,7 @@ pageTracker._trackPageview();
             $Session = Gdn::Session();
             $this->_GetDatabase()->SQL()->Replace(
                'SiteFeature',
-               array('Selected' => '0', 'UpdateUserID' => $Session->UserID, 'DateUpdated' => Format::ToDateTime()),
+               array('Selected' => '0', 'UpdateUserID' => $Session->UserID, 'DateUpdated' => Gdn_Format::ToDateTime()),
                array('SiteID' => $SiteID, 'FeatureID' => $FeatureID)
             );
             
@@ -465,7 +378,7 @@ pageTracker._trackPageview();
    
    public function PluginController_RemoveComplete_Create(&$Sender, $EventArguments) {
       $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $Sender->AddSideMenu('dashboard/plugin/upgrades');
       // Remove the feature from the forum
       $this->_ApplyUpgrades();
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'removecomplete.php');
@@ -479,7 +392,7 @@ pageTracker._trackPageview();
    public function PluginController_RenameForum_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Rename Forum');
-      $Sender->AddSideMenu('garden/plugin/myforums');
+      $Sender->AddSideMenu('dashboard/plugin/myforums');
       
       $Session = Gdn::Session();
       $SiteID = ArrayValue(0, $EventArguments, '');
@@ -552,7 +465,7 @@ pageTracker._trackPageview();
     */
    public function PluginController_Spoof_Create(&$Sender) {
       $Sender->Title('Spoof User');
-      $Sender->AddSideMenu('garden/user');
+      $Sender->AddSideMenu('dashboard/user');
       $Sender->Form = new Gdn_Form();
       $Email = $Sender->Form->GetValue('Email', '');
       $Password = $Sender->Form->GetValue('Password', '');
@@ -584,9 +497,9 @@ pageTracker._trackPageview();
     * purchased upgrades.
     */
    public function PluginController_ThankYou_Create(&$Sender, $EventArguments) {
-      $this->_ReAuthenticate($Sender, 'garden/plugin/thankyou');
+      $this->_ReAuthenticate($Sender, 'dashboard/plugin/thankyou');
       $Sender->Title('Premium Upgrades &raquo; Thank You!');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $Sender->AddSideMenu('dashboard/plugin/upgrades');
       
       // Update the SiteFeature table so that all selected items are now marked active
       $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
@@ -646,11 +559,11 @@ pageTracker._trackPageview();
             
          Redirect('plugin/upgrades');
       }
-      $this->_ReAuthenticate($Sender, 'garden/plugin/upgrades');
+      $this->_ReAuthenticate($Sender, 'dashboard/plugin/upgrades');
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades');
       $Sender->AddCssFile('/plugins/vfoptions/style.css');
-      $Sender->AddSideMenu('garden/plugin/upgrades');
+      $Sender->AddSideMenu('dashboard/plugin/upgrades');
       $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
       // Reset upgrade selections
       $SiteFeatureData = $this->_GetDatabase()->SQL()->Select('SiteFeatureID, Active')->From('SiteFeature')->Where('SiteID', $SiteID)->Get();
@@ -683,6 +596,93 @@ pageTracker._trackPageview();
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
       ) Redirect($Sender->Routes['DefaultPermission']);
+   }
+
+   /**
+    * When an administrative user (UserID == 1) is saved, make sure to save the
+    * changes across all of the user's forums, including the VanillaForums.com
+    * database.
+    */
+   public function UserModel_AfterSave_Handler(&$Sender, $EventArguments = '') {
+      $Fields = ArrayValue('Fields', $EventArguments);
+      $UserID = ArrayValue('UserID', $Fields, -1);
+      if ($UserID == -1)
+         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
+         
+      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
+      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
+      $Email = ArrayValue('Email', $Fields);
+      $Password = ArrayValue('Password', $Fields); // <-- This was encrypted in the model
+      $SaveFields = array();
+      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
+         // If a new password was specified, save it
+         if ($Password !== FALSE)
+            $SaveFields['Password'] = $Password;
+            
+         // If a new email was specified, save that too
+         if ($Email !== FALSE)
+            $SaveFields['Email'] = $Email;
+            
+         $this->_SaveAcrossForums($SaveFields, $VFUserID, $VFAccountID);
+      }
+   }
+
+   /**
+    * Before any forum's administrative user (UserID == 1) is saved, validate
+    * that the email address being saved isn't being used by any other user in
+    * any of their forums, or in the VanillaForums.com database.
+    */
+   public function UserModel_BeforeSave_Handler(&$Sender, $EventArguments = '') {
+      $Fields = ArrayValue('Fields', $EventArguments);
+      $UserID = ArrayValue('UserID', $Fields, -1);
+      if ($UserID == -1)
+         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
+
+      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
+      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
+      $Email = ArrayValue('Email', $Fields);
+      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
+         // Retrieve all of the user's sites
+         $SiteData = $this->_GetDatabase()->SQL()
+            ->Select('DatabaseName, Path')
+            ->From('Site')
+            ->Where('AccountID', $VFAccountID)
+            ->Get();
+
+         // If the user is trying to change the email address...
+         if ($this->_GetDatabase()->SQL()
+            ->Select('UserID')
+            ->From('User')
+            ->Where('UserID <> ', $VFUserID)
+            ->Where('Email', $Email)
+            ->Get()
+            ->NumRows() > 0) {
+            $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
+         } else {
+            // Now check it against all forums the user owns, as well
+            if (is_numeric($VFAccountID) && $VFAccountID > 0) {
+               $Cnn = @mysql_connect(
+                  Gdn::Config('Database.Host', ''),
+                  Gdn::Config('Database.User', ''),
+                  Gdn::Config('Database.Password', '')
+               );
+               if ($Cnn) {
+                  foreach ($SiteData as $Site) {
+                     if ($Site->Path != '') {
+                        mysql_select_db($Site->DatabaseName, $Cnn);
+                        $Result = mysql_query("select UserID from GDN_User where UserID <> 1 and Email = '".mysql_real_escape_string($Email, $Cnn)."'");
+                        if ($Result && mysql_num_rows($Result) > 0) {
+                           $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
+                           break;
+                        }
+                     }
+                  }
+                  mysql_close($Cnn);
+               }
+            }
+         }
+         $this->_CloseDatabase();
+      }
    }
 
    /**
@@ -751,7 +751,7 @@ pageTracker._trackPageview();
 // --== CUSTOM DOMAINS ==--
 
          } else if ($Feature->Code == 'customdomain') {
-            $Attributes = Format::Unserialize($Feature->Attributes);
+            $Attributes = Gdn_Format::Unserialize($Feature->Attributes);
             $Domain = ArrayValue('Domain', $Attributes, '');
             $OldDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', ''));
             $IsEnabled = $Domain == $OldDomain ? TRUE : FALSE;
@@ -802,7 +802,7 @@ pageTracker._trackPageview();
                         
                         // Redirect to the new domain
                         $Session = Gdn::Session();
-                        $Redirect = $FQDN.'/garden/plugin/thankyou/auth/'.$Session->TransientKey();
+                        $Redirect = $FQDN.'/dashboard/plugin/thankyou/auth/'.$Session->TransientKey();
                      }
                   }
                }
@@ -845,7 +845,7 @@ pageTracker._trackPageview();
                   
                   // Redirect to the new domain
                   $Session = Gdn::Session();
-                  $Redirect = 'http://'.$Site->Name.'/garden/plugin/upgrades/auth/'.$Session->TransientKey();
+                  $Redirect = 'http://'.$Site->Name.'/dashboard/plugin/upgrades/auth/'.$Session->TransientKey();
                }
             }
          }
@@ -898,7 +898,7 @@ pageTracker._trackPageview();
          $PostBackKey = ArrayValue(1, $Sender->RequestArgs, '');
          $UserModel = Gdn::UserModel();
          $AdminUser = $UserModel->GetSession(1);
-         $Attributes = Format::Unserialize($AdminUser->Attributes);
+         $Attributes = Gdn_Format::Unserialize($AdminUser->Attributes);
          $TransientKey = is_array($Attributes) ? ArrayValue('TransientKey', $Attributes) : FALSE;
          if ($TransientKey == $PostBackKey) {
             $Identity = new Gdn_CookieIdentity();
@@ -985,9 +985,9 @@ pageTracker._trackPageview();
                   'FeatureID' => $Feature->FeatureID,
                   'Selected' => 1,
                   'Active' => 0,
-                  'DateInserted' => Format::ToDateTime(),
+                  'DateInserted' => Gdn_Format::ToDateTime(),
                   'InsertUserID' => $Session->UserID,
-                  'Attributes' => Format::Serialize($Attributes)
+                  'Attributes' => Gdn_Format::Serialize($Attributes)
                   )
                );
          } else {
@@ -1001,8 +1001,8 @@ pageTracker._trackPageview();
             array(
                'Selected' => 1,
                'Active' => 0,
-               'Attributes' => Format::Serialize($Attributes),
-               'DateUpdated' => Format::ToDateTime(),
+               'Attributes' => Gdn_Format::Serialize($Attributes),
+               'DateUpdated' => Gdn_Format::ToDateTime(),
                'UpdateUserID' => $Session->UserID
             ),
             array(
@@ -1062,12 +1062,12 @@ pageTracker._trackPageview();
       }
       if (is_object($Site)) {
          // Update the site attributes with the user's transientkey so we can authenticate them at the checkout
-         $Attributes = Format::Unserialize($Site);
+         $Attributes = Gdn_Format::Unserialize($Site);
          if (!is_array($Attributes))
             $Attributes = array();
             
          $Attributes['UserTransientKey'] = $Session->TransientKey();
-         $this->_GetDatabase()->SQL()->Put('Site', array('Attributes' => Format::Serialize($Attributes)), array('SiteID' => $SiteID));
+         $this->_GetDatabase()->SQL()->Put('Site', array('Attributes' => Gdn_Format::Serialize($Attributes)), array('SiteID' => $SiteID));
       }      
    }
 }

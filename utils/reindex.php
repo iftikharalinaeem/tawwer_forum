@@ -18,5 +18,5 @@ define('PATH_ROOT', dirname(__FILE__).DS.'..'.DS.$App);
 require_once(PATH_ROOT.DS.'bootstrap.php');
 
 
-$Model = new Gdn_CommentModel();
+$Model = new CommentModel();
 $Model->Reindex(NULL, $Count, TRUE);

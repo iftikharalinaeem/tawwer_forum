@@ -42,7 +42,7 @@ function vanilla_quickin() {
 		);
 		$QuickInUrl .= urlencode('arr:'.json_encode($QuickIn));
 		// echo '<script type="text/javascript" src="'.$QuickInUrl.'"></script>';
-		echo '<a href="http://gunn.local/vanilla2/?QuickIn='.urlencode('arr:'.json_encode($QuickIn)).'">Vanilla</a>';
+		echo '<a href="http://gunn.local/vanilla2/?QuickIn='.urlencode('arr:'.json_encode($QuickIn)).'">Vanilla Test Link</a>';
 		/*
 		?>
 		<script type="text/javascript">
@@ -114,4 +114,3 @@ function vanilla_quickin_options() {
 	</table>
 </div>
 <?php
-}

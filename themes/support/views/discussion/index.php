@@ -73,7 +73,7 @@ if ($this->Pager->FirstPage()) {
    <div class="Title"><?php
       if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
          echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryID.'/'.Format::Url($this->Discussion->Category));
-         echo '<span>&bull;</span>';
+         echo ' &raquo; ';
       }
       echo Format::Text($this->Discussion->Name);
    ?></div>

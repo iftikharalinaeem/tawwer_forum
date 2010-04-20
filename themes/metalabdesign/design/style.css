@@ -258,7 +258,7 @@ div.Info {
 div.EmptyInfo {
    margin: 10px 0;
 }
-/* Note: The MessageModule (in /applications/garden/modules) wraps all messages
+/* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
   that it renders in a div with this DismissMessage class. */
 div.DismissMessage {
    margin: 6px 0 10px;
@@ -290,7 +290,7 @@ a.Close {
 a.Close:hover {
 	color: #333;
 }
-/* Note: MorePager is related to the /applications/garden/modules/MorePagerModule. */
+/* Note: MorePager is related to the /applications/dashboard/modules/MorePagerModule. */
 .MorePager {
    list-style: none;
    margin: 1px 0 0;
@@ -868,8 +868,8 @@ body.Entry li.Buttons input.Button {
 body.Entry #Content #Form_User_Password {
 	padding-top: 0;
 }
-#garden_entry_index #Form_User_Password ul li label,
-#garden_entry_signin #Form_User_Password ul li label {
+#dashboard_entry_index #Form_User_Password ul li label,
+#dashboard_entry_signin #Form_User_Password ul li label {
 	padding: 0;
 }
 
@@ -1559,7 +1559,7 @@ body.Entry div.Popup p {
 	color: #000;
 }
 div.Popup #Form_User div.Warning,
-#garden_profile_picture #Form_User div.Warning {
+#dashboard_profile_picture #Form_User div.Warning {
 	margin: 6px 0;
 }
 div.SignInPopup div.Body {
