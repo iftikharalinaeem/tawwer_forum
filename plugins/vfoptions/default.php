@@ -143,7 +143,7 @@ pageTracker._trackPageview();
 
             if ($Form->ErrorCount() == 0) {
                $Sender->StatusMessage = T("The forum was created successfully.");
-               $Sender->RedirectUrl = 'http://'.$Subdomain.$HostingDomain.'/gardensetup/first';
+               $Sender->RedirectUrl = 'http://'.$Subdomain.$HostingDomain.'/dashboard/setup/first';
             }
          }
          

@@ -20,7 +20,7 @@ class FoodNetworkPlugin implements Gdn_IPlugin {
          $Script = "<!-- SiteCatalyst code version: H.20.3.
 Copyright 1996-2009 Adobe, Inc. All Rights Reserved
 More info available at http://www.omniture.com -->
-<script language=\"JavaScript\" type=\"text/javascript\" src=\"/scripts/omniture/s_code.js\"></script>
+<script language=\"JavaScript\" type=\"text/javascript\" src=\"/plugins/FoodNetwork/s_code_ums.js\"></script>
 <script language=\"JavaScript\" type=\"text/javascript\"><!--
 /* You may give each page an identifying name, server, and channel on
 the next lines. */

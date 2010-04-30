@@ -53,10 +53,10 @@ function __FormatPrice($PerMonth) {
                <div class="Buttons">
                   <?php
                   if (!$CustomDomainPurchased) {
-                     echo Anchor('Learn More', '/plugin/learnmore/customdomain', 'Popdown Button');
-                     echo Anchor('Buy Now', '/plugin/learnmore/customdomain', 'Popdown Button');
+                     echo Anchor('Learn More', '/plugin/learnmore/customdomain', 'Popdown SmallButton');
+                     echo Anchor('Buy Now', '/plugin/learnmore/customdomain', 'Popdown SmallButton');
                   } else {
-                     echo Anchor('Remove Upgrade', '/plugin/remove/customdomain', 'Popdown Button');
+                     echo Anchor('Remove Upgrade', '/plugin/remove/customdomain', 'Popdown SmallButton');
                   }
                   ?>
                </div>
@@ -68,10 +68,10 @@ function __FormatPrice($PerMonth) {
                <div class="Buttons">
                   <?php
                   if (!$AdRemovalPurchased) {
-                     echo Anchor('Learn More', '/plugin/learnmore/adremoval', 'Popdown Button');
-                     echo Anchor('Buy Now', '/plugin/buynow/adremoval', 'Button');
+                     echo Anchor('Learn More', '/plugin/learnmore/adremoval', 'Popdown SmallButton');
+                     echo Anchor('Buy Now', '/plugin/buynow/adremoval', 'SmallButton');
                   } else {
-                     echo Anchor('Remove Upgrade', '/plugin/remove/adremoval', 'Popdown Button');
+                     echo Anchor('Remove Upgrade', '/plugin/remove/adremoval', 'Popdown SmallButton');
                   }
                   ?>
                </div>
@@ -87,10 +87,10 @@ function __FormatPrice($PerMonth) {
                <div class="Buttons">
                   <?php
                   if (!$CustomCssPurchased) {
-                     echo Anchor('Learn More', '/plugin/learnmore/customcss', 'Popdown Button');
-                     echo Anchor('Buy Now', '/plugin/buynow/customcss', 'Button');
+                     echo Anchor('Learn More', '/plugin/learnmore/customcss', 'Popdown SmallButton');
+                     echo Anchor('Buy Now', '/plugin/buynow/customcss', 'SmallButton');
                   } else {
-                     echo Anchor('Remove Upgrade', '/plugin/remove/customcss', 'Popdown Button');
+                     echo Anchor('Remove Upgrade', '/plugin/remove/customcss', 'Popdown SmallButton');
                   }
                   ?>
                </div>
@@ -100,8 +100,6 @@ function __FormatPrice($PerMonth) {
             <td class="FirstCol">
                <h4>File Uploading <span>Purchased!</span></h4>
                <em>Let your users upload files with their discussions.</em>
-               <?php
-               /*
                <table class="PriceOptions">
                   <tr>
                      <th>1GB</th>
@@ -116,10 +114,8 @@ function __FormatPrice($PerMonth) {
                      <td>$15 <em>per month</em></td>
                   </tr>
                </table>
-               */
-               ?>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/fileuploading', 'Popdown Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/fileuploading', 'Popdown SmallButton'); ?>
                   Coming Soon!
                </div>
             </td>
@@ -129,17 +125,13 @@ function __FormatPrice($PerMonth) {
                array('http://', '/'),
                array('', ''),
                Gdn::Config('Garden.Domain', 'your_forum_name.vanillaforums.com')); ?> domain.</em>
-               <?php
-               /*
                <div class="Price">
                   <strong>$9</strong>
                   per month
                   <span>$0.30 per day</span>
                </div>
-               */
-               ?>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/ssl', 'Popdown Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/ssl', 'Popdown SmallButton'); ?>
                   Coming Soon!
                </div>
             </td>
@@ -150,7 +142,7 @@ function __FormatPrice($PerMonth) {
                   <strong>FREE</strong>
                </div>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/datatransfer', 'Popdown Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/datatransfer', 'Popdown SmallButton'); ?>
                   Coming Soon!
                </div>
             </td>
@@ -165,8 +157,6 @@ function __FormatPrice($PerMonth) {
             <td class="FirstCol">
                <h4>Extra Bandwidth <span>Purchased!</span></h4>
                <em>For heavy-traffic forums.</em>
-               <?php
-               /*
                <table class="PriceOptions">
                   <tr>
                      <th>10M</th>
@@ -181,44 +171,34 @@ function __FormatPrice($PerMonth) {
                      <td><a href="mailto:support@vanillaforums.com?subject=Extra Bandwidth">Contact Us</a></td>
                   </tr>
                </table>
-               */
-               ?>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/extrabandwidth', 'Popdown Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/extrabandwidth', 'Popdown SmallButton'); ?>
                   Coming Soon!
                </div>
             </td>
             <td class="MiddleCol">
                <h4>Single Sign-on <span>Purchased!</span></h4>
                <em>Let your existing users access the forum without signing in or registering again.</em>
-               <?php
-               /*
                <div class="Price">
                   <strong>$49</strong>
                   per month
                   <span>$1.61 per day</span>
                </div>
-               */
-               ?>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/singlesignon', 'Popdown Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/singlesignon', 'Popdown SmallButton'); ?>
                   Coming Soon!
                </div>
             </td>
             <td class="LastCol">
                <h4>Daily Backups <span>Purchased!</span></h4>
                <em>Rest easy knowing that your data is backed up and ready to be restored should the need arise.</em>
-               <?php
-               /*
                <div class="Price">
                   <strong>$19</strong>
                   per month
                   <span>$0.63 per day</span>
                </div>
-               */
-               ?>
                <div class="Buttons">
-                  <?php echo Anchor('Learn More', '/plugin/learnmore/dailybackups', 'Popdown Button'); ?>
+                  <?php echo Anchor('Learn More', '/plugin/learnmore/dailybackups', 'Popdown SmallButton'); ?>
                   Coming Soon!
                </div>
             </td>

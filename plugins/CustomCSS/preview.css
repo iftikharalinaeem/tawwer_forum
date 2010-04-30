@@ -31,7 +31,7 @@ body div#Frame div#Body div#Content div.PreviewCustomCSS form#Form_Form div inpu
    text-decoration: none !important;
    border: 1px solid #000 !important;
    text-shadow: 0 1px 0 #fff !important;
-   background: url('../../applications/garden/design/button_bg2.png') repeat-x center left #f8f8f8 !important;
+   background: url('../../applications/dashboard/design/images/buttonbg.png') repeat-x center left #f8f8f8 !important;
    -moz-border-radius: 3px !important;
    -webkit-border-radius: 3px !important;
 }

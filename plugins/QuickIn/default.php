@@ -83,7 +83,7 @@ class QuickInPlugin implements Gdn_IPlugin {
    public function SettingsController_QuickIn_Create($Sender, $EventArguments) {
       $Sender->Permission('Garden.Admin.Only');
       $Sender->Title('QuickIn');
-      $Sender->AddSideMenu('garden/settings/quickin');
+      $Sender->AddSideMenu('dashboard/settings/quickin');
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(

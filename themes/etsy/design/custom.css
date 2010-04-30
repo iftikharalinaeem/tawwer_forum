@@ -1339,7 +1339,7 @@ ul.Options li.Parent strong {
 }
 ul.Options li.Parent strong:hover {
    padding: 4px;
-   background: url('images/button_bg2.png') no-repeat center center #f8f8f8;
+   background: url('images/buttonbg.png') no-repeat center center #f8f8f8;
    color: #333;
    border: 1px solid #888;
    -moz-border-radius: 2px;

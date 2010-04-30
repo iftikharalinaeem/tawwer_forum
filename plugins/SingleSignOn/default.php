@@ -24,13 +24,13 @@ class SingleSignOnPlugin implements Gdn_IPlugin {
    // Adds a "Single Sign-on" menu option to the dashboard
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Site Settings', 'Single Sign-on', 'garden/plugin/singlesignon', 'Garden.Settings.Manage');
+      $Menu->AddLink('Site Settings', 'Single Sign-on', 'dashboard/plugin/singlesignon', 'Garden.Settings.Manage');
    }
 
    public function PluginController_SingleSignOn_Create($Sender, $EventArguments) {
       $Sender->Permission('Garden.Admin.Only');
       $Sender->Title('Single Sign-on');
-      $Sender->AddSideMenu('garden/plugin/singlesignon');
+      $Sender->AddSideMenu('dashboard/plugin/singlesignon');
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(

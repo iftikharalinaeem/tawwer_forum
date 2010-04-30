@@ -81,7 +81,7 @@
 				/*
 					$this->FireEvent('BeforeMenu');
 					
-					echo MenuItem('Dashboard', 'Dashboard', '/garden/settings', array('Garden.Settings.Manage'));
+					echo MenuItem('Dashboard', 'Dashboard', '/dashboard/settings', array('Garden.Settings.Manage'));
 					echo MenuItem('Dashboard', 'Users', '/user/browse', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
 					echo MenuItem('Activity', 'Activity', '/activity');
 					

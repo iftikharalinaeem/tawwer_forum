@@ -45,7 +45,7 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 		}
 		if ($Preview) {
 			$Sender->AddAsset('Content', $Sender->FetchView(PATH_PLUGINS . DS . 'CustomCSS' . DS . 'views' . DS . 'preview.php'));
-			$Sender->AddCssFile('previewtheme.css', 'garden');
+			$Sender->AddCssFile('previewtheme.css', 'dashboard');
 		}
 	}
 	
