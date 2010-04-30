@@ -68,7 +68,7 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
       </li>
       <li class="Created">
          <?php
-         echo Format::Date($Comment->DateInserted);
+         echo Gdn_Format::Date($Comment->DateInserted);
          ?>
       </li>
       <li class="Permalink">
@@ -78,7 +78,7 @@ function WriteComment($Comment, &$Sender, &$Session, $CurrentOffset) {
       $Sender->FireEvent('AfterCommentMeta');
       ?>
    </ul>
-   <div class="Body"><?php echo Format::To($Comment->Body, $Comment->Format); ?></div>
+   <div class="Body"><?php echo Gdn_Format::To($Comment->Body, $Comment->Format); ?></div>
    <?php
       $LinkText = '';
       if ($Sender->Discussion->Category == 'Question')

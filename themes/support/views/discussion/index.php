@@ -6,7 +6,7 @@ if (!function_exists('WriteComment'))
    
 // Unserialize Discussion Attributes
 if (is_object($this->Discussion) && property_exists($this->Discussion, 'UserDiscussionAttributes'))
-   $this->Discussion->UserDiscussionAttributes = Format::Unserialize($this->Discussion->UserDiscussionAttributes);
+   $this->Discussion->UserDiscussionAttributes = Gdn_Format::Unserialize($this->Discussion->UserDiscussionAttributes);
 
 
 if ($this->Pager->FirstPage()) {
@@ -72,10 +72,10 @@ if ($this->Pager->FirstPage()) {
    ?>
    <div class="Title"><?php
       if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
-         echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryID.'/'.Format::Url($this->Discussion->Category));
+         echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryID.'/'.Gdn_Format::Url($this->Discussion->Category));
          echo ' &raquo; ';
       }
-      echo Format::Text($this->Discussion->Name);
+      echo Gdn_Format::Text($this->Discussion->Name);
    ?></div>
    <div class="Meta">
       <span class="Author">
@@ -85,7 +85,7 @@ if ($this->Pager->FirstPage()) {
       </span>
       <span class="Created">
          <?php
-         echo Format::Date($Comment->DateInserted);
+         echo Gdn_Format::Date($Comment->DateInserted);
          ?>
       </span>
       <span class="Permalink">
@@ -95,7 +95,7 @@ if ($this->Pager->FirstPage()) {
       $this->FireEvent('AfterCommentMeta');
       ?>
    </div>
-   <div class="Body"><?php echo Format::To($Comment->Body, $Comment->Format); ?></div>
+   <div class="Body"><?php echo Gdn_Format::To($Comment->Body, $Comment->Format); ?></div>
    <?php
    $this->FireEvent('AfterCommentBody');
 

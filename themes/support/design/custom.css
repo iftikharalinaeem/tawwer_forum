@@ -63,7 +63,7 @@ ul.Options li.Parent strong {
 }
 ul.Options li.Parent strong:hover {
    padding: 4px;
-   background: url('images/button_bg2.png') no-repeat center center #f8f8f8;
+   background: url('images/buttonbg.png') no-repeat center center #f8f8f8;
    color: #333;
    border: 1px solid #888;
    -moz-border-radius: 2px;
@@ -224,7 +224,7 @@ a.Bookmarking {
    margin: 4px;
    font-size: 11px;
    padding: 4px;
-   background: url('images/button_bg2.png') repeat-x center left #f8f8f8;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
    color: #02475A;
 	text-shadow: 0 1px 0 #fff;
    border: 1px solid #999;
