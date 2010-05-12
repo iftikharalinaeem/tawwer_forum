@@ -116,8 +116,6 @@ textarea.TextBox {
    font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
    color: #aaaaaa;
    font-size: 13px;
-   height: 42px;
-   min-height: 42px;
    margin: 0 0 6px;
 	padding: 3px;
 	-moz-border-radius: 0;
@@ -129,9 +127,9 @@ textarea.TextBox {
 	line-height: 1.3;
 	cursor: text;
 }
-a.CommentLink {
-	height: auto;
-	min-height: inherit;
+textarea.TextBox {
+   height: 42px;
+   min-height: 42px;
 }
 input.SmallInput,
 input.InputBox {
@@ -502,10 +500,12 @@ i.AllDiscussions {
 	background-position: 0px -256px;
 }
 i.MyDiscussions {
-	background-position: 0px -1023px;
+	/* background-position: 0px -1023px; */
+	background: none;
 }
 i.Bookmarks {
-	background-position: 0px -286px;
+	/* background-position: 0px -286px; */
+	background: none;
 }
 i.Drafts {
 	background-position: 0px -702px;
@@ -564,6 +564,16 @@ i.Notifications {
 	display: block;
 	border-bottom: 1px solid #4e6ca2;
 }
+#Menu div.Links a.Activities {
+	margin-top: 10px;
+}
+#Menu div.Links a.MyDiscussions span span,
+#Menu div.Links a.Activities span span,
+#Menu div.Links a.Inbox span span,
+#Menu div.Links a.Notifications span span {
+	border: none;
+}
+
 #Menu div.Links a strong {
 	font-weight: bold;
 	font-size: 11px;

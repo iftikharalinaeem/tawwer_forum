@@ -16,6 +16,7 @@ jQuery(document).ready(function($) {
       $(CommentForm).show();
       $(this).hide();
       $(CommentForm).find('textarea').focus();
+      return false;
    });
    
    // Make all textareas autogrow
@@ -40,18 +41,25 @@ jQuery(document).ready(function($) {
    gdn.matchHeight = function(selectorParent, selectorChild) {
       var childHeight = $(selectorChild).height();
       var parentHeight = $(selectorParent).height();
-      var childPadding = $(selectorChild).outerHeight() - $(selectorChild).height();
-      var parentPadding = $(selectorParent).outerHeight() - $(selectorParent).height();
+      var childPadding = $(selectorChild).outerHeight() - childHeight;
+      var parentPadding = $(selectorParent).outerHeight() - parentHeight;
       if (parentHeight > childHeight) {
-         $(selectorChild).css('height', parentHeight+parentPadding-childPadding);
+         $(selectorChild).css('min-height', parentHeight+parentPadding-childPadding);
       } else {
-         $(selectorParent).css('height', childHeight+childPadding-parentPadding);
+         $(selectorParent).css('min-height', childHeight+childPadding-parentPadding);
       }
-      // $(selectorChild).css('top', $(selectorParent).offset.top);
+   }   
+
+   gdn.matchDocumentHeight = function(selector) {
+      var height = $(selector).height();
+      var padding = $(selector).outerHeight() - height;
+      var doc = $(document).height();
+      if (doc > height)
+         $(selector).css('height', doc - padding);
    }   
    
    // Make sure that all panels stretch to the bottom of the document
-   gdn.matchHeight(document, '#Menu,#SubContent');
+   gdn.matchDocumentHeight('#Menu,#Content,#SubContent');
    gdn.matchHeight('#DiscussionForm', '.TopAdvertisement');
    $('ul.Discussions li.Item').each(function() {
       var parent = this;
@@ -60,7 +68,7 @@ jQuery(document).ready(function($) {
    });
    
    $(window).resize(function(){
-      gdn.matchHeight(document, '#Menu,#SubContent');
+      // gdn.matchDocumentHeight('#Menu,#Content,#SubContent');
       gdn.matchHeight('#DiscussionForm', '.TopAdvertisement');
       $('ul.Discussions li.Item').each(function() {
          var parent = this;
@@ -69,8 +77,52 @@ jQuery(document).ready(function($) {
       });
    });
 
-   
-   // Show drafts delete button on hover
+   // Hijack discussion form button clicks
+   $('#DiscussionForm :submit').click(function() {
+      var btn = this;
+      var frm = $(btn).parents('form').get(0);
+      var textbox = $(frm).find('textarea');
+      var postValues = $(frm).serialize();
+      postValues += '&DeliveryType=VIEW&DeliveryMethod=JSON'; // DELIVERY_TYPE_VIEW
+      postValues += '&'+btn.name+'='+btn.value;
+      // Add a spinner and disable the buttons
+      $(frm).find(':submit:last').before('<span class="TinyProgress">&nbsp;</span>');
+      $(frm).find(':submit').attr('disabled', 'disabled');      
+      $.ajax({
+         type: "POST",
+         url: $(frm).attr('action'),
+         data: postValues,
+         dataType: 'json',
+         error: function(XMLHttpRequest, textStatus, errorThrown) {
+            $('.Popup').remove();
+            $.popup({}, XMLHttpRequest.responseText);
+         },
+         success: function(json) {
+            // Remove any old popups
+            $('.Popup').remove();
+            // Remove any old errors from the form
+            $(frm).find('div.Errors').remove();
+            if (json.FormSaved == false) {
+               $(frm).prepend(json.StatusMessage);
+               json.StatusMessage = null;
+            } else {
+               // Load the new discussion
+               $('ul.Discussions').prepend(json.DiscussionHtml);
+               $('ul.Discussions li.Hidden').slideDown('fast');
+               $('ul.Discussions li.Hidden').removeClass('Hidden');
+               $(textbox).val('');
+               $(textbox).blur();
+            }
+         },
+         complete: function(XMLHttpRequest, textStatus) {
+            // Remove any spinners, and re-enable buttons.
+            $('span.TinyProgress').remove();
+            $(frm).find(':submit').removeAttr("disabled");
+         }
+      });
+      return false;
+   });
+
    // Show options on each row (if present)
    $('li.Item').livequery(function() {
       var row = this;

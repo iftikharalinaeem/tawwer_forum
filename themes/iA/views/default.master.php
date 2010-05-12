@@ -15,20 +15,21 @@
 			      $Session = Gdn::Session();
 					$Activities = Wrap(T('Activities'), 'strong');
 					$AllDiscussions = Wrap(T('All Discussions'), 'strong');
-					$MyBookmarks = Wrap(T('My Bookmarks'), 'strong');
-					$MyDiscussions = Wrap(T('My Discussions'), 'strong');
-					$MyDrafts = Wrap(T('My Drafts'), 'strong');
+					$MyBookmarks = Wrap(T('Bookmarked'), 'strong');
+					$MyDiscussions = Wrap(T('Mine'), 'strong');
+					// $MyDrafts = Wrap(T('My Drafts'), 'strong');
 					$Notifications = Wrap(T('Notifications'), 'strong');
 					$Inbox = Wrap(T('Inbox'), 'strong');
 					$CountBookmarks = 0;
 					$CountDiscussions = 0;
-					$CountDrafts = 0;
+					// $CountDrafts = 0;
 					$CountConversations = 0;
 					$CountUnreadConversations = 0;
+					$CountNotifications = 0;
 					if ($Session->IsValid()) {
 						$CountBookmarks = $Session->User->CountBookmarks;
 						$CountDiscussions = $Session->User->CountDiscussions;
-						$CountDrafts = $Session->User->CountDrafts;
+						// $CountDrafts = $Session->User->CountDrafts;
 						$CountNotifications = $Session->User->CountNotifications;
 						$CountUnreadConversations = $Session->User->CountUnreadConversations;
 					}
@@ -38,8 +39,8 @@
 					if (is_numeric($CountDiscussions) && $CountDiscussions > 0)
 						$MyDiscussions .= '('.$CountDiscussions.')';
 				
-					if (is_numeric($CountDrafts) && $CountDrafts > 0)
-						$MyDrafts .= '('.$CountDrafts.')';
+					// if (is_numeric($CountDrafts) && $CountDrafts > 0)
+					// 	$MyDrafts .= '('.$CountDrafts.')';
 						
 					if (is_numeric($CountNotifications) && $CountNotifications > 0)
 						$Notifications .= '('.$CountNotifications.')';
@@ -50,7 +51,7 @@
 					$AllDiscussions = '<i class="Ico AllDiscussions"></i>'.Wrap($AllDiscussions);
 					$MyBookmarks = '<i class="Ico Bookmarks"></i>'.Wrap($MyBookmarks);
 					$MyDiscussions = '<i class="Ico MyDiscussions"></i>'.Wrap($MyDiscussions);
-					$MyDrafts = '<i class="Ico Drafts"></i>'.Wrap($MyDrafts);
+					// $MyDrafts = '<i class="Ico Drafts"></i>'.Wrap($MyDrafts);
 					$Notifications = '<i class="Ico Notifications"></i>'.Wrap($Notifications);
 					$Inbox = '<i class="Ico Inbox"></i>'.Wrap($Inbox);
 					$Activities = '<i class="Ico Activities"></i>'.Wrap($Activities);
@@ -64,7 +65,7 @@
 						echo Anchor(Wrap($MyDiscussions), '/discussions/mine', 'MyDiscussions');
 						
 					// if ($CountDrafts > 0)
-						echo Anchor(Wrap($MyDrafts), '/drafts', 'MyDrafts');
+					// 	echo Anchor(Wrap($MyDrafts), '/drafts', 'MyDrafts');
 						
 					echo Anchor(Wrap($Activities), '/activity', 'Activities');
 

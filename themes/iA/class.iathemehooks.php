@@ -84,17 +84,35 @@ class IaThemeHooks implements Gdn_IPlugin {
                ->Select('iu.Email', '', 'InsertEmail')
                ->Join('Discussion d', 'c.DiscussionID = d.DiscussionID')
                ->WhereIn('c.DiscussionID', $DiscussionIDs)
-               ->OrderBy('d.DiscussionID', 'desc')
+               ->OrderBy('d.DateLastComment', 'desc')
                ->OrderBy('c.DateInserted', 'asc');
             $Sender->CommentModel->CommentQuery();
             
             $Sender->CommentData = $Sender->CommentModel->SQL->Get();
-            $Sender->AddAsset('SubContent', $Sender->FetchView('preview', 'discussion', 'vanilla'));
+            $Sender->AddAsset('SubContent', $Sender->FetchView('previews', 'discussion', 'vanilla'));
          } else {
             $Sender->CommentData = FALSE;
          }
       }
-   }   
+   }
+   public function PostController_AfterDiscussionSave_Handler($Sender) {
+      $Discussion = GetValue('Discussion', $Sender->EventArguments);
+      if ($Discussion) {
+         $Discussion->FirstUserID = $Discussion->InsertUserID;
+         $Discussion->FirstName = $Discussion->InsertName;
+         $Discussion->FirstPhoto = $Discussion->InsertPhoto;
+         $Discussion->FirstEmail = $Discussion->InsertEmail;
+         $Discussion->FirstDate = $Discussion->DateInserted;
+         $Sender->ShowOptions = TRUE;
+         ob_clean();
+         ob_start();
+         include($Sender->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
+         WriteDiscussion($Discussion, $Sender, Gdn::Session(), ' Hidden');
+         $DiscussionHtml = ob_get_contents();
+         ob_end_clean();
+         $Sender->SetJson('DiscussionHtml', $DiscussionHtml);
+      }
+   }
 }
 
 if (!function_exists('UserBuilder')) {
