@@ -11,7 +11,8 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 /**
  * An associative array of information about this application.
  */
-$ThemeInfo['Cilantro'] = array(
+$ThemeInfo['cilantro'] = array(
+	'Name' => 'Cilantro',
    'Description' => "A Vanilla take on issue tracking. Cilantro is that nasty, tiny, horrible stuff that shows up in your food to ruin the entire experience.",
    'Version' => '1.0',
    'Author' => "Mark O'Sullivan",
