@@ -884,7 +884,7 @@ pageTracker._trackPageview();
     */
    private function _GetUserIDByName($Name) {
       $UserModel = Gdn::UserModel();
-      $User = $UserModel->Get($Name);
+      $User = $UserModel->GetByUsername($Name);
       return (is_object($User) && property_exists($User, 'UserID')) ? $User->UserID : -1;
    }
    
