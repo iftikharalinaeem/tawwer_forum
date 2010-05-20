@@ -1,0 +1,28 @@
+div.VanillaConnectBlock {
+   margin-bottom:       10px;
+}
+
+div.VanillaConnectBlock h1 {
+   margin-bottom:       0px;
+}
+
+div.VanillaConnectBlock div.Detail {
+   font-style:          italic;
+}
+
+table.VanillaConnectTable th {
+   background-color:    white;
+}
+
+table.VanillaConnectTable td:first-child {
+   width:               400px;
+}
+
+table.VanillaConnectTable td em {
+   font-style:          italic;
+   font-size:           80%;
+}
+
+table.VanillaConnectTable td input {
+   width:               400px;
+}
