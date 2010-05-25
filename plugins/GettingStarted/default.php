@@ -23,8 +23,8 @@ class GettingStartedPlugin implements Gdn_IPlugin {
    // Adds a "My Forums" menu option to the dashboard area
    public function SettingsController_Render_Before(&$Sender) {
       // Save the action if editing registration settings
-      if (strcasecmp($Sender->RequestMethod, 'registration') == 0 && $Sender->Form->AuthenticatedPostBack() === TRUE)
-         $this->SaveStep('Plugins.GettingStarted.Registration');
+      // if (strcasecmp($Sender->RequestMethod, 'registration') == 0 && $Sender->Form->AuthenticatedPostBack() === TRUE)
+      //   $this->SaveStep('Plugins.GettingStarted.Registration');
 
       // Save the action if they reviewed plugins
       // if (strcasecmp($Sender->RequestMethod, 'plugins') == 0)
@@ -43,11 +43,9 @@ class GettingStartedPlugin implements Gdn_IPlugin {
             .Anchor('×', '/dashboard/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
    ."<p>Here's how to get started:</p>"
    .'<ul>
-      <li class="One'.(Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1' ? ' Done' : '').'">'.Anchor(T('Define how users register for your forum'), '/settings/registration').'</li>
-      <li class="Two'.(Gdn::Config('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '').'">'.Anchor(T('Organize your discussion categories'), 'vanilla/settings/managecategories').'</li>
-      <li class="Three'.(Gdn::Config('Plugins.GettingStarted.Profile', '0') == '1' ? ' Done' : '').'">'.Anchor(T('Customize your profile'), 'profile').'</li>
-      <li class="Four'.(Gdn::Config('Plugins.GettingStarted.Discussion', '0') == '1' ? ' Done' : '').'">'.Anchor(T('Start your first discussion'), 'post/discussion').'</li>
-      <li class="Five'.(Gdn::Config('Plugins.GettingStarted.Upgrades', '0') == '1' ? ' Done' : '').'">'.Anchor(T('Purchase some upgrades'), 'plugin/upgrades').'</li>
+      <li class="One'.(C('Plugins.GettingStarted.Categories', '0') == '1' ? ' Done' : '').'">'.Anchor(T('Organize your discussion categories'), 'vanilla/settings/managecategories').'</li>
+      <li class="Two'.(C('Plugins.GettingStarted.Profile', '0') == '1' ? ' Done' : '').'">'.Anchor(T('Customize your profile'), 'profile').'</li>
+      <li class="Three'.(C('Plugins.GettingStarted.Discussion', '0') == '1' ? ' Done' : '').'">'.Anchor(T('Start your first discussion'), 'post/discussion').'</li>
    </ul>
 </div>';
          $Sender->AddAsset('Messages', $WelcomeMessage, 'WelcomeMessage');
@@ -60,11 +58,9 @@ class GettingStartedPlugin implements Gdn_IPlugin {
       SaveToConfig($Step, '1');
       // If all of the steps are now completed, disable this plugin
       if (
-         Gdn::Config('Plugins.GettingStarted.Registration', '0') == '1'
-         && Gdn::Config('Plugins.GettingStarted.Upgrades', '0') == '1'
-         && Gdn::Config('Plugins.GettingStarted.Categories', '0') == '1'
-         && Gdn::Config('Plugins.GettingStarted.Profile', '0') == '1'
-         && Gdn::Config('Plugins.GettingStarted.Discussion', '0') == '1'
+         C('Plugins.GettingStarted.Categories', '0') == '1'
+         && C('Plugins.GettingStarted.Profile', '0') == '1'
+         && C('Plugins.GettingStarted.Discussion', '0') == '1'
       ) {
          $PluginManager = Gdn::Factory('PluginManager');
          $PluginManager->DisablePlugin('GettingStarted');
@@ -77,7 +73,7 @@ class GettingStartedPlugin implements Gdn_IPlugin {
          $this->SaveStep('Plugins.GettingStarted.Profile');
    }
 
-   // If the user starts a discussion, they've completed step 5: profile customization
+   // If the user starts a discussion, they've completed step 5
    public function PostController_Render_Before(&$Sender) {
       if (strcasecmp($Sender->RequestMethod, 'discussion') == 0 && $Sender->Form->AuthenticatedPostBack() === TRUE)
          $this->SaveStep('Plugins.GettingStarted.Discussion');
