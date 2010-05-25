@@ -1,0 +1,106 @@
+#DiscussionForm ul.PostOptions {
+   margin-bottom: 0px;
+}
+
+div.AttachFileWrapper {
+   margin-bottom: 2px;
+   padding: 5px;
+   text-align: left;
+}
+
+input.HiddenFileInput {
+   position: absolute;
+}
+
+input.HiddenFileInput:hover {
+   cursor: pointer;
+}
+
+div.AttachFileWrapper table.AttachFileContainer {
+   border-collapse: collapse;
+   border: none;
+}
+
+div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment {
+   
+}
+div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td {
+   padding: 3px;
+   vertical-align: middle;
+}
+
+div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.ProgressBar {
+   width: 100px;
+   border: 2px solid gray;
+   background-color: lightgrey;
+   height: 14px;
+}
+
+div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.ProgressBar div.ProgressTicker {
+   height: 100%;
+   background-color: lime;
+}
+
+div.AttachFileWrapper div.NewAttachment {
+   float: left;
+   width: 350px;
+   background-color: white;
+}
+
+div.AttachFileWrapper div.NewAttachment div.FileUploadInput {
+   padding: 10px;
+}
+
+div.AttachFileWrapper div.NewAttachment input.FileUploadButton {
+   font-size: 12px;
+}
+
+div.AttachFileWrapper div.NewAttachment div.MediaManager {
+   border-top: 1px solid #AAAAAA;
+   padding: 5px;
+}
+
+
+div.AttachFileWrapper div.FileHolder {
+   float: left;
+   width: 550px;
+   overflow:hidden;
+   padding: 5px;
+   padding-left: 10px;
+   background-color: #e1f0ff;
+   border-left: 1px solid #AAAAAA;
+}
+
+div.AttachFileWrapper div.FileHolder h3 {
+   font-size: 16px;
+}
+
+div.AttachFileWrapper div.FileHolder div#FileContainer {
+
+}
+
+div.AttachFileWrapper div.FileHolder div#FileContainer span {
+   padding-left: 5px;
+}
+
+div.Attachments {
+   background-color: #CFECFF;
+   padding: 4px;
+   margin-bottom: 6px;
+   margin-right: 7px;
+}
+
+div.Attachments div.AttachmentHeader {
+   font-weight: bold;
+}
+
+div.Attachments table.AttachFileContainer {
+   margin-left: 10px;
+   border-collapse: collapse;
+   border: none;
+}
+
+div.Attachments table.AttachFileContainer tr td {
+   padding: 3px;
+   vertical-align: middle;
+}
