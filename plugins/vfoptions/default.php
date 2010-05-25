@@ -3,7 +3,7 @@
 // Define the plugin:
 $PluginInfo['vfoptions'] = array(
    'Name' => 'VF.com Admin Options',
-   'Description' => 'Adds global admin options to the admin screens at VanillaForums.com, allowing administrators to add, edit, and purchase premium upgrades for their hosted forums.',
+   'Description' => 'VF.com admin options.',
    'Version' => '1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
@@ -19,30 +19,46 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    2. Make sure that administrators are signed into every one of their forums when they sign in
    3. Make sure that administrators are signed out of every one of their forums when they sign out
    4. Only show the admin top-panel when the administrator is "root".
-   5. Show the form that allows upgrades
    6. Show the form that allows users to delete a forum
-   7. Show the domain name form (if purchased)
    8. Don't allow email to be changed to one that is already being used in master db.
-   9. Show upgrade offerings & more info on each
-   10. Allow purchase & enabling of upgrade offerings
    11. Include Google analytics code if the appropriate settings are in their conf file (see Base_Render_Before)
 */
 
+   public function Base_BeforeUserOptionsMenu_Handler($Sender) {
+      echo Anchor('My Account', 'dashboard/settings/myaccount', 'MyAccountLink');
+   }
+   
    /**
-    * Adds "My Forums", "Premium Upgrades", and "Appearance" menu options to the
-    * dashboard. Removes the "Add-ons" menu option from the dashboard area.
+    * Adds & removes dashboard menu options.
     */
-   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      // Clean out entire menu & re-add everything
       $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->ClearGroups();
+      
+      $Menu->AddItem('Dashboard', T('Dashboard'));
+      $Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
       $Menu->AddLink('Dashboard', 'My Forums', 'dashboard/plugin/myforums', 'Garden.Settings.GlobalPrivs');
-      $Menu->AddLink('Dashboard', 'Premium Upgrades ♥', 'dashboard/plugin/upgrades', 'Garden.Settings.GlobalPrivs', array('class' => 'HighlightButton'));
-      
-      // Remove the addons menu items
-      $Menu->RemoveGroup('Add-ons');
-      
-      // Add the "Appearance" menu group & items
-      $Menu->AddItem('Appearance', 'Appearance');
-      $Menu->AddLink('Appearance', 'Themes', 'settings/themes', 'Garden.Themes.Manage');
+
+      $Menu->AddItem('Appearance', T('Appearance'));
+		$Menu->AddLink('Appearance', T('Banner <span class="New">New</span>'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
+      $Menu->AddLink('Appearance', T('Themes'), 'dashboard/settings/themes', 'Garden.Themes.Manage');
+      $Menu->AddLink('Appearance', 'Custom Theme <span class="New">New</span>', 'settings/customtheme', 'Garden.AdminUser.Only');
+      $Menu->AddLink('Appearance', T('Messages'), 'dashboard/message', 'Garden.Messages.Manage');
+		
+      $Menu->AddItem('Users', T('Users'));
+      $Menu->AddLink('Users', T('Users'), 'dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
+		$Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Roles.Manage');
+			
+      if (C('Garden.Registration.Manage', TRUE))
+			$Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Registration.Manage');
+			
+      if (C('Garden.Registration.Method') == 'Approval')
+         $Menu->AddLink('Users', T('Applicants'), 'dashboard/user/applicants', 'Garden.Applicants.Manage');
+		
+		$Menu->AddItem('Forum', T('Forum Settings'));
+      $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
+      $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
    }
    
    /**
@@ -51,7 +67,27 @@ class VFOptionsPlugin implements Gdn_IPlugin {
     * all pages if the conf file contains Plugins.GoogleAnalytics.TrackerCode
     * and Plugins.GoogleAnalytics.TrackerDomain.
     */
-   public function Base_Render_Before(&$Sender) {
+   public function Base_Render_Before($Sender) {
+      Gdn::Locale()->SetTranslation('PluginHelp', "Plugins allow you to add functionality to your site.");
+      Gdn::Locale()->SetTranslation('ApplicationHelp', "Applications allow you to add large groups of functionality to your site.");
+      Gdn::Locale()->SetTranslation('ThemeHelp', "Themes allow you to change the look &amp; feel of your site.");
+      Gdn::Locale()->SetTranslation('AddonProblems', '');
+      
+      // If we're using the admin master view, make sure to add links to the footer for T's & C's
+      if ($Sender->MasterView == 'admin') {
+         $Domain = C('Garden.Domain', '');
+         $Url = strpos($Domain, 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforums';
+         $Footer = Anchor('Terms of Service', 'http://'.$Url.'.com/info/termsofservice', '', array('target' => '_New'))
+            .' | '
+            .Anchor('Privacy Policy', 'http://'.$Url.'.com/info/privacy', '', array('target' => '_New'))
+            .' | '
+            .Anchor('Refund Policy', 'http://'.$Url.'.com/info/refund', '', array('target' => '_New'))
+            .' | '
+            .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New'));
+         $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'float: right;')));
+         $Sender->AddCssFile('plugins/vfoptions/vfcomoptions.css', 'dashboard');
+      }
+      
       // Redirect if the domain in the url doesn't match that in the config (so
       // custom domains can't be accessed from their original subdomain).
       $Domain = Gdn::Config('Garden.Domain', '');
@@ -92,7 +128,6 @@ pageTracker._trackPageview();
    
    /**
     * Creates a "Buy Now" url that sends the user directly to checkout for an upgrade.
-    */
    public function PluginController_BuyNow_Create(&$Sender, $EventArguments) {
       $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
       $Sender->Permission('Garden.AdminUser.Only');
@@ -104,6 +139,7 @@ pageTracker._trackPageview();
          $this->_SetSelectionGoToCheckout($FeatureCode);
       }
    }
+    */
    
    /**
     * Creates a "Create a New Forum" page where users can do just that.
@@ -154,7 +190,6 @@ pageTracker._trackPageview();
    /**
     * Creates a "Custom Domain" upgrade offering screen where users can purchase
     * & implement a custom domain.
-    */
    public $AddSideMenu = TRUE;
    public function PluginController_CustomDomain_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
@@ -192,6 +227,7 @@ pageTracker._trackPageview();
       }
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'customdomain.php');
    }
+    */
 
    /**
     * Creates a "Delete Forum" page where users can completely remove their
@@ -263,7 +299,6 @@ pageTracker._trackPageview();
    /**
     * Creates a "Learn More" screen that contains more info on upgrade
     * offerings.
-    */
    public function PluginController_LearnMore_Create(&$Sender, $EventArguments) {
       $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
       $Sender->Permission('Garden.AdminUser.Only');
@@ -287,17 +322,18 @@ pageTracker._trackPageview();
          $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'learnmore.php');
       }
    }
+    */
    
    /**
     * Creates a "Learn More" screen that contains more info on upgrade
     * offerings.
-    */
    public function PluginController_MoreInfo_Create(&$Sender, $EventArguments) {
       $Sender->Title('Premium Upgrades &raquo; Learn More');
       $Sender->AddSideMenu('dashboard/plugin/upgrades');
       $Sender->Form = new Gdn_Form();
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'moreinfo.php');
    }
+    */
 
    /**
     * Creates a "My Forums" management screen where users can review, add, and
@@ -322,7 +358,6 @@ pageTracker._trackPageview();
    /**
     * Creates a "Remove Upgrade" screen where users can remove previously
     * purchased upgrade offerings.
-    */
    public function PluginController_Remove_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
@@ -375,7 +410,8 @@ pageTracker._trackPageview();
 
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'remove.php');
    }
-   
+    */
+/*   
    public function PluginController_RemoveComplete_Create(&$Sender, $EventArguments) {
       $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
       $Sender->AddSideMenu('dashboard/plugin/upgrades');
@@ -383,7 +419,7 @@ pageTracker._trackPageview();
       $this->_ApplyUpgrades();
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'removecomplete.php');
    }
-   
+*/   
    /**
     * Creates a "Rename Forum" page where users can rename their forum's
     * VanillaForums.com subdomain. Note: this ONLY works for vf.com subdomains,
@@ -495,7 +531,6 @@ pageTracker._trackPageview();
    /**
     * Creates a "Thank You" page that users can be directed to after they have
     * purchased upgrades.
-    */
    public function PluginController_ThankYou_Create(&$Sender, $EventArguments) {
       $this->_ReAuthenticate($Sender, 'dashboard/plugin/thankyou');
       $Sender->Title('Premium Upgrades &raquo; Thank You!');
@@ -513,11 +548,11 @@ pageTracker._trackPageview();
       
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'thankyou.php');
    }
+    */
    
    /**
     * Creates a "Premium Upgrades" management screen where users can review &
     * purchase upgrade offerings.
-    */
    public function PluginController_Upgrades_Create(&$Sender, $EventArguments) {
       $FirstArg = ArrayValue('0', $Sender->RequestArgs, '');
       $SecondArg = ArrayValue('1', $Sender->RequestArgs, '');
@@ -545,13 +580,6 @@ pageTracker._trackPageview();
                //$cm->debug_level = 1;
                //This is the actual call to the method, passing email address, name.
                $result = $FirstArg == 'subscribe' ? $CM->subscriberAdd($VFUser->Email, $VFUser->Name, NULL, TRUE) : $CM->subscriberUnsubscribe($VFUser->Email);
-               /*
-                  Fail Quietly: 
-                  if($result['Result']['Code'] == 0)
-                     echo 'Success';
-                  else
-                     echo 'Error : ' . $result['Result']['Message'];
-               */
             }
          } catch (Exception $Ex) {
             // Do nothing with the exception (fail quietly)
@@ -585,6 +613,37 @@ pageTracker._trackPageview();
       $View = Gdn::Config('Plugins.VFOptions.UpgradeView', 'upgrades.php');
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . $View);
    }
+    */
+   
+   /**
+    * Redirect to the user's account page when accessing this url.
+    */
+   public function SettingsController_MyAccount_Create($Sender) {
+      $AccountUrl = 'https://www.vanillaforums.com/myaccount/';
+      $SiteID = C('VanillaForums.SiteID', 0);
+      $Site = $this->_GetDatabase()->SQL()
+         ->Select()
+         ->From('Site')
+         ->Where('SiteID', $SiteID)
+         ->Get()
+         ->FirstRow();      
+      if (is_object($Site)) {
+         // Point at vanilladev.com if that's where this site is managed
+         if (strpos($Site->Name, 'vanilladev') !== FALSE)
+            $UpdateUrl = 'https://www.vanilladev.com/myaccount/';
+      }
+      
+      // Set the transient key for authentication on the other side
+      $this->_SetTransientKey($Site);
+      
+      // Close any open db connections
+      $this->_CloseDatabase();
+      
+      // Redirect
+      $SiteUrl = $Site->Domain == '' ? $Site->Name : $Site->Domain;
+      $Session = Gdn::Session();
+      Redirect($UpdateUrl.$SiteID.'/'.$Session->TransientKey());
+   }
    
    /**
     * Don't let the users access the items under the "Add-ons" menu section of
@@ -595,7 +654,11 @@ pageTracker._trackPageview();
       if (
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
-      ) Redirect($Sender->Routes['DefaultPermission']);
+      ) Redirect('/dashboard/home/permission');
+      
+      // TODO: ONLY USE A DIFFERENT VIEW IF THE USER IS ON THE FREE PLAN (FREE PLAN CANNOT UPLOAD LOGO).
+      if ($Sender->RequestMethod == 'banner')
+         $Sender->View = PATH_PLUGINS.'/vfoptions/views/banner.php';
    }
 
    /**
@@ -694,7 +757,6 @@ pageTracker._trackPageview();
     * Grabs the features for this site from the vfcom database and makes sure
     * that their db status matches their actual status (enables or disables
     * them). This may redirect away if required (ie. the domain has been changed).
-    */
    private function _ApplyUpgrades() {
       $Redirect = '';
       
@@ -855,6 +917,7 @@ pageTracker._trackPageview();
          Redirect($Redirect);
       }
    }
+    */
    
    /**
     * Opens a connection to the VanillaForums.com database.
@@ -958,7 +1021,6 @@ pageTracker._trackPageview();
    /**
     * Selects an upgrade for activation, records the appropriate information,
     * and sends the user to the checkout page.
-    */
    private function _SelectUpgrade($FeatureCode, $Attributes = '') {
       // Define the feature that was selected
       $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
@@ -1013,10 +1075,10 @@ pageTracker._trackPageview();
       }
       $this->_CloseDatabase();
    }
+    */
    
    /**
     * Applies a selection and redirects to the checkout.
-    */
    private function _SetSelectionGoToCheckout($FeatureCode, $Attributes = '') {
       $this->_SelectUpgrade($FeatureCode, $Attributes);
       
@@ -1042,6 +1104,7 @@ pageTracker._trackPageview();
       $Session = Gdn::Session();
       Redirect($CheckoutUrl.$SiteID.'/'.$Session->TransientKey());
    }
+    */
    
    /**
     * When going to the home site for a payment transaction
