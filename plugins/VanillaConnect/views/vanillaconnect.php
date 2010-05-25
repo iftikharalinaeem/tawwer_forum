@@ -21,7 +21,7 @@
             </tr>
             <tr>
                <td><?php echo T('Vanilla Forum URL'); ?></td>
-               <td><?php echo Gdn::Request()->Url(); ?></td>
+               <td><?php echo Gdn::Request()->Url('',TRUE); ?></td>
             </tr>
             <tr>
                <td><?php echo T('VanillaConnect Key'); ?></td>
