@@ -275,6 +275,22 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    public function Setup() {
+
+      $Structure = Gdn::Structure();
+      $Structure
+         ->Table('Media')
+         ->PrimaryKey('MediaID')
+         ->Column('Name', 'varchar(255)')
+         ->Column('Type', 'varchar(64)')
+         ->Column('Size', 'int(11)')
+         ->Column('StorageMethod', 'varchar(24)')
+         ->Column('Path', 'varchar(255)')
+         ->Column('InsertUserID', 'int(11)')
+         ->Column('DateInserted', 'datetime')
+         ->Column('ForeignID', 'int(11)', TRUE)
+         ->Column('ForeignTable', 'varchar(24)', TRUE)
+         ->Set(FALSE, FALSE);
+ 
       Gdn_FileCache::SafeCache('library','class.mediamodel.php',$this->GetResource('models/class.mediamodel.php'));
    }
 
