@@ -174,7 +174,8 @@ body #Head h1 {
 
 ul#Menu {
 	float:left;
-	padding:30px 400px 0 0;
+	padding:30px 700px 0 0;
+	width:900px;
 }
 
 
@@ -374,6 +375,11 @@ ul.DataList.Discussions {
 	border:1px solid #c4c4c4;*/
 }
 
+div.CommentForm textarea {
+	
+	width:623px;
+}
+
 /* ============================================================= activities */
 
 
@@ -550,7 +556,7 @@ div.Box {
 
 #Panel {
 	float:right;
-	margin:20px 0 0 0;
+	margin:20px 0 20px 0;
 	width:250px;
 }
 
