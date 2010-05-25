@@ -12,6 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['DefaultSmarty'] = array(
+   'Name' => 'Smarty Vanilla',
    'Description' => "The default theme for Vanilla, using a Smarty template for the master.",
    'Version' => '1.0',
    'Author' => "Todd Burry",

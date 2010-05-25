@@ -11,7 +11,8 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
 /**
  * An associative array of information about this application.
  */
-$ThemeInfo['Carsonified'] = array(
+$ThemeInfo['carsonified'] = array(
+   'Name' => 'Carsonified',
    'Description' => "A custom joint for Carsonified.",
    'Version' => '1.0',
    'Author' => "Mark O'Sullivan",
