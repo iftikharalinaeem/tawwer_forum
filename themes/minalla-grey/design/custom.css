@@ -25,33 +25,25 @@ a:hover{
 
 div.Box h4 {
 	color:#282828;
-	margin:5px 0 10px 0;
 }
 
 a.BigButton {
 	-moz-box-shadow:0 0 0px #fff;
-	background:#00baff;
-	border:1px solid #006287;
+	background:#282828;
+	border:1px solid #ddd;
 	color:#fff;
-	text-shadow:0 1px 0 #006287;
-	-moz-border-radius-bottomleft:0px;
-	-moz-border-radius-bottomright:0px;
-	-moz-border-radius-topleft:0px;
-	-moz-border-radius-topright:0px;
-	padding-bottom:12px;
-	margin:0 0 20px 0;
+	text-shadow:0 1px 0 #000;
 }
 
 a.BigButton:hover {
     color: #fff;
-	background:#41cbfe;
-    border-top::1px solid #006287
+    border: 1px solid #666;
 	box-shadow: 0;
 	-moz-box-shadow:0 0 0px #fff;
 	  
 }
 a.BigButton:focus {
-    background: #00baff;
+    background: #282828;
 	color: #fff;
 	box-shadow: 0;
 	-moz-box-shadow:0 0 0px #fff;
@@ -80,31 +72,12 @@ a.Button,
 	-webkit-box-shadow: 0px 0px 0px #fff;  
    }
 
-input a.Button,
-input.Button {
-   cursor: pointer;
-   margin: 0;
-   font-size: 11px;
-   padding: 2px;
-   background:#fff;
-   color: #282828 ;
-	text-shadow: 0 1px 0 #fff;
-   border: 1px solid #00BAFF;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-	box-shadow: 0px 0px 0px #fff;
-	-moz-box-shadow: 0px 0px 0px #fff;
-	-webkit-box-shadow: 0px 0px 0px #fff;  
-	width:50px;
-   }
-
-
 .Button:hover {
    color: #282828;
    border: 1px solid #282828;
 }
 .Button:focus {
-   background: #00baff;
+   background: #282828;
 }
 
 ul.DataList a.Delete {
@@ -126,32 +99,10 @@ div.Box {
 /* ============================================================= Header */
 
 #Head {
-	background: transparent url(header_bg.png) repeat-x scroll left top;
+	background: transparent url(header_bg.gif) repeat-x scroll left top;
 	padding:0;
-	height:155px;
-}
-
-.logo {
-	padding-top:35px;	
-	width:248px;
-	height:47;
-	float:left;
-	z-index:1;
-}
-
-.top-banner {
-	padding:35px 465px 0 0;	
-	width:468px;
-	height:60;
-	float:right;
-	z-index:1;
-}
-
-.small-banner {
-	padding:5px;	
-	width:125px;
-	height:125px;
-	float:left;
+	text-align:right;
+	height:72px;
 }
 
 div.Menu {
@@ -159,42 +110,56 @@ div.Menu {
 }
 
 ul#Menu {
-	float:left;
-	padding:26px 400px 0 0;
+	float:right;
+	padding:25px 0 0 10px;
 }
 
+#Head h1.Title a{
+	color:#f2f2f2;
+	font-size:1.7em;
 
+}
+
+#Head h1.Title a:hover{
+	color:#c4c4c4;
+	font-size:1.7em;
+}
 
 #Menu a, #Menu li.Active a {
-	
-	color:#fff;
+	-moz-border-radius-bottomleft:3px;
+	-moz-border-radius-bottomright:3px;
+	-moz-border-radius-topleft:3px;
+	-moz-border-radius-topright:3px;
+	background:#f2f2f2;
+	color:#282828;
 }
 
 #Menu li a:hover,#Menu li.Active a:hover {
-	
-	color:#fff  !important;
+	-moz-border-radius-bottomleft:3px;
+	-moz-border-radius-bottomright:3px;
+	background:#c4c4c4;
+	color:#282828 !important;
 }
 
 #Menu li ul li a:hover,#Menu li.Active ul li a:hover {
-	
-	background:#00BAFF ;
-	color:#fff!important;
+	-moz-border-radius-bottomleft:3px;
+	-moz-border-radius-bottomright:3px;
+	background:#c4c4c4;
+	color:#282828 !important;
 }
 
 #Menu ul, #Menu li.Active {
-	
-	color:#fff;
+	background:#f2f2f2;
+	color:#282828;
 }
 
 #Menu li.NonTab, #Menu li.NonTab a {
-
-
-	color:#fff;
-}
-
-#Menu a:hover {
-	color:#fff;
-   background: #00BAFF;
+	-moz-border-radius-bottomleft:3px;
+	-moz-border-radius-bottomright:3px;
+	-moz-border-radius-topleft:3px;
+	-moz-border-radius-topright:3px;
+	background:#c4c4c4;
+	color:#282828;
 }
 
 div.Tabs div.SubTab {
@@ -230,7 +195,9 @@ body.Entry form ul li label {
 
 div.MessageForm, div.Tabs {
 	background:#f2f2f2;
-	border:1px solid #c4c4c4;
+	border-right:1px solid #c4c4c4;
+	border-left:1px solid #c4c4c4;
+	border-bottom:1px solid #c4c4c4;
 	display:block;
 	margin-bottom:30px;
 	padding:5px 8px;
@@ -255,9 +222,7 @@ div.MessageForm a.Cancel:hover, div.MorePager a:hover, a.TabLink:hover, div.Tabs
 }
 
 ul.DataList li.Item {
-		background:#fff url(ul_datalist_discussions_bg.png) top center no-repeat;
-
-	border:1px solid #c4c4c4;
+	border-bottom:1px solid #e1e1e1;
 	margin:0 0 20px;
 	padding:4px 0;
 }
@@ -276,36 +241,34 @@ ul.DataList a.Title {
 }
 
 div.Tabs li a span {
-	background:#00baff;
+	background:#282828;
 	color:#fff;
 }
 
 ul.DataList div.Meta strong {
-	background:#00baff;
+	background:#282828;
 	color:#fff;
 }
 
 ul.DataList div.Meta span.Announcement {
-	background:#00baff;
+	background:#282828;
 	color:#fff;
 }
 
 ul.DataList li.Mine div.Meta a.Category {
-	background:#d8f4ff;
+	background:#f2f2f2;
 }
 
 ul.Options li.Parent strong {
-	background:#00BAFF ;
+	background:#f2f2f2;
 	border:1px solid #ddd;
-	color:#fff;
+	color:#282828;
 }
 
 ul.Options li.Parent strong:hover,
 ul.Options li.Active strong:hover,
 ul.Options li.Active strong,
 ul.Options li.Active ul {
-	border:1px solid #fff;
-	color:#fff;
   	box-shadow: 0px 0px 0px #fff;
 	-moz-box-shadow: 0 0 0px #fff;
 	-webkit-box-shadow: 0px 0px 0px #fff;     
@@ -315,7 +278,7 @@ a.Bookmark,
 a.Bookmarking {
 	float: right;
    display: block;
-   background: url(tag_sprite.png) top center no-repeat;
+   background: url(star_sprite.png) top center no-repeat;
    height: 22px;
    width: 22px;
    margin: 2px 4px 0 4px;
@@ -325,18 +288,13 @@ a.Bookmarking span {
    display: none;
 }
 a.Bookmarked {
-   background: url(tag_sprite.png) center center no-repeat;
+   background: url(star_sprite.png) center center no-repeat;
 }
 a.Bookmarking {
-   background: url(tag_sprite.png) bottom center no-repeat;
+   background: url(star_sprite.png) bottom center no-repeat;
 }
 
 /* ============================================================= discussions */
-
-#Content {
-
-	width:650px;
-}
 
 #DiscussionForm h2 {
 	font-size:19px;
@@ -352,11 +310,6 @@ a.Bookmarking {
 	border:1px solid #c4c4c4;
 	margin:0;
 	padding:20px;
-}
-
-ul.DataList.Discussions {
-/*	background:#fff url(ul_datalist_discussions_bg.png) top center no-repeat;
-	border:1px solid #c4c4c4;*/
 }
 
 /* ============================================================= activities */
@@ -400,12 +353,12 @@ ul.Activities li.CommentForm input.Button {
 }
 
 .ac_over {
-	background:#00baff;
+	background:#282828;
 	color:#282828;
 }
 
 .ac_over strong {
-	background:#00baff;
+	background:#282828;
 	font-weight:normal;
 }
 
@@ -479,10 +432,10 @@ div.Popup .Footer {
 /* ============================================================= search */
 
 #Search {	
-	background:#D8F4FF none repeat scroll 0 0;
-	border:1px solid #00BAFF;
+	background:#333;
+	border:#333 1px solid;
 	display:block;
-	margin:0;
+	margin:0 0 30px;
 	padding:7px;
 }
 
@@ -496,11 +449,11 @@ div.Popup .Footer {
 
 #Panel input.InputBox, div.AddPeople textarea.MultiComplete {
 	margin:0 5px 2px 5px;
-	width:160px;
+	width:180px;
 }
 
 input.DateBox, input.InputBox, input.SmallInput, textarea {
-	border:1px solid #00BAFF;
+	border:1px solid #282828;
 	font-family:Georgia,"Times New Roman",Times,serif;;
 	font-size:12px;
 	padding:3px;
@@ -509,16 +462,15 @@ input.DateBox, input.InputBox, input.SmallInput, textarea {
 /* ============================================================= sidebar */
 
 div.Box {	
-	background:#fff url(div_box_bg.png) top center no-repeat;
+	background:#f2f2f2 none repeat scroll 0 0;
 	color:#282828;
-	border:1px solid #c4c4c4;
-	
+	;
 }
 
 #Panel {
 	float:right;
-	margin:20px 0 0 0;
-	width:270px;
+	margin-bottom:50px;
+	width:250px;
 }
 
 
@@ -540,7 +492,7 @@ ul.PanelInfo li.Active a {
 }
 
 ul.PanelInfo div.Meta strong {
-	background:#00baff;
+	background:#282828;
 	color:#fff;
 }
 
@@ -561,11 +513,12 @@ ul.PanelInfo div.Meta strong {
 	/*text-decoration:underline;*/
 }
 #Foot .vanilla-ico {
+	background:url(vanilla_ico.png) no-repeat;
 	float:left;
 	width:15px;
 	height:15px;
 	margin:0;
-	padding:0 6px 6px 0;
+	padding:0 7px 7px 0;
 }
 
 .Foot {

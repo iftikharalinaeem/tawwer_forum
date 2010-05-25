@@ -95,7 +95,6 @@ input.Button {
 	box-shadow: 0px 0px 0px #fff;
 	-moz-box-shadow: 0px 0px 0px #fff;
 	-webkit-box-shadow: 0px 0px 0px #fff;  
-	width:50px;
    }
 
 
@@ -128,7 +127,7 @@ div.Box {
 #Head {
 	background: transparent url(header_bg.png) repeat-x scroll left top;
 	padding:0;
-	height:155px;
+	height:125px;
 }
 
 .logo {
@@ -158,9 +157,25 @@ div.Menu {
 	text-align:left;
 }
 
+body #Head h1 {
+	padding:35px 7px 0 0;
+	text-shadow:0 1px 0 #fff;
+}
+
+#Head h1.Title a{
+	color:#005292;
+	font-size:1.7em;
+}
+
+#Head h1.Title a:hover{
+	color:#00BAFF ;
+	font-size:1.7em;
+}
+
 ul#Menu {
 	float:left;
-	padding:26px 400px 0 0;
+	padding:30px 700px 0 0;
+	width:900px;
 }
 
 
@@ -229,10 +244,11 @@ body.Entry form ul li label {
 /* ============================================================= content */
 
 div.MessageForm, div.Tabs {
+	clear:both;
 	background:#f2f2f2;
 	border:1px solid #c4c4c4;
 	display:block;
-	margin-bottom:30px;
+	margin:20px 0 20px 0;
 	padding:5px 8px;
 }
 
@@ -259,7 +275,7 @@ ul.DataList li.Item {
 
 	border:1px solid #c4c4c4;
 	margin:0 0 20px;
-	padding:4px 0;
+	padding:10px 0 20px;
 }
 
 .Mine {
@@ -315,7 +331,7 @@ a.Bookmark,
 a.Bookmarking {
 	float: right;
    display: block;
-   background: url(tag_sprite.png) top center no-repeat;
+   background: url(star_sprite.png) top center no-repeat;
    height: 22px;
    width: 22px;
    margin: 2px 4px 0 4px;
@@ -325,10 +341,10 @@ a.Bookmarking span {
    display: none;
 }
 a.Bookmarked {
-   background: url(tag_sprite.png) center center no-repeat;
+   background: url(star_sprite.png) center center no-repeat;
 }
 a.Bookmarking {
-   background: url(tag_sprite.png) bottom center no-repeat;
+   background: url(star_sprite.png) bottom center no-repeat;
 }
 
 /* ============================================================= discussions */
@@ -359,6 +375,11 @@ ul.DataList.Discussions {
 	border:1px solid #c4c4c4;*/
 }
 
+div.CommentForm textarea {
+	
+	width:623px;
+}
+
 /* ============================================================= activities */
 
 
@@ -374,6 +395,7 @@ ul.Activities div.Meta a:hover {
 ul.Activities ul.DataList li {
 	background:#F2F2F2 none repeat scroll 0 0;
 	border:1px solid #C4C4C4;
+	padding-bottom:20px;
 }
 
 ul.Activities li.CommentForm input.Button {
@@ -419,6 +441,23 @@ ul.Activities li.CommentForm input.Button {
 
 /* ============================================================= profile page */
 
+body.Profile #Content {
+
+	width:650px;
+}
+
+form.Activity textarea {
+
+	width:640px;
+}
+
+form.Activity {
+	padding:10px 0;
+}
+
+ul.DataList div.Photo {
+	padding:10px;
+}
 
 div.User h1 {
 	margin:15px 0 20px 0;
@@ -446,10 +485,10 @@ ul.PanelInfo li {
 }
 
 body.Profile ul.PanelInfo{
-	border:1px solid #f2f2f2;
+	border:1px solid #fff;
 }
 body.Profile ul.PanelInfo li{
-	background:#f2f2f2;
+	background:#fff;
 }
 
 div.Box dl {
@@ -461,12 +500,12 @@ div.Box dl {
 }
 
 div.Popup div.Body {
-	border:4px solid #282828;
+	border:4px solid #005292;
 }
 
 div.Popup h1, div.Popup h2 {
-	background:#282828;
-	border-bottom:1px solid #ddd;
+	background:#005292;
+	border-bottom:1px solid #005292;
 }
 
 div.Popup .Footer {
@@ -517,8 +556,14 @@ div.Box {
 
 #Panel {
 	float:right;
-	margin:20px 0 0 0;
-	width:270px;
+	margin:20px 0 20px 0;
+	width:250px;
+}
+
+body.Profile #Panel {
+	float:left;
+	width:250px;
+	text-align:left;
 }
 
 
@@ -561,11 +606,12 @@ ul.PanelInfo div.Meta strong {
 	/*text-decoration:underline;*/
 }
 #Foot .vanilla-ico {
+	background:url(vanilla_ico.png) no-repeat;
 	float:left;
 	width:15px;
 	height:15px;
 	margin:0;
-	padding:0 6px 6px 0;
+	padding:0 7px 7px 0;
 }
 
 .Foot {
