@@ -186,11 +186,30 @@ body.Entry #Content h1 {
 }
 
 body.Entry #Content div.Box {
-	background:#fff;
-	border:1px solid #fff;
+	background:#f2f2f2 url(div_box_bg.png) top left no-repeat;
+	border:1px solid #c4c4c4;
+	margin-bottom:20px;
 }
 body.Entry form ul li label {
 	color:#282828;
+}
+
+#dashboard_entrycontroller_index #Panel {
+	float:right;
+	margin-bottom:50px;
+	width:250px;
+}
+
+#dashboard_entrycontroller_register #Panel {
+	float:right;
+	margin-bottom:50px;
+	width:250px;
+}
+
+#dashboard_entrycontroller_leave #Panel {
+	float:right;
+	margin-bottom:50px;
+	width:250px;
 }
 
 /* ============================================================= content */
@@ -366,6 +385,11 @@ ul.DataList div.Photo {
 	padding:5px;
 }
 
+ul.Activities div.ItemContent {
+	padding:10px;
+
+}
+
 /* ==================================================== New Conversation Form */
 
 #ConversationForm h2 {
@@ -385,12 +409,12 @@ ul.DataList div.Photo {
 }
 
 .ac_over {
-	background:#282828;
+	background:#c4c4c4;
 	color:#282828;
 }
 
 .ac_over strong {
-	background:#282828;
+	background:#c4c4c4;
 	font-weight:normal;
 }
 
@@ -499,6 +523,7 @@ input.DateBox, input.InputBox, input.SmallInput, textarea {
 	padding:3px;
 }
 
+
 /* ============================================================= sidebar */
 
 div.Box {	
@@ -514,8 +539,9 @@ div.Box {
 }
 
 
+
 ul.PanelInfo {
-	border-top:1px solid #c4c4c4;
+	border-top:1px solid #c4c4c4
 }
 
 ul.PanelInfo li.Active {
