@@ -40,7 +40,7 @@
     <div id="Panel">{asset name="Panel"}</div>
   </div>
   <div id="Foot">
-    <div>Powered by <a href="http://vanillaforums.org"><span>Vanilla</span></a></div>
+    <div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
     {asset name="Foot"}
  </div>
 </div>
