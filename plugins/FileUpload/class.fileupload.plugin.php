@@ -125,8 +125,10 @@ class FileUploadPlugin extends Gdn_Plugin {
       if (!$Filename) $Filename = $Media->Name;
       
       header('Content-Type: application/octet-stream');
-      header('Content-Disposition: inline;filename='.$Filename);
-      readfile(FileUploadPlugin::FindLocalMedia($MediaID, $Media->InsertUserID, TRUE, TRUE));
+      header('Content-Disposition: inline;filename='.urlencode($Filename));
+      
+      $DownloadPath = FileUploadPlugin::FindLocalMedia($Media, TRUE, TRUE);
+      readfile($DownloadPath);
       exit();
    }
    
@@ -163,7 +165,7 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    protected function PlaceMedia(&$Media, $UserID) {
-      $NewFolder = FileUploadPlugin::FindLocalMedia($Media->MediaID, $UserID, TRUE, FALSE);
+      $NewFolder = FileUploadPlugin::FindLocalMediaFolder($Media->MediaID, $UserID, TRUE, FALSE);
       
       $CurrentPath = array();
       foreach ($NewFolder as $FolderPart) {
@@ -178,11 +180,11 @@ class FileUploadPlugin extends Gdn_Plugin {
       $NewFilePath = implode(DS,array($TestFolder,$Media->MediaID.'.'.$FileParts['extension']));
       rename($Media->Path, $NewFilePath);
       
-      $NewFilePath = FileUploadPlugin::FindLocalMedia($Media->MediaID, $UserID, FALSE, TRUE);
+      $NewFilePath = FileUploadPlugin::FindLocalMedia($Media, FALSE, TRUE);
       $Media->Path = $NewFilePath;
    }
    
-   public static function FindLocalMedia($MediaID, $UserID, $Absolute = FALSE, $ReturnString = FALSE) {
+   public static function FindLocalMediaFolder($MediaID, $UserID, $Absolute = FALSE, $ReturnString = FALSE) {
       $DispersionFactor = 20;
       $FolderID = $UserID % 20;
       $ReturnArray = array('FileUpload',$FolderID,$UserID);
@@ -191,6 +193,16 @@ class FileUploadPlugin extends Gdn_Plugin {
          array_unshift($ReturnArray, PATH_UPLOADS);
       
       return ($ReturnString) ? implode(DS,$ReturnArray) : $ReturnArray;
+   }
+   
+   public static function FindLocalMedia($Media, $Absolute = FALSE, $ReturnString = FALSE) {
+      $ArrayPath = FileUploadPlugin::FindLocalMediaFolder($Media->MediaID, $Media->InsertUserID, $Absolute, FALSE);
+      
+      $FileParts = pathinfo($Media->Name);
+      $RealFileName = $Media->MediaID.'.'.$FileParts['extension'];
+      array_push($ArrayPath, $RealFileName);
+      
+      return ($ReturnString) ? implode(DS, $ArrayPath) : $ArrayPath;
    }
    
    /**
