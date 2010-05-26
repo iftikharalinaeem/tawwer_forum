@@ -1,9 +1,10 @@
 var Gdn_MultiFileUpload = Class.create({
 
-   init: function(AttachmentWindow, FileContainerID, AttachFileLinkID, AttachFileRootName, MaxFiles, UniqID) {
+   init: function(Action, AttachmentWindow, FileContainerID, AttachFileLinkID, AttachFileRootName, MaxFiles, UniqID) {
       this.AttachmentWindow = AttachmentWindow;
       this.AttachmentWindowHTML = $('#'+AttachmentWindow).html();
    
+      this.ActionRoot = Action;
       this.FileContainerID = FileContainerID;
       this.AttachFileLinkID = AttachFileLinkID;
       this.AttachFileRootName = AttachFileRootName;
@@ -77,10 +78,14 @@ var Gdn_MultiFileUpload = Class.create({
       NewUploaderID = [this.AttachFileRootName,NewUploaderID].join('_');
       
       var UploaderForm = document.createElement('form');
-      var SubmitAction = ['/post','upload',NewUploaderID].join('/');
+      var Action = ['post','upload',NewUploaderID];
+      if (this.ActionRoot)
+         Action.unshift(this.ActionRoot);
+      Action.unshift('');
+
       UploaderForm.enctype = 'multipart/form-data';
       UploaderForm.method = 'POST';
-      UploaderForm.action = SubmitAction;
+      UploaderForm.action = Action.join('/');
       var IFrameName = this.NewFrame(NewUploaderID);
       var FormName = IFrameName+'_form';
       UploaderForm.id = FormName;
@@ -215,8 +220,12 @@ var Gdn_MultiFileUpload = Class.create({
          return;
       }
    
+      var Action = ['post','checkupload',ApcKey];
+      if (this.ActionRoot)
+         Action.unshift(this.ActionRoot);
+      Action.unshift('');
       jQuery.ajax({
-         url:['/post','checkupload',ApcKey].join('/'),
+         url:Action.join('/'),
          type:'POST',
          //data:{'Previous':Progress},
          success:jQuery.proxy(this.Progress, this)
