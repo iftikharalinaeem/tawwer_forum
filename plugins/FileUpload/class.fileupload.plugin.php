@@ -67,8 +67,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       $this->GetResource('views/attach_file.php', TRUE);
    }
    
-   public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
-      // Cache the list of media. Don't want to do multiple queries!
+   protected function CacheAttachedMedia(&$Sender) {
       $Comments = $Sender->Data('CommentData');
       $CommentIDList = array();
       
@@ -86,7 +85,25 @@ class FileUploadPlugin extends Gdn_Plugin {
       $Sender->SetData('FileUploadMedia', $MediaArray);
    }
    
+   public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
+      // Cache the list of media. Don't want to do multiple queries!
+      $this->CacheAttachedMedia($Sender);
+   }
+   
+   public function PostController_BeforeCommentRender_Handler(&$Sender) {
+      // Cache the list of media. Don't want to do multiple queries!
+      $this->CacheAttachedMedia($Sender);
+   }
+   
    public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
+      $this->AttachUploadsToComment($Sender);
+   }
+   
+   public function PostController_AfterCommentBody_Handler(&$Sender) {
+      $this->AttachUploadsToComment($Sender);
+   }
+   
+   protected function AttachUploadsToComment(&$Sender) {
       $Type = strtolower($RawType = $Sender->EventArguments['Type']);
       $MediaList = $Sender->Data('FileUploadMedia');
       $Param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
@@ -109,11 +126,13 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       header('Content-Type: application/octet-stream');
       header('Content-Disposition: inline;filename='.$Filename);
-      readfile($Media->Path);
+      readfile(FileUploadPlugin::FindLocalMedia($MediaID, $Media->InsertUserID, TRUE, TRUE));
       exit();
    }
    
    public function PostController_AfterCommentSave_Handler(&$Sender) {
+      if (!$Sender->EventArguments['Comment']) return;
+      
       $CommentID = $Sender->EventArguments['Comment']->CommentID;
       $AttachedFilesData = Gdn::Request()->GetValue('AttachedUploads');
       if (!$AttachedFilesData) return;
@@ -122,6 +141,8 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    public function PostController_AfterDiscussionSave_Handler(&$Sender) {
+      if (!$Sender->EventArguments['Discussion']) return;
+      
       $DiscussionID = $Sender->EventArguments['Discussion']->DiscussionID;
       $AttachedFilesData = Gdn::Request()->GetValue('AttachedUploads');
       if (!$AttachedFilesData) return;
@@ -142,7 +163,7 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    protected function PlaceMedia(&$Media, $UserID) {
-      $NewFolder = FileUploadPlugin::FindLocalMedia($Media->MediaID, $UserID);
+      $NewFolder = FileUploadPlugin::FindLocalMedia($Media->MediaID, $UserID, TRUE, FALSE);
       
       $CurrentPath = array();
       foreach ($NewFolder as $FolderPart) {
@@ -156,13 +177,20 @@ class FileUploadPlugin extends Gdn_Plugin {
       $FileParts = pathinfo($Media->Name);
       $NewFilePath = implode(DS,array($TestFolder,$Media->MediaID.'.'.$FileParts['extension']));
       rename($Media->Path, $NewFilePath);
+      
+      $NewFilePath = FileUploadPlugin::FindLocalMedia($Media->MediaID, $UserID, FALSE, TRUE);
       $Media->Path = $NewFilePath;
    }
    
-   public static function FindLocalMedia($MediaID, $UserID) {
+   public static function FindLocalMedia($MediaID, $UserID, $Absolute = FALSE, $ReturnString = FALSE) {
       $DispersionFactor = 20;
       $FolderID = $UserID % 20;
-      return array(PATH_UPLOADS,'attachments',$FolderID,$UserID);
+      $ReturnArray = array('FileUpload',$FolderID,$UserID);
+      
+      if ($Absolute)
+         array_unshift($ReturnArray, PATH_UPLOADS);
+      
+      return ($ReturnString) ? implode(DS,$ReturnArray) : $ReturnArray;
    }
    
    /**

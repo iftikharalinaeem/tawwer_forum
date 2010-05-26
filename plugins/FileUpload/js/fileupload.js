@@ -1,19 +1,38 @@
 var Gdn_MultiFileUpload = Class.create({
 
-   init: function(FileContainerID, AttachFileLinkID, AttachFileRootName, MaxFiles, UniqID) {
+   init: function(AttachmentWindow, FileContainerID, AttachFileLinkID, AttachFileRootName, MaxFiles, UniqID) {
+      this.AttachmentWindow = AttachmentWindow;
+      this.AttachmentWindowHTML = $('#'+AttachmentWindow).html();
+   
       this.FileContainerID = FileContainerID;
       this.AttachFileLinkID = AttachFileLinkID;
       this.AttachFileRootName = AttachFileRootName;
       this.MaxFiles = MaxFiles;
       this.UniqID = UniqID;
       
-      this.MyFiles = [];
-      this.ProgressBars = {};
-      this.CurrentInput = null;
       this.UploaderContainer = null;
       this.IFrameContainer = null;
       
       $(document).ready(jQuery.proxy(this.Ready, this));
+   },
+   
+   Reset: function() {
+      $('#'+this.AttachmentWindow).html(this.AttachmentWindowHTML);
+      
+      if (this.CurrentInput) {
+         this.RemoveUploader(this.CurrentInput);
+      }
+      
+      this.MyFiles = [];
+      this.ProgressBars = {};
+      this.CurrentInput = null;
+      
+      // Create a new uploader
+      var UploaderID = this.NewUploader();
+      
+      // Attach onClick event to the Attach File button
+      //$('#'+this.AttachFileLinkID).click(jQuery.proxy(this.AlignUploader, this));
+      
    },
    
    /**
@@ -22,13 +41,13 @@ var Gdn_MultiFileUpload = Class.create({
     * Create an uploader, create the focus() link
     */
    Ready: function() {
+   
       // Create uploader container
       var UploaderContainer = document.createElement('div');
       var UploaderContainerID = 'ctnr' + Math.floor(Math.random() * 99999);
       UploaderContainer.id = UploaderContainerID;
       $(document.body).append(UploaderContainer);
       this.UploaderContainer = $('#'+UploaderContainerID);
-      //this.UploaderContainer.hide();
       
       // Create iframe container
       var IFrameContainer = document.createElement('div');
@@ -38,11 +57,9 @@ var Gdn_MultiFileUpload = Class.create({
       this.IFrameContainer = $('#'+IFrameContainerID);
       this.IFrameContainer.hide();
       
-      // Create a new uploader
-      var UploaderID = this.NewUploader();
+      this.Reset();
       
-      // Attach onClick event to e to the form element
-      $('#'+this.AttachFileLinkID).click(jQuery.proxy(this.FocusCurrentUploader, this));
+      $('#'+this.AttachFileLinkID).parents('form').bind('complete',jQuery.proxy(this.Reset,this));
    },
    
    FocusCurrentUploader: function() {
@@ -75,10 +92,8 @@ var Gdn_MultiFileUpload = Class.create({
       NewUploader.id    = NewUploaderID;
       NewUploader.className = 'HiddenFileInput';
       $(NewUploader).fadeTo(0,0);
-      $(NewUploader).offset($('#'+this.AttachFileLinkID).offset());
-      $(NewUploader).css('top', (parseInt($(NewUploader).css('top'))-5)+'px');
-      $(NewUploader).css('width', parseInt($('#'+this.AttachFileLinkID).width())+'px');
       $(UploaderForm).append(NewUploader);
+      this.AlignUploader(NewUploader);
       
       var APCNotifier = document.createElement('input');
       APCNotifier.type = 'hidden';
@@ -99,6 +114,13 @@ var Gdn_MultiFileUpload = Class.create({
          'Complete': false
       };
       $('#'+this.CurrentInput).change(jQuery.proxy(this.DispatchCurrentUploader,this));
+   },
+   
+   AlignUploader: function(Uploader) {
+      var Offset = $('#'+this.AttachFileLinkID).offset();
+      $(Uploader).offset(Offset);
+      $(Uploader).css('top', (parseInt(Offset.top) - 5)+'px');
+      $(Uploader).css('width', parseInt($('#'+this.AttachFileLinkID).width())+'px');
    },
    
    // Create a new named iframe to which our uploads can be submitted
@@ -234,7 +256,7 @@ var Gdn_MultiFileUpload = Class.create({
       var TargetFrame = $('#'+this.ProgressBars[UploaderID].Target);
       var TargetForm = $('#'+this.ProgressBars[UploaderID].Target+'_form');
       
-      TargetFrame.remove();
+      TargetFrame.parent().remove();
       TargetForm.remove();
       
       // If a progress request is pending, cancel it
