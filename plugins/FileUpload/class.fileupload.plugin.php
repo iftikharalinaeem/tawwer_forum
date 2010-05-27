@@ -60,10 +60,18 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    public function PostController_BeforeFormButtons_Handler(&$Sender) {
-      $this->GetResource('views/attach_file.php', TRUE);
+      $this->DrawAttachFile($Sender);
    }
    
    public function DiscussionController_BeforeFormButtons_Handler(&$Sender) {
+      $this->DrawAttachFile($Sender);
+   }
+   
+   public function DrawAttachFile(&$Sender) {
+      $PostMaxSize = Gdn_Upload::UnformatFileSize(ini_get('post_max_size'));
+      $FileMaxSize = Gdn_Upload::UnformatFileSize(ini_get('upload_max_filesize'));
+      
+      $this->MaxUploadSize = ($PostMaxSize > $FileMaxSize) ? $PostMaxSize : $FileMaxSize;
       $this->GetResource('views/attach_file.php', TRUE);
    }
    
@@ -128,7 +136,11 @@ class FileUploadPlugin extends Gdn_Plugin {
       header('Content-Disposition: inline;filename='.urlencode($Filename));
       
       $DownloadPath = FileUploadPlugin::FindLocalMedia($Media, TRUE, TRUE);
-      readfile($DownloadPath);
+      if (file_exists($DownloadPath)) {
+         readfile($DownloadPath);
+      } else {
+         throw new Exception('File could not be streamed: missing file ('.$DownloadPath.').');
+      }
       exit();
    }
    
@@ -137,9 +149,9 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $CommentID = $Sender->EventArguments['Comment']->CommentID;
       $AttachedFilesData = Gdn::Request()->GetValue('AttachedUploads');
-      if (!$AttachedFilesData) return;
-      foreach ($AttachedFilesData as $FileID)
-         $this->AttachFile($FileID, $CommentID, 'comment');
+      $AllFilesData = Gdn::Request()->GetValue('AllUploads');
+      
+      $this->AttachAllFiles($AttachedFilesData, $AllFilesData, $CommentID, 'comment');
    }
    
    public function PostController_AfterDiscussionSave_Handler(&$Sender) {
@@ -147,20 +159,54 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $DiscussionID = $Sender->EventArguments['Discussion']->DiscussionID;
       $AttachedFilesData = Gdn::Request()->GetValue('AttachedUploads');
+      $AllFilesData = Gdn::Request()->GetValue('AllUploads');
+      
+      $this->AttachAllFiles($AttachedFilesData, $AllFilesData, $DiscussionID, 'discussion');
+   }
+   
+   protected function AttachAllFiles($AttachedFilesData, $AllFilesData, $ForeignID, $ForeignTable) {
       if (!$AttachedFilesData) return;
-      foreach ($AttachedFilesData as $FileID)
-         $this->AttachFile($FileID, $DiscussionID, 'discussion');
+      
+      $SuccessFiles = array();
+      foreach ($AttachedFilesData as $FileID) {
+         $Attached = $this->AttachFile($FileID, $ForeignID, $ForeignTable);
+         if ($Success)
+            $SuccessFiles[] = $FileID;
+      }
+         
+      // TODO: clean up failed and unattached files
+      $DeleteIDs = array_diff($AllFilesData, $SuccessFiles);
+      foreach ($DeleteIDs as $DeleteID) {
+         $this->TrashFile($DeleteID);
+      }
    }
    
    protected function AttachFile($FileID, $ForeignID, $ForeignType) {
-      $SQL = Gdn::Database()->SQL();
       $MediaModel = new MediaModel();
       $Media = $MediaModel->GetID($FileID);
       if ($Media) {
          $Media->ForeignID = $ForeignID;
          $Media->ForeignTable = $ForeignType;
-         $this->PlaceMedia($Media, Gdn::Session()->UserID);
-         $MediaModel->Save($Media);
+         $PlacementStatus = $this->PlaceMedia($Media, Gdn::Session()->UserID);
+         if ($PlacementStatus) {
+            $MediaModel->Save($Media);
+            return TRUE;
+         }
+      }
+      return FALSE;
+   }
+   
+   protected function TrashFile($FileID) {
+      $MediaModel = new MediaModel();
+      $Media = $MediaModel->GetID($FileID);
+      
+      if ($Media) {
+         $MediaModel->Delete($Media);
+         $DirectPath = PATH_UPLOADS.DS.$Media->Path;
+         if (file_exists($DirectPath)) {
+            unlink($DirectPath);
+         }
+            
       }
    }
    
@@ -178,10 +224,15 @@ class FileUploadPlugin extends Gdn_Plugin {
       }
       $FileParts = pathinfo($Media->Name);
       $NewFilePath = implode(DS,array($TestFolder,$Media->MediaID.'.'.$FileParts['extension']));
-      rename($Media->Path, $NewFilePath);
+      $Success = @rename($Media->Path, $NewFilePath);
+      if (!$Success) {
+         return false;
+      }
       
       $NewFilePath = FileUploadPlugin::FindLocalMedia($Media, FALSE, TRUE);
       $Media->Path = $NewFilePath;
+      
+      return true;
    }
    
    public static function FindLocalMediaFolder($MediaID, $UserID, $Absolute = FALSE, $ReturnString = FALSE) {
@@ -295,21 +346,36 @@ class FileUploadPlugin extends Gdn_Plugin {
       array_shift($KeyData);
       $UploaderID = implode('_',$KeyData);
       
-      $UploadStatus = apc_fetch('upload_'.$ApcKey);
-      
-      if (is_array($UploadStatus)) {
-         $NewProgress = ($UploadStatus['current'] / $UploadStatus['total']) * 100;
-      } else {
-         $NewProgress = 0;
-      }
+      $UploadStatus = apc_fetch('upload_'.$ApcKey, $Success);
       
       $Progress = array(
-         'progress'     => $NewProgress,
          'key'          => $ApcKey,
-         'uploader'     => $UploaderID,
-         'total'        => $UploadStatus['total'],
-         'format_total' => Gdn_Format::Bytes2String($UploadStatus['total'],0)
+         'uploader'     => $UploaderID
       );
+      
+/*
+      if ($Success) {
+         $Progress['progress'] = ($UploadStatus['current'] / $UploadStatus['total']) * 100;
+         $Progress['total'] = $UploadStatus['total'];
+      } else {
+         $Progress['progress'] = 0;
+         $Progress['total'] = -1;
+      }
+*/
+      
+      if (!$Success)
+         $UploadStatus = array(
+            'current'   => 0,
+            'total'     => -1
+         );
+         
+      $Progress['progress'] = ($UploadStatus['current'] / $UploadStatus['total']) * 100;
+      $Progress['total'] = $UploadStatus['total'];
+         
+      
+      $Progress['format_total'] = Gdn_Format::Bytes2String($Progress['total'],1);
+      $Progress['cache'] = $UploadStatus;
+      
       $Sender->SetJSON('Progress', $Progress);
       $Sender->Render($this->GetView('confirm_file.php'));
    }

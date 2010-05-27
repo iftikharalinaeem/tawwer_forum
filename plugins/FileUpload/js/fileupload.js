@@ -1,6 +1,6 @@
 var Gdn_MultiFileUpload = Class.create({
 
-   init: function(Action, AttachmentWindow, FileContainerID, AttachFileLinkID, AttachFileRootName, MaxFiles, UniqID) {
+   init: function(Action, AttachmentWindow, FileContainerID, AttachFileLinkID, AttachFileRootName, MaxUploadSize, UniqID) {
       this.AttachmentWindow = AttachmentWindow;
       this.AttachmentWindowHTML = $('#'+AttachmentWindow).html();
    
@@ -8,11 +8,13 @@ var Gdn_MultiFileUpload = Class.create({
       this.FileContainerID = FileContainerID;
       this.AttachFileLinkID = AttachFileLinkID;
       this.AttachFileRootName = AttachFileRootName;
-      this.MaxFiles = MaxFiles;
+      this.MaxUploadSize = MaxUploadSize;
       this.UniqID = UniqID;
       
       this.UploaderContainer = null;
       this.IFrameContainer = null;
+      this.IFrames = {};
+      this.TID = 0;
       
       $(document).ready(jQuery.proxy(this.Ready, this));
    },
@@ -91,6 +93,13 @@ var Gdn_MultiFileUpload = Class.create({
       UploaderForm.id = FormName;
       UploaderForm.target = IFrameName;
       
+      var APCNotifier = document.createElement('input');
+      APCNotifier.type = 'hidden';
+      APCNotifier.name = 'APC_UPLOAD_PROGRESS';
+      APCNotifier.id = NewUploaderID+'_apckey';
+      APCNotifier.value = this.UniqID + '_' + NewUploaderID;
+      $(UploaderForm).append(APCNotifier);
+      
       var NewUploader   = document.createElement('input');
       NewUploader.type  = 'file';
       NewUploader.name  = NewUploaderID;
@@ -100,12 +109,11 @@ var Gdn_MultiFileUpload = Class.create({
       $(UploaderForm).append(NewUploader);
       this.AlignUploader(NewUploader);
       
-      var APCNotifier = document.createElement('input');
-      APCNotifier.type = 'hidden';
-      APCNotifier.name = 'APC_UPLOAD_PROGRESS';
-      APCNotifier.id = NewUploaderID+'_apckey';
-      APCNotifier.value = this.UniqID + '_' + NewUploaderID;
-      $(UploaderForm).append(APCNotifier);
+      var MaxUploadSize = document.createElement('input');
+      MaxUploadSize.type = 'hidden';
+      MaxUploadSize.name = 'MAX_UPLOAD_SIZE';
+      MaxUploadSize.value = this.MaxUploadSize;
+      $(UploaderForm).append(MaxUploadSize);
       
       this.UploaderContainer.append(UploaderForm);
       this.CurrentInput = NewUploaderID;
@@ -139,9 +147,11 @@ var Gdn_MultiFileUpload = Class.create({
 		IFrame.name = IFrameName;
 		$(ContainerDiv).append(IFrame);
 		$(this.IFrameContainer).append(ContainerDiv);
+		
+		this.IFrames[IFrameName] = {ready:'no'};
       
       // Re-target just to be safe
-		$(IFrame).load(jQuery.proxy(function(){ this.UploadComplete(IFrameName,TargetUploaderID); }, this));
+		$('#'+IFrameName).load(jQuery.proxy(function(){ this.UploadComplete(IFrameName,TargetUploaderID); }, this));
       
 		return IFrameName;
    },
@@ -149,11 +159,19 @@ var Gdn_MultiFileUpload = Class.create({
    // Submit the form parent of the current uploader and hide the current uploader's input
    DispatchCurrentUploader: function(ChangeEvent) {
       var Target = $(ChangeEvent.target);
-      Target.parent().submit();
       var UploaderID = Target.attr('id');
-      
       this.RememberFile(Target);
-      this.NewUploader();
+      var IFrameName = Target.parent().attr('target');
+      this.IFrames[IFrameName].ready = 'yes';
+      
+/*       var Submitter = jQuery.proxy(function(){ */
+         Target.parent().submit();
+         this.NewUploader();
+/*
+      }, this);      
+      setTimeout(Submitter ,200);
+*/
+
    },
    
    RememberFile: function(FileInput) {
@@ -184,14 +202,13 @@ var Gdn_MultiFileUpload = Class.create({
       return UploaderID;
    },
    
-   Progress: function(UploaderID, ResponseStatus, XMLResponse) {
-      if (this.ProgressBars[UploaderID]) {
-      
-         // Timeout response call
-         var ApcKey = this.ProgressBars[UploaderID].ApcKey;
-         var Progress = this.ProgressBars[UploaderID].Progress;
+   Progress: function(Data, ResponseStatus, XMLResponse) {
+      if (this.ProgressBars[Data]) {
+         var ApcKey = this.ProgressBars[Data].ApcKey;
+         var Progress = this.ProgressBars[Data].Progress;
+         
+         var UploaderID = Data;
       } else {
-         var Data = UploaderID;
          if (!Data) return;
          
          var JData = jQuery.parseJSON(Data);
@@ -202,11 +219,16 @@ var Gdn_MultiFileUpload = Class.create({
             
             this.ProgressBars[UploaderID].Progress = Progress;
             this.ProgressBars[UploaderID].Total = JProgress.total;
-            
-            if (!this.ProgressBars[UploaderID].Complete) {
-               // Update progress bar
-               var FileListing = $('#'+UploaderID+'_listing');
+
+            var FileListing = $('#'+UploaderID+'_listing');
+
+            // Update the filesize
+            if (JProgress.total != null) {
                $(FileListing.find('td')[3]).html(JProgress.format_total);
+            }
+            
+            // Update progress bar
+            if (!this.ProgressBars[UploaderID].Complete) {
                var ProgressBar = FileListing.find('div.ProgressTicker');
                ProgressBar.css('width',Progress+'%');
             }
@@ -214,28 +236,37 @@ var Gdn_MultiFileUpload = Class.create({
          }
          
          // Wait 100 MS and then trigger another request
-         if (Progress && parseInt(Progress) < 100) {
-            this.ProgressBars[UploaderID].TimerID = setTimeout(jQuery.proxy(function(){ this.Progress(UploaderID); }, this), 1000);
+         Progress = parseInt(Progress);
+         if ((!this.ProgressBars[UploaderID].Complete && Progress < 100) || (this.ProgressBars[UploaderID].Complete && Progress <= 0)) {
+            this.TID = this.ProgressBars[UploaderID].TimerID = setTimeout(jQuery.proxy(function(){ this.Progress(UploaderID); }, this), 100);
          }
          return;
       }
    
-      var Action = ['post','checkupload',ApcKey];
+      var Action = ['post','checkupload',ApcKey,this.ProgressBars[UploaderID].Progress];
       if (this.ActionRoot)
          Action.unshift(this.ActionRoot);
       Action.unshift('');
+      var FinalURL = Action.join('/')+'?randval='+Math.random();
+      
       jQuery.ajax({
-         url:Action.join('/'),
-         type:'POST',
+         url:FinalURL,
+         type:'GET',
+         async:true,
          //data:{'Previous':Progress},
          success:jQuery.proxy(this.Progress, this)
       });
+
    },
    
    UploadComplete: function(IFrameName, TargetUploaderID) {
+      if (this.IFrames[IFrameName].ready != 'yes') {
+         this.IFrames[IFrameName].ready = 'yes';
+         return;
+      }
+      
       var IFR = document.getElementById(IFrameName);
       var Response = IFR.contentWindow.document.body.innerHTML;
-      if (!Response) return;
       
       var JResponse = jQuery.parseJSON(Response);
       if (JResponse && JResponse.MediaResponse) {
@@ -253,9 +284,17 @@ var Gdn_MultiFileUpload = Class.create({
                EnableMe.value = MediaID;
                EnableMe.checked = 'checked';
                
+               var TrackAll = document.createElement('input');
+               TrackAll.type = 'hidden';
+               TrackAll.name = 'AllUploads[]';
+               TrackAll.value = MediaID;
+               
+               
                var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
                $(FileListing.find('td')[1]).append(EnableMe);
+               $(FileListing.find('td')[1]).append(TrackAll);
                $(FileListing.find('td')[4]).find('div').remove();
+               
             }
          }
       }
@@ -269,7 +308,11 @@ var Gdn_MultiFileUpload = Class.create({
       TargetForm.remove();
       
       // If a progress request is pending, cancel it
-      clearTimeout(this.ProgressBars[UploaderID].TimerID);
+      //clearTimeout(this.ProgressBars[UploaderID].TimerID);
+   },
+   
+   Stop: function() {
+      clearTimeout(this.TID);
    }
 
 });
