@@ -11,5 +11,5 @@
    <div class="AttachFileLink"><a href="#" id="AttachFileLink">Attach a file</a></div>
 </div>
 <script type="text/javascript">
-   var UploadManager = new Gdn_MultiFileUpload('<?php echo Gdn::Request()->WebRoot(); ?>', 'AttachmentWindow', 'AttachFileContainer', 'AttachFileLink', 'UploadAttachment', 0, '<?php echo uniqid(''); ?>');
+   var UploadManager = new Gdn_MultiFileUpload('<?php echo Gdn::Request()->WebRoot(); ?>', 'AttachmentWindow', 'AttachFileContainer', 'AttachFileLink', 'UploadAttachment', '<?php echo $this->MaxUploadSize; ?>', '<?php echo uniqid(''); ?>');
 </script>
