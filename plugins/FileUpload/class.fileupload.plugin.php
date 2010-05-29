@@ -124,6 +124,8 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    protected function PrepareController(&$Controller) {
+      if (!Gdn::Config('Plugins.FileUpload.Enabled')) return;
+      
       $Controller->AddCssFile($this->GetResource('css/fileupload.css', FALSE, FALSE));
       $Controller->AddJsFile('js/library/jquery.class.js');
       $Controller->AddJsFile($this->GetResource('js/fileupload.js', FALSE, FALSE));
@@ -148,6 +150,8 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    public function DrawAttachFile(&$Sender) {
+      if (!Gdn::Config('Plugins.FileUpload.Enabled')) return;
+      
       $PostMaxSize = Gdn_Upload::UnformatFileSize(ini_get('post_max_size'));
       $FileMaxSize = Gdn_Upload::UnformatFileSize(ini_get('upload_max_filesize'));
       
@@ -155,7 +159,19 @@ class FileUploadPlugin extends Gdn_Plugin {
       $this->GetResource('views/attach_file.php', TRUE);
    }
    
+   public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
+      // Cache the list of media. Don't want to do multiple queries!
+      $this->CacheAttachedMedia($Sender);
+   }
+   
+   public function PostController_BeforeCommentRender_Handler(&$Sender) {
+      // Cache the list of media. Don't want to do multiple queries!
+      $this->CacheAttachedMedia($Sender);
+   }
+   
    protected function CacheAttachedMedia(&$Sender) {
+      if (!Gdn::Config('Plugins.FileUpload.Enabled')) return;
+      
       $Comments = $Sender->Data('CommentData');
       $CommentIDList = array();
       
@@ -173,16 +189,6 @@ class FileUploadPlugin extends Gdn_Plugin {
       $Sender->SetData('FileUploadMedia', $MediaArray);
    }
    
-   public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
-      // Cache the list of media. Don't want to do multiple queries!
-      $this->CacheAttachedMedia($Sender);
-   }
-   
-   public function PostController_BeforeCommentRender_Handler(&$Sender) {
-      // Cache the list of media. Don't want to do multiple queries!
-      $this->CacheAttachedMedia($Sender);
-   }
-   
    public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
       $this->AttachUploadsToComment($Sender);
    }
@@ -192,6 +198,8 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    protected function AttachUploadsToComment(&$Sender) {
+      if (!Gdn::Config('Plugins.FileUpload.Enabled')) return;
+      
       $Type = strtolower($RawType = $Sender->EventArguments['Type']);
       $MediaList = $Sender->Data('FileUploadMedia');
       $Param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
@@ -203,6 +211,8 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_Download_Create(&$Sender) {
+      if (!Gdn::Config('Plugins.FileUpload.Enabled')) return;
+   
       list($MediaID) = $Sender->RequestArgs;
       $MediaModel = new MediaModel();
       $Media = $MediaModel->GetID($MediaID);
@@ -245,6 +255,8 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    protected function AttachAllFiles($AttachedFilesData, $AllFilesData, $ForeignID, $ForeignTable) {
+      if (!Gdn::Config('Plugins.FileUpload.Enabled')) return;
+      
       if (!$AttachedFilesData) return;
       
       $SuccessFiles = array();
@@ -355,6 +367,8 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    public function PostController_Upload_Create(&$Sender) {
+      if (!Gdn::Config('Plugins.FileUpload.Enabled')) return;
+      
       list($FieldName) = $Sender->RequestArgs;
       
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
