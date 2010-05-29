@@ -30,15 +30,23 @@ div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td {
 }
 
 div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.ProgressBar {
-   width: 100px;
+   width: 126px;
    border: 2px solid gray;
    background-color: lightgrey;
    height: 14px;
+   background: transparent url('../images/progress_base.gif') no-repeat center left;
+   border: 0px;
 }
 
 div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.ProgressBar div.ProgressTicker {
    height: 100%;
    background-color: lime;
+   background: transparent url('../images/progress_active.gif') no-repeat center left;
+   line-height: 14px;
+   font-size: 10px;
+   color: #444444;
+   padding-right: 2px;
+   text-align: right;
 }
 
 div.AttachFileWrapper div.NewAttachment {

@@ -231,6 +231,8 @@ var Gdn_MultiFileUpload = Class.create({
             if (!this.ProgressBars[UploaderID].Complete) {
                var ProgressBar = FileListing.find('div.ProgressTicker');
                ProgressBar.css('width',Progress+'%');
+               if (Progress >= 15)
+                  ProgressBar.html(Math.ceil(Progress)+'%');
             }
             
          }
