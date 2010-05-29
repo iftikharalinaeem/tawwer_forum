@@ -271,31 +271,43 @@ var Gdn_MultiFileUpload = Class.create({
       var JResponse = jQuery.parseJSON(Response);
       if (JResponse && JResponse.MediaResponse) {
          var Filename = JResponse.MediaResponse.Filename;
-         var MediaID = JResponse.MediaResponse.MediaID;
+         if (!this.ProgressBars[TargetUploaderID]) return;
+         if (this.ProgressBars[TargetUploaderID].Filename != Filename) return;
          
-         if (this.ProgressBars[TargetUploaderID]) {
-            if (this.ProgressBars[TargetUploaderID].Filename == Filename) {
-               this.ProgressBars[TargetUploaderID].Complete = true;
-               this.MyFiles[MediaID] = Filename;
-               this.RemoveUploader(TargetUploaderID);
-               var EnableMe = document.createElement('input');
-               EnableMe.type = 'checkbox';
-               EnableMe.name = 'AttachedUploads[]';
-               EnableMe.value = MediaID;
-               EnableMe.checked = 'checked';
-               
-               var TrackAll = document.createElement('input');
-               TrackAll.type = 'hidden';
-               TrackAll.name = 'AllUploads[]';
-               TrackAll.value = MediaID;
-               
-               
-               var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
-               $(FileListing.find('td')[1]).append(EnableMe);
-               $(FileListing.find('td')[1]).append(TrackAll);
-               $(FileListing.find('td')[4]).find('div').remove();
-               
-            }
+         if (JResponse.MediaResponse.Status == 'success') {
+            // SUCCESS
+            
+            var MediaID = JResponse.MediaResponse.MediaID;
+            this.ProgressBars[TargetUploaderID].Complete = true;
+            this.MyFiles[MediaID] = Filename;
+            this.RemoveUploader(TargetUploaderID);
+            var EnableMe = document.createElement('input');
+            EnableMe.type = 'checkbox';
+            EnableMe.name = 'AttachedUploads[]';
+            EnableMe.value = MediaID;
+            EnableMe.checked = 'checked';
+            
+            var TrackAll = document.createElement('input');
+            TrackAll.type = 'hidden';
+            TrackAll.name = 'AllUploads[]';
+            TrackAll.value = MediaID;
+            
+            var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
+            $(FileListing.find('td')[1]).append(EnableMe);
+            $(FileListing.find('td')[1]).append(TrackAll);
+            $(FileListing.find('td')[4]).find('div').remove();
+            
+         } else {
+            // FAILURE
+            
+            clearTimeout(this.ProgressBars[TargetUploaderID].TimerID);
+            this.RemoveUploader(TargetUploaderID);
+            
+            var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
+            FileListing.remove();
+            delete this.ProgressBars[TargetUploaderID];
+            
+            this.AlignUploader($('#'+this.CurrentInput));
          }
       }
    },

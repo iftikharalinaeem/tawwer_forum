@@ -16,7 +16,7 @@ $PluginInfo['FileUpload'] = array(
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
-   'RegisterPermissions' => FALSE,
+   'RegisterPermissions' => array('Plugins.Attachments.Upload.Allow','Plugins.Attachments.Download.Allow'),
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'
@@ -27,13 +27,93 @@ class FileUploadPlugin extends Gdn_Plugin {
    /**
     * Adds "Media" menu option to the Forum menu on the dashboard.
     */
-/*
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Forum', 'Forum');
       $Menu->AddLink('Forum', 'Media', 'plugin/fileupload', 'Garden.AdminUser.Only');
    }
+   
+   public function PluginController_FileUpload_Create(&$Sender) {
+      $Sender->Permission('Garden.AdminUser.Only');
+      $Sender->Title('FileUpload');
+      $Sender->AddSideMenu('plugin/fileupload');
+      $Sender->Form = new Gdn_Form();
+      $this->Dispatch($Sender, $Sender->RequestArgs);
+   }
+   
+   public function Controller_Toggle(&$Sender) {
+      sleep(2);
+      $FileUploadStatus = Gdn::Config('Plugins.FileUpload.Enabled', FALSE);
+
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField(array('FileUploadStatus'));
+      
+      // Set the model on the form.
+      $Sender->Form->SetModel($ConfigurationModel);
+      
+      if ($Sender->Form->AuthenticatedPostBack()) {
+         $FileUploadStatus = ($Sender->Form->GetValue('FileUploadStatus') == 'ON') ? TRUE : FALSE;
+         SaveToConfig('Plugins.FileUpload.Enabled', $FileUploadStatus);
+      }
+      
+      $Sender->SetData('FileUploadStatus', $FileUploadStatus);
+      $Sender->Form->SetData(array(
+         'FileUploadStatus'  => $FileUploadStatus
+      ));
+      $Sender->Render($this->GetView('toggle.php'));
+   }
+   
+   public function Controller_Index(&$Sender) {
+      $Sender->AddCssFile($this->GetWebResource('css/fileupload.css'));
+      $Sender->AddJsFile('/js/library/jquery.gardencheckboxgrid.js');
+      $Sender->AddCssFile('admin.css');
+      
+      $this->EnableSlicing($Sender);
+      
+      $PermissionModel = Gdn::PermissionModel();
+      $RoleModel = new RoleModel();
+      $Roles = $RoleModel->Get();
+      $Sender->SetData('Roles',$Roles);
+/*
+      
+      $RoleGrid = array(
+         '_Role'     => array(
+            '_Columns'  => array(
+               'Download'  => 1,
+               'Upload'    => 1
+            ),
+            '_Info' => array(
+               'Name'      => 'Role'
+            ),
+            '_Rows'        => array()
+         )
+      );
+      $PermissionName = 'FileUpload.%s.%s';
+      while ($Role = $Roles->NextRow()) {
+         if (!$Role->CanSession) continue;
+         $Permissions = $PermissionModel->GetPermissions($Role->RoleID);
+         
+         $RoleGrid['_Role']['_Rows'][$Role->Name] = 1;
+
+         $UploadPermission = sprintf($PermissionName,$Role->Name,'Upload.File');
+         $DownloadPermission = sprintf($PermissionName,$Role->Name,'Download.File');
+         $RoleGrid['_Role'][$Role->Name.'.Upload'] = array(
+            'Value'     => $Permissions->$UploadPermission,
+            'PostValue' => $UploadPermission
+         );
+         
+         $RoleGrid['_Role'][$Role->Name.'.Download'] = array(
+            'Value'     => $Permissions->$DownloadPermission,
+            'PostValue' => $DownloadPermission
+         );
+
+      }
+      $Sender->FileUploadPermissions = $RoleGrid;
 */
+      
+      $Sender->Render($this->GetView('fileupload.php'));
+   }
 
    public function DiscussionController_Render_Before(&$Sender) {
       $this->PrepareController($Sender);
@@ -170,11 +250,11 @@ class FileUploadPlugin extends Gdn_Plugin {
       $SuccessFiles = array();
       foreach ($AttachedFilesData as $FileID) {
          $Attached = $this->AttachFile($FileID, $ForeignID, $ForeignTable);
-         if ($Success)
+         if ($Attached)
             $SuccessFiles[] = $FileID;
       }
          
-      // TODO: clean up failed and unattached files
+      // clean up failed and unattached files
       $DeleteIDs = array_diff($AllFilesData, $SuccessFiles);
       foreach ($DeleteIDs as $DeleteID) {
          $this->TrashFile($DeleteID);
@@ -202,11 +282,20 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       if ($Media) {
          $MediaModel->Delete($Media);
-         $DirectPath = PATH_UPLOADS.DS.$Media->Path;
-         if (file_exists($DirectPath)) {
-            unlink($DirectPath);
+         $Deleted = FALSE;
+         
+         if (!$Deleted) {
+            $DirectPath = PATH_UPLOADS.DS.$Media->Path;
+            if (file_exists($DirectPath))
+               $Deleted = @unlink($DirectPath);
          }
-            
+         
+         if (!$Deleted) {
+            $CalcPath = FileUploadPlugin::FindLocalMedia($Media, TRUE, TRUE);
+            if (file_exists($CalcPath))
+               $Deleted = @unlink($CalcPath);
+         }
+         
       }
    }
    
@@ -224,7 +313,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       }
       $FileParts = pathinfo($Media->Name);
       $NewFilePath = implode(DS,array($TestFolder,$Media->MediaID.'.'.$FileParts['extension']));
-      $Success = @rename($Media->Path, $NewFilePath);
+      $Success = @rename(PATH_UPLOADS.DS.$Media->Path, $NewFilePath);
       if (!$Success) {
          return false;
       }
@@ -284,40 +373,50 @@ class FileUploadPlugin extends Gdn_Plugin {
          if ($FileData) {
             // Validate the file upload now.
             $FileErr  = $FileData['error'];
-            if ($FileErr) { continue; }
-            
             $FileType = $FileData['type'];
             $FileName = $FileData['name'];
             $FileTemp = $FileData['tmp_name'];
             $FileSize = $FileData['size'];
-            
-            $TemporaryScratchFolder = CombinePaths(array(PATH_UPLOADS,'scratch'));
-            if (!is_dir($TemporaryScratchFolder))
-               @mkdir($TemporaryScratchFolder);
-               
-            if (!is_dir($TemporaryScratchFolder)) { break; }
-            
-            $ScratchFileName = CombinePaths(array($TemporaryScratchFolder,basename($FileTemp)));
-            $MoveSuccess = @move_uploaded_file($FileTemp, $ScratchFileName);
-            
-            if (!$MoveSuccess) { continue; }
-            
-            $MediaID = $MediaModel->Save(array(
-               'Name'            => $FileName,
-               'Type'            => $FileType,
-               'Size'            => $FileSize,
-               'InsertUserID'    => Gdn::Session()->UserID,
-               'DateInserted'    => time(),
-               'StorageMethod'   => 'local',
-               'Path'            => $ScratchFileName
-            ));
-            
-            $MediaResponse = array(
-               'MediaID'      => $MediaID,
-               'Filename'     => $FileName,
-               'ProgressKey'  => $Sender->ApcKey
-            );
 
+            if ($FileErr) {
+               $MediaResponse = array(
+                  'Status'          => 'failed',
+                  'ErrorCode'       => $FileErr,
+                  'Filename'        => $FileName,
+                  'ProgressKey'     => $Sender->ApcKey
+               );
+            } else {
+                           
+               $ScratchFolder = array('FileUpload','scratch');
+               $ScratchPath = PATH_UPLOADS.DS.CombinePaths($ScratchFolder);
+               if (!is_dir($ScratchPath))
+                  @mkdir($ScratchPath);
+                  
+               if (!is_dir($ScratchPath)) { break; }
+               
+               $ScratchFileName = CombinePaths(array($ScratchPath,basename($FileTemp)));
+               $MoveSuccess = @move_uploaded_file($FileTemp, $ScratchFileName);
+               
+               if (!$MoveSuccess) { continue; }
+               
+               $MediaID = $MediaModel->Save(array(
+                  'Name'            => $FileName,
+                  'Type'            => $FileType,
+                  'Size'            => $FileSize,
+                  'InsertUserID'    => Gdn::Session()->UserID,
+                  'DateInserted'    => time(),
+                  'StorageMethod'   => 'local',
+                  'Path'            => CombinePaths(array_merge($ScratchFolder,array(basename($FileTemp))))
+               ));
+               
+               $MediaResponse = array(
+                  'Status'          => 'success',
+                  'MediaID'         => $MediaID,
+                  'Filename'        => $FileName,
+                  'ProgressKey'     => $Sender->ApcKey
+               );
+               
+            }
          }
          
          $Sender->SetJSON('MediaResponse', $MediaResponse);
@@ -398,8 +497,12 @@ class FileUploadPlugin extends Gdn_Plugin {
          ->Set(FALSE, FALSE);
  
       Gdn_FileCache::SafeCache('library','class.mediamodel.php',$this->GetResource('models/class.mediamodel.php'));
+      
+      SaveToConfig('Plugins.FileUpload.Enabled', TRUE);
    }
 
-   public function OnDisable() {}
+   public function OnDisable() {
+      SaveToConfig('Plugins.FileUpload.Enabled', FALSE);
+   }
    
 }

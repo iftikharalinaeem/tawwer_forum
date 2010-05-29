@@ -104,3 +104,28 @@ div.Attachments table.AttachFileContainer tr td {
    padding: 3px;
    vertical-align: middle;
 }
+
+li div.FileUploadBlock {
+   margin-bottom:       10px;
+}
+
+li div.FileUploadBlock h1 {
+   margin-bottom:       0px;
+}
+
+li div.FileUploadBlock div.Detail {
+   font-style:          italic;
+}
+
+li table.FileUploadTable th {
+   background-color:    white;
+}
+
+li table.FileUploadTable td:first-child {
+   width:               150px;
+}
+
+li table.FileUploadTable td em {
+   font-style:          italic;
+   font-size:           80%;
+}
