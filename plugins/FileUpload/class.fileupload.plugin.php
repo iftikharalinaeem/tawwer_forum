@@ -15,8 +15,10 @@ $PluginInfo['FileUpload'] = array(
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
-   'HasLocale' => TRUE,
+   'HasLocale' => FALSE,
    'RegisterPermissions' => array('Plugins.Attachments.Upload.Allow','Plugins.Attachments.Download.Allow'),
+   'SettingsUrl' => '/dashboard/plugin/fileupload',
+   'SettingsPermission' => 'Garden.AdminUser.Only',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'
@@ -42,7 +44,6 @@ class FileUploadPlugin extends Gdn_Plugin {
    }
    
    public function Controller_Toggle(&$Sender) {
-      sleep(2);
       $FileUploadStatus = Gdn::Config('Plugins.FileUpload.Enabled', FALSE);
 
       $Validation = new Gdn_Validation();
