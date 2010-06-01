@@ -70,11 +70,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
                'SignInUrl'          => ArrayValue('SignInUrl', $FormPostValues, ''),
                'SignOutUrl'         => ArrayValue('SignOutUrl', $FormPostValues, '')
             );
-            if ($ProviderModel->Validate($FormPostValues)) {
-               $ProviderModel->Update($SaveValues, array(
-                  'AuthenticationKey'  => $ConsumerKey
-               ));
-            } else {
+            if (!$ProviderModel->Update($FormPostValues, array('AuthenticationKey'  => $ConsumerKey))) {
                $Sender->Form->SetValidationResults($ProviderModel->ValidationResults());
             }
          }
@@ -247,8 +243,8 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       $ProviderModel->Insert($Provider = array(
          'AuthenticationKey'           => $Key,
          'AuthenticationSchemeAlias'   => 'handshake',
+         'URL'                         => 'enter your site url',
          'AssociationSecret'           => $Secret,
-         'URL'                         => '',
          'AssociationHashMethod'       => 'HMAC-SHA1'
       ));
       
