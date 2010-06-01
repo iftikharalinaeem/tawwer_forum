@@ -233,8 +233,8 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       $ProviderModel->Insert($Provider = array(
          'AuthenticationKey'           => $Key,
          'AuthenticationSchemeAlias'   => 'handshake',
+         'URL'                         => 'enter your site url',
          'AssociationSecret'           => $Secret,
-         'URL'                         => 'Enter your site url',
          'AssociationHashMethod'       => 'HMAC-SHA1'
       ));
       
