@@ -10,6 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['VanillaConnect'] = array(
+	'Name' => 'Vanilla Connect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers.',
    'Version' => '1.0',
    'RequiredApplications' => FALSE,
@@ -30,12 +31,23 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Authentication', 'Authentication');
-      $Menu->AddLink('Authentication', 'VanillaConnect', 'plugin/vanillaconnect', 'Garden.AdminUser.Only');
+      $Menu->AddLink('Authentication', 'Vanilla Connect', 'plugin/vanillaconnect', 'Garden.AdminUser.Only');
    }
    
    public function PluginController_VanillaConnect_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
-      $Sender->Title('VanillaConnect');
+		
+		// Enable/Disable VanillaConnect
+		if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
+			if (GetValue(0, $Sender->RequestArgs, '') == 'enable') {
+				$this->_Enable();
+			} else if (GetValue(0, $Sender->RequestArgs, '') == 'disable') {
+				$this->_Disable();
+			}
+			Redirect('plugin/vanillaconnect');
+		}
+		
+      $Sender->Title('Vanilla Connect');
       $Sender->AddSideMenu('plugin/vanillaconnect');
       $Sender->Form = new Gdn_Form();
 		$Sender->AddCssFile('/plugins/VanillaConnect/vanillaconnect.css');
@@ -57,26 +69,13 @@ class VanillaConnectPlugin extends Gdn_Plugin {
          
          if (!$Sender->Form->AuthenticatedPostBack()) {
             $Sender->Form->SetData($Provider);
-         } else {
+         } else if (C('Plugins.VanillaConnect.Enabled')) {
             $ProviderModel->Validation->ApplyRule('URL',             'Required');
             $ProviderModel->Validation->ApplyRule('RegistrationUrl', 'Required');
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
             $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
-            
-            $FormPostValues = $Sender->Form->FormValues();
-            $SaveValues = array(
-               'URL'                => ArrayValue('URL', $FormPostValues, ''),
-               'RegistrationUrl'    => ArrayValue('RegistrationUrl', $FormPostValues, ''),
-               'SignInUrl'          => ArrayValue('SignInUrl', $FormPostValues, ''),
-               'SignOutUrl'         => ArrayValue('SignOutUrl', $FormPostValues, '')
-            );
-            if ($ProviderModel->Validate($FormPostValues)) {
-               $ProviderModel->Update($SaveValues, array(
-                  'AuthenticationKey'  => $ConsumerKey
-               ));
-            } else {
-               $Sender->Form->SetValidationResults($ProviderModel->ValidationResults());
-            }
+				$Sender->Form->SetFormValue('AuthenticationKey', $ConsumerKey);
+            $Sender->Form->Save();
          }
       }
       
@@ -87,6 +86,10 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    }
 
    public function EntryController_Handshake_Create(&$Sender) {
+		// Don't show anything if not enabled
+		if (!C('Plugins.VanillaConnect.Enabled'))
+			return FALSE;
+
       $Sender->AddJsFile('entry.js');
       
       $Sender->Form->SetModel($Sender->UserModel);
@@ -206,24 +209,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    }
    
    public function Setup() {
-      SaveToConfig('Garden.Authenticators.handshake.CookieName', 'VanillaHandshake');
-      SaveToConfig('Garden.Authenticators.handshake.TokenLifetime', 0);
-      
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      array_push($EnabledSchemes, 'handshake');
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
-      
-      Gdn_FileCache::SafeCache('library','class.handshakeauthenticator.php',$this->GetResource('class.handshakeauthenticator.php'));
-      
-      // Create a provider key/secret pair if needed
-      $SQL = Gdn::Database()->SQL();
-      $Provider = $SQL->Select('uap.*')
-         ->From('UserAuthenticationProvider uap')
-         ->Get()
-         ->FirstRow(DATASET_TYPE_ARRAY);
-         
-      if (!$Provider)
-         $this->_CreateProviderModel();
+		// Do nothing
    }
    
    protected function _CreateProviderModel() {
@@ -248,14 +234,17 @@ class VanillaConnectPlugin extends Gdn_Plugin {
          'AuthenticationKey'           => $Key,
          'AuthenticationSchemeAlias'   => 'handshake',
          'AssociationSecret'           => $Secret,
-         'URL'                         => '',
+         'URL'                         => 'Enter your site url',
          'AssociationHashMethod'       => 'HMAC-SHA1'
       ));
       
       return $Provider; 
    }
    
-   public function OnDisable() {
+   private function _Disable() {
+		RemoveFromConfig('Garden.SignIn.Popup');
+		RemoveFromConfig('Plugins.VanillaConnect.Enabled');
+		RemoveFromConfig('Garden.Authenticator.DefaultScheme');
       RemoveFromConfig('Garden.Authenticators.handshake.CookieName');
       RemoveFromConfig('Garden.Authenticators.handshake.TokenLifetime');
 
@@ -265,5 +254,28 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       }
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
    }
-   
+	
+	private function _Enable() {
+		SaveToConfig('Garden.SignIn.Popup', TRUE);
+		SaveToConfig('Plugins.VanillaConnect.Enabled', TRUE);
+		SaveToConfig('Garden.Authenticator.DefaultScheme', 'handshake');
+      SaveToConfig('Garden.Authenticators.handshake.CookieName', 'VanillaHandshake');
+      SaveToConfig('Garden.Authenticators.handshake.TokenLifetime', 0);
+      
+      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      array_push($EnabledSchemes, 'handshake');
+      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+      
+      Gdn_FileCache::SafeCache('library','class.handshakeauthenticator.php',$this->GetResource('class.handshakeauthenticator.php'));
+      
+      // Create a provider key/secret pair if needed
+      $SQL = Gdn::Database()->SQL();
+      $Provider = $SQL->Select('uap.*')
+         ->From('UserAuthenticationProvider uap')
+         ->Get()
+         ->FirstRow(DATASET_TYPE_ARRAY);
+         
+      if (!$Provider)
+         $this->_CreateProviderModel();
+	}  
 }

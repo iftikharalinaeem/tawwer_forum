@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-
+$CanUploadLogo = C('VanillaForums.BannerLogo.CanUpload');
 ?>
 <h1><?php echo T('Banner'); ?></h1>
 <?php
@@ -12,15 +12,15 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->Label('Banner Title', 'Garden.Title');
          echo Wrap(
-               T('The banner title appears on the top-left of every page. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.'),
+               T('The banner title appears on the top-left of every page.'.($CanUploadLogo ? ' If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.' : '')),
                'div',
                array('class' => 'Info')
             );
          echo $this->Form->TextBox('Garden.Title');
       ?>
    </li>
-	<?php /*
-   <li>
+	<?php if ($CanUploadLogo) { ?>
+	<li>
       <?php
          echo $this->Form->Label('Banner Logo', 'Garden.Logo');
          $Logo = C('Garden.Logo');
@@ -46,6 +46,6 @@ echo $this->Form->Errors();
          echo $this->Form->Input('Logo', 'file');
       ?>
    </li>
-   */ ?>
+   <?php } ?>
 </ul>
 <?php echo $this->Form->Close('Save');

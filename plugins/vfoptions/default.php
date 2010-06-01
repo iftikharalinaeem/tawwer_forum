@@ -654,10 +654,10 @@ pageTracker._trackPageview();
       if (
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
-      ) Redirect('/dashboard/home/permission');
+      ) $Sender->AddAsset('Content', '<span style="color: red; font-weight: bold;">REDIRECT</span>');// Redirect('/dashboard/home/permission');
       
-      // TODO: ONLY USE A DIFFERENT VIEW IF THE USER IS ON THE FREE PLAN (FREE PLAN CANNOT UPLOAD LOGO).
-      if ($Sender->RequestMethod == 'banner')
+      // TODO: Logo upload is enabled if C('VanillaForums.BannerLogo.CanUpload') is TRUE.
+      if ($Sender->RequestMethod == 'banners')
          $Sender->View = PATH_PLUGINS.'/vfoptions/views/banner.php';
    }
 
@@ -926,7 +926,7 @@ pageTracker._trackPageview();
    private function _GetDatabase() {
       if (!is_object($this->_Database)) {
          $this->_Database = new Gdn_Database(array(
-            'Name' => Gdn::Config('VanillaForums.Database.Name', 'vanillaforumscom'),
+            'Name' => Gdn::Config('VanillaForums.Database.Name', 'vfcom'),
             'Host' => Gdn::Config('Database.Host'),
             'User' => Gdn::Config('Database.User'),
             'Password' => Gdn::Config('Database.Password')
