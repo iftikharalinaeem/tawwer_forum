@@ -64,15 +64,9 @@ class VanillaConnectPlugin extends Gdn_Plugin {
             $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
             
             $FormPostValues = $Sender->Form->FormValues();
-            $SaveValues = array(
-               'URL'                => ArrayValue('URL', $FormPostValues, ''),
-               'RegistrationUrl'    => ArrayValue('RegistrationUrl', $FormPostValues, ''),
-               'SignInUrl'          => ArrayValue('SignInUrl', $FormPostValues, ''),
-               'SignOutUrl'         => ArrayValue('SignOutUrl', $FormPostValues, '')
-            );
-            if (!$ProviderModel->Update($FormPostValues, array('AuthenticationKey'  => $ConsumerKey))) {
+            $FormPostValues['AuthenticationKey'] = $ConsumerKey;
+            if (!$ProviderModel->Save($FormPostValues))
                $Sender->Form->SetValidationResults($ProviderModel->ValidationResults());
-            }
          }
       }
       
