@@ -120,7 +120,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
          if (ArrayValue('StopLinking', $FormValues)) {
          
             $Authenticator->DeleteCookie();
-            Gdn::Request()->WithURI('DefaultController');
+            Gdn::Request()->WithRoute('DefaultController');
             return Gdn::Dispatcher()->Dispatch();
             
          } elseif (ArrayValue('NewAccount', $FormValues)) {

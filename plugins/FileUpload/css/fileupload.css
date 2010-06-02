@@ -49,6 +49,16 @@ div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.Progres
    text-align: right;
 }
 
+div.AttachFileWrapper div.AttachFileLink {
+   position: relative;
+}
+
+div.AttachFileWrapper div.AttachFileLink input {
+   position: absolute;
+   top: 0px;
+   left: 0px;
+}
+
 div.AttachFileWrapper div.NewAttachment {
    float: left;
    width: 350px;
