@@ -113,7 +113,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
          'name'         => $UserName,
          'uid'          => $UserID
       );
-      $SerializedCookiePayload = serialize($CookiePayload);
+      $SerializedCookiePayload = Gdn_Format::Serialize($CookiePayload);
       
       $this->AssociateRemoteKey($ConsumerKey, $UserEmail, $TokenKey);
 
@@ -441,6 +441,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
    
    public function GetHandshakeCookie() {
       $HaveHandshake = Gdn_CookieIdentity::CheckCookie($this->_CookieName);
+      
       if ($HaveHandshake) {
          // Found a handshake cookie, sweet. Get the payload.
          $Payload = Gdn_CookieIdentity::GetCookiePayload($this->_CookieName);
@@ -450,7 +451,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
          array_shift($Payload);
          
          // Rebuild the real payload
-         $ReconstitutedCookiePayload = unserialize(array_shift($Payload));
+         $ReconstitutedCookiePayload = Gdn_Format::Unserialize(TrueStripSlashes(array_shift($Payload)));
          
          return $ReconstitutedCookiePayload;
       }
@@ -497,7 +498,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
    public function WakeUp() {
       $this->FetchData(Gdn::Request());
       $CurrentStep = $this->CurrentStep();
-
+      
       // Shortcircuit to prevent pointless work when the access token has already been handled and we already have a session 
       if ($CurrentStep == Gdn_Authenticator::MODE_REPEAT)
          return;
@@ -505,13 +506,12 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
       // Don't try to wakeup when the URL contains an OAuth request
       if ($CurrentStep == Gdn_Authenticator::MODE_VALIDATE)
          return;
-         
+      
       if (Gdn::Request()->Filename() == 'handshake.js')
          return;
       
       // Look for handshake cookies
       $Payload = $this->GetHandshakeCookie();
-
       if ($Payload) {
          // Process the cookie auth
          $this->ProcessAuthorizedRequest($Payload);

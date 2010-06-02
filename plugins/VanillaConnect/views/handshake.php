@@ -8,12 +8,15 @@
    echo $this->Form->Open(array('Action' => Url('/entry/handshake'), 'id' => 'Form_User_Handshake'));
 	echo $this->Form->Errors();
 	?>
-	<div class="Info"><?php printf(
+	<div class="Info"><?php
+	// printf(
 		//T('There is already an account with the same username (%1$s) or email (%2$s) as you. You can either create a new account, or you can enter the credentials for your existing forum account.'),
-		T("It looks like this is the first time you've visited these forums. You should probably do a handstand or train a dolphin to juggle eggs."),
-		ArrayValue('Name', $this->Data),
-		ArrayValue('Email', $this->Data)
-	); ?></div>
+		echo Wrap(T("This is the first time you've visited the discussion forums."), 'strong');
+		echo Wrap(T("You can either create a new account, or enter your credentials if you have an existing account."), 'div');
+		// ArrayValue('Name', $this->Data),
+		// ArrayValue('Email', $this->Data)
+	// );
+	?></div>
 	<ul class="NewAccount">
 		<li><h2><?php echo T('✔ Give me a new account'); ?></h2></li>
 		<li>
@@ -50,8 +53,8 @@
 			<?php echo $this->Form->Button('Link Existing Account', array('Name' => 'User/LinkAccount')); ?>
 		</li>
 	</ul>
-	<div style="text-align:center;margin-top:40px;">
-	  <?php echo $this->Form->Button("What is this I don't even", array('Name' => 'User/StopLinking')); ?>
-	</div>
-	<?php echo $this->Form->Close();?>
+	<?php
+		// echo $this->Form->Button("Get me outta here!", array('Name' => 'User/StopLinking')); 
+		echo $this->Form->Close();
+	?>
 </div>

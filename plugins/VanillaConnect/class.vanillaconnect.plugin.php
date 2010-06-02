@@ -256,7 +256,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    }
 	
 	private function _Enable() {
-		SaveToConfig('Garden.SignIn.Popup', TRUE);
+		SaveToConfig('Garden.SignIn.Popup', FALSE);
 		SaveToConfig('Plugins.VanillaConnect.Enabled', TRUE);
 		SaveToConfig('Garden.Authenticator.DefaultScheme', 'handshake');
       SaveToConfig('Garden.Authenticators.handshake.CookieName', 'VanillaHandshake');
