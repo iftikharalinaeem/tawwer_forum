@@ -120,7 +120,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
          if (ArrayValue('StopLinking', $FormValues)) {
          
             $Authenticator->DeleteCookie();
-            Gdn::Request()->WithURI('DefaultController');
+            Gdn::Request()->WithRoute('DefaultController');
             return Gdn::Dispatcher()->Dispatch();
             
          } elseif (ArrayValue('NewAccount', $FormValues)) {
@@ -233,7 +233,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       $ProviderModel->Insert($Provider = array(
          'AuthenticationKey'           => $Key,
          'AuthenticationSchemeAlias'   => 'handshake',
-         'URL'                         => 'enter your site url',
+         'URL'                         => 'Enter your site url',
          'AssociationSecret'           => $Secret,
          'AssociationHashMethod'       => 'HMAC-SHA1'
       ));

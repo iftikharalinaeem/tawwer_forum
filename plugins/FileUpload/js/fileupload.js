@@ -105,9 +105,10 @@ var Gdn_MultiFileUpload = Class.create({
       NewUploader.name  = NewUploaderID;
       NewUploader.id    = NewUploaderID;
       NewUploader.className = 'HiddenFileInput';
-      $(NewUploader).fadeTo(0,0);
-      $(UploaderForm).append(NewUploader);
-      this.AlignUploader(NewUploader);
+      NewUploader.rel = FormName;
+      $(NewUploader).css('opacity',0);
+      $('#'+this.AttachFileLinkID).parent().append(NewUploader);
+      //this.AlignUploader(NewUploader);
       
       var MaxUploadSize = document.createElement('input');
       MaxUploadSize.type = 'hidden';
@@ -129,12 +130,14 @@ var Gdn_MultiFileUpload = Class.create({
       $('#'+this.CurrentInput).change(jQuery.proxy(this.DispatchCurrentUploader,this));
    },
    
+/*
    AlignUploader: function(Uploader) {
       var Offset = $('#'+this.AttachFileLinkID).offset();
       $(Uploader).offset(Offset);
       $(Uploader).css('top', (parseInt(Offset.top) - 5)+'px');
       $(Uploader).css('width', parseInt($('#'+this.AttachFileLinkID).width())+'px');
    },
+*/
    
    // Create a new named iframe to which our uploads can be submitted
    NewFrame: function(TargetUploaderID) {
@@ -159,6 +162,7 @@ var Gdn_MultiFileUpload = Class.create({
    // Submit the form parent of the current uploader and hide the current uploader's input
    DispatchCurrentUploader: function(ChangeEvent) {
       var Target = $(ChangeEvent.target);
+      $('#'+Target.attr('rel')).append(Target);
       var UploaderID = Target.attr('id');
       this.RememberFile(Target);
       var IFrameName = Target.parent().attr('target');
@@ -309,7 +313,7 @@ var Gdn_MultiFileUpload = Class.create({
             FileListing.remove();
             delete this.ProgressBars[TargetUploaderID];
             
-            this.AlignUploader($('#'+this.CurrentInput));
+            //this.AlignUploader($('#'+this.CurrentInput));
          }
       }
    },

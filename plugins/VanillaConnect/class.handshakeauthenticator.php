@@ -158,11 +158,30 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
    }
 
    public function DeAuthenticate() {
-      $SignOutURL = Gdn::Authenticator()->SignOutUrl();
-      Gdn::Authenticator()->SetIdentity(NULL);
+      $ConsumerKey = $this->GetValue('ConsumerKey');
+      $Nonce = $this->GetValue('Nonce');
+      $Signature = $this->GetValue('Signature');
+      $SignatureMethod = $this->GetValue('SignatureMethod');
+      $Timestamp = $this->GetValue('Timestamp');
+      $Version = $this->GetValue('Version');
       
-      // Redirect to the external signout url
-      Redirect($SignOutURL);
+      $RequestArguments = array(
+         'oauth_consumer_key'      => $ConsumerKey,
+         'oauth_version'           => $Version,
+         'oauth_timestamp'         => $Timestamp,
+         'oauth_nonce'             => $Nonce,
+         'oauth_signature_method'  => $SignatureMethod,
+         'oauth_signature'         => $Signature,
+      );
+
+      try {
+         $OAuthRequest = OAuthRequest::from_request(NULL, NULL, $RequestArguments);
+      } catch (Exception $e) {
+         return Gdn_Authenticator::AUTH_DENIED;
+      }
+      
+      Gdn::Authenticator()->SetIdentity(NULL);
+      return Gdn_Authenticator::AUTH_SUCCESS;
    }
    
    public function LoginResponse() {
@@ -191,6 +210,10 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
          return Gdn_Authenticator::REACT_REMOTE;
       else
          return Gdn_Authenticator::REACT_EXIT;
+   }
+   
+   public function RequireLogoutTransientKey() {
+      return FALSE;
    }
    
    public function AssociateRemoteKey($ConsumerKey, $UserKey, $TokenKey, $UserID = 0) {
