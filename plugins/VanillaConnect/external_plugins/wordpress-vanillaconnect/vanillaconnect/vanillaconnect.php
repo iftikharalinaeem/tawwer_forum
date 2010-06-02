@@ -29,9 +29,10 @@ function vanilla_connect() {
    
    // Only report user info if the user is authenticated and the vanilla domain has been defined.
    $VanillaConnectDomain = get_option('vanilla_connect_domain');
-   $VanillaConnectKey = get_option('vanilla_connect_key');
-   $VanillaConnectSecret = get_option('vanilla_connect_secret');
    if ($current_user->ID != '' && $VanillaConnectDomain != '') {
+   
+      $VanillaConnectKey = get_option('vanilla_connect_key');
+      $VanillaConnectSecret = get_option('vanilla_connect_secret');
       
       if ($VanillaConnectKey == '') return;
       if ($VanillaConnectSecret == '') return;
@@ -50,6 +51,30 @@ function vanilla_connect() {
       )->Script();
 
    }
+   
+}
+
+add_action('login_form', 'vanilla_disconnect');
+function vanilla_disconnect() {
+   if (!isset($_GET['loggedout']) || !$_GET['loggedout']) return;
+   
+   // Only report user info if the user is authenticated and the vanilla domain has been defined.
+   $VanillaConnectDomain = get_option('vanilla_connect_domain');
+   $VanillaConnectKey = get_option('vanilla_connect_key');
+   $VanillaConnectSecret = get_option('vanilla_connect_secret');
+
+   if ($VanillaConnectKey == '') return;
+   if ($VanillaConnectSecret == '') return;
+   
+   require_once(WP_CONTENT_DIR . '/plugins/vanillaconnect/class.VanillaConnect.php');
+   require_once(WP_CONTENT_DIR . '/plugins/vanillaconnect/class.OAuth.php');
+   echo VanillaConnect::DeAuthenticate(
+      $VanillaConnectDomain,
+      $VanillaConnectKey,
+      $VanillaConnectSecret,
+      FALSE,
+      array()
+   )->Script();
 }
 
 add_action('admin_menu', 'vanilla_connect_menu');
