@@ -3,11 +3,8 @@
 <div class="Info">
    <?php
       echo T('Using Vanilla Connect, you can allow users from your external application or website to be automatically registered and signed into Vanilla. For instructions on how to enable Vanilla Connect, <a href="http://vanillaforums.com/info/vanillaconnect">read our documentation</a>.');
-      if (C('Plugins.VanillaConnect.Enabled')) {
-         echo Wrap(Anchor('Disable Vanilla Connect', 'plugin/VanillaConnect/disable/'.Gdn::Session()->TransientKey(), 'SmallButton'));
-      } else {
-         echo Wrap(Anchor('Enable Vanilla Connect', 'plugin/VanillaConnect/enable/'.Gdn::Session()->TransientKey(), 'SmallButton'));
-      }
+      $ToggleName = C('Plugins.VanillaConnect.Enabled') ? T('Disable Vanilla Connect') : T('Enable Vanilla Connect');
+      echo Wrap(Anchor($ToggleName, 'plugin/VanillaConnect/toggle/'.Gdn::Session()->TransientKey(), 'SmallButton'));
    ?>
 </div>
 <?php if (C('Plugins.VanillaConnect.Enabled')) { ?>

@@ -37,21 +37,14 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    public function PluginController_VanillaConnect_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
 		
-		// Enable/Disable VanillaConnect
-		if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
-			if (GetValue(0, $Sender->RequestArgs, '') == 'enable') {
-				$this->_Enable();
-			} else if (GetValue(0, $Sender->RequestArgs, '') == 'disable') {
-				$this->_Disable();
-			}
-			Redirect('plugin/vanillaconnect');
-		}
-		
       $Sender->Title('Vanilla Connect');
       $Sender->AddSideMenu('plugin/vanillaconnect');
-      $Sender->Form = new Gdn_Form();
 		$Sender->AddCssFile('/plugins/VanillaConnect/vanillaconnect.css');
-      
+		$Sender->Form = new Gdn_Form();
+		$this->Dispatch($Sender, $Sender->RequestArgs);
+   }
+   
+   public function Controller_Index(&$Sender) {
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.AuthenticationKey')
          ->From('UserAuthenticationProvider uap')
@@ -83,6 +76,24 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       $Sender->ConsumerSecret = ($Provider) ? $Provider['AssociationSecret'] : '';
       
       $Sender->Render($this->GetView('vanillaconnect.php'));
+   }
+   
+   public function Controller_Toggle(&$Sender) {
+		
+		// Enable/Disable VanillaConnect
+		if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
+			if (C('Plugins.VanillaConnect.Enabled')) {
+				$this->_Disable();
+			} else {
+				$this->_Enable();
+			}
+			Redirect('plugin/vanillaconnect');
+		}
+   }
+   
+   public function Controller_Library(&$Sender) {
+      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+      $Sender->Render($this->GetResource('js/library.js'));
    }
 
    public function EntryController_Handshake_Create(&$Sender) {
