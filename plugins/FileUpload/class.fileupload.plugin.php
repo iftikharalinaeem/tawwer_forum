@@ -378,7 +378,6 @@ class FileUploadPlugin extends Gdn_Plugin {
       $MediaModel = new MediaModel();
       
       if ($Sender->Form->IsPostBack()) {
-         die("POOOST BACK");
       
          // this will hold the IDs and filenames of the items we were sent. booyahkashaa.
          $MediaResponse = array();
