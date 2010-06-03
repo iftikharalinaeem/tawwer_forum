@@ -397,25 +397,25 @@ class FileUploadPlugin extends Gdn_Plugin {
                switch ($FileErr) {
                   case UPLOAD_ERR_INI_SIZE:
                      $MaxUploadSize = ini_get('upload_max_filesize');
-                     $ErrorString = 'The uploaded file exceeds the upload_max_filesize ('.$MaxUploadSize.') directive in php.ini.';
+                     $ErrorString = 'The uploaded file was too big (max '.$MaxUploadSize.')';
                      break;
                   case UPLOAD_ERR_FORM_SIZE:
-                     $ErrorString = 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.';
+                     $ErrorString = 'The uploaded file was too big';
                      break;
                   case UPLOAD_ERR_PARTIAL:
-                     $ErrorString = 'The uploaded file was only partially uploaded. ';
+                     $ErrorString = 'The uploaded file was only partially uploaded';
                      break;
                   case UPLOAD_ERR_NO_FILE:
-                     $ErrorString = 'No file was uploaded. ';
+                     $ErrorString = 'No file was uploaded';
                      break;
                   case UPLOAD_ERR_NO_TMP_DIR:
-                     $ErrorString = 'Missing a temporary folder.';
+                     $ErrorString = 'Missing a temporary folder';
                      break;
                   case UPLOAD_ERR_CANT_WRITE:
-                     $ErrorString = 'Failed to write file to disk.';
+                     $ErrorString = 'Failed to write file to disk';
                      break;
                   case UPLOAD_ERR_EXTENSION:
-                     $ErrorString = 'A PHP extension stopped the file upload.';
+                     $ErrorString = 'A PHP extension stopped the file upload';
                      break;
                }
                $MediaResponse = array(
@@ -465,7 +465,7 @@ class FileUploadPlugin extends Gdn_Plugin {
                'Status'          => 'failed',
                'ErrorCode'       => '9',
                'Filename'        => '???',
-               'StrError'        => 'No file was uploaded.'
+               'StrError'        => 'No file was uploaded'
             );
          }
          
@@ -475,7 +475,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             'Status'          => 'failed',
             'ErrorCode'       => '10',
             'Filename'        => '???',
-            'StrError'        => 'Either no file was uploaded, or the file size exceeded the post_max_size ('.$PostMaxSize.') directive in php.ini.'
+            'StrError'        => 'The file was too big (max '.$PostMaxSize.')'
          );
       }
       

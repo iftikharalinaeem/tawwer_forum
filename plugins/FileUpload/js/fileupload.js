@@ -220,6 +220,8 @@ var Gdn_MultiFileUpload = Class.create({
          
          var JData = jQuery.parseJSON(Data);
          if (JData && JData.Progress) {
+            if (!this.ProgressBars[UploaderID]) return;
+            
             var JProgress = JData.Progress;
             var Progress = JProgress.progress;
             var UploaderID = JProgress.uploader;
@@ -317,10 +319,20 @@ var Gdn_MultiFileUpload = Class.create({
             this.RemoveUploader(TargetUploaderID);
             
             var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
-            FileListing.remove();
+            FileListing.html("File upload failed. Reason: "+JResponse.MediaResponse.StrError);
+            FileListing.css({
+               'background-color':'#ffbfbf',
+               'color':'#a70000',
+               'padding-left':'20px',
+               'background-position':'8px center',
+               'cursor':'pointer'
+            });
+            FileListing.click(function(){FileListing.remove();});
+            setTimeout(function(){
+               FileListing.fadeTo(1500,0,function(){ FileListing.animate({'height':0},600,function(){ FileListing.remove(); }) });
+            },6000);
             delete this.ProgressBars[TargetUploaderID];
             
-            alert(JResponse.MediaResponse.StrError);
          }
       }
    },
