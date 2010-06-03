@@ -220,12 +220,12 @@ var Gdn_MultiFileUpload = Class.create({
          
          var JData = jQuery.parseJSON(Data);
          if (JData && JData.Progress) {
-            if (!this.ProgressBars[UploaderID]) return;
-            
             var JProgress = JData.Progress;
-            var Progress = JProgress.progress;
             var UploaderID = JProgress.uploader;
             
+            if (!this.ProgressBars[UploaderID]) return;
+            
+            var Progress = JProgress.progress;
             this.ProgressBars[UploaderID].Progress = Progress;
             this.ProgressBars[UploaderID].Total = JProgress.total;
 
