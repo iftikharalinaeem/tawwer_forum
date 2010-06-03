@@ -426,12 +426,14 @@ class FileUploadPlugin extends Gdn_Plugin {
                   'StrError'        => $ErrorString
                );
             } else {
-                           
-               $ScratchFolder = array('FileUpload','scratch');
-               $ScratchPath = PATH_UPLOADS.DS.CombinePaths($ScratchFolder);
+               $ScratchPath = PATH_UPLOADS.DS.'FileUpload';
                if (!is_dir($ScratchPath))
                   @mkdir($ScratchPath);
-                  
+               
+               $ScratchPath .= DS . 'scratch';
+               if (!is_dir($ScratchPath))
+                  @mkdir($ScratchPath);
+
                if (!is_dir($ScratchPath)) { break; }
                
                $ScratchFileName = CombinePaths(array($ScratchPath,basename($FileTemp)));
@@ -446,7 +448,7 @@ class FileUploadPlugin extends Gdn_Plugin {
                   'InsertUserID'    => Gdn::Session()->UserID,
                   'DateInserted'    => time(),
                   'StorageMethod'   => 'local',
-                  'Path'            => CombinePaths(array_merge($ScratchFolder,array(basename($FileTemp))))
+                  'Path'            => CombinePaths(array_merge(array('FileUpload', 'scratch'), array(basename($FileTemp))))
                ));
                
                $MediaResponse = array(
@@ -528,7 +530,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       $Progress['total'] = $UploadStatus['total'];
          
       
-      $Progress['format_total'] = Gdn_Format::Bytes2String($Progress['total'],1);
+      $Progress['format_total'] = Gdn_Format::Bytes($Progress['total'],1);
       $Progress['cache'] = $UploadStatus;
       
       $Sender->SetJSON('Progress', $Progress);

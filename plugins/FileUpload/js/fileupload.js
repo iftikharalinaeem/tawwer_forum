@@ -189,16 +189,19 @@ var Gdn_MultiFileUpload = Class.create({
       
       // Handle the file list UI
       var FileListContainer = $('#'+this.FileContainerID);
-      var PrototypeFileListing = $($(FileListContainer).find('tr')[0]).clone();
-      var PrototypeFileListingElements = PrototypeFileListing.find('td');
-      $(PrototypeFileListingElements[2]).html(FileName);
-      $(PrototypeFileListingElements[3]).html('? Kb');
-      $($(PrototypeFileListingElements[4]).find('div')[1]).css('width','0px');
+      var PrototypeFileAttachment = $($(FileListContainer).find('div.FileAttachment')[0]).clone();
+		var FileNameDiv = $(PrototypeFileAttachment).find('div.FileName');
+		var FileSizeDiv = $(PrototypeFileAttachment).find('div.FileSize');
+		var ProgressDiv = $(PrototypeFileAttachment).find('div.UploadProgress');
+      $(FileNameDiv).html(FileName);
+      $(FileSizeDiv).html('? Kb');
+      $($(ProgressDiv).find('div.Background')).css('width','0px');
       
       var FileListingID = [FileInput.attr('id'),'listing'].join('_');
-      PrototypeFileListing.attr('id', FileListingID);
-      PrototypeFileListing.appendTo(FileListContainer);
-      PrototypeFileListing.css('display','table-row');
+      PrototypeFileAttachment.attr('id', FileListingID);
+		PrototypeFileAttachment.css('display', 'block');
+      PrototypeFileAttachment.appendTo(FileListContainer);
+      // PrototypeFileAttachment.css('display','table-row');
       
       this.Progress(FileInput.attr('id'));
       
@@ -228,15 +231,18 @@ var Gdn_MultiFileUpload = Class.create({
 
             // Update the filesize
             if (JProgress.total != null) {
-               $(FileListing.find('td')[3]).html(JProgress.format_total);
+               $(FileListing.find('div.FileSize')).html(JProgress.format_total);
             }
             
             // Update progress bar
             if (!this.ProgressBars[UploaderID].Complete) {
-               var ProgressBar = FileListing.find('div.ProgressTicker');
-               ProgressBar.css('width',Progress+'%');
-               if (Progress >= 15)
-                  ProgressBar.html(Math.ceil(Progress)+'%');
+					var UploadProgress = FileListing.find('div.UploadProgress');
+					var ProgressForeground = FileListing.find('div.UploadProgress div.Foreground');
+               var ProgressBackground = FileListing.find('div.UploadProgress div.Background');
+					ProgressForeground.html('<strong>Uploading:</strong> ' + Math.ceil(Progress)+'%');
+               ProgressBackground.css('width', ((Progress * $(UploadProgress).width()) / 100)+'px');
+               // if (Progress >= 15)
+               // 	ProgressBar.html(Math.ceil(Progress)+'%');
             }
             
          }
@@ -300,9 +306,9 @@ var Gdn_MultiFileUpload = Class.create({
             TrackAll.value = MediaID;
             
             var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
-            $(FileListing.find('td')[1]).append(EnableMe);
-            $(FileListing.find('td')[1]).append(TrackAll);
-            $(FileListing.find('td')[4]).find('div').remove();
+            $(FileListing.find('div.FileOptions')).append(EnableMe);
+            $(FileListing.find('div.FileOptions')).append(TrackAll);
+            $(FileListing.find('div.UploadProgress')).remove();
             
          } else {
             // FAILURE
