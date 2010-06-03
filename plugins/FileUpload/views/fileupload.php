@@ -8,10 +8,8 @@
          </div>
       </div>
       <?php
-         //echo $this->Plugin->Slice('toggle');
+         echo $this->Plugin->Slice('toggle');
       ?>
-      
-      <div class="FileUploadBlock Slice Async" rel="/plugin/fileupload/toggle"></div>
       
       <div class="FileUploadBlock">
          <h1><?php echo T('Permissions'); ?></h1>
