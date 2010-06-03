@@ -276,12 +276,13 @@ var Gdn_MultiFileUpload = Class.create({
       
       var JResponse = jQuery.parseJSON(Response);
       if (JResponse && JResponse.MediaResponse) {
-         var Filename = JResponse.MediaResponse.Filename;
-         if (!this.ProgressBars[TargetUploaderID]) return;
-         if (this.ProgressBars[TargetUploaderID].Filename != Filename) return;
-         
+      
          if (JResponse.MediaResponse.Status == 'success') {
             // SUCCESS
+            
+            var Filename = JResponse.MediaResponse.Filename;
+            if (!this.ProgressBars[TargetUploaderID]) return;
+            if (this.ProgressBars[TargetUploaderID].Filename != Filename) return;
             
             var MediaID = JResponse.MediaResponse.MediaID;
             this.ProgressBars[TargetUploaderID].Complete = true;
@@ -313,7 +314,7 @@ var Gdn_MultiFileUpload = Class.create({
             FileListing.remove();
             delete this.ProgressBars[TargetUploaderID];
             
-            //this.AlignUploader($('#'+this.CurrentInput));
+            alert(JResponse.MediaResponse.StrError);
          }
       }
    },
