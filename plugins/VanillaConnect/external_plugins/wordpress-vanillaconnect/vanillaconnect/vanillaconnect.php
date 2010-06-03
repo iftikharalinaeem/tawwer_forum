@@ -37,8 +37,6 @@ function vanilla_connect() {
       if ($VanillaConnectKey == '') return;
       if ($VanillaConnectSecret == '') return;
       
-      require_once(WP_CONTENT_DIR . '/plugins/vanillaconnect/class.VanillaConnect.php');
-      require_once(WP_CONTENT_DIR . '/plugins/vanillaconnect/class.OAuth.php');
       echo VanillaConnect::Authenticate(
          $VanillaConnectDomain,
          $VanillaConnectKey,
@@ -66,8 +64,6 @@ function vanilla_disconnect() {
    if ($VanillaConnectKey == '') return;
    if ($VanillaConnectSecret == '') return;
    
-   require_once(WP_CONTENT_DIR . '/plugins/vanillaconnect/class.VanillaConnect.php');
-   require_once(WP_CONTENT_DIR . '/plugins/vanillaconnect/class.OAuth.php');
    echo VanillaConnect::DeAuthenticate(
       $VanillaConnectDomain,
       $VanillaConnectKey,

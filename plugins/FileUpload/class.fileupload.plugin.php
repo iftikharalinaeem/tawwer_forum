@@ -203,6 +203,8 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $Type = strtolower($RawType = $Sender->EventArguments['Type']);
       $MediaList = $Sender->Data('FileUploadMedia');
+      if (!is_array($MediaList)) return;
+      
       $Param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
       $MediaKey = $Type.'/'.$Sender->EventArguments[$RawType]->$Param;
       if (array_key_exists($MediaKey, $MediaList)) {
@@ -223,15 +225,11 @@ class FileUploadPlugin extends Gdn_Plugin {
       $Filename = Gdn::Request()->Filename();
       if (!$Filename) $Filename = $Media->Name;
       
-      header('Content-Type: application/octet-stream');
-      header('Content-Disposition: inline;filename='.urlencode($Filename));
-      
       $DownloadPath = FileUploadPlugin::FindLocalMedia($Media, TRUE, TRUE);
-      if (file_exists($DownloadPath)) {
-         readfile($DownloadPath);
-      } else {
-         throw new Exception('File could not be streamed: missing file ('.$DownloadPath.').');
-      }
+      
+      return Gdn_FileSystem::ServeFile($DownloadPath, $Filename);
+      throw new Exception('File could not be streamed: missing file ('.$DownloadPath.').');
+      
       exit();
    }
    
