@@ -1110,13 +1110,14 @@ SCRIPTFRAGMENT;
       return $ScriptResult;
    }
    
-   public function Url($TargetUrl) {
-      return $this->_Url;
+   public function Url($UrlName) {
+      $Url = $this->_Url;
+      return '<a href="'.htmlspecialchars($Url).'" alt="'.$UrlName.'">'.$UrlName.'</a>';
    }
 
    public function Image() {
       $Url = $this->_Url;
-      return '<img src="' . htmlspecialchars($Url) . '" alt="" />';
+      return '<img src="'.htmlspecialchars($Url).'" alt="" />';
    }
    
 /*
@@ -1129,6 +1130,10 @@ SCRIPTFRAGMENT;
       $Url = $this->_Request->to_url();
       Header("Location: ".$Url);
       exit();
+   }
+   
+   public function GetUrl() {
+      return $this->_Url;
    }
 
 }
