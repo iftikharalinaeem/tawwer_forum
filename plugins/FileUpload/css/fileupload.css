@@ -147,12 +147,6 @@ li table.FileUploadTable td em {
    font-style:          italic;
    font-size:           80%;
 }
-div.AttachFileLink a {
-   cursor: pointer;
-}
-div.AttachFileLink a:hover {
-   color: red;
-}
 div.FileAttachment {
    background: url('../images/gear.png') center left no-repeat;
    padding-left: 14px;
