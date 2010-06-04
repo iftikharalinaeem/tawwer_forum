@@ -1,10 +1,34 @@
 <?php
 
 /**
+ * Tell VanillaConnect how to connect to your forum by filling in these values:
+ *
+ *  VanillaForumURL        - Find this on your Vanilla dashboard, under VanillaConnect
+ *  VanillaConnectKey      - Find this on your Vanilla dashboard, under VanillaConnect
+ *  VanillaConnectSecret   - Find this on your Vanilla dashboard, under VanillaConnect
+ *  UserEmail              - The email address of the user you're sending to Vanilla
+ *  UserName               - The username of the user on your site
+ *  UserID                 - The ID of the user on your site.
+ */
+
+   $VanillaConnect = VanillaConnect::Authenticate(
+      $VanillaForumURL,
+      $VanillaConnectKey,
+      $VanillaConnectSecret,
+      $UserEmail,
+      $UserName,
+      $UserID
+   );
+
+/**
+ *
+ * DO NOT MAKE CHANGES BELOW THIS LINE!
+ * --------------------------------------------------------
+ */
+
+/**
  * Vanilla Single-Sign-On foreign consumer
- * 
- * 
- * 
+ *
  */
 class VanillaConnect {
 
