@@ -14,7 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @author Tim Gunter <tim@vanillaforums.com>
  * @package Garden
  */
-require_once(implode(DS, array(PATH_LIBRARY,'vendors','OAuth','OAuth.php')));
+require_once(implode(DS, array(PATH_LIBRARY,'vendors','oauth','OAuth.php')));
 
 class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
 

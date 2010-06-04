@@ -391,12 +391,38 @@ class FileUploadPlugin extends Gdn_Plugin {
             $FileTemp = $FileData['tmp_name'];
             $FileSize = $FileData['size'];
 
-            if ($FileErr) {
+            if ($FileErr != UPLOAD_ERR_OK) {
+               $ErrorString = '';
+               switch ($FileErr) {
+                  case UPLOAD_ERR_INI_SIZE:
+                     $MaxUploadSize = ini_get('upload_max_filesize');
+                     $ErrorString = 'The uploaded file was too big (max '.$MaxUploadSize.')';
+                     break;
+                  case UPLOAD_ERR_FORM_SIZE:
+                     $ErrorString = 'The uploaded file was too big';
+                     break;
+                  case UPLOAD_ERR_PARTIAL:
+                     $ErrorString = 'The uploaded file was only partially uploaded';
+                     break;
+                  case UPLOAD_ERR_NO_FILE:
+                     $ErrorString = 'No file was uploaded';
+                     break;
+                  case UPLOAD_ERR_NO_TMP_DIR:
+                     $ErrorString = 'Missing a temporary folder';
+                     break;
+                  case UPLOAD_ERR_CANT_WRITE:
+                     $ErrorString = 'Failed to write file to disk';
+                     break;
+                  case UPLOAD_ERR_EXTENSION:
+                     $ErrorString = 'A PHP extension stopped the file upload';
+                     break;
+               }
                $MediaResponse = array(
                   'Status'          => 'failed',
                   'ErrorCode'       => $FileErr,
                   'Filename'        => $FileName,
-                  'ProgressKey'     => $Sender->ApcKey
+                  'ProgressKey'     => $Sender->ApcKey ? $Sender->ApcKey : '',
+                  'StrError'        => $ErrorString
                );
             } else {
                $ScratchPath = PATH_UPLOADS.DS.'FileUpload';
@@ -428,15 +454,31 @@ class FileUploadPlugin extends Gdn_Plugin {
                   'Status'          => 'success',
                   'MediaID'         => $MediaID,
                   'Filename'        => $FileName,
-                  'ProgressKey'     => $Sender->ApcKey
+                  'ProgressKey'     => $Sender->ApcKey ? $Sender->ApcKey : ''
                );
                
             }
+         } else {
+            $PostMaxSize = Gdn_Upload::UnformatFileSize(ini_get('post_max_size'));
+            $MediaResponse = array(
+               'Status'          => 'failed',
+               'ErrorCode'       => '9',
+               'Filename'        => '???',
+               'StrError'        => 'No file was uploaded'
+            );
          }
          
-         $Sender->SetJSON('MediaResponse', $MediaResponse);
+      } else {
+         $PostMaxSize = ini_get('post_max_size');
+         $MediaResponse = array(
+            'Status'          => 'failed',
+            'ErrorCode'       => '10',
+            'Filename'        => '???',
+            'StrError'        => 'The file was too big (max '.$PostMaxSize.')'
+         );
       }
       
+      $Sender->SetJSON('MediaResponse', $MediaResponse);
       $Sender->Render($this->GetView('confirm_file.php'));
    }
    

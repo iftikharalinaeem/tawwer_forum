@@ -221,9 +221,11 @@ var Gdn_MultiFileUpload = Class.create({
          var JData = jQuery.parseJSON(Data);
          if (JData && JData.Progress) {
             var JProgress = JData.Progress;
-            var Progress = JProgress.progress;
             var UploaderID = JProgress.uploader;
             
+            if (!this.ProgressBars[UploaderID]) return;
+            
+            var Progress = JProgress.progress;
             this.ProgressBars[UploaderID].Progress = Progress;
             this.ProgressBars[UploaderID].Total = JProgress.total;
 
@@ -282,12 +284,13 @@ var Gdn_MultiFileUpload = Class.create({
       
       var JResponse = jQuery.parseJSON(Response);
       if (JResponse && JResponse.MediaResponse) {
-         var Filename = JResponse.MediaResponse.Filename;
-         if (!this.ProgressBars[TargetUploaderID]) return;
-         if (this.ProgressBars[TargetUploaderID].Filename != Filename) return;
-         
+      
          if (JResponse.MediaResponse.Status == 'success') {
             // SUCCESS
+            
+            var Filename = JResponse.MediaResponse.Filename;
+            if (!this.ProgressBars[TargetUploaderID]) return;
+            if (this.ProgressBars[TargetUploaderID].Filename != Filename) return;
             
             var MediaID = JResponse.MediaResponse.MediaID;
             this.ProgressBars[TargetUploaderID].Complete = true;
@@ -316,10 +319,20 @@ var Gdn_MultiFileUpload = Class.create({
             this.RemoveUploader(TargetUploaderID);
             
             var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
-            FileListing.remove();
+            FileListing.html("File upload failed. Reason: "+JResponse.MediaResponse.StrError);
+            FileListing.css({
+               'background-color':'#ffbfbf',
+               'color':'#a70000',
+               'padding-left':'20px',
+               'background-position':'8px center',
+               'cursor':'pointer'
+            });
+            FileListing.click(function(){FileListing.remove();});
+            setTimeout(function(){
+               FileListing.fadeTo(1500,0,function(){ FileListing.animate({'height':0},600,function(){ FileListing.remove(); }) });
+            },6000);
             delete this.ProgressBars[TargetUploaderID];
             
-            //this.AlignUploader($('#'+this.CurrentInput));
          }
       }
    },
