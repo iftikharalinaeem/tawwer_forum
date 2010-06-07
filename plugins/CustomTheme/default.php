@@ -234,7 +234,6 @@ Here are some things you should know before you begin:
 			// Only keep the last 20 revs
 			clean_revisions(PATH_THEMES . DS . $CurrentThemeFolder, 'css');
 			clean_revisions(PATH_THEMES . DS . $CurrentThemeFolder, 'html');
-			
 
 			// TODO: HANDLE PREVIEWS
 			if ($IsPreview) {
