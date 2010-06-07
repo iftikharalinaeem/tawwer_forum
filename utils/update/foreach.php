@@ -10,8 +10,10 @@ class TaskList {
    
       $this->Clients = $ClientDir;
       $this->Tasks = array();
-      $this->Database = mysql_connect('localhost', 'root', 'okluijfire4'); // Open the db connection
+      $this->Database = mysql_connect('localhost', 'root', 'Va2aWu5A'); // Open the db connection
       mysql_select_db('vfcom', $this->Database);
+   
+      chdir(dirname(__FILE__));
    
       // Setup tasks
       if (!is_dir($TaskDir) || !is_readable($TaskDir)) 
@@ -30,11 +32,14 @@ class TaskList {
          $NewClasses = array_diff(get_declared_classes(), $Classes);
          
          foreach ($NewClasses as $Class) {
-            if (is_subclass_of($Class, 'Task'))
+            if (is_subclass_of($Class, 'Task')) {
+               $NewTask = new $Class();
+               $NewTask->Database = $this->Database;
                $this->Tasks[] = array(
                   'name'      => str_replace('Task', '', $Class),
-                  'task'      => new $Class()
+                  'task'      => $NewTask
                );
+            }
          }
       }
       
@@ -42,9 +47,9 @@ class TaskList {
    }
    
    public function RunAll() {
-      if ($DirectoryHandle = @opendir($this->Clients) === FALSE) return FALSE;
+      if (($DirectoryHandle = @opendir($this->Clients)) === FALSE) return FALSE;
       
-      while (($Item = readdir($this->Clients)) !== FALSE) {
+      while (($Item = readdir($DirectoryHandle)) !== FALSE) {
          foreach ($this->Tasks as &$Task) {
             $Task['task']->Run($Item);
          }
