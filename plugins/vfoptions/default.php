@@ -592,7 +592,7 @@ pageTracker._trackPageview();
 				// TODO: SpamControl
          }
       }
-		Redirect('/dashboard/settings/thankyou');
+		Redirect('/dashboard/settings');
    }
 
    /**
@@ -639,16 +639,6 @@ pageTracker._trackPageview();
       // TODO: Logo upload is enabled if C('VanillaForums.BannerLogo.CanUpload') is TRUE.
       if ($Sender->RequestMethod == 'banners')
          $Sender->View = PATH_PLUGINS.'/vfoptions/views/banner.php';
-   }
-
-   /**
-    * Creates a "Thank You" page that users can be directed to after they have
-    * purchased upgrades.
-    **/
-   public function SettingsController_ThankYou_Create(&$Sender, $EventArguments) {
-      $Sender->Title('Premium Upgrades &raquo; Thank You!');
-      $Sender->AddSideMenu('dashboard/settings');
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'thankyou.php');
    }
 
    /**
