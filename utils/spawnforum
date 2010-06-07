@@ -50,8 +50,7 @@ if [ ! -d "$PATH" ]; then
     # End Custom VF.com Plugins
 
     # Themes
-    /bin/ln -s "${THEMES}vfcom" "${PATH}themes/default"
-    /bin/ln -s "${THEMES}vfcom" "${PATH}themes/vfcom"
+    /bin/ln -s "${THEMES}defaultsmarty" "${PATH}themes/default"
     # End Themes
         
     # Misc Symlinks
