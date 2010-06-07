@@ -574,8 +574,8 @@ pageTracker._trackPageview();
 					$PluginManager->EnablePlugin('GoogleAdSense');
 				}
             // Other features
-				$this->_ApplyFeature('CustomTheme', $Items);
-				$this->_ApplyFeature('CustomDomain', $Items);
+				$this->_ApplyFeature('CustomTheme', $Items, $PluginManager);
+				$this->_ApplyFeature('CustomDomain', $Items, $PluginManager);
 				// BannerLogo
 				$IsEnabled = C('VanillaForums.BannerLogo.CanUpload');
 				$IsInPlan = in_array('BannerLogo', $Items);
@@ -584,8 +584,8 @@ pageTracker._trackPageview();
 				} else if (!$IsInPlan && $IsEnabled) {
 					RemoveFromConfig('VanillaForums.BannerLogo.CanUpload');
 				}
-				$this->_ApplyFeature('VanillaConnect', $Items);
-				$this->_ApplyFeature('FileUpload', $Items);
+				$this->_ApplyFeature('VanillaConnect', $Items, $PluginManager);
+				$this->_ApplyFeature('FileUpload', $Items, $PluginManager);
 				// TODO: UserManagement
 				// TODO: PrivateCommunity
 				// TODO: Backups
@@ -743,7 +743,7 @@ pageTracker._trackPageview();
     */
    public function Setup() {}
    
-	private function _ApplyFeature($FeatureName, $Features) {
+	private function _ApplyFeature($FeatureName, $Features, $PluginManager) {
 		$IsEnabled = C('EnabledPlugins.'.$FeatureName);
 		$IsInPlan = in_array($FeatureName, $Features);
 		if ($IsInPlan && !$IsEnabled) {
