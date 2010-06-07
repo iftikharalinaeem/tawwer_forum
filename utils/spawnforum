@@ -46,11 +46,16 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${PLUGINS}GettingStarted" "${PATH}plugins/GettingStarted"
     /bin/ln -s "${PLUGINS}googleadsense" "${PATH}plugins/googleadsense"
     /bin/ln -s "${PLUGINS}vfoptions" "${PATH}plugins/vfoptions"
-    /bin/ln -s "${PLUGINS}CustomCSS" "${PATH}plugins/CustomCSS"
+    /bin/ln -s "${PLUGINS}CustomTheme" "${PATH}plugins/CustomTheme"
+    /bin/ln -s "${PLUGINS}CustomDomain" "${PATH}plugins/CustomDomain"
+    /bin/ln -s "${PLUGINS}FileUpload" "${PATH}plugins/FileUpload"
+    /bin/ln -s "${PLUGINS}VanillaConnect" "${PATH}plugins/VanillaConnect"
     # End Custom VF.com Plugins
 
     # Themes
     /bin/ln -s "${THEMES}defaultsmarty" "${PATH}themes/default"
+    /bin/ln -s "${THEMES}minalla" "${PATH}themes/minalla"
+    /bin/ln -s "${THEMES}light-grunge" "${PATH}themes/light-grunge"
     # End Themes
         
     # Misc Symlinks
