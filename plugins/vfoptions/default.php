@@ -25,7 +25,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 */
 
    public function Base_BeforeUserOptionsMenu_Handler($Sender) {
-      echo Anchor('My Account', 'dashboard/settings/myaccount', 'MyAccountLink');
+      echo Anchor('My Account', 'https://vanillaforums.com/account', 'MyAccountLink');
    }
    
    /**
@@ -595,36 +595,6 @@ pageTracker._trackPageview();
 		Redirect('/dashboard/settings');
    }
 
-   /**
-    * Redirect to the user's account page when accessing this url.
-    */
-   public function SettingsController_MyAccount_Create($Sender) {
-      $AccountUrl = 'https://www.vanillaforums.com/myaccount/';
-      $SiteID = C('VanillaForums.SiteID', 0);
-      $Site = $this->_GetDatabase()->SQL()
-         ->Select()
-         ->From('Site')
-         ->Where('SiteID', $SiteID)
-         ->Get()
-         ->FirstRow();      
-      if (is_object($Site)) {
-         // Point at vanilladev.com if that's where this site is managed
-         if (strpos($Site->Name, 'vanilladev') !== FALSE)
-            $UpdateUrl = 'https://www.vanilladev.com/myaccount/';
-      }
-      
-      // Set the transient key for authentication on the other side
-      $this->_SetTransientKey($Site);
-      
-      // Close any open db connections
-      $this->_CloseDatabase();
-      
-      // Redirect
-      $SiteUrl = $Site->Domain == '' ? $Site->Name : $Site->Domain;
-      $Session = Gdn::Session();
-      Redirect($UpdateUrl.$SiteID.'/'.$Session->TransientKey());
-   }
-   
    /**
     * Don't let the users access the items under the "Add-ons" menu section of
     * the dashboard: applications & plugins (themes was moved to the "
