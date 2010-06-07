@@ -25,7 +25,11 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 */
 
    public function Base_BeforeUserOptionsMenu_Handler($Sender) {
-      echo Anchor('My Account', 'https://vanillaforums.com/account', 'MyAccountLink');
+		$Url = 'https://vanillaforums.com/account';
+		if (strpos(Gdn::Request()->Domain(), 'vanilladev') !== FALSE)
+         $Url = 'https://www.vanilladev.com/account/';
+
+      echo Anchor('My Account', $Url, 'MyAccountLink');
    }
    
    /**
