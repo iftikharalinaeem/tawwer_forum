@@ -16,6 +16,8 @@ $PluginInfo['VanillaConnect'] = array(
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
+   'SettingsUrl' => '/dashboard/plugin/vanillaconnect',
+   'SettingsPermission' => 'Garden.AdminUser.Only',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
@@ -94,6 +96,79 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    public function Controller_Library(&$Sender) {
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       $Sender->Render($this->GetResource('js/library.js'));
+   }
+   
+   public function Controller_Bundle(&$Sender) {
+      if (!class_exists('ZipArchive')) die('No zip archive tools!');
+      
+      $ExternalPath = $this->GetResource('external',FALSE,TRUE);
+      $Files = scandir($ExternalPath);
+      
+      $Resources = array();
+      $NeededResources = array_fill_keys(array('vanillaconnect', 'oauth'), array());
+      foreach ($Files as $Filename) {
+         foreach ($NeededResources as $ResourceFragment => &$ResourceFileList) {
+            $FN = CombinePaths(array($ExternalPath,$Filename));
+            if (!is_dir($FN) && preg_match("/{$ResourceFragment}/i",$Filename)) {
+               $ResourceFileList[] = $FN;
+            }
+         }
+         unset($ResourceFileList);
+      }
+      
+      // Reorder to match NeededResources
+      foreach ($NeededResources as $ResourceName => $FileList)
+         if (is_array($FileList) && sizeof($FileList))
+            foreach ($FileList as $FilePath)
+               $Resources[] = $this->_StripLibraryTags($FilePath);
+      
+      $SuperData = "<?php\n" . implode("\n\n", $Resources) . "\n?>";
+      
+      $Zip = new ZipArchive();
+      $ZipFile = CombinePaths(array(PATH_CACHE,'vanillaconnect.php.zip'));
+      if (file_exists($ZipFile)) 
+         unlink($ZipFile);
+         
+      if ($Zip->open($ZipFile, ZIPARCHIVE::CREATE) !== TRUE)
+         die('Could not create archive!');
+      
+      $Zip->addFromString('vanillaconnect.php', $SuperData);
+      $Zip->close();
+      print_r($Zip);
+      try {
+         Gdn_FileSystem::ServeFile($ZipFile, 'vanillaconnect.php.zip');
+      } catch (Exception $e) {
+         throw new Exception('File could not be streamed: missing file ('.$ZipFile.').');
+      }
+            
+      exit();
+   }
+   
+   protected function _StripLibraryTags($Filename) {
+      if (!file_exists($Filename)) return '';
+      $FileData = file($Filename);
+      
+      // Strip opening PHP tag
+      if (trim($FileData[0]) == '<?php')
+         array_shift($FileData);
+         
+      // Strip ending PHP tag
+      $Index = sizeof($FileData) - 1;
+      while ($Index > 0) {
+         if (trim($FileData[$Index]) == '?>') {
+            array_pop($FileData);
+            break;
+         }
+         
+         if (trim($FileData[$Index]) == '')
+            array_pop($FileData);
+         else
+            break;
+            
+         $Index--;
+      }
+      
+      return implode("", $FileData);
    }
 
    public function EntryController_Handshake_Create(&$Sender) {
