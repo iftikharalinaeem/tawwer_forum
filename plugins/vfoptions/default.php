@@ -533,7 +533,7 @@ pageTracker._trackPageview();
     * that their db status matches their actual status (enables or disables
     * them). This may redirect away if required (ie. the domain has been changed).
 	*/ 
-   private function SettingsController_ApplyPlan_Create() {
+   public function SettingsController_ApplyPlan_Create() {
 		$PluginManager = Gdn::Factory('PluginManager');
 
 		// Define all of the features to be enabled/disabled
