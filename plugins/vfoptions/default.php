@@ -25,7 +25,11 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 */
 
    public function Base_BeforeUserOptionsMenu_Handler($Sender) {
-      echo Anchor('My Account', 'dashboard/settings/myaccount', 'MyAccountLink');
+		$Url = 'https://vanillaforums.com/account';
+		if (strpos(Gdn::Request()->Domain(), 'vanilladev') !== FALSE)
+         $Url = 'https://www.vanilladev.com/account/';
+
+      echo Anchor('My Account', $Url, 'MyAccountLink');
    }
    
    /**
@@ -533,7 +537,7 @@ pageTracker._trackPageview();
     * that their db status matches their actual status (enables or disables
     * them). This may redirect away if required (ie. the domain has been changed).
 	*/ 
-   private function SettingsController_ApplyPlan_Create() {
+   public function SettingsController_ApplyPlan_Create() {
 		$PluginManager = Gdn::Factory('PluginManager');
 
 		// Define all of the features to be enabled/disabled
@@ -574,8 +578,8 @@ pageTracker._trackPageview();
 					$PluginManager->EnablePlugin('GoogleAdSense');
 				}
             // Other features
-				$this->_ApplyFeature('CustomTheme', $Items);
-				$this->_ApplyFeature('CustomDomain', $Items);
+				$this->_ApplyFeature('CustomTheme', $Items, $PluginManager);
+				$this->_ApplyFeature('CustomDomain', $Items, $PluginManager);
 				// BannerLogo
 				$IsEnabled = C('VanillaForums.BannerLogo.CanUpload');
 				$IsInPlan = in_array('BannerLogo', $Items);
@@ -584,47 +588,17 @@ pageTracker._trackPageview();
 				} else if (!$IsInPlan && $IsEnabled) {
 					RemoveFromConfig('VanillaForums.BannerLogo.CanUpload');
 				}
-				$this->_ApplyFeature('VanillaConnect', $Items);
-				$this->_ApplyFeature('FileUpload', $Items);
+				$this->_ApplyFeature('VanillaConnect', $Items, $PluginManager);
+				$this->_ApplyFeature('FileUpload', $Items, $PluginManager);
 				// TODO: UserManagement
 				// TODO: PrivateCommunity
 				// TODO: Backups
 				// TODO: SpamControl
          }
       }
-		Redirect('/dashboard/settings/thankyou');
+		Redirect('/dashboard/settings');
    }
 
-   /**
-    * Redirect to the user's account page when accessing this url.
-    */
-   public function SettingsController_MyAccount_Create($Sender) {
-      $AccountUrl = 'https://www.vanillaforums.com/myaccount/';
-      $SiteID = C('VanillaForums.SiteID', 0);
-      $Site = $this->_GetDatabase()->SQL()
-         ->Select()
-         ->From('Site')
-         ->Where('SiteID', $SiteID)
-         ->Get()
-         ->FirstRow();      
-      if (is_object($Site)) {
-         // Point at vanilladev.com if that's where this site is managed
-         if (strpos($Site->Name, 'vanilladev') !== FALSE)
-            $UpdateUrl = 'https://www.vanilladev.com/myaccount/';
-      }
-      
-      // Set the transient key for authentication on the other side
-      $this->_SetTransientKey($Site);
-      
-      // Close any open db connections
-      $this->_CloseDatabase();
-      
-      // Redirect
-      $SiteUrl = $Site->Domain == '' ? $Site->Name : $Site->Domain;
-      $Session = Gdn::Session();
-      Redirect($UpdateUrl.$SiteID.'/'.$Session->TransientKey());
-   }
-   
    /**
     * Don't let the users access the items under the "Add-ons" menu section of
     * the dashboard: applications & plugins (themes was moved to the "
@@ -639,16 +613,6 @@ pageTracker._trackPageview();
       // TODO: Logo upload is enabled if C('VanillaForums.BannerLogo.CanUpload') is TRUE.
       if ($Sender->RequestMethod == 'banners')
          $Sender->View = PATH_PLUGINS.'/vfoptions/views/banner.php';
-   }
-
-   /**
-    * Creates a "Thank You" page that users can be directed to after they have
-    * purchased upgrades.
-    **/
-   public function SettingsController_ThankYou_Create(&$Sender, $EventArguments) {
-      $Sender->Title('Premium Upgrades &raquo; Thank You!');
-      $Sender->AddSideMenu('dashboard/settings');
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'thankyou.php');
    }
 
    /**
@@ -743,7 +707,7 @@ pageTracker._trackPageview();
     */
    public function Setup() {}
    
-	private function _ApplyFeature($FeatureName, $Features) {
+	private function _ApplyFeature($FeatureName, $Features, $PluginManager) {
 		$IsEnabled = C('EnabledPlugins.'.$FeatureName);
 		$IsInPlan = in_array($FeatureName, $Features);
 		if ($IsInPlan && !$IsEnabled) {
