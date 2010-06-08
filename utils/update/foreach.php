@@ -60,7 +60,10 @@ class TaskList {
    }
    
    public function RunAll() {
-      if (($DirectoryHandle = @opendir($this->Clients)) === FALSE) return FALSE;
+      if (($DirectoryHandle = @opendir($this->Clients)) === FALSE) {
+         if (VERBOSE) echo "Could not open client folder.\n";
+         return FALSE;
+      }
       
       if (VERBOSE) echo "Running through client list...\n";
       while (($ClientFolder = readdir($DirectoryHandle)) !== FALSE) {
