@@ -1,10 +1,34 @@
 <?php
 
 /**
+ * Tell VanillaConnect how to connect to your forum by filling in these values:
+ *
+ *  VanillaForumURL        - Find this on your Vanilla dashboard, under VanillaConnect
+ *  VanillaConnectKey      - Find this on your Vanilla dashboard, under VanillaConnect
+ *  VanillaConnectSecret   - Find this on your Vanilla dashboard, under VanillaConnect
+ *  UserEmail              - The email address of the user you're sending to Vanilla
+ *  UserName               - The username of the user on your site
+ *  UserID                 - The ID of the user on your site.
+ */
+
+   $VanillaConnect = VanillaConnect::Authenticate(
+      $VanillaForumURL,
+      $VanillaConnectKey,
+      $VanillaConnectSecret,
+      $UserEmail,
+      $UserName,
+      $UserID
+   );
+
+/**
+ *
+ * DO NOT MAKE CHANGES BELOW THIS LINE!
+ * --------------------------------------------------------
+ */
+
+/**
  * Vanilla Single-Sign-On foreign consumer
- * 
- * 
- * 
+ *
  */
 class VanillaConnect {
 
@@ -85,13 +109,14 @@ SCRIPTFRAGMENT;
       return $ScriptResult;
    }
    
-   public function Url($TargetUrl) {
-      return $this->_Url;
+   public function Url($UrlName) {
+      $Url = $this->_Url;
+      return '<a href="'.htmlspecialchars($Url).'" alt="'.$UrlName.'">'.$UrlName.'</a>';
    }
 
    public function Image() {
       $Url = $this->_Url;
-      return '<img src="' . htmlspecialchars($Url) . '" alt="" />';
+      return '<img src="'.htmlspecialchars($Url).'" alt="" />';
    }
    
 /*
@@ -104,6 +129,10 @@ SCRIPTFRAGMENT;
       $Url = $this->_Request->to_url();
       Header("Location: ".$Url);
       exit();
+   }
+   
+   public function GetUrl() {
+      return $this->_Url;
    }
 
 }
