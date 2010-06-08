@@ -50,6 +50,7 @@ class TaskList {
       if (($DirectoryHandle = @opendir($this->Clients)) === FALSE) return FALSE;
       
       while (($Item = readdir($DirectoryHandle)) !== FALSE) {
+         if ($Item == '.' || $Item == '..') continue;
          foreach ($this->Tasks as &$Task) {
             $Task['task']->Run($Item);
          }
@@ -71,8 +72,15 @@ abstract class Task {
    abstract public function Run($ClientFolder);
    
    protected function LookupClientByFolder($ClientFolder) {
-      $Data = mysql_query("select SiteID from GDN_Site where Name = '{$ClientFolder}'", $this->Database);
-      if (mysql_num_rows($Data)) {
+      /*
+$ClientFolderPartsArray = explode('.', $ClientFolder);
+      if (sizeof($ClientFolderPartsArray) <= 1) return FALSE;
+      $ClientName = array_shift($ClientFolderPartsArray);
+*/
+      
+      $Query = "select * from GDN_Site where Name = '{$ClientFolder}'";
+      $Data = mysql_query($Query, $this->Database);
+      if ($Data && mysql_num_rows($Data)) {
          $Row = mysql_fetch_assoc($Data);
          mysql_free_result($Data);
          return $Row;

@@ -10,7 +10,6 @@ class SymlinkTask extends Task {
       $Client = $this->LookupClientByFolder($ClientFolder);
       if (!$Client) return FALSE;
       
-      print_r($Client);
       
    }
 
