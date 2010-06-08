@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL);
+
 // Represents a config file
 require_once("configuration.php");
 
@@ -13,9 +15,12 @@ class TaskList {
    
       $this->Clients = $ClientDir;
       $this->Tasks = array();
-      $this->Database = mysql_connect('localhost', 'root', 'Va2aWu5A'); // Open the db connection
-      mysql_select_db('vfcom', $this->Database);
-   
+      $this->Database = mysql_connect(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD); // Open the db connection
+      mysql_select_db(DATABASE_MAIN, $this->Database);
+      
+      if (VERBOSE)
+         echo "Connected to ".DATABASE_MAIN." @ ".DATABASE_HOST."\n";
+      
       chdir(dirname(__FILE__));
    
       // Setup tasks
@@ -25,6 +30,8 @@ class TaskList {
       if (!$TaskDirectory = opendir($TaskDir))
          die("Could not open task_dir '{$TaskDir}' for reading.\n");
          
+      if (VERBOSE) echo "Setting up task objects...\n";
+      
       while (($FileName = readdir($TaskDirectory)) !== FALSE) {
          if ($FileName == '.' || $FileName == '..') continue;
          if (!preg_match('/^.*\.task\.php$/', $FileName)) continue;
@@ -42,8 +49,11 @@ class TaskList {
                   'name'      => str_replace('Task', '', $Class),
                   'task'      => $NewTask
                );
+               if (VERBOSE) echo "  ".strtolower($Class)."\n";
             }
          }
+         if (VERBOSE) echo "\n\n";
+         
       }
       
       closedir($TaskDirectory);
@@ -52,17 +62,19 @@ class TaskList {
    public function RunAll() {
       if (($DirectoryHandle = @opendir($this->Clients)) === FALSE) return FALSE;
       
+      if (VERBOSE) echo "Running through client list...\n";
       while (($ClientFolder = readdir($DirectoryHandle)) !== FALSE) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
          
          $ClientInfo = $this->LookupClientByFolder($ClientFolder);
+         if (VERBOSE) echo "  {$ClientFolder} [{$ClientInfo['SiteID']}]... ";
          // Run all tasks for this client
          foreach ($this->Tasks as &$Task)
             $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
-         
+            
+         if (VERBOSE) echo "done\n";
       }
       closedir($DirectoryHandle);
-      
    }
    
    protected function LookupClientByFolder($ClientFolder) {
@@ -114,12 +126,24 @@ class TaskList {
    public static function ArrayValueForPhp($String) {
       return str_replace('\\', '\\', html_entity_decode($String, ENT_QUOTES));
    }
+   
+   // Convenience method
+   function CombinePaths($Paths, $Delimiter = '/') {
+      if (is_array($Paths)) {
+         $MungedPath = implode($Delimiter, $Paths);
+         $MungedPath = str_replace(array($Delimiter.$Delimiter.$Delimiter, $Delimiter.$Delimiter), array($Delimiter, $Delimiter), $MungedPath);
+         return str_replace('http:/', 'http://', $MungedPath);
+      } else {
+         return $Paths;
+      }
+   }
 
 }
 
 abstract class Task {
 
    public $Database;
+   protected $Root;
    protected $ClientRoot;
    protected $ClientFolder;
    protected $ClientInfo;
@@ -127,7 +151,8 @@ abstract class Task {
    protected $Config;
 
    public function __construct($RootFolder) {
-      $this->ClientRoot = $RootFolder;
+      $this->Root = trim($RootFolder,'/');
+      $this->ClientRoot = NULL;
       $this->ClientFolder = NULL;
       $this->ClientInfo = NULL;
       $this->ConfigFile = NULL;
@@ -138,9 +163,11 @@ abstract class Task {
    
    public function SandboxExecute($ClientFolder, $ClientInfo) {
       $this->ClientFolder = $ClientFolder;
+      $this->ClientRoot = TaskList::CombinePaths($this->Root, $this->ClientFolder);
       $this->ClientInfo = $ClientInfo;
       
-      $this->ConfigFile = trim($this->ClientRoot,'/').'/'.$this->ClientFolder.'/conf/config.php';
+      
+      $this->ConfigFile = TaskList::CombinePaths($this->ClientRoot,'conf/config.php');
       $this->Config = new Configuration();
       $this->Config->Load($ConfigFile, 'Use');
       

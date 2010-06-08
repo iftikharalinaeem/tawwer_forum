@@ -7,7 +7,8 @@ class SymlinkTask extends Task {
    }
    
    protected function Run() {
-
+      $ClientDashboardLink = TaskList::CombinePaths($this->ClientRoot,'applications/dashboard');
+      @unlink($ClientDashboardLink);
       
       
    }
