@@ -41,10 +41,12 @@ echo $this->Form->Errors();
          </tbody>
       </table>
    </li>
+   <?php /*
    <li id="NewUserRoles">
       <div class="Info"><?php echo T('Check all roles that should be applied to new/approved users:'); ?></div>
       <?php echo $this->Form->CheckBoxList('Garden.Registration.DefaultRoles', $this->RoleData, $this->ExistingRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID')); ?>
    </li>
+    */ ?>
    <li id="InvitationExpiration">
       <?php
          echo $this->Form->Label('Invitations will expire', 'Garden.Registration.InviteExpiration');
