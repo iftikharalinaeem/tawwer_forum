@@ -34,8 +34,8 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		// If we are using the default master view, and in preview mode, use custom css & html files
 		$DoPreview = Gdn::Session()->GetPreference('PreviewCustomTheme', FALSE);
 		$CSSFile = C('Plugins.CustomTheme.PreviewCSS', '');
+		$CssFiles = GetValue('CssFiles', $Sender->EventArguments);
 		if ($CSSFile != '' && $DoPreview && ($Sender->MasterView == 'default' || $Sender->MasterView == '')) {
-			$CssFiles = GetValue('CssFiles', $Sender->EventArguments);
 			// If there is custom css, and we are not supposed to include theme-based css files...
 			if (C('Plugins.CustomTheme.IncludeThemeCSS', 'Yes') == 'No') {
 				foreach ($CssFiles as $k => $v) {
@@ -46,13 +46,17 @@ class CustomThemePlugin implements Gdn_IPlugin {
 				}
 			} else {
 				foreach ($CssFiles as $k => $v) {
-					if (GetValue('FileName', $v) == 'custom.css') {
+					if (GetValue('FileName', $v) == 'customtheme.css') {
 						unset($CssFiles[$k]);
 						array_merge($CssFiles);
 					}
 				}
 			}
-			$CssFiles[] = array('FileName' => $CSSFile, 'AppFolder' => 'turds');
+			$CssFiles[] = array('FileName' => $CSSFile, 'AppFolder' => 'false');
+			$Sender->EventArguments['CssFiles'] = $CssFiles;
+		} else if ($Sender->MasterView == 'default' || $Sender->MasterView == '') {
+			// Add the customtheme.css file
+			$CssFiles[] = array('FileName' => 'customtheme.css', 'AppFolder' => 'false');
 			$Sender->EventArguments['CssFiles'] = $CssFiles;
 		}
 	}
@@ -221,9 +225,9 @@ Here are some things you should know before you begin:
 			if (in_array($IncludeThemeCSS, array('Yes', 'No'))) 
 				SaveToConfig('Plugins.CustomTheme.IncludeThemeCSS', $IncludeThemeCSS);
 			
-			// If we are applying the changes, copy the current revs over the custom.css & default.master.tpl			
+			// If we are applying the changes, copy the current revs over the customtheme.css & default.master.tpl			
 			if ($IsApply || $IsApplyPreview) {
-				file_put_contents($Folder . DS . 'design'. DS . 'custom.css', $NewCSS);
+				file_put_contents($Folder . DS . 'design'. DS . 'customtheme.css', $NewCSS);
 				file_put_contents($Folder . DS . 'views'. DS . 'default.master.tpl', $NewHtml);
 				SaveToConfig('Plugins.CustomTheme.EnabledCSS', $PreviewCSSFile);
 				SaveToConfig('Plugins.CustomTheme.EnabledHtml', $PreviewHtmlFile);
