@@ -88,16 +88,19 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
       } else {
 
          $RequestArguments = array(
-            'oauth_consumer_key'      => $ConsumerKey,
-            'oauth_version'           => $Version,
-            'oauth_timestamp'         => $Timestamp,
-            'oauth_nonce'             => $Nonce,
-            'oauth_signature_method'  => $SignatureMethod,
-            'oauth_signature'         => $Signature,
+            'oauth_consumer_key'       => $ConsumerKey,
+            'oauth_version'            => $Version,
+            'oauth_timestamp'          => $Timestamp,
+            'oauth_nonce'              => $Nonce,
+            'oauth_signature_method'   => $SignatureMethod,
+            'oauth_signature'          => $Signature,
+            'email'                    => $UserEmail,
+            'name'                     => $UserName,
+            'uid'                      => $UserID
          );
-   
+         
          try {
-            $OAuthRequest = OAuthRequest::from_request(NULL, NULL, $RequestArguments);
+            $OAuthRequest = OAuthRequest::from_request('GET', Url('/entry/auth/handshake/handshake.js',TRUE), $RequestArguments);
             $Token = $this->_OAuthServer->fetch_request_token($OAuthRequest);
          } catch (Exception $e) {
             return Gdn_Authenticator::AUTH_DENIED;
@@ -125,15 +128,15 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
        * Just go directly to creating an access token and authenticating it with a normal vanilla identity cookie.
        */
       if ($HaveToken['UserID']) {
-         
          $this->ProcessAuthorizedRequest($CookiePayload, TRUE);
          return Gdn_Authenticator::AUTH_SUCCESS;
       } else {
          
-         if (Gdn::Request()->Filename() == 'handshake.js')
+         if (Gdn::Request()->Filename() == 'handshake.js') {
             return Gdn_Authenticator::AUTH_PARTIAL;
-         else
+         } else {
             return Gdn_Authenticator::AUTH_SUCCESS;
+         }
       }
    }
    
@@ -535,6 +538,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
       
       // Look for handshake cookies
       $Payload = $this->GetHandshakeCookie();
+      
       if ($Payload) {
          // Process the cookie auth
          $this->ProcessAuthorizedRequest($Payload);
