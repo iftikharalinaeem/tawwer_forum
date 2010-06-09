@@ -65,13 +65,12 @@ class TaskList {
    }
    
    public function RunAll($TaskOrder = NULL) {
-      if (($DirectoryHandle = @opendir($this->Clients)) === FALSE) {
+      TaskList::MajorEvent("Running through client list...");
+      $FolderList = scandir($DirectoryHandle);
+      if ($FolderList === FALSE) {
          TaskList::MajorEvent("Could not open client folder.");
          return FALSE;
       }
-      
-      TaskList::MajorEvent("Running through client list...");
-      $FolderList = scandir($DirectoryHandle);
       foreach ($FolderList as $ClientFolder) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
          if (!is_dir($ClientFolder)) continue;
@@ -90,7 +89,6 @@ class TaskList {
                      
          TaskList::MajorEvent("");
       }
-      closedir($DirectoryHandle);
    }
    
    protected function LookupClientByFolder($ClientFolder) {
