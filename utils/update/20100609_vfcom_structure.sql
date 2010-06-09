@@ -302,7 +302,7 @@ alter table `GDN_Discussion`  add `Score` float after `LastCommentUserID`;
 /* Existing: `Attributes` mediumtext, New: `Attributes` text */
 alter table `GDN_Discussion`  change Attributes `Attributes` text;
 
-alter table `GDN_Discussion` add key FK_Discussion_FirstCommentID (`FirstCommentID`);
+/*alter table `GDN_Discussion` add key FK_Discussion_FirstCommentID (`FirstCommentID`); */
 
 alter table `GDN_Discussion` drop index TX_Discussion;
 alter table `GDN_Discussion` add fulltext index TX_Discussion (`Name`, `Body`);
