@@ -45,7 +45,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 
       $Menu->AddItem('Appearance', T('Appearance'));
 		$Menu->AddLink('Appearance', T('Banner <span class="New">New</span>'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
-      $Menu->AddLink('Appearance', T('Themes'), 'dashboard/settings/themes', 'Garden.Themes.Manage');
+      $Menu->AddLink('Appearance', T('Themes <span class="New">New</span>'), 'dashboard/settings/themes', 'Garden.Themes.Manage');
 		if (C('EnabledPlugins.CustomCSS'))
 	      $Menu->AddLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
 			
