@@ -68,8 +68,10 @@ class TaskList {
       }
       
       TaskList::MajorEvent("Running through client list...");
-      while (($ClientFolder = readdir($DirectoryHandle)) !== FALSE) {
+      $FolderList = scandir($DirectoryHandle);
+      foreach ($FolderList as $ClientFolder) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
+         if (!is_dir($ClientFolder)) continue;
          
          $ClientInfo = $this->LookupClientByFolder($ClientFolder);
          TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
