@@ -53,6 +53,9 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 	      $Menu->AddLink('Appearance', 'Custom Theme <span class="New">New</span>', 'settings/customtheme', 'Garden.AdminUser.Only');
 			
       $Menu->AddLink('Appearance', T('Messages'), 'dashboard/message', 'Garden.Messages.Manage');
+
+		if (C('EnabledPlugins.CustomDomain'))
+	      $Menu->AddLink('Appearance', 'Custom Domain <span class="New">New</span>', 'settings/customdomain', 'Garden.AdminUser.Only');
 		
       $Menu->AddItem('Users', T('Users'));
       $Menu->AddLink('Users', T('Users'), 'dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
@@ -614,6 +617,11 @@ pageTracker._trackPageview();
 		// TODO: PrivateCommunity
 		// TODO: Backups
 		// TODO: SpamControl
+
+
+		// Remove & Re-Add the vfoptions plugin (so it goes last to have better control over what gets added to the dashboard menu)
+		RemoveFromConfig('EnabledPlugins.vfoptions');
+		SaveToConfig('EnabledPlugins.vfoptions', 'vfoptions');
 
 		Redirect('/dashboard/settings');
    }
