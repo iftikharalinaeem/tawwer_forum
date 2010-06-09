@@ -593,9 +593,9 @@ pageTracker._trackPageview();
 		$IsEnabled = C('EnabledPlugins.googleadsense', '') == '' ? TRUE : FALSE;
 		$IsInPlan = in_array('NoAds', $ApplyFeatures);
 		if ($IsInPlan && !$IsEnabled) {
-			$PluginManager->DisablePlugin('googleadsense');
+			RemoveFromConfig('EnabledPlugins.googleadsense');
 		} else if (!$IsInPlan && $IsEnabled) {
-			$PluginManager->EnablePlugin('googleadsense');
+			SaveToConfig('EnabledPlugins.googleadsense', 'googleadsense');
 		}
 		// Other features
 		$this->_ApplyFeature('CustomTheme', array('CustomTheme'), $PluginManager); // Everyone gets CustomTheme plugin turned on
