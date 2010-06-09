@@ -67,14 +67,14 @@ class TaskList {
    public function RunAll($TaskOrder = NULL) {      
       TaskList::MajorEvent("Running through client list...");
       $FolderList = scandir($this->Clients);
-      if ($FolderList === FALSE) {
+      if ($FolderList === FALSE || !is_array($FolderList)) {
          TaskList::MajorEvent("Could not open client folder.");
          return FALSE;
       }
 
       foreach ($FolderList as $ClientFolder) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
-         if (!is_dir($ClientFolder)) continue;
+         //if (!is_dir($ClientFolder)) continue;
          
          $ClientInfo = $this->LookupClientByFolder($ClientFolder);
          TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
@@ -90,7 +90,6 @@ class TaskList {
                      
          TaskList::MajorEvent("");
       }
-      closedir($DirectoryHandle);
    }
    
    protected function LookupClientByFolder($ClientFolder) {

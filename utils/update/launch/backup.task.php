@@ -71,7 +71,6 @@ class BackupTask extends Task {
       
       // Perform Database backup
       if ($Proceed == 'yes') {
-         print_r($this->ClientInfo);
          $DatabaseName = $this->ClientInfo['DatabaseName'];
          $BackupSQLFile = TaskList::CombinePaths($BackupFolder, "database_".strtolower($DatabaseName)."_{$DateString}.%s");
          
