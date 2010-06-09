@@ -7,6 +7,8 @@ require_once("configuration.php");
 
 class TaskList {
 
+   const NOBREAK = FALSE;
+   
    protected $Clients;
    protected $Tasks;
    protected $Database;
@@ -43,7 +45,7 @@ class TaskList {
          
          foreach ($NewClasses as $Class) {
             if (is_subclass_of($Class, 'Task')) {
-               TaskList::Event("  ".strtolower($Class));
+               TaskList::Event(strtolower($Class));
                $NewTask = new $Class($ClientDir);
                $NewTask->Database = $this->Database;
                $this->Tasks[$Taskname] = array(
@@ -87,7 +89,7 @@ class TaskList {
    }
    
    protected function LookupClientByFolder($ClientFolder) {
-      $Query = "select * from GDN_Site where Name = '{$ClientFolder}'";
+      $Query = "SELECT * FROM GDN_Site WHERE Name = '{$ClientFolder}'";
       $Data = mysql_query($Query, $this->Database);
       if ($Data && mysql_num_rows($Data)) {
          $Row = mysql_fetch_assoc($Data);
@@ -159,19 +161,30 @@ class TaskList {
       }
    }
    
-   public static function MinorEvent($Message) {
-      if (VERBOSE) echo "    > {$Message}\n";
+   public static function MinorEvent($Message, $LineBreak = TRUE) {
+      if (VERBOSE) {
+         echo "    - {$Message}";
+         if ($LineBreak) echo "\n";
+      }
    }
    
-   public static function Event($Message) {
-      if (VERBOSE) echo "  - {$Message}\n";
+   public static function Event($Message, $LineBreak = TRUE) {
+      if (VERBOSE) {
+         echo "  {$Message}";
+         if ($LineBreak) echo "\n";
+      }
    }
    
-   public static function MajorEvent($Message) {
-      if (VERBOSE) echo "{$Message}\n";
+   public static function MajorEvent($Message, $LineBreak = TRUE) {
+      if (VERBOSE) {
+         echo "{$Message}";
+         if ($LineBreak) echo "\n";
+      }
+
    }
    
    public static function Question($Message, $Prompt, $Options, $Default) {
+      echo "\n";
       if ($Message)
          echo $Message."\n";
          
