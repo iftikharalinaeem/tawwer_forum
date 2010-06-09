@@ -1,28 +1,12 @@
-div.VanillaConnectBlock {
-   margin-bottom:       10px;
+div.RemoteConfig {
+   margin: 0 0 20px 460px;
 }
-
-div.VanillaConnectBlock h1 {
-   margin-bottom:       0px;
+div.VanillaConfig {
+   float: left;
+   width: 430px;
+   margin: 0 30px 20px 0;
 }
-
-div.VanillaConnectBlock div.Detail {
-   font-style:          italic;
-}
-
-table.VanillaConnectTable th {
-   background-color:    white;
-}
-
-table.VanillaConnectTable td:first-child {
-   width:               400px;
-}
-
-table.VanillaConnectTable td em {
-   font-style:          italic;
-   font-size:           80%;
-}
-
-table.VanillaConnectTable td input {
-   width:               400px;
+div.Info span {
+   display: block;
+   padding: 20px 0 6px;
 }

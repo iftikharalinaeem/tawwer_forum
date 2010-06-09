@@ -7,7 +7,7 @@
             <tr>
                <td><img src="<?php echo $this->GetWebResource('images/gear.png'); ?>"/></td>
                <td><a href="<?php echo Url("/discussion/download/{$Media->MediaID}/{$Media->Name}"); ?>"><?php echo $Media->Name; ?></a></td>
-               <td>(<?php echo Gdn_Format::Bytes2String($Media->Size, 0); ?>)</td>
+               <td>(<?php echo Gdn_Format::Bytes($Media->Size, 0); ?>)</td>
             </tr>
       <?php
          }

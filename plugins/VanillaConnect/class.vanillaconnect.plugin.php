@@ -10,11 +10,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['VanillaConnect'] = array(
+	'Name' => 'Vanilla Connect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers.',
    'Version' => '1.0',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
+   'SettingsUrl' => '/dashboard/settings/vanillaconnect',
+   'SettingsPermission' => 'Garden.AdminUser.Only',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
@@ -29,17 +32,20 @@ class VanillaConnectPlugin extends Gdn_Plugin {
     */
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddItem('Authentication', 'Authentication');
-      $Menu->AddLink('Authentication', 'VanillaConnect', 'plugin/vanillaconnect', 'Garden.AdminUser.Only');
+      $Menu->AddLink('Users', 'Vanilla Connect', 'settings/vanillaconnect', 'Garden.AdminUser.Only');
    }
    
-   public function PluginController_VanillaConnect_Create(&$Sender, $EventArguments) {
+   public function SettingsController_VanillaConnect_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
-      $Sender->Title('VanillaConnect');
-      $Sender->AddSideMenu('plugin/vanillaconnect');
-      $Sender->Form = new Gdn_Form();
+		
+      $Sender->Title('Vanilla Connect');
+      $Sender->AddSideMenu('settings/vanillaconnect');
 		$Sender->AddCssFile('/plugins/VanillaConnect/vanillaconnect.css');
-      
+		$Sender->Form = new Gdn_Form();
+		$this->Dispatch($Sender, $Sender->RequestArgs);
+   }
+   
+   public function Controller_Index(&$Sender) {
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.AuthenticationKey')
          ->From('UserAuthenticationProvider uap')
@@ -57,26 +63,13 @@ class VanillaConnectPlugin extends Gdn_Plugin {
          
          if (!$Sender->Form->AuthenticatedPostBack()) {
             $Sender->Form->SetData($Provider);
-         } else {
+         } else if (C('Plugins.VanillaConnect.Enabled')) {
             $ProviderModel->Validation->ApplyRule('URL',             'Required');
             $ProviderModel->Validation->ApplyRule('RegistrationUrl', 'Required');
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
             $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
-            
-            $FormPostValues = $Sender->Form->FormValues();
-            $SaveValues = array(
-               'URL'                => ArrayValue('URL', $FormPostValues, ''),
-               'RegistrationUrl'    => ArrayValue('RegistrationUrl', $FormPostValues, ''),
-               'SignInUrl'          => ArrayValue('SignInUrl', $FormPostValues, ''),
-               'SignOutUrl'         => ArrayValue('SignOutUrl', $FormPostValues, '')
-            );
-            if ($ProviderModel->Validate($FormPostValues)) {
-               $ProviderModel->Update($SaveValues, array(
-                  'AuthenticationKey'  => $ConsumerKey
-               ));
-            } else {
-               $Sender->Form->SetValidationResults($ProviderModel->ValidationResults());
-            }
+				$Sender->Form->SetFormValue('AuthenticationKey', $ConsumerKey);
+            $Sender->Form->Save();
          }
       }
       
@@ -85,8 +78,103 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       
       $Sender->Render($this->GetView('vanillaconnect.php'));
    }
+   
+   public function Controller_Toggle(&$Sender) {
+		
+		// Enable/Disable VanillaConnect
+		if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
+			if (C('Plugins.VanillaConnect.Enabled')) {
+				$this->_Disable();
+			} else {
+				$this->_Enable();
+			}
+			Redirect('settings/vanillaconnect');
+		}
+   }
+   
+   public function Controller_Library(&$Sender) {
+      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+      $Sender->Render($this->GetResource('js/library.js'));
+   }
+   
+   public function Controller_Bundle(&$Sender) {
+      if (!class_exists('ZipArchive')) die('No zip archive tools!');
+      
+      $ExternalPath = $this->GetResource('external',FALSE,TRUE);
+      $Files = scandir($ExternalPath);
+      
+      $Resources = array();
+      $NeededResources = array_fill_keys(array('vanillaconnect', 'oauth'), array());
+      foreach ($Files as $Filename) {
+         foreach ($NeededResources as $ResourceFragment => &$ResourceFileList) {
+            $FN = CombinePaths(array($ExternalPath,$Filename));
+            if (!is_dir($FN) && preg_match("/{$ResourceFragment}/i",$Filename)) {
+               $ResourceFileList[] = $FN;
+            }
+         }
+         unset($ResourceFileList);
+      }
+      
+      // Reorder to match NeededResources
+      foreach ($NeededResources as $ResourceName => $FileList)
+         if (is_array($FileList) && sizeof($FileList))
+            foreach ($FileList as $FilePath)
+               $Resources[] = $this->_StripLibraryTags($FilePath);
+      
+      $SuperData = "<?php\n" . implode("\n\n", $Resources) . "\n?>";
+      
+      $Zip = new ZipArchive();
+      $ZipFile = CombinePaths(array(PATH_CACHE,'vanillaconnect.php.zip'));
+      if (file_exists($ZipFile)) 
+         unlink($ZipFile);
+         
+      if ($Zip->open($ZipFile, ZIPARCHIVE::CREATE) !== TRUE)
+         die('Could not create archive!');
+      
+      $Zip->addFromString('vanillaconnect.php', $SuperData);
+      $Zip->close();
+      
+      try {
+         Gdn_FileSystem::ServeFile($ZipFile, 'vanillaconnect.php.zip');
+      } catch (Exception $e) {
+         throw new Exception('File could not be streamed: missing file ('.$ZipFile.').');
+      }
+            
+      exit();
+   }
+   
+   protected function _StripLibraryTags($Filename) {
+      if (!file_exists($Filename)) return '';
+      $FileData = file($Filename);
+      
+      // Strip opening PHP tag
+      if (trim($FileData[0]) == '<?php')
+         array_shift($FileData);
+         
+      // Strip ending PHP tag
+      $Index = sizeof($FileData) - 1;
+      while ($Index > 0) {
+         if (trim($FileData[$Index]) == '?>') {
+            array_pop($FileData);
+            break;
+         }
+         
+         if (trim($FileData[$Index]) == '')
+            array_pop($FileData);
+         else
+            break;
+            
+         $Index--;
+      }
+      
+      return implode("", $FileData);
+   }
 
    public function EntryController_Handshake_Create(&$Sender) {
+		// Don't show anything if not enabled
+		if (!C('Plugins.VanillaConnect.Enabled'))
+			return FALSE;
+
       $Sender->AddJsFile('entry.js');
       
       $Sender->Form->SetModel($Sender->UserModel);
@@ -117,7 +205,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
          if (ArrayValue('StopLinking', $FormValues)) {
          
             $Authenticator->DeleteCookie();
-            Gdn::Request()->WithURI('DefaultController');
+            Gdn::Request()->WithRoute('DefaultController');
             return Gdn::Dispatcher()->Dispatch();
             
          } elseif (ArrayValue('NewAccount', $FormValues)) {
@@ -206,24 +294,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    }
    
    public function Setup() {
-      SaveToConfig('Garden.Authenticators.handshake.CookieName', 'VanillaHandshake');
-      SaveToConfig('Garden.Authenticators.handshake.TokenLifetime', 0);
-      
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      array_push($EnabledSchemes, 'handshake');
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
-      
-      Gdn_FileCache::SafeCache('library','class.handshakeauthenticator.php',$this->GetResource('class.handshakeauthenticator.php'));
-      
-      // Create a provider key/secret pair if needed
-      $SQL = Gdn::Database()->SQL();
-      $Provider = $SQL->Select('uap.*')
-         ->From('UserAuthenticationProvider uap')
-         ->Get()
-         ->FirstRow(DATASET_TYPE_ARRAY);
-         
-      if (!$Provider)
-         $this->_CreateProviderModel();
+		// Do nothing
    }
    
    protected function _CreateProviderModel() {
@@ -247,23 +318,51 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       $ProviderModel->Insert($Provider = array(
          'AuthenticationKey'           => $Key,
          'AuthenticationSchemeAlias'   => 'handshake',
+         'URL'                         => 'Enter your site url',
          'AssociationSecret'           => $Secret,
-         'URL'                         => '',
          'AssociationHashMethod'       => 'HMAC-SHA1'
       ));
       
       return $Provider; 
    }
    
-   public function OnDisable() {
+   private function _Disable() {
+		RemoveFromConfig('Garden.SignIn.Popup');
+		RemoveFromConfig('Plugins.VanillaConnect.Enabled');
+		RemoveFromConfig('Garden.Authenticator.DefaultScheme');
       RemoveFromConfig('Garden.Authenticators.handshake.CookieName');
       RemoveFromConfig('Garden.Authenticators.handshake.TokenLifetime');
 
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      while (($HandshakeKey = array_search('handshake', $EnabledSchemes)) !== FALSE) {
+      foreach (array_keys($EnabledSchemes, array('handshake', 'proxy')) as $HandshakeKey) {
          unset($EnabledSchemes[$HandshakeKey]);
       }
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
    }
-   
+	
+	private function _Enable() {
+		SaveToConfig('Garden.SignIn.Popup', FALSE);
+		SaveToConfig('Plugins.VanillaConnect.Enabled', TRUE);
+		SaveToConfig('Garden.Authenticator.DefaultScheme', 'handshake');
+      SaveToConfig('Garden.Authenticators.handshake.CookieName', 'VanillaHandshake');
+      SaveToConfig('Garden.Authenticators.handshake.TokenLifetime', 0);
+      
+      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      array_push($EnabledSchemes, 'handshake');
+      array_push($EnabledSchemes, 'proxy');
+      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+      
+      Gdn_FileCache::SafeCache('library','class.handshakeauthenticator.php',$this->GetResource('class.handshakeauthenticator.php'));
+      Gdn_FileCache::SafeCache('library','class.proxyauthenticator.php',$this->GetResource('class.proxyauthenticator.php'));
+      
+      // Create a provider key/secret pair if needed
+      $SQL = Gdn::Database()->SQL();
+      $Provider = $SQL->Select('uap.*')
+         ->From('UserAuthenticationProvider uap')
+         ->Get()
+         ->FirstRow(DATASET_TYPE_ARRAY);
+         
+      if (!$Provider)
+         $this->_CreateProviderModel();
+	}  
 }

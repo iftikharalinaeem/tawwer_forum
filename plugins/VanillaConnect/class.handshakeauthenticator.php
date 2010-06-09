@@ -14,7 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * @author Tim Gunter <tim@vanillaforums.com>
  * @package Garden
  */
-require_once(implode(DS, array(PATH_LIBRARY,'vendors','OAuth','OAuth.php')));
+require_once(implode(DS, array(PATH_LIBRARY,'vendors','oauth','OAuth.php')));
 
 class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
 
@@ -88,16 +88,19 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
       } else {
 
          $RequestArguments = array(
-            'oauth_consumer_key'      => $ConsumerKey,
-            'oauth_version'           => $Version,
-            'oauth_timestamp'         => $Timestamp,
-            'oauth_nonce'             => $Nonce,
-            'oauth_signature_method'  => $SignatureMethod,
-            'oauth_signature'         => $Signature,
+            'oauth_consumer_key'       => $ConsumerKey,
+            'oauth_version'            => $Version,
+            'oauth_timestamp'          => $Timestamp,
+            'oauth_nonce'              => $Nonce,
+            'oauth_signature_method'   => $SignatureMethod,
+            'oauth_signature'          => $Signature,
+            'email'                    => $UserEmail,
+            'name'                     => $UserName,
+            'uid'                      => $UserID
          );
-   
+         
          try {
-            $OAuthRequest = OAuthRequest::from_request(NULL, NULL, $RequestArguments);
+            $OAuthRequest = OAuthRequest::from_request('GET', Url('/entry/auth/handshake/handshake.js',TRUE), $RequestArguments);
             $Token = $this->_OAuthServer->fetch_request_token($OAuthRequest);
          } catch (Exception $e) {
             return Gdn_Authenticator::AUTH_DENIED;
@@ -113,7 +116,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
          'name'         => $UserName,
          'uid'          => $UserID
       );
-      $SerializedCookiePayload = serialize($CookiePayload);
+      $SerializedCookiePayload = Gdn_Format::Serialize($CookiePayload);
       
       $this->AssociateRemoteKey($ConsumerKey, $UserEmail, $TokenKey);
 
@@ -125,15 +128,15 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
        * Just go directly to creating an access token and authenticating it with a normal vanilla identity cookie.
        */
       if ($HaveToken['UserID']) {
-         
          $this->ProcessAuthorizedRequest($CookiePayload, TRUE);
          return Gdn_Authenticator::AUTH_SUCCESS;
       } else {
          
-         if (Gdn::Request()->Filename() == 'handshake.js')
+         if (Gdn::Request()->Filename() == 'handshake.js') {
             return Gdn_Authenticator::AUTH_PARTIAL;
-         else
+         } else {
             return Gdn_Authenticator::AUTH_SUCCESS;
+         }
       }
    }
    
@@ -158,11 +161,30 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
    }
 
    public function DeAuthenticate() {
-      $SignOutURL = Gdn::Authenticator()->SignOutUrl();
-      Gdn::Authenticator()->SetIdentity(NULL);
+      $ConsumerKey = $this->GetValue('ConsumerKey');
+      $Nonce = $this->GetValue('Nonce');
+      $Signature = $this->GetValue('Signature');
+      $SignatureMethod = $this->GetValue('SignatureMethod');
+      $Timestamp = $this->GetValue('Timestamp');
+      $Version = $this->GetValue('Version');
       
-      // Redirect to the external signout url
-      Redirect($SignOutURL);
+      $RequestArguments = array(
+         'oauth_consumer_key'      => $ConsumerKey,
+         'oauth_version'           => $Version,
+         'oauth_timestamp'         => $Timestamp,
+         'oauth_nonce'             => $Nonce,
+         'oauth_signature_method'  => $SignatureMethod,
+         'oauth_signature'         => $Signature,
+      );
+
+      try {
+         $OAuthRequest = OAuthRequest::from_request(NULL, NULL, $RequestArguments);
+      } catch (Exception $e) {
+         return Gdn_Authenticator::AUTH_DENIED;
+      }
+      
+      Gdn::Authenticator()->SetIdentity(NULL);
+      return Gdn_Authenticator::AUTH_SUCCESS;
    }
    
    public function LoginResponse() {
@@ -191,6 +213,10 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
          return Gdn_Authenticator::REACT_REMOTE;
       else
          return Gdn_Authenticator::REACT_EXIT;
+   }
+   
+   public function RequireLogoutTransientKey() {
+      return FALSE;
    }
    
    public function AssociateRemoteKey($ConsumerKey, $UserKey, $TokenKey, $UserID = 0) {
@@ -441,6 +467,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
    
    public function GetHandshakeCookie() {
       $HaveHandshake = Gdn_CookieIdentity::CheckCookie($this->_CookieName);
+      
       if ($HaveHandshake) {
          // Found a handshake cookie, sweet. Get the payload.
          $Payload = Gdn_CookieIdentity::GetCookiePayload($this->_CookieName);
@@ -450,7 +477,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
          array_shift($Payload);
          
          // Rebuild the real payload
-         $ReconstitutedCookiePayload = unserialize(array_shift($Payload));
+         $ReconstitutedCookiePayload = Gdn_Format::Unserialize(TrueStripSlashes(array_shift($Payload)));
          
          return $ReconstitutedCookiePayload;
       }
@@ -497,7 +524,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
    public function WakeUp() {
       $this->FetchData(Gdn::Request());
       $CurrentStep = $this->CurrentStep();
-
+      
       // Shortcircuit to prevent pointless work when the access token has already been handled and we already have a session 
       if ($CurrentStep == Gdn_Authenticator::MODE_REPEAT)
          return;
@@ -505,13 +532,13 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
       // Don't try to wakeup when the URL contains an OAuth request
       if ($CurrentStep == Gdn_Authenticator::MODE_VALIDATE)
          return;
-         
+      
       if (Gdn::Request()->Filename() == 'handshake.js')
          return;
       
       // Look for handshake cookies
       $Payload = $this->GetHandshakeCookie();
-
+      
       if ($Payload) {
          // Process the cookie auth
          $this->ProcessAuthorizedRequest($Payload);

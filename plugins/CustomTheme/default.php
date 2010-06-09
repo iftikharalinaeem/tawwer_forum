@@ -34,8 +34,8 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		// If we are using the default master view, and in preview mode, use custom css & html files
 		$DoPreview = Gdn::Session()->GetPreference('PreviewCustomTheme', FALSE);
 		$CSSFile = C('Plugins.CustomTheme.PreviewCSS', '');
+		$CssFiles = GetValue('CssFiles', $Sender->EventArguments);
 		if ($CSSFile != '' && $DoPreview && ($Sender->MasterView == 'default' || $Sender->MasterView == '')) {
-			$CssFiles = GetValue('CssFiles', $Sender->EventArguments);
 			// If there is custom css, and we are not supposed to include theme-based css files...
 			if (C('Plugins.CustomTheme.IncludeThemeCSS', 'Yes') == 'No') {
 				foreach ($CssFiles as $k => $v) {
@@ -46,13 +46,17 @@ class CustomThemePlugin implements Gdn_IPlugin {
 				}
 			} else {
 				foreach ($CssFiles as $k => $v) {
-					if (GetValue('FileName', $v) == 'custom.css') {
+					if (GetValue('FileName', $v) == 'customtheme.css') {
 						unset($CssFiles[$k]);
 						array_merge($CssFiles);
 					}
 				}
 			}
-			$CssFiles[] = array('FileName' => $CSSFile, 'AppFolder' => 'turds');
+			$CssFiles[] = array('FileName' => $CSSFile, 'AppFolder' => 'false');
+			$Sender->EventArguments['CssFiles'] = $CssFiles;
+		} else if ($Sender->MasterView == 'default' || $Sender->MasterView == '') {
+			// Add the customtheme.css file
+			$CssFiles[] = array('FileName' => 'customtheme.css', 'AppFolder' => 'false');
 			$Sender->EventArguments['CssFiles'] = $CssFiles;
 		}
 	}
@@ -193,6 +197,7 @@ Here are some things you should know before you begin:
 				$CurrentThemeFolder = $DestFolder;
 				$DestFolder = PATH_THEMES . DS . $DestFolder;
 				recurse_copy($Folder, $DestFolder);
+				@unlink(CombinePaths(array($DestFolder, 'screenshot.png'), '/')); // Get rid of screenshots
 				$Folder = $DestFolder;
 				SaveToConfig('Garden.Theme', $CurrentThemeFolder);
 			}
@@ -220,9 +225,9 @@ Here are some things you should know before you begin:
 			if (in_array($IncludeThemeCSS, array('Yes', 'No'))) 
 				SaveToConfig('Plugins.CustomTheme.IncludeThemeCSS', $IncludeThemeCSS);
 			
-			// If we are applying the changes, copy the current revs over the custom.css & default.master.tpl			
+			// If we are applying the changes, copy the current revs over the customtheme.css & default.master.tpl			
 			if ($IsApply || $IsApplyPreview) {
-				file_put_contents($Folder . DS . 'design'. DS . 'custom.css', $NewCSS);
+				file_put_contents($Folder . DS . 'design'. DS . 'customtheme.css', $NewCSS);
 				file_put_contents($Folder . DS . 'views'. DS . 'default.master.tpl', $NewHtml);
 				SaveToConfig('Plugins.CustomTheme.EnabledCSS', $PreviewCSSFile);
 				SaveToConfig('Plugins.CustomTheme.EnabledHtml', $PreviewHtmlFile);
@@ -234,7 +239,6 @@ Here are some things you should know before you begin:
 			// Only keep the last 20 revs
 			clean_revisions(PATH_THEMES . DS . $CurrentThemeFolder, 'css');
 			clean_revisions(PATH_THEMES . DS . $CurrentThemeFolder, 'html');
-			
 
 			// TODO: HANDLE PREVIEWS
 			if ($IsPreview) {
@@ -285,85 +289,87 @@ Here are some things you should know before you begin:
 
 }
 
-function safecss_class() {
-	// Wrapped so we don't need the parent class just to load the plugin
-	if (class_exists('safecss'))
-		return;
-
-	require_once('csstidy/class.csstidy.php');
-	class safecss extends csstidy_optimise {
-		var $tales = array();
-		var $props_w_urls = array('background', 'background-image', 'list-style', 'list-style-image');
-		var $allowed_protocols = array('http');
-
-		function __construct(&$css) {
-			return $this->csstidy_optimise($css);
-		}
-
-		function postparse() {
-			if ( !empty($this->parser->import) ) {
-				$this->tattle("Import attempt:\n".print_r($this->parser->import,1));
-				$this->parser->import = array();
+if (!function_exists('safecss_class')) {
+	function safecss_class() {
+		// Wrapped so we don't need the parent class just to load the plugin
+		if (class_exists('safecss'))
+			return;
+	
+		require_once('csstidy/class.csstidy.php');
+		class safecss extends csstidy_optimise {
+			var $tales = array();
+			var $props_w_urls = array('background', 'background-image', 'list-style', 'list-style-image');
+			var $allowed_protocols = array('http');
+	
+			function __construct(&$css) {
+				return $this->csstidy_optimise($css);
 			}
-			if ( !empty($this->parser->charset) ) {
-				$this->tattle("Charset attempt:\n".print_r($this->parser->charset,1));
-				$this->parser->charset = array();
+	
+			function postparse() {
+				if ( !empty($this->parser->import) ) {
+					$this->tattle("Import attempt:\n".print_r($this->parser->import,1));
+					$this->parser->import = array();
+				}
+				if ( !empty($this->parser->charset) ) {
+					$this->tattle("Charset attempt:\n".print_r($this->parser->charset,1));
+					$this->parser->charset = array();
+				}
+				return parent::postparse();
 			}
-			return parent::postparse();
-		}
-
-		function subvalue() {
-			$this->sub_value = trim($this->sub_value);
-
-			// Send any urls through our filter
-			if ( preg_match('!^\\s*url\\s*(?:\\(|\\\\0028)(.*)(?:\\)|\\\\0029).*$!Dis', $this->sub_value, $matches) )
-				$this->sub_value = $this->clean_url($matches[1]);
-
-			// Strip any expressions
-			if ( preg_match('!^\\s*expression!Dis', $this->sub_value) ) {
-				$this->tattle("Expression attempt: $this->sub_value");
-				$this->sub_value = '';
+	
+			function subvalue() {
+				$this->sub_value = trim($this->sub_value);
+	
+				// Send any urls through our filter
+				if ( preg_match('!^\\s*url\\s*(?:\\(|\\\\0028)(.*)(?:\\)|\\\\0029).*$!Dis', $this->sub_value, $matches) )
+					$this->sub_value = $this->clean_url($matches[1]);
+	
+				// Strip any expressions
+				if ( preg_match('!^\\s*expression!Dis', $this->sub_value) ) {
+					$this->tattle("Expression attempt: $this->sub_value");
+					$this->sub_value = '';
+				}
+	
+				return parent::subvalue();
 			}
-
-			return parent::subvalue();
-		}
-
-		function clean_url($url) {
-			// Clean up the string
-			$url = trim($url, "' \" \r \n");
-
-			// Check against whitelist for properties allowed to have URL values
-			if ( ! in_array($this->property, $this->props_w_urls) ) {
-				$this->tattle('URL in illegal property ' . $this->property . ":\n$url");
-				return '';
+	
+			function clean_url($url) {
+				// Clean up the string
+				$url = trim($url, "' \" \r \n");
+	
+				// Check against whitelist for properties allowed to have URL values
+				if ( ! in_array($this->property, $this->props_w_urls) ) {
+					$this->tattle('URL in illegal property ' . $this->property . ":\n$url");
+					return '';
+				}
+	
+				$url = wp_kses_bad_protocol_once($url, $this->allowed_protocols);
+	
+				if ( empty($url) ) {
+					$this->tattle('URL empty');
+					return '';
+				}
+	
+				return "url('$url')";
 			}
-
-			$url = wp_kses_bad_protocol_once($url, $this->allowed_protocols);
-
-			if ( empty($url) ) {
-				$this->tattle('URL empty');
-				return '';
-			}
-
-			return "url('$url')";
-		}
-
-		function tattle($msg, $send=false) {
-			if ( $msg )
-				$this->tales [] = $msg;
-
-			if ( $send && $this->tales ) {
-				try {
-					$SiteID = Gdn::Config('VanillaForums.SiteID', '');
-					$Session = Gdn::Session();
-					$E = new Gdn_Email();
-					$E->Subject = '[Custom CSS]';
-					$E->Message = 'SiteID: '.$SiteID."\nUserID: ".$Session->UserID."\n".implode("\n", $this->tales);
-					$E->To = 'support@vanillaforums.com';
-					$E->From('customcss@vanillaforums.com', 'Custom CSS Attack');
-					$E->Send();
-				} catch(Exception $ex) {
-					// do nothing
+	
+			function tattle($msg, $send=false) {
+				if ( $msg )
+					$this->tales [] = $msg;
+	
+				if ( $send && $this->tales ) {
+					try {
+						$SiteID = Gdn::Config('VanillaForums.SiteID', '');
+						$Session = Gdn::Session();
+						$E = new Gdn_Email();
+						$E->Subject = '[Custom CSS]';
+						$E->Message = 'SiteID: '.$SiteID."\nUserID: ".$Session->UserID."\n".implode("\n", $this->tales);
+						$E->To = 'support@vanillaforums.com';
+						$E->From('customcss@vanillaforums.com', 'Custom CSS Attack');
+						$E->Send();
+					} catch(Exception $ex) {
+						// do nothing
+					}
 				}
 			}
 		}

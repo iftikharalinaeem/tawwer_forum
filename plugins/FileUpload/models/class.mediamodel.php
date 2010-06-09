@@ -67,4 +67,21 @@ class MediaModel extends VanillaModel {
 		return $Data;
    }
    
+   public function Delete($Media) {
+      $MediaID = FALSE;
+      if (is_a($Media, 'stdClass'))
+         $Media = (array)$Media;
+            
+      if (is_numeric($Media)) 
+         $MediaID = $Media;
+      elseif (array_key_exists('MediaID', $Media))
+         $MediaID = $Media['MediaID'];
+      
+      if ($MediaID) {
+         $this->SQL->Delete($this->Name, array('MediaID' => $MediaID), FALSE);
+      } else {
+         $this->SQL->Delete($this->Name, $Media, FALSE);
+      }
+   }
+   
 }

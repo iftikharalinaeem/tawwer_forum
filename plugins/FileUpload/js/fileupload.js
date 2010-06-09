@@ -105,9 +105,10 @@ var Gdn_MultiFileUpload = Class.create({
       NewUploader.name  = NewUploaderID;
       NewUploader.id    = NewUploaderID;
       NewUploader.className = 'HiddenFileInput';
-      $(NewUploader).fadeTo(0,0);
-      $(UploaderForm).append(NewUploader);
-      this.AlignUploader(NewUploader);
+      NewUploader.rel = FormName;
+      $(NewUploader).css('opacity',0);
+      $('#'+this.AttachFileLinkID).parent().append(NewUploader);
+      //this.AlignUploader(NewUploader);
       
       var MaxUploadSize = document.createElement('input');
       MaxUploadSize.type = 'hidden';
@@ -129,12 +130,14 @@ var Gdn_MultiFileUpload = Class.create({
       $('#'+this.CurrentInput).change(jQuery.proxy(this.DispatchCurrentUploader,this));
    },
    
+/*
    AlignUploader: function(Uploader) {
       var Offset = $('#'+this.AttachFileLinkID).offset();
       $(Uploader).offset(Offset);
       $(Uploader).css('top', (parseInt(Offset.top) - 5)+'px');
       $(Uploader).css('width', parseInt($('#'+this.AttachFileLinkID).width())+'px');
    },
+*/
    
    // Create a new named iframe to which our uploads can be submitted
    NewFrame: function(TargetUploaderID) {
@@ -159,6 +162,7 @@ var Gdn_MultiFileUpload = Class.create({
    // Submit the form parent of the current uploader and hide the current uploader's input
    DispatchCurrentUploader: function(ChangeEvent) {
       var Target = $(ChangeEvent.target);
+      $('#'+Target.attr('rel')).append(Target);
       var UploaderID = Target.attr('id');
       this.RememberFile(Target);
       var IFrameName = Target.parent().attr('target');
@@ -185,16 +189,19 @@ var Gdn_MultiFileUpload = Class.create({
       
       // Handle the file list UI
       var FileListContainer = $('#'+this.FileContainerID);
-      var PrototypeFileListing = $($(FileListContainer).find('tr')[0]).clone();
-      var PrototypeFileListingElements = PrototypeFileListing.find('td');
-      $(PrototypeFileListingElements[2]).html(FileName);
-      $(PrototypeFileListingElements[3]).html('? Kb');
-      $($(PrototypeFileListingElements[4]).find('div')[1]).css('width','0px');
+      var PrototypeFileAttachment = $($(FileListContainer).find('div.FileAttachment')[0]).clone();
+		var FileNameDiv = $(PrototypeFileAttachment).find('div.FileName');
+		var FileSizeDiv = $(PrototypeFileAttachment).find('div.FileSize');
+		var ProgressDiv = $(PrototypeFileAttachment).find('div.UploadProgress');
+      $(FileNameDiv).html(FileName);
+      $(FileSizeDiv).html('? Kb');
+      $($(ProgressDiv).find('div.Background')).css('width','0px');
       
       var FileListingID = [FileInput.attr('id'),'listing'].join('_');
-      PrototypeFileListing.attr('id', FileListingID);
-      PrototypeFileListing.appendTo(FileListContainer);
-      PrototypeFileListing.css('display','table-row');
+      PrototypeFileAttachment.attr('id', FileListingID);
+		PrototypeFileAttachment.css('display', 'block');
+      PrototypeFileAttachment.appendTo(FileListContainer);
+      // PrototypeFileAttachment.css('display','table-row');
       
       this.Progress(FileInput.attr('id'));
       
@@ -214,9 +221,11 @@ var Gdn_MultiFileUpload = Class.create({
          var JData = jQuery.parseJSON(Data);
          if (JData && JData.Progress) {
             var JProgress = JData.Progress;
-            var Progress = JProgress.progress;
             var UploaderID = JProgress.uploader;
             
+            if (!this.ProgressBars[UploaderID]) return;
+            
+            var Progress = JProgress.progress;
             this.ProgressBars[UploaderID].Progress = Progress;
             this.ProgressBars[UploaderID].Total = JProgress.total;
 
@@ -224,13 +233,18 @@ var Gdn_MultiFileUpload = Class.create({
 
             // Update the filesize
             if (JProgress.total != null) {
-               $(FileListing.find('td')[3]).html(JProgress.format_total);
+               $(FileListing.find('div.FileSize')).html(JProgress.format_total);
             }
             
             // Update progress bar
             if (!this.ProgressBars[UploaderID].Complete) {
-               var ProgressBar = FileListing.find('div.ProgressTicker');
-               ProgressBar.css('width',Progress+'%');
+					var UploadProgress = FileListing.find('div.UploadProgress');
+					var ProgressForeground = FileListing.find('div.UploadProgress div.Foreground');
+               var ProgressBackground = FileListing.find('div.UploadProgress div.Background');
+					ProgressForeground.html('<strong>Uploading:</strong> ' + Math.ceil(Progress)+'%');
+               ProgressBackground.css('width', ((Progress * $(UploadProgress).width()) / 100)+'px');
+               // if (Progress >= 15)
+               // 	ProgressBar.html(Math.ceil(Progress)+'%');
             }
             
          }
@@ -270,32 +284,55 @@ var Gdn_MultiFileUpload = Class.create({
       
       var JResponse = jQuery.parseJSON(Response);
       if (JResponse && JResponse.MediaResponse) {
-         var Filename = JResponse.MediaResponse.Filename;
-         var MediaID = JResponse.MediaResponse.MediaID;
-         
-         if (this.ProgressBars[TargetUploaderID]) {
-            if (this.ProgressBars[TargetUploaderID].Filename == Filename) {
-               this.ProgressBars[TargetUploaderID].Complete = true;
-               this.MyFiles[MediaID] = Filename;
-               this.RemoveUploader(TargetUploaderID);
-               var EnableMe = document.createElement('input');
-               EnableMe.type = 'checkbox';
-               EnableMe.name = 'AttachedUploads[]';
-               EnableMe.value = MediaID;
-               EnableMe.checked = 'checked';
-               
-               var TrackAll = document.createElement('input');
-               TrackAll.type = 'hidden';
-               TrackAll.name = 'AllUploads[]';
-               TrackAll.value = MediaID;
-               
-               
-               var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
-               $(FileListing.find('td')[1]).append(EnableMe);
-               $(FileListing.find('td')[1]).append(TrackAll);
-               $(FileListing.find('td')[4]).find('div').remove();
-               
-            }
+      
+         if (JResponse.MediaResponse.Status == 'success') {
+            // SUCCESS
+            
+            var Filename = JResponse.MediaResponse.Filename;
+            if (!this.ProgressBars[TargetUploaderID]) return;
+            if (this.ProgressBars[TargetUploaderID].Filename != Filename) return;
+            
+            var MediaID = JResponse.MediaResponse.MediaID;
+            this.ProgressBars[TargetUploaderID].Complete = true;
+            this.MyFiles[MediaID] = Filename;
+            this.RemoveUploader(TargetUploaderID);
+            var EnableMe = document.createElement('input');
+            EnableMe.type = 'checkbox';
+            EnableMe.name = 'AttachedUploads[]';
+            EnableMe.value = MediaID;
+            EnableMe.checked = 'checked';
+            
+            var TrackAll = document.createElement('input');
+            TrackAll.type = 'hidden';
+            TrackAll.name = 'AllUploads[]';
+            TrackAll.value = MediaID;
+            
+            var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
+            $(FileListing.find('div.FileOptions')).append(EnableMe);
+            $(FileListing.find('div.FileOptions')).append(TrackAll);
+            $(FileListing.find('div.UploadProgress')).remove();
+            
+         } else {
+            // FAILURE
+            
+            clearTimeout(this.ProgressBars[TargetUploaderID].TimerID);
+            this.RemoveUploader(TargetUploaderID);
+            
+            var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
+            FileListing.html("File upload failed. Reason: "+JResponse.MediaResponse.StrError);
+            FileListing.css({
+               'background-color':'#ffbfbf',
+               'color':'#a70000',
+               'padding-left':'20px',
+               'background-position':'8px center',
+               'cursor':'pointer'
+            });
+            FileListing.click(function(){FileListing.remove();});
+            setTimeout(function(){
+               FileListing.fadeTo(1500,0,function(){ FileListing.animate({'height':0},600,function(){ FileListing.remove(); }) });
+            },6000);
+            delete this.ProgressBars[TargetUploaderID];
+            
          }
       }
    },

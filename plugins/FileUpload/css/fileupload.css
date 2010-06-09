@@ -30,15 +30,33 @@ div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td {
 }
 
 div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.ProgressBar {
-   width: 100px;
+   width: 126px;
    border: 2px solid gray;
    background-color: lightgrey;
    height: 14px;
+   background: transparent url('../images/progress_base.gif') no-repeat center left;
+   border: 0px;
 }
 
 div.AttachFileWrapper table.AttachFileContainer tr.FileAttachment td div.ProgressBar div.ProgressTicker {
    height: 100%;
    background-color: lime;
+   background: transparent url('../images/progress_active.gif') no-repeat center left;
+   line-height: 14px;
+   font-size: 10px;
+   color: #444444;
+   padding-right: 2px;
+   text-align: right;
+}
+
+div.AttachFileWrapper div.AttachFileLink {
+   position: relative;
+}
+
+div.AttachFileWrapper div.AttachFileLink input {
+   position: absolute;
+   top: 0px;
+   left: 0px;
 }
 
 div.AttachFileWrapper div.NewAttachment {
@@ -103,4 +121,42 @@ div.Attachments table.AttachFileContainer {
 div.Attachments table.AttachFileContainer tr td {
    padding: 3px;
    vertical-align: middle;
+}
+
+li div.FileUploadBlock {
+   margin-bottom:       10px;
+}
+
+li div.FileUploadBlock h1 {
+   margin-bottom:       0px;
+}
+
+li div.FileUploadBlock div.Detail {
+   font-style:          italic;
+}
+
+li table.FileUploadTable th {
+   background-color:    white;
+}
+
+li table.FileUploadTable td:first-child {
+   width:               150px;
+}
+
+li table.FileUploadTable td em {
+   font-style:          italic;
+   font-size:           80%;
+}
+div.FileAttachment {
+   background: url('../images/gear.png') center left no-repeat;
+   padding-left: 14px;
+}
+div.FileOptions,
+div.FileName,
+div.FileSize {
+   display: inline;
+   margin-right: 6px;
+}
+div.UploadProgress {
+   display: inline-block;
 }

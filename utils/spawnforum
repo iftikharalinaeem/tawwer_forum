@@ -51,18 +51,24 @@ if [ ! -d "$PATH" ]; then
     # Core Package Plugins
     /bin/ln -s "${SOURCE}plugins/VanillaInThisDiscussion" "${PATH}plugins/VanillaInThisDiscussion"
     /bin/ln -s "${SOURCE}plugins/HtmlPurifier" "${PATH}plugins/HtmlPurifier"
+    /bin/ln -s "${SOURCE}plugins/Gravatar" "${PATH}plugins/Gravatar"
     # End Core Package Plugins
     
     # Custom VF.com Plugins
-    /bin/ln -s "${PLUGINS}GettingStarted" "${PATH}plugins/GettingStarted"
+    /bin/ln -s "${PLUGINS}GettingStartedHosting" "${PATH}plugins/GettingStartedHosting"
     /bin/ln -s "${PLUGINS}googleadsense" "${PATH}plugins/googleadsense"
     /bin/ln -s "${PLUGINS}vfoptions" "${PATH}plugins/vfoptions"
-    /bin/ln -s "${PLUGINS}CustomCSS" "${PATH}plugins/CustomCSS"
+    /bin/ln -s "${PLUGINS}CustomTheme" "${PATH}plugins/CustomTheme"
+    /bin/ln -s "${PLUGINS}CustomDomain" "${PATH}plugins/CustomDomain"
+    /bin/ln -s "${PLUGINS}FileUpload" "${PATH}plugins/FileUpload"
+    /bin/ln -s "${PLUGINS}VanillaConnect" "${PATH}plugins/VanillaConnect"
     # End Custom VF.com Plugins
 
     # Themes
-    /bin/ln -s "${THEMES}vfcom" "${PATH}themes/default"
-    /bin/ln -s "${THEMES}vfcom" "${PATH}themes/vfcom"
+    /bin/ln -s "${THEMES}defaultsmarty" "${PATH}themes/default"
+    /bin/ln -s "${THEMES}minalla-yellow" "${PATH}themes/minalla"
+    /bin/ln -s "${THEMES}light-grunge" "${PATH}themes/light-grunge"
+    /bin/ln -s "${THEMES}iVanilla" "${PATH}themes/iVanilla"
     # End Themes
         
     # Misc Symlinks

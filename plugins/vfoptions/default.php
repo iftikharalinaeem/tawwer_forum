@@ -25,7 +25,11 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 */
 
    public function Base_BeforeUserOptionsMenu_Handler($Sender) {
-      echo Anchor('My Account', 'dashboard/settings/myaccount', 'MyAccountLink');
+		$Url = 'https://vanillaforums.com/account';
+		if (strpos(Gdn::Request()->Domain(), 'vanilladev') !== FALSE)
+         $Url = 'https://www.vanilladev.com/account/';
+
+      echo Anchor('My Account', $Url, 'MyAccountLink');
    }
    
    /**
@@ -38,23 +42,29 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       
       $Menu->AddItem('Dashboard', T('Dashboard'));
       $Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
-      $Menu->AddLink('Dashboard', 'My Forums', 'dashboard/plugin/myforums', 'Garden.Settings.GlobalPrivs');
 
       $Menu->AddItem('Appearance', T('Appearance'));
 		$Menu->AddLink('Appearance', T('Banner <span class="New">New</span>'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
       $Menu->AddLink('Appearance', T('Themes'), 'dashboard/settings/themes', 'Garden.Themes.Manage');
-      $Menu->AddLink('Appearance', 'Custom Theme <span class="New">New</span>', 'settings/customtheme', 'Garden.AdminUser.Only');
+		if (C('EnabledPlugins.CustomCSS'))
+	      $Menu->AddLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
+			
+		if (C('EnabledPlugins.CustomTheme'))
+	      $Menu->AddLink('Appearance', 'Custom Theme <span class="New">New</span>', 'settings/customtheme', 'Garden.AdminUser.Only');
+			
       $Menu->AddLink('Appearance', T('Messages'), 'dashboard/message', 'Garden.Messages.Manage');
 		
       $Menu->AddItem('Users', T('Users'));
       $Menu->AddLink('Users', T('Users'), 'dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
 		$Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Roles.Manage');
-			
       if (C('Garden.Registration.Manage', TRUE))
 			$Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Registration.Manage');
 			
       if (C('Garden.Registration.Method') == 'Approval')
          $Menu->AddLink('Users', T('Applicants'), 'dashboard/user/applicants', 'Garden.Applicants.Manage');
+
+		if (C('EnabledPlugins.VanillaConnect'))
+			$Menu->AddLink('Users', 'Vanilla Connect <span class="New">New</span>', 'settings/vanillaconnect', 'Garden.AdminUser.Only');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'));
       $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
@@ -85,7 +95,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             .' | '
             .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New'));
          $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'float: right;')));
-         $Sender->AddCssFile('plugins/vfoptions/vfcomoptions.css', 'dashboard');
+         $Sender->AddCssFile('plugins/vfoptions/design/vfoptions.css', 'dashboard');
       }
       
       // Redirect if the domain in the url doesn't match that in the config (so
@@ -179,7 +189,7 @@ pageTracker._trackPageview();
 
             if ($Form->ErrorCount() == 0) {
                $Sender->StatusMessage = T("The forum was created successfully.");
-               $Sender->RedirectUrl = 'http://'.$Subdomain.$HostingDomain.'/dashboard/setup/first';
+               $Sender->RedirectUrl = 'http://'.$Subdomain.$HostingDomain.'/dashboard/settings/applyplan';
             }
          }
          
@@ -338,7 +348,6 @@ pageTracker._trackPageview();
    /**
     * Creates a "My Forums" management screen where users can review, add, and
     * rename their forums.
-    */
    public function PluginController_MyForums_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('My Forums');
@@ -354,6 +363,7 @@ pageTracker._trackPageview();
       
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'myforums.php');
    }
+    */
 
    /**
     * Creates a "Remove Upgrade" screen where users can remove previously
@@ -529,122 +539,85 @@ pageTracker._trackPageview();
    }
    
    /**
-    * Creates a "Thank You" page that users can be directed to after they have
-    * purchased upgrades.
-   public function PluginController_ThankYou_Create(&$Sender, $EventArguments) {
-      $this->_ReAuthenticate($Sender, 'dashboard/plugin/thankyou');
-      $Sender->Title('Premium Upgrades &raquo; Thank You!');
-      $Sender->AddSideMenu('dashboard/plugin/upgrades');
-      
-      // Update the SiteFeature table so that all selected items are now marked active
-      $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
-      $this->_GetDatabase()->SQL()->Put('SiteFeature', array('Active' => '1'), array('SiteID' => $SiteID, 'Selected' => '1'));
-      
-      // For the "Getting Started" Plugin. Record that they've purchased an upgrade.
-      SaveToConfig('Plugins.GettingStarted.Upgrades', '1');
-      
-      // Now apply upgrades
-      $this->_ApplyUpgrades();
-      
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'thankyou.php');
-   }
-    */
-   
-   /**
-    * Creates a "Premium Upgrades" management screen where users can review &
-    * purchase upgrade offerings.
-   public function PluginController_Upgrades_Create(&$Sender, $EventArguments) {
-      $FirstArg = ArrayValue('0', $Sender->RequestArgs, '');
-      $SecondArg = ArrayValue('1', $Sender->RequestArgs, '');
-      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
-      $VFUser = FALSE;
-      if (in_array($FirstArg, array('unsubscribe', 'subscribe')) && Gdn::Session()->ValidateTransientKey($SecondArg)) {
-         $this->_GetDatabase()->SQL()
-            ->Update('User')
-            ->Set('Newsletter', $FirstArg == 'subscribe' ? '1' : '0')
-            ->Where('UserID', $VFUserID)
-            ->Put();
-            
-         // Update the record at campaign monitor
-         try {
-            $VFUser = $this->_GetDatabase()->SQL()->Select('Name, Email, Newsletter')->From('User')->Where('UserID', $VFUserID)->Get()->FirstRow();
-            if ($VFUser) {
-               require_once(PATH_PLUGINS . DS . 'vfoptions' . DS . 'vendors' . DS . 'campaignmonitor-php-1.4.5' . DS . 'CMBase.php');
-               //Your API Key. Go to http://www.campaignmonitor.com/api/required/ to see where to find this and other required keys
-               $ApiKey = '32d4abc2fcdfa50e8358f221789df6b6';
-               $ClientID = NULL;
-               $CampaignID = NULL;
-               $ListID = 'c0238d79753b05c04383c9dacef81446';
-               $CM = new CampaignMonitor($ApiKey, $ClientID, $CampaignID, $ListID);
-               //Optional statement to include debugging information in the result
-               //$cm->debug_level = 1;
-               //This is the actual call to the method, passing email address, name.
-               $result = $FirstArg == 'subscribe' ? $CM->subscriberAdd($VFUser->Email, $VFUser->Name, NULL, TRUE) : $CM->subscriberUnsubscribe($VFUser->Email);
-            }
-         } catch (Exception $Ex) {
-            // Do nothing with the exception (fail quietly)
-         }
-            
-         Redirect('plugin/upgrades');
-      }
-      $this->_ReAuthenticate($Sender, 'dashboard/plugin/upgrades');
-      $Sender->Permission('Garden.AdminUser.Only');
-      $Sender->Title('Premium Upgrades');
-      $Sender->AddCssFile('/plugins/vfoptions/style.css');
-      $Sender->AddSideMenu('dashboard/plugin/upgrades');
-      $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
-      // Reset upgrade selections
-      $SiteFeatureData = $this->_GetDatabase()->SQL()->Select('SiteFeatureID, Active')->From('SiteFeature')->Where('SiteID', $SiteID)->Get();
-      foreach ($SiteFeatureData as $SiteFeature) {
-         $this->_GetDatabase()->SQL()->Put('SiteFeature', array('Selected' => $SiteFeature->Active), array('SiteFeatureID' => $SiteFeature->SiteFeatureID));
-      }
+    * Grabs the features for this site from the vfcom database and makes sure
+    * that their db status matches their actual status (enables or disables
+    * them). This may redirect away if required (ie. the domain has been changed).
+	*/ 
+   public function SettingsController_ApplyPlan_Create() {
+		$PluginManager = Gdn::Factory('PluginManager');
+
+		// Define all of the features to be enabled/disabled
+		$Features = array();
+		// Old A-La-Carte features
+		$Features['customdomain'] = array('CustomDomain');
+		$Features['customcss'] = array('CustomCSS', 'CustomTheme'); // Munge these two upgrades
+		$Features['adremoval'] = array('NoAds');
 		
-		// Load all of the features for price comparison.
-		$Prices = $this->_GetDatabase()->SQL()->Select('Code, Price')->From('Feature')->Get()->ResultArray();
-		$Prices = ConsolidateArrayValuesByKey($Prices, 'Code', 'Price');
-		$Sender->SetData('Prices', $Prices);
+		// Plans
+		$Features['free'] = array();
+		$Features['basic'] = array(
+			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
+			'CustomDomain'
+		);
+		$Features['plus'] = array(
+			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
+			'CustomDomain', 'CustomTheme', 'PrivateCommunity', 'VanillaConnect',
+			'Backups'
+		);
+		$Features['premium'] = array(
+			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
+			'CustomDomain', 'CustomTheme', 'PrivateCommunity', 'VanillaConnect',
+			'Backups', 'FileUpload', 'SpamControl'
+		);
+
+      // See what plan the site has
+      $SiteID = C('VanillaForums.SiteID', '0');
+      $FeatureData = $this->_GetDatabase()->SQL()
+         ->Select('sf.*, f.Name, f.Code')
+         ->From('SiteFeature sf')
+         ->Join('Feature f', 'sf.FeatureID = f.FeatureID')
+         ->Where('sf.SiteID', $SiteID)
+         ->Get();
       
-      // See if the admin is subscribed to the newsletter
-      if (!$VFUser)
-         $VFUser = $this->_GetDatabase()->SQL()->Select('Newsletter')->From('User')->Where('UserID', $VFUserID)->Get()->FirstRow();
-         
-      $Sender->Newsletter = $VFUser ? $VFUser->Newsletter : '0';
-      
-      $View = Gdn::Config('Plugins.VFOptions.UpgradeView', 'upgrades.php');
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . $View);
+		$ApplyFeatures = array();   
+      foreach ($FeatureData as $Feature) {
+			$Items = GetValue($Feature->Code, $Features);
+			if (is_array($Items))
+				$ApplyFeatures = array_merge($ApplyFeatures, $Items);
+		}
+
+		// No Advertisements - This is polarized (enabling this feature means turning off the ads plugin).
+		$IsEnabled = C('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
+		$IsInPlan = in_array('NoAds', $ApplyFeatures);
+		if ($IsInPlan && !$IsEnabled) {
+			$PluginManager->DisablePlugin('GoogleAdSense');
+		} else if (!$IsInPlan && $IsEnabled) {
+			$PluginManager->EnablePlugin('GoogleAdSense');
+		}
+		// Other features
+		$this->_ApplyFeature('CustomTheme', array('CustomTheme'), $PluginManager); // Everyone gets CustomTheme plugin turned on
+		// But only paying customers get it fully enabled
+		$IsInPlan = in_array('CustomTheme', $ApplyFeatures);
+		if ($IsInPlan)
+			SaveToConfig('Plugins.CustomTheme.Enabled', TRUE);
+		else
+			RemoveFromConfig('Plugins.CustomTheme.Enabled');
+
+		$this->_ApplyFeature('CustomCSS', $ApplyFeatures, $PluginManager);
+		$this->_ApplyFeature('CustomDomain', $ApplyFeatures, $PluginManager);
+		// BannerLogo
+		$this->_ApplyConfig('BannerLogo', $ApplyFeatures, 'VanillaForums.BannerLogo.CanUpload');
+		$this->_ApplyFeature('VanillaConnect', $ApplyFeatures, $PluginManager);
+		$this->_ApplyFeature('FileUpload', $ApplyFeatures, $PluginManager);
+		$this->_ApplyConfig('UserManagement', $ApplyFeatures, 'Garden.Roles.Manage');
+		$this->_ApplyConfig('UserManagement', $ApplyFeatures, 'Garden.Registration.Manage');
+		// TODO: PrivateCommunity
+		// TODO: Backups
+		// TODO: SpamControl
+
+		Redirect('/dashboard/settings');
    }
-    */
-   
-   /**
-    * Redirect to the user's account page when accessing this url.
-    */
-   public function SettingsController_MyAccount_Create($Sender) {
-      $AccountUrl = 'https://www.vanillaforums.com/myaccount/';
-      $SiteID = C('VanillaForums.SiteID', 0);
-      $Site = $this->_GetDatabase()->SQL()
-         ->Select()
-         ->From('Site')
-         ->Where('SiteID', $SiteID)
-         ->Get()
-         ->FirstRow();      
-      if (is_object($Site)) {
-         // Point at vanilladev.com if that's where this site is managed
-         if (strpos($Site->Name, 'vanilladev') !== FALSE)
-            $UpdateUrl = 'https://www.vanilladev.com/myaccount/';
-      }
-      
-      // Set the transient key for authentication on the other side
-      $this->_SetTransientKey($Site);
-      
-      // Close any open db connections
-      $this->_CloseDatabase();
-      
-      // Redirect
-      $SiteUrl = $Site->Domain == '' ? $Site->Name : $Site->Domain;
-      $Session = Gdn::Session();
-      Redirect($UpdateUrl.$SiteID.'/'.$Session->TransientKey());
-   }
-   
+
    /**
     * Don't let the users access the items under the "Add-ons" menu section of
     * the dashboard: applications & plugins (themes was moved to the "
@@ -654,9 +627,13 @@ pageTracker._trackPageview();
       if (
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
-      ) Redirect('/dashboard/home/permission');
+      ) {
+			if (defined('DEBUG'))
+				$Sender->AddAsset('Content', '<span style="color: red; font-weight: bold;">REDIRECT</span>');
+			else
+				Redirect('/dashboard/home/permission');
+		}
       
-      // TODO: ONLY USE A DIFFERENT VIEW IF THE USER IS ON THE FREE PLAN (FREE PLAN CANNOT UPLOAD LOGO).
       if ($Sender->RequestMethod == 'banner')
          $Sender->View = PATH_PLUGINS.'/vfoptions/views/banner.php';
    }
@@ -753,171 +730,25 @@ pageTracker._trackPageview();
     */
    public function Setup() {}
    
-   /**
-    * Grabs the features for this site from the vfcom database and makes sure
-    * that their db status matches their actual status (enables or disables
-    * them). This may redirect away if required (ie. the domain has been changed).
-   private function _ApplyUpgrades() {
-      $Redirect = '';
-      
-      // Get all upgrades for this site
-      $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
-      $FeatureData = $this->_GetDatabase()->SQL()
-         ->Select('sf.*, f.Name, f.Code')
-         ->From('SiteFeature sf')
-         ->Join('Feature f', 'sf.FeatureID = f.FeatureID')
-         ->Where('sf.SiteID', $SiteID)
-         ->Get();
-         
-      foreach ($FeatureData as $Feature) {
-
-// --== AD REMOVAL ==--
-
-         if ($Feature->Code == 'adremoval') {
-            $IsEnabled = Gdn::Config('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
-            if ($Feature->Active == '1' && !$IsEnabled) {
-               // ---- ENABLE ----
-               $PluginManager = Gdn::Factory('PluginManager');
-               $PluginManager->DisablePlugin('GoogleAdSense');
-            } else if ($Feature->Active == '0' && $IsEnabled) {
-               // ---- DISABLE ----
-               $Conf = PATH_CONF . DS . 'config.php';
-               $Contents = file_get_contents($Conf);
-               $Contents = str_replace(
-                  "\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';\n",
-                  '',
-                  $Contents
-               );
-               $Contents = str_replace(
-                  "// EnabledPlugins",
-                  "// EnabledPlugins
-\$Configuration['EnabledPlugins']['GoogleAdSense'] = 'googleadsense';",
-                  $Contents
-               );
-               
-               file_put_contents($Conf, $Contents);
-            }
-            
-// --== Custom CSS ==--
-
-         } else if ($Feature->Code == 'customcss') {
-            $IsEnabled = Gdn::Config('Plugins.CustomCSS.Enabled');
-            if ($Feature->Active == '1' && !$IsEnabled) {
-               // ---- ENABLE ----
-               SaveToConfig('Plugins.CustomCSS.Enabled', TRUE);
-            } else if ($Feature->Active == '0' && $IsEnabled) {
-               // ---- DISABLE ----
-               SaveToConfig('Plugins.CustomCSS.Enabled', FALSE);
-            }
-
-// --== CUSTOM DOMAINS ==--
-
-         } else if ($Feature->Code == 'customdomain') {
-            $Attributes = Gdn_Format::Unserialize($Feature->Attributes);
-            $Domain = ArrayValue('Domain', $Attributes, '');
-            $OldDomain = str_replace(array('http://', '/'), array('', ''), Gdn::Config('Garden.Domain', ''));
-            $IsEnabled = $Domain == $OldDomain ? TRUE : FALSE;
-            if ($Feature->Active == '1' && !$IsEnabled) {
-               // ---- ENABLE ----
-               if ($Domain != '' && !file_exists('/srv/www/vhosts/'.$Domain)) {
-                  $FQDN = PrefixString('http://', $Domain);
-                  $Error = FALSE;
-                  try {
-                     $Response = ProxyRequest($FQDN);
-                     $ExpectedResponse = ProxyRequest('http://reserved.vanillaforums.com');               
-                  } catch(Exception $e) {
-                     $Error = TRUE;
-                     // Don't do anything with the exception
-                  }
-                  if (!$Error && $Response == $ExpectedResponse) {
-                     // It is pointing at the correct place, so...
-                     // Create the symlink folder
-                     exec('/bin/ln -s "/srv/www/vhosts/'.$OldDomain.'" "/srv/www/vhosts/'.$Domain.'"');
-                     
-                     // Make sure it exists
-                     if (file_exists('/srv/www/vhosts/'.$Domain)) {
-                        // Change the domain in the conf file
-                        $CookieDomain = substr($Domain, strpos($Domain, '.'));
-                        $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
-                        $Contents = str_replace(
-                           array(
-                              "\$Configuration['Garden']['Cookie']['Domain'] = '".Gdn::Config('Garden.Cookie.Domain')."';",
-                              "\$Configuration['Garden']['Domain'] = '".$OldDomain."';"
-                           ),
-                           array(
-                              "\$Configuration['Garden']['Cookie']['Domain'] = '$CookieDomain';",
-                              "\$Configuration['Garden']['Domain'] = '$Domain';"
-                           ),
-                           $Contents
-                        );
-                        file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
-                        
-                        // Update the domain in the VanillaForums.GDN_Site table
-                        $this->_GetDatabase()->SQL()->Put(
-                           'Site',
-                           array(
-                              'Domain' => $Domain,
-                              'Path' => '/srv/www/vhosts/'.$Domain
-                           ),
-                           array('SiteID' => Gdn::Config('VanillaForums.SiteID'))
-                        );
-                        
-                        // Redirect to the new domain
-                        $Session = Gdn::Session();
-                        $Redirect = $FQDN.'/dashboard/plugin/thankyou/auth/'.$Session->TransientKey();
-                     }
-                  }
-               }
-            } else if ($Feature->Active == '0' && $IsEnabled) {
-               // ---- DISABLE ----
-               $Site = $this->_GetDatabase()->SQL()->Select()->From('Site')->Where('SiteID', $SiteID)->Get()->FirstRow();
-               
-               if (is_object($Site) && $Site->Domain != '') {
-                  // Update the Site record to remove the domain entry & revert the path
-                  $this->_GetDatabase()->SQL()->Put(
-                     'Site',
-                     array(
-                        'Domain' => '',
-                        'Path' => '/srv/www/vhosts/'.$Site->Name
-                     ),
-                     array('SiteID' => $SiteID)
-                  );
-                  
-                  // Update the config file
-                  $CookieDomain = substr($Site->Name, strpos($Site->Name, '.'));
-                  $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
-                  $Contents = str_replace(
-                     array(
-                        "\$Configuration['Garden']['Cookie']['Domain'] = '".Gdn::Config('Garden.Cookie.Domain')."';",
-                        "\$Configuration['Garden']['Domain'] = '".Gdn::Config('Garden.Domain')."';"
-                     ),
-                     array(
-                        "\$Configuration['Garden']['Cookie']['Domain'] = '$CookieDomain';",
-                        "\$Configuration['Garden']['Domain'] = '".$Site->Name."';"
-                     ),
-                     $Contents
-                  );
-                  file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
-                  
-                  // Remove the symlinked folder
-                  // WARNING: Do not use a trailing slash on symlinked folders when rm'ing, or it will remove the source!
-                  $SymLinkedFolder = '/srv/www/vhosts/'.$Site->Domain;
-                  if (file_exists($SymLinkedFolder))
-                     unlink($SymLinkedFolder);
-                  
-                  // Redirect to the new domain
-                  $Session = Gdn::Session();
-                  $Redirect = 'http://'.$Site->Name.'/dashboard/plugin/upgrades/auth/'.$Session->TransientKey();
-               }
-            }
-         }
-      }
-      if ($Redirect != '') {
-         $this->_CloseDatabase();
-         Redirect($Redirect);
-      }
-   }
-    */
+	private function _ApplyFeature($FeatureName, $Features, $PluginManager) {
+		$IsEnabled = C('EnabledPlugins.'.$FeatureName);
+		$IsInPlan = in_array($FeatureName, $Features);
+		if ($IsInPlan && !$IsEnabled) {
+			$PluginManager->EnablePlugin($FeatureName);
+		} else if (!$IsInPlan && $IsEnabled) {
+			$PluginManager->DisablePlugin($FeatureName);
+		}
+	}
+	
+	private function _ApplyConfig($FeatureName, $Features, $ConfigSetting) {
+		$IsEnabled = C($ConfigSetting);
+		$IsInPlan = in_array($FeatureName, $ApplyFeatures);
+		if ($IsInPlan && !$IsEnabled) {
+			SaveToConfig($ConfigSetting, TRUE);
+		} else if (!$IsInPlan && $IsEnabled) {
+			RemoveFromConfig($ConfigSetting);
+		}
+	}
    
    /**
     * Opens a connection to the VanillaForums.com database.
@@ -926,7 +757,7 @@ pageTracker._trackPageview();
    private function _GetDatabase() {
       if (!is_object($this->_Database)) {
          $this->_Database = new Gdn_Database(array(
-            'Name' => Gdn::Config('VanillaForums.Database.Name', 'vanillaforumscom'),
+            'Name' => Gdn::Config('VanillaForums.Database.Name', 'vfcom'),
             'Host' => Gdn::Config('Database.Host'),
             'User' => Gdn::Config('Database.User'),
             'Password' => Gdn::Config('Database.Password')
