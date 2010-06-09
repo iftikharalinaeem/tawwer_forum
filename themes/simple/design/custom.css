@@ -174,7 +174,7 @@ body #Head h1 {
 
 ul#Menu {
 	float:left;
-	padding:30px 700px 0 0;
+	padding:30px 0 0 0;
 	width:900px;
 }
 
@@ -210,6 +210,14 @@ ul#Menu {
 #Menu a:hover {
 	color:#fff;
    background: #00BAFF;
+}
+
+#Menu a span, #Menu li.Active a span, #Menu li.Highlight a:hover span {
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	background:#069BCD ;
+	border:1px solid #069BCD ;
+	color:#fff;
 }
 
 div.Tabs div.SubTab {
@@ -401,6 +409,11 @@ ul.Activities ul.DataList li {
 ul.Activities li.CommentForm input.Button {
 	-moz-box-shadow:0 0 0px #fff;
 	font-size:12px;
+}
+
+ul.Activities div.ItemContent {
+	padding:5px;
+	width:631px;
 }
 
 /* ==================================================== New Conversation Form */

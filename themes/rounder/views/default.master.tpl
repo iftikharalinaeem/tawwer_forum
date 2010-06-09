@@ -31,11 +31,11 @@
                     {if $User.SignedIn}
                        <li>
                          <a href="{link path="messages/inbox"}">Inbox
-                         {if $User.CountUnreadConversations}<span>{$User.CountUnreadConversations}</span>{/if}</a>
+                         {if $User.CountUnreadConversations} <span>{$User.CountUnreadConversations}</span>{/if}</a>
                        </li>
                        <li>
                          <a href="{link path="profile"}">{$User.Name}
-                         {if $User.CountNotifications}<span>{$User.CountNotifications}</span>{/if}</a>
+                         {if $User.CountNotifications} <span>{$User.CountNotifications}</span>{/if}</a>
                        </li>
                     {/if}
                     {custom_menu}

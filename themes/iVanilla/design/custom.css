@@ -187,6 +187,16 @@ body #Head h1 {
 	color: #ffffff;
 }
 
+#nav  a span, #nav  li.Active a span, #nav  li.Highlight a:hover span {
+
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	background:#00BAFF;
+	border:1px solid #00BAFF;
+	color:#fff;
+	padding:1px;
+	font-size:9px;
+}
 
 div.Tabs div.SubTab {
 	background:#fff;
