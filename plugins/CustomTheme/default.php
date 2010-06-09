@@ -76,7 +76,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 	}
 	
    public function SettingsController_CustomTheme_Create(&$Sender, $EventArguments) {
-		require_once('kses.php');
+		require_once(PATH_PLUGINS.DS.'CustomTheme'.DS.'kses.php');
 		$Session = Gdn::Session();
 		$UserModel = Gdn::UserModel();
       $Sender->Permission('Garden.AdminUser.Only');
