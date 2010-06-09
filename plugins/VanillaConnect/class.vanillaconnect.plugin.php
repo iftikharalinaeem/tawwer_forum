@@ -16,7 +16,7 @@ $PluginInfo['VanillaConnect'] = array(
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
-   'SettingsUrl' => '/dashboard/plugin/vanillaconnect',
+   'SettingsUrl' => '/dashboard/settings/vanillaconnect',
    'SettingsPermission' => 'Garden.AdminUser.Only',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -32,15 +32,14 @@ class VanillaConnectPlugin extends Gdn_Plugin {
     */
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddItem('Authentication', 'Authentication');
-      $Menu->AddLink('Authentication', 'Vanilla Connect', 'plugin/vanillaconnect', 'Garden.AdminUser.Only');
+      $Menu->AddLink('Users', 'Vanilla Connect', 'settings/vanillaconnect', 'Garden.AdminUser.Only');
    }
    
-   public function PluginController_VanillaConnect_Create(&$Sender, $EventArguments) {
+   public function SettingsController_VanillaConnect_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
 		
       $Sender->Title('Vanilla Connect');
-      $Sender->AddSideMenu('plugin/vanillaconnect');
+      $Sender->AddSideMenu('settings/vanillaconnect');
 		$Sender->AddCssFile('/plugins/VanillaConnect/vanillaconnect.css');
 		$Sender->Form = new Gdn_Form();
 		$this->Dispatch($Sender, $Sender->RequestArgs);
@@ -89,7 +88,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
 			} else {
 				$this->_Enable();
 			}
-			Redirect('plugin/vanillaconnect');
+			Redirect('settings/vanillaconnect');
 		}
    }
    

@@ -1,0 +1,27 @@
+.MyAccountLink {
+	border: 1px solid #0f7fe6;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	background: url('bg-button-blue.png') top left repeat-x;
+	color: #003673;
+	text-shadow: 0 1px 0 #b7f5fd;
+	font-weight: bold;
+	font-size: 12px;
+	text-decoration: none;
+	padding: 6px 10px;
+	cursor: pointer;
+}
+.MyAccountLink:hover {
+	border: 1px solid #0B64c6;
+	color: #001F44;
+	text-shadow: 0 1px 0 #EFF;
+   box-shadow: 0 0 2px #3241DD;
+	-moz-box-shadow: 0 0 2px #3241DD;
+	-webkit-box-shadow: 0 0 2px #3241DD;
+}
+.MyAccountLink:focus {
+	background: #81cff6;
+	border: 1px solid #0B64c6;
+	color: #001F44;
+	text-shadow: 0 1px 0 #EFF;
+}

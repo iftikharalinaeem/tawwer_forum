@@ -42,23 +42,29 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       
       $Menu->AddItem('Dashboard', T('Dashboard'));
       $Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
-      $Menu->AddLink('Dashboard', 'My Forums', 'dashboard/plugin/myforums', 'Garden.Settings.GlobalPrivs');
 
       $Menu->AddItem('Appearance', T('Appearance'));
 		$Menu->AddLink('Appearance', T('Banner <span class="New">New</span>'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
       $Menu->AddLink('Appearance', T('Themes'), 'dashboard/settings/themes', 'Garden.Themes.Manage');
-      $Menu->AddLink('Appearance', 'Custom Theme <span class="New">New</span>', 'settings/customtheme', 'Garden.AdminUser.Only');
+		if (C('EnabledPlugins.CustomCSS'))
+	      $Menu->AddLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
+			
+		if (C('EnabledPlugins.CustomTheme'))
+	      $Menu->AddLink('Appearance', 'Custom Theme <span class="New">New</span>', 'settings/customtheme', 'Garden.AdminUser.Only');
+			
       $Menu->AddLink('Appearance', T('Messages'), 'dashboard/message', 'Garden.Messages.Manage');
 		
       $Menu->AddItem('Users', T('Users'));
       $Menu->AddLink('Users', T('Users'), 'dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
 		$Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Roles.Manage');
-			
       if (C('Garden.Registration.Manage', TRUE))
 			$Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Registration.Manage');
 			
       if (C('Garden.Registration.Method') == 'Approval')
          $Menu->AddLink('Users', T('Applicants'), 'dashboard/user/applicants', 'Garden.Applicants.Manage');
+
+		if (C('EnabledPlugins.VanillaConnect'))
+			$Menu->AddLink('Users', 'Vanilla Connect <span class="New">New</span>', 'settings/vanillaconnect', 'Garden.AdminUser.Only');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'));
       $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
@@ -89,7 +95,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             .' | '
             .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New'));
          $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'float: right;')));
-         $Sender->AddCssFile('plugins/vfoptions/vfcomoptions.css', 'dashboard');
+         $Sender->AddCssFile('plugins/vfoptions/design/vfoptions.css', 'dashboard');
       }
       
       // Redirect if the domain in the url doesn't match that in the config (so
@@ -342,7 +348,6 @@ pageTracker._trackPageview();
    /**
     * Creates a "My Forums" management screen where users can review, add, and
     * rename their forums.
-    */
    public function PluginController_MyForums_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('My Forums');
@@ -358,6 +363,7 @@ pageTracker._trackPageview();
       
       $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'myforums.php');
    }
+    */
 
    /**
     * Creates a "Remove Upgrade" screen where users can remove previously
@@ -542,18 +548,26 @@ pageTracker._trackPageview();
 
 		// Define all of the features to be enabled/disabled
 		$Features = array();
+		// Old A-La-Carte features
+		$Features['customdomain'] = array('CustomDomain');
+		$Features['customcss'] = array('CustomCSS', 'CustomTheme'); // Munge these two upgrades
+		$Features['adremoval'] = array('NoAds');
+		
+		// Plans
 		$Features['free'] = array();
 		$Features['basic'] = array(
-			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo'
+			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
+			'CustomDomain'
 		);
 		$Features['plus'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
-			'CustomTheme', 'PrivateCommunity', 'VanillaConnect', 'Backups'
+			'CustomDomain', 'CustomTheme', 'PrivateCommunity', 'VanillaConnect',
+			'Backups'
 		);
 		$Features['premium'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
-			'CustomTheme', 'PrivateCommunity', 'VanillaConnect', 'Backups',
-			'FileUpload', 'SpamControl'
+			'CustomDomain', 'CustomTheme', 'PrivateCommunity', 'VanillaConnect',
+			'Backups', 'FileUpload', 'SpamControl'
 		);
 
       // See what plan the site has
@@ -564,38 +578,43 @@ pageTracker._trackPageview();
          ->Join('Feature f', 'sf.FeatureID = f.FeatureID')
          ->Where('sf.SiteID', $SiteID)
          ->Get();
-         
+      
+		$ApplyFeatures = array();   
       foreach ($FeatureData as $Feature) {
 			$Items = GetValue($Feature->Code, $Features);
-			if (is_array($Items)) {
+			if (is_array($Items))
+				$ApplyFeatures = array_merge($ApplyFeatures, $Items);
+		}
 
-				// No Advertisements - This is polarized (enabling this feature means turning off the ads plugin).
-				$IsEnabled = C('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
-				$IsInPlan = in_array('NoAds', $Items);
-				if ($IsInPlan && !$IsEnabled) {
-					$PluginManager->DisablePlugin('GoogleAdSense');
-				} else if (!$IsInPlan && $IsEnabled) {
-					$PluginManager->EnablePlugin('GoogleAdSense');
-				}
-            // Other features
-				$this->_ApplyFeature('CustomTheme', $Items, $PluginManager);
-				$this->_ApplyFeature('CustomDomain', $Items, $PluginManager);
-				// BannerLogo
-				$IsEnabled = C('VanillaForums.BannerLogo.CanUpload');
-				$IsInPlan = in_array('BannerLogo', $Items);
-				if ($IsInPlan && !$IsEnabled) {
-					SaveToConfig('VanillaForums.BannerLogo.CanUpload', TRUE);
-				} else if (!$IsInPlan && $IsEnabled) {
-					RemoveFromConfig('VanillaForums.BannerLogo.CanUpload');
-				}
-				$this->_ApplyFeature('VanillaConnect', $Items, $PluginManager);
-				$this->_ApplyFeature('FileUpload', $Items, $PluginManager);
-				// TODO: UserManagement
-				// TODO: PrivateCommunity
-				// TODO: Backups
-				// TODO: SpamControl
-         }
-      }
+		// No Advertisements - This is polarized (enabling this feature means turning off the ads plugin).
+		$IsEnabled = C('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
+		$IsInPlan = in_array('NoAds', $ApplyFeatures);
+		if ($IsInPlan && !$IsEnabled) {
+			$PluginManager->DisablePlugin('GoogleAdSense');
+		} else if (!$IsInPlan && $IsEnabled) {
+			$PluginManager->EnablePlugin('GoogleAdSense');
+		}
+		// Other features
+		$this->_ApplyFeature('CustomTheme', array('CustomTheme'), $PluginManager); // Everyone gets CustomTheme plugin turned on
+		// But only paying customers get it fully enabled
+		$IsInPlan = in_array('CustomTheme', $ApplyFeatures);
+		if ($IsInPlan)
+			SaveToConfig('Plugins.CustomTheme.Enabled', TRUE);
+		else
+			RemoveFromConfig('Plugins.CustomTheme.Enabled');
+
+		$this->_ApplyFeature('CustomCSS', $ApplyFeatures, $PluginManager);
+		$this->_ApplyFeature('CustomDomain', $ApplyFeatures, $PluginManager);
+		// BannerLogo
+		$this->_ApplyConfig('BannerLogo', $ApplyFeatures, 'VanillaForums.BannerLogo.CanUpload');
+		$this->_ApplyFeature('VanillaConnect', $ApplyFeatures, $PluginManager);
+		$this->_ApplyFeature('FileUpload', $ApplyFeatures, $PluginManager);
+		$this->_ApplyConfig('UserManagement', $ApplyFeatures, 'Garden.Roles.Manage');
+		$this->_ApplyConfig('UserManagement', $ApplyFeatures, 'Garden.Registration.Method');
+		// TODO: PrivateCommunity
+		// TODO: Backups
+		// TODO: SpamControl
+
 		Redirect('/dashboard/settings');
    }
 
@@ -608,7 +627,12 @@ pageTracker._trackPageview();
       if (
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
-      ) $Sender->AddAsset('Content', '<span style="color: red; font-weight: bold;">REDIRECT</span>');// Redirect('/dashboard/home/permission');
+      ) {
+			if (defined('DEBUG'))
+				$Sender->AddAsset('Content', '<span style="color: red; font-weight: bold;">REDIRECT</span>');
+			else
+				Redirect('/dashboard/home/permission');
+		}
       
       // TODO: Logo upload is enabled if C('VanillaForums.BannerLogo.CanUpload') is TRUE.
       if ($Sender->RequestMethod == 'banners')
@@ -714,6 +738,16 @@ pageTracker._trackPageview();
 			$PluginManager->EnablePlugin($FeatureName);
 		} else if (!$IsInPlan && $IsEnabled) {
 			$PluginManager->DisablePlugin($FeatureName);
+		}
+	}
+	
+	private function _ApplyConfig($FeatureName, $Features, $ConfigSetting) {
+		$IsEnabled = C($ConfigSetting);
+		$IsInPlan = in_array($FeatureName, $ApplyFeatures);
+		if ($IsInPlan && !$IsEnabled) {
+			SaveToConfig($ConfigSetting, TRUE);
+		} else if (!$IsInPlan && $IsEnabled) {
+			RemoveFromConfig($ConfigSetting);
 		}
 	}
    

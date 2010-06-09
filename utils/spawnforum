@@ -40,6 +40,7 @@ if [ ! -d "$PATH" ]; then
     # Core Package Plugins
     /bin/ln -s "${SOURCE}plugins/VanillaInThisDiscussion" "${PATH}plugins/VanillaInThisDiscussion"
     /bin/ln -s "${SOURCE}plugins/HtmlPurifier" "${PATH}plugins/HtmlPurifier"
+    /bin/ln -s "${SOURCE}plugins/Gravatar" "${PATH}plugins/Gravatar"
     # End Core Package Plugins
     
     # Custom VF.com Plugins
