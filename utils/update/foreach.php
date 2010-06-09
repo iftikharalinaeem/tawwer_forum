@@ -64,17 +64,17 @@ class TaskList {
       closedir($TaskDirectory);
    }
    
-   public function RunAll($TaskOrder = NULL) {      
-      TaskList::MajorEvent("Running through client list...");
-      $FolderList = scandir($this->Clients);
-      if ($FolderList === FALSE || !is_array($FolderList)) {
+   public function RunAll($TaskOrder = NULL) {
+      if (($DirectoryHandle = @opendir($this->Clients)) === FALSE) {
          TaskList::MajorEvent("Could not open client folder.");
          return FALSE;
       }
-
+      
+      TaskList::MajorEvent("Running through client list...");
+      $FolderList = scandir($DirectoryHandle);
       foreach ($FolderList as $ClientFolder) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
-         //if (!is_dir($ClientFolder)) continue;
+         if (!is_dir($ClientFolder)) continue;
          
          $ClientInfo = $this->LookupClientByFolder($ClientFolder);
          TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
@@ -90,6 +90,7 @@ class TaskList {
                      
          TaskList::MajorEvent("");
       }
+      closedir($DirectoryHandle);
    }
    
    protected function LookupClientByFolder($ClientFolder) {
@@ -155,7 +156,7 @@ class TaskList {
    }
    
    public static function Symlink($Link, $Source = NULL) {
-      if (file_exists($Link))
+      if (file_exists($Link) || is_link($Link))
          if (!LAME) unlink($Link);
       
       if (!is_null($Source)) {
