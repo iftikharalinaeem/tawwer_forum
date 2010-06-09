@@ -56,7 +56,7 @@
       <tbody>
          <tr class="Alt">
             <td><?php echo T('Vanilla Forum URL'); ?></td>
-            <td class="Alt"><?php echo Gdn::Request()->Url('',TRUE); ?></td>
+            <td class="Alt"><?php echo Gdn::Request()->Url('/',TRUE); ?></td>
          </tr>
          <tr>
             <td><?php echo T('VanillaConnect Key'); ?></td>
