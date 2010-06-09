@@ -64,14 +64,14 @@ class TaskList {
       closedir($TaskDirectory);
    }
    
-   public function RunAll($TaskOrder = NULL) {
-      if (($DirectoryHandle = @opendir($this->Clients)) === FALSE) {
+   public function RunAll($TaskOrder = NULL) {      
+      TaskList::MajorEvent("Running through client list...");
+      $FolderList = scandir($this->Clients);
+      if ($FolderList === FALSE) {
          TaskList::MajorEvent("Could not open client folder.");
          return FALSE;
       }
-      
-      TaskList::MajorEvent("Running through client list...");
-      $FolderList = scandir($DirectoryHandle);
+
       foreach ($FolderList as $ClientFolder) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
          if (!is_dir($ClientFolder)) continue;
