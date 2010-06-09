@@ -750,7 +750,7 @@ pageTracker._trackPageview();
 	
 	private function _ApplyConfig($FeatureName, $Features, $ConfigSetting) {
 		$IsEnabled = C($ConfigSetting);
-		$IsInPlan = in_array($FeatureName, $ApplyFeatures);
+		$IsInPlan = in_array($FeatureName, $Features);
 		if ($IsInPlan && !$IsEnabled) {
 			SaveToConfig($ConfigSetting, TRUE);
 		} else if (!$IsInPlan && $IsEnabled) {
