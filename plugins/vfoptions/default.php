@@ -590,12 +590,12 @@ pageTracker._trackPageview();
 		}
 
 		// No Advertisements - This is polarized (enabling this feature means turning off the ads plugin).
-		$IsEnabled = C('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
+		$IsEnabled = C('EnabledPlugins.googleadsense', '') == '' ? TRUE : FALSE;
 		$IsInPlan = in_array('NoAds', $ApplyFeatures);
 		if ($IsInPlan && !$IsEnabled) {
-			$PluginManager->DisablePlugin('GoogleAdSense');
+			$PluginManager->DisablePlugin('googleadsense');
 		} else if (!$IsInPlan && $IsEnabled) {
-			$PluginManager->EnablePlugin('GoogleAdSense');
+			$PluginManager->EnablePlugin('googleadsense');
 		}
 		// Other features
 		$this->_ApplyFeature('CustomTheme', array('CustomTheme'), $PluginManager); // Everyone gets CustomTheme plugin turned on
