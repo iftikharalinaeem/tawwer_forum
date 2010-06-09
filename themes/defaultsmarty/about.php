@@ -17,5 +17,5 @@ $ThemeInfo['DefaultSmarty'] = array(
    'Version' => '1.0',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
+   'AuthorUrl' => 'http://vanillaforums.org/profile/todd'
 );
