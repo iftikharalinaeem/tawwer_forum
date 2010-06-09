@@ -610,7 +610,7 @@ pageTracker._trackPageview();
 		$this->_ApplyFeature('VanillaConnect', $ApplyFeatures, $PluginManager);
 		$this->_ApplyFeature('FileUpload', $ApplyFeatures, $PluginManager);
 		$this->_ApplyConfig('UserManagement', $ApplyFeatures, 'Garden.Roles.Manage');
-		$this->_ApplyConfig('UserManagement', $ApplyFeatures, 'Garden.Registration.Method');
+		$this->_ApplyConfig('UserManagement', $ApplyFeatures, 'Garden.Registration.Manage');
 		// TODO: PrivateCommunity
 		// TODO: Backups
 		// TODO: SpamControl
