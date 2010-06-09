@@ -8,19 +8,28 @@ class BackupTask extends Task {
       parent::__construct($ClientDir);
       
       $BackupDateString = date('Y-m-d');
-      $this->BackupPath = "/srv/backups/{$BackupDateString}";
+      $this->BackupPath = "/srv/backups/upgrade-{$BackupDateString}/vhosts";
       
-      if (!is_dir($this->BackupPath))
-         @mkdir($this->BackupPath);
-         
-      if (!is_dir($this->BackupPath)) {
-         TaskList::Event("Could not access or create the primary backup folder '{$this->BackupPath}'");
-         $Proceed = TaskList::Question("Would you like to continue anyway? 'yes' to continue, 'no' to halt the entire script:",
-            "Continue?", array('yes','no'), 'no');
+      $FolderParts = explode('/',$this->BackupPath);
+      for ($i = 0; $i < sizeof($FolderParts); $i++) {
+         $TryFolder = '/'.implode('/',array_slice($FolderParts, 0, $i+1));
+
+         if (!is_dir($TryFolder))
+            @mkdir($TryFolder);
+         else
+            continue;
             
-         if ($Proceed == 'skip') return;
-         if ($Proceed == 'no') exit();
+         if (!is_dir($TryFolder)) {
+            TaskList::Event("Could not access or create the primary backup folder '{$this->BackupPath}'. Failed at '{$TryFolder}'.");
+            $Proceed = TaskList::Question("Would you like to continue anyway? 'yes' to continue, 'no' to halt the entire script:",
+               "Continue?", array('yes','no'), 'no');
+               
+            if ($Proceed == 'skip') return;
+            if ($Proceed == 'no') exit();
+         }
       }
+      
+      die();
       
    }
    
