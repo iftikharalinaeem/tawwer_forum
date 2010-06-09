@@ -45,7 +45,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 
       $Menu->AddItem('Appearance', T('Appearance'));
 		$Menu->AddLink('Appearance', T('Banner <span class="New">New</span>'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
-      $Menu->AddLink('Appearance', T('Themes'), 'dashboard/settings/themes', 'Garden.Themes.Manage');
+      $Menu->AddLink('Appearance', T('Themes <span class="New">New</span>'), 'dashboard/settings/themes', 'Garden.Themes.Manage');
 		if (C('EnabledPlugins.CustomCSS'))
 	      $Menu->AddLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
 			
@@ -590,12 +590,12 @@ pageTracker._trackPageview();
 		}
 
 		// No Advertisements - This is polarized (enabling this feature means turning off the ads plugin).
-		$IsEnabled = C('EnabledPlugins.GoogleAdSense', '') == '' ? TRUE : FALSE;
+		$IsEnabled = C('EnabledPlugins.googleadsense', '') == '' ? TRUE : FALSE;
 		$IsInPlan = in_array('NoAds', $ApplyFeatures);
 		if ($IsInPlan && !$IsEnabled) {
-			$PluginManager->DisablePlugin('GoogleAdSense');
+			RemoveFromConfig('EnabledPlugins.googleadsense');
 		} else if (!$IsInPlan && $IsEnabled) {
-			$PluginManager->EnablePlugin('GoogleAdSense');
+			SaveToConfig('EnabledPlugins.googleadsense', 'googleadsense');
 		}
 		// Other features
 		$this->_ApplyFeature('CustomTheme', array('CustomTheme'), $PluginManager); // Everyone gets CustomTheme plugin turned on
@@ -749,13 +749,7 @@ pageTracker._trackPageview();
 	}
 	
 	private function _ApplyConfig($FeatureName, $Features, $ConfigSetting) {
-		$IsEnabled = C($ConfigSetting);
-		$IsInPlan = in_array($FeatureName, $ApplyFeatures);
-		if ($IsInPlan && !$IsEnabled) {
-			SaveToConfig($ConfigSetting, TRUE);
-		} else if (!$IsInPlan && $IsEnabled) {
-			RemoveFromConfig($ConfigSetting);
-		}
+		SaveToConfig($ConfigSetting, in_array($FeatureName, $Features) ? TRUE : FALSE);
 	}
    
    /**

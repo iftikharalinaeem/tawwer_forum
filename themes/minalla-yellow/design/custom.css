@@ -171,6 +171,16 @@ div.Preview {
 	background:#fff;
 }
 
+#Menu a span, #Menu li.Active a span, #Menu li.Highlight a:hover span {
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	background:#FFDE00;
+	border:1px solid #FFDE00;
+	color:#282828;
+}
+
+
+ 
 /* ============================================================= Entry Screen */
 body.Entry #Content {
 	float:left;

@@ -23,10 +23,9 @@
 			<div><a href="{link path="discussions"}"><span>Discussions</span></a></div>
 			<div><a href="{link path="activity"}"><span>Activity</span></a></div>
              {if $User.SignedIn}
-			<div><a href="{link path="messages/inbox"}"><span>Inbox{if $User.CountUnreadConversations}<span>{$User.CountUnreadConversations}</span>{/if}</span></a></div>
+			<div><a href="{link path="messages/inbox"}"> <span>Inbox{if $User.CountUnreadConversations}<span>{$User.CountUnreadConversations}</span>{/if}</span></a></div>
             
-            <div><a href="{link path="profile"}"><span>{$User.Name}</span>
-                         {if $User.CountNotifications}<span>{$User.CountNotifications}</span>{/if}</a></div>
+            <div><a href="{link path="profile"}"><span>{$User.Name}</span>{if $User.CountNotifications} <span>{$User.CountNotifications}</span>{/if}</a></div>
      {/if}
      {custom_menu}
       {if $User.SignedIn}

@@ -207,6 +207,14 @@ body #Head h1 {
    color: #B8E3F1 !important;
 }
 
+#Menu a span, #Menu li.Active a span, #Menu li.Highlight a:hover span {
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	background:#069BCD ;
+	border:1px solid #069BCD ;
+	color:#fff;
+}
+
 div.Tabs div.SubTab {
 	background:#f2f2f2;
 	font-family:Georgia, "Times New Roman", Times, serif;

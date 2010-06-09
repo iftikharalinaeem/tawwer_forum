@@ -7,6 +7,8 @@ require_once("configuration.php");
 
 class TaskList {
 
+   const NOBREAK = FALSE;
+   
    protected $Clients;
    protected $Tasks;
    protected $Database;
@@ -16,6 +18,9 @@ class TaskList {
       $this->Clients = $ClientDir;
       $this->Tasks = array();
       $this->Database = mysql_connect(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD); // Open the db connection
+      if (!$this->Database)
+         die("Could not connect to database as '".DATABASE_USER."'@'".DATABASE_HOST."'\n");
+         
       mysql_select_db(DATABASE_MAIN, $this->Database);
       
       TaskList::MajorEvent("Connected to ".DATABASE_MAIN." @ ".DATABASE_HOST);
@@ -43,7 +48,7 @@ class TaskList {
          
          foreach ($NewClasses as $Class) {
             if (is_subclass_of($Class, 'Task')) {
-               TaskList::Event("  ".strtolower($Class));
+               TaskList::Event(strtolower($Class));
                $NewTask = new $Class($ClientDir);
                $NewTask->Database = $this->Database;
                $this->Tasks[$Taskname] = array(
@@ -59,15 +64,17 @@ class TaskList {
       closedir($TaskDirectory);
    }
    
-   public function RunAll($TaskOrder = NULL) {
-      if (($DirectoryHandle = @opendir($this->Clients)) === FALSE) {
+   public function RunAll($TaskOrder = NULL) {      
+      TaskList::MajorEvent("Running through client list...");
+      $FolderList = scandir($this->Clients);
+      if ($FolderList === FALSE || !is_array($FolderList)) {
          TaskList::MajorEvent("Could not open client folder.");
          return FALSE;
       }
-      
-      TaskList::MajorEvent("Running through client list...");
-      while (($ClientFolder = readdir($DirectoryHandle)) !== FALSE) {
+
+      foreach ($FolderList as $ClientFolder) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
+         //if (!is_dir($ClientFolder)) continue;
          
          $ClientInfo = $this->LookupClientByFolder($ClientFolder);
          TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
@@ -83,11 +90,10 @@ class TaskList {
                      
          TaskList::MajorEvent("");
       }
-      closedir($DirectoryHandle);
    }
    
    protected function LookupClientByFolder($ClientFolder) {
-      $Query = "select * from GDN_Site where Name = '{$ClientFolder}'";
+      $Query = "SELECT * FROM GDN_Site WHERE Name = '{$ClientFolder}'";
       $Data = mysql_query($Query, $this->Database);
       if ($Data && mysql_num_rows($Data)) {
          $Row = mysql_fetch_assoc($Data);
@@ -159,19 +165,30 @@ class TaskList {
       }
    }
    
-   public static function MinorEvent($Message) {
-      if (VERBOSE) echo "    > {$Message}\n";
+   public static function MinorEvent($Message, $LineBreak = TRUE) {
+      if (VERBOSE) {
+         echo "    - {$Message}";
+         if ($LineBreak) echo "\n";
+      }
    }
    
-   public static function Event($Message) {
-      if (VERBOSE) echo "  - {$Message}\n";
+   public static function Event($Message, $LineBreak = TRUE) {
+      if (VERBOSE) {
+         echo "  {$Message}";
+         if ($LineBreak) echo "\n";
+      }
    }
    
-   public static function MajorEvent($Message) {
-      if (VERBOSE) echo "{$Message}\n";
+   public static function MajorEvent($Message, $LineBreak = TRUE) {
+      if (VERBOSE) {
+         echo "{$Message}";
+         if ($LineBreak) echo "\n";
+      }
+
    }
    
    public static function Question($Message, $Prompt, $Options, $Default) {
+      echo "\n";
       if ($Message)
          echo $Message."\n";
          

@@ -386,7 +386,6 @@ class Configuration {
       
       // Record who made the change and when
       if (is_array($NewLines)) {
-         $Session = Gdn::Session();
          $User = 'MassUpdater';
          $NewLines[] = '';
          $NewLines[] = '// Last edited by '.$User.' (localhost)' . TaskList::ToDateTime();
@@ -434,7 +433,7 @@ class Configuration {
             }
          } else {
             // If $Value is not an associative array, just write it like a simple array definition.
-            $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $Value);
+            $FormattedValue = array_map(array('TaskList', 'ArrayValueForPhp'), $Value);
             $Array[] = $Prefix .= " = array('".implode("', '", $FormattedValue)."');";
          }
       } elseif (is_int($Value)) {
