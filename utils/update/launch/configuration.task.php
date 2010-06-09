@@ -9,7 +9,10 @@ class ConfigurationTask extends Task {
    protected function Run() {
       TaskList::Event("Removing CustomCSS plugin from config");
       // Remove CustomCSS from enabled plugins
-      $this->RemoveFromConfig('EnabledPlugins.CustomCSS');      
+      $this->RemoveFromConfig('EnabledPlugins.CustomCSS');
+      
+      // Add VanillaUrl to configs
+      $this->SaveToConfig('Garden.VanillaUrl', 'http://vanillaforums.com');
    }
 
 }
