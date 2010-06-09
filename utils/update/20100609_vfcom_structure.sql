@@ -11,7 +11,7 @@ update `GDN_Role` set `Deletable` = case `Deletable` when 1 then 1 when 2 then 0
 
 update `GDN_Role` set `CanSession` = case `CanSession` when 1 then 1 when 2 then 0 else `CanSession` end;
 
-update GDN_Role Role set 
+update GDN_Role Role set
  Name = 'Banned',
  Sort = '1',
  Deletable = '1',
@@ -19,7 +19,7 @@ update GDN_Role Role set
  Description = 'Banned users are not allowed to participate or sign in.'
 where RoleID = '1';
 
-update GDN_Role Role set 
+update GDN_Role Role set
  Name = 'Guest',
  Sort = '2',
  Deletable = '0',
@@ -27,7 +27,7 @@ update GDN_Role Role set
  Description = 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a \"Guest\".'
 where RoleID = '2';
 
-update GDN_Role Role set 
+update GDN_Role Role set
  Name = 'Applicant',
  Sort = '3',
  Deletable = '0',
@@ -35,7 +35,7 @@ update GDN_Role Role set
  Description = 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.'
 where RoleID = '4';
 
-update GDN_Role Role set 
+update GDN_Role Role set
  Name = 'Member',
  Sort = '4',
  Deletable = '1',
@@ -43,11 +43,11 @@ update GDN_Role Role set
  Description = 'Members can participate in discussions.'
 where RoleID = '8';
 
-insert GDN_Role 
-(Name, Sort, Deletable, CanSession, Description, RoleID) 
+insert GDN_Role
+(Name, Sort, Deletable, CanSession, Description, RoleID)
 values ('Moderator', '5', '1', '1', 'Moderators have permission to edit most content.', '32');
 
-update GDN_Role Role set 
+update GDN_Role Role set
  Name = 'Administrator',
  Sort = '6',
  Deletable = '1',
@@ -137,7 +137,7 @@ create table `GDN_UserAuthenticationToken` (
 primary key (`Token`, `ProviderKey`)
 ) default character set utf8 collate utf8_unicode_ci;
 
-update GDN_Permission Permission set 
+update GDN_Permission Permission set
  `Garden.Email.Manage` = '2',
  `Garden.Settings.Manage` = '2',
  `Garden.Routes.Manage` = '2',
@@ -158,18 +158,18 @@ where RoleID = '0'
   and JunctionTable is null
   and JunctionColumn is null;
 
-update GDN_Permission Permission set 
+update GDN_Permission Permission set
  `Garden.Signin.Allow` = '1'
 where RoleID = '8'
   and JunctionTable is null
   and JunctionColumn is null
   and JunctionID is null;
 
-insert GDN_Permission 
-(`Garden.Signin.Allow`, RoleID, JunctionTable, JunctionColumn, JunctionID) 
-values ('1', '32', '', '', '');
+insert GDN_Permission
+(`Garden.Signin.Allow`, RoleID, JunctionTable, JunctionColumn, JunctionID)
+values ('1', '32', null, null, null);
 
-update GDN_Permission Permission set 
+update GDN_Permission Permission set
  `Garden.Settings.Manage` = '1',
  `Garden.Routes.Manage` = '1',
  `Garden.Applications.Manage` = '1',
@@ -366,7 +366,7 @@ update `GDN_Draft` set `Announce` = case `Announce` when 1 then 1 when 2 then 0 
 
 update `GDN_Draft` set `Sink` = case `Sink` when 1 then 1 when 2 then 0 else `Sink` end;
 
-update GDN_Permission Permission set 
+update GDN_Permission Permission set
  `Vanilla.Settings.Manage` = '2',
  `Vanilla.Categories.Manage` = '2',
  `Vanilla.Spam.Manage` = '2'
@@ -374,7 +374,7 @@ where RoleID = '0'
   and JunctionTable is null
   and JunctionColumn is null;
 
-update GDN_Permission Permission set 
+update GDN_Permission Permission set
  `Vanilla.Discussions.View` = '3',
  `Vanilla.Discussions.Add` = '3',
  `Vanilla.Discussions.Edit` = '2',
