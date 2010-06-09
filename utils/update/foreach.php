@@ -18,6 +18,9 @@ class TaskList {
       $this->Clients = $ClientDir;
       $this->Tasks = array();
       $this->Database = mysql_connect(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD); // Open the db connection
+      if (!$this->Database)
+         die("Could not connect to database as '".DATABASE_USER."'@'".DATABASE_HOST."'\n");
+         
       mysql_select_db(DATABASE_MAIN, $this->Database);
       
       TaskList::MajorEvent("Connected to ".DATABASE_MAIN." @ ".DATABASE_HOST);
