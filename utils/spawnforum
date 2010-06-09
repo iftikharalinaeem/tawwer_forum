@@ -3,11 +3,22 @@
 # This script assumes 1 argument is passed: the name of the vhost to create.
 
 # Variables
-PATH=/srv/www/vhosts/${1}/
-SOURCE=/srv/www/vanilla_source/
-PLUGINS=/srv/www/misc/plugins/
-THEMES=/srv/www/misc/themes/
-UTILS=/srv/www/misc/utils/
+if [${2} == ""]; then
+	ROOT=/srv/www
+else
+	ROOT=$2
+fi
+
+PATH=${ROOT}/vhosts/${1}/
+
+if [${3} == ""]; then
+	SOURCE=${ROOT}/vanilla_source/
+else
+	SOURCE=${ROOT}/${3}/
+fi
+PLUGINS=${ROOT}/misc/plugins/
+THEMES=${ROOT}/misc/themes/
+UTILS=${ROOT}/misc/utils/
    
 echo "Creating new vhost: ${PATH}"
 

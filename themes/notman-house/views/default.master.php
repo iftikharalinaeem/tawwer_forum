@@ -4,8 +4,8 @@
   
    
    <link rel="stylesheet" type="text/css" href="http://notmanhouse.com/wp-content/themes/enkelt_standard/style.css" media="screen" />
-
-	 <?php $this->RenderAsset('Head'); ?>
+	<?php $this->RenderAsset('Head'); ?>
+   <link rel="stylesheet" type="text/css" href="/themes/notman-house/design/custom.css" media="screen" />
    
    <script type="text/javascript" src="http://notmanhouse.com/wp-content/themes/enkelt_standard/library/js/superfish.js"></script>
 <!--[if lt IE 8]><script src="http://ie7-js.googlecode.com/svn/version/2.0(beta3)/IE8.js" type="text/javascript"></script><![endif]-->

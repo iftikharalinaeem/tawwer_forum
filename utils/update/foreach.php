@@ -1,7 +1,7 @@
 <?php
 
 error_reporting(E_ALL);
-
+define('APPLICATION', 'VanillaUpdate');
 // Represents a config file
 require_once("configuration.php");
 
@@ -18,8 +18,7 @@ class TaskList {
       $this->Database = mysql_connect(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD); // Open the db connection
       mysql_select_db(DATABASE_MAIN, $this->Database);
       
-      if (VERBOSE)
-         echo "Connected to ".DATABASE_MAIN." @ ".DATABASE_HOST."\n";
+      TaskList::MajorEvent("Connected to ".DATABASE_MAIN." @ ".DATABASE_HOST);
       
       chdir(dirname(__FILE__));
    
@@ -30,12 +29,13 @@ class TaskList {
       if (!$TaskDirectory = opendir($TaskDir))
          die("Could not open task_dir '{$TaskDir}' for reading.\n");
          
-      if (VERBOSE) echo "Setting up task objects...\n";
+      TaskList::MajorEvent("Setting up task objects...");
       
       while (($FileName = readdir($TaskDirectory)) !== FALSE) {
          if ($FileName == '.' || $FileName == '..') continue;
-         if (!preg_match('/^.*\.task\.php$/', $FileName)) continue;
+         if (!preg_match('/^(.*)\.task\.php$/', $FileName, $Matches)) continue;
          
+         $Taskname = $Matches[1];
          $IncludePath = trim($TaskDir,'/').'/'.$FileName;
          $Classes = get_declared_classes();
          require_once($IncludePath);
@@ -43,39 +43,45 @@ class TaskList {
          
          foreach ($NewClasses as $Class) {
             if (is_subclass_of($Class, 'Task')) {
-               $NewTask = new $Class($TaskDir);
+               TaskList::Event("  ".strtolower($Class));
+               $NewTask = new $Class($ClientDir);
                $NewTask->Database = $this->Database;
-               $this->Tasks[] = array(
+               $this->Tasks[$Taskname] = array(
                   'name'      => str_replace('Task', '', $Class),
                   'task'      => $NewTask
                );
-               if (VERBOSE) echo "  ".strtolower($Class)."\n";
             }
          }
-         if (VERBOSE) echo "\n\n";
+         TaskList::Event("");
          
       }
       
       closedir($TaskDirectory);
    }
    
-   public function RunAll() {
+   public function RunAll($TaskOrder = NULL) {
       if (($DirectoryHandle = @opendir($this->Clients)) === FALSE) {
-         if (VERBOSE) echo "Could not open client folder.\n";
+         TaskList::MajorEvent("Could not open client folder.");
          return FALSE;
       }
       
-      if (VERBOSE) echo "Running through client list...\n";
+      TaskList::MajorEvent("Running through client list...");
       while (($ClientFolder = readdir($DirectoryHandle)) !== FALSE) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
          
          $ClientInfo = $this->LookupClientByFolder($ClientFolder);
-         if (VERBOSE) echo "  {$ClientFolder} [{$ClientInfo['SiteID']}]... ";
+         TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
+         
          // Run all tasks for this client
-         foreach ($this->Tasks as &$Task)
-            $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
-            
-         if (VERBOSE) echo "done\n";
+         if (!is_null($TaskOrder)) {
+            foreach ($TaskOrder as $TaskName)
+               $this->Tasks[$TaskName]['task']->SandboxExecute($ClientFolder, $ClientInfo);
+         } else {
+            foreach ($this->Tasks as $TaskName => &$Task)
+               $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
+         }
+                     
+         TaskList::MajorEvent("");
       }
       closedir($DirectoryHandle);
    }
@@ -131,16 +137,68 @@ class TaskList {
    }
    
    // Convenience method
-   function CombinePaths($Paths, $Delimiter = '/') {
-      if (is_array($Paths)) {
-         $MungedPath = implode($Delimiter, $Paths);
-         $MungedPath = str_replace(array($Delimiter.$Delimiter.$Delimiter, $Delimiter.$Delimiter), array($Delimiter, $Delimiter), $MungedPath);
-         return str_replace('http:/', 'http://', $MungedPath);
-      } else {
-         return $Paths;
+   public static function CombinePaths($Paths, $Delimiter = '/') {
+      if (!is_array($Paths)) {
+         $Paths = func_get_args();
+         $Delimiter = '/';
+      }
+      
+      $MungedPath = implode($Delimiter, $Paths);
+      $MungedPath = str_replace(array($Delimiter.$Delimiter.$Delimiter, $Delimiter.$Delimiter), array($Delimiter, $Delimiter), $MungedPath);
+      return str_replace('http:/', 'http://', $MungedPath);
+   }
+   
+   public static function Symlink($Link, $Source = NULL) {
+      if (file_exists($Link))
+         if (!LAME) unlink($Link);
+      
+      if (!is_null($Source)) {
+         TaskList::Event("/bin/ln -s {$Source} {$Link}");
+         if (!LAME) symlink($Source, $Link);
+         //exec("/bin/ln -s {$EscapedSource} {$EscapedLink}");
       }
    }
-
+   
+   public static function MinorEvent($Message) {
+      if (VERBOSE) echo "    > {$Message}\n";
+   }
+   
+   public static function Event($Message) {
+      if (VERBOSE) echo "  - {$Message}\n";
+   }
+   
+   public static function MajorEvent($Message) {
+      if (VERBOSE) echo "{$Message}\n";
+   }
+   
+   public static function Question($Message, $Prompt, $Options, $Default) {
+      if ($Message)
+         echo $Message."\n";
+         
+      foreach ($Options as &$Opt)
+         $Opt = strtolower($Opt);
+         
+      $HaveAnswer = FALSE;
+      do {
+         self::_Prompt($Prompt, $Options, $Default);
+         $Answer = trim(fgets(STDIN));
+         if ($Answer == '') $Answer = $Default;
+         $Answer = strtolower($Answer);
+         
+         if (in_array($Answer, $Options))
+            $HaveAnswer = TRUE;
+      } while(!$HaveAnswer);
+      return $Answer;
+   }
+   
+   protected static function _Prompt($Prompt, $Options, $Default) {
+      $PromptOpts = array();
+      foreach ($Options as $Opt)
+         $PromptOpts[] = (strtolower($Opt) == strtolower($Default)) ? strtoupper($Opt) : strtolower($Opt);
+         
+      echo "{$Prompt} (".implode(',',$PromptOpts).") ";
+   }
+   
 }
 
 abstract class Task {
@@ -154,7 +212,8 @@ abstract class Task {
    protected $Config;
 
    public function __construct($RootFolder) {
-      $this->Root = trim($RootFolder,'/');
+      $this->Root = rtrim($RootFolder,'/');
+      TaskList::Event("Set root folder to '{$this->Root}'");
       $this->ClientRoot = NULL;
       $this->ClientFolder = NULL;
       $this->ClientInfo = NULL;
@@ -166,19 +225,21 @@ abstract class Task {
    
    public function SandboxExecute($ClientFolder, $ClientInfo) {
       $this->ClientFolder = $ClientFolder;
-      $this->ClientRoot = TaskList::CombinePaths($this->Root, $this->ClientFolder);
+      $this->ClientRoot = TaskList::CombinePaths($this->Root, $this->ClientFolder );
       $this->ClientInfo = $ClientInfo;
-      
       
       $this->ConfigFile = TaskList::CombinePaths($this->ClientRoot,'conf/config.php');
       $this->Config = new Configuration();
-      $this->Config->Load($ConfigFile, 'Use');
-      
+      try {
+         $this->Config->Load($this->ConfigFile, 'Use');
+      } catch (Exception $e) { die ($e->getMessage()); }
+
       $this->Run();
    }
    
    protected function SaveToConfig($Key, $Value) {
       if (is_null($this->ClientInfo)) return;
+      if (!LAME) return;
       
       $this->Config->Load($this->ConfigFile, 'Save');
       
@@ -193,6 +254,7 @@ abstract class Task {
    
    protected function RemoveFromConfig($Key) {
       if (is_null($this->ClientInfo)) return;
+      if (LAME) return;
       
       $this->Config->Load($this->ConfigFile, 'Save');
 
@@ -211,6 +273,30 @@ abstract class Task {
    protected function C($Name = FALSE, $Default = FALSE) {
       if (is_null($this->ClientInfo)) return;
       return $this->Config->Get($Name, $Default);
+   }
+   
+   protected function Symlink($RelativeLink, $Source = NULL) {
+      $AbsoluteLink = TaskList::CombinePaths($this->ClientRoot,$RelativeLink);
+      TaskList::Symlink($AbsoluteLink, $Source);
+   }
+   
+   protected function CopySourceFile($RelativePath, $SourcecodePath) {
+      $AbsoluteClientPath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
+      $AbsoluteSourcePath = TaskList::CombinePaths($SourcecodePath,$RelativePath);
+      
+      $NewFileHash = md5_file($AbsoluteSourcePath);
+      
+      if (file_exists($AbsoluteClientPath)) {
+         $OldFileHash = md5_file($AbsoluteClientPath);
+         if ($OldFileHash == $NewFileHash) {
+            TaskList::Event("copy aborted. local {$RelativePath} is the same as {$AbsoluteSourcePath}");
+            return;
+         }
+         if (!LAME) unlink($AbsoluteClientPath);
+      }
+      
+      TaskList::Event("copy '{$AbsoluteSourcePath} / ".md5_file($AbsoluteSourcePath)."' to '{$AbsoluteClientPath} / {$OldFileHash}'");
+      if (!LAME) copy($AbsoluteSourcePath, $AbsoluteClientPath);
    }
 
 }
