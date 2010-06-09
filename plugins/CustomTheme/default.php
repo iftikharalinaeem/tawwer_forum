@@ -193,6 +193,7 @@ Here are some things you should know before you begin:
 				$CurrentThemeFolder = $DestFolder;
 				$DestFolder = PATH_THEMES . DS . $DestFolder;
 				recurse_copy($Folder, $DestFolder);
+				@unlink(CombinePaths(array($DestFolder, 'screenshot.png'), '/')); // Get rid of screenshots
 				$Folder = $DestFolder;
 				SaveToConfig('Garden.Theme', $CurrentThemeFolder);
 			}
