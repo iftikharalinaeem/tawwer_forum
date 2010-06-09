@@ -58,7 +58,6 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${THEMES}minalla-yellow" "${PATH}themes/minalla"
     /bin/ln -s "${THEMES}light-grunge" "${PATH}themes/light-grunge"
     /bin/ln -s "${THEMES}iVanilla" "${PATH}themes/iVanilla"
-    /bin/ln -s "${THEMES}simple" "${PATH}themes/simple"
     # End Themes
         
     # Misc Symlinks
