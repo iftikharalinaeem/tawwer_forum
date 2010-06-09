@@ -416,6 +416,13 @@ ul.Activities div.ItemContent {
 	width:631px;
 }
 
+#MessageForm textarea {
+height:100px;
+margin-bottom:2px;
+min-height:100px;
+width:625px;
+}
+
 /* ==================================================== New Conversation Form */
 
 #ConversationForm h2 {
@@ -548,7 +555,7 @@ div.Popup .Footer {
 
 #Panel input.InputBox, div.AddPeople textarea.MultiComplete {
 	margin:0 5px 2px 5px;
-	width:160px;
+	width:180px;
 }
 
 input.DateBox, input.InputBox, input.SmallInput, textarea {
