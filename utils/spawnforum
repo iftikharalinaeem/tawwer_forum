@@ -44,7 +44,7 @@ if [ ! -d "$PATH" ]; then
     # End Core Package Plugins
     
     # Custom VF.com Plugins
-    /bin/ln -s "${PLUGINS}GettingStarted" "${PATH}plugins/GettingStarted"
+    /bin/ln -s "${PLUGINS}GettingStartedHosting" "${PATH}plugins/GettingStartedHosting"
     /bin/ln -s "${PLUGINS}googleadsense" "${PATH}plugins/googleadsense"
     /bin/ln -s "${PLUGINS}vfoptions" "${PATH}plugins/vfoptions"
     /bin/ln -s "${PLUGINS}CustomTheme" "${PATH}plugins/CustomTheme"
