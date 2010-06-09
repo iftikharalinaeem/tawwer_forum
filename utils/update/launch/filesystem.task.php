@@ -36,8 +36,8 @@ class FilesystemTask extends Task {
       
       // Symlink all core themes
       $this->Symlink('themes/minalla-yellow', TaskList::CombinePaths($this->ThemePath,'minalla-yellow'));
-      $this->Symlink('themes/lightgrunge', TaskList::CombinePaths($this->ThemePath,'lightgrunge'));
-      $this->Symlink('themes/ivanilla', TaskList::CombinePaths($this->ThemePath,'ivanilla'));
+      $this->Symlink('themes/lightgrunge', TaskList::CombinePaths($this->ThemePath,'light-grunge'));
+      $this->Symlink('themes/ivanilla', TaskList::CombinePaths($this->ThemePath,'iVanilla'));
       $this->Symlink('themes/simple', TaskList::CombinePaths($this->ThemePath,'simple'));
       $this->Symlink('themes/rounder', TaskList::CombinePaths($this->ThemePath,'rounder'));
       
