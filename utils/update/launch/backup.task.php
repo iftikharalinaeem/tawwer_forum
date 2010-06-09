@@ -29,8 +29,6 @@ class BackupTask extends Task {
          }
       }
       
-      die();
-      
    }
    
    protected function Run() {
@@ -66,7 +64,7 @@ class BackupTask extends Task {
       
          // Create TGZ archive
          TaskList::Event("Backing up client vhost data to {$BackupTarFile}...", TaskList::NOBREAK);
-         if (!LAME) { ob_start(); $trash = shell_exec("tar -cvzf {$BackupTarFile} {$this->ClientRoot}"); ob_end_clean(); }
+         if (!LAME) { ob_start(); $trash = shell_exec("tar -czf {$BackupTarFile} {$this->ClientRoot}"); ob_end_clean(); }
          TaskList::MajorEvent("done");
       
       }
@@ -81,12 +79,12 @@ class BackupTask extends Task {
          $CompressedSQLFile = sprintf($BackupSQLFile,'tgz');
          
          TaskList::Event("Backing up client database to {$RawSQLFile}...", TaskList::NOBREAK);
-         if (!LAME) $trash = shell_exec("mysqldump --extended-insert --no-create-db -u".DATABASE_USER." --password=".DATABASE_PASSWORD." {$DatabaseName} > {$RawSQLFile}");
+         if (!LAME) $trash = shell_exec("mysqldump --extended-insert --no-create-db -u".DATABASE_USER." --password=".DATABASE_PASSWORD." -h ".DATABASE_HOST." {$DatabaseName} > {$RawSQLFile}");
          TaskList::MajorEvent("done");
          
          if (file_exists($RawSQLFile)) {
             TaskList::Event("Compressing...", TaskList::NOBREAK);
-            if (!LAME) { ob_start(); $trash = shell_exec("tar --remove-files -zcvf {$CompressedSQLFile} {$RawSQLFile}"); ob_end_clean(); }
+            if (!LAME) { ob_start(); $trash = shell_exec("tar --remove-files -zcf {$CompressedSQLFile} {$RawSQLFile}"); ob_end_clean(); }
             TaskList::MajorEvent("done");
          } else {
             if (!LAME) TaskList::Event("Could not create backup of sql data {$RawSQLFile}");
