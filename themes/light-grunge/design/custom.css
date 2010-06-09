@@ -164,6 +164,14 @@ ul#Menu {
 	color:#282828;
 }
 
+#Menu a span, #Menu li.Active a span, #Menu li.Highlight a:hover span {
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	background:#282828;
+	border:1px solid #282828;
+	color:#f2f2f2;
+}
+
 div.Tabs div.SubTab {
 	background:#fff;
 }
@@ -346,13 +354,13 @@ a.Bookmarking {
 }
 
 ul.MessageList li.Item {
-	background:#f2f2f2 url(div_box_bg.png) left no-repeat;
+	background:#f2f2f2 url(div_box_bg.png) left top no-repeat;
 	border:1px solid #C4C4C4;
 	margin-bottom:10px;
 }
 
 div.Empty {
-	background:#f2f2f2 url(div_box_bg.png) left no-repeat;
+	background:#f2f2f2 url(div_box_bg.png) left top no-repeat;
 	border:1px solid #C4C4C4;
 	padding:10px;
 }
@@ -590,4 +598,11 @@ ul.PanelInfo div.Meta strong {
 .Foot {
 	background:#f2f2f2;
 	border-bottom:1px solid #c4c4c4;
+}
+
+/* ============================================================= plugins */
+
+/* File Upload */
+div.Attachments {
+	background-color:#fff;
 }
