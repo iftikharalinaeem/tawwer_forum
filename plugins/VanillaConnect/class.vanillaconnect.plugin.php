@@ -133,7 +133,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       
       $Zip->addFromString('vanillaconnect.php', $SuperData);
       $Zip->close();
-      print_r($Zip);
+      
       try {
          Gdn_FileSystem::ServeFile($ZipFile, 'vanillaconnect.php.zip');
       } catch (Exception $e) {
@@ -334,7 +334,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       RemoveFromConfig('Garden.Authenticators.handshake.TokenLifetime');
 
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      while (($HandshakeKey = array_search('handshake', $EnabledSchemes)) !== FALSE) {
+      foreach (array_keys($EnabledSchemes, array('handshake', 'proxy')) as $HandshakeKey) {
          unset($EnabledSchemes[$HandshakeKey]);
       }
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
@@ -349,9 +349,11 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
       array_push($EnabledSchemes, 'handshake');
+      array_push($EnabledSchemes, 'proxy');
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
       
       Gdn_FileCache::SafeCache('library','class.handshakeauthenticator.php',$this->GetResource('class.handshakeauthenticator.php'));
+      Gdn_FileCache::SafeCache('library','class.proxyauthenticator.php',$this->GetResource('class.proxyauthenticator.php'));
       
       // Create a provider key/secret pair if needed
       $SQL = Gdn::Database()->SQL();
