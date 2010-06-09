@@ -6,9 +6,9 @@ class SymlinkTask extends Task {
       parent::__construct();
    }
    
-   public function Run($ClientFolder) {
-      $Client = $this->LookupClientByFolder($ClientFolder);
-      if (!$Client) return FALSE;
+   protected function Run() {
+      $ClientDashboardLink = TaskList::CombinePaths($this->ClientRoot,'applications/dashboard');
+      @unlink($ClientDashboardLink);
       
       
    }
