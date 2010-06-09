@@ -35,14 +35,14 @@ class FilesystemTask extends Task {
       $this->Symlink('plugins/Gravatar', TaskList::CombinePaths($this->SourcecodePath,'plugins/Gravatar'));
       
       // Symlink all core themes
-      $this->Symlink('themes/minalla-yellow', TaskList::CombinePaths($this->SourcecodePath,'themes/minalla-yellow'));
-      $this->Symlink('themes/lightgrunge', TaskList::CombinePaths($this->SourcecodePath,'themes/lightgrunge'));
-      $this->Symlink('themes/ivanilla', TaskList::CombinePaths($this->SourcecodePath,'themes/ivanilla'));
-      $this->Symlink('themes/simple', TaskList::CombinePaths($this->SourcecodePath,'themes/simple'));
-      $this->Symlink('themes/rounder', TaskList::CombinePaths($this->SourcecodePath,'themes/rounder'));
+      $this->Symlink('themes/minalla-yellow', TaskList::CombinePaths($this->ThemePath,'minalla-yellow'));
+      $this->Symlink('themes/lightgrunge', TaskList::CombinePaths($this->ThemePath,'lightgrunge'));
+      $this->Symlink('themes/ivanilla', TaskList::CombinePaths($this->ThemePath,'ivanilla'));
+      $this->Symlink('themes/simple', TaskList::CombinePaths($this->ThemePath,'simple'));
+      $this->Symlink('themes/rounder', TaskList::CombinePaths($this->ThemePath,'rounder'));
       
       // Replace default theme with smartydefault
-      $this->Symlink('default', TaskList::CombinePaths($this->ThemePath,'defaultsmarty'));
+      $this->Symlink('themes/default', TaskList::CombinePaths($this->ThemePath,'defaultsmarty'));
       
       // Copy the new index file
       $this->CopySourceFile('index.php', $this->SourcecodePath);
