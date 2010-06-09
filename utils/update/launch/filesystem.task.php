@@ -4,12 +4,14 @@ class FilesystemTask extends Task {
 
    protected $SourcecodePath;
    protected $PluginPath;
+   protected $ThemePath;
 
    public function __construct($ClientDir) {
       parent::__construct($ClientDir);
       
       $this->SourcecodePath = '/srv/www/vanilla_source/';
       $this->PluginPath = '/srv/www/misc/plugins/';
+      $this->ThemePath = '/srv/www/misc/themes/';
    }
    
    protected function Run() {
@@ -38,6 +40,9 @@ class FilesystemTask extends Task {
       $this->Symlink('themes/ivanilla', TaskList::CombinePaths($this->SourcecodePath,'themes/ivanilla'));
       $this->Symlink('themes/simple', TaskList::CombinePaths($this->SourcecodePath,'themes/simple'));
       $this->Symlink('themes/rounder', TaskList::CombinePaths($this->SourcecodePath,'themes/rounder'));
+      
+      // Replace default theme with smartydefault
+      $this->Symlink('default', TaskList::CombinePaths($this->ThemePath,'defaultsmarty'));
       
       // Copy the new index file
       $this->CopySourceFile('index.php', $this->SourcecodePath);
