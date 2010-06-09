@@ -15,7 +15,7 @@
 							$Authenticator = Gdn::Authenticator();
 							if ($Session->IsValid()) {
 								$Name = '<em>'.$Session->User->Name.'</em>';
-								$CountNotifications = $Session->User->CountNotifications;
+								$CountNotifications = 0;
 								if (is_numeric($CountNotifications) && $CountNotifications > 0)
 									$Name .= '<span>'.$CountNotifications.'</span>';
 									
@@ -26,7 +26,7 @@
 								);
 		
 								$Inbox = '<em>Inbox</em>';
-								$CountUnreadConversations = $Session->User->CountUnreadConversations;
+								$CountUnreadConversations = 0;
 								if (is_numeric($CountUnreadConversations) && $CountUnreadConversations > 0)
 									$Inbox .= '<span>'.$CountUnreadConversations.'</span>';
 						
