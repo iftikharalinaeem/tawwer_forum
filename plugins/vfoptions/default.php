@@ -634,8 +634,7 @@ pageTracker._trackPageview();
 				Redirect('/dashboard/home/permission');
 		}
       
-      // TODO: Logo upload is enabled if C('VanillaForums.BannerLogo.CanUpload') is TRUE.
-      if ($Sender->RequestMethod == 'banners')
+      if ($Sender->RequestMethod == 'banner')
          $Sender->View = PATH_PLUGINS.'/vfoptions/views/banner.php';
    }
 
