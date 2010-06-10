@@ -46,6 +46,9 @@ class CustomDomainPlugin implements Gdn_IPlugin {
       // us).
       $Sender->Form = new Gdn_Form();
       $Domain = $Sender->Form->GetValue('CustomDomain', '');
+      if (!$Sender->Form->IsPostBack())
+         $Sender->Form->SetFormValue('CustomDomain', $Sender->Site->Domain);
+
       $Response = '';
       if ($Domain != '') {
          // Make sure it isn't already in use
