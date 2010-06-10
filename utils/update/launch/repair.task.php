@@ -17,7 +17,7 @@ class RepairTask extends Task {
       
       $Rows = $RepairResult ? mysql_num_rows($RepairResult) : 0;
       TaskList::Event("Checking if repairs are needed for '{$DatabaseName}'...", TaskList::NOBREAK);
-      if ($Rows) {
+      if (!$Rows) {
          TaskList::Event("yes");
          $Command = sprintf("mysql -u%s --password=%s -h %s '%s' < %s",DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, $DatabaseName, $SqlFile);
          TaskList::Event($Command);
