@@ -41,7 +41,7 @@ echo $this->Form->Open();
       echo $this->Form->Label('Your Custom Domain Name', 'CustomDomain');
       echo '<span style="font-size: 120%; padding-right: 6px; display: inline;">http://</span>' . $this->Form->TextBox('CustomDomain');
       if (is_object($this->Site) && $this->Site->Domain != '')
-         echo Anchor('Remove Custom Domain', 'settings/customdomain/remove/'.$Session->TransientKey(), 'Button');
+         echo Anchor('Remove Custom Domain', 'settings/customdomain/remove/'.$Session->TransientKey(), 'SmallButton', array('style' => 'margin-left: 20px;'));
       ?>
    </li>
 </ul>
