@@ -19,6 +19,11 @@ class ConfigurationTask extends Task {
       // Enable CustomTheme for everyone
       TaskList::Event("Adding EnabledPlugins.CustomTheme to config");
       $this->SaveToConfig('EnabledPlugins.CustomTheme', 'CustomTheme');
+      
+      // Add Bonk type errors to all forums
+      TaskList::Event("Adding Bonk MasterView to config");
+      $this->SaveToConfig('Garden.Errors.MasterView', 'error.master.php');
+      
    }
 
 }

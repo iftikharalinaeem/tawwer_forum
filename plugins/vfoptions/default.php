@@ -112,7 +112,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          $Domain = str_replace(array('http://', '/'), array('', ''), $Domain);
          $ServerName = str_replace(array('http://', '/'), array('', ''), $ServerName);
          if ($ServerName != $Domain)
-            Redirect(Gdn_Url::Request(TRUE, TRUE));
+            Redirect('http://' . $Domain . Gdn::Request()->Url());
          
       }
       
