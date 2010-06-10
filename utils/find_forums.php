@@ -8,7 +8,7 @@ if ($DirectoryHandle = opendir('/srv/www/vhosts')) {
 		  $File = '/srv/www/vhosts/' . $Item . '/conf/config.php';
 		  if (file_exists($File)) {
 				$Contents = file_get_contents($File);
-				if (strpos("['CustomCSS']['Enabled'] = TRUE"))
+				if (strpos("['CustomCSS']['Enabled'] = TRUE", $Contents) !== FALSE)
 					 echo $File."\n";
 		  }
     }
