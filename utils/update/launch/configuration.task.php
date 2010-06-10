@@ -15,6 +15,10 @@ class ConfigurationTask extends Task {
       // Add VanillaUrl to configs
       TaskList::Event("Adding VanillaUrl to config");
       $this->SaveToConfig('Garden.VanillaUrl', 'http://vanillaforums.com');
+      
+      // Add Bonk type errors to all forums
+      TaskList::Event("Adding Bonk MasterView to config");
+      $this->SaveToConfig('Garden.Errors.MasterView', 'error.master.php');
    }
 
 }
