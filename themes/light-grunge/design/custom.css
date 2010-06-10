@@ -501,6 +501,10 @@ div.Popup .Footer {
 
 /* ============================================================= search */
 
+#dashboard_entrycontroller_signin #Search{
+	display:none;
+}
+
 #Search {	
 	background:#282828 url(bg_texture.png);
 	border-bottom:#282828 1px solid;
