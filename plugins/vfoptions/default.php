@@ -70,7 +70,10 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 			$Menu->AddLink('Users', 'Vanilla Connect <span class="New">New</span>', 'settings/vanillaconnect', 'Garden.AdminUser.Only');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'));
-      $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
+		if (C('EnabledPlugins.FileUpload'))
+			$Menu->AddLink('Forum', 'Media <span class="New">New</span>', 'plugin/fileupload', 'Garden.AdminUser.Only');
+			
+		$Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
       $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
    }
    
