@@ -11,7 +11,7 @@ class StructureTask extends Task {
    
       $DatabaseName = $this->ClientInfo['DatabaseName'];
       TaskList::Event("Running structure file against client database '{$DatabaseName}'");
-      if (!LAME) exec(sprintf("mysql -u%s --password=%s -h %s %s < %s",DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, $DatabaseName, $SqlFile));
+      if (!LAME) exec(sprintf("mysql -u%s --password=%s -h %s '%s' < %s",DATABASE_USER, DATABASE_PASSWORD, DATABASE_HOST, $DatabaseName, $SqlFile));
    }
 
 }
