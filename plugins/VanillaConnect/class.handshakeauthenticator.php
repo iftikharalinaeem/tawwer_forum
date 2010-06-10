@@ -486,6 +486,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
    }
    
    public function DeleteCookie() {
+      return;
       Gdn_Cookieidentity::DeleteCookie($this->_CookieName);
    }
    

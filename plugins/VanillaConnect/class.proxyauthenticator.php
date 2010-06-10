@@ -54,6 +54,9 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator {
          $UserName = ArrayValue('Name', $Response);
          $UserID = ArrayValue('UniqueID', $Response);
          
+         $UserName = trim(preg_replace('/[^a-z0-9-]+/i','',$UserName));
+         $UserID = 1;
+         
          // Build an OAuth request from the provided information
          $OAuthConsumer = new OAuthConsumer($Provider['AuthenticationKey'], $Provider['AssociationSecret']);
          $ConsumerParams = array("email" => $UserEmail, "name" => $UserName, "uid" => $UserID);
