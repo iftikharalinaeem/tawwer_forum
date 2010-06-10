@@ -15,7 +15,6 @@ class RepairTask extends Task {
       mysql_select_db(DATABASE_MAIN, $this->Database);
       
       $Rows = $ColResult ? mysql_num_rows($ColResult) : 0;
-      $Rows = 1; $DatabaseName = 'vf_-happy-_gdr';
       TaskList::Event("Checking if repairs are needed for '{$DatabaseName}'...", TaskList::NOBREAK);
       if ($Rows) {
          TaskList::Event("yes");
