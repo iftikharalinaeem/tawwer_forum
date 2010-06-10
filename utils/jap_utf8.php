@@ -3,7 +3,7 @@
  Used for updating all tables in all databases to utf-8 encoding on durig the 
  update of 2009-12-17
 */
-$Database = 'vf_smartfm_QMYPB';
+$Database = 'vf_chemicalwatch_0PWGC';
 
 $Cnn = mysql_connect('vfdb1', 'root', 'Va2aWu5A'); // Open the db connection
 mysql_select_db($Database, $Cnn);
