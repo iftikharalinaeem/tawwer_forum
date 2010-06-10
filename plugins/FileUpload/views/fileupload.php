@@ -14,12 +14,7 @@
       <div class="FileUploadBlock">
          <h1><?php echo T('Permissions'); ?></h1>
          <div class="Info">
-            <?php echo T('Decide which kinds of users are allowed to upload and download files.'); ?>
-         </div>
-         <div>
-         <?php
-            //echo $this->Form->CheckBoxGridGroups($this->FileUploadPermissions, 'Permission'); 
-         ?>
+            <?php echo T('Define who can upload and manage files on the '.Anchor('Roles & Permissions','/dashboard/role').' page.'); ?>
          </div>
       </div>
    </li>

@@ -9,12 +9,16 @@ class ConfigurationTask extends Task {
    protected function Run() {
 
       // Remove CustomCSS from enabled plugins
-      TaskList::Event("Removing CustomCSS plugin from config");
+      TaskList::Event("Removing EnabledBplugins.CustomCSS plugin from config");
       $this->RemoveFromConfig('EnabledPlugins.CustomCSS');
       
       // Add VanillaUrl to configs
-      TaskList::Event("Adding VanillaUrl to config");
+      TaskList::Event("Adding Garden.VanillaUrl to config");
       $this->SaveToConfig('Garden.VanillaUrl', 'http://vanillaforums.com');
+      
+      // Enable CustomTheme for everyone
+      TaskList::Event("Adding EnabledPlugins.CustomTheme to config");
+      $this->SaveToConfig('EnabledPlugins.CustomTheme', 'CustomTheme');
    }
 
 }
