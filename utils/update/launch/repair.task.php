@@ -7,14 +7,15 @@ class RepairTask extends Task {
    }
    
    protected function Run() {
-      $SqlFile = '/srv/www/misc/utils/update/20100609_vfcom_structure.sql';
+      $SqlFile = '/srv/www/misc/utils/update/vfcom_role32_structure.sql';
       $DatabaseName = $this->ClientInfo['DatabaseName'];
       
       mysql_select_db($DatabaseName, $this->Database);
-      $ColResult = mysql_query("SHOW COLUMNS FROM `GDN_Discussion` LIKE 'FirstCommentID'", $this->Database);
+      //$ColResult = mysql_query("SHOW COLUMNS FROM `GDN_Discussion` LIKE 'FirstCommentID'", $this->Database);
+      $RepairResult = mysql_query("SELECT RoleID FROM `GDN_Role` WHERE RoleID=32",$this->Database);
       mysql_select_db(DATABASE_MAIN, $this->Database);
       
-      $Rows = $ColResult ? mysql_num_rows($ColResult) : 0;
+      $Rows = $RepairResult ? mysql_num_rows($RepairResult) : 0;
       TaskList::Event("Checking if repairs are needed for '{$DatabaseName}'...", TaskList::NOBREAK);
       if ($Rows) {
          TaskList::Event("yes");
@@ -24,8 +25,6 @@ class RepairTask extends Task {
       } else {
          TaskList::Event("no");
       }
-      
-      die();
    }
 
 }
