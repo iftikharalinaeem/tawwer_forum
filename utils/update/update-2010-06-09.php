@@ -12,6 +12,13 @@ define('DATABASE_PASSWORD', 'Va2aWu5A');
 define('DATABASE_MAIN', 'vfcom');
 
 $Tasks = new TaskList('launch','/srv/www/vhosts');
+
 $Tasks->RunAll(array(
-   'backup'
-));
+   'configuration'
+), FALSE);
+
+/*
+$Tasks->RunRegex('/^(usergroups).*$/',array(
+   'configuration'
+), TRUE);
+*/

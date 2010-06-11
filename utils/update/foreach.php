@@ -12,6 +12,7 @@ class TaskList {
    protected $Clients;
    protected $Tasks;
    protected $Database;
+   protected $ClientFolders;
 
    public function __construct($TaskDir, $ClientDir) {
    
@@ -62,32 +63,62 @@ class TaskList {
       }
       
       closedir($TaskDirectory);
-   }
-   
-   public function RunAll($TaskOrder = NULL) {
-      TaskList::MajorEvent("Running through client list...");
-      $FolderList = scandir($this->Clients);
-      if ($FolderList === FALSE) {
+      
+      $this->ClientFolders = scandir($this->Clients);
+      if ($this->ClientFolders === FALSE) {
          TaskList::MajorEvent("Could not open client folder.");
          return FALSE;
       }
-      foreach ($FolderList as $ClientFolder) {
+      
+      $NumClients = count($this->ClientFolders);
+      $Proceed = TaskList::Question("Found {$NumClients} clients in {$this->Clients}.","Proceed?",array('yes','no'),'yes');
+      if ($Proceed == 'no') exit();
+   }
+   
+   public function RunAll($TaskOrder = NULL, $Conditional = FALSE) {
+      TaskList::MajorEvent("Running through client list...");
+      foreach ($this->ClientFolders as $ClientFolder) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
          
-         $ClientInfo = $this->LookupClientByFolder($ClientFolder);
-         TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
-         
-         // Run all tasks for this client
-         if (!is_null($TaskOrder)) {
-            foreach ($TaskOrder as $TaskName)
-               $this->Tasks[$TaskName]['task']->SandboxExecute($ClientFolder, $ClientInfo);
-         } else {
-            foreach ($this->Tasks as $TaskName => &$Task)
-               $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
+         if ($Conditional) {
+            $Proceed = TaskList::Question("{$ClientFolder} matches...","Execute?",array('yes','no','end'),'yes');
+            if ($Proceed == 'end') exit();
+            if ($Proceed == 'no') continue;
          }
-                     
-         TaskList::MajorEvent("");
+         $this->RunClient($ClientFolder, $TaskOrder);
       }
+   }
+   
+   public function RunRegex($Regex, $TaskOrder = NULL, $Conditional = FALSE) {
+      TaskList::MajorEvent("Running through client list with regular expression [{$Regex}]...");
+      foreach ($this->ClientFolders as $ClientFolder) {
+         if ($ClientFolder == '.' || $ClientFolder == '..') continue;
+         
+         if (preg_match($Regex, $ClientFolder)) {
+            if ($Conditional) {
+               $Proceed = TaskList::Question("{$ClientFolder} matches...","Execute?",array('yes','no','end'),'yes');
+               if ($Proceed == 'end') exit();
+               if ($Proceed == 'no') continue;
+            }
+            $this->RunClient($ClientFolder, $TaskOrder);
+         }
+      }
+   }
+   
+   public function RunClient($ClientFolder, $TaskOrder = NULL) {
+      $ClientInfo = $this->LookupClientByFolder($ClientFolder);
+      TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
+      
+      // Run all tasks for this client
+      if (!is_null($TaskOrder)) {
+         foreach ($TaskOrder as $TaskName)
+            $this->Tasks[$TaskName]['task']->SandboxExecute($ClientFolder, $ClientInfo);
+      } else {
+         foreach ($this->Tasks as $TaskName => &$Task)
+            $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
+      }
+      
+      TaskList::MajorEvent("");
    }
    
    protected function LookupClientByFolder($ClientFolder) {
@@ -254,14 +285,14 @@ abstract class Task {
    
    protected function SaveToConfig($Key, $Value) {
       if (is_null($this->ClientInfo)) return;
-      if (!LAME) return;
+      if (LAME) return;
       
       $this->Config->Load($this->ConfigFile, 'Save');
       
       if (!is_array($Key))
          $Key = array($Key => $Value);
       
-      foreach ($Name as $k => $v)
+      foreach ($Key as $k => $v)
          $this->Config->Set($k, $v);
       
       return $this->Config->Save($this->ConfigFile);
@@ -283,6 +314,11 @@ abstract class Task {
       if ($Result)
          $this->Config->Load($this->ConfigFile, 'Use');
       return $Result;
+   }
+   
+   protected function CheckConfig($Name) {
+      TaskList::Event("Checking for {$Name}...",TaskList::NOBREAK);
+      return is_null($this->C($Name, NULL)) ? FALSE : TRUE;
    }
 
    protected function C($Name = FALSE, $Default = FALSE) {
