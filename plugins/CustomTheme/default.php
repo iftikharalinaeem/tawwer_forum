@@ -231,7 +231,7 @@ Here are some things you should know before you begin:
 			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', TRUE);
 			$Result = ProxyRequest(Gdn::Request()->Url('/', TRUE));
 //			echo Wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
-			$SmartyCompileError = strpos($Result, '<title>Fatal Error</title>') > 0 ? TRUE : FALSE;
+			$SmartyCompileError = (strpos($Result, '<title>Fatal Error</title>') > 0 || strpos($Result, '<title>Bonk</title>') > 0) ? TRUE : FALSE;
 			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
 		
 			// If we are applying the changes, and the changes didn't cause crashes,
