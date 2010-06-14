@@ -100,7 +100,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             .Anchor('Refund Policy', 'http://'.$Url.'.com/info/refund', '', array('target' => '_New'))
             .' | '
             .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New'));
-         $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'float: right;')));
+         $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'float: right; padding-top: 6px;')));
          $Sender->AddCssFile('plugins/vfoptions/design/vfoptions.css', 'dashboard');
       }
       
