@@ -105,12 +105,13 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		// Are we switching back to a previous revision (css OR html)?
 		if (!$Sender->Form->AuthenticatedPostBack()) {
 			$LoadFile = GetValue(0, $Sender->RequestArgs);
+			// PHP replaces url dots with underscores automatically - This fixes it:
+			$LoadFile = str_replace(array('_tpl', '_css'), array('.tpl', '.css'), $LoadFile);
 			if ($LoadFile !== FALSE && strpos($LoadFile, 'custom_') !== FALSE) {
 				if (file_exists($Folder . DS . 'design' . DS . $LoadFile)) {
 					$Sender->CurrentTab = 'Css';
 					$PreviewCSSFile = $LoadFile;
 				}
-				
 				if (file_exists($Folder . DS . 'views' . DS . $LoadFile)) {
 					$Sender->CurrentTab = 'Html';
 					$PreviewHtmlFile = $LoadFile;
