@@ -563,17 +563,17 @@ pageTracker._trackPageview();
 		$Features['free'] = array();
 		$Features['basic'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
-			'CustomDomain'
+			'CustomDomain', 'FileUpload'
 		);
 		$Features['plus'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
-			'CustomDomain', 'CustomTheme', 'PrivateCommunity', 'VanillaConnect',
-			'Backups'
+			'CustomDomain', 'FileUpload', 'CustomTheme', 'PrivateCommunity',
+			'VanillaConnect', 'Backups'
 		);
 		$Features['premium'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
-			'CustomDomain', 'CustomTheme', 'PrivateCommunity', 'VanillaConnect',
-			'Backups', 'FileUpload', 'SpamControl'
+			'CustomDomain', 'FileUpload', 'CustomTheme', 'PrivateCommunity',
+			'VanillaConnect', 'Backups', 'FileUpload', 'SpamControl'
 		);
 
       // See what plan the site has
@@ -620,7 +620,6 @@ pageTracker._trackPageview();
 		// TODO: PrivateCommunity
 		// TODO: Backups
 		// TODO: SpamControl
-
 
 		// Remove & Re-Add the vfoptions plugin (so it goes last to have better control over what gets added to the dashboard menu)
 		RemoveFromConfig('EnabledPlugins.vfoptions');
