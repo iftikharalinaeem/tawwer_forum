@@ -106,9 +106,17 @@ var Gdn_MultiFileUpload = Class.create({
       NewUploader.id    = NewUploaderID;
       NewUploader.className = 'HiddenFileInput';
       NewUploader.rel = FormName;
-      $(NewUploader).css('opacity',0);
-      $('#'+this.AttachFileLinkID).parent().append(NewUploader);
-      //this.AlignUploader(NewUploader);
+
+      var $link = $('#'+this.AttachFileLinkID);
+
+      if (!$.browser.opera) {
+         $(NewUploader).css('opacity',0);
+         $(NewUploader).css('right', $link.parent().outerWidth() - $link.outerWidth());
+         $link.parent().append(NewUploader);
+      } else {
+         $link.parent().append(NewUploader);
+         $link.remove();
+      }
       
       var MaxUploadSize = document.createElement('input');
       MaxUploadSize.type = 'hidden';
