@@ -64,6 +64,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
    public function Base_BeforeFetchMaster_Handler(&$Sender) {
 		// If we are using the default master view, and in preview mode, use custom css & html files
 		$DoPreview = Gdn::Session()->GetPreference('PreviewCustomTheme', FALSE);
+		// echo $DoPreview ? 'YES' : 'NO';
 		$HtmlFile = C('Plugins.CustomTheme.PreviewHtml', '');
 		if ($HtmlFile != '' && $DoPreview && ($Sender->MasterView == 'default' || $Sender->MasterView == '')) {
 			$MasterViewPath = GetValue('MasterViewPath', $Sender->EventArguments, '');
@@ -226,8 +227,16 @@ Here are some things you should know before you begin:
 			if (in_array($IncludeThemeCSS, array('Yes', 'No'))) 
 				SaveToConfig('Plugins.CustomTheme.IncludeThemeCSS', $IncludeThemeCSS);
 			
-			// If we are applying the changes, copy the current revs over the customtheme.css & default.master.tpl			
-			if ($IsApply || $IsApplyPreview) {
+			// Check to see if there are any fatal errors in the smarty template
+			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', TRUE);
+			$Result = ProxyRequest(Gdn::Request()->Url('/', TRUE));
+//			echo Wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
+			$SmartyCompileError = strpos($Result, '<title>Fatal Error</title>') > 0 ? TRUE : FALSE;
+			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
+		
+			// If we are applying the changes, and the changes didn't cause crashes,
+			// copy the current revs over the customtheme.css & default.master.tpl			
+			if (!$SmartyCompileError && ($IsApply || $IsApplyPreview)) {
 				file_put_contents($Folder . DS . 'design'. DS . 'customtheme.css', $NewCSS);
 				file_put_contents($Folder . DS . 'views'. DS . 'default.master.tpl', $NewHtml);
 				SaveToConfig('Plugins.CustomTheme.EnabledCSS', $PreviewCSSFile);
@@ -242,13 +251,16 @@ Here are some things you should know before you begin:
 			clean_revisions(PATH_THEMES . DS . $CurrentThemeFolder, 'html');
 
 			// TODO: HANDLE PREVIEWS
-			if ($IsPreview) {
-				// Not sure how to handle previews yet...
+			if ($IsPreview && !$SmartyCompileError) {
 				$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', TRUE);
 				Redirect('/');
 			}
+			
+			if ($SmartyCompileError)
+				$Sender->Form->AddError('There was a templating error in your HTML customizations. Make sure that any inline CSS definitions are wrapped in {literal} tags, and all {if} statements have a closing {/if} tag.');
+			else 
+				$Sender->StatusMessage = "Your changes have been applied.";
 
-			$Sender->StatusMessage = "Your changes have been applied.";
 		}
       $Sender->Render(PATH_PLUGINS . DS . 'CustomTheme' . DS . 'views' . DS . 'customtheme.php');
    }
