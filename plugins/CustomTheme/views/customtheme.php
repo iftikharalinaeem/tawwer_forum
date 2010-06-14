@@ -44,10 +44,11 @@ function WriteRevisions($Folder, $CurrentFile) {
 
 $this->Form->AddHidden('CurrentTab', $this->CurrentTab);
 echo $this->Form->Open();
-echo $this->Form->Errors();
 ?>
 <h1>Custom Theme: <?php echo $this->Form->TextBox('ThemeName'); ?></h1>
-
+<?php
+echo $this->Form->Errors();
+?>
 <div class="Tabs CustomThemeTabs">
    <ul>
       <li class="CustomHtml<?php echo $this->CurrentTab == 'Html' ? ' Active' : ''; ?>"><?php echo Anchor(T('Edit Html'), 'settings/customtheme/#'); ?></li>
