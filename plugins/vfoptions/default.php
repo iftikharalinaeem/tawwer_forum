@@ -70,7 +70,10 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 			$Menu->AddLink('Users', 'Vanilla Connect <span class="New">New</span>', 'settings/vanillaconnect', 'Garden.AdminUser.Only');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'));
-      $Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
+		if (C('EnabledPlugins.FileUpload'))
+			$Menu->AddLink('Forum', 'Media <span class="New">New</span>', 'plugin/fileupload', 'Garden.AdminUser.Only');
+			
+		$Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
       $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
    }
    
@@ -97,7 +100,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             .Anchor('Refund Policy', 'http://'.$Url.'.com/info/refund', '', array('target' => '_New'))
             .' | '
             .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New'));
-         $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'float: right;')));
+         $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'float: right; padding-top: 6px;')));
          $Sender->AddCssFile('plugins/vfoptions/design/vfoptions.css', 'dashboard');
       }
       
@@ -560,17 +563,17 @@ pageTracker._trackPageview();
 		$Features['free'] = array();
 		$Features['basic'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
-			'CustomDomain'
+			'CustomDomain', 'FileUpload'
 		);
 		$Features['plus'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
-			'CustomDomain', 'CustomTheme', 'PrivateCommunity', 'VanillaConnect',
-			'Backups'
+			'CustomDomain', 'FileUpload', 'CustomTheme', 'PrivateCommunity',
+			'VanillaConnect', 'Backups'
 		);
 		$Features['premium'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
-			'CustomDomain', 'CustomTheme', 'PrivateCommunity', 'VanillaConnect',
-			'Backups', 'FileUpload', 'SpamControl'
+			'CustomDomain', 'FileUpload', 'CustomTheme', 'PrivateCommunity',
+			'VanillaConnect', 'Backups', 'FileUpload', 'SpamControl'
 		);
 
       // See what plan the site has
@@ -617,7 +620,6 @@ pageTracker._trackPageview();
 		// TODO: PrivateCommunity
 		// TODO: Backups
 		// TODO: SpamControl
-
 
 		// Remove & Re-Add the vfoptions plugin (so it goes last to have better control over what gets added to the dashboard menu)
 		RemoveFromConfig('EnabledPlugins.vfoptions');
