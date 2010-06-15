@@ -12,12 +12,13 @@ class TaskList {
    protected $Clients;
    protected $Tasks;
    protected $Database;
+   protected $ClientList;
 
    public function __construct($TaskDir, $ClientDir) {
    
       $this->Clients = $ClientDir;
       $this->Tasks = array();
-      $this->Database = mysql_connect(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD); // Open the db connection
+      $this->Database = mysql_connect(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, TRUE); // Open the db connection, new link please
       if (!$this->Database)
          die("Could not connect to database as '".DATABASE_USER."'@'".DATABASE_HOST."'\n");
          
@@ -58,36 +59,57 @@ class TaskList {
             }
          }
          TaskList::Event("");
-         
       }
-      
       closedir($TaskDirectory);
-   }
-   
-   public function RunAll($TaskOrder = NULL) {
-      TaskList::MajorEvent("Running through client list...");
+      
+      TaskList::MajorEvent("Scanning for clients...", TaskList::NOBREAK);
+      $this->ClientList = array();
       $FolderList = scandir($this->Clients);
       if ($FolderList === FALSE) {
-         TaskList::MajorEvent("Could not open client folder.");
+         TaskList::MajorEvent("could not open client folder.");
          return FALSE;
       }
+      
       foreach ($FolderList as $ClientFolder) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
          
          $ClientInfo = $this->LookupClientByFolder($ClientFolder);
-         TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
-         
-         // Run all tasks for this client
-         if (!is_null($TaskOrder)) {
-            foreach ($TaskOrder as $TaskName)
-               $this->Tasks[$TaskName]['task']->SandboxExecute($ClientFolder, $ClientInfo);
-         } else {
-            foreach ($this->Tasks as $TaskName => &$Task)
-               $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
-         }
-                     
-         TaskList::MajorEvent("");
+         $this->ClientList[$ClientFolder] = $ClientInfo;
       }
+      $NumClients = count($this->ClientList);
+      TaskList::MajorEvent("found {$NumClients}!", TaskList::NOBREAK);
+      
+      $Proceed = TaskList::Question("","Proceed with task execution?",array('yes''no'),'no');
+      if ($Proceed == 'no') exit();
+   }
+   
+   public function RunAll($TaskOrder = NULL) {
+      TaskList::MajorEvent("Running through full client list...");
+      foreach ($this->ClientList as $ClientFolder => $ClientInfo)
+         $this->RunClient($ClientFolder, $TaskOrder);
+   }
+   
+   public function RunSelectiveRegex($RegularExression, $TaskOrder = NULL) {
+      TaskList::MajorEvent("Running regular expression {$RegularExpression} against client list...");
+      foreach ($this->ClientList as $ClientFolder => $ClientInfo) {
+         if (!preg_match($RegularExpression, $ClientFolder, $Matches)) continue;
+         $this->RunClient($ClientFolder, $TaskOrder);
+      }
+   }
+   
+   public function RunClient($ClientFolder, $TaskOrder = NULL) {
+      $ClientInfo = $this->ClientList[$ClientFolder];
+      TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
+      
+      // Run all tasks for this client
+      if (!is_null($TaskOrder)) {
+         foreach ($TaskOrder as $TaskName)
+            $this->Tasks[$TaskName]['task']->SandboxExecute($ClientFolder, $ClientInfo);
+      } else {
+         foreach ($this->Tasks as $TaskName => &$Task)
+            $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
+      }
+      TaskList::MajorEvent("");
    }
    
    protected function LookupClientByFolder($ClientFolder) {
