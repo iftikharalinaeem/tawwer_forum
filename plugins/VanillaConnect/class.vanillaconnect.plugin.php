@@ -352,8 +352,8 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       array_push($EnabledSchemes, 'proxy');
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
       
-      Gdn_LibraryMap::SafeCache('library','class.handshakeauthenticator.php',$this->GetResource('class.handshakeauthenticator.php'));
-      Gdn_LibraryMap::SafeCache('library','class.proxyauthenticator.php',$this->GetResource('class.proxyauthenticator.php'));
+      Gdn_FileCache::SafeCache('library','class.handshakeauthenticator.php',$this->GetResource('class.handshakeauthenticator.php'));
+      Gdn_FileCache::SafeCache('library','class.proxyauthenticator.php',$this->GetResource('class.proxyauthenticator.php'));
       
       // Create a provider key/secret pair if needed
       $SQL = Gdn::Database()->SQL();
