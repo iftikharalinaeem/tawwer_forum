@@ -583,6 +583,7 @@ pageTracker._trackPageview();
          ->From('SiteFeature sf')
          ->Join('Feature f', 'sf.FeatureID = f.FeatureID')
          ->Where('sf.SiteID', $SiteID)
+         ->Where('sf.Selected', '1')
          ->Get();
       
 		$ApplyFeatures = array();   
