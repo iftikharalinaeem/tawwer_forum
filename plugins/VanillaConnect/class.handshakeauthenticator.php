@@ -252,7 +252,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
          $this->GetProviderKey(), 
          $this->GetProviderSecret(), 
          $this->GetProviderUrl(),
-         $this->GetProviderValue('RegistrationUrl'),
+         $this->GetProviderValue('RegisterUrl'),
          $this->GetProviderValue('SignInUrl'),
          $this->GetProviderValue('SignOutUrl')
       );
@@ -594,14 +594,14 @@ class Gdn_OAuthToken extends OAuthToken {
 
 class Gdn_OAuthConsumer extends OAuthConsumer {
 
-   public $RegistrationURL;
+   public $RegisterURL;
    public $SignInURL;
    public $SignOutURL;
 
-   public function __construct($ConsumerKey, $ConsumerSecret, $ConsumerUrl, $RegistrationUrl, $SignInUrl, $SignOutUrl) {
+   public function __construct($ConsumerKey, $ConsumerSecret, $ConsumerUrl, $RegisterUrl, $SignInUrl, $SignOutUrl) {
       parent::__construct($ConsumerKey, $ConsumerSecret, $ConsumerUrl);
       
-      $this->RegistrationUrl = $RegistrationUrl;
+      $this->RegisterUrl = $RegisterUrl;
       $this->SignInUrl = $SignInUrl;
       $this->SignOutUrl = $SignOutUrl;
    }

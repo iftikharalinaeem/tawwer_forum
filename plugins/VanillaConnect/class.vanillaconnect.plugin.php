@@ -65,7 +65,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
             $Sender->Form->SetData($Provider);
          } else if (C('Plugins.VanillaConnect.Enabled')) {
             $ProviderModel->Validation->ApplyRule('URL',             'Required');
-            $ProviderModel->Validation->ApplyRule('RegistrationUrl', 'Required');
+            $ProviderModel->Validation->ApplyRule('RegisterUrl',     'Required');
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
             $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
 				$Sender->Form->SetFormValue('AuthenticationKey', $ConsumerKey);
