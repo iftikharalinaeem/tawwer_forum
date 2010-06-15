@@ -594,10 +594,11 @@ pageTracker._trackPageview();
 		}
 
 		// No Advertisements - This is polarized (enabling this feature means turning off the ads plugin).
-		$IsEnabled = C('EnabledPlugins.googleadsense', '') == '' ? TRUE : FALSE;
+		$IsEnabled = C('EnabledPlugins.googleadsense', C('EnabledPlugins.GoogleAdSense', '')) == '' ? TRUE : FALSE;
 		$IsInPlan = in_array('NoAds', $ApplyFeatures);
 		if ($IsInPlan && !$IsEnabled) {
 			RemoveFromConfig('EnabledPlugins.googleadsense');
+         RemoveFromConfig('EnabledPlugins.GoogleAdSense');
 		} else if (!$IsInPlan && $IsEnabled) {
 			SaveToConfig('EnabledPlugins.googleadsense', 'googleadsense');
 		}
