@@ -553,7 +553,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          ->Column('ForeignTable', 'varchar(24)', TRUE)
          ->Set(FALSE, FALSE);
  
-      Gdn_FileCache::SafeCache('library','class.mediamodel.php',$this->GetResource('models/class.mediamodel.php'));
+      Gdn_LibraryMap::SafeCache('library','class.mediamodel.php',$this->GetResource('models/class.mediamodel.php'));
       
       SaveToConfig('Plugins.FileUpload.Enabled', TRUE);
    }
