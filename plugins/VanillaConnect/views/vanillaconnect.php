@@ -24,8 +24,8 @@
          echo Wrap(T('The URL of your website where you will use VanillaConnect'));
       ?></li>
       <li><?php
-         echo $this->Form->Label(T('Registration URL'), 'RegistrationUrl');
-         echo $this->Form->TextBox('RegistrationUrl');
+         echo $this->Form->Label(T('Registration URL'), 'RegisterUrl');
+         echo $this->Form->TextBox('RegisterUrl');
          echo Wrap(T('The URL where users can sign up for new accounts on your site'));
       ?></li>
       <li><?php
