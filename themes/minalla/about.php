@@ -20,11 +20,11 @@ $ThemeInfo['minalla'] = array(
    'AuthorUrl' => 'http://brendanserashriar.com',
    'Options' => array(
          'Styles' => array(
-            'Blue' => '%s_blue',
-            'Green' => '%s_green',
-            'Red' => '%s_red',
-            'Yellow' => '%s'),
-         'Text' => array(
-            'Some Text' => 'This is some text!!!!')
+            'Minalla Blue' => '%s_blue',
+            'Minalla Green' => '%s_green',
+            'Minalla Red' => '%s_red',
+			'Minalla Grey' => '%s_grey',
+            'Minalla Yellow' => '%s'),
+         
    )
 );
