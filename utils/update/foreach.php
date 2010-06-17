@@ -79,7 +79,7 @@ class TaskList {
       $NumClients = count($this->ClientList);
       TaskList::MajorEvent("found {$NumClients}!", TaskList::NOBREAK);
       
-      $Proceed = TaskList::Question("","Proceed with task execution?",array('yes''no'),'no');
+      $Proceed = TaskList::Question("","Proceed with task execution?",array('yes','no'),'no');
       if ($Proceed == 'no') exit();
    }
    
