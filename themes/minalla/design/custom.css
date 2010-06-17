@@ -108,6 +108,17 @@ div.Menu {
 	text-align:left;
 }
 
+#Head h1.Title a{
+	color:#FFDE00;
+	font-size:1.7em;
+
+}
+
+#Head h1.Title a:hover{
+	color:#F4B722;
+	font-size:1.7em;
+}
+
 ul#Menu {
 	float:right;
 	padding:25px 0 0 10px;
@@ -160,6 +171,16 @@ div.Preview {
 	background:#fff;
 }
 
+#Menu a span, #Menu li.Active a span, #Menu li.Highlight a:hover span {
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	background:#FFDE00;
+	border:1px solid #FFDE00;
+	color:#282828;
+}
+
+
+ 
 /* ============================================================= Entry Screen */
 body.Entry #Content {
 	float:left;
@@ -502,14 +523,16 @@ ul.PanelInfo div.Meta strong {
 	/*text-decoration:underline;*/
 }
 #Foot .vanilla-ico {
+	background:url(vanilla_ico.png) no-repeat;
 	float:left;
 	width:15px;
 	height:15px;
 	margin:0;
-	padding:0 6px 6px 0;
+	padding:0 7px 7px 0;
 }
 
 .Foot {
 	background:#f2f2f2;
 	border-bottom:1px solid #c4c4c4;
 }
+

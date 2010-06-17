@@ -109,6 +109,17 @@ div.Menu {
 	text-align:left;
 }
 
+#Head h1.Title a{
+	color:#c4c4c4  ;
+	font-size:1.7em;
+
+}
+
+#Head h1.Title a:hover{
+	color:#fff;
+	font-size:1.7em;
+}
+
 ul#Menu {
 	float:right;
 	padding:25px 0 0 10px;

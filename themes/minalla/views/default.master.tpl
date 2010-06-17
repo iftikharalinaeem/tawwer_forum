@@ -5,23 +5,15 @@
 </head>
 <body id="{$BodyID}" class="{$BodyClass}">
    <div id="Frame">
-   
-   <div id="container-wrap">
-      <div id="container">
       <div id="Head">
-        
+         <div class="Menu">
 
 				<!--Load custom logo from banner options-->
             
             	<h1 class="Title"><a href="{link path="/"}">{logo}</a></h1>
                 
-                <div id="t-right">
-					<p class="intro">{text code="Header Text" default="This is just place holder text. Use the theme options to put whatever you want here!"}</p>
-				</div>
-
-                
                   <!-- Start menu -->
-                 <div class="Menu">
+                  
                   <ul id="Menu">
                     {if CheckPermission('Garden.Settings.Manage')}
                        <li><a href="{link path="dashboard/settings"}">Dashboard</a></li>
@@ -47,11 +39,11 @@
          </div>
       </div>
       
+      
+      
       <div id="Body">
       
          <!-- Start body content: helper menu and discussion list -->
-      
-      
       
          <div id="Content">{asset name="Content"}</div>
          
@@ -80,8 +72,7 @@
 		</div>
         
       <!-- End foot -->  
-        </div>
-        </div>
+        
    </div>
 </body>
 </html>
