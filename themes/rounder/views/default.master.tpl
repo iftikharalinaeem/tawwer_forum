@@ -16,7 +16,7 @@
             	<h1 class="Title"><a href="{link path="/"}">{logo}</a></h1>
                 
                 <div id="t-right">
-					<p class="intro">This is just place holder text. Use the default master to put whatever you want here!</p>
+					<p class="intro">{text code="Header Text" default="This is just place holder text. Use the theme options to put whatever you want here!"}</p>
 				</div>
 
                 
