@@ -16,7 +16,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 require_once(implode(DS, array(PATH_LIBRARY,'vendors','oauth','OAuth.php')));
 
-class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
+class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake {
 
    protected $_CookieName = NULL;
    protected $_OAuthServer = NULL;
@@ -128,7 +128,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
        * Just go directly to creating an access token and authenticating it with a normal vanilla identity cookie.
        */
       if ($HaveToken['UserID']) {
-         $this->ProcessAuthorizedRequest($CookiePayload, TRUE);
+         $this->ProcessAuthorizedRequest($CookiePayload);
          return Gdn_Authenticator::AUTH_SUCCESS;
       } else {
          
@@ -220,25 +220,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
    }
    
    public function AssociateRemoteKey($ConsumerKey, $UserKey, $TokenKey, $UserID = 0) {
-      $SQL = Gdn::Database()->SQL();
-      
-      if ($UserID == 0) {
-         try {
-            $SQL->Insert('UserAuthentication',array(
-               'UserID'          => 0,
-               'ForeignUserKey'  => $UserKey,
-               'ProviderKey'     => $ConsumerKey
-            ));
-         } catch(Exception $e) {}
-      } else {
-         $SQL->Replace('UserAuthentication',array(
-               'UserID'          => $UserID
-            ), array(
-               'ForeignUserKey'  => $UserKey,
-               'ProviderKey'     => $ConsumerKey
-            ));
-      }
-      
+      Gdn::Authenticator()->AssociateUser($ConsumerKey, $UserKey, $UserID);      
       $this->_AssociateOAuthToken($TokenKey, $UserKey);
    }
    
@@ -404,20 +386,25 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
    
    protected function _Synchronize($RequestToken, $OAuthConsumer, $CookiePayload) {
       $UserEmail = $RequestToken->UserKey;
-      $UserName = array_key_exists('name', $CookiePayload) ? $CookiePayload['name'] : NULL;
-      
-      $TokenHash = array_pop(explode('.',$RequestToken->key));
-      $ConsumerKey = $OAuthConsumer->key;
       
       // Check if the user has already been associated, otherwise redirect to the HANDSHAKER OF DOOM!!!
       if (($UserAssociation = $RequestToken->GetAssociation()) !== false ) {
          $AccessToken = $this->_ConvertRequestToken($RequestToken, $OAuthConsumer);
          return $AccessToken;
       } else {
-         Gdn::Request()->WithURI('entry/handshake');
+         Gdn::Request()->WithURI('entry/handshake/handshake');
       }
       
       return FALSE;
+   }
+   
+   public function Finalize($UserKey, $UserID, $ConsumerKey, $TokenKey, $CookiePayload) {
+
+      // Associate the request token with this user ID
+      $this->AssociateRemoteKey($ConsumerKey, $UserKey, $TokenKey,  $UserID);
+            
+      // Process the request token and create an access token
+      $this->ProcessAuthorizedRequest($CookiePayload);
    }
    
    public function ProcessAuthorizedRequest($CookiePayload) {
@@ -465,7 +452,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
       }
    }
    
-   public function GetHandshakeCookie() {
+   public function GetHandshake() {
       $HaveHandshake = Gdn_CookieIdentity::CheckCookie($this->_CookieName);
       
       if ($HaveHandshake) {
@@ -490,14 +477,28 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
       Gdn_Cookieidentity::DeleteCookie($this->_CookieName);
    }
    
-   public function GetTokenFromCookie($CookiePayload) {
-      $TokenKey = $CookiePayload['token'];
-      $ConsumerKey = $CookiePayload['consumer_key'];
+   public function GetUserKeyFromHandshake($CookiePayload) {
+      $TokenKey = ArrayValue('token', $CookiePayload, FALSE);
+      $ConsumerKey = ArrayValue('consumer_key', $CookiePayload, FALSE);
+      
+      $Token = FALSE;
       foreach (array('request','access') as $TokenType) {
          $Token = $this->lookup_token($ConsumerKey, $TokenType, $TokenKey);
          if ($Token) break;
       }
-      return $Token;
+      return $Token ? $Token->UserKey : $Token;
+   }
+   
+   public function GetProviderKeyFromHandshake($CookiePayload) {
+      return ArrayValue('consumer_key', $CookiePayload, FALSE);
+   }
+   
+   public function GetTokenKeyFromHandshake($Handshake) {
+      return ArrayValue('token', $CookiePayload, '');
+   }
+   
+   public function GetUserNameFromHandshake($Handshake) {
+      return ArrayValue('name', $CookiePayload, '');
    }
    
    public function GetURL($URLType) {
@@ -523,6 +524,9 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
    }
    
    public function WakeUp() {
+      // Allow the entry/handshake method to function
+      Gdn::Authenticator()->AllowHandshake();
+      
       $this->FetchData(Gdn::Request());
       $CurrentStep = $this->CurrentStep();
       
@@ -538,9 +542,10 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator {
          return;
       
       // Look for handshake cookies
-      $Payload = $this->GetHandshakeCookie();
+      $Payload = $this->GetHandshake();
       
       if ($Payload) {
+         
          // Process the cookie auth
          $this->ProcessAuthorizedRequest($Payload);
       }
@@ -569,25 +574,7 @@ class Gdn_OAuthToken extends OAuthToken {
    }
    
    public function GetAssociation() {
-      if ($this->UserKey == NULL) 
-         return FALSE;
-         
-      $SQL = Gdn::Database()->SQL();
-      $UserAssociation = $SQL->Select('ua.UserID, ua.ForeignUserKey')
-         ->From('UserAuthentication ua')
-         ->Join('UserAuthenticationToken uat', 'ua.ForeignUserKey = uat.ForeignUserKey', 'left')
-         ->Where('ua.ForeignUserKey', $this->UserKey)
-         ->Where('uat.Token', $this->key)
-         ->Where('UserID >', 0)
-         ->Get()
-         ->FirstRow(DATASET_TYPE_ARRAY);
-         
-      if ($UserAssociation) {
-         $this->UserID = $UserAssociation['UserID'];
-         return $UserAssociation;
-      }
-         
-      return FALSE;
+      return Gdn::Authenticator()->GetAssociation($this->UserKey, $this->key, Gdn_Authenticator::KEY_TYPE_TOKEN);
    }
 
 }
