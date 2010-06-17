@@ -24,6 +24,7 @@ $PluginInfo['FileUpload'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
+Gdn_LibraryMap::SafeCache('library','class.mediamodel.php',dirname(__FILE__).DS.'models/class.mediamodel.php');
 class FileUploadPlugin extends Gdn_Plugin {
 
    /**
@@ -399,7 +400,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          $FileName = $FileData['name'];
          $FileTemp = $FileData['tmp_name'];
          $FileSize = $FileData['size'];
-         $FileKey = ($Sender->ApcKey ? $Sender->ApcKey : '');
+         $FileKey  = ($Sender->ApcKey ? $Sender->ApcKey : '');
 
          if ($FileErr != UPLOAD_ERR_OK) {
             $ErrorString = '';
@@ -560,8 +561,6 @@ class FileUploadPlugin extends Gdn_Plugin {
          ->Column('ForeignID', 'int(11)', TRUE)
          ->Column('ForeignTable', 'varchar(24)', TRUE)
          ->Set(FALSE, FALSE);
- 
-      Gdn_FileCache::SafeCache('library','class.mediamodel.php',$this->GetResource('models/class.mediamodel.php'));
       
       SaveToConfig('Plugins.FileUpload.Enabled', TRUE);
    }
