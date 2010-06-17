@@ -89,7 +89,7 @@ class TaskList {
          $this->RunClient($ClientFolder, $TaskOrder);
    }
    
-   public function RunSelectiveRegex($RegularExression, $TaskOrder = NULL) {
+   public function RunSelectiveRegex($RegularExpression, $TaskOrder = NULL) {
       TaskList::MajorEvent("Running regular expression {$RegularExpression} against client list...");
       foreach ($this->ClientList as $ClientFolder => $ClientInfo) {
          if (!preg_match($RegularExpression, $ClientFolder, $Matches)) continue;
