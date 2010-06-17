@@ -23,6 +23,8 @@ $ThemeInfo['minalla'] = array(
             'Blue' => '%s_blue',
             'Green' => '%s_green',
             'Red' => '%s_red',
-            'Yellow' => '%s')
+            'Yellow' => '%s'),
+         'Text' => array(
+            'Some Text' => 'This is some text!!!!')
    )
 );
