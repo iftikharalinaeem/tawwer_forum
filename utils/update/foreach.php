@@ -72,8 +72,6 @@ class TaskList {
       
       foreach ($FolderList as $ClientFolder) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
-         
-         $ClientInfo = $this->LookupClientByFolder($ClientFolder);
          $this->ClientList[$ClientFolder] = $ClientInfo;
       }
       $NumClients = count($this->ClientList);
@@ -98,7 +96,7 @@ class TaskList {
    }
    
    public function RunClient($ClientFolder, $TaskOrder = NULL) {
-      $ClientInfo = $this->ClientList[$ClientFolder];
+      $ClientInfo = $this->LookupClientByFolder($ClientFolder);
       TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
       
       // Run all tasks for this client
