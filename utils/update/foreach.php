@@ -72,7 +72,7 @@ class TaskList {
       
       foreach ($FolderList as $ClientFolder) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
-         $this->ClientList[$ClientFolder] = $ClientInfo;
+         $this->ClientList[$ClientFolder] = 1;
       }
       $NumClients = count($this->ClientList);
       TaskList::MajorEvent("found {$NumClients}!", TaskList::NOBREAK);
