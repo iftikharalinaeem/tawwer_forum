@@ -24,7 +24,7 @@ $PluginInfo['FileUpload'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
-Gdn_FileCache::SafeCache('library','class.mediamodel.php',dirname(__FILE__).DS.'models/class.mediamodel.php');
+Gdn_LibraryMap::SafeCache('library','class.mediamodel.php',dirname(__FILE__).DS.'models/class.mediamodel.php');
 class FileUploadPlugin extends Gdn_Plugin {
 
    /**

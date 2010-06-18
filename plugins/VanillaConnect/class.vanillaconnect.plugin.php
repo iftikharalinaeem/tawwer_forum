@@ -25,7 +25,7 @@ $PluginInfo['VanillaConnect'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
-Gdn_FileCache::SafeCache('library','class.handshakeauthenticator.php',dirname(__FILE__).DS.'class.handshakeauthenticator.php');
+Gdn_LibraryMap::SafeCache('library','class.handshakeauthenticator.php',dirname(__FILE__).DS.'class.handshakeauthenticator.php');
 class VanillaConnectPlugin extends Gdn_Plugin {
 
    /**
