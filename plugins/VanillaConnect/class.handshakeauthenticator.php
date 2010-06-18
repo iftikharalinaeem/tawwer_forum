@@ -46,7 +46,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       $this->_OAuthServer->add_signature_method(new OAuthSignatureMethod_PLAINTEXT());
       
       // Which cookie signals the presence of an authentication package?
-      $this->_CookieName = Gdn::Config('Garden.Authenticators.handshake.CookieName');
+      $this->_CookieName = Gdn::Config('Garden.Authenticators.handshake.CookieName', 'VanillaHandshake');
       
       // Initialize built-in authenticator functionality
       parent::__construct();
