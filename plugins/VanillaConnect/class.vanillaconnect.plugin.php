@@ -25,6 +25,7 @@ $PluginInfo['VanillaConnect'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
+Gdn_FileCache::SafeCache('library','class.handshakeauthenticator.php',dirname(__FILE__).DS.'class.handshakeauthenticator.php');
 class VanillaConnectPlugin extends Gdn_Plugin {
 
    /**
@@ -65,7 +66,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
             $Sender->Form->SetData($Provider);
          } else if (C('Plugins.VanillaConnect.Enabled')) {
             $ProviderModel->Validation->ApplyRule('URL',             'Required');
-            $ProviderModel->Validation->ApplyRule('RegistrationUrl', 'Required');
+            $ProviderModel->Validation->ApplyRule('RegisterUrl',     'Required');
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
             $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
 				$Sender->Form->SetFormValue('AuthenticationKey', $ConsumerKey);
@@ -169,132 +170,13 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       
       return implode("", $FileData);
    }
-
-   public function EntryController_Handshake_Create(&$Sender) {
-		// Don't show anything if not enabled
-		if (!C('Plugins.VanillaConnect.Enabled'))
-			return FALSE;
-
-      $Sender->AddJsFile('entry.js');
-      
-      $Sender->Form->SetModel($Sender->UserModel);
-      $Sender->Form->AddHidden('ClientHour', date('G', time())); // Use the server's current hour as a default
-      $Sender->Form->AddHidden('Target', GetIncomingValue('Target', '/'));
-      
-      $Target = GetIncomingValue('Target', '/');
-      
-      $Authenticator = Gdn::Authenticator()->AuthenticateWith('handshake');
-      $CookiePayload = $Authenticator->GetHandshakeCookie();
-      if ($CookiePayload === FALSE) {
-         Gdn::Request()->WithURI('dashboard/entry/auth/password');
-         return Gdn::Dispatcher()->Dispatch();
-      }
-      $Token = $Authenticator->GetTokenFromCookie($CookiePayload);
-      $ConsumerKey = $CookiePayload['consumer_key'];
-      $UserKey = $Token->UserKey;
-      
-      $PreservedKeys = array(
-         'UserKey', 'Token', 'Consumer', 'Email', 'Name', 'Gender', 'HourOffset'
-      );
-      
-      $UserID = 0;
-      
-      if ($Sender->Form->IsPostBack() === TRUE) {
-      
-         $FormValues = $Sender->Form->FormValues();
-         if (ArrayValue('StopLinking', $FormValues)) {
-         
-            $Authenticator->DeleteCookie();
-            Gdn::Request()->WithRoute('DefaultController');
-            return Gdn::Dispatcher()->Dispatch();
-            
-         } elseif (ArrayValue('NewAccount', $FormValues)) {
-         
-            // Try and synchronize the user with the new username/email.
-            $FormValues['Name'] = $FormValues['NewName'];
-            $FormValues['Email'] = $FormValues['NewEmail'];
-            $UserID = $Sender->UserModel->Synchronize($Token->UserKey, $FormValues);
-            $Sender->Form->SetValidationResults($Sender->UserModel->ValidationResults());
-            
-         } else {
-
-            // Try and sign the user in.
-            $PasswordAuthenticator = Gdn::Authenticator()->AuthenticateWith('password');
-            $PasswordAuthenticator->HookDataField('Email', 'SignInEmail');
-            $PasswordAuthenticator->HookDataField('Password', 'SignInPassword');
-            $PasswordAuthenticator->FetchData($Sender->Form);
-            
-            $UserID = $PasswordAuthenticator->Authenticate();
-            
-            if ($UserID < 0) {
-               $Sender->Form->AddError('ErrorPermission');
-            } else if ($UserID == 0) {
-               $Sender->Form->AddError('ErrorCredentials');
-            }
-            
-            if ($UserID > 0) {
-               $Data = $FormValues;
-               $Data['UserID'] = $UserID;
-               $Data['Email'] = ArrayValue('SignInEmail', $FormValues, '');
-               $UserID = $Sender->UserModel->Synchronize($Token->UserKey, $Data);
-            }
-         }
-         
-         if ($UserID > 0) {
-            // The user has been created successfully, so sign in now
-            
-            // Associate the request token with this user ID
-            $Authenticator->AssociateRemoteKey($ConsumerKey, $Token->UserKey, $Token->key,  $UserID);
-            
-            // Process the request token and create an access token
-            $Authenticator->ProcessAuthorizedRequest($CookiePayload);
-            
-            /// ... and redirect them appropriately
-            $Route = $Sender->RedirectTo();
-            if ($Route !== FALSE)
-               Redirect($Route);
-         } else {
-            // Add the hidden inputs back into the form.
-            foreach($FormValues as $Key => $Value) {
-               if(in_array($Key, $PreservedKeys))
-                  $Sender->Form->AddHidden($Key, $Value);
-            }
-         }
-      } else {
-         $Id = Gdn::Authenticator()->GetIdentity(TRUE);
-         if ($Id > 0) {
-            // The user is signed in so we can just go back to the homepage.
-            Redirect($Target);
-         }
-         
-         $Name = ArrayValue('name', $CookiePayload);
-         $Email = $Token->UserKey;
-         
-         // Set the defaults for a new user.
-         $Sender->Form->SetFormValue('NewName', $Name);
-         $Sender->Form->SetFormValue('NewEmail', $Email);
-         
-         // Set the default for the login.
-         $Sender->Form->SetFormValue('SignInEmail', $Email);
-         $Sender->Form->SetFormValue('Handshake', 'NEW');
-         
-         // Add the handshake data as hidden fields.
-         $Sender->Form->AddHidden('Name',       $Name);
-         $Sender->Form->AddHidden('Email',      $Email);
-         $Sender->Form->AddHidden('UserKey',    $Token->UserKey);
-         $Sender->Form->AddHidden('Token',      $Token->key);
-         $Sender->Form->AddHidden('Consumer',   $ConsumerKey);
-         
-      }
-      
-      $Sender->SetData('Name', ArrayValue('Name', $Sender->Form->HiddenInputs));
-      $Sender->SetData('Email', ArrayValue('Email', $Sender->Form->HiddenInputs));
-      
-      $Sender->Render($this->GetView('handshake.php'));
-   }
    
    public function Setup() {
 		// Do nothing
+   }
+   
+   public function OnDisable() {
+		$this->_Disable();
    }
    
    protected function _CreateProviderModel() {
@@ -334,8 +216,9 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       RemoveFromConfig('Garden.Authenticators.handshake.TokenLifetime');
 
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      foreach (array_keys($EnabledSchemes, array('handshake', 'proxy')) as $HandshakeKey) {
-         unset($EnabledSchemes[$HandshakeKey]);
+      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
+         if ($SchemeKey == 'handshake')
+            unset($EnabledSchemes[$SchemeKey]);
       }
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
    }
@@ -349,11 +232,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
       array_push($EnabledSchemes, 'handshake');
-      array_push($EnabledSchemes, 'proxy');
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
-      
-      Gdn_FileCache::SafeCache('library','class.handshakeauthenticator.php',$this->GetResource('class.handshakeauthenticator.php'));
-      Gdn_FileCache::SafeCache('library','class.proxyauthenticator.php',$this->GetResource('class.proxyauthenticator.php'));
       
       // Create a provider key/secret pair if needed
       $SQL = Gdn::Database()->SQL();
