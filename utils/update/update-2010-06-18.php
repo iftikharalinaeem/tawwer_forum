@@ -13,5 +13,6 @@ define('DATABASE_MAIN', 'vanilla.tim');
 
 $Tasks = new TaskList('launch','/www/vanilla/');
 $Tasks->RunSelectiveRegex('/^vanilla$/',array(
-   'uncache'
+   'uncache',
+   'repairprovider'
 ));
