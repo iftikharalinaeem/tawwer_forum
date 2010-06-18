@@ -652,6 +652,9 @@ pageTracker._trackPageview();
       
       if ($Sender->RequestMethod == 'banner')
          $Sender->View = PATH_PLUGINS.'/vfoptions/views/banner.php';
+
+      if ($Sender->RequestMethod == 'registration')
+         $Sender->View = PATH_PLUGINS.'/vfoptions/views/registration.php';
    }
 
    /**
