@@ -13,5 +13,5 @@ define('DATABASE_MAIN', 'vfcom');
 
 $Tasks = new TaskList('launch','/srv/www/vhosts');
 $Tasks->RunAll(array(
-   'backup'
+   'uncache'
 ));
