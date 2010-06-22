@@ -16,7 +16,7 @@ $PluginInfo['Twitter'] = array(
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
-   'SettingsUrl' => '/dashboard/plugin/fileupload',
+   'SettingsUrl' => '/dashboard/plugin/twitter',
    'SettingsPermission' => 'Garden.AdminUser.Only',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -28,12 +28,19 @@ $PluginInfo['Twitter'] = array(
 class TwitterPlugin extends Gdn_Plugin {
 
    public function Base_Render_Before(&$Sender) {
+      
+      // Only display this in panels loaded from the default master view... prevent loading in admin panel
+      if (!in_array($Sender->MasterView, array('','default.master.php'))) return;
+      
+      // Attach Twitter script library to the HeadModule on the $Sender (calling controller)
       $Sender->Head->AddScript("http://widgets.twimg.com/j/2/widget.js");
       
+      // Get the twitter username we want to use. First check the config, and if not found, use the default of 'vanilla'
       $TwitterUser = C('Plugin.Twitter.Username', 'vanilla');
       $NumTweets = 4;
       $BoxWidth = 250;
       $RefreshInterval = 6000;
+      
       $TwitterCode = <<<TWITCODE
 <script>
 new TWTR.Widget({
@@ -66,6 +73,8 @@ new TWTR.Widget({
 }).render().setUser('{$TwitterUser}').start();
 </script>
 TWITCODE;
+
+      // Add the resulting Javascript to the panel
       $Sender->AddAsset('Panel', $TwitterCode, 'TwitterPlugin');
    }
 
