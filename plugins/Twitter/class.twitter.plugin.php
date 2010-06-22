@@ -38,8 +38,6 @@ class TwitterPlugin extends Gdn_Plugin {
       // Get the twitter username we want to use. First check the config, and if not found, use the default of 'vanilla'
       $TwitterUser = C('Plugin.Twitter.Username', 'vanilla');
       $NumTweets = 4;
-      $BoxWidth = 250;
-      $RefreshInterval = 6000;
       
       $TwitterCode = <<<TWITCODE
 <script>
@@ -47,8 +45,8 @@ new TWTR.Widget({
   version: 2,
   type: 'profile',
   rpp: {$NumTweets},
-  interval: {$RefreshInterval},
-  width: {$BoxWidth},
+  interval: 6000,
+  width: 250,
   height: 300,
   theme: {
     shell: {
@@ -86,4 +84,48 @@ TWITCODE;
       // Nothing to do here!
    }
    
+   public function PluginController_Twitter_Create(&$Sender) {
+      $Sender->Permission('Garden.AdminUser.Only');
+      $Sender->Title('Twitter Plugin Settings');
+      $Sender->AddSideMenu('plugin/twitter');
+      $Sender->Form = new Gdn_Form();
+      $this->Dispatch($Sender, $Sender->RequestArgs);
+   }
+   
+   public function Controller_Index(&$Sender) {
+      //$Sender->AddCssFile($this->GetWebResource('css/twitter.css'));
+      $Sender->AddCssFile('admin.css');
+      
+      $TwitterUsername = C('Vanilla.Plugin.Username', 'vanilla');
+      
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      
+      $ConfigArray = array(
+         'Plugin.Twitter.Username'
+      );
+      if ($Sender->Form->AuthenticatedPostBack() === FALSE)
+         $ConfigArray['Plugin.Twitter.Username'] = $TwitterUsername;
+      
+      $ConfigurationModel->SetField($ConfigArray);
+      
+      // Set the model on the form.
+      $Sender->Form->SetModel($ConfigurationModel);
+      
+      // If seeing the form for the first time...
+      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+         // Apply the config settings to the form.
+         $Sender->Form->SetData($ConfigurationModel->Data);
+      } else {
+         // Define some validation rules for the fields being saved
+         $ConfigurationModel->Validation->ApplyRule('Plugin.Twitter.Username', 'Required');
+         
+         if ($Sender->Form->Save() !== FALSE) {
+            $Sender->StatusMessage = T("Your changes have been saved.");
+         }
+      }
+      
+      $Sender->Render($this->GetView('twitter.php'));
+   }
+      
 }
