@@ -11,24 +11,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * An associative array of information about this application.
  */
-$ThemeInfo['minalla'] = array(
-   'Name' => 'Minalla',
-   'Description' => "A minimilist forum - simple and clean",
+$ThemeInfo['devlab'] = array(
+   'Description' => "A Vanilla Forum for devLAB Montreal ",
    'Version' => '1.0',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://brendanserashriar.com',
-   'Options' => array(
-         'Description' => 'Minalla has a bunch of options.',
-
-         'Styles' => array(
-            'Minalla Blue' => array('%s_blue', 'Description' => 'This is a blue theme'),
-            'Minalla Green' => '%s_green',
-            'Minalla Red' => '%s_red',
-            'Minalla Grey' => '%s_grey',
-            'Minalla Yellow' => '%s'),
-         'Text' => array(
-            'Some Text' => 'TextArea',
-            'Some Other Text' => array('TextBox', 'Description' => 'This is some other text'))
-   )
+   'AuthorUrl' => 'http://brendanserashriar.com'
 );
