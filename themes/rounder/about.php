@@ -19,6 +19,8 @@ $ThemeInfo['rounder'] = array(
    'AuthorEmail' => 'brendan@vanillaforums.com',
    'AuthorUrl' => 'http://brendanserashriar.com',
    'Options' => array(
+		'Description' => 'You can customize the heading text for <strong>Rounder</strong>. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">"Theme Options"</a>.',			  
+					  
          'Text' => array(
             'Header Text' => 'This is just place holder text. Use the theme options to put whatever you want here!'),
 	)
