@@ -19,12 +19,16 @@ $ThemeInfo['minalla'] = array(
    'AuthorEmail' => 'brendan@vanillaforums.com',
    'AuthorUrl' => 'http://brendanserashriar.com',
    'Options' => array(
+         'Description' => 'Minalla has a bunch of options.',
+
          'Styles' => array(
-            'Minalla Blue' => '%s_blue',
+            'Minalla Blue' => array('%s_blue', 'Description' => 'This is a blue theme'),
             'Minalla Green' => '%s_green',
             'Minalla Red' => '%s_red',
-			'Minalla Grey' => '%s_grey',
+            'Minalla Grey' => '%s_grey',
             'Minalla Yellow' => '%s'),
-         
+         'Text' => array(
+            'Some Text' => 'TextArea',
+            'Some Other Text' => array('TextBox', 'Description' => 'This is some other text'))
    )
 );
