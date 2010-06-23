@@ -13,9 +13,22 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 $ThemeInfo['DefaultSmarty'] = array(
    'Name' => 'Vanilla Default',
-   'Description' => "A customizable default theme for Vanilla.",
+   'Description' => "A customizable default theme for Vanilla. This theme has 7 color options.",
    'Version' => '1.0',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.org/profile/todd'
+   'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
+   'Options' => array(
+		'Description' => '<strong>Vanilla</strong> has <font color="red">7 color</font> options. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">"Theme Options"</a>.',
+         
+		 'Styles' => array(
+            'Vanilla Terminal' => '%s_terminal',
+			'Vanilla Grey' => '%s_grey',
+			'Vanilla Old Tyme' => '%s_oldtyme',
+			'Vanilla Big City' => '%s_bigcity',
+			'Vanilla Poppy' => '%s_poppy',
+			'Vanilla Lemon Sea' => '%s_lemonsea',
+            'Vanilla Blue' => '%s'),
+         
+   )
 );
