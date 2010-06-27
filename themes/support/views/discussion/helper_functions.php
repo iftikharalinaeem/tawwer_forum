@@ -57,6 +57,25 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    </div>
 </li>
 <?php
+	$AnswerCount = $Sender->Discussion->CountComments - 1;
+	if ($Type != 'Comment' && $AnswerCount > 0) {
+	?>
+	<li>
+		<div class="Tabs DiscussionTabs AnswerTabs">
+		<?php
+		echo
+			Wrap($AnswerCount.' '.Plural($AnswerCount, 'Answer', 'Answers'), 'strong')
+			.' sorted by 
+			<ul>
+				<li'.($Sender->Sort == 'popular' ? ' class="Active"' : '').'>'.Anchor('Votes', Gdn::Request()->Url('', TRUE)).'</li>
+				<li'.($Sender->Sort == 'date' ? ' class="Active"' : '').'>'.Anchor('Date Added', Gdn::Request()->Url('', TRUE).'?Sort=date').'</li>
+			</ul>';
+		?>
+		</div>
+	</li>
+	<?php
+	}
+
 }
 
 function WriteOptionList($Object, $Sender, $Session) {

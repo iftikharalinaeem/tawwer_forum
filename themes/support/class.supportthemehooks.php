@@ -47,6 +47,16 @@ class SupportThemeHooks implements Gdn_IPlugin {
    }
     */
 
+   // Sort the comments by popularity if necessary
+   public function DiscussionModel_BeforeGet_Handler($Sender) {
+      $Sort = GetIncomingValue('Sort', 'popular');
+      if (!in_array($Sort, array('popular', 'date')))
+         $Sort = 'popular';
+         
+      if ($Sort == 'popular')
+         $Sender->SQL->OrderBy('d.Score', 'desc');
+   }
+
    // Add the vote.js file to discussions page
    public function DiscussionController_Render_Before($Sender) {
 // ===========================================================================================================================
@@ -54,6 +64,13 @@ class SupportThemeHooks implements Gdn_IPlugin {
 // Use a numbered pager instead of more pager.
 // ===========================================================================================================================
       $Sender->AddJsFile('vote.js');
+
+      // Define the sort on the controller (for views to use)
+      $Sort = GetIncomingValue('Sort', 'popular');
+      if (!in_array($Sort, array('popular', 'date')))
+         $Sort = 'popular';
+
+      $Sender->Sort = $Sort;
    }
    
    /**

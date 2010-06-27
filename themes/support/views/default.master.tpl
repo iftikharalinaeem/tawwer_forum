@@ -22,8 +22,8 @@
       {asset name="Content"}
     </div>
     <div id="Panel">
-      <div id="Search">{searchbox}</div>
       {asset name="Panel"}
+      <div id="Search">{searchbox}</div>
     </div>
   </div>
   <div id="Foot">

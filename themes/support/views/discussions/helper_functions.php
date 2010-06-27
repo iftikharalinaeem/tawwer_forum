@@ -47,20 +47,28 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
 
    // Follows
    $Title = T($Discussion->Bookmarked == '1' ? 'Undo Follow' : 'Follow');
-   echo Wrap(Anchor(
-      Wrap(T('Follows')) . $Discussion->CountBookmarks,
-      '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
-      '',
-      array('title' => $Title)
-   ), 'div', array('class' => 'StatBox FollowsBox'));
+   if ($Session->IsValid()) {
+      echo Wrap(Anchor(
+         Wrap(T('Follows')) . $Discussion->CountBookmarks,
+         '/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
+         '',
+         array('title' => $Title)
+      ), 'div', array('class' => 'StatBox FollowsBox'));
+   } else {
+      echo Wrap(Wrap(T('Follows')) . $Discussion->CountBookmarks, 'div', array('class' => 'StatBox FollowsBox'));
+   }
 
    // Votes
-   echo Wrap(Anchor(
-      Wrap(T('Votes')) . $CountVotes,
-      '/vanilla/discussion/votediscussion/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
-      '',
-      array('title' => T('Vote'))
-   ), 'div', array('class' => 'StatBox VotesBox'));
+   if ($Session->IsValid()) {
+      echo Wrap(Anchor(
+         Wrap(T('Votes')) . $CountVotes,
+         '/vanilla/discussion/votediscussion/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
+         '',
+         array('title' => T('Vote'))
+      ), 'div', array('class' => 'StatBox VotesBox'));
+   } else {
+      echo Wrap(Wrap(T('Votes')) . $CountVotes, 'div', array('class' => 'StatBox VotesBox'));
+   }
 
 /*
    if ($FirstPhoto != '') {

@@ -1,153 +1,45 @@
 /* ============================================= Support Theme Customizations */
-/*
- ul.DataList li.DiscussionRow div.Discussion strong a.DiscussionLink {
-   display: block;
-   padding: 6px 0 0;
-   margin: 0;
-   max-width: 598px;
-   font-size: 120%;
-   font-weight: bold;
+div.Menu {
+	text-align: left;
+	position: relative;
+	padding: 10px 0;
 }
-ul.DataList li.DiscussionRow {
-   clear: both;
+body #Head h1 {
+	margin: 0;
+	padding: 0;
+	float:none;
 }
-ul.DataList li.DiscussionRow a.AuthorPhoto {
-   float: left;
-   margin: 6px 6px 0;
-   width: 40px;
-   height: 40px;
-   overflow: hidden;
+ul.UserOptions {
+	position: absolute;
+	top: 10px;
+	right: 6px;
 }
-ul.DataList li.DiscussionRow a.AuthorPhoto img {
-   height: 40px;
-   width: 40px;
-   overflow: hidden;
+ul.UserOptions a {
+	color: #fff;
 }
-ul.DataList .Discussion {
-   margin-left: 56px;
-}
-ul.DataList div.Meta b {
-	margin-right: 12px;
-}
-ul.DataList div.Meta a.Option {
-	margin-right: 6px;
-}
-ul.DataList div.Meta a:hover {
-	color: #ff0084;
+ul.UserOptions a:hover {
+	color: #fff;
 	text-decoration: underline;
 }
-.Preview li ul.Info li.Author img,
-#Discussion li ul.Info li.Author img {
-   height: 50px;
-   width: 50px;
-   border: 0;
-   margin: 0 10px 0 0;
-   float: left;
-   overflow: hidden;
-   background: #eee;
+ul.UserOptions li {
+	display: inline-block;
+	margin-left: 10px;
 }
-.Preview li ul.Info li,
-#Discussion li ul.Info li {
-   line-height: 1.5;
-}
-.Preview li .Body,
-#Discussion li .Body {
-   clear: none;
-   padding: 1px 8px 2px 70px;
-   line-height: 140%;
-   font-size: 100%;
-}
-div.FirstComment {
-   -moz-border-radius: 6px;
-   -webkit-border-radius: 6px;
-   background: #ffc;
-   padding: 10px;
-   margin: 0 0 18px;
-	box-shadow: 0px 0px 3px #999;
-	-moz-box-shadow: 0px 0px 3px #999;
-	-webkit-box-shadow: 0px 0px 3px #999;
-}
-div.FirstComment a.AuthorPhoto {
-   float: left;
-   height: 50px;
-   width: 50px;
-   margin: 0 12px 0 0;
-}
-div.FirstComment div.Title {
-   font-size: 24px;
-   font-weight: bold;
-   color: #333;
-}
-div.FirstComment div.Meta {
-   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
-   font-size: 11px;
-   color: #777;
-   padding: 4px 0 0 8px;
-}
-div.FirstComment div.Meta span.Author {
-   font-size: 130%;
-   font-weight: bold;
-}
-div.FirstComment div.Meta span {
-   margin-right: 12px;
-}
-#Discussion,
-body.Discussion #CommentForm,
-.Back {
-   margin: 0 8px;
-}
-body.Discussion div.Popup #CommentForm {
-   margin: 0;
-}
-#CommentForm textarea {
-   width: 640px;
-}
-*/
-/* Main Voter 
-div.Voter {
-   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
-   line-height: 1.3;
-   font-size: 11px;
-   background: #fffff5;
-   margin: 30px 0 0;
-   padding: 10px;
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
-   border: 1px solid #dfdfd5;
-}
-div.Voter span strong {
-   line-height: 1.4;
-   font-size: 14px;
-   display: block;
-   font-weight: bold;
-}
-a.Vote {
-   line-height: 1.2;
-   display: block;
-   font-size: 15px;
-   font-weight: bold;
-   color: #02475A;
-   float: left;
-   margin: 0 20px 0 0;
-   padding: 8px 10px;
-}
-*/
-/* Comment Voter 
-li.Comment div.Voter {
-   padding: 6px;
-   margin: 6px;
-}
-li.Comment div.Voter a.Vote {
-   font-size: 13px;
-   display: inline;
-   float: none;
-   padding: 4px 10px;
-   line-height: 2.2;
-}
-*/
 
-
-
+#Panel #Search {
+	display: none;
+}
+body.Discussion #Panel #Search,
+body.Discussions #Panel #Search {
+	display: block;
+}
+#Panel #Search {
+	margin: 30px 0 10px;
+}
+#Panel #Search input.InputBox {
+	width:200px;
+	margin-right: 3px;
+}
 
 
 div.Tabs {
@@ -155,6 +47,11 @@ div.Tabs {
 	background: none;
 	padding: 0  0 0 8px;
 }
+div.AnswerTabs li a,
+div.AnswerTabs li a:link,
+div.AnswerTabs li a:hover,
+div.AnswerTabs li a:active,
+div.AnswerTabs li a:visited,
 body.Discussions div.Tabs li a,
 body.Discussions div.Tabs li a:link,
 body.Discussions div.Tabs li a:hover,
@@ -166,6 +63,7 @@ body.Discussions div.Tabs li a:visited {
 	-moz-border-radius: 3px 3px 0 0;
 	border-bottom: none;
 }
+div.AnswerTabs li.Active a,
 body.Discussions div.Tabs li.Active a {
 	padding: 6px 10px 5px;
 	position: relative;
@@ -250,12 +148,24 @@ ul.DataList div.Meta strong {
 	color:#000;
 	font-size:9px;
 	font-weight:bold;
-	padding: 4px;
+	padding: 3px;
 	line-height: 1;
 	position:absolute;
 	left: 657px;
 	white-space: nowrap;
 	top: -4px;
+}
+ul.PanelInfo div.Meta strong {
+	-moz-border-radius: 2px;
+	box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+	-webkit-box-shadow: 0px 0px 2px #777;
+	background: #FF0;
+	color:#000;
+	font-size:9px;
+	font-weight:bold;
+	padding: 3px;
+	line-height: 1;
 }
 ul.MessageList div.Meta {
 	position: relative;
@@ -318,3 +228,27 @@ i.ArrowSprite {
 i.SpriteDown { background-position: bottom left; }
 a:hover i.SpriteUp {	background-position: top right; }
 a:hover i.SpriteDown {	background-position: bottom right; }
+
+/* Comments */
+ul.MessageList li.FirstComment {
+	border-bottom: none;
+}
+div.AnswerTabs {
+	padding: 10px 0 0;
+	font-size: 11px;
+	color: #aaa;
+	text-align: right;
+	position: relative;
+}
+div.AnswerTabs strong {
+	position: absolute;
+	left: 0;
+	color: #000;
+	font-weight: bold;
+	font-size: 16px;
+	margin-right: 20px;
+}
+div.AnswerTabs ul {
+	display: inline-block;
+	margin: 0 10px;
+}
