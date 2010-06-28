@@ -3,18 +3,18 @@
 Plugin Name: Vanilla ProxyConnect
 Plugin URI: http://vanillaforums.org/addons/
 Description: Vanilla ProxyConnect allows users to create and manage their accounts & sessions through Wordpress, and be automatically signed into a related Vanilla forum.
-Version: 1.0.0
-Author: Mark O'Sullivan
-Author URI: http://markosullivan.ca/
+Version: 1.1.0
+Author: Tim Gunter
+Author URI: http://www.vanillaforums.com/
 */
 
 /*
-Copyright 2009 Mark O'Sullivan
-This file is part of the Vanilla Single Sign-on plugin for WordPress 2.9.
-The Vanilla Single Sign-on plugin is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-The Vanilla Single Sign-on plugin is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with the Vanilla Single Sign-on plugin.  If not, see <http://www.gnu.org/licenses/>.
-Contact Mark O'Sullivan at mark [at] vanillaforums [dot] com
+Copyright 2008, 2009 Vanilla Forums Inc.
+This file is part of the Vanilla ProxyConnect plugin for WordPress 2.9.
+The Vanilla ProxyConnect plugin is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+The Vanilla ProxyConnect plugin is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with the Vanilla ProxyConnect plugin.  If not, see <http://www.gnu.org/licenses/>.
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 define('VANILLA_COOKIE', 'Vanilla'); // <-- You might need to change this if you've customized your cookie name in vanilla.

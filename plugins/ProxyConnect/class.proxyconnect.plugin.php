@@ -20,8 +20,8 @@ $PluginInfo['ProxyConnect'] = array(
    'SettingsPermission' => 'Garden.AdminUser.Only',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
-   'Author' => "Mark O'Sullivan, Tim Gunter",
-   'AuthorEmail' => 'mark@vanillaforums.com, tim@vanillaforums.com',
+   'Author' => "Tim Gunter",
+   'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
