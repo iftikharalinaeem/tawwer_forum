@@ -25,6 +25,7 @@ $PluginInfo['ProxyConnect'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
+Gdn_LibraryMap::SafeCache('library','class.proxyauthenticator.php',dirname(__FILE__).DS.'class.proxyauthenticator.php');
 class ProxyConnectPlugin extends Gdn_Plugin {
 
    /**
