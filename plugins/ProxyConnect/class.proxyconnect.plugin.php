@@ -63,6 +63,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          $Sender->Form->SetModel($ProviderModel);
          
          if (!$Sender->Form->AuthenticatedPostBack()) {
+            $Provider['AuthenticateURL'] = C('Garden.Authenticator.AuthenticateURL');
             $Sender->Form->SetData($Provider);
          } else if (C('Plugins.ProxyConnect.Enabled')) {
             $ProviderModel->Validation->ApplyRule('URL',             'Required');
@@ -70,7 +71,9 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
             $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
 				$Sender->Form->SetFormValue('AuthenticationKey', $ConsumerKey);
-            $Sender->Form->Save();
+            $Saved = $Sender->Form->Save();
+            
+            SaveToConfig('Garden.Authenticator.AuthenticateURL', $Sender->Form->GetValue('AuthenticateURL'));
          }
       }
       

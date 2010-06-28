@@ -6,6 +6,11 @@ div.VanillaConfig {
    width: 430px;
    margin: 0 30px 20px 0;
 }
+
+div.VanillaConfig input[type='text'] {
+   width: 420px;
+}
+
 div.Info span {
    display: block;
    padding: 20px 0 6px;
