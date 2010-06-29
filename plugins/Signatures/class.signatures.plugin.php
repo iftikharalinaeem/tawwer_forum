@@ -69,6 +69,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Values = $Sender->Form->FormValues();
          $FrmValues = array_intersect_key($Values, $ConfigArray);
          if (sizeof($FrmValues)) {
+            $SQL = Gdn::SQL();
             foreach ($FrmValues as $UserMetaKey => $UserMetaValue) {
                try {
                   $SQL->Insert('UserMeta', array(
