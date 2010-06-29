@@ -36,9 +36,6 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    public function ProfileController_Signature_Create(&$Sender) {
-      $Session = Gdn::Session();
-      $ViewingUserID = $Session->UserID;
-      
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigArray = array(
@@ -48,22 +45,12 @@ class SignaturesPlugin extends Gdn_Plugin {
       );
       
       // TIM: Waiting for RC3...
-      // $UserMeta = $this->GetUserMeta($ViewingUserID, 'Plugin.Signature.%');
+      //$Session = Gdn::Session();
+      //$ViewingUserID = $Session->UserID;
+      //$UserMeta = $this->GetUserMeta($ViewingUserID, 'Plugin.Signature.%');
       
-      //
-      $SQL = Gdn::SQL();
-      $UserSig = $SQL
-         ->Select('*')
-         ->From('UserMeta')
-         ->Where('UserID', $ViewingUserID)
-         ->Like('Name', 'Plugin.Signature.%')
-         ->Get();
-         
-      $UserMeta = array();
-      if ($UserSig->NumRows())
-         while ($MetaRow = $UserSig->NextRow(DATASET_TYPE_ARRAY))
-            $UserMeta[$MetaRow['Name']] = $MetaRow['Value'];
-      unset($UserSig);
+      // TIM: Leaving this here until RC3+
+      $UserMeta = $this->_GetUserSignatureData();
       //
       
       if ($Sender->Form->AuthenticatedPostBack() === FALSE)
@@ -195,7 +182,21 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       if (isset($UserSignatures[$SourceUserID])) {
          $HideImages = ArrayValue('Plugin.Signature.HideImages', $Sender->Data('Plugin-Signatures-ViewingUserData'), FALSE);
-         $UserSig = $HideImages ? preg_replace('/^\n/m','',str_replace("\r\n","\n",$this->_StripOnly($UserSignatures[$SourceUserID], array('img')))) : $UserSignatures[$SourceUserID];
+         
+         $UserSig = $UserSignatures[$SourceUserID];
+         
+         if ($HideImages) {
+            // Strip img tags
+            $UserSig = $this->_StripOnly($UserSig, array('img'));
+         
+            // Remove blank lines and spare whitespace
+            $UserSig = preg_replace('/^\S*\n\S*/m','',str_replace("\r\n","\n",$UserSig));
+            $UserSig = trim($UserSig);
+         }
+         
+         // Don't show empty sigs, brah
+         if ($UserSig == '') return;
+         
          $Sender->UserSignature = Gdn_Format::Html($UserSig);
          $Display = $Sender->FetchView($this->GetView('usersig.php'));
          unset($Sender->UserSignature);
@@ -204,28 +205,16 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    protected function _HideAllSignatures(&$Sender) {
-      // Short circuit if not needed
+      
       if (!$Sender->Data('Plugin-Signatures-ViewingUserData')) {
-         $Session = Gdn::Session();
-         $ViewingUserID = $Session->UserID;
-         
          // TIM: Commented this out until RC3 releases and we can start using Gdn_Plugin::GetUserMeta()
+         //
+         //$Session = Gdn::Session();
+         //$ViewingUserID = $Session->UserID;
          //$UserSig = $this->GetUserMeta($ViewingUserID, 'Plugin.Signature.%');
          
          // TIM: Leaving this here until RC3+
-         $SQL = Gdn::SQL();
-         $UserMetaData = $SQL
-            ->Select('*')
-            ->From('UserMeta')
-            ->Where('UserID', $UserID)
-            ->Like('Name', 'Plugin.Signatures.%')
-            ->Get();
-         
-         $UserSig = array();
-         if ($UserMetaData->NumRows())
-            while ($MetaRow = $UserMetaData->NextRow(DATASET_TYPE_ARRAY))
-               $UserSig[$MetaRow['Name']] = $MetaRow['Value'];
-         unset($UserMetaData);
+         $UserSig = $this->_GetUserSignatureData();
          //
          
          $Sender->SetData('Plugin-Signatures-ViewingUserData',$UserSig);
@@ -234,6 +223,28 @@ class SignaturesPlugin extends Gdn_Plugin {
       $HideSigs = ArrayValue('Plugin.Signature.HideAll', $Sender->Data('Plugin-Signatures-ViewingUserData'), FALSE);
       if ($HideSigs == "TRUE") return TRUE;
       return FALSE;
+   }
+   
+   protected function _GetUserSignatureData($UserID = NULL) {
+      if (is_null($UserID)) {
+         $Session = Gdn::Session();
+         $UserID = $Session->UserID;
+      }
+      
+      $SQL = Gdn::SQL();
+      $UserMetaData = $SQL
+         ->Select('*')
+         ->From('UserMeta')
+         ->Where('UserID', $UserID)
+         ->Like('Name', 'Plugin.Signature.%')
+         ->Get();
+      
+      $UserSig = array();
+      if ($UserMetaData->NumRows())
+         while ($MetaRow = $UserMetaData->NextRow(DATASET_TYPE_ARRAY))
+            $UserSig[$MetaRow['Name']] = $MetaRow['Value'];
+      unset($UserMetaData);
+      return $UserSig;
    }
    
    protected function _StripOnly($str, $tags, $stripContent = false) {
