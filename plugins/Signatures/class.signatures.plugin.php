@@ -151,7 +151,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Signatures = $SQL
             ->Select('*')
             ->From('UserMeta')
-            ->WhereIn('UserID', array_values($UserIDList))
+            ->WhereIn('UserID', array_keys($UserIDList))
             ->Where('Name', 'Plugin.Signature.Sig')
             ->Get();
          

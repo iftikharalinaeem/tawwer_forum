@@ -1,5 +1,10 @@
 .UserSignature {
-   border-top: 1px solid #ABDAFB;
-   padding: 5px 0px;
+   border-top: 1px solid #595959;
+   padding: 2px 0px;
    font-size: 11px;
+   margin-top: 4px;
+}
+
+.UserSignature p {
+   padding: 0px;
 }
