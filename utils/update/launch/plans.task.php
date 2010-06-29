@@ -28,7 +28,7 @@ class PlansTask extends Task {
          TaskList::Event("paid");
          return;
       } else {
-         TaskList::Event("free");
+         TaskList::Event("free - ".$PaidStatus);
          return;
       }
       
