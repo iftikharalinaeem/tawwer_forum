@@ -43,6 +43,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          'Plugin.Signature.HideAll'       => NULL,
          'Plugin.Signature.HideImages'    => NULL
       );
+      $ViewingUserID = Gdn::Session()->UserID;
       
       // TIM: Waiting for RC3...
       //$Session = Gdn::Session();
@@ -69,21 +70,20 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Values = $Sender->Form->FormValues();
          $FrmValues = array_intersect_key($Values, $ConfigArray);
          if (sizeof($FrmValues)) {
-            $SQL = Gdn::SQL();
             foreach ($FrmValues as $UserMetaKey => $UserMetaValue) {
                try {
-                  $SQL->Insert('UserMeta', array(
+                  Gdn::SQL()->Insert('UserMeta', array(
                         'UserID' => $ViewingUserID,
                         'Name'   => $UserMetaKey,
                         'Value'  => $UserMetaValue
                      ));
                } catch (Exception $e) {
-                  $SQL
-                  ->Update('UserMeta')
-                  ->Set('Value', $UserMetaValue)
-                  ->Where('UserID', $ViewingUserID)
-                  ->Where('Name', $UserMetaKey)
-                  ->Put();
+                  Gdn::SQL()
+                     ->Update('UserMeta')
+                     ->Set('Value', $UserMetaValue)
+                     ->Where('UserID', $ViewingUserID)
+                     ->Where('Name', $UserMetaKey)
+                     ->Put();
                }
             }
          }
@@ -227,13 +227,10 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    protected function _GetUserSignatureData($UserID = NULL) {
-      if (is_null($UserID)) {
-         $Session = Gdn::Session();
-         $UserID = $Session->UserID;
-      }
+      if (is_null($UserID))
+         $UserID = Gdn::Session()->UserID;
       
-      $SQL = Gdn::SQL();
-      $UserMetaData = $SQL
+      $UserMetaData = Gdn::SQL()
          ->Select('*')
          ->From('UserMeta')
          ->Where('UserID', $UserID)
