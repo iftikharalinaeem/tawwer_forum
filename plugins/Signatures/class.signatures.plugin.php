@@ -47,6 +47,10 @@ class SignaturesPlugin extends Gdn_Plugin {
          'Plugin.Signature.HideImages'    => NULL
       );
       
+      // TIM: Waiting for RC3...
+      // $UserMeta = $this->GetUserMeta($ViewingUserID, 'Plugin.Signature.%');
+      
+      //
       $SQL = Gdn::SQL();
       $UserSig = $SQL
          ->Select('*')
@@ -60,6 +64,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          while ($MetaRow = $UserSig->NextRow(DATASET_TYPE_ARRAY))
             $UserMeta[$MetaRow['Name']] = $MetaRow['Value'];
       unset($UserSig);
+      //
       
       if ($Sender->Form->AuthenticatedPostBack() === FALSE)
          $ConfigArray = array_merge($ConfigArray, $UserMeta);
@@ -203,7 +208,26 @@ class SignaturesPlugin extends Gdn_Plugin {
       if (!$Sender->Data('Plugin-Signatures-ViewingUserData')) {
          $Session = Gdn::Session();
          $ViewingUserID = $Session->UserID;
-         $UserSig = $this->GetUserMeta($ViewingUserID, 'Plugin.Signature.%');
+         
+         // TIM: Commented this out until RC3 releases and we can start using Gdn_Plugin::GetUserMeta()
+         //$UserSig = $this->GetUserMeta($ViewingUserID, 'Plugin.Signature.%');
+         
+         // TIM: Leaving this here until RC3+
+         $SQL = Gdn::SQL();
+         $UserMetaData = $SQL
+            ->Select('*')
+            ->From('UserMeta')
+            ->Where('UserID', $UserID)
+            ->Like('Name', 'Plugin.Signatures.%')
+            ->Get();
+         
+         $UserSig = array();
+         if ($UserMetaData->NumRows())
+            while ($MetaRow = $UserMetaData->NextRow(DATASET_TYPE_ARRAY))
+               $UserSig[$MetaRow['Name']] = $MetaRow['Value'];
+         unset($UserMetaData);
+         //
+         
          $Sender->SetData('Plugin-Signatures-ViewingUserData',$UserSig);
       }
       
