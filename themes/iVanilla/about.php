@@ -16,5 +16,13 @@ $ThemeInfo['iVanilla'] = array(
    'Version' => '1.0',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://brendanserashriar.com'
+   'AuthorUrl' => 'http://brendanserashriar.com',
+   'Options' => array(
+		'Description' => '<strong>iVanilla</strong> has <font color="red">2 background</font> options. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">"Theme Options"</a>.',
+         
+		 'Styles' => array(
+            'iVanilla - Leopard' => '%s_leopard',
+            'iVanilla - Default ' => '%s'),
+         
+   )
 );
