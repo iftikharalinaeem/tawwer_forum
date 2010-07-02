@@ -9,14 +9,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 // Define the plugin:
-$PluginInfo['VanillaConnect'] = array(
-	'Name' => 'Vanilla Connect',
-   'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers.',
-   'Version' => '1.0',
+$PluginInfo['ProxyConnect'] = array(
+	'Name' => 'Proxy Connect SSO',
+   'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
+   'Version' => '1.2',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
-   'SettingsUrl' => '/dashboard/settings/vanillaconnect',
+   'SettingsUrl' => '/dashboard/settings/proxyconnect',
    'SettingsPermission' => 'Garden.AdminUser.Only',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -25,23 +25,23 @@ $PluginInfo['VanillaConnect'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
-Gdn_LibraryMap::SafeCache('library','class.handshakeauthenticator.php',dirname(__FILE__).DS.'class.handshakeauthenticator.php');
-class VanillaConnectPlugin extends Gdn_Plugin {
+Gdn_LibraryMap::SafeCache('library','class.proxyauthenticator.php',dirname(__FILE__).DS.'class.proxyauthenticator.php');
+class ProxyConnectPlugin extends Gdn_Plugin {
 
    /**
-    * Adds "VanillaConnect" menu option to the dashboard.
+    * Adds "ProxyConnect" menu option to the dashboard.
     */
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Users', 'Vanilla Connect', 'settings/vanillaconnect', 'Garden.AdminUser.Only');
+      $Menu->AddLink('Users', 'Proxy Connect', 'settings/proxyconnect', 'Garden.AdminUser.Only');
    }
    
-   public function SettingsController_VanillaConnect_Create(&$Sender, $EventArguments) {
+   public function SettingsController_ProxyConnect_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
 		
-      $Sender->Title('Vanilla Connect');
-      $Sender->AddSideMenu('settings/vanillaconnect');
-		$Sender->AddCssFile('/plugins/VanillaConnect/vanillaconnect.css');
+      $Sender->Title('Proxy Connect SSO');
+      $Sender->AddSideMenu('settings/proxyconnect');
+		$Sender->AddCssFile('/plugins/ProxyConnect/proxyconnect.css');
 		$Sender->Form = new Gdn_Form();
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
@@ -63,112 +63,37 @@ class VanillaConnectPlugin extends Gdn_Plugin {
          $Sender->Form->SetModel($ProviderModel);
          
          if (!$Sender->Form->AuthenticatedPostBack()) {
+            $Provider['AuthenticateURL'] = C('Garden.Authenticator.AuthenticateURL');
             $Sender->Form->SetData($Provider);
-         } else if (C('Plugins.VanillaConnect.Enabled')) {
+         } else if (C('Plugins.ProxyConnect.Enabled')) {
             $ProviderModel->Validation->ApplyRule('URL',             'Required');
             $ProviderModel->Validation->ApplyRule('RegisterUrl',     'Required');
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
             $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
 				$Sender->Form->SetFormValue('AuthenticationKey', $ConsumerKey);
-            $Sender->Form->Save();
+            $Saved = $Sender->Form->Save();
+            
+            SaveToConfig('Garden.Authenticator.AuthenticateURL', $Sender->Form->GetValue('AuthenticateURL'));
          }
       }
       
       $Sender->ConsumerKey = ($Provider) ? $Provider['AuthenticationKey'] : '';
       $Sender->ConsumerSecret = ($Provider) ? $Provider['AssociationSecret'] : '';
       
-      $Sender->Render($this->GetView('vanillaconnect.php'));
+      $Sender->Render($this->GetView('proxyconnect.php'));
    }
    
    public function Controller_Toggle(&$Sender) {
 		
 		// Enable/Disable VanillaConnect
 		if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
-			if (C('Plugins.VanillaConnect.Enabled')) {
+			if (C('Plugins.ProxyConnect.Enabled')) {
 				$this->_Disable();
 			} else {
 				$this->_Enable();
 			}
-			Redirect('settings/vanillaconnect');
+			Redirect('settings/proxyconnect');
 		}
-   }
-   
-   public function Controller_Library(&$Sender) {
-      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
-      $Sender->Render($this->GetResource('js/library.js'));
-   }
-   
-   public function Controller_Bundle(&$Sender) {
-      if (!class_exists('ZipArchive')) die('No zip archive tools!');
-      
-      $ExternalPath = $this->GetResource('external',FALSE,TRUE);
-      $Files = scandir($ExternalPath);
-      
-      $Resources = array();
-      $NeededResources = array_fill_keys(array('vanillaconnect', 'oauth'), array());
-      foreach ($Files as $Filename) {
-         foreach ($NeededResources as $ResourceFragment => &$ResourceFileList) {
-            $FN = CombinePaths(array($ExternalPath,$Filename));
-            if (!is_dir($FN) && preg_match("/{$ResourceFragment}/i",$Filename)) {
-               $ResourceFileList[] = $FN;
-            }
-         }
-         unset($ResourceFileList);
-      }
-      
-      // Reorder to match NeededResources
-      foreach ($NeededResources as $ResourceName => $FileList)
-         if (is_array($FileList) && sizeof($FileList))
-            foreach ($FileList as $FilePath)
-               $Resources[] = $this->_StripLibraryTags($FilePath);
-      
-      $SuperData = "<?php\n" . implode("\n\n", $Resources) . "\n?>";
-      
-      $Zip = new ZipArchive();
-      $ZipFile = CombinePaths(array(PATH_CACHE,'vanillaconnect.php.zip'));
-      if (file_exists($ZipFile)) 
-         unlink($ZipFile);
-         
-      if ($Zip->open($ZipFile, ZIPARCHIVE::CREATE) !== TRUE)
-         die('Could not create archive!');
-      
-      $Zip->addFromString('vanillaconnect.php', $SuperData);
-      $Zip->close();
-      
-      try {
-         Gdn_FileSystem::ServeFile($ZipFile, 'vanillaconnect.php.zip');
-      } catch (Exception $e) {
-         throw new Exception('File could not be streamed: missing file ('.$ZipFile.').');
-      }
-            
-      exit();
-   }
-   
-   protected function _StripLibraryTags($Filename) {
-      if (!file_exists($Filename)) return '';
-      $FileData = file($Filename);
-      
-      // Strip opening PHP tag
-      if (trim($FileData[0]) == '<?php')
-         array_shift($FileData);
-         
-      // Strip ending PHP tag
-      $Index = sizeof($FileData) - 1;
-      while ($Index > 0) {
-         if (trim($FileData[$Index]) == '?>') {
-            array_pop($FileData);
-            break;
-         }
-         
-         if (trim($FileData[$Index]) == '')
-            array_pop($FileData);
-         else
-            break;
-            
-         $Index--;
-      }
-      
-      return implode("", $FileData);
    }
    
    public function Setup() {
@@ -181,7 +106,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    
    protected function _CreateProviderModel() {
       $Key = 'k'.sha1(implode('.',array(
-         'vanillaconnect',
+         'proxyconnect',
          'key',
          microtime(true),
          RandomString(16),
@@ -189,7 +114,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       )));
       
       $Secret = 's'.sha1(implode('.',array(
-         'vanillaconnect',
+         'proxyconnect',
          'secret',
          md5(microtime(true)),
          RandomString(16),
@@ -210,14 +135,13 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    
    private function _Disable() {
 		RemoveFromConfig('Garden.SignIn.Popup');
-		RemoveFromConfig('Plugins.VanillaConnect.Enabled');
+		RemoveFromConfig('Plugins.ProxyConnect.Enabled');
 		RemoveFromConfig('Garden.Authenticator.DefaultScheme');
-      RemoveFromConfig('Garden.Authenticators.handshake.CookieName');
-      RemoveFromConfig('Garden.Authenticators.handshake.TokenLifetime');
+      RemoveFromConfig('Garden.Authenticators.proxy.CookieName');
 
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
       foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
-         if ($SchemeKey == 'handshake')
+         if ($SchemeKey == 'proxy')
             unset($EnabledSchemes[$SchemeIndex]);
       }
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
@@ -225,22 +149,21 @@ class VanillaConnectPlugin extends Gdn_Plugin {
 	
 	private function _Enable() {
 		SaveToConfig('Garden.SignIn.Popup', FALSE);
-		SaveToConfig('Plugins.VanillaConnect.Enabled', TRUE);
-		SaveToConfig('Garden.Authenticator.DefaultScheme', 'handshake');
-      SaveToConfig('Garden.Authenticators.handshake.CookieName', 'VanillaHandshake');
-      SaveToConfig('Garden.Authenticators.handshake.TokenLifetime', 0);
+		SaveToConfig('Plugins.ProxyConnect.Enabled', TRUE);
+		SaveToConfig('Garden.Authenticator.DefaultScheme', 'proxy');
+      SaveToConfig('Garden.Authenticators.proxy.CookieName', 'VanillaProxy');
       
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
       $HaveProxy = FALSE;
       foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
-         if ($SchemeKey == 'handshake') {
+         if ($SchemeKey == 'proxy') {
             if ($HaveProxy === TRUE)
                unset($EnabledSchemes[$SchemeIndex]);
             $HaveProxy = TRUE;
          }
       }
       if (!$HaveProxy)
-         array_push($EnabledSchemes, 'handshake');
+         array_push($EnabledSchemes, 'proxy');
       
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
       

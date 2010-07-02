@@ -72,8 +72,31 @@ class TaskList {
       
       foreach ($FolderList as $ClientFolder) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
-         
-         $ClientInfo = $this->LookupClientByFolder($ClientFolder);
+         $this->ClientList[$ClientFolder] = 1;
+      }
+      $NumClients = count($this->ClientList);
+      TaskList::MajorEvent("found {$NumClients}!", TaskList::NOBREAK);
+      
+      $Proceed = TaskList::Question("","Proceed with task execution?",array('yes','no'),'no');
+      if ($Proceed == 'no') exit();
+   }
+   
+   public function RunAll($TaskOrder = NULL) {
+      TaskList::MajorEvent("Running through full client list...");
+      foreach ($this->ClientList as $ClientFolder => $ClientInfo)
+         $this->RunClient($ClientFolder, $TaskOrder);
+   }
+   
+   public function RunSelectiveRegex($RegularExpression, $TaskOrder = NULL) {
+      TaskList::MajorEvent("Running regular expression {$RegularExpression} against client list...");
+      foreach ($this->ClientList as $ClientFolder => $ClientInfo) {
+         if (!preg_match($RegularExpression, $ClientFolder, $Matches)) continue;
+         $this->RunClient($ClientFolder, $TaskOrder);
+      }
+   }
+   
+   public function RunClient($ClientFolder, $TaskOrder = NULL) {
+      $ClientInfo = $this->LookupClientByFolder($ClientFolder);
          $this->ClientList[$ClientFolder] = $ClientInfo;
       }
       $NumClients = count($this->ClientList);

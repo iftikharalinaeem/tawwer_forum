@@ -1,274 +1,254 @@
 /* ============================================= Support Theme Customizations */
-ul.DataList li.DiscussionRow div.Discussion strong a.DiscussionLink {
-   display: block;
-   padding: 6px 0 0;
-   margin: 0;
-   max-width: 598px;
-   font-size: 120%;
-   font-weight: bold;
+div.Menu {
+	text-align: left;
+	position: relative;
+	padding: 10px 0;
 }
-ul.DataList li.DiscussionRow {
-   clear: both;
+body #Head h1 {
+	margin: 0;
+	padding: 0;
+	float:none;
 }
-ul.DataList li.DiscussionRow a.AuthorPhoto {
-   float: left;
-   margin: 6px 6px 0;
-   width: 40px;
-   height: 40px;
-   overflow: hidden;
+ul.UserOptions {
+	position: absolute;
+	top: 10px;
+	right: 6px;
 }
-ul.DataList li.DiscussionRow a.AuthorPhoto img {
-   height: 40px;
-   width: 40px;
-   overflow: hidden;
+ul.UserOptions a {
+	color: #fff;
 }
-ul.DataList .Discussion {
-   margin-left: 56px;
+ul.UserOptions a:hover {
+	color: #fff;
+	text-decoration: underline;
 }
-ul.DataList li div.Meta {
-   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
-   font-size: 11px;
-   color: #80828c /* Meta Label Font Color */;
-}
-ul.DataList li div.Meta span,
-ul.DataList li div.Meta span a {
-   margin-right: 12px;
-}
-ul.DataList li div.Meta strong {
-   background: #ffc;
-   padding: 1px 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-	box-shadow: 0px 0px 3px #999;
-	-moz-box-shadow: 0px 0px 3px #999;
-	-webkit-box-shadow: 0px 0px 3px #999;     
-}
-ul.DataList li div.Meta a {
-   color: #60626C;
-}
-ul.DataList li div.Meta a:hover {
-   text-decoration: underline;
+ul.UserOptions li {
+	display: inline-block;
+	margin-left: 10px;
 }
 
-ul.DataList li div.Meta span b a {
-   margin: 0;
+#Panel #Search {
+	display: none;
 }
-ul.Options li.Parent strong {
-   padding: 5px;
-   background: none;
-   border: 0;
-   color: #555;
-   cursor: pointer;
-   line-height: 100%;
+body.Discussion #Panel #Search,
+body.Discussions #Panel #Search {
+	display: block;
 }
-ul.Options li.Parent strong:hover {
-   padding: 4px;
-   background: url('images/buttonbg.png') no-repeat center center #f8f8f8;
-   color: #333;
-   border: 1px solid #888;
+#Panel #Search {
+	margin: 30px 0 10px;
+}
+#Panel #Search input.InputBox {
+	width:200px;
+	margin-right: 3px;
+}
+
+
+div.Tabs {
+	border-bottom: 1px solid #999;
+	background: none;
+	padding: 0  0 0 8px;
+}
+div.AnswerTabs li a,
+div.AnswerTabs li a:link,
+div.AnswerTabs li a:hover,
+div.AnswerTabs li a:active,
+div.AnswerTabs li a:visited,
+body.Discussions div.Tabs li a,
+body.Discussions div.Tabs li a:link,
+body.Discussions div.Tabs li a:hover,
+body.Discussions div.Tabs li a:active,
+body.Discussions div.Tabs li a:visited {
+	display:inline-block;
+	line-height: normal;
+	-webkit-border-radius: 3px 3px 0 0;
+	-moz-border-radius: 3px 3px 0 0;
+	border-bottom: none;
+}
+div.AnswerTabs li.Active a,
+body.Discussions div.Tabs li.Active a {
+	padding: 6px 10px 5px;
+	position: relative;
+	top: 1px;
+	border: 1px solid #999;
+	border-bottom: none;
+}
+body.mine .Mine {
+	background: none;
+}
+div.HeadingTabs div.SubTab {
+	font-size:16px;
+}
+.StatBox {
+	background: #004C9B;
+	padding: 5px 5px 0;
+	float: right;
+	height: 38px;
+	text-align: center;
+	font-weight: bold;
+	font-size: 18px;
+	line-height: 1.2;
+}
+.StatBox span {
+	display: block;
+	font-weight: normal;
+	font-size: 11px;
+	line-height: 1;
+}
+.StatBox,
+.StatBox a {
+	color: #99e2fe;
+	display: block;
+}
+.StatBox a {
+	position: relative;
+	z-index: 10;
+}
+.StatBox a:hover {
+	color: #fff;
+	text-shadow: 0 0px 5px #fff;
+}
+.ViewsBox { background: #0065CE; }
+.FollowsBox { background: #0053A9; }
+.AnswersBox {
+	background: #0053A9;
+	margin-right: 4px;
+	-webkit-border-bottom-right-radius: 2px;
+	-webkit-border-bottom-right-radius: 2px;
+	-moz-border-radius-topright: 2px;
+	-moz-border-radius-bottomright: 2px;
+}
+.HasAnswersBox { background: #013b76; }
+.HasAnswersBox a { color: #fff; }
+.VotesBox {
+	margin-left: 4px;
+	-webkit-border-top-left-radius: 2px;
+	-webkit-border-bottom-left-radius: 2px;
+	-moz-border-radius-topleft: 2px;
+	-moz-border-radius-bottomleft: 2px;
+}
+ul.Discussions div.ItemContent a.Title {
+	max-width: none;
+}
+
+
+/* Discussions */
+ul.DataList div.Meta a {
+	margin-right: 12px;
+}
+ul.DataList div.Meta {
+	z-index: 5;
+	position: relative;
+}
+ul.DataList div.Meta strong {
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
-   text-shadow: 0 1px 0 #fff;
+	box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+	-webkit-box-shadow: 0px 0px 2px #777;
+	background: #FF0;
+	color:#000;
+	font-size:9px;
+	font-weight:bold;
+	padding: 3px;
+	line-height: 1;
+	position:absolute;
+	left: 657px;
+	white-space: nowrap;
+	top: -4px;
 }
-ul.Options li.Active strong:hover,
-ul.Options li.Active strong {
-   padding: 4px;
-   color: #fff;
-   background: #9c9c9c !important;
-   border: 1px solid #9c9c9c;
-   -moz-border-radius-bottomleft: 0;
-   -moz-border-radius-bottomright: 0;
-   -webkit-border-bottom-left-radius: 0;
-   -webkit-border-bottom-right-radius: 0;
-   text-shadow: none;
+ul.PanelInfo div.Meta strong {
+	-moz-border-radius: 2px;
+	box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+	-webkit-box-shadow: 0px 0px 2px #777;
+	background: #FF0;
+	color:#000;
+	font-size:9px;
+	font-weight:bold;
+	padding: 3px;
+	line-height: 1;
 }
-li.New {
-   background: inherit;
+ul.MessageList div.Meta {
+	position: relative;
 }
-.Preview li ul.Info li.Author img,
-#Discussion li ul.Info li.Author img {
-   height: 50px;
-   width: 50px;
-   border: 0;
-   margin: 0 10px 0 0;
-   float: left;
-   overflow: hidden;
-   background: #eee;
+ul.MessageList div.Meta span.Votes {
+	text-align: center;
+	display: block;
+	position: absolute;
+	right: 684px;
+	line-height: normal;
+	padding: 0;
 }
-.Preview li ul.Info li,
-#Discussion li ul.Info li {
-   line-height: 1.5;
+span.Votes a,
+span.Votes span {
+	display: block;
 }
-.Preview li .Body,
-#Discussion li .Body {
-   clear: none;
-   padding: 1px 8px 2px 70px;
-   line-height: 140%;
-   font-size: 100%;
+ul.MessageList div.Meta span.Votes span {
+	padding: 0;
+	color: #000;
+	font-weight: bold;
+	font-size: 18px;
+	line-height: 1.2;	
 }
-div.FirstComment {
-   -moz-border-radius: 6px;
-   -webkit-border-radius: 6px;
-   background: #ffc;
-   padding: 10px;
-   margin: 0 0 18px;
-	box-shadow: 0px 0px 3px #999;
-	-moz-box-shadow: 0px 0px 3px #999;
-	-webkit-box-shadow: 0px 0px 3px #999;
+span.Votes span {
+	padding: 0 4px !important;
+	background: #0065CE;
+	color: #99E2FE !important;
+	min-width: 36px;
 }
-div.FirstComment a.AuthorPhoto {
-   float: left;
-   height: 50px;
-   width: 50px;
-   margin: 0 12px 0 0;
+span.Votes a {
+	color: #99E2FE;
+	background: #004C9B;
 }
-div.FirstComment div.Title {
-   font-size: 24px;
-   font-weight: bold;
-   color: #333;
+span.Votes a.VoteUp {
+	padding: 3px 4px 0;
+	-webkit-border-radius: 3px 3px 0 0;
+	-moz-border-radius: 3px 3px 0 0;
 }
-div.FirstComment div.Meta {
-   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
-   font-size: 11px;
-   color: #777;
-   padding: 4px 0 0 8px;
+span.Votes a.VoteDown {
+	padding: 0 4px 3px;
+	-webkit-border-radius: 0 0 3px 3px;
+	-moz-border-radius: 0 0 3px 3px;
 }
-div.FirstComment div.Meta span.Author {
-   font-size: 130%;
-   font-weight: bold;
-}
-div.FirstComment div.Meta span {
-   margin-right: 12px;
-}
-#Discussion,
-body.Discussion #CommentForm,
-.Back {
-   margin: 0 8px;
-}
-body.Discussion div.Popup #CommentForm {
-   margin: 0;
-}
-#CommentForm textarea {
-   width: 640px;
-}
-/* Main Voter */
-div.Voter {
-   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
-   line-height: 1.3;
-   font-size: 11px;
-   background: #fffff5;
-   margin: 30px 0 0;
-   padding: 10px;
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
-   border: 1px solid #dfdfd5;
-}
-div.Voter span strong {
-   line-height: 1.4;
-   font-size: 14px;
-   display: block;
-   font-weight: bold;
-}
-a.Vote {
-   line-height: 1.2;
-   display: block;
-   font-size: 15px;
-   font-weight: bold;
-   color: #02475A;
-   float: left;
-   margin: 0 20px 0 0;
-   padding: 8px 10px;
-}
-/* Comment Voter */
-li.Comment div.Voter {
-   padding: 6px;
-   margin: 6px;
-}
-li.Comment div.Voter a.Vote {
-   font-size: 13px;
-   display: inline;
-   float: none;
-   padding: 4px 10px;
-   line-height: 2.2;
-}
-/* Discussion State */
-div.State {
-   font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
-   line-height: 1.3;
-   font-size: 11px;
-   background: #fff;
-   margin: 10px 0 0;
-   padding: 10px;
-   -moz-border-radius: 4px;
-   -webkit-border-radius: 4px;
-	box-shadow: 0px 0px 2px #999;
-	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;  
-}
-div.State strong {
-   display: block;
-   font-weight: bold;
-   font-size: 14px;
-   line-height: 1.4;
+span.Votes a:hover {
+	background: #013B76;
+	color: #fff;
+	text-shadow: 0 0px 5px #fff;	
 }
 
-a.Bookmark,
-a.Bookmarked,
-a.Bookmarking {
-   background: #efefef;
-   border: 1px solid #dfdfdf;
-   color: #333;
-   font-weight: bold;
-   width: auto;
-   padding: 2px 4px;
-   margin: 4px;
-   font-size: 11px;
-   padding: 4px;
-   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
-   color: #02475A;
-	text-shadow: 0 1px 0 #fff;
-   border: 1px solid #999;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-	box-shadow: 0px 0px 2px #999;
-	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;  
+/* Arrow Sprites */
+span.Votes i.ArrowSprite i {
+	display: none;
 }
-a.Bookmark:hover,
-a.Bookmarked:hover,
-a.Bookmarking:hover {
-   color: #111;
-   border: 1px solid #666;
+i.ArrowSprite {
+	display: inline-block;
+	height: 9px;
+	width: 13px;
+	background: url('images/arrow_sprite.png') top left no-repeat;
 }
-a.Bookmark:focus,
-a.Bookmarked:focus,
-a.Bookmarking:focus {
-   background: #eee;
-}
+i.SpriteDown { background-position: bottom left; }
+a:hover i.SpriteUp {	background-position: top right; }
+a:hover i.SpriteDown {	background-position: bottom right; }
 
-a.Bookmark span.Votes,
-a.Bookmarking span.Votes {
-   display: inline;
-   padding: 0 0 0 4px;
-   font-size: 14px;
-   line-height: 1.7;
+/* Comments */
+ul.MessageList li.FirstComment {
+	border-bottom: none;
 }
-
-a.Bookmarked img,
-a.Bookmark img,
-a.Bookmarking img {
-   background: url('images/star_sprite.png') top center no-repeat;
-   height: 22px;
-   width: 22px;
-   vertical-align: top;
+div.AnswerTabs {
+	padding: 10px 0 0;
+	font-size: 11px;
+	color: #aaa;
+	text-align: right;
+	position: relative;
 }
-a.Bookmarked img {
-   background: url('images/star_sprite.png') center center no-repeat;
+div.AnswerTabs strong {
+	position: absolute;
+	left: 0;
+	color: #000;
+	font-weight: bold;
+	font-size: 16px;
+	margin-right: 20px;
 }
-a.Bookmarking img {
-   background: url('images/star_sprite.png') bottom center no-repeat;
-}
-a.Bookmark span,
-a.Bookmarking span {
-   display: inline;
+div.AnswerTabs ul {
+	display: inline-block;
+	margin: 0 10px;
 }
