@@ -84,19 +84,28 @@ class TaskList {
    public function RunAll($TaskOrder = NULL) {
       TaskList::MajorEvent("Running through full client list...");
       foreach ($this->ClientList as $ClientFolder => $ClientInfo)
-         $this->RunClient($ClientFolder, $TaskOrder);
+         $this->PerformClient($ClientFolder, $TaskOrder);
    }
    
-   public function RunSelectiveRegex($RegularExpression, $TaskOrder = NULL) {
+   public function RunSelectiveRegex($RegularExression, $TaskOrder = NULL) {
       TaskList::MajorEvent("Running regular expression {$RegularExpression} against client list...");
       foreach ($this->ClientList as $ClientFolder => $ClientInfo) {
          if (!preg_match($RegularExpression, $ClientFolder, $Matches)) continue;
-         $this->RunClient($ClientFolder, $TaskOrder);
+         $this->PerformClient($ClientFolder, $TaskOrder);
       }
    }
    
-   public function RunClient($ClientFolder, $TaskOrder = NULL) {
-      $ClientInfo = $this->LookupClientByFolder($ClientFolder);
+   public function RunClientFromCLI($ClientFolder, $TaskOrder = NULL) {
+      TaskList::MajorEvent("Running client {$ClientFolder}...");
+      
+      if (!array_key_exists($ClientFolder,$this->ClientList))
+         die("client not found.\n");
+         
+      $this->PerformClient($ClientFolder, $TaskOrder);
+   }
+   
+   public function PerformClient($ClientFolder, $TaskOrder = NULL) {
+      $ClientInfo = $this->ClientList[$ClientFolder];
       TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
       
       // Run all tasks for this client
@@ -227,11 +236,25 @@ class TaskList {
    }
    
    protected static function _Prompt($Prompt, $Options, $Default) {
-      $PromptOpts = array();
-      foreach ($Options as $Opt)
-         $PromptOpts[] = (strtolower($Opt) == strtolower($Default)) ? strtoupper($Opt) : strtolower($Opt);
+      echo "{$Prompt} ";
+      if (sizeof ($Options)) {
+         $PromptOpts = array();
+         foreach ($Options as $Opt)
+            $PromptOpts[] = (strtolower($Opt) == strtolower($Default)) ? strtoupper($Opt) : strtolower($Opt);
+         echo "(".implode(',',$PromptOpts).") ";
+      }
+   }
+   
+   public static function Input($Message, $Prompt, $Default) {
+      echo "\n";
+      if ($Message)
+         echo $Message."\n";
          
-      echo "{$Prompt} (".implode(',',$PromptOpts).") ";
+      self::_Prompt($Prompt, $Options, $Default);
+      $Answer = trim(fgets(STDIN));
+      if ($Answer == '') $Answer = $Default;
+      $Answer = strtolower($Answer);
+      return $Answer;
    }
    
 }
