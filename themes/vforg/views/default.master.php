@@ -6,7 +6,7 @@
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
 	<div class="Banner">
 		<div class="BannerWrapper">
-			<h1><a href="<?php echo Url('/'); ?>"><span>Vanilla</span></a></h1>
+			<h1><a href="<?php echo Url('/'); ?>"><span><?php echo Gdn_Theme::Logo(); ?></span></a></h1>
 			<div class="Buttons">
 				<div class="UserOptions">
 					<div>

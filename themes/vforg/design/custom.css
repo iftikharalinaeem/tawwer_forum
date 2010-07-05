@@ -96,15 +96,11 @@ div#Foot div a:hover {
    padding: 0;
 }
 .Banner h1 a {
-	margin: 10px 0 0;
+	padding: 10px 0 0;
+	font-size: 30px;
+	color: #fff;
+   text-shadow:1px 1px 1px #000;
 	float: left;
-   display: block;
-   height: 100px;
-   width: 236px;
-   background: url('images/vanilla_logo.png') center center no-repeat;
-}
-.Banner h1 a span {
-   display: none;
 }
 .Banner ul {
    list-style: none;
