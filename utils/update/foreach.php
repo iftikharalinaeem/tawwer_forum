@@ -14,7 +14,7 @@ class TaskList {
    protected $Database;
    protected $ClientList;
 
-   public function __construct($TaskDir, $ClientDir) {
+   public function __construct($UserTaskDir, $ClientDir) {
    
       $this->Clients = $ClientDir;
       $this->Tasks = array();
@@ -29,39 +29,49 @@ class TaskList {
       chdir(dirname(__FILE__));
    
       // Setup tasks
-      if (!is_dir($TaskDir) || !is_readable($TaskDir)) 
-         die("Could not find task_dir '{$TaskDir}', or it does not have read permissions.\n");
-         
-      if (!$TaskDirectory = opendir($TaskDir))
-         die("Could not open task_dir '{$TaskDir}' for reading.\n");
-         
       TaskList::MajorEvent("Setting up task objects...");
       
-      while (($FileName = readdir($TaskDirectory)) !== FALSE) {
-         if ($FileName == '.' || $FileName == '..') continue;
-         if (!preg_match('/^(.*)\.task\.php$/', $FileName, $Matches)) continue;
+      if (!is_array($UserTaskDirs))
+         $UserTaskDirs = array($UserTaskDirs);
          
-         $Taskname = $Matches[1];
-         $IncludePath = trim($TaskDir,'/').'/'.$FileName;
-         $Classes = get_declared_classes();
-         require_once($IncludePath);
-         $NewClasses = array_diff(get_declared_classes(), $Classes);
-         
-         foreach ($NewClasses as $Class) {
-            if (is_subclass_of($Class, 'Task')) {
-               TaskList::Event(strtolower($Class));
-               $NewTask = new $Class($ClientDir);
-               $NewTask->Database = $this->Database;
-               $this->Tasks[$Taskname] = array(
-                  'name'      => str_replace('Task', '', $Class),
-                  'task'      => $NewTask
-               );
-            }
-         }
-         TaskList::Event("");
-      }
-      closedir($TaskDirectory);
+      $TaskDirs = array_merge(array('global'), $UserTaskDirs);
       
+      // Looping task dirs
+      foreach ($TaskDirs as $TaskDir) {
+         if (!is_dir($TaskDir) || !is_readable($TaskDir)) 
+            die("Could not find task_dir '{$TaskDir}', or it does not have read permissions.\n");
+         
+         if (!$TaskDirectory = opendir($TaskDir))
+            die("Could not open task_dir '{$TaskDir}' for reading.\n");
+            
+         TaskList::Event("Scanning {$TaskDir} for task objects...");
+         
+         while (($FileName = readdir($TaskDirectory)) !== FALSE) {
+            if ($FileName == '.' || $FileName == '..') continue;
+            if (!preg_match('/^(.*)\.task\.php$/', $FileName, $Matches)) continue;
+            
+            $Taskname = $Matches[1];
+            $IncludePath = trim($TaskDir,'/').'/'.$FileName;
+            $Classes = get_declared_classes();
+            require_once($IncludePath);
+            $NewClasses = array_diff(get_declared_classes(), $Classes);
+            
+            foreach ($NewClasses as $Class) {
+               if (is_subclass_of($Class, 'Task')) {
+                  TaskList::Event(strtolower($Class));
+                  $NewTask = new $Class($ClientDir);
+                  $NewTask->Database = $this->Database;
+                  $this->Tasks[$Taskname] = array(
+                     'name'      => str_replace('Task', '', $Class),
+                     'task'      => $NewTask
+                  );
+               }
+            }
+            TaskList::Event("");
+         }
+         closedir($TaskDirectory);
+      }
+            
       TaskList::MajorEvent("Scanning for clients...", TaskList::NOBREAK);
       $this->ClientList = array();
       $FolderList = scandir($this->Clients);
