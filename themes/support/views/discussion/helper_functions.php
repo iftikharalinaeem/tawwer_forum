@@ -29,10 +29,18 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 			<span class="Votes">
 				<?php
 				$VoteType = $Sender->EventArguments['Type'] == 'Discussion' ? 'votediscussion' : 'votecomment';
+				$CssClass = '';
+				$VoteUpUrl = '/discussion/'.$VoteType.'/'.$ID.'/voteup/'.$Session->TransientKey().'/';
+				$VoteDownUrl = '/discussion/'.$VoteType.'/'.$ID.'/votedown/'.$Session->TransientKey().'/';
+				if (!$Session->IsValid()) {
+					$VoteUpUrl = Gdn::Authenticator()->SignInUrl($Sender->SelfUrl);
+					$VoteDownUrl = $VoteUpUrl;
+					$CssClass = ' SignInPopup';
+				}
 				$ID = $Sender->EventArguments['Type'] == 'Discussion' ? $Object->DiscussionID : $Object->CommentID;
-				echo Anchor(Wrap(Wrap('Vote Up', 'i'), 'i', array('class' => 'ArrowSprite SpriteUp')), '/discussion/'.$VoteType.'/'.$ID.'/voteup/'.$Session->TransientKey().'/', 'VoteUp');
+				echo Anchor(Wrap(Wrap('Vote Up', 'i'), 'i', array('class' => 'ArrowSprite SpriteUp')), $VoteUpUrl, 'VoteUp'.$CssClass);
 				echo Wrap(StringIsNullOrEmpty($Object->Score) ? '0' : $Object->Score);
-				echo Anchor(Wrap(Wrap('Vote Down', 'i'), 'i', array('class' => 'ArrowSprite SpriteDown')), '/discussion/'.$VoteType.'/'.$ID.'/votedown/'.$Session->TransientKey().'/', 'VoteDown');
+				echo Anchor(Wrap(Wrap('Vote Down', 'i'), 'i', array('class' => 'ArrowSprite SpriteDown')), $VoteDownUrl, 'VoteDown'.$CssClass);
 				?>
 			</span>
          <span class="Author">
@@ -64,8 +72,8 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 		<div class="Tabs DiscussionTabs AnswerTabs">
 		<?php
 		echo
-			Wrap($AnswerCount.' '.Plural($AnswerCount, 'Answer', 'Answers'), 'strong')
-			.' sorted by 
+			Wrap($AnswerCount.' '.Plural($AnswerCount, 'Answer', 'Answers'), 'strong');
+			echo ' sorted by 
 			<ul>
 				<li'.($Sender->Sort == 'popular' ? ' class="Active"' : '').'>'.Anchor('Votes', Gdn::Request()->Url('', TRUE)).'</li>
 				<li'.($Sender->Sort == 'date' ? ' class="Active"' : '').'>'.Anchor('Date Added', Gdn::Request()->Url('', TRUE).'?Sort=date').'</li>

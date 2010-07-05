@@ -48,21 +48,17 @@ class SupportThemeHooks implements Gdn_IPlugin {
     */
 
    // Sort the comments by popularity if necessary
-   public function DiscussionModel_BeforeGet_Handler($Sender) {
+   public function CommentModel_BeforeGet_Handler($Sender) {
       $Sort = GetIncomingValue('Sort', 'popular');
       if (!in_array($Sort, array('popular', 'date')))
          $Sort = 'popular';
          
       if ($Sort == 'popular')
-         $Sender->SQL->OrderBy('d.Score', 'desc');
+         $Sender->SQL->OrderBy('c.Score', 'desc');
    }
 
    // Add the vote.js file to discussions page
    public function DiscussionController_Render_Before($Sender) {
-// ===========================================================================================================================
-// Make sure to NOT jump to a subsequent page - always go to the first page by default.
-// Use a numbered pager instead of more pager.
-// ===========================================================================================================================
       $Sender->AddJsFile('vote.js');
 
       // Define the sort on the controller (for views to use)
@@ -90,13 +86,14 @@ class SupportThemeHooks implements Gdn_IPlugin {
       if ($Session->IsValid() && $Session->ValidateTransientKey($TransientKey) && $DiscussionID > 0) {
          $DiscussionModel = new DiscussionModel();
          $OldUserVote = $DiscussionModel->GetUserScore($DiscussionID, $Session->UserID);
+
          if ($VoteType == 'voteup')
             $NewUserVote = 1;
          else if ($VoteType == 'votedown')
             $NewUserVote = -1;
          else
-            $NewUserVote = $OldUserVote == 1 ? 0 : 1;
-            
+            $NewUserVote = $OldUserVote == 1 ? -1 : 1;
+         
          $FinalVote = intval($OldUserVote) + intval($NewUserVote);
          // Allow admins to vote unlimited.
          $AllowVote = $Session->CheckPermission('Vanilla.Comments.Edit');
@@ -109,7 +106,7 @@ class SupportThemeHooks implements Gdn_IPlugin {
       }
       $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
       $Sender->SetJson('TotalScore', $Total);
-      $Sender->SetJson('FinalVote', $NewUserVote);
+      $Sender->SetJson('FinalVote', $FinalVote);
       $Sender->Render();
    }
    
@@ -163,6 +160,9 @@ class SupportThemeHooks implements Gdn_IPlugin {
     * Load popular discussions.
     */
    public function DiscussionsController_Popular_Create($Sender) {
+      $Sender->Title(T('Popular'));
+      $Sender->Head->Title($Sender->Head->Title());
+
       $Offset = GetValue('0', $Sender->RequestArgs, '0');
 
       // Get rid of announcements from this view
@@ -172,7 +172,6 @@ class SupportThemeHooks implements Gdn_IPlugin {
 			$Sender->AddJsFile('js/library/jquery.menu.js');
          $Sender->AddJsFile('options.js');
          $Sender->Head->AddRss($Sender->SelfUrl.'/feed.rss', $Sender->Head->Title());
-         $Sender->Head->Title(T('Popular'));
       }
       if (!is_numeric($Offset) || $Offset < 0)
          $Offset = 0;

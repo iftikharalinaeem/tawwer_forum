@@ -30,11 +30,11 @@ jQuery(document).ready(function($) {
                $(btn).attr('title', json.AnchorTitle);
 
                // Change the Vote count
-               count = $(btn).html();
-               count = count.substr(count.lastIndexOf('>')+1);
-               count = json.FinalVote == '1' ? ++count : --count;
+               // count = $(btn).html();
+               // count = count.substr(count.lastIndexOf('>')+1);
+               // count = json.FinalVote == '1' ? ++count : --count;
                txt = $(btn).find('span').text();
-               $(btn).html('<span>' + txt + '</span>' + count);
+               $(btn).html('<span>' + txt + '</span>' + json.TotalScore);
                $(btn).blur();
             }
          }
@@ -43,7 +43,7 @@ jQuery(document).ready(function($) {
    });   
 
    // Handle follow button clicks   
-   $('div.FollowsBox a').live('click', function() {
+   $('div.FollowsBox a, a.Bookmark').live('click', function() {
       var btn = this;
       var parent = $(this).parents('.Bookmarks');
       var oldClass = $(btn).attr('class');
@@ -70,14 +70,23 @@ jQuery(document).ready(function($) {
             } else {
                // Otherwise just change the class & title on the anchor
                $(btn).attr('title', json.AnchorTitle);
-
-               // Change the Bookmark count
-               count = $(btn).html();
-               count = count.substr(count.lastIndexOf('>')+1);
-               count = json.State ? ++count : --count;
-               txt = $(btn).find('span').text();
-               $(btn).html('<span>' + txt + '</span>' + count);
-               $(btn).blur();
+               
+               if ($(btn).hasClass('Bookmark')) {
+                  $(btn).attr('class', 'Bookmark');
+                  $(btn).attr('title', 'Follow');
+                  if (json.State == '1') {
+                     $(btn).attr('title', 'Unfollow');
+                     $(btn).addClass('Bookmarked');
+                  }
+               } else {
+                  // Change the Bookmark count
+                  count = $(btn).html();
+                  count = count.substr(count.lastIndexOf('>')+1);
+                  count = json.State ? ++count : --count;
+                  txt = $(btn).find('span').text();
+                  $(btn).html('<span>' + txt + '</span>' + count);
+                  $(btn).blur();
+               }
             }
             $('a.MyBookmarks span').text(json.CountBookmarks);
             // Add/remove the bookmark from the side menu.

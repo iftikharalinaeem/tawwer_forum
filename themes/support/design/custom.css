@@ -1,31 +1,109 @@
 /* ============================================= Support Theme Customizations */
+body.Mine,
+body  {
+	background: url('images/background-feature.jpg') center -140px repeat-x #ffffff;
+}
 div.Menu {
-	text-align: left;
+	background: url('images/header-background.png') top center no-repeat;
+	height: 56px; 
 	position: relative;
-	padding: 10px 0;
+	padding: 0;
+}
+div.Menu ul {
+	padding: 0 40px 0 2px;
+	float: right;
+	background:url("images/header-nav-divider.png") no-repeat scroll left top transparent;
+}
+div.Menu li {
+	float: right;
+	display: block;
+}
+div.Menu li a {
+	display: block;
+	height: 56px;
+	line-height: 4;
+	padding: 0 12px;
+	font-weight: bold;
+	background:url("images/header-nav-divider.png") no-repeat scroll right top transparent;
+	color: #fff;
+}
+div.Menu li a:hover {
+	background: url("images/header-nav-menu-backgrounds.png") no-repeat scroll right top #31526F;
+	color: #fff;
+}
+#Head  {
+	background: none;
+	text-align: right;
 }
 body #Head h1 {
 	margin: 0;
 	padding: 0;
-	float:none;
+	float:left;
 }
-ul.UserOptions {
-	position: absolute;
-	top: 10px;
-	right: 6px;
+#Head h1 a span {
+	color:#ffffff;
+	font-size:24px;
+	text-shadow: none;
+	line-height: 2.2;
+	margin-left: 16px;
 }
-ul.UserOptions a {
+#About {
+	display: none;
+}
+#vanilla_discussionscontroller_index {
+	background-position: center -120px;
+}
+#vanilla_discussionscontroller_index #About {
+	display: block;
+	background: url('images/background-about.png') 0 0 no-repeat;
+	min-height: 300px;
+	font-family: georgia, serif;
+	color: #4B4742;
+	font-size: 20px;
+}
+#About h2 {
+	padding: 40px 0 20px;
+	font-weight: normal;
+	font-size: 50px;
+	border: 0;
+	font-family: georgia, serif;
 	color: #fff;
+	text-shadow: 0 0px 4px #b6d5e2;
 }
-ul.UserOptions a:hover {
-	color: #fff;
-	text-decoration: underline;
+#About p {
+	width: 400px;
 }
-ul.UserOptions li {
+#Content {
+	clear: left;
+}
+#Foot {
+	background: url('images/footer-border.png') top left repeat-x;
+	margin: 0;
+}
+#Foot div {
+	margin: 0 auto;
+	padding: 10px 0 6px;
+}
+#Foot a {
+	color: #898378;
+}
+#Foot div a {
 	display: inline-block;
-	margin-left: 10px;
+	background: url('images/logo_footer.png') center center no-repeat;
+	height: 32px;
+	width: 72px;
+	padding: 0;
+}
+#Foot div a span {
+	display: none;
 }
 
+#Foot a:hover, #Foot a:active {
+	color: #69645c;
+}
+#Panel {
+	width: 230px;
+}
 #Panel #Search {
 	display: none;
 }
@@ -37,7 +115,7 @@ body.Discussions #Panel #Search {
 	margin: 30px 0 10px;
 }
 #Panel #Search input.InputBox {
-	width:200px;
+	width:178px;
 	margin-right: 3px;
 }
 
@@ -47,6 +125,11 @@ div.Tabs {
 	background: none;
 	padding: 0  0 0 8px;
 }
+div.ProfileTabs li a,
+div.ProfileTabs li a:link,
+div.ProfileTabs li a:hover,
+div.ProfileTabs li a:active,
+div.ProfileTabs li a:visited,
 div.AnswerTabs li a,
 div.AnswerTabs li a:link,
 div.AnswerTabs li a:hover,
@@ -62,7 +145,16 @@ body.Discussions div.Tabs li a:visited {
 	-webkit-border-radius: 3px 3px 0 0;
 	-moz-border-radius: 3px 3px 0 0;
 	border-bottom: none;
+
+	-webkit-border-radius: none;
+	-moz-border-radius: none;
+	background: none;
+	border: none;
 }
+.Loading {
+   background: url('images/progress.gif') center center no-repeat #fff;
+}
+div.ProfileTabs li.Active a,
 div.AnswerTabs li.Active a,
 body.Discussions div.Tabs li.Active a {
 	padding: 6px 10px 5px;
@@ -70,8 +162,12 @@ body.Discussions div.Tabs li.Active a {
 	top: 1px;
 	border: 1px solid #999;
 	border-bottom: none;
+	background: #fff;
 }
-body.mine .Mine {
+form.Activity {
+	background: #fff;
+}
+body.mine li.Mine {
 	background: none;
 }
 div.HeadingTabs div.SubTab {
@@ -90,8 +186,10 @@ div.HeadingTabs div.SubTab {
 .StatBox span {
 	display: block;
 	font-weight: normal;
-	font-size: 11px;
+	font-size:9px;
 	line-height: 1;
+	padding-bottom:2px;
+	min-width:38px;
 }
 .StatBox,
 .StatBox a {
@@ -131,6 +229,21 @@ ul.Discussions div.ItemContent a.Title {
 
 
 /* Discussions */
+a.BigButton,
+a.BigButton:hover,
+a.BigButton:focus {
+   background: url('images/buttonbg.png') repeat-x top left #f8f8f8;
+	border: 1px solid #585858;
+	color: #fff;
+	text-shadow: 0 1px 1px #000;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+}
+a.BigButton:hover { background-position: 0 -180px; }
+a.BigButton:focus { background-position: 0 -360px; }
+ul.DataList {
+	background: #fff;
+}
 ul.DataList div.Meta a {
 	margin-right: 12px;
 }
@@ -151,7 +264,7 @@ ul.DataList div.Meta strong {
 	padding: 3px;
 	line-height: 1;
 	position:absolute;
-	left: 657px;
+	left: 660px;
 	white-space: nowrap;
 	top: -4px;
 }
@@ -166,6 +279,9 @@ ul.PanelInfo div.Meta strong {
 	font-weight:bold;
 	padding: 3px;
 	line-height: 1;
+}
+ul.MessageList li.Item {
+	background: #fff;
 }
 ul.MessageList div.Meta {
 	position: relative;
@@ -230,19 +346,24 @@ a:hover i.SpriteUp {	background-position: top right; }
 a:hover i.SpriteDown {	background-position: bottom right; }
 
 /* Comments */
+body.Discussion a.Bookmark {
+	margin: 6px 6px 6px 8px;
+}
 ul.MessageList li.FirstComment {
 	border-bottom: none;
 }
 div.AnswerTabs {
-	padding: 10px 0 0;
+	margin-top: 12px;
+	padding: 6px 8px 0;
 	font-size: 11px;
 	color: #aaa;
 	text-align: right;
 	position: relative;
+	background: #f5f9ff;
 }
 div.AnswerTabs strong {
 	position: absolute;
-	left: 0;
+	left: 8px;
 	color: #000;
 	font-weight: bold;
 	font-size: 16px;
@@ -252,3 +373,115 @@ div.AnswerTabs ul {
 	display: inline-block;
 	margin: 0 10px;
 }
+
+/* Forms */
+body.Post #Content {
+	width: 100%;
+}
+#DiscussionForm form {
+	display: block;
+	padding-right: 270px;
+}
+#DiscussionForm label {
+	color: #333;
+}
+#DiscussionForm textarea,
+#DiscussionForm input.InputBox {
+   width: 100%;
+	display: block;
+}
+#DiscussionForm {
+	position: relative;
+}
+.PostHelp {
+	top: 58px;
+	right: 20px;
+	position: absolute;
+	width: 220px;
+	background: #1e4262;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	font-size: 11px;
+	box-shadow: 0px 0px 4px #fff;
+	-moz-box-shadow: 0px 0px 4px #fff;
+	-webkit-box-shadow: 0px 0px 4px #fff;
+	color: #fff;
+}
+.PostHelp h4 {
+	color: #fff;
+	text-shadow: 0 0px 4px #000;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	font-size: 15px;
+	font-weight: bold;
+}
+.PostHelp .Help {
+	padding: 4px 8px;
+}
+.Help ul { margin: 0 !important; }
+.Help ul li {
+	list-style: disc;
+	margin-left: 14px;
+}
+div.Examples {
+	padding-top: 12px;
+}
+div.Examples,
+div.Help {
+	font-size: 11px;
+}
+div.Examples div {
+	font-style: italic;
+}
+div.Examples div strong {
+	font-weight: bold;
+	font-style: normal;
+	display: inline-block;
+}
+div.Examples div.Good strong,
+div.Examples div.Bad strong {
+	text-shadow: 0 0px 3px #000;
+}
+div.Examples div.Good strong { color: #0a0; }
+div.Examples div.Bad strong { color: #f00; }
+a.Cancel { margin-left: 20px; }
+
+/* Popups */
+div.Popup div.Body {
+	border: none;
+	-webkit-border-radius: 6px 6px 5px 5px;
+	-moz-border-radius: 6px 6px 5px 5px;
+	box-shadow: 0px 0px 10px #222;
+	-moz-box-shadow: 0px 0px 10px #222;
+	-webkit-box-shadow: 0px 0px 10px #222;
+}
+div.Popup div.Box {
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+}
+div.Popup h1, div.Popup h2 {
+	-webkit-border-radius: 5px 5px 0 0;
+	-moz-border-radius: 5px 5px 0 0;
+	background: url('images/header-background.png') center center no-repeat #163755;
+	border-bottom:1px solid #1a3857;
+}
+div.Popup .Footer {
+	background:none;
+	border:none;
+	padding: 0 6px 0 0;
+}
+/*
+  TODO:
+  ACME INC BANNER & GREY/GENERIC THEME/COLORS
+  TAGGING,
+  FLAGGING,
+  FOLLOWING USERS,
+  SHOW POPULAR TAGS IN SIDEBAR,
+  SHOW HIGHLY VOTED QUESTIONS & ANSWERS IN PROFILES
+  WRITE "ASK MARK A QUESTION" ON USER PROFILE PAGE
+  ALLOW FOLLOWING USERS
+  SHOW FOLLOWED & FOLLOWING USERS ON PROFILE PAGE IN SIDEBAR 
+ 
+*/

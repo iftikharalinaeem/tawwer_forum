@@ -10,14 +10,22 @@
  <div id="Head">
    <div class="Banner Menu">
       <h1><a class="Title" href="{link path="/"}"><span>{logo}</span></a></h1>
-      <ul class="UserOptions">
+      <ul>
+         {signinout_link class="leave"}
          {profile_link}
-         {signinout_link}
+         {dashboard_link}
+         {discussions_link}
       </ul>
     </div>
   </div>
 
   <div id="Body">
+    <div id="About">
+      <h2>About Mozilla Fans</h2>
+      <p>Welcome to the Mozilla Fans question &amp; answer community. Find &amp;
+      share info about Mozilla products with the thriving Mozilla
+      community. Help us help you!</p>
+    </div>
     <div id="Content">
       {asset name="Content"}
     </div>
@@ -27,11 +35,13 @@
     </div>
   </div>
   <div id="Foot">
-    <div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
-    {dashboard_link}
+    <div>
+      <a href="{vanillaurl}"><span>Powered by Vanilla</span></a>
+    </div>
+    
     {asset name="Foot"}
  </div>
 </div>
-
+{event name="AfterBody"}
 </body>
 </html>

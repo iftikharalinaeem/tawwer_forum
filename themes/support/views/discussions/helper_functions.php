@@ -78,7 +78,12 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
 */
 ?>   
    <div class="ItemContent Discussion">
-      <?php echo Anchor(Gdn_Format::Text($Discussion->Name), '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
+      <?php echo Anchor(
+         Gdn_Format::Text($Discussion->Name),
+         '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name)
+         // .($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
+         , 'Title');
+      ?>
       <?php $Sender->FireEvent('AfterDiscussionTitle'); ?>
       <div class="Meta">
          <?php
