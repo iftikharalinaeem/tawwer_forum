@@ -8,6 +8,7 @@ class RetargetTask extends Task {
       parent::__construct($ClientDir);
       
       $this->SourcecodePath = FALSE;
+      $this->MiscPath = FALSE
       $this->PluginPath = FALSE;
       $this->ThemePath = FALSE;
       
@@ -18,13 +19,21 @@ class RetargetTask extends Task {
       
       $MiscFolder = TaskList::Input("Enter new misc location for selected clients, or 'no' to skip miscpath", "Misc Folder", "misc");
       if (strtolower($MiscFolder) != 'no') {
+         $this->MiscPath = sprintf('/srv/www/%s/', $MiscFolder);
          $this->PluginPath = sprintf('/srv/www/%s/plugins/', $MiscFolder);
          $this->ThemePath = sprintf('/srv/www/%s/themes/', $MiscFolder);
       }
+      
+      TaskList::MajorEvent("New targets:");
+      if ($this->SourcecodePath)
+         TaskList::Event("SourcecodePath: {$this->SourcecodePath}");
+      if ($this->MiscPath)
+         TaskList::Event("MiscPath: {$this->MiscPath}");
    }
    
    protected function Run() {
-      $Proceed = TaskList::Question("Really retarget {$this->ClientFolder}'s sourcecodepath to {$this->SourcecodePath}?","Retarget?",array('yes','no','skip'),'skip');
+      
+      $Proceed = TaskList::Question("Really retarget {$this->ClientFolder}?","Retarget?",array('yes','no','skip'),'skip');
       if ($Proceed == 'no') exit();
       if ($Proceed == 'skip') return;
       
@@ -54,6 +63,11 @@ class RetargetTask extends Task {
          
          // Copy the new index file
          $this->CopySourceFile('index.php', $this->SourcecodePath);
+      }
+      
+      if ($this->MiscPath !== FALSE) {
+         //Symlink .htaccess
+         $this->Symlink('utils/.htaccess', TaskList::CombinePaths($this->MiscPath,'utils/.htaccess'));
       }
       
       if ($this->PluginPath !== FALSE) {
