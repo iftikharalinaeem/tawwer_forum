@@ -17,6 +17,11 @@ a:hover {
    text-decoration: none;
    color: #fff;
 }
+.Warning  {
+	background: #000000;
+	border: none;
+	color: #FFFFFF;
+}
 #Body {
    width: 100%;
    text-align: left;
@@ -447,4 +452,7 @@ div.Popup div.Body {
 }
 a.Close:hover {
 	color:#fff;
+}
+#Status {
+	background: #494949;
 }

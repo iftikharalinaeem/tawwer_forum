@@ -11,8 +11,11 @@ define('DATABASE_USER', 'root');
 define('DATABASE_PASSWORD', 'Va2aWu5A');
 define('DATABASE_MAIN', 'vfcom');
 
-$Tasks = new TaskList('launch','/srv/www/vhosts');
-$Tasks->RunAll(array(
-   'uncache'
-));
+if ($argc < 2) exit();
 
+$Tasks = new TaskList('maintain','/srv/www/vhosts');
+$Tasks->RunClientFromCLI($argv[1], array(
+   'backup',
+   'uncache',
+   'retarget'
+));

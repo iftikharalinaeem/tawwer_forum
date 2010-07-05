@@ -8,6 +8,17 @@ class ConfigurationTask extends Task {
    
    protected function Run() {
 
+/*
+      if (!$this->CheckConfig("EnabledPlugins.CustomTheme")) {
+         $Proceed = TaskList::Question("This customer does not have CustomTheme.","Try to fix?",array('yes','no','end'),'yes');
+         
+         if ($Proceed == 'no') return;
+         if ($Proceed == 'end') exit();
+      } else {
+         return;
+      }
+*/
+
       // Remove CustomCSS from enabled plugins
       TaskList::Event("Removing EnabledBplugins.CustomCSS plugin from config");
       $this->RemoveFromConfig('EnabledPlugins.CustomCSS');
