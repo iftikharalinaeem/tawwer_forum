@@ -156,7 +156,7 @@ jQuery(document).ready(function($) {
       if (draftInp.val() != '')
          $.ajax({
             type: "POST",
-            url: combinePaths(definition('WebRoot'), 'index.php?/vanilla/drafts/delete/'+draftInp.val()+'/'+definition('TransientKey')),
+            url: combinePaths(definition('WebRoot'), 'index.php?p=/vanilla/drafts/delete/'+draftInp.val()+'/'+definition('TransientKey')),
             data: 'DeliveryType=BOOL&DeliveryMethod=JSON',
             dataType: 'json'
          });         
