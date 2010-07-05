@@ -236,7 +236,13 @@ class TaskList {
    }
    
    protected static function _Prompt($Prompt, $Options, $Default) {
-      echo "{$Prompt} ";
+      echo "{$Prompt}";
+      
+      if (!sizeof($Options) && $Default !== FALSE && !is_null($Default)) {
+         echo " [{$Default}]";
+      }
+      echo ": ";
+      
       if (sizeof ($Options)) {
          $PromptOpts = array();
          foreach ($Options as $Opt)
