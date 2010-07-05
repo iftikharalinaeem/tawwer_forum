@@ -8,7 +8,7 @@ class RetargetTask extends Task {
       parent::__construct($ClientDir);
       
       $this->SourcecodePath = FALSE;
-      $this->MiscPath = FALSE
+      $this->MiscPath = FALSE;
       $this->PluginPath = FALSE;
       $this->ThemePath = FALSE;
       
