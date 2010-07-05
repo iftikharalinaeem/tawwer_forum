@@ -67,7 +67,7 @@ class RetargetTask extends Task {
       
       if ($this->MiscPath !== FALSE) {
          //Symlink .htaccess
-         $this->Symlink('utils/.htaccess', TaskList::CombinePaths($this->MiscPath,'utils/.htaccess'));
+         $this->Symlink('.htaccess', TaskList::CombinePaths($this->MiscPath,'utils/.htaccess'));
       }
       
       if ($this->PluginPath !== FALSE) {
