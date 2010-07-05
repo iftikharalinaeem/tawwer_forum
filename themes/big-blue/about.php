@@ -11,7 +11,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * An associative array of information about this application.
  */
-$ThemeInfo['Big Blue'] = array(
+$ThemeInfo['big-blue'] = array(
+   'Name' => 'Big Blue',
    'Description' => "Based on the new Vanilla.com site",
    'Version' => '1.0',
    'Author' => "Brendan Sera-Shriar",
