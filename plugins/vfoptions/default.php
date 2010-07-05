@@ -615,7 +615,7 @@ pageTracker._trackPageview();
 		else
 			RemoveFromConfig('Plugins.CustomTheme.Enabled');
 
-		$this->_ApplyFeature('CustomCSS', $ApplyFeatures, $PluginManager);
+		// $this->_ApplyFeature('CustomCSS', $ApplyFeatures, $PluginManager);
 		$this->_ApplyFeature('CustomDomain', $ApplyFeatures, $PluginManager);
 		// BannerLogo
 		$this->_ApplyConfig('BannerLogo', $ApplyFeatures, 'VanillaForums.BannerLogo.CanUpload');
@@ -753,6 +753,13 @@ pageTracker._trackPageview();
 		$IsEnabled = C('EnabledPlugins.'.$FeatureName);
 		$IsInPlan = in_array($FeatureName, $Features);
 		if ($IsInPlan && !$IsEnabled) {
+			// Make sure the plugin symlink exists
+			$SourcePath = '/srv/www/misc/plugins/'.$FeatureName;
+			$DestPath = PATH_PLUGINS.'/'.$FeatureName;
+			if (!file_exists($DestPath))
+				symlink($SourcePath, $DestPath);
+			
+			// Enable it.
 			$PluginManager->EnablePlugin($FeatureName);
 		} else if (!$IsInPlan && $IsEnabled) {
 			$PluginManager->DisablePlugin($FeatureName);
