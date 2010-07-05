@@ -12,12 +12,12 @@ class RetargetTask extends Task {
       $this->ThemePath = FALSE;
       
       $SourceCodeFolder = TaskList::Input("Enter new sourcecode location for selected clients, or 'no' to skip sourcecodepath", "Sourcecode Folder", "vanilla_source");
-      if (strtolower($SourceCodeFolder) == 'no') {
+      if (strtolower($SourceCodeFolder) != 'no') {
          $this->SourcecodePath = sprintf('/srv/www/%s/',$SourceCodeFolder);
       }
       
       $MiscFolder = TaskList::Input("Enter new misc location for selected clients, or 'no' to skip miscpath", "Misc Folder", "misc");
-      if (strtolower($MiscFolder) == 'no') {
+      if (strtolower($MiscFolder) != 'no') {
          $this->PluginPath = sprintf('/srv/www/%s/plugins/', $MiscFolder);
          $this->ThemePath = sprintf('/srv/www/%s/themes/', $MiscFolder);
       }
