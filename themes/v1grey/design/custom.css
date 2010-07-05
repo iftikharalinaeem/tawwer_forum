@@ -34,7 +34,7 @@ body.Profile #Content,
    width: auto;
 }
 #Head {
-   background: url('waves.dark.gif') top left repeat-x;
+   background: url('waves.dark.gif') top left repeat-x #333;
 }
 #Head h1 a:hover span,
 #Head h1 a span {
