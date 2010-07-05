@@ -28,17 +28,13 @@ a:hover {
    height: 140px;
 }
 body #Head h1 {
-   position: absolute;
-   background: url('images/carsonified.png') center center no-repeat;
-   display: block;
-   height: 112px;
-   width: 232px;
-   margin: 30px 0 0;
+   margin: 25px 0 0;
    padding: 0;
    border: 0;
 }
 #Head h1 a span {
-   display: none;
+	color:#fff;
+	text-shadow: none;
 }
 #Head form {
    margin: 80px 0 0;
@@ -51,7 +47,7 @@ body #Head h1 {
    color: #fff /* Panel Font Color */;
 }
 ul#Menu {
-   margin: 0 auto 0 232px;
+   margin: 0;
    padding: 82px 0 0 10px;
 }
 #Menu ul {
