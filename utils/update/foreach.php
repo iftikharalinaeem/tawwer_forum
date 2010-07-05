@@ -250,7 +250,7 @@ class TaskList {
       if ($Message)
          echo $Message."\n";
          
-      self::_Prompt($Prompt, $Options, $Default);
+      self::_Prompt($Prompt, array(), $Default);
       $Answer = trim(fgets(STDIN));
       if ($Answer == '') $Answer = $Default;
       $Answer = strtolower($Answer);
