@@ -12,6 +12,9 @@ class VFOrgThemeHooks implements Gdn_IPlugin {
    public function Setup() {
       return TRUE;
    }
+   public function OnDisable() {
+      return TRUE;
+   }
    
    public function Base_Render_Before(&$Sender) {
       if ($Sender->Head->Title() == Gdn::Config('Garden.Title'))

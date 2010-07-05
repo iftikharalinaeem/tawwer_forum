@@ -218,7 +218,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
       foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
          if ($SchemeKey == 'handshake')
-            unset($EnabledSchemes[$SchemeKey]);
+            unset($EnabledSchemes[$SchemeIndex]);
       }
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
    }
@@ -231,7 +231,17 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       SaveToConfig('Garden.Authenticators.handshake.TokenLifetime', 0);
       
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      array_push($EnabledSchemes, 'handshake');
+      $HaveProxy = FALSE;
+      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
+         if ($SchemeKey == 'handshake') {
+            if ($HaveProxy === TRUE)
+               unset($EnabledSchemes[$SchemeIndex]);
+            $HaveProxy = TRUE;
+         }
+      }
+      if (!$HaveProxy)
+         array_push($EnabledSchemes, 'handshake');
+      
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
       
       // Create a provider key/secret pair if needed

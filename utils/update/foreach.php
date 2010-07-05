@@ -14,7 +14,7 @@ class TaskList {
    protected $Database;
    protected $ClientList;
 
-   public function __construct($TaskDir, $ClientDir) {
+   public function __construct($UserTaskDirs, $ClientDir) {
    
       $this->Clients = $ClientDir;
       $this->Tasks = array();
@@ -29,39 +29,49 @@ class TaskList {
       chdir(dirname(__FILE__));
    
       // Setup tasks
-      if (!is_dir($TaskDir) || !is_readable($TaskDir)) 
-         die("Could not find task_dir '{$TaskDir}', or it does not have read permissions.\n");
-         
-      if (!$TaskDirectory = opendir($TaskDir))
-         die("Could not open task_dir '{$TaskDir}' for reading.\n");
-         
       TaskList::MajorEvent("Setting up task objects...");
       
-      while (($FileName = readdir($TaskDirectory)) !== FALSE) {
-         if ($FileName == '.' || $FileName == '..') continue;
-         if (!preg_match('/^(.*)\.task\.php$/', $FileName, $Matches)) continue;
+      if (!is_array($UserTaskDirs))
+         $UserTaskDirs = array($UserTaskDirs);
          
-         $Taskname = $Matches[1];
-         $IncludePath = trim($TaskDir,'/').'/'.$FileName;
-         $Classes = get_declared_classes();
-         require_once($IncludePath);
-         $NewClasses = array_diff(get_declared_classes(), $Classes);
-         
-         foreach ($NewClasses as $Class) {
-            if (is_subclass_of($Class, 'Task')) {
-               TaskList::Event(strtolower($Class));
-               $NewTask = new $Class($ClientDir);
-               $NewTask->Database = $this->Database;
-               $this->Tasks[$Taskname] = array(
-                  'name'      => str_replace('Task', '', $Class),
-                  'task'      => $NewTask
-               );
-            }
-         }
-         TaskList::Event("");
-      }
-      closedir($TaskDirectory);
+      $TaskDirs = array_merge(array('global'), $UserTaskDirs);
       
+      // Looping task dirs
+      foreach ($TaskDirs as $TaskDir) {
+         if (!is_dir($TaskDir) || !is_readable($TaskDir)) 
+            die("Could not find task_dir '{$TaskDir}', or it does not have read permissions.\n");
+         
+         if (!$TaskDirectory = opendir($TaskDir))
+            die("Could not open task_dir '{$TaskDir}' for reading.\n");
+            
+         TaskList::Event("Scanning {$TaskDir} for task objects...");
+         
+         while (($FileName = readdir($TaskDirectory)) !== FALSE) {
+            if ($FileName == '.' || $FileName == '..') continue;
+            if (!preg_match('/^(.*)\.task\.php$/', $FileName, $Matches)) continue;
+            
+            $Taskname = $Matches[1];
+            $IncludePath = trim($TaskDir,'/').'/'.$FileName;
+            $Classes = get_declared_classes();
+            require_once($IncludePath);
+            $NewClasses = array_diff(get_declared_classes(), $Classes);
+            
+            foreach ($NewClasses as $Class) {
+               if (is_subclass_of($Class, 'Task')) {
+                  TaskList::Event(strtolower($Class));
+                  $NewTask = new $Class($ClientDir);
+                  $NewTask->Database = $this->Database;
+                  $this->Tasks[$Taskname] = array(
+                     'name'      => str_replace('Task', '', $Class),
+                     'task'      => $NewTask
+                  );
+               }
+            }
+            TaskList::Event("");
+         }
+         closedir($TaskDirectory);
+      }
+            
       TaskList::MajorEvent("Scanning for clients...", TaskList::NOBREAK);
       $this->ClientList = array();
       $FolderList = scandir($this->Clients);
@@ -72,32 +82,39 @@ class TaskList {
       
       foreach ($FolderList as $ClientFolder) {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
-         
-         $ClientInfo = $this->LookupClientByFolder($ClientFolder);
-         $this->ClientList[$ClientFolder] = $ClientInfo;
+         $this->ClientList[$ClientFolder] = 1;
       }
       $NumClients = count($this->ClientList);
       TaskList::MajorEvent("found {$NumClients}!", TaskList::NOBREAK);
       
-      $Proceed = TaskList::Question("","Proceed with task execution?",array('yes''no'),'no');
+      $Proceed = TaskList::Question("","Proceed with task execution?",array('yes','no'),'no');
       if ($Proceed == 'no') exit();
    }
    
    public function RunAll($TaskOrder = NULL) {
       TaskList::MajorEvent("Running through full client list...");
       foreach ($this->ClientList as $ClientFolder => $ClientInfo)
-         $this->RunClient($ClientFolder, $TaskOrder);
+         $this->PerformClient($ClientFolder, $TaskOrder);
    }
    
    public function RunSelectiveRegex($RegularExression, $TaskOrder = NULL) {
       TaskList::MajorEvent("Running regular expression {$RegularExpression} against client list...");
       foreach ($this->ClientList as $ClientFolder => $ClientInfo) {
          if (!preg_match($RegularExpression, $ClientFolder, $Matches)) continue;
-         $this->RunClient($ClientFolder, $TaskOrder);
+         $this->PerformClient($ClientFolder, $TaskOrder);
       }
    }
    
-   public function RunClient($ClientFolder, $TaskOrder = NULL) {
+   public function RunClientFromCLI($ClientFolder, $TaskOrder = NULL) {
+      TaskList::MajorEvent("Running client {$ClientFolder}...");
+      
+      if (!array_key_exists($ClientFolder,$this->ClientList))
+         die("client not found.\n");
+         
+      $this->PerformClient($ClientFolder, $TaskOrder);
+   }
+   
+   public function PerformClient($ClientFolder, $TaskOrder = NULL) {
       $ClientInfo = $this->ClientList[$ClientFolder];
       TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
       
@@ -229,11 +246,31 @@ class TaskList {
    }
    
    protected static function _Prompt($Prompt, $Options, $Default) {
-      $PromptOpts = array();
-      foreach ($Options as $Opt)
-         $PromptOpts[] = (strtolower($Opt) == strtolower($Default)) ? strtoupper($Opt) : strtolower($Opt);
+      echo "{$Prompt}";
+      
+      if (!sizeof($Options) && $Default !== FALSE && !is_null($Default)) {
+         echo " [{$Default}]";
+      }
+      echo ": ";
+      
+      if (sizeof ($Options)) {
+         $PromptOpts = array();
+         foreach ($Options as $Opt)
+            $PromptOpts[] = (strtolower($Opt) == strtolower($Default)) ? strtoupper($Opt) : strtolower($Opt);
+         echo "(".implode(',',$PromptOpts).") ";
+      }
+   }
+   
+   public static function Input($Message, $Prompt, $Default) {
+      echo "\n";
+      if ($Message)
+         echo $Message."\n";
          
-      echo "{$Prompt} (".implode(',',$PromptOpts).") ";
+      self::_Prompt($Prompt, array(), $Default);
+      $Answer = trim(fgets(STDIN));
+      if ($Answer == '') $Answer = $Default;
+      $Answer = strtolower($Answer);
+      return $Answer;
    }
    
 }

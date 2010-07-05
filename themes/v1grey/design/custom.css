@@ -17,6 +17,11 @@ a:hover {
    text-decoration: none;
    color: #fff;
 }
+.Warning  {
+	background: #000000;
+	border: none;
+	color: #FFFFFF;
+}
 #Body {
    width: 100%;
    text-align: left;
@@ -34,7 +39,7 @@ body.Profile #Content,
    width: auto;
 }
 #Head {
-   background: url('waves.dark.gif') top left repeat-x;
+   background: url('waves.dark.gif') top left repeat-x #333;
 }
 #Head h1 a:hover span,
 #Head h1 a span {
@@ -447,4 +452,7 @@ div.Popup div.Body {
 }
 a.Close:hover {
 	color:#fff;
+}
+#Status {
+	background: #494949;
 }

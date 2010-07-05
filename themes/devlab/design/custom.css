@@ -253,7 +253,6 @@ div.MessageForm, div.Tabs {
 	background:#f2f2f2;
 	border:1px solid #c4c4c4;
 	display:block;
-	margin-bottom:30px;
 	padding:5px 8px;
 }
 
@@ -277,7 +276,7 @@ div.MessageForm a.Cancel:hover, div.MorePager a:hover, a.TabLink:hover, div.Tabs
 
 ul.DataList li.Item {
 	border-bottom:1px solid #e1e1e1;
-	margin:0 0 20px;
+	margin:0;
 	padding:4px 0;
 }
 

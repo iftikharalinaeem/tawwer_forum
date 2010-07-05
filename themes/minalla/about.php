@@ -13,22 +13,19 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 $ThemeInfo['minalla'] = array(
    'Name' => 'Minalla',
-   'Description' => "A minimilist forum - simple and clean",
-   'Version' => '1.0',
+   'Description' => "A minimilist forum - simple and clean. This theme has 5 style options.",
+   'Version' => '1.5',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
    'AuthorUrl' => 'http://brendanserashriar.com',
    'Options' => array(
-         'Description' => 'Minalla has a bunch of options.',
+         'Description' => '<strong>Minalla</strong> has <font color="red">5 color</font> options. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">"Theme Options"</a>.',
 
          'Styles' => array(
-            'Minalla Blue' => array('%s_blue', 'Description' => 'This is a blue theme'),
+            'Minalla Blue' => '%s_blue',
             'Minalla Green' => '%s_green',
             'Minalla Red' => '%s_red',
             'Minalla Grey' => '%s_grey',
             'Minalla Yellow' => '%s'),
-         'Text' => array(
-            'Some Text' => 'TextArea',
-            'Some Other Text' => array('TextBox', 'Description' => 'This is some other text'))
    )
 );
