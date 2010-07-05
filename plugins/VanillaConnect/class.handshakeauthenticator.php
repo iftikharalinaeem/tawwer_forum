@@ -502,17 +502,18 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
    }
    
    public function GetURL($URLType) {
-      $SQL = Gdn::Database()->SQL();
       if ($UserID = Gdn::Authenticator()->GetIdentity()) {
-         $Provider = $SQL->Select('uap.*')
+         $Provider = Gdn::SQL()->Select('uap.*')
             ->From('UserAuthenticationProvider uap')
             ->Join('UserAuthentication ua', 'ua.ProviderKey = uap.AuthenticationKey', 'left')
             ->Where('ua.UserID', $UserID)
+            ->Where('uap.AuthenticationSchemeAlias', 'handshake')
             ->Get()
             ->FirstRow(DATASET_TYPE_ARRAY);
       } else {
-         $Provider = $SQL->Select('uap.*')
+         $Provider = Gdn::SQL()->Select('uap.*')
             ->From('UserAuthenticationProvider uap')
+            ->Where('uap.AuthenticationSchemeAlias', 'handshake')
             ->Get()
             ->FirstRow(DATASET_TYPE_ARRAY);
       }

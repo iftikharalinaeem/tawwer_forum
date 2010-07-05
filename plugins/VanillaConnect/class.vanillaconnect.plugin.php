@@ -50,6 +50,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.AuthenticationKey')
          ->From('UserAuthenticationProvider uap')
+         ->Where('uap.AuthenticationSchemeAlias', 'handshake')
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
          
@@ -70,6 +71,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
             $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
 				$Sender->Form->SetFormValue('AuthenticationKey', $ConsumerKey);
+				$Sender->Form->SetFormValue('AuthenticationSchemeAlias', 'handshake');
             $Sender->Form->Save();
          }
       }
@@ -248,6 +250,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.*')
          ->From('UserAuthenticationProvider uap')
+         ->Where('uap.AuthenticationSchemeAlias', 'handshake')
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
          

@@ -17,6 +17,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake {
 
    protected $_CookieName = NULL;
+   protected $Provider = NULL;
    
    public function __construct() {
    
@@ -38,9 +39,9 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          $Response = $this->_GetForeignCredentials($ForeignIdentityUrl);
          if (!$Response) throw new Exception();
          
-         $SQL = Gdn::Database()->SQL();
-         $Provider = $SQL->Select('uap.AuthenticationKey, uap.AssociationSecret')
+         $Provider = Gdn::SQL()->Select('uap.AuthenticationKey, uap.AssociationSecret')
             ->From('UserAuthenticationProvider uap')
+            ->Where('uap.AuthenticationSchemeAlias', 'proxy')
             ->Get()
             ->FirstRow(DATASET_TYPE_ARRAY);
          if (!$Provider) throw new Exception();
@@ -64,7 +65,8 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       }
       catch (Exception $e) {
          // Fallback to defer checking until the next session
-         $this->SetIdentity(-1, FALSE);
+         if (substr(Gdn::Request()->Path(),0,6) != 'entry/')
+            $this->SetIdentity(-1, FALSE);
       }
    }
    
@@ -178,7 +180,20 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    }
    
    public function GetURL($URLType) {
-      // We arent overriding anything
+      $Provider = $this->_GetProvider();
+      $RealURLType = $URLType;
+      $URLType = substr($URLType, 0, 4) == 'Real' ? substr($URLType,4) : $URLType;
+      if ($Provider && $Provider[$URLType]) {
+         
+         if ($RealURLType == Gdn_Authenticator::URL_SIGNIN)
+            return Url('entry/signinloopback',TRUE);
+            
+         if ($RealURLTYPE == 'Real'.Gdn_Authenticator::URL_SIGNIN)
+            $URLType = Gdn_Authenticator::URL_SIGNIN;
+            
+         return $Provider[$URLType];
+      }
+      
       return FALSE;
    }
    
@@ -204,6 +219,30 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       if (!$Id) return Gdn_Authenticator::MODE_GATHER;
       if ($Id > 0) return Gdn_Authenticator::MODE_REPEAT;
       if ($Id < 0) return Gdn_Authenticator::MODE_NOAUTH;
+   }
+   
+   protected function _GetProvider($ProviderKey = NULL) {
+      if (is_null($ProviderKey) && $UserID = Gdn::Authenticator()->GetIdentity()) {
+         $Provider = Gdn::SQL()->Select('uap.*')
+            ->From('UserAuthenticationProvider uap')
+            ->Join('UserAuthentication ua', 'ua.ProviderKey = uap.AuthenticationKey', 'left')
+            ->Where('ua.UserID', $UserID)
+            ->Where('uap.AuthenticationSchemeAlias', 'proxy')
+            ->Get()
+            ->FirstRow(DATASET_TYPE_ARRAY);
+      } else {
+         $ProviderQuery = Gdn::SQL()->Select('uap.*')
+            ->From('UserAuthenticationProvider uap')
+            ->Where('uap.AuthenticationSchemeAlias', 'proxy');
+         if (!is_null($ProviderKey)) {
+            $ProviderQuery->Where('uap.AuthenticationKey', $ProviderKey);
+         }
+            
+         $Provider = $ProviderQuery->Get()
+            ->FirstRow(DATASET_TYPE_ARRAY);
+      }
+      
+      return $Provider;
    }
    
    public function WakeUp() {

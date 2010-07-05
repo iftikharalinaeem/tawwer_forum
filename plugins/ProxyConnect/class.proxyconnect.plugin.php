@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProxyConnect'] = array(
 	'Name' => 'Proxy Connect SSO',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
-   'Version' => '1.2',
+   'Version' => '1.3',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -50,6 +50,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.AuthenticationKey')
          ->From('UserAuthenticationProvider uap')
+         ->Where('uap.AuthenticationSchemeAlias', 'proxy')
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
          
@@ -71,6 +72,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
             $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
 				$Sender->Form->SetFormValue('AuthenticationKey', $ConsumerKey);
+				$Sender->Form->SetFormValue('AuthenticationSchemeAlias', 'proxy');
             $Saved = $Sender->Form->Save();
             
             SaveToConfig('Garden.Authenticator.AuthenticateURL', $Sender->Form->GetValue('AuthenticateURL'));
@@ -94,6 +96,20 @@ class ProxyConnectPlugin extends Gdn_Plugin {
 			}
 			Redirect('settings/proxyconnect');
 		}
+   }
+   
+   public function EntryController_SigninLoopback_Create(&$Sender) {
+      $RealUserID = Gdn::Authenticator()->GetRealIdentity();
+      $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
+      if ($RealUserID == -1) {
+         $Authenticator->Authenticate();
+         if (Gdn::Authenticator()->GetIdentity()) {
+            Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
+         } else {
+            $RealSigninURL = $Authenticator->GetURL('Real'.Gdn_Authenticator::URL_SIGNIN);
+            Redirect($RealSigninURL,302);
+         }
+      }
    }
    
    public function Setup() {
@@ -124,7 +140,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $ProviderModel = new Gdn_AuthenticationProviderModel();
       $ProviderModel->Insert($Provider = array(
          'AuthenticationKey'           => $Key,
-         'AuthenticationSchemeAlias'   => 'handshake',
+         'AuthenticationSchemeAlias'   => 'proxy',
          'URL'                         => 'Enter your site url',
          'AssociationSecret'           => $Secret,
          'AssociationHashMethod'       => 'HMAC-SHA1'
@@ -171,6 +187,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.*')
          ->From('UserAuthenticationProvider uap')
+         ->Where('uap.AuthenticationSchemeAlias', 'proxy')
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
          
