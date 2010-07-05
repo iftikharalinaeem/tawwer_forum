@@ -14,7 +14,7 @@ class TaskList {
    protected $Database;
    protected $ClientList;
 
-   public function __construct($UserTaskDir, $ClientDir) {
+   public function __construct($UserTaskDirs, $ClientDir) {
    
       $this->Clients = $ClientDir;
       $this->Tasks = array();
