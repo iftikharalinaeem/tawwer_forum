@@ -17,7 +17,7 @@ class RetargetTask extends Task {
       }
       
       $MiscFolder = TaskList::Input("Enter new misc location for selected clients, or 'no' to skip miscpath", "Misc Folder", "misc");
-      if (strtolower($$MiscFolder) == 'no') {
+      if (strtolower($MiscFolder) == 'no') {
          $this->PluginPath = sprintf('/srv/www/%s/plugins/', $MiscFolder);
          $this->ThemePath = sprintf('/srv/www/%s/themes/', $MiscFolder);
       }
