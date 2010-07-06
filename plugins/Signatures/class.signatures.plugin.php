@@ -200,7 +200,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Data = $Sender->EventArguments['Comment'];
       
       $SourceUserID = $Data->InsertUserID;
-      $UserSignatures = $Sender->Data('Plugin-Signatures-UserSignatures');
+      $UserSignatures =& $Sender->Data('Plugin-Signatures-UserSignatures');
       
       if (isset($UserSignatures[$SourceUserID])) {
          $HideImages = ArrayValue('Plugin.Signature.HideImages', $Sender->Data('Plugin-Signatures-ViewingUserData'), FALSE);
