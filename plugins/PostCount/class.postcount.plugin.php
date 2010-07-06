@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['PostCount'] = array(
    'Name' => 'Post Count',
    'Description' => "This plugin shows each user's post count along with their messages.",
-   'Version' => '0.8',
+   'Version' => '0.9',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
