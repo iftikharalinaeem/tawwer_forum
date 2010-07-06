@@ -25,6 +25,17 @@ $PluginInfo['PostCount'] = array(
 
 class PostCountPlugin extends Gdn_Plugin {
    
+   public function UserInfoModule_OnBasicInfo_Handler(&$Sender) {
+      $UserID = $Sender->User->UserID;
+      $PostCount = GetValue('PostCount', Gdn::SQL()
+         ->Select('u.CountComments + u.CountDiscussions', FALSE, 'PostCount')
+         ->From('User u')
+         ->Where('UserID', $UserID)
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY),0);
+      echo "<dt>".T(Plural($PostCount, 'Posts', 'Posts'))."</dt>\n";
+      echo "<dd>".number_format($PostCount)."</dd>";
+   }
+   
    public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
       $this->_CachePostCounts($Sender);
    }
@@ -85,7 +96,7 @@ class PostCountPlugin extends Gdn_Plugin {
    
    protected function _AttachPostCount(&$Sender) {
       $Posts = ArrayValue($Sender->EventArguments['Author']->UserID, $Sender->Data('Plugin-PostCount-Counts'));
-      echo '<div class="PostCount">'.sprintf(T('Posts: %s'),number_format($Posts,0)).'</div>';
+      echo '<div class="PostCount">'.sprintf(T(Plural($Posts,'Posts: %s','Posts: %s')),number_format($Posts,0)).'</div>';
    }
 
    public function Setup() {
