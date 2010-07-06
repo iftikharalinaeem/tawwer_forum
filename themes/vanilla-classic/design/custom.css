@@ -346,12 +346,6 @@ ul.MessageList li.Item div.Message a:hover {
 div.FileAttachment {
    color: #999;
 }
-div.Preview div.Message code,
-div.Preview div.Message pre,
-ul.MessageList div.Message code,
-ul.MessageList div.Message pre {
-   background: #444;
-}
 ul.Discussions div.ItemContent,
 ul.Drafts div.ItemContent {
 	margin:0;
