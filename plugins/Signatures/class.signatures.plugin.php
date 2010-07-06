@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'This plugin allows users to attach their own signatures to their posts.',
-   'Version' => '1.1.2',
+   'Version' => '1.1.3',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
