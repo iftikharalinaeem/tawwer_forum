@@ -104,6 +104,15 @@ div.Tabs {
    -webkit-border-top-left-radius: 2px;
    -webkit-border-top-right-radius: 2px;
 }
+div.MessageForm {
+	text-align: left;
+}
+div.MessageForm div.Buttons {
+	text-align: right;
+}
+div.CommentForm textarea {
+	width:99%;
+}
 div.Tabs {
    margin-bottom: 1px;
 }

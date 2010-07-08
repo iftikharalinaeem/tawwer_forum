@@ -13,6 +13,9 @@ class IaThemeHooks implements Gdn_IPlugin {
    public function Setup() {
       return TRUE;
    }
+   public function OnDisable() {
+      return TRUE;
+   }
    
    public function DiscussionsController_AfterInitialize_Handler($Sender) {
       // echo 'test';
