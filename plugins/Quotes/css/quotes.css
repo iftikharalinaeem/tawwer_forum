@@ -10,7 +10,7 @@ div.Comment blockquote.UserQuote div.QuoteAuthor {
 }
 
 div.Comment blockquote.UserQuote div.QuoteText {
-   color: grey;
+   color: #232323;
    border-left: 1px solid grey;
    padding-left: 5px;
 }
