@@ -1,7 +1,18 @@
 var QuotesPlugin = {
+   ConvertQuoteLinks: function() {
+      $('span.CommentQuote a').each(function(i,el){
+         el = $(el);
+         var ObjectID = el.attr('href').split('/').pop();
+         el.attr('href',"javascript:QuotesPlugin.Quote('"+ObjectID+"');");
+      });
+   },
    
    Quote: function(QuotedElement) {
-      QuotesPlugin.GetQuoteData(QuotedElement);
+      var Comment = QuotesPlugin.GetQuoteData(QuotedElement);
+      if (!Comment) return;
+      
+      var x = $('#Form_Body').offset().top - 100; // 100 provides buffer in viewport
+      $('html,body').animate({scrollTop: x}, 800);
    },
    
    QuoteResponse: function(Data, Status, XHR) {
@@ -46,7 +57,8 @@ var QuotesPlugin = {
    },
    
    GetQuoteData: function(QuotedElement) {
-      if (!$('#'+QuotedElement)) return;
+      var Quoted = $('#'+QuotedElement);
+      if (!Quoted) return false;
       QuotesPlugin.AddSpinner(QuotedElement);
       var QuotebackURL = gdn.definition('WebRoot')+'plugin/quotes/getquote/'+QuotedElement;
       jQuery.ajax({
@@ -54,6 +66,8 @@ var QuotesPlugin = {
          type: 'GET',
          success: QuotesPlugin.QuoteResponse
       });
+      return Quoted;
    }
 
 }
+jQuery(document).ready(QuotesPlugin.ConvertQuoteLinks);

@@ -93,8 +93,9 @@ class QuotesPlugin extends Gdn_Plugin {
    
    protected function AddQuoteButton(&$Sender) {
       $ObjectID = !isset($Sender->EventArguments['Comment']) ? 'Discussion_'.$Sender->EventArguments['Discussion']->DiscussionID : 'Comment_'.$Sender->EventArguments['Comment']->CommentID;
+      $QuoteURL = Url("post/quote/{$ObjectID}",TRUE);
       echo <<<QUOTE
-      <span class="CommentQuote"><a href="javascript:QuotesPlugin.Quote('{$ObjectID}');">Quote</a></span>
+      <span class="CommentQuote"><a href="{$QuoteURL}">Quote</a></span>
 QUOTE;
    }
    
@@ -130,39 +131,8 @@ QUOTE;
             break;
       
       }
-      
-/*
-      $SourceUserID = $Data->InsertUserID;
-      $UserSignatures =& $Sender->Data('Plugin-Signatures-UserSignatures');
-      
-      if (isset($UserSignatures[$SourceUserID])) {
-         $HideImages = ArrayValue('Plugin.Signature.HideImages', $Sender->Data('Plugin-Signatures-ViewingUserData'), FALSE);
-         
-         $UserSig = $UserSignatures[$SourceUserID];
-         
-         if ($HideImages) {
-            // Strip img tags
-            $UserSig = $this->_StripOnly($UserSig, array('img'));
-         
-            // Remove blank lines and spare whitespace
-            
-            $UserSig = trim($UserSig);
-         }
-         
-         // Don't show empty sigs, brah
-         if ($UserSig == '') return;
-         
-         $Sender->UserSignature = Gdn_Format::Html($UserSig);
-         $Display = $Sender->FetchView($this->GetView('usersig.php'));
-         unset($Sender->UserSignature);
-         $Data->Body .= $Display;
-      }
-*/
    }
    
-   /*
-   <blockquote class="UserQuote"><div class="QuoteAuthor"><a href="/profile/3/McNugget" rel="nofollow">McNugget</a> said:</div><div class="QuoteText"><p>Combo</p></div></blockquote>
-   */
    protected function QuoteAuthorCallback($Matches) {
       return <<<BLOCKQUOTE
       <blockquote class="UserQuote"><div class="QuoteAuthor"><a href="/profile/{$Matches[2]}" rel="nofollow">{$Matches[2]}</a> said:</div><div class="QuoteText"><p>
