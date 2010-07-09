@@ -131,6 +131,15 @@ div.Tabs {
    border-bottom: 1px solid #ccc;
 	padding: 5px 10px;
 }
+div.MessageForm {
+	text-align: left;
+}
+div.MessageForm div.Buttons {
+	text-align: right;
+}
+div.CommentForm textarea {
+	width:99%;
+}
 ul.DataList li.Item {
    background: none;
    border-bottom: 1px solid #ccc;

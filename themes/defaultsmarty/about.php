@@ -19,16 +19,15 @@ $ThemeInfo['DefaultSmarty'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
    'Options' => array(
-		'Description' => '<strong>Vanilla</strong> has <font color="red">7 color</font> options. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">"Theme Options"</a>.',
-         
-		 'Styles' => array(
-            'Vanilla Terminal' => '%s_terminal',
+		'Description' => 'This theme has <font color="red">7 color</font> options. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">"Theme Options"</a>.',
+      'Styles' => array(
+         'Vanilla Terminal' => '%s_terminal',
 			'Vanilla Grey' => '%s_grey',
 			'Vanilla Old Tyme' => '%s_oldtyme',
 			'Vanilla Big City' => '%s_bigcity',
 			'Vanilla Poppy' => '%s_poppy',
 			'Vanilla Lemon Sea' => '%s_lemonsea',
-            'Vanilla Blue' => '%s'),
-         
+         'Vanilla Blue' => '%s'
+      ),
    )
 );

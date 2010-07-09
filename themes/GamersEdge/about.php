@@ -11,17 +11,24 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * An associative array of information about this application.
  */
-$ThemeInfo['rounder'] = array(
-   'Name' => 'Rounder',
-   'Description' => "A well rounded theme",
+$ThemeInfo['Gamers Edge'] = array(
+   'Name' => 'Gamers Edge',
+   'Description' => "A custom theme for a gaming review site",
    'Version' => '1.0',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
    'AuthorUrl' => 'http://brendanserashriar.com',
    'Options' => array(
-		'Description' => 'You can customize the heading text for <strong>Rounder</strong>. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">"Theme Options"</a>.',
-      'Text' => array('Header Text' => 'This is just place holder text. Use the theme options to put whatever you want here!'),
+         'Text' => array(
+            'Twitter' => 'Get twitter widget code at twitter.com/widgets.',
+			'Ad 1' => 'CONTENT MIDDLE: Paste Remote Ad Code Here. Make Sure your ad is 660x150.',
+			'Ad 2' => 'SIDE BAR TOP: Paste Remote Ad Code Here. Make Sure your ad is 250x250.',
+			'Ad 3' => 'SIDE BAR BOTTOM: Paste Remote Ad Code Here. Make Sure your ad is 250x250.',
+		 
+		 	'Review Soon 1' => 'Paste review with link to post here.',
+			'Review Soon 2' => 'Paste review with link to post here.',
+			'Review Soon 3' => 'Paste review with link to post here.',
+			'Review Soon 4' => 'Paste review with link to post here.',
+			'Review Soon 5' => 'Paste review with link to post here.'),
 	)
 );
-   
-   
