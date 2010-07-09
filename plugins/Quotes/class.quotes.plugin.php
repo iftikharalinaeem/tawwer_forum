@@ -26,7 +26,6 @@ $PluginInfo['Quotes'] = array(
 class QuotesPlugin extends Gdn_Plugin {
 
    public function PluginController_Quotes_Create(&$Sender) {
-      $Sender->Permission('Garden.AdminUser.Only');
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
