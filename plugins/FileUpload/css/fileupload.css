@@ -57,6 +57,10 @@ div.AttachFileWrapper div.AttachFileLink div#CurrentUploader {
    height: 0px;
 }
 
+div.AttachFileWrapper div.AttachFileLink div#CurrentUploader {
+   width: 350px;
+}
+
 div.AttachFileWrapper div.NewAttachment {
    float: left;
    width: 350px;

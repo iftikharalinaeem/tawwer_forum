@@ -182,11 +182,11 @@ class SignaturesPlugin extends Gdn_Plugin {
       return (is_array($UserSig)) ? $UserSig['Value'] : $Default;
    }
    
-   public function DiscussionController_BeforeCommentDisplay_Handler(&$Sender) {
+   public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
       $this->_DrawSignature($Sender);
    }
    
-   public function PostController_BeforeCommentDisplay_Handler(&$Sender) {
+   public function PostController_AfterCommentBody_Handler(&$Sender) {
       $this->_DrawSignature($Sender);
    }
    
@@ -222,7 +222,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Sender->UserSignature = Gdn_Format::Html($UserSig);
          $Display = $Sender->FetchView($this->GetView('usersig.php'));
          unset($Sender->UserSignature);
-         $Data->Body .= $Display;
+         echo $Display;
       }
    }
    
