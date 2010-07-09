@@ -53,7 +53,9 @@ class FollowingModule extends Gdn_Module {
             echo "<div class=\"\">".sprintf(Plural($this->NumFollowees, 'Following %d person', 'Following %d people'), $this->NumFollowees)."</div>\n";
             if ($this->Followees->NumRows() > 0) {
                echo '<div class="FriendsList">';
-               while ($User = $this->Followees->NextRow(DATASET_TYPE_ARRAY)) {
+               $Followees = $this->Followees->ResultArray(); shuffle($Followees);
+               $Followees = array_slice($Followees,0,($this->NumFollowees >= 30 ? 30 : $this->NumFollowees));
+               foreach ($Followees as $User) {
                   ?>
                   <div>
                      <a title="<?php echo $User['Name']; ?>" href="<?php echo Url("profile/{$User['UserID']}/{$User['Name']}", TRUE); ?>">
@@ -62,6 +64,7 @@ class FollowingModule extends Gdn_Module {
                   </div>
                   <?php
                }
+               unset($Followees); unset($this->Followees);
                echo '</div>';
             }
          }
@@ -70,7 +73,10 @@ class FollowingModule extends Gdn_Module {
             echo "<div class=\"\">".sprintf(Plural($this->NumFollowers, 'Followed by %d person', 'Followed by %d people'), $this->NumFollowers)."</div>\n";
             if ($this->Followers->NumRows() > 0) {
                echo '<div class="FriendsList">';
-               while ($User = $this->Followers->NextRow(DATASET_TYPE_ARRAY)) {
+               $Followers = $this->Followers->ResultArray(); shuffle($Followers);
+               $Followers = array_slice($Followers,0,($this->NumFollowers >= 30 ? 30 : $this->NumFollowers));
+               prev($Followers);
+               foreach ($Followers as $User) {
                   ?>
                   <div>
                      <a title="<?php echo $User['Name']; ?>" href="<?php echo Url("profile/{$User['UserID']}/{$User['Name']}", TRUE); ?>">
@@ -79,6 +85,7 @@ class FollowingModule extends Gdn_Module {
                   </div>
                   <?php
                }
+               unset($Followers); unset($this->Followers);
                echo '</div>';
             }
          }
