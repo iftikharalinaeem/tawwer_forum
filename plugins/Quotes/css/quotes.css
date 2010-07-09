@@ -2,6 +2,7 @@ body ul div.Comment blockquote.UserQuote {
    padding: 5px 10px;
    margin-right: 10px;
    font-style: italic;
+   background-color: #595959;
 }
 
 div.Comment blockquote.UserQuote div.QuoteAuthor {

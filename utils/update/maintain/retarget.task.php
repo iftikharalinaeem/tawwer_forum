@@ -57,9 +57,11 @@ class RetargetTask extends Task {
          $this->Symlink('library', TaskList::CombinePaths($this->SourcecodePath,'library'));
          
          // Symlink all core feature plugins
-         $this->Symlink('plugins/HtmlPurifier', TaskList::CombinePaths($this->SourcecodePath,'plugins/HtmlPurifier'));
+         $this->Symlink('plugins/HtmlLawed', TaskList::CombinePaths($this->SourcecodePath,'plugins/HtmlLawed'));
          $this->Symlink('plugins/Gravatar', TaskList::CombinePaths($this->SourcecodePath,'plugins/Gravatar'));
          $this->Symlink('plugins/VanillaInThisDiscussion', TaskList::CombinePaths($this->SourcecodePath,'plugins/VanillaInThisDiscussion'));
+         SaveToConfig('EnabledPlugins.HtmlLawed','HtmlLawed');
+         RemovedFromConfig('EnabledPlugins.HtmlPurifier');
          
          // Copy the new index file
          $this->CopySourceFile('index.php', $this->SourcecodePath);
