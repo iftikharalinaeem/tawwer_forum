@@ -41,30 +41,7 @@ class QuotesPlugin extends Gdn_Plugin {
       if (sizeof($Sender->RequestArgs)) {
          $QuoteData['selector'] = $Sender->RequestArgs[0];
          list($Type, $ID) = explode('_',$Sender->RequestArgs[0]);
-         $Model = FALSE;
-         switch (strtolower($Type)) {
-            case 'comment':
-               $Model = new CommentModel();
-               break;
-            
-            case 'discussion':
-               $Model = new DiscussionModel();
-               $Data = $Model->GetID($ID);
-               break;
-               
-            default:
-               break;
-         }
-         if ($Model !== FALSE) {
-            $Data = $Model->GetID($ID);
-            $QuoteData = array_merge($QuoteData, array(
-               'status'       => 'success',
-               'body'         => $Data->Body,
-               'format'       => $Data->Format,
-               'authorid'     => $Data->InsertUserID,
-               'authorname'   => $Data->InsertName
-            ));
-         }
+         $this->FormatQuote($Type, $ID, $QuoteData);
       }
       $Sender->SetJson('Quote', $QuoteData);
       $Sender->Render($this->GetView('getquote.php'));
@@ -93,7 +70,7 @@ class QuotesPlugin extends Gdn_Plugin {
    
    protected function AddQuoteButton(&$Sender) {
       $ObjectID = !isset($Sender->EventArguments['Comment']) ? 'Discussion_'.$Sender->EventArguments['Discussion']->DiscussionID : 'Comment_'.$Sender->EventArguments['Comment']->CommentID;
-      $QuoteURL = Url("post/quote/{$ObjectID}",TRUE);
+      $QuoteURL = Url("post/quote/{$Sender->EventArguments['Discussion']->DiscussionID}/{$ObjectID}",TRUE);
       echo <<<QUOTE
       <span class="CommentQuote"><a href="{$QuoteURL}">Quote</a></span>
 QUOTE;
@@ -137,6 +114,84 @@ QUOTE;
       return <<<BLOCKQUOTE
       <blockquote class="UserQuote"><div class="QuoteAuthor"><a href="/profile/{$Matches[2]}" rel="nofollow">{$Matches[2]}</a> said:</div><div class="QuoteText"><p>
 BLOCKQUOTE;
+   }
+   
+   public function PostController_Quote_Create(&$Sender) {
+      if (sizeof($Sender->RequestArgs) < 2) return;
+      $Selector = $Sender->RequestArgs[1];
+      $Sender->SetData('Plugin.Quotes.QuoteSource', $Selector);
+      $Sender->View = 'comment';
+      return $Sender->Comment();
+   }
+   
+   public function PostController_BeforeCommentRender_Handler(&$Sender) {
+      if (isset($Sender->Data['Plugin.Quotes.QuoteSource'])) {
+         if (sizeof($Sender->RequestArgs) < 2) return;
+         $Selector = $Sender->RequestArgs[1];
+         list($Type, $ID) = explode('_', $Selector);
+         $QuoteData = array(
+            'status' => 'failed'
+         );
+         $this->FormatQuote($Type, $ID, $QuoteData);
+         
+         if ($QuoteData['status'] == 'success') {
+            switch ($QuoteData['format']) {
+               case 'Html':
+                  $Sender->Form->SetValue('Body', '<blockquote rel="'.$QuoteData['authorname'].'">'.$QuoteData['body']."</blockquote>\n");
+                  break;
+               case 'BBCode':
+                  $Sender->Form->SetValue('Body', '[quote="'.$QuoteData['authorname'].'"]'.$QuoteData['body']."[/quote]\n");
+                  break;
+               case 'Display':
+               case 'Text':
+               default:
+                  $Sender->Form->SetValue('Body', '> '.$QuoteData['authorname']."\n> {$QuoteData['body']}\n");
+            }
+         }
+      }
+   }
+   
+   protected function FormatQuote($Type, $ID, &$QuoteData) {
+      $Model = FALSE;
+      switch (strtolower($Type)) {
+         case 'comment':
+            $Model = new CommentModel();
+            break;
+         
+         case 'discussion':
+            $Model = new DiscussionModel();
+            break;
+            
+         default:
+            break;
+      }
+      $QuoteData = array();
+      if ($Model !== FALSE) {
+         $Data = $Model->GetID($ID);
+         $NewFormat = C('Garden.InputFormatter');
+         $QuoteFormat = $Data->Format;
+         $QuoteData = array_merge($QuoteData, array(
+            'status'       => 'success',
+            'body'         => $Data->Body,
+            'format'       => C('Garden.InputFormatter'),
+            'authorid'     => $Data->InsertUserID,
+            'authorname'   => $Data->InsertName
+         ));
+         
+         // Perform transcoding if possible
+         $NewBody = $Data->Body;
+         if ($QuoteFormat != $NewFormat) {
+            if ($QuoteFormat == 'BBCode' && $NewFormat == 'Html')
+               $NewBody = Gdn_Format::BBCode($NewBody);
+            elseif ($QuoteFormat == 'Text' && $NewFormat == 'Html')
+               $NewBody = Gdn_Format::Text($NewBody);
+            elseif ($QuoteFormat == 'Html' && $NewFormat == 'BBCode')
+               $NewBody = Gdn_Format::Text($NewBody);
+            elseif ($QuoteFormat == 'Text' && $NewFormat == 'BBCode')
+               $NewBody = Gdn_Format::Text($NewBody);
+         }
+         $Data->Body = $NewBody;
+      }
    }
    
    public function Setup() {
