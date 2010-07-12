@@ -126,7 +126,7 @@ class TaskList {
 
             foreach ($Chunks as $Chunk) {
                $ChunkRegex = "/^({$Chunk}.*)\$/i";
-               $this->RunSelectiveRegex($ChunkRegex, $TaskOrder, TRUE);
+               //$this->RunSelectiveRegex($ChunkRegex, $TaskOrder, TRUE);
                $Proceed = TaskList::Question("","Proceed with next chunk?",array('yes','no'),'yes');
                if ($Proceed == 'no') exit();
             }
