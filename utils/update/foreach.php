@@ -101,7 +101,7 @@ class TaskList {
       if ($Internal) TaskList::MajorEvent("Running regular expression {$RegularExpression} against client list...");
       foreach ($this->ClientList as $ClientFolder => $ClientInfo) {
          if (!preg_match($RegularExpression, $ClientFolder, $Matches)) continue;
-         //$this->PerformClient($ClientFolder, $TaskOrder);
+         $this->PerformClient($ClientFolder, $TaskOrder);
       }
    }
    
@@ -123,10 +123,11 @@ class TaskList {
             $Chunks = array_merge($Chunks, array_keys(array_fill(0,10,'a')));
             for ($i = 97; $i < 123; $i++)
                 $Chunks[] = chr($i);
-
-            foreach ($Chunks as $Chunk) {
+            
+            foreach ($Chunks as $ChunkIndex => $Chunk) {
                $ChunkRegex = "/^({$Chunk}.*)\$/i";
-               $this->RunSelectiveRegex($ChunkRegex, $TaskOrder);
+               TaskList::Event("Running list chunk: '{$ChunkRegex}'...");
+               //$this->RunSelectiveRegex($ChunkRegex, $TaskOrder);
                $Proceed = TaskList::Question("","Proceed with next chunk?",array('yes','no'),'yes');
                if ($Proceed == 'no') exit();
             }
