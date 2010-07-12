@@ -152,6 +152,8 @@ class TaskList {
    public function PerformClient($ClientFolder, $TaskOrder = NULL) {
       $ClientInfo = $this->LookupClientByFolder($ClientFolder);
       TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
+      print_r($ClientInfo);
+      if (!sizeof($ClientInfo)) return;
       
       // Run all tasks for this client
       if (!is_null($TaskOrder)) {
@@ -338,8 +340,6 @@ abstract class Task {
       $this->ClientFolder = $ClientFolder;
       $this->ClientRoot = TaskList::CombinePaths($this->Root, $this->ClientFolder );
       $this->ClientInfo = $ClientInfo;
-      print_r($ClientInfo);
-      if (!sizeof($ClientInfo)) return;
       
       $this->ConfigFile = TaskList::CombinePaths($this->ClientRoot,'conf/config.php');
       $this->Config = new Configuration();
