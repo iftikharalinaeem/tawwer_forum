@@ -358,7 +358,7 @@ abstract class Task {
       if (!is_array($Key))
          $Key = array($Key => $Value);
       
-      foreach ($Name as $k => $v)
+      foreach ($Key as $k => $v)
          $this->Config->Set($k, $v);
       
       return $this->Config->Save($this->ConfigFile);
