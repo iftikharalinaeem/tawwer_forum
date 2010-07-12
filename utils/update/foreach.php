@@ -97,8 +97,8 @@ class TaskList {
          $this->PerformClient($ClientFolder, $TaskOrder);
    }
    
-   public function RunSelectiveRegex($RegularExression, $TaskOrder = NULL) {
-      TaskList::MajorEvent("Running regular expression {$RegularExpression} against client list...");
+   public function RunSelectiveRegex($RegularExression, $TaskOrder = NULL, $Internal = FALSE) {
+      if ($Internal) TaskList::MajorEvent("Running regular expression {$RegularExpression} against client list...");
       foreach ($this->ClientList as $ClientFolder => $ClientInfo) {
          if (!preg_match($RegularExpression, $ClientFolder, $Matches)) continue;
          $this->PerformClient($ClientFolder, $TaskOrder);
@@ -114,14 +114,44 @@ class TaskList {
       $this->PerformClient($ClientFolder, $TaskOrder);
    }
    
+   public function RunChunked($ChunkRule, $TaskOrder) {
+      TaskList::MajorEvent("Running client list, chunked by '{$ChunkRule}'...");
+      switch ($ChunkRule) {
+         case 'alphabet':
+            $Chunks = array();
+            $Chunks[] = '-';
+            $Chunks = array_merge($Chunks, array_keys(array_fill(10,'a')));
+            for ($i = 97; $i < 123; $i++)
+                $Chunks[] = chr($i);
+
+            foreach ($Chunks as $Chunk) {
+               $ChunkRegex = "/^({$Chunk}.*)\$/i";
+               $this->RunSelectiveRegex($ChunkRegex, $TaskOrder, TRUE);
+               $Proceed = TaskList::Question("","Proceed with next chunk?",array('yes','no'),'yes');
+               if ($Proceed == 'no') exit();
+            }
+         break;
+         
+         case 'tier':
+            
+         break;
+         
+         default:
+            die("Invalid chunk type.\n");
+         break;
+      }
+   }
+   
    public function PerformClient($ClientFolder, $TaskOrder = NULL) {
       $ClientInfo = $this->ClientList[$ClientFolder];
       TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
       
       // Run all tasks for this client
       if (!is_null($TaskOrder)) {
-         foreach ($TaskOrder as $TaskName)
+         foreach ($TaskOrder as $TaskName) {
+            if (!array_key_exists($TaskName, $this->Tasks)) continue;
             $this->Tasks[$TaskName]['task']->SandboxExecute($ClientFolder, $ClientInfo);
+         }
       } else {
          foreach ($this->Tasks as $TaskName => &$Task)
             $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
@@ -313,7 +343,7 @@ abstract class Task {
    
    protected function SaveToConfig($Key, $Value) {
       if (is_null($this->ClientInfo)) return;
-      if (!LAME) return;
+      if (LAME) return;
       
       $this->Config->Load($this->ConfigFile, 'Save');
       
