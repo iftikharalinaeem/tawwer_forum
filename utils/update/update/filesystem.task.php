@@ -1,6 +1,6 @@
 <?php
 
-class RetargetTask extends Task {
+class FilesystemTask extends Task {
 
    protected $SourcecodePath;
 

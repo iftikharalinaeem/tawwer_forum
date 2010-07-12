@@ -120,7 +120,7 @@ class TaskList {
          case 'alphabet':
             $Chunks = array();
             $Chunks[] = '-';
-            $Chunks = array_merge($Chunks, array_keys(array_fill(10,'a')));
+            $Chunks = array_merge($Chunks, array_keys(array_fill(0,10,'a')));
             for ($i = 97; $i < 123; $i++)
                 $Chunks[] = chr($i);
 
