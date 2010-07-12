@@ -38,10 +38,12 @@ class FilesystemTask extends Task {
    }
    
    protected function Run() {
-      $Proceed = TaskList::Question("Really retarget {$this->ClientFolder}?","Retarget?",array('yes','no','skip'),'skip');
-      if ($Proceed == 'no') exit();
-      if ($Proceed == 'skip') return;
-      
+      if (!FAST) {
+         $Proceed = TaskList::Question("Really retarget {$this->ClientFolder}?","Retarget?",array('yes','no','exit'),'no');
+         if ($Proceed == 'no') return;
+         if ($Proceed == 'exit') exit();
+      }
+            
       if ($this->SourcecodePath !== FALSE) {
          // Symlink Applications
          $this->Symlink('applications/dashboard', TaskList::CombinePaths($this->SourcecodePath,'applications/dashboard'));
