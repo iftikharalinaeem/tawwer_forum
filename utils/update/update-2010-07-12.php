@@ -4,12 +4,14 @@
 require_once('foreach.php');
 
 define("VERBOSE", TRUE);
-define("LAME", FALSE);
+define("LAME", TRUE);
 
 define('DATABASE_HOST', 'vfdb1');
 define('DATABASE_USER', 'root');
 define('DATABASE_PASSWORD', 'Va2aWu5A');
 define('DATABASE_MAIN', 'vfcom');
+
+if ($argc < 2) exit();
 
 $Tasks = new TaskList('update','/srv/www/vhosts');
 $Tasks->RunChunked($argv[1], array(
@@ -17,6 +19,5 @@ $Tasks->RunChunked($argv[1], array(
    'offline',
    'uncache',
    'filesystem',
-   'structure',
    'online'
 ));
