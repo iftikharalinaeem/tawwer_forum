@@ -1,6 +1,6 @@
 <?php
 
-class OfflineTask extends Task {
+class OnlineTask extends Task {
 
    public function __construct($ClientDir) {
       parent::__construct($ClientDir);
