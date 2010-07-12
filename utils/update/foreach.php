@@ -150,7 +150,7 @@ class TaskList {
    }
    
    public function PerformClient($ClientFolder, $TaskOrder = NULL) {
-      $ClientInfo = $this->ClientList[$ClientFolder];
+      $ClientInfo = $this->LookupClientByFolder($ClientFolder);
       TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
       
       // Run all tasks for this client
