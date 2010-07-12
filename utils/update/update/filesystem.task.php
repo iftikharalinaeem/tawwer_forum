@@ -38,7 +38,6 @@ class FilesystemTask extends Task {
    }
    
    protected function Run() {
-      return;
       $Proceed = TaskList::Question("Really retarget {$this->ClientFolder}?","Retarget?",array('yes','no','skip'),'skip');
       if ($Proceed == 'no') exit();
       if ($Proceed == 'skip') return;
