@@ -98,11 +98,13 @@ class TaskList {
    }
    
    public function RunSelectiveRegex($RegularExression, $TaskOrder = NULL, $Internal = FALSE) {
-      if ($Internal) TaskList::MajorEvent("Running regular expression {$RegularExpression} against client list...");
+      if (!$Internal) TaskList::MajorEvent("Running regular expression {$RegularExpression} against client list...");
+/*
       foreach ($this->ClientList as $ClientFolder => $ClientInfo) {
          if (!preg_match($RegularExpression, $ClientFolder, $Matches)) continue;
          $this->PerformClient($ClientFolder, $TaskOrder);
       }
+*/
    }
    
    public function RunClientFromCLI($ClientFolder, $TaskOrder = NULL) {
@@ -126,8 +128,7 @@ class TaskList {
             
             foreach ($Chunks as $ChunkIndex => $Chunk) {
                $ChunkRegex = "/^({$Chunk}.*)\$/i";
-               TaskList::Event("Running list chunk: '{$ChunkRegex}'...");
-               //$this->RunSelectiveRegex($ChunkRegex, $TaskOrder);
+               $this->RunSelectiveRegex($ChunkRegex, $TaskOrder);
                $Proceed = TaskList::Question("","Proceed with next chunk?",array('yes','no'),'yes');
                if ($Proceed == 'no') exit();
             }
