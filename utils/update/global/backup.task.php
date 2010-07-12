@@ -64,7 +64,7 @@ class BackupTask extends Task {
       
          // Create TGZ archive
          TaskList::Event("Backing up client vhost data to {$BackupTarFile}...", TaskList::NOBREAK);
-         if (!LAME) { ob_start(); $trash = shell_exec("tar -czf {$BackupTarFile} {$this->ClientRoot}"); ob_end_clean(); }
+         if (!LAME) { ob_start(); $trash = shell_exec("tar -C / -czf {$BackupTarFile} {$this->ClientRoot}"); ob_end_clean(); }
          TaskList::MajorEvent("done");
       
       }
@@ -83,7 +83,7 @@ class BackupTask extends Task {
          
          if (file_exists($RawSQLFile)) {
             TaskList::Event("Compressing...", TaskList::NOBREAK);
-            if (!LAME) { ob_start(); $trash = shell_exec("tar --remove-files -zcf {$CompressedSQLFile} {$RawSQLFile}"); ob_end_clean(); }
+            if (!LAME) { ob_start(); $trash = shell_exec("tar --remove-files -C / -czf {$CompressedSQLFile} {$RawSQLFile}"); ob_end_clean(); }
             TaskList::MajorEvent("done");
          } else {
             if (!LAME) TaskList::Event("Could not create backup of sql data {$RawSQLFile}");
