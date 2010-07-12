@@ -168,6 +168,7 @@ class TaskList {
    
    protected function LookupClientByFolder($ClientFolder) {
       $Query = "SELECT * FROM GDN_Site WHERE Name = '{$ClientFolder}'";
+      TaskList::Event($Query);
       $Data = mysql_query($Query, $this->Database);
       if ($Data && mysql_num_rows($Data)) {
          $Row = mysql_fetch_assoc($Data);
@@ -322,6 +323,8 @@ abstract class Task {
    protected $ConfigFile;
    protected $Config;
 
+   abstract protected function Run();
+
    public function __construct($RootFolder) {
       $this->Root = rtrim($RootFolder,'/');
       TaskList::Event("Set root folder to '{$this->Root}'");
@@ -331,8 +334,6 @@ abstract class Task {
       $this->ConfigFile = NULL;
       $this->Config = new Configuration();
    }
-   
-   abstract protected function Run();
    
    public function SandboxExecute($ClientFolder, $ClientInfo) {
       $this->ClientFolder = $ClientFolder;
