@@ -338,6 +338,7 @@ abstract class Task {
       $this->ClientFolder = $ClientFolder;
       $this->ClientRoot = TaskList::CombinePaths($this->Root, $this->ClientFolder );
       $this->ClientInfo = $ClientInfo;
+      if (!sizeof($ClientInfo)) return;
       
       $this->ConfigFile = TaskList::CombinePaths($this->ClientRoot,'conf/config.php');
       $this->Config = new Configuration();
