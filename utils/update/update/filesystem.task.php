@@ -12,14 +12,20 @@ class FilesystemTask extends Task {
       $this->PluginPath = FALSE;
       $this->ThemePath = FALSE;
       
-      $SourceCodeFolder = TaskList::Input("Enter new sourcecode location for selected clients, or 'no' to skip sourcecodepath", "Sourcecode Folder", "vanilla_source");
+      do {
+         $SourceCodeFolder = TaskList::Input("Enter new sourcecode location for selected clients, or 'no' to skip sourcecodepath", "Sourcecode Folder", "vanilla_source");
+         $SourceCodePath = sprintf('/srv/www/%s/',$SourceCodeFolder);
+      } while (strtolower($SourceCodeFolder) != 'no' && !is_dir($SourceCodePath));
       if (strtolower($SourceCodeFolder) != 'no') {
-         $this->SourcecodePath = sprintf('/srv/www/%s/',$SourceCodeFolder);
+         $this->SourcecodePath = $SourceCodePath;
       }
       
-      $MiscFolder = TaskList::Input("Enter new misc location for selected clients, or 'no' to skip miscpath", "Misc Folder", "misc");
+      do {
+         $MiscFolder = TaskList::Input("Enter new misc location for selected clients, or 'no' to skip miscpath", "Misc Folder", "misc");
+         $MiscPath = sprintf('/srv/www/%s/', $MiscFolder);
+      } while (strtolower($MiscFolder) != 'no' && !is_dir($MiscPath));
       if (strtolower($MiscFolder) != 'no') {
-         $this->MiscPath = sprintf('/srv/www/%s/', $MiscFolder);
+         $this->MiscPath = $MiscPath;
          $this->PluginPath = sprintf('/srv/www/%s/plugins/', $MiscFolder);
          $this->ThemePath = sprintf('/srv/www/%s/themes/', $MiscFolder);
       }
