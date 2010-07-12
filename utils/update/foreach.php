@@ -168,7 +168,6 @@ class TaskList {
    
    protected function LookupClientByFolder($ClientFolder) {
       $Query = "SELECT * FROM GDN_Site WHERE Name = '{$ClientFolder}'";
-      TaskList::Event($Query);
       $Data = mysql_query($Query, $this->Database);
       if ($Data && mysql_num_rows($Data)) {
          $Row = mysql_fetch_assoc($Data);

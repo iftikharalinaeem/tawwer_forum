@@ -4,7 +4,7 @@
 require_once('foreach.php');
 
 define("VERBOSE", TRUE);
-define("LAME", TRUE);
+define("LAME", FALSE);
 
 define('DATABASE_HOST', 'vfdb1');
 define('DATABASE_USER', 'root');
