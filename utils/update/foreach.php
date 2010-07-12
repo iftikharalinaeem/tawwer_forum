@@ -152,8 +152,8 @@ class TaskList {
    public function PerformClient($ClientFolder, $TaskOrder = NULL) {
       $ClientInfo = $this->LookupClientByFolder($ClientFolder);
       TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
-      print_r($ClientInfo);
-      if (!sizeof($ClientInfo)) return;
+      var_dump($ClientInfo);
+      if (!sizeof($ClientInfo) || !isset($ClientInfo['SiteID'])) return;
       
       // Run all tasks for this client
       if (!is_null($TaskOrder)) {
