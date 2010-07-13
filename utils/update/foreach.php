@@ -402,8 +402,8 @@ abstract class Task {
    }
    
    protected function Uncache($Key) {
-   
-   }  unset($this->TaskList->GroupData[$Key]);
+      unset($this->TaskList->GroupData[$Key]);
+   }
    
    protected function SaveToConfig($Key, $Value) {
       if (is_null($this->ClientInfo)) return;
