@@ -9,7 +9,7 @@ class StructureTask extends Task {
       
       do {
          $StructureFile = TaskList::Input("Enter the structure file location for selected clients, or 'no' to skip structure", "Structure File", "structure.sql");
-         $StructureFilePath = sprintf('/srv/www/update/%s',$SourceCodeFolder);
+         $StructureFilePath = sprintf('/srv/www/update/%s',$StructureFile);
       } while (strtolower($StructureFile) != 'no' && !file_exists($StructureFilePath));
       if (strtolower($StructureFile) != 'no') {
          $this->Structure = $StructureFilePath;
