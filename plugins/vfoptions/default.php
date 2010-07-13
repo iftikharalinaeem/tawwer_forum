@@ -306,8 +306,8 @@ pageTracker._trackPageview();
             }
             // We delete the forum *after* the redirects have been defined so we
             // can use the conf file to determine some things.
-            $SiteID = $Site->SiteID;
-            $VFSQL = &$this->_GetDatabase()->SQL();
+            // $SiteID = $Site->SiteID;
+            // $VFSQL = &$this->_GetDatabase()->SQL();
             include('/srv/www/'.$Folder.'/applications/vfcom/utils/deleteforum.php');
          }
          
