@@ -155,8 +155,11 @@ class TaskList {
                
                $Completion = round(($this->Completed / $this->NumClients) * 100,0);
                TaskList::MajorEvent("Completion: {$this->Completed}/{$this->NumClients} ({$Completion}%)");
-               $Proceed = TaskList::Question("","Proceed with next chunk?",array('yes','no'),'yes');
-               if ($Proceed == 'no') exit();
+               TaskList::MajorEvent("\x07\x07\x07");
+               if (!TaskList::Carefree()) {
+                  $Proceed = TaskList::Question("","Proceed with next chunk?",array('yes','no'),'yes');
+                  if ($Proceed == 'no') exit();
+               }
             }
          break;
          
@@ -362,6 +365,13 @@ class TaskList {
       if (!FAST) return TRUE;
       
       return FALSE;
+   }
+   
+   public static function Carefree() {
+      if (!defined('VERYFAST')) return FALSE;
+      if (!VERYFAST) return FALSE;
+      
+      return TRUE;
    }
    
 }
