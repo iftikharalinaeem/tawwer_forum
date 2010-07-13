@@ -12,22 +12,10 @@ define('DATABASE_USER', 'root');
 define('DATABASE_PASSWORD', 'Va2aWu5A');
 define('DATABASE_MAIN', 'vfcom');
 
-/*
 if ($argc < 2) exit();
 
 $Tasks = new TaskList(array('update','maintain'),'/srv/www/vhosts');
 $Tasks->RunChunked($argv[1], array(
-   'backup',
-   'offline',
-   'uncache',
-   'filesystem',
-   'structure',
-   'online'
-));
-*/
-
-$Tasks = new TaskList(array('update','maintain'),'/srv/www/vhosts');
-$Tasks->RunSelectiveRegex('/^(q.*)$/i', array(
    'backup',
    'offline',
    'uncache',
