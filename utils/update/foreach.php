@@ -13,9 +13,18 @@ class TaskList {
    protected $Tasks;
    protected $Database;
    protected $ClientList;
+   protected $Config;
 
    public function __construct($UserTaskDirs, $ClientDir) {
    
+      $ConfigDefaultsFile = '/srv/www/vanillaforumscom/conf/config-defaults.php';
+      $ConfigFile = '/srv/www/vanillaforumscom/conf/config.php';
+      $this->Config = new Configuration();
+      try {
+         $this->Config->Load($ConfigDefaultsFile, 'Use');
+         $this->Config->Load($ConfigFile, 'Use');
+      } catch (Exception $e) { die ($e->getMessage()); }
+      
       $this->Clients = $ClientDir;
       $this->Tasks = array();
       $this->Database = mysql_connect(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, TRUE); // Open the db connection, new link please
@@ -61,10 +70,13 @@ class TaskList {
                   TaskList::Event(strtolower($Class));
                   $NewTask = new $Class($ClientDir);
                   $NewTask->Database = $this->Database;
+                  $NewTask->TaskList =& $this;
                   $this->Tasks[$Taskname] = array(
                      'name'      => str_replace('Task', '', $Class),
                      'task'      => $NewTask
                   );
+                  if (method_exists($NewTask, 'Init'))
+                     $NewTask->Init();
                }
             }
             TaskList::Event("");
@@ -87,8 +99,10 @@ class TaskList {
       $NumClients = count($this->ClientList);
       TaskList::MajorEvent("found {$NumClients}!", TaskList::NOBREAK);
       
-      $Proceed = TaskList::Question("","Proceed with task execution?",array('yes','no'),'no');
-      if ($Proceed == 'no') exit();
+      if (TaskList::Cautious()) {
+         $Proceed = TaskList::Question("","Proceed with task execution?",array('yes','no'),'no');
+         if ($Proceed == 'no') exit();
+      }
    }
    
    public function RunAll($TaskOrder = NULL) {
@@ -134,6 +148,7 @@ class TaskList {
                   TaskList::Event("No matches for {$ChunkRegex}, skipping to next chunk");
                   continue;
                }
+               
                $Proceed = TaskList::Question("","Proceed with next chunk?",array('yes','no'),'yes');
                if ($Proceed == 'no') exit();
             }
@@ -168,6 +183,11 @@ class TaskList {
             $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
       }
       TaskList::MajorEvent("");
+   }
+   
+   public function ExecTask($TaskName, $ClientFolder, $ClientInfo) {
+      if (!array_key_exists($TaskName, $this->Tasks)) return;
+      $this->Tasks[$TaskName]['task']->SandboxExecute($ClientFolder, $ClientInfo);
    }
    
    protected function LookupClientByFolder($ClientFolder) {
@@ -243,6 +263,17 @@ class TaskList {
       }
    }
    
+   public static function Mkdir($AbsolutePath) {
+      if (file_exists($AbsolutePath)) return true;
+      
+      mkdir($AbsolutePath);
+      return file_exists($AbsolutePath);
+   }
+   
+   public static function Touch($AbsolutePath) {
+      return touch($AbsolutePath);
+   }
+   
    public static function MinorEvent($Message, $LineBreak = TRUE) {
       if (VERBOSE) {
          echo "    - {$Message}";
@@ -314,11 +345,20 @@ class TaskList {
       return $Answer;
    }
    
+   public static function Cautious() {
+      if (!defined('FAST')) return TRUE;
+      if (!FAST) return TRUE;
+      
+      return FALSE;
+   }
+   
 }
 
 abstract class Task {
 
    public $Database;
+   public $TaskList;
+   
    protected $Root;
    protected $ClientRoot;
    protected $ClientFolder;
@@ -393,6 +433,16 @@ abstract class Task {
    protected function Symlink($RelativeLink, $Source = NULL) {
       $AbsoluteLink = TaskList::CombinePaths($this->ClientRoot,$RelativeLink);
       TaskList::Symlink($AbsoluteLink, $Source);
+   }
+   
+   protected function Mkdir($RelativePath) {
+      $AbsolutePath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
+      TaskList::Mkdir($AbsolutePath);
+   }
+   
+   protected function Touch($RelativePath) {
+      $AbsolutePath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
+      TaskList::Touch($AbsolutePath);
    }
    
    protected function CopySourceFile($RelativePath, $SourcecodePath) {
