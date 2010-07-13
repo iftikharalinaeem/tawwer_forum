@@ -12,13 +12,13 @@ fi
 PATH=${ROOT}/vhosts/${1}/
 
 if [${3} == ""]; then
-	SOURCE=${ROOT}/vanilla_source/
+	SOURCE=${ROOT}/source/vanilla_unstable/
 else
 	SOURCE=${ROOT}/${3}/
 fi
-PLUGINS=${ROOT}/misc/plugins/
-THEMES=${ROOT}/misc/themes/
-UTILS=${ROOT}/misc/utils/
+PLUGINS=${ROOT}/source/misc_unstable/plugins/
+THEMES=${ROOT}/source/misc_unstable/themes/
+UTILS=${ROOT}/source/misc_unstable/utils/
    
 echo "Creating new vhost: ${PATH}"
 

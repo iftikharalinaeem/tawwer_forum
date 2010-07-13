@@ -20,5 +20,6 @@ $Tasks->RunChunked($argv[1], array(
    'offline',
    'uncache',
    'filesystem',
+   'structure',
    'online'
 ));
