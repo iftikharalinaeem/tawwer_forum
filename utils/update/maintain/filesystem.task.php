@@ -17,19 +17,13 @@ class FilesystemTask extends Task {
    public function Init($RootPath = NULL) {
       if (is_null($RootPath) || !is_dir($RootPath)) {
          do {
-            $SourceCodeFolder = TaskList::Input("Enter new sourcecode location for selected clients, or 'no' to skip sourcecodepath", "Sourcecode Folder", "vanilla_source");
-            $SourceCodePath = sprintf('/srv/www/%s/',$SourceCodeFolder);
+            $SourceCodeFolder = TaskList::Input("Enter new sourcecode version for selected clients, or 'no' to skip", "Sourcecode Version", "unstable");
+            $SourceCodePath = sprintf('/srv/www/source/%s/',$SourceCodeFolder);
          } while (strtolower($SourceCodeFolder) != 'no' && !is_dir($SourceCodePath));
          if (strtolower($SourceCodeFolder) != 'no') {
-            $this->VanillaPath = $SourceCodePath;
-         }
          
-         do {
-            $MiscFolder = TaskList::Input("Enter new misc location for selected clients, or 'no' to skip miscpath", "Misc Folder", "misc");
-            $MiscPath = sprintf('/srv/www/%s/', $MiscFolder);
-         } while (strtolower($MiscFolder) != 'no' && !is_dir($MiscPath));
-         if (strtolower($MiscFolder) != 'no') {
-            $this->MiscPath = $MiscPath;
+            $this->VanillaPath = TaskList::CombinePaths($SourceCodePath,'vanilla');
+            $this->MiscPath = TaskList::CombinePaths($SourceCodePath,'misc');
             $this->PluginPath = TaskList::CombinePaths($this->MiscPath, 'plugins');
             $this->ThemePath = TaskList::CombinePaths($this->MiscPath, 'themes');
          }
@@ -52,9 +46,9 @@ class FilesystemTask extends Task {
       
       TaskList::MajorEvent("New targets:");
       if ($this->VanillaPath)
-         TaskList::Event("SourcecodePath: {$this->SourcecodePath}");
+         TaskList::Event("Vanilla Path: {$this->VanillaPath}");
       if ($this->MiscPath)
-         TaskList::Event("MiscPath: {$this->MiscPath}");
+         TaskList::Event("Misc Path: {$this->MiscPath}");
    }
    
    protected function Run() {
