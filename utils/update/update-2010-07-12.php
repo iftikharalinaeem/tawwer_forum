@@ -14,7 +14,7 @@ define('DATABASE_MAIN', 'vfcom');
 
 if ($argc < 2) exit();
 
-$Tasks = new TaskList('update','/srv/www/vhosts');
+$Tasks = new TaskList(array('update','maintain'),'/srv/www/vhosts');
 $Tasks->RunChunked($argv[1], array(
    'backup',
    'offline',
