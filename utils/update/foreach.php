@@ -142,8 +142,7 @@ class TaskList {
             $Chunks = array();
             $Chunks[] = '-';
             $Chunks[] = '[0-9]';
-            for ($i = 97; $i < 123; $i++)
-                $Chunks[] = chr($i);
+            $Chunks = array_merge($Chunks, range('a','z'));
             
             foreach ($Chunks as $ChunkIndex => $Chunk) {
                $ChunkRegex = "/^({$Chunk}.*)\$/i";

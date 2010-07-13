@@ -78,10 +78,10 @@ class FilesystemTask extends Task {
          $this->Symlink('library', TaskList::CombinePaths($this->VanillaPath,'library'));
          
          // Symlink all core feature plugins
-         $this->Symlink('plugins/HtmlLawed', TaskList::CombinePaths($this->VanillaPath,'plugins/HtmlLawed'));
+         $this->Symlink('plugins/HtmLawed', TaskList::CombinePaths($this->VanillaPath,'plugins/HtmLawed'));
          $this->Symlink('plugins/Gravatar', TaskList::CombinePaths($this->VanillaPath,'plugins/Gravatar'));
          $this->Symlink('plugins/VanillaInThisDiscussion', TaskList::CombinePaths($this->VanillaPath,'plugins/VanillaInThisDiscussion'));
-         $this->SaveToConfig('EnabledPlugins.HtmlLawed','HtmlLawed');
+         $this->SaveToConfig('EnabledPlugins.HtmLawed','HtmLawed');
          $this->RemoveFromConfig('EnabledPlugins.HtmlPurifier');
          
          // Copy the new index file
