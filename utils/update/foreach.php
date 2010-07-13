@@ -164,6 +164,10 @@ class TaskList {
             
          break;
          
+         case 'range':
+            
+         break;
+         
          default:
             die("Invalid chunk type.\n");
          break;
@@ -173,6 +177,7 @@ class TaskList {
    public function PerformClient($ClientFolder, $TaskOrder = NULL) {
       $ClientInfo = $this->LookupClientByFolder($ClientFolder);
       TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
+      $this->Completed++;
       if (!$ClientInfo || !sizeof($ClientInfo) || !isset($ClientInfo['SiteID'])) {
          TaskList::Event("skipped... no db");
          return;
