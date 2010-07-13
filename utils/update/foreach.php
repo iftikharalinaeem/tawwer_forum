@@ -15,7 +15,9 @@ class TaskList {
    protected $Database;
    protected $ClientList;
    protected $Config;
-
+   protected $NumClients;
+   protected $Completed;
+   
    public function __construct($UserTaskDirs, $ClientDir) {
    
       $ConfigDefaultsFile = '/srv/www/vanillaforumscom/conf/config-defaults.php';
@@ -26,6 +28,7 @@ class TaskList {
          $this->Config->Load($ConfigFile, 'Use');
       } catch (Exception $e) { die ($e->getMessage()); }
       
+      $this->Completed = $this->NumClients = 0;
       $this->Clients = $ClientDir;
       $this->Tasks = array();
       $this->Database = mysql_connect(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, TRUE); // Open the db connection, new link please
@@ -97,7 +100,7 @@ class TaskList {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
          $this->ClientList[$ClientFolder] = 1;
       }
-      $NumClients = count($this->ClientList);
+      $this->NumClients = $NumClients = count($this->ClientList);
       TaskList::MajorEvent("found {$NumClients}!", TaskList::NOBREAK);
       
       if (TaskList::Cautious()) {
@@ -138,7 +141,7 @@ class TaskList {
          case 'alphabet':
             $Chunks = array();
             $Chunks[] = '-';
-            $Chunks = array_merge($Chunks, array_keys(array_fill(0,10,'a')));
+            $Chunks[] = '[0-9]';
             for ($i = 97; $i < 123; $i++)
                 $Chunks[] = chr($i);
             
@@ -150,6 +153,8 @@ class TaskList {
                   continue;
                }
                
+               $Completion = round(($this->Completed / $this->NumClients) * 100,0);
+               TaskList::MajorEvent("Completion: {$this->Completed}/{$this->NumClients} ({$Completion}%)");
                $Proceed = TaskList::Question("","Proceed with next chunk?",array('yes','no'),'yes');
                if ($Proceed == 'no') exit();
             }
