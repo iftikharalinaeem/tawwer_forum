@@ -10,6 +10,7 @@ var Gdn_MultiFileUpload = Class.create({
       this.AttachFileRootName = AttachFileRootName;
       this.MaxUploadSize = MaxUploadSize;
       this.UniqID = UniqID;
+      this.CurrentUploader = 'div#CurrentUploader';
       
       this.UploaderContainer = null;
       this.IFrameContainer = null;
@@ -34,8 +35,9 @@ var Gdn_MultiFileUpload = Class.create({
       var UploaderID = this.NewUploader();
       
       // Attach onClick event to the Attach File button
-      //$('#'+this.AttachFileLinkID).click(jQuery.proxy(this.AlignUploader, this));
+      $('a#'+this.AttachFileLinkID).click(jQuery.proxy(this.ShowUploader,this));
       
+      $('#'+this.AttachFileLinkID).parents('form').bind('complete',jQuery.proxy(this.Reset,this));
    },
    
    /**
@@ -61,12 +63,7 @@ var Gdn_MultiFileUpload = Class.create({
       this.IFrameContainer.hide();
       
       this.Reset();
-      
-      $('#'+this.AttachFileLinkID).parents('form').bind('complete',jQuery.proxy(this.Reset,this));
-   },
-   
-   FocusCurrentUploader: function() {
-      $('#'+this.CurrentInput).click();
+      $('#'+this.CurrentInput).css('opacity',0);
    },
    
    NewUploader: function() {
@@ -104,9 +101,11 @@ var Gdn_MultiFileUpload = Class.create({
       NewUploader.type  = 'file';
       NewUploader.name  = NewUploaderID;
       NewUploader.id    = NewUploaderID;
-      NewUploader.className = 'HiddenFileInput';
+      NewUploader.className = '';
       NewUploader.rel = FormName;
+      $(UploaderForm).append(NewUploader);
 
+/*
       var $link = $('#'+this.AttachFileLinkID);
 
       if (!$.browser.opera) {
@@ -117,6 +116,7 @@ var Gdn_MultiFileUpload = Class.create({
          $link.parent().append(NewUploader);
          $link.remove();
       }
+*/
       
       var MaxUploadSize = document.createElement('input');
       MaxUploadSize.type = 'hidden';
@@ -124,7 +124,7 @@ var Gdn_MultiFileUpload = Class.create({
       MaxUploadSize.value = this.MaxUploadSize;
       $(UploaderForm).append(MaxUploadSize);
       
-      this.UploaderContainer.append(UploaderForm);
+      $(this.CurrentUploader).append(UploaderForm);
       this.CurrentInput = NewUploaderID;
       this.ProgressBars[NewUploaderID] = {
          'Target':   IFrameName,
@@ -138,14 +138,15 @@ var Gdn_MultiFileUpload = Class.create({
       $('#'+this.CurrentInput).change(jQuery.proxy(this.DispatchCurrentUploader,this));
    },
    
-/*
-   AlignUploader: function(Uploader) {
-      var Offset = $('#'+this.AttachFileLinkID).offset();
-      $(Uploader).offset(Offset);
-      $(Uploader).css('top', (parseInt(Offset.top) - 5)+'px');
-      $(Uploader).css('width', parseInt($('#'+this.AttachFileLinkID).width())+'px');
+
+   ShowUploader: function() {
+      console.log('show uploader');
+      $('#CurrentUploader').animate({
+         'height': '24px'
+      },300,function(){$('#CurrentUploader form input[type=file]').animate({
+         'opacity': 1
+      });});
    },
-*/
    
    // Create a new named iframe to which our uploads can be submitted
    NewFrame: function(TargetUploaderID) {
@@ -169,6 +170,8 @@ var Gdn_MultiFileUpload = Class.create({
    
    // Submit the form parent of the current uploader and hide the current uploader's input
    DispatchCurrentUploader: function(ChangeEvent) {
+      this.UploaderContainer.append($('form#'+$('#'+this.CurrentInput).attr('rel')));
+      
       var Target = $(ChangeEvent.target);
       $('#'+Target.attr('rel')).append(Target);
       var UploaderID = Target.attr('id');

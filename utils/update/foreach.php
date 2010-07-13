@@ -97,12 +97,15 @@ class TaskList {
          $this->PerformClient($ClientFolder, $TaskOrder);
    }
    
-   public function RunSelectiveRegex($RegularExression, $TaskOrder = NULL) {
-      TaskList::MajorEvent("Running regular expression {$RegularExpression} against client list...");
+   public function RunSelectiveRegex($RegularExpression, $TaskOrder = NULL, $Internal = FALSE) {
+      if (!$Internal) TaskList::MajorEvent("Running regular expression {$RegularExpression} against client list...");
+      $Matched = 0;
       foreach ($this->ClientList as $ClientFolder => $ClientInfo) {
          if (!preg_match($RegularExpression, $ClientFolder, $Matches)) continue;
+         $Matched++;
          $this->PerformClient($ClientFolder, $TaskOrder);
       }
+      return $Matched;
    }
    
    public function RunClientFromCLI($ClientFolder, $TaskOrder = NULL) {
@@ -114,14 +117,52 @@ class TaskList {
       $this->PerformClient($ClientFolder, $TaskOrder);
    }
    
+   public function RunChunked($ChunkRule, $TaskOrder) {
+      TaskList::MajorEvent("Running client list, chunked by '{$ChunkRule}'...");
+      switch ($ChunkRule) {
+         case 'alphabet':
+            $Chunks = array();
+            $Chunks[] = '-';
+            $Chunks = array_merge($Chunks, array_keys(array_fill(0,10,'a')));
+            for ($i = 97; $i < 123; $i++)
+                $Chunks[] = chr($i);
+            
+            foreach ($Chunks as $ChunkIndex => $Chunk) {
+               $ChunkRegex = "/^({$Chunk}.*)\$/i";
+               $Matches = $this->RunSelectiveRegex($ChunkRegex, $TaskOrder);
+               if (!$Matches) {
+                  TaskList::Event("No matches for {$ChunkRegex}, skipping to next chunk");
+                  continue;
+               }
+               $Proceed = TaskList::Question("","Proceed with next chunk?",array('yes','no'),'yes');
+               if ($Proceed == 'no') exit();
+            }
+         break;
+         
+         case 'tier':
+            
+         break;
+         
+         default:
+            die("Invalid chunk type.\n");
+         break;
+      }
+   }
+   
    public function PerformClient($ClientFolder, $TaskOrder = NULL) {
-      $ClientInfo = $this->ClientList[$ClientFolder];
+      $ClientInfo = $this->LookupClientByFolder($ClientFolder);
       TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
+      if (!$ClientInfo || !sizeof($ClientInfo) || !isset($ClientInfo['SiteID'])) {
+         TaskList::Event("skipped... no db");
+         return;
+      }
       
       // Run all tasks for this client
       if (!is_null($TaskOrder)) {
-         foreach ($TaskOrder as $TaskName)
+         foreach ($TaskOrder as $TaskName) {
+            if (!array_key_exists($TaskName, $this->Tasks)) continue;
             $this->Tasks[$TaskName]['task']->SandboxExecute($ClientFolder, $ClientInfo);
+         }
       } else {
          foreach ($this->Tasks as $TaskName => &$Task)
             $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
@@ -285,6 +326,8 @@ abstract class Task {
    protected $ConfigFile;
    protected $Config;
 
+   abstract protected function Run();
+
    public function __construct($RootFolder) {
       $this->Root = rtrim($RootFolder,'/');
       TaskList::Event("Set root folder to '{$this->Root}'");
@@ -294,8 +337,6 @@ abstract class Task {
       $this->ConfigFile = NULL;
       $this->Config = new Configuration();
    }
-   
-   abstract protected function Run();
    
    public function SandboxExecute($ClientFolder, $ClientInfo) {
       $this->ClientFolder = $ClientFolder;
@@ -313,14 +354,14 @@ abstract class Task {
    
    protected function SaveToConfig($Key, $Value) {
       if (is_null($this->ClientInfo)) return;
-      if (!LAME) return;
+      if (LAME) return;
       
       $this->Config->Load($this->ConfigFile, 'Save');
       
       if (!is_array($Key))
          $Key = array($Key => $Value);
       
-      foreach ($Name as $k => $v)
+      foreach ($Key as $k => $v)
          $this->Config->Set($k, $v);
       
       return $this->Config->Save($this->ConfigFile);
