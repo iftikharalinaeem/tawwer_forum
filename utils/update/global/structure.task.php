@@ -19,6 +19,7 @@ class StructureTask extends Task {
    protected function Run() {
       // No structure, no run
       if ($this->Structure === FALSE) return;
+      if ($this->Cache('Updated') === FALSE) return;
       
       $DatabaseName = $this->ClientInfo['DatabaseName'];
       TaskList::Event("Running structure file against client database '{$DatabaseName}'");

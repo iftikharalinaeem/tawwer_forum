@@ -9,6 +9,7 @@ class TaskList {
 
    const NOBREAK = FALSE;
    
+   public $GroupData;
    protected $Clients;
    protected $Tasks;
    protected $Database;
@@ -172,6 +173,7 @@ class TaskList {
          return;
       }
       
+      $this->GroupData = array();
       // Run all tasks for this client
       if (!is_null($TaskOrder)) {
          foreach ($TaskOrder as $TaskName) {
@@ -392,6 +394,17 @@ abstract class Task {
       $this->Run();
    }
    
+   protected function Cache($Key, $Value = NULL) {
+      if (is_null($Value))
+         return (array_key_exists($Key, $this->TaskList->GroupData)) ? $this->TaskList->GroupData[$Key] : NULL;
+         
+      return $this->TaskList->GroupData[$Key] = $Value;
+   }
+   
+   protected function Uncache($Key) {
+   
+   }  unset($this->TaskList->GroupData[$Key]);
+   
    protected function SaveToConfig($Key, $Value) {
       if (is_null($this->ClientInfo)) return;
       if (LAME) return;
@@ -455,13 +468,14 @@ abstract class Task {
          $OldFileHash = md5_file($AbsoluteClientPath);
          if ($OldFileHash == $NewFileHash) {
             TaskList::Event("copy aborted. local {$RelativePath} is the same as {$AbsoluteSourcePath}");
-            return;
+            return FALSE;
          }
          if (!LAME) unlink($AbsoluteClientPath);
       }
       
       TaskList::Event("copy '{$AbsoluteSourcePath} / ".md5_file($AbsoluteSourcePath)."' to '{$AbsoluteClientPath} / {$OldFileHash}'");
       if (!LAME) copy($AbsoluteSourcePath, $AbsoluteClientPath);
+      return TRUE;
    }
 
 }

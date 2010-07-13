@@ -85,7 +85,8 @@ class FilesystemTask extends Task {
          $this->RemoveFromConfig('EnabledPlugins.HtmlPurifier');
          
          // Copy the new index file
-         $this->CopySourceFile('index.php', $this->VanillaPath);
+         $Copied = $this->CopySourceFile('index.php', $this->VanillaPath);
+         $this->Cache('Updated',$Copied);
       }
       
       if ($this->MiscPath !== FALSE) {
