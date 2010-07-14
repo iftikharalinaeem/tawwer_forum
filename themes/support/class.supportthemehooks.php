@@ -26,24 +26,13 @@ class SupportThemeHooks implements Gdn_IPlugin {
    public function OnDisable() {
       SaveToConfig('Vanilla.Comments.AutoOffset', TRUE);
    }
+   
    /**
     * Grab the score field whenever the discussions are queried.
-    */
    public function DiscussionModel_AfterDiscussionSummaryQuery_Handler(&$Sender) {
       $Sender->SQL->Select('d.Score')
          ->Select('iu.Email', '', 'FirstEmail')
          ->Select('lcu.Email', '', 'LastEmail');
-   }
-
-   /**
-    * When a discussion is bookmarked or unbookmarked, increase or decrease it's score.
-   public function DiscussionModel_AfterBookmarkDiscussion_Handler($Sender) {
-      $Discussion = $Sender->EventArguments['Discussion'];
-      $State = $Sender->EventArguments['State'];
-      if (is_object($Discussion)) {
-         $Math = 'Score ' . ($State == '1' ? '+ 1' : '- 1');
-         $Sender->SQL->Update('Discussion')->Set('Score', $Math, FALSE)->Where('DiscussionID', $Discussion->DiscussionID)->Put();
-      }
    }
     */
 
@@ -57,6 +46,7 @@ class SupportThemeHooks implements Gdn_IPlugin {
          $Sender->SQL->OrderBy('c.Score', 'desc');
    }
 
+/*
    // Add the vote.js file to discussions page
    public function DiscussionController_Render_Before($Sender) {
       $Sender->AddJsFile('vote.js');
@@ -68,10 +58,10 @@ class SupportThemeHooks implements Gdn_IPlugin {
 
       $Sender->Sort = $Sort;
    }
-   
+*/
+
    /**
     * Increment/decrement discussion scores
-    */
    public function DiscussionController_VoteDiscussion_Create($Sender) {
       $DiscussionID = GetValue(0, $Sender->RequestArgs, 0);
       $TransientKey = GetValue(1, $Sender->RequestArgs);
@@ -109,10 +99,10 @@ class SupportThemeHooks implements Gdn_IPlugin {
       $Sender->SetJson('FinalVote', $FinalVote);
       $Sender->Render();
    }
+   */
    
    /**
     * Increment/decrement comment scores
-    */
    public function DiscussionController_VoteComment_Create($Sender) {
       $CommentID = GetValue(0, $Sender->RequestArgs, 0);
       $VoteType = GetValue(1, $Sender->RequestArgs);
@@ -139,6 +129,7 @@ class SupportThemeHooks implements Gdn_IPlugin {
       $Sender->SetJson('FinalVote', $FinalVote);
       $Sender->Render();
    }
+    */
    
    /**
     * Remove Vanilla category management (we want to structure them our own way).
@@ -158,7 +149,6 @@ class SupportThemeHooks implements Gdn_IPlugin {
    
    /**
     * Load popular discussions.
-    */
    public function DiscussionsController_Popular_Create($Sender) {
       $Sender->Title(T('Popular'));
       $Sender->Head->Title($Sender->Head->Title());
@@ -225,5 +215,6 @@ class SupportThemeHooks implements Gdn_IPlugin {
       $Sender->View = 'index';
       $Sender->Render();
    }
+    */
    
 }
