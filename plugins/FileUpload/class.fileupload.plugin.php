@@ -25,6 +25,7 @@ $PluginInfo['FileUpload'] = array(
 );
 
 Gdn_LibraryMap::SafeCache('library','class.mediamodel.php',dirname(__FILE__).DS.'models/class.mediamodel.php');
+include_once(dirname(__FILE__).DS.'models/class.mediamodel.php');
 class FileUploadPlugin extends Gdn_Plugin {
 
    /**
