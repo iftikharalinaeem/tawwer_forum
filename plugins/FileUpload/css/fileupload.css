@@ -2,6 +2,13 @@
    margin-bottom: 0px;
 }
 
+body #DiscussionForm form.FileUpload {
+   background: transparent;
+   border: 0px;
+   margin: 0px;
+   padding: 0px;
+}
+
 div.AttachFileWrapper {
    margin-bottom: 2px;
    padding: 5px;

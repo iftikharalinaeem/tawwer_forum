@@ -98,7 +98,7 @@ QUOTE;
             break;
             
          case 'BBCode':
-            $Data->Body = preg_replace_callback('/([quote="([\d\w_]{3,20})"])/', array($this, 'QuoteAuthorCallback'), $Data->Body);
+            $Data->Body = preg_replace_callback('/(\[quote="([\d\w_]{3,20})"\])/', array($this, 'QuoteAuthorCallback'), $Data->Body);
             $Data->Body = str_replace('[/quote]','</p></div></blockquote>',$Data->Body);
             break;
             
