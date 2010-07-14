@@ -68,16 +68,14 @@ class FileUploadPlugin extends Gdn_Plugin {
    
    public function Controller_Index(&$Sender) {
       $Sender->AddCssFile($this->GetWebResource('css/fileupload.css'));
-      $Sender->AddJsFile('/js/library/jquery.gardencheckboxgrid.js');
       $Sender->AddCssFile('admin.css');
       
       $this->EnableSlicing($Sender);
-      
+      /*
       $PermissionModel = Gdn::PermissionModel();
       $RoleModel = new RoleModel();
       $Roles = $RoleModel->Get();
       $Sender->SetData('Roles',$Roles);
-/*
       
       $RoleGrid = array(
          '_Role'     => array(
@@ -129,7 +127,6 @@ class FileUploadPlugin extends Gdn_Plugin {
       if (!Gdn::Config('Plugins.FileUpload.Enabled')) return;
       
       $Controller->AddCssFile($this->GetResource('css/fileupload.css', FALSE, FALSE));
-      $Controller->AddJsFile('js/library/jquery.class.js');
       $Controller->AddJsFile($this->GetResource('js/fileupload.js', FALSE, FALSE));
    }
    
