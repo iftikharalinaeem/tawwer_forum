@@ -84,6 +84,7 @@ var Gdn_MultiFileUpload = Class.create({
 
       UploaderForm.enctype = 'multipart/form-data';
       UploaderForm.method = 'POST';
+      UploaderForm.className = 'FileUpload';
       UploaderForm.action = Action.join('/');
       var IFrameName = this.NewFrame(NewUploaderID);
       var FormName = IFrameName+'_form';
@@ -140,7 +141,6 @@ var Gdn_MultiFileUpload = Class.create({
    
 
    ShowUploader: function() {
-      console.log('show uploader');
       $('#CurrentUploader').animate({
          'height': '24px'
       },300,function(){$('#CurrentUploader form input[type=file]').animate({
