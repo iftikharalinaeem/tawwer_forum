@@ -9,13 +9,26 @@ class TaskList {
 
    const NOBREAK = FALSE;
    
+   public $GroupData;
    protected $Clients;
    protected $Tasks;
    protected $Database;
    protected $ClientList;
-
+   protected $Config;
+   protected $NumClients;
+   protected $Completed;
+   
    public function __construct($UserTaskDirs, $ClientDir) {
    
+      $ConfigDefaultsFile = '/srv/www/vanillaforumscom/conf/config-defaults.php';
+      $ConfigFile = '/srv/www/vanillaforumscom/conf/config.php';
+      $this->Config = new Configuration();
+      try {
+         $this->Config->Load($ConfigDefaultsFile, 'Use');
+         $this->Config->Load($ConfigFile, 'Use');
+      } catch (Exception $e) { die ($e->getMessage()); }
+      
+      $this->Completed = $this->NumClients = 0;
       $this->Clients = $ClientDir;
       $this->Tasks = array();
       $this->Database = mysql_connect(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, TRUE); // Open the db connection, new link please
@@ -61,10 +74,13 @@ class TaskList {
                   TaskList::Event(strtolower($Class));
                   $NewTask = new $Class($ClientDir);
                   $NewTask->Database = $this->Database;
+                  $NewTask->TaskList =& $this;
                   $this->Tasks[$Taskname] = array(
                      'name'      => str_replace('Task', '', $Class),
                      'task'      => $NewTask
                   );
+                  if (method_exists($NewTask, 'Init'))
+                     $NewTask->Init();
                }
             }
             TaskList::Event("");
@@ -84,11 +100,13 @@ class TaskList {
          if ($ClientFolder == '.' || $ClientFolder == '..') continue;
          $this->ClientList[$ClientFolder] = 1;
       }
-      $NumClients = count($this->ClientList);
+      $this->NumClients = $NumClients = count($this->ClientList);
       TaskList::MajorEvent("found {$NumClients}!", TaskList::NOBREAK);
       
-      $Proceed = TaskList::Question("","Proceed with task execution?",array('yes','no'),'no');
-      if ($Proceed == 'no') exit();
+      if (TaskList::Cautious()) {
+         $Proceed = TaskList::Question("","Proceed with task execution?",array('yes','no'),'no');
+         if ($Proceed == 'no') exit();
+      }
    }
    
    public function RunAll($TaskOrder = NULL) {
@@ -123,9 +141,8 @@ class TaskList {
          case 'alphabet':
             $Chunks = array();
             $Chunks[] = '-';
-            $Chunks = array_merge($Chunks, array_keys(array_fill(0,10,'a')));
-            for ($i = 97; $i < 123; $i++)
-                $Chunks[] = chr($i);
+            $Chunks[] = '[0-9]';
+            $Chunks = array_merge($Chunks, range('a','z'));
             
             foreach ($Chunks as $ChunkIndex => $Chunk) {
                $ChunkRegex = "/^({$Chunk}.*)\$/i";
@@ -134,12 +151,22 @@ class TaskList {
                   TaskList::Event("No matches for {$ChunkRegex}, skipping to next chunk");
                   continue;
                }
-               $Proceed = TaskList::Question("","Proceed with next chunk?",array('yes','no'),'yes');
-               if ($Proceed == 'no') exit();
+               
+               $Completion = round(($this->Completed / $this->NumClients) * 100,0);
+               TaskList::MajorEvent("Completion: {$this->Completed}/{$this->NumClients} ({$Completion}%)");
+               TaskList::MajorEvent("\x07\x07\x07");
+               if (!TaskList::Carefree()) {
+                  $Proceed = TaskList::Question("","Proceed with next chunk?",array('yes','no'),'yes');
+                  if ($Proceed == 'no') exit();
+               }
             }
          break;
          
          case 'tier':
+            
+         break;
+         
+         case 'range':
             
          break;
          
@@ -152,11 +179,13 @@ class TaskList {
    public function PerformClient($ClientFolder, $TaskOrder = NULL) {
       $ClientInfo = $this->LookupClientByFolder($ClientFolder);
       TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
+      $this->Completed++;
       if (!$ClientInfo || !sizeof($ClientInfo) || !isset($ClientInfo['SiteID'])) {
          TaskList::Event("skipped... no db");
          return;
       }
       
+      $this->GroupData = array();
       // Run all tasks for this client
       if (!is_null($TaskOrder)) {
          foreach ($TaskOrder as $TaskName) {
@@ -168,6 +197,11 @@ class TaskList {
             $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
       }
       TaskList::MajorEvent("");
+   }
+   
+   public function ExecTask($TaskName, $ClientFolder, $ClientInfo) {
+      if (!array_key_exists($TaskName, $this->Tasks)) return;
+      $this->Tasks[$TaskName]['task']->SandboxExecute($ClientFolder, $ClientInfo);
    }
    
    protected function LookupClientByFolder($ClientFolder) {
@@ -243,6 +277,17 @@ class TaskList {
       }
    }
    
+   public static function Mkdir($AbsolutePath) {
+      if (file_exists($AbsolutePath)) return true;
+      
+      mkdir($AbsolutePath);
+      return file_exists($AbsolutePath);
+   }
+   
+   public static function Touch($AbsolutePath) {
+      return touch($AbsolutePath);
+   }
+   
    public static function MinorEvent($Message, $LineBreak = TRUE) {
       if (VERBOSE) {
          echo "    - {$Message}";
@@ -314,11 +359,27 @@ class TaskList {
       return $Answer;
    }
    
+   public static function Cautious() {
+      if (!defined('FAST')) return TRUE;
+      if (!FAST) return TRUE;
+      
+      return FALSE;
+   }
+   
+   public static function Carefree() {
+      if (!defined('VERYFAST')) return FALSE;
+      if (!VERYFAST) return FALSE;
+      
+      return TRUE;
+   }
+   
 }
 
 abstract class Task {
 
    public $Database;
+   public $TaskList;
+   
    protected $Root;
    protected $ClientRoot;
    protected $ClientFolder;
@@ -350,6 +411,17 @@ abstract class Task {
       } catch (Exception $e) { die ($e->getMessage()); }
 
       $this->Run();
+   }
+   
+   protected function Cache($Key, $Value = NULL) {
+      if (is_null($Value))
+         return (array_key_exists($Key, $this->TaskList->GroupData)) ? $this->TaskList->GroupData[$Key] : NULL;
+         
+      return $this->TaskList->GroupData[$Key] = $Value;
+   }
+   
+   protected function Uncache($Key) {
+      unset($this->TaskList->GroupData[$Key]);
    }
    
    protected function SaveToConfig($Key, $Value) {
@@ -395,6 +467,16 @@ abstract class Task {
       TaskList::Symlink($AbsoluteLink, $Source);
    }
    
+   protected function Mkdir($RelativePath) {
+      $AbsolutePath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
+      TaskList::Mkdir($AbsolutePath);
+   }
+   
+   protected function Touch($RelativePath) {
+      $AbsolutePath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
+      TaskList::Touch($AbsolutePath);
+   }
+   
    protected function CopySourceFile($RelativePath, $SourcecodePath) {
       $AbsoluteClientPath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
       $AbsoluteSourcePath = TaskList::CombinePaths($SourcecodePath,$RelativePath);
@@ -405,13 +487,14 @@ abstract class Task {
          $OldFileHash = md5_file($AbsoluteClientPath);
          if ($OldFileHash == $NewFileHash) {
             TaskList::Event("copy aborted. local {$RelativePath} is the same as {$AbsoluteSourcePath}");
-            return;
+            return FALSE;
          }
          if (!LAME) unlink($AbsoluteClientPath);
       }
       
       TaskList::Event("copy '{$AbsoluteSourcePath} / ".md5_file($AbsoluteSourcePath)."' to '{$AbsoluteClientPath} / {$OldFileHash}'");
       if (!LAME) copy($AbsoluteSourcePath, $AbsoluteClientPath);
+      return TRUE;
    }
 
 }

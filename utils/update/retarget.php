@@ -17,5 +17,5 @@ $Tasks = new TaskList('maintain','/srv/www/vhosts');
 $Tasks->RunClientFromCLI($argv[1], array(
    'backup',
    'uncache',
-   'retarget'
+   'filesystem'
 ));
