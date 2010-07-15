@@ -257,17 +257,13 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       
       $CurrentStep = $this->CurrentStep();
       
-//      if (substr(Gdn::Request()->Path(),0,6) != 'entry/') {
-      
-         // Shortcircuit to prevent pointless work when the access token has already been handled and we already have a session 
-         if ($CurrentStep == Gdn_Authenticator::MODE_REPEAT)
-            return;
-            
-         // Don't try to wakeup when we've already tried once this session
-         if ($CurrentStep == Gdn_Authenticator::MODE_NOAUTH)
-            return;
-            
-//      }
+      // Shortcircuit to prevent pointless work when the access token has already been handled and we already have a session 
+      if ($CurrentStep == Gdn_Authenticator::MODE_REPEAT)
+         return;
+         
+      // Don't try to wakeup when we've already tried once this session
+      if ($CurrentStep == Gdn_Authenticator::MODE_NOAUTH)
+         return;
 
       $this->Authenticate();
    }
