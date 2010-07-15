@@ -62,10 +62,11 @@ div.AttachFileWrapper div.AttachFileLink {
 
 div.AttachFileWrapper div.AttachFileLink div#CurrentUploader {
    height: 0px;
+   width: 350px;
 }
 
-div.AttachFileWrapper div.AttachFileLink div#CurrentUploader {
-   width: 350px;
+div.AttachFileWrapper div.AttachFileLink div#CurrentUploader input[type=file] {
+   display: none;
 }
 
 div.AttachFileWrapper div.NewAttachment {
