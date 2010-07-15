@@ -110,6 +110,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
          } else {
             $RealSigninURL = Gdn::Authenticator()->GetURL('Real'.Gdn_Authenticator::URL_SIGNIN, $Redirect);
+            $Authenticator->SetIdentity(NULL);
             Redirect($RealSigninURL,302);
          }
       }
