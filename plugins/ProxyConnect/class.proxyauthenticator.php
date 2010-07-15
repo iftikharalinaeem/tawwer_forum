@@ -186,7 +186,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       if ($Provider && $Provider[$URLType]) {
          
          if ($RealURLType == Gdn_Authenticator::URL_SIGNIN)
-            return Url('entry/signinloopback',TRUE);
+            return Url('entry/signinloopback/%2$s',TRUE);
             
          if ($RealURLTYPE == 'Real'.Gdn_Authenticator::URL_SIGNIN)
             $URLType = Gdn_Authenticator::URL_SIGNIN;

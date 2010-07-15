@@ -99,6 +99,9 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    }
    
    public function EntryController_SigninLoopback_Create(&$Sender) {
+      $Args = $Sender->RequestArgs;
+      $Redirect = (sizeof($Args)) ? $Args[0] : '';
+
       $RealUserID = Gdn::Authenticator()->GetRealIdentity();
       $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
       if ($RealUserID == -1) {
@@ -106,7 +109,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          if (Gdn::Authenticator()->GetIdentity()) {
             Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
          } else {
-            $RealSigninURL = $Authenticator->GetURL('Real'.Gdn_Authenticator::URL_SIGNIN);
+            $RealSigninURL = Gdn::Authenticator()->GetURL('Real'.Gdn_Authenticator::URL_SIGNIN, $Redirect);
             Redirect($RealSigninURL,302);
          }
       }
