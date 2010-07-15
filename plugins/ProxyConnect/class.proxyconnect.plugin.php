@@ -100,7 +100,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    
    public function EntryController_SigninLoopback_Create(&$Sender) {
       $Args = $Sender->RequestArgs;
-      $Redirect = (sizeof($Args)) ? $Args[0] : '';
+      $Redirect = (sizeof($Args)) ? $Args[0] : '/';
 
       $RealUserID = Gdn::Authenticator()->GetRealIdentity();
       $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
