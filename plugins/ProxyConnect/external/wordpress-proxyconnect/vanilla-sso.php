@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Vanilla ProxyConnect
+Plugin Name: Vanilla ProxyConnect for WP2
 Plugin URI: http://vanillaforums.org/addons/
 Description: Vanilla ProxyConnect allows users to create and manage their accounts & sessions through Wordpress, and be automatically signed into a related Vanilla forum.
 Version: 1.1.0
