@@ -3,7 +3,7 @@
 Plugin Name: Vanilla ProxyConnect for WP3
 Plugin URI: http://vanillaforums.org/addons/
 Description: Vanilla ProxyConnect allows users to create and manage their accounts & sessions through Wordpress, and be automatically signed into a related Vanilla forum.
-Version: 1.0
+Version: 1.2.0
 Author: Tim Gunter
 Author URI: http://www.vanillaforums.com/
 */
@@ -41,6 +41,35 @@ if (is_array($_GET) && array_key_exists('VanillaChallengeKey', $_GET)) {
 		}
 		exit();
 	}
+}
+
+add_filter('login_redirect', 'proxyconnect_vanilla_li_redirect', 10, 3);
+function proxyconnect_vanilla_li_redirect($redirect_to, $raw_requested_redirect_to, $user) {
+   if ($user instanceof WP_User) {
+      wp_redirect($redirect_to);
+      die();
+   }
+      
+   return $redirect_to;
+}
+
+add_action('wp_logout', 'proxyconnect_vanilla_logout');
+function proxyconnect_vanilla_logout() {
+   $RedirectTo = !empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : FALSE;
+   if ($RedirectTo !== FALSE) {
+      $UrlParts = parse_url($RedirectTo);
+      $Host = $UrlParts['host'];
+      
+      $Referer = $_SERVER['HTTP_REFERER'];
+      $RefererUrlParts = parse_url($Referer);
+      $RefererHost = $RefererUrlParts['host'];
+      
+      if ($Host == $RefererHost) {
+         wp_redirect($RedirectTo);
+         die();
+      }
+   }
+
 }
 
 add_action('admin_menu', 'vanilla_sso_menu');
@@ -98,7 +127,7 @@ function vanilla_sso_options() {
 		</tr>
 		<tr>
 			<th>Sign-in Url</th>
-			<td><span class="description"><?php echo wp_login_url(); ?>?Target=%s</span></td>
+			<td><span class="description"><?php echo wp_login_url(); ?>?redirect_to={Redirect}</span></td>
 		</tr>
 		<tr>
 			<th>Sign-out Url</th>
