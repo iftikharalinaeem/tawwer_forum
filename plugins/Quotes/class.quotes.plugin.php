@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "This plugin allows users to quote each other's posts easily.",
-   'Version' => '0.2.1',
+   'Version' => '0.2.2',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -68,6 +68,8 @@ class QuotesPlugin extends Gdn_Plugin {
    }
    
    protected function AddQuoteButton(&$Sender) {
+      if (!Gdn::Session()->UserID) return;
+      
       $ObjectID = !isset($Sender->EventArguments['Comment']) ? 'Discussion_'.$Sender->Data['Discussion']->DiscussionID : 'Comment_'.$Sender->EventArguments['Comment']->CommentID;
       $QuoteURL = Url("post/quote/{$Sender->Data['Discussion']->DiscussionID}/{$ObjectID}",TRUE);
       $QuoteText = T('Quote');
