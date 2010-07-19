@@ -68,8 +68,8 @@ class QuotesPlugin extends Gdn_Plugin {
    }
    
    protected function AddQuoteButton(&$Sender) {
-      $ObjectID = !isset($Sender->EventArguments['Comment']) ? 'Discussion_'.$Sender->EventArguments['Discussion']->DiscussionID : 'Comment_'.$Sender->EventArguments['Comment']->CommentID;
-      $QuoteURL = Url("post/quote/{$Sender->EventArguments['Discussion']->DiscussionID}/{$ObjectID}",TRUE);
+      $ObjectID = !isset($Sender->EventArguments['Comment']) ? 'Discussion_'.$Sender->Data['Discussion']->DiscussionID : 'Comment_'.$Sender->EventArguments['Comment']->CommentID;
+      $QuoteURL = Url("post/quote/{$Sender->Data['Discussion']->DiscussionID}/{$ObjectID}",TRUE);
       $QuoteText = T('Quote');
       echo <<<QUOTE
       <span class="CommentQuote"><a href="{$QuoteURL}">{$QuoteText}</a></span>
