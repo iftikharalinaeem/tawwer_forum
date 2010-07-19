@@ -1,6 +1,8 @@
 var QuotesPlugin = {
    ConvertQuoteLinks: function() {
       $('span.CommentQuote a').each(function(i,el){
+         if (el.QuoteFunctioning) return;
+         el.QuoteFunctioning = true;
          el = $(el);
          var ObjectID = el.attr('href').split('/').pop();
          el.attr('href',"javascript:QuotesPlugin.Quote('"+ObjectID+"');");
@@ -70,4 +72,7 @@ var QuotesPlugin = {
    }
 
 }
+
 jQuery(document).ready(QuotesPlugin.ConvertQuoteLinks);
+jQuery(document).bind('CommentPagingComplete', QuotesPlugin.ConvertQuoteLinks);
+jQuery(document).bind('CommentAdded', QuotesPlugin.ConvertQuoteLinks);
