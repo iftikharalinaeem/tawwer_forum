@@ -117,7 +117,13 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    }
    
    public function Setup() {
-		// Do nothing
+		$NumLookupMethods = 0;
+		
+		if (function_exists('fsockopen')) $NumLookupMethods++;
+		if (function_exists('curl_init')) $NumLookupMethods++;
+		
+		if (!$NumLookupMethods)
+		 throw new Exception(T("Unable to initialize plugin: required connectivity libraries not found, need either 'fsockopen' or 'curl'."));
    }
    
    public function OnDisable() {
