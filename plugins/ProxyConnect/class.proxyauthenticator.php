@@ -51,7 +51,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          // Got a response from the remote identity provider
          $UserEmail = ArrayValue('Email', $Response);
          $UserName = ArrayValue('Name', $Response);
-         $UserName = trim(preg_replace('/[^a-z0-9-]+/i','',$UserName));
+         $UserName = trim(preg_replace('/[^a-z0-9- ]+/i','',$UserName));
          $TransientKey = ArrayValue('TransientKey', $Response, NULL);
          
          $AuthResponse = $this->ProcessAuthorizedRequest($Provider['AuthenticationKey'], $UserEmail, $UserName, $TransientKey);
