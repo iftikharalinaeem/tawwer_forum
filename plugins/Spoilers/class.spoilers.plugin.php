@@ -53,7 +53,7 @@ class SpoilersPlugin extends Gdn_Plugin {
       if (isset($Sender->EventArguments['Comment'])) 
          $Data = $Sender->EventArguments['Comment'];
 
-      $Data->Body = preg_replace_callback('/(\[spoiler(?:="?([\d\w_ ]+)"?)?\])/', array($this, 'SpoilerCallback'), $Data->Body);
+      $Data->Body = preg_replace_callback("/(\[spoiler(?:=\"?([\d\w_',.? ]+)\"?)?\])/", array($this, 'SpoilerCallback'), $Data->Body);
       $Data->Body = str_replace('[/spoiler]','</div></div>',$Data->Body);
    }
    
