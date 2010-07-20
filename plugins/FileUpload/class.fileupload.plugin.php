@@ -41,6 +41,8 @@ class FileUploadPlugin extends Gdn_Plugin {
       $Sender->Title('FileUpload');
       $Sender->AddSideMenu('plugin/fileupload');
       $Sender->Form = new Gdn_Form();
+      
+      $this->EnableSlicing($Sender);
       $this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
@@ -69,48 +71,6 @@ class FileUploadPlugin extends Gdn_Plugin {
    public function Controller_Index(&$Sender) {
       $Sender->AddCssFile($this->GetWebResource('css/fileupload.css'));
       $Sender->AddCssFile('admin.css');
-      
-      $this->EnableSlicing($Sender);
-      /*
-      $PermissionModel = Gdn::PermissionModel();
-      $RoleModel = new RoleModel();
-      $Roles = $RoleModel->Get();
-      $Sender->SetData('Roles',$Roles);
-      
-      $RoleGrid = array(
-         '_Role'     => array(
-            '_Columns'  => array(
-               'Download'  => 1,
-               'Upload'    => 1
-            ),
-            '_Info' => array(
-               'Name'      => 'Role'
-            ),
-            '_Rows'        => array()
-         )
-      );
-      $PermissionName = 'FileUpload.%s.%s';
-      while ($Role = $Roles->NextRow()) {
-         if (!$Role->CanSession) continue;
-         $Permissions = $PermissionModel->GetPermissions($Role->RoleID);
-         
-         $RoleGrid['_Role']['_Rows'][$Role->Name] = 1;
-
-         $UploadPermission = sprintf($PermissionName,$Role->Name,'Upload.File');
-         $DownloadPermission = sprintf($PermissionName,$Role->Name,'Download.File');
-         $RoleGrid['_Role'][$Role->Name.'.Upload'] = array(
-            'Value'     => $Permissions->$UploadPermission,
-            'PostValue' => $UploadPermission
-         );
-         
-         $RoleGrid['_Role'][$Role->Name.'.Download'] = array(
-            'Value'     => $Permissions->$DownloadPermission,
-            'PostValue' => $DownloadPermission
-         );
-
-      }
-      $Sender->FileUploadPermissions = $RoleGrid;
-*/
       
       $Sender->Render($this->GetView('fileupload.php'));
    }
