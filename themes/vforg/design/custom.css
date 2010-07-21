@@ -1,16 +1,154 @@
+/*
+  Queries to run on vf.org to get discussions tagged properly.
+  
+  Insert Tags based on existing categories, which are:
+  Category           ->             Tag
+  --------------------------------------------
+  General                           [Untagged]
+  Vanilla 1                         vanilla1 
+  Vanilla 2                         vanilla2
+  Localization                      locale
+  Themes                            themes
+  Addons                            addons
+                                    plugins
+  Testing                           test
+  VanillaForums.com                 hosting
+  Feedback & FeatureRequests        feature-request
+  
+  // Cleanup
+  truncate table GDN_Tag;
+  truncate table GDN_DiscussionTag;
+  
+  // Insert tags
+  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('vanilla2', 1, now(), 0);
+  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('vanilla1', 1, now(), 0);
+  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('locales', 1, now(), 0);
+  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('themes', 1, now(), 0);
+  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('addons', 1, now(), 0);
+  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('plugins', 1, now(), 0);
+  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('test', 1, now(), 0);
+  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('hosting', 1, now(), 0);
+  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('feature-request', 1, now(), 0);
+  
+  // Insert unions
+  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 1 from GDN_Discussion where CategoryID = 21;
+  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 2 from GDN_Discussion where CategoryID = 7;
+  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 3 from GDN_Discussion where CategoryID = 24;
+  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 4 from GDN_Discussion where CategoryID = 25;
+  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 5 from GDN_Discussion where CategoryID = 13;
+  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 6 from GDN_Discussion where CategoryID = 13;
+  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 7 from GDN_Discussion where CategoryID = 17;
+  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 8 from GDN_Discussion where CategoryID = 22;
+  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 9 from GDN_Discussion where CategoryID = 23;
+  
+  // Update counts
+  update GDN_Tag t set t.CountDiscussions = (select count(DiscussionID) from GDN_DiscussionTag where TagID = t.TagID);
+  
+  // Remove all announcements
+  update GDN_Discussion set Announce = '0';
+  
+  // Update the tableofcontents
+  
+  // Update doc pages
+  
+<strong>Welcome to the Vanilla Community Forum.</strong>
+You've found the source for finding and sharing information about working with and developing for the open-source Vanilla Forum project. <a href="http://vanillaforums.org/page/bugreport">Go here to submit bug reports</a>.
+  
+*/
+
+
 /* ========================================= VanillaForums.org Customizations */
 
+a,
+a:link,
+a:visited,
+a:active {
+   color: #045dcd;
+}
+a:hover {
+   color: #ff0084;
+}
+
 /* ---- General Styles ---- */
+#Content h1,
+#Content h2,
+#Content h3,
+#Content h4,
+#Content h5 {
+   color: #744000;
+   font-size: 130%;
+   font-weight: bold;
+	border-bottom: 1px solid #EED3A2;
+	padding: 0;
+	margin-bottom: 4px;
+}
+#Content h2 {
+   font-size: 115%;
+   margin: 20px 0 4px;
+}
+#Content h3 {
+   font-size: 100%;
+   margin: 20px 0 4px;
+}
+#Content h4 {
+   font-size: 90%;
+}
+#Content h5 {
+   font-size: 80%;
+}
+a.Button,
+.Button {
+	color:#583100;
+}
+
+a.GreenButton,
+a.BigButton {
+	font-weight: bold;
+	background: url('images/bg-button-blue.png') 0 -140px repeat-x;
+	text-align: center;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	color: #002E69;
+	text-shadow: 0 1px 0 #6FB8E0;
+	color: #FFFFFF;
+	text-shadow:0 1px 1px #111196;
+	padding: 8px 0;
+	border: 1px solid #045dcd;
+   -moz-border-radius: 5px;
+   -webkit-border-radius: 5px;	
+}
+a.BigButton:hover {
+	color: #FFFFFF;
+	text-shadow:0 1px 1px #111196;
+	background-position: 0 0;
+}
+a.BigButton:focus {
+	color: #FFFFFF;
+	text-shadow:0 1px 1px #111196;
+	background: #2274d5;
+}
+a.GreenButton {
+	background: url('images/bg-button-green.png') 0 -140px repeat-x;
+	text-shadow: 0 1px 1px #155a00;
+}
+a.GreenButton:hover {
+	color: #FFFFFF;
+	text-shadow:0 1px 1px #155a00;
+	background-position: 0 0;
+}
+a.GreenButton:focus {
+	color: #FFFFFF;
+	text-shadow:0 1px 1px #155a00;
+	background: #2274d5;
+}
+
 .Button:hover {
 	text-decoration: none;
 }
 body {
-	background: #E9F9FF;
+	background: url('images/bg-tile.png') top left repeat #f9f1dc;
 }
 #Frame {
-	border-top: 1px solid #fff;
-	background: #e4f0fc;
-	background: url('images/fade.jpg') top left repeat-x #fff;
+	border-top: 1px solid #f8f4e9;
 }
 #Body {
    margin: 0 auto;
@@ -20,9 +158,12 @@ div#Content {
 	margin-bottom: 40px;
 }
 div#Foot {
-	margin: 0;
-	padding: 0;
-	background: url('images/hr.png') repeat-x top left #E9F9FF;
+   color: #777;
+   padding: 0;
+   margin: 30px 0 0;  
+	border-top: 1px solid #EED3A2;
+	border-bottom: 1px solid #EED3A2;
+	background: #FEF7DF;
 }
 div#Foot div {
 	padding: 12px 0 10px;
@@ -31,64 +172,68 @@ div#Foot div {
 }
 div#Foot div,
 div#Foot div a {
-	color: #80828C;
+	color: #e4ab62;
 }
 div#Foot div a:hover {
 	text-decoration: none;
-	color: #40424C;
+	color: #B76600;
 }
 
+/* Sprites */
+i.Sprite {
+	display: inline-block;
+	background-image: url('images/sprites.png');
+	background-repeat: no-repeat;
+}
+i.Sprite span {
+	display: none;
+}
+i.SpriteScreen {
+	display: block;
+	float: left;
+	height: 34px;
+	width: 40px;
+	margin: 2px 10px 10px 0;
+	background-position: 0 -131px;
+}
+i.SpriteSmile {
+	display: block;
+	float: left;
+	height: 44px;
+	width: 42px;
+	margin: 2px 8px 0 0;
+	background-position: 0 -165px;
+}
+i.SpriteDot {
+	height: 20px;
+	width: 20px;
+}
+i.SpriteDotOn { background-position:  0 -210px; }
+i.SpriteDotOff { background-position:  0 -230px; }
+i.SpriteTools,
+i.SpriteSuit {
+	display: block;
+	height: 48px;
+	width: 48px;
+}
+i.SpriteTools { background-position: -48px -136px; }
+i.SpriteSuit { background-position: -48px -184px; }
 
 /* ---- Banner ---- */
 
 .Banner {
-	background: url('images/shine.jpg') top center no-repeat #2a529a;
-   border-bottom: 1px solid #183a7c;
+	background: url('images/bg-title.png') center center repeat-x #e15b10;
+   border-bottom: 1px solid #bd6a01;
 	text-align: center;
-	height: 120px;
 }
 .BannerWrapper {
 	width: 960px;
 	margin: 0 auto;
 	text-align: right;
-}
-.Banner div.Buttons {
-	float: right;
+	position: relative;
 }
 .Banner div.UserOptions {
-	float: right;
-	background: url('images/userinfo_left.png') left bottom no-repeat;
-}
-.Banner div.UserOptions div {
-	background: url('images/userinfo_right.png') right bottom no-repeat;
-	padding: 0 10px 4px 4px;
-	margin-left: 6px;
-}
-.Banner div.UserOptions a {
-	color: #fff;
-	text-shadow: 0 1px 0 #000;
-	margin: 0 8px;
-	font-family: 'Trebuchet MS', Arial;
-	font-size: 11px;
-}
-.Banner div.UserOptions a.Username:hover,
-.Banner div.UserOptions a.Inbox:hover {
-	text-decoration: none;
-}
-.Banner div.UserOptions a.Username:hover em,
-.Banner div.UserOptions a.Inbox:hover em {
-	text-decoration: underline;
-}
-.Banner div.UserOptions a span {
-	margin: 0 0 0 6px;
-	background: #8b8bff;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	color: #fff;
-	padding: 0 2px;
-	font-weight: normal;
-	font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
-	text-shadow: 0 1px 0 #000;;
+	display: none;
 }
 .Banner h1 {
    border: 0;
@@ -96,42 +241,53 @@ div#Foot div a:hover {
    padding: 0;
 }
 .Banner h1 a {
-	padding: 10px 0 0;
-	font-size: 30px;
-	color: #fff;
-   text-shadow:1px 1px 1px #000;
-	float: left;
+	position: absolute;
+	top: 5px;
+	left: 0;
+	height: 40px;
+	width: 142px;
+	background: url('images/sprites.png') top left;
+}
+.Banner h1 a span {
+	display: none;
 }
 .Banner ul {
    list-style: none;
-   margin: 50px 0 0;
+	padding: 10px 0;
 }
 .Banner ul li {
-	float: right;
-	height: 46px;
+	display: inline-block;
+	height: 32px;
 	padding-left: 4px;
 	margin-left: 4px;
+	background: url('images/sprite-menu-buttons.png');
+	background-repeat: no-repeat;
+	background-position: left top;
 }
 .Banner ul li a {
    display: block;
-   font-family:'Trebuchet MS', 'helvetica nueue', helvetica;
-   font-size:15px;
+   font-family:'lucida grande','Lucida Sans Unicode',tahoma,sans-serif;
+   font-size:12px;
    font-weight:bold;
    text-decoration: none;
-   color: #fff;
-   text-shadow:1px 1px 1px #000;
-	height: 46px;
-	line-height: 46px;
+   color: #744000;
+   text-shadow:0 1px 1px #FEE369;
+	height: 32px;
+	line-height: 31px;
 	padding: 0 14px 0 10px;
+	background: url('images/sprite-menu-buttons.png');
+	background-repeat: no-repeat;
+	background-position: right top;
 }
-.Banner ul li.Download {
-	background: url('images/dl_left.png') left center no-repeat;	
-}
+.Banner ul li:hover { background-position: left -32px; }
+.Banner ul li:hover a { background-position: right -32px; }
+.Banner ul li.Download { background-position: left -96px; }
 .Banner ul li.Download a {
-	background: url('images/dl_right.png') right center no-repeat;
+	color: #ffffff;
+	text-shadow: 0 1px 1px #111196;
+	background-position: right -96px;
 }
 body#dashboard_search_index .Banner ul li.Community,
-body#vforg_home_index .Banner ul li.Home,
 body.hosting .Banner ul li.Hosting,
 body.Wiki .Banner ul li.Documentation,
 body.Addons .Banner ul li.Addons,
@@ -139,10 +295,10 @@ body.Profile .Banner ul li.Community,
 body.Vanilla .Banner ul li.Community,
 body.Conversations .Banner ul li.Community,
 body.Activity .Banner ul li.Community {
-	background: url('images/tab_left.png') left center no-repeat;	
+	background-position: left -64px;
 }
-body#dashboard_search_index .Banner ul li.Community a,
 body#vforg_home_index .Banner ul li.Home a,
+body#dashboard_search_index .Banner ul li.Community a,
 body.hosting .Banner ul li.Hosting a,
 body.Wiki .Banner ul li.Documentation a,
 body.Addons .Banner ul li.Addons a,
@@ -150,26 +306,22 @@ body.Profile .Banner ul li.Community a,
 body.Vanilla .Banner ul li.Community a,
 body.Conversations .Banner ul li.Community a,
 body.Activity .Banner ul li.Community a {
-	background: url('images/tab_right.png') right center no-repeat;
+	background-position: right -64px;
+	color: #fff;
+	text-shadow: 0 1px 1px #4C2305;
 }
+/* Reposition sprites for splash page/alternate bg */
+body#vforg_home_index .Banner ul li { background-position: left -128px; }
+body#vforg_home_index .Banner ul li a { background-position: right -128px; }
+body#vforg_home_index .Banner ul li:hover { background-position: left -160px; }
+body#vforg_home_index .Banner ul li:hover a { background-position: right -160px; }
+body#vforg_home_index .Banner ul li.Download { background-position: left -224px; }
+body#vforg_home_index .Banner ul li.Download a { background-position: right -224px; }
+body#vforg_home_index .Banner ul li.Home { background-position: left -192px; }
+body#vforg_home_index .Banner ul li.Home a { background-position: right -192px; }
 
-/* --- Profile Page --- */
-form.Activity,
-ul.Activities {
-	background: #fff;
-}
-ul.Activities li.Item {
-	padding: 4px; 
-}
-ul.Discussions {
-	background: #fff;
-}
 
-a.BigButton:hover {
-	text-decoration: none;
-}
-
-/* ==================================================== VF.org Customizations */
+/* ==================================================== VF.org Customizations
 body.Conversations #Content h2 {
    -moz-border-radius-topleft: 3px;
    -moz-border-radius-topright: 3px;
@@ -225,7 +377,7 @@ ul#Conversation {
    border-top: 0;
    margin: 0 0 6px;
    padding: 3px 6px;
-   background: #e9f9ff /* Panel Background Color */;
+   background: #e9f9ff;
    text-align: left;
    -moz-border-radius-bottomright: 2px;
    -moz-border-radius-bottomleft: 2px;
@@ -280,4 +432,688 @@ ul.DataList li ul li.Meta strong {
 div.AddPeople textarea.MultiComplete {
   width: 248px;
   margin: 2px 0;
+}
+*/
+
+
+/* Homepage Customizations */
+body#vforg_home_index {
+	background: url('images/bg-fade.png') top left repeat-x #f1e5ca;
+}
+body#vforg_download_index #Content,
+body#vforg_home_index #Content {
+	float: none;
+	width: auto;
+}
+body#vforg_download_index #Panel,
+body#vforg_home_index #Panel {
+	display: none;
+}
+body#vforg_home_index h1,
+body#vforg_home_index h2 {
+	text-decoration: none;
+	border: none;
+}
+body#vforg_home_index h2 {
+	padding-top: 50px;
+	color: #744000;
+}
+body#vforg_home_index div.Wrap {
+	background:url("images/bg-shines.png") no-repeat scroll center top transparent;
+	min-height: 550px;
+}
+body#vforg_home_index .Banner {
+	background: none;
+	border: none;
+}
+body#vforg_home_index #Frame {
+	border: none;
+}
+body#vforg_home_index .Banner h1 a {
+	position: absolute;
+	top: 28px;
+	left: 82px;
+	height: 92px;
+	width: 203px;
+	background-position: 0 -39px;
+}
+body#vforg_home_index #Foot {
+	display: none;
+}
+body#vforg_home_index .Banner ul {
+   list-style: none;
+	padding: 30px 0 0;
+}
+body#vforg_home_index a.Active {
+	background: none;
+}
+div.Splash {
+	position: relative;
+	width: 100%;
+}
+div.SplashMessage {
+	width: 370px;
+	text-align: left;
+}
+div.SplashMessage p {
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	text-shadow: 0 1px 0 #FFF9F0;
+	color: #744000;
+	font-size: 12px;
+	margin: 0;
+	padding: 10px 0;
+	clear: both;
+	line-height: 1.4;
+}
+div.SplashPreview {
+	position: absolute;
+	background: url('images/bg-screenshot.png') top right no-repeat;
+	height: 411px;
+	width: 603px;
+	padding: 32px 32px 0 0;
+	right: -30px;
+	top: -16px;
+}
+div.SplashPreview div.Window {
+	position: relative;
+	margin-left: 64px;
+	overflow: hidden;
+	height: 361px;
+	width: 539px;
+}
+div.SplashPreview div.Window div.Reel {
+	position: absolute;
+}
+div.ScreenNav {
+	margin: 20px 0 0 64px;
+	text-align: center;
+}
+a.Get {
+	font-weight: bold;
+	margin-top: 20px;
+	display: block;
+	background: url('images/bg-button-blue.png') top left repeat-x;
+	text-align: center;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	font-size: 12px;
+	color: #002E69;
+	text-shadow: 0 1px 0 #6FB8E0;
+	padding: 12px 0 8px;
+	border: 1px solid #045dcd;
+   -moz-border-radius: 5px;
+   -webkit-border-radius: 5px;	
+}
+a.Get:hover {
+	background-position: 0 -70px;
+}
+a.Get:focus {
+	background: #2274d5;
+}
+a.Get strong {
+	font-weight: normal;
+	padding: 0 0 2px;
+	font-size: 24px;
+	display: block;
+	color: #fff;
+}
+
+/* Move Errors Back Into Page */
+div.Messages {
+   text-align: inherit !important;
+   position: relative;
+   top: auto;
+   left: auto;
+   z-index: 200;
+   font-size: 12px;
+   display: block;
+   width: auto;
+}
+* html div.Messages {
+  position: relative;
+  width: auto;
+  top: auto;
+  left: auto;
+}
+div.Messages ul {
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   display: block;
+   zoom:1;
+   *display:inline;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;  
+}
+div.Messages ul li {
+   text-align: left !important;
+   border: 0 !important;
+   color: #000 !important;
+   padding: 0 !important;
+   margin: 0 !important;
+	list-style: none;
+}
+div.Errors {
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #d50a0a !important;
+	margin: 0 0 10px !important;
+}
+div.Errors ul li {
+   color: #fff !important;
+}
+
+/* Panel Boxes */
+div.Box,
+div.UserOptions {
+   color: #B76600;
+	background: #FEF7DF;
+	border: 1px solid #EED3A2;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;  
+}
+div.Box p {
+   color: #B76600;	
+}
+div.UserOptions h3,
+div.Box h4 {
+	color:#744000;
+	font-weight:bold;
+}
+div.UserOptions ul {
+   margin: 0;
+   padding: 0;
+}
+div.UserOptions ul li {
+   margin: 0;
+   padding: 6px 2px 0;
+   font-size: 13px;
+   font-weight: bold;
+   color: #B76600;	
+}
+div.UserOptions a:hover {
+   text-decoration: underline;
+}
+ul.PanelInfo,
+ul.PanelActivity  {
+	border: none;
+}
+ul.PanelInfo li,
+ul.PanelActivity li {
+	background: none;
+	border: none;
+	border-top:1px solid #EED3A2;
+	font-size: 11px;
+	color: #B76600;
+}
+ul.PanelActivity li em {
+	padding-left: 5px;
+	font-size: 11px;
+	color: #a65d02;
+}
+ul.PanelActivity li div.Story {
+	font-size: 11px;
+	font-style: italic;
+	color: #e79e42;
+}
+div.Tags ul.PanelInfo li a {
+	font-weight: bold;
+}
+
+/* Sign In Form */
+body.Entry #Content h1 { color: inherit; }
+body.Entry #Content div.Box {
+	background: #F6DAA8;
+	border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+}
+body.Entry #Content form {
+	display: block;
+	padding:10px 30px 20px !important;
+}
+body.Entry div.Errors {
+	margin: 0 !important;
+}
+
+
+/* Popups */
+div.Popup div.Body {
+	border: 1px solid #FFF8EB;
+	background: #F6DAA8;
+	box-shadow: 0 0 5px #A59371;
+	-moz-box-shadow: 0 0 5px #A59371;
+	-webkit-box-shadow: 0 0 5px #A59371;  
+}
+div.Popup h1,
+div.Popup h2 {
+	font-size:120%;
+	font-weight:bold;
+	margin-bottom: 0;
+	background: none;
+	border: none;
+	padding: 6px 9px 0;
+   color: #744000;
+}
+a.Close { color: #744000; }
+a.Close:hover { color: #4A2900; }
+div.SignInPopup .Content form { padding: 0 14px 10px; }
+div.SignInPopup div.Body { max-width:286px; }
+
+
+/* DataList & Headings */
+div.MessageForm, div.Tabs {
+	background: none;
+	border-bottom:1px solid #EED3A2;
+	padding: 0 5px; 
+}
+div.MessageForm {
+	background: #fdfaef;
+	padding: 8px;
+}
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   border: 1px solid #EED3A2;
+	border-bottom: 0;
+   border-radius: 3px 3px 0 0;
+   -moz-border-radius: 3px 3px 0 0;
+   -webkit-border-radius: 3px 3px 0 0;
+   background: #F6DAA8;
+   color: #b76600;
+   padding: 6px 10px;
+	line-height: 1;
+	display: inline-block;
+}
+div.HeadingTabs li a,
+div.HeadingTabs li a:link,
+div.HeadingTabs li a:hover,
+div.HeadingTabs li a:active,
+div.HeadingTabs li a:visited,
+div.MessageForm a.Back,
+div.MessageForm a.Back:link,
+div.MessageForm a.Back:hover,
+div.MessageForm a.Back:active,
+div.MessageForm a.Back:visited,
+div.MessageForm a.Cancel,
+div.MessageForm a.Cancel:link,
+div.MessageForm a.Cancel:hover,
+div.MessageForm a.Cancel:active,
+div.MessageForm a.Cancel:visited,
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited {
+   border: 1px solid #EED3A2;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #F6DAA8;
+   color: #b76600;
+   padding: 6px 10px;
+	line-height: 1;
+	display: inline-block;
+}
+div.MessageForm a.Back:hover,
+div.MessageForm a.Cancel:hover,
+div.MorePager li a:hover,
+a.TabLink:hover,
+div.Tabs li a:hover {
+   background: #FEF7DF;
+}
+a.Active,
+div.Tabs li.Active a {
+   background: #FEF7DF;
+   color: #744000;
+	position: relative;
+	padding-top: 7px;
+	top: 1px;
+}
+div.MessageForm div.Tabs {
+	margin-left: 6px;
+}
+div.MessageForm div.Tabs li.Active a {
+	top: 0;
+}
+div.Tabs li a span {
+   background: #744000;
+   color: #FEF7DF;
+}
+div.Tabs div.SubTab {
+	margin: 0;
+	padding: 0;
+	background: none;
+   border-radius: none;
+   -webkit-border-radius: none;
+   -moz-border-radius: none;
+}
+div.HeadingTabs div.SubTab {
+	line-height: 2;
+}
+ul.Drafts,
+ul.Discussions,
+ul.MessageList li.Item {
+	background: #FEF7DF;
+}
+ul.DataList li.Item,
+ul.MessageList li.Item {
+	border-bottom:1px solid #EED3A2;
+}
+div.Preview  {
+   border: 1px solid #EED3A2;
+   background: #FEF7DF;
+	padding: 6px;
+	margin: 0 0 8px;
+}
+.Foot  {
+	background:none;
+	border: none;
+}
+.Mine {
+	background: #FDFAEF;
+}
+
+/* Voting Boxes */
+i.ArrowSprite  { background-image: url("images/arrow_sprite.png"); }
+.StatBox, .StatBox a, span.Votes span, span.Votes a { color: #fcd4ab !important; }
+.StatBox a:hover { color: #ffffff !important; }
+.StatBox { background: #6c3f11; }
+span.Votes a { background: #6c3f11; }
+.HasAnswersBox { background: #53310e; }
+span.Votes a:hover { background: #53310e; }
+.ViewsBox { background: #905417; }
+span.Votes span { background: #905417; }
+.FollowsBox { background: #764513; }
+
+
+/* Dismiss Messages */
+div.Info {
+   border: 1px solid #EED3A2;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #FEF7DF;
+   color: #b76600;
+	font-size:13px;
+	margin:0 0 10px;
+	padding:6px;
+	position: relative;
+}
+div.Info strong {
+	color:#744000;
+}
+div.DismissMessage a.Dismiss {
+	color:#744000;
+	float: none;
+	position: absolute;
+	top: 4px;
+	right: 6px;
+	line-height: 1;
+}
+
+/* --- Profile Page --- */
+form.Activity,
+ul.Activities {
+	background: #FEF7DF;
+}
+form.Activity {
+	padding: 10px;
+	border-bottom: 1px solid #EED3A2;
+}
+ul.Activities li.Item {
+	padding: 4px; 
+}
+a.BigButton:hover {
+	text-decoration: none;
+}
+div.Box dl {
+	padding: 0;
+	background: none;
+	border: none;
+}
+body.Profile ul.PanelInfo,
+body.Profile ul.PanelInfo li {
+	border: none;
+}
+body.Profile ul.PanelInfo li {
+	padding: 0;
+}
+body.Profile ul.Activities {
+	border: none;
+	margin: 0;
+}
+#Content div.User h1 {
+	border: none;
+}
+#Status {
+	background: none;
+	padding: 6px 2px 10px;
+	color: #B76600;
+}
+ul.Activities ul.DataList li {
+	background: #F6DAA8;
+}
+
+/* Help Info on Post Discussion Form */
+#DiscussionForm h2 {
+	border: none;
+	font-size: 18px;
+}
+#DiscussionForm form {
+	display: block;
+	padding-right: 270px;
+	background: #F6DAA8;
+	border: none;
+}
+#DiscussionForm label {
+	color: #744000;
+}
+#DiscussionForm textarea,
+#DiscussionForm input.InputBox {
+   width: 100%;
+	display: block;
+}
+#DiscussionForm {
+	position: relative;
+}
+.PostHelp {
+	top: 48px;
+	right: 20px;
+	position: absolute;
+	width: 220px;
+	background: #FEF7DF;
+	border: 1px solid #EEC38A;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	font-size: 11px;
+	color: #B76600;
+}
+#Content .PostHelp h4 {
+	font-size: 14px;
+	font-weight: bold;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+.PostHelp .Help {
+	padding: 4px 8px;
+}
+.Help ul { margin: 0 !important; }
+.Help ul li {
+	list-style: disc;
+	margin-left: 14px;
+}
+div.Examples {
+	padding-top: 12px;
+}
+div.Examples,
+div.Help {
+	font-size: 11px;
+}
+div.Examples div {
+	font-style: italic;
+}
+div.Examples div strong {
+	font-weight: bold;
+	font-style: normal;
+	display: inline-block;
+}
+div.Examples div.Good strong,
+div.Examples div.Bad strong {
+	/* text-shadow: 0 0px 3px #000; */
+	color: #fff;
+	border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+	line-height: 1;
+	padding: 2px 4px;
+}
+div.Examples div.Good strong { background: #0a0; }
+div.Examples div.Bad strong { background: #f00; }
+
+
+/* Download Form */
+body#vforg_download_index #Frame {
+	background: url('images/bg-divider.png') center 20px no-repeat;
+}
+.DownloadForm,
+.HostingForm {
+	width: 375px;
+	float: left;
+	padding: 0 52px 40px 53px;
+	position: relative;
+}
+.DownloadForm {
+	float: left;
+}
+#Content .DownloadForm h1,
+#Content .HostingForm h1 {
+	padding: 0 0 30px 60px;
+	color: #0155ba;
+	border: none;
+	font-size: 25px;
+}
+#Content .DownloadForm h1 {
+	padding-bottom: 25px;
+}
+i.SpriteTools,
+i.SpriteSuit {
+	position: absolute;
+	top: 0;
+	left: 60px;
+}
+#Content .DownloadForm h1 span,
+#Content .HostingForm h1 span {
+	display: block;
+	color: #c8590e;
+	font-size: 16px;
+	text-transform: uppercase;
+}
+.DownloadForm ul {
+	margin-bottom: 20px;
+}
+li.CaptchaInput {
+	margin-bottom: 12px;
+}
+.DownloadForm label {
+	display: block;
+	color: #744000;
+	font-weight: bold;
+}
+.DownloadForm label.CheckBoxLabel {
+	font-weight: normal;
+	margin-bottom: 4px;
+}
+.DownloadForm input.InputBox {
+	margin-bottom: 6px;
+	width: 362px;
+}
+a.RenderedDownloadButton span {
+	display: none;
+}
+a.RenderedDownloadButton {
+	margin-top: 23px;
+	display:block;
+	height: 60px;
+	width: 370px;
+	background: url('images/btn-hosting.png') 0 0 no-repeat;
+}
+a.RenderedDownloadButton:hover { background-position: 0 -60px; }
+a.RenderedDownloadButton:focus { background-position: 0 -120px; }
+
+.Quote {
+	margin: 10px 0;
+	background: url('images/bg-quote.png') right 0 no-repeat;
+}
+.Quote img {
+	margin-right: 10px;
+	border: 3px solid #fff;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+   box-shadow: 1px 1px 1px #989386;
+	-moz-box-shadow: 1px 1px 1px #989386;
+	-webkit-box-shadow: 1px 1px 1px #989386;
+	float: left;	
+}
+.Quote p {
+	margin: 0 10px 0 107px;
+	padding: 6px 0 2px;
+	color: #000000;
+	font-size: 12px;
+	line-height: 1.5;
+}
+.Quote p strong {
+	font-weight: bold;
+}
+.Quote p.Author {
+	padding: 0;
+}
+.Quote div.Foot {
+	background: url('images/bg-quote.png') right -536px no-repeat;
+	height: 4px;
+	overflow: hidden;
+	padding: 0;
+	margin: 6px 0 0;
+}
+
+/* Get the download page */
+body#vforg_download_get #Content {
+	float: right;
+}
+body#vforg_download_get #Panel {
+	float: left;
+}
+body#vforg_download_get #Panel strong {
+	font-weight: bold;
+}
+body#vforg_download_get #Content h1 {
+   border: none;
+	font-size: 20px;
+}
+.DownloadInfo {
+   border: none !important;
+   background: #F6DAA8 !important;
+   color: #744000 !important;
+}
+.DownloadInfo strong {
+   padding: 12px 0 0 !important;
+   font-size: 14px !important;
+   font-weight: bold;
+}
+.DownloadInfo p {
+   font-size: 13px !important;
+   padding: 0 0 12px !important;
+   margin: 0;
 }
