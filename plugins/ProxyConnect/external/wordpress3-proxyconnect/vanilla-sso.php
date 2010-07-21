@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Vanilla ProxyConnect for WP2
+Plugin Name: Vanilla ProxyConnect for WP3
 Plugin URI: http://vanillaforums.org/addons/
 Description: Vanilla ProxyConnect allows users to create and manage their accounts & sessions through Wordpress, and be automatically signed into a related Vanilla forum.
 Version: 1.2.0
@@ -69,6 +69,7 @@ function proxyconnect_vanilla_logout() {
          die();
       }
    }
+
 }
 
 add_action('admin_menu', 'vanilla_sso_menu');
@@ -126,12 +127,12 @@ function vanilla_sso_options() {
 		</tr>
 		<tr>
 			<th>Sign-in Url</th>
-			<td><span class="description"><?php echo wp_login_url(); ?>?Target=%s</span></td>
+			<td><span class="description"><?php echo wp_login_url(); ?>?redirect_to={Redirect}</span></td>
 		</tr>
 		<tr>
 			<th>Sign-out Url</th>
 			<td><span class="description"><?php
-				echo add_query_arg(array('action' => 'logout', '_wpnonce' => '{Session_TransientKey}'), site_url('wp-login.php', 'login'));
+				echo add_query_arg(array('action' => 'logout', '_wpnonce' => '{Nonce}'), site_url('wp-login.php', 'login'));
 			?></span></td>
 		</tr>
 	</table>
@@ -140,105 +141,105 @@ function vanilla_sso_options() {
 }
 
 // Make sure that wordpress cookies don't set the path variable and are accessible to all subdomains.
-if ( !function_exists('wp_set_auth_cookie') ) :
-/**
- * Sets the authentication cookies based User ID.
- *
- * The $remember parameter increases the time that the cookie will be kept. The
- * default the cookie is kept without remembering is two days. When $remember is
- * set, the cookies will be kept for 14 days or two weeks.
- *
- * @since 2.5
- *
- * @param int $user_id User ID
- * @param bool $remember Whether to remember the user or not
- */
-function wp_set_auth_cookie($user_id, $remember = false, $secure = '') {
-	if ( $remember ) {
-		$expiration = $expire = time() + apply_filters('auth_cookie_expiration', 1209600, $user_id, $remember);
-	} else {
-		$expiration = time() + apply_filters('auth_cookie_expiration', 172800, $user_id, $remember);
-		$expire = 0;
-	}
-
-	if ( '' === $secure )
-		$secure = is_ssl() ? true : false;
-
-	if ( $secure ) {
-		$auth_cookie_name = SECURE_AUTH_COOKIE;
-		$scheme = 'secure_auth';
-	} else {
-		$auth_cookie_name = AUTH_COOKIE;
-		$scheme = 'auth';
-	}
-
-	$auth_cookie = wp_generate_auth_cookie($user_id, $expiration, $scheme);
-	$logged_in_cookie = wp_generate_auth_cookie($user_id, $expiration, 'logged_in');
-
-	do_action('set_auth_cookie', $auth_cookie, $expire, $expiration, $user_id, $scheme);
-	do_action('set_logged_in_cookie', $logged_in_cookie, $expire, $expiration, $user_id, 'logged_in');
-	$VanillaCookiePath = '/';
-	$VanillaCookieDomain = get_option('vanilla_cookie_domain');
-
-	// Set httponly if the php version is >= 5.2.0
-	if ( version_compare(phpversion(), '5.2.0', 'ge') ) {
-		setcookie($auth_cookie_name, $auth_cookie, $expire, $VanillaCookiePath, $VanillaCookieDomain, $secure, true);
-		setcookie($auth_cookie_name, $auth_cookie, $expire, $VanillaCookiePath, $VanillaCookieDomain, $secure, true);
-		setcookie(LOGGED_IN_COOKIE, $logged_in_cookie, $expire, $VanillaCookiePath, $VanillaCookieDomain, false, true);
-		if ( COOKIEPATH != SITECOOKIEPATH )
-			setcookie(LOGGED_IN_COOKIE, $logged_in_cookie, $expire, $VanillaCookiePath, $VanillaCookieDomain, false, true);
-	} else {
-		$cookie_domain = $VanillaCookieDomain;
-		if ( !empty($cookie_domain) )
-			$cookie_domain .= '; HttpOnly';
-		setcookie($auth_cookie_name, $auth_cookie, $expire, $VanillaCookiePath, $cookie_domain, $secure);
-		setcookie($auth_cookie_name, $auth_cookie, $expire, $VanillaCookiePath, $cookie_domain, $secure);
-		setcookie(LOGGED_IN_COOKIE, $logged_in_cookie, $expire, $VanillaCookiePath, $cookie_domain);
-		if ( COOKIEPATH != SITECOOKIEPATH )
-			setcookie(LOGGED_IN_COOKIE, $logged_in_cookie, $expire, $VanillaCookiePath, $cookie_domain);
-	}
+if ( !function_exists('wp_set_auth_cookie') ) {
+   /**
+    * Sets the authentication cookies based User ID.
+    *
+    * The $remember parameter increases the time that the cookie will be kept. The
+    * default the cookie is kept without remembering is two days. When $remember is
+    * set, the cookies will be kept for 14 days or two weeks.
+    *
+    * @since 2.5
+    *
+    * @param int $user_id User ID
+    * @param bool $remember Whether to remember the user or not
+    */
+   function wp_set_auth_cookie($user_id, $remember = false, $secure = '') {
+   	if ( $remember ) {
+   		$expiration = $expire = time() + apply_filters('auth_cookie_expiration', 1209600, $user_id, $remember);
+   	} else {
+   		$expiration = time() + apply_filters('auth_cookie_expiration', 172800, $user_id, $remember);
+   		$expire = 0;
+   	}
+   
+   	if ( '' === $secure )
+   		$secure = is_ssl() ? true : false;
+   
+   	if ( $secure ) {
+   		$auth_cookie_name = SECURE_AUTH_COOKIE;
+   		$scheme = 'secure_auth';
+   	} else {
+   		$auth_cookie_name = AUTH_COOKIE;
+   		$scheme = 'auth';
+   	}
+   
+   	$auth_cookie = wp_generate_auth_cookie($user_id, $expiration, $scheme);
+   	$logged_in_cookie = wp_generate_auth_cookie($user_id, $expiration, 'logged_in');
+   
+   	do_action('set_auth_cookie', $auth_cookie, $expire, $expiration, $user_id, $scheme);
+   	do_action('set_logged_in_cookie', $logged_in_cookie, $expire, $expiration, $user_id, 'logged_in');
+   	$VanillaCookiePath = '/';
+   	$VanillaCookieDomain = get_option('vanilla_cookie_domain');
+   
+   	// Set httponly if the php version is >= 5.2.0
+   	if ( version_compare(phpversion(), '5.2.0', 'ge') ) {
+   		setcookie($auth_cookie_name, $auth_cookie, $expire, $VanillaCookiePath, $VanillaCookieDomain, $secure, true);
+   		setcookie($auth_cookie_name, $auth_cookie, $expire, $VanillaCookiePath, $VanillaCookieDomain, $secure, true);
+   		setcookie(LOGGED_IN_COOKIE, $logged_in_cookie, $expire, $VanillaCookiePath, $VanillaCookieDomain, false, true);
+   		if ( COOKIEPATH != SITECOOKIEPATH )
+   			setcookie(LOGGED_IN_COOKIE, $logged_in_cookie, $expire, $VanillaCookiePath, $VanillaCookieDomain, false, true);
+   	} else {
+   		$cookie_domain = $VanillaCookieDomain;
+   		if ( !empty($cookie_domain) )
+   			$cookie_domain .= '; HttpOnly';
+   		setcookie($auth_cookie_name, $auth_cookie, $expire, $VanillaCookiePath, $cookie_domain, $secure);
+   		setcookie($auth_cookie_name, $auth_cookie, $expire, $VanillaCookiePath, $cookie_domain, $secure);
+   		setcookie(LOGGED_IN_COOKIE, $logged_in_cookie, $expire, $VanillaCookiePath, $cookie_domain);
+   		if ( COOKIEPATH != SITECOOKIEPATH )
+   			setcookie(LOGGED_IN_COOKIE, $logged_in_cookie, $expire, $VanillaCookiePath, $cookie_domain);
+   	}
+   }
 }
-endif;
 
-if ( !function_exists('wp_clear_auth_cookie') ) :
-/**
- * Removes all of the cookies associated with authentication.
- *
- * @since 2.5
- */
-function wp_clear_auth_cookie() {
-	do_action('clear_auth_cookie');
-	
-	$VanillaCookiePath = '/';
-	$VanillaCookieDomain = get_option('vanilla_cookie_domain');
-
-	setcookie(AUTH_COOKIE, ' ', time() - 31536000, ADMIN_COOKIE_PATH, COOKIE_DOMAIN);
-	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, ADMIN_COOKIE_PATH, COOKIE_DOMAIN);
-	setcookie(AUTH_COOKIE, ' ', time() - 31536000, PLUGINS_COOKIE_PATH, COOKIE_DOMAIN);
-	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, PLUGINS_COOKIE_PATH, COOKIE_DOMAIN);
-	setcookie(LOGGED_IN_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
-	setcookie(LOGGED_IN_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
-
-	// Old cookies
-	setcookie(AUTH_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
-	setcookie(AUTH_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
-	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
-	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
-
-	// Even older cookies
-	setcookie(USER_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
-	setcookie(PASS_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
-	setcookie(USER_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
-	setcookie(PASS_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
-
-	// WordPress' new Vanilla SSO cookies
-	setcookie(AUTH_COOKIE, ' ', time() - 31536000, $VanillaCookiePath, $VanillaCookieDomain);
-	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, $VanillaCookiePath, $VanillaCookieDomain);
-	setcookie(LOGGED_IN_COOKIE, ' ', time() - 31536000, $VanillaCookiePath, $VanillaCookieDomain);
-	setcookie(USER_COOKIE, ' ', time() - 31536000, $VanillaCookiePath, $VanillaCookieDomain);
-	setcookie(PASS_COOKIE, ' ', time() - 31536000, $VanillaCookiePath, $VanillaCookieDomain);
-	
-	// Destroy Vanilla's session cookie as well
-	setcookie(VANILLA_COOKIE, ' ', time() - 31536000, $VanillaCookiePath, $VanillaCookieDomain);
+if ( !function_exists('wp_clear_auth_cookie') ) {
+   /**
+    * Removes all of the cookies associated with authentication.
+    *
+    * @since 2.5
+    */
+   function wp_clear_auth_cookie() {
+   	do_action('clear_auth_cookie');
+   	
+   	$VanillaCookiePath = '/';
+   	$VanillaCookieDomain = get_option('vanilla_cookie_domain');
+   
+   	setcookie(AUTH_COOKIE, ' ', time() - 31536000, ADMIN_COOKIE_PATH, COOKIE_DOMAIN);
+   	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, ADMIN_COOKIE_PATH, COOKIE_DOMAIN);
+   	setcookie(AUTH_COOKIE, ' ', time() - 31536000, PLUGINS_COOKIE_PATH, COOKIE_DOMAIN);
+   	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, PLUGINS_COOKIE_PATH, COOKIE_DOMAIN);
+   	setcookie(LOGGED_IN_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
+   	setcookie(LOGGED_IN_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
+   
+   	// Old cookies
+   	setcookie(AUTH_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
+   	setcookie(AUTH_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
+   	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
+   	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
+   
+   	// Even older cookies
+   	setcookie(USER_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
+   	setcookie(PASS_COOKIE, ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
+   	setcookie(USER_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
+   	setcookie(PASS_COOKIE, ' ', time() - 31536000, SITECOOKIEPATH, COOKIE_DOMAIN);
+   
+   	// WordPress' new Vanilla SSO cookies
+   	setcookie(AUTH_COOKIE, ' ', time() - 31536000, $VanillaCookiePath, $VanillaCookieDomain);
+   	setcookie(SECURE_AUTH_COOKIE, ' ', time() - 31536000, $VanillaCookiePath, $VanillaCookieDomain);
+   	setcookie(LOGGED_IN_COOKIE, ' ', time() - 31536000, $VanillaCookiePath, $VanillaCookieDomain);
+   	setcookie(USER_COOKIE, ' ', time() - 31536000, $VanillaCookiePath, $VanillaCookieDomain);
+   	setcookie(PASS_COOKIE, ' ', time() - 31536000, $VanillaCookiePath, $VanillaCookieDomain);
+   	
+   	// Destroy Vanilla's session cookie as well
+   	setcookie(VANILLA_COOKIE, ' ', time() - 31536000, $VanillaCookiePath, $VanillaCookieDomain);
+   }
 }
-endif;

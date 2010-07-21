@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProxyConnect'] = array(
 	'Name' => 'Proxy Connect SSO',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
-   'Version' => '1.3',
+   'Version' => '1.4',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -99,6 +99,9 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    }
    
    public function EntryController_SigninLoopback_Create(&$Sender) {
+      $Args = $Sender->RequestArgs;
+      $Redirect = (sizeof($Args)) ? $Args[0] : '/';
+
       $RealUserID = Gdn::Authenticator()->GetRealIdentity();
       $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
       if ($RealUserID == -1) {
@@ -106,14 +109,21 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          if (Gdn::Authenticator()->GetIdentity()) {
             Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
          } else {
-            $RealSigninURL = $Authenticator->GetURL('Real'.Gdn_Authenticator::URL_SIGNIN);
+            $RealSigninURL = Gdn::Authenticator()->GetURL('Real'.Gdn_Authenticator::URL_SIGNIN, $Redirect);
+            $Authenticator->SetIdentity(NULL);
             Redirect($RealSigninURL,302);
          }
       }
    }
    
    public function Setup() {
-		// Do nothing
+		$NumLookupMethods = 0;
+		
+		if (function_exists('fsockopen')) $NumLookupMethods++;
+		if (function_exists('curl_init')) $NumLookupMethods++;
+		
+		if (!$NumLookupMethods)
+		 throw new Exception(T("Unable to initialize plugin: required connectivity libraries not found, need either 'fsockopen' or 'curl'."));
    }
    
    public function OnDisable() {

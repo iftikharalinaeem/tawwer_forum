@@ -472,3 +472,21 @@ a.Close:hover {
 #Status {
 	background: #494949;
 }
+
+div.UserSpoiler {
+   background-color: #595959;
+   color: #CCCCCC;
+}
+
+div.UserSpoiler div.SpoilerTitle span {
+   color: white;
+}
+
+div.UserSpoiler div.SpoilerTitle input {
+   border: 1px solid grey;
+   color: #232323;
+}
+
+div.UserSpoiler div.SpoilerText {
+   border-left: 1px solid grey;
+}

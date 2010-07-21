@@ -64,10 +64,11 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
    }
    
    Gdn_MultiFileUpload.prototype.NewUploader = function() {
-      var NewUploaderID = null;
+      var NewUploaderID = null; var AutoShow = false;
       if (this.CurrentInput == null) {
          NewUploaderID = 1;
       } else {
+         AutoShow = true;
          NewUploaderID = parseInt(this.CurrentInput.split('_').pop()) + 1;
       }
       
@@ -133,6 +134,9 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
          'Size':     0,
          'Complete': false
       };
+      
+      if (AutoShow)
+         this.ShowUploader(true);
       $('#'+this.CurrentInput).change(jQuery.proxy(this.DispatchCurrentUploader,this));
    }
    
@@ -142,6 +146,7 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
          $('#CurrentUploader').animate({
             'height': '24px'
          },300,jQuery.proxy(function(){
+            $('#CurrentUploader form input[type=file]').css('display', 'block');
             $('#CurrentUploader form input[type=file]').animate({
                'opacity': 1
             });
@@ -150,9 +155,8 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
          $('#CurrentUploader').animate({
             'height': '24px'
          },0,function(){
-            $('#CurrentUploader form input[type=file]').css({
-               'opacity': 1
-            });
+            $('#CurrentUploader form input[type=file]').css('display','block');
+            $('#CurrentUploader form input[type=file]').css('opacity',1);
          });
       }
    }

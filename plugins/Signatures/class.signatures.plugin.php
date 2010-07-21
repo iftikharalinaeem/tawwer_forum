@@ -54,9 +54,9 @@ class SignaturesPlugin extends Gdn_Plugin {
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigArray = array(
-         'Plugin.Signature.Sig'           => NULL,
-         'Plugin.Signature.HideAll'       => NULL,
-         'Plugin.Signature.HideImages'    => NULL
+         'Plugin.Signatures.Sig'           => NULL,
+         'Plugin.Signatures.HideAll'       => NULL,
+         'Plugin.Signatures.HideImages'    => NULL
       );
       $SigUserID = $ViewingUserID = Gdn::Session()->UserID;
       
@@ -68,10 +68,10 @@ class SignaturesPlugin extends Gdn_Plugin {
       $Sender->SetData('Plugin-Signatures-ForceEditing', ($SigUserID == Gdn::Session()->UserID) ? FALSE : $Sender->User->Name);
       
       // TIM: Waiting for RC3...
-      //$UserMeta = $this->GetUserMeta($SigUserID, 'Plugin.Signature.%');
+      $UserMeta = $this->GetUserMeta($SigUserID, '%');
       
       // TIM: Leaving this here until RC3+
-      $UserMeta = $this->_GetUserSignatureData($SigUserID);
+      // $UserMeta = $this->_GetUserSignatureData($SigUserID);
       //
       
       if ($Sender->Form->AuthenticatedPostBack() === FALSE)
@@ -91,6 +91,8 @@ class SignaturesPlugin extends Gdn_Plugin {
          $FrmValues = array_intersect_key($Values, $ConfigArray);
          if (sizeof($FrmValues)) {
             foreach ($FrmValues as $UserMetaKey => $UserMetaValue) {
+               $this->SetUserMeta($SigUserID, $this->TrimMetaKey($UserMetaKey), $UserMetaValue);
+/*
                try {
                   Gdn::SQL()->Insert('UserMeta', array(
                         'UserID' => $SigUserID,
@@ -105,6 +107,7 @@ class SignaturesPlugin extends Gdn_Plugin {
                      ->Where('Name', $UserMetaKey)
                      ->Put();
                }
+*/
             }
          }
          
@@ -141,16 +144,20 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       $UserSignatures = array();
       if (sizeof($UserIDList)) {
-         $SQL = Gdn::SQL();
-         $Signatures = $SQL
+/*
+         $Signatures = Gdn::SQL()
             ->Select('*')
             ->From('UserMeta')
             ->WhereIn('UserID', array_keys($UserIDList))
             ->Where('Name', 'Plugin.Signature.Sig')
             ->Get();
-         
+            
          while ($UserSig = $Signatures->NextRow())
             $UserSignatures[$UserSig->UserID] = $UserSig->Value;
+*/
+         $Signatures = $this->GetUserMeta(array_keys($UserIDList), 'Sig');
+         foreach ($Signatures as $UserID => $UserSig)
+            $UserSignatures[$UserID] = $UserSig[$this->MakeMetaKey('Sig')];
       }
       $Sender->SetData('Plugin-Signatures-UserSignatures', $UserSignatures);
    }
@@ -171,13 +178,15 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    public function GetUserSignature($UserID, $Default = NULL) {
-      $SQL = Gdn::SQL();
-      $UserSig = $SQL
+/*
+      $UserSig = Gdn::SQL()
          ->Select('*')
          ->From('UserMeta')
          ->Where('UserID', $UserID)
          ->Where('Name', 'Plugin.Signature.Sig')
          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+*/
+      $UserSig = $this->GetUserMeta($UserID, 'Sig');
          
       return (is_array($UserSig)) ? $UserSig['Value'] : $Default;
    }
@@ -203,7 +212,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       $UserSignatures =& $Sender->Data('Plugin-Signatures-UserSignatures');
       
       if (isset($UserSignatures[$SourceUserID])) {
-         $HideImages = ArrayValue('Plugin.Signature.HideImages', $Sender->Data('Plugin-Signatures-ViewingUserData'), FALSE);
+         $HideImages = ArrayValue('Plugin.Signatures.HideImages', $Sender->Data('Plugin-Signatures-ViewingUserData'), FALSE);
          
          $UserSig = $UserSignatures[$SourceUserID];
          
@@ -229,24 +238,24 @@ class SignaturesPlugin extends Gdn_Plugin {
    protected function _HideAllSignatures(&$Sender) {
       
       if (!$Sender->Data('Plugin-Signatures-ViewingUserData')) {
-         // TIM: Commented this out until RC3 releases and we can start using Gdn_Plugin::GetUserMeta()
+         // TIM: RC3 now, using built in UserMeta methods
          //
-         //$Session = Gdn::Session();
-         //$ViewingUserID = $Session->UserID;
-         //$UserSig = $this->GetUserMeta($ViewingUserID, 'Plugin.Signature.%');
+         $UserSig = $this->GetUserMeta(Gdn::Session()->UserID, '%');
          
-         // TIM: Leaving this here until RC3+
-         $UserSig = $this->_GetUserSignatureData();
+         // TIM: Leaving this here until RC3+ UserMeta stuff is proven
+         //$UserSig = $this->_GetUserSignatureData();
          //
          
          $Sender->SetData('Plugin-Signatures-ViewingUserData',$UserSig);
       }
       
-      $HideSigs = ArrayValue('Plugin.Signature.HideAll', $Sender->Data('Plugin-Signatures-ViewingUserData'), FALSE);
+      $HideSigs = ArrayValue('Plugin.Signatures.HideAll', $Sender->Data('Plugin-Signatures-ViewingUserData'), FALSE);
       if ($HideSigs == "TRUE") return TRUE;
       return FALSE;
    }
    
+/*
+   // Removed because we can now use UserMeta methods
    protected function _GetUserSignatureData($UserID = NULL) {
       if (is_null($UserID))
          $UserID = Gdn::Session()->UserID;
@@ -265,6 +274,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       unset($UserMetaData);
       return $UserSig;
    }
+*/
    
    protected function _StripOnly($str, $tags, $stripContent = false) {
       $content = '';

@@ -72,6 +72,9 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 
 		if (C('EnabledPlugins.VanillaConnect'))
 			$Menu->AddLink('Users', 'Vanilla Connect <span class="New">New</span>', 'settings/vanillaconnect', 'Garden.AdminUser.Only');
+			
+		if (C('EnabledPlugins.ProxyConnect'))
+			$Menu->AddLink('Users', 'Proxy Connect <span class="New">New</span>', 'settings/proxyconnect', 'Garden.AdminUser.Only');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'));
 		if (C('EnabledPlugins.FileUpload'))
