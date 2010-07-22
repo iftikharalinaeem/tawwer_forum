@@ -52,7 +52,7 @@
   // Update doc pages
   
 <strong>Welcome to the Vanilla Community Forum.</strong>
-You've found the source for finding and sharing information about working with and developing for the open-source Vanilla Forum project. <a href="http://vanillaforums.org/page/bugreport">Go here to submit bug reports</a>.
+You've found the source for finding and sharing information about working with and developing for the open-source Vanilla Forum project. <a href="http://github.com/vanillaforums/Garden/issues/">Go here to submit bug reports</a>.
   
 */
 
@@ -208,7 +208,7 @@ i.SpriteDot {
 	height: 20px;
 	width: 20px;
 }
-i.SpriteDotOn { background-position:  0 -210px; }
+i.SpriteDotOn { background-position:  0 -212px; }
 i.SpriteDotOff { background-position:  0 -230px; }
 i.SpriteTools,
 i.SpriteSuit {
@@ -320,122 +320,6 @@ body#vforg_home_index .Banner ul li.Download a { background-position: right -224
 body#vforg_home_index .Banner ul li.Home { background-position: left -192px; }
 body#vforg_home_index .Banner ul li.Home a { background-position: right -192px; }
 
-
-/* ==================================================== VF.org Customizations
-body.Conversations #Content h2 {
-   -moz-border-radius-topleft: 3px;
-   -moz-border-radius-topright: 3px;
-	background: url('images/grey_fade.png') top left repeat-x #ECF0F9;
-   border:1px solid #9CA7B8;
-   padding:4px 8px;
-   text-shadow: 0 1px 0 #fff;
-}
-body.Conversations #Content #MessageForm h2 {
-   background: none;
-   border: 0;
-   color: #000;
-	padding: 0 0 4px;
-	font-size: 120%;
-}
-ul#Conversations {
-   border: 1px solid #9CA7B8;
-   border-top: 0;
-   -moz-border-radius-bottomleft: 3px;
-   -moz-border-radius-bottomright: 3px;
-}
-ul#Conversation {
-   background: #fff;
-   border: 1px solid #9CA7B8;
-   border-top: 0;
-   border-bottom: 0;
-   margin: 0;
-}
-#MessageForm {
-   border: 1px solid #9CA7B8;
-   border-top: 0;
-   margin: 0;
-}
-.Preview li ul.Info li.Author img,
-#Discussion li ul.Info li.Author img {
-   background: url('images/grey_fade.png') top left repeat-x #Ecf0f9;
-   border: 1px solid #9ca7b8;
-   padding: 5px;
-   height: 32px;
-   width: 32px;
-   -moz-border-radius: 3px;
-}
-.Preview li ul.Info li,
-#Discussion li ul.Info li {
-   line-height:2.8;
-}
-#CommentForm {
-   background:#E9F9FF none repeat scroll 0 0;
-   padding:8px;
-}
-.Back {
-   border: 1px solid #9CA7B8;
-   border-top: 0;
-   margin: 0 0 6px;
-   padding: 3px 6px;
-   background: #e9f9ff;
-   text-align: left;
-   -moz-border-radius-bottomright: 2px;
-   -moz-border-radius-bottomleft: 2px;
-   -webkit-border-bottom-right-radius: 2px;
-   -webkit-border-bottom-left-radius: 2px;
-}
-body.Discussion #Content #CommentForm h2 {
-   background: none;
-   border: 0;
-   color: #000;
-}
-ul.DataList li ul li.Title {
-   font-family: 'Trebuchet MS';
-   float: left;
-   width: 558px;
-}
-ul.DataList li ul li.Title strong a {
-   color:#2A529A;
-   text-shadow: 0 1px 0 #fff;
-}
-ul.DataList li.DiscussionRow {
-   background: #f9fcff;
-}
-ul.DataList li.Mine { background: url('images/blue_fade.jpg') top left repeat-x #e8f8ff; }
-ul#Discussion li.Mine { background: #E9F9FF; }
-ul.DataList li.New, li.New { background: url('images/ylw_fade.jpg') top left repeat-x #ffd; }
-ul.DataList li ul li.Meta strong {
-   color:#555;
-}
-#Conversation li a.Photo img,
-#Conversations li a.Photo img {
-	background: url('images/grey_fade.png') top left repeat-x #Ecf0f9;
-   border: 1px solid #9ca7b8;
-   padding: 5px;
-   height: 32px;
-   width: 32px;
-   -moz-border-radius: 3px;
-}
-#Conversation li {
-	border-bottom: 1px solid #ddd;
-}
-#Conversations li,
-#Conversations li.New {
-	background: #fff;
-}
-#Conversations li.Active {
-	background: #ffe;
-}
-#Conversations li a.Message {
-	text-decoration: none;
-}
-div.AddPeople textarea.MultiComplete {
-  width: 248px;
-  margin: 2px 0;
-}
-*/
-
-
 /* Homepage Customizations */
 body#vforg_home_index {
 	background: url('images/bg-fade.png') top left repeat-x #f1e5ca;
@@ -457,6 +341,7 @@ body#vforg_home_index h2 {
 body#vforg_home_index h2 {
 	padding-top: 50px;
 	color: #744000;
+	font-size: 21px;
 }
 body#vforg_home_index div.Wrap {
 	background:url("images/bg-shines.png") no-repeat scroll center top transparent;
@@ -530,7 +415,7 @@ div.ScreenNav {
 }
 a.Get {
 	font-weight: bold;
-	margin-top: 20px;
+	margin-top: 10px;
 	display: block;
 	background: url('images/bg-button-blue.png') top left repeat-x;
 	text-align: center;
