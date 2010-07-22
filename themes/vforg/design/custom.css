@@ -236,7 +236,7 @@ i.SpriteFive { background-position: 0 -148px; }
    text-shadow:0 1px 1px #FEE369;
 	height: 32px;
 	line-height: 31px;
-	padding: 0 14px 0 10px;
+	padding: 0 10px 0 6px;
 	background: url('images/sprite-menu-buttons.png');
 	background-repeat: no-repeat;
 	background-position: right top;
