@@ -11,13 +11,11 @@
 				<ul>
 					<!-- Put your own menu items here -->
 					<li class="Home"><?php echo Anchor('Home', '/'); ?></li>
-					<!-- 
 					<li class="Features"><?php echo Anchor('Features', '/features'); ?></li>
-					-->
 					<li class="Addons"><?php echo Anchor('Addons', '/addons'); ?></li>
 					<li class="Community"><?php echo Anchor('Community', '/discussions'); ?></li>
 					<li class="Documentation"><?php echo Anchor('Documentation', '/docs'); ?></li>
-					<?php if ($this->ControllerName != 'homecontroller' && Gdn::Session()->IsValid() && Gdn::Session()->CheckPermission('Garden.Settings.Manage')) { ?>
+					<?php if (Gdn::Session()->IsValid() && Gdn::Session()->CheckPermission('Garden.Settings.Manage')) { ?>
 					<li class="Dashboard"><?php echo Anchor('Dashboard', '/settings'); ?></li>
 					<?php } ?>
 					<li class="Download"><?php echo Anchor('Download', '/download'); ?></li>

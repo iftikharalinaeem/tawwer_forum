@@ -43,7 +43,8 @@ a.Button,
 }
 
 a.GreenButton,
-a.BigButton {
+a.BigButton,
+a.BlueButton {
 	font-weight: bold;
 	background: url('images/bg-button-blue.png') 0 -140px repeat-x;
 	text-align: center;
@@ -57,11 +58,19 @@ a.BigButton {
    -moz-border-radius: 5px;
    -webkit-border-radius: 5px;	
 }
+a.BlueButton {
+	padding: 6px;
+	border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;	
+}
+a.BlueButton:hover,
 a.BigButton:hover {
 	color: #FFFFFF;
 	text-shadow:0 1px 1px #111196;
 	background-position: 0 0;
 }
+a.BlueButton:focus,
 a.BigButton:focus {
 	color: #FFFFFF;
 	text-shadow:0 1px 1px #111196;
@@ -159,6 +168,18 @@ i.SpriteSuit {
 }
 i.SpriteTools { background-position: -48px -136px; }
 i.SpriteSuit { background-position: -48px -184px; }
+i.SpriteNumber {
+	background-image: url('images/sprite-numbers.png');
+	height: 38px;
+	width: 38px;
+	position: absolute;
+	left: -12px;
+}
+i.SpriteOne { background-position: 0 0; }
+i.SpriteTwo { background-position: 0 -42px; }
+i.SpriteThree { background-position: 0 -84px; }
+i.SpriteFour { background-position: 0 -126px; }
+i.SpriteFive { background-position: 0 -148px; }
 
 /* ---- Banner ---- */
 
@@ -228,6 +249,7 @@ i.SpriteSuit { background-position: -48px -184px; }
 	text-shadow: 0 1px 1px #111196;
 	background-position: right -96px;
 }
+body#vforg_home_features .Banner ul li.Features,
 body#dashboard_search_index .Banner ul li.Community,
 body.hosting .Banner ul li.Hosting,
 body.Wiki .Banner ul li.Documentation,
@@ -238,6 +260,7 @@ body.Conversations .Banner ul li.Community,
 body.Activity .Banner ul li.Community {
 	background-position: left -64px;
 }
+body#vforg_home_features .Banner ul li.Features a,
 body#vforg_home_index .Banner ul li.Home a,
 body#dashboard_search_index .Banner ul li.Community a,
 body.hosting .Banner ul li.Hosting a,
@@ -265,11 +288,13 @@ body#vforg_home_index .Banner ul li.Home a { background-position: right -192px; 
 body#vforg_home_index {
 	background: url('images/bg-fade.png') top left repeat-x #f1e5ca;
 }
+body#vforg_home_features #Content,
 body#vforg_download_index #Content,
 body#vforg_home_index #Content {
 	float: none;
 	width: auto;
 }
+body#vforg_home_features #Panel,
 body#vforg_download_index #Panel,
 body#vforg_home_index #Panel {
 	display: none;
@@ -985,4 +1010,146 @@ body.Discussions div.SearchForm input.Button {
    font-size: 14px;
    padding: 8px 4px;
 }
-.SearchTabs
+
+/* Features Page */
+i.SpriteWand,
+i.SpriteColors,
+i.SpriteBars {
+	float: left;
+	display: block;
+	margin-right: 6px;
+	background-image: url('images/sprite-icons.png');
+	background-repeat: no-repeat;
+}
+i.SpriteWand {
+	height: 41px;
+	width: 41px;
+	background-position: -81px 0;
+}
+i.SpriteColors {
+	height: 44px;
+	width: 42px;
+	background-position: -127px 0;
+}
+i.SpriteBars {
+	height: 46px;
+	width: 41px;
+	background-position: -173px 0;
+}
+.PlansWrapper {
+	padding-top: 30px;
+}
+div.SubHead {
+	clear: both;
+}
+div.Feature,
+.FeatureSections {
+	text-align: left;
+	float: left;
+	width: 100%;
+	background: url('images/bg-shade.png') top left repeat-x;
+	padding: 10px 0;
+	margin: 20px 0 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+   box-shadow: 0 1px 0 #fbf7ea;
+	-moz-box-shadow: 0 1px 0 #fbf7ea;
+	-webkit-box-shadow: 0 1px 0 #fbf7ea;
+}
+.FeatureSections {
+	margin: 20px 0 40px;
+}
+div#Features {
+	color: #744000;
+}
+div#Features ol li {
+	list-style: decimal;
+}
+div#Features h2 {
+	font-size: 25px;
+	border: none;
+}
+div#Features h4 {
+	font-size: 22px;
+	border: none;
+}
+div#Features div.Feature h4 {
+	padding-left: 12px;
+}
+div.Feature {
+	padding: 10px 0 0;
+	text-align: left;
+}
+.FeatureSections div {
+	float: left;
+	width: 290px;
+	margin: 0 15px;
+}
+.PlansWrapper {
+	padding-top: 30px;
+	clear: left;
+}
+.FeaturePage .Feature {
+	height: auto;
+	margin-bottom: 20px;
+}
+.FeaturePage .Feature div {
+	float: none;
+	width: auto;
+	margin: 0;
+}
+.Feature h4,
+.FeatureSections h4 {
+	margin: 0;
+	padding: 0;
+	color: #fff;
+	font-weight: 400;
+	text-shadow: 0 1px 0 #000;
+	font-size: 22px;
+	line-height: 2;
+}
+div.Feature h4 {
+	padding: 0 10px;	
+}
+.Feature ol {
+	margin: 0 32px;
+	padding: 0 50px;
+}
+.FeaturePage p,
+.Feature li,
+.FeatureSections p.About {
+	clear: left;
+	font-size: 13px;
+	line-height: 1.4;
+	text-shadow: 0 1px 0 #fff;
+	margin: 0;
+	padding: 6px 3px 10px;
+}
+.Feature li,
+.FeaturePage .Feature p.About {
+	font-weight: bold;
+}
+.Feature img {
+	padding-left: 10px;
+}
+.FeaturePage .Feature p {
+	padding: 0 64px;
+}
+.FeaturePanel span.Description {
+	display: block;
+	clear: both;
+	padding: 0 0 0 35px;
+}
+.FeaturePanel span.Description strong {
+	font-weight: bold;
+	font-size: 16px;
+	display: block;
+	padding: 30px 0 0;
+}
+.FeaturePanel span.Description p {
+	font-weight: bold;
+	padding: 0;
+}
+.FeaturePanel img {
+	float: right;
+}
