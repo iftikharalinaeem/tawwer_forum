@@ -15,6 +15,7 @@
 					<li class="Addons"><?php echo Anchor('Addons', '/addons'); ?></li>
 					<li class="Community"><?php echo Anchor('Community', '/discussions'); ?></li>
 					<li class="Documentation"><?php echo Anchor('Documentation', '/docs'); ?></li>
+					<li class="Blog"><?php echo Anchor('Blog', '/blog'); ?></li>
 					<?php if (Gdn::Session()->IsValid() && Gdn::Session()->CheckPermission('Garden.Settings.Manage')) { ?>
 					<li class="Dashboard"><?php echo Anchor('Dashboard', '/settings'); ?></li>
 					<?php } ?>
