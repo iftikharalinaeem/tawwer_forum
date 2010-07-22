@@ -645,8 +645,15 @@ div.HeadingTabs div.SubTab {
 ul.Conversations,
 ul.Drafts,
 ul.Discussions,
+ul.SearchResults,
 ul.MessageList li.Item {
 	background: #FEF7DF;
+}
+ul.SearchResults {
+	border-top:1px solid #EED3A2;
+}
+ul.SearchResults li.Item {
+	padding: 8px;
 }
 ul.DataList li.Item,
 ul.MessageList li.Item {
@@ -958,3 +965,24 @@ body#vforg_download_get #Content h1 {
    padding: 0 0 12px !important;
    margin: 0;
 }
+
+/* Search Form over discussions */
+div.SearchTabs,
+body.Discussions div.SearchForm {
+   margin: 0 0 20px;
+   padding: 8px 8px 6px;
+   color: #B76600;
+	background: #FEF7DF;
+	border: 1px solid #EED3A2;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+}
+body.Discussions div.SearchForm input.InputBox {
+   width: 580px;
+   margin: 0 8px 0 0;
+}
+body.Discussions div.SearchForm input.Button {
+   font-size: 14px;
+   padding: 8px 4px;
+}
+.SearchTabs
