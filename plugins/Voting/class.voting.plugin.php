@@ -37,7 +37,7 @@ class VotingPlugin extends Gdn_Plugin {
          $Sort = 'popular';
          
       if ($Sort == 'popular')
-         $Sender->SQL->OrderBy('c.Score', 'desc');
+         $Sender->SQL->OrderBy('coalesce(c.Score, 0)', 'desc');
    }
 
 	/**
