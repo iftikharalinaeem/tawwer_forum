@@ -532,14 +532,21 @@ div.SignInPopup div.Body { max-width:286px; }
 
 
 /* DataList & Headings */
-div.MessageForm, div.Tabs {
+div#MessageForm,
+div.MessageForm,
+div.Tabs {
 	background: none;
 	border-bottom:1px solid #EED3A2;
 	padding: 0 5px; 
 }
+div#MessageForm,
 div.MessageForm {
 	background: #fdfaef;
 	padding: 8px;
+}
+div#MessageForm h2 {
+	border: none;
+	margin: 0 0 2px;
 }
 div.Tabs li a,
 div.Tabs li a:link,
