@@ -88,9 +88,6 @@ ul.Discussions div.ItemContent a.Title {
 	max-width: none;
 }
 
-a.Bookmark {
-	display: none;
-}
 ul.DataList li.Item {
 	position: relative;
 }
@@ -188,7 +185,7 @@ a:hover i.SpriteDown {	background-position: bottom right; }
 
 /* Comments */
 body.Discussion a.Bookmark {
-	margin: 6px 6px 6px 8px;
+	margin: 2px 6px 6px 8px;
 }
 ul.MessageList li.FirstComment {
 	border-bottom: none;
