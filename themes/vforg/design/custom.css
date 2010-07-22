@@ -1,62 +1,3 @@
-/*
-  Queries to run on vf.org to get discussions tagged properly.
-  
-  Insert Tags based on existing categories, which are:
-  Category           ->             Tag
-  --------------------------------------------
-  General                           [Untagged]
-  Vanilla 1                         vanilla1 
-  Vanilla 2                         vanilla2
-  Localization                      locale
-  Themes                            themes
-  Addons                            addons
-                                    plugins
-  Testing                           test
-  VanillaForums.com                 hosting
-  Feedback & FeatureRequests        feature-request
-  
-  // Cleanup
-  truncate table GDN_Tag;
-  truncate table GDN_DiscussionTag;
-  
-  // Insert tags
-  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('vanilla2', 1, now(), 0);
-  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('vanilla1', 1, now(), 0);
-  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('locales', 1, now(), 0);
-  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('themes', 1, now(), 0);
-  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('addons', 1, now(), 0);
-  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('plugins', 1, now(), 0);
-  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('test', 1, now(), 0);
-  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('hosting', 1, now(), 0);
-  insert into GDN_Tag (Name, InsertUserID, DateInserted, CountDiscussions) values ('feature-request', 1, now(), 0);
-  
-  // Insert unions
-  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 1 from GDN_Discussion where CategoryID = 21;
-  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 2 from GDN_Discussion where CategoryID = 7;
-  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 3 from GDN_Discussion where CategoryID = 24;
-  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 4 from GDN_Discussion where CategoryID = 25;
-  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 5 from GDN_Discussion where CategoryID = 13;
-  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 6 from GDN_Discussion where CategoryID = 13;
-  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 7 from GDN_Discussion where CategoryID = 17;
-  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 8 from GDN_Discussion where CategoryID = 22;
-  insert into GDN_DiscussionTag (DiscussionID, TagID) select DiscussionID, 9 from GDN_Discussion where CategoryID = 23;
-  
-  // Update counts
-  update GDN_Tag t set t.CountDiscussions = (select count(DiscussionID) from GDN_DiscussionTag where TagID = t.TagID);
-  
-  // Remove all announcements
-  update GDN_Discussion set Announce = '0';
-  
-  // Update the tableofcontents
-  
-  // Update doc pages
-  
-<strong>Welcome to the Vanilla Community Forum.</strong>
-You've found the source for finding and sharing information about working with and developing for the open-source Vanilla Forum project. <a href="http://github.com/vanillaforums/Garden/issues/">Go here to submit bug reports</a>.
-  
-*/
-
-
 /* ========================================= VanillaForums.org Customizations */
 
 a,
@@ -687,6 +628,7 @@ div.Tabs div.SubTab {
 div.HeadingTabs div.SubTab {
 	line-height: 2;
 }
+ul.Conversations,
 ul.Drafts,
 ul.Discussions,
 ul.MessageList li.Item {
