@@ -477,9 +477,9 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       Gdn_Cookieidentity::DeleteCookie($this->_CookieName);
    }
    
-   public function GetUserKeyFromHandshake($CookiePayload) {
-      $TokenKey = ArrayValue('token', $CookiePayload, FALSE);
-      $ConsumerKey = ArrayValue('consumer_key', $CookiePayload, FALSE);
+   public function GetUserKeyFromHandshake($Handshake) {
+      $TokenKey = ArrayValue('token', $Handshake, FALSE);
+      $ConsumerKey = ArrayValue('consumer_key', $Handshake, FALSE);
       
       $Token = FALSE;
       foreach (array('request','access') as $TokenType) {
@@ -489,16 +489,20 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       return $Token ? $Token->UserKey : $Token;
    }
    
-   public function GetProviderKeyFromHandshake($CookiePayload) {
-      return ArrayValue('consumer_key', $CookiePayload, FALSE);
+   public function GetProviderKeyFromHandshake($Handshake) {
+      return ArrayValue('consumer_key', $Handshake, FALSE);
    }
    
    public function GetTokenKeyFromHandshake($Handshake) {
-      return ArrayValue('token', $CookiePayload, '');
+      return ArrayValue('token', $Handshake, '');
    }
    
    public function GetUserNameFromHandshake($Handshake) {
-      return ArrayValue('name', $CookiePayload, '');
+      return ArrayValue('name', $Handshake, '');
+   }
+   
+   public function GetUserEmailFromHandshake($Handshake) {
+      return $this->GetUserKeyFromHandshake($Handshake);
    }
    
    public function GetURL($URLType) {

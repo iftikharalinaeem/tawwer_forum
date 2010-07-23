@@ -102,6 +102,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $Args = $Sender->RequestArgs;
       $Redirect = (sizeof($Args)) ? $Args[0] : '/';
 
+      $RealSigninURL = Gdn::Authenticator()->GetURL('Real'.Gdn_Authenticator::URL_SIGNIN, $Redirect);
       $RealUserID = Gdn::Authenticator()->GetRealIdentity();
       $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
       if ($RealUserID == -1) {
@@ -109,7 +110,12 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          if (Gdn::Authenticator()->GetIdentity()) {
             Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
          } else {
-            $RealSigninURL = Gdn::Authenticator()->GetURL('Real'.Gdn_Authenticator::URL_SIGNIN, $Redirect);
+            $Authenticator->SetIdentity(NULL);
+            Redirect($RealSigninURL,302);
+         }
+      } else {
+         if ($RealUserID) Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
+         else {
             $Authenticator->SetIdentity(NULL);
             Redirect($RealSigninURL,302);
          }

@@ -59,7 +59,9 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          $UserName = trim(preg_replace('/[^a-z0-9- ]+/i','',$UserName));
          $TransientKey = ArrayValue('TransientKey', $Response, NULL);
          
-         $AuthResponse = $this->ProcessAuthorizedRequest($Provider['AuthenticationKey'], $UserUnique, $UserName, $TransientKey);
+         $AuthResponse = $this->ProcessAuthorizedRequest($Provider['AuthenticationKey'], $UserUnique, $UserName, $TransientKey, array(
+            'Email'  => $UserEmail
+         ));
 
          if ($AuthResponse == Gdn_Authenticator::AUTH_SUCCESS) {
             Gdn::Request()->WithRoute('DefaultController');
@@ -87,7 +89,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       $this->ProcessAuthorizedRequest($ProviderKey, $UserKey);
    }
    
-   public function ProcessAuthorizedRequest($ProviderKey, $UserKey, $UserName = NULL, $ForeignNonce = NULL) {
+   public function ProcessAuthorizedRequest($ProviderKey, $UserKey, $UserName = NULL, $ForeignNonce = NULL, $OptionalPayload = NULL) {
       $Association = Gdn::Authenticator()->GetAssociation($UserKey, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
       
       // We havent created a user entry yet. Lets!
@@ -117,7 +119,8 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          $CookiePayload = array(
             'UserKey'      => $UserKey,
             'ProviderKey'  => $ProviderKey,
-            'UserName'     => $UserName
+            'UserName'     => $UserName,
+            'UserOptional' => Gdn_Format::Serialize($OptionalPayload)
          );
          $SerializedCookiePayload = Gdn_Format::Serialize($CookiePayload);
          $this->_Remember($ProviderKey, $SerializedCookiePayload);
@@ -168,6 +171,15 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    
    public function GetTokenKeyFromHandshake($Handshake) {
       return '';  // this authenticator doesnt use tokens
+   }
+   
+   public function GetUserEmailFromHandshake($Handshake) {
+      static $UserOptional = NULL;
+      
+      if (is_null($UserOptional)) {
+         $UserOptional = Gdn_Format::Unserialize(ArrayValue('UserOptional', $Handshake, array()));
+      }
+      return ArrayValue('Email', $UserOptional, '');
    }
    
    public function DeAuthenticate() {
@@ -228,7 +240,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
                'Email'        => ArrayValue('Email', $Result),
                'Name'         => ArrayValue('Name', $Result),
                'UniqueID'     => ArrayValue('UniqueID', $Result),
-               'TransientKey' => ArrayValue('TransientKey', $Result)
+               'TransientKey' => ArrayValue('TransientKey', $Result. NULL)
             );
             return $ReturnArray;
          }
