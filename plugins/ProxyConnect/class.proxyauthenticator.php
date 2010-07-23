@@ -47,14 +47,19 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
             ->Get()
             ->FirstRow(DATASET_TYPE_ARRAY);
          if (!$Provider) throw new Exception();
-         
          // Got a response from the remote identity provider
+         
+         $AuthUniqueField = C('Garden.Authenticators.proxy.AuthField','UniqueID');
+         $UserUnique = ArrayValue($AuthUniqueField, $Response, NULL);
+         if (is_null($UserUnique))
+            throw new Exception("Selected AuthUniqueField ({$AuthUniqueField}) not found in Response.");
+         
          $UserEmail = ArrayValue('Email', $Response);
          $UserName = ArrayValue('Name', $Response);
          $UserName = trim(preg_replace('/[^a-z0-9- ]+/i','',$UserName));
          $TransientKey = ArrayValue('TransientKey', $Response, NULL);
          
-         $AuthResponse = $this->ProcessAuthorizedRequest($Provider['AuthenticationKey'], $UserEmail, $UserName, $TransientKey);
+         $AuthResponse = $this->ProcessAuthorizedRequest($Provider['AuthenticationKey'], $UserUnique, $UserName, $TransientKey);
 
          if ($AuthResponse == Gdn_Authenticator::AUTH_SUCCESS) {
             Gdn::Request()->WithRoute('DefaultController');
