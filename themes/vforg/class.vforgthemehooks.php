@@ -16,15 +16,26 @@ class VFOrgThemeHooks implements Gdn_IPlugin {
       return TRUE;
    }
    
-   public function Base_Render_Before(&$Sender) {
-      if ($Sender->Head->Title() == Gdn::Config('Garden.Title'))
+   public function Base_Render_Before($Sender) {
+      if ($Sender->Head->Title() == C('Garden.Title'))
          $Sender->Head->Title('Vanilla - Free, Open-Source Forum Software');
    }
    
-   public function DiscussionsController_Render_Before(&$Sender) {
+   public function DiscussionsController_Render_Before($Sender) {
       $RecentActivityModule = new RecentActivityModule();
       $RecentActivityModule->GetData();
       $Sender->AddModule($RecentActivityModule);
+   }
+   
+   public function PostController_Render_Before($Sender) {
+      $Sender->Head->AddString("<script type=\"text/javascript\">
+jQuery(document).ready(function($) {
+   $('.HelpFormat, .HelpTags').hide();
+   $('#Form_Name').focus(function() { $('.Help').hide(); $('.HelpTitle').show(); });
+   $('#Form_Body').focus(function() { $('.Help').hide(); $('.HelpFormat').show(); });
+   $('#Form_Tags').focus(function() { $('.Help').hide(); $('.HelpTags').show(); });
+});
+</script>");
    }
    
 }

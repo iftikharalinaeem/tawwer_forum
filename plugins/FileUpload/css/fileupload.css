@@ -2,6 +2,13 @@
    margin-bottom: 0px;
 }
 
+body #DiscussionForm form.FileUpload {
+   background: transparent;
+   border: 0px;
+   margin: 0px;
+   padding: 0px;
+}
+
 div.AttachFileWrapper {
    margin-bottom: 2px;
    padding: 5px;
@@ -53,10 +60,13 @@ div.AttachFileWrapper div.AttachFileLink {
    position: relative;
 }
 
-div.AttachFileWrapper div.AttachFileLink input {
-   position: absolute;
-   top: 0px;
-   left: 0px;
+div.AttachFileWrapper div.AttachFileLink div#CurrentUploader {
+   height: 0px;
+   width: 350px;
+}
+
+div.AttachFileWrapper div.AttachFileLink div#CurrentUploader input[type=file] {
+   display: none;
 }
 
 div.AttachFileWrapper div.NewAttachment {

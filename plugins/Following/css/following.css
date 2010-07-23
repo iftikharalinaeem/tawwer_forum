@@ -1,0 +1,15 @@
+div#FollowingPluginUsers div.FriendsList img {
+   width: 24px;
+   height: 24px;
+}
+
+div#FollowingPluginUsers div.FriendsList {
+   overflow: hidden;
+   height: 100%;
+}
+
+div#FollowingPluginUsers div.FriendsList div {
+   float: left;
+   width: 24px;
+   margin-right: 5px;
+}

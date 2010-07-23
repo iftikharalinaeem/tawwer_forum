@@ -1,6 +1,7 @@
 /* Body & Header */
 body {
    background: #595959;
+   color: #CCCCCC;
 }
 a,
 a:link,
@@ -144,6 +145,11 @@ ul.DataList div.Meta strong {
    color: #222;
    padding:1px 4px;
 }
+div.MessageForm a.Back,
+div.MessageForm a.Back:link,
+div.MessageForm a.Back:hover,
+div.MessageForm a.Back:active,
+div.MessageForm a.Back:visited,
 div.MessageForm a.Cancel,
 div.MessageForm a.Cancel:link,
 div.MessageForm a.Cancel:hover,
@@ -168,6 +174,7 @@ div.Tabs li a:visited {
    color: #7F7F7F;
    border: 1px solid #353535;
 }
+div.MessageForm a.Back:hover,
 div.MessageForm a.Cancel:hover,
 div.MorePager li a:hover,
 a.TabLink:hover,
@@ -464,4 +471,22 @@ a.Close:hover {
 }
 #Status {
 	background: #494949;
+}
+
+div.UserSpoiler {
+   background-color: #595959;
+   color: #CCCCCC;
+}
+
+div.UserSpoiler div.SpoilerTitle span {
+   color: white;
+}
+
+div.UserSpoiler div.SpoilerTitle input {
+   border: 1px solid grey;
+   color: #232323;
+}
+
+div.UserSpoiler div.SpoilerText {
+   border-left: 1px solid grey;
 }

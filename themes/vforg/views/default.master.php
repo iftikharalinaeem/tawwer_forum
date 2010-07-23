@@ -4,71 +4,54 @@
    <?php $this->RenderAsset('Head'); ?>
 </head>
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
-	<div class="Banner">
-		<div class="BannerWrapper">
-			<h1><a href="<?php echo Url('/'); ?>"><span><?php echo Gdn_Theme::Logo(); ?></span></a></h1>
-			<div class="Buttons">
-				<div class="UserOptions">
-					<div>
-						<?php
-							$Session = Gdn::Session();
-							$Authenticator = Gdn::Authenticator();
-							if ($Session->IsValid()) {
-								$Name = '<em>'.$Session->User->Name.'</em>';
-								$CountNotifications = 0;
-								if (is_numeric($CountNotifications) && $CountNotifications > 0)
-									$Name .= '<span>'.$CountNotifications.'</span>';
-									
-								echo Anchor(
-									$Name,
-									$CountNotifications > 0 ? '/profile/notifications' : '/profile/'.$Session->UserID.'/'.$Session->User->Name,
-									'Username'
-								);
-		
-								$Inbox = '<em>Inbox</em>';
-								$CountUnreadConversations = 0;
-								if (is_numeric($CountUnreadConversations) && $CountUnreadConversations > 0)
-									$Inbox .= '<span>'.$CountUnreadConversations.'</span>';
-						
-								echo Anchor($Inbox, '/messages/all', 'Inbox');
-		
-								if ($Session->CheckPermission('Garden.Settings.Manage')) {
-									echo Anchor('Dashboard', '/dashboard/settings', 'Dashboard');
-								} else if ($Session->CheckPermission(array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'))) {
-									echo Anchor('Users', '/user/browse', 'Dashboard');
-								}
-								
-								echo Anchor('Sign Out', str_replace('{Session_TransientKey}', $Session->TransientKey(), $Authenticator->SignOutUrl()), 'Leave');
-							} else {
-								echo Anchor('Sign In', $Authenticator->SignInUrl($this->SelfUrl), 'SignInPopup');
-								echo Anchor('Apply for Membership', $Authenticator->RegisterUrl($this->SelfUrl), 'Register');
-							}
-						?>
-					</div>
-				</div>
+	<div class="Wrap">
+		<div class="Banner">
+			<div class="BannerWrapper">
+				<h1><a href="<?php echo Url('/'); ?>"><span><?php echo Gdn_Theme::Logo(); ?></span></a></h1>
 				<ul>
-					<li class="Download"><?php echo Anchor('Download', '/download'); ?></li>
-					<li class="Hosting"><?php echo Anchor('Hosting', '/hosting'); ?></li>
-					<li class="Documentation"><?php echo Anchor('Documentation', '/docs'); ?></li>
-					<li class="Community"><?php echo Anchor('Community', '/discussions'); ?></li>
-					<li class="Addons"><?php echo Anchor('Addons', '/addons'); ?></li>
-					<li class="Blog"><?php echo Anchor('Blog', '/blog'); ?></li>
+					<!-- Put your own menu items here -->
 					<li class="Home"><?php echo Anchor('Home', '/'); ?></li>
+					<li class="Features"><?php echo Anchor('Features', '/features'); ?></li>
+					<li class="Addons"><?php echo Anchor('Addons', '/addons'); ?></li>
+					<li class="Community"><?php echo Anchor('Community', '/discussions'); ?></li>
+					<li class="Documentation"><?php echo Anchor('Documentation', '/docs'); ?></li>
+					<li class="Blog"><?php echo Anchor('Blog', '/blog'); ?></li>
+					<?php if (Gdn::Session()->IsValid() && Gdn::Session()->CheckPermission('Garden.Settings.Manage')) { ?>
+					<li class="Dashboard"><?php echo Anchor('Dashboard', '/settings'); ?></li>
+					<?php } ?>
+					<li class="Download"><?php echo Anchor('Download', '/download'); ?></li>
+					<!-- End Menu Items -->
 				</ul>
 			</div>
 		</div>
-	</div>
-   <div id="Frame">
-      <div id="Body">
-         <div id="Content"><?php $this->RenderAsset('Content'); ?></div>
-         <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
-      </div>
-      <div id="Foot">
-			<div><?php
-				$this->RenderAsset('Foot');
-				printf(Gdn::Translate('Powered by %s'), '<a href="http://vanillaforums.org"><span>Vanilla</span></a>');
-			?></div>
+		<div id="Frame">
+			<div id="Body">
+				<div id="Content"><?php $this->RenderAsset('Content'); ?></div>
+				<div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
+			</div>
+			<div id="Foot">
+				<div>
+					<span style="float: right;">
+						<?php
+				      $Session = Gdn::Session();
+						$Authenticator = Gdn::Authenticator();
+						if ($Session->IsValid()) {
+							echo Anchor($Session->User->Name, '/profile/'.$Session->User->UserID.'/'.Gdn_Format::Url($Session->User->Name));
+							echo Wrap('&bull;', 'span', array('style' => 'font-size: 10px; padding: 0 10px;'));
+							echo Anchor(T('Sign Out'), $Authenticator->SignOutUrl(), 'SignOut');
+						} else {
+							$CssClass = (C('Garden.SignIn.Popup') && strpos(Gdn::Request()->Url(), 'entry') === FALSE) ? 'SignInPopup' : '';
+							echo Anchor(T('Sign In'), $Authenticator->SignInUrl($this->SelfUrl), $CssClass);
+						}
+						?>
+					</span>
+					<?php
+					$this->RenderAsset('Foot');
+					printf(Gdn::Translate('Powered by %s'), '<a href="http://vanillaforums.org"><span>Vanilla</span></a>');
+				?></div>
+			</div>
 		</div>
-   </div>
+	</div>
+	<?php $this->FireEvent('AfterBody'); ?>
 </body>
 </html>

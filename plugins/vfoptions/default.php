@@ -72,6 +72,9 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 
 		if (C('EnabledPlugins.VanillaConnect'))
 			$Menu->AddLink('Users', 'Vanilla Connect <span class="New">New</span>', 'settings/vanillaconnect', 'Garden.AdminUser.Only');
+			
+		if (C('EnabledPlugins.ProxyConnect'))
+			$Menu->AddLink('Users', 'Proxy Connect <span class="New">New</span>', 'settings/proxyconnect', 'Garden.AdminUser.Only');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'));
 		if (C('EnabledPlugins.FileUpload'))
@@ -306,8 +309,8 @@ pageTracker._trackPageview();
             }
             // We delete the forum *after* the redirects have been defined so we
             // can use the conf file to determine some things.
-            $SiteID = $Site->SiteID;
-            $VFSQL = &$this->_GetDatabase()->SQL();
+            // $SiteID = $Site->SiteID;
+            // $VFSQL = &$this->_GetDatabase()->SQL();
             include('/srv/www/'.$Folder.'/applications/vfcom/utils/deleteforum.php');
          }
          

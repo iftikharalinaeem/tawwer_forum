@@ -18,6 +18,8 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
 
    protected $_CookieName = NULL;
    protected $Provider = NULL;
+   protected $Token = NULL;
+   protected $Nonce = NULL;
    
    public function __construct() {
    
@@ -49,9 +51,10 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          // Got a response from the remote identity provider
          $UserEmail = ArrayValue('Email', $Response);
          $UserName = ArrayValue('Name', $Response);
-         $UserName = trim(preg_replace('/[^a-z0-9-]+/i','',$UserName));
+         $UserName = trim(preg_replace('/[^a-z0-9- ]+/i','',$UserName));
+         $TransientKey = ArrayValue('TransientKey', $Response, NULL);
          
-         $AuthResponse = $this->ProcessAuthorizedRequest($Provider['AuthenticationKey'], $UserEmail, $UserName);
+         $AuthResponse = $this->ProcessAuthorizedRequest($Provider['AuthenticationKey'], $UserEmail, $UserName, $TransientKey);
 
          if ($AuthResponse == Gdn_Authenticator::AUTH_SUCCESS) {
             Gdn::Request()->WithRoute('DefaultController');
@@ -79,8 +82,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       $this->ProcessAuthorizedRequest($ProviderKey, $UserKey);
    }
    
-   public function ProcessAuthorizedRequest($ProviderKey, $UserKey, $UserName = NULL) {
-      
+   public function ProcessAuthorizedRequest($ProviderKey, $UserKey, $UserName = NULL, $ForeignNonce = NULL) {
       $Association = Gdn::Authenticator()->GetAssociation($UserKey, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
       
       // We havent created a user entry yet. Lets!
@@ -95,6 +97,15 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          $this->DeleteCookie();
          
          $this->SetIdentity($Association['UserID'], FALSE);
+         $Token = $this->LookupToken($ProviderKey, $UserKey, 'access');
+         if (!$Token)
+            $Token = $this->CreateToken('access', $ProviderKey, $UserKey, TRUE);
+         
+         if ($Token && !is_null($ForeignNonce)) {
+            $TokenKey = $Token['Token'];
+            $this->SetNonce($TokenKey, $ForeignNonce);
+         }
+         
          return Gdn_Authenticator::AUTH_SUCCESS;
       } else {
          // Set the memory cookie
@@ -181,17 +192,23 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    
    public function GetURL($URLType) {
       $Provider = $this->_GetProvider();
+      $Nonce = $this->_GetNonce();
       $RealURLType = $URLType;
       $URLType = substr($URLType, 0, 4) == 'Real' ? substr($URLType,4) : $URLType;
       if ($Provider && $Provider[$URLType]) {
          
          if ($RealURLType == Gdn_Authenticator::URL_SIGNIN)
-            return Url('entry/signinloopback',TRUE);
+            return Url('entry/signinloopback/%2$s',TRUE);
             
-         if ($RealURLTYPE == 'Real'.Gdn_Authenticator::URL_SIGNIN)
+         if ($RealURLType == 'Real'.Gdn_Authenticator::URL_SIGNIN)
             $URLType = Gdn_Authenticator::URL_SIGNIN;
             
-         return $Provider[$URLType];
+         return array(
+            'URL'          => $Provider[$URLType],
+            'Parameters'   => array(
+               'Nonce'  => $Nonce['Nonce']
+            )
+         );
       }
       
       return FALSE;
@@ -203,9 +220,10 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          $Result = @parse_ini_string($Response);
          if ($Result) {
             $ReturnArray = array(
-               'Email'     => ArrayValue('Email', $Result),
-               'Name'      => ArrayValue('Name', $Result),
-               'UniqueID'  => ArrayValue('UniqueID', $Result)
+               'Email'        => ArrayValue('Email', $Result),
+               'Name'         => ArrayValue('Name', $Result),
+               'UniqueID'     => ArrayValue('UniqueID', $Result),
+               'TransientKey' => ArrayValue('TransientKey', $Result)
             );
             return $ReturnArray;
          }
@@ -222,27 +240,70 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    }
    
    protected function _GetProvider($ProviderKey = NULL) {
-      if (is_null($ProviderKey) && $UserID = Gdn::Authenticator()->GetIdentity()) {
-         $Provider = Gdn::SQL()->Select('uap.*')
-            ->From('UserAuthenticationProvider uap')
-            ->Join('UserAuthentication ua', 'ua.ProviderKey = uap.AuthenticationKey', 'left')
-            ->Where('ua.UserID', $UserID)
-            ->Where('uap.AuthenticationSchemeAlias', 'proxy')
-            ->Get()
-            ->FirstRow(DATASET_TYPE_ARRAY);
-      } else {
-         $ProviderQuery = Gdn::SQL()->Select('uap.*')
-            ->From('UserAuthenticationProvider uap')
-            ->Where('uap.AuthenticationSchemeAlias', 'proxy');
-         if (!is_null($ProviderKey)) {
-            $ProviderQuery->Where('uap.AuthenticationKey', $ProviderKey);
+      if (is_null($this->Provider)) {
+      
+         if (is_null($ProviderKey) && $UserID = Gdn::Authenticator()->GetIdentity()) {
+            $ProviderData = Gdn::SQL()->Select('uap.*')
+               ->From('UserAuthenticationProvider uap')
+               ->Join('UserAuthentication ua', 'ua.ProviderKey = uap.AuthenticationKey', 'left')
+               ->Where('ua.UserID', $UserID)
+               ->Where('uap.AuthenticationSchemeAlias', 'proxy')
+               ->Get();
+               
+         } else {
+            $ProviderQuery = Gdn::SQL()->Select('uap.*')
+               ->From('UserAuthenticationProvider uap')
+               ->Where('uap.AuthenticationSchemeAlias', 'proxy');
+            if (!is_null($ProviderKey)) {
+               $ProviderQuery->Where('uap.AuthenticationKey', $ProviderKey);
+            }
+            $ProviderData = $ProviderQuery->Get();
          }
-            
-         $Provider = $ProviderQuery->Get()
-            ->FirstRow(DATASET_TYPE_ARRAY);
+         
+         if ($ProviderData->NumRows())
+            $this->Provider = $ProviderData->FirstRow(DATASET_TYPE_ARRAY);
+         else
+            return FALSE;
       }
       
-      return $Provider;
+      return $this->Provider;
+   }
+   
+   protected function _GetToken() {
+      $Provider = $this->_GetProvider();
+      if (is_null($this->Token)) {
+         $UserID = Gdn::Authenticator()->GetIdentity();
+         $UserAuthenticationData = Gdn::SQL()->Select('uat.*')
+            ->From('UserAuthenticationToken uat')
+            ->Join('UserAuthentication ua', 'ua.ForeignUserKey = uat.ForeignUserKey')
+            ->Where('ua.UserID', $UserID)
+            ->Where('ua.ProviderKey', $Provider['AuthenticationKey'])
+            ->Get();
+            
+         if ($UserAuthenticationData->NumRows())
+            $this->Token = $UserAuthenticationData->FirstRow(DATASET_TYPE_ARRAY);
+         else
+            return FALSE;
+      }
+      
+      return $this->Token;
+   }
+
+   protected function _GetNonce() {
+      $Token = $this->_GetToken();
+      if (is_null($this->Nonce)) {
+         $UserNonceData = Gdn::SQL()->Select('uan.*')
+            ->From('UserAuthenticationNonce uan')
+            ->Where('uan.Token', $this->Token['Token'])
+            ->Get();
+            
+         if ($UserNonceData->NumRows())
+            $this->Nonce = $UserNonceData->FirstRow(DATASET_TYPE_ARRAY);
+         else
+            return FALSE;
+      }
+      
+      return $this->Nonce;
    }
    
    public function WakeUp() {
@@ -257,17 +318,13 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       
       $CurrentStep = $this->CurrentStep();
       
-//      if (substr(Gdn::Request()->Path(),0,6) != 'entry/') {
-      
-         // Shortcircuit to prevent pointless work when the access token has already been handled and we already have a session 
-         if ($CurrentStep == Gdn_Authenticator::MODE_REPEAT)
-            return;
-            
-         // Don't try to wakeup when we've already tried once this session
-         if ($CurrentStep == Gdn_Authenticator::MODE_NOAUTH)
-            return;
-            
-//      }
+      // Shortcircuit to prevent pointless work when the access token has already been handled and we already have a session 
+      if ($CurrentStep == Gdn_Authenticator::MODE_REPEAT)
+         return;
+         
+      // Don't try to wakeup when we've already tried once this session
+      if ($CurrentStep == Gdn_Authenticator::MODE_NOAUTH)
+         return;
 
       $this->Authenticate();
    }
