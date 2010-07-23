@@ -26,7 +26,7 @@ $Editing = isset($this->Comment);
    echo $this->Form->Open();
    echo $this->Form->Errors();
    echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
-   echo Anchor(T('Cancel'), '/vanilla/discussion/'.$this->DiscussionID, 'Cancel');
+   echo Anchor(T('Cancel'), 'discussion/'.$this->DiscussionID, 'Cancel');
    echo $this->Form->Button($Editing ? 'Save Comment' : 'Post Comment', array('class' => 'Button CommentButton'));
    $this->FireEvent('AfterFormButtons');
    echo $this->Form->Close();
