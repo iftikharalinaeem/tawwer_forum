@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class CilantroThemeHooks implements Gdn_IPlugin {
    
    public function Setup() {
-      $Structure = Gdn::Structure();
+/*      $Structure = Gdn::Structure();
       $Structure->Table('Tag')
 			->PrimaryKey('TagID')
 			->Column('Name', 'varchar(50)')
@@ -21,6 +21,7 @@ class CilantroThemeHooks implements Gdn_IPlugin {
 			->Column('DiscussionID', 'int', FALSE, 'key')
 			->Column('TagID', 'int', FALSE, 'key')
 			->Set();
+*/
    }
 
 	public function DiscussionModel_BeforeGet_Handler($Sender) {

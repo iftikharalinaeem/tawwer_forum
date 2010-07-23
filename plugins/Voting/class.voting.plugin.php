@@ -37,7 +37,7 @@ class VotingPlugin extends Gdn_Plugin {
          $Sort = 'popular';
          
       if ($Sort == 'popular')
-         $Sender->SQL->OrderBy('c.Score', 'desc');
+         $Sender->SQL->OrderBy('coalesce(c.Score, 0)', 'desc');
    }
 
 	/**
@@ -174,8 +174,13 @@ class VotingPlugin extends Gdn_Plugin {
          if (!$AllowVote)
             $AllowVote = $FinalVote > -2 && $FinalVote < 2;
          
-         if ($AllowVote)
+         if ($AllowVote) {
             $Total = $DiscussionModel->SetUserScore($DiscussionID, $Session->UserID, $FinalVote);
+         } else {
+				$Discussion = $DiscussionModel->GetID($DiscussionID);
+				$Total = GetValue('Score', $Discussion, 0);
+				$FinalVote = $OldUserVote;
+			}
       }
       $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
       $Sender->SetJson('TotalScore', $Total);
@@ -213,7 +218,7 @@ class VotingPlugin extends Gdn_Plugin {
 			$Css .= ' HasAnswersBox';
 			
 		$CountVotes = 0;
-		if (is_numeric($Discussion->Score) && $Discussion->Score > 0)
+		if (is_numeric($Discussion->Score)) // && $Discussion->Score > 0)
 			$CountVotes = $Discussion->Score;
 			
 		if (!is_numeric($Discussion->CountBookmarks))

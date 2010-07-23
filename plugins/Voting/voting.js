@@ -66,7 +66,7 @@ jQuery(document).ready(function($) {
                $(parent).slideUp('fast', function() { $(this).remove(); });
             } else if ($(parent).length > 0) {
                // Remove the affected row
-               $(btn).parents('.DiscussionRow').slideUp('fast', function() { $(this).remove(); });
+               $(btn).parents('li.Item').slideUp('fast', function() { $(this).remove(); });
             } else {
                // Otherwise just change the class & title on the anchor
                $(btn).attr('title', json.AnchorTitle);
