@@ -47,7 +47,6 @@ class VotingPlugin extends Gdn_Plugin {
 		$AnswerCount = $Sender->Discussion->CountComments - 1;
 		$Type = GetValue('Type', $Sender->EventArguments, 'Comment');
 		if ($Type != 'Comment' && $AnswerCount > 0) {
-			$Url = Gdn::Request()->Url('', TRUE);
 		?>
 		<li>
 			<div class="Tabs DiscussionTabs AnswerTabs">
@@ -56,8 +55,8 @@ class VotingPlugin extends Gdn_Plugin {
 				Wrap($AnswerCount.' '.Plural($AnswerCount, 'Answer', 'Answers'), 'strong');
 				echo ' sorted by 
 				<ul>
-					<li'.($Sender->Sort == 'popular' ? ' class="Active"' : '').'>'.Anchor('Votes', $Url).'</li>
-					<li'.($Sender->Sort == 'date' ? ' class="Active"' : '').'>'.Anchor('Date Added', $Url.'?Sort=date').'</li>
+					<li'.($Sender->Sort == 'popular' ? ' class="Active"' : '').'>'.Anchor('Votes', Url('', TRUE)).'</li>
+					<li'.($Sender->Sort == 'date' ? ' class="Active"' : '').'>'.Anchor('Date Added', Url('?Sort=date', TRUE)).'</li>
 				</ul>';
 			?>
 			</div>
