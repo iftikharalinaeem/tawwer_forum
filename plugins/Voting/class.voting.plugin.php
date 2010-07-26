@@ -55,7 +55,7 @@ class VotingPlugin extends Gdn_Plugin {
 				Wrap($AnswerCount.' '.Plural($AnswerCount, 'Answer', 'Answers'), 'strong');
 				echo ' sorted by 
 				<ul>
-					<li'.($Sender->Sort == 'popular' ? ' class="Active"' : '').'>'.Anchor('Votes', Url('', TRUE)).'</li>
+					<li'.($Sender->Sort == 'popular' ? ' class="Active"' : '').'>'.Anchor('Votes', Url('?Sort=popular', TRUE)).'</li>
 					<li'.($Sender->Sort == 'date' ? ' class="Active"' : '').'>'.Anchor('Date Added', Url('?Sort=date', TRUE)).'</li>
 				</ul>';
 			?>
@@ -94,6 +94,23 @@ class VotingPlugin extends Gdn_Plugin {
 		echo '</span>';
 	}
 
+   public function DiscussionController_Index_Handler($Sender) {
+      $Sort = GetIncomingValue('Sort', '');
+
+      if (Gdn::Session()->IsValid()) {
+         if ($Sort == '') {
+            // No sort was specified so grab it from the user's preferences.
+            $Sort = Gdn::Session()->GetPreference('Plugins.Voting.CommentSort', 'popular');
+         } else {
+            // Save the sort to the user's preferences.
+            Gdn::Session()->SetPreference('Plugins.Voting.CommentSort', $Sort == 'popular' ? '' : $Sort);
+         }
+      }
+
+      if (!in_array($Sort, array('popular', 'date')))
+         $Sort = 'popular';
+      $Sender->Sort = $Sort;
+   }
 
    /**
 	 * Add the vote.js file to discussions page, and handle sorting of answers.
@@ -101,13 +118,6 @@ class VotingPlugin extends Gdn_Plugin {
    public function DiscussionController_Render_Before($Sender) {
 		$Sender->AddCSSFile('plugins/Voting/design/voting.css');
 		$Sender->AddJSFile('plugins/Voting/voting.js');
-
-      // Define the sort on the controller (for views to use)
-      $Sort = GetIncomingValue('Sort', 'popular');
-      if (!in_array($Sort, array('popular', 'date')))
-         $Sort = 'popular';
-
-      $Sender->Sort = $Sort;
    }
    
    
