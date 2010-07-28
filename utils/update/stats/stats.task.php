@@ -25,7 +25,7 @@ class StatsTask extends Task {
       $StatsResult = mysql_query($SQL, $this->Database);
       $Stats = array();
       while ($Row = mysql_fetch_array($StatsResult)) {
-         $Stats[] = "($SiteID,".implode(",",$Row).")";
+         $Stats[] = "({$SiteID},'{$Row['Date']}',{$Row['CountComments']})";
       }
       mysql_free_result($StatsResult);
 
