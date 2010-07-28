@@ -1,5 +1,5 @@
 <?php
-class PlansTask extends Task {
+class StatsTask extends Task {
 
    public function __construct($ClientDir) {
       parent::__construct($ClientDir);
@@ -13,7 +13,7 @@ class PlansTask extends Task {
          return;
       }
       // Switch to the client's database.
-      mysql_select_db($this->ClientInfo['Database'], $this->Database);
+      mysql_select_db($this->ClientInfo['DatabaseName'], $this->Database);
 
       // Grab the stats from the site.
       $SQL = "select
@@ -25,12 +25,12 @@ class PlansTask extends Task {
       $StatsResult = mysql_query($SQL, $this->Database);
       $Stats = array();
       while ($Row = mysql_fetch_array($StatsResult)) {
-         $Stats[] = "($SiteID,".implode(",",$Row).")";
+         $Stats[] = "({$SiteID},'{$Row['Date']}',{$Row['CountComments']})";
       }
       mysql_free_result($StatsResult);
 
       // Select vfcom again.
-      myqsl_select_db(DATABASE_MAIN, $this->Database);
+      mysql_select_db(DATABASE_MAIN, $this->Database);
 
       // Construct the insert query for the stats.
       $InsertQuery = "insert ignore GDN_SiteStat (SiteID, Date, CountComments) values ".
