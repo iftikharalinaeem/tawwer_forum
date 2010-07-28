@@ -6,6 +6,7 @@ require_once('foreach.php');
 define("VERBOSE", TRUE);
 define("LAME", FALSE);
 define("FAST", ($argc > 2 && $argv[2] == 'fast') ? TRUE : FALSE);
+define("VERYFAST", ($argc > 3 && $argv[3] == 'fast') ? TRUE : FALSE);
 
 define('DATABASE_HOST', 'vfdb1');
 define('DATABASE_USER', 'root');
@@ -15,6 +16,6 @@ define('DATABASE_MAIN', 'vfcom');
 if ($argc < 2) exit();
 
 $Tasks = new TaskList('stats','/srv/www/vhosts');
-$Tasks->RunClientFromCLI($argv[1], array(
+$Tasks->RunChunked($argv[1], array(
    'stats'
 ));
