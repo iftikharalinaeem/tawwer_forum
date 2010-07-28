@@ -70,7 +70,9 @@ div.HeadingTabs div.SubTab {
 .AnswersBox {
 	background: #0053A9;
 	margin-right: 4px;
-	-webkit-border-bottom-right-radius: 2px;
+   border-top-right-radius: 2px;
+   border-bottom-right-radius: 2px;
+	-webkit-border-top-right-radius: 2px;
 	-webkit-border-bottom-right-radius: 2px;
 	-moz-border-radius-topright: 2px;
 	-moz-border-radius-bottomright: 2px;
@@ -79,6 +81,8 @@ div.HeadingTabs div.SubTab {
 .HasAnswersBox a { color: #fff; }
 .VotesBox {
 	margin-left: 4px;
+   border-top-left-radius: 2px;
+	border-bottom-left-radius: 2px;
 	-webkit-border-top-left-radius: 2px;
 	-webkit-border-bottom-left-radius: 2px;
 	-moz-border-radius-topleft: 2px;

@@ -12,13 +12,35 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Voting'] = array(
    'Name' => 'Voting',
    'Description' => 'Allows users to vote on comments and discussions.',
-   'Version' => '1.0',
+   'Version' => '1.0.1b',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'RequiredApplications' => array('Vanilla' => '2.0.1a')
 );
 
 class VotingPlugin extends Gdn_Plugin {
+   protected static $_CommentSort;
+   public static function CommentSort() {
+      if (self::$_CommentSort)
+         return self::$_CommentSort;
+      
+      $Sort = GetIncomingValue('Sort', '');
+      if (Gdn::Session()->IsValid()) {
+         if ($Sort == '') {
+            // No sort was specified so grab it from the user's preferences.
+            $Sort = Gdn::Session()->GetPreference('Plugins.Voting.CommentSort', 'popular');
+         } else {
+            // Save the sort to the user's preferences.
+            Gdn::Session()->SetPreference('Plugins.Voting.CommentSort', $Sort == 'popular' ? '' : $Sort);
+         }
+      }
+
+      if (!in_array($Sort, array('popular', 'date')))
+         $Sort = 'popular';
+      self::$_CommentSort = $Sort;
+      return $Sort;
+   }
 
    /**
     * Remove Vanilla category management (we want to structure them our own way).
@@ -30,23 +52,29 @@ class VotingPlugin extends Gdn_Plugin {
 
    /**
 	 * Sort the comments by popularity if necessary
+    * @param CommentModel $CommentModel
 	 */
-   public function CommentModel_BeforeGet_Handler($Sender) {
-      $Sort = GetIncomingValue('Sort', 'popular');
-      if (!in_array($Sort, array('popular', 'date')))
-         $Sort = 'popular';
-         
-      if ($Sort == 'popular')
-         $Sender->SQL->OrderBy('coalesce(c.Score, 0)', 'desc');
+   public function CommentModel_AfterConstruct_Handler($CommentModel) {
+      $Sort = self::CommentSort();
+
+      switch (strtolower($Sort)) {
+         case 'date':
+            $CommentModel->OrderBy('c.DateInserted');
+            break;
+         case 'popular':
+         default:
+            $CommentModel->OrderBy(array('coalesce(c.Score, 0) desc', 'c.CommentID'));
+            break;
+      }
    }
 
 	/**
 	 * Insert sorting tabs after first comment.
 	 */
-	public function DiscussionController_AfterComment_Handler($Sender) {
+	public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
 		$AnswerCount = $Sender->Discussion->CountComments - 1;
 		$Type = GetValue('Type', $Sender->EventArguments, 'Comment');
-		if ($Type != 'Comment' && $AnswerCount > 0) {
+		if ($Type == 'Comment' && !GetValue('VoteHeaderWritten', $Sender)) { //$Type != 'Comment' && $AnswerCount > 0) {
 		?>
 		<li>
 			<div class="Tabs DiscussionTabs AnswerTabs">
@@ -55,13 +83,14 @@ class VotingPlugin extends Gdn_Plugin {
 				Wrap($AnswerCount.' '.Plural($AnswerCount, 'Answer', 'Answers'), 'strong');
 				echo ' sorted by 
 				<ul>
-					<li'.($Sender->Sort == 'popular' ? ' class="Active"' : '').'>'.Anchor('Votes', Url('?Sort=popular', TRUE)).'</li>
-					<li'.($Sender->Sort == 'date' ? ' class="Active"' : '').'>'.Anchor('Date Added', Url('?Sort=date', TRUE)).'</li>
+					<li'.(self::CommentSort() == 'popular' ? ' class="Active"' : '').'>'.Anchor('Votes', Url('?Sort=popular', TRUE), '', array('rel' => 'nofollow')).'</li>
+					<li'.(self::CommentSort() == 'date' ? ' class="Active"' : '').'>'.Anchor('Date Added', Url('?Sort=date', TRUE), '', array('rel' => 'nofollow')).'</li>
 				</ul>';
 			?>
 			</div>
 		</li>
 		<?php
+      $Sender->VoteHeaderWritten = TRUE;
 		}		
 	}
 
@@ -88,29 +117,11 @@ class VotingPlugin extends Gdn_Plugin {
 				$VoteDownUrl = $VoteUpUrl;
 				$CssClass = ' SignInPopup';
 			}
-			echo Anchor(Wrap(Wrap('Vote Up', 'i'), 'i', array('class' => 'ArrowSprite SpriteUp')), $VoteUpUrl, 'VoteUp'.$CssClass);
+			echo Anchor(Wrap(Wrap('Vote Up', 'i'), 'i', array('class' => 'ArrowSprite SpriteUp', 'rel' => 'nofollow')), $VoteUpUrl, 'VoteUp'.$CssClass);
 			echo Wrap(StringIsNullOrEmpty($Object->Score) ? '0' : $Object->Score);
-			echo Anchor(Wrap(Wrap('Vote Down', 'i'), 'i', array('class' => 'ArrowSprite SpriteDown')), $VoteDownUrl, 'VoteDown'.$CssClass);
+			echo Anchor(Wrap(Wrap('Vote Down', 'i'), 'i', array('class' => 'ArrowSprite SpriteDown', 'rel' => 'nofollow')), $VoteDownUrl, 'VoteDown'.$CssClass);
 		echo '</span>';
 	}
-
-   public function DiscussionController_Index_Handler($Sender) {
-      $Sort = GetIncomingValue('Sort', '');
-
-      if (Gdn::Session()->IsValid()) {
-         if ($Sort == '') {
-            // No sort was specified so grab it from the user's preferences.
-            $Sort = Gdn::Session()->GetPreference('Plugins.Voting.CommentSort', 'popular');
-         } else {
-            // Save the sort to the user's preferences.
-            Gdn::Session()->SetPreference('Plugins.Voting.CommentSort', $Sort == 'popular' ? '' : $Sort);
-         }
-      }
-
-      if (!in_array($Sort, array('popular', 'date')))
-         $Sort = 'popular';
-      $Sender->Sort = $Sort;
-   }
 
    /**
 	 * Add the vote.js file to discussions page, and handle sorting of answers.
