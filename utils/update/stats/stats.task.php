@@ -13,7 +13,7 @@ class StatsTask extends Task {
          return;
       }
       // Switch to the client's database.
-      mysql_select_db($this->ClientInfo['Database'], $this->Database);
+      mysql_select_db($this->ClientInfo['DatabaseName'], $this->Database);
 
       // Grab the stats from the site.
       $SQL = "select
