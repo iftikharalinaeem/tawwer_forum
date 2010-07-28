@@ -1,5 +1,5 @@
 <?php
-class PlansTask extends Task {
+class StatsTask extends Task {
 
    public function __construct($ClientDir) {
       parent::__construct($ClientDir);
