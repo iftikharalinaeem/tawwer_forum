@@ -80,7 +80,7 @@ class VotingPlugin extends Gdn_Plugin {
 			<div class="Tabs DiscussionTabs AnswerTabs">
 			<?php
 			echo
-				Wrap($AnswerCount.' '.Plural($AnswerCount, 'Answer', 'Answers'), 'strong');
+				Wrap($AnswerCount.' '.Plural($AnswerCount, 'Comment', 'Comments'), 'strong');
 				echo ' sorted by 
 				<ul>
 					<li'.(self::CommentSort() == 'popular' ? ' class="Active"' : '').'>'.Anchor('Votes', Url('?Sort=popular', TRUE), '', array('rel' => 'nofollow')).'</li>
@@ -246,7 +246,7 @@ class VotingPlugin extends Gdn_Plugin {
 			
 		echo Wrap(
 			// Anchor(
-			Wrap(T('Answers')) . ($Discussion->CountComments - 1)
+			Wrap(T('Comments')) . ($Discussion->CountComments - 1)
 			// ,'/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
 			// )
 			, 'div', array('class' => $Css));
@@ -391,7 +391,7 @@ class VotingPlugin extends Gdn_Plugin {
          ->Column('State', 'varchar(30)', TRUE)
          ->Set(FALSE, FALSE); 
 
-      SaveToConfig('Vanilla.Categories.Use', FALSE);
+//    SaveToConfig('Vanilla.Categories.Use', FALSE);
       SaveToConfig('Vanilla.Comments.AutoOffset', FALSE);
    }
 	

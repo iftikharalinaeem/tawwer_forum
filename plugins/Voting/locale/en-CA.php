@@ -23,3 +23,5 @@ $Definition['Write Comment'] = 'Write Answer';
 $Definition['Post Comment'] = 'Post Answer';
 $Definition['%1$s more comments'] = '%s more';
 $Definition['%1$s older comments'] = '%1$s older';
+$Definition['Comment'] = 'Answer';
+$Definition['Comments'] = 'Answers';
