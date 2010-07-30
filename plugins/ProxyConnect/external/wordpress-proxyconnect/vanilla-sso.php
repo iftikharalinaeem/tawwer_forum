@@ -126,12 +126,12 @@ function vanilla_sso_options() {
 		</tr>
 		<tr>
 			<th>Sign-in Url</th>
-			<td><span class="description"><?php echo wp_login_url(); ?>?Target=%s</span></td>
+			<td><span class="description"><?php echo wp_login_url(); ?>?redirect_to={Redirect}</span></td>
 		</tr>
 		<tr>
 			<th>Sign-out Url</th>
 			<td><span class="description"><?php
-				echo add_query_arg(array('action' => 'logout', '_wpnonce' => '{Session_TransientKey}'), site_url('wp-login.php', 'login'));
+				echo add_query_arg(array('action' => 'logout', '_wpnonce' => '{Nonce}'), site_url('wp-login.php', 'login'));
 			?></span></td>
 		</tr>
 	</table>
