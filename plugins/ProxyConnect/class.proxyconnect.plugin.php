@@ -12,8 +12,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProxyConnect'] = array(
 	'Name' => 'Proxy Connect SSO',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
-   'Version' => '1.4',
-   'RequiredApplications' => FALSE,
+   'Version' => '1.5',
+   'RequiredApplications' => array('Vanilla' => '2.0.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/settings/proxyconnect',
@@ -43,6 +43,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $Sender->AddSideMenu('settings/proxyconnect');
 		$Sender->AddCssFile('/plugins/ProxyConnect/proxyconnect.css');
 		$Sender->Form = new Gdn_Form();
+		$this->EnableSlicing($Sender);
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
@@ -96,6 +97,35 @@ class ProxyConnectPlugin extends Gdn_Plugin {
 			}
 			Redirect('settings/proxyconnect');
 		}
+   }
+   
+   public function Controller_Cookie(&$Sender) {
+      $ExplodedDomain = explode('.',Gdn::Request()->RequestHost());
+      $GuessedCookieDomain = '.'.implode('.',array_slice($ExplodedDomain,-2,2));
+      
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField(array('Plugin.ProxyConnect.NewCookieDomain'));
+      
+      // Set the model on the form.
+      $Sender->Form->SetModel($ConfigurationModel);
+      
+      if ($Sender->Form->AuthenticatedPostBack()) {
+         $NewCookieDomain = $Sender->Form->GetValue('Plugin.ProxyConnect.NewCookieDomain', '');
+         SaveToConfig('Garden.Cookie.Domain', $NewCookieDomain);
+      } else { 
+         $NewCookieDomain = $GuessedCookieDomain;
+      }
+      
+      $Sender->SetData('GuessedCookieDomain', $GuessedCookieDomain);
+      $CurrentCookieDomain = C('Garden.Cookie.Domain');
+      $Sender->SetData('CurrentCookieDomain', $CurrentCookieDomain);
+      
+      $Sender->Form->SetData(array(
+         'Plugin.ProxyConnect.NewCookieDomain'  => $NewCookieDomain
+      ));
+      
+      $Sender->Render($this->GetView('cookie.php'));
    }
    
    public function EntryController_SigninLoopback_Create(&$Sender) {

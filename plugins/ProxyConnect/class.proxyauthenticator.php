@@ -240,7 +240,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
                'Email'        => ArrayValue('Email', $Result),
                'Name'         => ArrayValue('Name', $Result),
                'UniqueID'     => ArrayValue('UniqueID', $Result),
-               'TransientKey' => ArrayValue('TransientKey', $Result. NULL)
+               'TransientKey' => ArrayValue('TransientKey', $Result, NULL)
             );
             return $ReturnArray;
          }

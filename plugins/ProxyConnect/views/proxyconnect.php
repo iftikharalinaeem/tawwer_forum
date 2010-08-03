@@ -53,26 +53,8 @@
    <div class="Info"><?php echo T("These are the settings you might need when you configure VanillaConnect on your remote website."); ?></div>
    <div>
       You will probably need to configure Vanilla and your remote application to use a shared Cookie Domain that they can both access. We've
-      tried to guess what that might be, based on your hostname, but you'll need to check this and make sure that it works. This can 
-      be achieved on Vanilla by adding/modifying the <code>$Configuration['Garden']['Cookie']['Domain']</code> setting in your <code>conf/config.php</code> file.
+      tried to guess what that might be, based on your hostname, but you'll need to check this and make sure that it works.
    </div>
-   <table class="Label AltColumns">
-      <thead>
-         <tr>
-            <th><?php echo T('Setting'); ?></th>
-            <th class="Alt"><?php echo T('Value'); ?></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr class="Alt">
-            <?php
-               $ExplodedDomain = explode('.',Gdn::Request()->RequestHost());
-               $CookieDomain = '.'.implode('.',array_slice($ExplodedDomain,-2,2));
-            ?>
-            <td><?php echo T('Vanilla Cookie Domain'); ?></td>
-            <td class="Alt"><?php echo $CookieDomain; ?></td>
-         </tr>      
-      </tbody>
-   </table>
+   <?php echo $this->Plugin->Slice('cookie'); ?>
 </div>
 <?php }
