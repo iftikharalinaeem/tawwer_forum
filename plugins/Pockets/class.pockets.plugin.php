@@ -1,0 +1,352 @@
+<?php if (!defined('APPLICATION')) exit();
+/*
+Copyright 2008, 2009 Vanilla Forums Inc.
+This file is part of Garden.
+Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
+Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
+*/
+
+// Define the plugin:
+$PluginInfo['Pockets'] = array(
+   'Name' => 'Pockets',
+   'Description' => 'Allows site admins to add free-form HTML to various places around the application.',
+   'Version' => '0.1a',
+   'Author' => "Todd Burry",
+   'AuthorEmail' => 'todd@vanillaforums.com',
+   'AuthorUrl' => 'http://vanillaforums.org/todd',
+   'RequiredApplications' => array('Vanilla' => '2.0.1a'),
+   'RegisterPermissions' => array('Plugins.Pockets.Manage'),
+   'SettingsUrl' => '/dashboard/plugin/pockets',
+   'SettingsPermission' => 'Plugins.Pockets.Manage',
+   'HasLocale' => TRUE
+);
+
+require_once dirname(__FILE__).'/class.pocket.php';
+
+class PocketsPlugin extends Gdn_Plugin {
+   /** An array of counters for the various locations.
+    *
+    * @var array
+    */
+   protected $_Counters = array();
+
+   public $Locations = array(
+      'Content' => array('Name' => 'Main Content'),
+      'Panel' => array('Name' => 'Side Panel'),
+      'BetweenDiscussions' => array('Name' => 'Between Discussions'),
+      'BetweenComments' => array('Name' => 'Between Comments'));
+
+   /** An array of all of the pockets indexed by location.
+    *
+    * @var array
+    */
+   protected $_Pockets = array();
+
+   /**
+    * Adds "Media" menu option to the Forum menu on the dashboard.
+    */
+   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+      $Menu = $Sender->EventArguments['SideMenu'];
+      $Menu->AddItem('Appearance', T('Appearance'));
+      $Menu->AddLink('Appearance', T('Pockets'), 'plugin/pockets', 'Plugins.Pockets.Manage');
+   }
+
+   public function Base_RenderAsset_Handler($Sender) {
+      $AssetName = GetValueR('EventArguments.AssetName', $Sender);
+      $this->ProcessPockets($AssetName);
+
+      //echo $this->TestHtml("RenderAsset: $AssetName");
+   }
+
+   public function DiscussionsController_BetweenDiscussion_Handler($Sender) {
+      $this->ProcessPockets('BetweenDiscussions');
+
+      //echo '<li>'.$this->TestHtml("BetweenDiscussion").'</li>';
+   }
+
+   public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
+      // We don't want pockets to display before the first comment because they are only between comments.
+      $Processed = isset($this->_Counters['BeforeCommentDisplay']);
+      if (!$Processed) {
+         $this->_Counters['BeforeCommentDisplay'] = TRUE;
+         return;
+      }
+
+      $this->ProcessPockets('BetweenComments');
+      //echo '<li>'.$this->TestHtml("BetweenComments").'</li>';
+   }
+
+   /** Main list for a pocket management.
+    *
+    * @param Gdn_Controller $Sender.
+    */
+   public function PluginController_Pockets_Create(&$Sender, $Args = array()) {
+      $Sender->Permission('Plugins.Pockets.Manage');
+      $Sender->AddSideMenu('plugin/pockets');
+      $Sender->AddJsFile('plugins/Pockets/pockets.js');
+
+      $Page = GetValue(0, $Args);
+      switch(strtolower($Page)) {
+         case 'add':
+            return $this->_Add($Sender);
+            break;
+         case 'edit':
+            return $this->_Edit($Sender, GetValue(1, $Args));
+            break;
+         case 'delete':
+            return $this->_Delete($Sender, GetValue(1, $Args));
+            break;
+         default:
+            return $this->_Index($Sender);
+      }
+   }
+
+   protected function _Index($Sender) {
+      $Sender->SetData('Title', T('Pockets'));
+
+      // Grab the pockets from the DB.
+      $PocketData = Gdn::SQL()->Get('Pocket', 'Location, `Sort`')->ResultArray();
+      // Add notes to the pockets data.
+      foreach ($PocketData as $Index => &$PocketRow) {
+         // Add notes for the display.
+         $Notes = array();
+
+         if ($PocketRow['Repeat'] && $PocketRow['Repeat'] != Pocket::REPEAT_ONCE)
+            $Notes[] = $PocketRow['Repeat'];
+
+         if ($PocketRow['Disabled'] == Pocket::DISABLED)
+            $Notes[] = T('Disabled');
+         elseif ($PocketRow['Disabled'] == Pocket::TESTING)
+            $Notes[] = T('Testing');
+
+         $PocketRow['Notes'] = implode(', ', $Notes);
+      }
+
+      $Sender->SetData('PocketData', $PocketData);
+
+      $Sender->Form = new Gdn_Form();
+      $Sender->Render(dirname(__FILE__).'/views/index.php');
+   }
+
+   protected function _Add($Sender) {
+      $Sender->SetData('Title', sprintf(T('Add %s'), T('Pocket')));
+
+      return $this->_AddEdit($Sender);
+   }
+
+   protected function _AddEdit($Sender, $PocketID = FALSE) {
+      $Form = new Gdn_Form();
+      $PocketModel = new Gdn_Model('Pocket');
+      $Form->SetModel($PocketModel);
+
+      if ($Form->AuthenticatedPostBack()) {
+         // Save the pocket.
+         if ($PocketID !== FALSE)
+            $Form->SetFormValue('PocketID', $PocketID);
+
+         // Convert the form data into a format digestable by the database.
+         $Repeat = $Form->GetFormValue('RepeatType');
+         switch ($Repeat) {
+            case Pocket::REPEAT_EVERY:
+               $PocketModel->Validation->ApplyRule('EveryFrequency', 'Integer');
+               $PocketModel->Validation->ApplyRule('EveryBegin', 'Integer');
+               $Frequency = $Form->GetFormValue('EveryFrequency', 1);
+               if (!$Frequency || !ValidateInteger($Frequency) || $Frequency < 1)
+                  $Frequency = 1;
+               $Repeat .= ' '.$Frequency;
+               if ($Form->GetFormValue('EveryBegin', 1) > 1)
+                  $Repeat .= ','.$Form->GetFormValue('EveryBegin');
+               break;
+            case Pocket::REPEAT_INDEX:
+               $PocketModel->Validation->AddRule('IntegerArray', 'function:ValidateIntegerArray');
+               $PocketModel->Validation->ApplyRule('Indexes', 'IntegerArray');
+               $Indexes = explode(',', $Form->GetFormValue('Indexes', ''));
+               $Indexes = array_map('trim', $Indexes);
+               $Repeat .= ' '.implode(',', $Indexes);
+               break;
+            default:
+               $Repeat = Pocket::REPEAT_ONCE;
+               break;
+         }
+         $Form->SetFormValue('Repeat', $Repeat);
+         $Form->SetFormValue('Sort', 0);
+         $Form->SetFormValue('Format', 'Raw');
+
+         $Saved = $Form->Save();
+         if ($Saved) {
+            $Sender->StatusMessage = T('Your changes have been saved.');
+            $Sender->RedirectUrl = Url('plugin/pockets');
+         }
+      } else {
+         if ($PocketID !== FALSE) {
+            // Load the pocket.
+            $Pocket = $PocketModel->GetWhere(array('PocketID' => $PocketID))->FirstRow(DATASET_TYPE_ARRAY);
+            if (!$Pocket)
+               return Gdn::Dispatcher()->Dispatch('Default404');
+
+            // Convert some of the pocket data into a format digestable by the form.
+            list($RepeatType, $RepeatFrequency) = Pocket::ParseRepeat($Pocket['Repeat']);
+            $Pocket['RepeatType'] = $RepeatType;
+            $Pocket['EveryFrequency'] = GetValue(0, $RepeatFrequency, 1);
+            $Pocket['EveryBegin'] = GetValue(1, $RepeatFrequency, 1);
+            $Pocket['Indexes'] = implode(',', $RepeatFrequency);
+            $Form->SetData($Pocket);
+         } else {
+            // Default the repeat.
+            $Form->SetFormValue('RepeatType', Pocket::REPEAT_ONCE);
+         }
+      }
+
+      $Sender->Form = $Form;
+      $Sender->SetData('LocationsArray', $this->GetLocationsArray());
+      
+      return $Sender->Render(dirname(__FILE__).'/views/addedit.php');
+   }
+
+   protected function _Edit($Sender, $PocketID) {
+      $Sender->SetData('Title', sprintf(T('Edit %s'), T('Pocket')));
+
+      return $this->_AddEdit($Sender, $PocketID);
+   }
+
+   protected function _Delete($Sender, $PocketID) {
+      $Sender->SetData('Title', sprintf(T('Delete %s'), T('Pocket')));
+      
+      $Form = new Gdn_Form();
+
+      if ($Form->AuthenticatedPostBack()) {
+         Gdn::SQL()->Delete('Pocket', array('PocketID' => $PocketID));
+         $Sender->StatusMessage = sprintf(T('The %s has been deleted.'), strtolower(T('Pocket')));
+         $Sender->RedirectUrl = Url('plugin/pockets');
+      }
+
+      $Sender->Form = $Form;
+      $Sender->Render(dirname(__FILE__).'/views/delete.php');
+      return TRUE;
+   }
+
+   /** Add a pocket to the plugin's array of pockets to process.
+    *
+    * @param Pocket $Pocket
+    */
+   public function AddPocket($Pocket) {
+      if (!isset($this->_Pockets[$Pocket->Location]))
+         $this->_Pockets[$Pocket->Location] = array();
+      $this->_Pockets[$Pocket->Location][] = $Pocket;
+   }
+
+   public function GetLocationsArray() {
+      $Result = array();
+      foreach ($this->Locations as $Key => $Value) {
+         $Result[$Key] = GetValue('Name', $Value, $Key);
+      }
+      return $Result;
+   }
+
+   protected function _LoadState() {
+      $PM = Gdn::PluginManager();
+      if (isset($PM->_PocketsPluginState)) {
+         $State = $PM->_PocketsPluginState;
+         $this->_Pockets = (array)GetValue('Pockets', $State, array());
+         $this->_Counters = (array)GetValue('Counters', $State, array());
+
+      } else {
+         // Grab all of the pockets from the database.
+         $Pockets = Gdn::SQL()->Get('Pocket', 'Location, Sort, Name')->ResultArray();
+         foreach ($Pockets as $Row) {
+            $Pocket = new Pocket();
+            $Pocket->Load($Row);
+            $this->AddPocket($Pocket);
+         }
+
+//         $Pocket = new Pocket('BetweenComment');
+//         $Pocket->Body = $this->TestHtml('<li>Between Comment</li>');
+//         $Pocket->Repeat(Pocket::REPEAT_EVERY, 3);
+//         $this->AddPocket($Pocket);
+
+      }
+   }
+
+   public function ProcessPockets($Location) {
+      // Since plugins can't currently maintain their state we have to stash it in the Gdn object.
+      $this->_LoadState();
+
+      if (!array_key_exists($Location, $this->_Pockets)) {
+         $this->_SaveState();
+         return;
+      }
+      
+      // Build up the data for filtering.
+      $Data = array();
+      $Data['Request'] = Gdn::Request();
+
+
+      // Increment the counter.
+      if (array_key_exists($Location, $this->_Counters)) {
+         $Count = $this->_Counters[$Location] + 1;
+         $this->_Counters[$Location] = $Count;
+      } else {
+         $Count = $this->_Counters[$Location] = 1;
+      }
+
+      $Data['Count'] = $Count;
+//      echo "$Location : $Count";
+
+      // Process all of the pockets.
+      foreach ($this->_Pockets[$Location] as $Pocket) {
+         /** @var Pocket $Pocket */
+
+         if ($Pocket->CanRender($Data)) {
+            $Pocket->Render($Data);
+         }
+      }
+
+      $this->_SaveState();
+   }
+
+   protected function _SaveState() {
+      $State = array(
+         'Counters' => $this->_Counters,
+         'Pockets' => $this->_Pockets
+      );
+      $PM = Gdn::PluginManager();
+      $PM->_PocketsPluginState = $State;
+   }
+
+   public function Setup() {
+      $this->Structure();
+   }
+
+   public function Structure($Explicit = FALSE, $Drop = FALSE) {
+      $St = Gdn::Structure();
+      $St->Table('Pocket')
+         ->PrimaryKey('PocketID')
+         ->Column('Name', 'varchar(255)')
+         ->Column('Location', 'varchar(50)')
+         ->Column('Sort', 'smallint')
+         ->Column('Repeat', 'varchar(25)')
+         ->Column('Body', 'text')
+         ->Column('Format', 'varchar(20)')
+         ->Column('Disabled', 'smallint', '0') // set to a constant in class Pocket
+         ->Column('Attributes', 'text', NULL)
+         ->Set($Explicit, $Drop);
+   }
+
+   public function TestHtml($Html) {
+      return "\n".'<div style="border: 1px solid #C09; background: #F6C; color: #036; padding: 2px 6px; text-align: center;">'.$Html.'</div>';
+   }
+}
+
+if (!function_exists('ValidateIntegerArray')) {
+   function ValidateIntegerArray($Value, $Field) {
+      $Values = explode(',', $Value);
+      foreach ($Values as $Val) {
+         if ($Val && !ValidateInteger(trim($Val)))
+            return FALSE;
+      }
+
+      return TRUE;
+   }
+}
