@@ -16,13 +16,6 @@ echo $Form->Errors();
    </li>
    <li>
       <?php
-         echo $Form->Label('Location', 'Location');
-         echo '<div class="Info2">', T('Select the location of the pocket.', 'Select the location of the pocket.'), '</div>';
-         echo $Form->DropDown('Location', $this->Data('LocationsArray'));
-      ?>
-   </li>
-   <li>
-      <?php
          echo $Form->Label('Body', 'Body');
          echo '<div class="Info2">', T('The text of the pocket.', 'Enter the text of the pocket. This will be output exactly as you type it so make sure that you enter valid HTML.'), '</div>';
          echo $Form->TextBox('Body', array('Multiline' => TRUE));
@@ -30,8 +23,24 @@ echo $Form->Errors();
    </li>
    <li>
       <?php
+         echo $Form->Label('Location', 'Location');
+         echo '<div class="Info2">', T('Select the location of the pocket.', 'Select the location of the pocket.'), '</div>';
+         echo $Form->DropDown('Location', array_merge(array('' => '('.sprintf(T('Select a %s'), T('Location')).')'), $this->Data('LocationsArray')));
+         // Write the help for each location type.
+         foreach ($this->Data('Locations') as $Location => $Options) {
+            if (!array_key_exists('Description', $Options))
+               continue;
+
+            echo '<div class="Info LocationInfo '.$Location.'Info">',
+               Gdn_Format::Html($Options['Description']),
+               '</div>';
+         }
+      ?>
+   </li>
+   <li>
+      <?php
          echo $Form->Label('Repeat', 'RepeatType');
-         echo $Form->RadioList('RepeatType', array(Pocket::REPEAT_ONCE => 'Once', Pocket::REPEAT_EVERY => T('Repeat Every'), Pocket::REPEAT_INDEX => T('Given Indexes')));
+         echo $Form->RadioList('RepeatType', array(Pocket::REPEAT_BEFORE => 'Before', Pocket::REPEAT_AFTER => 'After', Pocket::REPEAT_EVERY => T('Repeat Every'), Pocket::REPEAT_INDEX => T('Given Indexes')));
 
          // Options for repeat every.
          echo '<div class="RepeatEveryOptions">',
@@ -54,9 +63,19 @@ echo $Form->Errors();
    </li>
    <li>
       <?php
+         echo $Form->Label('Conditions', '');   
+         $this->ConditionModule->Render();
+      ?>
+   </li>
+   <li>
+      <?php
          echo $Form->Label('Enable/Disable', 'Disabled');
          echo $Form->RadioList('Disabled', array(Pocket::ENABLED => T('Enabled'), Pocket::DISABLED => T('Disabled'), Pocket::TESTING => T('Test Mode')));
       ?>
    </li>
 </ul>
-<?php echo $Form->Close('Save'); ?>
+<?php
+echo $Form->Button('Save'),
+   '&nbsp;&nbsp;&nbsp;&nbsp;', Anchor(T('Cancel'), '/plugin/pockets', 'Cancel'), ' ',
+   $Form->Close();
+?>

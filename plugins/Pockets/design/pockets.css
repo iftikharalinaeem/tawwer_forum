@@ -1,0 +1,33 @@
+.TestPocket {
+   border: 1px solid #FC3;
+   background: #F6C;
+   color: #036;
+   padding: 2px 6px;
+
+   /* default background colour, for all layout engines that don't implement gradients */
+   background: #FFE768;
+
+   /* gecko based browsers */
+   background: -moz-linear-gradient(top, #ff9, #fc3);
+
+   /* webkit based browsers */
+   background: -webkit-gradient(linear, left top, left bottom, from(#ff9), to(#fc3));
+
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+
+
+	box-shadow: 0px 0px 10px #999;
+	-moz-box-shadow: 0px 0px 10px #999;
+	-webkit-box-shadow: 0px 0px 10px #999;
+}
+
+.TestPocket h3 {
+   color: #036;
+   font-weight: bold;
+   font-size: 14px;
+   font-variant: small-caps;
+   letter-spacing: 4px;
+   text-align: center;
+}

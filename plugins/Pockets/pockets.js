@@ -22,4 +22,23 @@ jQuery(document).ready(function($) {
    $("input[name=Pocket/RepeatType]").click(revealRepeatOptions);
 
    revealRepeatOptions();
+
+   // Hide/show the appropriate location elements.
+   var revealLocationElements = function() {
+      var selected = $("select[name=Pocket/Location]").val();
+      // Select everything.
+      var $hide;
+      if (selected != "") {
+         $hide = $(".LocationInfo:not(." + selected + "Info)");
+         var $show = $("." + selected + "Info");
+         $show.show();
+      } else {
+         $hide = $(".LocationInfo");
+      }
+
+      $hide.hide();
+   };
+
+   $("select[name=Pocket/Location]").change(revealLocationElements);
+   revealLocationElements();
 });

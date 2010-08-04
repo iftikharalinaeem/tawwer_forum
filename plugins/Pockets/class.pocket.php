@@ -13,6 +13,8 @@ class Pocket {
    const DISABLED = 1;
    const TESTING = 2;
 
+   const REPEAT_BEFORE = 'before';
+   const REPEAT_AFTER = 'after';
    const REPEAT_ONCE = 'once';
    const REPEAT_EVERY = 'every';
    const REPEAT_INDEX = 'index';
@@ -59,9 +61,17 @@ class Pocket {
             break;
       }
 
-      // Check to see if this is a repeating.
+      // Check to see if this is repeating.
       $Count = GetValue('Count', $Data);
       switch ($this->RepeatType) {
+         case Pocket::REPEAT_AFTER:
+            if (strcasecmp($Count, Pocket::REPEAT_AFTER) != 0)
+               return FALSE;
+            break;
+         case Pocket::REPEAT_BEFORE:
+            if (strcasecmp($Count, Pocket::REPEAT_BEFORE) != 0)
+               return FALSE;
+            break;
          case Pocket::REPEAT_ONCE:
             if ($Count != 1)
                return FALSE;
@@ -109,6 +119,10 @@ class Pocket {
          $Frequency = substr($Repeat, strlen(Pocket::REPEAT_INDEX));
       } elseif (StringBeginsWith($Repeat, Pocket::REPEAT_ONCE)) {
          $RepeatType = Pocket::REPEAT_ONCE;
+      } elseif (StringBeginsWith($Repeat, Pocket::REPEAT_BEFORE)) {
+         $RepeatType = Pocket::REPEAT_BEFORE;
+      } elseif (StringBeginsWith($Repeat, Pocket::REPEAT_AFTER)) {
+         $RepeatType = Pocket::REPEAT_AFTER;
       }
 
       if (isset($Frequency)) {

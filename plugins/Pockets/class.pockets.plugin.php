@@ -12,10 +12,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Pockets'] = array(
    'Name' => 'Pockets',
    'Description' => 'Allows site admins to add free-form HTML to various places around the application.',
-   'Version' => '0.1a',
+   'Version' => '0.1b',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.org/todd',
+   'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
    'RequiredApplications' => array('Vanilla' => '2.0.1a'),
    'RegisterPermissions' => array('Plugins.Pockets.Manage'),
    'SettingsUrl' => '/dashboard/plugin/pockets',
@@ -33,16 +33,26 @@ class PocketsPlugin extends Gdn_Plugin {
    protected $_Counters = array();
 
    public $Locations = array(
-      'Content' => array('Name' => 'Main Content'),
-      'Panel' => array('Name' => 'Side Panel'),
-      'BetweenDiscussions' => array('Name' => 'Between Discussions'),
-      'BetweenComments' => array('Name' => 'Between Comments'));
+      'Content' => array('Name' => 'Content'),
+      'Panel' => array('Name' => 'Panel'),
+      'BetweenDiscussions' => array('Name' => 'Between Discussions', 'Wrap' => array('<li>', '</li>')),
+      'BetweenComments' => array('Name' => 'Between Comments', 'Wrap' => array('<li>', '</li>')));
 
    /** An array of all of the pockets indexed by location.
     *
     * @var array
     */
    protected $_Pockets = array();
+
+   /** Whether or not to display test items for all pockets. */
+   public $TestMode = TRUE;
+
+   public function Base_Render_Before($Sender) {
+      if ($this->TestMode && Gdn::Session()->CheckPermission('Plugins.Pockets.Manage')) {
+         // Add the css for the test pockets to the page.
+         $Sender->AddCSSFile('plugins/Pockets/design/pockets.css');
+      }
+   }
 
    /**
     * Adds "Media" menu option to the Forum menu on the dashboard.
@@ -53,20 +63,30 @@ class PocketsPlugin extends Gdn_Plugin {
       $Menu->AddLink('Appearance', T('Pockets'), 'plugin/pockets', 'Plugins.Pockets.Manage');
    }
 
-   public function Base_RenderAsset_Handler($Sender) {
+   public function Base_BeforeRenderAsset_Handler($Sender) {
       $AssetName = GetValueR('EventArguments.AssetName', $Sender);
-      $this->ProcessPockets($AssetName);
+      $this->ProcessPockets($Sender, $AssetName, Pocket::REPEAT_BEFORE);
+   }
+
+   public function Base_AfterRenderAsset_Handler($Sender) {
+      $AssetName = GetValueR('EventArguments.AssetName', $Sender);
+      $this->ProcessPockets($Sender, $AssetName, Pocket::REPEAT_AFTER);
+   }
+
+   public function Base_BetweenRenderAsset_Handler($Sender) {
+      $AssetName = GetValueR('EventArguments.AssetName', $Sender);
+      $this->ProcessPockets($Sender, $AssetName);
 
       //echo $this->TestHtml("RenderAsset: $AssetName");
    }
 
-   public function DiscussionsController_BetweenDiscussion_Handler($Sender) {
-      $this->ProcessPockets('BetweenDiscussions');
+   public function Base_BetweenDiscussion_Handler($Sender) {
+      $this->ProcessPockets($Sender, 'BetweenDiscussions');
 
       //echo '<li>'.$this->TestHtml("BetweenDiscussion").'</li>';
    }
 
-   public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
+   public function Base_BeforeCommentDisplay_Handler($Sender) {
       // We don't want pockets to display before the first comment because they are only between comments.
       $Processed = isset($this->_Counters['BeforeCommentDisplay']);
       if (!$Processed) {
@@ -74,7 +94,7 @@ class PocketsPlugin extends Gdn_Plugin {
          return;
       }
 
-      $this->ProcessPockets('BetweenComments');
+      $this->ProcessPockets($Sender, 'BetweenComments');
       //echo '<li>'.$this->TestHtml("BetweenComments").'</li>';
    }
 
@@ -114,7 +134,7 @@ class PocketsPlugin extends Gdn_Plugin {
          $Notes = array();
 
          if ($PocketRow['Repeat'] && $PocketRow['Repeat'] != Pocket::REPEAT_ONCE)
-            $Notes[] = $PocketRow['Repeat'];
+            $PocketRow['Location'] .= " ({$PocketRow['Repeat']})";
 
          if ($PocketRow['Disabled'] == Pocket::DISABLED)
             $Notes[] = T('Disabled');
@@ -140,6 +160,9 @@ class PocketsPlugin extends Gdn_Plugin {
       $Form = new Gdn_Form();
       $PocketModel = new Gdn_Model('Pocket');
       $Form->SetModel($PocketModel);
+      $Sender->ConditionModule = new ConditionModule($Sender);
+      $Sender->Form = $Form;
+      $this->TestMode = TRUE;
 
       if ($Form->AuthenticatedPostBack()) {
          // Save the pocket.
@@ -167,12 +190,13 @@ class PocketsPlugin extends Gdn_Plugin {
                $Repeat .= ' '.implode(',', $Indexes);
                break;
             default:
-               $Repeat = Pocket::REPEAT_ONCE;
                break;
          }
          $Form->SetFormValue('Repeat', $Repeat);
          $Form->SetFormValue('Sort', 0);
          $Form->SetFormValue('Format', 'Raw');
+         $Condition = Gdn_Condition::ToString($Sender->ConditionModule->Conditions(TRUE));
+         $Form->SetFormValue('Condition', $Condition);
 
          $Saved = $Form->Save();
          if ($Saved) {
@@ -192,6 +216,7 @@ class PocketsPlugin extends Gdn_Plugin {
             $Pocket['EveryFrequency'] = GetValue(0, $RepeatFrequency, 1);
             $Pocket['EveryBegin'] = GetValue(1, $RepeatFrequency, 1);
             $Pocket['Indexes'] = implode(',', $RepeatFrequency);
+            $Sender->ConditionModule->Conditions(Gdn_Condition::FromString($Pocket['Condition']));
             $Form->SetData($Pocket);
          } else {
             // Default the repeat.
@@ -200,6 +225,8 @@ class PocketsPlugin extends Gdn_Plugin {
       }
 
       $Sender->Form = $Form;
+
+      $Sender->SetData('Locations', $this->Locations);
       $Sender->SetData('LocationsArray', $this->GetLocationsArray());
       
       return $Sender->Render(dirname(__FILE__).'/views/addedit.php');
@@ -269,14 +296,9 @@ class PocketsPlugin extends Gdn_Plugin {
       }
    }
 
-   public function ProcessPockets($Location) {
+   public function ProcessPockets($Sender, $Location, $CountHint = NULL) {
       // Since plugins can't currently maintain their state we have to stash it in the Gdn object.
       $this->_LoadState();
-
-      if (!array_key_exists($Location, $this->_Pockets)) {
-         $this->_SaveState();
-         return;
-      }
       
       // Build up the data for filtering.
       $Data = array();
@@ -284,7 +306,9 @@ class PocketsPlugin extends Gdn_Plugin {
 
 
       // Increment the counter.
-      if (array_key_exists($Location, $this->_Counters)) {
+      if ($CountHint != NULL) {
+         $Count = $CountHint;
+      } elseif (array_key_exists($Location, $this->_Counters)) {
          $Count = $this->_Counters[$Location] + 1;
          $this->_Counters[$Location] = $Count;
       } else {
@@ -292,14 +316,25 @@ class PocketsPlugin extends Gdn_Plugin {
       }
 
       $Data['Count'] = $Count;
-//      echo "$Location : $Count";
+
+      if ($this->TestMode && array_key_exists($Location, $this->Locations) && Gdn::Session()->CheckPermission('Plugins.Pockets.Manage')) {
+         $LocationOptions = GetValue($Location, $this->Locations, FALSE);
+
+         $LocationName = GetValue("Name", $this->Locations, $Location);
+         echo
+            GetValueR('Wrap.0', $LocationOptions, ''),
+            "<div class=\"TestPocket\"><h3>$LocationName ($Count)</h3></div>",
+            GetValueR('Wrap.1', $LocationOptions, '');
+      }
 
       // Process all of the pockets.
-      foreach ($this->_Pockets[$Location] as $Pocket) {
-         /** @var Pocket $Pocket */
+      if (array_key_exists($Location, $this->_Pockets)) {
+         foreach ($this->_Pockets[$Location] as $Pocket) {
+            /** @var Pocket $Pocket */
 
-         if ($Pocket->CanRender($Data)) {
-            $Pocket->Render($Data);
+            if ($Pocket->CanRender($Data)) {
+               $Pocket->Render($Data);
+            }
          }
       }
 
@@ -329,13 +364,10 @@ class PocketsPlugin extends Gdn_Plugin {
          ->Column('Repeat', 'varchar(25)')
          ->Column('Body', 'text')
          ->Column('Format', 'varchar(20)')
+         ->Column('Condition', 'varchar(500)', NULL)
          ->Column('Disabled', 'smallint', '0') // set to a constant in class Pocket
          ->Column('Attributes', 'text', NULL)
          ->Set($Explicit, $Drop);
-   }
-
-   public function TestHtml($Html) {
-      return "\n".'<div style="border: 1px solid #C09; background: #F6C; color: #036; padding: 2px 6px; text-align: center;">'.$Html.'</div>';
    }
 }
 
