@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+   <?php if (!defined('APPLICATION')) exit();
 /*
 Copyright 2008, 2009 Vanilla Forums Inc.
 This file is part of Garden.
@@ -226,10 +226,14 @@ class VotingPlugin extends Gdn_Plugin {
 		.'</li>';
 	}
 
+//   public function CategoriesController_BeforeDiscussionContent_Handler($Sender) {
+//      $this->DiscussionsController_BeforeDiscussionContent_Handler($Sender);
+//   }
+
 	/**
 	 * Add the "Stats" buttons to the discussion list.
 	 */
-	public function DiscussionsController_BeforeDiscussionContent_Handler($Sender) {
+	public function Base_BeforeDiscussionContent_Handler($Sender) {
 		$Session = Gdn::Session();
 		$Discussion = GetValue('Discussion', $Sender->EventArguments);
 		// Answers
@@ -359,9 +363,16 @@ class VotingPlugin extends Gdn_Plugin {
 	 * Add JS & CSS to the page.
 	 */
 	public function DiscussionsController_Render_Before($Sender) {
-		$Sender->AddCSSFile('plugins/Voting/design/voting.css');
-		$Sender->AddJSFile('plugins/Voting/voting.js');
+		$this->AddJsCss($Sender);
 	}
+   public function CategoriesController_Render_Before($Sender) {
+      $this->AddJsCss($Sender);
+   }
+
+   public function AddJsCss($Sender) {
+      $Sender->AddCSSFile('plugins/Voting/design/voting.css');
+		$Sender->AddJSFile('plugins/Voting/voting.js');
+   }
 
 	/**
 	 * If turning off scoring, make the forum go back to the traditional "jump
