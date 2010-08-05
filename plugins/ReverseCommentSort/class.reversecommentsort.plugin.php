@@ -18,20 +18,20 @@ $PluginInfo['ReverseCommentSort'] = array(
    'AuthorUrl' => 'http://markosullivan.ca'
 );
 
-class VotingPlugin extends Gdn_Plugin {
+class ReverseCommentSortPlugin extends Gdn_Plugin {
 
-   /**
-	 * Sort the comments by popularity if necessary
-	 */
-   public function CommentModel_AfterCommentQuery_Handler($Sender) {
-      $Sender->OrderDirection = 'desc';
+	// 
+   public function CommentModel_AfterConstruct_Handler($CommentModel) {
+	   $CommentModel->OrderBy('c.DateInserted desc');
    }
+	
 	// Redirect back to the top of the discussion when posting a comment.
 	public function PostController_BeforeCommentRender_Handler($Sender) {
 		if (!GetValue('Draft', $Sender->EventArguments) && !GetValue('Editing', $Sender->EventArguments)) {
-			$Discussion = GetValue('Discussion', $Sender->EventArguments);
-			if ($Discussion)
-				$Sender->RedirectUrl = Gdn::Request()->Url('discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/#', TRUE);
+			$Comment = GetValue('Comment', $Sender->EventArguments);
+			// Redirect to the permalink of the new comment
+			if ($Comment)
+				$Sender->RedirectUrl = Gdn::Request()->Url('/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID, TRUE);
 		}
 	}
 
