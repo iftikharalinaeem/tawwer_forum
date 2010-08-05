@@ -65,6 +65,7 @@ class StatisticsPlugin extends Gdn_Plugin {
    }
    
    public function Controller_Catchup(&$Sender) {
+      set_time_limit(0);
       foreach (array('comments','discussions','registrations') as $TrackedItem) {
          $Method = 'Catchup'.ucfirst($TrackedItem);
          $this->$Method();
@@ -227,6 +228,8 @@ class StatisticsPlugin extends Gdn_Plugin {
             throw new Exception("Invalid range resolution '{$Resolution}' used when attempting to track '{$Type}:{$Qualifier}'");
       }
       
+      $NullValue = ($FillMode == self::FILL_ZERO) ? 0 : NULL;
+      
       $StatQuery = Gdn::SQL()
          ->Select('s.DateRangeStart')
          ->Select('s.IndexValue')
@@ -242,10 +245,9 @@ class StatisticsPlugin extends Gdn_Plugin {
       
       $StatData = $StatQuery->Get();
       
-      $NullValue = ($FillMode == self::FILL_ZERO) ? 0 : NULL;
-      
       $StatResults = array();
       if ($StatData->NumRows()) {
+      
          $DateExpect = $DateStart; $DateLast = NULL;
          while ($Stat = $StatData->NextRow()) {
             $DateInterval = self::DateFormatByResolution($Stat->DateRangeStart, $Resolution);
@@ -278,8 +280,20 @@ class StatisticsPlugin extends Gdn_Plugin {
             $DateExpect = $DateNextInterval;
             $DateLast = $DateInterval;
          }
+      } else {
+         $WorkingDate = $DateStart;
+         do {
+            
+            if (!array_key_exists($WorkingDate, $StatResults))
+               $StatResults[$WorkingDate] = array(
+                  'Date'      => $WorkingDate,
+                  'Value'     => $NullValue
+               );
+            
+            $WorkingDate = self::NextDate($WorkingDate, $Resolution);
+            $Continue = ($WorkingDate <= $DateEnd);
+         } while ($Continue);
       }
-      
       return $StatResults;
    }
    
