@@ -29,6 +29,9 @@ class StatisticsPlugin extends Gdn_Plugin {
    const RESOLUTION_DAY = 'day';
    const RESOLUTION_MONTH = 'month';
    
+   const FILL_ZERO = 'zero';
+   const FILL_NULL = 'null';
+   
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $LinkText = T('Statistics');
       $Menu = &$Sender->EventArguments['SideMenu'];
@@ -195,6 +198,118 @@ class StatisticsPlugin extends Gdn_Plugin {
             ->Where('DateRangeStart', $DateStart)
             ->Where('DateRangeEnd', $DateEnd)
             ->Put();
+      }
+   }
+   
+   public static function GetDataRange($Type, $Qualifier, $Resolution, $RangeStart, $RangeEnd, $FillMode = self::FILL_ZERO) {
+      $RangeStartRaw = (!is_int($RangeStart)) ? strtotime($RangeStart) : $RangeStart;
+      if ($RangeStartRaw === FALSE)
+         throw new Exception("Invalid range start date '{$RangeStart}' used when attempting to get data for '{$Type}:{$Qualifier}'");
+         
+      $RangeEndRaw = (!is_int($RangeEnd)) ? strtotime($RangeEnd) : $RangeEnd;
+      if ($RangeEndRaw === FALSE)
+         throw new Exception("Invalid range end date '{$RangeEnd}' used when attempting to get data for '{$Type}:{$Qualifier}'");
+         
+      switch ($Resolution) {
+         case self::RESOLUTION_HOUR:
+            $DateStart = date('Y-m-d H:00:00',$RangeStartRaw);
+            $DateEnd = date('Y-m-d H:00:00',$RangeEndRaw);
+            break;
+         case self::RESOLUTION_DAY:
+            $DateStart = date('Y-m-d',$RangeStartRaw);
+            $DateEnd = date('Y-m-d',$RangeEndRaw);
+            break;
+         case self::RESOLUTION_MONTH:
+            $DateStart = date('Y-m-01',$RangeStartRaw);
+            $DateEnd = date('Y-m-t',$RangeEndRaw);
+            break;
+         default:
+            throw new Exception("Invalid range resolution '{$Resolution}' used when attempting to track '{$Type}:{$Qualifier}'");
+      }
+      
+      $StatQuery = Gdn::SQL()
+         ->Select('s.DateRangeStart')
+         ->Select('s.IndexValue')
+         ->From('Statistics s')
+         ->Where('DateRangeType', $Resolution)
+         ->Where('IndexType', $Type)
+         ->Where('DateRangeStart >=', $DateStart)
+         ->Where('DateRangeEnd <=', $DateEnd)
+         ->OrderBy('s.DateRangeStart', 'asc');
+         
+      if (!is_null($Qualifier))
+         $StatQuery->Where('IndexQualifier', $Qualifier);
+      
+      $StatData = $StatQuery->Get();
+      
+      $NullValue = ($FillMode == self::FILL_ZERO) ? 0 : NULL;
+      
+      $StatResults = array();
+      if ($StatData->NumRows()) {
+         $DateExpect = $DateStart; $DateLast = NULL;
+         while ($Stat = $StatData->NextRow()) {
+            $DateInterval = self::DateFormatByResolution($Stat->DateRangeStart, $Resolution);
+            
+            // The date I'm reading in is not what I expected. Need to create some fake data.
+            if ($DateInterval != $DateExpect && $DateInterval != $DateLast) {
+               $WorkingDate = $DateExpect;
+               do {
+                  
+                  if (!array_key_exists($WorkingDate, $StatResults))
+                     $StatResults[$WorkingDate] = array(
+                        'Date'      => $WorkingDate,
+                        'Value'     => $NullValue
+                     );
+                  
+                  $WorkingDate = self::NextDate($WorkingDate, $Resolution);
+                  $Continue = ($WorkingDate < $DateInterval);
+               } while ($Continue);
+            }
+            
+            if (!array_key_exists($DateInterval, $StatResults))
+               $StatResults[$DateInterval] = array(
+                  'Date'            => $DateInterval,
+                  'Value'           => $Stat->IndexValue
+               );
+            else
+               $StatResults[$DateInterval]['Value'] += $Stat->IndexValue;
+            
+            $DateNextInterval = self::NextDate($Stat->DateRangeStart, $Resolution);
+            $DateExpect = $DateNextInterval;
+            $DateLast = $DateInterval;
+         }
+      }
+      
+      return $StatResults;
+   }
+   
+   protected static function NextDate($CurrentDate, $Resolution) {
+      $DateRaw = (!is_int($CurrentDate)) ? strtotime($CurrentDate) : $CurrentDate;
+      if ($DateRaw === FALSE)
+         throw new Exception("Invalid range start date '{$CurrentDate}' while calculating next date");
+      
+      $NextDateRaw = strtotime("+1 {$Resolution}", $DateRaw);
+      return self::DateFormatByResolution($NextDateRaw, $Resolution);
+   }
+   
+   protected static function DateFormatByResolution($Date, $Resolution) {
+   
+      $DateRaw = (!is_int($Date)) ? strtotime($Date) : $Date;
+      if ($DateRaw === FALSE)
+         throw new Exception("Invalid date '{$Date}', unable to convert to epoch");
+      
+      switch ($Resolution) {
+         case self::RESOLUTION_HOUR:
+            return date('Y-m-d H:00:00',$DateRaw);
+            
+         case self::RESOLUTION_DAY:
+            return date('Y-m-d',$DateRaw);
+            
+         case self::RESOLUTION_MONTH:
+            return date('Y-m-01',$DateRaw);
+            
+         default:
+            throw new Exception("Invalid date resolution '{$Resolution}'");
       }
    }
    
