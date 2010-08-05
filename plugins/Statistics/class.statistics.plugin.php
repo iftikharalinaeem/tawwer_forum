@@ -214,6 +214,38 @@ class StatisticsPlugin extends Gdn_Plugin {
       self::RegisterTrackedItem($TrackedItem, $Qualifiers);
    }
    
+   /**
+    * Override the default index method of the settings controller in the
+    * dashboard application to render new statistics.
+    */
+   public function SettingsController_Index_Create(&$Sender) {
+      $Sender->AddJsFile('settings.js');
+      $Sender->AddJsFile('plugins/Statistics/js/raphael.js');
+      $Sender->AddJsFile('plugins/Statistics/js/graph.js');
+      $Sender->AddCSSFile('plugins/Statistics/design/graph.css');
+      $Sender->Title(T('Dashboard'));
+      $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Applications.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Applicants.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
+      $Sender->FireEvent('DefineAdminPermissions');
+      $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
+      $Sender->AddSideMenu('garden/settings');
+      $Sender->SetData('UserData', StatisticsPlugin::GetDataRange('users', NULL, StatisticsPlugin::RESOLUTION_DAY, '2010-07-01', '2010-08-05'));
+      $Sender->SetData('CommentData', StatisticsPlugin::GetDataRange('comments', NULL, StatisticsPlugin::RESOLUTION_DAY, '2010-07-01', '2010-08-05'));
+      $Sender->SetData('DiscussionData', StatisticsPlugin::GetDataRange('discussions', NULL, StatisticsPlugin::RESOLUTION_DAY, '2010-07-01', '2010-08-05'));
+      
+      $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboard.php');
+   }
+   
    public function Setup() {
       $this->Structure();
       $this->_RegisterTrackedItem(array(

@@ -1,0 +1,27 @@
+#GraphHolder {
+   height: 250px;
+   background: #E2F4FF;
+   background: #fff;
+   border: 1px solid #A5D0E7;
+   border: 1px solid #AAA;
+   padding-bottom: 18px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   border-radius: 2px;
+}
+#GraphHolder span {
+   display: none;
+}
+#GraphHolder span.Metrics {
+}
+#GraphHolder span.Metric5 { color: #8e72d6; }
+#GraphHolder span.Metric2 { color: #1da4db; }
+#GraphHolder span.Metric3 { color: #90d954; }
+#GraphHolder span.Metric4 { color: #efd015; }
+#GraphHolder span.Metric1 { color: #fa9f2c; }
+#GraphHolder span.Metric6 { color: #f80e27; }
+#GraphHolder span.Headings {
+   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+   font-size: 9px;
+   color: #555;
+}
