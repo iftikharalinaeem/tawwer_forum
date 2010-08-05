@@ -205,144 +205,151 @@ $(function () {
 });
 
 window.onload = function () {
-    // Grab the data
-    var rowLabels = [],
-        footLabels = [],
-        rows = []
-        data = [];
-    $("table.GraphData tfoot td, table.GraphData thead td").each(function () {
-        footLabels.push($(this).html());
-    });
-    $('table.GraphData tbody tr').each(function() {
-        var d = [];
-        $(this).find('td').each(function() {
-            d.push($(this).html());
-        });
-        rows.push(d);
-        d = [];
-    });
-    $("table.GraphData tbody td").each(function () {
-        data.push($(this).html());
-    });
-    $("table.GraphData tbody th").each(function () {
-        rowLabels.push($(this).html());
-    });
     
-    var width = $('#GraphHolder').width(),
-        height = $('#GraphHolder').height(),
-        leftgutter = 0,
-        bottomgutter = 20,
-        topgutter = 20,
-        r = Raphael("GraphHolder", width, height),
-        metricFontSize = 11,
-        metricText = {font: metricFontSize + "px 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif", fill: "#fff"},
-        dateText = {font: "10px 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif", fill: "#fff"},
-        footText = {font: $('#GraphHolder span.Headings').css('font-size') + ' ' + $('#GraphHolder span.Headings').css('font-family'), fill: $('#GraphHolder span.Headings').css('color')},
-        X = (width - leftgutter) / footLabels.length,
-        max = Math.max.apply(Math, data),
-        Y = (height - bottomgutter - topgutter) / max;
+    function drawGraph() {
+        // Grab the data
+        var rowLabels = [],
+            footLabels = [],
+            rows = []
+            data = [];
+        $("table.GraphData tfoot td, table.GraphData thead td").each(function () {
+            footLabels.push($(this).html());
+        });
+        $('table.GraphData tbody tr').each(function() {
+            var d = [];
+            $(this).find('td').each(function() {
+                d.push($(this).html());
+            });
+            rows.push(d);
+            d = [];
+        });
+        $("table.GraphData tbody td").each(function () {
+            data.push($(this).html());
+        });
+        $("table.GraphData tbody th").each(function () {
+            rowLabels.push($(this).html());
+        });
         
-    r.drawGrid(leftgutter + X * .5 - 1, topgutter + .5, width - leftgutter - X, height - topgutter - bottomgutter, footLabels.length - 1, 10, $('#GraphHolder').css('border-left-color'));
-
-    var dots = [];
-    var coordinates = [];
-    for (var j = 0; j < rows.length; j++) {
-        dots.push([]);
-        coordinates.push([]);
-        var color = getColor(j);
-        var row = rows[j];
-        var path = r.path().attr({stroke: color, "stroke-width": 2}),
-            label = r.set(),
-            is_label_visible = false,
-            leave_timer,
-            blanket = r.set(),
-            lineHeight = metricFontSize + 2;
-        for (m = 0; m < rows.length; m++) {
-            label.push(r.text(0, lineHeight, "400 Discussions").attr(metricText).attr({fill: getColor(m)}));
-            lineHeight += metricFontSize + 2;
+        var width = $('#GraphHolder').width(),
+            height = $('#GraphHolder').height(),
+            leftgutter = 0,
+            bottomgutter = 20,
+            topgutter = 20,
+            r = Raphael("GraphHolder", width, height),
+            metricFontSize = 11,
+            metricText = {font: metricFontSize + "px 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif", fill: "#fff"},
+            dateText = {font: "10px 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif", fill: "#fff"},
+            footText = {font: $('#GraphHolder span.Headings').css('font-size') + ' ' + $('#GraphHolder span.Headings').css('font-family'), fill: $('#GraphHolder span.Headings').css('color')},
+            X = (width - leftgutter) / footLabels.length,
+            max = Math.max.apply(Math, data),
+            Y = (height - bottomgutter - topgutter) / max;
+            
+        r.drawGrid(leftgutter + X * .5 - 1, topgutter + .5, width - leftgutter - X, height - topgutter - bottomgutter, footLabels.length - 1, 10, $('#GraphHolder').css('border-left-color'));
+    
+        var dots = [];
+        var coordinates = [];
+        for (var j = 0; j < rows.length; j++) {
+            dots.push([]);
+            coordinates.push([]);
+            var color = getColor(j);
+            var row = rows[j];
+            var path = r.path().attr({stroke: color, "stroke-width": 2}),
+                label = r.set(),
+                is_label_visible = false,
+                leave_timer,
+                blanket = r.set(),
+                lineHeight = metricFontSize + 2;
+            for (m = 0; m < rows.length; m++) {
+                label.push(r.text(0, lineHeight, "400 Discussions").attr(metricText).attr({fill: getColor(m)}));
+                lineHeight += metricFontSize + 2;
+            }
+            label.push(r.text(0, lineHeight + 4, "16 Sept").attr(dateText));
+            label.hide();
+            var frame = r.popup(100, 100, label, "right").attr({fill: "#000", stroke: "#474747", "stroke-width": 2, "fill-opacity": .7}).hide();
+            var p;
+            
+            for (var i = 0; i < row.length; i++) {
+                var y = Math.round(height - bottomgutter - Y * row[i]); // Define the y position of the dot
+                var x = Math.round(leftgutter + X * (i + .5)); // Define the x position of the dot
+                if (!i) {
+                    p = ["M", x, y, "C", x, y]; // C is for a curving line path
+                }
+                if (i && i < row.length - 1) {
+                    var Y0 = Math.round(height - bottomgutter - Y * row[i - 1]),
+                        Y2 = Math.round(height - bottomgutter - Y * row[i + 1]),
+                        // Defines the radius of the curve of the line paths
+                        X0 = Math.round(leftgutter + X * (i - .1)),
+                        X2 = Math.round(leftgutter + X * (i + 1.1));
+    
+                    var a = getAnchors(X0, Y0, x, y, X2, Y2);
+                    p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
+                }
+                var dot = r.circle(x, y, 5).attr({fill: color, stroke: $('#GraphHolder').css('background-color')});
+                dot.hide();
+                blanket.push(r.rect(leftgutter + X * i, 0, X, height - bottomgutter).attr({stroke: "none", fill: "#fff", opacity: 0}));
+                
+                dots[j].push(dot);
+                coordinates[j].push([x, y]);
+            }
+            for (var i = 0; i < blanket.length; i++) {
+                var rect = blanket[i];
+                
+                // Show/Hide the popup data when the top line is hovered
+                (function (i, lbl) {
+                    var timer;
+                    rect.hover(function () {
+                        yLevel = 100000;
+                        for (j = 0; j < rows.length; j++) {
+                            dots[j][i].show();
+                            x = coordinates[j][i][0];
+                            y = coordinates[j][i][1];
+                            if (y < yLevel)
+                                yLevel = y;
+                        }
+                        clearTimeout(leave_timer);
+                        var side = "top-middle";
+                        if (x + frame.getBBox().width > width) {
+                            // console.log('x + frame.getBBox().width', x + frame.getBBox().width);
+                            // console.log('width', width);
+                            side = "left";
+                        }
+                        if (x < frame.getBBox().width)
+                            side = "right";
+                            
+                        if (yLevel - frame.getBBox().height - 5 < 0)
+                            side = "bottom-middle";
+                            
+                        var ppp = r.popup(x, yLevel, label, side, 1);
+                        frame.show().animate({path: ppp.path}, 200 * is_label_visible);
+                        for (a = 0; a < rows.length; a++) {
+                            label[a].attr({text: rows[a][i] + " " + rowLabels[a]}).show().animateWith(frame, {translation: [ppp.dx, ppp.dy]}, 200 * is_label_visible);                            
+                        }
+                        label[rows.length].attr({text: lbl}).show().animateWith(frame, {translation: [ppp.dx, ppp.dy]}, 200 * is_label_visible);
+                        is_label_visible = true;
+                    }, function () {
+                        for (j = 0; j < rows.length; j++) {
+                            dots[j][i].hide();
+                        }
+                        leave_timer = setTimeout(function () {
+                            frame.hide();
+                            label.hide();
+                            is_label_visible = false;
+                        }, 1);
+                    });
+                })(i, footLabels[i]);
+                
+            }
+            p = p.concat([x, y, x, y]);
+            path.attr({path: p}); // This adds the line connecting the dots
+            frame.toFront();
+            label.toFront();
+            blanket.toFront();   
         }
-        label.push(r.text(0, lineHeight + 4, "16 Sept").attr(dateText));
-        label.hide();
-        var frame = r.popup(100, 100, label, "right").attr({fill: "#000", stroke: "#474747", "stroke-width": 2, "fill-opacity": .7}).hide();
-        var p;
         
-        for (var i = 0; i < row.length; i++) {
-            var y = Math.round(height - bottomgutter - Y * row[i]); // Define the y position of the dot
-            var x = Math.round(leftgutter + X * (i + .5)); // Define the x position of the dot
-            if (!i) {
-                p = ["M", x, y, "C", x, y]; // C is for a curving line path
-            }
-            if (i && i < row.length - 1) {
-                var Y0 = Math.round(height - bottomgutter - Y * row[i - 1]),
-                    Y2 = Math.round(height - bottomgutter - Y * row[i + 1]),
-                    // Defines the radius of the curve of the line paths
-                    X0 = Math.round(leftgutter + X * (i - .1)),
-                    X2 = Math.round(leftgutter + X * (i + 1.1));
-
-                var a = getAnchors(X0, Y0, x, y, X2, Y2);
-                p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
-            }
-            var dot = r.circle(x, y, 5).attr({fill: color, stroke: $('#GraphHolder').css('background-color')});
-            dot.hide();
-            blanket.push(r.rect(leftgutter + X * i, 0, X, height - bottomgutter).attr({stroke: "none", fill: "#fff", opacity: 0}));
-            
-            dots[j].push(dot);
-            coordinates[j].push([x, y]);
-        }
-        for (var i = 0; i < blanket.length; i++) {
-            var rect = blanket[i];
-            
-            // Show/Hide the popup data when the top line is hovered
-            (function (i, lbl) {
-                var timer;
-                rect.hover(function () {
-                    yLevel = 100000;
-                    for (j = 0; j < rows.length; j++) {
-                        dots[j][i].show();
-                        x = coordinates[j][i][0];
-                        y = coordinates[j][i][1];
-                        if (y < yLevel)
-                            yLevel = y;
-                    }
-                    clearTimeout(leave_timer);
-                    var side = "top-middle";
-                    if (x + frame.getBBox().width > width) {
-                        // console.log('x + frame.getBBox().width', x + frame.getBBox().width);
-                        // console.log('width', width);
-                        side = "left";
-                    }
-                    if (x < frame.getBBox().width)
-                        side = "right";
-                        
-                    if (yLevel - frame.getBBox().height - 5 < 0)
-                        side = "bottom-middle";
-                        
-                    var ppp = r.popup(x, yLevel, label, side, 1);
-                    frame.show().animate({path: ppp.path}, 200 * is_label_visible);
-                    for (a = 0; a < rows.length; a++) {
-                        label[a].attr({text: rows[a][i] + " " + rowLabels[a]}).show().animateWith(frame, {translation: [ppp.dx, ppp.dy]}, 200 * is_label_visible);                            
-                    }
-                    label[rows.length].attr({text: lbl}).show().animateWith(frame, {translation: [ppp.dx, ppp.dy]}, 200 * is_label_visible);
-                    is_label_visible = true;
-                }, function () {
-                    for (j = 0; j < rows.length; j++) {
-                        dots[j][i].hide();
-                    }
-                    leave_timer = setTimeout(function () {
-                        frame.hide();
-                        label.hide();
-                        is_label_visible = false;
-                    }, 1);
-                });
-            })(i, footLabels[i]);
-            
-        }
-        p = p.concat([x, y, x, y]);
-        path.attr({path: p}); // This adds the line connecting the dots
-        frame.toFront();
-        label.toFront();
-        blanket.toFront();   
+        r.drawFoot(footLabels, height, leftgutter, r, footText, X);
     }
     
-    r.drawFoot(footLabels, height, leftgutter, r, footText, X);
+    drawGraph();
+    $(window).resize(function() { drawGraph(); });
+
 };

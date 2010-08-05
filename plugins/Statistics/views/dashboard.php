@@ -8,8 +8,10 @@ function WriteData($Data, $Field = 'Value') {
    foreach ($Data as $Date => $Row) {
       $Alt = $Alt == 0 ? 1 : 0;
       $Val = GetValue($Field, $Row, 0);
-      if ($Field == 'Date')
-         $Val = date('m d', strtotime($Val));
+      if ($Field == 'Date') {
+         $Date = Gdn_Format::ToTimestamp($Val);
+         $Val = date(date('Y', $Date) < date('Y') ? 'M d, Y' : 'M d', strtotime($Val));
+      }
          
       echo Wrap($Val, 'td', $Alt ? array('class' => 'Alt') : '');
    }
@@ -30,13 +32,7 @@ function WriteData($Data, $Field = 'Value') {
     <thead>
         <tr>
             <th>Date</th>
-            <?php
-            $Alt = 0;
-            foreach ($UserData as $Date => $Data) {
-               $Alt = $Alt == 0 ? 1 : 0;
-               echo Wrap($Date, 'td', Alt($Alt));
-            }
-            ?>
+            <?php WriteData($UserData, 'Date'); ?>
         </tr>
     </thead>
     <tbody>

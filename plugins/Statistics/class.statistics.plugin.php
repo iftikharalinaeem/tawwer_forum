@@ -350,8 +350,8 @@ class StatisticsPlugin extends Gdn_Plugin {
    public function SettingsController_Index_Create(&$Sender) {
       $Sender->AddJsFile('settings.js');
       $Sender->AddJsFile('plugins/Statistics/js/raphael.js');
-      // $Sender->AddJsFile('plugins/Statistics/js/graph.js');
-      // $Sender->AddCSSFile('plugins/Statistics/design/graph.css');
+      $Sender->AddJsFile('plugins/Statistics/js/graph.js');
+      $Sender->AddCSSFile('plugins/Statistics/design/graph.css');
       $Sender->Title(T('Dashboard'));
       $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
@@ -368,9 +368,9 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->FireEvent('DefineAdminPermissions');
       $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
       $Sender->AddSideMenu('garden/settings');
-      $Sender->SetData('UserData', StatisticsPlugin::GetDataRange('users', NULL, StatisticsPlugin::RESOLUTION_DAY, '2005-07-01', '2005-08-05'));
-      $Sender->SetData('CommentData', StatisticsPlugin::GetDataRange('comments', NULL, StatisticsPlugin::RESOLUTION_DAY, '2005-07-01', '2005-08-05'));
-      $Sender->SetData('DiscussionData', StatisticsPlugin::GetDataRange('discussions', NULL, StatisticsPlugin::RESOLUTION_DAY, '2005-07-01', '2005-08-05'));
+      $Sender->SetData('UserData', StatisticsPlugin::GetDataRange('users', NULL, StatisticsPlugin::RESOLUTION_DAY, '2010-07-01', '2010-08-01'));
+      $Sender->SetData('CommentData', StatisticsPlugin::GetDataRange('comments', NULL, StatisticsPlugin::RESOLUTION_DAY, '2010-07-01', '2010-08-01'));
+      $Sender->SetData('DiscussionData', StatisticsPlugin::GetDataRange('discussions', NULL, StatisticsPlugin::RESOLUTION_DAY, '2010-07-01', '2010-08-01'));
       $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboard.php');
    }
    
