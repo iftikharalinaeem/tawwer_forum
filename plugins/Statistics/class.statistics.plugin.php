@@ -247,7 +247,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       
       $StatResults = array();
       if ($StatData->NumRows()) {
-      
+         $DateInterval = NULL;
          $DateExpect = $DateStart; $DateLast = NULL;
          while ($Stat = $StatData->NextRow()) {
             $DateInterval = self::DateFormatByResolution($Stat->DateRangeStart, $Resolution);
@@ -280,8 +280,10 @@ class StatisticsPlugin extends Gdn_Plugin {
             $DateExpect = $DateNextInterval;
             $DateLast = $DateInterval;
          }
-      } else {
-         $WorkingDate = $DateStart;
+      }
+      
+      if (!sizeof($StatResults) || $DateInterval < $DateEnd) {
+         $WorkingDate = (sizeof($StatResults)) ? $DateInterval : $DateStart;
          do {
             
             if (!array_key_exists($WorkingDate, $StatResults))
