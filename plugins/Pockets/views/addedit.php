@@ -23,6 +23,13 @@ echo $Form->Errors();
    </li>
    <li>
       <?php
+         echo $Form->Label('Page', 'Page');
+         //echo '<div class="Info2">', T('Select the location of the pocket.', 'Select the location of the pocket.'), '</div>';
+         echo $Form->DropDown('Page', $this->Data('Pages'));
+      ?>
+   </li>
+   <li>
+      <?php
          echo $Form->Label('Location', 'Location');
          echo '<div class="Info2">', T('Select the location of the pocket.', 'Select the location of the pocket.'), '</div>';
          echo $Form->DropDown('Location', array_merge(array('' => '('.sprintf(T('Select a %s'), T('Location')).')'), $this->Data('LocationsArray')));
