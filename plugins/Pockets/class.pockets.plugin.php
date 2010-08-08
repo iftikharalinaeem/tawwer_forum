@@ -36,7 +36,9 @@ class PocketsPlugin extends Gdn_Plugin {
       'Content' => array('Name' => 'Content'),
       'Panel' => array('Name' => 'Panel'),
       'BetweenDiscussions' => array('Name' => 'Between Discussions', 'Wrap' => array('<li>', '</li>')),
-      'BetweenComments' => array('Name' => 'Between Comments', 'Wrap' => array('<li>', '</li>')));
+      'BetweenComments' => array('Name' => 'Between Comments', 'Wrap' => array('<li>', '</li>')),
+      'Head' => array('Name' => 'Head'),
+      'Foot' => array('Name' => 'Foot'));
 
    /** An array of all of the pockets indexed by location.
     *
@@ -45,9 +47,12 @@ class PocketsPlugin extends Gdn_Plugin {
    protected $_Pockets = array();
 
    /** Whether or not to display test items for all pockets. */
-   public $TestMode = TRUE;
+   public $TestMode = NULL;
 
    public function Base_Render_Before($Sender) {
+      if ($this->TestMode === NULL)
+         $this->TestMode = C('Plugins.Pockets.ShowLocations');
+
       if ($this->TestMode && Gdn::Session()->CheckPermission('Plugins.Pockets.Manage')) {
          // Add the css for the test pockets to the page.
          $Sender->AddCSSFile('plugins/Pockets/design/pockets.css');
@@ -146,7 +151,18 @@ class PocketsPlugin extends Gdn_Plugin {
 
       $Sender->SetData('PocketData', $PocketData);
 
-      $Sender->Form = new Gdn_Form();
+      $Form = new Gdn_Form();
+
+      // Save global options.
+      if ($Form->AuthenticatedPostBack()) {
+         $ShowLocations = $Form->GetFormValue('ShowLocations');
+         SaveToConfig('Plugins.Pockets.ShowLocations', $ShowLocations);
+         $Sender->StatusMessage = T('Your changes have been saved.');
+      } else {
+         $Form->SetFormValue('ShowLocations', C('Plugins.Pockets.ShowLocations', FALSE));
+      }
+
+      $Sender->Form = $Form;
       $Sender->Render(dirname(__FILE__).'/views/index.php');
    }
 
@@ -162,7 +178,6 @@ class PocketsPlugin extends Gdn_Plugin {
       $Form->SetModel($PocketModel);
       $Sender->ConditionModule = new ConditionModule($Sender);
       $Sender->Form = $Form;
-      $this->TestMode = TRUE;
 
       if ($Form->AuthenticatedPostBack()) {
          // Save the pocket.
@@ -228,6 +243,7 @@ class PocketsPlugin extends Gdn_Plugin {
 
       $Sender->SetData('Locations', $this->Locations);
       $Sender->SetData('LocationsArray', $this->GetLocationsArray());
+      $Sender->SetData('Pages', array('' => '('.T('All').')', 'activity' => 'activity', 'comments' => 'comments', 'dashboard' => 'dashboard', 'discussions' => 'discussions', 'inbox' => 'inbox', 'profile' => 'profile'));
       
       return $Sender->Render(dirname(__FILE__).'/views/addedit.php');
    }
@@ -316,15 +332,20 @@ class PocketsPlugin extends Gdn_Plugin {
       }
 
       $Data['Count'] = $Count;
+      $Data['PageName'] = Pocket::PageName($Sender);
+
+      $LocationOptions = GetValue($Location, $this->Locations, array());
 
       if ($this->TestMode && array_key_exists($Location, $this->Locations) && Gdn::Session()->CheckPermission('Plugins.Pockets.Manage')) {
-         $LocationOptions = GetValue($Location, $this->Locations, FALSE);
-
          $LocationName = GetValue("Name", $this->Locations, $Location);
          echo
             GetValueR('Wrap.0', $LocationOptions, ''),
             "<div class=\"TestPocket\"><h3>$LocationName ($Count)</h3></div>",
             GetValueR('Wrap.1', $LocationOptions, '');
+
+         if ($Location == 'Foot' && strcasecmp($Count, 'after') == 0) {
+            echo $this->TestData($Sender);
+         }
       }
 
       // Process all of the pockets.
@@ -333,7 +354,11 @@ class PocketsPlugin extends Gdn_Plugin {
             /** @var Pocket $Pocket */
 
             if ($Pocket->CanRender($Data)) {
+               $Wrap = GetValue('Wrap', $LocationOptions, array());
+
+               echo GetValue(0, $Wrap, '');
                $Pocket->Render($Data);
+               echo GetValue(1, $Wrap, '');
             }
          }
       }
@@ -359,6 +384,7 @@ class PocketsPlugin extends Gdn_Plugin {
       $St->Table('Pocket')
          ->PrimaryKey('PocketID')
          ->Column('Name', 'varchar(255)')
+         ->Column('Page', 'varchar(50)', NULL)
          ->Column('Location', 'varchar(50)')
          ->Column('Sort', 'smallint')
          ->Column('Repeat', 'varchar(25)')
@@ -368,6 +394,34 @@ class PocketsPlugin extends Gdn_Plugin {
          ->Column('Disabled', 'smallint', '0') // set to a constant in class Pocket
          ->Column('Attributes', 'text', NULL)
          ->Set($Explicit, $Drop);
+   }
+
+   public function TestData($Sender) {
+      echo "<div class=\"TestPocket\"><h3>Test Data</h3>";
+
+      echo '<ul class="Variables">';
+
+      echo self::_Var('path', Gdn::Request()->Path());
+
+      echo self::_Var('page', Pocket::PageName($Sender));
+
+
+//      $RequestArgs = Gdn::Request()->GetRequestArguments();
+//      foreach ($RequestArgs as $Type => $Args) {
+//         if ($Type == Gdn_Request::INPUT_COOKIES)
+//            continue;
+//         foreach ($Args as $Name => $Value) {
+//            echo self::_Var("$Type.$Name", $Value);
+//         }
+//      }
+
+      echo '</ul>';
+
+      echo "</div>";
+   }
+
+   protected static function _Var($Name, $Value) {
+      return '<li class="Var"><b>'.htmlspecialchars($Name).'</b><span>'.htmlspecialchars($Value).'</span></li>';
    }
 }
 

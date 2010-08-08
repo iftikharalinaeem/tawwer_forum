@@ -35,6 +35,9 @@ class Pocket {
    /** $var string A descriptive name for the pocket to help keep it organized. */
    public $Name = '';
 
+   /** $var string The name of the page to put the pocket on. */
+   public $Page = '';
+
    /** $var string How the pocket repeats on the page. */
    public $RepeatType = Pocket::REPEAT_INDEX;
 
@@ -60,6 +63,10 @@ class Pocket {
                return FALSE;
             break;
       }
+
+      // Check to see if the page matches.
+      if ($this->Page && strcasecmp($this->Page, GetValue('PageName', $Data)) != 0)
+         return FALSE;
 
       // Check to see if this is repeating.
       $Count = GetValue('Count', $Data);
@@ -104,10 +111,28 @@ class Pocket {
       $this->Format = $Data['Format'];
       $this->Location = $Data['Location'];
       $this->Name = $Data['Name'];
+      $this->Page = $Data['Page'];
 
       // parse the frequency.
       $Repeat = $Data['Repeat'];
       list($this->RepeatType, $this->RepeatFrequency) = Pocket::ParseRepeat($Repeat);
+   }
+
+   public static $NameTranslations = array('conversations' => 'inbox', 'messages' => 'inbox', 'categories' => 'discussions', 'discussion' => 'comments');
+
+   public static function PageName($NameOrObject = NULL) {
+      if (is_object($NameOrObject))
+         $Name = GetValue('PageName', $NameOrObject, GetValue('ControllerName', $NameOrObject, get_class($NameOrObject)));
+      else
+         $Name = $NameOrObject;
+
+      $Name = strtolower($Name);
+      if (StringEndsWith($Name, 'controller', FALSE))
+         $Name = substr($Name, 0, -strlen('controller'));
+
+      if (array_key_exists($Name, self::$NameTranslations))
+         $Name = self::$NameTranslations[$Name];
+      return $Name;
    }
 
    public static function ParseRepeat($Repeat) {

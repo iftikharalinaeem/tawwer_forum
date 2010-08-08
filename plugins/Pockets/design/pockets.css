@@ -2,7 +2,7 @@
    border: 1px solid #FC3;
    background: #F6C;
    color: #036;
-   padding: 2px 6px;
+   padding: 4px 6px !important;
 
    /* default background colour, for all layout engines that don't implement gradients */
    background: #FFE768;
@@ -30,4 +30,21 @@
    font-variant: small-caps;
    letter-spacing: 4px;
    text-align: center;
+}
+
+.TestPocket .Variables .Var {
+   display: inline-block;
+   width: 25% !important;
+   vertical-align: top;
+   margin-top: 5px;
+   overflow: hidden;
+}
+
+.TestPocket li {
+   border-top: dotted 1px #c90;
+   padding: 4px 0px 0 0px;
+}
+
+.TestPocket .Var b {
+   display: block;
 }
