@@ -247,9 +247,8 @@ body.managecategories table td.Last {
 /* Buttons */
 a.SmallButton,
 a.Button,
-input.Button,
-.SmallBlueButton,
-.BlueButton {
+input.SmallButton,
+input.Button {
    border-radius: 4px;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
@@ -263,27 +262,25 @@ input.Button,
 	text-decoration:none;
 	text-shadow:0 1px 0 #B7F5FD;
 }
+input.SmallButton:hover,
 a.SmallButton:hover,
 a.Button:hover,
-input.Button:hover,
-.SmallBlueButton:hover,
-.BlueButton:hover {
+input.Button:hover {
 	border:1px solid #0B64C6;
 	color:#001F44;
 	text-shadow:0 1px 0 #EEFFFF;
 }
+input.SmallButton:focus,
 a.SmallButton:focus,
 a.Button:focus,
-input.Button:focus,
-.SmallBlueButton:focus,
-.BlueButton:focus {
+input.Button:focus {
 	background:none repeat scroll 0 0 #81CFF6;
 	border:1px solid #0B64C6;
 	color:#001F44;
 	text-shadow:0 1px 0 #EEFFFF;
 }
-a.SmallButton,
-.SmallBlueButton {
+input.SmallButton,
+a.SmallButton {
    border-radius: 3px;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
@@ -295,11 +292,15 @@ a.SmallButton,
 	-moz-box-shadow:0 0 0 #999999;
 	-webkit-box-shadow:0 0 0 #999999;
 }
+input.SmallButton:hover,
 a.SmallButton:hover,
 .SmallBlueButton:hover {
 	box-shadow:0 0 2px #999999;
 	-moz-box-shadow:0 0 2px #999999;
 	-webkit-box-shadow:0 0 2px #999999;
+}
+#UrlCode span {
+	background: #ff8;
 }
 /* Popups */
 .Overlay {
@@ -381,7 +382,13 @@ ul.PanelInfo li a {
 	color: #000;
 	text-shadow: 0 0 1px #fff;
 	display: block;
-	padding: 4px 10px;
+	padding: 2px 10px;
+}
+ul.PanelInfo li {
+	padding: 0;
+}
+ul.PanelInfo {
+	margin: 0 0 10px;
 }
 #Panel div.Box h4 a {
 	font-size: 14px;
