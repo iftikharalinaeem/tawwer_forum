@@ -12,19 +12,34 @@ body {
 }
 #Head div.User a,
 #Head h1 a span {
-	background: url('images/dashboard-sprites.png') top left no-repeat #014783;
+	background: #01518d;
 	border: 1px solid #002b57;
 	color: #fff;
 	text-shadow:0 1px 0 #000;
-	padding: 4px 6px 4px 22px;
+	padding: 4px 6px;
 	font-size: 12px;
 	font-weight: normal;
    border-radius: 3px;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 }
-#Head div.User a { background-position: 4px -595px; }
+#Head div.User a:hover,
+#Head h1 a span:hover {
+	background: #003e7b;
+}
+#Head div.User a.Profile,
 #Head h1 a span {
+	background: url('images/dashboard-sprites.png') top left no-repeat #01518d;
+	padding: 4px 6px 4px 22px;
+}
+#Head div.User a.Profile:hover,
+#Head h1 a span:hover {
+	background: url('images/dashboard-sprites.png') top left no-repeat #003e7b;
+}
+#Head div.User a.Profile,
+#Head div.User a.Profile:hover { background-position: 4px -595px; }
+#Head h1 a span,
+#Head h1 a span:hover {
 	padding: 4px 6px 4px 20px;
 	background-position: 6px -694px;
 }
@@ -48,10 +63,25 @@ body {
 	border-bottom: 1px solid #8bc1de;
 	padding: 10px 20px;
 	font-size: 14px;
+	margin: 0;
 }
 #Content h3 {
-	margin-top: 10px;
 	border-top: 1px solid #8bc1de;
+}
+div.Errors ul {
+	background: #ff0000 !important;
+	border: none !important;
+}
+div.Errors ul li {
+	font-size: 12px;
+	color: #fff;
+	text-shadow: 0 1px 0 #000;
+}
+div.Messages ul {
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+	padding: 10px 20px !important;
 }
 .CurrentTheme {
 	border:none;
@@ -59,6 +89,9 @@ body {
 }
 #Content h4 {
 	padding: 20px 20px 0;
+}
+#Content table h4 {
+	padding: 0;
 }
 div.Description {
 	padding: 0 20px 20px;
@@ -80,14 +113,16 @@ table.SelectionGrid td {
 	border-color: #e0e0e0;
 }
 #Content form ul {
-	padding: 0 20px;
+	padding: 20px 20px 0;
 }
 #Content form input.Button {
 	margin: 0 20px 20px;
 }
+#dashboard_user_browse #Content div.Info,
 #dashboard_user_index #Content div.Info {
 	padding: 10px 20px 0;
 }
+#dashboard_user_browse #Content form input.Button,
 #dashboard_user_index #Content form input.Button {
 	margin: 0 20px 10px;
 }
@@ -98,14 +133,20 @@ div.Info {
 	background: none;
 	border: none;
 	line-height: inherit;
-	margin: 0;
+	margin: 20px 0;
 	padding: 0 20px;
 }
 #Content form ul div.Info {
 	padding: 0;
 }
 .FilterMenu {
-	padding: 6px 20px;
+	padding:0 20px 10px;
+	position:relative;
+	top:-10px;	
+}
+table tbody td.Info strong,
+a.SmallButton {
+	margin-right: 10px;
 }
 #dashboard_settings_registration #Content form ul {
 	padding: 0;
@@ -124,7 +165,7 @@ div.Tabs {
 	background: none;
 	border: none;
 	margin:0;
-	padding: 0 8px;
+	padding: 0 10px;
 }
 div.Tabs li a,
 div.Tabs li a:link,
@@ -132,7 +173,7 @@ div.Tabs li a:hover,
 div.Tabs li a:active,
 div.Tabs li a:visited {
 	position: relative;
-	top: 14px;
+	top: 4px;
    margin: 0;
    border: 1px solid #8bc1de;
 	border-bottom: 0;
@@ -159,7 +200,7 @@ table {
 	background: none;
 	border-left: none;
 	border-right: none;
-	margin: 10px 0 0;
+	margin: 0;
 }
 table.AltRows tr.Disabled th,
 table.AltRows tr.Disabled td,
@@ -189,6 +230,10 @@ table.AltColumns thead td.Alt {
 	color: #222;
 	text-shadow: 0 1px 0 #fff;
 }
+table th,
+table td {
+	padding: 6px 6px 6px 20px;
+}
 table tbody th,
 table tbody td {
 	border-bottom: 1px solid #e0e0e0;
@@ -196,6 +241,113 @@ table tbody td {
 .CheckBoxGrid td.Alt {
 	background: none;
 }
+body.managecategories table td.Last {
+	white-space: nowrap;
+}
+/* Buttons */
+a.SmallButton,
+a.Button,
+input.Button,
+.SmallBlueButton,
+.BlueButton {
+   border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	background:url("images/bg-button-blue.png") repeat-x scroll left top transparent;
+	border:1px solid #0F7FE6;
+	color:#003673;
+	cursor:pointer;
+	font-size:12px;
+	font-weight:bold;
+	padding:6px 10px;
+	text-decoration:none;
+	text-shadow:0 1px 0 #B7F5FD;
+}
+a.SmallButton:hover,
+a.Button:hover,
+input.Button:hover,
+.SmallBlueButton:hover,
+.BlueButton:hover {
+	border:1px solid #0B64C6;
+	color:#001F44;
+	text-shadow:0 1px 0 #EEFFFF;
+}
+a.SmallButton:focus,
+a.Button:focus,
+input.Button:focus,
+.SmallBlueButton:focus,
+.BlueButton:focus {
+	background:none repeat scroll 0 0 #81CFF6;
+	border:1px solid #0B64C6;
+	color:#001F44;
+	text-shadow:0 1px 0 #EEFFFF;
+}
+a.SmallButton,
+.SmallBlueButton {
+   border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	font-size:11px;
+	font-weight:normal;
+	padding:2px 4px;
+	background-position: 0 -3px;
+	box-shadow:0 0 0 #999999;
+	-moz-box-shadow:0 0 0 #999999;
+	-webkit-box-shadow:0 0 0 #999999;
+}
+a.SmallButton:hover,
+.SmallBlueButton:hover {
+	box-shadow:0 0 2px #999999;
+	-moz-box-shadow:0 0 2px #999999;
+	-webkit-box-shadow:0 0 2px #999999;
+}
+/* Popups */
+.Overlay {
+	background: url('images/overlay.png') top left repeat;
+}
+div.Popup div.Body {
+	background: #f1fbfe;
+	border: 1px solid #01416b;
+	box-shadow: 0px 0px 3px #01416b;
+	-moz-box-shadow: 0px 0px 3px #01416b;
+	-webkit-box-shadow: 0px 0px 3px #01416b;  
+}
+div.Popup h1,
+div.Popup h2 {
+	border-radius: 4px 4px 0 0;
+	-webkit-border-radius: 4px 4px 0 0;
+	-moz-border-radius: 4px 4px 0 0;
+	font-size:14px;
+	font-weight:bold;
+	margin-bottom: 0;
+	color: #f8fdff;
+	background: url('images/dashboard-bg.png') top center repeat-x #014687;
+	border-bottom: 1px solid #000;
+	text-shadow: 0 1px 0 #000;
+}
+div.Popup h3 {
+	font-size: 13px;
+}
+div.Popup form ul li label {
+	color:#222;
+}
+a.Close {
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	background: url('images/dashboard-sprites.png') 5px -795px no-repeat #000;
+	border-bottom: 1px solid #006edf;
+	position:absolute;
+	right:10px;
+	top:7px;
+	height: 18px;
+	width: 18px;
+	overflow: hidden;
+}
+a.Close span {
+	display: none;
+}
+
 #Panel {
 	margin: 0;
 	width: 200px;
