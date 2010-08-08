@@ -36,15 +36,6 @@ function WriteRangeTab($Range, $Sender) {
 }
 
 ?>
-<style type="text/css">
-.DateRangeTabs {
-   position: relative;
-}
-.DateRange {
-   position: absolute;
-   right: 10px;   
-}
-</style>
 <h1>Statistics Dashboard</h1>
 <div class="Tabs DateRangeTabs">
    <div class="DateRange">

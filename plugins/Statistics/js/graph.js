@@ -244,7 +244,7 @@ window.onload = function () {
             Y = (height - bottomgutter - topgutter) / max;
             
         r.clear();
-        r.drawGrid(leftgutter + X * .5 - 1, topgutter + .5, width - leftgutter - X, height - topgutter - bottomgutter, footLabels.length - 1, 10, $('#GraphHolder').css('border-left-color'));
+        r.drawGrid(leftgutter + X * .5 - 1, topgutter + .5, width - leftgutter - X, height - topgutter - bottomgutter, footLabels.length - 1, 10, $('#GraphHolder').css('border-bottom-color'));
     
         var dots = [];
         var coordinates = [];
