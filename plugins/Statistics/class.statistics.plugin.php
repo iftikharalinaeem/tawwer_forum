@@ -25,8 +25,9 @@ $PluginInfo['Statistics'] = array(
 
 class StatisticsPlugin extends Gdn_Plugin {
    
-   const RESOLUTION_HOUR = 'hour';
+   /* const RESOLUTION_HOUR = 'hour'; */
    const RESOLUTION_DAY = 'day';
+   const RESOLUTION_WEEK = 'week';
    const RESOLUTION_MONTH = 'month';
    
    const FILL_ZERO = 'zero';
@@ -78,7 +79,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       // Figure out where to stop searching
       $EarliestData = Gdn::SQL()->Select('DateRangeStart', 'MIN', 'EarliestDate')
          ->From('Statistics')
-         ->Where('DateRangeType', self::RESOLUTION_HOUR)
+         ->Where('DateRangeType', self::RESOLUTION_DAY) //self::RESOLUTION_HOUR)
          ->Where('IndexType', $TrackType)
          ->Get();
          
@@ -134,8 +135,9 @@ class StatisticsPlugin extends Gdn_Plugin {
       if (!C('Plugins.Statistics.Enabled')) return;
       
       $Date = is_null($Date) ? time() : $Date;
-      self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_HOUR);
+      // self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_HOUR);
       self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_DAY);
+      self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_WEEK);
       self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_MONTH);
    }
    
@@ -162,10 +164,13 @@ class StatisticsPlugin extends Gdn_Plugin {
          throw new Exception("Invalid anchor date '{$Date}' used when attempting to track '{$Type}:{$Qualifier}'");
       
       switch ($Range) {
+         /*
          case self::RESOLUTION_HOUR:
             $DateStart = date('Y-m-d H:00:00',$DateRaw);
             $DateEnd = date('Y-m-d H:00:00',$DateRaw);
             break;
+         */
+         case self::RESOLUTION_WEEK:
          case self::RESOLUTION_DAY:
             $DateStart = date('Y-m-d',$DateRaw);
             $DateEnd = date('Y-m-d',$DateRaw);
@@ -212,10 +217,13 @@ class StatisticsPlugin extends Gdn_Plugin {
          throw new Exception("Invalid range end date '{$RangeEnd}' used when attempting to get data for '{$Type}:{$Qualifier}'");
          
       switch ($Resolution) {
+         /*
          case self::RESOLUTION_HOUR:
             $DateStart = date('Y-m-d H:00:00',$RangeStartRaw);
             $DateEnd = date('Y-m-d H:00:00',$RangeEndRaw);
             break;
+         */
+         case self::RESOLUTION_WEEK:
          case self::RESOLUTION_DAY:
             $DateStart = date('Y-m-d',$RangeStartRaw);
             $DateEnd = date('Y-m-d',$RangeEndRaw);
@@ -315,9 +323,12 @@ class StatisticsPlugin extends Gdn_Plugin {
          throw new Exception("Invalid date '{$Date}', unable to convert to epoch");
       
       switch ($Resolution) {
+         /*
          case self::RESOLUTION_HOUR:
             return date('Y-m-d H:00:00',$DateRaw);
-            
+         */
+         
+         case self::RESOLUTION_WEEK:
          case self::RESOLUTION_DAY:
             return date('Y-m-d',$DateRaw);
             
@@ -369,10 +380,38 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
       $Sender->FireEvent('DefineAdminPermissions');
       $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
-      $Sender->AddSideMenu('garden/settings');
-      $Sender->SetData('UserData', StatisticsPlugin::GetDataRange('users', NULL, StatisticsPlugin::RESOLUTION_DAY, '2010-07-01', '2010-08-01'));
-      $Sender->SetData('CommentData', StatisticsPlugin::GetDataRange('comments', NULL, StatisticsPlugin::RESOLUTION_DAY, '2010-07-01', '2010-08-01'));
-      $Sender->SetData('DiscussionData', StatisticsPlugin::GetDataRange('discussions', NULL, StatisticsPlugin::RESOLUTION_DAY, '2010-07-01', '2010-08-01'));
+      $Sender->AddSideMenu('dashboard/settings');
+      
+      
+      // Load data for the graph
+      $Sender->Range = GetIncomingValue('Range');
+      if (!in_array($Sender->Range, array(
+            StatisticsPlugin::RESOLUTION_DAY,
+            StatisticsPlugin::RESOLUTION_WEEK,
+            StatisticsPlugin::RESOLUTION_MONTH)))
+         $Sender->Range = StatisticsPlugin::RESOLUTION_DAY;
+         
+      $Sender->StampStart = Gdn_Format::ToTimestamp(GetIncomingValue('DateStart'));
+      $Sender->StampEnd = Gdn_Format::ToTimestamp(GetIncomingValue('DateEnd'));
+      if (!$Sender->StampEnd)
+         $Sender->StampEnd = time();
+         
+      // If no date was provided...
+      if (!$Sender->StampStart) {
+         $Sender->StampEnd = time();
+         // Default to 30 days ago
+         if ($Sender->Range == 'day') $Sender->StampStart = strtotime('-30 days');
+         // Default to 16 weeks ago
+         if ($Sender->Range == 'week') $Sender->StampStart = strtotime('-16 weeks');
+         // Default to 24 months ago
+         if ($Sender->Range == 'month') $Sender->StampStart = strtotime('-24 months');
+      }
+      $Sender->DateStart = Gdn_Format::ToDate($Sender->StampStart);
+      $Sender->DateEnd = Gdn_Format::ToDate($Sender->StampEnd);
+      
+      $Sender->SetData('UserData', StatisticsPlugin::GetDataRange('users', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
+      $Sender->SetData('CommentData', StatisticsPlugin::GetDataRange('comments', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
+      $Sender->SetData('DiscussionData', StatisticsPlugin::GetDataRange('discussions', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
       $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboard.php');
    }
    

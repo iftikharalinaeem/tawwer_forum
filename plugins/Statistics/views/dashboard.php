@@ -16,8 +16,49 @@ function WriteData($Data, $Field = 'Value') {
       echo Wrap($Val, 'td', $Alt ? array('class' => 'Alt') : '');
    }
 }
+function Capitalize($Word) {
+   return strtoupper(substr($Word, 0, 1)).substr($Word, 1);
+}
+function WriteRangeTab($Range, $Sender) {
+   echo Wrap(
+      Anchor(
+         Capitalize($Range),
+         'settings?'
+         .Attribute(array(
+            'Range' => $Range,
+            'DateStart' => $Sender->DateStart,
+            'DateEnd' => $Sender->DateEnd)
+         )
+      ),
+      'li',
+      $Range == $Sender->Range ? array('class' => 'Active') : ''
+   )."\n";
+}
+
 ?>
+<style type="text/css">
+.DateRangeTabs {
+   position: relative;
+}
+.DateRange {
+   position: absolute;
+   right: 10px;   
+}
+</style>
 <h1>Statistics Dashboard</h1>
+<div class="Tabs DateRangeTabs">
+   <div class="DateRange">
+      <?php echo Anchor(Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')) . ' - ' . Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')), '#daterangepicker'); ?>
+   </div>
+   <ul>
+      <?php
+      WriteRangeTab(StatisticsPlugin::RESOLUTION_DAY, $this);
+      WriteRangeTab(StatisticsPlugin::RESOLUTION_WEEK, $this);
+      WriteRangeTab(StatisticsPlugin::RESOLUTION_MONTH, $this);
+      ?>
+   </ul>
+</ul>
+</div>
 <div id="GraphHolder">
    <span class="Metrics"></span>
    <span class="Metric1"></span>

@@ -205,8 +205,7 @@ $(function () {
 });
 
 window.onload = function () {
-    
-    function drawGraph() {
+
         // Grab the data
         var rowLabels = [],
             footLabels = [],
@@ -244,6 +243,7 @@ window.onload = function () {
             max = Math.max.apply(Math, data),
             Y = (height - bottomgutter - topgutter) / max;
             
+        r.clear();
         r.drawGrid(leftgutter + X * .5 - 1, topgutter + .5, width - leftgutter - X, height - topgutter - bottomgutter, footLabels.length - 1, 10, $('#GraphHolder').css('border-left-color'));
     
         var dots = [];
@@ -347,9 +347,5 @@ window.onload = function () {
         }
         
         r.drawFoot(footLabels, height, leftgutter, r, footText, X);
-    }
-    
-    drawGraph();
-    $(window).resize(function() { drawGraph(); });
 
 };
