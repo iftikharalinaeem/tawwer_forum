@@ -20,7 +20,7 @@ $PluginInfo['ReverseCommentSort'] = array(
 
 class ReverseCommentSortPlugin extends Gdn_Plugin {
 
-	// 
+	// Reverse the comment sort order
    public function CommentModel_AfterConstruct_Handler($CommentModel) {
 	   $CommentModel->OrderBy('c.DateInserted desc');
    }
@@ -33,6 +33,26 @@ class ReverseCommentSortPlugin extends Gdn_Plugin {
 			if ($Comment)
 				$Sender->RedirectUrl = Gdn::Request()->Url('/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID, TRUE);
 		}
+	}
+
+	/**
+	 * Insert comment form after the first comment.
+	 */
+	public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
+		$Type = GetValue('Type', $Sender->EventArguments, 'Comment');
+		if ($Type == 'Comment' && !GetValue('CommentFormWritten', $Sender)) {
+			echo '<style type="text/css">
+			div.CommentForm,
+			div.CommentForm div.Tabs {
+				display: none;
+			}
+			ul.MessageList div.CommentForm {
+				display: block;
+			}
+			</style>';
+			echo Wrap($Sender->FetchView('comment', 'post'), 'li');
+	      $Sender->CommentFormWritten = TRUE;
+		}		
 	}
 
 	/**
