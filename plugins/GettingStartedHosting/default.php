@@ -20,7 +20,7 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
    3. Disable itself when "dismiss" is clicked
 */    
     
-   // Adds a "My Forums" menu option to the dashboard area
+   // Save various steps, and render the getting started message.
    public function SettingsController_Render_Before(&$Sender) {
       // Save the action if editing registration settings
       if (strtolower($Sender->RequestMethod) != 'index')
@@ -41,7 +41,7 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
          $Session = Gdn::Session();
          $WelcomeMessage = '<div class="GettingStartedHosting">'
             .Anchor('×', '/dashboard/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
-   ."<h3>Tips on how to get started</h3>"
+   ."<h1>Tips on how to get started</h1>"
    .'<ul>
       <li class="One'.(C('Plugins.GettingStartedHosting.Dashboard', '0') == '1' ? ' Done' : '').'">
          <strong>'.Anchor('Welcome to your Dashboard', 'settings').'</strong>

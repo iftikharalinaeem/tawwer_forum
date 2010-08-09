@@ -202,6 +202,9 @@ table {
 	border-right: none;
 	margin: 0;
 }
+.Column table {
+	border: none;
+}
 table.AltRows tr.Disabled th,
 table.AltRows tr.Disabled td,
 table.AltColumns tr.Disabled th,
