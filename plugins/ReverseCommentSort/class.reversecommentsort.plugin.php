@@ -49,8 +49,28 @@ class ReverseCommentSortPlugin extends Gdn_Plugin {
 			ul.MessageList div.CommentForm {
 				display: block;
 			}
-			</style>';
-			echo Wrap($Sender->FetchView('comment', 'post'), 'li');
+			</style>
+			<li>';
+			if ($Sender->Discussion->Closed == '1') {
+		   ?>
+<div class="Foot Closed">
+	<div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
+	<?php echo Anchor(T('&larr; All Discussions'), 'discussions', 'TabLink'); ?>
+</div>
+<?php
+			} else if (Gdn::Session()->IsValid()) { 
+				echo $Sender->FetchView('comment', 'post');
+			} else {
+?>
+<div class="Foot">
+	<?php
+	echo Anchor(T('Add a Comment'), Gdn::Authenticator()->SignInUrl($Sender->SelfUrl), 'TabLink'.(C('Garden.SignIn.Popup') ? ' SignInPopup' : ''));
+	?> 
+</div>
+<?php 
+			}
+			echo '</li>';
+			
 	      $Sender->CommentFormWritten = TRUE;
 		}		
 	}
