@@ -24,11 +24,11 @@ function WriteRangeTab($Range, $Sender) {
       Anchor(
          Capitalize($Range),
          'settings?'
-         .Attribute(array(
+         .http_build_query(array(
             'Range' => $Range,
             'DateStart' => $Sender->DateStart,
-            'DateEnd' => $Sender->DateEnd)
-         )
+            'DateEnd' => $Sender->DateEnd
+         ))
       ),
       'li',
       $Range == $Sender->Range ? array('class' => 'Active') : ''
@@ -59,6 +59,7 @@ function WriteRangeTab($Range, $Sender) {
    <span class="Metric5"></span>
    <span class="Metric6"></span>
    <span class="Headings"></span>
+   <span class="Legend"></span>
 </div>
 <table class="GraphData AltColumns">
     <thead>

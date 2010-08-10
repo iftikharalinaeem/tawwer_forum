@@ -1,5 +1,6 @@
-(function () {
-var tokenRegex = /\{([^\}]+)\}/g,
+jQuery(document).ready(function($) {
+    
+    var tokenRegex = /\{([^\}]+)\}/g,
     objNotationRegex = /(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g, // matches .xxxxx or ["xxxxx"] to run over object properties
     replacer = function (all, key, obj) {
         var res = obj;
@@ -133,88 +134,123 @@ var tokenRegex = /\{([^\}]+)\}/g,
             set.translate(dx, dy);
             return out;
     };
-})();
 
-function getAnchors(p1x, p1y, p2x, p2y, p3x, p3y) {
-    var l1 = (p2x - p1x) / 2,
-        l2 = (p3x - p2x) / 2,
-        a = Math.atan((p2x - p1x) / Math.abs(p2y - p1y)),
-        b = Math.atan((p3x - p2x) / Math.abs(p2y - p3y));
-    a = p1y < p2y ? Math.PI - a : a;
-    b = p3y < p2y ? Math.PI - b : b;
-    var alpha = Math.PI / 2 - ((a + b) % (Math.PI * 2)) / 2,
-        dx1 = l1 * Math.sin(alpha + a),
-        dy1 = l1 * Math.cos(alpha + a),
-        dx2 = l2 * Math.sin(alpha + b),
-        dy2 = l2 * Math.cos(alpha + b);
-    return {
-        x1: p2x - dx1,
-        y1: p2y + dy1,
-        x2: p2x + dx2,
-        y2: p2y + dy2
-    };
-}
-function getColor(row) {
-    // return "hsb(" + [((row + 6) / 10), .5, 1] + ")";
-    return $('#GraphHolder span.Metric'+(row+1)).css('color');
-}
 
-Raphael.fn.drawGrid = function (x, y, w, h, wv, hv, color) {
-    color = color || "#000";
-    var path = [
-        "M",
-        Math.round(x) + .5,
-        Math.round(y) + .5,
-        "L",
-        Math.round(x + w) + .5,
-        // Math.round(y) + .5,
-        // Math.round(x + w) + .5,
-        // Math.round(y + h) + .5,
-        // Math.round(x) + .5,
-        // Math.round(y + h) + 5,
-        // Math.round(x) + .5,
-        // Math.round(y) + .5
-    ],
-        rowHeight = h / hv,
-        columnWidth = w / wv,
-        dashed = {fill: "none", stroke: color, "stroke-dasharray": "- "};
-
-    for (i = 0; i <= wv; i++) {
-        path = path.concat(["M", Math.round(x + i * columnWidth) + .5, Math.round(y) + .5, "V", Math.round(y + h) + .5]);
+    function getAnchors(p1x, p1y, p2x, p2y, p3x, p3y) {
+        var l1 = (p2x - p1x) / 2,
+            l2 = (p3x - p2x) / 2,
+            a = Math.atan((p2x - p1x) / Math.abs(p2y - p1y)),
+            b = Math.atan((p3x - p2x) / Math.abs(p2y - p3y));
+        a = p1y < p2y ? Math.PI - a : a;
+        b = p3y < p2y ? Math.PI - b : b;
+        var alpha = Math.PI / 2 - ((a + b) % (Math.PI * 2)) / 2,
+            dx1 = l1 * Math.sin(alpha + a),
+            dy1 = l1 * Math.cos(alpha + a),
+            dx2 = l2 * Math.sin(alpha + b),
+            dy2 = l2 * Math.cos(alpha + b);
+        return {
+            x1: p2x - dx1,
+            y1: p2y + dy1,
+            x2: p2x + dx2,
+            y2: p2y + dy2
+        };
     }
-    return this.path(path.join(",")).attr(dashed);
-};
-
-Raphael.fn.drawFoot = function(labels, height, leftgutter, r, footText, X) {
-    var maxLabels = 12;
-    var labelsToDisplay = labels.length;
-    var increment = 1;
-    while (labelsToDisplay > maxLabels) {
-        increment++;
-        labelsToDisplay = Math.round(labels.length / increment);
+    
+    function getColor(graphContainer, row) {
+        // return "hsb(" + [((row + 6) / 10), .5, 1] + ")";
+        return $('#'+graphContainer+' span.Metric'+(row+1)).css('color');
     }
-    for (var i = 0; i < labels.length; i += increment) {
-        var x = Math.round(leftgutter + X * (i + .5)); // Define the x position of the dot
-        var t = r.text(x, height - 6, labels[i]).attr(footText).toBack(); // This adds the text along the bottom of the grid
+    
+    Raphael.fn.drawGrid = function (x, y, w, h, wv, hv, color) {
+        color = color || "#000";
+        var path = [
+            "M",
+            Math.round(x) + .5,
+            Math.round(y) + .5,
+            "L",
+            Math.round(x + w) + .5,
+            // Math.round(y) + .5,
+            // Math.round(x + w) + .5,
+            // Math.round(y + h) + .5,
+            // Math.round(x) + .5,
+            // Math.round(y + h) + 5,
+            // Math.round(x) + .5,
+            // Math.round(y) + .5
+        ],
+            rowHeight = h / hv,
+            columnWidth = w / wv,
+            dashed = {fill: "none", stroke: color, "stroke-dasharray": "- "};
+    
+        for (i = 0; i <= wv; i++) {
+            path = path.concat(["M", Math.round(x + i * columnWidth) + .5, Math.round(y) + .5, "V", Math.round(y + h) + .5]);
+        }
+        return this.path(path.join(",")).attr(dashed);
     }
-    return;    
-}
+    
+    Raphael.fn.drawFoot = function(labels, height, leftgutter, r, footText, X, bottomgutter) {
+        var maxLabels = 12;
+        var labelsToDisplay = labels.length;
+        var increment = 1;
+        while (labelsToDisplay > maxLabels) {
+            increment++;
+            labelsToDisplay = Math.round(labels.length / increment);
+        }
+        for (var i = 0; i < labels.length; i += increment) {
+            var x = Math.round(leftgutter + X * (i + .5)); // Define the x position of the dot
+            var t = r.text(x, height - bottomgutter + 10, labels[i]).attr(footText).toBack(); // This adds the text along the bottom of the grid
+        }
+        return;    
+    }
+    
+    Raphael.fn.drawLegend = function(graphContainer, raphael, rows, height, leftgutter, X) {
+        var legend = raphael.set();
+        var xPos = Math.round(leftgutter + 16);
+        for (var i = 0; i < rows.length; i++) {
+            // Draw a box
+            var box = raphael.rect(xPos, height - 15, 15, 15);
+            var color = getColor(graphContainer, i);
+            var bgcolor = $('body').css('background-color');
+            box.attr({ fill: color, stroke: color, "stroke-width": 0});
+            box.click(function() {
+               alert('test'+i);
+            });
+            legend.push(box);
+            xPos = xPos + Math.round(box.getBBox().width) + 6;
+            
+            // Draw a label for the box
+            var text = raphael.text(xPos, height - 8, rows[i]).attr({
+                'font-size': $('#'+graphContainer+' span.Legend').css('fontSize'),
+                'font-family': $('#'+graphContainer+' span.Legend').css('fontFamily'),
+                'stroke-width': 0,
+                'text-anchor': 'start',
+                fill: $('#'+graphContainer+' span.Legend').css('color')
+            });
+            legend.push(text);
+            xPos = xPos + Math.round(text.getBBox().width) + 20;
+        }
+        
+        return;
+    }
+    
+    drawGraph = function(graphContainer, dataSource) {
+        // Hide the source data
+        $("table."+dataSource).hide();
 
-$(function () {
-    $("table.GraphData").hide();
-});
-
-window.onload = function () {
-
+        // initialize the chart area
+        var graphHolder = $("#" + graphContainer);
+        graphHolder.children('*:not(span)').remove();
+        
         // Grab the data
         var rowLabels = [],
             footLabels = [],
             rows = []
             data = [];
-        $("table.GraphData tfoot td, table.GraphData thead td").each(function () {
+            
+        $("table."+dataSource+" tfoot td, table."+dataSource+" thead td").each(function () {
             footLabels.push($(this).html());
         });
-        $('table.GraphData tbody tr').each(function() {
+        
+        $('table.'+dataSource+' tbody tr').each(function() {
             var d = [];
             $(this).find('td').each(function() {
                 d.push($(this).html());
@@ -222,36 +258,41 @@ window.onload = function () {
             rows.push(d);
             d = [];
         });
-        $("table.GraphData tbody td").each(function () {
+        
+        $("table."+dataSource+" tbody td").each(function () {
             data.push($(this).html());
         });
-        $("table.GraphData tbody th").each(function () {
+        
+        $("table."+dataSource+" tbody th").each(function () {
             rowLabels.push($(this).html());
         });
         
-        var width = $('#GraphHolder').width(),
-            height = $('#GraphHolder').height(),
+        //create the Raphael object
+        var width = graphHolder.width(),
+            height = graphHolder.height(),
             leftgutter = 0,
-            bottomgutter = 20,
+            bottomgutter = 40,
             topgutter = 20,
-            r = Raphael("GraphHolder", width, height),
+            r = Raphael(graphContainer, width, height),
             metricFontSize = 11,
             metricText = {font: metricFontSize + "px 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif", fill: "#fff"},
             dateText = {font: "10px 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif", fill: "#fff"},
-            footText = {font: $('#GraphHolder span.Headings').css('font-size') + ' ' + $('#GraphHolder span.Headings').css('font-family'), fill: $('#GraphHolder span.Headings').css('color')},
+            footText = {font: $('#'+graphContainer+' span.Headings').css('font-size') + ' ' + $('#'+graphContainer+' span.Headings').css('font-family'), fill: $('#'+graphContainer+' span.Headings').css('color')},
             X = (width - leftgutter) / footLabels.length,
             max = Math.max.apply(Math, data),
             Y = (height - bottomgutter - topgutter) / max;
             
         r.clear();
-        r.drawGrid(leftgutter + X * .5 - 1, topgutter + .5, width - leftgutter - X, height - topgutter - bottomgutter, footLabels.length - 1, 10, $('#GraphHolder').css('border-bottom-color'));
-    
+        r.drawGrid(leftgutter + X * .5 - 1, topgutter + .5, width - leftgutter - X, height - topgutter - bottomgutter, footLabels.length - 1, 10, graphHolder.css('border-bottom-color'));
+        r.drawFoot(footLabels, height, leftgutter, r, footText, X, bottomgutter);
+        r.drawLegend(graphContainer, r, rowLabels, height, leftgutter, X);
+        
         var dots = [];
         var coordinates = [];
         for (var j = 0; j < rows.length; j++) {
             dots.push([]);
             coordinates.push([]);
-            var color = getColor(j);
+            var color = getColor(graphContainer, j);
             var row = rows[j];
             var path = r.path().attr({stroke: color, "stroke-width": 2}),
                 label = r.set(),
@@ -260,7 +301,7 @@ window.onload = function () {
                 blanket = r.set(),
                 lineHeight = metricFontSize + 2;
             for (m = 0; m < rows.length; m++) {
-                label.push(r.text(0, lineHeight, "400 Discussions").attr(metricText).attr({fill: getColor(m)}));
+                label.push(r.text(0, lineHeight, "400 Discussions").attr(metricText).attr({fill: getColor(graphContainer, m)}));
                 lineHeight += metricFontSize + 2;
             }
             label.push(r.text(0, lineHeight + 4, "16 Sept").attr(dateText));
@@ -284,7 +325,7 @@ window.onload = function () {
                     var a = getAnchors(X0, Y0, x, y, X2, Y2);
                     p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
                 }
-                var dot = r.circle(x, y, 5).attr({fill: color, stroke: $('#GraphHolder').css('background-color')});
+                var dot = r.circle(x, y, 5).attr({fill: color, stroke: graphHolder.css('background-color')});
                 dot.hide();
                 blanket.push(r.rect(leftgutter + X * i, 0, X, height - bottomgutter).attr({stroke: "none", fill: "#fff", opacity: 0}));
                 
@@ -345,7 +386,15 @@ window.onload = function () {
             label.toFront();
             blanket.toFront();   
         }
-        
-        r.drawFoot(footLabels, height, leftgutter, r, footText, X);
+    }
+    // Draw the graph when the window is loaded.
+    window.onload = function() {
+        drawGraph('GraphHolder', 'GraphData');
+    }
 
-};
+    // Redraw the grpah when the window is resized
+    $(window).resize(function() {
+        drawGraph('GraphHolder', 'GraphData');
+    });
+    
+});
