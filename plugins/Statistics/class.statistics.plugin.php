@@ -169,6 +169,9 @@ class StatisticsPlugin extends Gdn_Plugin {
             $DateEnd = date('Y-m-d H:00:00',$DateRaw);
             break;
          case self::RESOLUTION_WEEK:
+            $DateStart = date('Y-m-d',strtotime('last sunday',$DateRaw));
+            $DateEnd = date('Y-m-d',strtotime('this saturday',$DateRaw));
+            break;
          case self::RESOLUTION_DAY:
             $DateStart = date('Y-m-d',$DateRaw);
             $DateEnd = date('Y-m-d',$DateRaw);
@@ -220,6 +223,9 @@ class StatisticsPlugin extends Gdn_Plugin {
             $DateEnd = date('Y-m-d H:00:00',$RangeEndRaw);
             break;
          case self::RESOLUTION_WEEK:
+            $DateStart = date('Y-m-d',strtotime('last sunday',$RangeStartRaw));
+            $DateEnd = date('Y-m-d',strtotime('this saturday',$RangeEndRaw));
+            break;
          case self::RESOLUTION_DAY:
             $DateStart = date('Y-m-d',$RangeStartRaw);
             $DateEnd = date('Y-m-d',$RangeEndRaw);
@@ -322,9 +328,9 @@ class StatisticsPlugin extends Gdn_Plugin {
          case self::RESOLUTION_HOUR:
             return date('Y-m-d H:00:00',$DateRaw);
          case self::RESOLUTION_WEEK:
+            return date('Y-m-d',strtotime('last sunday',$DateRaw));
          case self::RESOLUTION_DAY:
             return date('Y-m-d',$DateRaw);
-            
          case self::RESOLUTION_MONTH:
             return date('Y-m-01',$DateRaw);
             
