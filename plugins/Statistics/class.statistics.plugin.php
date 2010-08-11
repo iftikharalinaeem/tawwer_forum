@@ -359,7 +359,8 @@ class StatisticsPlugin extends Gdn_Plugin {
     * Override the default index method of the settings controller in the
     * dashboard application to render new statistics.
     */
-   public function SettingsController_Index_Create(&$Sender) {
+   public function SettingsController_Index_Create($Sender) {
+      // Load javascript & css, check permissions, and load side menu for this page.
       $Sender->AddJsFile('settings.js');
       $Sender->AddJsFile('plugins/Statistics/js/raphael.js');
       $Sender->AddJsFile('plugins/Statistics/js/graph.js');
@@ -381,7 +382,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
       $Sender->AddSideMenu('dashboard/settings');
       
-      // Load data for the graph
+      // Grab the range resolution from the url or form. Default to "day" range.
       $Sender->Range = GetIncomingValue('Range');
       if (!in_array($Sender->Range, array(
             StatisticsPlugin::RESOLUTION_HOUR,
@@ -390,7 +391,7 @@ class StatisticsPlugin extends Gdn_Plugin {
             StatisticsPlugin::RESOLUTION_MONTH)))
          $Sender->Range = StatisticsPlugin::RESOLUTION_DAY;
          
-         
+      // Define default values for start & end dates
       $Sender->HourStampStart = strtotime('-24 hours');
       $Sender->DayStampStart = strtotime('-1 month'); // Default to 1 month ago
       $Sender->WeekStampStart = strtotime('-24 weeks'); // Default to 24 weeks ago
@@ -399,28 +400,42 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->DayDateStart = Gdn_Format::ToDate($Sender->DayStampStart);
       $Sender->WeekDateStart = Gdn_Format::ToDate($Sender->WeekStampStart);
       $Sender->MonthDateStart = Gdn_Format::ToDate($Sender->MonthStampStart);
-
-      $Sender->StampStart = Gdn_Format::ToTimestamp(GetIncomingValue('DateStart'));
-      $Sender->StampEnd = Gdn_Format::ToTimestamp(GetIncomingValue('DateEnd'));
+      
+      // Validate that any values coming from the url or form are valid
+      $Sender->DateRange = GetIncomingValue('DateRange');
+      $DateRangeParts = explode(' - ', $Sender->DateRange);
+      $Sender->StampStart = Gdn_Format::ToTimestamp(GetValue(0, $DateRangeParts));
+      $Sender->StampEnd = Gdn_Format::ToTimestamp(GetValue(1, $DateRangeParts));
       if (!$Sender->StampEnd)
          $Sender->StampEnd = time();
          
-      // If no date was provided...
+      // If no date was provided, or the provided values were invalid, use defaults
       if (!$Sender->StampStart) {
          $Sender->StampEnd = time();
          if ($Sender->Range == 'day') $Sender->StampStart = $Sender->DayStampStart;
          if ($Sender->Range == 'week') $Sender->StampStart = $Sender->WeekStampStart;
          if ($Sender->Range == 'month') $Sender->StampStart = $Sender->MonthStampStart;
       }
+      
+      // Assign the variables used in the page with the validated values.
       $Sender->DateStart = Gdn_Format::ToDate($Sender->StampStart);
       $Sender->DateEnd = Gdn_Format::ToDate($Sender->StampEnd);
+      $Sender->DateRange = $Sender->DateStart . ' - ' . $Sender->DateEnd;
       
+      // Retrieve associated data for graph
       $Sender->SetData('UserData', StatisticsPlugin::GetDataRange('users', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
       $Sender->SetData('CommentData', StatisticsPlugin::GetDataRange('comments', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
       $Sender->SetData('DiscussionData', StatisticsPlugin::GetDataRange('discussions', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
+      
+      // Render the custom dashboard view
       $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboard.php');
    }
    
+   /**
+    * Get the default starting date for the specified range resolution.
+    * @param object $Sender The controller being attached to.
+    * @param string $Range The range resolution to get the default start date for.
+    */
    public static function GetDateStart($Sender, $Range) {
       if ($Range == StatisticsPlugin::RESOLUTION_HOUR)
          return $Sender->HourDateStart;

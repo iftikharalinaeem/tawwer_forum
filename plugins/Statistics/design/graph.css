@@ -46,46 +46,48 @@ div.DateRange {
    position: relative;
    right: -10px;
 }
-input.DateRange {
-   position: absolute;
-   top: 4px;
-   height: 22px;
-   right: 0;
+div.DateRange input.DateRange {
+   display: none;
 }
-input.DateRange,
-input.DateRange:hover,
-input.DateRange:focus {
+a.RangeToggle,
+a.RangeToggle:hover,
+a.RangeToggle:focus {
+   position: absolute;
+   top: 3px;
+   right: 0;
    border: none;
-   background: url('daterange-sprites.png') 257px 7px no-repeat transparent;
-   width: 250px;
-   text-align: right;
-   padding: 4px 30px 4px 0;
+   background: url('daterange-sprites.png') 275px 7px no-repeat transparent;
+   padding: 8px 30px 8px 10px;
    margin: 0;
    font-size: 14px;
    line-height: 14px;
    font-weight: bold;
    cursor: pointer;
+   color: #000;
 }
-input.DateRange:hover { background-position: 257px -94px; }
-input.DateRange:focus { background-position: 257px -193px; }
-input.DateRangeActive,
-input.DateRangeActive:hover,
-input.DateRangeActive:focus {
-   background-position: 257px -292px;
-   background-color: #8BC1DE;
+a.RangeToggle:hover { background-position: 275px -94px; }
+a.RangeToggle:focus { background-position: 275px -193px; }
+a.RangeToggleActive,
+a.RangeToggleActive:hover,
+a.RangeToggleActive:focus {
+   background-position: 275px -292px;
+   background-color: #DBF3FC;
+   border: 1px solid #8BC1DE;
+   border-bottom: 1px solid #DBF3FC;
+   border-right: none;
+   z-index: 300;
 }
-input.DateRangeActive:hover { background-position: 257px -394px; }
-input.DateRangeActive:focus { background-position: 257px -492px; }
+a.RangeToggleActive:hover { background-position: 275px -394px; }
+a.RangeToggleActive:focus { background-position: 275px -492px; }
 div.DateRange div.Picker {
    position: absolute;
    top: 34px;
    right: 0;
-   border-top: 1px solid #8BC1DE;
    background: #DBF3FC;
    padding: 10px 20px;
    width: 600px;
-   box-shadow: 0 1px 0 #000;
-   -moz-box-shadow: -1px 2px 1px #5C7F93;
+   border: 1px solid #8BC1DE;
+   border-right: none;
 }
 div.DateRange hr {
    border: none;
@@ -149,7 +151,11 @@ div.DateRange div.Slider div.RangeEnd {
    background-repeat: none;
    width: 7px;
 }
-div.DateRange div.Slider div.SliderDate {
+div.DateRange div.Slider div.SliderDates {
+   line-height: 1;
+   padding-bottom: 4px;
+}
+div.DateRange div.Slider div.SliderDates div.SliderDate {
    display: inline;
    font-size: 11px;
 }

@@ -40,6 +40,7 @@ function WriteRangeTab($Range, $Sender) {
 <div class="Tabs DateRangeTabs">
    <div class="DateRange">
       <input type="text" name="DateRange" class="DateRange DateRangeActive" value="<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')) . ' - ' . Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>" />
+      <a class="RangeToggle RangeToggleActive" href="#"><?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')) . ' - ' . Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?></a>
       <div class="Picker">
          <div class="Slider">
             <div class="SliderHandle HandleStart">6/06/09</div>
