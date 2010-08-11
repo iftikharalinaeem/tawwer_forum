@@ -44,38 +44,48 @@ body div.Tabs li.Active a {
 /* Date Range Picker */
 div.DateRange {
    position: relative;
+   right: -10px;
 }
 input.DateRange {
    position: absolute;
-   top: 0;
+   top: 4px;
+   height: 22px;
    right: 0;
 }
 input.DateRange,
 input.DateRange:hover,
 input.DateRange:focus {
    border: none;
-   background: url('daterange-sprites.png') 307px 7px no-repeat transparent;
-   width: 300px;
+   background: url('daterange-sprites.png') 257px 7px no-repeat transparent;
+   width: 250px;
    text-align: right;
-   padding: 4px 24px 4px 0;
+   padding: 4px 30px 4px 0;
    margin: 0;
    font-size: 14px;
+   line-height: 14px;
    font-weight: bold;
    cursor: pointer;
 }
-input.DateRange:hover { background-position: 307px -94px; }
-input.DateRange:focus { background-position: 307px -193px; }
-input.DateRangeOpen { background-position: 307px -293px; }
-input.DateRangeOpen:hover { background-position: 307px -394px; }
-input.DateRangeOpen:focus { background-position: 307px -493px; }
+input.DateRange:hover { background-position: 257px -94px; }
+input.DateRange:focus { background-position: 257px -193px; }
+input.DateRangeActive,
+input.DateRangeActive:hover,
+input.DateRangeActive:focus {
+   background-position: 257px -292px;
+   background-color: #8BC1DE;
+}
+input.DateRangeActive:hover { background-position: 257px -394px; }
+input.DateRangeActive:focus { background-position: 257px -492px; }
 div.DateRange div.Picker {
    position: absolute;
-   top: 30px;
+   top: 34px;
    right: 0;
-   border: 1px solid #8BC1DE;
+   border-top: 1px solid #8BC1DE;
    background: #DBF3FC;
    padding: 10px 20px;
    width: 600px;
+   box-shadow: 0 1px 0 #000;
+   -moz-box-shadow: 0 2px 2px #5C7F93;
 }
 div.DateRange hr {
    border: none;
@@ -116,28 +126,28 @@ div.DateRange div.HandleEnd {
 div.Slider div.SelectedRange {
    position: absolute;
    background: url('slider-sprites.png') 0 -150px repeat-x transparent;
-   top: 35px;
+   top: 33px;
    left: 50px;
    width: 200px;
    height: 13px;
    z-index: 100;
 }
 div.DateRange div.Slider div.Range {
-   margin-top: 34px;
+   margin-top: 32px;
    display: inline-block;
    height: 19px;
-   width: 90%;
-   background: url('slider-sprites.png') 0 -100px repeat-x transparent;
+   width: 566px;
+   background: url('slider-sprites.png') center -100px repeat-x transparent;
 }
 div.DateRange div.Slider div.RangeStart {
    background-position: 0 0;
    background-repeat: none;
-   width: 13px;
+   width: 6px;
 }
 div.DateRange div.Slider div.RangeEnd {
-   background-position: 0 -50px;
+   background-position: 7px -50px;
    background-repeat: none;
-   width: 13px;
+   width: 7px;
 }
 div.DateRange div.Slider div.SliderDate {
    display: inline;
