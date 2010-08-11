@@ -16,7 +16,7 @@ $PluginInfo['ProxyConnect'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
-   'SettingsUrl' => '/dashboard/settings/proxyconnect',
+   'SettingsUrl' => '/dashboard/authentication/choose/proxy',
    'SettingsPermission' => 'Garden.AdminUser.Only',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -28,26 +28,20 @@ $PluginInfo['ProxyConnect'] = array(
 Gdn_LibraryMap::SafeCache('library','class.proxyauthenticator.php',dirname(__FILE__).DS.'class.proxyauthenticator.php');
 class ProxyConnectPlugin extends Gdn_Plugin {
 
-   /**
-    * Adds "ProxyConnect" menu option to the dashboard.
-    */
-   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
-      $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Users', 'Proxy Connect', 'settings/proxyconnect', 'Garden.AdminUser.Only');
-   }
-   
    public function SettingsController_ProxyConnect_Create(&$Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
-		
       $Sender->Title('Proxy Connect SSO');
-      $Sender->AddSideMenu('settings/proxyconnect');
-		$Sender->AddCssFile('/plugins/ProxyConnect/proxyconnect.css');
 		$Sender->Form = new Gdn_Form();
 		$this->EnableSlicing($Sender);
+      $this->AddSliceAsset($this->GetResource('proxyconnect.css', FALSE,FALSE));
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
-   public function Controller_Index(&$Sender) {
+   public function AuthenticationController_AuthenticatorConfiguration_Handler(&$Sender) {
+      $Sender->AuthenticatorConfigure = '/dashboard/settings/proxyconnect';
+   }
+   
+   public function Controller_Index(&$Sender) {   
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.AuthenticationKey')
          ->From('UserAuthenticationProvider uap')
@@ -83,6 +77,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $Sender->ConsumerKey = ($Provider) ? $Provider['AuthenticationKey'] : '';
       $Sender->ConsumerSecret = ($Provider) ? $Provider['AssociationSecret'] : '';
       
+      $Sender->SliceConfig = $this->RenderSliceConfig();
       $Sender->Render($this->GetView('proxyconnect.php'));
    }
    
@@ -157,7 +152,21 @@ class ProxyConnectPlugin extends Gdn_Plugin {
 		
 		if (function_exists('fsockopen')) $NumLookupMethods++;
 		if (function_exists('curl_init')) $NumLookupMethods++;
-		
+
+      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      $HaveProxy = FALSE;
+      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
+         if ($SchemeKey == 'proxy') {
+            if ($HaveProxy === TRUE)
+               unset($EnabledSchemes[$SchemeIndex]);
+            $HaveProxy = TRUE;
+         }
+      }
+      if (!$HaveProxy)
+         array_push($EnabledSchemes, 'proxy');
+      
+      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+
 		if (!$NumLookupMethods)
 		 throw new Exception(T("Unable to initialize plugin: required connectivity libraries not found, need either 'fsockopen' or 'curl'."));
    }
@@ -195,39 +204,27 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       return $Provider; 
    }
    
+   public function AuthenticationController_DisableAuthenticatorProxy_Handler(&$Sender) {
+      $this->_Disable();
+   }
+   
    private function _Disable() {
+      RemoveFromConfig('Plugins.ProxyConnect.Enabled');
 		RemoveFromConfig('Garden.SignIn.Popup');
-		RemoveFromConfig('Plugins.ProxyConnect.Enabled');
 		RemoveFromConfig('Garden.Authenticator.DefaultScheme');
       RemoveFromConfig('Garden.Authenticators.proxy.CookieName');
-
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
-         if ($SchemeKey == 'proxy')
-            unset($EnabledSchemes[$SchemeIndex]);
-      }
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+   }
+	
+   public function AuthenticationController_EnableAuthenticatorProxy_Handler(&$Sender) {
+      $this->_Enable();
    }
 	
 	private function _Enable() {
 		SaveToConfig('Garden.SignIn.Popup', FALSE);
 		SaveToConfig('Plugins.ProxyConnect.Enabled', TRUE);
-		SaveToConfig('Garden.Authenticator.DefaultScheme', 'proxy');
+		SaveToConfig('Garden.Authenticators.proxy.Name', 'ProxyConnect');
       SaveToConfig('Garden.Authenticators.proxy.CookieName', 'VanillaProxy');
-      
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      $HaveProxy = FALSE;
-      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
-         if ($SchemeKey == 'proxy') {
-            if ($HaveProxy === TRUE)
-               unset($EnabledSchemes[$SchemeIndex]);
-            $HaveProxy = TRUE;
-         }
-      }
-      if (!$HaveProxy)
-         array_push($EnabledSchemes, 'proxy');
-      
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+      SaveToConfig('Garden.Authenticator.DefaultScheme', 'proxy');
       
       // Create a provider key/secret pair if needed
       $SQL = Gdn::Database()->SQL();
