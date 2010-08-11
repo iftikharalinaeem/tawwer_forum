@@ -13,7 +13,7 @@ $PluginInfo['VanillaConnect'] = array(
 	'Name' => 'Vanilla Connect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers.',
    'Version' => '1.1',
-   'RequiredApplications' => FALSE,
+   'RequiredApplications' => array('Vanilla' => '2.0.2a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/authentication/handshake',
