@@ -528,6 +528,13 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       return FALSE;
    }
    
+   public function AuthenticatorConfiguration(&$Sender) {
+      // Let the plugin handle the config
+      $Sender->AuthenticatorConfigure = NULL;
+      $Sender->FireEvent('AuthenticatorConfigurationHandshake');
+      return $Sender->AuthenticatorConfigure;
+   }
+   
    public function WakeUp() {
       // Allow the entry/handshake method to function
       Gdn::Authenticator()->AllowHandshake();

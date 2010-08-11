@@ -12,7 +12,7 @@
       ?>
       
       <div class="FileUploadBlock">
-         <h1><?php echo T('Permissions'); ?></h1>
+         <h3><?php echo T('Permissions'); ?></h3>
          <div class="Info">
             <?php echo T('Define who can upload and manage files on the '.Anchor('Roles & Permissions','/dashboard/role').' page.'); ?>
          </div>
