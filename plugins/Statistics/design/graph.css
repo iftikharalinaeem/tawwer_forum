@@ -137,7 +137,7 @@ div.Slider div.SelectedRange {
 div.DateRange div.Slider div.Range {
    margin-top: 32px;
    display: inline-block;
-   height: 19px;
+   height: 16px;
    width: 566px;
    background: url('slider-sprites.png') center -100px repeat-x transparent;
 }
