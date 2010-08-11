@@ -326,7 +326,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    public function AuthenticatorConfiguration(&$Sender) {
       // Let the plugin handle the config
       $Sender->AuthenticatorConfigure = NULL;
-      $Sender->FireEvent('AuthenticatorConfiguration');
+      $Sender->FireEvent('AuthenticatorConfigurationProxy');
       return $Sender->AuthenticatorConfigure;
    }
    

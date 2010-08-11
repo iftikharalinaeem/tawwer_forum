@@ -57,7 +57,7 @@
          </td>
          
          <td class="RemoteConfig">
-            <div class="Info"><?php echo T("These are the settings you might need when you configure VanillaConnect on your remote website."); ?></div>
+            <div class="Info"><?php echo T("These are the settings you might need when you configure ProxyConnect on your remote website."); ?></div>
             <div>
                You will probably need to configure Vanilla and your remote application to use a shared Cookie Domain that they can both access. We've
                tried to guess what that might be, based on your hostname, but you'll need to check this and make sure that it works.

@@ -32,12 +32,13 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Proxy Connect SSO');
 		$Sender->Form = new Gdn_Form();
+		
 		$this->EnableSlicing($Sender);
       $this->AddSliceAsset($this->GetResource('proxyconnect.css', FALSE,FALSE));
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
-   public function AuthenticationController_AuthenticatorConfiguration_Handler(&$Sender) {
+   public function AuthenticationController_AuthenticatorConfigurationProxy_Handler(&$Sender) {
       $Sender->AuthenticatorConfigure = '/dashboard/settings/proxyconnect';
    }
    
@@ -79,19 +80,6 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       
       $Sender->SliceConfig = $this->RenderSliceConfig();
       $Sender->Render($this->GetView('proxyconnect.php'));
-   }
-   
-   public function Controller_Toggle(&$Sender) {
-		
-		// Enable/Disable VanillaConnect
-		if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
-			if (C('Plugins.ProxyConnect.Enabled')) {
-				$this->_Disable();
-			} else {
-				$this->_Enable();
-			}
-			Redirect('settings/proxyconnect');
-		}
    }
    
    public function Controller_Cookie(&$Sender) {
@@ -153,6 +141,9 @@ class ProxyConnectPlugin extends Gdn_Plugin {
 		if (function_exists('fsockopen')) $NumLookupMethods++;
 		if (function_exists('curl_init')) $NumLookupMethods++;
 
+		if (!$NumLookupMethods)
+		   throw new Exception(T("Unable to initialize plugin: required connectivity libraries not found, need either 'fsockopen' or 'curl'."));
+		   
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
       $HaveProxy = FALSE;
       foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
@@ -166,9 +157,8 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          array_push($EnabledSchemes, 'proxy');
       
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
-
-		if (!$NumLookupMethods)
-		 throw new Exception(T("Unable to initialize plugin: required connectivity libraries not found, need either 'fsockopen' or 'curl'."));
+      
+      $this->_Enable(FALSE);
    }
    
    public function OnDisable() {
@@ -211,6 +201,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    private function _Disable() {
       RemoveFromConfig('Plugins.ProxyConnect.Enabled');
 		RemoveFromConfig('Garden.SignIn.Popup');
+		RemoveFromConfig('Garden.Authenticators.proxy.Name');
 		RemoveFromConfig('Garden.Authenticator.DefaultScheme');
       RemoveFromConfig('Garden.Authenticators.proxy.CookieName');
    }
@@ -219,12 +210,15 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $this->_Enable();
    }
 	
-	private function _Enable() {
+	private function _Enable($FullEnable = TRUE) {
 		SaveToConfig('Garden.SignIn.Popup', FALSE);
-		SaveToConfig('Plugins.ProxyConnect.Enabled', TRUE);
 		SaveToConfig('Garden.Authenticators.proxy.Name', 'ProxyConnect');
       SaveToConfig('Garden.Authenticators.proxy.CookieName', 'VanillaProxy');
-      SaveToConfig('Garden.Authenticator.DefaultScheme', 'proxy');
+      
+      if ($FullEnable) {
+         SaveToConfig('Garden.Authenticator.DefaultScheme', 'proxy');
+         SaveToConfig('Plugins.ProxyConnect.Enabled', TRUE);
+      }
       
       // Create a provider key/secret pair if needed
       $SQL = Gdn::Database()->SQL();
