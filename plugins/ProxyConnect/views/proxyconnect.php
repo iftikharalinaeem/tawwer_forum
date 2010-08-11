@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="AuthenticationConfigure Slice" rel="/dashboard/settings/proxyconnect">
+<div class="AuthenticationConfigure Slice" rel="dashboard/settings/proxyconnect">
    <div class="SliceConfig"><?php echo $this->SliceConfig; ?></div>
    
    <h3><?php echo T('Proxy Connect'); ?></h3>
