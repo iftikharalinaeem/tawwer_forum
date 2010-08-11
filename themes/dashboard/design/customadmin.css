@@ -29,12 +29,12 @@ body {
 }
 #Head div.User a.Profile,
 #Head h1 a span {
-	background: url('images/dashboard-sprites.png') top left no-repeat #01518d;
+	background: url('images/dashboard-sprites2.png') top left no-repeat #01518d;
 	padding: 4px 6px 4px 22px;
 }
 #Head div.User a.Profile:hover,
 #Head h1 a span:hover {
-	background: url('images/dashboard-sprites.png') top left no-repeat #003e7b;
+	background: url('images/dashboard-sprites2.png') top left no-repeat #003e7b;
 }
 #Head div.User a.Profile,
 #Head div.User a.Profile:hover { background-position: 4px -595px; }
@@ -339,7 +339,7 @@ a.Close {
 	border-radius: 3px;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
-	background: url('images/dashboard-sprites.png') 5px -795px no-repeat #000;
+	background: url('images/dashboard-sprites2.png') 5px -795px no-repeat #000;
 	border-bottom: 1px solid #006edf;
 	position:absolute;
 	right:10px;
@@ -372,7 +372,7 @@ a.Close span {
 	padding: 0;
 	margin: 0;
 }
-#Panel div.Box h4 { background: url('images/dashboard-sprites.png') 170px 4px no-repeat; }
+#Panel div.Box h4 { background: url('images/dashboard-sprites2.png') 170px 4px no-repeat; }
 #Panel div.Dashboard h4 { background-position: 166px 7px; }
 #Panel div.Appearance h4 { background-position: 166px -492px; }
 #Panel div.Users h4 { background-position: 162px -292px; }

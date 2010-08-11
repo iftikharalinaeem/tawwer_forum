@@ -25,9 +25,9 @@ function WriteRangeTab($Range, $Sender) {
          Capitalize($Range),
          'settings?'
          .http_build_query(array(
-            'Range' => $Range,
-            'DateStart' => $Sender->DateStart,
-            'DateEnd' => $Sender->DateEnd
+            'Range' => $Range
+            // ,'DateStart' => StatisticsPlugin::GetDateStart($Sender, $Range)
+            // ,'DateEnd' => $Sender->DateEnd
          ))
       ),
       'li',
@@ -39,7 +39,31 @@ function WriteRangeTab($Range, $Sender) {
 <h1>Statistics Dashboard</h1>
 <div class="Tabs DateRangeTabs">
    <div class="DateRange">
-      <?php echo Anchor(Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')) . ' - ' . Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')), '#daterangepicker'); ?>
+      <input type="text" name="DateRange" class="DateRange DateRangeActive" value="<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')) . ' - ' . Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>" />
+      <div class="Picker">
+         <div class="Slider">
+            <div class="SliderHandle HandleStart">6/06/09</div>
+            <div class="SliderHandle HandleEnd">8/10/10</div>
+            <div class="SelectedRange"></div>
+            <div class="Range RangeStart"></div><div class="Range RangeMid"></div><div class="Range RangeEnd"></div>
+            <div class="SliderDates">
+               <div class="SliderDate">Jun 6</div>
+               <div class="SliderDate">Aug 7</div>
+               <div class="SliderDate">Oct 8</div>
+               <div class="SliderDate">Dec 9</div>
+               <div class="SliderDate">Feb 9</div>
+               <div class="SliderDate">Apr 12</div>
+               <div class="SliderDate">Jun 13</div>
+            </div>
+         </div>
+         <hr />
+         <div class="InputRange">
+            <label for="DateStart" class="DateStart">Start Date</label>
+            <input type="text" name="DateStart" />
+            <label for="DateEnd" class="DateEnd">End Date</label>
+            <input type="text" name="DateEnd" />
+         </div>
+      </div>
    </div>
    <ul>
       <?php

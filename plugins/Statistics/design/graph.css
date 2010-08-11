@@ -32,15 +32,124 @@
 .DateRangeTabs {
    position: relative;
 }
-.DateRange {
-   position: absolute;
-   right: 10px;
-   top: 6px;
-}
 body div.Tabs {
    background: #f3fcff;
 }
 body div.Tabs li.Active a {
    background: #fff;
 	border-bottom: 1px solid #fff;
+}
+
+
+/* Date Range Picker */
+div.DateRange {
+   position: relative;
+   right: -10px;
+}
+input.DateRange {
+   position: absolute;
+   top: 4px;
+   height: 22px;
+   right: 0;
+}
+input.DateRange,
+input.DateRange:hover,
+input.DateRange:focus {
+   border: none;
+   background: url('daterange-sprites.png') 257px 7px no-repeat transparent;
+   width: 250px;
+   text-align: right;
+   padding: 4px 30px 4px 0;
+   margin: 0;
+   font-size: 14px;
+   line-height: 14px;
+   font-weight: bold;
+   cursor: pointer;
+}
+input.DateRange:hover { background-position: 257px -94px; }
+input.DateRange:focus { background-position: 257px -193px; }
+input.DateRangeActive,
+input.DateRangeActive:hover,
+input.DateRangeActive:focus {
+   background-position: 257px -292px;
+   background-color: #8BC1DE;
+}
+input.DateRangeActive:hover { background-position: 257px -394px; }
+input.DateRangeActive:focus { background-position: 257px -492px; }
+div.DateRange div.Picker {
+   position: absolute;
+   top: 34px;
+   right: 0;
+   border-top: 1px solid #8BC1DE;
+   background: #DBF3FC;
+   padding: 10px 20px;
+   width: 600px;
+   box-shadow: 0 1px 0 #000;
+   -moz-box-shadow: -1px 2px 1px #5C7F93;
+}
+div.DateRange hr {
+   border: none;
+   border-top: 1px solid #99D3F4;
+   border-bottom: 1px solid #fff;
+}
+div.DateRange div.InputRange {
+   font-size: 12px;
+   text-align: center;
+}
+div.DateRange div.InputRange input {
+   width: 100px;
+}
+div.DateRange div.InputRange label.DateEnd {
+   padding-left: 20px;
+}
+div.DateRange div.Slider {
+   text-align: center;
+   position: relative;
+}
+div.DateRange div.SliderHandle {
+   position: absolute;
+   font-size: 9px;
+   text-align: center;
+   height: 56px;
+   width: 59px;
+   padding: 2px 0 0;
+   background: url('daterange-sprites.png') 0 -550px no-repeat transparent;
+   cursor: pointer;
+   z-index: 200;
+}
+div.DateRange div.HandleStart {
+   left: 20px;
+}
+div.DateRange div.HandleEnd {
+   left: 220px;
+}
+div.Slider div.SelectedRange {
+   position: absolute;
+   background: url('slider-sprites.png') 0 -150px repeat-x transparent;
+   top: 33px;
+   left: 50px;
+   width: 200px;
+   height: 13px;
+   z-index: 100;
+}
+div.DateRange div.Slider div.Range {
+   margin-top: 32px;
+   display: inline-block;
+   height: 19px;
+   width: 566px;
+   background: url('slider-sprites.png') center -100px repeat-x transparent;
+}
+div.DateRange div.Slider div.RangeStart {
+   background-position: 0 0;
+   background-repeat: none;
+   width: 6px;
+}
+div.DateRange div.Slider div.RangeEnd {
+   background-position: 7px -50px;
+   background-repeat: none;
+   width: 7px;
+}
+div.DateRange div.Slider div.SliderDate {
+   display: inline;
+   font-size: 11px;
 }

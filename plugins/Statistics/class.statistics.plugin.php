@@ -381,15 +381,25 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
       $Sender->AddSideMenu('dashboard/settings');
       
-      
       // Load data for the graph
       $Sender->Range = GetIncomingValue('Range');
       if (!in_array($Sender->Range, array(
+            StatisticsPlugin::RESOLUTION_HOUR,
             StatisticsPlugin::RESOLUTION_DAY,
             StatisticsPlugin::RESOLUTION_WEEK,
             StatisticsPlugin::RESOLUTION_MONTH)))
          $Sender->Range = StatisticsPlugin::RESOLUTION_DAY;
          
+         
+      $Sender->HourStampStart = strtotime('-24 hours');
+      $Sender->DayStampStart = strtotime('-1 month'); // Default to 1 month ago
+      $Sender->WeekStampStart = strtotime('-24 weeks'); // Default to 24 weeks ago
+      $Sender->MonthStampStart = strtotime('-24 months'); // Default to 24 months ago
+      $Sender->HourDateStart = Gdn_Format::ToDate($Sender->HourStampStart);
+      $Sender->DayDateStart = Gdn_Format::ToDate($Sender->DayStampStart);
+      $Sender->WeekDateStart = Gdn_Format::ToDate($Sender->WeekStampStart);
+      $Sender->MonthDateStart = Gdn_Format::ToDate($Sender->MonthStampStart);
+
       $Sender->StampStart = Gdn_Format::ToTimestamp(GetIncomingValue('DateStart'));
       $Sender->StampEnd = Gdn_Format::ToTimestamp(GetIncomingValue('DateEnd'));
       if (!$Sender->StampEnd)
@@ -398,12 +408,9 @@ class StatisticsPlugin extends Gdn_Plugin {
       // If no date was provided...
       if (!$Sender->StampStart) {
          $Sender->StampEnd = time();
-         // Default to 30 days ago
-         if ($Sender->Range == 'day') $Sender->StampStart = strtotime('-30 days');
-         // Default to 16 weeks ago
-         if ($Sender->Range == 'week') $Sender->StampStart = strtotime('-16 weeks');
-         // Default to 24 months ago
-         if ($Sender->Range == 'month') $Sender->StampStart = strtotime('-24 months');
+         if ($Sender->Range == 'day') $Sender->StampStart = $Sender->DayStampStart;
+         if ($Sender->Range == 'week') $Sender->StampStart = $Sender->WeekStampStart;
+         if ($Sender->Range == 'month') $Sender->StampStart = $Sender->MonthStampStart;
       }
       $Sender->DateStart = Gdn_Format::ToDate($Sender->StampStart);
       $Sender->DateEnd = Gdn_Format::ToDate($Sender->StampEnd);
@@ -412,6 +419,20 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->SetData('CommentData', StatisticsPlugin::GetDataRange('comments', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
       $Sender->SetData('DiscussionData', StatisticsPlugin::GetDataRange('discussions', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
       $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboard.php');
+   }
+   
+   public static function GetDateStart($Sender, $Range) {
+      if ($Range == StatisticsPlugin::RESOLUTION_HOUR)
+         return $Sender->HourDateStart;
+      else if ($Range == StatisticsPlugin::RESOLUTION_DAY)
+         return $Sender->DayDateStart;
+      else if ($Range == StatisticsPlugin::RESOLUTION_WEEK)
+         return $Sender->WeekDateStart;
+      else if ($Range == StatisticsPlugin::RESOLUTION_MONTH) {
+         return $Sender->MonthDateStart;
+      } else {
+         return $Sender->DateStart;
+      }
    }
    
    public function Setup() {
