@@ -54,7 +54,7 @@ input.DateRange,
 input.DateRange:hover,
 input.DateRange:focus {
    border: none;
-   background: url('sprites.png') right 7px no-repeat transparent;
+   background: url('daterange-sprites.png') 307px 7px no-repeat transparent;
    width: 300px;
    text-align: right;
    padding: 4px 24px 4px 0;
@@ -63,11 +63,11 @@ input.DateRange:focus {
    font-weight: bold;
    cursor: pointer;
 }
-input.DateRange:hover { background-position: right -94px; }
-input.DateRange:focus { background-position: right -193px; }
-input.DateRangeOpen { background-position: right -293px; }
-input.DateRangeOpen:hover { background-position: right -394px; }
-input.DateRangeOpen:focus { background-position: right -493px; }
+input.DateRange:hover { background-position: 307px -94px; }
+input.DateRange:focus { background-position: 307px -193px; }
+input.DateRangeOpen { background-position: 307px -293px; }
+input.DateRangeOpen:hover { background-position: 307px -394px; }
+input.DateRangeOpen:focus { background-position: 307px -493px; }
 div.DateRange div.Picker {
    position: absolute;
    top: 30px;
@@ -103,7 +103,7 @@ div.DateRange div.SliderHandle {
    height: 56px;
    width: 59px;
    padding: 2px 0 0;
-   background: url('slider-handle.png') 0 0 no-repeat transparent;
+   background: url('daterange-sprites.png') 0 -550px no-repeat transparent;
    cursor: pointer;
    z-index: 200;
 }
