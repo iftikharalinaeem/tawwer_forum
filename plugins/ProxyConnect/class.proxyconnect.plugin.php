@@ -16,7 +16,7 @@ $PluginInfo['ProxyConnect'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.1a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
-   'SettingsUrl' => '/dashboard/authentication/choose/proxy',
+   'SettingsUrl' => '/dashboard/authentication/proxy',
    'SettingsPermission' => 'Garden.AdminUser.Only',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
