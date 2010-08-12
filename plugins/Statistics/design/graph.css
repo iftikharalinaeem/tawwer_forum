@@ -49,6 +49,7 @@ div.DateRange {
 div.DateRange input.DateRange {
    display: none;
 }
+/* Slider */
 a.RangeToggle,
 a.RangeToggle:hover,
 a.RangeToggle:focus {
@@ -79,36 +80,7 @@ a.RangeToggleActive:focus {
 }
 a.RangeToggleActive:hover { background-position: 275px -394px; }
 a.RangeToggleActive:focus { background-position: 275px -492px; }
-div.DateRange div.Picker {
-   position: absolute;
-   top: 34px;
-   right: 0;
-   background: #DBF3FC;
-   padding: 10px 20px;
-   width: 600px;
-   border: 1px solid #8BC1DE;
-   border-right: none;
-}
-div.DateRange hr {
-   border: none;
-   border-top: 1px solid #99D3F4;
-   border-bottom: 1px solid #fff;
-}
-div.DateRange div.InputRange {
-   font-size: 12px;
-   text-align: center;
-}
-div.DateRange div.InputRange input {
-   width: 100px;
-}
-div.DateRange div.InputRange label.DateEnd {
-   padding-left: 20px;
-}
-div.DateRange div.Slider {
-   text-align: center;
-   position: relative;
-}
-div.DateRange div.SliderHandle {
+div.Picker div.SliderHandle {
    position: absolute;
    font-size: 9px;
    text-align: center;
@@ -119,43 +91,77 @@ div.DateRange div.SliderHandle {
    cursor: pointer;
    z-index: 200;
 }
-div.DateRange div.HandleStart {
-   left: 20px;
+div.Picker {
+   background: #DBF3FC;
+   padding: 10px 20px;
+   border-top: 1px solid #8BC1DE;
 }
-div.DateRange div.HandleEnd {
-   left: 220px;
+div.Picker div.Slider {
+   text-align: center;
+   position: relative;
+   width: 700px;
+   margin: 0 auto;
+}
+/* Bump the handles back half their width so percentages can be used to hit the
+beginning (0%) and end (100%) of the slider. */
+div.Picker div.HandleContainer {
+   position: absolute;
+   width: 700px;
+   left: -30px;
+}
+div.Picker div.HandleStart {
+   left: 30%;
+}
+div.Picker div.HandleEnd {
+   left: 70%;
 }
 div.Slider div.SelectedRange {
    position: absolute;
    background: url('slider-sprites.png') 0 -150px repeat-x transparent;
    top: 33px;
-   left: 50px;
-   width: 200px;
+   left: 30%; /* The same as HandleStart */
+   width: 40%; /* HandleEnd - HandleStart = Width */
    height: 13px;
    z-index: 100;
 }
-div.DateRange div.Slider div.Range {
+div.Picker div.Slider div.Range {
    margin-top: 32px;
    display: inline-block;
    height: 16px;
-   width: 566px;
+   width: 687px;
    background: url('slider-sprites.png') center -100px repeat-x transparent;
 }
-div.DateRange div.Slider div.RangeStart {
+div.Picker div.Slider div.RangeStart {
    background-position: 0 0;
    background-repeat: none;
    width: 6px;
 }
-div.DateRange div.Slider div.RangeEnd {
+div.Picker div.Slider div.RangeEnd {
    background-position: 7px -50px;
    background-repeat: none;
    width: 7px;
 }
-div.DateRange div.Slider div.SliderDates {
+div.Picker div.Slider div.SliderDates {
    line-height: 1;
    padding-bottom: 4px;
 }
-div.DateRange div.Slider div.SliderDates div.SliderDate {
+div.Picker div.Slider div.SliderDates div.SliderDate {
    display: inline;
    font-size: 11px;
+}
+/* Inputs */
+div.Picker hr {
+   border: none;
+   border-top: 1px solid #99D3F4;
+   border-bottom: 1px solid #fff;
+}
+div.Picker div.InputRange {
+   font-size: 12px;
+   text-align: center;
+}
+div.Picker div.InputRange input {
+   width: 100px;
+}
+div.Picker div.InputRange label.DateEnd {
+   padding-left: 20px;
 }
