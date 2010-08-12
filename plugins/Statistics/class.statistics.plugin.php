@@ -18,8 +18,8 @@ $PluginInfo['Statistics'] = array(
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
+   'Author' => "Tim Gunter, Mark O'Sullivan",
+   'AuthorEmail' => 'support@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
@@ -364,7 +364,9 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('settings.js');
       $Sender->AddJsFile('plugins/Statistics/js/raphael.js');
       $Sender->AddJsFile('plugins/Statistics/js/graph.js');
+      $Sender->AddJsFile('plugins/Statistics/js/picker.js');
       $Sender->AddCSSFile('plugins/Statistics/design/graph.css');
+      $Sender->AddCSSFile('plugins/Statistics/design/picker.css');
       $Sender->Title(T('Dashboard'));
       $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
