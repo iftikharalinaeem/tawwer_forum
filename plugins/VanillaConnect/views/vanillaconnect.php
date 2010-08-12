@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="AuthenticationConfigure Slice" rel="/dashboard/settings/vanillaconnect">
+<div class="AuthenticationConfigure Slice" rel="dashboard/settings/vanillaconnect">
    <div class="SliceConfig"><?php echo $this->SliceConfig; ?></div>
    
    <h3><?php echo T('Vanilla Connect'); ?></h3>
