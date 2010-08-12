@@ -40,8 +40,9 @@ body div.Tabs li.Active a {
 	border-bottom: 1px solid #fff;
 }
 
+/* Begin Date Range Picker Classes */
 
-/* Date Range Picker */
+/* Date Range Input & Toggle */
 div.DateRange {
    position: relative;
    right: -10px;
@@ -49,7 +50,6 @@ div.DateRange {
 div.DateRange input.DateRange {
    display: none;
 }
-/* Slider */
 a.RangeToggle,
 a.RangeToggle:hover,
 a.RangeToggle:focus {
@@ -80,6 +80,8 @@ a.RangeToggleActive:focus {
 }
 a.RangeToggleActive:hover { background-position: 275px -394px; }
 a.RangeToggleActive:focus { background-position: 275px -492px; }
+
+/* Slider */
 div.Picker div.SliderHandle {
    position: absolute;
    font-size: 9px;
@@ -118,14 +120,14 @@ div.Picker div.HandleEnd {
 div.Slider div.SelectedRange {
    position: absolute;
    background: url('slider-sprites.png') 0 -150px repeat-x transparent;
-   top: 33px;
+   top: 32px;
    left: 30%; /* The same as HandleStart */
    width: 40%; /* HandleEnd - HandleStart = Width */
    height: 13px;
    z-index: 100;
 }
 div.Picker div.Slider div.Range {
-   margin-top: 32px;
+   margin-top: 31px;
    display: inline-block;
    height: 16px;
    width: 687px;
