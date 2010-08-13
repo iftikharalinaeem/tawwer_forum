@@ -23,20 +23,20 @@ a.RangeToggle:focus {
    cursor: pointer;
    color: #000;
 }
-a.RangeToggle:hover { background-position: 275px -94px; }
-a.RangeToggle:focus { background-position: 275px -193px; }
+a.RangeToggle:hover { background-position: right -94px; }
+a.RangeToggle:focus { background-position: right -193px; }
 a.RangeToggleActive,
 a.RangeToggleActive:hover,
 a.RangeToggleActive:focus {
-   background-position: 275px -292px;
+   background-position: right -292px;
    background-color: #DBF3FC;
    border: 1px solid #8BC1DE;
    border-bottom: 1px solid #DBF3FC;
    border-right: none;
    z-index: 300;
 }
-a.RangeToggleActive:hover { background-position: 275px -394px; }
-a.RangeToggleActive:focus { background-position: 275px -492px; }
+a.RangeToggleActive:hover { background-position: right -394px; }
+a.RangeToggleActive:focus { background-position: right -492px; }
 
 /* Slider */
 div.Picker div.SliderHandle {

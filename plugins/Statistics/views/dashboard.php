@@ -2,8 +2,8 @@
 
 $PageViewData = GetValue('PageViewData', $this->Data);
 $PageViewSum = array_sum(ConsolidateArrayValuesByKey($PageViewData, 'Value'));
-$VisitorData = GetValue('VisitorData', $this->Data);
-$VisitorSum = array_sum(ConsolidateArrayValuesByKey($VisitorData, 'Value'));
+// $VisitorData = GetValue('VisitorData', $this->Data);
+// $VisitorSum = array_sum(ConsolidateArrayValuesByKey($VisitorData, 'Value'));
 $UserData = GetValue('UserData', $this->Data);
 $UserSum = array_sum(ConsolidateArrayValuesByKey($UserData, 'Value'));
 $DiscussionData = GetValue('DiscussionData', $this->Data);
@@ -123,12 +123,17 @@ function WriteRangeTab($Range, $Sender) {
          <strong><?php echo number_format($PageViewSum); ?></strong>
       </div>
    </li>
+   <?php
+   /*
+    TODO:
    <li class="UniqueVisitors">
       <div>
          Unique Visitors
          <strong><?php echo number_format($VisitorSum); ?></strong>
       </div>
    </li>
+   */
+   ?>
    <li class="NewUsers">
       <div>
          New Users
@@ -168,6 +173,29 @@ function WriteRangeTab($Range, $Sender) {
       </tbody>
    </table>
 </div>
+<div class="Summary ActiveUserSummary">
+   <table>
+      <thead>
+         <tr>
+            <th><?php echo T('Active Users'); ?></th>
+            <td><?php echo T('Discussions'); ?></td>
+            <td><?php echo T('Comments'); ?></td>
+            <td><?php echo T('PageViews'); ?></td>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <th>Username</th>
+            <td>#,###</td>
+            <td>#,###</td>
+            <td>#,###</td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+<?php
+/*
+  TODO:
 <div class="Summary PageViewSummary">
    <table>
       <thead>
@@ -281,4 +309,4 @@ function WriteRangeTab($Range, $Sender) {
       </tbody>
    </table>
 </div>
- 
+*/

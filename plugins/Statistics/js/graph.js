@@ -325,8 +325,8 @@ jQuery(document).ready(function($) {
                     var a = getAnchors(X0, Y0, x, y, X2, Y2);
                     p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
                 }
-                var dot = r.circle(x, y, 5).attr({fill: color, stroke: graphHolder.css('background-color')});
-                dot.hide();
+                var dot = r.circle(x, y, 4).attr({fill: color, stroke: graphHolder.css('background-color')});
+                // dot.hide();
                 blanket.push(r.rect(leftgutter + X * i, 0, X, height - bottomgutter).attr({stroke: "none", fill: "#fff", opacity: 0}));
                 
                 dots[j].push(dot);
@@ -341,7 +341,8 @@ jQuery(document).ready(function($) {
                     rect.hover(function () {
                         yLevel = 100000;
                         for (j = 0; j < rows.length; j++) {
-                            dots[j][i].show();
+                            // dots[j][i].show();
+                            dots[j][i].attr("r", 5);
                             x = coordinates[j][i][0];
                             y = coordinates[j][i][1];
                             if (y < yLevel)
@@ -369,7 +370,8 @@ jQuery(document).ready(function($) {
                         is_label_visible = true;
                     }, function () {
                         for (j = 0; j < rows.length; j++) {
-                            dots[j][i].hide();
+                            // dots[j][i].hide();
+                            dots[j][i].attr("r", 4);
                         }
                         leave_timer = setTimeout(function () {
                             frame.hide();
