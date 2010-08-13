@@ -24,6 +24,7 @@ function Picker() {
       $('div.SliderHandle').bind('mousedown', jQuery.proxy(function(e){
          this.DownTarget = $(e.target);
          console.log(this.ToPerc(this.DownTarget.css('left')));
+         return false; // Return false so text selection fails.
       },this));
       
       $(document).bind('mouseup', jQuery.proxy(function(e){
