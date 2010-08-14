@@ -14,7 +14,7 @@ a.RangeToggle:focus {
    top: 3px;
    right: 0;
    border: none;
-   background: url('daterange-sprites.png') 275px 7px no-repeat transparent;
+   background: url('daterange-sprites.png') right 9px no-repeat transparent;
    padding: 8px 30px 8px 10px;
    margin: 0;
    font-size: 14px;
@@ -23,8 +23,8 @@ a.RangeToggle:focus {
    cursor: pointer;
    color: #000;
 }
-a.RangeToggle:hover { background-position: right -94px; }
-a.RangeToggle:focus { background-position: right -193px; }
+a.RangeToggle:hover { background-position: right -92px; }
+a.RangeToggle:focus { background-position: right -191px; }
 a.RangeToggleActive,
 a.RangeToggleActive:hover,
 a.RangeToggleActive:focus {

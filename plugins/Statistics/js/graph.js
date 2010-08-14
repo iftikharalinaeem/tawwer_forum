@@ -319,7 +319,7 @@ jQuery(document).ready(function($) {
                     var Y0 = Math.round(height - bottomgutter - Y * row[i - 1]),
                         Y2 = Math.round(height - bottomgutter - Y * row[i + 1]),
                         // Defines the radius of the curve of the line paths
-                        X0 = Math.round(leftgutter + X * (i - .1)),
+                        X0 = Math.round(leftgutter + X * (i + .1)),
                         X2 = Math.round(leftgutter + X * (i + 1.1));
     
                     var a = getAnchors(X0, Y0, x, y, X2, Y2);
