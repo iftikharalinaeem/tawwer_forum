@@ -1,11 +1,9 @@
 
 /* Date Range Input & Toggle */
-div.DateRange {
-   position: relative;
-   right: -10px;
-}
-div.DateRange input.DateRange {
-   display: none;
+input.DateRange {
+   font-size: 12px;
+   font-weight: bold;
+   width: 240px;
 }
 a.RangeToggle,
 a.RangeToggle:hover,
@@ -14,7 +12,7 @@ a.RangeToggle:focus {
    top: 3px;
    right: 0;
    border: none;
-   background: url('daterange-sprites.png') 275px 7px no-repeat transparent;
+   background: url('daterange-sprites.png') right 9px no-repeat transparent;
    padding: 8px 30px 8px 10px;
    margin: 0;
    font-size: 14px;
@@ -23,35 +21,36 @@ a.RangeToggle:focus {
    cursor: pointer;
    color: #000;
 }
-a.RangeToggle:hover { background-position: 275px -94px; }
-a.RangeToggle:focus { background-position: 275px -193px; }
+a.RangeToggle:hover { background-position: right -92px; }
+a.RangeToggle:focus { background-position: right -191px; }
 a.RangeToggleActive,
 a.RangeToggleActive:hover,
 a.RangeToggleActive:focus {
-   background-position: 275px -292px;
+   background-position: right -292px;
    background-color: #DBF3FC;
    border: 1px solid #8BC1DE;
    border-bottom: 1px solid #DBF3FC;
    border-right: none;
    z-index: 300;
 }
-a.RangeToggleActive:hover { background-position: 275px -394px; }
-a.RangeToggleActive:focus { background-position: 275px -492px; }
+a.RangeToggleActive:hover { background-position: right -394px; }
+a.RangeToggleActive:focus { background-position: right -492px; }
 
 /* Slider */
 div.Picker div.SliderHandle {
    position: absolute;
    font-size: 9px;
    text-align: center;
-   height: 56px;
-   width: 59px;
-   margin-left: -30px;
+   height: 52px;
+   width: 56px;
+   margin-left: -28px; /* half the width of the handle */
    padding: 2px 0 0;
    background: url('daterange-sprites.png') 0 -550px no-repeat transparent;
    cursor: pointer;
    z-index: 200;
 }
 div.Picker {
+   display: none;
    background: #DBF3FC;
    padding: 10px 20px;
    border-top: 1px solid #8BC1DE;

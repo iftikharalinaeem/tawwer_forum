@@ -1,9 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$UserData = GetValue('UserData', $this->Data);
-$DiscussionData = GetValue('DiscussionData', $this->Data);
-$CommentData = GetValue('CommentData', $this->Data);
-function WriteData($Data, $Field = 'Value') {
+/*function WriteData($Data, $Field = 'Value') {
    $Alt = 0;
    foreach ($Data as $Date => $Row) {
       $Alt = $Alt == 0 ? 1 : 0;
@@ -16,6 +13,7 @@ function WriteData($Data, $Field = 'Value') {
       echo Wrap($Val, 'td', $Alt ? array('class' => 'Alt') : '');
    }
 }
+*/
 function Capitalize($Word) {
    return strtoupper(substr($Word, 0, 1)).substr($Word, 1);
 }
@@ -34,14 +32,11 @@ function WriteRangeTab($Range, $Sender) {
       $Range == $Sender->Range ? array('class' => 'Active') : ''
    )."\n";
 }
-
 ?>
 <h1>Statistics Dashboard</h1>
 <div class="Tabs DateRangeTabs">
-   <div class="DateRange">
-      <input type="text" name="DateRange" class="DateRange DateRangeActive" value="<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')) . ' - ' . Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>" />
-      <a class="RangeToggle RangeToggleActive" href="#"><?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')) . ' - ' . Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?></a>
-   </div>
+   <input type="text" name="DateRange" class="DateRange DateRangeActive" value="<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')) . ' - ' . Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>" />
+   <input type="hidden" name="Range" class="Range" value="<?php echo $this->Range; ?>" />
    <ul>
       <?php
       WriteRangeTab(StatisticsPlugin::RESOLUTION_DAY, $this);
@@ -50,33 +45,9 @@ function WriteRangeTab($Range, $Sender) {
       ?>
    </ul>
 </div>
-<div class="Picker">
-   <div class="Slider">
-      <div class="SelectedRange"></div>
-      <div class="HandleContainer">
-         <div class="SliderHandle HandleStart">6/06/09</div>
-         <div class="SliderHandle HandleEnd">8/10/10</div>
-      </div>
-      <div class="Range RangeStart"></div><div class="Range RangeMid"></div><div class="Range RangeEnd"></div>
-      <div class="SliderDates">
-         <div class="SliderDate">Jun 6</div>
-         <div class="SliderDate">Aug 7</div>
-         <div class="SliderDate">Oct 8</div>
-         <div class="SliderDate">Dec 9</div>
-         <div class="SliderDate">Feb 9</div>
-         <div class="SliderDate">Apr 12</div>
-         <div class="SliderDate">Jun 13</div>
-      </div>
-   </div>
-   <hr />
-   <div class="InputRange">
-      <label for="DateStart" class="DateStart">Start Date</label>
-      <input type="text" name="DateStart" />
-      <label for="DateEnd" class="DateEnd">End Date</label>
-      <input type="text" name="DateEnd" />
-   </div>
-</div>
+<div class="Picker"></div>
 <div id="GraphHolder">
+   <div class="Loading"></div>
    <span class="Metrics"></span>
    <span class="Metric1"></span>
    <span class="Metric2"></span>
@@ -87,6 +58,8 @@ function WriteRangeTab($Range, $Sender) {
    <span class="Headings"></span>
    <span class="Legend"></span>
 </div>
+<?php
+/*
 <table class="GraphData AltColumns">
     <thead>
         <tr>
@@ -109,7 +82,7 @@ function WriteRangeTab($Range, $Sender) {
         </tr>
     </tbody>
 </table>
-<script type="text/javascript">
+ <script type="text/javascript">
    jQuery(document).ready(function(){
       var GraphPicker = new Picker();
       GraphPicker.Attach({
@@ -120,3 +93,45 @@ function WriteRangeTab($Range, $Sender) {
       });
    });
 </script>
+*/
+?>
+<ul class="StatsOverview">
+   <li class="PageViews">
+      <div>
+         Page Views
+         <strong><?php echo number_format($PageViewSum); ?></strong>
+      </div>
+   </li>
+   <?php
+   /*
+    TODO:
+   <li class="UniqueVisitors">
+      <div>
+         Unique Visitors
+         <strong><?php echo number_format($VisitorSum); ?></strong>
+      </div>
+   </li>
+   */
+   ?>
+   <li class="NewUsers">
+      <div>
+         Users
+         <strong><?php echo number_format($UserSum); ?></strong>
+      </div>
+   </li>
+   <li class="NewDiscussions">
+      <div>
+         Discussions
+         <strong><?php echo number_format($DiscussionSum); ?></strong>
+      </div>
+   </li>
+   <li class="NewComments">
+      <div>
+         Comments
+         <strong><?php echo number_format($CommentSum); ?></strong>
+      </div>
+   </li>
+</ul>
+<div class="DashboardSummaries">
+<?php echo $this->FetchView(PATH_PLUGINS.'/Statistics/views/dashboardsummaries.php'); ?>
+</div>

@@ -165,10 +165,12 @@ class StatisticsPlugin extends Gdn_Plugin {
       
       switch ($Range) {
          case self::RESOLUTION_HOUR:
+return;
             $DateStart = date('Y-m-d H:00:00',$DateRaw);
             $DateEnd = date('Y-m-d H:00:00',$DateRaw);
             break;
          case self::RESOLUTION_WEEK:
+return;
             $DateStart = date('Y-m-d',strtotime('last sunday',$DateRaw));
             $DateEnd = date('Y-m-d',strtotime('this saturday',$DateRaw));
             break;
@@ -384,6 +386,15 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
       $Sender->AddSideMenu('dashboard/settings');
       
+      $this->ConfigureRange($Sender);
+      // $Sender->Head->AddScript('dashboard/settings/loadstats?Range='.$Sender->Range.'&DateRange='.$Sender->DateRange);
+      // $Sender->SetData('AllData', $this->GetData($Sender));
+      
+      // Render the custom dashboard view
+      $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboard.php');
+   }
+   
+   private function ConfigureRange($Sender) {
       // Grab the range resolution from the url or form. Default to "day" range.
       $Sender->Range = GetIncomingValue('Range');
       if (!in_array($Sender->Range, array(
@@ -406,8 +417,8 @@ class StatisticsPlugin extends Gdn_Plugin {
       // Validate that any values coming from the url or form are valid
       $Sender->DateRange = GetIncomingValue('DateRange');
       $DateRangeParts = explode(' - ', $Sender->DateRange);
-      $Sender->StampStart = Gdn_Format::ToTimestamp(GetValue(0, $DateRangeParts));
-      $Sender->StampEnd = Gdn_Format::ToTimestamp(GetValue(1, $DateRangeParts));
+      $Sender->StampStart = strtotime(GetValue(0, $DateRangeParts));
+      $Sender->StampEnd = strtotime(GetValue(1, $DateRangeParts));
       if (!$Sender->StampEnd)
          $Sender->StampEnd = time();
          
@@ -423,14 +434,44 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->DateStart = Gdn_Format::ToDate($Sender->StampStart);
       $Sender->DateEnd = Gdn_Format::ToDate($Sender->StampEnd);
       $Sender->DateRange = $Sender->DateStart . ' - ' . $Sender->DateEnd;
-      
+   }
+   
+   private function GetData($Sender) {
       // Retrieve associated data for graph
-      $Sender->SetData('UserData', StatisticsPlugin::GetDataRange('users', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
-      $Sender->SetData('CommentData', StatisticsPlugin::GetDataRange('comments', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
-      $Sender->SetData('DiscussionData', StatisticsPlugin::GetDataRange('discussions', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
-      
-      // Render the custom dashboard view
-      $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboard.php');
+      $UserData = StatisticsPlugin::GetDataRange('registrations', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
+      $CommentData = StatisticsPlugin::GetDataRange('comments', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
+      $DiscussionData = StatisticsPlugin::GetDataRange('discussions', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
+
+      // Build a single array that contains all of the data
+      $Data = array(
+         'Dates' => array(),
+         'Users' => array(),
+         'Discussions' => array(),
+         'Comments' => array()
+      );
+      foreach ($UserData as $Date => $Value) {
+         $Data['Dates'][] = date(date('Y', Gdn_Format::ToTimestamp($Date)) < date('Y') ? 'M j, Y' : 'M j', strtotime($Date));
+         $Data['Users'][] = $Value['Value'];
+         $Data['Discussions'][] = $DiscussionData[$Date]['Value'];
+         $Data['Comments'][] = $CommentData[$Date]['Value'];
+      }
+      return $Data;
+   }
+   
+   public function SettingsController_LoadStats_Create($Sender) {
+      $this->ConfigureRange($Sender);
+      $Data = $this->GetData($Sender);
+      $AjaxRequest = GetIncomingValue('Ajax');
+      if (!$AjaxRequest) {
+         echo '
+         var Range = "'.$Sender->Range.'";
+         var GraphData = '.json_encode($Data).';';
+      } else {
+         echo json_encode($Data);
+      }
+      // Make sure the database connection is closed before exiting.
+      Gdn::Database()->CloseConnection();
+      exit();
    }
    
    /**

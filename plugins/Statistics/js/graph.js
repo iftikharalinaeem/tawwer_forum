@@ -180,7 +180,18 @@ jQuery(document).ready(function($) {
             rowHeight = h / hv,
             columnWidth = w / wv,
             dashed = {fill: "none", stroke: color, "stroke-dasharray": "- "};
+
+        /* Don't show so many vertical cols?
+        var maxCols = 30;
+        var colsToDisplay = wv;
+        var increment = 1;
+        while (colsToDisplay > maxCols) {
+            increment++;
+            colsToDisplay = Math.round(wv / increment);
+        }
     
+        for (i = 0; i <= wv; i += increment) {
+        */
         for (i = 0; i <= wv; i++) {
             path = path.concat(["M", Math.round(x + i * columnWidth) + .5, Math.round(y) + .5, "V", Math.round(y + h) + .5]);
         }
@@ -197,7 +208,16 @@ jQuery(document).ready(function($) {
         }
         for (var i = 0; i < labels.length; i += increment) {
             var x = Math.round(leftgutter + X * (i + .5)); // Define the x position of the dot
-            var t = r.text(x, height - bottomgutter + 10, labels[i]).attr(footText).toBack(); // This adds the text along the bottom of the grid
+            var attr = {};
+            if (i == 0) {
+                attr = {'text-anchor': 'start'};
+                x = x - 4;
+            }
+            if (i == labels.length - 1) {
+                attr = {'text-anchor': 'end'};
+                x = x + 4;
+            }
+            var t = r.text(x, height - bottomgutter + 10, labels[i]).attr(footText).attr(attr).toBack(); // This adds the text along the bottom of the grid
         }
         return;    
     }
@@ -212,7 +232,7 @@ jQuery(document).ready(function($) {
             var bgcolor = $('body').css('background-color');
             box.attr({ fill: color, stroke: color, "stroke-width": 0});
             box.click(function() {
-               alert('test'+i);
+               // alert('test'+i);
             });
             legend.push(box);
             xPos = xPos + Math.round(box.getBBox().width) + 6;
@@ -233,39 +253,60 @@ jQuery(document).ready(function($) {
     }
     
     drawGraph = function(graphContainer, dataSource) {
-        // Hide the source data
-        $("table."+dataSource).hide();
-
         // initialize the chart area
         var graphHolder = $("#" + graphContainer);
         graphHolder.children('*:not(span)').remove();
-        
-        // Grab the data
+
+        // define data containers
         var rowLabels = [],
             footLabels = [],
-            rows = []
+            rows = [],
             data = [];
-            
-        $("table."+dataSource+" tfoot td, table."+dataSource+" thead td").each(function () {
-            footLabels.push($(this).html());
-        });
-        
-        $('table.'+dataSource+' tbody tr').each(function() {
-            var d = [];
-            $(this).find('td').each(function() {
-                d.push($(this).html());
+                
+        // Is the datasource an array, or a table selector?
+        if (typeof(dataSource)=='object') {
+            $.each(dataSource, function(Key, Value) {
+                if (Key == 'Dates') {
+                    footLabels = Value;
+                } else {
+                    rowLabels.push(Key);
+                    rows.push(Value);
+                    $.each(Value, function(k, v) {
+                        data.push(v);
+                    });
+                }
             });
-            rows.push(d);
-            d = [];
-        });
-        
-        $("table."+dataSource+" tbody td").each(function () {
-            data.push($(this).html());
-        });
-        
-        $("table."+dataSource+" tbody th").each(function () {
-            rowLabels.push($(this).html());
-        });
+            
+            // I realize this identifies the rows being graph'd (Users,
+            // Discussions, Comments), but I can't think of a better place to
+            // put it right now:
+            setSummary(dataSource, 'Users', 'li.NewUsers strong');
+            setSummary(dataSource, 'Discussions', 'li.NewDiscussions strong');
+            setSummary(dataSource, 'Comments', 'li.NewComments strong');
+        } else {
+            // Hide the source data
+            $("table."+dataSource).hide();
+            $("table."+dataSource+" tfoot td, table."+dataSource+" thead td").each(function () {
+                footLabels.push($(this).html());
+            });
+            
+            $('table.'+dataSource+' tbody tr').each(function() {
+                var d = [];
+                $(this).find('td').each(function() {
+                    d.push($(this).html());
+                });
+                rows.push(d);
+                d = [];
+            });
+            
+            $("table."+dataSource+" tbody td").each(function () {
+                data.push($(this).html());
+            });
+            
+            $("table."+dataSource+" tbody th").each(function () {
+                rowLabels.push($(this).html());
+            });
+        }
         
         //create the Raphael object
         var width = graphHolder.width(),
@@ -319,14 +360,14 @@ jQuery(document).ready(function($) {
                     var Y0 = Math.round(height - bottomgutter - Y * row[i - 1]),
                         Y2 = Math.round(height - bottomgutter - Y * row[i + 1]),
                         // Defines the radius of the curve of the line paths
-                        X0 = Math.round(leftgutter + X * (i - .1)),
+                        X0 = Math.round(leftgutter + X * (i + .1)),
                         X2 = Math.round(leftgutter + X * (i + 1.1));
     
                     var a = getAnchors(X0, Y0, x, y, X2, Y2);
                     p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
                 }
-                var dot = r.circle(x, y, 5).attr({fill: color, stroke: graphHolder.css('background-color')});
-                dot.hide();
+                var dot = r.circle(x, y, 4).attr({fill: color, stroke: graphHolder.css('background-color')});
+                // dot.hide();
                 blanket.push(r.rect(leftgutter + X * i, 0, X, height - bottomgutter).attr({stroke: "none", fill: "#fff", opacity: 0}));
                 
                 dots[j].push(dot);
@@ -341,7 +382,8 @@ jQuery(document).ready(function($) {
                     rect.hover(function () {
                         yLevel = 100000;
                         for (j = 0; j < rows.length; j++) {
-                            dots[j][i].show();
+                            // dots[j][i].show();
+                            dots[j][i].attr("r", 5);
                             x = coordinates[j][i][0];
                             y = coordinates[j][i][1];
                             if (y < yLevel)
@@ -349,16 +391,17 @@ jQuery(document).ready(function($) {
                         }
                         clearTimeout(leave_timer);
                         var side = "top-middle";
-                        if (x + frame.getBBox().width > width) {
-                            // console.log('x + frame.getBBox().width', x + frame.getBBox().width);
-                            // console.log('width', width);
+                        if (x + frame.getBBox().width > width)
                             side = "left";
-                        }
+                        
                         if (x < frame.getBBox().width)
                             side = "right";
                             
-                        if (yLevel - frame.getBBox().height - 5 < 0)
+                        if (yLevel - frame.getBBox().height - 8 < 0)
                             side = "bottom-middle";
+
+                        if (x < frame.getBBox().width && side == "bottom-middle")
+                            side = "bottom-left";
                             
                         var ppp = r.popup(x, yLevel, label, side, 1);
                         frame.show().animate({path: ppp.path}, 200 * is_label_visible);
@@ -369,7 +412,8 @@ jQuery(document).ready(function($) {
                         is_label_visible = true;
                     }, function () {
                         for (j = 0; j < rows.length; j++) {
-                            dots[j][i].hide();
+                            // dots[j][i].hide();
+                            dots[j][i].attr("r", 4);
                         }
                         leave_timer = setTimeout(function () {
                             frame.hide();
@@ -387,14 +431,68 @@ jQuery(document).ready(function($) {
             blanket.toFront();   
         }
     }
+   
+    // Sum and format data for the summary rows
+    Number.prototype.formatThousands = function() {
+        var n = this,
+           t = ",",
+           s = n < 0 ? "-" : "",
+           i = parseInt(n = Math.abs(+n || 0).toFixed(0)) + "",
+           j = (j = i.length) > 3 ? j % 3 : 0;
+        return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t);
+     };
+
+    function setSummary(data, rowkey, selector) {
+        var sum = 0;
+        $.each(data[rowkey], function(Key, Value) {
+            sum += Value * 1;
+        });
+        $(selector).html((sum).formatThousands());
+    }
+    
+    function getData() {
+        // Add spinner
+        if ($('#Content h1 span').length == 0)
+            $('<span class="TinyProgress"></span>').appendTo('#Content h1');
+        
+        // reload the graph data
+// TODO: USE INDEX.PHP
+        var dataUrl = gdn.combinePaths(
+            gdn.definition('WebRoot'),
+            'dashboard/settings/loadstats?Ajax=1&Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
+            );
+        return $.ajax({
+            type: "GET",
+            url: dataUrl,
+            dataType: 'json',
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                $('#Content h1 span.TinyProgress').remove();
+                var graphHolder = $("#GraphHolder");
+                graphHolder.children('*:not(span)').remove();
+                $('<div class="Messages Errors"><ul><li>Failed to load statistics data.</li></ul></div>').appendTo(graphHolder);
+                return false;
+            },
+            success: function(data) {
+                $('#Content h1 span.TinyProgress').remove();
+                drawGraph('GraphHolder', data);
+                return data;
+            }
+         });
+    }
+
     // Draw the graph when the window is loaded.
     window.onload = function() {
-        drawGraph('GraphHolder', 'GraphData');
-    }
+        getData();
+   }
 
     // Redraw the grpah when the window is resized
     $(window).resize(function() {
-        drawGraph('GraphHolder', 'GraphData');
+        getData();
     });
-    
+
+    // Redraw the graph if the date range changes
+    $('input.DateRange').live('change', function() {
+        getData();
+    });
+
 });

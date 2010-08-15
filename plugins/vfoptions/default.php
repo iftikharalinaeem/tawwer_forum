@@ -40,10 +40,10 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->ClearGroups();
       
-      $Menu->AddItem('Dashboard', T('Dashboard'));
+      $Menu->AddItem('Dashboard', T('Dashboard'), FALSE, array('class' => 'Dashboard'));
       $Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
 
-      $Menu->AddItem('Appearance', T('Appearance'));
+      $Menu->AddItem('Appearance', T('Appearance'), FALSE, array('class' => 'Appearance'));
 		$Menu->AddLink('Appearance', T('Banner <span class="New">New</span>'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
       $Menu->AddLink('Appearance', T('Themes <span class="New">New</span>'), 'dashboard/settings/themes', 'Garden.Themes.Manage');
 		if ($ThemeOptionsName = C('Garden.ThemeOptions.Name')) {
@@ -61,7 +61,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		if (C('EnabledPlugins.CustomDomain'))
 	      $Menu->AddLink('Appearance', 'Custom Domain <span class="New">New</span>', 'settings/customdomain', 'Garden.AdminUser.Only');
 		
-      $Menu->AddItem('Users', T('Users'));
+      $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), 'dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
 		$Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Roles.Manage');
       if (C('Garden.Registration.Manage', TRUE))
@@ -76,7 +76,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		if (C('EnabledPlugins.ProxyConnect'))
 			$Menu->AddLink('Users', 'Proxy Connect <span class="New">New</span>', 'settings/proxyconnect', 'Garden.AdminUser.Only');
 		
-		$Menu->AddItem('Forum', T('Forum Settings'));
+		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
 		if (C('EnabledPlugins.FileUpload'))
 			$Menu->AddLink('Forum', 'Media <span class="New">New</span>', 'plugin/fileupload', 'Garden.AdminUser.Only');
 			
@@ -100,14 +100,15 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       if ($Sender->MasterView == 'admin') {
          $Domain = C('Garden.Domain', '');
          $Url = strpos($Domain, 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforums';
-         $Footer = Anchor('Terms of Service', 'http://'.$Url.'.com/info/termsofservice', '', array('target' => '_New'))
+			$Style = 'background: none; height: auto; width: auto; margin: 0; display: inline; color: #ACDDF8; font-size: 12px; font-weight: normal;';
+         $Footer = Anchor('Terms of Service', 'http://'.$Url.'.com/info/termsofservice', '', array('target' => '_New', 'style' => $Style))
             .' | '
-            .Anchor('Privacy Policy', 'http://'.$Url.'.com/info/privacy', '', array('target' => '_New'))
+            .Anchor('Privacy Policy', 'http://'.$Url.'.com/info/privacy', '', array('target' => '_New', 'style' => $Style))
             .' | '
-            .Anchor('Refund Policy', 'http://'.$Url.'.com/info/refund', '', array('target' => '_New'))
+            .Anchor('Refund Policy', 'http://'.$Url.'.com/info/refund', '', array('target' => '_New', 'style' => $Style))
             .' | '
-            .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New'));
-         $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'float: right; padding-top: 6px;')));
+            .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New', 'style' => $Style));
+         $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'position: absolute; bottom: 15px; right: 140px;')));
          $Sender->AddCssFile('plugins/vfoptions/design/vfoptions.css', 'dashboard');
       }
       

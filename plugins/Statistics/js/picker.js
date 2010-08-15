@@ -10,6 +10,29 @@ function Picker() {
       
       this.StartDate = new Date(this.StartDateText);
       this.EndDate = new Date(this.EndDateText);
+      var self = this;
+      self.PickerField = $('input.DateRange');
+      self.PickerField.after('<a class="RangeToggle" href="#">' + self.PickerField.val() + '</a>');
+      self.PickerToggle = $('a.RangeToggle');
+      // self.PickerField.hide();
+      self.PickerContainer = $('div.Picker');
+      // Add the picker container if it wasn't already on the page somewhere
+      if (self.PickerContainer.length == 0) {
+         self.PickerToggle.after('<div class="Picker"></div>');
+         self.PickerContainer = $('div.Picker');
+      }
+      self.PickerContainer.hide();
+      self.PickerContainer.html(this.Settings.SliderHtml);
+      self.PickerToggle.live('click', function() {
+         if ($(this).hasClass('RangeToggleActive')) {
+            $(this).removeClass('RangeToggleActive');
+            self.PickerContainer.slideUp('fast');
+         } else {
+            $(this).addClass('RangeToggleActive');
+            self.PickerContainer.slideDown('fast');
+         }
+         this.blur();
+      });
       
       this.DownTarget = false;
       this.SlideRail = $('div.Slider');
@@ -133,6 +156,34 @@ function Picker() {
    Picker.prototype.ToPerc = function(X) {
       if (X.substr(-1,1) == '%') return parseFloat(X);
       return (parseInt(X) / this.SlideRail.width()) * 100;
+   }
+   
+   Picker.prototype.Settings = {
+      SliderHtml:       '\
+<div class="Slider"> \
+   <div class="SelectedRange"></div> \
+   <div class="HandleContainer"> \
+      <div class="SliderHandle HandleStart">6/06/09</div> \
+      <div class="SliderHandle HandleEnd">8/10/10</div> \
+   </div> \
+   <div class="Range RangeStart"></div><div class="Range RangeMid"></div><div class="Range RangeEnd"></div> \
+   <div class="SliderDates"> \
+      <div class="SliderDate">Jun 6</div> \
+      <div class="SliderDate">Aug 7</div> \
+      <div class="SliderDate">Oct 8</div> \
+      <div class="SliderDate">Dec 9</div> \
+      <div class="SliderDate">Feb 9</div> \
+      <div class="SliderDate">Apr 12</div> \
+      <div class="SliderDate">Jun 13</div> \
+   </div> \
+</div> \
+<hr /> \
+<div class="InputRange"> \
+   <label for="DateStart" class="DateStart">Start Date</label> \
+   <input type="text" name="DateStart" /> \
+   <label for="DateEnd" class="DateEnd">End Date</label> \
+   <input type="text" name="DateEnd" /> \
+</div>'
    }
 
 }
