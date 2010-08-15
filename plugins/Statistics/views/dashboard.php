@@ -1,16 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PageViewData = GetValue('PageViewData', $this->Data);
-$PageViewSum = array_sum(ConsolidateArrayValuesByKey($PageViewData, 'Value'));
-// $VisitorData = GetValue('VisitorData', $this->Data);
-// $VisitorSum = array_sum(ConsolidateArrayValuesByKey($VisitorData, 'Value'));
-$UserData = GetValue('UserData', $this->Data);
-$UserSum = array_sum(ConsolidateArrayValuesByKey($UserData, 'Value'));
-$DiscussionData = GetValue('DiscussionData', $this->Data);
-$DiscussionSum = array_sum(ConsolidateArrayValuesByKey($DiscussionData, 'Value'));
-$CommentData = GetValue('CommentData', $this->Data);
-$CommentSum = array_sum(ConsolidateArrayValuesByKey($CommentData, 'Value'));
-function WriteData($Data, $Field = 'Value') {
+/*function WriteData($Data, $Field = 'Value') {
    $Alt = 0;
    foreach ($Data as $Date => $Row) {
       $Alt = $Alt == 0 ? 1 : 0;
@@ -23,6 +13,7 @@ function WriteData($Data, $Field = 'Value') {
       echo Wrap($Val, 'td', $Alt ? array('class' => 'Alt') : '');
    }
 }
+*/
 function Capitalize($Word) {
    return strtoupper(substr($Word, 0, 1)).substr($Word, 1);
 }
@@ -41,7 +32,6 @@ function WriteRangeTab($Range, $Sender) {
       $Range == $Sender->Range ? array('class' => 'Active') : ''
    )."\n";
 }
-
 ?>
 <h1>Statistics Dashboard</h1>
 <div class="Tabs DateRangeTabs">
@@ -56,6 +46,7 @@ function WriteRangeTab($Range, $Sender) {
 </div>
 <div class="Picker"></div>
 <div id="GraphHolder">
+   <div class="Loading"></div>
    <span class="Metrics"></span>
    <span class="Metric1"></span>
    <span class="Metric2"></span>
@@ -66,6 +57,8 @@ function WriteRangeTab($Range, $Sender) {
    <span class="Headings"></span>
    <span class="Legend"></span>
 </div>
+<?php
+/*
 <table class="GraphData AltColumns">
     <thead>
         <tr>
@@ -88,6 +81,8 @@ function WriteRangeTab($Range, $Sender) {
         </tr>
     </tbody>
 </table>
+*/
+?>
 <ul class="StatsOverview">
    <li class="PageViews">
       <div>
@@ -125,160 +120,6 @@ function WriteRangeTab($Range, $Sender) {
       </div>
    </li>
 </ul>
-<div class="Summary PopularDiscussionSummary">
-   <table>
-      <thead>
-         <tr>
-            <th><?php echo T('Popular Discussions'); ?></th>
-            <td><?php echo T('Comments'); ?></td>
-            <td><?php echo T('Views'); ?></td>
-            <td><?php echo T('% Views'); ?></td>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <th>Discussion Title</th>
-            <td>#,###</td>
-            <td>#,###</td>
-            <td>##%</td>
-         </tr>
-      </tbody>
-   </table>
+<div class="DashboardSummaries">
+<?php echo $this->FetchView(PATH_PLUGINS.'/Statistics/views/dashboardsummaries.php'); ?>
 </div>
-<div class="Summary ActiveUserSummary">
-   <table>
-      <thead>
-         <tr>
-            <th><?php echo T('Active Users'); ?></th>
-            <td><?php echo T('Discussions'); ?></td>
-            <td><?php echo T('Comments'); ?></td>
-            <td><?php echo T('PageViews'); ?></td>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <th>Username</th>
-            <td>#,###</td>
-            <td>#,###</td>
-            <td>#,###</td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-<?php
-/*
-  TODO:
-<div class="Summary PageViewSummary">
-   <table>
-      <thead>
-         <tr>
-            <th><?php echo T('Content'); ?></th>
-            <td><?php echo T('Page Views'); ?></td>
-            <td><?php echo T('% Page Views'); ?></td>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <th>/page/path</th>
-            <td>#,###</td>
-            <td>##%</td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-<div class="Summary SearchSummary">
-   <table>
-      <thead>
-         <tr>
-            <th><?php echo T('Search Keywords'); ?></th>
-            <td><?php echo T('Searches'); ?></td>
-            <td><?php echo T('% Searches'); ?></td>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <th>Search Keywords</th>
-            <td>#,###</td>
-            <td>##%</td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-<div class="Summary EntranceKeywordSummary">
-   <table>
-      <thead>
-         <tr>
-            <th><?php echo T('Entrance Keywords'); ?></th>
-            <td><?php echo T('Page Views'); ?></td>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <th>Organic Search Keywords</th>
-            <td>#,###</td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-<div class="Summary ReferrerSummary">
-   <table>
-      <thead>
-         <tr>
-            <th><?php echo T('Traffic Sources / Referrers'); ?></th>
-            <td><?php echo T('Visits'); ?></td>
-            <td><?php echo T('% Visits'); ?></td>
-         </tr>
-      </thead>
-      <tbody>
-         <tr class="ReservedRow">
-            <th>Direct</th>
-            <td>#,###</td>
-            <td>##%</td>
-         </tr>
-         <tr>
-            <th>Google (organic)</th>
-            <td>#,###</td>
-            <td>##%</td>
-         </tr>
-         <tr>
-            <th>rackspace.com (referral)</th>
-            <td>#,###</td>
-            <td>##%</td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-<div class="Summary VisitorSummary">
-   <table>
-      <thead>
-         <tr>
-            <th><?php echo T('Visitors'); ?></th>
-            <td><?php echo T('Visits'); ?></td>
-            <td><?php echo T('% Visits'); ?></td>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <th>Member Page Views</th>
-            <td>#,###</td>
-            <td>##%</td>
-         </tr>
-         <tr>
-            <th>Absolute Unique Members</th>
-            <td>#,###</td>
-            <td>##%</td>
-         </tr>
-         <tr>
-            <th>Visitor Page Views</th>
-            <td>#,###</td>
-            <td>##%</td>
-         </tr>
-         <tr>
-            <th>Absolute Unique Visitors</th>
-            <td>#,###</td>
-            <td>##%</td>
-         </tr>
-      </tbody>
-   </table>
-</div>
-*/

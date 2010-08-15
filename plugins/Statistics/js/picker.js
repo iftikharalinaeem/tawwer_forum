@@ -5,8 +5,9 @@ function Picker() {
       self.PickerField = $('input.DateRange');
       self.PickerField.after('<a class="RangeToggle" href="#">' + self.PickerField.val() + '</a>');
       self.PickerToggle = $('a.RangeToggle');
-      self.PickerField.hide();
+      // self.PickerField.hide();
       self.PickerContainer = $('div.Picker');
+      // Add the picker container if it wasn't already on the page somewhere
       if (self.PickerContainer.length == 0) {
          self.PickerToggle.after('<div class="Picker"></div>');
          self.PickerContainer = $('div.Picker');

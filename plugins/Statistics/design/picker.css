@@ -1,11 +1,9 @@
 
 /* Date Range Input & Toggle */
-div.DateRange {
-   position: relative;
-   right: -10px;
-}
-div.DateRange input.DateRange {
-   display: none;
+input.DateRange {
+   font-size: 12px;
+   font-weight: bold;
+   width: 240px;
 }
 a.RangeToggle,
 a.RangeToggle:hover,
@@ -52,6 +50,7 @@ div.Picker div.SliderHandle {
    z-index: 200;
 }
 div.Picker {
+   display: none;
    background: #DBF3FC;
    padding: 10px 20px;
    border-top: 1px solid #8BC1DE;
