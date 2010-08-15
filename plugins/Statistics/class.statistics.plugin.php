@@ -165,10 +165,12 @@ class StatisticsPlugin extends Gdn_Plugin {
       
       switch ($Range) {
          case self::RESOLUTION_HOUR:
+return;
             $DateStart = date('Y-m-d H:00:00',$DateRaw);
             $DateEnd = date('Y-m-d H:00:00',$DateRaw);
             break;
          case self::RESOLUTION_WEEK:
+return;
             $DateStart = date('Y-m-d',strtotime('last sunday',$DateRaw));
             $DateEnd = date('Y-m-d',strtotime('this saturday',$DateRaw));
             break;
@@ -385,7 +387,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->AddSideMenu('dashboard/settings');
       
       $this->ConfigureRange($Sender);
-      $Sender->Head->AddScript('dashboard/settings/loadstats?Range='.$Sender->Range.'&DateRange='.$Sender->DateRange);
+      // $Sender->Head->AddScript('dashboard/settings/loadstats?Range='.$Sender->Range.'&DateRange='.$Sender->DateRange);
       // $Sender->SetData('AllData', $this->GetData($Sender));
       
       // Render the custom dashboard view
@@ -436,7 +438,7 @@ class StatisticsPlugin extends Gdn_Plugin {
    
    private function GetData($Sender) {
       // Retrieve associated data for graph
-      $UserData = StatisticsPlugin::GetDataRange('users', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
+      $UserData = StatisticsPlugin::GetDataRange('registrations', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
       $CommentData = StatisticsPlugin::GetDataRange('comments', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
       $DiscussionData = StatisticsPlugin::GetDataRange('discussions', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
 
@@ -448,7 +450,7 @@ class StatisticsPlugin extends Gdn_Plugin {
          'Comments' => array()
       );
       foreach ($UserData as $Date => $Value) {
-         $Data['Dates'][] = date(date('Y', Gdn_Format::ToTimestamp($Date)) < date('Y') ? 'M d, Y' : 'M d', strtotime($Date));
+         $Data['Dates'][] = date(date('Y', Gdn_Format::ToTimestamp($Date)) < date('Y') ? 'M j, Y' : 'M j', strtotime($Date));
          $Data['Users'][] = $Value['Value'];
          $Data['Discussions'][] = $DiscussionData[$Date]['Value'];
          $Data['Comments'][] = $CommentData[$Date]['Value'];

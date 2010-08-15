@@ -180,7 +180,18 @@ jQuery(document).ready(function($) {
             rowHeight = h / hv,
             columnWidth = w / wv,
             dashed = {fill: "none", stroke: color, "stroke-dasharray": "- "};
+
+        /* Don't show so many vertical cols?
+        var maxCols = 30;
+        var colsToDisplay = wv;
+        var increment = 1;
+        while (colsToDisplay > maxCols) {
+            increment++;
+            colsToDisplay = Math.round(wv / increment);
+        }
     
+        for (i = 0; i <= wv; i += increment) {
+        */
         for (i = 0; i <= wv; i++) {
             path = path.concat(["M", Math.round(x + i * columnWidth) + .5, Math.round(y) + .5, "V", Math.round(y + h) + .5]);
         }
@@ -380,16 +391,17 @@ jQuery(document).ready(function($) {
                         }
                         clearTimeout(leave_timer);
                         var side = "top-middle";
-                        if (x + frame.getBBox().width > width) {
-                            // console.log('x + frame.getBBox().width', x + frame.getBBox().width);
-                            // console.log('width', width);
+                        if (x + frame.getBBox().width > width)
                             side = "left";
-                        }
+                        
                         if (x < frame.getBBox().width)
                             side = "right";
                             
                         if (yLevel - frame.getBBox().height - 8 < 0)
                             side = "bottom-middle";
+
+                        if (x < frame.getBBox().width && side == "bottom-middle")
+                            side = "bottom-left";
                             
                         var ppp = r.popup(x, yLevel, label, side, 1);
                         frame.show().animate({path: ppp.path}, 200 * is_label_visible);
@@ -419,16 +431,6 @@ jQuery(document).ready(function($) {
             blanket.toFront();   
         }
     }
-    // Draw the graph when the window is loaded.
-    window.onload = function() {
-        drawGraph('GraphHolder', GraphData);
-    }
-
-    // Redraw the grpah when the window is resized
-    $(window).resize(function() {
-        drawGraph('GraphHolder', GraphData);
-    });
-   
    
     // Sum and format data for the summary rows
     Number.prototype.formatThousands = function() {
@@ -448,31 +450,49 @@ jQuery(document).ready(function($) {
         $(selector).html((sum).formatThousands());
     }
     
-    // Redraw the graph if the date range changes
-    $('input.DateRange').live('change', function() {
+    function getData() {
         // Add spinner
-        $('<span class="TinyProgress"></span>').appendTo('#Content h1');
+        if ($('#Content h1 span').length == 0)
+            $('<span class="TinyProgress"></span>').appendTo('#Content h1');
         
         // reload the graph data
 // TODO: USE INDEX.PHP
         var dataUrl = gdn.combinePaths(
             gdn.definition('WebRoot'),
-            'dashboard/settings/loadstats?Ajax=1&Range='+Range+'&DateRange='+$(this).val()
+            'dashboard/settings/loadstats?Ajax=1&Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
             );
-        $.ajax({
+        return $.ajax({
             type: "GET",
             url: dataUrl,
             dataType: 'json',
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-                // TODO: CLEANUP
-                alert('failed to load data');
                 $('#Content h1 span.TinyProgress').remove();
+                var graphHolder = $("#GraphHolder");
+                graphHolder.children('*:not(span)').remove();
+                $('<div class="Messages Errors"><ul><li>Failed to load statistics data.</li></ul></div>').appendTo(graphHolder);
+                return false;
             },
             success: function(data) {
                 $('#Content h1 span.TinyProgress').remove();
                 drawGraph('GraphHolder', data);
+                return data;
             }
          });
-        return true;
+    }
+
+    // Draw the graph when the window is loaded.
+    window.onload = function() {
+        getData();
+   }
+
+    // Redraw the grpah when the window is resized
+    $(window).resize(function() {
+        getData();
     });
+
+    // Redraw the graph if the date range changes
+    $('input.DateRange').live('change', function() {
+        getData();
+    });
+
 });

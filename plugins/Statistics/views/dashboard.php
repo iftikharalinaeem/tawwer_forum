@@ -35,7 +35,8 @@ function WriteRangeTab($Range, $Sender) {
 ?>
 <h1>Statistics Dashboard</h1>
 <div class="Tabs DateRangeTabs">
-   <input type="text" name="DateRange" class="DateRange DateRangeActive" value="<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')) . ' - ' . Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>" />      
+   <input type="text" name="DateRange" class="DateRange DateRangeActive" value="<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')) . ' - ' . Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>" />
+   <input type="hidden" name="Range" class="Range" value="<?php echo $this->Range; ?>" />
    <ul>
       <?php
       WriteRangeTab(StatisticsPlugin::RESOLUTION_DAY, $this);
@@ -103,19 +104,19 @@ function WriteRangeTab($Range, $Sender) {
    ?>
    <li class="NewUsers">
       <div>
-         New Users
+         Users
          <strong><?php echo number_format($UserSum); ?></strong>
       </div>
    </li>
    <li class="NewDiscussions">
       <div>
-         New Discussions
+         Discussions
          <strong><?php echo number_format($DiscussionSum); ?></strong>
       </div>
    </li>
    <li class="NewComments">
       <div>
-         New Comments
+         Comments
          <strong><?php echo number_format($CommentSum); ?></strong>
       </div>
    </li>
