@@ -1,7 +1,8 @@
 function Picker() {
 
    Picker.prototype.Attach = function(Options) {
-   
+      
+      // Load options from supplied options object
       this.RangeTarget = $(Options.Range);
       this.Granularity = Options.Units;
       this.StartDateText = Options.DateStart;
@@ -10,29 +11,28 @@ function Picker() {
       
       this.StartDate = new Date(this.StartDateText);
       this.EndDate = new Date(this.EndDateText);
-      var self = this;
-      self.PickerField = $('input.DateRange');
-      self.PickerField.after('<a class="RangeToggle" href="#">' + self.PickerField.val() + '</a>');
-      self.PickerToggle = $('a.RangeToggle');
-      // self.PickerField.hide();
-      self.PickerContainer = $('div.Picker');
+      
+      this.RangeTarget.after('<a class="RangeToggle" href="#">' + this.RangeTarget.val() + '</a>');
+      this.RangeToggle = $('a.RangeToggle');
+      
+      this.PickerContainer = $('div.Picker');
       // Add the picker container if it wasn't already on the page somewhere
-      if (self.PickerContainer.length == 0) {
-         self.PickerToggle.after('<div class="Picker"></div>');
-         self.PickerContainer = $('div.Picker');
+      if (this.PickerContainer.length == 0) {
+         this.RangeToggle.after('<div class="Picker"></div>');
+         this.PickerContainer = $('div.Picker');
       }
-      self.PickerContainer.hide();
-      self.PickerContainer.html(this.Settings.SliderHtml);
-      self.PickerToggle.live('click', function() {
-         if ($(this).hasClass('RangeToggleActive')) {
-            $(this).removeClass('RangeToggleActive');
-            self.PickerContainer.slideUp('fast');
+      this.PickerContainer.hide();
+      this.PickerContainer.html(this.Settings.SliderHtml);
+      this.RangeToggle.bind('click', jQuery.proxy(function(e) {
+         if ($(e.target).hasClass('RangeToggleActive')) {
+            $(e.target).removeClass('RangeToggleActive');
+            this.PickerContainer.slideUp('fast');
          } else {
-            $(this).addClass('RangeToggleActive');
-            self.PickerContainer.slideDown('fast');
+            $(e.target).addClass('RangeToggleActive');
+            this.PickerContainer.slideDown('fast');
          }
-         this.blur();
-      });
+         $(e.target).blur();
+      },this));
       
       this.DownTarget = false;
       this.SlideRail = $('div.Slider');
@@ -54,56 +54,68 @@ function Picker() {
       
       $('div.SliderHandle, div.SelectedRange').bind('mousedown', jQuery.proxy(function(e){
          this.DownTarget = $(e.target);
-         this.DownX = e.clientX;
+         this.Down(e.clientX);
          return false;
       },this));
       
       $(document).bind('mouseup', jQuery.proxy(function(e){
          if (this.DownTarget == false) return;
          this.DownTarget = false;
+         this.DownMoveHandler = false;
+         return false;
       },this));
+   }
+   
+   Picker.prototype.Down = function(ClientX) {
+      this.DownX = ClientX;
+      
+      this.DownSliderWidth = this.Slider.width();
+      this.DownRailWidth = this.SlideRail.width();
+      
+      this.DownRailLeft = this.SlideRail.offset().left;
+      this.DownRailRight = this.DownRailLeft + this.DownRailWidth;
+      this.DownRailX = this.DownX - this.DownRailLeft;
+      
+      this.DownClickLeftDifference = this.DownX - this.Slider.offset().left;
+      this.DownClickRightDifference = (this.Slider.offset().left + this.DownSliderWidth) - this.DownX;
+      
+      this.DownMoveHandler = (this.DownTarget.hasClass('SelectedRange')) ? this.MoveSlider : this.MoveHandle;
    }
    
    Picker.prototype.MoveDelegator = function(e) {
       if (this.DownTarget == false) return;
-      
-      if (this.DownTarget.hasClass('SelectedRange'))
-         this.MoveSlider(this.DownTarget, e);
-      else
-         this.MoveHandle(this.DownTarget, e);
-         
+      this.DownMoveHandler(this.DownTarget, e);
       return false;
    }
    
-   Picker.prototype.MoveHandle = function(Handle, Event, Coupled) {
-      console.log('real:'+Event.clientX+' start:'+this.DownX);
+   Picker.prototype.MoveHandle = function(Handle, Event) {
       
-      var SliderPos = this.SlideRail.offset();
-      var SliderWidth = this.SlideRail.width();
-      var SliderLeft = SliderPos.left;
-      var SliderRight = SliderPos.left + this.SlideRail.width();
-      
-      var CursorX = Event.clientX;
-      var RelativeX = CursorX - SliderLeft;
+      // Computed 'X' relative to the start of the slide rail
+      var RelativeX = Event.clientX - this.DownRailLeft;
       RelativeX = (RelativeX < 0) ? 0 : RelativeX;
-      RelativeX = (RelativeX > SliderWidth) ? SliderWidth : RelativeX;
+      RelativeX = (RelativeX > this.DownRailWidth) ? this.DownRailWidth : RelativeX;
+      var PercX = (RelativeX / this.DownRailWidth) * 100;
       
-      var PercX = (RelativeX / SliderWidth) * 100;
-      var MoveAction = this.DoMove(Handle, RelativeX, PercX);
-      if (Coupled == true) {
-         var NewCoupledPercX = this.ToPerc(MoveAction.Ref.attr('left')+MoveAction.Moved);
-         this.DoMove(MoveAction.Ref, 0, NewCoupledPercX);
+      var MoveAction = this.DoMoveHandle(Handle, PercX);
+      
+      // Resize slider
+      if (MoveAction.Moved != 0) {
+         var LeftPerc = this.ToPerc(this.HandleStart.css('left'))
+         var RightPerc = this.ToPerc(this.HandleEnd.css('left'))
+         var PercDiff = RightPerc - LeftPerc;
+         this.Range.css('left',LeftPerc+'%');
+         this.Range.css('width',PercDiff+'%');
       }
       
+      return MoveAction.Moved;
    }
    
-   Picker.prototype.DoMove = function(Handle, ProposedPosX, ProposedPercX) {
-      var AllowedMinMax = Handle.get(0).limit();
-      
-      if (this.Nudge) {
+   Picker.prototype.DoMoveHandle = function(Handle, ProposedPercX, Manual) {
+      if (Manual != true && this.Nudge == true) {
+         var AllowedMinMax = Handle.get(0).limit();
          if (ProposedPercX > AllowedMinMax.right || ProposedPercX < AllowedMinMax.left) {
             // Nudge
-            this.DoMove(AllowedMinMax.ref, ProposedPosX, ProposedPercX);
+            this.DoMoveHandle(AllowedMinMax.Ref, ProposedPercX);
          }
       }
       
@@ -114,43 +126,46 @@ function Picker() {
       var CurrentPercX = this.ToPerc($(Handle).css('left'));
       $(Handle).css('left',RealPercX+'%');
       
-      // Resize slider
-      var LeftPerc = this.ToPerc(this.HandleStart.css('left'))
-      var RightPerc = this.ToPerc(this.HandleEnd.css('left'))
-      var PercDiff = RightPerc - LeftPerc;
-      this.Range.css('left',LeftPerc+'%');
-      this.Range.css('width',PercDiff+'%');
-      
       return {
-         'Ref': AllowedMinMax.ref,
-         'Moved': CurrentPercX - RealPercX
+         'Ref': AllowedMinMax.Ref,
+         'Moved': RealPercX - CurrentPercX
       }
    }
    
    Picker.prototype.MoveSlider = function(Handle, Event) {
-      console.log('real:'+Event.clientX+' start:'+this.DownX);
-
-      if (this.DownX !== false) {
-         var SliderPos = this.Slider.offset();
-         var SliderLeft = SliderPos.left;
-         
-         var RelAdjustedX = Event.clientX - (this.DownX - SliderLeft);
-         console.log('sliderleft:'+SliderLeft+' adjusted:'+RelAdjustedX);
-         
-         Event.clientX = RelAdjustedX;
-         this.DownX = false;
+      var LeftRelativeX = (Event.clientX - this.DownRailLeft) - this.DownClickLeftDifference;
+      if (LeftRelativeX < 0) {
+         LeftRelativeX = 0;
       }
+      var LeftPercX = (LeftRelativeX / this.DownRailWidth) * 100;
       
-      this.MoveHandle(this.HandleStart, Event);
+      var RightRelativeX = LeftRelativeX + this.DownSliderWidth;
+      if (RightRelativeX > this.DownRailWidth) {
+         RightRelativeX = this.DownRailWidth;
+         LeftRelativeX = RightRelativeX - this.DownSliderWidth;
+         LeftPercX = (LeftRelativeX / this.DownRailWidth) * 100;
+      }
+      var RightPercX = (RightRelativeX / this.DownRailWidth) * 100;
       
+      MoveAction = this.DoMoveHandle(this.HandleStart, LeftPercX, true);
+      MoveAction = this.DoMoveHandle(this.HandleEnd, RightPercX, true);
+      
+      this.Range.css('left',LeftPercX+'%');
+      
+/*      if (LeftPercX == 0 && Event.clientX <= this.DownRailLeft) {
+         this.Down(this.DownRailLeft);
+      }
+      if (RightPercX == 100 && Event.clientX >= this.DownRailRight) {
+         this.Down(this.DownRailRight);
+      }*/
    }
 
    Picker.prototype.LimitStayLeft = function(ReferenceElement) {
-      return { 'left':0, 'right':this.ToPerc(ReferenceElement.css('left')), 'ref':ReferenceElement };
+      return { 'left':0, 'right':this.ToPerc(ReferenceElement.css('left')), 'Ref':ReferenceElement };
    }
    
    Picker.prototype.LimitStayRight = function(ReferenceElement) {
-      return { 'left':this.ToPerc(ReferenceElement.css('left')), 'right':100, 'ref':ReferenceElement };
+      return { 'left':this.ToPerc(ReferenceElement.css('left')), 'right':100, 'Ref':ReferenceElement };
    }
    
    Picker.prototype.ToPerc = function(X) {
