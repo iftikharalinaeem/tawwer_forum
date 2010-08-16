@@ -387,13 +387,63 @@ return;
       $Sender->AddSideMenu('dashboard/settings');
       
       $this->ConfigureRange($Sender);
-      // $Sender->Head->AddScript('dashboard/settings/loadstats?Range='.$Sender->Range.'&DateRange='.$Sender->DateRange);
-      // $Sender->SetData('AllData', $this->GetData($Sender));
       
       // Render the custom dashboard view
       $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboard.php');
    }
    
+   public function SettingsController_DashboardSummaries_Create($Sender) {
+      // Load javascript & css, check permissions, and load side menu for this page.
+      $Sender->AddJsFile('settings.js');
+      $Sender->Title(T('Dashboard Summaries'));
+      $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Applications.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Applicants.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
+      $Sender->FireEvent('DefineAdminPermissions');
+      $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
+      $Sender->AddSideMenu('dashboard/settings');
+      
+      $this->ConfigureRange($Sender);
+
+      $UserModel = new UserModel();
+      $Sender->SetData('DiscussionData', $UserModel->SQL
+         ->Select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments')
+         ->From('Discussion d')
+         ->Where('d.DateLastComment >=', $Sender->DateStart)
+         ->Where('d.DateLastComment <=', $Sender->DateEnd)
+         ->OrderBy('d.CountComments', 'desc')
+         ->OrderBy('d.CountViews', 'desc')
+         ->OrderBy('d.CountBookmarks', 'desc')
+         ->Limit(10, 0)
+         ->Get()
+      );
+      
+      $Sender->SetData('UserData', $UserModel->SQL
+         ->Select('u.UserID, u.Name')
+         ->Select('c.CommentID', 'count', 'CountComments')
+         ->From('User u')
+         ->Join('Comment c', 'u.UserID = c.InsertUserID', 'inner')
+         ->GroupBy('u.UserID, u.Name')
+         ->Where('c.DateInserted >=', $Sender->DateStart)
+         ->Where('c.DateInserted <=', $Sender->DateEnd)
+         ->OrderBy('CountComments', 'desc')
+         ->Limit(10, 0)
+         ->Get()
+      );
+      
+      // Render the custom dashboard view
+      $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboardsummaries.php');
+   }
+
    private function ConfigureRange($Sender) {
       // Grab the range resolution from the url or form. Default to "day" range.
       $Sender->Range = GetIncomingValue('Range');
@@ -416,7 +466,7 @@ return;
       
       // Validate that any values coming from the url or form are valid
       $Sender->DateRange = GetIncomingValue('DateRange');
-      $DateRangeParts = explode(' - ', $Sender->DateRange);
+      $DateRangeParts = explode('-', $Sender->DateRange);
       $Sender->StampStart = strtotime(GetValue(0, $DateRangeParts));
       $Sender->StampEnd = strtotime(GetValue(1, $DateRangeParts));
       if (!$Sender->StampEnd)
@@ -460,15 +510,7 @@ return;
    
    public function SettingsController_LoadStats_Create($Sender) {
       $this->ConfigureRange($Sender);
-      $Data = $this->GetData($Sender);
-      $AjaxRequest = GetIncomingValue('Ajax');
-      if (!$AjaxRequest) {
-         echo '
-         var Range = "'.$Sender->Range.'";
-         var GraphData = '.json_encode($Data).';';
-      } else {
-         echo json_encode($Data);
-      }
+      echo json_encode($this->GetData($Sender));
       // Make sure the database connection is closed before exiting.
       Gdn::Database()->CloseConnection();
       exit();

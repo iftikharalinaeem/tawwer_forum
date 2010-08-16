@@ -5,17 +5,19 @@
          <tr>
             <th><?php echo T('Popular Discussions'); ?></th>
             <td><?php echo T('Comments'); ?></td>
+            <td><?php echo T('Follows'); ?></td>
             <td><?php echo T('Views'); ?></td>
-            <td><?php echo T('% Views'); ?></td>
          </tr>
       </thead>
       <tbody>
+         <?php foreach ($this->Data['DiscussionData'] as $Discussion) { ?>
          <tr>
-            <th>Discussion Title</th>
-            <td>#,###</td>
-            <td>#,###</td>
-            <td>##%</td>
+            <th><?php echo Anchor($Discussion->Name, 'discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name)); ?></th>
+            <td><?php echo number_format($Discussion->CountComments); ?></td>
+            <td><?php echo number_format($Discussion->CountBookmarks); ?></td>
+            <td><?php echo number_format($Discussion->CountViews); ?></td>
          </tr>
+         <?php } ?>
       </tbody>
    </table>
 </div>
@@ -24,18 +26,19 @@
       <thead>
          <tr>
             <th><?php echo T('Active Users'); ?></th>
-            <td><?php echo T('Discussions'); ?></td>
+            <!-- <td><?php echo T('Discussions'); ?></td> -->
             <td><?php echo T('Comments'); ?></td>
-            <td><?php echo T('PageViews'); ?></td>
+            <!-- <td><?php echo T('PageViews'); ?></td> -->
          </tr>
       </thead>
       <tbody>
+         <?php foreach ($this->Data['UserData'] as $User) { ?>
          <tr>
-            <th>Username</th>
-            <td>#,###</td>
-            <td>#,###</td>
-            <td>#,###</td>
+            <th><?php echo Anchor($User->Name, 'profile/'.$User->UserID.'/'.Gdn_Format::Url($User->Name)); ?></th>
+            <td><?php echo number_format($User->CountComments); ?></td>
+            <!-- <td><?php // echo number_format($Discussion->CountViews); ?></td> -->
          </tr>
+         <?php } ?>
       </tbody>
    </table>
 </div>
