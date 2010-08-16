@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'This plugin allows users to attach their own signatures to their posts.',
-   'Version' => '1.1.3',
+   'Version' => '1.1.4',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -24,8 +24,38 @@ $PluginInfo['Signatures'] = array(
 );
 
 class SignaturesPlugin extends Gdn_Plugin {
+   
+   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+      $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddItem('Forum', T('Forum'));
+      $Menu->AddLink('Forum', T('Signatures'), 'settings/signatures', 'Garden.Settings.Manage');
+   }
+
+   /**
+    * Sig management
+    */
+   public function SettingsController_Signatures_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $Sender->Title('Signatures');
+      $Sender->AddSideMenu('settings/signatures');
+      $Sender->Render('plugins/Signatures/views/settings.php');
+   }
+
+   /**
+    * Turn sigs on or off.
+    */
+   public function SettingsController_ToggleSignatures_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      if (Gdn::Session()->ValidateTransientKey(GetValue(0, $Sender->RequestArgs)))
+         SaveToConfig('Plugins.Signatures.Enabled', C('Plugins.Signatures.Enabled') ? FALSE : TRUE);
+         
+      Redirect('settings/signatures');
+   }
 
    public function ProfileController_AfterAddSideMenu_Handler(&$Sender) {
+      if (!C('Plugins.Signatures.Enabled'))
+         return;
+      
       $SideMenu = $Sender->EventArguments['SideMenu'];
       $Session = Gdn::Session();
       $ViewingUserID = $Session->UserID;
@@ -38,6 +68,9 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    public function ProfileController_Signature_Create(&$Sender) {
+      if (!C('Plugins.Signatures.Enabled'))
+         return;
+
       $Args = $Sender->RequestArgs;
       if (sizeof($Args) < 2)
          $Args = array_merge($Args, array(0,0));
@@ -126,6 +159,9 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    protected function CacheSignatures(&$Sender) {
+      if (!C('Plugins.Signatures.Enabled'))
+         return;
+
       // Short circuit if not needed
       if ($this->_HideAllSignatures($Sender)) return;
       
@@ -171,6 +207,9 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    protected function PrepareController(&$Controller) {
+      if (!C('Plugins.Signatures.Enabled'))
+         return;
+
       // Short circuit if not needed
       if ($this->_HideAllSignatures($Controller)) return;
       
@@ -200,6 +239,9 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    protected function _DrawSignature(&$Sender) {
+      if (!C('Plugins.Signatures.Enabled'))
+         return;
+
       if ($this->_HideAllSignatures($Sender)) return;
       
       if (isset($Sender->EventArguments['Discussion'])) 
