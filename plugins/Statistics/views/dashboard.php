@@ -82,19 +82,19 @@ function WriteRangeTab($Range, $Sender) {
         </tr>
     </tbody>
 </table>
+*/
+?>
  <script type="text/javascript">
    jQuery(document).ready(function(){
       var GraphPicker = new Picker();
       GraphPicker.Attach({
-         'Range': $('div.DateRange input.DateRange'),
+         'Range': $('input.DateRange'),
          'Units': 'hour',
          'DateStart': 'June 15th, 2010',
          'DateEnd': 'August 12th, 2010'
       });
    });
 </script>
-*/
-?>
 <ul class="StatsOverview">
    <li class="PageViews">
       <div>
