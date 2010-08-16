@@ -82,17 +82,6 @@ function WriteRangeTab($Range, $Sender) {
         </tr>
     </tbody>
 </table>
- <script type="text/javascript">
-   jQuery(document).ready(function(){
-      var GraphPicker = new Picker();
-      GraphPicker.Attach({
-         'Range': $('div.DateRange input.DateRange'),
-         'Units': 'hour',
-         'DateStart': 'June 15th, 2010',
-         'DateEnd': 'August 12th, 2010'
-      });
-   });
-</script>
 */
 ?>
 <ul class="StatsOverview">
@@ -135,3 +124,15 @@ function WriteRangeTab($Range, $Sender) {
 <div class="DashboardSummaries">
 <?php echo $this->FetchView(PATH_PLUGINS.'/Statistics/views/dashboardsummaries.php'); ?>
 </div>
+
+<script type="text/javascript">
+   jQuery(document).ready(function(){
+      var GraphPicker = new Picker();
+      GraphPicker.Attach({
+         'Range': $('div.DateRangeTabs input.DateRange'),
+         'Units': 'hour',
+         'DateStart': 'June 15th, 2010',
+         'DateEnd': 'August 12th, 2010'
+      });
+   });
+</script>
