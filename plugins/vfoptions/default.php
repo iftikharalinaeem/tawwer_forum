@@ -47,9 +47,8 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $Menu->AddItem('Appearance', T('Appearance'), FALSE, array('class' => 'Appearance'));
 		$Menu->AddLink('Appearance', T('Banner'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
       $Menu->AddLink('Appearance', T('Themes').$New, 'dashboard/settings/themes', 'Garden.Themes.Manage');
-		if ($ThemeOptionsName = C('Garden.ThemeOptions.Name')) {
-         $Menu->AddLink('Appearance', sprintf(T('%s Options', '%s Options  <span class="New">New</span>'), $ThemeOptionsName), '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
-      }
+		if (C('Garden.ThemeOptions.Name'))
+         $Menu->AddLink('Appearance', T('Theme Options').$New, '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
 
       if (C('EnabledPlugins.CustomCSS'))
 	      $Menu->AddLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
@@ -78,6 +77,9 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		if (C('EnabledPlugins.FileUpload'))
 			$Menu->AddLink('Forum', 'Media', 'plugin/fileupload', 'Garden.AdminUser.Only');
 			
+		if (C('EnabledPlugins.Voting'))
+			$Menu->AddLink('Forum', T('Voting').$New, 'settings/voting', 'Garden.Settings.Manage');
+		
 		if (C('EnabledPlugins.Tagging'))
 			$Menu->AddLink('Forum', T('Tagging').$New, 'settings/tagging', 'Garden.Settings.Manage');
 			
@@ -94,7 +96,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		}
 
 		if (C('EnabledPlugins.Signatures'))
-			$Menu->AddLink('Forum', T('Signatures'), 'settings/signatures', 'Garden.Settings.Manage');
+			$Menu->AddLink('Forum', T('Signatures').$New, 'settings/signatures', 'Garden.Settings.Manage');
 			
 		$Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
       $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
