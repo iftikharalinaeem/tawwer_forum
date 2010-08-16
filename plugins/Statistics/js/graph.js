@@ -451,17 +451,21 @@ jQuery(document).ready(function($) {
     }
     
     function getData() {
-        // Add spinner
+        // Add spinners
         if ($('#Content h1 span').length == 0)
             $('<span class="TinyProgress"></span>').appendTo('#Content h1');
+            
+        if ($('div.DashboardSummaries div.Loading').length == 0)
+            $('div.DashboardSummaries').html('<div class="Loading"></div>');
+            
         
-        // reload the graph data
+        // Load the graph data
 // TODO: USE INDEX.PHP
         var dataUrl = gdn.combinePaths(
             gdn.definition('WebRoot'),
-            'dashboard/settings/loadstats?Ajax=1&Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
+            'dashboard/settings/loadstats?Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
             );
-        return $.ajax({
+        $.ajax({
             type: "GET",
             url: dataUrl,
             dataType: 'json',
@@ -470,14 +474,19 @@ jQuery(document).ready(function($) {
                 var graphHolder = $("#GraphHolder");
                 graphHolder.children('*:not(span)').remove();
                 $('<div class="Messages Errors"><ul><li>Failed to load statistics data.</li></ul></div>').appendTo(graphHolder);
-                return false;
             },
             success: function(data) {
                 $('#Content h1 span.TinyProgress').remove();
                 drawGraph('GraphHolder', data);
-                return data;
             }
          });
+        
+        $.get(gdn.combinePaths(
+            gdn.definition('WebRoot'),
+            'dashboard/settings/dashboardsummaries?DeliveryType=VIEW&Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
+            ), function(data) {
+                $('div.DashboardSummaries').html(data);
+        });
     }
 
     // Draw the graph when the window is loaded.

@@ -122,7 +122,7 @@ function WriteRangeTab($Range, $Sender) {
    </li>
 </ul>
 <div class="DashboardSummaries">
-<?php echo $this->FetchView(PATH_PLUGINS.'/Statistics/views/dashboardsummaries.php'); ?>
+   <div class="Loading"></div>
 </div>
 
 <script type="text/javascript">
