@@ -453,7 +453,7 @@ jQuery(document).ready(function($) {
     function getData() {
         // Add spinners
         if ($('#Content h1 span').length == 0)
-            $('<span class="TinyProgress"></span>').appendTo('#Content h1');
+            $('<span class="TinyProgress"></span>').appendTo('#Content h1:last');
             
         if ($('div.DashboardSummaries div.Loading').length == 0)
             $('div.DashboardSummaries').html('<div class="Loading"></div>');

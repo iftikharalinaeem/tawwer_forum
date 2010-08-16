@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-
+$this->RenderAsset('Messages');
 /*function WriteData($Data, $Field = 'Value') {
    $Alt = 0;
    foreach ($Data as $Date => $Row) {
