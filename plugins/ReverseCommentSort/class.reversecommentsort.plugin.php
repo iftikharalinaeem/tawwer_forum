@@ -43,6 +43,7 @@ class ReverseCommentSortPlugin extends Gdn_Plugin {
 		if ($Type == 'Comment' && !GetValue('CommentFormWritten', $Sender)) {
 			echo '<style type="text/css">
 			div.CommentForm,
+			div.Foot,
 			div.CommentForm div.Tabs {
 				display: none;
 			}
