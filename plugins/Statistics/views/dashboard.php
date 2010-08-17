@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-$this->RenderAsset('Messages');
+
 /*function WriteData($Data, $Field = 'Value') {
    $Alt = 0;
    foreach ($Data as $Date => $Row) {
@@ -133,8 +133,8 @@ function WriteRangeTab($Range, $Sender) {
          'Units': '<?php echo $this->Range; ?>',
          'DateStart': '<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')); ?>',
          'DateEnd': '<?php echo Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>',
-         'RangeStart': 'September 14, 2009',
-         'RangeEnd': 'February 20, 2010' 
+         'RangeStart': '<?php echo Gdn_Format::Date($this->RangeStart, T('Date.DefaultFormat')); ?>',
+         'RangeEnd': '<?php echo Gdn_Format::Date($this->RangeEnd, T('Date.DefaultFormat')); ?>' 
       });
    });
 </script>
