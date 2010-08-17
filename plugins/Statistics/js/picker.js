@@ -79,7 +79,7 @@ function Picker() {
       
       var RangeStart = Options.RangeStart || Options.DateStart;
       var RangeEnd = Options.RangeEnd || Options.DateEnd;
-      this.SetRange(RangeStart, RangeEnd);
+      this.SetRange(RangeStart, RangeEnd, false, true);
    }
    
    Picker.prototype.Axis = function(StartDate, EndDate, Units) {
@@ -291,7 +291,7 @@ function Picker() {
       }
    }
    
-   Picker.prototype.SetRange = function(RangeStart, RangeEnd, Trigger) {
+   Picker.prototype.SetRange = function(RangeStart, RangeEnd, Trigger, SetAnchor) {
       if (Date.parse(RangeStart) < 1 || Date.parse(RangeEnd) < 1) return;
       
       var RangeStart = new Date(RangeStart);
@@ -302,6 +302,7 @@ function Picker() {
       
       if (RangeEnd.valueOf() > this.Axis.End.Milli)
          RangeEnd.setTime(this.Axis.End.Milli);
+      
       
       var DateRangeStart = this.GetStartLimit(RangeStart, this.Units);
       var DateRangeEnd = this.GetEndLimit(RangeEnd, this.Units);
@@ -322,6 +323,10 @@ function Picker() {
      
       if (Trigger == true) {
          this.RangeTarget.trigger('change');
+      }
+      
+      if (SetAnchor == true) {
+         $('a.RangeToggle').html(FormatStartDate+' - '+FormatEndDate);
       }
    }
    
