@@ -131,6 +131,7 @@ function WriteRangeTab($Range, $Sender) {
       GraphPicker.Attach({
          'Range': $('div.DateRangeTabs input.DateRange'),
          'Units': '<?php echo $this->Range; ?>',
+         'MaxGraduations': 15,
          'DateStart': '<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')); ?>',
          'DateEnd': '<?php echo Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>',
          'RangeStart': '<?php echo Gdn_Format::Date($this->RangeStart, T('Date.DefaultFormat')); ?>',
