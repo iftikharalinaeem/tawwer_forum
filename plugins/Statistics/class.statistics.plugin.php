@@ -171,12 +171,10 @@ class StatisticsPlugin extends Gdn_Plugin {
       
       switch ($Range) {
          case self::RESOLUTION_HOUR:
-return;
             $DateStart = date('Y-m-d H:00:00',$DateRaw);
             $DateEnd = date('Y-m-d H:00:00',$DateRaw);
             break;
          case self::RESOLUTION_WEEK:
-return;
             $DateStart = date('Y-m-d',strtotime('last sunday',$DateRaw));
             $DateEnd = date('Y-m-d',strtotime('this saturday',$DateRaw));
             break;
@@ -490,6 +488,13 @@ return;
       $Sender->DateStart = Gdn_Format::ToDate($Sender->StampStart);
       $Sender->DateEnd = Gdn_Format::ToDate($Sender->StampEnd);
       $Sender->DateRange = $Sender->DateStart . ' - ' . $Sender->DateEnd;
+
+      // Define the range boundaries.
+      $Database = Gdn::Database();
+      $Data = $Database->SQL()->Select('DateRangeStart')->From('Statistics')->OrderBy('DateRangeStart', 'asc')->Limit(1)->Get()->FirstRow();
+      $Sender->BoundaryStart = $Data ? $Data->DateRangeStart : $Sender->DateStart;
+      $Data = $Database->SQL()->Select('DateRangeEnd')->From('Statistics')->OrderBy('DateRangeEnd', 'desc')->Limit(1)->Get()->FirstRow();
+      $Sender->BoundaryEnd = $Data ? $Data->DateRangeEnd : $Sender->DateEnd;
    }
    
    private function GetData($Sender) {
