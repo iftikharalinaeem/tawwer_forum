@@ -459,10 +459,11 @@ class StatisticsPlugin extends Gdn_Plugin {
          $Sender->Range = StatisticsPlugin::RESOLUTION_DAY;
          
       // Define default values for start & end dates
-      $Sender->HourStampStart = strtotime('-24 hours');
-      $Sender->DayStampStart = strtotime('-1 month'); // Default to 1 month ago
-      $Sender->WeekStampStart = strtotime('-12 weeks'); // Default to 24 weeks ago
-      $Sender->MonthStampStart = strtotime('-12 months'); // Default to 24 months ago
+      $Sender->HourStampStart = strtotime('24 hours ago');
+      $Sender->DayStampStart = strtotime('1 month ago'); // Default to 1 month ago
+      $Sender->WeekStampStart = strtotime('12 weeks ago'); // Default to 24 weeks ago
+      $Sender->MonthStampStart = strtotime('12 months ago'); // Default to 24 months ago
+      
       $Sender->HourDateStart = Gdn_Format::ToDate($Sender->HourStampStart);
       $Sender->DayDateStart = Gdn_Format::ToDate($Sender->DayStampStart);
       $Sender->WeekDateStart = Gdn_Format::ToDate($Sender->WeekStampStart);
@@ -491,9 +492,9 @@ class StatisticsPlugin extends Gdn_Plugin {
 
       // Define the range boundaries.
       $Database = Gdn::Database();
-      $Data = $Database->SQL()->Select('DateRangeStart')->From('Statistics')->Where('DateRangeStart >', '1975-09-16')->OrderBy('DateRangeStart', 'asc')->Limit(1)->Get()->FirstRow();
+      $Data = $Database->SQL()->Select('DateRangeStart')->From('Statistics')->Where('DateRangeStart >', '1975-09-17')->OrderBy('DateRangeStart', 'asc')->Limit(1)->Get()->FirstRow();
       $Sender->BoundaryStart = Gdn_Format::Date($Data ? $Data->DateRangeStart : $Sender->DateStart, '%Y-%m-%d');
-      $Data = $Database->SQL()->Select('DateRangeEnd')->From('Statistics')->OrderBy('DateRangeEnd', 'desc')->Limit(1)->Get()->FirstRow();
+      $Data = $Database->SQL()->Select('DateRangeEnd')->From('Statistics')->Where('DateRangeStart >', '1975-09-17')->OrderBy('DateRangeEnd', 'desc')->Limit(1)->Get()->FirstRow();
       $Sender->BoundaryEnd = Gdn_Format::Date($Data ? $Data->DateRangeEnd : $Sender->DateEnd, '%Y-%m-%d');
    }
    

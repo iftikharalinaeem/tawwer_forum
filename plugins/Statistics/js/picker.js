@@ -101,10 +101,8 @@ function Picker() {
       switch (this.Units) {
          case 'month':
             var NumTicks = 0; var MonthTicks = [];
-            var WorkingDate = new Date(this.Axis.Start.Date); var AvailableDays = DaysDiff;
+            var WorkingDate = new Date(this.Axis.Start.Date);
             do {
-            
-               var DaysInThisMonth = this.GetDaysInMonth(WorkingDate.getFullYear(), WorkingDate.getMonth());
                var TickLabel = this.GetShortMonth(WorkingDate.getMonth())+' \''+String(WorkingDate.getFullYear()).substring(2,4);
             
                var NextMonth = (WorkingDate.getMonth() < 11) ? WorkingDate.getMonth()+1 : 0;
@@ -114,12 +112,7 @@ function Picker() {
                
                var KeepItUp = ((WorkingDate.getFullYear() > this.Axis.End.Date.getFullYear()) || (WorkingDate.getFullYear() == this.Axis.End.Date.getFullYear()) && (WorkingDate.getMonth() > this.Axis.End.Date.getMonth())) ? false : true;
                if (KeepItUp) {
-                  AvailableDays -= DaysInThisMonth;
-                  MonthTicks[NumTicks] = {
-                     'Label': TickLabel,
-                     'Days': DaysInThisMonth,
-                     'Perc': (DaysInThisMonth / DaysDiff)
-                  };
+                  MonthTicks[NumTicks] = TickLabel;
                   NumTicks++;
                }
             } while(KeepItUp == true);
@@ -149,7 +142,7 @@ function Picker() {
          var SpotDate = new Date(this.Axis.Start.Date.valueOf() + DeltaMilli);
          
          if (this.Units == 'month') {
-            var TickLabel = MonthTicks[Tick].Label;
+            var TickLabel = MonthTicks[Tick];
          } else {
             var TickLabel = this.GetShortMonth(SpotDate.getMonth())+' '+SpotDate.getDate();
          }
@@ -268,9 +261,9 @@ function Picker() {
          
       var StartDeltaMilli = StartPerc * this.Axis.Diff.Milli;
       var StartDate = this.GetStartLimit(new Date(this.Axis.Start.Date.valueOf() + StartDeltaMilli),this.Units);
-      var StartShortDate = this.GetShortStrDate(StartDate);
+      var StartShortDate = this.GetStrDate(StartDate);
       this.HandleStart.html(StartShortDate);
-      this.InputStart.val(this.GetStrDate(StartDate));
+      this.InputStart.val(StartShortDate);
       
       var EndPerc = this.HandleEnd.position().left;
       if (String(this.HandleEnd.css('left')).substring(-1,1) != '%')
@@ -278,9 +271,9 @@ function Picker() {
          
       var EndDeltaMilli = EndPerc * this.Axis.Diff.Milli;
       var EndDate = this.GetEndLimit(new Date(this.Axis.Start.Date.valueOf() + EndDeltaMilli),this.Units);
-      var EndShortDate = this.GetShortStrDate(EndDate);
+      var EndShortDate = this.GetStrDate(EndDate);
       this.HandleEnd.html(EndShortDate);
-      this.InputEnd.val(this.GetStrDate(EndDate));
+      this.InputEnd.val(EndShortDate);
       
       if (HardUpdate == true) {
          var FormatStartDate = this.GetLongDate(StartDate);
