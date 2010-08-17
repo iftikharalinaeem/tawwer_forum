@@ -130,9 +130,11 @@ function WriteRangeTab($Range, $Sender) {
       var GraphPicker = new Picker();
       GraphPicker.Attach({
          'Range': $('div.DateRangeTabs input.DateRange'),
-         'Units': 'hour',
-         'DateStart': 'June 15th, 2010',
-         'DateEnd': 'August 12th, 2010'
+         'Units': '<?php echo $this->Range; ?>',
+         'DateStart': '<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')); ?>',
+         'DateEnd': '<?php echo Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>',
+         'RangeStart': 'September 14, 2009',
+         'RangeEnd': 'February 20, 2010' 
       });
    });
 </script>

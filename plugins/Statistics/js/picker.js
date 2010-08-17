@@ -4,13 +4,8 @@ function Picker() {
       
       // Load options from supplied options object
       this.RangeTarget = $(Options.Range);
-      this.Granularity = Options.Units;
-      this.StartDateText = Options.DateStart;
-      this.EndDateText = Options.DateEnd;
+      this.Graduations = Options.Graduations || 8;
       this.Nudge = Options.Nudge || true;
-      
-      this.StartDate = new Date(this.StartDateText);
-      this.EndDate = new Date(this.EndDateText);
       
       this.RangeTarget.after('<a class="RangeToggle" href="#">' + this.RangeTarget.val() + '</a>');
       this.RangeToggle = $('a.RangeToggle');
@@ -30,6 +25,8 @@ function Picker() {
          } else {
             $(e.target).addClass('RangeToggleActive');
             this.PickerContainer.slideDown('fast');
+            this.UpdateUI();
+            this.SyncSlider();
          }
          $(e.target).blur();
       },this));
@@ -41,6 +38,10 @@ function Picker() {
       this.HandleStart = $('div.HandleStart');
       this.HandleEnd = $('div.HandleEnd');
       this.Range = $('div.SelectedRange');
+      this.InputStart = $('div.InputRange input[name=DateStart]');
+      this.InputEnd = $('div.InputRange input[name=DateEnd]');
+      
+      this.RailWidth = (this.SlideRail.width() != 0) ? this.SlideRail.width() : 700;
       
       this.HandleStart.get(0).limit = jQuery.proxy(function(){
          return this.LimitStayLeft(this.HandleEnd);
@@ -60,10 +61,174 @@ function Picker() {
       
       $(document).bind('mouseup', jQuery.proxy(function(e){
          if (this.DownTarget == false) return;
+         this.UpdateUI(true);
          this.DownTarget = false;
          this.DownMoveHandler = false;
          return false;
       },this));
+      
+      this.Axis(Options.DateStart, Options.DateEnd, Options.Units);
+      
+      var RangeStart = Options.RangeStart || Options.DateStart;
+      var RangeEnd = Options.RangeEnd || Options.DateEnd;
+      this.SetRange(RangeStart, RangeEnd);
+   }
+   
+   Picker.prototype.Axis = function(StartDate, EndDate, Units) {
+      var AdjustedStartLimit = this.GetStartLimit(StartDate, Units);
+      var AdjustedEndLimit = this.GetEndLimit(EndDate, Units);
+      
+      this.Axis = {
+         'Start': {'Original':StartDate, 'Date':AdjustedStartLimit, 'Milli': AdjustedStartLimit.valueOf()},
+         'End': {'Original':EndDate, 'Date':AdjustedEndLimit, 'Milli': AdjustedEndLimit.valueOf()},
+         'Diff': {},
+         'Ticks': {}
+      }
+      
+      this.Units = Units;
+      var MilliDiff = this.Axis.Diff.Milli = this.Axis.End.Date.getTime() - this.Axis.Start.Date.getTime();
+      var SecondsDiff = this.Axis.Diff.Sec = MilliDiff / 1000;
+      var DaysDiff = this.Axis.Diff.Day = SecondsDiff / (3600*24);
+      
+      switch (this.Units) {
+         case 'month':
+            var NumTicks = 0; var MonthTicks = [];
+            var WorkingDate = new Date(this.Axis.Start.Date); var AvailableDays = DaysDiff;
+            do {
+            
+               var DaysInThisMonth = this.GetDaysInMonth(WorkingDate.getFullYear(), WorkingDate.getMonth());
+               var TickLabel = this.GetShortMonth(WorkingDate.getMonth())+' '+String(WorkingDate.getFullYear()).substring(2,4);
+            
+               var NextMonth = (WorkingDate.getMonth() < 11) ? WorkingDate.getMonth()+1 : 0;
+               var NextYear = (WorkingDate.getMonth() < 11) ? WorkingDate.getFullYear() : WorkingDate.getFullYear()+1;
+               WorkingDate.setFullYear(NextYear);
+               WorkingDate.setMonth(NextMonth);
+               
+               var KeepItUp = ((WorkingDate.getFullYear() > this.Axis.End.Date.getFullYear()) || (WorkingDate.getFullYear() == this.Axis.End.Date.getFullYear()) && (WorkingDate.getMonth() > this.Axis.End.Date.getMonth())) ? false : true;
+               if (KeepItUp) {
+                  AvailableDays -= DaysInThisMonth;
+                  MonthTicks.push({
+                     'Label': TickLabel,
+                     'Days': DaysInThisMonth,
+                     'Perc': (DaysInThisMonth / DaysDiff)
+                  });
+                  NumTicks++;
+               }
+            } while(KeepItUp == true);
+            
+         break;
+         case 'week':
+            var NumTicks = DaysDiff/7;
+         break;
+         case 'day':
+            var NumTicks = DaysDiff;
+         break;
+      }
+      
+      this.Axis.Ticks.Count = NumTicks;
+      this.Axis.Ticks.PerGraduation = NumTicks / this.Graduations;
+      var WidthPerTick = this.RailWidth / NumTicks;
+      this.Axis.Ticks.WidthPerGraduation = this.Axis.Ticks.PerGraduation * WidthPerTick;
+      
+      var SliderDates = $('div.SliderDates');
+      SliderDates.html('');
+      for (i = 0; i < this.Graduations; i++) {
+         var Tick = i * this.Axis.Ticks.PerGraduation;
+         var AmountPercent = ((i * this.Axis.Ticks.PerGraduation) / NumTicks);
+         var DeltaMilli = AmountPercent * MilliDiff;
+         var SpotDate = new Date(this.Axis.Start.Date.valueOf() + DeltaMilli);
+         
+         if (this.Units == 'month') {
+            var TickLabel = MonthTicks[Tick].Label;
+         } else {
+            var TickLabel = this.GetShortMonth(SpotDate.getMonth())+' '+SpotDate.getDate();
+         }
+         SliderDates.append('<div class="SliderDate">'+TickLabel+'</div>');
+      }
+      $('div.SliderDates div.SliderDate').css('width',this.Axis.Ticks.WidthPerGraduation+'px');
+   }
+
+   Picker.prototype.GetLongDate = function(DateItem) {
+      return this.GetMonth(DateItem.getMonth())+' '+DateItem.getDate()+', '+DateItem.getFullYear();
+   }
+   
+   Picker.prototype.GetStrDate = function(DateItem) {
+      return DateItem.getFullYear()+'-'+(DateItem.getMonth()+1)+'-'+DateItem.getDate();
+   }
+   
+   Picker.prototype.GetShortStrDate = function(DateItem) {
+      return DateItem.getDate()+'/'+(DateItem.getMonth()+1)+'/'+String(DateItem.getFullYear()).substring(2,4);
+   }
+   
+   Picker.prototype.GetStartLimit = function(DateItem, Unit) {
+      var CurrentDate = new Date(DateItem);
+      switch(Unit) {
+         case 'month':
+            CurrentDate.setDate(1);
+            return CurrentDate;
+         break;
+         case 'week':
+            if (CurrentDate.getDate() > CurrentDate.getDay()) {
+               CurrentDate.setDate(CurrentDate.getDate() - CurrentDate.getDay());
+            } else {
+               var Difference = CurrentDate.getDay() - CurrentDate.getDate();
+               
+               // Gotta roll back to previous month. Gotta check if possible first, otherwise roll back the year too.
+               if (CurrentDate.getMonth()) {
+                  CurrentDate.setMonth(CurrentDate.getMonth()-1);
+               } else {
+                  CurrentDate.setYear(CurrentDate.getYear()-1);
+                  CurrentDate.setMonth(11);
+               }
+               var DaysInMonth = this.GetDaysInMonth(CurrentDate.getYear(), CurrentDate.getMonth());
+               CurrentDate.setDate(DaysInMonth-Difference);
+            }
+            
+            return CurrentDate;
+         break;
+         case 'day':
+         default:
+            return CurrentDate;
+         break;
+      }
+   }
+   
+   Picker.prototype.GetEndLimit = function(DateItem, Unit) {
+      return this.GetStartLimit(DateItem, Unit);
+   }
+   
+   Picker.prototype.GetDaysInMonth = function (Year, Month) {
+      Month++;
+      switch (Month) {
+         case 1: return 31;
+         case 2:
+            var isLeap = new Date(Year,1,29).getDate() == 29;
+            return (isLeap) ? 29 : 28;
+         case 3: return 31;
+         case 4: return 30;
+         case 5: return 31;
+         case 6: return 30;
+         case 7: return 31;
+         case 8: return 31;
+         case 9: return 30;
+         case 10: return 31;
+         case 11: return 30;
+         case 12: return 31;
+      }
+   }
+   
+   Picker.prototype.GetShortMonth = function(Month) {
+      var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return M[Month];
+   }
+   
+   Picker.prototype.GetMonth = function(Month) {
+      var M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      return M[Month];
+   }
+   
+   Picker.prototype.GetNextGraduation = function(DateObj) {
+      
    }
    
    Picker.prototype.Down = function(ClientX) {
@@ -82,9 +247,64 @@ function Picker() {
       this.DownMoveHandler = (this.DownTarget.hasClass('SelectedRange')) ? this.MoveSlider : this.MoveHandle;
    }
    
+   Picker.prototype.UpdateUI = function(HardUpdate, NoTrigger) {
+      this.RailWidth = this.SlideRail.width();
+      
+      var StartPerc = this.HandleStart.position().left;
+      if (String(this.HandleStart.css('left')).substring(-1,1) != '%')
+         StartPerc = StartPerc / this.RailWidth;
+         
+      var StartDeltaMilli = StartPerc * this.Axis.Diff.Milli;
+      var StartDate = this.GetStartLimit(new Date(this.Axis.Start.Date.valueOf() + StartDeltaMilli),this.Units);
+      var StartShortDate = this.GetShortStrDate(StartDate);
+      this.HandleStart.html(StartShortDate);
+      this.InputStart.val(StartShortDate);
+      
+      var EndPerc = this.HandleEnd.position().left;
+      if (String(this.HandleEnd.css('left')).substring(-1,1) != '%')
+         EndPerc = EndPerc / this.RailWidth;
+         
+      var EndDeltaMilli = EndPerc * this.Axis.Diff.Milli;
+      var EndDate = this.GetEndLimit(new Date(this.Axis.Start.Date.valueOf() + EndDeltaMilli),this.Units);
+      var EndShortDate = this.GetShortStrDate(EndDate);
+      this.HandleEnd.html(EndShortDate);
+      this.InputEnd.val(EndShortDate);
+      
+      if (HardUpdate == true) {
+         var FormatStartDate = this.GetLongDate(StartDate);
+         var FormatEndDate = this.GetLongDate(EndDate);
+         this.RangeTarget.val(FormatStartDate+' - '+FormatEndDate);
+         if (!NoTrigger)
+            this.RangeTarget.trigger('change');
+      }
+   }
+   
+   Picker.prototype.SetRange = function(RangeStart, RangeEnd, Trigger) {
+      var DateRangeStart = this.GetStartLimit(new Date(RangeStart), this.Units);
+      var DateRangeEnd = this.GetEndLimit(new Date(RangeEnd), this.Units);
+      
+      var FormatStartDate = this.GetLongDate(DateRangeStart);
+      var FormatEndDate = this.GetLongDate(DateRangeEnd);
+      this.RangeTarget.val(FormatStartDate+' - '+FormatEndDate);
+      
+      var MilliStartDiff = DateRangeStart.valueOf() - this.Axis.Start.Milli;
+      var MilliEndDiff = DateRangeEnd.valueOf() - this.Axis.Start.Milli;
+      
+      var PercStart = (MilliStartDiff / this.Axis.Diff.Milli) * 100;
+      var PercEnd = (MilliEndDiff / this.Axis.Diff.Milli) * 100;
+      
+      this.DoMoveHandle(this.HandleStart, PercStart);
+      this.DoMoveHandle(this.HandleEnd, PercEnd);
+      this.SyncSlider();
+      
+      if (Trigger == true)
+         this.RangeTarget.trigger('change');
+   }
+   
    Picker.prototype.MoveDelegator = function(e) {
       if (this.DownTarget == false) return;
       this.DownMoveHandler(this.DownTarget, e);
+      this.UpdateUI();
       return false;
    }
    
@@ -99,15 +319,19 @@ function Picker() {
       var MoveAction = this.DoMoveHandle(Handle, PercX);
       
       // Resize slider
-      if (MoveAction.Moved != 0) {
-         var LeftPerc = this.ToPerc(this.HandleStart.css('left'))
-         var RightPerc = this.ToPerc(this.HandleEnd.css('left'))
-         var PercDiff = RightPerc - LeftPerc;
-         this.Range.css('left',LeftPerc+'%');
-         this.Range.css('width',PercDiff+'%');
-      }
+      
+      if (MoveAction.Moved != 0)
+         this.SyncSlider();
       
       return MoveAction.Moved;
+   }
+   
+   Picker.prototype.SyncSlider = function() {
+      var LeftPerc = this.ToPerc(this.HandleStart.css('left'))
+      var RightPerc = this.ToPerc(this.HandleEnd.css('left'))
+      var PercDiff = RightPerc - LeftPerc;
+      this.Range.css('left',LeftPerc+'%');
+      this.Range.css('width',PercDiff+'%');
    }
    
    Picker.prototype.DoMoveHandle = function(Handle, ProposedPercX, Manual) {
@@ -169,7 +393,7 @@ function Picker() {
    }
    
    Picker.prototype.ToPerc = function(X) {
-      if (X.substr(-1,1) == '%') return parseFloat(X);
+      if (String(X).substr(-1,1) == '%') return parseFloat(X);
       return (parseInt(X) / this.SlideRail.width()) * 100;
    }
    
@@ -178,19 +402,11 @@ function Picker() {
 <div class="Slider"> \
    <div class="SelectedRange"></div> \
    <div class="HandleContainer"> \
-      <div class="SliderHandle HandleStart">6/06/09</div> \
-      <div class="SliderHandle HandleEnd">8/10/10</div> \
+      <div class="SliderHandle HandleStart"></div> \
+      <div class="SliderHandle HandleEnd"></div> \
    </div> \
    <div class="Range RangeStart"></div><div class="Range RangeMid"></div><div class="Range RangeEnd"></div> \
-   <div class="SliderDates"> \
-      <div class="SliderDate">Jun 6</div> \
-      <div class="SliderDate">Aug 7</div> \
-      <div class="SliderDate">Oct 8</div> \
-      <div class="SliderDate">Dec 9</div> \
-      <div class="SliderDate">Feb 9</div> \
-      <div class="SliderDate">Apr 12</div> \
-      <div class="SliderDate">Jun 13</div> \
-   </div> \
+   <div class="SliderDates"></div> \
 </div> \
 <hr /> \
 <div class="InputRange"> \
