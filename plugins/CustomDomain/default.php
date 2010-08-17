@@ -30,7 +30,7 @@ class CustomDomainPlugin implements Gdn_IPlugin {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Custom Domain Name');
       if ($this->AddSideMenu)
-         $Sender->AddSideMenu('dashboard/settings/customdomain');
+         $Sender->AddSideMenu('settings/customdomain');
          
       $Sender->Site = $this->_GetSite();
       

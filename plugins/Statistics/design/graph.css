@@ -11,11 +11,11 @@
 }
 #GraphHolder span.Metrics {
 }
-#GraphHolder span.Metric5 { color: #8e72d6; }
+#GraphHolder span.Metric1 { color: #fa9f2c; }
 #GraphHolder span.Metric2 { color: #1da4db; }
 #GraphHolder span.Metric3 { color: #90d954; }
-#GraphHolder span.Metric4 { color: #efd015; }
-#GraphHolder span.Metric1 { color: #fa9f2c; }
+#GraphHolder span.Metric4 { color: #8e72d6; }
+#GraphHolder span.Metric5 { color: #efd015; }
 #GraphHolder span.Metric6 { color: #f80e27; }
 #GraphHolder span.Headings {
    font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;

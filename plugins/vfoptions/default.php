@@ -36,30 +36,30 @@ class VFOptionsPlugin implements Gdn_IPlugin {
     * Adds & removes dashboard menu options.
     */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+		$New = ' <span class="New">New</span>';
       // Clean out entire menu & re-add everything
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->ClearGroups();
       
-      $Menu->AddItem('Dashboard', T('Dashboard'), FALSE, array('class' => 'Dashboard'));
+      $Menu->AddItem('Dashboard', T('Dashboard').$New, FALSE, array('class' => 'Dashboard'));
       $Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
 
       $Menu->AddItem('Appearance', T('Appearance'), FALSE, array('class' => 'Appearance'));
-		$Menu->AddLink('Appearance', T('Banner <span class="New">New</span>'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
-      $Menu->AddLink('Appearance', T('Themes <span class="New">New</span>'), 'dashboard/settings/themes', 'Garden.Themes.Manage');
-		if ($ThemeOptionsName = C('Garden.ThemeOptions.Name')) {
-         $Menu->AddLink('Appearance', sprintf(T('%s Options', '%s Options  <span class="New">New</span>'), $ThemeOptionsName), '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
-      }
+		$Menu->AddLink('Appearance', T('Banner'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
+      $Menu->AddLink('Appearance', T('Themes').$New, 'dashboard/settings/themes', 'Garden.Themes.Manage');
+		if (C('Garden.ThemeOptions.Name'))
+         $Menu->AddLink('Appearance', T('Theme Options').$New, '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
 
       if (C('EnabledPlugins.CustomCSS'))
 	      $Menu->AddLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
 			
 		if (C('EnabledPlugins.CustomTheme'))
-	      $Menu->AddLink('Appearance', 'Custom Theme <span class="New">New</span>', 'settings/customtheme', 'Garden.AdminUser.Only');
+	      $Menu->AddLink('Appearance', 'Custom Theme', 'settings/customtheme', 'Garden.AdminUser.Only');
 			
       $Menu->AddLink('Appearance', T('Messages'), 'dashboard/message', 'Garden.Messages.Manage');
 
 		if (C('EnabledPlugins.CustomDomain'))
-	      $Menu->AddLink('Appearance', 'Custom Domain <span class="New">New</span>', 'settings/customdomain', 'Garden.AdminUser.Only');
+	      $Menu->AddLink('Appearance', 'Custom Domain', 'settings/customdomain', 'Garden.AdminUser.Only');
 		
       $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), 'dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
@@ -70,18 +70,35 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       if (C('Garden.Registration.Method') == 'Approval')
          $Menu->AddLink('Users', T('Applicants'), 'dashboard/user/applicants', 'Garden.Applicants.Manage');
 
-		if (C('EnabledPlugins.VanillaConnect'))
-			$Menu->AddLink('Users', 'Vanilla Connect <span class="New">New</span>', 'settings/vanillaconnect', 'Garden.AdminUser.Only');
-			
-		if (C('EnabledPlugins.ProxyConnect'))
-			$Menu->AddLink('Users', 'Proxy Connect <span class="New">New</span>', 'settings/proxyconnect', 'Garden.AdminUser.Only');
+		if (C('EnabledPlugins.VanillaConnect') || C('EnabledPlugins.ProxyConnect'))
+			$Menu->AddLink('Users', T('Authentication').$New, 'dashboard/authentication', 'Garden.Settings.Manage');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
-		if (C('EnabledPlugins.FileUpload'))
-			$Menu->AddLink('Forum', 'Media <span class="New">New</span>', 'plugin/fileupload', 'Garden.AdminUser.Only');
-			
 		$Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
+		if (C('EnabledPlugins.Tagging'))
+			$Menu->AddLink('Forum', T('Tagging').$New, 'settings/tagging', 'Garden.Settings.Manage');
+
+		if (C('EnabledPlugins.Voting'))
+			$Menu->AddLink('Forum', T('Voting').$New, 'settings/voting', 'Garden.Settings.Manage');
+		
       $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
+		if (C('EnabledPlugins.Flagging')) {
+			$NumFlaggedItems = Gdn::SQL()->Select('fl.ForeignID','DISTINCT', 'NumFlaggedItems')
+				->From('Flag fl')
+				->GroupBy('ForeignURL')
+				->Get()->NumRows();
+			
+			$LinkText = T('Flagged Content');
+			if ($NumFlaggedItems)
+				$LinkText .= " ({$NumFlaggedItems})";
+			$Menu->AddLink('Forum', $LinkText.$New, 'plugin/flagging', 'Garden.Settings.Manage');
+		}
+
+		if (C('EnabledPlugins.FileUpload'))
+			$Menu->AddLink('Forum', 'Media', 'plugin/fileupload', 'Garden.AdminUser.Only');
+			
+		if (C('EnabledPlugins.Signatures'))
+			$Menu->AddLink('Forum', T('Signatures').$New, 'settings/signatures', 'Garden.Settings.Manage');
    }
    
    /**
@@ -988,4 +1005,5 @@ pageTracker._trackPageview();
          $this->_GetDatabase()->SQL()->Put('Site', array('Attributes' => Gdn_Format::Serialize($Attributes)), array('SiteID' => $SiteID));
       }      
    }
+	
 }

@@ -80,6 +80,7 @@ div.Slider div.SelectedRange {
    top: 32px;
    height: 13px;
    z-index: 100;
+   cursor: move;
 }
 div.Picker div.Slider div.Range {
    margin-top: 31px;
