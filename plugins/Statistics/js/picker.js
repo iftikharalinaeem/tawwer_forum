@@ -4,7 +4,7 @@ function Picker() {
       
       // Load options from supplied options object
       this.RangeTarget = $(Options.Range);
-      this.Graduations = Options.Graduations || 8;
+      this.Graduations = Options.MaxGraduations || 8;
       this.Nudge = Options.Nudge || true;
       
       this.RangeTarget.after('<a class="RangeToggle" href="#">' + this.RangeTarget.val() + '</a>');
@@ -71,6 +71,10 @@ function Picker() {
          return false;
       },this));
       
+      $('div.InputRange input').bind('change', jQuery.proxy(function(e){
+         this.SetRange(this.InputStart.val(), this.InputEnd.val(), true);
+      },this));
+      
       this.Axis(Options.DateStart, Options.DateEnd, Options.Units);
       
       var RangeStart = Options.RangeStart || Options.DateStart;
@@ -101,7 +105,7 @@ function Picker() {
             do {
             
                var DaysInThisMonth = this.GetDaysInMonth(WorkingDate.getFullYear(), WorkingDate.getMonth());
-               var TickLabel = this.GetShortMonth(WorkingDate.getMonth())+' '+String(WorkingDate.getFullYear()).substring(2,4);
+               var TickLabel = this.GetShortMonth(WorkingDate.getMonth())+' \''+String(WorkingDate.getFullYear()).substring(2,4);
             
                var NextMonth = (WorkingDate.getMonth() < 11) ? WorkingDate.getMonth()+1 : 0;
                var NextYear = (WorkingDate.getMonth() < 11) ? WorkingDate.getFullYear() : WorkingDate.getFullYear()+1;
@@ -111,11 +115,11 @@ function Picker() {
                var KeepItUp = ((WorkingDate.getFullYear() > this.Axis.End.Date.getFullYear()) || (WorkingDate.getFullYear() == this.Axis.End.Date.getFullYear()) && (WorkingDate.getMonth() > this.Axis.End.Date.getMonth())) ? false : true;
                if (KeepItUp) {
                   AvailableDays -= DaysInThisMonth;
-                  MonthTicks.push({
+                  MonthTicks[NumTicks] = {
                      'Label': TickLabel,
                      'Days': DaysInThisMonth,
                      'Perc': (DaysInThisMonth / DaysDiff)
-                  });
+                  };
                   NumTicks++;
                }
             } while(KeepItUp == true);
@@ -130,15 +134,17 @@ function Picker() {
       }
       
       this.Axis.Ticks.Count = NumTicks;
-      this.Axis.Ticks.PerGraduation = NumTicks / this.Graduations;
+      this.Axis.Ticks.PerGraduation = Math.ceil(NumTicks / this.Graduations);
+      this.Graduations = NumTicks / this.Axis.Ticks.PerGraduation;
       var WidthPerTick = this.RailWidth / NumTicks;
       this.Axis.Ticks.WidthPerGraduation = this.Axis.Ticks.PerGraduation * WidthPerTick;
       
       var SliderDates = $('div.SliderDates');
       SliderDates.html('');
-      for (i = 0; i < this.Graduations; i++) {
-         var Tick = i * this.Axis.Ticks.PerGraduation;
-         var AmountPercent = ((i * this.Axis.Ticks.PerGraduation) / NumTicks);
+      var SliderWidth = (this.RailWidth / this.Graduations) - 20;
+      for (Graduation = 0; Graduation < this.Graduations; Graduation++) {
+         var Tick = Graduation * this.Axis.Ticks.PerGraduation;
+         var AmountPercent = (Tick / NumTicks);
          var DeltaMilli = AmountPercent * MilliDiff;
          var SpotDate = new Date(this.Axis.Start.Date.valueOf() + DeltaMilli);
          
@@ -147,9 +153,11 @@ function Picker() {
          } else {
             var TickLabel = this.GetShortMonth(SpotDate.getMonth())+' '+SpotDate.getDate();
          }
-         SliderDates.append('<div class="SliderDate">'+TickLabel+'</div>');
+         
+         var PxLeft = (AmountPercent * this.RailWidth);
+         SliderDates.append('<div class="SliderDate" style="left: '+PxLeft+'px;">'+TickLabel+'</div>');
       }
-      $('div.SliderDates div.SliderDate').css('width',this.Axis.Ticks.WidthPerGraduation+'px');
+      
    }
 
    Picker.prototype.GetLongDate = function(DateItem) {
@@ -157,7 +165,7 @@ function Picker() {
    }
    
    Picker.prototype.GetStrDate = function(DateItem) {
-      return DateItem.getFullYear()+'-'+(DateItem.getMonth()+1)+'-'+DateItem.getDate();
+      return (DateItem.getMonth()+1)+'/'+DateItem.getDate()+'/'+DateItem.getFullYear();
    }
    
    Picker.prototype.GetShortStrDate = function(DateItem) {
@@ -262,7 +270,7 @@ function Picker() {
       var StartDate = this.GetStartLimit(new Date(this.Axis.Start.Date.valueOf() + StartDeltaMilli),this.Units);
       var StartShortDate = this.GetShortStrDate(StartDate);
       this.HandleStart.html(StartShortDate);
-      this.InputStart.val(StartShortDate);
+      this.InputStart.val(this.GetStrDate(StartDate));
       
       var EndPerc = this.HandleEnd.position().left;
       if (String(this.HandleEnd.css('left')).substring(-1,1) != '%')
@@ -272,7 +280,7 @@ function Picker() {
       var EndDate = this.GetEndLimit(new Date(this.Axis.Start.Date.valueOf() + EndDeltaMilli),this.Units);
       var EndShortDate = this.GetShortStrDate(EndDate);
       this.HandleEnd.html(EndShortDate);
-      this.InputEnd.val(EndShortDate);
+      this.InputEnd.val(this.GetStrDate(EndDate));
       
       if (HardUpdate == true) {
          var FormatStartDate = this.GetLongDate(StartDate);
@@ -284,13 +292,24 @@ function Picker() {
    }
    
    Picker.prototype.SetRange = function(RangeStart, RangeEnd, Trigger) {
-      var DateRangeStart = this.GetStartLimit(new Date(RangeStart), this.Units);
-      var DateRangeEnd = this.GetEndLimit(new Date(RangeEnd), this.Units);
+      if (Date.parse(RangeStart) < 1 || Date.parse(RangeEnd) < 1) return;
+      
+      var RangeStart = new Date(RangeStart);
+      var RangeEnd = new Date(RangeEnd);
+      
+      if (RangeStart.valueOf() < this.Axis.Start.Milli)
+         RangeStart.setTime(this.Axis.Start.Milli);
+      
+      if (RangeEnd.valueOf() > this.Axis.End.Milli)
+         RangeEnd.setTime(this.Axis.End.Milli);
+      
+      var DateRangeStart = this.GetStartLimit(RangeStart, this.Units);
+      var DateRangeEnd = this.GetEndLimit(RangeEnd, this.Units);
       
       var FormatStartDate = this.GetLongDate(DateRangeStart);
       var FormatEndDate = this.GetLongDate(DateRangeEnd);
       this.RangeTarget.val(FormatStartDate+' - '+FormatEndDate);
-      
+
       var MilliStartDiff = DateRangeStart.valueOf() - this.Axis.Start.Milli;
       var MilliEndDiff = DateRangeEnd.valueOf() - this.Axis.Start.Milli;
       
@@ -300,9 +319,10 @@ function Picker() {
       this.DoMoveHandle(this.HandleStart, PercStart);
       this.DoMoveHandle(this.HandleEnd, PercEnd);
       this.SyncSlider();
-      
-      if (Trigger == true)
+     
+      if (Trigger == true) {
          this.RangeTarget.trigger('change');
+      }
    }
    
    Picker.prototype.MoveDelegator = function(e) {
@@ -321,9 +341,6 @@ function Picker() {
       var PercX = (RelativeX / this.DownRailWidth) * 100;
       
       var MoveAction = this.DoMoveHandle(Handle, PercX);
-      
-      // Resize slider
-      
       if (MoveAction.Moved != 0)
          this.SyncSlider();
       
@@ -379,13 +396,6 @@ function Picker() {
       MoveAction = this.DoMoveHandle(this.HandleEnd, RightPercX, true);
       
       this.Range.css('left',LeftPercX+'%');
-      
-/*      if (LeftPercX == 0 && Event.clientX <= this.DownRailLeft) {
-         this.Down(this.DownRailLeft);
-      }
-      if (RightPercX == 100 && Event.clientX >= this.DownRailRight) {
-         this.Down(this.DownRailRight);
-      }*/
    }
 
    Picker.prototype.LimitStayLeft = function(ReferenceElement) {

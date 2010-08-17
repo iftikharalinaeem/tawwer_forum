@@ -102,14 +102,17 @@ div.Picker div.Slider div.RangeEnd {
 div.Picker div.Slider div.SliderDates {
    line-height: 1;
    padding-bottom: 4px;
-   overflow: hidden;
-   height: 100%;
+   position:relative;
+   height: 12px;
 }
 div.Picker div.Slider div.SliderDates div.SliderDate {
    display: inline;
    font-size: 11px;
-   float: left;
+   position: absolute;
    text-align: left;
+   height: 12px;
+   overflow: visible;
+   width: 100px;
 }
 /* Inputs */
 div.Picker hr {
