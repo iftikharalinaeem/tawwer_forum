@@ -60,6 +60,7 @@ div.Picker div.Slider {
    position: relative;
    width: 700px;
    margin: 0 auto;
+   cursor: pointer;
 }
 /* Bump the handles back half their width so percentages can be used to hit the
 beginning (0%) and end (100%) of the slider. */
@@ -68,17 +69,15 @@ div.Picker div.HandleContainer {
    width: 700px;
 }
 div.Picker div.HandleStart {
-   left: 30%;
+   left: 0%;
 }
 div.Picker div.HandleEnd {
-   left: 70%;
+   left: 100%;
 }
 div.Slider div.SelectedRange {
    position: absolute;
    background: url('slider-sprites.png') 0 -150px repeat-x transparent;
    top: 32px;
-   left: 30%; /* The same as HandleStart */
-   width: 40%; /* HandleEnd - HandleStart = Width */
    height: 13px;
    z-index: 100;
 }
@@ -102,10 +101,14 @@ div.Picker div.Slider div.RangeEnd {
 div.Picker div.Slider div.SliderDates {
    line-height: 1;
    padding-bottom: 4px;
+   overflow: hidden;
+   height: 100%;
 }
 div.Picker div.Slider div.SliderDates div.SliderDate {
    display: inline;
    font-size: 11px;
+   float: left;
+   text-align: left;
 }
 /* Inputs */
 div.Picker hr {
