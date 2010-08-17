@@ -156,9 +156,28 @@ jQuery(document).ready(function($) {
         };
     }
     
-    function getColor(graphContainer, row) {
-        // return "hsb(" + [((row + 6) / 10), .5, 1] + ")";
-        return $('#'+graphContainer+' span.Metric'+(row+1)).css('color');
+    function getColor(graphContainer, row, forLine) {
+        var index = row;
+        if (forLine) {
+            var inps = $('input:hidden[name^="graphLabel_"]');
+            var onCount = 0;
+            for (var i = 0; i < inps.length; i++) {
+                if ($(inps[i]).val() == 'off' && onCount <= row) {
+                    index++;
+                } else {
+                    onCount++;
+                }
+            }
+        }
+        return $('#'+graphContainer+' span.Metric'+(index+1)).css('color');
+    }
+    
+    function getRowController(rowIndex) {
+        return $('input:hidden[name="graphLabel_'+rowIndex+'"]');
+    }
+    function getRowState(rowIndex) {
+        var inp = getRowController(rowIndex);
+        return inp.length > 0 ? inp.val() : "off";
     }
     
     Raphael.fn.drawGrid = function (x, y, w, h, wv, hv, color) {
@@ -225,16 +244,39 @@ jQuery(document).ready(function($) {
     Raphael.fn.drawLegend = function(graphContainer, raphael, rows, height, leftgutter, X) {
         var legend = raphael.set();
         var xPos = Math.round(leftgutter + 16);
+        var boxes = [];
         for (var i = 0; i < rows.length; i++) {
+            // Add hidden input
+            var inp = getRowController(i);
+            if (inp.length == 0)
+                $('body').append('<input type="hidden" name="graphLabel_'+i+'" value="on" />');
+                
+            var inp = getRowController(i);
+
             // Draw a box
-            var box = raphael.rect(xPos, height - 15, 15, 15);
-            var color = getColor(graphContainer, i);
+            var box = raphael.rect(xPos, height - 15, 13, 13);
+            var white = 'rgb(255,255,255)';
+            var color = getColor(graphContainer, i, false);
             var bgcolor = $('body').css('background-color');
-            box.attr({ fill: color, stroke: color, "stroke-width": 0});
-            box.click(function() {
-               // alert('test'+i);
-            });
+            box.attr({ fill: inp.val() == 'on' ? color : white, stroke: color, "stroke-width": 2, cursor: 'pointer'});
             legend.push(box);
+            (function(box, inp, white, color){
+                box.node.onclick = function() {
+                    if (inp.val() == "on") {
+                        inp.val('off');
+                        box.attr({fill: color});
+                    } else {
+                        inp.val('on');
+                        box.attr({fill: white});
+                    }
+                    getData();
+                }
+                box.hover(function() {
+                    box.attr({stroke: '#444'});
+                }, function() {
+                    box.attr({stroke: color});
+                });
+            })(box, inp, white, color);
             xPos = xPos + Math.round(box.getBBox().width) + 6;
             
             // Draw a label for the box
@@ -265,11 +307,17 @@ jQuery(document).ready(function($) {
                 
         // Is the datasource an array, or a table selector?
         if (typeof(dataSource)=='object') {
+            var i = -1;
             $.each(dataSource, function(Key, Value) {
                 if (Key == 'Dates') {
                     footLabels = Value;
                 } else {
                     rowLabels.push(Key);
+
+                    i++;
+                    if (getRowController(i).val() == "off")
+                        return;
+                    
                     rows.push(Value);
                     $.each(Value, function(k, v) {
                         data.push(v);
@@ -280,6 +328,7 @@ jQuery(document).ready(function($) {
             // I realize this identifies the rows being graph'd (Users,
             // Discussions, Comments), but I can't think of a better place to
             // put it right now:
+            setSummary(dataSource, 'Page Views', 'li.PageViews strong');
             setSummary(dataSource, 'Users', 'li.NewUsers strong');
             setSummary(dataSource, 'Discussions', 'li.NewDiscussions strong');
             setSummary(dataSource, 'Comments', 'li.NewComments strong');
@@ -333,7 +382,7 @@ jQuery(document).ready(function($) {
         for (var j = 0; j < rows.length; j++) {
             dots.push([]);
             coordinates.push([]);
-            var color = getColor(graphContainer, j);
+            var color = getColor(graphContainer, j, true);
             var row = rows[j];
             var path = r.path().attr({stroke: color, "stroke-width": 2}),
                 label = r.set(),
@@ -342,7 +391,7 @@ jQuery(document).ready(function($) {
                 blanket = r.set(),
                 lineHeight = metricFontSize + 2;
             for (m = 0; m < rows.length; m++) {
-                label.push(r.text(0, lineHeight, "400 Discussions").attr(metricText).attr({fill: getColor(graphContainer, m)}));
+                label.push(r.text(0, lineHeight, "400 Discussions").attr(metricText).attr({fill: getColor(graphContainer, m, false)}));
                 lineHeight += metricFontSize + 2;
             }
             label.push(r.text(0, lineHeight + 4, "16 Sept").attr(dateText));

@@ -33,6 +33,12 @@ class StatisticsPlugin extends Gdn_Plugin {
    const FILL_ZERO = 'zero';
    const FILL_NULL = 'null';
    
+   // Record a pageview if loading a full page.
+   public function Base_Render_Before($Sender) {
+      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
+         $this->TrackEvent('pageviews');
+   }
+   
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $LinkText = T('Statistics');
       $Menu = &$Sender->EventArguments['SideMenu'];
@@ -491,16 +497,19 @@ return;
       $UserData = StatisticsPlugin::GetDataRange('registrations', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
       $CommentData = StatisticsPlugin::GetDataRange('comments', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
       $DiscussionData = StatisticsPlugin::GetDataRange('discussions', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
+      $PageViewData = StatisticsPlugin::GetDataRange('pageviews', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
 
       // Build a single array that contains all of the data
       $Data = array(
          'Dates' => array(),
+         'Page Views' => array(),
          'Users' => array(),
          'Discussions' => array(),
          'Comments' => array()
       );
       foreach ($UserData as $Date => $Value) {
          $Data['Dates'][] = date(date('Y', Gdn_Format::ToTimestamp($Date)) < date('Y') ? 'M j, Y' : 'M j', strtotime($Date));
+         $Data['Page Views'][] = $PageViewData[$Date]['Value'];
          $Data['Users'][] = $Value['Value'];
          $Data['Discussions'][] = $DiscussionData[$Date]['Value'];
          $Data['Comments'][] = $CommentData[$Date]['Value'];
@@ -538,6 +547,7 @@ return;
    public function Setup() {
       $this->Structure();
       $this->_RegisterTrackedItem(array(
+         'pageviews'       => 'none',
          'comments'        => 'none',
          'discussions'     => 'none',
          'registrations'   => 'none',
