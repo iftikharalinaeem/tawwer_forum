@@ -74,15 +74,14 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 			$Menu->AddLink('Users', T('Authentication').$New, 'dashboard/authentication', 'Garden.Settings.Manage');
 		
 		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
-		if (C('EnabledPlugins.FileUpload'))
-			$Menu->AddLink('Forum', 'Media', 'plugin/fileupload', 'Garden.AdminUser.Only');
-			
+		$Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
+		if (C('EnabledPlugins.Tagging'))
+			$Menu->AddLink('Forum', T('Tagging').$New, 'settings/tagging', 'Garden.Settings.Manage');
+
 		if (C('EnabledPlugins.Voting'))
 			$Menu->AddLink('Forum', T('Voting').$New, 'settings/voting', 'Garden.Settings.Manage');
 		
-		if (C('EnabledPlugins.Tagging'))
-			$Menu->AddLink('Forum', T('Tagging').$New, 'settings/tagging', 'Garden.Settings.Manage');
-			
+      $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
 		if (C('EnabledPlugins.Flagging')) {
 			$NumFlaggedItems = Gdn::SQL()->Select('fl.ForeignID','DISTINCT', 'NumFlaggedItems')
 				->From('Flag fl')
@@ -95,11 +94,11 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 			$Menu->AddLink('Forum', $LinkText.$New, 'plugin/flagging', 'Garden.Settings.Manage');
 		}
 
+		if (C('EnabledPlugins.FileUpload'))
+			$Menu->AddLink('Forum', 'Media', 'plugin/fileupload', 'Garden.AdminUser.Only');
+			
 		if (C('EnabledPlugins.Signatures'))
 			$Menu->AddLink('Forum', T('Signatures').$New, 'settings/signatures', 'Garden.Settings.Manage');
-			
-		$Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
-      $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
    }
    
    /**
@@ -1006,4 +1005,5 @@ pageTracker._trackPageview();
          $this->_GetDatabase()->SQL()->Put('Site', array('Attributes' => Gdn_Format::Serialize($Attributes)), array('SiteID' => $SiteID));
       }      
    }
+	
 }
