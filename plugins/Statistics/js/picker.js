@@ -299,12 +299,12 @@ function Picker() {
       
       if (RangeStart.valueOf() < this.Axis.Start.Milli)
          RangeStart.setTime(this.Axis.Start.Milli);
+      
       if (RangeEnd.valueOf() > this.Axis.End.Milli)
          RangeEnd.setTime(this.Axis.End.Milli);
       
       var DateRangeStart = this.GetStartLimit(RangeStart, this.Units);
       var DateRangeEnd = this.GetEndLimit(RangeEnd, this.Units);
-      
       
       var FormatStartDate = this.GetLongDate(DateRangeStart);
       var FormatEndDate = this.GetLongDate(DateRangeEnd);
@@ -319,12 +319,10 @@ function Picker() {
       this.DoMoveHandle(this.HandleStart, PercStart);
       this.DoMoveHandle(this.HandleEnd, PercEnd);
       this.SyncSlider();
-/*      
+     
       if (Trigger == true) {
-         console.log('setrange trigger');
          this.RangeTarget.trigger('change');
       }
-*/
    }
    
    Picker.prototype.MoveDelegator = function(e) {
@@ -343,9 +341,6 @@ function Picker() {
       var PercX = (RelativeX / this.DownRailWidth) * 100;
       
       var MoveAction = this.DoMoveHandle(Handle, PercX);
-      
-      // Resize slider
-      
       if (MoveAction.Moved != 0)
          this.SyncSlider();
       
@@ -401,13 +396,6 @@ function Picker() {
       MoveAction = this.DoMoveHandle(this.HandleEnd, RightPercX, true);
       
       this.Range.css('left',LeftPercX+'%');
-      
-/*      if (LeftPercX == 0 && Event.clientX <= this.DownRailLeft) {
-         this.Down(this.DownRailLeft);
-      }
-      if (RightPercX == 100 && Event.clientX >= this.DownRailRight) {
-         this.Down(this.DownRailRight);
-      }*/
    }
 
    Picker.prototype.LimitStayLeft = function(ReferenceElement) {
