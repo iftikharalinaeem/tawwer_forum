@@ -132,10 +132,10 @@ function WriteRangeTab($Range, $Sender) {
          'Range': $('div.DateRangeTabs input.DateRange'),
          'Units': '<?php echo $this->Range; ?>',
          'MaxGraduations': 15,
-         'DateStart': '<?php echo $this->DateStart; ?>',
-         'DateEnd': '<?php echo $this->DateEnd; ?>',
-         'RangeStart': '<?php echo $this->BoundaryStart; ?>',
-         'RangeEnd': '<?php echo $this->BoundaryEnd; ?>' 
+         'DateStart': '<?php echo $this->BoundaryStart; ?>',
+         'DateEnd': '<?php echo $this->BoundaryEnd; ?>',
+         'RangeStart': '<?php echo $this->DateStart; ?>',
+         'RangeEnd': '<?php echo $this->DateEnd; ?>' 
       });
    });
 </script>
