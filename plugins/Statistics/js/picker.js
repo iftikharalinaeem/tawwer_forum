@@ -8,7 +8,11 @@ function Picker() {
       this.Nudge = Options.Nudge || true;
       
       this.RangeTarget.after('<a class="RangeToggle" href="#">' + this.RangeTarget.val() + '</a>');
+      this.RangeTarget.hide();
       this.RangeToggle = $('a.RangeToggle');
+      this.RangeTarget.bind('change', function() {
+         $('a.RangeToggle').text($(this).val())
+      })
       
       this.PickerContainer = $('div.Picker');
       // Add the picker container if it wasn't already on the page somewhere

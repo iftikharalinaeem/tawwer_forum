@@ -131,10 +131,10 @@ function WriteRangeTab($Range, $Sender) {
       GraphPicker.Attach({
          'Range': $('div.DateRangeTabs input.DateRange'),
          'Units': '<?php echo $this->Range; ?>',
-         'DateStart': '<?php echo Gdn_Format::Date($this->StampStart, T('Date.DefaultFormat')); ?>',
-         'DateEnd': '<?php echo Gdn_Format::Date($this->StampEnd, T('Date.DefaultFormat')); ?>',
-         'RangeStart': '<?php echo Gdn_Format::Date($this->RangeStart, T('Date.DefaultFormat')); ?>',
-         'RangeEnd': '<?php echo Gdn_Format::Date($this->RangeEnd, T('Date.DefaultFormat')); ?>' 
+         'DateStart': '<?php echo $this->DateStart; ?>',
+         'DateEnd': '<?php echo $this->DateEnd; ?>',
+         'RangeStart': '<?php echo $this->BoundaryStart; ?>',
+         'RangeEnd': '<?php echo $this->BoundaryEnd; ?>' 
       });
    });
 </script>
