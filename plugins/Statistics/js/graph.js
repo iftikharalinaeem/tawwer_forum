@@ -509,10 +509,9 @@ jQuery(document).ready(function($) {
             
         
         // Load the graph data
-// TODO: USE INDEX.PHP
         var dataUrl = gdn.combinePaths(
             gdn.definition('WebRoot'),
-            'dashboard/settings/loadstats?Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
+            'index.php?p=dashboard/settings/loadstats?Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
             );
         $.ajax({
             type: "GET",
