@@ -55,12 +55,44 @@ div.Picker {
    padding: 10px 20px;
    border-top: 1px solid #8BC1DE;
 }
+div.Picker div.RailContainer {
+   width: 800px;
+   position: relative;
+   height: 100%;
+   overflow: hidden;
+   margin: 0 auto;
+}
+div.Picker div.RailPager {
+   visibility: hidden;
+}
+div.Picker div.RailPage {
+   width: 30px;
+   height: 19px;
+   margin-top: 28px;
+   margin-bottom: 22px;
+   font-weight: bold;
+   font-size: 20px;
+   z-index: 80;
+   text-align: center;
+   cursor: pointer;
+}
+div.Picker div.PageBack {
+   margin-right: 20px;
+   float: left;
+}
+div.Picker div.PageForward {
+   margin-left: 20px;
+   float: right;
+}
+div.Picker div.RailPager div.CannotPage {
+   color: grey;
+   cursor: default;
+}
 div.Picker div.Slider {
+   float: right;
    text-align: center;
    position: relative;
    width: 700px;
-   margin: 0 auto;
-   cursor: pointer;
 }
 /* Bump the handles back half their width so percentages can be used to hit the
 beginning (0%) and end (100%) of the slider. */

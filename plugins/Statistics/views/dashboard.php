@@ -126,12 +126,14 @@ function WriteRangeTab($Range, $Sender) {
 </div>
 
 <script type="text/javascript">
+   var GraphPicker = new Picker();
    jQuery(document).ready(function(){
-      var GraphPicker = new Picker();
+      //GraphPicker = new Picker();
       GraphPicker.Attach({
          'Range': $('div.DateRangeTabs input.DateRange'),
          'Units': '<?php echo $this->Range; ?>',
          'MaxGraduations': 15,
+         'MaxRailSize': -1,
          'DateStart': '<?php echo $this->BoundaryStart; ?>',
          'DateEnd': '<?php echo $this->BoundaryEnd; ?>',
          'RangeStart': '<?php echo $this->DateStart; ?>',
