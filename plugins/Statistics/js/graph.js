@@ -511,7 +511,7 @@ jQuery(document).ready(function($) {
         // Load the graph data
         var dataUrl = gdn.combinePaths(
             gdn.definition('WebRoot'),
-            'index.php?p=dashboard/settings/loadstats?Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
+            'index.php?p=dashboard/settings/loadstats&Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
             );
         $.ajax({
             type: "GET",
@@ -531,7 +531,7 @@ jQuery(document).ready(function($) {
         
         $.get(gdn.combinePaths(
             gdn.definition('WebRoot'),
-            'dashboard/settings/dashboardsummaries?DeliveryType=VIEW&Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
+            'index.php?p=dashboard/settings/dashboardsummaries&DeliveryType=VIEW&Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
             ), function(data) {
                 $('div.DashboardSummaries').html(data);
         });

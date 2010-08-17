@@ -463,8 +463,8 @@ return;
       // Define default values for start & end dates
       $Sender->HourStampStart = strtotime('-24 hours');
       $Sender->DayStampStart = strtotime('-1 month'); // Default to 1 month ago
-      $Sender->WeekStampStart = strtotime('-24 weeks'); // Default to 24 weeks ago
-      $Sender->MonthStampStart = strtotime('-24 months'); // Default to 24 months ago
+      $Sender->WeekStampStart = strtotime('-12 weeks'); // Default to 24 weeks ago
+      $Sender->MonthStampStart = strtotime('-12 months'); // Default to 24 months ago
       $Sender->HourDateStart = Gdn_Format::ToDate($Sender->HourStampStart);
       $Sender->DayDateStart = Gdn_Format::ToDate($Sender->DayStampStart);
       $Sender->WeekDateStart = Gdn_Format::ToDate($Sender->WeekStampStart);
