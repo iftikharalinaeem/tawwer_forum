@@ -491,7 +491,7 @@ class StatisticsPlugin extends Gdn_Plugin {
 
       // Define the range boundaries.
       $Database = Gdn::Database();
-      $Data = $Database->SQL()->Select('DateRangeStart')->From('Statistics')->OrderBy('DateRangeStart', 'asc')->Limit(1)->Get()->FirstRow();
+      $Data = $Database->SQL()->Select('DateRangeStart')->From('Statistics')->WhereNotIn('DateRangeStart', array('1975-09-01','1975-09-16'))->OrderBy('DateRangeStart', 'asc')->Limit(1)->Get()->FirstRow();
       $Sender->BoundaryStart = $Data ? $Data->DateRangeStart : $Sender->DateStart;
       $Data = $Database->SQL()->Select('DateRangeEnd')->From('Statistics')->OrderBy('DateRangeEnd', 'desc')->Limit(1)->Get()->FirstRow();
       $Sender->BoundaryEnd = $Data ? $Data->DateRangeEnd : $Sender->DateEnd;
