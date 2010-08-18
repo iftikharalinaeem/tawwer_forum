@@ -287,8 +287,10 @@ function Picker() {
                case 'day': this.MaxRailSize = 90; break;
             }
          } // else PHP gave us a value
-         
-         var Increment = 0; 
+      }
+      
+      if (this.MaxRailSize > 0) {
+         var Increment = 0;
          var WorkingTick = new Date(this.Rail.End.Date);
          var AnchorTick = new Date(this.Rail.End.Date);
          do {
@@ -307,7 +309,6 @@ function Picker() {
          // Catch remainder
          if (Increment)
             this.AddRailPage(WorkingTick, AnchorTick);
-         
       } else {
          this.AddRailPage(AdjustedStartLimit, AdjustedEndLimit);
       }
