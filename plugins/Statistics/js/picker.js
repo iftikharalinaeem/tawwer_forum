@@ -3,6 +3,7 @@ function Picker() {
    Picker.prototype.Attach = function(Options) {
       
       // Load options from supplied options object
+      this.Options = Options;
       this.RangeTarget = $(Options.Range);
       this.Graduations = Options.MaxGraduations || 8;
       this.MaxSelection = Options.MaxSelection || 0;
@@ -85,10 +86,6 @@ function Picker() {
       },this));
       
       this.ConfigureRail(Options.DateStart, Options.DateEnd, Options.Units);
-      
-      var RangeStart = Options.RangeStart || Options.DateStart;
-      var RangeEnd = Options.RangeEnd || Options.DateEnd;
-      this.SetRange(RangeStart, RangeEnd, false, true);
    }
    
    Picker.prototype.Down = function(ClientX) {
@@ -111,7 +108,7 @@ function Picker() {
       var StartPerc = this.HandleStart.position().left;
       if (String(this.HandleStart.css('left')).substring(-1,1) != '%')
          StartPerc = StartPerc / this.RailWidth;
-         
+      
       var StartDeltaMilli = StartPerc * this.Axis.Diff.Milli;
       var StartDate = this.GetStartLimit(new Date(this.Axis.Start.Date.valueOf() + StartDeltaMilli),this.Units);
       var StartShortDate = this.GetStrDate(StartDate);
@@ -326,14 +323,18 @@ function Picker() {
          },this));
       }
       
-      this.SetRailPage(1);
+      this.SetRailPage(1, true);
+      
+      var RangeStart = this.Options.RangeStart || this.Options.DateStart;
+      var RangeEnd = this.Options.RangeEnd || this.Options.DateEnd;
+      this.SetRange(RangeStart, RangeEnd, false, true);
    }
    
    Picker.prototype.AddRailPage = function(StartDate, EndDate) {
       this.Rail.Pages.push({'Start':new Date(StartDate), 'End':new Date(EndDate)});
    }
    
-   Picker.prototype.SetRailPage = function(PageNumber) {
+   Picker.prototype.SetRailPage = function(PageNumber, NoAutoUpdate) {
       var PageIndex = PageNumber - 1;
             
       if (PageIndex < 0 || PageIndex >= this.Rail.Pages.length) return;
@@ -351,8 +352,10 @@ function Picker() {
          this.RailPager.find('div.PageBack').addClass('CannotPageBack');
       else
          this.RailPager.find('div.PageBack').removeClass('CannotPageBack');
-         
-      this.UpdateUI(true);
+      
+      if (NoAutoUpdate != true)
+         this.UpdateUI(true);
+      
    }
    
    Picker.prototype.SetAxis = function(StartDate, EndDate) {
