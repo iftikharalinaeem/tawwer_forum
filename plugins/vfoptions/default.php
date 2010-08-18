@@ -99,7 +99,14 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 			
 		if (C('EnabledPlugins.Signatures'))
 			$Menu->AddLink('Forum', T('Signatures').$New, 'settings/signatures', 'Garden.Settings.Manage');
-   }
+			
+		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Addons'));
+		$Menu->AddLink('Import', T('Import'), 'dashboard/import', 'Garden.Import');
+		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
+   too large to upload directly to this page you can
+   <a href="mailto:support@vanillaforums.com?subject=Importing+to+VanillaForums">contact us</a>
+   to import your data for you.');
+	}
    
    /**
     * If the domain in the config doesn't match that in the url, this will
