@@ -535,11 +535,9 @@ jQuery(document).ready(function($) {
    }
 
    // Draw the graph when the window is loaded.
-   /*
    window.onload = function() {
       getData();
    }
-   */
 
    // Redraw the grpah when the window is resized
    $(window).resize(function() {
