@@ -76,9 +76,9 @@ div.Picker div.SlidePage span {
    display: none;
 }
 div.Picker div.PageBack { background-position: 1px -750px; }
-div.Picker div.CannotPageBack { background-position: 1px -800px; }
+div.Picker div.CannotPageBack { background-position: 1px -800px; cursor: default; }
 div.Picker div.PageForward { background-position: 1px -650px; right: 0; }
-div.Picker div.CannotPageForward { background-position: 1px -700px; right: 0; }
+div.Picker div.CannotPageForward { background-position: 1px -700px; right: 0; cursor: default; }
 div.Picker div.SlidePager div.CannotPage {
    cursor: default;
 }
