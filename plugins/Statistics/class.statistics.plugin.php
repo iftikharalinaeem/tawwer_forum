@@ -260,7 +260,6 @@ class StatisticsPlugin extends Gdn_Plugin {
          $StatQuery->Where('IndexQualifier', $Qualifier);
       
       $StatData = $StatQuery->Get();
-      
       $StatResults = array();
       if ($StatData->NumRows()) {
          $DateInterval = NULL;
@@ -297,16 +296,17 @@ class StatisticsPlugin extends Gdn_Plugin {
             $DateLast = $DateInterval;
          }
       }
+      asort($StatResults);
       
       if (!sizeof($StatResults) || $DateInterval < $DateEnd) {
          $WorkingDate = (sizeof($StatResults)) ? $DateInterval : $DateStart;
          do {
-            
-            if (!array_key_exists($WorkingDate, $StatResults))
+            if (!array_key_exists($WorkingDate, $StatResults)) {
                $StatResults[$WorkingDate] = array(
                   'Date'      => $WorkingDate,
                   'Value'     => $NullValue
                );
+            }
             
             $WorkingDate = self::NextDate($WorkingDate, $Resolution);
             $Continue = ($WorkingDate <= $DateEnd);
@@ -320,7 +320,10 @@ class StatisticsPlugin extends Gdn_Plugin {
       if ($DateRaw === FALSE)
          throw new Exception("Invalid range start date '{$CurrentDate}' while calculating next date");
       
-      $NextDateRaw = strtotime("+1 {$Resolution}", $DateRaw);
+      $TimeAdvance = "+1 {$Resolution}";
+      if ($Resolution == self::RESOLUTION_WEEK)
+         $TimeAdvance = "+8 days";
+      $NextDateRaw = strtotime($TimeAdvance, $DateRaw);
       return self::DateFormatByResolution($NextDateRaw, $Resolution);
    }
    
@@ -489,7 +492,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->DateStart = Gdn_Format::ToDate($Sender->StampStart);
       $Sender->DateEnd = Gdn_Format::ToDate($Sender->StampEnd);
       $Sender->DateRange = $Sender->DateStart . ' - ' . $Sender->DateEnd;
-
+      
       // Define the range boundaries.
       $Database = Gdn::Database();
       $Data = $Database->SQL()->Select('DateRangeStart')->From('Statistics')->Where('DateRangeStart >', '1975-09-17')->OrderBy('DateRangeStart', 'asc')->Limit(1)->Get()->FirstRow();
@@ -504,7 +507,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       $CommentData = StatisticsPlugin::GetDataRange('comments', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
       $DiscussionData = StatisticsPlugin::GetDataRange('discussions', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
       $PageViewData = StatisticsPlugin::GetDataRange('pageviews', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
-
+      
       // Build a single array that contains all of the data
       $Data = array(
          'Dates' => array(),
@@ -566,7 +569,7 @@ class StatisticsPlugin extends Gdn_Plugin {
          ->Engine('InnoDB')
          ->Column('DateRangeStart', 'datetime', FALSE, 'unique')
          ->Column('DateRangeEnd', 'datetime', FALSE, 'unique')
-         ->Column('DateRangeType', array('hour','day','month'), FALSE, 'unique')
+         ->Column('DateRangeType', array('hour','day','week','month'), FALSE, 'unique')
          ->Column('IndexType', 'varchar(32)', FALSE, 'unique')
          ->Column('IndexQualifier', 'varchar(32)', NULL, 'unique')
          ->Column('IndexValue', 'int', NULL)
