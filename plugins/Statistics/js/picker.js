@@ -279,16 +279,16 @@ function Picker() {
       this.Rail.Diff.Sec = this.Rail.Diff.Milli / 1000;
       this.Rail.Diff.Day = this.Rail.Diff.Sec / (3600*24);
       
-      if (this.MaxPageSize != 0) {
-         if (this.MaxPageSize == -1) { // JS decides
-            switch (this.Units) {
-               case 'month': this.MaxPageSize = 48; break;
-               case 'week': this.MaxPageSize = 52; break;
-               case 'day': this.MaxPageSize = 90; break;
-            }
-         } // else PHP gave us a value
-         
-         var Increment = 0; 
+      if (this.MaxPageSize == -1) { // JS decides
+         switch (this.Units) {
+            case 'month': this.MaxPageSize = 0; break;
+            case 'week': this.MaxPageSize = 52; break;
+            case 'day': this.MaxPageSize = 90; break;
+         }
+      }
+      
+      if (this.MaxPageSize > 0) {
+         var Increment = 0;
          var WorkingTick = new Date(this.Rail.End.Date);
          var AnchorTick = new Date(this.Rail.End.Date);
          do {
@@ -307,7 +307,6 @@ function Picker() {
          // Catch remainder
          if (Increment)
             this.AddRailPage(WorkingTick, AnchorTick);
-         
       } else {
          this.AddRailPage(AdjustedStartLimit, AdjustedEndLimit);
       }
