@@ -42,8 +42,8 @@ div.Picker div.SliderHandle {
    font-size: 9px;
    text-align: center;
    height: 52px;
-   width: 56px;
-   margin-left: -28px; /* half the width of the handle */
+   width: 60px;
+   margin-left: -30px; /* half the width of the handle */
    padding: 2px 0 0;
    background: url('daterange-sprites.png') 0 -550px no-repeat transparent;
    cursor: pointer;
@@ -55,44 +55,39 @@ div.Picker {
    padding: 10px 20px;
    border-top: 1px solid #8BC1DE;
 }
-div.Picker div.RailContainer {
-   width: 800px;
-   position: relative;
-   height: 100%;
-   overflow: hidden;
-   margin: 0 auto;
+div.Picker div.SlidePager {
+   position: absolute;
+   width: 780px;
+   top: 30px;
+   margin-left: -40px;
+   background: yellow;
 }
-div.Picker div.RailPager {
-   visibility: hidden;
-}
-div.Picker div.RailPage {
-   width: 30px;
-   height: 19px;
-   margin-top: 28px;
-   margin-bottom: 22px;
-   font-weight: bold;
-   font-size: 20px;
-   z-index: 80;
+div.Picker div.SlidePage {
+   position: absolute;
    text-align: center;
+   z-index: 150;
+   width: 18px;
+   height: 18px;
    cursor: pointer;
+   background-image: url('daterange-sprites.png');
+   background-repeat: no-repeat;
 }
-div.Picker div.PageBack {
-   margin-right: 20px;
-   float: left;
+div.Picker div.SlidePage span {
+   display: none;
 }
-div.Picker div.PageForward {
-   margin-left: 20px;
-   float: right;
-}
-div.Picker div.RailPager div.CannotPage {
-   color: grey;
+div.Picker div.PageBack { background-position: 1px -750px; }
+div.Picker div.CannotPageBack { background-position: 1px -800px; }
+div.Picker div.PageForward { background-position: 1px -650px; right: 0; }
+div.Picker div.CannotPageForward { background-position: 1px -700px; right: 0; }
+div.Picker div.SlidePager div.CannotPage {
    cursor: default;
 }
 div.Picker div.Slider {
-   float: right;
    text-align: center;
    position: relative;
    width: 700px;
+   margin: 0 auto;
+   cursor: pointer;
 }
 /* Bump the handles back half their width so percentages can be used to hit the
 beginning (0%) and end (100%) of the slider. */
