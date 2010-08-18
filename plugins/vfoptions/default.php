@@ -100,7 +100,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		if (C('EnabledPlugins.Signatures'))
 			$Menu->AddLink('Forum', T('Signatures').$New, 'settings/signatures', 'Garden.Settings.Manage');
 			
-		$Menu->AddItem('Import', T('Import'), FALSE, array('class' => 'Addons'));
+		$Menu->AddItem('Import', T('Import').$New, FALSE, array('class' => 'Addons'));
 		$Menu->AddLink('Import', T('Import'), 'dashboard/import', 'Garden.Import');
 		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
    too large to upload directly to this page you can
