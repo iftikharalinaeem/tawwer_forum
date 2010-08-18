@@ -6,7 +6,7 @@ function Picker() {
       this.RangeTarget = $(Options.Range);
       this.Graduations = Options.MaxGraduations || 8;
       this.MaxSelection = Options.MaxSelection || 0;
-      this.MaxRailSize = Options.MaxRailSize || 0;
+      this.MaxPageSize = Options.MaxPageSize || 0;
       this.Nudge = Options.Nudge || true;
       
       this.RangeTarget.after('<a class="RangeToggle" href="#">' + this.RangeTarget.val() + '</a>');
@@ -279,12 +279,12 @@ function Picker() {
       this.Rail.Diff.Sec = this.Rail.Diff.Milli / 1000;
       this.Rail.Diff.Day = this.Rail.Diff.Sec / (3600*24);
       
-      if (this.MaxRailSize != 0) {
-         if (this.MaxRailSize == -1) { // JS decides
+      if (this.MaxPageSize != 0) {
+         if (this.MaxPageSize == -1) { // JS decides
             switch (this.Units) {
-               case 'month': this.MaxRailSize = 48; break;
-               case 'week': this.MaxRailSize = 52; break;
-               case 'day': this.MaxRailSize = 90; break;
+               case 'month': this.MaxPageSize = 48; break;
+               case 'week': this.MaxPageSize = 52; break;
+               case 'day': this.MaxPageSize = 90; break;
             }
          } // else PHP gave us a value
          
@@ -297,7 +297,7 @@ function Picker() {
                WorkingTick = IterateTick;
                
             Increment++;
-            if (Increment % this.MaxRailSize == 0) {
+            if (Increment % this.MaxPageSize == 0) {
                Increment = 0;
                this.AddRailPage(WorkingTick, AnchorTick);
                AnchorTick = new Date(WorkingTick);
@@ -312,12 +312,12 @@ function Picker() {
          this.AddRailPage(AdjustedStartLimit, AdjustedEndLimit);
       }
       
+      this.RailPager = $('div.Picker div.SlidePager');
       if (this.Rail.Pages.length > 1) {
          // Do Pagination
-         this.RailPager = $('div.Picker div.RailPager');
-         this.RailPager.css('visibility', 'visible');
+         this.RailPager.show();
          
-         this.RailPager.find('div.RailPage').bind('click', jQuery.proxy(function(e){
+         this.RailPager.find('div.SlidePage').bind('click', jQuery.proxy(function(e){
             if ($(e.target).hasClass('PageBack'))
                this.SetRailPage(this.Rail.Page+1);
             else
@@ -344,14 +344,14 @@ function Picker() {
       this.SetAxis(Page.Start, Page.End);
       
       if (PageIndex == 0)
-         this.RailPager.find('div.PageForward').addClass('CannotPage');
+         this.RailPager.find('div.PageForward').addClass('CannotPageForward');
       else
-         this.RailPager.find('div.PageForward').removeClass('CannotPage');
+         this.RailPager.find('div.PageForward').removeClass('CannotPageForward');
          
       if (PageNumber >= this.Rail.Pages.length)
-         this.RailPager.find('div.PageBack').addClass('CannotPage');
+         this.RailPager.find('div.PageBack').addClass('CannotPageBack');
       else
-         this.RailPager.find('div.PageBack').removeClass('CannotPage');
+         this.RailPager.find('div.PageBack').removeClass('CannotPageBack');
          
       this.UpdateUI(true);
    }
@@ -524,20 +524,18 @@ function Picker() {
    
    Picker.prototype.Settings = {
       SliderHtml: '\
-<div class="RailContainer"> \
-   <div class="RailPager"> \
-      <div class="RailPage PageBack">&laquo;</div> \
-      <div class="RailPage PageForward">&raquo;</div> \
+<div class="Slider"> \
+   <div class="SlidePager"> \
+      <div class="SlidePage PageBack"><span>&laquo;</span></div> \
+      <div class="SlidePage PageForward"><span>&raquo;</span></div> \
    </div> \
-   <div class="Slider"> \
-      <div class="SelectedRange"></div> \
-      <div class="HandleContainer"> \
-         <div class="SliderHandle HandleStart"></div> \
-         <div class="SliderHandle HandleEnd"></div> \
-      </div> \
-      <div class="Range RangeStart"></div><div class="Range RangeMid"></div><div class="Range RangeEnd"></div> \
-      <div class="SliderDates"></div> \
+   <div class="SelectedRange"></div> \
+   <div class="HandleContainer"> \
+      <div class="SliderHandle HandleStart"></div> \
+      <div class="SliderHandle HandleEnd"></div> \
    </div> \
+   <div class="Range RangeStart"></div><div class="Range RangeMid"></div><div class="Range RangeEnd"></div> \
+   <div class="SliderDates"></div> \
 </div> \
 <hr /> \
 <div class="InputRange"> \
