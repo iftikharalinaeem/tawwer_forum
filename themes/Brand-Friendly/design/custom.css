@@ -1,0 +1,205 @@
+#Body {
+	width: 960px;
+}
+#Body {
+	margin: 15px auto;
+}
+
+body #Head h1 {
+	padding:10px 7px 10px 0;
+}
+
+div#Body div.Wrapper {
+	float:left;
+	width:940px;
+	padding: 20px;
+	margin-bottom:20px;
+	border:1px solid #ccc;
+	-moz-border-radius:5px;
+		-webkit-border-radius:5px;
+			border-radius:5px;
+
+}
+#Content {
+	position: relative;
+	width: 670px;
+}
+body.Profile #Content {
+	float:right;
+	margin:0 0 40px 20px;
+	width:670px;
+}
+#Panel {
+	padding-top:12px;
+	position: relative;
+}
+body.Discussion a.Bookmark {
+	margin:2px 6px 6px 8px;
+}
+div#MessageForm,
+div.MessageForm,
+div.Tabs {
+	background: none;
+	border-bottom:1px solid #ccc;
+	padding: 0 5px; 
+}
+div#MessageForm,
+div.MessageForm {
+	background: #eee;
+	padding: 8px;
+}
+
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   border: 1px solid #ccc;
+	border-bottom: 0;
+   border-radius: 3px 3px 0 0;
+   -moz-border-radius: 3px 3px 0 0;
+   -webkit-border-radius: 3px 3px 0 0;
+   background: #eee;
+   color: #333;
+   padding: 6px 10px;
+	line-height: 1;
+	display: inline-block;
+}
+a.Active, div.Tabs li.Active a {
+	background:#fff none repeat scroll 0 0;
+	color:#333;
+	padding-top:7px;
+	position:relative;
+	top:1px;
+}
+
+div.HeadingTabs li a,
+div.HeadingTabs li a:link,
+div.HeadingTabs li a:hover,
+div.HeadingTabs li a:active,
+div.HeadingTabs li a:visited,
+div.MessageForm a.Cancel,
+div.MessageForm a.Cancel:link,
+div.MessageForm a.Cancel:hover,
+div.MessageForm a.Cancel:active,
+div.MessageForm a.Cancel:visited,
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited {
+   border: 1px solid #ccc;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #eee;
+   color: #333;
+   padding: 6px 10px;
+	line-height: 1;
+	display: inline-block;
+}
+div.MessageForm a.Back,
+div.MessageForm a.Back:link,
+div.MessageForm a.Back:hover,
+div.MessageForm a.Back:active,
+div.MessageForm a.Back:visited {
+	color: #333;
+	background: none;
+	border: none;
+	padding: 4px 2px;
+}
+
+#DiscussionForm form {
+
+	background:#fff none repeat scroll 0 0;
+	border:none;
+	margin:0;
+	padding:20px;
+}
+
+#DiscussionForm h2 {
+	color:#333;
+	
+}
+
+.Mine {
+	background:#fff none repeat scroll 0 0;
+}
+div.Box {
+	background:#fff none repeat scroll 0 0;
+	color:#888888;
+	margin:0 0 10px;
+	padding:6px 10px;
+}
+div.Box dl {
+	background:#eee;
+	border-bottom:1px solid #ccc;
+	border-top:1px solid #ccc;
+}
+#Panel input.InputBox {
+	margin:0 5px 10px 0;
+	width:200px;
+}
+ul.PanelInfo {
+	border-bottom:0 none;
+	border-top:1px solid #eee;
+}
+
+ul.PanelInfo li.Active {
+	border-bottom:1px solid #ccc;
+}
+
+ul.PanelInfo li {
+	background:#eee none repeat scroll 0 0;
+	border-bottom:1px solid #ccc;
+	padding:2px 4px;
+	text-align:right;
+}
+body.Profile ul.PanelInfo {
+	border:none;
+}
+body.Profile ul.PanelInfo li {
+	background:#fff;
+}
+input.DateBox, input.InputBox, input.SmallInput, textarea {
+	border:1px solid #ccc;
+
+}
+div.CommentForm textarea {
+	height:100px;
+	margin:0 0 6px;
+	min-height:100px;
+	width:645px;
+}
+
+div#Foot {
+	background:#eee none repeat scroll 0 0;
+	border-bottom:1px solid #ccc;
+	border-top:1px solid #ccc;
+	color:#666;
+	margin:30px 0 0;
+	padding:0;
+}
+
+div#Foot div {
+	border:0 none;
+	margin:0 auto;
+	padding:12px 0 10px;
+}
+#Foot div {
+	margin:20px auto 0;
+	padding:6px 0;
+	text-align:left;
+	width:960px;
+}
+div#Foot div, div#Foot div a {
+	color:#333;
+}
+div#Foot div, div#Foot div a:hover {
+	color:#999;
+}
