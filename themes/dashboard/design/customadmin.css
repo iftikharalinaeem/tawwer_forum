@@ -12,7 +12,7 @@ body {
 }
 #Head div.User a,
 #Head h1 a span {
-	background: #01518d;
+	background: url('images/dashboard-bg.png') -480px -191px repeat-x #01518d;
 	border: 1px solid #002b57;
 	color: #fff;
 	text-shadow:0 1px 0 #000;
@@ -25,23 +25,34 @@ body {
 }
 #Head div.User a:hover,
 #Head h1 a span:hover {
-	background: #003e7b;
+	background-position: -480px -191px;
+	box-shadow: 0 0 1px #0066C8;
+	-moz-box-shadow: 0 0 1px #0066C8;
+	-webkit-box-shadow: 0 0 1px #0066C8;
 }
 #Head div.User a.Profile,
-#Head h1 a span {
-	background: url('images/dashboard-sprites.png') top left no-repeat #01518d;
-	padding: 4px 6px 4px 22px;
+#Head div.User a.Profile:hover {
+	background-position: -5px -191px;
+	padding: 4px 6px 4px 24px;
 }
-#Head div.User a.Profile:hover,
-#Head h1 a span:hover {
-	background: url('images/dashboard-sprites.png') top left no-repeat #003e7b;
-}
-#Head div.User a.Profile,
-#Head div.User a.Profile:hover { background-position: 4px -595px; }
 #Head h1 a span,
 #Head h1 a span:hover {
-	padding: 4px 6px 4px 20px;
-	background-position: 6px -694px;
+	background-position: -454px -191px;
+	padding: 4px 6px 4px 22px;
+}
+#Head div.User a:focus { background-position: -480px -294px; }
+#Head div.User a.Profile:focus { background-position: -5px -294px; }
+#Head h1 a:focus span { background-position: -454px -294px; }
+#Head div.User a:focus,
+#Head h1 a:focus span {
+	box-shadow: 0 0 1px #6fa3c9;
+	-moz-box-shadow: 0 1px 0 #6fa3c9;
+	-webkit-box-shadow: 0 0 1px #6fa3c9;
+}
+#Head div.User a span {
+	background: #003671;
+	border: none;
+	padding:0 4px;
 }
 #Body {
 	background: #fff;
@@ -201,6 +212,9 @@ table {
 	border-left: none;
 	border-right: none;
 	margin: 0;
+}
+.Column table {
+	border: none;
 }
 table.AltRows tr.Disabled th,
 table.AltRows tr.Disabled td,
@@ -369,12 +383,12 @@ a.Close span {
 	padding: 0;
 	margin: 0;
 }
-#Panel div.Box h4 { background: url('images/dashboard-sprites.png') 170px 4px no-repeat; }
+#Panel div.Box h4 { background: url('images/dashboard-sprites.png') 166px -145px no-repeat; }
 #Panel div.Dashboard h4 { background-position: 166px 7px; }
 #Panel div.Appearance h4 { background-position: 166px -492px; }
 #Panel div.Users h4 { background-position: 162px -292px; }
-#Panel div.Forum h4 { background-position: 164px -392px; }
-#Panel div.Addons h4 { background-position: 166px -192px; }
+#Panel div.Forum h4 { background-position: 167px -442px; }
+#Panel div.Addons h4 { background-position: 166px -240px; }
 #Panel div.SiteSettings h4 { background-position: 164px -92px; }
 #Panel div.Box h4 a,
 ul.PanelInfo li a {
@@ -394,6 +408,15 @@ ul.PanelInfo {
 	font-size: 14px;
 	font-weight: bold;
 	padding: 10px;
+}
+span.New {
+	box-shadow: 0 1px 2px #333;
+	-moz-box-shadow: 0 1px 2px #333;
+	-webkit-box-shadow: 0 1px 2px #333;
+	padding:0px 2px;
+	position: relative;
+	top: -4px;
+	right: auto;
 }
 #Foot {
 	background: url('images/dashboard-bg.png') center -96px repeat-x #014687;

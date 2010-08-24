@@ -10,3 +10,6 @@ div.Info span {
    display: block;
    padding: 20px 0 6px;
 }
+#Content table.SplitConfiguration td.VanillaConfig form ul {
+   padding:0;
+}

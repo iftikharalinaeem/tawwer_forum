@@ -20,7 +20,7 @@ $PluginInfo['ReverseCommentSort'] = array(
 
 class ReverseCommentSortPlugin extends Gdn_Plugin {
 
-	// 
+	// Reverse the comment sort order
    public function CommentModel_AfterConstruct_Handler($CommentModel) {
 	   $CommentModel->OrderBy('c.DateInserted desc');
    }
@@ -33,6 +33,47 @@ class ReverseCommentSortPlugin extends Gdn_Plugin {
 			if ($Comment)
 				$Sender->RedirectUrl = Gdn::Request()->Url('/discussion/comment/'.$Comment->CommentID.'/#Comment_'.$Comment->CommentID, TRUE);
 		}
+	}
+
+	/**
+	 * Insert comment form after the first comment.
+	 */
+	public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
+		$Type = GetValue('Type', $Sender->EventArguments, 'Comment');
+		if ($Type == 'Comment' && !GetValue('CommentFormWritten', $Sender)) {
+			echo '<style type="text/css">
+			div.CommentForm,
+			#Content div.Foot,
+			div.CommentForm div.Tabs {
+				display: none;
+			}
+			ul.MessageList div.CommentForm {
+				display: block;
+			}
+			</style>
+			<li>';
+			if ($Sender->Discussion->Closed == '1') {
+		   ?>
+<div class="Foot Closed">
+	<div class="Note Closed"><?php echo T('This discussion has been closed.'); ?></div>
+	<?php echo Anchor(T('&larr; All Discussions'), 'discussions', 'TabLink'); ?>
+</div>
+<?php
+			} else if (Gdn::Session()->IsValid()) { 
+				echo $Sender->FetchView('comment', 'post');
+			} else {
+?>
+<div class="Foot">
+	<?php
+	echo Anchor(T('Add a Comment'), Gdn::Authenticator()->SignInUrl($Sender->SelfUrl), 'TabLink'.(C('Garden.SignIn.Popup') ? ' SignInPopup' : ''));
+	?> 
+</div>
+<?php 
+			}
+			echo '</li>';
+			
+	      $Sender->CommentFormWritten = TRUE;
+		}		
 	}
 
 	/**

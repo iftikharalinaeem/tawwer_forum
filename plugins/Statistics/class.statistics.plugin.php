@@ -18,20 +18,26 @@ $PluginInfo['Statistics'] = array(
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
+   'Author' => "Tim Gunter, Mark O'Sullivan",
+   'AuthorEmail' => 'support@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
 class StatisticsPlugin extends Gdn_Plugin {
    
-   /* const RESOLUTION_HOUR = 'hour'; */
+   const RESOLUTION_HOUR = 'hour';
    const RESOLUTION_DAY = 'day';
    const RESOLUTION_WEEK = 'week';
    const RESOLUTION_MONTH = 'month';
    
    const FILL_ZERO = 'zero';
    const FILL_NULL = 'null';
+   
+   // Record a pageview if loading a full page.
+   public function Base_Render_Before($Sender) {
+      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
+         $this->TrackEvent('pageviews');
+   }
    
    public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
       $LinkText = T('Statistics');
@@ -79,7 +85,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       // Figure out where to stop searching
       $EarliestData = Gdn::SQL()->Select('DateRangeStart', 'MIN', 'EarliestDate')
          ->From('Statistics')
-         ->Where('DateRangeType', self::RESOLUTION_DAY) //self::RESOLUTION_HOUR)
+         ->Where('DateRangeType', self::RESOLUTION_HOUR)
          ->Where('IndexType', $TrackType)
          ->Get();
          
@@ -135,7 +141,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       if (!C('Plugins.Statistics.Enabled')) return;
       
       $Date = is_null($Date) ? time() : $Date;
-      // self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_HOUR);
+      self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_HOUR);
       self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_DAY);
       self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_WEEK);
       self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_MONTH);
@@ -164,13 +170,14 @@ class StatisticsPlugin extends Gdn_Plugin {
          throw new Exception("Invalid anchor date '{$Date}' used when attempting to track '{$Type}:{$Qualifier}'");
       
       switch ($Range) {
-         /*
          case self::RESOLUTION_HOUR:
             $DateStart = date('Y-m-d H:00:00',$DateRaw);
             $DateEnd = date('Y-m-d H:00:00',$DateRaw);
             break;
-         */
          case self::RESOLUTION_WEEK:
+            $DateStart = date('Y-m-d',strtotime('last sunday',$DateRaw));
+            $DateEnd = date('Y-m-d',strtotime('this saturday',$DateRaw));
+            break;
          case self::RESOLUTION_DAY:
             $DateStart = date('Y-m-d',$DateRaw);
             $DateEnd = date('Y-m-d',$DateRaw);
@@ -217,13 +224,14 @@ class StatisticsPlugin extends Gdn_Plugin {
          throw new Exception("Invalid range end date '{$RangeEnd}' used when attempting to get data for '{$Type}:{$Qualifier}'");
          
       switch ($Resolution) {
-         /*
          case self::RESOLUTION_HOUR:
             $DateStart = date('Y-m-d H:00:00',$RangeStartRaw);
             $DateEnd = date('Y-m-d H:00:00',$RangeEndRaw);
             break;
-         */
          case self::RESOLUTION_WEEK:
+            $DateStart = date('Y-m-d',strtotime('last sunday',$RangeStartRaw));
+            $DateEnd = date('Y-m-d',strtotime('this saturday',$RangeEndRaw));
+            break;
          case self::RESOLUTION_DAY:
             $DateStart = date('Y-m-d',$RangeStartRaw);
             $DateEnd = date('Y-m-d',$RangeEndRaw);
@@ -252,7 +260,6 @@ class StatisticsPlugin extends Gdn_Plugin {
          $StatQuery->Where('IndexQualifier', $Qualifier);
       
       $StatData = $StatQuery->Get();
-      
       $StatResults = array();
       if ($StatData->NumRows()) {
          $DateInterval = NULL;
@@ -289,16 +296,17 @@ class StatisticsPlugin extends Gdn_Plugin {
             $DateLast = $DateInterval;
          }
       }
+      asort($StatResults);
       
       if (!sizeof($StatResults) || $DateInterval < $DateEnd) {
          $WorkingDate = (sizeof($StatResults)) ? $DateInterval : $DateStart;
          do {
-            
-            if (!array_key_exists($WorkingDate, $StatResults))
+            if (!array_key_exists($WorkingDate, $StatResults)) {
                $StatResults[$WorkingDate] = array(
                   'Date'      => $WorkingDate,
                   'Value'     => $NullValue
                );
+            }
             
             $WorkingDate = self::NextDate($WorkingDate, $Resolution);
             $Continue = ($WorkingDate <= $DateEnd);
@@ -312,7 +320,10 @@ class StatisticsPlugin extends Gdn_Plugin {
       if ($DateRaw === FALSE)
          throw new Exception("Invalid range start date '{$CurrentDate}' while calculating next date");
       
-      $NextDateRaw = strtotime("+1 {$Resolution}", $DateRaw);
+      $TimeAdvance = "+1 {$Resolution}";
+      if ($Resolution == self::RESOLUTION_WEEK)
+         $TimeAdvance = "+8 days";
+      $NextDateRaw = strtotime($TimeAdvance, $DateRaw);
       return self::DateFormatByResolution($NextDateRaw, $Resolution);
    }
    
@@ -323,15 +334,12 @@ class StatisticsPlugin extends Gdn_Plugin {
          throw new Exception("Invalid date '{$Date}', unable to convert to epoch");
       
       switch ($Resolution) {
-         /*
          case self::RESOLUTION_HOUR:
             return date('Y-m-d H:00:00',$DateRaw);
-         */
-         
          case self::RESOLUTION_WEEK:
+            return date('Y-m-d',strtotime('last sunday',$DateRaw));
          case self::RESOLUTION_DAY:
             return date('Y-m-d',$DateRaw);
-            
          case self::RESOLUTION_MONTH:
             return date('Y-m-01',$DateRaw);
             
@@ -360,11 +368,14 @@ class StatisticsPlugin extends Gdn_Plugin {
     * Override the default index method of the settings controller in the
     * dashboard application to render new statistics.
     */
-   public function SettingsController_Index_Create(&$Sender) {
+   public function SettingsController_Index_Create($Sender) {
+      // Load javascript & css, check permissions, and load side menu for this page.
       $Sender->AddJsFile('settings.js');
       $Sender->AddJsFile('plugins/Statistics/js/raphael.js');
       $Sender->AddJsFile('plugins/Statistics/js/graph.js');
+      $Sender->AddJsFile('plugins/Statistics/js/picker.js');
       $Sender->AddCSSFile('plugins/Statistics/design/graph.css');
+      $Sender->AddCSSFile('plugins/Statistics/design/picker.css');
       $Sender->Title(T('Dashboard'));
       $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
@@ -382,42 +393,170 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
       $Sender->AddSideMenu('dashboard/settings');
       
+      $this->ConfigureRange($Sender);
       
-      // Load data for the graph
+      // Render the custom dashboard view
+      $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboard.php');
+   }
+   
+   public function SettingsController_DashboardSummaries_Create($Sender) {
+      // Load javascript & css, check permissions, and load side menu for this page.
+      $Sender->AddJsFile('settings.js');
+      $Sender->Title(T('Dashboard Summaries'));
+      $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Applications.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Applicants.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
+      $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
+      $Sender->FireEvent('DefineAdminPermissions');
+      $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
+      $Sender->AddSideMenu('dashboard/settings');
+      
+      $this->ConfigureRange($Sender);
+
+      $UserModel = new UserModel();
+      $Sender->SetData('DiscussionData', $UserModel->SQL
+         ->Select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments')
+         ->From('Discussion d')
+         ->Where('d.DateLastComment >=', $Sender->DateStart)
+         ->Where('d.DateLastComment <=', $Sender->DateEnd)
+         ->OrderBy('d.CountComments', 'desc')
+         ->OrderBy('d.CountViews', 'desc')
+         ->OrderBy('d.CountBookmarks', 'desc')
+         ->Limit(10, 0)
+         ->Get()
+      );
+      
+      $Sender->SetData('UserData', $UserModel->SQL
+         ->Select('u.UserID, u.Name')
+         ->Select('c.CommentID', 'count', 'CountComments')
+         ->From('User u')
+         ->Join('Comment c', 'u.UserID = c.InsertUserID', 'inner')
+         ->GroupBy('u.UserID, u.Name')
+         ->Where('c.DateInserted >=', $Sender->DateStart)
+         ->Where('c.DateInserted <=', $Sender->DateEnd)
+         ->OrderBy('CountComments', 'desc')
+         ->Limit(10, 0)
+         ->Get()
+      );
+      
+      // Render the custom dashboard view
+      $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboardsummaries.php');
+   }
+
+   private function ConfigureRange($Sender) {
+      // Grab the range resolution from the url or form. Default to "day" range.
       $Sender->Range = GetIncomingValue('Range');
       if (!in_array($Sender->Range, array(
+            StatisticsPlugin::RESOLUTION_HOUR,
             StatisticsPlugin::RESOLUTION_DAY,
             StatisticsPlugin::RESOLUTION_WEEK,
             StatisticsPlugin::RESOLUTION_MONTH)))
          $Sender->Range = StatisticsPlugin::RESOLUTION_DAY;
          
-      $Sender->StampStart = Gdn_Format::ToTimestamp(GetIncomingValue('DateStart'));
-      $Sender->StampEnd = Gdn_Format::ToTimestamp(GetIncomingValue('DateEnd'));
+      // Define default values for start & end dates
+      $Sender->HourStampStart = strtotime('24 hours ago');
+      $Sender->DayStampStart = strtotime('1 month ago'); // Default to 1 month ago
+      $Sender->WeekStampStart = strtotime('12 weeks ago'); // Default to 24 weeks ago
+      $Sender->MonthStampStart = strtotime('12 months ago'); // Default to 24 months ago
+      
+      $Sender->HourDateStart = Gdn_Format::ToDate($Sender->HourStampStart);
+      $Sender->DayDateStart = Gdn_Format::ToDate($Sender->DayStampStart);
+      $Sender->WeekDateStart = Gdn_Format::ToDate($Sender->WeekStampStart);
+      $Sender->MonthDateStart = Gdn_Format::ToDate($Sender->MonthStampStart);
+      
+      // Validate that any values coming from the url or form are valid
+      $Sender->DateRange = GetIncomingValue('DateRange');
+      $DateRangeParts = explode('-', $Sender->DateRange);
+      $Sender->StampStart = strtotime(GetValue(0, $DateRangeParts));
+      $Sender->StampEnd = strtotime(GetValue(1, $DateRangeParts));
       if (!$Sender->StampEnd)
          $Sender->StampEnd = time();
          
-      // If no date was provided...
+      // If no date was provided, or the provided values were invalid, use defaults
       if (!$Sender->StampStart) {
          $Sender->StampEnd = time();
-         // Default to 30 days ago
-         if ($Sender->Range == 'day') $Sender->StampStart = strtotime('-30 days');
-         // Default to 16 weeks ago
-         if ($Sender->Range == 'week') $Sender->StampStart = strtotime('-16 weeks');
-         // Default to 24 months ago
-         if ($Sender->Range == 'month') $Sender->StampStart = strtotime('-24 months');
+         if ($Sender->Range == 'day') $Sender->StampStart = $Sender->DayStampStart;
+         if ($Sender->Range == 'week') $Sender->StampStart = $Sender->WeekStampStart;
+         if ($Sender->Range == 'month') $Sender->StampStart = $Sender->MonthStampStart;
       }
+      
+      // Assign the variables used in the page with the validated values.
       $Sender->DateStart = Gdn_Format::ToDate($Sender->StampStart);
       $Sender->DateEnd = Gdn_Format::ToDate($Sender->StampEnd);
+      $Sender->DateRange = $Sender->DateStart . ' - ' . $Sender->DateEnd;
       
-      $Sender->SetData('UserData', StatisticsPlugin::GetDataRange('users', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
-      $Sender->SetData('CommentData', StatisticsPlugin::GetDataRange('comments', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
-      $Sender->SetData('DiscussionData', StatisticsPlugin::GetDataRange('discussions', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd));
-      $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboard.php');
+      // Define the range boundaries.
+      $Database = Gdn::Database();
+      $Data = $Database->SQL()->Select('DateRangeStart')->From('Statistics')->Where('DateRangeStart >', '1975-09-17')->OrderBy('DateRangeStart', 'asc')->Limit(1)->Get()->FirstRow();
+      $Sender->BoundaryStart = Gdn_Format::Date($Data ? $Data->DateRangeStart : $Sender->DateStart, '%Y-%m-%d');
+      $Data = $Database->SQL()->Select('DateRangeEnd')->From('Statistics')->Where('DateRangeStart >', '1975-09-17')->OrderBy('DateRangeEnd', 'desc')->Limit(1)->Get()->FirstRow();
+      $Sender->BoundaryEnd = Gdn_Format::Date($Data ? $Data->DateRangeEnd : $Sender->DateEnd, '%Y-%m-%d');
+   }
+   
+   private function GetData($Sender) {
+      // Retrieve associated data for graph
+      $UserData = StatisticsPlugin::GetDataRange('registrations', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
+      $CommentData = StatisticsPlugin::GetDataRange('comments', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
+      $DiscussionData = StatisticsPlugin::GetDataRange('discussions', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
+      $PageViewData = StatisticsPlugin::GetDataRange('pageviews', NULL, $Sender->Range, $Sender->DateStart, $Sender->DateEnd);
+      
+      // Build a single array that contains all of the data
+      $Data = array(
+         'Dates' => array(),
+         'Page Views' => array(),
+         'Users' => array(),
+         'Discussions' => array(),
+         'Comments' => array()
+      );
+      foreach ($UserData as $Date => $Value) {
+         $Data['Dates'][] = date(date('Y', Gdn_Format::ToTimestamp($Date)) < date('Y') ? 'M j, Y' : 'M j', strtotime($Date));
+         $Data['Page Views'][] = $PageViewData[$Date]['Value'];
+         $Data['Users'][] = $Value['Value'];
+         $Data['Discussions'][] = $DiscussionData[$Date]['Value'];
+         $Data['Comments'][] = $CommentData[$Date]['Value'];
+      }
+      return $Data;
+   }
+   
+   public function SettingsController_LoadStats_Create($Sender) {
+      $this->ConfigureRange($Sender);
+      echo json_encode($this->GetData($Sender));
+      // Make sure the database connection is closed before exiting.
+      Gdn::Database()->CloseConnection();
+      exit();
+   }
+   
+   /**
+    * Get the default starting date for the specified range resolution.
+    * @param object $Sender The controller being attached to.
+    * @param string $Range The range resolution to get the default start date for.
+    */
+   public static function GetDateStart($Sender, $Range) {
+      if ($Range == StatisticsPlugin::RESOLUTION_HOUR)
+         return $Sender->HourDateStart;
+      else if ($Range == StatisticsPlugin::RESOLUTION_DAY)
+         return $Sender->DayDateStart;
+      else if ($Range == StatisticsPlugin::RESOLUTION_WEEK)
+         return $Sender->WeekDateStart;
+      else if ($Range == StatisticsPlugin::RESOLUTION_MONTH) {
+         return $Sender->MonthDateStart;
+      } else {
+         return $Sender->DateStart;
+      }
    }
    
    public function Setup() {
       $this->Structure();
       $this->_RegisterTrackedItem(array(
+         'pageviews'       => 'none',
          'comments'        => 'none',
          'discussions'     => 'none',
          'registrations'   => 'none',
@@ -430,7 +569,7 @@ class StatisticsPlugin extends Gdn_Plugin {
          ->Engine('InnoDB')
          ->Column('DateRangeStart', 'datetime', FALSE, 'unique')
          ->Column('DateRangeEnd', 'datetime', FALSE, 'unique')
-         ->Column('DateRangeType', array('hour','day','month'), FALSE, 'unique')
+         ->Column('DateRangeType', array('hour','day','week','month'), FALSE, 'unique')
          ->Column('IndexType', 'varchar(32)', FALSE, 'unique')
          ->Column('IndexQualifier', 'varchar(32)', NULL, 'unique')
          ->Column('IndexValue', 'int', NULL)

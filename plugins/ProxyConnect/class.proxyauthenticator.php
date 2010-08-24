@@ -323,6 +323,13 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       return $this->Nonce;
    }
    
+   public function AuthenticatorConfiguration(&$Sender) {
+      // Let the plugin handle the config
+      $Sender->AuthenticatorConfigure = NULL;
+      $Sender->FireEvent('AuthenticatorConfigurationProxy');
+      return $Sender->AuthenticatorConfigure;
+   }
+   
    public function WakeUp() {
       $ForeignIdentityUrl = C('Garden.Authenticator.AuthenticateURL');
       if (!$ForeignIdentityUrl) return FALSE;
