@@ -171,6 +171,14 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    
    public function OnDisable() {
 		$this->_Disable();
+		// Remove this authenticator from the enabled schemes collection.
+      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
+         if ($SchemeKey == 'proxy')
+            unset($EnabledSchemes[$SchemeIndex]);
+      }
+      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+		
    }
    
    protected function _CreateProviderModel() {
@@ -212,15 +220,6 @@ class ProxyConnectPlugin extends Gdn_Plugin {
 		RemoveFromConfig('Garden.Authenticators.proxy.Name');
 		RemoveFromConfig('Garden.Authenticator.DefaultScheme');
       RemoveFromConfig('Garden.Authenticators.proxy.CookieName');
-		
-		// Remove this authenticator from the enabled schemes collection.
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
-         if ($SchemeKey == 'proxy')
-            unset($EnabledSchemes[$SchemeIndex]);
-      }
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
-		
    }
 	
    public function AuthenticationController_EnableAuthenticatorProxy_Handler(&$Sender) {
