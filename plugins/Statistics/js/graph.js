@@ -300,61 +300,38 @@ jQuery(document).ready(function($) {
 
       // define data containers
       var rowLabels = [],
+         visibleRowLabels = [],
          footLabels = [],
          rows = [],
-         data = [];
-                
-      // Is the datasource an array, or a table selector?
-      if (typeof(dataSource)=='object') {
-         var i = -1;
-         $.each(dataSource, function(Key, Value) {
-            if (Key == 'Dates') {
-               footLabels = Value;
-            } else {
-               rowLabels.push(Key);
-
-               i++;
-               if (getRowController(i).val() == "off")
-                  return;
-                    
-               rows.push(Value);
-               $.each(Value, function(k, v) {
-                  data.push(v);
-               });
-            }
-         });
+         data = [],
+         i = -1;
+         
+      $.each(dataSource, function(Key, Value) {
+         if (Key == 'Dates') {
+            footLabels = Value;
+         } else {
+            rowLabels.push(Key);
             
-         // I realize this identifies the rows being graph'd (Users,
-         // Discussions, Comments), but I can't think of a better place to
-         // put it right now:
-         setSummary(dataSource, 'Page Views', 'li.PageViews strong');
-         setSummary(dataSource, 'Users', 'li.NewUsers strong');
-         setSummary(dataSource, 'Discussions', 'li.NewDiscussions strong');
-         setSummary(dataSource, 'Comments', 'li.NewComments strong');
-      } else {
-         // Hide the source data
-         $("table."+dataSource).hide();
-         $("table."+dataSource+" tfoot td, table."+dataSource+" thead td").each(function () {
-            footLabels.push($(this).html());
-         });
-            
-         $('table.'+dataSource+' tbody tr').each(function() {
-            var d = [];
-            $(this).find('td').each(function() {
-               d.push($(this).html());
+            // Don't include unchecked rows
+            i++;
+            if (getRowController(i).val() == "off")
+               return;
+                 
+            visibleRowLabels.push(Key);
+            rows.push(Value);
+            $.each(Value, function(k, v) {
+               data.push(v);
             });
-            rows.push(d);
-            d = [];
-         });
-            
-         $("table."+dataSource+" tbody td").each(function () {
-            data.push($(this).html());
-         });
-            
-         $("table."+dataSource+" tbody th").each(function () {
-            rowLabels.push($(this).html());
-         });
-      }
+         }
+      });
+         
+      // I realize this identifies the rows being graph'd (Users,
+      // Discussions, Comments), but I can't think of a better place to
+      // put it right now:
+      setSummary(dataSource, 'Page Views', 'li.PageViews strong');
+      setSummary(dataSource, 'Users', 'li.NewUsers strong');
+      setSummary(dataSource, 'Discussions', 'li.NewDiscussions strong');
+      setSummary(dataSource, 'Comments', 'li.NewComments strong');
         
       //create the Raphael object
       var width = graphHolder.width(),
@@ -393,7 +370,7 @@ jQuery(document).ready(function($) {
             blanket = r.set(),
             lineHeight = metricFontSize + 2;
          for (m = 0; m < rows.length; m++) {
-            label.push(r.text(0, lineHeight, "400 Discussions").attr(metricText).attr({fill: getColor(graphContainer, m, false)}));
+            label.push(r.text(0, lineHeight, "400 Discussions").attr(metricText).attr({fill: getColor(graphContainer, m, true)}));
             lineHeight += metricFontSize + 2;
          }
          label.push(r.text(0, lineHeight + 4, "16 Sept").attr(dateText));
@@ -454,7 +431,7 @@ jQuery(document).ready(function($) {
                      var ppp = r.popup(x, yLevel, label, side, 1);
                      frame.show().animate({path: ppp.path}, 200 * is_label_visible);
                      for (a = 0; a < rows.length; a++) {
-                        label[a].attr({text: rows[a][i] + " " + rowLabels[a]}).show().animateWith(frame, {translation: [ppp.dx, ppp.dy]}, 200 * is_label_visible);                            
+                        label[a].attr({text: (rows[a][i] * 1).formatThousands() + " " + visibleRowLabels[a]}).show().animateWith(frame, {translation: [ppp.dx, ppp.dy]}, 200 * is_label_visible);                            
                      }
                      label[rows.length].attr({text: lbl}).show().animateWith(frame, {translation: [ppp.dx, ppp.dy]}, 200 * is_label_visible);
                      is_label_visible = true;

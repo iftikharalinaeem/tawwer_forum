@@ -137,8 +137,8 @@ function Picker() {
    Picker.prototype.SetRange = function(RangeStart, RangeEnd, Trigger, SetAnchor) {
       if (Date.parse(RangeStart) < 1 || Date.parse(RangeEnd) < 1) return;
       
-      var RangeStart = new Date(RangeStart);
-      var RangeEnd = new Date(RangeEnd);
+      RangeStart = new Date(RangeStart);
+      RangeEnd = new Date(RangeEnd);
       
       if (RangeStart.valueOf() < this.Axis.Start.Milli)
          RangeStart.setTime(this.Axis.Start.Milli);
