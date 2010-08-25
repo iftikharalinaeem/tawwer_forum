@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['PostCount'] = array(
    'Name' => 'Post Count',
    'Description' => "This plugin shows each user's post count along with their messages.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -100,7 +100,7 @@ class PostCountPlugin extends Gdn_Plugin {
    
    protected function _AttachPostCount(&$Sender) {
       $Posts = ArrayValue($Sender->EventArguments['Author']->UserID, $Sender->Data('Plugin-PostCount-Counts'));
-      echo '<div class="PostCount">'.sprintf(T(Plural($Posts,'Posts: %s','Posts: %s')),number_format($Posts,0)).'</div>';
+      echo '<div class="PostCount">'.T(Plural(number_format($Posts),'Posts: %s','Posts: %s')).'</div>';
    }
 
    public function Setup() {
