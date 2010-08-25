@@ -131,7 +131,7 @@ function vanilla_sso_options() {
 		<tr>
 			<th>Sign-out Url</th>
 			<td><span class="description"><?php
-				echo add_query_arg(array('action' => 'logout', '_wpnonce' => '{Nonce}'), site_url('wp-login.php', 'login'));
+				echo add_query_arg(array('action' => 'logout', '_wpnonce' => '{Nonce}', 'redirect_to' => '{Redirect}'), site_url('wp-login.php', 'login'));
 			?></span></td>
 		</tr>
 	</table>
