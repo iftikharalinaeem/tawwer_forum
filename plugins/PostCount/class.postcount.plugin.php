@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['PostCount'] = array(
    'Name' => 'Post Count',
    'Description' => "This plugin shows each user's post count along with their messages.",
-   'Version' => '0.9',
+   'Version' => '1.0',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -27,11 +27,7 @@ class PostCountPlugin extends Gdn_Plugin {
    
    public function UserInfoModule_OnBasicInfo_Handler(&$Sender) {
       $UserID = $Sender->User->UserID;
-      $PostCount = GetValue('PostCount', Gdn::SQL()
-         ->Select('u.CountComments + u.CountDiscussions', FALSE, 'PostCount')
-         ->From('User u')
-         ->Where('UserID', $UserID)
-         ->Get()->FirstRow(DATASET_TYPE_ARRAY),0);
+      $PostCount = GetValue("PostCount", Gdn::Database()->Query(sprintf("SELECT COALESCE(u.CountComments,0) + COALESCE(u.CountDiscussions,0) AS PostCount FROM GDN_User u WHERE UserID = %d",$UserID))->FirstRow(DATASET_TYPE_ARRAY),0);
       echo "<dt>".T(Plural($PostCount, 'Posts', 'Posts'))."</dt>\n";
       echo "<dd>".number_format($PostCount)."</dd>";
    }
@@ -60,12 +56,20 @@ class PostCountPlugin extends Gdn_Plugin {
       
       $UserPostCounts = array();
       if (sizeof($UserIDList)) {
+/*
          $PostCounts = Gdn::SQL()
             ->Select('u.UserID')
             ->Select('u.CountComments + u.CountDiscussions', FALSE, 'PostCount')
             ->From('User u')
             ->WhereIn('UserID', array_keys($UserIDList))
             ->Get();
+*/
+         $PostCounts = Gdn::Database()->Query(sprintf("
+            SELECT 
+               u.UserID,
+               COALESCE(u.CountComments,0) + COALESCE(u.CountDiscussions,0) AS PostCount 
+            FROM GDN_User u 
+            WHERE UserID IN (%s)",implode(",",array_keys($UserIDList))));
             
          $PostCounts->DataSeek(-1);
          while ($UserPostCount = $PostCounts->NextRow())

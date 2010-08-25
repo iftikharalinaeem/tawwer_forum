@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'This plugin allows users to attach their own signatures to their posts.',
-   'Version' => '1.1.4',
+   'Version' => '1.1.5',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -107,7 +107,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       // $UserMeta = $this->_GetUserSignatureData($SigUserID);
       //
       
-      if ($Sender->Form->AuthenticatedPostBack() === FALSE)
+      if ($Sender->Form->AuthenticatedPostBack() === FALSE && is_array($UserMeta))
          $ConfigArray = array_merge($ConfigArray, $UserMeta);
       
       $ConfigurationModel->SetField($ConfigArray);
