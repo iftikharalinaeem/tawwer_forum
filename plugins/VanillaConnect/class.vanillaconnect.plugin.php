@@ -52,17 +52,20 @@ class VanillaConnectPlugin extends Gdn_Plugin {
          
       if (!$Provider)
          $Provider = $this->_CreateProviderModel();
-      
+
       if ($Provider) {
          $ConsumerKey = $Provider['AuthenticationKey'];
          $ProviderModel = new Gdn_AuthenticationProviderModel();
          $Provider = $ProviderModel->GetProviderByKey($ConsumerKey);
          $Sender->Form->SetModel($ProviderModel);
-         
+
          if (!$Sender->Form->AuthenticatedPostBack()) {
             $Sender->Form->SetData($Provider);
-         } else if (C('Plugins.VanillaConnect.Enabled')) {
-            $ProviderModel->Validation->ApplyRule('URL',             'Required');
+         } else {
+			// Commented out this elseif b/c you need to be able to save values to
+			// the db even if the authenticator isn't enabled.
+			// } else if (C('Plugins.VanillaConnect.Enabled')) {
+				$ProviderModel->Validation->ApplyRule('URL',             'Required');
             $ProviderModel->Validation->ApplyRule('RegisterUrl',     'Required');
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
             $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
@@ -171,8 +174,6 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    }
    
    public function Setup() {
-		// Do nothing
-		
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
       $HaveProxy = FALSE;
       foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
@@ -234,6 +235,14 @@ class VanillaConnectPlugin extends Gdn_Plugin {
 		RemoveFromConfig('Garden.Authenticators.handshake.Name');
       RemoveFromConfig('Garden.Authenticators.handshake.CookieName');
       RemoveFromConfig('Garden.Authenticators.handshake.TokenLifetime');
+		
+		// Remove this authenticator from the enabled schemes collection.
+      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
+      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
+         if ($SchemeKey == 'handshake')
+            unset($EnabledSchemes[$SchemeIndex]);
+      }
+      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
    }
    
    public function AuthenticationController_EnableAuthenticatorHandshake_Handler(&$Sender) {
