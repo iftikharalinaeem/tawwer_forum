@@ -34,7 +34,6 @@ class ProxyConnectPlugin extends Gdn_Plugin {
 		$Sender->Form = new Gdn_Form();
 		
 		$this->EnableSlicing($Sender);
-      $this->AddSliceAsset($this->GetResource('proxyconnect.css', FALSE,FALSE));
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
@@ -42,7 +41,9 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $Sender->AuthenticatorConfigure = '/dashboard/settings/proxyconnect';
    }
    
-   public function Controller_Index(&$Sender) {   
+   public function Controller_Index(&$Sender) {
+      $this->AddSliceAsset($this->GetResource('proxyconnect.css', FALSE,FALSE));
+      
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.AuthenticationKey')
          ->From('UserAuthenticationProvider uap')
@@ -84,7 +85,11 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    
    public function Controller_Cookie(&$Sender) {
       $ExplodedDomain = explode('.',Gdn::Request()->RequestHost());
-      $GuessedCookieDomain = '.'.implode('.',array_slice($ExplodedDomain,-2,2));
+      if (sizeof($ExplodedDomain) == 1)
+         $GuessedCookieDomain = '';
+      else {
+         $GuessedCookieDomain = '.'.implode('.',array_slice($ExplodedDomain,-2,2));
+      }
       
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
