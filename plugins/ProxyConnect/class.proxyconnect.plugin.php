@@ -63,7 +63,10 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          if (!$Sender->Form->AuthenticatedPostBack()) {
             $Provider['AuthenticateURL'] = C('Garden.Authenticator.AuthenticateURL');
             $Sender->Form->SetData($Provider);
-         } else if (C('Plugins.ProxyConnect.Enabled')) {
+         } else {
+			// Commented out this elseif b/c you need to be able to save values to
+			// the db even if the authenticator isn't enabled.
+         // } else if (C('Plugins.ProxyConnect.Enabled')) {
             $ProviderModel->Validation->ApplyRule('URL',             'Required');
             $ProviderModel->Validation->ApplyRule('RegisterUrl',     'Required');
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
@@ -168,7 +171,6 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    
    public function OnDisable() {
 		$this->_Disable();
-		
 		// Remove this authenticator from the enabled schemes collection.
       $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
       foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
@@ -176,6 +178,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             unset($EnabledSchemes[$SchemeIndex]);
       }
       SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+		
 		
 		RemoveFromConfig('Garden.Authenticators.proxy.Name');
       RemoveFromConfig('Garden.Authenticators.proxy.CookieName');

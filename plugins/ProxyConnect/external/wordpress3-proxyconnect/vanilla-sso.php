@@ -74,8 +74,7 @@ function proxyconnect_vanilla_logout() {
 
 add_action('admin_menu', 'vanilla_sso_menu');
 function vanilla_sso_menu() {
-  add_options_page('Vanilla ProxyConnect', 'Vanilla ProxyConnect', 8, 'vanilla-sso', 'vanilla_sso_options');
-  add_submenu_page('VSSO', 'VSSO', 'VSSO', 8, 'vanilla-sso-info', 'vanilla_sso_info');
+   add_submenu_page('plugins.php', 'ProxyConnect', 'ProxyConnect', 'administrator', 'proxy-connect', 'vanilla_sso_options');
 }
 
 function vanilla_sso_options() {
