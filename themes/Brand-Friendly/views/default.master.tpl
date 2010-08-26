@@ -10,22 +10,11 @@
  <div id="Head">
    <div class="Banner Menu">
       <h1><a class="Title" href="{link path="/"}"><span>{logo}</span></a></h1>
-      <!--<ul id="Menu">
-         {dashboard_link}
-         {discussions_link}
-         {activity_link}
-         {inbox_link}
-         {profile_link}
-               
-         {custom_menu}
-         {signinout_link}
-      </ul>-->
+      
       <div id="Search"></div>
     </div>
   </div>
 
-	
-    
   <div id="Body">
   
     <div class="Wrapper">
@@ -36,6 +25,18 @@
         
         <div id="Panel">
             {searchbox}
+            
+            
+            <div  class="Box">
+            <h4>My Profile</h4>
+              <ul>
+               {inbox_link}
+               {profile_link}
+               {activity_link}
+               {signinout_link}
+              </ul>
+            </div>
+            
             {asset name="Panel"}
         </div>
     
