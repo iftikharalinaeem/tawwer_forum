@@ -45,7 +45,9 @@ function vanilla_connect() {
          $current_user->nickname, 
          $current_user->ID,
          FALSE,
-         array()
+         array(
+            'transient' => wp_create_nonce('log-out')
+         )
       )->Script();
 
    }
@@ -71,34 +73,6 @@ function vanilla_disconnect() {
       FALSE,
       array()
    )->Script();
-}
-
-add_filter('login_redirect', 'proxyconnect_vanilla_li_redirect', 10, 3);
-function proxyconnect_vanilla_li_redirect($redirect_to, $raw_requested_redirect_to, $user) {
-   if ($user instanceof WP_User) {
-      wp_redirect($redirect_to);
-      die();
-   }
-      
-   return $redirect_to;
-}
-
-add_action('wp_logout', 'proxyconnect_vanilla_logout');
-function proxyconnect_vanilla_logout() {
-   $RedirectTo = !empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : FALSE;
-   if ($RedirectTo !== FALSE) {
-      $UrlParts = parse_url($RedirectTo);
-      $Host = $UrlParts['host'];
-      
-      $Referer = $_SERVER['HTTP_REFERER'];
-      $RefererUrlParts = parse_url($Referer);
-      $RefererHost = $RefererUrlParts['host'];
-      
-      if ($Host == $RefererHost) {
-         wp_redirect($RedirectTo);
-         die();
-      }
-   }
 }
 
 add_action('admin_menu', 'vanilla_connect_menu');
@@ -167,12 +141,12 @@ function vanilla_connect_options() {
       </tr>
       <tr>
          <th>Sign-in Url</th>
-         <td><span class="description"><?php echo wp_login_url(); ?>?redirect_to={Redirect}</span></td>
+         <td><span class="description"><?php echo wp_login_url(); ?></span></td>
       </tr>
       <tr>
          <th>Sign-out Url</th>
          <td><span class="description"><?php
-            echo add_query_arg(array('action' => 'logout', '_wpnonce' => '{Session_TransientKey}', 'redirect_to' => '{Redirect}'), site_url('wp-login.php', 'login'));
+            echo add_query_arg(array('action' => 'logout', '_wpnonce' => '{Nonce}'), site_url('wp-login.php', 'login'));
          ?></span></td>
       </tr>
    </table>
