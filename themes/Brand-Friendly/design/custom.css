@@ -9,6 +9,10 @@ body #Head h1 {
 	padding:10px 7px 10px 0;
 }
 
+body.Entry #Content h1 {
+	color:#333;
+}
+
 div#Body div.Wrapper {
 	float:left;
 	width:940px;
@@ -141,6 +145,11 @@ div.Box dl {
 	border-bottom:1px solid #ccc;
 	border-top:1px solid #ccc;
 }
+
+body.Entry #Content div.Box {
+	background:none;
+	border:none;
+}
 #Panel input.InputBox {
 	margin:0 5px 10px 0;
 	width:200px;
@@ -203,3 +212,4 @@ div#Foot div, div#Foot div a {
 div#Foot div, div#Foot div a:hover {
 	color:#999;
 }
+
