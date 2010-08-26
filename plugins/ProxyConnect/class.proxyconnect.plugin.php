@@ -121,22 +121,53 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    
    public function EntryController_SigninLoopback_Create(&$Sender) {
       $Args = $Sender->RequestArgs;
-      $Redirect = (sizeof($Args)) ? $Args[0] : '/';
-
+      $Redirect = (sizeof($Args)) ? implode('/',$Args) : '/';
+      
       $RealSigninURL = Gdn::Authenticator()->GetURL('Real'.Gdn_Authenticator::URL_SIGNIN, $Redirect);
       $RealUserID = Gdn::Authenticator()->GetRealIdentity();
       $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
+      
+      // Shortcircuit loopback if we have a Sync failure
+      $Payload = $Authenticator->GetHandshake();
+      
+      if ($Payload !== FALSE) {
+         if (array_key_exists('Sync',$Payload) && $Payload['Sync'] == 'Failed') {
+         
+            // Force user to be logged out of Vanilla
+            $Authenticator->SetIdentity(NULL);
+            
+            // Forget that this happened (user can start fresh)
+            $Authenticator->DeleteCookie();
+            
+            // Get the signout URL
+            $RealSignoutURL = Gdn::Authenticator()->GetURL(Gdn_Authenticator::URL_SIGNOUT, NULL);
+            
+            // Send the user to the signout URL
+            Redirect($RealSignoutURL,302);
+         }   
+      }
+      
       if ($RealUserID == -1) {
+         // The cookie says we're banned from auto-login in right now, but the user has specifically clicked
+         // 'sign in', so first try to sign them in using their current cookies:
          $Authenticator->Authenticate();
+         
          if (Gdn::Authenticator()->GetIdentity()) {
+            // What worked, so redirect to the default page. The user is now signed in.
             Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
+            
          } else {
+            // The user really isnt signed in. Delete their cookie and send them to the remote login page.
             $Authenticator->SetIdentity(NULL);
             Redirect($RealSigninURL,302);
          }
       } else {
-         if ($RealUserID) Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
-         else {
+         if ($RealUserID) {
+            // The user is already signed in. Send them to the default page.
+            Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
+            
+         } else {
+            // We have no cookie for this user. Send them to the remote login page.
             $Authenticator->SetIdentity(NULL);
             Redirect($RealSigninURL,302);
          }
@@ -152,33 +183,15 @@ class ProxyConnectPlugin extends Gdn_Plugin {
 		if (!$NumLookupMethods)
 		   throw new Exception(T("Unable to initialize plugin: required connectivity libraries not found, need either 'fsockopen' or 'curl'."));
 		   
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      $HaveProxy = FALSE;
-      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
-         if ($SchemeKey == 'proxy') {
-            if ($HaveProxy === TRUE)
-               unset($EnabledSchemes[$SchemeIndex]);
-            $HaveProxy = TRUE;
-         }
-      }
-      if (!$HaveProxy)
-         array_push($EnabledSchemes, 'proxy');
-      
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+      Gdn::Authenticator()->EnableAuthenticationScheme('proxy');
       
       $this->_Enable(FALSE);
    }
    
    public function OnDisable() {
 		$this->_Disable();
-		// Remove this authenticator from the enabled schemes collection.
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
-         if ($SchemeKey == 'proxy')
-            unset($EnabledSchemes[$SchemeIndex]);
-      }
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
 		
+		Gdn::Authenticator()->DisableAuthenticationScheme('proxy');
 		
 		RemoveFromConfig('Garden.Authenticators.proxy.Name');
       RemoveFromConfig('Garden.Authenticators.proxy.CookieName');

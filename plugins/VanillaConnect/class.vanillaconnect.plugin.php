@@ -29,7 +29,6 @@ Gdn_LibraryMap::SafeCache('library','class.handshakeauthenticator.php',dirname(_
 class VanillaConnectPlugin extends Gdn_Plugin {
    
    public function SettingsController_VanillaConnect_Create(&$Sender, $EventArguments) {
-      $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Vanilla Connect SSO');
 		$Sender->Form = new Gdn_Form();
 		
@@ -43,6 +42,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    }
    
    public function Controller_Index(&$Sender) {
+      $Sender->Permission('Garden.AdminUser.Only');
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.AuthenticationKey')
          ->From('UserAuthenticationProvider uap')
@@ -83,6 +83,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    }
    
    public function Controller_Toggle(&$Sender) {
+		$Sender->Permission('Garden.AdminUser.Only');
 		
 		// Enable/Disable VanillaConnect
 		if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
@@ -174,33 +175,13 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    }
    
    public function Setup() {
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      $HaveProxy = FALSE;
-      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
-         if ($SchemeKey == 'handshake') {
-            if ($HaveProxy === TRUE)
-               unset($EnabledSchemes[$SchemeIndex]);
-            $HaveProxy = TRUE;
-         }
-      }
-      if (!$HaveProxy)
-         array_push($EnabledSchemes, 'handshake');
-      
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
-      
       $this->_Enable(FALSE);
+      Gdn::Authenticator()->EnableAuthenticationScheme('handshake');
    }
    
    public function OnDisable() {
 		$this->_Disable();
-		
-		// Remove this authenticator from the enabled schemes collection.
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
-         if ($SchemeKey == 'handshake')
-            unset($EnabledSchemes[$SchemeIndex]);
-      }
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+		Gdn::Authenticator()->DisableAuthenticationScheme('handshake');
 		
 		RemoveFromConfig('Garden.Authenticators.handshake.Name');
       RemoveFromConfig('Garden.Authenticators.handshake.CookieName');
