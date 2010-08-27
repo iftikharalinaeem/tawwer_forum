@@ -4,9 +4,8 @@
    
    <h3><?php echo T('Proxy Connect'); ?></h3>
    <div class="Info">
-      <?php
-         echo T('Using Proxy Connect, you can allow users from your external application or website to be automatically registered and signed into Vanilla. For instructions on how to enable Proxy Connect, <a href="http://vanillaforums.com/info/proxyconnect">read our documentation</a>.');
-      ?>
+      <?php echo T('Using Proxy Connect, you can allow users from your remote application or website to be automatically registered and signed into Vanilla. For instructions on how to enable Proxy Connect, <a href="http://vanillaforums.org/page/signlesignon">read our documentation</a>.'); ?>
+      <?php echo T("Before attempting to populate the fields below, <b>please make sure you install and configure any remote application plugins or scripts first. They should provide the values you'll need below</b>."); ?>
    </div>
    
    <table class="SplitConfiguration">
@@ -21,7 +20,10 @@
                echo $this->Form->Errors();
                echo $this->Form->Hidden('AuthenticationKey', $this->ConsumerKey);
             ?>
-            <div><?php echo T("Define the following values so Vanilla knows where to send your users to register, sign in, sign out, etc."); ?><br/><br/></div>
+            <div>
+               <?php echo T("Define the following values so that Vanilla knows where to send your users to register, sign in, sign out, etc."); ?><br/><br/>
+               <div class="Box HighlightBox"><?php echo T("If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin's configuration screen."); ?></div>
+            </div>
             <ul>
                <li><?php
                   echo $this->Form->Label(T('Main Site URL'), 'Url');
@@ -57,10 +59,12 @@
          </td>
          
          <td class="RemoteConfig">
-            <div class="Info">
+            <div>
                <?php echo T("These are the settings you might need when you configure ProxyConnect on your remote website."); ?>
-               <p>You will probably need to configure Vanilla and your remote application to use a shared Cookie Domain that they can both access. We've
-               tried to guess what that might be, based on your hostname, but you'll need to check this and make sure that it works.</p>
+               <p>
+                  <?php echo T("You will probably need to configure Vanilla and your remote application to use a shared Cookie Domain that they can both access. We've
+                  tried to guess what that might be, based on your hostname, but you'll need to check this and make sure that it works."); ?>
+               </p><br/>
             </div>
             <?php 
                echo Gdn::Slice('dashboard/settings/proxyconnect/cookie');
