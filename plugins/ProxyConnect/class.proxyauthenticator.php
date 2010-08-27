@@ -39,16 +39,14 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       
       try {
          $Response = $this->_GetForeignCredentials($ForeignIdentityUrl);
-         if (!$Response) throw new Exception();
+         if (!$Response) throw new Exception('No response from Authentication URL');
          
-         $Provider = Gdn::SQL()->Select('uap.AuthenticationKey, uap.AssociationSecret')
-            ->From('UserAuthenticationProvider uap')
-            ->Where('uap.AuthenticationSchemeAlias', 'proxy')
-            ->Get()
-            ->FirstRow(DATASET_TYPE_ARRAY);
+         // @TODO: Response sends provider key, used as parameter to GetProvider()
+         
+         $Provider = $this->GetProvider();
          if (!$Provider) throw new Exception();
-         // Got a response from the remote identity provider
          
+         // Got a response from the remote identity provider, and loaded matching provider
          $AuthUniqueField = C('Garden.Authenticators.proxy.AuthField','UniqueID');
          $UserUnique = ArrayValue($AuthUniqueField, $Response, NULL);
          if (is_null($UserUnique))
@@ -59,12 +57,15 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          $UserName = trim(preg_replace('/[^a-z0-9- ]+/i','',$UserName));
          $TransientKey = ArrayValue('TransientKey', $Response, NULL);
          
+         
+         // Validate remote credentials against local auth tables
          $AuthResponse = $this->ProcessAuthorizedRequest($Provider['AuthenticationKey'], $UserUnique, $UserName, $TransientKey, array(
             'Email'  => $UserEmail
          ));
 
          if ($AuthResponse == Gdn_Authenticator::AUTH_SUCCESS) {
-            Gdn::Request()->WithRoute('DefaultController');
+            // Everything's cool, we don't have to do anything.
+            
          } elseif ($AuthResponse == Gdn_Authenticator::AUTH_PARTIAL) {
             Redirect(Url('/entry/handshake/proxy',TRUE),302);
          } else {
@@ -74,6 +75,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          
       }
       catch (Exception $e) {
+         
          // Fallback to defer checking until the next session
          if (substr(Gdn::Request()->Path(),0,6) != 'entry/')
             $this->SetIdentity(-1, FALSE);
@@ -81,41 +83,64 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    }
    
    public function Finalize($UserKey, $UserID, $ProviderKey, $TokenKey, $CookiePayload) {
-      
-      // Associate the userID with the foreign userkey
+      // Associate the local UserID with the foreign UserKey
       Gdn::Authenticator()->AssociateUser($ProviderKey, $UserKey,  $UserID);
       
-      // Log the user in if everything went well
+      // Log the user in
       $this->ProcessAuthorizedRequest($ProviderKey, $UserKey);
    }
    
+   /**
+    * 
+    * 
+    * 
+    * 
+    * 
+    */
    public function ProcessAuthorizedRequest($ProviderKey, $UserKey, $UserName = NULL, $ForeignNonce = NULL, $OptionalPayload = NULL) {
-      $Association = Gdn::Authenticator()->GetAssociation($UserKey, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
       
-      // We havent created a user entry yet. Lets!
+      // Try to load the association for this Provider + UserKey
+      $Association = Gdn::Authenticator()->GetAssociation($UserKey, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
+
+      // We havent created a UserAuthentication entry yet. Create one. This will be an un-associated entry.
       if (!$Association) {
          $Association = Gdn::Authenticator()->AssociateUser($ProviderKey, $UserKey, 0);
+         
+         // Couldn't even create a half-association.
          if (!$Association) 
             return Gdn_Authenticator::AUTH_DENIED;
       }
       
       if ($Association['UserID'] > 0) {
-         // Tracked by Vanilla cookies now...
+         // Retrieved an association which has been fully linked to a local user
+      
+         // We'll be tracked by Vanilla cookies now, so delete the Proxy cookie...
          $this->DeleteCookie();
          
+         // Log the user in
          $this->SetIdentity($Association['UserID'], FALSE);
-         $Token = $this->LookupToken($ProviderKey, $UserKey, 'access');
-         if (!$Token)
-            $Token = $this->CreateToken('access', $ProviderKey, $UserKey, TRUE);
          
-         if ($Token && !is_null($ForeignNonce)) {
-            $TokenKey = $Token['Token'];
-            $this->SetNonce($TokenKey, $ForeignNonce);
+         // Check for a request token that needs to be converted to an access token
+         $Token = $this->LookupToken($ProviderKey, $UserKey, 'request');
+         if ($Token) {
+            // Check for a stored Nonce
+            $ExistingNonce = $this->LookupNonce($Token['Token']);
+            
+            // Found one. Copy it as if it was passed in to this method, and then delete it.
+            if ($ExistingNonce !== FALSE) {
+               $ForeignNonce = $ExistingNonce;
+               $this->ClearNonces($Token['Token']);
+            }
+               
+            unset($Token);
          }
-         
-         return Gdn_Authenticator::AUTH_SUCCESS;
+
+         $TokenType = 'access';
+         $AuthReturn = Gdn_Authenticator::AUTH_SUCCESS;
       } else {
-         // Set the memory cookie
+         // This association is not yet associated with a local forum account. 
+         
+         // Set the memory cookie to trigger the handshake page
          $CookiePayload = array(
             'UserKey'      => $UserKey,
             'ProviderKey'  => $ProviderKey,
@@ -123,13 +148,25 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
             'UserOptional' => Gdn_Format::Serialize($OptionalPayload)
          );
          $SerializedCookiePayload = Gdn_Format::Serialize($CookiePayload);
-         $this->_Remember($ProviderKey, $SerializedCookiePayload);
+         $this->Remember($ProviderKey, $SerializedCookiePayload);
          
-         return Gdn_Authenticator::AUTH_PARTIAL;
+         $TokenType = 'request';
+         $AuthReturn = Gdn_Authenticator::AUTH_PARTIAL;
       }
+      
+      $Token = $this->LookupToken($ProviderKey, $UserKey, $TokenType);
+      if (!$Token)
+         $Token = $this->CreateToken($TokenType, $ProviderKey, $UserKey, TRUE);
+      
+      if ($Token && !is_null($ForeignNonce)) {
+         $TokenKey = $Token['Token'];
+         $this->SetNonce($TokenKey, $ForeignNonce);
+      }
+      
+      return $AuthReturn;
    }
    
-   protected function _Remember($Key, $SerializedCookiePayload) {
+   public function Remember($Key, $SerializedCookiePayload) {
       Gdn_CookieIdentity::SetCookie($this->_CookieName, $Key, array(1, 0, $SerializedCookiePayload), 0);
    }
    
@@ -208,8 +245,8 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    }
    
    public function GetURL($URLType) {
-      $Provider = $this->_GetProvider();
-      $Nonce = $this->_GetNonce();
+      $Provider = $this->GetProvider();
+      $Nonce = $this->GetNonce();
       $RealURLType = $URLType;
       $URLType = substr($URLType, 0, 4) == 'Real' ? substr($URLType,4) : $URLType;
       if ($Provider && $Provider[$URLType]) {
@@ -232,9 +269,25 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    }
    
    protected function _GetForeignCredentials($ForeignIdentityUrl) {
+   
+      // Get the contents of the Authentication Url (timeout 5 seconds)
       $Response = ProxyRequest($ForeignIdentityUrl,5);
       if ($Response) {
-         $Result = @parse_ini_string($Response);
+      
+         $ReadMode = strtolower(C("Garden.Authenticators.proxy.RemoteFormat", "ini"));
+         switch ($ReadMode) {
+            case 'ini':
+               $Result = @parse_ini_string($Response);
+               break;
+               
+            case 'json':
+               $Result = @json_decode($Response);
+               break;
+               
+            default:
+               throw new Exception("Unexpected value '$ReadMode' for 'Garden.Authenticators.proxy.RemoteFormat'");
+         }
+         
          if ($Result) {
             $ReturnArray = array(
                'Email'        => ArrayValue('Email', $Result),
@@ -256,73 +309,6 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       if ($Id < 0) return Gdn_Authenticator::MODE_NOAUTH;
    }
    
-   protected function _GetProvider($ProviderKey = NULL) {
-      if (is_null($this->Provider)) {
-      
-         if (is_null($ProviderKey) && $UserID = Gdn::Authenticator()->GetIdentity()) {
-            $ProviderData = Gdn::SQL()->Select('uap.*')
-               ->From('UserAuthenticationProvider uap')
-               ->Join('UserAuthentication ua', 'ua.ProviderKey = uap.AuthenticationKey', 'left')
-               ->Where('ua.UserID', $UserID)
-               ->Where('uap.AuthenticationSchemeAlias', 'proxy')
-               ->Get();
-               
-         } else {
-            $ProviderQuery = Gdn::SQL()->Select('uap.*')
-               ->From('UserAuthenticationProvider uap')
-               ->Where('uap.AuthenticationSchemeAlias', 'proxy');
-            if (!is_null($ProviderKey)) {
-               $ProviderQuery->Where('uap.AuthenticationKey', $ProviderKey);
-            }
-            $ProviderData = $ProviderQuery->Get();
-         }
-         
-         if ($ProviderData->NumRows())
-            $this->Provider = $ProviderData->FirstRow(DATASET_TYPE_ARRAY);
-         else
-            return FALSE;
-      }
-      
-      return $this->Provider;
-   }
-   
-   protected function _GetToken() {
-      $Provider = $this->_GetProvider();
-      if (is_null($this->Token)) {
-         $UserID = Gdn::Authenticator()->GetIdentity();
-         $UserAuthenticationData = Gdn::SQL()->Select('uat.*')
-            ->From('UserAuthenticationToken uat')
-            ->Join('UserAuthentication ua', 'ua.ForeignUserKey = uat.ForeignUserKey')
-            ->Where('ua.UserID', $UserID)
-            ->Where('ua.ProviderKey', $Provider['AuthenticationKey'])
-            ->Get();
-            
-         if ($UserAuthenticationData->NumRows())
-            $this->Token = $UserAuthenticationData->FirstRow(DATASET_TYPE_ARRAY);
-         else
-            return FALSE;
-      }
-      
-      return $this->Token;
-   }
-
-   protected function _GetNonce() {
-      $Token = $this->_GetToken();
-      if (is_null($this->Nonce)) {
-         $UserNonceData = Gdn::SQL()->Select('uan.*')
-            ->From('UserAuthenticationNonce uan')
-            ->Where('uan.Token', $this->Token['Token'])
-            ->Get();
-            
-         if ($UserNonceData->NumRows())
-            $this->Nonce = $UserNonceData->FirstRow(DATASET_TYPE_ARRAY);
-         else
-            return FALSE;
-      }
-      
-      return $this->Nonce;
-   }
-   
    public function AuthenticatorConfiguration(&$Sender) {
       // Let the plugin handle the config
       $Sender->AuthenticatorConfigure = NULL;
@@ -331,12 +317,17 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    }
    
    public function WakeUp() {
+
       $ForeignIdentityUrl = C('Garden.Authenticator.AuthenticateURL');
       if (!$ForeignIdentityUrl) return FALSE;
       
       // Allow the entry/handshake method to function
       Gdn::Authenticator()->AllowHandshake();
       
+      // Shortcircuit the wakeup if we're already awake
+      // 
+      // If we're already back on Vanilla and working with the handshake form, don't
+      // try to re-wakeup.
       $HaveHandshake = Gdn_CookieIdentity::CheckCookie($this->_CookieName);
       if ($HaveHandshake) return;
       
@@ -349,7 +340,8 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       // Don't try to wakeup when we've already tried once this session
       if ($CurrentStep == Gdn_Authenticator::MODE_NOAUTH)
          return;
-
+      
+      // Passed all shortcircuits. Try to log in via proxy.
       $this->Authenticate();
    }
    

@@ -103,7 +103,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
             'email'                    => $UserEmail,
             'name'                     => $UserName,
             'uid'                      => $UserID,
-            'transient'                => $Transientkey
+            'transient'                => $TransientKey
          );
          
          try {
@@ -147,7 +147,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       }
    }
    
-   protected function _Remember($TokenKey, $SerializedCookiePayload) {
+   public function Remember($TokenKey, $SerializedCookiePayload) {
       Gdn_CookieIdentity::SetCookie($this->_CookieName, $TokenKey, array(1, 0, $SerializedCookiePayload), 0);
    }
    
@@ -233,7 +233,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
    
    public function lookup_consumer($consumer_key) {
       try {
-         $this->LoadProvider($consumer_key);
+         $this->GetProvider($consumer_key, TRUE);
       } catch (Exception $e) {
          return FALSE;
       }
@@ -513,80 +513,12 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
    }
    
    public function GetURL($URLType) {
-      $Provider = $this->_GetProvider();
+      $Provider = $this->GetProvider();
       
-      if ($Provider && $Provider[$URLType]) {
+      if ($Provider && $Provider[$URLType])
          return $Provider[$URLType];
-      }
       
       return FALSE;
-   }
-   
-   protected function _GetProvider($ProviderKey = NULL) {
-      if (is_null($this->Provider)) {
-      
-         if (is_null($ProviderKey) && $UserID = Gdn::Authenticator()->GetIdentity()) {
-            $ProviderData = Gdn::SQL()->Select('uap.*')
-               ->From('UserAuthenticationProvider uap')
-               ->Join('UserAuthentication ua', 'ua.ProviderKey = uap.AuthenticationKey', 'left')
-               ->Where('ua.UserID', $UserID)
-               ->Where('uap.AuthenticationSchemeAlias', 'proxy')
-               ->Get();
-               
-         } else {
-            $ProviderQuery = Gdn::SQL()->Select('uap.*')
-               ->From('UserAuthenticationProvider uap')
-               ->Where('uap.AuthenticationSchemeAlias', 'proxy');
-            if (!is_null($ProviderKey)) {
-               $ProviderQuery->Where('uap.AuthenticationKey', $ProviderKey);
-            }
-            $ProviderData = $ProviderQuery->Get();
-         }
-         
-         if ($ProviderData->NumRows())
-            $this->Provider = $ProviderData->FirstRow(DATASET_TYPE_ARRAY);
-         else
-            return FALSE;
-      }
-      
-      return $this->Provider;
-   }
-   
-   protected function _GetToken() {
-      $Provider = $this->_GetProvider();
-      if (is_null($this->Token)) {
-         $UserID = Gdn::Authenticator()->GetIdentity();
-         $UserAuthenticationData = Gdn::SQL()->Select('uat.*')
-            ->From('UserAuthenticationToken uat')
-            ->Join('UserAuthentication ua', 'ua.ForeignUserKey = uat.ForeignUserKey')
-            ->Where('ua.UserID', $UserID)
-            ->Where('ua.ProviderKey', $Provider['AuthenticationKey'])
-            ->Get();
-            
-         if ($UserAuthenticationData->NumRows())
-            $this->Token = $UserAuthenticationData->FirstRow(DATASET_TYPE_ARRAY);
-         else
-            return FALSE;
-      }
-      
-      return $this->Token;
-   }
-
-   protected function _GetNonce() {
-      $Token = $this->_GetToken();
-      if (is_null($this->Nonce)) {
-         $UserNonceData = Gdn::SQL()->Select('uan.*')
-            ->From('UserAuthenticationNonce uan')
-            ->Where('uan.Token', $this->Token['Token'])
-            ->Get();
-            
-         if ($UserNonceData->NumRows())
-            $this->Nonce = $UserNonceData->FirstRow(DATASET_TYPE_ARRAY);
-         else
-            return FALSE;
-      }
-      
-      return $this->Nonce;
    }
    
    public function AuthenticatorConfiguration(&$Sender) {
