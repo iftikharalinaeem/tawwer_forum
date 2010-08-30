@@ -38,7 +38,7 @@ class IPTrackingPlugin extends Gdn_Plugin {
    }
    
    public function Gdn_Auth_AuthSuccess_Handler($Sender) {
-      $UserID = $Sender->User->UserID;
+      $UserID = Gdn::Session()->UserID;
       try {
          Gdn::SQL()->Update('User',array(
             'LastIP'    => Gdn::Request()->GetValue('REMOTE_ADDR')
