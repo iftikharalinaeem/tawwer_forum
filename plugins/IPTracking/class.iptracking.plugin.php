@@ -26,7 +26,7 @@ $PluginInfo['IPTracking'] = array(
 class IPTrackingPlugin extends Gdn_Plugin {
 
    public function UserInfoModule_OnBasicInfo_Handler(&$Sender) {
-      if (!Gdn::Session()->CheckPermission('Garden.Users.Manage')) return;
+      if (!Gdn::Session()->CheckPermission('Garden.Users.Edit')) return;
       
       $UserID = $Sender->User->UserID;
       $LastIP = GetValue("LastIP", Gdn::Database()->Query(sprintf("SELECT LastIP FROM GDN_User u WHERE UserID = %d",$UserID))->FirstRow(DATASET_TYPE_ARRAY),0);
@@ -89,15 +89,16 @@ public function CommentModel_BeforeSaveComment_Handler($Sender) {
    }
    
    public function DiscussionController_CommentInfo_Handler(&$Sender) {
-      $this->_AttachPostCount($Sender);
+      $this->AttachIP($Sender);
    }
    
    public function PostController_CommentInfo_Handler(&$Sender) {
-      $this->_AttachPostCount($Sender);
+      $this->AttachIP($Sender);
    }
    
-   protected function _AttachPostCount(&$Sender) {
-      if (!Gdn::Session()->CheckPermission('Garden.Users.Manage')) return;
+   protected function AttachIP(&$Sender) {
+      if (!Gdn::Session()->CheckPermission('Garden.Users.Edit')) return;
+      
       $IP = ArrayValue('LastIP',$Sender->EventArguments['Object'],NULL);
       if (is_null($IP)) $IP = T('Unknown');
       echo '<span>'.T('IP: ').$IP.'</span>';
