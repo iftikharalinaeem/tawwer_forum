@@ -78,29 +78,17 @@ class PostCountPlugin extends Gdn_Plugin {
       $Sender->SetData('Plugin-PostCount-Counts', $UserPostCounts);
    }
    
-   public function DiscussionController_Render_Before(&$Sender) {
-      $this->_PrepareController($Sender);
-   }
-   
-   public function PostController_Render_Before(&$Sender) {
-      $this->_PrepareController($Sender);
-   }
-   
-   protected function _PrepareController(&$Controller) {
-      $Controller->AddCssFile($this->GetResource('css/postcount.css', FALSE, FALSE));
-   }
-   
-   public function DiscussionController_AfterCommentMeta_Handler(&$Sender) {
+   public function DiscussionController_CommentInfo_Handler(&$Sender) {
       $this->_AttachPostCount($Sender);
    }
    
-   public function PostController_AfterCommentMeta_Handler(&$Sender) {
+   public function PostController_CommentInfo_Handler(&$Sender) {
       $this->_AttachPostCount($Sender);
    }
    
    protected function _AttachPostCount(&$Sender) {
       $Posts = ArrayValue($Sender->EventArguments['Author']->UserID, $Sender->Data('Plugin-PostCount-Counts'));
-      echo '<div class="PostCount">'.T(Plural(number_format($Posts),'Posts: %s','Posts: %s')).'</div>';
+      echo '<span>'.T(Plural(number_format($Posts),'Posts: %s','Posts: %s')).'</span>';
    }
 
    public function Setup() {

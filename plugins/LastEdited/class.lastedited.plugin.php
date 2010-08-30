@@ -47,13 +47,14 @@ class LastEditedPlugin extends Gdn_Plugin {
    }
    
    protected function DrawEdited(&$Sender) {
-      if (isset($Sender->EventArguments['Discussion'])) 
+      if (isset($Sender->EventArguments['Discussion']))
          $Data = $Sender->EventArguments['Discussion'];
          
-      if (isset($Sender->EventArguments['Comment'])) 
+      if (isset($Sender->EventArguments['Comment']))
          $Data = $Sender->EventArguments['Comment'];
       
       if (is_null($Data->DateUpdated)) return;
+      if ($Data->DateUpdated == $Data->DateInserted) return;
       
       $SourceUserID = $Data->InsertUserID;
       $UpdatedUserID = $Data->UpdateUserID;
