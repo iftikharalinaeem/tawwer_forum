@@ -706,6 +706,32 @@ span.Votes span { background: #905417; }
 .FollowsBox { background: #764513; }
 
 
+/* Dismiss Messages */
+div.Info {
+   border: 1px solid #EED3A2;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #FEF7DF;
+   color: #b76600;
+	font-size:13px;
+	margin:0 0 10px;
+	padding:6px;
+	position: relative;
+}
+div.Info strong {
+	color:#744000;
+}
+div.DismissMessage a.Dismiss {
+	color:#744000;
+	float: none;
+	position: absolute;
+	top: 4px;
+	right: 6px;
+	line-height: 1;
+}
+
+
 /* --- Profile Page --- */
 form.Activity,
 ul.Activities {
