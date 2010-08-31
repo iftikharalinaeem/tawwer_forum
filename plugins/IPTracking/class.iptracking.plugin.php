@@ -13,7 +13,7 @@ $PluginInfo['IPTracking'] = array(
    'Name' => 'IPTracking',
    'Description' => "This plugin adds fields to the User, Comment and Discussion tables that track the IPs of users as they log-in and post.",
    'Version' => '0.9',
-   'RequiredApplications' => FALSE,
+   'RequiredApplications' => array('Vanilla' => '2.0.4a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
