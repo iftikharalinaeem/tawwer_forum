@@ -409,7 +409,7 @@ a.Get strong {
 }
 
 /* Move Errors Back Into Page */
-div.Messages {
+div.Errors {
    text-align: inherit !important;
    position: relative;
    top: auto;
@@ -418,14 +418,19 @@ div.Messages {
    font-size: 12px;
    display: block;
    width: auto;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #d50a0a !important;
+	margin: 0 0 10px !important;
 }
-* html div.Messages {
+* html div.Errors {
   position: relative;
   width: auto;
   top: auto;
   left: auto;
 }
-div.Messages ul {
+div.Errors ul {
    border-radius: 2px;
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
@@ -436,22 +441,12 @@ div.Messages ul {
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;  
 }
-div.Messages ul li {
+div.Errors ul li {
    text-align: left !important;
    border: 0 !important;
-   color: #000 !important;
    padding: 0 !important;
    margin: 0 !important;
 	list-style: none;
-}
-div.Errors {
-   border-radius: 2px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-   background: #d50a0a !important;
-	margin: 0 0 10px !important;
-}
-div.Errors ul li {
    color: #fff !important;
 }
 
@@ -553,7 +548,7 @@ div.Popup h2 {
 a.Close { color: #744000; }
 a.Close:hover { color: #4A2900; }
 div.SignInPopup .Content form { padding: 0 14px 10px; }
-div.SignInPopup div.Body { max-width:286px; }
+div.SignInPopup div.Border { max-width: 290px; }
 
 
 /* DataList & Headings */
@@ -710,31 +705,6 @@ span.Votes a:hover { background: #53310e; }
 span.Votes span { background: #905417; }
 .FollowsBox { background: #764513; }
 
-
-/* Dismiss Messages */
-div.Info {
-   border: 1px solid #EED3A2;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
-   background: #FEF7DF;
-   color: #b76600;
-	font-size:13px;
-	margin:0 0 10px;
-	padding:6px;
-	position: relative;
-}
-div.Info strong {
-	color:#744000;
-}
-div.DismissMessage a.Dismiss {
-	color:#744000;
-	float: none;
-	position: absolute;
-	top: 4px;
-	right: 6px;
-	line-height: 1;
-}
 
 /* --- Profile Page --- */
 form.Activity,
