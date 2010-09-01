@@ -21,7 +21,6 @@
                echo $this->Form->Hidden('AuthenticationKey', $this->ConsumerKey);
             ?>
             <div>
-               <?php echo T("Define the following values so that Vanilla knows where to send your users to register, sign in, sign out, etc."); ?><br/><br/>
                <div class="Box HighlightBox"><?php echo T("If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin's configuration screen."); ?></div>
             </div>
             <ul>

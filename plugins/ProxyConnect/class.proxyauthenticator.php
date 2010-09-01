@@ -63,6 +63,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
             'Email'  => $UserEmail
          ));
 
+         Gdn::Authenticator()->Trigger($AuthResponse);
          if ($AuthResponse == Gdn_Authenticator::AUTH_SUCCESS) {
             // Everything's cool, we don't have to do anything.
             
@@ -242,6 +243,21 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    // What to do if the entry/auth/* page is triggered for a user that is already logged in
    public function RepeatResponse() {
       return Gdn_Authenticator::REACT_REDIRECT;
+   }
+   
+   // What to do if the entry/leave/* page is triggered for a user that is logged in and successfully logs out
+   public function LogoutResponse() {
+      return Gdn_Authenticator::REACT_REDIRECT;
+   }
+   
+   // What to do if the entry/auth/* page is triggered but login is denied or fails
+   public function FailedResponse() {
+      return Gdn_Authenticator::REACT_RENDER;
+   }
+   
+   public function GetHandshakeMode() {
+      $ModeStr = Gdn::Request()->GetValue('mode', Gdn_Authenticator::HANDSHAKE_DIRECT);
+      return $ModeStr;
    }
    
    public function GetURL($URLType) {

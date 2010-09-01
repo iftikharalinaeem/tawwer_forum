@@ -21,5 +21,5 @@
 </style>
 <div class="GitBranch">
    <span class="GitBranchTitle">GIT</span>
-   <span><?php echo "<strong>{$this->GitPlugin_Branch}</strong> :: {$this->GitPlugin_RevHash}"; ?></span>
+   <span><?php echo "<strong>{$this->GitPlugin_Branch}</strong> ".Gdn::Session()->TransientKey()." :: {$this->GitPlugin_RevHash}"; ?></span>
 </div>
