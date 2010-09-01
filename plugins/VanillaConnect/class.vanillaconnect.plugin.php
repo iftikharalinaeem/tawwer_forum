@@ -12,8 +12,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['VanillaConnect'] = array(
 	'Name' => 'Vanilla Connect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers.',
-   'Version' => '1.1',
-   'RequiredApplications' => array('Vanilla' => '2.0.2a'),
+   'Version' => '1.2',
+   'RequiredApplications' => array('Vanilla' => '2.0.4'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/authentication/handshake',
