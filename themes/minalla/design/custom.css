@@ -5,7 +5,6 @@
 body {
 	background:#FFFFFF;
 	color:#333333;
-	font-family:Georgia,"Times New Roman",Times,serif;
 	font-weight:normal;
 	text-align:center;
 }
@@ -108,6 +107,17 @@ div.Menu {
 	text-align:left;
 }
 
+#Head h1.Title a{
+	color:#FFDE00;
+	font-size:1.7em;
+
+}
+
+#Head h1.Title a:hover{
+	color:#F4B722;
+	font-size:1.7em;
+}
+
 ul#Menu {
 	float:right;
 	padding:25px 0 0 10px;
@@ -160,6 +170,16 @@ div.Preview {
 	background:#fff;
 }
 
+#Menu a span, #Menu li.Active a span, #Menu li.Highlight a:hover span {
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	background:#FFDE00;
+	border:1px solid #FFDE00;
+	color:#282828;
+}
+
+
+ 
 /* ============================================================= Entry Screen */
 body.Entry #Content {
 	float:left;
@@ -189,7 +209,6 @@ div.MessageForm, div.Tabs {
 	border-left:1px solid #c4c4c4;
 	border-bottom:1px solid #c4c4c4;
 	display:block;
-	margin-bottom:30px;
 	padding:5px 8px;
 }
 
@@ -213,7 +232,6 @@ div.MessageForm a.Cancel:hover, div.MorePager a:hover, a.TabLink:hover, div.Tabs
 
 ul.DataList li.Item {
 	border-bottom:1px solid #e1e1e1;
-	margin:0 0 20px;
 	padding:4px 0;
 }
 
@@ -375,8 +393,6 @@ div.User h1 {
 div.Photo img{
 	border:1px solid #282828;
 	padding:2px;
-	margin-bottom:10px;
-
 }
 
 ul.DataList div.Photo img {
@@ -396,11 +412,9 @@ body.Profile ul.PanelInfo li{
 }
 
 div.Box dl {
-	background:#fff none repeat scroll 0 0;
-	border-bottom:1px solid #c4c4c4;
-	border-top:1px solid #c4c4c4;
-	overflow:hidden;
-	padding:3px;
+	background: none;
+	border: none;
+	padding: 0;
 }
 
 div.Popup div.Body {
@@ -502,14 +516,16 @@ ul.PanelInfo div.Meta strong {
 	/*text-decoration:underline;*/
 }
 #Foot .vanilla-ico {
+	background:url(vanilla_ico.png) no-repeat;
 	float:left;
 	width:15px;
 	height:15px;
 	margin:0;
-	padding:0 6px 6px 0;
+	padding:0 7px 7px 0;
 }
 
 .Foot {
 	background:#f2f2f2;
 	border-bottom:1px solid #c4c4c4;
 }
+

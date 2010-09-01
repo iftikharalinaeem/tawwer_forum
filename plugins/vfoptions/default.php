@@ -36,28 +36,32 @@ class VFOptionsPlugin implements Gdn_IPlugin {
     * Adds & removes dashboard menu options.
     */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+		$New = ' <span class="New">New</span>';
       // Clean out entire menu & re-add everything
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->ClearGroups();
       
-      $Menu->AddItem('Dashboard', T('Dashboard'));
+      $Menu->AddItem('Dashboard', T('Dashboard').$New, FALSE, array('class' => 'Dashboard'));
       $Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
 
-      $Menu->AddItem('Appearance', T('Appearance'));
-		$Menu->AddLink('Appearance', T('Banner <span class="New">New</span>'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
-      $Menu->AddLink('Appearance', T('Themes <span class="New">New</span>'), 'dashboard/settings/themes', 'Garden.Themes.Manage');
-		if (C('EnabledPlugins.CustomCSS'))
+      $Menu->AddItem('Appearance', T('Appearance'), FALSE, array('class' => 'Appearance'));
+		$Menu->AddLink('Appearance', T('Banner'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
+      $Menu->AddLink('Appearance', T('Themes').$New, 'dashboard/settings/themes', 'Garden.Themes.Manage');
+		if (C('Garden.ThemeOptions.Name'))
+         $Menu->AddLink('Appearance', T('Theme Options').$New, '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
+
+      if (C('EnabledPlugins.CustomCSS'))
 	      $Menu->AddLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
 			
 		if (C('EnabledPlugins.CustomTheme'))
-	      $Menu->AddLink('Appearance', 'Custom Theme <span class="New">New</span>', 'settings/customtheme', 'Garden.AdminUser.Only');
+	      $Menu->AddLink('Appearance', 'Custom Theme', 'settings/customtheme', 'Garden.AdminUser.Only');
 			
       $Menu->AddLink('Appearance', T('Messages'), 'dashboard/message', 'Garden.Messages.Manage');
 
 		if (C('EnabledPlugins.CustomDomain'))
-	      $Menu->AddLink('Appearance', 'Custom Domain <span class="New">New</span>', 'settings/customdomain', 'Garden.AdminUser.Only');
+	      $Menu->AddLink('Appearance', 'Custom Domain', 'settings/customdomain', 'Garden.AdminUser.Only');
 		
-      $Menu->AddItem('Users', T('Users'));
+      $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
       $Menu->AddLink('Users', T('Users'), 'dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
 		$Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Roles.Manage');
       if (C('Garden.Registration.Manage', TRUE))
@@ -66,16 +70,43 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       if (C('Garden.Registration.Method') == 'Approval')
          $Menu->AddLink('Users', T('Applicants'), 'dashboard/user/applicants', 'Garden.Applicants.Manage');
 
-		if (C('EnabledPlugins.VanillaConnect'))
-			$Menu->AddLink('Users', 'Vanilla Connect <span class="New">New</span>', 'settings/vanillaconnect', 'Garden.AdminUser.Only');
+		if (C('EnabledPlugins.VanillaConnect') || C('EnabledPlugins.ProxyConnect'))
+			$Menu->AddLink('Users', T('Authentication').$New, 'dashboard/authentication', 'Garden.Settings.Manage');
 		
-		$Menu->AddItem('Forum', T('Forum Settings'));
-		if (C('EnabledPlugins.FileUpload'))
-			$Menu->AddLink('Forum', 'Media <span class="New">New</span>', 'plugin/fileupload', 'Garden.AdminUser.Only');
-			
+		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
 		$Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
+		if (C('EnabledPlugins.Tagging'))
+			$Menu->AddLink('Forum', T('Tagging').$New, 'settings/tagging', 'Garden.Settings.Manage');
+
+		if (C('EnabledPlugins.Voting'))
+			$Menu->AddLink('Forum', T('Voting').$New, 'settings/voting', 'Garden.Settings.Manage');
+		
       $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
-   }
+		if (C('EnabledPlugins.Flagging')) {
+			$NumFlaggedItems = Gdn::SQL()->Select('fl.ForeignID','DISTINCT', 'NumFlaggedItems')
+				->From('Flag fl')
+				->GroupBy('ForeignURL')
+				->Get()->NumRows();
+			
+			$LinkText = T('Flagged Content');
+			if ($NumFlaggedItems)
+				$LinkText .= " ({$NumFlaggedItems})";
+			$Menu->AddLink('Forum', $LinkText.$New, 'plugin/flagging', 'Garden.Settings.Manage');
+		}
+
+		if (C('EnabledPlugins.FileUpload'))
+			$Menu->AddLink('Forum', 'Media', 'plugin/fileupload', 'Garden.AdminUser.Only');
+			
+		if (C('EnabledPlugins.Signatures'))
+			$Menu->AddLink('Forum', T('Signatures').$New, 'settings/signatures', 'Garden.Settings.Manage');
+			
+		$Menu->AddItem('Import', T('Import').$New, FALSE, array('class' => 'Addons'));
+		$Menu->AddLink('Import', T('Import'), 'dashboard/import', 'Garden.Import');
+		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
+   too large to upload directly to this page you can
+   <a href="mailto:support@vanillaforums.com?subject=Importing+to+VanillaForums">contact us</a>
+   to import your data for you.');
+	}
    
    /**
     * If the domain in the config doesn't match that in the url, this will
@@ -93,14 +124,15 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       if ($Sender->MasterView == 'admin') {
          $Domain = C('Garden.Domain', '');
          $Url = strpos($Domain, 'vanilladev') > 0 ? 'vanilladev' : 'vanillaforums';
-         $Footer = Anchor('Terms of Service', 'http://'.$Url.'.com/info/termsofservice', '', array('target' => '_New'))
+			$Style = 'background: none; height: auto; width: auto; margin: 0; display: inline; color: #ACDDF8; font-size: 12px; font-weight: normal;';
+         $Footer = Anchor('Terms of Service', 'http://'.$Url.'.com/info/termsofservice', '', array('target' => '_New', 'style' => $Style))
             .' | '
-            .Anchor('Privacy Policy', 'http://'.$Url.'.com/info/privacy', '', array('target' => '_New'))
+            .Anchor('Privacy Policy', 'http://'.$Url.'.com/info/privacy', '', array('target' => '_New', 'style' => $Style))
             .' | '
-            .Anchor('Refund Policy', 'http://'.$Url.'.com/info/refund', '', array('target' => '_New'))
+            .Anchor('Refund Policy', 'http://'.$Url.'.com/info/refund', '', array('target' => '_New', 'style' => $Style))
             .' | '
-            .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New'));
-         $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'float: right; padding-top: 6px;')));
+            .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New', 'style' => $Style));
+         $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'position: absolute; bottom: 15px; right: 140px;')));
          $Sender->AddCssFile('plugins/vfoptions/design/vfoptions.css', 'dashboard');
       }
       
@@ -302,8 +334,8 @@ pageTracker._trackPageview();
             }
             // We delete the forum *after* the redirects have been defined so we
             // can use the conf file to determine some things.
-            $SiteID = $Site->SiteID;
-            $VFSQL = &$this->_GetDatabase()->SQL();
+            // $SiteID = $Site->SiteID;
+            // $VFSQL = &$this->_GetDatabase()->SQL();
             include('/srv/www/'.$Folder.'/applications/vfcom/utils/deleteforum.php');
          }
          
@@ -611,7 +643,7 @@ pageTracker._trackPageview();
 		else
 			RemoveFromConfig('Plugins.CustomTheme.Enabled');
 
-		$this->_ApplyFeature('CustomCSS', $ApplyFeatures, $PluginManager);
+		// $this->_ApplyFeature('CustomCSS', $ApplyFeatures, $PluginManager);
 		$this->_ApplyFeature('CustomDomain', $ApplyFeatures, $PluginManager);
 		// BannerLogo
 		$this->_ApplyConfig('BannerLogo', $ApplyFeatures, 'VanillaForums.BannerLogo.CanUpload');
@@ -749,6 +781,13 @@ pageTracker._trackPageview();
 		$IsEnabled = C('EnabledPlugins.'.$FeatureName);
 		$IsInPlan = in_array($FeatureName, $Features);
 		if ($IsInPlan && !$IsEnabled) {
+			// Make sure the plugin symlink exists
+			$SourcePath = '/srv/www/misc/plugins/'.$FeatureName;
+			$DestPath = PATH_PLUGINS.'/'.$FeatureName;
+			if (!file_exists($DestPath))
+				symlink($SourcePath, $DestPath);
+			
+			// Enable it.
 			$PluginManager->EnablePlugin($FeatureName);
 		} else if (!$IsInPlan && $IsEnabled) {
 			$PluginManager->DisablePlugin($FeatureName);
@@ -973,4 +1012,5 @@ pageTracker._trackPageview();
          $this->_GetDatabase()->SQL()->Put('Site', array('Attributes' => Gdn_Format::Serialize($Attributes)), array('SiteID' => $SiteID));
       }      
    }
+	
 }

@@ -12,9 +12,20 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['minalla'] = array(
-   'Description' => "A minimilist forum - simple and clean",
-   'Version' => '1.0',
+   'Name' => 'Minalla',
+   'Description' => "A minimilist forum - simple and clean. This theme has 5 style options.",
+   'Version' => '1.5',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://brendanserashriar.com'
+   'AuthorUrl' => 'http://brendanserashriar.com',
+   'Options' => array(
+         'Description' => '<strong>Minalla</strong> has <font color="red">5 color</font> options. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">"Theme Options"</a>.',
+
+         'Styles' => array(
+            'Minalla Blue' => '%s_blue',
+            'Minalla Green' => '%s_green',
+            'Minalla Red' => '%s_red',
+            'Minalla Grey' => '%s_grey',
+            'Minalla Yellow' => '%s'),
+   )
 );

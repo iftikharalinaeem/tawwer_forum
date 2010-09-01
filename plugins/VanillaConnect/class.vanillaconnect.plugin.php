@@ -12,11 +12,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['VanillaConnect'] = array(
 	'Name' => 'Vanilla Connect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers.',
-   'Version' => '1.0',
-   'RequiredApplications' => FALSE,
+   'Version' => '1.2',
+   'RequiredApplications' => array('Vanilla' => '2.0.4'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
-   'SettingsUrl' => '/dashboard/settings/vanillaconnect',
+   'SettingsUrl' => '/dashboard/authentication/handshake',
    'SettingsPermission' => 'Garden.AdminUser.Only',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -27,49 +27,50 @@ $PluginInfo['VanillaConnect'] = array(
 
 Gdn_LibraryMap::SafeCache('library','class.handshakeauthenticator.php',dirname(__FILE__).DS.'class.handshakeauthenticator.php');
 class VanillaConnectPlugin extends Gdn_Plugin {
-
-   /**
-    * Adds "VanillaConnect" menu option to the dashboard.
-    */
-   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
-      $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Users', 'Vanilla Connect', 'settings/vanillaconnect', 'Garden.AdminUser.Only');
-   }
    
    public function SettingsController_VanillaConnect_Create(&$Sender, $EventArguments) {
-      $Sender->Permission('Garden.AdminUser.Only');
-		
-      $Sender->Title('Vanilla Connect');
-      $Sender->AddSideMenu('settings/vanillaconnect');
-		$Sender->AddCssFile('/plugins/VanillaConnect/vanillaconnect.css');
+      $Sender->Title('Vanilla Connect SSO');
 		$Sender->Form = new Gdn_Form();
+		
+		$this->EnableSlicing($Sender);
+      $this->AddSliceAsset($this->GetResource('vanillaconnect.css', FALSE,FALSE));
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
+   public function AuthenticationController_AuthenticatorConfigurationHandshake_Handler(&$Sender) {
+      $Sender->AuthenticatorConfigure = '/dashboard/settings/vanillaconnect';
+   }
+   
    public function Controller_Index(&$Sender) {
+      $Sender->Permission('Garden.AdminUser.Only');
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.AuthenticationKey')
          ->From('UserAuthenticationProvider uap')
+         ->Where('uap.AuthenticationSchemeAlias', 'handshake')
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
          
       if (!$Provider)
          $Provider = $this->_CreateProviderModel();
-      
+
       if ($Provider) {
          $ConsumerKey = $Provider['AuthenticationKey'];
          $ProviderModel = new Gdn_AuthenticationProviderModel();
          $Provider = $ProviderModel->GetProviderByKey($ConsumerKey);
          $Sender->Form->SetModel($ProviderModel);
-         
+
          if (!$Sender->Form->AuthenticatedPostBack()) {
             $Sender->Form->SetData($Provider);
-         } else if (C('Plugins.VanillaConnect.Enabled')) {
-            $ProviderModel->Validation->ApplyRule('URL',             'Required');
+         } else {
+			// Commented out this elseif b/c you need to be able to save values to
+			// the db even if the authenticator isn't enabled.
+			// } else if (C('Plugins.VanillaConnect.Enabled')) {
+				$ProviderModel->Validation->ApplyRule('URL',             'Required');
             $ProviderModel->Validation->ApplyRule('RegisterUrl',     'Required');
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
             $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
 				$Sender->Form->SetFormValue('AuthenticationKey', $ConsumerKey);
+				$Sender->Form->SetFormValue('AuthenticationSchemeAlias', 'handshake');
             $Sender->Form->Save();
          }
       }
@@ -77,10 +78,12 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       $Sender->ConsumerKey = ($Provider) ? $Provider['AuthenticationKey'] : '';
       $Sender->ConsumerSecret = ($Provider) ? $Provider['AssociationSecret'] : '';
       
+      $Sender->SliceConfig = $this->RenderSliceConfig();
       $Sender->Render($this->GetView('vanillaconnect.php'));
    }
    
    public function Controller_Toggle(&$Sender) {
+		$Sender->Permission('Garden.AdminUser.Only');
 		
 		// Enable/Disable VanillaConnect
 		if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
@@ -172,11 +175,16 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    }
    
    public function Setup() {
-		// Do nothing
+      $this->_Enable(FALSE);
    }
    
    public function OnDisable() {
 		$this->_Disable();
+		Gdn::Authenticator()->DisableAuthenticationScheme('handshake');
+		
+		RemoveFromConfig('Garden.Authenticators.handshake.Name');
+      RemoveFromConfig('Garden.Authenticators.handshake.CookieName');
+      RemoveFromConfig('Garden.Authenticators.handshake.TokenLifetime');
    }
    
    protected function _CreateProviderModel() {
@@ -208,36 +216,40 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       return $Provider; 
    }
    
+   public function AuthenticationController_DisableAuthenticatorHandshake_Handler(&$Sender) {
+      $this->_Disable();
+   }
+   
    private function _Disable() {
-		RemoveFromConfig('Garden.SignIn.Popup');
-		RemoveFromConfig('Plugins.VanillaConnect.Enabled');
-		RemoveFromConfig('Garden.Authenticator.DefaultScheme');
-      RemoveFromConfig('Garden.Authenticators.handshake.CookieName');
-      RemoveFromConfig('Garden.Authenticators.handshake.TokenLifetime');
-
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      foreach ($EnabledSchemes as $SchemeIndex => $SchemeKey) {
-         if ($SchemeKey == 'handshake')
-            unset($EnabledSchemes[$SchemeKey]);
-      }
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+      RemoveFromConfig('Plugins.VanillaConnect.Enabled');
+		
+      $WasEnabled = Gdn::Authenticator()->UnsetDefaultAuthenticator('handshake');
+      if ($WasEnabled)
+         RemoveFromConfig('Garden.SignIn.Popup');
+   }
+   
+   public function AuthenticationController_EnableAuthenticatorHandshake_Handler(&$Sender) {
+      $this->_Enable();
    }
 	
-	private function _Enable() {
-		SaveToConfig('Garden.SignIn.Popup', FALSE);
-		SaveToConfig('Plugins.VanillaConnect.Enabled', TRUE);
-		SaveToConfig('Garden.Authenticator.DefaultScheme', 'handshake');
+	private function _Enable($FullEnable = TRUE) {
+		SaveToConfig('Garden.Authenticators.handshake.Name', 'VanillaConnect');
       SaveToConfig('Garden.Authenticators.handshake.CookieName', 'VanillaHandshake');
       SaveToConfig('Garden.Authenticators.handshake.TokenLifetime', 0);
       
-      $EnabledSchemes = Gdn::Config('Garden.Authenticator.EnabledSchemes', array());
-      array_push($EnabledSchemes, 'handshake');
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
+      if ($FullEnable) {
+         SaveToConfig('Garden.SignIn.Popup', FALSE);
+         SaveToConfig('Plugins.VanillaConnect.Enabled', TRUE);
+      }
+      
+      // Add this authenticator to the list of allowed authenticators, and optionally set it as the default
+      Gdn::Authenticator()->EnableAuthenticationScheme('handshake', $FullEnable);
       
       // Create a provider key/secret pair if needed
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.*')
          ->From('UserAuthenticationProvider uap')
+         ->Where('uap.AuthenticationSchemeAlias', 'handshake')
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
          

@@ -12,9 +12,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['rounder'] = array(
+   'Name' => 'Rounder',
    'Description' => "A well rounded theme",
    'Version' => '1.0',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://brendanserashriar.com'
+   'AuthorUrl' => 'http://brendanserashriar.com',
+   'Options' => array(
+		'Description' => 'You can customize the heading text for <strong>Rounder</strong>. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">"Theme Options"</a>.',
+      'Text' => array('Header Text' => 'This is just place holder text. Use the theme options to put whatever you want here!'),
+	)
 );
+   
+   

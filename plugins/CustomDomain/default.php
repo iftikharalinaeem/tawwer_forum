@@ -17,7 +17,7 @@ class CustomDomainPlugin implements Gdn_IPlugin {
     */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Appearance', 'Custom Domain', 'dashboard/settings/customdomain', 'Garden.Settings.GlobalPrivs');
+      $Menu->AddLink('Appearance', 'Custom Domain', 'settings/customdomain', 'Garden.Settings.GlobalPrivs');
    }
    
    /**
@@ -30,7 +30,7 @@ class CustomDomainPlugin implements Gdn_IPlugin {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Custom Domain Name');
       if ($this->AddSideMenu)
-         $Sender->AddSideMenu('dashboard/settings/customdomain');
+         $Sender->AddSideMenu('settings/customdomain');
          
       $Sender->Site = $this->_GetSite();
       

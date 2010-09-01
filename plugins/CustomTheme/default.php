@@ -21,13 +21,55 @@ class CustomThemePlugin implements Gdn_IPlugin {
 	}
 	
 	public function SettingsController_AfterCurrentTheme_Handler($Sender) {
-		/*
 		$ThemeManager = new Gdn_ThemeManager();
 		$ThemeInfo = $ThemeManager->EnabledThemeInfo();
-		if (GetValue('IsCustom', $ThemeInfo)) {
-		*/
-			echo Wrap(Anchor('Customize', 'settings/customtheme', 'SmallButton'), 'div', array('style' => 'padding: 10px 0 0;'));
-		// }
+		// Make sure the current theme uses a smarty master template instead of php
+		$CanHtml = file_exists(PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '').'/views/default.master.tpl');
+		if ($CanHtml)
+			echo Wrap(sprintf(T('You can customize the HTML and CSS for this theme on the %s page.'), Anchor('Custom Theme', 'settings/customtheme')), 'div', array('class' => 'CustomThemeOptions'));
+
+	}
+	
+	/**
+	 * Let the user remove themes they've created.
+	 */
+	public function SettingsController_AfterThemeButtons_Handler($Sender) {
+		$ThemeInfo = GetValue('ThemeInfo', $Sender->EventArguments, array());
+		$Folder = GetValue('Folder', $ThemeInfo, '');
+		// if (preg_match(substr($Folder, -7) == '_custom')
+		if (preg_match('`_custom[0-9]*$`', $Folder))
+			echo Anchor('Remove', 'dashboard/settings/removecustomtheme/'.$Folder.'/'.Gdn::Session()->TransientKey(), 'SmallButton RemoveAddon');
+
+	}
+	
+	/**
+	 * Remove a custom theme.
+	 */
+	public function SettingsController_RemoveCustomTheme_Create($Sender) {
+		$Session = Gdn::Session();
+		$ThemeFolder = GetValue(0, $Sender->RequestArgs, '');
+		$TransientKey = GetValue(1, $Sender->RequestArgs, '');
+		if ($Session->ValidateTransientKey($TransientKey) && $ThemeFolder != '')
+			Gdn_FileSystem::RemoveFolder(PATH_THEMES.'/'.$ThemeFolder);
+
+      Redirect('/settings/themes');		
+	}
+	
+	public function SettingsController_Render_Before($Sender) {
+		if ($Sender->RequestMethod == 'themes') {
+			if (is_object($Sender->Head)) {
+				$Sender->Head->AddString("
+<script type=\"text/javascript\">
+jQuery(document).ready(function($) {
+   $('a.RemoveAddon').popup({
+      confirm: true,
+      followConfirm: true
+   });
+});
+</script>
+");
+			}
+		}
 	}
 
    public function Base_BeforeAddCss_Handler($Sender) {
@@ -244,7 +286,10 @@ Here are some things you should know before you begin:
 			}
 			
 			// Save the about file (to get any theme name changes implemented)
-			save_about_file($CurrentThemeFolder, $Sender->Form->GetFormValue('ThemeName'));
+// TODO: GRAB THE CUSTOMIZATION VALUES FROM THE OLD THEME'S ABOUT ARRAY AND PASS INTO SAVE_ABOUT_FILE
+			$Options = array();
+			$Options[str_replace("'", '', $CurrentThemeFolder)] = array('Options' => GetValue('Options', $Sender->CurrentThemeInfo));
+			save_about_file($CurrentThemeFolder, $Sender->Form->GetFormValue('ThemeName'), $Options);
 
 			// Only keep the last 20 revs
 			clean_revisions(PATH_THEMES . DS . $CurrentThemeFolder, 'css');
@@ -427,16 +472,30 @@ function clean_revisions($Folder, $Type = 'css') {
 	}
 }
 
-function save_about_file($Folder, $Name) {
-	file_put_contents(
-		PATH_THEMES . DS . $Folder . DS . 'about.php',
-		"<?php if (!defined('APPLICATION')) exit();
-\$ThemeInfo['".str_replace("'", '', $Folder)."'] = array(
-	'Name' => '".str_replace("'", '', clean_theme_name($Name))."',
-	'Description' => 'A custom theme.',
-   'Author' => '".Gdn::Session()->User->Name."',
-	'IsCustom' => TRUE
-);");
+function save_about_file($Folder, $Name, $Attributes = array()) {
+	$Group = 'ThemeInfo';
+	$ThemeKey = str_replace("'", '', $Folder);
+	$Attributes[$ThemeKey]['Name'] = str_replace("'", '', clean_theme_name($Name));
+	$Attributes[$ThemeKey]['Description'] = 'A custom theme.';
+	$Attributes[$ThemeKey]['Author'] = Gdn::Session()->User->Name;
+	$Attributes[$ThemeKey]['IsCustom'] = TRUE;
+
+	$NewLines = array();
+	$NewLines[] = "<?php if (!defined('APPLICATION')) exit();";
+	foreach($Attributes as $Name => $Value) {
+		$Line = "\$".$Group."['".$Name."']";
+		FormatArrayAssignment($NewLines, $Line, $Value);
+	}
+
+	$FileContents = FALSE;
+	if ($NewLines !== FALSE)
+		$FileContents = implode("\n", $NewLines);
+
+	if ($FileContents === FALSE)
+		trigger_error(ErrorMessage('Failed to define configuration file contents.', 'Configuration', 'Save'), E_USER_ERROR);
+
+	// echo 'saving '.$File;
+	Gdn_FileSystem::SaveFile(PATH_THEMES . DS . $Folder . DS . 'about.php', $FileContents, LOCK_EX);
 }
 
 function clean_theme_name($Mixed) {

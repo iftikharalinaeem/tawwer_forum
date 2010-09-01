@@ -45,7 +45,7 @@ class VanillaConnect {
       $ConsumerNotifyUrl = sprintf('%s://%s%s',
          $SSL ? "https" : "http",
          $ProviderDomain,
-         '/entry/auth/handshake/handshake.js'
+         '/entry/auth/handshake'
       );
       
       $VanillaConnect = new VanillaConnect();
@@ -67,7 +67,7 @@ class VanillaConnect {
       $ConsumerNotifyUrl = sprintf('%s://%s%s',
          $SSL ? "https" : "http",
          $ProviderDomain,
-         '/entry/leave/handshake/handshake.js'
+         '/entry/leave/handshake'
       );
       
       $VanillaConnect = new VanillaConnect();
@@ -100,7 +100,7 @@ class VanillaConnect {
             if (window.onload) { window.prevonload = window.onload; }
             window.onload = function() {
                if (window.prevonload) window.prevonload();
-               AddInclude("vanillaconnect", "{$Url}");
+               AddInclude("vanillaconnect", "{$Url}&mode=js");
             }
          })();
       </script>
@@ -111,12 +111,12 @@ SCRIPTFRAGMENT;
    
    public function Url($UrlName) {
       $Url = $this->_Url;
-      return '<a href="'.htmlspecialchars($Url).'" alt="'.$UrlName.'">'.$UrlName.'</a>';
+      return '<a href="'.htmlspecialchars($Url).'&mode=direct" alt="'.$UrlName.'">'.$UrlName.'</a>';
    }
 
    public function Image() {
       $Url = $this->_Url;
-      return '<img src="'.htmlspecialchars($Url).'" alt="" />';
+      return '<img src="'.htmlspecialchars($Url).'&mode=image" alt="" />';
    }
    
 /*
@@ -127,7 +127,7 @@ SCRIPTFRAGMENT;
    
    public function  Redirect() {
       $Url = $this->_Request->to_url();
-      Header("Location: ".$Url);
+      Header("Location: ".$Url."&mode=direct");
       exit();
    }
    

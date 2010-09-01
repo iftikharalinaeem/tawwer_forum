@@ -109,6 +109,17 @@ div.Menu {
 	text-align:left;
 }
 
+#Head h1.Title a{
+	color:#4B9800  ;
+	font-size:1.7em;
+
+}
+
+#Head h1.Title a:hover{
+	color:#fff;
+	font-size:1.7em;
+}
+
 ul#Menu {
 	float:right;
 	padding:25px 0 0 10px;
@@ -190,7 +201,6 @@ div.MessageForm, div.Tabs {
 	border-left:1px solid #c4c4c4;
 	border-bottom:1px solid #c4c4c4;
 	display:block;
-	margin-bottom:30px;
 	padding:5px 8px;
 }
 
@@ -214,7 +224,6 @@ div.MessageForm a.Cancel:hover, div.MorePager a:hover, a.TabLink:hover, div.Tabs
 
 ul.DataList li.Item {
 	border-bottom:1px solid #e1e1e1;
-	margin:0 0 20px;
 	padding:4px 0;
 }
 
@@ -376,8 +385,6 @@ div.User h1 {
 div.Photo img{
 	border:1px solid #282828;
 	padding:2px;
-	margin-bottom:10px;
-
 }
 
 ul.DataList div.Photo img {
@@ -397,11 +404,9 @@ body.Profile ul.PanelInfo li{
 }
 
 div.Box dl {
-	background:#fff none repeat scroll 0 0;
-	border-bottom:1px solid #c4c4c4;
-	border-top:1px solid #c4c4c4;
-	overflow:hidden;
-	padding:3px;
+	background: none;
+	border: none;
+	padding: 0;
 }
 
 div.Popup div.Body {

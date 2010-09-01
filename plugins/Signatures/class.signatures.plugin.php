@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'This plugin allows users to attach their own signatures to their posts.',
-   'Version' => '1.1',
+   'Version' => '1.1.5',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -24,37 +24,90 @@ $PluginInfo['Signatures'] = array(
 );
 
 class SignaturesPlugin extends Gdn_Plugin {
+   
+   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+      $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddItem('Forum', T('Forum'));
+      $Menu->AddLink('Forum', T('Signatures'), 'settings/signatures', 'Garden.Settings.Manage');
+   }
+
+   /**
+    * Sig management
+    */
+   public function SettingsController_Signatures_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $Sender->Title('Signatures');
+      $Sender->AddSideMenu('settings/signatures');
+      $Sender->Render('plugins/Signatures/views/settings.php');
+   }
+
+   /**
+    * Turn sigs on or off.
+    */
+   public function SettingsController_ToggleSignatures_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      if (Gdn::Session()->ValidateTransientKey(GetValue(0, $Sender->RequestArgs)))
+         SaveToConfig('Plugins.Signatures.Enabled', C('Plugins.Signatures.Enabled') ? FALSE : TRUE);
+         
+      Redirect('settings/signatures');
+   }
 
    public function ProfileController_AfterAddSideMenu_Handler(&$Sender) {
+      if (!C('Plugins.Signatures.Enabled'))
+         return;
+      
       $SideMenu = $Sender->EventArguments['SideMenu'];
       $Session = Gdn::Session();
       $ViewingUserID = $Session->UserID;
       
       if ($Sender->User->UserID == $ViewingUserID) {
          $SideMenu->AddLink('Options', T('Signature Settings'), '/profile/signature', FALSE, array('class' => 'Popup'));
+      } else {
+         $SideMenu->AddLink('Options', T('Signature Settings'), '/profile/signature/'.$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
    
    public function ProfileController_Signature_Create(&$Sender) {
+      if (!C('Plugins.Signatures.Enabled'))
+         return;
+
+      $Args = $Sender->RequestArgs;
+      if (sizeof($Args) < 2)
+         $Args = array_merge($Args, array(0,0));
+      elseif (sizeof($Args) > 2)
+         $Args = array_slice($Args, 0, 2);
+      
+      list($UserReference, $Username) = $Args;
+      $Sender->Permission('Garden.SignIn.Allow');
+      $Sender->GetUserInfo($UserReference, $Username);
+      $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
+      if (!is_array($UserPrefs))
+         $UserPrefs = array();
+      
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigArray = array(
-         'Plugin.Signature.Sig'           => NULL,
-         'Plugin.Signature.HideAll'       => NULL,
-         'Plugin.Signature.HideImages'    => NULL
+         'Plugin.Signatures.Sig'           => NULL,
+         'Plugin.Signatures.HideAll'       => NULL,
+         'Plugin.Signatures.HideImages'    => NULL
       );
-      $ViewingUserID = Gdn::Session()->UserID;
+      $SigUserID = $ViewingUserID = Gdn::Session()->UserID;
+      
+      if ($Sender->User->UserID != $ViewingUserID) {
+         $Sender->Permission('Garden.Users.Edit');
+         $SigUserID = $Sender->User->UserID;
+      }
+      
+      $Sender->SetData('Plugin-Signatures-ForceEditing', ($SigUserID == Gdn::Session()->UserID) ? FALSE : $Sender->User->Name);
       
       // TIM: Waiting for RC3...
-      //$Session = Gdn::Session();
-      //$ViewingUserID = $Session->UserID;
-      //$UserMeta = $this->GetUserMeta($ViewingUserID, 'Plugin.Signature.%');
+      $UserMeta = $this->GetUserMeta($SigUserID, '%');
       
       // TIM: Leaving this here until RC3+
-      $UserMeta = $this->_GetUserSignatureData();
+      // $UserMeta = $this->_GetUserSignatureData($SigUserID);
       //
       
-      if ($Sender->Form->AuthenticatedPostBack() === FALSE)
+      if ($Sender->Form->AuthenticatedPostBack() === FALSE && is_array($UserMeta))
          $ConfigArray = array_merge($ConfigArray, $UserMeta);
       
       $ConfigurationModel->SetField($ConfigArray);
@@ -71,9 +124,11 @@ class SignaturesPlugin extends Gdn_Plugin {
          $FrmValues = array_intersect_key($Values, $ConfigArray);
          if (sizeof($FrmValues)) {
             foreach ($FrmValues as $UserMetaKey => $UserMetaValue) {
+               $this->SetUserMeta($SigUserID, $this->TrimMetaKey($UserMetaKey), $UserMetaValue);
+/*
                try {
                   Gdn::SQL()->Insert('UserMeta', array(
-                        'UserID' => $ViewingUserID,
+                        'UserID' => $SigUserID,
                         'Name'   => $UserMetaKey,
                         'Value'  => $UserMetaValue
                      ));
@@ -81,10 +136,11 @@ class SignaturesPlugin extends Gdn_Plugin {
                   Gdn::SQL()
                      ->Update('UserMeta')
                      ->Set('Value', $UserMetaValue)
-                     ->Where('UserID', $ViewingUserID)
+                     ->Where('UserID', $SigUserID)
                      ->Where('Name', $UserMetaKey)
                      ->Put();
                }
+*/
             }
          }
          
@@ -92,21 +148,6 @@ class SignaturesPlugin extends Gdn_Plugin {
       }
 
       $Sender->Render($this->GetView('signature.php'));
-   }
-   
-   public function DiscussionController_Render_Before(&$Sender) {
-      $this->PrepareController($Sender);
-   }
-   
-   public function PostController_Render_Before(&$Sender) {
-      $this->PrepareController($Sender);
-   }
-   
-   protected function PrepareController(&$Controller) {
-      // Short circuit if not needed
-      if ($this->_HideAllSignatures($Controller)) return;
-      
-      $Controller->AddCssFile($this->GetResource('design/signature.css', FALSE, FALSE));
    }
    
    public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
@@ -118,6 +159,9 @@ class SignaturesPlugin extends Gdn_Plugin {
    }
    
    protected function CacheSignatures(&$Sender) {
+      if (!C('Plugins.Signatures.Enabled'))
+         return;
+
       // Short circuit if not needed
       if ($this->_HideAllSignatures($Sender)) return;
       
@@ -125,51 +169,79 @@ class SignaturesPlugin extends Gdn_Plugin {
       $Comments = $Sender->Data('CommentData');
       $UserIDList = array();
       
-      $UserIDList[$Discussion->InsertUserID] = 1;
-      if ($Comments) {
-         while ($Comment = $Comments->NextRow()) {
-            $ThisUserID = $Comment->InsertUserID;
-            $UserIDList[$ThisUserID] = 1;
-         }
+      if ($Discussion)
+         $UserIDList[$Discussion->InsertUserID] = 1;
+         
+      if ($Comments && $Comments->NumRows()) {
+         $Comments->DataSeek(-1);
+         while ($Comment = $Comments->NextRow())
+            $UserIDList[$Comment->InsertUserID] = 1;
       }
       
       $UserSignatures = array();
       if (sizeof($UserIDList)) {
-         $SQL = Gdn::SQL();
-         $Signatures = $SQL
+/*
+         $Signatures = Gdn::SQL()
             ->Select('*')
             ->From('UserMeta')
             ->WhereIn('UserID', array_keys($UserIDList))
             ->Where('Name', 'Plugin.Signature.Sig')
             ->Get();
-         
+            
          while ($UserSig = $Signatures->NextRow())
             $UserSignatures[$UserSig->UserID] = $UserSig->Value;
+*/
+         $Signatures = $this->GetUserMeta(array_keys($UserIDList), 'Sig');
+         foreach ($Signatures as $UserID => $UserSig)
+            $UserSignatures[$UserID] = $UserSig[$this->MakeMetaKey('Sig')];
       }
       $Sender->SetData('Plugin-Signatures-UserSignatures', $UserSignatures);
    }
    
+   public function DiscussionController_Render_Before(&$Sender) {
+      $this->PrepareController($Sender);
+   }
+   
+   public function PostController_Render_Before(&$Sender) {
+      $this->PrepareController($Sender);
+   }
+   
+   protected function PrepareController(&$Controller) {
+      if (!C('Plugins.Signatures.Enabled'))
+         return;
+
+      // Short circuit if not needed
+      if ($this->_HideAllSignatures($Controller)) return;
+      
+      $Controller->AddCssFile($this->GetResource('design/signature.css', FALSE, FALSE));
+   }
+   
    public function GetUserSignature($UserID, $Default = NULL) {
-      $SQL = Gdn::SQL();
-      $UserSig = $SQL
+/*
+      $UserSig = Gdn::SQL()
          ->Select('*')
          ->From('UserMeta')
          ->Where('UserID', $UserID)
          ->Where('Name', 'Plugin.Signature.Sig')
          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+*/
+      $UserSig = $this->GetUserMeta($UserID, 'Sig');
          
       return (is_array($UserSig)) ? $UserSig['Value'] : $Default;
    }
    
-   public function DiscussionController_BeforeCommentDisplay_Handler(&$Sender) {
+   public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
       $this->_DrawSignature($Sender);
    }
    
-   public function PostController_BeforeCommentDisplay_Handler(&$Sender) {
+   public function PostController_AfterCommentBody_Handler(&$Sender) {
       $this->_DrawSignature($Sender);
    }
    
    protected function _DrawSignature(&$Sender) {
+      if (!C('Plugins.Signatures.Enabled'))
+         return;
+
       if ($this->_HideAllSignatures($Sender)) return;
       
       if (isset($Sender->EventArguments['Discussion'])) 
@@ -179,10 +251,10 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Data = $Sender->EventArguments['Comment'];
       
       $SourceUserID = $Data->InsertUserID;
-      $UserSignatures = $Sender->Data('Plugin-Signatures-UserSignatures');
+      $UserSignatures =& $Sender->Data('Plugin-Signatures-UserSignatures');
       
       if (isset($UserSignatures[$SourceUserID])) {
-         $HideImages = ArrayValue('Plugin.Signature.HideImages', $Sender->Data('Plugin-Signatures-ViewingUserData'), FALSE);
+         $HideImages = ArrayValue('Plugin.Signatures.HideImages', $Sender->Data('Plugin-Signatures-ViewingUserData'), FALSE);
          
          $UserSig = $UserSignatures[$SourceUserID];
          
@@ -201,31 +273,31 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Sender->UserSignature = Gdn_Format::Html($UserSig);
          $Display = $Sender->FetchView($this->GetView('usersig.php'));
          unset($Sender->UserSignature);
-         $Data->Body .= $Display;
+         echo $Display;
       }
    }
    
    protected function _HideAllSignatures(&$Sender) {
       
       if (!$Sender->Data('Plugin-Signatures-ViewingUserData')) {
-         // TIM: Commented this out until RC3 releases and we can start using Gdn_Plugin::GetUserMeta()
+         // TIM: RC3 now, using built in UserMeta methods
          //
-         //$Session = Gdn::Session();
-         //$ViewingUserID = $Session->UserID;
-         //$UserSig = $this->GetUserMeta($ViewingUserID, 'Plugin.Signature.%');
+         $UserSig = $this->GetUserMeta(Gdn::Session()->UserID, '%');
          
-         // TIM: Leaving this here until RC3+
-         $UserSig = $this->_GetUserSignatureData();
+         // TIM: Leaving this here until RC3+ UserMeta stuff is proven
+         //$UserSig = $this->_GetUserSignatureData();
          //
          
          $Sender->SetData('Plugin-Signatures-ViewingUserData',$UserSig);
       }
       
-      $HideSigs = ArrayValue('Plugin.Signature.HideAll', $Sender->Data('Plugin-Signatures-ViewingUserData'), FALSE);
+      $HideSigs = ArrayValue('Plugin.Signatures.HideAll', $Sender->Data('Plugin-Signatures-ViewingUserData'), FALSE);
       if ($HideSigs == "TRUE") return TRUE;
       return FALSE;
    }
    
+/*
+   // Removed because we can now use UserMeta methods
    protected function _GetUserSignatureData($UserID = NULL) {
       if (is_null($UserID))
          $UserID = Gdn::Session()->UserID;
@@ -244,6 +316,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       unset($UserMetaData);
       return $UserSig;
    }
+*/
    
    protected function _StripOnly($str, $tags, $stripContent = false) {
       $content = '';

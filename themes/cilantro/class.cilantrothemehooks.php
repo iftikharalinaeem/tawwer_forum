@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 class CilantroThemeHooks implements Gdn_IPlugin {
    
    public function Setup() {
-      $Structure = Gdn::Structure();
+/*      $Structure = Gdn::Structure();
       $Structure->Table('Tag')
 			->PrimaryKey('TagID')
 			->Column('Name', 'varchar(50)')
@@ -21,6 +21,7 @@ class CilantroThemeHooks implements Gdn_IPlugin {
 			->Column('DiscussionID', 'int', FALSE, 'key')
 			->Column('TagID', 'int', FALSE, 'key')
 			->Set();
+*/
    }
 
 	public function DiscussionModel_BeforeGet_Handler($Sender) {
@@ -82,7 +83,7 @@ class CilantroThemeHooks implements Gdn_IPlugin {
          ->Select('d.InsertUserID', '', 'FirstUserID')
          ->Select('d.DateInserted', '', 'FirstDate')
          ->Select('iu.Name', '', 'FirstName') // <-- Need these for rss!
-         ->Select('iup.Name', '', 'FirstPhoto')
+         ->Select('iu.Photo', '', 'FirstPhoto')
          ->Select('d.Body') // <-- Need these for rss!
          ->Select('d.Format') // <-- Need these for rss!
          ->Select('d.DateLastComment', '', 'LastDate')
@@ -94,10 +95,8 @@ class CilantroThemeHooks implements Gdn_IPlugin {
          ->Select('ca.UrlCode', '', 'CategoryUrlCode')
          ->From('Discussion d')
          ->Join('User iu', 'd.InsertUserID = iu.UserID', 'left') // First comment author is also the discussion insertuserid
-         ->Join('Photo iup', 'iu.PhotoID = iup.PhotoID', 'left') // First Photo
          //->Join('Comment lc', 'd.LastCommentID = lc.CommentID', 'left') // Last comment
          ->Join('User lcu', 'd.LastCommentUserID = lcu.UserID', 'left') // Last comment user
-         //->Join('Photo lcup', 'lcu.PhotoID = lcup.PhotoID', 'left') // Last Photo
          ->Join('Category ca', 'd.CategoryID = ca.CategoryID', 'left') // Category
          ->Join('Category pc', 'ca.ParentCategoryID = pc.CategoryID', 'left'); // Parent category
          //->Permission('ca', 'CategoryID', 'Vanilla.Discussions.View');

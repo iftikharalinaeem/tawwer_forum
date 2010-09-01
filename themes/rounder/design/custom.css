@@ -261,7 +261,6 @@ div.MessageForm, div.Tabs {
 	background:#f2f2f2;
 	border:1px solid #c4c4c4;
 	display:block;
-	margin-bottom:30px;
 	padding:5px 8px;
 }
 
@@ -285,7 +284,6 @@ div.MessageForm a.Cancel:hover, div.MorePager a:hover, a.TabLink:hover, div.Tabs
 
 ul.DataList li.Item {
 	border-bottom:1px solid #e1e1e1;
-	margin:0 0 20px;
 	padding:4px 0;
 }
 
@@ -439,6 +437,9 @@ ul.Activities li.CommentForm input.Button {
 form.Activity textarea {
 	width:600px;
 }
+ul.Activities ul.DataList li {
+	margin-bottom: 0;
+}
 
 /* ==================================================== New Conversation Form */
 
@@ -504,7 +505,10 @@ div.Photo img{
 	margin-bottom:10px;
 
 }
-
+/* Above margin caused layout problems on activity list */
+ul.DataList div.Photo img {
+	margin-bottom: 0;
+}
 ul.DataList div.Photo img {
 	border:1px solid #282828;
 	padding:2px;

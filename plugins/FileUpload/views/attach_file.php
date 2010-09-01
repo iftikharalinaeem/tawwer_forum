@@ -12,7 +12,8 @@
       </div>
    </div>
    <div class="AttachFileLink">
-      <a href="#" id="AttachFileLink">Attach a file</a>
+      <a href="javascript:;" id="AttachFileLink">Attach a file</a>
+      <div id="CurrentUploader"></div>
    </div>
 </div>
 <script type="text/javascript">

@@ -28,17 +28,13 @@ a:hover {
    height: 140px;
 }
 body #Head h1 {
-   position: absolute;
-   background: url('images/carsonified.png') center center no-repeat;
-   display: block;
-   height: 112px;
-   width: 232px;
-   margin: 30px 0 0;
+   margin: 25px 0 0;
    padding: 0;
    border: 0;
 }
 #Head h1 a span {
-   display: none;
+	color:#fff;
+	text-shadow: none;
 }
 #Head form {
    margin: 80px 0 0;
@@ -51,7 +47,7 @@ body #Head h1 {
    color: #fff /* Panel Font Color */;
 }
 ul#Menu {
-   margin: 0 auto 0 232px;
+   margin: 0;
    padding: 82px 0 0 10px;
 }
 #Menu ul {
@@ -206,6 +202,11 @@ div.Tabs {
    background: #E8E7D7;
    border-bottom: 1px solid #D8D7C7;
 }
+div.MessageForm a.Cancel,
+div.MessageForm a.Cancel:link,
+div.MessageForm a.Cancel:hover,
+div.MessageForm a.Cancel:active,
+div.MessageForm a.Cancel:visited,
 div.MorePager a,
 div.MorePager a:link,
 div.MorePager a:hover,
@@ -225,6 +226,7 @@ div.Tabs li a:visited {
    border: 1px solid #D8D7C7;
    background: #EEEEDE;
 }
+div.MessageForm a.Cancel:hover,
 div.MorePager a:hover,
 a.TabLink:hover,
 div.Tabs li a:hover {
@@ -307,8 +309,9 @@ a.NewConversation:hover {
 .Mine {
    background: #f2f1e7;
 }
-#MessageForm {
+div.MessageForm {
 	background: #E8E7D7;
+	border: none;
 }
 .ac_results {
    padding: 0;
@@ -400,6 +403,11 @@ div.Back a {
 body.Discussion #CommentForm h2 {
    color: #1b1a00 !important;
 }
+#DiscussionForm form {
+	background: none;
+	border: none;
+	padding:0 10px 10px;
+}
 input.InputBox:focus,
 input.SmallInput:focus,
 textarea:focus {
@@ -416,4 +424,12 @@ div.Info {
 }
 div.Info {
 	border: 1px solid #e8e7d7;
+}
+div.Popup #ConversationForm form ,
+#ConversationForm form {
+	background:none;
+	border: none;
+}
+div.Preview {
+	background: #F2F1E7;
 }
