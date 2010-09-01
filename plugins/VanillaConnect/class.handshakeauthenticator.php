@@ -73,9 +73,9 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       $Timestamp = $this->GetValue('Timestamp');
       $Version = $this->GetValue('Version');
       
-      // First check if we already have a token for this userkey
-      $SQL = Gdn::Database()->SQL();
-      $HaveToken = $SQL->Select('ua.UserID, ua.ForeignUserKey, uat.*')
+      /*
+// First check if we already have a token for this userkey
+      $HaveToken = Gdn::SQL()->Select('ua.UserID, ua.ForeignUserKey, uat.*')
          ->From('UserAuthentication ua')
          ->Join('UserAuthenticationToken uat', 'ua.ForeignUserKey = uat.ForeignUserKey', 'left')
          ->Where('ua.ForeignUserKey', $UserEmail)
@@ -86,37 +86,41 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
          ->EndWhereGroup()
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
+         
+      $ExpectedTokenKey = NULL;
+      if ($HaveToken)
+         $ExpectedTokenKey = $HaveToken['Token'];
+*/
+         
+      $RequestArguments = array(
+         'oauth_consumer_key'       => $ConsumerKey,
+         'oauth_version'            => $Version,
+         'oauth_timestamp'          => $Timestamp,
+         'oauth_nonce'              => $Nonce,
+         'oauth_signature_method'   => $SignatureMethod,
+         'oauth_signature'          => $Signature,
+         'email'                    => $UserEmail,
+         'name'                     => $UserName,
+         'uid'                      => $UserID,
+         'transient'                => $TransientKey
+      );
       
-      if ($HaveToken) {
+      try {
+         $OAuthRequest = OAuthRequest::from_request('GET', Url('/entry/auth/handshake',TRUE), $RequestArguments);
          
-         $TokenKey = $HaveToken['Token'];
-
-      } else {
-
-         $RequestArguments = array(
-            'oauth_consumer_key'       => $ConsumerKey,
-            'oauth_version'            => $Version,
-            'oauth_timestamp'          => $Timestamp,
-            'oauth_nonce'              => $Nonce,
-            'oauth_signature_method'   => $SignatureMethod,
-            'oauth_signature'          => $Signature,
-            'email'                    => $UserEmail,
-            'name'                     => $UserName,
-            'uid'                      => $UserID,
-            'transient'                => $TransientKey
-         );
+         $UserAssociation = Gdn::Authenticator()->GetAssociation($UserEmail, $ConsumerKey, $KeyType = Gdn_Authenticator::KEY_TYPE_PROVIDER);
          
-         try {
-            $OAuthRequest = OAuthRequest::from_request('GET', Url('/entry/auth/handshake',TRUE), $RequestArguments);
-            $Token = $this->_OAuthServer->fetch_request_token($OAuthRequest);
-         } catch (Exception $e) {
-            return Gdn_Authenticator::AUTH_DENIED;
+         if ($UserAssociation['Token']) {
+            $TokenKey = $UserAssociation['Token'];
+         } else {
+            $Token = $this->_OAuthServer->fetch_access_token($OAuthRequest);
+            $TokenKey = $Token->key;
          }
          
-         $TokenKey = $Token->key;
-
+      } catch (Exception $e) {
+         return Gdn_Authenticator::AUTH_DENIED;
       }
-
+      
       $CookiePayload = array(
          'token'        => $TokenKey,
          'consumer_key' => $ConsumerKey,
@@ -224,6 +228,13 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
    }
    
    public function LogoutResponse() {
+      if ($this->GethandshakeMode() != Gdn_Authenticator::HANDSHAKE_DIRECT)
+         return Gdn_Authenticator::REACT_REMOTE;
+      else
+         return Gdn_Authenticator::REACT_REDIRECT;
+   }
+   
+   public function FailedResponse() {
       if ($this->GethandshakeMode() != Gdn_Authenticator::HANDSHAKE_DIRECT)
          return Gdn_Authenticator::REACT_REMOTE;
       else
