@@ -18,7 +18,7 @@
     
       <div class="Info">
          <h1>Why Choose Vanilla Forums?</h1>
-         <p>Here’s some pretty cool stuff that just might make you want to use VanillaForums.com.</p>
+         <p>Here's some pretty cool stuff that just might make you want to use VanillaForums.com.</p>
       </div>
 
     <table class="Compare">
@@ -105,7 +105,7 @@
    
     <div class="Info">
          <h2>Features You'll Love</h2>
-         <p>We make it Easy for You to Manage and Fun for You're Community. </p>
+         <p>We make it Easy for You to Manage and Fun for Your Community. </p>
       </div>
 
 	
