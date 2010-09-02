@@ -12,8 +12,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['VanillaConnect'] = array(
 	'Name' => 'Vanilla Connect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers.',
-   'Version' => '1.1',
-   'RequiredApplications' => array('Vanilla' => '2.0.2a'),
+   'Version' => '1.2',
+   'RequiredApplications' => array('Vanilla' => '2.0.4'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/authentication/handshake',
@@ -176,7 +176,6 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    
    public function Setup() {
       $this->_Enable(FALSE);
-      Gdn::Authenticator()->EnableAuthenticationScheme('handshake');
    }
    
    public function OnDisable() {
@@ -223,8 +222,10 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    
    private function _Disable() {
       RemoveFromConfig('Plugins.VanillaConnect.Enabled');
-		RemoveFromConfig('Garden.SignIn.Popup');
-		RemoveFromConfig('Garden.Authenticator.DefaultScheme');
+		
+      $WasEnabled = Gdn::Authenticator()->UnsetDefaultAuthenticator('handshake');
+      if ($WasEnabled)
+         RemoveFromConfig('Garden.SignIn.Popup');
    }
    
    public function AuthenticationController_EnableAuthenticatorHandshake_Handler(&$Sender) {
@@ -232,15 +233,17 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    }
 	
 	private function _Enable($FullEnable = TRUE) {
-		SaveToConfig('Garden.SignIn.Popup', FALSE);
 		SaveToConfig('Garden.Authenticators.handshake.Name', 'VanillaConnect');
       SaveToConfig('Garden.Authenticators.handshake.CookieName', 'VanillaHandshake');
       SaveToConfig('Garden.Authenticators.handshake.TokenLifetime', 0);
       
       if ($FullEnable) {
-         SaveToConfig('Garden.Authenticator.DefaultScheme', 'handshake');
+         SaveToConfig('Garden.SignIn.Popup', FALSE);
          SaveToConfig('Plugins.VanillaConnect.Enabled', TRUE);
       }
+      
+      // Add this authenticator to the list of allowed authenticators, and optionally set it as the default
+      Gdn::Authenticator()->EnableAuthenticationScheme('handshake', $FullEnable);
       
       // Create a provider key/secret pair if needed
       $SQL = Gdn::Database()->SQL();

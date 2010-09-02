@@ -4,9 +4,8 @@
    
    <h3><?php echo T('Vanilla Connect'); ?></h3>
    <div class="Info">
-      <?php
-         echo T('Using Vanilla Connect, you can allow users from your external application or website to be automatically registered and signed into Vanilla. For instructions on how to enable Vanilla Connect, <a href="http://vanillaforums.com/info/vanillaconnect">read our documentation</a>.');
-      ?>
+      <?php echo T('Using Vanilla Connect, you can allow users from your external application or website to be automatically registered and signed into Vanilla. For instructions on how to enable Vanilla Connect, <a href="http://vanillaforums.com/info/vanillaconnect">read our documentation</a>.'); ?>
+      <?php echo T("Before attempting to populate the fields below, <b>please make sure you install and configure any remote application plugins or scripts first. They should provide the values you'll need below</b>."); ?>
    </div>
    
    <table class="SplitConfiguration">
@@ -21,7 +20,9 @@
                echo $this->Form->Errors();
                echo $this->Form->Hidden('AuthenticationKey', $this->ConsumerKey);
             ?>
-            <div><?php echo T("Define the following values so Vanilla knows where to send your users to register, sign in, sign out, etc."); ?><br/><br/></div>
+            <div>
+               <div class="Box HighlightBox"><?php echo T("If you are using VanillaConnect with an officially supported remote application plugin such as our wordpress-vanillaconnect plugin, these values will be available in that plugin's configuration screen."); ?></div>
+            </div>
             <ul>
                <li><?php
                   echo $this->Form->Label(T('Main Site URL'), 'Url');
@@ -52,7 +53,9 @@
          </td>
 
          <td class="RemoteConfig">
-            <div class="Info"><?php echo T("These are the settings you'll need when you configure VanillaConnect on your remote website."); ?></div>
+            <div>
+               <?php echo T("These are the settings you'll need when you configure VanillaConnect on your remote website."); ?><p/>
+            </div>
             <table class="Label AltColumns">
                <thead>
                   <tr>

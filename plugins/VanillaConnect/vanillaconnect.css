@@ -1,18 +1,8 @@
-div.RemoteConfig {
-   margin: 0 0 20px 460px;
-}
-div.VanillaConfig {
-   float: left;
-   width: 430px;
-   margin: 0 30px 20px 0;
-}
 div.Info span {
    display: block;
    padding: 20px 0 6px;
 }
-#Content table.SplitConfiguration td.VanillaConfig form ul {
-   padding:0;
-}
+
 #Content table.SplitConfiguration form input.Button {
    margin:0 20px 20px 0;
 }

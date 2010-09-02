@@ -73,9 +73,9 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       $Timestamp = $this->GetValue('Timestamp');
       $Version = $this->GetValue('Version');
       
-      // First check if we already have a token for this userkey
-      $SQL = Gdn::Database()->SQL();
-      $HaveToken = $SQL->Select('ua.UserID, ua.ForeignUserKey, uat.*')
+      /*
+// First check if we already have a token for this userkey
+      $HaveToken = Gdn::SQL()->Select('ua.UserID, ua.ForeignUserKey, uat.*')
          ->From('UserAuthentication ua')
          ->Join('UserAuthenticationToken uat', 'ua.ForeignUserKey = uat.ForeignUserKey', 'left')
          ->Where('ua.ForeignUserKey', $UserEmail)
@@ -86,49 +86,54 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
          ->EndWhereGroup()
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
+         
+      $ExpectedTokenKey = NULL;
+      if ($HaveToken)
+         $ExpectedTokenKey = $HaveToken['Token'];
+*/
+         
+      $RequestArguments = array(
+         'oauth_consumer_key'       => $ConsumerKey,
+         'oauth_version'            => $Version,
+         'oauth_timestamp'          => $Timestamp,
+         'oauth_nonce'              => $Nonce,
+         'oauth_signature_method'   => $SignatureMethod,
+         'oauth_signature'          => $Signature,
+         'email'                    => $UserEmail,
+         'name'                     => $UserName,
+         'uid'                      => $UserID,
+         'transient'                => $TransientKey
+      );
       
-      if ($HaveToken) {
+      try {
+         $OAuthRequest = OAuthRequest::from_request('GET', Url('/entry/auth/handshake',TRUE), $RequestArguments);
          
-         $TokenKey = $HaveToken['Token'];
-
-      } else {
-
-         $RequestArguments = array(
-            'oauth_consumer_key'       => $ConsumerKey,
-            'oauth_version'            => $Version,
-            'oauth_timestamp'          => $Timestamp,
-            'oauth_nonce'              => $Nonce,
-            'oauth_signature_method'   => $SignatureMethod,
-            'oauth_signature'          => $Signature,
-            'email'                    => $UserEmail,
-            'name'                     => $UserName,
-            'uid'                      => $UserID,
-            'transient'                => $TransientKey
-         );
+         $UserAssociation = Gdn::Authenticator()->GetAssociation($UserEmail, $ConsumerKey, $KeyType = Gdn_Authenticator::KEY_TYPE_PROVIDER);
          
-         try {
-            $OAuthRequest = OAuthRequest::from_request('GET', Url('/entry/auth/handshake/handshake.js',TRUE), $RequestArguments);
-            $Token = $this->_OAuthServer->fetch_request_token($OAuthRequest);
-         } catch (Exception $e) {
-            return Gdn_Authenticator::AUTH_DENIED;
+         if ($UserAssociation['Token']) {
+            $TokenKey = $UserAssociation['Token'];
+         } else {
+            $Token = $this->_OAuthServer->fetch_access_token($OAuthRequest);
+            $TokenKey = $Token->key;
          }
          
-         $TokenKey = $Token->key;
-
+      } catch (Exception $e) {
+         return Gdn_Authenticator::AUTH_DENIED;
       }
-
+      
       $CookiePayload = array(
          'token'        => $TokenKey,
          'consumer_key' => $ConsumerKey,
          'name'         => $UserName,
-         'uid'          => $UserID
+         'uid'          => $UserID,
+         'transient'    => $TransientKey
       );
       $SerializedCookiePayload = Gdn_Format::Serialize($CookiePayload);
       
       $this->AssociateRemoteKey($ConsumerKey, $UserEmail, $TokenKey);
 
       // Set authorized cookie on target
-      $this->_Remember($TokenKey, $SerializedCookiePayload);
+      $this->Remember($TokenKey, $SerializedCookiePayload);
       
       /*
        * If this foreign key is already fully associated with a local user account, don't bother to set a request cookie.
@@ -139,11 +144,10 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
          return Gdn_Authenticator::AUTH_SUCCESS;
       } else {
          
-         if (Gdn::Request()->Filename() == 'handshake.js') {
+         if ($this->GethandshakeMode() != Gdn_Authenticator::HANDSHAKE_DIRECT)
             return Gdn_Authenticator::AUTH_PARTIAL;
-         } else {
+         else
             return Gdn_Authenticator::AUTH_SUCCESS;
-         }
       }
    }
    
@@ -190,36 +194,56 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
          return Gdn_Authenticator::AUTH_DENIED;
       }
       
+      $this->DeleteCookie();
       Gdn::Authenticator()->SetIdentity(NULL);
       return Gdn_Authenticator::AUTH_SUCCESS;
    }
    
    public function LoginResponse() {
-      if (Gdn::Request()->Filename() == 'handshake.js')
+      if ($this->GethandshakeMode() != Gdn_Authenticator::HANDSHAKE_DIRECT)
          return Gdn_Authenticator::REACT_REMOTE;
       else
          return Gdn_Authenticator::REACT_REDIRECT;
    }
    
    public function PartialResponse() {
-      if (Gdn::Request()->Filename() == 'handshake.js')
+      if ($this->GethandshakeMode() != Gdn_Authenticator::HANDSHAKE_DIRECT)
          return Gdn_Authenticator::REACT_REMOTE;
       else
          return Gdn_Authenticator::REACT_REDIRECT;
    }
    
    public function RepeatResponse() {
-      if (Gdn::Request()->Filename() == 'handshake.js')
+      if ($this->GethandshakeMode() != Gdn_Authenticator::HANDSHAKE_DIRECT)
          return Gdn_Authenticator::REACT_REMOTE;
       else
          return Gdn_Authenticator::REACT_REDIRECT;
    }
    
    public function SuccessResponse() {
-      if (Gdn::Request()->Filename() == 'handshake.js')
+      if ($this->GethandshakeMode() != Gdn_Authenticator::HANDSHAKE_DIRECT)
          return Gdn_Authenticator::REACT_REMOTE;
       else
-         return Gdn_Authenticator::REACT_EXIT;
+         return Gdn_Authenticator::REACT_REDIRECT;
+   }
+   
+   public function LogoutResponse() {
+      if ($this->GethandshakeMode() != Gdn_Authenticator::HANDSHAKE_DIRECT)
+         return Gdn_Authenticator::REACT_REMOTE;
+      else
+         return Gdn_Authenticator::REACT_REDIRECT;
+   }
+   
+   public function FailedResponse() {
+      if ($this->GethandshakeMode() != Gdn_Authenticator::HANDSHAKE_DIRECT)
+         return Gdn_Authenticator::REACT_REMOTE;
+      else
+         return Gdn_Authenticator::REACT_REDIRECT;
+   }
+   
+   public function GetHandshakeMode() {
+      $ModeStr = Gdn::Request()->GetValue('mode', Gdn_Authenticator::HANDSHAKE_DIRECT);
+      return $ModeStr;
    }
    
    public function RequireLogoutTransientKey() {
@@ -455,6 +479,8 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
          $UserAssociation = $AccessToken->GetAssociation();
          if ($UserAssociation != FALSE) {
             $this->SetIdentity($UserAssociation['UserID'], FALSE);
+            if ($CookiePayload['transient'])
+               Gdn::Session()->TransientKey($CookiePayload['transient']);
          }   
       }
    }
@@ -480,7 +506,6 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
    }
    
    public function DeleteCookie() {
-      return;
       Gdn_Cookieidentity::DeleteCookie($this->_CookieName);
    }
    
@@ -550,7 +575,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       $Payload = $this->GetHandshake();
       
       if ($Payload) {
-         
+
          // Process the cookie auth
          $this->ProcessAuthorizedRequest($Payload);
       }

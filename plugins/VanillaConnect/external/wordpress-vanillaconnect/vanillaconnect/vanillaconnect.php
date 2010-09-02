@@ -17,27 +17,44 @@ You should have received a copy of the GNU General Public License along with the
 Contact Mark O'Sullivan at mark [at] vanillaforums [dot] com
 */
 
-add_action('wp_head', 'vanilla_connect');
-add_action('admin_head', 'vanilla_connect');
-function vanilla_connect() {
+// Store a marker to allow logins to take action after success
+add_action('login_head', 'vanillaconnect_login_marker');
+function vanillaconnect_login_marker() {
+   if (isset($_GET) && array_key_exists('mode', $_GET)) $Mode = $_GET['mode'];
+   else {
+      if (is_array($_COOKIE) && array_key_exists('VanillaHandshakeMarker', $_COOKIE)) return;
+      $Mode = 'script';
+   }
+   
+   setcookie('VanillaHandshakeMarker', $Mode, time() + 3600, COOKIEPATH, COOKIE_DOMAIN);
+}
 
+// Hook the point immediately after logout so that logouts can take redirect action
+add_action('wp_logout', 'vanillaconnect_handle_logout');
+function vanillaconnect_handle_logout() {
+   vanillaconnect_login_marker();
+}
+
+add_action('wp_head', 'vanillaconnect_process');
+add_action('admin_head', 'vanillaconnect_process');
+add_action('login_form', 'vanillaconnect_process');
+function vanillaconnect_process() {
    global $current_user;
    if (!function_exists('get_currentuserinfo'))
       require (ABSPATH . WPINC . '/pluggable.php');
 
    get_currentuserinfo();
    
-   // Only report user info if the user is authenticated and the vanilla domain has been defined.
    $VanillaConnectDomain = get_option('vanilla_connect_domain');
-   if ($current_user->ID != '' && $VanillaConnectDomain != '') {
+   $VanillaConnectKey = get_option('vanilla_connect_key');
+   $VanillaConnectSecret = get_option('vanilla_connect_secret');
    
-      $VanillaConnectKey = get_option('vanilla_connect_key');
-      $VanillaConnectSecret = get_option('vanilla_connect_secret');
+   if ($current_user->ID) {
+      // if the user is logged in, but the 'just logged out' flags are set, do nothing.
+      if (isset($_GET['loggedout']) || $_GET['loggedout']) return;
       
-      if ($VanillaConnectKey == '') return;
-      if ($VanillaConnectSecret == '') return;
-      
-      echo VanillaConnect::Authenticate(
+      // User is logged in
+      $AuthToken = VanillaConnect::Authenticate(
          $VanillaConnectDomain,
          $VanillaConnectKey,
          $VanillaConnectSecret,
@@ -48,31 +65,35 @@ function vanilla_connect() {
          array(
             'transient' => wp_create_nonce('log-out')
          )
-      )->Script();
-
+      );
+   
+   } else {
+      // if the user is not logged in, but the 'just logged out' flags arent set, do nothing.
+      if (!isset($_GET['loggedout']) || !$_GET['loggedout']) return;
+      
+      // User is logged out
+      $AuthToken = VanillaConnect::DeAuthenticate(
+         $VanillaConnectDomain,
+         $VanillaConnectKey,
+         $VanillaConnectSecret,
+         FALSE,
+         array()
+      );
    }
    
-}
-
-add_action('login_form', 'vanilla_disconnect');
-function vanilla_disconnect() {
-   if (!isset($_GET['loggedout']) || !$_GET['loggedout']) return;
+   $Mode = 'script';
    
-   // Only report user info if the user is authenticated and the vanilla domain has been defined.
-   $VanillaConnectDomain = get_option('vanilla_connect_domain');
-   $VanillaConnectKey = get_option('vanilla_connect_key');
-   $VanillaConnectSecret = get_option('vanilla_connect_secret');
-
-   if ($VanillaConnectKey == '') return;
-   if ($VanillaConnectSecret == '') return;
+   if (isset($_GET) && array_key_exists('mode', $_GET)) $Mode = $_GET['mode'];
+   else if (is_array($_COOKIE) && array_key_exists('VanillaHandshakeMarker', $_COOKIE)) {
+      $Mode = $_COOKIE['VanillaHandshakeMarker'];
+      setcookie('VanillaHandshakeMarker', ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
+   }
    
-   echo VanillaConnect::DeAuthenticate(
-      $VanillaConnectDomain,
-      $VanillaConnectKey,
-      $VanillaConnectSecret,
-      FALSE,
-      array()
-   )->Script();
+   if ($Mode == 'handshake')
+      echo $AuthToken->Redirect();
+   else
+      echo $AuthToken->Script();
+   
 }
 
 add_action('admin_menu', 'vanilla_connect_menu');
@@ -141,12 +162,14 @@ function vanilla_connect_options() {
       </tr>
       <tr>
          <th>Sign-in Url</th>
-         <td><span class="description"><?php echo wp_login_url(); ?></span></td>
+         <td><span class="description"><?php echo 
+            add_query_arg(array('mode' => 'handshake'), site_url('wp-login.php', 'login'));
+         ?></span></td>
       </tr>
       <tr>
          <th>Sign-out Url</th>
          <td><span class="description"><?php
-            echo add_query_arg(array('action' => 'logout', '_wpnonce' => '{Nonce}'), site_url('wp-login.php', 'login'));
+            echo add_query_arg(array('action' => 'logout', '_wpnonce' => '{Nonce}', 'mode' => 'handshake'), site_url('wp-login.php', 'login'));
          ?></span></td>
       </tr>
    </table>
@@ -1048,7 +1071,7 @@ class VanillaConnect {
       $ConsumerNotifyUrl = sprintf('%s://%s%s',
          $SSL ? "https" : "http",
          $ProviderDomain,
-         '/entry/auth/handshake/handshake.js'
+         '/entry/auth/handshake'
       );
       
       $VanillaConnect = new VanillaConnect();
@@ -1070,7 +1093,7 @@ class VanillaConnect {
       $ConsumerNotifyUrl = sprintf('%s://%s%s',
          $SSL ? "https" : "http",
          $ProviderDomain,
-         '/entry/leave/handshake/handshake.js'
+         '/entry/leave/handshake'
       );
       
       $VanillaConnect = new VanillaConnect();
@@ -1103,7 +1126,7 @@ class VanillaConnect {
             if (window.onload) { window.prevonload = window.onload; }
             window.onload = function() {
                if (window.prevonload) window.prevonload();
-               AddInclude("vanillaconnect", "{$Url}");
+               AddInclude("vanillaconnect", "{$Url}&mode=js");
             }
          })();
       </script>
@@ -1114,12 +1137,12 @@ SCRIPTFRAGMENT;
    
    public function Url($UrlName) {
       $Url = $this->_Url;
-      return '<a href="'.htmlspecialchars($Url).'" alt="'.$UrlName.'">'.$UrlName.'</a>';
+      return '<a href="'.htmlspecialchars($Url).'&mode=direct" alt="'.$UrlName.'">'.$UrlName.'</a>';
    }
 
    public function Image() {
       $Url = $this->_Url;
-      return '<img src="'.htmlspecialchars($Url).'" alt="" />';
+      return '<img src="'.htmlspecialchars($Url).'&mode=image" alt="" />';
    }
    
 /*
@@ -1130,7 +1153,7 @@ SCRIPTFRAGMENT;
    
    public function  Redirect() {
       $Url = $this->_Request->to_url();
-      Header("Location: ".$Url);
+      Header("Location: ".$Url."&mode=direct");
       exit();
    }
    

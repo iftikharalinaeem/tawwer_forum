@@ -12,8 +12,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProxyConnect'] = array(
 	'Name' => 'Proxy Connect SSO',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
-   'Version' => '1.6',
-   'RequiredApplications' => array('Vanilla' => '2.0.2a'),
+   'Version' => '1.7',
+   'RequiredApplications' => array('Vanilla' => '2.0.4'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/authentication/proxy',
@@ -182,8 +182,6 @@ class ProxyConnectPlugin extends Gdn_Plugin {
 
 		if (!$NumLookupMethods)
 		   throw new Exception(T("Unable to initialize plugin: required connectivity libraries not found, need either 'fsockopen' or 'curl'."));
-		   
-      Gdn::Authenticator()->EnableAuthenticationScheme('proxy');
       
       $this->_Enable(FALSE);
    }
@@ -232,8 +230,10 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    
    private function _Disable() {
       RemoveFromConfig('Plugins.ProxyConnect.Enabled');
-		RemoveFromConfig('Garden.SignIn.Popup');
-		RemoveFromConfig('Garden.Authenticator.DefaultScheme');
+		
+		$WasEnabled = Gdn::Authenticator()->UnsetDefaultAuthenticator('proxy');
+      if ($WasEnabled)
+         RemoveFromConfig('Garden.SignIn.Popup');
    }
 	
    public function AuthenticationController_EnableAuthenticatorProxy_Handler(&$Sender) {
@@ -241,14 +241,14 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    }
 	
 	private function _Enable($FullEnable = TRUE) {
-		SaveToConfig('Garden.SignIn.Popup', FALSE);
 		SaveToConfig('Garden.Authenticators.proxy.Name', 'ProxyConnect');
       SaveToConfig('Garden.Authenticators.proxy.CookieName', 'VanillaProxy');
       
       if ($FullEnable) {
-         SaveToConfig('Garden.Authenticator.DefaultScheme', 'proxy');
+         SaveToConfig('Garden.SignIn.Popup', FALSE);
          SaveToConfig('Plugins.ProxyConnect.Enabled', TRUE);
       }
+      Gdn::Authenticator()->EnableAuthenticationScheme('proxy', $FullEnable);
       
       // Create a provider key/secret pair if needed
       $SQL = Gdn::Database()->SQL();
