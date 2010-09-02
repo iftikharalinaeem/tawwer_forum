@@ -1,3 +1,28 @@
+body.fileupload div#Content div.Info {
+   padding-bottom: 0px;
+   margin-bottom: 0px;
+}
+
+body.fileupload div#Content div.Info div.RealtimeMode {
+   display: block;
+   font-size: 85%;
+}
+
+body.fileupload div#Content div.Info div.RealtimeMode span {
+   padding: 2px 5px;;
+   
+}
+
+body.fileupload div#Content div.Info div.RealtimeMode span.FileUploadRealtimeUnavailable {
+   color: #ff7c25;
+   background-color: #fff1e8;
+}
+
+body.fileupload div#Content div.Info div.RealtimeMode span.FileUploadRealtimeAvailable {
+   color: #40aa00;
+   background-color: #dfffcb;
+}
+
 #DiscussionForm ul.PostOptions {
    margin-bottom: 0px;
 }

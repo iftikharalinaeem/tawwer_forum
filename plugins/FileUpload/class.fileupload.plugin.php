@@ -11,8 +11,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions, comments and conversations.',
-   'Version' => '1.0',
-   'RequiredApplications' => FALSE,
+   'Version' => '1.1',
+   'RequiredApplications' => array('Vanilla' => '2.0.2'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
@@ -338,13 +338,13 @@ class FileUploadPlugin extends Gdn_Plugin {
       // this will hold the IDs and filenames of the items we were sent. booyahkashaa.
       $MediaResponse = array();
       
-      if (!$Sender->Form->IsPostBack()) {
-         $PostMaxSize = ini_get('post_max_size');
-         throw new FileUploadPluginUploadErrorException("The post data was too big (max {$PostMaxSize})",10,'???');
-      }
-      
       $FileData = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, $FieldName, FALSE);
       try {
+         if (!$Sender->Form->IsPostBack()) {
+            $PostMaxSize = ini_get('post_max_size');
+            throw new FileUploadPluginUploadErrorException("The post data was too big (max {$PostMaxSize})",10,'???');
+         }
+      
          if (!$FileData) {
             //$PostMaxSize = ini_get('post_max_size');
             $MaxUploadSize = ini_get('upload_max_filesize');
@@ -426,6 +426,8 @@ class FileUploadPlugin extends Gdn_Plugin {
             'Status'          => 'success',
             'MediaID'         => $MediaID,
             'Filename'        => $FileName,
+            'Filesize'        => $FileSize,
+            'FormatFilesize'  => Gdn_Format::Bytes($FileSize,1),
             'ProgressKey'     => $Sender->ApcKey ? $Sender->ApcKey : ''
          );
 
@@ -467,39 +469,44 @@ class FileUploadPlugin extends Gdn_Plugin {
       $KeyData = explode('_',$ApcKey);
       array_shift($KeyData);
       $UploaderID = implode('_',$KeyData);
-      
-      $UploadStatus = apc_fetch('upload_'.$ApcKey, $Success);
+   
+      $ApcAvailable = self::ApcAvailable();
       
       $Progress = array(
          'key'          => $ApcKey,
-         'uploader'     => $UploaderID
+         'uploader'     => $UploaderID,
+         'apc'          => ($ApcAvailable) ? 'yes' : 'no'
       );
       
-/*
-      if ($Success) {
+      if ($ApcAvailable) {
+         
+         $UploadStatus = apc_fetch('upload_'.$ApcKey, $Success);
+         
+         if (!$Success)
+            $UploadStatus = array(
+               'current'   => 0,
+               'total'     => -1
+            );
+            
          $Progress['progress'] = ($UploadStatus['current'] / $UploadStatus['total']) * 100;
          $Progress['total'] = $UploadStatus['total'];
-      } else {
-         $Progress['progress'] = 0;
-         $Progress['total'] = -1;
+            
+         
+         $Progress['format_total'] = Gdn_Format::Bytes($Progress['total'],1);
+         $Progress['cache'] = $UploadStatus;
+         
       }
-*/
-      
-      if (!$Success)
-         $UploadStatus = array(
-            'current'   => 0,
-            'total'     => -1
-         );
          
-      $Progress['progress'] = ($UploadStatus['current'] / $UploadStatus['total']) * 100;
-      $Progress['total'] = $UploadStatus['total'];
-         
-      
-      $Progress['format_total'] = Gdn_Format::Bytes($Progress['total'],1);
-      $Progress['cache'] = $UploadStatus;
-      
       $Sender->SetJSON('Progress', $Progress);
       $Sender->Render($this->GetView('confirm_file.php'));
+   }
+   
+   public static function ApcAvailable() {
+      $ApcAvailable = TRUE;
+      if ($ApcAvailable && !ini_get('apc.enabled')) $ApcAvailable = FALSE;
+      if ($ApcAvailable && !ini_get('apc.rfc1867')) $ApcAvailable = FALSE;
+      
+      return $ApcAvailable;
    }
    
    public function Setup() {

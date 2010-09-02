@@ -5,7 +5,7 @@
          <div class="FileName">FileName</div>
          <div class="FileSize">FileSize</div>
          <div class="UploadProgress">
-            <div class="Foreground"><strong>Uploading:</strong> 10%</div>
+            <div class="Foreground"><strong>Uploading...</strong></div>
             <div class="Background">&nbsp;</div>
             <div>&nbsp;</div>
          </div>
@@ -18,4 +18,5 @@
 </div>
 <script type="text/javascript">
    var UploadManager = new Gdn_MultiFileUpload('<?php echo Gdn::Request()->WebRoot(); ?>', 'AttachmentWindow', 'AttachFileContainer', 'AttachFileLink', 'UploadAttachment', '<?php echo $this->MaxUploadSize; ?>', '<?php echo uniqid(''); ?>');
+   UploadManager.Apc(<?php echo (FileUploadPlugin::ApcAvailable()) ? 'true' : 'false'; ?>);
 </script>

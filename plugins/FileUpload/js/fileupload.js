@@ -15,6 +15,12 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
    this.IFrameContainer = null;
    this.IFrames = {};
    this.TID = 0;
+   
+   this.APC = false;
+   
+   Gdn_MultiFileUpload.prototype.Apc = function(ApcStatus) {
+      this.APC = ApcStatus;
+   }
 
    Gdn_MultiFileUpload.prototype.Reset = function() {
       $('#'+this.AttachmentWindow).html(this.AttachmentWindowHTML);
@@ -89,13 +95,15 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
       UploaderForm.id = FormName;
       UploaderForm.target = IFrameName;
       
-      var APCNotifier = document.createElement('input');
-      APCNotifier.type = 'hidden';
-      APCNotifier.name = 'APC_UPLOAD_PROGRESS';
-      APCNotifier.id = NewUploaderID+'_apckey';
-      APCNotifier.value = this.UniqID + '_' + NewUploaderID;
-      $(UploaderForm).append(APCNotifier);
-      
+      if (this.APC) {
+         var APCNotifier = document.createElement('input');
+         APCNotifier.type = 'hidden';
+         APCNotifier.name = 'APC_UPLOAD_PROGRESS';
+         APCNotifier.id = NewUploaderID+'_apckey';
+         APCNotifier.value = this.UniqID + '_' + NewUploaderID;
+         $(UploaderForm).append(APCNotifier);
+      }
+            
       var NewUploader   = document.createElement('input');
       NewUploader.type  = 'file';
       NewUploader.name  = NewUploaderID;
@@ -103,19 +111,6 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
       NewUploader.className = '';
       NewUploader.rel = FormName;
       $(UploaderForm).append(NewUploader);
-
-/*
-      var $link = $('#'+this.AttachFileLinkID);
-
-      if (!$.browser.opera) {
-         $(NewUploader).css('opacity',0);
-         $(NewUploader).css('right', $link.parent().outerWidth() - $link.outerWidth());
-         $link.parent().append(NewUploader);
-      } else {
-         $link.parent().append(NewUploader);
-         $link.remove();
-      }
-*/
       
       var MaxUploadSize = document.createElement('input');
       MaxUploadSize.type = 'hidden';
@@ -192,14 +187,8 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
       var IFrameName = Target.parent().attr('target');
       this.IFrames[IFrameName].ready = 'yes';
       
-/*       var Submitter = jQuery.proxy(function(){ */
-         Target.parent().submit();
-         this.NewUploader();
-/*
-      }, this);      
-      setTimeout(Submitter ,200);
-*/
-
+      Target.parent().submit();
+      this.NewUploader();
    }
    
    Gdn_MultiFileUpload.prototype.RememberFile = function(FileInput) {
@@ -218,7 +207,7 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
 		var FileSizeDiv = $(PrototypeFileAttachment).find('div.FileSize');
 		var ProgressDiv = $(PrototypeFileAttachment).find('div.UploadProgress');
       $(FileNameDiv).html(FileName);
-      $(FileSizeDiv).html('? Kb');
+      $(FileSizeDiv).html('');
       $($(ProgressDiv).find('div.Background')).css('width','0px');
       
       var FileListingID = [FileInput.attr('id'),'listing'].join('_');
@@ -234,6 +223,9 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
    }
    
    Gdn_MultiFileUpload.prototype.Progress = function(Data, ResponseStatus, XMLResponse) {
+      if (!this.APC) return;
+      var ExecuteApcLookup = this.APC;
+   
       if (this.ProgressBars[Data]) {
          var ApcKey = this.ProgressBars[Data].ApcKey;
          var Progress = this.ProgressBars[Data].Progress;
@@ -244,10 +236,15 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
          
          var JData = jQuery.parseJSON(Data);
          if (JData && JData.Progress) {
+
             var JProgress = JData.Progress;
             var UploaderID = JProgress.uploader;
             
             if (!this.ProgressBars[UploaderID]) return;
+            
+            if (JProgress.apc == 'no') {
+               return;
+            }
             
             var Progress = JProgress.progress;
             this.ProgressBars[UploaderID].Progress = Progress;
@@ -273,28 +270,32 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
             
          }
          
-         // Wait 100 MS and then trigger another request
-         Progress = parseInt(Progress);
-         if ((!this.ProgressBars[UploaderID].Complete && Progress < 100) || (this.ProgressBars[UploaderID].Complete && Progress <= 0)) {
-            this.TID = this.ProgressBars[UploaderID].TimerID = setTimeout(jQuery.proxy(function(){ this.Progress(UploaderID); }, this), 100);
+         if (ExecuteApcLookup) {
+            // Wait 100 MS and then trigger another request
+            Progress = parseInt(Progress);
+            if ((!this.ProgressBars[UploaderID].Complete && Progress < 100) || (this.ProgressBars[UploaderID].Complete && Progress <= 0)) {
+               this.TID = this.ProgressBars[UploaderID].TimerID = setTimeout(jQuery.proxy(function(){ this.Progress(UploaderID); }, this), 100);
+            }
          }
+         
          return;
       }
    
-      var Action = ['post','checkupload',ApcKey,this.ProgressBars[UploaderID].Progress];
-      if (this.ActionRoot)
-         Action.unshift(this.ActionRoot);
-      Action.unshift('');
-      var FinalURL = Action.join('/')+'?randval='+Math.random();
-      
-      jQuery.ajax({
-         url:FinalURL,
-         type:'GET',
-         async:true,
-         //data:{'Previous':Progress},
-         success:jQuery.proxy(this.Progress, this)
-      });
-
+      if (ExecuteApcLookup) {
+         var Action = ['post','checkupload',ApcKey,this.ProgressBars[UploaderID].Progress];
+         if (this.ActionRoot)
+            Action.unshift(this.ActionRoot);
+         Action.unshift('');
+         var FinalURL = Action.join('/')+'?randval='+Math.random();
+         
+         jQuery.ajax({
+            url:FinalURL,
+            type:'GET',
+            async:true,
+            //data:{'Previous':Progress},
+            success:jQuery.proxy(this.Progress, this)
+         });
+      }
    }
    
    Gdn_MultiFileUpload.prototype.UploadComplete = function(IFrameName, TargetUploaderID) {
@@ -306,10 +307,14 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
       var IFR = document.getElementById(IFrameName);
       var Response = IFR.contentWindow.document.body.innerHTML;
       
+      var UploadResultStatus = 'fail';
+      var FailReason = 'An unknown error occured.';
+      
       var JResponse = jQuery.parseJSON(Response);
       if (JResponse && JResponse.MediaResponse) {
       
          if (JResponse.MediaResponse.Status == 'success') {
+            UploadResultStatus = 'success';
             // SUCCESS
             
             var Filename = JResponse.MediaResponse.Filename;
@@ -332,32 +337,41 @@ function Gdn_MultiFileUpload(Action, AttachmentWindow, FileContainerID, AttachFi
             TrackAll.value = MediaID;
             
             var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
+            
+            // Update the filesize
+            if (JResponse.MediaResponse.Filesize != null) {
+               $(FileListing.find('div.FileSize')).html(JResponse.MediaResponse.FormatFilesize);
+            }
+            
             $(FileListing.find('div.FileOptions')).append(EnableMe);
             $(FileListing.find('div.FileOptions')).append(TrackAll);
             $(FileListing.find('div.UploadProgress')).remove();
             
          } else {
             // FAILURE
-            
-            clearTimeout(this.ProgressBars[TargetUploaderID].TimerID);
-            this.RemoveUploader(TargetUploaderID);
-            
-            var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
-            FileListing.html("File upload failed. Reason: "+JResponse.MediaResponse.StrError);
-            FileListing.css({
-               'background-color':'#ffbfbf',
-               'color':'#a70000',
-               'padding-left':'20px',
-               'background-position':'8px center',
-               'cursor':'pointer'
-            });
-            FileListing.click(function(){FileListing.remove();});
-            setTimeout(function(){
-               FileListing.fadeTo(1500,0,function(){ FileListing.animate({'height':0},600,function(){ FileListing.remove(); }) });
-            },6000);
-            delete this.ProgressBars[TargetUploaderID];
+            FailReason = JResponse.MediaResponse.StrError;
             
          }
+      }
+      
+      if (UploadResultStatus == 'fail') {
+         clearTimeout(this.ProgressBars[TargetUploaderID].TimerID);
+         this.RemoveUploader(TargetUploaderID);
+         
+         var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
+         FileListing.html("File upload failed. Reason: "+FailReason);
+         FileListing.css({
+            'background-color':'#ffbfbf',
+            'color':'#a70000',
+            'padding-left':'20px',
+            'background-position':'8px center',
+            'cursor':'pointer'
+         });
+         FileListing.click(function(){FileListing.remove();});
+         setTimeout(function(){
+            FileListing.fadeTo(1500,0,function(){ FileListing.animate({'height':0},600,function(){ FileListing.remove(); }) });
+         },6000);
+         delete this.ProgressBars[TargetUploaderID];
       }
    }
    
