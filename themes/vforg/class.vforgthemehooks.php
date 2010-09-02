@@ -38,4 +38,9 @@ jQuery(document).ready(function($) {
 </script>");
    }
    
+   public function ProfileController_Render_Before($Sender) {
+		$Sender->AddJsFile('plugins/Voting/voting.js');
+		$Sender->AddCssFile('plugins/Voting/design/voting.css');
+   }
+   
 }
