@@ -509,6 +509,9 @@ ul.PanelActivity li div.Story {
 div.Tags ul.PanelInfo li a {
 	font-weight: bold;
 }
+ul.PanelInfo li.Active {
+	border-bottom: none;
+}
 
 /* Sign In Form */
 body.Entry #Content h1 { color: inherit; }
