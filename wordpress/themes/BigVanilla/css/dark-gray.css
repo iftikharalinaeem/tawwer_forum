@@ -1,0 +1,58 @@
+body {
+	background: #212121;
+}
+a:link, a:visited {
+	color: #272727;
+	text-decoration: none;
+}
+a:hover {
+	color: #272727;
+	text-decoration: underline;
+}
+a:active {
+	color: #272727;
+	text-decoration: none;
+}
+#header_wrap {
+  background: #212121 url(../images/dark-gray/background.png) repeat-x;
+}
+#header {
+  background: url(../images/dark-gray/header-bg.png) no-repeat 100% 0;
+}
+#header .subscribe {
+  color: #777;
+}
+#header .navigation li a {
+	color: #f1f1f1;
+	text-shadow: #000 0 1px 0;
+	background: #000;
+	border-color: #000;
+}
+#header .navigation li a:hover, 
+#header .navigation li.current_page_item a,
+#header .navigation li.current_page_parent a {
+	color: #000;
+	text-shadow: #fff 0 1px 0;
+	background: #f1f1f1;
+	border-color: #f1f1f1;
+}
+.extend {
+  background: url(../images/dark-gray/extend.png) repeat-x;
+}
+#footer p {
+  color: #777;
+  text-shadow: none;
+  background: url(../images/dark-gray/footer-divider.gif) repeat-x left bottom;
+}
+.left_block ul {
+  background: url(../images/dark-gray/footer-divider.gif) repeat-x left top;
+}
+.left_block ul li a {
+  background: url(../images/dark-gray/footer-divider.gif) repeat-x left bottom;
+}
+.left_block ul li a:hover {
+  background-color: #111;
+}
+.credits {
+  color: #777;
+}
