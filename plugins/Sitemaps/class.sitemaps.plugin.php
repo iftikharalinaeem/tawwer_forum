@@ -161,7 +161,7 @@ class SitemapsPlugin extends Gdn_Plugin {
             'loc'       => Url(basename($MapFile),TRUE),
             'file'      => basename($MapFile),
             'hash'      => $MapHash,
-            'lastmod'   => (!is_null($this->Lastmod)) ? $this->Lastmod : date('c')
+            'lastmod'   => (!is_null($this->Lastmod)) ? $this->Lastmod : date('Y-m-d')
          );
       }
    }
