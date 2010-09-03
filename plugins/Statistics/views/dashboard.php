@@ -1,19 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
 
-/*function WriteData($Data, $Field = 'Value') {
-   $Alt = 0;
-   foreach ($Data as $Date => $Row) {
-      $Alt = $Alt == 0 ? 1 : 0;
-      $Val = GetValue($Field, $Row, 0);
-      if ($Field == 'Date') {
-         $Date = Gdn_Format::ToTimestamp($Val);
-         $Val = date(date('Y', $Date) < date('Y') ? 'M d, Y' : 'M d', strtotime($Val));
-      }
-         
-      echo Wrap($Val, 'td', $Alt ? array('class' => 'Alt') : '');
-   }
-}
-*/
+$PageViewSum = 0;
+$UserSum = 0;
+$DiscussionSum = 0;
+$CommentSum = 0;
+
 function Capitalize($Word) {
    return strtoupper(substr($Word, 0, 1)).substr($Word, 1);
 }
