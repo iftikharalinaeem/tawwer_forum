@@ -122,7 +122,7 @@ class SitemapsPlugin extends Gdn_Plugin {
                
             $this->MapItem(
                DiscussionLink($Discussion, FALSE),
-               $Discussion->DateLastComment,
+               date('Y-m-d', strtotime($Discussion->DateLastComment)),
                $ChangeFreq,
                $PriorityMatrix[$ChangeFreq]
             );
