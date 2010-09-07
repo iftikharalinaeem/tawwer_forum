@@ -122,7 +122,7 @@ class SitemapsPlugin extends Gdn_Plugin {
                
             $this->MapItem(
                DiscussionLink($Discussion, FALSE),
-               $Discussion->DateLastComment,
+               date('Y-m-d', strtotime($Discussion->DateLastComment)),
                $ChangeFreq,
                $PriorityMatrix[$ChangeFreq]
             );
@@ -161,7 +161,7 @@ class SitemapsPlugin extends Gdn_Plugin {
             'loc'       => Url(basename($MapFile),TRUE),
             'file'      => basename($MapFile),
             'hash'      => $MapHash,
-            'lastmod'   => (!is_null($this->Lastmod)) ? $this->Lastmod : date('c')
+            'lastmod'   => (!is_null($this->Lastmod)) ? $this->Lastmod : date('Y-m-d')
          );
       }
    }

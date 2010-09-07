@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "This plugin allows users to quote each other's posts easily.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -70,8 +70,9 @@ class QuotesPlugin extends Gdn_Plugin {
    protected function AddQuoteButton(&$Sender) {
       if (!Gdn::Session()->UserID) return;
       
+      $Object = !isset($Sender->EventArguments['Comment']) ? $Sender->Data['Discussion'] : $Sender->EventArguments['Comment'];
       $ObjectID = !isset($Sender->EventArguments['Comment']) ? 'Discussion_'.$Sender->Data['Discussion']->DiscussionID : 'Comment_'.$Sender->EventArguments['Comment']->CommentID;
-      $QuoteURL = Url("post/quote/{$Sender->Data['Discussion']->DiscussionID}/{$ObjectID}",TRUE);
+      $QuoteURL = Url("post/quote/{$Object->DiscussionID}/{$ObjectID}",TRUE);
       $QuoteText = T('Quote');
       echo <<<QUOTE
       <span class="CommentQuote"><a href="{$QuoteURL}">{$QuoteText}</a></span>
@@ -95,12 +96,12 @@ QUOTE;
       
       switch ($Data->Format) {
          case 'Html':
-            $Data->Body = preg_replace_callback('/(<blockquote rel="([\d\w_]{3,20})">)/', array($this, 'QuoteAuthorCallback'), $Data->Body);
+            $Data->Body = preg_replace_callback('/(<blockquote rel="([\d\w_ ]{3,30})">)/u', array($this, 'QuoteAuthorCallback'), $Data->Body);
             $Data->Body = str_replace('</blockquote>','</p></div></blockquote>',$Data->Body);
             break;
             
          case 'BBCode':
-            $Data->Body = preg_replace_callback('/(\[quote="([\d\w_]{3,20})"\])/', array($this, 'QuoteAuthorCallback'), $Data->Body);
+            $Data->Body = preg_replace_callback('/(\[quote="([\d\w_ ]{3,30})"\])/u', array($this, 'QuoteAuthorCallback'), $Data->Body);
             $Data->Body = str_replace('[/quote]','</p></div></blockquote>',$Data->Body);
             break;
             
