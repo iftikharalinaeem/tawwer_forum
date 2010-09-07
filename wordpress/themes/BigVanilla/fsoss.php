@@ -2,7 +2,7 @@
 /**
  * @package WordPress
  * @subpackage Cullection_Theme
- * Template Name: Events
+ * Template Name: fsoss
  */
 
 ?>
@@ -23,47 +23,11 @@
 
     
    
-           <img src="<?php echo bloginfo('template_url'); ?>/images/events.png" alt="" title="Vanilla Events" border="0" />
+           <img src="<?php echo bloginfo('template_url'); ?>/images/fsoss.png" alt="" title="Vanilla Events" border="0" />
 
    
    
    <div class="FeatureSections">
-   
-     <div class="post_events_list">
-     
-     <h4 class="blue"><i class="Sprite SpriteDate"></i> Upcoming Events</h4>
-            <p class="About">
-             <strong>Find out where Vanilla Forums will be next.</strong>
-              
-            </p>
-			
-		<div class="post_events_entry">	
-			<?php $paged = (get_query_var('paged')) ? get_query_var('paged') : 1; ?>
-      <?php query_posts("showposts=5&cat=36&paged=$paged"); ?>
-      <?php while (have_posts()) : the_post(); ?>
-      
-      <ul><li><a href="<?php the_permalink() ?>" rel="bookmark" title="Permanent Link to <?php the_title_attribute(); ?>"><?php the_title(); ?></a> </li></ul>
-                     
-        
-        <?php endwhile; ?>
-
-  </div>
-  
-     </div>
-     
-     <div class="invite_vanilla">
-      <h4 class="blue"><i class="Sprite SpriteEvents"></i> Want Vanilla Forums?</h4>
-            <p class="About">
-             <strong>Can't get enough of us?</strong> Have us speak at your event.Tells us where and when and we'll be there!             
-            </p>
-            <br  />
-            <form action="http://vanilla.createsend.com/t/r/s/oiiwu/" method="post" id="subForm">
-					<input type="text"  name="cm-oiiwu-oiiwu" id="oiiwu-oiiwu" class="InputBox" />
-					<input type="submit" value="Submit" class="BlueButton" />
-				</form>
-
-     </div>
-   
    </div>
    
     <div class="Info">

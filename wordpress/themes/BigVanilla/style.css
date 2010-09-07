@@ -1218,6 +1218,36 @@ div.SubHead p.SubSubHead, div.Info p {
 	margin:0 0 0 15px;
 	width:450px;
 }
+div.event_pic{
+	float:left;
+	margin:0 0 0 15px;
+	width:600px;
+}
+.FeatureSections div.post_events_list{
+	float:left;
+	margin:0 0 0 15px;
+	width:500px;
+}
+	.FeatureSections div.post_events_entry{
+			width:450px;
+			margin:0;
+	}
+	
+	.FeatureSections div.invite_vanilla{
+			width:400px;
+			margin:0;
+	}
+	
+.FeatureSections div.post_events_single{
+			padding:10px;
+			width:900px;
+	}
+	
+.FeatureSections div.team{
+	float:left;
+	margin:0 0 0 15px;
+	width:220px;
+}
 .FeatureSections div.BoxLeft{
 	float:left;
 	margin:0 0 0 40px;
@@ -1240,7 +1270,7 @@ div.BoxRight ol, div.BoxLeft ol {
 	margin:0;
 	width:50%;
 }
-.FeaturePage p, .Feature li, .FeatureSections p.About {
+.FeaturePage p, .Feature li, .FeatureSections p.About, .FeatureSections p {
 	clear:left;
 	color:#000;
 	font-size:13px;
@@ -1358,4 +1388,26 @@ table.Compare tbody th {
 	text-align: left;
 		font-weight:bold;
 
+}
+input.InputBox {
+	color:#000000;
+	font-size:16px;
+	font-weight:bold;
+	margin:0;
+	padding:3px;
+	width:300px;
+}
+
+#back {
+	clear:inherit;
+	float:right;
+	margin:0 15px;
+}
+#back a{
+	color:#003673 !important;
+}
+#back a:hover{
+	color:#001F44 !important;
+	text-decoration:none;
+	
 }
