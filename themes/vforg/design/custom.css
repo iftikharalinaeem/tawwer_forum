@@ -249,6 +249,12 @@ i.SpriteFive { background-position: 0 -148px; }
 	text-shadow: 0 1px 1px #111196;
 	background-position: right -96px;
 }
+.Banner ul li.Services { background-position: left -256px; }
+.Banner ul li.Services a {
+	color: #ffffff;
+	text-shadow: 0 1px 1px #1a5300;
+	background-position: right -256px;
+}
 body#vforg_home_features .Banner ul li.Features,
 body#dashboard_search_index .Banner ul li.Community,
 body.hosting .Banner ul li.Hosting,
@@ -283,7 +289,14 @@ body#vforg_home_index .Banner ul li.Download { background-position: left -224px;
 body#vforg_home_index .Banner ul li.Download a { background-position: right -224px; }
 body#vforg_home_index .Banner ul li.Home { background-position: left -192px; }
 body#vforg_home_index .Banner ul li.Home a { background-position: right -192px; }
-
+body#vforg_home_index .Banner ul li.Services { background-position: left -288px; }
+body#vforg_home_index .Banner ul li.Services a { background-position: right -288px; }
+body#vforg_home_index .Banner ul li {
+	margin-left: 2px;
+}
+body#vforg_home_index .Banner ul li a {
+	padding: 0 8px 0 4px;
+}
 /* Homepage Customizations */
 body#vforg_home_index {
 	background: url('images/bg-fade.png') top left repeat-x #f1e5ca;

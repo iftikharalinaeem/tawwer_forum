@@ -16,9 +16,7 @@
 					<li class="Community"><?php echo Anchor('Community', '/discussions'); ?></li>
 					<li class="Documentation"><?php echo Anchor('Documentation', '/docs'); ?></li>
 					<li class="Blog"><?php echo Anchor('Blog', '/blog'); ?></li>
-					<?php if (Gdn::Session()->IsValid() && Gdn::Session()->CheckPermission('Garden.Settings.Manage')) { ?>
-					<li class="Dashboard"><?php echo Anchor('Dashboard', '/settings'); ?></li>
-					<?php } ?>
+					<li class="Services"><?php echo Anchor('Services', '/services'); ?></li>
 					<li class="Download"><?php echo Anchor('Download', '/download'); ?></li>
 					<!-- End Menu Items -->
 				</ul>
