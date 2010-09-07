@@ -483,13 +483,15 @@ jQuery(document).ready(function($) {
          $('div.DashboardSummaries').html('<div class="Loading"></div>');
             
       // Load the graph data
-      var dataUrl = gdn.combinePaths(
-         gdn.definition('WebRoot'),
-         'index.php?p=dashboard/settings/loadstats&Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
-      );
+      var dataUrl = gdn.url('/dashboard/settings/loadstats');
+      
       $.ajax({
          type: "GET",
          url: dataUrl,
+         data: {
+            'Range': $('input.Range').val(),
+            'DateRange': $('input.DateRange').val()
+         },
          dataType: 'json',
          error: function(XMLHttpRequest, textStatus, errorThrown) {
             $('#Content h1 span.TinyProgress').remove();
@@ -503,10 +505,7 @@ jQuery(document).ready(function($) {
          }
       });
         
-      $.get(gdn.combinePaths(
-         gdn.definition('WebRoot'),
-         'index.php?p=dashboard/settings/dashboardsummaries&DeliveryType=VIEW&Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()
-         ), function(data) {
+      $.get(gdn.url('/dashboard/settings/dashboardsummaries&DeliveryType=VIEW&Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()), function(data) {
             $('div.DashboardSummaries').html(data);
       });
    }
