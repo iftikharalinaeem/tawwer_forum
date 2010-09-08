@@ -190,6 +190,16 @@ i.SpriteThemes{
 	height:36px;
 	background-position: -370px -101px;
 }
+i.SpriteEvents{
+	width:44px;
+	height:44px;
+	background-position: -407px -52px;
+}
+i.SpriteDate{
+	width:42px;
+	height:43px;
+	background-position: -407px 0;
+}
 i.SpriteWand,
 i.SpriteColors,
 i.SpriteBars,
@@ -204,7 +214,9 @@ i.SpriteConnect,
 i.SpriteWP,
 i.SpriteOtherForums,
 i.SpriteVanillaForums,
-i.SpriteThemes{
+i.SpriteThemes,
+i.SpriteEvents,
+i.SpriteDate{
 	float: left;
 	display: block;
 	margin-right: 6px;

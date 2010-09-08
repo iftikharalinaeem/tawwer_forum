@@ -148,6 +148,12 @@ i.SpriteSuit { background-position: -48px -184px; }
 	text-shadow: 0 1px 1px #111196;
 	background-position: right -96px;
 }
+
+.Banner ul li.Services a {
+	background-position:right -256px;
+	color:#FFFFFF;
+	text-shadow:0 1px 1px #1A5300;
+}
 #top-bar-wrapper{
 	margin:0;
 	padding-top:10px;
