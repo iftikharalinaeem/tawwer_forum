@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-class ThemeHooks implements Gdn_IPlugin {
+class VFOrgThemeHooks implements Gdn_IPlugin {
    public function Setup() {
       return TRUE;
    }
@@ -17,6 +17,16 @@ class ThemeHooks implements Gdn_IPlugin {
       $RecentActivityModule = new RecentActivityModule();
       $RecentActivityModule->GetData();
       $Sender->AddModule($RecentActivityModule);
+      $Form = Gdn::Factory('Form');
+      $Form->InputPrefix = '';
+      $SearchForm = '<div class="SearchForm">'
+      .$Form->Open(array('action' => Url('/search'), 'method' => 'get'))
+		.$Form->TextBox('Search')
+		.$Form->Button('Search', array('Name' => ''))
+		.$Form->Close()
+      .'</div>';
+
+      $Sender->AddAsset('Content', $SearchForm, 'Content');
    }
    
 }

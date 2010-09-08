@@ -177,6 +177,12 @@ ul.Activities li.Item {
 ul.Discussions {
 	background: #fff;
 }
+#Status {
+	background: none;
+	padding: 0 0 8px;
+	color: #333;
+}
+
 
 a.BigButton:hover {
 	text-decoration: none;
