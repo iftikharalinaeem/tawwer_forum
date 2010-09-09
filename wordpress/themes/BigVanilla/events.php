@@ -18,7 +18,7 @@
     
       <div class="Info">
          <h1>On the Road with Vanilla Forums</h1>
-         <p>We like to get around spreading the word about Vanilla Forums!</p>
+         <p>We like to get around spreading the Vanilla word!</p>
       </div>
 
     
@@ -54,7 +54,7 @@
      <div class="invite_vanilla">
       <h4 class="blue"><i class="Sprite SpriteEvents"></i> Want More Vanilla Forums?</h4>
             <p class="About">
-             <strong>Can't get enough of us?</strong> Have us speak at your event.Tells us where and when and we'll be there!             
+             <strong>Can't get enough of us?</strong> Have us speak at your event.Tell us where and when and we'll be there!             
             </p>
          
             <a href="mailto:brendan@vanillaforums.com" class="Plans"><strong>Have Us at Your Event</strong> We're really cool, you'll like us!</a>
