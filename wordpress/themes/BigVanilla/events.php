@@ -18,7 +18,7 @@
     
       <div class="Info">
          <h1>On the Road with Vanilla Forums</h1>
-         <p>We like to get around spreading the Vanilla word!</p>
+         <p>We like to get around spreading the word about Vanilla Forums!</p>
       </div>
 
     
@@ -96,7 +96,7 @@
    
     <div class="Info">
          <h2>The Vanilla Showcase</h2>
-         <p>Check out what others have done with their Vanilla.</p>
+         <p>Check out what others have done with their Vanilla Forums.</p>
       </div>
 
     
