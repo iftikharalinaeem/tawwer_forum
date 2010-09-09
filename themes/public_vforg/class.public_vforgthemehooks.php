@@ -14,9 +14,6 @@ class VFOrgThemeHooks implements Gdn_IPlugin {
    }
    
    public function DiscussionsController_Render_Before(&$Sender) {
-      $RecentActivityModule = new RecentActivityModule();
-      $RecentActivityModule->GetData();
-      $Sender->AddModule($RecentActivityModule);
       $Form = Gdn::Factory('Form');
       $Form->InputPrefix = '';
       $SearchForm = '<div class="SearchForm">'
