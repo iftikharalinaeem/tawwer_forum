@@ -1411,3 +1411,20 @@ input.InputBox {
 	text-decoration:none;
 	
 }
+a.Plans{
+	
+	background:transparent url(images/sprite-plans-btn.png) no-repeat scroll left top;
+	color:#184E00;
+	display:block;
+	font-family:'lucida grande','Lucida Sans Unicode',tahoma,sans-serif;
+	font-size:12px;
+	height:70px;
+	margin-top:5px;
+	text-align:center;
+	text-shadow:0 1px 0 #45C408;
+	width:370px;
+
+}
+a:hover.Plans{
+	text-decoration:none;
+}

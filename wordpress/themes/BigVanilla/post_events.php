@@ -39,9 +39,51 @@
       
       <?php endif; ?>
    
-    <span id="back" class="BlueButton"><a href="/events">See all events</a></span>
-  </div> 
+<!--    <span id="back" class="BlueButton"><a href="/events">See all events</a></span>
+-->  </div> 
   
+   <div class="FeatureSections">
+   
+     <div class="post_events_list">
+     
+     <h4 class="blue"><i class="Sprite SpriteDate"></i> Upcoming Events</h4>
+            <p class="About">
+             <strong>Find out where Vanilla Forums will be next.</strong>
+              
+            </p>
+			
+		<div class="post_events_entry">	
+			<?php $paged = (get_query_var('paged')) ? get_query_var('paged') : 1; ?>
+      <?php query_posts("showposts=5&cat=36&paged=$paged"); ?>
+      <?php while (have_posts()) : the_post(); ?>
+      
+      <ul><li><a href="<?php the_permalink() ?>" rel="bookmark" title="Permanent Link to <?php the_title_attribute(); ?>"><?php the_title(); ?></a> </li></ul>
+                     
+        
+        <?php endwhile; ?>
+
+  </div>
+  
+     </div>
+     
+     <div class="invite_vanilla">
+      <h4 class="blue"><i class="Sprite SpriteEvents"></i> Want More Vanilla Forums?</h4>
+            <p class="About">
+             <strong>Can't get enough of us?</strong> Have us speak at your event.Tells us where and when and we'll be there!             
+            </p>
+         
+            <a href="mailto:brendan@vanillaforums.com" class="Plans"><strong>Have Us at Your Event</strong> We're really cool, you'll like us!</a>
+            
+            
+            <p class="About">Or, subscribe to our event newsletter.
+            <form action="http://vanilla.createsend.com/t/r/s/oiiwu/" method="post" id="subForm">
+					<input type="text"  name="cm-oiiwu-oiiwu" id="oiiwu-oiiwu" class="InputBox" />
+					<input type="submit" value="Submit" class="BlueButton" />
+				</form>
+
+     </div>
+   
+   </div>
   
     <div class="Info">
          <h2>Get Social with Vanilla Forums</h2>
@@ -73,7 +115,7 @@
    
     <div class="Info">
          <h2>The Vanilla Showcase</h2>
-         <p>Check out what others have done with their Vanilla.</p>
+         <p>Check out what others have done with their Vanilla Forums.</p>
       </div>
 
     

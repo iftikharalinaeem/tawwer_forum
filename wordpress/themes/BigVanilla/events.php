@@ -52,11 +52,15 @@
      </div>
      
      <div class="invite_vanilla">
-      <h4 class="blue"><i class="Sprite SpriteEvents"></i> Want Vanilla Forums?</h4>
+      <h4 class="blue"><i class="Sprite SpriteEvents"></i> Want More Vanilla Forums?</h4>
             <p class="About">
              <strong>Can't get enough of us?</strong> Have us speak at your event.Tells us where and when and we'll be there!             
             </p>
-            <br  />
+         
+            <a href="mailto:brendan@vanillaforums.com" class="Plans"><strong>Have Us at Your Event</strong> We're really cool, you'll like us!</a>
+            
+            
+            <p class="About">Or, subscribe to our event newsletter.
             <form action="http://vanilla.createsend.com/t/r/s/oiiwu/" method="post" id="subForm">
 					<input type="text"  name="cm-oiiwu-oiiwu" id="oiiwu-oiiwu" class="InputBox" />
 					<input type="submit" value="Submit" class="BlueButton" />
@@ -96,7 +100,7 @@
    
     <div class="Info">
          <h2>The Vanilla Showcase</h2>
-         <p>Check out what others have done with their Vanilla.</p>
+         <p>Check out what others have done with their Vanilla Forums.</p>
       </div>
 
     

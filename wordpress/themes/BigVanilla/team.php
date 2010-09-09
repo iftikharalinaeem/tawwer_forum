@@ -133,7 +133,7 @@ His software has been downloaded and used by millions of people. There is a fant
    
     <div class="Info">
          <h2>The Vanilla Showcase</h2>
-         <p>Check out what others have done with their Vanilla.</p>
+         <p>Check out what others have done with their Vanilla Forums.</p>
       </div>
 
     

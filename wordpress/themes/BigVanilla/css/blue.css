@@ -17,9 +17,19 @@ div.Feature, .FeatureSections a{
 	color:#FF0084;
 	text-shadow:0 0 1px #C3F0FE;
 }
+div.Feature, .FeatureSections a.Plans{
+	font-weight:bold;
+	color:#fff;
+	text-shadow:0 0 0px #45C408;
+}
 div.Feature, .FeatureSections a:hover{
 	color:#2A529A;
 	text-decoration:underline;
+
+}
+div.Feature, .FeatureSections a:hover.Plans{
+	color:#fff;
+	text-decoration:none;
 
 }
 /* .marketing */
