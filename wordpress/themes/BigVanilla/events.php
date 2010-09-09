@@ -18,7 +18,7 @@
     
       <div class="Info">
          <h1>On the Road with Vanilla Forums</h1>
-         <p>We like to get around spreading the Vanilla word!</p>
+         <p>We like to get around spreading the word about Vanilla Forums!</p>
       </div>
 
     

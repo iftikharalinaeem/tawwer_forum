@@ -18,7 +18,7 @@
     
       <div class="Info">
          <h1>Why Choose Vanilla Forums?</h1>
-         <p>Here's some pretty cool stuff that just might make you want to use VanillaForums.com.</p>
+         <p>Here are some great reasons to choose VanillaForums.com.</p>
       </div>
 
     <table class="Compare">
@@ -105,7 +105,7 @@
    
     <div class="Info">
          <h2>Features You'll Love</h2>
-         <p>We make it Easy for You to Manage and Fun for Your Community. </p>
+         <p>Vanilla Forums are easy to manage, and cultivate activity in your community.</p>
       </div>
 
 	
@@ -137,7 +137,7 @@
             
            <h4 class="blue"><i class="Sprite SpriteBars"></i> Dynamic Stats</h4>
             <p class="About">
-             It's designed to give you up-to-the-minute stats on how many people are visiting your forum, where they're coming from, which posts are most popular, and more.
+             Analytics that give you up-to-the-minute information on how many people are visiting your forum, where they're coming from, which posts are most popular, and more.
             </p>
             
                    

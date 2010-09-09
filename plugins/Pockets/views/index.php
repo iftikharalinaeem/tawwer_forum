@@ -1,12 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo '<h1>', $this->Data('Title'), '</h1>';
+echo Wrap($this->Data('Title'), 'h1');
 ?>
-<div class="FilterMenu">
-<?php
-   echo Anchor(sprintf(T('Add %s'), T('Pocket')), 'plugin/pockets/add', 'SmallButton');
-?>
-</div>
+<div class="Info"><?php echo T('Pockets allow you to add free-form HTML to various places around the application.'); ?></div>
+<div class="FilterMenu"><?php echo Anchor(sprintf(T('Add %s'), T('Pocket')), 'plugin/pockets/add', 'SmallButton'); ?></div>
 <table id="Pockets" class="AltColumns">
    <thead>
       <tr>
@@ -41,7 +38,7 @@ echo '<h1>', $this->Data('Title'), '</h1>';
       ?>
    </tbody>
 </table>
-<h2><?php echo T('Global Options'); ?></h2>
+<h1><?php echo T('Global Options'); ?></h1>
 <?php
    $Form = $this->Form;
    echo $Form->Open();
