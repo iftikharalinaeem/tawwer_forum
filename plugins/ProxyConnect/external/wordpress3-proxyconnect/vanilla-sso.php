@@ -17,11 +17,65 @@ You should have received a copy of the GNU General Public License along with the
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-define('VANILLA_COOKIE', 'Vanilla'); // <-- You might need to change this if you've customized your cookie name in vanilla.
+$VanillaCookieName = get_option('vanilla_cookie_name');
+if (empty($VanillaCookieName))
+   $VanillaCookieName = 'Vanilla'; // <-- You might need to change this if you've customized your cookie name in Vanilla.
+   
+define('VANILLA_COOKIE', $VanillaCookieName); 
 
 // Check to see if we should kill processing and display signed in user info
-if (is_array($_GET) && array_key_exists('VanillaChallengeKey', $_GET)) {
-	$VanillaChallengeKey = get_option('vanilla_sso_key');
+if (is_array($_GET)) {
+   if (array_key_exists('ProxyConnectAutoconfigure', $_GET) || array_key_exists('VanillaChallengeKey', $_GET)) {
+
+   // allow the remote host to detect us
+   header('X-ProxyConnect-Enabled: yes');
+   $VanillaChallengeKey = get_option('vanilla_sso_key');
+   $SuppliedChallangeKey = array_key_exists('VanillaChallengeKey', $_GET) ? $_GET['VanillaChallengeKey'] : NULL;
+   
+   if (array_key_exists('ProxyConnectAutoconfigure', $_GET)) {
+      $AutoconfigureTask = array_key_exists('Task', $_GET) ? $_GET['Task'] : 'Check';
+      
+      $Secure = TRUE;
+
+      if ($VanillaChallengeKey == '') {
+         header('X-Autoconfigure-Challenge: missing');
+         $Secure = FALSE
+      }
+      
+      else if (!is_null($SuppliedChallangeKey) && $VanillaChallengeKey != $SuppliedChallangeKey) {
+         header('X-Autoconfigure-Challenge: invalid');
+         $Secure = FALSE;
+      }
+      
+      switch ($AutoconfigureTask) {
+         case 'Check':
+            // Remote is simply seeing if we respond appropriately
+         break;
+         
+         case 'Secure':
+            $Key = array_key_exists('Challenge', $_GET) ? $_GET['Challenge'] : NULL;
+            if (!is_null($Key)) {
+               if (!is_null($VanillaChallengeKey) || $Secure) {
+                  update_option('vanilla_sso_key', $Key);
+                  header('X-Autoconfigure-Challenge: set');
+            }
+         break;
+         
+         case 'Exchange':
+            if ($Secure) {
+               $OutInfo = array();
+               $OutInfo[] = "AuthenticateUrl=".site_url('?VanillaChallengeKey='.$Key, 'vanilla-sso-info');
+               $OutInfo[] = "RegistrationUrl=".site_url('wp-login.php?action=register', 'login');
+               $OutInfo[] = "SignInUrl=".add_query_arg(array('redirect_to' => '{Redirtect}'), site_url('wp-login.php', 'login'));
+               $OutInfo[] = "SignOutUrl=".add_query_arg(array('action' => 'logout', '_wpnonce' => '{Nonce}', 'redirect_to' => '{Redirect}'), site_url('wp-login.php', 'login'));
+               echo implode("\n",$OutInfo);
+            }
+         break;
+      }
+      
+      exit();
+   }
+
 	if ($VanillaChallengeKey != '' && $VanillaChallengeKey == $_GET['VanillaChallengeKey']) {
 		// If the challenge key was provided to WordPress, and it validates to the one saved in this system (and it's not empty)
 		// Spit out some json_encoded data about the user for Vanilla to use when authenticating/creating user accounts

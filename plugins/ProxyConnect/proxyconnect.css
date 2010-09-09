@@ -1,3 +1,11 @@
+div.IntegrationChooser select.IntegrationChooser {
+   margin-top: 10px;
+}
+
+div.IntegrationManagerConfigure {
+   margin-top: 20px;
+}
+
 div.SmallerSetting {
    font-size: 80%;
 }
