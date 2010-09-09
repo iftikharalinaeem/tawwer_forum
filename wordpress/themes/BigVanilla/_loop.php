@@ -12,7 +12,7 @@
 </div>
 
  <?php $paged = (get_query_var('paged')) ? get_query_var('paged') : 1; ?>
-  <?php query_posts("showposts=10&cat=-32&paged=$paged"); ?>
+  <?php query_posts("showposts=10&cat=-32,-36&paged=$paged"); ?>
   <?php while (have_posts()) : the_post(); ?>
   
 

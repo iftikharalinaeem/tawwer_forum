@@ -18,7 +18,7 @@
     
       <div class="Info">
          <h1>Adding Vanilla to WordPress</h1>
-         <p>Why just have a forum with WordPress when you can have a Vanilla Forum!</p>
+         <p>Quickly add the power of Vanilla Forums to your WordPress blog!</p>
       </div>
 
     
@@ -26,17 +26,19 @@
          <div class="BoxLeft">
             <h4><i class="Sprite SpriteConnect"></i> Vanilla Connect</h4>
             <p class="About">
-            Vanilla is all about integrating with existing applications. Let your users create accounts and sign into Vanilla through external applications.
-              
+            With Vanilla Connect, your users will be automagically signed into
+				Vanilla without having to create a new account or sign in again.
             </p>
     	</div>
         
         <div class="BoxRight">
-            <h4><i class="Sprite SpriteWP"></i> Vanilla WordPress Plugin</h4>
+            <h4><i class="Sprite SpriteWP"></i> Vanilla WordPress Plugins</h4>
             <p class="About">
-            With our Single Sign-On integration you can easily integrate with WordPress.
-   
-              
+				VanillaPress 2010 is a Vanilla theme that makes your forum look like
+				the WordPress 2010 theme. This is the first of many WordPress
+				plugins we are working on that will make it incredibly easy to get
+				Vanilla integrated with your blog.
+
             </p>
     	</div>
     </div>

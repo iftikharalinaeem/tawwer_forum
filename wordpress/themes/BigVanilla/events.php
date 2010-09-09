@@ -22,113 +22,53 @@
       </div>
 
     
+   
+           <img src="<?php echo bloginfo('template_url'); ?>/images/events.png" alt="" title="Vanilla Events" border="0" />
+
+   
+   
    <div class="FeatureSections">
    
-   <div>
-            <h4><i class="Sprite SpriteNews"></i> The Blog</h4>
+     <div class="post_events_list">
+     
+     <h4 class="blue"><i class="Sprite SpriteDate"></i> Upcoming Events</h4>
             <p class="About">
-             Find out what's happening in the world of VanillaForums.com and stay in the loop with all the latest news.
+             <strong>Find out where Vanilla Forums will be next.</strong>
               
             </p>
-            
-           <p class="button">
-               <a href="http://www.vanillaforums.com/blog/help" class="BlueButton">Learn More <i class="Sprite SpriteRarr SpriteRarrDown"><span>&rarr;</span></i></a>            </p>
-               
-           <p class="About">  <strong>Latest News</strong></p>
-                <ul>
-                    <?php query_posts('category_name=general&showposts=5'); ?>
-                            <?php while (have_posts()) : the_post(); ?>
-                            <li><a href="<?php the_permalink() ?>" rel="bookmark" title="Permanent Link to <?php the_title_attribute(); ?>"><?php the_title(); ?></a></li>
-                            <?php endwhile;?>
-                            
-                            
-                            
-                </ul>    
-    	</div>
-         <div>
-            <h4><i class="Sprite SpriteTuts"></i> Tutorials</h4>
-            <p class="About">
-             Have a look through our help topics and tutorials. To make things easy for you we are always adding new stuff. 
-              
-            </p>
-            
-           <p class="button">
-               <a href="http://vanillaforums.com/blog/category/general/" class="BlueButton">Learn More <i class="Sprite SpriteRarr SpriteRarrDown"><span>&rarr;</span></i></a>            </p>
-               
-           <p class="About">  <strong>Popular Tutorials</strong></p>
-                <ul>
-                    <?php query_posts('category_name=help-tutorials&showposts=5'); ?>
-                            <?php while (have_posts()) : the_post(); ?>
-                            <li><a href="<?php the_permalink() ?>" rel="bookmark" title="Permanent Link to <?php the_title_attribute(); ?>"><?php the_title(); ?></a></li>
-                            <?php endwhile;?>
-                            
-                            
-                            
-                </ul>    
-    	</div>
-         <div>
-            <h4><i class="Sprite SpriteHelp"></i> Vanilla Glossary</h4>
-            <p class="About">
-               Vanilla has its own lingo. The glossary will introduce you to some of the terminulogy used in Vanilla. 
-            </p>
+			
+		<div class="post_events_entry">	
+			<?php $paged = (get_query_var('paged')) ? get_query_var('paged') : 1; ?>
+      <?php query_posts("showposts=5&cat=36&paged=$paged"); ?>
+      <?php while (have_posts()) : the_post(); ?>
+      
+      <ul><li><a href="<?php the_permalink() ?>" rel="bookmark" title="Permanent Link to <?php the_title_attribute(); ?>"><?php the_title(); ?></a> </li></ul>
+                     
+        
+        <?php endwhile; ?>
 
-            <p class="button">
-               <a href="http://www.vanillaforums.com/blog/help" class="BlueButton">Learn More <i class="Sprite SpriteRarr SpriteRarrDown"><span>&rarr;</span></i></a>            </p>
-               
-            <p class="About">  <strong>Recent Terms</strong></p>
-                <ul>
-                    <?php query_posts('category_name=vanilla-glossary&showposts=5'); ?>
-                            <?php while (have_posts()) : the_post(); ?>
-                            <li><a href="<?php the_permalink() ?>" rel="bookmark" title="Permanent Link to <?php the_title_attribute(); ?>"><?php the_title(); ?></a></li>
-                            <?php endwhile;?>
-                            
-                            
-                            
-                </ul>       
-               
-         </div>
+  </div>
+  
+     </div>
+     
+     <div class="invite_vanilla">
+      <h4 class="blue"><i class="Sprite SpriteEvents"></i> Want More Vanilla Forums?</h4>
+            <p class="About">
+             <strong>Can't get enough of us?</strong> Have us speak at your event.Tell us where and when and we'll be there!             
+            </p>
+         
+            <a href="mailto:brendan@vanillaforums.com" class="Plans"><strong>Have Us at Your Event</strong> We're really cool, you'll like us!</a>
+            
+            
+            <p class="About">Or, subscribe to our event newsletter.
+            <form action="http://vanilla.createsend.com/t/r/s/oiiwu/" method="post" id="subForm">
+					<input type="text"  name="cm-oiiwu-oiiwu" id="oiiwu-oiiwu" class="InputBox" />
+					<input type="submit" value="Submit" class="BlueButton" />
+				</form>
 
+     </div>
    
    </div>
-   
-   <div class="Info">
-         <h2>Vanilla Video Tips</h2>
-         <p>Here are a few quick video tips to help you get started.</p>
-      </div>
-
-    
-   <div class="FeatureSections">
-   
-   		<div class="videoDesc">
-            <p>How to upload a custom logo to your Vanilla Forum using the Banner feature.</p>
-           
-    	</div>
-        
-         <div class="video">
-            <object classid='clsid:d27cdb6e-ae6d-11cf-96b8-444553540000' codebase='http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,115,0' width='450' height='277'><param name='movie' value='http://screenr.com/Content/assets/screenr_1116090935.swf' /><param name='flashvars' value='i=98814' /><param name='allowFullScreen' value='true' /><embed src='http://screenr.com/Content/assets/screenr_1116090935.swf' flashvars='i=98814' allowFullScreen='true' width='450' height='277' pluginspage='http://www.macromedia.com/go/getflashplayer'></embed></object>
-    	</div>
-        
-        <div class="videoDesc">
-            <p>How to use Theme Options in Vanilla. Theme Options can include: color styles, text areas, and images.</p>
-           
-    	</div>
-        
-         <div class="video">
-           <object classid='clsid:d27cdb6e-ae6d-11cf-96b8-444553540000' codebase='http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,115,0' width='450' height='277'><param name='movie' value='http://screenr.com/Content/assets/screenr_1116090935.swf' /><param name='flashvars' value='i=98824' /><param name='allowFullScreen' value='true' /><embed src='http://screenr.com/Content/assets/screenr_1116090935.swf' flashvars='i=98824' allowFullScreen='true' width='450' height='277' pluginspage='http://www.macromedia.com/go/getflashplayer'></embed></object>
-    	</div>
-        
-        <div class="videoDesc">
-            <p> How to attach files to discussions and comments in Vanilla Forums.</p>
-           
-    	</div>
-        
-         <div class="video">
-            <object classid='clsid:d27cdb6e-ae6d-11cf-96b8-444553540000' codebase='http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,115,0' width='450' height='277'><param name='movie' value='http://screenr.com/Content/assets/screenr_1116090935.swf' /><param name='flashvars' value='i=98829' /><param name='allowFullScreen' value='true' /><embed src='http://screenr.com/Content/assets/screenr_1116090935.swf' flashvars='i=98829' allowFullScreen='true' width='450' height='277' pluginspage='http://www.macromedia.com/go/getflashplayer'></embed></object>
-    	</div>
-
-   
-   </div>
-   
    
     <div class="Info">
          <h2>Get Social with Vanilla Forums</h2>
@@ -160,7 +100,7 @@
    
     <div class="Info">
          <h2>The Vanilla Showcase</h2>
-         <p>Check out what others have done with their Vanilla.</p>
+         <p>Check out what others have done with their Vanilla Forums.</p>
       </div>
 
     

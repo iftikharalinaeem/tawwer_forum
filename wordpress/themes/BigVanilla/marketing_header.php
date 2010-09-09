@@ -46,7 +46,7 @@
 	  color: '#fff',
       textShadow: '0px 1px 2px #333'
    });
-   Cufon.replace('div.Info p, div.videoDesc p, p.SubSubHead, .Friends p', {
+   Cufon.replace('div.Info p, div.videoDesc p, p.SubSubHead, .Friends p, div.post_events_single h3', {
       fontFamily: 'GothamRound',
 	  color: '#003B82',
 	  fontSize: '16px',

@@ -17,9 +17,19 @@ div.Feature, .FeatureSections a{
 	color:#FF0084;
 	text-shadow:0 0 1px #C3F0FE;
 }
+div.Feature, .FeatureSections a.Plans{
+	font-weight:bold;
+	color:#fff;
+	text-shadow:0 0 0px #45C408;
+}
 div.Feature, .FeatureSections a:hover{
 	color:#2A529A;
 	text-decoration:underline;
+
+}
+div.Feature, .FeatureSections a:hover.Plans{
+	color:#fff;
+	text-decoration:none;
 
 }
 /* .marketing */
@@ -190,6 +200,16 @@ i.SpriteThemes{
 	height:36px;
 	background-position: -370px -101px;
 }
+i.SpriteEvents{
+	width:44px;
+	height:44px;
+	background-position: -407px -52px;
+}
+i.SpriteDate{
+	width:42px;
+	height:43px;
+	background-position: -407px 0;
+}
 i.SpriteWand,
 i.SpriteColors,
 i.SpriteBars,
@@ -204,7 +224,9 @@ i.SpriteConnect,
 i.SpriteWP,
 i.SpriteOtherForums,
 i.SpriteVanillaForums,
-i.SpriteThemes{
+i.SpriteThemes,
+i.SpriteEvents,
+i.SpriteDate{
 	float: left;
 	display: block;
 	margin-right: 6px;

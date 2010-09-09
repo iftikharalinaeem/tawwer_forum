@@ -71,6 +71,7 @@
 					<li class="Community"><a href="http://vanillaforums.org/discussions">Community</a></li>
 					<li class="Documentation"><a href="http://vanillaforums.org/docs">Documentation</a></li>
                     <li class="Blog"><a href="http://vanillaforums.org/blog">Blog</a></li>
+                    <li class="Services"><a href="http://vanillaforums.org/services">Services</a></li>
 					<li class="Download"><a href="http://vanillaforums.org/download">Download</a></li>
 
 					<!-- End Menu Items -->
