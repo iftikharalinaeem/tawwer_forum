@@ -357,6 +357,7 @@ div.Splash {
 }
 div.SplashMessage {
 	width: 370px;
+	min-height: 411px;
 	text-align: left;
 }
 div.SplashMessage p {
@@ -420,6 +421,78 @@ a.Get strong {
 	display: block;
 	color: #fff;
 }
+/* News & Events */
+div.NewsAndEvents {
+	margin: 0;
+	/* background: url('images/bg-horizontal-div.png') top center no-repeat; */
+}
+div.News,
+div.Events {
+	display: inline-block;
+	width: 440px;
+	padding: 0 40px 0 0;
+	text-align: left;
+	vertical-align: top;
+}
+div.Events {
+	padding: 0 0 0 40px;
+}
+#Content div.NewsAndEvents h3 {
+	padding: 50px 0 0;
+	margin: 0;
+	font-size: 18px;
+}
+div.Feed {
+	padding: 10px 0 0;
+}
+div.Feed div {
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	padding: 4px 0;
+	font-size: 13px;
+}
+div.Feed a {
+	padding: 2px 4px;
+	margin: 0 4px;
+	color: #DDFFFF;
+	text-shadow: 0 1px 3px #744000;
+	background: #E3C06D;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+}
+div.Feed a:hover {
+	color: #ffffff;
+	background: #CB7100;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+}
+
+
+/* Foot */
+div.Foot {
+	padding: 45px 0 25px;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	font-size: 12px;
+	text-align: center;
+	clear: both;
+}
+div.Foot div.Center {
+	text-align: center;
+}
+div.Foot a {
+	padding: 2px 4px;
+	margin: 0 8px;
+	color: #744000;
+}
+div.Foot a:hover {
+	color: #ffffff;
+	background: #CB7100;
+	-moz-border-radius: 2px;
+}
+
+
+
 
 /* Move Errors Back Into Page */
 div.Errors {
