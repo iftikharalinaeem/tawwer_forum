@@ -266,9 +266,11 @@ class TaskList {
       return str_replace('http:/', 'http://', $MungedPath);
    }
    
-   public static function Symlink($Link, $Source = NULL) {
-      if (file_exists($Link) || is_link($Link))
+   public static function Symlink($Link, $Source = NULL, $Respectful = FALSE) {
+      if (file_exists($Link) || is_link($Link)) {
+         if ($Respectful) return TRUE;
          if (!LAME) unlink($Link);
+      }
       
       if (!is_null($Source)) {
          TaskList::Event("/bin/ln -s {$Source} {$Link}");
