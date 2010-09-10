@@ -4,71 +4,56 @@
    
    <h3><?php echo T('Proxy Connect'); ?></h3>
    <div class="Info">
-      <?php echo T('Using Proxy Connect, you can allow users from your remote application or website to be automatically registered and signed into Vanilla. For instructions on how to enable Proxy Connect, <a href="http://vanillaforums.org/page/signlesignon">read our documentation</a>.'); ?>
-      <?php echo T("Before attempting to populate the fields below, <b>please make sure you install and configure any remote application plugins or scripts first. They should provide the values you'll need below</b>."); ?>
+      <div class="ProxyConnectInfo">
+         <?php echo T('This authenticator allows users from your remote application or website to be automatically registered and signed into Vanilla. For a detailed explanation of how Proxy Connect works, please <a href="http://vanillaforums.org/page/signlesignon">read our documentation</a>.'); ?>
+         <?php echo T('Proxy Connect ships with several pre-built <b>Remote Integration Managers</b>, each designed to automate the setup process. If your remote application is listed in the dropdown below, select it now, otherwise choose "Manual Setup".'); ?>
+         <div class="IntegrationChooser">
+            <?php
+               echo $this->Form->Open(array(
+                  'action'  => Url('dashboard/authentication/choose')
+               ));
+               echo $this->Form->Errors();
+
+               echo $this->Form->Label("Integration Manager: ");
+               echo $this->Form->DropDown('Garden.Authentication.IntegrationChooser', array_merge($this->Data('IntegrationChooserList')), array(
+                  'value'  => $this->Data('PreFocusIntegration'),
+                  'class'  => 'IntegrationChooser',
+                  'disabled'  => 'disabled'
+               ));
+
+               echo $this->Form->Close();
+            ?>
+         </div>
+      </div>
    </div>
    
-   <table class="SplitConfiguration">
-      <thead>
-         <th><?php echo T('Vanilla Configuration'); ?></th>
-         <th><?php echo T('Remote Configuration'); ?></th>
-      </thead>
-      <tbody>
-         <td class="VanillaConfig">
-            <?php
-               echo $this->Form->Open();
-               echo $this->Form->Errors();
-               echo $this->Form->Hidden('AuthenticationKey', $this->ConsumerKey);
-            ?>
-            <div>
-               <div class="Box HighlightBox"><?php echo T("If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin's configuration screen."); ?></div>
-            </div>
-            <ul>
-               <li><?php
-                  echo $this->Form->Label(T('Main Site URL'), 'Url');
-                  echo $this->Form->TextBox('URL');
-                  echo Wrap(T('The URL of your website where you will use ProxyConnect'));
-               ?></li>
-               <li><?php
-                  echo $this->Form->Label(T('Authenticate URL'), 'AuthenticateURL');
-                  echo $this->Form->TextBox('AuthenticateURL');
-                  echo Wrap(T('The behind-the-scenes URL that shares identity information with Vanilla'));
-               ?></li>
-               <li><?php
-                  echo $this->Form->Label(T('Registration URL'), 'RegisterUrl');
-                  echo $this->Form->TextBox('RegisterUrl');
-                  echo Wrap(T('The URL where users can sign up for new accounts on your site'));
-               ?></li>
-               <li><?php
-                  echo $this->Form->Label(T('Sign-In URL'), 'SignInUrl');
-                  echo $this->Form->TextBox('SignInUrl');
-                  echo Wrap(T('The URL where users sign in on your site'));
-               ?></li>
-               <li><?php
-                  echo $this->Form->Label(T('Sign-Out URL'), 'SignOutUrl');
-                  echo $this->Form->TextBox('SignOutUrl');
-                  echo Wrap(T('The URL where users sign out of your site'));
-               ?></li>
-            </ul>
-            <?php
-               echo $this->Form->Close('Save', '', array(
-                                 'class' => 'SliceSubmit Button'
-                              ));
-            ?>
-         </td>
+   <script type="text/javascript">
+      var IntegrationList = <?php echo json_encode($this->Data('IntegrationChooserList')); ?>;
+      jQuery(document).one('SliceReady', function(Event) {
+         $('select.IntegrationChooser').attr('disabled', false);
+         if ($('select.IntegrationChooser').attr('bound')) return;
          
-         <td class="RemoteConfig">
-            <div>
-               <?php echo T("These are the settings you might need when you configure ProxyConnect on your remote website."); ?>
-               <p>
-                  <?php echo T("You will probably need to configure Vanilla and your remote application to use a shared Cookie Domain that they can both access. We've
-                  tried to guess what that might be, based on your hostname, but you'll need to check this and make sure that it works."); ?>
-               </p><br/>
-            </div>
-            <?php 
-               echo Gdn::Slice('dashboard/settings/proxyconnect/cookie');
-            ?>
-         </td>
-      </tbody>
-   </table>
+         var ChosenIntegrationManager = '<?php echo $this->Data('PreFocusIntegration'); ?>';
+         if (!ChosenIntegrationManager) {
+            $('select.IntegrationChooser').val('');
+         }
+   
+         $('select.IntegrationChooser').attr('bound',true);
+         $('select.IntegrationChooser').bind('change',function(e){
+            var Chooser = $(e.target);
+            var SliceElement = $('div.IntegrationManagerConfigure');
+            var SliceObj = SliceElement.attr('Slice');
+            
+            var ChooserVal = Chooser.val();
+            var ChosenURL = (ConfigureList[ChooserVal]) ? ConfigureList[ChooserVal] : ((ConfigureList[ChooserVal] != 'undefined') ? '/dashboard/settings/proxyconnect/integrate/'+ChooserVal : false);
+            if (ChosenURL)
+               SliceObj.ReplaceSlice(ChosenURL);
+         });
+      });
+   </script>
+   
+   <?php
+      $IntegrationSuffix = (!$this->Data('PreFocusIntegration')) ? NULL : "/".$this->Data('PreFocusIntegration');
+   ?>
+   <div class="IntegrationManagerConfigure Slice Async" rel="dashboard/settings/proxyconnect/integration"></div>
 </div>

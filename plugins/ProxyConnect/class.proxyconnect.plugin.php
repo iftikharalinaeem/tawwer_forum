@@ -28,32 +28,87 @@ $PluginInfo['ProxyConnect'] = array(
 Gdn_LibraryMap::SafeCache('library','class.proxyauthenticator.php',dirname(__FILE__).DS.'class.proxyauthenticator.php');
 class ProxyConnectPlugin extends Gdn_Plugin {
 
-   public function SettingsController_ProxyConnect_Create(&$Sender, $EventArguments) {
+   public function SettingsController_ProxyConnect_Create($Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Proxy Connect SSO');
 		$Sender->Form = new Gdn_Form();
 		
+      // Load internal Integration Manager list
+      $this->IntegrationManagers = array();
+      $InternalPath = $this->GetResource('internal');
+      $IntegrationList = array();
+      if ($FolderHandle = opendir($InternalPath)) {
+         // Loop through subfolders (ie. the actual plugin folders)
+         while ($FolderHandle !== FALSE && ($Item = readdir($FolderHandle)) !== FALSE) {
+            if (in_array($Item, array('.', '..')))
+               continue;
+            
+            $PluginPaths = SafeGlob($InternalPath . DS . $Item . DS . '*plugin.php');
+            $PluginPaths[] = $InternalPath . DS . $Item . DS . 'default.php';
+            
+            foreach ($PluginPaths as $i => $PluginFile) {
+               if (file_exists($PluginFile)) {
+                  
+                  $PluginInfo = Gdn::PluginManager()->ScanPluginFile($PluginFile);
+                  
+                  if (!is_null($PluginInfo)) {
+                     Gdn_LibraryMap::SafeCache('plugin',$PluginInfo['ClassName'],$PluginInfo['PluginFilePath']);
+                     $Index = strtolower($PluginInfo['Index']);
+                     $this->IntegrationManagers[$Index] = $PluginInfo;
+                  }
+               }
+            }
+         }
+         closedir($FolderHandle);
+      }
+      
+      $this->IntegrationManager = C('Plugin.ProxyConnect.IntegrationManager', NULL);
+      if (is_null($this->IntegrationManager)) 
+         $this->SetIntegrationManager('proxyconnectmanual');
+      
 		$this->EnableSlicing($Sender);
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
-   public function AuthenticationController_AuthenticatorConfigurationProxy_Handler(&$Sender) {
+   /**
+   *  Handle request for configure URL
+   * 
+   * When the user loads Dashboard/Authentication, the list of currently enabled authenticators is polled for 
+   * each of their configuration URLs. This handles that polling request and responds with the subcontroller
+   * URL that loads ProxyConnect's config window.
+   * 
+   * @param mixed $Sender
+   */
+   public function AuthenticationController_AuthenticatorConfigurationProxy_Handler($Sender) {
       $Sender->AuthenticatorConfigure = '/dashboard/settings/proxyconnect';
    }
    
-   public function Controller_Index(&$Sender) {
+   public function Controller_Index($Sender) {
       $this->AddSliceAsset($this->GetResource('proxyconnect.css', FALSE,FALSE));
+      $Provider = $this->LoadProviderData($Sender);
+      if ($Provider) {
+         $Sender->ConsumerKey = ($Provider) ? $Provider['AuthenticationKey'] : '';
+         $Sender->ConsumerSecret = ($Provider) ? $Provider['AssociationSecret'] : '';
+      }
+            
+      foreach ($this->IntegrationManagers as $Index => $Manager)
+         $IntegrationList[$Index] = $Manager['Name'];
       
-      $SQL = Gdn::Database()->SQL();
-      $Provider = $SQL->Select('uap.AuthenticationKey')
-         ->From('UserAuthenticationProvider uap')
-         ->Where('uap.AuthenticationSchemeAlias', 'proxy')
-         ->Get()
-         ->FirstRow(DATASET_TYPE_ARRAY);
+      $Sender->SetData('IntegrationChooserList', $IntegrationList);
+      $Sender->SetData('PreFocusIntegration', $this->IntegrationManager);
+      
+      $Sender->SliceConfig = $this->RenderSliceConfig();
+      $Sender->Render($this->GetView('proxyconnect.php'));
+   }
+   
+   public function LoadProviderData($Sender) {
+      $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
+      $Provider = $Authenticator->GetProvider();
          
       if (!$Provider)
-         $Provider = $this->_CreateProviderModel();
+         $Provider = $this->CreateProviderModel();
       
+      $Sender->SetData('Provider', $Provider);
       if ($Provider) {
          $ConsumerKey = $Provider['AuthenticationKey'];
          $ProviderModel = new Gdn_AuthenticationProviderModel();
@@ -64,9 +119,6 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             $Provider['AuthenticateURL'] = C('Garden.Authenticator.AuthenticateURL');
             $Sender->Form->SetData($Provider);
          } else {
-			// Commented out this elseif b/c you need to be able to save values to
-			// the db even if the authenticator isn't enabled.
-         // } else if (C('Plugins.ProxyConnect.Enabled')) {
             $ProviderModel->Validation->ApplyRule('URL',             'Required');
             $ProviderModel->Validation->ApplyRule('RegisterUrl',     'Required');
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
@@ -77,16 +129,14 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             
             SaveToConfig('Garden.Authenticator.AuthenticateURL', $Sender->Form->GetValue('AuthenticateURL'));
          }
+      } else {
+         return NULL;
       }
       
-      $Sender->ConsumerKey = ($Provider) ? $Provider['AuthenticationKey'] : '';
-      $Sender->ConsumerSecret = ($Provider) ? $Provider['AssociationSecret'] : '';
-      
-      $Sender->SliceConfig = $this->RenderSliceConfig();
-      $Sender->Render($this->GetView('proxyconnect.php'));
+      return $Provider;
    }
    
-   public function Controller_Cookie(&$Sender) {
+   public function Controller_Cookie($Sender) {
       $ExplodedDomain = explode('.',Gdn::Request()->RequestHost());
       if (sizeof($ExplodedDomain) == 1)
          $GuessedCookieDomain = '';
@@ -117,6 +167,54 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       ));
       
       $Sender->Render($this->GetView('cookie.php'));
+   }
+   
+   public function Controller_Integrate($Sender) {
+      $IntegrationManager = (sizeof($Sender->RequestArgs) > 1) ? $Sender->RequestArgs[1] : NULL;
+      
+      if (!is_null($IntegrationManager)) {
+         if (!array_key_exists($IntegrationManager, $this->IntegrationManagers))
+            throw new Exception('No such Integration Manager - '.$IntegrationManager);
+         
+         $this->SetIntegrationManager($IntegrationManager);
+      }
+      
+      $this->Controller_Integration($Sender);
+   }
+   
+   public function Controller_Integration($Sender) {
+      $this->IntegrationConfigurationPath = $this->GetView('integration.php');
+         
+      $Manager = C('Plugin.ProxyConnect.IntegrationManager', FALSE);
+      if ($Manager) {
+         $this->Controller = &$Sender;
+         $this->Controller->EnableSlicing($this->Controller);
+         $this->SubController = (sizeof($Sender->RequestArgs) > 2) ? $Sender->RequestArgs[2] : 'index';
+         $this->FireEvent('ConfigureIntegrationManager');
+      }
+
+      $Sender->Render($this->IntegrationConfigurationPath);
+   }
+   
+   protected function SetIntegrationManager($ManagerName) {
+      $Manager = $this->IntegrationManagers[$ManagerName];
+      
+      if ($OldManager = C('Plugin.ProxyConnect.IntegrationManager', FALSE)) {
+         $OldManagerData = $this->IntegrationManagers[$OldManager];
+         if (Gdn::PluginManager()->CheckPlugin($OldManagerData['Index'])) {
+            echo "Disabled";
+            Gdn::PluginManager()->DisablePlugin($OldManagerData['Index']);
+         } else {
+            echo "Not Disabled";
+         }
+      }
+      
+      $AlreadyEnabled = Gdn::PluginManager()->CheckPlugin($Manager['Index']);
+      if (!$AlreadyEnabled) {
+         Gdn::PluginManager()->EnablePlugin($Manager['ClassName'], FALSE, FALSE, "ClassName");
+      }
+      SaveToConfig('Plugin.ProxyConnect.IntegrationManager', $ManagerName);
+      $this->IntegrationManager = $ManagerName;
    }
    
    public function EntryController_SigninLoopback_Create(&$Sender) {
@@ -195,7 +293,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       RemoveFromConfig('Garden.Authenticators.proxy.CookieName');
    }
    
-   protected function _CreateProviderModel() {
+   public function CreateProviderModel() {
       $Key = 'k'.sha1(implode('.',array(
          'proxyconnect',
          'key',
@@ -213,15 +311,14 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       )));
       
       $ProviderModel = new Gdn_AuthenticationProviderModel();
-      $ProviderModel->Insert($Provider = array(
+      $Inserted = $ProviderModel->Insert($Provider = array(
          'AuthenticationKey'           => $Key,
          'AuthenticationSchemeAlias'   => 'proxy',
-         'URL'                         => 'Enter your site url',
          'AssociationSecret'           => $Secret,
          'AssociationHashMethod'       => 'HMAC-SHA1'
       ));
       
-      return $Provider; 
+      return ($Inserted) ? $Provider : FALSE;
    }
    
    public function AuthenticationController_DisableAuthenticatorProxy_Handler(&$Sender) {
@@ -259,6 +356,6 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          ->FirstRow(DATASET_TYPE_ARRAY);
          
       if (!$Provider)
-         $this->_CreateProviderModel();
+         $this->CreateProviderModel();
 	}  
 }
