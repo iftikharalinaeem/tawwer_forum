@@ -105,7 +105,7 @@ body {
 	padding: 30px 0;
 }
 div#Content {
-	margin-bottom: 40px;
+	margin-bottom: 0;
 }
 div#Foot {
    color: #777;
@@ -471,7 +471,7 @@ div.Feed a:hover {
 
 /* Foot */
 div.Foot {
-	padding: 45px 0 25px;
+	padding: 45px 0 0;
 	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 	font-size: 12px;
 	text-align: center;
