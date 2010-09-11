@@ -32,6 +32,8 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Proxy Connect SSO');
 		$Sender->Form = new Gdn_Form();
+      
+      $this->Provider = $this->LoadProviderData($Sender);
 		
       // Load internal Integration Manager list
       $this->IntegrationManagers = array();
@@ -85,12 +87,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    
    public function Controller_Index($Sender) {
       $this->AddSliceAsset($this->GetResource('proxyconnect.css', FALSE,FALSE));
-      $Provider = $this->LoadProviderData($Sender);
-      if ($Provider) {
-         $Sender->ConsumerKey = ($Provider) ? $Provider['AuthenticationKey'] : '';
-         $Sender->ConsumerSecret = ($Provider) ? $Provider['AssociationSecret'] : '';
-      }
-            
+      
       foreach ($this->IntegrationManagers as $Index => $Manager)
          $IntegrationList[$Index] = $Manager['Name'];
       
@@ -99,74 +96,6 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       
       $Sender->SliceConfig = $this->RenderSliceConfig();
       $Sender->Render($this->GetView('proxyconnect.php'));
-   }
-   
-   public function LoadProviderData($Sender) {
-      $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
-      $Provider = $Authenticator->GetProvider();
-         
-      if (!$Provider)
-         $Provider = $this->CreateProviderModel();
-      
-      $Sender->SetData('Provider', $Provider);
-      if ($Provider) {
-         $ConsumerKey = $Provider['AuthenticationKey'];
-         $ProviderModel = new Gdn_AuthenticationProviderModel();
-         $Provider = $ProviderModel->GetProviderByKey($ConsumerKey);
-         $Sender->Form->SetModel($ProviderModel);
-         
-         if (!$Sender->Form->AuthenticatedPostBack()) {
-            $Provider['AuthenticateURL'] = C('Garden.Authenticator.AuthenticateURL');
-            $Sender->Form->SetData($Provider);
-         } else {
-            $ProviderModel->Validation->ApplyRule('URL',             'Required');
-            $ProviderModel->Validation->ApplyRule('RegisterUrl',     'Required');
-            $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
-            $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
-				$Sender->Form->SetFormValue('AuthenticationKey', $ConsumerKey);
-				$Sender->Form->SetFormValue('AuthenticationSchemeAlias', 'proxy');
-            $Saved = $Sender->Form->Save();
-            
-            SaveToConfig('Garden.Authenticator.AuthenticateURL', $Sender->Form->GetValue('AuthenticateURL'));
-         }
-      } else {
-         return NULL;
-      }
-      
-      return $Provider;
-   }
-   
-   public function Controller_Cookie($Sender) {
-      $ExplodedDomain = explode('.',Gdn::Request()->RequestHost());
-      if (sizeof($ExplodedDomain) == 1)
-         $GuessedCookieDomain = '';
-      else {
-         $GuessedCookieDomain = '.'.implode('.',array_slice($ExplodedDomain,-2,2));
-      }
-      
-      $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Plugin.ProxyConnect.NewCookieDomain'));
-      
-      // Set the model on the form.
-      $Sender->Form->SetModel($ConfigurationModel);
-      
-      if ($Sender->Form->AuthenticatedPostBack()) {
-         $NewCookieDomain = $Sender->Form->GetValue('Plugin.ProxyConnect.NewCookieDomain', '');
-         SaveToConfig('Garden.Cookie.Domain', $NewCookieDomain);
-      } else { 
-         $NewCookieDomain = $GuessedCookieDomain;
-      }
-      
-      $Sender->SetData('GuessedCookieDomain', $GuessedCookieDomain);
-      $CurrentCookieDomain = C('Garden.Cookie.Domain');
-      $Sender->SetData('CurrentCookieDomain', $CurrentCookieDomain);
-      
-      $Sender->Form->SetData(array(
-         'Plugin.ProxyConnect.NewCookieDomain'  => $NewCookieDomain
-      ));
-      
-      $Sender->Render($this->GetView('cookie.php'));
    }
    
    public function Controller_Integrate($Sender) {
@@ -184,7 +113,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    
    public function Controller_Integration($Sender) {
       $this->IntegrationConfigurationPath = $this->GetView('integration.php');
-         
+      
       $Manager = C('Plugin.ProxyConnect.IntegrationManager', FALSE);
       if ($Manager) {
          $this->Controller = &$Sender;
@@ -217,11 +146,29 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $this->IntegrationManager = $ManagerName;
    }
    
-   public function EntryController_SigninLoopback_Create(&$Sender) {
-      $Args = $Sender->RequestArgs;
-      $Redirect = (sizeof($Args)) ? implode('/',$Args) : '/';
+   public function LoadProviderData($Sender) {
+      $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
+      $Provider = $Authenticator->GetProvider();
       
-      $RealSigninURL = Gdn::Authenticator()->GetURL('Real'.Gdn_Authenticator::URL_SIGNIN, $Redirect);
+      if (!$Provider) {
+         $Provider = $this->CreateProviderModel();
+      }
+      
+      $Sender->SetData('Provider', $Provider);
+      return ($Provider) ? $Provider : NULL;
+   }
+   
+   public function EntryController_SignIn_Handler(&$Sender) {
+      if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
+      $this->SigninLoopback($Sender);
+   }
+   
+   protected function SigninLoopback($Sender) {
+      if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
+      $Redirect = Gdn::Request()->GetValue('HTTP_REFERER');
+      
+      $SigninURL = Gdn::Authenticator()->GetURL(Gdn_Authenticator::URL_REMOTE_SIGNIN, $Redirect);
+      $SignoutURL = Gdn::Authenticator()->GetURL(Gdn_Authenticator::URL_SIGNOUT, NULL);
       $RealUserID = Gdn::Authenticator()->GetRealIdentity();
       $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
       
@@ -237,11 +184,8 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             // Forget that this happened (user can start fresh)
             $Authenticator->DeleteCookie();
             
-            // Get the signout URL
-            $RealSignoutURL = Gdn::Authenticator()->GetURL(Gdn_Authenticator::URL_SIGNOUT, NULL);
-            
             // Send the user to the signout URL
-            Redirect($RealSignoutURL,302);
+            Redirect($SignoutURL,302);
          }   
       }
       
@@ -251,25 +195,33 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          $Authenticator->Authenticate();
          
          if (Gdn::Authenticator()->GetIdentity()) {
-            // What worked, so redirect to the default page. The user is now signed in.
+            
+            // That worked, so redirect to the default page. The user is now signed in.
             Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
             
          } else {
+            
             // The user really isnt signed in. Delete their cookie and send them to the remote login page.
             $Authenticator->SetIdentity(NULL);
-            Redirect($RealSigninURL,302);
+            $Authenticator->DeleteCookie();
+            Redirect($SigninURL,302);
+            
          }
       } else {
          if ($RealUserID) {
             // The user is already signed in. Send them to the default page.
             Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
-            
          } else {
             // We have no cookie for this user. Send them to the remote login page.
             $Authenticator->SetIdentity(NULL);
-            Redirect($RealSigninURL,302);
+            Redirect($SigninURL,302);
          }
       }
+      exit();
+   }
+   
+   public function EntryController_SignOut_Handler(&$Sender) {
+      if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
    }
    
    public function Setup() {
@@ -318,7 +270,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          'AssociationHashMethod'       => 'HMAC-SHA1'
       ));
       
-      return ($Inserted) ? $Provider : FALSE;
+      return ($Inserted !== FALSE) ? $Provider : FALSE;
    }
    
    public function AuthenticationController_DisableAuthenticatorProxy_Handler(&$Sender) {

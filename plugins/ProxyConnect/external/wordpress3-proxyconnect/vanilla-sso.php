@@ -25,7 +25,6 @@ define('VANILLA_COOKIE', $VanillaCookieName);
 
 // Check to see if we should kill processing and display signed in user info
 if (is_array($_GET)) {
-   if (array_key_exists('ProxyConnectAutoconfigure', $_GET) || array_key_exists('VanillaChallengeKey', $_GET)) {
 
    // allow the remote host to detect us
    header('X-ProxyConnect-Enabled: yes');
@@ -39,7 +38,7 @@ if (is_array($_GET)) {
 
       if ($VanillaChallengeKey == '') {
          header('X-Autoconfigure-Challenge: missing');
-         $Secure = FALSE
+         $Secure = FALSE;
       }
       
       else if (!is_null($SuppliedChallangeKey) && $VanillaChallengeKey != $SuppliedChallangeKey) {
@@ -58,17 +57,38 @@ if (is_array($_GET)) {
                if (!is_null($VanillaChallengeKey) || $Secure) {
                   update_option('vanilla_sso_key', $Key);
                   header('X-Autoconfigure-Challenge: set');
+               }
             }
          break;
          
          case 'Exchange':
             if ($Secure) {
-               $OutInfo = array();
-               $OutInfo[] = "AuthenticateUrl=".site_url('?VanillaChallengeKey='.$Key, 'vanilla-sso-info');
-               $OutInfo[] = "RegistrationUrl=".site_url('wp-login.php?action=register', 'login');
-               $OutInfo[] = "SignInUrl=".add_query_arg(array('redirect_to' => '{Redirtect}'), site_url('wp-login.php', 'login'));
-               $OutInfo[] = "SignOutUrl=".add_query_arg(array('action' => 'logout', '_wpnonce' => '{Nonce}', 'redirect_to' => '{Redirect}'), site_url('wp-login.php', 'login'));
-               echo implode("\n",$OutInfo);
+               $OutInfo = array(
+                  "AuthenticateUrl" => site_url('?VanillaChallengeKey='.$VanillaChallengeKey, 'vanilla-sso-info'),
+                  "RegisterUrl" => add_query_arg(array('action' => 'register'),site_url('wp-login.php', 'login')),
+                  "SignInUrl" => add_query_arg(array('redirect_to' => '{Redirect}'), site_url('wp-login.php', 'login')),
+                  "SignOutUrl" => add_query_arg(array('action' => 'logout', '_wpnonce' => '{Nonce}', 'redirect_to' => '{Redirect}'), site_url('wp-login.php', 'login')),
+                  "PasswordUrl" => "not supported",
+                  "ProfileUrl" => "not supported"
+               );
+
+               echo json_encode($OutInfo);
+            }
+         break;
+         
+         case 'Cookie':
+            $VanillaCookieDomain = get_option('vanilla_cookie_domain');
+            if ($VanillaCookieDomain == '') 
+               header('X-Autoconfigure-Cookie: missing');
+            else 
+               header('X-Autoconfigure-Cookie: set');
+               
+            if ($Secure) {
+               $CookieDomain = array_key_exists('Cookie', $_GET) ? $_GET['Cookie'] : NULL;
+               if (!is_null($CookieDomain)) {
+                  update_option('vanilla_cookie_domain', $CookieDomain);
+                  header('X-Autoconfigure-Cookie: set');
+               }
             }
          break;
       }

@@ -57,12 +57,11 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          $UserName = trim(preg_replace('/[^a-z0-9- ]+/i','',$UserName));
          $TransientKey = ArrayValue('TransientKey', $Response, NULL);
          
-         
          // Validate remote credentials against local auth tables
          $AuthResponse = $this->ProcessAuthorizedRequest($Provider['AuthenticationKey'], $UserUnique, $UserName, $TransientKey, array(
             'Email'  => $UserEmail
          ));
-
+         
          Gdn::Authenticator()->Trigger($AuthResponse);
          if ($AuthResponse == Gdn_Authenticator::AUTH_SUCCESS) {
             // Everything's cool, we don't have to do anything.
@@ -102,7 +101,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       
       // Try to load the association for this Provider + UserKey
       $Association = Gdn::Authenticator()->GetAssociation($UserKey, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
-
+      
       // We havent created a UserAuthentication entry yet. Create one. This will be an un-associated entry.
       if (!$Association) {
          $Association = Gdn::Authenticator()->AssociateUser($ProviderKey, $UserKey, 0);
@@ -115,7 +114,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       if ($Association['UserID'] > 0) {
          // Retrieved an association which has been fully linked to a local user
       
-         // We'll be tracked by Vanilla cookies now, so delete the Proxy cookie...
+         // We'll be tracked by Vanilla cookies now, so delete the Proxy cookie if it exists...
          $this->DeleteCookie();
          
          // Log the user in
@@ -123,6 +122,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          
          // Check for a request token that needs to be converted to an access token
          $Token = $this->LookupToken($ProviderKey, $UserKey, 'request');
+         
          if ($Token) {
             // Check for a stored Nonce
             $ExistingNonce = $this->LookupNonce($Token['Token']);
@@ -135,7 +135,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
                
             unset($Token);
          }
-
+         
          $TokenType = 'access';
          $AuthReturn = Gdn_Authenticator::AUTH_SUCCESS;
       } else {
@@ -161,7 +161,9 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       
       if ($Token && !is_null($ForeignNonce)) {
          $TokenKey = $Token['Token'];
-         $this->SetNonce($TokenKey, $ForeignNonce);
+         try {
+            $this->SetNonce($TokenKey, $ForeignNonce);
+         } catch (Exception $e) {}
       }
       
       return $AuthReturn;
@@ -247,7 +249,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    
    // What to do if the entry/leave/* page is triggered for a user that is logged in and successfully logs out
    public function LogoutResponse() {
-      return Gdn_Authenticator::REACT_REDIRECT;
+      return Gdn::Authenticator()->RemoteSignOutUrl();
    }
    
    // What to do if the entry/auth/* page is triggered but login is denied or fails
@@ -263,16 +265,13 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    public function GetURL($URLType) {
       $Provider = $this->GetProvider();
       $Nonce = $this->GetNonce();
-      $RealURLType = $URLType;
-      $URLType = substr($URLType, 0, 4) == 'Real' ? substr($URLType,4) : $URLType;
-      if ($Provider && $Provider[$URLType]) {
-         
-         if ($RealURLType == Gdn_Authenticator::URL_SIGNIN)
-            return Url('entry/signinloopback/%2$s',TRUE);
-            
-         if ($RealURLType == 'Real'.Gdn_Authenticator::URL_SIGNIN)
-            $URLType = Gdn_Authenticator::URL_SIGNIN;
-            
+      
+      // Dirty hack to allow handling Remote* url requests and delegate basic requests to the config
+      if (strlen($URLType) == strlen(str_replace('Remote','',$URLType))) return FALSE;
+      
+      $URLType = str_replace('Remote','',$URLType);
+      // If we get here, we're handling a RemoteURL question
+      if ($Provider && GetValue($URLType, $Provider, FALSE)) {
          return array(
             'URL'          => $Provider[$URLType],
             'Parameters'   => array(
@@ -345,7 +344,8 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       // If we're already back on Vanilla and working with the handshake form, don't
       // try to re-wakeup.
       $HaveHandshake = Gdn_CookieIdentity::CheckCookie($this->_CookieName);
-      if ($HaveHandshake) return;
+      if ($HaveHandshake)
+         return;
       
       $CurrentStep = $this->CurrentStep();
       
