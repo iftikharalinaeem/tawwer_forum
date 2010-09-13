@@ -28,6 +28,30 @@ $PluginInfo['ProxyConnectManual'] = array(
 class ProxyConnectManualPlugin extends Gdn_Plugin {
    
    public function Controller_Index($Sender) {
+      
+      if ($this->ProxyConnect->Provider) {
+         $ConsumerKey = $Sender->ConsumerKey = GetValue('AuthenticationKey', $this->ProxyConnect->Provider, '');
+         $Sender->ConsumerSecret = GetValue('AssociationSecret', $this->ProxyConnect->Provider, '');
+      
+         $ProviderModel = new Gdn_AuthenticationProviderModel();
+         $Sender->Form->SetModel($ProviderModel);
+         
+         if (!$Sender->Form->AuthenticatedPostBack()) {
+            $this->Provider['AuthenticateURL'] = C('Garden.Authenticator.AuthenticateURL');
+            $Sender->Form->SetData($this->ProxyConnect->Provider);
+         } else {
+            $ProviderModel->Validation->ApplyRule('URL',             'Required');
+            $ProviderModel->Validation->ApplyRule('RegisterUrl',     'Required');
+            $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
+            $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
+            $Sender->Form->SetFormValue('AuthenticationKey', $ConsumerKey);
+            $Sender->Form->SetFormValue('AuthenticationSchemeAlias', 'proxy');
+            $Saved = $Sender->Form->Save();
+            
+            SaveToConfig('Garden.Authenticator.AuthenticateURL', $Sender->Form->GetValue('AuthenticateURL'));
+         }
+      }
+      
       return $this->GetView('manual.php');
    }
    
@@ -74,8 +98,6 @@ class ProxyConnectManualPlugin extends Gdn_Plugin {
          return;
          
       $this->Controller = $Sender->Controller;
-      
-      $Sender->LoadProviderData($Sender->Controller);
 
       $SubController = 'Controller_'.ucfirst($Sender->SubController);
       if (!method_exists($this, $SubController))

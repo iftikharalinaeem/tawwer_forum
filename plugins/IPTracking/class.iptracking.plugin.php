@@ -37,6 +37,26 @@ class IPTrackingPlugin extends Gdn_Plugin {
       }
    }
    
+   public function UserModel_AfterInsertUser_Handler($Sender) {
+      $UserID = $Sender->EventArguments['InsertUserID'];
+      try {
+         Gdn::SQL()->Update('User',array(
+            'LastIP'    => Gdn::Request()->GetValue('REMOTE_ADDR')
+         ), array(
+            'UserID'    => $UserID
+         ))->Put();
+      } catch (Exception $e) {
+         // Do nothing
+      }
+   }
+   
+   public function UserController_ApplicantInfo_Handler($Sender) {
+      $User = GetValue('User', $Sender->EventArguments, NULL);
+      if (!is_null($User) && !is_null($LastIP = GetValue('LastIP', $User))) {
+         echo " [{$LastIP}]";
+      }
+   }
+   
    public function Gdn_Auth_AuthSuccess_Handler($Sender) {
       $UserID = Gdn::Session()->UserID;
       try {

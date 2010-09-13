@@ -71,7 +71,7 @@ class FilesystemTask extends Task {
          $this->Symlink('conf/bootstrap.before.php', TaskList::CombinePaths($this->VanillaPath,'conf/bootstrap.before.php'));
          $this->Symlink('conf/config-defaults.php', TaskList::CombinePaths($this->VanillaPath,'conf/config-defaults.php'));
          $this->Symlink('conf/constants.php', TaskList::CombinePaths($this->VanillaPath,'conf/constants.php'));
-         $this->Symlink('conf/locale.php', TaskList::CombinePaths($this->VanillaPath,'conf/locale.php'));
+         $this->Symlink('conf/locale.php', TaskList::CombinePaths($this->VanillaPath,'conf/locale.php'), TRUE);
          
          // Symlink core folders
          $this->Symlink('js', TaskList::CombinePaths($this->VanillaPath,'js'));
@@ -81,6 +81,8 @@ class FilesystemTask extends Task {
          $this->Symlink('plugins/HtmLawed', TaskList::CombinePaths($this->VanillaPath,'plugins/HtmLawed'));
          $this->Symlink('plugins/Gravatar', TaskList::CombinePaths($this->VanillaPath,'plugins/Gravatar'));
          $this->Symlink('plugins/VanillaInThisDiscussion', TaskList::CombinePaths($this->VanillaPath,'plugins/VanillaInThisDiscussion'));
+         $this->Symlink('plugins/Tagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Tagging'));
+         $this->Symlink('plugins/Flagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Flagging'));
          $this->SaveToConfig('EnabledPlugins.HtmLawed','HtmLawed');
          $this->RemoveFromConfig('EnabledPlugins.HtmlPurifier');
          
