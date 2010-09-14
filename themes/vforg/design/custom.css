@@ -320,7 +320,9 @@ body#vforg_home_index h2 {
 body#vforg_home_index h2 {
 	padding-top: 50px;
 	color: #744000;
-	font-size: 21px;
+	font-size: 18px;
+	white-space: nowrap;
+	overflow: visible;
 }
 body#vforg_home_index div.Wrap {
 	background:url("images/bg-shines.png") no-repeat scroll center top transparent;
@@ -369,6 +371,9 @@ div.SplashMessage p {
 	padding: 10px 0;
 	clear: both;
 	line-height: 1.4;
+}
+div.SplashMessage p span {
+	font-weight: bold;
 }
 div.SplashPreview {
 	position: absolute;
