@@ -192,6 +192,7 @@ class SignaturesPlugin extends Gdn_Plugin {
             $UserSignatures[$UserSig->UserID] = $UserSig->Value;
 */
          $Signatures = $this->GetUserMeta(array_keys($UserIDList), 'Sig');
+         if (!is_array($Signatures)) $Signatures = array();
          foreach ($Signatures as $UserID => $UserSig)
             $UserSignatures[$UserID] = $UserSig[$this->MakeMetaKey('Sig')];
       }
