@@ -20,13 +20,18 @@ Contact Mark O'Sullivan at mark [at] vanillaforums [dot] com
 // Store a marker to allow logins to take action after success
 add_action('login_head', 'vanillaconnect_login_marker');
 function vanillaconnect_login_marker() {
-   if (isset($_GET) && array_key_exists('mode', $_GET)) $Mode = $_GET['mode'];
-   else {
-      if (is_array($_COOKIE) && array_key_exists('VanillaHandshakeMarker', $_COOKIE)) return;
-      $Mode = 'script';
-   }
    
-   setcookie('VanillaHandshakeMarker', $Mode, time() + 3600, COOKIEPATH, COOKIE_DOMAIN);
+   $Mode = 'script';
+   if (isset($_GET) && array_key_exists('mode', $_GET)) $Mode = $_GET['mode'];
+
+   $Cookie = array(
+      'mode'               => $Mode,
+      'oauth_token'        => NULL
+   );
+   
+   if (isset($_GET) && array_key_exists('oauth_token', $_GET)) $Cookie['oauth_token'] = $_GET['oauth_token'];
+   
+   setcookie('VanillaHandshakeMarker', serialize($Cookie), time() + 3600, COOKIEPATH, COOKIE_DOMAIN);
 }
 
 // Hook the point immediately after logout so that logouts can take redirect action
@@ -49,15 +54,38 @@ function vanillaconnect_process() {
    $VanillaConnectKey = get_option('vanilla_connect_key');
    $VanillaConnectSecret = get_option('vanilla_connect_secret');
    
+   $Mode = 'script';
+   $OAuthToken = NULL;
+   
+   if (is_array($_COOKIE) && array_key_exists('VanillaHandshakeMarker', $_COOKIE)) {
+      $Cookie = $_COOKIE['VanillaHandshakeMarker'];
+      $Cookie = unserialize(stripslashes($Cookie));
+      
+      if (array_key_exists('mode', $Cookie)) $Mode = $Cookie['mode'];
+      if (array_key_exists('oauth_token', $Cookie)) $OAuthToken = $Cookie['oauth_token'];
+   }
+   
+   if (array_key_exists('mode', $_GET)) $Mode = $_GET['mode'];
+   if (array_key_exists('oauth_token', $_GET)) $OAuthToken = $_GET['oauth_token'];
+      
    if ($current_user->ID) {
+   
       // if the user is logged in, but the 'just logged out' flags are set, do nothing.
       if (isset($_GET['loggedout']) || $_GET['loggedout']) return;
+      
+      if (is_null($OAuthToken))
+         return;
+      else
+         $RequestToken = new OAuthToken($OAuthToken, "");
+      
+      setcookie('VanillaHandshakeMarker', ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
       
       // User is logged in
       $AuthToken = VanillaConnect::Authenticate(
          $VanillaConnectDomain,
          $VanillaConnectKey,
          $VanillaConnectSecret,
+         $RequestToken,
          $current_user->user_email, 
          $current_user->nickname, 
          $current_user->ID,
@@ -79,14 +107,6 @@ function vanillaconnect_process() {
          FALSE,
          array()
       );
-   }
-   
-   $Mode = 'script';
-   
-   if (isset($_GET) && array_key_exists('mode', $_GET)) $Mode = $_GET['mode'];
-   else if (is_array($_COOKIE) && array_key_exists('VanillaHandshakeMarker', $_COOKIE)) {
-      $Mode = $_COOKIE['VanillaHandshakeMarker'];
-      setcookie('VanillaHandshakeMarker', ' ', time() - 31536000, COOKIEPATH, COOKIE_DOMAIN);
    }
    
    if ($Mode == 'handshake')
@@ -481,7 +501,6 @@ class OAuthRequest {
       $defaults['oauth_token'] = $token->key;
 
     $parameters = array_merge($defaults, $parameters);
-
     return new OAuthRequest($http_method, $http_url, $parameters);
   }
 
@@ -1064,7 +1083,7 @@ class VanillaConnect {
    
    protected function __construct() {}
 
-   public static function Authenticate($ProviderDomain, $ConsumerKey, $ConsumerSecret, $UserEmail, $UserName, $UserID, $SSL = FALSE, $ExtensionArguments = array()) {
+   public static function Authenticate($ProviderDomain, $ConsumerKey, $ConsumerSecret, $RequestToken, $UserEmail, $UserName, $UserID, $SSL = FALSE, $ExtensionArguments = array()) {
       preg_match('/^(?:http|https)?(?::\/\/)?(.*)$/',$ProviderDomain,$Matches);
       $ProviderDomain = trim($Matches[1],'/');
    
@@ -1077,9 +1096,9 @@ class VanillaConnect {
       $VanillaConnect = new VanillaConnect();
       $OAuthConsumer = new OAuthConsumer($ConsumerKey, $ConsumerSecret);
       $ConsumerParams = array_merge($ExtensionArguments, array("email" => $UserEmail, "name" => $UserName, "uid" => $UserID));
-      $OAuthRequest = OAuthRequest::from_consumer_and_token($OAuthConsumer, null, "GET", $ConsumerNotifyUrl, $ConsumerParams);
+      $OAuthRequest = OAuthRequest::from_consumer_and_token($OAuthConsumer, $RequestToken, "GET", $ConsumerNotifyUrl, $ConsumerParams);
       $SignatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
-      $OAuthRequest->sign_request($SignatureMethod, $OAuthConsumer, null);
+      $OAuthRequest->sign_request($SignatureMethod, $OAuthConsumer, $RequestToken);
       $VanillaConnect->_Request = $OAuthRequest;
       
       $VanillaConnect->_Url = $VanillaConnect->_Request->to_url();

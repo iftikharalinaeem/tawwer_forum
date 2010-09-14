@@ -28,7 +28,7 @@ $PluginInfo['VanillaConnect'] = array(
 Gdn_LibraryMap::SafeCache('library','class.handshakeauthenticator.php',dirname(__FILE__).DS.'class.handshakeauthenticator.php');
 class VanillaConnectPlugin extends Gdn_Plugin {
    
-   public function SettingsController_VanillaConnect_Create(&$Sender, $EventArguments) {
+   public function SettingsController_VanillaConnect_Create($Sender, $EventArguments) {
       $Sender->Title('Vanilla Connect SSO');
 		$Sender->Form = new Gdn_Form();
 		
@@ -37,11 +37,11 @@ class VanillaConnectPlugin extends Gdn_Plugin {
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
-   public function AuthenticationController_AuthenticatorConfigurationHandshake_Handler(&$Sender) {
+   public function AuthenticationController_AuthenticatorConfigurationHandshake_Handler($Sender) {
       $Sender->AuthenticatorConfigure = '/dashboard/settings/vanillaconnect';
    }
    
-   public function Controller_Index(&$Sender) {
+   public function Controller_Index($Sender) {
       $Sender->Permission('Garden.AdminUser.Only');
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.AuthenticationKey')
@@ -82,7 +82,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       $Sender->Render($this->GetView('vanillaconnect.php'));
    }
    
-   public function Controller_Toggle(&$Sender) {
+   public function Controller_Toggle($Sender) {
 		$Sender->Permission('Garden.AdminUser.Only');
 		
 		// Enable/Disable VanillaConnect
@@ -96,12 +96,12 @@ class VanillaConnectPlugin extends Gdn_Plugin {
 		}
    }
    
-   public function Controller_Library(&$Sender) {
+   public function Controller_Library($Sender) {
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       $Sender->Render($this->GetResource('js/library.js'));
    }
    
-   public function Controller_Bundle(&$Sender) {
+   public function Controller_Bundle($Sender) {
       if (!class_exists('ZipArchive')) die('No zip archive tools!');
       
       $ExternalPath = $this->GetResource('external',FALSE,TRUE);
@@ -174,6 +174,44 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       return implode("", $FileData);
    }
    
+   public function EntryController_SignIn_Handler(&$Sender) {
+      if (!Gdn::Authenticator()->IsPrimary('handshake')) return;
+      $this->SigninLoopback($Sender);
+   }
+   
+   protected function SigninLoopback($Sender) {
+      if (!Gdn::Authenticator()->IsPrimary('handshake')) return;
+      $Redirect = Gdn::Request()->GetValue('HTTP_REFERER');
+      
+      $SigninURL = Gdn::Authenticator()->GetURL(Gdn_Authenticator::URL_REMOTE_SIGNIN, $Redirect);
+      $SignoutURL = Gdn::Authenticator()->GetURL(Gdn_Authenticator::URL_SIGNOUT, NULL);
+      $RealUserID = Gdn::Authenticator()->GetRealIdentity();
+      
+      $Authenticator = Gdn::Authenticator()->GetAuthenticator('handshake');
+      
+      // The user really isnt signed in. Delete their cookie and send them to the remote login page.
+      $Authenticator->SetIdentity(NULL);
+      $Authenticator->DeleteCookie();
+      Redirect($SigninURL,302);
+
+      exit();
+   }
+   
+   public function EntryController_SignOut_Handler(&$Sender) {
+      if (!Gdn::Authenticator()->IsPrimary('handshake')) return;
+      
+      $SignoutURL = Gdn::Authenticator()->GetURL(Gdn_Authenticator::URL_REMOTE_SIGNOUT, NULL);
+      
+/*
+      $Authenticator = Gdn::Authenticator()->GetAuthenticator('handshake');
+      $Authenticator->SetIdentity(NULL);
+      $Authenticator->DeleteCookie();
+*/
+      
+      Redirect($SignoutURL,302);
+      exit();
+   }
+   
    public function Setup() {
       $this->_Enable(FALSE);
    }
@@ -216,7 +254,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
       return $Provider; 
    }
    
-   public function AuthenticationController_DisableAuthenticatorHandshake_Handler(&$Sender) {
+   public function AuthenticationController_DisableAuthenticatorHandshake_Handler($Sender) {
       $this->_Disable();
    }
    
@@ -228,7 +266,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
          RemoveFromConfig('Garden.SignIn.Popup');
    }
    
-   public function AuthenticationController_EnableAuthenticatorHandshake_Handler(&$Sender) {
+   public function AuthenticationController_EnableAuthenticatorHandshake_Handler($Sender) {
       $this->_Enable();
    }
 	
