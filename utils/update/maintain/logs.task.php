@@ -10,6 +10,9 @@ class LogsTask extends Task {
    
    protected function Run() {
       $this->Mkdir('log');
+      $LogDir = TaskList::CombinePaths($this->ClientRoot,'log');
+      @chgrp($LogDir, 'www-data');
+      @chmod($LogDir, 0774);
    }
 
 }
