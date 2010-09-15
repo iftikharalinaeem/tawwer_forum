@@ -37,6 +37,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       $this->HookDataField('Transient', 'transient');   // transient key, if needed/provided
       
       $this->HookDataField('ConsumerKey', 'oauth_consumer_key');
+      $this->HookDataField('Token', 'oauth_token');
       $this->HookDataField('Nonce', 'oauth_nonce');
       $this->HookDataField('Signature', 'oauth_signature');
       $this->HookDataField('SignatureMethod', 'oauth_signature_method');
@@ -58,7 +59,6 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
    }
    
    public function Authenticate() {
-      
       if ($this->CurrentStep() != Gdn_Authenticator::MODE_VALIDATE) return Gdn_Authenticator::AUTH_INSUFFICIENT;
       
       $UserEmail = $this->GetValue('UserEmail');
@@ -67,33 +67,16 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       $TransientKey = $this->GetValue('Transient');
       
       $ConsumerKey = $this->GetValue('ConsumerKey');
+      $RToken = $this->GetValue('Token');
       $Nonce = $this->GetValue('Nonce');
       $Signature = $this->GetValue('Signature');
       $SignatureMethod = $this->GetValue('SignatureMethod');
       $Timestamp = $this->GetValue('Timestamp');
       $Version = $this->GetValue('Version');
       
-      /*
-// First check if we already have a token for this userkey
-      $HaveToken = Gdn::SQL()->Select('ua.UserID, ua.ForeignUserKey, uat.*')
-         ->From('UserAuthentication ua')
-         ->Join('UserAuthenticationToken uat', 'ua.ForeignUserKey = uat.ForeignUserKey', 'left')
-         ->Where('ua.ForeignUserKey', $UserEmail)
-         ->Where('ua.ProviderKey', $ConsumerKey)
-         ->BeginWhereGroup()
-            ->Where('DATE_ADD(uat.Timestamp, INTERVAL uat.Lifetime SECOND) >=', 'NOW()')
-            ->OrWHere('uat.Lifetime', 0)
-         ->EndWhereGroup()
-         ->Get()
-         ->FirstRow(DATASET_TYPE_ARRAY);
-         
-      $ExpectedTokenKey = NULL;
-      if ($HaveToken)
-         $ExpectedTokenKey = $HaveToken['Token'];
-*/
-         
       $RequestArguments = array(
          'oauth_consumer_key'       => $ConsumerKey,
+         'oauth_token'              => $RToken,
          'oauth_version'            => $Version,
          'oauth_timestamp'          => $Timestamp,
          'oauth_nonce'              => $Nonce,
@@ -105,19 +88,21 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
          'transient'                => $TransientKey
       );
       
+      $RequestURL = Url('/entry/auth/handshake',TRUE);
+      
       try {
-         $OAuthRequest = OAuthRequest::from_request('GET', Url('/entry/auth/handshake',TRUE), $RequestArguments);
-         
+         $OAuthRequest = OAuthRequest::from_request('GET', $RequestURL, $RequestArguments);
          $UserAssociation = Gdn::Authenticator()->GetAssociation($UserEmail, $ConsumerKey, $KeyType = Gdn_Authenticator::KEY_TYPE_PROVIDER);
          
-         if ($UserAssociation['Token']) {
+         if ($UserAssociation !== FALSE && $UserAssociation['Token']) {
             $TokenKey = $UserAssociation['Token'];
          } else {
-            $Token = $this->_OAuthServer->fetch_access_token($OAuthRequest);
+            $Token = $this->lookup_token($ConsumerKey, 'request', $OAuthRequest->get_parameter('oauth_token'));
             $TokenKey = $Token->key;
          }
          
       } catch (Exception $e) {
+         die('auth denied - '.$e->getMessage());
          return Gdn_Authenticator::AUTH_DENIED;
       }
       
@@ -128,22 +113,24 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
          'uid'          => $UserID,
          'transient'    => $TransientKey
       );
-      $SerializedCookiePayload = Gdn_Format::Serialize($CookiePayload);
-      
-      $this->AssociateRemoteKey($ConsumerKey, $UserEmail, $TokenKey);
-
-      // Set authorized cookie on target
-      $this->Remember($TokenKey, $SerializedCookiePayload);
       
       /*
        * If this foreign key is already fully associated with a local user account, don't bother to set a request cookie.
        * Just go directly to creating an access token and authenticating it with a normal vanilla identity cookie.
        */
-      if ($HaveToken['UserID']) {
+      if (GetValue('UserID', $UserAssociation, FALSE)) {
          $this->ProcessAuthorizedRequest($CookiePayload);
          return Gdn_Authenticator::AUTH_SUCCESS;
       } else {
          
+         $SerializedCookiePayload = Gdn_Format::Serialize($CookiePayload);
+         
+         $this->AuthorizeToken($TokenKey);
+         $this->AssociateRemoteKey($ConsumerKey, $UserEmail, $TokenKey);
+   
+         // Set authorized cookie on target
+         $this->Remember($TokenKey, $SerializedCookiePayload);
+      
          if ($this->GethandshakeMode() != Gdn_Authenticator::HANDSHAKE_DIRECT)
             return Gdn_Authenticator::AUTH_PARTIAL;
          else
@@ -156,9 +143,8 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
    }
    
    protected function _AssociateOAuthToken($TokenKey, $UserKey) {
-      $SQL = Gdn::Database()->SQL();
-      $SQL->Reset();
-      $SQL->Update('UserAuthenticationToken')
+      Gdn::Database()->SQL()->Reset();
+      Gdn::Database()->SQL()->Update('UserAuthenticationToken')
          ->Set('ForeignUserKey', $UserKey)
          ->Where('Token', $TokenKey)
          ->Put();
@@ -172,6 +158,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
    }
 
    public function DeAuthenticate() {
+   
       $ConsumerKey = $this->GetValue('ConsumerKey');
       $Nonce = $this->GetValue('Nonce');
       $Signature = $this->GetValue('Signature');
@@ -275,8 +262,14 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       $TokenKey = is_object($Token) ? $Token->key : $Token;
       $ConsumerKey = is_object($Consumer) ? $Consumer->key : $Consumer;
    
-      $SQL = Gdn::Database()->SQL();
-      $TokenData = $SQL
+      // Delete old tokens
+      Gdn::Database()->SQL()
+         ->From('UserAuthenticationToken uat')
+         ->Where('uat.Timestamp + uat.Lifetime <','NOW()', FALSE, FALSE)
+         ->Where('uat.Lifetime >',0)
+         ->Delete();
+   
+      $TokenData = Gdn::Database()->SQL()
          ->Select('uat.*')
          ->From('UserAuthenticationToken uat')
          ->Where('uat.Token', $TokenKey)
@@ -288,7 +281,7 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
          ->EndWhereGroup()
          ->Get()
          ->FirstRow(DATASET_TYPE_ARRAY);
-         
+      
       if ($TokenData) {
          $OToken = new Gdn_OAuthToken(
             $TokenData['Token'], 
@@ -349,12 +342,14 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
    }
    
    public function new_request_token($Consumer) {
-      return $this->CreateNewToken('request', $Consumer->key, NULL, TRUE);
+      $TokenArray = $this->CreateToken('request', $Consumer->key, NULL, FALSE);
+      return new Gdn_OAuthToken($TokenArray['Token'], $TokenArray['TokenSecret'], $TokenArray['TokenType'], $TokenArray['ForeignUserKey'], $TokenArray['Authorized'], $TokenArray['Timestamp'], $TokenArray['Lifetime']);
    }
    
    public function new_access_token($Token, $Consumer, $Verifier) {
       if ($Token->Authorized) {
-         $AccessToken = $this->CreateNewToken('access', $Consumer->key, $Token->UserKey, $Token->Authorized);
+         $TokenArray = $this->CreateToken('access', $Consumer->key, $Token->UserKey, $Token->Authorized);
+         $AccessToken = new Gdn_OAuthToken($TokenArray['Token'], $TokenArray['TokenSecret'], $TokenArray['TokenType'], $TokenArray['ForeignUserKey'], $TokenArray['Authorized'], $TokenArray['Timestamp'], $TokenArray['Lifetime']);
          
          $SQL = Gdn::Database()->SQL();
          $SQL
@@ -369,31 +364,6 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       return FALSE;
    }
    
-   protected function CreateNewToken($TokenType, $ConsumerKey, $UserKey = NULL, $Authorized = FALSE) {
-      $TokenKey = implode('.', array('token',$ConsumerKey,time(),mt_rand(0,100000)));
-      $TokenSecret = sha1(md5(implode('.',array($TokenKey,mt_rand(0,100000)))));
-      $Timestamp = time();
-      
-      $SQL = Gdn::Database()->SQL();
-      $InsertArray = array(
-         'Token' => $TokenKey,
-         'TokenSecret' => $TokenSecret,
-         'TokenType' => $TokenType,
-         'ProviderKey' => $ConsumerKey,
-         'Lifetime' => Gdn::Config('Garden.Authenticators.handshake.TokenLifetime', 60),
-         'Timestamp' => date('Y-m-d H:i:s',$Timestamp),
-         'Authorized' => $Authorized
-      );
-      
-      if ($UserKey !== NULL)
-         $InsertArray['ForeignUserKey'] = $UserKey;
-         
-      $SQL->Insert('UserAuthenticationToken', $InsertArray);
-         
-      $OToken = new Gdn_OAuthToken($TokenKey, $TokenSecret, $TokenType, $UserKey, $Authorized, $Timestamp, $InsertArray['Lifetime']);
-      return $OToken;
-   }
-   
    protected function _ConvertRequestToken($RequestToken, $OAuthConsumer) {
       
       if ($RequestToken && $RequestToken->UserKey) {
@@ -404,8 +374,8 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
          $AccessToken = $this->_OAuthServer->fetch_access_token($OAuthRequest);
          
          if ($AccessToken) {
-            if ($RequestToken->UserID)
-               $AccessToken->UserID = $RequestToken->UserID;
+            if (GetValue('UserID',$RequestToken,FALSE))
+               $AccessToken->UserID = GetValue('UserID',$RequestToken);
             
             $this->AssociateRemoteKey($OAuthConsumer->key, $RequestToken->UserKey, $AccessToken->key, $AccessToken->UserID);
             return $AccessToken;
@@ -539,9 +509,29 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
    
    public function GetURL($URLType) {
       $Provider = $this->GetProvider();
+      $Nonce = $this->GetNonce();
       
-      if ($Provider && $Provider[$URLType])
-         return $Provider[$URLType];
+      // Dirty hack to allow handling Remote* url requests and delegate basic requests to the config
+      if (strlen($URLType) == strlen(str_replace('Remote','',$URLType))) return FALSE;
+      
+      $URLType = str_replace('Remote','',$URLType);
+      // If we get here, we're handling a RemoteURL question
+      if ($Provider && GetValue($URLType, $Provider, FALSE)) {
+         $ResponseArray = array(
+            'URL'          => $Provider[$URLType],
+            'Parameters'   => array(
+               'Nonce'  => $Nonce['Nonce']
+            )
+         );
+         
+         if ($URLType = Gdn_Authenticator::URL_SIGNIN) {
+            $ResponseArray['URL'] .= '&oauth_token={oauth_token}&oauth_token_secret={oauth_token_secret}';
+            $RequestToken = $this->new_request_token($this->lookup_consumer($Provider['AuthenticationKey']));
+            $ResponseArray['Parameters']['oauth_token'] = $RequestToken->key;
+            $ResponseArray['Parameters']['oauth_token_secret'] = $RequestToken->secret;
+         }
+         return $ResponseArray;
+      }
       
       return FALSE;
    }
@@ -568,14 +558,14 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       if ($CurrentStep == Gdn_Authenticator::MODE_VALIDATE)
          return;
       
-      if (Gdn::Request()->Filename() == 'handshake.js')
+      if ($this->GethandshakeMode() != Gdn_Authenticator::HANDSHAKE_DIRECT)
          return;
       
       // Look for handshake cookies
       $Payload = $this->GetHandshake();
       
       if ($Payload) {
-
+         
          // Process the cookie auth
          $this->ProcessAuthorizedRequest($Payload);
       }
