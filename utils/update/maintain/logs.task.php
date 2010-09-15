@@ -9,7 +9,7 @@ class LogsTask extends Task {
    public function Init($RootPath = NULL) {}
    
    protected function Run() {
-      $this->Mkdir('log/');
+      $this->Mkdir('log');
    }
 
 }
