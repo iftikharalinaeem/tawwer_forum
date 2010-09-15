@@ -79,6 +79,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
       foreach ($this->GetFeeds() as $FeedURL => $FeedData) {
          // Check feed here
          $LastImport = GetValue('LastImport', $FeedData) == 'never' ? 0 : strtotime(GetValue('LastImport', $FeedData));
+         $Historical = (bool)GetValue('Historical', $FeedData, FALSE);
          $Delay = GetValue('Refresh', $FeedData);
          $DelayStr = '+'.str_replace(array(
             'h',
@@ -90,7 +91,12 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             'weeks'
          ),$Delay);
          $DelayMinTime = strtotime($DelayStr, $LastImport);
-         if (time() > $DelayMinTime) {
+         if (
+            ($LastImport && time() > $DelayMinTime) ||                  // We've imported before, and this article was published since then
+            
+            (!$LastImport && (time() > $DelayMinTime || $Historical))   // We've not imported before, and this is either a new article,
+                                                                        // or its old and we're allowed to import old articles
+         ) {
             if ($AutoImport) {
                $NeedToPoll = $NeedToPoll | 1;
                $this->PollFeed($FeedURL, $LastImport);
