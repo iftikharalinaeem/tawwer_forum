@@ -13,7 +13,7 @@ Contact Mark O'Sullivan at mark [at] lussumo [dot] com
  */
 $ThemeInfo['vfcom'] = array(
    'Name' => 'VanillaForums.com Theme',
-   'Description' => "A custom theme for VanillaForums.com.",
+   'Description' => "Friendlyizes the 404 and permission pages.",
    'Version' => '1.0',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
