@@ -25,8 +25,6 @@ $PluginInfo['Facebook'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
 );
 
-//Gdn_LibraryMap::SafeCache('library', 'class.facebookauthenticator.php', dirname(__FILE__).'/class.facebookauthenticator.php', FALSE);
-
 class FacebookPlugin extends Gdn_Plugin {
    public function AccessToken() {
       $Token = GetValue('fb_access_token', $_COOKIE);
