@@ -39,6 +39,7 @@ if [ ! -d "$PATH" ]; then
     /bin/mkdir ${PATH}plugins
     /bin/mkdir ${PATH}themes
     /bin/mkdir ${PATH}uploads
+    /bin/mkdir ${PATH}log
     
     # Fill it out the symbolic links to the vanilla source code
     
