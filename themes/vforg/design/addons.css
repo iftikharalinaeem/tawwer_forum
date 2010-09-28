@@ -12,6 +12,12 @@ body.Addon #Content img.Icon {
    padding: 8px;
    border: 1px solid #ddd;
 }
+
+input.Button {
+   margin-top: 4px;
+   margin-bottom: 4px;
+}
+
 div.DownloadPanel {
    margin-left: 20px;
    width: 270px;
@@ -29,16 +35,12 @@ div.DownloadBox {
    overflow: hidden;
    font-size: 12px;
 }
-div.RequirementBox dl dt {
-   color: #744000;
-   font-weight: bold;
-   font-size: 14px;
-}
 div.DownloadBox dl {
    padding: 0 !important;
    background: none;
    border: none;
 }
+div.RequirementBox dl dt,
 div.DownloadBox dl dt {
    color: inherit;
    width: 100px;
@@ -67,8 +69,8 @@ div.Testing h3 {
 #Content {
    font-size: 120%;
 }
-#addons_addon_index #Content h1 {
-   margin: 0;
+.Addons #Content h1 {
+   padding-bottom: 4px;
 }
 #addons_addon_index #Content h1 div {
    display: inline;
@@ -468,7 +470,7 @@ div.Hosting div.Host img {
    font-size: 13px;
    border: none;
    margin: 0;
-   padding: 0 0 10px;
+   padding: 0 0 4px;
 }
 #Content h2 {
    margin-bottom: 0 !important;
@@ -505,4 +507,20 @@ body#addons_get_index #Content h1 {
    font-size: 13px !important;
    padding: 0 0 12px !important;
    margin: 0;
+}
+
+table.Data {
+   background: #FEF7DF;
+}
+
+table.Data td, table.Data th {
+   padding: 4px;
+}
+
+table.Data th, table.Data thead td {
+   font-weight: bold;
+}
+
+table.Data .Alt {
+   background: #F6DAA8;
 }
