@@ -53,8 +53,8 @@ class Twitter2Plugin extends Gdn_Plugin {
       return $this->_AccessToken;
    }
 
-   protected function _AuthorizeHref($Popup) {
-      $Result = Url('/entry/twauthorize');
+   protected function _AuthorizeHref($Popup = FALSE) {
+      $Result = Url('/entry/twauthorize', TRUE);
       $Query = array();
       if (isset($_GET['Target']))
          $Query['Target'] = $_GET['Target'];
@@ -78,7 +78,7 @@ class Twitter2Plugin extends Gdn_Plugin {
          $ImgAlt = T('Sign In with Twitter');
 
          if ($AccessToken) {
-            $SigninHref = $this->_RedirectUri();
+            $SigninHref = $this->RedirectUri();
 
             // We already have an access token so we can just link to the connect page.
             $TwMethod = array(
@@ -109,13 +109,16 @@ class Twitter2Plugin extends Gdn_Plugin {
       echo $Html;
    }
 
-   public function EntryController_Twauthorize_Create() {
+   public function Authorize($Query = FALSE) {
       // Aquire the request token.
       $Consumer = new OAuthConsumer(C('Twitter.ConsumerKey'), C('Twitter.Secret'));
 
       $Params = array(
-          'oauth_callback' => $this->_RedirectUri(GetIncomingValue('display') == 'popup')
+          'oauth_callback' => $this->RedirectUri()
       );
+      if ($Query)
+         $Params['oauth_callback'] .= '&'.$Query;
+      
       $Url = 'https://api.twitter.com/oauth/request_token';
       $Request = OAuthRequest::from_consumer_and_token($Consumer, NULL, 'POST', $Url, $Params);
       $SignatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
@@ -146,12 +149,19 @@ class Twitter2Plugin extends Gdn_Plugin {
       echo $Response;
    }
 
+   public function EntryController_Twauthorize_Create() {
+      $Query = FALSE;
+      if (GetIncomingValue('display'))
+         $Query = 'display='.urlencode($Query);
+      $this->Authorize($Query);
+   }
+
    /**
     *
     * @param Gdn_Controller $Sender
     * @param array $Args
     */
-   public function EntryController_ConnectData_Handler($Sender, $Args) {
+   public function Base_ConnectData_Handler($Sender, $Args) {
       if (GetValue(0, $Args) != 'twitter')
          return;
 
@@ -312,20 +322,20 @@ class Twitter2Plugin extends Gdn_Plugin {
       return $C;
    }
 
-   protected function _RedirectUri($Popup = FALSE) {
-      $RedirectUri = Url('/entry/connect/twitter', TRUE);
+   protected $_RedirectUri = NULL;
 
-      $Args = array();
+   public function RedirectUri($NewValue = NULL) {
+      if ($NewValue !== NULL)
+         $this->_RedirectUri = $NewValue;
+      elseif ($this->_RedirectUri === NULL) {
+         $RedirectUri = Url('/entry/connect/twitter', TRUE);
+         $Args = array('Target' => GetValue('Target', $_GET, Url('')));
 
-      if ($Target = GetValue('Target', $_GET));
-         $Args['Target'] = $Target;
-      if ($Popup)
-         $Args['display'] = 'popup';
-
-      if (count($Args) > 0)
          $RedirectUri .= '?'.http_build_query($Args);
+         $this->_RedirectUri = $RedirectUri;
+      }
 
-      return $RedirectUri;
+      return $this->_RedirectUri;
    }
 
    /**
