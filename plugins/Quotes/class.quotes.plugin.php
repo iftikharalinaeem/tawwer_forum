@@ -25,11 +25,11 @@ $PluginInfo['Quotes'] = array(
 
 class QuotesPlugin extends Gdn_Plugin {
 
-   public function PluginController_Quotes_Create(&$Sender) {
+   public function PluginController_Quotes_Create($Sender) {
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
-   public function Controller_Getquote(&$Sender) {
+   public function Controller_Getquote($Sender) {
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       
@@ -46,28 +46,28 @@ class QuotesPlugin extends Gdn_Plugin {
       $Sender->Render($this->GetView('getquote.php'));
    }
 
-   public function DiscussionController_Render_Before(&$Sender) {
+   public function DiscussionController_Render_Before($Sender) {
       $this->PrepareController($Sender);
    }
    
-   public function PostController_Render_Before(&$Sender) {
+   public function PostController_Render_Before($Sender) {
       $this->PrepareController($Sender);
    }
    
-   protected function PrepareController(&$Sender) {
+   protected function PrepareController($Sender) {
       $Sender->AddJsFile($this->GetResource('js/quotes.js', FALSE, FALSE));
       $Sender->AddCssFile($this->GetResource('css/quotes.css', FALSE, FALSE));
    }
    
-   public function DiscussionController_CommentOptions_Handler(&$Sender) {
+   public function DiscussionController_CommentOptions_Handler($Sender) {
       $this->AddQuoteButton($Sender);
    }
    
-   public function PostController_CommentOptions_Handler(&$Sender) {
+   public function PostController_CommentOptions_Handler($Sender) {
       $this->AddQuoteButton($Sender);
    }
    
-   protected function AddQuoteButton(&$Sender) {
+   protected function AddQuoteButton($Sender) {
       if (!Gdn::Session()->UserID) return;
       
       $Object = !isset($Sender->EventArguments['Comment']) ? $Sender->Data['Discussion'] : $Sender->EventArguments['Comment'];
@@ -79,30 +79,24 @@ class QuotesPlugin extends Gdn_Plugin {
 QUOTE;
    }
    
-   public function DiscussionController_BeforeCommentDisplay_Handler(&$Sender) {
+   public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
       $this->RenderQuotes($Sender);
    }
    
-   public function PostController_BeforeCommentDisplay_Handler(&$Sender) {
+   public function PostController_BeforeCommentDisplay_Handler($Sender) {
       $this->RenderQuotes($Sender);
    }
    
-   protected function RenderQuotes(&$Sender) {
-      if (isset($Sender->EventArguments['Discussion'])) 
-         $Data = $Sender->EventArguments['Discussion'];
-         
-      if (isset($Sender->EventArguments['Comment'])) 
-         $Data = $Sender->EventArguments['Comment'];
-      
-      switch ($Data->Format) {
+   protected function RenderQuotes($Sender) {      
+      switch ($Sender->EventArguments['Object']->Format) {
          case 'Html':
-            $Data->Body = preg_replace_callback('/(<blockquote rel="([\d\w_ ]{3,30})">)/u', array($this, 'QuoteAuthorCallback'), $Data->Body);
-            $Data->Body = str_replace('</blockquote>','</p></div></blockquote>',$Data->Body);
+            $Sender->EventArguments['Object']->Body = preg_replace_callback('/(<blockquote rel="([\d\w_ ]{3,30})">)/u', array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
+            $Sender->EventArguments['Object']->Body = str_replace('</blockquote>','</p></div></blockquote>',$Sender->EventArguments['Object']->Body);
             break;
             
          case 'BBCode':
-            $Data->Body = preg_replace_callback('/(\[quote="([\d\w_ ]{3,30})"\])/u', array($this, 'QuoteAuthorCallback'), $Data->Body);
-            $Data->Body = str_replace('[/quote]','</p></div></blockquote>',$Data->Body);
+            $Sender->EventArguments['Object']->Body = preg_replace_callback('/(\[quote="([\d\w_ ]{3,30})"\])/u', array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
+            $Sender->EventArguments['Object']->Body = str_replace('[/quote]','</p></div></blockquote>',$Sender->EventArguments['Object']->Body);
             break;
             
          case 'Display':
@@ -121,7 +115,7 @@ QUOTE;
 BLOCKQUOTE;
    }
    
-   public function PostController_Quote_Create(&$Sender) {
+   public function PostController_Quote_Create($Sender) {
       if (sizeof($Sender->RequestArgs) < 2) return;
       $Selector = $Sender->RequestArgs[1];
       $Sender->SetData('Plugin.Quotes.QuoteSource', $Selector);
@@ -129,7 +123,7 @@ BLOCKQUOTE;
       return $Sender->Comment();
    }
    
-   public function PostController_BeforeCommentRender_Handler(&$Sender) {
+   public function PostController_BeforeCommentRender_Handler($Sender) {
       if (isset($Sender->Data['Plugin.Quotes.QuoteSource'])) {
          if (sizeof($Sender->RequestArgs) < 2) return;
          $Selector = $Sender->RequestArgs[1];
@@ -200,7 +194,11 @@ BLOCKQUOTE;
    }
    
    public function Setup() {
-      // Nothing to do here!
+      SaveToConfig('Garden.Html.SafeStyles',FALSE);
+   }
+   
+   public function OnDisable() {
+      RemoveFromConfig('Garden.Html.SafeStyles');
    }
    
    public function Structure() {
