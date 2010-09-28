@@ -464,9 +464,9 @@ abstract class Task {
       return $this->Config->Get($Name, $Default);
    }
    
-   protected function Symlink($RelativeLink, $Source = NULL) {
+   protected function Symlink($RelativeLink, $Source = NULL, $Respectful = FALSE) {
       $AbsoluteLink = TaskList::CombinePaths($this->ClientRoot,$RelativeLink);
-      TaskList::Symlink($AbsoluteLink, $Source);
+      TaskList::Symlink($AbsoluteLink, $Source, $Respectful);
    }
    
    protected function Mkdir($RelativePath) {
