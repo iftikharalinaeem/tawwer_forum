@@ -31,6 +31,7 @@ class FileUploadPlugin extends Gdn_Plugin {
    
    public function __construct() {
       $this->MediaCache = array();
+      $this->MediaModel = new MediaModel();
    }
 
    /**
@@ -91,8 +92,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          'Status'    => 'failed'
       );
       
-      $MediaModel = new MediaModel();
-      $Media = $MediaModel->GetID($MediaID);
+      $Media = $this->MediaModel->GetID($MediaID);
 
       if ($Media) {
          $Delete['Media'] = $Media;
@@ -169,6 +169,12 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    public function PostController_BeforeFormButtons_Handler($Sender) {
+      if (!is_null($Discussion = GetValue('Discussion',$Sender, NULL))) {
+         $this->CacheAttachedMedia($Sender);
+         $Sender->EventArguments['Type'] = 'Discussion';
+         $Sender->EventArguments['Discussion'] = $Discussion;
+         $this->AttachUploadsToComment($Sender);
+      }
       $this->DrawAttachFile($Sender);
    }
    
@@ -233,17 +239,20 @@ class FileUploadPlugin extends Gdn_Plugin {
          $Comments->DataSeek(-1);
          while ($Comment = $Comments->NextRow())
             $CommentIDList[] = $Comment->CommentID;
+      } elseif ($Sender->Discussion) {
+         $CommentIDList[] = $Sender->DiscussionID = $Sender->Discussion->DiscussionID;
       }
       
-      $MediaModel = new MediaModel();
-      $MediaData = $MediaModel->PreloadDiscussionMedia($Sender->DiscussionID, $CommentIDList);
+      $MediaData = $this->MediaModel->PreloadDiscussionMedia($Sender->DiscussionID, $CommentIDList);
 
       $MediaArray = array();
-      $MediaData->DataSeek(-1);
-      while ($Media = $MediaData->NextRow()) {
-         $MediaArray[$Media->ForeignTable.'/'.$Media->ForeignID][] = $Media;
+      if ($MediaData !== FALSE) {
+         $MediaData->DataSeek(-1);
+         while ($Media = $MediaData->NextRow()) {
+            $MediaArray[$Media->ForeignTable.'/'.$Media->ForeignID][] = $Media;
+         }
       }
-      
+            
       $this->MediaCache = $MediaArray;
    }
    
@@ -268,7 +277,7 @@ class FileUploadPlugin extends Gdn_Plugin {
    public function PostController_AfterCommentBody_Handler($Sender) {
       $this->AttachUploadsToComment($Sender);
    }
-   
+      
    /**
     * AttachUploadsToComment function.
     * 
@@ -304,8 +313,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       if (!$this->IsEnabled()) return;
    
       list($MediaID) = $Sender->RequestArgs;
-      $MediaModel = new MediaModel();
-      $Media = $MediaModel->GetID($MediaID);
+      $Media = $this->MediaModel->GetID($MediaID);
       
       if (!$Media) return;
       
@@ -367,6 +375,7 @@ class FileUploadPlugin extends Gdn_Plugin {
    protected function AttachAllFiles($AttachedFilesData, $AllFilesData, $ForeignID, $ForeignTable) {
       if (!$this->IsEnabled()) return;
       
+      // No files attached
       if (!$AttachedFilesData) return;
       
       $SuccessFiles = array();
@@ -393,48 +402,20 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    protected function AttachFile($FileID, $ForeignID, $ForeignType) {
-      $MediaModel = new MediaModel();
-      $Media = $MediaModel->GetID($FileID);
+      $Media = $this->MediaModel->GetID($FileID);
       if ($Media) {
          $Media->ForeignID = $ForeignID;
          $Media->ForeignTable = $ForeignType;
-         $PlacementStatus = $this->PlaceMedia($Media, Gdn::Session()->UserID);
-         if ($PlacementStatus) {
-            $MediaModel->Save($Media);
-            return TRUE;
+         try {
+            $PlacementStatus = $this->PlaceMedia($Media, Gdn::Session()->UserID);
+            $this->MediaModel->Save($Media);
+         } catch (Exception $e) {
+            die($e->getMessage());
+            return FALSE;
          }
+         return TRUE;
       }
       return FALSE;
-   }
-   
-   /**
-    * TrashFile function.
-    * 
-    * @access protected
-    * @param mixed $FileID
-    * @return void
-    */
-   protected function TrashFile($FileID) {
-      $MediaModel = new MediaModel();
-      $Media = $MediaModel->GetID($FileID);
-      
-      if ($Media) {
-         $MediaModel->Delete($Media);
-         $Deleted = FALSE;
-         
-         if (!$Deleted) {
-            $DirectPath = PATH_UPLOADS.DS.$Media->Path;
-            if (file_exists($DirectPath))
-               $Deleted = @unlink($DirectPath);
-         }
-         
-         if (!$Deleted) {
-            $CalcPath = FileUploadPlugin::FindLocalMedia($Media, TRUE, TRUE);
-            if (file_exists($CalcPath))
-               $Deleted = @unlink($CalcPath);
-         }
-         
-      }
    }
    
    /**
@@ -447,27 +428,26 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    protected function PlaceMedia(&$Media, $UserID) {
       $NewFolder = FileUploadPlugin::FindLocalMediaFolder($Media->MediaID, $UserID, TRUE, FALSE);
-      
       $CurrentPath = array();
       foreach ($NewFolder as $FolderPart) {
          array_push($CurrentPath, $FolderPart);
-         $TestFolder = implode(DS, $CurrentPath);
-         if (!is_dir($TestFolder))
-            @mkdir($TestFolder);
-         if (!is_dir($TestFolder))
-            return false;
+         $TestFolder = CombinePaths($CurrentPath);
+         
+         if (!is_dir($TestFolder) && !@mkdir($TestFolder))
+            throw new Exception("Failed creating folder '{$TestFolder}' during PlaceMedia verification loop");
       }
+      
       $FileParts = pathinfo($Media->Name);
-      $NewFilePath = implode(DS,array($TestFolder,$Media->MediaID.'.'.$FileParts['extension']));
-      $Success = @rename(PATH_UPLOADS.DS.$Media->Path, $NewFilePath);
-      if (!$Success) {
-         return false;
-      }
+      $SourceFilePath = CombinePaths(array(PATH_UPLOADS,$Media->Path));
+      $NewFilePath = CombinePaths(array($TestFolder,$Media->MediaID.'.'.$FileParts['extension']));
+      $Success = rename($SourceFilePath, $NewFilePath);
+      if (!$Success)
+         throw new Exception("Failed renaming '{$SourceFilePath}' -> '{$NewFilePath}'");
       
       $NewFilePath = FileUploadPlugin::FindLocalMedia($Media, FALSE, TRUE);
       $Media->Path = $NewFilePath;
       
-      return true;
+      return TRUE;
    }
    
    /**
@@ -482,9 +462,9 @@ class FileUploadPlugin extends Gdn_Plugin {
     * @return void
     */
    public static function FindLocalMediaFolder($MediaID, $UserID, $Absolute = FALSE, $ReturnString = FALSE) {
-      $DispersionFactor = 20;
-      $FolderID = $UserID % 20;
-      $ReturnArray = array('FileUpload',$FolderID,$UserID);
+      $DispersionFactor = C('Plugin.FileUpload.DispersionFactor',20);
+      $FolderID = $MediaID % $DispersionFactor;
+      $ReturnArray = array('FileUpload',$FolderID);
       
       if ($Absolute)
          array_unshift($ReturnArray, PATH_UPLOADS);
@@ -531,7 +511,6 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $Sender->FieldName = $FieldName;
       $Sender->ApcKey = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_POST,'APC_UPLOAD_PROGRESS');
-      $MediaModel = new MediaModel();
       
       // this will hold the IDs and filenames of the items we were sent. booyahkashaa.
       $MediaResponse = array();
@@ -604,20 +583,21 @@ class FileUploadPlugin extends Gdn_Plugin {
          if (!in_array($Extension, $AllowedExtensions) && !in_array('*',$AllowedExtensions))
             throw new FileUploadPluginUploadErrorException("Uploaded file type is not allowed.", 11, $FileName, $FileKey);
          
-         $ScratchFileName = CombinePaths(array($ScratchPath,basename($FileTemp)));
+         $TempFileName = "fresh-".md5($FileName)."-".microtime(true)."-".$Extension;
+         $ScratchFileName = CombinePaths(array($ScratchPath,$TempFileName));
          $MoveSuccess = @move_uploaded_file($FileTemp, $ScratchFileName);
          
          if (!$MoveSuccess)
             throw new FileUploadPluginUploadErrorException("Internal error, could not move the file.",9,$FileName);
          
-         $MediaID = $MediaModel->Save(array(
+         $MediaID = $this->MediaModel->Save(array(
             'Name'            => $FileName,
             'Type'            => $FileType,
             'Size'            => $FileSize,
             'InsertUserID'    => Gdn::Session()->UserID,
             'DateInserted'    => date('Y-m-d H:i:s'),
             'StorageMethod'   => 'local',
-            'Path'            => CombinePaths(array_merge(array('FileUpload', 'scratch'), array(basename($FileTemp))))
+            'Path'            => CombinePaths(array_merge(array('FileUpload', 'scratch'), array($TempFileName)))
          ));
          
          $MediaResponse = array(
@@ -705,6 +685,45 @@ class FileUploadPlugin extends Gdn_Plugin {
       if ($ApcAvailable && !ini_get('apc.rfc1867')) $ApcAvailable = FALSE;
       
       return $ApcAvailable;
+   }
+   
+   /**
+    * TrashFile function.
+    * 
+    * @access protected
+    * @param mixed $FileID
+    * @return void
+    */
+   protected function TrashFile($FileID) {
+      $Media = $this->MediaModel->GetID($FileID);
+      
+      if ($Media) {
+         $this->MediaModel->Delete($Media);
+         $Deleted = FALSE;
+         
+         if (!$Deleted) {
+            $DirectPath = PATH_UPLOADS.DS.$Media->Path;
+            if (file_exists($DirectPath))
+               $Deleted = @unlink($DirectPath);
+         }
+         
+         if (!$Deleted) {
+            $CalcPath = FileUploadPlugin::FindLocalMedia($Media, TRUE, TRUE);
+            if (file_exists($CalcPath))
+               $Deleted = @unlink($CalcPath);
+         }
+         
+      }
+   }
+   
+   public function DiscussionModel_DeleteDiscussion_Handler($Sender) {
+      $DiscussionID = $Sender->EventArguments['DiscussionID'];
+      $this->MediaModel->DeleteParent('Discussion', $DiscussionID);
+   }
+   
+   public function CommentModel_DeleteComment_Handler($Sender) {
+      $CommentID = $Sender->EventArguments['CommentID'];
+      $this->MediaModel->DeleteParent('Comment', $CommentID);
    }
    
    public function Setup() {

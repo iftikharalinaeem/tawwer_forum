@@ -108,7 +108,6 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       this.CurrentUploader = this.AttachmentWindow.find('div.AttachFileLink div.CurrentUploader').first();
       
       if (this.CurrentInput) {
-         console.log('auto show');
          this.ShowUploader(true);
          this.RemoveUploader(this.CurrentInput);
       }
