@@ -229,7 +229,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    
    // What to do if entry/auth/* is called while the user is logged out. Should normally be REACT_RENDER
    public function LoginResponse() {
-      return Gdn_Authenticator::REACT_RENDER;
+      return Gdn::Authenticator()->RemoteSignInUrl();
    }
    
    // What to do after part 1 of a 2 part authentication process. This is used in conjunction with OAauth/OpenID type authentication schemes
