@@ -65,7 +65,7 @@ class FacebookPlugin extends Gdn_Plugin {
       }
    }
 
-   public function Base_AfterSignInButton_Handler($Sender, $Args) {
+   public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       $ImgSrc = Url('/plugins/Facebook/design/facebook-login.png');
       $ImgAlt = T('Login with Facebook');
       $SigninHref = $this->_AuthorizeHref();

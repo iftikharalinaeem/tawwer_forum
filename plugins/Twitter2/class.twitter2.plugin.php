@@ -98,7 +98,7 @@ class Twitter2Plugin extends Gdn_Plugin {
       }
    }
 
-   public function Base_AfterSignInButton_Handler($Sender, $Args) {
+   public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       $ImgSrc = Url('/plugins/Twitter2/design/twitter-signin.png');
       $ImgAlt = T('Sign In with Twitter');
       $SigninHref = $this->_AuthorizeHref();
