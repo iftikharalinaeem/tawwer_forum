@@ -120,7 +120,12 @@ class FollowingPlugin extends Gdn_Plugin {
    }
 
    public function Setup() {
-      // Nothing to do here!
+      $Structure = Gdn::Structure();
+      $Structure
+         ->Table('Following')
+         ->Column('UserID', 'int(11)', FALSE, 'primary')
+         ->Column('FollowedUserID', 'int(11)', FALSE, 'primary')
+         ->Set(FALSE, FALSE);
    }
    
    public function Structure() {

@@ -67,7 +67,7 @@ class MediaModel extends VanillaModel {
 		return $Data;
    }
    
-   public function Delete($Media) {
+   public function Delete($Media, $DeleteFile = TRUE) {
       $MediaID = FALSE;
       if (is_a($Media, 'stdClass'))
          $Media = (array)$Media;
@@ -78,9 +78,30 @@ class MediaModel extends VanillaModel {
          $MediaID = $Media['MediaID'];
       
       if ($MediaID) {
+         $Media = $this->GetID($MediaID);
          $this->SQL->Delete($this->Name, array('MediaID' => $MediaID), FALSE);
+         
+         if ($DeleteFile) {
+            $DirectPath = PATH_UPLOADS.DS.GetValue('Path',$Media);
+            if (file_exists($DirectPath))
+               @unlink($DirectPath);
+         }
+
       } else {
          $this->SQL->Delete($this->Name, $Media, FALSE);
+      }
+      
+   }
+   
+   public function DeleteParent($ParentTable, $ParentID) {
+      $MediaItems = $this->SQL->Select('*')
+         ->From($this->Name)
+         ->Where('ForeignTable', strtolower($ParentTable))
+         ->Where('ForeignID', $ParentID)
+         ->Get()->Result(DATASET_TYPE_ARRAY);
+         
+      foreach ($MediaItems as $Media) {
+         $this->Delete(GetValue('MediaID',$Media));
       }
    }
    

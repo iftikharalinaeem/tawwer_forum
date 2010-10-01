@@ -85,12 +85,12 @@ div.AttachFileWrapper div.AttachFileLink {
    position: relative;
 }
 
-div.AttachFileWrapper div.AttachFileLink div#CurrentUploader {
+div.AttachFileWrapper div.AttachFileLink div.CurrentUploader {
    height: 0px;
    width: 350px;
 }
 
-div.AttachFileWrapper div.AttachFileLink div#CurrentUploader input[type=file] {
+div.AttachFileWrapper div.AttachFileLink div.CurrentUploader input[type=file] {
    display: none;
 }
 
@@ -128,11 +128,11 @@ div.AttachFileWrapper div.FileHolder h3 {
    font-size: 16px;
 }
 
-div.AttachFileWrapper div.FileHolder div#FileContainer {
+div.AttachFileWrapper div.FileHolder div.AttachFileContainer {
 
 }
 
-div.AttachFileWrapper div.FileHolder div#FileContainer span {
+div.AttachFileWrapper div.FileHolder div.AttachFileContainer span {
    padding-left: 5px;
 }
 
@@ -156,6 +156,17 @@ div.Attachments table.AttachFileContainer {
 div.Attachments table.AttachFileContainer tr td {
    padding: 3px;
    vertical-align: middle;
+}
+
+div.Attachments table.AttachFileContainer tr td a.DeleteFile span {
+   display: none;
+}
+
+div.Attachments table.AttachFileContainer tr td a.DeleteFile {
+   width: 12px;
+   height: 12px;
+   background: transparent url('../images/trash.png') no-repeat top left;
+   display: block;
 }
 
 li div.FileUploadBlock {

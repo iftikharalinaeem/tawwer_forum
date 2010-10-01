@@ -1,22 +1,22 @@
-<div class="AttachFileWrapper" id="AttachmentWindow">
-   <div id="AttachFileContainer">
-      <div class="FileAttachment" id="PrototypicalAttachment" style="display:none;">
+<div class="AttachFileWrapper AttachmentWindow">
+   <div class="AttachFileContainer">
+      <div class="FileAttachment PrototypicalAttachment" style="display:none;">
          <div class="FileOptions"></div>
-         <div class="FileName">FileName</div>
-         <div class="FileSize">FileSize</div>
+         <div class="FileName"><?php echo T('FileName'); ?></div>
+         <div class="FileSize"><?php echo T('FileSize'); ?></div>
          <div class="UploadProgress">
-            <div class="Foreground"><strong>Uploading...</strong></div>
+            <div class="Foreground"><strong><?php echo T('Uploading...'); ?></strong></div>
             <div class="Background">&nbsp;</div>
             <div>&nbsp;</div>
          </div>
       </div>
    </div>
    <div class="AttachFileLink">
-      <a href="javascript:;" id="AttachFileLink">Attach a file</a>
-      <div id="CurrentUploader"></div>
+      <a href="javascript:;"><?php echo T('Attach a file'); ?></a>
+      <div class="CurrentUploader"></div>
    </div>
 </div>
 <script type="text/javascript">
-   var UploadManager = new Gdn_MultiFileUpload('<?php echo Gdn::Request()->WebRoot(); ?>', 'AttachmentWindow', 'AttachFileContainer', 'AttachFileLink', 'UploadAttachment', '<?php echo $this->MaxUploadSize; ?>', '<?php echo uniqid(''); ?>');
-   UploadManager.Apc(<?php echo (FileUploadPlugin::ApcAvailable()) ? 'true' : 'false'; ?>);
+   if (GdnUploaders)
+      GdnUploaders.Prepare();
 </script>
