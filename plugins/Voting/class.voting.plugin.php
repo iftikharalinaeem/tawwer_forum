@@ -83,7 +83,7 @@ class VotingPlugin extends Gdn_Plugin {
 			
 		echo Wrap(
 			// Anchor(
-			Wrap(T('Comments')) . ($Discussion->CountComments - 1)
+			Wrap(T('Comments')) . Gdn_Format::BigNumber($Discussion->CountComments - 1)
 			// ,'/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
 			// )
 			, 'div', array('class' => $Css));
@@ -91,7 +91,7 @@ class VotingPlugin extends Gdn_Plugin {
 		// Views
 		echo Wrap(
 			// Anchor(
-			Wrap(T('Views')) . $Discussion->CountViews
+			Wrap(T('Views')) . Gdn_Format::BigNumber($Discussion->CountViews)
 			// , '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
 			// )
 			, 'div', array('class' => 'StatBox ViewsBox'));
@@ -100,7 +100,7 @@ class VotingPlugin extends Gdn_Plugin {
 		$Title = T($Discussion->Bookmarked == '1' ? 'Undo Follow' : 'Follow');
 		if ($Session->IsValid()) {
 			echo Wrap(Anchor(
-				Wrap(T('Follows')) . $Discussion->CountBookmarks,
+				Wrap(T('Follows')) . Gdn_Format::BigNumber($Discussion->CountBookmarks),
 				'/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
 				'',
 				array('title' => $Title)
@@ -112,7 +112,7 @@ class VotingPlugin extends Gdn_Plugin {
 		// Votes
 		if ($Session->IsValid()) {
 			echo Wrap(Anchor(
-				Wrap(T('Votes')) . $CountVotes,
+				Wrap(T('Votes')) . Gdn_Format::BigNumber($CountVotes),
 				'/vanilla/discussion/votediscussion/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
 				'',
 				array('title' => T('Vote'))
@@ -215,7 +215,7 @@ class VotingPlugin extends Gdn_Plugin {
 				$CssClass = ' SignInPopup';
 			}
 			echo Anchor(Wrap(Wrap('Vote Up', 'i'), 'i', array('class' => 'ArrowSprite SpriteUp', 'rel' => 'nofollow')), $VoteUpUrl, 'VoteUp'.$CssClass);
-			echo Wrap(StringIsNullOrEmpty($Object->Score) ? '0' : $Object->Score);
+			echo Wrap(StringIsNullOrEmpty($Object->Score) ? '0' : Gdn_Format::BigNumber($Object->Score));
 			echo Anchor(Wrap(Wrap('Vote Down', 'i'), 'i', array('class' => 'ArrowSprite SpriteDown', 'rel' => 'nofollow')), $VoteDownUrl, 'VoteDown'.$CssClass);
 		echo '</span>';
 	}
