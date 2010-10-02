@@ -1,215 +1,272 @@
 #Body {
-	width: 960px;
+	margin: 0;
+	width: 99.9%;
+	position: relative;
 }
-#Body {
-	margin: 15px auto;
+#Head {
+	background: #3B5998;
+	padding:0;
+	margin: 20px 20px 0;
+	text-align: left;
+	position: relative;
 }
-
-body #Head h1 {
-	padding:10px 7px 10px 0;
+div.Popup h1,
+div.Popup h2 {
+	background: #3b5998;
+	border: none;
 }
-
-body.Entry #Content h1 {
-	color:#333;
+.Banner {
+	padding: 10px;
+	text-align: left;
+	position: relative;
 }
-
-div#Body div.Wrapper {
-	float:left;
-	width:940px;
-	padding: 20px;
-	margin-bottom:20px;
-	border:1px solid #ccc;
-	-moz-border-radius:5px;
-		-webkit-border-radius:5px;
-			border-radius:5px;
-
+.Banner ul {
+	background: #3B5998;
+	padding: 0;
+	margin: 0;
+}
+.Banner ul li {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+.Banner ul li a {
+	font-weight: bold;
+	padding: 3px 6px;
+	font-size: 11px;
+	color: #fff;
+	display: inline-block;
+}
+.Banner ul li a:hover {
+	background: #4b67a1;
+}
+.Banner ul li a.SignOut {
+	font-weight: normal;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+.Banner ul li a span {
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	padding: 1px 2px 0 1px;
+	background: #f00;
+	border-right: 1px solid #a00;
+	border-bottom: 1px solid #a00;
+	color: #fff;
+	font-size: 9px;
+	position: relative;
+	top: -3px;
 }
 #Content {
-	position: relative;
-	width: 670px;
-}
-body.Profile #Content {
-	float:right;
-	margin:0 0 40px 20px;
-	width:670px;
+	float: none;
+	width: auto;
+	margin: 0 280px 0 10px;
 }
 #Panel {
-	padding-top:12px;
-	position: relative;
+	float: right;
+	margin-right: 10px;
 }
-body.Discussion a.Bookmark {
-	margin:2px 6px 6px 8px;
+#Panel div.SearchBox input.InputBox {
+	width: 200px;
+	margin-right: 4px;
 }
-div#MessageForm,
-div.MessageForm,
-div.Tabs {
-	background: none;
-	border-bottom:1px solid #ccc;
-	padding: 0 5px; 
+div.SearchBox {
+	margin-bottom: 6px;
 }
-div#MessageForm,
-div.MessageForm {
-	background: #eee;
-	padding: 8px;
+body.Profile div.SearchBox {
+	display: none;
+}
+body.Profile #Content {
+	float:none;
+	width: auto;
+	margin: 0 10px 0 280px;
+}
+body.Profile #Panel {
+	margin: 0 0 0 10px;
+}
+form.Activity textarea {
+	width:99%;
+}
+#Foot div {
+	width: auto;
+}
+body.Post #Content {
+	margin:0 20px;
+}
+#ConversationForm textarea.MultiComplete,
+#ConversationForm .TextBox,
+#MessageForm textarea,
+div.Comment div.CommentForm,
+div.Comment div.CommentForm textarea,
+div.CommentForm textarea,
+#DiscussionForm input.InputBox,
+#DiscussionForm textarea {
+	width:99%;
 }
 
+/* Tabs */
+div.Tabs {
+	background: none;
+	padding: 0;
+	border-bottom: 1px solid #aaa;
+}
+div.Tabs ul {
+	padding: 0 8px;
+	white-space: nowrap;
+}
+div.MessageForm {
+	padding: 8px 8px 5px;
+}
+div.MessageForm div.Tabs {
+	padding: 0 8px;
+}
 div.Tabs li a,
 div.Tabs li a:link,
 div.Tabs li a:hover,
 div.Tabs li a:active,
 div.Tabs li a:visited {
-   border: 1px solid #ccc;
-	border-bottom: 0;
+	font-size: 11px;
+   margin: 0;
+   border: none;
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   background: none;
+   color: #1E79A7;
+   text-decoration: none;
+   padding: 8px 10px;
+	line-height: 11px;
+}
+div.Tabs li a:hover {
+   text-decoration: underline;
+}
+a.Active,
+div.Tabs li.Active a {
+   background: #fff;
+   color: #474747;
+   margin: 0;
+   border: 1px solid #aaa;
+	border-bottom: none;
    border-radius: 3px 3px 0 0;
    -moz-border-radius: 3px 3px 0 0;
    -webkit-border-radius: 3px 3px 0 0;
-   background: #eee;
-   color: #333;
+   display: inline-block;
+	font-size: 12px;
+	line-height: 12px;
+   font-weight: bold;
+   text-decoration: none;
    padding: 6px 10px;
-	line-height: 1;
-	display: inline-block;
+	position: relative;
+	top: 1px;
 }
-a.Active, div.Tabs li.Active a {
-	background:#fff none repeat scroll 0 0;
-	color:#333;
-	padding-top:7px;
-	position:relative;
-	top:1px;
-}
-
-div.HeadingTabs li a,
-div.HeadingTabs li a:link,
-div.HeadingTabs li a:hover,
-div.HeadingTabs li a:active,
-div.HeadingTabs li a:visited,
-div.MessageForm a.Cancel,
-div.MessageForm a.Cancel:link,
-div.MessageForm a.Cancel:hover,
-div.MessageForm a.Cancel:active,
-div.MessageForm a.Cancel:visited,
-div.MorePager a,
-div.MorePager a:link,
-div.MorePager a:hover,
-div.MorePager a:active,
-div.MorePager a:visited,
-a.TabLink,
-a.TabLink:link,
-a.TabLink:hover,
-a.TabLink:active,
-a.TabLink:visited {
-   border: 1px solid #ccc;
+div.Tabs li a span {
+   line-height: 1;
+   font-size: 80%;
+   padding: 0 3px;
    border-radius: 3px;
-   -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
-   background: #eee;
-   color: #333;
-   padding: 6px 10px;
-	line-height: 1;
-	display: inline-block;
+   -moz-border-radius: 3px;
+   font-weight: normal;
+	background: #E3F4FF;
+   color: #70727C;
+   margin: 0 0 0 4px;
 }
-div.MessageForm a.Back,
-div.MessageForm a.Back:link,
-div.MessageForm a.Back:hover,
-div.MessageForm a.Back:active,
-div.MessageForm a.Back:visited {
-	color: #333;
+div.DiscussionsTabs div.SubTab {
+	font-size: 11px;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-top: 1px solid #aaa;
+	background: #f3f3f3;
+	margin:0;
+	padding:4px 8px;
+}
+div.HeadingTabs ul {
+	margin: 8px 0 0;
+}
+body.Discussion a.Bookmark {
+	margin: 6px 2px;
+}
+div.Preview {
+	border: 1px solid #aaa;
+	background: #fff;
+	margin:0 0 8px;
+	padding: 8px;
+}
+.Foot {
 	background: none;
 	border: none;
-	padding: 4px 2px;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:visited,
+div.MorePager a:active,
+div.MorePager a:hover {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	background: none;
+	border: none;
+	color: #1e79a7;
+	line-height: 1;
+	padding: 0;
+	text-decoration: none;	
+}
+div.MorePager a:hover {
+	color: #ff0084;
+	text-decoration: underline;
+}
+body.add #Content {
+	margin: 0 10px;
 }
 
-#DiscussionForm form {
-
-	background:#fff none repeat scroll 0 0;
-	border:none;
-	margin:0;
-	padding:20px;
-}
-
-#DiscussionForm h2 {
-	color:#333;
-	
-}
-
-.Mine {
-	background:#fff none repeat scroll 0 0;
-}
+/* Panel Boxes */
 div.Box {
-	background:#fff none repeat scroll 0 0;
-	color:#888888;
-	margin:0 0 10px;
-	padding:6px 10px;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	background: none;
+	padding: 0;
 }
-div.Box dl {
-	background:#eee;
-	border-bottom:1px solid #ccc;
-	border-top:1px solid #ccc;
-}
-
-body.Entry #Content div.Box {
-	background:none;
-	border:none;
-}
-#Panel input.InputBox {
-	margin:0 5px 10px 0;
-	width:200px;
+div.Box h4 {
+	color: #333;
 }
 ul.PanelInfo {
-	border-bottom:0 none;
-	border-top:1px solid #eee;
+	border-top:1px solid #ccc;
 }
-
+ul.PanelInfo li,
 ul.PanelInfo li.Active {
-	border-bottom:1px solid #ccc;
+	background: none;
+	border-bottom: 1px solid #ccc;
 }
-
-ul.PanelInfo li {
-	background:#eee none repeat scroll 0 0;
-	border-bottom:1px solid #ccc;
-	padding:2px 4px;
-	text-align:right;
+ul.PanelInfo li.Active {
+	background: #ffd;
 }
 body.Profile ul.PanelInfo {
-	border:none;
+	border: none;
 }
 body.Profile ul.PanelInfo li {
-	background:#fff;
+	margin: 0;
+	padding: 0;
 }
-input.DateBox, input.InputBox, input.SmallInput, textarea {
-	border:1px solid #ccc;
-
+body.Profile ul.PanelInfo li a {
+	font-size: 12px;
+	display: block;
+	padding: 0 6px;
 }
-div.CommentForm textarea {
-	height:100px;
-	margin:0 0 6px;
-	min-height:100px;
-	width:645px;
-}
-
-div#Foot {
-	background:#eee none repeat scroll 0 0;
-	border-bottom:1px solid #ccc;
-	border-top:1px solid #ccc;
-	color:#666;
-	margin:30px 0 0;
-	padding:0;
+body.Profile ul.PanelInfo li a:hover {
+	background: #D8DFEA;
 }
 
-div#Foot div {
-	border:0 none;
-	margin:0 auto;
-	padding:12px 0 10px;
+/* Sign In Page */
+body.Entry #Content div.Box {
+	background: #efefef;
 }
-#Foot div {
-	margin:20px auto 0;
-	padding:6px 0;
-	text-align:left;
-	width:960px;
+body.Entry #Panel {
+	display: none;
 }
-div#Foot div, div#Foot div a {
-	color:#333;
-}
-div#Foot div, div#Foot div a:hover {
-	color:#999;
-}
-

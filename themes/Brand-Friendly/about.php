@@ -12,6 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['Brand Friendly'] = array(
+   'Name' => 'Brand-Friendly',
    'Description' => "Easily customizable theme to match your brand!",
    'Version' => '1.0',
    'Author' => "Brendan Sera-Shriar",
