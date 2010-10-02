@@ -1,0 +1,98 @@
+<?php if (!defined('APPLICATION')) exit();
+
+$Session = Gdn::Session();
+$RecommendedThemeName = 'Brand-Friendly';
+?>
+<h1><?php echo T('&lt;Embed&gt; Vanilla'); ?></h1>
+<div class="Info">
+   <?php echo T('To embed your Vanilla community forum into a remote web application, use the forum embed code or one of the forum embed plugins below.'); ?>
+</div>
+<?php echo $this->Form->Open(); ?>
+<div class="Embeds">
+   <div class="EmbedCode">
+      <strong>Forum Embed Code</strong>
+      <textarea id="EmbedCode"><script type="text/javascript" src="<?php echo Url('plugins/embedvanilla/remote.js', TRUE); ?>"></script></textarea>
+      <em>Copy and paste this forum embed code into the remote application where you would like the forum to appear.</em>
+      <script type="text/javascript">
+      window.onload = function() {
+         var TextBoxID = 'EmbedCode';
+         document.getElementById(TextBoxID).focus();
+         document.getElementById(TextBoxID).select();
+      }
+      </script>
+   </div><div class="EmbedPlugins">
+      <strong>Forum Embed Plugins</strong>
+      <em>Use these custom-built plugins to embed the forum into various other applications without the need to touch any code.</em>
+      <ul>
+         <li><?php echo Anchor(T('WordPress Plugin'), 'plugins/embedvanilla/plugins/wordpress.zip', 'WordPress'); ?></li>
+         <li><?php echo Anchor(T('Blogger Gadget'), 'plugins/embedvanilla/plugins/blogger.zip', 'Blogger'); ?></li>
+         <li><?php echo Anchor(T('Drupal Plugin'), 'plugins/embedvanilla/plugins/drupal.zip', 'Drupal'); ?></li>
+      </ul>
+   </div>
+</div>
+<div class="Info">
+   <?php echo T('Make sure to use a forum theme that meshes well with the look and feel of the remote site.'); ?>
+</div>
+<div class="Embeds">
+   <div class="EmbedTheme">
+      <strong>Current Theme</strong>
+      <?php
+      $Author = $this->Data('EnabledTheme.Author');
+      $AuthorUrl = $this->Data('EnabledTheme.AuthorUrl');
+      $PreviewImage = SafeGlob(PATH_THEMES . DS . $this->Data('EnabledThemeFolder') . DS . "screenshot.*");
+      $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
+      if ($PreviewImage && in_array(strtolower(pathinfo($PreviewImage, PATHINFO_EXTENSION)), array('gif','jpg','png')))
+         echo Img('/themes/'.$this->Data('EnabledThemeFolder').'/'.$PreviewImage, array('alt' => $this->Data('EnabledThemeName'), 'height' => '112', 'width' => '150'));
+      ?>
+      <em>You are currently using the <?php echo Wrap($this->Data('EnabledThemeName'), 'b'); ?> theme by <?php echo $AuthorUrl != '' ? Anchor($Author, $AuthorUrl) : $Author; ?>.</em>
+      <em><?php
+         echo Anchor('Browse all installed themes', 'settings/themes');
+         echo ', or ';
+         echo Anchor('find more themes at VanillaForums.org.', 'http://vanillaforums.org/addons');
+      ?></em>
+   </div><?php
+   // Has the user applied the recommended theme?
+   if ($this->Data('EnabledThemeName') != $RecommendedThemeName) {
+   ?><div class="EmbedRecommend">
+      <strong>We Recommend</strong>
+      <?php
+      // Does the user have the recommended theme?
+      foreach ($this->Data('AvailableThemes') as $Theme) {
+         if (GetValue('Name', $Theme) == $RecommendedThemeName) {
+            $RecommendedThemeFolder = GetValue('Folder', $Theme);
+            $HasRecommendedTheme = TRUE;
+         }
+      }
+      $PreviewImage = SafeGlob(PATH_THEMES . DS . $RecommendedThemeFolder . DS . "screenshot.*");
+      $PreviewImage = count($PreviewImage) > 0 ? basename($PreviewImage[0]) : FALSE;
+      if ($PreviewImage && in_array(strtolower(pathinfo($PreviewImage, PATHINFO_EXTENSION)), array('gif','jpg','png')))
+         echo Img('/themes/'.$RecommendedThemeFolder.'/'.$PreviewImage, array('alt' => $RecommendedThemeName, 'height' => '112', 'width' => '150'));
+         
+      ?>
+      <em>We recommend the <?php echo Wrap($RecommendedThemeName, 'b'); ?> theme. <?php
+      if ($HasRecommendedTheme)
+         echo Anchor(T('Click here to apply it.'), 'plugin/embed/'.$RecommendedThemeFolder.'/'.$Session->TransientKey());
+      else
+         echo Anchor(T('Click here to get it.'), '#');
+      
+      ?></em>
+   </div>
+   <?php } ?>
+</div>
+<?php if (C('Plugins.EmbedVanilla.RemoteUrl')) { ?>
+<div class="Info">
+   <?php echo T('The forum will force itself to be viewed from the Remote Url.'); ?>
+</div>
+<?php echo $this->Form->Errors(); ?>
+<ul class="RemoteSettings">
+   <li>
+      <?php
+         echo $this->Form->Label('Remote Url to Forum', 'Plugins.EmbedVanilla.RemoteUrl');
+         echo $this->Form->TextBox('Plugins.EmbedVanilla.RemoteUrl');
+      ?><span>For SEO purposes, search engine crawlers are excluded from being forced to view the forum in the remote url.</span>
+   </li>
+</ul>
+<?php
+echo $this->Form->Button('Save');
+}
+echo $this->Form->Close();

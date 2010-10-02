@@ -21,6 +21,7 @@ $PluginInfo['embedvanilla'] = array(
 class EmbedVanillaPlugin extends Gdn_Plugin {
    
 	public function Base_Render_Before($Sender) {
+		$InDashboard = !($Sender->MasterView == 'default' || $Sender->MasterView == '');
 		$Sender->AddJsFile('plugins/embedvanilla/local.js');
 
 		// Record the remote source using the embed feature.
@@ -32,10 +33,65 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 		}
 
 		// Report the remote url to redirect to if not currently embedded.
-		if (!IsSearchEngine() && $RemoteUrl && ($Sender->MasterView == 'default' || $Sender->MasterView == ''))
+		if (!IsSearchEngine() && $RemoteUrl && !$InDashboard)
 			$Sender->AddDefinition('RemoteUrl', $RemoteUrl);
-
+			
+		if ($InDashboard)
+			$Sender->AddDefinition('InDashboard', TRUE);
 	}
+	
+	public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      $Menu = $Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla'), 'plugin/embed', 'Garden.Settings.Manage');
+   }
+	
+	public function PluginController_Embed_Create($Sender) {
+      $Sender->Title('Embed Vanilla');
+		$Sender->AddCssFile($this->GetResource('design/settings.css', FALSE, FALSE));
+      $Sender->AddSideMenu('plugin/embed');
+      $Sender->Form = new Gdn_Form();
+		
+		$ThemeManager = new Gdn_ThemeManager();
+		$Sender->SetData('AvailableThemes', $ThemeManager->AvailableThemes());
+      $Sender->SetData('EnabledThemeFolder', $ThemeManager->EnabledTheme());
+      $Sender->SetData('EnabledTheme', $ThemeManager->EnabledThemeInfo());
+		$Sender->SetData('EnabledThemeName', $Sender->Data('EnabledTheme.Name', $Sender->Data('EnabledTheme.Folder')));
+
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField(array('Plugins.EmbedVanilla.RemoteUrl'));
+      
+      $Sender->Form->SetModel($ConfigurationModel);
+      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+         // Apply the config settings to the form.
+         $Sender->Form->SetData($ConfigurationModel->Data);
+      } else {
+         // Define some validation rules for the fields being saved
+         $ConfigurationModel->Validation->ApplyRule('Plugins.EmbedVanilla.RemoteUrl', 'WebAddress', 'The remote url you specified could not be validated as a functional url to redirect to.');
+         if ($Sender->Form->Save() !== FALSE)
+            $Sender->StatusMessage = T("Your settings have been saved.");
+      }
+		
+		// Handle changing the theme to the recommended one
+		$ThemeFolder = GetValue(0, $Sender->RequestArgs);
+		$TransientKey = GetValue(1, $Sender->RequestArgs);
+		$Session = Gdn::Session();
+      if ($Session->ValidateTransientKey($TransientKey) && $ThemeFolder != '') {
+         try {
+            foreach ($Sender->Data('AvailableThemes') as $ThemeName => $ThemeInfo) {
+		         if ($ThemeInfo['Folder'] == $ThemeFolder)
+                  $ThemeManager->EnableTheme($ThemeName);
+            }
+         } catch (Exception $Ex) {
+            $Sender->Form->AddError($Ex);
+         }
+         if ($Sender->Form->ErrorCount() == 0)
+            Redirect('/plugin/embed');
+
+      }
+
+      $Sender->Render(PATH_PLUGINS.'/embedvanilla/views/settings.php');
+   }
 	
    public function Setup() {
       // Nothing to do here!

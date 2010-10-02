@@ -112,6 +112,8 @@ window.vanilla.embed = function(host) {
       } else if (message[0] == 'unload') {
          if (window.attachEvent || findPosScroll('vanilla'+id) < 0)
             document.getElementById('vanilla'+id).scrollIntoView(true);
+      } else if (message[0] == 'unembed') {
+         document.location = 'http://' + host + window.location.hash.substr(1);
       }
    }
 
