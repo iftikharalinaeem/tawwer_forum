@@ -108,3 +108,30 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
    }
 
 }
+
+if (!function_exists('IsSearchEngine')) {
+   function IsSearchEngine() {
+      $Engines = array(
+         'googlebot', 
+         'slurp', 
+         'search.msn.com', 
+         'nutch', 
+         'simpy', 
+         'bot', 
+         'aspseek', 
+         'crawler', 
+         'msnbot', 
+         'libwww-perl', 
+         'fast', 
+         'baidu', 
+      );
+      $HttpUserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER, ''));
+      if ($HttpUserAgent != '') {
+         foreach ($Engines as $Engine) {
+            if (strpos($HttpUserAgent, $Engine) !== FALSE)
+               return TRUE;
+         }
+      }
+      return FALSE;
+   }
+}
