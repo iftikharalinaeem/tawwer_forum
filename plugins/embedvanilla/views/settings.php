@@ -10,7 +10,7 @@ $RecommendedThemeName = 'Brand-Friendly';
 <?php echo $this->Form->Open(); ?>
 <div class="Embeds">
    <div class="EmbedCode">
-      <strong>Forum Embed Code</strong>
+      <strong>Forum &lt;Embed&gt; Code</strong>
       <textarea id="EmbedCode"><script type="text/javascript" src="<?php echo Url('plugins/embedvanilla/remote.js', TRUE); ?>"></script></textarea>
       <em>Copy and paste this forum embed code into the remote application where you would like the forum to appear.</em>
       <script type="text/javascript">

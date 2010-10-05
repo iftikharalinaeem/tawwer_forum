@@ -24,6 +24,16 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 		$InDashboard = !($Sender->MasterView == 'default' || $Sender->MasterView == '');
 		$Sender->AddJsFile('plugins/embedvanilla/local.js');
 
+/*
+		// Record the remote source using the embed feature.
+		$RemoteUrl = GetIncomingValue('remote', '');
+		if ($RemoteUrl) {
+			if ($RemoteUrl != C('Plugins.EmbedVanilla.RemoteUrl'))
+				SaveToConfig('Plugins.EmbedVanilla.RemoteUrl', $RemoteUrl);
+		} else {
+			$RemoteUrl = C('Plugins.EmbedVanilla.RemoteUrl');
+		}
+*/
 		// Record the remote source using the embed feature.
 		$RemoteUrl = C('Plugins.EmbedVanilla.RemoteUrl');
 		if (!$RemoteUrl) {
