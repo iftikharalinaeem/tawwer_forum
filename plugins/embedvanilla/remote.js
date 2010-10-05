@@ -144,8 +144,7 @@ window.vanilla.embed = function(host) {
       return 'http://' + host + path + concat + 'remote=' + encodeURIComponent(embedUrl);
    }
 
-   // document.write('<iframe id="vanilla'+id+'" name="vanilla'+id+'" src="'+vanillaUrl(currentPath)+'" scrolling="no" frameborder="0" border="0" width="100%" height="1000" style="width: 100%; height: 1000px; border: 0; display: block;"></iframe>');
-   document.write(vanillaUrl(currentPath));
+   document.write('<iframe id="vanilla'+id+'" name="vanilla'+id+'" src="'+vanillaUrl(currentPath)+'" scrolling="no" frameborder="0" border="0" width="100%" height="1000" style="width: 100%; height: 1000px; border: 0; display: block;"></iframe>');
    return this;
 };
 try {
