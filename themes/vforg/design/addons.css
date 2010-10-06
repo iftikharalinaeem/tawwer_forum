@@ -414,6 +414,10 @@ ul.DataList li a:hover {
    color: #111;
    text-decoration: none;
 }
+li.AddonRow div.Meta {
+   clear: left;
+}
+
 ul.DataList li div.Meta span span {
    color: #333;
    padding: 2px 4px;
@@ -522,4 +526,19 @@ table.Data th, table.Data thead td {
 
 table.Data .Alt {
    background: #F6DAA8;
+}
+
+.AddonPicture {
+   position: relative;
+}
+
+.AddonPicture .DeletePicture {
+   position: absolute;
+   bottom: 5px;
+   right: 5px;
+   color: #fff;
+   padding: 0 2px 1px 2px;
+   font-family: arial;
+   font-weight: bold;
+   text-shadow: 0px 0px 10px #000;
 }
