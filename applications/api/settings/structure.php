@@ -20,6 +20,8 @@ if (!isset($Explicit))
 $SQL = Gdn::SQL();
 $St = Gdn::Structure();
 
+$ApplicationTableExists = $St->TableExists('Application');
+
 // Registered applications that are connected to the VPI
 $St->Table('Application')
    ->PrimaryKey('ApplicationID', 'uint') // used for client_id
@@ -33,9 +35,8 @@ $St->Table('Application')
    ->Set($Explicit, $Drop);
 
 // Make sure a default application is in to make the numbers correct.
-$AppID = 12345678;
-$Count = $SQL->GetCount('Application', array('ApplicationID' => $AppID));
-if ($Count == 0) {
+if (!$ApplicationTableExists || $SQL->GetCount('Application', array('ApplicationID' => $AppID)) == 0) {
+   $AppID = 12345678;
    $Secret = RandomString(32, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
    $SQL->History(FALSE, TRUE)
       ->Insert(
