@@ -9,8 +9,16 @@ window.vanilla.embed = function(host) {
    var scripts = document.getElementsByTagName('script'),
       id = Math.floor((Math.random()) * 100000).toString(),
       embedUrl = window.location.href.split('#')[0],
+      jsPath = '/plugins/embedvanilla/remote.js',
       currentPath = window.location.hash.substr(1),
-      jsPath = '/plugins/embedvanilla/remote.js';
+      disablePath = currentPath && currentPath[0] != "/";
+      disablePath |= (window != top);
+
+   if (!currentPath || disablePath)
+      currentPath = "/";
+
+   if (window.gadgets)
+      embedUrl = '';
       
    if (typeof(host) == 'undefined') {
       host = '';
@@ -57,13 +65,17 @@ window.vanilla.embed = function(host) {
    }
 
 
-   if ("onhashchange" in window) {
-      if (window.addEventListener)
-         window.addEventListener("hashchange", checkHash, false);
-      else
-         window.attachEvent("onhashchange", checkHash);
-   } else {
-      setInterval(checkHash, 300);
+   if (!window.gadgets) {
+      if (!disablePath) {
+         if ("onhashchange" in window) {
+            if (window.addEventListener)
+               window.addEventListener("hashchange", checkHash, false);
+            else
+               window.attachEvent("onhashchange", checkHash);
+         } else {
+            setInterval(checkHash, 300);
+         }
+      }
    }
 
    function checkHash() {
@@ -104,10 +116,14 @@ window.vanilla.embed = function(host) {
       if (message[0] == 'height') {
          setHeight(message[1]);
       } else if (message[0] == 'location') {
-         current_path = window.location.hash.substr(1);
-         if (current_path != message[1]) {
-            current_path = message[1];
-            location.href = embedUrl + "#" + current_path;
+         if (disablePath) {
+            currentPath = cmd[1];
+         } else {
+            currentPath = window.location.hash.substr(1);
+            if (currentPath != message[1]) {
+               currentPath = message[1];
+               location.href = embedUrl + "#" + currentPath;
+            }
          }
       } else if (message[0] == 'unload') {
          if (window.attachEvent || findPosScroll('vanilla'+id) < 0)
@@ -119,6 +135,8 @@ window.vanilla.embed = function(host) {
 
    function setHeight(height) {
       document.getElementById('vanilla'+id).style['height'] = height + "px";
+      if (window.gadgets)
+         gadgets.window.adjustHeight();
    }
 
    function vanillaUrl(path) {
