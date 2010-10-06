@@ -484,7 +484,7 @@ abstract class Task {
       $AbsoluteSourcePath = TaskList::CombinePaths($SourcecodePath,$RelativePath);
       
       $NewFileHash = md5_file($AbsoluteSourcePath);
-      
+      $OldFileHash = NULL;
       if (file_exists($AbsoluteClientPath)) {
          $OldFileHash = md5_file($AbsoluteClientPath);
          if ($OldFileHash == $NewFileHash) {
