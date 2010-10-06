@@ -189,6 +189,10 @@ class StatisticsPlugin extends Gdn_Plugin {
    }
    
    protected function CatchupGeneric($TrackType, &$Response) {
+   
+      $EventSuf = ucfirst($TrackType);
+      $this->FireEvent('BeforeCatchup'.$EventSuf);
+      
       if (!array_key_exists($TrackType, $this->TrackedItems))
          throw new Exception("Invalid tracking type '{$TrackType}', not found in [".implode(',',array_keys($this->TrackedItems))."]");
          
@@ -223,6 +227,11 @@ class StatisticsPlugin extends Gdn_Plugin {
       $FinalBlock = $this->NextDate($LastHour, self::RESOLUTION_HOUR);
       $FinalBlockValue = strtotime($FinalBlock);
       
+      // Clear data for this tracktype
+      Gdn::Database()->SQL()->Delete('Statistics', array(
+         'IndexType' => $TrackType
+      ));
+      
       // Loop over lowest denomination chunks and use intelligent summing for larger blocks
       $CurrentHour = $this->DateFormatByResolution($FirstDate, self::RESOLUTION_HOUR);
       do {
@@ -239,7 +248,16 @@ class StatisticsPlugin extends Gdn_Plugin {
          $NextHourValue = strtotime($NextHour);
       } while ($NextHourValue <= $FinalBlockValue);
       
+      $this->FireEvent('AfterCatchup'.$EventSuf);
+      
       return TRUE;
+   }
+   
+   public function StatisticsPlugin_BeforeCatchupRegistrations_Handler($Sender) {
+      $Construct = Gdn::Database()->Structure();
+      $Construct->Table('User')
+         ->Column('DateInserted', 'datetime', FALSE, 'index')
+         ->Set(FALSE, FALSE);
    }
    
    /**
