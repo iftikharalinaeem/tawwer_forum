@@ -85,6 +85,7 @@ class FilesystemTask extends Task {
          $this->Symlink('plugins/Flagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Flagging'));
          $this->SaveToConfig('EnabledPlugins.HtmLawed','HtmLawed');
          $this->RemoveFromConfig('EnabledPlugins.HtmlPurifier');
+         $this->RemoveFromConfig('EnabledPlugins.HTMLPurifier');
          
          // Copy the new index file
          $Copied = $this->CopySourceFile('index.php', $this->VanillaPath);

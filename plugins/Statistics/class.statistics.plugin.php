@@ -33,36 +33,46 @@ class StatisticsPlugin extends Gdn_Plugin {
    const FILL_ZERO = 'zero';
    const FILL_NULL = 'null';
    
+   protected $TrackedItems = array(
+      'comments'        => 'Comment',
+      'discussions'     => 'Discussion',
+      'registrations'   => 'User'
+   );
+   
    // Record a pageview if loading a full page.
    public function Base_Render_Before($Sender) {
       if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
          $this->TrackEvent('pageviews');
    }
    
-   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $LinkText = T('Statistics');
-      $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddItem('Forum', T('Forum'));
       $Menu->AddLink('Forum', $LinkText, 'plugin/statistics', 'Garden.Settings.Manage');
    }
    
-   public function PluginController_Statistics_Create(&$Sender) {
+   public function PluginController_Statistics_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Statistics');
       $Sender->AddSideMenu('plugin/statistics');
       $Sender->Form = new Gdn_Form();
+      $Sender->AddJsFile($this->GetResource('js/catchup.js', FALSE, FALSE));
+      $Sender->AddCssFile($this->GetResource('design/catchup.css', FALSE, FALSE));
+      
+      $this->EnableSlicing($Sender);
       $this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
-   public function Controller_Index(&$Sender) {
+   public function Controller_Index($Sender) {
       $Sender->AddCssFile('admin.css');
       $Sender->Render($this->GetView('statistics.php'));
    }
    
-   public function Controller_Toggle(&$Sender) {
+   public function Controller_Toggle($Sender) {
       // Enable/Disable Forum Statistics
       if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
-         if (C('Plugins.Statistics.Enabled')) {
+         if ($this->IsEnabled()) {
             $this->_Disable();
          } else {
             $this->_Enable();
@@ -71,74 +81,222 @@ class StatisticsPlugin extends Gdn_Plugin {
       }
    }
    
-   public function Controller_Catchup(&$Sender) {
-      set_time_limit(0);
-      foreach (array('comments','discussions','registrations') as $TrackedItem) {
-         $Method = 'Catchup'.ucfirst($TrackedItem);
-         $this->$Method();
-      }
-      Redirect('plugin/statistics');
+   public function Controller_Catchup($Sender) {
+      $Sender->Render($this->GetView("catchup.php"));
    }
    
-   protected function _CatchupGeneric($Type, $TrackType) {
-
-      // Figure out where to stop searching
-      $EarliestData = Gdn::SQL()->Select('DateRangeStart', 'MIN', 'EarliestDate')
-         ->From('Statistics')
-         ->Where('DateRangeType', self::RESOLUTION_HOUR)
-         ->Where('IndexType', $TrackType)
-         ->Get();
-         
-      $EarliestDate = NULL;
-      if ($EarliestData->NumRows()) {
-         $EarliestData = $EarliestData->FirstRow(DATASET_TYPE_ARRAY);
-         $EarliestDate = $EarliestData['EarliestDate'];
-      } 
-      if (is_null($EarliestDate))
-         $EarliestDate = date('Y-m-d 00:00:01',strtotime('Tomorrow'));
+   public function Controller_ExecCatchup($Sender) {
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       
-      $Limit = 1000; $Offset = 0;
-      do {
-         $Items = Gdn::SQL()->Select('DateInserted')
-            ->From($Type)
-            ->Where('DateInserted<',$EarliestDate)
-            ->Offset($Offset)
-            ->Limit($Limit)
-            ->Get();
-         $NumItems = $Items->NumRows();
-         $Offset += $NumItems;
+      list($Method, $TrackedItem) = $Sender->RequestArgs; $TrackedItem = strtolower($TrackedItem);
+      
+      $Response = array(
+         'Status'    => 'invalid',
+         'Item'      => $TrackedItem
+      );
+      
+      set_time_limit(0);
+      try {
+         $Status = $this->CatchupGeneric($TrackedItem, $Response);
+         $Response['Status'] = ($Status) ? 'success' : 'failed';
+      } catch (Exception $e) {
+         $Response['Status'] = 'failed';
+         $Response['Reason'] = $e->getMessage();
+      }
+            
+      $Sender->SetJSON('Catchup', $Response);
+      $Sender->Render($this->GetView('blank.php'));
+   }
+   
+   public function Controller_Monitor($Sender) {
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+      
+      list($Method, $TrackedItem) = $Sender->RequestArgs; $TrackedItem = strtolower($TrackedItem);
+      $Response = array(
+         'Status'    => 'invalid',
+         'Item'      => $TrackedItem
+      );
+      try {
+         if (array_key_exists($TrackedItem, $this->TrackedItems)) {
+            $Response['Values'] = array();
+            
+            $TableName = $this->TrackedItems[$TrackedItem];
+            
+            $FirstDate = Gdn::SQL()->Select('DateInserted')
+                  ->From($TableName)
+                  ->OrderBy('DateInserted','asc')
+                  ->Offset(0)->Limit(1)
+                  ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+            if (!sizeof($FirstDate))
+               throw new Exception("No data for metric '{$TrackedItem}' in table '{$TableName}'");
+            $FirstDate = $FirstDate['DateInserted'];
+            $Response['FirstDate'] = $FirstDate;
+            $FirstDateValue = strtotime($this->DateFormatByResolution($FirstDate, self::RESOLUTION_HOUR));
+            $Response['Values']['First'] = $FirstDateValue;
+            
+            $LastDate = Gdn::SQL()->Select('DateInserted')
+                  ->From($TableName)
+                  ->OrderBy('DateInserted','desc')
+                  ->Offset(0)->Limit(1)
+                  ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+            $LastDate = $LastDate['DateInserted'];
+            $Response['LastDate'] = $LastDate;
+            $LastDateValue = strtotime($this->DateFormatByResolution($LastDate, self::RESOLUTION_HOUR));
+            $Response['Values']['Last'] = $LastDateValue;
+            
+            $CurrentDate = Gdn::Database()->SQL()->Select('DateRangeStart')
+               ->From('Statistics')
+               ->Where('IndexType', $TrackedItem)
+               ->Where('IndexQualifier', 'none')
+               ->Where('DateRangeType', self::RESOLUTION_HOUR)
+               ->OrderBy('DateRangeStart', 'desc')
+               ->Offset(0)->Limit(1)
+               ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+            if (!sizeof($CurrentDate))
+               throw new Exception("No data for metric '{$TrackedItem}' in table 'Statistics'");
+            $CurrentDate = $CurrentDate['DateRangeStart'];
+            $Response['CurrentDate'] = $CurrentDate;
+            $CurrentDateValue = (is_null($CurrentDate)) ? $FirstDateValue :strtotime($this->DateFormatByResolution($CurrentDate, self::RESOLUTION_HOUR));
+            $Response['Values']['Current'] = $CurrentDateValue;
+            
+            $Range = $LastDateValue - $FirstDateValue;
+            $RelativeCurrentValue = $CurrentDateValue - $FirstDateValue;
+            
+            $Completion = round(($RelativeCurrentValue / $Range) * 100,2);
+            $Response['Completion'] = $Completion;
+            $Response['Status'] = ($Completion < 100) ? 'progress' : 'complete';
+         }
+      } catch (Exception $e) {
+         $Response['Status'] = 'failed';
+         $Response['Reason'] = $e->getMessage();
+      }      
+      
+      $Sender->SetJSON('Progress', $Response);
+      $Sender->Render($this->GetView("blank.php"));
+   }
+   
+   public function Controller_StartCatchup($Sender) {
+      
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+      
+      // Empty table
+      Gdn::Database()->Query("TRUNCATE TABLE GDN_Statistics");
+      
+      $Sender->Render($this->GetView("blank.php"));
+   }
+   
+   protected function CatchupGeneric($TrackType, &$Response) {
+      if (!array_key_exists($TrackType, $this->TrackedItems))
+         throw new Exception("Invalid tracking type '{$TrackType}', not found in [".implode(',',array_keys($this->TrackedItems))."]");
          
-         while ($Item = $Items->NextRow(DATASET_TYPE_ARRAY))
-            $this->TrackEvent($TrackType, 'none', $Item['DateInserted']);
-      } while ($NumItems);
+      $Type = $this->TrackedItems[$TrackType];
+      $FirstDate = Gdn::SQL()->Select('DateInserted')
+            ->From($Type)
+            ->OrderBy('DateInserted','asc')
+            ->Offset(0)->Limit(1)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+            
+      if (!sizeof($FirstDate)) 
+         return TRUE;
+      
+      $FirstDate = $FirstDate['DateInserted'];
+      $Response['FirstDate'] = $FirstDate;
+      
+      $LastDate = Gdn::SQL()->Select('DateInserted')
+            ->From($Type)
+            ->OrderBy('DateInserted','desc')
+            ->Offset(0)->Limit(1)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+            
+      if (!sizeof($LastDate)) 
+         return TRUE;
+      
+      $LastDate = $LastDate['DateInserted'];
+      $Response['LastDate'] = $LastDate;
+      
+      $LastHour = $this->DateFormatByResolution($LastDate, self::RESOLUTION_HOUR);
+      $LastHourValue = strtotime($LastHour);
+      
+      $FinalBlock = $this->NextDate($LastHour, self::RESOLUTION_HOUR);
+      $FinalBlockValue = strtotime($FinalBlock);
+      
+      // Loop over lowest denomination chunks and use intelligent summing for larger blocks
+      $CurrentHour = $this->DateFormatByResolution($FirstDate, self::RESOLUTION_HOUR);
+      do {
+         $NextHour = $this->NextDate($CurrentHour, self::RESOLUTION_HOUR);
+         $Items = Gdn::SQL()
+            ->Select('DateInserted','COUNT','Hits')
+            ->From($Type)
+            ->Where('DateInserted>=',$CurrentHour)
+            ->Where('DateInserted<',$NextHour)
+            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+            
+         $this->CachedTrackEvent($TrackType, 'none', $CurrentHour, $Items['Hits']);
+         $CurrentHour = $NextHour;
+         $NextHourValue = strtotime($NextHour);
+      } while ($NextHourValue <= $FinalBlockValue);
+      
+      return TRUE;
    }
    
-   protected function CatchupComments() {
-      $this->_CatchupGeneric('Comment', 'comments');
+   /**
+   * Receive a chunk of hourly data and cache it against the day, week and month
+   * 
+   * @param mixed $RealType
+   * @param mixed $Qualifier
+   * @param mixed $Date
+   */
+   protected function CachedTrackEvent($RealType, $Qualifier = 'none', $Date = NULL, $Hits = 1) {
+      static $LocalCache = null;
+      static $Resolutions = array(self::RESOLUTION_HOUR, self::RESOLUTION_DAY, self::RESOLUTION_WEEK, self::RESOLUTION_MONTH);
+      
+      $ForceReset = FALSE;
+      
+      // Caching some data. Figure out what boxes the new data belongs to
+      $InstanceDates = array();
+      foreach ($Resolutions as $Resolution)
+         $InstanceDates[$Resolution] = $this->DateFormatByResolution($Date, $Resolution);
+      
+      if (is_null($LocalCache) || $ForceReset) {
+         $LocalCache = array();
+         foreach ($Resolutions as $Resolution)
+            $LocalCache[$Resolution] = array('Date' => $InstanceDates[$Resolution], 'Hits' => 0);
+      }
+      
+      foreach ($LocalCache as $CacheResolution => &$CacheValue) {
+         // New box for this resolution. Store and reset.
+         if ($CacheValue['Date'] != $InstanceDates[$CacheResolution]) {
+            // Store
+            if ($CacheValue['Hits'] > 0)
+               $this->TrackItem($RealType, $Qualifier, $CacheValue['Date'], $CacheResolution, $CacheValue['Hits']);
+            
+            // Reset
+            $CacheValue = array('Date' => $InstanceDates[$CacheResolution], 'Hits' => 0);
+         }
+         
+         // Update
+         $CacheValue['Hits'] += $Hits;
+      }
+      
    }
    
-   protected function CatchupDiscussions() {
-      $this->_CatchupGeneric('Discussion', 'discussions');
-   }
-   
-   protected function CatchupRegistrations() {
-      $this->_CatchupGeneric('User', 'registrations');
-   }
-   
-   public function UserModel_AfterInsertUser_Handler(&$Sender) {
+   public function UserModel_AfterInsertUser_Handler($Sender) {
       $this->TrackEvent('registrations');
    }
    
-   public function PostController_AfterDiscussionSave_Handler(&$Sender) {
+   public function PostController_AfterDiscussionSave_Handler($Sender) {
       $this->TrackEvent('discussions');
    }
    
-   public function PostController_AfterCommentSave_Handler(&$Sender) {
+   public function PostController_AfterCommentSave_Handler($Sender) {
       $this->TrackEvent('comments');
    }
    
    protected function TrackEvent($RealType, $Qualifier = 'none', $Date = NULL) {
-      if (!C('Plugins.Statistics.Enabled')) return;
+      if (!$this->IsEnabled()) return;
       
       $Date = is_null($Date) ? time() : $Date;
       self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_HOUR);

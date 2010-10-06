@@ -33,19 +33,19 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       parent::__construct();
    }
    
-   public function Authenticate() {
-      $ForeignIdentityUrl = C('Garden.Authenticator.AuthenticateURL');
-      if (!$ForeignIdentityUrl) return FALSE;
-      
+   public function Authenticate() {      
       try {
+         $Provider = $this->GetProvider();
+         if (!$Provider) throw new Exception('Provider not defined');
+      
+         $ForeignIdentityUrl = GetValue('AuthenticateUrl', $Provider, FALSE);
+         if ($ForeignIdentityUrl === FALSE) throw new Exception('AuthenticateUrl not defined');
+      
          $Response = $this->_GetForeignCredentials($ForeignIdentityUrl);
          if (!$Response) throw new Exception('No response from Authentication URL');
          
          // @TODO: Response sends provider key, used as parameter to GetProvider()
-         
-         $Provider = $this->GetProvider();
-         if (!$Provider) throw new Exception();
-         
+
          // Got a response from the remote identity provider, and loaded matching provider
          $AuthUniqueField = C('Garden.Authenticators.proxy.AuthField','UniqueID');
          $UserUnique = ArrayValue($AuthUniqueField, $Response, NULL);
@@ -229,7 +229,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    
    // What to do if entry/auth/* is called while the user is logged out. Should normally be REACT_RENDER
    public function LoginResponse() {
-      return Gdn_Authenticator::REACT_RENDER;
+      return Gdn::Authenticator()->RemoteSignInUrl();
    }
    
    // What to do after part 1 of a 2 part authentication process. This is used in conjunction with OAauth/OpenID type authentication schemes
@@ -332,9 +332,6 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    }
    
    public function WakeUp() {
-
-      $ForeignIdentityUrl = C('Garden.Authenticator.AuthenticateURL');
-      if (!$ForeignIdentityUrl) return FALSE;
       
       // Allow the entry/handshake method to function
       Gdn::Authenticator()->AllowHandshake();

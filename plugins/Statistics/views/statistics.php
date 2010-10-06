@@ -7,8 +7,10 @@
    <?php
       $ToggleName = C('Plugins.Statistics.Enabled') ? T('Disable Forum Statistics') : T('Enable Forum Statistics');
       echo Anchor($ToggleName, 'plugin/statistics/toggle/'.Gdn::Session()->TransientKey(), 'SmallButton');
-      
-      if (C('Plugins.Statistics.Enabled'))
-         echo Anchor(T('Catchup'), 'plugin/statistics/catchup', 'SmallButton');
    ?>
 </div>
+<?php 
+   if ($this->Plugin->IsEnabled()) {
+      echo $this->Plugin->Slice('catchup');
+   }
+?>

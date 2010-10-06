@@ -24,6 +24,16 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 		$InDashboard = !($Sender->MasterView == 'default' || $Sender->MasterView == '');
 		$Sender->AddJsFile('plugins/embedvanilla/local.js');
 
+/*
+		// Record the remote source using the embed feature.
+		$RemoteUrl = GetIncomingValue('remote', '');
+		if ($RemoteUrl) {
+			if ($RemoteUrl != C('Plugins.EmbedVanilla.RemoteUrl'))
+				SaveToConfig('Plugins.EmbedVanilla.RemoteUrl', $RemoteUrl);
+		} else {
+			$RemoteUrl = C('Plugins.EmbedVanilla.RemoteUrl');
+		}
+*/
 		// Record the remote source using the embed feature.
 		$RemoteUrl = C('Plugins.EmbedVanilla.RemoteUrl');
 		if (!$RemoteUrl) {
@@ -97,4 +107,31 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
       // Nothing to do here!
    }
 
+}
+
+if (!function_exists('IsSearchEngine')) {
+   function IsSearchEngine() {
+      $Engines = array(
+         'googlebot', 
+         'slurp', 
+         'search.msn.com', 
+         'nutch', 
+         'simpy', 
+         'bot', 
+         'aspseek', 
+         'crawler', 
+         'msnbot', 
+         'libwww-perl', 
+         'fast', 
+         'baidu', 
+      );
+      $HttpUserAgent = strtolower(GetValue('HTTP_USER_AGENT', $_SERVER, ''));
+      if ($HttpUserAgent != '') {
+         foreach ($Engines as $Engine) {
+            if (strpos($HttpUserAgent, $Engine) !== FALSE)
+               return TRUE;
+         }
+      }
+      return FALSE;
+   }
 }
