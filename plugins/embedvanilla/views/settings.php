@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 $Session = Gdn::Session();
-$RecommendedThemeName = 'Brand-Friendly';
+$RecommendedThemeName = 'Embed-Friendly';
 ?>
 <h1><?php echo T('&lt;Embed&gt; Vanilla'); ?></h1>
 <div class="Info">
