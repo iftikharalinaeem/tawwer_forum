@@ -12,8 +12,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProxyConnectManual'] = array(
    'Name' => 'Manual Integration',
    'Description' => "This plugin allows manual configuration of ProxyConnect's various internal integration settings.",
-   'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.0.6'),
+   'Version' => '1.0.1',
+   'RequiredApplications' => array('Vanilla' => '2.0.11'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsPermission' => 'Garden.AdminUser.Only',
@@ -37,18 +37,16 @@ class ProxyConnectManualPlugin extends Gdn_Plugin {
          $Sender->Form->SetModel($ProviderModel);
          
          if (!$Sender->Form->AuthenticatedPostBack()) {
-            $this->Provider['AuthenticateURL'] = C('Garden.Authenticator.AuthenticateURL');
             $Sender->Form->SetData($this->ProxyConnect->Provider);
          } else {
             $ProviderModel->Validation->ApplyRule('URL',             'Required');
+            $ProviderModel->Validation->ApplyRule('AuthenticateUrl', 'Required');
             $ProviderModel->Validation->ApplyRule('RegisterUrl',     'Required');
             $ProviderModel->Validation->ApplyRule('SignInUrl',       'Required');
             $ProviderModel->Validation->ApplyRule('SignOutUrl',      'Required');
             $Sender->Form->SetFormValue('AuthenticationKey', $ConsumerKey);
             $Sender->Form->SetFormValue('AuthenticationSchemeAlias', 'proxy');
             $Saved = $Sender->Form->Save();
-            
-            SaveToConfig('Garden.Authenticator.AuthenticateURL', $Sender->Form->GetValue('AuthenticateURL'));
          }
       }
       

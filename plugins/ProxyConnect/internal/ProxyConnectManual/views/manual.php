@@ -22,8 +22,8 @@
                   echo Wrap(T('The URL of your website where you will use ProxyConnect'));
                ?></li>
                <li><?php
-                  echo $this->Form->Label(T('Authenticate URL'), 'AuthenticateURL');
-                  echo $this->Form->TextBox('AuthenticateURL');
+                  echo $this->Form->Label(T('Authenticate URL'), 'AuthenticateUrl');
+                  echo $this->Form->TextBox('AuthenticateUrl');
                   echo Wrap(T('The behind-the-scenes URL that shares identity information with Vanilla'));
                ?></li>
                <li><?php
