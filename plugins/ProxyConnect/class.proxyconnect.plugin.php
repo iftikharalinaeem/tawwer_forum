@@ -224,6 +224,24 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
    }
    
+   public function EntryController_Register_Handler(&$Sender) {
+      if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
+      
+      $Redirect = Gdn::Request()->GetValue('HTTP_REFERER');
+      $RegisterURL = Gdn::Authenticator()->GetURL(Gdn_Authenticator::URL_REMOTE_REGISTER, $Redirect);
+      $RealUserID = Gdn::Authenticator()->GetRealIdentity();
+      $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
+      
+      if ($RealUserID > 0) {
+         // The user is already signed in. Send them to the default page.
+         Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
+      } else {
+         // We have no cookie for this user. Send them to the remote registration page.
+         $Authenticator->SetIdentity(NULL);
+         Redirect($RegisterURL,302);
+      }
+   }
+   
    public function Setup() {
 		$NumLookupMethods = 0;
 		
