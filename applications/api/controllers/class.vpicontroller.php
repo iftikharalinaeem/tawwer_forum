@@ -87,7 +87,7 @@ class VpiController extends Gdn_Controller {
 
       } catch (VPIException $Ex) {
          $Ex->SetHeader();
-         return $this->_RenderData($Ex->ToOAuth());
+         return $this->RenderData($Ex->ToOAuth());
       }
    }
    
@@ -113,7 +113,7 @@ class VpiController extends Gdn_Controller {
       $this->DeliveryType(DELIVERY_TYPE_DATA);
       $this->DeliveryMethod(DELIVERY_METHOD_JSON);
       
-      return $this->_RenderData($this->Data);
+      return $this->RenderData($this->Data);
    }
 
    public function StartSession($ThrowException = FALSE) {

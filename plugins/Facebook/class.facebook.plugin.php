@@ -25,12 +25,15 @@ $PluginInfo['Facebook'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
 );
 
-//Gdn_LibraryMap::SafeCache('library', 'class.facebookauthenticator.php', dirname(__FILE__).'/class.facebookauthenticator.php', FALSE);
-
 class FacebookPlugin extends Gdn_Plugin {
    public function AccessToken() {
       $Token = GetValue('fb_access_token', $_COOKIE);
       return $Token;
+   }
+
+   public function Authorize($Query = FALSE) {
+      $Uri = $this->AuthorizeUri($Query);
+      Redirect($Uri);
    }
 
    /**
@@ -45,15 +48,15 @@ class FacebookPlugin extends Gdn_Plugin {
          $ImgAlt = T('Login with Facebook');
 
          if ($AccessToken) {
-            $SigninHref = $this->_RedirectUri();
+            $SigninHref = $this->RedirectUri();
 
             // We already have an access token so we can just link to the connect page.
             $FbMethod = array(
                 'Name' => 'Facebook',
                 'SignInHtml' => "<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopLink\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>");
          } else {
-            $SigninHref = $this->_AuthorizeHref();
-            $PopupSigninHref = $this->_AuthorizeHref(TRUE);
+            $SigninHref = $this->AuthorizeUri();
+            $PopupSigninHref = $this->AuthorizeUri('display=popup');
 
             // Add the facebook method to the controller.
             $FbMethod = array(
@@ -65,11 +68,11 @@ class FacebookPlugin extends Gdn_Plugin {
       }
    }
 
-   public function Base_AfterSignInButton_Handler($Sender, $Args) {
+   public function Base_BeforeSignInButton_Handler($Sender, $Args) {
       $ImgSrc = Url('/plugins/Facebook/design/facebook-login.png');
       $ImgAlt = T('Login with Facebook');
-      $SigninHref = $this->_AuthorizeHref();
-      $PopupSigninHref = $this->_AuthorizeHref(TRUE);
+      $SigninHref = $this->AuthorizeUri();
+      $PopupSigninHref = $this->AuthorizeUri('display=popup');
       
       $Html = "\n<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" align=\"bottom\" /></a>";
    
@@ -81,20 +84,24 @@ class FacebookPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     * @param array $Args
     */
-   public function EntryController_ConnectData_Handler($Sender, $Args) {
+   public function Base_ConnectData_Handler($Sender, $Args) {
       if (GetValue(0, $Args) != 'facebook')
          return;
 
       $AppID = C('Facebook.ApplicationID');
       $Secret = C('Facebook.Secret');
       $Code = GetValue('code', $_GET);
-      $RedirectUri = urlencode($this->_RedirectUri(GetValue('display', $_GET) == 'popup'));
+      $Query = '';
+      if ($Sender->Request->Get('display'))
+         $Query = 'display='.urlencode($Sender->Request->Get('display'));
+
+      $RedirectUri = urlencode(ConcatSep('&', $this->RedirectUri(), $Query));
 
       // Get the access token.
       if ($Code || !($AccessToken = $this->AccessToken())) {
          // Exchange the token for an access token.
 
-         $Url = "https://graph.facebook.com/oauth/access_token?client_id=$AppID&redirect_uri=$RedirectUri&client_secret=$Secret&code=$Code";
+         $Url = "https://graph.facebook.com/oauth/access_token?client_id=$AppID&client_secret=$Secret&code=$Code&redirect_uri=$RedirectUri";
 
          // Get the redirect URI.
          $Contents = file_get_contents($Url);
@@ -113,11 +120,11 @@ class FacebookPlugin extends Gdn_Plugin {
          if (!isset($NewToken)) {
             // There was an error getting the profile, which probably means the saved access token is no longer valid. Try and reauthorize.
             if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
-               Redirect($this->_AuthorizeHref());
+               Redirect($this->AuthorizeUri());
             } else {
                $Sender->SetHeader('Content-type', 'application/json');
                $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
-               $Sender->RedirectUrl = $this->_AuthorizeHref();
+               $Sender->RedirectUrl = $this->AuthorizeUri();
             }
          } else {
             $Sender->Form->AddError('There was an error with the Facebook connection.');
@@ -133,41 +140,45 @@ class FacebookPlugin extends Gdn_Plugin {
       $Form->SetFormValue('Email', GetValue('email', $Profile));
       $Form->SetFormValue('Photo', "http://graph.facebook.com/$ID/picture");
       $Sender->SetData('Verified', TRUE);
-
    }
 
    public function GetProfile($AccessToken) {
       $Url = "https://graph.facebook.com/me?access_token=$AccessToken";
 
       $Contents = file_get_contents($Url);
-      $Profile = json_decode($Contents);
+      $Profile = json_decode($Contents, TRUE);
       return $Profile;
    }
 
-   protected function _AuthorizeHref($Popup = FALSE) {
+   public function AuthorizeUri($Query = FALSE) {
       $AppID = C('Facebook.ApplicationID');
-      $RedirectUri = urlencode($this->_RedirectUri($Popup));
+
+      $RedirectUri = $this->RedirectUri();
+      if ($Query)
+         $RedirectUri .= '&'.$Query;
+      $RedirectUri = urlencode($RedirectUri);
+      $Foo = strlen($RedirectUri);
 
       $SigninHref = "https://graph.facebook.com/oauth/authorize?client_id=$AppID&redirect_uri=$RedirectUri&scope=email,publish_stream";
-      if ($Popup)
-         $SigninHref .= '&display=popup';
+      if ($Query)
+         $SigninHref .= '&'.$Query;
       return $SigninHref;
    }
 
-   protected function _RedirectUri($Popup = FALSE) {
-      $RedirectUri = Url('/entry/connect/facebook', TRUE);
+   protected $_RedirectUri = NULL;
 
-      $Args = array();
+   public function RedirectUri($NewValue = NULL) {
+      if ($NewValue !== NULL)
+         $this->_RedirectUri = $NewValue;
+      elseif ($this->_RedirectUri === NULL) {
+         $RedirectUri = Url('/entry/connect/facebook', TRUE);
+         $Args = array('Target' => GetValue('Target', $_GET, Url('')));
 
-      if ($Target = GetValue('Target', $_GET));
-         $Args['Target'] = $Target;
-      if ($Popup)
-         $Args['display'] = 'popup';
-
-      if (count($Args) > 0)
          $RedirectUri .= '?'.http_build_query($Args);
+         $this->_RedirectUri = $RedirectUri;
+      }
       
-      return $RedirectUri;
+      return $this->_RedirectUri;
    }
 
    public function SettingsController_Facebook_Create($Sender, $EventArguments) {

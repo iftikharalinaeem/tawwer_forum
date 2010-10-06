@@ -10,25 +10,7 @@
   </ModulePrefs>
   <Content type="html">
   <![CDATA[
-  <div id="content_div"></div>
-  <script type="text/javascript">
-
-  function getDiscussions() {
-   var params = {};
-   params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.GET;
-   var stamp = new Date();    
-   gadgets.io.makeRequest('http://vanillaforums.org/discussions/?DeliveryType=VIEW&Gadget=1&avoidcache=' + stamp.getTime(), response, params); 
-  };
-
-  function response(obj) { 
-    // obj.data contains the feed data
-    var html = obj.text;
-    document.getElementById('content_div').innerHTML = html;
-    gadgets.window.adjustHeight();
-  };
-
-  gadgets.util.registerOnLoadHandler(getDiscussions);
-  </script>
+  <script type="text/javascript" src="http://manilla.vanillaforums.com/plugins/embedvanilla/remote.js"></script>
   ]]>
   </Content>
 </Module>

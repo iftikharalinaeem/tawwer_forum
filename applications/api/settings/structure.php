@@ -29,7 +29,7 @@ $St->Table('Application')
    ->Column('DateInserted', 'datetime')
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('InsertUserID', 'int')
-   ->Column('UpdateUserID', 'int', FALSE)
+   ->Column('UpdateUserID', 'int', NULL)
    ->Set($Explicit, $Drop);
 
 // Make sure a default application is in to make the numbers correct.
@@ -53,8 +53,8 @@ $St->Table('UserApplication')
 // This is the table to connect tokens to users.
 $St->Table('OAuth2Token')
    ->Column('Token', 'varchar(32)', FALSE, 'primary')
-   ->Column('UserID', 'int', FALSE, 'unique')
-   ->Column('TokenType', array('authorization_code', 'access_token'), FALSE, 'unique')
+   ->Column('UserID', 'int', FALSE)
+   ->Column('TokenType', array('authorization_code', 'access_token'), FALSE)
    ->Column('Timestamp', 'timestamp')
    ->Column('ExpiresIn', 'usmallint', '0')
    ->Set($Explicit, $Drop);

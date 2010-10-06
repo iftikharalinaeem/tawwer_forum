@@ -12,7 +12,7 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->Label('Banner Title', 'Garden.Title');
          echo Wrap(
-               T('The banner title appears on the top-left of every page.'.($CanUploadLogo ? ' If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.' : '')),
+               T('The banner title appears on the top-left of every page.').($CanUploadLogo ? ' '.T('If a banner logo is uploaded, it will replace the banner title on user-facing forum pages.') : ''),
                'div',
                array('class' => 'Info')
             );
