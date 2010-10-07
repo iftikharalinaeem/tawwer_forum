@@ -44,18 +44,23 @@ class StatisticsTask extends Task {
          ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", $this->Database);
       }
 
+      $Success = TRUE;
       foreach ($this->TrackedItems as $TrackType => $TrackTable) {
                
          try {
             $Status = $this->CatchupGeneric($TrackedItem, $Response);
             if (!$Status)
                throw new Exception();
+
          } catch(Exception $e) {
             TaskList::Event("failed");
-            return FALSE;
+            $Success = FALSE;
+            break;
          }
       }
-      TaskList::Event("complete");
+      
+      if ($Success)
+         TaskList::Event("complete");
 
       // Select vfcom again.
       mysql_select_db(DATABASE_MAIN, $this->Database);
