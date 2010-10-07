@@ -183,7 +183,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       
       // Empty table
-      Gdn::Database()->Query("TRUNCATE TABLE GDN_Statistics");
+      // Gdn::Database()->Query("TRUNCATE TABLE GDN_Statistics");
       
       $Sender->Render($this->GetView("blank.php"));
    }
