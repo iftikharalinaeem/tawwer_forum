@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['embedvanilla'] = array(
-   'Name' => 'Embed Vanilla',
+   'Name' => '&lt;Embed&gt; Vanilla',
    'Description' => "Embed Vanilla allows you to embed your Vanilla forum within another application like WordPress, Drupal, or some custom website you've created.",
    'Version' => '1',
    'Author' => "Mark O'Sullivan",
