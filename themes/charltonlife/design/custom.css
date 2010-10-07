@@ -53,18 +53,18 @@ div#Foot div a:hover {
 .Banner {
 	background: url('images/bannerbg.jpg') top left repeat-x #000;
 	text-align: center;
+	position: relative;
 }
 .BannerWrapper {
 	width: 960px;
 	margin: 0 auto;
-	position: relative;
 }
 .Banner div.Buttons {
 }
 .Banner div.UserOptions {
 	position: absolute;
 	top: 0;
-	right: 0;
+	right: 20px;
 	background: url('images/userinfo_left.png') left bottom no-repeat;
 }
 .Banner div.UserOptions div {
@@ -104,7 +104,7 @@ div#Foot div a:hover {
    padding: 0;
 	position: absolute;
 	top: 0;
-	left: 0;
+	left: 20px;
 }
 .Banner h1 a {
 	margin: 10px 0 0;
@@ -192,7 +192,7 @@ a.BigButton:hover {
 #Search {
 	position: absolute;
 	top: 48px;
-	right: 0;
+	right: 20px;
 }
 #Search input.InputBox {
 	width: 200px;
