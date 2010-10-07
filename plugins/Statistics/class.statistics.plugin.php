@@ -183,7 +183,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       
       // Empty table
-      Gdn::Database()->Query("TRUNCATE TABLE GDN_Statistics");
+      // Gdn::Database()->Query("TRUNCATE TABLE GDN_Statistics");
       
       $Sender->Render($this->GetView("blank.php"));
    }
@@ -247,6 +247,7 @@ class StatisticsPlugin extends Gdn_Plugin {
          $CurrentHour = $NextHour;
          $NextHourValue = strtotime($NextHour);
       } while ($NextHourValue <= $FinalBlockValue);
+      $this->CachedTrackEvent($TrackType, 'none', NULL, NULL);
       
       $this->FireEvent('AfterCatchup'.$EventSuf);
       
@@ -274,10 +275,12 @@ class StatisticsPlugin extends Gdn_Plugin {
       $ForceReset = FALSE;
       
       // Caching some data. Figure out what boxes the new data belongs to
-      $InstanceDates = array();
-      foreach ($Resolutions as $Resolution)
-         $InstanceDates[$Resolution] = $this->DateFormatByResolution($Date, $Resolution);
-      
+      if (!is_null($Date)) {
+         $InstanceDates = array();
+         foreach ($Resolutions as $Resolution)
+            $InstanceDates[$Resolution] = $this->DateFormatByResolution($Date, $Resolution);
+      }
+            
       if (is_null($LocalCache) || $ForceReset) {
          $LocalCache = array();
          foreach ($Resolutions as $Resolution)
@@ -285,18 +288,23 @@ class StatisticsPlugin extends Gdn_Plugin {
       }
       
       foreach ($LocalCache as $CacheResolution => &$CacheValue) {
-         // New box for this resolution. Store and reset.
-         if ($CacheValue['Date'] != $InstanceDates[$CacheResolution]) {
-            // Store
+         if (is_null($Date)) {
             if ($CacheValue['Hits'] > 0)
                $this->TrackItem($RealType, $Qualifier, $CacheValue['Date'], $CacheResolution, $CacheValue['Hits']);
+         } else {
+            // New box for this resolution. Store and reset.
+            if ($CacheValue['Date'] != $InstanceDates[$CacheResolution]) {
+               // Store
+               if ($CacheValue['Hits'] > 0)
+                  $this->TrackItem($RealType, $Qualifier, $CacheValue['Date'], $CacheResolution, $CacheValue['Hits']);
+               
+               // Reset
+               $CacheValue = array('Date' => $InstanceDates[$CacheResolution], 'Hits' => 0);
+            }
             
-            // Reset
-            $CacheValue = array('Date' => $InstanceDates[$CacheResolution], 'Hits' => 0);
+            // Update
+            $CacheValue['Hits'] += $Hits;
          }
-         
-         // Update
-         $CacheValue['Hits'] += $Hits;
       }
       
    }
