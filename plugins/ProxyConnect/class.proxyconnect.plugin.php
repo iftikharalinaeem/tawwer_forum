@@ -12,8 +12,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProxyConnect'] = array(
 	'Name' => 'Proxy Connect SSO',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
-   'Version' => '1.8',
-   'RequiredApplications' => array('Vanilla' => '2.0.9'),
+   'Version' => '1.8.1',
+   'RequiredApplications' => array('Vanilla' => '2.0.11'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/authentication/proxy',
@@ -222,6 +222,24 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    
    public function EntryController_SignOut_Handler(&$Sender) {
       if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
+   }
+   
+   public function EntryController_Register_Handler(&$Sender) {
+      if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
+      
+      $Redirect = Gdn::Request()->GetValue('HTTP_REFERER');
+      $RegisterURL = Gdn::Authenticator()->GetURL(Gdn_Authenticator::URL_REMOTE_REGISTER, $Redirect);
+      $RealUserID = Gdn::Authenticator()->GetRealIdentity();
+      $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
+      
+      if ($RealUserID > 0) {
+         // The user is already signed in. Send them to the default page.
+         Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
+      } else {
+         // We have no cookie for this user. Send them to the remote registration page.
+         $Authenticator->SetIdentity(NULL);
+         Redirect($RegisterURL,302);
+      }
    }
    
    public function Setup() {

@@ -12,8 +12,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProxyConnectWordpress'] = array(
    'Name' => 'Wordpress Integration',
    'Description' => 'This plugin tightens the integration between Wordpress and Vanilla when ProxyConnect is enabled.',
-   'Version' => '0.9',
-   'RequiredApplications' => array('Vanilla' => '2.0.6'),
+   'Version' => '1.0.1',
+   'RequiredApplications' => array('Vanilla' => '2.0.11'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsPermission' => 'Garden.AdminUser.Only',
@@ -110,10 +110,6 @@ class ProxyConnectWordpressPlugin extends Gdn_Plugin {
                      $this->ProxyConnect->Provider[$CheckURL] = $Value;
                   }
                }
-               
-               // if we have an AuthenticateUrl in the provider, push it to config
-               if (!is_null($AuthenticateUrl = GetValue('AuthenticateUrl', $this->ProxyConnect->Provider, NULL)))
-                  SaveToConfig('Garden.Authenticator.AuthenticateURL', $AuthenticateUrl);
                
                // save the provider data
                $ProviderModel->Save($this->ProxyConnect->Provider);
