@@ -2,8 +2,24 @@
 
 echo Wrap($this->Data('Title'), 'h1');
 ?>
-<div class="Info"><?php echo T('Pockets allow you to add free-form HTML to various places around the application.'); ?></div>
-<div class="FilterMenu"><?php echo Anchor(sprintf(T('Add %s'), T('Pocket')), 'plugin/pockets/add', 'SmallButton'); ?></div>
+<div class="Info"><?php echo T('Pockets allow you to add free-form HTML to various places around the application.'); ?>
+
+<table>
+   <tr>
+      <td width="200"><?php
+      if (C('Plugins.Pockets.ShowLocations')) {
+         echo Anchor(T('Hide Pocket Locations'), '/dashboard/plugin/pockets/hidelocations', 'SmallButton');
+      } else {
+         echo Anchor(T('Show Pocket Locations'), '/dashboard/plugin/pockets/showlocations', 'SmallButton');
+      }
+      ?></td>
+      <td><?php echo T('This option shows/hides the locations where pockets can go.', 'This option shows/hides the locations where pockets can go, but only for users that have permission to add/edit pockets. Try showing the locations and then visit your site.'); ?></td>
+   </tr>
+   <tr>
+      <td><?php echo Anchor(sprintf(T('Add %s'), T('Pocket')), 'plugin/pockets/add', 'SmallButton'); ?></td>
+      <td><?php echo T('Add a new Pocket to your site.'); ?></td>
+   </tr>
+</table></div>
 <table id="Pockets" class="AltColumns">
    <thead>
       <tr>
@@ -38,17 +54,4 @@ echo Wrap($this->Data('Title'), 'h1');
       ?>
    </tbody>
 </table>
-<h1><?php echo T('Global Options'); ?></h1>
-<?php
-   $Form = $this->Form;
-   echo $Form->Open();
-?>
-<ul>
-   <li>
-      <?php
-         echo $Form->CheckBox('ShowLocations', T('Show Pocket Locations'));
-         echo '<div class="Info2">', T('Show all possible pocket locations.'), '</div>';
-      ?>
-   </li>
-</ul>
-<?php echo $Form->Close('Save'); ?>
+<?php echo $this->Form->Close(''); ?>
