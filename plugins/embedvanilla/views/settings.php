@@ -79,12 +79,19 @@ $RecommendedThemeName = 'Embed-Friendly';
    </div>
    <?php } ?>
 </div>
-<?php if (C('Plugins.EmbedVanilla.RemoteUrl')) { ?>
-<div class="Info">
-   <?php echo T('The forum will force itself to be viewed from the Remote Url.'); ?>
-</div>
-<?php echo $this->Form->Errors(); ?>
+<?php
+if (C('Plugins.EmbedVanilla.RemoteUrl')) {
+   echo Wrap(T('The "Remote Url" is the web address of the place where your embedded forum should be viewed from.'), 'div', array('class' => 'Info'));
+
+echo $this->Form->Errors();
+?>
 <ul class="RemoteSettings">
+   <li>
+      <?php
+      echo Wrap(T('Remote Url'), 'strong');
+      echo $this->Form->CheckBox('Plugins.EmbedVanilla.ForceRemoteUrl', "Force your forum to be viewed through the Remote Url");
+      ?>
+   </li>
    <li>
       <?php
          echo $this->Form->Label('Remote Url to Forum', 'Plugins.EmbedVanilla.RemoteUrl');

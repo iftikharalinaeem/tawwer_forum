@@ -1,5 +1,6 @@
 .Embeds {
-    margin-left: 20px;
+    margin: 0 20px;
+    background: #f5f5f5;
 }
 .EmbedTheme,
 .EmbedRecommend,
@@ -12,9 +13,9 @@
     padding: 20px;
     background: #f5f5f5;
 }
-.EmbedRecommend,
-.EmbedPlugins {
-    border-left: 1px solid #ddd;
+.EmbedTheme,
+.EmbedCode {
+    border-right: 1px solid #ddd;
 }
 .EmbedTheme strong,
 .EmbedRecommend strong,
@@ -65,7 +66,13 @@ textarea:focus {
     background: #fff;
 }
 #Content form ul.RemoteSettings {
-    padding: 0 20px;
+    margin: 0 20px 20px;
+    padding: 20px 20px 10px 20px;
+    background: #f5f5f5;
+}
+#Content form ul.RemoteSettings li strong {
+    color: #000;
+    font-size: 13px;
 }
 input.InputBox,
 input.InputBox:focus {
