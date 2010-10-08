@@ -131,24 +131,38 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
             'FeedDiscussions.FeedOption.Refresh'      => '1d'
          );
          $FormPostValues = array_merge($Defaults, $FormPostValues);
+         
+         try {
+            $FeedURL = GetValue('FeedDiscussions.FeedURL', $FormPostValues, NULL);
+            if (empty($FeedURL))
+               throw new Exception("You must supply a valid Feed URL");
+         
+            if ($this->HaveFeed($FeedURL))
+               throw new Exception("The Feed URL you supplied is already part of an Active Feed");
+               
+            // Check feed is valid RSS:
+            $FeedRSS = ProxyRequest($FeedURL, FALSE, TRUE);
+            if (!$FeedRSS)
+               throw new Exception("The Feed URL you supplied is not available");
             
-         if (array_key_exists('FeedDiscussions.FeedURL', $FormPostValues)) {
-            $FeedURL = $FormPostValues['FeedDiscussions.FeedURL'];
-            if ($this->HaveFeed($FeedURL)) {
-               $Sender->Form->AddError(T("The Feed URL you supplied is already part of an Active Feed"));
-            } else {
-               $this->AddFeed($FeedURL, array(
-                  'Historical'   => $FormPostValues['FeedDiscussions.FeedOption.Historical'],
-                  'Refresh'      => $FormPostValues['FeedDiscussions.FeedOption.Refresh'],
-                  'LastImport'   => "never"
-               ));
-               $Sender->StatusMessage = sprintf(T("Feed has been added"),$FeedURL);
-               $Sender->Form->ClearInputs();
-            }
-         } else {
-            $Sender->Form->SetValidationResults(array(
-               'FeedDiscussions.FeedURL'  => array('ValidateRequired')
+            $RSSData = simplexml_load_string($FeedRSS);
+            if (!$RSSData)
+               throw new Exception("The Feed URL you supplied is not valid XML");
+               
+            $Channel = GetValue('channel', $RSSData, FALSE);
+            if (!$Channel)
+               throw new Exception("The Feed URL you supplied is not an RSS stream");
+               
+            $this->AddFeed($FeedURL, array(
+               'Historical'   => $FormPostValues['FeedDiscussions.FeedOption.Historical'],
+               'Refresh'      => $FormPostValues['FeedDiscussions.FeedOption.Refresh'],
+               'LastImport'   => "never"
             ));
+            $Sender->StatusMessage = sprintf(T("Feed has been added"),$FeedURL);
+            $Sender->Form->ClearInputs();
+               
+         } catch(Exception $e) {
+            $Sender->Form->AddError(T($e->getMessage()));
          }
       }
       
