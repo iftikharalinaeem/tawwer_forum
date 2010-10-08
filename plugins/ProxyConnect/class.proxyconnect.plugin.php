@@ -10,9 +10,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['ProxyConnect'] = array(
-	'Name' => 'Proxy Connect SSO',
+	'Name' => 'Vanilla Proxyconnect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
-   'Version' => '1.8.1',
+   'Version' => '1.8.3',
    'RequiredApplications' => array('Vanilla' => '2.0.11'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
