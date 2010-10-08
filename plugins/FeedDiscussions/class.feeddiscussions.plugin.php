@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['FeedDiscussions'] = array(
    'Name' => 'Feed Discussions',
    'Description' => "Automatically creates new discussions based on content imported from supplied RSS feeds.",
-   'Version' => '0.9',
+   'Version' => '0.9.1',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
