@@ -199,7 +199,7 @@ a.BigButton:hover {
 	background: none;
 	box-shadow: none;
 	-moz-box-shadow: none;
-	-webkit-border-radius: none;
+	-webkit-box-shadow: none;
 	text-shadow: none;
 	font-weight: normal;
 	font-size: 11px;
