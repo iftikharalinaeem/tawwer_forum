@@ -359,6 +359,12 @@ input.InputBox {
 body.register input.InputBox {
 	width: 310px;
 }
+body.Entry #Content {
+	width: 340px;
+}
+body.register #Content {
+	width: 360px;
+}
 input.Password {
 	width:170px;
 }
