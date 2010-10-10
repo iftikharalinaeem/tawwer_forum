@@ -347,10 +347,14 @@ ul.Discussion {
 	border-top: none;
 	background: #E5EAF6;
 }
+div.Comment div.CommentForm textarea,
 #MessageForm textarea,
 form.Activity textarea,
 div.CommentForm textarea {
 	width: 99%;
+}
+div.Comment div.CommentForm {
+	width:auto;
 }
 ul.DataList li.Activity {
 	padding:6px;
