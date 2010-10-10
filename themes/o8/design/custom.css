@@ -289,6 +289,10 @@ div.Popup h1, div.Popup h2,
 	color: #07378F;
 	margin:0;
 }
+#DiscussionForm h2 {
+	border: 1px solid #C7D3EA;
+	border-bottom: 0;
+}
 body.Entry #Content h1 {
 	border: 1px solid #C7D3EA;
 	border-bottom: none;
@@ -435,4 +439,15 @@ div.Popup div.Messages ul {
 	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
+}
+
+div.Attachments {
+	background: #F5F9FF;
+	margin-bottom:6px;
+	margin-right:7px;
+	padding:4px;
+	border: 1px solid #c7d3ea;
+}
+div.Attachments div.AttachmentHeader {
+	padding-left: 10px;
 }
