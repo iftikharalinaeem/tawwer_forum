@@ -222,6 +222,7 @@ ul.DataList div.Excerpt a {
 #DiscussionForm input.InputBox {
 	width: 99%;
 }
+body.Entry #Content form,
 div.Popup .Content form,
 #MessageForm,
 form.Activity,
@@ -233,6 +234,13 @@ div.MessageForm,
 }
 div.MessageForm {
 	border-top: 0;
+	background: #E5EAF6;
+	padding: 10px 20px 16px;
+}
+div.Preview {
+	background: #fff;
+	margin: 8px 0;
+	padding: 8px;
 }
 #MessageForm {
 	margin: 0;
@@ -241,6 +249,7 @@ div.MessageForm {
 form.Activity {
 	border-top: none;
 }
+body.Entry #Content h1,
 div.Popup h1, div.Popup h2,
 #DiscussionForm h2 {
 	text-transform: uppercase;
@@ -285,8 +294,7 @@ ul.Discussion {
 	margin: 0;
 	border: 1px solid #c7d3ea;
 	border-top: none;
-	border-bottom: none;
-	background: #fff;
+	background: #E5EAF6;
 }
 #MessageForm textarea,
 form.Activity textarea,
@@ -324,29 +332,32 @@ input.Button:focus {
 	background: #E5EAF6;
 	text-shadow: none;
 }
+
 /* Profile */
 body.Profile #Panel {
 	display: block;
 }
 body.Profile #Content {
-	width:380px;
+	width: 380px;
 }
 ul.Activities li.HasPhoto div.ItemContent {
-	width:280px;
-}
+	width: 280px;
 }
 ul.Activities ul.DataList {
-	width:316px;
+	width: 316px;
 }
 ul.Activities li.CommentForm textarea.TextBox {
-	width:298px;
+	width: 298px;
 	display: block;
 }
 ul.Activities ul.DataList {
 	width: auto;
 }
 input.InputBox {
-	width:230px;
+	width: 230px;
+}
+body.register input.InputBox {
+	width: 310px;
 }
 input.Password {
 	width:170px;
