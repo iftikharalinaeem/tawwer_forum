@@ -345,3 +345,6 @@ ul.Activities li.CommentForm textarea.TextBox {
 ul.Activities ul.DataList {
 	width: auto;
 }
+input.InputBox {
+	width:230px;
+}
