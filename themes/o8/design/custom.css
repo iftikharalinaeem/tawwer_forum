@@ -231,6 +231,9 @@ div.MessageForm,
 	border: 1px solid #C7D3EA;
 	padding: 10px 20px 20px;
 }
+div.MessageForm {
+	border-top: 0;
+}
 #MessageForm {
 	margin: 0;
 	border-top: 0;
@@ -281,9 +284,9 @@ ul.Discussion {
 .NumberedPager {
 	margin: 0;
 	border: 1px solid #c7d3ea;
-	border-bottom: none;
 	border-top: none;
-	background: #E5EAF6;
+	border-bottom: none;
+	background: #fff;
 }
 #MessageForm textarea,
 form.Activity textarea,
