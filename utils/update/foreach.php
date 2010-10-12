@@ -5,9 +5,13 @@ define('APPLICATION', 'VanillaUpdate');
 // Represents a config file
 require_once("configuration.php");
 
+define('PATH_CACHE', '/cache');
+
 class TaskList {
 
    const NOBREAK = FALSE;
+   const CONFIGDEFAULTS = '/srv/www/vanillaforumscom/conf/config-defaults.php';
+   const CONFIG = '/srv/www/vanillaforumscom/conf/config.php';
    
    public $GroupData;
    protected $Clients;
@@ -19,14 +23,14 @@ class TaskList {
    protected $Completed;
    
    public function __construct($UserTaskDirs, $ClientDir) {
-   
-      $ConfigDefaultsFile = '/srv/www/vanillaforumscom/conf/config-defaults.php';
-      $ConfigFile = '/srv/www/vanillaforumscom/conf/config.php';
       $this->Config = new Configuration();
       try {
-         $this->Config->Load($ConfigDefaultsFile, 'Use');
-         $this->Config->Load($ConfigFile, 'Use');
+         $this->Config->Load(TaskList::CONFIGDEFAULTS, 'Use');
+         $this->Config->Load(TaskList::CONFIG, 'Use');
       } catch (Exception $e) { die ($e->getMessage()); }
+      
+      TaskList::Event("Global DB Collation is: ".$this->Config->Get('Database.ExtendedProperties.Collate'));
+      
       
       $this->Completed = $this->NumClients = 0;
       $this->Clients = $ClientDir;
@@ -406,9 +410,11 @@ abstract class Task {
       $this->ClientRoot = TaskList::CombinePaths($this->Root, $this->ClientFolder );
       $this->ClientInfo = $ClientInfo;
       
+      $this->ConfigDefaultsFile = TaskList::CombinePaths($this->ClientRoot,'conf/config-defaults.php');
       $this->ConfigFile = TaskList::CombinePaths($this->ClientRoot,'conf/config.php');
       $this->Config = new Configuration();
       try {
+         $this->Config->Load($this->ConfigDefaultsFile, 'Use');
          $this->Config->Load($this->ConfigFile, 'Use');
       } catch (Exception $e) { die ($e->getMessage()); }
 
@@ -479,7 +485,7 @@ abstract class Task {
    }
    
    protected function EnablePlugin($PluginName) {
-      TaskList::Event("Enabling plugin '{$PluginName}'", TaskList::NOBREAK);
+      TaskList::Event("Enabling plugin '{$PluginName}'...", TaskList::NOBREAK);
       try {
          $Token = $this->TokenAuthentication();
          if ($Token === FALSE) throw new Exception("could not generate token");
@@ -494,7 +500,7 @@ abstract class Task {
    }
    
    protected function DisablePlugin($PluginName) {
-      TaskList::Event("Disabling plugin '{$PluginName}'", TaskList::NOBREAK);
+      TaskList::Event("Disabling plugin '{$PluginName}'...", TaskList::NOBREAK);
       try {
          $Token = $this->TokenAuthentication();
          if ($Token === FALSE) throw new Exception("could not generate token");
