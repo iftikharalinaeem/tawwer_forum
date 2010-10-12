@@ -504,6 +504,7 @@ abstract class Task {
    }
    
    protected function Request($RelativeURL, $QueryParams = array()) {
+      $FollowRedirects = TRUE;
       $Timeout = $this->C('Garden.SocketTimeout', 2.0);
       
       $Url = 'http://'.$this->ClientFolder.'/'.ltrim($RelativeURL,'/').'?'.http_build_query($QueryParams);
