@@ -222,7 +222,7 @@ class StatisticsTask extends Task {
       }
       
       try {
-         $Rows = mysql_query("INSERT INTO GDN_Statistics (
+         $RowQuery = "INSERT INTO GDN_Statistics (
             IndexType,
             IndexQualifier,
             DateRangeStart,
@@ -238,8 +238,9 @@ class StatisticsTask extends Task {
             '{$Range}',
             '{$Amount}',
             '".date('Y-m-d H:i:s')."'
-         )", $this->Database);
-         if (!mysql_affected_rows($Rows))
+         )";
+         mysql_query($RowQuery, $this->Database);
+         if (!mysql_affected_rows($this->Database))
             throw new Exception();
       } catch (Exception $e) {
          mysql_query("UPDATE GDN_Statistics 
