@@ -73,12 +73,12 @@ class StatisticsTask extends Task {
       $Type = $this->TrackedItems[$TrackType];
       
       $FirstDate = mysql_query("SELECT DateInserted FROM GDN_{$Type} 
-         ORDER BY DateInserted ASC OFFSET 0 LIMIT 1", $this->Database);
+         ORDER BY DateInserted ASC LIMIT 1 OFFSET 0", $this->Database);
       if (!mysql_num_rows($FirstDate)) return TRUE;
       $FirstDate = mysql_fetch_assoc($FirstDate); $FirstDate = $FirstDate['DateInserted'];
       
       $LastDate = mysql_query("SELECT DateInserted FROM GDN_{$Type} 
-         ORDER BY DateInserted ASC OFFSET 0 LIMIT 1", $this->Database);
+         ORDER BY DateInserted ASC LIMIT 1 OFFSET 0", $this->Database);
       if (!mysql_num_rows($LastDate)) return TRUE;
       $LastDate = mysql_fetch_assoc($LastDate); $LastDate = $LastDate['DateInserted'];
             
