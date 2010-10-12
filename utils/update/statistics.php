@@ -18,5 +18,5 @@ if ($argc < 2) exit();
 
 $Tasks = new TaskList('stats','/srv/www/vhosts');
 $Tasks->RunChunked($argv[1], array(
-   'stats'
+   'statistics'
 ));
