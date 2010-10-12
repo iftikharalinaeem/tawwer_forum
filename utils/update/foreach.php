@@ -464,7 +464,8 @@ abstract class Task {
       $RandomData = fread($RandomDataStream, 32);
       $TokenString = md5($RandomData);
       
-      $EnabledAuthenticators = $this->C('Garden.Authenticator.EnabledSchemes');
+      $EnabledAuthenticators = $this->C('Garden.Authenticator.EnabledSchemes',array());
+      if (!is_array($EnabledAuthenticators) || !sizeof($EnabledAuthenticators)) return FALSE;
       if (!in_array('token', $EnabledAuthenticators)) {
          $EnabledAuthenticators[] = 'token';
          $this->SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledAuthenticators);
@@ -476,6 +477,7 @@ abstract class Task {
    
    protected function EnablePlugin($PluginName) {
       $Token = $this->TokenAuthentication();
+      if ($Token === FALSE) return FALSE;
       try {
          $Result = $this->Request('plugin/forceenableplugin/'.$PluginName,array(
             'token'  => $Token
@@ -489,6 +491,7 @@ abstract class Task {
    
    protected function DisablePlugin($PluginName) {
       $Token = $this->TokenAuthentication();
+      if ($Token === FALSE) return FALSE;
       try {
          $Result = $this->Request('plugin/forcedisableplugin/'.$PluginName,array(
             'token'  => $Token
@@ -501,7 +504,7 @@ abstract class Task {
    }
    
    protected function Request($RelativeURL, $QueryParams = array()) {
-      $Timeout = C('Garden.SocketTimeout', 2.0);
+      $Timeout = $this->C('Garden.SocketTimeout', 2.0);
       
       $Url = 'http://'.$this->ClientFolder.'/'.ltrim($RelativeURL,'/').'?'.http_build_query($QueryParams);
       
