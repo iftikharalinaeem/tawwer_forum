@@ -137,6 +137,8 @@ class TaskList {
    }
    
    public function RunChunked($ChunkRule, $TaskOrder) {
+      global $argv;
+      $args = $argv;
       TaskList::MajorEvent("Running client list, chunked by '{$ChunkRule}'...");
       switch ($ChunkRule) {
          case 'alphabet':
@@ -149,7 +151,7 @@ class TaskList {
             }
             
             if ($ChunkRule == 'alfast') {
-               $ChunkRules = explode(',',array_pop($GLOBALS['argv']));
+               $ChunkRules = explode(',',array_pop($args));
                foreach ($ChunkRules as $FastChunkRule) {
                   if (strlen($FastChunkRule) == 1)
                      $Chunks[] = $FastChunkRule;
