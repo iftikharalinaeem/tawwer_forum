@@ -192,7 +192,7 @@ class StatisticsTask extends Task {
       }
    }
    
-   public static function TrackItem($Type, $Qualifier, $Datetime, $Range, $Amount = 1) {
+   public function TrackItem($Type, $Qualifier, $Datetime, $Range, $Amount = 1) {
       if (!is_int($Amount))
          throw new Exception("Tried to add non-integer tracking quantity '{$Amount}' to '{$Type}:{$Qualifier}'");
       
