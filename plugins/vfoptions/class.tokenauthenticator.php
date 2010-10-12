@@ -117,7 +117,7 @@ class Gdn_TokenAuthenticator extends Gdn_Authenticator {
       $Expiry = C('Garden.Authenticators.token.Expiry', 0);
       if ($Expiry != 0 && strtotime($Expiry) < time()) return Gdn_Authenticator::MODE_NOAUTH;
       
-      if (!$Id == 0 || $Id == -1) {
+      if ($Id == 0 || $Id == -1) {
          $this->_CheckHookedFields();
          return Gdn_Authenticator::MODE_GATHER;
       }
