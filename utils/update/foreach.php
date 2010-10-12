@@ -475,6 +475,7 @@ abstract class Task {
       
       $this->SaveToConfig('Garden.Authenticators.token.Token', $TokenString);
       $this->SaveToConfig('Garden.Authenticators.token.Expiry', date('Y-m-d H:i:s',time()+30));
+      return $TokenString;
    }
    
    protected function EnablePlugin($PluginName) {
