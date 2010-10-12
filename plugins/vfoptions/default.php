@@ -58,7 +58,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		$Menu->RemoveGroup('Dashboard');
 		$Menu->AddItem('Dashboard', T('Dashboard').$New, FALSE, array('class' => 'Dashboard'));
 		$Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
-		$Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla').$New, 'plugin/embed', 'Garden.Settings.Manage');
+		//$Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla').$New, 'plugin/embed', 'Garden.Settings.Manage');
 		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
    too large to upload directly to this page you can
    <a href="mailto:support@vanillaforums.com?subject=Importing+to+VanillaForums">contact us</a>
