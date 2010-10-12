@@ -1,7 +1,7 @@
 <?php
 class StatisticsTask extends Task {
 
-   protected $TrackedItem = array(
+   protected $TrackedItems = array(
       'comments'        => 'Comment',
       'discussions'     => 'Discussion',
       'registrations'   => 'User'
