@@ -46,7 +46,7 @@ class StatisticsTask extends Task {
 
       $Success = TRUE;
       foreach ($this->TrackedItems as $TrackType => $TrackTable) {
-               
+         TaskList::MinorEvent("Catchup ({$TrackType}/{$TrackTable}) ", TaskList::NOBREAK); 
          try {
             $Status = $this->CatchupGeneric($TrackType);
             if (!$Status)
@@ -57,6 +57,7 @@ class StatisticsTask extends Task {
             $Success = FALSE;
             break;
          }
+         TaskList::Event("completed");
       }
       
       if ($Success)
@@ -71,7 +72,6 @@ class StatisticsTask extends Task {
    protected function CatchupGeneric($TrackType) {
 
       $Type = $this->TrackedItems[$TrackType];
-      TaskList::MinorEvent("Catchup ({$TrackType}/{$Type}) ", TaskList::NOBREAK);
       
       $FirstDate = mysql_query("SELECT DateInserted FROM GDN_{$Type} 
          WHERE DateInserted > '1976-01-01'
@@ -112,7 +112,6 @@ class StatisticsTask extends Task {
          $NextHourValue = strtotime($NextHour);
       } while ($NextHourValue <= $FinalBlockValue);
       $this->CachedTrackEvent($TrackType, 'none', NULL, NULL);
-      TaskList::Event("completed");
       
       return TRUE;
    }
