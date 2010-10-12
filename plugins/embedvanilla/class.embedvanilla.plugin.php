@@ -24,16 +24,6 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 		$InDashboard = !($Sender->MasterView == 'default' || $Sender->MasterView == '');
 		$Sender->AddJsFile('plugins/embedvanilla/local.js');
 
-/*
-		// Record the remote source using the embed feature.
-		$RemoteUrl = GetIncomingValue('remote', '');
-		if ($RemoteUrl) {
-			if ($RemoteUrl != C('Plugins.EmbedVanilla.RemoteUrl'))
-				SaveToConfig('Plugins.EmbedVanilla.RemoteUrl', $RemoteUrl);
-		} else {
-			$RemoteUrl = C('Plugins.EmbedVanilla.RemoteUrl');
-		}
-*/
 		// Record the remote source using the embed feature.
 		$RemoteUrl = C('Plugins.EmbedVanilla.RemoteUrl');
 		if (!$RemoteUrl) {
@@ -43,11 +33,12 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 		}
 
 		// Report the remote url to redirect to if not currently embedded.
-		if (!IsSearchEngine() && $RemoteUrl && !$InDashboard)
+		if (!IsSearchEngine() && $RemoteUrl && !$InDashboard && C('Plugins.EmbedVanilla.ForceRemoteUrl'))
 			$Sender->AddDefinition('RemoteUrl', $RemoteUrl);
 			
 		if ($InDashboard)
 			$Sender->AddDefinition('InDashboard', TRUE);
+			
 	}
 	
 	public function Base_GetAppSettingsMenuItems_Handler($Sender) {
@@ -69,7 +60,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Plugins.EmbedVanilla.RemoteUrl'));
+      $ConfigurationModel->SetField(array('Plugins.EmbedVanilla.RemoteUrl', 'Plugins.EmbedVanilla.ForceRemoteUrl'));
       
       $Sender->Form->SetModel($ConfigurationModel);
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {

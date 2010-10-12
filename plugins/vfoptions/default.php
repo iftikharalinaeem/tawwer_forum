@@ -39,7 +39,9 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		if (strpos(Gdn::Request()->Domain(), 'vanilladev') !== FALSE)
          $Url = 'https://www.vanilladev.com/account/';
 
+		echo Anchor('Help', '#', 'HelpLink');
       echo Anchor('My Account', $Url, 'MyAccountLink');
+		
    }
    
    /**
@@ -47,71 +49,16 @@ class VFOptionsPlugin implements Gdn_IPlugin {
     */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
 		$New = ' <span class="New">New</span>';
-      // Clean out entire menu & re-add everything
+      // Clean out options hosting customers should not see
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->ClearGroups();
-      
-      $Menu->AddItem('Dashboard', T('Dashboard').$New, FALSE, array('class' => 'Dashboard'));
-      $Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
-
-      $Menu->AddItem('Appearance', T('Appearance'), FALSE, array('class' => 'Appearance'));
-		$Menu->AddLink('Appearance', T('Banner'), 'dashboard/settings/banner', 'Garden.Settings.Manage');
-      $Menu->AddLink('Appearance', T('Themes').$New, 'dashboard/settings/themes', 'Garden.Themes.Manage');
-		if (C('Garden.ThemeOptions.Name'))
-         $Menu->AddLink('Appearance', T('Theme Options').$New, '/dashboard/settings/themeoptions', 'Garden.Themes.Manage');
-
-      if (C('EnabledPlugins.CustomCSS'))
-	      $Menu->AddLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
-			
-		if (C('EnabledPlugins.CustomTheme'))
-	      $Menu->AddLink('Appearance', 'Custom Theme', 'settings/customtheme', 'Garden.AdminUser.Only');
-			
-      $Menu->AddLink('Appearance', T('Messages'), 'dashboard/message', 'Garden.Messages.Manage');
-
-		if (C('EnabledPlugins.CustomDomain'))
-	      $Menu->AddLink('Appearance', 'Custom Domain', 'settings/customdomain', 'Garden.AdminUser.Only');
-		
-      $Menu->AddItem('Users', T('Users'), FALSE, array('class' => 'Users'));
-      $Menu->AddLink('Users', T('Users'), 'dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'));
-		$Menu->AddLink('Users', T('Roles & Permissions'), 'dashboard/role', 'Garden.Roles.Manage');
-      if (C('Garden.Registration.Manage', TRUE))
-			$Menu->AddLink('Users', T('Registration'), 'dashboard/settings/registration', 'Garden.Registration.Manage');
-			
-      if (C('Garden.Registration.Method') == 'Approval')
-         $Menu->AddLink('Users', T('Applicants'), 'dashboard/user/applicants', 'Garden.Applicants.Manage');
-
-		if (C('EnabledPlugins.VanillaConnect') || C('EnabledPlugins.ProxyConnect'))
-			$Menu->AddLink('Users', T('Authentication').$New, 'dashboard/authentication', 'Garden.Settings.Manage');
-		
-		$Menu->AddItem('Forum', T('Forum Settings'), FALSE, array('class' => 'Forum'));
-		$Menu->AddLink('Forum', T('Categories'), 'vanilla/settings/managecategories', 'Vanilla.Categories.Manage');
-		if (C('EnabledPlugins.Tagging'))
-			$Menu->AddLink('Forum', T('Tagging').$New, 'settings/tagging', 'Garden.Settings.Manage');
-
-		if (C('EnabledPlugins.Voting'))
-			$Menu->AddLink('Forum', T('Voting').$New, 'settings/voting', 'Garden.Settings.Manage');
-		
-      $Menu->AddLink('Forum', T('Spam'), 'vanilla/settings/spam', 'Vanilla.Spam.Manage');
-		if (C('EnabledPlugins.Flagging')) {
-			$NumFlaggedItems = Gdn::SQL()->Select('fl.ForeignID','DISTINCT', 'NumFlaggedItems')
-				->From('Flag fl')
-				->GroupBy('ForeignURL')
-				->Get()->NumRows();
-			
-			$LinkText = T('Flagged Content');
-			if ($NumFlaggedItems)
-				$LinkText .= " ({$NumFlaggedItems})";
-			$Menu->AddLink('Forum', $LinkText.$New, 'plugin/flagging', 'Garden.Settings.Manage');
-		}
-
-		if (C('EnabledPlugins.FileUpload'))
-			$Menu->AddLink('Forum', 'Media', 'plugin/fileupload', 'Garden.AdminUser.Only');
-			
-		if (C('EnabledPlugins.Signatures'))
-			$Menu->AddLink('Forum', T('Signatures').$New, 'settings/signatures', 'Garden.Settings.Manage');
-			
-		$Menu->AddItem('Import', T('Import').$New, FALSE, array('class' => 'Addons'));
-		$Menu->AddLink('Import', T('Import'), 'dashboard/import', 'Garden.Import');
+		$Menu->RemoveLink('Add-ons', T('Plugins'));
+		$Menu->RemoveLink('Add-ons', T('Applications'));
+		$Menu->RemoveLink('Add-ons', T('Locales'));
+		$Menu->RemoveLink('Add-ons', T('&lt;Embed&gt; Vanilla'));
+		$Menu->RemoveGroup('Dashboard');
+		$Menu->AddItem('Dashboard', T('Dashboard').$New, FALSE, array('class' => 'Dashboard'));
+		$Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
+		$Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla').$New, 'plugin/embed', 'Garden.Settings.Manage');
 		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
    too large to upload directly to this page you can
    <a href="mailto:support@vanillaforums.com?subject=Importing+to+VanillaForums">contact us</a>
@@ -185,19 +132,6 @@ pageTracker._trackPageview();
    }
    
    /**
-    * Creates a "Buy Now" url that sends the user directly to checkout for an upgrade.
-   public function PluginController_BuyNow_Create(&$Sender, $EventArguments) {
-      $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
-      $Sender->Permission('Garden.AdminUser.Only');
-      $FeatureCode = ArrayValue(0, $Sender->RequestArgs, '');
-      if ($SiteID <= 0 || $FeatureCode == '') {
-         $this->PluginController_LearnMore_Create($Sender, $EventArguments);
-      } else {
-         // Select the feature and redirect to the checkout
-         $this->_SetSelectionGoToCheckout($FeatureCode);
-      }
-   }
-    */
    
    public function PluginController_ForceEnablePlugin_Create($Sender) {
       $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
@@ -248,8 +182,6 @@ pageTracker._trackPageview();
       }
       die();
    }
-   
-   /**
     * Creates a "Create a New Forum" page where users can do just that.
     */
    public function PluginController_CreateForum_Create(&$Sender, $EventArguments) {
@@ -294,48 +226,6 @@ pageTracker._trackPageview();
          $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'createforum.php');
       }
    }
-
-   /**
-    * Creates a "Custom Domain" upgrade offering screen where users can purchase
-    * & implement a custom domain.
-   public $AddSideMenu = TRUE;
-   public function PluginController_CustomDomain_Create(&$Sender, $EventArguments) {
-      $Sender->Permission('Garden.AdminUser.Only');
-      $Sender->Title('Premium Upgrades &raquo; Custom Domain Name');
-      if ($this->AddSideMenu)
-         $Sender->AddSideMenu('dashboard/plugin/upgrades');
-
-      // Send a request to the specified domain, and see if it hits our
-      // server (it should return our custom 404 error if it is pointed at
-      // us).
-      $Sender->Form = new Gdn_Form();
-      $Domain = $Sender->Form->GetValue('CustomDomain', '');
-      $Response = '';
-      if ($Domain != '') {
-         // Make sure it isn't already in use
-         if (file_exists('/srv/www/vhosts/'.$Domain)) {
-            $Sender->Form->AddError('The requested domain is already assigned.');
-         } else {
-            $FQDN = PrefixString('http://', $Domain);
-            $Error = FALSE;
-            try {
-               $Response = ProxyRequest($FQDN);
-               $ExpectedResponse = ProxyRequest('http://reserved.vanillaforums.com');               
-            } catch(Exception $e) {
-               $Error = TRUE;
-               // Don't do anything with the exception
-            }
-            if ($Error || $Response != $ExpectedResponse) {
-               $Sender->Form->AddError("We were unable to verify that ".$Domain." is pointing at VanillaForums.com.");
-            } else {
-               // Everything is set up properly, so select the upgrade and go to checkout
-               $this->_SetSelectionGoToCheckout('customdomain', array('Domain' => $Domain));
-            }
-         }
-      }
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'customdomain.php');
-   }
-    */
 
    /**
     * Creates a "Delete Forum" page where users can completely remove their
@@ -403,131 +293,7 @@ pageTracker._trackPageview();
          $Sender->Render('/srv/www/misc/plugins/vfoptions/views/deleteforum.php');
       }
    }
-   
-   /**
-    * Creates a "Learn More" screen that contains more info on upgrade
-    * offerings.
-   public function PluginController_LearnMore_Create(&$Sender, $EventArguments) {
-      $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
-      $Sender->Permission('Garden.AdminUser.Only');
-      $Sender->Title('Premium Upgrades &raquo; Learn More');
-      $Sender->AddSideMenu('dashboard/plugin/upgrades');
-      $Sender->Form = new Gdn_Form();
-      $Sender->Form->AddHidden('SiteID', $SiteID);
-      $FeatureCode = ArrayValue(0, $Sender->RequestArgs, '');
-      if ($SiteID <= 0)
-         $FeatureCode = 'error';
-      
-      if ($FeatureCode == 'customdomain') {
-         $this->AddSideMenu = FALSE;
-         return $this->PluginController_CustomDomain_Create($Sender, $EventArguments);
-      }
-         
-      if ($Sender->Form->IsPostBack()) {
-         // Select the feature and redirect to the checkout
-         $this->_SetSelectionGoToCheckout($FeatureCode);
-      } else {
-         $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'learnmore.php');
-      }
-   }
-    */
-   
-   /**
-    * Creates a "Learn More" screen that contains more info on upgrade
-    * offerings.
-   public function PluginController_MoreInfo_Create(&$Sender, $EventArguments) {
-      $Sender->Title('Premium Upgrades &raquo; Learn More');
-      $Sender->AddSideMenu('dashboard/plugin/upgrades');
-      $Sender->Form = new Gdn_Form();
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'moreinfo.php');
-   }
-    */
 
-   /**
-    * Creates a "My Forums" management screen where users can review, add, and
-    * rename their forums.
-   public function PluginController_MyForums_Create(&$Sender, $EventArguments) {
-      $Sender->Permission('Garden.AdminUser.Only');
-      $Sender->Title('My Forums');
-      $Sender->AddSideMenu('dashboard/plugin/myforums');
-
-      $Sender->SiteData = $this->_GetDatabase()->SQL()->Select('s.*')
-         ->From('Site s')
-         ->Where('AccountID', Gdn::Config('VanillaForums.AccountID', -1))
-         ->Where('InsertUserID', Gdn::Config('VanillaForums.UserID', -1))
-         ->Where('Path <>', '') // Make sure default site or buggy rows are excluded
-         ->Get();
-      $this->_CloseDatabase();
-      
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'myforums.php');
-   }
-    */
-
-   /**
-    * Creates a "Remove Upgrade" screen where users can remove previously
-    * purchased upgrade offerings.
-   public function PluginController_Remove_Create(&$Sender, $EventArguments) {
-      $Sender->Permission('Garden.AdminUser.Only');
-      $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
-      $Sender->AddSideMenu('dashboard/plugin/upgrades');
-      $UpgradeToRemove = ArrayValue(0, $Sender->RequestArgs, '');
-      $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
-      $Sender->Form = new Gdn_Form();
-      if ($Sender->Form->IsPostBack()) {
-         $Feature = $this->_GetDatabase()->SQL()->Select('FeatureID')->From('Feature')->Where('Code', $UpgradeToRemove)->Get()->FirstRow();
-         $FeatureID = is_object($Feature) ? $Feature->FeatureID : 0;
-         if ($FeatureID > 0) {
-            // Mark the feature for removal
-            $Session = Gdn::Session();
-            $this->_GetDatabase()->SQL()->Replace(
-               'SiteFeature',
-               array('Selected' => '0', 'UpdateUserID' => $Session->UserID, 'DateUpdated' => Gdn_Format::ToDateTime()),
-               array('SiteID' => $SiteID, 'FeatureID' => $FeatureID)
-            );
-            
-            // Figure out where to send the user for subscription update
-            $Site = $this->_GetDatabase()->SQL()
-               ->Select()
-               ->From('Site')
-               ->Where('SiteID', $SiteID)
-               ->Get()
-               ->FirstRow();
-      
-            $UpdateUrl = 'https://www.vanillaforums.com/payment/synch/';
-            if (is_object($Site)) {
-               // Point at vanilladev.com if that's where this site is managed
-               if (strpos($Site->Name, 'vanilladev') !== FALSE)
-                  $UpdateUrl = 'https://www.vanilladev.com/payment/synch/';
-            }
-            
-            // Set the transient key for authentication on the other side
-            $this->_SetTransientKey($Site);
-            
-            // Close any open db connections
-            $this->_CloseDatabase();
-            
-            // Redirect
-            $SiteUrl = $Site->Domain == '' ? $Site->Name : $Site->Domain;
-            $Session = Gdn::Session();
-            Redirect($UpdateUrl.$SiteID.'/'.$Session->TransientKey().'/?Redirect=http://'.$SiteUrl.'/plugin/removecomplete/');
-            return;
-         } else {
-            $Sender->Form->AddError('Failed to remove upgrade. Please contact support@vanillaforums.com for assistance.');
-         }
-      }
-
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'remove.php');
-   }
-    */
-/*   
-   public function PluginController_RemoveComplete_Create(&$Sender, $EventArguments) {
-      $Sender->Title('Premium Upgrades &raquo; Remove Upgrade');
-      $Sender->AddSideMenu('dashboard/plugin/upgrades');
-      // Remove the feature from the forum
-      $this->_ApplyUpgrades();
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'removecomplete.php');
-   }
-*/   
    /**
     * Creates a "Rename Forum" page where users can rename their forum's
     * VanillaForums.com subdomain. Note: this ONLY works for vf.com subdomains,
@@ -957,94 +723,6 @@ pageTracker._trackPageview();
       $this->_CloseDatabase();
    }
 
-   /**
-    * Selects an upgrade for activation, records the appropriate information,
-    * and sends the user to the checkout page.
-   private function _SelectUpgrade($FeatureCode, $Attributes = '') {
-      // Define the feature that was selected
-      $SiteID = Gdn::Config('VanillaForums.SiteID', '0');
-      $Session = Gdn::Session();
-      $ExistingRow = $this->_GetDatabase()->SQL()
-         ->Select('sf.*')
-         ->From('SiteFeature sf')
-         ->Join('Feature f', 'sf.FeatureID = f.FeatureID')
-         ->Where('sf.SiteID', $SiteID)
-         ->Where('f.Code', $FeatureCode)
-         ->Get()
-         ->FirstRow();
-         
-      // If the row didn't exist for this site...
-      if (!$ExistingRow) {
-         // Make sure that the feature does exist
-         $Feature = $this->_GetDatabase()->SQL()->Select('FeatureID')->From('Feature')->Where('Code', $FeatureCode)->Get()->FirstRow();
-         if (is_object($Feature)) {
-            // If the feature does exist, add the row as selected
-            $this->_GetDatabase()->SQL()->Insert(
-               'SiteFeature',
-               array(
-                  'SiteID' => $SiteID,
-                  'FeatureID' => $Feature->FeatureID,
-                  'Selected' => 1,
-                  'Active' => 0,
-                  'DateInserted' => Gdn_Format::ToDateTime(),
-                  'InsertUserID' => $Session->UserID,
-                  'Attributes' => Gdn_Format::Serialize($Attributes)
-                  )
-               );
-         } else {
-            // If the feature doesn't exist, throw an error
-            $Sender->Form->AddError('The requested upgrade does not have an associated record in the features table.');
-         }
-      } else {
-         // Update the row as selected
-         $this->_GetDatabase()->SQL()->Put(
-            'SiteFeature',
-            array(
-               'Selected' => 1,
-               'Active' => 0,
-               'Attributes' => Gdn_Format::Serialize($Attributes),
-               'DateUpdated' => Gdn_Format::ToDateTime(),
-               'UpdateUserID' => $Session->UserID
-            ),
-            array(
-               'SiteID' => $SiteID,
-               'FeatureID' => $ExistingRow->FeatureID
-            )
-         );
-      }
-      $this->_CloseDatabase();
-   }
-    */
-   
-   /**
-    * Applies a selection and redirects to the checkout.
-   private function _SetSelectionGoToCheckout($FeatureCode, $Attributes = '') {
-      $this->_SelectUpgrade($FeatureCode, $Attributes);
-      
-      // Figure out which checkout to send them to (dev or production):
-      $SiteID = Gdn::Config('VanillaForums.SiteID', 0);
-      $Site = $this->_GetDatabase()->SQL()
-         ->Select()
-         ->From('Site')
-         ->Where('SiteID', $SiteID)
-         ->Get()
-         ->FirstRow();
-      
-      $CheckoutUrl = 'https://www.vanillaforums.com/payment/pay/';
-      if (is_object($Site)) {
-         // Point at vanilladev.com if that's where this site is managed
-         if (strpos($Site->Name, 'vanilladev') !== FALSE)
-            $CheckoutUrl = 'https://www.vanilladev.com/payment/pay/';
-            
-         $this->_SetTransientKey($Site);
-      }
-      
-      $this->_CloseDatabase();
-      $Session = Gdn::Session();
-      Redirect($CheckoutUrl.$SiteID.'/'.$Session->TransientKey());
-   }
-    */
-   
    /**
     * When going to the home site for a payment transaction
     * (increasing/decreasing subscription amounts, updating cc info, etc) it is

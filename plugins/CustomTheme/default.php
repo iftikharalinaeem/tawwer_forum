@@ -12,7 +12,12 @@ $PluginInfo['CustomTheme'] = array(
 
 class CustomThemePlugin implements Gdn_IPlugin {
    
-   public function Base_Render_Before(&$Sender) {
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+		$Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Appearance', 'Custom Theme', 'settings/customtheme', 'Garden.Settings.GlobalPrivs');
+	}
+
+   public function Base_Render_Before(&$Sender) {		
 		// If we are using the default master view, and in preview mode, add the custom css file
 		if (Gdn::Session()->GetPreference('PreviewCustomTheme')) {
 			$Sender->AddAsset('Content', $Sender->FetchView(PATH_PLUGINS . DS . 'CustomTheme' . DS . 'views' . DS . 'preview.php'));
