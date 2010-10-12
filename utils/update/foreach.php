@@ -476,19 +476,27 @@ abstract class Task {
    
    protected function EnablePlugin($PluginName) {
       $Token = $this->TokenAuthentication();
-      $Result = $this->Request('plugin/forceenableplugin/'.$PluginName,array(
-         'token'  => $Token
-      ));
-      
+      try {
+         $Result = $this->Request('plugin/forceenableplugin/'.$PluginName,array(
+            'token'  => $Token
+         ));
+      } catch (Exception $e) {
+         TaskList::Event("Failed to enable plugin: {$PluginName} - '".$e->getMessage()."'");
+         $Result = 'FALSE';
+      }      
       return ($Result == 'TRUE') ? TRUE : FALSE;
    }
    
    protected function DisablePlugin($PluginName) {
       $Token = $this->TokenAuthentication();
-      $Result = $this->Request('plugin/forcedisableplugin/'.$PluginName,array(
-         'token'  => $Token
-      ));
-      
+      try {
+         $Result = $this->Request('plugin/forcedisableplugin/'.$PluginName,array(
+            'token'  => $Token
+         ));
+      } catch (Exception $e) {
+         TaskList::Event("Failed to disable plugin: {$PluginName} - '".$e->getMessage()."'");
+         $Result = 'FALSE';
+      }  
       return ($Result == 'TRUE') ? TRUE : FALSE;
    }
    
