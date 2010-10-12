@@ -78,7 +78,7 @@ class StatisticsTask extends Task {
       $FirstDate = mysql_fetch_assoc($FirstDate); $FirstDate = $FirstDate['DateInserted'];
       
       $LastDate = mysql_query("SELECT DateInserted FROM GDN_{$Type} 
-         ORDER BY DateInserted ASC LIMIT 1 OFFSET 0", $this->Database);
+         ORDER BY DateInserted DESC LIMIT 1 OFFSET 0", $this->Database);
       if (!mysql_num_rows($LastDate)) return TRUE;
       $LastDate = mysql_fetch_assoc($LastDate); $LastDate = $LastDate['DateInserted'];
             
