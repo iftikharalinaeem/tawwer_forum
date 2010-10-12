@@ -29,9 +29,6 @@ class TaskList {
          $this->Config->Load(TaskList::CONFIG, 'Use');
       } catch (Exception $e) { die ($e->getMessage()); }
       
-      TaskList::Event("Global DB Collation is: ".$this->Config->Get('Database.ExtendedProperties.Collate'));
-      
-      
       $this->Completed = $this->NumClients = 0;
       $this->Clients = $ClientDir;
       $this->Tasks = array();
