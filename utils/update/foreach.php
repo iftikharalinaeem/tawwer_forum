@@ -511,11 +511,14 @@ abstract class Task {
       return ($Result == 'TRUE') ? TRUE : FALSE;
    }
    
-   protected function Request($RelativeURL, $QueryParams = array()) {
+   protected function Request($RelativeURL, $QueryParams = array(), $Absolute = FALSE) {
       $FollowRedirects = TRUE;
       $Timeout = $this->C('Garden.SocketTimeout', 2.0);
       
-      $Url = 'http://'.$this->ClientFolder.'/'.ltrim($RelativeURL,'/').'?'.http_build_query($QueryParams);
+      if (!$Absolute)
+         $Url = 'http://'.$this->ClientFolder.'/'.ltrim($RelativeURL,'/').'?'.http_build_query($QueryParams);
+      else
+         $Url = $RelativeURL;
       
       $UrlParts = parse_url($Url);
       $Scheme = GetValue('scheme', $UrlParts, 'http');
@@ -635,7 +638,7 @@ abstract class Task {
          if (in_array($Code, array(301,302))) {
             if (array_key_exists('Location', $ResponseHeaders)) {
                $Location = GetValue('Location', $ResponseHeaders);
-               return ProxyRequest($Location, $OriginalTimeout, $FollowRedirects);
+               return $this->Request($Location, $QueryParams, TRUE);
             }
          }
       }
