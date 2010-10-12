@@ -140,10 +140,25 @@ class TaskList {
       TaskList::MajorEvent("Running client list, chunked by '{$ChunkRule}'...");
       switch ($ChunkRule) {
          case 'alphabet':
+         case 'alfast':
             $Chunks = array();
-            $Chunks[] = '-';
-            $Chunks[] = '[0-9]';
-            $Chunks = array_merge($Chunks, range('a','z'));
+            if ($ChunkRule == 'alphabet') {
+               $Chunks[] = '-';
+               $Chunks[] = '[0-9]';
+               $Chunks = array_merge($Chunks, range('a','z'));
+            }
+            
+            if ($ChunkRule == 'alfast') {
+               $ChunkRules = explode(',',$argv[4]);
+               foreach ($ChunkRules as $FastChunkRule) {
+                  if (strlen($FastChunkRule) == 1)
+                     $Chunks[] = $FastChunkRule
+                  else {
+                     $RangeSplit = explode('::');
+                     $Chunks = array_merge($Chunks, range($RangeSplit[0],$RangeSplit[1]));
+                  }
+               }
+            }
             
             foreach ($Chunks as $ChunkIndex => $Chunk) {
                $ChunkRegex = "/^({$Chunk}.*)\$/i";
