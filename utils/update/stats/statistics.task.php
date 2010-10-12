@@ -74,6 +74,7 @@ class StatisticsTask extends Task {
       TaskList::MinorEvent("Catchup ({$TrackType}/{$Type}) ", TaskList::NOBREAK);
       
       $FirstDate = mysql_query("SELECT DateInserted FROM GDN_{$Type} 
+         WHERE DateInserted > '1976-01-01'
          ORDER BY DateInserted ASC LIMIT 1 OFFSET 0", $this->Database);
       if (!mysql_num_rows($FirstDate)) return TRUE;
       $FirstDate = mysql_fetch_assoc($FirstDate); $FirstDate = $FirstDate['DateInserted'];
@@ -111,7 +112,7 @@ class StatisticsTask extends Task {
          $NextHourValue = strtotime($NextHour);
       } while ($NextHourValue <= $FinalBlockValue);
       $this->CachedTrackEvent($TrackType, 'none', NULL, NULL);
-      TaskList::MinorEvent("completed");
+      TaskList::Event("completed");
       
       return TRUE;
    }
