@@ -131,8 +131,6 @@ pageTracker._trackPageview();
       }
    }
    
-   /**
-   
    public function PluginController_ForceEnablePlugin_Create($Sender) {
       $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
       
@@ -182,6 +180,8 @@ pageTracker._trackPageview();
       }
       die();
    }
+   
+   /**
     * Creates a "Create a New Forum" page where users can do just that.
     */
    public function PluginController_CreateForum_Create(&$Sender, $EventArguments) {
