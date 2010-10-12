@@ -534,8 +534,14 @@ abstract class Task {
       
       if (!$Absolute)
          $Url = 'http://'.$this->ClientFolder.'/'.ltrim($RelativeURL,'/').'?'.http_build_query($QueryParams);
-      else
+      else {
          $Url = $RelativeURL;
+         if (stristr($RelativeURL, '?'))
+            $Url .= '&';
+         else
+            $Url .= '?';
+         $Url .= http_build_query($QueryParams);
+      }
       
       $UrlParts = parse_url($Url);
       $Scheme = GetValue('scheme', $UrlParts, 'http');
@@ -567,6 +573,7 @@ abstract class Task {
          curl_setopt($Handler, CURLOPT_HEADER, 1);
          curl_setopt($Handler, CURLOPT_USERAGENT, GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
+         curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
          if ($Cookie != '')
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
          
