@@ -20,7 +20,7 @@ class StatisticsTask extends Task {
    }
 
    protected function Run() {
-      TaskList::Event("Updating site stats... ", TaskList::NOBREAK);
+      TaskList::Event("Updating site stats... ");
       $SiteID = isset($this->ClientInfo['SiteID']) ? $this->ClientInfo['SiteID'] : FALSE;
       if ($SiteID === FALSE) {
          TaskList::Event("site not found");
@@ -60,7 +60,7 @@ class StatisticsTask extends Task {
       }
       
       if ($Success)
-         TaskList::Event("complete");
+         TaskList::Event("Update complete");
 
       // Select vfcom again.
       mysql_select_db(DATABASE_MAIN, $this->Database);
@@ -71,6 +71,7 @@ class StatisticsTask extends Task {
    protected function CatchupGeneric($TrackType) {
 
       $Type = $this->TrackedItems[$TrackType];
+      TaskList::MinorEvent("Catchup ({$TrackType}/{$Type}) ", TaskList::NOBREAK);
       
       $FirstDate = mysql_query("SELECT DateInserted FROM GDN_{$Type} 
          ORDER BY DateInserted ASC LIMIT 1 OFFSET 0", $this->Database);
@@ -84,6 +85,8 @@ class StatisticsTask extends Task {
             
       $LastHour = self::DateFormatByResolution($LastDate, self::RESOLUTION_HOUR);
       $LastHourValue = strtotime($LastHour);
+      
+      echo "{$FirstDate} - {$LastDate}...";
       
       $FinalBlock = self::NextDate($LastHour, self::RESOLUTION_HOUR);
       $FinalBlockValue = strtotime($FinalBlock);
@@ -108,6 +111,7 @@ class StatisticsTask extends Task {
          $NextHourValue = strtotime($NextHour);
       } while ($NextHourValue <= $FinalBlockValue);
       $this->CachedTrackEvent($TrackType, 'none', NULL, NULL);
+      TaskList::MinorEvent("completed");
       
       return TRUE;
    }
