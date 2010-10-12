@@ -460,12 +460,14 @@ abstract class Task {
    }
    
    protected function TokenAuthentication() {
-      $RandomDataStream = fopen('/dev/random','r');
-      $RandomData = fread($RandomDataStream, 32);
-      $TokenString = md5($RandomData);
+      $TokenString = md5(RandomString(32).microtime(true));
       
       $EnabledAuthenticators = $this->C('Garden.Authenticator.EnabledSchemes',array());
-      if (!is_array($EnabledAuthenticators) || !sizeof($EnabledAuthenticators)) return FALSE;
+      if (!is_array($EnabledAuthenticators) || !sizeof($EnabledAuthenticators)) {
+         TaskList::Event("Failed to read current authenticator list from config");
+         return FALSE;
+      }
+      
       if (!in_array('token', $EnabledAuthenticators)) {
          $EnabledAuthenticators[] = 'token';
          $this->SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledAuthenticators);
@@ -690,4 +692,14 @@ function GetValue($Key, &$Collection, $Default = FALSE, $Remove = FALSE) {
    }
 		
    return $Result;
+}
+
+function RandomString($Length, $Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
+   $CharLen = strlen($Characters) - 1;
+   $String = '' ;
+   for ($i = 0; $i < $Length; ++$i) {
+     $Offset = rand() % $CharLen;
+     $String .= substr($Characters, $Offset, 1);
+   }
+   return $String;
 }
