@@ -48,7 +48,7 @@ class StatisticsTask extends Task {
       foreach ($this->TrackedItems as $TrackType => $TrackTable) {
                
          try {
-            $Status = $this->CatchupGeneric($TrackedItem, $Response);
+            $Status = $this->CatchupGeneric($TrackType);
             if (!$Status)
                throw new Exception();
 
