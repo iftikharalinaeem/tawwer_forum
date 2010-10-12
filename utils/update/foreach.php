@@ -458,6 +458,170 @@ abstract class Task {
          $this->Config->Load($this->ConfigFile, 'Use');
       return $Result;
    }
+   
+   protected function TokenAuthentication() {
+      $RandomDataStream = fopen('/dev/random','r');
+      $RandomData = fread($RandomDataStream, 32);
+      $TokenString = md5($RandomData);
+      
+      $EnabledAuthenticators = $this->C('Garden.Authenticator.EnabledSchemes');
+      if (!in_array('token', $EnabledAuthenticators)) {
+         $EnabledAuthenticators[] = 'token';
+         $this->SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledAuthenticators);
+      }
+      
+      $this->SaveToConfig('Garden.Authenticators.token.Token', $TokenString);
+      $this->SaveToConfig('Garden.Authenticators.token.Expiry', date('Y-m-d H:i:s',time()+30));
+   }
+   
+   protected function EnablePlugin($PluginName) {
+      $Token = $this->TokenAuthentication();
+      $Result = $this->Request('plugin/forceenableplugin/'.$PluginName,array(
+         'token'  => $Token
+      ));
+      
+      return ($Result == 'TRUE') ? TRUE : FALSE;
+   }
+   
+   protected function DisablePlugin($PluginName) {
+      $Token = $this->TokenAuthentication();
+      $Result = $this->Request('plugin/forcedisableplugin/'.$PluginName,array(
+         'token'  => $Token
+      ));
+      
+      return ($Result == 'TRUE') ? TRUE : FALSE;
+   }
+   
+   protected function Request($RelativeURL, $QueryParams = array()) {
+      $Timeout = C('Garden.SocketTimeout', 2.0);
+      
+      $Url = 'http://'.$this->ClientFolder.'/'.ltrim($RelativeURL,'/').'?'.http_build_query($QueryParams);
+      
+      $UrlParts = parse_url($Url);
+      $Scheme = GetValue('scheme', $UrlParts, 'http');
+      $Host = GetValue('host', $UrlParts, '');
+      $Port = GetValue('port', $UrlParts, '80');
+      $Path = GetValue('path', $UrlParts, '');
+      $Query = GetValue('query', $UrlParts, '');
+      // Get the cookie.
+      $Cookie = '';
+      $EncodeCookies = TRUE;
+      
+      foreach($_COOKIE as $Key => $Value) {
+         if(strncasecmp($Key, 'XDEBUG', 6) == 0)
+            continue;
+         
+         if(strlen($Cookie) > 0)
+            $Cookie .= '; ';
+            
+         $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
+         $Cookie .= "{$Key}={$EValue}";
+      }
+      $Response = '';
+      if (function_exists('curl_init')) {
+         
+         //$Url = $Scheme.'://'.$Host.$Path;
+         $Handler = curl_init();
+         curl_setopt($Handler, CURLOPT_URL, $Url);
+         curl_setopt($Handler, CURLOPT_PORT, $Port);
+         curl_setopt($Handler, CURLOPT_HEADER, 1);
+         curl_setopt($Handler, CURLOPT_USERAGENT, ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
+         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
+         if ($Cookie != '')
+            curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
+         
+         // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above
+         // 
+         //if ($Query != '') {
+         //   curl_setopt($Handler, CURLOPT_POST, 1);
+         //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
+         //}
+         
+         $Response = curl_exec($Handler);
+         $Success = TRUE;
+         if ($Response == FALSE) {
+            $Success = FALSE;
+            $Response = curl_error($Handler);
+         }
+         
+         curl_close($Handler);
+      } else if (function_exists('fsockopen')) {
+         $Referer = Gdn_Url::WebRoot(TRUE);
+      
+         // Make the request
+         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
+         if (!$Pointer)
+            throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+   
+         if(strlen($Cookie) > 0)
+            $Cookie = "Cookie: $Cookie\r\n";
+         
+         $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
+         $Header = "GET $Path?$Query HTTP/1.1\r\n"
+            ."Host: {$HostHeader}\r\n"
+            // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
+            // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
+            ."User-Agent: ".ArrayValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
+            ."Accept: */*\r\n"
+            ."Accept-Charset: utf-8;\r\n"
+            ."Referer: {$Referer}\r\n"
+            ."Connection: close\r\n";
+            
+         if ($Cookie != '')
+            $Header .= $Cookie;
+         
+         $Header .= "\r\n";
+         
+         // Send the headers and get the response
+         fputs($Pointer, $Header);
+         while ($Line = fread($Pointer, 4096)) {
+            $Response .= $Line;
+         }
+         @fclose($Pointer);
+         $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
+         $Success = TRUE;
+      } else {
+         throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
+      }
+      
+      if (!$Success)
+         return $Response;
+      
+      $ResponseHeaderData = trim(substr($Response, 0, strpos($Response, "\r\n\r\n")));
+      $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
+      
+      $ResponseHeaderLines = explode("\n",trim($ResponseHeaderData));
+      $Status = array_shift($ResponseHeaderLines);
+      $ResponseHeaders = array();
+      $ResponseHeaders['HTTP'] = trim($Status);
+      
+      /* get the numeric status code. 
+       * - trim off excess edge whitespace, 
+       * - split on spaces, 
+       * - get the 2nd element (as a single element array), 
+       * - pop the first (only) element off it... 
+       * - return that.
+       */
+      $ResponseHeaders['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
+      foreach ($ResponseHeaderLines as $Line) {
+         $Line = explode(':',trim($Line));
+         $Key = trim(array_shift($Line));
+         $Value = trim(implode(':',$Line));
+         $ResponseHeaders[$Key] = $Value;
+      }
+      
+      if ($FollowRedirects) { 
+         $Code = GetValue('StatusCode',$ResponseHeaders, 200);
+         if (in_array($Code, array(301,302))) {
+            if (array_key_exists('Location', $ResponseHeaders)) {
+               $Location = GetValue('Location', $ResponseHeaders);
+               return ProxyRequest($Location, $OriginalTimeout, $FollowRedirects);
+            }
+         }
+      }
+      
+      return $Response;
+   }
 
    protected function C($Name = FALSE, $Default = FALSE) {
       if (is_null($this->ClientInfo)) return;
