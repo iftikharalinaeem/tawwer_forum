@@ -149,7 +149,7 @@ class TaskList {
             }
             
             if ($ChunkRule == 'alfast') {
-               $ChunkRules = explode(',',$argv[4]);
+               $ChunkRules = explode(',',array_pop($GLOBALS['argv']));
                foreach ($ChunkRules as $FastChunkRule) {
                   if (strlen($FastChunkRule) == 1)
                      $Chunks[] = $FastChunkRule;
