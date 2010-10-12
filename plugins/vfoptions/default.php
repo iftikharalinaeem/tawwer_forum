@@ -10,7 +10,17 @@ $PluginInfo['vfoptions'] = array(
    'AuthorUrl' => 'http://vanillaforums.com'
 );
 
+Gdn_LibraryMap::SafeCache('library','class.tokenauthenticator.php',dirname(__FILE__).DS.'class.tokenauthenticator.php');
 class VFOptionsPlugin implements Gdn_IPlugin {
+
+   public function __construct() {
+      Gdn::Authenticator()->EnableAuthenticationScheme('token');
+   }
+   
+   // Make sure token authenticator is never activated as the primary authentication scheme
+   public function AuthenticationController_EnableAuthenticatorToken_Handler(&$Sender) {
+      Gdn::Authenticator()->UnsetDefaultAuthenticator('token');
+   }
 
 /*
    This plugin should:
@@ -188,6 +198,56 @@ pageTracker._trackPageview();
       }
    }
     */
+   
+   public function PluginController_ForceEnablePlugin_Create($Sender) {
+      $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
+      
+      try {
+         if (!Gdn::Session()->IsValid() || !GetValue('Token',Gdn::Session()->User, FALSE))
+            throw new Exception('FALSE');
+         
+         // Retrieve all available plugins from the plugins directory
+         $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins;
+         $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
+         
+         list($PluginName) = $Sender->RequestArgs;
+         if (array_key_exists($PluginName, $this->AvailablePlugins) && !array_key_exists($PluginName, $this->EnabledPlugins)) {
+            Gdn::PluginManager()->EnablePlugin($PluginName);
+            throw new Exception('TRUE');
+         }
+         throw new Exception('FALSE');
+         
+      } catch(Exception $e) {
+         $Sender->Finalize();
+         echo $e->getMessage();
+      }
+      die();
+   }
+   
+   public function PluginController_ForceDisablePlugin_Create($Sender) {
+      $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
+      
+      try {
+         if (!Gdn::Session()->IsValid() || !GetValue('Token',Gdn::Session()->User, FALSE)) 
+            throw new Exception('FALSE');
+         
+         // Retrieve all available plugins from the plugins directory
+         $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins;
+         $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
+         
+         list($PluginName) = $Sender->RequestArgs;
+         if (array_key_exists($PluginName, $this->EnabledPlugins)) {
+            Gdn::PluginManager()->DisablePlugin($PluginName);
+            throw new Exception('TRUE');
+         }
+         throw new Exception('FALSE');
+         
+      } catch(Exception $e) {
+         $Sender->Finalize();
+         echo $e->getMessage();
+      }
+      die();
+   }
    
    /**
     * Creates a "Create a New Forum" page where users can do just that.
