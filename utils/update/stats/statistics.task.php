@@ -96,8 +96,8 @@ class StatisticsTask extends Task {
       do {
          $NextHour = self::NextDate($CurrentHour, self::RESOLUTION_HOUR);
          $ItemResult = mysql_query("SELECT COUNT(DateInserted) AS Hits FROM GDN_{$Type} WHERE
-            DateInserted >= '{$CurrentHour} AND
-            DateInserted < '{$NextHour}''", $this->Database);
+            DateInserted >= '{$CurrentHour}' AND
+            DateInserted < '{$NextHour}'", $this->Database);
 
          if (mysql_num_rows($ItemResult)) {
             $Item = mysql_fetch_assoc($ItemResult); $Hits = $Item['Hits'];
