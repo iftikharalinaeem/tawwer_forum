@@ -100,8 +100,8 @@ class StatisticsTask extends Task {
             DateInserted < '{$NextHour}'", $this->Database);
 
          if (mysql_num_rows($ItemResult)) {
-            $Item = mysql_fetch_assoc($ItemResult); $Hits = $Item['Hits'];
-            $this->CachedTrackEvent($TrackType, 'none', $CurrentHour, $Items['Hits']);
+            $Item = mysql_fetch_assoc($ItemResult); $Hits = GetValue('Hits',$Item, 0);
+            $this->CachedTrackEvent($TrackType, 'none', $CurrentHour, $Hits);
          }
          
          $CurrentHour = $NextHour;
