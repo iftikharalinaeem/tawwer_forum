@@ -156,7 +156,7 @@ class TaskList {
                   if (strlen($FastChunkRule) == 1)
                      $Chunks[] = $FastChunkRule;
                   else {
-                     $RangeSplit = explode('::');
+                     $RangeSplit = explode('::', $FastChunkRule);
                      $Chunks = array_merge($Chunks, range($RangeSplit[0],$RangeSplit[1]));
                   }
                }
