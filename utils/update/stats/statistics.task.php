@@ -229,7 +229,7 @@ class StatisticsTask extends Task {
             DateRangeEnd,
             DateRangeType,
             IndexValue,
-            DateUpdate
+            DateUpdated
          ) VALUES (
             '{$Type}',
             '{$Qualifier}',
