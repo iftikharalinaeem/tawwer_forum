@@ -4,6 +4,7 @@ $(function() {
       inIframe = top !== self,
       inDashboard = gdn.definition('InDashboard', '') != '',
       remoteUrl = gdn.definition('RemoteUrl', ''),
+      forceRemoteUrl = gdn.definition('ForceRemoteUrl', '') != '',
       webroot = gdn.definition('WebRoot'),
       pathroot = gdn.definition('UrlFormat').replace('/{Path}', '').replace('{Path}', '');
       
@@ -17,30 +18,36 @@ $(function() {
          }
       } else {
          var messages = [];
-         // set the new location after the poll has had a chance to do it's thing.
+   
+         messageUrl = function(message) {
+            var id = Math.floor(Math.random() * 100000);
+            if (remoteUrl.substr(-1))
+               remoteUrl += '/';
+               
+            return remoteUrl + "/poll.html#poll:" + id + ":" + message;
+         }
+        
+         remotePostMessage = function(message, target) {
+            messages.push(message);
+         }
+        
          setLocation = function(newLocation) {
             if (messages.length == 0)
                parent.window.frames[0].location.replace(newLocation);
+            else {
+               setTimeout(function(){
+                  setLocation(newLocation);
+               },500);
             }
-   
-            remotePostMessage = function(message, target) {
-               messages.push(message);
-            }
-           
-            function messageUrl(message) {
-               // alert('messageUrl: '+message);
-               var id = Math.floor(Math.random() * 100000);
-               return webroot + "/plugins/embedvanilla/poll.html#poll:" + id + ":" + message;
-            }
-           
-            function setMessage() {
-               if (messages.length == 0)
-                  return;
-               
-               var message = messages.splice(0, 1)[0];
-               // alert('setmessage: '+message);
-               document.getElementById('messageFrame').src = messageUrl(message);
-            }
+         }
+         
+         setMessage = function() {
+            if (messages.length == 0)
+               return;
+            
+            var message = messages.splice(0, 1)[0];
+            document.getElementById('messageFrame').src = messageUrl(message);
+         }
            
          $(function() {
             var body = document.getElementsByTagName("body")[0],
@@ -58,7 +65,7 @@ $(function() {
    }
 
    // If not embedded and we should be, redirect to the embedded version.
-   if (!inIframe && remoteUrl != '') {
+   if (!inIframe && forceRemoteUrl && remoteUrl != '') {
       var path = document.location.toString().substr(webroot.length);
       var hashIndex = path.indexOf('#');
       if (hashIndex > -1)
@@ -71,7 +78,7 @@ $(function() {
 
    // hijack all anchors to see if they should go to "top" or be within the embed (ie. are they in Vanilla or not?)
    if (inIframe) {
-      function setHeight() {
+      setHeight = function() {
          var newHeight = document.body.offsetHeight;
          if (newHeight != currentHeight) {
             currentHeight = newHeight;
@@ -97,6 +104,7 @@ $(function() {
                hash = path.substr(hashIndex);
                path = path.substr(0, hashIndex);
             }
+            
             remotePostMessage('location:' + path, '*');
             setLocation(pathroot + path + hash);
             return false;

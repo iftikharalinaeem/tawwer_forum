@@ -490,3 +490,7 @@ div.UserSpoiler div.SpoilerText {
 div.User h1 {
 	color: #fff;
 }
+
+body ul div.Comment blockquote.UserQuote {
+   background-color: #555555;
+}

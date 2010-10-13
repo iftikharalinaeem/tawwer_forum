@@ -51,6 +51,7 @@ $RecommendedThemeName = 'Embed-Friendly';
          echo Anchor('find more themes at VanillaForums.org.', 'http://vanillaforums.org/addons');
       ?></em>
    </div><?php
+   $this->FireEvent('BeforeEmbedRecommend');
    // Has the user applied the recommended theme?
    if ($this->Data('EnabledThemeName') != $RecommendedThemeName) {
    ?><div class="EmbedRecommend">
@@ -73,22 +74,30 @@ $RecommendedThemeName = 'Embed-Friendly';
       if ($HasRecommendedTheme)
          echo Anchor(T('Click here to apply it.'), 'plugin/embed/'.$RecommendedThemeFolder.'/'.$Session->TransientKey());
       else
-         echo Anchor(T('Click here to get it.'), '#');
+         echo Anchor(T('Click here to get it.'), 'http://vanillaforums.org/addons');
       
       ?></em>
    </div>
    <?php } ?>
 </div>
-<?php if (C('Plugins.EmbedVanilla.RemoteUrl')) { ?>
-<div class="Info">
-   <?php echo T('The forum will force itself to be viewed from the Remote Url.'); ?>
-</div>
-<?php echo $this->Form->Errors(); ?>
+<?php
+if (C('Plugins.EmbedVanilla.RemoteUrl')) {
+   echo Wrap(T('The "Remote Url" is the web address of the place where your embedded forum should be viewed from.'), 'div', array('class' => 'Info'));
+
+echo $this->Form->Errors();
+?>
 <ul class="RemoteSettings">
+   <li>
+      <?php
+      echo Wrap(T('Remote Url'), 'strong');
+      echo $this->Form->CheckBox('Plugins.EmbedVanilla.ForceRemoteUrl', "Force your forum to be viewed through the Remote Url");
+      ?>
+   </li>
    <li>
       <?php
          echo $this->Form->Label('Remote Url to Forum', 'Plugins.EmbedVanilla.RemoteUrl');
          echo $this->Form->TextBox('Plugins.EmbedVanilla.RemoteUrl');
+         echo ' '.Anchor('View Page', C('Plugins.EmbedVanilla.RemoteUrl'), 'SmallButton', array('target' => '_blank'));
       ?><span>For SEO purposes, search engine crawlers are excluded from being forced to view the forum in the remote url.</span>
    </li>
 </ul>

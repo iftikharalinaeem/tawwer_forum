@@ -5,7 +5,7 @@
    <h3><?php echo T('Proxy Connect'); ?></h3>
    <div class="Info">
       <div class="ProxyConnectInfo">
-         <?php echo T('This authenticator allows users from your remote application or website to be automatically registered and signed into Vanilla. For a detailed explanation of how Proxy Connect works, please <a href="http://vanillaforums.org/page/signlesignon">read our documentation</a>.'); ?>
+         <?php echo T('This authenticator allows users from your remote application or website to be automatically registered and signed into Vanilla. For a detailed explanation of how Proxy Connect works, please <a href="http://vanillaforums.org/page/singlesignon">read our documentation</a>.'); ?>
          <?php echo T('Proxy Connect ships with several pre-built <b>Remote Integration Managers</b>, each designed to automate the setup process. If your remote application is listed in the dropdown below, select it now, otherwise choose "Manual Setup".'); ?>
          <div class="IntegrationChooser">
             <?php

@@ -178,8 +178,7 @@ class ProxyConnectWordpressPlugin extends Gdn_Plugin {
          GetValue('AuthenticateUrl', $Provider) == NULL ||
          GetValue('RegisterUrl', $Provider) == NULL ||
          GetValue('SignInUrl', $Provider) == NULL ||
-         GetValue('SignOutUrl', $Provider) == NULL ||
-         C('Garden.Authenticator.AuthenticateURL') == NULL
+         GetValue('SignOutUrl', $Provider) == NULL
       ) {
          return 'Exchange';
       }
