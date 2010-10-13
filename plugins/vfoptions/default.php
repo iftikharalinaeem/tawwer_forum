@@ -29,9 +29,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		if (strpos(Gdn::Request()->Domain(), 'vanilladev') !== FALSE)
          $Url = 'https://www.vanilladev.com/account/';
 
-		echo Anchor('Help', '#', 'HelpLink');
       echo Anchor('My Account', $Url, 'MyAccountLink');
-		
    }
    
    /**
