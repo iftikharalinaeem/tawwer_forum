@@ -95,6 +95,27 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
       $Sender->Render(PATH_PLUGINS.'/embedvanilla/views/settings.php');
    }
 	
+	public function PluginController_Gadget_Create($Sender) {
+		echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
+<Module>
+  <ModulePrefs title=\"Discussions\" 
+    title_url=\"http://vanillaforums.org/\" 
+    scrolling=\"true\"
+    author=\"Mark O'Sullivan\" 
+    author_email=\"mark@vanillaforums.com\"
+    height=\"500\">
+    <Require feature=\"dynamic-height\"/>
+  </ModulePrefs>
+  <Content type=\"html\">
+  <![CDATA[
+  <script type=\"text/javascript\" src=\"".Url('plugins/embedvanilla/remote.js', TRUE)."\"></script>
+  ]]>
+  </Content>
+</Module>";
+		$Sender->Finalize();
+		die();
+	}
+	
    public function Setup() {
       // Nothing to do here!
    }

@@ -25,8 +25,7 @@ $RecommendedThemeName = 'Embed-Friendly';
       <em>Use these custom-built plugins to embed the forum into various other applications without the need to touch any code.</em>
       <ul>
          <li><?php echo Anchor(T('WordPress Plugin'), 'plugins/embedvanilla/plugins/wordpress.zip', 'WordPress'); ?></li>
-         <li><?php echo Anchor(T('Blogger Gadget'), 'plugins/embedvanilla/plugins/blogger.zip', 'Blogger'); ?></li>
-         <li><?php echo Anchor(T('Drupal Plugin'), 'plugins/embedvanilla/plugins/drupal.zip', 'Drupal'); ?></li>
+         <li><?php echo Anchor(T('Blogger Gadget'), 'plugin/gadget', 'Blogger'); ?></li>
       </ul>
    </div>
 </div>
