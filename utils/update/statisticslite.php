@@ -11,12 +11,9 @@ define('DATABASE_USER', 'root');
 define('DATABASE_PASSWORD', 'Va2aWu5A');
 define('DATABASE_MAIN', 'vfcom');
 
-define("FAST", ($argc > 2 && $argv[2] == 'fast') ? TRUE : FALSE);
-define("VERYFAST", ($argc > 3 && $argv[3] == 'fast') ? TRUE : FALSE);
-
 if ($argc < 2) exit();
 
 $Tasks = new TaskList('stats','/srv/www/vhosts');
-$Tasks->RunChunked($argv[1], array(
+$Tasks->RunClientFromCLI($argv[1], array(
    'statistics'
 ));

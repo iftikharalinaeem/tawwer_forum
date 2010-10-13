@@ -5,9 +5,13 @@ define('APPLICATION', 'VanillaUpdate');
 // Represents a config file
 require_once("configuration.php");
 
+define('PATH_CACHE', '/cache');
+
 class TaskList {
 
    const NOBREAK = FALSE;
+   const CONFIGDEFAULTS = '/srv/www/vanillaforumscom/conf/config-defaults.php';
+   const CONFIG = '/srv/www/vanillaforumscom/conf/config.php';
    
    public $GroupData;
    protected $Clients;
@@ -19,13 +23,10 @@ class TaskList {
    protected $Completed;
    
    public function __construct($UserTaskDirs, $ClientDir) {
-   
-      $ConfigDefaultsFile = '/srv/www/vanillaforumscom/conf/config-defaults.php';
-      $ConfigFile = '/srv/www/vanillaforumscom/conf/config.php';
       $this->Config = new Configuration();
       try {
-         $this->Config->Load($ConfigDefaultsFile, 'Use');
-         $this->Config->Load($ConfigFile, 'Use');
+         $this->Config->Load(TaskList::CONFIGDEFAULTS, 'Use');
+         $this->Config->Load(TaskList::CONFIG, 'Use');
       } catch (Exception $e) { die ($e->getMessage()); }
       
       $this->Completed = $this->NumClients = 0;
@@ -136,13 +137,30 @@ class TaskList {
    }
    
    public function RunChunked($ChunkRule, $TaskOrder) {
+      global $argv;
+      $args = $argv;
       TaskList::MajorEvent("Running client list, chunked by '{$ChunkRule}'...");
       switch ($ChunkRule) {
          case 'alphabet':
+         case 'alfast':
             $Chunks = array();
-            $Chunks[] = '-';
-            $Chunks[] = '[0-9]';
-            $Chunks = array_merge($Chunks, range('a','z'));
+            if ($ChunkRule == 'alphabet') {
+               $Chunks[] = '-';
+               $Chunks[] = '[0-9]';
+               $Chunks = array_merge($Chunks, range('a','z'));
+            }
+            
+            if ($ChunkRule == 'alfast') {
+               $ChunkRules = explode(',',array_pop($args));
+               foreach ($ChunkRules as $FastChunkRule) {
+                  if (strlen($FastChunkRule) == 1)
+                     $Chunks[] = $FastChunkRule;
+                  else {
+                     $RangeSplit = explode('::', $FastChunkRule);
+                     $Chunks = array_merge($Chunks, range($RangeSplit[0],$RangeSplit[1]));
+                  }
+               }
+            }
             
             foreach ($Chunks as $ChunkIndex => $Chunk) {
                $ChunkRegex = "/^({$Chunk}.*)\$/i";
@@ -406,9 +424,11 @@ abstract class Task {
       $this->ClientRoot = TaskList::CombinePaths($this->Root, $this->ClientFolder );
       $this->ClientInfo = $ClientInfo;
       
+      $this->ConfigDefaultsFile = TaskList::CombinePaths($this->ClientRoot,'conf/config-defaults.php');
       $this->ConfigFile = TaskList::CombinePaths($this->ClientRoot,'conf/config.php');
       $this->Config = new Configuration();
       try {
+         $this->Config->Load($this->ConfigDefaultsFile, 'Use');
          $this->Config->Load($this->ConfigFile, 'Use');
       } catch (Exception $e) { die ($e->getMessage()); }
 
@@ -458,6 +478,197 @@ abstract class Task {
          $this->Config->Load($this->ConfigFile, 'Use');
       return $Result;
    }
+   
+   protected function TokenAuthentication() {
+      $TokenString = md5(RandomString(32).microtime(true));
+      
+      $EnabledAuthenticators = $this->C('Garden.Authenticator.EnabledSchemes',array());
+      if (!is_array($EnabledAuthenticators) || !sizeof($EnabledAuthenticators)) {
+         TaskList::Event("Failed to read current authenticator list from config");
+         return FALSE;
+      }
+      
+      if (!in_array('token', $EnabledAuthenticators)) {
+         $EnabledAuthenticators[] = 'token';
+         $this->SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledAuthenticators);
+      }
+      
+      $this->SaveToConfig('Garden.Authenticators.token.Token', $TokenString);
+      $this->SaveToConfig('Garden.Authenticators.token.Expiry', date('Y-m-d H:i:s',time()+30));
+      return $TokenString;
+   }
+   
+   protected function EnablePlugin($PluginName) {
+      TaskList::Event("Enabling plugin '{$PluginName}'...", TaskList::NOBREAK);
+      try {
+         $Token = $this->TokenAuthentication();
+         if ($Token === FALSE) throw new Exception("could not generate token");
+         $Result = $this->Request('plugin/forceenableplugin/'.$PluginName,array(
+            'token'  => $Token
+         ));
+      } catch (Exception $e) {
+         $Result = 'msg: '.$e->getMessage();
+      }
+      TaskList::Event((($Result == "TRUE") ? "success" : "failure ({$Result})"));
+      return ($Result == 'TRUE') ? TRUE : FALSE;
+   }
+   
+   protected function DisablePlugin($PluginName) {
+      TaskList::Event("Disabling plugin '{$PluginName}'...", TaskList::NOBREAK);
+      try {
+         $Token = $this->TokenAuthentication();
+         if ($Token === FALSE) throw new Exception("could not generate token");
+         $Result = $this->Request('plugin/forcedisableplugin/'.$PluginName,array(
+            'token'  => $Token
+         ));
+      } catch (Exception $e) {
+         $Result = 'msg: '.$e->getMessage();
+      }
+      TaskList::Event((($Result == "TRUE") ? "success" : "failure ({$Result})"));
+      return ($Result == 'TRUE') ? TRUE : FALSE;
+   }
+   
+   protected function Request($RelativeURL, $QueryParams = array(), $Absolute = FALSE) {
+      $FollowRedirects = TRUE;
+      $Timeout = $this->C('Garden.SocketTimeout', 2.0);
+      
+      if (!$Absolute)
+         $Url = 'http://'.$this->ClientFolder.'/'.ltrim($RelativeURL,'/').'?'.http_build_query($QueryParams);
+      else {
+         $Url = $RelativeURL;
+         if (stristr($RelativeURL, '?'))
+            $Url .= '&';
+         else
+            $Url .= '?';
+         $Url .= http_build_query($QueryParams);
+      }
+      
+      $UrlParts = parse_url($Url);
+      $Scheme = GetValue('scheme', $UrlParts, 'http');
+      $Host = GetValue('host', $UrlParts, '');
+      $Port = GetValue('port', $UrlParts, '80');
+      $Path = GetValue('path', $UrlParts, '');
+      $Query = GetValue('query', $UrlParts, '');
+      // Get the cookie.
+      $Cookie = '';
+      $EncodeCookies = TRUE;
+      
+      foreach($_COOKIE as $Key => $Value) {
+         if(strncasecmp($Key, 'XDEBUG', 6) == 0)
+            continue;
+         
+         if(strlen($Cookie) > 0)
+            $Cookie .= '; ';
+            
+         $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
+         $Cookie .= "{$Key}={$EValue}";
+      }
+      $Response = '';
+      if (function_exists('curl_init')) {
+         
+         //$Url = $Scheme.'://'.$Host.$Path;
+         $Handler = curl_init();
+         curl_setopt($Handler, CURLOPT_URL, $Url);
+         curl_setopt($Handler, CURLOPT_PORT, $Port);
+         curl_setopt($Handler, CURLOPT_HEADER, 1);
+         curl_setopt($Handler, CURLOPT_USERAGENT, GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
+         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
+         curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
+         if ($Cookie != '')
+            curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
+         
+         // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above
+         // 
+         //if ($Query != '') {
+         //   curl_setopt($Handler, CURLOPT_POST, 1);
+         //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
+         //}
+         
+         $Response = curl_exec($Handler);
+         $Success = TRUE;
+         if ($Response == FALSE) {
+            $Success = FALSE;
+            $Response = curl_error($Handler);
+         }
+         
+         curl_close($Handler);
+      } else if (function_exists('fsockopen')) {
+         $Referer = Gdn_Url::WebRoot(TRUE);
+      
+         // Make the request
+         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
+         if (!$Pointer)
+            throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+   
+         if(strlen($Cookie) > 0)
+            $Cookie = "Cookie: $Cookie\r\n";
+         
+         $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
+         $Header = "GET $Path?$Query HTTP/1.1\r\n"
+            ."Host: {$HostHeader}\r\n"
+            // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
+            // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
+            ."User-Agent: ".GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
+            ."Accept: */*\r\n"
+            ."Accept-Charset: utf-8;\r\n"
+            ."Referer: {$Referer}\r\n"
+            ."Connection: close\r\n";
+            
+         if ($Cookie != '')
+            $Header .= $Cookie;
+         
+         $Header .= "\r\n";
+         
+         // Send the headers and get the response
+         fputs($Pointer, $Header);
+         while ($Line = fread($Pointer, 4096)) {
+            $Response .= $Line;
+         }
+         @fclose($Pointer);
+         $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
+         $Success = TRUE;
+      } else {
+         throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
+      }
+      
+      if (!$Success)
+         return $Response;
+      
+      $ResponseHeaderData = trim(substr($Response, 0, strpos($Response, "\r\n\r\n")));
+      $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
+      
+      $ResponseHeaderLines = explode("\n",trim($ResponseHeaderData));
+      $Status = array_shift($ResponseHeaderLines);
+      $ResponseHeaders = array();
+      $ResponseHeaders['HTTP'] = trim($Status);
+      
+      /* get the numeric status code. 
+       * - trim off excess edge whitespace, 
+       * - split on spaces, 
+       * - get the 2nd element (as a single element array), 
+       * - pop the first (only) element off it... 
+       * - return that.
+       */
+      $ResponseHeaders['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
+      foreach ($ResponseHeaderLines as $Line) {
+         $Line = explode(':',trim($Line));
+         $Key = trim(array_shift($Line));
+         $Value = trim(implode(':',$Line));
+         $ResponseHeaders[$Key] = $Value;
+      }
+      
+      if ($FollowRedirects) { 
+         $Code = GetValue('StatusCode',$ResponseHeaders, 200);
+         if (in_array($Code, array(301,302))) {
+            if (array_key_exists('Location', $ResponseHeaders)) {
+               $Location = GetValue('Location', $ResponseHeaders);
+               return $this->Request($Location, $QueryParams, TRUE);
+            }
+         }
+      }
+      
+      return $Response;
+   }
 
    protected function C($Name = FALSE, $Default = FALSE) {
       if (is_null($this->ClientInfo)) return;
@@ -499,4 +710,29 @@ abstract class Task {
       return TRUE;
    }
 
+}
+
+function GetValue($Key, &$Collection, $Default = FALSE, $Remove = FALSE) {
+	$Result = $Default;
+	if(is_array($Collection) && array_key_exists($Key, $Collection)) {
+		$Result = $Collection[$Key];
+      if($Remove)
+         unset($Collection[$Key]);
+	} elseif(is_object($Collection) && property_exists($Collection, $Key)) {
+		$Result = $Collection->$Key;
+      if($Remove)
+         unset($Collection->$Key);
+   }
+		
+   return $Result;
+}
+
+function RandomString($Length, $Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
+   $CharLen = strlen($Characters) - 1;
+   $String = '' ;
+   for ($i = 0; $i < $Length; ++$i) {
+     $Offset = rand() % $CharLen;
+     $String .= substr($Characters, $Offset, 1);
+   }
+   return $String;
 }
