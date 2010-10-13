@@ -51,6 +51,7 @@ $RecommendedThemeName = 'Embed-Friendly';
          echo Anchor('find more themes at VanillaForums.org.', 'http://vanillaforums.org/addons');
       ?></em>
    </div><?php
+   $this->FireEvent('BeforeEmbedRecommend');
    // Has the user applied the recommended theme?
    if ($this->Data('EnabledThemeName') != $RecommendedThemeName) {
    ?><div class="EmbedRecommend">
@@ -96,6 +97,7 @@ echo $this->Form->Errors();
       <?php
          echo $this->Form->Label('Remote Url to Forum', 'Plugins.EmbedVanilla.RemoteUrl');
          echo $this->Form->TextBox('Plugins.EmbedVanilla.RemoteUrl');
+         echo ' '.Anchor('View Page', C('Plugins.EmbedVanilla.RemoteUrl'), 'SmallButton', array('target' => '_blank'));
       ?><span>For SEO purposes, search engine crawlers are excluded from being forced to view the forum in the remote url.</span>
    </li>
 </ul>
