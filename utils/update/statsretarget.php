@@ -16,7 +16,13 @@ define("VERYFAST", ($argc > 3 && $argv[3] == 'fast') ? TRUE : FALSE);
 
 if ($argc < 2) exit();
 
-$Tasks = new TaskList('stats','/srv/www/vhosts');
+$Tasks = new TaskList(array(
+   'maintain',
+   'stats'
+),'/srv/www/vhosts');
 $Tasks->RunChunked($argv[1], array(
+   'backup',
+   'uncache',
+   'filesystem',
    'statistics'
 ));

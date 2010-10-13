@@ -1,7 +1,7 @@
 <?php
 class StatisticsTask extends Task {
 
-   protected $TrackedItem = array(
+   protected $TrackedItems = array(
       'comments'        => 'Comment',
       'discussions'     => 'Discussion',
       'registrations'   => 'User'
@@ -20,7 +20,7 @@ class StatisticsTask extends Task {
    }
 
    protected function Run() {
-      TaskList::Event("Updating site stats... ", TaskList::NOBREAK);
+      TaskList::Event("Updating site stats... ");
       $SiteID = isset($this->ClientInfo['SiteID']) ? $this->ClientInfo['SiteID'] : FALSE;
       if ($SiteID === FALSE) {
          TaskList::Event("site not found");
@@ -46,9 +46,9 @@ class StatisticsTask extends Task {
 
       $Success = TRUE;
       foreach ($this->TrackedItems as $TrackType => $TrackTable) {
-               
+         TaskList::MinorEvent("Catchup ({$TrackType}/{$TrackTable}) ", TaskList::NOBREAK); 
          try {
-            $Status = $this->CatchupGeneric($TrackedItem, $Response);
+            $Status = $this->CatchupGeneric($TrackType);
             if (!$Status)
                throw new Exception();
 
@@ -57,10 +57,11 @@ class StatisticsTask extends Task {
             $Success = FALSE;
             break;
          }
+         TaskList::Event("completed");
       }
       
       if ($Success)
-         TaskList::Event("complete");
+         TaskList::Event("Update complete");
 
       // Select vfcom again.
       mysql_select_db(DATABASE_MAIN, $this->Database);
@@ -73,17 +74,20 @@ class StatisticsTask extends Task {
       $Type = $this->TrackedItems[$TrackType];
       
       $FirstDate = mysql_query("SELECT DateInserted FROM GDN_{$Type} 
-         ORDER BY DateInserted ASC OFFSET 0 LIMIT 1", $this->Database);
+         WHERE DateInserted > '1976-01-01'
+         ORDER BY DateInserted ASC LIMIT 1 OFFSET 0", $this->Database);
       if (!mysql_num_rows($FirstDate)) return TRUE;
       $FirstDate = mysql_fetch_assoc($FirstDate); $FirstDate = $FirstDate['DateInserted'];
       
       $LastDate = mysql_query("SELECT DateInserted FROM GDN_{$Type} 
-         ORDER BY DateInserted ASC OFFSET 0 LIMIT 1", $this->Database);
+         ORDER BY DateInserted DESC LIMIT 1 OFFSET 0", $this->Database);
       if (!mysql_num_rows($LastDate)) return TRUE;
       $LastDate = mysql_fetch_assoc($LastDate); $LastDate = $LastDate['DateInserted'];
             
       $LastHour = self::DateFormatByResolution($LastDate, self::RESOLUTION_HOUR);
       $LastHourValue = strtotime($LastHour);
+      
+      echo "{$FirstDate} - {$LastDate}...";
       
       $FinalBlock = self::NextDate($LastHour, self::RESOLUTION_HOUR);
       $FinalBlockValue = strtotime($FinalBlock);
@@ -96,12 +100,12 @@ class StatisticsTask extends Task {
       do {
          $NextHour = self::NextDate($CurrentHour, self::RESOLUTION_HOUR);
          $ItemResult = mysql_query("SELECT COUNT(DateInserted) AS Hits FROM GDN_{$Type} WHERE
-            DateInserted >= '{$CurrentHour} AND
-            DateInserted < '{$NextHour}''", $this->Database);
+            DateInserted >= '{$CurrentHour}' AND
+            DateInserted < '{$NextHour}'", $this->Database);
 
          if (mysql_num_rows($ItemResult)) {
-            $Item = mysql_fetch_assoc($ItemResult); $Hits = $Item['Hits'];
-            $this->CachedTrackEvent($TrackType, 'none', $CurrentHour, $Items['Hits']);
+            $Item = mysql_fetch_assoc($ItemResult); $Hits = GetValue('Hits',$Item, 0);
+            $this->CachedTrackEvent($TrackType, 'none', $CurrentHour, $Hits);
          }
          
          $CurrentHour = $NextHour;
@@ -192,7 +196,7 @@ class StatisticsTask extends Task {
       }
    }
    
-   public static function TrackItem($Type, $Qualifier, $Datetime, $Range, $Amount = 1) {
+   public function TrackItem($Type, $Qualifier, $Datetime, $Range, $Amount = 1) {
       if (!is_int($Amount))
          throw new Exception("Tried to add non-integer tracking quantity '{$Amount}' to '{$Type}:{$Qualifier}'");
       
@@ -222,14 +226,14 @@ class StatisticsTask extends Task {
       }
       
       try {
-         $Rows = mysql_query("INSERT INTO GDN_Statistics (
+         $RowQuery = "INSERT INTO GDN_Statistics (
             IndexType,
             IndexQualifier,
             DateRangeStart,
             DateRangeEnd,
             DateRangeType,
             IndexValue,
-            DateUpdate
+            DateUpdated
          ) VALUES (
             '{$Type}',
             '{$Qualifier}',
@@ -238,8 +242,9 @@ class StatisticsTask extends Task {
             '{$Range}',
             '{$Amount}',
             '".date('Y-m-d H:i:s')."'
-         )", $this->Database);
-         if (!mysql_affected_rows($Rows))
+         )";
+         mysql_query($RowQuery, $this->Database);
+         if (!mysql_affected_rows($this->Database))
             throw new Exception();
       } catch (Exception $e) {
          mysql_query("UPDATE GDN_Statistics 

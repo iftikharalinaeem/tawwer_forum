@@ -10,7 +10,17 @@ $PluginInfo['vfoptions'] = array(
    'AuthorUrl' => 'http://vanillaforums.com'
 );
 
+Gdn_LibraryMap::SafeCache('library','class.tokenauthenticator.php',dirname(__FILE__).DS.'class.tokenauthenticator.php');
 class VFOptionsPlugin implements Gdn_IPlugin {
+
+   public function __construct() {
+      Gdn::Authenticator()->EnableAuthenticationScheme('token');
+   }
+   
+   // Make sure token authenticator is never activated as the primary authentication scheme
+   public function AuthenticationController_EnableAuthenticatorToken_Handler(&$Sender) {
+      Gdn::Authenticator()->UnsetDefaultAuthenticator('token');
+   }
 
 /*
    This plugin should:
@@ -29,9 +39,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		if (strpos(Gdn::Request()->Domain(), 'vanilladev') !== FALSE)
          $Url = 'https://www.vanilladev.com/account/';
 
-		echo Anchor('Help', '#', 'HelpLink');
       echo Anchor('My Account', $Url, 'MyAccountLink');
-		
    }
    
    /**
@@ -45,10 +53,16 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		$Menu->RemoveLink('Add-ons', T('Applications'));
 		$Menu->RemoveLink('Add-ons', T('Locales'));
 		$Menu->RemoveLink('Add-ons', T('&lt;Embed&gt; Vanilla'));
+		$Menu->RemoveLink('Site Settings', T('Routes'));
+		$Menu->RemoveLink('Site Settings', T('Outgoing Email'));
+		
 		$Menu->RemoveGroup('Dashboard');
 		$Menu->AddItem('Dashboard', T('Dashboard').$New, FALSE, array('class' => 'Dashboard'));
 		$Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
-		$Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla').$New, 'plugin/embed', 'Garden.Settings.Manage');
+		
+		if (C('EnabledPlugins.embedvanilla'))
+   		$Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla').$New, 'plugin/embed', 'Garden.Settings.Manage');
+   		
 		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
    too large to upload directly to this page you can
    <a href="mailto:support@vanillaforums.com?subject=Importing+to+VanillaForums">contact us</a>
@@ -119,6 +133,56 @@ pageTracker._trackPageview();
 
          $Sender->AddAsset('Content', $Script);
       }
+   }
+   
+   public function PluginController_ForceEnablePlugin_Create($Sender) {
+      $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
+      
+      try {
+         if (!Gdn::Session()->IsValid() || !GetValue('Token',Gdn::Session()->User, FALSE))
+            throw new Exception('FALSE');
+         
+         // Retrieve all available plugins from the plugins directory
+         $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins;
+         $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
+         
+         list($PluginName) = $Sender->RequestArgs;
+         if (array_key_exists($PluginName, $this->AvailablePlugins) && !array_key_exists($PluginName, $this->EnabledPlugins)) {
+            Gdn::PluginManager()->EnablePlugin($PluginName);
+            throw new Exception('TRUE');
+         }
+         throw new Exception('FALSE');
+         
+      } catch(Exception $e) {
+         $Sender->Finalize();
+         echo $e->getMessage();
+      }
+      die();
+   }
+   
+   public function PluginController_ForceDisablePlugin_Create($Sender) {
+      $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
+      
+      try {
+         if (!Gdn::Session()->IsValid() || !GetValue('Token',Gdn::Session()->User, FALSE)) 
+            throw new Exception('FALSE');
+         
+         // Retrieve all available plugins from the plugins directory
+         $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins;
+         $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
+         
+         list($PluginName) = $Sender->RequestArgs;
+         if (array_key_exists($PluginName, $this->EnabledPlugins)) {
+            Gdn::PluginManager()->DisablePlugin($PluginName);
+            throw new Exception('TRUE');
+         }
+         throw new Exception('FALSE');
+         
+      } catch(Exception $e) {
+         $Sender->Finalize();
+         echo $e->getMessage();
+      }
+      die();
    }
    
    /**

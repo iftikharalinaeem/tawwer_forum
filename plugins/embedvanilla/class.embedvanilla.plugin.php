@@ -33,8 +33,9 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 		}
 
 		// Report the remote url to redirect to if not currently embedded.
-		if (!IsSearchEngine() && $RemoteUrl && !$InDashboard && C('Plugins.EmbedVanilla.ForceRemoteUrl'))
-			$Sender->AddDefinition('RemoteUrl', $RemoteUrl);
+		$Sender->AddDefinition('RemoteUrl', $RemoteUrl);
+		if (!IsSearchEngine() && !$InDashboard && C('Plugins.EmbedVanilla.ForceRemoteUrl'))
+			$Sender->AddDefinition('ForceRemoteUrl', TRUE);
 			
 		if ($InDashboard)
 			$Sender->AddDefinition('InDashboard', TRUE);
