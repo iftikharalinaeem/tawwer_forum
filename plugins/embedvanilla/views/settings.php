@@ -73,7 +73,7 @@ $RecommendedThemeName = 'Embed-Friendly';
       if ($HasRecommendedTheme)
          echo Anchor(T('Click here to apply it.'), 'plugin/embed/'.$RecommendedThemeFolder.'/'.$Session->TransientKey());
       else
-         echo Anchor(T('Click here to get it.'), '#');
+         echo Anchor(T('Click here to get it.'), 'http://vanillaforums.org/addons');
       
       ?></em>
    </div>

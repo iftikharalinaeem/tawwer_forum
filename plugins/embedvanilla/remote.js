@@ -1,11 +1,10 @@
-if (!window.vanilla) {
-   window.vanilla = function() { return this; }();
-}
-if (!window.vanilla.embeds) {
+if (window.vanilla == undefined)
+   window.vanilla = {};
+
+if (window.vanilla.embeds == undefined)
    window.vanilla.embeds = {};
-}
+
 window.vanilla.embed = function(host) {
-   
    var scripts = document.getElementsByTagName('script'),
       id = Math.floor((Math.random()) * 100000).toString(),
       embedUrl = window.location.href.split('#')[0],
@@ -33,7 +32,7 @@ window.vanilla.embed = function(host) {
       
    window.vanilla.embeds[id] = this;
    if (window.postMessage) {
-      function onMessage(e) {
+      onMessage = function(e) {
          var message = e.data.split(':');
          var frame = document.getElementById('vanilla'+id);
          if (frame.contentWindow != e.source)
@@ -48,7 +47,8 @@ window.vanilla.embed = function(host) {
       var messageId = null;
       setInterval(function() {
          try {
-            var hash = window.frames['vanilla'+id].frames.messageFrame.location.hash.substr(6);
+            var vid = 'vanilla' + id;
+            var hash = window.frames[vid].frames['messageFrame'].location.hash.substr(6);
          } catch(e) {
             return;
          }
@@ -57,13 +57,21 @@ window.vanilla.embed = function(host) {
          var newMessageId = message[0];
          if (newMessageId == messageId)
             return;
-            
+         
          messageId = newMessageId;
          message.splice(0, 1);
          processMessage(message);
       }, 300);
    }
 
+
+   checkHash = function() {
+      var path = window.location.hash.substr(1);
+      if (path != currentPath) {
+         currentPath = path;
+         window.frames['vanilla'+id].location.replace(vanillaUrl(path));
+      }
+   }
 
    if (!window.gadgets) {
       if (!disablePath) {
@@ -76,40 +84,6 @@ window.vanilla.embed = function(host) {
             setInterval(checkHash, 300);
          }
       }
-   }
-
-   function checkHash() {
-      var path = window.location.hash.substr(1);
-      if (path != currentPath) {
-         currentPath = path;
-         window.frames['vanilla'+id].location.replace(vanillaUrl(path));
-      }
-   }
-
-   function findPos(id) {
-      var node = document.getElementById(id),
-         top = 0;
-      if (node.offsetParent) {
-         do {
-            top += node.offsetTop;
-         } while (node = node.offsetParent);
-         return top;
-      }
-      return -1;
-   }
-
-   function findPosScroll(id) {
-      var node = document.getElementById(id),
-         top = 0,
-         topScroll = 0;
-      if (node.offsetParent) {
-         do {
-            top += node.offsetTop;
-            topScroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
-         } while (node = node.offsetParent);
-         return top - topScroll;
-      }
-      return -1;
    }
 
    processMessage = function(message) {
@@ -126,20 +100,34 @@ window.vanilla.embed = function(host) {
             }
          }
       } else if (message[0] == 'unload') {
-         if (window.attachEvent || findPosScroll('vanilla'+id) < 0)
+         if (window.attachEvent || scrollPosition('vanilla'+id) < 0)
             document.getElementById('vanilla'+id).scrollIntoView(true);
       } else if (message[0] == 'unembed') {
          document.location = 'http://' + host + window.location.hash.substr(1);
       }
    }
 
-   function setHeight(height) {
+   scrollPosition = function(id) {
+      var node = document.getElementById(id),
+         top = 0,
+         topScroll = 0;
+      if (node.offsetParent) {
+         do {
+            top += node.offsetTop;
+            topScroll += node.offsetParent ? node.offsetParent.scrollTop : 0;
+         } while (node = node.offsetParent);
+         return top - topScroll;
+      }
+      return -1;
+   }
+
+   setHeight = function(height) {
       document.getElementById('vanilla'+id).style['height'] = height + "px";
       if (window.gadgets)
          gadgets.window.adjustHeight();
    }
 
-   function vanillaUrl(path) {
+   vanillaUrl = function(path) {
       var concat = path.indexOf('?') > -1 ? '&' : '?';
       return 'http://' + host + path + concat + 'remote=' + encodeURIComponent(embedUrl);
    }
