@@ -63,6 +63,7 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${PLUGINS}CustomDomain" "${PATH}plugins/CustomDomain"
     /bin/ln -s "${PLUGINS}FileUpload" "${PATH}plugins/FileUpload"
     /bin/ln -s "${PLUGINS}VanillaConnect" "${PATH}plugins/VanillaConnect"
+    /bin/ln -s "${PLUGINS}embedvanilla" "${PATH}plugins/embedvanilla"
     # End Custom VF.com Plugins
 
     # Themes
@@ -74,6 +75,7 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${THEMES}rounder" "${PATH}themes/rounder"
     /bin/ln -s "${THEMES}vanilla-classic" "${PATH}themes/vanilla-classic"
     /bin/ln -s "${THEMES}v1grey" "${PATH}themes/v1grey"
+    /bin/ln -s "${SOURCE}themes/EmbedFriendly" "${PATH}themes/EmbedFriendly"
     # End Themes
         
     # Misc Symlinks
