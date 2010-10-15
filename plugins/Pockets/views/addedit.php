@@ -47,10 +47,15 @@ echo $Form->Errors();
    <li>
       <?php
          echo $Form->Label('Repeat', 'RepeatType');
-         echo $Form->RadioList('RepeatType', array(Pocket::REPEAT_BEFORE => 'Before', Pocket::REPEAT_AFTER => 'After', Pocket::REPEAT_EVERY => T('Repeat Every'), Pocket::REPEAT_INDEX => T('Given Indexes')));
 
+         echo '<div>', $Form->Radio('RepeatType', 'Before', array('Value' => Pocket::REPEAT_BEFORE)), '</div>';
+
+         echo '<div>', $Form->Radio('RepeatType', 'After', array('Value' => Pocket::REPEAT_BEFORE)), '</div>';
+
+         echo '<div>', $Form->Radio('RepeatType', 'Repeat Every', array('Value' => Pocket::REPEAT_EVERY)), '</div>';
+         
          // Options for repeat every.
-         echo '<div class="RepeatEveryOptions">',
+         echo '<div class="RepeatOptions RepeatEveryOptions">',
             '<div class="Info2">', T('Enter numbers starting at 1.'), '</div>',
             '<p>',
             $Form->Label('Frequency', 'EveryFrequency', array('Class' => 'SubLabel')),
@@ -60,8 +65,10 @@ echo $Form->Errors();
             $Form->TextBox('EveryBegin', array('Class' => 'SmallInput')),
             '</p></div>';
 
+         echo '<div>', $Form->Radio('RepeatType', 'Given Indexes', array('Value' => Pocket::REPEAT_INDEX)), '</div>';
+
          // Options for repeat indexes.
-         echo '<div class="RepeatIndexesOptions"',
+         echo '<div class="RepeatOptions RepeatIndexesOptions"',
             '<div class="Info2">', T('Enter a comma-delimited list of indexes, starting at 1.'), '</div><p>',
             $Form->Label('Indexes', 'Indexes', array('Class' => 'SubLabel')),
             $Form->TextBox('Indexes'),
@@ -70,14 +77,24 @@ echo $Form->Errors();
    </li>
    <li>
       <?php
-         echo $Form->Label('Conditions', '');   
+         echo $Form->Label('Conditions', '');
+         echo '<div class="Info2">', T('Limit the pocket to one or more roles or permissions.'), '</div>';
          $this->ConditionModule->Render();
       ?>
    </li>
    <li>
       <?php
          echo $Form->Label('Enable/Disable', 'Disabled');
-         echo $Form->RadioList('Disabled', array(Pocket::ENABLED => T('Enabled'), Pocket::DISABLED => T('Disabled'), Pocket::TESTING => T('Test Mode')));
+
+         echo '<div>', $Form->Radio('Disabled', T('Enabled', 'Enabled: The pocket will be displayed.'), array('Value' => Pocket::DISABLED)), '</div>';
+
+         echo '<div>', $Form->Radio('Disabled', T('Disabled', 'Disabled: The pocket will <b>not</b> be displayed.'), array('Value' => Pocket::ENABLED)), '</div>';
+
+         echo '<div>', $Form->Radio('Disabled', T('Test Mode', 'Test Mode: The pocket will only be displayed for pocket administrators.'), array('Value' => Pocket::TESTING)), '</div>';
+
+
+//         echo $Form->Label('Enable/Disable', 'Disabled');
+//         echo $Form->RadioList('Disabled', array(Pocket::ENABLED => T('Enabled'), Pocket::DISABLED => T('Disabled'), Pocket::TESTING => T('Test Mode')));
       ?>
    </li>
 </ul>

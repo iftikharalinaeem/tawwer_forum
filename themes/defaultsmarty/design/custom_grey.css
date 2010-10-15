@@ -710,28 +710,6 @@ ul.PanelInfo li strong {
    text-align: left;
    font-weight: normal;
 }
-ul.PanelInfo li a {
-   float: left;
-}
-ul.PanelInfo div.Meta {
-   font-size: 11px;
-}
-ul.PanelInfo div.Meta span,
-ul.PanelInfo div.Meta strong {
-   margin-right: 8px;
-}
-ul.PanelInfo div.Meta span a {
-   margin-left: 8px;
-}
-ul.PanelInfo div.Meta strong {
-   font-weight: normal;
-   display: inline;
-   padding: 1px 3px;
-	-moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-	background: #FFFF00;
-	padding:2px 4px;
-}
 ul.PanelInfo li.Active {
    background: #fff;
    border-bottom: 1px solid #c3c3c3;
@@ -968,15 +946,6 @@ ul.DataList div.Meta span,
 ul.DataList div.Meta span a,
 ul.DataList div.Meta strong {
    margin-right: 12px;
-}
-ul.DataList div.Meta strong {
-   background: #ddd;
-   padding: 1px 4px;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
-}
-ul.DataList div.Meta a {
-   color: #2b2d33;
 }
 ul.DataList a.Delete {
    width: auto;
@@ -1437,6 +1406,17 @@ div.Tabs li {
    display: inline;
    margin: 0;
 }
+
+div.MessageForm a.Back,
+div.MessageForm a.Back:link,
+div.MessageForm a.Back:hover,
+div.MessageForm a.Back:active,
+div.MessageForm a.Back:visited {
+   border: 1px solid #666;
+   background: #aaa;
+   color: #282828;
+}
+
 div.MessageForm a.Cancel,
 div.MessageForm a.Cancel:link,
 div.MessageForm a.Cancel:hover,
@@ -1619,28 +1599,6 @@ div.Overlay {
   width: 100%;
   height: 100%;
 }
-div.Popup {
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 0;
-  z-index: 5000;
-  text-align: center;
-}
-div.Popup div.Body {
-  margin: 0px auto;
-  text-align: left;
-  position: relative;
-  padding: 0px;
-  background: #fff;
-  max-width: 500px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border: 8px solid #555;
-	box-shadow: 0px 0px 10px #333;
-	-moz-box-shadow: 0px 0px 10px #333;
-	-webkit-box-shadow: 0px 0px 10px #333;  
-}
 div.Popup div.Body div.Body {
    border: 0;
 }
@@ -1662,16 +1620,6 @@ div.Popup h2 {
 	background: #282828;
 	border-bottom: 1px solid #282828;
 	padding: 6px 9px 4px;
-}
-div.Popup .Footer {
-  background: #fff;
-  text-align: right;
-  padding: 2px 6px 0 0;
-  border-top:1px solid #ddd;
-  -moz-border-radius-bottomleft: 5px;
-  -moz-border-radius-bottomright: 5px;
-  -webkit-border-bottom-left-radius: 5px;
-  -webkit-border-bottom-right-radius: 5px;
 }
 div.Popup h3 {
 	font-size: 120%;
@@ -1714,28 +1662,8 @@ div.Popup form ul li label.RadioLabel,
 div.Popup form ul li label.CheckBoxLabel {
 	font-weight: normal;
 }
-div.Profile #Form_User input.Button,
-div.Popup input.Button {
-	margin: 4px 0 2px;
-}
 body.Entry div.Popup p {
 	color: #000;
-}
-div.Popup #Form_User div.Warning,
-#dashboard_profile_picture #Form_User div.Warning {
-	margin: 6px 0;
-}
-div.SignInPopup div.Body {
-	max-width: 320px;
-}
-div.SignInPopup .Content form {
-	padding: 0 30px 10px;
-}
-div.SignInPopup div.Box {
-	margin: 0;
-	padding: 0;
-	background: none;
-	border: 0;
 }
 /* Serious Ajax Error Styles */
 div.AjaxError {
@@ -2128,64 +2056,7 @@ body.add #Content {
 	font-size:14px;
 	font-weight:bold;	
 }
-#ConversationForm textarea.MultiComplete {
-  width: 910px;
-}
-#ConversationForm .TextBox {
-   width: 910px;
-   height: 100px;
-   min-height: 100px;
-   margin: 8px 0 6px;
-	padding: 0;
-}
-body.Conversations a.Cancel {
-   margin-left: 20px;
-}
-div.Popup #ConversationForm form {
-	background: none;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	padding: 10px;
-}
-div.Popup #ConversationForm h2 {
-	color: #fff;
-	font-size: 120%;
-	font-weight: bold;
-	padding: 6px 9px 4px;	
-}
-div.Popup #ConversationForm textarea.MultiComplete,
-div.Popup #ConversationForm .TextBox {
-	width: 478px;
-}
 
-/* Upload Progress Bar */
-div.UploadProgress {
-	margin: 10px 0;
-	width: 200px;
-	z-index: 0;
-	color: #fff;
-	text-shadow: 0 1px 1px #333;
-	border: 1px solid #0c3c7e;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-}
-div.UploadProgress div {
-	padding: 2px 0;
-}
-div.UploadProgress div strong {
-	font-weight: bold;
-}
-div.UploadProgress div.Foreground,
-div.UploadProgress div.Background {
-	position: absolute;
-}
-div.UploadProgress div.Background {
-	width: 0;
-	z-index: 1;
-}
-div.UploadProgress div.Foreground {
-	text-indent: 6px;
-	overflow: visible;
-	white-space: nowrap;
-	z-index: 2;
+.Message a, .Message a:link, .Message a:visited, .Message a:active {
+color:#2786C2;
 }

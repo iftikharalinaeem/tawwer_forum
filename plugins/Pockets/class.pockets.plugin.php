@@ -124,11 +124,11 @@ class PocketsPlugin extends Gdn_Plugin {
             return $this->_Delete($Sender, GetValue(1, $Args));
             break;
          default:
-            return $this->_Index($Sender);
+            return $this->_Index($Sender, $Args);
       }
    }
 
-   protected function _Index($Sender) {
+   protected function _Index($Sender, $Args) {
       $Sender->SetData('Title', T('Pockets'));
 
       // Grab the pockets from the DB.
@@ -154,13 +154,22 @@ class PocketsPlugin extends Gdn_Plugin {
       $Form = new Gdn_Form();
 
       // Save global options.
-      if ($Form->AuthenticatedPostBack()) {
-         $ShowLocations = $Form->GetFormValue('ShowLocations');
-         SaveToConfig('Plugins.Pockets.ShowLocations', $ShowLocations);
-         $Sender->StatusMessage = T('Your changes have been saved.');
-      } else {
-         $Form->SetFormValue('ShowLocations', C('Plugins.Pockets.ShowLocations', FALSE));
+      switch (GetValue(0, $Args)) {
+         case 'showlocations':
+            SaveToConfig('Plugins.Pockets.ShowLocations', TRUE);
+            break;
+         case 'hidelocations':
+            SaveToConfig('Plugins.Pockets.ShowLocations', FALSE, array('RemoveEmpty' => TRUE));
+            break;
       }
+
+//      if ($Form->AuthenticatedPostBack()) {
+//         $ShowLocations = $Form->GetFormValue('ShowLocations');
+//         SaveToConfig('Plugins.Pockets.ShowLocations', $ShowLocations);
+//         $Sender->StatusMessage = T('Your changes have been saved.');
+//      } else {
+//         $Form->SetFormValue('ShowLocations', C('Plugins.Pockets.ShowLocations', FALSE));
+//      }
 
       $Sender->Form = $Form;
       $Sender->Render(dirname(__FILE__).'/views/index.php');
@@ -397,6 +406,7 @@ class PocketsPlugin extends Gdn_Plugin {
    }
 
    public function TestData($Sender) {
+      return;
       echo "<div class=\"TestPocket\"><h3>Test Data</h3>";
 
       echo '<ul class="Variables">';
