@@ -11,11 +11,17 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * An associative array of information about this application.
  */
-$ThemeInfo['Brand Friendly'] = array(
-   'Name' => 'Brand-Friendly',
-   'Description' => "Easily customizable theme to match your brand!",
+$ThemeInfo['WordPressBridge'] = array(
+   'Name' => 'WordPressBridge',
+   'Description' => "This theme takes your WordPress theme and pulls uses it around your Vanilla Forum.",
    'Version' => '1.0',
-   'Author' => "Brendan Sera-Shriar",
-   'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://brendanserashriar.com'
+   'Author' => "Mark O'Sullivan",
+   'AuthorEmail' => 'mark@vanillaforums.com',
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'Options' => array(
+		'Description' => 'Define where your wordpress installation is so Vanilla can grab your template files. You must have the VanillaThemeBridge plugin for wordpress enabled on your WordPress installation in order for this to function properly.',			  
+      'Text' => array('WordPressUrl' => 'Your WordPress Url: http://yourdomain.com/wordpress')
+	)
 );
+   
+   
