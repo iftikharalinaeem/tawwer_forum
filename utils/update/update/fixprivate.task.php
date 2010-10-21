@@ -1,6 +1,6 @@
 <?php
 
-class FixlawedTask extends Task {
+class FixprivateTask extends Task {
 
    protected $SourcecodePath;
 
