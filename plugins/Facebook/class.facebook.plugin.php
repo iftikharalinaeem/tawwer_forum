@@ -55,7 +55,7 @@ class FacebookPlugin extends Gdn_Plugin {
       if (isset($Sender->Data['Methods'])) {
          $AccessToken = $this->AccessToken();
 
-         $ImgSrc = Url('/plugins/Facebook/design/facebook-login.png');
+         $ImgSrc = Asset('/plugins/Facebook/design/facebook-login.png');
          $ImgAlt = T('Login with Facebook');
 
          if ($AccessToken) {
@@ -80,12 +80,12 @@ class FacebookPlugin extends Gdn_Plugin {
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
-      $ImgSrc = Url('/plugins/Facebook/design/facebook-login.png');
+      $ImgSrc = Asset('/plugins/Facebook/design/facebook-icon.png');
       $ImgAlt = T('Login with Facebook');
       $SigninHref = $this->AuthorizeUri();
       $PopupSigninHref = $this->AuthorizeUri('display=popup');
       
-      $Html = "\n<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" align=\"bottom\" /></a>";
+      $Html = "\n<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" align=\"bottom\" /></a>";
    
       echo $Html;
    }
@@ -210,35 +210,15 @@ class FacebookPlugin extends Gdn_Plugin {
       
       return $this->_RedirectUri;
    }
-
-   public function AuthenticationController_AuthenticatorConfigurationHandshake_Handler(&$Sender) {
-      $Sender->AuthenticatorConfigure = '/dashboard/settings/vanillaconnect';
-   }
    
    public function Setup() {
       // Save the facebook provider type.
       Gdn::SQL()->Replace('UserAuthenticationProvider',
          array('AuthenticationSchemeAlias' => 'facebook', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),
          array('AuthenticationKey' => 'Facebook'));
-
-      // Add the facebook authenticator to the list of possible schemes.
-      $EnabledSchemes = C('Garden.Authenticator.EnabledSchemes', array());
-
-      if (!in_array('facebook', $EnabledSchemes))
-         $EnabledSchemes[] = 'facebook';
-
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
    }
 
    public function OnDisable() {
-      // Add the facebook authenticator to the list of possible schemes.
-      $EnabledSchemes = C('Garden.Authenticator.EnabledSchemes', array());
-
-      $Pos = array_search('facebook', $EnabledSchemes);
-      if ($Pos !== FALSE) {
-         unset($EnabledSchemes[$Pos]);
-         SaveToConfig($EnabledSchemes);
-      }
    }
 
 //   public function OnDisable() {

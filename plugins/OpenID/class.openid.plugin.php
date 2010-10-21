@@ -128,7 +128,7 @@ class OpenIDPlugin extends Gdn_Plugin {
     */
    public function EntryController_SignIn_Handler($Sender, $Args) {
       if (isset($Sender->Data['Methods'])) {
-         $ImgSrc = Url('/plugins/OpenID/design/openid-signin.png');
+         $ImgSrc = Asset('/plugins/OpenID/design/openid-signin.png');
          $ImgAlt = T('Sign In with OpenID');
 
          $SigninHref = $this->_AuthorizeHref();
@@ -143,14 +143,14 @@ class OpenIDPlugin extends Gdn_Plugin {
       }
    }
 
-//   public function Base_BeforeSignInButton_Handler($Sender, $Args) {
-//      $ImgSrc = Url('/plugins/OpenID/design/openid-signin.png');
-//      $ImgAlt = T('Sign In with OpenID');
-//      $SigninHref = $this->_AuthorizeHref();
-//      $PopupSigninHref = $this->_AuthorizeHref(TRUE);
-//
-//      $Html = "\n<a id=\"OpenIDAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
-//
-//      echo $Html;
-//   }
+   public function Base_BeforeSignInButton_Handler($Sender, $Args) {
+      $ImgSrc = Asset('/plugins/OpenID/design/openid-icon.png');
+      $ImgAlt = T('Sign In with OpenID');
+      $SigninHref = $this->_AuthorizeHref();
+      $PopupSigninHref = $this->_AuthorizeHref(TRUE);
+
+      $Html = "\n<a id=\"OpenIDAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
+
+      echo $Html;
+   }
 }

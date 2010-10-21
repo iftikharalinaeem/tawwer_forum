@@ -85,7 +85,7 @@ class TwitterPlugin extends Gdn_Plugin {
       if (isset($Sender->Data['Methods'])) {
          $AccessToken = $this->AccessToken();
 
-         $ImgSrc = Url('/plugins/Twitter/design/twitter-signin.png');
+         $ImgSrc = Asset('/plugins/Twitter/design/twitter-signin.png');
          $ImgAlt = T('Sign In with Twitter');
 
          if (FALSE && $AccessToken) {
@@ -110,12 +110,12 @@ class TwitterPlugin extends Gdn_Plugin {
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
-      $ImgSrc = Url('/plugins/Twitter/design/twitter-signin.png');
+      $ImgSrc = Asset('/plugins/Twitter/design/twitter-icon.png');
       $ImgAlt = T('Sign In with Twitter');
       $SigninHref = $this->_AuthorizeHref();
       $PopupSigninHref = $this->_AuthorizeHref(TRUE);
 
-      $Html = "\n<a id=\"TwitterAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
+      $Html = "\n<a id=\"TwitterAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"400\" popupWidth=\"800\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>";
 
       echo $Html;
    }
