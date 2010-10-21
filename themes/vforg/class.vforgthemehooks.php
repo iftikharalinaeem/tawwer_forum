@@ -22,9 +22,15 @@ class VFOrgThemeHooks implements Gdn_IPlugin {
    }
    
    public function DiscussionsController_Render_Before($Sender) {
-      $RecentActivityModule = new RecentActivityModule();
+      $RecentActivityModule = new RecentActivityModule($Sender);
+		$DevActivityModule->ActivityModuleTitle = T('Recent User Activity');
       $RecentActivityModule->GetData();
       $Sender->AddModule($RecentActivityModule);
+		
+		$DevActivityModule = new RecentActivityModule($Sender);
+		$DevActivityModule->ActivityModuleTitle = T('News from the Developers');
+		$DevActivityModule->GetData(5, 16);
+		$Sender->AddModule($DevActivityModule);
    }
    
    public function PostController_Render_Before($Sender) {

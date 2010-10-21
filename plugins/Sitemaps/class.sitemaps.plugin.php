@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Sitemaps'] = array(
    'Name' => 'Sitemaps',
    'Description' => "This plugin creates http://www.sitemaps.org compatible XML sitemaps for your forum.",
-   'Version' => '0.2',
+   'Version' => '0.9',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -36,7 +36,6 @@ class SitemapsPlugin extends Gdn_Plugin {
    }
    
    public function Base_Render_Before(&$Sender) {
-      if (!C('Plugins.Sitemaps.Enabled')) return;
       if (($Filename = Gdn::Request()->Filename()) && $Filename != 'default') {
          $Parts = explode('.',$Filename);
          $Prefix = array_shift($Parts); $Suffix = array_pop($Parts);
@@ -48,7 +47,6 @@ class SitemapsPlugin extends Gdn_Plugin {
    }
    
    public function PostController_AfterDiscussionSave_Handler(&$Sender) {
-      if (!C('Plugins.Sitemaps.Enabled')) return;
       $Discussion = $Sender->EventArguments['Discussion'];
       $DiscussionPostDate = strtotime($Discussion->DateInserted);
       $DiscussionPostIndex = (int)date('Y',$DiscussionPostDate) + (int)date('d',$DiscussionPostDate);
@@ -62,7 +60,6 @@ class SitemapsPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
-      if (!C('Plugins.Sitemaps.Enabled')) return;
       if (!C('Plugin.Sitemaps.Regenerate')) return;
       RemoveFromConfig('Plugin.Sitemaps.Regenerate');
       $Sender->AddJsFile($this->GetResource('js/sitemaps.js',FALSE,FALSE));
@@ -76,7 +73,6 @@ class SitemapsPlugin extends Gdn_Plugin {
    }
    
    public function RenderMap(&$Sender, $Filename) {
-      if (!C('Plugins.Sitemaps.Enabled')) return;
       $MapDir = CombinePaths(array(PATH_CACHE,C('Plugin.Sitemaps.MapDir', 'Sitemaps')));
       if (!is_dir($MapDir)) return;
       

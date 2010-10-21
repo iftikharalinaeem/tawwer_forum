@@ -6,11 +6,8 @@
 <body id="{$BodyID}" class="{$BodyClass}">
   <div id="Frame">
 	 <div class="Banner">
-     
-     <a href="/vanilla/post/discussion" class="BigButton NewDiscussion">Start a New Discussion</a>
-     
 		<ul>
-		 
+		  {dashboard_link}
 		  {discussions_link}
 		  {activity_link}
 		  {inbox_link}
@@ -21,7 +18,8 @@
 	 </div>
 	 <div id="Body">
 		<div class="Wrapper">
-        <div id="Panel">
+		  <div id="Panel">
+			 <div class="SearchBox">{searchbox}</div>
 			 {asset name="Panel"}
 		  </div>
 		  <div id="Content">
@@ -30,7 +28,7 @@
 		</div>
 	 </div>
 	 <div id="Foot">
-		<div><a href="{vanillaurl}"><span>Powered by Vanilla Mobile</span></a></div>
+		<div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
 		{asset name="Foot"}
 	 </div>
   </div>
