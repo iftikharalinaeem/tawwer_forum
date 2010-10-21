@@ -110,12 +110,14 @@ class OpenIDPlugin extends Gdn_Plugin {
 
             break;
          default:
-            $Url = $OpenID->authUrl();
-
-            $Foo = parse_url($Url);
-            parse_str($Foo['query'], $Q);
-
-            Redirect($Url);
+            if (!$OpenID->identity) {
+               $Sender->CssClass = 'Dashboard Entry connect';
+               $Sender->SetData('Title', T('Sign In with OpenID'));
+               $Sender->Render('Url', '', 'plugins/OpenID');
+            } else {
+               $Url = $OpenID->authUrl();
+               Redirect($Url);
+            }
             break;
       }
    }
