@@ -10,13 +10,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Facebook'] = array(
-	'Name' => 'Facebook',
-   'Description' => 'This plugin integrates Vanilla with Facebook',
+	'Name' => 'Vanilla Facebook',
+   'Description' => 'This plugin integrates Vanilla with Facebook. This plugin requires you to register your application with Facebook and will not work until you have configured it properly.',
    'Version' => '0.1a',
-   'RequiredApplications' => array('Vanilla' => '2.0.4a'),
+   'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
-   'SettingsUrl' => '/dashboard/authentication/facebook',
+   'SettingsUrl' => '/dashboard/settings/facebook',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -36,6 +36,17 @@ class FacebookPlugin extends Gdn_Plugin {
       Redirect($Uri);
    }
 
+   public function AuthenticationController_Render_Before($Sender, $Args) {
+      if (isset($Sender->ChooserList)) {
+         $Sender->ChooserList['facebook'] = 'Facebook';
+      }
+      if (is_array($Sender->Data('AuthenticationConfigureList'))) {
+         $List = $Sender->Data('AuthenticationConfigureList');
+         $List['facebook'] = '/dashboard/settings/facebook';
+         $Sender->SetData('AuthenticationConfigureList', $List);
+      }
+   }
+
    /**
     *
     * @param Gdn_Controller $Sender
@@ -44,7 +55,7 @@ class FacebookPlugin extends Gdn_Plugin {
       if (isset($Sender->Data['Methods'])) {
          $AccessToken = $this->AccessToken();
 
-         $ImgSrc = Url('/plugins/Facebook/design/facebook-login.png');
+         $ImgSrc = Asset('/plugins/Facebook/design/facebook-login.png');
          $ImgAlt = T('Login with Facebook');
 
          if ($AccessToken) {
@@ -69,14 +80,33 @@ class FacebookPlugin extends Gdn_Plugin {
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
-      $ImgSrc = Url('/plugins/Facebook/design/facebook-login.png');
+      $ImgSrc = Asset('/plugins/Facebook/design/facebook-icon.png');
       $ImgAlt = T('Login with Facebook');
       $SigninHref = $this->AuthorizeUri();
       $PopupSigninHref = $this->AuthorizeUri('display=popup');
       
-      $Html = "\n<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" align=\"bottom\" /></a>";
+      $Html = "\n<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" align=\"bottom\" /></a>";
    
       echo $Html;
+   }
+
+   public function SettingsController_Facebook_Create($Sender, $Args) {
+      if ($Sender->Form->IsPostBack()) {
+         $Settings = array(
+             'Plugins.Facebook.ApplicationID' => $Sender->Form->GetFormValue('ApplicationID'),
+             'Plugins.Facebook.Secret' => $Sender->Form->GetFormValue('Secret'));
+
+         SaveToConfig($Settings);
+         $Sender->StatusMessage = T("Your settings have been saved.");
+
+      } else {
+         $Sender->Form->SetFormValue('ApplicationID', C('Plugins.Facebook.ApplicationID'));
+         $Sender->Form->SetFormValue('Secret', C('Plugins.Facebook.Secret'));
+      }
+
+      $Sender->AddSideMenu();
+      $Sender->SetData('Title', T('Facebook Settings'));
+      $Sender->Render('Settings', '', 'plugins/Facebook');
    }
 
    /**
@@ -88,8 +118,8 @@ class FacebookPlugin extends Gdn_Plugin {
       if (GetValue(0, $Args) != 'facebook')
          return;
 
-      $AppID = C('Facebook.ApplicationID');
-      $Secret = C('Facebook.Secret');
+      $AppID = C('Plugins.Facebook.ApplicationID');
+      $Secret = C('Plugins.Facebook.Secret');
       $Code = GetValue('code', $_GET);
       $Query = '';
       if ($Sender->Request->Get('display'))
@@ -151,7 +181,7 @@ class FacebookPlugin extends Gdn_Plugin {
    }
 
    public function AuthorizeUri($Query = FALSE) {
-      $AppID = C('Facebook.ApplicationID');
+      $AppID = C('Plugins.Facebook.ApplicationID');
 
       $RedirectUri = $this->RedirectUri();
       if ($Query)
@@ -180,42 +210,15 @@ class FacebookPlugin extends Gdn_Plugin {
       
       return $this->_RedirectUri;
    }
-
-   public function SettingsController_Facebook_Create($Sender, $EventArguments) {
-      $Sender->Permission('Garden.Settings.Manage');
-      $Sender->Title(T('Facebook Integration'));
-		$Sender->Form = new Gdn_Form();
-      $this->Dispatch($Sender, $EventArguments);
-   }
-
-   public function AuthenticationController_AuthenticatorConfigurationHandshake_Handler(&$Sender) {
-      $Sender->AuthenticatorConfigure = '/dashboard/settings/vanillaconnect';
-   }
    
    public function Setup() {
       // Save the facebook provider type.
       Gdn::SQL()->Replace('UserAuthenticationProvider',
          array('AuthenticationSchemeAlias' => 'facebook', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),
          array('AuthenticationKey' => 'Facebook'));
-
-      // Add the facebook authenticator to the list of possible schemes.
-      $EnabledSchemes = C('Garden.Authenticator.EnabledSchemes', array());
-
-      if (!in_array('facebook', $EnabledSchemes))
-         $EnabledSchemes[] = 'facebook';
-
-      SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledSchemes);
    }
 
    public function OnDisable() {
-      // Add the facebook authenticator to the list of possible schemes.
-      $EnabledSchemes = C('Garden.Authenticator.EnabledSchemes', array());
-
-      $Pos = array_search('facebook', $EnabledSchemes);
-      if ($Pos !== FALSE) {
-         unset($EnabledSchemes[$Pos]);
-         SaveToConfig($EnabledSchemes);
-      }
    }
 
 //   public function OnDisable() {
