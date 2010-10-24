@@ -7,16 +7,17 @@ echo $Form->Open();
 echo $Form->Errors();
 ?>
 <div class="Box">
-<ul>
-   <li>
-      <?php
-         echo $Form->Label('OpenID Url', 'Url');
-         echo $Form->TextBox('Url', array('Name' => 'url'));
-         echo ' ', $Form->Button('Go');
-      ?>
-   </li>
-</ul>
+   <ul>
+      <li>
+         <?php
+            echo $Form->Label('Enter Your OpenID Url', 'Url');
+            echo $Form->TextBox('Url', array('Name' => 'url'));
+         ?>
+      </li>
+   </ul>
+   <div class="ButtonContainer">
+      <?php echo $Form->Button('Go'); ?>
+   </div>
 </div>
 <?php
 echo $Form->Close();
-?>
