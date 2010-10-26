@@ -17,12 +17,21 @@ class VFOrgThemeHooks implements Gdn_IPlugin {
    }
    
    public function Base_Render_Before($Sender) {
+      if ($Sender->ControllerName == 'discussionscontroller' && $Sender->RequestMethod == 'index')
+         $Sender->AddModule('DiscussionSearchModule');
+
       if ($Sender->Head->Title() == C('Garden.Title'))
          $Sender->Head->Title('Vanilla - Free, Open-Source Forum Software');
    }
    
    public function DiscussionsController_Render_Before($Sender) {
-      $RecentActivityModule = new RecentActivityModule();
+      $DevActivityModule = new RecentActivityModule($Sender);
+      $DevActivityModule->ActivityModuleTitle = T('News from the Developers');
+      $DevActivityModule->GetData(5, 16);
+      $Sender->AddModule($DevActivityModule);
+
+      $RecentActivityModule = new RecentActivityModule($Sender);
+      $RecentActivityModule->ActivityModuleTitle = T('Recent User Activity');
       $RecentActivityModule->GetData();
       $Sender->AddModule($RecentActivityModule);
    }
@@ -39,8 +48,8 @@ jQuery(document).ready(function($) {
    }
    
    public function ProfileController_Render_Before($Sender) {
-		$Sender->AddJsFile('plugins/Voting/voting.js');
-		$Sender->AddCssFile('plugins/Voting/design/voting.css');
+      $Sender->AddJsFile('plugins/Voting/voting.js');
+      $Sender->AddCssFile('plugins/Voting/design/voting.css');
    }
    
 }

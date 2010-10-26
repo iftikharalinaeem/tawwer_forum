@@ -1,7 +1,6 @@
 #Body {
+	width: auto;
 	margin: 0;
-	width: 99.9%;
-	position: relative;
 }
 #Head {
 	background: #3B5998;
@@ -61,8 +60,8 @@ div.Popup h2 {
 }
 #Content {
 	float: none;
-	width: 93%;
-	margin:0 0 0 10px;
+	width: auto;
+	margin: 0 10px;
 }
 #Panel {
 	float: right;
@@ -81,14 +80,14 @@ body.Profile div.SearchBox {
 }
 body.Profile #Content {
 	float:none;
-	width: 93%;
-	margin: 0 0 0 10px;
+	width: auto;
+	margin: 0 10px;
 }
 body.Profile #Panel {
-	margin: 0 0 0 10px;
+	margin: 0 10px;
 	display:block;
 	float:none;
-	width:93%;
+	width:auto;
 }
 form.Activity textarea {
 	width:99%;
@@ -252,19 +251,7 @@ ul.PanelInfo li.Active {
 	background: #ffd;
 }
 body.Profile ul.PanelInfo {
-	border: none;
-}
-body.Profile ul.PanelInfo li {
-	margin: 0;
-	padding: 0;
-}
-body.Profile ul.PanelInfo li a {
-	font-size: 12px;
-	display: block;
-	padding: 0 6px;
-}
-body.Profile ul.PanelInfo li a:hover {
-	background: #D8DFEA;
+	display: none;
 }
 
 /* Sign In Page */
@@ -273,6 +260,15 @@ body.Entry #Content div.Box {
 }
 body.Entry #Panel {
 	display: none;
+}
+
+/* Profile Page */
+body.Profile {
+	padding-top: 30px;
+}
+div.User {
+	position: absolute;
+	top: 10px;
 }
 
 /* 
