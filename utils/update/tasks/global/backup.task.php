@@ -79,7 +79,7 @@ class BackupTask extends Task {
          $CompressedSQLFile = sprintf($BackupSQLFile,'tgz');
          
          TaskList::Event("Backing up client database to {$RawSQLFile}...", TaskList::NOBREAK);
-         if (!LAME) $trash = shell_exec("mysqldump --extended-insert --no-create-db -u".DATABASE_USER." --password=".DATABASE_PASSWORD." -h ".DATABASE_HOST." {$DatabaseName} > {$RawSQLFile}");
+         if (!LAME) $trash = shell_exec("mysqldump --extended-insert --no-create-db -u".$this->TaskList->DBUSER." --password=".$this->TaskList->DBPASS." -h ".$this->TaskList->DBHOST." {$DatabaseName} > {$RawSQLFile}");
          TaskList::MajorEvent("done");
          
          if (file_exists($RawSQLFile)) {
