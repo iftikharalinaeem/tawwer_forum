@@ -15,38 +15,84 @@ class TaskList {
    const CONFIG         = '/srv/www/vanillaforumscom/conf/config.php';
    const TASKS          = 'tasks/';
    
+   // List of perform tasks
    protected $Perform;
-   protected $Arguments;
+   
+   // Exec mode
    protected $Mode;
+   
+   // List of requested tasks
    protected $RequestedTasks;
    
+   // Cross-task per client cache
    public $GroupData;
+   
+   // Client Folder
    protected $Clients;
+   
+   // Known tasklist (contains instances)
    protected $Tasks;
+   
+   // Link to database resource
    protected $Database;
+   
+   // Cached list of clients
    protected $ClientList;
+   
+   // Config object
    protected $Config;
+   
+   // Int number of known clients
    protected $NumClients;
+   
+   // Int number of completed clients
    protected $Completed;
    
-   public function __construct($UserTaskDirs, $ClientDir) {
+   // Argument parser instance
+   public static $Args = NULL;
+   
+   // Boolean flag whether or not to require a valid DB to perform client
+   protected $RequireDB;
+   
+   public function __construct() {
+   
+      define("FAST", ((TaskList::GetConsoleOption("fast", FALSE) || TaskList::GetConsoleOption("veryfast", FALSE)) !== FALSE) ? TRUE : FALSE);
+      define("VERYFAST", (TaskList::GetConsoleOption("veryfast", FALSE) !== FALSE) ? TRUE : FALSE);
+   
+      $Configs = array(
+            "config-defaults"    => TaskList::GetConsoleOption("config-defaults", TaskList::CONFIGDEFAULTS),
+            "config"             => TaskList::GetConsoleOption("config", TaskList::CONFIG)
+      );
+   
       $this->Config = new Configuration();
       try {
-         $this->Config->Load(TaskList::CONFIGDEFAULTS, 'Use');
-         $this->Config->Load(TaskList::CONFIG, 'Use');
-      } catch (Exception $e) { die ($e->getMessage()); }
+         if (!file_exists($Configs['config-defaults']))
+            throw new Exception("cannot read ".$Configs['config-defaults']);
+            
+         if (!file_exists($Configs['config']))
+            throw new Exception("cannot read ".$Configs['config']);
+         
+         $this->Config->Load($Configs['config-defaults'], 'Use');
+         $this->Config->Load($Configs['config'], 'Use');
+      } catch (Exception $e) { 
+         TaskList::MajorEvent("Fatal error loading core config:");
+         TaskList::MinorEvent($e->getMessage());
+         die();
+      }
       
       // Get db connection details from vfcom's config
-      $this->DBHOST = $this->Config->Get('Database.Host');
-      $this->DBUSER = $this->Config->Get('Database.User');
-      $this->DBPASS = $this->Config->Get('Database.Password');
-      $this->DBMAIN = $this->Config->Get('Database.Name');
+      $this->DBHOST = $this->Config->Get('Database.Host', NULL);
+      $this->DBUSER = $this->Config->Get('Database.User', NULL);
+      $this->DBPASS = $this->Config->Get('Database.Password', NULL);
+      $this->DBMAIN = $this->Config->Get('Database.Name', NULL);
 
       // Open the db connection, new link please
       $this->Database = mysql_connect($this->DBHOST, $this->DBUSER, $this->DBPASS, TRUE);
-      if (!$this->Database)
-         die("Could not connect to database as '".$this->DBUSER."'@'".$this->DBHOST."'\n");
-      
+      if (!$this->Database) {
+         TaskList::MajorEvent("Could not connect to database as '".$this->DBUSER."'@'".$this->DBHOST."'");
+         die();
+      }
+         
       mysql_select_db($this->DBMAIN, $this->Database);
       
       TaskList::MajorEvent("Connected to ".$this->DBMAIN." @ ".$this->DBHOST);
@@ -55,9 +101,9 @@ class TaskList {
       chdir(dirname(__FILE__));
       chdir('../');
       
-      $this->Arguments = array();
       $this->Perform = array();
       $this->Clients = NULL;
+      $this->RequireDB = TRUE;
    }
    
    /**
@@ -105,38 +151,43 @@ class TaskList {
          
          case TaskList::ACTION_TARGET:
          case TaskList::ACTION_CREATE:
-            $Arguments = $this->Console('t:');
             // Check if the forum exists
             
             $Action = ($Perform == TaskList::ACTION_TARGET) ? 'target' : 'create';
             
-            $Forum = GetValue('t', $Arguments, NULL);
+            $Forum = TaskList::GetConsoleOption('target', NULL);
             if (is_null($Forum)) {
-               $Forum = TaskList::Input("Please provide the name of the forum you wish to {$Action}:","[________].vanillaforums.com: ",NULL);
-               if (is_null($Forum)) {
-                  TaskList::MajorEvent("No forum provided.");
-                  die();
-               }
+               $Forum = TaskList::Input("Please provide the name of the forum you wish to {$Action}, or 'no' to quit :","Forum name [________].vanillaforums.com",NULL);
+               if (is_null($Forum) || $Forum == 'no')
+                  TaskList::FatalError("No forum provided.");
             }
             
             $QualifiedForumName = $Forum.".vanillaforums.com";
-            $ForumPath = TaskList::CombinePaths(array($QualifiedForumName, $this->Clients));
+            $ForumPath = TaskList::CombinePaths(array($this->Clients,$QualifiedForumName));
             $Exists = is_dir($ForumPath);
             if ($Perform == TaskList::ACTION_CREATE) {
             
-               if ($Exists) {
-                  TaskList::MajorEvent("The forum you selected already exists.");
-                  die();
-               }
+               // When creating, do not require DB.
+               $this->RequireDB = FALSE;
                
-               // mkdir
+               if ($Exists) {
+               
+                  if (TaskList::Cautious())
+                     $Delete = TaskList::Question("The forum you selected already exists.","Delete it?",array("yes","no"),"no");
+                  else
+                     $Delete = 'yes';
+                     
+                  if ($Delete == 'yes') {
+                     TaskList::Rmdir($ForumPath);
+                  } else {
+                     die();
+                  }
+               }
             }
             
             if ($Perform == TaskList::ACTION_TARGET) {
-               if (!$Exists) {
-                  TaskList::MajorEvent("The forum you selected does not exist.");
-                  die();
-               }
+               if (!$Exists)
+                  TaskList::FatalError("The forum you selected does not exist.");
             }
 
             $this->TargetForum = $QualifiedForumName;
@@ -144,13 +195,107 @@ class TaskList {
       }
    }
    
-   public function ClientDir($ClientDir) {
-      if (!is_dir($ClientDir)) {
-         TaskList::MajorEvent("Could not open client folder.");
-         die();
+   public function Clients($ClientDir) {
+      if (!is_dir($ClientDir))
+         TaskList::FatalError("Could not open client folder.");
+      
+      $this->Clients = TaskList::Pathify($ClientDir);
+   }
+   
+   public static function GetConsoleOption($Option, $Default = NULL) {
+      if (is_null(TaskList::$Args)) TaskList::$Args = new Args();
+            
+      if (($Flag = TaskList::$Args->Flag($Option)) !== FALSE)
+         return $Flag;
+      return $Default;
+   }
+   
+   public function Configure() {
+      if (is_null($this->Clients))
+         TaskList::FatalError("No client folder supplied.");
+   
+      // Setup tasks
+      TaskList::MajorEvent("Setting up task objects...");
+      
+      $this->TaskFolder = TaskList::CombinePaths(array(
+         TaskList::Pathify(getcwd()),
+         TaskList::TASKS
+      ));
+      $this->ScanTaskFolder($this->TaskFolder, TRUE);
+   }
+   
+   protected function ScanTaskFolder($TaskFolder, $TopLevel = FALSE) {
+      $TaskFolder = TaskList::Pathify($TaskFolder);
+      
+      if (!is_dir($TaskFolder)) {
+         // Only really care about a vocal error if its the first item, in which case die too.
+         if ($TopLevel === TRUE)
+            TaskList::FatalError("[find tasks] Could not find primary task repository '{$TaskFolder}'");
+         return FALSE;
       }
       
-      $this->Clients = $ClientDir;
+      if (!$FolderItems = opendir($TaskFolder))
+         TaskList::FatalError("[find tasks] Could not open folder '{$TaskFolder}'... does it have read permissions?");
+      
+      if ($TopLevel === TRUE)
+         $this->Tasks = array();
+      
+      // Loop over file list
+      while (($FolderItem = readdir($FolderItems)) !== FALSE) {
+         $FolderItem = trim($FolderItem,'/');
+         if ($FolderItem == '.' || $FolderItem == '..') continue;
+         $AbsFolderItem = TaskList::CombinePaths(array($TaskFolder,$FolderItem));
+         
+         // Recurse if we hit a nested folder
+         if (is_dir($AbsFolderItem)) {
+            $this->ScanTaskFolder($AbsFolderItem);
+            continue;
+         }
+         
+         // Otherwise try to read the task file
+         try {
+            // Not readable
+            if (!is_readable($AbsFolderItem)) throw new Exception('cannot read');
+            
+            // Not a valid task name
+            if (!preg_match('/^(.*)\.task\.php$/', $FolderItem, $Matches)) continue;
+            
+            $Taskname = $Matches[1];
+            $QualifiedTaskName = rtrim(dirname(str_replace($this->TaskFolder, '', $AbsFolderItem)),'/').'/'.$Taskname;
+            
+            // Not a requested task, so don't set it up
+            if (!in_array($QualifiedTaskName, $this->RequestedTasks)) continue;
+            
+            // Include the taskfile and track the change in declared classes
+            $Classes = get_declared_classes();
+            require_once($AbsFolderItem);
+            $NewClasses = array_diff(get_declared_classes(), $Classes);
+            
+            // For each new class, if it is a taskfile, instantiate it and break.
+            foreach ($NewClasses as $Class) {
+               if (is_subclass_of($Class, 'Task')) {
+                  TaskList::Event("Configuring task: {$QualifiedTaskName} (".strtolower($Class).")");
+                  $NewTask = new $Class($this->Clients);
+                  $NewTask->Database = $this->Database;
+                  $NewTask->TaskList =& $this;
+                  $this->Tasks[$QualifiedTaskName] = array(
+                     'name'            => str_replace('Task', '', $Class),
+                     'qualifiedname'   => $QualifiedTaskName,
+                     'task'            => $NewTask
+                  );
+                  if (method_exists($NewTask, 'Init'))
+                     $NewTask->Init();
+                     
+                  break;
+               }
+            }
+                        
+         } catch (Exception $e) {
+            TaskList::MajorEvent("[{$AbsFolderItem}] ".$e->getMessage());
+            continue;
+         }
+      }
+      closedir($FolderItems);
    }
    
    public function Run($RunMode, $TaskList) {
@@ -172,81 +317,27 @@ class TaskList {
       }
       
       // Go
-      //$this->
-   }
-   
-   protected function Console($ConsoleDefinition, $Defaults = NULL) {
-      
-      getopt();
-   }
-   
-   public function Configure() {
-      if (is_null($this->Clients)) {
-         TaskList::MajorEvent("No client folder supplied.");
-         die();
+      switch ($RunMode) {
+         case TaskList::MODE_TARGET:
+            if (!$this->TargetForum)
+               TaskList::FatalError("Attempting to run targeted task without pre-targeting.");
+               
+            $this->PerformClient($this->TargetForum, $TaskList);
+         break;
+         
+         case TaskList::MODE_CHUNKED:
+            $ChunkRule = $this->GetConsoleOption('chunk-mode', 'alphabet');
+            $this->RunChunked($ChunkRule, $TaskList);
+         break;
+         
+         case TaskList::MODE_REGEX:
+            $RegexRule = $this->GetConsoleOption('rule', NULL);
+            if (is_null($RegexRule))
+               TaskList::FatalError("No valid regex rule supplied.");
+               
+            $this->RunSelectiveRegex($RegexRule, $TaskList);
+         break;
       }
-      
-      $this->Tasks = array();
-   
-      // Setup tasks
-      TaskList::MajorEvent("Setting up task objects...");
-      
-      $TaskFolder = rtrim(getcwd(), '/').'/';
-      if (!$TaskFolders = opendir($TaskFolder))
-         die("Could not find task_dir '{$TaskFolder}', or it does not have read permissions.\n");
-         
-      // Looping task dirs
-      while (($TaskDir = readdir($TaskFolders)) !== FALSE) {
-         $TaskDir = trim($TaskDir,'/');
-         if ($TaskDir == '.' || $TaskDir == '..') continue;
-         $AbsTaskDir = $TaskFolder.$TaskDir;
-         
-         TaskList::Event("Scanning '{$TaskDir}' for task objects... ", TaskList::NOBREAK);
-         try {
-            if (!is_dir($AbsTaskDir) || !is_readable($AbsTaskDir)) throw new Exception('cannot read');
-            if (!$TaskDirectory = opendir($AbsTaskDir)) throw new Exception('cannot open');
-         } catch (Exception $e) {
-            TaskList::MajorEvent($e->getMessage(), TaskList::NOBREAK);
-            continue;
-         }
-         TaskList::MajorEvent('opened', TaskList::NOBREAK);
-         
-         while (($FileName = readdir($TaskDirectory)) !== FALSE) {
-            if ($FileName == '.' || $FileName == '..') continue;
-            
-            // Not a valid task name
-            if (!preg_match('/^(.*)\.task\.php$/', $FileName, $Matches)) continue;
-            
-            $Taskname = $Matches[1];
-            $QualifiedTaskName = $TaskDir.'/'.$Taskname;
-            
-            // Not a requested task
-            if (!in_array($QualifiedTaskName, $this->RequestedTasks)) continue;
-            
-            $IncludePath = $AbsTaskDir.'/'.$FileName;
-            $Classes = get_declared_classes();
-            require_once($IncludePath);
-            $NewClasses = array_diff(get_declared_classes(), $Classes);
-            
-            foreach ($NewClasses as $Class) {
-               if (is_subclass_of($Class, 'Task')) {
-                  TaskList::Event(strtolower($Class));
-                  $NewTask = new $Class($ClientDir);
-                  $NewTask->Database = $this->Database;
-                  $NewTask->TaskList =& $this;
-                  $this->Tasks[$Taskname] = array(
-                     'name'      => str_replace('Task', '', $Class),
-                     'task'      => $NewTask
-                  );
-                  if (method_exists($NewTask, 'Init'))
-                     $NewTask->Init();
-               }
-            }
-            TaskList::Event("");
-         }
-         closedir($TaskDirectory);
-      }
-      closedir($TaskFolders);
    }
    
    public function RunAll($TaskOrder = NULL) {
@@ -266,18 +357,7 @@ class TaskList {
       return $Matched;
    }
    
-   public function RunClientFromCLI($ClientFolder, $TaskOrder = NULL) {
-      TaskList::MajorEvent("Running client {$ClientFolder}...");
-      
-      if (!array_key_exists($ClientFolder,$this->ClientList))
-         die("client not found.\n");
-         
-      $this->PerformClient($ClientFolder, $TaskOrder);
-   }
-   
    public function RunChunked($ChunkRule, $TaskOrder) {
-      global $argv;
-      $args = $argv;
       TaskList::MajorEvent("Running client list, chunked by '{$ChunkRule}'...");
       switch ($ChunkRule) {
          case 'alphabet':
@@ -290,7 +370,7 @@ class TaskList {
             }
             
             if ($ChunkRule == 'alfast') {
-               $ChunkRules = explode(',',array_pop($args));
+               $ChunkRules = explode(',',TaskList::$Args->args[0]);
                foreach ($ChunkRules as $FastChunkRule) {
                   if (strlen($FastChunkRule) == 1)
                      $Chunks[] = $FastChunkRule;
@@ -321,11 +401,11 @@ class TaskList {
          
          case 'tier':
             
-         break;
+         //break;
          
          case 'range':
             
-         break;
+         //break;
          
          default:
             die("Invalid chunk type.\n");
@@ -335,11 +415,15 @@ class TaskList {
    
    public function PerformClient($ClientFolder, $TaskOrder = NULL) {
       $ClientInfo = $this->LookupClientByFolder($ClientFolder);
-      TaskList::MajorEvent("{$ClientFolder} [{$ClientInfo['SiteID']}]...");
+      $SiteID = GetValue('SiteID', $ClientInfo, 'unknown site id');
+      TaskList::MajorEvent("{$ClientFolder} [{$SiteID}]...");
       $this->Completed++;
-      if (!$ClientInfo || !sizeof($ClientInfo) || !isset($ClientInfo['SiteID'])) {
-         TaskList::Event("skipped... no db");
-         return;
+      
+      if ($this->RequireDB) {
+         if (!$ClientInfo || !sizeof($ClientInfo) || !isset($ClientInfo['SiteID'])) {
+            TaskList::Event("skipped... no db");
+            return;
+         }
       }
       
       $this->GroupData = array();
@@ -412,6 +496,11 @@ class TaskList {
    }
    
    // Convenience method
+   public static function Pathify($Path) {
+      return rtrim($Path, '/').'/';
+   }
+   
+   // Convenience method
    public static function CombinePaths($Paths, $Delimiter = '/') {
       if (!is_array($Paths)) {
          $Paths = func_get_args();
@@ -443,6 +532,46 @@ class TaskList {
       return file_exists($AbsolutePath);
    }
    
+   public static function Rmdir($AbsolutePath) {
+      if (!file_exists($AbsolutePath)) return true;
+      
+      self::RemoveFolder($AbsolutePath);
+      return file_exists($AbsolutePath);
+   }
+   
+   /**
+    * Remove a folder (and all the sub-folders and files).
+    * Taken from http://php.net/manual/en/function.rmdir.php
+    * 
+    * @param string $Dir 
+    * @return void
+    */
+   public static function RemoveFolder($Path) {
+      if (is_file($Path)) {
+         unlink($Path);
+         return;
+      }
+
+      $Path = rtrim($Path, '/').'/';
+
+      // Get all of the files in the directory.
+      if ($dh = opendir($Path)) {
+         while (($File = readdir($dh)) !== false) {
+            if (trim($File, '.') == '')
+               continue;
+
+            $SubPath = $Path.$File;
+
+            if (is_dir($SubPath))
+               self::RemoveFolder($SubPath);
+            else
+               unlink($SubPath);
+         }
+         closedir($dh);
+      }
+      rmdir($Path);
+   }
+   
    public static function Touch($AbsolutePath) {
       return touch($AbsolutePath);
    }
@@ -467,6 +596,12 @@ class TaskList {
          if ($LineBreak) echo "\n";
       }
 
+   }
+   
+   public static function FatalError($Message, $LineBreak = TRUE) {
+      echo "{$Message}";
+      if ($LineBreak) echo "\n";
+      die();
    }
    
    public static function Question($Message, $Prompt, $Options, $Default) {

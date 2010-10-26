@@ -1,21 +1,24 @@
 #!/usr/bin/php
 <?php
 
-require_once('foreach.php');
+require_once("includes/runner.php");
 
-define("VERBOSE", TRUE);
-define("LAME", FALSE);
+/**
+ * Set up tasklist object
+ *  - Open configuration files
+ *  - Connect to database
+ *
+ */
+$Tasks = new TaskList();
+$Tasks->Clients('/www/vanilla/vhosts');
+$Tasks->Perform(TaskList::ACTION_CACHE);
+$Tasks->Perform(TaskList::ACTION_CREATE);
 
-define('DATABASE_HOST', 'vfdb1');
-define('DATABASE_USER', 'root');
-define('DATABASE_PASSWORD', 'Va2aWu5A');
-define('DATABASE_MAIN', 'vfcom');
-
-if ($argc < 2) exit();
-
-$Tasks = new TaskList('maintain','/srv/www/vhosts');
-$Tasks->RunClientFromCLI($argv[1], array(
-   'backup',
-   'uncache',
-   'filesystem'
+$Tasks->Run(TaskList::MODE_TARGET, array(
+   'global/backup',
+   'global/offline',
+   'global/uncache',
+   'maintain/filesystem',
+   'maintain/structure',
+   'global/online'
 ));

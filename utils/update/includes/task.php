@@ -16,7 +16,6 @@ abstract class Task {
 
    public function __construct($RootFolder) {
       $this->Root = rtrim($RootFolder,'/');
-      TaskList::Event("Set root folder to '{$this->Root}'");
       $this->ClientRoot = NULL;
       $this->ClientFolder = NULL;
       $this->ClientInfo = NULL;

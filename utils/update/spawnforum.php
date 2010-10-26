@@ -10,11 +10,11 @@ require_once("includes/runner.php");
  *
  */
 $Tasks = new TaskList();
-$Tasks->Clients('/srv/www/vhosts');
-$Tasks->Perform(TaskList::ACTION_CACHE);
+$Tasks->Clients('/www/vanilla/vhosts');
+//$Tasks->Perform(TaskList::ACTION_CACHE);
 $Tasks->Perform(TaskList::ACTION_CREATE);
 
 $Tasks->Run(TaskList::MODE_TARGET, array(
-   'spawn/spawnforum',
+   'spawn/newforum',
    'maintain/filesystem'
 ));

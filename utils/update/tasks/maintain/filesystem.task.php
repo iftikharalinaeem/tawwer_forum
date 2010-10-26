@@ -15,10 +15,17 @@ class FilesystemTask extends Task {
    }
    
    public function Init($RootPath = NULL) {
+   
+      $this->SourceRoot = TaskList::Pathify(TaskList::GetConsoleOption('source','/srv/www/source'));
+      if (!file_exists($this->SourceRoot) || !is_dir($this->SourceRoot))
+         TaskList::FatalError("Could not find sourcecode root folder.");
+      
+      
       if (is_null($RootPath) || !is_dir($RootPath)) {
          do {
             $SourceCodeFolder = TaskList::Input("Enter new sourcecode version for selected clients, or 'no' to skip", "Sourcecode Version", "unstable");
-            $SourceCodePath = sprintf('/srv/www/source/%s/',$SourceCodeFolder);
+            $SourceCodePath = TaskList::Pathify(TaskList::CombinePaths(array($this->SourceRoot, $SourceCodeFolder)));
+            
          } while (strtolower($SourceCodeFolder) != 'no' && !is_dir($SourceCodePath));
          if (strtolower($SourceCodeFolder) != 'no') {
          
@@ -44,7 +51,6 @@ class FilesystemTask extends Task {
          }
       }
       
-      TaskList::MajorEvent("New targets:");
       if ($this->VanillaPath)
          TaskList::Event("Vanilla Path: {$this->VanillaPath}");
       if ($this->MiscPath)
@@ -113,6 +119,8 @@ class FilesystemTask extends Task {
          // Link and enable Statistics
          $this->Symlink('plugins/Statistics', TaskList::CombinePaths($this->PluginPath,'Statistics'));
          $this->EnablePlugin('Statistics');
+         
+         $this->Symlink('plugins/embedvanilla', TaskList::CombinePaths($this->PluginPath,'embedvanilla'));
       }
       
       if ($this->ThemePath !== FALSE) {
@@ -124,6 +132,7 @@ class FilesystemTask extends Task {
          $this->Symlink('themes/rounder', TaskList::CombinePaths($this->ThemePath,'rounder'));
          $this->Symlink('themes/vanilla-classic', TaskList::CombinePaths($this->ThemePath,'vanilla-classic'));
          $this->Symlink('themes/v1grey', TaskList::CombinePaths($this->ThemePath,'v1grey'));
+         $this->Symlink('themes/EmbedFriendly', TaskList::CombinePaths($this->VanillaPath,'themes/EmbedFriendly'));
          
          // Replace default theme with smartydefault
          $this->Symlink('themes/default', TaskList::CombinePaths($this->ThemePath,'defaultsmarty'));
