@@ -89,6 +89,7 @@ class FilesystemTask extends Task {
          $this->Symlink('plugins/VanillaInThisDiscussion', TaskList::CombinePaths($this->VanillaPath,'plugins/VanillaInThisDiscussion'));
          $this->Symlink('plugins/Tagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Tagging'));
          $this->Symlink('plugins/Flagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Flagging'));
+         $this->Symlink('plugins/embedvanilla', TaskList::CombinePaths($this->VanillaPath,'plugins/embedvanilla'));
          
          // Copy the new index file
          $Copied = $this->CopySourceFile('index.php', $this->VanillaPath);
@@ -112,7 +113,6 @@ class FilesystemTask extends Task {
          $this->Symlink('plugins/CustomTheme', TaskList::CombinePaths($this->PluginPath,'CustomTheme'));
          $this->Symlink('plugins/googleadsense', TaskList::CombinePaths($this->PluginPath,'googleadsense'));
          $this->Symlink('plugins/Statistics', TaskList::CombinePaths($this->PluginPath,'Statistics'));
-         $this->Symlink('plugins/embedvanilla', TaskList::CombinePaths($this->PluginPath,'embedvanilla'));
          $this->Symlink('plugins/vfoptions', TaskList::CombinePaths($this->PluginPath,'vfoptions'));
       }
       
