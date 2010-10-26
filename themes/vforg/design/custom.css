@@ -870,6 +870,9 @@ ul.Activities ul.DataList li {
 }
 
 /* Help Info on Post Discussion Form */
+body.Post #Content {
+	float: none;
+}
 #DiscussionForm h2 {
 	border: none;
 	font-size: 18px;
