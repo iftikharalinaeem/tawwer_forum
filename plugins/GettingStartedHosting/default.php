@@ -90,7 +90,9 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
    // Record when the various actions are taken
    // 1. If the user edits the registration settings
    public function SaveStep($Step) {
-      SaveToConfig($Step, '1');
+      if (Gdn::Config($Step, '') != '1')
+         SaveToConfig($Step, '1');
+
       /*
       // If all of the steps are now completed, disable this plugin
       if (
