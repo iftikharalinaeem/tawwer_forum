@@ -18,13 +18,10 @@ Copyright 2008, 2009 Mark O'Sullivan
 //   'AuthorEmail' => 'todd@vanillaforums.com',
 //   'AuthorUrl' => 'http://toddburry.com'
 //);
-
+/*
 require_once(dirname(__FILE__).DS.'class.adsensemodule.php');
 
 class Gdn_AdSensePlugin implements Gdn_IPlugin {	
-	/**
-	 * @param Gdn_Controller $Sender
-	 */
    public function Base_Render_Before($Sender) {
 		// Only serve the ads if we are delvering the entire page.
 		if($Sender->DeliveryType() != DELIVERY_TYPE_ALL)
@@ -72,3 +69,4 @@ class Gdn_AdSensePlugin implements Gdn_IPlugin {
 	public function Setup() {
 	}
 }
+*/
