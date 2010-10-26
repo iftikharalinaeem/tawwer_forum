@@ -13,7 +13,7 @@ class NewforumTask extends Task {
    }
    
    public function Init() {
-      $SourceCodeVersion = $this->TaskList->Config->Get('VFCom.DeploymentVersion',FALSE);
+      $SourceCodeVersion = $this->C('VFCom.DeploymentVersion',FALSE);
       if ($SourceCodeVersion === FALSE) return;
       
       $SourceCodePath = sprintf('/srv/www/source/%s/',$SourceCodeVersion);

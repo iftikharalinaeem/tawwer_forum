@@ -63,6 +63,8 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${PLUGINS}CustomDomain" "${PATH}plugins/CustomDomain"
     /bin/ln -s "${PLUGINS}FileUpload" "${PATH}plugins/FileUpload"
     /bin/ln -s "${PLUGINS}VanillaConnect" "${PATH}plugins/VanillaConnect"
+    /bin/ln -s "${PLUGINS}PrivateCommunity" "${PATH}plugins/PrivateCommunity"
+    /bin/ln -s "${PLUGINS}ProxyConnect" "${PATH}plugins/ProxyConnect"
     /bin/ln -s "${PLUGINS}Statistics" "${PATH}plugins/Statistics"
     /bin/ln -s "${PLUGINS}embedvanilla" "${PATH}plugins/embedvanilla"
     # End Custom VF.com Plugins
