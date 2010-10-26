@@ -89,9 +89,6 @@ class FilesystemTask extends Task {
          $this->Symlink('plugins/VanillaInThisDiscussion', TaskList::CombinePaths($this->VanillaPath,'plugins/VanillaInThisDiscussion'));
          $this->Symlink('plugins/Tagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Tagging'));
          $this->Symlink('plugins/Flagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Flagging'));
-         $this->SaveToConfig('EnabledPlugins.HtmLawed','HtmLawed');
-         $this->RemoveFromConfig('EnabledPlugins.HtmlPurifier');
-         $this->RemoveFromConfig('EnabledPlugins.HTMLPurifier');
          
          // Copy the new index file
          $Copied = $this->CopySourceFile('index.php', $this->VanillaPath);
@@ -111,16 +108,12 @@ class FilesystemTask extends Task {
          $this->Symlink('plugins/VanillaConnect', TaskList::CombinePaths($this->PluginPath,'VanillaConnect'));
          $this->Symlink('plugins/ProxyConnect', TaskList::CombinePaths($this->PluginPath,'ProxyConnect'));
          $this->Symlink('plugins/FileUpload', TaskList::CombinePaths($this->PluginPath,'FileUpload'));
-         $this->Symlink('plugins/vfoptions', TaskList::CombinePaths($this->PluginPath,'vfoptions'));
          $this->Symlink('plugins/CustomDomain', TaskList::CombinePaths($this->PluginPath,'CustomDomain'));
          $this->Symlink('plugins/CustomTheme', TaskList::CombinePaths($this->PluginPath,'CustomTheme'));
          $this->Symlink('plugins/googleadsense', TaskList::CombinePaths($this->PluginPath,'googleadsense'));
-         
-         // Link and enable Statistics
          $this->Symlink('plugins/Statistics', TaskList::CombinePaths($this->PluginPath,'Statistics'));
-         $this->EnablePlugin('Statistics');
-         
          $this->Symlink('plugins/embedvanilla', TaskList::CombinePaths($this->PluginPath,'embedvanilla'));
+         $this->Symlink('plugins/vfoptions', TaskList::CombinePaths($this->PluginPath,'vfoptions'));
       }
       
       if ($this->ThemePath !== FALSE) {
@@ -137,6 +130,17 @@ class FilesystemTask extends Task {
          // Replace default theme with smartydefault
          $this->Symlink('themes/default', TaskList::CombinePaths($this->ThemePath,'defaultsmarty'));
       }
+      
+      // Enable plugins
+      $this->SaveToConfig('EnabledPlugins.HtmLawed','HtmLawed');
+      $this->SaveToConfig('EnabledPlugins.GettingStartedHosting','GettingStartedHosting');
+      $this->SaveToConfig('EnabledPlugins.CustomTheme','CustomTheme');
+      $this->SaveToConfig('EnabledPlugins.Gravatar','Gravatar');
+      $this->SaveToConfig('EnabledPlugins.embedvanilla','embedvanilla');
+      $this->SaveToConfig('EnabledPlugins.vfoptions','vfoptions');
+      
+      // Politely enable plugins with structures
+      $this->EnablePlugin('Statistics');
    }
 
 }

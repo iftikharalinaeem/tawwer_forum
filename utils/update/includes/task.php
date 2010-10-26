@@ -132,6 +132,19 @@ abstract class Task {
       return ($Result == 'TRUE') ? TRUE : FALSE;
    }
    
+   protected function PrivilegedExec($RelativeURL) {
+      TaskList::Event("Executing '{$RelativeURL}' as administrator...");
+      try {
+         $Token = $this->TokenAuthentication();
+         if ($Token === FALSE) throw new Exception("could not generate token");
+         $Result = $this->Request($RelativeURL,array(
+            'token'  => $Token
+         ));
+      } catch (Exception $e) {
+         $Result = 'msg: '.$e->getMessage();
+      }
+   }
+   
    protected function Request($RelativeURL, $QueryParams = array(), $Absolute = FALSE) {
       $FollowRedirects = TRUE;
       $Timeout = $this->C('Garden.SocketTimeout', 2.0);
