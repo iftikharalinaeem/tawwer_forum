@@ -113,6 +113,7 @@ class FilesystemTask extends Task {
          $this->Symlink('plugins/CustomTheme', TaskList::CombinePaths($this->PluginPath,'CustomTheme'));
          $this->Symlink('plugins/googleadsense', TaskList::CombinePaths($this->PluginPath,'googleadsense'));
          $this->Symlink('plugins/Statistics', TaskList::CombinePaths($this->PluginPath,'Statistics'));
+         $this->Symlink('plugins/PrivateCommunity', TaskList::CombinePaths($this->PluginPath,'PrivateCommunity'));
          $this->Symlink('plugins/vfoptions', TaskList::CombinePaths($this->PluginPath,'vfoptions'));
       }
       
