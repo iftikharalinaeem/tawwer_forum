@@ -53,6 +53,7 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${SOURCE}plugins/VanillaInThisDiscussion" "${PATH}plugins/VanillaInThisDiscussion"
     /bin/ln -s "${SOURCE}plugins/HtmLawed" "${PATH}plugins/HtmLawed"
     /bin/ln -s "${SOURCE}plugins/Gravatar" "${PATH}plugins/Gravatar"
+    /bin/ln -s "${SOURCE}plugins/embedvanilla" "${PATH}plugins/embedvanilla"
     # End Core Package Plugins
     
     # Custom VF.com Plugins
@@ -66,7 +67,6 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${PLUGINS}PrivateCommunity" "${PATH}plugins/PrivateCommunity"
     /bin/ln -s "${PLUGINS}ProxyConnect" "${PATH}plugins/ProxyConnect"
     /bin/ln -s "${PLUGINS}Statistics" "${PATH}plugins/Statistics"
-    /bin/ln -s "${PLUGINS}embedvanilla" "${PATH}plugins/embedvanilla"
     # End Custom VF.com Plugins
 
     # Themes
