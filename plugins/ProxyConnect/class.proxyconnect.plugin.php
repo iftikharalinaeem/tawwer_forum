@@ -17,7 +17,7 @@ $PluginInfo['ProxyConnect'] = array(
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/authentication/proxy',
-   'SettingsPermission' => 'Garden.AdminUser.Only',
+   'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
@@ -29,7 +29,7 @@ Gdn_LibraryMap::SafeCache('library','class.proxyauthenticator.php',dirname(__FIL
 class ProxyConnectPlugin extends Gdn_Plugin {
 
    public function SettingsController_ProxyConnect_Create($Sender, $EventArguments) {
-      $Sender->Permission('Garden.AdminUser.Only');
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Proxy Connect SSO');
 		$Sender->Form = new Gdn_Form();
       
