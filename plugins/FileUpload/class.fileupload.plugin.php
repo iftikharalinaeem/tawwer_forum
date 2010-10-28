@@ -320,7 +320,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       $Filename = Gdn::Request()->Filename();
       if (!$Filename) $Filename = $Media->Name;
       
-      $DownloadPath = FileUploadPlugin::FindLocalMedia($Media, TRUE, TRUE);
+      $DownloadPath = CombinePaths(array(PATH_UPLOADS,GetValue('Path', $Media)));
       
       return Gdn_FileSystem::ServeFile($DownloadPath, $Filename);
       throw new Exception('File could not be streamed: missing file ('.$DownloadPath.').');
