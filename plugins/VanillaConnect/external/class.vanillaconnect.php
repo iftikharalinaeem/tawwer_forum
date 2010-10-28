@@ -9,12 +9,18 @@
  *  UserEmail              - The email address of the user you're sending to Vanilla
  *  UserName               - The username of the user on your site
  *  UserID                 - The ID of the user on your site.
+ *
+ * $_GET['oauth_token']    - When Vanilla sends a user to this site, they have a token payload. 
+ *                           This payload must be used to sign the reply.
  */
+
+   $RequestToken = OAuthToken($_GET['oauth_token'], "");
 
    $VanillaConnect = VanillaConnect::Authenticate(
       $VanillaForumURL,
       $VanillaConnectKey,
       $VanillaConnectSecret,
+      $RequestToken,
       $UserEmail,
       $UserName,
       $UserID
@@ -38,7 +44,7 @@ class VanillaConnect {
    
    protected function __construct() {}
 
-   public static function Authenticate($ProviderDomain, $ConsumerKey, $ConsumerSecret, $UserEmail, $UserName, $UserID, $SSL = FALSE, $ExtensionArguments = array()) {
+   public static function Authenticate($ProviderDomain, $ConsumerKey, $ConsumerSecret, $RequestToken, $UserEmail, $UserName, $UserID, $SSL = FALSE, $ExtensionArguments = array()) {
       preg_match('/^(?:http|https)?(?::\/\/)?(.*)$/',$ProviderDomain,$Matches);
       $ProviderDomain = trim($Matches[1],'/');
    
@@ -51,9 +57,9 @@ class VanillaConnect {
       $VanillaConnect = new VanillaConnect();
       $OAuthConsumer = new OAuthConsumer($ConsumerKey, $ConsumerSecret);
       $ConsumerParams = array_merge($ExtensionArguments, array("email" => $UserEmail, "name" => $UserName, "uid" => $UserID));
-      $OAuthRequest = OAuthRequest::from_consumer_and_token($OAuthConsumer, null, "GET", $ConsumerNotifyUrl, $ConsumerParams);
+      $OAuthRequest = OAuthRequest::from_consumer_and_token($OAuthConsumer, $RequestToken, "GET", $ConsumerNotifyUrl, $ConsumerParams);
       $SignatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
-      $OAuthRequest->sign_request($SignatureMethod, $OAuthConsumer, null);
+      $OAuthRequest->sign_request($SignatureMethod, $OAuthConsumer, $RequestToken);
       $VanillaConnect->_Request = $OAuthRequest;
       
       $VanillaConnect->_Url = $VanillaConnect->_Request->to_url();
