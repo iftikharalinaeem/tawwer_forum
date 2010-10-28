@@ -13,6 +13,7 @@ $PluginInfo['Statistics'] = array(
    'Name' => 'Statistics',
    'Description' => 'Gathers statistics about activity on your forum and lets you view historical stats.',
    'Version' => '0.5',
+   'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,

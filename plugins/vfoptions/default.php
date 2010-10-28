@@ -5,6 +5,7 @@ $PluginInfo['vfoptions'] = array(
    'Name' => 'VF.com Admin Options',
    'Description' => 'VF.com admin options.',
    'Version' => '1',
+   'MobileFriendly' => TRUE,
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'
