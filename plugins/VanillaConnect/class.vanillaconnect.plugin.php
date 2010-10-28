@@ -17,7 +17,7 @@ $PluginInfo['VanillaConnect'] = array(
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/authentication/handshake',
-   'SettingsPermission' => 'Garden.AdminUser.Only',
+   'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
@@ -42,7 +42,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    }
    
    public function Controller_Index($Sender) {
-      $Sender->Permission('Garden.AdminUser.Only');
+      $Sender->Permission('Garden.Settings.Manage');
       $SQL = Gdn::Database()->SQL();
       $Provider = $SQL->Select('uap.AuthenticationKey')
          ->From('UserAuthenticationProvider uap')
@@ -83,7 +83,7 @@ class VanillaConnectPlugin extends Gdn_Plugin {
    }
    
    public function Controller_Toggle($Sender) {
-		$Sender->Permission('Garden.AdminUser.Only');
+		$Sender->Permission('Garden.Settings.Manage');
 		
 		// Enable/Disable VanillaConnect
 		if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
