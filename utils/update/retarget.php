@@ -10,7 +10,7 @@ require_once("includes/runner.php");
  *
  */
 $Tasks = new TaskList();
-$Tasks->Clients('/www/vanilla/vhosts');
+$Tasks->Clients('/srv/www/vhosts');
 $Tasks->Perform(TaskList::ACTION_CACHE);
 $Tasks->Perform(TaskList::ACTION_CREATE);
 
