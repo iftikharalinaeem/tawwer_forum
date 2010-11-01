@@ -117,8 +117,12 @@ function WriteRangeTab($Range, $Sender) {
 </div>
 
 <script type="text/javascript">
-   var GraphPicker = new Picker();
-   jQuery(document).ready(function(){
+   Loader.LoadHook('Canvas', 'available', '<?php echo $this->RaphaelLocation; ?>');
+   Loader.LoadHook('Canvas', 'available', '<?php echo $this->GraphLocation; ?>');
+   Loader.LoadHook('Canvas', 'available', '<?php echo $this->PickerLocation; ?>');
+   
+   // Delayed hook
+   Loader.Hook("Canvas", "available", function(){
       GraphPicker.Attach({
          'Range': $('div.DateRangeTabs input.DateRange'),
          'Units': '<?php echo $this->Range; ?>',
@@ -129,5 +133,55 @@ function WriteRangeTab($Range, $Sender) {
          'RangeStart': '<?php echo $this->DateStart; ?>',
          'RangeEnd': '<?php echo $this->DateEnd; ?>' 
       });
+   },true);
+   
+   Loader.Hook("Canvas", "unavailable", function() {
+      $('div.DateRangeTabs').remove();
+      $('ul.StatsOverview').remove();
+      $('div.DashboardSummaries').remove();
+      
+      var GraphArea = $('div#GraphHolder');
+      
+      // Get rid of graph stuff
+      GraphArea.html('');
+      
+      // Remove extra styles
+      GraphArea.css('border-top', '0px');
+      GraphArea.css('padding', '0px');
+      GraphArea.css('text-align', 'center');
+      
+      // Add explanation
+      GraphArea.append('<p>The <a href="http://en.wikipedia.org/wiki/Canvas_element">Canvas feature</a> is not available in your browser.</p>');
+      GraphArea.append('<div>Please upgrade to <a href="http://en.wikipedia.org/wiki/HTML5">an HTML5-capable browser</a> to make use of the Statistics features.</div>');
+      GraphArea.append('<div class="AlternativeBrowsers"></div>');
+      
+      $('<style type="text/css"> \
+         div.AlternativeBrowsers { margin:15px; } \
+         div.AlternativeBrowsers div.Browser{ margin: 10px; width:64px; height:64px; display:inline; } \
+      </style>').appendTo("head");
+      
+      var AlternativeBrowsers = GraphArea.find('div.AlternativeBrowsers');
+      AlternativeBrowsers.append('<div class="Browser"><a href="http://www.firefox.com" title="Mozilla Firefox"><img src="/plugins/Statistics/design/images/firefox.png"/></a></div>');
+      AlternativeBrowsers.append('<div class="Browser"><a href="http://www.google.com/chrome" title="Google Chrome"><img src="/plugins/Statistics/design/images/chrome.png"/></a></div>');
+      AlternativeBrowsers.append('<div class="Browser"><a href="http://www.apple.com/safari" title="Apple Safari"><img src="/plugins/Statistics/design/images/safari.png"/></a></div>');
+      AlternativeBrowsers.append('<div class="Browser"><a href="http://www.opera.com" title="Opera"><img src="/plugins/Statistics/design/images/opera.png"/></a></div>');
+      
+      var UrlParts = ['plugin','Statistics','toggle',gdn.definition('TransientKey')];
+      var DisableURL = gdn.url(UrlParts.join('/'));
+      GraphArea.append('<div class="StatsQuickDisable">Alternatively, you can simply <a href="javascript:return false;">disable the Statistics plugin</a> to remove this feature entirely.</div>');
+      
+      $('div.StatsQuickDisable a').click(function(){
+         jQuery.ajax({
+            url: DisableURL,
+            complete:function(){ 
+               document.location.reload(); 
+            }
+         });
+      });
+      
+      GraphArea.find('p').css({'font-size':'24px','margin-top':'40px'});
+      GraphArea.find('div').css('font-size','11px');
    });
 </script>
+
+

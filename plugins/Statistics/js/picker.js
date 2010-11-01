@@ -86,6 +86,7 @@ function Picker() {
       },this));
       
       this.ConfigureRail(Options.DateStart, Options.DateEnd, Options.Units);
+
    }
    
    Picker.prototype.Down = function(ClientX) {
@@ -137,15 +138,14 @@ function Picker() {
    Picker.prototype.SetRange = function(RangeStart, RangeEnd, Trigger, SetAnchor) {
       if (Date.parse(RangeStart) < 1 || Date.parse(RangeEnd) < 1) return;
       
-      RangeStart = new Date(RangeStart);
-      RangeEnd = new Date(RangeEnd);
+      RangeStart = this.NewDate(RangeStart);
+      RangeEnd = this.NewDate(RangeEnd);
       
       if (RangeStart.valueOf() < this.Axis.Start.Milli)
          RangeStart.setTime(this.Axis.Start.Milli);
       
       if (RangeEnd.valueOf() > this.Axis.End.Milli)
          RangeEnd.setTime(this.Axis.End.Milli);
-      
       
       var DateRangeStart = this.GetStartLimit(RangeStart, this.Units);
       var DateRangeEnd = this.GetEndLimit(RangeEnd, this.Units);
@@ -162,6 +162,7 @@ function Picker() {
       
       this.DoMoveHandle(this.HandleStart, PercStart);
       this.DoMoveHandle(this.HandleEnd, PercEnd);
+      
       this.SyncSlider();
      
       if (Trigger == true) {
@@ -196,11 +197,12 @@ function Picker() {
    }
    
    Picker.prototype.SyncSlider = function() {
-      var LeftPerc = this.ToPerc(this.HandleStart.css('left'))
-      var RightPerc = this.ToPerc(this.HandleEnd.css('left'))
+      var LeftPerc = this.ToPerc(this.HandleStart.css('left'));
+      var RightPerc = this.ToPerc(this.HandleEnd.css('left'));
       var PercDiff = RightPerc - LeftPerc;
-      this.Range.css('left',LeftPerc+'%');
-      this.Range.css('width',PercDiff+'%');
+      
+      $(this.Range).css('left',LeftPerc+'%');
+      $(this.Range).css('width',PercDiff+'%');
    }
    
    Picker.prototype.DoMoveHandle = function(Handle, ProposedPercX, Manual) {
@@ -255,8 +257,12 @@ function Picker() {
    }
    
    Picker.prototype.ToPerc = function(X) {
-      if (String(X).substr(-1,1) == '%') return parseFloat(X);
-      return (parseInt(X) / this.SlideRail.width()) * 100;
+      var ItemString = String(X); 
+      var ItemLength = ItemString.length;
+      var LastChar = ItemString.substring(ItemLength-1, ItemLength);
+      
+      if (LastChar == '%') return parseFloat(X);
+      return (parseFloat(X) / parseFloat(this.SlideRail.width())) * 100.0;
    }
    
    Picker.prototype.ConfigureRail = function(StartDate, EndDate, Units) {
@@ -280,25 +286,28 @@ function Picker() {
          switch (this.Units) {
             case 'month': this.MaxPageSize = 0; break;
             case 'week': this.MaxPageSize = 52; break;
-            case 'day': this.MaxPageSize = 90; break;
+            case 'day': this.MaxPageSize = 60; break;
          }
       }
       
       if (this.MaxPageSize > 0) {
          var Increment = 0;
-         var WorkingTick = new Date(this.Rail.End.Date);
-         var AnchorTick = new Date(this.Rail.End.Date);
+         var WorkingTick = this.NewDate(this.Rail.End.Date);
+         var AnchorTick = this.NewDate(this.Rail.End.Date);
+         
          do {
             var IterateTick = this.GetPrecedingTick(WorkingTick);
+            
             if (IterateTick !== false) 
                WorkingTick = IterateTick;
                
             Increment++;
             if (Increment % this.MaxPageSize == 0) {
-               Increment = 0;
+               //Increment = 0;
                this.AddRailPage(WorkingTick, AnchorTick);
-               AnchorTick = new Date(WorkingTick);
+               AnchorTick = this.NewDate(WorkingTick);
             }
+               
          } while (IterateTick !== false);
          
          // Catch remainder
@@ -327,11 +336,12 @@ function Picker() {
       
       var RangeStart = this.Options.RangeStart || this.Options.DateStart;
       var RangeEnd = this.Options.RangeEnd || this.Options.DateEnd;
+      
       this.SetRange(RangeStart, RangeEnd, false, true);
    }
    
    Picker.prototype.AddRailPage = function(StartDate, EndDate) {
-      this.Rail.Pages.push({'Start':new Date(StartDate), 'End':new Date(EndDate)});
+      this.Rail.Pages.push({'Start':this.NewDate(StartDate), 'End':this.NewDate(EndDate)});
    }
    
    Picker.prototype.SetRailPage = function(PageNumber, NoAutoUpdate) {
@@ -376,7 +386,7 @@ function Picker() {
       switch (this.Units) {
          case 'month':
             var NumTicks = 0; var MonthTicks = [];
-            var WorkingDate = new Date(this.Axis.Start.Date);
+            var WorkingDate = this.NewDate(this.Axis.Start.Date);
             do {
                var TickLabel = this.GetShortMonth(WorkingDate.getMonth())+' \''+String(WorkingDate.getFullYear()).substring(2,4);
             
@@ -458,7 +468,9 @@ function Picker() {
    }
    
    Picker.prototype.GetStartLimit = function(DateItem, Unit) {
-      var CurrentDate = new Date(DateItem);
+   
+      var CurrentDate = this.NewDate(DateItem);
+      
       switch(Unit) {
          case 'month':
             CurrentDate.setDate(1);
@@ -492,6 +504,29 @@ function Picker() {
    
    Picker.prototype.GetEndLimit = function(DateItem, Unit) {
       return this.GetStartLimit(DateItem, Unit);
+   }
+   
+   Picker.prototype.NewDate = function(DateItem) {
+      var DateType = gettype(DateItem);
+
+      CurrentDate = false;      
+      if (DateType == 'string') {
+   
+         var CurrentDate = new Date();
+         var DatePart = DateItem.split(' ').shift();
+         var DateParts = DatePart.split('-');
+         
+         // Retardo month indexing from 0
+         DateParts[1] = parseInt(DateParts[1]) - 1;
+         
+         CurrentDate.setFullYear(DateParts[0]);
+         CurrentDate.setMonth(DateParts[1]);
+         CurrentDate.setDate(DateParts[2]);
+      }
+      else {
+         return new Date(DateItem);
+      }
+      return CurrentDate;
    }
    
    Picker.prototype.GetDaysInMonth = function (Year, Month) {
@@ -550,3 +585,63 @@ function Picker() {
    }
 
 }
+
+function gettype (mixed_var) {
+    // http://kevin.vanzonneveld.net
+    // +   original by: Paulo Freitas
+    // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+    // +   improved by: Douglas Crockford (http://javascript.crockford.com)
+    // +   input by: KELAN
+    // +   improved by: Brett Zamir (http://brett-zamir.me)
+    // -    depends on: is_float
+    // %        note 1: 1.0 is simplified to 1 before it can be accessed by the function, this makes
+    // %        note 1: it different from the PHP implementation. We can't fix this unfortunately.
+    // *     example 1: gettype(1);
+    // *     returns 1: 'integer'
+    // *     example 2: gettype(undefined);
+    // *     returns 2: 'undefined'
+    // *     example 3: gettype({0: 'Kevin van Zonneveld'});
+    // *     returns 3: 'array'
+    // *     example 4: gettype('foo');
+    // *     returns 4: 'string'
+    // *     example 5: gettype({0: function () {return false;}});
+    // *     returns 5: 'array'
+
+    var s = typeof mixed_var, name;
+    var getFuncName = function (fn) {
+        var name = (/\W*function\s+([\w\$]+)\s*\(/).exec(fn);
+        if (!name) {
+            return '(Anonymous)';
+        }
+        return name[1];
+    };
+    if (s === 'object') {
+        if (mixed_var !== null) { // From: http://javascript.crockford.com/remedial.html
+            if (typeof mixed_var.length === 'number' &&
+                    !(mixed_var.propertyIsEnumerable('length')) &&
+                    typeof mixed_var.splice === 'function') {
+                s = 'array';
+            }
+            else if (mixed_var.constructor && getFuncName(mixed_var.constructor)) {
+                name = getFuncName(mixed_var.constructor);
+                if (name === 'Date') {
+                    s = 'date'; // not in PHP
+                }
+                else if (name === 'RegExp') {
+                    s = 'regexp'; // not in PHP
+                }
+                else if (name === 'PHPJS_Resource') { // Check against our own resource constructor
+                    s = 'resource';
+                }
+            }
+        } else {
+            s = 'null';
+        }
+    }
+    else if (s === 'number') {
+        s = this.is_float(mixed_var) ? 'double' : 'integer';
+    }
+    return s;
+}
+
+var GraphPicker = new Picker();
