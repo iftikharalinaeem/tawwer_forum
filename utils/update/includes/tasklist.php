@@ -172,11 +172,7 @@ class TaskList {
                
                if ($Exists) {
                
-                  if (TaskList::Cautious())
-                     $Delete = TaskList::Question("The forum you selected already exists.","Delete it?",array("yes","no"),"no");
-                  else
-                     $Delete = 'yes';
-                     
+                  $Delete = TaskList::Question("The forum you selected already exists.","Delete it?",array("yes","no"),"no");                     
                   if ($Delete == 'yes') {
                      TaskList::Rmdir($ForumPath);
                   } else {

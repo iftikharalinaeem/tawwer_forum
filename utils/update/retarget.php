@@ -12,7 +12,7 @@ require_once("includes/runner.php");
 $Tasks = new TaskList();
 $Tasks->Clients('/srv/www/vhosts');
 $Tasks->Perform(TaskList::ACTION_CACHE);
-$Tasks->Perform(TaskList::ACTION_CREATE);
+$Tasks->Perform(TaskList::ACTION_TARGET);
 
 $Tasks->Run(TaskList::MODE_TARGET, array(
    'global/backup',
