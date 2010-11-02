@@ -5,6 +5,7 @@ $PluginInfo['vfoptions'] = array(
    'Name' => 'VF.com Admin Options',
    'Description' => 'VF.com admin options.',
    'Version' => '1',
+   'MobileFriendly' => TRUE,
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'
@@ -52,7 +53,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		$Menu->RemoveLink('Add-ons', T('Plugins'));
 		$Menu->RemoveLink('Add-ons', T('Applications'));
 		$Menu->RemoveLink('Add-ons', T('Locales'));
-		$Menu->RemoveLink('Add-ons', T('&lt;Embed&gt; Vanilla'));
+//		$Menu->RemoveLink('Add-ons', T('&lt;Embed&gt; Vanilla'));
 		$Menu->RemoveLink('Site Settings', T('Routes'));
 		$Menu->RemoveLink('Site Settings', T('Outgoing Email'));
 		
@@ -60,8 +61,10 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		$Menu->AddItem('Dashboard', T('Dashboard').$New, FALSE, array('class' => 'Dashboard'));
 		$Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
 		
-		if (C('EnabledPlugins.embedvanilla'))
+/*
+      if (C('EnabledPlugins.embedvanilla'))
    		$Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla').$New, 'plugin/embed', 'Garden.Settings.Manage');
+*/
    		
 		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
    too large to upload directly to this page you can

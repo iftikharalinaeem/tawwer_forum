@@ -12,12 +12,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProxyConnect'] = array(
 	'Name' => 'Vanilla Proxyconnect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
-   'Version' => '1.8.3',
+   'Version' => '1.8.4',
+   'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.11'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/authentication/proxy',
-   'SettingsPermission' => 'Garden.AdminUser.Only',
+   'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
@@ -29,7 +30,7 @@ Gdn_LibraryMap::SafeCache('library','class.proxyauthenticator.php',dirname(__FIL
 class ProxyConnectPlugin extends Gdn_Plugin {
 
    public function SettingsController_ProxyConnect_Create($Sender, $EventArguments) {
-      $Sender->Permission('Garden.AdminUser.Only');
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Proxy Connect SSO');
 		$Sender->Form = new Gdn_Form();
       

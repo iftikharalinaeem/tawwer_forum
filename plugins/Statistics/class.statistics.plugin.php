@@ -13,6 +13,7 @@ $PluginInfo['Statistics'] = array(
    'Name' => 'Statistics',
    'Description' => 'Gathers statistics about activity on your forum and lets you view historical stats.',
    'Version' => '0.5',
+   'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -322,8 +323,6 @@ class StatisticsPlugin extends Gdn_Plugin {
    }
    
    protected function TrackEvent($RealType, $Qualifier = 'none', $Date = NULL) {
-      if (!$this->IsEnabled()) return;
-      
       $Date = is_null($Date) ? time() : $Date;
       self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_HOUR);
       self::TrackItem($RealType, $Qualifier, $Date, self::RESOLUTION_DAY);
@@ -548,16 +547,23 @@ class StatisticsPlugin extends Gdn_Plugin {
       self::RegisterTrackedItem($TrackedItem, $Qualifiers);
    }
    
+   public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender) {
+      if ($this->IsEnabled() && !Gdn::PluginManager()->HasNewMethod('SettingsController', 'Index')) {
+         Gdn::PluginManager()->RegisterNewMethod('StatisticsPlugin', 'StatsDashboard', 'SettingsController', 'Index');
+      }
+   }
+   
    /**
     * Override the default index method of the settings controller in the
     * dashboard application to render new statistics.
     */
-   public function SettingsController_Index_Create($Sender) {
+   public function StatsDashboard($Sender) {
       // Load javascript & css, check permissions, and load side menu for this page.
       $Sender->AddJsFile('settings.js');
-      $Sender->AddJsFile('plugins/Statistics/js/raphael.js');
-      $Sender->AddJsFile('plugins/Statistics/js/graph.js');
-      $Sender->AddJsFile('plugins/Statistics/js/picker.js');
+      $Sender->RaphaelLocation = '/plugins/Statistics/js/raphael.js';
+      $Sender->GraphLocation = '/plugins/Statistics/js/graph.js';
+      $Sender->PickerLocation = '/plugins/Statistics/js/picker.js';
+      $Sender->AddJsFile('plugins/Statistics/js/loader.js');
       $Sender->AddCSSFile('plugins/Statistics/design/graph.css');
       $Sender->AddCSSFile('plugins/Statistics/design/picker.css');
       $Sender->Title(T('Dashboard'));

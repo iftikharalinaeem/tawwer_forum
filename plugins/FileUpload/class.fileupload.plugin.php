@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions, comments and conversations.',
-   'Version' => '1.2.1',
+   'Version' => '1.2.2',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -321,7 +321,7 @@ class FileUploadPlugin extends Gdn_Plugin {
       $Filename = Gdn::Request()->Filename();
       if (!$Filename) $Filename = $Media->Name;
       
-      $DownloadPath = FileUploadPlugin::FindLocalMedia($Media, TRUE, TRUE);
+      $DownloadPath = CombinePaths(array(PATH_UPLOADS,GetValue('Path', $Media)));
       
       return Gdn_FileSystem::ServeFile($DownloadPath, $Filename);
       throw new Exception('File could not be streamed: missing file ('.$DownloadPath.').');

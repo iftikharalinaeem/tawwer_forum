@@ -16,7 +16,6 @@ abstract class Task {
 
    public function __construct($RootFolder) {
       $this->Root = rtrim($RootFolder,'/');
-      TaskList::Event("Set root folder to '{$this->Root}'");
       $this->ClientRoot = NULL;
       $this->ClientFolder = NULL;
       $this->ClientInfo = NULL;
@@ -131,6 +130,19 @@ abstract class Task {
       }
       TaskList::Event((($Result == "TRUE") ? "success" : "failure ({$Result})"));
       return ($Result == 'TRUE') ? TRUE : FALSE;
+   }
+   
+   protected function PrivilegedExec($RelativeURL) {
+      TaskList::Event("Executing '{$RelativeURL}' as administrator...");
+      try {
+         $Token = $this->TokenAuthentication();
+         if ($Token === FALSE) throw new Exception("could not generate token");
+         $Result = $this->Request($RelativeURL,array(
+            'token'  => $Token
+         ));
+      } catch (Exception $e) {
+         $Result = 'msg: '.$e->getMessage();
+      }
    }
    
    protected function Request($RelativeURL, $QueryParams = array(), $Absolute = FALSE) {
