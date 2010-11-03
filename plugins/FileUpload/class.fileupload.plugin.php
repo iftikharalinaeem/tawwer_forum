@@ -154,7 +154,8 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $PostMaxSize = Gdn_Upload::UnformatFileSize(ini_get('post_max_size'));
       $FileMaxSize = Gdn_Upload::UnformatFileSize(ini_get('upload_max_filesize'));
-      $MaxSize = ($PostMaxSize > $FileMaxSize) ? $PostMaxSize : $FileMaxSize;
+      $ConfigMaxSize = Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize', '1G'));
+      $MaxSize = min($PostMaxSize, $FileMaxSize, $ConfigMaxSize);
       $Controller->AddDefinition('maxuploadsize',$MaxSize);
    }
    
@@ -541,7 +542,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             switch ($FileErr) {
                case UPLOAD_ERR_INI_SIZE:
                   $MaxUploadSize = ini_get('upload_max_filesize');
-                  $ErrorString = 'The uploaded file was too big (max '.$MaxUploadSize.')';
+                  $ErrorString = sprintf(T('The uploaded file was too big (max %s).'), $MaxUploadSize);
                   break;
                case UPLOAD_ERR_FORM_SIZE:
                   $ErrorString = 'The uploaded file was too big';
@@ -582,6 +583,12 @@ class FileUploadPlugin extends Gdn_Plugin {
          $AllowedExtensions = C('Garden.Upload.AllowedFileExtensions', array("*"));
          if (!in_array($Extension, $AllowedExtensions) && !in_array('*',$AllowedExtensions))
             throw new FileUploadPluginUploadErrorException("Uploaded file type is not allowed.", 11, $FileName, $FileKey);
+
+         $MaxUploadSize = Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize', '1G'));
+         if ($FileSize > $MaxUploadSize) {
+            $Message = sprintf(T('The uploaded file was too big (max %s).'), Gdn_Upload::FormatFileSize($MaxUploadSize));
+            throw new FileUploadPluginUploadErrorException($Message, 11, $FileName, $FileKey);
+         }
          
          $TempFileName = "fresh-".md5($FileName)."-".microtime(true)."-".$Extension;
          $ScratchFileName = CombinePaths(array($ScratchPath,$TempFileName));
