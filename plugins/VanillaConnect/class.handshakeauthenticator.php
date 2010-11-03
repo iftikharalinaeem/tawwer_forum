@@ -34,10 +34,10 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       $this->HookDataField('UserEmail', 'email');
       $this->HookDataField('UserName', 'name');
       $this->HookDataField('UserID', 'uid');
-      $this->HookDataField('Transient', 'transient');   // transient key, if needed/provided
+      $this->HookDataField('Transient', 'transient', FALSE);      // transient key, if needed/provided
       
       $this->HookDataField('ConsumerKey', 'oauth_consumer_key');
-      $this->HookDataField('Token', 'oauth_token');
+      $this->HookDataField('Token', 'oauth_token', FALSE);        // Might be null if doing background SSO
       $this->HookDataField('Nonce', 'oauth_nonce');
       $this->HookDataField('Signature', 'oauth_signature');
       $this->HookDataField('SignatureMethod', 'oauth_signature_method');
@@ -154,7 +154,12 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       $Id = Gdn::Authenticator()->GetIdentity();
       if ($Id > 0) return Gdn_Authenticator::MODE_REPEAT;
       
-      return $this->_CheckHookedFields();
+      $HookedFieldStatus = $this->_CheckHookedFields();
+      if ($HookedFieldStatus) {
+         if (is_null($this->_DataHooks['Token']['value']) && $this->GetHandshakeMode() != 'javascript')
+            return FALSE;
+      }
+      return $HookedFieldStatus;
    }
 
    public function DeAuthenticate() {

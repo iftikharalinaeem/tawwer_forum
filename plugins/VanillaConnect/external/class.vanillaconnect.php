@@ -106,7 +106,7 @@ class VanillaConnect {
             if (window.onload) { window.prevonload = window.onload; }
             window.onload = function() {
                if (window.prevonload) window.prevonload();
-               AddInclude("vanillaconnect", "{$Url}&mode=js");
+               AddInclude("vanillaconnect", "{$Url}&mode=javascript");
             }
          })();
       </script>
