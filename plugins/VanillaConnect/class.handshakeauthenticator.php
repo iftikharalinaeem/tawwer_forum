@@ -74,6 +74,12 @@ class Gdn_HandshakeAuthenticator extends Gdn_Authenticator implements Gdn_IHands
       $Timestamp = $this->GetValue('Timestamp');
       $Version = $this->GetValue('Version');
       
+      // When the request is coming from a script (reverse request order), fake the token... lol >,>
+      if ($this->GetHandshakeMode() == 'javascript' && empty($RToken)) {
+         $Token = $this->CreateToken('request', $ConsumerKey);
+         $RToken = GetValue('Token', $Token);
+      }
+      
       $RequestArguments = array(
          'oauth_consumer_key'       => $ConsumerKey,
          'oauth_token'              => $RToken,
