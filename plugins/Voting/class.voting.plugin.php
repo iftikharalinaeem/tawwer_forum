@@ -227,8 +227,7 @@ class VotingPlugin extends Gdn_Plugin {
 		if (!C('Plugins.Voting.Enabled'))
 			return;
 
-		$Sender->AddCSSFile('plugins/Voting/design/voting.css');
-		$Sender->AddJSFile('plugins/Voting/voting.js');
+      $this->AddJsCss($Sender);
    }
    
    
@@ -449,8 +448,15 @@ class VotingPlugin extends Gdn_Plugin {
 		if (!C('Plugins.Voting.Enabled'))
 			return;
 
-		$Sender->AddCSSFile('plugins/Voting/design/voting.css');
+      $this->AddJsCss($Sender);
 	}
+
+   public function ProfileController_Render_Before($Sender) {
+		if (!C('Plugins.Voting.Enabled'))
+			return;
+
+      $this->AddJsCss($Sender);
+   }
 
 	/**
 	 * Add a field to the db for storing the "State" of a question.
