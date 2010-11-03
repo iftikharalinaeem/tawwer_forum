@@ -23,7 +23,6 @@ $ThemeInfo['DefaultSmarty'] = array(
       'Styles' => array(
          'Vanilla Terminal' => '%s_terminal',
 			'Vanilla Grey' => '%s_grey',
-			'Vanilla Old Tyme' => '%s_oldtyme',
 			'Vanilla Big City' => '%s_bigcity',
 			'Vanilla Poppy' => '%s_poppy',
 			'Vanilla Lemon Sea' => '%s_lemonsea',

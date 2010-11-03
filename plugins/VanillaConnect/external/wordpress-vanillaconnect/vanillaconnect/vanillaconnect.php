@@ -45,6 +45,7 @@ add_action('admin_head', 'vanillaconnect_process');
 add_action('login_form', 'vanillaconnect_process');
 function vanillaconnect_process() {
    global $current_user;
+   
    if (!function_exists('get_currentuserinfo'))
       require (ABSPATH . WPINC . '/pluggable.php');
 
@@ -67,13 +68,13 @@ function vanillaconnect_process() {
    
    if (array_key_exists('mode', $_GET)) $Mode = $_GET['mode'];
    if (array_key_exists('oauth_token', $_GET)) $OAuthToken = $_GET['oauth_token'];
-      
+   
    if ($current_user->ID) {
    
       // if the user is logged in, but the 'just logged out' flags are set, do nothing.
       if (isset($_GET['loggedout']) || $_GET['loggedout']) return;
       
-      if (is_null($OAuthToken))
+      if (is_null($OAuthToken) && $Mode != 'script')
          return;
       else
          $RequestToken = new OAuthToken($OAuthToken, "");
@@ -1145,7 +1146,7 @@ class VanillaConnect {
             if (window.onload) { window.prevonload = window.onload; }
             window.onload = function() {
                if (window.prevonload) window.prevonload();
-               AddInclude("vanillaconnect", "{$Url}&mode=js");
+               AddInclude("vanillaconnect", "{$Url}&mode=javascript");
             }
          })();
       </script>
