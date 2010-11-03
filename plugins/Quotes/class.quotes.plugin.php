@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Quotes'] = array(
    'Name' => 'Quotes',
    'Description' => "This plugin allows users to quote each other's posts easily.",
-   'Version' => '1.1.1',
+   'Version' => '1.2',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
@@ -33,7 +33,7 @@ class QuotesPlugin extends Gdn_Plugin {
    public function Controller_Getquote($Sender) {
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
-      
+
       $QuoteData = array(
          'status' => 'failed'
       );
@@ -165,7 +165,8 @@ BLOCKQUOTE;
          default:
             break;
       }
-      $QuoteData = array();
+      
+      //$QuoteData = array();
       if ($Model !== FALSE) {
          $Data = $Model->GetID($ID);
          $NewFormat = C('Garden.InputFormatter');
