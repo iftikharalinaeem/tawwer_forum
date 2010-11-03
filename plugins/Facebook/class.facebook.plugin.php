@@ -58,14 +58,14 @@ class FacebookPlugin extends Gdn_Plugin {
          $ImgSrc = Asset('/plugins/Facebook/design/facebook-login.png');
          $ImgAlt = T('Login with Facebook');
 
-         if ($AccessToken) {
-            $SigninHref = $this->RedirectUri();
-
-            // We already have an access token so we can just link to the connect page.
-            $FbMethod = array(
-                'Name' => 'Facebook',
-                'SignInHtml' => "<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopLink\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>");
-         } else {
+//         if ($AccessToken) {
+//            $SigninHref = $this->RedirectUri();
+//
+//            // We already have an access token so we can just link to the connect page.
+//            $FbMethod = array(
+//                'Name' => 'Facebook',
+//                'SignInHtml' => "<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopLink\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>");
+//         } else {
             $SigninHref = $this->AuthorizeUri();
             $PopupSigninHref = $this->AuthorizeUri('display=popup');
 
@@ -73,7 +73,7 @@ class FacebookPlugin extends Gdn_Plugin {
             $FbMethod = array(
                'Name' => 'Facebook',
                'SignInHtml' => "<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" /></a>");
-         }
+//         }
 
          $Sender->Data['Methods'][] = $FbMethod;
       }
