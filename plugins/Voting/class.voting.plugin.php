@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Voting'] = array(
    'Name' => 'Voting',
    'Description' => 'Allows users to vote on comments and discussions.',
-   'Version' => '1.0.1b',
+   'Version' => '1.0.2b',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
@@ -227,8 +227,7 @@ class VotingPlugin extends Gdn_Plugin {
 		if (!C('Plugins.Voting.Enabled'))
 			return;
 
-		$Sender->AddCSSFile('plugins/Voting/design/voting.css');
-		$Sender->AddJSFile('plugins/Voting/voting.js');
+      $this->AddJsCss($Sender);
    }
    
    
@@ -449,8 +448,15 @@ class VotingPlugin extends Gdn_Plugin {
 		if (!C('Plugins.Voting.Enabled'))
 			return;
 
-		$Sender->AddCSSFile('plugins/Voting/design/voting.css');
+      $this->AddJsCss($Sender);
 	}
+
+   public function ProfileController_Render_Before($Sender) {
+		if (!C('Plugins.Voting.Enabled'))
+			return;
+
+      $this->AddJsCss($Sender);
+   }
 
 	/**
 	 * Add a field to the db for storing the "State" of a question.
