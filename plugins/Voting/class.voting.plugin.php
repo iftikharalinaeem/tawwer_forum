@@ -50,7 +50,7 @@ class VotingPlugin extends Gdn_Plugin {
 		if (!C('Plugins.Voting.Enabled'))
 			return;
 		
-      $Sender->AddCSSFile('plugins/Voting/design/voting.css');
+      $Sender->AddCSSFile('voting.css', 'plugins/Voting');
 		$Sender->AddJSFile('plugins/Voting/voting.js');
    }
 	public function DiscussionsController_Render_Before($Sender) {
