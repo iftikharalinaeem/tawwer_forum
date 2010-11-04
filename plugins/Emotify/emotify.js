@@ -79,7 +79,7 @@ window.emotify = (function(){
         arr.push(regexp_str);
       }
       
-      EMOTICON_RE = new RegExp('(^|\\s)(' + arr.join('|') + ')(?=(?:$|\\s))', 'g');
+      EMOTICON_RE = new RegExp('(\\s?)(' + arr.join('|') + ')(?=(?:$|\\s))', 'g');
     }
     
     return emoticons;
@@ -90,9 +90,9 @@ window.emotify = (function(){
 })();
 
 $(function(){
-  emotify.emoticons({
+  var emoticons = {
 /*  smiley, css_suffix, alternate_smileys */
-    ":)":    ["1", ":-)"],
+    ":-)":    ["1", ":)"],
     ":(":    ["2", ":-("],
     ";)":    ["3", ";-)"],
     ":D":    ["4", ":-D"],
@@ -115,9 +115,9 @@ $(function(){
     ":))":   ["21", ":-))"],
     ":|":    ["22", ":-|"],
     "/:)":   ["23", "/:-)"],
-    "=))":   ["24"],
+//    "=))":   ["24"],
     "O:-)":  ["25", "O:)"],
-    ":-B":   ["26"],
+//    ":-B":   ["26"],
     "=;":    ["27"],
     "I-)":   ["28"],
     "8-|":   ["29"],
@@ -125,9 +125,9 @@ $(function(){
     ":-&":   ["31"],
     ":-$":   ["32"],
     "[-(":   ["33"],
-    ":O)":   ["34"],
-    "8-}":   ["35"],
-    "<:-P":  ["36"],
+//    ":O)":   ["34"],
+//    "8-}":   ["35"],
+//    "<:-P":  ["36"],
     "(:|":   ["37"],
     "=P~":   ["38"],
     ":-?":   ["39"],
@@ -140,18 +140,18 @@ $(function(){
     ":-<":   ["46"],
     ">:P":   ["47", ">:p"],
     "<):)":  ["48"],
-    ":@)":   ["49"],
-    "3:-O":  ["50", "3:-o"],
+//    ":@)":   ["49"],
+//    "3:-O":  ["50", "3:-o"],
     ":(|)":  ["51"],
     "~:>":   ["52"],
-    "@};-":  ["53"],
+//    "@};-":  ["53"],
     "%%-":   ["54"],
-    "**==":  ["55"],
-    "(~~)":  ["56"],
+//    "**==":  ["55"],
+//    "(~~)":  ["56"],
     "~O)":   ["57"],
     "*-:)":  ["58"],
     "8-X":   ["59"],
-    "=:)":   ["60"],
+//    "=:)":   ["60"],
     ">-)":   ["61"],
     ":-L":   ["62", ":L"],
     "[-O<":  ["63"],
@@ -179,7 +179,7 @@ $(function(){
     "8->":   ["105"],
     ":-??":  ["106"],
     "%-(":   ["107"],
-    ":o3":   ["108"],
+//    ":o3":   ["108"],
     "X_X":   ["109"],
     ":!!":   ["110"],
     "\\m/":  ["111"],
@@ -189,10 +189,62 @@ $(function(){
     ":bz":   ["115"],
     ":ar!":  ["pirate"],
     "[..]":  ["transformer"]
+  }
+  
+  emotify.emoticons(emoticons);
+  
+  $('div.Comment div.Message, div.Preview').livequery(function() {
+    var txt = $(this).html().toString();
+    txt = txt.replace("\n", "EXPLICIT_EMOTIFY_NEWLINE");
+    txt = txt.replace(/<br>/img, "\nEXPLICIT_EMOTIFY_BR");
+    txt = txt.replace(/<br \/>/img, "\nEXPLICIT_EMOTIFY_BR");
+    txt = emotify(txt);
+    txt = txt.replace(/EXPLICIT_EMOTIFY_BR/img, "<br />");
+    txt = txt.replace(/EXPLICIT_EMOTIFY_NEWLINE/img, "\n\n");
+    $(this).html(txt);
   });
   
-  $('div.Comment div.Message').livequery(function() {
-    var html = $(this).html();
-    $(this).html(emotify(html));
+  insertEmoticon = function() {
+    
+  }
+  
+  // Insert a clickable icon list after the textbox
+  $('textarea#Form_Body').livequery(function() {
+    var textbox = this;
+    var buts = '';
+    var emo = '';
+    for (e in emoticons) {
+      emo = emoticons[e][1];
+      if (typeof(emo) == 'undefined')
+        emo = e;
+        
+      buts += '<a class="EmoticonBox Emoticon Emoticon'+emoticons[e][0]+'"><span>'+emo+'</span></a>';
+    }
+    $(this).before("<div class=\"EmotifyWrapper\">\
+      <a class=\"EmotifyDropdown\"><span>Emoticons</span></a> \
+      <div class=\"EmoticonContainer Hidden\">"+buts+"</div> \
+    </div>");
+    
+    $('.EmotifyDropdown').click(function() {
+      if ($(this).hasClass('EmotifyDropdownActive'))
+        $(this).removeClass('EmotifyDropdownActive');
+      else
+        $(this).addClass('EmotifyDropdownActive');
+
+      $('.EmoticonContainer').toggle();
+      return false;
+    });
+    
+    $('.EmoticonBox').live('click', function() {
+      var emoticon = $(this).find('span').text();
+      var txt = $(textbox).text();
+      if (txt != '')
+        txt += ' ';
+      $(textbox).text(txt + emoticon + ' ');
+      $('.EmoticonContainer').hide();
+      $('.EmotifyDropdown').removeClass('EmotifyDropdownActive');
+      return false;
+    });
   });
+  
 });
