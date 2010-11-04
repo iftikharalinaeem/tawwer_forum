@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['StopAutoDraft'] = array(
    'Name' => 'Stop Auto Draft',
    'Description' => 'Comments are auto-saved in Vanilla by default. This plugin removes the feature so that drafts are only saved if the "save draft" button is clicked.',
-   'Version' => '1.0',
+   'Version' => '1.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca'
@@ -20,8 +20,13 @@ $PluginInfo['StopAutoDraft'] = array(
 
 class StopAutoDraftPlugin extends Gdn_Plugin {
 
-	// Reverse the comment sort order
    public function DiscussionController_Render_Before($Sender) {
+		$this->_NoDrafting($Sender);
+	}
+   public function PostController_Render_Before($Sender) {
+		$this->_NoDrafting($Sender);
+	}
+	private function _NoDrafting($Sender) {
 	   $Sender->RemoveJsFile('autosave.js');
 		$Sender->Head->AddString('
 <script type="text/javascript">
