@@ -7,8 +7,15 @@ $PluginInfo['Emotify'] = array(
 	'Author' 	=>	 "Mark O'Sullivan",
 	'AuthorEmail' => 'mark@vanillaforums.com',
 	'AuthorUrl' =>	 'http://vanillaforums.org',
-	'License' => 'GPL v2'
+	'License' => 'GPL v2',
+	'RequiredApplications' => array('Vanilla' => '>=2.0.14'),
 );
+
+/**
+ * Note: Added jquery events required for proper display/hiding of emoticons
+ * as write & preview buttons are clicked on forms in Vanilla 2.0.14. These
+ * are necessary in order for this plugin to work properly.
+ */
 
 class EmotifyPlugin implements Gdn_IPlugin {
 	

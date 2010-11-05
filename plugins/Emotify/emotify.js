@@ -210,7 +210,6 @@ $(function(){
   
   // Insert a clickable icon list after the textbox
   $('textarea#Form_Body').livequery(function() {
-    var textbox = this;
     var buts = '';
     var emo = '';
     for (e in emoticons) {
@@ -225,24 +224,36 @@ $(function(){
       <div class=\"EmoticonContainer Hidden\">"+buts+"</div> \
     </div>");
     
-    $('.EmotifyDropdown').click(function() {
+    $('.EmotifyDropdown').live('click', function() {
       if ($(this).hasClass('EmotifyDropdownActive'))
         $(this).removeClass('EmotifyDropdownActive');
       else
         $(this).addClass('EmotifyDropdownActive');
 
-      $('.EmoticonContainer').toggle();
+      $(this).next().toggle();
       return false;
+    });
+    
+    $('form#Form_Comment').bind("PreviewLoaded", function(e, frm) {
+      frm.find('.EmotifyDropdown').removeClass('EmotifyDropdownActive');
+      frm.find('.EmotifyDropdown').hide();
+      frm.find('.EmoticonContainer').hide();
+    });
+    
+    $('form#Form_Comment').bind('WriteButtonClick', function(e, frm) {
+      frm.find('.EmotifyDropdown').show();
     });
     
     $('.EmoticonBox').live('click', function() {
       var emoticon = $(this).find('span').text();
-      var txt = $(textbox).text();
+      var textbox = $(this).parents('form').find('textarea#Form_Body');
+      var txt = $(textbox).val();
       if (txt != '')
         txt += ' ';
-      $(textbox).text(txt + emoticon + ' ');
-      $('.EmoticonContainer').hide();
-      $('.EmotifyDropdown').removeClass('EmotifyDropdownActive');
+      $(textbox).val(txt + emoticon + ' ');
+      var container = $(this).parents('.EmoticonContainer');
+      $(container).hide();
+      $(container).prev().removeClass('EmotifyDropdownActive');
       return false;
     });
   });
