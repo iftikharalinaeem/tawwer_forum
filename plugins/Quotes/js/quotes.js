@@ -96,11 +96,11 @@ function Gdn_Quotes() {
                }               
             }
 */
-
+				var webRoot = gdn.definition('WebRoot', '');
             var ss = document.createElement("link");
             ss.type = "text/css";
             ss.rel = "stylesheet";
-            ss.href = "/plugins/Quotes/css/cleditor.css";
+            ss.href = gdn.combinePaths(webRoot, '/plugins/Quotes/css/cleditor.css');
             
             if (document.all)
             	FrameDocument.createStyleSheet(ss.href);
