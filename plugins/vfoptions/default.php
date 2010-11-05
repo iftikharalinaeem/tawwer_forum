@@ -381,8 +381,8 @@ pageTracker._trackPageview();
     * VanillaForums.com database.
     */
    public function EntryController_Spoof_Create(&$Sender) {
-      $Sender->Title('Spoof User');
-      $Sender->AddSideMenu('dashboard/user');
+      $Sender->Title('Spoof');
+      // $Sender->AddSideMenu('dashboard/user');
       $Sender->Form = new Gdn_Form();
       $Email = $Sender->Form->GetValue('Email', '');
       $Password = $Sender->Form->GetValue('Password', '');
