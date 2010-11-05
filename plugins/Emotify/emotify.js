@@ -19,7 +19,11 @@ window.emotify = (function(){
       return '<span class="Emoticon Emoticon' + cssSuffix + '"><span>' + smiley + '</span></span>';
     };
     
-    return txt.replace(EMOTICON_RE, function(a, b, text) {
+    txt = txt.toString();
+    txt = txt.replace("\n", "EXPLICIT_EMOTIFY_NEWLINE");
+    txt = txt.replace(/<br>/img, "\nEXPLICIT_EMOTIFY_BR");
+    txt = txt.replace(/<br \/>/img, "\nEXPLICIT_EMOTIFY_BR");
+    txt = txt.replace(EMOTICON_RE, function(a, b, text) {
       var i = 0,
         smiley = text,
         e = emoticons[text];
@@ -34,6 +38,9 @@ window.emotify = (function(){
       // If the smiley was found, return HTML, otherwise the original search string
       return e ? (b + callback(e[0], smiley)) : a;
     });
+    txt = txt.replace(/EXPLICIT_EMOTIFY_BR/img, "<br />");
+    txt = txt.replace(/EXPLICIT_EMOTIFY_NEWLINE/img, "\n\n");
+    return txt;
   };
   
   emotify.emoticons = function() {
@@ -122,7 +129,7 @@ $(function(){
     "I-)":   ["28"],
     "8-|":   ["29"],
     "L-)":   ["30"],
-    ":-&":   ["31"],
+    ":-&":   ["31", ":0&amp;"],
     ":-$":   ["32"],
     "[-(":   ["33"],
 //    ":O)":   ["34"],
@@ -193,20 +200,9 @@ $(function(){
   
   emotify.emoticons(emoticons);
   
-  $('div.Comment div.Message, div.Preview').livequery(function() {
-    var txt = $(this).html().toString();
-    txt = txt.replace("\n", "EXPLICIT_EMOTIFY_NEWLINE");
-    txt = txt.replace(/<br>/img, "\nEXPLICIT_EMOTIFY_BR");
-    txt = txt.replace(/<br \/>/img, "\nEXPLICIT_EMOTIFY_BR");
-    txt = emotify(txt);
-    txt = txt.replace(/EXPLICIT_EMOTIFY_BR/img, "<br />");
-    txt = txt.replace(/EXPLICIT_EMOTIFY_NEWLINE/img, "\n\n");
-    $(this).html(txt);
+  $('div.Comment div.Message p, div.Preview div.Message').livequery(function() {
+    $(this).html(emotify($(this).html()));
   });
-  
-  insertEmoticon = function() {
-    
-  }
   
   // Insert a clickable icon list after the textbox
   $('textarea#Form_Body').livequery(function() {
@@ -234,16 +230,26 @@ $(function(){
       return false;
     });
     
+    // Hide emotify options when previewing
     $('form#Form_Comment').bind("PreviewLoaded", function(e, frm) {
       frm.find('.EmotifyDropdown').removeClass('EmotifyDropdownActive');
       frm.find('.EmotifyDropdown').hide();
       frm.find('.EmoticonContainer').hide();
     });
     
+    // Reveal emotify dropdowner when write button clicked
     $('form#Form_Comment').bind('WriteButtonClick', function(e, frm) {
       frm.find('.EmotifyDropdown').show();
     });
     
+    // Hide emoticon box when textarea is focused
+    $('textarea#Form_Body').live('focus', function() {
+      var frm = $(this).parents('form');
+      frm.find('.EmotifyDropdown').removeClass('EmotifyDropdownActive');
+      frm.find('.EmoticonContainer').hide();
+    });
+
+    // Put the clicked emoticon into the textarea
     $('.EmoticonBox').live('click', function() {
       var emoticon = $(this).find('span').text();
       var textbox = $(this).parents('form').find('textarea#Form_Body');
@@ -254,6 +260,38 @@ $(function(){
       var container = $(this).parents('.EmoticonContainer');
       $(container).hide();
       $(container).prev().removeClass('EmotifyDropdownActive');
+      
+      // If cleditor is running, update it's contents
+      var ed = $(textbox).get(0).editor;
+      if (ed) {
+        // Update the frame to match the contents of textarea
+        ed.updateFrame();
+        // Run emotify on the frame contents
+        var Frame = $(ed.$frame).get(0);
+        var FrameBody = null;
+        var FrameDocument = null;
+        
+        // DOM
+        if (Frame.contentDocument) {
+           FrameDocument = Frame.contentDocument;
+           FrameBody = FrameDocument.body;
+        // IE
+        } else if (Frame.contentWindow) {
+           FrameDocument = Frame.contentWindow.document;
+           FrameBody = FrameDocument.body;
+        }
+        $(FrameBody).html(emotify($(FrameBody).html()));
+        var webRoot = gdn.definition('WebRoot', '');
+        var ss = document.createElement("link");
+        ss.type = "text/css";
+        ss.rel = "stylesheet";
+        ss.href = gdn.combinePaths(webRoot, 'plugins/Emotify/emotify.css');
+        if (document.all)
+           FrameDocument.createStyleSheet(ss.href);
+        else
+           FrameDocument.getElementsByTagName("head")[0].appendChild(ss);
+      }
+
       return false;
     });
   });
