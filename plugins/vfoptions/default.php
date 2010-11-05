@@ -428,7 +428,7 @@ pageTracker._trackPageview();
 		$Features['free'] = array();
 		$Features['basic'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
-			'CustomDomain', 'FileUpload'
+			'CustomDomain', 'FileUpload', 'PrivateCommunity'
 		);
 		$Features['plus'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
