@@ -118,6 +118,10 @@ class FacebookPlugin extends Gdn_Plugin {
       if (GetValue(0, $Args) != 'facebook')
          return;
 
+      if (isset($_GET['error'])) {
+         throw new Gdn_UserException(GetValue('error_description', $_GET, T('There was an error connecting to Facebook')));
+      }
+
       $AppID = C('Plugins.Facebook.ApplicationID');
       $Secret = C('Plugins.Facebook.Secret');
       $Code = GetValue('code', $_GET);
