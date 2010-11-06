@@ -240,6 +240,9 @@ ul.DataList div.Excerpt a {
 #Foot div {
 	width:650px;
 }
+div.SingleEntryMethod {
+	width:312px;
+}
 #ConversationForm .TextBox,
 #ConversationForm textarea.MultiComplete,
 #DiscussionForm textarea,
@@ -248,6 +251,8 @@ ul.DataList div.Excerpt a {
 }
 #ConversationForm form,
 body.Entry #Content form,
+body#dashboard_entry_password #Content form,
+body#dashboard_entry_signin #Content form,
 div.Popup .Content form,
 #MessageForm,
 form.Activity,
