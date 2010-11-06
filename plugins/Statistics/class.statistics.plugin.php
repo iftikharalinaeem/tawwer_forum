@@ -560,9 +560,9 @@ class StatisticsPlugin extends Gdn_Plugin {
    public function StatsDashboard($Sender) {
       // Load javascript & css, check permissions, and load side menu for this page.
       $Sender->AddJsFile('settings.js');
-      $Sender->RaphaelLocation = '/plugins/Statistics/js/raphael.js';
-      $Sender->GraphLocation = '/plugins/Statistics/js/graph.js';
-      $Sender->PickerLocation = '/plugins/Statistics/js/picker.js';
+      $Sender->RaphaelLocation = Asset('/plugins/Statistics/js/raphael.js');
+      $Sender->GraphLocation = Asset('/plugins/Statistics/js/graph.js');
+      $Sender->PickerLocation = Asset('/plugins/Statistics/js/picker.js');
       $Sender->AddJsFile('plugins/Statistics/js/loader.js');
       $Sender->AddCSSFile('plugins/Statistics/design/graph.css');
       $Sender->AddCSSFile('plugins/Statistics/design/picker.css');
