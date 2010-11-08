@@ -21,7 +21,8 @@ $PluginInfo['Statistics'] = array(
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter, Mark O'Sullivan",
    'AuthorEmail' => 'support@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'SettingsUrl' => '/plugin/statistics',
 );
 
 class StatisticsPlugin extends Gdn_Plugin {
