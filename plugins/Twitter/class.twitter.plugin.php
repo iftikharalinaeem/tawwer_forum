@@ -161,7 +161,6 @@ class TwitterPlugin extends Gdn_Plugin {
       }
 
       // There was an error. Echo the error.
-      echo "There was an error authorizing the twitter connect.\n";
       echo $Response;
    }
 
@@ -328,6 +327,7 @@ class TwitterPlugin extends Gdn_Plugin {
    protected function _Curl($Request) {
       $C = curl_init();
       curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
+		curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
       
       switch ($Request->get_normalized_http_method()) {
          case 'POST':
