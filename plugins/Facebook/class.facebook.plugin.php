@@ -13,7 +13,7 @@ $PluginInfo['Facebook'] = array(
 	'Name' => 'Vanilla Facebook',
    'Description' => 'This plugin integrates Vanilla with Facebook. This plugin requires you to register your application with Facebook and will not work until you have configured it properly.',
    'Version' => '0.1a',
-   'RequiredApplications' => array('Vanilla' => '2.0.12a'),
+   'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/settings/facebook',
