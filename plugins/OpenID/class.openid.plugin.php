@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['OpenID'] = array(
-	'Name' => 'Vanilla OpenID',
+	'Name' => 'OpenID',
    'Description' => 'This plugin allows users to sign in with OpenID.',
    'Version' => '0.1a',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
