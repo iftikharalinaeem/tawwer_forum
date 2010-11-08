@@ -137,6 +137,10 @@ class TwitterPlugin extends Gdn_Plugin {
 
       $Curl = $this->_Curl($Request);
       $Response = curl_exec($Curl);
+      if ($Response === FALSE) {
+         $Response = curl_error($Curl);
+      }
+
       $HttpCode = curl_getinfo($Curl, CURLINFO_HTTP_CODE);
       curl_close($Curl);
 
@@ -157,6 +161,7 @@ class TwitterPlugin extends Gdn_Plugin {
       }
 
       // There was an error. Echo the error.
+      echo "There was an error authorizing the twitter connect.\n";
       echo $Response;
    }
 
@@ -197,6 +202,9 @@ class TwitterPlugin extends Gdn_Plugin {
 
          $Curl = $this->_Curl($Request);
          $Response = curl_exec($Curl);
+         if ($Response === FALSE) {
+            $Response = curl_error($Curl);
+         }
          $HttpCode = curl_getinfo($Curl, CURLINFO_HTTP_CODE);
          curl_close($Curl);
 
