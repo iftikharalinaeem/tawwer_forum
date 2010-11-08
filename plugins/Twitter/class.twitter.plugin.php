@@ -328,7 +328,6 @@ class TwitterPlugin extends Gdn_Plugin {
       $C = curl_init();
       curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
-      
       switch ($Request->get_normalized_http_method()) {
          case 'POST':
             curl_setopt($C, CURLOPT_URL, $Request->get_normalized_http_url());
