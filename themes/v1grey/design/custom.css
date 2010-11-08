@@ -111,8 +111,11 @@ div.MessageForm {
 div.MessageForm div.Buttons {
 	text-align: right;
 }
+
+div.Comment div.CommentForm,
 div.CommentForm textarea {
-	width:99%;
+	width:98%;
+	clear: none;
 }
 div.Tabs {
    margin-bottom: 1px;
@@ -493,4 +496,10 @@ div.User h1 {
 
 body ul div.Comment blockquote.UserQuote {
    background-color: #555555;
+}
+ul.MessageList div.Message blockquote {
+	background: none;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
 }

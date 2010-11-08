@@ -7,7 +7,8 @@ $PluginInfo['CustomTheme'] = array(
    'Version' => '1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
+   'AuthorUrl' => 'http://vanillaforums.com',
+	'SettingsUrl' => '/settings/customtheme',
 );
 
 class CustomThemePlugin implements Gdn_IPlugin {

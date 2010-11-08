@@ -380,9 +380,9 @@ pageTracker._trackPageview();
     * Allows you to spoof the admin user if you have admin access in the
     * VanillaForums.com database.
     */
-   public function PluginController_Spoof_Create(&$Sender) {
-      $Sender->Title('Spoof User');
-      $Sender->AddSideMenu('dashboard/user');
+   public function EntryController_Spoof_Create(&$Sender) {
+      $Sender->Title('Spoof');
+      // $Sender->AddSideMenu('dashboard/user');
       $Sender->Form = new Gdn_Form();
       $Email = $Sender->Form->GetValue('Email', '');
       $Password = $Sender->Form->GetValue('Password', '');
@@ -428,7 +428,7 @@ pageTracker._trackPageview();
 		$Features['free'] = array();
 		$Features['basic'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
-			'CustomDomain', 'FileUpload'
+			'CustomDomain', 'FileUpload', 'PrivateCommunity'
 		);
 		$Features['plus'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
