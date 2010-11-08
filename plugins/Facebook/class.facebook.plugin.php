@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Facebook'] = array(
-	'Name' => 'Vanilla Facebook',
+	'Name' => 'Facebook',
    'Description' => 'This plugin integrates Vanilla with Facebook. This plugin requires you to register your application with Facebook and will not work until you have configured it properly.',
    'Version' => '0.1a',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),

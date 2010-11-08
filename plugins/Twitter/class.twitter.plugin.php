@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Twitter'] = array(
-	'Name' => 'Vanilla Twitter',
+	'Name' => 'Twitter',
    'Description' => 'This plugin integrates Twitter with Vanilla. You must register your application with Twitter for this plugin to work.',
    'Version' => '0.1a',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
@@ -378,7 +378,12 @@ class TwitterPlugin extends Gdn_Plugin {
    }
 
    public function Setup() {
-      // Save the facebook provider type.
+      // Make sure the user has curl.
+      if (!function_exists('curl_exec')) {
+         throw new Gdn_UserException('This plugin requires curl.');
+      }
+
+      // Save the twitter provider type.
       Gdn::SQL()->Replace('UserAuthenticationProvider',
          array('AuthenticationSchemeAlias' => 'twitter', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),
          array('AuthenticationKey' => self::$ProviderKey));
