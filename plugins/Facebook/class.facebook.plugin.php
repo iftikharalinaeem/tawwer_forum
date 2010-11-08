@@ -16,6 +16,7 @@ $PluginInfo['Facebook'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
+	'MobileFriendly' => TRUE,
    'SettingsUrl' => '/dashboard/settings/facebook',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,

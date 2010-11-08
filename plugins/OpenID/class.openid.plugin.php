@@ -16,6 +16,7 @@ $PluginInfo['OpenID'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
+	'MobileFriendly' => TRUE,
    'SettingsUrl' => '/dashboard/settings/openid',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
