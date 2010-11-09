@@ -32,8 +32,14 @@ class PluginsTask extends Task {
       $this->SaveToConfig('EnabledPlugins.CustomTheme','CustomTheme');
       $this->SaveToConfig('EnabledPlugins.Gravatar','Gravatar');
       $this->SaveToConfig('EnabledPlugins.embedvanilla','embedvanilla');
-      $this->SaveToConfig('EnabledPlugins.vfoptions','vfoptions');
+      $this->SaveToConfig('EnabledPlugins.Facebook','Facebook');
+      $this->SaveToConfig('EnabledPlugins.Twitter','Twitter');
+      $this->SaveToConfig('EnabledPlugins.GoogleSignIn','GoogleSignIn');
+      $this->SaveToConfig('EnabledPlugins.OpenID','OpenID');
+
       
+      $this->SaveToConfig('EnabledPlugins.vfoptions','vfoptions');
+            
       // Politely enable plugins with structures
       $this->EnablePlugin('Statistics');
    }
