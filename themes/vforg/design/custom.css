@@ -1246,3 +1246,6 @@ div.Feature h4 {
 .FeaturePanel img {
 	float: right;
 }
+body.Discussion a.Bookmark {
+	margin:2px 8px;
+}

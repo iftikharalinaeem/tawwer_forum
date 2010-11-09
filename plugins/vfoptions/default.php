@@ -53,18 +53,19 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		$Menu->RemoveLink('Add-ons', T('Plugins'));
 		$Menu->RemoveLink('Add-ons', T('Applications'));
 		$Menu->RemoveLink('Add-ons', T('Locales'));
-//		$Menu->RemoveLink('Add-ons', T('&lt;Embed&gt; Vanilla'));
 		$Menu->RemoveLink('Site Settings', T('Routes'));
 		$Menu->RemoveLink('Site Settings', T('Outgoing Email'));
+		$Menu->RemoveLink('Users', T('Authentication'));
+		$Menu->AddLink('Users', T('Authentication').$New, 'dashboard/authentication', 'Garden.Settings.Manage');
+
+      if (C('EnabledPlugins.embedvanilla')) {
+			$Menu->RemoveLink('Add-ons', T('&lt;Embed&gt; Vanilla'));
+			$Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla').$New, 'plugin/embed', 'Garden.Settings.Manage');
+      }
+	
+		$Menu->RemoveLink('Forum', T('Statistics'));
+		$Menu->AddLink('Forum', T('Statistics').$New, 'plugin/statistics', 'Garden.Settings.Manage');
 		
-		$Menu->RemoveGroup('Dashboard');
-		$Menu->AddItem('Dashboard', T('Dashboard').$New, FALSE, array('class' => 'Dashboard'));
-		$Menu->AddLink('Dashboard', T('Dashboard'), 'dashboard/settings', 'Garden.Settings.Manage');
-		
-/*
-      if (C('EnabledPlugins.embedvanilla'))
-   		$Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla').$New, 'plugin/embed', 'Garden.Settings.Manage');
-*/
    		
 		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
    too large to upload directly to this page you can
