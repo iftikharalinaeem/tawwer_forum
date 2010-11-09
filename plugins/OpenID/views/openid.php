@@ -5,8 +5,10 @@
 </div>
 <div class="FilterMenu">
       <?php
+      $FormAction = $this->Plugin->AutoTogglePath();
       echo $this->Form->Open(array(
-         'action'  => Url($this->Plugin->AutoTogglePath())
+         'action'    => Url($FormAction),
+         'jsaction'  => $FormAction
       ));
       echo $this->Form->Errors();
       
