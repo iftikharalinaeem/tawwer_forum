@@ -348,9 +348,6 @@ class TwitterPlugin extends Gdn_Plugin {
          $this->_RedirectUri = $NewValue;
       elseif ($this->_RedirectUri === NULL) {
          $RedirectUri = Url('/entry/connect/twitter', TRUE);
-         $Args = array('Target' => GetValue('Target', $_GET, Url('/')));
-
-         $RedirectUri .= '?'.http_build_query($Args);
          $this->_RedirectUri = $RedirectUri;
       }
 
