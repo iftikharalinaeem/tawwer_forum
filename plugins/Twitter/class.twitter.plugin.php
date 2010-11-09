@@ -16,6 +16,7 @@ $PluginInfo['Twitter'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
+	'MobileFriendly' => TRUE,
    'SettingsUrl' => '/dashboard/settings/twitter',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
@@ -358,9 +359,6 @@ class TwitterPlugin extends Gdn_Plugin {
          $this->_RedirectUri = $NewValue;
       elseif ($this->_RedirectUri === NULL) {
          $RedirectUri = Url('/entry/connect/twitter', TRUE);
-         $Args = array('Target' => GetValue('Target', $_GET, Url('/')));
-
-         $RedirectUri .= '?'.http_build_query($Args);
          $this->_RedirectUri = $RedirectUri;
       }
 

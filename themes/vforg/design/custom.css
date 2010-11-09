@@ -612,13 +612,6 @@ body.Entry #Content div.Box {
    -moz-border-radius: 4px;
    -webkit-border-radius: 4px;
 }
-body.Entry #Content form {
-	display: block;
-	padding:10px 30px 20px !important;
-}
-body.Entry div.Errors {
-	margin: 0 !important;
-}
 
 
 /* Popups */
@@ -642,8 +635,15 @@ div.Popup h2 {
 a.Close { color: #744000; }
 a.Close:hover { color: #4A2900; }
 div.SignInPopup .Content form { padding: 0 14px 10px; }
-div.SignInPopup div.Border { max-width: 290px; }
-
+div.Methods {
+	background: none;
+	border: none;
+	font-weight: bold;
+	padding: 1px 6px 0 22px;
+	color: #000;
+	font-size: 14px;
+	text-align: left;
+}
 
 /* DataList & Headings */
 div#MessageForm,
