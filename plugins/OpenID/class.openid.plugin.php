@@ -69,9 +69,34 @@ class OpenIDPlugin extends Gdn_Plugin {
       return $OpenID;
    }
 
+   /**
+    * Act as a mini dispatcher for API requests to the plugin app
+    */
+   public function PluginController_OpenID_Create(&$Sender) {
+		$this->Dispatch($Sender, $Sender->RequestArgs);
+   }
+   
+   public function Controller_Toggle($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $this->AutoToggle($Sender);
+   }
+   
+   public function AuthenticationController_Render_Before($Sender, $Args) {
+      if (isset($Sender->ChooserList)) {
+         $Sender->ChooserList['openid'] = 'OpenID';
+      }
+      if (is_array($Sender->Data('AuthenticationConfigureList'))) {
+         $List = $Sender->Data('AuthenticationConfigureList');
+         $List['openid'] = '/dashboard/plugin/openid';
+         $Sender->SetData('AuthenticationConfigureList', $List);
+      }
+   }
+
    /// Plugin Event Handlers ///
 
    public function Base_ConnectData_Handler($Sender, $Args) {
+      if (!$this->IsEnabled()) return;
+      
       if (GetValue(0, $Args) != 'openid')
          return;
 
@@ -94,18 +119,6 @@ class OpenIDPlugin extends Gdn_Plugin {
          $Sender->SetData('Verified', TRUE);
       }
    }
-   
-   /**
-    * Act as a mini dispatcher for API requests to the plugin app
-    */
-   public function PluginController_OpenID_Create(&$Sender) {
-		$this->Dispatch($Sender, $Sender->RequestArgs);
-   }
-   
-   public function Controller_Toggle($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
-      $this->AutoToggle($Sender);
-   }
 
    /**
     *
@@ -113,6 +126,8 @@ class OpenIDPlugin extends Gdn_Plugin {
     * @param array $Args
     */
    public function EntryController_OpenID_Create($Sender, $Args) {
+      if (!$this->IsEnabled()) return;
+      
       $this->EventArguments = $Args;
       $OpenID = $this->GetOpenID();
 
@@ -146,6 +161,8 @@ class OpenIDPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function EntryController_SignIn_Handler($Sender, $Args) {
+      if (!$this->IsEnabled()) return;
+      
       if (isset($Sender->Data['Methods'])) {
          $ImgSrc = Asset('/plugins/OpenID/design/openid-signin.png');
          $ImgAlt = T('Sign In with OpenID');
@@ -163,6 +180,8 @@ class OpenIDPlugin extends Gdn_Plugin {
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
+      if (!$this->IsEnabled()) return;
+      
       $ImgSrc = Asset('/plugins/OpenID/design/openid-icon.png');
       $ImgAlt = T('Sign In with OpenID');
       $SigninHref = $this->_AuthorizeHref();
