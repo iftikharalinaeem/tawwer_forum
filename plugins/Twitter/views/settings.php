@@ -47,7 +47,7 @@ echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
 <div class="Info">
-   <?php echo T('Twitter Connect allows users to sign in using their Twitter account.'); ?>
+   <?php echo T('Twitter Connect allows users to sign in using their Twitter account.', 'Twitter Connect allows users to sign in using their Twitter account. <b>You must register your application with Twitter for this plugin to work.</b>'); ?>
 </div>
 <div class="Configuration">
    <div class="ConfigurationForm">

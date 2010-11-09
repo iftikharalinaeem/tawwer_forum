@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Twitter'] = array(
 	'Name' => 'Twitter',
-   'Description' => 'This plugin integrates Twitter with Vanilla. You must register your application with Twitter for this plugin to work.',
+   'Description' => 'This plugin integrates Twitter with Vanilla. <b>You must register your application with Twitter for this plugin to work.</b>',
    'Version' => '0.1a',
    'RequiredApplications' => array('Vanilla' => '2.0.12a'),
    'RequiredTheme' => FALSE,
@@ -83,6 +83,9 @@ class TwitterPlugin extends Gdn_Plugin {
     */
    public function EntryController_SignIn_Handler($Sender, $Args) {
       if (isset($Sender->Data['Methods'])) {
+         if (!$this->IsConfigured())
+            return;
+
          $AccessToken = $this->AccessToken();
 
          $ImgSrc = Asset('/plugins/Twitter/design/twitter-signin.png');
@@ -110,6 +113,9 @@ class TwitterPlugin extends Gdn_Plugin {
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
+      if (!$this->IsConfigured())
+            return;
+      
       $ImgSrc = Asset('/plugins/Twitter/design/twitter-icon.png');
       $ImgAlt = T('Sign In with Twitter');
       $SigninHref = $this->_AuthorizeHref();
@@ -293,6 +299,11 @@ class TwitterPlugin extends Gdn_Plugin {
       } else {
          return NULL;
       }
+   }
+
+   public function IsConfigured() {
+      $Result = C('Plugins.Twitter.ConsumerKey') && C('Plugins.Twitter.Secret');
+      return $Result;
    }
 
    public function SetOAuthToken($Token, $Secret = NULL, $Type = 'request') {

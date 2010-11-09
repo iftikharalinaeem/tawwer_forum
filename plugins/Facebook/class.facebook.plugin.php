@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Facebook'] = array(
 	'Name' => 'Facebook',
-   'Description' => 'This plugin integrates Vanilla with Facebook. This plugin requires you to register your application with Facebook and will not work until you have configured it properly.',
+   'Description' => 'This plugin integrates Vanilla with Facebook. <b>You must register your application with Facebook for this plugin to work.</b>',
    'Version' => '0.1a',
    'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
@@ -52,6 +52,9 @@ class FacebookPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function EntryController_SignIn_Handler($Sender, $Args) {
+      if (!$this->IsConfigured())
+         return;
+      
       if (isset($Sender->Data['Methods'])) {
          $AccessToken = $this->AccessToken();
 
@@ -80,6 +83,9 @@ class FacebookPlugin extends Gdn_Plugin {
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
+      if (!$this->IsConfigured())
+         return;
+
       $ImgSrc = Asset('/plugins/Facebook/design/facebook-icon.png');
       $ImgAlt = T('Login with Facebook');
       $SigninHref = $this->AuthorizeUri();
@@ -213,6 +219,14 @@ class FacebookPlugin extends Gdn_Plugin {
       }
       
       return $this->_RedirectUri;
+   }
+
+   public function IsConfigured() {
+      $AppID = C('Plugins.Facebook.ApplicationID');
+      $Secret = C('Plugins.Facebook.Secret');
+      if (!$AppID || !$Secret)
+         return FALSE;
+      return TRUE;
    }
    
    public function Setup() {
