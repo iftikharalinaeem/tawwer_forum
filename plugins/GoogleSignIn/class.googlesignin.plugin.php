@@ -17,7 +17,7 @@ $PluginInfo['GoogleSignIn'] = array(
    'RequiredPlugins' => array('OpenID' => '0.1a'),
    'RequiredTheme' => FALSE,
 	'MobileFriendly' => TRUE,
-   'SettingsUrl' => '/dashboard/plguin/googlesignin',
+   'SettingsUrl' => '/dashboard/plugin/googlesignin',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,

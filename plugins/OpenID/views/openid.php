@@ -6,7 +6,7 @@
 <div class="FilterMenu">
       <?php
       echo $this->Form->Open(array(
-         'action'  => $this->Plugin->AutoTogglePath()
+         'action'  => Url($this->Plugin->AutoTogglePath())
       ));
       echo $this->Form->Errors();
       
