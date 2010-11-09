@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions, comments and conversations.',
-   'Version' => '1.2.2',
+   'Version' => '1.2.3',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -32,6 +32,9 @@ class FileUploadPlugin extends Gdn_Plugin {
    public function __construct() {
       $this->MediaCache = array();
       $this->MediaModel = new MediaModel();
+      
+      $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
+      $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
    }
 
    /**
@@ -195,6 +198,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function DrawAttachFile($Controller) {
       if (!$this->IsEnabled()) return;
+      if (!$this->CanUpload) return;
       
       echo $Controller->FetchView($this->GetView('attach_file.php'));
    }
@@ -299,6 +303,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          $Controller->SetData('CommentMediaList', $MediaList[$MediaKey]);
          $Controller->SetData('GearImage', $this->GetWebResource('images/gear.png'));
          $Controller->SetData('Garbage', $this->GetWebResource('images/trash.png'));
+         $Controller->SetData('CanDownload', $this->CanDownload);
          echo $Controller->FetchView($this->GetView('link_files.php'));
       }
    }
@@ -312,6 +317,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_Download_Create($Sender) {
       if (!$this->IsEnabled()) return;
+      if (!$this->CanDownload) throw new PermissionException("File could not be streamed: Access is denied");
    
       list($MediaID) = $Sender->RequestArgs;
       $Media = $this->MediaModel->GetID($MediaID);
@@ -518,6 +524,9 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $FileData = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, $FieldName, FALSE);
       try {
+         if (!$this->CanUpload) 
+            throw new FileUploadPluginUploadErrorException("You do not have permission to upload files",11,'???');
+      
          if (!$Sender->Form->IsPostBack()) {
             $PostMaxSize = ini_get('post_max_size');
             throw new FileUploadPluginUploadErrorException("The post data was too big (max {$PostMaxSize})",10,'???');

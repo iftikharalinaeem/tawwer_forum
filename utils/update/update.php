@@ -8,6 +8,7 @@ $Tasks->Run(TaskList::MODE_CHUNKED, array(
    'global/offline',
    'global/uncache',
    'maintain/filesystem',
+   'maintain/plugins',
    'maintain/structure',
    'global/online'
 ));
