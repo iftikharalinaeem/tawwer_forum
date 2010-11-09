@@ -13,11 +13,11 @@ $PluginInfo['GoogleSignIn'] = array(
 	'Name' => 'Google Sign In',
    'Description' => 'This plugin allows users to sign in with their Google accounts. You must register your domain with Google for this plugin to work.',
    'Version' => '0.1a',
-   'RequiredApplications' => array('Vanilla' => '2.0.12a'),
+   'RequiredApplications' => array('Vanilla' => '2.0.14'),
    'RequiredPlugins' => array('OpenID' => '0.1a'),
    'RequiredTheme' => FALSE,
 	'MobileFriendly' => TRUE,
-   'SettingsUrl' => '/dashboard/settings/googlesignin',
+   'SettingsUrl' => '/dashboard/plguin/googlesignin',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -42,6 +42,29 @@ class GoogleSignInPlugin extends Gdn_Plugin {
          $Result .= '?'.http_build_query ($Query);
       return $Result;
    }
+   
+   /**
+    * Act as a mini dispatcher for API requests to the plugin app
+    */
+   public function PluginController_GoogleSignIn_Create(&$Sender) {
+		$this->Dispatch($Sender, $Sender->RequestArgs);
+   }
+   
+   public function Controller_Toggle($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $this->AutoToggle($Sender);
+   }
+   
+   public function AuthenticationController_Render_Before($Sender, $Args) {
+      if (isset($Sender->ChooserList)) {
+         $Sender->ChooserList['googlesignin'] = 'Google';
+      }
+      if (is_array($Sender->Data('AuthenticationConfigureList'))) {
+         $List = $Sender->Data('AuthenticationConfigureList');
+         $List['googlesignin'] = '/dashboard/plugin/googlesignin';
+         $Sender->SetData('AuthenticationConfigureList', $List);
+      }
+   }
 
    /// Plugin Event Handlers ///
 
@@ -50,6 +73,8 @@ class GoogleSignInPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function EntryController_SignIn_Handler($Sender, $Args) {
+      if (!$this->IsEnabled()) return;
+      
       if (isset($Sender->Data['Methods'])) {
          $ImgSrc = Asset('/plugins/GoogleSignIn/design/google-signin.png');
          $ImgAlt = T('Sign In with Google');
@@ -66,6 +91,8 @@ class GoogleSignInPlugin extends Gdn_Plugin {
    }
 
    public function Base_BeforeSignInButton_Handler($Sender, $Args) {
+      if (!$this->IsEnabled()) return;
+      
       $ImgSrc = Asset('/plugins/GoogleSignIn/design/google-icon.png');
       $ImgAlt = T('Sign In with Google');
       $SigninHref = $this->_AuthorizeHref();
