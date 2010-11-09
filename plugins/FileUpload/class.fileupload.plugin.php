@@ -303,6 +303,7 @@ class FileUploadPlugin extends Gdn_Plugin {
          $Controller->SetData('CommentMediaList', $MediaList[$MediaKey]);
          $Controller->SetData('GearImage', $this->GetWebResource('images/gear.png'));
          $Controller->SetData('Garbage', $this->GetWebResource('images/trash.png'));
+         $Controller->SetData('CanDownload', $this->CanDownload);
          echo $Controller->FetchView($this->GetView('link_files.php'));
       }
    }

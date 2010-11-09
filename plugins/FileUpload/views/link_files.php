@@ -2,7 +2,7 @@
    <div class="AttachmentHeader"><?php echo T('Attachments'); ?></div>
    <table class="AttachFileContainer">
       <?php
-         $CanDownload = $this->Plugin->CanDownload;
+         $CanDownload = $this->Data('CanDownload');
          foreach ($this->Data('CommentMediaList') as $Media) {
             $IsOwner = (Gdn::Session()->IsValid() && (Gdn::Session()->UserID == GetValue('InsertUserID',$Media,NULL)));
       ?>
