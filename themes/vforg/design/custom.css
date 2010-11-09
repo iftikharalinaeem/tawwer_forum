@@ -622,6 +622,8 @@ div.Popup div.Body {
 	-moz-box-shadow: 0 0 5px #A59371;
 	-webkit-box-shadow: 0 0 5px #A59371;  
 }
+div.Connect h1,
+div.Connect h2,
 div.Popup h1,
 div.Popup h2 {
 	font-size:120%;
@@ -643,6 +645,9 @@ div.Methods {
 	color: #000;
 	font-size: 14px;
 	text-align: left;
+}
+body.connect div.Box {
+	border: none;
 }
 
 /* DataList & Headings */
