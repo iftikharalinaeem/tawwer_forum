@@ -91,6 +91,11 @@ class FilesystemTask extends Task {
          $this->Symlink('plugins/Flagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Flagging'));
          $this->Symlink('plugins/embedvanilla', TaskList::CombinePaths($this->VanillaPath,'plugins/embedvanilla'));
          
+         $this->Symlink('plugins/Facebook', TaskList::CombinePaths($this->VanillaPath,'plugins/Facebook'));
+         $this->Symlink('plugins/Twitter', TaskList::CombinePaths($this->VanillaPath,'plugins/Twitter'));
+         $this->Symlink('plugins/GoogleSignIn', TaskList::CombinePaths($this->VanillaPath,'plugins/GoogleSignIn'));
+         $this->Symlink('plugins/OpenID', TaskList::CombinePaths($this->VanillaPath,'plugins/OpenID'));
+         
          // Copy the new index file
          $Copied = $this->CopySourceFile('index.php', $this->VanillaPath);
          $this->Cache('Updated',$Copied);
@@ -133,16 +138,6 @@ class FilesystemTask extends Task {
          $this->Symlink('themes/default', TaskList::CombinePaths($this->ThemePath,'defaultsmarty'));
       }
       
-      // Enable plugins
-      $this->SaveToConfig('EnabledPlugins.HtmLawed','HtmLawed');
-      $this->SaveToConfig('EnabledPlugins.GettingStartedHosting','GettingStartedHosting');
-      $this->SaveToConfig('EnabledPlugins.CustomTheme','CustomTheme');
-      $this->SaveToConfig('EnabledPlugins.Gravatar','Gravatar');
-      $this->SaveToConfig('EnabledPlugins.embedvanilla','embedvanilla');
-      $this->SaveToConfig('EnabledPlugins.vfoptions','vfoptions');
-      
-      // Politely enable plugins with structures
-      $this->EnablePlugin('Statistics');
    }
 
 }
