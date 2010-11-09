@@ -13,11 +13,11 @@ $PluginInfo['OpenID'] = array(
 	'Name' => 'OpenID',
    'Description' => 'This plugin allows users to sign in with OpenID.',
    'Version' => '0.1a',
-   'RequiredApplications' => array('Vanilla' => '2.0.12a'),
+   'RequiredApplications' => array('Vanilla' => '2.0.14a'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
 	'MobileFriendly' => TRUE,
-   'SettingsUrl' => '/dashboard/settings/openid',
+   'SettingsUrl' => '/dashboard/plugin/openid',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -87,6 +87,18 @@ class OpenIDPlugin extends Gdn_Plugin {
          $Form->SetFormValue('Email', GetValue('contact/email', $Attr));
          $Sender->SetData('Verified', TRUE);
       }
+   }
+   
+   /**
+    * Act as a mini dispatcher for API requests to the plugin app
+    */
+   public function PluginController_OpenID_Create(&$Sender) {
+		$this->Dispatch($Sender, $Sender->RequestArgs);
+   }
+   
+   public function Controller_Toggle($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $this->AutoToggle($Sender);
    }
 
    /**
