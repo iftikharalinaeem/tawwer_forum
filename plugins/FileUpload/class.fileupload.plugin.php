@@ -32,6 +32,9 @@ class FileUploadPlugin extends Gdn_Plugin {
    public function __construct() {
       $this->MediaCache = array();
       $this->MediaModel = new MediaModel();
+      
+      $this->CanUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', FALSE);
+      $this->CanDownload = Gdn::Session()->CheckPermission('Plugins.Attachments.Download.Allow', FALSE);
    }
 
    /**
@@ -195,6 +198,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function DrawAttachFile($Controller) {
       if (!$this->IsEnabled()) return;
+      if (!$this->CanUpload) return;
       
       echo $Controller->FetchView($this->GetView('attach_file.php'));
    }
@@ -312,6 +316,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_Download_Create($Sender) {
       if (!$this->IsEnabled()) return;
+      if (!$this->CanDownload) throw new Exception("File could not be streamed: Access is denied");
    
       list($MediaID) = $Sender->RequestArgs;
       $Media = $this->MediaModel->GetID($MediaID);
@@ -518,6 +523,9 @@ class FileUploadPlugin extends Gdn_Plugin {
       
       $FileData = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, $FieldName, FALSE);
       try {
+         if (!$this->CanUpload) 
+            throw new FileUploadPluginUploadErrorException("You do not have permission to upload files",11,'???');
+      
          if (!$Sender->Form->IsPostBack()) {
             $PostMaxSize = ini_get('post_max_size');
             throw new FileUploadPluginUploadErrorException("The post data was too big (max {$PostMaxSize})",10,'???');
