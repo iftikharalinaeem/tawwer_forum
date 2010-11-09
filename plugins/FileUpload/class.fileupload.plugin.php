@@ -317,7 +317,7 @@ class FileUploadPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_Download_Create($Sender) {
       if (!$this->IsEnabled()) return;
-      if (!$this->CanDownload) throw new Exception("File could not be streamed: Access is denied");
+      if (!$this->CanDownload) throw new PermissionException("File could not be streamed: Access is denied");
    
       list($MediaID) = $Sender->RequestArgs;
       $Media = $this->MediaModel->GetID($MediaID);
