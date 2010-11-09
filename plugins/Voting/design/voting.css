@@ -158,14 +158,16 @@ span.Votes a {
 	background: #004C9B;
 }
 span.Votes a.VoteUp {
-	padding: 3px 4px 0;
+	padding: 5px 4px 3px;
 	-webkit-border-radius: 3px 3px 0 0;
 	-moz-border-radius: 3px 3px 0 0;
+   line-height: 100%;
 }
 span.Votes a.VoteDown {
-	padding: 0 4px 3px;
+	padding: 3px 4px 5px;
 	-webkit-border-radius: 0 0 3px 3px;
 	-moz-border-radius: 0 0 3px 3px;
+   line-height: 100%;
 }
 span.Votes a:hover {
 	background: #013B76;
