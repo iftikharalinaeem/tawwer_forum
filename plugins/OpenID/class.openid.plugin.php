@@ -95,8 +95,6 @@ class OpenIDPlugin extends Gdn_Plugin {
    /// Plugin Event Handlers ///
 
    public function Base_ConnectData_Handler($Sender, $Args) {
-      if (!$this->IsEnabled()) return;
-      
       if (GetValue(0, $Args) != 'openid')
          return;
 
@@ -126,8 +124,6 @@ class OpenIDPlugin extends Gdn_Plugin {
     * @param array $Args
     */
    public function EntryController_OpenID_Create($Sender, $Args) {
-      if (!$this->IsEnabled()) return;
-      
       $this->EventArguments = $Args;
       $OpenID = $this->GetOpenID();
 
