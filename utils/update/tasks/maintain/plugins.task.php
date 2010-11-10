@@ -36,12 +36,14 @@ class PluginsTask extends Task {
       $this->SaveToConfig('EnabledPlugins.Twitter','Twitter');
       $this->SaveToConfig('EnabledPlugins.GoogleSignIn','GoogleSignIn');
       $this->SaveToConfig('EnabledPlugins.OpenID','OpenID');
-
-      
-      $this->SaveToConfig('EnabledPlugins.vfoptions','vfoptions');
-            
+                  
       // Politely enable plugins with structures
       $this->EnablePlugin('Statistics');
+      
+      // We do this to ensure that vfoptions goes to the end. Dirty hacks ;)
+      $this->RemoveFromConfig('EnabledPlugins.vfoptions');
+      $this->SaveToConfig('EnabledPlugins.vfoptions','vfoptions');
+
    }
 
 }
