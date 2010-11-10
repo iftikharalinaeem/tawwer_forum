@@ -90,6 +90,8 @@ class FilesystemTask extends Task {
          $this->Symlink('plugins/Tagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Tagging'));
          $this->Symlink('plugins/Flagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Flagging'));
          $this->Symlink('plugins/embedvanilla', TaskList::CombinePaths($this->VanillaPath,'plugins/embedvanilla'));
+         $this->Symlink('plugins/Emotify', TaskList::CombinePaths($this->VanillaPath,'plugins/Emotify'));
+         $this->Symlink('plugins/cleditor', TaskList::CombinePaths($this->VanillaPath,'plugins/cleditor'));
          
          $this->Symlink('plugins/Facebook', TaskList::CombinePaths($this->VanillaPath,'plugins/Facebook'));
          $this->Symlink('plugins/Twitter', TaskList::CombinePaths($this->VanillaPath,'plugins/Twitter'));
