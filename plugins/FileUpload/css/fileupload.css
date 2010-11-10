@@ -85,6 +85,13 @@ div.AttachFileWrapper div.AttachFileLink {
    position: relative;
 }
 
+div.AttachFileWrapper div.AttachFileLink a {
+   zoom: 1;
+   display: inline;
+   
+   display: inline-block;
+}
+
 div.AttachFileWrapper div.AttachFileLink div.CurrentUploader {
    height: 0px;
    width: 350px;
