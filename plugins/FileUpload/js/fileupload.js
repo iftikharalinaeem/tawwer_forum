@@ -473,6 +473,9 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             if (this.isIE)
                EnableMe.checked = 'true';
                
+            // Make the file a link
+            $(FileListing.find('div.FileName')).html('<a href="'+gdn.url('discussion/download/'+MediaID+'/'+Filename)+'">'+Filename+'</a>');
+               
             $(FileListing.find('div.FileOptions')).append(TrackAll);
             $(FileListing.find('div.UploadProgress')).remove();
             

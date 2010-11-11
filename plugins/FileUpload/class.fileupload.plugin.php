@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions, comments and conversations.',
-   'Version' => '1.3.1',
+   'Version' => '1.3.2',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -600,7 +600,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             throw new FileUploadPluginUploadErrorException($Message, 11, $FileName, $FileKey);
          }
          
-         $TempFileName = "fresh-".md5($FileName)."-".microtime(true)."-".$Extension;
+         $TempFileName = "fresh-".md5($FileName)."-".microtime(true).".".$Extension;
          $ScratchFileName = CombinePaths(array($ScratchPath,$TempFileName));
          $MoveSuccess = @move_uploaded_file($FileTemp, $ScratchFileName);
          
