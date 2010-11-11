@@ -216,22 +216,42 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
    
    // Create a new named iframe to which our uploads can be submitted
    Gdn_MultiFileUpload.prototype.NewFrame = function(TargetUploaderID) {
-		var IFrameName = 'frm'+Math.floor(Math.random() * 99999);
-		var ContainerDiv = document.createElement('div');
-		var IFrame = document.createElement('iframe');
-		$(IFrame).style = "display:none;";
-		IFrame.src = "about:blank";
-		IFrame.id = IFrameName;
-		IFrame.name = IFrameName;
-		$(ContainerDiv).append(IFrame);
-		$(this.IFrameContainer).append(ContainerDiv);
-		
-		this.IFrames[IFrameName] = {ready:'no'};
+      var IFrameName = 'frm'+Math.floor(Math.random() * 99999);
+      var ContainerDiv = document.createElement('div');
+      
+      var isOpera, isIE = false;
+      if (typeof(window.opera) != 'undefined') {
+         isOpera = true;
+         console.log('found opera');
+      }
+      
+      if (!isOpera && navigator.userAgent.indexOf('Internet Explorer') >= 0) {
+         console.log(navigator.userAgent.indexOf('Internet Explorer'));
+         isIE = true;
+         console.log('found IE');
+      }
+      
+      if (isIE) {
+         var IFrame = document.createElement('<iframe name="'+IFrameName+'" id="'+IFrameName+'">');
+      } else {
+         var IFrame = document.createElement('iframe');
+         IFrame.name = IFrameName;
+         IFrame.id = IFrameName;
+      }
+      
+      $(IFrame).style = "display:none;";
+      IFrame.src = "about:blank";
+      
+      
+      $(ContainerDiv).append(IFrame);
+      $(this.IFrameContainer).append(ContainerDiv);
+      
+      this.IFrames[IFrameName] = {ready:'no'};
       
       // Re-target just to be safe
-		$('#'+IFrameName).load(jQuery.proxy(function(){ this.UploadComplete(IFrameName,TargetUploaderID); }, this));
+      $('#'+IFrameName).load(jQuery.proxy(function(){ this.UploadComplete(IFrameName,TargetUploaderID); }, this));
       
-		return IFrameName;
+      return IFrameName;
    }
    
    // Submit the form parent of the current uploader and hide the current uploader's input
@@ -260,16 +280,16 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       
       // Handle the file list UI
       var PrototypeFileAttachment = $(this.FileContainer.find('div.PrototypicalAttachment')[0]).clone();
-		var FileNameDiv = $(PrototypeFileAttachment).find('div.FileName');
-		var FileSizeDiv = $(PrototypeFileAttachment).find('div.FileSize');
-		var ProgressDiv = $(PrototypeFileAttachment).find('div.UploadProgress');
+      var FileNameDiv = $(PrototypeFileAttachment).find('div.FileName');
+      var FileSizeDiv = $(PrototypeFileAttachment).find('div.FileSize');
+      var ProgressDiv = $(PrototypeFileAttachment).find('div.UploadProgress');
       $(FileNameDiv).html(FileName);
       $(FileSizeDiv).html('');
       $($(ProgressDiv).find('div.Background')).css('width','0px');
       
       var FileListingID = [FileInput.attr('id'),'listing'].join('_');
       PrototypeFileAttachment.attr('id', FileListingID);
-		PrototypeFileAttachment.css('display', 'block');
+      PrototypeFileAttachment.css('display', 'block');
       PrototypeFileAttachment.appendTo(this.FileContainer);
       // PrototypeFileAttachment.css('display','table-row');
       
@@ -317,13 +337,13 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             
             // Update progress bar
             if (!this.ProgressBars[UploaderID].Complete) {
-					var UploadProgress = FileListing.find('div.UploadProgress');
-					var ProgressForeground = FileListing.find('div.UploadProgress div.Foreground');
+               var UploadProgress = FileListing.find('div.UploadProgress');
+               var ProgressForeground = FileListing.find('div.UploadProgress div.Foreground');
                var ProgressBackground = FileListing.find('div.UploadProgress div.Background');
-					ProgressForeground.html('<strong>Uploading:</strong> ' + Math.ceil(Progress)+'%');
+               ProgressForeground.html('<strong>Uploading:</strong> ' + Math.ceil(Progress)+'%');
                ProgressBackground.css('width', ((Progress * $(UploadProgress).width()) / 100)+'px');
                // if (Progress >= 15)
-               // 	ProgressBar.html(Math.ceil(Progress)+'%');
+               //    ProgressBar.html(Math.ceil(Progress)+'%');
             }
             
          }
