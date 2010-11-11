@@ -6,16 +6,25 @@ function Gdn_Uploaders() {
    this.UploaderIndex = 0;
    this.MaxUploadSize = gdn.definition('maxuploadsize');
    
-   this.isOpera = false;
-   this.isIE = false;
-   
-   if (typeof(window.opera) != 'undefined')
-      this.isOpera = true;
-      
-   if (!this.isOpera && (navigator.userAgent.indexOf('Internet Explorer') >= 0 || navigator.userAgent.indexOf('MSIE')) >= 0)
-      this.isIE = true;
-   
    Gdn_Uploaders.prototype.Prepare = function () {
+      
+      this.isOpera = false;
+      this.isIE = false;
+      this.ieVersion = 0;
+      this.CompatibilityMode = false;
+      
+      if (typeof(window.opera) != 'undefined')
+         this.isOpera = true;
+         
+      if (!this.isOpera && (navigator.userAgent.indexOf('Internet Explorer') >= 0 || navigator.userAgent.indexOf('MSIE')) >= 0)
+         this.isIE = true;
+      
+      if (this.isIE) {
+         this.ieVersion = this.InternetExplorerVersion();
+         if (this.ieVersion >=7 && this.ieVersion <= 8)
+            this.CompatibilityMode = true;
+      }
+      
       var Our = this;
       $('div.AttachmentWindow').each(function(i,AttachmentWindow){
          Our.Spawn($(AttachmentWindow));
@@ -29,6 +38,8 @@ function Gdn_Uploaders() {
       this.Uploaders[this.UploaderIndex] = new Gdn_MultiFileUpload(AttachmentWindow, 'UploadAttachment', this);
       this.Uploaders[this.UploaderIndex].isOpera = this.isOpera;
       this.Uploaders[this.UploaderIndex].isIE = this.isIE;
+      this.Uploaders[this.UploaderIndex].ieVersion = this.ieVersion;
+      this.Uploaders[this.UploaderIndex].CompatibilityMode = this.CompatibilityMode;
       this.Uploaders[this.UploaderIndex].Apc((gdn.definition('apcavailable')) ? 'true' : 'false');
       this.Uploaders[this.UploaderIndex].Ready();
       this.UploaderIndex++;
@@ -41,6 +52,19 @@ function Gdn_Uploaders() {
    Gdn_Uploaders.prototype.GetUniqID = function() {
       var NewDate = new Date;
       return NewDate.getTime();
+   }
+
+   // Returns the version of Internet Explorer or a -1
+   // (indicating the use of another browser).   
+   Gdn_Uploaders.prototype.InternetExplorerVersion = function() {
+      var rv = -1; // Return value assumes failure.
+      if (navigator.appName == 'Microsoft Internet Explorer') {
+         var ua = navigator.userAgent;
+         var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+         if (re.exec(ua) != null)
+            rv = parseFloat( RegExp.$1 );
+      }
+      return rv;
    }
    
 }
@@ -140,7 +164,7 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
    }
    
    Gdn_MultiFileUpload.prototype.CreateElement = function (ElementType, SetOptions) {
-      if (this.isIE) {
+      if (this.CompatibilityMode) {
          var ElementString = '<'+ElementType+' ';
          if (SetOptions.name != undefined) ElementString += 'name="'+SetOptions.name+'"';
          if (SetOptions.id != undefined) ElementString += 'id="'+SetOptions.id+'"';
@@ -153,15 +177,16 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       
       for (var prop in SetOptions) {
          var propval = SetOptions[prop];
-      
-         if (this.isIE) {
-            Element.setAttribute(prop, propval);
-         } else {
-            Element[prop] = propval;
-         }
+         Element.setAttribute(prop, propval);
+         
+         //if (this.CompatibilityMode) {
+            
+         //} else {
+         //   Element[prop] = propval;
+         //}
       }
       
-      if (ElementType == 'form') {
+      if (ElementType == 'form' && this.CompatibilityMode) {
          if (SetOptions.enctype) {
             encType = Element.getAttributeNode("enctype");
             encType.value = SetOptions.enctype;
@@ -198,7 +223,6 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
          'action': gdn.url(Action.join('/'))
       });
       
-            
       if (this.APC) {
       
          var APCNotifier = this.CreateElement('input', {
