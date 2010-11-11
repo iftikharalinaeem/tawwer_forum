@@ -616,13 +616,28 @@ class FileUploadPlugin extends Gdn_Plugin {
             'Path'            => CombinePaths(array_merge(array('FileUpload', 'scratch'), array($TempFileName)))
          ));
          
+         $FinalImageLocation = '';
+         $PreviewImageLocation = Asset('plugins/FileUpload/images/paperclip.png');
+         if (getimagesize($ScratchFileName)) {
+            $FinalImageLocation = Asset(
+               'uploads/'
+               .FileUploadPlugin::FindLocalMediaFolder($MediaID, Gdn::Session()->UserID, FALSE, TRUE)
+               .'/'
+               .$MediaID
+               .'.'
+               .GetValue('extension', pathinfo($FileName), '')
+            );
+            $PreviewImageLocation = Asset('uploads/FileUpload/scratch/'.$TempFileName);
+         }
          $MediaResponse = array(
-            'Status'          => 'success',
-            'MediaID'         => $MediaID,
-            'Filename'        => $FileName,
-            'Filesize'        => $FileSize,
-            'FormatFilesize'  => Gdn_Format::Bytes($FileSize,1),
-            'ProgressKey'     => $Sender->ApcKey ? $Sender->ApcKey : ''
+            'Status'             => 'success',
+            'MediaID'            => $MediaID,
+            'Filename'           => $FileName,
+            'Filesize'           => $FileSize,
+            'FormatFilesize'     => Gdn_Format::Bytes($FileSize,1),
+            'ProgressKey'        => $Sender->ApcKey ? $Sender->ApcKey : '',
+            'PreviewImageLocation' => $PreviewImageLocation,
+            'FinalImageLocation' => $FinalImageLocation
          );
 
       } catch (FileUploadPluginUploadErrorException $e) {

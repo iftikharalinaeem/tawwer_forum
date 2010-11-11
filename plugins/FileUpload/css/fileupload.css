@@ -148,7 +148,6 @@ div.Attachments div.AttachmentHeader {
 }
 
 div.Attachments table.AttachFileContainer {
-   margin-left: 10px;
    border-collapse: collapse;
    border: none;
 }
@@ -194,8 +193,22 @@ li table.FileUploadTable td em {
    font-size:           80%;
 }
 div.FileAttachment {
-   background: url('../images/gear.png') center left no-repeat;
-   padding-left: 14px;
+   margin-bottom: 6px;
+}
+div.FilePreview {
+   max-height: 32px;
+   width: 32px;
+   display: inline-block;
+   vertical-align: middle;
+   text-align: center;
+   border: 1px solid #666;
+   background: #fff;
+}
+div.FilePreview img {
+   max-width: 32px;
+   max-height: 32px;
+   display: block;
+   margin: 0 auto;
 }
 div.FileOptions,
 div.FileName,
@@ -205,4 +218,16 @@ div.FileSize {
 }
 div.UploadProgress {
    display: inline-block;
+}
+img.ImageThumbnail {
+   max-height: 32px;
+   max-width: 32px;
+}
+a.InsertImage {
+   background: url('../images/insert.png') 0 0 no-repeat;
+   padding-left: 20px;
+}
+table.AttachFileContainer td.FileSize {
+   font-size: 11px;
+   color: #888;
 }

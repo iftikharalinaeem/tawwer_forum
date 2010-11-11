@@ -390,7 +390,7 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             TrackAll.type = 'hidden';
             TrackAll.name = 'AllUploads[]';
             TrackAll.value = MediaID;
-            
+				
             var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
             
             // Update the filesize
@@ -401,6 +401,23 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             $(FileListing.find('div.FileOptions')).append(EnableMe);
             $(FileListing.find('div.FileOptions')).append(TrackAll);
             $(FileListing.find('div.UploadProgress')).remove();
+            
+				// Add image preview
+				var img = document.createElement('img');
+				img.src = JResponse.MediaResponse.PreviewImageLocation;
+				$(FileListing.find('div.FilePreview')).append(img);
+
+				// Add "insert image" button
+				if (JResponse.MediaResponse.FinalImageLocation != '') {
+					var ImageAnchor = $(FileListing.find('a.InsertImage'));
+					ImageAnchor.attr('href', JResponse.MediaResponse.FinalImageLocation);
+					ImageAnchor.show();
+					ImageAnchor.live('click', function() {
+						var txtbox = $(FileListing.parents('form').find('textarea'));
+						txtbox.val(txtbox.val()+'<img src="'+ImageAnchor.attr('href')+'" />');
+						return false;
+					});
+				}
             
          } else {
             // FAILURE
