@@ -27,6 +27,14 @@ body.fileupload div#Content div.Info div.RealtimeMode span.FileUploadRealtimeAva
    margin-bottom: 0px;
 }
 
+body #DiscussionForm div.AttachFileWrapper form {
+   background: transparent;
+   border: 0px;
+   padding: 0px;
+   margin: 0px;
+   
+}
+
 body #DiscussionForm form.FileUpload {
    background: transparent;
    border: 0px;

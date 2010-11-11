@@ -224,7 +224,6 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       });
       
       if (this.APC) {
-      
          var APCNotifier = this.CreateElement('input', {
             'type': 'hidden',
             'name': 'APC_UPLOAD_PROGRESS',
@@ -303,7 +302,6 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
          'id': IFrameName,
          'src': 'about:blank'
       });
-
       $(IFrame).css('display','none');
       
       $(ContainerDiv).append(IFrame);
