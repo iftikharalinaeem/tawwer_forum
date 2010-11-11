@@ -14,7 +14,7 @@
       </div>
    </div>
    <div class="AttachFileLink">
-      <a href="javascript:;"><?php echo T('Attach a file'); ?></a>
+      <a href="javascript:void(0);"><?php echo T('Attach a file'); ?></a>
       <div class="CurrentUploader"></div>
    </div>
 </div>

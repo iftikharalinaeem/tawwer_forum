@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions, comments and conversations.',
-   'Version' => '1.2.3',
+   'Version' => '1.3.3',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -535,7 +535,8 @@ class FileUploadPlugin extends Gdn_Plugin {
          if (!$FileData) {
             //$PostMaxSize = ini_get('post_max_size');
             $MaxUploadSize = ini_get('upload_max_filesize');
-            throw new FileUploadPluginUploadErrorException("The uploaded file was too big (max {$MaxUploadSize})",10,'???');
+            //throw new FileUploadPluginUploadErrorException("The uploaded file was too big (max {$MaxUploadSize})",10,'???');
+            throw new FileUploadPluginUploadErrorException("No file data could be found in your post",10,'???');
          }
 
          // Validate the file upload now.
@@ -599,7 +600,7 @@ class FileUploadPlugin extends Gdn_Plugin {
             throw new FileUploadPluginUploadErrorException($Message, 11, $FileName, $FileKey);
          }
          
-         $TempFileName = "fresh-".md5($FileName)."-".microtime(true)."-".$Extension;
+         $TempFileName = "fresh-".md5($FileName)."-".microtime(true).".".$Extension;
          $ScratchFileName = CombinePaths(array($ScratchPath,$TempFileName));
          $MoveSuccess = @move_uploaded_file($FileTemp, $ScratchFileName);
          
