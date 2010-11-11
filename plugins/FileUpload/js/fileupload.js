@@ -6,6 +6,15 @@ function Gdn_Uploaders() {
    this.UploaderIndex = 0;
    this.MaxUploadSize = gdn.definition('maxuploadsize');
    
+   this.isOpera = false;
+   this.isIE = false;
+   
+   if (typeof(window.opera) != 'undefined')
+      this.isOpera = true;
+      
+   if (!this.isOpera && (navigator.userAgent.indexOf('Internet Explorer') >= 0 || navigator.userAgent.indexOf('MSIE')) >= 0)
+      this.isIE = true;
+   
    Gdn_Uploaders.prototype.Prepare = function () {
       var Our = this;
       $('div.AttachmentWindow').each(function(i,AttachmentWindow){
@@ -18,6 +27,8 @@ function Gdn_Uploaders() {
       
       AttachmentWindow.attr('spawned', true);
       this.Uploaders[this.UploaderIndex] = new Gdn_MultiFileUpload(AttachmentWindow, 'UploadAttachment', this);
+      this.Uploaders[this.UploaderIndex].isOpera = this.isOpera;
+      this.Uploaders[this.UploaderIndex].isIE = this.isIE;
       this.Uploaders[this.UploaderIndex].Apc((gdn.definition('apcavailable')) ? 'true' : 'false');
       this.Uploaders[this.UploaderIndex].Ready();
       this.UploaderIndex++;
@@ -128,6 +139,43 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       this.AttachFileLink.parents('form').bind('complete',jQuery.proxy(this.Reset,this));
    }
    
+   Gdn_MultiFileUpload.prototype.CreateElement = function (ElementType, SetOptions) {
+      if (this.isIE) {
+         var ElementString = '<'+ElementType+' ';
+         if (SetOptions.name != undefined) ElementString += 'name="'+SetOptions.name+'"';
+         if (SetOptions.id != undefined) ElementString += 'id="'+SetOptions.id+'"';
+         ElementString += '>';
+         
+         var Element = document.createElement(ElementString);
+      } else {
+         var Element = document.createElement(ElementType);
+      }
+      
+      for (var prop in SetOptions) {
+         var propval = SetOptions[prop];
+      
+         if (this.isIE) {
+            Element.setAttribute(prop, propval);
+         } else {
+            Element[prop] = propval;
+         }
+      }
+      
+      if (ElementType == 'form') {
+         if (SetOptions.enctype) {
+            encType = Element.getAttributeNode("enctype");
+            encType.value = SetOptions.enctype;
+         }
+         
+         if (SetOptions.method) {
+            formMethod = Element.getAttributeNode("method");
+            formMethod.value = SetOptions.method;
+         }
+      }
+      
+      return Element;
+   }
+   
    Gdn_MultiFileUpload.prototype.NewUploader = function() {
       var NewUploaderID = null; var AutoShow = true;
       if (this.CurrentInput == null)
@@ -136,42 +184,49 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       NewUploaderID = this.Master.GetFreshID();
       NewUploaderID = [this.AttachFileRootName,NewUploaderID].join('_');
       
-      var UploaderForm = document.createElement('form');
       var Action = ['post','upload',NewUploaderID];
-
-      UploaderForm.enctype = 'multipart/form-data';
-      UploaderForm.method = 'POST';
-      UploaderForm.className = 'FileUpload';
-      UploaderForm.action = gdn.url(Action.join('/'));
       var IFrameName = this.NewFrame(NewUploaderID);
       var FormName = IFrameName+'_form';
-      UploaderForm.id = FormName;
-      UploaderForm.target = IFrameName;
       
+      var UploaderForm = this.CreateElement('form', {
+         'name': FormName,
+         'id': FormName,
+         'target': IFrameName,
+         'enctype': 'multipart/form-data',
+         'className': 'FileUpload',
+         'method': 'POST',
+         'action': gdn.url(Action.join('/'))
+      });
+      
+            
       if (this.APC) {
-         var APCNotifier = document.createElement('input');
-         APCNotifier.type = 'hidden';
-         APCNotifier.name = 'APC_UPLOAD_PROGRESS';
-         APCNotifier.id = NewUploaderID+'_apckey';
-         APCNotifier.value = this.UniqID + '_' + NewUploaderID;
+      
+         var APCNotifier = this.CreateElement('input', {
+            'type': 'hidden',
+            'name': 'APC_UPLOAD_PROGRESS',
+            'id': NewUploaderID+'_apckey',
+            'value': this.UniqID + '_' + NewUploaderID
+         });
          $(UploaderForm).append(APCNotifier);
       }
-            
-      var NewUploader   = document.createElement('input');
-      NewUploader.type  = 'file';
-      NewUploader.name  = NewUploaderID;
-      NewUploader.id    = NewUploaderID;
-      NewUploader.className = '';
-      NewUploader.rel = FormName;
+      
+      var NewUploader = this.CreateElement('input', {
+         'type': 'file',
+         'name': NewUploaderID,
+         'id': NewUploaderID,
+         'rel': FormName
+      });
       $(UploaderForm).append(NewUploader);
       
-      var MaxUploadSize = document.createElement('input');
-      MaxUploadSize.type = 'hidden';
-      MaxUploadSize.name = 'MAX_UPLOAD_SIZE';
-      MaxUploadSize.value = this.MaxUploadSize;
+      var MaxUploadSize = this.CreateElement('input', {
+         'type': 'hidden',
+         'name': 'MAX_UPLOAD_SIZE',
+         'value': this.MaxUploadSize
+      });
       $(UploaderForm).append(MaxUploadSize);
       
       this.CurrentUploader.append(UploaderForm);
+      
       this.CurrentInput = NewUploaderID;
       this.ProgressBars[NewUploaderID] = {
          'Target':   IFrameName,
@@ -218,30 +273,14 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
    Gdn_MultiFileUpload.prototype.NewFrame = function(TargetUploaderID) {
       var IFrameName = 'frm'+Math.floor(Math.random() * 99999);
       var ContainerDiv = document.createElement('div');
-      
-      var isOpera, isIE = false;
-      if (typeof(window.opera) != 'undefined') {
-         isOpera = true;
-         console.log('found opera');
-      }
-      
-      if (!isOpera && navigator.userAgent.indexOf('Internet Explorer') >= 0) {
-         console.log(navigator.userAgent.indexOf('Internet Explorer'));
-         isIE = true;
-         console.log('found IE');
-      }
-      
-      if (isIE) {
-         var IFrame = document.createElement('<iframe name="'+IFrameName+'" id="'+IFrameName+'">');
-      } else {
-         var IFrame = document.createElement('iframe');
-         IFrame.name = IFrameName;
-         IFrame.id = IFrameName;
-      }
-      
-      $(IFrame).style = "display:none;";
-      IFrame.src = "about:blank";
-      
+
+      var IFrame = this.CreateElement('iframe', {
+         'name': IFrameName,
+         'id': IFrameName,
+         'src': 'about:blank'
+      });
+
+      $(IFrame).css('display','none');
       
       $(ContainerDiv).append(IFrame);
       $(this.IFrameContainer).append(ContainerDiv);
@@ -271,6 +310,10 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
    
    Gdn_MultiFileUpload.prototype.RememberFile = function(FileInput) {
       var FileName = FileInput.val();
+      
+      FileName = FileName.split('/').pop();
+      FileName = FileName.split('\\').pop();
+      
       var UploaderID = FileInput.attr('id');
       this.ProgressBars[UploaderID].Filename = FileName
       
@@ -392,24 +435,30 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             UploadResultStatus = 'success';
             // SUCCESS
             
-            var Filename = JResponse.MediaResponse.Filename;
             if (!this.ProgressBars[TargetUploaderID]) return;
-            if (this.ProgressBars[TargetUploaderID].Filename != Filename) return;
+            
+            var Filename = JResponse.MediaResponse.Filename;
+            
+            var StoredFilename = this.ProgressBars[TargetUploaderID].Filename;
+            if (StoredFilename != Filename) return;
             
             var MediaID = JResponse.MediaResponse.MediaID;
             this.ProgressBars[TargetUploaderID].Complete = true;
             this.MyFiles[MediaID] = Filename;
             this.RemoveUploader(TargetUploaderID);
-            var EnableMe = document.createElement('input');
-            EnableMe.type = 'checkbox';
-            EnableMe.name = 'AttachedUploads[]';
-            EnableMe.value = MediaID;
-            EnableMe.checked = 'checked';
             
-            var TrackAll = document.createElement('input');
-            TrackAll.type = 'hidden';
-            TrackAll.name = 'AllUploads[]';
-            TrackAll.value = MediaID;
+            var EnableMe = this.CreateElement('input', {
+               'type': 'checkbox',
+               'name': 'AttachedUploads[]',
+               'value': MediaID,
+               'checked': 'checked'
+            });
+            
+            var TrackAll = this.CreateElement('input', {
+               'type': 'hidden',
+               'name': 'AllUploads[]',
+               'value': MediaID
+            });
             
             var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
             
@@ -419,12 +468,17 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             }
             
             $(FileListing.find('div.FileOptions')).append(EnableMe);
+            
+            // FIX IE
+            if (this.isIE)
+               EnableMe.checked = 'true';
+               
             $(FileListing.find('div.FileOptions')).append(TrackAll);
             $(FileListing.find('div.UploadProgress')).remove();
             
          } else {
             // FAILURE
-            FailReason = JResponse.MediaResponse.StrError;
+            FailReason = '<pre>'+JResponse.MediaResponse.StrError+'</pre>';
             this.ProgressBars[TargetUploaderID].Complete = true;
             
          }
@@ -444,9 +498,11 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             'cursor':'pointer'
          });
          FileListing.click(function(){FileListing.remove();});
-         setTimeout(function(){
+         /*
+setTimeout(function(){
             FileListing.fadeTo(1500,0,function(){ FileListing.animate({'height':0},600,function(){ FileListing.remove(); }) });
          },6000);
+*/
          delete this.ProgressBars[TargetUploaderID];
       }
    }

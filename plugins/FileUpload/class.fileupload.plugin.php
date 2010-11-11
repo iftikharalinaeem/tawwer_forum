@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['FileUpload'] = array(
    'Description' => 'This plugin enables file uploads and attachments to discussions, comments and conversations.',
-   'Version' => '1.2.3',
+   'Version' => '1.3',
    'RequiredApplications' => array('Vanilla' => '2.0.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -535,7 +535,8 @@ class FileUploadPlugin extends Gdn_Plugin {
          if (!$FileData) {
             //$PostMaxSize = ini_get('post_max_size');
             $MaxUploadSize = ini_get('upload_max_filesize');
-            throw new FileUploadPluginUploadErrorException("The uploaded file was too big (max {$MaxUploadSize})",10,'???');
+            throw new FileUploadPluginUploadErrorException(print_r(Gdn::Request(),true),10,'???');
+            //throw new FileUploadPluginUploadErrorException("The uploaded file was too big (max {$MaxUploadSize})",10,'???');
          }
 
          // Validate the file upload now.
