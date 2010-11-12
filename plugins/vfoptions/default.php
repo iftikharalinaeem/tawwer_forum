@@ -67,7 +67,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		$Menu->AddLink('Forum', T('Statistics').$New, 'plugin/statistics', 'Garden.Settings.Manage');
 
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Add-ons', T('Browse Addons'), 'dashboard/settings/addons', 'Garden.Settings.Manage');
+      $Menu->AddLink('Add-ons', T('Browse Addons').' <span class="New">New</span>', 'dashboard/settings/addons', 'Garden.Settings.Manage');
 		
    		
 		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
