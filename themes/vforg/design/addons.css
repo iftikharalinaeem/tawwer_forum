@@ -552,3 +552,15 @@ table.Data .Alt {
    font-weight: bold;
    text-shadow: 0px 0px 10px #000;
 }
+
+.Legal .Help {
+   width: 357px;
+   margin-bottom: 10px;
+
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #ff9;
+   padding: 4px 8px;
+	border: 1px solid #eec;
+}
