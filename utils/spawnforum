@@ -54,6 +54,14 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${SOURCE}plugins/HtmLawed" "${PATH}plugins/HtmLawed"
     /bin/ln -s "${SOURCE}plugins/Gravatar" "${PATH}plugins/Gravatar"
     /bin/ln -s "${SOURCE}plugins/embedvanilla" "${PATH}plugins/embedvanilla"
+    
+    /bin/ln -s "${SOURCE}plugins/Facebook" "${PATH}plugins/Facebook"
+    /bin/ln -s "${SOURCE}plugins/Twitter" "${PATH}plugins/Twitter"
+    /bin/ln -s "${SOURCE}plugins/GoogleSignIn" "${PATH}plugins/GoogleSignIn"
+    /bin/ln -s "${SOURCE}plugins/OpenID" "${PATH}plugins/OpenID"
+    
+    /bin/ln -s "${SOURCE}plugins/cleditor" "${PATH}plugins/cleditor"
+    /bin/ln -s "${SOURCE}plugins/Emotify" "${PATH}plugins/Emotify"
     # End Core Package Plugins
     
     # Custom VF.com Plugins
