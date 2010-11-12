@@ -7,6 +7,8 @@ class BackupTask extends Task {
    public function __construct($ClientDir) {
       parent::__construct($ClientDir);
       
+      $this->ReallyRun = FALSE;
+      
       $BackupDateString = date('Y-m-d');
       $this->BackupPath = "/srv/backups/upgrade-{$BackupDateString}/vhosts";
       
@@ -31,7 +33,16 @@ class BackupTask extends Task {
       
    }
    
+   public function Init() {
+      $ReallyRun = TaskList::Question("Perform backup of files and data?", "Backup?", array('yes','no','exit'), 'no');
+      if ($ReallyRun == 'no') return;
+      if ($ReallyRun == 'exit') exit();
+      
+      $this->ReallyRun = TRUE;
+   }
+   
    protected function Run() {
+      if ($this->ReallyRun !== TRUE) return;
 
       $BackupFolder = TaskList::CombinePaths($this->BackupPath,$this->ClientFolder);
       if (!is_dir($BackupFolder))

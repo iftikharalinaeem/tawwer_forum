@@ -7,6 +7,24 @@ function Gdn_Uploaders() {
    this.MaxUploadSize = gdn.definition('maxuploadsize');
    
    Gdn_Uploaders.prototype.Prepare = function () {
+      
+      this.isOpera = false;
+      this.isIE = false;
+      this.ieVersion = 0;
+      this.CompatibilityMode = false;
+      
+      if (typeof(window.opera) != 'undefined')
+         this.isOpera = true;
+         
+      if (!this.isOpera && (navigator.userAgent.indexOf('Internet Explorer') >= 0 || navigator.userAgent.indexOf('MSIE')) >= 0)
+         this.isIE = true;
+      
+      if (this.isIE) {
+         this.ieVersion = this.InternetExplorerVersion();
+         if (this.ieVersion >=7 && this.ieVersion <= 8)
+            this.CompatibilityMode = true;
+      }
+      
       var Our = this;
       $('div.AttachmentWindow').each(function(i,AttachmentWindow){
          Our.Spawn($(AttachmentWindow));
@@ -18,6 +36,10 @@ function Gdn_Uploaders() {
       
       AttachmentWindow.attr('spawned', true);
       this.Uploaders[this.UploaderIndex] = new Gdn_MultiFileUpload(AttachmentWindow, 'UploadAttachment', this);
+      this.Uploaders[this.UploaderIndex].isOpera = this.isOpera;
+      this.Uploaders[this.UploaderIndex].isIE = this.isIE;
+      this.Uploaders[this.UploaderIndex].ieVersion = this.ieVersion;
+      this.Uploaders[this.UploaderIndex].CompatibilityMode = this.CompatibilityMode;
       this.Uploaders[this.UploaderIndex].Apc((gdn.definition('apcavailable')) ? 'true' : 'false');
       this.Uploaders[this.UploaderIndex].Ready();
       this.UploaderIndex++;
@@ -30,6 +52,19 @@ function Gdn_Uploaders() {
    Gdn_Uploaders.prototype.GetUniqID = function() {
       var NewDate = new Date;
       return NewDate.getTime();
+   }
+
+   // Returns the version of Internet Explorer or a -1
+   // (indicating the use of another browser).   
+   Gdn_Uploaders.prototype.InternetExplorerVersion = function() {
+      var rv = -1; // Return value assumes failure.
+      if (navigator.appName == 'Microsoft Internet Explorer') {
+         var ua = navigator.userAgent;
+         var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+         if (re.exec(ua) != null)
+            rv = parseFloat( RegExp.$1 );
+      }
+      return rv;
    }
    
 }
@@ -128,6 +163,44 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       this.AttachFileLink.parents('form').bind('complete',jQuery.proxy(this.Reset,this));
    }
    
+   Gdn_MultiFileUpload.prototype.CreateElement = function (ElementType, SetOptions) {
+      if (this.CompatibilityMode) {
+         var ElementString = '<'+ElementType+' ';
+         if (SetOptions.name != undefined) ElementString += 'name="'+SetOptions.name+'"';
+         if (SetOptions.id != undefined) ElementString += 'id="'+SetOptions.id+'"';
+         ElementString += '>';
+         
+         var Element = document.createElement(ElementString);
+      } else {
+         var Element = document.createElement(ElementType);
+      }
+      
+      for (var prop in SetOptions) {
+         var propval = SetOptions[prop];
+         Element.setAttribute(prop, propval);
+         
+         //if (this.CompatibilityMode) {
+            
+         //} else {
+         //   Element[prop] = propval;
+         //}
+      }
+      
+      if (ElementType == 'form' && this.CompatibilityMode) {
+         if (SetOptions.enctype) {
+            encType = Element.getAttributeNode("enctype");
+            encType.value = SetOptions.enctype;
+         }
+         
+         if (SetOptions.method) {
+            formMethod = Element.getAttributeNode("method");
+            formMethod.value = SetOptions.method;
+         }
+      }
+      
+      return Element;
+   }
+   
    Gdn_MultiFileUpload.prototype.NewUploader = function() {
       var NewUploaderID = null; var AutoShow = true;
       if (this.CurrentInput == null)
@@ -136,42 +209,47 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       NewUploaderID = this.Master.GetFreshID();
       NewUploaderID = [this.AttachFileRootName,NewUploaderID].join('_');
       
-      var UploaderForm = document.createElement('form');
       var Action = ['post','upload',NewUploaderID];
-
-      UploaderForm.enctype = 'multipart/form-data';
-      UploaderForm.method = 'POST';
-      UploaderForm.className = 'FileUpload';
-      UploaderForm.action = gdn.url(Action.join('/'));
       var IFrameName = this.NewFrame(NewUploaderID);
       var FormName = IFrameName+'_form';
-      UploaderForm.id = FormName;
-      UploaderForm.target = IFrameName;
+      
+      var UploaderForm = this.CreateElement('form', {
+         'name': FormName,
+         'id': FormName,
+         'target': IFrameName,
+         'enctype': 'multipart/form-data',
+         'className': 'FileUpload',
+         'method': 'POST',
+         'action': gdn.url(Action.join('/'))
+      });
       
       if (this.APC) {
-         var APCNotifier = document.createElement('input');
-         APCNotifier.type = 'hidden';
-         APCNotifier.name = 'APC_UPLOAD_PROGRESS';
-         APCNotifier.id = NewUploaderID+'_apckey';
-         APCNotifier.value = this.UniqID + '_' + NewUploaderID;
+         var APCNotifier = this.CreateElement('input', {
+            'type': 'hidden',
+            'name': 'APC_UPLOAD_PROGRESS',
+            'id': NewUploaderID+'_apckey',
+            'value': this.UniqID + '_' + NewUploaderID
+         });
          $(UploaderForm).append(APCNotifier);
       }
-            
-      var NewUploader   = document.createElement('input');
-      NewUploader.type  = 'file';
-      NewUploader.name  = NewUploaderID;
-      NewUploader.id    = NewUploaderID;
-      NewUploader.className = '';
-      NewUploader.rel = FormName;
+      
+      var NewUploader = this.CreateElement('input', {
+         'type': 'file',
+         'name': NewUploaderID,
+         'id': NewUploaderID,
+         'rel': FormName
+      });
       $(UploaderForm).append(NewUploader);
       
-      var MaxUploadSize = document.createElement('input');
-      MaxUploadSize.type = 'hidden';
-      MaxUploadSize.name = 'MAX_UPLOAD_SIZE';
-      MaxUploadSize.value = this.MaxUploadSize;
+      var MaxUploadSize = this.CreateElement('input', {
+         'type': 'hidden',
+         'name': 'MAX_UPLOAD_SIZE',
+         'value': this.MaxUploadSize
+      });
       $(UploaderForm).append(MaxUploadSize);
       
       this.CurrentUploader.append(UploaderForm);
+      
       this.CurrentInput = NewUploaderID;
       this.ProgressBars[NewUploaderID] = {
          'Target':   IFrameName,
@@ -216,22 +294,25 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
    
    // Create a new named iframe to which our uploads can be submitted
    Gdn_MultiFileUpload.prototype.NewFrame = function(TargetUploaderID) {
-		var IFrameName = 'frm'+Math.floor(Math.random() * 99999);
-		var ContainerDiv = document.createElement('div');
-		var IFrame = document.createElement('iframe');
-		$(IFrame).style = "display:none;";
-		IFrame.src = "about:blank";
-		IFrame.id = IFrameName;
-		IFrame.name = IFrameName;
-		$(ContainerDiv).append(IFrame);
-		$(this.IFrameContainer).append(ContainerDiv);
-		
-		this.IFrames[IFrameName] = {ready:'no'};
+      var IFrameName = 'frm'+Math.floor(Math.random() * 99999);
+      var ContainerDiv = document.createElement('div');
+
+      var IFrame = this.CreateElement('iframe', {
+         'name': IFrameName,
+         'id': IFrameName,
+         'src': 'about:blank'
+      });
+      $(IFrame).css('display','none');
+      
+      $(ContainerDiv).append(IFrame);
+      $(this.IFrameContainer).append(ContainerDiv);
+      
+      this.IFrames[IFrameName] = {ready:'no'};
       
       // Re-target just to be safe
-		$('#'+IFrameName).load(jQuery.proxy(function(){ this.UploadComplete(IFrameName,TargetUploaderID); }, this));
+      $('#'+IFrameName).load(jQuery.proxy(function(){ this.UploadComplete(IFrameName,TargetUploaderID); }, this));
       
-		return IFrameName;
+      return IFrameName;
    }
    
    // Submit the form parent of the current uploader and hide the current uploader's input
@@ -251,6 +332,10 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
    
    Gdn_MultiFileUpload.prototype.RememberFile = function(FileInput) {
       var FileName = FileInput.val();
+      
+      FileName = FileName.split('/').pop();
+      FileName = FileName.split('\\').pop();
+      
       var UploaderID = FileInput.attr('id');
       this.ProgressBars[UploaderID].Filename = FileName
       
@@ -260,16 +345,16 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
       
       // Handle the file list UI
       var PrototypeFileAttachment = $(this.FileContainer.find('div.PrototypicalAttachment')[0]).clone();
-		var FileNameDiv = $(PrototypeFileAttachment).find('div.FileName');
-		var FileSizeDiv = $(PrototypeFileAttachment).find('div.FileSize');
-		var ProgressDiv = $(PrototypeFileAttachment).find('div.UploadProgress');
+      var FileNameDiv = $(PrototypeFileAttachment).find('div.FileName');
+      var FileSizeDiv = $(PrototypeFileAttachment).find('div.FileSize');
+      var ProgressDiv = $(PrototypeFileAttachment).find('div.UploadProgress');
       $(FileNameDiv).html(FileName);
       $(FileSizeDiv).html('');
       $($(ProgressDiv).find('div.Background')).css('width','0px');
       
       var FileListingID = [FileInput.attr('id'),'listing'].join('_');
       PrototypeFileAttachment.attr('id', FileListingID);
-		PrototypeFileAttachment.css('display', 'block');
+      PrototypeFileAttachment.css('display', 'block');
       PrototypeFileAttachment.appendTo(this.FileContainer);
       // PrototypeFileAttachment.css('display','table-row');
       
@@ -317,13 +402,13 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             
             // Update progress bar
             if (!this.ProgressBars[UploaderID].Complete) {
-					var UploadProgress = FileListing.find('div.UploadProgress');
-					var ProgressForeground = FileListing.find('div.UploadProgress div.Foreground');
+               var UploadProgress = FileListing.find('div.UploadProgress');
+               var ProgressForeground = FileListing.find('div.UploadProgress div.Foreground');
                var ProgressBackground = FileListing.find('div.UploadProgress div.Background');
-					ProgressForeground.html('<strong>Uploading:</strong> ' + Math.ceil(Progress)+'%');
+               ProgressForeground.html('<strong>Uploading:</strong> ' + Math.ceil(Progress)+'%');
                ProgressBackground.css('width', ((Progress * $(UploadProgress).width()) / 100)+'px');
                // if (Progress >= 15)
-               // 	ProgressBar.html(Math.ceil(Progress)+'%');
+               //    ProgressBar.html(Math.ceil(Progress)+'%');
             }
             
          }
@@ -372,24 +457,30 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             UploadResultStatus = 'success';
             // SUCCESS
             
-            var Filename = JResponse.MediaResponse.Filename;
             if (!this.ProgressBars[TargetUploaderID]) return;
-            if (this.ProgressBars[TargetUploaderID].Filename != Filename) return;
+            
+            var Filename = JResponse.MediaResponse.Filename;
+            
+            var StoredFilename = this.ProgressBars[TargetUploaderID].Filename;
+            if (StoredFilename != Filename) return;
             
             var MediaID = JResponse.MediaResponse.MediaID;
             this.ProgressBars[TargetUploaderID].Complete = true;
             this.MyFiles[MediaID] = Filename;
             this.RemoveUploader(TargetUploaderID);
-            var EnableMe = document.createElement('input');
-            EnableMe.type = 'checkbox';
-            EnableMe.name = 'AttachedUploads[]';
-            EnableMe.value = MediaID;
-            EnableMe.checked = 'checked';
             
-            var TrackAll = document.createElement('input');
-            TrackAll.type = 'hidden';
-            TrackAll.name = 'AllUploads[]';
-            TrackAll.value = MediaID;
+            var EnableMe = this.CreateElement('input', {
+               'type': 'checkbox',
+               'name': 'AttachedUploads[]',
+               'value': MediaID,
+               'checked': 'checked'
+            });
+            
+            var TrackAll = this.CreateElement('input', {
+               'type': 'hidden',
+               'name': 'AllUploads[]',
+               'value': MediaID
+            });
             
             var FileListing = $('#'+[TargetUploaderID,'listing'].join('_'));
             
@@ -399,12 +490,37 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             }
             
             $(FileListing.find('div.FileOptions')).append(EnableMe);
+            
+            // FIX IE
+            if (this.isIE)
+               EnableMe.checked = 'true';
+               
+            // Make the file a link
+            $(FileListing.find('div.FileName')).html('<a href="'+gdn.url('discussion/download/'+MediaID+'/'+Filename)+'">'+Filename+'</a>');
+               
             $(FileListing.find('div.FileOptions')).append(TrackAll);
             $(FileListing.find('div.UploadProgress')).remove();
             
+				// Add image preview
+				var img = document.createElement('img');
+				img.src = JResponse.MediaResponse.PreviewImageLocation;
+				$(FileListing.find('div.FilePreview')).append(img);
+
+				// Add "insert image" button
+				if (JResponse.MediaResponse.FinalImageLocation != '') {
+					var ImageAnchor = $(FileListing.find('a.InsertImage'));
+					ImageAnchor.attr('href', JResponse.MediaResponse.FinalImageLocation);
+					ImageAnchor.show();
+					ImageAnchor.live('click', function() {
+						var txtbox = $(FileListing.parents('form').find('textarea'));
+						txtbox.val(txtbox.val()+'<img src="'+ImageAnchor.attr('href')+'" />');
+						return false;
+					});
+				}
+            
          } else {
             // FAILURE
-            FailReason = JResponse.MediaResponse.StrError;
+            FailReason = '<pre>'+JResponse.MediaResponse.StrError+'</pre>';
             this.ProgressBars[TargetUploaderID].Complete = true;
             
          }
@@ -424,9 +540,11 @@ function Gdn_MultiFileUpload(AttachmentWindow, AttachFileRootName, Uploaders) {
             'cursor':'pointer'
          });
          FileListing.click(function(){FileListing.remove();});
-         setTimeout(function(){
+         /*
+setTimeout(function(){
             FileListing.fadeTo(1500,0,function(){ FileListing.animate({'height':0},600,function(){ FileListing.remove(); }) });
          },6000);
+*/
          delete this.ProgressBars[TargetUploaderID];
       }
    }
