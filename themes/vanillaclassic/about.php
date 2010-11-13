@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * An associative array of information about this application.
  */
-$ThemeInfo['vanilla-classic'] = array(
+$ThemeInfo['vanillaclassic'] = array(
    'Name' => 'Vanilla Classic',
    'Description' => "The original Vanilla 1 theme.",
    'Version' => '1.0',
