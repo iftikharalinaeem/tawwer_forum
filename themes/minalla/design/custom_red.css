@@ -122,6 +122,7 @@ div.Menu {
 ul#Menu {
 	float:right;
 	padding:25px 0 0 10px;
+   margin-right: 0;
 }
 
 
