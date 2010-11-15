@@ -4,7 +4,6 @@ include($this->FetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 $ViewLocation = $this->FetchViewLocation('discussions');
 WriteFilterTabs($this);
 if ($this->DiscussionData->NumRows() > 0) {
-echo $this->Pager->ToString('less');
 ?>
 <ul class="DataList Discussions Participated">
    <?php include($ViewLocation); ?>
