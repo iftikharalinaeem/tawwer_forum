@@ -65,6 +65,9 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 	
 		$Menu->RemoveLink('Forum', T('Statistics'));
 		$Menu->AddLink('Forum', T('Statistics').$New, 'plugin/statistics', 'Garden.Settings.Manage');
+
+      $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Add-ons', T('Browse Addons').' <span class="New">New</span>', 'dashboard/settings/addons', 'Garden.Settings.Manage');
 		
    		
 		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
@@ -758,5 +761,34 @@ pageTracker._trackPageview();
          $this->_GetDatabase()->SQL()->Put('Site', array('Attributes' => Gdn_Format::Serialize($Attributes)), array('SiteID' => $SiteID));
       }      
    }
-	
+
+
+   /**
+    *
+    * @param SettingsController $Sender
+    * @param array $Args
+    */
+   public function SettingsController_Addons_Create($Sender, $Args) {
+      $Sender->Title('Addons');
+      $Sender->Permission('Garden.Applications.Manage');
+      $Sender->AddSideMenu('dashboard/settings/addons');
+
+      $Action = GetValue(0, $Args);
+      $Key = GetValue(1, $Args);
+      if (Gdn::Session()->ValidateTransientKey($Sender->Request->Get('TransientKey')) && $Key) {
+         try {
+            switch (strtolower($Action)) {
+               case 'enable':
+                  Gdn::PluginManager()->EnablePlugin($Key, NULL);
+                  break;
+               case 'disable':
+                  Gdn::PluginManager()->DisablePlugin($Key, NULL);
+            }
+         } catch (Exception $Ex) {
+            $Sender->Form->AddError($Ex);
+         }
+      }
+
+      $Sender->Render('Addons', '', 'plugins/vfoptions');
+   }
 }
