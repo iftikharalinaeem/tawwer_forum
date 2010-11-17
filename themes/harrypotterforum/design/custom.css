@@ -160,6 +160,9 @@ ul.DataList li.Item {
    background: none;
    border-bottom: 1px solid #344254;
 }
+ul.Activities ul.DataList li {
+   background-color: #222222;
+}
 ul.PanelInfo div.Meta,
 ul.DataList div.Meta {
    font-size: 10px;
