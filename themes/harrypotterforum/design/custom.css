@@ -637,7 +637,8 @@ body div.UserSpoiler div.SpoilerText {
    color: #91CDFF;
 }
 
-body #Menu a span {
+body #Menu a span,
+body ul.DataList div.Meta strong {
    color: black;
    background-color: red;
 }
