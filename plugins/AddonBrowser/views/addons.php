@@ -29,59 +29,67 @@ echo $this->Form->Close();
    </ul>
 </div>
 <?php echo $this->Form->Errors(); ?>
-<table class="AltRows">
-   <thead>
-      <tr>
-         <th><?php echo T('Addon'); ?></th>
-         <th><?php echo T('Description'); ?></th>
-      </tr>
-   </thead>
-   <tbody>
+<ul class="Addons">
    <?php
    $Addons = (array)$this->Data('Addons', array());
    $Alt = FALSE;
    foreach ($Addons as $Addon):
-      $RowClass = '';
+      $RowClass = 'Addon';
 
       if (GetValue('Enabled', $Addon))
          $RowClass .= ' Enabled';
-      if ($Alt)
-         $RowClass .= ' Alt';
       ?>
-      <tr class="More <?php echo $RowClass; ?>">
-         <th><?php echo Gdn_Format::Html(GetValue('Name', $Addon)) ?></th>
-         <td class="Alt"><?php echo Gdn_Format::Html(GetValue('Description', $Addon, '')); ?></td>
-      </tr>
-      <tr class="<?php echo $RowClass; ?>">
-         <td class="Info">
+      <li class="<?php echo $RowClass; ?>">
          <?php
-         $Section = strtolower($this->Data('Section'));
-         parse_str($this->Data('_Query'), $Query);
-         $Query['Slug'] = AddonSlug($Addon);
-         $Query['TransientKey'] = Gdn::Session()->TransientKey();
+            // Write the icon.
+            $IconUrl = GetValue('IconUrl', $Addon);
+            if (!$IconUrl)
+               $IconUrl = Asset('plugins/AddonBrowser/design/defaulticon.png');
+            echo Img($IconUrl, array('class' => 'AddonIcon'));
 
-         if (GetValue('Enabled', $Addon)) {
-            $Href = Url("/settings/addons/$Section/disable?".http_build_query($Query));
-            echo "<a href=\"$Href\" class=\"SmallButton\">", T('Disable'), '</a>';
-         } elseif (GetValue('Downloaded', $Addon)) {
-            $Href = Url("/settings/addons/$Section/enable?".http_build_query($Query));
-            echo "<a href=\"$Href\" class=\"SmallButton\">", T('Enable'), '</a>';
-         } else {
-            $Href = Url("/settings/addons/$Section/download?".http_build_query($Query));
-            echo "<a href=\"$Href\" class=\"SmallButton\">", T('Download'), '</a>';
-         }
-         ?>
-         </td>
-         <td class="Info">
-         <?php
+            // Write the name and description.
+            echo '<div class="AddonInfo">';
+            echo '<h2>', Gdn_Format::Html(GetValue('Name', $Addon)), '</h2>';
+            echo '<p>', Gdn_Format::Html(GetValue('Description', $Addon, '')), '</p>';
+            echo '</div>';
+
+            echo '<div class="Foot">';
+
+            // Write the buttons.
+            echo '<div class="Buttons">';
+            $Section = strtolower($this->Data('Section'));
+            parse_str($this->Data('_Query'), $Query);
+            $Query['Slug'] = AddonSlug($Addon);
+            $Query['TransientKey'] = Gdn::Session()->TransientKey();
+
+            if (GetValue('Enabled', $Addon)) {
+               $Href = Url("/settings/addons/$Section/disable?".http_build_query($Query));
+               echo "<a href=\"$Href\" class=\"SmallButton\">", T('Disable'), '</a>';
+            } elseif (GetValue('Downloaded', $Addon)) {
+               $Href = Url("/settings/addons/$Section/enable?".http_build_query($Query));
+               echo "<a href=\"$Href\" class=\"SmallButton\">", T('Enable'), '</a>';
+            } else {
+               $Href = Url("/settings/addons/$Section/download?".http_build_query($Query));
+               echo "<a href=\"$Href\" class=\"SmallButton\">", T('Download'), '</a>';
+            }
+
+            if (GetValue('Enabled', $Addon) && GetValue('SettingsUrl', $Addon)) {
+               echo "<a href='{$Addon['SettingsUrl']}' class='SmallButton'>", T('Settings'), '</a>';
+            }
+
+            echo '</div>';
+
+            // Write the meta information.
+            echo '<div class="Meta">';
             echo '<span class="Tag '.$Addon['Type'].'Tag">'.T($Addon['Type'] == 'Locale' ? '_Locale' : $Addon['Type']).'</span>';
+            echo '</div>';
+
+            echo '</div>';
          ?>
-         </td>
-      </tr>
+      </li>
       <?php
    endforeach;
    ?>
-   </tbody>
-</table>
+</ul>
 <?php
 echo $this->Data('_Pager')->ToString();

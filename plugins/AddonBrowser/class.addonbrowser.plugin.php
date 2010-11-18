@@ -23,7 +23,7 @@ $PluginInfo['AddonBrowser'] = array(
 class AddonBrowserPlugin extends Gdn_Plugin {
    /// Properties ///
 
-   public $AddonSiteUrl = 'http://vanillaforums.org';
+   public $AddonSiteUrl = 'http://vanilla.local'; //'http://vanillaforums.org';
 
    /**
     * @var AddonInstaller The installer used to install the addons from the browser.
@@ -102,13 +102,14 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       $Addons = array();
 
       // Get the plugins.
-      $Plugins = array_merge(Gdn::PluginManager()->EnabledPlugins, Gdn::PluginManager()->AvailablePlugins());
+      $Plugins = Gdn::PluginManager()->AvailablePlugins();
       foreach ($Plugins as $Index => $Plugin) {
          $Addon = (array)$Plugin;
          $Addon['Type'] = 'Plugin';
          $Addon['AddonKey'] = $Index;
          $Addon['Enabled'] = isset(Gdn::PluginManager()->EnabledPlugins[$Index]);
          $Addon['Downloaded'] = TRUE;
+         $Addon['SettingsUrl'] = GetValue('SettingsUrl', $Plugin);
          if (!GetValue('Name', $Addon))
             $Addon['Name'] = $Index;
 
@@ -126,6 +127,7 @@ class AddonBrowserPlugin extends Gdn_Plugin {
          $Addon['AddonKey'] = $Index;
          $Addon['Enabled'] = array_key_exists($Index, $ApplicationManager->EnabledApplications());
          $Addon['Downloaded'] = TRUE;
+         $Addon['SettingsUrl'] = GetValue('SettingsUrl', $Application);
          if (!GetValue('Name', $Addon))
             $Addon['Name'] = $Index;
 
@@ -198,6 +200,7 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       $Sender->Title('Addons');
       $Sender->Permission('Garden.Applications.Manage');
       $Sender->AddSideMenu('dashboard/settings/addons');
+      $Sender->AddCssFile('addonbrowser.css', 'plugins/addonbrowser');
 
       $Sections = array('enabled' => 'Enabled', 'downloaded' => 'Downloaded', 'browse' => 'Browse');
       $Section = strtolower(GetValue(0, $Args));
