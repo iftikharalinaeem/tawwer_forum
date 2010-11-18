@@ -160,6 +160,9 @@ ul.DataList li.Item {
    background: none;
    border-bottom: 1px solid #344254;
 }
+ul.Activities ul.DataList li {
+   background-color: #222222;
+}
 ul.PanelInfo div.Meta,
 ul.DataList div.Meta {
    font-size: 10px;
@@ -193,7 +196,7 @@ div.Tabs li a:hover,
 div.Tabs li a:active,
 div.Tabs li a:visited {
    background: none;
-   color: #B6D3F1;
+   color: #4488FF;
    border: none;
 	padding: 5px 15px 5px 0;
 }
@@ -365,6 +368,11 @@ ul.Options li ul li a {
 div.Preview,
 ul.MessageList div.Message {
    clear: none;
+   padding: 10px;
+}
+ul.MessageList div.Meta {
+   padding: 10px;
+   background-color: #222222;
 }
 ul.MessageList div.Meta a {
 	text-decoration: none;
@@ -375,6 +383,7 @@ ul.MessageList div.Meta a:hover {
 div.Preview,
 ul.MessageList li.Item {
    border-bottom: 1px solid #ccc;
+   padding: 0px;
 }
 ul.MessageList li.Item div.Message a {
    text-decoration: none;
@@ -398,9 +407,16 @@ div.User h1 {
 	color: #fff;
 }
 #Status {
-	background: #fef9e9;
-	border-bottom: 1px solid #FAEBB1;
+	background: #91CDFF;
+	border-bottom: 0px;
 	padding: 8px;
+	margin-bottom: 10px;
+	-moz-border-radius: 2px;
+	color: black;
+}
+
+#Status a {
+   color: white;
 }
 form.Activity {
    text-align: left;
@@ -592,4 +608,48 @@ a.Close {
 }
 div.AddPeople h4 {
   border-bottom: 0px;
+}
+
+body ul div.Comment blockquote.UserQuote {
+   background-color: #222222;
+}
+
+body ul div.Comment blockquote.UserQuote div.QuoteText {
+   color: lightgrey;
+}
+
+body div.UserSpoiler {
+   background-color: #222222;
+}
+
+body div.UserSpoiler div.SpoilerText {
+   color: lightgrey;
+}
+
+#ConversationForm form {
+   background-color: #222222;
+   border: 1px solid white;
+   border-width: 1px 0px 0px 0px;
+}
+
+#ConversationForm form textarea.MultiComplete,
+#ConversationForm form textarea.TextBox {
+   
+}
+#ConversationForm h2 {
+   color: #91CDFF;
+}
+
+body #Menu a span,
+body ul.DataList div.Meta strong {
+   color: black;
+   background-color: red;
+}
+
+ul.DataList div.Meta span.LastCommentBy a:hover {
+   color: red;
+}
+
+ul.Activities li.Condensed div.Excerpt {
+   color: white;
 }

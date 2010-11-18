@@ -47,25 +47,16 @@ class ParticipatedPlugin extends Gdn_Plugin {
    }
    
    // CONTEXT: DiscussionModel
-   public function DiscussionModel_GetParticipated_Create(&$Sender, $Args) {
-      echo "get participated:\n ";
-      var_dump($Args);
-      die();
+   public function DiscussionModel_GetParticipated_Create(&$Sender) {
+      
+      $UserID = GetValue(0, $Sender->EventArguments);
+      $Offset = GetValue(1, $Sender->EventArguments);
+      $Limit = GetValue(2, $Sender->EventArguments);
       
       if (is_null($UserID)) {
          if (!Gdn::Session()->IsValid()) throw new Exception(T("Could not get participated discussions for non logged-in user."));
          $UserID = Gdn::Session()->UserID;
       }
-      
-      $Fargs = func_get_args();
-
-      var_dump(array(
-         'userid' => $UserID,
-         'offset' => $Offset,
-         'limit'  => $Limit
-      
-      ));
-      die();
       
       $Sender->SQL->Reset();
       $Sender->DiscussionSummaryQuery();
@@ -79,6 +70,8 @@ class ParticipatedPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionModel_GetCountParticipated_Create(&$Sender) {
+      
+      $UserID = GetValue(0, $Sender->EventArguments);
       
       if (is_null($UserID)) {
          if (!Gdn::Session()->IsValid()) throw new Exception(T("Could not get participated discussions for non logged-in user."));
@@ -108,38 +101,25 @@ class ParticipatedPlugin extends Gdn_Plugin {
    public function DiscussionsController_Participated_Create(&$Sender, $Args) {
       $Sender->Permission('Garden.SignIn.Allow');
       
-      list($Offset, $Limit) = $Args;
+      $Page = GetValue(0, $Args);
+      $Limit = GetValue(1, $Args);
       
-      // Validate $Offset & $Limit
-      if (!is_numeric($Offset) || $Offset < 0)
-         $Offset = 0;
-      
-      $Limit = Gdn::Config('Vanilla.Discussions.PerPage', 30);
+      list($Offset, $Limit) = OffsetLimit($Page, Gdn::Config('Vanilla.Discussions.PerPage', 30));
          
       // Get Discussions
       $DiscussionModel = new DiscussionModel();
       
-      echo "before get\n";
-      var_dump(array(
-         'offset' => $Offset,
-         'limit'  => $Limit
-      ));
-      
-      echo "getting...\n";
       $Sender->DiscussionData = $DiscussionModel->GetParticipated(Gdn::Session()->UserID, $Offset, $Limit);
       $Sender->SetData('Discussions', $Sender->DiscussionData);
-      echo "got";
       
       $CountDiscussions = $DiscussionModel->GetCountParticipated(Gdn::Session()->UserID);
       $Sender->SetData('CountDiscussions', $CountDiscussions);
       
       // Build a pager
       $PagerFactory = new Gdn_PagerFactory();
-		$Sender->EventArguments['PagerType'] = 'MorePager';
-		$Sender->FireEvent('BeforeBuildMinePager');
-      $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $this);
-      $Sender->Pager->MoreCode = 'More Discussions';
-      $Sender->Pager->LessCode = 'Newer Discussions';
+		$Sender->EventArguments['PagerType'] = 'Pager';
+		$Sender->FireEvent('BeforeBuildPager');
+      $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $Sender);
       $Sender->Pager->ClientID = 'Pager';
       $Sender->Pager->Configure(
          $Offset,
@@ -147,7 +127,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
          $CountDiscussions,
          'discussions/participated/%1$s'
       );
-		$Sender->FireEvent('AfterBuildMinePager');
+		$Sender->FireEvent('AfterBuildPager');
       
       // Deliver JSON data if necessary
       if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL) {
