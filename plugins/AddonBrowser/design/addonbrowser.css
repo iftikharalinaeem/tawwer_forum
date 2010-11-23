@@ -1,0 +1,36 @@
+ul.Addons {
+   border-top: 1px solid #8bc1de;
+}
+
+ul.Addons li.Addon {
+   padding: 10px 20px;
+   border-bottom: solid 1px #E0E0E0;
+   position: relative;
+   overflow: hidden;
+}
+
+li.Addon .Foot {
+   clear: left;
+}
+
+.Addons .Enabled{
+   background-color: #FFFF88;
+}
+
+ul.Addons .AddonIcon {
+   float: left;
+   margin-right: 10px;
+   margin-bottom: 10px;
+}
+
+ul.Addons .Buttons {
+   clear: both;
+   display: inline-block;
+   width: 120px;
+   margin-right: 10px;
+   padding-left: 8px;
+}
+
+ul.Addons .Meta {
+   display: inline-block;
+}

@@ -50,7 +50,7 @@ echo $Form->Errors();
 
          echo '<div>', $Form->Radio('RepeatType', 'Before', array('Value' => Pocket::REPEAT_BEFORE)), '</div>';
 
-         echo '<div>', $Form->Radio('RepeatType', 'After', array('Value' => Pocket::REPEAT_BEFORE)), '</div>';
+         echo '<div>', $Form->Radio('RepeatType', 'After', array('Value' => Pocket::REPEAT_AFTER)), '</div>';
 
          echo '<div>', $Form->Radio('RepeatType', 'Repeat Every', array('Value' => Pocket::REPEAT_EVERY)), '</div>';
          
@@ -86,9 +86,9 @@ echo $Form->Errors();
       <?php
          echo $Form->Label('Enable/Disable', 'Disabled');
 
-         echo '<div>', $Form->Radio('Disabled', T('Enabled', 'Enabled: The pocket will be displayed.'), array('Value' => Pocket::DISABLED)), '</div>';
+         echo '<div>', $Form->Radio('Disabled', T('Enabled', 'Enabled: The pocket will be displayed.'), array('Value' => Pocket::ENABLED)), '</div>';
 
-         echo '<div>', $Form->Radio('Disabled', T('Disabled', 'Disabled: The pocket will <b>not</b> be displayed.'), array('Value' => Pocket::ENABLED)), '</div>';
+         echo '<div>', $Form->Radio('Disabled', T('Disabled', 'Disabled: The pocket will <b>not</b> be displayed.'), array('Value' => Pocket::DISABLED)), '</div>';
 
          echo '<div>', $Form->Radio('Disabled', T('Test Mode', 'Test Mode: The pocket will only be displayed for pocket administrators.'), array('Value' => Pocket::TESTING)), '</div>';
 

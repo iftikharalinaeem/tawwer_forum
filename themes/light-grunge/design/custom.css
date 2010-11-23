@@ -102,8 +102,6 @@ div.Box {
 #Head {
 	background: #282828 url(bg_texture.png);
 	padding:0;
-	text-align:right;
-	height:72px;
 }
 
 div.Menu {
@@ -112,6 +110,7 @@ div.Menu {
 
 ul#Menu {
 	float:right;
+   margin-right: 0;
 	padding:25px 0 0 10px;
 }
 
