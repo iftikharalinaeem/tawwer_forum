@@ -21,7 +21,8 @@ $PluginInfo['FileUpload'] = array(
    'SettingsPermission' => 'Garden.AdminUser.Only',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'Hidden' => TRUE
 );
 
 Gdn_LibraryMap::SafeCache('library','class.mediamodel.php',dirname(__FILE__).DS.'models/class.mediamodel.php');
