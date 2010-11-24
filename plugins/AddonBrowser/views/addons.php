@@ -29,22 +29,28 @@ echo $this->Form->Close();
    </ul>
 </div>
 <?php echo $this->Form->Errors(); ?>
-<ul class="Addons">
+<table class="Addons">
    <?php
+   $Cols = 2;
+   $Col = 0;
+
    $Addons = (array)$this->Data('Addons', array());
    $Alt = FALSE;
    foreach ($Addons as $Addon):
-      $RowClass = 'Addon';
+      if ($Col == 0)
+         echo '<tr>';
+
+      $RowClass = 'Addon '.$Addon['Type'];
 
       if (GetValue('Enabled', $Addon))
          $RowClass .= ' Enabled';
       ?>
-      <li class="<?php echo $RowClass; ?>">
+      <td class="<?php echo $RowClass; ?>">
          <?php
             // Write the icon.
             $IconUrl = GetValue('IconUrl', $Addon);
             if (!$IconUrl)
-               $IconUrl = Asset('plugins/AddonBrowser/design/defaulticon.png');
+               $IconUrl = Asset('plugins/AddonBrowser/design/'.strtolower($Addon['Type']).'.png');
             echo Img($IconUrl, array('class' => 'AddonIcon'));
 
             // Write the name and description.
@@ -62,15 +68,17 @@ echo $this->Form->Close();
             $Query['Slug'] = AddonSlug($Addon);
             $Query['TransientKey'] = Gdn::Session()->TransientKey();
 
-            if (GetValue('Enabled', $Addon)) {
-               $Href = Url("/settings/addons/$Section/disable?".http_build_query($Query));
-               echo "<a href=\"$Href\" class=\"SmallButton\">", T('Disable'), '</a>';
-            } elseif (GetValue('Downloaded', $Addon)) {
-               $Href = Url("/settings/addons/$Section/enable?".http_build_query($Query));
-               echo "<a href=\"$Href\" class=\"SmallButton\">", T('Enable'), '</a>';
-            } else {
-               $Href = Url("/settings/addons/$Section/download?".http_build_query($Query));
-               echo "<a href=\"$Href\" class=\"SmallButton\">", T('Download'), '</a>';
+            if (GetValue('CanEnable', $Addon, TRUE)) {
+               if (GetValue('Enabled', $Addon)) {
+                  $Href = Url("/settings/addons/$Section/disable?".http_build_query($Query));
+                  echo "<a href=\"$Href\" class=\"SmallButton\">", T('Disable'), '</a>';
+               } elseif (GetValue('Downloaded', $Addon) || !$this->Data('_ShowDownloads', TRUE)) {
+                  $Href = Url("/settings/addons/$Section/enable?".http_build_query($Query));
+                  echo "<a href=\"$Href\" class=\"SmallButton\">", T('Enable'), '</a>';
+               } else {
+                  $Href = Url("/settings/addons/$Section/download?".http_build_query($Query));
+                  echo "<a href=\"$Href\" class=\"SmallButton\">", T('Download'), '</a>';
+               }
             }
 
             if (GetValue('Enabled', $Addon) && GetValue('SettingsUrl', $Addon)) {
@@ -85,11 +93,23 @@ echo $this->Form->Close();
             echo '</div>';
 
             echo '</div>';
+
+            $Col = ($Col + 1) % $Cols;
+            if ($Col == 0)
+               echo '</tr>';
          ?>
-      </li>
+      </td>
       <?php
    endforeach;
+
+   // Write the remaining cells.
+   if ($Col != 0) {
+      for ($i = $Col; $i != 0; $i = ($i + 1) % $Cols) {
+         echo '<td class="Addon Empty">&nbsp;</td>';
+      }
+      echo '</tr>';
+   }
    ?>
-</ul>
+</table>
 <?php
 echo $this->Data('_Pager')->ToString();

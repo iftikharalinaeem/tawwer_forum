@@ -17,7 +17,8 @@ $PluginInfo['AddonBrowser'] = array(
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+   'Hidden' => TRUE
 );
 
 class AddonBrowserPlugin extends Gdn_Plugin {
@@ -29,6 +30,16 @@ class AddonBrowserPlugin extends Gdn_Plugin {
     * @var AddonInstaller The installer used to install the addons from the browser.
     */
    public $Installer = NULL;
+
+   /**
+    * @var bool Whether or not to show hidden addons.
+    */
+   public $ShowHidden = TRUE;
+
+   /**
+    * @var bool Whether or not to show downloads.
+    */
+   public $ShowDownloads = TRUE;
 
    /// Methods ///
 
@@ -82,9 +93,12 @@ class AddonBrowserPlugin extends Gdn_Plugin {
    public function FilterAddon($Addon, $Search, $Options) {
       $Found = FALSE;
 
-      if (GetValue('Enabled', $Options) && GetValue('Enabled', $Addon) != $Options['Enabled']) {
+      if (isset($Options['Enabled']) && GetValue('Enabled', $Addon) != $Options['Enabled']) {
          return FALSE;
       }
+
+      if (!$this->ShowHidden && $Addon['Hidden'])
+         return FALSE;
 
       if ($Search) {
          $Strings = array(GetValue('Name', $Addon), GetValue('Description', $Addon));
@@ -119,7 +133,7 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       }
 
       // Get the applications.
-      $ApplicationManager = new Gdn_ApplicationManager();
+      $ApplicationManager = $this->ApplicationManager();
       $Applications = $ApplicationManager->AvailableVisibleApplications();
       foreach ($Applications as $Index => $Application) {
          $Addon = (array)$Application;
@@ -128,6 +142,28 @@ class AddonBrowserPlugin extends Gdn_Plugin {
          $Addon['Enabled'] = array_key_exists($Index, $ApplicationManager->EnabledApplications());
          $Addon['Downloaded'] = TRUE;
          $Addon['SettingsUrl'] = GetValue('SettingsUrl', $Application);
+         if (!GetValue('Name', $Addon))
+            $Addon['Name'] = $Index;
+
+         $Slug = AddonSlug($Addon);
+         if ($this->FilterAddon($Addon, $Search, $Options))
+            $Addons[] = $Addon;
+      }
+
+      // Get the themes.
+      $ThemeManager = $this->ThemeManager();
+      $Themes = $ThemeManager->AvailableThemes();
+      foreach ($Themes as $Index => $Theme) {
+         $Addon = (array)$Theme;
+         $Addon['Type'] = 'Theme';
+         $Addon['AddonKey'] = $Index;
+         $Addon['Enabled'] = $Index == $ThemeManager->CurrentTheme();
+         $Addon['Downloaded'] = TRUE;
+         if (isset($Theme['Options'])) {
+            $Addon['SettingsUrl'] = Url('/dashboard/settings/themeoptions');
+         }
+         if (isset($Theme['ScreenshotUrl']))
+            $Addon['IconUrl'] = $Theme['ScreenshotUrl'];
          if (!GetValue('Name', $Addon))
             $Addon['Name'] = $Index;
 
@@ -171,6 +207,8 @@ class AddonBrowserPlugin extends Gdn_Plugin {
    }
 
    public function Rest($Url) {
+
+
       $Response = file_get_contents($Url);
       $Data = json_decode($Response, TRUE);
       return $Data;
@@ -183,6 +221,16 @@ class AddonBrowserPlugin extends Gdn_Plugin {
          SetValue('Name', $Array[$Key], $Name);
       }
       uasort($Array, array('SettingsController', 'CompareAddonName'));
+   }
+
+   protected $_ThemeManager = NULL;
+   /**
+    * @return Gdn_ThemeManager
+    */
+   public function ThemeManager() {
+      if ($this->_ThemeManager === NULL)
+         $this->_ThemeManager = new Gdn_ThemeManager();
+      return $this->_ThemeManager;
    }
 
    public static function CompareAddonName($A, $B) {
@@ -203,6 +251,9 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       $Sender->AddCssFile('addonbrowser.css', 'plugins/addonbrowser');
 
       $Sections = array('enabled' => 'Enabled', 'downloaded' => 'Downloaded', 'browse' => 'Browse');
+      if (!$this->ShowDownloads)
+         unset($Sections['downloaded']);
+
       $Section = strtolower(GetValue(0, $Args));
       if (!array_key_exists($Section, $Sections))
          $Section = 'enabled';
@@ -247,7 +298,7 @@ class AddonBrowserPlugin extends Gdn_Plugin {
            list($Addons, $TotalAddons) = $this->GetLocalAddons($Sender->Request->Get('Search'), $Page, array('Enabled' => TRUE));
            break;
         default:
-           list($Addons, $TotalAddons) = $this->GetLocalAddons($Sender->Request->Get('Search'), $Page);
+           list($Addons, $TotalAddons) = $this->GetLocalAddons($Sender->Request->Get('Search'), $Page, array('Enabled' => FALSE));
            break;
       }
       $Sender->SetData('Addons', $Addons);
@@ -270,6 +321,7 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       $Query = $Sender->Request->Get();
       unset($Query['Slug'], $Query['TransientKey']);
       $Sender->SetData('_Query', http_build_query($Query));
+      $Sender->SetData('_ShowDownloads', $this->ShowDownloads);
 
       $Sender->Render('Addons', '', 'plugins/AddonBrowser');
    }
