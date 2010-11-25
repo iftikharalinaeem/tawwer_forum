@@ -488,6 +488,7 @@ pageTracker._trackPageview();
 		$this->_ApplyFeature('FileUpload', $ApplyFeatures, $PluginManager);
 		$this->_ApplyConfig('UserManagement', $ApplyFeatures, 'Garden.Roles.Manage');
 		$this->_ApplyConfig('UserManagement', $ApplyFeatures, 'Garden.Registration.Manage');
+		$this->_ApplyFeature('PrivateCommunity', $ApplyFeatures, $PluginManager);
 		// TODO: PrivateCommunity
 		// TODO: Backups
 		// TODO: SpamControl
