@@ -2,6 +2,8 @@
 <h1><?php echo $this->Data('Title') ?></h1>
 <div class="Info"><?php echo T('Addons allow you to add functionality to your site.'); ?></div>
 <?php
+parse_str($this->Data('_Query'), $Query);
+
 $this->Form->InputPrefix = '';
 echo $this->Form->Open(array('method' => 'get', 'Exclude' => array('Action', 'Search')));
 
@@ -20,9 +22,11 @@ echo $this->Form->Close();
 <div class="Tabs FilterTabs">
    <ul>
    <?php
+   $TabQuery = $Query;
+   unset($TabQuery['Page']);
    foreach ($this->Data('Sections') as $Key => $Name) {
       echo '<li',$this->Data('Section') == $Key ? ' class="Active"' : '','>',
-         Anchor(T($Name), "settings/addons/$Key?".$this->Data('_Query')),
+         Anchor(T($Name), "settings/addons/$Key?".http_build_query($TabQuery)),
          "</li>\n";
    }
    ?>
@@ -37,6 +41,8 @@ echo $this->Form->Close();
    $Addons = (array)$this->Data('Addons', array());
    $Alt = FALSE;
    foreach ($Addons as $Addon):
+      $ID = "Addon_".AddonSlug($Addon);
+
       if ($Col == 0)
          echo '<tr>';
 
@@ -45,12 +51,12 @@ echo $this->Form->Close();
       if (GetValue('Enabled', $Addon))
          $RowClass .= ' Enabled';
       ?>
-      <td class="<?php echo $RowClass; ?>">
+      <td id="<?php echo $ID; ?>" class="<?php echo $RowClass; ?>">
          <?php
             // Write the icon.
             $IconUrl = GetValue('IconUrl', $Addon);
             if (!$IconUrl)
-               $IconUrl = Asset('plugins/AddonBrowser/design/'.strtolower($Addon['Type']).'.png');
+               $IconUrl = 'plugins/AddonBrowser/design/'.strtolower($Addon['Type']).'.png';
             echo Img($IconUrl, array('class' => 'AddonIcon'));
 
             // Write the name and description.

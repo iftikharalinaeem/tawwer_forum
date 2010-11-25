@@ -207,8 +207,6 @@ class AddonBrowserPlugin extends Gdn_Plugin {
    }
 
    public function Rest($Url) {
-
-
       $Response = file_get_contents($Url);
       $Data = json_decode($Response, TRUE);
       return $Data;
