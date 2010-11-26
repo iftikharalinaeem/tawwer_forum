@@ -415,7 +415,7 @@ body.Entry #Content h1,
 #MessageForm textarea {
    width: 99%;
 }
-body.Entry #Content form,
+body.Entry #Content .Box,
 #MessageForm,
 #DiscussionForm form {
    border: 0;
