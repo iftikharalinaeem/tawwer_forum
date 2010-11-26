@@ -11,6 +11,9 @@ ul.Activities div.Meta a {
    text-decoration: underline;
 	color:#3354AA;
 }
+a.Dismiss {
+	text-decoration: none;
+}
 ul.Activities div.Excerpt a:hover,
 ul.Activities div.Meta a:hover,
 a:hover {
@@ -65,6 +68,7 @@ body.Profile #Content,
 }
 div.Menu {
    text-align: center;
+	position: inherit;
 }
 body #Head h1 {
    padding: 11px 0;
@@ -76,6 +80,7 @@ ul#Menu {
    padding: 0;
    text-align: center;
    height: auto;
+	display: block;
 }
 #Menu li {
    display: inline !important;
@@ -293,16 +298,17 @@ a.VanillaLink span {
 
 /* Search Page */
 body.Entry #Panel,
-#dashboard_entrycontroller_signin #Panel,
-#vanilla_postcontroller_editdiscussion #Panel,
-#vanilla_postcontroller_discussion #Panel,
-#dashboard_searchcontroller_index #Panel {
+#dashboard_entry_signin #Panel,
+#vanilla_post_editdiscussion #Panel,
+#vanilla_post_discussion #Panel,
+#dashboard_search_index #Panel {
    display: none;
 }
-#vanilla_postcontroller_editdiscussion #Content,
-#vanilla_postcontroller_discussion #Content,
-#dashboard_searchcontroller_index #Content {
-   margin: 0 20px;
+#vanilla_post_editdiscussion #Content,
+#vanilla_post_discussion #Content,
+#dashboard_search_index #Content,
+#conversations_messages_add #Content {
+   margin: 0;
 }
 div.Tabs div.SubTab  {
    background: #FFFEEC;
@@ -395,6 +401,9 @@ ul.Activities div.Title a {
 }
 
 /* Forms */
+#DiscussionForm {
+	padding: 0 20px;
+}
 body.Entry #Content h1,
 #MessageForm h2,
 #DiscussionForm h2 {
@@ -430,13 +439,21 @@ body.Entry form ul li label,
 div.CommentForm textarea {
 	width: 99%;
 }
+ul.token-input-list,
+#DiscussionForm input.InputBox,
+#DiscussionForm textarea {
+	width: 99.5%;
+}
 /* Conversations */
+body#conversations_messages_add #ConversationForm {
+	padding: 0 20px;
+}
 ul.Condensed li, li.Condensed {
    clear: none;
 }
-textarea.MultiComplete {
-   padding:6px 3px;
-   display: inline !important;
+#ConversationForm textarea.TextBox,
+#ConversationForm textarea.MultiComplete {
+	width: 99.5%;
 }
 div.AddPeople form div {
    text-align: left;

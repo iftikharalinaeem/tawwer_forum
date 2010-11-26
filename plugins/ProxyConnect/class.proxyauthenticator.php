@@ -16,6 +16,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake {
 
+   public $HandshakeResponse = NULL;
    protected $_CookieName = NULL;
    protected $Provider = NULL;
    protected $Token = NULL;
@@ -33,7 +34,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       parent::__construct();
    }
    
-   public function Authenticate() {      
+   public function Authenticate() {
       try {
          $Provider = $this->GetProvider();
          if (!$Provider) throw new Exception('Provider not defined');
@@ -43,6 +44,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       
          $Response = $this->_GetForeignCredentials($ForeignIdentityUrl);
          if (!$Response) throw new Exception('No response from Authentication URL');
+         $this->HandshakeResponse = $Response;
          
          // @TODO: Response sends provider key, used as parameter to GetProvider()
 
@@ -62,17 +64,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
             'Email'  => $UserEmail
          ));
          
-         Gdn::Authenticator()->Trigger($AuthResponse);
-         if ($AuthResponse == Gdn_Authenticator::AUTH_SUCCESS) {
-            // Everything's cool, we don't have to do anything.
-            
-         } elseif ($AuthResponse == Gdn_Authenticator::AUTH_PARTIAL) {
-            Redirect(Url('/entry/handshake/proxy',TRUE),302);
-         } else {
-            Gdn::Request()->WithRoute('DefaultController');
-            throw new Exception('authentication failed');
-         }
-         
+         return $AuthResponse;
       }
       catch (Exception $e) {
          
@@ -336,6 +328,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       // Allow the entry/handshake method to function
       Gdn::Authenticator()->AllowHandshake();
       
+      if (Gdn::Request()->Path() == 'entry/auth/proxy') return;
       // Shortcircuit the wakeup if we're already awake
       // 
       // If we're already back on Vanilla and working with the handshake form, don't
@@ -354,8 +347,34 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       if ($CurrentStep == Gdn_Authenticator::MODE_NOAUTH)
          return;
       
-      // Passed all shortcircuits. Try to log in via proxy.
-      $this->Authenticate();
+      try {
+      
+         // Passed all shortcircuits. Try to log in via proxy.
+         $AuthResponse = $this->Authenticate();
+         
+         $UserInfo = array();
+         $UserEventData = array_merge(array(
+            'UserID'    => Gdn::Session()->UserID,
+            'Payload'   => GetValue('HandshakeResponse', $this, FALSE)
+         ),$UserInfo);
+         Gdn::Authenticator()->Trigger($AuthResponse,$UserEventData);
+         
+         if ($AuthResponse == Gdn_Authenticator::AUTH_SUCCESS ) {
+            // Everything's cool, we don't have to do anything.
+            
+         } elseif ($AuthResponse == Gdn_Authenticator::AUTH_PARTIAL) {
+            return Redirect(Url('/entry/handshake/proxy',TRUE),302);
+         } else {
+            Gdn::Request()->WithRoute('DefaultController');
+            throw new Exception('authentication failed');
+         }
+         
+      } catch (Exception $e) {
+         
+         // Fallback to defer checking until the next session
+         if (substr(Gdn::Request()->Path(),0,6) != 'entry/')
+            $this->SetIdentity(-1, FALSE);
+      }
    }
    
 }
