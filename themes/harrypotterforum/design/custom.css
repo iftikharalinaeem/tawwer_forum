@@ -58,6 +58,7 @@ body.Profile #Content,
    margin:0 20px 40px 290px;
    width: auto;
 }
+body#conversations_messages_add #Content,
 body.Post #Content {
 	margin: 0 0 40px;
 }
@@ -77,6 +78,7 @@ body.Post #Content {
 }
 div.Menu {
    text-align: center;
+	position: inherit;
 }
 body #Head h1 {
    padding: 11px 0;
@@ -88,6 +90,7 @@ ul#Menu {
    padding: 0;
    text-align: center;
    height: auto;
+	display: block;
 }
 #Menu li {
    display: inline !important;
@@ -155,6 +158,10 @@ div.MessageForm div.Buttons {
 }
 div.CommentForm textarea {
 	width:99%;
+}
+#DiscussionForm textarea,
+#DiscussionForm input.InputBox {
+	width:99.5%;
 }
 ul.DataList li.Item {
    background: none;
@@ -634,7 +641,8 @@ body div.UserSpoiler div.SpoilerText {
 
 #ConversationForm form textarea.MultiComplete,
 #ConversationForm form textarea.TextBox {
-   
+	padding: 3px 0;
+   width: 100%;
 }
 #ConversationForm h2 {
    color: #91CDFF;
