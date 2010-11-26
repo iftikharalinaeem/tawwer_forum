@@ -49,6 +49,7 @@ body.Profile #Content,
 }
 div.Menu {
    text-align: center;
+	position: inherit;
 }
 body #Head h1 {
    padding: 10px 0;
@@ -60,6 +61,7 @@ ul#Menu {
    padding: 0;
    text-align: center;
    height: auto;
+	display: block;
 }
 #Menu li {
    display: inline !important;
@@ -290,16 +292,17 @@ a.VanillaLink span {
 }
 
 /* Search Page */
-#dashboard_entrycontroller_signin #Panel,
-#vanilla_postcontroller_editdiscussion #Panel,
-#vanilla_postcontroller_discussion #Panel,
-#dashboard_searchcontroller_index #Panel {
+#dashboard_entry_signin #Panel,
+#vanilla_post_editdiscussion #Panel,
+#vanilla_post_discussion #Panel,
+#dashboard_search_index #Panel {
    display: none;
 }
-#vanilla_postcontroller_editdiscussion #Content,
-#vanilla_postcontroller_discussion #Content,
-#dashboard_searchcontroller_index #Content {
-   margin: 0 20px;
+#vanilla_post_editdiscussion #Content,
+#vanilla_post_discussion #Content,
+#dashboard_search_index #Content,
+#conversations_messages_add #Content {
+   margin: 0;
 }
 div.Tabs div.SubTab  {
    background: #333;
@@ -408,7 +411,8 @@ div.Box dl {
 /* Forms */
 body.Entry #Content h1,
 #MessageForm h2,
-#DiscussionForm h2 {
+#DiscussionForm h2,
+#ConversationForm h2 {
    color: #bbb;   
 }
 #MessageForm {
@@ -417,16 +421,21 @@ body.Entry #Content h1,
 #MessageForm textarea {
    width: 99%;
 }
-body.Entry #Content form,
+body.Entry #Content div.Box,
 #MessageForm,
-#DiscussionForm form {
+#DiscussionForm form,
+#ConversationForm form {
    border: 0;
    background: #666;
 }
+body.Entry #Content div.Box {
+	padding: 6px;
+}
 body.Entry form ul li label,
-#DiscussionForm form label {
+#DiscussionForm form label,
+#ConversationForm form label {
    display: block;
-   color: #333;
+   color: #fff;
 }
 #DiscussionForm ul.PostOptions label {
    color:#333;
@@ -439,12 +448,36 @@ input.DateBox, input.InputBox, input.SmallInput, textarea {
 ul.Condensed li, li.Condensed {
    clear: none;
 }
-textarea.MultiComplete {
-   padding:6px 3px;
-   display: inline !important;
+#ConversationForm .TextBox,
+#ConversationForm textarea.MultiComplete {
+	width: 100%;
 }
 div.AddPeople form div {
    text-align: left;
+}
+
+/* Autocomplete */
+.ac_results {
+   border: 1px solid #000;
+	color: #000;
+   border-top: 0;
+   background-color: white;
+}
+.ac_results li {
+   border-bottom: 1px solid #000;
+}
+.ac_lastitem {
+   border-bottom: 0 !important;
+}
+.ac_results strong {
+   background: #dadada;
+}
+.ac_over strong {
+   background: #555;
+}
+.ac_over {
+   background: #333;
+   color: #fff;
 }
 
 /* Popups */
@@ -503,4 +536,10 @@ ul.MessageList div.Message blockquote {
 	border-radius: 0;
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
+}
+#ConversationForm form {
+	border: none;
+}
+#ConversationForm label {
+	color: #fff;
 }
