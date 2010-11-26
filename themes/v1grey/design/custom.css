@@ -116,7 +116,7 @@ div.MessageForm div.Buttons {
 
 div.Comment div.CommentForm,
 div.CommentForm textarea {
-	width:98%;
+	width:99.5%;
 	clear: none;
 }
 div.Tabs {
@@ -542,4 +542,8 @@ ul.MessageList div.Message blockquote {
 }
 #ConversationForm label {
 	color: #fff;
+}
+
+div.Attachments {
+	background: #2a2a2a;
 }
