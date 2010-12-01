@@ -81,6 +81,12 @@ echo $this->Form->Close();
                } elseif (GetValue('Downloaded', $Addon) || !$this->Data('_ShowDownloads', TRUE)) {
                   $Href = Url("/settings/addons/$Section/enable?".http_build_query($Query));
                   echo "<a href=\"$Href\" class=\"SmallButton\">", T('Enable'), '</a>';
+
+                  if (GetValue('CanRemove', $Addon)) {
+                     echo ' ';
+                     $Href = Url("/settings/addons/$Section/remove?".http_build_query($Query));
+                     echo "<a href=\"$Href\" class='SmallButton'>", T('Remove'), '</a>';
+                  }
                } else {
                   $Href = Url("/settings/addons/$Section/download?".http_build_query($Query));
                   echo "<a href=\"$Href\" class=\"SmallButton\">", T('Download'), '</a>';
@@ -88,7 +94,8 @@ echo $this->Form->Close();
             }
 
             if (GetValue('Enabled', $Addon) && GetValue('SettingsUrl', $Addon)) {
-               echo "<a href='{$Addon['SettingsUrl']}' class='SmallButton'>", T('Settings'), '</a>';
+               $SettingsUrl = Url($Addon['SettingsUrl']);
+               echo " <a href='$SettingsUrl' class='SmallButton'>", T('Settings'), '</a>';
             }
 
             echo '</div>';

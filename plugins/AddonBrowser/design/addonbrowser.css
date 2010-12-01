@@ -48,3 +48,11 @@
 .Addons td.Addon {
    width: 50%;
 }
+
+.Addons td.Addon .SmallButton {
+   margin: 0;
+}
+
+body.addons .Errors {
+   border-top: 1px solid #8BC1DE;
+}

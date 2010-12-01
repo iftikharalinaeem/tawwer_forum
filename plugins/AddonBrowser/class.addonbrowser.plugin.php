@@ -70,9 +70,9 @@ class AddonBrowserPlugin extends Gdn_Plugin {
          case 'Locale':
             return FALSE;
          case 'Plugin':
-            return Gdn::PluginManager()->AvailablePlugins($Key);
+            return Gdn::PluginManager()->AvailablePlugins($Key) !== FALSE;
          case 'Theme':
-            return FALSE;
+            return array_key_exists($Key, $this->ThemeManager()->AvailableThemes());
       }
    }
 
@@ -86,7 +86,8 @@ class AddonBrowserPlugin extends Gdn_Plugin {
          case 'Plugin':
             return array_key_exists($Key, Gdn::PluginManager()->EnabledPlugins());
          case 'Theme':
-            return FALSE;
+            $CurrentTheme = $this->ThemeManager()->EnabledThemeInfo();
+            return GetValue('Index', $CurrentTheme) == $Key;
       }
    }
 
@@ -157,8 +158,11 @@ class AddonBrowserPlugin extends Gdn_Plugin {
          $Addon = (array)$Theme;
          $Addon['Type'] = 'Theme';
          $Addon['AddonKey'] = $Index;
-         $Addon['Enabled'] = $Index == $ThemeManager->CurrentTheme();
+         $Addon['Enabled'] = GetValue('Folder', $Theme) == $ThemeManager->CurrentTheme();
          $Addon['Downloaded'] = TRUE;
+         if (GetValue('Folder', $Theme))
+            $Addon['InstallPath'] = PATH_THEMES.'/'.$Theme['Folder'];
+
          if (isset($Theme['Options'])) {
             $Addon['SettingsUrl'] = Url('/dashboard/settings/themeoptions');
          }
@@ -179,6 +183,15 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       // Paginate the array.
       list($Offset, $Limit) = OffsetLimit($Page, 20);
       $Addons = array_slice($Addons, $Offset, $Limit);
+
+      // Check to see which addons can be removed.
+      foreach ($Addons as &$Addon) {
+         if (!isset($Addon['InstallPath'])) {
+            $Addon['CanRemove'] = FALSE;
+         } else {
+            $Addon['CanRemove'] = TRUE; //is_writable($Addon['InstallPath']);
+         }
+      }
 
       return array($Addons, $TotalAddons);
    }
@@ -201,6 +214,7 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       foreach ($Addons as &$Addon) {
          $Addon['Enabled'] = $this->Enabled($Addon);
          $Addon['Downloaded'] = $this->Downloaded($Addon);
+         $Addon['CanRemove'] = FALSE;
       }
 
       return array($Addons, $TotalAddons);
@@ -258,6 +272,8 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       $Sender->SetData('Section', $Section);
       $Sender->SetData('Sections', $Sections);
 
+      $this->FireEvent('AddonSettings');
+
       // Perform an action if applicable.
       $Action = strtolower(GetValue(1, $Args));
       if ($Action && in_array($Action, array('enable', 'disable', 'download'))) {
@@ -296,7 +312,7 @@ class AddonBrowserPlugin extends Gdn_Plugin {
            list($Addons, $TotalAddons) = $this->GetLocalAddons($Sender->Request->Get('Search'), $Page, array('Enabled' => TRUE));
            break;
         default:
-           list($Addons, $TotalAddons) = $this->GetLocalAddons($Sender->Request->Get('Search'), $Page, array('Enabled' => FALSE));
+           list($Addons, $TotalAddons) = $this->GetLocalAddons($Sender->Request->Get('Search'), $Page);
            break;
       }
       $Sender->SetData('Addons', $Addons);
