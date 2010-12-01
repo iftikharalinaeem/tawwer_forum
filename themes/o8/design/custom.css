@@ -18,10 +18,12 @@ div.Menu {
 	background: url('o8banner.png') 0 26px no-repeat;
 	text-align: left;
 	width: 650px;
+	position: relative;
 }
 body #Head h1 {
 	float: none;
 	padding: 0 7px 0 0;
+	display: block;
 }
 body #Head h1 a {
 	display: block;
@@ -33,10 +35,16 @@ body #Head h1 a {
 }
 ul#Menu {
 	border-top: 1px dotted #c7d3ea;
-	padding: 4px 0 0;
+	padding: 0;
 	margin: 0 0 0 40px;
 	float: none;
 	position: relative;
+	display: block;
+}
+#Menu li {
+	float: none;
+	display: inline-block;
+	line-height: 1;
 }
 #Menu a,
 #Menu a:hover,
@@ -54,11 +62,13 @@ ul#Menu {
 #Menu li.NonTab {
 	position: absolute;
 	right: 0;
+	top: 0;
 }
 #Menu li.NonTab a,
 #Menu li.NonTab a:hover {
 	margin: 0;
 	color: #c7d3ea !important;
+	line-height: 2;
 }
 #Menu li.NonTab a:hover {
 	color: #062971 !important;
