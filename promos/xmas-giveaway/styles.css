@@ -73,24 +73,24 @@ padding-left: 50px;
 }
 
 .open{
-float:left;
-margin:126px 0 0 -488px;
+top:126px;
+right:545px;
 position:absolute;
 text-align:left;
 z-index:10;
 }
 
 .close{
-float:left;
-margin:156px 0 0 -295px;
+top:156px;
+right:353px;
 position:absolute;
 text-align:left;
 z-index:10;
 }
 
 .five{
-float:left;
-margin:190px 0 0 -470px;
+top:190px;
+right:502px;
 position:absolute;
 text-align:left;
 z-index:10;
