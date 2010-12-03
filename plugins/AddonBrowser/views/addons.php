@@ -51,7 +51,7 @@ echo $this->Form->Close();
       if (GetValue('Enabled', $Addon))
          $RowClass .= ' Enabled';
       ?>
-      <td id="<?php echo $ID; ?>" class="<?php echo $RowClass; ?>">
+      <td id="<?php echo $ID; ?>" class="<?php echo $RowClass; ?>"><div class="Con">
          <?php
             // Write the icon.
             $IconUrl = GetValue('IconUrl', $Addon);
@@ -79,8 +79,10 @@ echo $this->Form->Close();
                   $Href = Url("/settings/addons/$Section/disable?".http_build_query($Query));
                   echo "<a href=\"$Href\" class=\"SmallButton\">", T('Disable'), '</a>';
                } elseif (GetValue('Downloaded', $Addon) || !$this->Data('_ShowDownloads', TRUE)) {
-                  $Href = Url("/settings/addons/$Section/enable?".http_build_query($Query));
-                  echo "<a href=\"$Href\" class=\"SmallButton\">", T('Enable'), '</a>';
+                  if (GetValue('CanEnable', $Addon, TRUE)) {
+                     $Href = Url("/settings/addons/$Section/enable?".http_build_query($Query));
+                     echo "<a href=\"$Href\" class=\"SmallButton\">", T('Enable'), '</a>';
+                  }
 
                   if (GetValue('CanRemove', $Addon)) {
                      echo ' ';
@@ -103,6 +105,9 @@ echo $this->Form->Close();
             // Write the meta information.
             echo '<div class="Meta">';
             echo '<span class="Tag '.$Addon['Type'].'Tag">'.T($Addon['Type'] == 'Locale' ? '_Locale' : $Addon['Type']).'</span>';
+
+            $this->EventArguments['Addon'] = $Addon;
+            $this->FireEvent('AddonMeta');
             echo '</div>';
 
             echo '</div>';
@@ -111,7 +116,7 @@ echo $this->Form->Close();
             if ($Col == 0)
                echo '</tr>';
          ?>
-      </td>
+         </div></td>
       <?php
    endforeach;
 

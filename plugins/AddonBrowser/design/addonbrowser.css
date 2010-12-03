@@ -3,10 +3,8 @@
 }
 
 .Addons .Addon {
-   padding: 10px 10px;
    border-bottom: solid 1px #E0E0E0;
-   position: relative;
-   overflow: hidden;
+   padding: 0;
 }
 
 .Addon .Foot {
@@ -51,6 +49,18 @@
 
 .Addons td.Addon .SmallButton {
    margin: 0;
+}
+
+.Addons td.Addon .Con {
+   padding: 10px 10px;
+   position: relative;
+   overflow: hidden;
+}
+
+.Addons .Con img.PlanRequirement {
+   position: absolute;
+   left: 8px;
+   top: 8px;
 }
 
 body.addons .Errors {
