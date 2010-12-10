@@ -20,8 +20,8 @@ class BoagWorldThemeHooks implements Gdn_IPlugin {
 	
 	/**
 	 * Add script to jump down to the forum body on page load.
-	 */
 	public function Base_Render_Before($Sender) {
+	if ($Sender->MasterView == '' || $Sender->MasterView == 'default') {
 		$Sender->Head->AddString('<script type="text/javascript">
 // If not looking for a specific hash, jump to the forum body
 var hash = window.location.href.split("#")[1];
@@ -31,6 +31,7 @@ if (typeof(hash) == "undefined") {
 	}, 100);
 }
 </script>');
-	}	
+	}	}
+	 */
 	
 }
