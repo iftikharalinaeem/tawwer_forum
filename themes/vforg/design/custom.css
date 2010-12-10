@@ -561,6 +561,9 @@ div.Box h4 {
 	color:#744000;
 	font-weight:bold;
 }
+div.Box h4 a {
+	color: #744000;
+}
 div.UserOptions ul {
    margin: 0;
    padding: 0;
