@@ -17,7 +17,8 @@ $PluginInfo['AddonBrowser'] = array(
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+   'Hidden' => TRUE
 );
 
 class AddonBrowserPlugin extends Gdn_Plugin {
@@ -29,6 +30,16 @@ class AddonBrowserPlugin extends Gdn_Plugin {
     * @var AddonInstaller The installer used to install the addons from the browser.
     */
    public $Installer = NULL;
+
+   /**
+    * @var bool Whether or not to show hidden addons.
+    */
+   public $ShowHidden = TRUE;
+
+   /**
+    * @var bool Whether or not to show downloads.
+    */
+   public $ShowDownloads = TRUE;
 
    /// Methods ///
 
@@ -59,9 +70,9 @@ class AddonBrowserPlugin extends Gdn_Plugin {
          case 'Locale':
             return FALSE;
          case 'Plugin':
-            return Gdn::PluginManager()->AvailablePlugins($Key);
+            return Gdn::PluginManager()->AvailablePlugins($Key) !== FALSE;
          case 'Theme':
-            return FALSE;
+            return array_key_exists($Key, $this->ThemeManager()->AvailableThemes());
       }
    }
 
@@ -75,16 +86,20 @@ class AddonBrowserPlugin extends Gdn_Plugin {
          case 'Plugin':
             return array_key_exists($Key, Gdn::PluginManager()->EnabledPlugins());
          case 'Theme':
-            return FALSE;
+            $CurrentTheme = $this->ThemeManager()->EnabledThemeInfo();
+            return GetValue('Index', $CurrentTheme) == $Key;
       }
    }
 
    public function FilterAddon($Addon, $Search, $Options) {
       $Found = FALSE;
 
-      if (GetValue('Enabled', $Options) && GetValue('Enabled', $Addon) != $Options['Enabled']) {
+      if (isset($Options['Enabled']) && GetValue('Enabled', $Addon) != $Options['Enabled']) {
          return FALSE;
       }
+
+      if (!$this->ShowHidden && $Addon['Hidden'])
+         return FALSE;
 
       if ($Search) {
          $Strings = array(GetValue('Name', $Addon), GetValue('Description', $Addon));
@@ -119,7 +134,7 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       }
 
       // Get the applications.
-      $ApplicationManager = new Gdn_ApplicationManager();
+      $ApplicationManager = $this->ApplicationManager();
       $Applications = $ApplicationManager->AvailableVisibleApplications();
       foreach ($Applications as $Index => $Application) {
          $Addon = (array)$Application;
@@ -136,6 +151,31 @@ class AddonBrowserPlugin extends Gdn_Plugin {
             $Addons[] = $Addon;
       }
 
+      // Get the themes.
+      $ThemeManager = $this->ThemeManager();
+      $Themes = $ThemeManager->AvailableThemes();
+      foreach ($Themes as $Index => $Theme) {
+         $Addon = (array)$Theme;
+         $Addon['Type'] = 'Theme';
+         $Addon['AddonKey'] = $Index;
+         $Addon['Enabled'] = GetValue('Folder', $Theme) == $ThemeManager->CurrentTheme();
+         $Addon['Downloaded'] = TRUE;
+         if (GetValue('Folder', $Theme))
+            $Addon['InstallPath'] = PATH_THEMES.'/'.$Theme['Folder'];
+
+         if (isset($Theme['Options'])) {
+            $Addon['SettingsUrl'] = Url('/dashboard/settings/themeoptions');
+         }
+         if (isset($Theme['ScreenshotUrl']))
+            $Addon['IconUrl'] = $Theme['ScreenshotUrl'];
+         if (!GetValue('Name', $Addon))
+            $Addon['Name'] = $Index;
+
+         $Slug = AddonSlug($Addon);
+         if ($this->FilterAddon($Addon, $Search, $Options))
+            $Addons[] = $Addon;
+      }
+
       // Sort the addons.
       self::SortAddons($Addons);
       $TotalAddons = count($Addons);
@@ -143,6 +183,15 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       // Paginate the array.
       list($Offset, $Limit) = OffsetLimit($Page, 20);
       $Addons = array_slice($Addons, $Offset, $Limit);
+
+      // Check to see which addons can be removed.
+      foreach ($Addons as &$Addon) {
+         if (!isset($Addon['InstallPath'])) {
+            $Addon['CanRemove'] = FALSE;
+         } else {
+            $Addon['CanRemove'] = TRUE; //is_writable($Addon['InstallPath']);
+         }
+      }
 
       return array($Addons, $TotalAddons);
    }
@@ -165,6 +214,7 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       foreach ($Addons as &$Addon) {
          $Addon['Enabled'] = $this->Enabled($Addon);
          $Addon['Downloaded'] = $this->Downloaded($Addon);
+         $Addon['CanRemove'] = FALSE;
       }
 
       return array($Addons, $TotalAddons);
@@ -185,6 +235,16 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       uasort($Array, array('SettingsController', 'CompareAddonName'));
    }
 
+   protected $_ThemeManager = NULL;
+   /**
+    * @return Gdn_ThemeManager
+    */
+   public function ThemeManager() {
+      if ($this->_ThemeManager === NULL)
+         $this->_ThemeManager = new Gdn_ThemeManager();
+      return $this->_ThemeManager;
+   }
+
    public static function CompareAddonName($A, $B) {
       return strcasecmp(GetValue('Name', $A), GetValue('Name', $B));
    }
@@ -203,11 +263,16 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       $Sender->AddCssFile('addonbrowser.css', 'plugins/addonbrowser');
 
       $Sections = array('enabled' => 'Enabled', 'downloaded' => 'Downloaded', 'browse' => 'Browse');
+      if (!$this->ShowDownloads)
+         unset($Sections['downloaded']);
+
       $Section = strtolower(GetValue(0, $Args));
       if (!array_key_exists($Section, $Sections))
          $Section = 'enabled';
       $Sender->SetData('Section', $Section);
       $Sender->SetData('Sections', $Sections);
+
+      $this->FireEvent('AddonSettings');
 
       // Perform an action if applicable.
       $Action = strtolower(GetValue(1, $Args));
@@ -270,6 +335,7 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       $Query = $Sender->Request->Get();
       unset($Query['Slug'], $Query['TransientKey']);
       $Sender->SetData('_Query', http_build_query($Query));
+      $Sender->SetData('_ShowDownloads', $this->ShowDownloads);
 
       $Sender->Render('Addons', '', 'plugins/AddonBrowser');
    }

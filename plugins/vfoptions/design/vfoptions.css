@@ -4,14 +4,3 @@
 #Head div.User a.MyAccountLink:focus {
 	background: #138b01;
 }
-
-table.Addons td {
-   vertical-align: top;
-}
-table.Addons h2 {
-   margin-top: 15px;
-}
-table.Addons .AddonIcon {
-   border: solid 1px #E0E0E0;
-   padding: 2px;
-}

@@ -40,7 +40,7 @@ class AddonInstaller {
             $Addon['BasePath'] = '/plugins';
             break;
          case 'theme':
-            $Addon['Themes'] = '/themes';
+            $Addon['BasePath'] = '/themes';
             break;
       }
       return $Addon;

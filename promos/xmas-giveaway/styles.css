@@ -1,0 +1,137 @@
+
+   
+body {
+	padding: 0;
+	margin: 0;
+	font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+	background: url('images/bg-pattern.png') #023844;
+	text-align: center;
+}
+
+a,
+a:link,
+a:visited,
+a:active {
+   text-decoration: none;
+   color: #2A529A;
+}
+a:hover {
+   text-decoration: none;
+   color: #ff0084;
+}
+
+#wrapper{
+margin: 0;
+padding: 0;
+width: 100%;
+
+}
+
+#header{
+margin: 0;
+padding: 0;
+height: 720px !important;
+background:transparent url('images/header-bg.png') top repeat-x;
+}
+
+#content{
+margin: auto;
+width: 940px;
+}
+
+.how-it-works{
+background:url("images/how_it_works.png") no-repeat scroll 0 0 transparent;
+height:278px;
+margin:-110px 0 0 50px;
+padding:0;
+position:absolute;
+width:720px;
+z-index:10;
+}
+
+.how-it-works p{
+float: left;
+color: #fff;
+font-family:Georgia,"Times New Roman",Times,serif;
+text-align:left;
+margin:100px 0 0 180px;
+}
+
+span.retweet{
+font-size: 12px;
+}
+span.quote{
+font-size: 16px;
+line-height: 30px;
+
+}
+
+.lucky{
+font-size: 12px;
+font-style: italic;
+padding-left: 50px;
+}
+
+.open{
+top:126px;
+right:545px;
+position:absolute;
+text-align:left;
+z-index:10;
+}
+
+.close{
+top:156px;
+right:353px;
+position:absolute;
+text-align:left;
+z-index:10;
+}
+
+.five{
+top:190px;
+right:502px;
+position:absolute;
+text-align:left;
+z-index:10;
+}
+
+.happy-holidays{
+margin: : 0;
+padding: 200px 0 30px 0;
+outline: none;
+}
+
+#links{
+margin: auto;
+width:940px;
+position: relative;
+}
+
+.vlink, .tlink{
+position: absolute;
+z-index: 10;
+display: block;
+height:50px;
+width: 100px;
+}
+
+
+.vlink{
+ left: 550px;
+    top: 320px;
+    height:34px;
+}
+.vlink:hover{
+border-bottom: 2px solid #C42619;
+}
+.tlink{
+  left: 445px;
+    top: 430px;
+    width: 150px;
+    height: 38px;
+}
+.tlink:hover{
+border-bottom: 2px solid #C42619;
+
+}

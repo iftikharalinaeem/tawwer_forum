@@ -9,6 +9,7 @@ $PluginInfo['CustomTheme'] = array(
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
 	'SettingsUrl' => '/settings/customtheme',
+   'Hidden' => TRUE
 );
 
 class CustomThemePlugin implements Gdn_IPlugin {

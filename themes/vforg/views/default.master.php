@@ -15,7 +15,7 @@
 					<li class="Addons"><?php echo Anchor('Addons', '/addons'); ?></li>
 					<li class="Community"><?php echo Anchor('Community', '/discussions'); ?></li>
 					<li class="Documentation"><?php echo Anchor('Documentation', '/docs'); ?></li>
-					<li class="Blog"><?php echo Anchor('Blog', '/blog'); ?></li>
+					<li class="Blog"><?php echo Anchor('Blog', 'http://vanillaforums.com/blog'); ?></li>
 					<li class="Services"><?php echo Anchor('Services', '/services'); ?></li>
 					<li class="Download"><?php echo Anchor('Download', '/download'); ?></li>
 					<!-- End Menu Items -->
