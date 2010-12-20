@@ -525,6 +525,7 @@ body ul div.Comment blockquote.UserQuote {
 	border-top: 3px dotted #ddd;
 }
 div.Attachments {
+	background: none;
 	border-top:3px dotted #DDDDDD;
 	margin-top:10px;
 }
