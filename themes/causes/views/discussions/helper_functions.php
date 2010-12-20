@@ -33,14 +33,14 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    else
       $FirstDiscussion = FALSE;
       
-   $Discussion->CountComments--;
-   if ($Discussion->CountComments < 0)
-      $Discussion->CountComments = 0;
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php
    $Sender->FireEvent('BeforeDiscussionContent');
    WriteOptions($Discussion, $Sender, $Session);
+   $Discussion->CountComments--;
+   if ($Discussion->CountComments < 0)
+      $Discussion->CountComments = 0;
    
    echo UserPhoto($First);
    ?>

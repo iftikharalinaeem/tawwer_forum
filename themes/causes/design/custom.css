@@ -139,10 +139,15 @@ a:hover {
 }
 /* Numbers next to menu items */
 .VanillaNav a span,
-.VanillaNav li.Active a span,
-.VanillaNav li.Highlight a:hover span {
+.VanillaNav li.Active a span {
    background: #f3fdd6;
    color: #68bd44;
+}
+.VanillaNav li a:hover span,
+.VanillaNav li.Active a:hover span,
+.VanillaNav li.Highlight a:hover span {
+   background: #68bd44;
+   color: #f3fdd6;
 }
 
 
@@ -528,4 +533,131 @@ div.Attachments {
 	background: none;
 	border-top:3px dotted #DDDDDD;
 	margin-top:10px;
+}
+.StatBox {
+	color: #555;
+	border-width: 1px 1px 1px 0;
+	border-color: #ddd;
+	border-style: solid;
+	background-color: none !important;
+	background-image: url('images/fade.png') !important;
+	background-repeat: no-repeat !important;
+	background-position: bottom center !important;
+}
+.StatBox a {
+	color: #FF7520;
+}
+.StatBox a:hover,
+.VotesBox:hover a,
+.VotesBox:hover a:hover,
+.FollowsBox:hover,
+.FollowsBox:hover a,
+.FollowsBox:hover a:hover,
+.VotesBox:hover,
+.FollowsBox:hover {
+	background: #FF7520 !important;
+	color: #ffffeb !important;
+	text-shadow: none;
+}
+.VotesBox {
+	border-width: 1px;
+}
+ul.DataList li.Item {
+	position: relative;
+}
+span.Votes span {
+	background: #0065CE;
+	color: #99E2FE !important;
+}
+span.Votes a {
+	color: #99E2FE;
+	background-color: none;
+	background: url('images/fade.png') center center no-repeat;
+}
+span.Votes a.VoteUp {
+	border: 1px solid #ddd;
+	border-bottom: none;
+	border-radius: 3px 3px 0 0;
+	-webkit-border-radius: 3px 3px 0 0;
+	-moz-border-radius: 3px 3px 0 0;
+}
+span.Votes a.VoteDown {
+	border: 1px solid #ddd;
+	border-top: none;
+	border-radius: 0 0 3px 3px;
+	-webkit-border-radius: 0 0 3px 3px;
+	-moz-border-radius: 0 0 3px 3px;
+}
+span.Votes a:hover {
+	background: #FF7520;
+	color: #fff;
+	border-color: #B35114;
+}
+ul.MessageList div.Meta span.Votes span {
+	border: 1px solid #B35114;
+	background: #FF7520;
+	color:#ffffeb !important;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	box-shadow: 0 2px 2px #fff;
+	-moz-box-shadow: 0 2px 2px #fff;
+	-webkit-box-shadow: 0 2px 0 #fff;
+}
+i.ArrowSprite {
+	background-image: url("images/arrow_sprite.png") !important;
+}
+/* Comments */
+ul.Discussions a.Bookmark { display: none; }
+body.Discussion a.Bookmark {
+	margin: 2px 6px 6px 8px;
+}
+ul.MessageList li.FirstComment {
+	border-bottom: none;
+}
+div.AnswerTabs {
+	border-bottom: 1px solid #999;
+	margin-top: 12px;
+	padding: 6px 8px 0;
+	font-size: 11px;
+	color: #aaa;
+	text-align: right;
+	position: relative;
+	background: #f5f9ff;
+}
+div.AnswerTabs ul {
+	display: inline-block;
+	margin: 0 10px;
+}
+div.AnswerTabs li a,
+div.AnswerTabs li a:link,
+div.AnswerTabs li a:hover,
+div.AnswerTabs li a:active,
+div.AnswerTabs li a:visited {
+	display:inline-block;
+	line-height: normal;
+	-webkit-border-radius: 3px 3px 0 0;
+	-moz-border-radius: 3px 3px 0 0;
+	border-bottom: none;
+
+	-webkit-border-radius: none;
+	-moz-border-radius: none;
+	background: none;
+	border: none;
+}
+div.AnswerTabs li.Active a {
+	padding: 6px 10px 5px;
+	position: relative;
+	top: 1px;
+	border: 1px solid #999;
+	border-bottom: none;
+	background: #fff;
+}
+div.AnswerTabs strong {
+	position: absolute;
+	left: 8px;
+	color: #000;
+	font-weight: bold;
+	font-size: 16px;
+	margin-right: 20px;
 }
