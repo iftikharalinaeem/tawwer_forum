@@ -32,6 +32,10 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
       $Sender->FireEvent('BetweenDiscussion');
    else
       $FirstDiscussion = FALSE;
+      
+   $Discussion->CountComments--;
+   if ($Discussion->CountComments < 0)
+      $Discussion->CountComments = 0;
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php
