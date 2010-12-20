@@ -50,12 +50,19 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
       <div class="Meta">
          <span class="Author"><?php echo $Discussion->FirstName; ?></span>
          <?php
-            echo '<span class="Counts'.($Discussion->CountUnreadComments > 0 ? ' NewCounts' : '').'">
-            <span>'.($Discussion->CountUnreadComments > 0 ? $Discussion->CountUnreadComments.'/' : '')
-            .$Discussion->CountComments
-            .'</span>'
-            .T(($Discussion->CountUnreadComments > 0 ? 'new answers' : 'answers'))
-            .'</span>';
+            echo '<span class="Counts'.($Discussion->CountUnreadComments > 0 ? ' NewCounts' : '').'">';
+            if ($Discussion->CountComments == 0) {
+               if ($Discussion->CountUnreadComments > 0) echo '<span>';
+               echo T('Needs answer');
+               if ($Discussion->CountUnreadComments > 0) echo '</span>';
+            } else {
+               echo '<span>'.($Discussion->CountUnreadComments > 0 ? $Discussion->CountUnreadComments.'/' : '')
+                  .$Discussion->CountComments
+               .'</span>'
+               .($Discussion->CountUnreadComments > 0 ? T('new ') : '')
+               .Plural($Discussion->CountUnreadComments, 'answer', 'answers');
+            }
+            echo '</span>';
             if ($Discussion->LastCommentID != '')
                echo '<span class="LastCommentBy">'.sprintf(T('Latest %1$s'), $Discussion->LastName).'</span> ';
                
