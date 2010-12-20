@@ -920,7 +920,12 @@ div.Tabs li a span {
 #Body a.Title:hover {
 	text-decoration: underline;
 }
-#Body a.BigButton {
+#Body a.BigButton,
+#Body input.Button,
+#Body a.Button,
+#Body .Button,
+a.Button,
+.Button {
 	color: #000;
 	text-decoration: none;
 }
@@ -942,4 +947,30 @@ ul.DataList div.Options {
 }
 body.Discussions div.Tabs div.SubTab {
 	background: #E9FCAB;
+}
+body.Entry #Content h1 {
+	color:#000;
+}
+div.Popup h1,
+div.Popup h2,
+div.Connect h1,
+div.Connect h2,
+div.Popup #ConversationForm h2 {
+	color: #000;
+	background: #D7E79E;
+	border-bottom: 1px solid #ccc;
+}
+a.Close,
+a.Close:active,
+a.Close:visited,
+a.Close:link {
+	color:#E56C1B;
+	text-decoration: none;
+}
+a.Close:hover {
+	color: #000;
+	text-decoration: none;
+}
+#ConversationForm form {
+	border: none;
 }
