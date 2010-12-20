@@ -4,7 +4,7 @@
 $PluginInfo['Spoof'] = array(
    'Name' => 'Spoof',
    'Description' => 'Allows users with admin role to "spoof" users in their system. Helpful for debugging permission issues.',
-   'Version' => '1',
+   'Version' => '1.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'
