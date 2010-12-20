@@ -589,17 +589,14 @@ span.Votes a.VoteDown {
 	-moz-border-radius: 0 0 3px 3px;
 }
 span.Votes a:hover {
-	background: #FF7520;
+	background: #DE6419;
 	color: #fff;
-	border-color: #B35114;
+	border-color: #DE6419;
 }
 ul.MessageList div.Meta span.Votes span {
-	border: 1px solid #B35114;
+	border: 1px solid #FF7520;
 	background: #FF7520;
 	color:#ffffeb !important;
-	border-radius: 2px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
 	box-shadow: 0 2px 2px #fff;
 	-moz-box-shadow: 0 2px 2px #fff;
 	-webkit-box-shadow: 0 2px 0 #fff;
@@ -610,7 +607,7 @@ i.ArrowSprite {
 /* Comments */
 ul.Discussions a.Bookmark { display: none; }
 body.Discussion a.Bookmark {
-	margin: 2px 6px 6px 8px;
+	margin: 8px 6px 6px 8px;
 }
 ul.MessageList li.FirstComment {
 	border-bottom: none;
@@ -623,7 +620,7 @@ div.AnswerTabs {
 	color: #aaa;
 	text-align: right;
 	position: relative;
-	background: #f5f9ff;
+	background: #CDF3F4;
 }
 div.AnswerTabs ul {
 	display: inline-block;
@@ -646,7 +643,7 @@ div.AnswerTabs li a:visited {
 	border: none;
 }
 div.AnswerTabs li.Active a {
-	padding: 6px 10px 5px;
+	padding: 6px 10px 8px;
 	position: relative;
 	top: 1px;
 	border: 1px solid #999;
