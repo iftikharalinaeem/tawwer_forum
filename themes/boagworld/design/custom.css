@@ -300,13 +300,15 @@ input:focus, select:focus, textarea:focus { background:#fff !important; }
 #sContent .subscribe .rss a { background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/rss.gif) no-repeat left center; }
 
 #sContent .subscribe .email a { background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/email.gif) no-repeat left center; }
-
+#Foot {
+	margin: 0;
+	padding: 0;
+}
 #copyright {
 	text-align: left;
-	padding: 0 20px;
-	margin: 0 6px 10px;
-	background:#412715;
-	height:39px;
+	padding: 8px 20px;
+	margin: 0;
+	background:#422816;
 	display:block;
 	clear:both;
 	-moz-border-radius-bottomright:20px; 
@@ -320,6 +322,9 @@ input:focus, select:focus, textarea:focus { background:#fff !important; }
 #copyright a:hover {
 	color: #D57F44;
 	text-decoration: underline;
+}
+.copyright {
+	display: none;
 }
 
 .headline { 
@@ -973,4 +978,13 @@ a.Close:hover {
 }
 #ConversationForm form {
 	border: none;
+}
+#DiscussionForm {
+	width: 85%;
+}
+body ul div.Comment blockquote.UserQuote {
+	background-color: #D7E79E;
+}
+ul.Activities ul.DataList li {
+	background: #D7E79E;
 }

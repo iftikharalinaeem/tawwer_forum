@@ -72,12 +72,12 @@
 		  </div>
 		</div>
 	 </div>
+	 <div id="sContent">&nbsp;</div>
 	 <div id="Foot">
 		{asset name="Foot"}
-		<div id="sContent">&nbsp;</div>
 		<p id="copyright">
-		  <a href="{vanillaurl}"><span>Powered by Vanilla</span></a>
-		  <a href="http://creativecommons.org/licenses/by-nc-sa/2.0/uk/">Copyright Notice</a>
+		  <a href="{vanillaurl}"><span>Discussions by Vanilla</span></a>
+		  <a class="copyright" href="http://creativecommons.org/licenses/by-nc-sa/2.0/uk/">Copyright Notice</a>
 		</p>
 	 </div>
   </div>
