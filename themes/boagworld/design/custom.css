@@ -988,3 +988,6 @@ body ul div.Comment blockquote.UserQuote {
 ul.Activities ul.DataList li {
 	background: #D7E79E;
 }
+div.Attachments {
+	background-color:#D7E79E;
+}
