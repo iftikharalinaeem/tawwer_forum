@@ -32,8 +32,10 @@ class VanillabookThemeHooks implements Gdn_IPlugin {
 		}
 
 		// Move the profile tabs into the Panel asset.
-		$ProfileTabs = str_replace(array('<div class="StatusArrow"></div>', 'Tabs ProfileTabs'), array('', 'MainMenu ProfileMenu'), $Sender->FetchView('tabs'));
-		$Sender->AddAsset('Panel', $ProfileTabs);
+		if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
+			$ProfileTabs = str_replace(array('<div class="StatusArrow"></div>', 'Tabs ProfileTabs'), array('', 'MainMenu ProfileMenu'), $Sender->FetchView('tabs'));
+			$Sender->AddAsset('Panel', $ProfileTabs);
+		}
 	}
 	
 	/**
@@ -56,7 +58,8 @@ class VanillabookThemeHooks implements Gdn_IPlugin {
 	 * Place a little arrow above the status form.
 	 */
 	public function Base_BeforeStatusForm_Handler($Sender) {
-		echo '<div class="StatusArrow"></div>';
+		if (Gdn::Session()->IsValid())
+			echo '<div class="StatusArrow"></div>';
 	}
 	
 	/**
