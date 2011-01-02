@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-class CausesThemeHooks implements Gdn_IPlugin {
+class VanillabookThemeHooks implements Gdn_IPlugin {
 	
 	/**
 	 * Move the guest module over to the BodyMenu asset.
@@ -27,17 +27,6 @@ class CausesThemeHooks implements Gdn_IPlugin {
 				$Sender->Assets['Content']['UserInfoModule'] = $Sender->Assets['Panel']['UserInfoModule'];
 				unset($Sender->Assets['Panel']['UserInfoModule']);
 			}
-/*
-			if (array_key_exists('UserPhotoModule', $Sender->Assets['Panel'])) {
-				$Sender->Assets['BodyMenu']['UserPhotoModule'] = $Sender->Assets['Panel']['UserPhotoModule'];
-				unset($Sender->Assets['Panel']['UserPhotoModule']);
-			}
-
-			if (array_key_exists('SideMenuModule', $Sender->Assets['Panel'])) {
-				$Sender->Assets['BodyMenu']['SideMenuModule'] = $Sender->Assets['Panel']['SideMenuModule'];
-				unset($Sender->Assets['Panel']['SideMenuModule']);
-			}
-*/
 		}
 
 		// Move the profile tabs into the Panel asset.
@@ -107,5 +96,6 @@ class CausesThemeHooks implements Gdn_IPlugin {
    public function OnDisable() {
       return TRUE;
    }
+	
 	
 }

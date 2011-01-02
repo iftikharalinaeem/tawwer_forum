@@ -1,7 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$ThemeInfo['Vanillabook'] = array(
-   'Description' => "A Facebook inspired theme for Vanilla 2",
+$ThemeInfo['vanillabook'] = array(
+   'Name' => 'VanillaBook',
+   'Description' => "Turns Vanilla into a Facebook-style social networking application.",
    'Version' => '1.0',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
