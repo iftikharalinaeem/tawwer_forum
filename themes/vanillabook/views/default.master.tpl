@@ -27,6 +27,9 @@
 		<ul class="MainMenu">
 		  <li><a class="Activity" href="{link path="/activity"}">Recent Activity</a></li>
 		  {discussions_link format='<li><a href="%url" class="Discussions">%text</a></li>'}
+		  {bookmarks_link format='<li><a href="%url" class="Bookmarked MyBookmarks">%text</a></li>'}
+		  {mydiscussions_link format='<li><a href="%url" class="Mine">%text</a></li>'}
+		  {drafts_link format='<li><a href="%url" class="Drafts">%text</a></li>'}
 		  {inbox_link format='<li><a href="%url" class="Inbox">%text</a></li>'}
 		  {custom_menu}
 		</ul>

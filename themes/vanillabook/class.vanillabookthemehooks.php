@@ -7,6 +7,7 @@ class CausesThemeHooks implements Gdn_IPlugin {
 	 */
 	public function Base_Render_Before($Sender) {
 		Gdn::Locale()->SetTranslation('Activity.Delete', '×');
+		Gdn::Locale()->SetTranslation('All Conversations', 'Inbox');
 		// Move the howdy stranger module into the BodyMenu asset container
 		if (array_key_exists('Panel', $Sender->Assets)) {
 			if (array_key_exists('GuestModule', $Sender->Assets['Panel'])) {
@@ -63,16 +64,8 @@ class CausesThemeHooks implements Gdn_IPlugin {
 	/**
 	 * Place a little arrow above the status form.
 	 */
-	public function ActivityController_BeforeStatusForm_Handler($Sender) {
+	public function Base_BeforeStatusForm_Handler($Sender) {
 		echo '<div class="StatusArrow"></div>';
-	}
-	
-	/**
-	 * Place the arrow above the status form on the profile page, too.
-	 */
-	public function ProfileController_AfterProfileTabs_Handler($Sender) {
-		if (in_array($Sender->RequestMethod, array('index', 'activity')))
-			echo '<div class="StatusArrow"></div>';
 	}
 	
 	/**
