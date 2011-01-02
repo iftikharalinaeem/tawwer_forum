@@ -8,6 +8,8 @@ class VanillabookThemeHooks implements Gdn_IPlugin {
 	public function Base_Render_Before($Sender) {
 		Gdn::Locale()->SetTranslation('Activity.Delete', '×');
 		Gdn::Locale()->SetTranslation('All Conversations', 'Inbox');
+		Gdn::Locale()->SetTranslation('Apply for Membership', 'Sign Up');
+		Gdn::Locale()->SetTranslation('Apply', 'Sign Up');
 		// Move the howdy stranger module into the BodyMenu asset container
 		if (array_key_exists('Panel', $Sender->Assets)) {
 			if (array_key_exists('GuestModule', $Sender->Assets['Panel'])) {

@@ -535,6 +535,17 @@ a.BigButton:hover {
    padding: 4px 0;
    margin-bottom: 20px;
 }
+a.ApplyButton,
+a.ApplyButton:hover {
+   background-position: 0 -96px;
+   border: 1px solid #3B6E22;
+   border-bottom: 1px solid #2C5115;
+}
+a.ApplyButton:focus,
+a.ApplyButton:active {
+   background: #609946;
+   border-bottom: 1px solid #3b6e22;
+}
 input.DateBox,
 input.InputBox,
 input.SmallInput,
@@ -1079,3 +1090,15 @@ div.Errors ul li {
    background: #d50a0a !important;
 }
 
+/* Entry Pages */
+body.Entry div.BodyMenu ul.MainMenu {
+   display: none;
+}
+body.Entry #Content h1 {
+   font-size: 16px;
+   line-height: 20px;
+   color: #1C2A47;
+   border-bottom: 1px solid #ccc;
+   padding: 0 0 6px;
+   margin: 0 0 12px;
+}
