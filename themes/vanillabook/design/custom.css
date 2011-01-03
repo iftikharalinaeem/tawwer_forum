@@ -510,7 +510,7 @@ input.Button:hover {
    box-shadow: none;
    -moz-box-shadow: none;
    -webkit-box-shadow: none;
-   background:url("images/buttons.png") 0 -48px repeat-x #5B74A8;
+   background:url("images/buttons.png") 0 0 repeat-x #5B74A8;
    border:1px solid #29447E;
    border-bottom: 1px solid #1A356E;
    color:#fff;
@@ -537,7 +537,7 @@ a.BigButton:hover {
 }
 a.ApplyButton,
 a.ApplyButton:hover {
-   background-position: 0 -96px;
+   background-position: 0 -48px;
    border: 1px solid #3B6E22;
    border-bottom: 1px solid #2C5115;
 }
@@ -571,7 +571,7 @@ div.StatusArrow {
    position: absolute;
    height: 7px;
    width: 11px;
-   background: url('images/statusarrow.gif') 0 0 no-repeat;
+   background: url('images/statusarrow.png') 0 0 no-repeat;
 }
 ul.DataList div.Photo img {
    height: 50px;
@@ -676,15 +676,15 @@ body.Discussion a.Bookmarking {
 ul.Options li.Active strong,
 ul.Options li.Active strong:hover,
 ul.Options li.Parent strong {
-   padding-right: 20px;
+   padding-right: 18px;
    font-size: 11px;
-   background: url('images/buttons.png') right -144px no-repeat;
+   background: url('images/buttons.png') right -96px no-repeat;
 }
 ul.Options li.Active strong,
 ul.Options li.Active strong:hover {
    border: 1px solid #282828;
    color: #fff;
-   background: url('images/buttons.png') right -192px no-repeat #282828 !important;
+   background: url('images/buttons.png') right -144px no-repeat #282828 !important;
 }
 ul.Options li.Active ul {
    background: #444;
