@@ -1,0 +1,59 @@
+body { background: url('paper.png') 0 0 repeat; }
+#Frame { background: url('bgmid.png') center center repeat-y; }
+#Frame2 { background: url('bgtop.png') center top no-repeat; }
+#Head { background: none; }
+#Body, div.Menu, #Foot div { width: 920px; }
+#Content { width: 650px; }
+body.Profile #Content { width: 650px; }
+ul#Menu { margin: 145px 0 0; background: #555; }
+#Menu a:hover, #Menu li.NonTab a:hover { background: #333; }
+#Menu a span, #Menu li.Active a span, #Menu li.Highlight a:hover span { background:#fefefe; color:#222; }
+#Menu li.NonTab { margin-right: 0; }
+body #Head h1 { display: none; }
+#Foot { background: url('bgbot.png') center bottom no-repeat; padding: 0; margin: 0 auto; }
+#Foot div { padding: 80px 0 10px; }
+#Foot div a { color: #555; }
+#Foot div a:hover { color: #222; }
+#supnav { color:#000000; font-size:20px; font-weight:700; position:absolute; right:40px; top:48px; }
+#supnav a { font-family:"Helvetica Neue",Helvetica,Arial,default; color:#000000; padding:8px; text-decoration:none; }
+#supnav a:hover { border-radius: 6px; -moz-border-radius: 6px; -webkit-border-radius: 6px; background-color:#318EC4; color:#FFFFFF; padding:8px; }
+div.Tabs { background: none; padding: 0; border-bottom: 1px solid #aaa; }
+div.Tabs ul { padding: 0 8px; white-space: nowrap; }
+div.MessageForm { padding: 8px 8px 5px; }
+div.MessageForm div.Tabs { padding: 0 8px; }
+div.Tabs li a, div.Tabs li a:link, div.Tabs li a:hover, div.Tabs li a:active, div.Tabs li a:visited { margin: 0; border: none; border-radius: 0; -moz-border-radius: 0; -webkit-border-radius: 0; background: none; color: #1E79A7; text-decoration: none; padding: 8px 10px; line-height: 11px; }
+div.Tabs li a:hover { text-decoration: underline; }
+a.Active, div.Tabs li.Active a { background: #fff; color: #474747; margin: 0; border: 1px solid #aaa; border-bottom: none; border-radius: 3px 3px 0 0; -moz-border-radius: 3px 3px 0 0; -webkit-border-radius: 3px 3px 0 0; display: inline-block; font-size: 110%; line-height: 110%; font-weight: bold; text-decoration: none; padding: 6px 10px; position: relative; top: 1px; }
+div.Tabs li a span { line-height: 1; font-size: 80%; padding: 0 3px; border-radius: 3px; -webkit-border-radius: 3px; -moz-border-radius: 3px; font-weight: normal; background: #E3F4FF; color: #70727C; margin: 0 0 0 4px; }
+div.DiscussionsTabs div.SubTab { font-size: 11px; border-radius: 0; -moz-border-radius: 0; -webkit-border-radius: 0; border-top: 1px solid #aaa; background: #f3f3f3; margin:0; padding:4px 8px; }
+div.HeadingTabs ul { margin: 8px 0 0; }
+body.Discussion a.Bookmark { margin: 6px 2px; }
+form.Activity, ul.DataList { background: #fff; }
+#Status { background: none; color: #555; padding-bottom: 8px; line-height: 1.5; }
+.Foot { background: none; border: none; }
+div.MorePager a, div.MorePager a:link, div.MorePager a:hover, div.MorePager a:active, div.MorePager a:visited { background: none; border: none; }
+#MessageForm, div.MessageForm, ul.Activities ul.DataList li { background: #eee; }
+#DiscussionForm form, #ConversationForm form { background: #eee; border: 1px solid #ccc; }
+div.Popup #ConversationForm form { border: none; }
+#DiscussionForm h2, #MessageForm h2 { color: #333; }
+div.MessageForm { border-bottom: none; }
+#ConversationForm .TextBox, #ConversationForm textarea.MultiComplete { width: 100%; }
+.ac_results { border: 1px solid #d7d8da; color: #000; border-top: 0; background-color: white; }
+.ac_results li { border-bottom: 1px solid #ddd; }
+.ac_lastitem { border-bottom: 0 !important; }
+.ac_results strong { background: #d0d0d0; }
+.ac_over strong { background: #555; }
+.ac_over { background: #333; color: #fff; }
+#Head .Search, #Head #Search { bottom: 0; }
+#Head form { border: 1px solid #ddd; }
+#Head form, #Head form input.InputBox { background: #eee; color: #333; }
+#Head form input.Button { background: #ddd; color: #000; }
+div.Box { background: #eee; color:#888888; }
+div.Box h4, div.Box h4 a { color:#111; }
+ul.PanelInfo li { background: #f5f5f5; border-bottom: 1px solid #ccc; }
+body.Profile ul.PanelInfo, ul.PanelInfo li.Active { border-bottom: 1px solid #ccc; }
+ul.PanelInfo {	border-top:1px solid #ccc; }
+div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 { background: #555; border-bottom: none; }
+a.Close { color:#eee; }
+a.BigButton { background: url('btnbg.png') top left repeat-x #2a79a7; color: #fff; text-shadow: 0 0 1px #000; border: 1px solid #266d96; border-bottom: 1px solid #20597a; }
+a.BigButton:hover { background: url('btnbg_on.png') top left repeat-x #308cc1; color: #fff; border: 1px solid #246990; border-bottom: 1px solid #1e5879; }

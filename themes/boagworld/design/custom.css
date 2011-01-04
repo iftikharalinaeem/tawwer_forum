@@ -300,13 +300,15 @@ input:focus, select:focus, textarea:focus { background:#fff !important; }
 #sContent .subscribe .rss a { background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/rss.gif) no-repeat left center; }
 
 #sContent .subscribe .email a { background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/email.gif) no-repeat left center; }
-
+#Foot {
+	margin: 0;
+	padding: 0;
+}
 #copyright {
 	text-align: left;
-	padding: 0 20px;
-	margin: 0 6px 10px;
-	background:#412715;
-	height:39px;
+	padding: 8px 20px;
+	margin: 0;
+	background:#422816;
 	display:block;
 	clear:both;
 	-moz-border-radius-bottomright:20px; 
@@ -320,6 +322,9 @@ input:focus, select:focus, textarea:focus { background:#fff !important; }
 #copyright a:hover {
 	color: #D57F44;
 	text-decoration: underline;
+}
+.copyright {
+	display: none;
 }
 
 .headline { 
@@ -920,7 +925,12 @@ div.Tabs li a span {
 #Body a.Title:hover {
 	text-decoration: underline;
 }
-#Body a.BigButton {
+#Body a.BigButton,
+#Body input.Button,
+#Body a.Button,
+#Body .Button,
+a.Button,
+.Button {
 	color: #000;
 	text-decoration: none;
 }
@@ -942,4 +952,42 @@ ul.DataList div.Options {
 }
 body.Discussions div.Tabs div.SubTab {
 	background: #E9FCAB;
+}
+body.Entry #Content h1 {
+	color:#000;
+}
+div.Popup h1,
+div.Popup h2,
+div.Connect h1,
+div.Connect h2,
+div.Popup #ConversationForm h2 {
+	color: #000;
+	background: #D7E79E;
+	border-bottom: 1px solid #ccc;
+}
+a.Close,
+a.Close:active,
+a.Close:visited,
+a.Close:link {
+	color:#E56C1B;
+	text-decoration: none;
+}
+a.Close:hover {
+	color: #000;
+	text-decoration: none;
+}
+#ConversationForm form {
+	border: none;
+}
+#DiscussionForm {
+	width: 85%;
+}
+body ul div.Comment blockquote.UserQuote {
+	background-color: #D7E79E;
+}
+ul.Activities ul.DataList li {
+	background: #D7E79E;
+}
+div.Attachments {
+	background-color:#D7E79E;
 }
