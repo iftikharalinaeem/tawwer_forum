@@ -1,0 +1,618 @@
+body{
+background: url(bg.png) repeat-x top #ffffff;
+font: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+#Body {
+	margin: 0;
+	width: 99.9%;
+	position: relative;
+}
+#Head {
+	background: #3B5998;
+	padding:0;
+	margin: 20px 20px 0;
+	text-align: left;
+	position: relative;
+}
+
+a, a:link, a:visited, a:active {
+    color: #2854BB;
+    cursor: pointer;
+    text-decoration: none;
+    }
+    
+a:hover{
+color: #000;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+a.BigButton, a.Button, .Button {
+    background: -moz-linear-gradient(center top , #FFFFFF, #E3ECF6) repeat scroll 0 0 #E3ECF6;
+    border: 1px solid #1B5790;
+    color: #105CB6;
+    padding:2px 5px;
+    text-shadow: 0 1px 0 #FFFFFF; 
+    
+    cursor: pointer;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: bold;
+    width: auto;
+       
+    left:545px;
+    top:-15px;
+    
+    position: relative;
+    z-index: 10;
+    
+    /*resets */
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: 0 0 0 #999999;
+     text-shadow: 0 0 0 #FFFFFF;
+}
+a.BigButton:hover, a.Button:hover {
+	 -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	 -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    text-decoration: none !important;
+
+}
+
+body.inbox a.BigButton{
+
+left: 770px;
+
+}
+
+a.Button, .Button{
+left: 0;
+top:0;
+}
+
+.logo{
+position: relative;
+background: url(vanilladigg_logo.png) no-repeat;
+outline: none;
+width: 124px;
+height: 48px;
+	top: -20px;
+
+}
+.Wrapper{
+margin: 20px auto;
+width: 960px;
+}
+div.Popup h1,
+div.Popup h2 {
+	background: #3b5998;
+	border: none;
+}
+.Banner {
+	left: 130px;
+    padding: 10px;
+    position: relative;
+    text-align: left;
+    top: -65px;
+    width: 510px;
+}
+.Banner ul {
+	padding: 0;
+	margin: 0;
+}
+.Banner ul li {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+.Banner ul li a {
+	font-weight: bold;
+	padding: 3px 6px 10px;
+	font-size: 11px;
+	color: #fff;
+	display: inline-block;
+}
+.Banner ul li a:hover {
+	background: #164673;
+}
+.Banner ul li a.SignOut {
+	font-weight: normal;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+.Banner ul li a span {
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	padding: 1px 2px 0 1px;
+	background: #f00;
+	border-right: 1px solid #a00;
+	border-bottom: 1px solid #a00;
+	color: #fff;
+	font-size: 9px;
+	position: relative;
+	top: -3px;
+}
+#Content {
+	float: none;
+	width: auto;
+	margin: 0 10px 0 280px;
+}
+
+body.Discussion #Content {
+	clear: both;
+    left: 70px;
+    position: relative;
+    top: -462px;
+    width: 600px;
+
+   
+}
+
+#Panel {
+	float: left;
+	margin: -50px 10px 10px;
+	width: 250px;
+	font-size: 11px;
+}
+
+
+
+#Panel div.SearchBox input.InputBox {
+	width: 200px;
+	margin-right: 4px;
+}
+div.SearchBox {
+    position: relative;
+    top: -10px;
+    width: 230px;
+    float: right;
+
+}
+
+
+
+div.SearchBox input.InputBox{
+     background: url("search_bg.png") no-repeat scroll left top #FFFFFF;
+    border: medium none;
+    color: #5A91CE;
+    display: block;
+    font-size: 1.16667em;
+    height: 20px;
+    margin-left: -10px;
+    padding: 5px 30px 5px 10px;
+    width: 198px;
+}
+div.SearchBox a.Button, div.SearchBox .Button {
+    background: url("digg_sprites.png") no-repeat scroll -2px -200px transparent;
+    border: medium none;
+    cursor: pointer;
+    height: 30px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 30px;
+    
+    /*resets*/
+    -moz-border-radius: 0 0 0 0;
+    -moz-box-shadow: 0 0 0 #999999;
+}
+
+
+body.Profile #Content {
+	float:none;
+	width: auto;
+	margin: 0 10px 0 280px;
+}
+body.Profile #Panel {
+	margin: 0 0 0 10px;
+}
+body.Activity #Content, body.inbox #Content{
+margin: 0;
+width: auto;
+}
+form.Activity textarea {
+	width:99%;
+}
+#Foot div {
+	width: auto;
+}
+body.Post #Content {
+	margin:0 20px;
+}
+#ConversationForm textarea.MultiComplete,
+#ConversationForm .TextBox,
+#MessageForm textarea,
+div.Comment div.CommentForm,
+div.Comment div.CommentForm textarea,
+div.CommentForm textarea,
+#DiscussionForm input.InputBox,
+#DiscussionForm textarea {
+	width:99%;
+}
+
+/* Tabs */
+div.Tabs {
+	background: #E5ECF3;
+    border-bottom: 1px solid #E5ECF3;
+    height: 45px;
+    padding: 0;
+    position: relative;
+    top: -74px;
+    right:280px;
+    
+    -moz-border-radius-bottomleft: 5px;
+        -moz-border-radius-bottomright: 5px;
+
+   -webkit-border-bottom-left-radius: 5px;
+      -webkit-border-bottom-right-radius: 5px;
+
+}
+
+div.ProfileTabs{
+	top: -100px;
+}
+
+div.DiscussionTabs {
+   clear: both;
+    right: 350px;
+    top: -52px;
+    width: 670px;
+}
+div.ActivityTabs, div.ConversationsTabs{
+left: 0;
+}
+div.HeadingTabs div.SubTab {
+   border-bottom: 1px solid #555555;
+    left: 300px;
+    position: relative;
+    top: 60px;
+}
+
+div.HeadingTabs ul {
+    display: none;        
+}
+
+ 
+
+div.AnswerTabs{
+top:0;
+left: 0;
+background: transparent;
+ width: auto;
+}
+div.AnswerTabs strong {
+
+    top: 15px;
+}
+div.Tabs ul {
+	padding: 10px 8px;
+	white-space: nowrap;
+}
+div.MessageForm {
+	padding: 8px 8px 5px;
+}
+
+div.MessageForm {
+    background: none repeat scroll 0 0 #EEEEEE;
+    border-bottom: 1px solid #999999;
+
+}
+div.MessageForm div.Tabs {
+	padding: 0 8px;
+}
+
+div.CommentTabs{
+	left: -10px;
+    position: relative;
+    top: 7px;
+}
+
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+	 -moz-border-radius: 25px 25px 25px 25px;
+    background: transparent;
+    border: medium none;
+    color: #578CCA;
+    font-size: 11px;
+    line-height: 11px;
+    margin: 0;
+    padding: 5px 10px 6px;
+    text-decoration: none;
+}
+div.Tabs li a:hover{
+   background: #D0DDE9;
+   text-decoration: none;
+}
+a.Active,
+div.Tabs li.Active a {
+    background-color: #1B5790 !important;
+    color: #FFFFFF !important;
+    font-weight: bold;
+     -moz-border-radius: 25px 25px 25px 25px;
+          -webkit-border-radius: 25px 25px 25px 25px;
+
+    padding: 5px 10px 6px;
+}
+div.Tabs li a span {
+   line-height: 1;
+   font-size: 80%;
+   padding: 0 3px;
+   border-radius: 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   font-weight: normal;
+	background: #fff;
+   color: #70727C;
+   margin: 0 0 0 4px;
+}
+div.DiscussionsTabs div.SubTab {
+	display: none;
+}
+div.HeadingTabs ul {
+	margin: 8px 0 0;
+}
+body.Discussion a.Bookmark {
+	display: none;
+}
+div.Preview {
+	border: 1px solid #aaa;
+	background: #fff;
+	margin:0 0 8px;
+	padding: 8px;
+}
+.Foot {
+	background: none;
+	border: none;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:visited,
+div.MorePager a:active,
+div.MorePager a:hover {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	background: none;
+	border: none;
+	color: #1e79a7;
+	line-height: 1;
+	padding: 0;
+	text-decoration: none;	
+}
+div.MorePager a:hover {
+	color: #ff0084;
+	text-decoration: underline;
+}
+body.add #Content {
+	margin: 0 10px;
+}
+
+ul.Datalist, ul.Discussions{
+margin:-50px 0;
+}
+
+ul.Discussions div.ItemContent {
+    margin: 0 0 0 60px;
+}
+ul.DataList a.Title {
+    text-decoration: underline;
+}
+
+.Mine {
+    background: #fff;
+}
+
+/* Panel Boxes */
+div.Box {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	background: none;
+	padding: 0;
+}
+div.Box h4 {
+	color: #333;
+}
+ul.PanelInfo {
+	border-top:1px solid #ccc;
+}
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+	background: none;
+	border-bottom: 1px solid #ccc;
+}
+ul.PanelInfo li.Active {
+	background: #ffd;
+}
+
+div.BoxCategories ul.PanelInfo, div.Tags ul.PanelInfo {
+	border:0;
+}
+div.BoxCategories ul.PanelInfo li, div.Tags ul.PanelInfo li {
+	background: none;
+	border-bottom: 0;
+	-moz-border-radius: 25px 25px 25px 25px;
+		-webkit-border-radius: 25px 25px 25px 25px;
+
+	padding:0 5px 0 5px;
+	margin-bottom: 5px;
+}
+div.BoxCategories ul.PanelInfo li.Active, div.Tags ul.PanelInfo li.Active {
+	background: #E5ECF3;
+	-moz-border-radius: 25px 25px 25px 25px;
+			-webkit-border-radius: 25px 25px 25px 25px;
+
+	padding:0 5px 0 5px;
+    border-bottom: 0;
+
+
+}
+div.BoxCategories ul.PanelInfo li a, div.Tags ul.PanelInfo li a{
+ -moz-border-radius: 25px 25px 25px 25px;
+ 		-webkit-border-radius: 25px 25px 25px 25px;
+
+	padding:0 5px 0 5px;
+
+ }
+div.BoxCategories ul.PanelInfo li:hover, div.Tags ul.PanelInfo li:hover{
+ background: #E5ECF3;
+ -moz-border-radius: 25px 25px 25px 25px;
+ 		-webkit-border-radius: 25px 25px 25px 25px;
+
+	padding:0 5px 0 5px;
+ }
+ 
+#DiscussionForm{
+position: relative;
+top:-50px;
+}
+ 
+#DiscussionForm form {
+    background: #EEEEEE;
+    border: 1px solid #999999;
+
+}
+#DiscussionForm h2 {
+    color: #000;
+
+}
+ul.Activities ul.DataList li {
+    background: #eee;
+
+}
+body.Profile ul.PanelInfo {
+	border: none;
+}
+body.Profile ul.PanelInfo li {
+	margin: 0;
+	padding: 0;
+}
+body.Profile ul.PanelInfo li a {
+	font-size: 12px;
+	display: block;
+	padding: 0 6px;
+}
+
+
+/* Sign In Page */
+body.Entry #Content div.Box {
+	background: #efefef;
+}
+body.Entry #Panel {
+	display: none;
+}
+/* voting */
+
+.StatBox {
+    float: left;
+}
+
+.AnswersBox {
+    visibility: hidden;
+    position: relative;
+    z-index: 10;
+}
+
+.ViewsBox {
+   visibility: hidden;
+   position: relative;
+    z-index: 20;
+    margin: 0 -50px;
+}
+
+.FollowsBox {
+   visibility: hidden;
+   position: relative;
+    z-index: 30;
+    margin: 0 -50px;
+}
+
+.VotesBox {
+       background: #FFF2A2;
+       color:#555555;
+       border: 1px solid #DFC200;
+       position: relative;
+       z-index: 40;
+       margin: 0 -50px;
+       
+       -moz-border-radius: 5px;
+       -webkit-border-radius: 5px;
+
+}
+.VotesBox a, .VotesBox a:hover{
+color:#716B14;
+}
+
+ul.MessageList div.Meta span.Votes {
+
+    right: 600px;
+    border: 1px solid #DFC200;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+
+}
+
+span.Votes a, span.Votes a:hover {
+    background:  #FFF2A2;
+    color: #716B14;
+}
+
+span.Votes span {
+    background: #FFF2A2;
+    color: #716B14 !important;
+}
+
+.NumberedPager {
+    clear: both;
+    padding-top: 20px;
+    
+}
+    
+ul.DataList div.Meta strong {
+    -moz-box-shadow: 0 0 0 #777777;
+        -webkit-box-shadow: 0 0 0 #777777;
+
+    left: 630px;
+    position: absolute;
+    top: 30px;
+    white-space: nowrap;
+    
+}
+ul.DataList div.Options {
+    float: right;
+    position: absolute;
+    right: 0;
+    top: 2px;
+    width: auto;
+}
+body.inbox ul.DataList div.Meta strong {
+
+   left: 300px;
+    top: 130px;
+}
+.LastCommentBy{
+color:#82AB4D;
+}
+.LastCommentBy a{
+color:#82AB4D;
+border-bottom: 1px solid #82AB4D;
+}
+ul.DataList li.Mine div.Meta a.Category {
+	-moz-border-radius: 25px 25px 25px 25px;
+    background:  #E5ECF3;
+    color: #1E79A7;
+    padding: 3px 7px 3px 7px;    
+}
+
+ul.MessageList, ul.MessageList li {
+    margin: 0;
+    padding: 0;
+}
