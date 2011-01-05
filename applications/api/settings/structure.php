@@ -35,8 +35,8 @@ $St->Table('Application')
    ->Set($Explicit, $Drop);
 
 // Make sure a default application is in to make the numbers correct.
+$AppID = 12345678;
 if (!$ApplicationTableExists || $SQL->GetCount('Application', array('ApplicationID' => $AppID)) == 0) {
-   $AppID = 12345678;
    $Secret = RandomString(32, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
    $SQL->History(FALSE, TRUE)
       ->Insert(
