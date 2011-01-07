@@ -775,27 +775,27 @@ pageTracker._trackPageview();
     * @param SettingsController $Sender
     * @param array $Args
     */
-//   public function SettingsController_Addons_Create($Sender, $Args) {
-//      $Sender->Title('Addons');
-//      $Sender->Permission('Garden.Applications.Manage');
-//      $Sender->AddSideMenu('dashboard/settings/addons');
-//
-//      $Action = GetValue(0, $Args);
-//      $Key = GetValue(1, $Args);
-//      if (Gdn::Session()->ValidateTransientKey($Sender->Request->Get('TransientKey')) && $Key) {
-//         try {
-//            switch (strtolower($Action)) {
-//               case 'enable':
-//                  Gdn::PluginManager()->EnablePlugin($Key, NULL);
-//                  break;
-//               case 'disable':
-//                  Gdn::PluginManager()->DisablePlugin($Key, NULL);
-//            }
-//         } catch (Exception $Ex) {
-//            $Sender->Form->AddError($Ex);
-//         }
-//      }
-//
-//      $Sender->Render('Addons', '', 'plugins/vfoptions');
-//   }
+   public function SettingsController_Addons_Create($Sender, $Args) {
+      $Sender->Title('Addons');
+      $Sender->Permission('Garden.Applications.Manage');
+      $Sender->AddSideMenu('dashboard/settings/addons');
+
+      $Action = GetValue(0, $Args);
+      $Key = GetValue(1, $Args);
+      if (Gdn::Session()->ValidateTransientKey($Sender->Request->Get('TransientKey')) && $Key) {
+         try {
+            switch (strtolower($Action)) {
+               case 'enable':
+                  Gdn::PluginManager()->EnablePlugin($Key, NULL);
+                  break;
+               case 'disable':
+                  Gdn::PluginManager()->DisablePlugin($Key, NULL);
+            }
+         } catch (Exception $Ex) {
+            $Sender->Form->AddError($Ex);
+         }
+      }
+
+      $Sender->Render('Addons', '', 'plugins/vfoptions');
+   }
 }
