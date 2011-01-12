@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$VanillaID = C('VanillaID', 'UniqueVanillaInstallationID');
+$VanillaID = C('Garden.InstallationID', 'UniqueVanillaInstallationID');
 
 function Capitalize($Word) {
    return strtoupper(substr($Word, 0, 1)).substr($Word, 1);
