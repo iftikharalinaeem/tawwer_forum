@@ -37,6 +37,17 @@ class SMFCompatibilityPlugin extends Gdn_Plugin {
 
 	/// METHODS ///
 
+   public function Base_BeforeDispatch_Handler($Sender) {
+      $Request = Gdn::Request();
+      $Folder = ltrim($Request->RequestFolder(), '/');
+      $Uri = ltrim($_SERVER['REQUEST_URI'], '/');
+
+      // Fix the url in the request for routing.
+      if (preg_match("`^{$Folder}index.php/`", $Uri)) {
+         $Request->PathAndQuery(substr($Uri, strlen($Folder)));
+      }
+   }
+
 	public function Format($String) {
       $Result = parse_bbc($String);
       return $Result;
@@ -50,6 +61,13 @@ class SMFCompatibilityPlugin extends Gdn_Plugin {
             'Garden.InputFormatter' => 'BBCode',
             'Garden.InputFormatterBak' => $OldFormat));
       }
+
+      // Setup the default routes.
+      $Router = Gdn::Router();
+      $Router->SetRoute('\?board=(\d+).*$', 'categories/$1', 'Permanent');
+      $Router->SetRoute('index\.php/topic,(\d+).(\d+)\.html.*$', 'discussion/$1/x/$2lim', 'Permanent');
+      $Router->SetRoute('index\.php/board,(\d+)\.(\d+)\.html.*$', 'categories/$1/$2lim', 'Permanent');
+      $Router->SetRoute('\?action=profile%3Bu%3D(\d+).*$', 'profile/$1/x', 'Permanent');
 	}
 
    public function OnDisable() {
