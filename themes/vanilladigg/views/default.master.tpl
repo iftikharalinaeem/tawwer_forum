@@ -6,7 +6,8 @@
 <body id="{$BodyID}" class="{$BodyClass}">
   <div id="Frame">
   
-  	<div class="Wrapper">
+	 <div class="MainMenu">
+		<div class="Wrapper">
     	
     <div class="SearchBox">
     	<form method="get" action="/vanilla/search">
@@ -18,7 +19,7 @@
 	</div>
 
 
-	<div class="logo"></div>
+	<a class="Home" href="{link path="/"}"><span>{logo}</span></a>
 	
 	 <div class="Banner">
 		<ul>
@@ -31,7 +32,13 @@
 		  {signinout_link}
 		</ul>
 	 </div>
+	 </div>
+	 </div>
+  	<div class="Wrapper">
 	 <div id="Body">
+		  <div id="BodyMenu">
+			 {asset name="BodyMenu"}
+		  </div>
 		  <div id="Panel">
 			 {asset name="Panel"}
 		  </div>
