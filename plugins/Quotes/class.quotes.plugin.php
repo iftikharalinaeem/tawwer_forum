@@ -96,7 +96,8 @@ QUOTE;
             break;
             
          case 'BBCode':
-            $Sender->EventArguments['Object']->Body = preg_replace_callback('/(\[quote="([\d\w_ ]{3,30})"\])/u', array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
+         case 'Markdown':
+            $Sender->EventArguments['Object']->Body = preg_replace_callback('/(\[quote="?([\d\w_ ]{3,30})"?\])/u', array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
             $Sender->EventArguments['Object']->Body = str_replace('[/quote]','</p></div></blockquote>',$Sender->EventArguments['Object']->Body);
             break;
             
