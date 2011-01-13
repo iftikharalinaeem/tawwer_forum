@@ -113,12 +113,22 @@ div.Popup h2 {
 	font-size: 14px;
 	color: #fff;
 	display: inline-block;
+	line-height: 1;
 }
 .Banner ul li a:hover {
 	background: #164673;
 }
-.Banner ul li a.SignOut {
+.Banner ul li a.Selected {
+	background-color: #E5ECF3;
+	color: #1B5790;
+}
+.Banner ul li a.SignInPopup,
+.Banner ul li a.SignInPopup:hover,
+.Banner ul li a.SignOut,
+.Banner ul li a.SignOut:hover {
+	line-height: 1;
 	font-weight: normal;
+	background: transparent;
 }
 .Banner ul li a span {
 	border-radius: 3px;
@@ -142,7 +152,8 @@ div.Popup h2 {
 }
 body.Conversations #BodyMenu,
 body.Activity #BodyMenu,
-body.Profile #BodyMenu {
+body.Profile #BodyMenu,
+body.Search #BodyMenu {
 	display: none;
 }
 #BodyMenu h4,
@@ -175,10 +186,16 @@ body.Profile #BodyMenu {
 }
 body.Conversations #Content,
 body.Activity #Content,
-body.Profile #Content {
+body.Profile #Content,
+body.Search #Content {
 	margin: 0 270px 0 0;
 }
-
+body.Search #Content {
+	padding-top: 20px;
+}
+body.Search div.Tabs div.SubTab {
+	background: transparent;
+}
 body.Discussions #Content {
 	padding-top: 60px;
 }
@@ -266,6 +283,12 @@ div.Tabs li.Active a {
 	padding: 0;
 	line-height: 24px;
 }
+div.CommentTabs li.Active a {
+	background: none repeat scroll 0 0 #FFFFFF;
+   color: #474747;
+	padding: 5px 10px;
+	border: 1px solid #ABDAFB;
+}
 div.ProfileTabs,
 div.DiscussionsTabs {
 	background: #E5ECF3;
@@ -276,6 +299,14 @@ div.DiscussionsTabs {
 	-moz-border-radius-bottomright: 5px;
 	-webkit-border-bottom-left-radius: 5px;
 	-webkit-border-bottom-right-radius: 5px;
+}
+div.DiscussionTabs {
+	padding-top: 6px;
+}
+ul.MessageList div.Meta span.Votes {
+	float: right;
+	position: inherit;
+	right: auto;
 }
 #Status {
 	background: #e5ecf3;
@@ -297,28 +328,11 @@ div.DiscussionsTabs {
 	width: 690px;
 	height: 45px;
 }
-div.HeadingTabs div.SubTab {
-   border-bottom: 1px solid #555555;
-    left: 300px;
-    position: relative;
-    top: 60px;
-}
-
 div.HeadingTabs ul {
     display: none;        
 }
-
- 
-
-div.AnswerTabs{
-top:0;
-left: 0;
-background: transparent;
- width: auto;
-}
-div.AnswerTabs strong {
-
-    top: 15px;
+div.Preview div.Message, ul.MessageList div.Message {
+	clear: none;
 }
 div.Tabs ul {
 	padding: 10px 8px;
@@ -334,13 +348,11 @@ div.MessageForm {
 
 }
 div.MessageForm div.Tabs {
-	padding: 0 8px;
+	padding: 0 0 8px;
+	font-size: inherit;
 }
-
-div.CommentTabs{
-	left: -10px;
-    position: relative;
-    top: 7px;
+div.MessageForm div.Tabs ul {
+	padding: 10px 0;
 }
 
 div.ProfileTabs li a,
@@ -348,6 +360,16 @@ div.ProfileTabs li a:link,
 div.ProfileTabs li a:hover,
 div.ProfileTabs li a:active,
 div.ProfileTabs li a:visited,
+div.CommentTabs li a,
+div.CommentTabs li a:link,
+div.CommentTabs li a:hover,
+div.CommentTabs li a:active,
+div.CommentTabs li a:visited,
+div.DiscussionTabs li a,
+div.DiscussionTabs li a:link,
+div.DiscussionTabs li a:hover,
+div.DiscussionTabs li a:active,
+div.DiscussionTabs li a:visited,
 div.DiscussionsTabs li a,
 div.DiscussionsTabs li a:link,
 div.DiscussionsTabs li a:hover,
@@ -368,12 +390,18 @@ div.DiscussionsTabs li a:visited {
 	display: inline-block;
 }
 div.ProfileTabs li a:hover,
+div.CommentTabs li a:hover,
+div.DiscussionTabs li a:hover,
 div.DiscussionsTabs li a:hover {
    background: #D0DDE9;
    text-decoration: none;
 }
 div.ProfileTabs a.Active,
 div.ProfileTabs li.Active a,
+div.CommentTabs a.Active,
+div.CommentTabs li.Active a,
+div.DiscussionTabs a.Active,
+div.DiscussionTabs li.Active a,
 div.DiscussionsTabs a.Active,
 div.DiscussionsTabs li.Active a {
 	background-color: #1B5790 !important;
@@ -381,6 +409,7 @@ div.DiscussionsTabs li.Active a {
 	font-weight: bold;
 }
 div.ProfileTabs li a span,
+div.DiscussionTabs li a span,
 div.DiscussionsTabs li a span {
    line-height: 1;
    font-size: 80%;
@@ -401,6 +430,9 @@ div.HeadingTabs ul {
 }
 body.Discussion a.Bookmark {
 	display: none;
+}
+div.AnswerTabs strong {
+	line-height: 40px;
 }
 div.Preview {
 	border: 1px solid #aaa;
@@ -596,13 +628,68 @@ ul.MessageList, ul.MessageList li {
 	padding: 0;
 }
 
+ul.Condensed li, li.Condensed {
+	clear: none;
+}
+
 /* Popups */
+div.Popup .Loading,
 div.Popup div.Body {
 	background: -moz-linear-gradient(center top , #FFFFFF, #EAF0F5) repeat scroll 0 0 #FFFFFF;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+div.Popup .Loading {
+	background-image: url('../../../applications/dashboard/design/images/progress.gif');
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+div.Border {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	background: none;
+	padding: 0;
 }
 div.Overlay {
-	    background-color: rgba(0, 0, 0, 0.3);
-    height: 100%;
-    position: fixed;
-    width: 100%;
+	background-color: rgba(0, 0, 0, 0.3);
+	height: 100%;
+	position: fixed;
+	width: 100%;
+}
+div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
+	background: none;
+	border: none;
+	color: #29271E;
+	font-size: 30px;
+	padding: 12px 9px 8px;
+}
+a.Close {
+	color: #fff;
+	background: #900;
+	border: 3px solid #fff;
+	border-radius: 20px;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	display: block;
+	height: 20px;
+	width: 20px;
+	padding: 0;
+	margin: 0;
+	top: -10px;
+	right: -10px;
+}
+a.Close span {
+	display: block;
+	height: 20px;
+	width: 17px;
+	padding: 0;
+	margin: 0;
 }

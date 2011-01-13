@@ -88,7 +88,7 @@ QUOTE;
       $this->RenderQuotes($Sender);
    }
    
-   protected function RenderQuotes($Sender) {      
+   protected function RenderQuotes($Sender) {
       switch ($Sender->EventArguments['Object']->Format) {
          case 'Html':
             $Sender->EventArguments['Object']->Body = preg_replace_callback('/(<blockquote rel="([\d\w_ ]{3,30})">)/u', array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
@@ -96,7 +96,7 @@ QUOTE;
             break;
             
          case 'BBCode':
-         case 'Markdown':
+			case 'Markdown':
             $Sender->EventArguments['Object']->Body = preg_replace_callback('/(\[quote="?([\d\w_ ]{3,30})"?\])/u', array($this, 'QuoteAuthorCallback'), $Sender->EventArguments['Object']->Body);
             $Sender->EventArguments['Object']->Body = str_replace('[/quote]','</p></div></blockquote>',$Sender->EventArguments['Object']->Body);
             break;
