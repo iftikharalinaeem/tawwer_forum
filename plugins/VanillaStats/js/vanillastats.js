@@ -1,5 +1,5 @@
 $(function() {
-   statsUrl = gdn.definition('VanillaStatsUrl', 'http://analytics.vanillaforums.com/graph/');
+   statsUrl = gdn.definition('VanillaStatsUrl', 'http://analytics.vanillaforums.com');
    
    frame = function() {
       var frame = document.getElementById('VanillaStatsGraph');
@@ -21,6 +21,7 @@ $(function() {
          
       // Load the graph data
       frame().src = statsUrl
+         +'/graph/'
          +'?VanillaID=' + vanillaId
          +'&Range=' + range
          +'&DateRange=' + dateRange;

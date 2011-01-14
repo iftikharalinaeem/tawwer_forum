@@ -30,7 +30,7 @@ function WriteRangeTab($Range, $Sender) {
    </ul>
 </div>
 <div class="Picker"></div>
-<script type="text/javascript" src="http://analytics.vanillaforums.com/applications/vanillastats/js/remote.js"></script>
+<script type="text/javascript" src="<?php echo VanillaStatsPlugin::ANALYTICS_URL; ?>/applications/vanillastats/js/remote.js"></script>
 <div class="DashboardSummaries">
    <div class="Loading"></div>
 </div>

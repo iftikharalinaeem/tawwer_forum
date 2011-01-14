@@ -28,6 +28,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
    
    const RESOLUTION_DAY = 'day';
    const RESOLUTION_MONTH = 'month';
+   const ANALYTICS_URL = 'http://analytics.vanillaforums.com';
    
    /**
     * Override the default dashboard page with the new stats one.
@@ -44,7 +45,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     */
    public function StatsDashboard($Sender) {
       // Tell the page where to find the Vanilla Analytics provider
-      $Sender->AddDefinition('VanillaStatsUrl', 'http://analytics.vanillaforums.com/graph/');
+      $Sender->AddDefinition('VanillaStatsUrl', VanillaStatsPlugin::ANALYTICS_URL);
       
       // Load javascript & css, check permissions, and load side menu for this page.
       $Sender->AddJsFile('settings.js');
