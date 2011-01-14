@@ -9,15 +9,15 @@
 			<div id="header"> 
 <a id="logo" href="/"><img alt="Boagworld Logo" src="http://boagworld.com/wp-content/themes/Boagworld/images/logo.gif"></a> 
 <dl id="nav"> 
-		<dt class="archiveN"><a href="/archive/">Archive</a></dt> 
+		<dt class="archiveN"><a href="http://boagworld.com/archive/">Archive</a></dt> 
 		<dd class="archiveN">Everything written on boagworld</dd> 
-		<dt class="forumN"><a href="/forum/">Forum</a></dt> 
+		<dt class="forumN"><a href="http://forum.boagworld.com/">Forum</a></dt> 
 		<dd class="forumN">help on every aspect of web design</dd> 
-		<dt class="aboutN"><a href="/about/">About</a></dt> 
+		<dt class="aboutN"><a href="http://boagworld.com/about/">About</a></dt> 
 		<dd class="aboutN">about Paul, Marcus and the show</dd> 
 		<dt class="searchN">Search</dt> 
 		<dd class="searchN"> 
-				<form action="/" method="get"> 
+				<form action="http://boagworld.com/" method="get"> 
 						<p><input type="text" value="" name="s" id="search"> 
 						<input type="hidden" value="1" name="IncludeBlogs"> 
 						</p> 

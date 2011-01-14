@@ -912,7 +912,12 @@ div.Tabs li a span {
 	background: #fff;
 	color:#000;
 }
+ul.DataList li.Mine div.Meta a.Category,
+ul.DataList div.Meta a.Category,
 .Mine {
+	background: transparent;
+}
+ul.DataList li.Item.New {
 	background: #FEFECC;
 }
 #Body a.Title,
