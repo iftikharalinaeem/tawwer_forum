@@ -1707,3 +1707,9 @@ function timeformat($logTime, $show_today = true)
 	// Format any other characters..
 	return strftime($str, $time);
 }
+
+// Removes special entities from strings.  Compatibility...
+function un_htmlspecialchars($string)
+{
+	return strtr($string, array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' '));
+}

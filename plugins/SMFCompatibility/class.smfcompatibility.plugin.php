@@ -49,7 +49,12 @@ class SMFCompatibilityPlugin extends Gdn_Plugin {
    }
 
 	public function Format($String) {
-      $Result = parse_bbc($String);
+      try {
+         $Result = parse_bbc($String);
+      } catch (Exception $Ex) {
+         $Result = '<!-- Error: '.htmlspecialchars($Ex->getMessage()).'-->'
+            .Gdn_Format::Display($String);
+      }
       return $Result;
 	}
 
@@ -68,6 +73,8 @@ class SMFCompatibilityPlugin extends Gdn_Plugin {
       $Router->SetRoute('index\.php/topic,(\d+).(\d+)\.html.*$', 'discussion/$1/x/$2lim', 'Permanent');
       $Router->SetRoute('index\.php/board,(\d+)\.(\d+)\.html.*$', 'categories/$1/$2lim', 'Permanent');
       $Router->SetRoute('\?action=profile%3Bu%3D(\d+).*$', 'profile/$1/x', 'Permanent');
+      $Router->SetRoute('index\.php/topic,(\d+)\.msg(\d+)\.html.*$', 'discussion/comment/$2/#Comment_$2', 'Permanent');
+      $Router->SetRoute('\?topic=(\d+).*$', 'discussion/$1/x/p1', 'Permanent');
 	}
 
    public function OnDisable() {
