@@ -6,27 +6,24 @@
 <body id="{$BodyID}" class="{$BodyClass}">
   <div id="Frame">
 <div id="HeaderCont">
-			<div id="header"> 
-<a id="logo" href="/"><img alt="Boagworld Logo" src="http://boagworld.com/wp-content/themes/Boagworld/images/logo.gif"></a> 
-<dl id="nav"> 
-		<dt class="archiveN"><a href="http://boagworld.com/archive/">Archive</a></dt> 
-		<dd class="archiveN">Everything written on boagworld</dd> 
-		<dt class="forumN"><a href="http://forum.boagworld.com/">Forum</a></dt> 
-		<dd class="forumN">help on every aspect of web design</dd> 
-		<dt class="aboutN"><a href="http://boagworld.com/about/">About</a></dt> 
-		<dd class="aboutN">about Paul, Marcus and the show</dd> 
-		<dt class="searchN">Search</dt> 
-		<dd class="searchN"> 
-				<form action="http://boagworld.com/" method="get"> 
-						<p><input type="text" value="" name="s" id="search"> 
-						<input type="hidden" value="1" name="IncludeBlogs"> 
-						</p> 
-						<p><button type="submit">Search</button></p> 
-				</form> 
-		</dd> 
-</dl> 
- 
-</div> 
+			<div id="header">
+            <a href="http://boagworld.com" id="logo"><img src="http://boagworld.com/wp-content/themes/BoagworldV2/images/logo.gif" alt="Boagworld Logo" /></a>
+
+			<ul id="nav-primary">
+				<li><a href="http://boagworld.com">Home</a></li>
+				<li><a href="http://boagworld.com/archive/">Blog</a></li>
+				<li><a href="http://boagworld.com/podcast/">Podcast</a></li>
+				<li><a href="http://boagworld.com/#product-nav">Products</a></li>
+				<li><a href="http://forum.boagworld.com">Forum</a></li>
+				<li><a href="http://boagworld.com/about/">About</a></li>
+				<li><a href="http://boagworld.com/contact/">Contact</a></li>
+			</ul>
+
+            <div id="nav">
+				<span class="searchN">{searchbox}
+            </div>
+        </div>
+
 		<div id="info"> 
 		<div id="about"> 
 				<h2> 
@@ -55,8 +52,8 @@
 		  {activity_link}
 		  {inbox_link}
 		  {profile_link}
+{signinout_link} <li><a href="http://forum.boagworld.com/search">Search</a>
 		  {custom_menu}
-		  {signinout_link}
 		</ul>
 	 </div>
 	 <div id="Body">

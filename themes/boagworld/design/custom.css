@@ -996,3 +996,93 @@ ul.Activities ul.DataList li {
 div.Attachments {
 	background-color:#D7E79E;
 }
+
+/* Paul's Customizations */
+#nav-primary {
+background:transparent url('http://boagworld.com/wp-content/themes/boagworld-v2.2/images/nav-primary.jpg') center bottom no-repeat;
+float:right;
+height:40px;
+margin:40px 30px 0 0;
+}
+
+#nav-primary li {
+border:none;
+float:left;
+}
+
+#nav-primary li a {
+color:#412715;
+font-size:14px;
+line-height:14px;
+text-decoration:none;
+text-transform:uppercase;
+padding:8px 10px 5px;
+}
+
+#nav-primary li a:hover {
+color:#FFF;
+background-color:#BD7945;
+-moz-border-radius:5px;
+-webkit-border-radius:5px;
+-o-border-radius:5px;
+border-radius:5px;
+}
+
+div.Info {
+margin-top:0;
+padding:10px 20px;
+}
+
+#Form_AddPeople1 {
+width:200px;
+}
+
+.Message blockquote {
+font-style:italic;
+font-family:Georgia, "Times New Roman", Times, serif;
+}
+
+body ul div.Comment blockquote.UserQuote {
+background-color:#fff;
+}
+
+.Banner ul li a.SignOut {
+position:inherit;
+display:inline;
+font-size:14px;
+}
+
+.Banner ul li a {
+font-weight:normal;
+padding-bottom:0;
+margin-bottom:0;
+font-size:14px;
+}
+
+.Banner ul li a.Selected {
+border-bottom-left-radius:3px 3px;
+border-bottom-right-radius:3px 3px;
+border-top-left-radius:3px 3px;
+border-top-right-radius:3px 3px;
+}
+
+.searchN input {
+width:auto;
+margin:0 5px;
+}
+
+.searchN {
+margin-left:auto;
+}
+
+.searchN form {
+padding-left:120px;
+}
+
+body.connect {
+padding: 0;
+background: #fff;
+}
+body.connect #Content {
+	width: auto;
+}
