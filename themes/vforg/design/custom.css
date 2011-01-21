@@ -1256,3 +1256,51 @@ div.Feature h4 {
 body.Discussion a.Bookmark {
 	margin:2px 8px;
 }
+
+.Wiki #Panel {
+   display: none;
+}
+
+.Wiki #Content {
+   float: none;
+   width: 100%;
+}
+
+.Wiki #Frame {
+   background-color: #fff;
+   color: #000;
+}
+
+.Wiki #Content h1 {
+   color: #000;
+   border-color: #BFD1E1;
+}
+.Wiki #Content h2 {
+   color: #000;
+   border-color: #BFD1E1;
+}
+.Wiki #Content h3 {
+   color: #000;
+   border-color: #BFD1E1;
+}
+
+.TOC {
+   margin-top: 10px;
+   text-align: center;
+}
+
+.TOC .Section {
+   text-align: left;
+   vertical-align: top;
+   display: inline-block;
+   width: 290px;
+   padding: 10px;
+}
+
+#Content .TOC .Section h2 {
+   margin: 0px 0px;
+}
+
+.TOC .Section ul {
+   padding: 2px 15px 10px;
+}
