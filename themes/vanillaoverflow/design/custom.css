@@ -1,6 +1,6 @@
 body{
-background: url(bg.png) repeat-x top #ffffff;
-font: Arial,Liberation Sans,DejaVu Sans,sans-serif;
+    background: url(bg.png) repeat-x top #ffffff;
+    font-family: Arial,Liberation Sans,DejaVu Sans,sans-serif;
 }
 a, a:link, a:visited, a:active {
     color: #0077CC;
@@ -44,21 +44,26 @@ a.BigButton:hover {
 	width: auto;
 }
 
-a.Button, .Button {
-    
-    background: none repeat scroll 0 0 #F8F8F8;
-    border: 1px solid #999999;
-    color: #555555;
+a.Button,
+.Button {
+    background: #777777;
+    border: none;
+    color: #FFFFFF;
+    font-weight: bold;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 13px;
     margin: 0;
     padding: 4px;
-    
-     /*resets */
-
     -moz-border-radius: 0 0 0 0;
     -moz-box-shadow: 0 0 0 #999999;
     text-shadow: 0 0 0 #FFFFFF;
+}
+a.Button:hover,
+.Button:hover {
+    border: none;
+    color: #fff;
+    text-decoration: none;
+    background: #f90;
 }
 #Body {
 	margin: 0;
@@ -96,36 +101,35 @@ div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
 a.Close{
 color:#999;
 }
-.logo{
-position: relative;
-background: url(vanillaoverflow_logo.png) no-repeat;
-outline: none;
-width: 258px;
-height: 35px;
+.logo {
+    display: inline-block;
+    background: url('vanillaoverflow_logo.png') no-repeat -5px 4px;
+    outline: none;
+    width: 273px;
+    height: 63px;
+    vertical-align: bottom;
 }
 .Banner {
-	left: 260px;
     padding: 10px;
-    position: relative;
     text-align: left;
-    top: -38px;
-    width: 670px;
 }
 .Banner ul {
-	background: #3B5998;
-	padding: 0;
-	margin: 0;
+    display: inline-block;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    vertical-align: bottom;
 }
 .Banner ul li {
 	 background: none repeat scroll 0 0 #777777;
-    display: block;
-    float: left;
+    display: inline-block;
+    float: none;
     margin-right: 7px;
 }
 .Banner ul li a {
 	font-weight: bold;
-	padding: 3px 6px;
-	font-size: 11px;
+	padding: 3px 10px;
+	font-size: 16px;
 	color: #fff;
 	display: inline-block;
 }
@@ -230,7 +234,7 @@ div.CommentForm textarea,
 div.Tabs {
 	background: none;
 	padding: 0;
-	border-bottom: 1px solid #aaa;
+	border-bottom: 1px solid #666;
 }
 div.Tabs ul {
 	padding: 0 8px;
@@ -265,16 +269,16 @@ div.Tabs li a:hover {
 a.Active,
 div.Tabs li.Active a {
    background: #fff;
-   color: #474747;
+   color: #000;
    margin: 0;
-   border: 1px solid #aaa;
+   border: 1px solid #666;
 	border-bottom: none;
-   border-radius: 3px 3px 0 0;
-   -moz-border-radius: 3px 3px 0 0;
-   -webkit-border-radius: 3px 3px 0 0;
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
    display: inline-block;
-	font-size: 12px;
-	line-height: 12px;
+	font-size: 15px;
+	line-height: 15px;
    font-weight: bold;
    text-decoration: none;
    padding: 6px 10px;
@@ -311,25 +315,41 @@ body.Discussion a.Bookmark {
 }
 
 ul.Discussions div.ItemContent {
-    margin: 0 50px 0 220px;
+    margin: 0 0 0 180px;
 }
 
 .Mine {
     background: none repeat scroll 0 0 #ffffff;
 }
-ul.DataList li.Mine div.Meta a.Category, ul.DataList li div.Meta a.Category, div.Tags ul.PanelInfo li{
+div.Box ul.PanelInfo {
+    border: none;
+    margin-bottom: 20px;
+}
+div.BoxCategories ul.PanelInfo li,
+div.Tags ul.PanelInfo li {
+    font-size: 15px;
+    color: #444;
+    font-weight: bold;
+    text-align: left;
+    border: none;
+    padding: 0;
+}
+div.BoxCategories ul.PanelInfo li strong a,
+div.Tags ul.PanelInfo li strong a {
     background-color: #E0EAF1;
     border-bottom: 1px solid #3E6D8E;
     border-right: 1px solid #7F9FB6;
     color: #3E6D8E;
-    font-size: 90%;
-    line-height: 2.4;
-    margin: 2px 2px 2px 0;
+    font-size: 12px;
+    line-height: 26px;
+    margin: 2px 6px 2px 0;
     padding: 3px 4px;
     text-decoration: none;
     white-space: nowrap;
+    float: none;
 }
-ul.DataList li.Mine div.Meta a:hover.Category, ul.DataList li div.Meta a:hover.Category, div.Tags ul.PanelInfo li:hover{
+div.BoxCategories ul.PanelInfo li strong a:hover,
+div.Tags ul.PanelInfo li strong a:hover {
     background-color: #3E6D8E;
     border-bottom: 1px solid #37607D;
     border-right: 1px solid #37607D;
@@ -406,14 +426,6 @@ ul.PanelInfo li.Active {
 	background: #f9f9f9;
 }
 
-div.Tags ul.PanelInfo li{
-	margin: 5px 0 5px 0;
-	padding: 0 5px 0 5px;
-}
-div.Tags ul.PanelInfo li:hover{
-	color:#fff;
-}
-
 body.Profile ul.PanelInfo {
 	border: none;
 }
@@ -447,11 +459,23 @@ body.Entry #Panel {
 }
 
 div.GuestBox {
-background: #eee;
-border:1px solid #ddd;
-padding: 10px;
+    background: #FFEFC6;
+    border: none;
+    padding: 8px;
+    color: #735005;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
 }
-
+div.GuestBox p {
+    color: #735005;
+    font-size: 15px;
+    line-height: 19px;
+}
+div.GuestBox h4 {
+    color: #AE0000;
+    font-size: 16px;
+}
 ul.DataList div.Options {
     float: right;
     position: absolute;
@@ -483,24 +507,37 @@ ul.MessageList div.Meta span.Votes {
     right: 0;
 }
 
-div.MessageForm, div.Tabs {
+div.MessageForm {
     background:  #EEEEEE;
     border-bottom: 1px solid #DDDDDD;
 }
 
 /* voting */
 
-.StatBox {
-    background: transparent;
-    float: left;
-}
-
+.VotesBox,
 .AnswersBox {
-    background: none repeat scroll 0 0 #9A4444;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+}
+.StatBox {
+    float: left;
+    font-size: 25px;
+    line-height: 25px;
+    height: auto;
+    margin-right: 4px;
+    padding-bottom: 3px;
+}
+.StatBox span {
+    font-size: 13px;
+    line-height: 10px;
+}
+.AnswersBox {
+    background: #9A4444;
     color:#ffffff;
 }
 .AnswersBox.HasAnswersBox {
-    background: none repeat scroll 0 0 #75845C;
+    background: #75845C;
     color:#ffffff;
 }
 .AnswersBox a, .AnswersBox a:hover{
@@ -515,15 +552,11 @@ color:#ffffff;
 color:#999999;
 }
 .FollowsBox {
-    background: none repeat scroll 0 0 #cccccc;
-    color:#555555;
-}
-.FollowsBox a, .FollowsBox a:hover{
-color:#555555;
+    display: none;
 }
 .VotesBox {
        background: none repeat scroll 0 0 #eeeeee;
-       color:#555555;s
+       color:#555555;
 }
 .VotesBox a, .VotesBox a:hover{
 color:#555555;
@@ -544,3 +577,19 @@ span.Votes span {
  
 }
 
+
+ul.DataList a.Title {
+    font-size: 16.6px;
+}
+ul.DataList div.Meta {
+    font-size: 13px;
+}
+ul.DataList div.Meta span.Announcement {
+    background: none;
+    color: #AE0000;
+    font-weight: bold;
+    padding: 0;
+}
+ul.DataList li.Item {
+    border-bottom: 1px dotted #999;
+}

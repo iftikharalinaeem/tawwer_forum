@@ -658,3 +658,90 @@ div.AnswerTabs strong {
 	font-size: 16px;
 	margin-right: 20px;
 }
+
+/* Category Page Customizations */
+#vanilla_categories_index div.ProfileBox {
+	display: none;
+}
+div.CategoryBox {
+	display: none;
+}
+div.CategoryBox:nth-child(1),
+div.CategoryBox:nth-child(2),
+div.CategoryBox:nth-child(3),
+div.CategoryBox:nth-child(4) {
+	display: inline-block;
+	width: 315px;
+	padding: 8px;
+	margin: 0 8px 10px 0;
+	overflow: hidden;
+	vertical-align: top;
+	background: url('images/fade.png') 0 0 repeat-x #ffffeb;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+}
+div.CategoryBox:nth-child(2),
+div.CategoryBox:nth-child(4),
+div.CategoryBox:nth-child(6),
+div.CategoryBox:nth-child(8),
+div.CategoryBox:nth-child(10) {
+	margin-right: 0;
+}
+div.CategoryTabs {
+	border: none;
+}
+div.CategoryTabs ul {
+	padding: 0;
+	margin: 0;
+}
+div.CategoryTabs li.Active {
+	display: block;
+	background: url('images/speechbubble.png') 2px 12px no-repeat transparent;
+	padding-bottom: 10px;
+}
+div.CategoryTabs li.Active a {
+	display: block;
+	color: #fff;
+	background: #1cade3;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	margin: 0;
+	padding: 4px 6px;
+	border: none;
+	white-space: normal;
+	text-align: center;
+}
+div.CategoryBox ul.Discussions {
+	background: none;
+}
+div.CategoryBox div.StatBox,
+div.CategoryBox div.Meta {
+	display: none;
+}
+div.CategoryBox ul.Discussions li a.UserAnchor img {
+	height: 20px;
+	width: 20px;
+	margin: 0 8px 0 1px;
+}
+div.CategoryBox a.Title {
+	font-size: 12px;
+	font-weight: normal;
+}
+div.CategoryBox a.Title:hover {
+	text-decoration: underline;
+}
+div.CategoryBox ul.DataList li.Item {
+	border: none;
+	padding: 0;
+	margin: 0;
+}
+div.CategoryBox div.Foot {
+	display: none;
+}
+div.CategoryBox ul.Discussions div.ItemContent {
+	margin: 0;
+	padding: 0;
+}

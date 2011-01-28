@@ -5,42 +5,29 @@
 </head>
 <body id="{$BodyID}" class="{$BodyClass}">
   <div id="Frame">
-  
-  
-
-  
-  <div class="Wrapper">
-  
-    	<div class="SearchBox">{searchbox}</div>
-
-
-	 <div class="logo"></div>
-	 <div class="Banner">
-		<ul>
-		  {dashboard_link}
-		  {discussions_link}
-		  {activity_link}
-		  {inbox_link}
-		  {profile_link}
-		  {custom_menu}
-		  {signinout_link}
-		</ul>
-	 </div>
-	 <div id="Body">
-		  <div id="Panel">
-			 {asset name="Panel"}
-		  </div>
-		  <div id="Content">
-			 {asset name="Content"}
-		  </div>
+    <div class="Wrapper">
+	   <div class="SearchBox">{searchbox}</div>
+		<div class="Banner">
+		  <div class="logo"></div>
+		  <ul>
+			 {dashboard_link}
+			 {discussions_link}
+			 {activity_link}
+			 {inbox_link}
+			 {profile_link}
+			 {custom_menu}
+			 {signinout_link}
+		  </ul>
 		</div>
-	 <div id="Foot">
-		<div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
-		{asset name="Foot"}
+		<div id="Body">
+		  <div id="Panel">{asset name="Panel"}</div>
+		  <div id="Content">{asset name="Content"}</div>
+		</div>
+		<div id="Foot">
+		  <div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
+		  {asset name="Foot"}
+		</div>
 	 </div>
-	
-  </div>
-
   </div>
 </body>
 </html>

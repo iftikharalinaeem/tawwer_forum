@@ -12,10 +12,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['vanilladigg'] = array(
-   'Name' => 'vanilladigg',
-   'Description' => "digg mimic",
+   'Name' => 'VanillaDigg',
+   'Description' => "A Vanilla theme built to look like digg.com. Requires the Voting plugin.",
    'Version' => '1.0',
-   'Author' => "Brendan Sera-Shriar",
-   'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://brendanserashriar.com'
+   'Author' => "Mark O'Sullivan & Brendan Sera-Shriar",
+   'AuthorEmail' => 'support@vanillaforums.com',
+   'AuthorUrl' => 'http://vanillaforums.com'
 );

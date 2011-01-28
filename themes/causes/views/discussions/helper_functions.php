@@ -42,7 +42,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt) {
    if ($Discussion->CountComments < 0)
       $Discussion->CountComments = 0;
    
-   echo UserPhoto($First);
+   echo UserPhoto($First, 'UserAnchor');
    ?>
    <div class="ItemContent Discussion">
       <?php echo Anchor($DiscussionName, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') ? '/#Item_'.$Discussion->CountCommentWatch : ''), 'Title'); ?>
