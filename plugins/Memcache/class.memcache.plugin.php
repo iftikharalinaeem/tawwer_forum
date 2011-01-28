@@ -40,12 +40,4 @@ class MemcachePlugin extends Gdn_Plugin {
       
    }
    
-   public function Enable() {
-      
-   }
-   
-   public function Disable() {
-      
-   }
-   
 }

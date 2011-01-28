@@ -30,6 +30,7 @@ class Gdn_Memcache extends Gdn_Cache {
    
    public function __construct() {
       parent::__construct();
+      $this->CacheType = Gdn_Cache::CACHE_TYPE_MEMORY;
       
       $this->Memcache = new Memcache;
       
@@ -52,7 +53,7 @@ class Gdn_Memcache extends Gdn_Cache {
    * config file.
    */
    public function Autorun() {
-      $Servers = C('Cache.Memcache.Servers');
+      $Servers = Gdn_Cache::ActiveStore('memcache');
       if (!is_array($Servers)) 
          $Servers = explode(',',$Servers);
          
