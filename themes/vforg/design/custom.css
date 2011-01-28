@@ -258,7 +258,6 @@ i.SpriteFive { background-position: 0 -148px; }
 body#vforg_home_features .Banner ul li.Features,
 body#dashboard_search_index .Banner ul li.Community,
 body.hosting .Banner ul li.Hosting,
-body.Wiki .Banner ul li.Documentation,
 body.Addons .Banner ul li.Addons,
 body.Profile .Banner ul li.Community,
 body.Vanilla .Banner ul li.Community,
@@ -270,7 +269,6 @@ body#vforg_home_features .Banner ul li.Features a,
 body#vforg_home_index .Banner ul li.Home a,
 body#dashboard_search_index .Banner ul li.Community a,
 body.hosting .Banner ul li.Hosting a,
-body.Wiki .Banner ul li.Documentation a,
 body.Addons .Banner ul li.Addons a,
 body.Profile .Banner ul li.Community a,
 body.Vanilla .Banner ul li.Community a,
@@ -1257,39 +1255,39 @@ body.Discussion a.Bookmark {
 	margin:2px 8px;
 }
 
-.Wiki #Panel {
+.Pages #Panel {
    display: none;
 }
 
-.Wiki #Content {
+.Pages #Content {
    float: none;
    width: 100%;
 }
 
-.Wiki #Frame {
+.Pages #Frame {
    background-color: #fff;
    color: #000;
 }
 
-.Wiki #Content h1 {
+.Pages #Content h1 {
    color: #000;
    border-color: #BFD1E1;
 }
-.Wiki #Content h2 {
+.Pages #Content h2 {
    color: #000;
    border-color: #BFD1E1;
 }
-.Wiki #Content h3 {
+.Pages #Content h3 {
    color: #000;
    border-color: #BFD1E1;
 }
 
-.TOC {
+.MainTOC {
    margin-top: 10px;
    text-align: center;
 }
 
-.TOC .Section {
+.MainTOC .Section {
    text-align: left;
    vertical-align: top;
    display: inline-block;
@@ -1297,10 +1295,10 @@ body.Discussion a.Bookmark {
    padding: 10px;
 }
 
-#Content .TOC .Section h2 {
+#Content .MainTOC .Section h2 {
    margin: 0px 0px;
 }
 
-.TOC .Section ul {
+.MainTOC .Section ul {
    padding: 2px 15px 10px;
 }
