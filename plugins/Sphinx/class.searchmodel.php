@@ -5,13 +5,20 @@ class SearchModel extends Gdn_Model {
 
    public $Types = array(1 => 'Discussion', 2 => 'Comment', 3 => 'Page');
    public $TypeInfo = array();
+   public $DataPath = '/usr/local/var/data';
+   public $LogPath = '/usr/local/var/log';
+   public $UseDeltas;
+
+   protected $_fp = NULL;
 
 	/// METHODS ///
 
    public function __construct() {
-      $this->AddTypeInfo('Discussion', array($this, 'GetDiscussions'));
-      $this->AddTypeInfo('Comment', array($this, 'GetComments'));
-      $this->AddTypeInfo('Page', array($this, 'GetPages'));
+      $this->AddTypeInfo('Discussion', array($this, 'GetDiscussions'), array($this, 'IndexDiscussions'));
+      $this->AddTypeInfo('Comment', array($this, 'GetComments'), array($this, 'IndexComments'));
+      $this->AddTypeInfo('Page', array($this, 'GetPages'), array($this, 'IndexPages'));
+      $this->UseDeltas = C('Plugins.Sphinx.UseDeltas');
+      parent::__construct();
    }
 
    public function AddTypeInfo($Type, $GetCallback, $IndexCallback = NULL) {
@@ -19,7 +26,56 @@ class SearchModel extends Gdn_Model {
          $Type = array_search($Type, $this->Types);
       }
 
-      $this->TypeInfo[$Type] = array('GetCallback' => $GetCallback, 'IndexCallback' => '');
+      $this->TypeInfo[$Type] = array('GetCallback' => $GetCallback, 'IndexCallback' => $IndexCallback);
+   }
+
+   public function GenerateConfig($fp) {
+      $this->_fp = $fp;
+      $UseDeltas = C('Plugins.Sphinx.UseDeltas');
+      $Px = $this->Database->DatabasePrefix;
+
+      $Types = $this->Types;
+      if (!Gdn::Structure()->TableExists('Page')) {
+         unset($Types[3]);
+      }
+
+      $DeltaTypes = $Types;
+      foreach ($DeltaTypes as &$Type) {
+         $Type = C('Database.Name').'_'.$Type.'_Delta';
+      }
+
+      // Write the basic header.
+      fwrite($fp, '# sphinx.conf automatically generated '.Gdn_Format::ToDateTime()."\n\n");
+
+      // Cron help.
+      fwrite($fp, "# You'll need to set up a cron job to reindex the database with the following commands.\n");
+      fwrite($fp, "# /usr/local/bin/indexer --config /path/to/sphinx.conf --all --rotate\n");
+      if ($UseDeltas) {
+         fwrite($fp, "# /usr/local/bin/indexer --config /path/to/sphinx.conf ".implode(' ', $DeltaTypes)." --rotate\n");
+      }
+      fwrite($fp, "\n");
+
+      // Write each datasource and index definition.
+      foreach ($this->Types as $Index => $Type) {
+         $Info = $this->TypeInfo[$Index];
+         $Callback = $Info['IndexCallback'];
+         $Name = C('Database.Name').'_'.$Type;
+         call_user_func($Callback, $this, $Name, $UseDeltas);
+      }
+
+      // Write the searchd section.
+      $Server = C('Plugins.Sphinx.Server', C('Databse.Host', 'localhost'));
+      $Port = C('Plugins.Sphinx.Port', 9312);
+      
+      $Searchd = "
+# This searchd section is default searchd section. You can replace it with your own.
+searchd {
+  listen = {$Server}:{$Port}
+  pid_file = {$this->LogPath}/searchd.pid
+}";
+      $this->WriteConf($Searchd);
+
+      $this->_fp = NULL;
    }
 
    public function GetComments($IDs) {
@@ -122,36 +178,220 @@ class SearchModel extends Gdn_Model {
       return $Result;
    }
 
+   /**
+    *
+    * @param SearchModel $SearchModel
+    * @param string $Name
+    * @param mixed $Delta
+    */
+   public function IndexComments($SearchModel, $Name, $Delta) {
+      $Px = $SearchModel->Database->DatabasePrefix;
+      $ID = 2;
+      $SelectSql = "
+    select c.CommentID * 10 + $ID, d.CategoryID, c.InsertUserID, unix_timestamp(c.DateInserted) as DateInserted, c.Body
+    from {$Px}Comment c join {$Px}Discussion d on c.DiscussionID = d.DiscussionID";
+
+      // Write the general datasource.
+      $SearchModel->WriteConfSourceBegin($Name);
+      $SearchModel->WriteConfValue('sql_query_pre', 'set names utf8');
+      if ($Delta) {
+         $SearchModel->WriteConfValue('sql_query_pre', "replace into {$Px}SphinxCounter select $ID, max(CommentID) from {$Px}Comment");
+         $SearchModel->WriteConfValue('sql_query',
+            "{$SelectSql}\n    where CommentID <= (select MaxID from {$Px}SphinxCounter where CounterID = $ID)");
+      } else {
+         $SearchModel->WriteConfValue('sql_query', $SelectSql);
+      }
+      $SearchModel->WriteConfValue('sql_attr_uint', 'CategoryID');
+      $SearchModel->WriteConfValue('sql_attr_uint', 'InsertUserID');
+      $SearchModel->WriteConfValue('sql_attr_timestamp', 'DateInserted');
+      $SearchModel->WriteConfSourceEnd();
+
+      if ($Delta) {
+         // Write the delta datasource.
+         $SearchModel->WriteConf("source {$Name}_Delta: $Name {");
+         $SearchModel->WriteConfValue('sql_query_pre', 'set names utf8');
+         $SearchModel->WriteConfValue('sql_query',
+            "{$SelectSql}\n    where CommentID > (select MaxID from {$Px}SphinxCounter where CounterID = $ID)");
+         $SearchModel->WriteConfSourceEnd();
+      }
+
+      // Write the general index.
+      $SearchModel->WriteConf("index $Name {");
+      $SearchModel->WriteConfValue('source', $Name);
+      $SearchModel->WriteConfValue('path', "{$this->DataPath}/$Name");
+      $SearchModel->WriteConfValue('morphology', 'stem_en');
+      $SearchModel->WriteConfValue('charset_type', 'utf-8');
+      $SearchModel->WriteConfSourceEnd();
+
+      // Write the delta index.
+      if ($Delta) {
+         $SearchModel->WriteConf("index {$Name}_Delta: $Name {");
+         $SearchModel->WriteConfValue('source', $Name.'_Delta');
+         $SearchModel->WriteConfValue('path', "{$this->DataPath}/{$Name}_Delta");
+         $SearchModel->WriteConfSourceEnd();
+      }
+   }
+
+   /**
+    *
+    * @param SearchModel $SearchModel
+    * @param string $Name
+    * @param mixed $Delta
+    */
+   public function IndexDiscussions($SearchModel, $Name, $Delta) {
+      $Px = $SearchModel->Database->DatabasePrefix;
+      $ID = 1;
+      $SelectSql = "
+    select DiscussionID * 10 + $ID, CategoryID, InsertUserID, unix_timestamp(DateLastComment) as DateLastComment, Name, Body
+    from {$Px}Discussion";
+
+      // Write the general datasource.
+      $SearchModel->WriteConfSourceBegin($Name);
+      $SearchModel->WriteConfValue('sql_query_pre', 'set names utf8');
+      if ($Delta) {
+         $SearchModel->WriteConfValue('sql_query_pre', "replace into {$Px}SphinxCounter select $ID, max(DiscussionID) from {$Px}Discussion");
+         $SearchModel->WriteConfValue('sql_query',
+            "{$SelectSql}\n    where DiscussionID <= (select MaxID from {$Px}SphinxCounter where CounterID = $ID)");
+      } else {
+         $SearchModel->WriteConfValue('sql_query', $SelectSql);
+      }
+      $SearchModel->WriteConfValue('sql_attr_uint', 'CategoryID');
+      $SearchModel->WriteConfValue('sql_attr_uint', 'InsertUserID');
+      $SearchModel->WriteConfValue('sql_attr_timestamp', 'DateLastComment');
+      $SearchModel->WriteConfSourceEnd();
+
+      if ($Delta) {
+         // Write the delta datasource.
+         $SearchModel->WriteConf("source {$Name}_Delta: $Name {");
+         $SearchModel->WriteConfValue('sql_query_pre', 'set names utf8');
+         $SearchModel->WriteConfValue('sql_query',
+            "{$SelectSql}\n    where DiscussionID > (select MaxID from {$Px}SphinxCounter where CounterID = $ID)");
+         $SearchModel->WriteConfSourceEnd();
+      }
+
+      // Write the general index.
+      $SearchModel->WriteConf("index $Name {");
+      $SearchModel->WriteConfValue('source', $Name);
+      $SearchModel->WriteConfValue('path', "{$this->DataPath}/$Name");
+      $SearchModel->WriteConfValue('morphology', 'stem_en');
+      $SearchModel->WriteConfValue('charset_type', 'utf-8');
+      $SearchModel->WriteConfSourceEnd();
+      
+      // Write the delta index.
+      if ($Delta) {
+         $SearchModel->WriteConf("index {$Name}_Delta: $Name {");
+         $SearchModel->WriteConfValue('source', $Name.'_Delta');
+         $SearchModel->WriteConfValue('path', "{$this->DataPath}/{$Name}_Delta");
+         $SearchModel->WriteConfSourceEnd();
+      }
+   }
+
+   /**
+    *
+    * @param SearchModel $SearchModel
+    * @param string $Name
+    * @param mixed $Delta
+    */
+   public function IndexPages($SearchModel, $Name, $Delta) {
+      $Px = $SearchModel->Database->DatabasePrefix;
+      $ID = 3;
+      $SelectSql = "
+    select PageID * 10 + $ID, 0 as CategoryID, InsertUserID, unix_timestamp(DateInserted) as DateInserted, Content
+    from {$Px}Page
+    where Current = 1";
+
+      // Write the general datasource.
+      $SearchModel->WriteConfSourceBegin($Name);
+      $SearchModel->WriteConfValue('sql_query_pre', 'set names utf8');
+      if ($Delta) {
+         $SearchModel->WriteConfValue('sql_query_pre', "replace into {$Px}SphinxCounter select $ID, max(PageID) from {$Px}Page where Current = 1");
+         $SearchModel->WriteConfValue('sql_query',
+            "{$SelectSql}\n      and PageID <= (select MaxID from {$Px}SphinxCounter where CounterID = $ID)");
+      } else {
+         $SearchModel->WriteConfValue('sql_query', $SelectSql);
+      }
+      $SearchModel->WriteConfValue('sql_attr_uint', 'CategoryID');
+      $SearchModel->WriteConfValue('sql_attr_uint', 'InsertUserID');
+      $SearchModel->WriteConfValue('sql_attr_timestamp', 'DateInserted');
+      $SearchModel->WriteConfSourceEnd();
+
+      if ($Delta) {
+         // Write the delta datasource.
+         $SearchModel->WriteConf("source {$Name}_Delta: $Name {");
+         $SearchModel->WriteConfValue('sql_query_pre', 'set names utf8');
+         $SearchModel->WriteConfValue('sql_query',
+            "{$SelectSql}\n      and PageID > (select MaxID from {$Px}SphinxCounter where CounterID = $ID)");
+         $SearchModel->WriteConfSourceEnd();
+      }
+
+      // Write the general index.
+      $SearchModel->WriteConf("index $Name {");
+      $SearchModel->WriteConfValue('source', $Name);
+      $SearchModel->WriteConfValue('path', "{$this->DataPath}/$Name");
+      $SearchModel->WriteConfValue('morphology', 'stem_en');
+      $SearchModel->WriteConfValue('charset_type', 'utf-8');
+      $SearchModel->WriteConfSourceEnd();
+
+      // Write the delta index.
+      if ($Delta) {
+         $SearchModel->WriteConf("index {$Name}_Delta: $Name {");
+         $SearchModel->WriteConfValue('source', $Name.'_Delta');
+         $SearchModel->WriteConfValue('path', "{$this->DataPath}/{$Name}_Delta");
+         $SearchModel->WriteConfSourceEnd();
+      }
+   }
+
 	public function Search($Search, $Offset = 0, $Limit = 20) {
+      $Indexes = $this->Types;
+      $Prefix = C('Database.Name').'_';
+      foreach ($Indexes as &$Name) {
+         $Name = $Prefix.$Name;
+      }
+      unset($Name);
+      
+      if ($this->UseDeltas) {
+         foreach ($Indexes as $Name) {
+            $Indexes[] = $Name.'_Delta';
+         }
+      }
+
       // Get the raw results from sphinx.
       $Sphinx = new SphinxClient();
       $Sphinx->setServer(C('Plugin.Sphinx.Server', C('Database.Host', 'localhost')), C('Plugin.Sphinx.Port', 9312));
-      $Sphinx->setMatchMode(SPH_MATCH_ANY);
+      $Sphinx->setMatchMode(SPH_MATCH_BOOLEAN);
       $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS);
       $Sphinx->setLimits($Offset, $Limit);
-      $Sphinx->setIndexWeights(array('Page' => 200, 'Discussion' => 150, 'Comment' => 100));
+//      $Sphinx->setIndexWeights(array('Page' => 200, 'Discussion' => 150, 'Comment' => 100));
       $Sphinx->setMaxQueryTime(10);
 
       // Allow the client to be overridden.
       $this->EventArguments['SphinxClient'] = $Sphinx;
       $this->FireEvent('BeforeSphinxSearch');
 
-      $Search = $Sphinx->query($Search, 'Discussion Comment Page');
+      $Search = $Sphinx->query($Search, implode(' ', $Indexes));
       $Result = $this->GetDocuments($Search);
-
-//		$Result = array(array(
-//          'Relavence' => 1,
-//          'PrimaryID' => 1,
-//          'Title' => 'Test sphinx',
-//          'Summary' => 'Returned from sphinx search.',
-//          'Url' => '/',
-//          'DateInserted' => Gdn_Format::ToDateTime(),
-//          'UserID' => Gdn::Session()->UserID,
-//          'Name' => Gdn::Session()->User->Name,
-//          'Photo' => '',
-//          'Foo' => $Search
-//      ));
 
       return $Result;
 	}
+
+   public function WriteConf($String, $Newline = TRUE) {
+      fwrite($this->_fp, $String.($Newline ? "\n" : ''));
+   }
+
+   public function WriteConfValue($Name, $Value) {
+      $this->WriteConf("  $Name = ".str_replace("\n", "\\\n", $Value));
+   }
+
+   public function WriteConfSourceBegin($Name) {
+      $this->WriteConf("source $Name {");
+      $this->WriteConfValue('type', 'mysql');
+      $this->WriteConfValue('sql_host', C('Database.Host'));
+      $this->WriteConfValue('sql_user', C('Database.User'));
+      $this->WriteConfValue('sql_pass', C('Database.Password'));
+      $this->WriteConfValue('sql_db', C('Database.Name'));
+   }
+
+   public function WriteConfSourceEnd() {
+      $this->WriteConf("}\n");
+   }
 }
