@@ -1265,10 +1265,14 @@ body.Discussion a.Bookmark {
 }
 
 .Pages #Frame {
-   background-color: #fff;
+   background: url('images/bg-fade2.png') 0 -30px repeat-x #fff;
    color: #000;
+	padding: 20px 0 0 0;
 }
-
+body.Pages div#Foot {
+   border-bottom: none;
+   color: #777777;
+}
 .Pages #Content h1 {
    color: #000;
    border-color: #BFD1E1;
@@ -1302,3 +1306,4 @@ body.Discussion a.Bookmark {
 .MainTOC .Section ul {
    padding: 2px 15px 10px;
 }
+
