@@ -15,18 +15,16 @@ a.BigButton {
     color:#ffffff;
     cursor: pointer;
     display: block;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: bold;
-    margin: -48px 0 40px 130px;
+    margin: 0;
     padding: 3px;
     text-align: center;
     border:none;
-    width: 110px;
-    
-    /*resets */
     -moz-border-radius: 0 0 0 0;
     -moz-box-shadow: 0 0 0 #999999;
      text-shadow: 0 0 0 #FFFFFF;
+     margin-bottom: 20px;
 }
 a.BigButton:hover {
 	color:#ffffff;
@@ -70,11 +68,15 @@ a.Button:hover,
 	width: 99.9%;
 	position: relative;
 }
-#dashboard_profile_index #Body{
-clear: both;
+#dashboard_profile_index #Body {
+    padding-top: 20px;
+    clear: both;
+}
+ul.Condensed li, li.Condensed {
+    clear: none;
 }
 .Wrapper{
-margin: 20px auto;
+margin: 0 auto;
 width: 960px;
 }
 
@@ -110,7 +112,7 @@ color:#999;
     vertical-align: bottom;
 }
 .Banner {
-    padding: 10px;
+    padding: 10px 0 30px;
     text-align: left;
 }
 .Banner ul {
@@ -152,16 +154,14 @@ color:#999;
 
 }
 .Banner ul li a span {
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	padding: 1px 2px 0 1px;
-	background: #000;
-
-	color: #fff;
-	font-size: 9px;
+	padding: 0 0 0 6px;
+	background: transparent;
+	color: #ddd;
+   font-weight: bold;
+	font-size: 13px;
 	position: relative;
-	top: -3px;
+	top: auto;
+   line-height: 1;
 }
 #Content {
 	float: left;
@@ -178,10 +178,7 @@ color:#999;
 	margin-right: 4px;
 }
 div.SearchBox {
-	left: 620px;
-    position: relative;
-    top: -20px;
-    width: 300px;
+    text-align: right;
 }
 div.SearchBox input.InputBox{
 
@@ -190,12 +187,14 @@ div.SearchBox input.InputBox{
     margin: 5px 5px 0 0;
     width: 150px;
     height: 13px;
+    width: 220px;
 }
 div.SearchBox a.Button, div.SearchBox .Button {
     background: #f8f8f8;
     font-size: 11px;
     padding: 2px;
     left:5px;
+    color: #333;
     
     /*resets*/
     -moz-border-radius: 0 0 0 0;
@@ -317,6 +316,9 @@ body.Discussion a.Bookmark {
 ul.Discussions div.ItemContent {
     margin: 0 0 0 180px;
 }
+ul.Discussions li.Item {
+    padding: 10px 0;
+}
 
 .Mine {
     background: none repeat scroll 0 0 #ffffff;
@@ -334,6 +336,7 @@ div.Tags ul.PanelInfo li {
     border: none;
     padding: 0;
 }
+ul.DataList div.Meta a.Category,
 div.BoxCategories ul.PanelInfo li strong a,
 div.Tags ul.PanelInfo li strong a {
     background-color: #E0EAF1;
@@ -348,6 +351,7 @@ div.Tags ul.PanelInfo li strong a {
     white-space: nowrap;
     float: none;
 }
+ul.DataList div.Meta a.Category:hover,
 div.BoxCategories ul.PanelInfo li strong a:hover,
 div.Tags ul.PanelInfo li strong a:hover {
     background-color: #3E6D8E;
@@ -415,12 +419,12 @@ div.Box h4 {
 	color: #333;
 }
 ul.PanelInfo {
-	border-top:1px solid #ccc;
+	border-top: 1px dotted #999;
 }
 ul.PanelInfo li,
 ul.PanelInfo li.Active {
 	background: none;
-	border-bottom: 1px solid #ccc;
+	border-bottom: 1px dotted #999;
 }
 ul.PanelInfo li.Active {
 	background: #f9f9f9;
@@ -442,9 +446,6 @@ body.Profile ul.PanelInfo li a:hover {
 	background: #D8DFEA;
 }
 
-body.Activity #Content{
-width: auto;
-} 
 ul.Activities ul.DataList li {
     background:#EEEEEE;
 
@@ -484,10 +485,12 @@ ul.DataList div.Options {
     width: auto;
 }
 ul.DataList div.Meta strong {
+    background: none;
     -moz-box-shadow: 0 0 0 #777777;
-    left: 610px;
-    top:30px;
-    position: absolute;
+    left: auto;
+    top: auto;
+    position: relative;
+    font-size: 13px;
     white-space: nowrap;
 }
 #conversations_messages_inbox ul.DataList div.Meta strong {
@@ -503,13 +506,24 @@ ul.DataList div.Meta strong {
 	}
 	
 ul.MessageList div.Meta span.Votes {
-
-    right: 0;
+    position: relative;
+    right: auto;
+    float: right;
 }
 
 div.MessageForm {
     background:  #EEEEEE;
     border-bottom: 1px solid #DDDDDD;
+}
+div.Preview div.Message, ul.MessageList div.Message {
+    font-size: 14px;
+}
+div.User h1 {
+    display: inline-block;
+}
+#Status {
+    background: none;
+    display: inline-block;
 }
 
 /* voting */
@@ -576,13 +590,21 @@ span.Votes span {
     color: #555555 !important;
  
 }
+div.Meta span.CommentCount {
+    display: inline;
+}
 
 
 ul.DataList a.Title {
     font-size: 16.6px;
 }
-ul.DataList div.Meta {
+ul.Discussions div.Meta {
+    text-align: right;
     font-size: 13px;
+}
+ul.DataList div.Meta span,
+ul.DataList div.Meta strong {
+    direction: rtl;
 }
 ul.DataList div.Meta span.Announcement {
     background: none;

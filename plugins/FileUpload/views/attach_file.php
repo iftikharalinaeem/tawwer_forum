@@ -7,8 +7,8 @@
          <div class="FileSize"><?php echo T('FileSize'); ?></div>
          <div class="UploadProgress">
             <div class="Foreground"><strong><?php echo T('Uploading...'); ?></strong></div>
-            <div class="Background">&nbsp;</div>
-            <div>&nbsp;</div>
+            <div class="Background">&#160;</div>
+            <div>&#160;</div>
          </div>
          <a class="InsertImage Hidden"><?php echo T('Insert Image'); ?></a>
       </div>

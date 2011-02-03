@@ -550,3 +550,31 @@ ul.MessageList div.Message blockquote {
 div.Attachments {
 	background: #2a2a2a;
 }
+
+/* A few fixes for the voting plugin. */
+ul.MessageList div.Meta span.Votes {
+    right: 10px;
+}
+
+span.Votes a {
+    background-color: #494949;
+    color: #CCC !important;
+}
+
+span.Votes a:hover {
+    background-color: #595959;
+    color: #CCC !important;
+}
+
+span.Votes span {
+    background-color: #595959;
+    color: #CCC !important;
+}
+
+.StatBox {
+    background-color: #333333;
+}
+
+.FollowsBox, .AnswersBox {
+    background-color: #444444;
+}

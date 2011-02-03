@@ -123,7 +123,7 @@ echo $this->Form->Close();
    // Write the remaining cells.
    if ($Col != 0) {
       for ($i = $Col; $i != 0; $i = ($i + 1) % $Cols) {
-         echo '<td class="Addon Empty">&nbsp;</td>';
+         echo '<td class="Addon Empty">&#160;</td>';
       }
       echo '</tr>';
    }

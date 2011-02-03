@@ -258,7 +258,6 @@ i.SpriteFive { background-position: 0 -148px; }
 body#vforg_home_features .Banner ul li.Features,
 body#dashboard_search_index .Banner ul li.Community,
 body.hosting .Banner ul li.Hosting,
-body.Wiki .Banner ul li.Documentation,
 body.Addons .Banner ul li.Addons,
 body.Profile .Banner ul li.Community,
 body.Vanilla .Banner ul li.Community,
@@ -270,7 +269,6 @@ body#vforg_home_features .Banner ul li.Features a,
 body#vforg_home_index .Banner ul li.Home a,
 body#dashboard_search_index .Banner ul li.Community a,
 body.hosting .Banner ul li.Hosting a,
-body.Wiki .Banner ul li.Documentation a,
 body.Addons .Banner ul li.Addons a,
 body.Profile .Banner ul li.Community a,
 body.Vanilla .Banner ul li.Community a,
@@ -1256,3 +1254,56 @@ div.Feature h4 {
 body.Discussion a.Bookmark {
 	margin:2px 8px;
 }
+
+.Pages #Panel {
+   display: none;
+}
+
+.Pages #Content {
+   float: none;
+   width: 100%;
+}
+
+.Pages #Frame {
+   background: url('images/bg-fade2.png') 0 -30px repeat-x #fff;
+   color: #000;
+	padding: 20px 0 0 0;
+}
+body.Pages div#Foot {
+   border-bottom: none;
+   color: #777777;
+}
+.Pages #Content h1 {
+   color: #000;
+   border-color: #BFD1E1;
+}
+.Pages #Content h2 {
+   color: #000;
+   border-color: #BFD1E1;
+}
+.Pages #Content h3 {
+   color: #000;
+   border-color: #BFD1E1;
+}
+
+.MainTOC {
+   margin-top: 10px;
+   text-align: center;
+}
+
+.MainTOC .Section {
+   text-align: left;
+   vertical-align: top;
+   display: inline-block;
+   width: 290px;
+   padding: 10px;
+}
+
+#Content .MainTOC .Section h2 {
+   margin: 0px 0px;
+}
+
+.MainTOC .Section ul {
+   padding: 2px 15px 10px;
+}
+
