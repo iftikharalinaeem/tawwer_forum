@@ -25,7 +25,6 @@ $PluginInfo['Memcache'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
-Gdn_LibraryMap::SafeCache('library','class.memcache.php',dirname(__FILE__).DS.'class.memcache.php');
 class MemcachePlugin extends Gdn_Plugin {
 
    public function __construct() {
