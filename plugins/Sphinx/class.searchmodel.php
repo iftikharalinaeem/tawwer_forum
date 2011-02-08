@@ -1,4 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
+/**
+ * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ */
 
 class SearchModel extends Gdn_Model {
 	/// PROPERTIES ///
