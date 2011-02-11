@@ -32,7 +32,7 @@ class SitemapsPlugin extends Gdn_Plugin {
    protected $Root;
    protected $Lastmod;
 
-   public function PluginController_Sitemaps_Create(&$Sender) {
+   public function PluginController_Sitemaps_Create($Sender) {
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
@@ -47,7 +47,7 @@ class SitemapsPlugin extends Gdn_Plugin {
       }
    }
    
-   public function PostController_AfterDiscussionSave_Handler(&$Sender) {
+   public function PostController_AfterDiscussionSave_Handler($Sender) {
       $Discussion = $Sender->EventArguments['Discussion'];
       $DiscussionPostDate = strtotime($Discussion->DateInserted);
       $DiscussionPostIndex = (int)date('Y',$DiscussionPostDate) + (int)date('d',$DiscussionPostDate);
@@ -60,7 +60,7 @@ class SitemapsPlugin extends Gdn_Plugin {
       }
    }
    
-   public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {
+   public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
       if (!C('Plugin.Sitemaps.Regenerate')) return;
       RemoveFromConfig('Plugin.Sitemaps.Regenerate');
       $Sender->AddJsFile($this->GetResource('js/sitemaps.js',FALSE,FALSE));
@@ -73,7 +73,7 @@ class SitemapsPlugin extends Gdn_Plugin {
       $Sender->Render($this->GetView('showfile.php'));
    }
    
-   public function RenderMap(&$Sender, $Filename) {
+   public function RenderMap($Sender, $Filename) {
       $MapDir = CombinePaths(array(PATH_CACHE,C('Plugin.Sitemaps.MapDir', 'Sitemaps')));
       if (!is_dir($MapDir)) return;
       
