@@ -30,7 +30,7 @@ class StatsTask extends Task {
       mysql_free_result($StatsResult);
 
       // Select vfcom again.
-      mysql_select_db(DATABASE_MAIN, $this->Database);
+      mysql_select_db($this->TaskList->DBMAIN, $this->Database);
 
       // Construct the insert query for the stats.
       $InsertQuery = "insert ignore GDN_SiteStat (SiteID, Date, CountComments) values ".
