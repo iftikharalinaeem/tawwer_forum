@@ -36,7 +36,7 @@ class VfcomPlugin extends Gdn_Plugin {
       if (is_null($VfcomClient)) return;
       
       $VfcomHostname = C('VanillaForums.Hostname', 'vanillaforums.com');
-      $Args['Urls'][''] = $FinalURL = sprintf('http://%s.static.%s',
+      $Args['Urls'][''] = $FinalURL = sprintf('http://%s.static.%s/uploads',
          $VfcomClient,
          $VfcomHostname
       );
