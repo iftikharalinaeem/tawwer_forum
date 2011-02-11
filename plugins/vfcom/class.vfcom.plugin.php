@@ -31,15 +31,16 @@ class VfcomPlugin extends Gdn_Plugin {
    }
    
    public function Gdn_Upload_GetUrls_Handler($Sender, $Args) {
+      
       $VfcomClient = C('VanillaForums.SiteName', NULL);
       if (is_null($VfcomClient)) return;
       
       $VfcomHostname = C('VanillaForums.Hostname', 'vanillaforums.com');
-      $VfcomClientFolder = $VfcomClient.'.'.$VfcomHostname;
-      $Args['Urls'][''] = sprintf('http://static.%s/%s',
-         $VfcomHostname,
-         $VfcomClientFolder
+      $Args['Urls'][''] = $FinalURL = sprintf('http://%s.static.%s',
+         $VfcomClient,
+         $VfcomHostname
       );
+
    }
    
    public function Setup() {
