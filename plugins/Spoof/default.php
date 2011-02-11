@@ -4,7 +4,7 @@
 $PluginInfo['Spoof'] = array(
    'Name' => 'Spoof',
    'Description' => 'Allows users with admin role to "spoof" users in their system. Helpful for debugging permission issues.',
-   'Version' => '1',
+   'Version' => '1.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'
@@ -18,9 +18,17 @@ class SpoofPlugin implements Gdn_IPlugin {
       $Menu->AddLink('Users', T('Spoof'), 'dashboard/user/spoof', 'Garden.Admin.Only');
 	}
    
-   public function UserController_Spoof_Create(&$Sender) {
-      $Sender->Title('Spoof');
+   public function UserController_Spoof_Create($Sender) {
       $Sender->AddSideMenu('dashboard/user/spoof');
+		$this->_SpoofMethod($Sender);
+	}
+	
+	public function EntryController_Spoof_Create($Sender) {
+		$this->_SpoofMethod($Sender);
+	}
+	
+	private function _SpoofMethod($Sender) {
+      $Sender->Title('Spoof');
       $Sender->Form = new Gdn_Form();
       $UserReference = $Sender->Form->GetValue('UserReference', '');
       $Email = $Sender->Form->GetValue('Email', '');
@@ -28,6 +36,7 @@ class SpoofPlugin implements Gdn_IPlugin {
       if ($UserReference != '' && $Email != '' && $Password != '') {
          $UserModel = Gdn::UserModel();
          $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
+			// if (1 == 1) {
          if (is_object($UserData) && $UserData->Admin == '1') {
 				if (is_numeric($UserReference)) {
 					$SpoofUser = $UserModel->Get($UserReference);

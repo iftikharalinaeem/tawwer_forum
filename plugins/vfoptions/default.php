@@ -4,11 +4,12 @@
 $PluginInfo['vfoptions'] = array(
    'Name' => 'VF.com Admin Options',
    'Description' => 'VF.com admin options.',
-   'Version' => '1',
+   'Version' => '1.1',
    'MobileFriendly' => TRUE,
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
+   'AuthorUrl' => 'http://vanillaforums.com',
+   'Hidden' => TRUE
 );
 
 Gdn_LibraryMap::SafeCache('library','class.tokenauthenticator.php',dirname(__FILE__).DS.'class.tokenauthenticator.php');
@@ -140,6 +141,11 @@ pageTracker._trackPageview();
 
          $Sender->AddAsset('Content', $Script);
       }
+   }
+
+   public function AddonBrowserPlugin_AddonSettings_Handler($Sender) {
+      $Sender->Installer = new LinkAddonInstaller('/srv/www/source/stable/addons');
+      $Sender->ShowHidden = FALSE;
    }
    
    public function PluginController_ForceEnablePlugin_Create($Sender) {

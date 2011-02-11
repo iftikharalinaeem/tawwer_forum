@@ -29,8 +29,8 @@ class PostCountPlugin extends Gdn_Plugin {
    public function UserInfoModule_OnBasicInfo_Handler(&$Sender) {
       $UserID = $Sender->User->UserID;
       $PostCount = GetValue("PostCount", Gdn::Database()->Query(sprintf("SELECT COALESCE(u.CountComments,0) + COALESCE(u.CountDiscussions,0) AS PostCount FROM GDN_User u WHERE UserID = %d",$UserID))->FirstRow(DATASET_TYPE_ARRAY),0);
-      echo "<dt>".T(Plural($PostCount, 'Posts', 'Posts'))."</dt>\n";
-      echo "<dd>".number_format($PostCount)."</dd>";
+      echo "<dt class=\"Posts\">".T(Plural($PostCount, 'Posts', 'Posts'))."</dt>\n";
+      echo "<dd class=\"Posts\">".number_format($PostCount)."</dd>";
    }
    
    public function DiscussionController_BeforeDiscussionRender_Handler(&$Sender) {

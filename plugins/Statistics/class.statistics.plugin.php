@@ -86,6 +86,16 @@ class StatisticsPlugin extends Gdn_Plugin {
    public function Controller_Catchup($Sender) {
       $Sender->Render($this->GetView("catchup.php"));
    }
+
+   public function Controller_ExecCatchupInit($Sender) {
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+
+      list($Method, $TrackedItem) = $Sender->RequestArgs; $TrackedItem = strtolower($TrackedItem);
+      $this->CatchupGenericInit($TrackedItem);
+
+      $Sender->SetData('Status', 'complete');
+   }
    
    public function Controller_ExecCatchup($Sender) {
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
@@ -189,6 +199,13 @@ class StatisticsPlugin extends Gdn_Plugin {
       
       $Sender->Render($this->GetView("blank.php"));
    }
+
+   protected function CatchupGenericInit($TrackType) {
+      // Clear data for this tracktype
+      Gdn::Database()->SQL()->Delete('Statistics', array(
+         'IndexType' => $TrackType
+      ));
+   }
    
    protected function CatchupGeneric($TrackType, &$Response) {
    
@@ -229,23 +246,47 @@ class StatisticsPlugin extends Gdn_Plugin {
       $FinalBlock = $this->NextDate($LastHour, self::RESOLUTION_HOUR);
       $FinalBlockValue = strtotime($FinalBlock);
       
-      // Clear data for this tracktype
-      Gdn::Database()->SQL()->Delete('Statistics', array(
-         'IndexType' => $TrackType
-      ));
+//      // Clear data for this tracktype
+//      Gdn::Database()->SQL()->Delete('Statistics', array(
+//         'IndexType' => $TrackType
+//      ));
+
+      $Px = Gdn::Database()->DatabasePrefix;
+
+      $Sql = "
+         select
+            count({$Type}ID) as Hits,
+            date_format(DateInserted, '%Y-%m-%d %H:00') as HourInserted
+         from {$Px}{$Type}
+         where DateInserted >= :CurrentHour
+            and DateInserted < :NextHour
+         group by date_format(DateInserted, '%Y-%m-%d %H:00')
+         order by date_format(DateInserted, '%Y-%m-%d %H:00')";
       
       // Loop over lowest denomination chunks and use intelligent summing for larger blocks
       $CurrentHour = $this->DateFormatByResolution($FirstDate, self::RESOLUTION_HOUR);
       do {
-         $NextHour = $this->NextDate($CurrentHour, self::RESOLUTION_HOUR);
-         $Items = Gdn::SQL()
-            ->Select('DateInserted','COUNT','Hits')
-            ->From($Type)
-            ->Where('DateInserted>=',$CurrentHour)
-            ->Where('DateInserted<',$NextHour)
-            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
-            
-         $this->CachedTrackEvent($TrackType, 'none', $CurrentHour, $Items['Hits']);
+//         $NextHour = $this->NextDate($CurrentHour, self::RESOLUTION_HOUR);
+//
+//         $Items = Gdn::SQL()
+//            ->Select('DateInserted','COUNT','Hits')
+//            ->From($Type)
+//            ->Where('DateInserted>=',$CurrentHour)
+//            ->Where('DateInserted<',$NextHour)
+//            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+//
+//         $this->CachedTrackEvent($TrackType, 'none', $CurrentHour, $Items['Hits']);
+//         $CurrentHour = $NextHour;
+//         $NextHourValue = strtotime($NextHour);
+         $NextHour = $this->NextDate($CurrentHour, self::RESOLUTION_WEEK);
+
+         $Items = Gdn::Database()->Query($Sql, array(':CurrentHour' => $CurrentHour, ':NextHour' => $NextHour))->ResultArray();
+         
+         foreach ($Items as $Row) {
+            $CurrentHour = $Row['HourInserted'];
+            $this->CachedTrackEvent($TrackType, 'none', $CurrentHour, $Row['Hits']);
+         }
+         
          $CurrentHour = $NextHour;
          $NextHourValue = strtotime($NextHour);
       } while ($NextHourValue <= $FinalBlockValue);

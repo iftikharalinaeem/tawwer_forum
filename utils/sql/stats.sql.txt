@@ -10,7 +10,7 @@ join GDN_Account a
 left join GDN_SiteStat sl
   on sl.SiteID = ss.SiteID and date_add(sl.Date, interval 1 month) = ss.Date
 where a.Internal = 0
-  and ss.CountComments > 10
+  and ss.CountComments > 0
 group by ss.Date;
 
 /* New active accounts */

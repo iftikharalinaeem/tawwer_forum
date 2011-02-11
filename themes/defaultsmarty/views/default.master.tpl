@@ -34,6 +34,5 @@
     {asset name="Foot"}
  </div>
 </div>
-
 </body>
 </html>

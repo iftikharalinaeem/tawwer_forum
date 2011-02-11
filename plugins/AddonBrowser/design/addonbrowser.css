@@ -1,15 +1,13 @@
-ul.Addons {
+.Addons {
    border-top: 1px solid #8bc1de;
 }
 
-ul.Addons li.Addon {
-   padding: 10px 20px;
+.Addons .Addon {
    border-bottom: solid 1px #E0E0E0;
-   position: relative;
-   overflow: hidden;
+   padding: 0;
 }
 
-li.Addon .Foot {
+.Addon .Foot {
    clear: left;
 }
 
@@ -17,13 +15,13 @@ li.Addon .Foot {
    background-color: #FFFF88;
 }
 
-ul.Addons .AddonIcon {
+.Addons .AddonIcon {
    float: left;
    margin-right: 10px;
    margin-bottom: 10px;
 }
 
-ul.Addons .Buttons {
+.Addons .Buttons {
    clear: both;
    display: inline-block;
    width: 120px;
@@ -31,6 +29,40 @@ ul.Addons .Buttons {
    padding-left: 8px;
 }
 
-ul.Addons .Meta {
+.Addons .Meta {
    display: inline-block;
+}
+
+.Addons .Theme .AddonIcon {
+   width: 124px;
+   border: solid 1px #777;
+   padding: 1px;
+}
+
+.Addons .Enabled {
+   background: url(gradient.png) repeat-x;
+}
+
+.Addons td.Addon {
+   width: 50%;
+}
+
+.Addons td.Addon .SmallButton {
+   margin: 0;
+}
+
+.Addons td.Addon .Con {
+   padding: 10px 10px;
+   position: relative;
+   overflow: hidden;
+}
+
+.Addons .Con img.PlanRequirement {
+   position: absolute;
+   left: 8px;
+   top: 8px;
+}
+
+body.addons .Errors {
+   border-top: 1px solid #8BC1DE;
 }

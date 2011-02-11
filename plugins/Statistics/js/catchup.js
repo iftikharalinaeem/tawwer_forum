@@ -3,7 +3,7 @@ function Gdn_Statistics() {
    Gdn_Statistics.prototype.Prepare = function() {
    
       this.CatchingUp = false;
-      this.Elements = ['comments','discussions','registrations'];
+      this.Elements = ['registrations','discussions','comments'];
       this.Queue = [];
       this.Active = false;
    
@@ -47,14 +47,21 @@ function Gdn_Statistics() {
          
          var NextQueueItem = this.Queue.shift();
          this.Active = NextQueueItem;
-         
+         var self = this;
+
          $.ajax({
-            url: gdn.url('plugin/statistics/execcatchup/'+this.Active),
+            url: gdn.url('plugin/statistics/execcatchupinit/'+this.Active),
             dataType: 'json',
-            success: jQuery.proxy(this.DoneCatchup, this)
+            success: function() {
+               $.ajax({
+                  url: gdn.url('plugin/statistics/execcatchup/'+self.Active),
+                  dataType: 'json',
+                  success: jQuery.proxy(self.DoneCatchup, self)
+               });
+
+               self.Monitor();
+            }
          });
-         
-         this.Monitor();
       }
    }
    
