@@ -23,13 +23,13 @@ $PluginInfo['GoogleAdSense'] = array(
 // require_once(dirname(__FILE__).DS.'class.adsensemodule.php');
 
 class Gdn_AdSensePlugin implements Gdn_IPlugin {	
-   public function Discussion_Render_Before($Sender) {
+   public function DiscussionController_Render_Before($Sender) {
 		// Only serve the ads if we are delvering the entire page.
 		if($Sender->DeliveryType() != DELIVERY_TYPE_ALL)
 			return;
       
       if (property_exists($Sender, 'Head') && is_object($Sender->Head)) {
-         $Head->AddString('<script type="text/javascript" src="http://s.skimresources.com/js/7631X665150.skimlinks.js"></script>');
+         $Sender->Head->AddString('<script type="text/javascript" src="http://s.skimresources.com/js/7631X665150.skimlinks.js"></script>');
       }
 		
 		// Get the add content.
