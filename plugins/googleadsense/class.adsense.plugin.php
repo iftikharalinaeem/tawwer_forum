@@ -28,9 +28,8 @@ class Gdn_AdSensePlugin implements Gdn_IPlugin {
 		if($Sender->DeliveryType() != DELIVERY_TYPE_ALL)
 			return;
       
-      if (property_exists($Sender, 'Head') && is_object($Sender->Head)) {
-         $Sender->Head->AddString('<script type="text/javascript" src="http://s.skimresources.com/js/7631X665150.skimlinks.js"></script>');
-      }
+      // Add skimlinks script at bottom of page.
+		$Sender->AddAsset('Foot', '<script type="text/javascript" src="http://s.skimresources.com/js/7631X665150.skimlinks.js"></script>');
 		
 		// Get the add content.
 		// $Config = Gdn::Config('Plugins.GoogleAdSense', FALSE);
