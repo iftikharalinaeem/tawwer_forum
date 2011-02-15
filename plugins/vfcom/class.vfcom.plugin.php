@@ -9,15 +9,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 // Define the plugin:
-$PluginInfo['Memcache'] = array(
-   'Name' => 'Memcache',
-   'Description' => 'This plugin replaces the default Vanilla filecache system with memcache.',
+$PluginInfo['vfcom'] = array(
+   'Name' => 'VanillaForums.com Hosting',
+   'Description' => "This plugin applies modifications needed for vanilla to support multiple webhead technology.",
    'Version' => '1.0',
+   'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
-   'SettingsUrl' => '/dashboard/settings/memcache',
-   'SettingsPermission' => 'Garden.AdminUser.Only',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
@@ -25,14 +24,23 @@ $PluginInfo['Memcache'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
-class MemcachePlugin extends Gdn_Plugin {
-
+class VfcomPlugin extends Gdn_Plugin {
+   
    public function __construct() {
       
    }
    
-   public function Gdn_PluginManager_BeforeActiveCache_Handler($Sender) {
-      $Sender->EventArguments['ActiveCache'] = 'memcache';
+   public function Gdn_Upload_GetUrls_Handler($Sender, $Args) {
+      
+      $VfcomClient = C('VanillaForums.SiteName', NULL);
+      if (is_null($VfcomClient)) return;
+      
+      $VfcomHostname = C('VanillaForums.Hostname', 'vanillaforums.com');
+      $Args['Urls'][''] = $FinalURL = sprintf('http://%s.static.%s/uploads',
+         $VfcomClient,
+         $VfcomHostname
+      );
+
    }
    
    public function Setup() {
