@@ -10,7 +10,10 @@ a:hover{
 	color: #ff000;
 }
 #Panel li a{
-	color: #ccc;
+	color: #f1f1f1;
+}
+ul.PanelInfo li.Active a {
+    color: #fff;
 }
 a.Button, .Button {
     color: #000;
@@ -46,16 +49,21 @@ div.Popup h2 {
 }
 #TopBanner{
 	background: url(top_banner.png) no-repeat;
-	width: 980px;
-	height: 350px;
+    height: 350px;
+    position: relative;
+    vertical-align: bottom;
+    width: 980px;
 }
 .TitleBanner{
-	color: #FFFFFF;
-   font-size: 30px;
-   left: 320px;
-   position: absolute;
-   top: 280px;
-   text-shadow: 0 1px 1px #000;
+	 bottom: 0;
+    color: #FFFFFF;
+    font-size: 30px;
+    margin: 0 0 10px 0;
+    position: absolute;
+    text-align: center;
+    text-shadow: 0 1px 1px #000000;
+    vertical-align: bottom;
+    width: 980px;
 }
 .Banner ul {
 	 background: none repeat scroll 0 0 transparent;
@@ -351,7 +359,7 @@ ul.PanelInfo li.Active {
 	border-bottom: 1px solid #675251;
 }
 ul.PanelInfo li.Active {
-	background: #ffd;
+	background: #c00e0e;
 }
 body.Profile ul.PanelInfo {
 	border: none;

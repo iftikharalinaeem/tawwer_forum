@@ -8,7 +8,7 @@
 
 	 <div class="Banner">
 	 
-	   	 <div id="TopBanner"><p class="TitleBanner">Super Heroin Forums</p></div>
+	   	 <div id="TopBanner"><div class="TitleBanner"><a class="Title" href="{link path="/"}">{logo}</a></div></div>
 
 	 
 		<ul>
