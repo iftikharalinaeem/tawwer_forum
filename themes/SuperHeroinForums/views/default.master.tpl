@@ -8,7 +8,13 @@
 
 	 <div class="Banner">
 	 
-	   	 <div id="TopBanner"><div class="TitleBanner"><a class="Title" href="{link path="/"}">{logo}</a></div></div>
+	   	 <div id="TopBanner">
+	   	 		 
+	   	 		 <div class="TitleBanner"><a class="Title" href="{link path="/"}">{logo}</a></div>
+	   	 	 	 
+	   	 	 	 <center><div class="AdBanner"></div></center>
+
+	   	 </div>
 
 	 
 		<ul>
@@ -24,7 +30,6 @@
 	 
 	 <div id="Body">
 	 
-	 	 <div class="AdBanner"></div>
 
 	 
 	 		<div class="Wrapper">
