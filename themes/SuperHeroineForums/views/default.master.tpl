@@ -12,12 +12,12 @@
 	   	 		 
 	   	 		 <div class="TitleBanner"><a class="Title" href="{link path="/"}">{logo}</a></div>
 	   	 	 	 
-	   	 	 	 <center><div class="AdBanner"></div></center>
+	   	 	 	 <div class="Banner"><img src="/themes/SuperHeroineForums/design/{$BannerName}" /></div>
 
 	   	 </div>
 
 	 
-		<ul>
+		<ul class="Menu">
 		  {dashboard_link}
 		  {discussions_link}
 		  {activity_link}

@@ -53,13 +53,19 @@ div.Popup h2 {
     vertical-align: bottom;
     width: 980px;
 }
-.TitleBanner{
-	 color: #FFFFFF;
-    font-size: 30px;
-    margin: 20px 0;
-    text-align: center;
-    text-shadow: 0 1px 1px #000000;
+.TitleBanner {
+    margin: 10px 0;
     width: 980px;
+}
+.TitleBanner .Title {
+   color: #675251;
+   font-variant: small-caps;
+   font-family: verdana, sans-serif;
+   letter-spacing: 0.5ex;
+   font-size: 22px;
+}
+#TopBanner .Banner {
+   text-align: center;
 }
 .Banner ul {
 	 background: none repeat scroll 0 0 transparent;
@@ -393,4 +399,13 @@ input.DateBox, input.InputBox, input.SmallInput, textarea {
     color: #333333;
     font-size: 12px;
  
+}
+
+body.disclaimer .Menu {
+   display: none;
+}
+
+body.disclaimer #Content .Box {
+   font-size: 20px;
+   padding: 10px;
 }

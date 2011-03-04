@@ -11,8 +11,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * An associative array of information about this application.
  */
-$ThemeInfo['SuperHeroinForum'] = array(
-   'Name' => 'Super Heroin Forum',
+$ThemeInfo['SuperHeroineForums'] = array(
+   'Name' => 'Super Heroin Forums',
    'Description' => "Custom Forum for Super Heroin",
    'Version' => '1.0',
    'Author' => "Brendan Sera-Shriar",
