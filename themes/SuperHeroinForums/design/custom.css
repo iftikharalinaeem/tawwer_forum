@@ -1,19 +1,19 @@
 body{
-	background: #000;
-	color: #fff;
+	background: #fff;
+	color: #000;
 }
 a, a:link, a:visited, a:active {
-    color: #fff;
+    color: #000;
     text-decoration: none;
 }
 a:hover{
 	color: #ff000;
 }
 #Panel li a{
-	color: #f1f1f1;
+	color: #000;
 }
 ul.PanelInfo li.Active a {
-    color: #fff;
+    color: #ddd;
 }
 a.Button, .Button {
     color: #000;
@@ -48,21 +48,17 @@ div.Popup h2 {
     width: 980px;
 }
 #TopBanner{
-	background: url(top_banner.png) no-repeat;
-    height: 350px;
+    height: 150px;
     position: relative;
     vertical-align: bottom;
     width: 980px;
 }
 .TitleBanner{
-	 bottom: 0;
-    color: #FFFFFF;
+	 color: #FFFFFF;
     font-size: 30px;
-    margin: 0 0 10px 0;
-    position: absolute;
+    margin: 20px 0;
     text-align: center;
     text-shadow: 0 1px 1px #000000;
-    vertical-align: bottom;
     width: 980px;
 }
 .Banner ul {
@@ -81,7 +77,7 @@ div.Popup h2 {
 	font-weight: bold;
 	padding: 3px 6px;
 	font-size: 12px;
-	color: #fff;
+	color: #000;
 	display: inline-block;
 }
 .Banner ul li a:hover {
@@ -106,7 +102,7 @@ div.Popup h2 {
 	top: -3px;
 }
 #Panel {
-    margin: -105px -10px 0 0;
+    margin: 0;
 }
 
 #Panel div.SearchBox input.InputBox {
@@ -250,7 +246,7 @@ ul.DataList li.Item {
     border-bottom: 1px solid #675251;
 }
 .Mine, .Alt, .New { 
-	background: #000; 
+	background: #fff; 
 }
 
 ul.DataList li.Mine div.Meta a.Category {
@@ -359,7 +355,7 @@ ul.PanelInfo li.Active {
 	border-bottom: 1px solid #675251;
 }
 ul.PanelInfo li.Active {
-	background: #c00e0e;
+	background: #eee;
 }
 body.Profile ul.PanelInfo {
 	border: none;
@@ -374,7 +370,7 @@ body.Profile ul.PanelInfo li a {
 	padding: 0 6px;
 }
 body.Profile #Panel ul.PanelInfo li a:hover{
-	background: #000;
+	background: #fff;
 	color: #c00e0e;
 }
 
