@@ -21,7 +21,8 @@ $PluginInfo['ProxyConnectWordpress'] = array(
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'Hidden' => TRUE
 );
 
 class ProxyConnectWordpressPlugin extends Gdn_Plugin {
