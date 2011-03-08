@@ -20,7 +20,8 @@ $PluginInfo['Signatures'] = array(
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'MobileFriendly' => FALSE
 );
 
 class SignaturesPlugin extends Gdn_Plugin {

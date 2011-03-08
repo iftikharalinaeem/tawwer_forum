@@ -12,9 +12,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProxyConnect'] = array(
 	'Name' => 'Vanilla Proxyconnect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
-   'Version' => '1.8.5a',
+   'Version' => '1.9',
    'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.0.11'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/authentication/proxy',
@@ -128,20 +128,18 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    
    protected function SetIntegrationManager($ManagerName) {
       $Manager = $this->IntegrationManagers[$ManagerName];
+      $OldManager = C('Plugin.ProxyConnect.IntegrationManager', FALSE);
       
-      if ($OldManager = C('Plugin.ProxyConnect.IntegrationManager', FALSE)) {
+      if ($OldManager !== FALSE) {
          $OldManagerData = $this->IntegrationManagers[$OldManager];
          if (Gdn::PluginManager()->CheckPlugin($OldManagerData['Index'])) {
-            echo "Disabled";
             Gdn::PluginManager()->DisablePlugin($OldManagerData['Index']);
-         } else {
-            echo "Not Disabled";
          }
       }
       
       $AlreadyEnabled = Gdn::PluginManager()->CheckPlugin($Manager['Index']);
       if (!$AlreadyEnabled) {
-         Gdn::PluginManager()->EnablePlugin($Manager['ClassName'], FALSE, FALSE, "ClassName");
+         Gdn::PluginManager()->EnablePlugin($Manager['Index'], FALSE, TRUE);
       }
       SaveToConfig('Plugin.ProxyConnect.IntegrationManager', $ManagerName);
       $this->IntegrationManager = $ManagerName;
@@ -302,6 +300,9 @@ class ProxyConnectPlugin extends Gdn_Plugin {
 		$WasEnabled = Gdn::Authenticator()->UnsetDefaultAuthenticator('proxy');
       if ($WasEnabled)
          RemoveFromConfig('Garden.SignIn.Popup');
+         
+      $InternalPluginFolder = $this->GetResource('internal');
+      Gdn::PluginManager()->RemoveSearchPath($InternalPluginFolder);
    }
 	
    public function AuthenticationController_EnableAuthenticatorProxy_Handler(&$Sender) {
@@ -311,6 +312,9 @@ class ProxyConnectPlugin extends Gdn_Plugin {
 	private function _Enable($FullEnable = TRUE) {
 		SaveToConfig('Garden.Authenticators.proxy.Name', 'ProxyConnect');
       SaveToConfig('Garden.Authenticators.proxy.CookieName', 'VanillaProxy');
+      
+      $InternalPluginFolder = $this->GetResource('internal');
+      Gdn::PluginManager()->AddSearchPath($InternalPluginFolder, 'ProxyConnect RIMs');
       
       if ($FullEnable) {
          SaveToConfig('Garden.SignIn.Popup', FALSE);
