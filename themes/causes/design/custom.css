@@ -767,3 +767,7 @@ div.Methods {
 div.Methods div:first-child {
 	display: none;
 }
+
+#dashboard_entry_connect {
+	background: #fff;
+}
