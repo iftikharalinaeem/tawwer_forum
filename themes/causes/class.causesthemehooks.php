@@ -4,7 +4,7 @@ class CausesThemeHooks implements Gdn_IPlugin {
 	
 	// Don't let users see any of the registration screens (they must use facebook).
 	public function EntryController_Render_Before($Sender) {
-		if (strtolower($Sender->RequestMethod) == 'register')
+		if (in_array(strtolower($Sender->RequestMethod), array('signout', 'register')))
 			Redirect('discussions');
 
 	}
