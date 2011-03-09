@@ -41,6 +41,7 @@
 			 <?php
 				$Wrap = Wrap('<a href="%url" class="%class">%text</a>', 'li');
 				echo Gdn_Theme::Link('dashboard', 'Dashboard', $Wrap);
+				echo Gdn_Theme::Link('categories', 'Categories', $Wrap);
 				echo Gdn_Theme::Link('discussions', 'Discussions', $Wrap);
 				echo Gdn_Theme::Link('activity', 'Activity', $Wrap);
 				echo Gdn_Theme::Link('inbox', 'Inbox', $Wrap);

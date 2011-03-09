@@ -9,6 +9,11 @@ class CausesThemeHooks implements Gdn_IPlugin {
 
 	}
 	
+	public function CategoriesController_Render_Before($Sender) {
+		if (strtolower($Sender->RequestMethod) == 'all')
+			Redirect('categories');
+	}
+	
    public function Setup() {
 		return TRUE;
    }
