@@ -125,7 +125,7 @@ Have fun!!
 			$IncludeTheme = $Sender->Form->GetFormValue('IncludeTheme');
 			
 			if ($IsApply || $IsSave)
-				$Sender->StatusMessage = "Your changes have been applied.";
+				$Sender->InformMessage("Your changes have been applied.");
 			
 			if ($IsApply) {
 				SaveToConfig('Plugins.CustomCSS.File', $FileName);

@@ -121,7 +121,7 @@ TWITCODE;
          $ConfigurationModel->Validation->ApplyRule('Plugin.Twitter.Username', 'Required');
          
          if ($Sender->Form->Save() !== FALSE) {
-            $Sender->StatusMessage = T("Your changes have been saved.");
+            $Sender->InformMessage(T("Your changes have been saved."));
          }
       }
       

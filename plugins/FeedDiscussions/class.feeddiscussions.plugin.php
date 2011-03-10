@@ -158,7 +158,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
                'Refresh'      => $FormPostValues['FeedDiscussions.FeedOption.Refresh'],
                'LastImport'   => "never"
             ));
-            $Sender->StatusMessage = sprintf(T("Feed has been added"),$FeedURL);
+            $Sender->InformMessage(sprintf(T("Feed has been added"),$FeedURL));
             $Sender->Form->ClearInputs();
                
          } catch(Exception $e) {
@@ -176,7 +176,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
          $FeedURL = self::DecodeFeedKey($ChosenFeed);
          if ($this->HaveFeed($FeedURL)) {
             $this->RemoveFeed($FeedURL);
-            $Sender->StatusMessage = sprintf(T("Feed has been removed"),$FeedURL);
+            $Sender->InformMessage(sprintf(T("Feed has been removed"),$FeedURL));
          }
       }
       
