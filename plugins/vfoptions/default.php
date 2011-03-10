@@ -649,10 +649,10 @@ pageTracker._trackPageview();
    private function _GetDatabase() {
       if (!is_object($this->_Database)) {
          $this->_Database = new Gdn_Database(array(
-            'Name' => Gdn::Config('VanillaForums.Database.Name', 'vfcom'),
-            'Host' => Gdn::Config('Database.Host'),
-            'User' => Gdn::Config('Database.User'),
-            'Password' => Gdn::Config('Database.Password')
+            'Name' => C('VanillaForums.Database.Name', 'vfcom'),
+            'Host' => C('VanillaForums.Database.Host', C('Database.Host')),
+            'User' => C('VanillaForums.Database.User', C('Database.User')),
+            'Password' => C('VanillaForums.Database.Password', C('Database.Password'))
          ));
       }
          
