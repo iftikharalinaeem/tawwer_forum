@@ -9,12 +9,6 @@ class NineToFiveMacThemeHooks implements Gdn_IPlugin {
 		Gdn::Locale()->SetTranslation('Activity.Delete', '×');
 		Gdn::Locale()->SetTranslation('Draft.Delete', '×');
 		Gdn::Locale()->SetTranslation('All Conversations', 'Inbox');
-		Gdn::Locale()->SetTranslation('Apply for Membership', 'Sign Up');
-		Gdn::Locale()->SetTranslation('Apply', 'Sign Up');
-		Gdn::Locale()->SetTranslation('%s comments', '%s');
-		Gdn::Locale()->SetTranslation('%s comment', '%s');
-		Gdn::Locale()->SetTranslation('%s discussions', '%s');
-		Gdn::Locale()->SetTranslation('%s discussion', '%s');
 	}
 
 	/**

@@ -281,8 +281,18 @@ div.Box {
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
 }
+div.Box.GuestBox,
 div.Box.AddPeople {
 	background: #fff;
+}
+div.Box.GuestBox {
+	padding-bottom: 6px;
+}
+div.Box.GuestBox p {
+	padding: 0 6px 4px;
+}
+div.Box.GuestBox a.PopupWindow {
+	margin-left: 6px;
 }
 div.Box.AddPeople form {
 	padding: 4px;
