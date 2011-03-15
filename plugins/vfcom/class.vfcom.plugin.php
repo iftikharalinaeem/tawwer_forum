@@ -21,7 +21,8 @@ $PluginInfo['vfcom'] = array(
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'Hidden' => TRUE
 );
 
 class VfcomPlugin extends Gdn_Plugin {
