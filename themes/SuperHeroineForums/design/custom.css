@@ -259,9 +259,9 @@ ul.DataList li.Mine div.Meta a.Category {
     background: #CCCCCC;
     color: #000;
 }
-ul.DataList div.Meta a {
-    color: #ccc;
-}
+/*ul.DataList div.Meta a {
+    color: #024269;
+}*/
 a.Bookmark {
 	visibility: hidden;
 }
@@ -401,11 +401,14 @@ input.DateBox, input.InputBox, input.SmallInput, textarea {
  
 }
 
-body.disclaimer .Menu {
-   display: none;
+body.disclaimer a {
+   color: #f00;
 }
 
-body.disclaimer #Content .Box {
-   font-size: 20px;
-   padding: 10px;
+body.disclaimer {
+   margin-top: 20px;
+}
+
+body.disclaimer h1 {
+   border: none;
 }
