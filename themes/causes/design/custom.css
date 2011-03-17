@@ -88,8 +88,15 @@ a:hover {
   margin-right: 5px;
   width: 30px;
 }
+.nav .auth img.FacebookIcon {
+	height: auto;
+	width: auto;
+}
 .nav .auth .fbconnect_login_button {
   margin-top: 4px;
+}
+#FacebookAuth:hover {
+	text-decoration: none;
 }
 .VanillaNav {
 	clear: both;
@@ -178,7 +185,7 @@ a.BigButton:hover {
 div.Box {
 	box-shadow: none;
 	-moz-box-shadow: none;
-	-webit-box-shadow: none;
+	-webkit-box-shadow: none;
 	background: none;
 	padding: 0 0 20px 0;
 	margin: 0 0 20px 0;
@@ -744,4 +751,26 @@ div.CategoryBox div.Foot {
 div.CategoryBox ul.Discussions div.ItemContent {
 	margin: 0;
 	padding: 0;
+}
+
+/* Hide Entry & Registration Forms */
+div.Entry div.Box,
+#Form_User_SignIn {
+	display: none;
+}
+div.Methods {
+	padding-top: 0 !important;
+	top: auto;
+	right: auto;
+	position: relative;
+}
+div.Methods div:first-child {
+	display: none;
+}
+
+#dashboard_entry_connect {
+	background: #fff;
+}
+div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
+   background: none;
 }

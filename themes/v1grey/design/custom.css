@@ -584,3 +584,12 @@ span.Votes span {
 .FollowsBox, .AnswersBox {
     background-color: #444444;
 }
+
+table.PreferenceGroup thead td {
+   background: #333;
+   border-bottom: 1px solid #222;
+   border-top: 1px solid #222;
+}
+table.PreferenceGroup tbody td {
+	border-bottom: 1px solid #777;
+}

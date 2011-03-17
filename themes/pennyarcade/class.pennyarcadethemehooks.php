@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-class VanillabookThemeHooks implements Gdn_IPlugin {
+class PennyArcadeThemeHooks implements Gdn_IPlugin {
 	
 	/**
 	 * Move the guest module over to the BodyMenu asset.
@@ -11,6 +11,10 @@ class VanillabookThemeHooks implements Gdn_IPlugin {
 		Gdn::Locale()->SetTranslation('All Conversations', 'Inbox');
 		Gdn::Locale()->SetTranslation('Apply for Membership', 'Sign Up');
 		Gdn::Locale()->SetTranslation('Apply', 'Sign Up');
+		Gdn::Locale()->SetTranslation('%s comments', '%s');
+		Gdn::Locale()->SetTranslation('%s comment', '%s');
+		Gdn::Locale()->SetTranslation('%s discussions', '%s');
+		Gdn::Locale()->SetTranslation('%s discussion', '%s');
 		// Move the howdy stranger module into the BodyMenu asset container
 		if (array_key_exists('Panel', $Sender->Assets)) {
 			if (array_key_exists('GuestModule', $Sender->Assets['Panel'])) {
@@ -19,50 +23,7 @@ class VanillabookThemeHooks implements Gdn_IPlugin {
 			}
 		}
 	}
-	
-	/**
-	 * Move some assets around on the profile page.
-	 */
-	public function ProfileController_Render_Before($Sender) {
-		// Move the "About this user" module into the content asset on the profile page
-		if (array_key_exists('Panel', $Sender->Assets)) {
-			if (array_key_exists('UserInfoModule', $Sender->Assets['Panel'])) {
-				$Sender->Assets['Content']['UserInfoModule'] = $Sender->Assets['Panel']['UserInfoModule'];
-				unset($Sender->Assets['Panel']['UserInfoModule']);
-			}
-		}
 
-		// Move the profile tabs into the Panel asset.
-		if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
-			$ProfileTabs = str_replace(array('<div class="StatusArrow"></div>', 'Tabs ProfileTabs'), array('', 'MainMenu ProfileMenu'), $Sender->FetchView('tabs'));
-			$Sender->AddAsset('Panel', $ProfileTabs);
-		}
-	}
-	
-	/**
-	 * Write ProfileInfo in BodyMenu asset if not on the profile page.
-	 */
-	public function Base_BeforeRenderAsset_Handler($Sender) {
-		if (in_array($Sender->MasterView, array('default', '')) && GetValue('Name', $Sender, '') != 'ProfileController' && $Sender->EventArguments['AssetName'] == 'BodyMenu') {
-			$User = Gdn::Session()->User;
-			if (is_object($User)) {
-				echo '<div class="ProfileInfo">';
-				echo UserPhoto($User, 'UserPhoto');
-				echo UserAnchor($User, 'UserAnchor');
-				echo Anchor(T('Edit My Profile'), '/profile', 'UserEdit');
-				echo '</div>';
-			}
-		}
-	}
-	
-	/**
-	 * Place a little arrow above the status form.
-	 */
-	public function Base_BeforeStatusForm_Handler($Sender) {
-		if (Gdn::Session()->IsValid())
-			echo '<div class="StatusArrow"></div>';
-	}
-	
 	/**
 	 * Add the user photo in each discussion list item.
 	 */
@@ -92,6 +53,22 @@ class VanillabookThemeHooks implements Gdn_IPlugin {
 		$Discussion = GetValue('Discussion', $Sender->EventArguments);
 		if (is_object($Discussion))
 			echo '<div class="Excerpt">'.SliceString(Gdn_Format::Text($Discussion->Body, FALSE), 100).'</div>';
+	}
+	
+	public function CategoriesController_BeforeCategoryItem_Handler($Sender) {
+		$NumRows = GetValue('NumRows', $Sender->EventArguments, 0);
+		$Counter = GetValue('Counter', $Sender->EventArguments, -1);
+		$Category = GetValue('Category', $Sender->EventArguments);
+		if (!is_object($Category))
+			return;
+		
+		if ($Counter == -1)
+			$Sender->EventArguments['Counter'] = 1;
+		else
+			$Sender->EventArguments['Counter']++;
+			
+		if ($Category->Depth == 1 && $Counter > 1)
+			$Sender->EventArguments['CatList'] .= '</ul><ul class="DataList CategoryList CategoryListWithHeadings">';
 	}
 	
 

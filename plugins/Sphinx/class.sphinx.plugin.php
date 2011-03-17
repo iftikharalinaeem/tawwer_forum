@@ -80,7 +80,7 @@ class SphinxPlugin extends Gdn_Plugin {
 			// Save new settings
 			$Saved = $Sender->Form->Save();
          if ($Saved)
-            $Sender->StatusMessage = T('Saved');
+            $Sender->InformMessage(T('Saved'));
 		}
 
       $Sender->SetData('Title', 'Sphinx Settings');

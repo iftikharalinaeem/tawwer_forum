@@ -63,7 +63,7 @@ class SingleSignOnPlugin implements Gdn_IPlugin {
          $Sender->Form->SetFormValue('Garden.SignIn.Popup', $Enabled ? FALSE : TRUE); // <-- Make sure that sign in links don't ajaxy popup.
          $Sender->Form->SetFormValue('Garden.UserAccount.AllowEdit', $Enabled ? FALSE : TRUE); // <-- Make sure that users cannot edit their account information through garden.
          if ($Sender->Form->Save() !== FALSE)
-            $Sender->StatusMessage = Translate("Your changes have been saved successfully.");
+            $Sender->InformMessage(T("Your changes have been saved successfully."));
             $Sender->RedirectUrl = Url('/plugin/singlesignon');
 
          // If SSO has been enabled, redirect the user to the external site's

@@ -29,7 +29,7 @@ class WhosOnlinePlugin implements Gdn_IPlugin {
          $ConfigurationModel->Validation->ApplyRule('WhosOnline.Frequency', array('Required', 'Integer'));
          $ConfigurationModel->Validation->ApplyRule('WhosOnline.Location.Show', 'Required');
          if ($Sender->Form->Save() !== FALSE)
-            $Sender->StatusMessage = Gdn::Translate("Your settings have been saved.");
+            $Sender->InformMessage(T("Your settings have been saved."));
       }
       
       // creates the page for the plugin options such as display options

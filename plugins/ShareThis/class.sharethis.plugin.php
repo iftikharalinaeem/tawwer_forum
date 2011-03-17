@@ -102,7 +102,7 @@ class ShareThisPlugin extends Gdn_Plugin {
          $ConfigurationModel->Validation->ApplyRule('Plugin.ShareThis.PublisherNumber', 'Required');
          
          if ($Sender->Form->Save() !== FALSE) {
-            $Sender->StatusMessage = T("Your changes have been saved.");
+            $Sender->InformMessage(T("Your changes have been saved."));
          }
       }
       

@@ -1,0 +1,288 @@
+body {
+	background: url('images/pa-top-pixels-bg.png') top center no-repeat #e9f8fc;
+}
+
+/* =============================================== Penny Arcade Header Styles */
+#header {
+	background: url('images/pa-banner-tile.png') top left repeat-x;
+}
+#header .pixels {
+	background: url('images/pa-banner-bg.png') center top no-repeat;
+}
+#header .content {
+	overflow: hidden;
+	height: 160px;
+	margin: 0 auto;
+   width: 990px;
+}
+#header h1 {
+	margin: 0;
+	border: none;
+}
+#header h1 a {
+	background: url('images/pa-logo.png') top left no-repeat;
+	float: left;
+	display: inline;
+	text-indent: -999em;
+	overflow: hidden;
+	width: 200px;
+	height: 126px;
+	margin: 17px 0 0 16px;
+	outline: none;
+}
+#header h1 a:hover {
+	background-position: bottom;
+}
+#header #bannerAd {
+	width: 728px;
+	height: 90px;
+	float: left;
+	display: inline;
+	margin: 10px 0 0 21px;
+}
+#header ul {
+	overflow: hidden;
+	width: 760px;
+	float: left;
+	display: inline;
+	margin: 0 0 0 11px;
+	list-style: none;
+	list-style-position: outside;
+}
+#header li {
+	float: left;
+	display: inline;
+}
+#header ul .nav a {
+	height: 38px;
+	float: left;
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+#header .nav a {
+	border: 0;
+	position: relative;
+	display: block;
+	text-indent: -999em;
+	overflow: hidden;
+}
+#header .nav a:hover {text-decoration: none;}
+#header .active a {background-position: bottom;}
+#navComic a {background: url('images/pa-nav-comic.png') top left no-repeat; width: 92px;}
+#navArchive a {background: url('images/pa-nav-archive.png') top left no-repeat; width: 104px;}
+#navStore a {background: url('images/pa-nav-store.png') top left no-repeat; width: 84px;}
+#navForum a {background: url('images/pa-nav-forum.png') top left no-repeat; width: 87px;}
+#navPATV a {background: url('images/pa-nav-patv.png') top left no-repeat; width: 78px;}
+#header .nav a span {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: block;
+	height: 38px;
+	width: 92px;
+}
+#navComic a span {background: url('images/pa-nav-comic.png') bottom left no-repeat; width: 92px;}
+#navArchive a span {background: url('images/pa-nav-archive.png') bottom left no-repeat; width: 104px;}
+#navStore a span {background: url('images/pa-nav-store.png') bottom left no-repeat; width: 84px;}
+#navForum a span {background: url('images/pa-nav-forum.png') bottom left no-repeat; width: 87px;}
+#navPATV a span {background: url('images/pa-nav-patv.png') bottom left no-repeat; width: 78px;}
+#header ul a {
+	border-right: 1px solid #013e7f;
+	color: #fff;
+	float: left;
+	display: inline;
+	font-size: 11px;
+	line-height: 14px;
+	font-weight: bold;
+	text-decoration: none;
+	padding: 0 11px 0 11px;
+	margin: 8px 0 0 0;
+}
+#header ul a:hover {
+	color: #2abae1;
+}
+#header ul .last a {
+	border-right: 0;
+}
+#footer {
+	background: url('images/pa-footer-tile.png') top center repeat-x #010d21;
+	text-align: center;
+	padding: 40px 0;
+}
+#footer #brands {
+	list-style: none;
+	list-style-position: outside;
+	overflow: hidden;
+}
+#footer #brands li {
+	display: inline-block;
+	vertical-align: middle;
+}
+#footer .btn a {
+	border: 0 none;
+	cursor: pointer;
+	display: block;
+	outline: medium none;
+	overflow: hidden;
+	text-indent: -999em;
+	text-transform: uppercase;
+	margin: 0 28px;
+}
+#footer .btn a:hover {
+   background-position: left bottom !important;
+}
+#footer #logoPAX a {
+	background: url('images/pa-logo-pax.png') top left no-repeat;
+	width: 65px;
+	height: 35px;
+	margin-top: 4px;
+}
+#footer #logoFP a {
+	background: url('images/pa-logo-fp.png') top left no-repeat;
+	width: 125px;
+	height: 21px;
+}
+#footer #logoCP a {
+	background: url('images/pa-logo-cp.png') top left no-repeat;
+	width: 58px;
+	height: 57px;
+}
+#footer #logoPA a {
+	background: url('images/pa-logo-footer.png') top left no-repeat;
+	width: 189px;
+	height: 141px;
+	margin: 0;
+}
+#footer #logoPATV a {
+	background: url('images/pa-logo-patv.png') top left no-repeat;
+	width: 61px;
+	height: 36px;
+}
+#footer #logoGH a {
+	background: url('images/pa-logo-gh.png') top left no-repeat;
+	width: 104px;
+	height: 23px;
+}
+#footer #logoBench a {
+	background: url('images/pa-logo-bench.png') top left no-repeat;
+	width: 61px;
+	height: 32px;
+}
+
+/* Vanilla Styles */
+#Head div.Search {
+	display: none;
+}
+#Head {
+	background: none;
+}
+div.Menu {
+	width: auto;
+	margin: 0 30px;
+}
+#Body {
+	width: auto;
+	margin: 15px 30px;
+}
+body.Categories #Panel {
+	display: none;
+}
+body.Categories #Content {
+	float: none;
+	width: auto;
+}
+
+/* Categories */
+div.CategoryHeadings {
+	border: 1px solid #004487;
+	background: url('images/bg-heading-tile.png') top left repeat-x #004d99;
+	color: #fff;
+	text-shadow: 0 -1px 0 #000;
+	border-radius: 4px 4px 0 0;
+	-moz-border-radius: 4px 4px 0 0;
+	-webkit-border-radius: 4px 4px 0 0;
+}
+div.Headings div.ItemHeading {
+	font-size: 13px;
+	line-height: 1;
+}
+ul.CategoryList .ItemContent {
+   border: 0;
+	margin-top: 0 !important;
+	padding: 4px 9px 4px 20px;
+}
+ul.CategoryList li.CategoryHeading div.ItemContent {
+	padding: 6px 8px;
+}
+ul.CategoryList li.Item {
+	border-bottom: 1px solid #d9d9d9 !important;
+}
+ul.CategoryList li.Depth1 {
+	text-transform: uppercase;
+	color: #fff;
+	text-shadow: 0 1px 0 #336694;
+	background: #4080b9;
+	border-bottom: 1px solid #00529f !important;
+}
+ul.CategoryList li.Depth2 {
+	background: #fff;
+}
+ul.CategoryList li.Depth2 {
+	border-top: 1px solid #fff !important;	
+}
+ul.CategoryList li.Depth2:nth-child(2) {
+	border-top: none !important;
+}
+ul.CategoryList li.Unread.Depth2 {
+	background: url('images/bg-unread.png') left center repeat-y #fff;
+}
+ul.CategoryList li.Unread.Depth2:nth-of-type(odd) {
+	background: url('images/bg-unread.png') left center repeat-y #f2f2f2;
+}
+ul.CategoryList li.Read.Depth2 {
+	background: url('images/bg-read.png') left center repeat-y #fff;
+}
+ul.CategoryList li.Read.Depth2:nth-of-type(odd) {
+	background: url('images/bg-read.png') left center repeat-y #f2f2f2;
+}
+ul.CategoryList:nth-child(2) li.CategoryHeading {
+	border-top: 1px solid #346da5 !important;
+}
+
+/* */
+ul.DataList a.Title {
+	color: #032255;
+	font-size: 18px;
+	font-weight: normal;
+	text-shadow: 0 1px 0 #fff;
+}
+div.CategoryDescription {
+	color: #666;
+	font-size: 13px;
+}
+ul.CategoryList div.Meta span {
+	display: none;
+}
+ul.CategoryList div.Meta span.CommentCount,
+ul.CategoryList div.Meta span.DiscussionCount {
+	display: block;
+
+	position: absolute;
+	top: 10%;
+	right: 0;
+	color: #032255;
+	width: 100px;
+	height: 80%;
+	line-height: 2;
+
+	font-weight: bold;
+	font-size: 20px;
+	text-align: center;
+	overflow: visible;
+	border-left: 1px solid #d9e2ea;
+}
+
+ul.CategoryList div.Meta span.DiscussionCount {
+	right: 100px;
+}
