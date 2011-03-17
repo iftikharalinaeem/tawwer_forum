@@ -1,35 +1,58 @@
+@font-face {
+  font-family: 'Buda';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Buda'), url('http://themes.googleusercontent.com/font?kit=LjwoG0-QkvByFM8NJaZmJQLUuEpTyoUstqEm5AMlJo4') format('woff');
+}
+@font-face {
+  font-family: 'Dancing Script';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Dancing Script'), local('DancingScript'), url('http://themes.googleusercontent.com/font?kit=DK0eTGXiZjN6yA8zAEyM2bDH3ri20rYH10B2w3wbVeU') format('woff');
+}
+
 body{
-	background: #fff;
-	color: #000;
+	background: #FCEBF8;
+	color: #555555;
+	font-family: trebuchet MS;
 }
 a, a:link, a:visited, a:active {
-    color: #000;
+    color: #1A717B;
     text-decoration: none;
 }
 a:hover{
-	color: #ff000;
-}
-#Panel li a{
-	color: #000;
-}
-ul.PanelInfo li.Active a {
-    color: #ddd;
+ color: #C83482;
 }
 a.Button, .Button {
-    color: #000;
+    color: #C83482;
 }
 a.BigButton {
-    color: #000;
-    margin: 0 0 30px;
+    color: #C83482;
+    font-family: Buda, Trebuchet MS, Tahoma, sans-serif;
+    font-weight: bold;
+    font-size: 22px;
 }
-
-
+a.BigButton:hover {
+    color: #1A717B;
+}
+a.Close {
+    color: #C83482;
+}
+a.Close:hover{
+	color: #1A717B;
+}
+h1, h2, h3, h4, h5{
+   font-family: Buda, Trebuchet MS, Tahoma, sans-serif;
+   font-weight: normal;
+   text-transform: uppercase;
+}
 #Body {
-	width: 980px;
+	margin: 0;
+	width: 99.9%;
+	position: relative;
 }
-
 #Head {
-	background: #000;
+	background: #3B5998;
 	padding:0;
 	margin: 20px 20px 0;
 	text-align: left;
@@ -37,36 +60,27 @@ a.BigButton {
 }
 div.Popup h1,
 div.Popup h2 {
-	background: #3b5998;
+	background: #FFD8F5;
 	border: none;
+	color:#555555;
+}
+div.Popup #ConversationForm h2 {
+    color: #555555;
 }
 .Banner {
-	 margin: 0 auto;
-    position: relative;
-    text-align: left;
-    vertical-align: bottom;
-    width: 980px;
-}
-#TopBanner{
-    height: 150px;
-    position: relative;
-    vertical-align: bottom;
-    width: 980px;
-}
-.TitleBanner{
-	 color: #FFFFFF;
-    font-size: 30px;
-    margin: 20px 0;
-    text-align: center;
-    text-shadow: 0 1px 1px #000000;
-    width: 980px;
+	padding: 10px;
+	text-align: left;
+	position: relative;
+	font-family: Dancing Script;
 }
 .Banner ul {
-	 background: none repeat scroll 0 0 transparent;
-    margin: 0;
-    padding: 0;
-    position: relative;
-    width: 980px;
+   border-radius: 16px;
+	-moz-border-radius: 16px;
+	-webkit-border-radius: 16px;
+	 background-color: #FFB8ED;
+    border: 1px solid #C83482;
+	padding: 10px;
+	margin: 0;
 }
 .Banner ul li {
 	display: inline;
@@ -74,20 +88,21 @@ div.Popup h2 {
 	margin: 0;
 }
 .Banner ul li a {
-	font-weight: bold;
+	font-weight: normal;
 	padding: 3px 6px;
-	font-size: 12px;
-	color: #000;
+	font-size: 26px;
+	color: #555555;
 	display: inline-block;
 }
 .Banner ul li a:hover {
-	color: #ff0000;
+
+	background: #FFBEF4;
 }
 .Banner ul li a.SignOut {
 	font-weight: normal;
 	position: absolute;
-	top: 0px;
-	right: 10px;
+	top: 20px;
+	right: 20px;
 }
 .Banner ul li a span {
 	border-radius: 3px;
@@ -95,16 +110,22 @@ div.Popup h2 {
 	-webkit-border-radius: 3px;
 	padding: 1px 2px 0 1px;
 	background: #f00;
-
+	border-right: 1px solid #a00;
+	border-bottom: 1px solid #a00;
 	color: #fff;
 	font-size: 9px;
 	position: relative;
 	top: -3px;
 }
-#Panel {
-    margin: 0;
+#Content {
+	float: none;
+	width: auto;
+	margin: 0 280px 0 10px;
 }
-
+#Panel {
+	float: right;
+	margin-right: 10px;
+}
 #Panel div.SearchBox input.InputBox {
 	width: 200px;
 	margin-right: 4px;
@@ -144,18 +165,11 @@ div.CommentForm textarea,
 	width:99%;
 }
 
-.AdBanner{
-	background: url(9SHBanner6.jpg) no-repeat;
-	width: 728px;
-	height: 90px;
-	padding: 10px 0 10px;
-}
-
 /* Tabs */
 div.Tabs {
 	background: none;
 	padding: 0;
-	border-bottom: 1px solid #675251;
+	border-bottom: 1px solid #aaa;
 }
 div.Tabs ul {
 	padding: 0 8px;
@@ -163,8 +177,6 @@ div.Tabs ul {
 }
 div.MessageForm {
 	padding: 8px 8px 5px;
-	background: #999999;
-    border-bottom: 1px solid #FFFFFF;
 }
 div.MessageForm div.Tabs {
 	padding: 0 8px;
@@ -190,7 +202,7 @@ div.Tabs li a:visited {
    -moz-border-radius: 0;
    -webkit-border-radius: 0;
    background: none;
-   color: #999;
+   color: #1A717B;
    text-decoration: none;
    padding: 8px 10px;
 	line-height: 11px;
@@ -200,10 +212,10 @@ div.Tabs li a:hover {
 }
 a.Active,
 div.Tabs li.Active a {
-   background: #ccc;
-   color: #000;
+   background: #f6f6f6;
+   color: #555555;
    margin: 0;
-   border: 0;
+   border: 1px solid #76252A;
 	border-bottom: none;
    border-radius: 3px 3px 0 0;
    -moz-border-radius: 3px 3px 0 0;
@@ -225,8 +237,8 @@ div.Tabs li a span {
    -webkit-border-radius: 3px;
    -moz-border-radius: 3px;
    font-weight: normal;
-	background: #ccc;
-   color: #000;
+	background: #FFB8ED;
+   color: #555555;
    margin: 0 0 0 4px;
 }
 div.DiscussionsTabs div.SubTab {
@@ -234,64 +246,10 @@ div.DiscussionsTabs div.SubTab {
 	border-radius: 0;
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
-	border-top: 1px solid #aaa;
+	border-top: 1px solid #76252A;
 	background: #f3f3f3;
 	margin:0;
 	padding:4px 8px;
-}
-ul.DataList a.Title {
-	color: #c00e0e;
-}
-ul.DataList li.Item {
-    border-bottom: 1px solid #675251;
-}
-.Mine, .Alt, .New { 
-	background: #fff; 
-}
-
-ul.DataList li.Mine div.Meta a.Category {
-    background: #CCCCCC;
-    color: #000;
-}
-ul.DataList div.Meta a {
-    color: #ccc;
-}
-a.Bookmark {
-	visibility: hidden;
-}
-ul.MessageList li.Item {
-    border-bottom: 1px solid #675251;
-}
-ul.Activities ul.DataList li {
-    background: #CCCCCC;
-}
-ul.Conversations div.Meta a.Name {
-    color: #c00e0e;
-}
-ul.DataList div.Excerpt a {
-    color: #fff;
-}
-#MessageForm {
-    background: #999999;
-}
-#MessageForm h2 {
-    color: #000;
-}
-div.Popup h1, div.Popup h2 {
-    background: #000;
-}
-#Status {
-    background: #000;
-    color: #fff;
-}
-#Status a{
-	text-decoration: underline;
-}
-#Status a:hover{
-	text-decoration: none;
-}
-body.Profile ul.Activities {
-    border-top: 1px solid #675251;
 }
 div.HeadingTabs ul {
 	margin: 8px 0 0;
@@ -300,7 +258,7 @@ body.Discussion a.Bookmark {
 	margin: 6px 2px;
 }
 div.Preview {
-	border: 1px solid #aaa;
+	border: 1px solid #76252A;
 	background: #fff;
 	margin:0 0 8px;
 	padding: 8px;
@@ -319,43 +277,115 @@ div.MorePager a:hover {
 	-webkit-border-radius: 0;
 	background: none;
 	border: none;
-	color: #fff;
+	color: #1e79a7;
 	line-height: 1;
 	padding: 0;
 	text-decoration: none;	
 }
 div.MorePager a:hover {
-	color: #ff0000;
+	color: #ff0084;
 	text-decoration: underline;
 }
 body.add #Content {
 	margin: 0 10px;
 }
 
+/* Discussions */
+
+ul.DataList li.Item {
+    border-bottom: 1px solid #76252A;
+}
+
+.Mine, .Alt, .New { 
+	background: #f6f6f6; 
+}
+
+ul.DataList li.Mine div.Meta a.Category {
+   background: #FFB8ED;
+}
+ul.DataList div.Meta a.Category {
+   background: #FAE1F4;
+}
+ul.DataList div.Meta span.Announcement {
+    background: #FFB8ED;
+    color: #555555;
+}
+ul.DataList div.Meta strong {
+    background: #C83482;
+    color: #ffffff;
+}
+#DiscussionForm h2 {
+    color: #555555;
+}
+#DiscussionForm form {
+    background: #FFD8F5;
+    border: 1px solid #C83482;
+}
+div.MessageForm{
+    background: #FFD8F5;
+    border-bottom: 1px solid #C83482;
+}
+ul.MessageList li.Item, div.Tabs{
+    border-bottom: 1px solid #76252A;
+}
+
+ul.Activities ul.DataList li {
+    background: #FFD8F5;
+    border: 1px solid #C83482;
+}
+#MessageForm {
+    background: #FFD8F5;
+}
+#MessageForm h2 {
+    color: #555555;
+}
+
+#Status {
+    background: #FCEBF8;
+}
+
+div.HeadingTabs div.SubTab {
+   font-family: buda, Trebuchet MS, Tahoma, sans-serif;
+   font-size: 18px;
+   line-height: 2.4;
+}
+.Tabs, div.Tabs li a {
+   font-family: buda, Trebuchet MS, Tahoma, sans-serif;
+   font-size: 15px !Important;
+}
+    
 /* Panel Boxes */
 div.Box {
-	border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
 	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
-	background: none;
+	 background-color: #FAE1F4;
+    border: 1px solid #76252A;
+    color: #555555;
+/*    font: 12px/1.5em Verdana,Geneva,sans-serif;*/
 	padding: 0;
 }
 div.Box h4 {
-	color: #f9f9f9;
+	color: #555;
+	font-size: 18px;
+   font-weight: normal;
+   padding: 7px 7px 0 7px;
+	border-bottom:2px solid #C83482;
 }
 ul.PanelInfo {
-	border-top:1px solid #675251;
+   margin: 7px;
+   border-top: none;
 }
 ul.PanelInfo li,
 ul.PanelInfo li.Active {
 	background: none;
-	border-bottom: 1px solid #675251;
+	border-bottom: 1px solid #C83482;
 }
 ul.PanelInfo li.Active {
-	background: #eee;
+	background: #f6f6f6;
 }
 body.Profile ul.PanelInfo {
 	border: none;
@@ -369,28 +399,37 @@ body.Profile ul.PanelInfo li a {
 	display: block;
 	padding: 0 6px;
 }
-body.Profile #Panel ul.PanelInfo li a:hover{
-	background: #fff;
-	color: #c00e0e;
+body.Profile ul.PanelInfo li a:hover {
+	background: #FCEBF8;
 }
 
-ul.Condensed li, li.Condensed {
-    clear: none;
+ul.PanelInfo div.Meta strong {
+    background: #C83482;
+    color: #ffffff;
 }
 
 /* Sign In Page */
 body.Entry #Content div.Box {
-	background: #efefef;
+	background: #FAE1F4;
 }
 body.Entry #Panel {
 	display: none;
 }
 
-/*forms */
+div.Border {
+    background: rgba(200, 52, 130, 0.7);
+}
+
+body.Entry #Content div.Box {
+    background: #FAE1F4;
+}
+
+.GuestBox p {
+   margin: 7px;
+}
+
+/* Forms */
 input.DateBox, input.InputBox, input.SmallInput, textarea {
-    border: 1px solid #AAAAAA;
-    background: #ddd;
-    color: #333333;
-    font-size: 12px;
- 
+    background:#F6F6F6;
+    border: 1px solid #76252A;
 }
