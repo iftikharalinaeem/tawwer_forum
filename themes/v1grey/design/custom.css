@@ -127,12 +127,18 @@ ul.DataList li.Item {
    border: 0;
    margin-bottom: 2px;
 }
+ul.DataList div.Meta a {
+    color:#ddd;
+}
 ul.CategoryList .ItemContent {
 	border: none;
 }
 ul.PanelInfo div.Meta,
 ul.DataList div.Meta {
    font-size: 10px;
+}
+ul.PanelInfo li.Heading {
+    color: inherit;
 }
 li.Activity div.Title {
    color: #bbb;
