@@ -8,10 +8,6 @@ Copyright 2008, 2009 Mark O'Sullivan
  */
 class AdSenseModule extends Gdn_Module {
 	public $Content = '';
-	
-   public function __construct(&$Sender = NULL) {
-      parent::__construct($Sender);
-   }
    
    public function AssetTarget() {
       return 'Panel';
