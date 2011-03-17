@@ -8,7 +8,7 @@ class FollowingModule extends Gdn_Module {
    protected $Followers;
    protected $NumFollowers;
    
-   public function __construct(&$Sender = '') {
+   public function __construct($Sender = '') {
       parent::__construct($Sender);
    }
    
