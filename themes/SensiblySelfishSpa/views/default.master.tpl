@@ -15,10 +15,10 @@
 		  {dashboard_link}
 		  {discussions_link}
 		  {activity_link}
-		  {inbox_link}
-		  {profile_link}
+		  <!--{inbox_link}
+		  {profile_link}-->
 		  {custom_menu}
-		  {signinout_link}
+		  <!--{signinout_link}-->
 		</ul>
 	 </div>
 	 <div id="Body">

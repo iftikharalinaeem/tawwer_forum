@@ -28,7 +28,9 @@ a.Button, .Button {
 }
 a.BigButton {
     color: #C83482;
-    font: bold 22px Buda;
+    font-family: Buda, Trebuchet MS, Tahoma, sans-serif;
+    font-weight: bold;
+    font-size: 22px;
 }
 a.BigButton:hover {
     color: #1A717B;
@@ -40,7 +42,9 @@ a.Close:hover{
 	color: #1A717B;
 }
 h1, h2, h3, h4, h5{
-font-family: Buda;
+   font-family: Buda, Trebuchet MS, Tahoma, sans-serif;
+   font-weight: normal;
+   text-transform: uppercase;
 }
 #Body {
 	margin: 0;
@@ -297,7 +301,10 @@ ul.DataList li.Item {
 }
 
 ul.DataList li.Mine div.Meta a.Category {
-    background: #ffd8f5;
+   background: #FFB8ED;
+}
+ul.DataList div.Meta a.Category {
+   background: #FAE1F4;
 }
 ul.DataList div.Meta span.Announcement {
     background: #FFB8ED;
@@ -338,8 +345,13 @@ ul.Activities ul.DataList li {
 }
 
 div.HeadingTabs div.SubTab {
-    font: bold 18px buda;
-     line-height: 2.4;
+   font-family: buda, Trebuchet MS, Tahoma, sans-serif;
+   font-size: 18px;
+   line-height: 2.4;
+}
+.Tabs, div.Tabs li a {
+   font-family: buda, Trebuchet MS, Tahoma, sans-serif;
+   font-size: 15px !Important;
 }
     
 /* Panel Boxes */
@@ -350,18 +362,22 @@ div.Box {
 	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
-	 background-color: #FCEBF8;
+	 background-color: #FAE1F4;
     border: 1px solid #76252A;
     color: #555555;
-    font: 12px/1.5em Verdana,Geneva,sans-serif;
-	padding: 7px;
+/*    font: 12px/1.5em Verdana,Geneva,sans-serif;*/
+	padding: 0;
 }
 div.Box h4 {
-	color: #333;
-	font-size: 20px;
+	color: #555;
+	font-size: 18px;
+   font-weight: normal;
+   padding: 7px 7px 0 7px;
+	border-bottom:2px solid #C83482;
 }
 ul.PanelInfo {
-	border-top:2px solid #C83482;
+   margin: 7px;
+   border-top: none;
 }
 ul.PanelInfo li,
 ul.PanelInfo li.Active {
@@ -394,7 +410,7 @@ ul.PanelInfo div.Meta strong {
 
 /* Sign In Page */
 body.Entry #Content div.Box {
-	background: #efefef;
+	background: #FAE1F4;
 }
 body.Entry #Panel {
 	display: none;
@@ -405,7 +421,11 @@ div.Border {
 }
 
 body.Entry #Content div.Box {
-    background: #FFD8F5;
+    background: #FAE1F4;
+}
+
+.GuestBox p {
+   margin: 7px;
 }
 
 /* Forms */
@@ -413,4 +433,3 @@ input.DateBox, input.InputBox, input.SmallInput, textarea {
     background:#F6F6F6;
     border: 1px solid #76252A;
 }
-
