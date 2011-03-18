@@ -50,8 +50,9 @@ class VfcomPlugin extends Gdn_Plugin {
       
       if (stristr(Gdn::Session()->User->Email, 'vanillaforums.com') && Gdn::Session()->User->Admin) {
          echo '<div style="text-align:left;margin:10px;padding:5px;font-size:14px;background-color:white;color:gray;">';
-         echo "<div>Frontend: ".GetValue('HTTP_X_HANDLING_SERVER', $_SERVER, 'unknown')."</div>";
-         echo "<div>".print_r($_SERVER,true)."</div>";
+         echo "<div>Upstream: ".GetValue('HTTP_X_UPSTREAM', $_SERVER, 'unknown')."</div>";
+         echo "<div>Frontend: ".C('VanillaForums.Frontend', 'unknown')."</div>";
+         //echo "<div>".print_r($_SERVER,true)."</div>";
          echo '</div>';
       }
    }
