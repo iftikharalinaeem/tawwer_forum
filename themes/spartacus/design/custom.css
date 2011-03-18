@@ -1,0 +1,339 @@
+/* Global Anchor Color Change */
+a {
+   text-decoration: none;
+   color: #156fbb;
+}
+a:hover {
+   text-decoration: none;
+   color: #333;
+}
+
+/* Fluid Width */
+#Body,
+div.Menu {
+	width: auto;
+	padding: 0 10px;
+}
+body.Profile #Panel,
+#Panel {
+	width: 200px;
+}
+body.Profile #Panel div.Photo img {
+	max-width: 200px;
+}
+#Content {
+	width: auto;
+	float: none;
+	margin: 0 215px 0 0;
+}
+body.Profile #Content {
+	width: auto;
+	float: none;
+	margin: 0 0 0 215px;
+}
+#Foot div {
+	width: auto;
+}
+
+/* Head */
+#Head {
+	background: #000;
+}
+ul#Menu {
+	margin: auto;
+}
+#Head .Search {
+	display: none;
+}
+#Menu a,
+#Menu a:hover,
+#Menu a span,
+#Menu li.Active a span,
+#Menu li.Highlight a:hover span {
+   background: none;
+   color: #fff;
+	font-weight: normal;
+}
+#Menu a:hover,
+#Menu a:hover span {
+	color: #2c85b1 !important;
+}
+/* Body */
+#Body {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	float: left;
+	/* max-height: 600px; */
+	overflow: auto;
+	background: url('bg.jpg') top center no-repeat #ae6939;
+}
+div.Body {
+	padding: 10px;
+}
+#Foot {
+	display: none;
+}
+
+/* Voting Plugin Fixes */
+ul.DataList div.Meta strong {
+   box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+   left: auto;
+   position: inherit;
+   top: auto;
+}
+.StatBox, .StatBox a {
+   color: #cf9d78;
+}
+.StatBox {
+   background: #990000;
+}
+.ViewsBox {
+	background: #cc0000;
+	color: #ffffcc;
+}
+ul.MessageList div.Meta span.Votes {
+   display: inline-block;
+   float: right;
+	position: relative;
+	top: auto;
+	right: auto;
+}
+span.Votes a {
+	background: #990000;
+}
+span.Votes a:hover {
+	background: #770000;
+}
+ul.MessageList div.Meta span.Votes span {
+	background: #cc0000;
+	color: #ffffcc !important;
+}
+
+
+/* Tabs */
+div.HeadingTabs div.SubTab {
+    font-size: 16px;
+}
+div.Tabs, div.Headings {
+   background: none;
+	padding: 5px 8px 2px;
+	border: none;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited,
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   margin: 0;
+   border: none;
+   border-radius: 3px 3px 0 0;
+   -moz-border-radius: 3px 3px 0 0;
+   -webkit-border-radius: 3px 3px 0 0;
+   background: #efd6aa;
+   font-weight: bold;
+   color: #b76600;
+   padding: 5px 10px 4px;
+	line-height: 1;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited {
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+div.MorePager li a:hover,
+a.TabLink:hover,
+div.Tabs li a:hover {
+   background: #f3e6d4;
+}
+a.Active,
+div.Tabs li.Active a {
+   background: #f3e6d4;
+   color: #333333;
+	padding: 5px 10px;
+}
+div.Tabs li a span {
+   background: #744000;
+   color: #fef7df;
+}
+#MessageForm,
+form.Activity,
+div.MessageForm {
+	background: #f3e6d4;
+}
+#MessageForm h2 {
+	color: #333;
+}
+form.Activity {
+	padding-bottom: 6px;
+	margin-bottom: 1px;
+}
+div.MessageForm div.Tabs {
+	padding: 5px 0 2px;
+}
+div.HeadingTabs ul {
+	margin: 18px 0 0;
+}
+div.AnswerTabs {
+	bottom: -1px;
+}
+#Panel input.InputBox, div.AddPeople textarea.MultiComplete {
+   width: 172px;
+}
+
+/* DataList */
+ul.MessageList li.Item,
+ul.DataList li.Item {
+	background: #f3e6d4;
+	border-bottom: none;
+	margin-bottom: 1px;
+}
+ul.MessageList li.Item:nth-child(even),
+ul.DataList li.Item:nth-child(even) {
+	background: #fffbea;
+}
+ul.DataList li.Mine div.Meta a.Category,
+ul.DataList div.Meta a.Category {
+	background: none;
+}
+.NumberedPager a.Highlight {
+	color: #cf9d78;
+}
+.NumberedPager a {
+	color: #ffffcc;
+}
+.NumberedPager span {
+	color: #cf9d78;
+}
+ul.MessageList div.Message {
+	clear: none;
+}
+ul.DataList.SearchResults li.Item,
+ul.DataList.Activities li.Item {
+	padding: 4px;
+}
+.Foot {
+	background: none;
+	border: none;
+}
+
+/* Panel */
+a.BigButton {
+	background-image: url('dot.png');
+	background-position: top left;
+	background-repeat: repeat-x;
+	background-color: #2364ce;
+	background:-webkit-gradient(linear, center bottom, center top, from(#2364ce), to(#458fdd));
+	background:-moz-linear-gradient(top, #458fdd, #2364ce);
+	-pie-background:linear-gradient(top, #458fdd, #2364ce);
+	background:linear-gradient(top, #458fdd, #2364ce);
+   color: #ffffff;
+	text-shadow: 0 1px 0 #1e3aaf;
+   border: 1px solid #045dcd;
+}
+a.BigButton:hover {
+	color: #fff;
+	background:-webkit-gradient(linear, center bottom, center top, from(#1D58B7), to(#4A9AF0));
+	background:-moz-linear-gradient(top, #4A9AF0, #1D58B7);
+	-pie-background:linear-gradient(top, #4A9AF0, #1D58B7);
+	background:linear-gradient(top, #4A9AF0, #1D58B7);
+   border: 1px solid #0256C0;
+}
+a.BigButton:active {
+	color: #fff;
+	background: #2364ce;
+   border: 1px solid #0256C0;
+}
+a.BigButton.NewConversation {
+	font-size: 13px;
+}
+#Panel div.Box {
+	border: 1px solid #937431;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	background: #efd6aa;	
+}
+#Panel div.Box h4 {
+	color: #333;
+}
+ul.PanelInfo {
+	border-top: 1px solid #bfab88;
+}
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+   background: none;
+   border-bottom: 1px solid #bfab88;
+}
+ul.PanelInfo li.Active {
+	background: #fef7df;
+}
+ul.PanelInfo li.Active a {
+	color: #333;
+}
+ul.PanelInfo li:last-child {
+	border-bottom: none;
+}
+
+/* Profile */
+#Status {
+	background: none;
+	padding: 0;
+	color: #333;
+}
+body.Profile ul.PanelInfo {
+	border: none;
+}
+ul.Condensed li, li.Condensed {
+   clear: none;
+}
+body.Profile ul.Activities {
+   margin-top: 1px;
+}
+
+div.DismissMessage,
+div.DismissMessage.Info {
+	color: #f3e6d4;
+	background: none;
+	border: none;
+	padding: 0;
+}
+div.DismissMessage.Warning {
+	background: #d00;
+	padding: 4px 8px;
+}
+div.DismissMessage.Box {
+	border: none;
+	background: #f3e6d4;
+	color: #333;
+	padding: 4px 8px;
+}
+
+/* Hide unwanted functionality */
+body.Discussion a.Bookmark,
+div.FollowsBox,
+div.Tabs ul li a.MyDrafts,
+div.Tabs ul li a.MyBookmarks {
+	display: none;
+}
