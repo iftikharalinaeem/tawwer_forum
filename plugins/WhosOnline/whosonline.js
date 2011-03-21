@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	function GetOnline() {
-		var webRoot = gdn.definition('WebRoot', '');
-		var url =  gdn.combinePaths(webRoot, '/plugin/imonline');
+		var url = gdn.url('/plugin/imonline');
+		
 		$.ajax({
 			url: url,
 			global: false,

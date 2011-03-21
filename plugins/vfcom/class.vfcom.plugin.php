@@ -44,6 +44,20 @@ class VfcomPlugin extends Gdn_Plugin {
 
    }
    
+   public function HeadModule_BeforeToString_Handler($Sender) {
+      // Only for logged-in users
+      if (!Gdn::Session()->UserID) return;
+      // Only when enabled (finally)
+      if (!C('VanillaForums.ShowInfrastructure', FALSE)) return;
+      
+      if (stristr(Gdn::Session()->User->Email, 'vanillaforums.com') && Gdn::Session()->User->Admin) {
+         echo '<div style="text-align:left;margin:10px;padding:5px;font-size:14px;background-color:white;color:gray;">';
+         echo "<div>Upstream: ".GetValue('HTTP_X_UPSTREAM', $_SERVER, 'unknown')."</div>";
+         echo "<div>Frontend: ".C('VanillaForums.Frontend', 'unknown')."</div>";
+         echo '</div>';
+      }
+   }
+   
    public function Setup() {
       
    }
