@@ -128,17 +128,17 @@ public function CommentModel_BeforeSaveComment_Handler($Sender) {
       $Structure = Gdn::Structure();
       $Structure
          ->Table('User')
-         ->Column('LastIP', 'varchar(14)', TRUE)
+         ->Column('LastIP', 'varchar(15)', TRUE)
          ->Set(FALSE, FALSE);
          
       $Structure
          ->Table('Comment')
-         ->Column('LastIP', 'varchar(14)', TRUE)
+         ->Column('LastIP', 'varchar(15)', TRUE)
          ->Set(FALSE, FALSE);
          
       $Structure
          ->Table('Discussion')
-         ->Column('LastIP', 'varchar(14)', TRUE)
+         ->Column('LastIP', 'varchar(15)', TRUE)
          ->Set(FALSE, FALSE);
    }
    
