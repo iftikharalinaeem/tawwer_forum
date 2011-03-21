@@ -58,15 +58,27 @@ ul#Menu {
 #Menu a:hover span {
 	color: #2c85b1 !important;
 }
+
+#Head .FacebookButton {
+   position: absolute;
+   right: 10px;
+   bottom: 0;
+}
+
 /* Body */
-#Body {
+
+html {
+   background: #B88A3D;
+}
+
+#Body, body.Entry {
 	width: 100%;
 	margin: 0;
 	padding: 0;
 	float: left;
 	/* max-height: 600px; */
 	overflow: auto;
-	background: url('bg.jpg') top center no-repeat #ae6939;
+	background: url('bg.jpg') top left no-repeat;
 }
 div.Body {
 	padding: 10px;
@@ -239,6 +251,13 @@ ul.DataList.Activities li.Item {
 }
 
 /* Panel */
+
+a.Button {
+   display: inline-block;
+   padding:0 4px;
+   margin:3px 0;
+}
+
 a.BigButton {
 	background-image: url('dot.png');
 	background-position: top left;
@@ -268,14 +287,17 @@ a.BigButton:active {
 a.BigButton.NewConversation {
 	font-size: 13px;
 }
-#Panel div.Box {
+div.Box, body.connect div.Box {
 	border: 1px solid #937431;
 	border-radius: 0;
 	-moz-border-radius: 0;
 	-webkit-border-radius: 0;
 	background: #efd6aa;	
 }
-#Panel div.Box h4 {
+body.Entry input.InputBox {
+   width: auto;
+}
+div.Box h4 {
 	color: #333;
 }
 ul.PanelInfo {
@@ -337,3 +359,19 @@ div.Tabs ul li a.MyDrafts,
 div.Tabs ul li a.MyBookmarks {
 	display: none;
 }
+
+div.Popup div.Body {
+   background: #F3E6D4;
+}
+
+div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
+   border: none;
+   background: none;
+   color: #333333;
+   padding: 0;
+}
+
+a.Close {
+   color: #333;
+}
+
