@@ -29,7 +29,7 @@ class SignaturesPlugin extends Gdn_Plugin {
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
       if (!Gdn::Session()->CheckPermission(array(
          'Garden.SignIn.Allow',
-         'Plugins.Signatures.Allow'
+         'Plugins.Signatures.Edit'
       ))) {
          return;
       }
@@ -48,7 +48,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       $Sender->Permission(array(
          'Garden.SignIn.Allow',
-         'Plugins.Signatures.Allow'
+         'Plugins.Signatures.Edit'
       ));
       
       $Args = $Sender->RequestArgs;
@@ -58,7 +58,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Args = array_slice($Args, 0, 2);
       
       list($UserReference, $Username) = $Args;
-      $Sender->Permission('Plugins.Signatures.Allow');
+      $Sender->Permission('Plugins.Signatures.Edit');
       $Sender->GetUserInfo($UserReference, $Username);
       $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
       if (!is_array($UserPrefs))
