@@ -17,9 +17,11 @@ $PluginInfo['Sphinx'] = array(
 
 class SphinxPlugin extends Gdn_Plugin {
    public function  __construct() {
+/*
       if (!class_exists('SphinxClient')) {
          throw new Exception('Sphinx requires the sphinx client to be installed. See http://www.php.net/manual/en/book.sphinx.php');
       }
+*/
 
       parent::__construct();
    }
@@ -86,7 +88,7 @@ class SphinxPlugin extends Gdn_Plugin {
       $Sender->SetData('Title', 'Sphinx Settings');
 
       $Sender->AddSideMenu('/dashboard/settings/plugins');
-      $Sender->Render('settings', '', GetValue('PluginRoot', $this->PluginInfo));
+      $Sender->Render('settings', '', 'plugins/Sphinx');
    }
 
    /**
