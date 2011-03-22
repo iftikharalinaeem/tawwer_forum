@@ -28,9 +28,9 @@ a.Button, .Button {
 }
 a.BigButton {
     color: #C83482;
-    font-family: Buda, Trebuchet MS, Tahoma, sans-serif;
-    font-weight: bold;
-    font-size: 22px;
+    font-family: Buda,Trebuchet MS,Tahoma,sans-serif;
+    font-size: 16px;
+    text-transform: uppercase;
 }
 a.BigButton:hover {
     color: #1A717B;
@@ -68,18 +68,12 @@ div.Popup #ConversationForm h2 {
     color: #555555;
 }
 .Banner {
-	padding: 10px;
-	text-align: left;
-	position: relative;
-	font-family: Dancing Script;
+		font-family: Verdana;
+		font-size: 27px;
+		text-align: left;
 }
 .Banner ul {
-   border-radius: 16px;
-	-moz-border-radius: 16px;
-	-webkit-border-radius: 16px;
-	 background-color: #FFB8ED;
-    border: 1px solid #C83482;
-	padding: 10px;
+  	padding: 0 0 10px;
 	margin: 0;
 }
 .Banner ul li {
@@ -91,7 +85,7 @@ div.Popup #ConversationForm h2 {
 	font-weight: normal;
 	padding: 3px 6px;
 	font-size: 26px;
-	color: #555555;
+	color: #692126;
 	display: inline-block;
 }
 .Banner ul li a:hover {
@@ -125,6 +119,7 @@ div.Popup #ConversationForm h2 {
 #Panel {
 	float: right;
 	margin-right: 10px;
+	font-family: verdana;
 }
 #Panel div.SearchBox input.InputBox {
 	width: 200px;
