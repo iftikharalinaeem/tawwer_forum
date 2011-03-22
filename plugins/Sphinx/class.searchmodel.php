@@ -148,6 +148,9 @@ searchd {
 
       // Loop through the matches to figure out which IDs we have to grab.
       $IDs = array();
+      if (!is_array($Search['matches']))
+         $Search['matches'] = array();
+         
       foreach ($Search['matches'] as $DocumentID => $Info) {
          $ID = (int)($DocumentID / 10);
          $Type = $DocumentID % 10;

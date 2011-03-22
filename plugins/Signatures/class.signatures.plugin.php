@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'This plugin allows users to attach their own signatures to their posts.',
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -26,11 +26,16 @@ $PluginInfo['Signatures'] = array(
 
 class SignaturesPlugin extends Gdn_Plugin {
    
-   public function ProfileController_AfterAddSideMenu_Handler(&$Sender) {
-
+   public function ProfileController_AfterAddSideMenu_Handler($Sender) {
+      if (!Gdn::Session()->CheckPermission(array(
+         'Garden.SignIn.Allow',
+         'Plugins.Signatures.Allow'
+      ))) {
+         return;
+      }
+   
       $SideMenu = $Sender->EventArguments['SideMenu'];
-      $Session = Gdn::Session();
-      $ViewingUserID = $Session->UserID;
+      $ViewingUserID = Gdn::Session()->UserID;
       
       if ($Sender->User->UserID == $ViewingUserID) {
          $SideMenu->AddLink('Options', T('Signature Settings'), '/profile/signature', FALSE, array('class' => 'Popup'));
@@ -39,7 +44,13 @@ class SignaturesPlugin extends Gdn_Plugin {
       }
    }
    
-   public function ProfileController_Signature_Create(&$Sender) {
+   public function ProfileController_Signature_Create($Sender) {
+      
+      $Sender->Permission(array(
+         'Garden.SignIn.Allow',
+         'Plugins.Signatures.Allow'
+      ));
+      
       $Args = $Sender->RequestArgs;
       if (sizeof($Args) < 2)
          $Args = array_merge($Args, array(0,0));
@@ -138,6 +149,7 @@ class SignaturesPlugin extends Gdn_Plugin {
                foreach ($DataSignatures as $UserID => $UserSig)
                   $Signatures[$UserID] = GetValue($this->MakeMetaKey('Sig'), $UserSig);
          }
+         
       }
       
       if (!is_null($UserID))
