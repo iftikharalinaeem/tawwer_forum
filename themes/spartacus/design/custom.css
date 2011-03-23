@@ -71,8 +71,18 @@ ul#Menu {
 div.Body {
 	padding: 10px;
 }
+div.Popup div.Body {
+	padding: 0;
+}
 #Foot {
 	display: none;
+}
+
+/* Popups */
+div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
+	background: #000;
+	color: #fff;
+	border: none;
 }
 
 /* Voting Plugin Fixes */
@@ -319,6 +329,14 @@ div.DismissMessage.Info {
 	border: none;
 	padding: 0;
 }
+div.DismissMessage a {
+	color: #b00;
+	text-decoration: underline;
+}
+div.DismissMessage a:hover {
+	text-decoration: none;
+}
+
 div.DismissMessage.Warning {
 	background: #d00;
 	padding: 4px 8px;
