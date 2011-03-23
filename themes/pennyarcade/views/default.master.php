@@ -25,35 +25,31 @@
 	</div>
 	<div id="Frame">
       <div id="Head">
-         <div class="Menu">
+         <div class="Breadcrumbs">
             <?php
 					$Session = Gdn::Session();
 					$Wrap = '<a href="%url" class="%class">%text</a>';
-
 					echo Gdn_Theme::Link('categories', 'Penny Arcade Forums', $Wrap);
-					echo Gdn_Theme::Link('dashboard', 'Dashboard', $Wrap);
-					echo Gdn_Theme::Link('inbox', 'Inbox', $Wrap);
-					if ($Session->IsValid())
-						echo Gdn_Theme::Link('profile', $Session->User->Name, $Wrap);
-					else
+				?>
+			</div>
+			<div class="ProfileMenu">
+				<?php
+					if ($Session->IsValid()) {
+						echo Gdn_Theme::Link('dashboard', 'Dashboard', $Wrap, array('class' => 'Dashboard'));
+						echo UserPhoto($Session->User, 'PhotoProfile');
+						echo Gdn_Theme::Link('profile', $Session->User->Name, $Wrap, array('class' => 'Profile'));
+						echo Gdn_Theme::Link('inbox', '<span class="Hidden">Inbox</span>', $Wrap, array('class' => 'Inbox'));
+					} else {
 						echo Gdn_Theme::Link('signinout', 'Sign In', $Wrap);
+					}
 						
 				?>
 				</ul>
-            <div class="Search"><?php
-					$Form = Gdn::Factory('Form');
-					$Form->InputPrefix = '';
-					echo 
-						$Form->Open(array('action' => Url('/search'), 'method' => 'get')),
-						$Form->TextBox('Search'),
-						$Form->Button('Go', array('Name' => '')),
-						$Form->Close();
-				?></div>
          </div>
       </div>
       <div id="Body">
-         <div id="Content"><?php $this->RenderAsset('Content'); ?></div>
          <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
+         <div id="Content"><?php $this->RenderAsset('Content'); ?></div>
       </div>
       <div id="Foot">
 			<?php
