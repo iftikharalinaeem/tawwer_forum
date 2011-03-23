@@ -25,7 +25,7 @@ class SphinxPlugin extends Gdn_Plugin {
    }
 
    public function OnDisable() {
-      // Remove the current library map so that the core file won't be grabbed.
+      // Remove the current library map so re-indexing will occur
       @unlink(PATH_CACHE.'/library_map.ini');
    }
 
@@ -86,7 +86,7 @@ class SphinxPlugin extends Gdn_Plugin {
       $Sender->SetData('Title', 'Sphinx Settings');
 
       $Sender->AddSideMenu('/dashboard/settings/plugins');
-      $Sender->Render('Settings', '', 'plugins/Sphinx');
+      $Sender->Render('settings', '', 'plugins/Sphinx');
    }
 
    /**

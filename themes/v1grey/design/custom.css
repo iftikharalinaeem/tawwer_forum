@@ -313,11 +313,11 @@ a.VanillaLink span {
 #conversations_messages_add #Content {
    margin: 0;
 }
-div.Tabs div.SubTab  {
+/*div.Tabs div.SubTab  {
    background: #333;
    color: #888;
    margin-bottom: 2px;
-}
+}*/
 ul.DataList div.Photo {
    padding: 0 6px;
 }
@@ -344,21 +344,9 @@ a.Bookmarked {
 a.Bookmarking {
    background: url('star_sprite.png') bottom center no-repeat;
 }
-ul.Options li.Parent strong,
-ul.Options li.Parent strong:hover,
-ul.Options li.Active strong:hover, ul.Options li.Active strong,
-ul.Options li.Active ul {
-   border: none;
-}
-ul.Options li.Active strong:hover,
-ul.Options li.Active strong {
-   background: #333 !important;
-}
-ul.Options li.Active a:hover {
-   background: #444;
-}
-ul.Options li ul li a {
-   width:68px;
+.OptionsMenu .MenuItems {
+   right: 0;
+   left: inherit;
 }
 
 

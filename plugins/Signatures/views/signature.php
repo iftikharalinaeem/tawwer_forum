@@ -15,8 +15,9 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Settings');
-         echo $this->Form->CheckBox('Plugin.Signatures.HideAll','Hide signatures?');
-         echo $this->Form->CheckBox('Plugin.Signatures.HideImages','Strip images out of signatures?');
+         echo $this->Form->CheckBox('Plugin.Signatures.HideAll','Hide signatures always');
+         echo $this->Form->CheckBox('Plugin.Signatures.HideMobile',"Hide signatures on my mobile device");
+         echo $this->Form->CheckBox('Plugin.Signatures.HideImages','Strip images out of signatures');
       ?>
    </li>
    <li>
@@ -25,6 +26,7 @@ echo $this->Form->Errors();
          echo $this->Form->TextBox('Plugin.Signatures.Sig', array('MultiLine' => TRUE));
       ?>
    </li>
+   
    <?php
       $this->FireEvent('EditMySignatureAfter');
    ?>

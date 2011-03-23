@@ -43,7 +43,7 @@ a.BigButton {
 }
 
 a.BigButton:hover,
-a.BigButon:focus {
+a.BigButton:focus {
 	background-position: 0 -100px;
 	border:1px solid #b8d9ec;
 

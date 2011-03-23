@@ -3,29 +3,34 @@ $Session = Gdn::Session();
 if (!function_exists('WriteComment'))
    include($this->FetchViewLocation('helper_functions', 'discussion'));
 ?>
-<div class="DataHeading">
-   <h1><?php
-      $DiscussionName = Gdn_Format::Text($this->Discussion->Name);
-      if ($DiscussionName == '')
-         $DiscussionName = T('Blank Discussion Topic');
 
-      echo $DiscussionName;
-   ?></h1>
+<h1>
    <?php
-   if ($Session->IsValid()) {
-      echo '<div class="Options">';
-
-      // Bookmark link
-      echo Anchor(
-         '<span>*</span>',
-         '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
-         'Bookmark' . ($this->Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-         array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
-      );
-
-      echo '</div>';
-   }
+   $DiscussionName = Gdn_Format::Text($this->Discussion->Name);
+   echo $DiscussionName ? $DiscussionName : T('Blank Discussion Topic');
+   ?>
+</h1>
+<?php
+if ($Session->IsValid()) {
+   // Bookmark link
+   echo Anchor(
+      '<span>*</span>',
+      '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
+      'Bookmark' . ($this->Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
+      array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
+   );
+}
 ?>
+<div class="Tabs HeadingTabs DiscussionTabs">
+   <ul>
+      <li><?php
+         if (Gdn::Config('Vanilla.Categories.Use') === TRUE) {
+            echo Anchor($this->Discussion->Category, 'categories/'.$this->Discussion->CategoryUrlCode);
+         } else {
+            echo Anchor(T('All Discussions'), 'discussions');
+         }
+      ?></li>
+   </ul>
 </div>
 <?php
    $this->FireEvent('BeforeDiscussion');
@@ -65,16 +70,8 @@ if ($this->Discussion->Closed == '1') {
 } else {
    ?>
    <div class="Foot">
-      To add a comment: <?php
-      try {
-         $FB = Gdn::PluginManager()->GetPluginInstance('FacebookPlugin');
-         $ImgSrc = Asset('/plugins/Facebook/design/facebook-login.png');
-         $ImgAlt = T('Login with Facebook');
-         $SigninHref = $FB->AuthorizeUri();
-         $PopupSigninHref = $FB->AuthorizeUri('display=popup');
-         echo "<a id=\"FacebookAuth\" href=\"$SigninHref\" class=\"PopupWindow\" title=\"$ImgAlt\" popupHref=\"$PopupSigninHref\" popupHeight=\"326\" popupWidth=\"627\" ><img src=\"$ImgSrc\" alt=\"$ImgAlt\" style=\"vertical-align: middle;\" /></a>";
-      } catch(Exception $ex) {
-      }
+      <?php
+      echo Anchor(T('Add a Comment'), Gdn::Authenticator()->SignInUrl($this->SelfUrl.(strpos($this->SelfUrl, '?') ? '&' : '?').'post#Form_Body'), 'TabLink'.(SignInPopup() ? ' SignInPopup' : ''));
       ?> 
    </div>
    <?php 
