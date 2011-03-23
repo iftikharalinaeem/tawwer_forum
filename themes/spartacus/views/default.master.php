@@ -28,15 +28,16 @@
                         $ProfileSlug = $Session->UserID.'/'.urlencode($Session->User->Name);
 							$this->Menu->AddLink('User', $Name, '/profile/'.$ProfileSlug, array('Garden.SignIn.Allow'), array('class' => 'UserNotifications'));
 							$this->Menu->AddLink('SignOut', T('Sign Out'), Gdn::Authenticator()->SignOutUrl(), FALSE, array('class' => 'NonTab SignOut'));
-						} else {
-							$Attribs = array();
-							if (SignInPopup() && strpos(Gdn::Request()->Url(), 'entry') === FALSE)
-								$Attribs['class'] = 'SignInPopup';
-								
-							$this->Menu->AddLink('Entry', T('Sign In'), Gdn::Authenticator()->SignInUrl(), FALSE, array('class' => 'NonTab'), $Attribs);
-						}
+//						} else {
+//							$Attribs = array();
+//							if (SignInPopup() && strpos(Gdn::Request()->Url(), 'entry') === FALSE)
+//								$Attribs['class'] = 'SignInPopup';
+//								
+//							$this->Menu->AddLink('Entry', T('Sign In'), Gdn::Authenticator()->SignInUrl(), FALSE, array('class' => 'NonTab'), $Attribs);
+                  }
 						echo $this->Menu->ToString();
-					}
+					}  
+//               echo SpartacusThemeHooks::FacebookButton();
 				?>
             <div class="Search"><?php
 					$Form = Gdn::Factory('Form');

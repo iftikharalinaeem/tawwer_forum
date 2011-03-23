@@ -1,0 +1,604 @@
+/*** Resets ***/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+   border: 0;
+   margin: 0;
+   outline: 0;
+   padding: 0;
+   text-decoration: none;
+}
+
+/** Margins for body-text **/
+h1, h2, h3, h4, h5, h6, blockquote, pre, .List li {
+   margin: 5px 0;
+}
+
+p, .P {
+   margin: 10px 0;
+}
+
+h1 {
+   font-size: 18px;
+}
+
+h2 {
+   font-size: 17px;
+}
+
+#Panel h2 {
+   font-size: 15px;
+}
+
+#Panel h3 {
+   font-size: 14px;
+}
+
+ul {
+   list-style: none;
+}
+
+/*** Basic Styling ***/
+
+body {
+   font-family: 'Lucida Grande', 'Lucida Sans', 'Lucida Sans Unicode', Arial, Helvetica, Verdana, sans-serif;
+   font-size: 13px;
+/*   height: 100%;*/
+   margin: 0;
+}
+
+h1, h1 a, h2, h2 a, h3 {
+   color: #3E3F37;
+}
+
+h3 a {
+   color: #3189E8;
+}
+
+a {
+   color: #006BDF;
+}
+
+a:hover {
+   color: #ff0084;
+}
+
+code, pre {
+   background: #F7FFCF;
+   border: solid .1ex #C9CCB7;
+   -moz-border-radius: .5ex;
+}
+code {
+   padding: .3ex .7ex;
+}
+pre {
+   padding: 1ex;
+}
+
+/*** Wireframe ***/
+
+#Background {
+   background: #fff; /* old browsers */
+   background: -moz-linear-gradient(top, #F7F6E4 0, #fff 100%);
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F7F6E4), color-stop(100%,#FFF));
+   height: 300px;
+   position: absolute;
+   width: 100%;
+   z-index: -1000;
+}
+
+.Wrap {
+   margin: auto;
+   width: 1019px;
+}
+
+.Column1 {
+   border-right: solid 1px #C9CCB7;
+   float: left;
+   width: 728px;
+}
+
+.Column2 {
+   border-left: solid 1px #C9CCB7;
+   float: right;
+   margin-left: -1px;
+   width: 250px;
+}
+
+#Content, #Panel {
+   min-height: 200px;
+   padding-left: 10px;
+   padding-right: 10px;
+   padding-top: 5px;
+}
+
+#Foot {
+   clear: both;
+}
+
+.ClearFix {
+   display: block;
+   zoom: 1;
+}
+.ClearFix:after {
+   clear: both;
+   content: ".";
+   display: block;
+   font-size: 0;
+   height: 0;
+   line-height: 0;
+   visibility: hidden;
+}
+
+@media (max-width: 1038px) {
+   .Wrap { width: 100% }
+   .Columns { float: none; }
+   .Column1 { float: none; width: inherit }
+   .Column2 { float: none; width: inherit }
+}
+
+* html .Column1 {  /* ie fix */
+	display: inline;
+}
+* html .Columns {  /* opera fix */
+	float: left;
+}
+
+/*** Banner & Menu ***/
+
+#Head {
+   margin-bottom: 10px;
+}
+
+#Head, #Head a {
+   color: #3E3F37;
+   text-shadow: 0 .1ex .1ex #fff;
+}
+
+#Head a:hover {
+   text-decoration: underline;
+}
+
+#Head h1 {
+   display: inline-block;
+/*   font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;*/
+   font-size: 20px;
+   font-weight: normal;
+   margin-top: 1ex;
+   padding: 0.5ex 1ex 0;
+}
+
+#Head .Wrap {
+   position: relative;
+}
+
+#Head .Menu {
+   bottom: 0;
+   position: absolute;
+   right: 0;
+}
+
+/*@media (max-width: 800px) {
+   .Menu { background: #000; display: block; position: static;}
+}*/
+
+.Menu li {
+   display: inline-block;
+   padding: 0 1em 0 0;
+}
+
+/*** Panel ***/
+
+#Panel .Box {
+   border-bottom: solid 1px #C9CCB7;
+   margin: 10px 0;
+   padding-bottom: 5px;
+}
+
+#Panel .Box:last-child {
+   border-bottom: none;
+}
+
+.PanelCategories .Count {
+   float: right;
+}
+
+
+/*** Datalists ***/
+
+.DataList {
+}
+
+.DataList .Item {
+   border-bottom: solid 1px #C9CCB7;
+   position: relative;
+}
+
+.DataList .ItemContent {
+   margin: 5px 0;
+}
+
+/*** Forms ***/
+
+form {
+   background: #FDFBF5;
+   border: solid 1px #C9CCB7;
+   -moz-border-radius: .7ex;
+   padding: 0 15px;   
+}
+
+.Button {
+   background: -moz-linear-gradient(top, #ffffff, #cccccc);
+   border: solid 1px #999;
+   -moz-border-radius: .6ex;
+   -moz-box-shadow: 0 0 .3ex rgba(0,0,0,.5);
+   color: #222;
+   cursor: pointer;
+   font-weight: bold;
+   padding: .5ex 1ex;
+   text-shadow: 0 .1ex .1ex #fff;
+}
+
+.Button:hover {
+   border-color: #444;
+   color: #000;
+}
+
+.BigButton {
+   background: #f1e767; /* old browsers */
+   background: -moz-linear-gradient(top, #F8B437 0%, #DA782B 100%); /* firefox */
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F8B437), color-stop(100%,#DA782B)); /* webkit */
+   border: solid 2px #F8B437;
+   -moz-border-radius: .5ex;
+   -moz-box-shadow: 0 0 .3ex rgba(0,0,0,.8);
+   color: #fff;
+   display: block;
+   font-size: 16px;
+   font-weight: bold;
+   padding: .7ex 1ex;
+   margin: 10px 0;
+   text-align: center;
+   text-shadow: 0 .1ex .2ex rgba(0,0,0,.5);
+}
+.BigButton:hover {
+   background: #a9e4f7; /* old browsers */
+   background: -moz-linear-gradient(top, #a9e4f7 0%, #0fb4e7 100%); /* firefox */
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#a9e4f7), color-stop(100%,#0fb4e7)); /* webkit */
+   border-color: #0fb4e7;
+   -moz-box-shadow: 0 0 .7ex rgba(0,0,0,.3);
+   color: #fff;
+   text-shadow: 0 .1ex .3ex rgba(0,0,0,.8);
+}
+
+label {
+   font-size: 14px;
+   font-weight: bold;
+}
+
+.InputBox, textarea, select {
+   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+   font-size: 15px;
+   padding: 3px;
+}
+.InputBox, textarea {
+   border: solid 1px #999;
+   -moz-border-radius: .3ex;
+}
+
+textarea, .BigInput {
+   box-sizing: border-box;
+   -webkit-box-sizing:border-box;
+   -moz-box-sizing: border-box;
+   margin-top: 5px;
+   width: 100%;
+}
+
+textarea {
+   min-height: 10em;
+}
+
+.CheckBoxLabel {
+   cursor: pointer;
+   font-weight: normal;
+   font-size: inherit;
+}
+.Inline li {
+   display: inline-block;
+   padding-left: 10px;
+   margin: 0;
+}
+.Inline li:first-child {
+   padding-left: 0;
+}
+
+.Buttons {
+   margin: 20px 0 10px;
+}
+
+/*** Messages ***/
+
+.Alert {
+   background: #CF2456;
+   -moz-border-radius: .7ex;
+   -webkit-border-radius: .7ex;
+   color: #fff;
+   font-size: 11px;
+   padding: 0 .5ex;
+   text-shadow: none;
+}
+
+.Count {
+   background: #46617D;
+   -moz-border-radius: .5ex;
+   -webkit-border-radius: .5ex;
+   color: #fff;
+   font-size: 11px;
+   padding: 0 .6ex;
+}
+
+.Errors {
+   background: #D50A0A;
+   -moz-border-radius: .7ex;
+   -webkit-border-radius: .7ex;
+   color: #fff;
+   text-shadow: 0 .1ex .2ex #000;
+}
+
+.Warnings {
+   background: #f1e767; /* old browsers */
+   background: -moz-linear-gradient(top, #F8B437 0%, #DA782B 100%); /* firefox */
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F8B437), color-stop(100%,#DA782B)); /* webkit */
+   border: solid 1px #DA782B;
+   color: #fff;
+   text-shadow: 0 .1ex .2ex #000;
+}
+
+div.Messages {
+   -moz-border-radius: .5ex;
+   margin: 10px 0;
+   padding: 1px 10px;
+}
+
+div.Messages li, .Messages p {
+   margin: 7px 0;
+}
+
+/*** Options Menu ***/
+
+.HoverItem {
+   visibility: hidden;
+}
+
+.HoverContainer:hover .HoverItem {
+   visibility: visible;
+}
+
+.Options {
+   position: absolute;
+   right: 0;
+}
+
+.OptionsMenu {
+   display: inline-block;
+}
+
+.Open.OptionsMenu, .Item:hover .OptionsMenu {
+   visibility: visible;
+}
+
+.MenuTitle {
+   background: #f2f5f6; /* old browsers */
+   background: -moz-linear-gradient(top, #f2f5f6 0%, #e3eaed 37%, #c8d7dc 100%); /* firefox */
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f2f5f6), color-stop(37%,#e3eaed), color-stop(100%,#c8d7dc)); /* webkit */
+   border: 1px solid #bbb;
+   -moz-border-radius: .5ex;
+   -webkit-border-radius: .5ex;
+   border-radius: .5ex;
+   color: #000;
+   
+   padding: .4ex 1ex;
+   user-select: none;
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -o-user-select: none;
+}
+
+.Open .MenuTitle {
+   border: 1px solid #282828;
+   -moz-border-radius-bottomleft: 0;
+   -moz-border-radius-bottomright: 0;
+   -webkit-border-bottom-left-radius: 0;
+   -webkit-border-bottom-right-radius: 0;
+   box-shadow: .3ex .3ex 1.5ex rgba(0,0,0,0.5);
+   -moz-box-shadow: .3ex .3ex 1.5ex rgba(0,0,0,0.5);
+   -webkit-box-shadow: .3ex .3ex 1.5ex rgba(0,0,0,0.5);
+   border-bottom-left-radius: 0;
+   border-bottom-right-radius: 0;
+   color: #fff;
+   background: url('images/buttons.png') right -144px no-repeat #282828;
+}
+.MenuItems {
+   border: 1px solid #282828;
+   -moz-border-radius-bottomleft: .5ex;
+   -moz-border-radius-bottomright: .5ex;
+   -webkit-border-radius-bottom-left: .5ex;
+   -webkit-border-radius-bottom-right: .5ex;
+   box-shadow: .3ex .3ex 1.5ex rgba(0,0,0,0.5);
+   -moz-box-shadow: .3ex .3ex 1.5ex rgba(0,0,0,0.5);
+   -webkit-box-shadow: .3ex .3ex 1.5ex rgba(0,0,0,0.5);
+   background: #444444;
+   border: 1px solid #282828;
+   min-width: 15ex;
+}
+.MenuItems li {
+   padding: .4ex 1ex;
+}
+.MenuItems li:hover {
+   background: #282828;
+}
+.MenuItems, .MenuItems a {
+   color: #fff;
+}
+
+.ToggleFlyout {
+   cursor: pointer;
+   position: relative;
+}
+.ToggleFlyout.Open {
+   z-index: 100;
+}
+.ToggleFlyout .Flyout {
+   position: absolute;
+   top: 100%;
+   left: 0;
+   display: none;
+   z-index: 100;
+}
+
+/*** Pagers ***/
+
+.Pager {
+   display: inline-block;
+   font-size: 12px;
+   margin: 4px 0;
+}
+
+.Pager a {
+   background: #a9e4f7;
+   border: solid 1px #0fb4e7;
+   -moz-border-radius: .5ex;
+   color: #0479A0;
+   margin-right: 5px;
+   padding: 3px 6px;
+}
+
+.Pager span {
+   background: none;
+   border: solid 1px #888;
+   -moz-border-radius: .5ex;
+   color: #888;
+   margin-right: 5px;
+   padding: 3px 6px;
+}
+
+.Pager span.Ellipsis {
+   border: none;
+   color: #555;
+   font-weight: bold;
+   padding: 4px 0;
+}
+
+.Pager a:hover {
+   background: #F8B437;
+   border-color: #DA782B;
+   color: #A94900;
+}
+
+.Pager .Highlight {
+   background: #0fb4e7;
+   color: #E7F9FF;
+}
+
+/*** Popups ***/
+
+.Border {
+   border-radius: 1ex;
+   -moz-border-radius: 1ex;
+   -webkit-border-radius: 1ex;
+	background: rgba(0,0,0,.5);
+	padding: 10px;
+}
+
+div.Popup .Loading {
+   display: block;
+	width: 200px;
+}
+
+.Overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+div.Popup {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  z-index: 5000;
+}
+
+div.Popup .Border {
+  -moz-box-shadow: 0 1.5ex 2em rgba(0,0,0,.5);
+  display: inline-block;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+a.Close {
+	color: #3E3F37;
+	font-size: 22px;
+   font-family: Arial;
+	font-weight: bold;
+   line-height: 1;
+   margin: 0 4px;
+	padding: 0;
+   position: absolute;
+	right: 0;
+   text-shadow: 0 1px 2px #FFFFFF;
+	top: 0;
+}
+a.Close:hover {
+	color: #000;
+}
+
+div.Popup .Body {  
+   background: #F7F6E4;
+   -moz-border-radius: .3ex;
+   padding: 5px;
+   position: relative;
+   text-align: left;
+}
+
+div.Popup h1 {
+   margin-top: 0;
+}
+
+div.Popup .SmallPopup {
+   max-width: 30em;
+}
+
+div.Popup form {
+   background: none;
+   border: none;
+   padding: 0;
+   
+}
+
+/*** User Info ***/
+
+.UserInfo a {
+   color:#3E3F37;
+   text-shadow:0 0.1ex 0.1ex #FFFFFF;
+}
+
+.UserInfo a:hover {
+   text-decoration: underline;
+}
+
+.UserInfo .ProfileLink {
+   display: block;
+   float: left;
+   margin: 0 5px 5px 0;
+}
+
+.UserInfo h3 {
+   margin: 0;
+}

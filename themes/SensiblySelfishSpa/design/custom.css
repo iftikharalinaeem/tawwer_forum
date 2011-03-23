@@ -361,17 +361,19 @@ div.Box {
     border: 1px solid #76252A;
     color: #555555;
 /*    font: 12px/1.5em Verdana,Geneva,sans-serif;*/
-	padding: 0;
+	padding: 7px;
 }
 div.Box h4 {
 	color: #555;
 	font-size: 18px;
    font-weight: normal;
-   padding: 7px 7px 0 7px;
+   margin-left: -7px;
+   margin-right: -7px;
+   margin-bottom: 7px;
+   padding: 0 7px;
 	border-bottom:2px solid #C83482;
 }
 ul.PanelInfo {
-   margin: 7px;
    border-top: none;
 }
 ul.PanelInfo li,
