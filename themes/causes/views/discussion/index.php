@@ -25,18 +25,6 @@ if (!function_exists('WriteComment'))
 
       echo '</div>';
    }
-
-   if (Gdn::Config('Vanilla.Categories.Use')) {
-      echo '<span class="Breadcrumbs">';
-      echo '<span class="Label">'.Anchor(T('Home'), "/").'</span>';
-
-      foreach ($this->Data('CategoryBreadcrumbs') as $Category) {
-         echo '<span class="Crumb">'.T('Breadcrumbs Crumb', ' &raquo; ').'</span>',
-            '<span class="Label">'.Anchor($Category['Name'], "/categories/{$Category['UrlCode']}").'</span>';
-      }
-
-      echo '</span>';
-   }
 ?>
 </div>
 <?php
