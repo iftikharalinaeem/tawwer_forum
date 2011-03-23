@@ -8,8 +8,9 @@ class SearchModel extends Gdn_Model {
 
    public $Types = array(1 => 'Discussion', 2 => 'Comment', 3 => 'Page');
    public $TypeInfo = array();
-   public $DataPath = '/usr/local/var/data';
-   public $LogPath = '/usr/local/var/log';
+   public $DataPath = '/var/data/searchd';
+   public $LogPath = '/var/log/searchd';
+   public $RunPath = '/var/run/searchd';
    public $UseDeltas;
 
    protected $_fp = NULL;
@@ -52,9 +53,9 @@ class SearchModel extends Gdn_Model {
 
       // Cron help.
       fwrite($fp, "# You'll need to set up a cron job to reindex the database with the following commands.\n");
-      fwrite($fp, "# /usr/local/bin/indexer --config /path/to/sphinx.conf --all --rotate\n");
+      fwrite($fp, "# indexer --all --rotate\n");
       if ($UseDeltas) {
-         fwrite($fp, "# /usr/local/bin/indexer --config /path/to/sphinx.conf ".implode(' ', $DeltaTypes)." --rotate\n");
+         fwrite($fp, "# indexer ".implode(' ', $DeltaTypes)." --rotate\n");
       }
       fwrite($fp, "\n");
 
@@ -74,7 +75,7 @@ class SearchModel extends Gdn_Model {
 # This searchd section is default searchd section. You can replace it with your own.
 searchd {
   listen = {$Server}:{$Port}
-  pid_file = {$this->LogPath}/searchd.pid
+  pid_file = {$this->RunPath}/searchd.pid
 }";
       $this->WriteConf($Searchd);
 
@@ -148,8 +149,8 @@ searchd {
 
       // Loop through the matches to figure out which IDs we have to grab.
       $IDs = array();
-      if (!is_array($Search['matches']))
-         $Search['matches'] = array();
+      if (!is_array($Search) || !isset($Search['matches']))
+         return array();
          
       foreach ($Search['matches'] as $DocumentID => $Info) {
          $ID = (int)($DocumentID / 10);
