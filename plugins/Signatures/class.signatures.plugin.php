@@ -17,7 +17,7 @@ $PluginInfo['Signatures'] = array(
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
-   'RegisterPermissions' => array('Plugins.Signatures.Allow' => 1),
+   'RegisterPermissions' => array('Plugins.Signatures.Edit' => 1),
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',
@@ -29,7 +29,7 @@ class SignaturesPlugin extends Gdn_Plugin {
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
       if (!Gdn::Session()->CheckPermission(array(
          'Garden.SignIn.Allow',
-         'Plugins.Signatures.Allow'
+         'Plugins.Signatures.Edit'
       ))) {
          return;
       }
@@ -48,7 +48,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       $Sender->Permission(array(
          'Garden.SignIn.Allow',
-         'Plugins.Signatures.Allow'
+         'Plugins.Signatures.Edit'
       ));
       
       $Args = $Sender->RequestArgs;
@@ -58,6 +58,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          $Args = array_slice($Args, 0, 2);
       
       list($UserReference, $Username) = $Args;
+      $Sender->Permission('Plugins.Signatures.Edit');
       $Sender->GetUserInfo($UserReference, $Username);
       $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
       if (!is_array($UserPrefs))
@@ -126,7 +127,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       if (is_null($Signatures)) {
          $Signatures = array();
          
-         // Short circuit if not needed
+         // Short circuit if not needed.
          if ($this->Hide()) return $Signatures;
       
          $Discussion = $Sender->Data('Discussion');

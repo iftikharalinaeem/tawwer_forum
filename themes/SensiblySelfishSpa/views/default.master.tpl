@@ -33,7 +33,7 @@
 		</div>
 	 </div>
 	 <div id="Foot">
-		<div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
+		<!--<div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>-->
 		{asset name="Foot"}
 	 </div>
   </div>

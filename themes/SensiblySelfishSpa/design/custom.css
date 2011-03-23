@@ -23,17 +23,21 @@ a, a:link, a:visited, a:active {
 a:hover{
  color: #C83482;
 }
-a.Button, .Button {
-    color: #C83482;
+a.Button, .Button, input.Button, a.BigButton {
+   background: #F6F6F6; /* old browsers */
+   background: -moz-linear-gradient(top, #FFF 0%, #FAE1F4 100%);
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FFF), color-stop(100%,#FAE1F4));
+   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFF', endColorstr='#FAE1F4',GradientType=0 );
+   color: #692126;
+   -moz-border-radius: 1.3ex;
+   font-family: Buda,Trebuchet MS,Tahoma,sans-serif;
+   text-transform: uppercase;
+   text-shadow: 0 1px 1px #FFF;
 }
-a.BigButton {
-    color: #C83482;
-    font-family: Buda, Trebuchet MS, Tahoma, sans-serif;
-    font-weight: bold;
-    font-size: 22px;
-}
-a.BigButton:hover {
-    color: #1A717B;
+a.Button:hover, .Button:hover, input.Button:hover, a.BigButton:hover {
+ background: -moz-linear-gradient(top, #FAE1F4 0%, #FFF 100%);
+ background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FAE1F4), color-stop(100%,#FFF));
+ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FAE1F4', endColorstr='#FFF',GradientType=0 );  
 }
 a.Close {
     color: #C83482;
@@ -68,18 +72,12 @@ div.Popup #ConversationForm h2 {
     color: #555555;
 }
 .Banner {
-	padding: 10px;
-	text-align: left;
-	position: relative;
-	font-family: Dancing Script;
+		font-family: Verdana;
+		font-size: 27px;
+		text-align: left;
 }
 .Banner ul {
-   border-radius: 16px;
-	-moz-border-radius: 16px;
-	-webkit-border-radius: 16px;
-	 background-color: #FFB8ED;
-    border: 1px solid #C83482;
-	padding: 10px;
+  	padding: 0 0 10px;
 	margin: 0;
 }
 .Banner ul li {
@@ -91,7 +89,7 @@ div.Popup #ConversationForm h2 {
 	font-weight: normal;
 	padding: 3px 6px;
 	font-size: 26px;
-	color: #555555;
+	color: #692126;
 	display: inline-block;
 }
 .Banner ul li a:hover {
@@ -125,6 +123,7 @@ div.Popup #ConversationForm h2 {
 #Panel {
 	float: right;
 	margin-right: 10px;
+	font-family: verdana;
 }
 #Panel div.SearchBox input.InputBox {
 	width: 200px;
@@ -163,6 +162,16 @@ div.CommentForm textarea,
 #DiscussionForm input.InputBox,
 #DiscussionForm textarea {
 	width:99%;
+}
+
+#DiscussionForm form {
+   border-radius: 10px; 
+   -moz-border-radius: 10px;
+   -webkit-border-radius: 10px;
+}
+
+#DiscussionForm label, label {
+   color: #692154;
 }
 
 /* Tabs */
@@ -369,7 +378,7 @@ div.Box {
 	padding: 7px;
 }
 div.Box h4 {
-	color: #555;
+	color: #1A717B;
 	font-size: 18px;
    font-weight: normal;
    margin-left: -7px;
