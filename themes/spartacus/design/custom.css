@@ -97,6 +97,9 @@ div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
 	color: #fff;
 	border: none;
 }
+h1, h2 {
+   text-shadow: 0 1px 1px #EFD6AA;
+}
 
 /* Voting Plugin Fixes */
 ul.DataList div.Meta strong {
