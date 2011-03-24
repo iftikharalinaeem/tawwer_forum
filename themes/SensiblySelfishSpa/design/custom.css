@@ -87,14 +87,16 @@ div.Popup #ConversationForm h2 {
 }
 .Banner ul li a {
 	font-weight: normal;
-	padding: 3px 6px;
-	font-size: 26px;
-	color: #692126;
+	padding: 3px 6px 0;
+	font-family: 'Buda';
+	font-variant: small-caps;
+	font-size: 18px;
+	color: #1A717B;
 	display: inline-block;
+	font-weight: bold;
 }
 .Banner ul li a:hover {
-
-	background: #FFBEF4;
+	text-decoration: underline;
 }
 .Banner ul li a.SignOut {
 	font-weight: normal;
@@ -118,11 +120,10 @@ div.Popup #ConversationForm h2 {
 #Content {
 	float: none;
 	width: auto;
-	margin: 0 280px 0 10px;
+	margin: 0 270px 0 0;
 }
 #Panel {
 	float: right;
-	margin-right: 10px;
 	font-family: verdana;
 }
 #Panel div.SearchBox input.InputBox {
@@ -138,11 +139,9 @@ body.Profile div.SearchBox {
 body.Profile #Content {
 	float:none;
 	width: auto;
-	margin: 0 10px 0 280px;
+	margin: 0 0 0 270px;
 }
-body.Profile #Panel {
-	margin: 0 0 0 10px;
-}
+
 form.Activity textarea {
 	width:99%;
 }
