@@ -516,7 +516,7 @@ pageTracker._trackPageview();
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
       ) {
-			if (defined('DEBUG'))
+			if (Debug())
 				$Sender->AddAsset('Content', '<span style="color: red; font-weight: bold;">REDIRECT</span>');
 			else
 				Redirect('/dashboard/home/permission');
