@@ -7,7 +7,13 @@ $ChildCategories = '';
 $this->EventArguments['NumRows'] = $this->CategoryData->NumRows();
 ?>
 <div class="Tabs Headings CategoryHeadings">
-   <div class="ItemHeading"><?php echo T('All Categories'); ?></div>
+   <table class="CategoryHeading">
+      <tr>
+         <td class="CategoryName">Forum</td>
+         <td class="Count CountDiscussions">Threads</td>
+         <td class="Count CountComments">Posts</td>
+      </tr>
+   </table>
 </div>
 <?php
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
@@ -32,35 +38,29 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
          } else if ($DoHeadings && $Category->Depth == 1) {
             $CatList .= '<li class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.'">
-               <div class="ItemContent Category '.$ReadClass.'">'.Gdn_Format::Text($Category->Name).'</div>'
-               .GetOptions($Category, $this).'
-            </li>';
+               <div class="Category '.$ReadClass.'">'.Gdn_Format::Text($Category->Name).'</div>'
+               // .GetOptions($Category, $this).'
+            .'</li>';
          } else {
             $LastComment = UserBuilder($Category, 'LastComment');
-            $CatList .= '<li class="Item Depth'.$Category->Depth.' Category-'.$Category->UrlCode.'">
-               <div class="ItemContent Category '.$ReadClass.'">'
-                  .Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
-                  .GetOptions($Category, $this)
-                  .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'))
-                  .'<div class="Meta">
-                     <span class="RSS">'.Anchor(Img('applications/dashboard/design/images/rss.gif'), '/categories/'.$Category->UrlCode.'/feed.rss').'</span>
-                     <span class="DiscussionCount">'.sprintf(Plural(number_format($Category->CountAllDiscussions), '%s discussion', '%s discussions'), $Category->CountDiscussions).'</span>
-                     <span class="CommentCount">'.sprintf(Plural(number_format($Category->CountAllComments), '%s comment', '%s comments'), $Category->CountComments).'</span>';
-                     if ($Category->LastCommentID != '' && $Category->LastDiscussionName != '') {
-                        $CatList .= '<span class="LastDiscussionName">'.sprintf(
-                              T('Most recent: %1$s by %2$s'),
-                              Anchor(SliceString($Category->LastDiscussionName, 40), '/discussion/'.$Category->LastDiscussionID.'/'.Gdn_Format::Url($Category->LastDiscussionName)),
-                              UserAnchor($LastComment)
-                           ).'</span>'
-                           .'<span class="LastCommentDate">'.Gdn_Format::Date($Category->DateLastComment).'</span>';
-                     }
+            $CatList .= '<li class="Item Depth'.$Category->Depth.' Category-'.$Category->UrlCode.' '.$ReadClass.'">
+               '.GetOptions($Category, $this).'
+               <table>
+                  <tr>
+                     <td class="CategoryName">'.
+                        Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode, 'Title')
+                        .Wrap($Category->Description, 'div', array('class' => 'CategoryDescription'));
+
                      // If this category is one level above the max display depth, and it
                      // has children, add a replacement string for them.
                      if ($MaxDisplayDepth > 0 && $Category->Depth == $MaxDisplayDepth - 1 && $Category->TreeRight - $Category->TreeLeft > 1)
                         $CatList .= '{ChildCategories}';
-         
-                  $CatList .= '</div>
-               </div>
+                        
+                     $CatList .= '</td>
+                     <td class="Count CountDiscussions"><div class="Wrap">'.Gdn_Format::BigNumber($Category->CountAllDiscussions).'</div></td>
+                     <td class="Count CountComments">'.Gdn_Format::BigNumber($Category->CountAllComments).'</td>
+                  </tr>
+               </table>
             </li>';
          }
       }

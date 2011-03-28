@@ -17,12 +17,12 @@ echo $PostReplyButton;
 
 if ($Session->IsValid()) {
    // Bookmark link
-   echo Anchor(
+   echo Wrap(Anchor(
       '<span>*</span>',
       '/vanilla/discussion/bookmark/'.$this->Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl),
       'Bookmark' . ($this->Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
       array('title' => T($this->Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark'))
-   );
+   ), 'div', array('class' => 'BookmarkWrapper'));
 }
 ?>
 <div class="Tabs HeadingTabs DiscussionTabs">
@@ -78,7 +78,37 @@ if ($this->Discussion->Closed == '1') {
    </div>
    <?php
 } else if ($Session->IsValid() && $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $this->Discussion->PermissionCategoryID)) {
-   echo $this->FetchView('comment', 'post');
+  	// Append the user's roles to the class definition
+   $CssClass = 'CommentFormTable CommentTable';
+	$CssRoles = strtolower(implode(' role-', $Session->User->Roles));
+	if ($CssRoles != '')
+		$CssClass .= ' role-'.$CssRoles;
+	
+	// Identify jailed & banned users
+	if (GetValue('InsertBanned', $Session->User) == '1')
+		$CssClass .= ' banned';
+	else if (GetValue('InsertJailed', $Session->User) == '1')
+		$CssClass .= ' jailed';
+
+   ?>
+   <div class="FormBanner">Post a Reply</div>
+	<table class="<?php echo $CssClass; ?>">
+		<tr>
+			<td class="Author">
+				<?php
+				echo Wrap(UserAnchor($Session->User), 'div', array('class' => 'Name'));
+				echo Wrap('<span class="Rank"></span>'.UserPhoto($Session->User), 'div', array('class' => 'Photo'));
+				if ($Session->User->About != '')
+					echo Wrap(Gdn_Format::Text($Session->User->About), 'div', array('class' => 'Status'));
+
+				?>
+			</td>
+			<td class="Comment">
+            <?php echo $this->FetchView('comment', 'post'); ?>
+         </td>
+      </tr>
+   </table>
+   <?php
 } else if ($Session->IsValid()) { ?>
    <div class="Foot Closed">
       <div class="Note Closed"><?php echo T('Commenting not allowed.'); ?></div>

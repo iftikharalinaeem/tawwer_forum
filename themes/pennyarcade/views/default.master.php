@@ -34,6 +34,7 @@
 			</div>
 			<div class="ProfileMenu">
 				<?php
+					echo Gdn_Theme::Link('activity', 'Activity', $Wrap, array('class' => 'Activity'));
 					if ($Session->IsValid()) {
 						echo Gdn_Theme::Link('dashboard', 'Dashboard', $Wrap, array('class' => 'Dashboard'));
 						echo UserPhoto($Session->User, 'PhotoProfile');
