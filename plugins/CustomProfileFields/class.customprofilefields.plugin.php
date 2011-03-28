@@ -58,6 +58,7 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 				echo $Sender->Form->TextBox('CustomProfileFieldValue[]', array('value' => GetValue($Field, $ProfileFields, '')));
 			echo '</li>';
 		}
+		if (!C('Plugins.CustomProfileFields.Disallow')) {
 		?>
 <li>
 	<label><?php echo T('Custom Information'); ?></label>
@@ -96,7 +97,6 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 	</style>
 </li>
 <?php
-		if (!C('Plugins.CustomProfileFields.Disallow')) {
 			// Write out user-defined custom fields
 			foreach ($ProfileFields as $Field => $Value) {
 				if (!in_array($Field, $SuggestedFields)) {
@@ -167,7 +167,31 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 			// No errors
 		}
 	}
+	
+	/**
+	 * Configuration screen
+	 */
+	public function PluginController_CustomProfileFields_Create($Sender) {
+		$Conf = new ConfigurationModule($Sender);
+		$Conf->Initialize(array(
+			'Plugins.CustomProfileFields.Disallow' => array('Type' => 'bool', 'Control' => 'CheckBox'),
+			'Plugins.CustomProfileFields.SuggestedFields' => array('Control' => 'TextBox', 'Options' => array('MultiLine' => TRUE))
+		));
 
+     $Sender->AddSideMenu('plugin/customprofilefields');
+     $Sender->SetData('Title', T('Custom Profile Field Settings'));
+     $Sender->ConfigurationModule = $Conf;
+     $Conf->RenderAll();
+	}
+	
+	/**
+	 * Add the admin config menu option.
+	 */
+	public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      $Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Users', T('Custom Profile Fields'), 'plugin/customprofilefields', 'Garden.User.Edit');
+	}
+	
    /**
     * Add suggested fields on install. These are configurable in conf/config.php.
     */
