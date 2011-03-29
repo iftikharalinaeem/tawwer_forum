@@ -466,7 +466,7 @@ class InfractionsPlugin extends Gdn_Plugin {
       // Add an attributes column to the Activity table
       $Structure
          ->Table('Activity')
-         ->Column('Attributes', 'text')
+         ->Column('Attributes', 'text', TRUE)
          ->Set(FALSE, FALSE);
 
       // Create a new permission for infractions
