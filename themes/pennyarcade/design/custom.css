@@ -829,6 +829,9 @@ ul.MessageList.Discussion li.Item:nth-of-type(odd) {
 	background: #E2E2E2;
 	border-right: 1px solid #c7c7c7;
 }
+.CommentTable td.Author {
+	padding-bottom: 10px;
+}
 .ProfileUser {
 	width: 250px;
 	padding-bottom: 10px;
@@ -839,7 +842,7 @@ ul.MessageList.Discussion li.Item:nth-of-type(odd) {
 	font-size: 12px;
 	color: #666;
 	display: block;
-	margin: 0 10px 10px;
+	margin: 0 10px;
 	padding: 10px 0 0;
 	line-height: 1;
 	border-top: 1px solid #cbcfd5;
