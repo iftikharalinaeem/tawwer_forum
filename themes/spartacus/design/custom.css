@@ -59,6 +59,10 @@ ul#Menu {
 	color: #2c85b1 !important;
 }
 
+#Head {
+   height: 50px;
+}
+
 #Head .FacebookButton {
    position: absolute;
    right: 10px;
@@ -67,8 +71,9 @@ ul#Menu {
 
 /* Body */
 
-html {
+html, body {
    background: #B8905C;
+   height: 700px;
 }
 
 #Body, body.Entry {
@@ -76,10 +81,9 @@ html {
 	margin: 0;
 	padding: 0;
 	float: left;
-	/* max-height: 600px; */
 	overflow: auto;
 	background: url('bg.jpg') top left no-repeat;
-   min-height: 600px;
+   height: 650px;
 }
 div.Body {
 	padding: 10px;
