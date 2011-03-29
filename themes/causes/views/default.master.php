@@ -20,6 +20,8 @@
 			 if (Gdn::Session()->IsValid()) {
 				echo Gdn_Theme::Link('signinout', 'Sign Out', '<a href="%url" class="%class">%text</a>');
 			 } else {
+				echo Gdn_Theme::Link('signinout', 'Sign In', '<a href="%url" class="%class">%text</a>');
+				/*
 				$Link = '';
 				try {
 				  $FB = Gdn::PluginManager()->GetPluginInstance('FacebookPlugin');
@@ -31,6 +33,7 @@
 				  echo str_replace('{login_text}', '<img class="FacebookIcon" src="'.$ImgSrc.'" alt="'.$ImgAlt.'" align="bottom" /> Sign In', $Link);
 				} catch (Exception $ex) {
 				}
+				*/
 			 }
 			 ?>
 			 </span>
