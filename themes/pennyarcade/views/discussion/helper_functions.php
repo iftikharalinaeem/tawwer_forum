@@ -32,7 +32,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    $Alt = !$Alt;
 	
 	// Append the user's roles to the class definition
-	$CssRoles = strtolower(implode(' role-', $Object->Roles));
+	$CssRoles = strtolower(implode(' role-', GetValue('Roles', $Object, array())));
 	if ($CssRoles != '')
 		$CssClass .= ' role-'.$CssRoles;
 	
@@ -45,7 +45,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    $Sender->FireEvent('BeforeCommentDisplay');
 ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo $Id; ?>">
-	<table>
+	<table class="CommentTable">
 		<tr>
 			<td class="Author">
 				<?php
@@ -58,24 +58,26 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 				?>
 			</td>
 			<td class="Comment">
-				<div class="Meta">
-					<?php $Sender->FireEvent('BeforeCommentMeta'); ?>
-					<span class="DateCreated">
-						<?php echo Anchor(Gdn_Format::Date($Object->DateInserted), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset+1), 'rel' => 'nofollow')); ?>
-					</span>
-					<?php WriteOptionList($Object, $Sender, $Session); ?>
-					<?php $Sender->FireEvent('AfterCommentMeta'); ?>
+				<div class="Comment">
+					<div class="Meta">
+						<?php $Sender->FireEvent('BeforeCommentMeta'); ?>
+						<span class="DateCreated">
+							<?php echo Anchor(Gdn_Format::Date($Object->DateInserted), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset+1), 'rel' => 'nofollow')); ?>
+						</span>
+						<?php WriteOptionList($Object, $Sender, $Session); ?>
+						<?php $Sender->FireEvent('AfterCommentMeta'); ?>
+					</div>
+					<div class="Message">
+						<?php
+							$Sender->FireEvent('BeforeCommentBody');
+							$Object->FormatBody = Gdn_Format::To($Object->Body, $Object->Format);
+							$Sender->FireEvent('AfterCommentFormat');
+							$Object = $Sender->EventArguments['Object'];
+							echo $Object->FormatBody;
+						?>
+					</div>
+					<?php $Sender->FireEvent('AfterCommentBody'); ?>
 				</div>
-				<div class="Message">
-					<?php
-						$Sender->FireEvent('BeforeCommentBody');
-						$Object->FormatBody = Gdn_Format::To($Object->Body, $Object->Format);
-						$Sender->FireEvent('AfterCommentFormat');
-						$Object = $Sender->EventArguments['Object'];
-						echo $Object->FormatBody;
-					?>
-				</div>
-				<?php $Sender->FireEvent('AfterCommentBody'); ?>
 			</td>
 		</tr>
 	</table>

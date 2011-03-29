@@ -18,6 +18,10 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $Sender->EventArguments['CssClass'] = &$CssClass;
    $First = UserBuilder($Discussion, 'First');
    $Last = UserBuilder($Discussion, 'Last');
+   if (is_null($Last->UserID)) {
+      $Last = $First;
+      $Discussion->LastDate = $Discussion->FirstDate;
+   }
    
    $Sender->FireEvent('BeforeDiscussionName');
    
@@ -32,6 +36,10 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
       $Sender->FireEvent('BetweenDiscussion');
    else
       $FirstDiscussion = FALSE;
+      
+   $Discussion->CountComments--;
+   if ($Discussion->CountComments < 0)
+      $Discussion->CountComments = 0;
 ?>
 <li class="<?php echo $CssClass; ?>">
    <?php

@@ -15,9 +15,12 @@ class PennyArcadeThemeHooks implements Gdn_IPlugin {
 		Gdn::Locale()->SetTranslation('%s comment', '%s');
 		Gdn::Locale()->SetTranslation('%s threads', '%s');
 		Gdn::Locale()->SetTranslation('%s thread', '%s');
+		Gdn::Locale()->SetTranslation('Bookmarked Discussions', 'Bookmarked Threads');
 		Gdn::Locale()->SetTranslation('My Discussions', 'My Threads');
 		Gdn::Locale()->SetTranslation('All Discussions', 'All Threads');
 		Gdn::Locale()->SetTranslation('Recent Discussions', 'Recent Threads');
+		Gdn::Locale()->SetTranslation('Write Comment', 'Write Reply');
+		Gdn::Locale()->SetTranslation('Post Comment', 'Post Reply');
 		// Move the howdy stranger module into the BodyMenu asset container
 		if (array_key_exists('Panel', $Sender->Assets)) {
 			if (array_key_exists('GuestModule', $Sender->Assets['Panel'])) {
@@ -73,12 +76,34 @@ class PennyArcadeThemeHooks implements Gdn_IPlugin {
 	
 	// Add the insert user's roles to the comment data so we can visually identify different roles in the view
 	public function DiscussionController_Render_Before($Sender) {
-      $JoinDiscussion = array($Sender->Discussion);
-      RoleModel::SetUserRoles($JoinDiscussion, 'InsertUserID');
-      RoleModel::SetUserRoles($Sender->CommentData->Result(), 'InsertUserID');
+		$Session = Gdn::Session();
+		if ($Session->IsValid()) {
+			$JoinUser = array($Session->User);
+			RoleModel::SetUserRoles($JoinUser, 'UserID');
+		}
+		if (property_exists($Sender, 'Discussion')) {
+			$JoinDiscussion = array($Sender->Discussion);
+			RoleModel::SetUserRoles($JoinDiscussion, 'InsertUserID');
+			RoleModel::SetUserRoles($Sender->CommentData->Result(), 'InsertUserID');
+		}
+	}
+	public function PostController_Render_Before($Sender) {
+		if (property_exists($Sender, 'CommentData') && is_object($Sender->CommentData)) {
+			RoleModel::SetUserRoles($Sender->CommentData->Result(), 'InsertUserID');
+			if (Gdn::Session()->IsValid()) {
+				$Results = &$Sender->CommentData->Result();
+				foreach ($Results as &$Result) {
+					$User = Gdn::UserModel()->GetID($Result->InsertUserID);
+					$Result->InsertEmail = $User->Email;
+					$Result->InsertStatus = $User->About;
+				}
+			}
+		}
 	}
 
    public function Setup() {
+		SaveToConfig('Garden.Thumbnail.Size', '80');
+		SaveToConfig('Plugins.Gravatar.DefaultAvatar', 'themes/pennyarcade/design/images/generic_user.png');
 		return TRUE;
    }
 
