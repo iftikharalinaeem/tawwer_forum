@@ -441,7 +441,7 @@ class InfractionsPlugin extends Gdn_Plugin {
          ->Column('UserID', 'int(11)', FALSE, 'key')
          ->Column('Points', 'int(11)', FALSE)
          ->Column('Reason', 'varchar(255)', TRUE)
-         ->Column('Note', 'text')
+         ->Column('Note', 'text', TRUE)
          ->Column('DateExpires', 'datetime')
          ->Column('Reversed', 'int', FALSE, '0')
          ->Column('Warning', 'int', FALSE, '0')
@@ -466,7 +466,7 @@ class InfractionsPlugin extends Gdn_Plugin {
       // Add an attributes column to the Activity table
       $Structure
          ->Table('Activity')
-         ->Column('Attributes', 'text')
+         ->Column('Attributes', 'text', TRUE)
          ->Set(FALSE, FALSE);
 
       // Create a new permission for infractions

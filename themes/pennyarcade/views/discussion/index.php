@@ -11,9 +11,12 @@ $PostReplyButton = Anchor('Post a Reply', '#Form_Body', 'BigButton');
 if (!$Session->IsValid())
    $PostReplyButton = Anchor('Post a Reply', Gdn::Authenticator()->SignInUrl($this->SelfUrl.(strpos($this->SelfUrl, '?') ? '&' : '?').'post#Form_Body'), 'BigButton'.(SignInPopup() ? ' SignInPopup' : ''));
    
-echo $this->Pager->ToString('less');
-
+echo '<table class="PageNavigation Top"><tr><td>';
 echo $PostReplyButton;   
+echo '</td><td>';
+echo $this->Pager->ToString('less');
+echo '</td></tr></table>';
+
 
 if ($Session->IsValid()) {
    // Bookmark link
@@ -67,7 +70,12 @@ if($this->Pager->LastPage()) {
    $this->AddDefinition('Vanilla_Comments_AutoRefresh', Gdn::Config('Vanilla.Comments.AutoRefresh', 0));
 }
 
+echo '<table class="PageNavigation Bottom"><tr><td>';
+if ($this->Discussion->Closed == '1' || !$Session->IsValid())
+   echo $PostReplyButton;
+echo '</td><td>';
 echo $this->Pager->ToString('more');
+echo '</td></tr></table>';
 
 // Write out the comment form
 if ($this->Discussion->Closed == '1') {
@@ -115,10 +123,4 @@ if ($this->Discussion->Closed == '1') {
       <?php echo Anchor(T('&larr; All Discussions'), 'discussions', 'TabLink'); ?>
    </div>
    <?php
-} else {
-   ?>
-   <div class="Foot">
-      <?php echo $PostReplyButton; ?>
-   </div>
-   <?php 
 }

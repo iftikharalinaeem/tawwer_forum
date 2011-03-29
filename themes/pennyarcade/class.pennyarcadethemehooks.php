@@ -86,7 +86,20 @@ class PennyArcadeThemeHooks implements Gdn_IPlugin {
 			RoleModel::SetUserRoles($JoinDiscussion, 'InsertUserID');
 			RoleModel::SetUserRoles($Sender->CommentData->Result(), 'InsertUserID');
 		}
+		
+		// Add moderator module to the page
+		$ModeratorsModule = new CategoryModeratorsModule($Sender);
+		$ModeratorsModule->GetData($Sender->Category);
+		$Sender->AddModule($ModeratorsModule);
 	}
+	
+	public function CategoriesController_Render_Before($Sender) {
+		// Add moderator module to the page
+		$ModeratorsModule = new CategoryModeratorsModule($Sender);
+		$ModeratorsModule->GetData($Sender->Category);
+		$Sender->AddModule($ModeratorsModule);
+	}
+	
 	public function PostController_Render_Before($Sender) {
 		if (property_exists($Sender, 'CommentData') && is_object($Sender->CommentData)) {
 			RoleModel::SetUserRoles($Sender->CommentData->Result(), 'InsertUserID');

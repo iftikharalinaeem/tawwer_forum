@@ -12,7 +12,6 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $CssClass .= $Discussion->InsertUserID == $Session->UserID ? ' Mine' : '';
    $CssClass .= ($Discussion->CountUnreadComments > 0 && $Session->IsValid()) ? ' New' : '';
    $DiscussionUrl = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') && $Session->UserID > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '');
-   $LastPageUrl = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 && C('Vanilla.Comments.AutoOffset') && $Session->UserID > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '');
    $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
    $Sender->EventArguments['Discussion'] = &$Discussion;
    $Sender->EventArguments['CssClass'] = &$CssClass;
@@ -24,6 +23,13 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    }
    
    $Sender->FireEvent('BeforeDiscussionName');
+   $CountCommentsPerPage = GetValue('CountCommentsPerPage', $Sender);
+   if (!$CountCommentsPerPage) {
+      $CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
+      $Sender->CountCommentsPerPage = $CountCommentsPerPage;
+   }
+   $CountPages = ceil($Discussion->CountComments / $CountCommentsPerPage);
+   $LastPageUrl = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/p'.$CountPages.'/#Comment_'.$Discussion->LastCommentID;
    
    $DiscussionName = Gdn_Format::Text($Discussion->Name);
    if ($DiscussionName == '')
@@ -50,6 +56,22 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
       <tr>
          <td class="DiscussionName"><?php
             echo Anchor($DiscussionName, $DiscussionUrl, 'Title');
+            if ($CountPages > 1) {
+               echo '<div class="MiniPager">
+                  <div class="MiniPagerArrow"></div>';
+                  if ($CountPages < 5) {
+                     for ($i = 0; $i < $CountPages; $i++) {
+                        WritePageLink($Discussion, $i+1);
+                     }
+                  } else {
+                     WritePageLink($Discussion, 1);
+                     WritePageLink($Discussion, 2);
+                     echo '<span class="Elipsis">...</span>';
+                     WritePageLink($Discussion, $CountPages-1);
+                     WritePageLink($Discussion, $CountPages);
+                  }
+               echo '</div>';
+            }
          ?></td>
          <td class="User FirstUser">
             <div class="Wrap">
@@ -80,6 +102,10 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    </table>
 </li>
 <?php
+}
+
+function WritePageLink($Discussion, $PageNumber) {
+   echo Anchor($PageNumber, '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/p'.$PageNumber);
 }
 
 // WriteFilterTabs() is modified to include a heading row for the discussion list. Check bottom of function for changes.

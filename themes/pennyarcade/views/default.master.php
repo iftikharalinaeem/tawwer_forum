@@ -39,7 +39,12 @@
 						echo Gdn_Theme::Link('dashboard', 'Dashboard', $Wrap, array('class' => 'Dashboard'));
 						echo UserPhoto($Session->User, 'PhotoProfile');
 						echo Gdn_Theme::Link('profile', $Session->User->Name, $Wrap, array('class' => 'Profile'));
-						echo Gdn_Theme::Link('inbox', '<span class="Hidden">Inbox</span>', $Wrap, array('class' => 'Inbox'));
+						$Inbox = '0';
+						$CountUnreadConversations = $Session->User->CountUnreadConversations;
+						if (is_numeric($CountUnreadConversations) && $CountUnreadConversations > 0)
+							$Inbox = $CountUnreadConversations;
+						
+						echo Anchor('<span class="Alert">'.$Inbox.'</span>', '/messages/all', 'Inbox HasCount');
 					} else {
 						echo Gdn_Theme::Link('signinout', 'Sign In', $Wrap);
 					}

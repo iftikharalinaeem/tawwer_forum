@@ -753,7 +753,7 @@ div.CategoryBox ul.Discussions div.ItemContent {
 	padding: 0;
 }
 
-/* Hide Entry & Registration Forms */
+/* Hide Entry & Registration Forms 
 div.Entry div.Box,
 #Form_User_SignIn {
 	display: none;
@@ -774,3 +774,4 @@ div.Methods div:first-child {
 div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
    background: none;
 }
+*/

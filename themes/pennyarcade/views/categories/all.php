@@ -5,11 +5,14 @@ $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
 $ChildCategories = '';
 $this->EventArguments['NumRows'] = $this->CategoryData->NumRows();
+CategoryModel::JoinModerators($this->CategoryData);
+
 ?>
 <div class="Tabs Headings CategoryHeadings">
    <table class="CategoryHeading">
       <tr>
          <td class="CategoryName">Forum</td>
+         <td class="Moderators">Moderators</td>
          <td class="Count CountDiscussions">Threads</td>
          <td class="Count CountComments">Posts</td>
       </tr>
@@ -42,6 +45,11 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                // .GetOptions($Category, $this).'
             .'</li>';
          } else {
+            $ModList = '';
+            foreach ($Category->Moderators as $Moderator) {
+               $Moderator = UserBuilder($Moderator);
+               $ModList .= UserPhoto($Moderator, 'Small');
+            }
             $LastComment = UserBuilder($Category, 'LastComment');
             $CatList .= '<li class="Item Depth'.$Category->Depth.' Category-'.$Category->UrlCode.' '.$ReadClass.'">
                '.GetOptions($Category, $this).'
@@ -57,6 +65,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                         $CatList .= '{ChildCategories}';
                         
                      $CatList .= '</td>
+                     <td class="Moderators">'.$ModList.'</td>
                      <td class="Count CountDiscussions"><div class="Wrap">'.Gdn_Format::BigNumber($Category->CountAllDiscussions).'</div></td>
                      <td class="Count CountComments">'.Gdn_Format::BigNumber($Category->CountAllComments).'</td>
                   </tr>
