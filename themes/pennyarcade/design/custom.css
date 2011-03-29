@@ -482,6 +482,14 @@ ul.DataList.Discussions li.Item table td {
 	line-height: 1;
 	padding: 4px 0;
 }
+table.CategoryHeading td.Moderators,
+ul.DataList.CategoryList li.Item table td.Moderators {
+	width: 160px;
+	text-align: left;
+}
+table.CategoryHeading td.Moderators {
+	width: 151px;
+}
 table.CategoryHeading td.Count,
 ul.DataList.CategoryList li.Item table td.Count,
 ul.DataList.Discussions li.Item table td.Count,
@@ -541,7 +549,7 @@ ul.DataList.Discussions li.Item table td.Count {
 ul.DataList.CategoryList li.Item td .Wrap,
 ul.DataList.Discussions li.Item td .Wrap {
 	border-right: 1px solid #e5eef6;
-	margin-right: 10px;
+	margin-right: 4px;
 }
 table.CategoryHeading td .Wrap,
 table.DiscussionHeading td .Wrap {
@@ -709,13 +717,12 @@ body.Vanilla div.CommentForm input.CommentButton:hover,
 body.Discussion a.BigButton:hover { background-position: -105px 0px; }
 body.Vanilla div.CommentForm input.CommentButton:active,
 body.Discussion a.BigButton:active { background-position: -105px -58px; }
-div.P {
-	min-height: 35px;
-}
 .NumberedPager {
 	padding: 3px 0;
-	float: right;
+	float: none;
 }
+.MiniPager a,
+.MiniPager span,
 .NumberedPager a,
 .NumberedPager span {
 	font-weight: normal !important;
@@ -728,12 +735,14 @@ div.P {
 	margin: 0 !important;
 	padding: 4px 8px;
 }
+.MiniPager a:nth-child(2),
 .NumberedPager a:first-child,
 .NumberedPager span:first-child {
 	border-radius: 3px 0 0 3px;
 	-moz-border-radius: 3px 0 0 3px;
 	-webkit-border-radius: 3px 0 0 3px;
 }
+.MiniPager a:last-child,
 .NumberedPager a:last-child,
 .NumberedPager span:last-child {
 	border-radius: 0 3px 3px 0;
@@ -741,6 +750,7 @@ div.P {
 	-webkit-border-radius: 0 3px 3px 0;
 	border: none;
 }
+.MiniPager a:hover,
 .NumberedPager a:hover {
 	background: #99EDFF;
 	text-decoration: none;
@@ -758,6 +768,46 @@ body.Discussion #PagerAfter {
 	float: none;
 	padding: 10px 0 12px;
 	margin: 0;
+}
+ul.DataList.Discussions li.Item.Announcement td.DiscussionName {
+	background: url('images/sprites.png') 0 -342px no-repeat;
+	padding-left: 28px;
+}
+ul.DataList.Discussions a.Title {
+	display: inline-block;
+}
+.MiniPager {
+	margin: 0 0 0 8px;
+	vertical-align: text-top;
+	display: inline-block;
+	white-space: nowrap;
+}
+.MiniPager a,
+.MiniPager span {
+	line-height: 1 !important;
+	color: #fff;
+	text-shadow: 0 1px 0 #4b5618;
+	background: #96ac31;
+	border-right: 1px solid #82952a;
+	padding: 1px 4px;
+}
+.MiniPager a:hover {
+	background: #B3CE3A;
+}
+.MiniPagerArrow {
+	display: inline-block;
+	height: 8px;
+	width: 4px;
+	background: url('images/sprites.png') 0 -400px no-repeat transparent;
+}
+table.PageNavigation {
+	width: 100%;
+}
+table.PageNavigation td {
+	vertical-align: middle;
+}
+table.PageNavigation td:last-child {
+	text-align: right;
 }
 
 /* Discussion */
@@ -985,7 +1035,29 @@ div.CategoryDescription {
 	line-height: 13px;
 }
 ul.DataList.CategoryList .ToggleFlyout {
-	right: 150px;
+	right: 302px;
+}
+ul.DataList.CategoryList a.Small,
+ul.DataList.CategoryList a.Small img {
+	background: #ddd;
+	display: inline-block;
+	height: 24px;
+	width: 24px;
+	overflow: hidden;
+}
+ul.DataList.CategoryList a.Small:hover {
+	text-decoration: none;
+	background: #eee;
+}
+ul.DataList.CategoryList a.Small img {
+	background: none;
+	text-indent: -100px;
+}
+ul.DataList.CategoryList a.Small {
+	margin: 0 2px 2px 0;
+}
+div.Box.Moderators ul.PanelInfo li:last-child {
+	padding-bottom: 10px;
 }
 
 /* Panel Boxes */
@@ -1241,4 +1313,9 @@ a.Close, a.Close:hover {
 }
 div.MultipleEntryMethods {
    width: 494px;
+}
+
+/* Forms */
+#DiscussionForm label {
+   color: #333;
 }
