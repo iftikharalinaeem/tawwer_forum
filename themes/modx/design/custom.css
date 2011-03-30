@@ -1064,6 +1064,12 @@ ul.DataList.Discussions li.Item {
 ul.DataList.Conversations li.Item {
 	min-height: 56px;
 }
+ul.DataList .Unfollow {
+   background: #eee;
+}
+ul.DataList .Unfollow a {
+   color: #888;
+}
 ul.CategoryList .ItemContent {
 	border-color: #E3E3E3;
 }
