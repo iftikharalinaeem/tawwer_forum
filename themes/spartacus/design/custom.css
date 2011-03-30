@@ -83,7 +83,7 @@ html, body {
 	float: left;
 	overflow: auto;
 	background: url('bg.jpg') top left no-repeat;
-/*   height: 650px;*/
+   min-height: 600px;
 }
 div.Body {
 	padding: 10px;
