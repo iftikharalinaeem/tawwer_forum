@@ -39,7 +39,10 @@ if ($Session->IsValid()) {
             foreach ($DescendantData->Result() as $Descendant) {
                // Ignore the root node
                if ($Descendant->CategoryID > 0) {
-                  echo Anchor(Gdn_Format::Text($Descendant->Name), '/categories/'.$Descendant->UrlCode);
+                  if ($Descendant->Depth == 1)
+                     echo Gdn_Format::Text($Descendant->Name);
+                  else
+                     echo Anchor(Gdn_Format::Text($Descendant->Name), '/categories/'.$Descendant->UrlCode);
                   echo '<span class="BreadCrumb"> &rarr; </span>';
                }
             }
