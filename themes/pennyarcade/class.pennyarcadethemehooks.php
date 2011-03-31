@@ -113,6 +113,18 @@ class PennyArcadeThemeHooks implements Gdn_IPlugin {
 			}
 		}
 	}
+	
+	/**
+	 * Make depth1 categories disabled in the category dropdown on the discussion form.
+	 */
+	public function PostController_AfterCategoryItem_Handler($Sender) {
+		$Category = GetValue('Category', $Sender->EventArguments);
+		if (is_object($Category) && $Category->Depth == 1) {
+			$Sender->EventArguments['aCategoryData'][$Category->CategoryID] = array('Text' => $Category->Name, 'disabled' => 'disabled');
+		} else {
+			$Sender->EventArguments['aCategoryData'][$Category->CategoryID] = str_replace('↳', '', $Sender->EventArguments['aCategoryData'][$Category->CategoryID]);
+		}
+	}
 
    public function Setup() {
 		SaveToConfig('Garden.Thumbnail.Size', '80');
