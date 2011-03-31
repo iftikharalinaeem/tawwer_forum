@@ -33,6 +33,7 @@ a.Button, .Button, input.Button, a.BigButton {
    font-family: Buda,Trebuchet MS,Tahoma,sans-serif;
    text-transform: uppercase;
    text-shadow: 0 1px 1px #FFF;
+   font-weight: normal;
 }
 a.Button:hover, .Button:hover, input.Button:hover, a.BigButton:hover {
  background: -moz-linear-gradient(top, #FAE1F4 0%, #FFF 100%);
@@ -125,6 +126,7 @@ div.Popup #ConversationForm h2 {
 #Panel {
 	float: right;
 	font-family: verdana;
+	margin-top: -6px;
 }
 #Panel div.SearchBox input.InputBox {
 	width: 200px;
@@ -132,6 +134,12 @@ div.Popup #ConversationForm h2 {
 }
 div.SearchBox {
 	margin-bottom: 6px;
+}
+div.Tabs.SearchTabs{
+	border-bottom: none;
+}
+body.Search #Panel .SearchBox{
+	display: none;
 }
 body.Profile div.SearchBox {
 	display: none;
@@ -214,6 +222,7 @@ div.Tabs li a:visited {
    text-decoration: none;
    padding: 8px 10px;
 	line-height: 11px;
+	font-weight: normal;
 }
 div.Tabs li a:hover {
    text-decoration: underline;
@@ -231,7 +240,7 @@ div.Tabs li.Active a {
    display: inline-block;
 	font-size: 12px;
 	line-height: 12px;
-   font-weight: bold;
+   font-weight: normal;
    text-decoration: none;
    padding: 6px 10px;
 	position: relative;

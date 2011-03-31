@@ -961,6 +961,11 @@ body.Profile div.PanelBox div.Photo img {
 div.Box dl {
 	padding: 4px;
 }
+
+h1, h2 {
+   margin: 10px;
+}
+
 a.BigButton {
 	background: #61adc7;
 	background:-webkit-gradient(linear, center bottom, center top, from(#61adc7), to(#9fd4e6));
@@ -1049,6 +1054,19 @@ body.Profile #Panel div.SearchBox input.InputBox {
 body.Profile ul.Activities {
 	margin-top: 0;
 }
+
+#DiscussionForm form {
+    background: none;
+    border: none;
+    margin: 10px;
+    padding: 0;
+}
+
+#DiscussionForm .RadioLabel {
+   font-size: inherit;
+   font-weight: normal;
+}
+
 #Content ul.DataList,
 #Content ul.MessageList {
 	background: #fff;
@@ -1234,4 +1252,21 @@ div.DismissMessage.Box {
 .ac_over {
    background: #3b5998;
    color: #fff;
+}
+
+.MessageList .Item {
+   position: relative;
+}
+
+.QnA-Accepted {
+   background: url('check.png') no-repeat;
+   display: block;
+   height: 40px;
+   position: absolute;
+   left: -50px;
+   top: 10px;
+   width: 40px;
+}
+.QnA-Accepted div {
+   display: none;
 }
