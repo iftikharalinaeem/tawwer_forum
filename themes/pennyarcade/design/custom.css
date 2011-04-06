@@ -1323,3 +1323,23 @@ div.MultipleEntryMethods {
 #DiscussionForm label {
    color: #333;
 }
+
+/* Discussion Administration Checkboxes */
+.Administration {
+	width: 32px;
+	text-align: center;
+	padding: 4px 0 5px;
+	position: absolute;
+	left: -32px;
+	top: 38px;
+}
+.DiscussionsTabs .Administration {
+	left: -33px;
+	top: 47px;
+}
+.Item .Administration {
+	left: -32px;
+	top: 6px;
+	background: none;
+	border: none;
+}
