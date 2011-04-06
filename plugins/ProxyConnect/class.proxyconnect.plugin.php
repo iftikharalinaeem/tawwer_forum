@@ -132,6 +132,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       
       if ($OldManager !== FALSE) {
          $OldManagerData = $this->IntegrationManagers[$OldManager];
+
          if (Gdn::PluginManager()->CheckPlugin($OldManagerData['Index'])) {
             Gdn::PluginManager()->DisablePlugin($OldManagerData['Index']);
          }
@@ -139,7 +140,11 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       
       $AlreadyEnabled = Gdn::PluginManager()->CheckPlugin($Manager['Index']);
       if (!$AlreadyEnabled) {
-         Gdn::PluginManager()->EnablePlugin($Manager['Index'], FALSE, TRUE);
+         // 2.0.18+ vs 2.0.17.9-
+         if (version_compare(APPLICATION_VERSION, '2.0.17.9', ">"))
+            Gdn::PluginManager()->EnablePlugin($Manager['Index'], FALSE, TRUE);
+         else
+            Gdn::PluginManager()->EnablePlugin($Manager['ClassName'], FALSE, TRUE, 'ClassName');
       }
       SaveToConfig('Plugin.ProxyConnect.IntegrationManager', $ManagerName);
       $this->IntegrationManager = $ManagerName;
@@ -305,7 +310,10 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          RemoveFromConfig('Garden.SignIn.Popup');
          
       $InternalPluginFolder = $this->GetResource('internal');
-      Gdn::PluginManager()->RemoveSearchPath($InternalPluginFolder);
+      // 2.0.18+
+      try {
+         Gdn::PluginManager()->RemoveSearchPath($InternalPluginFolder);
+      } catch (Exception $e) {}
    }
 	
    public function AuthenticationController_EnableAuthenticatorProxy_Handler(&$Sender) {
@@ -317,7 +325,10 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       SaveToConfig('Garden.Authenticators.proxy.CookieName', 'VanillaProxy');
       
       $InternalPluginFolder = $this->GetResource('internal');
-      Gdn::PluginManager()->AddSearchPath($InternalPluginFolder, 'ProxyConnect RIMs');
+      // 2.0.18+
+      try {
+         Gdn::PluginManager()->AddSearchPath($InternalPluginFolder, 'ProxyConnect RIMs');
+      } catch (Exception $e) {}
       
       if ($FullEnable) {
          SaveToConfig('Garden.SignIn.Popup', FALSE);
