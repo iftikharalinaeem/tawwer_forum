@@ -43,6 +43,7 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 		// Retrieve user's existing profile fields
 		$SuggestedFields = C('Plugins.CustomProfileFields.SuggestedFields', '');
 		$SuggestedFields = explode(',', $SuggestedFields);
+		$IsPostBack = $Sender->Form->IsPostBack();
 		$ProfileFields = array();
 		if (is_object($Sender->User))
 			$ProfileFields = Gdn::UserModel()->GetAttribute($Sender->User->UserID, 'CustomProfileFields', array());
@@ -51,11 +52,14 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 		if (count($SuggestedFields) > 0)
 			echo Wrap(Wrap(T('More Information'), 'label'), 'li');
 			
+		$CountFields = 0;
 		foreach ($SuggestedFields as $Field) {
+			$CountFields++;
+			$Value = $IsPostBack ? GetValue($Field, $_POST, '') : GetValue($Field, $ProfileFields, '');
 			echo '<li>';
 				echo $Sender->Form->Hidden('CustomProfileFieldLabel[]', array('value' => $Field));
 				echo $Sender->Form->Label($Field, 'CustomProfileFieldValue[]');
-				echo $Sender->Form->TextBox('CustomProfileFieldValue[]', array('value' => GetValue($Field, $ProfileFields, '')));
+				echo $Sender->Form->TextBox('CustomProfileFieldValue[]', array('value' => $Value));
 			echo '</li>';
 		}
 		if (!C('Plugins.CustomProfileFields.Disallow')) {
@@ -98,8 +102,15 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 </li>
 <?php
 			// Write out user-defined custom fields
+			$CustomProfileFieldLabel = GetValue('CustomProfileFieldLabel', $Sender->Form->FormValues(), array());
+			$CustomProfileFieldValue = GetValue('CustomProfileFieldValue', $Sender->Form->FormValues(), array());
 			foreach ($ProfileFields as $Field => $Value) {
 				if (!in_array($Field, $SuggestedFields)) {
+					if ($IsPostBack) {
+						$Field = GetValue($CountFields, $CustomProfileFieldLabel, '');
+						$Value = GetValue($CountFields, $CustomProfileFieldValue, '');
+					}
+					$CountFields++;
 					echo '<li>';
 						echo $Sender->Form->TextBox('CustomProfileFieldLabel[]', array('value' => $Field, 'class' => 'CustomProfileFieldLabel'));
 						echo $Sender->Form->TextBox('CustomProfileFieldValue[]', array('value' => $Value, 'class' => 'CustomProfileFieldValue'));
