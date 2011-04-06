@@ -42,6 +42,9 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 	else if (GetValue('InsertJailed', $Object) == '1')
 		$CssClass .= ' jailed';
 	
+	if (!property_exists($Sender, 'CanEditComments'))
+		$Sender->CanEditComments = $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any');
+
    $Sender->FireEvent('BeforeCommentDisplay');
 ?>
 <li class="<?php echo $CssClass; ?>" id="<?php echo $Id; ?>">
@@ -64,7 +67,16 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 						<span class="DateCreated">
 							<?php echo Anchor(Gdn_Format::Date($Object->DateInserted), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset+1), 'rel' => 'nofollow')); ?>
 						</span>
-						<?php WriteOptionList($Object, $Sender, $Session); ?>
+						<?php
+						WriteOptionList($Object, $Sender, $Session);
+						if ($Type == 'Comment' && $Sender->CanEditComments) {
+							if (!property_exists($Sender, 'CheckedComments'))
+								$Sender->CheckedComments = $Session->GetAttribute('CheckedComments', array());
+								
+							$ItemSelected = InSubArray($Id, $Sender->CheckedComments);
+							echo '<div class="Administration"><input type="checkbox" name="'.$Type.'ID[]" value="'.$Id.'"'.($ItemSelected?' checked="checked"':'').' /></div>';
+						}
+						?>
 						<?php $Sender->FireEvent('AfterCommentMeta'); ?>
 					</div>
 					<div class="Message">
