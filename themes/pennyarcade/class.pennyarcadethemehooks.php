@@ -11,10 +11,6 @@ class PennyArcadeThemeHooks implements Gdn_IPlugin {
 		Gdn::Locale()->SetTranslation('All Conversations', 'Inbox');
 		Gdn::Locale()->SetTranslation('Apply for Membership', 'Sign Up');
 		Gdn::Locale()->SetTranslation('Apply', 'Sign Up');
-		Gdn::Locale()->SetTranslation('%s comments', '%s');
-		Gdn::Locale()->SetTranslation('%s comment', '%s');
-		Gdn::Locale()->SetTranslation('%s threads', '%s');
-		Gdn::Locale()->SetTranslation('%s thread', '%s');
 		Gdn::Locale()->SetTranslation('Bookmarked Discussions', 'Bookmarked Threads');
 		Gdn::Locale()->SetTranslation('My Discussions', 'My Threads');
 		Gdn::Locale()->SetTranslation('All Discussions', 'All Threads');
