@@ -80,8 +80,6 @@ html, body {
 	width: 100%;
 	margin: 0;
 	padding: 0;
-	float: left;
-/*	overflow: auto;*/
 	background: url('bg.jpg') top left no-repeat;
    min-height: 600px;
 }
