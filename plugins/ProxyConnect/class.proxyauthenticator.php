@@ -65,12 +65,14 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          ));
          
          return $AuthResponse;
-      }
-      catch (Exception $e) {
-         
+      } catch (Exception $e) {
+
          // Fallback to defer checking until the next session
          if (substr(Gdn::Request()->Path(),0,6) != 'entry/')
             $this->SetIdentity(-1, FALSE);
+
+         // Error of some kind. Very sad :(
+         return Gdn_Authenticator::AUTH_ABORTED;
       }
    }
    
@@ -90,7 +92,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
     * 
     */
    public function ProcessAuthorizedRequest($ProviderKey, $UserKey, $UserName = NULL, $ForeignNonce = NULL, $OptionalPayload = NULL) {
-      
+
       // Try to load the association for this Provider + UserKey
       $Association = Gdn::Authenticator()->GetAssociation($UserKey, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
       
@@ -162,19 +164,15 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    }
    
    public function Remember($Key, $SerializedCookiePayload) {
-      Gdn_CookieIdentity::SetCookie($this->_CookieName, $Key, array(1, 0, $SerializedCookiePayload), 0);
+      $this->SetCookie($Key, $SerializedCookiePayload, 0);
    }
    
    public function GetHandshake() {
-      $HaveHandshake = Gdn_CookieIdentity::CheckCookie($this->_CookieName);
+      $HaveHandshake = $this->CheckCookie();
       
       if ($HaveHandshake) {
          // Found a handshake cookie, sweet. Get the payload.
-         $Payload = Gdn_CookieIdentity::GetCookiePayload($this->_CookieName);
-         
-         // Shift the 'userid' and 'expiration' off the front. These were made-up anyway :D
-         array_shift($Payload);
-         array_shift($Payload);
+         $Payload = $this->GetCookie();
          
          // Rebuild the real payload
          $ReconstitutedCookiePayload = Gdn_Format::Unserialize(TrueStripSlashes(array_shift($Payload)));
@@ -184,9 +182,118 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       
       return FALSE;
    }
+
+   public function SetCookie($Key, $Payload) {
+      $Path = Gdn::Config('Garden.Cookie.Path', '/');
+      $Domain = Gdn::Config('Garden.Cookie.Domain', '');
+
+      // If the domain being set is completely incompatible with the current domain then make the domain work.
+      $CurrentHost = Gdn::Request()->Host();
+      if (!StringEndsWith($CurrentHost, trim($Domain, '.')))
+         $Domain = '';
+
+      $CookieHashMethod = C('Garden.Cookie.HashMethod');
+      $CookieSalt = C('Garden.Cookie.Salt');
+
+      // Create the cookie contents
+      $KeyHash = self::_Hash($Key, $CookieHashMethod, $CookieSalt);
+      $Hash = self::_HashHMAC($CookieHashMethod, $Key, $KeyHash);
+      $Cookie = array($Key,$Hash,time());
+      if (!is_null($Payload)) {
+         if (!is_array($Payload))
+            $Payload = array($Payload);
+         $Cookie = array_merge($Cookie, $Payload);
+      }
+
+      $CookieContents = implode('|',$Cookie);
+
+      // Create the cookie. Lasts for the browser session only.
+      setcookie($this->_CookieName, $CookieContents, 0, $Path, $Domain);
+      $_COOKIE[$this->_CookieName] = $CookieContents;
+   }
+
+   public function GetCookie() {
+      if (!$this->CheckCookie($this->_CookieName)) return FALSE;
+
+      $Payload = explode('|', $_COOKIE[$this->_CookieName]);
+
+      array_shift($Payload);
+      array_shift($Payload);
+      array_shift($Payload);
+      
+      return $Payload;
+   }
+
+   public function CheckCookie() {
+      if (empty($_COOKIE[$this->_CookieName]))
+         return FALSE;
+
+      $CookieHashMethod = C('Garden.Cookie.HashMethod');
+      $CookieSalt = C('Garden.Cookie.Salt');
+
+      $CookieData = explode('|', $_COOKIE[$this->_CookieName]);
+      if (count($CookieData) < 4) {
+         $this->DeleteCookie();
+         return FALSE;
+      }
+
+      list($Key, $CookieHash, $Time, $CookiePayload) = $CookieData;
+
+      $KeyHash = self::_Hash($Key, $CookieHashMethod, $CookieSalt);
+      $GeneratedHash = self::_HashHMAC($CookieHashMethod, $Key, $KeyHash);
+
+      if (!CompareHashDigest($CookieHash, $GeneratedHash))
+         return $this->DeleteCookie();
+      
+      return TRUE;
+   }
    
    public function DeleteCookie() {
-      Gdn_Cookieidentity::DeleteCookie($this->_CookieName);
+      $Path = C('Garden.Cookie.Path');
+      $Domain = C('Garden.Cookie.Domain');
+
+      $Expiry = strtotime('one year ago');
+      setcookie($this->_CookieName, "", $Expiry, $Path, $Domain);
+      $_COOKIE[$this->_CookieName] = NULL;
+
+      return TRUE;
+   }
+
+   /**
+    * Returns $this->_HashHMAC with the provided data, the default hashing method
+    * (md5), and the server's COOKIE.SALT string as the key.
+    *
+    * @param string $Data The data to place in the hash.
+    */
+   protected static function _Hash($Data, $CookieHashMethod, $CookieSalt) {
+      return self::_HashHMAC($CookieHashMethod, $Data, $CookieSalt);
+   }
+
+   /**
+    * Returns the provided data hashed with the specified method using the
+    * specified key.
+    *
+    * @param string $HashMethod The hashing method to use on $Data. Options are MD5 or SHA1.
+    * @param string $Data The data to place in the hash.
+    * @param string $Key The key to use when hashing the data.
+    */
+   protected static function _HashHMAC($HashMethod, $Data, $Key) {
+      $PackFormats = array('md5' => 'H32', 'sha1' => 'H40');
+
+      if (!isset($PackFormats[$HashMethod]))
+         return false;
+
+      $PackFormat = $PackFormats[$HashMethod];
+      // this is the equivalent of "strlen($Key) > 64":
+      if (isset($Key[63]))
+         $Key = pack($PackFormat, $HashMethod($Key));
+      else
+         $Key = str_pad($Key, 64, chr(0));
+
+      $InnerPad = (substr($Key, 0, 64) ^ str_repeat(chr(0x36), 64));
+      $OuterPad = (substr($Key, 0, 64) ^ str_repeat(chr(0x5C), 64));
+
+      return $HashMethod($OuterPad . pack($PackFormat, $HashMethod($InnerPad . $Data)));
    }
    
    public function GetUserKeyFromHandshake($Handshake) {
@@ -329,16 +436,17 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       Gdn::Authenticator()->AllowHandshake();
       
       if (Gdn::Request()->Path() == 'entry/auth/proxy') return;
+      if (Gdn::Request()->Path() == 'entry/handshake/proxy') return;
       // Shortcircuit the wakeup if we're already awake
       // 
       // If we're already back on Vanilla and working with the handshake form, don't
       // try to re-wakeup.
-      $HaveHandshake = Gdn_CookieIdentity::CheckCookie($this->_CookieName);
+      $HaveHandshake = $this->CheckCookie();
       if ($HaveHandshake)
          return;
-      
+
       $CurrentStep = $this->CurrentStep();
-      
+
       // Shortcircuit to prevent pointless work when the access token has already been handled and we already have a session 
       if ($CurrentStep == Gdn_Authenticator::MODE_REPEAT)
          return;
@@ -351,17 +459,18 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       
          // Passed all shortcircuits. Try to log in via proxy.
          $AuthResponse = $this->Authenticate();
-         
+
          $UserInfo = array();
          $UserEventData = array_merge(array(
             'UserID'    => Gdn::Session()->UserID,
             'Payload'   => GetValue('HandshakeResponse', $this, FALSE)
          ),$UserInfo);
          Gdn::Authenticator()->Trigger($AuthResponse,$UserEventData);
-         
+
+
          if ($AuthResponse == Gdn_Authenticator::AUTH_SUCCESS ) {
             // Everything's cool, we don't have to do anything.
-            
+            // I don't always authenticate, but when I do, I use ProxyConnect.
          } elseif ($AuthResponse == Gdn_Authenticator::AUTH_PARTIAL) {
             return Redirect(Url('/entry/handshake/proxy',TRUE),302);
          } else {

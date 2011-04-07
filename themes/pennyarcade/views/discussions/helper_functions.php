@@ -51,6 +51,14 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    <?php
    $Sender->FireEvent('BeforeDiscussionContent');
    WriteOptions($Discussion, $Sender, $Session);
+         
+   if ($Sender->CanEditDiscussions) {
+      if (!property_exists($Sender, 'CheckedDiscussions'))
+         $Sender->CheckedDiscussions = $Session->GetAttribute('CheckedDiscussions', array());
+
+      $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
+      echo '<div class="Administration"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></div>';
+   }
    ?>
    <table>
       <tr>
@@ -173,7 +181,15 @@ function WriteFilterTabs(&$Sender) {
       echo $Category->Name;
       echo '</div>';
    }
+   if (!property_exists($Sender, 'CanEditDiscussions'))
+      $Sender->CanEditDiscussions = $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any');
+   
+   if ($Sender->CanEditDiscussions) {
    ?>
+   <div class="Administration">
+      <input type="checkbox" name="Toggle" />
+   </div>
+   <?php } ?>
 </div>
 <?php // BEGIN CUSTOM THEME CHANGES ?>
 <table class="DiscussionHeading">

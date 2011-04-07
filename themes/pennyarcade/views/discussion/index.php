@@ -55,6 +55,11 @@ if ($Session->IsValid()) {
       echo $DiscussionName;
       ?>
    </div>
+   <?php if ($this->Discussion->CountComments > 1 && $Session->CheckPermission('Vanilla.Discussions.Edit', TRUE, 'Category', 'any')) { ?>
+      <div class="Administration">
+         <input type="checkbox" name="Toggle" />
+      </div>
+   <?php } ?>
 </div>
 <?php
    $this->FireEvent('BeforeDiscussion');

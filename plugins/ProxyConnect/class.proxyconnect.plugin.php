@@ -12,9 +12,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProxyConnect'] = array(
 	'Name' => 'Vanilla Proxyconnect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
-   'Version' => '1.9',
+   'Version' => '1.9.2',
    'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.0.18a'),
+   'RequiredApplications' => array('Vanilla' => '2.0.17.9'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/authentication/proxy',
@@ -132,6 +132,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       
       if ($OldManager !== FALSE) {
          $OldManagerData = $this->IntegrationManagers[$OldManager];
+
          if (Gdn::PluginManager()->CheckPlugin($OldManagerData['Index'])) {
             Gdn::PluginManager()->DisablePlugin($OldManagerData['Index']);
          }
@@ -139,7 +140,11 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       
       $AlreadyEnabled = Gdn::PluginManager()->CheckPlugin($Manager['Index']);
       if (!$AlreadyEnabled) {
-         Gdn::PluginManager()->EnablePlugin($Manager['Index'], FALSE, TRUE);
+         // 2.0.18+ vs 2.0.17.9-
+         if (version_compare(APPLICATION_VERSION, '2.0.17.9', ">"))
+            Gdn::PluginManager()->EnablePlugin($Manager['Index'], FALSE, TRUE);
+         else
+            Gdn::PluginManager()->EnablePlugin($Manager['ClassName'], FALSE, TRUE, 'ClassName');
       }
       SaveToConfig('Plugin.ProxyConnect.IntegrationManager', $ManagerName);
       $this->IntegrationManager = $ManagerName;
@@ -175,6 +180,9 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $Payload = $Authenticator->GetHandshake();
       
       if ($Payload !== FALSE) {
+         if (!is_array($Payload))
+               $Payload = array('Sync' => 'Failed');
+
          if (array_key_exists('Sync',$Payload) && $Payload['Sync'] == 'Failed') {
          
             // Force user to be logged out of Vanilla
@@ -189,12 +197,12 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       }
       
       if ($RealUserID == -1) {
-         // The cookie says we're banned from auto-login in right now, but the user has specifically clicked
+         // The cookie says we're banned from auto remote pinging in right now, but the user has specifically clicked
          // 'sign in', so first try to sign them in using their current cookies:
          $Authenticator->Authenticate();
          
          if (Gdn::Authenticator()->GetIdentity()) {
-            
+
             // That worked, so redirect to the default page. The user is now signed in.
             Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
             
@@ -302,7 +310,10 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          RemoveFromConfig('Garden.SignIn.Popup');
          
       $InternalPluginFolder = $this->GetResource('internal');
-      Gdn::PluginManager()->RemoveSearchPath($InternalPluginFolder);
+      // 2.0.18+
+      try {
+         Gdn::PluginManager()->RemoveSearchPath($InternalPluginFolder);
+      } catch (Exception $e) {}
    }
 	
    public function AuthenticationController_EnableAuthenticatorProxy_Handler(&$Sender) {
@@ -314,7 +325,10 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       SaveToConfig('Garden.Authenticators.proxy.CookieName', 'VanillaProxy');
       
       $InternalPluginFolder = $this->GetResource('internal');
-      Gdn::PluginManager()->AddSearchPath($InternalPluginFolder, 'ProxyConnect RIMs');
+      // 2.0.18+
+      try {
+         Gdn::PluginManager()->AddSearchPath($InternalPluginFolder, 'ProxyConnect RIMs');
+      } catch (Exception $e) {}
       
       if ($FullEnable) {
          SaveToConfig('Garden.SignIn.Popup', FALSE);
