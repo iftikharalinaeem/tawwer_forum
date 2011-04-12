@@ -37,6 +37,7 @@ function smf_setglobals() {
    $context['browser']['is_gecko'] = FALSE;
    $context['browser']['is_mac_ie'] = FALSE;
    $context['browser']['is_ie'] = FALSE;
+   $context['server']['complex_preg_chars'] = FALSE;
 
    $txt = array();
    $txt['lang_character_set'] = 'utf8';
