@@ -29,6 +29,7 @@ function smf_setglobals() {
 
    $modSettings = array();
    $modSettings['enableBBC'] = TRUE;
+   $modSettings['smileys_url'] = '';
    $modSettings['enableEmbeddedFlash'] = TRUE;
    $modSettings['lang_character_set'] = 'UTF-8';
    $modSettings['global_character_set'] = 'UTF-8';
@@ -37,6 +38,10 @@ function smf_setglobals() {
    $context['browser']['is_gecko'] = FALSE;
    $context['browser']['is_mac_ie'] = FALSE;
    $context['browser']['is_ie'] = FALSE;
+   $context['browser']['is_ie4'] = FALSE;
+   $context['browser']['is_ie5'] = FALSE;
+   $context['browser']['is_ie6'] = FALSE;
+   $context['browser']['is_ie7'] = FALSE;
    $context['server']['complex_preg_chars'] = FALSE;
 
    $txt = array();
