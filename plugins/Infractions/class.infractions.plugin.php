@@ -33,7 +33,7 @@ class InfractionsPlugin extends Gdn_Plugin {
       $Context = strtolower($Sender->EventArguments['Type']);
       $Url = "profile/assigninfraction/";
       $Url .= (is_object($Sender->EventArguments['Author']) ? $Sender->EventArguments['Author']->UserID : 0).'/';
-      $Url .= $Sender->EventArguments['Discussion']->DiscussionID.'/';
+      $Url .= $Sender->DiscussionID.'/';
       if (GetValue('Type', $Sender->EventArguments) == 'Comment')
          $Url .= $Sender->EventArguments['Comment']->CommentID.'/';
 
