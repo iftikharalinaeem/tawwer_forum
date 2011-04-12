@@ -144,9 +144,11 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 			}
 			
 			// Don't save any empty values or labels
-			foreach ($CustomProfileFields as $Field => $Value) {
-				if ($Field == '' || $Value == '')
-					unset($CustomProfileFields[$Field]);
+			if (is_array($CustomProfileFields)) {
+				foreach ($CustomProfileFields as $Field => $Value) {
+					if ($Field == '' || $Value == '')
+						unset($CustomProfileFields[$Field]);
+				}
 			}
 		}
 			
