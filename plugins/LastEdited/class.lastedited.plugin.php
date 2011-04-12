@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['LastEdited'] = array(
    'Name' => 'Last Edited',
    'Description' => 'This plugin appends a "post last edited by X at Y" line to the end of edited posts.',
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0'),
    'RequiredTheme' => FALSE, 
@@ -36,7 +36,6 @@ class LastEditedPlugin extends Gdn_Plugin {
    
    public function PrepareEdited($Sender) {
       $Sender->AddCssFile($this->GetResource('design/lastedited.css', FALSE, FALSE));
-      $this->UserModel = new UserModel();
    }
    
    public function DiscussionController_AfterCommentBody_Handler(&$Sender) {
@@ -60,7 +59,7 @@ class LastEditedPlugin extends Gdn_Plugin {
       $SourceUserID = $Data->InsertUserID;
       $UpdatedUserID = $Data->UpdateUserID;
       
-      $UserData = $this->UserModel->Get($UpdatedUserID);
+      $UserData = Gdn::UserModel()->Get($UpdatedUserID);
       $Sender->Edited = array(
          'Date'      => Gdn_Format::ToDateTime(Gdn_Format::ToTimestamp($Data->DateUpdated)),
          'User'      => GetValue('Name', $UserData, T('Unknown User'))
