@@ -467,15 +467,8 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          ),$UserInfo);
          Gdn::Authenticator()->Trigger($AuthResponse,$UserEventData);
 
-
-         if ($AuthResponse == Gdn_Authenticator::AUTH_SUCCESS ) {
-            // Everything's cool, we don't have to do anything.
-            // I don't always authenticate, but when I do, I use ProxyConnect.
-         } elseif ($AuthResponse == Gdn_Authenticator::AUTH_PARTIAL) {
+         if ($AuthResponse == Gdn_Authenticator::AUTH_PARTIAL) {
             return Redirect(Url('/entry/handshake/proxy',TRUE),302);
-         } else {
-            Gdn::Request()->WithRoute('DefaultController');
-            throw new Exception('authentication failed');
          }
          
       } catch (Exception $e) {
