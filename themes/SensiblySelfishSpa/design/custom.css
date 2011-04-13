@@ -451,4 +451,5 @@ body.Entry #Content div.Box {
 input.DateBox, input.InputBox, input.SmallInput, textarea {
     background:#F6F6F6;
     border: 1px solid #76252A;
+    font-size: 12px;
 }
