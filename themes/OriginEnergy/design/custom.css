@@ -5,7 +5,7 @@ body{
 }
 a, a:link, a:visited, a:active {
     color: #0040F4;
-    text-decoration: underline;
+    text-decoration: none;
 }
 a:hover{
 	color: #0040F4;
@@ -67,6 +67,7 @@ div.Popup h2 {
 }
 .TitleBanner a{
 	 color: #FFFFFF;
+	  font-weight: bold;
 }
 .Banner ul {
 	 background: none repeat scroll 0 0 transparent;
