@@ -10,7 +10,7 @@ class PushFront {
    protected $RemotePath;
    
    public function __construct($Hostname, $Address) {
-      echo "New pushfront - {$Hostname}/{$Address}\n";
+      Push::Log(Push::LOG_L_INFO, "Frontend - {$Hostname}/{$Address}");
       $this->Hostname = $Hostname;
       $this->Address = $Address;
       
@@ -22,18 +22,19 @@ class PushFront {
    }
    
    public function Push() {
-      $SourceLevel = Push::Config('source level');
+      $SourceTag = Push::Config('source tag');
       $StrObjects = Push::Config('objects');
-      echo "Pushing {$StrObjects}:{$SourceLevel} for {$this->Hostname}\n";
+      Push::Log(Push::LOG_L_NOTICE, "Pushing {$StrObjects}:{$SourceTag} for {$this->Hostname}");
       
-      $ObjectList = explode(',', $Objects);
+      $ObjectList = explode(',', $StrObjects);
       foreach ($ObjectList as $Object) {
          $Object = trim($Object);
-         $this->PushObject($SourceLevel, $ObjectType);
+         $this->PushObject($SourceTag, $Object);
       }
    }
    
-   protected function PushObject($ObjectType) {
+   protected function PushObject($SourceTag, $ObjectType) {
+      Push::Log(Push::LOG_L_NOTICE, "  {$ObjectType}:{$SourceTag}");
       
       /**
        * 
@@ -41,9 +42,31 @@ class PushFront {
        * 
        * SPECIFY A TRAILING SLASH to prevent nesting additional directories
        */
+      $Relative = "{$SourceTag}/{$ObjectType}";
+      $LocalFolder = Push::Relative($Relative);
       
+      $RemotePath = Push::Config('remote path');
+      $RemotePath = Push::CombinePaths($RemotePath,$ObjectType);
       
+      $this->Rsync($LocalFolder, $RemotePath);
+   }
+   
+   protected function Rsync($Local, $Remote, $Unpathify = TRUE) {
+      if ($Unpathify) {
+         $Local = Push::UnPathify($Local);
+         $Remote = Push::UnPathify($Remote);
+      }
       
+      $RemoteUser = Push::Config('remote user');
+      $RemotePass = Push::Config('remote password', NULL);
+      $RemoteSystem = $this->Address;
+      
+      $RemoteAuth = $RemoteUser;
+      if (!is_null($RemotePass))
+         $RemoteAuth .= ":{$RemotePass}";
+      
+      $Response = array();
+      exec("rsync -avz {$Local} {$RemoteAuth}:{$RemoteSystem}@{$Remote}");
    }
    
 }
