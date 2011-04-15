@@ -133,6 +133,7 @@ class FilesystemTask extends Task {
          $this->Symlink('themes/rounder', TaskList::CombinePaths($this->ThemePath,'rounder'));
          $this->Symlink('themes/vanillaclassic', TaskList::CombinePaths($this->ThemePath,'vanillaclassic'));
          $this->Symlink('themes/v1grey', TaskList::CombinePaths($this->ThemePath,'v1grey'));
+         
          $this->Symlink('themes/mobile', TaskList::CombinePaths($this->VanillaPath,'themes/mobile'));
          $this->Symlink('themes/EmbedFriendly', TaskList::CombinePaths($this->VanillaPath,'themes/EmbedFriendly'));
          
