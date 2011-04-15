@@ -197,6 +197,23 @@ body {
 }
 
 /* Vanilla Styles */
+#Panel {
+	display: none;
+}
+body.Conversations.Messages #Panel {
+	display: block;
+}
+#Content {
+	width: auto;
+	float: none;
+	margin: 0;
+}
+body.Conversations.Messages #Content {
+	margin: 0 280px 0 0;
+}
+body.Conversations.Messages.add #Content {
+	margin: 0;
+}
 ul.Conversations div.Meta a.Name,
 ul.Activities div.Excerpt a,
 ul.Activities div.Meta a,
@@ -336,15 +353,9 @@ div.DismissMessage a.Dismiss:hover {
 }
 
 /* Discussions */
-body.Drafts #Content,
-body.Categories #Content,
-body.Activity #Content,
-body.Conversations #Content,
-body.Discussion #Content,
-body.Discussions #Content {
-	width: auto;
-	float: none;
-	margin: 0 280px 0 0;
+.DiscussionsTabs,
+body.Discussion #Content {
+	position: inherit;
 }
 .ProfileBreadCrumb,
 div.ActivityTabs div.SubTab,
@@ -819,6 +830,9 @@ ul.MessageList.Discussion li.Item {
 ul.MessageList.Discussion li.Item:nth-of-type(odd) {
 	background: #f2f2f2;
 }
+.CommentTable {
+	width: 100%;
+}
 .CommentTable td {
 	vertical-align: top;
 }
@@ -975,6 +989,79 @@ div.Preview {
 	padding: 4px 0;
 }
 
+/* Quote, Awesome, Report Buttons */
+ul.MessageList div.Meta {
+	min-height: 0;
+}
+ul.MessageList div.Message {
+	margin: 0 20px 36px;
+	padding: 12px 0 8px;
+	border-bottom: 1px solid #dadde3;
+}
+span.CommentQuote,
+span.AwesomePost,
+span.ReportPost {
+	position: absolute;
+	bottom: 8px;
+	right: 16px;
+	border-right: 1px solid #d9e2ea;
+	padding-right: 10px;
+}
+span.ReportPost {
+	border-right: none;
+	padding-right: 0;
+}
+span.CommentQuote { right: 200px; }
+span.AwesomePost { right: 96px; }
+span.CommentQuote a,
+span.AwesomePost a,
+span.ReportPost a {
+	background: url('images/sprites.png') 0 -500px no-repeat transparent;
+	display: inline-block;
+	height: 20px;
+	font-family: RockwellBold;
+	font-size: 14px;
+	padding-left: 24px;
+}
+span.AwesomePost a {
+	padding-left: 18px;
+}
+span.CommentQuote a { background-position: 0 -600px; }
+span.AwesomePost a { background-position: 0 -550px; }
+span.ReportPost a { background-position: 0 -500px; }
+
+/* Quotes */
+body ul div.Comment blockquote.UserQuote {
+	background-color: transparent;
+	font-style: inherit;
+	margin: 0;
+	padding: 5px 10px;
+}
+.QuoteAuthor a {
+	font-weight: bold;
+}
+.QuoteAuthor span.GreenArrow {
+	vertical-align: middle;
+}
+div.Comment blockquote.UserQuote div.QuoteText {
+   border: 1px solid #e5e9ef;
+	border-width: 1px 0;
+	margin: 5px 0 0;
+   padding: 5px;
+}
+
+/* Signatures */
+div.UserSignature {
+	margin: 10px 0 10px 20px;
+	padding: 10px 0 0;
+	overflow: hidden;
+	border-top: 0;
+	width: 500px;
+	max-height: 150px;
+}
+
+
+
 /* Categories */
 ul.CategoryList li.CategoryHeading div.Category {
 	padding: 8px 8px 4px 15px;
@@ -1059,14 +1146,13 @@ ul.DataList.CategoryList a.Small img {
 ul.DataList.CategoryList a.Small {
 	margin: 0 2px 2px 0;
 }
-div.Box.Moderators ul.PanelInfo li:last-child {
-	padding-bottom: 10px;
-}
 
 /* Panel Boxes */
+div.Box.Moderators,
 div.Box {
 	color: #666;
 }
+div.Box.Moderators,
 #Panel div.Box {
 	background: none;
 	border-radius: 0;
@@ -1077,6 +1163,7 @@ div.Box {
 	-webkit-box-shadow: none;
 	padding: 0;
 }
+div.Box.Moderators h4,
 #Panel div.Box h4 {
 	border: 1px solid #004487;
 	background: url('images/bg-heading-tile.png') top left repeat-x #004d99;
@@ -1087,6 +1174,19 @@ div.Box {
 	font-size: 13px;
 	color: #fff;
 	text-shadow: 0 -1px 0 #000;	
+}
+div.Box.Moderators h4 {
+	padding-left: 38px;
+	position: relative;
+}
+span.ModeratorsIcon {
+	background: url('images/rank-sprites.png') 0 -289px no-repeat transparent;
+	height: 21px;
+	width: 18px;
+	overflow: hidden;
+	display: block;
+	position: absolute;
+	left: 12px;
 }
 #Panel div.Box h4 a {
 	color: #fff;
@@ -1116,6 +1216,25 @@ ul.PanelInfo li.Active {
 	padding: 2px 10px;
 }
 
+/* Moderators List */
+div.Box.Moderators ul.PanelInfo {
+	background: #fff;
+	padding: 15px 15px 10px;
+}
+div.Box.Moderators ul.PanelInfo li {
+	padding: 0 0 5px;
+	background: none;
+	display: inline-block;
+	width: 150px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+div.Moderators ul.PanelInfo li a.Small,
+div.Moderators ul.PanelInfo li a.Small img {
+	display: inline-block;
+   vertical-align: bottom;
+}
+
 /* Profile Page */
 body.Profile #Content {
 	width: auto;
@@ -1126,6 +1245,7 @@ body.Profile ul.PanelInfo {
    border-bottom: 1px solid #BEC8CC;
 }
 body.Profile #Panel {
+	display: block;
    width: 250px;
 }
 body.Profile #Panel div.PhotoBox {
@@ -1177,15 +1297,60 @@ div.Box dl dd.CustomProfileField-website {
 	white-space: nowrap;
 }
 /* Activities */
+.TimestampContainer {
+	position: relative;
+}
+.TimestampArrow {
+	border-radius: 0 !important;
+	-moz-border-radius: 0 !important;
+	-webkit-border-radius: 0 !important;
+   background: url("images/sprites.png") no-repeat scroll 0px -450px transparent !important;
+   display: block !important;
+	margin: 0 !important;
+   padding: 0 !important;
+   text-shadow: none !important;
+	position: absolute !important;
+	top: 4px;
+	left: -4px !important;
+	height: 8px !important;
+	width: 4px !important;
+}
+ul.MessageList div.Comment div.Meta span.TimestampArrow {
+	top: 6px;
+}
 form.Activity {
 	background: #E2E2E2;
 	padding-bottom: 10px;
 }
+ul.DataList.Activities li.Item {
+	padding: 15px 20px;
+}
 body.Profile ul.DataList.Activities {
 	margin-top: 0;
 }
+.DataList.Activities div.DateCreated {
+	line-height: 1;
+	padding: 0 0 8px;
+}
+.DataList.Activities div.DateCreated span {
+	background: url('images/sprites.png') 5px -145px no-repeat #a6a6a6;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	padding: 2px 6px 3px 28px;
+	margin: 0;
+	color: #fff;
+	text-shadow: 0 1px 0 #666;
+	font-size: 11px;
+	line-height: 1;
+	display: inline-block;
+}
+ul.DataList.Activities div.Photo img {
+    height: 24px;
+    width: 24px;
+}
 ul.Activities li.HasPhoto div.ItemContent {
-   margin-left: 53px;
+   margin-left: 35px;
    width: auto;
 }
 ul.Condensed li, li.Condensed {
@@ -1197,6 +1362,16 @@ ul.DataList.Activities li.Item li.Item {
 }
 ul.DataList.Activities li.Item li.Item {
 	border: none !important;
+}
+ul.DataList.Activities div.Excerpt {
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 1px solid #dadde3;
+}
+ul.DataList.Activities li.AboutUpdate div.Excerpt {
+	margin: 0;
+	padding: 0 0 0 4px;
+	border: none;
 }
 .Foot {
 	border-radius: 0;
@@ -1252,10 +1427,10 @@ ul.MessageList div.Message {
 	margin: 10px 0 0;
 	padding: 0;
 }
-#MessageForm div {
+#MessageForm form {
 	padding: 10px;
 }
-div.AddPeople form div {
+div.AddPeople form {
 	background: #fff;
 	padding: 10px;
 }
@@ -1333,13 +1508,159 @@ div.MultipleEntryMethods {
 	left: -32px;
 	top: 38px;
 }
+.DiscussionTabs .Administration,
 .DiscussionsTabs .Administration {
-	left: -33px;
-	top: 47px;
+	left: -2px;
+	top: auto;
+	margin: -30px 0 0;
 }
 .Item .Administration {
 	left: -32px;
 	top: 6px;
 	background: none;
 	border: none;
+}
+
+/* Entry Pages */
+body.Entry div.DismissMessage {
+	display: none;
+}
+body.Entry #Content h1  {
+	border: 1px solid #004487;
+	background: url('images/bg-heading-tile.png') top left repeat-x #004d99;
+	border-radius: 4px 4px 0 0;
+	-moz-border-radius: 4px 4px 0 0;
+	-webkit-border-radius: 4px 4px 0 0;
+	padding: 4px 10px;
+	font-size: 13px;
+	color: #fff;
+	text-shadow: 0 -1px 0 #000;	
+}
+body.Entry.register #Content h1 {
+	padding: 8px 16px;
+	font-size: 18px;
+}
+body.Entry.register #Content {
+   width: 710px;
+}
+body.Entry div.MainForm {
+	background: #fff;
+	padding: 8px;
+}
+body.Entry div.Box {
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	padding: 0;
+	background: #fff;
+	border-radius: 0 0 4px 4px;
+	-moz-border-radius: 0 0 4px 4px;
+	-webkit-border-radius: 0 0 4px 4px;
+}
+body.Entry.register #Content form {
+	padding: 0;
+}
+body.Entry.register form ul li {
+	border-top: 1px solid #fff;
+	border-bottom: 1px solid #d9d9d9;
+	padding: 6px 16px;
+	vertical-align: bottom;
+}
+body.Entry.register form ul li:nth-child(even) {
+	background: #f2f2f2;
+}
+body.Entry.register form ul li.Buttons {
+	margin: 0;
+	background: none;
+	border: none;
+	padding: 6px 16px 6px 205px;
+}
+div#recaptcha_widget_div {
+	display: inline-block;
+}
+body.Entry.register form ul li label {
+	vertical-align: top;
+	padding: 0 0 5px;
+	display: inline-block;
+	width: 185px;
+	white-space: nowrap;
+	overflow: hidden;
+	color: #032255;
+	line-height: 2;
+}
+body.Entry.register form ul li label.CheckBoxLabel {
+	width: auto;
+	display: block;
+	margin-left: 190px;
+}
+body.Entry.register li.Gender {
+   margin-bottom: 0;
+}
+
+/* Forms */
+#ConversationForm h1,
+#DiscussionForm h1 {
+	border: 1px solid #004487;
+	background: url('images/bg-heading-tile.png') top left repeat-x #004d99;
+	border-radius: 4px 4px 0 0;
+	-moz-border-radius: 4px 4px 0 0;
+	-webkit-border-radius: 4px 4px 0 0;
+	padding: 8px 16px;
+	margin: 0;
+	font-size: 18px;
+	color: #fff;
+	text-shadow: 0 -1px 0 #000;	
+}
+#ConversationForm form,
+#DiscussionForm form {
+	border-radius: 0 0 4px 4px;
+	-moz-border-radius: 0 0 4px 4px;
+	-webkit-border-radius: 0 0 4px 4px;
+	background: #fff;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+#ConversationForm form div.P,
+#DiscussionForm form div.P {
+	margin: 0;
+	padding: 0 16px;
+}
+#ConversationForm form div.P:nth-child(3),
+#DiscussionForm form div.P:nth-child(5) {
+	margin: 0;
+	padding: 10px 16px 6px;
+}
+#ConversationForm form div.Buttons,
+#DiscussionForm form div.Buttons {
+	margin: 0;
+	padding: 16px;
+}
+#ConversationForm form {
+   text-align: left;
+}
+div.Popup #ConversationForm div.P,
+div.Popup #ConversationForm form div.Buttons {
+	margin: 0;
+	padding: 0;
+}
+
+/* Errors */
+div.Errors ul {
+	border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+   padding: 6px 16px;
+}
+
+/* Custom Inform Sprites */
+span.InformSprite.Check {
+	background: url('images/sprites.png') 0 -650px no-repeat;
+	top: 7px;
+	left: 7px;
+	height: 23px;
+	width: 23px;
 }

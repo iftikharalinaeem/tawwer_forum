@@ -25,7 +25,7 @@ echo $this->Pager->ToString('less');
    <h2><?php echo T('Add Message'); ?></h2>
    <?php
    echo $this->Form->Open(array('action' => Url('/messages/addmessage/')));
-   echo $this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'MessageBox'));
+   echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'class' => 'MessageBox')), 'div', array('class' => 'TextBoxWrapper'));
    echo $this->Form->Button('Send Message');
    echo $this->Form->Close();
    ?>

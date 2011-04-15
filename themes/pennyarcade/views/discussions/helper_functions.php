@@ -52,9 +52,15 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
    $Sender->FireEvent('BeforeDiscussionContent');
    WriteOptions($Discussion, $Sender, $Session);
          
+   if (!property_exists($Sender, 'CanEditDiscussions'))
+      $Sender->CanEditDiscussions = GetValue('PermsDiscussionsEdit', CategoryModel::Categories($Discussion->CategoryID)) && C('Vanilla.AdminCheckboxes.Use');;
+         
    if ($Sender->CanEditDiscussions) {
-      if (!property_exists($Sender, 'CheckedDiscussions'))
-         $Sender->CheckedDiscussions = $Session->GetAttribute('CheckedDiscussions', array());
+      if (!property_exists($Sender, 'CheckedDiscussions')) {
+         $Sender->CheckedDiscussions = (array)$Session->GetAttribute('CheckedDiscussions', array());
+         if (!is_array($Sender->CheckedDiscussions))
+            $Sender->CheckedDiscussions = array();
+      }
 
       $ItemSelected = in_array($Discussion->DiscussionID, $Sender->CheckedDiscussions);
       echo '<div class="Administration"><input type="checkbox" name="DiscussionID[]" value="'.$Discussion->DiscussionID.'"'.($ItemSelected?' checked="checked"':'').' /></div>';

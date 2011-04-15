@@ -2,7 +2,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
 <head>
-   <?php $this->RenderAsset('Head'); ?>
+   <?php
+	$this->RenderAsset('Head');
+	$Session = Gdn::Session();
+	$Wrap = '<a href="%url" class="%class">%text</a>';
+	?>
 </head>
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
 	<div id="header">
@@ -17,6 +21,7 @@
 					<li class="nav" id="navPATV"><a title="PATV" href="http://www.penny-arcade.com/patv/"><strong>PATV</strong><span style="opacity: 0;"></span></a></li>
 					<li><a title="PA Presents" href="http://www.penny-arcade.com/presents/">PA Presents</a></li>
 					<li><a title="PA Scholarship" href="http://www.penny-arcade.com/pas/">PA Scholarship</a></li>
+					<li><?php echo Gdn_Theme::Link('signinout'); ?></li>
 				</ul>
 				<div id="bannerAd">
 				</div>
@@ -26,15 +31,11 @@
 	<div id="Frame">
       <div id="Head">
          <div class="Breadcrumbs">
-            <?php
-					$Session = Gdn::Session();
-					$Wrap = '<a href="%url" class="%class">%text</a>';
-					echo Gdn_Theme::Link('categories', 'Penny Arcade Forums', $Wrap);
-				?>
+            <?php echo Gdn_Theme::Link('categories', 'Penny Arcade Forums', $Wrap); ?>
 			</div>
 			<div class="ProfileMenu">
 				<?php
-					echo Gdn_Theme::Link('activity', 'Activity', $Wrap, array('class' => 'Activity'));
+					// echo Gdn_Theme::Link('activity', 'Activity', $Wrap, array('class' => 'Activity'));
 					if ($Session->IsValid()) {
 						echo Gdn_Theme::Link('dashboard', 'Dashboard', $Wrap, array('class' => 'Dashboard'));
 						echo UserPhoto($Session->User, 'PhotoProfile');

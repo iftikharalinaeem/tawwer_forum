@@ -64,7 +64,7 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 				<div class="Comment">
 					<div class="Meta">
 						<?php $Sender->FireEvent('BeforeCommentMeta'); ?>
-						<span class="DateCreated">
+						<span class="DateCreated TimestampContainer"><span class="TimestampArrow"></span>
 							<?php echo Anchor(Gdn_Format::Date($Object->DateInserted), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset+1), 'rel' => 'nofollow')); ?>
 						</span>
 						<?php
