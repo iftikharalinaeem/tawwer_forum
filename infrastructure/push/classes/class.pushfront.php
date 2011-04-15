@@ -57,7 +57,7 @@ class PushFront {
          Push::Log(Push::LOG_L_NOTICE, "Clearing autoloader cache");
          $RemoteCacheFiles = Push::UnPathify(Push::CombinePaths($this->RemotePath, 'frontend/cache/*.ini'));
          if (!Push::Config('dry run')) {
-            exec("ssh {$this->RemoteUser}@{$this->Address} 'rm {$RemoteCacheFiles}'");
+            passthru("ssh {$this->RemoteUser}@{$this->Address} 'rm {$RemoteCacheFiles}'");
          }
       }
    }
