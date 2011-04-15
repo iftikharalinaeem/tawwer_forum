@@ -43,7 +43,7 @@ class PushFront {
       Push::Log(Push::LOG_L_NOTICE, "Pushing {$StrObjects}:{$SourceTag} for {$this->Hostname}");
       
       if (!Push::Config('fast')) {
-         $Proceed = Push::Question("Are you sure?", $Prompt, array('yes','no'), 'yes');
+         $Proceed = Push::Question("", "Are you sure?", array('yes','no'), 'no');
          if ($Proceed == 'no') return;
       }
       
