@@ -49,7 +49,8 @@ class Push {
          'log level'                => array('l','log-level',TRUE),
          'lookup mode'              => array('m','lookup-mode',TRUE),
          'clear autoloader'         => array(NULL,'clear-autoloader',TRUE),
-         'utility update'           => array(NULL,'utility-update',TRUE)
+         'utility update'           => array(NULL,'utility-update',TRUE),
+         'fast'                     => array(NULL,'fast',FALSE)
       );
       
       $ShortOptions = "";

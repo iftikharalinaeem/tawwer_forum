@@ -42,6 +42,11 @@ class PushFront {
       $StrObjects = Push::Config('objects');
       Push::Log(Push::LOG_L_NOTICE, "Pushing {$StrObjects}:{$SourceTag} for {$this->Hostname}");
       
+      if (!Push::Config('fast')) {
+         $Proceed = Push::Question("Are you sure?", $Prompt, array('yes','no'), 'yes');
+         if ($Proceed == 'no') return;
+      }
+      
       $ObjectList = explode(',', $StrObjects);
       foreach ($ObjectList as $Object) {
          $Object = trim($Object);
@@ -52,7 +57,7 @@ class PushFront {
          Push::Log(Push::LOG_L_NOTICE, "Clearing autoloader cache");
          $RemoteCacheFiles = Push::UnPathify(Push::CombinePaths($this->RemotePath, 'frontend/cache/*.ini'));
          if (!Push::Config('dry run')) {
-            exec("ssh {$this->RemoteUser}@{$this->RemoteAddress} 'rm {$RemoteCacheFiles}'");
+            exec("ssh {$this->RemoteUser}@{$this->Address} 'rm {$RemoteCacheFiles}'");
          }
       }
    }
