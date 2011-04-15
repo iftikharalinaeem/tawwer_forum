@@ -23,7 +23,7 @@ echo $this->Form->Errors();
    <li>
       <?php
          echo $this->Form->Label('Signature Code', 'Plugin.Signatures.Sig');
-         echo $this->Form->TextBox('Plugin.Signatures.Sig', array('MultiLine' => TRUE));
+         echo Wrap($this->Form->TextBox('Plugin.Signatures.Sig', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
       ?>
    </li>
    
