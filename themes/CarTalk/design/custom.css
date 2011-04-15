@@ -20,38 +20,32 @@ ul.PanelInfo li.Active a {
 a.Button, .Button {
     color: #000;
 }
-a.BigButton {
-    color: #000;
-    margin: -35px 0 30px;
-}
+a.BigButton, a.BigButton:focus {
+    background: -moz-linear-gradient(center top , #C83219, #9B200D) repeat scroll 0 0 transparent;
+        background: -webkit-gradient(linear, left top, left bottom, from(#C83219), to(#9B200D));
 
-/*a.BigButton {
-    background: transparent url(submit_car_question.gif) no-repeat;
-    border-width: 0;
+    border: 1px solid #D6B967;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    box-shadow: 0 0 2px #999999;
+    color: #ffffff;
+    cursor: pointer;
     display: block;
-    float: right;
-    height: 57px;
-    margin-bottom: 0;
-    margin-right: 0;
-    margin-top: -35px;
-    width: 193px;
-    
-    border: none;
-    border-radius: 0px;
-    box-shadow: 0 0 0px #fff;
-    text-indent: -9999px;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 0 0 10px;
+    padding: 8px 0;
+    text-align: center;
+    text-shadow: 0 1px 0 #000000;
 }
-a.BigButton:hover{
-    border: none;
-    border-radius: 0px;
-    box-shadow: 0 0 0px #fff;
-}
-a.BigButton:focus{
-    background: transparent url(submit_car_question.gif) no-repeat;
-}*/
+a.BigButton:hover {
+	color:#ffffff;
+	}
 
 #Body {
 	width: 980px;
+	margin: 45px auto 0;
 }
 
 #Head {
@@ -88,9 +82,9 @@ a.BigButton:focus{
     vertical-align: bottom;
 }
 
-div.SearchBox {
+/*div.SearchBox {
     visibility: hidden;
-}
+}*/
 
 div.Popup h1,
 div.Popup h2 {
@@ -100,12 +94,17 @@ div.Popup h2 {
 .Banner {
 	padding: 10px;
 	text-align: left;
-	position: relative;
+	/*position: relative;*/
 }
 .Banner ul {
-	background: none;
-	padding: 0;
-	margin: 0;
+	background: none repeat scroll 0 0 #F7F7F7;
+    border: 1px solid #CCCCCC;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    padding-left: 5px;
+    width: 380px;
+    height:30px;
 }
 .Banner ul li {
 	display: inline;
@@ -124,9 +123,9 @@ div.Popup h2 {
 	color: #000066;
 }
 .Banner ul li a.SignOut {
-	 position: absolute;
-    right: 10px;
-    top: 28px;
+	 left: 880px;
+    position: relative;
+    top: -30px;
 }
 #Content {
 	float: none;
@@ -313,7 +312,7 @@ div.MorePager a:hover {
 body.add #Content {
 	margin: 0 10px;
 }
-ul.Discussions{
+ul.Discussions, ul.CategoryList{
 	background: transparent url(grad_bg.gif) repeat-x bottom;
 }
 .Mine, .Alt {
@@ -338,14 +337,15 @@ ul.DataList li.Mine div.Meta a.Category {
 }
 /* Panel Boxes */
 div.Box {
-	border-radius: 0;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 	box-shadow: none;
 	-moz-box-shadow: none;
 	-webkit-box-shadow: none;
-	background: none;
-	padding: 0;
+	background: #f7f7f7;
+	padding: 5px;
+	border: 1px solid #ccc;
 }
 div.Box h4 {
 	color: #333;

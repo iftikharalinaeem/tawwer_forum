@@ -232,9 +232,10 @@
 		  			{signinout_link}
 				</ul>
 	 		</div>
+		  			
 
 		  <div id="Panel">
-			 <div class="SearchBox">{searchbox}</div>
+			 <!--<div class="SearchBox">{searchbox}</div>-->
 			 {asset name="Panel"}
 			{literal} <script type="text/javascript">
 <!--
