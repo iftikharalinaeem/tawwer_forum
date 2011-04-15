@@ -3,17 +3,25 @@
 require_once('class.pushfront.php');
 class Push {
    
+   const LOG_L_FATAL = 1;
+   const LOG_L_WARN = 2;
+   const LOG_L_NOTICE = 4;
+   const LOG_L_INFO = 8;
+   
+   const LOG_O_NONEWLINE = 1;
+   
    protected static $Args;
    
    protected static $Config;
    protected $Fronts = NULL;
+   protected $PushRoot = NULL;
    
    protected static $CommandOptions;
    
    public function __construct() {
       $ConfigFileOption = getopt('c:');
       if (!sizeof($ConfigFileOption))
-         $ConfigFile = Push::Relative('conf/push.conf');
+         $ConfigFile = Push::ExecRelative('conf/push.conf');
       else
          $ConfigFile = $ConfigFileOption['c'];
          
@@ -22,7 +30,6 @@ class Push {
          
       $ConfigDefaults = parse_ini_file($ConfigFile, FALSE, INI_SCANNER_RAW);
       $this->Overlay($ConfigDefaults);
-      
       $this->CheckConfig();
    }
    
@@ -34,11 +41,16 @@ class Push {
          'frontend padding'         => array(NULL,'frontend-padding',TRUE),
          'frontend hostname'        => array('h','frontend-hostname', TRUE),
          'exclude frontends'        => array('e','exclude', TRUE),
-         'source level'             => array('s','source-level', TRUE),
-         'dry run'                  => array('d','dry-run', FALSE),
+         'source tag'               => array('s','source-tag', TRUE),
+         'dry run'                  => array('d','dry-run', TRUE),
          'objects'                  => array('o','objects', TRUE),
          'remote user'              => array('u','user', TRUE),
-         'remote password'          => array('p','password', TRUE)
+         'remote password'          => array('p','password', TRUE),
+         'log level'                => array('l','log-level',TRUE),
+         'lookup mode'              => array('m','lookup-mode',TRUE),
+         'clear autoloader'         => array(NULL,'clear-autoloader',TRUE),
+         'utility update'           => array(NULL,'utility-update',TRUE),
+         'fast'                     => array(NULL,'fast',FALSE)
       );
       
       $ShortOptions = "";
@@ -86,10 +98,10 @@ class Push {
    }
    
    protected function CheckConfig() {
-      $LocalPath = Push::Config('local path');
-      $SourceLevel = Push::Config('source level');
+      $LocalPath = Push::LocalPath();
+      $SourceTag = Push::Config('source tag');
       
-      $FullPath = Push::CombinePaths($LocalPath, $SourceLevel);
+      $FullPath = Push::CombinePaths($LocalPath, $SourceTag);
       if (!is_dir($FullPath) || !is_readable($FullPath))
          throw new Exception("Could not read local source repository {$FullPath}");
       
@@ -122,23 +134,39 @@ class Push {
       $Min = Push::Config('frontend min');
       $Max = Push::Config('frontend max');
       $Padding = Push::Config('frontend padding');
+      $LookupMode = Push::Config('lookup mode');
+      
+      $ExcludedFrontends = Push::Config('exclude frontends', '');
+      $ExcludedFrontends = explode(',', $ExcludedFrontends);
       
       if ($Max == 0) {
          // Autodetect
-         $Front = $Min;
+         $Front = $Min - 1;
          $ExclusionHost = Push::Config('frontend exclusion').".{$FrontendSuffix}";
          $ExclusionAddress = gethostbyname($ExclusionHost);
-         while ($Front) {
+         while (TRUE) {
+            $Front++;
             $PaddedFront = sprintf("%0{$Padding}d", $Front);
             $FrontendPrefix = sprintf($FrontendPattern, $PaddedFront);
             
-            $FrontendHost = $FrontendPrefix.".{$FrontendSuffix}";
+            if ($LookupMode == 'full')
+               $FrontendHost = $FrontendPrefix.".{$FrontendSuffix}";
+            elseif ($LookupMode == 'local')
+               $FrontendHost = $FrontendPrefix;
+            else {
+               Push::Log(Push::LOG_L_FATAL, "No lookup mode defined. Please define 'lookup mode' in the config, or pass -m");
+               die();
+            }
+            
+            // Exclusions
+            if (in_array($FrontendPrefix,$ExcludedFrontends) || in_array($FrontendHost, $ExcludedFrontends))
+               continue;
+            
             $FrontendAddress = gethostbyname($FrontendHost);
             if ($FrontendAddress == $FrontendHost || $FrontendAddress == $ExclusionAddress)
                break;
             
             $this->Fronts[] = new PushFront($FrontendHost, $FrontendAddress);
-            $Front++;
          }
       }
    }
@@ -154,20 +182,97 @@ class Push {
       if (!array_key_exists($Parameter, Push::$Config))
          return $Default;
          
-      return Push::$Config[$Parameter];
+      $Param = Push::$Config[$Parameter];
+      
+      if (!is_array($Param) && !is_object($Param)) {
+         if (in_array(strtolower($Param), array('yes','true','on')))
+            return 1;
+         if (in_array(strtolower($Param), array('no', 'false', 'off')))
+            return 0;
+      }
+      
+      return $Param;
+   }
+   
+   public static function LocalPath() {
+      static $LocalPath = FALSE;
+      
+      if ($LocalPath === FALSE) {
+         // Assign to local static variable
+         $LocalPath = Push::Path(Push::Config('local path'));
+      }
+      return $LocalPath;
+   }
+   
+   public static function Path($Path, $AutoSlash = TRUE) {
+      $Prepend = "";
+      $Prefix = substr($Path, 0, 1);
+      
+      if ($Prefix == '~') {
+         $Prepend = Push::PushRoot();
+         $Suffix = substr($Path, 1);
+      } else if ($Prefix == '!') {
+         $Prepend = Push::PushExecRoot();
+         $Suffix = substr($Path, 1);
+      } else {
+         $Suffix = $Path;
+      }
+      
+      $Path = $Prepend.$Suffix;
+      
+      if ($AutoSlash) {
+         if (is_dir($Path) || !file_exists($Path))
+            $Path = Push::Pathify($Path);
+      }
+      return $Path;
+   }
+   
+   public static function PushExecRoot() {
+      static $PushExecRoot = FALSE;
+      if ($PushExecRoot === FALSE) {
+         $PushExecRoot = exec('pwd');
+      }
+      return $PushExecRoot;
+   }
+   
+   public static function PushRoot() {
+      static $PushRoot = FALSE;
+      if ($PushRoot === FALSE) {
+         $PushFolderComponents = explode('/', Push::PushExecRoot());
+         array_pop($PushFolderComponents);
+         $PushRoot = implode('/', $PushFolderComponents);
+      }
+      return $PushRoot;
+   }
+   
+   // Convenience method
+   public static function ExecRelative($Path) {
+      static $Where = NULL;
+      if (is_null($Where))
+         $Where = Push::PushExecRoot();
+      return Push::CombinePaths($Where, $Path);
    }
    
    // Convenience method
    public static function Relative($Path) {
       static $Where = NULL;
       if (is_null($Where))
-         $Where = getcwd();
+         $Where = Push::PushRoot();
       return Push::CombinePaths($Where, $Path);
+   }
+   
+   public static function Staging($Path) {
+      $StagingRoot = Push::LocalPath();
+      return Push::CombinePaths($StagingRoot, $Path);
    }
    
    // Convenience method
    public static function Pathify($Path) {
       return rtrim($Path, '/').'/';
+   }
+   
+   public static function UnPathify($Path) {
+      return rtrim($Path, '/');
    }
    
    // Convenience method
@@ -227,6 +332,19 @@ class Push {
       if ($Answer == '') $Answer = $Default;
       $Answer = strtolower($Answer);
       return $Answer;
+   }
+   
+   public static function Log($Level, $Message, $Options = 0) {
+      static $LoggingLevel = FALSE;
+      
+      if ($LoggingLevel === FALSE)
+         $LoggingLevel = Push::Config('log level', 1);
+      
+      if ($LoggingLevel & $Level) {
+         echo $Message;
+         if (!($Options & Push::LOG_O_NONEWLINE))
+            echo "\n";
+      }
    }
    
 }

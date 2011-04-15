@@ -63,6 +63,11 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${SOURCE}plugins/cleditor" "${PATH}plugins/cleditor"
     /bin/ln -s "${SOURCE}plugins/Emotify" "${PATH}plugins/Emotify"
     # End Core Package Plugins
+
+    # Core Package Themes
+    /bin/ln -s "${SOURCE}themes/mobile" "${PATH}themes/mobile"
+    /bin/ln -s "${SOURCE}themes/EmbedFriendly" "${PATH}themes/EmbedFriendly"
+    # End Core Package Themes
     
     # Custom VF.com Plugins
     /bin/ln -s "${PLUGINS}GettingStartedHosting" "${PATH}plugins/GettingStartedHosting"
@@ -86,7 +91,6 @@ if [ ! -d "$PATH" ]; then
     /bin/ln -s "${THEMES}rounder" "${PATH}themes/rounder"
     /bin/ln -s "${THEMES}vanilla-classic" "${PATH}themes/vanilla-classic"
     /bin/ln -s "${THEMES}v1grey" "${PATH}themes/v1grey"
-    /bin/ln -s "${SOURCE}themes/EmbedFriendly" "${PATH}themes/EmbedFriendly"
     # End Themes
         
     # Misc Symlinks
