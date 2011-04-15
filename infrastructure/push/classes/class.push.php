@@ -46,7 +46,8 @@ class Push {
          'objects'                  => array('o','objects', TRUE),
          'remote user'              => array('u','user', TRUE),
          'remote password'          => array('p','password', TRUE),
-         'log level'                => array('l','log-level',TRUE)
+         'log level'                => array('l','log-level',TRUE),
+         'lookup mode'              => array('m','lookup-mode',TRUE),
       );
       
       $ShortOptions = "";
@@ -130,6 +131,7 @@ class Push {
       $Min = Push::Config('frontend min');
       $Max = Push::Config('frontend max');
       $Padding = Push::Config('frontend padding');
+      $LookupMode = Push::Config('lookup mode');
       
       $ExcludedFrontends = Push::Config('exclude frontends', '');
       $ExcludedFrontends = explode(',', $ExcludedFrontends);
@@ -143,7 +145,15 @@ class Push {
             $Front++;
             $PaddedFront = sprintf("%0{$Padding}d", $Front);
             $FrontendPrefix = sprintf($FrontendPattern, $PaddedFront);
-            $FrontendHost = $FrontendPrefix.".{$FrontendSuffix}";
+            
+            if ($LookupMode == 'full')
+               $FrontendHost = $FrontendPrefix.".{$FrontendSuffix}";
+            elseif ($LookupMode == 'local')
+               $FrontendHost = $FrontendPrefix;
+            else {
+               Push::Log(Push::LOG_L_FATAL, "No lookup mode defined. Please define 'lookup mode' in the config, or pass -m");
+               die();
+            }
             
             // Exclusions
             if (in_array($FrontendPrefix,$ExcludedFrontends) || in_array($FrontendHost, $ExcludedFrontends))
@@ -169,26 +179,49 @@ class Push {
       if (!array_key_exists($Parameter, Push::$Config))
          return $Default;
          
-      return Push::$Config[$Parameter];
+      $Param = Push::$Config[$Parameter];
+      
+      if (!is_array($Param) && !is_object($Param)) {
+         if (in_array(strtolower($Param), array('yes','true','on')))
+            return 1;
+         if (in_array(strtolower($Param), array('no', 'false', 'off')))
+            return 0;
+      }
+      
+      return $Param;
    }
    
    public static function LocalPath() {
       static $LocalPath = FALSE;
       
       if ($LocalPath === FALSE) {
-         $ConfLocalPath = Push::Config('local path');
-         $ParseLocal = (substr($ConfLocalPath, 0, 1) == '~') ? TRUE : FALSE;
-      
-         if ($ParseLocal) {
-            $Response = Push::PushStagingRoot().substr($ConfLocalPath, 1);
-         } else {
-            $Response = $ConfLocalPath;
-         }
-         
          // Assign to local static variable
-         $LocalPath = Push::Pathify($Response);
+         $LocalPath = Push::Path(Push::Config('local path'));
       }
       return $LocalPath;
+   }
+   
+   public static function Path($Path, $AutoSlash = TRUE) {
+      $Prepend = "";
+      $Prefix = substr($Path, 0, 1);
+      
+      if ($Prefix == '~') {
+         $Prepend = Push::PushRoot();
+         $Suffix = substr($Path, 1);
+      } else if ($Prefix == '!') {
+         $Prepend = Push::PushExecRoot();
+         $Suffix = substr($Path, 1);
+      } else {
+         $Suffix = $Path;
+      }
+      
+      $Path = $Prepend.$Suffix;
+      
+      if ($AutoSlash) {
+         if (is_dir($Path) || !file_exists($Path))
+            $Path = Push::Pathify($Path);
+      }
+      return $Path;
    }
    
    public static function PushExecRoot() {
@@ -199,7 +232,7 @@ class Push {
       return $PushExecRoot;
    }
    
-   public static function PushStagingRoot() {
+   public static function PushRoot() {
       static $PushRoot = FALSE;
       if ($PushRoot === FALSE) {
          $PushFolderComponents = explode('/', Push::PushExecRoot());
@@ -221,8 +254,13 @@ class Push {
    public static function Relative($Path) {
       static $Where = NULL;
       if (is_null($Where))
-         $Where = Push::PushStagingRoot();
+         $Where = Push::PushRoot();
       return Push::CombinePaths($Where, $Path);
+   }
+   
+   public static function Staging($Path) {
+      $StagingRoot = Push::LocalPath();
+      return Push::CombinePaths($StagingRoot, $Path);
    }
    
    // Convenience method

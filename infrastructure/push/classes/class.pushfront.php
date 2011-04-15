@@ -9,6 +9,11 @@ class PushFront {
    protected $RemotePass;
    protected $RemotePath;
    
+   protected $Exclude;
+   protected $RsyncExtra;
+   protected $ExpandSymlinks;
+   protected $DeleteMissing;
+   
    public function __construct($Hostname, $Address) {
       Push::Log(Push::LOG_L_INFO, "Frontend - {$Hostname}/{$Address}");
       $this->Hostname = $Hostname;
@@ -17,6 +22,15 @@ class PushFront {
       $this->RemoteUser = Push::Config('remote user');
       $this->RemotePass = Push::Config('remote password');
       $this->RemotePath = Push::Config('remote path');
+      
+      $this->Exclude = Push::Config('exclude file', NULL);
+      if (!is_null($this->Exclude))
+         $this->Exclude = Push::Path($this->Exclude);
+      
+      $this->RsyncExtra = Push::Config('rsync extra', NULL);
+      
+      $this->ExpandSymlinks = Push::Config('expand symlinks', TRUE);
+      $this->DeleteMissing = Push::Config('delete missing', TRUE);
       
       $this->Objects = Push::Config('compiled objects');
    }
@@ -43,30 +57,38 @@ class PushFront {
        * SPECIFY A TRAILING SLASH to prevent nesting additional directories
        */
       $Relative = "{$SourceTag}/{$ObjectType}";
-      $LocalFolder = Push::Relative($Relative);
+      $LocalFolder = Push::Staging($Relative);
       
-      $RemotePath = Push::Config('remote path');
-      $RemotePath = Push::CombinePaths($RemotePath,$ObjectType);
+      $RemotePath = Push::CombinePaths($this->RemotePath,$ObjectType);
       
       $this->Rsync($LocalFolder, $RemotePath);
    }
    
    protected function Rsync($Local, $Remote, $Unpathify = TRUE) {
       if ($Unpathify) {
-         $Local = Push::UnPathify($Local);
-         $Remote = Push::UnPathify($Remote);
+         $Local = Push::Pathify($Local);
+         $Remote = Push::Pathify($Remote);
       }
       
-      $RemoteUser = Push::Config('remote user');
-      $RemotePass = Push::Config('remote password', NULL);
-      $RemoteSystem = $this->Address;
+      $Rsync = "rsync ";
+      if (!is_null($this->RsyncExtra))
+         $Rsync .= rtrim($this->RsyncExtra).' ';
       
-      $RemoteAuth = $RemoteUser;
-      if (!is_null($RemotePass))
-         $RemoteAuth .= ":{$RemotePass}";
+      if (!is_null($this->Exclude))
+         $Rsync .= "--exclude-from={$this->Exclude} ";
       
+      if ($this->ExpandSymlinks)
+         $Rsync .= "--copy-links ";
+      
+      if ($this->DeleteMissing)
+         $Rsync .= "--delete ";
+      
+      $Rsync .= "-avz {$Local} {$this->RemoteUser}@{$this->Address}:{$Remote}";
       $Response = array();
-      exec("rsync -avz {$Local} {$RemoteAuth}:{$RemoteSystem}@{$Remote}");
+      if (!Push::Config('dry run')) {
+         echo "{$Rsync}\n";
+         passthru($Rsync);
+      }
    }
    
 }
