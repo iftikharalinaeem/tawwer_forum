@@ -13,6 +13,7 @@ class PushFront {
    protected $RsyncExtra;
    protected $ExpandSymlinks;
    protected $DeleteMissing;
+   protected $ClearAutoloader;
    
    public function __construct($Hostname, $Address) {
       Push::Log(Push::LOG_L_INFO, "Frontend - {$Hostname}/{$Address}");
@@ -31,6 +32,7 @@ class PushFront {
       
       $this->ExpandSymlinks = Push::Config('expand symlinks', TRUE);
       $this->DeleteMissing = Push::Config('delete missing', TRUE);
+      $this->ClearAutoloader = Push::Config('clear autoloader', TRUE);
       
       $this->Objects = Push::Config('compiled objects');
    }
@@ -44,6 +46,14 @@ class PushFront {
       foreach ($ObjectList as $Object) {
          $Object = trim($Object);
          $this->PushObject($SourceTag, $Object);
+      }
+      
+      if ($this->ClearAutoloader) {
+         Push::Log(Push::LOG_L_NOTICE, "Clearing autoloader cache");
+         $RemoteCacheFiles = Push::UnPathify(Push::CombinePaths($this->RemotePath, 'frontend/cache/*.ini'));
+         if (!Push::Config('dry run')) {
+            exec("ssh {$this->RemoteUser}@{$this->RemoteAddress} 'rm {$RemoteCacheFiles}'");
+         }
       }
    }
    
@@ -86,7 +96,6 @@ class PushFront {
       $Rsync .= "-avz {$Local} {$this->RemoteUser}@{$this->Address}:{$Remote}";
       $Response = array();
       if (!Push::Config('dry run')) {
-         echo "{$Rsync}\n";
          passthru($Rsync);
       }
    }

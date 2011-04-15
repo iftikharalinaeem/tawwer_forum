@@ -42,12 +42,14 @@ class Push {
          'frontend hostname'        => array('h','frontend-hostname', TRUE),
          'exclude frontends'        => array('e','exclude', TRUE),
          'source tag'               => array('s','source-tag', TRUE),
-         'dry run'                  => array('d','dry-run', FALSE),
+         'dry run'                  => array('d','dry-run', TRUE),
          'objects'                  => array('o','objects', TRUE),
          'remote user'              => array('u','user', TRUE),
          'remote password'          => array('p','password', TRUE),
          'log level'                => array('l','log-level',TRUE),
          'lookup mode'              => array('m','lookup-mode',TRUE),
+         'clear autoloader'         => array(NULL,'clear-autoloader',TRUE),
+         'utility update'           => array(NULL,'utility-update',TRUE)
       );
       
       $ShortOptions = "";
