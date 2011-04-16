@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'This plugin allows users to attach their own signatures to their posts.',
-   'Version' => '1.2.1',
+   'Version' => '1.2.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18a'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -121,7 +121,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       return $UserSigData;
    }
    
-   protected function Signatures($Sender, $UserID = NULL, $Default = NULL) {
+   protected function Signatures($Sender, $RequestUserID = NULL, $Default = NULL) {
       static $Signatures = NULL;
       
       if (is_null($Signatures)) {
@@ -152,8 +152,8 @@ class SignaturesPlugin extends Gdn_Plugin {
          
       }
       
-      if (!is_null($UserID))
-         return GetValue($UserID, $Signatures, $Default);
+      if (!is_null($RequestUserID))
+         return GetValue($RequestUserID, $Signatures, $Default);
       
       return $Signatures;
    }
@@ -187,7 +187,7 @@ class SignaturesPlugin extends Gdn_Plugin {
       
       if (isset($Sender->EventArguments['Discussion'])) 
          $Data = $Sender->EventArguments['Discussion'];
-         
+      
       if (isset($Sender->EventArguments['Comment'])) 
          $Data = $Sender->EventArguments['Comment'];
       
