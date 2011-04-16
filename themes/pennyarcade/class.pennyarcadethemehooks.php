@@ -27,6 +27,10 @@ class PennyArcadeThemeHooks implements Gdn_IPlugin {
 			if (array_key_exists('NewDiscussionModule', $Sender->Assets['Panel']))
 				unset($Sender->Assets['Panel']['NewDiscussionModule']);
 		}
+
+		// Add the fade.js if we're on the default master
+		if ($Sender->MasterView == '')
+			$Sender->AddJsFile('themes/pennyarcade/js/fade.js');
 	}
 
 	public function CategoriesController_BeforeCategoryItem_Handler($Sender) {
