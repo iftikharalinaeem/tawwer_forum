@@ -175,6 +175,13 @@ class Push {
       foreach ($this->Frontends() as $Frontend) {
          $Frontend->Push();
       }
+      
+      if (Push::Config('utility update')) {
+         if (!Push::Config('fast')) {
+            $Proceed = Push::Question("Run utility/update for all clients?", "utility/update?", array('yes','no'),'no');
+            if ($Proceed == 'no') return;
+         }
+      }
    }
    
    public static function Config($Parameter, $Default = NULL) {
@@ -286,9 +293,10 @@ class Push {
    }
    
    public static function Question($Message, $Prompt, $Options, $Default) {
-      echo "\n";
-      if ($Message)
+      if ($Message && !is_null($Message)) {
+         echo "\n";
          echo $Message."\n";
+      }
          
       foreach ($Options as &$Opt)
          $Opt = strtolower($Opt);
