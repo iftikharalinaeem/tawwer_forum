@@ -88,7 +88,6 @@ class VfcomPlugin extends Gdn_Plugin {
          
          if (Gdn::Request()->GetValue("Plugin_vfcom_IncrementCacheRevision", FALSE) !== FALSE) {
             $Incremented = Gdn::Cache()->IncrementRevision();
-            var_dump($Incremented);
             $Sender->InformMessage("The cache revision has been incremented.");
          }
       }
