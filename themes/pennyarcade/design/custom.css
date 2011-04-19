@@ -293,6 +293,21 @@ a:hover {
 #Head div.ProfileMenu a.Inbox span.Hidden {
 	display: none;
 }
+#Head div.ProfileMenu a.Profile {
+	text-decoration: none;
+}
+#Head div.ProfileMenu a.Profile span.Alert {
+	padding: 4px;
+	background: #64cde9;
+	color: #032255;
+	text-shadow: none;
+	border-radius: 12px;
+	-moz-border-radius: 12px;
+	-webkit-border-radius: 12px;
+}
+#Head div.ProfileMenu a.Profile:hover span.Alert {
+	background: #6EE1FF;
+}
 #Body {
 	width: auto;
 	margin: 15px 30px;
@@ -934,6 +949,14 @@ ul.MessageList.Discussion li.Item:nth-of-type(odd) {
 	overflow: hidden;
 	background: url('images/generic_user.png') 0 0 no-repeat #777;
 }
+.ProfileUser div.Photo img.Jailed {
+	position: absolute;
+	left: 90px;
+}
+.JailedIcon {
+	position: absolute;
+	z-index: 200;
+}
 .ProfileUser div.Photo img {
 	display: block;
 	width: 180px;
@@ -1438,6 +1461,8 @@ div.ConversationMessage {
 }
 ul.MessageList div.Message {
 	clear: none;
+}
+ul.MessageList.Discussion div.Message {
 	min-height: 82px;
 }
 #MessageForm {
@@ -1685,6 +1710,13 @@ span.InformSprite.Check {
 	height: 23px;
 	width: 23px;
 }
+span.InformSprite.Redflag {
+	background: url('images/sprites.png') 0 -700px no-repeat;
+	top: 7px;
+	left: 7px;
+	height: 25px;
+	width: 23px;
+}
 
 /* Search Results */
 ul.DataList.SearchResults .ItemContent {
@@ -1692,4 +1724,19 @@ ul.DataList.SearchResults .ItemContent {
 }
 ul.DataList div.Excerpt a:hover {
 	text-decoration: none;
+}
+
+/* Infractions */
+body.Profile ul.InfractionOverview {
+	background: #fff;
+	padding: 10px 0 10px 20px;
+}
+body.Profile div.Punishment {
+   margin: 0;
+}
+body.Profile ul.DataList.Infractions {
+	background: #fff;
+}
+body.Profile ul.DataList.Infractions li.Item {
+	padding: 4px 8px;
 }
