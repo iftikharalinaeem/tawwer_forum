@@ -139,6 +139,19 @@ class VfcomPlugin extends Gdn_Plugin {
       }
    }
    
+   public function Gdn_Router_BeforeLoadRoutes_Handler($Sender) {
+      if (is_null($this->VfcomClient)) return;
+      
+      $StaticRoute = "/?uploads/(.*)";
+      $StaticRouteDestination = "{$this->StaticURL}/uploads/$1";
+      $StaticRouteMethod = "Temporary";
+      
+      $Sender->EventArguments['Routes'][$StaticRoute] = array(
+          $StaticRouteDestination,
+          $StaticRouteMethod
+      );
+   }
+   
    public function Setup() {
       
    }
