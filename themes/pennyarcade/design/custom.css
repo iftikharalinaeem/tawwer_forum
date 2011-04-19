@@ -293,6 +293,21 @@ a:hover {
 #Head div.ProfileMenu a.Inbox span.Hidden {
 	display: none;
 }
+#Head div.ProfileMenu a.Profile {
+	text-decoration: none;
+}
+#Head div.ProfileMenu a.Profile span.Alert {
+	padding: 4px;
+	background: #64cde9;
+	color: #032255;
+	text-shadow: none;
+	border-radius: 12px;
+	-moz-border-radius: 12px;
+	-webkit-border-radius: 12px;
+}
+#Head div.ProfileMenu a.Profile:hover span.Alert {
+	background: #6EE1FF;
+}
 #Body {
 	width: auto;
 	margin: 15px 30px;
@@ -303,16 +318,18 @@ a:hover {
 }
 #Foot div {
 	width: auto;
-	margin: 0 30px;
+	margin: 0 30px 20px;
 	padding: 0;
+	text-align: right;
 }
 #Foot div a {
-	display: block;
+	display: inline-block;
 	height: 32px;
 	width: 72px;
 	background: url('images/logo_footer.png') top left no-repeat;
-	text-indent: -1000px;
+	text-indent: 1000px;
 	overflow: hidden;
+	white-space: nowrap;
 }
 
 /* Dismiss Messages */
@@ -777,7 +794,7 @@ body.Discussion a.BigButton:active { background-position: -105px -58px; }
 }
 body.Discussion #PagerAfter {
 	float: none;
-	padding: 10px 0 12px;
+	padding: 10px 0 2px;
 	margin: 0;
 }
 ul.DataList.Discussions li.Item.Announcement td.DiscussionName {
@@ -813,6 +830,7 @@ ul.DataList.Discussions a.Title {
 }
 table.PageNavigation {
 	width: 100%;
+	margin-bottom: 10px;
 }
 table.PageNavigation td {
 	vertical-align: middle;
@@ -867,8 +885,12 @@ ul.MessageList.Discussion li.Item:nth-of-type(odd) {
 	line-height: 1.4;
 	color: #666;
 	padding: 6px 0 8px;
-	margin: 10px 10px 0;
+	margin: 10px;
 	border-bottom: 1px solid #cbcfd5;
+}
+.CommentTable td.Author div {
+	width: 130px;
+	overflow: hidden;
 }
 .ProfileUser div.Name,
 .CommentTable td.Author div.Name a {
@@ -927,6 +949,14 @@ ul.MessageList.Discussion li.Item:nth-of-type(odd) {
 	overflow: hidden;
 	background: url('images/generic_user.png') 0 0 no-repeat #777;
 }
+.ProfileUser div.Photo img.Jailed {
+	position: absolute;
+	left: 90px;
+}
+.JailedIcon {
+	position: absolute;
+	z-index: 200;
+}
 .ProfileUser div.Photo img {
 	display: block;
 	width: 180px;
@@ -946,6 +976,7 @@ ul.MessageList.Discussion li.Item:nth-of-type(odd) {
 	padding: 8px 0 0;
 	min-height: 0;
 }
+ul.DataList.SearchResults div.DateCreated,
 .CommentTable div.Meta span.DateCreated {
 	background: #a6a6a6;
 	border-radius: 3px;
@@ -953,7 +984,10 @@ ul.MessageList.Discussion li.Item:nth-of-type(odd) {
 	-webkit-border-radius: 3px;
 	padding: 2px 2px 3px 6px;
 	margin: 0 0 0 10px;
+	display: inline;
+	font-size: 11px;
 }
+ul.DataList.SearchResults div.DateCreated a,
 .CommentTable div.Meta span.DateCreated a {
 	background: url('images/sprites.png') 0 -145px no-repeat transparent;
 	padding-left: 23px;
@@ -1003,7 +1037,7 @@ span.AwesomePost,
 span.ReportPost {
 	position: absolute;
 	bottom: 8px;
-	right: 16px;
+	right: 20px;
 	border-right: 1px solid #d9e2ea;
 	padding-right: 10px;
 }
@@ -1011,8 +1045,8 @@ span.ReportPost {
 	border-right: none;
 	padding-right: 0;
 }
-span.CommentQuote { right: 200px; }
-span.AwesomePost { right: 96px; }
+span.CommentQuote { right: 204px; }
+span.AwesomePost { right: 100px; }
 span.CommentQuote a,
 span.AwesomePost a,
 span.ReportPost a {
@@ -1315,6 +1349,9 @@ div.Box dl dd.CustomProfileField-website {
 	height: 8px !important;
 	width: 4px !important;
 }
+ul.DataList.SearchResults div.DateCreated span.TimestampArrow {
+	top: 5px;
+}
 ul.MessageList div.Comment div.Meta span.TimestampArrow {
 	top: 6px;
 }
@@ -1324,6 +1361,9 @@ form.Activity {
 }
 ul.DataList.Activities li.Item {
 	padding: 15px 20px;
+}
+ul.DataList.Activities li.Item li.Item {
+	padding: 4px 6px;
 }
 body.Profile ul.DataList.Activities {
 	margin-top: 0;
@@ -1373,6 +1413,9 @@ ul.DataList.Activities li.AboutUpdate div.Excerpt {
 	padding: 0 0 0 4px;
 	border: none;
 }
+ul.Activities ul.DataList {
+   margin-left: 35px;
+}
 .Foot {
 	border-radius: 0;
 	-moz-border-radius: 0;
@@ -1418,6 +1461,9 @@ div.ConversationMessage {
 }
 ul.MessageList div.Message {
 	clear: none;
+}
+ul.MessageList.Discussion div.Message {
+	min-height: 82px;
 }
 #MessageForm {
 	border-radius: 0;
@@ -1663,4 +1709,34 @@ span.InformSprite.Check {
 	left: 7px;
 	height: 23px;
 	width: 23px;
+}
+span.InformSprite.Redflag {
+	background: url('images/sprites.png') 0 -700px no-repeat;
+	top: 7px;
+	left: 7px;
+	height: 25px;
+	width: 23px;
+}
+
+/* Search Results */
+ul.DataList.SearchResults .ItemContent {
+	padding: 0 10px;
+}
+ul.DataList div.Excerpt a:hover {
+	text-decoration: none;
+}
+
+/* Infractions */
+body.Profile ul.InfractionOverview {
+	background: #fff;
+	padding: 10px 0 10px 20px;
+}
+body.Profile div.Punishment {
+   margin: 0;
+}
+body.Profile ul.DataList.Infractions {
+	background: #fff;
+}
+body.Profile ul.DataList.Infractions li.Item {
+	padding: 4px 8px;
 }

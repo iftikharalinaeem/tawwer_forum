@@ -31,6 +31,10 @@ class PennyArcadeThemeHooks implements Gdn_IPlugin {
 		// Add the fade.js if we're on the default master
 		if ($Sender->MasterView == '')
 			$Sender->AddJsFile('themes/pennyarcade/js/fade.js');
+
+		// Set the favicon if there is a head module
+		if (property_exists($Sender, 'Head') && is_object($Sender->Head))
+			$Sender->Head->SetFavIcon(Asset('themes/pennyarcade/design/images/favicon.ico'));
 	}
 
 	public function CategoriesController_BeforeCategoryItem_Handler($Sender) {
