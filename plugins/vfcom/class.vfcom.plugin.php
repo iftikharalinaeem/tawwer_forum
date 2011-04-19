@@ -27,8 +27,21 @@ $PluginInfo['vfcom'] = array(
 
 class VfcomPlugin extends Gdn_Plugin {
    
+   protected $VfcomClient;
+   protected $StaticURL;
+   protected $WhitelistDomain = 'vanillaforums.com';
+   
    public function __construct() {
+      // Name of this client (usually the <prefix> part of http://<prefix>.<hostname>.com)
+      $this->VfcomClient = C('VanillaForums.SiteName', NULL);
+      if (is_null($this->VfcomClient)) return;
       
+      // Root domain of this deployment
+      $this->VfcomHostname = C('VanillaForums.Hostname', 'vanillaforums.com');
+      
+      // Targetting URL to the static content server / CDN
+      $StaticFormat = C('VanillaForums.StaticFormat', 'http://%s.static.%s');
+      $this->StaticURL = sprintf($StaticFormat, $this->VfcomClient, $this->VfcomHostname);
    }
 
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
@@ -36,7 +49,7 @@ class VfcomPlugin extends Gdn_Plugin {
       if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
          return;
 
-      if (!StringEndsWith(GetValue('Email', Gdn::Session()->User, NULL), "@vanillaforums.com"))
+      if (!StringEndsWith(GetValue('Email', Gdn::Session()->User, NULL), "@{$this->WhitelistDomain}"))
          return;
       
       $LinkText = T('Infrastructure');
@@ -47,8 +60,8 @@ class VfcomPlugin extends Gdn_Plugin {
 
    public function PluginController_Vfcom_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
-      if (!StringEndsWith(GetValue('Email', Gdn::Session()->User, NULL), "@vanillaforums.com"))
-         throw new Exception(T("Sorry, only Vanilla Forums personnel are permitted here."));
+      if (!StringEndsWith(GetValue('Email', Gdn::Session()->User, NULL), "@{$this->WhitelistDomain}"))
+         throw new Exception(T("Sorry, only authorized personnel are permitted here."));
 
       $Sender->Title('Infrastructure');
       $Sender->AddSideMenu('plugin/vfcom');
@@ -95,24 +108,26 @@ class VfcomPlugin extends Gdn_Plugin {
       $Sender->Render('settings','','plugins/vfcom');
    }
 
+   /**
+    * Handle requests for uploaded images, such as user pics and file uploads
+    * 
+    * This method adds the static content url to the list of URLs that can serve
+    * this request.
+    * 
+    * @param Gdn_Pluggable $Sender firing controller
+    * @param array $Args arguments passed to firing controller
+    * @return void
+    */
    public function Gdn_Upload_GetUrls_Handler($Sender, $Args) {
+      if (is_null($this->VfcomClient)) return;
       
-      $VfcomClient = C('VanillaForums.SiteName', NULL);
-      if (is_null($VfcomClient)) return;
-      
-      $StaticFormat = C('VanillaForums.StaticFormat', 'http://%s.static.%s/uploads');
-      
-      $VfcomHostname = C('VanillaForums.Hostname', 'vanillaforums.com');
-      $Args['Urls'][''] = $FinalURL = sprintf($StaticFormat,
-         $VfcomClient,
-         $VfcomHostname
-      );
-
+      $Args['Urls'][''] = $FinalURL = "{$this->StaticURL}/uploads";
    }
    
    public function HeadModule_BeforeToString_Handler($Sender) {
       // Only for logged-in users
       if (!Gdn::Session()->UserID) return;
+      
       // Only when enabled (finally)
       if (!C('VanillaForums.ShowInfrastructure', FALSE)) return;
       
