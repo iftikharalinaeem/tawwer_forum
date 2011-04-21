@@ -12,6 +12,7 @@ body {
 	background: url("http://www.blogworld.com/wp-content/themes/BlogWorld_20/images/bg-bottom.png") no-repeat bottom center transparent;
 	display:block;
 	padding-bottom: 20px;
+	min-height: 910px;
 }
 hr { clear:both; }
 /***** Hyperlinks ********************/
