@@ -93,7 +93,7 @@ div.Popup h2 {
 #Content {
 	float: none;
 	width: auto;
-	margin: 0 280px 0 10px;
+	margin: 0 300px 0 10px;
 }
 #Panel {
 	float: right;
@@ -311,6 +311,15 @@ body.Entry #Content div.Box {
 body.Entry #Panel {
 	display: none;
 }
+
+/* voting */
+
+ul.DataList div.Meta strong {
+    left: 688px;
+
+}
+voting....0.4.1b (line 111)
+
 
 /* blog world */
 
