@@ -1174,6 +1174,7 @@ ul.Activities ul.DataList {
 div.Box.GuestBox {
 	padding-bottom: 6px;
 }
+div.Box.CategoryFollowToggleBox p,
 div.Box.GuestBox p {
 	padding: 0 6px 4px;
 }

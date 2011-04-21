@@ -112,6 +112,6 @@ if (is_object($InfractionData)) {
       }
       echo '</ul>';
    } else {
-      echo Wrap('This user has not had any infractions.', 'p');
+      echo Wrap('This user has not had any infractions.', 'div', array('class' => 'Empty'));
    }
 }

@@ -9,8 +9,14 @@ class PushFront {
    protected $RemotePass;
    protected $RemotePath;
    
+   protected $Exclude;
+   protected $RsyncExtra;
+   protected $ExpandSymlinks;
+   protected $DeleteMissing;
+   protected $ClearAutoloader;
+   
    public function __construct($Hostname, $Address) {
-      echo "New pushfront - {$Hostname}/{$Address}\n";
+      Push::Log(Push::LOG_L_INFO, "Frontend - {$Hostname}/{$Address}");
       $this->Hostname = $Hostname;
       $this->Address = $Address;
       
@@ -18,22 +24,46 @@ class PushFront {
       $this->RemotePass = Push::Config('remote password');
       $this->RemotePath = Push::Config('remote path');
       
+      $this->Exclude = Push::Config('exclude file', NULL);
+      if (!is_null($this->Exclude))
+         $this->Exclude = Push::Path($this->Exclude);
+      
+      $this->RsyncExtra = Push::Config('rsync extra', NULL);
+      
+      $this->ExpandSymlinks = Push::Config('expand symlinks', TRUE);
+      $this->DeleteMissing = Push::Config('delete missing', TRUE);
+      $this->ClearAutoloader = Push::Config('clear autoloader', TRUE);
+      
       $this->Objects = Push::Config('compiled objects');
    }
    
    public function Push() {
-      $SourceLevel = Push::Config('source level');
+      $SourceTag = Push::Config('source tag');
       $StrObjects = Push::Config('objects');
-      echo "Pushing {$StrObjects}:{$SourceLevel} for {$this->Hostname}\n";
+      Push::Log(Push::LOG_L_NOTICE, "Pushing {$StrObjects}:{$SourceTag} for {$this->Hostname}");
       
-      $ObjectList = explode(',', $Objects);
+      if (!Push::Config('fast')) {
+         $Proceed = Push::Question(NULL, "Are you sure?", array('yes','no'), 'no');
+         if ($Proceed == 'no') return;
+      }
+      
+      $ObjectList = explode(',', $StrObjects);
       foreach ($ObjectList as $Object) {
          $Object = trim($Object);
-         $this->PushObject($SourceLevel, $ObjectType);
+         $this->PushObject($SourceTag, $Object);
+      }
+      
+      if ($this->ClearAutoloader) {
+         Push::Log(Push::LOG_L_NOTICE, "Clearing autoloader cache");
+         $RemoteCacheFiles = Push::UnPathify(Push::CombinePaths($this->RemotePath, 'frontend/cache/*.ini'));
+         if (!Push::Config('dry run')) {
+            passthru("ssh {$this->RemoteUser}@{$this->Address} 'rm -f {$RemoteCacheFiles}'");
+         }
       }
    }
    
-   protected function PushObject($ObjectType) {
+   protected function PushObject($SourceTag, $ObjectType) {
+      Push::Log(Push::LOG_L_NOTICE, "  {$ObjectType}:{$SourceTag}");
       
       /**
        * 
@@ -41,9 +71,38 @@ class PushFront {
        * 
        * SPECIFY A TRAILING SLASH to prevent nesting additional directories
        */
+      $Relative = "{$SourceTag}/{$ObjectType}";
+      $LocalFolder = Push::Staging($Relative);
       
+      $RemotePath = Push::CombinePaths($this->RemotePath,$ObjectType);
       
+      $this->Rsync($LocalFolder, $RemotePath);
+   }
+   
+   protected function Rsync($Local, $Remote, $Unpathify = TRUE) {
+      if ($Unpathify) {
+         $Local = Push::Pathify($Local);
+         $Remote = Push::Pathify($Remote);
+      }
       
+      $Rsync = "rsync ";
+      if (!is_null($this->RsyncExtra))
+         $Rsync .= rtrim($this->RsyncExtra).' ';
+      
+      if (!is_null($this->Exclude))
+         $Rsync .= "--exclude-from={$this->Exclude} ";
+      
+      if ($this->ExpandSymlinks)
+         $Rsync .= "--copy-links ";
+      
+      if ($this->DeleteMissing)
+         $Rsync .= "--delete ";
+      
+      $Rsync .= "-avz {$Local} {$this->RemoteUser}@{$this->Address}:{$Remote}";
+      $Response = array();
+      if (!Push::Config('dry run')) {
+         passthru($Rsync);
+      }
    }
    
 }

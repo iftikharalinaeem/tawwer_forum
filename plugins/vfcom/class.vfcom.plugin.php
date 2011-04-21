@@ -11,8 +11,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['vfcom'] = array(
    'Name' => 'VanillaForums.com Hosting',
-   'Description' => "This plugin applies modifications needed for vanilla to support multiple webhead technology.",
-   'Version' => '1.0',
+   'Description' => "This plugin provides the hooks and management tools need to run Vanilla in Infrastructure Mode.",
+   'Version' => '1.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
@@ -27,26 +27,107 @@ $PluginInfo['vfcom'] = array(
 
 class VfcomPlugin extends Gdn_Plugin {
    
-   public function __construct() {
-      
-   }
+   protected $VfcomClient;
+   protected $StaticURL;
+   protected $WhitelistDomain = 'vanillaforums.com';
    
-   public function Gdn_Upload_GetUrls_Handler($Sender, $Args) {
+   public function __construct() {
+      // Name of this client (usually the <prefix> part of http://<prefix>.<hostname>.com)
+      $this->VfcomClient = C('VanillaForums.SiteName', NULL);
+      if (is_null($this->VfcomClient)) return;
       
-      $VfcomClient = C('VanillaForums.SiteName', NULL);
-      if (is_null($VfcomClient)) return;
+      // Root domain of this deployment
+      $this->VfcomHostname = C('VanillaForums.Hostname', 'vanillaforums.com');
       
-      $VfcomHostname = C('VanillaForums.Hostname', 'vanillaforums.com');
-      $Args['Urls'][''] = $FinalURL = sprintf('http://%s.static.%s/uploads',
-         $VfcomClient,
-         $VfcomHostname
-      );
+      // Targetting URL to the static content server / CDN
+      $StaticFormat = C('VanillaForums.StaticFormat', 'http://%s.static.%s');
+      $this->StaticURL = sprintf($StaticFormat, $this->VfcomClient, $this->VfcomHostname);
+   }
 
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      
+      if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
+         return;
+
+      if (!StringEndsWith(GetValue('Email', Gdn::Session()->User, NULL), "@{$this->WhitelistDomain}"))
+         return;
+      
+      $LinkText = T('Infrastructure');
+      $Menu = $Sender->EventArguments['SideMenu'];
+      $Menu->AddItem('Site Settings', T('Settings'));
+      $Menu->AddLink('Site Settings', $LinkText, 'plugin/vfcom', 'Garden.Settings.Manage');
+   }
+
+   public function PluginController_Vfcom_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      if (!StringEndsWith(GetValue('Email', Gdn::Session()->User, NULL), "@{$this->WhitelistDomain}"))
+         throw new Exception(T("Sorry, only authorized personnel are permitted here."));
+
+      $Sender->Title('Infrastructure');
+      $Sender->AddSideMenu('plugin/vfcom');
+      $Sender->Form = new Gdn_Form();
+      $Sender->AddCssFile('vfcom.css', 'plugins/vfcom');
+
+      $this->EnableSlicing($Sender);
+      $this->Dispatch($Sender, $Sender->RequestArgs);
+   }
+
+   public function Controller_Index($Sender) {
+      
+      if ($Sender->Form->AuthenticatedPostBack()) {
+         
+         if (Gdn::Request()->GetValue("Plugin_vfcom_ClearCache", FALSE) !== FALSE) {
+            // Clear all caches
+            Gdn::PluginManager()->ClearPluginCache();
+
+            // Rebuild now
+            Gdn::PluginManager()->AvailablePlugins(TRUE);
+            $Sender->InformMessage("The entire plugin cache has been cleared.");
+         }
+            
+         if (Gdn::Request()->GetValue("Plugin_vfcom_ClearLocalCache", FALSE) !== FALSE) {
+            foreach (Gdn::PluginManager()->SearchPaths() as $SearchPath => $SearchPathName) {
+               if ($SearchPathName != "local") continue;
+               
+               // Clear local cache
+               Gdn::PluginManager()->ClearPluginCache($SearchPath);
+               
+               // Rebuild now
+               Gdn::PluginManager()->AvailablePlugins(TRUE);
+               $Sender->InformMessage("The local plugin cache has been cleared.");
+               break;
+            }
+         }
+         
+         if (Gdn::Request()->GetValue("Plugin_vfcom_IncrementCacheRevision", FALSE) !== FALSE) {
+            $Incremented = Gdn::Cache()->IncrementRevision();
+            $Sender->InformMessage("The cache revision has been incremented.");
+         }
+      }
+      
+      $Sender->Render('settings','','plugins/vfcom');
+   }
+
+   /**
+    * Handle requests for uploaded images, such as user pics and file uploads
+    * 
+    * This method adds the static content url to the list of URLs that can serve
+    * this request.
+    * 
+    * @param Gdn_Pluggable $Sender firing controller
+    * @param array $Args arguments passed to firing controller
+    * @return void
+    */
+   public function Gdn_Upload_GetUrls_Handler($Sender, $Args) {
+      if (is_null($this->VfcomClient)) return;
+      
+      $Args['Urls'][''] = $FinalURL = "{$this->StaticURL}/uploads";
    }
    
    public function HeadModule_BeforeToString_Handler($Sender) {
       // Only for logged-in users
       if (!Gdn::Session()->UserID) return;
+      
       // Only when enabled (finally)
       if (!C('VanillaForums.ShowInfrastructure', FALSE)) return;
       
@@ -56,6 +137,19 @@ class VfcomPlugin extends Gdn_Plugin {
          echo "<div>Frontend: ".C('VanillaForums.Frontend', 'unknown')."</div>";
          echo '</div>';
       }
+   }
+   
+   public function Gdn_Router_BeforeLoadRoutes_Handler($Sender) {
+      if (is_null($this->VfcomClient)) return;
+      
+      $StaticRoute = "/?uploads/(.*)";
+      $StaticRouteDestination = "{$this->StaticURL}/uploads/$1";
+      $StaticRouteMethod = "Temporary";
+      
+      $Sender->EventArguments['Routes'][$StaticRoute] = array(
+          $StaticRouteDestination,
+          $StaticRouteMethod
+      );
    }
    
    public function Setup() {

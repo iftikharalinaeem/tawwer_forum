@@ -314,8 +314,10 @@ class InfractionsPlugin extends Gdn_Plugin {
          // Is the account banned or jailed?
          if ($InfractionCache['Points'] >= 8) {
             $InfractionCache['Banned'] = TRUE;
+				Gdn::SQL()->Update('User', array('Banned' => '1'), array('UserID' => $UserID))->Put();
          } else if ($InfractionCache['Points'] >= 4) {
             $InfractionCache['Jailed'] = TRUE;
+				Gdn::SQL()->Update('User', array('Jailed' => '1'), array('UserID' => $UserID))->Put();
          }
       }
       
@@ -405,13 +407,6 @@ class InfractionsPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Include the infraction information when retrieving conversation messages.
-    */
-   public function ConversationMessageModel_BeforeGet_Handler($Sender) {
-      $Sender->SQL->Select('c.InfractionID');
-   }
-
-   /**
     * Write out information about the infraction along with the first message.
     */
    public function MessagesController_BeforeConversationMessageBody_Handler($Sender) {
@@ -475,5 +470,140 @@ class InfractionsPlugin extends Gdn_Plugin {
       $PermissionModel->SQL = Gdn::SQL();
       $PermissionModel->Define(array('Garden.Infractions.Manage'));
       // NOTE: WILL NEED TO MANUALLY ENABLE THIS PERMISSION ON APPLICABLE ROLES
+   }
+	
+
+
+
+
+
+
+
+
+
+/* Do what the gravatar plugin does, and also add the & banned flags - so that we can change the user icons appropriately. */
+	
+   // Find all the places where UserBuilder is called, and make sure that there
+   // is a related $UserPrefix.'Email' field pulled from the database.
+   public function AddonCommentModel_BeforeGet_Handler(&$Sender) {
+      $Sender->SQL->Select('iu.Email', '', 'InsertEmail')
+			->Select('iu.Jailed', '', 'InsertJailed')
+			->Select('iu.Banned', '', 'InsertBanned');
+   }
+   public function ConversationModel_BeforeGet_Handler(&$Sender) {
+      $Sender->SQL->Select('lmu.Email', '', 'LastMessageEmail')
+			->Select('lmu.Jailed', '', 'LastMessageJailed')
+			->Select('lmu.Banned', '', 'LastMessageBanned');
+   }
+   public function ConversationMessageModel_BeforeGet_Handler(&$Sender) {
+      $Sender->SQL->Select('c.InfractionID')
+			->Select('iu.Email', '', 'InsertEmail')
+			->Select('iu.Jailed', '', 'InsertJailed')
+			->Select('iu.Banned', '', 'InsertBanned');
+   }
+   public function ActivityModel_BeforeGet_Handler(&$Sender) {
+      $Sender->SQL
+         ->Select('au.Email', '', 'ActivityEmail')
+			->Select('au.Jailed', '', 'ActivityJailed')
+			->Select('au.Banned', '', 'ActivityBanned')
+         ->Select('ru.Email', '', 'RegardingEmail')
+			->Select('ru.Jailed', '', 'RegardingJailed')
+			->Select('ru.Banned', '', 'RegardingBanned');
+   }
+	public function ActivityModel_BeforeGetNotifications_Handler(&$Sender) {
+      $Sender->SQL
+         ->Select('au.Email', '', 'ActivityEmail')
+			->Select('au.Jailed', '', 'ActivityJailed')
+			->Select('au.Banned', '', 'ActivityBanned')
+         ->Select('ru.Email', '', 'RegardingEmail')
+			->Select('ru.Jailed', '', 'RegardingJailed')
+			->Select('ru.Banned', '', 'RegardingBanned');
+	}
+   public function ActivityModel_BeforeGetComments_Handler(&$Sender) {
+      $Sender->SQL
+         ->Select('au.Email', '', 'ActivityEmail')
+			->Select('au.Jailed', '', 'ActivityJailed')
+			->Select('au.Banned', '', 'ActivityBanned');
+   }
+   public function UserModel_BeforeGetActiveUsers_Handler(&$Sender) {
+      $Sender->SQL->Select('u.Email, u.Jailed, u.Banned');
+   }
+	
+	public function DiscussionModel_BeforeGetID_Handler(&$Sender) {
+		$Sender->SQL->Select('iu.Email', '', 'InsertEmail')
+			->Select('iu.Jailed', '', 'InsertJailed')
+			->Select('iu.Banned', '', 'InsertBanned');
+		
+	}
+	
+   public function CommentModel_BeforeGet_Handler(&$Sender) {
+      $Sender->SQL->Select('iu.Email', '', 'InsertEmail')
+			->Select('iu.Jailed', '', 'InsertJailed')
+			->Select('iu.Banned', '', 'InsertBanned');
+   }
+
+   public function CommentModel_BeforeGetNew_Handler(&$Sender) {
+      $Sender->SQL->Select('iu.Email', '', 'InsertEmail')
+			->Select('iu.Jailed', '', 'InsertJailed')
+			->Select('iu.Banned', '', 'InsertBanned');
+   }
+
+}
+
+if (!function_exists('UserBuilder')) {
+   /**
+    * Override the default UserBuilder function with one that switches the photo
+    * out with a gravatar url if the photo is empty.
+    */
+   function UserBuilder($Object, $UserPrefix = '') {
+		$Object = (object)$Object;
+      $User = new stdClass();
+      $UserID = $UserPrefix.'UserID';
+      $Name = $UserPrefix.'Name';
+      $Photo = $UserPrefix.'Photo';
+      $Email = $UserPrefix.'Email';
+		$Jailed = $UserPrefix.'Jailed';
+		$Banned = $UserPrefix.'Banned';
+      $User->UserID = $Object->$UserID;
+      $User->Name = $Object->$Name;
+      $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
+      $Protocol =  (strlen(GetValue('HTTPS', $_SERVER, 'No')) != 'No' || GetValue('SERVER_PORT', $_SERVER) == 443) ? 'https://secure.' : 'http://www.';
+      if ($User->Photo == '' && property_exists($Object, $Email)) {
+         $User->Photo = $Protocol.'gravatar.com/avatar.php?'
+            .'gravatar_id='.md5(strtolower($Object->$Email))
+            .'&amp;default='.urlencode(Asset(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
+            .'&amp;size='.Gdn::Config('Garden.Thumbnail.Width', 40);
+      }
+		$User->Jailed = GetValue($Jailed, $Object);
+		$User->Banned = GetValue($Banned, $Object);
+		return $User;
+   }
+}
+if (!function_exists('UserPhoto')) {
+   function UserPhoto($User, $Options = array()) {
+		$User = (object)$User;
+      if (is_string($Options))
+         $Options = array('LinkClass' => $Options);
+      
+      $LinkClass = GetValue('LinkClass', $Options, 'ProfileLink');
+      $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoBig');
+      
+      $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
+      if ($User->Photo) {
+         if (!preg_match('`^https?://`i', $User->Photo)) {
+            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($User->Photo, 'n%s'));
+         } else {
+            $PhotoUrl = $User->Photo;
+         }
+			
+			$Jailed = GetValue('Jailed', $User) == '1' ? Img('themes/pennyarcade/design/images/jailed-80.png', array('alt' => 'Jailed', 'class' => 'JailedIcon')) : '';
+         
+         return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$LinkClass.'>'
+            .$Jailed
+				.Img($PhotoUrl, array('alt' => urlencode($User->Name), 'class' => $ImgClass))
+            .'</a>';
+      } else {
+         return '';
+      }
    }
 }

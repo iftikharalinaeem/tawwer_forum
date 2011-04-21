@@ -20,10 +20,24 @@ class CustomThemePlugin implements Gdn_IPlugin {
 	}
 
    public function Base_Render_Before(&$Sender) {		
-		// If we are using the default master view, and in preview mode, add the custom css file
+		// If we are using the default master view, and in preview mode...
 		if (Gdn::Session()->GetPreference('PreviewCustomTheme')) {
-			$Sender->AddAsset('Content', $Sender->FetchView(PATH_PLUGINS . DS . 'CustomTheme' . DS . 'views' . DS . 'preview.php'));
+			// Add the custom css file
 			$Sender->AddCssFile('previewtheme.css', 'dashboard');
+			
+			// Inform the user of the preview status
+		   $Form = new Gdn_Form();
+			$Message = 'You are previewing your custom theme revisions.'
+				.$Form->Open(array('action' => Url('settings/customtheme')))
+				.'<div><strong>Options:</strong> ';
+			if (C('Plugins.CustomTheme.Enabled'))
+				$Message .= $Form->Button('Apply Changes', array('class' => 'PreviewThemeButton', 'Name' => 'Form/ApplyChanges'));
+			
+			$Message .=  $Form->Button('Exit Preview', array('class' => 'PreviewThemeButton', 'Name' => 'Form/ExitPreview'))
+				.'</div>'
+				.$Form->Close();
+				
+			$Sender->InformMessage($Message, 'NoDismiss');
 		}
 	}
 	
@@ -198,10 +212,9 @@ Here are some things you should know before you begin:
    include your custom css definitions with the "Revision Options" to the
    top-right.
 	
-4. We strip comments, invalid code, expressions, @imports, and unsafe or
-   potentially malicious code from your css before saving it.
-	
-5. When you preview your changes, you are the only one who can see the preview.
+4. When you preview your changes, you are the only one who can see the preview.
+
+5. Feel free to delete these comments!
 
 */' : file_get_contents($Folder . DS . 'design' . DS . $PreviewCSSFile);
 		$HtmlContents = '';
@@ -255,7 +268,8 @@ Here are some things you should know before you begin:
 				
 			// Create the revision files:
 			// 1. CSS
-			$NewCSS = $this->_CleanCSS($Sender->Form->GetFormValue('CustomCSS', ''));
+			// $NewCSS = $this->_CleanCSS($Sender->Form->GetFormValue('CustomCSS', '')); - mosullivan April 13, 2011 - let the admin put whatever he/she wants in here
+			$NewCSS = $Sender->Form->GetFormValue('CustomCSS', '');
 			if ($CSSContents != $NewCSS) {
 				$FileName = 'custom_'.($CurrentCSSRevision + 1).'.css';
 
@@ -279,7 +293,7 @@ Here are some things you should know before you begin:
 			// Check to see if there are any fatal errors in the smarty template
 			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', TRUE);
 			$Result = ProxyRequest(Gdn::Request()->Url('/', TRUE));
-//			echo Wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
+			// echo Wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
 			$SmartyCompileError = (strpos($Result, '<title>Fatal Error</title>') > 0 || strpos($Result, '<title>Bonk</title>') > 0) ? TRUE : FALSE;
 			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
 		
@@ -320,7 +334,7 @@ Here are some things you should know before you begin:
    public function Setup() {
       // No setup required.
    }
-	
+	/*
 	private function _CleanCSS($FormCSS) {
 		// Clean the css
 		$NewCSS = $FormCSS;
@@ -351,9 +365,9 @@ Here are some things you should know before you begin:
 		$csstidy->parse($NewCSS);
 		return $csstidy->print->plain();
 	}
-
+	*/
 }
-
+/*
 if (!function_exists('safecss_class')) {
 	function safecss_class() {
 		// Wrapped so we don't need the parent class just to load the plugin
@@ -440,7 +454,7 @@ if (!function_exists('safecss_class')) {
 		}
 	}
 }
-
+*/
 function recurse_copy($src,$dst) {
     $dir = opendir($src);
     @mkdir($dst);

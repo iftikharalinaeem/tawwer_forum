@@ -2,10 +2,7 @@
 
 class PennyArcadeThemeHooks implements Gdn_IPlugin {
 	
-	/**
-	 * Move the guest module over to the BodyMenu asset.
-	 */
-	public function Base_Render_Before($Sender) {
+	public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender) {
 		Gdn::Locale()->SetTranslation('Activity.Delete', '×');
 		Gdn::Locale()->SetTranslation('Draft.Delete', '×');
 		Gdn::Locale()->SetTranslation('All Conversations', 'Inbox');
@@ -17,18 +14,27 @@ class PennyArcadeThemeHooks implements Gdn_IPlugin {
 		Gdn::Locale()->SetTranslation('Recent Discussions', 'Recent Threads');
 		Gdn::Locale()->SetTranslation('Write Comment', 'Write Reply');
 		Gdn::Locale()->SetTranslation('Post Comment', 'Post Reply');
-		// Move the howdy stranger module into the BodyMenu asset container
-		if (array_key_exists('Panel', $Sender->Assets)) {
-			if (array_key_exists('GuestModule', $Sender->Assets['Panel'])) {
-				$Sender->Assets['BodyMenu']['GuestModule'] = $Sender->Assets['Panel']['GuestModule'];
-				unset($Sender->Assets['Panel']['GuestModule']);
-			}
-		}
+		Gdn::Locale()->SetTranslation('Post Discussion', 'Post Thread');
+		Gdn::Locale()->SetTranslation('Discussion Title', 'Thread Title');
+		Gdn::Locale()->SetTranslation('Start a New Discussion', 'Start a New Thread');
+		Gdn::Locale()->SetTranslation('Moderators', '<span class="ModeratorsIcon"></span>Moderators');
+		Gdn::Locale()->SetTranslation('%s said:', '%s said: <span class="PaSprite GreenArrow"></span>');
+	}
+		
+	public function Base_Render_Before($Sender) {
 		// Remove New Discussion module from the panel
 		if (array_key_exists('Panel', $Sender->Assets)) {
 			if (array_key_exists('NewDiscussionModule', $Sender->Assets['Panel']))
 				unset($Sender->Assets['Panel']['NewDiscussionModule']);
 		}
+
+		// Add the fade.js if we're on the default master
+		if ($Sender->MasterView == '')
+			$Sender->AddJsFile('themes/pennyarcade/js/fade.js');
+
+		// Set the favicon if there is a head module
+		if (property_exists($Sender, 'Head') && is_object($Sender->Head))
+			$Sender->Head->SetFavIcon(Asset('themes/pennyarcade/design/images/favicon.ico'));
 	}
 
 	public function CategoriesController_BeforeCategoryItem_Handler($Sender) {
@@ -85,15 +91,23 @@ class PennyArcadeThemeHooks implements Gdn_IPlugin {
 		
 		// Add moderator module to the page
 		$ModeratorsModule = new CategoryModeratorsModule($Sender);
-		$ModeratorsModule->GetData($Sender->Category);
-		$Sender->AddModule($ModeratorsModule);
+		if (!property_exists($Sender, 'Category') || !is_object($Sender->Category)) {
+			$CategoryModel = new CategoryModel();
+			$Sender->Category = $CategoryModel->GetID($Sender->CategoryID);
+		}
+		if ($Sender->Category) {
+			$ModeratorsModule->GetData($Sender->Category);
+			$Sender->AddModule($ModeratorsModule);
+		}
 	}
 	
 	public function CategoriesController_Render_Before($Sender) {
-		// Add moderator module to the page
-		$ModeratorsModule = new CategoryModeratorsModule($Sender);
-		$ModeratorsModule->GetData($Sender->Category);
-		$Sender->AddModule($ModeratorsModule);
+		// Add moderator module to the page if a category is defined
+		if (property_exists($Sender, 'Category') && is_object($Sender->Category)) {
+			$ModeratorsModule = new CategoryModeratorsModule($Sender);
+			$ModeratorsModule->GetData($Sender->Category);
+			$Sender->AddModule($ModeratorsModule, 'Content');
+		}
 	}
 	
 	public function PostController_Render_Before($Sender) {
@@ -125,6 +139,12 @@ class PennyArcadeThemeHooks implements Gdn_IPlugin {
    public function Setup() {
 		SaveToConfig('Garden.Thumbnail.Size', '80');
 		SaveToConfig('Plugins.Gravatar.DefaultAvatar', 'themes/pennyarcade/design/images/generic_user.png');
+		// They don't want to use their panel, so hide all modules that might show up there to reduce html & query load.
+		SaveToConfig('Vanilla.Categories.HideModule', TRUE);
+		SaveToConfig('Garden.Modules.ShowGuestModule', FALSE);
+		SaveToConfig('Garden.Modules.ShowSignedInModule', FALSE);
+		SaveToConfig('Garden.Modules.ShowRecentUserModule', FALSE);
+		SaveToConfig('Vanilla.Modules.ShowBookmarkedModule', FALSE);
 		return TRUE;
    }
 
