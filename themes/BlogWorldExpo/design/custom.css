@@ -318,8 +318,14 @@ ul.DataList div.Meta strong {
     left: 688px;
 
 }
-voting....0.4.1b (line 111)
 
+ul.MessageList div.Meta span.Votes {
+    right: 0;
+}
+
+div.Preview div.Message, div.Preview div.Message p, ul.MessageList div.Message, ul.MessageList div.Message p {
+    margin: 25px 0;
+}
 
 /* blog world */
 
@@ -667,7 +673,7 @@ voting....0.4.1b (line 111)
 	width: 1010px;
 	font-family: Arial, Tahoma, Verdana;
 	color: #000;
-	margin: 0 auto 0;
+	margin: 0 0 35px auto;
 	text-transform: uppercase;
 	border-top: 4px solid #406b00;
 	overflow: hidden;
