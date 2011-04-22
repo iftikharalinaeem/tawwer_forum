@@ -58,23 +58,17 @@
          <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
          <div id="Content"><?php $this->RenderAsset('Content'); ?></div>
       </div>
-      <div id="Foot">
-			<?php
-				$this->RenderAsset('Foot');
-				echo Wrap(Anchor(T('Powered by Vanilla'), C('Garden.VanillaUrl')), 'div');
-			?>
-		</div>
+      <div id="Foot"><?php $this->RenderAsset('Foot'); ?></div>
    </div>
 	<div id="footer">
 		<div class="content">
+			<?php echo Wrap(Anchor(T('Powered by Vanilla'), C('Garden.VanillaUrl')), 'div id="vLogo"'); ?>
 			<ul id="brands">
 				<li class="btn" id="logoPAX"><a title="PAX" href="http://www.paxsite.com">PAX</a></li>
-				<li class="btn" id="logoFP"><a title="First Party" href="http://www.firstparty.com">First Party</a></li>
 				<li class="btn" id="logoCP"><a title="Child's Play" href="http://www.childsplaycharity.org">Child's Play</a></li>
 				<li class="btn" id="logoPA"><a title="Penny Arcade" href="http://www.penny-arcade.com"><strong>Penny Arcade</strong></a></li>
 				<li class="btn" id="logoPATV"><a title="PATV" href="http://www.penny-arcade.com/patv/">PATV</a></li>
-				<li class="btn" id="logoGH"><a title="greenhouse" href="http://www.penny-arcade.com/patv/">greenhouse</a></li>
-				<li class="btn" id="logoBench"><a title="The Bench" href="http://www.penny-arcade.com/thebench/">The Bench</a></li>
+				<li class="btn" id="logoFP"><a title="First Party" href="http://www.firstparty.com">First Party</a></li>
 			</ul>
 		</div>
 	</div>	
