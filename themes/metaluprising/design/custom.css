@@ -1,6 +1,6 @@
 /* Body & Header */
 body {
-   background: #303030;
+   background: #252525;
    color: #CCCCCC;
 }
 a,
@@ -10,7 +10,7 @@ a:active,
 ul.Activities div.Excerpt a,
 ul.Activities div.Meta a {
    text-decoration: none;
-   color: #ccc;
+   color: #CCCCCC;
 }
 ul.Activities div.Excerpt a:hover,
 ul.Activities div.Meta a:hover,
@@ -119,14 +119,23 @@ div.MessageForm,
 div.Tabs {
    background: none;
    border-bottom: none;
-   background: #A0A0A0;
+   background: #909090;
    -moz-border-radius-topleft: 2px;
    -moz-border-radius-topright: 2px;
    -webkit-border-top-left-radius: 2px;
    -webkit-border-top-right-radius: 2px;
 }
+div.DiscussionTabs {
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
 div.MessageForm {
 	text-align: left;
+   background-color: #505050;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
 }
 div.MessageForm div.Buttons {
 	text-align: right;
@@ -142,12 +151,15 @@ div.Tabs {
    border-bottom: 1px solid #505050;
 }
 ul.DataList li.Item {
-   background-color: #202020;
+   background-color: #353535;
    border: 0;
    margin: 1px 0px;
 }
 ul.DataList div.Meta a {
     color:#ddd;
+}
+ul.DataList a.Title {
+   color: #909090;
 }
 ul.CategoryList .ItemContent {
 	border: none;
@@ -231,9 +243,10 @@ div.Tabs li.Active a:hover {
 #Menu a span,
 #Menu li.Active a span,
 #Menu li.Highlight a:hover span,
-div.Tabs li a span {
-   background: #333;
-   color: #ccc;
+div.Tabs li a span,
+.Alert {
+   background: #d62c2c;
+   color: black;
 }
 ul.Activities ul.DataList li {
    background: #777;
@@ -389,8 +402,8 @@ ul.MessageList div.Message {
 div.Preview,
 ul.MessageList li.Item {
    border-bottom: none;
-   margin: 1px 0px;
-   background-color: #252525;
+   margin: 10px 0px;
+   background-color: #353535;
    padding: 0px;
 }
 ul.MessageList li.Item div.Meta {
@@ -499,6 +512,9 @@ ul.Condensed li, li.Condensed {
 }
 div.AddPeople form div {
    text-align: left;
+}
+div.ConversationMessage div.Message {
+   padding: 0px 10px 10px 10px;
 }
 
 /* Autocomplete */
