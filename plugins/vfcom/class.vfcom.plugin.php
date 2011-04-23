@@ -155,6 +155,8 @@ class VfcomPlugin extends Gdn_Plugin {
    public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender) {
       // Redirect if the domain in the url doesn't match that in the config (so
       // custom domains can't be accessed from their original subdomain).
+      if (C('Garden.AutoDomainSwitch',TRUE) === FALSE) return;
+      
       $Domain = C('Garden.Domain', '');
       $ServerName = GetValue('SERVER_NAME', $_SERVER, '');
       if ($ServerName == '')
