@@ -1,11 +1,22 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
 $RoleCss = strtolower(implode(' role-', $this->_Sender->Roles));
+$Jailed = '';
+$Photo = '';
+
 if ($RoleCss != '')
    $RoleCss = ' role-'.$RoleCss;
-
-$Photo = $this->User->Photo != '' ? Gdn_Upload::Url(ChangeBasename($this->User->Photo, 'p%s')) : 'themes/pennyarcade/design/images/profile_user.png';
-$Jailed = $this->User->Jailed == '1' ? Img('themes/pennyarcade/design/images/jailed-180.png', array('alt' => 'Jailed', 'class' => 'Jailed')) : '';
+   
+if ($this->User->Banned == '1' || $this->User->TempBanned == '1') {
+   $Photo = 'themes/pennyarcade/design/images/banned-180.png';
+   $RoleCss .= ' Banned';
+} else {
+   $Photo = $this->User->Photo != '' ? Gdn_Upload::Url(ChangeBasename($this->User->Photo, 'p%s')) : 'themes/pennyarcade/design/images/profile_user.png';
+   if ($this->User->Jailed == '1') {
+      $RoleCss .= ' Jailed';
+      $Jailed = Img('themes/pennyarcade/design/images/jailed-180.png', array('alt' => 'Jailed', 'class' => 'Jailed'));
+   }
+}
 ?>
 <div class="Box PhotoBox">
    <h4>Profile</h4>

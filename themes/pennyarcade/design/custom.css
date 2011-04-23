@@ -25,19 +25,33 @@
 }
 
 body {
-	background: url('images/pa-top-pixels-bg.png') top center no-repeat #e9f8fc;
+	/* background: url('images/pa-top-pixels-bg.png') top center no-repeat #e9f8fc; */
+	background: #010d21;
+	font-family: Helvetica, Arial, Verdana, sans-serif;
+}
+.content {
+	width: 990px;
+	margin: 0 auto;
+}
+.nav a:hover {
+	background-position: bottom left !important;
+}
+#Frame {
+	background: #e9f8fc url('images/pa-top-pixels-bg.png') top center repeat-x;
+	overflow: hidden;
 }
 
 /* =============================================== Penny Arcade Header Styles */
 #header {
-	background: url('images/pa-banner-tile.png') top left repeat-x;
+	/* background: url('images/pa-banner-tile.png') top left repeat-x;  */
+	background: #032255 url('images/pa-banner-tile.png') top left repeat-x;
 }
 #header .pixels {
 	background: url('images/pa-banner-bg.png') center top no-repeat;
 }
 #header .content {
 	overflow: hidden;
-	height: 160px;
+	height: 155px;
 	margin: 0 auto;
    width: 990px;
 }
@@ -185,16 +199,6 @@ body {
 	width: 61px;
 	height: 36px;
 }
-#footer #logoGH a {
-	background: url('images/pa-logo-gh.png') top left no-repeat;
-	width: 104px;
-	height: 23px;
-}
-#footer #logoBench a {
-	background: url('images/pa-logo-bench.png') top left no-repeat;
-	width: 61px;
-	height: 32px;
-}
 
 /* Vanilla Styles */
 #Panel {
@@ -242,6 +246,7 @@ a:hover {
 	float: left;
 	font-size: 12px;
 	line-height: 24px;
+	margin: 4px 0 0 0;
 }
 #Head a {
 	color: #0055a2;
@@ -257,8 +262,10 @@ a:hover {
 #Head .ProfileMenu a,
 #Head .ProfileMenu a:hover {
 	display: inline-block;
-	line-height: 24px;
+	text-decoration: none;
+	line-height: 20px;
 	color: #032255;
+	margin: 6px 0 0 0;
 }
 #Head .ProfileMenu a.Activity,
 #Head .ProfileMenu a.Dashboard,
@@ -273,6 +280,9 @@ a:hover {
 	vertical-align: top;
 	display: inline-block;
 	margin-right: 8px;
+	overflow: hidden;
+	text-indent: 1000px;
+	background: #fff;
 }
 #Head div.ProfileMenu a.Inbox {
 	background: url('images/sprites.png') 10px 7px no-repeat #64cde9;
@@ -314,7 +324,7 @@ a:hover {
 }
 #Foot {
 	padding: 0;
-	margin: -4px 0 0 0;
+	margin: 50px 0 0 0;
 }
 #Foot div {
 	width: auto;
@@ -322,14 +332,15 @@ a:hover {
 	padding: 0;
 	text-align: right;
 }
-#Foot div a {
-	display: inline-block;
-	height: 32px;
-	width: 72px;
+#footer .content #vLogo a:hover {color: #fff;}
+#footer .content #vLogo a {
+	display: block;
+	height: 30px;
+	width: 130px;
+	text-align: left;
+	padding: 6px 0 0 80px;
 	background: url('images/logo_footer.png') top left no-repeat;
-	text-indent: 1000px;
-	overflow: hidden;
-	white-space: nowrap;
+	margin: 10px 0 0 350px;
 }
 
 /* Dismiss Messages */
@@ -382,8 +393,8 @@ div.DiscussionTabs div.SubTab,
 div.DiscussionsTabs div.SubTab {
 	font-size: 12px;
 	position: absolute;
-	top: 170px;
-	left: 166px;
+	top: 169px;
+	left: 160px;
 	right: 310px;
 	white-space: nowrap;
 	overflow: hidden;
@@ -420,7 +431,7 @@ span.BreadCrumb {
 	background: url('images/sprites.png') 0 -47px no-repeat;
 	vertical-align: middle;
 	padding: 0;
-	margin: 0 10px;
+	margin: 0 5px;
 	line-height: 1;
 }
 div.CategoryHeadings,
@@ -558,7 +569,7 @@ table.DiscussionHeading td.DiscussionName {
 }
 table.DiscussionHeading td {
 	padding: 8px 0 4px;
-	font-family: Rockwell, Helvetica, Arial;
+	font-family: "RockwellBold", Helvetica, Arial;
 	font-weight: normal;
 	text-transform: uppercase;
 	color: #fff;
@@ -929,16 +940,16 @@ ul.MessageList.Discussion li.Item:nth-of-type(odd) {
 	overflow: hidden;
 	background: url('images/rank-sprites.png') 3px -120px no-repeat transparent;
 }
-.jailed div.Photo { background: #c3c3c3; }
-.jailed div.Photo span.Rank { background-position: 3px -160px; }
-.banned div.Photo { background: #d8b5b5; }
-.banned div.Photo span.Rank { background-position: 3px -200px; }
-.role-moderator div.Photo { background: #e0d8b8; }
-.role-moderator div.Photo span.Rank { background-position: 3px -80px; }
-.role-administrator div.Photo { background: #cfd3d6; }
-.role-administrator div.Photo span.Rank { background-position: 3px -40px; }
-.role-staff div.Photo { background: #e5cbb7; }
-.role-staff div.Photo span.Rank { background-position: 3px 0px; }
+.role-moderator div.Photo { background: #e0d8b8 !important; }
+.role-moderator div.Photo span.Rank { background-position: 3px -80px !important; }
+.role-administrator div.Photo { background: #cfd3d6 !important; }
+.role-administrator div.Photo span.Rank { background-position: 3px -40px !important; }
+.role-staff div.Photo { background: #e5cbb7 !important; }
+.role-staff div.Photo span.Rank { background-position: 3px 0px !important; }
+.Jailed div.Photo { background: #c3c3c3 !important; }
+.Jailed div.Photo span.Rank { background-position: 3px -160px !important; }
+.Banned div.Photo { background: #d8b5b5 !important; }
+.Banned div.Photo span.Rank { background-position: 3px -200px !important; }
 
 .CommentTable td.Author div.Photo a.ProfileLink {
 	color: #777;
@@ -956,6 +967,7 @@ ul.MessageList.Discussion li.Item:nth-of-type(odd) {
 .JailedIcon {
 	position: absolute;
 	z-index: 200;
+	background: transparent !important;
 }
 .ProfileUser div.Photo img {
 	display: block;
@@ -1097,6 +1109,14 @@ div.UserSignature {
 
 
 /* Categories */
+span.ChildCategories {
+	display: block;
+	padding: 2px 0;
+	color: #666;
+}
+span.ChildCategories b {
+	font-weight: normal;
+}
 ul.CategoryList li.CategoryHeading div.Category {
 	padding: 8px 8px 4px 15px;
 	font-family: Rockwell, Helvetica, Arial;
@@ -1156,7 +1176,8 @@ ul.DataList.Discussions a.Title {
 div.CategoryDescription {
 	color: #666;
 	font-size: 13px;
-	line-height: 13px;
+	line-height: 14px;
+	padding: 2px 0;
 }
 ul.DataList.CategoryList .ToggleFlyout {
 	right: 302px;
@@ -1236,6 +1257,7 @@ div.Box dl dt {
 	font-weight: bold;
 }
 div.Box dl dd {
+	width: 150px;
 	margin-left: 80px;
 	font-size: 13px;
 	overflow: hidden;

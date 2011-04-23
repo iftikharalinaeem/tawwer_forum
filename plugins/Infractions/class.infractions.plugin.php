@@ -43,7 +43,7 @@ class InfractionsPlugin extends Gdn_Plugin {
    /**
     * Allow profile infractions.
     */
-   public function ProfileController_AfterAddSideMenu_Handler(&$Sender) {
+   public function ProfileController_AfterAddSideMenu_Handler($Sender) {
       $ViewingUserID = Gdn::Session()->UserID;
       if ($ViewingUserID == $Sender->User->UserID) return;
       
@@ -155,6 +155,7 @@ class InfractionsPlugin extends Gdn_Plugin {
                   'UserID'          => $UserID,
                   'Points'          => $Points,
                   'Reason'          => $Reason,
+						'BanReason'			=> $BanReason,
                   'DateExpires'     => $Expires == 0 ? '' : Gdn_Format::ToDateTime(strtotime('+ '.$Expires)),
                   'Reversed'        => '0',
                   'Warning'         => $Warning,
@@ -304,21 +305,26 @@ class InfractionsPlugin extends Gdn_Plugin {
          $InfractionCache['Jailed'] = FALSE;
          foreach ($Data->Result() as $Row) {
             $InfractionCache['Count']++;
-            if (Gdn_Format::ToTimestamp($Row->DateExpires) > time() && $Row->Warning == '0') {
+            if (($Row->DateExpires == '0000-00-00 00:00:00' || Gdn_Format::ToTimestamp($Row->DateExpires) > time()) && $Row->Warning == '0') {
                $InfractionCache['Points'] += $Row->Points;
                $InfractionCache['DateExpires'] = $Row->DateExpires;
                $InfractionCache['ConversationID'] = $Row->ConversationID;
             }
          }
-         
+
          // Is the account banned or jailed?
          if ($InfractionCache['Points'] >= 8) {
             $InfractionCache['Banned'] = TRUE;
 				Gdn::SQL()->Update('User', array('Banned' => '1'), array('UserID' => $UserID))->Put();
+			} else if ($InfractionCache['Points'] >= 6) {
+            $InfractionCache['TempBanned'] = TRUE;
+				Gdn::SQL()->Update('User', array('TempBanned' => '1'), array('UserID' => $UserID))->Put();
          } else if ($InfractionCache['Points'] >= 4) {
             $InfractionCache['Jailed'] = TRUE;
 				Gdn::SQL()->Update('User', array('Jailed' => '1'), array('UserID' => $UserID))->Put();
-         }
+         } else {
+				Gdn::SQL()->Update('User', array('Jailed' => '0', 'Banned' => '0', 'TempBanned' => '0'), array('UserID' => $UserID))->Put();
+			}
       }
       
       Gdn::UserModel()->SaveAttribute($UserID, 'InfractionCache', $InfractionCache);
@@ -436,6 +442,7 @@ class InfractionsPlugin extends Gdn_Plugin {
          ->Column('UserID', 'int(11)', FALSE, 'key')
          ->Column('Points', 'int(11)', FALSE)
          ->Column('Reason', 'varchar(255)', TRUE)
+         ->Column('BanReason', 'text', TRUE)
          ->Column('Note', 'text', TRUE)
          ->Column('DateExpires', 'datetime')
          ->Column('Reversed', 'int', FALSE, '0')
@@ -454,6 +461,7 @@ class InfractionsPlugin extends Gdn_Plugin {
       $Structure
          ->Table('User')
          ->Column('Jailed', 'int', FALSE, '0')
+         ->Column('TempBanned', 'int', FALSE, '0')
          ->Set(FALSE, FALSE);
          
 // BUG: "Jailed is required" on user forms.
@@ -485,67 +493,89 @@ class InfractionsPlugin extends Gdn_Plugin {
 	
    // Find all the places where UserBuilder is called, and make sure that there
    // is a related $UserPrefix.'Email' field pulled from the database.
-   public function AddonCommentModel_BeforeGet_Handler(&$Sender) {
+   public function AddonCommentModel_BeforeGet_Handler($Sender) {
       $Sender->SQL->Select('iu.Email', '', 'InsertEmail')
 			->Select('iu.Jailed', '', 'InsertJailed')
-			->Select('iu.Banned', '', 'InsertBanned');
+			->Select('iu.Banned', '', 'InsertBanned')
+			->Select('iu.TempBanned', '', 'InsertTempBanned');
    }
-   public function ConversationModel_BeforeGet_Handler(&$Sender) {
+   public function ConversationModel_BeforeGet_Handler($Sender) {
       $Sender->SQL->Select('lmu.Email', '', 'LastMessageEmail')
 			->Select('lmu.Jailed', '', 'LastMessageJailed')
-			->Select('lmu.Banned', '', 'LastMessageBanned');
+			->Select('lmu.TempBanned', '', 'LastMessageTempBanned')
+			->Select('lmu.TempBanned', '', 'LastMessageTempBanned');
    }
-   public function ConversationMessageModel_BeforeGet_Handler(&$Sender) {
+   public function ConversationMessageModel_BeforeGet_Handler($Sender) {
       $Sender->SQL->Select('c.InfractionID')
 			->Select('iu.Email', '', 'InsertEmail')
 			->Select('iu.Jailed', '', 'InsertJailed')
-			->Select('iu.Banned', '', 'InsertBanned');
+			->Select('iu.Banned', '', 'InsertBanned')
+			->Select('iu.TempBanned', '', 'InsertTempBanned');
    }
-   public function ActivityModel_BeforeGet_Handler(&$Sender) {
+   public function ActivityModel_BeforeGet_Handler($Sender) {
       $Sender->SQL
          ->Select('au.Email', '', 'ActivityEmail')
 			->Select('au.Jailed', '', 'ActivityJailed')
 			->Select('au.Banned', '', 'ActivityBanned')
+			->Select('au.TempBanned', '', 'ActivityTempBanned')
          ->Select('ru.Email', '', 'RegardingEmail')
 			->Select('ru.Jailed', '', 'RegardingJailed')
-			->Select('ru.Banned', '', 'RegardingBanned');
+			->Select('ru.Banned', '', 'RegardingBanned')
+			->Select('ru.TempBanned', '', 'RegardingTempBanned');
    }
-	public function ActivityModel_BeforeGetNotifications_Handler(&$Sender) {
+	public function ActivityModel_BeforeGetNotifications_Handler($Sender) {
       $Sender->SQL
          ->Select('au.Email', '', 'ActivityEmail')
 			->Select('au.Jailed', '', 'ActivityJailed')
 			->Select('au.Banned', '', 'ActivityBanned')
+			->Select('au.TempBanned', '', 'ActivityTempBanned')
          ->Select('ru.Email', '', 'RegardingEmail')
 			->Select('ru.Jailed', '', 'RegardingJailed')
-			->Select('ru.Banned', '', 'RegardingBanned');
+			->Select('ru.Banned', '', 'RegardingBanned')
+			->Select('ru.TempBanned', '', 'RegardingTempBanned');
 	}
-   public function ActivityModel_BeforeGetComments_Handler(&$Sender) {
+   public function ActivityModel_BeforeGetComments_Handler($Sender) {
       $Sender->SQL
          ->Select('au.Email', '', 'ActivityEmail')
 			->Select('au.Jailed', '', 'ActivityJailed')
-			->Select('au.Banned', '', 'ActivityBanned');
+			->Select('au.Banned', '', 'ActivityBanned')
+			->Select('au.TempBanned', '', 'ActivityTempBanned');
    }
-   public function UserModel_BeforeGetActiveUsers_Handler(&$Sender) {
-      $Sender->SQL->Select('u.Email, u.Jailed, u.Banned');
+   public function UserModel_BeforeGetActiveUsers_Handler($Sender) {
+      $Sender->SQL->Select('u.Email, u.Jailed, u.Banned, u.TempBanned');
    }
 	
-	public function DiscussionModel_BeforeGetID_Handler(&$Sender) {
+	public function DiscussionModel_BeforeGetID_Handler($Sender) {
 		$Sender->SQL->Select('iu.Email', '', 'InsertEmail')
 			->Select('iu.Jailed', '', 'InsertJailed')
-			->Select('iu.Banned', '', 'InsertBanned');
+			->Select('iu.Banned', '', 'InsertBanned')
+			->Select('iu.TempBanned', '', 'InsertTempBanned');
 		
 	}
 	
-   public function CommentModel_BeforeGet_Handler(&$Sender) {
+	public function DiscussionModel_AfterDiscussionSummaryQuery_Handler($Sender) {
+		$Sender->SQL->Select('iu.Email', '', 'InsertEmail')
+			->Select('iu.Jailed', '', 'InsertJailed')
+			->Select('iu.Banned', '', 'InsertBanned')
+			->Select('iu.TempBanned', '', 'InsertTempBanned')
+			->Select('lcu.Email', '', 'LastEmail')
+			->Select('lcu.Jailed', '', 'LastJailed')
+			->Select('lcu.Banned', '', 'LastBanned')
+			->Select('lcu.TempBanned', '', 'LastTempBanned');
+	}
+	
+   public function CommentModel_BeforeGet_Handler($Sender) {
       $Sender->SQL->Select('iu.Email', '', 'InsertEmail')
 			->Select('iu.Jailed', '', 'InsertJailed')
-			->Select('iu.Banned', '', 'InsertBanned');
+			->Select('iu.Banned', '', 'InsertBanned')
+			->Select('iu.TempBanned', '', 'InsertTempBanned');
    }
 
-   public function CommentModel_BeforeGetNew_Handler(&$Sender) {
+   public function CommentModel_BeforeGetNew_Handler($Sender) {
       $Sender->SQL->Select('iu.Email', '', 'InsertEmail')
 			->Select('iu.Jailed', '', 'InsertJailed')
-			->Select('iu.Banned', '', 'InsertBanned');
+			->Select('iu.Banned', '', 'InsertBanned')
+			->Select('iu.TempBanned', '', 'InsertTempBanned');
    }
 
 }
@@ -564,6 +594,7 @@ if (!function_exists('UserBuilder')) {
       $Email = $UserPrefix.'Email';
 		$Jailed = $UserPrefix.'Jailed';
 		$Banned = $UserPrefix.'Banned';
+		$TempBanned = $UserPrefix.'TempBanned';
       $User->UserID = $Object->$UserID;
       $User->Name = $Object->$Name;
       $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
@@ -576,6 +607,7 @@ if (!function_exists('UserBuilder')) {
       }
 		$User->Jailed = GetValue($Jailed, $Object);
 		$User->Banned = GetValue($Banned, $Object);
+		$User->TempBanned = GetValue($TempBanned, $Object);
 		return $User;
    }
 }
@@ -596,7 +628,16 @@ if (!function_exists('UserPhoto')) {
             $PhotoUrl = $User->Photo;
          }
 			
-			$Jailed = GetValue('Jailed', $User) == '1' ? Img('themes/pennyarcade/design/images/jailed-80.png', array('alt' => 'Jailed', 'class' => 'JailedIcon')) : '';
+			$Jailed = GetValue('Jailed', $User) == '1';
+			$TempBanned = GetValue('TempBanned', $User) == '1';
+			$Banned = GetValue('Banned', $User) == '1';
+			if ($Banned || $TempBanned) {
+				$PhotoUrl = 'themes/pennyarcade/design/images/banned-80.png';
+				$Jailed = '';
+			} else if ($Jailed)
+				$Jailed = Img('themes/pennyarcade/design/images/jailed-80.png', array('alt' => 'Jailed', 'class' => 'JailedIcon'));
+			else
+				$Jailed = '';
          
          return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$LinkClass.'>'
             .$Jailed

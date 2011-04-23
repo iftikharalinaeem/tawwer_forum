@@ -20,7 +20,9 @@ if (is_object($InfractionData)) {
    if ($Total > 0) {
       foreach ($InfractionData->Result() as $Infraction) {
          // Define data for summary
-         if ($Infraction->Reversed == '0' && Gdn_Format::ToTimestamp($Infraction->DateExpires) > time() && !$Infraction->Warning) {
+         if ($Infraction->Reversed == '0'
+            && (Gdn_Format::ToTimestamp($Infraction->DateExpires) > time() || $Infraction->DateExpires == '0000-00-00 00:00:00')
+            && !$Infraction->Warning) {
             $Active++;
             $Points += $Infraction->Points;
          }
@@ -75,13 +77,14 @@ if (is_object($InfractionData)) {
       </ul>
       <div class="Punishment">
       <?php
-      if ($Points >= 8) {
+      if ($Points >= 8)
          echo 'User is currently banned for these infractions.';
-      } else if ($Points >= 4) {
+      else if ($Points >= 6)
+         echo 'User has been temporarily banned for these infractions.';
+      else if ($Points >= 4)
          echo 'User is currently jailed for these infractions.';
-      } else {
+      else
          echo 'User has not yet incurred any punishment for these infractions';
-      }
       ?>
       </div>
       <ul class="DataList Infractions">
@@ -103,7 +106,16 @@ if (is_object($InfractionData)) {
                <div class="Meta">
                   <span class="Admin"><?php echo UserAnchor(UserBuilder($Infraction, 'Insert')); ?></span>
                   <span class="Inserted"><?php echo Gdn_Format::Date($Infraction->DateInserted); ?></span>
-                  <span class="DateExpires"><?php echo $Infraction->Reversed ? 'Reversed' : 'Expires '.Gdn_Format::Date($Infraction->DateExpires); ?></span>
+                  <span class="DateExpires"><?php
+                     if ($Infraction->Reversed)
+                        echo 'Reversed';
+                     else {
+                        if ($Infraction->DateExpires == '0000-00-00 00:00:00')
+                           echo 'Never Expires';
+                        else
+                           echo 'Expires '.Gdn_Format::Date($Infraction->DateExpires);
+                     }
+                  ?></span>
                   <span class="InfractionPoints"><?php echo $Infraction->Warning == '1' ? 'Warning' : 'Points: '.number_format($Infraction->Points); ?></span>
                </div>
             </div>

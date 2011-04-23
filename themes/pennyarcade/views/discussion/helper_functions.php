@@ -37,10 +37,10 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
 		$CssClass .= ' role-'.$CssRoles;
 	
 	// Identify jailed & banned users
-	if (GetValue('InsertBanned', $Object) == '1')
-		$CssClass .= ' banned';
+	if (GetValue('InsertBanned', $Object) == '1' || GetValue('InsertTempBanned', $Object) == '1')
+		$CssClass .= ' Banned';
 	else if (GetValue('InsertJailed', $Object) == '1')
-		$CssClass .= ' jailed';
+		$CssClass .= ' Jailed';
 	
 	if (!property_exists($Sender, 'CanEditComments'))
 		$Sender->CanEditComments = $Session->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', 'any');
