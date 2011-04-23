@@ -12,12 +12,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['vfcom'] = array(
    'Name' => 'VanillaForums.com Hosting',
    'Description' => "This plugin provides the hooks and management tools need to run Vanilla in Infrastructure Mode.",
-   'Version' => '1.1',
+   'Version' => '1.2',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
-   'HasLocale' => TRUE,
+   'HasLocale' => FALSE,
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
@@ -150,6 +150,22 @@ class VfcomPlugin extends Gdn_Plugin {
           $StaticRouteDestination,
           $StaticRouteMethod
       );
+   }
+   
+   public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender) {
+      // Redirect if the domain in the url doesn't match that in the config (so
+      // custom domains can't be accessed from their original subdomain).
+      $Domain = C('Garden.Domain', '');
+      $ServerName = GetValue('SERVER_NAME', $_SERVER, '');
+      if ($ServerName == '')
+         $ServerName = GetValue('HTTP_HOST', $_SERVER, '');
+         
+      if ($ServerName != '' && $Domain != '') {
+         $Domain = str_replace(array('http://', '/'), array('', ''), $Domain);
+         $ServerName = str_replace(array('http://', '/'), array('', ''), $ServerName);
+         if ($ServerName != $Domain)
+            Redirect('http://' . $Domain . Gdn::Request()->Url());
+      }
    }
    
    public function Setup() {
