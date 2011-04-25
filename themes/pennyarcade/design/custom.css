@@ -51,7 +51,7 @@ body {
 }
 #header .content {
 	overflow: hidden;
-	height: 155px;
+	height: 160px;
 	margin: 0 auto;
    width: 990px;
 }
@@ -263,9 +263,9 @@ a:hover {
 #Head .ProfileMenu a:hover {
 	display: inline-block;
 	text-decoration: none;
-	line-height: 20px;
+	line-height: 24px;
 	color: #032255;
-	margin: 6px 0 0 0;
+	margin: 5px 0 0 0;
 }
 #Head .ProfileMenu a.Activity,
 #Head .ProfileMenu a.Dashboard,
@@ -393,7 +393,7 @@ div.DiscussionTabs div.SubTab,
 div.DiscussionsTabs div.SubTab {
 	font-size: 12px;
 	position: absolute;
-	top: 169px;
+	top: 174px;
 	left: 160px;
 	right: 310px;
 	white-space: nowrap;
@@ -443,7 +443,8 @@ div.ConversationsTabs,
 div.FormBanner,
 div.ProfileTabs,
 div.DiscussionTabs,
-div.DiscussionsTabs {
+div.DiscussionsTabs,
+div.SearchTabs {
 	border: 1px solid #004487;
 	background: url('images/bg-heading-tile.png') top left repeat-x #004d99;
 	border-radius: 4px 4px 0 0;
@@ -468,7 +469,9 @@ div.ConversationTabs h1,
 div.ConversationTabs h1 a,
 div.ConversationsTabs h1,
 div.ConversationsTabs h1 a,
-div.DiscussionTabs h1 {
+div.DiscussionTabs h1,
+div.SearchTabs h1,
+div.SearchTabs h2 {
 	margin: 0;
 	padding: 0;
 	font-size: 13px;
@@ -654,11 +657,11 @@ ul.DataList.Discussions li.Item:nth-child(2) {
 	border-top: none !important;
 }
 ul.DataList.Conversations li.Item:nth-of-type(odd),
+ul.DataList.SearchResults li.Item:nth-of-type(odd),
 ul.DataList.Discussions li.Item:nth-of-type(odd) {
 	background: url('images/bg-read.png') left center repeat-y #f2f2f2;
 }
 ul.DataList.Drafts li.Item,
-ul.DataList.SearchResults li.Item,
 ul.DataList.Activities li.Item {
 	padding: 4px 6px;
 	background: #fff;
@@ -667,7 +670,6 @@ ul.DataList.Drafts li.Item {
 	padding: 4px 0;
 }
 ul.DataList.Drafts li.Item:nth-of-type(odd),
-ul.DataList.SearchResults li.Item:nth-of-type(odd),
 ul.DataList.Activities li.Item:nth-of-type(odd) {
 	background: #f2f2f2;
 }
@@ -726,6 +728,7 @@ body.Discussion a.Bookmarking {
 a.BigButton:hover {
 	text-decoration: none;
 }
+div.SearchForm input.Button,
 body.Vanilla div.CommentForm input.CommentButton,
 body.Vanilla a.BigButton,
 body.Vanilla a.BigButton:hover,
@@ -756,6 +759,13 @@ body.Vanilla div.CommentForm input.CommentButton:hover,
 body.Discussion a.BigButton:hover { background-position: -105px 0px; }
 body.Vanilla div.CommentForm input.CommentButton:active,
 body.Discussion a.BigButton:active { background-position: -105px -58px; }
+div.SearchForm input.Button {
+	display: inline-block;
+	width: 68px;
+	background-position: -210px -29px;
+}
+div.SearchForm input.Button:hover { background-position: -210px 0px; }
+div.SearchForm input.Button:active { background-position: -210px -58px; }
 .NumberedPager {
 	padding: 3px 0;
 	float: none;
@@ -1741,11 +1751,45 @@ span.InformSprite.Redflag {
 }
 
 /* Search Results */
+div.SearchForm {
+	background: #fff;
+	border-radius: 0 0 3px 3px;
+	-moz-border-radius: 0 0 3px 3px;
+	-webkit-border-radius: 0 0 3px 3px;
+	padding: 15px;
+	margin: 0 0 15px;
+}
+.SearchBox {
+	font-size: 14px;
+	padding: 3px 3px 3px 21px;
+	width: 450px;
+	margin: 0 10px 0 0;
+}
+span.SearchSprite {
+	margin: 13px 0 0 8px;
+	position: absolute;
+	display: block;
+	background: url('images/sprites.png') 0px -750px no-repeat transparent;
+	height: 13px;
+	width: 13px;
+}
 ul.DataList.SearchResults .ItemContent {
 	padding: 0 10px;
 }
 ul.DataList div.Excerpt a:hover {
 	text-decoration: none;
+}
+ul.DataList.SearchResults a.Title,
+ul.DataList.SearchResults div.Excerpt,
+ul.DataList.SearchResults div.Excerpt a {
+	display: inline;
+}
+ul.DataList.SearchResults div.Excerpt a {
+	margin-left: 10px;
+	color: #666;
+}
+ul.DataList.SearchResults li.Item, ul.DataList.Activities li.Item {
+   padding: 8px 6px;
 }
 
 /* Infractions */
