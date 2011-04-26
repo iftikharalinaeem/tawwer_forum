@@ -160,6 +160,7 @@ Jacob Javits Convention Center | New York, NY</font></td><td width=3%>&nbsp;</td
 </ul>
 </li>
 <li id="menu-item-1463" class="menu-item menu-item-type-post_type menu-item-1463"><a  href="http://www.blogworldexpo.com/2011-nyc/contact/">Contact</a></li>
+<li id="menu-item-1493" class="menu-item menu-item-type-post_type current-menu-item page_item page-item-89 current_page_item menu-item-1493"><a  href="http://blogworldexpo.vanillaforums.com">Forum</a></li>
 <li id="menu-item-1461" class="menu-item menu-item-type-custom menu-item-1461"><a  href="http://www.blogworld.com" class="external" target="_blank">Blog</a></li>
 <li id="menu-item-1455" class="menu-item menu-item-type-post_type menu-item-1455"><a  href="http://www.blogworldexpo.com/2011-nyc/faq/">FAQ</a></li>
 </ul></div>

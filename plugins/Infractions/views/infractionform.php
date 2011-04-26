@@ -16,7 +16,7 @@
             showAutoBan = false;
          } else {
             // Define the current # of points that the user has
-            var activePoints = $('ul.InfractionOverview li.Active strong').text()*1;
+            var activePoints = $('ul.InfractionOverview:last li.Points strong').text()*1;
             if (typeof(activePoints) != 'number')
                activePoints = 0;
             
@@ -31,13 +31,14 @@
             if (typeof(newPoints) != 'number')
                newPoints = 0;
                
-            if (newPoints + activePoints >= 6)
+				totalPoints = newPoints + activePoints;
+            if (totalPoints >= 6)
                showAutoBan = true;
             
             $('div.AutoBan p').hide();
-            if (newPoints + activePoints >= 8) {
+            if (totalPoints >= 8) {
                $('div.AutoBan p.PermaBan').show();
-            } else if (newPoints + activePoints >= 6) {
+            } else if (totalPoints >= 6) {
                $('div.AutoBan p.TempBan').show();
             }
          }

@@ -7,26 +7,11 @@ if (is_array($this->SearchResults) && count($this->SearchResults) > 0) {
 ?>
 	<li class="Item">
 		<?php $this->FireEvent('BeforeItemContent'); ?>
-		<div class="DateCreated TimestampContainer"><span class="TimestampArrow"></span><?php
-			echo Anchor(Gdn_Format::Date($Row->DateInserted), $Row->Url, 'Permalink', array('rel' => 'nofollow'));
-		?></div>		
 		<div class="ItemContent">
 			<?php echo Anchor(Gdn_Format::Text($Row->Title), $Row->Url, 'Title'); ?>
 			<div class="Excerpt"><?php
-				echo Anchor(nl2br(SliceString(Gdn_Format::Text($Row->Summary, FALSE), 250)), $Row->Url);
+				echo Anchor(SliceString(Gdn_Format::Text($Row->Summary, FALSE), 250), $Row->Url);
 			?></div>
-			<div class="Meta">
-				<span class="Author"><?php printf(T('by %s'), UserAnchor($Row)); ?></span>
-            <?php
-            if (isset($Row->CategoryID)) {
-               $Category = CategoryModel::Categories($Row->CategoryID);
-               if ($Category !== NULL) {
-                  $Url = Url('categories/'.$Category['UrlCode']);
-                  echo "<span><a class='Category' href='{$Url}'>{$Category['Name']}</a></span>";
-               }
-            }
-            ?>
-			</div>
 		</div>
 	</li>
 <?php

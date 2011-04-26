@@ -39,11 +39,10 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
             if ($ChildCategories != '')
                $ChildCategories .= ', ';
             $ChildCategories .= Anchor(Gdn_Format::Text($Category->Name), '/categories/'.$Category->UrlCode);
-         } else if ($DoHeadings && $Category->Depth == 1) {
+         } else if ($Category->Depth == 1) {
             $CatList .= '<li class="Item CategoryHeading Depth1 Category-'.$Category->UrlCode.'">
-               <div class="Category '.$ReadClass.'">'.Gdn_Format::Text($Category->Name).'</div>'
-               // .GetOptions($Category, $this).'
-            .'</li>';
+               <div class="Category '.$ReadClass.'">'.Gdn_Format::Text($Category->Name).'</div>
+            </li>';
          } else {
             $ModList = '';
             foreach ($Category->Moderators as $Moderator) {
