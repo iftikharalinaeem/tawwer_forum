@@ -58,7 +58,6 @@ a.BigButton:hover {
 
 #container-wrap{
 	width:100%;
-	margin:10px auto;
 }
 
 #container {
@@ -68,18 +67,19 @@ a.BigButton:hover {
 
 }
 .TopBanner{
-	margin:0 auto;
+   position: relative;
 	width:980px;
+   height: 120px;
 	background: #C83219;
 }
 .logo {
-    display: inline-block;
-    margin: 0px 782px -2px 0;
-    background: url('logo.png') no-repeat;
-    outline: none;
-    width: 166px;
+    background: url("logo.png") no-repeat scroll 0 0 transparent;
     height: 109px;
-    vertical-align: bottom;
+    left: 16px;
+    outline: medium none;
+    position: absolute;
+    top: 13px;
+    width: 166px;
 }
 
 /*div.SearchBox {
@@ -104,7 +104,6 @@ div.Popup h2 {
     border-radius: 5px;
     padding-left: 5px;
     display: inline-block;
-    height:30px;
 }
 .Banner ul li {
 	display: inline;
@@ -114,7 +113,7 @@ div.Popup h2 {
 .Banner ul li a {
 	font-weight: bold;
 	padding: 3px 6px;
-	font-size: 14px;
+	font-size: 12px;
 	color: #000;
 	display: inline-block;
 }
@@ -884,13 +883,13 @@ ul#menu li.mega.hovering li a.more:hover {
     position: relative;
 }
 #header_ad {
-     color: #FFFFFF;
-    float: right;
+    color: #FFFFFF;
     font-family: Arial,Helvetica,sans-serif;
     font-size: 10px;
     height: 120px;
-    margin-top: -120px;
-    width: 740px;
+    width: 728px;
+    position: absolute;
+    right: 0;
 }
 #header_ad_text_left {
     height: 24px;
@@ -900,14 +899,18 @@ ul#menu li.mega.hovering li a.more:hover {
     height: 20px;
 }
 #header_ad_text_right {
-    background: url("sponsor_icon.png") no-repeat 25px 7px transparent;
+    background: url("sponsor_icon.png") no-repeat scroll 0 3px transparent;
     color: #FFFFFF;
-    height: 20px;
+    height: 15px;
+    line-height: 13.3333px;
+    margin: 0 0 0 17px;
     padding-left: 20px;
-    width: 180px;
+    width: 131px;
 }
 #header_ad_text_left, #header_ad_text_right {
+    line-height: 13.3333px;
     padding-top: 4px;
+    text-align: left;
 }
 a.header_ad_text_right:link, a.header_ad_text_right:active, a.header_ad_text_right:hover {
     color: #FFFFFF;
@@ -917,7 +920,6 @@ a.header_ad_text_right:link, a.header_ad_text_right:active, a.header_ad_text_rig
     height: 96px;
     overflow: hidden;
     padding-top: 2px;
-    width: 740px;
 }
 #header_ad_banner[id] {
     height: 94px;
