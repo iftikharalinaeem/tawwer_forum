@@ -94,7 +94,7 @@ div.Popup h2 {
 .Banner {
 	padding: 10px;
 	text-align: left;
-	/*position: relative;*/
+	position: relative;
 }
 .Banner ul {
 	background: none repeat scroll 0 0 #F7F7F7;
@@ -103,7 +103,7 @@ div.Popup h2 {
     -webkit-border-radius: 5px;
     border-radius: 5px;
     padding-left: 5px;
-    width: 380px;
+    display: inline-block;
     height:30px;
 }
 .Banner ul li {
@@ -122,10 +122,10 @@ div.Popup h2 {
 	background: none;
 	color: #000066;
 }
-.Banner ul li a.SignOut {
-	 left: 880px;
-    position: relative;
-    top: -30px;
+.Banner ul li a.SignOut, .Banner ul li a.SignIn, .Banner ul li a.SignInPopup {
+	 right: 0;
+    top: 4px;
+    position: absolute;
 }
 #Content {
 	float: none;
