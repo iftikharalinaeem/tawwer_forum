@@ -142,7 +142,7 @@ class IPTrackingPlugin extends Gdn_Plugin {
       $Link = ($this->Mode == 'compat') ? TRUE : FALSE;
       if (is_null($IP)) { $IP = T('Unknown'); $Link = FALSE; }
       if ($Link)
-         $IP = Anchor($IP,Url("dashboard/user?filter=u.{$this->UserIPField}={$IP}"));
+         $IP = Anchor($IP,Url("dashboard/user?Filter=u.{$this->UserIPField}+like+{$IP}"));
          
       $IPText = sprintf(T('IP: %s'),$IP);
       echo "<span>{$IPText}</span>";
