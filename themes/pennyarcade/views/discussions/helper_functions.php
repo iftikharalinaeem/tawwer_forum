@@ -29,7 +29,8 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
       $Sender->CountCommentsPerPage = $CountCommentsPerPage;
    }
    $CountPages = ceil($Discussion->CountComments / $CountCommentsPerPage);
-   $LastPageUrl = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).'/p'.$CountPages.'/#Comment_'.$Discussion->LastCommentID;
+   $FirstPageUrl = '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name);
+   $LastPageUrl = $FirstPageUrl . '/p'.$CountPages.'/#Comment_'.$Discussion->LastCommentID;
    
    $DiscussionName = Gdn_Format::Text($Discussion->Name);
    if ($DiscussionName == '')
@@ -83,6 +84,7 @@ function WriteDiscussion($Discussion, &$Sender, &$Session, $Alt2) {
                      echo '<span class="Elipsis">...</span>';
                      WritePageLink($Discussion, $CountPages-1);
                      WritePageLink($Discussion, $CountPages);
+                     echo Anchor('Go To Page', '#', 'GoToPageLink');
                   }
                echo '</div>';
             }
@@ -180,7 +182,10 @@ function WriteFilterTabs(&$Sender) {
       foreach ($DescendantData->Result() as $Descendant) {
          // Ignore the root node
          if ($Descendant->CategoryID > 0) {
-            echo Anchor(Gdn_Format::Text($Descendant->Name), '/categories/'.$Descendant->UrlCode);
+            if ($Descendant->Depth == 1)
+               echo Gdn_Format::Text($Descendant->Name).' ';
+            else
+               echo Anchor(Gdn_Format::Text($Descendant->Name), '/categories/'.$Descendant->UrlCode);
             echo '<span class="BreadCrumb"> &rarr; </span>';
          }
       }
