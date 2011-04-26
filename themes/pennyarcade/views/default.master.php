@@ -7,6 +7,42 @@
 	$Session = Gdn::Session();
 	$Wrap = '<a href="%url" class="%class">%text</a>';
 	?>
+	<script charset="utf-8" id="gotopage-tpl" type="text/template">
+      <div class="GoToPage Hidden">
+			<form name="GoToPage" method="get" action="{url}">
+			Go To Page: <input type="text" name="Page" value="" />
+			</form>
+		</div>
+	</script>
+	<script type="text/javascript">
+	// Pager reveal
+	$(document).ready(function() {
+		// Wrap pagers with a container
+		$('.MiniPager').wrap('<div class="PageControl MiniPageControl" />');
+		$('.NumberedPager').wrap('<div class="PageControl" />');
+		// Add GoToPage Forms to pager containers
+		var tpl = $('#gotopage-tpl').html();
+		$('.PageControl').each(function() {
+			if ($(this).find('a').length > 4) {
+				var anchor = $(this).find('.MiniPager a:first, .NumberedPager a:first').get(0);
+				$(this).append(tpl.replace('{url}', anchor.href.substr(0, anchor.href.lastIndexOf('/'))));
+			}
+		});
+		goToPage = function(sender) {
+			var pageNum = $(sender).find(':input[name="Page"]').val();
+			if ((pageNum - 0) == pageNum && pageNum.length > 0)
+				document.location = $(sender).attr('action') + '/p' + pageNum;
+				
+			return false;
+		}
+		$('.GoToPage form').submit(function() { goToPage(this); return false; });
+		$('.GoToPage form :input[name="Page"]').blur(function() { goToPage($(this).parents('form')); });
+		$('a.GoToPageLink, .NumberedPager .Next').click(function() {
+			$(this).parents('.PageControl').find('.GoToPage').toggle();
+			return false;
+		});
+	});
+	</script>
 </head>
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
 	<div id="header">
@@ -34,6 +70,35 @@
             <?php echo Gdn_Theme::Link('categories', 'Penny Arcade Forums', $Wrap); ?>
 			</div>
 			<div class="ProfileMenu">
+				<script type="text/javascript">
+					$(document).ready(function() {
+						$('.TinySearch form :input').blur(function() {
+							if ($(this).val() == 'Search Forum')
+								return;
+							
+							if ($(this).val() == '') {
+								$(this).val('Search Forum');
+								return;
+							}
+							
+							$(this).parents('form').submit();							
+						});
+						$('.TinySearch form :input').focus(function() {
+							if ($(this).val() == 'Search Forum') {
+								$(this).val('');
+								return;
+							}
+						});
+					});
+				</script>
+            <div class="TinySearch"><?php
+					$Form = Gdn::Factory('Form');
+					$Form->InputPrefix = '';
+					echo 
+						$Form->Open(array('action' => Url('/search'), 'method' => 'get')),
+						$Form->TextBox('Search', array('value' => 'Search Forum', 'class' => 'SearchInput')),
+						$Form->Close();
+				?></div>
 				<?php
 					// echo Gdn_Theme::Link('activity', 'Activity', $Wrap, array('class' => 'Activity'));
 					if ($Session->IsValid()) {
