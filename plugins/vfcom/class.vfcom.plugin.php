@@ -56,7 +56,7 @@ class VfcomPlugin extends Gdn_Plugin {
          
          $XHPROF_ROOT = '/var/www/xhprof';
          $XHPROF_SERVER_NAME = FormatString("profiler.{Frontend}.{Client}.{Hostname}",array(
-            'Frontend'     => '',
+            'Frontend'     => $Frontend,
             'Client'       => $this->VfcomClient,
             'Hostname'     => $this->VfcomHostname
          ));
