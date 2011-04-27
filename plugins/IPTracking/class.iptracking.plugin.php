@@ -24,12 +24,31 @@ $PluginInfo['IPTracking'] = array(
 );
 
 class IPTrackingPlugin extends Gdn_Plugin {
+   
+   public function __construct() {
+      $Compare = version_compare(APPLICATION_VERSION, "2.0.17");
+      if ($Compare > 0)
+         $this->Mode = "compat";
+      else
+         $this->Mode = "normal";
+         
+      switch ($this->Mode) {
+         case 'compat':
+            $this->UserIPField = 'LastIPAddress';
+            $this->PostIPField = 'InsertIPAddress';
+            break;
+         case 'normal':
+            $this->UserIPField = 'LastIP';
+            $this->PostIPField = 'LastIP';
+            break;
+      }
+   }
 
    public function UserInfoModule_OnBasicInfo_Handler(&$Sender) {
       if (!Gdn::Session()->CheckPermission('Garden.Users.Edit')) return;
       
       $UserID = $Sender->User->UserID;
-      $LastIP = GetValue("LastIP", Gdn::Database()->Query(sprintf("SELECT LastIP FROM GDN_User u WHERE UserID = %d",$UserID))->FirstRow(DATASET_TYPE_ARRAY),0);
+      $LastIP = GetValue($this->UserIPField, Gdn::Database()->Query(sprintf("SELECT %s FROM GDN_User u WHERE UserID = %d",$this->UserIPField,$UserID))->FirstRow(DATASET_TYPE_ARRAY),0);
       
       if (!is_null($LastIP) && $LastIP != '') {
          echo "<dt>".T('Last IP')."</dt>\n";
@@ -38,6 +57,9 @@ class IPTrackingPlugin extends Gdn_Plugin {
    }
    
    public function UserModel_AfterInsertUser_Handler($Sender) {
+      // We are slotting into a modern forum with existing fields, we do not need to interfere
+      if ($this->Mode == "compat") return;
+      
       $UserID = $Sender->EventArguments['InsertUserID'];
       try {
          Gdn::SQL()->Update('User',array(
@@ -52,12 +74,15 @@ class IPTrackingPlugin extends Gdn_Plugin {
    
    public function UserController_ApplicantInfo_Handler($Sender) {
       $User = GetValue('User', $Sender->EventArguments, NULL);
-      if (!is_null($User) && !is_null($LastIP = GetValue('LastIP', $User))) {
+      if (!is_null($User) && !is_null($LastIP = GetValue($this->UserIPField, $User))) {
          echo " [{$LastIP}]";
       }
    }
    
    public function Gdn_Auth_AuthSuccess_Handler($Sender) {
+      // We are slotting into a modern forum with existing fields, we do not need to interfere
+      if ($this->Mode == "compat") return;
+      
       $UserID = Gdn::Session()->UserID;
       try {
          Gdn::SQL()->Update('User',array(
@@ -70,13 +95,10 @@ class IPTrackingPlugin extends Gdn_Plugin {
       }
    }
    
-   /*
-public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender) {
-      $Sender->EventArguments['FormPostValues']['LastIP'] = Gdn::Request()->GetValue('REMOTE_ADDR');
-   }
-*/
-   
    public function PostController_AfterDiscussionSave_Handler($Sender) {
+      // We are slotting into a modern forum with existing fields, we do not need to interfere
+      if ($this->Mode == "compat") return;
+      
       $DiscussionID = $Sender->EventArguments['Discussion']->DiscussionID;
       try {
          Gdn::SQL()->Update('Discussion',array(
@@ -89,13 +111,10 @@ public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender) {
       }
    }
    
-   /*
-public function CommentModel_BeforeSaveComment_Handler($Sender) {
-      $Sender->EventArguments['FormPostValues']['LastIP'] = Gdn::Request()->GetValue('REMOTE_ADDR');
-   }
-*/
-   
    public function PostController_AfterCommentSave_Handler($Sender) {
+      // We are slotting into a modern forum with existing fields, we do not need to interfere
+      if ($this->Mode == "compat") return;
+      
       $CommentID = $Sender->EventArguments['Comment']->CommentID;
       try {
          Gdn::SQL()->Update('Comment',array(
@@ -119,12 +138,20 @@ public function CommentModel_BeforeSaveComment_Handler($Sender) {
    protected function AttachIP(&$Sender) {
       if (!Gdn::Session()->CheckPermission('Garden.Users.Edit')) return;
       
-      $IP = ArrayValue('LastIP',$Sender->EventArguments['Object'],NULL);
-      if (is_null($IP)) $IP = T('Unknown');
-      echo '<span>'.T('IP: ').$IP.'</span>';
+      $IP = ArrayValue($this->PostIPField,$Sender->EventArguments['Object'],NULL);
+      $Link = ($this->Mode == 'compat') ? TRUE : FALSE;
+      if (is_null($IP)) { $IP = T('Unknown'); $Link = FALSE; }
+      if ($Link)
+         $IP = Anchor($IP,Url("dashboard/user?Filter=u.{$this->UserIPField}+like+{$IP}"));
+         
+      $IPText = sprintf(T('IP: %s'),$IP);
+      echo "<span>{$IPText}</span>";
    }
       
    public function Setup() {
+      // We are slotting into a modern forum with existing fields, we do not need to interfere
+      if ($this->Mode == "compat") return;
+      
       $Structure = Gdn::Structure();
       $Structure
          ->Table('User')

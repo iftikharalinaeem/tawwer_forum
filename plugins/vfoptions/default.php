@@ -385,39 +385,6 @@ pageTracker._trackPageview();
          $Sender->Render('/srv/www/misc/plugins/vfoptions/views/renameforum.php');
       }
    }
-
-   /**
-    * Allows you to spoof the admin user if you have admin access in the
-    * VanillaForums.com database.
-    */
-   public function EntryController_Spoof_Create(&$Sender) {
-      $Sender->Title('Spoof');
-      // $Sender->AddSideMenu('dashboard/user');
-      $Sender->Form = new Gdn_Form();
-      $Email = $Sender->Form->GetValue('Email', '');
-      $Password = $Sender->Form->GetValue('Password', '');
-      $UserIDToSpoof = ArrayValue(0, $Sender->RequestArgs, '1');
-      if ($Email != '' && $Password != '') {
-         // Validate the username & password
-         $UserModel = Gdn::UserModel();
-         $UserModel->SQL = $this->_GetDatabase()->SQL();
-         $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
-         if (is_object($UserData) && $UserData->Admin == '1') {
-            $Identity = new Gdn_CookieIdentity();
-            $Identity->Init(array(
-               'Salt' => Gdn::Config('Garden.Cookie.Salt'),
-               'Name' => Gdn::Config('Garden.Cookie.Name'),
-               'Domain' => Gdn::Config('Garden.Cookie.Domain')
-            ));
-            $Identity->SetIdentity($UserIDToSpoof, TRUE);
-            $this->_CloseDatabase();
-            Redirect('settings');
-         } else {
-            $Sender->Form->AddError('Bad Credentials');
-         }
-      }
-      $Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'spoof.php');
-   }
    
    /**
     * Grabs the features for this site from the vfcom database and makes sure

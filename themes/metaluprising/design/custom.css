@@ -440,6 +440,9 @@ ul.MessageList div.Message pre {
    background: #444;
 }
 
+div.Attachment div.FileHover {
+   background: #c1c1c1;
+}
 
 /* Profile Page */
 form.Activity {
@@ -467,6 +470,22 @@ div.Box dl {
 }
 
 /* Forms */
+
+#DiscussionForm {
+   margin: 0px auto;
+   width: 750px;
+}
+
+#DiscussionForm h1 {
+    background-color: #780000;
+    border-radius: 3px 3px 0 0;
+    -moz-border-radius: 3px 3px 0 0;
+    -webkit-border-radius: 3px 3px 0 0;
+    color: #FF3636;
+    margin: 0;
+    padding: 10px;
+}
+
 body.Entry #Content h1,
 #MessageForm h2,
 #DiscussionForm h2,
@@ -485,6 +504,12 @@ body.Entry #Content div.Box,
 #ConversationForm form {
    border: 0;
    background: #666;
+   border-radius: 0 0 3px 3px;
+   -moz-border-radius: 0 0 3px 3px;
+   -webkit-border-radius: 0 0 3px 3px;
+}
+#DiscussionForm form {
+   border-radius: 
 }
 body.Entry #Content div.Box {
 	padding: 6px;
