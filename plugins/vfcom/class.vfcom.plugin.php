@@ -42,6 +42,25 @@ class VfcomPlugin extends Gdn_Plugin {
       // Targetting URL to the static content server / CDN
       $StaticFormat = C('VanillaForums.StaticFormat', 'http://%s.static.%s');
       $this->StaticURL = sprintf($StaticFormat, $this->VfcomClient, $this->VfcomHostname);
+      
+      if (defined('PROFILER') && PROFILER) {
+         global $XHPROF_ROOT, $XHPROF_SERVER_NAME;
+         
+         $Frontend = C('VanillaForums.Frontend', NULL);
+         if (is_null($Frontend))
+            return;
+         
+         $Frontend = explode('-',$Frontend);
+         array_shift($Frontend);
+         $Frontend = implode('', $Frontend);
+         
+         $XHPROF_ROOT = '/var/www/xhprof';
+         $XHPROF_SERVER_NAME = FormatString("profiler.{Frontend}.{Client}.{Hostname}",array(
+            'Frontend'     => $Frontend,
+            'Client'       => $this->VfcomClient,
+            'Hostname'     => $this->VfcomHostname
+         ));
+      }
    }
 
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
@@ -143,10 +162,11 @@ class VfcomPlugin extends Gdn_Plugin {
       if (is_null($this->VfcomClient)) return;
       
       $StaticRoute = "/?uploads/(.*)";
+      $EncodedStaticRoute = base64_encode($StaticRoute);
       $StaticRouteDestination = "{$this->StaticURL}/uploads/$1";
       $StaticRouteMethod = "Temporary";
       
-      $Sender->EventArguments['Routes'][$StaticRoute] = array(
+      $Sender->EventArguments['Routes'][$EncodedStaticRoute] = array(
           $StaticRouteDestination,
           $StaticRouteMethod
       );
