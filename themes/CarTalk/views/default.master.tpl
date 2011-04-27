@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
 <head>
   {asset name='Head'}
-</head>
+  </head>
 <body id="{$BodyID}" class="{$BodyClass}">
   <div id="Frame">
   
@@ -236,8 +236,14 @@
 
 		  <div id="Panel">
 			 <!--<div class="SearchBox">{searchbox}</div>-->
+			 <div class="Community"></div>
+			<center><a href="discussions/rules" class="Rules">Discussion Rules</a></center>
+			<br />
+						
 			 {asset name="Panel"}
-			{literal} <script type="text/javascript">
+			 
+			{literal} 
+			<script type="text/javascript">
 <!--
 google_ad_client = "pub-7133054861616181";
 /* 250x250CTad */
@@ -245,12 +251,17 @@ google_ad_slot = "8418209865";
 google_ad_width = 250;
 google_ad_height = 250;
 //-->
-</script>{/literal}
-<div style="margin-top: 10px;"><script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script></div>
+</script>
+{/literal}
+
+<div style="margin-top: 10px;"><script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div>
 		  </div>
+		  
 		  <div id="Content">
 			 {asset name="Content"}
 		  </div>
+		  
 		</div>
 	 </div>
 	 
@@ -266,11 +277,12 @@ google_ad_height = 90;
 
 {/literal}
 	 
-<div style="text-align:center;margin-top:10px;"><script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script></div>
+<div style="text-align:center;margin-top:10px;"><script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+</div>
 
 	 	<div id="Footer">
 			<div id="footer_row_1">
-					<div id="npr"><a target="_blank" href="http://www.npr.org/"><img width="60" height="20" border="0" src="http://action.publicbroadcasting.net/media/cartalk/header/pb/images/npr.png"/></a></div>
+					<div id="npr"><a target="_blank" href="http://www.npr.org/"><img width="60" height="20" border="0" src="/themes/CarTalk/design//npr.png"/></a></div>
 
 					<div id="footer_row_1_links">
 						<a href="http://www.cartalk.com/menus/info.html">Actual Car Info</a> | 
@@ -283,16 +295,16 @@ google_ad_height = 90;
 						<a href="http://www.cartalk.com/index.html">Home</a>
 
 					</div>
-					<div id="boss"><a target="_blank" href="http://www.cartalk.com/ct/boss.jsp"><img width="38" height="37" border="0" src="http://action.publicbroadcasting.net/media/cartalk/header/pb/images/boss.png"/></a></div>
+					<div id="boss"><a target="_blank" href="http://www.cartalk.com/ct/boss.jsp"><img width="38" height="37" border="0" src="/themes/CarTalk/design/boss.png"/></a></div>
 				</div>
 				<div id="footer_row_2">
 					<div id="corsis">
-						<a href="http://www.corsis.com/" target="_blank"><img src="http://www.cartalk.com/template/images/Corsis2010_Logo.png" width="100" height="44" border="0"></a><br>
+						<a href="http://www.corsis.com/" target="_blank"><img src="/themes/CarTalk/design/Corsis2010_Logo.png" width="100" height="44" border="0"></a><br>
 						Hosting for cartalk.com is <br> generously provided by <a href="http://www.corsis.com/" target="_blank">Corsis</a>
 
 					</div>
 					<div id="emma">
-						<a target="_blank" href="http://e2ma.net/go/183688083/152308/4262355/goto:http://www.myemma.com"><img height="40" width="123" border="0" src="http://action.publicbroadcasting.net/media/cartalk/header/pb/images/emma_cartalk_logo.png"/></a><br/>
+						<a target="_blank" href="http://e2ma.net/go/183688083/152308/4262355/goto:http://www.myemma.com"><img height="40" width="123" border="0" src="/themes/CarTalk/design/emma_cartalk_logo.png"/></a><br/>
 						Car Talk's email newsletters are powered by <a target="_blank" href="http://e2ma.net/go/183688083/152308/4262355/goto:http://www.myemma.com">Emma</a>
 					</div>
 					

@@ -13,7 +13,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 $ThemeInfo['iVanilla'] = array(
    'Description' => "A mac inspired theme",
-   'Version' => '1.0',
+   'Version' => '1.1',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
    'AuthorUrl' => 'http://brendanserashriar.com',
