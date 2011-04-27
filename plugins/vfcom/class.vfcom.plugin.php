@@ -143,10 +143,11 @@ class VfcomPlugin extends Gdn_Plugin {
       if (is_null($this->VfcomClient)) return;
       
       $StaticRoute = "/?uploads/(.*)";
+      $EncodedStaticRoute = base64_encode($StaticRoute);
       $StaticRouteDestination = "{$this->StaticURL}/uploads/$1";
       $StaticRouteMethod = "Temporary";
       
-      $Sender->EventArguments['Routes'][$StaticRoute] = array(
+      $Sender->EventArguments['Routes'][$EncodedStaticRoute] = array(
           $StaticRouteDestination,
           $StaticRouteMethod
       );
