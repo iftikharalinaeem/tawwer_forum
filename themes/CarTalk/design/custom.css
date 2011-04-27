@@ -7,6 +7,11 @@ a, a:link, a:visited, a:active {
     color: #000;
     text-decoration: none;
 }
+.Message a{
+    color: #1E79A7;
+    text-decoration: underline;
+}
+
 a:hover{
 	color: #000066;
 }
@@ -206,11 +211,11 @@ div.MessageForm div.Tabs {
 
 /* css fix for message spacing - Brand-Friendly 1.2 */
 
-	div.Preview div.Message, ul.MessageList div.Message {
-		clear: none;
-		font-size: 100%;
-		line-height: 140%;
-	}
+div.Preview div.Message, ul.MessageList div.Message {
+   clear: none;
+   font-size: 100%;
+   line-height: 140%;
+}
 
 div.Tabs li a,
 div.Tabs li a:link,
