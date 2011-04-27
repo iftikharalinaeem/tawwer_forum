@@ -4,7 +4,7 @@ body{
 	font-family: 'Arial','Helvetica','sans-serif' !important;
 }
 a, a:link, a:visited, a:active {
-    color: #000;
+    color: #000066;
     text-decoration: none;
 }
 .Message a{
@@ -14,6 +14,9 @@ a, a:link, a:visited, a:active {
 
 a:hover{
 	color: #000066;
+}
+body.rules a{
+	color:#C83219;
 }
 #Panel li a{
 	color: #000066;
@@ -93,7 +96,7 @@ a.BigButton:hover {
 
 div.Popup h1,
 div.Popup h2 {
-	background: #3b5998;
+	background: #C83219;
 	border: none;
 }
 .Banner {
@@ -134,11 +137,12 @@ div.Popup h2 {
 #Content {
 	float: none;
 	width: auto;
-	margin: 0 280px 20px 10px;
+	margin: 0 310px 20px 10px;
 }
 #Panel {
 	float: right;
 	margin: 0 10px 20px 0;
+	width: 280px;
 }
 #Panel div.SearchBox input.InputBox {
 	width: 200px;
@@ -341,6 +345,7 @@ ul.DataList li.Mine div.Meta a.Category {
 }
 /* Panel Boxes */
 div.Box {
+	clear:both;
 	border-radius: 5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
@@ -416,7 +421,18 @@ ul.Activities div.Excerpt a:hover, ul.Activities div.Meta a:hover, ul.Conversati
     background: #fff;
 
 }
-
+.Community{
+ 	background: transparent url(community-home-sm.gif) no-repeat;
+ 	background-position:center; 
+ 	width: 275px;
+ 	height: 112px;
+ 	padding: 5px;
+}
+a.Rules{
+	text-align: center;
+	padding-bottom: 5px;
+	text-decoration: underline;
+}
 /* Sign In Page */
 body.Entry #Content div.Box {
 	background: #efefef;
@@ -928,4 +944,254 @@ a.header_ad_text_right:link, a.header_ad_text_right:active, a.header_ad_text_rig
 }
 #header_ad_banner[id] {
     height: 94px;
+}
+
+/* tool box */
+
+#cars_search {
+    float: left;
+	 margin-bottom: 10px;
+    position: relative;
+    width: 275px;
+}
+
+#cars_header {
+    background: url(toolbox_header.png) no-repeat scroll left center transparent;
+    height: 72px;
+    width: 275px;
+}
+#cars_spanish a {
+    color: #0000CC;
+    float: left;
+    padding: 6px 0 0 164px;
+    position: relative;
+    text-decoration: underline;
+}
+#goto_cars {
+    color: #9F9F9F;
+    float: left;
+    font-size: 12px;
+    padding: 13px 0 0 155px;
+    position: relative;
+}
+#goto_cars a {
+    color: #60518C;
+    text-decoration: underline;
+}
+#cars_body_english {
+    float: left;
+    position: relative;
+}
+.latest_automotive_news {
+    background: url(cars_background.gif) repeat-y scroll left center transparent;
+    float: left;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 12px 5px 0 18px;
+    position: relative;
+    text-align: left;
+    width: 100%;
+}
+.latest_automotive_news a {
+    color: #60518C;
+    display: block;
+    font-size: 11px;
+    font-weight: bold;
+    padding-bottom: 3px;
+    text-decoration: underline;
+}
+.latest_automotive_news ul {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0 0 5px;
+}
+.latest_automotive_news li {
+    border: 1px solid transparent;
+    margin: 0;
+    padding: 0;
+}
+.latest_automotive_news ul li a {
+    color: #9F9F9F;
+    padding: 0;
+    text-decoration: none;
+}
+.expandable {
+    background: url(cars_background.gif) repeat-y scroll left center transparent;
+    color: #9F9F9F;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 12px 0 0 18px;
+    position: relative;
+    text-align: left;
+    width: 100%;
+}
+.expandable[class] {
+    float: left;
+    width: 257px;
+}
+.expandable a {
+    color: #C83219;
+    font-size: 10px;
+    font-weight: bold;
+    padding-bottom: 3px;
+    position: relative;
+    text-decoration: none;
+    width: 200px;
+}
+.expandable SELECT OPTION {
+    color: #000000;
+}
+.drop_down_closed {
+    background: url(arrow_hor_new.png) no-repeat scroll left center transparent;
+    color: #60518C;
+    display: block;
+    float: left;
+    font-size: 12px !important;
+    font-weight: bold;
+    padding-bottom: 3px;
+    padding-left: 22px;
+    position: relative;
+}
+.expandable_non_link {
+    color: #60518C;
+    float: left;
+    font-size: 12px !important;
+    font-weight: bold;
+    position: relative;
+}
+.expandable img {
+    float: left;
+    margin-right: 5px;
+    position: relative;
+}
+.expandable form {
+    float: left;
+    padding: 5px 0 10px 23px;
+    position: relative;
+}
+.sellyrself a {
+    color: #C83219;
+    font-size: 10px;
+    font-weight: bold;
+    padding-left: 22px;
+    text-decoration: underline;
+}
+#read_owner_reviews {
+    background: url(cars_background.png) repeat-y scroll left center transparent;
+    float: left;
+    padding: 5px 0 0 0;
+    position: relative;
+    width: 100%;
+}
+div.p {
+    height: 18px;
+    margin: 4px 0;
+}
+#read_owner_reviews a {
+    background: url(grey_icon.png) no-repeat scroll 0 50% transparent;
+    color: #C83219;
+    font-size: 11px;
+    font-weight: bold;
+    padding-left: 20px;
+    text-decoration: underline;
+    vertical-align: middle;
+}
+#cars_body_english {
+    float: left;
+    position: relative;
+}
+.latest_automotive_news {
+    background: url(cars_background.png) repeat-y scroll left center transparent;
+    float: left;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 12px 0 0 18px;
+    position: relative;
+    width: 257px;
+}
+.latest_automotive_news a {
+    color: #C83219;
+    display: block;
+    font-size: 11px;
+    font-weight: bold;
+    padding-bottom: 3px;
+    text-decoration: underline;
+}
+#find_mechanic_title_side {
+    background: url(cars_background.png) repeat-y scroll left center transparent;
+    color: #9F9F9F;
+    float: left;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 13px 0 0 22px;
+    position: relative;
+    width: 255px;
+}
+#find_mechanic_form_side {
+    background: url(cars_background.png) repeat-y scroll left center transparent;
+    float: left;
+    padding: 5px 0 0 22px;
+    position: relative;
+    width: 255px;
+}
+#find_mechanic_form_side label {
+    color: #9F9F9F;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+}
+input {
+    border: 1px solid #A8A8A8;
+}
+#find_mechanic_form_side a {
+    background: url(grey_icon.png) no-repeat scroll 0 50% transparent;
+    color: #C83219;
+    font-size: 11px;
+    font-weight: bold;
+    padding-left: 20px;
+    text-decoration: underline;
+    vertical-align: middle;
+}
+.drop_down_open {
+    background: url(arrow_down_new.png) no-repeat scroll left center transparent !important;
+}
+#search_cartalk_title {
+    font-size: 12px;
+    font-weight: bold;
+    margin: 0 0 5px;
+    padding: 12px 0 0 10px;
+    position: relative;
+}
+#search_cartalk_form_holder {
+    margin: 0 0 10px;
+}
+#research_links img {
+    height: 29px;
+    padding-right: 2px;
+    width: 40px;
+}
+#research_car_form a {
+    width: 200px;
+}
+#research_links a {
+    display: block;
+    float: left;
+    height: 21px;
+    line-height: 16px;
+    position: relative;
+}
+.formLine {
+    margin: 2px 0;
+}
+#cars_header a {
+    display: block;
+    float: right;
+    height: 20px;
+    margin-right: 5px;
+    margin-top: 45px;
+    width: 55px;
+}
+#cars_header[id] a {
+    margin-right: 10px;
 }
