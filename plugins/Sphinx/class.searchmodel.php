@@ -6,7 +6,7 @@
 class SearchModel extends Gdn_Model {
 	/// PROPERTIES ///
 
-   public $Types = array(1 => 'Discussion', 2 => 'Comment', 3 => 'Page');
+   public $Types = array();
    public $TypeInfo = array();
    public $DataPath = '/var/data/searchd';
    public $LogPath = '/var/log/searchd';
