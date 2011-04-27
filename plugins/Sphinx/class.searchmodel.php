@@ -18,10 +18,21 @@ class SearchModel extends Gdn_Model {
 	/// METHODS ///
 
    public function __construct() {
-      $this->AddTypeInfo('Discussion', array($this, 'GetDiscussions'), array($this, 'IndexDiscussions'));
-      $this->AddTypeInfo('Comment', array($this, 'GetComments'), array($this, 'IndexComments'));
-      $this->AddTypeInfo('Page', array($this, 'GetPages'), array($this, 'IndexPages'));
       $this->UseDeltas = C('Plugins.Sphinx.UseDeltas');
+      
+      if (array_key_exists("Vanilla", Gdn::ApplicationManager()->EnabledApplications())) {
+         $this->Types[] = 'Discussion';
+         $this->AddTypeInfo('Discussion', array($this, 'GetDiscussions'), array($this, 'IndexDiscussions'));
+         
+         $this->Types[] = 'Comment';
+         $this->AddTypeInfo('Comment', array($this, 'GetComments'), array($this, 'IndexComments'));
+      }
+      
+      if (array_key_exists("Pages", Gdn::ApplicationManager()->EnabledApplications())) {
+         $this->Types[] = 'Page';
+         $this->AddTypeInfo('Page', array($this, 'GetPages'), array($this, 'IndexPages'));
+      }
+      
       parent::__construct();
    }
 
