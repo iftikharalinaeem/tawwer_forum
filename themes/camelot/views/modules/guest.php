@@ -5,7 +5,7 @@
    <?php //$this->FireEvent('BeforeSignInButton'); ?>
    <p class="Center">
       <?php
-      echo SpartacusThemeHooks::FacebookButton();
+      echo CamelotThemeHooks::FacebookButton();
       
 //      echo Anchor(T('Sign In'), Gdn::Authenticator()->SignInUrl($this->_Sender->SelfUrl), 'Button'.(SignInPopup() ? ' SignInPopup' : ''));
 //      $Url = Gdn::Authenticator()->RegisterUrl($this->_Sender->SelfUrl);

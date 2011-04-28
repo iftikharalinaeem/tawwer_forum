@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-class SpartacusThemeHooks implements Gdn_IPlugin {
+class CamelotThemeHooks implements Gdn_IPlugin {
 	
 	public function Base_Render_Before($Sender) {
 		Gdn::Locale()->SetTranslation('Activity.Delete', '×');
