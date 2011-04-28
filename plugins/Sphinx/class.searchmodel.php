@@ -21,15 +21,15 @@ class SearchModel extends Gdn_Model {
       $this->UseDeltas = C('Plugins.Sphinx.UseDeltas');
       
       if (array_key_exists("Vanilla", Gdn::ApplicationManager()->EnabledApplications())) {
-         $this->Types[] = 'Discussion';
+         $this->Types[1] = 'Discussion';
          $this->AddTypeInfo('Discussion', array($this, 'GetDiscussions'), array($this, 'IndexDiscussions'));
          
-         $this->Types[] = 'Comment';
+         $this->Types[2] = 'Comment';
          $this->AddTypeInfo('Comment', array($this, 'GetComments'), array($this, 'IndexComments'));
       }
       
       if (array_key_exists("Pages", Gdn::ApplicationManager()->EnabledApplications())) {
-         $this->Types[] = 'Page';
+         $this->Types[3] = 'Page';
          $this->AddTypeInfo('Page', array($this, 'GetPages'), array($this, 'IndexPages'));
       }
       
