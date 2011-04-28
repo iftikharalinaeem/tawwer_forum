@@ -61,7 +61,7 @@ class VFSpoofPlugin extends Gdn_Plugin {
             $Sender->Form->AddError('Bad Credentials');
          }
       }
-      $Sender->Render('spoof', '', 'plugin/vfspoof');
+      $Sender->Render('spoof', '', 'plugins/vfspoof');
    }
    
    public function Setup() {
