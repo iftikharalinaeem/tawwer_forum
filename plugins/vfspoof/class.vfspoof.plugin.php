@@ -32,6 +32,29 @@ class VFSpoofPlugin extends Gdn_Plugin {
    }
    
    /**
+    * Opens a connection to the VanillaForums.com database.
+    */
+   private $_Database = FALSE;
+   private function _GetDatabase() {
+      if (!is_object($this->_Database)) {
+         $this->_Database = new Gdn_Database(array(
+            'Name' => C('VanillaForums.Database.Name', 'vfcom'),
+            'Host' => C('VanillaForums.Database.Host', C('Database.Host')),
+            'User' => C('VanillaForums.Database.User', C('Database.User')),
+            'Password' => C('VanillaForums.Database.Password', C('Database.Password'))
+         ));
+      }
+         
+      return $this->_Database;
+   }
+   private function _CloseDatabase() {
+      if (is_object($this->_Database)) {
+         $this->_Database->CloseConnection();
+         $this->_Database = FALSE;
+      }
+   }
+   
+   /**
     * Allows you to spoof the admin user if you have admin access in the
     * VanillaForums.com database.
     */
@@ -61,7 +84,7 @@ class VFSpoofPlugin extends Gdn_Plugin {
             $Sender->Form->AddError('Bad Credentials');
          }
       }
-      $Sender->Render('spoof', '', 'plugin/vfspoof');
+      $Sender->Render('spoof', '', 'plugins/vfspoof');
    }
    
    public function Setup() {
