@@ -40,4 +40,4 @@ If you need to individually contact any of the Car Talk Plaza lackeys, please do
 <p>
 <b>You are solely responsible for the content you post.</b> The Car Talk Community is not responsible for the content posted by its users. We do not and cannot review all user content posted on the CTC. However, we have the right (but not the obligation) to review, screen, delete, edit and/or move any content posted on the CTC.
 </p>
-<p align="center"><a href="http://action.publicbroadcasting.net/cartalk/forums/list.page"><img src="http://www.cartalk.com/content/community/images/head-over.gif" border="0"></a></p>
+<p align="center"><a href="http://community.cartalk.com"><img src="http://www.cartalk.com/content/community/images/head-over.gif" border="0"></a></p>

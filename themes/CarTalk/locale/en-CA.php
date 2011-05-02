@@ -11,3 +11,4 @@ $Definition['You are currently only viewing categories that you follow.'] = 'You
 $Definition['You are currently viewing all categories.'] = 'You are currently viewing all topics.';
 $Definition['Show unfollowed categories'] = 'Show unfollowed topics';
 $Definition['Only show followed categories'] = 'Only show followed topics';
+$Definition['Howdy, Stranger!'] = 'Welcome to the Car Talk Community!';
