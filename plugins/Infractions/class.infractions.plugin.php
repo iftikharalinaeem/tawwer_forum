@@ -460,8 +460,8 @@ class InfractionsPlugin extends Gdn_Plugin {
       // Allow a user to be "Jailed" when they reach a certain number of infractions.
       $Structure
          ->Table('User')
-         ->Column('Jailed', 'int', FALSE, '0')
-         ->Column('TempBanned', 'int', FALSE, '0')
+         ->Column('Jailed', 'int', TRUE, '0')
+         ->Column('TempBanned', 'int', TRUE, '0')
          ->Set(FALSE, FALSE);
          
 // BUG: "Jailed is required" on user forms.
