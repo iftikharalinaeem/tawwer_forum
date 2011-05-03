@@ -64,21 +64,25 @@ class VFSpoofPlugin extends Gdn_Plugin {
       $Sender->Form = new Gdn_Form();
       $Email = $Sender->Form->GetValue('Email', '');
       $Password = $Sender->Form->GetValue('Password', '');
-      $UserIDToSpoof = ArrayValue(0, $Sender->RequestArgs, '1');
+      $UserIDToSpoof = GetValue(0, $Sender->RequestArgs, '1');
       if ($Email != '' && $Password != '') {
+         
          // Validate the username & password
          $UserModel = Gdn::UserModel();
          $UserModel->SQL = $this->_GetDatabase()->SQL();
          $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
+         $this->_CloseDatabase();
+         
          if (is_object($UserData) && $UserData->Admin == '1') {
-            $Identity = new Gdn_CookieIdentity();
-            $Identity->Init(array(
-               'Salt' => Gdn::Config('Garden.Cookie.Salt'),
-               'Name' => Gdn::Config('Garden.Cookie.Name'),
-               'Domain' => Gdn::Config('Garden.Cookie.Domain')
-            ));
-            $Identity->SetIdentity($UserIDToSpoof, TRUE);
-            $this->_CloseDatabase();
+//            $Identity = new Gdn_CookieIdentity();
+//            $Identity->Init(array(
+//               'Salt' => Gdn::Config('Garden.Cookie.Salt'),
+//               'Name' => Gdn::Config('Garden.Cookie.Name'),
+//               'Domain' => Gdn::Config('Garden.Cookie.Domain')
+//            ));
+//            $Identity->SetIdentity($UserIDToSpoof, TRUE);
+            Gdn::Session()->Start($UserIDToSpoof, TRUE);
+            
             Redirect('settings');
          } else {
             $Sender->Form->AddError('Bad Credentials');
