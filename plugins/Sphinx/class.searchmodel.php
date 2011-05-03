@@ -389,6 +389,9 @@ searchd {
       $Search = $Sphinx->query($Search, implode(' ', $Indexes));
       $Result = $this->GetDocuments($Search);
 
+      if (!is_array($Result))
+         $Result = array();
+      
       return $Result;
 	}
 
