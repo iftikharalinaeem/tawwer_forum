@@ -59,7 +59,7 @@ if (!function_exists('ValidateUsername')) {
    function ValidateUsername($Value, $Field = '') {
       return ValidateRegex(
          $Value,
-         "/^([\d\w_ \*~]{3,30})?$/siu"
+         "/^[\w~.\-=`()'\\\[\]!#?:\/\,&;|@+{}$^*\x{00C0}-\x{00FF} ]{3,25}$/siu"
       );
    }
 }
