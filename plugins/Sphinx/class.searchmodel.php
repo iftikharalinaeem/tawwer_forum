@@ -372,10 +372,13 @@ searchd {
             $Indexes[] = $Name.'_Delta';
          }
       }
+      
+      $SphinxHost = C('Plugins.Sphinx.Server', C('Database.Host', 'localhost'));
+      $SphinxPort = C('Plugins.Sphinx.Port', 9312);
 
       // Get the raw results from sphinx.
       $Sphinx = new SphinxClient();
-      $Sphinx->setServer(C('Plugin.Sphinx.Server', C('Database.Host', 'localhost')), C('Plugin.Sphinx.Port', 9312));
+      $Sphinx->setServer($SphinxHost, $SphinxPort);
       $Sphinx->setMatchMode(SPH_MATCH_BOOLEAN);
       $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS);
       $Sphinx->setLimits($Offset, $Limit);
@@ -389,6 +392,9 @@ searchd {
       $Search = $Sphinx->query($Search, implode(' ', $Indexes));
       $Result = $this->GetDocuments($Search);
 
+      if (!is_array($Result))
+         $Result = array();
+      
       return $Result;
 	}
 
