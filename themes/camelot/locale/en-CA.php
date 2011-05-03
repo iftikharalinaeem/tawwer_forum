@@ -1,3 +1,3 @@
 <?php if (!defined('APPLICATION')) exit();
-$Definition['Welcome, Stranger!'] = 'Greetings, lanista!';
-$Definition['GuestModule.Message'] = 'You are unknown to this ludus. Please introduce yourself.';
+$Definition['Welcome, Stranger!'] = 'How now, ye fans of Camelot!';
+$Definition['GuestModule.Message'] = "Verily, we're pleased to see you! We bid you to introduce ye self!";
