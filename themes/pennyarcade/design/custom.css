@@ -677,6 +677,20 @@ ul.DataList.Discussions li.Item table td.User span.CommentDate {
 	height: 20px;
 	width: 20px;
 }
+
+.UserQuote .QuoteLink {
+   background: url('images/sprites.png') top left no-repeat;
+   background-position: 0 -101px;
+	display: inline-block;
+	height: 20px;
+	width: 20px;
+   vertical-align: middle;
+}
+
+.UserQuote .ArrowLink {
+   display: none;
+}
+
 ul.DataList.Discussions .PaSprite {
 	float: right;
 	margin: 2px 8px 0 0;
