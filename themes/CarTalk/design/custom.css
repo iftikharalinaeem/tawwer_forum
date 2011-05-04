@@ -390,7 +390,11 @@ div.MessageForm{
     border-bottom: 1px solid #CCCCCC;
 
 }
-div.Tabs, div.Headings {
+div.SearchTabs {
+   border: none;
+}
+
+div.Headings {
     background: #fff;
     border-bottom: 1px solid #CCCCCC;
 
@@ -1218,4 +1222,9 @@ input {
 /*voting*/
 ul.DataList div.Meta strong {
     left: 658px;
+}
+
+#Panel #Form_Search {
+   width: 200px;
+   margin-right: 5px;
 }
