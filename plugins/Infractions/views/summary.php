@@ -92,16 +92,23 @@ if (is_object($InfractionData)) {
          <li class="Item">
             <div class="ItemContent Infraction">
                <?php
-               echo Gdn_Format::Text($Infraction->Reason).': '; 
+               echo '<h4 class="Title">';
+               echo Gdn_Format::Text($Infraction->Reason);
+               if ($Infraction->Note)
+                  echo ': ', Gdn_Format::Text($Infraction->Note);
+               echo '</h4>';
+
+               echo '<div class="Message">';
                if ($Infraction->ActivityID > 0) {
                   echo Anchor(SliceString(Gdn_Format::Text($Infraction->ActivityBody), 100), '/activity/item/'.$Infraction->ActivityID);
                } else if ($Infraction->CommentID > 0) {
-                  echo Anchor(SliceString(Gdn_Format::Text($Infraction->CommentBody), 100), '/discussion/comment/'.$Infraction->CommentID.'/#Comment_'.$Infraction->CommentID);
+                  echo Anchor(SliceString(Gdn_Format::Text(Gdn_Format::To($Infraction->CommentBody, $Infraction->CommentFormat)), 100), '/discussion/comment/'.$Infraction->CommentID.'/#Comment_'.$Infraction->CommentID);
                } else if ($Infraction->DiscussionID > 0) {
                   echo Anchor(SliceString(Gdn_Format::Text($Infraction->DiscussionName), 100), '/discussion/'.$Infraction->DiscussionID.'/'.Gdn_Format::Url($Infraction->DiscussionName));
                } else {
                   echo 'Profile Infraction';
                }
+               echo '</div>';
                ?>
                <div class="Meta">
                   <span class="Admin"><?php echo UserAnchor(UserBuilder($Infraction, 'Insert')); ?></span>
@@ -110,7 +117,7 @@ if (is_object($InfractionData)) {
                      if ($Infraction->Reversed)
                         echo 'Reversed';
                      else {
-                        if ($Infraction->DateExpires == '0000-00-00 00:00:00')
+                        if ($Infraction->DateExpires == NULL || $Infraction->DateExpires == '0000-00-00 00:00:00')
                            echo 'Never Expires';
                         else
                            echo 'Expires '.Gdn_Format::Date($Infraction->DateExpires);

@@ -53,7 +53,7 @@
 
       // Based on changes to the form, display/hide autoban form.
       setAutoBan();
-      $(':radio').change(function() { setAutoBan(); });
+      $(':radio').click(function() { setAutoBan(); });
       $('#Form_Plugin-dot-Infraction-dot-Warning').change(function() {
          setAutoBan();
          // Style the points if this is a warning

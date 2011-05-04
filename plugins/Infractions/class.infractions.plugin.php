@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Infractions'] = array(
    'Description' => 'Infraction punishment system designed by/for Penny Arcade. Note: once this plugin is enabled, you must apply the Infractions permission to the appropriate role before users can begin assigning infractions.',
-   'Version' => '1',
+   'Version' => '1.0.1b',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -62,7 +62,7 @@ class InfractionsPlugin extends Gdn_Plugin {
       $CommentID = GetValue(2, $Sender->RequestArgs, '');
       $ActivityID = GetValue(3, $Sender->RequestArgs, '');
 
-      // Load infraction history data
+      // Load infraction history datas
       $this->_LoadInfractionHistory($Sender, $UserID);
 
       // Handle infraction form
@@ -113,14 +113,14 @@ class InfractionsPlugin extends Gdn_Plugin {
                $Reason = $Sender->Form->GetValue('Plugin.Infraction.CustomReason');
                $Points = $Sender->Form->GetValue('Plugin.Infraction.Points');
                $ExpiresRange = $Sender->Form->GetValue('Plugin.Infraction.ExpiresRange');
-               $Expires = $ExpiresRange == 'Never' ? 0 : $Sender->Form->GetValue('Plugin.Infraction.Expires').' '.$ExpiresRange;
+               $Expires = $ExpiresRange == 'Never' ? NULL : $Sender->Form->GetValue('Plugin.Infraction.Expires').' '.$ExpiresRange;
                break;
          }
 
          // Is the user going to be autobanned because of this?
          $CurrentPoints = 0;
          foreach ($Sender->Data['InfractionData']->Result() as $Infraction) {
-            if ($Infraction->Reversed == '0' && Gdn_Format::ToTimestamp($Infraction->DateExpires) > time() && !$Infraction->Warning)
+            if ($Infraction->Reversed == '0' && ($Infraction->DateExpires == NULL || Gdn_Format::ToTimestamp($Infraction->DateExpires) > time()) && !$Infraction->Warning)
                $CurrentPoints += $Infraction->Points;
          }
          $BanType = false;
@@ -132,6 +132,11 @@ class InfractionsPlugin extends Gdn_Plugin {
          // Error handling
          if ($Reason == '')
             $Sender->Form->AddError('You must specify a reason for the infraction.');
+
+         if (isset($ExpiresRange)) {
+            if ($ExpiresRange != 'Never' && !is_numeric($Sender->Form->GetValue('Plugin.Infraction.Expires')))
+                  $Sender->Form->AddError('You must specify an expiry.');
+         }
             
          if (!is_numeric($Points))
             $Sender->Form->AddError('You must specify a numeric point value.');
@@ -156,7 +161,7 @@ class InfractionsPlugin extends Gdn_Plugin {
                   'Points'          => $Points,
                   'Reason'          => $Reason,
 						'BanReason'			=> $BanReason,
-                  'DateExpires'     => $Expires == 0 ? '' : Gdn_Format::ToDateTime(strtotime('+ '.$Expires)),
+                  'DateExpires'     => $Expires == NULL ? NULL : Gdn_Format::ToDateTime(strtotime('+ '.$Expires)),
                   'Reversed'        => '0',
                   'Warning'         => $Warning,
                   'Note'            => $Note,
@@ -305,12 +310,14 @@ class InfractionsPlugin extends Gdn_Plugin {
          $InfractionCache['Jailed'] = FALSE;
          foreach ($Data->Result() as $Row) {
             $InfractionCache['Count']++;
-            if (($Row->DateExpires == '0000-00-00 00:00:00' || Gdn_Format::ToTimestamp($Row->DateExpires) > time()) && $Row->Warning == '0') {
+            if (($Row->DateExpires == NULL || Gdn_Format::ToTimestamp($Row->DateExpires) > time()) && $Row->Warning == '0') {
                $InfractionCache['Points'] += $Row->Points;
                $InfractionCache['DateExpires'] = $Row->DateExpires;
                $InfractionCache['ConversationID'] = $Row->ConversationID;
             }
          }
+
+         var_dump($InfractionCache);
 
          // Is the account banned or jailed?
          if ($InfractionCache['Points'] >= 8) {
@@ -399,6 +406,7 @@ class InfractionsPlugin extends Gdn_Plugin {
          ->Select('iu.Name', '', 'InsertName')
          ->Select('a.Story', '', 'ActivityBody')
          ->Select('c.Body', '', 'CommentBody')
+         ->Select('c.Format', '', 'CommentFormat')
          ->Select('d.Name', '', 'DiscussionName')
          ->From('Infraction i')
          ->Join('User u', 'i.UserID = u.UserID')
@@ -426,10 +434,14 @@ class InfractionsPlugin extends Gdn_Plugin {
       }
    }
 
+   public function Setup() {
+      $this->Structure();
+   }
+
    /**
     * Create Infractions table & related columns.
     */
-   public function Setup() {
+   public function Structure() {
       $Structure = Gdn::Structure();
       
       // Infraction table
@@ -444,9 +456,9 @@ class InfractionsPlugin extends Gdn_Plugin {
          ->Column('Reason', 'varchar(255)', TRUE)
          ->Column('BanReason', 'text', TRUE)
          ->Column('Note', 'text', TRUE)
-         ->Column('DateExpires', 'datetime')
-         ->Column('Reversed', 'int', FALSE, '0')
-         ->Column('Warning', 'int', FALSE, '0')
+         ->Column('DateExpires', 'datetime', NULL)
+         ->Column('Reversed', 'tinyint', '0')
+         ->Column('Warning', 'tinyint', '0')
          ->Column('InsertUserID', 'int', FALSE)
          ->Column('DateInserted', 'datetime')
          ->Set(FALSE, FALSE);
@@ -460,8 +472,8 @@ class InfractionsPlugin extends Gdn_Plugin {
       // Allow a user to be "Jailed" when they reach a certain number of infractions.
       $Structure
          ->Table('User')
-         ->Column('Jailed', 'int', TRUE, '0')
-         ->Column('TempBanned', 'int', TRUE, '0')
+         ->Column('Jailed', 'tinyint', '0')
+         ->Column('TempBanned', 'tinyint', '0')
          ->Set(FALSE, FALSE);
          
 // BUG: "Jailed is required" on user forms.
