@@ -57,9 +57,14 @@ class PennyArcadePlugin extends Gdn_Plugin {
 
 if (!function_exists('ValidateUsername')) {
    function ValidateUsername($Value, $Field = '') {
+      static $ValidateUsernameRegex = NULL;
+      
+      if (is_null($ValidateUsernameRegex))
+         $ValidateUsernameRegex = C('Garden.User.ValidationRegex',"[\d\w_]{3,20}");
+      
       return ValidateRegex(
          $Value,
-         "/^[\w~.\-=`()'\\\[\]!#?:\/\,&;|@+{}$^*\x{00C0}-\x{00FF} ]{3,25}$/siu"
+         "/^{$ValidateUsernameRegex}$/siu"
       );
    }
 }
