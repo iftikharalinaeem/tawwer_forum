@@ -245,7 +245,7 @@
 			<br />
 						
 			 {asset name="Panel"}
-			 {searchbox}
+			 <div class="Search">{searchbox}</div>
 			{literal} 
 			<script type="text/javascript">
 <!--
