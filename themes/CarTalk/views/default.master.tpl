@@ -24,22 +24,25 @@
 					Support for Car Talk is provided by:
 				</div>
 				<div id="header_ad_banner">
-				
-					{literal}<script language="JavaScript">
-						userver = "http://u.npr.org";
-						target = "/site=CARTALK/utype=banner/area=CarTalk.Forums/aamsz=728x90/position=ct_top";
-						random = Math.round(Math.random() * 10000000000);
-						if (!pageNum) var pageNum = Math.round(Math.random() * 100000000);
-						document.write('<');
-						document.write('script language=\"JavaScript\" src="' + userver + '/jserver/random=' + random + target + '/pageid=' + pageNum + '">');
-						document.write('<');
-						document.write('/script>');
-					</script>
+					{literal}
+               <!-- begin ad tag (tile=1) -->
+
+               <script type="text/javascript">
+
+               //<![CDATA[
+
+               ord=Math.random()*10000000000000000;
+
+               document.write('<script type="text/javascript" src="http://ad.doubleclick.net/adj/n6735.NPR.CARTALK/cartalk.forums;tile=1;dcopt=ist;sz=728x90;ord=' + ord + '?"><\/script>');
+
+               //]]>
+
+               </script>
+
+               <noscript><a href="http://ad.doubleclick.net/jump/n6735.NPR.CARTALK/cartalk.forums;tile=1;sz=728x90;ord=123456789?" target="_blank" ><img src="http://ad.doubleclick.net/ad/n6735.NPR.CARTALK/cartalk.forums;tile=1;sz=728x90;ord=123456789?" border="0" alt="" /></a></noscript>
+
+               <!-- end ad tag -->
 					{/literal}
-					<noscript>
-					<a rel="nofollow" HREF="http://u.npr.org/adclick/site=CARTALK/utype=banner/area=CarTalk.Forums/aamsz=728x90/position=ct_top">
-					<img src="http://u.npr.org/nserver/site=CARTALK/utype=banner/area=CarTalk.Forums/aamsz=728x90/position=ct_top"></a>
-					</noscript>
 				
 				</div>				
 			</div>
