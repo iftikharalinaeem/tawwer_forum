@@ -3,7 +3,7 @@
 <p align="center"><img src="http://www.cartalk.com/content/community/images/header.gif"></p>
 <p align="center"><img src="http://www.cartalk.com/content/community/images/rules-title.gif"></p>
 <p><i>
-The following text serves as the official discussion policy for users of the Car Talk Community (CTC). All participants in the Car Talk Community are required to follow these rules, in addition to the <a href="http://action.publicbroadcasting.net/cartalk/help/termsOfService.page" target="_blank">Terms of Use</a> and <a href="http://action.publicbroadcasting.net/cartalk/help/privacyPolicy.page" target="_blank">Privacy Policy</a> for the CTC. We'd like to thank our friends at <a href="http://www.npr.org" target="_blank">NPR.org</a> for their advice and guidance &#151; and especially for allowing us to adapt their guidelines for the Car Talk Community.</i>
+The following text serves as the official discussion policy for users of the Car Talk Community (CTC). All participants in the Car Talk Community are required to follow these rules, in addition to the <a href="http://www.cartalk.com/terms-of-service.html#user" target="_blank">Terms of Use</a> and <a href="http://www.cartalk.com/menus/privacy.html" target="_blank">Privacy Policy</a> for the CTC. We'd like to thank our friends at <a href="http://www.npr.org" target="_blank">NPR.org</a> for their advice and guidance &#151; and especially for allowing us to adapt their guidelines for the Car Talk Community.</i>
 
 </p>
 <br>
