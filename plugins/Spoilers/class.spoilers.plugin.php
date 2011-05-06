@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Spoilers'] = array(
    'Name' => 'Spoilers',
    'Description' => "This plugin allows users to hide sensitive or revealing information behind clickable barriers to prevent accidental spoilers.",
-   'Version' => '0.1.1',
+   'Version' => '0.2',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
@@ -54,8 +54,8 @@ class SpoilersPlugin extends Gdn_Plugin {
       if (isset($Sender->EventArguments['Comment'])) 
          $Data = $Sender->EventArguments['Comment'];
 
-      $Data->Body = preg_replace_callback("/(\[spoiler(?:=\"?([\d\w_',.? ]+)\"?)?\])/", array($this, 'SpoilerCallback'), $Data->Body);
-      $Data->Body = str_replace('[/spoiler]','</div></div>',$Data->Body);
+      $Data->Body = preg_replace_callback("/(\[spoiler(?:=\"?([\d\w_',.? ]+)\"?)?\])/siu", array($this, 'SpoilerCallback'), $Data->Body);
+      $Data->Body = str_ireplace('[/spoiler]','</div></div>',$Data->Body);
    }
    
    protected function SpoilerCallback($Matches) {
