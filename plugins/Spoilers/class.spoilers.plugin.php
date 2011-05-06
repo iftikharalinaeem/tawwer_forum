@@ -48,14 +48,21 @@ class SpoilersPlugin extends Gdn_Plugin {
    }
    
    protected function RenderSpoilers(&$Sender) {
-      if (isset($Sender->EventArguments['Discussion'])) 
-         $Data = $Sender->EventArguments['Discussion'];
-         
-      if (isset($Sender->EventArguments['Comment'])) 
-         $Data = $Sender->EventArguments['Comment'];
-
-      $Data->Body = preg_replace_callback("/(\[spoiler(?:=\"?([\d\w_',.? ]+)\"?)?\])/siu", array($this, 'SpoilerCallback'), $Data->Body);
-      $Data->Body = str_ireplace('[/spoiler]','</div></div>',$Data->Body);
+      switch ($Sender->EventArguments['Object']->Format) {
+         case 'Html':
+            $Sender->EventArguments['Object']->Body = preg_replace_callback("/(\[spoiler(?:=\"?([\d\w_',.? ]+)\"?)?\])/siu", array($this, 'SpoilerCallback'), $Sender->EventArguments['Object']->Body);
+            $Sender->EventArguments['Object']->Body = str_ireplace('[/spoiler]','</div></div>',$Sender->EventArguments['Object']->Body);
+            break;
+         case 'BBCode':
+         case 'Markdown':
+            
+            break;
+            
+         case 'Display':
+         case 'Text':
+         default:
+            break;
+      }
    }
    
    protected function SpoilerCallback($Matches) {
