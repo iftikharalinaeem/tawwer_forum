@@ -39,30 +39,19 @@ class SpoilersPlugin extends Gdn_Plugin {
       $Sender->AddCssFile($this->GetResource('css/spoilers.css', FALSE, FALSE));
    }
    
-   public function DiscussionController_BeforeCommentDisplay_Handler(&$Sender) {
+   public function DiscussionController_AfterCommentFormat_Handler(&$Sender) {
       $this->RenderSpoilers($Sender);
    }
    
-   public function PostController_BeforeCommentDisplay_Handler(&$Sender) {
+   public function PostController_AfterCommentFormat_Handler(&$Sender) {
       $this->RenderSpoilers($Sender);
    }
    
    protected function RenderSpoilers(&$Sender) {
-      switch ($Sender->EventArguments['Object']->Format) {
-         case 'Html':
-            $Sender->EventArguments['Object']->Body = preg_replace_callback("/(\[spoiler(?:=\"?([\d\w_',.? ]+)\"?)?\])/siu", array($this, 'SpoilerCallback'), $Sender->EventArguments['Object']->Body);
-            $Sender->EventArguments['Object']->Body = str_ireplace('[/spoiler]','</div></div>',$Sender->EventArguments['Object']->Body);
-            break;
-         case 'BBCode':
-         case 'Markdown':
-            
-            break;
-            
-         case 'Display':
-         case 'Text':
-         default:
-            break;
-      }
+      $FormatBody = &$Sender->EventArguments['Object']->FormatBody;
+
+      $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
+      $FormatBody = str_ireplace('[/spoiler]','</div></div>',$FormatBody);
    }
    
    protected function SpoilerCallback($Matches) {
