@@ -58,10 +58,12 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          $UserName = ArrayValue('Name', $Response);
          $UserName = trim(preg_replace('/[^a-z0-9- ]+/i','',$UserName));
          $TransientKey = ArrayValue('TransientKey', $Response, NULL);
+         $Roles = ArrayValue('Roles', $Response, NULL);
          
          // Validate remote credentials against local auth tables
          $AuthResponse = $this->ProcessAuthorizedRequest($Provider['AuthenticationKey'], $UserUnique, $UserName, $TransientKey, array(
-            'Email'  => $UserEmail
+            'Email'  => $UserEmail,
+            'Roles' => $Roles
          ));
          
          return $AuthResponse;
@@ -319,6 +321,15 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          $UserOptional = Gdn_Format::Unserialize(ArrayValue('UserOptional', $Handshake, array()));
       }
       return ArrayValue('Email', $UserOptional, '');
+   }
+
+   public function GetRolesFromHandshake($Handshake) {
+      static $UserOptional = NULL;
+
+      if (is_null($UserOptional)) {
+         $UserOptional = Gdn_Format::Unserialize(ArrayValue('UserOptional', $Handshake, array()));
+      }
+      return ArrayValue('Roles', $UserOptional, '');
    }
    
    public function DeAuthenticate() {
