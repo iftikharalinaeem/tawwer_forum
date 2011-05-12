@@ -151,10 +151,6 @@ div.Popup h2 {
 div.SearchBox {
 	margin-bottom: 6px;
 }
-.Search {
-   margin: 10px 0;
-}
-
 body.Profile div.SearchBox {
 	display: none;
 }
