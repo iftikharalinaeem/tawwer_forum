@@ -20,6 +20,7 @@
   </div>
   
   <div id="topuserbar">
+  {if !$User.SignedIn }
   	<img src="http://d1djb7jwq4h1ad.cloudfront.net/images/other/default-user.png" alt="User Icon" height="12" width="9"> Welcome <b style="color:#FFF;">Guest</b>, <a id="loginLink" href="http://www.webmasterbond.com/account/login/" onclick="login558()">Login</a> or <a id="registerLink" href="http://www.webmasterbond.com/account/register/">Register</a>
   	
   		<div id="loginDropdown" style="display:none;">
@@ -37,7 +38,12 @@
   			<div id="ajax_login_process">Verifying...</div>
   			<div id="ajax_res">
   			</div>
-  		</div>	
+  		</div>
+   {else }
+      Logged in as <b style="color:#FFF;">{$User.Name}</b>
+      |
+      {signinout_link format='<a href="%url" class="%class">%text</a>'}
+   {/if}
   	</div>
   	
   	<div class="clr"></div>
@@ -80,7 +86,6 @@
 		  {inbox_link}
 		  {profile_link}
 		  {custom_menu}
-		  {signinout_link}
 		</ul>
 	 </div>
 	 <div id="Body">
