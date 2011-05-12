@@ -1077,8 +1077,8 @@ ul.MessageList.Discussion li.Item:nth-of-type(odd) {
 .role-moderator div.Photo span.Rank { background-position: 3px -80px !important; }
 .role-administrator div.Photo { background: #cfd3d6 !important; }
 .role-administrator div.Photo span.Rank { background-position: 3px -40px !important; }
-.role-staff div.Photo { background: #e5cbb7 !important; }
-.role-staff div.Photo span.Rank { background-position: 3px 0px !important; }
+.role-penny_arcade_staff div.Photo { background: #e5cbb7 !important; }
+.role-penny_arcade_staff div.Photo span.Rank { background-position: 3px 0px !important; }
 .Jailed div.Photo { background: #c3c3c3 !important; }
 .Jailed div.Photo span.Rank { background-position: 3px -160px !important; }
 .Banned div.Photo { background: #d8b5b5 !important; }
