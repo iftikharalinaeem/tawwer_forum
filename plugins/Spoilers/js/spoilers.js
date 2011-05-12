@@ -1,6 +1,5 @@
 var SpoilersPlugin = {
    FindAndReplace: function() {
-      
       $('div.UserSpoiler').each(function(i, el) {
          SpoilersPlugin.ReplaceSpoiler(el);
       });
@@ -13,19 +12,30 @@ var SpoilersPlugin = {
    },
    
    ReplaceSpoiler: function(Spoiler) {
+      // Don't re-event spoilers that are already 'on'
       if (Spoiler.SpoilerFunctioning) return;
       Spoiler.SpoilerFunctioning = true;
+      
+      // Extend object with jQuery
       Spoiler = $(Spoiler);
       var SpoilerTitle = Spoiler.find('div.SpoilerTitle');
       var SpoilerButton = document.createElement('input');
       SpoilerButton.type = 'button';
       SpoilerButton.value = 'show';
-      $(SpoilerButton).click(jQuery.proxy(function(event){
-         $(this).find('div.SpoilerText').css('display','block');
-         $(event.target).remove();
-      },Spoiler));
+      SpoilerButton.className = 'SpoilerToggle';
       SpoilerTitle.append(SpoilerButton);
-
+   },
+   
+   ToggleSpoiler: function(Spoiler, SpoilerButton) {
+      var ThisSpoilerText = Spoiler.find('div.SpoilerText');
+      var ThisSpoilerStatus = ThisSpoilerText.css('display');
+      var NewSpoilerStatus = (ThisSpoilerStatus == 'none') ? 'block' : 'none';
+      ThisSpoilerText.css('display',NewSpoilerStatus);
+      
+      if (NewSpoilerStatus == 'none')
+         SpoilerButton.val('show');
+      else
+         SpoilerButton.val('hide');
    }
 };
 
@@ -41,4 +51,9 @@ jQuery(document).bind('CommentPagingComplete',function() {
 
 jQuery(document).bind('CommentAdded', function() {
    SpoilersPlugin.FindAndReplace();
+});
+
+jQuery('input.SpoilerToggle').livequery('click',function(event){
+   var Spoiler = $(event.target).parents('div.UserSpoiler');
+   SpoilersPlugin.ToggleSpoiler(Spoiler, $(event.target));
 });

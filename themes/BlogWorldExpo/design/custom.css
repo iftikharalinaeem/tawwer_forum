@@ -303,7 +303,10 @@ body.Profile ul.PanelInfo li a {
 body.Profile ul.PanelInfo li a:hover {
 	background: #D8DFEA;
 }
-
+ul.DataList li.Depth1{
+	background: none repeat scroll 0 0 #F2F2F2;
+    border: 2px solid #C4C4C4;
+}
 /* Sign In Page */
 body.Entry #Content div.Box {
 	background: #efefef;
@@ -311,6 +314,8 @@ body.Entry #Content div.Box {
 body.Entry #Panel {
 	display: none;
 }
+
+
 
 /* voting */
 

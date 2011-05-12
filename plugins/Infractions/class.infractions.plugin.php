@@ -317,8 +317,6 @@ class InfractionsPlugin extends Gdn_Plugin {
             }
          }
 
-         var_dump($InfractionCache);
-
          // Is the account banned or jailed?
          if ($InfractionCache['Points'] >= 8) {
             $InfractionCache['Banned'] = TRUE;
