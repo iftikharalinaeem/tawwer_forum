@@ -33,6 +33,20 @@ class PennyArcadePlugin extends Gdn_Plugin {
       
    }
    
+   public static function ValidateUsernameRegex() {
+      static $ValidateUsernameRegex;
+      
+      if (is_null($ValidateUsernameRegex) || $Rebuild) {
+         $ValidateUsernameRegex = sprintf("[%s]%s",
+            C("Garden.User.ValidationRegex","\d\w_"),
+            C("Garden.User.ValidationLength","{3,20}"));
+         
+      }
+      
+      return $ValidateUsernameRegex;
+   }
+   
+   // Enforce custom rules for PA discussions and categories
    public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender) {
       $DiscussionName = GetValue('Name',$Sender->EventArguments['FormPostValues']);
       if (strlen($DiscussionName) > $this->MaxDiscussionLength)
@@ -57,10 +71,7 @@ class PennyArcadePlugin extends Gdn_Plugin {
 
 if (!function_exists('ValidateUsername')) {
    function ValidateUsername($Value, $Field = '') {
-      static $ValidateUsernameRegex = NULL;
-      
-      if (is_null($ValidateUsernameRegex))
-         $ValidateUsernameRegex = C('Garden.User.ValidationRegex',"[\d\w_]{3,20}");
+      $ValidateUsernameRegex = PennyArcadePlugin::ValidateUsernameRegex();
       
       return ValidateRegex(
          $Value,

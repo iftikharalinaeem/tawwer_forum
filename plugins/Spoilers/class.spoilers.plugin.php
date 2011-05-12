@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Spoilers'] = array(
    'Name' => 'Spoilers',
    'Description' => "This plugin allows users to hide sensitive or revealing information behind clickable barriers to prevent accidental spoilers.",
-   'Version' => '0.1.1',
+   'Version' => '0.2',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
@@ -39,23 +39,19 @@ class SpoilersPlugin extends Gdn_Plugin {
       $Sender->AddCssFile($this->GetResource('css/spoilers.css', FALSE, FALSE));
    }
    
-   public function DiscussionController_BeforeCommentDisplay_Handler(&$Sender) {
+   public function DiscussionController_AfterCommentFormat_Handler(&$Sender) {
       $this->RenderSpoilers($Sender);
    }
    
-   public function PostController_BeforeCommentDisplay_Handler(&$Sender) {
+   public function PostController_AfterCommentFormat_Handler(&$Sender) {
       $this->RenderSpoilers($Sender);
    }
    
    protected function RenderSpoilers(&$Sender) {
-      if (isset($Sender->EventArguments['Discussion'])) 
-         $Data = $Sender->EventArguments['Discussion'];
-         
-      if (isset($Sender->EventArguments['Comment'])) 
-         $Data = $Sender->EventArguments['Comment'];
+      $FormatBody = &$Sender->EventArguments['Object']->FormatBody;
 
-      $Data->Body = preg_replace_callback("/(\[spoiler(?:=\"?([\d\w_',.? ]+)\"?)?\])/", array($this, 'SpoilerCallback'), $Data->Body);
-      $Data->Body = str_replace('[/spoiler]','</div></div>',$Data->Body);
+      $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
+      $FormatBody = str_ireplace('[/spoiler]','</div></div>',$FormatBody);
    }
    
    protected function SpoilerCallback($Matches) {
