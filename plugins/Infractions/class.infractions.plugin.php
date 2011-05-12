@@ -611,12 +611,12 @@ if (!function_exists('UserBuilder')) {
       $User->Name = $Object->$Name;
       $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
       $Protocol =  (strlen(GetValue('HTTPS', $_SERVER, 'No')) != 'No' || GetValue('SERVER_PORT', $_SERVER) == 443) ? 'https://secure.' : 'http://www.';
-      if ($User->Photo == '' && property_exists($Object, $Email)) {
-         $User->Photo = $Protocol.'gravatar.com/avatar.php?'
-            .'gravatar_id='.md5(strtolower($Object->$Email))
-            .'&amp;default='.urlencode(Asset(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
-            .'&amp;size='.Gdn::Config('Garden.Thumbnail.Width', 40);
-      }
+//      if ($User->Photo == '' && property_exists($Object, $Email)) {
+//         $User->Photo = $Protocol.'gravatar.com/avatar.php?'
+//            .'gravatar_id='.md5(strtolower($Object->$Email))
+//            .'&amp;default='.urlencode(Asset(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
+//            .'&amp;size='.Gdn::Config('Garden.Thumbnail.Width', 40);
+//      }
 		$User->Jailed = GetValue($Jailed, $Object);
 		$User->Banned = GetValue($Banned, $Object);
 		$User->TempBanned = GetValue($TempBanned, $Object);
