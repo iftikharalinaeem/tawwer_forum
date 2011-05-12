@@ -799,3 +799,25 @@ p.clr, .clr {
     margin: 0;
     padding: 0;
 }
+
+.QnA-Accepted {
+   background: url('check.png') no-repeat;
+   display: block;
+   height: 40px;
+   position: absolute;
+   left: -50px;
+   top: 10px;
+   width: 40px;
+}
+.QnA-Accepted div {
+   display: none;
+}
+
+.QnA-Tag-Accepted {
+   background: #61adc7;
+	background:-webkit-gradient(linear, center bottom, center top, from(#61adc7), to(#9fd4e6));
+	background:-moz-linear-gradient(top, #9fd4e6, #61adc7);
+	-pie-background:linear-gradient(top, #9fd4e6, #61adc7);
+	background:linear-gradient(top, #9fd4e6, #61adc7);
+   text-shadow: 0 1px 1px rgba(0,0,0,.7);
+}
