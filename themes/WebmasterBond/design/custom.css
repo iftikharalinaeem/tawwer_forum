@@ -799,3 +799,72 @@ p.clr, .clr {
     margin: 0;
     padding: 0;
 }
+#loginLink, #registerLink {
+    background-color: #000000;
+    cursor: pointer;
+    padding: 6px;
+}
+#loginDropdown {
+    background-color: #FFFFFF;
+    border-color: #000000;
+    border-right: 1px solid #000000;
+    border-style: solid;
+    border-width: 0 1px 5px;
+    display: none;
+    margin-top: 6px;
+    padding: 0 10px;
+    position: absolute;
+    right: 55px;
+    text-align: left;
+    z-index: 999;
+}
+#loginDropdown p {
+    font: 11px Arial,Helvetica,sans-serif;
+    margin: 0;
+    padding: 5px 0 4px;
+}
+#loginDropdown input[type="text"], #loginDropdown input[type="password"] {
+    border: 1px solid #CCCCCC;
+    cursor: text;
+    display: block;
+    margin: 0;
+    padding: 2px;
+}
+#signin_submit::-moz-focus-inner {
+    border: 0 none;
+    padding: 0;
+}
+#signin_submit:hover, #signin_submit:focus {
+    background-position: 0 -5px;
+    cursor: pointer;
+}
+input[type="checkbox"] {
+    -moz-appearance: none;
+    color: white;
+}
+#signin_submit {
+    background: url(bg-btn-blue.png) repeat-x scroll 0 0 #3399DD;
+    border: 1px solid #3399DD;
+    border-radius: 4px 4px 4px 4px;
+    color: #F7F7F7;
+    font-size: 11px;
+    font-weight: bold;
+    margin: 0 5px 0 0;
+    padding: 4px 10px 5px;
+    text-shadow: 0 -1px 0 #3399DD;
+}
+.bold {
+    color: #0099FF;
+}
+#loginDropdown a:hover {
+    text-decoration: underline;
+}
+#loginDropdown input[type="text"] {
+    width: 170px;
+}
+#loginDropdown input[type="password"] {
+    width: 170px;
+}
+#loginDropdown input[type="password"] {
+    width: 170px;
+}
