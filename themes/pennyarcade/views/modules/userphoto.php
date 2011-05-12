@@ -1,6 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::Session();
-$RoleCss = strtolower(implode(' role-', $this->_Sender->Roles));
+$CssRoles = $this->_Sender->Roles;
+foreach ($CssRoles as &$RawRole)
+   $RawRole = 'role-'.str_replace(' ','_',  strtolower($RawRole));
+$RoleCss = ' '.implode(' ',$CssRoles);
+   
 $Jailed = '';
 $Photo = '';
 

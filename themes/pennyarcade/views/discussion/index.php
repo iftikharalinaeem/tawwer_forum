@@ -96,9 +96,11 @@ if ($this->Discussion->Closed == '1') {
 } else if ($Session->IsValid() && $Session->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $this->Discussion->PermissionCategoryID)) {
   	// Append the user's roles to the class definition
    $CssClass = 'CommentFormTable CommentTable';
-	$CssRoles = strtolower(implode(' role-', $Session->User->Roles));
-	if ($CssRoles != '')
-		$CssClass .= ' role-'.$CssRoles;
+   $CssRoles = $Session->User->Roles;
+   foreach ($CssRoles as &$RawRole)
+      $RawRole = 'role-'.str_replace(' ','_',  strtolower($RawRole));
+	if (count($CssRoles))
+		$CssClass .= ' '.implode(' ',$CssRoles);
 	
 	// Identify jailed & banned users
 	if (GetValue('InsertBanned', $Session->User) == '1')

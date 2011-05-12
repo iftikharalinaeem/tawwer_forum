@@ -32,9 +32,11 @@ function WriteComment($Object, $Sender, $Session, $CurrentOffset) {
    $Alt = !$Alt;
 	
 	// Append the user's roles to the class definition
-	$CssRoles = strtolower(implode(' role-', GetValue('Roles', $Object, array())));
-	if ($CssRoles != '')
-		$CssClass .= ' role-'.$CssRoles;
+   $CssRoles = GetValue('Roles', $Object, array());
+   foreach ($CssRoles as &$RawRole)
+      $RawRole = 'role-'.str_replace(' ','_',  strtolower($RawRole));
+	if (count($CssRoles))
+		$CssClass .= ' '.implode(' ',$CssRoles);
 	
 	// Identify jailed & banned users
 	if (GetValue('InsertBanned', $Object) == '1' || GetValue('InsertTempBanned', $Object) == '1')
