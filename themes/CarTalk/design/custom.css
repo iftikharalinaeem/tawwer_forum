@@ -93,10 +93,6 @@ a.BigButton:hover {
     width: 166px;
 }
 
-/*div.SearchBox {
-    visibility: hidden;
-}*/
-
 div.Popup h1,
 div.Popup h2 {
 	background: #C83219;
@@ -156,6 +152,22 @@ div.SearchBox {
 }
 .Search {
    margin: 10px 0;
+}
+
+#cse-search-box {
+   margin-bottom: 10px;
+}
+
+#Panel #cse_text {
+   width: 175px;
+}
+
+#Content #cse_text {
+   width: 500px;
+}
+
+.SearchResultsBox {
+   text-align: center;
 }
 
 body.Profile div.SearchBox {
