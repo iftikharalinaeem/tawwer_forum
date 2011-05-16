@@ -241,7 +241,7 @@
 		  <div id="Panel">
 			 <!--<div class="SearchBox">{searchbox}</div>-->
 			 <div class="Community"></div>
-			<center><a href="discussions/rules" class="Rules">Discussion Rules</a></center>
+			<center><a href="{link path="/discussions/rules"}" class="Rules">Discussion Rules</a></center>
 			<br />
 						
 			 {asset name="Panel"}

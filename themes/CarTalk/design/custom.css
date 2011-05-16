@@ -29,9 +29,9 @@ a.Button, .Button {
     color: #000;
 }
 a.BigButton, a.BigButton:focus {
+    background: #B32A14;
     background: -moz-linear-gradient(center top , #C83219, #9B200D) repeat scroll 0 0 transparent;
-        background: -webkit-gradient(linear, left top, left bottom, from(#C83219), to(#9B200D));
-
+    background: -webkit-gradient(linear, left top, left bottom, from(#C83219), to(#9B200D));
     border: 1px solid #D6B967;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -47,9 +47,12 @@ a.BigButton, a.BigButton:focus {
     text-align: center;
     text-shadow: 0 1px 0 #000000;
 }
+* html a.BigButton {
+   background: #B32A14;
+}
 a.BigButton:hover {
 	color:#ffffff;
-	}
+}
 
 #Body {
 	width: 980px;
