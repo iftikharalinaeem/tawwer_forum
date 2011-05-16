@@ -67,7 +67,7 @@
 	<div id="Frame">
       <div id="Head">
          <div class="Breadcrumbs">
-            <?php echo Gdn_Theme::Link('categories', 'Penny Arcade Forums', $Wrap); ?>
+            <?php echo Gdn_Theme::Link('/', 'Penny Arcade Forums', $Wrap); ?>
 			</div>
 			<div class="ProfileMenu">
 				<script type="text/javascript">
