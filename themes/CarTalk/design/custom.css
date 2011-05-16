@@ -151,6 +151,10 @@ div.Popup h2 {
 div.SearchBox {
 	margin-bottom: 6px;
 }
+.Search {
+   margin: 10px 0;
+}
+
 body.Profile div.SearchBox {
 	display: none;
 }
@@ -173,7 +177,7 @@ form.Activity textarea {
     height: 100px;
     position: relative;
     width: 990px;
-	 background: #C83219 url(bottom.png) no-repeat;
+	 background: #C83219 url(bottom_3.png) no-repeat;
     clear: both;
     color: #000;
     font-size: 13px;
