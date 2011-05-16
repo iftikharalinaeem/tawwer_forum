@@ -21,24 +21,7 @@
   
   <div id="topuserbar">
   {if !$User.SignedIn }
-  	<img src="http://d1djb7jwq4h1ad.cloudfront.net/images/other/default-user.png" alt="User Icon" height="12" width="9"> Welcome <b style="color:#FFF;">Guest</b>, <a id="loginLink" href="http://www.webmasterbond.com/account/login/" onclick="login558()">Login</a> or <a id="registerLink" href="http://www.webmasterbond.com/account/register/">Register</a>
-  	
-  		<div id="loginDropdown" style="display:none;">
-  			<form id="ajax_login" name="ajax_login" action="/account/login/process.php" onsubmit="return loginP()"><p>
-  			<label for="login_username_ajax" class="bold">Username</label>
-  			<input maxlength="20" id="login_username_ajax" type="text"></p>
-  			<p><label for="login_password_ajax" class="bold">Password</label>
-  			<input id="login_password_ajax" type="password"></p>
-  			<p><input id="signin_submit" value="Login" type="submit">
-  			<input id="remember_me_ajax" type="checkbox">
-  			<label for="remember_me_ajax">Remember me</label></p>
-  			<div id="logf_h"><p id="ajax_forgot">I forgot my <a href="http://www.webmasterbond.com/account/forgot/">username/password</a></p>
-  			</div>
-  			</form>
-  			<div id="ajax_login_process">Verifying...</div>
-  			<div id="ajax_res">
-  			</div>
-  		</div>
+  	<img src="http://d1djb7jwq4h1ad.cloudfront.net/images/other/default-user.png" alt="User Icon" height="12" width="9"> Welcome <b style="color:#FFF;">Guest</b>, {signin_link format='<a href="%url" class="%class">Login</a>'} or <a id="registerLink" href="http://www.webmasterbond.com/account/register/">Register</a>
    {else }
       Logged in as <b style="color:#FFF;">{$User.Name}</b>
       |
