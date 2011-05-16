@@ -52,10 +52,10 @@
   	
   	<div class="header_text">
   		<h1><span class="h1_1">
-  			<span class="h1_2">Advertisement Solutions</span>
+  			<span class="h1_2">Community Forums</span>
   			</span>
   		</h1>
-  		<p>A full list of advertisement solutions offered by WebmasterBond.</p>
+  		<p></p>
   	</div>
   	
   	<div class="menu">
