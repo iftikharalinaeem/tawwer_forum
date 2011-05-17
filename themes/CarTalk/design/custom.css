@@ -29,9 +29,9 @@ a.Button, .Button {
     color: #000;
 }
 a.BigButton, a.BigButton:focus {
+    background: #B32A14;
     background: -moz-linear-gradient(center top , #C83219, #9B200D) repeat scroll 0 0 transparent;
-        background: -webkit-gradient(linear, left top, left bottom, from(#C83219), to(#9B200D));
-
+    background: -webkit-gradient(linear, left top, left bottom, from(#C83219), to(#9B200D));
     border: 1px solid #D6B967;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -47,9 +47,12 @@ a.BigButton, a.BigButton:focus {
     text-align: center;
     text-shadow: 0 1px 0 #000000;
 }
+* html a.BigButton {
+   background: #B32A14;
+}
 a.BigButton:hover {
 	color:#ffffff;
-	}
+}
 
 #Body {
 	width: 980px;
@@ -89,10 +92,6 @@ a.BigButton:hover {
     top: 13px;
     width: 166px;
 }
-
-/*div.SearchBox {
-    visibility: hidden;
-}*/
 
 div.Popup h1,
 div.Popup h2 {
@@ -155,6 +154,22 @@ div.SearchBox {
    margin: 10px 0;
 }
 
+#cse-search-box {
+   margin-bottom: 10px;
+}
+
+#Panel #cse_text {
+   width: 175px;
+}
+
+#Content #cse_text {
+   width: 500px;
+}
+
+.SearchResultsBox {
+   text-align: center;
+}
+
 body.Profile div.SearchBox {
 	display: none;
 }
@@ -182,6 +197,7 @@ form.Activity textarea {
     color: #000;
     font-size: 13px;
     text-align: left;
+    line-height: 100%;
 }
 #Foot div {
 }
