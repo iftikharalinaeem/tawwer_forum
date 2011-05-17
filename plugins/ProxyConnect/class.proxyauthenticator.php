@@ -395,8 +395,9 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    
    protected function _GetForeignCredentials($ForeignIdentityUrl) {
    
-      // Get the contents of the Authentication Url (timeout 5 seconds)
-      $Response = ProxyRequest($ForeignIdentityUrl,5);
+      // Get the contents of the Authentication Url (timeout 5 seconds);
+      @session_write_close();
+      $Response = ProxyRequest($ForeignIdentityUrl, 5);
       if ($Response) {
       
          $ReadMode = strtolower(C("Garden.Authenticators.proxy.RemoteFormat", "ini"));

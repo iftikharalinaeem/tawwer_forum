@@ -7,7 +7,7 @@
  <div class="Banner">
   <div class="BannerWrapper">
 	<h1><a href="{link path="/"}"><span>{logo}</span></a></h1>
-   <div class="Buttons">
+   <div class="Buttons1">
 	 <div class="UserOptions">
 	  <div>
 	   {if $User.SignedIn}
@@ -33,11 +33,12 @@
      </div>
     </div>
     <ul>
-     <li class="Home"><a href="http://www.charltonlife.com">Home</a></li>
-     <li class="Articles"><a href="http://www.charltonlife.com/articles">Articles</a></li>
-     <li class="Forum"><a href="http://www.charltonlife.com/forum">Forum</a></li>
-     <li class="Contact"><a href="http://www.charltonlife.com/contact">Contact Us</a></li>
-     <li class="Download"><a href="http://charltonlife.vanillaforums.com/help">Help</a></li>
+     <li class="Home"><a href="http://forum.charltonlife.com/">Forum</a></li>
+     <!--<li class="Articles"><a href="http://www.charltonlife.com/articles">Articles</a></li>-->
+<li class="Categories"><a href="http://forum.charltonlife.com/categories/all">Categories</a></li>
+<li class="Activitu"><a href="http://forum.charltonlife.com/activity">Activity</a></li>
+     <li class="Contact"><a href="mailto:admin@charltonlife.com">Contact Us</a></li>
+     <!--<li class="Download"><a href="http://charltonlife.vanillaforums.com/help">Help</a></li>-->
     </ul>
 	 <div id="Search">{searchbox}</div>
    </div>
@@ -50,6 +51,7 @@
   </div>
   <div id="Foot">
   <div>Powered by <a href="http://vanillaforums.org"><span>Vanilla</span></a></div>
+  {asset name="Foot"}
  </div>
 </body>
 </html>
