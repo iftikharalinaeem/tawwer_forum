@@ -287,7 +287,7 @@ google_ad_height = 90;
 
 	 	<div id="Footer">
 			<div id="footer_row_1">
-					<div id="npr"><a target="_blank" href="http://www.npr.org/"><img width="60" height="20" border="0" src="/themes/CarTalk/design//npr.png"/></a></div>
+					<div id="npr"><a target="_blank" href="http://www.npr.org/"><img width="60" height="20" border="0" src="/themes/CarTalk/design/npr.png"/></a></div>
 
 					<div id="footer_row_1_links">
 						<a href="http://www.cartalk.com/menus/info.html">Actual Car Info</a> | 
@@ -297,6 +297,7 @@ google_ad_height = 90;
 						<a target="_blank" href="http://www.shamelesscommerce.com/">Shameless Commerce</a>   |
 						<a href="http://www.cartalk.com/menus/privacy.html">Privacy Policy</a> |
 						<a href="http://www.cartalk.com/disclaimer.html">Disclaimer</a> |
+                  <a href="http://www.cartalk.com/terms-of-service.html">Terms of Service</a> |
 						<a href="http://www.cartalk.com/index.html">Home</a>
 
 					</div>
@@ -313,7 +314,7 @@ google_ad_height = 90;
 						Car Talk's email newsletters are powered by <a target="_blank" href="http://e2ma.net/go/183688083/152308/4262355/goto:http://www.myemma.com">Emma</a>
 					</div>
 					
-					<div class="footer_copy">Cartalk.com is a production of Dewey, Cheetham and Howe. Contents &copy; 2009, Dewey, Cheetham and Howe.</div>
+					<div class="footer_copy">Cartalk.com is a production of Dewey, Cheetham and Howe. Contents &copy; 2011, Dewey, Cheetham and Howe.</div>
 
 					<div class="footer_copy">CAR TALK, DEWEY, CHEETHAM &amp; HOWE, SHAMELESS COMMERCE, and WARPED DISCS are registered trademarks, and CLICK AND CLACK is a trademark, of Tom and Ray Magliozzi and/or Tappet Brothers Associates d/b/a Dewey, Cheetham &amp; Howe.</div>
 				</div>
