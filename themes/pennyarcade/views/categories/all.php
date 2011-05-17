@@ -44,11 +44,11 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                <div class="Category '.$ReadClass.'">'.Gdn_Format::Text($Category->Name).'</div>
             </li>';
          } else {
-            $ModList = '';
-            foreach ($Category->Moderators as $Moderator) {
-               $Moderator = UserBuilder($Moderator);
-               $ModList .= UserPhoto($Moderator, 'Small');
-            }
+//            $ModList = '';
+//            foreach ($Category->Moderators as $Moderator) {
+//               $Moderator = UserBuilder($Moderator);
+//               $ModList .= UserPhoto($Moderator, 'Small');
+//            }
             $LastComment = UserBuilder($Category, 'LastComment');
             $CatList .= '<li class="Item Depth'.$Category->Depth.' Category-'.$Category->UrlCode.' '.$ReadClass.'">
                '.GetOptions($Category, $this).'
