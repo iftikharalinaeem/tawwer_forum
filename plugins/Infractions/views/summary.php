@@ -92,11 +92,11 @@ if (is_object($InfractionData)) {
          <li class="Item">
             <div class="ItemContent Infraction">
                <?php
-               echo '<h4 class="Title">';
+               echo '<div class="Title">';
                echo Gdn_Format::Text($Infraction->Reason);
                if ($Infraction->Note)
                   echo ': ', Gdn_Format::Text($Infraction->Note);
-               echo '</h4>';
+               echo '</div>';
 
                echo '<div class="Message">';
                if ($Infraction->ActivityID > 0) {
@@ -124,6 +124,11 @@ if (is_object($InfractionData)) {
                      }
                   ?></span>
                   <span class="InfractionPoints"><?php echo $Infraction->Warning == '1' ? 'Warning' : 'Points: '.number_format($Infraction->Points); ?></span>
+                  <?php
+                  if (Gdn::Session()->CheckPermission('Garden.Infractions.Manage') && !$Infraction->Reversed) {
+                     echo Anchor('Reverse', '/profile/reverseinfraction/'.$Infraction->InfractionID.'/'.Gdn::Session()->TransientKey(), array('class' => 'PopConfirm'));
+                  }
+                  ?>
                </div>
             </div>
          </li>

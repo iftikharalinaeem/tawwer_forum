@@ -30,32 +30,86 @@ class InfractionsPlugin extends Gdn_Plugin {
       // Only allow admins to assign infractions
       if (!Gdn::Session()->CheckPermission('Garden.Infractions.Manage')) return;
       
-      $Context = strtolower($Sender->EventArguments['Type']);
+      $Context = $Sender->EventArguments['Type'];
       $Url = "profile/assigninfraction/";
       $Url .= (is_object($Sender->EventArguments['Author']) ? $Sender->EventArguments['Author']->UserID : 0).'/';
       $Url .= $Sender->DiscussionID.'/';
-      if (GetValue('Type', $Sender->EventArguments) == 'Comment')
+      if ($Context == 'Comment')
          $Url .= $Sender->EventArguments['Comment']->CommentID.'/';
+			
+		$Text = T('Infraction');
+		$Style = '';
+		// If an infraction has been assigned, highlight it in the infraction anchor
+      $Object = GetValue($Context, $Sender->EventArguments);
+		$Attributes = unserialize(GetValue('Attributes', $Object));
+		$Infracted = GetValue('Infraction', $Attributes);
+		if ($Infracted) {
+			$Text = T('INFRACTED');
+			$Style = array('style' => 'background: #f44; color: #fff; padding: 0 4px;');
+		}
 
-      $Sender->Options .= '<span>'.Anchor(T('Infraction'), $Url, 'Infraction Popup') . '</span>';
+      $Sender->Options .= '<span>'.Anchor($Text, $Url, 'Infraction Popup', $Style) . '</span>';
    }
+	
+	/**
+	 * Create 'Infraction' link for activities.
+	 */
+	public function ActivityController_AfterMeta_Handler($Sender) {
+      // Only allow admins to assign infractions
+      if (!Gdn::Session()->CheckPermission('Garden.Infractions.Manage')) return;
+      
+		$Activity = GetValue('Activity', $Sender->EventArguments);
+      $Url = "profile/assigninfraction/";
+      $Url .= GetValue('InsertUserID', $Activity, '0').'/0/0/';
+      $Url .= GetValue('ActivityID', $Activity, '0').'/';
+			
+		$Text = T('Infraction');
+		$Style = '';
+		// If an infraction has been assigned, highlight it in the infraction anchor
+		$Attributes = unserialize(GetValue('Attributes', $Activity));
+		$Infracted = GetValue('Infraction', $Attributes);
+		if ($Infracted) {
+			$Text = T('INFRACTED');
+			$Style = array('style' => 'background: #f44; color: #fff; padding: 0 4px;');
+		}
+
+      echo Wrap(Anchor($Text, $Url, 'Infraction Popup', $Style));
+	}
    
    /**
     * Allow profile infractions.
     */
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
       $ViewingUserID = Gdn::Session()->UserID;
-      if ($ViewingUserID == $Sender->User->UserID) return;
+      if ($ViewingUserID == $Sender->User->UserID || !Gdn::Session()->CheckPermission('Garden.Infractions.Manage')) return;
       
       $SideMenu = $Sender->EventArguments['SideMenu'];
       $SideMenu->AddLink('Options', 'Infraction!', "/profile/assigninfraction/".$Sender->User->UserID,  'Garden.Infractions.Manage', array('class' => 'Infraction Popup'));
    }
    
+	/**
+	 * Allow Infractions to be Reversed.
+	 */
+   public function ProfileController_ReverseInfraction_Create($Sender) {
+      if (!Gdn::Session()->CheckPermission('Garden.Infractions.Manage')) return;
+		
+		$InfractionID = GetValue('0', $Sender->RequestArgs);
+		$Infraction = Gdn::SQL()->Select()->From('Infraction')->Where('InfractionID', $InfractionID)->Get()->FirstRow();
+		$TransientKey = GetValue('1', $Sender->RequestArgs);
+		if (Gdn::Session()->ValidateTransientKey($TransientKey) && $Infraction) {
+			Gdn::SQL()->Update('Infraction', array('Reversed' => '1'), array('InfractionID' => $InfractionID))->Put();
+			// Update the user's infraction cache
+			InfractionsPlugin::SetInfractionCache($Infraction->UserID);
+		}
+		Redirect('/profile/infractions/'.$Infraction->UserID.'/unfracted');
+	}
 
    /**
 	 * Form to assign infractions.
 	 */
    public function ProfileController_AssignInfraction_Create($Sender) {
+      if (!Gdn::Session()->CheckPermission('Garden.Infractions.Manage')) return;
+		
       $SQL = Gdn::SQL();
       $UserID = GetValue(0, $Sender->RequestArgs, '');
       $DiscussionID = GetValue(1, $Sender->RequestArgs, '');
@@ -320,15 +374,15 @@ class InfractionsPlugin extends Gdn_Plugin {
          // Is the account banned or jailed?
          if ($InfractionCache['Points'] >= 8) {
             $InfractionCache['Banned'] = TRUE;
-				Gdn::SQL()->Update('User', array('Banned' => '1'), array('UserID' => $UserID))->Put();
+				Gdn::SQL()->Update('User', array('Jailed' => '1', 'TempBanned' => '1', 'Banned' => '1'), array('UserID' => $UserID))->Put();
 			} else if ($InfractionCache['Points'] >= 6) {
             $InfractionCache['TempBanned'] = TRUE;
-				Gdn::SQL()->Update('User', array('TempBanned' => '1'), array('UserID' => $UserID))->Put();
+				Gdn::SQL()->Update('User', array('Jailed' => '1', 'TempBanned' => '1', 'Banned' => '0'), array('UserID' => $UserID))->Put();
          } else if ($InfractionCache['Points'] >= 4) {
             $InfractionCache['Jailed'] = TRUE;
-				Gdn::SQL()->Update('User', array('Jailed' => '1'), array('UserID' => $UserID))->Put();
+				Gdn::SQL()->Update('User', array('Jailed' => '1', 'TempBanned' => '0', 'Banned' => '0'), array('UserID' => $UserID))->Put();
          } else {
-				Gdn::SQL()->Update('User', array('Jailed' => '0', 'Banned' => '0', 'TempBanned' => '0'), array('UserID' => $UserID))->Put();
+				Gdn::SQL()->Update('User', array('Jailed' => '0', 'TempBanned' => '0', 'Banned' => '0'), array('UserID' => $UserID))->Put();
 			}
       }
       
@@ -373,6 +427,37 @@ class InfractionsPlugin extends Gdn_Plugin {
          $Sender->InformMessage($String, array('CssClass' => 'Dismissable HasSprite', 'DismissCallbackUrl' => 'profile/dismissinfractionmessage'));
       }
    }
+	
+	/**
+	 * Remove comment formatting from banned & jailed users.
+	 */
+	public function Base_BeforeCommentBody_Handler($Sender) {
+		$Object = $Sender->EventArguments['Object'];
+		if (
+			GetValue('InsertJailed', $Object) == '1'
+			|| GetValue('InsertBanned', $Object) == '1'
+			|| GetValue('InsertTempBanned', $Object) == '1'
+		) {
+			$Object->Format = 'Text';
+			$Sender->EventArguments['Object'] = $Object;
+		}
+	}
+	
+	/**
+	 * Switch the user's profile picture out if they are banned or jailed.
+	 */
+	public function ProfileController_Render_Before($Sender) {
+		if (is_object($Sender->User)) {
+			$Jailed = GetValue('Jailed', $Sender->User) == '1';
+			$TempBanned = GetValue('TempBanned', $Sender->User) == '1';
+			$Banned = GetValue('Banned', $Sender->User) == '1';
+			if ($Banned || $TempBanned) {
+				$Sender->User->Photo = Asset('themes/pennyarcade/design/images/banned-180.png', TRUE);
+			} else if ($Jailed) {
+				$Sender->User->Photo = Asset('themes/pennyarcade/design/images/jailed-180.png', TRUE);
+			}
+		}
+	}
    
    /**
     * Allow infraction inform messages to be dismissed.
@@ -419,7 +504,7 @@ class InfractionsPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Write out information about the infraction along with the first message.
+    * Write out information about the infraction along with the first message in an infraction conversation.
     */
    public function MessagesController_BeforeConversationMessageBody_Handler($Sender) {
       $Message = $Sender->EventArguments['Message'];
@@ -427,10 +512,83 @@ class InfractionsPlugin extends Gdn_Plugin {
          $FirstMessageDone = GetValue('FirstMessageDone', $Sender->EventArguments);
          $Sender->EventArguments['FirstMessageDone'] = TRUE;
          if (!$FirstMessageDone) {
-            echo Wrap('infraction DEETS', 'div');
+				$Infraction = Gdn::SQL()
+					->Select('i.*')
+					->Select('d.Body', '', 'DiscussionBody')
+					->Select('d.Name', '', 'DiscussionName')
+					->Select('c.Body', '', 'CommentBody')
+					->Select('a.Story', '', 'ActivityBody')
+					->From('Infraction i')
+					->Join('Comment c', 'i.CommentID = c.CommentID', 'left')
+					->Join('Activity a', 'i.ActivityID = a.ActivityID', 'left')
+					->Join('Discussion d', 'i.DiscussionID = d.DiscussionID', 'left')
+					->Where('i.InfractionID', $Message->InfractionID)
+					->Get()
+					->FirstRow();
+				if ($Infraction) {
+					echo '<div style="border: 1px solid #f00; background: #fdd; padding: 8px; margin: 0 0 10px;">
+						<h4>Infraction</h4>
+						<div><strong>';
+						$ProfileInfraction = FALSE;
+						if ($Infraction->CommentID > 0)
+							echo 'Comment Infraction:';
+						else if ($Infraction->DiscussionID > 0)
+							echo 'Discussion Infraction:';
+						else if ($Infraction->ActivityID > 0)
+							echo 'Activity Infraction:';
+						else {
+							$ProfileInfraction = TRUE;
+							echo 'Profile Infraction:';
+						}
+						echo '</strong> '.$Infraction->Note.'</div>';
+						if (!$ProfileInfraction) {
+							echo '<div><strong>Offending Content:</strong> ';
+							echo htmlentities($Infraction->DiscussionBody);
+							echo htmlentities($Infraction->CommentBody);
+							echo htmlentities($Infraction->ActivityBody);
+							echo '</div>';
+							$Anchor = '';
+							if ($Infraction->CommentID > 0)
+								$Anchor = '/discussion/comment/'.$Infraction->CommentID.'/#Comment_'.$Infraction->CommentID;
+							else if ($Infraction->DiscussionID > 0)
+								$Anchor = '/discussion/'.$Infraction->DiscussionID.'/'.Gdn_Format::Url($Infraction->DiscussionName);
+							else if ($Infraction->ActivityID > 0)
+								$Anchor = '/activity/item/'.$Infraction->ActivityID;
+							
+							if ($Anchor != '') {
+								$Anchor = Url($Anchor, TRUE);
+								echo Wrap(T('Source:'), 'strong').' '.Anchor($Anchor, $Anchor);
+							}
+						}
+					echo '</div>';
+						
+				}
+            // echo Wrap('infraction DEETS', 'div');
          }
       }
    }
+	
+   /**
+    * Identify Discussions that have resulted in an infraction.
+    */
+   public function DiscussionsController_DiscussionMeta_Handler($Sender) {
+      $Discussion = GetValue('Discussion', $Sender->EventArguments);
+		$Attributes = unserialize(GetValue('Attributes', $Discussion));
+		$Infraction = GetValue('Infraction', $Attributes);
+		if ($Infraction)
+			echo Wrap(Anchor('Infraction!', '/profile/infractions/'.$Discussion->FirstUserID.'/'.Gdn_Format::Url($Discussion->FirstName), array('style' => 'background: #f44; color: #fff; padding: 0 4px;')));
+   }
+	
+	/**
+	 * If a user has been banned or tempbanned, sign them out.
+	 */
+	public function UserModel_AfterGetSession_Handler($Sender) {
+		$User = GetValue('User', $Sender->EventArguments);
+		if (is_object($User) && GetValue('TempBanned', $User) == '1') {
+			$User->Banned = '1';
+			$UserModel->EventArguments['User'] = $User;
+		}
+	}
 
    public function Setup() {
       $this->Structure();
@@ -491,102 +649,82 @@ class InfractionsPlugin extends Gdn_Plugin {
    }
 	
 
-
-
-
-
-
-
-
-
-/* Do what the gravatar plugin does, and also add the & banned flags - so that we can change the user icons appropriately. */
+/* DOES NOT WORK WITH THE GRAVATAR PLUGIN ENABLED!
+Add the & banned flags - so that we can change the user icons appropriately. */
 	
    // Find all the places where UserBuilder is called, and make sure that there
    // is a related $UserPrefix.'Email' field pulled from the database.
-   public function AddonCommentModel_BeforeGet_Handler($Sender) {
-      $Sender->SQL->Select('iu.Email', '', 'InsertEmail')
-			->Select('iu.Jailed', '', 'InsertJailed')
-			->Select('iu.Banned', '', 'InsertBanned')
-			->Select('iu.TempBanned', '', 'InsertTempBanned');
-   }
    public function ConversationModel_BeforeGet_Handler($Sender) {
       $Sender->SQL->Select('lmu.Email', '', 'LastMessageEmail')
 			->Select('lmu.Jailed', '', 'LastMessageJailed')
 			->Select('lmu.TempBanned', '', 'LastMessageTempBanned')
 			->Select('lmu.TempBanned', '', 'LastMessageTempBanned');
    }
-   public function ConversationMessageModel_BeforeGet_Handler($Sender) {
-      $Sender->SQL->Select('c.InfractionID')
-			->Select('iu.Email', '', 'InsertEmail')
-			->Select('iu.Jailed', '', 'InsertJailed')
-			->Select('iu.Banned', '', 'InsertBanned')
-			->Select('iu.TempBanned', '', 'InsertTempBanned');
-   }
-   public function ActivityModel_BeforeGet_Handler($Sender) {
-      $Sender->SQL
-         ->Select('au.Email', '', 'ActivityEmail')
-			->Select('au.Jailed', '', 'ActivityJailed')
-			->Select('au.Banned', '', 'ActivityBanned')
-			->Select('au.TempBanned', '', 'ActivityTempBanned')
-         ->Select('ru.Email', '', 'RegardingEmail')
-			->Select('ru.Jailed', '', 'RegardingJailed')
-			->Select('ru.Banned', '', 'RegardingBanned')
-			->Select('ru.TempBanned', '', 'RegardingTempBanned');
-   }
-	public function ActivityModel_BeforeGetNotifications_Handler($Sender) {
-      $Sender->SQL
-         ->Select('au.Email', '', 'ActivityEmail')
-			->Select('au.Jailed', '', 'ActivityJailed')
-			->Select('au.Banned', '', 'ActivityBanned')
-			->Select('au.TempBanned', '', 'ActivityTempBanned')
-         ->Select('ru.Email', '', 'RegardingEmail')
-			->Select('ru.Jailed', '', 'RegardingJailed')
-			->Select('ru.Banned', '', 'RegardingBanned')
-			->Select('ru.TempBanned', '', 'RegardingTempBanned');
+	public function DiscussionModel_AfterDiscussionSummaryQuery_Handler($Sender) {
+		$this->_JoinInsertUser($Sender);
+		$Sender->SQL->Select('lcu.Email', '', 'LastEmail')
+			->Select('lcu.Jailed', '', 'LastJailed')
+			->Select('lcu.Banned', '', 'LastBanned')
+			->Select('lcu.TempBanned', '', 'LastTempBanned');
 	}
-   public function ActivityModel_BeforeGetComments_Handler($Sender) {
-      $Sender->SQL
-         ->Select('au.Email', '', 'ActivityEmail')
-			->Select('au.Jailed', '', 'ActivityJailed')
-			->Select('au.Banned', '', 'ActivityBanned')
-			->Select('au.TempBanned', '', 'ActivityTempBanned');
-   }
    public function UserModel_BeforeGetActiveUsers_Handler($Sender) {
       $Sender->SQL->Select('u.Email, u.Jailed, u.Banned, u.TempBanned');
    }
-	
+   public function AddonCommentModel_BeforeGet_Handler($Sender) {
+		$this->_JoinInsertUser($Sender);
+   }
+   public function ConversationMessageModel_BeforeGet_Handler($Sender) {
+      $Sender->SQL->Select('c.InfractionID');
+		$this->_JoinInsertUser($Sender);
+   }
+   public function ActivityModel_BeforeGet_Handler($Sender) {
+		$this->_JoinActivityUser($Sender);
+		$this->_JoinRegardingUser($Sender);
+   }
+	public function ActivityModel_BeforeGetNotifications_Handler($Sender) {
+		$this->_JoinActivityUser($Sender);
+		$this->_JoinRegardingUser($Sender);
+	}
+   public function ActivityModel_BeforeGetComments_Handler($Sender) {
+		$this->_JoinActivityUser($Sender);
+   }
 	public function DiscussionModel_BeforeGetID_Handler($Sender) {
-		$Sender->SQL->Select('iu.Email', '', 'InsertEmail')
+		$this->_JoinInsertUser($Sender);
+	}
+	
+   public function CommentModel_BeforeGet_Handler($Sender) {
+		$this->_JoinInsertUser($Sender);
+   }
+
+   public function CommentModel_BeforeGetNew_Handler($Sender) {
+		$this->_JoinInsertUser($Sender);
+   }
+	
+	public function CommentModel_BeforeGetIDData_Handler($Sender) {
+		$this->_JoinInsertUser($Sender);
+	}
+	
+	private function _JoinInsertUser($Sender) {
+      $Sender->SQL->Select('iu.Email', '', 'InsertEmail')
 			->Select('iu.Jailed', '', 'InsertJailed')
 			->Select('iu.Banned', '', 'InsertBanned')
 			->Select('iu.TempBanned', '', 'InsertTempBanned');
 		
 	}
-	
-	public function DiscussionModel_AfterDiscussionSummaryQuery_Handler($Sender) {
-		$Sender->SQL->Select('iu.Email', '', 'InsertEmail')
-			->Select('iu.Jailed', '', 'InsertJailed')
-			->Select('iu.Banned', '', 'InsertBanned')
-			->Select('iu.TempBanned', '', 'InsertTempBanned')
-			->Select('lcu.Email', '', 'LastEmail')
-			->Select('lcu.Jailed', '', 'LastJailed')
-			->Select('lcu.Banned', '', 'LastBanned')
-			->Select('lcu.TempBanned', '', 'LastTempBanned');
+	private function _JoinActivityUser($Sender) {
+      $Sender->SQL
+         ->Select('au.Email', '', 'ActivityEmail')
+			->Select('au.Jailed', '', 'ActivityJailed')
+			->Select('au.Banned', '', 'ActivityBanned')
+			->Select('au.TempBanned', '', 'ActivityTempBanned');
 	}
-	
-   public function CommentModel_BeforeGet_Handler($Sender) {
-      $Sender->SQL->Select('iu.Email', '', 'InsertEmail')
-			->Select('iu.Jailed', '', 'InsertJailed')
-			->Select('iu.Banned', '', 'InsertBanned')
-			->Select('iu.TempBanned', '', 'InsertTempBanned');
-   }
-
-   public function CommentModel_BeforeGetNew_Handler($Sender) {
-      $Sender->SQL->Select('iu.Email', '', 'InsertEmail')
-			->Select('iu.Jailed', '', 'InsertJailed')
-			->Select('iu.Banned', '', 'InsertBanned')
-			->Select('iu.TempBanned', '', 'InsertTempBanned');
-   }
+	private function _JoinRegardingUser($Sender) {
+      $Sender->SQL
+         ->Select('ru.Email', '', 'RegardingEmail')
+			->Select('ru.Jailed', '', 'RegardingJailed')
+			->Select('ru.Banned', '', 'RegardingBanned')
+			->Select('ru.TempBanned', '', 'RegardingTempBanned');
+	}
 
 }
 
@@ -609,12 +747,13 @@ if (!function_exists('UserBuilder')) {
       $User->Name = $Object->$Name;
       $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
       $Protocol =  (strlen(GetValue('HTTPS', $_SERVER, 'No')) != 'No' || GetValue('SERVER_PORT', $_SERVER) == 443) ? 'https://secure.' : 'http://www.';
-      if ($User->Photo == '' && property_exists($Object, $Email)) {
+/*      if ($User->Photo == '' && property_exists($Object, $Email)) {
          $User->Photo = $Protocol.'gravatar.com/avatar.php?'
             .'gravatar_id='.md5(strtolower($Object->$Email))
             .'&amp;default='.urlencode(Asset(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
             .'&amp;size='.Gdn::Config('Garden.Thumbnail.Width', 40);
       }
+*/
 		$User->Jailed = GetValue($Jailed, $Object);
 		$User->Banned = GetValue($Banned, $Object);
 		$User->TempBanned = GetValue($TempBanned, $Object);
