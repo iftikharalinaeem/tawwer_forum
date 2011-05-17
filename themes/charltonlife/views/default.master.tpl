@@ -51,6 +51,7 @@
   </div>
   <div id="Foot">
   <div>Powered by <a href="http://vanillaforums.org"><span>Vanilla</span></a></div>
+  {asset name="Foot"}
  </div>
 </body>
 </html>
