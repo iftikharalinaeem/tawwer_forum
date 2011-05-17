@@ -213,6 +213,10 @@ body.Profile ul.PanelInfo li a:hover,
    background-color: #eff2f7;
    text-decoration: none;
 }
+.MainMenu a.Bookmarked {
+	height: auto;
+	width: auto;
+}
 .MainMenu a.Bookmarked { background-position: 8px -1192px; }
 .MainMenu a.Mine { background-position: 8px -1225px; }
 .MainMenu a.Drafts { background-position: 9px -1257px; }
@@ -661,7 +665,7 @@ a.Bookmark,
 a.Bookmarking {
    float: none;
    position: absolute;
-   top: -2px;
+   top: -4px;
    right: 0;
    margin: 0;
    z-index: 110;
