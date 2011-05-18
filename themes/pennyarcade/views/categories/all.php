@@ -67,7 +67,7 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                               $CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
                               $Sender->CountCommentsPerPage = $CountCommentsPerPage;
                            }
-                           $CountPages = ceil($Category->LastDiscussionCountComments / $CountCommentsPerPage);
+                           $CountPages = ceil(GetValue('LastDiscussionCountComments', $Category, 1) / $CountCommentsPerPage);
                            $FirstPageUrl = '/discussion/'.$Category->LastDiscussionID.'/'.Gdn_Format::Url($Category->LastDiscussionName);
                            $LastPageUrl = $FirstPageUrl . '/p'.$CountPages.'/#Comment_'.$Category->LastCommentID;
                            $CatList .= UserPhoto($LastComment, 'PhotoLink');
