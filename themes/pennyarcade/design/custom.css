@@ -543,8 +543,13 @@ div.Tabs li a span {
    background: #003569;
    color: #A0F5FF;
 }
-ul.CategoryList li.Depth2,
-ul.CategoryListWithHeadings li.Depth2 {
+ul.CategoryList li.Depth2, ul.CategoryListWithHeadings li.Depth2,
+ul.CategoryList li.Depth3, ul.CategoryListWithHeadings li.Depth3,
+ul.CategoryList li.Depth4, ul.CategoryListWithHeadings li.Depth4,
+ul.CategoryList li.Depth5, ul.CategoryListWithHeadings li.Depth5,
+ul.CategoryList li.Depth6, ul.CategoryListWithHeadings li.Depth6,
+ul.CategoryList li.Depth7, ul.CategoryListWithHeadings li.Depth7,
+ul.CategoryList li.Depth8, ul.CategoryListWithHeadings li.Depth8 {
    padding-left: 0 !important;
 }
 .CategoryHeadings table,
@@ -561,13 +566,13 @@ ul.DataList.Discussions li.Item table td {
 	line-height: 1;
 	padding: 4px 0;
 }
-table.CategoryHeading td.Moderators,
-ul.DataList.CategoryList li.Item table td.Moderators {
-	width: 160px;
+table.CategoryHeading td.LatestPost,
+ul.DataList.CategoryList li.Item table td.LatestPost {
+	width: 260px;
 	text-align: left;
 }
-table.CategoryHeading td.Moderators {
-	width: 151px;
+table.CategoryHeading td.LatestPost {
+	width: 251px;
 }
 table.CategoryHeading td.Count,
 ul.DataList.CategoryList li.Item table td.Count,
@@ -641,6 +646,7 @@ ul.DataList.Discussions li.Item:nth-child(odd) td .Wrap {
 ul.DataList.Discussions li.Item table td.User a.PhotoLink {
 	line-height: 1;
 }
+ul.CategoryList li.Item a.PhotoLink img,
 ul.DataList.Discussions li.Item table td.User a.PhotoLink img {
 	float: left;
 	margin: 1px 5px 0 0;
@@ -1313,7 +1319,7 @@ div.CategoryDescription {
 	padding: 2px 0;
 }
 ul.DataList.CategoryList .ToggleFlyout {
-	right: 302px;
+	right: 402px;
 }
 ul.DataList.CategoryList a.Small,
 ul.DataList.CategoryList a.Small img {
@@ -1334,6 +1340,23 @@ ul.DataList.CategoryList a.Small img {
 ul.DataList.CategoryList a.Small {
 	margin: 0 2px 2px 0;
 }
+ul.CategoryList li.Item a.LatestPostTitle {
+	display: block;	
+	font-weight: bold;
+	font-size: 13px;
+	color: #032255;
+}
+ul.CategoryList li.Item a.UserLink,
+ul.CategoryList li.Item a.CommentDate {
+	color: #032255;
+	font-size: 11px;
+	line-height: 11px;
+}
+ul.CategoryList li.Item a.CommentDate {
+	color: #666666;
+	margin: 0 0 0 10px;
+}
+
 
 /* Panel Boxes */
 div.Box.Moderators,

@@ -85,7 +85,7 @@ class Gdn_Session extends Gdn_Pluggable {
       }
    }
 
-   protected $_Attributes;
+   protected $_Attributes = array();
    /**
     * Gets the currently authenticated user's attribute for the specified
     * $AttributeName.
@@ -108,9 +108,15 @@ class Gdn_Session extends Gdn_Pluggable {
     *
     * @return array
     */
-   public function GetPermissions() {
-      if ($this->_Permissions === NULL && $this->UserID == 0) {
-         $this->_Permissions = Gdn::UserModel()->DefinePermissions(0, FALSE);
+   public function GetPermissions($UserID = FALSE) {
+      if ($this->_Permissions === NULL) {
+         if (!is_object($this->User))
+            $this->_Permissions = Gdn::UserModel()->DefinePermissions($this->UserID, FALSE);
+         else {
+            $this->_Permissions = $this->User->Permissions;
+            if ($this->_Permissions === NULL)
+               $this->_Permissions = Gdn::UserModel()->DefinePermissions($this->UserID, FALSE);
+         }
       }
 
       return is_array($this->_Permissions) ? $this->_Permissions : array();
@@ -210,6 +216,49 @@ class Gdn_Session extends Gdn_Pluggable {
       }
 
       return $this->_SessionID;
+   }
+
+   /**
+    * Sets a value in the $this->_Attributes array. This setting will persist
+    * only to the end of the page load. It is not intended for making permanent
+    * changes to user attributes.
+    *
+    * @param string|array $Name
+    * @param mixed $Value
+    * @todo check argument type
+    */
+   public function SetAttribute($Name, $Value = '') {
+      if (!is_array($Name))
+         $Name = array($Name => $Value);
+
+      foreach($Name as $Key => $Val) {
+         $this->_Attributes[$Key] = $Val;
+      }
+   }
+
+   /**
+    * Sets a value in the $this->_Preferences array. This setting will persist
+    * changes to user prefs.
+    *
+    * @param string|array $Name
+    * @param mixed $Value
+    * @todo check argument type
+    */
+   public function SetPreference($Name, $Value = '', $SaveToDatabase = TRUE) {
+      if (!is_object($this->User))
+         return;
+
+      if (!is_array($Name))
+         $Name = array($Name => $Value);
+
+      foreach($Name as $Key => $Val) {
+         $this->User->Preferences[$Key] = $Val;
+      }
+
+      if ($SaveToDatabase && $this->UserID > 0) {
+         $UserModel = Gdn::UserModel();
+         $UserModel->SavePreference($this->UserID, $Name);
+      }
    }
 
 //   public static function SetCookie($CookieName, $KeyData, $CookieContents, $Expire, $Path = NULL, $Domain = NULL, $CookieHashMethod = NULL, $CookieSalt = NULL) {

@@ -5,14 +5,14 @@ $DoHeadings = C('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = C('Vanilla.Categories.MaxDisplayDepth');
 $ChildCategories = '';
 $this->EventArguments['NumRows'] = $this->CategoryData->NumRows();
-CategoryModel::JoinModerators($this->CategoryData);
+// CategoryModel::JoinModerators($this->CategoryData);
 
 ?>
 <div class="Tabs Headings CategoryHeadings">
    <table class="CategoryHeading">
       <tr>
          <td class="CategoryName">Forum</td>
-         <td class="Moderators">Moderators</td>
+         <td class="LatestPost">Latest Post</td>
          <td class="Count CountDiscussions">Threads</td>
          <td class="Count CountComments">Posts</td>
       </tr>
@@ -44,11 +44,6 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                <div class="Category '.$ReadClass.'">'.Gdn_Format::Text($Category->Name).'</div>
             </li>';
          } else {
-            $ModList = '';
-            foreach ($Category->Moderators as $Moderator) {
-               $Moderator = UserBuilder($Moderator);
-               $ModList .= UserPhoto($Moderator, 'Small');
-            }
             $LastComment = UserBuilder($Category, 'LastComment');
             $CatList .= '<li class="Item Depth'.$Category->Depth.' Category-'.$Category->UrlCode.' '.$ReadClass.'">
                '.GetOptions($Category, $this).'
@@ -62,9 +57,36 @@ echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeading
                      // has children, add a replacement string for them.
                      if ($MaxDisplayDepth > 0 && $Category->Depth == $MaxDisplayDepth - 1 && $Category->TreeRight - $Category->TreeLeft > 1)
                         $CatList .= '{ChildCategories}';
-                        
+                     
                      $CatList .= '</td>
-                     <td class="Moderators">'.$ModList.'</td>
+                     <td class="LatestPost">
+                        <div class="Wrap">';
+                        if ($LastComment && $Category->LastDiscussionName != '') {
+                           $CountCommentsPerPage = GetValue('CountCommentsPerPage', $Sender);
+                           if (!$CountCommentsPerPage) {
+                              $CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
+                              $Sender->CountCommentsPerPage = $CountCommentsPerPage;
+                           }
+                           $CountPages = ceil(GetValue('LastDiscussionCountComments', $Category, 1) / $CountCommentsPerPage);
+                           $FirstPageUrl = '/discussion/'.$Category->LastDiscussionID.'/'.Gdn_Format::Url($Category->LastDiscussionName);
+                           $LastPageUrl = $FirstPageUrl . '/p'.$CountPages.'/#Comment_'.$Category->LastCommentID;
+                           $CatList .= UserPhoto($LastComment, 'PhotoLink');
+                           $CatList .= Anchor(
+                              SliceString(Gdn_Format::Text($Category->LastDiscussionName), 100),
+                              $FirstPageUrl,
+                              'LatestPostTitle'
+                           );
+                           $CatList .= UserAnchor($LastComment, 'UserLink');
+                           $CatList .= Anchor(
+                              Gdn_Format::Date($Category->DateLastComment),
+                              $LastPageUrl,
+                              'CommentDate'
+                           );
+                        } else {
+                           $CatList .= '&nbsp;';
+                        }
+                        $CatList .= '</div>
+                     </td>
                      <td class="Count CountDiscussions"><div class="Wrap">'.Gdn_Format::BigNumber($Category->CountAllDiscussions).'</div></td>
                      <td class="Count CountComments">'.Gdn_Format::BigNumber($Category->CountAllComments).'</td>
                   </tr>

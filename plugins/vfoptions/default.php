@@ -470,7 +470,7 @@ pageTracker._trackPageview();
 		RemoveFromConfig('EnabledPlugins.vfoptions');
 		SaveToConfig('EnabledPlugins.vfoptions', 'vfoptions');
 
-		Redirect('/dashboard/settings');
+		Redirect('/dashboard/settings/gettingstarted');
    }
 
    /**

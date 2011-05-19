@@ -34,7 +34,8 @@ div.DownloadPanel {
    float: right;
 }
 div.RequirementBox,
-div.DownloadBox {
+div.DownloadBox,
+.AddonBox {
    background: #F6DAA8 !important;
    color: #744000 !important;
    border: none !important;
@@ -563,4 +564,12 @@ table.Data .Alt {
    background: #ff9;
    padding: 4px 8px;
 	border: 1px solid #eec;
+}
+
+.VersionsTable {
+   width: 100%;
+}
+
+.DateColumn {
+   text-align: right;
 }
