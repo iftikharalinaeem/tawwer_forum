@@ -16,7 +16,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
    
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
 		$Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Appearance', 'Custom Theme', 'settings/customtheme', 'Garden.Settings.GlobalPrivs');
+      $Menu->AddLink('Appearance', 'Custom Theme', 'settings/customtheme', 'Garden.Settings.Manage');
 	}
 
    public function Base_Render_Before(&$Sender) {		
@@ -143,7 +143,7 @@ jQuery(document).ready(function($) {
 		require_once(PATH_PLUGINS.DS.'CustomTheme'.DS.'kses.php');
 		$Session = Gdn::Session();
 		$UserModel = Gdn::UserModel();
-      $Sender->Permission('Garden.AdminUser.Only');
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Custom Html');
       $Sender->AddSideMenu('settings/customtheme');
       $Sender->Form = new Gdn_Form();
