@@ -3,7 +3,7 @@
 $ThemeInfo['spartacus'] = array(
    'Name' => 'Spartacus',
    'Description' => "Custom theme for Spartacus: The Game on Facebook",
-   'Version' => '1.0.3',
+   'Version' => '1.0.4',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca'
