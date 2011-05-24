@@ -477,16 +477,18 @@ pageTracker._trackPageview();
     * Don't let the users access the items under the "Add-ons" menu section of
     * the dashboard: applications & plugins (themes was moved to the "
     * Appearance" section.
+    * @param Gdn_Controller $Sender
     */
    public function SettingsController_Render_Before(&$Sender) {
       if (
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
       ) {
-			if (Debug())
-				$Sender->AddAsset('Content', '<span style="color: red; font-weight: bold;">REDIRECT</span>');
-			else
-				Redirect('/dashboard/home/permission');
+			if (Debug()) {
+				$Sender->InformMessage('You can see this page because the site is in debug mode.');
+            return;
+			} else
+				throw PermissionException();
 		}
       
       if ($Sender->RequestMethod == 'banner')
