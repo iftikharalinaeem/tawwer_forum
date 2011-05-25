@@ -5,7 +5,7 @@
  */
 $PluginInfo['TwitterFeeds'] = array(
 	'Name' =>		'Twitter Feeds',
-	'Description' => T('Allows Users to add their Twitter Feed to their Profile.'),
+	'Description' => 'Allows Users to add their Twitter Feed to their Profile.',
 	'Version' =>	'1.0',
 	'Author' =>		'Oliver Raduner',
 	'AuthorEmail' => 'vanilla@raduner.ch',

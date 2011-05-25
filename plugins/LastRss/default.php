@@ -5,7 +5,7 @@
  */
 $PluginInfo['LastRssPlugin'] = array(
 	'Name' 		=>	 'Last RSS for Vanilla',
-	'Description' => T('Lets you add the headlines of an RSS feed to your Activities page.'),
+	'Description' => 'Lets you add the headlines of an RSS feed to your Activities page.',
 	'Version' 	=>	 '1.1',
 	'Author' 	=>	 'Oliver Raduner',
 	'AuthorEmail' => 'vanilla@raduner.ch',
