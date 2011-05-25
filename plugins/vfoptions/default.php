@@ -65,7 +65,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       }
 	
 		$Menu->RemoveLink('Forum', T('Statistics'));
-		$Menu->AddLink('Forum', T('Statistics').$New, 'plugin/statistics', 'Garden.Settings.Manage');
+      $Menu->RemoveLink('Site Settings', T('Statistics'));
 
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Add-ons', T('Browse Addons').' <span class="New">New</span>', 'dashboard/settings/addons', 'Garden.Settings.Manage');
@@ -477,16 +477,18 @@ pageTracker._trackPageview();
     * Don't let the users access the items under the "Add-ons" menu section of
     * the dashboard: applications & plugins (themes was moved to the "
     * Appearance" section.
+    * @param Gdn_Controller $Sender
     */
    public function SettingsController_Render_Before(&$Sender) {
       if (
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
       ) {
-			if (Debug())
-				$Sender->AddAsset('Content', '<span style="color: red; font-weight: bold;">REDIRECT</span>');
-			else
-				Redirect('/dashboard/home/permission');
+			if (Debug()) {
+				$Sender->InformMessage('You can see this page because the site is in debug mode.');
+            return;
+			} else
+				throw PermissionException();
 		}
       
       if ($Sender->RequestMethod == 'banner')

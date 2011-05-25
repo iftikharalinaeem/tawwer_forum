@@ -11,12 +11,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * An associative array of information about this application.
  */
-$ThemeInfo['CarTalk'] = array(
-   'Name' => 'Car Talk',
-   'Description' => "Custom theme for Car Talk Forum",
-   'Version' => '1.2.1',
+$ThemeInfo['Balaboostas'] = array(
+   'Name' => 'Balaboostas',
+   'Description' => "Custom theme for Balaboostas",
+   'Version' => '1.0',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://brendanserashriar.com',
-   'Site' => 'cartalk.vanillaforums.com'
+   'AuthorUrl' => 'http://brendanserashriar.com'
 );

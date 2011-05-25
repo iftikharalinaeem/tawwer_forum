@@ -409,3 +409,11 @@ a.Close {
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
   width: auto;
 }
+
+.PrivacyTerms {
+   text-align: center;
+   text-shadow: 0 1px 1px #ffffff;
+}
+.PrivacyTerms a {
+   color: #333333;
+}

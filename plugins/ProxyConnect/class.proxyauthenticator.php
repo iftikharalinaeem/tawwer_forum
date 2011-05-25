@@ -113,7 +113,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          // We'll be tracked by Vanilla cookies now, so delete the Proxy cookie if it exists...
          $this->DeleteCookie();
          
-         // Log the user in
+         // Log the user in.
          $this->SetIdentity($Association['UserID'], FALSE);
          
          // Check for a request token that needs to be converted to an access token
@@ -130,6 +130,18 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
             }
                
             unset($Token);
+         }
+
+         // Sync the user's email and roles.
+         if (is_array($OptionalPayload) && count($OptionalPayload) > 0) {
+            if (isset($OptionalPayload['Email'])) {
+               Gdn::SQL()->Put('User', array('Email' => $OptionalPayload['Email']), array('UserID' => $Association['UserID']));
+            }
+            $Roles = GetValue('Roles', $OptionalPayload, FALSE);
+            if ($Roles) {
+               Gdn::UserModel()->SaveRoles($Association['UserID'], $Roles, FALSE);
+               Gdn::Session()->Start($Association['UserID'], TRUE);
+            }
          }
          
          $TokenType = 'access';
@@ -398,6 +410,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       // Get the contents of the Authentication Url (timeout 5 seconds);
       @session_write_close();
       $Response = ProxyRequest($ForeignIdentityUrl, 5);
+      
       if ($Response) {
       
          $ReadMode = strtolower(C("Garden.Authenticators.proxy.RemoteFormat", "ini"));
@@ -421,6 +434,10 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
                'UniqueID'     => ArrayValue('UniqueID', $Result),
                'TransientKey' => ArrayValue('TransientKey', $Result, NULL)
             );
+
+            if (isset($Result['Roles']))
+               $ReturnArray['Roles'] = $Result['Roles'];
+
             return $ReturnArray;
          }
       }
