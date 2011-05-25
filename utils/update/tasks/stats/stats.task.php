@@ -1,4 +1,13 @@
 <?php
+
+/**
+ * 
+ * Run per-forum SiteStats
+ * 
+ * This should be run regularly to gather hosting statistics.
+ * 
+ */
+
 class StatsTask extends Task {
 
    public function __construct($ClientDir) {

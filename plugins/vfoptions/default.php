@@ -65,7 +65,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       }
 	
 		$Menu->RemoveLink('Forum', T('Statistics'));
-		$Menu->AddLink('Forum', T('Statistics').$New, 'plugin/statistics', 'Garden.Settings.Manage');
+      $Menu->RemoveLink('Site Settings', T('Statistics'));
 
       $Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Add-ons', T('Browse Addons').' <span class="New">New</span>', 'dashboard/settings/addons', 'Garden.Settings.Manage');
