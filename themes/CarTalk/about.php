@@ -17,5 +17,6 @@ $ThemeInfo['CarTalk'] = array(
    'Version' => '1.2.1',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://brendanserashriar.com'
+   'AuthorUrl' => 'http://brendanserashriar.com',
+   'Site' => 'cartalk.vanillaforums.com'
 );

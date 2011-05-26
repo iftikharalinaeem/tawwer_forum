@@ -1,8 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
 
 class CarTalkThemeHooks extends Gdn_Plugin {
+   /**
+    * @param Gdn_Controller $Sender
+    * @param <type> $Args
+    */
    public function Base_Render_Before($Sender, $Args) {
-      $this->AddAssets();
+      $Controller = strtolower(StringEndsWith($Sender->ControllerName, 'Controller', TRUE, TRUE));
+
+      if (in_array($Controller, array('discussion', 'discussions', 'profile', 'categories', 'activity')))
+         $this->AddAssets();
    }
    public function DiscussionsController_Rules_Create($Sender, $Args) {
       $Sender->Render();
