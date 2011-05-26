@@ -14,7 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $ThemeInfo['BoyzForum'] = array(
    'Name' => 'BoyzForum',
    'Description' => "Custom forum for BoyzForum",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
    'AuthorUrl' => 'http://brendanserashriar.com'

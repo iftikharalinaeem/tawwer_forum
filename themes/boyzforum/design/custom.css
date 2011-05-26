@@ -348,3 +348,7 @@ body.Entry #Panel {
 	display: none;
 }
 
+blockquote {
+   background: #F7FAFF;
+   -moz-border-radius: 5px;
+}
