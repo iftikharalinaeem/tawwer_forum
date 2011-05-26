@@ -50,15 +50,15 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
 
          // Got a response from the remote identity provider, and loaded matching provider
          $AuthUniqueField = C('Garden.Authenticators.proxy.AuthField','UniqueID');
-         $UserUnique = ArrayValue($AuthUniqueField, $Response, NULL);
+         $UserUnique = GetValue($AuthUniqueField, $Response, NULL);
          if (is_null($UserUnique))
             throw new Exception("Selected AuthUniqueField ({$AuthUniqueField}) not found in Response.");
          
-         $UserEmail = ArrayValue('Email', $Response);
-         $UserName = ArrayValue('Name', $Response);
+         $UserEmail = GetValue('Email', $Response);
+         $UserName = GetValue('Name', $Response);
          $UserName = trim(preg_replace('/[^a-z0-9- ]+/i','',$UserName));
-         $TransientKey = ArrayValue('TransientKey', $Response, NULL);
-         $Roles = ArrayValue('Roles', $Response, NULL);
+         $TransientKey = GetValue('TransientKey', $Response, NULL);
+         $Roles = GetValue('Roles', $Response, NULL);
          
          // Validate remote credentials against local auth tables
          $AuthResponse = $this->ProcessAuthorizedRequest($Provider['AuthenticationKey'], $UserUnique, $UserName, $TransientKey, array(
@@ -107,8 +107,8 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
             return Gdn_Authenticator::AUTH_DENIED;
       }
       
+      // Retrieved an association which has been fully linked to a local user
       if ($Association['UserID'] > 0) {
-         // Retrieved an association which has been fully linked to a local user
       
          // We'll be tracked by Vanilla cookies now, so delete the Proxy cookie if it exists...
          $this->DeleteCookie();

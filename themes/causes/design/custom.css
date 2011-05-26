@@ -775,3 +775,46 @@ div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
    background: none;
 }
 */
+
+.nav {
+background:none;
+border:none;
+}
+
+.nav a.SignOut {
+margin-right:0;
+}
+
+.Title img {
+margin-top:10px;
+}
+
+.VanillaNav a {
+font-size:14px;
+padding:10px 8px;
+}
+
+.VanillaNav ul {
+padding:0 10px;
+}
+
+.VanillaNav a:hover {
+text-decoration:none;
+}
+
+#Foot div.FootWrapper {
+padding-top:195px;
+}
+
+body,h1,h2,h3,h4,h5,h6,input,textarea {
+font-family:Helvetica, Arial, sans-serif;
+}
+
+ul.Conversations div.Meta a.Name:hover,a:hover {
+text-decoration:underline;
+}
+
+div.MessageForm,#MessageForm,#DiscussionForm form,#ConversationForm form {
+background:#F3F3F3;
+border:1px solid #EEE;
+}
