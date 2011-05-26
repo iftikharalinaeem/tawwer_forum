@@ -14,12 +14,14 @@ div.Menu {
 	width: auto;
 	padding: 0 10px;
 }
-body.Profile #Panel,
 #Panel {
 	width: 200px;
 }
+body.Profile #Panel {
+   width: 250px;
+}
 body.Profile #Panel div.Photo img {
-	max-width: 200px;
+	max-width: 250px;
 }
 #Content {
 	width: auto;
@@ -29,7 +31,7 @@ body.Profile #Panel div.Photo img {
 body.Profile #Content {
 	width: auto;
 	float: none;
-	margin: 0 0 0 215px;
+	margin: 0 0 0 265px;
 }
 #Foot div {
 	width: auto;
