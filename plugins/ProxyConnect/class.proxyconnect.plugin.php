@@ -180,6 +180,8 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $Payload = $Authenticator->GetHandshake();
       
       if ($Payload !== FALSE) {
+         
+         // If Payload was some weird thing, fix it so we can read it safely
          if (!is_array($Payload))
                $Payload = array('Sync' => 'Failed');
 
@@ -199,7 +201,15 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       if ($RealUserID == -1) {
          // The cookie says we're banned from auto remote pinging in right now, but the user has specifically clicked
          // 'sign in', so first try to sign them in using their current cookies:
-         $Authenticator->Authenticate();
+         $AuthResponse = $Authenticator->Authenticate();
+         
+         // @TODO
+//         $UserInfo = array();
+//         $UserEventData = array_merge(array(
+//            'UserID'    => Gdn::Session()->UserID,
+//            'Payload'   => GetValue('HandshakeResponse', $Authenticator, FALSE)
+//         ),$UserInfo);
+//         Gdn::Authenticator()->Trigger($AuthResponse,$UserEventData);
          
          if (Gdn::Authenticator()->GetIdentity()) {
 
@@ -208,10 +218,15 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             
          } else {
             
+            // Partial. Send user to Handshake
+            if ($AuthResponse == Gdn_Authenticator::AUTH_PARTIAL) {
+               return Redirect(Url('/entry/handshake/proxy',TRUE),302);
+            }
+            
             // The user really isnt signed in. Delete their cookie and send them to the remote login page.
             $Authenticator->SetIdentity(NULL);
             $Authenticator->DeleteCookie();
-            Redirect($SigninURL,302);
+            return Redirect($SigninURL,302);
             
          }
       } else {
