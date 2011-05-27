@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
 <head>
   {asset name="Head"}
+  <link rel="shortcut icon" href="http://s0.causes.com/k/325b52f9858cf465c57e05c59a9c919e9b7e10ed/images/icons/causes.gif?1302568989" /> 
 </head>
 <body id="{$BodyID}" class="{$BodyClass}">
   <div id="Frame">
@@ -12,12 +13,8 @@
 			 <a href="http://apps.facebook.com/causes/">Home</a>
 			 <a href="http://apps.facebook.com/causes/causes">Causes</a>
 			 <a href="http://wishes.causes.com/?bws=causes_header">Wishes</a>
-			 <a href="http://causes.com/donate">Donate</a>
-		  </div>
-		  <div class="auth">
-			 <span>
+			 <a href="http://causes.com/donate">Give</a>
 	         {link path="signinout"}
-			 </span>
 		  </div>
 		</div>
 		<div class="VanillaNav">
@@ -37,12 +34,11 @@
 	 </div>
 	 <div id="Foot">
 		<div class="FootWrapper">
-		  <div id="vanilla_footer_links">
-			 <a href="{vanillaurl}"><span>Discussions by Vanilla</span></a>
-			 {link path="dashboard" text="Dashboard"}
-		  </div>
 		  <div id="site_footer_links">
-			 <div class="tagline">&copy; Causes 2010. Anyone can change the world.</div>
+			 <div class="tagline">
+                            &copy; Causes 2011
+                            <a href="{vanillaurl}">Discussions by Vanilla</a>
+                         </div>
 			 <a href="http://apps.facebook.com/causes/">Home</a>
 			 <a href="http://apps.facebook.com/causes/help">Help</a>
 			 <a href="/widgets">Widgets</a>
