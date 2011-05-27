@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProxyConnectWordpress'] = array(
    'Name' => 'Wordpress Integration',
    'Description' => 'This plugin tightens the integration between Wordpress and Vanilla when ProxyConnect is enabled.',
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.0.11'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -191,9 +191,9 @@ class ProxyConnectWordpressPlugin extends Gdn_Plugin {
       $this->ProxyConnect = $Sender;
             
       // Check that we should be handling this
-      if ($this->ProxyConnect->IntegrationManager != strtolower($this->GetPluginIndex()))
+      if (strtolower($this->ProxyConnect->IntegrationManager) != strtolower($this->GetPluginIndex()))
          return;
-   
+      
       $this->Controller = $Sender->Controller;
       $this->EnableSlicing($Sender->Controller);
 

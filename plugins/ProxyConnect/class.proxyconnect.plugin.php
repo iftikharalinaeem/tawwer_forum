@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['ProxyConnect'] = array(
 	'Name' => 'Vanilla Proxyconnect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
-   'Version' => '1.9.4',
+   'Version' => '1.9.7',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.17.9'),
    'RequiredTheme' => FALSE, 
@@ -28,6 +28,22 @@ $PluginInfo['ProxyConnect'] = array(
 
 Gdn_LibraryMap::SafeCache('library','class.proxyauthenticator.php',dirname(__FILE__).DS.'class.proxyauthenticator.php');
 class ProxyConnectPlugin extends Gdn_Plugin {
+   
+   public function __construct() {
+      parent::__construct();
+      
+      // 2.0.18+
+      // Ensure that when ProxyConnect is turned on, we always have its SearchPath indexed
+      try {
+         $ProxyConnectSearchPathName = 'ProxyConnect RIMs';
+         $CustomSearchPaths = Gdn::PluginManager()->SearchPaths(TRUE);
+
+         if (!in_array($ProxyConnectSearchPathName, $CustomSearchPaths)) {
+            $InternalPluginFolder = $this->GetResource('internal');
+            Gdn::PluginManager()->AddSearchPath($InternalPluginFolder, 'ProxyConnect RIMs');
+         }
+      } catch (Exception $e) {}
+   }
 
    public function SettingsController_ProxyConnect_Create($Sender, $EventArguments) {
       $Sender->Permission('Garden.Settings.Manage');
@@ -39,31 +55,36 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       // Load internal Integration Manager list
       $this->IntegrationManagers = array();
       $InternalPath = $this->GetResource('internal');
+      $IntegrationManagers = Gdn::PluginManager()->AvailablePluginFolders($InternalPath);
       $IntegrationList = array();
-      if ($FolderHandle = opendir($InternalPath)) {
-         // Loop through subfolders (ie. the actual plugin folders)
-         while ($FolderHandle !== FALSE && ($Item = readdir($FolderHandle)) !== FALSE) {
-            if (in_array($Item, array('.', '..')))
-               continue;
-            
-            $PluginPaths = SafeGlob($InternalPath . DS . $Item . DS . '*plugin.php');
-            $PluginPaths[] = $InternalPath . DS . $Item . DS . 'default.php';
-            
-            foreach ($PluginPaths as $i => $PluginFile) {
-               if (file_exists($PluginFile)) {
-                  
-                  $PluginInfo = Gdn::PluginManager()->ScanPluginFile($PluginFile);
-                  
-                  if (!is_null($PluginInfo)) {
-                     Gdn_LibraryMap::SafeCache('plugin',$PluginInfo['ClassName'],$PluginInfo['PluginFilePath']);
-                     $Index = strtolower($PluginInfo['Index']);
-                     $this->IntegrationManagers[$Index] = $PluginInfo;
-                  }
-               }
-            }
-         }
-         closedir($FolderHandle);
-      }
+      
+      foreach ($IntegrationManagers as $Integration)
+         $this->IntegrationManagers[$Integration] = Gdn::PluginManager()->GetPluginInfo($Integration);
+      
+//      if ($FolderHandle = opendir($InternalPath)) {
+//         // Loop through subfolders (ie. the actual plugin folders)
+//         while ($FolderHandle !== FALSE && ($Item = readdir($FolderHandle)) !== FALSE) {
+//            if (in_array($Item, array('.', '..')))
+//               continue;
+//            
+//            $PluginPaths = SafeGlob($InternalPath . DS . $Item . DS . '*plugin.php');
+//            $PluginPaths[] = $InternalPath . DS . $Item . DS . 'default.php';
+//            
+//            foreach ($PluginPaths as $i => $PluginFile) {
+//               if (file_exists($PluginFile)) {
+//                  
+//                  $PluginInfo = Gdn::PluginManager()->ScanPluginFile($PluginFile);
+//                  
+//                  if (!is_null($PluginInfo)) {
+//                     Gdn_LibraryMap::SafeCache('plugin',$PluginInfo['ClassName'],$PluginInfo['PluginFilePath']);
+//                     $Index = strtolower($PluginInfo['Index']);
+//                     $this->IntegrationManagers[$Index] = $PluginInfo;
+//                  }
+//               }
+//            }
+//         }
+//         closedir($FolderHandle);
+//      }
       
       $this->IntegrationManager = C('Plugin.ProxyConnect.IntegrationManager', NULL);
       if (is_null($this->IntegrationManager)) 
@@ -117,9 +138,10 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       
       $Manager = C('Plugin.ProxyConnect.IntegrationManager', FALSE);
       if ($Manager) {
-         $this->Controller = &$Sender;
-         $this->Controller->EnableSlicing($this->Controller);
+         $Sender->EnableSlicing($Sender);
+         $this->Controller = $Sender;
          $this->SubController = (sizeof($Sender->RequestArgs) > 2) ? $Sender->RequestArgs[2] : 'index';
+         
          $this->FireEvent('ConfigureIntegrationManager');
       }
 
@@ -127,12 +149,11 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    }
    
    protected function SetIntegrationManager($ManagerName) {
-      $Manager = $this->IntegrationManagers[$ManagerName];
+      $Manager = $this->GetIntegrationManager($ManagerName);
       $OldManager = C('Plugin.ProxyConnect.IntegrationManager', FALSE);
       
       if ($OldManager !== FALSE) {
-         $OldManagerData = $this->IntegrationManagers[$OldManager];
-
+         $OldManagerData = $this->GetIntegrationManager($OldManager);
          if (Gdn::PluginManager()->CheckPlugin($OldManagerData['Index'])) {
             Gdn::PluginManager()->DisablePlugin($OldManagerData['Index']);
          }
@@ -141,13 +162,26 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $AlreadyEnabled = Gdn::PluginManager()->CheckPlugin($Manager['Index']);
       if (!$AlreadyEnabled) {
          // 2.0.18+ vs 2.0.17.9-
-         if (version_compare(APPLICATION_VERSION, '2.0.17.9', ">"))
+         if (version_compare(APPLICATION_VERSION, '2.0.17.10', ">"))
             Gdn::PluginManager()->EnablePlugin($Manager['Index'], FALSE, TRUE);
          else
             Gdn::PluginManager()->EnablePlugin($Manager['ClassName'], FALSE, TRUE, 'ClassName');
       }
       SaveToConfig('Plugin.ProxyConnect.IntegrationManager', $ManagerName);
       $this->IntegrationManager = $ManagerName;
+   }
+   
+   protected function GetIntegrationManager($ManagerName) {
+      if (array_key_exists($ManagerName, $this->IntegrationManagers)) return GetValue($ManagerName, $this->IntegrationManagers);
+      
+      $LoweredList = array();
+      foreach ($this->IntegrationManagers as $MName => $MVal)
+         $LoweredList[strtolower ($MName)] = $MName;
+      
+      $ManagerName = strtolower($ManagerName);
+      $ManagerName = GetValue($ManagerName, $LoweredList, NULL);
+      
+      return GetValue($ManagerName, $this->IntegrationManagers, FALSE);
    }
    
    public function LoadProviderData($Sender) {
@@ -180,6 +214,8 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $Payload = $Authenticator->GetHandshake();
       
       if ($Payload !== FALSE) {
+         
+         // If Payload was some weird thing, fix it so we can read it safely
          if (!is_array($Payload))
                $Payload = array('Sync' => 'Failed');
 
@@ -199,7 +235,15 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       if ($RealUserID == -1) {
          // The cookie says we're banned from auto remote pinging in right now, but the user has specifically clicked
          // 'sign in', so first try to sign them in using their current cookies:
-         $Authenticator->Authenticate();
+         $AuthResponse = $Authenticator->Authenticate();
+         
+         // @TODO
+//         $UserInfo = array();
+//         $UserEventData = array_merge(array(
+//            'UserID'    => Gdn::Session()->UserID,
+//            'Payload'   => GetValue('HandshakeResponse', $Authenticator, FALSE)
+//         ),$UserInfo);
+//         Gdn::Authenticator()->Trigger($AuthResponse,$UserEventData);
          
          if (Gdn::Authenticator()->GetIdentity()) {
 
@@ -208,10 +252,15 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             
          } else {
             
+            // Partial. Send user to Handshake
+            if ($AuthResponse == Gdn_Authenticator::AUTH_PARTIAL) {
+               return Redirect(Url('/entry/handshake/proxy',TRUE),302);
+            }
+            
             // The user really isnt signed in. Delete their cookie and send them to the remote login page.
             $Authenticator->SetIdentity(NULL);
             $Authenticator->DeleteCookie();
-            Redirect($SigninURL,302);
+            return Redirect($SigninURL,302);
             
          }
       } else {
