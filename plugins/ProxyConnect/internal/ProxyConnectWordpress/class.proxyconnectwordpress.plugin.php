@@ -191,9 +191,9 @@ class ProxyConnectWordpressPlugin extends Gdn_Plugin {
       $this->ProxyConnect = $Sender;
             
       // Check that we should be handling this
-      if ($this->ProxyConnect->IntegrationManager != strtolower($this->GetPluginIndex()))
+      if (strtolower($this->ProxyConnect->IntegrationManager) != strtolower($this->GetPluginIndex()))
          return;
-   
+      
       $this->Controller = $Sender->Controller;
       $this->EnableSlicing($Sender->Controller);
 
