@@ -63,7 +63,7 @@ a:hover{
 
 div.Popup h1,
 div.Popup h2 {
-	background: #3b5998;
+	background: #079ADA;
 	border: none;
 }
 .Banner {
@@ -137,10 +137,10 @@ body.Profile div.SearchBox {
 body.Profile #Content {
 	float:none;
 	width: auto;
-	margin: 0 10px 0 280px;
+	margin: 10px 10px 0 280px;
 }
 body.Profile #Panel {
-	margin: 0 0 0 10px;
+	margin: 10px 0 0 10px;
 }
 form.Activity textarea {
 	width:99%;
@@ -298,6 +298,17 @@ body.add #Content {
 	background: #e7f7fe;
 }
 
+ul.Activities ul.DataList li {
+    background: #DBEAF4;
+
+}
+
+#Status {
+    background: #fff;
+    margin-bottom: 10px;
+
+}
+
 /* Panel Boxes */
 div.Box {
 	border-radius: 0;
@@ -321,7 +332,7 @@ ul.PanelInfo li.Active {
 	border-bottom: 1px solid #ccc;
 }
 ul.PanelInfo li.Active {
-	background: #ffd;
+	background: #F9EFF2;
 }
 body.Profile ul.PanelInfo {
 	border: none;
@@ -341,7 +352,7 @@ body.Profile ul.PanelInfo li a:hover {
 
 /* Sign In Page */
 body.Entry #Content div.Box {
-	background: #efefef;
+	background: #079ADA;
 }
 body.Entry #Panel {
 	display: none;
