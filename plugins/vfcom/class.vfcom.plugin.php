@@ -122,7 +122,44 @@ class VfcomPlugin extends Gdn_Plugin {
             $Incremented = Gdn::Cache()->IncrementRevision();
             $Sender->InformMessage("The cache revision has been incremented.");
          }
+         
+         if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleCaching", FALSE) !== FALSE) {
+            $NewCachingMode = !Gdn::Cache()->ActiveEnabled();
+            SaveToConfig('Garden.Cache.Enabled',$NewCachingMode);
+            $Sender->InformMessage(sprintf("Caching mode has been turned %s.",(($NewCachingMode) ? 'on': 'off')));
+         }
+         
+         if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleDebugMode", FALSE) !== FALSE) {
+            $NewDebugMode = !C('Garden.Debug', FALSE);
+            SaveToConfig('Garden.Debug',$NewDebugMode);
+            $Sender->InformMessage(sprintf("Debug mode has been turned %s.",(($NewDebugMode) ? 'on': 'off')));
+         }
+         
+         if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleVFOptions", FALSE) !== FALSE) {
+            $NewVFOptions = !Gdn::PluginManager()->CheckPlugin('vfoptions');
+            if ($NewVFOptions)
+               Gdn::PluginManager()->EnablePlugin('vfoptions', FALSE, TRUE);
+            else
+               Gdn::PluginManager()->DisablePlugin('vfoptions');
+            
+            $Sender->InformMessage(sprintf("VF Options has been turned %s.",(($NewVFOptions) ? 'on': 'off')));
+         }
+         
+         if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleVFSpoof", FALSE) !== FALSE) {
+            $NewVFSpoof = !Gdn::PluginManager()->CheckPlugin('vfspoof');
+            if ($NewVFSpoof)
+               Gdn::PluginManager()->EnablePlugin('vfspoof', FALSE, TRUE);
+            else
+               Gdn::PluginManager()->DisablePlugin('vfspoof');
+            
+            $Sender->InformMessage(sprintf("VF Spoof has been turned %s.",(($NewVFSpoof) ? 'on': 'off')));
+         }
       }
+      
+      $Sender->SetData('Caching', Gdn::Cache()->ActiveEnabled());
+      $Sender->SetData('DebugMode', C('Garden.Debug', FALSE));
+      $Sender->SetData('VFOptions', Gdn::PluginManager()->CheckPlugin('vfoptions'));
+      $Sender->SetData('VFSpoof', Gdn::PluginManager()->CheckPlugin('vfspoof'));
       
       $Sender->Render('settings','','plugins/vfcom');
    }

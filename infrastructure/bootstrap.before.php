@@ -37,6 +37,8 @@ do {
       if (is_dir($UserUploadsDir)) define('PATH_LOCAL_UPLOADS', $UserUploadsDir);
 
       define('FORCE_CACHE_PREFIX', $ClientFolderName);
+      define('CLIENT_NAME', $ClientFolderName);
+      
       $Matched = TRUE;
       break;
    }

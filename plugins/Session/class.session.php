@@ -326,6 +326,26 @@ class Gdn_Session extends Gdn_Pluggable {
       }
    }
 
+   /**
+	 * Place a name/value pair into the user's session stash.
+	 */
+	public function Stash($Name = '', $Value = NULL, $UnsetOnRetrieve = TRUE) {
+		if ($Name == '')
+			return;
+
+      if ($Value === NULL) {
+         $Result = $this->GetAttribute($Name);
+         if ($UnsetOnRetrieve) {
+            $this->SetAttribute($Name, NULL);
+         }
+      } else {
+         $this->SetAttribute($Name, $Value);
+         $Result = $Value;
+      }
+
+      return $Result;
+	}
+
    protected $_TransientKey;
    /**
     * Returns the transient key for the authenticated user.

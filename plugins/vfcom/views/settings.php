@@ -38,7 +38,7 @@
       if ($HasLocalPluginCache)
          echo $this->Form->Button("Clear local plugin cache", array('Name' => 'Plugin_vfcom_ClearLocalCache'));
    ?>
-
+   
    <h3><?php echo T("Cache Revision"); ?></h3>
    <div class="Info">
       <?php echo T("The cache revision is appended to the installation prefix. Incrementing the revision number causes the full cache prefix to change, thereby invalidating all installation-specific cache entries, including the local config file cache."); ?>
@@ -56,6 +56,57 @@
    <?php
       echo $this->Form->Button("Increment cache revision", array('Name' => 'Plugin_vfcom_IncrementCacheRevision'));
    ?>
+   
+   <h3><?php echo T("Client Settings"); ?></h3>
+   <div class="Info">
+      <?php echo T("Control client-specific config settings. Debug mode, vfoptions, spoofing, etc..."); ?>
+   </div>
+   
+   <table id="ReportingTable" border="0" cellpadding="0" cellspacing="0" class="AltColumns">
+      <thead>
+         <tr>
+            <th><?php echo T('Feature'); ?></th>
+            <th class="Alt"><?php echo T('Description'); ?></th>
+         </tr>
+      </thead>
+
+      <?php
+         $Settings = array(
+            "Debug Mode"   => "Detailed error reporting. Turns on/off the in-depth error page for Bonks.",
+            "VF Options"   => "VF.com admin options.",
+            "VF Spoof"     => "Allows Vanilla employees to gain access to hosted forums by logging in with a vf.com administrative user."
+         );
+      ?>
+
+      <tbody>
+         <?php
+            $Alt = FALSE;
+            foreach ($Settings as $SettingKey => $SettingDescription) {
+               $Alt = !$Alt;
+               $ShortSettingKey = str_replace(' ', '', $SettingKey);
+               $SettingEnabled = $this->Data($ShortSettingKey);
+         ?>
+         <tr <?php echo ($Alt ? 'class="Alt"' : ''); ?>>
+            <td class="Info nowrap"><?php echo $SettingKey; ?>
+               <div>
+               <strong><?php echo $SettingEnabled ? 'Enabled' : 'Disabled'; ?></strong>
+               <?php
+                  $ButtonAction = $SettingEnabled ? 'disable': 'enable';
+                  echo $this->Form->Button(ucfirst($ButtonAction), array(
+                     'Name'   => "Plugin_vfcom_Toggle{$ShortSettingKey}",
+                     'Class'  => 'SmallButton'
+                  ));
+               ?>
+               </div>
+            </td>
+            <td class="Alt"><?php echo Gdn_Format::Text($SettingDescription); ?></td>
+         </tr>
+         <?php
+            }
+         ?>
+      </tbody>
+   </table>
+   
    <?php
       echo $this->Form->Close();
    ?>
