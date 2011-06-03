@@ -12,12 +12,12 @@
 }
 
 body{
-	background: #FCEBF8;
+	background: #FEE0F8/*FCEBF8*/;
 	color: #555555;
 	font-family: trebuchet MS;
 }
 a, a:link, a:visited, a:active {
-    color: #1A717B;
+    color: #9FC7C6;
     text-decoration: none;
 }
 a:hover{
@@ -44,7 +44,7 @@ a.Close {
     color: #C83482;
 }
 a.Close:hover{
-	color: #1A717B;
+	color: #9FC7C6;
 }
 h1, h2, h3, h4, h5{
    font-family: Buda, Trebuchet MS, Tahoma, sans-serif;
@@ -92,7 +92,7 @@ div.Popup #ConversationForm h2 {
 	font-family: 'Buda';
 	font-variant: small-caps;
 	font-size: 18px;
-	color: #1A717B;
+	color: #9FC7C6;
 	display: inline-block;
 	font-weight: bold;
 }
@@ -126,7 +126,7 @@ div.Popup #ConversationForm h2 {
 #Panel {
 	float: right;
 	font-family: verdana;
-	margin-top: -6px;
+	margin-top: 24px;
 }
 #Panel div.SearchBox input.InputBox {
 	width: 200px;
@@ -218,7 +218,7 @@ div.Tabs li a:visited {
    -moz-border-radius: 0;
    -webkit-border-radius: 0;
    background: none;
-   color: #1A717B;
+   color: #9FC7C6;
    text-decoration: none;
    padding: 8px 10px;
 	line-height: 11px;
@@ -386,7 +386,7 @@ div.Box {
 	padding: 7px;
 }
 div.Box h4 {
-	color: #1A717B;
+	color: #9FC7C6;
 	font-size: 18px;
    font-weight: normal;
    margin-left: -7px;

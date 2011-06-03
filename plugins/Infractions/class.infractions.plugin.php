@@ -622,7 +622,7 @@ class InfractionsPlugin extends Gdn_Plugin {
       // Relate an infraction to a private conversation that the admin & affected user take part in
       $Structure
          ->Table('Conversation')
-         ->Column('InfractionID', 'int(11)', FALSE)
+         ->Column('InfractionID', 'int(11)', NULL)
          ->Set(FALSE, FALSE);
 
       // Allow a user to be "Jailed" when they reach a certain number of infractions.

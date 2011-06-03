@@ -19,7 +19,7 @@ a:hover {
    color: #744000;
    font-size: 130%;
    font-weight: bold;
-	border-bottom: 1px solid #EED3A2;
+/*	border-bottom: 1px solid #EED3A2;*/
 	padding: 0;
 	margin-bottom: 4px;
 }
@@ -29,7 +29,6 @@ a:hover {
 }
 #Content h3 {
    font-size: 100%;
-   margin: 20px 0 4px;
 }
 #Content h4 {
    font-size: 90%;
@@ -474,10 +473,8 @@ div.Feed a:hover {
 
 /* Foot */
 div.Foot {
-	padding: 45px 0 0;
 	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
 	font-size: 12px;
-	text-align: center;
 	clear: both;
 }
 div.Foot div.Center {
@@ -1307,3 +1304,27 @@ body.Pages div#Foot {
    padding: 2px 15px 10px;
 }
 
+.QnA-Tag-Question {
+   background-color: #2A529A;
+}
+
+.QnA-Tag-Answered {
+   background-color: #d00;;
+}
+
+.QnA-Tag-Accepted {
+   background-color: #50C04C;
+}
+
+.QnA-Accepted {
+   background: url('check.png') no-repeat;
+   display: block;
+   height: 45px;
+   position: absolute;
+   left: -62px;
+   top: 10px;
+   width: 57px;
+   white-space: nowrap;
+   overflow: hidden;
+   text-indent: -1000px;
+}
