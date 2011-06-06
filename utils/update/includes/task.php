@@ -133,7 +133,6 @@ abstract class Task {
    }
    
    protected function PrivilegedExec($RelativeURL) {
-      TaskList::Event("Executing '{$RelativeURL}' as administrator...");
       try {
          $Token = $this->TokenAuthentication();
          if ($Token === FALSE) throw new Exception("could not generate token");
@@ -143,6 +142,7 @@ abstract class Task {
       } catch (Exception $e) {
          $Result = 'msg: '.$e->getMessage();
       }
+      return $Result;
    }
    
    protected function Request($RelativeURL, $QueryParams = array(), $Absolute = FALSE) {
