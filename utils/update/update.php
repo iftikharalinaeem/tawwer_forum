@@ -26,6 +26,7 @@ $Tasks->Run($RunMode, array(
    'global/offline',
    'global/uncache',
    'maintain/filesystem',
+   'maintain/plugins',
    'maintain/utilityupdate',
    'global/online'
 ));
