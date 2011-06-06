@@ -29,12 +29,17 @@ class UtilityUpdateTask extends Task {
       if (!LAME) {
          $UtilityUpdate = FALSE;
          try {
-            $UtilityUpdate = $this->PrivilegedExec('utility/update');
+            $UtilityUpdate = $this->PrivilegedExec('utility/update.json');
          } catch (Exception $e) {}
          
-         if ($UtilityUpdate == 'Success') {
-            TaskList::Event('success');
-            return;
+         
+         $JsonResponse = @json_decode($UtilityUpdate);
+         
+         if ($JsonResponse !== FALSE) {
+            if (GetValue('Success', $JsonResponse, FALSE) === TRUE) {
+               TaskList::Event('success');
+               return;
+            }
          }
          
          print_r($UtilityUpdate);
