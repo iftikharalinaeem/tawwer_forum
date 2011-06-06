@@ -19,7 +19,7 @@ class UtilityUpdateTask extends Task {
       //if ($this->Cache('Updated') !== TRUE) return;
       
       if (TaskList::Cautious()) {
-         $Proceed = TaskList::Question("Really run utility/update for {$this->ClientFolder}?","Run update?",array('yes','no','exit'),'no');
+         $Proceed = TaskList::Question("Really run utility/update for {$this->ClientFolder}?","Run update?",array('yes','no','exit'),'yes');
          if ($Proceed == 'no') return;
          if ($Proceed == 'exit') exit();
       }
