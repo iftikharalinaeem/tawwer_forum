@@ -59,7 +59,7 @@ class FilesystemTask extends Task {
    
    protected function Run() {
       if (TaskList::Cautious()) {
-         $Proceed = TaskList::Question("Really apply symlinks for {$this->ClientFolder}?","Apply symlinks?",array('yes','no','exit'),'no');
+         $Proceed = TaskList::Question("Really apply symlinks for {$this->ClientFolder}?","Apply symlinks?",array('yes','no','exit'),'yes');
          if ($Proceed == 'no') return;
          if ($Proceed == 'exit') exit();
       }

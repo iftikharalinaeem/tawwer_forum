@@ -7,7 +7,7 @@ class UtilityUpdateTask extends Task {
       
       $this->Utility = FALSE;
       
-      $Proceed = TaskList::Question("Run utility/update as part of this update?","Run utility/update?",array('yes','no'),'no');
+      $Proceed = TaskList::Question("Run utility/update as part of this update?","Run utility/update?",array('yes','no'),'yes');
       if ($Proceed == 'no') return;
       $this->Utility = TRUE;
    }

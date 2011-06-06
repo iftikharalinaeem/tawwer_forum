@@ -10,7 +10,7 @@ class PluginsTask extends Task {
    
    public function Init($RootPath = NULL) {
    
-      $ReallyRun = TaskList::Question("Run all default plugin enable commands?", "Enable default plugins", array('yes','no','exit'), 'no');
+      $ReallyRun = TaskList::Question("Run all default plugin enable commands?", "Enable default plugins", array('yes','no','exit'), 'yes');
       if ($ReallyRun == 'no') return;
       if ($ReallyRun == 'exit') exit();
       
@@ -21,28 +21,29 @@ class PluginsTask extends Task {
       if ($this->ReallyRun !== TRUE) return;
       
       if (TaskList::Cautious()) {
-         $Proceed = TaskList::Question("Really run default plugin enable commands for {$this->ClientFolder}?","Enable default plugins?",array('yes','no','exit'),'no');
+         $Proceed = TaskList::Question("Really run default plugin enable commands for {$this->ClientFolder}?","Enable default plugins?",array('yes','no','exit'),'yes');
          if ($Proceed == 'no') return;
          if ($Proceed == 'exit') exit();
       }
       
       // Enable plugins
-      $this->SaveToConfig('EnabledPlugins.HtmLawed','HtmLawed');
-      $this->SaveToConfig('EnabledPlugins.GettingStartedHosting','GettingStartedHosting');
-      $this->SaveToConfig('EnabledPlugins.CustomTheme','CustomTheme');
-      $this->SaveToConfig('EnabledPlugins.Gravatar','Gravatar');
-      $this->SaveToConfig('EnabledPlugins.embedvanilla','embedvanilla');
-      $this->SaveToConfig('EnabledPlugins.Facebook','Facebook');
-      $this->SaveToConfig('EnabledPlugins.Twitter','Twitter');
-      $this->SaveToConfig('EnabledPlugins.GoogleSignIn','GoogleSignIn');
-      $this->SaveToConfig('EnabledPlugins.OpenID','OpenID');
+      $this->SaveToConfig('EnabledPlugins.HtmLawed', TRUE);
+      $this->SaveToConfig('EnabledPlugins.GettingStartedHosting', TRUE);
+      $this->SaveToConfig('EnabledPlugins.CustomTheme', TRUE);
+      $this->SaveToConfig('EnabledPlugins.Gravatar', TRUE);
+      $this->SaveToConfig('EnabledPlugins.embedvanilla', TRUE);
+      $this->SaveToConfig('EnabledPlugins.Facebook', TRUE);
+      $this->SaveToConfig('EnabledPlugins.Twitter', TRUE);
+      $this->SaveToConfig('EnabledPlugins.GoogleSignIn', TRUE);
+      $this->SaveToConfig('EnabledPlugins.OpenID', TRUE);
+      $this->SaveToConfig('EnabledPlugins.vfspoof', TRUE);
                   
       // Politely enable plugins with structures
       $this->EnablePlugin('Statistics');
       
       // We do this to ensure that vfoptions goes to the end. Dirty hacks ;)
       $this->RemoveFromConfig('EnabledPlugins.vfoptions');
-      $this->SaveToConfig('EnabledPlugins.vfoptions','vfoptions');
+      $this->SaveToConfig('EnabledPlugins.vfoptions', TRUE);
 
    }
 
