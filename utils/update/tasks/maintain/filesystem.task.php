@@ -10,6 +10,7 @@ class FilesystemTask extends Task {
       $this->RootPath = FALSE;
       $this->VanillaPath = FALSE;
       $this->MiscPath = FALSE;
+      $this->AddonsPath = FALSE;
       $this->PluginPath = FALSE;
       $this->ThemePath = FALSE;
    }
@@ -31,6 +32,8 @@ class FilesystemTask extends Task {
          
             $this->VanillaPath = TaskList::CombinePaths($SourceCodePath,'vanilla');
             $this->MiscPath = TaskList::CombinePaths($SourceCodePath,'misc');
+            $this->AddonsPath = TaskList::CombinePaths($SourceCodePath,'addons');
+            
             $this->PluginPath = TaskList::CombinePaths($this->MiscPath, 'plugins');
             $this->ThemePath = TaskList::CombinePaths($this->MiscPath, 'themes');
          }
@@ -40,6 +43,7 @@ class FilesystemTask extends Task {
       
          $VanillaPath = TaskList::CombinePaths($this->RootPath, 'vanilla');
          $MiscPath = TaskList::CombinePaths($this->RootPath, 'misc');
+         $AddonsPath = TaskList::CombinePaths($this->RootPath, 'addons');
          
          if (is_dir($VanillaPath))
             $this->VanillaPath = $VanillaPath;
@@ -48,6 +52,10 @@ class FilesystemTask extends Task {
             $this->MiscPath = $MiscPath;
             $this->PluginPath = TaskList::CombinePaths($this->MiscPath, 'plugins');
             $this->ThemePath = TaskList::CombinePaths($this->MiscPath, 'themes');
+         }
+         
+         if (is_dir($AddonsPath)) {
+            $this->AddonsPath = $AddonsPath;
          }
       }
       
@@ -115,7 +123,6 @@ class FilesystemTask extends Task {
          // Symlink all misc feature plugins
          $this->Symlink('plugins/VanillaConnect', TaskList::CombinePaths($this->PluginPath,'VanillaConnect'));
          $this->Symlink('plugins/ProxyConnect', TaskList::CombinePaths($this->PluginPath,'ProxyConnect'));
-         $this->Symlink('plugins/FileUpload', TaskList::CombinePaths($this->PluginPath,'FileUpload'));
          $this->Symlink('plugins/CustomDomain', TaskList::CombinePaths($this->PluginPath,'CustomDomain'));
          $this->Symlink('plugins/CustomTheme', TaskList::CombinePaths($this->PluginPath,'CustomTheme'));
          $this->Symlink('plugins/googleadsense', TaskList::CombinePaths($this->PluginPath,'googleadsense'));
@@ -123,6 +130,10 @@ class FilesystemTask extends Task {
          $this->Symlink('plugins/PrivateCommunity', TaskList::CombinePaths($this->PluginPath,'PrivateCommunity'));
          $this->Symlink('plugins/vfspoof', TaskList::CombinePaths($this->PluginPath,'vfspoof'));
          $this->Symlink('plugins/vfoptions', TaskList::CombinePaths($this->PluginPath,'vfoptions'));
+      }
+      
+      if ($this->AddonsPath !== FALSE) {
+         $this->Symlink('plugins/FileUpload', TaskList::CombinePaths($this->PluginPath,'FileUpload'));
       }
       
       if ($this->ThemePath !== FALSE) {

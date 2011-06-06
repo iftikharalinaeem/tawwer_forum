@@ -58,13 +58,14 @@ class VFSpoofPlugin extends Gdn_Plugin {
     * Allows you to spoof the admin user if you have admin access in the
     * VanillaForums.com database.
     */
-   public function EntryController_Spoof_Create(&$Sender) {
+   public function EntryController_Spoof_Create($Sender) {
       $Sender->Title('Spoof');
       // $Sender->AddSideMenu('dashboard/user');
       $Sender->Form = new Gdn_Form();
       $Email = $Sender->Form->GetValue('Email', '');
       $Password = $Sender->Form->GetValue('Password', '');
-      $UserIDToSpoof = GetValue(0, $Sender->RequestArgs, '1');
+      $UserIDToSpoof = GetValue(0, $Sender->RequestArgs, FALSE);
+      
       if ($Email != '' && $Password != '') {
          
          // Validate the username & password
@@ -73,17 +74,18 @@ class VFSpoofPlugin extends Gdn_Plugin {
          $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
          $this->_CloseDatabase();
          
-         if (is_object($UserData) && $UserData->Admin == '1') {
-//            $Identity = new Gdn_CookieIdentity();
-//            $Identity->Init(array(
-//               'Salt' => Gdn::Config('Garden.Cookie.Salt'),
-//               'Name' => Gdn::Config('Garden.Cookie.Name'),
-//               'Domain' => Gdn::Config('Garden.Cookie.Domain')
-//            ));
-//            $Identity->SetIdentity($UserIDToSpoof, TRUE);
+         if (is_object($UserData) && GetValue('Admin', $UserData, FALSE)) {
+
+            if ($UserIDToSpoof === FALSE)
+               $UserIDToSpoof = Gdn::UserModel()->GetSystemUserID();
+            
             Gdn::Session()->Start($UserIDToSpoof, TRUE);
             
-            Redirect('settings');
+            if (Gdn::Session()->User->Admin)
+               Redirect('settings');
+            else
+               Redirect('discussions');
+            
          } else {
             $Sender->Form->AddError('Bad Credentials');
          }
