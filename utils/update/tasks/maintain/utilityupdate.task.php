@@ -29,7 +29,7 @@ class UtilityUpdateTask extends Task {
       if (!LAME) {
          $UtilityUpdate = FALSE;
          try {
-            $UtilityUpdate = $this->Request('utility/update');
+            $UtilityUpdate = $this->PrivilegedExec('utility/update');
          } catch (Exception $e) {}
          
          if ($UtilityUpdate == 'Success') {
