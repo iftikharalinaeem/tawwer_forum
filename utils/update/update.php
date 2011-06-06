@@ -13,6 +13,7 @@ $Tasks = new TaskList();
 $Tasks->Clients('/srv/www/vhosts');
 $Tasks->Perform(TaskList::ACTION_CACHE);
 
+$RunForAll = $Tasks->GetConsoleOption('all', FALSE);
 if ($RunForAll) {
    $RunMode = TaskList::MODE_TARGET;
 } else {
