@@ -15,7 +15,7 @@ $Tasks->Perform(TaskList::ACTION_CACHE);
 
 $RunForAll = $Tasks->GetConsoleOption('all', FALSE);
 if ($RunForAll) {
-   $RunMode = TaskList::MODE_TARGET;
+   $RunMode = TaskList::MODE_CHUNKED;
 } else {
    $RunMode = TaskList::MODE_TARGET;
    $Tasks->Perform(TaskList::ACTION_TARGET);
