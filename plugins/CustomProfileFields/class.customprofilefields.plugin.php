@@ -138,8 +138,8 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 			$CustomProfileFieldLabels = GetValue('CustomProfileFieldLabel', $FormPostValues);
 			$CustomProfileFieldValues = GetValue('CustomProfileFieldValue', $FormPostValues);
 			if (is_array($CustomProfileFieldLabels) && is_array($CustomProfileFieldValues)) {
-				$this->_TrimValues(&$CustomProfileFieldLabels, 50);
-				$this->_TrimValues(&$CustomProfileFieldValues, 255);
+				$this->_TrimValues($CustomProfileFieldLabels, 50);
+				$this->_TrimValues($CustomProfileFieldValues, 255);
 				$CustomProfileFields = array_combine($CustomProfileFieldLabels, $CustomProfileFieldValues);
 			}
 			
@@ -159,7 +159,7 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 	/**
 	 * Loop through values, trimming them to the specified length.
 	 */
-	private function _TrimValues($Array, $Length = 200) {
+	private function _TrimValues(&$Array, $Length = 200) {
 		foreach ($Array as $Key => $Val) {
 			$Array[$Key] = substr($Val, 0, $Length);
 		}

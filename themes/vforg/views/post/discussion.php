@@ -1,20 +1,22 @@
 <?php if (!defined('APPLICATION')) exit();
-$this->Title(T('Ask a Question'));
 $Session = Gdn::Session();
 $CancelUrl = '/vanilla/discussions';
-if (C('Vanilla.Categories.Use') && $this->CategoryID > 0 && $this->CategoryData->NumRows() > 0) {
-   foreach ($this->CategoryData->Result() as $Cat) {
-      if ($Cat->CategoryID == $this->CategoryID) {
-         $CancelUrl = '/vanilla/discussions/'.$Cat->Code;
-         break;
-      }      
-   }
-}
+//if (C('Vanilla.Categories.Use') && $this->CategoryID > 0 && $this->CategoryData->NumRows() > 0) {
+//   foreach ($this->CategoryData->Result() as $Cat) {
+//      if ($Cat->CategoryID == $this->CategoryID) {
+//         $CancelUrl = '/vanilla/discussions/'.$Cat->Code;
+//         break;
+//      }
+//   }
+//}
 ?>
 <div id="DiscussionForm">
-   <h2><?php echo property_exists($this, 'Discussion') ? 'Edit Question' : 'Ask a Question'; ?></h2>
+   <h1><?php echo property_exists($this, 'Discussion') ? 'Edit Question' : 'Ask a Question'; ?></h1>
    <?php
       echo $this->Form->Open();
+
+      $this->FireEvent('BeforeFormInputs');
+
       echo $this->Form->Errors();
    ?>
    <div class="PostHelp">

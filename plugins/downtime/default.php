@@ -1,6 +1,22 @@
 <?php if (!defined('APPLICATION')) exit();
 
 // Define the plugin:
+$PluginInfo['downtime'] = array(
+   'Name' => 'downtime',
+   'Description' => 'This plugin is pointless.',
+   'Version' => '1.0.0',
+   'MobileFriendly' => TRUE,
+   'RequiredApplications' => array('Vanilla' => '2.0'),
+   'RequiredTheme' => FALSE, 
+   'RequiredPlugins' => FALSE,
+   'HasLocale' => TRUE,
+   'RegisterPermissions' => FALSE,
+   'Author' => "??",
+   'AuthorEmail' => '??@vanillaforums.com',
+   'AuthorUrl' => 'http://www.vanillaforums.com'
+);
+
+// Define the plugin:
 class DowntimePlugin implements Gdn_IPlugin {
    
    public function Base_Render_Before(&$Sender) {
