@@ -16,7 +16,7 @@ class UtilityUpdateTask extends Task {
       
       // No structure, no run
       if ($this->Utility === FALSE) return;
-      if ($this->Cache('Updated') !== TRUE) return;
+      //if ($this->Cache('Updated') !== TRUE) return;
       
       if (TaskList::Cautious()) {
          $Proceed = TaskList::Question("Really run utility/update for {$this->ClientFolder}?","Run update?",array('yes','no','exit'),'no');
