@@ -156,7 +156,7 @@ pageTracker._trackPageview();
             throw new Exception('FALSE');
          
          // Retrieve all available plugins from the plugins directory
-         $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins;
+         $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins();
          $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
          
          list($PluginName) = $Sender->RequestArgs;
@@ -181,7 +181,7 @@ pageTracker._trackPageview();
             throw new Exception('FALSE');
          
          // Retrieve all available plugins from the plugins directory
-         $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins;
+         $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins();
          $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
          
          list($PluginName) = $Sender->RequestArgs;
