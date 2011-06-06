@@ -39,7 +39,7 @@ class PluginsTask extends Task {
       $this->SaveToConfig('EnabledPlugins.vfspoof', TRUE);
                   
       // Politely enable plugins with structures
-      $this->EnablePlugin('Statistics');
+      //$this->EnablePlugin('Statistics');
       
       // We do this to ensure that vfoptions goes to the end. Dirty hacks ;)
       $this->RemoveFromConfig('EnabledPlugins.vfoptions');
