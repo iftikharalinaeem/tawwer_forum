@@ -308,6 +308,10 @@ div.Box h4 {
    padding: 7px 0 7px 11px;
    position: relative;
 }
+div.Box h4 a {
+   color: #FFFFFF;
+   font-size: 14px;
+}
 div.Box dl {
 	background: #fff;
 	padding: 4px;
@@ -317,8 +321,9 @@ ul.PanelInfo {
 }
 ul.PanelInfo li {
    background: #fff;
-	border-bottom: 1px solid #CCCCCC;
+	border-bottom: none !important;
 	font-size: 13px;
+	padding: 2px 10px;
 }
 div.Tabs, div.Headings {
 	background: transparent;
