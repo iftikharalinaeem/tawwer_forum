@@ -25,7 +25,7 @@ class UtilityUpdateTask extends Task {
       }
       
       $DatabaseName = $this->ClientInfo['DatabaseName'];
-      TaskList::Event("Running utility/update...", NOBREAK);
+      TaskList::Event("Running utility/update...", TaskList::NOBREAK);
       if (!LAME) {
          $UtilityUpdate = FALSE;
          try {
@@ -36,6 +36,8 @@ class UtilityUpdateTask extends Task {
             TaskList::Event('success');
             return;
          }
+         
+         print_r($UtilityUpdate);
          TaskList::Event('failed');
       }
    }
