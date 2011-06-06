@@ -76,6 +76,19 @@ class VfcomPlugin extends Gdn_Plugin {
       $Menu->AddItem('Site Settings', T('Settings'));
       $Menu->AddLink('Site Settings', $LinkText, 'plugin/vfcom', 'Garden.Settings.Manage');
    }
+   
+   /**
+    * A standard 404 File Not Found error message is delivered when this action
+    * is encountered.
+    */
+   public function HomeController_FileNotFound_Override($Sender) {
+      $Sender->AddCssFile('crashstache.css', 'plugins/vfcom');
+      
+      if ($Sender->DeliveryMethod() == DELIVERY_METHOD_XHTML)
+         $Sender->Render('filenotfound','home','plugins/vfcom');
+      else
+         $Sender->RenderException(NotFoundException());
+   }
 
    public function PluginController_Vfcom_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
