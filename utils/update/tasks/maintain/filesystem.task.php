@@ -133,7 +133,7 @@ class FilesystemTask extends Task {
       }
       
       if ($this->AddonsPath !== FALSE) {
-         $this->Symlink('plugins/FileUpload', TaskList::CombinePaths($this->PluginPath,'FileUpload'));
+         $this->Symlink('plugins/FileUpload', TaskList::CombinePaths($this->AddonsPath,'plugins/FileUpload'));
       }
       
       if ($this->ThemePath !== FALSE) {
