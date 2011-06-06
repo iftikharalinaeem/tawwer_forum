@@ -130,8 +130,8 @@ class VfcomPlugin extends Gdn_Plugin {
          }
          
          if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleDebugMode", FALSE) !== FALSE) {
-            $NewDebugMode = !C('Garden.Debug', FALSE);
-            SaveToConfig('Garden.Debug',$NewDebugMode);
+            $NewDebugMode = !C('Debug', FALSE);
+            SaveToConfig('Debug',$NewDebugMode);
             $Sender->InformMessage(sprintf("Debug mode has been turned %s.",(($NewDebugMode) ? 'on': 'off')));
          }
          
