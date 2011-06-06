@@ -132,22 +132,38 @@ abstract class Task {
       return ($Result == 'TRUE') ? TRUE : FALSE;
    }
    
-   protected function PrivilegedExec($RelativeURL) {
+   protected function PrivilegedExec($RelativeURL, $QueryParams = array(), $Absolute = FALSE) {
       try {
          $Token = $this->TokenAuthentication();
-         if ($Token === FALSE) throw new Exception("could not generate token");
-         $Result = $this->Request($RelativeURL,array(
-            'token'  => $Token
-         ));
+         if ($Token === FALSE) 
+            throw new Exception("could not generate token");
+         $QueryParams['token'] = $Token;
+         $Result = $this->Request($RelativeURL,$QueryParams);
       } catch (Exception $e) {
          $Result = 'msg: '.$e->getMessage();
       }
       return $Result;
    }
    
-   protected function Request($RelativeURL, $QueryParams = array(), $Absolute = FALSE) {
-      $FollowRedirects = TRUE;
-      $Timeout = $this->C('Garden.SocketTimeout', 2.0);
+   protected function Request($Options, $QueryParams = array(), $Absolute = FALSE) {
+      
+      if (is_string($Options)) {
+         $Options = array(
+             'URL'      => $Options
+         );
+      }
+      
+      $Defaults = array(
+          'Url'         => NULL,
+          'Timeout'     => $this->C('Garden.SocketTimeout', 2.0),
+          'Redirects'   => TRUE
+      );
+      
+      $Options = array_merge($Defaults, $Options);
+      
+      $RelativeURL = GetValue('URL', $Options);
+      $FollowRedirects = GetValue('Redirects', $Options);
+      $Timeout = GetValue('Timeout', $Options);
       
       if (!$Absolute)
          $Url = 'http://'.$this->ClientFolder.'/'.ltrim($RelativeURL,'/').'?'.http_build_query($QueryParams);
@@ -220,7 +236,9 @@ abstract class Task {
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
    
-         stream_set_timeout($Pointer, $Timeout);
+         if ($Timeout > 0)
+            stream_set_timeout($Pointer, $Timeout);
+         
          if(strlen($Cookie) > 0)
             $Cookie = "Cookie: $Cookie\r\n";
          

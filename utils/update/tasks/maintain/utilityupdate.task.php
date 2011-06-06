@@ -29,7 +29,10 @@ class UtilityUpdateTask extends Task {
       if (!LAME) {
          $UtilityUpdate = FALSE;
          try {
-            $UtilityUpdate = $this->PrivilegedExec('utility/update.json');
+            $UtilityUpdate = $this->PrivilegedExec(array(
+               'URL'       => 'utility/update.json',
+               'Timeout'   => 0
+            ));
          } catch (Exception $e) {}
          
          
