@@ -16,5 +16,6 @@ $Tasks->Perform(TaskList::ACTION_CREATE);
 
 $Tasks->Run(TaskList::MODE_TARGET, array(
    'spawn/newforum',
-   'maintain/filesystem'
+   'maintain/filesystem',
+   'maintain/plugins'
 ));
