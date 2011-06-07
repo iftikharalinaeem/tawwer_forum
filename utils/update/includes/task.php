@@ -242,12 +242,11 @@ abstract class Task {
          // If we're trying to recycle, look for an existing handler
          if ($Recycle && array_key_exists($HostAddress, self::$ConnectionHandles)) {
             $Pointer = self::$ConnectionHandles[$HostAddress];
-            if (!feof($Pointer)) {
+            $StreamMeta = @stream_get_meta_data($Pointer);
+            if ($Pointer && !GetValue('timed_out', $Pointer)) {
                TaskList::MinorEvent("Loaded existing pointer for {$HostAddress}");
                $Recycled = TRUE;
             } else {
-               $StreamMeta = stream_get_meta_data($Pointer);
-               var_dump($StreamMeta);
                unset($Pointer);
                unset(self::$ConnectionHandles[$HostAddress]);
                TaskList::MinorEvent("Threw away dead pointer for {$HostAddress}");
