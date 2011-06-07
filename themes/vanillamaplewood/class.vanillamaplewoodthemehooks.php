@@ -15,4 +15,33 @@ class VanillaMaplewoodThemeHooks extends Gdn_Plugin {
       $Ad = ob_get_clean();
       $Sender->SetData('Ad', $Ad);
    }
+
+   public function DiscussionsController_BeforeRenderAsset_Handler($Sender, $Args) {
+      if ($Args['AssetName'] != 'Content')
+         return;
+
+      static $Rendered = FALSE;
+
+      if (!$Rendered) {
+         // This logic is from /applications/vanilla/views/discussions/index.php
+         $PagerOptions = array('RecordCount' => $Sender->Data('CountDiscussions'));
+         if ($Sender->Data('_PagerUrl')) {
+            $PagerOptions['Url'] = $Sender->Data('_PagerUrl');
+         }
+         echo PagerModule::Write($PagerOptions);
+         $Rendered = TRUE;
+      }
+   }
+
+   public function DiscussionController_BeforeRenderAsset_Handler($Sender, $Args) {
+      if ($Args['AssetName'] != 'Content' || !isset($Sender->Pager))
+         return;
+
+      static $Rendered = FALSE;
+
+      if (!$Rendered) {
+         echo $Sender->Pager->ToString('less');
+         $Rendered = TRUE;
+      }
+   }
 }

@@ -57,6 +57,7 @@ class VFSpoofPlugin extends Gdn_Plugin {
    /**
     * Allows you to spoof the admin user if you have admin access in the
     * VanillaForums.com database.
+    * @param Gdn_Controller $Sender
     */
    public function EntryController_Spoof_Create($Sender) {
       $Sender->Title('Spoof');
@@ -69,7 +70,7 @@ class VFSpoofPlugin extends Gdn_Plugin {
       if ($Email != '' && $Password != '') {
          
          // Validate the username & password
-         $UserModel = Gdn::UserModel();
+         $UserModel = new UserModel(); // don't pollute the old user model
          $UserModel->SQL = $this->_GetDatabase()->SQL();
          $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
          $this->_CloseDatabase();
@@ -82,9 +83,9 @@ class VFSpoofPlugin extends Gdn_Plugin {
             Gdn::Session()->Start($UserIDToSpoof, TRUE);
             
             if (Gdn::Session()->User->Admin)
-               Redirect('settings');
+               Redirect('/settings');
             else
-               Redirect('discussions');
+               Redirect('/');
             
          } else {
             $Sender->Form->AddError('Bad Credentials');
