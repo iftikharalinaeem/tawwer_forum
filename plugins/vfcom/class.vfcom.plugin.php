@@ -76,6 +76,19 @@ class VfcomPlugin extends Gdn_Plugin {
       $Menu->AddItem('Site Settings', T('Settings'));
       $Menu->AddLink('Site Settings', $LinkText, 'plugin/vfcom', 'Garden.Settings.Manage');
    }
+   
+   /**
+    * A standard 404 File Not Found error message is delivered when this action
+    * is encountered.
+    */
+   public function HomeController_FileNotFound_Override($Sender) {
+      $Sender->AddCssFile('crashstache.css', 'plugins/vfcom');
+      
+      if ($Sender->DeliveryMethod() == DELIVERY_METHOD_XHTML)
+         $Sender->Render('filenotfound','home','plugins/vfcom');
+      else
+         $Sender->RenderException(NotFoundException());
+   }
 
    public function PluginController_Vfcom_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
@@ -130,8 +143,8 @@ class VfcomPlugin extends Gdn_Plugin {
          }
          
          if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleDebugMode", FALSE) !== FALSE) {
-            $NewDebugMode = !C('Garden.Debug', FALSE);
-            SaveToConfig('Garden.Debug',$NewDebugMode);
+            $NewDebugMode = !C('Debug', FALSE);
+            SaveToConfig('Debug',$NewDebugMode);
             $Sender->InformMessage(sprintf("Debug mode has been turned %s.",(($NewDebugMode) ? 'on': 'off')));
          }
          
@@ -142,6 +155,7 @@ class VfcomPlugin extends Gdn_Plugin {
             else
                Gdn::PluginManager()->DisablePlugin('vfoptions');
             
+            SaveToConfig('EnabledPlugins.vfoptions', FALSE);
             $Sender->InformMessage(sprintf("VF Options has been turned %s.",(($NewVFOptions) ? 'on': 'off')));
          }
          

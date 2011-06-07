@@ -59,7 +59,7 @@ pageTracker._setVar("'.$Extra.'");';
 pageTracker._trackPageview();
 } catch(err) {}</script>";
 
-         $Sender->AddAsset('Content', $Script);
+         $Sender->AddAsset('Foot', $Script);
       }
    }
    

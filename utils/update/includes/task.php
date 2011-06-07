@@ -132,22 +132,38 @@ abstract class Task {
       return ($Result == 'TRUE') ? TRUE : FALSE;
    }
    
-   protected function PrivilegedExec($RelativeURL) {
-      TaskList::Event("Executing '{$RelativeURL}' as administrator...");
+   protected function PrivilegedExec($RelativeURL, $QueryParams = array(), $Absolute = FALSE) {
       try {
          $Token = $this->TokenAuthentication();
-         if ($Token === FALSE) throw new Exception("could not generate token");
-         $Result = $this->Request($RelativeURL,array(
-            'token'  => $Token
-         ));
+         if ($Token === FALSE) 
+            throw new Exception("could not generate token");
+         $QueryParams['token'] = $Token;
+         $Result = $this->Request($RelativeURL,$QueryParams);
       } catch (Exception $e) {
          $Result = 'msg: '.$e->getMessage();
       }
+      return $Result;
    }
    
-   protected function Request($RelativeURL, $QueryParams = array(), $Absolute = FALSE) {
-      $FollowRedirects = TRUE;
-      $Timeout = $this->C('Garden.SocketTimeout', 2.0);
+   protected function Request($Options, $QueryParams = array(), $Absolute = FALSE) {
+      
+      if (is_string($Options)) {
+         $Options = array(
+             'URL'      => $Options
+         );
+      }
+      
+      $Defaults = array(
+          'Url'         => NULL,
+          'Timeout'     => $this->C('Garden.SocketTimeout', 2.0),
+          'Redirects'   => TRUE
+      );
+      
+      $Options = array_merge($Defaults, $Options);
+      
+      $RelativeURL = GetValue('URL', $Options);
+      $FollowRedirects = GetValue('Redirects', $Options);
+      $Timeout = GetValue('Timeout', $Options);
       
       if (!$Absolute)
          $Url = 'http://'.$this->ClientFolder.'/'.ltrim($RelativeURL,'/').'?'.http_build_query($QueryParams);
@@ -190,7 +206,10 @@ abstract class Task {
          curl_setopt($Handler, CURLOPT_HEADER, 1);
          curl_setopt($Handler, CURLOPT_USERAGENT, GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
          curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
-         curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
+         
+         if ($Timeout > 0)
+            curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
+         
          if ($Cookie != '')
             curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
          
@@ -217,6 +236,9 @@ abstract class Task {
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
    
+         if ($Timeout > 0)
+            stream_set_timeout($Pointer, $Timeout);
+         
          if(strlen($Cookie) > 0)
             $Cookie = "Cookie: $Cookie\r\n";
          
@@ -242,8 +264,15 @@ abstract class Task {
             $Response .= $Line;
          }
          @fclose($Pointer);
-         $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
+         $Bytes = strlen($Response);
+         $Response = trim($Response);
          $Success = TRUE;
+         
+         $StreamInfo = stream_get_meta_data($Pointer);
+         if (GetValue('timed_out', $StreamInfo, FALSE) === TRUE) {
+            $Success = FALSE;
+            $Response = "Operation timed out after {$Timeout} seconds with {$Bytes} bytes received.";
+         }
       } else {
          throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
       }
