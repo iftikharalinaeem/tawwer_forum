@@ -296,8 +296,10 @@ abstract class Task {
             $Response .= $Line;
          }
          
-         if (!$Recycle)
+         if (!$Recycle) {
+            TaskList::MinorEvent("Closing onetime pointer for {$HostAddress}");
             @fclose($Pointer);
+         }
          
          $Bytes = strlen($Response);
          $Response = trim($Response);
