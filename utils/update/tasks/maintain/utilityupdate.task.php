@@ -34,7 +34,9 @@ class UtilityUpdateTask extends Task {
                'Timeout'   => 0,
                'Recycle'   => TRUE
             ));
-         } catch (Exception $e) {}
+         } catch (Exception $e) {
+            TaskList::FatalError($e->getMessage());
+         }
          
          $JsonResponse = @json_decode($UtilityUpdate);
          
