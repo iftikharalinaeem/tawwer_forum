@@ -146,7 +146,7 @@ abstract class Task {
    }
    
    protected function Request($Options, $QueryParams = array(), $Absolute = FALSE) {
-      
+      static $ConnectionHandles = array();
       if (is_string($Options)) {
          $Options = array(
              'URL'      => $Options
@@ -156,7 +156,8 @@ abstract class Task {
       $Defaults = array(
           'Url'         => NULL,
           'Timeout'     => $this->C('Garden.SocketTimeout', 2.0),
-          'Redirects'   => TRUE
+          'Redirects'   => TRUE,
+          'Recycle'     => TRUE
       );
       
       $Options = array_merge($Defaults, $Options);
@@ -164,6 +165,7 @@ abstract class Task {
       $RelativeURL = GetValue('URL', $Options);
       $FollowRedirects = GetValue('Redirects', $Options);
       $Timeout = GetValue('Timeout', $Options);
+      $Recycle = GetValue('Recycle', $Options, FALSE);
       
       if (!$Absolute)
          $Url = 'http://'.$this->ClientFolder.'/'.ltrim($RelativeURL,'/').'?'.http_build_query($QueryParams);
@@ -187,17 +189,17 @@ abstract class Task {
       $EncodeCookies = TRUE;
       
       foreach($_COOKIE as $Key => $Value) {
-         if(strncasecmp($Key, 'XDEBUG', 6) == 0)
+         if (strncasecmp($Key, 'XDEBUG', 6) == 0)
             continue;
          
-         if(strlen($Cookie) > 0)
+         if (strlen($Cookie) > 0)
             $Cookie .= '; ';
             
          $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
          $Cookie .= "{$Key}={$EValue}";
       }
       $Response = '';
-      if (function_exists('curl_init')) {
+      if (function_exists('curl_init') && !$Recycle) {
          
          //$Url = $Scheme.'://'.$Host.$Path;
          $Handler = curl_init();
@@ -230,16 +232,35 @@ abstract class Task {
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
          $Referer = Gdn_Url::WebRoot(TRUE);
-      
-         // Make the request
-         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
+         $Pointer = FALSE;
+         $HostAddress = gethostbyname($Host);
+         
+         // If we're trying to recycle, look for an existing handler
+         if ($Recycle) {
+            $Recycled = FALSE;
+            
+            if (array_key_exists($HostAddress, $ConnectionHandles)) {
+               $Pointer = $ConnectionHandles[$HostAddress];
+               if (!feof($Pointer)) {
+                  $Recycled = TRUE;
+               }
+            }
+         }
+         
+         // Make a new connection
+         if (!$Pointer)
+            $Pointer = @fsockopen($HostAddress, $Port, $ErrorNumber, $Error);
+         
          if (!$Pointer)
             throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
    
+         if ($Recycle && !$Recycled)
+            $ConnectionHandles[$HostAddress] = &$Pointer;
+            
          if ($Timeout > 0)
             stream_set_timeout($Pointer, $Timeout);
          
-         if(strlen($Cookie) > 0)
+         if (strlen($Cookie) > 0)
             $Cookie = "Cookie: $Cookie\r\n";
          
          $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
@@ -250,8 +271,12 @@ abstract class Task {
             ."User-Agent: ".GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
             ."Accept: */*\r\n"
             ."Accept-Charset: utf-8;\r\n"
-            ."Referer: {$Referer}\r\n"
-            ."Connection: close\r\n";
+            ."Referer: {$Referer}\r\n";
+            
+            if ($Recycle)
+               $Header .= "Connection: keep-alive\r\n";
+            else
+               $Header .= "Connection: close\r\n";
             
          if ($Cookie != '')
             $Header .= $Cookie;

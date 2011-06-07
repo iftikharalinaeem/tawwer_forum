@@ -103,7 +103,10 @@ class TaskList {
       
       $this->Perform = array();
       $this->Clients = NULL;
-      $this->RequireDB = TRUE;
+      
+      $RequireDB = $this->GetConsoleOption('require-db', TRUE);
+      if ($RequireDB == 'no') $RequireDB = FALSE;
+      $this->RequireDB = (bool)$RequireDB;
    }
    
    /**
