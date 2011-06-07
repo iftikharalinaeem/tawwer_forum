@@ -7,6 +7,8 @@ class FilesystemTask extends Task {
    public function __construct($ClientDir) {
       parent::__construct($ClientDir);
       
+      $this->ReallyRun = TRUE;
+      
       $this->RootPath = FALSE;
       $this->VanillaPath = FALSE;
       $this->MiscPath = FALSE;
@@ -29,13 +31,14 @@ class FilesystemTask extends Task {
             
          } while (strtolower($SourceCodeFolder) != 'no' && !is_dir($SourceCodePath));
          if (strtolower($SourceCodeFolder) != 'no') {
-         
             $this->VanillaPath = TaskList::CombinePaths($SourceCodePath,'vanilla');
             $this->MiscPath = TaskList::CombinePaths($SourceCodePath,'misc');
             $this->AddonsPath = TaskList::CombinePaths($SourceCodePath,'addons');
             
             $this->PluginPath = TaskList::CombinePaths($this->MiscPath, 'plugins');
             $this->ThemePath = TaskList::CombinePaths($this->MiscPath, 'themes');
+         } else {
+            $this->ReallyRun = FALSE;
          }
       } else {
          // Root provided and exists
@@ -66,6 +69,8 @@ class FilesystemTask extends Task {
    }
    
    protected function Run() {
+      if ($this->ReallyRun === FALSE) return;
+      
       if (TaskList::Cautious()) {
          $Proceed = TaskList::Question("Really apply symlinks for {$this->ClientFolder}?","Apply symlinks?",array('yes','no','exit'),'yes');
          if ($Proceed == 'no') return;
