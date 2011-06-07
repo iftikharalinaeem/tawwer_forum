@@ -3,7 +3,7 @@
    Plugin Name: Vanilla ProxyConnect for WP3
    Plugin URI: http://vanillaforums.org/addons/
    Description: Vanilla ProxyConnect allows users to create and manage their accounts & sessions through Wordpress, and be automatically signed into a related Vanilla forum.
-   Version: 1.2.0
+   Version: 1.2.1
    Author: Tim Gunter
    Author URI: http://www.vanillaforums.com/
    
@@ -83,6 +83,7 @@ if (is_array($_GET)) {
                
             if ($Secure) {
                $CookieDomain = array_key_exists('Cookie', $_GET) ? $_GET['Cookie'] : NULL;
+               $CookieDomain = '.'.ltrim($CookieDomain, '.');
                if (!is_null($CookieDomain)) {
                   update_option('vanilla_cookie_domain', $CookieDomain);
                   header('X-Autoconfigure-Cookie: set');
@@ -131,10 +132,14 @@ function proxyconnect_vanilla_logout() {
    if ($RedirectTo !== FALSE) {
       $UrlParts = parse_url($RedirectTo);
       $Host = $UrlParts['host'];
+      $HostParts = explode('.', $Host);
+      $Host = implode('.', array_slice($HostParts,-2,2));
       
       $Referer = $_SERVER['HTTP_REFERER'];
       $RefererUrlParts = parse_url($Referer);
       $RefererHost = $RefererUrlParts['host'];
+      $RefererHostParts = explode('.', $RefererHost);
+      $RefererHost = implode('.', array_slice($RefererHostParts,-2,2));
       
       if ($Host == $RefererHost) {
          wp_redirect($RedirectTo);

@@ -35,7 +35,6 @@ class UtilityUpdateTask extends Task {
             ));
          } catch (Exception $e) {}
          
-         
          $JsonResponse = @json_decode($UtilityUpdate);
          
          if ($JsonResponse !== FALSE) {
@@ -45,7 +44,6 @@ class UtilityUpdateTask extends Task {
             }
          }
          
-         print_r($UtilityUpdate);
          TaskList::Event('failed');
       }
    }
