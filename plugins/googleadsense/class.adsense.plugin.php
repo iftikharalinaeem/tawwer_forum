@@ -4,7 +4,7 @@ Copyright 2008, 2009 Mark O'Sullivan
 */
 
 // Define the plugin:
-$PluginInfo['GoogleAdSense'] = array(
+$PluginInfo['googleadsense'] = array(
    'Name' => 'Skimlinks',
    'Description' => 'Puts Skimlinks into vanilla pages.',
    'Version' => '1.0',
