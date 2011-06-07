@@ -240,7 +240,7 @@ abstract class Task {
          $Recycled = FALSE;
          
          // If we're trying to recycle, look for an existing handler
-         if ($Recycle && array_key_exists($HostAddress, $ConnectionHandles)) {
+         if ($Recycle && array_key_exists($HostAddress, self::$ConnectionHandles)) {
             $Pointer = self::$ConnectionHandles[$HostAddress];
             if (!feof($Pointer)) {
                TaskList::MinorEvent("Loaded existing pointer for {$HostAddress}");
