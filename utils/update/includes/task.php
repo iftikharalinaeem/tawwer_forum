@@ -252,7 +252,7 @@ abstract class Task {
             $Pointer = @fsockopen($HostAddress, $Port, $ErrorNumber, $Error);
          
          if (!$Pointer)
-            throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
+            throw new Exception(sprintf('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s', $Url, $ErrorNumber, $Error));
    
          if ($Recycle && !$Recycled)
             $ConnectionHandles[$HostAddress] = &$Pointer;
@@ -301,7 +301,7 @@ abstract class Task {
             $Response = "Operation timed out after {$Timeout} seconds with {$Bytes} bytes received.";
          }
       } else {
-         throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
+         throw new Exception('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.');
       }
       
       if (!$Success)
