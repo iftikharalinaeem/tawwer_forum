@@ -234,22 +234,17 @@ abstract class Task {
       } else if (function_exists('fsockopen')) {
          $Pointer = FALSE;
          $HostAddress = gethostbyname($Host);
+         echo TaskList::MinorEvent("Resolved {$Host} to {$HostAddress}");
+         $Recycled = FALSE;
          
          // If we're trying to recycle, look for an existing handler
-         if ($Recycle) {
-            $Recycled = FALSE;
-            
-            if (array_key_exists($HostAddress, $ConnectionHandles)) {
-               $Pointer = $ConnectionHandles[$HostAddress];
-               if (!feof($Pointer)) {
-                  $Recycled = TRUE;
-               }
-            }
-         }
-         
-         // Make a new connection
-         if (!$Pointer)
+         if ($Recycle && array_key_exists($HostAddress, $ConnectionHandles)) {
+            $Pointer = $ConnectionHandles[$HostAddress];
+            if (!feof($Pointer))
+               $Recycled = TRUE;
+         } else {
             $Pointer = @fsockopen($HostAddress, $Port, $ErrorNumber, $Error);
+         }
          
          if (!$Pointer)
             throw new Exception(sprintf('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s', $Url, $ErrorNumber, $Error));
