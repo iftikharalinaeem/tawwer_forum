@@ -149,7 +149,7 @@ class TaskList {
                $this->ClientList[$ClientFolder] = 1;
             }
             $this->NumClients = $NumClients = count($this->ClientList);
-            TaskList::MajorEvent("found {$NumClients}!", TaskList::NOBREAK);
+            TaskList::MajorEvent("found {$NumClients}!");
          break;
          
          case TaskList::ACTION_TARGET:
@@ -311,7 +311,7 @@ class TaskList {
    
       // Check one more time
       if (TaskList::Cautious()) {
-         TaskList::Event("TaskMode: {$this->Mode}");
+         TaskList::MajorEvent("TaskMode: {$this->Mode}");
          $Proceed = TaskList::Question("","Proceed with task execution?",array('yes','no'),'yes');
          if ($Proceed == 'no') exit();
       }
