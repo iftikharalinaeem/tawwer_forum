@@ -3,7 +3,7 @@
    Plugin Name: Vanilla ProxyConnect for WP3
    Plugin URI: http://vanillaforums.org/addons/
    Description: Vanilla ProxyConnect allows users to create and manage their accounts & sessions through Wordpress, and be automatically signed into a related Vanilla forum.
-   Version: 1.2.0
+   Version: 1.2.1
    Author: Tim Gunter
    Author URI: http://www.vanillaforums.com/
    
