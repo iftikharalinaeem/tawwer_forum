@@ -232,7 +232,6 @@ abstract class Task {
          
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
-         $Referer = Gdn_Url::WebRoot(TRUE);
          $Pointer = FALSE;
          $HostAddress = gethostbyname($Host);
          
@@ -271,8 +270,7 @@ abstract class Task {
             // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
             ."User-Agent: ".GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
             ."Accept: */*\r\n"
-            ."Accept-Charset: utf-8;\r\n"
-            ."Referer: {$Referer}\r\n";
+            ."Accept-Charset: utf-8;\r\n";
             
             if ($Recycle)
                $Header .= "Connection: keep-alive\r\n";
