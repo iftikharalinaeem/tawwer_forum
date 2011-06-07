@@ -11,6 +11,8 @@ abstract class Task {
    protected $ClientInfo;
    protected $ConfigFile;
    protected $Config;
+   
+   protected static $ConnectionHandles = array();
 
    abstract protected function Run();
 
@@ -146,8 +148,6 @@ abstract class Task {
    }
    
    protected function Request($Options, $QueryParams = array(), $Absolute = FALSE) {
-      static $ConnectionHandles = array();
-      
       if (is_string($Options)) {
          $Options = array(
              'URL'      => $Options
@@ -241,14 +241,14 @@ abstract class Task {
          
          // If we're trying to recycle, look for an existing handler
          if ($Recycle && array_key_exists($HostAddress, $ConnectionHandles)) {
-            $Pointer = $ConnectionHandles[$HostAddress];
+            $Pointer = self::$ConnectionHandles[$HostAddress];
             if (!feof($Pointer)) {
                TaskList::MinorEvent("Loaded existing pointer for {$HostAddress}");
                $Recycled = TRUE;
             } else {
                TaskList::MinorEvent("Threw away dead pointer for {$HostAddress}");
                unset($Pointer);
-               unset($ConnectionHandles[$HostAddress]);
+               unset(self::$ConnectionHandles[$HostAddress]);
             }
          }
          
@@ -262,7 +262,7 @@ abstract class Task {
             throw new Exception(sprintf('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s', $Url, $ErrorNumber, $Error));
    
          if ($Recycle && !$Recycled) {
-            $ConnectionHandles[$HostAddress] = &$Pointer;
+            self::$ConnectionHandles[$HostAddress] = &$Pointer;
          }
          
          if ($Timeout > 0)
