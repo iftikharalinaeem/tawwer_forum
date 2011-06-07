@@ -234,7 +234,9 @@ abstract class Task {
       } else if (function_exists('fsockopen')) {
          $Pointer = FALSE;
          $HostAddress = gethostbyname($Host);
-         echo TaskList::MinorEvent("Resolved {$Host} to {$HostAddress}");
+         if ($HostAddress == $Host)
+            $Recycle = FALSE;
+         
          $Recycled = FALSE;
          
          // If we're trying to recycle, look for an existing handler
