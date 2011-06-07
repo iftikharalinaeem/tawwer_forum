@@ -310,13 +310,15 @@ abstract class Task {
       if (!$Success)
          return $Response;
       
-      $ResponseHeaderData = trim(substr($Response, 0, strpos($Response, "\r\n\r\n")));
-      $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
+      $ResponseParts = explode("\r\n\r\n", $Response);
       
-      $ResponseHeaderLines = explode("\n",trim($ResponseHeaderData));
-      $Status = array_shift($ResponseHeaderLines);
+      $ResponseHeaderData = trim(array_shift($ResponseParts));
+      $Response = trim(implode("\r\n\r\n",$ResponseParts));
+      
+      $ResponseHeaderLines = explode("\n",$ResponseHeaderData);
+      $Status = trim(array_shift($ResponseHeaderLines));
       $ResponseHeaders = array();
-      $ResponseHeaders['HTTP'] = trim($Status);
+      $ResponseHeaders['HTTP'] = $Status;
       
       /* get the numeric status code. 
        * - trim off excess edge whitespace, 
@@ -325,7 +327,7 @@ abstract class Task {
        * - pop the first (only) element off it... 
        * - return that.
        */
-      $ResponseHeaders['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
+      $ResponseHeaders['StatusCode'] = array_pop(array_slice(explode(' ',$Status),1,1));
       foreach ($ResponseHeaderLines as $Line) {
          $Line = explode(':',trim($Line));
          $Key = trim(array_shift($Line));
