@@ -243,6 +243,7 @@ abstract class Task {
          if ($Recycle && array_key_exists($HostAddress, self::$ConnectionHandles)) {
             $Pointer = self::$ConnectionHandles[$HostAddress];
             $StreamMeta = @stream_get_meta_data($Pointer);
+            
             if ($Pointer && !GetValue('timed_out', $Pointer)) {
                TaskList::MinorEvent("Loaded existing pointer for {$HostAddress}");
                $Recycled = TRUE;
@@ -281,9 +282,7 @@ abstract class Task {
             ."Accept: */*\r\n"
             ."Accept-Charset: utf-8;\r\n";
             
-            if ($Recycle)
-               $Header .= "Connection: keep-alive\r\n";
-            else
+            if (!$Recycle)
                $Header .= "Connection: close\r\n";
             
          if ($Cookie != '')
