@@ -246,9 +246,11 @@ abstract class Task {
                TaskList::MinorEvent("Loaded existing pointer for {$HostAddress}");
                $Recycled = TRUE;
             } else {
-               TaskList::MinorEvent("Threw away dead pointer for {$HostAddress}");
+               $StreamMeta = stream_get_meta_data($Pointer);
+               var_dump($StreamMeta);
                unset($Pointer);
                unset(self::$ConnectionHandles[$HostAddress]);
+               TaskList::MinorEvent("Threw away dead pointer for {$HostAddress}");
             }
          }
          
