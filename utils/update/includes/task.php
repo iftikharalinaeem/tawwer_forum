@@ -242,9 +242,13 @@ abstract class Task {
          // If we're trying to recycle, look for an existing handler
          if ($Recycle && array_key_exists($HostAddress, $ConnectionHandles)) {
             $Pointer = $ConnectionHandles[$HostAddress];
-            if (!feof($Pointer))
+            if (!feof($Pointer)) {
+               TaskList::MinorEvent("Loaded existing pointer for {$HostAddress}");
                $Recycled = TRUE;
+            }
          } else {
+            if ($Recycle)
+               TaskList::MinorEvent("Making a new reusable pointer for {$HostAddress}");
             $Pointer = @fsockopen($HostAddress, $Port, $ErrorNumber, $Error);
          }
          
