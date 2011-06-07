@@ -279,7 +279,8 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    public function EntryController_SignOut_Handler(&$Sender) {
       if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
       
-      $SignoutURL = Gdn::Authenticator()->GetURL(Gdn_Authenticator::URL_REMOTE_SIGNOUT, $Redirect);
+      $Redirect = Gdn::Request()->GetValue('HTTP_REFERER');
+      $SignoutURL = Gdn::Authenticator()->RemoteSignOutUrl($Redirect);
       Redirect($SignoutURL,302);
    }
    
