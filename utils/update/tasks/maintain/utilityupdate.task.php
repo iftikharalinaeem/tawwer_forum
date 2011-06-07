@@ -48,6 +48,7 @@ class UtilityUpdateTask extends Task {
          }
          
          TaskList::MinorEvent('Update failed');
+         var_dump($JsonResponse);
       }
    }
 
