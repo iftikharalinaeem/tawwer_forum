@@ -255,8 +255,10 @@ abstract class Task {
          if (!$Pointer)
             throw new Exception(sprintf('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s', $Url, $ErrorNumber, $Error));
    
-         if ($Recycle && !$Recycled)
+         if ($Recycle && !$Recycled) {
+            TaskList::MinorEvent("Pointer created successfully");
             $ConnectionHandles[$HostAddress] = &$Pointer;
+         }
             
          if ($Timeout > 0)
             stream_set_timeout($Pointer, $Timeout);
