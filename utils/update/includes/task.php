@@ -245,6 +245,10 @@ abstract class Task {
             if (!feof($Pointer)) {
                TaskList::MinorEvent("Loaded existing pointer for {$HostAddress}");
                $Recycled = TRUE;
+            } else {
+               TaskList::MinorEvent("Threw away dead pointer for {$HostAddress}");
+               unset($Pointer);
+               unset($ConnectionHandles[$HostAddress]);
             }
          }
          
@@ -260,7 +264,7 @@ abstract class Task {
          if ($Recycle && !$Recycled) {
             $ConnectionHandles[$HostAddress] = &$Pointer;
          }
-            
+         
          if ($Timeout > 0)
             stream_set_timeout($Pointer, $Timeout);
          
