@@ -147,6 +147,7 @@ abstract class Task {
    
    protected function Request($Options, $QueryParams = array(), $Absolute = FALSE) {
       static $ConnectionHandles = array();
+      
       if (is_string($Options)) {
          $Options = array(
              'URL'      => $Options
@@ -157,7 +158,7 @@ abstract class Task {
           'Url'         => NULL,
           'Timeout'     => $this->C('Garden.SocketTimeout', 2.0),
           'Redirects'   => TRUE,
-          'Recycle'     => TRUE
+          'Recycle'     => FALSE
       );
       
       $Options = array_merge($Defaults, $Options);
