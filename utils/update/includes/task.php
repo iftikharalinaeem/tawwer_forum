@@ -288,7 +288,10 @@ abstract class Task {
          while ($Line = fread($Pointer, 4096)) {
             $Response .= $Line;
          }
-         @fclose($Pointer);
+         
+         if (!$Recycle)
+            @fclose($Pointer);
+         
          $Bytes = strlen($Response);
          $Response = trim($Response);
          $Success = TRUE;
