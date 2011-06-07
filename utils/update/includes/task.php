@@ -246,7 +246,9 @@ abstract class Task {
                TaskList::MinorEvent("Loaded existing pointer for {$HostAddress}");
                $Recycled = TRUE;
             }
-         } else {
+         }
+         
+         if (!$Pointer) {
             if ($Recycle)
                TaskList::MinorEvent("Making a new reusable pointer for {$HostAddress}");
             $Pointer = @fsockopen($HostAddress, $Port, $ErrorNumber, $Error);
@@ -256,7 +258,6 @@ abstract class Task {
             throw new Exception(sprintf('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s', $Url, $ErrorNumber, $Error));
    
          if ($Recycle && !$Recycled) {
-            TaskList::MinorEvent("Pointer created successfully");
             $ConnectionHandles[$HostAddress] = &$Pointer;
          }
             
