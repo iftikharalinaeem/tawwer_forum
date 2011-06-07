@@ -265,7 +265,7 @@ abstract class Task {
             self::$ConnectionHandles[$HostAddress] = &$Pointer;
          }
          
-         if ($Timeout > 0)
+         if ($Timeout > 0 && !$Recycle)
             stream_set_timeout($Pointer, $Timeout);
          
          if (strlen($Cookie) > 0)
