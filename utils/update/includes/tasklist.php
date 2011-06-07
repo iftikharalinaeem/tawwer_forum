@@ -311,7 +311,8 @@ class TaskList {
    
       // Check one more time
       if (TaskList::Cautious()) {
-         $Proceed = TaskList::Question("","Proceed with task execution?",array('yes','no'),'no');
+         TaskList::MajorEvent("TaskMode: {$this->Mode}");
+         $Proceed = TaskList::Question("","Proceed with task execution?",array('yes','no'),'yes');
          if ($Proceed == 'no') exit();
       }
       
