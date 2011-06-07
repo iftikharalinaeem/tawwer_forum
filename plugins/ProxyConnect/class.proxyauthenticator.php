@@ -393,11 +393,12 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       
       $URLType = str_replace('Remote','',$URLType);
       // If we get here, we're handling a RemoteURL question
-      if ($Provider && GetValue($URLType, $Provider, FALSE)) {
+      $ProviderUrlValue = GetValue($URLType, $Provider, FALSE);
+      if ($Provider && $ProviderUrlValue) {
          return array(
-            'URL'          => $Provider[$URLType],
+            'URL'          => $ProviderUrlValue,
             'Parameters'   => array(
-               'Nonce'  => $Nonce['Nonce']
+               'Nonce'     => $Nonce['Nonce']
             )
          );
       }
