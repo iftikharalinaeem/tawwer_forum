@@ -53,12 +53,14 @@ class UtilityUpdateTask extends Task {
          TaskList::MinorEvent('Update failed');
          
          if ($this->ReportFailures) {
-            $Email = new Email($this);
-            $Email->To('tim@vanillaforums.com', 'Tim Gunter')
-               ->From('runner@vanillaforums.com','VFCom Runner')
-               ->Subject("{$this->ClientFolder} update failed")
-               ->Message("Automatic remote utility/update failed.\n\n{$UtilityUpdate}")
-               ->Send();
+            try {
+               $Email = new Email($this);
+               $Email->To('tim@vanillaforums.com', 'Tim Gunter')
+                  ->From('runner@vanillaforums.com','VFCom Runner')
+                  ->Subject("{$this->ClientFolder} update failed")
+                  ->Message("Automatic remote utility/update failed.\n\n{$UtilityUpdate}")
+                  ->Send();
+            } catch (Exception $e) {}
          }
       }
    }
