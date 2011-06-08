@@ -267,8 +267,12 @@ class ProxyRequest {
       $Scheme = GetValue('scheme', $UrlParts, 'http');
       $Host = GetValue('host', $UrlParts, '');
       $Port = GetValue('port', $UrlParts, '80');
+      if (empty($Port)) $Port = 80;
       $Path = GetValue('path', $UrlParts, '');
       $Query = GetValue('query', $UrlParts, '');
+      
+      echo "GET {$Path} from {$Host}\n";
+      
       // Get the cookie.
       $Cookie = '';
       $EncodeCookies = TRUE;
