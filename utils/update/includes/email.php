@@ -23,7 +23,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 
 require_once(PATH_RUNNER.'/vendors/phpmailer/class.phpmailer.php');
-class Email extends Gdn_Pluggable {
+class Email {
 
    /**
     * @var PHPMailer
