@@ -358,6 +358,11 @@ class ProxyRequest {
 
          if (in_array($this->ResponseStatus, array(301,302)) && $FollowRedirects) {
             $Location = GetValue('Location', $this->ResponseHeaders);
+            
+            if (substr($Location,0,4) != 'http') {
+               $Location = ltrim($Location, '/');
+               $Location = "http://{$Host}/{$Location}";
+            }
             $Options['URL'] = $Location;
             return $this->Request($Options, $QueryParams);
          }
