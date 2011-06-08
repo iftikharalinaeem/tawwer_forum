@@ -1249,7 +1249,7 @@ div.Feature h4 {
 	float: right;
 }
 body.Discussion a.Bookmark {
-	margin:2px 8px;
+	margin: 0 0 0 8px
 }
 
 .Pages #Panel {
