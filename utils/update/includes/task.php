@@ -164,7 +164,7 @@ abstract class Task {
       return $ProxyRequest->Request($Options, $QueryParams);
    }
 
-   protected function C($Name = FALSE, $Default = FALSE) {
+   public function C($Name = FALSE, $Default = FALSE) {
       if (is_null($this->ClientInfo)) return;
       return $this->Config->Get($Name, $Default);
    }
