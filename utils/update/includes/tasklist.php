@@ -104,9 +104,8 @@ class TaskList {
       $this->Perform = array();
       $this->Clients = NULL;
       
-      $RequireDB = $this->GetConsoleOption('require-db', TRUE);
-      if ($RequireDB == 'no') $RequireDB = FALSE;
-      $this->RequireDB = (bool)$RequireDB;
+      $AllowBroken = (bool)$this->GetConsoleOption('allow-broken', FALSE);
+      $this->RequireDB = !$AllowBroken;
    }
    
    /**
