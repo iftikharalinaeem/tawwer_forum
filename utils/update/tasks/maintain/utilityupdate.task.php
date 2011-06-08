@@ -11,7 +11,7 @@ class UtilityUpdateTask extends Task {
       if ($Proceed == 'no') return;
       $this->Utility = TRUE;
       
-      $ReportFailures = $this->GetConsoleOption('report-failures', FALSE);
+      $ReportFailures = TaskList::GetConsoleOption('report-failures', FALSE);
       $this->ReportFailures = $ReportFailures;
    }
    
