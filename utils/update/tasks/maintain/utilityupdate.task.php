@@ -33,7 +33,7 @@ class UtilityUpdateTask extends Task {
          $UtilityUpdate = FALSE;
          try {
             $UtilityUpdate = $this->Request(array(
-               'URL'       => 'utility/alive.json',
+               'URL'       => 'utility/update.json',
                'Timeout'   => 0,
                'Recycle'   => TRUE
             ));
