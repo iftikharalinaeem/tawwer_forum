@@ -153,10 +153,11 @@ abstract class Task {
              'URL'      => $Options
          );
       }
+      if (!array_key_exists('URL', $Options))
+         return FALSE;
       
-      $Url = &$Options['URL'];
-      if ($Absolute && substr($Url,0,4) !== 'http')
-         $Url = 'http://'.$this->ClientFolder.'/'.ltrim($Url,'/');
+      if ($Absolute && substr($Options['URL'],0,4) !== 'http')
+         $Options['URL'] = 'http://'.$this->ClientFolder.'/'.ltrim($Options['URL'],'/');
       
       $ProxyRequest = new ProxyRequest();
       return $ProxyRequest->Request($Options, $QueryParams);
