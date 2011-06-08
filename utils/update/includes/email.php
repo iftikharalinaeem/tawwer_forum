@@ -175,26 +175,21 @@ class Email {
     */
    public function Send($EventName = '') {
       
-      if ($this->Task->C('Garden.Email.UseSmtp')) {
-         $this->PhpMailer->IsSMTP();
-         $SmtpHost = $this->Task->C('Garden.Email.SmtpHost', '');
-         $SmtpPort = $this->Task->C('Garden.Email.SmtpPort', 25);
-         if (strpos($SmtpHost, ':') !== FALSE) {
-            list($SmtpHost, $SmtpPort) = explode(':', $SmtpHost);
-         }
-
-         $this->PhpMailer->Host = $SmtpHost;
-         $this->PhpMailer->Port = $SmtpPort;
-         $this->PhpMailer->SMTPSecure = $this->Task->C('Garden.Email.SmtpSecurity', '');
-         $this->PhpMailer->Username = $Username = $this->Task->C('Garden.Email.SmtpUser', '');
-         $this->PhpMailer->Password = $Password = $this->Task->C('Garden.Email.SmtpPassword', '');
-         if(!empty($Username))
-            $this->PhpMailer->SMTPAuth = TRUE;
-
-         
-      } else {
-         $this->PhpMailer->IsMail();
+      $this->PhpMailer->IsSMTP();
+      $SmtpHost = $this->Task->C('Garden.Email.SmtpHost', '');
+      $SmtpPort = $this->Task->C('Garden.Email.SmtpPort', 25);
+      if (strpos($SmtpHost, ':') !== FALSE) {
+         list($SmtpHost, $SmtpPort) = explode(':', $SmtpHost);
       }
+
+      $this->PhpMailer->Host = $SmtpHost;
+      $this->PhpMailer->Port = $SmtpPort;
+      $this->PhpMailer->SMTPSecure = $this->Task->C('Garden.Email.SmtpSecurity', '');
+      $this->PhpMailer->Username = $Username = $this->Task->C('Garden.Email.SmtpUser', '');
+      $this->PhpMailer->Password = $Password = $this->Task->C('Garden.Email.SmtpPassword', '');
+      if(!empty($Username))
+         $this->PhpMailer->SMTPAuth = TRUE;
+
       
       if (!$this->PhpMailer->Send()) {
          throw new Exception($this->PhpMailer->ErrorInfo);
