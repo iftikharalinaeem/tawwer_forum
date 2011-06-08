@@ -357,7 +357,7 @@ class ProxyRequest {
          }
 
          if (in_array($this->ResponseStatus, array(301,302)) && $FollowRedirects) {
-            $Location = GetValue('Location', $ResponseHeaders);
+            $Location = GetValue('Location', $this->ResponseHeaders);
             $Options['URL'] = $Location;
             return $this->Request($Options, $QueryParams);
          }
