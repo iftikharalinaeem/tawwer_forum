@@ -271,8 +271,6 @@ class ProxyRequest {
       $Path = GetValue('path', $UrlParts, '');
       $Query = GetValue('query', $UrlParts, '');
       
-      echo "GET {$Path} from {$Host}\n";
-      
       // Get the cookie.
       $Cookie = '';
       $EncodeCookies = TRUE;
@@ -361,7 +359,7 @@ class ProxyRequest {
          }
 
          if (in_array($this->ResponseStatus, array(301,302)) && $FollowRedirects) {
-            $Location = GetValue('Location', $this->ResponseHeaders);
+            $Location = GetValue('Location', $this->ResponseHeaders, NULL);
             if (is_null($Location))
                $Location = GetValue('location', $this->ResponseHeaders, NULL);
             
