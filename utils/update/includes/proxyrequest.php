@@ -362,6 +362,11 @@ class ProxyRequest {
 
          if (in_array($this->ResponseStatus, array(301,302)) && $FollowRedirects) {
             $Location = GetValue('Location', $this->ResponseHeaders);
+            if (is_null($Location))
+               $Location = GetValue('location', $this->ResponseHeaders, NULL);
+            
+            if (is_null($Location))
+               throw new Exception("Received status code {$this->ResponseStatus} (redirect) but no 'Location' provided.");
             
             if (substr($Location,0,4) != 'http') {
                $Location = ltrim($Location, '/');
