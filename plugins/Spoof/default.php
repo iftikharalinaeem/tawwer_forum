@@ -37,7 +37,7 @@ class SpoofPlugin implements Gdn_IPlugin {
          $UserModel = Gdn::UserModel();
          $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
 			// if (1 == 1) {
-         if (is_object($UserData) && $UserData->Admin == '1') {
+         if (is_object($UserData) && $UserData->Admin) {
 				if (is_numeric($UserReference)) {
 					$SpoofUser = $UserModel->Get($UserReference);
 				} else {
