@@ -47,7 +47,6 @@ class Email {
       $this->PhpMailer->SingleTo = $this->Task->C('Garden.Email.SingleTo', FALSE);
       $this->PhpMailer->PluginDir = PATH_RUNNER.'/vendors/phpmailer/';
       $this->Clear();
-      parent::__construct();
    }
 
 
