@@ -73,7 +73,7 @@
       <!-- Start foot -->
       
       <div id="Foot">
-			<div><div class="vanilla-ico"></div> <a href="http://vanillaforums.org">Powered by Vanilla</a></div>
+			<div><div class="vanilla-ico"></div> <a href="{vanillaurl}">Powered by Vanilla</a></div>
     {asset name="Foot"}
 		</div>
         
