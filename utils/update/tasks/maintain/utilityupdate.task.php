@@ -10,6 +10,10 @@ class UtilityUpdateTask extends Task {
       $Proceed = TaskList::Question("Run utility/update as part of this update?","Run utility/update?",array('yes','no'),'yes');
       if ($Proceed == 'no') return;
       $this->Utility = TRUE;
+      
+      $ReportFailures = $this->GetConsoleOption('report-failures', TRUE);
+      if ($ReportFailures == 'no') $ReportFailures = FALSE;
+      $this->ReportFailures = $ReportFailures;
    }
    
    protected function Run() {
@@ -48,7 +52,10 @@ class UtilityUpdateTask extends Task {
          }
          
          TaskList::MinorEvent('Update failed');
-         var_dump($JsonResponse);
+         
+         if ($this->ReportFailures) {
+            mail('tim@vanillaforums.com','Failed DB Update',"Automatic DB Update Failed\n\n{$UtilityUpdate}");
+         }
       }
    }
 
