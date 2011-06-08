@@ -10,13 +10,43 @@ class VanillaMaplewoodThemeHooks extends Gdn_Plugin {
     * @param array $Args
     */
    public function Base_Render_Before($Sender, $Args) {
+   	if ($Sender->MasterView == 'admin.master')
+   		return;
+
+// $web_ref = @$_SERVER['HTTP_REFERER'];
+// echo "refer: ".$web_ref; //$_SERVER['HTTP_REFERER'];
+   
+   $Url = Url('/', TRUE);
+// echo "$Url";
+if (StringBeginsWith($Url, 'http://www.southorangevillage.com/forum/')) {	  
       ob_start();
-//      include '../ad_solo.php';
+      @include '/home/maple/public_html/maplewood_forum_top.php';
       $Ad = ob_get_clean();
-      $Sender->SetData('Ad', $Ad);
+    } elseif (StringBeginsWith($Url, 'http://sov.maplewoodonline.com/vc')) {
+      ob_start();
+      @include '/home/maple/public_html/southorange_forum_top.php';
+      $Ad = ob_get_clean();
+    } elseif (StringBeginsWith($Url, 'http://mil.maplewoodonline.com/vc')) {
+      ob_start();
+      @include '/home/maple/public_html/millburn_forum_top.php';
+      $Ad = ob_get_clean();
+    } else {
+      ob_start();
+      @include '/home/maple/public_html/maplewood_forum_top.php';
+      $Ad = ob_get_clean();
+    }
+
+     $Sender->SetData('Ad', $Ad);     
    }
 
    public function DiscussionsController_BeforeRenderAsset_Handler($Sender, $Args) {
+      $this->_WritePager($Sender, $Args);
+   }
+   public function CategoriesController_BeforeRenderAsset_Handler($Sender, $Args) {
+      $this->_WritePager($Sender, $Args);
+   }
+
+   protected function _WritePager($Sender, $Args) {
       if ($Args['AssetName'] != 'Content')
          return;
 

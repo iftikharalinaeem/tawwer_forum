@@ -35,6 +35,10 @@ body.Profile #Panel .Photo img {
     width: 184px;
 }
 .PanelCategories {
+margin:-3px 0 0 0 !important;
+width:180px;
+list-style:none;
+background:#f5f9ff;
     display: block;
 }
 .PanelCategories .Count {
@@ -46,6 +50,27 @@ body.Profile #Panel .Photo img {
     float: none;
     text-align: left;
 }
+.Depth1 {
+margin-left:5px !important;
+padding:0px 5px 3px 5px !important;
+font-size:12px !important;
+font-weight: bold;
+color:#062971 !important;
+}
+.Depth1 a {
+color: #3354aa !important;
+text-decoration: underline !important;
+    font-weight: bold;
+}
+.Depth1 a:hover {
+text-decoration:none !important;
+    font-weight: bold;
+}
+
+.Depth1 li {
+border-bottom:11px solid #ccc;
+}
+
 ul.PanelInfo li {
     text-align: left;
 }
@@ -57,8 +82,34 @@ body.Profile #Content, #Content {
     margin: 0 20px 40px 220px;
     width: auto;
 }
+
+body.Post #Body {
+   width: 680px;
+}
+body.Post #Content {
+    float: left;
+    margin: 0 0 40px;
+    width: 680px;
+}
+
+#PreHead {
+    float: none;
+    background:#00000c;
+    text-align: center;
+}
+
+#Ads {
+    float: none;
+    background:#46674c;
+    text-align: center;
+}
+
+#Ads table {
+    text-align: center;
+}
+
 #Head {
-    background: url("waves.blue.gif") repeat-x scroll left top transparent;
+    background: url("waves.blue.gif") repeat-x scroll left top transparent; 
     border-bottom: 1px solid #ACBEDF;
     border-top: 1px solid #ACBEDF;
 }
@@ -112,6 +163,8 @@ body.Discussions #Menu li.DiscussionsTab a,
 body.Discussions #Menu li.DiscussionsTab a:hover,
 body.Activity #Menu li.ActivityTab a,
 body.Activity #Menu li.ActivityTab a:hover,
+body.Last24 #Menu li.last24Tab a,
+body.Last24 #Menu li.last24Tab a:hover,
 body.Profile #Menu li.ProfileTab a,
 body.Profile #Menu li.ProfileTab a:hover,
 body.Categories #Menu li.CategoriesTab a,
@@ -138,7 +191,12 @@ body.Conversations #Menu li.InboxTab a {
 #Menu li.AccountTab a:hover {
     color: #000000 !important;
 }
-div.MessageForm, div.Tabs {
+div.Tabs {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-bottom: 1px solid #CCCCCC;
+    padding: 5px 10px;
+}
+div.MessageForm {
     background: none repeat scroll 0 0 #FEF9E9;
     border-bottom: 1px solid #CCCCCC;
     padding: 5px 10px;
@@ -264,9 +322,11 @@ body.Entry #Panel, #dashboard_entrycontroller_signin #Panel, #vanilla_postcontro
     margin: 0 20px;
 }
 div.Tabs div.SubTab {
-    background: none repeat scroll 0 0 #FFFEEC;
-    color: #D57D00;
-    margin: 0 0 2px;
+    background: none repeat scroll 0 0 #FFFFFF;
+    color: #000000;    
+	font-size: 28px;
+    margin: 2px;
+	padding: 0;
 }
 ul.DataList div.Photo {
     padding: 0 6px;
@@ -355,7 +415,7 @@ body.Entry #Content form, #MessageForm, #DiscussionForm form {
     -moz-border-left-colors: none;
     -moz-border-right-colors: none;
     -moz-border-top-colors: none;
-    background: none repeat scroll 0 0 #FEF9E9;
+    background: none repeat scroll 0 0 #FFFFFF;
     border-color: #FFEDAE -moz-use-text-color;
     border-style: solid none;
     border-width: 1px medium;
