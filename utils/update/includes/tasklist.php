@@ -478,6 +478,25 @@ class TaskList {
          $Client->Run($TaskOrder);
       } catch (Exception $e) {
          TaskList::MajorEvent($e->getMessage());
+         
+         try {
+            $Email = new Email($Client);
+            
+            $TaskList = implode(",\n",array_keys($this->Tasks));
+            $Error = $e->getMessage();
+            
+            $Email->To('tim@vanillaforums.com', 'Tim Gunter')
+               ->From('runner@vanillaforums.com','VFCom Runner')
+               ->Subject("{$ClientFolder} failed to run")
+               ->Message("Client {$ClientFolder} experienced an error while running:
+               
+Task list was:
+{$TaskList}
+
+Error:
+{$Error}")
+               ->Send();
+         } catch (Exception $e) {}
       }
       
       TaskList::MajorEvent("");

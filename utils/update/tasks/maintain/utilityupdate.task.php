@@ -63,7 +63,7 @@ class UtilityUpdateTask extends Task {
          
          if ($this->ReportFailures) {
             try {
-               $Email = new Email($this);
+               $Email = new Email($this->Client);
                $Email->To('tim@vanillaforums.com', 'Tim Gunter')
                   ->From('runner@vanillaforums.com','VFCom Runner')
                   ->Subject("{$ClientFolder} update failed")

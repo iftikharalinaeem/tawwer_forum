@@ -29,7 +29,7 @@ class Email {
     * @var PHPMailer
     */
    public $PhpMailer;
-   protected $Task;
+   protected $Client;
 
    /**
     * @var boolean
@@ -39,12 +39,12 @@ class Email {
    /**
     * Constructor
     */
-   function __construct($Task) {
-      $this->Task = $Task;
+   function __construct(&$Client) {
+      $this->Client = $Client;
       
       $this->PhpMailer = new PHPMailer();
-      $this->PhpMailer->CharSet = $this->Task->C('Garden.Charset', 'utf-8');
-      $this->PhpMailer->SingleTo = $this->Task->C('Garden.Email.SingleTo', FALSE);
+      $this->PhpMailer->CharSet = $this->Client->C('Garden.Charset', 'utf-8');
+      $this->PhpMailer->SingleTo = $this->Client->C('Garden.Email.SingleTo', FALSE);
       $this->PhpMailer->PluginDir = PATH_RUNNER.'/vendors/phpmailer/';
       $this->Clear();
    }
@@ -92,7 +92,7 @@ class Email {
       $this->PhpMailer->AltBody = '';
       $this->From();
       $this->_IsToSet = FALSE;
-      $this->MimeType($this->Task->C('Garden.Email.MimeType', 'text/plain'));
+      $this->MimeType($this->Client->C('Garden.Email.MimeType', 'text/plain'));
       $this->_MasterView = 'email.master';
       return $this;
    }
@@ -108,14 +108,14 @@ class Email {
     */
    public function From($SenderEmail = '', $SenderName = '', $bOverrideSender = FALSE) {
       if ($SenderEmail == '') {
-         $SenderEmail = $this->Task->C('Garden.Email.SupportAddress', '');
+         $SenderEmail = $this->Client->C('Garden.Email.SupportAddress', '');
          if (!$SenderEmail) {
             $SenderEmail = 'noreply@vanillaforums.com';
          }
       }
 
       if ($SenderName == '')
-         $SenderName = $this->Task->C('Garden.Email.SupportName', $this->Task->C('Garden.Title', ''));
+         $SenderName = $this->Client->C('Garden.Email.SupportName', $this->Client->C('Garden.Title', ''));
       
       if($this->PhpMailer->Sender == '' || $bOverrideSender) $this->PhpMailer->Sender = $SenderEmail;
       
@@ -176,17 +176,17 @@ class Email {
    public function Send($EventName = '') {
       
       $this->PhpMailer->IsSMTP();
-      $SmtpHost = $this->Task->C('Garden.Email.SmtpHost', '');
-      $SmtpPort = $this->Task->C('Garden.Email.SmtpPort', 25);
+      $SmtpHost = $this->Client->C('Garden.Email.SmtpHost', '');
+      $SmtpPort = $this->Client->C('Garden.Email.SmtpPort', 25);
       if (strpos($SmtpHost, ':') !== FALSE) {
          list($SmtpHost, $SmtpPort) = explode(':', $SmtpHost);
       }
 
       $this->PhpMailer->Host = $SmtpHost;
       $this->PhpMailer->Port = $SmtpPort;
-      $this->PhpMailer->SMTPSecure = $this->Task->C('Garden.Email.SmtpSecurity', '');
-      $this->PhpMailer->Username = $Username = $this->Task->C('Garden.Email.SmtpUser', '');
-      $this->PhpMailer->Password = $Password = $this->Task->C('Garden.Email.SmtpPassword', '');
+      $this->PhpMailer->SMTPSecure = $this->Client->C('Garden.Email.SmtpSecurity', '');
+      $this->PhpMailer->Username = $Username = $this->Client->C('Garden.Email.SmtpUser', '');
+      $this->PhpMailer->Password = $Password = $this->Client->C('Garden.Email.SmtpPassword', '');
       if(!empty($Username))
          $this->PhpMailer->SMTPAuth = TRUE;
 
