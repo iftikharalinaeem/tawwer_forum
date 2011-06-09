@@ -67,8 +67,7 @@ class ProxyRequest {
       if (!$Pointer)
          throw new Exception(sprintf('Encountered an error while making a request to the remote server (%s): [%s] %s', $Url, $ErrorNumber, $Error));
 
-      if ($Timeout > 0)
-         stream_set_timeout($Pointer, $Timeout);
+      stream_set_timeout($Pointer, $Timeout);
       
       return $Pointer;
    }
@@ -169,6 +168,7 @@ class ProxyRequest {
          if ($ChunkLength < 1) { break; }
          
          $TotalBytes = 0;
+         $StalledCount = 20;
          do {
             $LeftToRead = $ChunkLength - $TotalBytes;
             if (!$LeftToRead) break;
@@ -176,7 +176,9 @@ class ProxyRequest {
             $this->ResponseBody .= $Data = fread($Pointer, $LeftToRead);
             $TotalBytes += $BytesRead = strlen($Data);
             unset($Data);
-         } while ($BytesRead && $LeftToRead);
+            
+            if (!$BytesRead) $StalledCount--;
+         } while ($LeftToRead && ($BytesRead || $StalledCount > 0));
          if ($TotalBytes < $ChunkLength)
             throw new Exception("Connection failed after {$TotalBytes}/{$ChunkLength} bytes");
          
@@ -229,15 +231,15 @@ class ProxyRequest {
       }
 
       $Defaults = array(
-          'URL'            => NULL,
-          'ConnectTimeout' => 5,
-          'Timeout'        => 2,
-          'Redirects'      => TRUE,
-          'Recycle'        => FALSE,
-          'Cookies'        => TRUE,
-          'Headers'        => array(),
-          'CloseSession'   => TRUE,
-          'Redirected'     => FALSE
+          'URL'                  => NULL,
+          'ConnectTimeout'       => 5,
+          'Timeout'              => 2,
+          'Redirects'            => TRUE,
+          'Recycle'              => FALSE,
+          'RequestsPerPointer'   => 30,
+          'Cookies'              => TRUE,
+          'CloseSession'         => TRUE,
+          'Redirected'           => FALSE
       );
 
       $this->ResponseHeaders = array();
