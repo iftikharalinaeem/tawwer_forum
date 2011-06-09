@@ -38,6 +38,9 @@ abstract class Task {
          $this->Config->Load($this->ConfigFile, 'Use');
       } catch (Exception $e) { die ($e->getMessage()); }
 
+      $ClientDBName = $this->C('Database.Name');
+      mysql_select_db($ClientDBName, $this->Database);
+      
       $this->Run();
    }
    
