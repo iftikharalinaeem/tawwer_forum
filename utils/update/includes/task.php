@@ -13,6 +13,10 @@ abstract class Task {
       $this->Root = rtrim($RootFolder,'/');
    }
    
+   /**
+    *
+    * @param Client $Client 
+    */
    public function SandboxExecute(&$Client) {
       $this->Client = $Client;
       $this->Run();
@@ -28,6 +32,19 @@ abstract class Task {
    protected function Uncache($Key) {
       unset($this->Client->GroupData[$Key]);
    }
+   
+   public function Database() {
+      return $this->Client->Database;
+   }
+   
+   public function ClientRoot() { return $this->Client->ClientRoot; }
+   public function ClientInfo($Param = NULL, $Default = NULL) { 
+      if (!is_null($Param))
+         return GetValue($Param, $this->Client->ClientInfo, $Default);
+      return $this->Client->ClientInfo; 
+   }
+   public function ClientFolder() { return $this->Client->ClientFolder; }
+   public function ConfigFile() { return $this->Client->ConfigFile; }
    
    // Forward to client
    public function __call($Method, $Args) {

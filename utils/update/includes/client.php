@@ -7,12 +7,12 @@ class Client {
    public $Tasks;
    public $GroupData;
    
-   protected $Root;
-   protected $ClientRoot;
-   protected $ClientFolder;
-   protected $ClientInfo;
-   protected $ConfigFile;
-   protected $Config;
+   public $Root;
+   public $ClientRoot;
+   public $ClientFolder;
+   public $ClientInfo;
+   public $ConfigFile;
+   public $Config;
    
    public function __construct($RootFolder, $ClientFolder, $ClientInfo) {
       $this->Root = rtrim($RootFolder,'/');

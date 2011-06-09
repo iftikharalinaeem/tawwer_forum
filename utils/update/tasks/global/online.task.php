@@ -8,7 +8,7 @@ class OnlineTask extends Task {
    
    protected function Run() {
       TaskList::Event("Client online...");
-      $this->RemoveFromConfig('Garden.UpdateMode');
+      $this->Client->RemoveFromConfig('Garden.UpdateMode');
    }
 
 }

@@ -16,26 +16,27 @@ class UtilityUpdateTask extends Task {
    }
    
    protected function Run() {
+      $ClientFolder = $this->ClientFolder();
       
       // No structure, no run
       if ($this->Utility === FALSE) return;
       //if ($this->Cache('Updated') !== TRUE) return;
       
       if (TaskList::Cautious()) {
-         $Proceed = TaskList::Question("Really run utility/update for {$this->ClientFolder}?","Run update?",array('yes','no','exit'),'yes');
+         $Proceed = TaskList::Question("Really run utility/update for {$ClientFolder}?","Run update?",array('yes','no','exit'),'yes');
          if ($Proceed == 'no') return;
          if ($Proceed == 'exit') exit();
       }
       
-      $DatabaseName = $this->ClientInfo['DatabaseName'];
+      $DatabaseName = $this->ClientInfo('DatabaseName');
       TaskList::Event("Running utility/update...");
       if (!LAME) {
          $UtilityUpdate = FALSE;
          try {
-            mysql_query("DELETE FROM GDN_UserMeta WHERE Name='Garden.Update.LastTimestamp' AND UserID=0",$this->Database);
-            mysql_query("DELETE FROM GDN_UserMeta WHERE Name='Garden.Update.Count' AND UserID=0",$this->Database);
+            mysql_query("DELETE FROM GDN_UserMeta WHERE Name='Garden.Update.LastTimestamp' AND UserID=0",$this->Database());
+            mysql_query("DELETE FROM GDN_UserMeta WHERE Name='Garden.Update.Count' AND UserID=0",$this->Database());
             
-            $UtilityUpdate = $this->Request(array(
+            $UtilityUpdate = $this->Client->Request(array(
                'URL'       => 'utility/update.json',
                'Timeout'   => 0,
                'Recycle'   => TRUE
@@ -60,7 +61,7 @@ class UtilityUpdateTask extends Task {
                $Email = new Email($this);
                $Email->To('tim@vanillaforums.com', 'Tim Gunter')
                   ->From('runner@vanillaforums.com','VFCom Runner')
-                  ->Subject("{$this->ClientFolder} update failed")
+                  ->Subject("{$ClientFolder} update failed")
                   ->Message("Automatic remote utility/update failed.\n\n{$UtilityUpdate}")
                   ->Send();
             } catch (Exception $e) {}
