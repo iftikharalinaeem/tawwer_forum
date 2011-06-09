@@ -17,5 +17,6 @@ require_once('configuration.php');
 require_once('args.php');
 require_once('email.php');
 require_once('proxyrequest.php');
+require_once('client.php');
 require_once('tasklist.php');
 require_once('task.php');
