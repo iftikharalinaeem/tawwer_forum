@@ -29,7 +29,12 @@ class ProxyRequest {
       self::$ConnectionHandles = array();
    }
    
-   protected function FsockConnect($Host, $Port, $Timeout, $Recycle) {
+   protected function FsockConnect($Host, $Port, $Options) {
+      
+      $ConnectTimeout = GetValue('ConnectTimeout', $Options);
+      $Recycle = GetValue('Recycle', $Options);
+      $RecycleFrequency = GetValue('RequestsPerPointer', $Options);
+      
       $Pointer = FALSE;
       
       // Try to resolve hostname
@@ -43,15 +48,28 @@ class ProxyRequest {
 
       // If we're trying to recycle, look for an existing handler
       if ($Recycle && array_key_exists($HostAddress, self::$ConnectionHandles)) {
-         $Pointer = &self::$ConnectionHandles[$HostAddress];
-         $StreamMeta = stream_get_meta_data($Pointer);
-         
-         if ($Pointer && !GetValue('timed_out', $StreamMeta) && !GetValue('eof', $StreamMeta)) {
+         $PointerInfo = &self::$ConnectionHandles[$HostAddress];
+         try {
+            if (!is_array($PointerInfo))
+               throw new Exception();
+            
+            if (!isset($PointerInfo['Handle']) || !$PointerInfo['Handle'])
+               throw new Exception();
+            
+            $Pointer = $PointerInfo['Handle'];
+            $StreamMeta = stream_get_meta_data($Pointer);
+
+            if (GetValue('timed_out', $StreamMeta) || GetValue('eof', $StreamMeta))
+               throw new Exception();
+            
+            if ($RecycleFrequency > 0 && GetValue('Requests', $PointerInfo) > $RecycleFrequency)
+               throw new Exception();
+            
             //echo " : Loaded existing pointer for {$HostAddress}\n";
             $Recycled = TRUE;
-         } else {
-            $Pointer = FALSE;
-            unset(self::$ConnectionHandles[$HostAddress]);
+            
+         } catch (Exception $e) {
+            $this->FsockDisconnect($Pointer, $HostAddress);
             //echo " : Threw away dead pointer for {$HostAddress}\n";
          }
       }
@@ -60,7 +78,15 @@ class ProxyRequest {
          $Pointer = @fsockopen($HostAddress, $Port, $ErrorNumber, $Error, 30);
          if ($Recycle && !$Recycled) {
             //echo " : Making a new reusable pointer for {$HostAddress}\n";
-            self::$ConnectionHandles[$HostAddress] = $Pointer;
+            self::$ConnectionHandles[$HostAddress] = array(
+                'Handle'         => $Pointer,
+                'Host'           => $Host,
+                'HostAddress'    => $HostAddress,
+                'HostPort'       => $Port,
+                'Requests'       => 0,
+                'BytesSent'      => 0,
+                'BytesReceived'  => 0
+            );
          }
       }
 
@@ -72,8 +98,13 @@ class ProxyRequest {
       return $Pointer;
    }
    
-   protected function FsockDisconnect($Pointer) {
-      @fclose($Pointer);
+   protected function FsockDisconnect(&$Pointer, $HostAddress = NULL) {
+      if ($Pointer)
+         @fclose($Pointer);
+      $Pointer = FALSE;
+      
+      if (!is_null($HostAddress) && array_key_exists($HostAddress, self::$ConnectionHandles))
+         unset(self::$ConnectionHandles[$HostAddress]);
    }
    
    protected function FsockSend(&$Pointer, $Data) {
@@ -151,7 +182,10 @@ class ProxyRequest {
             $this->ResponseBody .= $Data = fread($Pointer, $LeftToRead);
             $TotalBytes += $BytesRead = strlen($Data);
             unset($Data);
-         } while ($BytesRead);
+            
+            if (feof($Pointer))
+               break;
+         } while ($LeftToRead);
          if ($TotalBytes < $ContentLength)
             throw new Exception("Connection failed after {$TotalBytes}/{$ContentLength} bytes");
          return $this->ResponseBody;
@@ -168,7 +202,6 @@ class ProxyRequest {
          if ($ChunkLength < 1) { break; }
          
          $TotalBytes = 0;
-         $StalledCount = 20;
          do {
             $LeftToRead = $ChunkLength - $TotalBytes;
             if (!$LeftToRead) break;
@@ -177,8 +210,9 @@ class ProxyRequest {
             $TotalBytes += $BytesRead = strlen($Data);
             unset($Data);
             
-            if (!$BytesRead) $StalledCount--;
-         } while ($LeftToRead && ($BytesRead || $StalledCount > 0));
+            if (feof($Pointer))
+               break;
+         } while ($LeftToRead);
          if ($TotalBytes < $ChunkLength)
             throw new Exception("Connection failed after {$TotalBytes}/{$ChunkLength} bytes");
          
@@ -324,7 +358,7 @@ class ProxyRequest {
          curl_close($Handler);
       } else if (function_exists('fsockopen')) {
          
-         $Pointer = $this->FsockConnect($Host, 80, $ConnectTimeout, $Recycle);
+         $Pointer = $this->FsockConnect($Host, 80, $Options);
 
          $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
          $SendHeaders = array();
