@@ -32,6 +32,7 @@ class ProxyRequest {
    protected function FsockConnect($Host, $Port, $Options) {
       
       $ConnectTimeout = GetValue('ConnectTimeout', $Options);
+      $ReadTimeout = GetValue('Timeout', $Options);
       $Recycle = GetValue('Recycle', $Options);
       $RecycleFrequency = GetValue('RequestsPerPointer', $Options);
       
@@ -75,7 +76,7 @@ class ProxyRequest {
       }
 
       if (!$Pointer) {
-         $Pointer = @fsockopen($HostAddress, $Port, $ErrorNumber, $Error, 30);
+         $Pointer = @fsockopen($HostAddress, $Port, $ErrorNumber, $Error, $ConnectTimeout);
          if ($Recycle && !$Recycled) {
             //echo " : Making a new reusable pointer for {$HostAddress}\n";
             self::$ConnectionHandles[$HostAddress] = array(
@@ -93,7 +94,7 @@ class ProxyRequest {
       if (!$Pointer)
          throw new Exception(sprintf('Encountered an error while making a request to the remote server (%s): [%s] %s', $Url, $ErrorNumber, $Error));
 
-      stream_set_timeout($Pointer, $Timeout);
+      stream_set_timeout($Pointer, $ReadTimeout);
       
       return $Pointer;
    }
@@ -173,10 +174,10 @@ class ProxyRequest {
       }
       
       // Keepalive, not chunked
-      if (isset($ContentLength) && $TransferEncoding != 'chunked') {
+      if (isset($this->ContentLength) && $TransferEncoding != 'chunked') {
          $TotalBytes = 0;
          do {
-            $LeftToRead = $ContentLength - $TotalBytes;
+            $LeftToRead = $this->ContentLength - $TotalBytes;
             if (!$LeftToRead) break;
             
             $this->ResponseBody .= $Data = fread($Pointer, $LeftToRead);
@@ -186,8 +187,9 @@ class ProxyRequest {
             if (feof($Pointer))
                break;
          } while ($LeftToRead);
-         if ($TotalBytes < $ContentLength)
-            throw new Exception("Connection failed after {$TotalBytes}/{$ContentLength} bytes");
+         if ($TotalBytes < $this->ContentLength)
+            throw new Exception("Connection failed after {$TotalBytes}/{$this->ContentLength} bytes (te: normal)");
+            
          return $this->ResponseBody;
       }
       
@@ -214,7 +216,7 @@ class ProxyRequest {
                break;
          } while ($LeftToRead);
          if ($TotalBytes < $ChunkLength)
-            throw new Exception("Connection failed after {$TotalBytes}/{$ChunkLength} bytes");
+            throw new Exception("Connection failed after {$TotalBytes}/{$ChunkLength} bytes (te: chunked)");
          
          // Chunks are terminated by CRLF
 			fgets($Pointer, $this->MaxReadSize);
