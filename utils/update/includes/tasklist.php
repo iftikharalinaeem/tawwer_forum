@@ -448,8 +448,9 @@ class TaskList {
       }
       
       $Client = new Client($this->Clients, $ClientFolder, $ClientInfo);
-      $Client->Configure($this->Database, $this, $this->Tasks);
+      $Client->Configure($this, $this->Tasks);
       $Client->Run($TaskOrder);
+      
       TaskList::MajorEvent("");
    }
    
