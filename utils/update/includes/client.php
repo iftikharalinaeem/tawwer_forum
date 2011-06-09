@@ -2,7 +2,7 @@
 
 class Client {
    
-   protected $Database;
+   public $Database;
    public $TaskList;
    public $Tasks;
    public $GroupData;
