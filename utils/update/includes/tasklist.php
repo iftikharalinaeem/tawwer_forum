@@ -121,7 +121,7 @@ class TaskList {
       $Key = "{$Host}:{$User}:{$Pass}";
       if (!array_key_exists($Key, $this->Databases) || $Reuse == FALSE) {
          // Open the db connection, new link please
-         $Database = mysql_connect($Host, $User, $Pass, TRUE);
+         $Database = @mysql_connect($Host, $User, $Pass, TRUE);
          if (!$Database) {
             throw new Exception("Could not connect to database as '".$User."'@'".$Host."'");
          }
@@ -134,7 +134,7 @@ class TaskList {
       }
       
       if (!is_null($Name) && $Database)
-         mysql_select_db($Name, $Database);
+         @mysql_select_db($Name, $Database);
       
       return $Database;
    }
