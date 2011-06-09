@@ -107,28 +107,38 @@ class TaskList {
     * @param type $Key 
     * @return mysql
     */
-   public function Database($Host, $User, $Pass, $Name = NULL) {
+   public function Database($Host, $User, $Pass, $Name = NULL, $Reuse = TRUE) {
       
       if (!is_array($this->Databases))
          $this->Databases = array();
       
       $Key = "{$Host}:{$User}:{$Pass}";
-      if (!array_key_exists($Key, $this->Databases)) {
+      if (!array_key_exists($Key, $this->Databases) || $Reuse == FALSE) {
          // Open the db connection, new link please
-         $this->Databases[$Key] = mysql_connect($Host, $User, $Pass, TRUE);
-         if (!$this->Databases[$Key]) {
+         $Database = mysql_connect($Host, $User, $Pass, TRUE);
+         if (!$Database) {
             throw new Exception("Could not connect to database as '".$User."'@'".$Host."'");
          }
+         
+         if ($Reuse) {
+            $this->Databases[$Key] = $Database;
+         }
+      } else {
+         $Database = $this->Databases[$Key];
       }
       
-      if (!is_null($Name))
-         mysql_select_db($Name, $this->Databases[$Key]);
+      if (!is_null($Name) && $Database)
+         mysql_select_db($Name, $Database);
       
-      return $this->Databases[$Key];
+      return $Database;
    }
    
    public function RootDatabase() {
-      return $this->Database($this->DBHOST, $this->DBUSER, $this->DBPASS, $this->DBMAIN);
+      static $RootDatabase = NULL;
+      if (is_null($RootDatabase)) {
+         $RootDatabase = $this->Database($this->DBHOST, $this->DBUSER, $this->DBPASS, $this->DBMAIN, FALSE);
+      }
+      return $RootDatabase;
    }
    
    /**
