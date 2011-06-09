@@ -44,7 +44,7 @@ class Client {
       if (is_null($Host))
          throw new Exception("Unknown client database name");
       
-      if ($this->RequireDatabaseTarget) {
+      if ($this->RequireTargetDatabase) {
          $this->Database = &$this->TaskList->Database($Host, $User, $Pass, $Name);
          $ClientDBName = $this->C('Database.Name');
          mysql_select_db($ClientDBName, $this->Database);

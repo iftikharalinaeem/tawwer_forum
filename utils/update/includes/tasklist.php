@@ -346,12 +346,14 @@ class TaskList {
          $this->PerformAction($Perform);
       }
       
+      TaskList::MajorEvent("");
       TaskList::MajorEvent("Configuration:");
       $ValidClients = (($this->RequireValid) ? 'yes' : 'no');
       TaskList::Event("Valid Clients: {$ValidClients}");
       $TargetDatabase = (($this->RequireTargetDatabase) ? 'yes' : 'no');
       TaskList::Event("Auto Database: {$TargetDatabase}");
       TaskList::Event("Running Mode : {$RunMode}");
+      TaskList::MajorEvent("");
       
       // Check one more time
       if (TaskList::Cautious()) {
