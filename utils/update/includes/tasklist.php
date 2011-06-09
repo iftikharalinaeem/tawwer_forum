@@ -52,8 +52,11 @@ class TaskList {
    // Argument parser instance
    public static $Args = NULL;
    
-   // Boolean flag whether or not to require a valid DB to perform client
-   protected $RequireDB;
+   // Boolean flag whether or not to require a valid client to perform client
+   protected $RequireValid;
+   
+   // Boolean flag whether or not to require a pre-targetted client DB
+   protected $RequireTargetDatabase;
    
    public function __construct() {
    
@@ -99,7 +102,10 @@ class TaskList {
       $this->Clients = NULL;
       
       $AllowBroken = (bool)$this->GetConsoleOption('allow-broken', FALSE);
-      $this->RequireDB = !$AllowBroken;
+      $this->RequireValid = !$AllowBroken;
+      
+      // Be default, don't automake and target client DBs
+      $this->RequireTargetDatabase = FALSE;
    }
    
    /**
@@ -203,7 +209,7 @@ class TaskList {
             if ($Perform == TaskList::ACTION_CREATE) {
             
                // When creating, do not require DB.
-               $this->RequireDB = FALSE;
+               $this->RequireValid = FALSE;
                
                if ($Exists) {
                
@@ -339,7 +345,14 @@ class TaskList {
       foreach ($this->Perform as $Perform) {
          $this->PerformAction($Perform);
       }
-   
+      
+      TaskList::MajorEvent("Configuration:");
+      $ValidClients = (($this->RequireValid) ? 'yes' : 'no');
+      TaskList::Event("Valid Clients: {$ValidClients}");
+      $TargetDatabase = (($this->RequireTargetDatabase) ? 'yes' : 'no');
+      TaskList::Event("Auto Database: {$TargetDatabase}");
+      TaskList::Event("Running Mode : {$RunMode}");
+      
       // Check one more time
       if (TaskList::Cautious()) {
          TaskList::Event("TaskMode: {$this->Mode}");
@@ -450,16 +463,20 @@ class TaskList {
       TaskList::MajorEvent("{$ClientFolder} [{$SiteID}]...");
       $this->Completed++;
       
-      if ($this->RequireDB) {
+      if ($this->RequireValid) {
          if (!$ClientInfo || !sizeof($ClientInfo) || !isset($ClientInfo['SiteID'])) {
             TaskList::Event("skipped... no db");
             return;
          }
       }
       
-      $Client = new Client($this->Clients, $ClientFolder, $ClientInfo);
-      $Client->Configure($this, $this->Tasks);
-      $Client->Run($TaskOrder);
+      try {
+         $Client = new Client($this->Clients, $ClientFolder, $ClientInfo);
+         $Client->Configure($this, $this->Tasks);
+         $Client->Run($TaskOrder);
+      } catch (Exception $e) {
+         TaskList::MajorEvent($e->getMessage());
+      }
       
       TaskList::MajorEvent("");
    }

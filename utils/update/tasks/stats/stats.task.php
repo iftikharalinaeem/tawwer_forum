@@ -13,6 +13,10 @@ class StatsTask extends Task {
    public function __construct($ClientDir) {
       parent::__construct($ClientDir);
    }
+   
+   public function Init() {
+      $this->TaskList->RequireTargetDatabase = TRUE;
+   }
 
    protected function Run() {
       TaskList::Event("Updating site stats...", TaskList::NOBREAK);

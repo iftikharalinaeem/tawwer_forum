@@ -15,6 +15,10 @@ class UtilityUpdateTask extends Task {
       $this->ReportFailures = $ReportFailures;
    }
    
+   public function Init() {
+      $this->TaskList->RequireTargetDatabase = TRUE;
+   }
+   
    protected function Run() {
       $ClientFolder = $this->ClientFolder();
       

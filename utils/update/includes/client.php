@@ -44,14 +44,14 @@ class Client {
       if (is_null($Host))
          throw new Exception("Unknown client database name");
       
-      $this->Database = &$this->TaskList->Database($Host, $User, $Pass, $Name);
+      if ($this->RequireDatabaseTarget) {
+         $this->Database = &$this->TaskList->Database($Host, $User, $Pass, $Name);
+         $ClientDBName = $this->C('Database.Name');
+         mysql_select_db($ClientDBName, $this->Database);
+      }
    }
    
    public function Run($TaskOrder) {
-      
-      $ClientDBName = $this->C('Database.Name');
-      mysql_select_db($ClientDBName, $this->Database);
-      
       $this->GroupData = array();
       // Run all tasks for this client
       if (!is_null($TaskOrder)) {
