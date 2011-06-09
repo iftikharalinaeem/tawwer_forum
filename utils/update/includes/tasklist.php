@@ -274,7 +274,6 @@ class TaskList {
                if (is_subclass_of($Class, 'Task')) {
                   TaskList::Event("Configuring task: {$QualifiedTaskName} (".strtolower($Class).")");
                   $NewTask = new $Class($this->Clients);
-                  $NewTask->Database = $this->Database;
                   $NewTask->TaskList =& $this;
                   $this->Tasks[$QualifiedTaskName] = array(
                      'name'            => str_replace('Task', '', $Class),
@@ -425,17 +424,9 @@ class TaskList {
          }
       }
       
-      $this->GroupData = array();
-      // Run all tasks for this client
-      if (!is_null($TaskOrder)) {
-         foreach ($TaskOrder as $TaskName) {
-            if (!array_key_exists($TaskName, $this->Tasks)) continue;
-            $this->Tasks[$TaskName]['task']->SandboxExecute($ClientFolder, $ClientInfo);
-         }
-      } else {
-         foreach ($this->Tasks as $TaskName => &$Task)
-            $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
-      }
+      $Client = new Client($this->Clients, $ClientFolder, $ClientInfo);
+      $Client->Configure($this->Database, $this, $this->Tasks);
+      $Client->Run($TaskOrder);
       TaskList::MajorEvent("");
    }
    
