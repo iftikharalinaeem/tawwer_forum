@@ -35,6 +35,7 @@ class TaskList {
    
    // Link to database resource
    protected $Database;
+   protected $Databases;
    
    // Cached list of clients
    protected $ClientList;
@@ -87,14 +88,7 @@ class TaskList {
       $this->DBMAIN = $this->Config->Get('Database.Name', NULL);
 
       // Open the db connection, new link please
-      $this->Database = mysql_connect($this->DBHOST, $this->DBUSER, $this->DBPASS, TRUE);
-      if (!$this->Database) {
-         TaskList::MajorEvent("Could not connect to database as '".$this->DBUSER."'@'".$this->DBHOST."'");
-         die();
-      }
-         
-      mysql_select_db($this->DBMAIN, $this->Database);
-      
+      $this->Database = &$this->RootDatabase();
       TaskList::MajorEvent("Connected to ".$this->DBMAIN." @ ".$this->DBHOST);
       
       // Chdir to where we are right now. Root of the utils/update/ folder
@@ -106,6 +100,35 @@ class TaskList {
       
       $AllowBroken = (bool)$this->GetConsoleOption('allow-broken', FALSE);
       $this->RequireDB = !$AllowBroken;
+   }
+   
+   /**
+    *
+    * @param type $Key 
+    * @return mysql
+    */
+   public function Database($Host, $User, $Pass, $Name = NULL) {
+      
+      if (!is_array($this->Databases))
+         $this->Databases = array();
+      
+      $Key = "{$Host}:{$User}:{$Pass}";
+      if (!array_key_exists($Key, $this->Databases)) {
+         // Open the db connection, new link please
+         $this->Databases[$Key] = mysql_connect($Host, $User, $Pass, TRUE);
+         if (!$this->Databases[$Key]) {
+            throw new Exception("Could not connect to database as '".$User."'@'".$Host."'");
+         }
+      }
+      
+      if (!is_null($Name))
+         mysql_select_db($Name, $this->Databases[$Key]);
+      
+      return $this->Databases[$Key];
+   }
+   
+   public function RootDatabase() {
+      return $this->Database($this->DBHOST, $this->DBUSER, $this->DBPASS, $this->DBMAIN);
    }
    
    /**

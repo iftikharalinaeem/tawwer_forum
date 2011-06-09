@@ -2,7 +2,7 @@
 
 class Client {
    
-   public $Database;
+   protected $Database;
    public $TaskList;
    public $Tasks;
    public $GroupData;
@@ -30,13 +30,28 @@ class Client {
       } catch (Exception $e) { die ($e->getMessage()); }
    }
    
-   public function Configure(&$Database, &$TaskList, &$Tasks) {
-      $this->Database = $Database;
+   public function Configure(&$TaskList, &$Tasks) {
       $this->TaskList = $TaskList;
       $this->Tasks = $Tasks;
+      
+      $Host = $this->C('Database.Host', NULL);
+      if (is_null($Host))
+         throw new Exception("Unknown client database host");
+      
+      $User = $this->C('Database.User', NULL);
+      $Pass = $this->C('Database.Password', NULL);
+      $Name = $this->C('Database.Name', NULL);
+      if (is_null($Host))
+         throw new Exception("Unknown client database name");
+      
+      $this->Database = &$this->TaskList->Database($Host, $User, $Pass, $Name);
    }
    
    public function Run($TaskOrder) {
+      
+      $ClientDBName = $this->C('Database.Name');
+      mysql_select_db($ClientDBName, $this->Database);
+      
       $this->GroupData = array();
       // Run all tasks for this client
       if (!is_null($TaskOrder)) {
