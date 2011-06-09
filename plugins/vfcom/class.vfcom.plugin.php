@@ -171,7 +171,7 @@ class VfcomPlugin extends Gdn_Plugin {
       }
       
       $Sender->SetData('Caching', Gdn::Cache()->ActiveEnabled());
-      $Sender->SetData('DebugMode', C('Garden.Debug', FALSE));
+      $Sender->SetData('DebugMode', C('Debug', FALSE));
       $Sender->SetData('VFOptions', Gdn::PluginManager()->CheckPlugin('vfoptions'));
       $Sender->SetData('VFSpoof', Gdn::PluginManager()->CheckPlugin('vfspoof'));
       
