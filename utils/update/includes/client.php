@@ -34,17 +34,17 @@ class Client {
       $this->TaskList = $TaskList;
       $this->Tasks = $Tasks;
       
-      $Host = $this->C('Database.Host', NULL);
-      if (is_null($Host))
-         throw new Exception("Unknown client database host");
+      if ($this->TaskList->RequireTargetDatabase) {
+         $Host = $this->C('Database.Host', NULL);
+         if (is_null($Host))
+            throw new Exception("Unknown client database host");
+
+         $User = $this->C('Database.User', NULL);
+         $Pass = $this->C('Database.Password', NULL);
+         $Name = $this->C('Database.Name', NULL);
+         if (is_null($Host))
+            throw new Exception("Unknown client database name");
       
-      $User = $this->C('Database.User', NULL);
-      $Pass = $this->C('Database.Password', NULL);
-      $Name = $this->C('Database.Name', NULL);
-      if (is_null($Host))
-         throw new Exception("Unknown client database name");
-      
-      if ($this->RequireTargetDatabase) {
          $this->Database = &$this->TaskList->Database($Host, $User, $Pass, $Name);
          $ClientDBName = $this->C('Database.Name');
          mysql_select_db($ClientDBName, $this->Database);
