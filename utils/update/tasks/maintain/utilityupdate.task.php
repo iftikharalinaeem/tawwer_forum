@@ -32,6 +32,9 @@ class UtilityUpdateTask extends Task {
       if (!LAME) {
          $UtilityUpdate = FALSE;
          try {
+            mysql_query("DELETE FROM GDN_UserMeta WHERE Name='Garden.Update.LastTimestamp' AND UserID=0",$this->Database);
+            mysql_query("DELETE FROM GDN_UserMeta WHERE Name='Garden.Update.Count' AND UserID=0",$this->Database);
+            
             $UtilityUpdate = $this->Request(array(
                'URL'       => 'utility/update.json',
                'Timeout'   => 0,
