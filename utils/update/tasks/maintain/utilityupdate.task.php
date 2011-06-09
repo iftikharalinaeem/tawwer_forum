@@ -17,6 +17,7 @@ class UtilityUpdateTask extends Task {
    
    public function Init() {
       $this->TaskList->RequireTargetDatabase = TRUE;
+      $this->TaskList->RequireValid = TRUE;
    }
    
    protected function Run() {

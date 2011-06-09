@@ -53,10 +53,10 @@ class TaskList {
    public static $Args = NULL;
    
    // Boolean flag whether or not to require a valid client to perform client
-   protected $RequireValid;
+   public $RequireValid;
    
    // Boolean flag whether or not to require a pre-targetted client DB
-   protected $RequireTargetDatabase;
+   public $RequireTargetDatabase;
    
    public function __construct() {
    
@@ -101,10 +101,10 @@ class TaskList {
       $this->Perform = array();
       $this->Clients = NULL;
       
-      $AllowBroken = (bool)$this->GetConsoleOption('allow-broken', FALSE);
-      $this->RequireValid = !$AllowBroken;
+      // By default, process all clients
+      $this->RequireValid = FALSE;
       
-      // Be default, don't automake and target client DBs
+      // By default, don't automake and target client DBs
       $this->RequireTargetDatabase = FALSE;
    }
    
