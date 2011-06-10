@@ -59,9 +59,6 @@ jQuery(document).ready(function($) {
 	 * Add the "Stats" buttons to the discussion list.
 	 */
 	public function Base_BeforeDiscussionContent_Handler($Sender) {
-		if (!C('Plugins.Voting.Enabled'))
-			return;
-
 		$Session = Gdn::Session();
 		$Discussion = GetValue('Discussion', $Sender->EventArguments);
 		// Answers
@@ -101,7 +98,7 @@ jQuery(document).ready(function($) {
 				array('title' => $Title)
 			), 'div', array('class' => 'StatBox FollowsBox'));
 		} else {
-			echo Wrap(Wrap(T('Follows')) . Wrap($Discussion->CountBookmarks, 'div', 'CountBookmarks'), 'div', array('class' => 'StatBox FollowsBox'));
+			echo Wrap(Wrap(T('Follows')) . Wrap($Discussion->CountBookmarks, 'div', array('class' => 'CountBookmarks')), 'div', array('class' => 'StatBox FollowsBox'));
 		}
 	}
 }
