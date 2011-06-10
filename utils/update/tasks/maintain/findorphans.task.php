@@ -31,7 +31,7 @@ class FindOrphansTask extends Task {
          if ($ClientConfigDBHost == 'dbhost')
             throw new OrphanException('Undefined Database.Name');
          
-         $ClientDBName = GetValue('DatabaseName', $ClientInfo);
+         $ClientDBName = $this->ClientInfo('DatabaseName');
          $ClientConfigDBName = $this->Client->C('Database.Name');
          if ($ClientDBName != $ClientConfigDBName)
             throw new OrphanException("DB Name mismatch: s({$ClientDBName}) != c({$ClientConfigDBName})");
