@@ -35,6 +35,13 @@ class VFOrgThemeHooks implements Gdn_IPlugin {
       $RecentActivityModule->GetData();
       $Sender->AddModule($RecentActivityModule);
    }
+
+   public function CategoriesController_AfterBreadcrumbs_Handler($Sender, $Args) {
+      $Description = $Sender->Data('Category.Description');
+      if ($Description) {
+         echo '<div class="P">'.$Description.'</div>';
+      }
+   }
    
    public function PostController_Render_Before($Sender) {
       $Sender->Head->AddString("<script type=\"text/javascript\">

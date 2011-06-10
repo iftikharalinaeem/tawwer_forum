@@ -782,6 +782,10 @@ body.Discussions div.Tabs div.SubTab {
    font-size: 16px;
    font-weight: bold;
 }
+body.Discussions div.Tabs div.SubTab .P {
+   font-size: 12px;
+   font-weight: normal;
+}
 div.Tabs div.SubTab a {
    color: #744000;
 }
