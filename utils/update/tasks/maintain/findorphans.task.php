@@ -2,6 +2,9 @@
 
 class FindOrphansTask extends Task {
    
+   protected $Orphans;
+   protected $Dead;
+   
    protected $ReallyRun;
    protected $LogForums;
 
@@ -17,7 +20,9 @@ class FindOrphansTask extends Task {
       if ($ReallyRun == 'no') return;
       if ($ReallyRun == 'exit') exit();
       
-      $this->LogForums = array();
+      $this->Orphans = array();
+      $this->Dead = array();
+      
       $this->ReallyRun = TRUE;
       
       $this->TaskList->RequireValid = FALSE;
@@ -27,10 +32,11 @@ class FindOrphansTask extends Task {
    protected function Run() {
       if (!$this->ReallyRun) return FALSE;
       
+      $ClientInfo = $this->ClientInfo();
       try {
          $ClientConfigDBHost = $this->Client->C('Database.Host');
          if ($ClientConfigDBHost == 'dbhost')
-            throw new OrphanException('Undefined Database.Name');
+            throw new DeadException('Missing Database.Name from config file');
          
          $ClientDBName = $this->ClientInfo('DatabaseName');
          $ClientConfigDBName = $this->Client->C('Database.Name');
@@ -38,17 +44,49 @@ class FindOrphansTask extends Task {
             try {
                $Database = $this->Database();
             } catch (Exception $e) {
-               throw new OrphanException("DB Name mismatch: s({$ClientDBName}) != c({$ClientConfigDBName})");
+               /*
+                * Unable to connect to the database
+                */
+               throw new DeadException($e->getMessage());
             }
             
+            /*
+             * Connected to database
+             */
+            
+            if (empty($ClientInfo) || !sizeof($ClientInfo)) {
+               throw new OrphanException("No Site table entry");
+            }
+            
+            if (empty($ClientDBName)) {
+               throw new OrphanException("No DatabaseName in Site table");
+            }
+            
+            if ($ClientDBName != $ClientConfigDBName) {
+               throw new OrphanException("Wrong database name in Site table");
+            }
+            
+            $NumCIEntries = sizeof($ClientInfo);
+            throw new OrphanException("Unknown reason. ClientInfo:{$NumCIEntries} site({$ClientDBName}) config({$ClientConfigDBName}) - connected ok");
             // Otherwise, DB connected, so update site table
          }
          
-         $ClientFolder = $this->ClientFolder();
+         $SiteID = $this->Client->C('VanillaForums.SiteID', NULL);
+         if (empty($SiteID)) {
+            throw new OrphanException("Config file missing VanillaForums.* entries");
+         }
+         
       } catch (OrphanException $e) {
          $Reason = $e->getMessage();
          TaskList::Event("Orphan detected: {$Reason}");
          $this->LogOrphan($Reason);
+
+      } catch (DeadException $e) {
+         $Reason = $e->getMessage();
+         TaskList::Event("Dead detected: {$Reason}");
+         $this->LogDead($Reason);
+         
+         $ClientFolder = $this->ClientFolder();
 //         if (TaskList::Cautious()) {
 //            $ReallyPrune = TaskList::Question("Really delete forum {$ClientFolder}?", "Delete", array('yes','no','exit'), 'yes');
 //            if ($ReallyPrune == 'no') return;
@@ -61,16 +99,21 @@ class FindOrphansTask extends Task {
    }
    
    protected function LogOrphan($Reason) {
-      $this->LogForums[] = array($this->ClientFolder(), $Reason);
+      $this->Orphans[] = array($this->ClientFolder(), $Reason);
+   }
+   
+   protected function LogDead($Reason) {
+      $this->Dead[] = array($this->ClientFolder(), $Reason);
    }
    
    public function Shutdown() {
-      $NumOrphans = sizeof($this->LogForums);
+      $NumOrphans = sizeof($this->Orphans);
       TaskList::MajorEvent("Orphan forums: {$NumOrphans}");
-      foreach ($this->LogForums as $Forum)
+      foreach ($this->Orphans as $Forum)
          TaskList::Event("http://{$Forum[0]} => {$Forum[1]}");
    }
    
 }
 
+class DeadException extends Exception {}
 class OrphanException extends Exception {}
