@@ -150,21 +150,22 @@ class VfcomPlugin extends Gdn_Plugin {
          
          if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleVFOptions", FALSE) !== FALSE) {
             $NewVFOptions = !Gdn::PluginManager()->CheckPlugin('vfoptions');
-            if ($NewVFOptions)
-               Gdn::PluginManager()->EnablePlugin('vfoptions', FALSE, TRUE);
-            else
-               Gdn::PluginManager()->DisablePlugin('vfoptions');
+            if ($NewVFOptions) {
+               $ActionCompleted = Gdn::PluginManager()->EnablePlugin('vfoptions', FALSE, TRUE);
+            } else {
+               $ActionCompleted = Gdn::PluginManager()->DisablePlugin('vfoptions');
+            }
             
-            SaveToConfig('EnabledPlugins.vfoptions', FALSE);
             $Sender->InformMessage(sprintf("VF Options has been turned %s.",(($NewVFOptions) ? 'on': 'off')));
          }
          
          if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleVFSpoof", FALSE) !== FALSE) {
             $NewVFSpoof = !Gdn::PluginManager()->CheckPlugin('vfspoof');
-            if ($NewVFSpoof)
+            if ($NewVFSpoof) {
                Gdn::PluginManager()->EnablePlugin('vfspoof', FALSE, TRUE);
-            else
+            } else {
                Gdn::PluginManager()->DisablePlugin('vfspoof');
+            }
             
             $Sender->InformMessage(sprintf("VF Spoof has been turned %s.",(($NewVFSpoof) ? 'on': 'off')));
          }

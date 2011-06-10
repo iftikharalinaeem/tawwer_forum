@@ -9,7 +9,7 @@ $PluginInfo['vfoptions'] = array(
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
-   'Hidden' => TRUE
+   'Hidden' => FALSE
 );
 
 Gdn_LibraryMap::SafeCache('library','class.tokenauthenticator.php',dirname(__FILE__).DS.'class.tokenauthenticator.php');
