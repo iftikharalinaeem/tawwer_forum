@@ -94,11 +94,13 @@ body.Post #Content {
 
 #PreHead {
     float: none;
-    background:#00000c;
+    background:#46674c;
     text-align: center;
 }
 
-#Ads {
+#Ads { 
+    width: 830px;
+    margin: 0 auto;
     float: none;
     background:#46674c;
     text-align: center;
@@ -159,12 +161,17 @@ ul#Menu {
     background: none repeat scroll 0 0 #919EBE;
     color: #FFFFFF;
 }
+
 body.Discussions #Menu li.DiscussionsTab a,
 body.Discussions #Menu li.DiscussionsTab a:hover,
 body.Activity #Menu li.ActivityTab a,
 body.Activity #Menu li.ActivityTab a:hover,
-body.Last24 #Menu li.last24Tab a,
-body.Last24 #Menu li.last24Tab a:hover,
+body.last24 #Menu li.Last24Tab a,
+body.last24 #Menu li.Last24Tab a:hover,
+body.Archives #Menu li.ArchivesTab a,
+body.Archives #Menu li.ArchivesTab a:hover,
+body.FAQ #Menu li.FAQTab a,
+body.FAQ #Menu li.FAQTab a:hover,
 body.Profile #Menu li.ProfileTab a,
 body.Profile #Menu li.ProfileTab a:hover,
 body.Categories #Menu li.CategoriesTab a,
@@ -191,6 +198,7 @@ body.Conversations #Menu li.InboxTab a {
 #Menu li.AccountTab a:hover {
     color: #000000 !important;
 }
+
 div.Tabs {
     background: none repeat scroll 0 0 #FFFFFF;
     border-bottom: 1px solid #CCCCCC;
@@ -327,6 +335,10 @@ div.Tabs div.SubTab {
 	font-size: 28px;
     margin: 2px;
 	padding: 0;
+}
+div.SubTab  a:link, a:visited, a:active, ul.Activities div.Excerpt a, ul.Activities div.Meta a {
+    color: #000000;
+    text-decoration: none;
 }
 ul.DataList div.Photo {
     padding: 0 6px;
