@@ -34,11 +34,23 @@ class FindOrphansTask extends Task {
       
       $ClientInfo = $this->ClientInfo();
       try {
-         $ClientConfigDBHost = $this->Client->C('Database.Host');
-         if ($ClientConfigDBHost == 'dbhost')
-            throw new DeadException('Missing Database.Name from config file');
-         
          $ClientDBName = $this->ClientInfo('DatabaseName');
+         $ClientConfigDBHost = $this->Client->C('Database.Host');
+         if ($ClientConfigDBHost == 'dbhost') {
+            if (!empty($ClientDBName)) {
+               try {
+                  $RootHost = $this->TaskList->C('Database.Host');
+                  $RootUser = $this->TaskList->C('Database.User');
+                  $RootPass = $this->TaskList->C('Database.Pass');
+                  
+                  $this->TaskList->Database($RootHost, $RootUser, $RootPass, $ClientDBName);
+                  throw new OrphanException("Missing Database.Host from config, defaults work OK");
+               } catch (Exception $e) {}
+            }
+            
+            throw new DeadException('Missing Database.Host from config file, and no Site entry');
+         }
+         
          $ClientConfigDBName = $this->Client->C('Database.Name');
          if ($ClientDBName != $ClientConfigDBName) {
             try {
@@ -59,11 +71,11 @@ class FindOrphansTask extends Task {
             }
             
             if (empty($ClientDBName)) {
-               throw new OrphanException("No DatabaseName in Site table");
+               throw new OrphanException("No DatabaseName in Site table. Should be '{$ClientConfigDBName}'");
             }
             
             if ($ClientDBName != $ClientConfigDBName) {
-               throw new OrphanException("Wrong database name in Site table");
+               throw new OrphanException("Wrong database name in Site table. '{$ClientDBName}' should be '{$ClientConfigDBName}'");
             }
             
             $NumCIEntries = sizeof($ClientInfo);
@@ -110,6 +122,12 @@ class FindOrphansTask extends Task {
       $NumOrphans = sizeof($this->Orphans);
       TaskList::MajorEvent("Orphan forums: {$NumOrphans}");
       foreach ($this->Orphans as $Forum)
+         TaskList::Event("http://{$Forum[0]} => {$Forum[1]}");
+         
+      TaskList::MajorEvent("");
+      $NumDead = sizeof($this->Dead);
+      TaskList::MajorEvent("Dead forums: {$NumDead}");
+      foreach ($this->Dead as $Forum)
          TaskList::Event("http://{$Forum[0]} => {$Forum[1]}");
    }
    

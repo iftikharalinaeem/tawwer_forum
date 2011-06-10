@@ -14,8 +14,10 @@ abstract class Task {
    }
    
    /**
+    * Auto attach RootFolder and TaskList object to new tasks
     * 
-    * @
+    * @param string $RootFolder
+    * @param TaskList $TaskList 
     */
    final public function Configure($RootFolder, &$TaskList) {
       $this->Root = $RootFolder;

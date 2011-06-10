@@ -182,7 +182,7 @@ class Client {
       return $ProxyRequest->Request($Options, $QueryParams);
    }
 
-   public function C($Name = FALSE, $Default = FALSE) {
+   public function C($Name = FALSE, $Default = NULL) {
       if (is_null($this->ClientInfo)) return;
       return $this->Config->Get($Name, $Default);
    }

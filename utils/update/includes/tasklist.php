@@ -162,6 +162,10 @@ class TaskList {
       return $RootDatabase;
    }
    
+   public function C($Name = FALSE, $Default = NULL) {
+      return $this->Config->Get($Name, $Default);
+   }
+   
    /**
     * Perform function.
     *
