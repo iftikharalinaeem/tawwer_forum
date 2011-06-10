@@ -135,7 +135,7 @@ class TaskList {
          // Open the db connection, new link please
          $Database = @mysql_connect($Host, $User, $Pass, TRUE);
          if (!$Database) {
-            throw new Exception("Could not connect to database as '".$User."'@'".$Host."'");
+            throw new Exception("Could not connect to database as '{$User}'@'{$Host}'");
          }
          
          if ($Reuse) {
@@ -145,8 +145,11 @@ class TaskList {
          $Database = $this->Databases[$Key];
       }
       
-      if (!is_null($Name) && $Database)
-         @mysql_select_db($Name, $Database);
+      if (!is_null($Name) && $Database) {
+         $SelectedDatabase = @mysql_select_db($Name, $Database);
+         if (!$SelectedDatabase)
+            throw new Exception("Could not select database '{$Name}' on '{$Host}'");
+      }
       
       return $Database;
    }
