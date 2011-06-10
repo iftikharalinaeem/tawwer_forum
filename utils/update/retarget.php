@@ -19,6 +19,7 @@ $Tasks->Run(TaskList::MODE_TARGET, array(
    'global/offline',
    'global/uncache',
    'maintain/filesystem',
+   'maintain/utilityupdate',
    'maintain/structure',
    'global/online'
 ));
