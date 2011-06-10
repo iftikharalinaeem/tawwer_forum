@@ -58,6 +58,12 @@ class TaskList {
    // Boolean flag whether or not to require a pre-targetted client DB
    public $RequireTargetDatabase;
    
+   // Boolean flag whether or not to ignore symlinks (multiname clients)
+   public $IgnoreSymlinks;
+   
+   // Boolean flag whether or not to ignore real folders
+   public $IgnoreReal;
+   
    public function __construct() {
    
       define("FAST", ((TaskList::GetConsoleOption("fast", FALSE) || TaskList::GetConsoleOption("veryfast", FALSE)) !== FALSE) ? TRUE : FALSE);
@@ -106,6 +112,12 @@ class TaskList {
       
       // By default, don't automake and target client DBs
       $this->RequireTargetDatabase = FALSE;
+      
+      // By default, don't consider symlinks to be real clients
+      $this->IgnoreSymlinks = TRUE;
+      
+      // By default, don't ignore real folders
+      $this->IgnoreReal = FALSE;
    }
    
    /**
@@ -184,6 +196,19 @@ class TaskList {
             
             foreach ($FolderList as $ClientFolder) {
                if ($ClientFolder == '.' || $ClientFolder == '..') continue;
+               $RealClientFolder = TaskList::CombinePaths($this->Clients, $ClientFolder);
+               
+               $IsSymlink = is_link($RealClientFolder);
+               
+               // If needed, detect and ignore symlinks
+               if ($this->IgnoreSymlinks && $IsSymlink) {
+                  continue;
+               }
+               
+               // If needed, detect and ignore real folders
+               if ($this->IgnoreReal && !$IsSymlink) {
+                  continue;
+               }
                $this->ClientList[$ClientFolder] = 1;
             }
             $this->NumClients = $NumClients = count($this->ClientList);

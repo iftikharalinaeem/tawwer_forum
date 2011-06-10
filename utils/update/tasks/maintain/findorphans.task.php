@@ -21,6 +21,7 @@ class FindOrphansTask extends Task {
       $this->ReallyRun = TRUE;
       
       $this->TaskList->RequireValid = FALSE;
+      $this->TaskList->IgnoreSymlinks = TRUE;
    }
    
    protected function Run() {
@@ -33,8 +34,15 @@ class FindOrphansTask extends Task {
          
          $ClientDBName = $this->ClientInfo('DatabaseName');
          $ClientConfigDBName = $this->Client->C('Database.Name');
-         if ($ClientDBName != $ClientConfigDBName)
-            throw new OrphanException("DB Name mismatch: s({$ClientDBName}) != c({$ClientConfigDBName})");
+         if ($ClientDBName != $ClientConfigDBName) {
+            try {
+               $Database = $this->Database();
+            } catch (Exception $e) {
+               throw new OrphanException("DB Name mismatch: s({$ClientDBName}) != c({$ClientConfigDBName})");
+            }
+            
+            // Otherwise, DB connected, so update site table
+         }
          
          $ClientFolder = $this->ClientFolder();
       } catch (OrphanException $e) {

@@ -43,7 +43,7 @@ abstract class Task {
    }
    
    public function Database() {
-      return $this->Client->Database;
+      return $this->Client->Database();
    }
    
    public function ClientRoot() { return $this->Client->ClientRoot; }

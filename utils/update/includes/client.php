@@ -17,6 +17,7 @@ class Client {
    public function __construct($RootFolder, $ClientFolder, $ClientInfo) {
       $this->Root = rtrim($RootFolder,'/');
       
+      $this->Database = NULL;
       $this->ClientFolder = $ClientFolder;
       $this->ClientRoot = TaskList::CombinePaths($this->Root, $this->ClientFolder );
       $this->ClientInfo = $ClientInfo;
@@ -34,7 +35,12 @@ class Client {
       $this->TaskList = $TaskList;
       $this->Tasks = $Tasks;
       
-      if ($this->TaskList->RequireTargetDatabase) {
+      if ($this->TaskList->RequireTargetDatabase)
+         $this->Database();
+   }
+   
+   public function Database() {
+      if (is_null($this->Database)) {
          $Host = $this->C('Database.Host', NULL);
          if (is_null($Host))
             throw new Exception("Unknown client database host");
@@ -44,9 +50,10 @@ class Client {
          $Name = $this->C('Database.Name', NULL);
          if (is_null($Host))
             throw new Exception("Unknown client database name");
-      
+
          $this->Database = &$this->TaskList->Database($Host, $User, $Pass, $Name);
       }
+      return $this->Database;
    }
    
    public function Run($TaskOrder) {
