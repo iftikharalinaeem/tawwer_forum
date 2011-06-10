@@ -13,12 +13,14 @@ class FindOrphansTask extends Task {
    
    public function Init($RootPath = NULL) {
    
-      $ReallyRun = TaskList::Question("Prune old clients with missing databases?", "Prune clients", array('yes','no','exit'), 'yes');
+      $ReallyRun = TaskList::Question("Find orphan clients with missing databases?", "Find orphans", array('yes','no','exit'), 'yes');
       if ($ReallyRun == 'no') return;
       if ($ReallyRun == 'exit') exit();
       
       $this->LogForums = array();
       $this->ReallyRun = TRUE;
+      
+      $this->TaskList->RequireValid = FALSE;
    }
    
    protected function Run() {
