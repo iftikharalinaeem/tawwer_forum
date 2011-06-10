@@ -384,6 +384,11 @@ class TaskList {
             $this->RunSelectiveRegex($RegexRule, $TaskList);
          break;
       }
+      
+      foreach ($this->Tasks as $TaskName => &$Task) {
+         if (method_exists($Task['task'], 'Shutdown'))
+            $Task['task']->Shutdown();
+      }
    }
    
    public function RunAll($TaskOrder = NULL) {

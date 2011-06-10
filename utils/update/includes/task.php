@@ -4,13 +4,22 @@ abstract class Task {
 
    protected $Client;
    public $TaskList;
-   
    protected $Root;
+   
+   protected $SetupOK = FALSE;
 
    abstract protected function Run();
 
-   public function __construct($RootFolder) {
-      $this->Root = rtrim($RootFolder,'/');
+   public function __construct() {
+   }
+   
+   /**
+    * 
+    * @
+    */
+   final public function Configure($RootFolder, &$TaskList) {
+      $this->Root = $RootFolder;
+      $this->TaskList = $TaskList;
    }
    
    /**
