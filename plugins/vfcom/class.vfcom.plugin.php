@@ -148,6 +148,12 @@ class VfcomPlugin extends Gdn_Plugin {
             $Sender->InformMessage(sprintf("Debug mode has been turned %s.",(($NewDebugMode) ? 'on': 'off')));
          }
          
+         if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleUpdateMode", FALSE) !== FALSE) {
+            $NewUpdateMode = !C('Garden.UpdateMode', FALSE);
+            SaveToConfig('Garden.UpdateMode',$NewUpdateMode);
+            $Sender->InformMessage(sprintf("Update mode has been turned %s.",(($NewUpdateMode) ? 'on': 'off')));
+         }
+         
          if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleVFOptions", FALSE) !== FALSE) {
             $NewVFOptions = !Gdn::PluginManager()->CheckPlugin('vfoptions');
             if ($NewVFOptions) {
@@ -173,6 +179,7 @@ class VfcomPlugin extends Gdn_Plugin {
       
       $Sender->SetData('Caching', Gdn::Cache()->ActiveEnabled());
       $Sender->SetData('DebugMode', C('Debug', FALSE));
+      $Sender->SetData('UpdateMode', C('Garden.UpdateMode', FALSE));
       $Sender->SetData('VFOptions', Gdn::PluginManager()->CheckPlugin('vfoptions'));
       $Sender->SetData('VFSpoof', Gdn::PluginManager()->CheckPlugin('vfspoof'));
       
