@@ -3,7 +3,7 @@
 $PluginInfo['GoogleAnalytics'] = array(
    'Name' => 'Google Analytics',
    'Description' => 'Adds google analytics script to pages if related configuration options are set.',
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'
@@ -17,7 +17,10 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
     * Plugins.GoogleAnalytics.TrackerDomain.
     */
    public function Base_Render_Before(&$Sender) {
-      $Blacklist = C('Plugins.GoogleAnalytics.ControllerBlacklist', array());
+      $Blacklist = C('Plugins.GoogleAnalytics.ControllerBlacklist', FALSE);
+      if (!$Blacklist && strtolower($Sender->MasterView) == 'admin') {
+         return;
+      }
       if (is_array($Blacklist) && InArrayI($Sender->ControllerName, $Blacklist))
          return;
       
