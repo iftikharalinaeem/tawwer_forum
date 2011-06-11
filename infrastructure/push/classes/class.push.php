@@ -1,5 +1,6 @@
 <?php
 
+require_once('class.proxyrequest.php');
 require_once('class.pushfront.php');
 class Push {
    
