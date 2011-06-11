@@ -379,7 +379,7 @@ searchd {
       // Get the raw results from sphinx.
       $Sphinx = new SphinxClient();
       $Sphinx->setServer($SphinxHost, $SphinxPort);
-      $Sphinx->setMatchMode(SPH_MATCH_BOOLEAN);
+      $Sphinx->setMatchMode(SPH_MATCH_EXTENDED);
       $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS);
       $Sphinx->setLimits($Offset, $Limit);
 //      $Sphinx->setIndexWeights(array('Page' => 200, 'Discussion' => 150, 'Comment' => 100));

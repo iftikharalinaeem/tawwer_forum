@@ -67,7 +67,7 @@
       <!-- Start foot -->
       
       <div id="Foot">
-			<div><div class="vanilla-ico"></div> Powered by <a href="http://vanillaforums.org"><span>Vanilla</span></a></div>
+			<div><div class="vanilla-ico"></div> Powered by <a href="{vanillaurl}"><span>Vanilla</span></a></div>
     {asset name="Foot"}
 		</div>
         

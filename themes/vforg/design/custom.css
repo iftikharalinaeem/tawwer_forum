@@ -597,7 +597,30 @@ ul.PanelActivity li div.Story {
 }
 div.Tags ul.PanelInfo li a {
 	font-weight: bold;
+   float: none;
 }
+
+.Tags .PanelInfo li {
+   background: rgba(246, 218, 168, .2);
+   display: inline-block;
+   margin: 2px 0;
+   padding: 5px 3px;
+   text-align: left;
+   line-height: 100%;
+   border: solid 1px #EED3A2;
+   -moz-border-radius: 3px;
+}
+.Tags li a {
+   float: none;
+}
+
+.Count {
+    background: none repeat scroll 0 0 #744000;
+    color: #FEF7DF;
+    padding: 0 3px;
+    -moz-border-radius: 3px;
+}
+
 ul.PanelInfo li.Active {
 	border-bottom: none;
 }
@@ -653,7 +676,7 @@ div.MessageForm,
 div.Tabs {
 	background: none;
 	border-bottom:1px solid #EED3A2;
-	padding: 0 5px; 
+	padding: 0;
 }
 div#MessageForm,
 div.MessageForm {
@@ -706,7 +729,7 @@ a.TabLink:visited {
    -webkit-border-radius: 3px;
    background: #F6DAA8;
    color: #b76600;
-   padding: 6px 10px;
+   padding: 5px 10px;
 	line-height: 1;
 	display: inline-block;
 }
@@ -747,13 +770,24 @@ div.Tabs li a span {
    background: #744000;
    color: #FEF7DF;
 }
-div.Tabs div.SubTab {
+body.Discussions div.Tabs div.SubTab {
 	margin: 0;
 	padding: 0;
-	background: none;
+	background: #FEF7DF;
+   border-top: 1px solid #EED3A2;
    border-radius: none;
    -webkit-border-radius: none;
    -moz-border-radius: none;
+   padding: 5px;
+   font-size: 16px;
+   font-weight: bold;
+}
+body.Discussions div.Tabs div.SubTab .P {
+   font-size: 12px;
+   font-weight: normal;
+}
+div.Tabs div.SubTab a {
+   color: #744000;
 }
 div.HeadingTabs div.SubTab {
 	line-height: 2;
@@ -879,10 +913,14 @@ body.Post #Content {
 	border: none;
 	font-size: 18px;
 }
+#DiscussionForm .Tabs {
+   margin: 0;
+}
 #DiscussionForm form {
 	display: block;
+   padding-left: 0;
 	padding-right: 270px;
-	background: #F6DAA8;
+	background: transparent;
 	border: none;
 }
 #DiscussionForm label {
@@ -895,6 +933,10 @@ body.Post #Content {
 }
 #DiscussionForm {
 	position: relative;
+}
+#DiscussionForm .FormInputs {
+	background: rgba(246, 218, 168, .5);
+   padding: 10px 20px;
 }
 .PostHelp {
 	top: 48px;
@@ -1088,7 +1130,8 @@ body#vforg_download_get #Content h1 {
 
 /* Search Form over discussions */
 div.SearchTabs,
-body.Discussions div.SearchForm {
+body.Discussions div.SearchForm,
+body.Categories div.SearchForm {
    margin: 0 0 20px;
    padding: 8px 8px 6px;
    color: #B76600;
@@ -1097,13 +1140,26 @@ body.Discussions div.SearchForm {
    -moz-border-radius: 4px;
    -webkit-border-radius: 4px;
 }
-body.Discussions div.SearchForm input.InputBox {
+body.Discussions div.SearchForm input.InputBox,
+body.Categories div.SearchForm input.InputBox {
    width: 570px;
    margin: 0 8px 0 0;
 }
-body.Discussions div.SearchForm input.Button {
+body.Discussions div.SearchForm input.Button,
+body.Categories div.SearchForm input.Button  {
    font-size: 14px;
    padding: 8px 4px;
+}
+
+ul.DataList div.Meta a.Category {
+   background: none repeat scroll 0 0 rgba(246, 218, 168, 0.2);
+   border: 1px solid #EED3A2;
+   border-radius: 3px 3px 3px 3px;
+   -moz-border-radius: 3px 3px 3px 3px;
+   -webkit-border-radius: 3px 3px 3px 3px;
+   line-height: 100%;
+   margin: 2px 0;
+   padding: 1px 3px;
 }
 
 /* Features Page */
@@ -1249,7 +1305,7 @@ div.Feature h4 {
 	float: right;
 }
 body.Discussion a.Bookmark {
-	margin:2px 8px;
+	margin: 0 0 0 8px
 }
 
 .Pages #Panel {
@@ -1313,18 +1369,77 @@ body.Pages div#Foot {
 }
 
 .QnA-Tag-Accepted {
-   background-color: #50C04C;
+   background-color: #438CDC;
 }
 
 .QnA-Accepted {
-   background: url('check.png') no-repeat;
+   background: url("check.png") no-repeat scroll 0 0 transparent;
    display: block;
-   height: 45px;
-   position: absolute;
-   left: -62px;
-   top: 10px;
-   width: 57px;
-   white-space: nowrap;
+   height: 40px;
+   left: -50px;
    overflow: hidden;
+   position: absolute;
    text-indent: -1000px;
+   top: 10px;
+   white-space: nowrap;
+   width: 40px;
+}
+
+.StatBox {
+	padding: 5px 5px 0;
+	float: right;
+	height: 38px;
+	text-align: center;
+	font-weight: bold;
+	font-size: 18px;
+	line-height: 1.2;
+}
+.StatBox span {
+	display: block;
+	font-weight: normal;
+	font-size:9px;
+	line-height: 1;
+	padding-bottom:2px;
+	min-width:38px;
+}
+.StatBox,
+.StatBox a {
+	color: #99e2fe;
+	display: block;
+}
+.StatBox a {
+	position: relative;
+	z-index: 10;
+}
+.StatBox a:hover {
+	color: #fff;
+	text-shadow: 0 0px 5px #fff;
+}
+.AnswersBox {
+	margin-right: 4px;
+   border-top-right-radius: 2px;
+   border-bottom-right-radius: 2px;
+	-webkit-border-top-right-radius: 2px;
+	-webkit-border-bottom-right-radius: 2px;
+	-moz-border-radius-topright: 2px;
+	-moz-border-radius-bottomright: 2px;
+}
+
+body.Discussions ul.DataList div.Options {
+    right: 160px;
+}
+
+body.Discussions a.Bookmark, body.Discussions a.Bookmarked, body.Discussions a.Bookmarking {
+    background: #764513;
+    display: block;
+    height: auto;
+    width: auto;
+}
+
+body.Discussions a.Bookmark span, body.Discussions a.Bookmarked span, body.Discussions a.Bookmarking span {
+   display: block;
+}
+
+.Discussions .Options .Bookmark {
+   display: none;
 }

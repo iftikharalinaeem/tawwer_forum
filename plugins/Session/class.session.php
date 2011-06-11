@@ -29,7 +29,7 @@ class Gdn_Session extends Gdn_Pluggable {
     */
    public function CheckPermission($Permission, $FullMatch = TRUE, $JunctionTable = '', $JunctionID = '') {
       if (is_object($this->User)) {
-         if ($this->User->Admin == '1')
+         if ($this->User->Admin)
             return TRUE;
          elseif ($this->User->Banned)
             return FALSE;

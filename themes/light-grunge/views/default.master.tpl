@@ -54,7 +54,7 @@
    <div>
     <div class="vanilla-ico"></div>
     Powered by
-    <a href="http://vanillaforums.org"><span>Vanilla</span></a>
+    <a href="{vanillaurl}"><span>Vanilla</span></a>
    </div>
    {asset name="Foot"}
   </div>

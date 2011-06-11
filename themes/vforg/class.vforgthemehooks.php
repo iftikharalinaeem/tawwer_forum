@@ -17,7 +17,7 @@ class VFOrgThemeHooks implements Gdn_IPlugin {
    }
    
    public function Base_Render_Before($Sender) {
-      if ($Sender->ControllerName == 'discussionscontroller' && $Sender->RequestMethod == 'index')
+      if (in_array(strtolower($Sender->ControllerName), array('discussionscontroller', 'categoriescontroller')))
          $Sender->AddModule('DiscussionSearchModule');
 
       if ($Sender->Head->Title() == C('Garden.Title'))
@@ -35,6 +35,13 @@ class VFOrgThemeHooks implements Gdn_IPlugin {
       $RecentActivityModule->GetData();
       $Sender->AddModule($RecentActivityModule);
    }
+
+   public function CategoriesController_AfterBreadcrumbs_Handler($Sender, $Args) {
+      $Description = $Sender->Data('Category.Description');
+      if ($Description) {
+         echo '<div class="P">'.$Description.'</div>';
+      }
+   }
    
    public function PostController_Render_Before($Sender) {
       $Sender->Head->AddString("<script type=\"text/javascript\">
@@ -46,10 +53,52 @@ jQuery(document).ready(function($) {
 });
 </script>");
    }
-   
-   public function ProfileController_Render_Before($Sender) {
-      $Sender->AddJsFile('plugins/Voting/voting.js');
-      $Sender->AddCssFile('plugins/Voting/design/voting.css');
-   }
-   
+
+
+   /**
+	 * Add the "Stats" buttons to the discussion list.
+	 */
+	public function Base_BeforeDiscussionContent_Handler($Sender) {
+		$Session = Gdn::Session();
+		$Discussion = GetValue('Discussion', $Sender->EventArguments);
+		// Answers
+		$Css = 'StatBox AnswersBox';
+		if ($Discussion->CountComments > 1)
+			$Css .= ' HasAnswersBox';
+
+		$CountVotes = 0;
+		if (is_numeric($Discussion->Score)) // && $Discussion->Score > 0)
+			$CountVotes = $Discussion->Score;
+
+		if (!is_numeric($Discussion->CountBookmarks))
+			$Discussion->CountBookmarks = 0;
+
+		echo Wrap(
+			// Anchor(
+			Wrap(T('Comments')) . Gdn_Format::BigNumber($Discussion->CountComments - 1)
+			// ,'/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
+			// )
+			, 'div', array('class' => $Css));
+
+		// Views
+		echo Wrap(
+			// Anchor(
+			Wrap(T('Views')) . Gdn_Format::BigNumber($Discussion->CountViews)
+			// , '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
+			// )
+			, 'div', array('class' => 'StatBox ViewsBox'));
+
+		// Follows
+		$Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
+		if ($Session->IsValid()) {
+			echo Wrap(Anchor(
+				Wrap(T('Follows')) . Wrap(Gdn_Format::BigNumber($Discussion->CountBookmarks), 'div', array('class' => 'CountBookmarks')),
+				'/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
+				'Bookmark',
+				array('title' => $Title)
+			), 'div', array('class' => 'StatBox FollowsBox'));
+		} else {
+			echo Wrap(Wrap(T('Follows')) . Wrap($Discussion->CountBookmarks, 'div', array('class' => 'CountBookmarks')), 'div', array('class' => 'StatBox FollowsBox'));
+		}
+	}
 }
