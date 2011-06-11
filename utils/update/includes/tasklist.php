@@ -35,6 +35,7 @@ class TaskList {
    
    // Link to database resource
    protected $Database;
+   protected $Databases;
    
    // Cached list of clients
    protected $ClientList;
@@ -51,8 +52,17 @@ class TaskList {
    // Argument parser instance
    public static $Args = NULL;
    
-   // Boolean flag whether or not to require a valid DB to perform client
-   protected $RequireDB;
+   // Boolean flag whether or not to require a valid client to perform client
+   public $RequireValid;
+   
+   // Boolean flag whether or not to require a pre-targetted client DB
+   public $RequireTargetDatabase;
+   
+   // Boolean flag whether or not to ignore symlinks (multiname clients)
+   public $IgnoreSymlinks;
+   
+   // Boolean flag whether or not to ignore real folders
+   public $IgnoreReal;
    
    public function __construct() {
    
@@ -87,14 +97,7 @@ class TaskList {
       $this->DBMAIN = $this->Config->Get('Database.Name', NULL);
 
       // Open the db connection, new link please
-      $this->Database = mysql_connect($this->DBHOST, $this->DBUSER, $this->DBPASS, TRUE);
-      if (!$this->Database) {
-         TaskList::MajorEvent("Could not connect to database as '".$this->DBUSER."'@'".$this->DBHOST."'");
-         die();
-      }
-         
-      mysql_select_db($this->DBMAIN, $this->Database);
-      
+      $this->Database = &$this->RootDatabase();
       TaskList::MajorEvent("Connected to ".$this->DBMAIN." @ ".$this->DBHOST);
       
       // Chdir to where we are right now. Root of the utils/update/ folder
@@ -103,7 +106,64 @@ class TaskList {
       
       $this->Perform = array();
       $this->Clients = NULL;
-      $this->RequireDB = TRUE;
+      
+      // By default, process all clients
+      $this->RequireValid = FALSE;
+      
+      // By default, don't automake and target client DBs
+      $this->RequireTargetDatabase = FALSE;
+      
+      // By default, don't consider symlinks to be real clients
+      $this->IgnoreSymlinks = TRUE;
+      
+      // By default, don't ignore real folders
+      $this->IgnoreReal = FALSE;
+   }
+   
+   /**
+    *
+    * @param type $Key 
+    * @return mysql
+    */
+   public function Database($Host, $User, $Pass, $Name = NULL, $Reuse = TRUE) {
+      
+      if (!is_array($this->Databases))
+         $this->Databases = array();
+      
+      $Key = "{$Host}:{$User}:{$Pass}";
+      if (!array_key_exists($Key, $this->Databases) || $Reuse == FALSE) {
+         // Open the db connection, new link please
+         $Database = @mysql_connect($Host, $User, $Pass, TRUE);
+         if (!$Database) {
+            throw new Exception("Could not connect to database as '{$User}'@'{$Host}'");
+         }
+         
+         if ($Reuse) {
+            $this->Databases[$Key] = $Database;
+         }
+      } else {
+         $Database = $this->Databases[$Key];
+      }
+      
+      if (!is_null($Name) && $Database) {
+         $SelectedDatabase = @mysql_select_db($Name, $Database);
+         if (!$SelectedDatabase)
+            throw new Exception("Could not select database '{$Name}' on '{$Host}'");
+      }
+      
+      return $Database;
+   }
+   
+   public function RootDatabase() {
+      static $RootDatabase = NULL;
+      if (is_null($RootDatabase)) {
+         $RootDatabase = $this->Database($this->DBHOST, $this->DBUSER, $this->DBPASS, $this->DBMAIN, FALSE);
+      }
+      return $RootDatabase;
+   }
+   
+   public function C($Name = FALSE, $Default = NULL) {
+      return $this->Config->Get($Name, $Default);
    }
    
    /**
@@ -143,10 +203,23 @@ class TaskList {
             
             foreach ($FolderList as $ClientFolder) {
                if ($ClientFolder == '.' || $ClientFolder == '..') continue;
+               $RealClientFolder = TaskList::CombinePaths($this->Clients, $ClientFolder);
+               
+               $IsSymlink = is_link($RealClientFolder);
+               
+               // If needed, detect and ignore symlinks
+               if ($this->IgnoreSymlinks && $IsSymlink) {
+                  continue;
+               }
+               
+               // If needed, detect and ignore real folders
+               if ($this->IgnoreReal && !$IsSymlink) {
+                  continue;
+               }
                $this->ClientList[$ClientFolder] = 1;
             }
             $this->NumClients = $NumClients = count($this->ClientList);
-            TaskList::MajorEvent("found {$NumClients}!", TaskList::NOBREAK);
+            TaskList::MajorEvent("found {$NumClients}!");
          break;
          
          case TaskList::ACTION_TARGET:
@@ -168,7 +241,7 @@ class TaskList {
             if ($Perform == TaskList::ACTION_CREATE) {
             
                // When creating, do not require DB.
-               $this->RequireDB = FALSE;
+               $this->RequireValid = FALSE;
                
                if ($Exists) {
                
@@ -272,7 +345,6 @@ class TaskList {
                if (is_subclass_of($Class, 'Task')) {
                   TaskList::Event("Configuring task: {$QualifiedTaskName} (".strtolower($Class).")");
                   $NewTask = new $Class($this->Clients);
-                  $NewTask->Database = $this->Database;
                   $NewTask->TaskList =& $this;
                   $this->Tasks[$QualifiedTaskName] = array(
                      'name'            => str_replace('Task', '', $Class),
@@ -305,10 +377,20 @@ class TaskList {
       foreach ($this->Perform as $Perform) {
          $this->PerformAction($Perform);
       }
-   
+      
+      TaskList::MajorEvent("");
+      TaskList::MajorEvent("Configuration:");
+      $ValidClients = (($this->RequireValid) ? 'yes' : 'no');
+      TaskList::Event("Valid Clients: {$ValidClients}");
+      $TargetDatabase = (($this->RequireTargetDatabase) ? 'yes' : 'no');
+      TaskList::Event("Auto Database: {$TargetDatabase}");
+      TaskList::Event("Running Mode : {$RunMode}");
+      TaskList::MajorEvent("");
+      
       // Check one more time
       if (TaskList::Cautious()) {
-         $Proceed = TaskList::Question("","Proceed with task execution?",array('yes','no'),'no');
+         TaskList::Event("TaskMode: {$this->Mode}");
+         $Proceed = TaskList::Question("","Proceed with task execution?",array('yes','no'),'yes');
          if ($Proceed == 'no') exit();
       }
       
@@ -333,6 +415,11 @@ class TaskList {
                
             $this->RunSelectiveRegex($RegexRule, $TaskList);
          break;
+      }
+      
+      foreach ($this->Tasks as $TaskName => &$Task) {
+         if (method_exists($Task['task'], 'Shutdown'))
+            $Task['task']->Shutdown();
       }
    }
    
@@ -415,24 +502,40 @@ class TaskList {
       TaskList::MajorEvent("{$ClientFolder} [{$SiteID}]...");
       $this->Completed++;
       
-      if ($this->RequireDB) {
+      if ($this->RequireValid) {
          if (!$ClientInfo || !sizeof($ClientInfo) || !isset($ClientInfo['SiteID'])) {
             TaskList::Event("skipped... no db");
             return;
          }
       }
       
-      $this->GroupData = array();
-      // Run all tasks for this client
-      if (!is_null($TaskOrder)) {
-         foreach ($TaskOrder as $TaskName) {
-            if (!array_key_exists($TaskName, $this->Tasks)) continue;
-            $this->Tasks[$TaskName]['task']->SandboxExecute($ClientFolder, $ClientInfo);
-         }
-      } else {
-         foreach ($this->Tasks as $TaskName => &$Task)
-            $Task['task']->SandboxExecute($ClientFolder, $ClientInfo);
+      try {
+         $Client = new Client($this->Clients, $ClientFolder, $ClientInfo);
+         $Client->Configure($this, $this->Tasks);
+         $Client->Run($TaskOrder);
+      } catch (Exception $e) {
+         TaskList::MajorEvent($e->getMessage());
+         
+         try {
+            $Email = new Email($Client);
+            
+            $TaskList = implode(",\n",array_keys($this->Tasks));
+            $Error = $e->getMessage();
+            
+            $Email->To('tim@vanillaforums.com', 'Tim Gunter')
+               ->From('runner@vanillaforums.com','VFCom Runner')
+               ->Subject("{$ClientFolder} failed to run")
+               ->Message("Client {$ClientFolder} experienced an error while running:
+               
+Task list was:
+{$TaskList}
+
+Error:
+{$Error}")
+               ->Send();
+         } catch (Exception $e) {}
       }
+      
       TaskList::MajorEvent("");
    }
    

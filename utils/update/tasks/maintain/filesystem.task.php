@@ -7,6 +7,8 @@ class FilesystemTask extends Task {
    public function __construct($ClientDir) {
       parent::__construct($ClientDir);
       
+      $this->ReallyRun = TRUE;
+      
       $this->RootPath = FALSE;
       $this->VanillaPath = FALSE;
       $this->MiscPath = FALSE;
@@ -29,13 +31,14 @@ class FilesystemTask extends Task {
             
          } while (strtolower($SourceCodeFolder) != 'no' && !is_dir($SourceCodePath));
          if (strtolower($SourceCodeFolder) != 'no') {
-         
             $this->VanillaPath = TaskList::CombinePaths($SourceCodePath,'vanilla');
             $this->MiscPath = TaskList::CombinePaths($SourceCodePath,'misc');
             $this->AddonsPath = TaskList::CombinePaths($SourceCodePath,'addons');
             
             $this->PluginPath = TaskList::CombinePaths($this->MiscPath, 'plugins');
             $this->ThemePath = TaskList::CombinePaths($this->MiscPath, 'themes');
+         } else {
+            $this->ReallyRun = FALSE;
          }
       } else {
          // Root provided and exists
@@ -66,45 +69,48 @@ class FilesystemTask extends Task {
    }
    
    protected function Run() {
+      if ($this->ReallyRun === FALSE) return;
+      $ClientFolder = $this->ClientFolder();
+      
       if (TaskList::Cautious()) {
-         $Proceed = TaskList::Question("Really apply symlinks for {$this->ClientFolder}?","Apply symlinks?",array('yes','no','exit'),'yes');
+         $Proceed = TaskList::Question("Really apply symlinks for {$ClientFolder}?","Apply symlinks?",array('yes','no','exit'),'yes');
          if ($Proceed == 'no') return;
          if ($Proceed == 'exit') exit();
       }
             
       if ($this->VanillaPath !== FALSE) {
          // Symlink Applications
-         $this->Symlink('applications/dashboard', TaskList::CombinePaths($this->VanillaPath,'applications/dashboard'));
-         $this->Symlink('applications/conversations', TaskList::CombinePaths($this->VanillaPath,'applications/conversations'));
-         $this->Symlink('applications/vanilla', TaskList::CombinePaths($this->VanillaPath,'applications/vanilla'));
+         $this->Client->Symlink('applications/dashboard', TaskList::CombinePaths($this->VanillaPath,'applications/dashboard'));
+         $this->Client->Symlink('applications/conversations', TaskList::CombinePaths($this->VanillaPath,'applications/conversations'));
+         $this->Client->Symlink('applications/vanilla', TaskList::CombinePaths($this->VanillaPath,'applications/vanilla'));
          
          // Symlink bootstrap.php
-         $this->Symlink('bootstrap.php', TaskList::CombinePaths($this->VanillaPath,'bootstrap.php'));
+         $this->Client->Symlink('bootstrap.php', TaskList::CombinePaths($this->VanillaPath,'bootstrap.php'));
          
          // Symlink config files
-         $this->Symlink('conf/bootstrap.before.php', TaskList::CombinePaths($this->VanillaPath,'conf/bootstrap.before.php'));
-         $this->Symlink('conf/config-defaults.php', TaskList::CombinePaths($this->VanillaPath,'conf/config-defaults.php'));
-         $this->Symlink('conf/constants.php', TaskList::CombinePaths($this->VanillaPath,'conf/constants.php'));
-         $this->Symlink('conf/locale.php', TaskList::CombinePaths($this->VanillaPath,'conf/locale.php'), TRUE);
+         $this->Client->Symlink('conf/bootstrap.before.php', TaskList::CombinePaths($this->VanillaPath,'conf/bootstrap.before.php'));
+         $this->Client->Symlink('conf/config-defaults.php', TaskList::CombinePaths($this->VanillaPath,'conf/config-defaults.php'));
+         $this->Client->Symlink('conf/constants.php', TaskList::CombinePaths($this->VanillaPath,'conf/constants.php'));
+         $this->Client->Symlink('conf/locale.php', TaskList::CombinePaths($this->VanillaPath,'conf/locale.php'), TRUE);
          
          // Symlink core folders
-         $this->Symlink('js', TaskList::CombinePaths($this->VanillaPath,'js'));
-         $this->Symlink('library', TaskList::CombinePaths($this->VanillaPath,'library'));
+         $this->Client->Symlink('js', TaskList::CombinePaths($this->VanillaPath,'js'));
+         $this->Client->Symlink('library', TaskList::CombinePaths($this->VanillaPath,'library'));
          
          // Symlink all core feature plugins
-         $this->Symlink('plugins/HtmLawed', TaskList::CombinePaths($this->VanillaPath,'plugins/HtmLawed'));
-         $this->Symlink('plugins/Gravatar', TaskList::CombinePaths($this->VanillaPath,'plugins/Gravatar'));
-         $this->Symlink('plugins/VanillaInThisDiscussion', TaskList::CombinePaths($this->VanillaPath,'plugins/VanillaInThisDiscussion'));
-         $this->Symlink('plugins/Tagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Tagging'));
-         $this->Symlink('plugins/Flagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Flagging'));
-         $this->Symlink('plugins/embedvanilla', TaskList::CombinePaths($this->VanillaPath,'plugins/embedvanilla'));
-         $this->Symlink('plugins/Emotify', TaskList::CombinePaths($this->VanillaPath,'plugins/Emotify'));
-         $this->Symlink('plugins/cleditor', TaskList::CombinePaths($this->VanillaPath,'plugins/cleditor'));
+         $this->Client->Symlink('plugins/HtmLawed', TaskList::CombinePaths($this->VanillaPath,'plugins/HtmLawed'));
+         $this->Client->Symlink('plugins/Gravatar', TaskList::CombinePaths($this->VanillaPath,'plugins/Gravatar'));
+         $this->Client->Symlink('plugins/VanillaInThisDiscussion', TaskList::CombinePaths($this->VanillaPath,'plugins/VanillaInThisDiscussion'));
+         $this->Client->Symlink('plugins/Tagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Tagging'));
+         $this->Client->Symlink('plugins/Flagging', TaskList::CombinePaths($this->VanillaPath,'plugins/Flagging'));
+         $this->Client->Symlink('plugins/embedvanilla', TaskList::CombinePaths($this->VanillaPath,'plugins/embedvanilla'));
+         $this->Client->Symlink('plugins/Emotify', TaskList::CombinePaths($this->VanillaPath,'plugins/Emotify'));
+         $this->Client->Symlink('plugins/cleditor', TaskList::CombinePaths($this->VanillaPath,'plugins/cleditor'));
          
-         $this->Symlink('plugins/Facebook', TaskList::CombinePaths($this->VanillaPath,'plugins/Facebook'));
-         $this->Symlink('plugins/Twitter', TaskList::CombinePaths($this->VanillaPath,'plugins/Twitter'));
-         $this->Symlink('plugins/GoogleSignIn', TaskList::CombinePaths($this->VanillaPath,'plugins/GoogleSignIn'));
-         $this->Symlink('plugins/OpenID', TaskList::CombinePaths($this->VanillaPath,'plugins/OpenID'));
+         $this->Client->Symlink('plugins/Facebook', TaskList::CombinePaths($this->VanillaPath,'plugins/Facebook'));
+         $this->Client->Symlink('plugins/Twitter', TaskList::CombinePaths($this->VanillaPath,'plugins/Twitter'));
+         $this->Client->Symlink('plugins/GoogleSignIn', TaskList::CombinePaths($this->VanillaPath,'plugins/GoogleSignIn'));
+         $this->Client->Symlink('plugins/OpenID', TaskList::CombinePaths($this->VanillaPath,'plugins/OpenID'));
          
          // Copy the new index file
          $Copied = $this->CopySourceFile('index.php', $this->VanillaPath);
@@ -113,44 +119,44 @@ class FilesystemTask extends Task {
       
       if ($this->MiscPath !== FALSE) {
          //Symlink .htaccess
-         $this->Symlink('.htaccess', TaskList::CombinePaths($this->MiscPath,'utils/.htaccess'));
+         $this->Client->Symlink('.htaccess', TaskList::CombinePaths($this->MiscPath,'utils/.htaccess'));
       }
       
       if ($this->PluginPath !== FALSE) {
          // Symlink GettingStartedHosting plugin
-         $this->Symlink('plugins/GettingStartedHosting', TaskList::CombinePaths($this->PluginPath,'GettingStartedHosting'));
+         $this->Client->Symlink('plugins/GettingStartedHosting', TaskList::CombinePaths($this->PluginPath,'GettingStartedHosting'));
          
          // Symlink all misc feature plugins
-         $this->Symlink('plugins/VanillaConnect', TaskList::CombinePaths($this->PluginPath,'VanillaConnect'));
-         $this->Symlink('plugins/ProxyConnect', TaskList::CombinePaths($this->PluginPath,'ProxyConnect'));
-         $this->Symlink('plugins/CustomDomain', TaskList::CombinePaths($this->PluginPath,'CustomDomain'));
-         $this->Symlink('plugins/CustomTheme', TaskList::CombinePaths($this->PluginPath,'CustomTheme'));
-         $this->Symlink('plugins/googleadsense', TaskList::CombinePaths($this->PluginPath,'googleadsense'));
-         $this->Symlink('plugins/Statistics', TaskList::CombinePaths($this->PluginPath,'Statistics'));
-         $this->Symlink('plugins/PrivateCommunity', TaskList::CombinePaths($this->PluginPath,'PrivateCommunity'));
-         $this->Symlink('plugins/vfspoof', TaskList::CombinePaths($this->PluginPath,'vfspoof'));
-         $this->Symlink('plugins/vfoptions', TaskList::CombinePaths($this->PluginPath,'vfoptions'));
+         $this->Client->Symlink('plugins/VanillaConnect', TaskList::CombinePaths($this->PluginPath,'VanillaConnect'));
+         $this->Client->Symlink('plugins/ProxyConnect', TaskList::CombinePaths($this->PluginPath,'ProxyConnect'));
+         $this->Client->Symlink('plugins/CustomDomain', TaskList::CombinePaths($this->PluginPath,'CustomDomain'));
+         $this->Client->Symlink('plugins/CustomTheme', TaskList::CombinePaths($this->PluginPath,'CustomTheme'));
+         $this->Client->Symlink('plugins/googleadsense', TaskList::CombinePaths($this->PluginPath,'googleadsense'));
+         $this->Client->Symlink('plugins/Statistics', TaskList::CombinePaths($this->PluginPath,'Statistics'));
+         $this->Client->Symlink('plugins/PrivateCommunity', TaskList::CombinePaths($this->PluginPath,'PrivateCommunity'));
+         $this->Client->Symlink('plugins/vfspoof', TaskList::CombinePaths($this->PluginPath,'vfspoof'));
+         $this->Client->Symlink('plugins/vfoptions', TaskList::CombinePaths($this->PluginPath,'vfoptions'));
       }
       
       if ($this->AddonsPath !== FALSE) {
-         $this->Symlink('plugins/FileUpload', TaskList::CombinePaths($this->AddonsPath,'plugins/FileUpload'));
+         $this->Client->Symlink('plugins/FileUpload', TaskList::CombinePaths($this->AddonsPath,'plugins/FileUpload'));
       }
       
       if ($this->ThemePath !== FALSE) {
          // Symlink all core themes
-         $this->Symlink('themes/minalla', TaskList::CombinePaths($this->ThemePath,'minalla'));
-         $this->Symlink('themes/lightgrunge', TaskList::CombinePaths($this->ThemePath,'light-grunge'));
-         $this->Symlink('themes/ivanilla', TaskList::CombinePaths($this->ThemePath,'iVanilla'));
-         $this->Symlink('themes/simple', TaskList::CombinePaths($this->ThemePath,'simple'));
-         $this->Symlink('themes/rounder', TaskList::CombinePaths($this->ThemePath,'rounder'));
-         $this->Symlink('themes/vanillaclassic', TaskList::CombinePaths($this->ThemePath,'vanillaclassic'));
-         $this->Symlink('themes/v1grey', TaskList::CombinePaths($this->ThemePath,'v1grey'));
+         $this->Client->Symlink('themes/minalla', TaskList::CombinePaths($this->ThemePath,'minalla'));
+         $this->Client->Symlink('themes/lightgrunge', TaskList::CombinePaths($this->ThemePath,'light-grunge'));
+         $this->Client->Symlink('themes/ivanilla', TaskList::CombinePaths($this->ThemePath,'iVanilla'));
+         $this->Client->Symlink('themes/simple', TaskList::CombinePaths($this->ThemePath,'simple'));
+         $this->Client->Symlink('themes/rounder', TaskList::CombinePaths($this->ThemePath,'rounder'));
+         $this->Client->Symlink('themes/vanillaclassic', TaskList::CombinePaths($this->ThemePath,'vanillaclassic'));
+         $this->Client->Symlink('themes/v1grey', TaskList::CombinePaths($this->ThemePath,'v1grey'));
          
-         $this->Symlink('themes/mobile', TaskList::CombinePaths($this->VanillaPath,'themes/mobile'));
-         $this->Symlink('themes/EmbedFriendly', TaskList::CombinePaths($this->VanillaPath,'themes/EmbedFriendly'));
+         $this->Client->Symlink('themes/mobile', TaskList::CombinePaths($this->VanillaPath,'themes/mobile'));
+         $this->Client->Symlink('themes/EmbedFriendly', TaskList::CombinePaths($this->VanillaPath,'themes/EmbedFriendly'));
          
          // Replace default theme with smartydefault
-         $this->Symlink('themes/default', TaskList::CombinePaths($this->ThemePath,'defaultsmarty'));
+         $this->Client->Symlink('themes/default', TaskList::CombinePaths($this->ThemePath,'defaultsmarty'));
       }
       
    }

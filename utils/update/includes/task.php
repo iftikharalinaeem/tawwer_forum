@@ -2,40 +2,34 @@
 
 abstract class Task {
 
-   public $Database;
+   protected $Client;
    public $TaskList;
-   
    protected $Root;
-   protected $ClientRoot;
-   protected $ClientFolder;
-   protected $ClientInfo;
-   protected $ConfigFile;
-   protected $Config;
+   
+   protected $SetupOK = FALSE;
 
    abstract protected function Run();
 
-   public function __construct($RootFolder) {
-      $this->Root = rtrim($RootFolder,'/');
-      $this->ClientRoot = NULL;
-      $this->ClientFolder = NULL;
-      $this->ClientInfo = NULL;
-      $this->ConfigFile = NULL;
-      $this->Config = new Configuration();
+   public function __construct() {
    }
    
-   public function SandboxExecute($ClientFolder, $ClientInfo) {
-      $this->ClientFolder = $ClientFolder;
-      $this->ClientRoot = TaskList::CombinePaths($this->Root, $this->ClientFolder );
-      $this->ClientInfo = $ClientInfo;
-      
-      $this->ConfigDefaultsFile = TaskList::CombinePaths($this->ClientRoot,'conf/config-defaults.php');
-      $this->ConfigFile = TaskList::CombinePaths($this->ClientRoot,'conf/config.php');
-      $this->Config = new Configuration();
-      try {
-         $this->Config->Load($this->ConfigDefaultsFile, 'Use');
-         $this->Config->Load($this->ConfigFile, 'Use');
-      } catch (Exception $e) { die ($e->getMessage()); }
-
+   /**
+    * Auto attach RootFolder and TaskList object to new tasks
+    * 
+    * @param string $RootFolder
+    * @param TaskList $TaskList 
+    */
+   final public function Configure($RootFolder, &$TaskList) {
+      $this->Root = $RootFolder;
+      $this->TaskList = $TaskList;
+   }
+   
+   /**
+    *
+    * @param Client $Client 
+    */
+   public function SandboxExecute(&$Client) {
+      $this->Client = $Client;
       $this->Run();
    }
    
@@ -43,317 +37,29 @@ abstract class Task {
       if (is_null($Value))
          return (array_key_exists($Key, $this->TaskList->GroupData)) ? $this->TaskList->GroupData[$Key] : NULL;
          
-      return $this->TaskList->GroupData[$Key] = $Value;
+      return $this->Client->GroupData[$Key] = $Value;
    }
    
    protected function Uncache($Key) {
-      unset($this->TaskList->GroupData[$Key]);
+      unset($this->Client->GroupData[$Key]);
    }
    
-   protected function SaveToConfig($Key, $Value) {
-      if (is_null($this->ClientInfo)) return;
-      if (LAME) return;
-      
-      $this->Config->Load($this->ConfigFile, 'Save');
-      
-      if (!is_array($Key))
-         $Key = array($Key => $Value);
-      
-      foreach ($Key as $k => $v)
-         $this->Config->Set($k, $v);
-      
-      return $this->Config->Save($this->ConfigFile);
+   public function Database() {
+      return $this->Client->Database();
    }
    
-   protected function RemoveFromConfig($Key) {
-      if (is_null($this->ClientInfo)) return;
-      if (LAME) return;
-      
-      $this->Config->Load($this->ConfigFile, 'Save');
-
-      if (!is_array($Key))
-         $Key = array($Key);
-      
-      foreach ($Key as $k)
-         $this->Config->Remove($k);
-      
-      $Result = $this->Config->Save($this->ConfigFile);
-      if ($Result)
-         $this->Config->Load($this->ConfigFile, 'Use');
-      return $Result;
+   public function ClientRoot() { return $this->Client->ClientRoot; }
+   public function ClientInfo($Param = NULL, $Default = NULL) { 
+      if (!is_null($Param))
+         return GetValue($Param, $this->Client->ClientInfo, $Default);
+      return $this->Client->ClientInfo; 
    }
+   public function ClientFolder() { return $this->Client->ClientFolder; }
+   public function ConfigFile() { return $this->Client->ConfigFile; }
    
-   protected function TokenAuthentication() {
-      $TokenString = md5(RandomString(32).microtime(true));
-      
-      $EnabledAuthenticators = $this->C('Garden.Authenticator.EnabledSchemes',array());
-      if (!is_array($EnabledAuthenticators) || !sizeof($EnabledAuthenticators)) {
-         TaskList::Event("Failed to read current authenticator list from config");
-         return FALSE;
-      }
-      
-      if (!in_array('token', $EnabledAuthenticators)) {
-         $EnabledAuthenticators[] = 'token';
-         $this->SaveToConfig('Garden.Authenticator.EnabledSchemes', $EnabledAuthenticators);
-      }
-      
-      $this->SaveToConfig('Garden.Authenticators.token.Token', $TokenString);
-      $this->SaveToConfig('Garden.Authenticators.token.Expiry', date('Y-m-d H:i:s',time()+30));
-      return $TokenString;
-   }
-   
-   protected function EnablePlugin($PluginName) {
-      TaskList::Event("Enabling plugin '{$PluginName}'...", TaskList::NOBREAK);
-      try {
-         $Token = $this->TokenAuthentication();
-         if ($Token === FALSE) throw new Exception("could not generate token");
-         $Result = $this->Request('plugin/forceenableplugin/'.$PluginName,array(
-            'token'  => $Token
-         ));
-      } catch (Exception $e) {
-         $Result = 'msg: '.$e->getMessage();
-      }
-      TaskList::Event((($Result == "TRUE") ? "success" : "failure ({$Result})"));
-      return ($Result == 'TRUE') ? TRUE : FALSE;
-   }
-   
-   protected function DisablePlugin($PluginName) {
-      TaskList::Event("Disabling plugin '{$PluginName}'...", TaskList::NOBREAK);
-      try {
-         $Token = $this->TokenAuthentication();
-         if ($Token === FALSE) throw new Exception("could not generate token");
-         $Result = $this->Request('plugin/forcedisableplugin/'.$PluginName,array(
-            'token'  => $Token
-         ));
-      } catch (Exception $e) {
-         $Result = 'msg: '.$e->getMessage();
-      }
-      TaskList::Event((($Result == "TRUE") ? "success" : "failure ({$Result})"));
-      return ($Result == 'TRUE') ? TRUE : FALSE;
-   }
-   
-   protected function PrivilegedExec($RelativeURL, $QueryParams = array(), $Absolute = FALSE) {
-      try {
-         $Token = $this->TokenAuthentication();
-         if ($Token === FALSE) 
-            throw new Exception("could not generate token");
-         $QueryParams['token'] = $Token;
-         $Result = $this->Request($RelativeURL,$QueryParams);
-      } catch (Exception $e) {
-         $Result = 'msg: '.$e->getMessage();
-      }
-      return $Result;
-   }
-   
-   protected function Request($Options, $QueryParams = array(), $Absolute = FALSE) {
-      
-      if (is_string($Options)) {
-         $Options = array(
-             'URL'      => $Options
-         );
-      }
-      
-      $Defaults = array(
-          'Url'         => NULL,
-          'Timeout'     => $this->C('Garden.SocketTimeout', 2.0),
-          'Redirects'   => TRUE
-      );
-      
-      $Options = array_merge($Defaults, $Options);
-      
-      $RelativeURL = GetValue('URL', $Options);
-      $FollowRedirects = GetValue('Redirects', $Options);
-      $Timeout = GetValue('Timeout', $Options);
-      
-      if (!$Absolute)
-         $Url = 'http://'.$this->ClientFolder.'/'.ltrim($RelativeURL,'/').'?'.http_build_query($QueryParams);
-      else {
-         $Url = $RelativeURL;
-         if (stristr($RelativeURL, '?'))
-            $Url .= '&';
-         else
-            $Url .= '?';
-         $Url .= http_build_query($QueryParams);
-      }
-      
-      $UrlParts = parse_url($Url);
-      $Scheme = GetValue('scheme', $UrlParts, 'http');
-      $Host = GetValue('host', $UrlParts, '');
-      $Port = GetValue('port', $UrlParts, '80');
-      $Path = GetValue('path', $UrlParts, '');
-      $Query = GetValue('query', $UrlParts, '');
-      // Get the cookie.
-      $Cookie = '';
-      $EncodeCookies = TRUE;
-      
-      foreach($_COOKIE as $Key => $Value) {
-         if(strncasecmp($Key, 'XDEBUG', 6) == 0)
-            continue;
-         
-         if(strlen($Cookie) > 0)
-            $Cookie .= '; ';
-            
-         $EValue = ($EncodeCookies) ? urlencode($Value) : $Value;
-         $Cookie .= "{$Key}={$EValue}";
-      }
-      $Response = '';
-      if (function_exists('curl_init')) {
-         
-         //$Url = $Scheme.'://'.$Host.$Path;
-         $Handler = curl_init();
-         curl_setopt($Handler, CURLOPT_URL, $Url);
-         curl_setopt($Handler, CURLOPT_PORT, $Port);
-         curl_setopt($Handler, CURLOPT_HEADER, 1);
-         curl_setopt($Handler, CURLOPT_USERAGENT, GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
-         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, 1);
-         
-         if ($Timeout > 0)
-            curl_setopt($Handler, CURLOPT_TIMEOUT, $Timeout);
-         
-         if ($Cookie != '')
-            curl_setopt($Handler, CURLOPT_COOKIE, $Cookie);
-         
-         // TIM @ 2010-06-28: Commented this out because it was forcing all requests with parameters to be POST. Same for the $Url above
-         // 
-         //if ($Query != '') {
-         //   curl_setopt($Handler, CURLOPT_POST, 1);
-         //   curl_setopt($Handler, CURLOPT_POSTFIELDS, $Query);
-         //}
-         
-         $Response = curl_exec($Handler);
-         $Success = TRUE;
-         if ($Response == FALSE) {
-            $Success = FALSE;
-            $Response = curl_error($Handler);
-         }
-         
-         curl_close($Handler);
-      } else if (function_exists('fsockopen')) {
-         $Referer = Gdn_Url::WebRoot(TRUE);
-      
-         // Make the request
-         $Pointer = @fsockopen($Host, $Port, $ErrorNumber, $Error);
-         if (!$Pointer)
-            throw new Exception(sprintf(T('Encountered an error while making a request to the remote server (%1$s): [%2$s] %3$s'), $Url, $ErrorNumber, $Error));
-   
-         if ($Timeout > 0)
-            stream_set_timeout($Pointer, $Timeout);
-         
-         if(strlen($Cookie) > 0)
-            $Cookie = "Cookie: $Cookie\r\n";
-         
-         $HostHeader = $Host.(($Port != 80) ? ":{$Port}" : '');
-         $Header = "GET $Path?$Query HTTP/1.1\r\n"
-            ."Host: {$HostHeader}\r\n"
-            // If you've got basic authentication enabled for the app, you're going to need to explicitly define the user/pass for this fsock call
-            // "Authorization: Basic ". base64_encode ("username:password")."\r\n" . 
-            ."User-Agent: ".GetValue('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
-            ."Accept: */*\r\n"
-            ."Accept-Charset: utf-8;\r\n"
-            ."Referer: {$Referer}\r\n"
-            ."Connection: close\r\n";
-            
-         if ($Cookie != '')
-            $Header .= $Cookie;
-         
-         $Header .= "\r\n";
-         
-         // Send the headers and get the response
-         fputs($Pointer, $Header);
-         while ($Line = fread($Pointer, 4096)) {
-            $Response .= $Line;
-         }
-         @fclose($Pointer);
-         $Bytes = strlen($Response);
-         $Response = trim($Response);
-         $Success = TRUE;
-         
-         $StreamInfo = stream_get_meta_data($Pointer);
-         if (GetValue('timed_out', $StreamInfo, FALSE) === TRUE) {
-            $Success = FALSE;
-            $Response = "Operation timed out after {$Timeout} seconds with {$Bytes} bytes received.";
-         }
-      } else {
-         throw new Exception(T('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
-      }
-      
-      if (!$Success)
-         return $Response;
-      
-      $ResponseHeaderData = trim(substr($Response, 0, strpos($Response, "\r\n\r\n")));
-      $Response = trim(substr($Response, strpos($Response, "\r\n\r\n") + 4));
-      
-      $ResponseHeaderLines = explode("\n",trim($ResponseHeaderData));
-      $Status = array_shift($ResponseHeaderLines);
-      $ResponseHeaders = array();
-      $ResponseHeaders['HTTP'] = trim($Status);
-      
-      /* get the numeric status code. 
-       * - trim off excess edge whitespace, 
-       * - split on spaces, 
-       * - get the 2nd element (as a single element array), 
-       * - pop the first (only) element off it... 
-       * - return that.
-       */
-      $ResponseHeaders['StatusCode'] = array_pop(array_slice(explode(' ',trim($Status)),1,1));
-      foreach ($ResponseHeaderLines as $Line) {
-         $Line = explode(':',trim($Line));
-         $Key = trim(array_shift($Line));
-         $Value = trim(implode(':',$Line));
-         $ResponseHeaders[$Key] = $Value;
-      }
-      
-      if ($FollowRedirects) { 
-         $Code = GetValue('StatusCode',$ResponseHeaders, 200);
-         if (in_array($Code, array(301,302))) {
-            if (array_key_exists('Location', $ResponseHeaders)) {
-               $Location = GetValue('Location', $ResponseHeaders);
-               return $this->Request($Location, $QueryParams, TRUE);
-            }
-         }
-      }
-      
-      return $Response;
-   }
-
-   protected function C($Name = FALSE, $Default = FALSE) {
-      if (is_null($this->ClientInfo)) return;
-      return $this->Config->Get($Name, $Default);
-   }
-   
-   protected function Symlink($RelativeLink, $Source = NULL, $Respectful = FALSE) {
-      $AbsoluteLink = TaskList::CombinePaths($this->ClientRoot,$RelativeLink);
-      TaskList::Symlink($AbsoluteLink, $Source, $Respectful);
-   }
-   
-   protected function Mkdir($RelativePath) {
-      $AbsolutePath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
-      TaskList::Mkdir($AbsolutePath);
-   }
-   
-   protected function Touch($RelativePath) {
-      $AbsolutePath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
-      TaskList::Touch($AbsolutePath);
-   }
-   
-   protected function CopySourceFile($RelativePath, $SourcecodePath) {
-      $AbsoluteClientPath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
-      $AbsoluteSourcePath = TaskList::CombinePaths($SourcecodePath,$RelativePath);
-      
-      $NewFileHash = md5_file($AbsoluteSourcePath);
-      $OldFileHash = NULL;
-      if (file_exists($AbsoluteClientPath)) {
-         $OldFileHash = md5_file($AbsoluteClientPath);
-         if ($OldFileHash == $NewFileHash) {
-            TaskList::Event("copy aborted. local {$RelativePath} is the same as {$AbsoluteSourcePath}");
-            return FALSE;
-         }
-         if (!LAME) unlink($AbsoluteClientPath);
-      }
-      
-      TaskList::Event("copy '{$AbsoluteSourcePath} / ".md5_file($AbsoluteSourcePath)."' to '{$AbsoluteClientPath} / {$OldFileHash}'");
-      if (!LAME) copy($AbsoluteSourcePath, $AbsoluteClientPath);
-      return TRUE;
+   // Forward to client
+   public function __call($Method, $Args) {
+      call_user_func_array(array($this->Client, $Method), $Args);
    }
 
 }

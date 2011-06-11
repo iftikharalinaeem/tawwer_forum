@@ -43,8 +43,9 @@ class BackupTask extends Task {
    
    protected function Run() {
       if ($this->ReallyRun !== TRUE) return;
-
-      $BackupFolder = TaskList::CombinePaths($this->BackupPath,$this->ClientFolder);
+      $ClientFolder = $this->ClientFolder();
+      
+      $BackupFolder = TaskList::CombinePaths($this->BackupPath,$ClientFolder);
       if (!is_dir($BackupFolder))
          @mkdir($BackupFolder);
          
@@ -61,7 +62,7 @@ class BackupTask extends Task {
       $DateString = date('Y-m-d_H-i-s');
       
       // Perform filesystem backup
-      $BackupTarFile = TaskList::CombinePaths($BackupFolder, "{$this->ClientFolder}_{$DateString}.tgz");
+      $BackupTarFile = TaskList::CombinePaths($BackupFolder, "{$ClientFolder}_{$DateString}.tgz");
       
       $Proceed = 'yes';
       if (!is_writable($BackupFolder)) {
@@ -75,7 +76,7 @@ class BackupTask extends Task {
       
          // Create TGZ archive
          TaskList::Event("Backing up client vhost data to {$BackupTarFile}...", TaskList::NOBREAK);
-         $TarableFileName = ltrim($this->ClientRoot,'/');
+         $TarableFileName = ltrim($this->ClientRoot(),'/');
          if (!LAME) { ob_start(); $trash = shell_exec("tar -czf {$BackupTarFile} -C / {$TarableFileName}"); ob_end_clean(); }
          TaskList::MajorEvent("done");
       
@@ -83,7 +84,7 @@ class BackupTask extends Task {
       
       // Perform Database backup
       if ($Proceed == 'yes') {
-         $DatabaseName = $this->ClientInfo['DatabaseName'];
+         $DatabaseName = $this->ClientInfo('DatabaseName');
          $BackupSQLFile = TaskList::CombinePaths($BackupFolder, "database_".strtolower($DatabaseName)."_{$DateString}.%s");
          
          $RawSQLFile = sprintf($BackupSQLFile,'sql');

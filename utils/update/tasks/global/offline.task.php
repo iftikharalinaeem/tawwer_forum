@@ -8,7 +8,7 @@ class OfflineTask extends Task {
    
    protected function Run() {
       TaskList::Event("Client offline...");
-      $this->SaveToConfig('Garden.UpdateMode', TRUE);
+      $this->Client->SaveToConfig('Garden.UpdateMode', TRUE);
    }
 
 }

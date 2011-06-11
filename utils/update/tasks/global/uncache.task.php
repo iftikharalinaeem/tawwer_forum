@@ -7,7 +7,7 @@ class UncacheTask extends Task {
    }
    
    protected function Run() {
-      $CachePath = TaskList::CombinePaths(array($this->ClientRoot, 'cache'));
+      $CachePath = TaskList::CombinePaths(array($this->ClientRoot(), 'cache'));
       
       foreach (scandir($CachePath) as $CacheItem) {
          if (in_array($CacheItem, array('.','..'))) continue;

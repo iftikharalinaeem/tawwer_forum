@@ -12,14 +12,18 @@ require_once("includes/runner.php");
 $Tasks = new TaskList();
 $Tasks->Clients('/srv/www/vhosts');
 $Tasks->Perform(TaskList::ACTION_CACHE);
-$Tasks->Perform(TaskList::ACTION_TARGET);
 
-$Tasks->Run(TaskList::MODE_TARGET, array(
+$RunForAll = $Tasks->GetConsoleOption('all', FALSE);
+if ($RunForAll) {
+   $RunMode = TaskList::MODE_CHUNKED;
+} else {
+   $RunMode = TaskList::MODE_TARGET;
+   $Tasks->Perform(TaskList::ACTION_TARGET);
+}
+
+$Tasks->Run($RunMode, array(
    'global/backup',
    'global/offline',
-   'global/uncache',
-   'maintain/filesystem',
    'maintain/utilityupdate',
-   'maintain/structure',
    'global/online'
 ));

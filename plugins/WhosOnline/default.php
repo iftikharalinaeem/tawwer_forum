@@ -60,7 +60,7 @@ class WhosOnlinePlugin extends Gdn_Plugin {
       $ConfigItem = C('WhosOnline.Location.Show', 'every');
       $Controller = $Sender->ControllerName;
       $Application = $Sender->ApplicationFolder;
-      $Session = Gdn::Session();     
+      $Session = Gdn::Session();
 
 		// Check if its visible to users
 		if (C('WhosOnline.Hide', TRUE) && !$Session->IsValid()) {

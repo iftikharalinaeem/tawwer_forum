@@ -73,6 +73,7 @@
       <?php
          $Settings = array(
             "Debug Mode"   => "Detailed error reporting. Turns on/off the in-depth error page for Bonks.",
+            "Update Mode"  => "Disables the site for non-admins.",
             "VF Options"   => "VF.com admin options.",
             "VF Spoof"     => "Allows Vanilla employees to gain access to hosted forums by logging in with a vf.com administrative user."
          );
