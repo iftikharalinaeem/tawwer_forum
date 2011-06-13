@@ -119,16 +119,40 @@ class FindOrphansTask extends Task {
    }
    
    public function Shutdown() {
+      $OrphanMessage = "";
       $NumOrphans = sizeof($this->Orphans);
-      TaskList::MajorEvent("Orphan forums: {$NumOrphans}");
-      foreach ($this->Orphans as $Forum)
-         TaskList::Event("http://{$Forum[0]} => {$Forum[1]}");
-         
+      $NumOrphanText = "Orphan forums: {$NumOrphans}";
+      TaskList::MajorEvent($NumOrphanText);
+      $OrphanMessage .= "{$NumOrphanText}\n";
+      foreach ($this->Orphans as $Forum) {
+         $ForumLine = "http://{$Forum[0]} => {$Forum[1]}";
+         TaskList::Event($ForumLine);
+         $OrphanMessage .= "{$ForumLine}\n";
+      }
+      
+      $OrphanMessage .= "\n";
+      
       TaskList::MajorEvent("");
       $NumDead = sizeof($this->Dead);
-      TaskList::MajorEvent("Dead forums: {$NumDead}");
-      foreach ($this->Dead as $Forum)
-         TaskList::Event("http://{$Forum[0]} => {$Forum[1]}");
+      $NumDeadText = "Dead forums: {$NumDead}";
+      TaskList::MajorEvent($NumDeadText);
+      $OrphanMessage .= "{$NumDeadText}\n";
+      foreach ($this->Dead as $Forum) {
+         $ForumLine = "http://{$Forum[0]} => {$Forum[1]}";
+         TaskList::Event($ForumLine);
+         $OrphanMessage .= "{$ForumLine}\n";
+      }
+      
+      if ($NumOrphans || $NumDead) {
+         try {
+            $Email = new Email($this->Client);
+            $Email->To('tim@vanillaforums.com', 'Tim Gunter')
+               ->From('runner@vanillaforums.com','VFCom Runner')
+               ->Subject("VFCom Orphans Found")
+               ->Message($OrphanMessage)
+               ->Send();
+         } catch (Exception $e) {}
+      }
    }
    
 }
