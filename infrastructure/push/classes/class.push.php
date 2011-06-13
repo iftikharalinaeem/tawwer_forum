@@ -10,6 +10,7 @@ class Push {
    const LOG_L_INFO = 8;
    
    const LOG_O_NONEWLINE = 1;
+   const LOG_O_SHOWTIME = 2;
    
    protected static $Args;
    
@@ -173,9 +174,13 @@ class Push {
    }
    
    public function Execute() {
+      Push::Log(Push::LOG_L_INFO, "Push started", Push::LOG_O_SHOWTIME);
+      
       foreach ($this->Frontends() as $Frontend) {
          $Frontend->Push();
       }
+      
+      Push::Log(Push::LOG_L_INFO, "Push complete", Push::LOG_O_SHOWTIME);
       
       if (Push::Config('utility update')) {
          if (!Push::Config('fast')) {
@@ -343,6 +348,23 @@ class Push {
       return $Answer;
    }
    
+   /**
+    *
+    * @param type $Time
+    * @param type $Format
+    * @return DateTime
+    */
+   public static function Time($Time = 'now', $Format = NULL) {
+      $Timezone = new DateTimeZone('utc');
+      
+      if (is_null($Format))
+         $Date = new DateTime($Time, $Timezone);
+      else
+         $Date = DateTime::createFromFormat ($Format, $Time, $Timezone);
+      
+      return $Date;
+   }
+   
    public static function Log($Level, $Message, $Options = 0) {
       static $LoggingLevel = FALSE;
       
@@ -350,6 +372,11 @@ class Push {
          $LoggingLevel = Push::Config('log level', 1);
       
       if ($LoggingLevel & $Level) {
+         if ($Options & Push::LOG_O_SHOWTIME) {
+            $Time = Push::Time('now');
+            echo "[".$Time->format('Y-m-d H:i:s')."] ";
+         }
+         
          echo $Message;
          if (!($Options & Push::LOG_O_NONEWLINE))
             echo "\n";
