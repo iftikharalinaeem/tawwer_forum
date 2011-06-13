@@ -182,13 +182,13 @@ class Push {
    }
    
    public function Execute() {
-      Push::Log(Push::LOG_L_INFO, "Push started", Push::LOG_O_SHOWTIME);
+      Push::Log(Push::LOG_L_NOTICE, "Push started", Push::LOG_O_SHOWTIME);
       
       foreach ($this->Frontends() as $Frontend) {
          $Frontend->Push();
       }
       
-      Push::Log(Push::LOG_L_INFO, "Push complete", Push::LOG_O_SHOWTIME);
+      Push::Log(Push::LOG_L_NOTICE, "Push complete", Push::LOG_O_SHOWTIME);
       
       if (Push::Config('utility update')) {
          if (!Push::Config('fast')) {
