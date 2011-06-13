@@ -747,7 +747,8 @@ if (!function_exists('UserBuilder')) {
       $User->Name = $Object->$Name;
       $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
       $Protocol =  (strlen(GetValue('HTTPS', $_SERVER, 'No')) != 'No' || GetValue('SERVER_PORT', $_SERVER) == 443) ? 'https://secure.' : 'http://www.';
-/*      if ($User->Photo == '' && property_exists($Object, $Email)) {
+      $User->Email = GetValue($Email, $Object);
+      /*      if ($User->Photo == '' && property_exists($Object, $Email)) {
          $User->Photo = $Protocol.'gravatar.com/avatar.php?'
             .'gravatar_id='.md5(strtolower($Object->$Email))
             .'&amp;default='.urlencode(Asset(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
@@ -770,11 +771,16 @@ if (!function_exists('UserPhoto')) {
       $ImgClass = GetValue('ImageClass', $Options, 'ProfilePhotoBig');
       
       $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
-      if ($User->Photo) {
-         if (!preg_match('`^https?://`i', $User->Photo)) {
-            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($User->Photo, 'n%s'));
+
+      $Photo = $User->Photo;
+      if (!$Photo && function_exists('UserPhotoDefaultUrl'))
+         $Photo = UserPhotoDefaultUrl($User);
+
+      if ($Photo) {
+         if (!preg_match('`^https?://`i', $Photo)) {
+            $PhotoUrl = Gdn_Upload::Url(ChangeBasename($Photo, 'n%s'));
          } else {
-            $PhotoUrl = $User->Photo;
+            $PhotoUrl = $Photo;
          }
 			
 			$Jailed = GetValue('Jailed', $User) == '1';
