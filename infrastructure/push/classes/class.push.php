@@ -1,6 +1,14 @@
 <?php
 
-require_once('class.proxyrequest.php');
+/*
+Copyright 2011, Tim Gunter
+This file is part of Push.
+Push is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Push is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with Push.  If not, see <http://www.gnu.org/licenses/>.
+Contact Tim Gunter at tim [at] vanillaforums [dot] com
+*/
+
 require_once('class.pushfront.php');
 class Push {
    
@@ -10,6 +18,7 @@ class Push {
    const LOG_L_INFO = 8;
    
    const LOG_O_NONEWLINE = 1;
+   const LOG_O_SHOWTIME = 2;
    
    protected static $Args;
    
@@ -173,9 +182,13 @@ class Push {
    }
    
    public function Execute() {
+      Push::Log(Push::LOG_L_NOTICE, "Push started", Push::LOG_O_SHOWTIME);
+      
       foreach ($this->Frontends() as $Frontend) {
          $Frontend->Push();
       }
+      
+      Push::Log(Push::LOG_L_NOTICE, "Push complete", Push::LOG_O_SHOWTIME);
       
       if (Push::Config('utility update')) {
          if (!Push::Config('fast')) {
@@ -343,6 +356,23 @@ class Push {
       return $Answer;
    }
    
+   /**
+    *
+    * @param type $Time
+    * @param type $Format
+    * @return DateTime
+    */
+   public static function Time($Time = 'now', $Format = NULL) {
+      $Timezone = new DateTimeZone('utc');
+      
+      if (is_null($Format))
+         $Date = new DateTime($Time, $Timezone);
+      else
+         $Date = DateTime::createFromFormat ($Format, $Time, $Timezone);
+      
+      return $Date;
+   }
+   
    public static function Log($Level, $Message, $Options = 0) {
       static $LoggingLevel = FALSE;
       
@@ -350,6 +380,11 @@ class Push {
          $LoggingLevel = Push::Config('log level', 1);
       
       if ($LoggingLevel & $Level) {
+         if ($Options & Push::LOG_O_SHOWTIME) {
+            $Time = Push::Time('now');
+            echo "[".$Time->format('Y-m-d H:i:s')."] ";
+         }
+         
          echo $Message;
          if (!($Options & Push::LOG_O_NONEWLINE))
             echo "\n";
