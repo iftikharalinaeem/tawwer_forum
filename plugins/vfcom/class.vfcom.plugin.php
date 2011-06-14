@@ -245,7 +245,7 @@ class VfcomPlugin extends Gdn_Plugin {
          $Domain = str_replace(array('http://', '/'), array('', ''), $Domain);
          $ServerName = str_replace(array('http://', '/'), array('', ''), $ServerName);
          if ($ServerName != $Domain)
-            Redirect('http://' . $Domain . Gdn::Request()->Url());
+            Redirect('http://' . $Domain . Gdn::Request()->Url(), 301);
       }
    }
    
