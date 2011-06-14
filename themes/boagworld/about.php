@@ -17,5 +17,6 @@ $ThemeInfo['boagworld'] = array(
    'Version' => '1.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
+   'AuthorUrl' => 'http://vanillaforums.com',
+   'Site' => 'boagworld.vanillaforums.com'
 );
