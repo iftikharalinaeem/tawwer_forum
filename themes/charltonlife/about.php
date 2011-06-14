@@ -6,5 +6,6 @@ $ThemeInfo['charltonlife'] = array(
    'Version' => '1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'Site' => 'charltonlife.vanillaforums.com'
 );

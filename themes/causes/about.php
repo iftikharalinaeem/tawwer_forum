@@ -5,5 +5,6 @@ $ThemeInfo['causes'] = array(
    'Version' => '1.0',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
+   'AuthorUrl' => 'http://vanillaforums.com',
+   'Site' => 'causes.vanillaforums.com'
 );
