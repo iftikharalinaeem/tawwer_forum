@@ -2,20 +2,25 @@
 
 class UtilityUpdateTask extends Task {
    
+   protected $Utility = FALSE;
+   
    public function __construct($ClientDir) {
       parent::__construct($ClientDir);
+   }
+   
+   public function Init() {
       
-      $this->Utility = FALSE;
+      if (TaskList::Cautious()) {
+         $Proceed = TaskList::Question("Run utility/update as part of this update?","Run utility/update?",array('yes','no','exit'),'yes');
+         if ($Proceed == 'no') return;
+         if ($Proceed == 'exit') exit();
+      }
       
-      $Proceed = TaskList::Question("Run utility/update as part of this update?","Run utility/update?",array('yes','no'),'yes');
-      if ($Proceed == 'no') return;
       $this->Utility = TRUE;
       
       $ReportFailures = TaskList::GetConsoleOption('report-failures', FALSE);
       $this->ReportFailures = $ReportFailures;
-   }
-   
-   public function Init() {
+      
       $this->TaskList->RequireTargetDatabase = TRUE;
       $this->TaskList->RequireValid = TRUE;
    }

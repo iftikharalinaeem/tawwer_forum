@@ -11,9 +11,12 @@ class TaskList {
    const MODE_REGEX     = 'regex';
 
    const NOBREAK        = FALSE;
-   const CONFIGDEFAULTS = '/srv/www/vanillaforumscom/conf/config-defaults.php';
-   const CONFIG         = '/srv/www/vanillaforumscom/conf/config.php';
+   const CONFIGDEFAULTS = '/var/www/vanilla/vanilla/conf/config-defaults.php';
+   const CONFIG         = '/var/www/vanilla/clients/dev.vanilla.tim/conf/config.php';
    const TASKS          = 'tasks/';
+   
+   const OUTMODE_CLI    = 'cli';
+   const OUTMODE_JSON   = 'json';
    
    // List of perform tasks
    protected $Perform;
@@ -23,9 +26,6 @@ class TaskList {
    
    // List of requested tasks
    protected $RequestedTasks;
-   
-   // Cross-task per client cache
-   public $GroupData;
    
    // Client Folder
    protected $Clients;
@@ -42,6 +42,12 @@ class TaskList {
    
    // Config object
    protected $Config;
+   
+   // Where sourcecode tags live
+   protected $SourceRoot;
+   
+   // What domain we're working on
+   protected $HostingDomain;
    
    // Int number of known clients
    protected $NumClients;
@@ -68,6 +74,13 @@ class TaskList {
    
       define("FAST", ((TaskList::GetConsoleOption("fast", FALSE) || TaskList::GetConsoleOption("veryfast", FALSE)) !== FALSE) ? TRUE : FALSE);
       define("VERYFAST", (TaskList::GetConsoleOption("veryfast", FALSE) !== FALSE) ? TRUE : FALSE);
+      
+      define("OUTPUTMODE", TaskList::GetConsoleOption("mode", TaskList::OUTMODE_CLI));
+      
+      $IsVerbose = !(bool)TaskList::GetConsoleOption("quiet", FALSE);
+      define("VERBOSE", $IsVerbose);
+      $IsLame = (bool)TaskList::GetConsoleOption("lame", FALSE);
+      define("LAME", $IsLame);
    
       $Configs = array(
             "config-defaults"    => TaskList::GetConsoleOption("config-defaults", TaskList::CONFIGDEFAULTS),
@@ -89,6 +102,12 @@ class TaskList {
          TaskList::MinorEvent($e->getMessage());
          die();
       }
+      
+      $this->SourceRoot = $this->C('VanillaForums.Spawn.SourceRoot','/srv/www/source');
+      if (!file_exists($this->SourceRoot) || !is_dir($this->SourceRoot))
+         TaskList::FatalError("Invalid sourcecode root folder '{$this->SourceRoot}'");
+         
+      $this->HostingDomain = $this->C('VanillaForums.Spawn.HostingDomain', 'vanillaforums.com');
       
       // Get db connection details from vfcom's config
       $this->DBHOST = $this->Config->Get('Database.Host', NULL);
@@ -135,7 +154,7 @@ class TaskList {
          // Open the db connection, new link please
          $Database = @mysql_connect($Host, $User, $Pass, TRUE);
          if (!$Database) {
-            throw new Exception("Could not connect to database as '{$User}'@'{$Host}'");
+            throw new ConnectException("Could not connect to database as '{$User}'@'{$Host}'.");
          }
          
          if ($Reuse) {
@@ -148,7 +167,7 @@ class TaskList {
       if (!is_null($Name) && $Database) {
          $SelectedDatabase = @mysql_select_db($Name, $Database);
          if (!$SelectedDatabase)
-            throw new Exception("Could not select database '{$Name}' on '{$Host}'");
+            throw new SelectException("Could not select database '{$Name}' on '{$Host}'.");
       }
       
       return $Database;
@@ -160,6 +179,31 @@ class TaskList {
          $RootDatabase = $this->Database($this->DBHOST, $this->DBUSER, $this->DBPASS, $this->DBMAIN, FALSE);
       }
       return $RootDatabase;
+   }
+   
+   public function IsValidSourceTag($SourceCodeTag) {
+      // Did we get given a tag at all?
+      if (empty($SourceCodeTag))
+         return FALSE;
+      
+      // Does this tag even exist?
+      $SourceCodeFolder = $SourceCodeTag;
+      $SourceCodePath = TaskList::Pathify(TaskList::CombinePaths(array($this->SourceRoot, $SourceCodeFolder)));
+      if (!is_dir($SourceCodePath))
+         return FALSE;
+      
+      // Make sure this is actually a valid source tag based on contents
+      $SubFolders = scandir($SourceCodePath);
+      if (!in_array('vanilla', $SubFolders))
+         return FALSE;
+      if (!in_array('misc', $SubFolders))
+         return FALSE;
+      
+      return $SourceCodePath;
+   }
+   
+   public function SourceRoot() {
+      return $this->SourceRoot;
    }
    
    public function C($Name = FALSE, $Default = NULL) {
@@ -230,18 +274,19 @@ class TaskList {
             
             $Forum = TaskList::GetConsoleOption('target', NULL);
             if (is_null($Forum)) {
-               $Forum = TaskList::Input("Please provide the name of the forum you wish to {$Action}, or 'no' to quit :","Forum name [________].vanillaforums.com",NULL);
+               $Forum = TaskList::Input("Please provide the name of the forum you wish to {$Action}, or 'no' to quit :","Forum name [________].{$this->HostingDomain}",NULL);
                if (is_null($Forum) || $Forum == 'no')
                   TaskList::FatalError("No forum provided.");
             }
             
-            $QualifiedForumName = $Forum.".vanillaforums.com";
+            $QualifiedForumName = $Forum.".{$this->HostingDomain}";
             $ForumPath = TaskList::CombinePaths(array($this->Clients,$QualifiedForumName));
             $Exists = is_dir($ForumPath);
             if ($Perform == TaskList::ACTION_CREATE) {
             
                // When creating, do not require DB.
                $this->RequireValid = FALSE;
+               $this->RequireTargetDatabase = FALSE;
                
                if ($Exists) {
                
@@ -264,7 +309,10 @@ class TaskList {
       }
    }
    
-   public function Clients($ClientDir) {
+   public function Clients($ClientDir = NULL) {
+      if (is_null($ClientDir))
+         $ClientDir = $this->C('VanillaForums.Spawn.Clients','/srv/www/vhosts');
+         
       if (!is_dir($ClientDir))
          TaskList::FatalError("Could not open client folder.");
       
@@ -279,18 +327,28 @@ class TaskList {
       return $Default;
    }
    
-   public function Configure() {
+   public function Configure($TaskOrder) {
       if (is_null($this->Clients))
          TaskList::FatalError("No client folder supplied.");
-   
+      
       // Setup tasks
-      TaskList::MajorEvent("Setting up task objects...");
+      TaskList::MajorEvent("Creating task objects...");
       
       $this->TaskFolder = TaskList::CombinePaths(array(
          TaskList::Pathify(getcwd()),
          TaskList::TASKS
       ));
       $this->ScanTaskFolder($this->TaskFolder, TRUE);
+      
+      // Setup tasks
+      TaskList::MajorEvent("Configuring task objects...");
+      foreach ($TaskOrder as $TaskQualifier) {
+         if (array_key_exists($TaskQualifier, $this->Tasks) && array_key_exists('task', $this->Tasks[$TaskQualifier]) && $this->Tasks[$TaskQualifier]['task'] instanceof Task) {
+            TaskList::Event("Configuring task: {$TaskQualifier}");
+            if (method_exists($this->Tasks[$TaskQualifier]['task'], 'Init'))
+               $this->Tasks[$TaskQualifier]['task']->Init();
+         }
+      }
    }
    
    protected function ScanTaskFolder($TaskFolder, $TopLevel = FALSE) {
@@ -299,7 +357,7 @@ class TaskList {
       if (!is_dir($TaskFolder)) {
          // Only really care about a vocal error if its the first item, in which case die too.
          if ($TopLevel === TRUE)
-            TaskList::FatalError("[find tasks] Could not find primary task repository '{$TaskFolder}'");
+            TaskList::FatalError("[find tasks] Could not find primary task repository '{$TaskFolder}'.");
          return FALSE;
       }
       
@@ -343,17 +401,15 @@ class TaskList {
             // For each new class, if it is a taskfile, instantiate it and break.
             foreach ($NewClasses as $Class) {
                if (is_subclass_of($Class, 'Task')) {
-                  TaskList::Event("Configuring task: {$QualifiedTaskName} (".strtolower($Class).")");
+                  TaskList::Event("Creating task: {$QualifiedTaskName} (".strtolower($Class).")");
                   $NewTask = new $Class($this->Clients);
                   $NewTask->TaskList =& $this;
+                  $NewTask->QualifiedName = $QualifiedTaskName;
                   $this->Tasks[$QualifiedTaskName] = array(
                      'name'            => str_replace('Task', '', $Class),
                      'qualifiedname'   => $QualifiedTaskName,
                      'task'            => $NewTask
                   );
-                  if (method_exists($NewTask, 'Init'))
-                     $NewTask->Init();
-                     
                   break;
                }
             }
@@ -371,7 +427,7 @@ class TaskList {
       $this->RequestedTasks = $TaskList;
       
       // Set up tasks
-      $this->Configure();
+      $this->Configure($TaskList);
       
       // Run pre-tasks
       foreach ($this->Perform as $Perform) {
@@ -509,8 +565,10 @@ class TaskList {
          }
       }
       
+      $ClientName = trim(str_replace($this->HostingDomain, '', $ClientFolder),' .');
+      
       try {
-         $Client = new Client($this->Clients, $ClientFolder, $ClientInfo);
+         $Client = new Client($this->Clients, $ClientName, $ClientFolder, $ClientInfo);
          $Client->Configure($this, $this->Tasks);
          $Client->Run($TaskOrder);
       } catch (Exception $e) {
@@ -672,7 +730,11 @@ Error:
    }
    
    public static function Touch($AbsolutePath) {
-      return touch($AbsolutePath);
+      return @touch($AbsolutePath);
+   }
+   
+   public static function Chmod($AbsolutePath, $FileMode) {
+      return @chmod($AbsolutePath, $FileMode);
    }
    
    public static function MinorEvent($Message, $LineBreak = TRUE) {
@@ -698,8 +760,54 @@ Error:
    }
    
    public static function FatalError($Message, $LineBreak = TRUE) {
-      echo "{$Message}";
-      if ($LineBreak) echo "\n";
+      if (is_array($Message)) {
+         $Data = $Message;
+      } else {
+         $Data = array('Message' => $Message);
+      }
+      
+      $Message = GetValue('Message', $Data, NULL);
+      $Code = GetValue('Code', $Data, 'unknown');
+      $Type = GetValue('Type', $Data, 'internal');
+      switch (OUTPUTMODE) {
+         case TaskList::OUTMODE_JSON:
+            echo json_encode(array_merge($Data, array(
+                'Status'   => false,
+                'Code'     => $Code,
+                'Type'     => $Type,
+                'Message'  => $Message
+            )));
+            break;
+         case TaskList::OUTMODE_CLI:
+         default:
+            echo "{$Message}";
+            if ($LineBreak) echo "\n";
+            break;
+      }
+      die();
+   }
+   
+   public static function Success($Message, $LineBreak = TRUE) {
+      if (is_array($Message)) {
+         $Data = $Message;
+      } else {
+         $Data = array('Message' => $Message);
+      }
+      
+      $Message = GetValue('Message', $Data, NULL);
+      switch (OUTPUTMODE) {
+         case TaskList::OUTMODE_JSON:
+            echo json_encode(array_merge($Data, array(
+                'Status'   => true,
+                'Message'  => $Message
+            )));
+            break;
+         case TaskList::OUTMODE_CLI:
+         default:
+            echo "{$Message}";
+            if ($LineBreak) echo "\n";
+            break;
+      }
       die();
    }
    
@@ -768,27 +876,5 @@ Error:
    
 }
 
-function GetValue($Key, &$Collection, $Default = FALSE, $Remove = FALSE) {
-	$Result = $Default;
-	if(is_array($Collection) && array_key_exists($Key, $Collection)) {
-		$Result = $Collection[$Key];
-      if($Remove)
-         unset($Collection[$Key]);
-	} elseif(is_object($Collection) && property_exists($Collection, $Key)) {
-		$Result = $Collection->$Key;
-      if($Remove)
-         unset($Collection->$Key);
-   }
-		
-   return $Result;
-}
-
-function RandomString($Length, $Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
-   $CharLen = strlen($Characters) - 1;
-   $String = '' ;
-   for ($i = 0; $i < $Length; ++$i) {
-     $Offset = rand() % $CharLen;
-     $String .= substr($Characters, $Offset, 1);
-   }
-   return $String;
-}
+class ConnectException extends Exception {}
+class SelectException extends Exception {}

@@ -157,9 +157,9 @@ class VfcomPlugin extends Gdn_Plugin {
          if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleVFOptions", FALSE) !== FALSE) {
             $NewVFOptions = !Gdn::PluginManager()->CheckPlugin('vfoptions');
             if ($NewVFOptions) {
-               $ActionCompleted = Gdn::PluginManager()->EnablePlugin('vfoptions', FALSE, TRUE);
+               Gdn::PluginManager()->EnablePlugin('vfoptions', FALSE, TRUE);
             } else {
-               $ActionCompleted = Gdn::PluginManager()->DisablePlugin('vfoptions');
+               Gdn::PluginManager()->DisablePlugin('vfoptions');
             }
             
             $Sender->InformMessage(sprintf("VF Options has been turned %s.",(($NewVFOptions) ? 'on': 'off')));

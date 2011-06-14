@@ -4,14 +4,14 @@ error_reporting(E_ALL & ~E_NOTICE);
 define('APPLICATION', 'VanillaUpdate');
 define('PATH_CACHE', '/cache');
 define('PATH_LOCAL_CACHE', '/cache');
-define("VERBOSE", TRUE);
-define("LAME", FALSE);
 
 $Root = dirname(__FILE__);
 $Root = explode('/',$Root);
 array_pop($Root);
 $Root = '/'.trim(implode('/', $Root),'/');
 define('PATH_RUNNER', $Root);
+
+require_once('functions.php');
 
 require_once('configuration.php');
 require_once('args.php');
