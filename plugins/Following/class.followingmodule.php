@@ -79,9 +79,7 @@ class FollowingModule extends Gdn_Module {
                foreach ($Followers as $User) {
                   ?>
                   <div>
-                     <a title="<?php echo $User['Name']; ?>" href="<?php echo Url("profile/{$User['UserID']}/{$User['Name']}", TRUE); ?>">
-                        <img src="<?php echo Url('uploads'.DS.'n'.$User['Photo'], TRUE); ?>" />
-                     </a>
+                     <?php echo UserPhoto($User); ?>
                   </div>
                   <?php
                }
