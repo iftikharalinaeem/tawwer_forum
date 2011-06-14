@@ -18,6 +18,18 @@ class CarTalkThemeHooks extends Gdn_Plugin {
       $Sender->Render();
    }
 
+   public function UtilityController_Serve_Create($Sender, $Args) {
+      $Filename = GetValue(0, $Args);
+      $Path = dirname(__FILE__).'/'.$Filename;
+      if (file_exists($Path)) {
+         readfile($Path);
+         die();
+      } else {
+         throw NotFoundException();
+      }
+
+   }
+
    public function SearchController_Index_Create($Sender, $Args) {
       $Sender->Render();
    }
