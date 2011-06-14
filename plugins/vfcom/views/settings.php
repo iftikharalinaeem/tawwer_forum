@@ -5,7 +5,13 @@
 ?>
 <h1><?php echo T($this->Data('Title')); ?></h1>
 <div class="Info">
-   <?php echo T('Monitor and control infrastructure configuration for this installation. Clear and increment caches.'); ?>
+   <?php
+   if (defined('CLIENT_NAME')) {
+      echo '<div><b>CLIENT_NAME:</b> '.htmlspecialchars(CLIENT_NAME).'</div>';
+   }
+
+   echo T('Monitor and control infrastructure configuration for this installation. Clear and increment caches.');
+   ?>
 </div>
 <div class="ContentArea">
    <?php
