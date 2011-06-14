@@ -383,7 +383,7 @@ searchd {
       $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS);
       $Sphinx->setLimits($Offset, $Limit);
 //      $Sphinx->setIndexWeights(array('Page' => 200, 'Discussion' => 150, 'Comment' => 100));
-      $Sphinx->setMaxQueryTime(10);
+      $Sphinx->setMaxQueryTime(5000);
 
       // Allow the client to be overridden.
       $this->EventArguments['SphinxClient'] = $Sphinx;

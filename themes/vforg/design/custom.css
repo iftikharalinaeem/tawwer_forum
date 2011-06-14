@@ -609,6 +609,8 @@ div.Tags ul.PanelInfo li a {
    line-height: 100%;
    border: solid 1px #EED3A2;
    -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   border-radius: 3px;
 }
 .Tags li a {
    float: none;
@@ -619,6 +621,8 @@ div.Tags ul.PanelInfo li a {
     color: #FEF7DF;
     padding: 0 3px;
     -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
 }
 
 ul.PanelInfo li.Active {
