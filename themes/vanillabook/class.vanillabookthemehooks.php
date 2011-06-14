@@ -93,6 +93,10 @@ class VanillabookThemeHooks implements Gdn_IPlugin {
 		if (is_object($Discussion))
 			echo '<div class="Excerpt">'.SliceString(Gdn_Format::Text($Discussion->Body, FALSE), 100).'</div>';
 	}
+
+   public function CategoriesController_Render_Before($Sender, $Args) {
+      Gdn::Locale()->SetTranslation('All Discussions', $Sender->Data('Title'));
+   }
 	
 
    public function Setup() {

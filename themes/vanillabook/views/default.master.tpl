@@ -8,9 +8,9 @@
  <div id="Head">
    <div class="Banner Menu">
 		<div class="IconMenu">
-        <a class="Home" href="{link path="/"}"><span>{logo}</span></a>
-		  {inbox_link text='<strong>Inbox</strong>' format='<a href="%url" class="%class Inbox">%text</a>'}
-		  {profile_link text='<strong>Notifications</strong>' format='<a href="%url/notifications" class="%class Notifications">%text</a>'}
+        <a class="Home Banner" href="{link path="/"}"><span>{logo}</span></a>
+		  {inbox_link text='<strong>Inbox</strong>' format='<a href="%url" class="%class Inbox BannerSprites">%text</a>'}
+		  {profile_link text='<strong>Notifications</strong>' format='<a href="%url/notifications" class="%class Notifications BannerSprites">%text</a>'}
 		</div>
 		<div class="SiteMenu">
 		  <div class="MenuSearch" id="Search">{searchbox}</div>
