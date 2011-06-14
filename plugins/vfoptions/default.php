@@ -116,7 +116,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          $Domain = str_replace(array('http://', '/'), array('', ''), $Domain);
          $ServerName = str_replace(array('http://', '/'), array('', ''), $ServerName);
          if ($ServerName != $Domain)
-            Redirect('http://' . $Domain . Gdn::Request()->Url());
+            Redirect('http://' . $Domain . Gdn::Request()->Url(), 301);
          
       }
       
@@ -490,6 +490,22 @@ pageTracker._trackPageview();
 			} else
 				throw PermissionException();
 		}
+
+
+      if (strcasecmp($Sender->RequestMethod, 'themes') == 0) {
+         $ClientName = defined('CLIENT_NAME') ? CLIENT_NAME : '';
+         // Remove any themes that are not available.
+         $Themes = $Sender->Data('AvailableThemes');
+         $Remove = array();
+         foreach ($Themes as $Index => $Theme) {
+            $Site = GetValue('Site', $Theme);
+            if ($Site && $Site != $ClientName)
+               $Remove[] = $Index;
+         }
+         foreach ($Remove as $Index) {
+            unset($Sender->Data['AvailableThemes'][$Index]);
+         }
+      }
       
       if ($Sender->RequestMethod == 'banner')
          $Sender->View = PATH_PLUGINS.'/vfoptions/views/banner.php';

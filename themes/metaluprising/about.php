@@ -17,5 +17,6 @@ $ThemeInfo['MetalUprising'] = array(
    'Version' => '1.0.0',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://timgunter.ca'
+   'AuthorUrl' => 'http://timgunter.ca',
+   'Site' => 'mayhemforums.vanillaforums.com'
 );

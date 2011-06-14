@@ -117,10 +117,13 @@ div.IconMenu a {
    position: relative;
    height: 30px;
    display: block;
-   background: url('images/sprites.png') 6px -34px no-repeat #3B5998;
    margin: 0;
 }
-div.IconMenu a:hover {
+
+.BannerSprites {
+   background: url('images/sprites.png') 6px -34px no-repeat #3B5998;
+}
+.BannerSprites:hover {
    background: url('images/sprites.png') 6px -34px no-repeat #4b67a1;
    text-decoration: none;
 }
@@ -128,7 +131,7 @@ div.IconMenu a.Home { width: 133px; }
 div.IconMenu a.Home:hover { background-position: 6px 6px; }
 div.IconMenu a.HasCount.Inbox { background-position: 4px -362px; }
 body div.IconMenu a.HasCount.Notifications { background-position: 4px -255px; }
-div.IconMenu a.Home span,
+
 div.IconMenu a.Inbox strong,
 div.IconMenu a.Notifications strong {
    display: none;
@@ -160,6 +163,24 @@ div.IconMenu a span {
    right: -2px;
 	line-height: 1;
    z-index: 110;
+}
+
+div.IconMenu a.Banner {
+   text-align: left;
+
+}
+div.IconMenu a.Banner span {
+   background: none;
+   border: none;
+   top: inherit;
+   bottom: 0;
+   left: 0;
+   font-size: 24  px;
+   font-family: Arial;
+}
+
+a.Banner img {
+   width: 132px;
 }
 
 /* Body Layout */
@@ -379,6 +400,7 @@ div.ProfileInfo {
 div.ProfileInfo img {
    float: left;
    margin-right: 8px;
+   height: 50px;
 }
 div.ProfileInfo a {
    font-size: 11px;
@@ -1136,3 +1158,24 @@ div.Icons img {
 	height: 40px;
 	width: 40px;
 }
+
+ul.CategoryList li.Item {
+   padding: 3px 0;
+}
+
+ul.CategoryList .ItemContent {
+   border: none;
+}
+ul.CategoryList .ItemContent {
+    margin: 0;
+}
+
+ul.CategoryList .Depth1 {
+   background: #EFF2F7;
+}
+
+ul.CategoryList li.Depth2 {
+   border-top: solid 1px #DEE1E5 !Important;
+}
+
+/*border: 0 none !important;*/

@@ -6,5 +6,6 @@ $ThemeInfo['VanillaForums.org'] = array(
    'Version' => '1.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'Site' => 'www.vanillaforums.org'
 );

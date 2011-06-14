@@ -6,5 +6,6 @@ $ThemeInfo['camelot'] = array(
    'Version' => '1.0.1',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://dropthedigibomb.com'
+   'AuthorUrl' => 'http://dropthedigibomb.com',
+   'Site' => 'camelot.vanillaforums.com'
 );
