@@ -55,6 +55,11 @@ $Configuration['VanillaForums']['UserID'] = '{vanilla userid}';
 $Configuration['VanillaForums']['SiteID'] = '{vanilla siteid}';
 $Configuration['VanillaForums']['AccountID'] = '{vanilla accountid}';
 
+$Configuration['VanillaForums']['Database']['Host'] = 'vfdb1.vanillaforums.com';
+$Configuration['VanillaForums']['Database']['User'] = 'frontend';
+$Configuration['VanillaForums']['Database']['Password'] = 'Va2aWu5A';
+$Configuration['VanillaForums']['Database']['Name'] = 'vfcom';
+
 // Plugins
 $Configuration['Plugins']['GoogleAnalytics']['TrackerCode'] = 'UA-12713112-1';
 $Configuration['Plugins']['GoogleAnalytics']['TrackerDomain'] = '.vanillaforums.com';
