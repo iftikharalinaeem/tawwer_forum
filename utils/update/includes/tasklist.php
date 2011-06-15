@@ -11,10 +11,10 @@ class TaskList {
    const MODE_REGEX     = 'regex';
 
    const NOBREAK        = FALSE;
-   //const CONFIGDEFAULTS = '/var/www/vanilla/vanilla/conf/config-defaults.php';
-   //const CONFIG         = '/var/www/vanilla/clients/dev.vanilla.tim/conf/config.php';
    const CONFIGDEFAULTS = '/srv/www/vanillaforumscom/conf/config-defaults.php';
-   const CONFIG         = '/srv/www/vanillaforumscom/conf/config.php';
+   const RUNNERCONFIG   = 'includes/runnerconfig.php';
+   
+   //const CONFIGDEFAULTS = '/var/www/vanilla/vanilla/conf/config-defaults.php';
    
    const TASKS          = 'tasks/';
    
@@ -86,20 +86,20 @@ class TaskList {
       define("LAME", $IsLame);
    
       $Configs = array(
-            "config-defaults"    => TaskList::GetConsoleOption("config-defaults", TaskList::CONFIGDEFAULTS),
-            "config"             => TaskList::GetConsoleOption("config", TaskList::CONFIG)
+          "config-defaults"    => TaskList::GetConsoleOption("config-defaults", TaskList::CONFIGDEFAULTS),
+          "runner-config"      => TaskList::GetConsoleOption("runner-config", TaskList::RUNNERCONFIG)
       );
    
       $this->Config = new Configuration();
       try {
          if (!file_exists($Configs['config-defaults']))
             throw new Exception("cannot read ".$Configs['config-defaults']);
-            
-         if (!file_exists($Configs['config']))
-            throw new Exception("cannot read ".$Configs['config']);
+         
+         if (!file_exists($Configs['runner-config']))
+            throw new Exception("cannot read ".$Configs['runner-config']);
          
          $this->Config->Load($Configs['config-defaults'], 'Use');
-         $this->Config->Load($Configs['config'], 'Use');
+         $this->Config->Load($Configs['runner-config'], 'Use');
       } catch (Exception $e) { 
          TaskList::MajorEvent("Fatal error loading core config:");
          TaskList::MinorEvent($e->getMessage());
@@ -113,10 +113,10 @@ class TaskList {
       $this->HostingDomain = $this->C('VanillaForums.Spawn.HostingDomain', 'vanillaforums.com');
       
       // Get db connection details from vfcom's config
-      $this->DBHOST = $this->Config->Get('Database.Host', NULL);
-      $this->DBUSER = $this->Config->Get('Database.User', NULL);
-      $this->DBPASS = $this->Config->Get('Database.Password', NULL);
-      $this->DBMAIN = $this->Config->Get('Database.Name', NULL);
+      $this->DBHOST = $this->Config->Get('VanillaForums.Database.Host', NULL);
+      $this->DBUSER = $this->Config->Get('VanillaForums.Database.User', NULL);
+      $this->DBPASS = $this->Config->Get('VanillaForums.Database.Password', NULL);
+      $this->DBMAIN = $this->Config->Get('VanillaForums.Database.Name', NULL);
 
       // Open the db connection, new link please
       $this->Database = &$this->RootDatabase();
