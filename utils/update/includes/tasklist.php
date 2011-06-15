@@ -84,12 +84,16 @@ class TaskList {
       define("VERBOSE", $IsVerbose);
       $IsLame = (bool)TaskList::GetConsoleOption("lame", FALSE);
       define("LAME", $IsLame);
+      
+      // Chdir to where we are right now. Root of the utils/update/ folder
+      chdir(realpath(dirname(__FILE__)));
+      chdir('../');
    
       $Configs = array(
           "config-defaults"    => TaskList::GetConsoleOption("config-defaults", TaskList::CONFIGDEFAULTS),
           "runner-config"      => TaskList::GetConsoleOption("runner-config", TaskList::RUNNERCONFIG)
       );
-   
+      
       $this->Config = new Configuration();
       try {
          if (!file_exists($Configs['config-defaults']))
@@ -121,10 +125,6 @@ class TaskList {
       // Open the db connection, new link please
       $this->Database = &$this->RootDatabase();
       TaskList::MajorEvent("Connected to ".$this->DBMAIN." @ ".$this->DBHOST);
-      
-      // Chdir to where we are right now. Root of the utils/update/ folder
-      chdir(dirname(__FILE__));
-      chdir('../');
       
       $this->Perform = array();
       $this->Clients = NULL;
