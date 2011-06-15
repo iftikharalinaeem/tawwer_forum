@@ -99,6 +99,9 @@ class FilesystemTask extends Task {
          
          // Copy the new index file
          $Copied = $this->CopySourceFile('index.php', $this->Path('vanilla'));
+         if ($Copied)
+            $this->Client->Chmod('index.php',0755);
+         
          $this->Cache('Updated',$Copied);
       }
       
