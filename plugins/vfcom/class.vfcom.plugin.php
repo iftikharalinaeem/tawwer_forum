@@ -172,6 +172,7 @@ class VfcomPlugin extends Gdn_Plugin {
                Gdn::PluginManager()->EnablePlugin('vfspoof', FALSE, TRUE);
             } else {
                Gdn::PluginManager()->DisablePlugin('vfspoof');
+               SaveToConfig('EnabledPlugins.vfspoof', FALSE);
             }
             
             $Sender->InformMessage(sprintf("VF Spoof has been turned %s.",(($NewVFSpoof) ? 'on': 'off')));
