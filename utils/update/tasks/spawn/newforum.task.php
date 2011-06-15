@@ -121,6 +121,7 @@ class NewforumTask extends Task {
       
       // Create the client vhost folder
       TaskList::Mkdir($this->Client->ClientRoot);
+      $this->Client->Chmod('/', 0775);
       
       // Create subfolders
       $this->Client->Mkdir('applications');

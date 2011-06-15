@@ -11,7 +11,6 @@ class InstalledTask extends Task {
    
    public function Run() {
       $this->Client->SaveToConfig('Garden.Installed', TRUE);
-      
       TaskList::Success(array(
          'Message'      => "Installed",
          'Hostname'     => $this->Client->ClientFolder,
