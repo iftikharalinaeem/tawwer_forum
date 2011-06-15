@@ -216,6 +216,11 @@ class Client {
       TaskList::Chmod($AbsolutePath, $FileMode);
    }
    
+   public function Chown($RelativePath, $Owner = NULL, $Group = NULL) {
+      $AbsolutePath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
+      TaskList::Chown($AbsolutePath, $Owner, $Group);
+   }
+   
    public function Write($RelativePath, $Data) {
       $AbsolutePath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
       if (!file_exists($AbsolutePath)) return FALSE;

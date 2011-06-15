@@ -737,6 +737,17 @@ Error:
       return @chmod($AbsolutePath, $FileMode);
    }
    
+   public static function Chown($AbsolutePath, $Owner = NULL, $Group = NULL) {
+      $Success = TRUE;
+      if (!is_null($Owner))
+         $Success &= @chown($AbsolutePath, $Owner);
+      
+      if (!is_null($Group))
+         $Success &= @chgrp($AbsolutePath, $Group);
+      
+      return $Success;
+   }
+   
    public static function MinorEvent($Message, $LineBreak = TRUE) {
       if (VERBOSE) {
          echo "    - {$Message}";
