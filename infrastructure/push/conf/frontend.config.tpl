@@ -45,10 +45,10 @@ $Configuration['Vanilla']['Views']['Denormalize'] = TRUE;
 
 // VanillaForums
 $Configuration['VanillaForums']['Hostname'] = 'vanillaforums.com';
-$Configuration['VanillaForums']['Database']['Host'] = 'vfdb1.vanillaforums.com';
-$Configuration['VanillaForums']['Database']['User'] = 'vfcom';
-$Configuration['VanillaForums']['Database']['Password'] = 'DQeYO4RohD';
-$Configuration['VanillaForums']['Database']['Name'] = 'vfcom';
+$Configuration['VanillaForums']['Database']['Host'] =       'vfdb1.vanillaforums.com';
+$Configuration['VanillaForums']['Database']['User'] =       'vfcom';
+$Configuration['VanillaForums']['Database']['Password'] =   'DQeYO4RohD';
+$Configuration['VanillaForums']['Database']['Name'] =       'vfcom';
 $Configuration['VanillaForums']['Frontend'] = '{frontend server}';
 
 // Last edited by Tim
