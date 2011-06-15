@@ -15,6 +15,7 @@ class TaskList {
    //const CONFIG         = '/var/www/vanilla/clients/dev.vanilla.tim/conf/config.php';
    const CONFIGDEFAULTS = '/srv/www/vanillaforumscom/conf/config-defaults.php';
    const CONFIG         = '/srv/www/vanillaforumscom/conf/config.php';
+   
    const TASKS          = 'tasks/';
    
    const OUTMODE_CLI    = 'cli';
@@ -290,14 +291,19 @@ class TaskList {
                $this->RequireValid = FALSE;
                $this->RequireTargetDatabase = FALSE;
                
-               if ($Exists) {
-               
+               if ($Exists && VERBOSE) {
                   $Delete = TaskList::Question("The forum you selected already exists.","Delete it?",array("yes","no"),"no");                     
                   if ($Delete == 'yes') {
                      TaskList::Rmdir($ForumPath);
-                  } else {
-                     die();
                   }
+               }
+               
+               if (is_dir($ForumPath)) {
+                  TaskList::FatalError(array(
+                     'Message'   => "The forum name you requested is already in use.",
+                     'Type'      => 'user',
+                     'Code'      => '002'
+                  ));
                }
             }
             
