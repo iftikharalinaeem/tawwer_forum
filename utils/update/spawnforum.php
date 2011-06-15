@@ -19,6 +19,6 @@ $Tasks->Run(TaskList::MODE_TARGET, array(
    'maintain/filesystem',
    'maintain/plugins',
    'maintain/utilityupdate',
-   'spawn/installed',
-   'global/online'
+   'global/online',
+   'spawn/installed'
 ));
