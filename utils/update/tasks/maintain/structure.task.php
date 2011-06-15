@@ -7,6 +7,7 @@ class StructureTask extends Task {
       
       $this->Structure = FALSE;
       
+      TaskList::Event("Structure files are searched for in: /srv/www/update/");
       do {
          $StructureFile = TaskList::Input("Enter the structure file location for selected clients, or 'no' to skip structure", "Structure File", "structure.sql");
          $StructureFilePath = sprintf('/srv/www/update/%s',$StructureFile);
@@ -22,9 +23,12 @@ class StructureTask extends Task {
       if ($this->Structure === FALSE) return;
       if ($this->Cache('Updated') !== TRUE) return;
       
-      $DatabaseName = $this->ClientInfo('DatabaseName');
+      $DatabaseHost = $this->Client->C('Database.Host');
+      $DatabaseUser = $this->Client->C('Database.User');
+      $DatabasePassword = $this->Client->C('Database.Password');
+      $DatabaseName = $this->Client->C('Database.Name');
       TaskList::Event("Running structure file against client database '{$DatabaseName}'");
-      if (!LAME) exec(sprintf("mysql -u%s --password=%s -h %s '%s' < %s",$this->TaskList->DBUSER, $this->TaskList->DBPASS, $this->TaskList->DBHOST, $DatabaseName, $this->Structure));
+      if (!LAME) exec(sprintf("mysql -u%s --password=%s -h %s '%s' < %s",$DatabaseUser, $DatabasePassword, $DatabaseHost, $DatabaseName, $this->Structure));
    }
 
 }
