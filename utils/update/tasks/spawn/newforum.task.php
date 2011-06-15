@@ -96,7 +96,19 @@ class NewforumTask extends Task {
          'blog',
          'etsy',
          'microsoft',
-         'apple'
+         'apple',
+         'vfcom',
+         'vfdb1',
+         'lb-web-01',
+         'db-web-01',
+         'sphinx-web-01',
+         'data-web-01',
+         'cache-web-01',
+         'front-web-01',
+         'front-web-02',
+         'front-web-03',
+         'front-web-04',
+         'front-web-dev'
       );
       if (in_array($Subdomain, $ReservedWords))
          TaskList::FatalError(array(
