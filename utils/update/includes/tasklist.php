@@ -11,8 +11,10 @@ class TaskList {
    const MODE_REGEX     = 'regex';
 
    const NOBREAK        = FALSE;
-   const CONFIGDEFAULTS = '/var/www/vanilla/vanilla/conf/config-defaults.php';
-   const CONFIG         = '/var/www/vanilla/clients/dev.vanilla.tim/conf/config.php';
+   //const CONFIGDEFAULTS = '/var/www/vanilla/vanilla/conf/config-defaults.php';
+   //const CONFIG         = '/var/www/vanilla/clients/dev.vanilla.tim/conf/config.php';
+   const CONFIGDEFAULTS = '/srv/www/vanillaforumscom/conf/config-defaults.php';
+   const CONFIG         = '/srv/www/vanillaforumscom/conf/config.php';
    const TASKS          = 'tasks/';
    
    const OUTMODE_CLI    = 'cli';
