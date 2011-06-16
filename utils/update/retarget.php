@@ -10,7 +10,7 @@ require_once("includes/runner.php");
  *
  */
 $Tasks = new TaskList();
-$Tasks->Clients('/srv/www/vhosts');
+$Tasks->Clients();
 $Tasks->Perform(TaskList::ACTION_CACHE);
 $Tasks->Perform(TaskList::ACTION_TARGET);
 
@@ -19,6 +19,7 @@ $Tasks->Run(TaskList::MODE_TARGET, array(
    'global/offline',
    'global/uncache',
    'maintain/filesystem',
+   'maintain/plugins',
    'maintain/utilityupdate',
    'maintain/structure',
    'global/online'

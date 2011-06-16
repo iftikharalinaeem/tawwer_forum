@@ -10,7 +10,7 @@ require_once("includes/runner.php");
  *
  */
 $Tasks = new TaskList();
-$Tasks->Clients('/srv/www/vhosts');
+$Tasks->Clients();
 $Tasks->Perform(TaskList::ACTION_CACHE);
 
 $RunForAll = $Tasks->GetConsoleOption('all', FALSE);

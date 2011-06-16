@@ -53,7 +53,7 @@ class SplitDatabaseUsersTask extends Task {
       TaskList::Event("Splitting database user...");
       if (!LAME) {
          $DatabaseOptions = $this->ProvisionUser($DatabaseName, $DatabaseHost);
-         
+         print_r($DatabaseOptions);
       }
    }
    
