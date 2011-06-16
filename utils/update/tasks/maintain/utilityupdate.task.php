@@ -38,7 +38,6 @@ class UtilityUpdateTask extends Task {
          if ($Proceed == 'exit') exit();
       }
       
-      $DatabaseName = $this->ClientInfo('DatabaseName');
       TaskList::Event("Running utility/update...");
       if (!LAME) {
          $UtilityUpdate = FALSE;
