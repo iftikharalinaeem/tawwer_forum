@@ -83,9 +83,11 @@ class SplitDatabaseUsersTask extends Task {
       $NumDatabases = sizeof($Databases);
       $TryDatabase = mt_rand(0, $NumDatabases-1);
       $Loops = 0; $Selected = FALSE;
+      TaskList::Event("Trying {$NumDatabases} databases");
       do {
          $DatabaseServerName = GetValue($TryDatabase, array_keys($Databases));
          $TestDatabaseHost = GetValue('Host', $Databases[$DatabaseServerName]);
+         TaskList::MinorEvent("Trying '{$DatabaseServerName}' => {$TestDatabaseHost}");
          
          $TestDatabaseAddr = gethostbyname($TestDatabaseHost);
          if ($DatabaseHostAddr == $TestDatabaseAddr) {
@@ -119,8 +121,11 @@ Current: {$DatabaseHost} -> {$DatabaseHostAddr}");
       $AccessHost = $this->TaskList->C('VanillaForums.Spawn.DatabaseAccessHost', 'localhost');
       $DatabaseOptions['AccessHost'] = $AccessHost;
 
+      TaskList::Event("Generating user credentials");
       $ProvisionUser = substr($this->Client->ClientName, 0, 10).substr($DatabaseOptions['Name'],-6);
+      TaskList::MinorEvent("User: {$ProvisionUser}");
       $ProvisionPassword = strtolower(RandomString(16, 'Aa0!'));
+      TaskList::MinorEvent("Pass: {$ProvisionPassword}");
       $ProvisionUserQuery = sprintf("
          GRANT alter, create, delete, drop, index, insert, select, update, truncate
          ON %s.* 
@@ -155,8 +160,11 @@ Current: {$DatabaseHost} -> {$DatabaseHostAddr}");
                ->Message($Message)
                ->Send();
          } catch (Exception $e) {}
-         return;
+         
       }
+      
+      TaskList::MajorEvent($Message);
+      return;
    }
 
 }
