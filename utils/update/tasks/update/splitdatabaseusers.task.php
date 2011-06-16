@@ -18,7 +18,7 @@ class SplitDatabaseUsersTask extends Task {
       }
       
       if (TaskList::Cautious()) {
-         $Proceed = TaskList::Question("Make unique database users for all hosted forums?","Split database users",array('yes','no','exit'),'yes');
+         $Proceed = TaskList::Question("Split database users per database?","Split database users",array('yes','no','exit'),'yes');
          if ($Proceed == 'no') return;
          if ($Proceed == 'exit') exit();
       }
