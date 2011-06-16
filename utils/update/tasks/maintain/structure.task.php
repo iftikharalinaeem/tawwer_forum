@@ -21,7 +21,7 @@ class StructureTask extends Task {
       
       // No structure, no run
       if ($this->Structure === FALSE) return;
-      if ($this->Cache('Updated') !== TRUE) return;
+      //if ($this->Cache('Updated') !== TRUE) return;
       
       $DatabaseHost = $this->Client->C('Database.Host');
       $DatabaseUser = $this->Client->C('Database.User');
