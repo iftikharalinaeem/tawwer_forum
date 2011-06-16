@@ -54,12 +54,16 @@ class SplitDatabaseUsersTask extends Task {
       
       TaskList::Event("Splitting database user...");
       if (!LAME) {
-         $DatabaseOptions = $this->ProvisionUser($DatabaseName, $DatabaseHost);
-         $this->Client->SaveToConfig(array(
-             'Database.Host'     => GetValue('Host', $DatabaseOptions),
-             'Database.User'     => GetValue('User', $DatabaseOptions),
-             'Database.Password' => GetValue('Password', $DatabaseOptions)
-         )); 
+         try {
+            $DatabaseOptions = $this->ProvisionUser($DatabaseName, $DatabaseHost);
+            $this->Client->SaveToConfig(array(
+                'Database.Host'     => GetValue('Host', $DatabaseOptions),
+                'Database.User'     => GetValue('User', $DatabaseOptions),
+                'Database.Password' => GetValue('Password', $DatabaseOptions)
+            ));
+         } catch (Exception $e) {
+            return $this->Problem($e->getMessage());
+         }
       }
    }
    
@@ -91,7 +95,7 @@ class SplitDatabaseUsersTask extends Task {
       } while ($Loops < $NumDatabases);
 
       if ($Selected === FALSE) {
-         return $this->Problem("Couldn't find a matching host:\n
+         throw new Exception("Couldn't find a matching host:\n
 Current: {$DatabaseHost} -> {$DatabaseHostAddr}");
       }
       
@@ -109,7 +113,7 @@ Current: {$DatabaseHost} -> {$DatabaseHostAddr}");
             $DatabaseOptions['Name']
          );
       } catch (Exception $e) {
-         return $this->Problem("Could not connect to host database: ".$e->getMessage());
+         throw new Exception("Could not connect to host database: ".$e->getMessage());
       }
       
       $AccessHost = $this->TaskList->C('VanillaForums.Spawn.DatabaseAccessHost', 'localhost');
@@ -130,7 +134,7 @@ Current: {$DatabaseHost} -> {$DatabaseHostAddr}");
       $Success = mysql_query($ProvisionUserQuery, $Database);
 
       if ($Success === FALSE)
-         return $this->Problem("Could not provision new database user: ".mysql_error($Database));
+         throw new Exception("Could not provision new database user: ".mysql_error($Database));
 
       mysql_query("FLUSH PRIVILEGES", $Database);
       $DatabaseOptions['User'] = $ProvisionUser;
