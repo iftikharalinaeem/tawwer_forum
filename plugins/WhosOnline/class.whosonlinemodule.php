@@ -63,7 +63,6 @@ class WhosOnlineModule extends Gdn_Module {
 		 				<strong <?php echo ($User->Invisible == 1 ? 'class="Invisible"' : '')?>>
 		    				<?php echo UserAnchor($User); ?>
 		 				</strong>
-		 				<?php echo Gdn_Format::Date($User->Timestamp); ?>
 					</li>
 				<?php
 					}
