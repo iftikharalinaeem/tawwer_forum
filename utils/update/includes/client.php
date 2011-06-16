@@ -79,7 +79,7 @@ class Client {
       }
    }
    
-   public function SaveToConfig($Key, $Value) {
+   public function SaveToConfig($Key, $Value = NULL) {
       if (is_null($this->ClientInfo)) return;
       if (LAME) return;
       
