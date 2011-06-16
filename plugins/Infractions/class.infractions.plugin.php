@@ -288,6 +288,7 @@ class InfractionsPlugin extends Gdn_Plugin {
                   'DateInserted'    => date('Y-m-d H:i:s'),
 						'DateLastComment' => date('Y-m-d H:i:s'),
 						'Body' => $InfractionInfo,
+						'Format' => 'Html',
 						'InfractionID' => $InfractionID,
 						'CategoryID' => C('Plugins.Infractions.InfractionCategoryID', 39)
 					));
@@ -489,18 +490,15 @@ class InfractionsPlugin extends Gdn_Plugin {
 	}
 	
 	/**
-	 * Switch the user's profile picture out if they are banned or jailed.
+	 * Switch the user's profile picture out if they are banned.
 	 */
 	public function ProfileController_Render_Before($Sender) {
 		if (is_object($Sender->User)) {
 			$Jailed = GetValue('Jailed', $Sender->User) == '1';
 			$TempBanned = GetValue('TempBanned', $Sender->User) == '1';
 			$Banned = GetValue('Banned', $Sender->User) == '1';
-			if ($Banned || $TempBanned) {
+			if ($Banned || $TempBanned)
 				$Sender->User->Photo = Asset('themes/pennyarcade/design/images/banned-180.png', TRUE);
-			} else if ($Jailed) {
-				$Sender->User->Photo = Asset('themes/pennyarcade/design/images/jailed-180.png', TRUE);
-			}
 		}
 	}
    
