@@ -62,7 +62,7 @@ class WhosOnlineModule extends Gdn_Module {
 					<li>
 		 				<strong <?php echo ($User->Invisible == 1 ? 'class="Invisible"' : '')?>>
 		    				<?php echo UserAnchor($User); ?>
-		 				</strong>
+		 				</strong><br/>
 					</li>
 				<?php
 					}
