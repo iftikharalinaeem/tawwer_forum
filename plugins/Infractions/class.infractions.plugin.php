@@ -288,6 +288,7 @@ class InfractionsPlugin extends Gdn_Plugin {
                   'DateInserted'    => date('Y-m-d H:i:s'),
 						'DateLastComment' => date('Y-m-d H:i:s'),
 						'Body' => $InfractionInfo,
+						'Format' => 'Html',
 						'InfractionID' => $InfractionID,
 						'CategoryID' => C('Plugins.Infractions.InfractionCategoryID', 39)
 					));
