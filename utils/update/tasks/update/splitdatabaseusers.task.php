@@ -59,7 +59,7 @@ class SplitDatabaseUsersTask extends Task {
       }
    }
    
-   protected function ProvisionDatabase($DatabaseName, $DatabaseHost) {
+   protected function ProvisionUser($DatabaseName, $DatabaseHost) {
       
       $DatabaseOptions = array(
           'Host'     => NULL,
