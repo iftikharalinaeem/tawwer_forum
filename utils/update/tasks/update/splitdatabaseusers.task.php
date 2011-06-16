@@ -55,7 +55,7 @@ class SplitDatabaseUsersTask extends Task {
       TaskList::Event("Splitting database user...");
       if (!LAME) {
          $DatabaseOptions = $this->ProvisionUser($DatabaseName, $DatabaseHost);
-         SaveToConfig(array(
+         $this->Client->SaveToConfig(array(
              'Database.Host'     => GetValue('Host', $DatabaseOptions),
              'Database.User'     => GetValue('User', $DatabaseOptions),
              'Database.Password' => GetValue('Password', $DatabaseOptions)
