@@ -55,7 +55,11 @@ class SplitDatabaseUsersTask extends Task {
       TaskList::Event("Splitting database user...");
       if (!LAME) {
          $DatabaseOptions = $this->ProvisionUser($DatabaseName, $DatabaseHost);
-         print_r($DatabaseOptions);
+         SaveToConfig(array(
+             'Database.Host'     => GetValue('Host', $DatabaseOptions),
+             'Database.User'     => GetValue('User', $DatabaseOptions),
+             'Database.Password' => GetValue('Password', $DatabaseOptions)
+         )); 
       }
    }
    
@@ -114,7 +118,7 @@ Current: {$DatabaseHost} -> {$DatabaseHostAddr}");
       $ProvisionUser = substr($this->Client->ClientName, 0, 10).substr($DatabaseOptions['Name'],-6);
       $ProvisionPassword = strtolower(RandomString(16, 'Aa0!'));
       $ProvisionUserQuery = sprintf("
-         GRANT alter, create, delete, drop, index, insert, select, update 
+         GRANT alter, create, delete, drop, index, insert, select, update, truncate
          ON %s.* 
          TO '%s'@'%s' 
          IDENTIFIED BY '%s'",
