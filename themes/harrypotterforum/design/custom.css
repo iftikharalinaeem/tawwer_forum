@@ -661,3 +661,11 @@ ul.DataList div.Meta span.LastCommentBy a:hover {
 ul.Activities li.Condensed div.Excerpt {
    color: white;
 }
+
+div.EmoticonContainer {
+   z-index:1000;
+}
+
+div.UserSpoiler,blockquote.UserQuote {
+   background-color:#222222;
+}
