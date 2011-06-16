@@ -3,7 +3,7 @@
 $Configuration['VanillaForums']['Spawn']['HostingDomain'] = 'vanillaforums.com';
 $Configuration['VanillaForums']['Spawn']['Application'] = '/srv/www/update/spawnforum';
 $Configuration['VanillaForums']['Spawn']['DatabaseProvisioning'] = 'automatic';
-$Configuration['VanillaForums']['Spawn']['DatabaseAccessHost'] = 'localhost';
+$Configuration['VanillaForums']['Spawn']['DatabaseAccessHost'] = 'vfcom';
 $Configuration['VanillaForums']['Spawn']['Database']['vfdb1']['Host'] = 'vfdb1.vanillaforums.com';
 $Configuration['VanillaForums']['Spawn']['Database']['vfdb1']['User'] = 'vfrunner';
 $Configuration['VanillaForums']['Spawn']['Database']['vfdb1']['Password'] = 'kOH8jEeItD';
