@@ -22,5 +22,6 @@ if ($RunForAll) {
 }
 
 $Tasks->Run($RunMode, array(
+   'maintain/config',
    'update/splitdatabaseusers'
 ));
