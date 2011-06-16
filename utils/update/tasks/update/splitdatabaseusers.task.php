@@ -23,6 +23,8 @@ class SplitDatabaseUsersTask extends Task {
          if ($Proceed == 'exit') exit();
       }
       
+      $this->ReallyRun = TRUE;
+      
       $ReportFailures = TaskList::GetConsoleOption('report-failures', FALSE);
       $this->ReportFailures = $ReportFailures;
       
