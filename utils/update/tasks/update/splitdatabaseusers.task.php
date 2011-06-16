@@ -127,7 +127,7 @@ Current: {$DatabaseHost} -> {$DatabaseHostAddr}");
       $ProvisionPassword = strtolower(RandomString(16, 'Aa0!'));
       TaskList::MinorEvent("Pass: {$ProvisionPassword}");
       $ProvisionUserQuery = sprintf("
-         GRANT alter, create, delete, drop, index, insert, select, update, truncate
+         GRANT alter, create, delete, drop, index, insert, select, update
          ON %s.* 
          TO '%s'@'%s' 
          IDENTIFIED BY '%s'",
