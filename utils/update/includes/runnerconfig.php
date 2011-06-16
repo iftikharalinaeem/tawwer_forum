@@ -9,7 +9,6 @@ $Configuration['VanillaForums']['Spawn']['Database']['vfdb1']['User'] = 'vfrunne
 $Configuration['VanillaForums']['Spawn']['Database']['vfdb1']['Password'] = 'kOH8jEeItD';
 $Configuration['VanillaForums']['Spawn']['DeploymentVersion'] = 'unstable';
 $Configuration['VanillaForums']['Spawn']['SourceRoot'] = '/srv/www/source';            
-$Configuration['VanillaForums']['Spawn']['HostingDomain'] = 'vanilla.tim';
 $Configuration['VanillaForums']['Spawn']['Clients'] = '/srv/www/vhosts';
 $Configuration['VanillaForums']['Spawn']['WebRoot'] = '/srv/www/vanillaforumscom';
 
