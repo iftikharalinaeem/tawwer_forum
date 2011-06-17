@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * This file is part of Runner.
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @license Proprietary
+ * @copyright 2010, Tim Gunter 
+ */
+
 error_reporting(E_ALL & ~E_NOTICE);
 define('APPLICATION', 'VanillaUpdate');
 define('PATH_CACHE', '/cache');

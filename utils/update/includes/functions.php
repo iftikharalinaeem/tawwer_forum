@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * This file is part of Runner.
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @license Proprietary
+ * @copyright 2010, Tim Gunter 
+ */
+
 function GetValue($Key, &$Collection, $Default = FALSE, $Remove = FALSE) {
 	$Result = $Default;
 	if(is_array($Collection) && array_key_exists($Key, $Collection)) {

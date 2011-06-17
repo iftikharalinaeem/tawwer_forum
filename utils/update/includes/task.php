@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * This file is part of Runner.
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @license Proprietary
+ * @copyright 2010, Tim Gunter 
+ */
+
 abstract class Task {
 
    public $QualifiedName;

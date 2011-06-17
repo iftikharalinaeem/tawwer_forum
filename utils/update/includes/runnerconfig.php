@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * This file is part of Runner.
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @license Proprietary
+ * @copyright 2010, Tim Gunter 
+ */
+
 $Configuration['VanillaForums']['Spawn']['HostingDomain'] = 'vanillaforums.com';
 $Configuration['VanillaForums']['Spawn']['Application'] = '/srv/www/update/spawnforum';
 $Configuration['VanillaForums']['Spawn']['DatabaseProvisioning'] = 'automatic';
