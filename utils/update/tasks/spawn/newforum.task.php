@@ -279,7 +279,7 @@ class NewforumTask extends Task {
          $ProvisionPassword = strtolower(RandomString(16, 'Aa0!'));
          $Success = mysql_query(sprintf("
             GRANT alter, create, delete, drop, index, insert, select, update 
-            ON '%s'.* 
+            ON `%s`.* 
             TO '%s'@'%s' 
             IDENTIFIED BY '%s'",
             $DatabaseOptions['Name'],
