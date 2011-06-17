@@ -121,8 +121,10 @@ Current: {$DatabaseHost} -> {$DatabaseHostAddr}");
       $AccessHost = $this->TaskList->C('VanillaForums.Spawn.DatabaseAccessHost', 'localhost');
       $DatabaseOptions['AccessHost'] = $AccessHost;
 
+      $SubdomainUser = str_replace(array('_','-'), '', $this->Client->ClientName);
+      
       TaskList::Event("Generating user credentials");
-      $ProvisionUser = substr($this->Client->ClientName, 0, 10).substr($DatabaseOptions['Name'],-6);
+      $ProvisionUser = substr($SubdomainUser, 0, 10).substr($DatabaseOptions['Name'],-6);
       TaskList::MinorEvent("User: {$ProvisionUser}");
       $ProvisionPassword = strtolower(RandomString(16, 'Aa0!'));
       TaskList::MinorEvent("Pass: {$ProvisionPassword}");

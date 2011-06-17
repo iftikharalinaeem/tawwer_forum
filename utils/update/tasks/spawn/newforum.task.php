@@ -274,7 +274,8 @@ class NewforumTask extends Task {
          $AccessHost = $this->TaskList->C('VanillaForums.Spawn.DatabaseAccessHost', 'localhost');
          $DatabaseOptions['AccessHost'] = $AccessHost;
          
-         $ProvisionUser = substr($Subdomain, 0, 10).substr($DatabaseOptions['Name'],-6);
+         $SubdomainUser = str_replace(array('_','-'), '', $Subdomain);
+         $ProvisionUser = substr($SubdomainUser, 0, 10).substr($DatabaseOptions['Name'],-6);
          $ProvisionPassword = strtolower(RandomString(16, 'Aa0!'));
          $Success = mysql_query(sprintf("
             GRANT alter, create, delete, drop, index, insert, select, update 
