@@ -289,7 +289,7 @@ class NewforumTask extends Task {
          ), $Database);
          
          if ($Success === FALSE) {
-            $this->RollebackProvision($DatabaseOptions);
+            $this->RollbackProvision($DatabaseOptions);
             TaskList::FatalError("Could not provision new database user: ".mysql_error($Database));
          }
          
@@ -303,7 +303,7 @@ class NewforumTask extends Task {
       return $DatabaseOptions;
    }
    
-   protected function RollebackProvision($DatabaseOptions) {
+   protected function RollbackProvision($DatabaseOptions) {
       if (GetValue('CreatedDatabase', $DatabaseOptions, FALSE)) {
          // Delete table
          mysql_query(sprintf("DROP DATABASE '%s'",

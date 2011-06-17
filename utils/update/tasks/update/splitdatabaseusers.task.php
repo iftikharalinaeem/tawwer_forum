@@ -141,7 +141,7 @@ Current: {$DatabaseHost} -> {$DatabaseHostAddr}");
       $Success = mysql_query($ProvisionUserQuery, $Database);
 
       if ($Success === FALSE)
-         throw new Exception("Could not provision new database user: ".mysql_error($Database));
+         throw new Exception("Could not provision new database user: ".mysql_error($Database)."\n\n{$ProvisionUserQuery}");
 
       mysql_query("FLUSH PRIVILEGES", $Database);
       $DatabaseOptions['User'] = $ProvisionUser;
