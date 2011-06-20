@@ -58,9 +58,10 @@ class CarTalkThemeHooks extends Gdn_Plugin {
     */
    protected function _PopularWhere($SQL) {
       // Popular discussions must be newer than two weeks old.
-      $BaseDate = Gdn_Format::ToTimestamp('2011-05-15');
+      $BaseDate = time();
       $BaseDate -= 14 * 24 * 60 * 60;
-      $SQL->Where('d.DateLastComment >=', Gdn_Format::ToDateTime($BaseDate));
+      $SQL->Where('d.DateLastComment >=', Gdn_Format::ToDateTime($BaseDate))
+         ->Where('d.Annouce', 0);
    }
 
    public function UtilityController_Serve_Create($Sender, $Args) {
