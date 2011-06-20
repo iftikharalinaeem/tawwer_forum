@@ -61,7 +61,7 @@ class CarTalkThemeHooks extends Gdn_Plugin {
       $BaseDate = time();
       $BaseDate -= 14 * 24 * 60 * 60;
       $SQL->Where('d.DateLastComment >=', Gdn_Format::ToDateTime($BaseDate))
-         ->Where('d.Annouce', 0);
+         ->Where('d.Announce', 0);
    }
 
    public function UtilityController_Serve_Create($Sender, $Args) {
