@@ -157,9 +157,10 @@ class VfcomPlugin extends Gdn_Plugin {
          if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleVFOptions", FALSE) !== FALSE) {
             $NewVFOptions = !Gdn::PluginManager()->CheckPlugin('vfoptions');
             if ($NewVFOptions) {
-               $ActionCompleted = Gdn::PluginManager()->EnablePlugin('vfoptions', FALSE, TRUE);
+               Gdn::PluginManager()->EnablePlugin('vfoptions', FALSE, TRUE);
             } else {
-               $ActionCompleted = Gdn::PluginManager()->DisablePlugin('vfoptions');
+               Gdn::PluginManager()->DisablePlugin('vfoptions');
+               SaveToConfig('EnabledPlugins.vfoptions', FALSE);
             }
             
             $Sender->InformMessage(sprintf("VF Options has been turned %s.",(($NewVFOptions) ? 'on': 'off')));
@@ -171,6 +172,7 @@ class VfcomPlugin extends Gdn_Plugin {
                Gdn::PluginManager()->EnablePlugin('vfspoof', FALSE, TRUE);
             } else {
                Gdn::PluginManager()->DisablePlugin('vfspoof');
+               SaveToConfig('EnabledPlugins.vfspoof', FALSE);
             }
             
             $Sender->InformMessage(sprintf("VF Spoof has been turned %s.",(($NewVFSpoof) ? 'on': 'off')));
@@ -200,6 +202,10 @@ class VfcomPlugin extends Gdn_Plugin {
       if (is_null($this->VfcomClient)) return;
       
       $Args['Urls'][''] = $FinalURL = "{$this->StaticURL}/uploads";
+   }
+   
+   public function UserModel_BeforeSystemUser_Handler($Sender) {
+      $Sender->EventArguments['SystemUser']['Email'] = 'system@vanillaforums.com';
    }
    
    public function HeadModule_BeforeToString_Handler($Sender) {
@@ -245,7 +251,7 @@ class VfcomPlugin extends Gdn_Plugin {
          $Domain = str_replace(array('http://', '/'), array('', ''), $Domain);
          $ServerName = str_replace(array('http://', '/'), array('', ''), $ServerName);
          if ($ServerName != $Domain)
-            Redirect('http://' . $Domain . Gdn::Request()->Url());
+            Redirect('http://' . $Domain . Gdn::Request()->Url(), 301);
       }
    }
    

@@ -19,14 +19,16 @@ require_once("includes/runner.php");
  */
 $Tasks = new TaskList();
 $Tasks->Clients();
-$Tasks->Perform(TaskList::ACTION_CREATE);
+$Tasks->Perform(TaskList::ACTION_CACHE);
 
-$Tasks->Run(TaskList::MODE_TARGET, array(
-   'spawn/newforum',
-   'global/offline',
-   'maintain/filesystem',
-   'maintain/plugins',
-   'maintain/utilityupdate',
-   'global/online',
-   'spawn/installed'
+$RunForAll = $Tasks->GetConsoleOption('all', FALSE);
+if ($RunForAll) {
+   $RunMode = TaskList::MODE_CHUNKED;
+} else {
+   $RunMode = TaskList::MODE_TARGET;
+   $Tasks->Perform(TaskList::ACTION_TARGET);
+}
+
+$Tasks->Run($RunMode, array(
+   'maintain/config'
 ));

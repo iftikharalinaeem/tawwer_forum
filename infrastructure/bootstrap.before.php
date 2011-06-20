@@ -1,5 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 
+/**
+ * This file is part of Push.
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @license Proprietary
+ * @copyright 2010, Tim Gunter 
+ */
+
 define('PATH_CLIENTS', '/srv/clients');
 if (is_array($_SERVER) && array_key_exists('HTTP_HOST', $_SERVER))
    $FolderName = $_SERVER['HTTP_HOST'];

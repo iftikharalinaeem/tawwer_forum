@@ -1,18 +1,20 @@
 <?php
 
 class PluginsTask extends Task {
+   
+   protected $ReallyRun = FALSE;
 
    public function __construct($ClientDir) {
       parent::__construct($ClientDir);
-      
-      $this->ReallyRun = FALSE;
    }
    
    public function Init($RootPath = NULL) {
    
-      $ReallyRun = TaskList::Question("Run all default plugin enable commands?", "Enable default plugins", array('yes','no','exit'), 'yes');
-      if ($ReallyRun == 'no') return;
-      if ($ReallyRun == 'exit') exit();
+      if (TaskList::Cautious()) {
+         $ReallyRun = TaskList::Question("Run all default plugin enable commands?", "Enable default plugins", array('yes','no','exit'), 'yes');
+         if ($ReallyRun == 'no') return;
+         if ($ReallyRun == 'exit') exit();
+      }
       
       $this->ReallyRun = TRUE;
    }

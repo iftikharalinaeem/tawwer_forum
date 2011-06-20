@@ -204,6 +204,7 @@ class InfractionsPlugin extends Gdn_Plugin {
          if ($Message == '')
             $Sender->Form->AddError('You must provide a message to the user.');
             
+			$InfractionDiscussionID = 0;
          if ($Sender->Form->ErrorCount() == 0) {
             try {
                // Insert the infraction
@@ -222,6 +223,9 @@ class InfractionsPlugin extends Gdn_Plugin {
                   'InsertUserID'    => Gdn::Session()->UserID,
                   'DateInserted'    => date('Y-m-d H:i:s')
                ));
+					
+					// Define the infraction discussion name/title.
+					$InfractionDiscussionName = 'INFRACTION -- '.$Reason.' -- ' . $Sender->Data['Username'];
                
                // Mark the affected item in it's attributes column so it can be styled differently
                $Table = 'Discussion';
@@ -231,18 +235,41 @@ class InfractionsPlugin extends Gdn_Plugin {
                   $Table = 'Activity';
                   $Column = 'ActivityID';
                   $UniqueID = $ActivityID;
+						$InfractionDiscussionName = 'Activity: '.$InfractionDiscussionName;
                } else if ($CommentID > 0) {
                   $Table = 'Comment';
                   $Column = 'CommentID';
                   $UniqueID = $CommentID;
-               }
+						$CategoryData = $SQL
+							->Select('ca.Name')
+							->From('Category ca')
+							->Join('Discussion d', 'ca.CategoryID = d.CategoryID')
+							->Join('Comment co', 'd.DiscussionID = co.DiscussionID')
+							->Where('co.CommentID', $CommentID)
+							->Get()
+							->FirstRow();
+						if ($CategoryData)
+							$InfractionDiscussionName = $CategoryData->Name.': '.$InfractionDiscussionName;
+					} else if ($DiscussionID > 0) {
+						$CategoryData = $SQL
+							->Select('ca.Name')
+							->From('Category ca')
+							->Join('Discussion d', 'ca.CategoryID = d.CategoryID')
+							->Where('d.DiscussionID', $DiscussionID)
+							->Get()
+							->FirstRow();
+						if ($CategoryData)
+							$InfractionDiscussionName = $CategoryData->Name.': '.$InfractionDiscussionName;
+					} else {
+						$InfractionDiscussionName = 'Profile: '.$InfractionDiscussionName;
+					}
                $Data = $SQL->Select('Attributes')->From($Table)->Where($Column, $UniqueID)->Get()->FirstRow();
                if (is_object($Data)) {
                   $Attributes = Gdn_Format::Unserialize($Data->Attributes);
                   $Attributes['Infraction'] = TRUE;
                   $SQL->Update($Table)->Set('Attributes', Gdn_Format::Serialize($Attributes))->Where($Column, $UniqueID)->Put();
                }
-               
+
                // Insert the conversation message
                $ConversationModel = new ConversationModel();
                $ConversationMessageModel = new ConversationMessageModel();
@@ -251,16 +278,35 @@ class InfractionsPlugin extends Gdn_Plugin {
                   'Body' => $Message,
                   'InfractionID' => $InfractionID
                ), $ConversationMessageModel);
+					
+					// Insert the infraction discussion into the infractions category
+					$InfractionInfo = $this->_InfractionInfo($InfractionID, $Message);
+					$DiscussionModel = new DiscussionModel();
+					$InfractionDiscussionID = $DiscussionModel->Save(array(
+						'Name' => $InfractionDiscussionName,
+						'InsertUserID'    => Gdn::Session()->UserID,
+                  'DateInserted'    => date('Y-m-d H:i:s'),
+						'DateLastComment' => date('Y-m-d H:i:s'),
+						'Body' => $InfractionInfo,
+						'Format' => 'Html',
+						'InfractionID' => $InfractionID,
+						'CategoryID' => C('Plugins.Infractions.InfractionCategoryID', 39)
+					));
+					
                
                // Update the user's infraction cache
                InfractionsPlugin::SetInfractionCache($UserID);
             } catch(Exception $e) {
                $Sender->Form->AddError($e);
             }
+				$InformMessage = T("The infraction has been created.");
+				if ($InfractionDiscussionID > 0) {
+					$InformMessage = Anchor($InformMessage, 'discussion/'.$InfractionDiscussionID.'/'.Gdn_Format::Url($InfractionDiscussionName));
+				}
             $Sender->InformMessage(
                '<span class="InformSprite Redflag"></span>'
-               .T("The infraction has been created."),
-               'Dismissable AutoDismiss HasSprite'
+               .$InformMessage,
+               'Dismissable HasSprite'
             );
          }
       }
@@ -444,18 +490,15 @@ class InfractionsPlugin extends Gdn_Plugin {
 	}
 	
 	/**
-	 * Switch the user's profile picture out if they are banned or jailed.
+	 * Switch the user's profile picture out if they are banned.
 	 */
 	public function ProfileController_Render_Before($Sender) {
 		if (is_object($Sender->User)) {
 			$Jailed = GetValue('Jailed', $Sender->User) == '1';
 			$TempBanned = GetValue('TempBanned', $Sender->User) == '1';
 			$Banned = GetValue('Banned', $Sender->User) == '1';
-			if ($Banned || $TempBanned) {
+			if ($Banned || $TempBanned)
 				$Sender->User->Photo = Asset('themes/pennyarcade/design/images/banned-180.png', TRUE);
-			} else if ($Jailed) {
-				$Sender->User->Photo = Asset('themes/pennyarcade/design/images/jailed-180.png', TRUE);
-			}
 		}
 	}
    
@@ -563,10 +606,75 @@ class InfractionsPlugin extends Gdn_Plugin {
 					echo '</div>';
 						
 				}
-            // echo Wrap('infraction DEETS', 'div');
          }
       }
    }
+	
+	private function _InfractionInfo($InfractionID, $UserMessage = '') {
+		$Infraction = Gdn::SQL()
+			->Select('i.*')
+			->Select('iu.Name', '', 'InfractionUsername')
+			->Select('d.Body', '', 'DiscussionBody')
+			->Select('d.Name', '', 'DiscussionName')
+			->Select('c.Body', '', 'CommentBody')
+			->Select('a.Story', '', 'ActivityBody')
+			->From('Infraction i')
+			->Join('Comment c', 'i.CommentID = c.CommentID', 'left')
+			->Join('Activity a', 'i.ActivityID = a.ActivityID', 'left')
+			->Join('Discussion d', 'i.DiscussionID = d.DiscussionID', 'left')
+			->Join('User iu', 'i.UserID = iu.UserID', 'left')
+			->Where('i.InfractionID', $InfractionID)
+			->Get()
+			->FirstRow();
+		
+		$Return = 'Infraction details unavailable.';
+		if ($Infraction) {
+			$Return = '';
+			$Return = '<strong>Source:</strong> ';
+			$Anchor = '';
+			$Content = '';
+			if ($Infraction->CommentID > 0) {
+				$Anchor = '/discussion/comment/'.$Infraction->CommentID.'/#Comment_'.$Infraction->CommentID;
+				$Text = $Infraction->DiscussionName;
+				$Content = $Infraction->CommentBody;
+			} else if ($Infraction->DiscussionID > 0) {
+				$Anchor = '/discussion/'.$Infraction->DiscussionID.'/'.Gdn_Format::Url($Infraction->DiscussionName);
+				$Text = $Infraction->DiscussionName;
+				$Content = $Infraction->DiscussionBody;
+			} else if ($Infraction->ActivityID > 0) {
+				$Anchor = '/activity/item/'.$Infraction->ActivityID;
+				$Text = 'Activity';
+				$Content = $Infraction->ActivityBody;
+			} else if ($Infraction->InfractionUsername) {
+				$Anchor = '/profile/'.$Infraction->UserID.'/'.Gdn_Format::Url($Infraction->InfractionUsername);
+				$Text = 'Profile Infraction';
+				$Content = '';
+			}
+			
+			if ($Anchor != '') {
+				$Return .= Anchor($Text, Url($Anchor, TRUE));
+			} else {
+				$Return .= 'Unknown';
+			}
+			
+			$Return .= "\n";
+			$Return .= '<strong>User:</strong> '.Anchor(Gdn_Format::Text($Infraction->InfractionUsername), '/profile/'.$Infraction->UserID.'/'.Gdn_Format::Url($Infraction->InfractionUsername));
+			$Return .= "\n";
+			$Return .= '<strong>Infraction:</strong> '.$Infraction->Reason;
+			$Return .= "\n";
+			$Return .= '<strong>Points:</strong> '.$Infraction->Points;
+			$Return .= "\n";
+			$Return .= '<strong>Administrative Note:</strong>';
+			$Return .= Wrap(Gdn_Format::Text($Infraction->Note), 'blockquote');
+			$Return .= '<strong>Message to User:</strong>';
+			$Return .= Wrap(Gdn_Format::Text($UserMessage), 'blockquote');
+			if ($Content != '') {
+				$Return .= '<strong>Original Post:</strong>';
+				$Return .= Wrap(htmlentities($Content), 'blockquote');
+			}
+		}
+		return $Return;
+	}
 	
    /**
     * Identify Discussions that have resulted in an infraction.
@@ -622,6 +730,12 @@ class InfractionsPlugin extends Gdn_Plugin {
       // Relate an infraction to a private conversation that the admin & affected user take part in
       $Structure
          ->Table('Conversation')
+         ->Column('InfractionID', 'int(11)', NULL)
+         ->Set(FALSE, FALSE);
+
+      // Relate a discussion to an infraction for admins to discuss the infraction
+      $Structure
+         ->Table('Discussion')
          ->Column('InfractionID', 'int(11)', NULL)
          ->Set(FALSE, FALSE);
 

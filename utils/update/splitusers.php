@@ -1,6 +1,14 @@
 #!/usr/bin/php
 <?php
 
+/**
+ * This file is part of Runner.
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @license Proprietary
+ * @copyright 2010, Tim Gunter 
+ */
+
 require_once("includes/runner.php");
 
 /**
@@ -10,7 +18,7 @@ require_once("includes/runner.php");
  *
  */
 $Tasks = new TaskList();
-$Tasks->Clients('/srv/www/vhosts');
+$Tasks->Clients();
 $Tasks->Perform(TaskList::ACTION_CACHE);
 
 $RunForAll = $Tasks->GetConsoleOption('all', FALSE);
@@ -22,5 +30,6 @@ if ($RunForAll) {
 }
 
 $Tasks->Run($RunMode, array(
-   'maintain/findorphans'
+   'maintain/config',
+   'update/splitdatabaseusers'
 ));

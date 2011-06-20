@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * This file is part of Runner.
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @license Proprietary
+ * @copyright 2010, Tim Gunter 
+ */
+
 class Client {
    
    public $Database;
@@ -9,24 +17,33 @@ class Client {
    
    public $Root;
    public $ClientRoot;
+   public $ClientName;
    public $ClientFolder;
    public $ClientInfo;
    public $ConfigFile;
    public $Config;
    
-   public function __construct($RootFolder, $ClientFolder, $ClientInfo) {
+   public function __construct($RootFolder, $ClientName, $ClientFolder, $ClientInfo) {
       $this->Root = rtrim($RootFolder,'/');
       
       $this->Database = NULL;
+      $this->ClientName = $ClientName;
       $this->ClientFolder = $ClientFolder;
-      $this->ClientRoot = TaskList::CombinePaths($this->Root, $this->ClientFolder );
+      $this->ClientRoot = TaskList::CombinePaths($this->Root, $this->ClientFolder);
       $this->ClientInfo = $ClientInfo;
       $this->ConfigDefaultsFile = TaskList::CombinePaths($this->ClientRoot,'conf/config-defaults.php');
       $this->ConfigFile = TaskList::CombinePaths($this->ClientRoot,'conf/config.php');
       
+      $this->LoadConfigFiles();
+   }
+   
+   public function LoadConfigFiles() {
       $this->Config = new Configuration();
       try {
+         TaskList::MinorEvent("Loading config defaults '{$this->ConfigDefaultsFile}'");
          $this->Config->Load($this->ConfigDefaultsFile, 'Use');
+         
+         TaskList::MinorEvent("Loading config '{$this->ConfigFile}'");
          $this->Config->Load($this->ConfigFile, 'Use');
       } catch (Exception $e) { die ($e->getMessage()); }
    }
@@ -43,13 +60,13 @@ class Client {
       if (is_null($this->Database)) {
          $Host = $this->C('Database.Host', NULL);
          if (is_null($Host))
-            throw new Exception("Unknown client database host");
+            throw new Exception("Unknown client database host.");
 
          $User = $this->C('Database.User', NULL);
          $Pass = $this->C('Database.Password', NULL);
          $Name = $this->C('Database.Name', NULL);
          if (is_null($Host))
-            throw new Exception("Unknown client database name");
+            throw new Exception("Unknown client database name.");
 
          $this->Database = &$this->TaskList->Database($Host, $User, $Pass, $Name);
       }
@@ -70,7 +87,7 @@ class Client {
       }
    }
    
-   public function SaveToConfig($Key, $Value) {
+   public function SaveToConfig($Key, $Value = NULL) {
       if (is_null($this->ClientInfo)) return;
       if (LAME) return;
       
@@ -108,7 +125,7 @@ class Client {
       
       $EnabledAuthenticators = $this->C('Garden.Authenticator.EnabledSchemes',array());
       if (!is_array($EnabledAuthenticators) || !sizeof($EnabledAuthenticators)) {
-         TaskList::Event("Failed to read current authenticator list from config");
+         TaskList::Event("Failed to read current authenticator list from config.");
          return FALSE;
       }
       
@@ -126,7 +143,7 @@ class Client {
       TaskList::Event("Enabling plugin '{$PluginName}'...", TaskList::NOBREAK);
       try {
          $Token = $this->TokenAuthentication();
-         if ($Token === FALSE) throw new Exception("could not generate token");
+         if ($Token === FALSE) throw new Exception("could not generate token.");
          $Result = $this->Request('plugin/forceenableplugin/'.$PluginName,array(
             'token'  => $Token
          ));
@@ -141,7 +158,7 @@ class Client {
       TaskList::Event("Disabling plugin '{$PluginName}'...", TaskList::NOBREAK);
       try {
          $Token = $this->TokenAuthentication();
-         if ($Token === FALSE) throw new Exception("could not generate token");
+         if ($Token === FALSE) throw new Exception("could not generate token.");
          $Result = $this->Request('plugin/forcedisableplugin/'.$PluginName,array(
             'token'  => $Token
          ));
@@ -156,7 +173,7 @@ class Client {
       try {
          $Token = $this->TokenAuthentication();
          if ($Token === FALSE) 
-            throw new Exception("could not generate token");
+            throw new Exception("could not generate token.");
          $QueryParams['token'] = $Token;
          $Result = $this->Request($RelativeURL,$QueryParams);
       } catch (Exception $e) {
@@ -200,6 +217,22 @@ class Client {
    public function Touch($RelativePath) {
       $AbsolutePath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
       TaskList::Touch($AbsolutePath);
+   }
+   
+   public function Chmod($RelativePath, $FileMode) {
+      $AbsolutePath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
+      TaskList::Chmod($AbsolutePath, $FileMode);
+   }
+   
+   public function Chown($RelativePath, $Owner = NULL, $Group = NULL) {
+      $AbsolutePath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
+      TaskList::Chown($AbsolutePath, $Owner, $Group);
+   }
+   
+   public function Write($RelativePath, $Data) {
+      $AbsolutePath = TaskList::CombinePaths($this->ClientRoot,$RelativePath);
+      if (!file_exists($AbsolutePath)) return FALSE;
+      return file_put_contents($AbsolutePath, $Data);
    }
    
    public function CopySourceFile($RelativePath, $SourcecodePath) {
