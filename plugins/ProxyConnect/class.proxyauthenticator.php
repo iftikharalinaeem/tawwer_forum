@@ -429,11 +429,17 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          }
          
          if ($Result) {
+            
+            // Bad page? Get out.
+            $UniqueID = GetValue('UniqueID', $Result, NULL);
+            $Email = GetValue('Email', $Result, NULL);
+            if (is_null($Email) || is_null($UniqueID)) return FALSE;
+            
             $ReturnArray = array(
-               'Email'        => ArrayValue('Email', $Result),
-               'Name'         => ArrayValue('Name', $Result),
-               'UniqueID'     => ArrayValue('UniqueID', $Result),
-               'TransientKey' => ArrayValue('TransientKey', $Result, NULL)
+               'Email'        => $Email,
+               'UniqueID'     => $UniqueID,
+               'Name'         => GetValue('Name', $Result, NULL),
+               'TransientKey' => GetValue('TransientKey', $Result, NULL)
             );
 
             if (isset($Result['Roles']))
