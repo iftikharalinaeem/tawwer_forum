@@ -415,7 +415,7 @@ pageTracker._trackPageview();
 		$Features['premium'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
 			'CustomDomain', 'FileUpload', 'CustomTheme', 'PrivateCommunity',
-			'VanillaConnect', 'Backups', 'FileUpload', 'SpamControl'
+			'VanillaConnect', 'Backups', 'SpamControl'
 		);
 
       // See what plan the site has
