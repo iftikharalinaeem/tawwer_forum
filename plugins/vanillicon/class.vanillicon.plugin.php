@@ -25,10 +25,10 @@ if (!function_exists('UserPhotoDefaultUrl')) {
 
       $Email = GetValue('Email', $User);
       if (!$Email) {
-         $Email = 'todd@vanillaforums.com'; //GetValue('UserID', $User, 100);
+         $Email = GetValue('UserID', $User, 100);
       }
 
-      $PhotoUrl = 'http://vanillicon.local/'.md5($Email).'.png';
+      $PhotoUrl = 'http://vanillicon.com/'.md5($Email).'.png';
       return $PhotoUrl;
    }
 }
