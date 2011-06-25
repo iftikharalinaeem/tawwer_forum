@@ -59,14 +59,7 @@ class Gdn_TokenAuthenticator extends Gdn_Authenticator {
          return 0;
       }
       
-      // Figure out who the admin user is
-      $UserModel = new UserModel();
-      $UserID = GetValue('UserID',Gdn::Database()->SQL()->Select('u.UserID')
-         ->From('User u')
-         ->Where('u.Admin', 1)
-         ->OrderBy('u.UserID', 'asc')
-         ->Offset(0)->Limit(1)
-         ->Get()->FirstRow(DATASET_TYPE_ARRAY),0);
+      $UserID = Gdn::UserModel()->GetSystemUserID();
       
       // One use token, gets removed immediately
       RemoveFromConfig('Garden.Authenticators.token.Token');
