@@ -636,8 +636,8 @@ pageTracker._trackPageview();
          $this->_Database = new Gdn_Database(array(
             'Name' => C('VanillaForums.Database.Name', 'vfcom'),
             'Host' => C('VanillaForums.Database.Host', C('Database.Host')),
-            'User' => C('VanillaForums.Database.User', 'root'), //C('Database.User')),
-            'Password' => C('VanillaForums.Database.Password', 'Va2aWu5A') //C('Database.Password'))
+            'User' => C('VanillaForums.Database.User', C('Database.User')),
+            'Password' => C('VanillaForums.Database.Password', C('Database.Password'))
          ));
       }
          
