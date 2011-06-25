@@ -54,37 +54,49 @@ class ProxyConnectPlugin extends Gdn_Plugin {
 		
       // Load internal Integration Manager list
       $this->IntegrationManagers = array();
+      
       $InternalPath = $this->GetResource('internal');
-      $IntegrationManagers = Gdn::PluginManager()->AvailablePluginFolders($InternalPath);
-      $IntegrationList = array();
       
-      foreach ($IntegrationManagers as $Integration)
-         $this->IntegrationManagers[$Integration] = Gdn::PluginManager()->GetPluginInfo($Integration);
+      try {
+         
+         // 2.0.18+
+         // New PluginManager Code
+         
+         $IntegrationManagers = Gdn::PluginManager()->AvailablePluginFolders($InternalPath);
+         $IntegrationList = array();
+         foreach ($IntegrationManagers as $Integration)
+            $this->IntegrationManagers[$Integration] = Gdn::PluginManager()->GetPluginInfo($Integration);
+      } catch (Exception $e) {
       
-//      if ($FolderHandle = opendir($InternalPath)) {
-//         // Loop through subfolders (ie. the actual plugin folders)
-//         while ($FolderHandle !== FALSE && ($Item = readdir($FolderHandle)) !== FALSE) {
-//            if (in_array($Item, array('.', '..')))
-//               continue;
-//            
-//            $PluginPaths = SafeGlob($InternalPath . DS . $Item . DS . '*plugin.php');
-//            $PluginPaths[] = $InternalPath . DS . $Item . DS . 'default.php';
-//            
-//            foreach ($PluginPaths as $i => $PluginFile) {
-//               if (file_exists($PluginFile)) {
-//                  
-//                  $PluginInfo = Gdn::PluginManager()->ScanPluginFile($PluginFile);
-//                  
-//                  if (!is_null($PluginInfo)) {
-//                     Gdn_LibraryMap::SafeCache('plugin',$PluginInfo['ClassName'],$PluginInfo['PluginFilePath']);
-//                     $Index = strtolower($PluginInfo['Index']);
-//                     $this->IntegrationManagers[$Index] = $PluginInfo;
-//                  }
-//               }
-//            }
-//         }
-//         closedir($FolderHandle);
-//      }
+         // 2.0.17.x and below
+         // Old PluginManager Code
+         
+         if ($FolderHandle = opendir($InternalPath)) {
+            // Loop through subfolders (ie. the actual plugin folders)
+            while ($FolderHandle !== FALSE && ($Item = readdir($FolderHandle)) !== FALSE) {
+               if (in_array($Item, array('.', '..')))
+                  continue;
+
+               $PluginPaths = SafeGlob($InternalPath . DS . $Item . DS . '*plugin.php');
+               $PluginPaths[] = $InternalPath . DS . $Item . DS . 'default.php';
+
+               foreach ($PluginPaths as $i => $PluginFile) {
+                  if (file_exists($PluginFile)) {
+
+                     $PluginInfo = Gdn::PluginManager()->ScanPluginFile($PluginFile);
+
+                     if (!is_null($PluginInfo)) {
+                        Gdn_LibraryMap::SafeCache('plugin',$PluginInfo['ClassName'],$PluginInfo['PluginFilePath']);
+                        $Index = strtolower($PluginInfo['Index']);
+                        $this->IntegrationManagers[$Index] = $PluginInfo;
+                     }
+                  }
+               }
+            }
+            closedir($FolderHandle);
+         }
+         
+      }
       
       $this->IntegrationManager = C('Plugin.ProxyConnect.IntegrationManager', NULL);
       if (is_null($this->IntegrationManager)) 
