@@ -325,5 +325,6 @@ google_ad_height = 90;
 	 </div>	 
   
   </div>
+  {event name="AfterBody"}
 </body>
 </html>
