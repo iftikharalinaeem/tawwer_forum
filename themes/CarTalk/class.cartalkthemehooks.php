@@ -35,7 +35,8 @@ class CarTalkThemeHooks extends Gdn_Plugin {
    }
    
    public function DiscussionModel_BeforeGetCount_Handler($Sender, $Args) {
-      $Sender->SQL->Where(1, 0, FALSE, FALSE);
+      if (self::$_InPopular)
+         $Sender->SQL->Where(1, 0, FALSE, FALSE);
    }
    
    /**
