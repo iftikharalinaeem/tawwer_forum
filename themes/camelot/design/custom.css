@@ -1,13 +1,18 @@
 /* Global Anchor Color Change */
 a {
    text-decoration: none;
-   color: #b68f5b;
+   color: #000;
 }
 a:hover {
    text-decoration: none;
    color: #704c1b;
 }
-
+div.Box h4 a{
+    color: #B68F5B;
+}
+div.Box h4 a:hover{
+    color: #704c1b;
+}
 /* Fluid Width */
 #Body,
 div.Menu {
@@ -332,6 +337,9 @@ body.Messages div.HeadingTabs div.SubTab a{
 #DiscussionForm label {
     color: #000;
 
+}
+ul.Activities div.Excerpt {
+    color: #222222;
 }
 /* Panel */
 

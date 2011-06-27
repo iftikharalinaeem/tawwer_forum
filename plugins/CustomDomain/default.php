@@ -193,9 +193,9 @@ class CustomDomainPlugin implements Gdn_IPlugin {
       if (!is_object($this->_Database)) {
          $this->_Database = new Gdn_Database(array(
             'Name' => C('VanillaForums.Database.Name', 'vfcom'),
-            'Host' => C('Database.Host'),
-            'User' => C('Database.User'),
-            'Password' => C('Database.Password')
+            'Host' => C('VanillaForums.Database.Host', C('Database.Host')),
+            'User' => C('VanillaForums.Database.User', C('Database.User')),
+            'Password' => C('VanillaForums.Database.Password', C('Database.Password'))
          ));
       }
          

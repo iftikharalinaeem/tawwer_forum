@@ -158,9 +158,9 @@ jQuery(document).ready(function($) {
 		$Sender->AddCssFile('/plugins/CustomTheme/customtheme.css');
 		
 		$ThemeManager = new Gdn_ThemeManager();
-		$Sender->CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
-		$CurrentThemeFolder = GetValue('Folder', $Sender->CurrentThemeInfo);
-		$IsCustomTheme = GetValue('IsCustom', $Sender->CurrentThemeInfo);
+		$CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
+		$CurrentThemeFolder = basename(GetValue('ThemeRoot', $CurrentThemeInfo));
+		$IsCustomTheme = GetValue('IsCustom', $CurrentThemeInfo);
 		$Folder = PATH_THEMES . DS . $CurrentThemeFolder;
 		
 		$PreviewCSSFile = C('Plugins.CustomTheme.PreviewCSS', 'custom_0.css');
@@ -226,7 +226,7 @@ Here are some things you should know before you begin:
 		// If viewing the form for the first time
 		if (!$Sender->Form->AuthenticatedPostBack()) {
 			// Make this a "copy" of the current non-custom theme
-			$ThemeName = GetValue('Name', $Sender->CurrentThemeInfo, $CurrentThemeFolder);
+			$ThemeName = GetValue('Name', $CurrentThemeInfo, $CurrentThemeFolder);
 			if (!$IsCustomTheme)
 				$ThemeName .= ' (custom)';
 
@@ -243,7 +243,7 @@ Here are some things you should know before you begin:
 			// If applying the changes from a preview
 			if ($IsApplyPreview) {
 				$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
-				$ThemeName = GetValue('Name', $Sender->CurrentThemeInfo, $CurrentThemeFolder);
+				$ThemeName = GetValue('Name', $CurrentThemeInfo, $CurrentThemeFolder);
 				$Sender->Form->SetFormValue('ThemeName', $ThemeName);
 				$Sender->Form->SetFormValue('CustomCSS', $CSSContents);
 				$Sender->Form->SetFormValue('CustomHtml', $HtmlContents);
@@ -292,7 +292,7 @@ Here are some things you should know before you begin:
 			
 			// Check to see if there are any fatal errors in the smarty template
 			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', TRUE);
-			$Result = ProxyRequest(Gdn::Request()->Url('/', TRUE));
+			$Result = ProxyRequest(Gdn::Request()->Url('/', TRUE), 10);
 			// echo Wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
 			$SmartyCompileError = (strpos($Result, '<title>Fatal Error</title>') > 0 || strpos($Result, '<title>Bonk</title>') > 0) ? TRUE : FALSE;
 			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
@@ -309,7 +309,7 @@ Here are some things you should know before you begin:
 			// Save the about file (to get any theme name changes implemented)
 // TODO: GRAB THE CUSTOMIZATION VALUES FROM THE OLD THEME'S ABOUT ARRAY AND PASS INTO SAVE_ABOUT_FILE
 			$Options = array();
-			$Options[str_replace("'", '', $CurrentThemeFolder)] = array('Options' => GetValue('Options', $Sender->CurrentThemeInfo));
+			$Options[str_replace("'", '', $CurrentThemeFolder)] = array('Options' => GetValue('Options', $CurrentThemeInfo));
 			save_about_file($CurrentThemeFolder, $Sender->Form->GetFormValue('ThemeName'), $Options);
 
 			// Only keep the last 20 revs
@@ -328,6 +328,7 @@ Here are some things you should know before you begin:
 				$Sender->StatusMessage = "Your changes have been applied.";
 
 		}
+      $Sender->CurrentThemeInfo = $CurrentThemeInfo;
       $Sender->Render(PATH_PLUGINS . DS . 'CustomTheme' . DS . 'views' . DS . 'customtheme.php');
    }
 	
@@ -457,7 +458,7 @@ if (!function_exists('safecss_class')) {
 */
 function recurse_copy($src,$dst) {
     $dir = opendir($src);
-    @mkdir($dst);
+    mkdir($dst);
     while(false !== ( $file = readdir($dir)) ) {
         if (( $file != '.' ) && ( $file != '..' )) {
             if ( is_dir($src . '/' . $file) ) {

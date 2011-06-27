@@ -59,7 +59,7 @@ class VFSpoofPlugin extends Gdn_Plugin {
     * VanillaForums.com database.
     * @param Gdn_Controller $Sender
     */
-   public function EntryController_Spoof_Create($Sender) {
+   public function EntryController_VfSpoof_Create($Sender) {
       $Sender->Title('Spoof');
       // $Sender->AddSideMenu('dashboard/user');
       $Sender->Form = new Gdn_Form();

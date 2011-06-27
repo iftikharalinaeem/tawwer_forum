@@ -204,6 +204,10 @@ class VfcomPlugin extends Gdn_Plugin {
       $Args['Urls'][''] = $FinalURL = "{$this->StaticURL}/uploads";
    }
    
+   public function UserModel_BeforeSystemUser_Handler($Sender) {
+      $Sender->EventArguments['SystemUser']['Email'] = 'system@vanillaforums.com';
+   }
+   
    public function HeadModule_BeforeToString_Handler($Sender) {
       // Only for logged-in users
       if (!Gdn::Session()->UserID) return;

@@ -17,6 +17,53 @@ class CarTalkThemeHooks extends Gdn_Plugin {
    public function DiscussionsController_Toolbox_Create($Sender, $Args) {
       $Sender->Render();
    }
+   
+   protected static $_InPopular = FALSE;
+   
+   /**
+    *
+    * @param DiscussionsController $Sender
+    * @param array $Args 
+    */
+   public function DiscussionsController_Popular_Create($Sender, $Args) {
+      $Sender->Title('Popular Discussions');
+      $Sender->View = 'Index';
+      $Sender->SetData('_PagerUrl', 'discussions/popular/{Page}');
+      self::$_InPopular = TRUE;
+      $Sender->Index(GetValue(0, $Args));
+      self::$_InPopular = FALSE;
+   }
+   
+   public function DiscussionModel_BeforeGetCount_Handler($Sender, $Args) {
+      if (self::$_InPopular)
+         $Sender->SQL->Where(1, 0, FALSE, FALSE);
+   }
+   
+   /**
+    *
+    * @param DiscussionModel $Sender
+    * @param type $Args
+    * @return type 
+    */
+   public function DiscussionModel_BeforeGet_Handler($Sender, $Args) {
+      if (!self::$_InPopular)
+         return;
+      
+      $this->_PopularWhere($Sender->SQL);
+      $Sender->SQL->OrderBy('CountComments', 'desc');
+   }
+   
+   /**
+    *
+    * @param Gdn_SQLDriver $SQL 
+    */
+   protected function _PopularWhere($SQL) {
+      // Popular discussions must be newer than two weeks old.
+      $BaseDate = time();
+      $BaseDate -= 14 * 24 * 60 * 60;
+      $SQL->Where('d.DateLastComment >=', Gdn_Format::ToDateTime($BaseDate))
+         ->Where('d.Announce', 0);
+   }
 
    public function UtilityController_Serve_Create($Sender, $Args) {
       $Filename = GetValue(0, $Args);
