@@ -148,6 +148,50 @@ pageTracker._trackPageview();
       $Sender->ShowHidden = FALSE;
    }
    
+   public function PluginController_RunnerPlugins_Create($Sender) {
+      $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
+      
+      $Enable = array_flip(explode(',',Gdn::Request()->GetValue('Enable','')));
+      $Enable = array_fill_keys($Enable, TRUE);
+      
+      $Disable = array_flip(explode(',',Gdn::Request()->GetValue('Disable','')));
+      $Disable = array_fill_keys($Disable, FALSE);
+      
+      $PluginList = array();
+      $PluginList = array_merge($PluginList, $Enable, $Disable);
+      
+      $Status = "TRUE";
+      try {
+         if (!Gdn::Session()->IsValid() || !GetValue('Token',Gdn::Session()->User, FALSE))
+            throw new Exception('FALSE');
+         
+         foreach ($PluginList as $PluginName => $Action) {
+            switch ($Action) {
+               case TRUE:
+                  if (Gdn::PluginManager()->GetPluginInfo($PluginName) && !Gdn::PluginManager()->CheckPlugin($PluginName)) {
+                     Gdn::PluginManager()->EnablePlugin($PluginName);
+                  }
+                  break;
+               case FALSE:
+                  if (Gdn::PluginManager()->CheckPlugin($PluginName)) {
+                     Gdn::PluginManager()->DisablePlugin($PluginName);
+                  }
+                  break;
+               default:
+                  throw new Exception('FALSE');
+                  break;
+            }
+            
+         }
+      } catch(Exception $e) {
+         $Status = "FALSE";
+      }
+      
+      $Sender->Finalize();
+      echo $Status;
+      die();
+   }
+   
    public function PluginController_ForceEnablePlugin_Create($Sender) {
       $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
       
