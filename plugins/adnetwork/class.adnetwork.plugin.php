@@ -108,7 +108,7 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 	 * Render Banner ads in header.
 	 */
 	public function Base_BeforeRenderAsset_Handler($Sender) {
-		if ($Sender->MasterView() != 'default')
+		if (!in_array($Sender->MasterView, array('', 'default')))
 			return;
 		
 		$AssetName = GetValue('AssetName', $Sender->EventArguments);
@@ -120,7 +120,7 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 	 * Render Banner ads in panel.
 	 */
 	public function Base_AfterRenderAsset_Handler($Sender) {
-		if ($Sender->MasterView() != 'default')
+		if (!in_array($Sender->MasterView, array('', 'default')))
 			return;
 		
 		$AssetName = GetValue('AssetName', $Sender->EventArguments);
@@ -135,7 +135,7 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 	 * </body> tag
 	 */
 	public function DiscussionController_AfterBody_Handler($Sender) {
-		if ($Sender->MasterView() == 'default') {
+		if (!in_array($Sender->MasterView, array('', 'default')))
 			$this->Ad_InfoLinks();
 			$this->Ad_VigLink();
 		}
