@@ -194,5 +194,6 @@ Jacob Javits Convention Center | New York, NY</font></td><td width=3%>&nbsp;</td
 		{asset name="Foot"}
 	 </div>
   </div>
+  {event name="AfterBody"}
 </body>
 </html>
