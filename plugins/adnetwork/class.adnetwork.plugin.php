@@ -258,17 +258,17 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 		if (in_array($url, array('vanillaforums.org', 'forumaboutforums.com'))) {
 
 			// Leaderboard 728 x 90
-			if ($dimensions = '728x90')
+			if ($dimensions == '728x90')
 				echo '<div id="lijit_region_127024"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127024&z=127024&n=1"></script>';
 
 			// Medium Rectangle 300 x 250
-			if ($dimensions = '300x250')
+			if ($dimensions == '300x250')
 				echo '<div id="lijit_region_127025"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127025&z=127025&n=3"></script>';
 
 			// Wide Skyscraper 160 x 600
-			if ($dimensions = '160x600')
+			if ($dimensions == '160x600')
 				echo '<div id="lijit_region_127026"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127026&z=127026&n=4"></script>';
 		}
@@ -277,17 +277,17 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 		if ($url == 'riverfans.vanillaforums.com') {
 
 			// Leaderboard 728 x 90
-			if ($dimensions = '728x90')
+			if ($dimensions == '728x90')
 				echo '<div id="lijit_region_127021"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127021&z=127021&n=1"></script>';
 
 			// Medium Rectangle 300 x 250
-			if ($dimensions = '300x250')
+			if ($dimensions == '300x250')
 				echo '<div id="lijit_region_127022"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127022&z=127022&n=3"></script>';
 
 			// Wide Skyscraper 160 x 600
-			if ($dimensions = '160x600')
+			if ($dimensions == '160x600')
 				echo '<div id="lijit_region_127023"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127023&z=127023&n=4"></script>';
 		}
@@ -295,17 +295,17 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 		// 9to5mac.vanillaforums.com
 		if ($url == '9to5mac.vanillaforums.com') {
 			// Leaderboard 728 x 90
-			if ($dimensions = '728x90')
+			if ($dimensions == '728x90')
 				echo '<div id="lijit_region_127027"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127027&z=127027&n=1"></script>';
 
 			// Medium Rectangle 300 x 250
-			if ($dimensions = '300x250')
+			if ($dimensions == '300x250')
 				echo '<div id="lijit_region_127028"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127028&z=127028&n=3"></script>';
 
 			// Wide Skyscraper 160 x 600
-			if ($dimensions = '160x600')
+			if ($dimensions == '160x600')
 				echo '<div id="lijit_region_127029"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127029&z=127029&n=4"></script>';
 		}
