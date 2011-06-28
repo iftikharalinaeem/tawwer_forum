@@ -135,7 +135,7 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 	 * </body> tag
 	 */
 	public function DiscussionController_AfterBody_Handler($Sender) {
-		if (!in_array($Sender->MasterView, array('', 'default')))
+		if (!in_array($Sender->MasterView, array('', 'default'))) {
 			$this->Ad_InfoLinks();
 			$this->Ad_VigLink();
 		}
