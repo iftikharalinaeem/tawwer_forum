@@ -149,97 +149,89 @@ pageTracker._trackPageview();
    }
    
    public function PluginController_RunnerPlugins_Create($Sender) {
-      $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
-      $Enable = array_flip(explode(',',Gdn::Request()->GetValue('Enable','')));
+      $Enable = explode(',',Gdn::Request()->GetValue('Enable',''));
       $Enable = array_fill_keys($Enable, TRUE);
       
-      $Disable = array_flip(explode(',',Gdn::Request()->GetValue('Disable','')));
+      $Disable = explode(',',Gdn::Request()->GetValue('Disable',''));
       $Disable = array_fill_keys($Disable, FALSE);
       
       $PluginList = array();
       $PluginList = array_merge($PluginList, $Enable, $Disable);
       
-      $Status = "TRUE";
+      $PluginOperations = array_fill_keys(array_keys($PluginList), NULL);
+      $OperationStatus = TRUE;
       try {
-         if (!Gdn::Session()->IsValid() || !GetValue('Token',Gdn::Session()->User, FALSE))
-            throw new Exception('FALSE');
+         
+         if (!Gdn::Session()->IsValid() || !GetValue('Token', Gdn::Session()->User, FALSE))
+            throw new Exception(FALSE);
          
          foreach ($PluginList as $PluginName => $Action) {
+            $PluginOperations[$PluginName] = NULL;
+            $PluginStatus = TRUE;
             switch ($Action) {
-               case TRUE:
-                  if (Gdn::PluginManager()->GetPluginInfo($PluginName) && !Gdn::PluginManager()->CheckPlugin($PluginName)) {
-                     Gdn::PluginManager()->EnablePlugin($PluginName);
-                  }
+               case TRUE:  // Enable
+                  try {
+                     if (Gdn::PluginManager()->GetPluginInfo($PluginName) && !Gdn::PluginManager()->CheckPlugin($PluginName))
+                        $PluginStatus = Gdn::PluginManager()->EnablePlugin($PluginName);
+                  } catch (Exception $e){ $PluginStatus = FALSE; }
                   break;
-               case FALSE:
-                  if (Gdn::PluginManager()->CheckPlugin($PluginName)) {
-                     Gdn::PluginManager()->DisablePlugin($PluginName);
-                  }
+               case FALSE: // Disable
+                  try {
+                     if (Gdn::PluginManager()->CheckPlugin($PluginName))
+                        Gdn::PluginManager()->DisablePlugin($PluginName);
+                  } catch (Exception $e){ $PluginStatus = FALSE; }
                   break;
                default:
-                  throw new Exception('FALSE');
                   break;
             }
-            
+            $PluginOperations[$PluginName] = $PluginStatus;
          }
-      } catch(Exception $e) {
-         $Status = "FALSE";
-      }
+      } catch(Exception $e) { $OperationStatus = FALSE; }
       
-      $Sender->Finalize();
-      echo $Status;
-      die();
+      $Sender->SetData("Operation", $OperationStatus);
+      $Sender->SetData("Plugins", $PluginOperations);
+      $Sender->Render('blank', 'utility', 'dashboard');
    }
    
    public function PluginController_ForceEnablePlugin_Create($Sender) {
-      $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
+      $OperationStatus = TRUE;
       try {
          if (!Gdn::Session()->IsValid() || !GetValue('Token',Gdn::Session()->User, FALSE))
-            throw new Exception('FALSE');
-         
-         // Retrieve all available plugins from the plugins directory
-         $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins();
-         $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
+            throw new Exception();
          
          list($PluginName) = $Sender->RequestArgs;
-         if (array_key_exists($PluginName, $this->AvailablePlugins) && !array_key_exists($PluginName, $this->EnabledPlugins)) {
-            Gdn::PluginManager()->EnablePlugin($PluginName);
-            throw new Exception('TRUE');
-         }
-         throw new Exception('FALSE');
-         
-      } catch(Exception $e) {
-         $Sender->Finalize();
-         echo $e->getMessage();
-      }
-      die();
+         $Sender->SetData("Plugin", $PluginName);
+         if (Gdn::PluginManager()->GetPluginInfo($PluginName) && !Gdn::PluginManager()->CheckPlugin($PluginName))
+            $OperationStatus = Gdn::PluginManager()->EnablePlugin($PluginName);
+      } catch(Exception $e) { $OperationStatus = FALSE; }
+      
+      $Sender->SetData("Operation", $OperationStatus);
+      $Sender->Render('blank', 'utility', 'dashboard');
    }
    
    public function PluginController_ForceDisablePlugin_Create($Sender) {
-      $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
+      $OperationStatus = TRUE;
       try {
          if (!Gdn::Session()->IsValid() || !GetValue('Token',Gdn::Session()->User, FALSE)) 
             throw new Exception('FALSE');
          
-         // Retrieve all available plugins from the plugins directory
-         $this->EnabledPlugins = Gdn::PluginManager()->EnabledPlugins();
-         $this->AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
-         
          list($PluginName) = $Sender->RequestArgs;
-         if (array_key_exists($PluginName, $this->EnabledPlugins)) {
+         $Sender->SetData("Plugin", $PluginName);
+         if (Gdn::PluginManager()->CheckPlugin($PluginName))
             Gdn::PluginManager()->DisablePlugin($PluginName);
-            throw new Exception('TRUE');
-         }
-         throw new Exception('FALSE');
-         
-      } catch(Exception $e) {
-         $Sender->Finalize();
-         echo $e->getMessage();
-      }
-      die();
+      } catch(Exception $e) { $OperationStatus = FALSE; }
+      
+      $Sender->SetData("Operation", $OperationStatus);
+      $Sender->Render('blank', 'utility', 'dashboard');
    }
    
    /**
