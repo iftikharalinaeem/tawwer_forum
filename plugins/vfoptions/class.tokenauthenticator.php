@@ -46,11 +46,13 @@ class Gdn_TokenAuthenticator extends Gdn_Authenticator {
     * have permission to sign in.
     */
    public function Authenticate($Token = NULL) {
-      if (is_null($Token))
+      if (is_null($Token)) {
          return 0;
-         
-      if (C('Garden.Authenticators.token.Token', NULL) != $Token)
+      }
+      
+      if (C('Garden.Authenticators.token.Token', NULL) != $Token) {
          return 0;
+      }
          
       $Expiry = C('Garden.Authenticators.token.Expiry', 0);
       if ($Expiry != 0 && strtotime($Expiry) < time()) {
@@ -106,9 +108,13 @@ class Gdn_TokenAuthenticator extends Gdn_Authenticator {
       $Id = Gdn::Authenticator()->GetRealIdentity();
       
       // Check token and token expiry
-      if (C('Garden.Authenticators.token.Token', FALSE) === FALSE) return Gdn_Authenticator::MODE_NOAUTH;
+      if (C('Garden.Authenticators.token.Token', FALSE) === FALSE) {
+         return Gdn_Authenticator::MODE_NOAUTH;
+      }
       $Expiry = C('Garden.Authenticators.token.Expiry', 0);
-      if ($Expiry != 0 && strtotime($Expiry) < time()) return Gdn_Authenticator::MODE_NOAUTH;
+      if ($Expiry != 0 && strtotime($Expiry) < time()) {
+         return Gdn_Authenticator::MODE_NOAUTH;
+      }
       
       if ($Id == 0 || $Id == -1) {
          $this->_CheckHookedFields();
