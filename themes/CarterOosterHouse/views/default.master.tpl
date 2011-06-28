@@ -129,5 +129,6 @@
 	 </div>
 	 
  </div>
+ {event name="AfterBody"}
 </body>
 </html>

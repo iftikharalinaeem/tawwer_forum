@@ -448,11 +448,18 @@ pageTracker._trackPageview();
 			'CustomDomain', 'FileUpload', 'CustomTheme', 'PrivateCommunity',
 			'VanillaConnect', 'Backups'
 		);
+		$Features['smallgroup'] = array(
+			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
+			'CustomDomain', 'CustomTheme', 'PrivateCommunity',
+			'VanillaConnect', 'Backups'
+		);
 		$Features['premium'] = array(
 			'NoAds', 'PremiumThemes', 'UserManagement', 'BannerLogo',
 			'CustomDomain', 'FileUpload', 'CustomTheme', 'PrivateCommunity',
 			'VanillaConnect', 'Backups', 'SpamControl'
 		);
+		$Features['smallbusiness'] = $Features['premium'];
+		$Features['enterprise'] = $Features['premium'];
 
       // See what plan the site has
       $SiteID = C('VanillaForums.SiteID', '0');

@@ -37,5 +37,6 @@
 		{asset name="Foot"}
 	 </div>
   </div>
+  {event name="AfterBody"}
 </body>
 </html>
