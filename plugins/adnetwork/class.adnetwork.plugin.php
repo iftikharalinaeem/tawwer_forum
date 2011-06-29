@@ -271,6 +271,7 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 		if (!C('Plugins.AdNetwork.LijitEnabled'))
 			return;
 
+		$Type = strtolower($Type);
 		$url = C('Plugins.AdNetwork.LijitUrl');
 		// VanillaForums.org & forumaboutforums.com
 		if (in_array($url, array('vanillaforums.org', 'forumaboutforums.com'))) {
