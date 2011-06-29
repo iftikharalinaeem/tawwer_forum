@@ -9,6 +9,7 @@
     <div id="container">
     <div class="TitleBanner"><a class="Title" href="{link path="/"}">{logo}</a></div>
     <div id="AdBanner">
+		{event name="TopBannerAd"}
     </div>
 	 <div class="Banner">
 		<ul>
@@ -24,8 +25,10 @@
 	 <div id="Body">
 		<div class="Wrapper">
 		  <div id="Panel">
+			 {event name="TopPanelAd"}
 			 <div class="SearchBox">{searchbox}</div>
 			 {asset name="Panel"}
+			 {event name="BottomPanelAd"}
 		  </div>
 		  <div id="Content">
 			 {asset name="Content"}
@@ -33,6 +36,7 @@
 		</div>
 	 </div>
 	 <div id="Foot">
+		{event name="BottomBannerAd"}
 		<div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
 		{asset name="Foot"}
 	 </div>
