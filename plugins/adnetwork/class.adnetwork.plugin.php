@@ -109,10 +109,10 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 	 */
 	private function ShowAds($ConfigSetting) {
 		$AdsToShow = C($ConfigSetting);
-		if (!is_array($Ads))
+		if (!is_array($AdsToShow))
 			return;
 		
-		foreach($Ads as $Ad) {
+		foreach($AdsToShow as $Ad) {
 			// Show Lijit ads
 			if (strtolower(substr($Ad, 0, 5)) == 'lijit')
 				$this->Ad_Lijit(substr($Ad, 5));
