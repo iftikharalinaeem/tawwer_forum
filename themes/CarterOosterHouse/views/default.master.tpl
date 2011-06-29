@@ -17,7 +17,7 @@
   
   <div id="container-wrap">
   <div id="container">
-  
+  {event name="TopBannerAd"}
   <div class="TopBanner">
 
 	<div class="logo">
@@ -85,8 +85,10 @@
 	 <div id="Body">
 		<div class="Wrapper">
 		  <div id="Panel">
+		  {event name="TopPanelAd"}
 			 <div class="SearchBox">{searchbox}</div>
 			 {asset name="Panel"}
+			 {event name="BottomPanelAd"}
 		  </div>
 		  <div id="Content">
 			 {asset name="Content"}
@@ -94,7 +96,7 @@
 		</div>
 	 </div>
 	 <div id="Foot">
-	 
+	 {event name="BottomBannerAd"}
 	 <table>
 	 <tr>
         <td width="160" align="left" valign="top" class="lighttextheader">Sitemap</td>

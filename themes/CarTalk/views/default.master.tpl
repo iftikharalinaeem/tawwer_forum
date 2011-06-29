@@ -9,7 +9,7 @@
   <div id="container-wrap">
   <div id="container">
   	
-  	
+  	{event name="TopBannerAd"}
   	
   	<div class="TopBanner">
   		<div class="logo"></div>  
@@ -239,12 +239,14 @@
 		  			
 
 		  <div id="Panel">
+		  {event name="TopPanelAd"}
 			 <!--<div class="SearchBox">{searchbox}</div>-->
 			 <div class="Community"></div>
 			<center><a href="{link path="/discussions/rules"}" class="Rules">Discussion Rules</a></center>
 			<br />
 						
 			 {asset name="Panel"}
+			 {event name="BottomPanelAd"}
          
 
 			{literal} 
@@ -286,6 +288,7 @@ google_ad_height = 90;
 </div>
 
 	 	<div id="Footer">
+	 	{event name="BottomBannerAd"}
 			<div id="footer_row_1">
 					<div id="npr"><a target="_blank" href="http://www.npr.org/"><img width="60" height="20" border="0" src="/themes/CarTalk/design/npr.png"/></a></div>
 

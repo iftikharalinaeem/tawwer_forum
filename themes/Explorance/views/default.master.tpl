@@ -14,7 +14,7 @@
   
   <div id="container-wrap">
   <div id="container">
-
+{event name="TopBannerAd"}
   
   <div class="siteHeader">
         
@@ -47,8 +47,10 @@
 	 <div id="Body">
 		<div class="Wrapper">
 		  <div id="Panel">
+		  {event name="TopPanelAd"}
 			 <div class="SearchBox">{searchbox}</div>
 			 {asset name="Panel"}
+			 {event name="BottomPanelAd"}
 		  </div>
 		  <div id="Content">
 			 {asset name="Content"}
@@ -57,6 +59,7 @@
 	 </div>
 
 	  <div id="Foot">
+	  {event name="BottomBannerAd"}
 		<div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
 		{asset name="Foot"}
 	 </div>
