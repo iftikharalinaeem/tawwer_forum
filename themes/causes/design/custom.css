@@ -135,10 +135,13 @@ a:hover {
    -moz-border-radius: 2px;
    -webkit-border-radius: 2px;
    border-radius: 2px;
-   padding: 0 2px;
    font-size: 9px;
-   line-height: 12px;
    font-weight: normal;
+	font-family: trebuchet MS;
+	font-weight: normal;
+	line-height: 1;
+	padding: 1px 2px;
+	text-shadow: none;
 }
 .VanillaNav a:hover {
    background: #f3fdd6;
@@ -817,4 +820,19 @@ text-decoration:underline;
 div.MessageForm,#MessageForm,#DiscussionForm form,#ConversationForm form {
 background:#F3F3F3;
 border:1px solid #EEE;
+}
+body.Search #Panel .SearchBox {
+	display: none;
+}
+body.Search div.SearchTabs {
+	padding-bottom: 20px;
+}
+#Panel .SearchBox {
+	padding-bottom: 10px;
+	border-bottom: 3px dotted #ddd;
+	margin-bottom: 10px;
+}
+#Panel .SearchBox input.InputBox {
+	width: 190px;
+	margin-right: 10px;
 }

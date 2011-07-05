@@ -29,7 +29,10 @@
 		</div>
 	 </div>
 	 <div id="Body">
-		<div id="Panel">{asset name="Panel"}</div>
+		<div id="Panel">
+		  <div class="SearchBox"><strong>Search</strong>{searchbox}</div>
+		  {asset name="Panel"}
+		</div>
 		<div id="Content">{asset name="Content"}</div>
 	 </div>
 	 <div id="Foot">
