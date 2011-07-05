@@ -105,29 +105,46 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 	}
 	
 	/**
-	 * Render Banner ads in header.
+	 * Grab an array of ads to show & display them.
 	 */
-	public function Base_BeforeRenderAsset_Handler($Sender) {
-		if (!in_array($Sender->MasterView, array('', 'default')))
+	private function ShowAds($ConfigSetting) {
+		$AdsToShow = C($ConfigSetting);
+		if (!is_array($AdsToShow))
 			return;
 		
-		$AssetName = GetValue('AssetName', $Sender->EventArguments);
-		if ($AssetName == 'Content')
-			$this->Ad_Lijit('728x90');
+		foreach($AdsToShow as $Ad) {
+			// Show Lijit ads
+			if (strtolower(substr($Ad, 0, 5)) == 'lijit')
+				$this->Ad_Lijit(substr($Ad, 5));
+		}
 	}
 
 	/**
-	 * Render Banner ads in panel.
+	 * Render Banner ads in header.
 	 */
-	public function Base_AfterRenderAsset_Handler($Sender) {
-		if (!in_array($Sender->MasterView, array('', 'default')))
-			return;
-		
-		$AssetName = GetValue('AssetName', $Sender->EventArguments);
-		if ($AssetName == 'Panel') {
-			$this->Ad_Lijit('300x250');
-			$this->Ad_Lijit('160x600');
-		}
+	public function Base_TopBannerAd_Handler($Sender) {
+		$this->ShowAds('Plugins.AdNetwork.TopBannerAd');
+	}
+
+	/**
+	 * Render Banner ads in footer.
+	 */
+	public function Base_BottomBannerAd_Handler($Sender) {
+		$this->ShowAds('Plugins.AdNetwork.BottomBannerAd');
+	}
+
+	/**
+	 * Render Banner ads above panel.
+	 */
+	public function Base_TopPanelAd_Handler($Sender) {
+		$this->ShowAds('Plugins.AdNetwork.TopPanelAd');
+	}
+	
+	/**
+	 * Render Banner ads below panel.
+	 */
+	public function Base_BottomPanelAd_Handler($Sender) {
+		$this->ShowAds('Plugins.AdNetwork.BottomPanelAd');
 	}
 	
 	/**
@@ -146,7 +163,7 @@ class AdNetworkPlugin implements Gdn_IPlugin {
     */
    public function SettingsController_AdNetwork_Create($Sender, $Args) {
       $Sender->Permission('Garden.Applications.Manage');
-		
+		$BannerAds = array('LijitWide', 'LijitBlock', 'LijitSkyscraper');
 		$Conf = new ConfigurationModule($Sender);
 		$Conf->Initialize(array(
 			'Plugins.AdNetwork.InfoLinksEnabled' => array('Type' => 'bool', 'Control' => 'CheckBox'),
@@ -155,9 +172,10 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 			'Plugins.AdNetwork.PostReleaseEnabled' => array('Type' => 'bool', 'Control' => 'CheckBox'),
 			'Plugins.AdNetwork.infolink_wsid' => array('Control' => 'TextBox'),
 			'Plugins.AdNetwork.LijitUrl' => array('Control' => 'TextBox'),
-			'Plugins.AdNetwork.LijitEnabled728x90' => array('Type' => 'bool', 'Control' => 'CheckBox'),
-			'Plugins.AdNetwork.LijitEnabled300x250' => array('Type' => 'bool', 'Control' => 'CheckBox'),
-			'Plugins.AdNetwork.LijitEnabled160x600' => array('Type' => 'bool', 'Control' => 'CheckBox')
+			'Plugins.AdNetwork.TopBannerAd' => array('Type' => 'array', 'Control' => 'CheckBoxList', 'Items' => $BannerAds),
+			'Plugins.AdNetwork.BottomBannerAd' => array('Type' => 'array', 'Control' => 'CheckBoxList', 'Items' => $BannerAds),
+			'Plugins.AdNetwork.TopPanelAd' => array('Type' => 'array', 'Control' => 'CheckBoxList', 'Items' => $BannerAds),
+			'Plugins.AdNetwork.BottomPanelAd' => array('Type' => 'array', 'Control' => 'CheckBoxList', 'Items' => $BannerAds)
 		));
 		$Sender->AddSideMenu('settings/adnetwork');
 		$Sender->SetData('Title', T('Ad Network'));
@@ -249,26 +267,27 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 	 * (i.e. same leaderboard, medium rectangle and wide skyscraper code on both
 	 * sites).
 	 */
-	private function Ad_Lijit($dimensions = '') {
+	private function Ad_Lijit($Type = '') {
 		if (!C('Plugins.AdNetwork.LijitEnabled'))
 			return;
 
+		$Type = strtolower($Type);
 		$url = C('Plugins.AdNetwork.LijitUrl');
 		// VanillaForums.org & forumaboutforums.com
 		if (in_array($url, array('vanillaforums.org', 'forumaboutforums.com'))) {
 
 			// Leaderboard 728 x 90
-			if ($dimensions == '728x90')
+			if ($Type == 'wide')
 				echo '<div id="lijit_region_127024"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127024&z=127024&n=1"></script>';
 
 			// Medium Rectangle 300 x 250
-			if ($dimensions == '300x250')
+			if ($Type == 'block')
 				echo '<div id="lijit_region_127025"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127025&z=127025&n=3"></script>';
 
 			// Wide Skyscraper 160 x 600
-			if ($dimensions == '160x600')
+			if ($Type == 'skyscraper')
 				echo '<div id="lijit_region_127026"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127026&z=127026&n=4"></script>';
 		}
@@ -277,17 +296,17 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 		if ($url == 'riverfans.vanillaforums.com') {
 
 			// Leaderboard 728 x 90
-			if ($dimensions == '728x90')
+			if ($Type == 'wide')
 				echo '<div id="lijit_region_127021"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127021&z=127021&n=1"></script>';
 
 			// Medium Rectangle 300 x 250
-			if ($dimensions == '300x250')
+			if ($Type == 'block')
 				echo '<div id="lijit_region_127022"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127022&z=127022&n=3"></script>';
 
 			// Wide Skyscraper 160 x 600
-			if ($dimensions == '160x600')
+			if ($Type == 'skyscraper')
 				echo '<div id="lijit_region_127023"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127023&z=127023&n=4"></script>';
 		}
@@ -295,17 +314,17 @@ class AdNetworkPlugin implements Gdn_IPlugin {
 		// 9to5mac.vanillaforums.com
 		if ($url == '9to5mac.vanillaforums.com') {
 			// Leaderboard 728 x 90
-			if ($dimensions == '728x90')
+			if ($Type == 'wide')
 				echo '<div id="lijit_region_127027"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127027&z=127027&n=1"></script>';
 
 			// Medium Rectangle 300 x 250
-			if ($dimensions == '300x250')
+			if ($Type == 'block')
 				echo '<div id="lijit_region_127028"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127028&z=127028&n=3"></script>';
 
 			// Wide Skyscraper 160 x 600
-			if ($dimensions == '160x600')
+			if ($Type == 'skyscraper')
 				echo '<div id="lijit_region_127029"></div>
 <script type="text/javascript" src="http://www.lijit.com/delivery/fp?u=vanillaforums&i=lijit_region_127029&z=127029&n=4"></script>';
 		}
