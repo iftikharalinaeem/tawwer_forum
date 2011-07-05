@@ -821,6 +821,7 @@ div.MessageForm,#MessageForm,#DiscussionForm form,#ConversationForm form {
 background:#F3F3F3;
 border:1px solid #EEE;
 }
+body.Profile #Panel .SearchBox,
 body.Search #Panel .SearchBox {
 	display: none;
 }
