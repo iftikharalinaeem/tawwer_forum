@@ -184,6 +184,7 @@ a.BigButton {
 a.BigButton:hover {
 	color: #378398;
 	border: none;
+	text-decoration: none;
 }
 div.Box {
 	box-shadow: none;
@@ -619,9 +620,6 @@ ul.Discussions a.Bookmark { display: none; }
 body.Discussion a.Bookmark {
 	margin: 8px 6px 6px 8px;
 }
-ul.MessageList li.FirstComment {
-	border-bottom: none;
-}
 div.AnswerTabs {
 	border-bottom: 1px solid #999;
 	margin-top: 12px;
@@ -668,6 +666,7 @@ div.AnswerTabs strong {
 	font-size: 16px;
 	margin-right: 20px;
 }
+
 
 /* Category Page Customizations */
 #vanilla_categories_index div.ProfileBox {
@@ -836,4 +835,27 @@ body.Search div.SearchTabs {
 #Panel .SearchBox input.InputBox {
 	width: 190px;
 	margin-right: 10px;
+}
+#DiscussionForm h1 {
+	display: none;
+}
+#DiscussionForm .P:nth-child(5) {
+	margin: -10px -20px;
+	padding: 10px 20px;
+	background: #f3f3f3;
+}
+#DiscussionForm .Tabs {
+	background: #f3f3f3;
+	padding: 10px 0 0;
+}
+#DiscussionForm div.Tabs li.Active a {
+	background: #fafafa;
+}
+#DiscussionForm form {
+	background: #fafafa;
+	padding: 10px 20px 20px;
+}
+.DataHeading h1 {
+	border-bottom: 1px solid #BEC8CC;
+	padding: 0 6px;
 }
