@@ -53,11 +53,15 @@ ul#Menu {
 #Head .Search {
 	display: none;
 }
-#Menu a,
-#Menu a span{
+#Menu a {
 	font-weight: normal;
 	color: #fff;
 }
+#Menu a span{
+	font-weight: normal;
+	color: #704c1b;
+}
+
 #Menu a:hover,
 #Menu li.Active a,
 #Menu li.Active a span,
@@ -341,6 +345,12 @@ body.Messages div.HeadingTabs div.SubTab a{
 ul.Activities div.Excerpt {
     color: #222222;
 }
+
+div.SingleEntryMethod {
+    background: #EBCBA5;
+	padding: 5px;
+}
+
 /* Panel */
 
 a.Button {
