@@ -59,7 +59,7 @@
   	</div>
   	</div>
   	</div>
-  
+  {event name="TopBannerAd"}
   <div id="container">
 	 <div class="Banner">
 		<ul>
@@ -74,8 +74,10 @@
 	 <div id="Body">
 		<div class="Wrapper">
 		  <div id="Panel">
+		  {event name="TopPanelAd"}
 			 <div class="SearchBox">{searchbox}</div>
 			 {asset name="Panel"}
+			 {event name="BottomPanelAd"}
 		  </div>
 		  <div id="Content">
 			 {asset name="Content"}
@@ -180,9 +182,10 @@
 	 	</div>
 	 	<div id="popupContact"></div>
 	 	<div id="backgroundPopup" onclick="disablePopup()"></div>
-
+{event name="BottomBannerAd"}
 	{asset name="Foot"}
  	
   </div>
+  {event name="AfterBody"}
 </body>
 </html>

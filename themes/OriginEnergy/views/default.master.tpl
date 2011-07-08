@@ -14,7 +14,7 @@
 	   	 	 	 
 
 	   	 </div>
-
+			{event name="TopBannerAd"}
 	 
 		<ul>
 		  {dashboard_link}
@@ -33,18 +33,22 @@
 	 
 	 		<div class="Wrapper">
 		  <div id="Panel">
+		  {event name="TopPanelAd"}
 			 <div class="SearchBox">{searchbox}</div>
 			 {asset name="Panel"}
+			 {event name="BottomPanelAd"}
 		  </div>
 		  <div id="Content">
 			 {asset name="Content"}
 		  </div>
 		</div>
 	 <div id="Foot">
+	 {event name="BottomBannerAd"}
 		<div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
 		{asset name="Foot"}
 	 </div>
   </div>
  </div>
+ {event name="AfterBody"}
 </body>
 </html>
