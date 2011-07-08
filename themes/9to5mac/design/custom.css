@@ -447,3 +447,10 @@ a.Close {
 .StatBox a {
     color: #84C7F6 !important;
 }
+
+ul.MessageList div.Meta span.Votes {
+    right: 0;
+}
+div.Preview div.Message, div.Preview div.Message p, ul.MessageList div.Message, ul.MessageList div.Message p {
+    margin: 8px 50px;
+}
