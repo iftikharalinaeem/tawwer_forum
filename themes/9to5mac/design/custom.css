@@ -438,8 +438,11 @@ a.Close {
 
 /* voting */
 
-.VotesBox, .FollowsBox., .AnswerBox {
+.VotesBox, .AnswerBox {
     background: #145987;
+}
+.FollowsBox {
+   background: #0075C4;
 }
 .ViewsBox {
     background: #0096FF;
@@ -453,4 +456,9 @@ ul.MessageList div.Meta span.Votes {
 }
 div.Preview div.Message, div.Preview div.Message p, ul.MessageList div.Message, ul.MessageList div.Message p {
     margin: 8px 50px;
+}
+
+ul.DataList div.Meta strong {
+   left: auto;
+   right: -33px;
 }
