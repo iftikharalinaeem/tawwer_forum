@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Following'] = array(
    'Name' => 'Following',
    'Description' => 'This plugin allows users to follow others.',
-   'Version' => '0.2',
+   'Version' => '1.0b',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -120,16 +120,16 @@ class FollowingPlugin extends Gdn_Plugin {
    }
 
    public function Setup() {
+      $this->Structure();
+   }
+   
+   public function Structure() {
       $Structure = Gdn::Structure();
       $Structure
          ->Table('Following')
          ->Column('UserID', 'int(11)', FALSE, 'primary')
          ->Column('FollowedUserID', 'int(11)', FALSE, 'primary')
          ->Set(FALSE, FALSE);
-   }
-   
-   public function Structure() {
-      // Nothing to do here!
    }
          
 }
