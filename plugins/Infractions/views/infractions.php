@@ -18,6 +18,7 @@ if (is_object($InfractionData)) {
    <?php
    $Active = 0;
    $Total = $InfractionData->NumRows();
+   $UnReversed = 0;
    $Points = 0;
    $Warnings = 0;
    foreach ($InfractionData->Result() as $Infraction) {
@@ -26,6 +27,9 @@ if (is_object($InfractionData)) {
          $Active++;
          $Points += $Infraction->Points;
       }
+      if ($Infraction->Reversed == '0')
+         $UnReversed++;
+
       if ($Infraction->Warning)
          $Warnings++;
       
@@ -39,7 +43,7 @@ if (is_object($InfractionData)) {
    <ul class="Overview InfractionOverview">
       <?php
       WriteOverviewItem('Active', $Active);
-      WriteOverviewItem('Total', $Total);
+      WriteOverviewItem('Total', $UnReversed);
       WriteOverviewItem('Points', $Points);
       WriteOverviewItem('Warnings', $Warnings);
       ?>

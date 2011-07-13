@@ -418,9 +418,9 @@ class InfractionsPlugin extends Gdn_Plugin {
             ->Select('i.*, c.ConversationID')
             ->From('Infraction i')
             ->Join('Conversation c', 'i.InfractionID = c.InfractionID', 'left')
-            ->Where('UserID', $UserID)
-            ->Where('Reversed', '0')
-            ->OrderBy('DateExpires', 'desc')
+            ->Where('i.UserID', $UserID)
+            ->Where('i.Reversed', '0')
+            ->OrderBy('i.DateExpires', 'desc')
             ->Get();
 
          $InfractionCache = array();
@@ -431,7 +431,8 @@ class InfractionsPlugin extends Gdn_Plugin {
          $InfractionCache['Banned'] = FALSE;
          $InfractionCache['Jailed'] = FALSE;
          foreach ($Data->Result() as $Row) {
-            $InfractionCache['Count']++;
+				$InfractionCache['Count']++;
+					
             if (($Row->DateExpires == NULL || Gdn_Format::ToTimestamp($Row->DateExpires) > time()) && $Row->Warning == '0') {
                $InfractionCache['Points'] += $Row->Points;
                $InfractionCache['DateExpires'] = $Row->DateExpires;
