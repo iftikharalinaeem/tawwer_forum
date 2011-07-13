@@ -100,6 +100,28 @@ class InfractionsPlugin extends Gdn_Plugin {
 			Gdn::SQL()->Update('Infraction', array('Reversed' => '1'), array('InfractionID' => $InfractionID))->Put();
 			// Update the user's infraction cache
 			InfractionsPlugin::SetInfractionCache($Infraction->UserID);
+			
+			// Remove any denotation of the infraction on the affected item
+			$Table = 'Discussion';
+			$Column = 'DiscussionID';
+			$UniqueID = $Infraction->DiscussionID;
+			if ($Infraction->ActivityID > 0) {
+				$Table = 'Activity';
+				$Column = 'ActivityID';
+				$UniqueID = $Infraction->ActivityID;
+			} else if ($Infraction->CommentID > 0) {
+				$Table = 'Comment';
+				$Column = 'CommentID';
+				$UniqueID = $Infraction->CommentID;
+			}
+			if (is_numeric($UniqueID) && $UniqueID > 0) {
+				$Data = Gdn::SQL()->Select('Attributes')->From($Table)->Where($Column, $UniqueID)->Get()->FirstRow();
+				if (is_object($Data)) {
+					$Attributes = Gdn_Format::Unserialize($Data->Attributes);
+					unset($Attributes['Infraction']);
+					Gdn::SQL()->Update($Table)->Set('Attributes', Gdn_Format::Serialize($Attributes))->Where($Column, $UniqueID)->Put();
+				}
+			}
 		}
 		Redirect('/profile/infractions/'.$Infraction->UserID.'/unfracted');
 	}
