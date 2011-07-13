@@ -48,6 +48,9 @@ class SpoilersPlugin extends Gdn_Plugin {
    }
    
    protected function RenderSpoilers(&$Sender) {
+      if (!C('Plugins.Spoilers.RenderSpoilers', TRUE))
+         return;
+      
       $FormatBody = &$Sender->EventArguments['Object']->FormatBody;
 
       $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
