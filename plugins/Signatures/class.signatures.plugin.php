@@ -13,7 +13,7 @@ $PluginInfo['Signatures'] = array(
    'Name' => 'Signatures',
    'Description' => 'This plugin allows users to attach their own signatures to their posts.',
    'Version' => '1.2.2',
-   'RequiredApplications' => array('Vanilla' => '2.0.18a'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
@@ -208,7 +208,7 @@ class SignaturesPlugin extends Gdn_Plugin {
          // Don't show empty sigs
          if ($Signature == '') return;
          
-         $Sender->UserSignature = Gdn_Format::Html($Signature);
+         $Sender->UserSignature = Gdn_Format::Auto($Signature);
          $Display = $Sender->FetchView($this->GetView('usersig.php'));
          unset($Sender->UserSignature);
          echo $Display;
