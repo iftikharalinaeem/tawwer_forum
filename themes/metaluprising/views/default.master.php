@@ -71,6 +71,6 @@
          <?php $this->RenderAsset('Foot'); ?>
       </div>
    </div>
-
+   <?php $this->FireEvent('AfterBody'); ?>
 </body>
 </html>
