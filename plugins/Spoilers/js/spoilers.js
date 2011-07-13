@@ -18,7 +18,7 @@ var SpoilersPlugin = {
       
       // Extend object with jQuery
       Spoiler = $(Spoiler);
-      var SpoilerTitle = Spoiler.find('div.SpoilerTitle');
+      var SpoilerTitle = Spoiler.find('div.SpoilerTitle').first();
       var SpoilerButton = document.createElement('input');
       SpoilerButton.type = 'button';
       SpoilerButton.value = 'show';
@@ -27,7 +27,7 @@ var SpoilersPlugin = {
    },
    
    ToggleSpoiler: function(Spoiler, SpoilerButton) {
-      var ThisSpoilerText = Spoiler.find('div.SpoilerText');
+      var ThisSpoilerText = Spoiler.find('div.SpoilerText').first();
       var ThisSpoilerStatus = ThisSpoilerText.css('display');
       var NewSpoilerStatus = (ThisSpoilerStatus == 'none') ? 'block' : 'none';
       ThisSpoilerText.css('display',NewSpoilerStatus);
