@@ -11,7 +11,7 @@
    <div class="Banner Menu">
       <h1><a class="Title" href="{link path="/"}"><span>{logo}</span></a></h1>
       <ul id="Menu">
-        {if CheckPermission('Garden.Settings.Manage')}
+        {if MultiCheckPermission(array('Garden.Settings.Manage', 'Garden.Settings.View'))}
            <li><a href="{link path="dashboard/settings"}">Dashboard</a></li>
         {/if}
         <li class="DiscussionsTab"><a href="{link path="discussions"}">Discussions</a></li>
