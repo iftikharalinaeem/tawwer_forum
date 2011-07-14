@@ -1,0 +1,125 @@
+
+i.Sprite {
+	display: inline-block;
+	background-image: url('../../../applications/vfcom/design/images/sprite-icons.png');
+	background-repeat: no-repeat;
+}
+i.Sprite span {
+	display: none;
+}
+i.SpriteLogo {
+	height: 38px;
+	width: 141px;
+	background-position: -38px -76px;
+}
+
+
+/* MENU */
+.VFMenu {
+   padding: 10px 0 4px;
+}
+.VFMenu div {
+    display: inline;
+    padding-left: 3px;
+}
+.VFMenu a {
+	padding: 0 0 0 3px;
+	background: url('../../../applications/vfcom/design/images/sprite-darkmenu-btn-left.png') top left no-repeat;
+	display: inline-block;
+	height: 32px;
+	overflow: hidden;
+	font-weight: 400;
+}
+.VFMenu a span {
+	font-weight: bold;
+	line-height: 2.5;
+	padding: 0 10px 0 5px;
+	background: url('../../../applications/vfcom/design/images/sprite-darkmenu-btn-right.png') top right no-repeat;
+	display: block;
+	height: 32px;
+	font-size: 12px;
+	text-shadow: 0 1px 1px #fff;
+	color: #003f87;
+}
+.VFMenu i.Sprite {
+	padding-right: 2px;
+}
+.VFMenu a:hover {
+	background: url('../../../applications/vfcom/design/images/sprite-darkmenu-btn-left.png') center left no-repeat;
+}
+.VFMenu a:hover span {
+	background: url('../../../applications/vfcom/design/images/sprite-darkmenu-btn-right.png') center right no-repeat;
+}
+i.SpriteSignIn,
+i.SpriteFeatures,
+i.SpritePlans,
+i.SpriteHome,
+i.SpriteBlog,
+i.SpriteQuestion {
+	vertical-align: middle;
+	height: 15px;
+	width: 14px;
+	background-position: -19px 0px;
+}
+i.SpriteHome { background-position: -19px -19px; }
+i.SpritePlans { background-position: -19px -36px; }
+i.SpriteFeatures { background-position: -19px -58px; }
+i.SpriteBlog { background-position: -19px -152px; }
+i.SpriteQuestion {
+	position: absolute;
+	top: 6px;
+	right: 0;
+	background-position: 0 -189px;
+	font-size: 1px;
+	text-indent: -200px;
+	overflow: hidden;
+}
+div.Menu a:focus {
+	background: url('../../../applications/vfcom/design/images/sprite-darkmenu-btn-left.png') bottom left no-repeat;
+}
+div.Menu a:focus span {
+	background: url('../../../applications/vfcom/design/images/sprite-darkmenu-btn-right.png') bottom right no-repeat;
+	text-shadow: 0 1px 1px #003f87;
+	color: #cef1fc;
+}
+div.Wrapper {
+   text-align: center;
+}
+div.Center {
+   text-align: left;
+   width: 960px;
+   margin: 0 auto;
+}
+#Head div.Center {
+   text-align: right;
+}
+#Head div.Logo {
+	margin: 6px 0 0 0;
+   float: left;
+}
+#Head {
+   background: url('../../../applications/vfcom/design/images/bg-banner.png') top left repeat-x #014381;
+   border-bottom: 1px solid #001225;
+}
+#Head .Logo img {
+   padding: 10px 0 0;
+}
+.Foot {
+	background: transparent;
+	border: none;
+}
+.Foot a {
+	margin: 0 8px;
+   padding: 2px 4px;	
+}
+#Foot div {
+	text-align: center;
+}
+
+#DiscussionForm form {
+   padding: 6px 10px 20px;
+}
+#DiscussionForm .Tabs {
+   margin: 0 -10px;
+	background: none;
+}
