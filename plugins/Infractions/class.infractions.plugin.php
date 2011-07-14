@@ -807,13 +807,13 @@ Add the & banned flags - so that we can change the user icons appropriately. */
    public function UserModel_BeforeGetActiveUsers_Handler($Sender) {
       $Sender->SQL->Select('u.Email, u.Jailed, u.Banned, u.TempBanned');
    }
-   public function AddonCommentModel_BeforeGet_Handler($Sender) {
-		$this->_JoinInsertUser($Sender);
-   }
-   public function ConversationMessageModel_BeforeGet_Handler($Sender) {
-      $Sender->SQL->Select('c.InfractionID');
-		$this->_JoinInsertUser($Sender);
-   }
+//   public function AddonCommentModel_BeforeGet_Handler($Sender) {
+//		$this->_JoinInsertUser($Sender);
+//   }
+//   public function ConversationMessageModel_BeforeGet_Handler($Sender) {
+//      $Sender->SQL->Select('c.InfractionID');
+//		$this->_JoinInsertUser($Sender);
+//   }
    public function ActivityModel_BeforeGet_Handler($Sender) {
 		$this->_JoinActivityUser($Sender);
 		$this->_JoinRegardingUser($Sender);
@@ -825,29 +825,29 @@ Add the & banned flags - so that we can change the user icons appropriately. */
    public function ActivityModel_BeforeGetComments_Handler($Sender) {
 		$this->_JoinActivityUser($Sender);
    }
-	public function DiscussionModel_BeforeGetID_Handler($Sender) {
-		$this->_JoinInsertUser($Sender);
-	}
+//	public function DiscussionModel_BeforeGetID_Handler($Sender) {
+//		$this->_JoinInsertUser($Sender);
+//	}
 	
-   public function CommentModel_BeforeGet_Handler($Sender) {
-		$this->_JoinInsertUser($Sender);
-   }
+//   public function CommentModel_BeforeGet_Handler($Sender) {
+//		$this->_JoinInsertUser($Sender);
+//   }
 
-   public function CommentModel_BeforeGetNew_Handler($Sender) {
-		$this->_JoinInsertUser($Sender);
-   }
+//   public function CommentModel_BeforeGetNew_Handler($Sender) {
+//		$this->_JoinInsertUser($Sender);
+//   }
 	
-	public function CommentModel_BeforeGetIDData_Handler($Sender) {
-		$this->_JoinInsertUser($Sender);
-	}
+//	public function CommentModel_BeforeGetIDData_Handler($Sender) {
+//		$this->_JoinInsertUser($Sender);
+//	}
 	
-	private function _JoinInsertUser($Sender) {
-      $Sender->SQL->Select('iu.Email', '', 'InsertEmail')
-			->Select('iu.Jailed', '', 'InsertJailed')
-			->Select('iu.Banned', '', 'InsertBanned')
-			->Select('iu.TempBanned', '', 'InsertTempBanned');
-		
-	}
+//	private function _JoinInsertUser($Sender) {
+//      $Sender->SQL->Select('iu.Email', '', 'InsertEmail')
+//			->Select('iu.Jailed', '', 'InsertJailed')
+//			->Select('iu.Banned', '', 'InsertBanned')
+//			->Select('iu.TempBanned', '', 'InsertTempBanned');
+//		
+//	}
 	private function _JoinActivityUser($Sender) {
       $Sender->SQL
          ->Select('au.Email', '', 'ActivityEmail')
