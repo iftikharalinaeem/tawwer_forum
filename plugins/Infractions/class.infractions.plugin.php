@@ -797,13 +797,13 @@ Add the & banned flags - so that we can change the user icons appropriately. */
 			->Select('lmu.TempBanned', '', 'LastMessageTempBanned')
 			->Select('lmu.TempBanned', '', 'LastMessageTempBanned');
    }
-	public function DiscussionModel_AfterDiscussionSummaryQuery_Handler($Sender) {
-		$this->_JoinInsertUser($Sender);
-		$Sender->SQL->Select('lcu.Email', '', 'LastEmail')
-			->Select('lcu.Jailed', '', 'LastJailed')
-			->Select('lcu.Banned', '', 'LastBanned')
-			->Select('lcu.TempBanned', '', 'LastTempBanned');
-	}
+//	public function DiscussionModel_AfterDiscussionSummaryQuery_Handler($Sender) {
+//		$this->_JoinInsertUser($Sender);
+//		$Sender->SQL->Select('lcu.Email', '', 'LastEmail')
+//			->Select('lcu.Jailed', '', 'LastJailed')
+//			->Select('lcu.Banned', '', 'LastBanned')
+//			->Select('lcu.TempBanned', '', 'LastTempBanned');
+//	}
    public function UserModel_BeforeGetActiveUsers_Handler($Sender) {
       $Sender->SQL->Select('u.Email, u.Jailed, u.Banned, u.TempBanned');
    }
@@ -900,7 +900,7 @@ if (!function_exists('UserBuilder')) {
 }
 if (!function_exists('UserPhoto')) {
    function UserPhoto($User, $Options = array()) {
-		$User = (object)$User;
+		$User = (object)Gdn::UserModel()->GetID(GetValue('UserID', $User));
       if (is_string($Options))
          $Options = array('LinkClass' => $Options);
       
