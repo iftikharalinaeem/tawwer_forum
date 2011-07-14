@@ -123,3 +123,7 @@ div.Center {
    margin: 0 -10px;
 	background: none;
 }
+div.DismissMessage.Info {
+	border: 1px solid #ddd;
+	color: #555;
+}
