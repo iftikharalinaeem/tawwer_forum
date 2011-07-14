@@ -389,8 +389,17 @@ searchd {
       $this->EventArguments['SphinxClient'] = $Sphinx;
       $this->FireEvent('BeforeSphinxSearch');
 
+      $Cats = DiscussionModel::CategoryPermissions();
+//      $Cats = CategoryModel::CategoryWatch();
+//      print_r($Cats);
+      if ($Cats !== TRUE);
+         $Sphinx->setFilter('CategoryID', $Cats);
       $Search = $Sphinx->query($Search, implode(' ', $Indexes));
+//      var_dump($Sphinx);
+//      var_dump($Search);
+//      die();
       $Result = $this->GetDocuments($Search);
+      
 
       if (!is_array($Result))
          $Result = array();
