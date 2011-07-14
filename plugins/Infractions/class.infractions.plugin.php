@@ -100,6 +100,28 @@ class InfractionsPlugin extends Gdn_Plugin {
 			Gdn::SQL()->Update('Infraction', array('Reversed' => '1'), array('InfractionID' => $InfractionID))->Put();
 			// Update the user's infraction cache
 			InfractionsPlugin::SetInfractionCache($Infraction->UserID);
+			
+			// Remove any denotation of the infraction on the affected item
+			$Table = 'Discussion';
+			$Column = 'DiscussionID';
+			$UniqueID = $Infraction->DiscussionID;
+			if ($Infraction->ActivityID > 0) {
+				$Table = 'Activity';
+				$Column = 'ActivityID';
+				$UniqueID = $Infraction->ActivityID;
+			} else if ($Infraction->CommentID > 0) {
+				$Table = 'Comment';
+				$Column = 'CommentID';
+				$UniqueID = $Infraction->CommentID;
+			}
+			if (is_numeric($UniqueID) && $UniqueID > 0) {
+				$Data = Gdn::SQL()->Select('Attributes')->From($Table)->Where($Column, $UniqueID)->Get()->FirstRow();
+				if (is_object($Data)) {
+					$Attributes = Gdn_Format::Unserialize($Data->Attributes);
+					unset($Attributes['Infraction']);
+					Gdn::SQL()->Update($Table)->Set('Attributes', Gdn_Format::Serialize($Attributes))->Where($Column, $UniqueID)->Put();
+				}
+			}
 		}
 		Redirect('/profile/infractions/'.$Infraction->UserID.'/unfracted');
 	}
@@ -396,9 +418,9 @@ class InfractionsPlugin extends Gdn_Plugin {
             ->Select('i.*, c.ConversationID')
             ->From('Infraction i')
             ->Join('Conversation c', 'i.InfractionID = c.InfractionID', 'left')
-            ->Where('UserID', $UserID)
-            ->Where('Reversed', '0')
-            ->OrderBy('DateExpires', 'desc')
+            ->Where('i.UserID', $UserID)
+            ->Where('i.Reversed', '0')
+            ->OrderBy('i.DateExpires', 'desc')
             ->Get();
 
          $InfractionCache = array();
@@ -409,7 +431,8 @@ class InfractionsPlugin extends Gdn_Plugin {
          $InfractionCache['Banned'] = FALSE;
          $InfractionCache['Jailed'] = FALSE;
          foreach ($Data->Result() as $Row) {
-            $InfractionCache['Count']++;
+				$InfractionCache['Count']++;
+					
             if (($Row->DateExpires == NULL || Gdn_Format::ToTimestamp($Row->DateExpires) > time()) && $Row->Warning == '0') {
                $InfractionCache['Points'] += $Row->Points;
                $InfractionCache['DateExpires'] = $Row->DateExpires;
