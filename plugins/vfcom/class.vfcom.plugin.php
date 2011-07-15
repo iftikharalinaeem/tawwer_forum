@@ -138,7 +138,9 @@ class VfcomPlugin extends Gdn_Plugin {
          
          if (Gdn::Request()->GetValue("Plugin_vfcom_ReloadConfig", FALSE) !== FALSE) {
             $ConfigFileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, PATH_LOCAL_CONF.'/config.php');
-            Gdn::Cache()->Get($ConfigFileKey);
+            Gdn::Cache()->Remove($ConfigFileKey, array(
+                Gdn_Cache::FEATURE_NOPREFIX => TRUE
+            ));
             $Sender->InformMessage("The client config has been reloaded.");
          }
          
