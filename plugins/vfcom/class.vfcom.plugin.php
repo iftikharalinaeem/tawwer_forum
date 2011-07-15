@@ -136,6 +136,12 @@ class VfcomPlugin extends Gdn_Plugin {
             $Sender->InformMessage("The cache revision has been incremented.");
          }
          
+         if (Gdn::Request()->GetValue("Plugin_vfcom_ReloadConfig", FALSE) !== FALSE) {
+            $ConfigFileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, PATH_LOCAL_CONF.'/config.php');
+            Gdn::Cache()->Get($ConfigFileKey);
+            $Sender->InformMessage("The client config has been reloaded.");
+         }
+         
          if (Gdn::Request()->GetValue("Plugin_vfcom_ToggleCaching", FALSE) !== FALSE) {
             $NewCachingMode = !Gdn::Cache()->ActiveEnabled();
             SaveToConfig('Garden.Cache.Enabled',$NewCachingMode);
