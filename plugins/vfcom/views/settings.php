@@ -61,6 +61,7 @@
    </div>
    <?php
       echo $this->Form->Button("Increment cache revision", array('Name' => 'Plugin_vfcom_IncrementCacheRevision'));
+      echo $this->Form->Button("Reload client config", array('Name' => 'Plugin_vfcom_ReloadConfig'));
    ?>
    
    <h3><?php echo T("Client Settings"); ?></h3>
