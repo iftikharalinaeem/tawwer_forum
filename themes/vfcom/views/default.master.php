@@ -11,14 +11,16 @@
          <a href="/"><i class="Sprite SpriteLogo"><span>Vanilla Forums</span></i></a>
       </div>
       <div class="VFMenu">
-			<div class="Home"><?php echo Anchor(Wrap('<i class="Sprite SpriteHome"></i> Home'), '/', '', array('SSL' => FALSE)); ?></div>
-			<div class="Plans"><?php echo Anchor(Wrap('<i class="Sprite SpritePlans"></i> Plans &amp; Pricing'), '/plans', '', array('SSL' => FALSE)); ?></div>
-			<div class="Features"><?php echo Anchor(Wrap('<i class="Sprite SpriteFeatures"></i> Features'), '/features', '', array('SSL' => FALSE)); ?></div>
-			<div class="Blog"><?php echo Anchor(Wrap('<i class="Sprite SpriteBlog"></i> Blog'), '/blog', '', array('SSL' => FALSE)); ?></div>
-			<div class="SignIn"><?php echo Anchor(Wrap('<i class="Sprite SpriteSignIn"></i> Sign In'), '/entry/signin', '', array('SSL' => TRUE)); ?></div>
+			<div class="Home"><?php echo Anchor('<i class="Sprite SpriteHome"></i> Home', '/', '', array('SSL' => FALSE)); ?></div>
+			<div class="Plans"><?php echo Anchor('<i class="Sprite SpritePlans"></i> Plans &amp; Pricing', '/plans', '', array('SSL' => FALSE)); ?></div>
+			<div class="Features"><?php echo Anchor('<i class="Sprite SpriteFeatures"></i> Features', '/features', '', array('SSL' => FALSE)); ?></div>
+			<div class="Blog"><?php echo Anchor('<i class="Sprite SpriteBlog"></i> Blog', '/blog', '', array('SSL' => FALSE)); ?></div>
+			<div class="SignIn"><?php echo Anchor('<i class="Sprite SpriteSignIn"></i> Sign In', '/entry/signin', '', array('SSL' => TRUE)); ?></div>
       </div>
-   </div>
+	</div>
+	<div class="Divider"></div>
 </div>
+
    <div id="Frame">
       <div id="Body">
          <div id="Content"><?php $this->RenderAsset('Content'); ?></div>

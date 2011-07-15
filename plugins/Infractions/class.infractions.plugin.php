@@ -919,24 +919,27 @@ if (!function_exists('UserPhoto')) {
          } else {
             $PhotoUrl = $Photo;
          }
-			
-			$Jailed = GetValue('Jailed', $User) == '1';
-			$TempBanned = GetValue('TempBanned', $User) == '1';
-			$Banned = GetValue('Banned', $User) == '1';
-			if ($Banned || $TempBanned) {
-				$PhotoUrl = 'themes/pennyarcade/design/images/banned-80.png';
-				$Jailed = '';
-			} else if ($Jailed)
-				$Jailed = Img('themes/pennyarcade/design/images/jailed-80.png', array('alt' => 'Jailed', 'class' => 'JailedIcon'));
-			else
-				$Jailed = '';
-         
-         return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$LinkClass.'>'
-            .$Jailed
-				.Img($PhotoUrl, array('alt' => urlencode($User->Name), 'class' => $ImgClass))
-            .'</a>';
+      } elseif (function_exists('UserPhotoDefaultUrl')) {
+         $PhotoUrl = UserPhotoDefaultUrl($User);
+         return '';
       } else {
          return '';
       }
+      $Jailed = GetValue('Jailed', $User) == '1';
+      $TempBanned = GetValue('TempBanned', $User) == '1';
+      $Banned = GetValue('Banned', $User) == '1';
+      if ($Banned || $TempBanned) {
+         $PhotoUrl = 'themes/pennyarcade/design/images/banned-80.png';
+         $Jailed = '';
+      } else if ($Jailed)
+         $Jailed = Img('themes/pennyarcade/design/images/jailed-80.png', array('alt' => 'Jailed', 'class' => 'JailedIcon'));
+      else
+         $Jailed = '';
+      
+      
+      return '<a title="'.htmlspecialchars($User->Name).'" href="'.Url('/profile/'.$User->UserID.'/'.rawurlencode($User->Name)).'"'.$LinkClass.'>'
+            .$Jailed
+				.Img($PhotoUrl, array('alt' => urlencode($User->Name), 'class' => $ImgClass))
+            .'</a>';
    }
 }

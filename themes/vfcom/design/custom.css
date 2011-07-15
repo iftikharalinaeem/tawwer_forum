@@ -23,39 +23,40 @@ i.SpriteLogo {
     padding-left: 3px;
 }
 .VFMenu a {
-	padding: 0 0 0 3px;
-	background: url('../../../applications/vfcom/design/images/sprite-darkmenu-btn-left.png') top left no-repeat;
+	background: url('sprite-menu.png') 0 0 repeat-x;
 	display: inline-block;
-	height: 32px;
 	overflow: hidden;
-	font-weight: 400;
-}
-.VFMenu a span {
 	font-weight: bold;
 	line-height: 2.5;
 	padding: 0 10px 0 5px;
-	background: url('../../../applications/vfcom/design/images/sprite-darkmenu-btn-right.png') top right no-repeat;
-	display: block;
-	height: 32px;
+	height: 30px;
 	font-size: 12px;
 	text-shadow: 0 1px 1px #fff;
 	color: #003f87;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border: 1px solid #003168;
 }
 .VFMenu i.Sprite {
 	padding-right: 2px;
 }
 .VFMenu a:hover {
-	background: url('../../../applications/vfcom/design/images/sprite-darkmenu-btn-left.png') center left no-repeat;
+	background: url('sprite-menu.png') 0 -40px repeat-x;
 }
-.VFMenu a:hover span {
-	background: url('../../../applications/vfcom/design/images/sprite-darkmenu-btn-right.png') center right no-repeat;
+.VFMenu a:focus {
+	border: 1px solid #002f61;
+	border-top: 1px solid #001b39;
+	border-bottom: 1px solid #82a6c5;
+	background: url('sprite-menu.png') 0 -80px repeat-x;
+	text-shadow: 0 1px 1px #003f87;
+	color: #cef1fc;
 }
-i.SpriteSignIn,
-i.SpriteFeatures,
-i.SpritePlans,
 i.SpriteHome,
+i.SpritePlans,
+i.SpriteFeatures,
 i.SpriteBlog,
-i.SpriteQuestion {
+i.SpriteSignIn {
 	vertical-align: middle;
 	height: 15px;
 	width: 14px;
@@ -65,23 +66,13 @@ i.SpriteHome { background-position: -19px -19px; }
 i.SpritePlans { background-position: -19px -36px; }
 i.SpriteFeatures { background-position: -19px -58px; }
 i.SpriteBlog { background-position: -19px -152px; }
-i.SpriteQuestion {
-	position: absolute;
-	top: 6px;
-	right: 0;
-	background-position: 0 -189px;
-	font-size: 1px;
-	text-indent: -200px;
-	overflow: hidden;
-}
-div.Menu a:focus {
-	background: url('../../../applications/vfcom/design/images/sprite-darkmenu-btn-left.png') bottom left no-repeat;
-}
-div.Menu a:focus span {
-	background: url('../../../applications/vfcom/design/images/sprite-darkmenu-btn-right.png') bottom right no-repeat;
-	text-shadow: 0 1px 1px #003f87;
-	color: #cef1fc;
-}
+.VFMenu a:focus i.SpriteHome { background-position: 0 -19px; }
+.VFMenu a:focus i.SpritePlans { background-position: 0 -36px; }
+.VFMenu a:focus i.SpriteFeatures { background-position: 0 -58px; }
+.VFMenu a:focus i.SpriteBlog { background-position: 0 -152px; }
+.VFMenu a:focus i.SpriteSignIn { background-position: 0 0; }
+
+
 div.Wrapper {
    text-align: center;
 }
@@ -99,10 +90,16 @@ div.Center {
 }
 #Head {
    background: url('../../../applications/vfcom/design/images/bg-banner.png') top left repeat-x #014381;
-   border-bottom: 1px solid #001225;
+	border-bottom: 1px solid #b9dde8;
 }
 #Head .Logo img {
    padding: 10px 0 0;
+}
+.Divider {
+	height: 1px;
+	border-top: 2px solid #27b1d9;
+	background: #66deff;
+	border-bottom: 1px solid #7b939a;
 }
 .Foot {
 	background: transparent;
@@ -123,7 +120,62 @@ div.Center {
    margin: 0 -10px;
 	background: none;
 }
+a.ApplyButton {
+	display: none;
+}
+
+
+/* Messages */
+div.DismissMessage a.Dismiss,
+div.DismissMessage a.Dismiss:hover {
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   color: #777;
+   display: block;
+   height:14px;
+   margin:0;
+   padding:1px 3px 2px 4px;
+   width:auto;
+   font-family:arial;
+   font-size:16px;
+   font-weight:bold;
+   right: -1px;
+   top: -1px;
+}
+div.DismissMessage strong {
+	font-weight: bold;
+}
+div.DismissMessage a.Dismiss:hover {
+   text-decoration: none;
+   border: none;
+   background: #333;
+   color: #fff;
+}
+div.DismissMessage {
+   color: #000;
+   border: none;
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   margin: 0 0 10px;
+   padding: 10px;
+}
+div.DismissMessage:first-child {
+   margin-top: 10px;
+}
 div.DismissMessage.Info {
-	border: 1px solid #ddd;
-	color: #555;
+   background: #f3f4f8;
+   border: 1px solid #ddd;
+}
+div.DismissMessage.Warning {
+   background: #ffebe9;
+   border: 1px solid #FFCCC9;
+}
+div.DismissMessage.Box {
+   background: #fff8ce;
+   border: 1px solid #c5bea4;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
 }
