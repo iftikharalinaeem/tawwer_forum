@@ -25,30 +25,42 @@ class InfractionsPlugin extends Gdn_Plugin {
 
    /**
     * Create 'Infraction' link for comments in a discussion.
+    * 
+    * Clickable for those who can give infractions, otherwise just a UI marker
+    * for regular users.
     */
    public function DiscussionController_CommentOptions_Handler($Sender) {
       // Only allow admins to assign infractions
-      if (!Gdn::Session()->CheckPermission('Garden.Infractions.Manage')) return;
-      
+      $CanInfract = Gdn::Session()->CheckPermission('Garden.Infractions.Manage');
       $Context = $Sender->EventArguments['Type'];
-      $Url = "profile/assigninfraction/";
-      $Url .= (is_object($Sender->EventArguments['Author']) ? $Sender->EventArguments['Author']->UserID : 0).'/';
-      $Url .= $Sender->DiscussionID.'/';
-      if ($Context == 'Comment')
-         $Url .= $Sender->EventArguments['Comment']->CommentID.'/';
-			
-		$Text = T('Infraction');
-		$Style = '';
+      $Text = FALSE;
+      
 		// If an infraction has been assigned, highlight it in the infraction anchor
       $Object = GetValue($Context, $Sender->EventArguments);
 		$Attributes = unserialize(GetValue('Attributes', $Object));
 		$Infracted = GetValue('Infraction', $Attributes);
 		if ($Infracted) {
 			$Text = T('INFRACTED');
-			$Style = array('style' => 'background: #f44; color: #fff; padding: 0 4px;');
+			$Style = array('style' => 'background: #f44; color: #fff; padding: 3px 4px 1px 4px; margin: 0px 4px; border-radius: 2px; -moz-border-radius: 2px;');
 		}
+      
+      if ($CanInfract) {
+         $Url = "profile/assigninfraction/";
+         $Url .= (is_object($Sender->EventArguments['Author']) ? $Sender->EventArguments['Author']->UserID : 0).'/';
+         $Url .= $Sender->DiscussionID.'/';
+         if ($Context == 'Comment')
+            $Url .= $Sender->EventArguments['Comment']->CommentID.'/';
 
-      $Sender->Options .= '<span>'.Anchor($Text, $Url, 'Infraction Popup', $Style) . '</span>';
+         if (!$Infracted) {
+            $Text = T('Infraction');
+            $Style = '';
+         }
+         
+         $Text = Anchor($Text, $Url, 'Infraction Popup', array('style' => 'color: white;'));
+      }
+
+      if ($Text !== FALSE)
+         $Sender->Options .= Wrap($Text, 'span', $Style);
    }
 	
 	/**

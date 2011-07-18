@@ -121,8 +121,12 @@ if (is_object($InfractionData)) {
                      if ($Infraction->Reversed)
                         echo 'Reversed';
                      else {
+                        $ExpiryDateTime = strtotime($Infraction->DateExpires);
+                        
                         if ($Infraction->DateExpires == NULL || $Infraction->DateExpires == '0000-00-00 00:00:00')
                            echo 'Never Expires';
+                        else if ($ExpiryDateTime < time())
+                           echo 'Expired '.Gdn_Format::Date($Infraction->DateExpires);
                         else
                            echo 'Expires '.Gdn_Format::Date($Infraction->DateExpires);
                      }
