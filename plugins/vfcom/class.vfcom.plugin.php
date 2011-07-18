@@ -29,6 +29,7 @@ class VfcomPlugin extends Gdn_Plugin {
    
    protected $VfcomClient;
    protected $StaticURL;
+   protected $AutoStaticURL;
    protected $WhitelistDomain = 'vanillaforums.com';
    
    public function __construct() {
@@ -42,6 +43,9 @@ class VfcomPlugin extends Gdn_Plugin {
       // Targetting URL to the static content server / CDN
       $StaticFormat = C('VanillaForums.StaticFormat', 'http://%s.static.%s');
       $this->StaticURL = sprintf($StaticFormat, $this->VfcomClient, $this->VfcomHostname);
+      
+      $AutoStaticFormat = C('VanillaForums.AutoStaticFormat', 'http://%s.autostatic.%s');
+      $this->AutoStaticURL = sprintf($AutoStaticFormat, $this->VfcomClient, $this->VfcomHostname);
       
       if (defined('PROFILER') && PROFILER) {
          global $XHPROF_ROOT, $XHPROF_SERVER_NAME;
@@ -61,6 +65,10 @@ class VfcomPlugin extends Gdn_Plugin {
             'Hostname'     => $this->VfcomHostname
          ));
       }
+   }
+   
+   public function MakeAutoStatic($URL) {
+      return CombinePaths(array($this->AutoStaticURL, $URL));
    }
 
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
