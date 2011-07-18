@@ -622,12 +622,12 @@ class InfractionsPlugin extends Gdn_Plugin {
          if ($Infraction) {
             $InfractionUserID = GetValue('UserID', $Infraction);
             echo '<div style="border: 1px solid #f00; background: #fdd; padding: 8px; margin: 15px 0px;">
-               <h4>Infraction</h4>
-               <div><strong>';
+               <h4>Infraction</h4>';
                $ProfileInfraction = FALSE;
                
                // Show admin note for admins that arent the target user
                if (Gdn::Session()->CheckPermission('Garden.Infractions.Manage') && Gdn::Session()->UserID != $InfractionUserID) {
+                  echo '<div><strong>';
                   if ($Infraction->CommentID > 0)
                      echo 'Comment Infraction:';
                   else if ($Infraction->DiscussionID > 0)
