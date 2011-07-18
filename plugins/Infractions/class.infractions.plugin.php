@@ -618,22 +618,29 @@ class InfractionsPlugin extends Gdn_Plugin {
             ->Where('i.InfractionID', $InfractionID)
             ->Get()
             ->FirstRow();
+         
          if ($Infraction) {
+            $InfractionUserID = GetValue('UserID', $Infraction);
             echo '<div style="border: 1px solid #f00; background: #fdd; padding: 8px; margin: 15px 0px;">
                <h4>Infraction</h4>
                <div><strong>';
                $ProfileInfraction = FALSE;
-               if ($Infraction->CommentID > 0)
-                  echo 'Comment Infraction:';
-               else if ($Infraction->DiscussionID > 0)
-                  echo 'Discussion Infraction:';
-               else if ($Infraction->ActivityID > 0)
-                  echo 'Activity Infraction:';
-               else {
-                  $ProfileInfraction = TRUE;
-                  echo 'Profile Infraction:';
+               
+               // Show admin note for admins that arent the target user
+               if (Gdn::Session()->CheckPermission('Garden.Infractions.Manage') && Gdn::Session()->UserID != $InfractionUserID) {
+                  if ($Infraction->CommentID > 0)
+                     echo 'Comment Infraction:';
+                  else if ($Infraction->DiscussionID > 0)
+                     echo 'Discussion Infraction:';
+                  else if ($Infraction->ActivityID > 0)
+                     echo 'Activity Infraction:';
+                  else {
+                     $ProfileInfraction = TRUE;
+                     echo 'Profile Infraction:';
+                  }
+                  echo '</strong> '.$Infraction->Note.'</div>';
                }
-               echo '</strong> '.$Infraction->Note.'</div>';
+               
                if (!$ProfileInfraction) {
                   echo '<div><strong>Offending Content:</strong> ';
                   echo Gdn_Format::Auto($Infraction->DiscussionBody);
