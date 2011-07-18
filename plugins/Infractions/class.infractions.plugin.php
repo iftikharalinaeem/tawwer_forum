@@ -164,13 +164,8 @@ class InfractionsPlugin extends Gdn_Plugin {
       ));
       
       // Get the user's name for display purposes
-      $Sender->Data['Username'] = $SQL
-         ->Select('Name')
-         ->From('User')
-         ->Where('UserID', $UserID)
-         ->Get()
-         ->FirstRow()
-         ->Name;
+      $User = Gdn::UserModel()->GetID('UserID', DATASET_TYPE_ARRAY);
+      $Sender->Data['Username'] = GetValue('Name', $User);
       
       if (!$Sender->Form->AuthenticatedPostBack()) {
          $Sender->Form->SetValue('Plugin.Infraction.Reason', 'Minor Offense');
@@ -272,6 +267,7 @@ class InfractionsPlugin extends Gdn_Plugin {
                   $Column = 'ActivityID';
                   $UniqueID = $ActivityID;
 						$InfractionDiscussionName = 'Activity: '.$InfractionDiscussionName;
+                  $InfractionURL = "/activity/item/{$ActivityID}";
                } else if ($CommentID > 0) {
                   $Table = 'Comment';
                   $Column = 'CommentID';
@@ -286,6 +282,8 @@ class InfractionsPlugin extends Gdn_Plugin {
 							->FirstRow();
 						if ($CategoryData)
 							$InfractionDiscussionName = $CategoryData->Name.': '.$InfractionDiscussionName;
+                  
+                  $InfractionURL = "/discussion/comment/{$CommentID}/#Comment_{$CommentID}";
 					} else if ($DiscussionID > 0) {
 						$CategoryData = $SQL
 							->Select('ca.Name')
@@ -296,13 +294,23 @@ class InfractionsPlugin extends Gdn_Plugin {
 							->FirstRow();
 						if ($CategoryData)
 							$InfractionDiscussionName = $CategoryData->Name.': '.$InfractionDiscussionName;
+                  
+                  $InfractionURL = "/discussion/{$DiscussionID}";
 					} else {
 						$InfractionDiscussionName = 'Profile: '.$InfractionDiscussionName;
 					}
+               
                $Data = $SQL->Select('Attributes')->From($Table)->Where($Column, $UniqueID)->Get()->FirstRow();
                if (is_object($Data)) {
                   $Attributes = Gdn_Format::Unserialize($Data->Attributes);
+                  // Record that this item was infracted
                   $Attributes['Infraction'] = TRUE;
+                  
+                  // Record number of points
+                  if (!array_key_exists('InfractionPoints', $Attributes))
+                     $Attributes['InfractionPoints'] = 0;
+                  $Attributes['InfractionPoints'] += $Points;
+                  
                   $SQL->Update($Table)->Set('Attributes', Gdn_Format::Serialize($Attributes))->Where($Column, $UniqueID)->Put();
                }
 
@@ -588,61 +596,64 @@ class InfractionsPlugin extends Gdn_Plugin {
     */
    public function MessagesController_BeforeConversationMessageBody_Handler($Sender) {
       $Message = $Sender->EventArguments['Message'];
-      if ($Message->InfractionID > 0 && $Sender->ControllerName == 'messagescontroller' && $Sender->RequestMethod == 'Index') {
-         $FirstMessageDone = GetValue('FirstMessageDone', $Sender->EventArguments);
-         $Sender->EventArguments['FirstMessageDone'] = TRUE;
-         if (!$FirstMessageDone) {
-				$Infraction = Gdn::SQL()
-					->Select('i.*')
-					->Select('d.Body', '', 'DiscussionBody')
-					->Select('d.Name', '', 'DiscussionName')
-					->Select('c.Body', '', 'CommentBody')
-					->Select('a.Story', '', 'ActivityBody')
-					->From('Infraction i')
-					->Join('Comment c', 'i.CommentID = c.CommentID', 'left')
-					->Join('Activity a', 'i.ActivityID = a.ActivityID', 'left')
-					->Join('Discussion d', 'i.DiscussionID = d.DiscussionID', 'left')
-					->Where('i.InfractionID', $Message->InfractionID)
-					->Get()
-					->FirstRow();
-				if ($Infraction) {
-					echo '<div style="border: 1px solid #f00; background: #fdd; padding: 8px; margin: 0 0 10px;">
-						<h4>Infraction</h4>
-						<div><strong>';
-						$ProfileInfraction = FALSE;
-						if ($Infraction->CommentID > 0)
-							echo 'Comment Infraction:';
-						else if ($Infraction->DiscussionID > 0)
-							echo 'Discussion Infraction:';
-						else if ($Infraction->ActivityID > 0)
-							echo 'Activity Infraction:';
-						else {
-							$ProfileInfraction = TRUE;
-							echo 'Profile Infraction:';
-						}
-						echo '</strong> '.$Infraction->Note.'</div>';
-						if (!$ProfileInfraction) {
-							echo '<div><strong>Offending Content:</strong> ';
-							echo htmlentities($Infraction->DiscussionBody);
-							echo htmlentities($Infraction->CommentBody);
-							echo htmlentities($Infraction->ActivityBody);
-							echo '</div>';
-							$Anchor = '';
-							if ($Infraction->CommentID > 0)
-								$Anchor = '/discussion/comment/'.$Infraction->CommentID.'/#Comment_'.$Infraction->CommentID;
-							else if ($Infraction->DiscussionID > 0)
-								$Anchor = '/discussion/'.$Infraction->DiscussionID.'/'.Gdn_Format::Url($Infraction->DiscussionName);
-							else if ($Infraction->ActivityID > 0)
-								$Anchor = '/activity/item/'.$Infraction->ActivityID;
-							
-							if ($Anchor != '') {
-								$Anchor = Url($Anchor, TRUE);
-								echo Wrap(T('Source:'), 'strong').' '.Anchor($Anchor, $Anchor);
-							}
-						}
-					echo '</div>';
-						
-				}
+      $Conversation = $Sender->Data('Conversation');
+      $FirstMessageID = GetValue('FirstMessageID', $Conversation);
+      $MessageID = GetValue('MessageID', $Message);
+      
+      // We only render extra information on the first message
+      if ($MessageID != $FirstMessageID) return;
+      
+      $InfractionID = GetValue('InfractionID', $Conversation);
+      if ($InfractionID > 0 && $Sender->ControllerName == 'messagescontroller' && $Sender->RequestMethod == 'Index') {
+         $Infraction = Gdn::SQL()
+            ->Select('i.*')
+            ->Select('d.Body', '', 'DiscussionBody')
+            ->Select('d.Name', '', 'DiscussionName')
+            ->Select('c.Body', '', 'CommentBody')
+            ->Select('a.Story', '', 'ActivityBody')
+            ->From('Infraction i')
+            ->Join('Comment c', 'i.CommentID = c.CommentID', 'left')
+            ->Join('Activity a', 'i.ActivityID = a.ActivityID', 'left')
+            ->Join('Discussion d', 'i.DiscussionID = d.DiscussionID', 'left')
+            ->Where('i.InfractionID', $InfractionID)
+            ->Get()
+            ->FirstRow();
+         if ($Infraction) {
+            echo '<div style="border: 1px solid #f00; background: #fdd; padding: 8px; margin: 0 0 10px;">
+               <h4>Infraction</h4>
+               <div><strong>';
+               $ProfileInfraction = FALSE;
+               if ($Infraction->CommentID > 0)
+                  echo 'Comment Infraction:';
+               else if ($Infraction->DiscussionID > 0)
+                  echo 'Discussion Infraction:';
+               else if ($Infraction->ActivityID > 0)
+                  echo 'Activity Infraction:';
+               else {
+                  $ProfileInfraction = TRUE;
+                  echo 'Profile Infraction:';
+               }
+               echo '</strong> '.$Infraction->Note.'</div>';
+               if (!$ProfileInfraction) {
+                  echo '<div><strong>Offending Content:</strong> ';
+                  echo htmlentities($Infraction->DiscussionBody);
+                  echo htmlentities($Infraction->CommentBody);
+                  echo htmlentities($Infraction->ActivityBody);
+                  echo '</div>';
+                  $Anchor = '';
+                  if ($Infraction->CommentID > 0)
+                     $Anchor = '/discussion/comment/'.$Infraction->CommentID.'/#Comment_'.$Infraction->CommentID;
+                  else if ($Infraction->DiscussionID > 0)
+                     $Anchor = '/discussion/'.$Infraction->DiscussionID.'/'.Gdn_Format::Url($Infraction->DiscussionName);
+                  else if ($Infraction->ActivityID > 0)
+                     $Anchor = '/activity/item/'.$Infraction->ActivityID;
+
+                  if ($Anchor != '') {
+                     $Anchor = Url($Anchor, TRUE);
+                     echo Wrap(T('Source:'), 'strong').' '.Anchor($Anchor, $Anchor);
+                  }
+               }
+            echo '</div>';
          }
       }
    }
