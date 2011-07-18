@@ -98,10 +98,14 @@ if (is_object($InfractionData)) {
                <?php
                echo '<div class="Title">';
                echo Gdn_Format::Text($Infraction->Reason);
-               if ($Infraction->Note)
-                  echo ': ', Gdn_Format::Text($Infraction->Note);
-               echo '</div>';
-
+               
+               // Don't show admin note to non admins or to the target user
+               if (Gdn::Session()->CheckPermission('Garden.Infractions.Manage') && Gdn::Session()->UserID != $Infraction->UserID) {
+                  if ($Infraction->Note)
+                     echo ': ', Gdn_Format::Text($Infraction->Note);
+                  echo '</div>';
+               }
+               
                echo '<div class="Message">';
                if ($Infraction->ActivityID > 0) {
                   echo Anchor(SliceString(Gdn_Format::Text($Infraction->ActivityBody), 100), '/activity/item/'.$Infraction->ActivityID);
