@@ -619,7 +619,7 @@ class InfractionsPlugin extends Gdn_Plugin {
             ->Get()
             ->FirstRow();
          if ($Infraction) {
-            echo '<div style="border: 1px solid #f00; background: #fdd; padding: 8px; margin: 0 0 10px;">
+            echo '<div style="border: 1px solid #f00; background: #fdd; padding: 8px; margin: 10px 0px;">
                <h4>Infraction</h4>
                <div><strong>';
                $ProfileInfraction = FALSE;
@@ -636,9 +636,9 @@ class InfractionsPlugin extends Gdn_Plugin {
                echo '</strong> '.$Infraction->Note.'</div>';
                if (!$ProfileInfraction) {
                   echo '<div><strong>Offending Content:</strong> ';
-                  echo htmlentities($Infraction->DiscussionBody);
-                  echo htmlentities($Infraction->CommentBody);
-                  echo htmlentities($Infraction->ActivityBody);
+                  echo Gdn_Format::Auto($Infraction->DiscussionBody);
+                  echo Gdn_Format::Auto($Infraction->CommentBody);
+                  echo Gdn_Format::Auto($Infraction->ActivityBody);
                   echo '</div>';
                   $Anchor = '';
                   if ($Infraction->CommentID > 0)
