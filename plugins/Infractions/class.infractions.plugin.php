@@ -34,6 +34,7 @@ class InfractionsPlugin extends Gdn_Plugin {
       $CanInfract = Gdn::Session()->CheckPermission('Garden.Infractions.Manage');
       $Context = $Sender->EventArguments['Type'];
       $Text = FALSE;
+      $Style = array();
       
 		// If an infraction has been assigned, highlight it in the infraction anchor
       $Object = GetValue($Context, $Sender->EventArguments);
