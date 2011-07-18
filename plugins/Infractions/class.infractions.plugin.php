@@ -53,10 +53,12 @@ class InfractionsPlugin extends Gdn_Plugin {
 
          if (!$Infracted) {
             $Text = T('Infraction');
-            $Style = '';
+            $LinkStyle = array();
+         } else {
+            $LinkStyle = array('style' => 'color: white;');
          }
          
-         $Text = Anchor($Text, $Url, 'Infraction Popup', array('style' => 'color: white;'));
+         $Text = Anchor($Text, $Url, 'Infraction Popup', $LinkStyle);
       }
 
       if ($Text !== FALSE)
