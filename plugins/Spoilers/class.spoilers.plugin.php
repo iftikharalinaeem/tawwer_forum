@@ -25,6 +25,11 @@ $PluginInfo['Spoilers'] = array(
 );
 
 class SpoilersPlugin extends Gdn_Plugin {
+   
+   public function __construct() {
+      // Whether to handle drawing quotes or leave it up to some other plugin
+      $this->RenderSpoilers = C('Plugins.Spoilers.RenderSpoilers',TRUE);
+   }
 
    public function DiscussionController_Render_Before(&$Sender) {
       $this->PrepareController($Sender);
@@ -35,6 +40,7 @@ class SpoilersPlugin extends Gdn_Plugin {
    }
    
    protected function PrepareController(&$Sender) {
+      //if (!$this->RenderSpoilers) return;
       $Sender->AddJsFile($this->GetResource('js/spoilers.js', FALSE, FALSE));
       $Sender->AddCssFile($this->GetResource('css/spoilers.css', FALSE, FALSE));
    }
@@ -48,11 +54,9 @@ class SpoilersPlugin extends Gdn_Plugin {
    }
    
    protected function RenderSpoilers(&$Sender) {
-      if (!C('Plugins.Spoilers.RenderSpoilers', TRUE))
-         return;
+      if (!$this->RenderSpoilers) return;
       
       $FormatBody = &$Sender->EventArguments['Object']->FormatBody;
-
       $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
       $FormatBody = str_ireplace('[/spoiler]','</div></div>',$FormatBody);
    }
