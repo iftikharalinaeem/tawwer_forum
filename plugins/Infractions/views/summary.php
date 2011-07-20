@@ -70,6 +70,10 @@ if (is_object($InfractionData)) {
          border-top: 1px dotted #555;
          border-bottom: 1px dotted #555;
       }
+      .Infraction-Reversed, .Infraction-Expired {
+         background: #efefef;
+         color: #444;
+      }
       </style>
       <ul class="Overview InfractionOverview">
          <?php
@@ -92,8 +96,14 @@ if (is_object($InfractionData)) {
       ?>
       </div>
       <ul class="DataList Infractions">
-      <?php foreach ($InfractionData->Result() as $Infraction) { ?>
-         <li class="Item">
+      <?php foreach ($InfractionData->Result() as $Infraction) { 
+         $ItemClass = 'Item';
+         if ($Infraction->Reversed)
+            $ItemClass = ConcatSep(' ', $ItemClass, 'Infraction-Reversed');
+         if ($Infraction->Expired)
+            $ItemClass = ConcatSep(' ', $ItemClass, 'Infraction-Expired');
+      ?>
+         <li class="<?php echo $ItemClass; ?>">
             <div class="ItemContent Infraction">
                <?php
                echo '<div class="Title">';

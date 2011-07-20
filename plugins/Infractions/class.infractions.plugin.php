@@ -380,8 +380,11 @@ class InfractionsPlugin extends Gdn_Plugin {
     * Adds 'Infractions' tab to profiles.
     */ 
    public function ProfileController_AddProfileTabs_Handler($Sender) {
-      if (is_object($Sender->User) && $Sender->User->UserID > 0)
-         $Sender->AddProfileTab(T('Infractions'), 'profile/infractions/'.$Sender->User->UserID.'/'.urlencode($Sender->User->Name));
+      if (is_object($Sender->User) && $Sender->User->UserID > 0) {
+         $Points = GetValueR('Attributes.InfractionCache.Points', $Sender->User, 0);
+         
+         $Sender->AddProfileTab(T('Infractions').'<span class="Count">'.$Points.'</span>', 'profile/infractions/'.$Sender->User->UserID.'/'.rawurlencode($Sender->User->Name));
+      }
    }
    
    /**
