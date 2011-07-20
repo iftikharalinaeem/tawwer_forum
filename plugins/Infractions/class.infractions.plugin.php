@@ -412,6 +412,29 @@ class InfractionsPlugin extends Gdn_Plugin {
       $Sender->Render('plugins/Infractions/views/aboutinfractions.php');
    }
    
+   public function UtilityController_UpdateInfractions_Create($Sender, $Args) {
+      $UserIDs = array();
+      
+      // Load all of the infractions that haven't been reversed.
+      $Data = Gdn::SQL()->GetWhere('Infraction', array('DateExpires <=' => Gdn_Format::ToDateTime(), 'Expired' => 0))->ResultArray();
+      foreach ($Data as $Row) {
+         Gdn::SQL()->Put('Infraction', array('Expired' => 1), array('InfractionID' => $Row['InfractionID']));
+         $UserIDs[$Row['UserID']] = TRUE;
+      }
+      
+      // Update the infraction cache on each user.
+      $UserIDs = array_keys($UserIDs);
+      foreach ($UserIDs as $UserID) {
+         self::SetInfractionCache($UserID);
+      }
+      
+      $Sender->SetData('Success', TRUE);
+
+      $Sender->MasterView = 'empty';
+      $Sender->CssClass = 'Home';
+      $Sender->Render('Update', 'Utility', 'Dashboard');
+   }
+   
    /**
     * Retrieve cached infractions from GDN_User.Attributes for the specified UserID.
     * If the cache is invalidated, it will be automatically reset here.
@@ -436,6 +459,9 @@ class InfractionsPlugin extends Gdn_Plugin {
     */
    public static function SetInfractionCache($UserID, $InfractionCache = FALSE) {
       if ($InfractionCache == FALSE) {
+         // Get the user.
+         $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+         
          // Load all active infractions.
          $Data = Gdn::SQL()
             ->Select('i.*, c.ConversationID')
@@ -451,8 +477,9 @@ class InfractionsPlugin extends Gdn_Plugin {
          $InfractionCache['Count'] = 0;
          $InfractionCache['Points'] = 0;
          $InfractionCache['DateExpires'] = '';
-         $InfractionCache['Banned'] = FALSE;
+         $InfractionCache['Banned'] = $User['Banned'];
          $InfractionCache['Jailed'] = FALSE;
+         
          foreach ($Data->Result() as $Row) {
 				$InfractionCache['Count']++;
 					
@@ -466,16 +493,30 @@ class InfractionsPlugin extends Gdn_Plugin {
          // Is the account banned or jailed?
          if ($InfractionCache['Points'] >= 8) {
             $InfractionCache['Banned'] = TRUE;
-				Gdn::SQL()->Update('User', array('Jailed' => '1', 'TempBanned' => '1', 'Banned' => '1'), array('UserID' => $UserID))->Put();
+				$UpdateFields = array('Jailed' => '1', 'TempBanned' => '0', 'Banned' => '1');
 			} else if ($InfractionCache['Points'] >= 6) {
-            $InfractionCache['TempBanned'] = TRUE;
-				Gdn::SQL()->Update('User', array('Jailed' => '1', 'TempBanned' => '1', 'Banned' => '0'), array('UserID' => $UserID))->Put();
+				$UpdateFields = array('Jailed' => '1', 'TempBanned' => '1', 'Banned' => '1');
+            
+            if (!$User['Banned'] || $User['TempBanned']) {
+               // This is only a temp ban if the user isn't already banned.
+               $InfractionCache['TempBanned'] = TRUE;
+               $UpdateFields['TempBanned'] = 1;
+            }
          } else if ($InfractionCache['Points'] >= 4) {
             $InfractionCache['Jailed'] = TRUE;
-				Gdn::SQL()->Update('User', array('Jailed' => '1', 'TempBanned' => '0', 'Banned' => '0'), array('UserID' => $UserID))->Put();
+				$UpdateFields = array('Jailed' => '1', 'TempBanned' => '0', 'Banned' => '0');
+            if ($User['Banned'] && !$User['TempBanned']) {
+               $User['Banned'] = '1';
+               $InfractionCache['Banned'] = TRUE;
+            }
          } else {
-				Gdn::SQL()->Update('User', array('Jailed' => '0', 'TempBanned' => '0', 'Banned' => '0'), array('UserID' => $UserID))->Put();
+				$UpdateFields = array('Jailed' => '0', 'TempBanned' => '0', 'Banned' => '0');
+            if ($User['Banned'] && !$User['TempBanned']) {
+               $User['Banned'] = '1';
+               $InfractionCache['Banned'] = TRUE;
+            }
 			}
+         Gdn::UserModel()->SetField($UserID, $UpdateFields);
       }
       
       Gdn::UserModel()->SaveAttribute($UserID, 'InfractionCache', $InfractionCache);
@@ -528,7 +569,6 @@ class InfractionsPlugin extends Gdn_Plugin {
 		if (
 			GetValue('InsertJailed', $Object) == '1'
 			|| GetValue('InsertBanned', $Object) == '1'
-			|| GetValue('InsertTempBanned', $Object) == '1'
 		) {
 			$Object->Format = 'Text';
 			$Sender->EventArguments['Object'] = $Object;
@@ -541,9 +581,8 @@ class InfractionsPlugin extends Gdn_Plugin {
 	public function ProfileController_Render_Before($Sender) {
 		if (is_object($Sender->User)) {
 			$Jailed = GetValue('Jailed', $Sender->User) == '1';
-			$TempBanned = GetValue('TempBanned', $Sender->User) == '1';
 			$Banned = GetValue('Banned', $Sender->User) == '1';
-			if ($Banned || $TempBanned)
+			if ($Banned)
 				$Sender->User->Photo = Asset('themes/pennyarcade/design/images/banned-180.png', TRUE);
 		}
 	}
@@ -746,13 +785,13 @@ class InfractionsPlugin extends Gdn_Plugin {
 	/**
 	 * If a user has been banned or tempbanned, sign them out.
 	 */
-	public function UserModel_AfterGetSession_Handler($Sender) {
-		$User = GetValue('User', $Sender->EventArguments);
-		if (is_object($User) && GetValue('TempBanned', $User) == '1') {
-			$User->Banned = '1';
-			$UserModel->EventArguments['User'] = $User;
-		}
-	}
+//	public function UserModel_AfterGetSession_Handler($Sender) {
+//		$User = GetValue('User', $Sender->EventArguments);
+//		if (is_object($User) && GetValue('TempBanned', $User) == '1') {
+//			$User->Banned = '1';
+//			$UserModel->EventArguments['User'] = $User;
+//		}
+//	}
 
    public function Setup() {
       $this->Structure();
@@ -777,8 +816,9 @@ class InfractionsPlugin extends Gdn_Plugin {
          ->Column('BanReason', 'text', TRUE)
          ->Column('Note', 'text', TRUE)
          ->Column('DateExpires', 'datetime', NULL)
-         ->Column('Reversed', 'tinyint', '0')
-         ->Column('Warning', 'tinyint', '0')
+         ->Column('Expired', 'tinyint(1)', '0')
+         ->Column('Reversed', 'tinyint(1)', '0')
+         ->Column('Warning', 'tinyint(1)', '0')
          ->Column('InsertUserID', 'int', FALSE)
          ->Column('DateInserted', 'datetime')
          ->Set(FALSE, FALSE);
@@ -798,8 +838,8 @@ class InfractionsPlugin extends Gdn_Plugin {
       // Allow a user to be "Jailed" when they reach a certain number of infractions.
       $Structure
          ->Table('User')
-         ->Column('Jailed', 'tinyint', '0')
-         ->Column('TempBanned', 'tinyint', '0')
+         ->Column('Jailed', 'tinyint(1)', '0')
+         ->Column('TempBanned', 'tinyint(1)', '0')
          ->Set(FALSE, FALSE);
          
 // BUG: "Jailed is required" on user forms.
@@ -824,12 +864,11 @@ Add the & banned flags - so that we can change the user icons appropriately. */
 	
    // Find all the places where UserBuilder is called, and make sure that there
    // is a related $UserPrefix.'Email' field pulled from the database.
-   public function ConversationModel_BeforeGet_Handler($Sender) {
-      $Sender->SQL->Select('lmu.Email', '', 'LastMessageEmail')
-			->Select('lmu.Jailed', '', 'LastMessageJailed')
-			->Select('lmu.TempBanned', '', 'LastMessageTempBanned')
-			->Select('lmu.TempBanned', '', 'LastMessageTempBanned');
-   }
+//   public function ConversationModel_BeforeGet_Handler($Sender) {
+//      $Sender->SQL->Select('lmu.Email', '', 'LastMessageEmail')
+//			->Select('lmu.Jailed', '', 'LastMessageJailed')
+//			->Select('lmu.TempBanned', '', 'LastMessageTempBanned');
+//   }
 //	public function DiscussionModel_AfterDiscussionSummaryQuery_Handler($Sender) {
 //		$this->_JoinInsertUser($Sender);
 //		$Sender->SQL->Select('lcu.Email', '', 'LastEmail')
@@ -837,9 +876,9 @@ Add the & banned flags - so that we can change the user icons appropriately. */
 //			->Select('lcu.Banned', '', 'LastBanned')
 //			->Select('lcu.TempBanned', '', 'LastTempBanned');
 //	}
-   public function UserModel_BeforeGetActiveUsers_Handler($Sender) {
-      $Sender->SQL->Select('u.Email, u.Jailed, u.Banned, u.TempBanned');
-   }
+//   public function UserModel_BeforeGetActiveUsers_Handler($Sender) {
+//      $Sender->SQL->Select('u.Email, u.Jailed, u.Banned, u.TempBanned');
+//   }
 //   public function AddonCommentModel_BeforeGet_Handler($Sender) {
 //		$this->_JoinInsertUser($Sender);
 //   }
@@ -881,56 +920,56 @@ Add the & banned flags - so that we can change the user icons appropriately. */
 //			->Select('iu.TempBanned', '', 'InsertTempBanned');
 //		
 //	}
-	private function _JoinActivityUser($Sender) {
-      $Sender->SQL
-         ->Select('au.Email', '', 'ActivityEmail')
-			->Select('au.Jailed', '', 'ActivityJailed')
-			->Select('au.Banned', '', 'ActivityBanned')
-			->Select('au.TempBanned', '', 'ActivityTempBanned');
-	}
-	private function _JoinRegardingUser($Sender) {
-      $Sender->SQL
-         ->Select('ru.Email', '', 'RegardingEmail')
-			->Select('ru.Jailed', '', 'RegardingJailed')
-			->Select('ru.Banned', '', 'RegardingBanned')
-			->Select('ru.TempBanned', '', 'RegardingTempBanned');
-	}
+//	private function _JoinActivityUser($Sender) {
+//      $Sender->SQL
+//         ->Select('au.Email', '', 'ActivityEmail')
+//			->Select('au.Jailed', '', 'ActivityJailed')
+//			->Select('au.Banned', '', 'ActivityBanned')
+//			->Select('au.TempBanned', '', 'ActivityTempBanned');
+//	}
+//	private function _JoinRegardingUser($Sender) {
+//      $Sender->SQL
+//         ->Select('ru.Email', '', 'RegardingEmail')
+//			->Select('ru.Jailed', '', 'RegardingJailed')
+//			->Select('ru.Banned', '', 'RegardingBanned')
+//			->Select('ru.TempBanned', '', 'RegardingTempBanned');
+//	}
 
 }
 
-if (!function_exists('UserBuilder')) {
-   /**
-    * Override the default UserBuilder function with one that switches the photo
-    * out with a gravatar url if the photo is empty.
-    */
-   function UserBuilder($Object, $UserPrefix = '') {
-		$Object = (object)$Object;
-      $User = new stdClass();
-      $UserID = $UserPrefix.'UserID';
-      $Name = $UserPrefix.'Name';
-      $Photo = $UserPrefix.'Photo';
-      $Email = $UserPrefix.'Email';
-		$Jailed = $UserPrefix.'Jailed';
-		$Banned = $UserPrefix.'Banned';
-		$TempBanned = $UserPrefix.'TempBanned';
-      $User->UserID = $Object->$UserID;
-      $User->Name = $Object->$Name;
-      $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
-      $Protocol =  (strlen(GetValue('HTTPS', $_SERVER, 'No')) != 'No' || GetValue('SERVER_PORT', $_SERVER) == 443) ? 'https://secure.' : 'http://www.';
-      $User->Email = GetValue($Email, $Object);
-      /*      if ($User->Photo == '' && property_exists($Object, $Email)) {
-         $User->Photo = $Protocol.'gravatar.com/avatar.php?'
-            .'gravatar_id='.md5(strtolower($Object->$Email))
-            .'&amp;default='.urlencode(Asset(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
-            .'&amp;size='.Gdn::Config('Garden.Thumbnail.Width', 40);
-      }
-*/
-		$User->Jailed = GetValue($Jailed, $Object);
-		$User->Banned = GetValue($Banned, $Object);
-		$User->TempBanned = GetValue($TempBanned, $Object);
-		return $User;
-   }
-}
+//if (!function_exists('UserBuilder')) {
+//   /**
+//    * Override the default UserBuilder function with one that switches the photo
+//    * out with a gravatar url if the photo is empty.
+//    */
+//   function UserBuilder($Object, $UserPrefix = '') {
+//		$Object = (object)$Object;
+//      $User = new stdClass();
+//      $UserID = $UserPrefix.'UserID';
+//      $Name = $UserPrefix.'Name';
+//      $Photo = $UserPrefix.'Photo';
+//      $Email = $UserPrefix.'Email';
+//		$Jailed = $UserPrefix.'Jailed';
+//		$Banned = $UserPrefix.'Banned';
+//		$TempBanned = $UserPrefix.'TempBanned';
+//      $User->UserID = $Object->$UserID;
+//      $User->Name = $Object->$Name;
+//      $User->Photo = property_exists($Object, $Photo) ? $Object->$Photo : '';
+//      $Protocol =  (strlen(GetValue('HTTPS', $_SERVER, 'No')) != 'No' || GetValue('SERVER_PORT', $_SERVER) == 443) ? 'https://secure.' : 'http://www.';
+//      $User->Email = GetValue($Email, $Object);
+//      /*      if ($User->Photo == '' && property_exists($Object, $Email)) {
+//         $User->Photo = $Protocol.'gravatar.com/avatar.php?'
+//            .'gravatar_id='.md5(strtolower($Object->$Email))
+//            .'&amp;default='.urlencode(Asset(Gdn::Config('Plugins.Gravatar.DefaultAvatar', 'plugins/Gravatar/default.gif'), TRUE))
+//            .'&amp;size='.Gdn::Config('Garden.Thumbnail.Width', 40);
+//      }
+//*/
+//		$User->Jailed = GetValue($Jailed, $Object);
+//		$User->Banned = GetValue($Banned, $Object);
+//		$User->TempBanned = GetValue($TempBanned, $Object);
+//		return $User;
+//   }
+//}
 if (!function_exists('UserPhoto')) {
    function UserPhoto($User, $Options = array()) {
 		$User = (object)Gdn::UserModel()->GetID(GetValue('UserID', $User));
@@ -959,9 +998,8 @@ if (!function_exists('UserPhoto')) {
          return '';
       }
       $Jailed = GetValue('Jailed', $User) == '1';
-      $TempBanned = GetValue('TempBanned', $User) == '1';
       $Banned = GetValue('Banned', $User) == '1';
-      if ($Banned || $TempBanned) {
+      if ($Banned) {
          $PhotoUrl = 'themes/pennyarcade/design/images/banned-80.png';
          $Jailed = '';
       } else if ($Jailed)

@@ -191,7 +191,7 @@
 ?>
 <div class="AutoBan">
    <h3>Automatic Ban</h3>
-   <p class="TempBan">Assigning this infraction will cause the user to be automatically banned for 2 weeks.</p>
+   <p class="TempBan">Assigning this infraction will cause the user to be temporarily banned.</p>
    <p class="PermaBan">Assigning this infraction will cause the user to be banned permanently.</p>
    <ul>
       <li>

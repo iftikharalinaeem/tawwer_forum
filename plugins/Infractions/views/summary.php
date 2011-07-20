@@ -88,7 +88,7 @@ if (is_object($InfractionData)) {
       else if ($Points >= 4)
          echo 'User is currently jailed for these infractions.';
       else
-         echo 'User has not yet incurred any punishment for these infractions';
+         echo 'User has not yet incurred any punishment for these infractions.';
       ?>
       </div>
       <ul class="DataList Infractions">
