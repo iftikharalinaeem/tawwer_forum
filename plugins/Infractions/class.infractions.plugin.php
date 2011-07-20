@@ -889,17 +889,17 @@ Add the & banned flags - so that we can change the user icons appropriately. */
 //      $Sender->SQL->Select('c.InfractionID');
 //		$this->_JoinInsertUser($Sender);
 //   }
-   public function ActivityModel_BeforeGet_Handler($Sender) {
-		$this->_JoinActivityUser($Sender);
-		$this->_JoinRegardingUser($Sender);
-   }
-	public function ActivityModel_BeforeGetNotifications_Handler($Sender) {
-		$this->_JoinActivityUser($Sender);
-		$this->_JoinRegardingUser($Sender);
-	}
-   public function ActivityModel_BeforeGetComments_Handler($Sender) {
-		$this->_JoinActivityUser($Sender);
-   }
+//   public function ActivityModel_BeforeGet_Handler($Sender) {
+//		$this->_JoinActivityUser($Sender);
+//		$this->_JoinRegardingUser($Sender);
+//   }
+//	public function ActivityModel_BeforeGetNotifications_Handler($Sender) {
+//		$this->_JoinActivityUser($Sender);
+//		$this->_JoinRegardingUser($Sender);
+//	}
+//   public function ActivityModel_BeforeGetComments_Handler($Sender) {
+//		$this->_JoinActivityUser($Sender);
+//   }
 //	public function DiscussionModel_BeforeGetID_Handler($Sender) {
 //		$this->_JoinInsertUser($Sender);
 //	}
