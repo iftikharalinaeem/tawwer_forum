@@ -101,28 +101,28 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 	</style>
 </li>
 <?php
-			// Write out user-defined custom fields
-			$CustomProfileFieldLabel = GetValue('CustomProfileFieldLabel', $Sender->Form->FormValues(), array());
-			$CustomProfileFieldValue = GetValue('CustomProfileFieldValue', $Sender->Form->FormValues(), array());
-			foreach ($ProfileFields as $Field => $Value) {
-				if (!in_array($Field, $SuggestedFields)) {
-					if ($IsPostBack) {
-						$Field = GetValue($CountFields, $CustomProfileFieldLabel, '');
-						$Value = GetValue($CountFields, $CustomProfileFieldValue, '');
-					}
-					$CountFields++;
-					echo '<li>';
-						echo $Sender->Form->TextBox('CustomProfileFieldLabel[]', array('value' => $Field, 'class' => 'CustomProfileFieldLabel'));
-						echo $Sender->Form->TextBox('CustomProfileFieldValue[]', array('value' => $Value, 'class' => 'CustomProfileFieldValue'));
-					echo '</li>';
-				}
-			}
-			// Write out one empty row
-			echo '<li>';
-				echo $Sender->Form->TextBox('CustomProfileFieldLabel[]', array('class' => 'CustomProfileFieldLabel'));
-				echo $Sender->Form->TextBox('CustomProfileFieldValue[]', array('class' => 'CustomProfileFieldValue'));
-			echo '</li>';
-		}
+            // Write out user-defined custom fields
+            $CustomProfileFieldLabel = GetValue('CustomProfileFieldLabel', $Sender->Form->FormValues(), array());
+            $CustomProfileFieldValue = GetValue('CustomProfileFieldValue', $Sender->Form->FormValues(), array());
+            foreach ($ProfileFields as $Field => $Value) {
+               if (!in_array($Field, $SuggestedFields)) {
+                  if ($IsPostBack) {
+                     $Field = GetValue($CountFields, $CustomProfileFieldLabel, '');
+                     $Value = GetValue($CountFields, $CustomProfileFieldValue, '');
+                  }
+                  $CountFields++;
+                  echo '<li>';
+                     echo $Sender->Form->TextBox('CustomProfileFieldLabel[]', array('value' => $Field, 'class' => 'CustomProfileFieldLabel'));
+                     echo $Sender->Form->TextBox('CustomProfileFieldValue[]', array('value' => $Value, 'class' => 'CustomProfileFieldValue'));
+                  echo '</li>';
+               }
+            }
+            // Write out one empty row
+            echo '<li>';
+               echo $Sender->Form->TextBox('CustomProfileFieldLabel[]', array('class' => 'CustomProfileFieldLabel'));
+               echo $Sender->Form->TextBox('CustomProfileFieldValue[]', array('class' => 'CustomProfileFieldValue'));
+            echo '</li>';
+         }
 	}
 	
 	/**
@@ -171,8 +171,12 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 	public function UserInfoModule_OnBasicInfo_Handler($Sender) {
 		// Render the custom fields
 		try {
+         $HideFields = (array)explode(',', C('Plugins.CustomProfileFields.HideFields'));
+         
 			$CustomProfileFields = GetValue('CustomProfileFields', $Sender->User->Attributes, array());
 			foreach ($CustomProfileFields as $Label => $Value) {
+            if (in_array($Label, $HideFields))
+               continue;
 				echo '<dt class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($Label).'">'.Gdn_Format::Text($Label).'</dt>';
 				echo '<dd class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($Label).'">'.Gdn_Format::Display($Value).'</dd>';
 			}
@@ -187,8 +191,8 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 	public function PluginController_CustomProfileFields_Create($Sender) {
 		$Conf = new ConfigurationModule($Sender);
 		$Conf->Initialize(array(
-			'Plugins.CustomProfileFields.Disallow' => array('Type' => 'bool', 'Control' => 'CheckBox'),
-			'Plugins.CustomProfileFields.SuggestedFields' => array('Control' => 'TextBox', 'Options' => array('MultiLine' => TRUE))
+			'Plugins.CustomProfileFields.SuggestedFields' => array('Control' => 'TextBox', 'Options' => array('MultiLine' => TRUE)),
+			'Plugins.CustomProfileFields.Disallow' => array('Type' => 'bool', 'Control' => 'CheckBox', 'LabelCode' => "Don't allow custom fields.")
 		));
 
      $Sender->AddSideMenu('plugin/customprofilefields');
