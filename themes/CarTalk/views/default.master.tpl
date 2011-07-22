@@ -227,8 +227,8 @@
 			<div class="Banner">
 				<ul>
 		  			{dashboard_link}
-               <li>{link path="/categories/all" text="Topic Index"}</li>
-		  			{discussions_link text="Recent Discussions"}
+               {forum_root_link text="Topic Index"}
+		  			<li>{link path="/discussions" text="Recent Discussions"}</li>
 		  			{activity_link}
 		  			{inbox_link}
 		  			{profile_link}
