@@ -243,7 +243,6 @@ class VfcomPlugin extends Gdn_Plugin {
          $AcceptTags = array('link', 'script');
          $FinalTags = array();
 
-         $VFCom = Gdn::PluginManager()->GetPluginInstance('vfcom', Gdn_PluginManager::ACCESS_PLUGINNAME);
          foreach ($Tags as $TagIndex => $Tag) {
             $FinalTags[$TagIndex] = $Tag;
             $TagType = GetValue('_tag', $Tag);
@@ -260,7 +259,7 @@ class VfcomPlugin extends Gdn_Plugin {
             }
             $URL = GetValue($Key, $Tag);
             if (!StringBeginsWith($URL, 'http', TRUE))
-               $Tag[$Key] = $VFCom->MakeAutoStatic($URL);
+               $Tag[$Key] = $this->MakeAutoStatic($URL);
 
             $FinalTags[$TagIndex] = $Tag;
          }
