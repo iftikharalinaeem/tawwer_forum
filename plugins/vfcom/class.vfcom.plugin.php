@@ -238,7 +238,7 @@ class VfcomPlugin extends Gdn_Plugin {
          if (!$UseAutoStatic) throw new Exception();
 
          // Get current tags
-         $Tags = $Head->Tags();
+         $Tags = $Sender->Tags();
 
          $AcceptTags = array('link', 'script');
          $FinalTags = array();
@@ -265,7 +265,7 @@ class VfcomPlugin extends Gdn_Plugin {
             $FinalTags[$TagIndex] = $Tag;
          }
 
-         $Head->Tags($FinalTags);
+         $Sender->Tags($FinalTags);
       } catch (Exception $e){}
       
       /**
