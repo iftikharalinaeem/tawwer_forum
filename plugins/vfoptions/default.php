@@ -616,7 +616,7 @@ pageTracker._trackPageview();
 			$Browser = $Sender->Form->GetFormValue('Browser');
 			
 			$Email = new Gdn_Email();
-			$Email->Subject(sprintf(T('[Support:%1$s] %2$s'), $SiteID, $Subject));
+			$Email->Subject(sprintf(T('[%1$s] %2$s'), $SiteID, $Subject));
 			$Email->From($FromEmail, $FromEmail);
 			$Email->To('support@vanillaforums.com', 'VanillaForums.com Support');
 			$Email->Message(
