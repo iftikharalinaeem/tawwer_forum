@@ -75,14 +75,18 @@ class VFSpoofPlugin extends Gdn_Plugin {
          $UserData = $UserModel->ValidateCredentials($Email, 0, $Password);
          $this->_CloseDatabase();
          
-         $IsAdmin = GetValue('Admin', $UserData, FALSE);
-         if ($IsAdmin > 0) {
+         $RemoteIsAdmin = GetValue('Admin', $UserData, FALSE);
+         if ($RemoteIsAdmin > 0) {
             if ($UserIDToSpoof === FALSE)
                $UserIDToSpoof = Gdn::UserModel()->GetSystemUserID();
             
             Gdn::Session()->Start($UserIDToSpoof, TRUE);
             
-            Redirect('/settings');
+            $UserIsAdmin = GetValue("Admin", Gdn::Session()->User, FALSE);
+            if ($UserIsAdmin > 0)
+               Redirect('/settings');
+            else
+               Redirect('/');
          } else {
             $Sender->Form->AddError('Bad Credentials');
          }
