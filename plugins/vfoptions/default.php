@@ -621,7 +621,7 @@ pageTracker._trackPageview();
 			$Email->To('support@vanillaforums.com', 'VanillaForums.com Support');
 			$Email->Message(
 				$Message."\r\n"
-				."\r\nUrl: ".Url('')
+				."\r\nUrl: ".Url('/', TRUE)
 				."\r\nBrowser: ".$Browser
 				."\r\nUsername: ".$Session->User->Name
 				."\r\nSiteID: ".$SiteID
