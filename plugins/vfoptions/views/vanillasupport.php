@@ -1,6 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 $SupportRequests = GetValue('SupportRequests', $this->Data, 0);
-$SupportRequests = 5;
 $UsedSupportRequests = 0;
 if (is_numeric($SupportRequests)) {
    $UsedSupportRequests = GetValue('UsedSupportRequests', $this->Data);
