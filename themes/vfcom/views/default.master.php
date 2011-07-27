@@ -34,7 +34,7 @@ $Session = Gdn::Session();
 			echo Anchor('All Support Discussions', '/discussions', 'Home');
 			echo '&nbsp;';
 			echo Gdn_Theme::Link('dashboard');
-			echo Gdn_Theme::Link('profile');
+			echo Gdn_Theme::Link('profile', 'Profile', '<a href="%url" class="Profile">Profile</a>');
 		?></div>
 	</div>
 </div>
