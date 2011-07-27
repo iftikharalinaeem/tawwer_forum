@@ -228,7 +228,7 @@
 				<ul>
 		  			{dashboard_link}
                <li>{link path="/categories/all" text="Topic Index"}</li>
-		  			{discussions_link text="Recent Discussions"}
+		  			<li>{link path="/discussions" text="Recent Discussions"}</li>
 		  			{activity_link}
 		  			{inbox_link}
 		  			{profile_link}

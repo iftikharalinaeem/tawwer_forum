@@ -225,18 +225,70 @@ class VfcomPlugin extends Gdn_Plugin {
    }
    
    public function HeadModule_BeforeToString_Handler($Sender) {
-      // Only for logged-in users
-      if (!Gdn::Session()->UserID) return;
       
-      // Only when enabled (finally)
-      if (!C('VanillaForums.ShowInfrastructure', FALSE)) return;
+      /**
+       * AutoStatic CDN
+       * 
+       * This handles the rewrite of all CSS and JS resources to AutoStatic.
+       */
       
-      if (stristr(Gdn::Session()->User->Email, 'vanillaforums.com') && Gdn::Session()->User->Admin) {
-         echo '<div style="text-align:left;margin:10px;padding:5px;font-size:14px;background-color:white;color:gray;">';
-         echo "<div>Upstream: ".GetValue('HTTP_X_UPSTREAM', $_SERVER, 'unknown')."</div>";
-         echo "<div>Frontend: ".C('VanillaForums.Frontend', 'unknown')."</div>";
-         echo '</div>';
-      }
+      try {
+         // Allow conditional autostatic for testing
+         $UseAutoStatic = C('VanillaForums.AutoStatic.Enabled', FALSE);
+         if (!$UseAutoStatic) throw new Exception();
+
+         // Get current tags
+         $Tags = $Sender->Tags();
+
+         $AcceptTags = array('link', 'script');
+         $FinalTags = array();
+
+         foreach ($Tags as $TagIndex => $Tag) {
+            $FinalTags[$TagIndex] = $Tag;
+            $TagType = GetValue('_tag', $Tag);
+            if (!in_array($TagType, $AcceptTags)) continue;
+
+            switch ($TagType) {
+               case 'link':
+                  $Key = 'href';
+                  break;
+
+               case 'script':
+                  $Key = 'src';
+                  break;
+            }
+            $URL = GetValue($Key, $Tag);
+            if (!StringBeginsWith($URL, 'http', TRUE))
+               $Tag[$Key] = $this->MakeAutoStatic($URL);
+
+            $FinalTags[$TagIndex] = $Tag;
+         }
+
+         $Sender->Tags($FinalTags);
+      } catch (Exception $e){}
+      
+      /**
+       * Infrastructure Banner
+       * 
+       * This allows a temporary banner to be inserted above all content, for admin users,
+       * in order to ease detection of DNS migration.
+       */
+      
+      try {
+         // Only for logged-in users
+         if (!Gdn::Session()->UserID) throw new Exception();
+
+         // Only when enabled (finally)
+         if (!C('VanillaForums.ShowInfrastructure', FALSE)) throw new Exception();
+
+         if (stristr(Gdn::Session()->User->Email, 'vanillaforums.com') && Gdn::Session()->User->Admin) {
+            echo '<div style="text-align:left;margin:10px;padding:5px;font-size:14px;background-color:white;color:gray;">';
+            echo "<div>Upstream: ".GetValue('HTTP_X_UPSTREAM', $_SERVER, 'unknown')."</div>";
+            echo "<div>Frontend: ".C('VanillaForums.Frontend', 'unknown')."</div>";
+            echo '</div>';
+         }
+      } catch (Exception $e){}
+      
    }
    
    public function Gdn_Router_BeforeLoadRoutes_Handler($Sender) {
