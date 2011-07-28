@@ -94,8 +94,15 @@ class VanillabookThemeHooks implements Gdn_IPlugin {
 			echo '<div class="Excerpt">'.SliceString(Gdn_Format::Text($Discussion->Body, FALSE), 100).'</div>';
 	}
 
-   public function CategoriesController_Render_Before($Sender, $Args) {
+	/**
+	 * Change the "all discussions" link above categories to the current page
+	 * title, and then change it back after.
+	 */
+   public function CategoriesController_BeforeDiscussionTabs_Handler($Sender, $Args) {
       Gdn::Locale()->SetTranslation('All Discussions', $Sender->Data('Title'));
+   }
+   public function CategoriesController_AfterAllDiscussionsTab_Handler($Sender, $Args) {
+      Gdn::Locale()->SetTranslation('All Discussions', 'All Discussions');
    }
 	
 

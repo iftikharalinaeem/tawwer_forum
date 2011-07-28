@@ -7,7 +7,7 @@
 $PluginInfo['PostAnonymous'] = array(
    'Name' => 'Post Anonymous',
    'Description' => 'Allows users to post anonymously.',
-   'Version' => '1.0b',
+   'Version' => '1.0.1b',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
@@ -22,9 +22,8 @@ class PostAnonymousPlugin extends Gdn_Plugin {
    /// Methods ///
 
    public function AttachForm($Sender, $CategoryID = NULL) {
-      if ($CategoryID != NULL && !in_array($CategoryID, self::CategoryIDs()))
+      if ($CategoryID === NULL || !in_array($CategoryID, self::CategoryIDs()))
          return;
-
 
       $this->Form = $Sender->Form;
       include $Sender->FetchViewLocation('AnonymousForm', '', 'plugins/PostAnonymous');
@@ -79,7 +78,15 @@ class PostAnonymousPlugin extends Gdn_Plugin {
    }
 
    public function PostController_AfterBodyField_Handler($Sender, $Args) {
-      $this->AttachForm($Sender, GetValueR('Discussion.CategoryID', $Args));
+      $CategoryID = GetValueR('Discussion.CategoryID', $Args);
+      if ($CategoryID === FALSE) {
+         $DiscussionID = GetValueR('Comment.DiscussionID', $Sender);
+         if ($DiscussionID) {
+            $CategoryID = Gdn::SQL()->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->Value('CategoryID', NULL);
+         }
+      }
+      
+      $this->AttachForm($Sender, $CategoryID);
    }
 
    /**

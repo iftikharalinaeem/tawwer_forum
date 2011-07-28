@@ -4,7 +4,7 @@
 $PluginInfo['CustomDomain'] = array(
    'Name' => 'Custom Domain',
    'Description' => 'Allows users to define a CName address for their VanillaForums.com hosted forum.',
-   'Version' => '1',
+   'Version' => '1.0.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'
@@ -87,7 +87,10 @@ class CustomDomainPlugin implements Gdn_IPlugin {
     */
    private function _SetDomain($Domain) {
       // Get all upgrades for this site
-      $OldDomain = str_replace(array('http://', '/'), array('', ''), C('Garden.Domain', ''));
+//      $OldDomain = str_replace(array('http://', '/'), array('', ''), C('Garden.Domain', ''));
+      $Root = rtrim(realpath(PATH_ROOT), '/');
+      $OldDomain = trim(strrchr($Root, '/'), '/');
+      
       $IsEnabled = $Domain == $OldDomain ? TRUE : FALSE;
       if ($Domain != '' && !file_exists('/srv/www/vhosts/'.$Domain)) {
          $FQDN = PrefixString('http://', $Domain);
@@ -102,25 +105,15 @@ class CustomDomainPlugin implements Gdn_IPlugin {
          if (!$Error && $Response == $ExpectedResponse) {
             // It is pointing at the correct place, so...
             // Create the symlink folder
-            exec('/bin/ln -s "/srv/www/vhosts/'.$OldDomain.'" "/srv/www/vhosts/'.$Domain.'"');
+            exec('/bin/ln -s "'.$Root.'" "/srv/www/vhosts/'.$Domain.'"');
             
             // Make sure it exists
             if (file_exists('/srv/www/vhosts/'.$Domain)) {
                // Change the domain in the conf file
                $CookieDomain = substr($Domain, strpos($Domain, '.'));
-               $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
-               $Contents = str_replace(
-                  array(
-                     "\$Configuration['Garden']['Cookie']['Domain'] = '".C('Garden.Cookie.Domain')."';",
-                     "\$Configuration['Garden']['Domain'] = '".$OldDomain."';"
-                  ),
-                  array(
-                     "\$Configuration['Garden']['Cookie']['Domain'] = '$CookieDomain';",
-                     "\$Configuration['Garden']['Domain'] = '$Domain';"
-                  ),
-                  $Contents
-               );
-               file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
+               SaveToConfig(array(
+                   'Garden.Cookie.Domain' => $CookieDomain,
+                   'Garden.Domain' => $Domain));
                
                // Update the domain in the VanillaForums.GDN_Site table
                $this->_GetDatabase()->SQL()->Put(
@@ -155,23 +148,13 @@ class CustomDomainPlugin implements Gdn_IPlugin {
          
          // Update the config file
          $CookieDomain = substr($Site->Name, strpos($Site->Name, '.'));
-         $Contents = file_get_contents(PATH_CONF. DS . 'config.php');
-         $Contents = str_replace(
-            array(
-               "\$Configuration['Garden']['Cookie']['Domain'] = '".C('Garden.Cookie.Domain')."';",
-               "\$Configuration['Garden']['Domain'] = '".C('Garden.Domain')."';"
-            ),
-            array(
-               "\$Configuration['Garden']['Cookie']['Domain'] = '$CookieDomain';",
-               "\$Configuration['Garden']['Domain'] = '".$Site->Name."';"
-            ),
-            $Contents
-         );
-         file_put_contents(PATH_CONF . DS . 'config.php', $Contents);
+         SaveToConfig(array(
+             'Garden.Cookie.Domain' => $CookieDomain,
+             'Garden.Domain' => $Site->Name));
          
          // Remove the symlinked folder
          // WARNING: Do not use a trailing slash on symlinked folders when rm'ing, or it will remove the source!
-         $SymLinkedFolder = '/srv/www/vhosts/'.$Site->Domain;
+         $SymLinkedFolder = '/srv/www/vhosts/'.trim($Site->Domain, '/');
          if (file_exists($SymLinkedFolder))
             unlink($SymLinkedFolder);
          

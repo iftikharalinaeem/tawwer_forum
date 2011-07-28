@@ -69,7 +69,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 
       $Menu->AddLink('Add-ons', T('Browse Addons').' <span class="New">New</span>', 'dashboard/settings/addons', 'Garden.Settings.Manage');
       $Menu->AddItem('Vanilla Support', 'Vanilla Support', FALSE, array('class' => 'Support'));
-      $Menu->AddLink('Vanilla Support', FALSE, '/dashboard/settings/vanillasupport', 'Garden.Settings.Manage');
+      $Menu->AddLink('Vanilla Support', FALSE, '/dashboard/settings/vanillasupport', 'Garden.AdminUser.Only');
 		
 		
    		
@@ -616,7 +616,7 @@ pageTracker._trackPageview();
 			$Browser = $Sender->Form->GetFormValue('Browser');
 			
 			$Email = new Gdn_Email();
-			$Email->Subject(sprintf(T('[Support:%1$s] %2$s'), $SiteID, $Subject));
+			$Email->Subject(sprintf(T('[%1$s] %2$s'), $SiteID, $Subject));
 			$Email->From($FromEmail, $FromEmail);
 			$Email->To('support@vanillaforums.com', 'VanillaForums.com Support');
 			$Email->Message(
