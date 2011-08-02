@@ -311,9 +311,9 @@ class VfcomPlugin extends Gdn_Plugin {
       if (C('Garden.AutoDomainSwitch',TRUE) === FALSE) return;
       
       $Domain = C('Garden.Domain', '');
-      $ServerName = GetValue('SERVER_NAME', $_SERVER, '');
+      $ServerName = GetValue('HTTP_HOST', $_SERVER, '');
       if ($ServerName == '')
-         $ServerName = GetValue('HTTP_HOST', $_SERVER, '');
+         return;
          
       if ($ServerName != '' && $Domain != '') {
          $Domain = str_replace(array('http://', '/'), array('', ''), $Domain);
