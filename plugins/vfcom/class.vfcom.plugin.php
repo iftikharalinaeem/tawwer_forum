@@ -54,12 +54,10 @@ class VfcomPlugin extends Gdn_Plugin {
          if (is_null($Frontend))
             return;
          
-         $Frontend = explode('-',$Frontend);
-         array_shift($Frontend);
-         $Frontend = implode('', $Frontend);
+         $Frontend = str_replace('.int.','.ext.', $Frontend);
          
          $XHPROF_ROOT = '/var/www/xhprof';
-         $XHPROF_SERVER_NAME = FormatString("profiler.{Frontend}.{Client}.{Hostname}",array(
+         $XHPROF_SERVER_NAME = FormatString("{Frontend}/xhprof/render",array(
             'Frontend'     => $Frontend,
             'Client'       => $this->VfcomClient,
             'Hostname'     => $this->VfcomHostname
