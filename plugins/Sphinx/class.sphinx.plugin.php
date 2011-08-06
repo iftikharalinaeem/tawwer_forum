@@ -17,10 +17,6 @@ $PluginInfo['Sphinx'] = array(
 
 class SphinxPlugin extends Gdn_Plugin {
    public function  __construct() {
-      if (!class_exists('SphinxClient')) {
-         throw new Exception('Sphinx requires the sphinx client to be installed. See http://www.php.net/manual/en/book.sphinx.php');
-      }
-
       parent::__construct();
    }
 
@@ -30,6 +26,10 @@ class SphinxPlugin extends Gdn_Plugin {
    }
 
    public function Setup() {
+      if (!class_exists('SphinxClient')) {
+         throw new Exception('Sphinx requires the sphinx client to be installed. See http://www.php.net/manual/en/book.sphinx.php');
+      }
+      
       // Remove the current library map so that the core file won't be grabbed.
       @unlink(PATH_CACHE.'/library_map.ini');
       $this->Structure();
