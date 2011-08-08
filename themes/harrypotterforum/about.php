@@ -14,5 +14,6 @@ $ThemeInfo['harrypotterforum'] = array(
    'Version' => '1.0',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'Site' => 'potter.vanillaforums.com'
 );
