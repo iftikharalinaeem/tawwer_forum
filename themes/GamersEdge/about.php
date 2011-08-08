@@ -30,5 +30,6 @@ $ThemeInfo['Gamers Edge'] = array(
 			'Review Soon 3' => 'Paste review with link to post here.',
 			'Review Soon 4' => 'Paste review with link to post here.',
 			'Review Soon 5' => 'Paste review with link to post here.'),
-	)
+	),
+   'Site' => 'gamersedge.vanillaforums.com'
 );

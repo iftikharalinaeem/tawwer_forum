@@ -17,5 +17,6 @@ $ThemeInfo['WebmasterBond'] = array(
    'Version' => '1.0',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://brendanserashriar.com'
+   'AuthorUrl' => 'http://brendanserashriar.com',
+   'Site' => 'webmasterbond.vanillaforums.com'
 );
