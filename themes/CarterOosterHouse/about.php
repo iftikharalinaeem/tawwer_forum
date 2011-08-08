@@ -18,5 +18,5 @@ $ThemeInfo['CarterOosterHouse'] = array(
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
    'AuthorUrl' => 'http://brendanserashriar.com',
-   'Sit' => 'carter.vanillaforums.com'
+   'Site' => 'carter.vanillaforums.com'
 );
