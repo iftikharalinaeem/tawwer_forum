@@ -95,7 +95,7 @@ searchd {
 
    public function GetComments($IDs) {
       $Result = Gdn::SQL()
-			->Select('c.CommentID as PrimaryID, d.Name as Title, c.Body as Summary')
+			->Select('c.CommentID as PrimaryID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID')
 			->Select("'/discussion/comment/', c.CommentID, '/#Comment_', c.CommentID", "concat", 'Url')
 			->Select('c.DateInserted')
 			->Select('c.InsertUserID as UserID, u.Name, u.Photo')
@@ -110,7 +110,7 @@ searchd {
 
    public function GetDiscussions($IDs) {
       $Result = Gdn::SQL()
-			->Select('d.DiscussionID as PrimaryID, d.Name as Title, d.Body as Summary')
+			->Select('d.DiscussionID as PrimaryID, d.Name as Title, d.Body as Summary, d.Format, d.CategoryID')
 			->Select('d.DiscussionID', "concat('/discussion/', %s)", 'Url')
 			->Select('d.DateInserted')
 			->Select('d.InsertUserID as UserID, u.Name, u.Photo')
@@ -260,7 +260,7 @@ searchd {
       $Px = $SearchModel->Database->DatabasePrefix;
       $ID = 1;
       $SelectSql = "
-    select DiscussionID * 10 + $ID, CategoryID, InsertUserID, unix_timestamp(DateLastComment) as DateLastComment, Name, Body
+    select DiscussionID * 10 + $ID, CategoryID, InsertUserID, unix_timestamp(DateInserted) as DateInserted, unix_timestamp(DateLastComment) as DateLastComment, Name, Body
     from {$Px}Discussion";
 
       // Write the general datasource.
@@ -275,6 +275,7 @@ searchd {
       }
       $SearchModel->WriteConfValue('sql_attr_uint', 'CategoryID');
       $SearchModel->WriteConfValue('sql_attr_uint', 'InsertUserID');
+      $SearchModel->WriteConfValue('sql_attr_timestamp', 'DateInserted');
       $SearchModel->WriteConfValue('sql_attr_timestamp', 'DateLastComment');
       $SearchModel->WriteConfSourceEnd();
 
@@ -380,9 +381,9 @@ searchd {
       $Sphinx = new SphinxClient();
       $Sphinx->setServer($SphinxHost, $SphinxPort);
       $Sphinx->setMatchMode(SPH_MATCH_EXTENDED);
-      $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS);
+//      $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
+      $Sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'DateInserted');
       $Sphinx->setLimits($Offset, $Limit);
-//      $Sphinx->setIndexWeights(array('Page' => 200, 'Discussion' => 150, 'Comment' => 100));
       $Sphinx->setMaxQueryTime(5000);
 
       // Allow the client to be overridden.
@@ -390,19 +391,34 @@ searchd {
       $this->FireEvent('BeforeSphinxSearch');
 
       $Cats = DiscussionModel::CategoryPermissions();
+      if ($CategoryID = Gdn::Controller()->Request->Get('CategoryID')) {
+         $Cats2 = CategoryModel::GetSubtree($CategoryID);
+         Gdn::Controller()->SetData('Categories', $Cats2);
+         $Cats2 = ConsolidateArrayValuesByKey($Cats2, 'CategoryID');
+         if (is_array($Cats))
+            $Cats = array_intersect($Cats, $Cats2);
+         elseif ($Cats)
+            $Cats = $Cats2;
+      }
 //      $Cats = CategoryModel::CategoryWatch();
-//      print_r($Cats);
-      if ($Cats !== TRUE);
-         $Sphinx->setFilter('CategoryID', $Cats);
+//      var_dump($Cats);
+      if ($Cats !== TRUE)
+         $Sphinx->setFilter('CategoryID', (array)$Cats);
       $Search = $Sphinx->query($Search, implode(' ', $Indexes));
-//      var_dump($Sphinx);
-//      var_dump($Search);
-//      die();
       $Result = $this->GetDocuments($Search);
       
+      $Total = GetValue('total', $Search);
+      Gdn::Controller()->SetData('RecordCount', $Total);
 
       if (!is_array($Result))
          $Result = array();
+      
+      foreach ($Result as $Key => $Value) {
+			if (isset($Value['Summary'])) {
+				$Value['Summary'] = Gdn_Format::Text(Gdn_Format::To($Value['Summary'], GetValue('Format', $Value, 'Html')));
+				$Result[$Key] = $Value;
+			}
+		}
       
       return $Result;
 	}

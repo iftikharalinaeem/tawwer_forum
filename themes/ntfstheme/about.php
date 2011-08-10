@@ -17,5 +17,6 @@ $ThemeInfo['ntfstheme'] = array(
    'Version' => '1.1',
    'Author' => "NTFS.com",
    'AuthorEmail' => 'olga_dambit@hotmail.com',
-   'AuthorUrl' => 'http://www.ntfs.com'
+   'AuthorUrl' => 'http://www.ntfs.com',
+   'Site' => 'ntfs.vanillaforums.com'
 );

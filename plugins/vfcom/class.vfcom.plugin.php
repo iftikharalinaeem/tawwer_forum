@@ -54,12 +54,10 @@ class VfcomPlugin extends Gdn_Plugin {
          if (is_null($Frontend))
             return;
          
-         $Frontend = explode('-',$Frontend);
-         array_shift($Frontend);
-         $Frontend = implode('', $Frontend);
+         $Frontend = str_replace('.int.','.ext.', $Frontend);
          
          $XHPROF_ROOT = '/var/www/xhprof';
-         $XHPROF_SERVER_NAME = FormatString("profiler.{Frontend}.{Client}.{Hostname}",array(
+         $XHPROF_SERVER_NAME = FormatString("{Frontend}/xhprof/render",array(
             'Frontend'     => $Frontend,
             'Client'       => $this->VfcomClient,
             'Hostname'     => $this->VfcomHostname
@@ -311,9 +309,9 @@ class VfcomPlugin extends Gdn_Plugin {
       if (C('Garden.AutoDomainSwitch',TRUE) === FALSE) return;
       
       $Domain = C('Garden.Domain', '');
-      $ServerName = GetValue('SERVER_NAME', $_SERVER, '');
+      $ServerName = GetValue('HTTP_HOST', $_SERVER, '');
       if ($ServerName == '')
-         $ServerName = GetValue('HTTP_HOST', $_SERVER, '');
+         return;
          
       if ($ServerName != '' && $Domain != '') {
          $Domain = str_replace(array('http://', '/'), array('', ''), $Domain);

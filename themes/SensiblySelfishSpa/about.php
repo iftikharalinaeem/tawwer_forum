@@ -17,5 +17,6 @@ $ThemeInfo['SensiblySelfishSpa'] = array(
    'Version' => '1.0',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendank@vanillaforums.com',
-   'AuthorUrl' => 'http://dropthedigibomb.com'
+   'AuthorUrl' => 'http://dropthedigibomb.com',
+   'Site' => 'sensiblyselfishspa.vanillaforums.com'
 );
