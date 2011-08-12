@@ -7,9 +7,7 @@ Reply to this email directly or follow the link below to check it out:
 
 -- 
 Have a great day!';
-$Definition['EmailStoryNotificationPop'] = '%1$s
-
-%3$s
+$Definition['EmailStoryNotificationPop'] = '%3$s
 
 -- 
 Reply to this email directly or follow the link below to check it out:

@@ -9,7 +9,8 @@ VanillaPopPlugin::SimpleForm($this->Form, array(
     'to' => 'TextBox',
     'subject' => 'TextBox',
     'text' => array('Control' => 'TextBox', 'Options' => array('Multiline' => TRUE)),
-    'html' => array('Control' => 'TextBox', 'Options' => array('Multiline' => TRUE))
+    'html' => array('Control' => 'TextBox', 'Options' => array('Multiline' => TRUE)),
+    'headers' => array('Control' => 'TextBox', 'Options' => array('Multiline' => TRUE))
 ));
 
 echo $this->Form->Close('Post');
