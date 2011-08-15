@@ -52,8 +52,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
          $Email = trim($Matches[2]);
       }
          
-      if (!$Name)
+      if (!$Name) {
          $Name = trim(substr($Email, 0, strpos($Email, '@')), '@');
+         
+         $NameParts = explode('.', $Name);
+         $NameParts = array_map('ucfirst', $NameParts);
+         $Name = implode(' ', $NameParts);
+      }
       
       $Result = array($Name, $Email);
       return $Result;
@@ -98,7 +103,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
    }
    
    public static function ParseType($Email) {
-      if (preg_match('`([a-z]+-[0-9]+)@`', $Email, $Matches)) {
+      if (preg_match('`\+([a-z]+-?[0-9]+)@`', $Email, $Matches)) {
          list($Type, $ID) = self::ParseUID($Matches[1]);
       } else {
          $Type = NULL;
@@ -115,19 +120,16 @@ class VanillaPopPlugin extends Gdn_Plugin {
          $UID = trim(trim($Matches[1]), '"');
       }
       
-      $Parts = explode('-', $UID);
-      if (count($Parts) == 1) {
-         if (is_numeric($Parts[0]))
-            return array(NULL, NULL);
-      } elseif (!is_numeric($Parts[1])) {
-         return array(NULL, NULL);
-      } else {
-         $Type = GetValue($Parts[0], self::$Types, NULL);
+      if (preg_match('`([a-z]+)-?([0-9]+)`i', $UID, $Matches)) {
+         $Type = GetValue($Matches[1], self::$Types, NULL);
          if ($Type)
-            $ID = $Parts[1];
+            $ID = $Matches[2];
          else
             $ID = NULL;
          return array($Type, $ID);
+         
+      } else {
+         return array(NULL, NULL);
       }
    }
    
@@ -139,6 +141,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
       
       $Sender->Data['_Status'][] = "Saving backup to $Path.";
       file_put_contents($Path, print_r($Data, TRUE));
+      
+      // Save the full post for debugging.
+      $Data['Attributes'] = serialize(array('POST' => $_POST));
       
       $Data['Body'] = self::StripEmail($Data['Body']);
       if (!$Data['Body'])
@@ -187,7 +192,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
       if (!$ReplyType) {
          // Grab the reply from the to.
          list($ToName, $ToEmail) = self::ParseEmailAddress(GetValue('To', $Data));
+//         $Data['Attributes']['POST']['ToEmail'] = $ToEmail;
+//         $Data['Attributes']['POST']['ToName'] = $ToName;
+         $Data['Body'] .= "\n\nTo: $ToName, $ToEmail";
          list($ReplyType, $ReplyID) = self::ParseType($ToEmail);
+//         $Data['Attributes']['POST']['RepyType'] = $ReplyType;
+//         $Data['Attributes']['POST']['ReplyID'] = $ReplyID;
+         $Data['Body'] .= "\n\nReplyType: $ReplyType, $ReplyID";
       }
       
       if (!$ReplyType && GetValue('ReplyTo', $Data)) {
@@ -259,9 +270,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $Data['Source'] = 'Email';
       $Data['SourceID'] = GetValue('MessageID', $Data, NULL);
       
-      // Save the full post for debugging.
-      $Data['Attributes'] = serialize(array('POST' => $_POST));
-      
       switch ($SaveType) {
          case 'Comment':
             $Sender->Data['_Status'][] = 'Saving comment.';
@@ -282,8 +290,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $Data['UpdateUserID'] = $Data['InsertUserID'];
             $DiscussionModel = new DiscussionModel();
             $DiscussionID = $DiscussionModel->Save($Data);            
-            if (!$DiscussionID)
+            if (!$DiscussionID) {
+               throw new Exception($DiscussionModel->Validation->ResultsText(), 400);
                $Sender->Data['_Status'][] = $DiscussionModel->Validation->Results();
+            }
             return $DiscussionID;
       }
    }
@@ -337,19 +347,19 @@ class VanillaPopPlugin extends Gdn_Plugin {
       Gdn::Structure()
          ->Table('Discussion')
          ->Column('Source', 'varchar(20)', NULL)
-         ->Column('SourceID', 'varchar(100)', NULL, 'index')
+         ->Column('SourceID', 'varchar(255)', NULL, 'index')
          ->Set();
       
       Gdn::Structure()
          ->Table('Comment')
          ->Column('Source', 'varchar(20)', NULL)
-         ->Column('SourceID', 'varchar(100)', NULL, 'index')
+         ->Column('SourceID', 'varchar(255)', NULL, 'index')
          ->Set();
       
       Gdn::Structure()
          ->Table('ConversationMessage')
          ->Column('Source', 'varchar(20)', NULL)
-         ->Column('SourceID', 'varchar(100)', NULL, 'index')
+         ->Column('SourceID', 'varchar(255)', NULL, 'index')
          ->Set();
    }
    
@@ -437,8 +447,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
             // This is a quote line.
             $LastLine = $i;
          } elseif (!$SigFound && preg_match('`^\s*--`', $Line)) {
+            // -- Signature delimiter.
             $LastLine = $i;
-            break;
+            $SigFound = TRUE;
+         } elseif (preg_match('`^\s*---.+---\s*$`', $Line)) {
+            // This will catch an ------Original Message------ heade
+            $LastLine = $i;
+            $InQuotes = FALSE;
          } elseif ($InQuotes === 0) {
             if (preg_match('`^\s*On.*wrote:\s*$`i', $Line)) {
                // This is the quote line...
@@ -463,7 +478,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $TypeKey = GetValue($Type, array_flip(self::$Types), NULL);
       if (!$TypeKey)
          return NULL;
-      $UID = $TypeKey.'-'.$ID;
+      $UID = $TypeKey.$ID;
       switch (strtolower($Format)) {
          case 'email':
             $UID = '<'.$UID.'@'.Gdn::Request()->Host().'>';
@@ -483,6 +498,15 @@ class VanillaPopPlugin extends Gdn_Plugin {
       if (in_array($Type, array('Discussion', 'Comment', 'Conversation', 'Message'))) {
          $Email = $Args['Email']; //new Gdn_Email(); //
          $Story = GetValue('Story', $Args);
+         
+         // Encode the message ID in the from.
+         $FromParts = explode('@', $Email->PhpMailer->From, 2);
+         if (count($FromParts) == 2) {
+            $UID = self::UID($Type, $ID);
+            $FromEmail = "{$FromParts[0]}+$UID@{$FromParts[1]}";
+            $Email->PhpMailer->From = $FromEmail;
+            $Email->PhpMailer->Sender = $FromEmail;
+         }
          
          if (GetValueR('Activity.ActivityType', $Args) == 'NewDiscussion') {
             // Format the new discussion notification a bit nicer.
@@ -584,22 +608,22 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $ActivityModel->QueueNotification($ActivityID, '');
    }
    
-//   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
-//      $Attributes = GetValueR('Object.Attributes', $Args);
-//      if (is_string($Attributes)) {
-//         $Attributes = @unserialize($Attributes);
-//      }
-//      
-//      $Body = GetValueR('Object.Body', $Args);
-//      $Format = GetValueR('Object.Format', $Args);
-//      $Text = self::FormatPlainText($Body, $Format);
-//      echo '<pre>'.htmlspecialchars($Text).'</pre>';
-//      
-//      
-//      $Post = GetValue('POST', $Attributes, FALSE);
-//      if (is_array($Post))
-//         echo '<pre>'.htmlspecialchars(print_r($Post, TRUE)).'</pre>';
-//   }
+   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
+      $Attributes = GetValueR('Object.Attributes', $Args);
+      if (is_string($Attributes)) {
+         $Attributes = @unserialize($Attributes);
+      }
+      
+      $Body = GetValueR('Object.Body', $Args);
+      $Format = GetValueR('Object.Format', $Args);
+      $Text = self::FormatPlainText($Body, $Format);
+      echo '<pre>'.nl2br(htmlspecialchars($Text)).'</pre>';
+      
+      
+      $Post = GetValue('POST', $Attributes, FALSE);
+      if (is_array($Post))
+         echo '<pre>'.htmlspecialchars(print_r($Post, TRUE)).'</pre>';
+   }
    
    public function PostController_Email_Create($Sender, $Args) {
       if (Gdn::Session()->UserID == 0) {
