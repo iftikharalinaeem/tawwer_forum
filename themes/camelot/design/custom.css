@@ -346,11 +346,6 @@ ul.Activities div.Excerpt {
     color: #222222;
 }
 
-div.SingleEntryMethod {
-    background: #EBCBA5;
-	padding: 5px;
-}
-
 /* Panel */
 
 a.Button {
@@ -516,4 +511,21 @@ a.Close {
   overflow: visible;
   bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
   width: auto;
+}
+
+body.Entry #Content h1 {
+	text-shadow: none;
+	color: #fff;
+}
+body.Entry .MainForm {
+   background: #EBCBA5;
+	border-radius: 1px;
+	-moz-border-radius: 1px;
+	-webkit-border-radius: 1px;
+	padding: 10px;
+}
+
+.CommentInfo,
+.Meta {
+	color: #000;
 }

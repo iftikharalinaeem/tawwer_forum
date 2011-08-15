@@ -123,7 +123,7 @@ class PostAnonymousPlugin extends Gdn_Plugin {
          }
       } else {
          // Grab the settings from the config.
-         $Username = Gdn::UserModel()->Get(C('Plugins.PostAnonymous.UserID'));
+         $Username = Gdn::UserModel()->Get(C('Plugins.PostAnonymous.UserID', 0));
          $Username = GetValue('Name', $Username);
          $Sender->Form->SetValue('Username', $Username);
 
@@ -145,6 +145,6 @@ class PostAnonymousPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('postanonymous.js', 'plugins/PostAnonymous'); //, array('hint' => 'inline'));
       $Sender->AddDefinition('AnonymousCategoryIDs', implode(',', self::CategoryIDs()));
 
-      $this->AttachForm($Sender);
+      $this->AttachForm($Sender, GetValue('CategoryID', $Sender));
    }
 }
