@@ -76,14 +76,15 @@ echo $this->Form->Errors();
                   $CssClass .= ' Last';
                
                $CssClass = trim($CssClass);
-               $CurrentValue = ArrayValue($Role->RoleID, $this->ExistingRoleInvitations, FALSE);
+               $RoleID = GetValue('RoleID', $Role);
+               $CurrentValue = ArrayValue($RoleID, $this->ExistingRoleInvitations, FALSE);
                ?>
                <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>               
-                  <th><?php echo $Role->Name; ?></th>
+                  <th><?php echo GetValue('Name', $Role); ?></th>
                   <td class="Alt">
                      <?php
                      echo $this->Form->DropDown('InvitationCount[]', $this->InvitationOptions, array('value' => $CurrentValue));
-                     echo $this->Form->Hidden('InvitationRoleID[]', array('value' => $Role->RoleID));
+                     echo $this->Form->Hidden('InvitationRoleID[]', array('value' => $RoleID));
                      ?>
                   </td>
                </tr>
