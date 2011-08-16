@@ -20,6 +20,11 @@ class PostAnonymousPlugin extends Gdn_Plugin {
    /// Properties ///
 
    /// Methods ///
+   
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+		$Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Forum', 'Post Anonymous', 'settings/postanonymous', 'Garden.Settings.Manage');
+	}
 
    public function AttachForm($Sender, $CategoryID = NULL) {
       if ($CategoryID === NULL || !in_array($CategoryID, self::CategoryIDs()))
