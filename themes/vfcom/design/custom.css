@@ -342,7 +342,9 @@ body.Entry div.Entry div.MainForm {
 	-webkit-box-shadow: 0 1px 2px #999;
 	
 }
-
+body.Entry .CreateAccount {
+	display: none;
+}
 /* Forms */
 #DiscussionForm form {
 	background: #fafafa;
