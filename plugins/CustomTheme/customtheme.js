@@ -7,11 +7,11 @@ jQuery(document).ready(function($) {
       var li = $(this).parent('li');
       $(li).addClass('Active');
       if ($(li).hasClass('CustomHtml')) {
-         $('input[name$=CurrentTab]').val('Html');
+         $('input[name$=CurrentTab]').val('html');
          $('div.CustomHtmlContainer').show();
          $('div.CustomCSSContainer').hide();
       } else {
-         $('input[name$=CurrentTab]').val('Css');
+         $('input[name$=CurrentTab]').val('css');
          $('div.CustomHtmlContainer').hide();
          $('div.CustomCSSContainer').show();
       }

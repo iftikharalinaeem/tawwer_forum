@@ -1,61 +1,50 @@
 <?php if (!defined('APPLICATION')) exit();
-$ThemeName = ArrayValue('Name', $this->CurrentThemeInfo, 'default');
-
-
-function WriteRevisions($Folder, $CurrentFile) {
-   $FileArray = array();
-   $Files = '';
-   if (file_exists($Folder)) {
-      if ($Handle = opendir($Folder)) {
-         $LastDay = '';
-          while (FALSE !== ($File = readdir($Handle))) {
-            if (substr($File, 0, 7) == 'custom_') {
-               $FilePath = $Folder . DS . $File;
-               $FileArray[filemtime($FilePath)] = $File;
-            }
-          }
-            
-         closedir($Handle);
+function WriteRevisions($Sender, $Tab = '') {
+   $Data = GetValue('RevisionData', $Sender->Data);
+   $LiveRevisionID = GetValue('LiveRevisionID', $Sender->Data);
+   if (!$Data || $Data->NumRows() == 0)
+      return;
+   
+   ?>
+   <strong>Recent Revisions</strong>
+   <div class="InfoBox RecentRevisions">
+   <?php
+   $LastDay = '';
+   foreach ($Data->Result() as $Row) {
+      $Day = date('M jS, Y', Gdn_Format::ToTimeStamp($Row->DateInserted));
+      if ($Day != $LastDay) {
+         echo "<div class=\"NewDay\">$Day</div>";
+         $LastDay = $Day;
       }
-      ksort($FileArray);
-      foreach ($FileArray as $MTime => $File) {
-         $Day = date("M jS, Y", $MTime);
-         if ($LastDay != $Day) {
-            $Files = "<div class=\"NewDay\">$LastDay</div>".$Files;
-            $LastDay = $Day;
-         }
-         $Files = '<div class="Revision'.($CurrentFile == $File ? ' LiveRevision' : '').'">&rarr;'
-            .Anchor(date("g:i:sa", $MTime), 'settings/customtheme/'.$File.'/archive')
-            .($CurrentFile == $File ? ' Live Version' : '')
-            .'</div>'.$Files;
-      }
-      if (isset($Day))
-         $Files = "<div class=\"NewDay\">$Day</div>".$Files;
-   }
-   if ($Files != '') {
-      ?>
-      <strong>Recent Revisions</strong>
-      <div class="InfoBox RecentRevisions">
-         <?php echo $Files; ?>
-      </div>
-      <?php
-   }
+
+      echo '<div class="Revision'.($Row->RevisionID == $LiveRevisionID ? ' LiveRevision' : '').'">&rarr;'
+         .Anchor(date("g:i:sa", Gdn_Format::ToTimeStamp($Row->DateInserted)), 'settings/customtheme/revision/'.$Tab.'/'.$Row->RevisionID)
+         .($Row->RevisionID == $LiveRevisionID ? ' Live Version' : '')
+      .'</div>';
+   }  
+   ?>
+      <div class="NewDay"><?php echo Anchor(T('Original Version'), 'settings/customtheme/revision/'.$Tab.'/0'); ?></div>
+   </div>
+   <?php
 }
-
-$this->Form->AddHidden('CurrentTab', $this->CurrentTab);
+$CurrentTab = $this->Form->GetFormValue('CurrentTab', GetValue(1, $this->RequestArgs, 'html'));
+if (!in_array($CurrentTab, array('html', 'css')))
+   $CurrentTab = 'html';
+   
+$this->Form->AddHidden('CurrentTab', $CurrentTab);
 echo $this->Form->Open();
 ?>
-<h1>Custom Theme: <?php echo $this->Form->TextBox('ThemeName'); ?></h1>
+<h1>Customize Theme</h1>
 <?php
 echo $this->Form->Errors();
 ?>
 <div class="Tabs CustomThemeTabs">
    <ul>
-      <li class="CustomHtml<?php echo $this->CurrentTab == 'Html' ? ' Active' : ''; ?>"><?php echo Anchor(T('Edit Html'), 'settings/customtheme/#'); ?></li>
-      <li class="CustomCSS<?php echo $this->CurrentTab == 'Html' ? '' : ' Active'; ?>"><?php echo Anchor(T('Edit CSS'), 'settings/customtheme/#'); ?></li>
+      <li class="CustomHtml<?php echo $CurrentTab == 'html' ? ' Active' : ''; ?>"><?php echo Anchor(T('Edit Html'), 'settings/customtheme/#'); ?></li>
+      <li class="CustomCSS<?php echo $CurrentTab == 'html' ? '' : ' Active'; ?>"><?php echo Anchor(T('Edit CSS'), 'settings/customtheme/#'); ?></li>
    </ul>
 </div>
-<div class="Container CustomCSSContainer<?php echo $this->CurrentTab == 'Html' ? ' Hidden' : ''; ?>">
+<div class="Container CustomCSSContainer<?php echo $CurrentTab == 'html' ? ' Hidden' : ''; ?>">
    <ul>
       <li>
          <div class="CustomThemeForm">
@@ -71,20 +60,21 @@ echo $this->Form->Errors();
                      <strong>How to include your Custom CSS:</strong>
                      <?php
                      $Default = C('Plugins.CustomCSS.IncludeThemeCSS', 'Yes');
-                     echo $this->Form->Radio('IncludeThemeCSS', 'Add my css after the '.$ThemeName.' theme css.', array('value' => 'Yes', 'default' => $Default));
-                     echo $this->Form->Radio('IncludeThemeCSS', "Don't use any theme css, ONLY use mine.", array('value' => 'No', 'default' => $Default));
+                     echo $this->Form->Radio('IncludeThemeCSS', 'Add my css after the theme css.', array('value' => 'Yes', 'default' => $Default));
+                     echo $this->Form->Radio('IncludeThemeCSS', "ONLY use my CSS (not recommended).", array('value' => 'No', 'default' => $Default));
                      ?>
                   </li>
                </ul>
                <?php
                if (C('Plugins.CustomTheme.Enabled'))
-                  echo $this->Form->Button('Apply &rarr;', array('Name' => 'Form/Apply', 'class' => 'Button Apply'));
+                  echo $this->Form->Button('Apply &rarr;', array('Name' => 'Apply', 'class' => 'Button Apply'));
                else
                   echo Anchor('Apply &rarr;', 'settings/customthemeupgrade/', 'Button Apply');
    
-               echo $this->Form->Button('Preview &uarr;', array('Name' => 'Form/Preview'));
+               echo $this->Form->Button('Preview &uarr;', array('Name' => 'Preview'));
                ?>
             </div>
+            <?php WriteRevisions($this, 'css'); ?>
             <strong>Help</strong>
             <div class="InfoBox">
                <div>If you are new to CSS, here are some links you should check out:</div>
@@ -94,18 +84,11 @@ echo $this->Form->Errors();
                echo '<br />&rarr; '.Anchor("Html Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', array('target' => '_blank'));
                ?>            
             </div>
-            <?php
-            WriteRevisions(
-               PATH_THEMES . DS . C('Garden.Theme', '') . DS . 'design',
-               C('Plugins.CustomTheme.EnabledCSS', ''),
-               '.css'
-            );
-            ?>
          </div>
       </li>
    </ul>
 </div>
-<div class="Container CustomHtmlContainer<?php echo $this->CurrentTab == 'Html' ? '' : ' Hidden'; ?>">
+<div class="Container CustomHtmlContainer<?php echo $CurrentTab == 'html' ? '' : ' Hidden'; ?>">
    <ul>
       <li>
          <div class="CustomThemeForm">
@@ -118,13 +101,14 @@ echo $this->Form->Errors();
             <div class="InfoBox RevisionOptions">
                <?php
                if (C('Plugins.CustomTheme.Enabled'))
-                  echo $this->Form->Button('Apply &rarr;', array('Name' => 'Form/Apply', 'class' => 'Button Apply'));
+                  echo $this->Form->Button('Apply &rarr;', array('Name' => 'Apply', 'class' => 'Button Apply'));
                else
                   echo Anchor('Apply &rarr;', 'settings/customthemeupgrade/', 'Button Apply');
    
-               echo $this->Form->Button('Preview &uarr;', array('Name' => 'Form/Preview'));
+               echo $this->Form->Button('Preview &uarr;', array('Name' => 'Preview'));
                ?>
             </div>
+            <?php WriteRevisions($this, 'html'); ?>
             <strong>Help</strong>
             <div class="InfoBox">
                <div>If you are new to HTML, here are some links you should check out:</div>
@@ -132,13 +116,6 @@ echo $this->Form->Errors();
                echo '&rarr; '.Anchor('Our Custom HTML Documentation', 'http://vanillaforums.com/blog/help-tutorials/how-to-use-custom-theme-part-1-edit-html/', '', array('target' => '_blank'));
                ?>            
             </div>
-            <?php
-            WriteRevisions(
-               PATH_THEMES . DS . C('Garden.Theme', '') . DS . 'views',
-               C('Plugins.CustomTheme.EnabledHtml', ''),
-               '.tpl'
-            );
-            ?>
          </div>
       </li>
    </ul>
