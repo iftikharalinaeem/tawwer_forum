@@ -18,12 +18,15 @@ $Session = Gdn::Session();
 			<div class="Plans"><?php echo Anchor('<i class="Sprite SpritePlans"></i> Plans &amp; Pricing', '/plans', '', array('SSL' => FALSE)); ?></div>
 			<div class="Features"><?php echo Anchor('<i class="Sprite SpriteFeatures"></i> Features', '/features', '', array('SSL' => FALSE)); ?></div>
 			<div class="Blog"><?php echo Anchor('<i class="Sprite SpriteBlog"></i> Blog', '/blog', '', array('SSL' => FALSE)); ?></div>
-			<div class="SignIn"><?php
+			<div class="<?php echo $Session->IsValid() ? 'Account' : 'SignIn'; ?>"><?php
 			$Text = 'Sign In';
 			$Link = SignInUrl();
 			if ($Session->IsValid()) {
 				$Text = 'Sign Out';
 				$Link = SignOutUrl();
+				
+				$Text = 'Account';
+				$Link = 'account';
 			}
 			echo Anchor('<i class="Sprite SpriteSignIn"></i> '.$Text, $Link, '', array('SSL' => TRUE)); ?></div>
       </div>
@@ -34,7 +37,12 @@ $Session = Gdn::Session();
 			echo Anchor('All Support Discussions', '/discussions', 'Home');
 			echo '&nbsp;';
 			echo Gdn_Theme::Link('dashboard');
+			if ($Session->IsValid())
+				echo Anchor('Account', '/account', 'Account');
+				
 			echo Gdn_Theme::Link('profile', 'Profile', '<a href="%url" class="Profile">Profile</a>');
+			if ($Session->IsValid())
+				echo Anchor('Sign Out', SignOutUrl(), 'SignOut');
 		?></div>
 	</div>
 </div>
