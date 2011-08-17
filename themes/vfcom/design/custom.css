@@ -100,6 +100,7 @@ i.SpriteRarrDown {
 .VFMenu a:hover {
 	background: url('sprite-menu.png') 0 -40px repeat-x;
 }
+body.Account .VFMenu .Account a,
 body.Entry .VFMenu .SignIn a,
 body.Features .VFMenu .Features a,
 .VFMenu a:focus {
@@ -129,8 +130,10 @@ i.SpriteBlog { background-position: -19px -152px; }
 body.Features .VFMenu .Features a i.SpriteFeatures,
 .VFMenu a:focus i.SpriteFeatures { background-position: 0 -58px; }
 .VFMenu a:focus i.SpriteBlog { background-position: 0 -152px; }
+body.Account .VFMenu .Account a i.SpriteSignIn,
 body.Entry .VFMenu .SignIn a i.SpriteSignIn,
 .VFMenu a:focus i.SpriteSignIn { background-position: 0 0; }
+
 
 
 div.Wrapper {
@@ -180,6 +183,9 @@ body.Info #Frame {
 	color: #999;
 	margin: 0 0 0 20px;
 	font-weight: bold;
+}
+.SubNav a.SignOut {
+	font-weight: normal;
 }
 body.Account .SubNav a.Account,
 body.Profile .SubNav a.Profile,
