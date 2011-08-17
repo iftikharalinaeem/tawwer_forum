@@ -21,4 +21,9 @@ jQuery(document).ready(function($) {
    setAnonymousForm();
 
    $('#Form_CategoryID').change(setAnonymousForm);
+   /*
+   $(document).bind('CommentEditingComplete', function() {
+      setTimeout(setAnonymousForm, 300);
+   });
+   */
 });
