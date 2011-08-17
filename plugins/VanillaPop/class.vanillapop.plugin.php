@@ -12,7 +12,9 @@ $PluginInfo['VanillaPop'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.18a3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+   'SettingsUrl' => '/settings/vanillapop',
+   'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
 class VanillaPopPlugin extends Gdn_Plugin {
@@ -26,6 +28,29 @@ class VanillaPopPlugin extends Gdn_Plugin {
       if ($Format != 'Text')
          $Result = Gdn_Format::Text($Result, FALSE);
       $Result = html_entity_decode($Result, ENT_QUOTES, 'UTF-8');
+      return $Result;
+   }
+   
+   public static function FormatEmailBody($Body, $Route = '', $Quote = '', $Options = FALSE) {
+      if ($Quote) {
+         $Body .= "\n\n".self::FormatQuoteText($Quote);
+      }
+      
+      // Construct the signature.
+      if ($Route) {
+         $Signature = T('ReplyOrFollow')."\n".ExternalUrl($Route);
+      } elseif ($Route === FALSE) {
+         $Signature = ExternalUrl('/');
+      } else {
+         $Signature = T('ReplyOnly');
+      }
+      
+      $Result = FormatString(T('EmailTemplate'), array('Body' => $Body, 'Signature' => $Signature));
+      return $Result;
+   }
+   
+   public static function FormatQuoteText($Text) {
+      $Result = str_replace("\n", "\n> ", $Text);
       return $Result;
    }
    
@@ -43,6 +68,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $LabelCode = trim($LabelCode);
 
       return $LabelCode;
+   }
+   
+   public static function Log($Message) {
+//      $Line = Gdn_Format::ToDateTime().' '.$Message."\n";
+//      file_put_contents(PATH_UPLOADS.'/email/log.txt', $Line, FILE_APPEND);
    }
    
    public static function ParseEmailAddress($Email) {
@@ -149,31 +179,40 @@ class VanillaPopPlugin extends Gdn_Plugin {
       if (!$Data['Body'])
          $Data['Body'] = T('(empty message)');
       
-      list($Name, $Email) = self::ParseEmailAddress($Data['From']);
+      list($FromName, $FromEmail) = self::ParseEmailAddress($Data['From']);
       
       // Check for a category.
       $CategoryID = C('Plugins.VanillaPop.DefaultCategoryID', -1);
+      if (!$CategoryID)
+         $CategoryID = -1;
       TouchValue('CategoryID', $Data, $CategoryID);
       
       // See if there is a user at the given email.
       $UserModel = new UserModel();
-      $User = $UserModel->GetByEmail($Email);
+      $User = $UserModel->GetByEmail($FromEmail);
       if (!$User) {
-         $Sender->Data['_Status'][] = 'Creating user.';
-         $User = array(
-             'Name' => $Name,
-             'Email' => $Email,
-             'Password' => RandomString(10),
-             'HashMethod' => 'Email'
-             );
-         
-         $UserID = $UserModel->InsertForBasic($User, FALSE, array('NoConfirmEmail' => 'NoConfirmEmail'));
-         
-         if (!$UserID) {
-            throw new Exception(T('Error creating user.').' '.$UserModel->Validation->ResultsText(), 400);
+         if (C('Plugins.VanillaPop.AllowUserRegistration')) {
+            $Sender->Data['_Status'][] = 'Creating user.';
+            $User = array(
+                'Name' => $FromName,
+                'Email' => $FromEmail,
+                'Password' => RandomString(10),
+                'HashMethod' => 'Email',
+                'Source' => 'Email',
+                'SourceID' => $FromEmail
+                );
+
+            $UserID = $UserModel->InsertForBasic($User, FALSE, array('NoConfirmEmail' => 'NoConfirmEmail'));
+
+            if (!$UserID) {
+               throw new Exception(T('Error creating user.').' '.$UserModel->Validation->ResultsText(), 400);
+            }
+
+            $User['UserID'] = $UserID;
+         } else {
+            $this->SendEmail($FromEmail, T("We couldn't accept your email."), 
+               T("Whoops! You'll need to register before you can email our site."), $Data['Body']);
          }
-         
-         $User['UserID'] = $UserID;
       } else {
          $Sender->Data['_Status'][] = 'User exists';
          $User = (array)$User;
@@ -192,13 +231,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       if (!$ReplyType) {
          // Grab the reply from the to.
          list($ToName, $ToEmail) = self::ParseEmailAddress(GetValue('To', $Data));
-//         $Data['Attributes']['POST']['ToEmail'] = $ToEmail;
-//         $Data['Attributes']['POST']['ToName'] = $ToName;
-         $Data['Body'] .= "\n\nTo: $ToName, $ToEmail";
          list($ReplyType, $ReplyID) = self::ParseType($ToEmail);
-//         $Data['Attributes']['POST']['RepyType'] = $ReplyType;
-//         $Data['Attributes']['POST']['ReplyID'] = $ReplyID;
-         $Data['Body'] .= "\n\nReplyType: $ReplyType, $ReplyID";
       }
       
       if (!$ReplyType && GetValue('ReplyTo', $Data)) {
@@ -229,6 +262,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
                   $InvalidReply = TRUE;
                   $SaveType = 'Discussion';
                } else {
+                  // Grab the discussion so we can see its category.
+                  $DiscussionModel = new DiscussionModel();
+                  $Discussion = $DiscussionModel->GetID($Comment['DiscussionID'], DATASET_TYPE_ARRAY);
+                  $Data['CategoryID'] = $Discussion['CategoryID'];
+                  
                   $SaveType = 'Comment';
                   $Data['DiscussionID'] = $Comment['DiscussionID'];
                }
@@ -240,6 +278,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
                   $InvalidReply = TRUE;
                   $SaveType = 'Discussion';
                } else {
+                  // TODO: Check permission.
+                  
                   $SaveType = 'Message';
                   $Data['ConversationID'] = $Conversation['ConversationID'];
                }
@@ -252,6 +292,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
                   $InvalidReply = TRUE;
                   $SaveType = 'Discussion';
                } else {
+                  // TODO: Check permission.
+                  
                   $SaveType = 'Message';
                   $Data['ConversationID'] = $Message['ConversationID'];
                }
@@ -270,35 +312,46 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $Data['Source'] = 'Email';
       $Data['SourceID'] = GetValue('MessageID', $Data, NULL);
       
+      $Category = CategoryModel::Categories(GetValue('CategoryID', $Data));
+      if ($Category) {
+         $PermissionCategoryID = $Category['PermissionCategoryID'];
+      } else {
+         $PermissionCategoryID = -1;
+      }
+      
       switch ($SaveType) {
          case 'Comment':
-            $Sender->Data['_Status'][] = 'Saving comment.';
+            if (!Gdn::Session()->CheckPermission('Vanilla.Comments.Add', TRUE, 'CategoryID', $PermissionCategoryID)) {
+               $this->SendEmail($FromEmail, T("We couldn't accept your email."),
+                  T("Sorry! You don't have permission to post right now."), $Data['Body']);
+            }
+            
             $CommentModel = new CommentModel();
             $CommentID = $CommentModel->Save($Data);
-            $Sender->Data['_Status'][] = "CommentID: $CommentID";
             $CommentModel->Save2($CommentID, TRUE);
             return $CommentID;
          case 'Message':
-            $Sender->Data['_Status'][] = 'Saving message.';
             $MessageModel = new ConversationMessageModel();
             $MessageID = $MessageModel->Save($Data);
-            $Sender->Data['_Status'][] = "MessageID: $MessageID";
             return $MessageID;
          default:
-            $Sender->Data['_Status'][] = 'Saving discussion.';
+            // Check the permission on the discussion.
+            if (!Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'CategoryID', $PermissionCategoryID)) {
+               $this->SendEmail($FromEmail, T("We couldn't accept your email."),
+                  T("Sorry! You don't have permission to post right now.")."\n\n".$Data['Body']);
+               return TRUE;
+            }
+            
             $Data['Name'] = $Data['Subject'];
             $Data['UpdateUserID'] = $Data['InsertUserID'];
             $DiscussionModel = new DiscussionModel();
             $DiscussionID = $DiscussionModel->Save($Data);            
             if (!$DiscussionID) {
-               throw new Exception($DiscussionModel->Validation->ResultsText(), 400);
-               $Sender->Data['_Status'][] = $DiscussionModel->Validation->Results();
+               throw new Exception($DiscussionModel->Validation->ResultsText().print_r($Data, TRUE), 400);
             }
             return $DiscussionID;
       }
    }
-   
-   
    
    public function SaveTypeFromRepyTo(&$Data) {
       $Tables = array(
@@ -320,6 +373,17 @@ class VanillaPopPlugin extends Gdn_Plugin {
          }
       }
       return NULL;
+   }
+   
+   public function SendEmail($To, $Subject, $Body, $Quote = FALSE) {
+      $Email = new Gdn_Email();
+      $Email->To($To);
+      $Email->Subject(sprintf('[%s] %s', C('Garden.Title'), $Subject));
+      
+      $Message = self::FormatEmailBody($Body, FALSE, $Quote);
+      
+      $Email->Message($Body);
+      @$Email->Send();
    }
    
    /**
@@ -524,11 +588,18 @@ class VanillaPopPlugin extends Gdn_Plugin {
                   $CommentModel = new CommentModel();
                   $Comment = $CommentModel->GetID($ID, DATASET_TYPE_ARRAY);
                   if ($Comment) {
-                     $Story = self::FormatPlainText($Comment['Body'], $Comment['Format']);
                      $this->SetFrom($Email, $Comment['InsertUserID']);
                      
                      $DiscussionModel = new DiscussionModel();
                      $Discussion = $DiscussionModel->GetID($Comment['DiscussionID']);
+                     
+                     // See if the user has permission to view this discussion on the site.
+                     $CanView = Gdn::UserModel()->GetCategoryViewPermission(GetValueR('Activity.RegardingUserID', $Args), GetValue('CategoryID', $Discussion));
+                     $Story = self::FormatPlainText($Comment['Body'], $Comment['Format']);
+                     
+                     $Message = self::FormatEmailBody($Story, $CanView ? GetValue('Route', $Args) : '');
+                     
+                     $Email->Message($Message);
                      
                      if ($Discussion) {
                         $Email->Subject(sprintf(T('Re: [%1$s] %2$s'), Gdn::Config('Garden.Title'), self::FormatPlainText(GetValue('Name', $Discussion), 'Text')));
@@ -567,6 +638,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
                      }
                   }
                   
+                  $Email->Message(self::FormatEmailBody($Story, GetValue('Route', $Args)));
+                  
                   break;
             }
             if (isset($ReplyTo)) {
@@ -574,16 +647,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
                $Email->PhpMailer->AddCustomHeader("References:$ReplyTo");
             }
          }
-         
-         // Switch the message with the new header/footer.
-         $Message = sprintf(
-            T($Story == '' ? 'EmailNotificationPop' : 'EmailStoryNotificationPop'),
-            GetValue('Headline', $Args),
-            ExternalUrl(GetValue('Route', $Args)),
-            $Story
-         );
-         
-         $Email->Message($Message);
          $Email->PhpMailer->MessageID = self::UID($Type, $ID, 'email');
       }
    }
@@ -605,7 +668,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       
       $ActivityModel = $Args['ActivityModel'];
       $ActivityID = $Sender->RecordActivity($ActivityModel, $Args['Discussion'], $CommentUserID, GetValueR('Comment.CommentID', $Args), 'Force');
-      $ActivityModel->QueueNotification($ActivityID, '');
+//      $ActivityModel->QueueNotification($ActivityID, '');
    }
    
    public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
@@ -707,8 +770,24 @@ class VanillaPopPlugin extends Gdn_Plugin {
       }
    }
    
-   public static function Log($Message) {
-//      $Line = Gdn_Format::ToDateTime().' '.$Message."\n";
-//      file_put_contents(PATH_UPLOADS.'/email/log.txt', $Line, FILE_APPEND);
+   /**
+    *
+    * @param SettingsController $Sender
+    * @param array $Args
+    */
+   public function SettingsController_VanillaPop_Create($Sender, $Args) {
+      $Sender->Permission('Garden.Settings.Manage');
+
+      $Conf = new ConfigurationModule($Sender);
+      $Conf->Initialize(array(
+          'Plugins.VanillaPop.DefaultCategoryID' => array('Control' => 'CategoryDropDown', 'Description' => 'Place discussions started through email in the following category.'),
+          'Plugins.VanillaPop.AllowUserRegistration' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow new users to be registered through email.')
+      ));
+
+      $Sender->AddSideMenu();
+      $Sender->SetData('Title', T('Vanilla Pop Settings'));
+      $Sender->ConfigurationModule = $Conf;
+//      $Conf->RenderAll();
+      $Sender->Render('Settings', '', 'plugins/VanillaPop');
    }
 }
