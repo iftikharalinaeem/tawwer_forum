@@ -22,6 +22,15 @@ class VanillaPopPlugin extends Gdn_Plugin {
    
    /// Methods ///
    
+   public static function AddIDToEmail($Email, $ID) {
+      // Encode the message ID in the from.
+      $FromParts = explode('@', $Email, 2);
+      if (count($FromParts) == 2) {
+         $Email = "{$FromParts[0]}+$ID@{$FromParts[1]}";   
+      }
+      return $Email;
+   }
+   
    public static function FormatPlainText($Body, $Format) {
       $Result = Gdn_Format::To($Body, $Format);
       
@@ -31,26 +40,29 @@ class VanillaPopPlugin extends Gdn_Plugin {
       return $Result;
    }
    
-   public static function FormatEmailBody($Body, $Route = '', $Quote = '', $Options = FALSE) {
-      if ($Quote) {
-         $Body .= "\n\n".self::FormatQuoteText($Quote);
-      }
-      
+   public static function FormatEmailBody($Body, $Route = '', $Quote = '', $Options = FALSE) {      
       // Construct the signature.
       if ($Route) {
-         $Signature = T('ReplyOrFollow')."\n".ExternalUrl($Route);
+         $Signature = FormatString(T('ReplyOrFollow'))."\n".ExternalUrl($Route);
       } elseif ($Route === FALSE) {
          $Signature = ExternalUrl('/');
       } else {
-         $Signature = T('ReplyOnly');
+         $Signature = FormatString(T('ReplyOnly'));
       }
       
-      $Result = FormatString(T('EmailTemplate'), array('Body' => $Body, 'Signature' => $Signature));
+      if ($Quote) {
+         if (is_array($Quote))
+            $Quote = self::FormatPlainText($Quote['Body'], GetValue('Format', $Quote, 'Text'));
+         
+         $Quote = "\n\n".T('You wrote:')."\n\n".self::FormatQuoteText($Quote);
+      }
+      
+      $Result = FormatString(T('EmailTemplate'), array('Body' => $Body, 'Signature' => $Signature, 'Quote' => $Quote));
       return $Result;
    }
    
    public static function FormatQuoteText($Text) {
-      $Result = str_replace("\n", "\n> ", $Text);
+      $Result = '> '.str_replace("\n", "\n> ", $Text);
       return $Result;
    }
    
@@ -210,8 +222,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
             $User['UserID'] = $UserID;
          } else {
-            $this->SendEmail($FromEmail, T("We couldn't accept your email."), 
-               T("Whoops! You'll need to register before you can email our site."), $Data['Body']);
+            $this->SendEmail($FromEmail, '', 
+               T("Whoops! You'll need to register before you can email our site."), $Data);
+            return TRUE;
          }
       } else {
          $Sender->Data['_Status'][] = 'User exists';
@@ -265,7 +278,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                   // Grab the discussion so we can see its category.
                   $DiscussionModel = new DiscussionModel();
                   $Discussion = $DiscussionModel->GetID($Comment['DiscussionID'], DATASET_TYPE_ARRAY);
-                  $Data['CategoryID'] = $Discussion['CategoryID'];
+                  $Data['CategoryID'] = GetValue('CategoryID', $Discussion);
                   
                   $SaveType = 'Comment';
                   $Data['DiscussionID'] = $Comment['DiscussionID'];
@@ -322,8 +335,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
       switch ($SaveType) {
          case 'Comment':
             if (!Gdn::Session()->CheckPermission('Vanilla.Comments.Add', TRUE, 'CategoryID', $PermissionCategoryID)) {
-               $this->SendEmail($FromEmail, T("We couldn't accept your email."),
-                  T("Sorry! You don't have permission to post right now."), $Data['Body']);
+               $this->SendEmail($FromEmail, '',
+                  T("Sorry! You don't have permission to post right now."), $Data);
+               return TRUE;
             }
             
             $CommentModel = new CommentModel();
@@ -337,8 +351,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
          default:
             // Check the permission on the discussion.
             if (!Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'CategoryID', $PermissionCategoryID)) {
-               $this->SendEmail($FromEmail, T("We couldn't accept your email."),
-                  T("Sorry! You don't have permission to post right now.")."\n\n".$Data['Body']);
+               $this->SendEmail($FromEmail, '',
+                  T("Sorry! You don't have permission to post right now."), $Data);
                return TRUE;
             }
             
@@ -380,9 +394,22 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $Email->To($To);
       $Email->Subject(sprintf('[%s] %s', C('Garden.Title'), $Subject));
       
+      if (is_array($Quote)) {
+         $MessageID = GetValue('MessageID', $Quote);
+         if ($MessageID) {
+            $Email->PhpMailer->AddCustomHeader("In-Reply-To:$MessageID");
+            $Email->PhpMailer->AddCustomHeader("References:$MessageID");
+         }
+         
+         $Subject = GetValue('Subject', $Quote);
+         if ($Subject) {
+            $Email->Subject(sprintf('Re: [%s] %s', C('Garden.Title'), ltrim(StringBeginsWith($Subject, 'Re:', TRUE, TRUE))));
+         }
+      }
+
       $Message = self::FormatEmailBody($Body, FALSE, $Quote);
       
-      $Email->Message($Body);
+      $Email->Message($Message);
       @$Email->Send();
    }
    
@@ -519,7 +546,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $LastLine = $i;
             $InQuotes = FALSE;
          } elseif ($InQuotes === 0) {
-            if (preg_match('`^\s*On.*wrote:\s*$`i', $Line)) {
+            if (preg_match('`wrote:\s*$`i', $Line)) {
                // This is the quote line...
                $LastLine = $i;
                $InQuotes = FALSE;
@@ -563,15 +590,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
          $Email = $Args['Email']; //new Gdn_Email(); //
          $Story = GetValue('Story', $Args);
          
-         // Encode the message ID in the from.
-         $FromParts = explode('@', $Email->PhpMailer->From, 2);
-         if (count($FromParts) == 2) {
-            $UID = self::UID($Type, $ID);
-            $FromEmail = "{$FromParts[0]}+$UID@{$FromParts[1]}";
-            $Email->PhpMailer->From = $FromEmail;
-            $Email->PhpMailer->Sender = $FromEmail;
-         }
-         
          if (GetValueR('Activity.ActivityType', $Args) == 'NewDiscussion') {
             // Format the new discussion notification a bit nicer.
             $Discussion = Gdn::SQL()->GetWhere('Discussion', array('DiscussionID' => $ID))->FirstRow(DATASET_TYPE_ARRAY);
@@ -581,6 +599,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             }
             
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $Args['Headline']));
+            $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Discussion', GetValue('DiscussionID', $Discussion)));
          } else {
             // Add the In-Reply-To field.
             switch ($Type) {
@@ -609,6 +628,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
                            $ReplyTo = GetValue('SourceID', $Discussion); // replying to an email...
                         else
                            $ReplyTo = self::UID('Discussion', GetValue('DiscussionID', $Discussion), 'email');
+
+                        $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Discussion', GetValue('DiscussionID', $Discussion)));
                      }
                   }
                   
@@ -636,6 +657,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
                         else
                            $ReplyTo = self::UID('Message', $Message2['MessageID'], 'email');
                      }
+                     
+                     $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Message', GetValue('MessageID', $Message)));
                   }
                   
                   $Email->Message(self::FormatEmailBody($Story, GetValue('Route', $Args)));

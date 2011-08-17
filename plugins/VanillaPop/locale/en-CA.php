@@ -2,9 +2,9 @@
 $Definition['EmailTemplate'] = '{Body}
 
 -- 
-{Signature}';
+{Signature}{Quote}';
 $Definition['ReplyOrFollow'] = 'Reply to this email directly or follow the link below to check it out:';
-$Definition['ReplyOnly'] = 'You can reply to this email directly.';
+$Definition['ReplyOnly'] = 'This email was sent from {/,exurl}. You can reply directly.';
 
 $Definition['EmailNotificationPop'] = '%1$s
 
