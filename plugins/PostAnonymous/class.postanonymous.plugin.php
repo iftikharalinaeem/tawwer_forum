@@ -7,7 +7,7 @@
 $PluginInfo['PostAnonymous'] = array(
    'Name' => 'Post Anonymous',
    'Description' => 'Allows users to post anonymously.',
-   'Version' => '1.0.1b',
+   'Version' => '1.0.2',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
