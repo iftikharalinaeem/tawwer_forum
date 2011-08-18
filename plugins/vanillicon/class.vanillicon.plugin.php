@@ -13,7 +13,8 @@ $PluginInfo['vanillicon'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.18b2'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+   'MobileFriendly' => TRUE,
 );
 
 class VanilliconPlugin extends Gdn_Plugin {
