@@ -9,7 +9,7 @@ $PluginInfo['VanillaPop'] = array(
    'Name' => 'Vanilla Pop',
    'Description' => "Integrates your forum with Vanilla's email service.",
    'Version' => '1.0a',
-   'RequiredApplications' => array('Vanilla' => '2.0.18a3'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
@@ -694,22 +694,22 @@ class VanillaPopPlugin extends Gdn_Plugin {
 //      $ActivityModel->QueueNotification($ActivityID, '');
    }
    
-   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
-      $Attributes = GetValueR('Object.Attributes', $Args);
-      if (is_string($Attributes)) {
-         $Attributes = @unserialize($Attributes);
-      }
-      
-      $Body = GetValueR('Object.Body', $Args);
-      $Format = GetValueR('Object.Format', $Args);
-      $Text = self::FormatPlainText($Body, $Format);
-      echo '<pre>'.nl2br(htmlspecialchars($Text)).'</pre>';
-      
-      
-      $Post = GetValue('POST', $Attributes, FALSE);
-      if (is_array($Post))
-         echo '<pre>'.htmlspecialchars(print_r($Post, TRUE)).'</pre>';
-   }
+//   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
+//      $Attributes = GetValueR('Object.Attributes', $Args);
+//      if (is_string($Attributes)) {
+//         $Attributes = @unserialize($Attributes);
+//      }
+//      
+//      $Body = GetValueR('Object.Body', $Args);
+//      $Format = GetValueR('Object.Format', $Args);
+//      $Text = self::FormatPlainText($Body, $Format);
+//      echo '<pre>'.nl2br(htmlspecialchars($Text)).'</pre>';
+//      
+//      
+//      $Post = GetValue('POST', $Attributes, FALSE);
+//      if (is_array($Post))
+//         echo '<pre>'.htmlspecialchars(print_r($Post, TRUE)).'</pre>';
+//   }
    
    public function PostController_Email_Create($Sender, $Args) {
       if (Gdn::Session()->UserID == 0) {
