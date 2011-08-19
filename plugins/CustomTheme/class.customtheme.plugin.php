@@ -36,9 +36,9 @@ class CustomThemePlugin implements Gdn_IPlugin {
 				.$Form->Open(array('action' => Url('settings/customtheme')))
 				.'<div><strong>Options:</strong> ';
 			if (C('Plugins.CustomTheme.Enabled'))
-				$Message .= $Form->Button('Apply Changes', array('class' => 'PreviewThemeButton', 'Name' => 'ApplyChanges'));
+				$Message .= $Form->Button('Apply Changes', array('class' => 'PreviewThemeButton'));
 			
-			$Message .=  $Form->Button('Exit Preview', array('class' => 'PreviewThemeButton', 'Name' => 'ExitPreview'))
+			$Message .=  $Form->Button('Exit Preview', array('class' => 'PreviewThemeButton'))
 				.'</div>'
 				.$Form->Close();
 				
@@ -194,7 +194,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
       $Sender->AddSideMenu('settings/customtheme');
 		
       $Sender->Form = new Gdn_Form();
-		if ($Sender->Form->GetFormValue('ExitPreview') ? TRUE : FALSE) {
+		if ($Sender->Form->GetFormValue('Exit_Preview') ? TRUE : FALSE) {
 			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
 			Redirect('/settings/customtheme');
 		}		
@@ -237,6 +237,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			$IncludeThemeCSS = $ThemeData->IncludeThemeCSS;
 		} else {
 			$IncludeThemeCSS = 'Yes';
+			$CSSContents = '';
 			if (file_exists($Folder . DS . 'design' . DS . 'customtheme.css'))
 				$CSSContents = file_get_contents ($Folder . DS . 'design' . DS . 'customtheme.css');
 				
@@ -279,7 +280,7 @@ Here are some things you should know before you begin:
 			// If saving the form
 			$IsApply = $Sender->Form->GetFormValue('Apply') ? TRUE : FALSE;
 			$IsPreview = $Sender->Form->GetFormValue('Preview') ? TRUE : FALSE;
-			$IsApplyPreview = $Sender->Form->GetFormValue('ApplyChanges') ? TRUE : FALSE;
+			$IsApplyPreview = $Sender->Form->GetFormValue('Apply_Changes') ? TRUE : FALSE;
 
 			// If applying the changes from a preview
 			if ($IsApplyPreview) {
