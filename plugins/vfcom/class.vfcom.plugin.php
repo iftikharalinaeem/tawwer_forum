@@ -36,7 +36,7 @@ class VfcomPlugin extends Gdn_Plugin {
    
    public function __construct() {
       // Get (and protect) and Infrastructure API token
-      $this->DataAPIToken = GetValue('X_FRONTEND_TOKEN', $_SERVER, 'D9BB-194F674A-B9BEE7AF');
+      $this->DataAPIToken = GetValue('X_FRONTEND_TOKEN', $_SERVER, NULL);
       unset($_SERVER['X_FRONTEND_TOKEN']);
       
       $ClientParts = explode('.', CLIENT_NAME);
