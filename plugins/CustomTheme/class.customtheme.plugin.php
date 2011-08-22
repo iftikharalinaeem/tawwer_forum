@@ -305,15 +305,14 @@ Here are some things you should know before you begin:
 				));
 				SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', $WorkingRevisionID);
 				SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', $NewIncludeThemeCSS);
-
-				// Check to see if there are any fatal errors in the smarty template
-				$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', TRUE);
-				$Result = ProxyRequest(Gdn::Request()->Url('/', TRUE), 10);
-				// echo Wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
-				$SmartyCompileError = ($Result == '' || strpos($Result, '<title>Fatal Error</title>') > 0 || strpos($Result, '<title>Bonk</title>') > 0) ? TRUE : FALSE;
-				$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
-
 			}
+
+			// Check to see if there are any fatal errors in the smarty template
+			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', TRUE);
+			$Result = ProxyRequest(Gdn::Request()->Url('/', TRUE), 10);
+			// echo Wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
+			$SmartyCompileError = ($Result == '' || strpos($Result, '<title>Fatal Error</title>') > 0 || strpos($Result, '<title>Bonk</title>') > 0) ? TRUE : FALSE;
+			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
 
 			// If we are applying the changes, and the changes didn't cause crashes save the live revision number.
 			if (!$SmartyCompileError && ($IsApply || $IsApplyPreview)) {
@@ -344,7 +343,7 @@ Here are some things you should know before you begin:
 			}
 			
 			if ($SmartyCompileError)
-				$Sender->Form->AddError('There was a templating error in your HTML customizations. Make sure that any inline CSS definitions are wrapped in {literal} tags, and all {if} statements have a closing {/if} tag.');
+				$Sender->Form->AddError('There was a templating error in your HTML customizations. Make sure that any javascript or inline CSS definitions are wrapped in {literal} tags, and all {if} statements have a closing {/if} tag.');
 			else 
 				$Sender->StatusMessage = "Your changes have been applied.";
 				
