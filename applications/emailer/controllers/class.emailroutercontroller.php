@@ -1,0 +1,135 @@
+<?php if (!defined('APPLICATION')) exit();
+
+class EmailRouterController extends Gdn_Controller {
+   /// Properties ///
+   
+   /**
+    *
+    * @var Gdn_Form 
+    */
+   public $Form;
+   
+   /// Methods ///
+   
+   /**
+    * Include JS, CSS, and modules used by all methods.
+    *
+    * Always called by dispatcher before controller's requested method.
+    * 
+    * @since 2.0.0
+    * @access public
+    */
+   public function Initialize() {
+      $this->Head = new HeadModule($this);
+      $this->AddJsFile('jquery.js');
+      $this->AddJsFile('global.js');
+      
+      $this->AddCssFile('style.css');
+      
+//      $this->MasterView = 'default';
+      parent::Initialize();
+   }
+   
+   public static function ParseEmailHeader($Header) {
+      $Result = array();
+      $Parts = explode("\n", $Header);
+
+      $i = NULL;
+      foreach ($Parts as $Part) {
+         if (!$Part)
+            continue;
+         if (preg_match('`^\s`', $Part)) {
+            if (isset($Result[$i])) {
+               $Result[$i] .= "\n".$Part;
+            }
+         } else {
+//            self::Log("Headerline: $Part");
+            list($Name, $Value) = explode(':', $Part, 2);
+            $i = trim($Name);
+            $Result[$i] = ltrim($Value);
+         }
+      }
+
+      return $Result;
+   }
+   
+   public function Sendgrid() {
+      $this->SetData('Title', T('Sendgrid Proxy'));
+      try {
+         Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE);
+         Gdn::Session()->User->Admin = FALSE;
+
+         $this->Form = new Gdn_Form();
+         $this->Form->InputPrefix = '';
+
+         if ($this->Form->IsPostBack()) {
+//            self::Log("Postback");
+
+//            self::Log("Getting post...");
+            $Post = $this->Form->FormValues();
+//            self::Log("Post got...");
+            $Data = ArrayTranslate($Post, array(
+                'from' => 'From',
+                'to' => 'To',
+                'subject' => 'Subject'
+            ));
+
+   //         self::Log('Parsing headers.'.GetValue('headers', $Post, ''));
+            $Headers = self::ParseEmailHeader(GetValue('headers', $Post, ''));
+   //         self::Log('Headers: '.print_r($Headers, TRUE));
+            $Headers = array_change_key_case($Headers);
+            $HeaderData = ArrayTranslate($Headers, array('message-id' => 'MessageID', 'references' => 'References', 'in-reply-to' => 'ReplyTo'));
+            $Data = array_merge($Data, $HeaderData);
+
+            if (FALSE && GetValue('html', $Post)) {
+               $Data['Body'] = $Post['html'];
+               $Data['Format'] = 'Html';
+            } else {
+               $Data['Body'] = $Post['text'];
+               $Data['Format'] = 'Html';
+            }
+
+//            self::Log("Saving data...");
+            $this->Data['_Status'][] = 'Saving data.';
+            
+            // Figure out the url from the email's address.
+            $To = GetValue('x-forwarded-to', $Headers);
+            if (!$To) {
+               $To = $Data['To'];
+            }
+            
+            if (preg_match('`([^+@]+)([^@]*)@(.+)`', $To, $Matches)) {
+               $ClientName = $Matches[1];
+               $Domain = $Matches[3];
+               
+               $Url = "http://$ClientName.vanillaforums.com/post/email.json";
+            } else {
+               $this->SetData('Error', "Invalid to: $To");
+               $this->Render();
+               return;
+            }
+            
+            // Curl the data to the new forum.
+            $C = curl_init();
+            curl_setopt($C, CURLOPT_URL, $Url);
+            curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
+            curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($C, CURLOPT_POST, 1);
+            curl_setopt($C, CURLOPT_POSTFIELDS, $Data);
+            
+            $Result = curl_exec($C);
+            $ResultInfo = curl_getinfo($C);
+         }
+
+         
+         $this->Render('Sendgrid', '', 'plugins/VanillaPop');
+      } catch (Exception $Ex) {
+         $Contents = $Ex->getMessage()."\n"
+            .$Ex->getTraceAsString()."\n"
+            .print_r($_POST, TRUE);
+         file_put_contents(PATH_UPLOADS.'/email/error_'.time().'.txt', $Contents);
+         
+         throw $Ex;
+      }
+   }
+}
