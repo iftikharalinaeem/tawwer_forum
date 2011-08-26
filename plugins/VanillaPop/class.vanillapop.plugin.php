@@ -180,17 +180,17 @@ class VanillaPopPlugin extends Gdn_Plugin {
    
    protected function Save($Data, $Sender) {
       // Save the email so we know what's going on.
-      $Path = PATH_LOCAL_UPLOADS.'/email/'.time().'.txt';
-      if (!file_exists(dirname($Path)))
-         mkdir(dirname($Path), 0777, TRUE);
+//      $Path = PATH_LOCAL_UPLOADS.'/email/'.time().'.txt';
+//      if (!file_exists(dirname($Path)))
+//         mkdir(dirname($Path), 0777, TRUE);
       
-      $Sender->Data['_Status'][] = "Saving backup to $Path.";
-      file_put_contents($Path, print_r($Data, TRUE));
+//      $Sender->Data['_Status'][] = "Saving backup to $Path.";
+//      file_put_contents($Path, print_r($Data, TRUE));
       
       // Save the full post for debugging.
-      $Data['Attributes'] = serialize(array('POST' => $_POST));
+      $Data['Attributes'] = ArrayTranslate($Data, array('Headers', 'Source'));
       
-      $Data['Body'] = self::StripEmail($Data['Body']);
+//      $Data['Body'] = self::StripEmail($Data['Body']);
       if (!$Data['Body'])
          $Data['Body'] = T('(empty message)');
       
@@ -719,12 +719,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
 //      $Body = GetValueR('Object.Body', $Args);
 //      $Format = GetValueR('Object.Format', $Args);
 //      $Text = self::FormatPlainText($Body, $Format);
-//      echo '<pre>'.nl2br(htmlspecialchars($Text)).'</pre>';
 //      
-//      
-//      $Post = GetValue('POST', $Attributes, FALSE);
-//      if (is_array($Post))
-//         echo '<pre>'.htmlspecialchars(print_r($Post, TRUE)).'</pre>';
+//      $Source = GetValue('Source', $Attributes, FALSE);
+//      if (is_array($Source))
+//         echo '<pre>'.htmlspecialchars(GetValue("Headers", $Attributes), $Source).'</pre>';
 //   }
    
    public function Gdn_Dispatcher_BeforeBlockDetect_Handler($Sender, $Args) {
@@ -732,6 +730,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
    }
    
    public function PostController_Email_Create($Sender, $Args) {
+      $this->UtilityController_Email_Create($Sender, $Args);
+   }
+   
+   public function UtilityController_Email_Create($Sender, $Args) {
       if (Gdn::Session()->UserID == 0) {
          Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE);
          Gdn::Session()->User->Admin = FALSE;
@@ -751,12 +753,16 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $Sender->Render('Email', '', 'plugins/VanillaPop');
    }
    
+   public function PostController_Sendgrid_Create($Sender, $Args) {
+      $this->UtilityController_Sendgrid_Create($Sender, $Args);
+   }
+   
    /**
     *
     * @param PostController $Sender
     * @param array $Args 
     */
-   public function PostController_Sendgrid_Create($Sender, $Args) {
+   public function UtilityController_Sendgrid_Create($Sender, $Args) {
       try {
          Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE);
          Gdn::Session()->User->Admin = FALSE;
