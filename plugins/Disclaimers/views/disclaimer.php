@@ -17,7 +17,7 @@
 $TK = $this->Data('TK');
 $CategoryID = rawurlencode($this->Data('CategoryID'));
 
-echo '<div class="Disclaimer-Text Info">', wpautop($this->Data('Disclaimer')), '</div>';
+echo '<div class="Disclaimer-Text Info">', vf_wpautop($this->Data('Disclaimer')), '</div>';
 
 echo '<div class="Disclaimer-Links">',
    Anchor(T('Leave'), "/entry/disclaimer/$CategoryID?TK=$TK&Disclaimed=0", 'Disclaimer-Leave'),
