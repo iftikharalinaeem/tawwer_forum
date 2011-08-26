@@ -71,7 +71,9 @@ class EmailRouterController extends Gdn_Controller {
             $Data = ArrayTranslate($Post, array(
                 'from' => 'From',
                 'to' => 'To',
-                'subject' => 'Subject'
+                'subject' => 'Subject',
+                'headers' => 'Headers',
+                'text' => 'Source'
             ));
 
    //         self::Log('Parsing headers.'.GetValue('headers', $Post, ''));
@@ -85,7 +87,7 @@ class EmailRouterController extends Gdn_Controller {
                $Data['Body'] = $Post['html'];
                $Data['Format'] = 'Html';
             } else {
-               $Data['Body'] = $Post['text'];
+               $Data['Body'] = self::StripEmail($Post['text']);
                $Data['Format'] = 'Html';
             }
 
@@ -102,7 +104,7 @@ class EmailRouterController extends Gdn_Controller {
                $ClientName = $Matches[1];
                $Domain = $Matches[3];
                
-               $Url = "http://$ClientName.vanillaforums.com/post/email.json";
+               $Url = "http://$ClientName.vanillaforums.com/utility/email.json";
             } else {
                $this->SetData('Error', "Invalid to: $To");
                $this->Render();
@@ -119,10 +121,14 @@ class EmailRouterController extends Gdn_Controller {
             
             $Result = curl_exec($C);
             $ResultInfo = curl_getinfo($C);
+            $ResultData = @json_decode($Result);
+            if ($ResultData) {
+               $this->Data = $Data;
+            }
          }
 
          
-         $this->Render('Sendgrid', '', 'plugins/VanillaPop');
+         $this->Render();
       } catch (Exception $Ex) {
          $Contents = $Ex->getMessage()."\n"
             .$Ex->getTraceAsString()."\n"
@@ -131,5 +137,46 @@ class EmailRouterController extends Gdn_Controller {
          
          throw $Ex;
       }
+   }
+   
+   public static function StripEmail($Body) {
+      $SigFound = FALSE; 
+      $InQuotes = 0;
+
+      $Lines = explode("\n", trim($Body));
+      $LastLine = count($Lines);
+
+      for ($i = $LastLine - 1; $i >= 0; $i--) {
+         $Line = $Lines[$i];
+
+         if ($InQuotes === 0 && preg_match('`^\s*[>|]`', $Line)) {
+            // This is a quote line.
+            $LastLine = $i;
+         } elseif (!$SigFound && preg_match('`^\s*--`', $Line)) {
+            // -- Signature delimiter.
+            $LastLine = $i;
+            $SigFound = TRUE;
+         } elseif (preg_match('`^\s*---.+---\s*$`', $Line)) {
+            // This will catch an ------Original Message------ heade
+            $LastLine = $i;
+            $InQuotes = FALSE;
+         } elseif ($InQuotes === 0) {
+            if (preg_match('`wrote:\s*$`i', $Line)) {
+               // This is the quote line...
+               $LastLine = $i;
+               $InQuotes = FALSE;
+            } elseif (preg_match('`^\s*$`', $Line)) {
+               $LastLine = $i;
+            } else {
+               $InQuotes = FALSE;
+            }
+         }
+      }
+
+      if ($LastLine >= 1) {
+         $Lines = array_slice($Lines, 0, $LastLine);
+      }
+      $Result = trim(implode("\n", $Lines));
+      return $Result;
    }
 }
