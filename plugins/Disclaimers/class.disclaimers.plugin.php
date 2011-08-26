@@ -82,7 +82,7 @@ class DisclaimersPlugin extends Gdn_Plugin {
       }
 
       $Sender->SetData('Title', T('Warning'));
-      $Sender->SetData('Disclaimer', T("Disclaimer.$CategoryID.Text", 'Some of the material in this section may not be suitable for all viewers. Please continue only if your are comfortable viewing such material.'));
+      $Sender->SetData('Disclaimer', C('Plugins.Disclaimers.Text', ''));
       $Sender->SetData('TK', Gdn::Session()->TransientKey());
       $Sender->SetData('Target', $Target);
       $Sender->SetData('CategoryID', $Args[0]);
@@ -97,12 +97,13 @@ class DisclaimersPlugin extends Gdn_Plugin {
     */
    public function SettingsController_Disclaimers_Create($Sender, $Args) {
       $Sender->Permission('Garden.Settings.Manage');
-      $Sender->AddSideMenu('');
+      $Sender->AddSideMenu('settings/disclaimers');
 
-      $Sender->Title(T('Disclaimer Settings'));
+      $Sender->Title(T('Category Disclaimer'));
 
       if ($Sender->Form->AuthenticatedPostBack()) {
          if ($Sender->Form->ErrorCount() == 0) {
+            $DisclaimerText = $Sender->Form->GetFormValue('DisclaimerText');
             $CategoryIDs = $Sender->Form->GetFormValue('CategoryIDs', array());
             if (is_array($CategoryIDs))
                $CategoryIDs = implode(',', $CategoryIDs);
@@ -110,17 +111,18 @@ class DisclaimersPlugin extends Gdn_Plugin {
                $CategoryIDs = '';
 
             SaveToConfig(array(
-                'Plugins.Disclaimers.CategoryIDs' => $CategoryIDs
+                'Plugins.Disclaimers.CategoryIDs' => $CategoryIDs,
+                'Plugins.Disclaimers.Text' => $DisclaimerText
             ));
 
             $Sender->InformMessage(T('Saved'));
          }
       } else {
          // Grab the settings from the config.
-
          $CategoryIDs = explode(',', C('Plugins.Disclaimers.CategoryIDs'));
          $Sender->Form->SetValue('CategoryIDs', $CategoryIDs);
-
+         $DisclaimerText = C('Plugins.Disclaimers.Text', 'Some of the material in this section may not be suitable for all viewers. Please continue only if your are comfortable viewing such material.');
+         $Sender->Form->SetValue('DisclaimerText', $DisclaimerText);
       }
 
       $Categories = CategoryModel::Categories();
@@ -131,5 +133,11 @@ class DisclaimersPlugin extends Gdn_Plugin {
 
       $Sender->Render('Settings', '', 'plugins/Disclaimers');
    }
+   
+   
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+		$Menu = &$Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Forum', 'Category Disclaimer', 'settings/disclaimers', 'Garden.Settings.Manage');
+	}   
 
 }
