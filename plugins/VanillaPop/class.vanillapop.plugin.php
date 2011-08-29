@@ -9,7 +9,7 @@ $PluginInfo['VanillaPop'] = array(
    'Name' => 'Vanilla Pop',
    'Description' => "Integrates your forum with Vanilla's email service.",
    'Version' => '1.0a',
-   'RequiredApplications' => array('Vanilla' => '2.0.18a3'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
@@ -23,6 +23,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
    /// Methods ///
    
    public static function AddIDToEmail($Email, $ID) {
+      if (!C('Plugins.VanillaPop.AugmentFrom', TRUE))
+         return;
+      
       // Encode the message ID in the from.
       $FromParts = explode('@', $Email, 2);
       if (count($FromParts) == 2) {
@@ -177,17 +180,17 @@ class VanillaPopPlugin extends Gdn_Plugin {
    
    protected function Save($Data, $Sender) {
       // Save the email so we know what's going on.
-      $Path = PATH_LOCAL_UPLOADS.'/email/'.time().'.txt';
-      if (!file_exists(dirname($Path)))
-         mkdir(dirname($Path), 0777, TRUE);
+//      $Path = PATH_LOCAL_UPLOADS.'/email/'.time().'.txt';
+//      if (!file_exists(dirname($Path)))
+//         mkdir(dirname($Path), 0777, TRUE);
       
-      $Sender->Data['_Status'][] = "Saving backup to $Path.";
-      file_put_contents($Path, print_r($Data, TRUE));
+//      $Sender->Data['_Status'][] = "Saving backup to $Path.";
+//      file_put_contents($Path, print_r($Data, TRUE));
       
       // Save the full post for debugging.
-      $Data['Attributes'] = serialize(array('POST' => $_POST));
+      $Data['Attributes'] = ArrayTranslate($Data, array('Headers', 'Source'));
       
-      $Data['Body'] = self::StripEmail($Data['Body']);
+//      $Data['Body'] = self::StripEmail($Data['Body']);
       if (!$Data['Body'])
          $Data['Body'] = T('(empty message)');
       
@@ -596,6 +599,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
             if ($Discussion) {
                $Args['Headline'] = self::FormatPlainText($Discussion['Name'], 'Text');
                $Story = self::FormatPlainText($Discussion['Body'], $Discussion['Format']);
+               $Message = self::FormatEmailBody($Story, GetValue('Route', $Args));
+               $Email->Message($Message);
             }
             
             $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $Args['Headline']));
@@ -674,6 +679,17 @@ class VanillaPopPlugin extends Gdn_Plugin {
       }
    }
    
+   /**
+	 * Adds items to dashboard menu.
+	 *
+	 * @param object $Sender DashboardController.
+	 */
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      $Menu = $Sender->EventArguments['SideMenu'];
+//      $Menu->AddItem('Pages', T('Pages Settings'), FALSE, array('class' => 'Pages', 'After' => 'Forum'));
+      $Menu->AddLink('Site Settings', T('Incoming Email'), '/settings/vanillapop', 'Garden.Settings.Manage', array('After' => 'dashboard/settings/email'));
+   }
+   
    
    public function CommentModel_BeforeNotification_Handler($Sender, $Args) {
       // Make sure the discussion's user is notified if they started the discussion by email.
@@ -694,24 +710,30 @@ class VanillaPopPlugin extends Gdn_Plugin {
 //      $ActivityModel->QueueNotification($ActivityID, '');
    }
    
-   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
-      $Attributes = GetValueR('Object.Attributes', $Args);
-      if (is_string($Attributes)) {
-         $Attributes = @unserialize($Attributes);
-      }
-      
-      $Body = GetValueR('Object.Body', $Args);
-      $Format = GetValueR('Object.Format', $Args);
-      $Text = self::FormatPlainText($Body, $Format);
-      echo '<pre>'.nl2br(htmlspecialchars($Text)).'</pre>';
-      
-      
-      $Post = GetValue('POST', $Attributes, FALSE);
-      if (is_array($Post))
-         echo '<pre>'.htmlspecialchars(print_r($Post, TRUE)).'</pre>';
+//   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
+//      $Attributes = GetValueR('Object.Attributes', $Args);
+//      if (is_string($Attributes)) {
+//         $Attributes = @unserialize($Attributes);
+//      }
+//      
+//      $Body = GetValueR('Object.Body', $Args);
+//      $Format = GetValueR('Object.Format', $Args);
+//      $Text = self::FormatPlainText($Body, $Format);
+//      
+//      $Source = GetValue('Source', $Attributes, FALSE);
+//      if (is_array($Source))
+//         echo '<pre>'.htmlspecialchars(GetValue("Headers", $Attributes), $Source).'</pre>';
+//   }
+   
+   public function Gdn_Dispatcher_BeforeBlockDetect_Handler($Sender, $Args) {
+      $Args['BlockExceptions']['`post/sendgrid(\/.*)?$`'] = Gdn_Dispatcher::BLOCK_NEVER;
    }
    
    public function PostController_Email_Create($Sender, $Args) {
+      $this->UtilityController_Email_Create($Sender, $Args);
+   }
+   
+   public function UtilityController_Email_Create($Sender, $Args) {
       if (Gdn::Session()->UserID == 0) {
          Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE);
          Gdn::Session()->User->Admin = FALSE;
@@ -731,12 +753,16 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $Sender->Render('Email', '', 'plugins/VanillaPop');
    }
    
+   public function PostController_Sendgrid_Create($Sender, $Args) {
+      $this->UtilityController_Sendgrid_Create($Sender, $Args);
+   }
+   
    /**
     *
     * @param PostController $Sender
     * @param array $Args 
     */
-   public function PostController_Sendgrid_Create($Sender, $Args) {
+   public function UtilityController_Sendgrid_Create($Sender, $Args) {
       try {
          Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE);
          Gdn::Session()->User->Admin = FALSE;
@@ -804,11 +830,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $Conf = new ConfigurationModule($Sender);
       $Conf->Initialize(array(
           'Plugins.VanillaPop.DefaultCategoryID' => array('Control' => 'CategoryDropDown', 'Description' => 'Place discussions started through email in the following category.'),
-          'Plugins.VanillaPop.AllowUserRegistration' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow new users to be registered through email.')
+          'Plugins.VanillaPop.AllowUserRegistration' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow new users to be registered through email.'),
+          'Plugins.VanillaPop.AugmentFrom' => array('Control' => 'CheckBox', 'LabelCode' => 'Add information into the from field in email addresses to help with replies (recommended).', 'Default' => TRUE),
+          'Garden.Email.SupportAddress' => array('Control' => 'TextBox', 'LabelCode' => 'Outgoing Email Address', 'Description' => 'This is the address that will show up in the from field of emails sent from the application.')
       ));
 
       $Sender->AddSideMenu();
-      $Sender->SetData('Title', T('Vanilla Pop Settings'));
+      $Sender->SetData('Title', T('Incoming Email'));
       $Sender->ConfigurationModule = $Conf;
 //      $Conf->RenderAll();
       $Sender->Render('Settings', '', 'plugins/VanillaPop');

@@ -65,14 +65,16 @@ echo $this->Form->Errors();
                      ?>
                   </li>
                </ul>
+               <div class="Buttons">
                <?php
+               echo $this->Form->Button('Preview', array('class' => 'TextButton'));
                if (C('Plugins.CustomTheme.Enabled'))
-                  echo $this->Form->Button('Apply &rarr;', array('Name' => 'Apply', 'class' => 'Button Apply'));
+                  echo $this->Form->Button('Apply', array('class' => 'Button Apply'));
                else
-                  echo Anchor('Apply &rarr;', 'settings/customthemeupgrade/', 'Button Apply');
+                  echo Anchor('Apply', 'settings/customthemeupgrade/', 'Button Apply');
    
-               echo $this->Form->Button('Preview &uarr;', array('Name' => 'Preview'));
                ?>
+               </div>
             </div>
             <?php WriteRevisions($this, 'css'); ?>
             <strong>Help</strong>
@@ -99,14 +101,16 @@ echo $this->Form->Errors();
          <div class="CustomThemeOptions">
             <strong>Revision Options</strong>
             <div class="InfoBox RevisionOptions">
+               <div class="Buttons">
                <?php
+               echo $this->Form->Button('Preview', array('class' => 'TextButton'));
                if (C('Plugins.CustomTheme.Enabled'))
-                  echo $this->Form->Button('Apply &rarr;', array('Name' => 'Apply', 'class' => 'Button Apply'));
+                  echo $this->Form->Button('Apply', array('class' => 'Button Apply'));
                else
-                  echo Anchor('Apply &rarr;', 'settings/customthemeupgrade/', 'Button Apply');
+                  echo Anchor('Apply', 'settings/customthemeupgrade/', 'Button Apply');
    
-               echo $this->Form->Button('Preview &uarr;', array('Name' => 'Preview'));
                ?>
+               </div>
             </div>
             <?php WriteRevisions($this, 'html'); ?>
             <strong>Help</strong>

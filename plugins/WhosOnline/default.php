@@ -4,7 +4,7 @@
 $PluginInfo['WhosOnline'] = array(
    'Name' => 'WhosOnline',
    'Description' => "Lists the users currently browsing the forum.",
-   'Version' => '1.3',
+   'Version' => '1.3.1',
    'Author' => "Gary Mardell",
    'AuthorEmail' => 'gary@vanillaplugins.com',
    'AuthorUrl' => 'http://vanillaplugins.com',
@@ -152,6 +152,10 @@ class WhosOnlinePlugin extends Gdn_Plugin {
    
 
    public function Setup() { 
+      $this->Structure();
+   }
+   
+   public function Structure() {
       $Structure = Gdn::Structure();
       $Structure->Table('Whosonline')
 			->Column('UserID', 'int(11)', FALSE, 'primary')

@@ -6,7 +6,13 @@ echo $this->Form->Errors();
 ?>
 <ul>
    <li>
-      <div><?php echo T('Check the categories that require a disclaimer.'); ?></div>
+      <?php
+      echo $this->Form->Label(T('Disclaimer Text'), 'DisclaimerText');
+      echo $this->Form->TextBox('DisclaimerText', array('MultiLine' => TRUE));
+      ?>
+   </li>
+   <li>
+      <div><?php echo $this->Form->Label(T('Check the categories that require a disclaimer.'), 'CategoryIDs'); ?></div>
       <?php
          echo $this->Form->CheckBoxList('CategoryIDs', $this->Data('_Categories'), NULL, array('TextField' => 'Name', 'ValueField' => 'CategoryID', 'listclass' => 'ColumnCheckBoxList'));
       ?>
