@@ -34,7 +34,7 @@ div#Foot {
 	padding: 0;
 }
 div#Foot div {
-	padding: 12px 0 10px;
+	padding: 10px 20px;
 	border: 0;
 	margin: 0 auto;
 }
@@ -256,7 +256,7 @@ ul.PanelInfo li.Active {
 
 /* Tabs */
 div.Tabs {
-	background: url('images/grey_fade.png') left top repeat-x;
+	background: url('images/grey_fade.png') left top repeat-x #EDF1F9;
 	border:1px solid #9fa9b9;
 	border-radius: 4px 4px 0 0;
 	-moz-border-radius: 4px 4px 0 0;
@@ -314,10 +314,20 @@ ul.DataList li.Mine div.Meta a.Category,
 ul.DataList div.Meta a.Category {
 	background:none;
 }
-form.Activity, ul.MessageList, ul.DataList {
+form.Activity {
+   border-bottom: solid 1px #9FA9B9;
+}
+form.Activity .TextBoxWrapper {
+   padding: 0;
+}
+ul.MessageList, ul.DataList {
 	border-left: none;
 	border-right: none;
 	border-bottom: none;
+}
+
+.CategoryList .ItemContent {
+   margin: 0;
 }
 
 /* Full Width */
@@ -331,10 +341,12 @@ form.Activity, ul.MessageList, ul.DataList {
 	 float: none;
 }
 #Panel {
-	 float: none;
+   float: left;
+   padding: 0 20px;
+/*	 float: none;
 	 position: absolute;
 	 left: 20px;
-	 top: 30px;
+	 top: 30px;*/
 }
 body.Profile #Content {
 	 width: auto;
@@ -362,3 +374,16 @@ div.CommentForm textarea,
     width:99%;
 }
 
+.Count {
+   background: #444;
+   color: #fff;
+}
+
+.ToggleFlyout .Flyout {
+   left: auto;
+   right: 0;
+}
+
+.MenuItems {
+   min-width: 75px;
+}

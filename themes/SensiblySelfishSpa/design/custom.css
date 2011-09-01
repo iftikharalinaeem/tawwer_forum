@@ -453,3 +453,8 @@ input.DateBox, input.InputBox, input.SmallInput, textarea {
     border: 1px solid #76252A;
     font-size: 12px;
 }
+
+.Count {
+   background: transparent;
+   color: #333;
+}

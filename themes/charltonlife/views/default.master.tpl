@@ -46,12 +46,15 @@
  </div>
  <div id="Frame">
   <div id="Body">
-   <div id="Content">{asset name="Content"}</div>
    <div id="Panel">{asset name="Panel"}</div>
+   <div id="Content">{asset name="Content"}</div>
   </div>
-  <div id="Foot">
-  <div>Powered by <a href="http://vanillaforums.org"><span>Vanilla</span></a></div>
-  {asset name="Foot"}
- </div>
+  <div id="Foot" style="clear: both;">
+   <div>Powered by <a href="http://vanillaforums.com"><span>Vanilla</span></a></div>
+   {asset name="Foot"}
+  </div>
+   
+   </div>
+   {event name="AfterBody"}
 </body>
 </html>
