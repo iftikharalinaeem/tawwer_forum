@@ -35,19 +35,5 @@ echo $this->Form->Errors();
                </tr>             
          </tbody>
       </table>
-      <table class="AltRows">
-         <thead>
-            <tr>
-               <th><?php echo T('Frequency'); ?></th>
-               <th class="Alt"><?php echo T('In seconds'); ?></th>
-            </tr>
-         </thead>
-         <tbody>
-            <tr>
-               <th><?php echo T('Rate of refresh'); ?></th>
-               <td class="Alt"><?php echo $this->Form->TextBox('WhosOnline.Frequency'); ?></td>
-            </tr>
-         </tbody>
-      </table>
 
 <?php echo $this->Form->Close('Save');

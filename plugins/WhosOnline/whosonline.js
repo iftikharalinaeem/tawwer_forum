@@ -15,7 +15,7 @@ $(document).ready(function() {
 		});
 	}
 
-	GetOnline();
+	setTimeout(GetOnline, gdn.definition('WhosOnlineFrequency') * 1000);
 });
 
 
