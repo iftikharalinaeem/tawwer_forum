@@ -30,7 +30,7 @@ class WhosOnlineModule extends Gdn_Module {
 		$History = time() - $Frequency;
 
 		$SQL
-			->Select('u.UserID, u.Name, w.Timestamp, w.Invisible')
+			->Select('u.UserID, u.Name, u.Email, w.Timestamp, w.Invisible')
 			->From('Whosonline w')
 			->Join('User u', 'w.UserID = u.UserID')
 			->Where('w.Timestamp >=', date('Y-m-d H:i:s', $History))
@@ -51,24 +51,47 @@ class WhosOnlineModule extends Gdn_Module {
 		$String = '';
 		$Session = Gdn::Session();
 		ob_start();
+      $DisplayStyle = C('WhosOnline.DisplayStyle', 'list');
 		?>
 			<div id="WhosOnline" class="Box">
 				<h4><?php echo T("Who's Online"); ?> (<?php echo $this->_OnlineUsers->NumRows(); ?>)</h4>
-				<ul class="PanelInfo">
+            <?php if ($DisplayStyle == 'pictures') { ?>
+               <div class="PhotoGrid">
+            <?php } else { ?>
+               <ul class="PanelInfo">
+            <?php } ?>
+               
 				<?php
 				if ($this->_OnlineUsers->NumRows() > 0) { 
-					foreach($this->_OnlineUsers->Result() as $User) {
-				?>
-					<li>
-		 				<strong <?php echo ($User->Invisible == 1 ? 'class="Invisible"' : '')?>>
-		    				<?php echo UserAnchor($User); ?>
-		 				</strong><br/>
-					</li>
-				<?php
-					}
+               $DisplayStyle = C('WhosOnline.DisplayStyle', 'list');
+               if ($this->_OnlineUsers->NumRows() > 10) {
+                  $ImageClass = 'ProfilePhotoSmall';
+               } else {
+                  $ImageClass = 'ProfilePhotoMedium';
+               }
+               
+					foreach($this->_OnlineUsers->Result() as $User):
+                  if ($DisplayStyle == 'pictures'):
+                     echo UserPhoto($User, array('ImageClass' => $ImageClass));
+                  else:
+                  ?>
+                     <li>
+                        <strong <?php echo ($User->Invisible == 1 ? 'class="Invisible"' : '')?>>
+                           <?php echo UserAnchor($User); ?>
+                        </strong><br/>
+                     </li>
+                  <?php
+                  endif;
+                  
+					endforeach;
 				}
 				?>
-			</ul>
+            <?php if ($DisplayStyle == 'pictures') { ?>
+               </div>
+            <?php } else { ?>
+               </ul>
+            <?php } ?>
+			
 		</div>
 		<?php
 		$String = ob_get_contents();

@@ -2,14 +2,14 @@
 
 // Define the plugin:
 $PluginInfo['WhosOnline'] = array(
-   'Name' => 'WhosOnline',
+   'Name' => 'Whos Online',
    'Description' => "Lists the users currently browsing the forum.",
-   'Version' => '1.3.1',
+   'Version' => '1.3.2',
    'Author' => "Gary Mardell",
    'AuthorEmail' => 'gary@vanillaplugins.com',
    'AuthorUrl' => 'http://vanillaplugins.com',
-   'RegisterPermissions' => array('Plugins.WhosOnline.ViewHidden', 'Plugins.WhosOnline.Manage'),
-   'SettingsPermission' => array('Plugins.WhosOnline.Manage')
+   'RegisterPermissions' => array('Plugins.WhosOnline.ViewHidden'),
+   'SettingsPermission' => array('Garden.Settings.Manage')
 );
 
 /**
@@ -21,26 +21,38 @@ $PluginInfo['WhosOnline'] = array(
 class WhosOnlinePlugin extends Gdn_Plugin {
    
    public function PluginController_WhosOnline_Create(&$Sender) {
-      $Sender->Permission('Plugins.WhosOnline.Manage');
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->AddSideMenu('plugin/whosonline');
-      $Sender->Form = new Gdn_Form();
-      $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('WhosOnline.Location.Show', 'WhosOnline.Frequency', 'WhosOnline.Hide'));
-      $Sender->Form->SetModel($ConfigurationModel);
-            
-      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {    
-         $Sender->Form->SetData($ConfigurationModel->Data);    
-      } else {
-         $Data = $Sender->Form->FormValues();
-         $ConfigurationModel->Validation->ApplyRule('WhosOnline.Frequency', array('Required', 'Integer'));
-         $ConfigurationModel->Validation->ApplyRule('WhosOnline.Location.Show', 'Required');
-         if ($Sender->Form->Save() !== FALSE)
-            $Sender->StatusMessage = T("Your settings have been saved.");
-      }
+      $Sender->SetData('Title', T("Who's Online Settings"));
       
-      // creates the page for the plugin options such as display options
-      $Sender->Render($this->GetView('whosonline.php'));
+      $Config = new ConfigurationModule($Sender);
+      $Config->Initialize(array(
+          'WhosOnline.Location.Show' => array('Control' => 'RadioList', 'Description' => "This setting determins where the list of online users is displayed.", 'Items' => array('every' => 'Every page', 'discussion' => 'In discussions only'), 'Default' => 'every'),
+          'WhosOnline.Hide' => array('Control' => 'CheckBox', 'LabelCode' => "Hide the who's online module for guests."),
+          'WhosOnline.DisplayStyle' => array('Control' => 'RadioList', 'Items' => array('list' => 'List', 'pictures' => 'Pictures'), 'Default' => 'list')
+      ));
+      
+      $Config->RenderAll();
+      
+      
+//      $Sender->Form = new Gdn_Form();
+//      $Validation = new Gdn_Validation();
+//      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+//      $ConfigurationModel->SetField(array('WhosOnline.Location.Show', 'WhosOnline.Frequency', 'WhosOnline.Hide'));
+//      $Sender->Form->SetModel($ConfigurationModel);
+//            
+//      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {    
+//         $Sender->Form->SetData($ConfigurationModel->Data);    
+//      } else {
+//         $Data = $Sender->Form->FormValues();
+//         $ConfigurationModel->Validation->ApplyRule('WhosOnline.Frequency', array('Required', 'Integer'));
+//         $ConfigurationModel->Validation->ApplyRule('WhosOnline.Location.Show', 'Required');
+//         if ($Sender->Form->Save() !== FALSE)
+//            $Sender->StatusMessage = T("Your settings have been saved.");
+//      }
+//      
+//      // creates the page for the plugin options such as display options
+//      $Sender->Render($this->GetView('whosonline.php'));
    }
 
    public function PluginController_ImOnline_Create(&$Sender) {
@@ -53,7 +65,6 @@ class WhosOnlinePlugin extends Gdn_Plugin {
       $WhosOnlineModule = new WhosOnlineModule($Sender);
       $WhosOnlineModule->GetData(ArrayValue('Plugin.WhosOnline.Invisible', $UserMetaData));
       echo $WhosOnlineModule->ToString();
-
    }
    
    public function Base_Render_Before(&$Sender) {
@@ -96,9 +107,9 @@ class WhosOnlinePlugin extends Gdn_Plugin {
 	   $Sender->AddModule($WhosOnlineModule);
 
 	   $Sender->AddJsFile('/plugins/WhosOnline/whosonline.js');
-	   $Frequency = C('WhosOnline.Frequency', 4);
+	   $Frequency = C('WhosOnline.Frequency', 60);
 	   if (!is_numeric($Frequency))
-	      $Frequency = 4;
+	      $Frequency = 60;
       
 	   $Sender->AddDefinition('WhosOnlineFrequency', $Frequency);
       
