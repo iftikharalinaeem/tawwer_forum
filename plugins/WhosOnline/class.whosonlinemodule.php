@@ -18,28 +18,45 @@ class WhosOnlineModule extends Gdn_Module {
 
 		$Invisible = ($Invisible ? 1 : 0);
 
-		if ($Session->UserID)
-			$SQL->Replace('Whosonline', array(
-				'UserID' => $Session->UserID,
-				'Timestamp' => Gdn_Format::ToDateTime(),
-				'Invisible' => $Invisible),
-				array('UserID' => $Session->UserID)
-			);     
+		if ($Session->UserID) {
+         $Timestamp = Gdn_Format::ToDateTime();
+         
+         $Px = $SQL->Database->DatabasePrefix;
+         $Sql = "insert {$Px}Whosonline (UserID, Timestamp, Invisible) values ({$Session->UserID}, :Timestamp, :Invisible) on duplicate key update Timestamp = :Timestamp1, Invisible = :Invisible1";
+         $SQL->Database->Query($Sql, array(':Timestamp' => $Timestamp, ':Invisible' => $Invisible, ':Timestamp1' => $Timestamp, ':Invisible1' => $Invisible));
+         
+//			$SQL->Replace('Whosonline', array(
+//				'UserID' => $Session->UserID,
+//				'Timestamp' => Gdn_Format::ToDateTime(),
+//				'Invisible' => $Invisible),
+//				array('UserID' => $Session->UserID)
+//			);
+      }
 
-		$Frequency = C('WhosOnline.Frequency', 4);
-		$History = time() - $Frequency;
+		$Frequency = C('WhosOnline.Frequency', 60);
+		$History = time() - 2 * $Frequency; // give bit of buffer
+      
+      // Try and grab the who's online data from the cache.
+      $Data = Gdn::Cache()->Get('WhosOnline');
+      
+      if (!$Data || !array_key_exists($Session->UserID, $Data)) {
+         $SQL
+            ->Select('*')
+            ->From('Whosonline w')
+            ->Where('w.Timestamp >=', date('Y-m-d H:i:s', $History))
+            ->OrderBy('Timestamp', 'desc');
 
-		$SQL
-			->Select('u.UserID, u.Name, u.Email, w.Timestamp, w.Invisible')
-			->From('Whosonline w')
-			->Join('User u', 'w.UserID = u.UserID')
-			->Where('w.Timestamp >=', date('Y-m-d H:i:s', $History))
-			->OrderBy('u.Name');
+         if (!$Session->CheckPermission('Plugins.WhosOnline.ViewHidden'))
+            $SQL->Where('w.Invisible', 0);
 
-		if (!$Session->CheckPermission('Plugins.WhosOnline.ViewHidden'))
-			$SQL->Where('w.Invisible', 0);
+         $Data = $SQL->Get()->ResultArray();
+         $Data = Gdn_DataSet::Index($Data, 'UserID');
+         Gdn::Cache()->Store('WhosOnline', $Data, array(Gdn_Cache::FEATURE_EXPIRY => $Frequency));
+      }
+      
+      Gdn::UserModel()->JoinUsers($Data, array('UserID'));
 
-		$this->_OnlineUsers = $SQL->Get();
+		$this->_OnlineUsers = $Data;
 	}
 
 	public function AssetTarget() {
@@ -48,50 +65,49 @@ class WhosOnlineModule extends Gdn_Module {
 	}
 
 	public function ToString() {
+      if (!$this->_OnlineUsers)
+         $this->GetData();
+      
+      $Data = $this->_OnlineUsers;
+      
+//      for ($i = 0; $i < 20; $i++) {
+//         $Data[] = $Data[0];
+//      }
+      
 		$String = '';
 		$Session = Gdn::Session();
 		ob_start();
       $DisplayStyle = C('WhosOnline.DisplayStyle', 'list');
 		?>
-			<div id="WhosOnline" class="Box">
-				<h4><?php echo T("Who's Online"); ?> (<?php echo $this->_OnlineUsers->NumRows(); ?>)</h4>
-            <?php if ($DisplayStyle == 'pictures') { ?>
-               <div class="PhotoGrid">
-            <?php } else { ?>
-               <ul class="PanelInfo">
-            <?php } ?>
-               
-				<?php
-				if ($this->_OnlineUsers->NumRows() > 0) { 
-               $DisplayStyle = C('WhosOnline.DisplayStyle', 'list');
-               if ($this->_OnlineUsers->NumRows() > 10) {
-                  $ImageClass = 'ProfilePhotoSmall';
+      <div id="WhosOnline" class="Box">
+         <h4><?php echo T("Who's Online"); ?> (<?php echo count($Data) ?>)</h4>
+         <?php
+         if (count($Data) > 0) {
+            if ($DisplayStyle == 'pictures') {
+               if (count($Data) > 10) {
+                  $ListClass= 'PhotoGridSmall';
                } else {
-                  $ImageClass = 'ProfilePhotoMedium';
+                  $ListClass= 'PhotoGrid';
                }
-               
-					foreach($this->_OnlineUsers->Result() as $User):
-                  if ($DisplayStyle == 'pictures'):
-                     echo UserPhoto($User, array('ImageClass' => $ImageClass));
-                  else:
-                  ?>
-                     <li>
-                        <strong <?php echo ($User->Invisible == 1 ? 'class="Invisible"' : '')?>>
-                           <?php echo UserAnchor($User); ?>
-                        </strong><br/>
-                     </li>
-                  <?php
-                  endif;
-                  
-					endforeach;
-				}
-				?>
-            <?php if ($DisplayStyle == 'pictures') { ?>
-               </div>
-            <?php } else { ?>
-               </ul>
-            <?php } ?>
-			
+
+               echo '<div class="'.$ListClass.'">';
+
+               foreach ($Data as $User) {
+                  echo UserPhoto($User);
+               }
+
+               echo '</div>';
+            } else {
+               echo '<ul class="PanelInfo">';
+
+               foreach ($Data as $User) {
+                  echo '<li><strong>'.UserAnchor($User).'</strong><br /></li>';
+               }
+
+               echo '</ul>';
+            }
+         }
+         ?>
 		</div>
 		<?php
 		$String = ob_get_contents();
