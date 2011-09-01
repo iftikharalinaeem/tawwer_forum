@@ -32,9 +32,13 @@ class DisclaimersPlugin extends Gdn_Plugin {
    public function RedirectDisclaim($Category) {
       $CategoryID = GetValue('CategoryID', $Category);
       if ($CategoryID && in_array($CategoryID, self::CategoryIDs())) {
-         if (!Gdn::Session()->GetPreference('Disclaimed_'.$CategoryID)) {
+         // Look for a disclaimer cookie
+         $CookieData = explode(',', GetValue('VanillaDisclaimersPlugin', $_COOKIE, ''));
+         if (!is_array($CookieData))
+            $CookieData = array();
+
+         if (!in_array($CategoryID, $CookieData))
             Redirect('/entry/disclaimer/'.rawurlencode(GetValue('UrlCode', $Category)));
-         }
       }
    }
 
@@ -73,8 +77,16 @@ class DisclaimersPlugin extends Gdn_Plugin {
       $Form = new Gdn_Form();
 
       if (Gdn::Session()->ValidateTransientKey($TK)) {
-         Gdn::Session()->SetPreference('Disclaimed_'.$CategoryID, $Disclaimed);
          if ($Disclaimed) {
+            // Look for a disclaimer cookie
+            $CookieData = explode(',', GetValue('VanillaDisclaimersPlugin', $_COOKIE, ''));
+            if (!is_array($CookieData))
+               $CookieData = array();
+   
+            if (!in_array($CategoryID, $CookieData))
+               $CookieData[] = $CategoryID;
+               
+            setcookie('VanillaDisclaimersPlugin', implode(',', $CookieData), 0, C('Garden.Cookie.Path', '/'), C('Garden.Cookie.Domain', ''));
             Redirect($Target);
          } else {
             Redirect('/');
