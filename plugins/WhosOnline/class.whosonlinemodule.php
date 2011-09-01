@@ -80,7 +80,7 @@ class WhosOnlineModule extends Gdn_Module {
       $DisplayStyle = C('WhosOnline.DisplayStyle', 'list');
 		?>
       <div id="WhosOnline" class="Box">
-         <h4><?php echo T("Who's Online"); ?> (<?php echo count($Data) ?>)</h4>
+         <h4><?php echo T("Who's Online"); ?> <span class="Count"><?php echo count($Data) ?></span></h4>
          <?php
          if (count($Data) > 0) {
             if ($DisplayStyle == 'pictures') {
