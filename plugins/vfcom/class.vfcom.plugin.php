@@ -44,12 +44,7 @@ class VfcomPlugin extends Gdn_Plugin {
    protected $AutoStaticURL;
    protected $WhitelistDomain = 'vanillaforums.com';
    
-   private $DataAPIToken;
-   
    public function __construct() {
-      // Get (and protect) and Infrastructure API token
-      $this->DataAPIToken = GetValue('HTTP_X_FRONTEND_TOKEN', $_SERVER, NULL);
-      unset($_SERVER['HTTP_X_FRONTEND_TOKEN']);
       
       $ClientParts = explode('.', CLIENT_NAME);
       // Name of this client (usually the <prefix> part of http://<prefix>.<hostname>.com)
