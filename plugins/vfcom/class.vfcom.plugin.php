@@ -44,12 +44,7 @@ class VfcomPlugin extends Gdn_Plugin {
    protected $AutoStaticURL;
    protected $WhitelistDomain = 'vanillaforums.com';
    
-   private $DataAPIToken;
-   
    public function __construct() {
-      // Get (and protect) and Infrastructure API token
-      $this->DataAPIToken = GetValue('HTTP_X_FRONTEND_TOKEN', $_SERVER, NULL);
-      unset($_SERVER['HTTP_X_FRONTEND_TOKEN']);
       
       $ClientParts = explode('.', CLIENT_NAME);
       // Name of this client (usually the <prefix> part of http://<prefix>.<hostname>.com)
@@ -373,121 +368,6 @@ class VfcomPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Intercept Config::Save events for Infrastructure
-    * 
-    * When the Infrastructure config string is triggered for save, handle it here
-    * by sending a call to the data server instead of trying to save it locally.
-    * 
-    * @param Gdn_ConfigurationSource $Sender
-    */
-   public function Gdn_ConfigurationSource_BeforeSave_Handler($Sender) {
-      $Type = $Sender->EventArguments['ConfigType'];
-      if ($Type != 'string') return;
-      
-      $Source = $Sender->EventArguments['ConfigSource'];
-      if ($Source != 'Infrastructure') return;
-      
-      $Config = $Sender->EventArguments['ConfigData'];
-      
-      // Write config data to string format, ready for saving
-      $ConfigString = Gdn_Configuration::Format($Config, array(
-         'VariableName'    => 'Configuration',
-         'WrapPHP'         => FALSE,
-         'ByLine'          => TRUE
-      ));
-      
-      // Alright, this is a legit client config save dudes, send to data server
-      $SaveConfigQuery = Communication::DataServerRequest('/api/forum/save')
-         ->Token($this->DataAPIToken)
-         ->Parameter('Name', CLIENT_NAME)
-         ->Parameter('Config', base64_encode($ConfigString))
-         ->Method('POST')
-         ->Send();
-      
-      $ResponseCode = GetValue('Code', $SaveConfigQuery, 404);
-      if ($ResponseCode == '200')
-         $Sender->EventArguments['ConfigNoSave'] = TRUE;
-      return;
-   }
-   
-   /**
-    * Copy an uploaded image to local frontend for work
-    * 
-    * @param Gdn_Upload $Sender
-    * @param array $Args
-    */
-   public function Gdn_Upload_CopyLocal_Handler($Sender, $Args) {
-      $Parsed = $Args['Parsed'];
-      if ($Parsed['Type'] != 'data')
-         return;
-      
-      $Store = $Parsed['Name'];
-      $DestPath = PATH_UPLOADS."/data/work/{$Store}";
-      @mkdir(dirname($DestPath), 0775, TRUE);
-      
-      $File = Communication::DataServerRequest('/api/upload/get')
-         ->Token($this->DataAPIToken)
-         ->Parameter('Name', CLIENT_NAME)
-         ->Parameter('Store', $Store)
-         ->SaveAs($DestPath)
-         ->Send();
-      
-      // If it worked, adjust the path and let the firing code know this was handled
-      $StatusCode = GetValue('Code', $File);
-      if ($StatusCode == '200' && GetValueR('Response.Success', $File) === TRUE) {
-         $Args['Handled'] = TRUE;
-         $Args['Path'] = $DestPath;
-      }
-      
-      return;
-   }
-   
-   public function Gdn_Upload_Delete_Handler($Sender, $Args) {
-      $Parsed = $Args['Parsed'];
-      if ($Parsed['Type'] != 'data')
-         return;
-      
-      $Store = $Parsed['Name'];
-      $File = Communication::DataServerRequest('/api/upload/delete')
-         ->Token($this->DataAPIToken)
-         ->Parameter('Name', CLIENT_NAME)
-         ->Parameter('Store', $Store)
-         ->Send();
-      
-      // If it worked, let the firing code know this was handled
-      $StatusCode = GetValue('Code', $File);
-      if ($StatusCode == '200') {
-         $Args['Handled'] = TRUE;
-      }
-      return;
-   }
-   
-   public function Gdn_Upload_SaveAs_Handler($Sender, $Args) {
-      $Path = $Args['Path'];
-      $Parsed = $Args['Parsed'];
-      
-      $Store = $Parsed['Name'];
-      $UploadFile = Communication::DataServerRequest('/api/upload/file')
-         ->Token($this->DataAPIToken)
-         ->Parameter('Name', CLIENT_NAME)
-         ->Parameter('Store', $Store)
-         ->File('Upload', $Path)
-         ->Send();
-      
-      // If it worked, adjust the path and let the firing code know this was handled
-      $StatusCode = GetValue('Code', $UploadFile);
-      if ($StatusCode == '201') {
-         $Parsed = Gdn_Upload::Parse('~data/'.$Store);
-         $Args['Parsed'] = $Parsed;
-         $Args['Handled'] = TRUE;
-         
-         @unlink($Path);
-      } else {
-         throw new Exception('There was an error saving the file to the Data server.', 500);
-      }
-   }
-   
-   /**
     * Handle requests for uploaded images, such as user pics and file uploads
     * 
     * This method adds the static content url to the list of URLs that can serve
@@ -500,31 +380,7 @@ class VfcomPlugin extends Gdn_Plugin {
    public function Gdn_Upload_GetUrls_Handler($Sender, $Args) {
       if (is_null($this->VfcomClient)) return;
       
-      $Args['Urls']['data'] = "{$this->StaticURL}/uploads";
-   }
-   
-   public function Gdn_UploadImage_SaveImageAs_Handler($Sender, $Args) {
-      $Path = $Args['Path'];
-      $Parsed = $Args['Parsed'];
-      
-      $Store = $Parsed['Name'];
-      $UploadFile = Communication::DataServerRequest('/api/upload/file')
-         ->Token($this->DataAPIToken)
-         ->Parameter('Name', CLIENT_NAME)
-         ->Parameter('Store', $Store)
-         ->File('Upload', $Path)
-         ->Send();
-      
-      $StatusCode = GetValue('Code', $UploadFile);
-      if ($StatusCode == '200') {
-         $Parsed = Gdn_Upload::Parse('~data/'.$Store);
-         $Args['Parsed'] = $Parsed;
-         $Args['Handled'] = TRUE;
-         
-         @unlink($Path);
-      } else {
-         throw new Exception('There was an error saving the file to the Data server.', 500);
-      }
+      $Args['Urls'][''] = "{$this->StaticURL}/uploads";
    }
    
    public function Setup() {
