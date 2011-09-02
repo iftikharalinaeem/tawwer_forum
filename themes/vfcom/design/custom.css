@@ -146,6 +146,7 @@ div.Center {
 }
 #Head div.Center {
    text-align: right;
+	min-height: 50px;
 }
 #Head div.Logo {
 	margin: 6px 0 0 0;
