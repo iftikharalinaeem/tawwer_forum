@@ -326,6 +326,10 @@ ul.MessageList, ul.DataList {
 	border-bottom: none;
 }
 
+div.Preview div.Message, ul.MessageList div.Message {
+    clear:none;
+}
+
 .CategoryList .ItemContent {
    margin: 0;
 }
