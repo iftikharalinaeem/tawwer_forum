@@ -1,10 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 
+// 2.1 - Added a fix so that css files are in a more unique url so it works with autostatic (which is not forum-specific).
+
 // Define the plugin:
 $PluginInfo['CustomTheme'] = array(
    'Name' => 'Custom Theme',
    'Description' => 'Allows administrators to customize the CSS & master HTML template of the currently enabled theme.',
-   'Version' => '2',
+   'Version' => '2.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
@@ -108,10 +110,10 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			// New method
 			if ($DoPreview && $WorkingRevisionID > 0) {
 				// $Sender->Head->AddString("\n".'<link rel="stylesheet" type="text/css" href="'.Asset('/plugin/customcss/rev_'.$WorkingRevisionID.'.css', FALSE, TRUE).'" media="all" />');
-				$Sender->Head->AddCss('/plugin/customcss/rev_'.$WorkingRevisionID.'.css', 'all');
+				$Sender->Head->AddCss('/plugin/customcss/'.Gdn_Format::Url(Gdn::Request()->Host()).'/rev_'.$WorkingRevisionID.'.css', 'all');
 			} elseif ($LiveRevisionID > 0) {
 				// $Sender->Head->AddString("\n".'<link rel="stylesheet" type="text/css" href="'.Asset('/plugin/customcss/rev_'.$LiveRevisionID.'.css', FALSE, TRUE).'" media="all" />');
-				$Sender->Head->AddCss('/plugin/customcss/rev_'.$LiveRevisionID.'.css', 'all');
+				$Sender->Head->AddCss('/plugin/customcss/'.Gdn_Format::Url(Gdn::Request()->Host()).'/rev_'.$LiveRevisionID.'.css', 'all');
 			}
 		}
 
@@ -161,7 +163,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		
 		header('Content-Type: text/css', TRUE); // Force browsers to agree that this is css
 		$Sender->MasterView = 'none';
-		$FileToLoad = GetValue(0, $Sender->RequestArgs);
+		$FileToLoad = GetValue(1, $Sender->RequestArgs);
 		$RevisionID = CustomThemePlugin::GetRevisionFromFileName($FileToLoad);
 		$ThemeData = Gdn::SQL()
 			->Select()
