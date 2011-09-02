@@ -149,6 +149,15 @@ class VfcomPlugin extends Gdn_Plugin {
             // Rebuild now
             Gdn::PluginManager()->AvailablePlugins(TRUE);
             $Sender->InformMessage("The entire plugin cache has been cleared.");
+            
+            $ThemeManager = Gdn::ThemeManager();
+            
+            
+            foreach ($ThemeManager->SearchPaths() as $SearchPath => $Trash) {
+               $SearchPathCacheKey = 'Garden.Themes.PathCache.'.$SearchPath;
+               $SearchPathCache = Gdn::Cache()->Remove($SearchPathCacheKey, array(Gdn_Cache::FEATURE_NOPREFIX => TRUE));
+            }
+            $Sender->InformMessage("The entire theme cache has been cleared.");
          }
             
          if (Gdn::Request()->GetValue("{$FormPrefix}Plugin_vfcom_ClearLocalCache", FALSE) !== FALSE) {
