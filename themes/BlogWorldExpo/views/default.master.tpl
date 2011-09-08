@@ -195,7 +195,10 @@
    {asset name="Foot"}
 </div>
 
-</div> <!-- #wrap -->
+</div><!-- #wrap -->
+
+</div><!-- #Frame -->
+</div><!-- #inner-body -->
 
 {event name="AfterBody"}
 </body>
