@@ -1,8 +1,8 @@
 body {
 	background: url("http://www.blogworld.com/wp-content/themes/BlogWorld_20/images/bg.png") no-repeat top center transparent;
 	color:#444444;
-	font-family: Arial;
-	font-size:15px;
+	font-family:georgia;
+	font-size:14px;
 	letter-spacing:0;
 	line-height:19px;
 	margin: 0 auto 0;
@@ -11,8 +11,6 @@ body {
 #inner-body {
 	background: url("http://www.blogworld.com/wp-content/themes/BlogWorld_20/images/bg-bottom.png") no-repeat bottom center transparent;
 	display:block;
-	padding-bottom: 20px;
-	min-height: 910px;
 }
 hr { clear:both; }
 /***** Hyperlinks ********************/
@@ -392,9 +390,9 @@ div.Preview div.Message, div.Preview div.Message p, ul.MessageList div.Message, 
 /***** Header  ********************/
 
 #header {
-    background:url("http://www.blogworldexpo.com/wp-content/themes/bwe-nyc-2011/images/bw-header.jpg") repeat-x scroll left bottom #2754B5;
+	background: url("http://www.blogworld.com/wp-content/uploads/2011/08/bwe-header-wide.jpg") no-repeat top center transparent;
 	width: 1010px; 
-	height: 130px;
+	height: 110px;
 	margin: 0;
 	padding: 0;
 	}
@@ -443,12 +441,10 @@ div.Preview div.Message, div.Preview div.Message p, ul.MessageList div.Message, 
 	}
 
 #header .widget-area {
-    color: #FFFFFF;
-    float: right;
-    font: 13px Arial;
-    margin: 0 10px 0 0;
-    padding: 19px 0 0;
-    width: 395px;
+	float:right;
+	margin:0 10px 0 0;
+	padding:8px 0 0;
+	width:729px;
 	}
 	
 #header .widget-area p {
@@ -479,20 +475,20 @@ div.Preview div.Message, div.Preview div.Message p, ul.MessageList div.Message, 
 /***** Image Header - Partial Width ********************/
 
 .header-image #header #title-area {
-	background: url(http://www.blogworldexpo.com/wp-content/themes/bwe-nyc-2011/images/logo.png) 20px 5px no-repeat;
+	/*background: url(images/blogworld-logo.png) left top no-repeat;*/
 	float:left;
-	height:130px;
-	margin:0;
+	height:110px;
+	margin:0 0 0 15px;
 	overflow:visible;
 	position:absolute;
 	top:-5px;
-	width:100%;	
+	width:250px;	
 	}
 
 .header-image #title-area, .header-image #title-area #title, .header-image #title-area #title a {
 	display: block; 
 	float: left;
-	width: 300px;
+	width: 1010px;
 	height: 80px;
 	margin: 0; 
 	padding: 0;
@@ -506,21 +502,6 @@ div.Preview div.Message, div.Preview div.Message p, ul.MessageList div.Message, 
 	height: 0;
 	overflow: hidden;
 	}
-
-#city-badge {
-	text-indent:-9999px;
-	background:url("http://www.blogworldexpo.com/wp-content/themes/bwe-nyc-2011/images/city-header-badge.png") no-repeat scroll right top transparent;
-	display:block;
-	height:40px;
-	text-align: left;
-}
-#city-badge-la {
-	text-indent:-9999px;
-	background:url("http://www.blogworldexpo.com/wp-content/themes/bwe-nyc-2011/images/city-header-badge-la.png") no-repeat scroll right top transparent;
-	display:block;
-	height:40px;
-	text-align: left;
-}
 
 /***** Image Header - Full Width ********************/
 
@@ -636,7 +617,7 @@ div.Preview div.Message, div.Preview div.Message p, ul.MessageList div.Message, 
 /***** Nav Menu ********************/
 
 #nav {
-	background:url("http://www.blogworldexpo.com/wp-content/themes/bwe-nyc-2011/images/topbar-bg.png") repeat-x #E6E6E6;
+	background:url("http://www.blogworld.com/wp-content/themes/BlogWorld_20/images/topbar-bg.png") repeat-x;
 	width: 100%;
 	font-family: Arial, Tahoma, Verdana;
 	color: #111111;
@@ -651,7 +632,7 @@ div.Preview div.Message, div.Preview div.Message p, ul.MessageList div.Message, 
 	width: 975px;
 	margin: 0 auto 0;
 	}
-#nav li.menu-item, #nav li.home { background:url("http://www.blogworldexpo.com/wp-content/themes/bwe-nyc-2011/images/topnavpageitem-bg.png")  repeat-x #666; }
+#nav li.menu-item, #nav li.home { background:url("http://www.blogworld.com/wp-content/themes/BlogWorld_20/images/topnavpageitem-bg.png")  repeat-x #666; }
 #nav li.current-menu-item { background:#fff; border-top:#98CB00 solid 4px; }
 #nav li.current-menu-item a, #nav li:hover a { color:#000; /*padding: 2px 10px 0; */}
 #nav li { border-top:#666 solid 4px; }
@@ -674,31 +655,35 @@ div.Preview div.Message, div.Preview div.Message p, ul.MessageList div.Message, 
 /***** SubNav Menu ********************/
 
 #subnav {
-	background:url("http://www.blogworldexpo.com/wp-content/themes/bwe-nyc-2011/images/mainnav-bg.jpg") repeat-x scroll 0 0 #709E31;
-	width: 1010px;
+	background-image:-moz-linear-gradient(100% 100% 90deg, #4066B0, #0D3395);
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#0D3395), to(#4066B0));
+	width: 1009px;
 	font-family: Arial, Tahoma, Verdana;
 	color: #000;
-	margin: 0 0 35px auto;
+	margin: 0 auto 0;
 	text-transform: uppercase;
-	border-top: 4px solid #406b00;
+	border-top: 4px solid #00194a;
 	overflow: hidden;
 	clear: both;
+	border-left:1px solid;
 	}
 
 #subnav .wrap {
+background:url("http://www.blogworld.com/wp-content/themes/BlogWorld_20/images/mainnav-bg.jpg") repeat-x scroll 0 0 transparent;
+overflow:hidden;
 	}
 
 
-.current-menu-item, .current-menu-parent { background:#fff;  }
-#subnav .current-menu-parent a { color:#444; }
-#subnav li.current-menu-parent ul.sub-menu, #subnav li.current-menu-item ul.sub-menu {
+.current-menu-item, .current-post-ancestor, .current-category-ancestor { background:#fff;  }
+#subnav .current-post-ancestor a, #subnav .current-category-ancestor a { color:#444; }
+#subnav li.current-post-ancestor ul.sub-menu, #subnav li.current-post-ancestor ul.sub-menu, #subnav li.current-category-ancestor ul.sub-menu {
 	left:0;
 	text-transform:none;
 	}
 	
 #subnav li {
-	border-right:1px solid #85B345;
-	border-left:1px solid #5B9C1A;	
+	border-right:1px solid #4066b0;
+	border-left:1px solid #0d3395;	
 	float:left;
 	height:30px;
 	line-height:12px;
@@ -706,32 +691,53 @@ div.Preview div.Message, div.Preview div.Message p, ul.MessageList div.Message, 
 	margin:0;
 	padding:0;
 	text-align:center;
-	/*width:65px;*/
+	width:65px;
 }	
 #subnav li:first-child {
 	border-left:none;
 }
+#subnav li#menu-item-6407 { width: 87px; }
+#subnav li.Digital-Photography { width:55px; }
+#subnav li.Monetization, #subnav li.Online-Communities { width:92px; }
+#subnav li.New-Media-News-Education { width:75px; }
+#subnav li.Podcasting-Radio { width:84px }
+#subnav li.Social-Networking { width:65px }
+#subnav li.Web-TV-Video{ width:61px }
+#subnav li.Tools-Tech { width:49px }
+#subnav li.Tools-Tech a, #subnav li.Statistics-Trends a { padding:2px 4px; }
+#subnav li.Statistics-Trends{ width:55px; }
+#subnav li.Blogging { width:72px;  }
+#subnav li#menu-item-6911 { width: 80px; }
+#subnav li#menu-item-6911 a,
+#subnav li.Blogging a, 
+#subnav li.Monetization a,
+#subnav li#menu-item-6395 a,
+#subnav li#menu-item-6396 a,
+#subnav li#menu-item-6407 a,
+#subnav li.Digital-Photography a,
+#subnav li.People-in-Media a,
+#subnav li.Social-Media-For-Business a { height:14px; padding:8px 9px; }
+#subnav li.People-in-Media a { padding:8px 7px; }
+#subnav li.Social-Media-For-Business { width:70px; }
+#subnav li.People-in-Media { width:91px; }
 
 #subnav li a {
 	color:#fff;
 	display:block;
-	font-size:11px;
+	font-size:10px;
 	margin:0;
-	padding:9px;
+	padding:2px 7px;
 	position:relative;
 	text-decoration:none;
+	height:26px;
 	}
-#subnav li a:hover  { background: #FEFEFE; color: #5A9C1D; }
+#subnav li a:hover  { background: #FEFEFE; color: #212A95; }
 #subnav li.current-menu-item a { background: #fff; color: #000; }
 #subnav li.currentHover { background:#FEFEFE; }
-#subnav li.currentHover a { color:#5A9C1D; }
+#subnav li.currentHover a { color:#212A95; }
 
+#subnav li:hover ul.sub-menu { left:0; text-transform:none; }
 #subnav li:hover ul.sub-menu ul { display:none; }
-#subnav li:hover ul.sub-menu {
-    left: 0;
-    text-transform: none;
-    z-index:99999 !important;
-}
 
 #subnav ul.sub-menu {
 	display:block;
