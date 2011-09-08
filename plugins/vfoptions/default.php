@@ -19,33 +19,6 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       Gdn::Authenticator()->EnableAuthenticationScheme('token');
    }
    
-   /**
-    *
-    * @param Gdn_Controller $Sender 
-    */
-   public function UtilityController_ResendEmails_Create($Sender) {
-      // Grab all of the activities that did not send.
-      $Data = Gdn::SQL()
-         ->Select('ActivityID')
-         ->From('Activity')
-         ->Where('Emailed', 4)
-         ->Limit(25)
-         ->Get()->ResultArray();
-      
-      $ActivityModel = new ActivityModel();
-      $Count = 0;
-      foreach ($Data as $Row) {
-         $ActivityID = $Row['ActivityID'];
-         $ActivityModel->SendNotification($ActivityID);
-         $Count++;
-      }
-      $Sender->SetData('Count', $Count);
-      if ($Sender->DeliveryMethod() == DELIVERY_METHOD_XHTML)
-         echo "$Count processed.";
-      else
-         $Sender->Render();
-   }
-   
    // Make sure token authenticator is never activated as the primary authentication scheme
    public function AuthenticationController_EnableAuthenticatorToken_Handler(&$Sender) {
       Gdn::Authenticator()->UnsetDefaultAuthenticator('token');

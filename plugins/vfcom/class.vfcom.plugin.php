@@ -250,6 +250,35 @@ class VfcomPlugin extends Gdn_Plugin {
    public function UserModel_BeforeSystemUser_Handler($Sender) {
       $Sender->EventArguments['SystemUser']['Email'] = 'system@vanillaforums.com';
    }
+   
+   
+   
+   /**
+    * Resend emails that errored out.
+    * @param Gdn_Controller $Sender 
+    */
+   public function UtilityController_ResendEmails_Create($Sender) {
+      // Grab all of the activities that did not send.
+      $Data = Gdn::SQL()
+         ->Select('ActivityID')
+         ->From('Activity')
+         ->Where('Emailed', 5)
+         ->Limit(25)
+         ->Get()->ResultArray();
+      
+      $ActivityModel = new ActivityModel();
+      $Count = 0;
+      foreach ($Data as $Row) {
+         $ActivityID = $Row['ActivityID'];
+         $ActivityModel->SendNotification($ActivityID);
+         $Count++;
+      }
+      $Sender->SetData('Count', $Count);
+      if ($Sender->DeliveryMethod() == DELIVERY_METHOD_XHTML)
+         echo "$Count processed.";
+      else
+         $Sender->Render();
+   }
 
    /**
     * AutoStatic and ShowInfrastructure
