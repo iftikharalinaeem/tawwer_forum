@@ -1263,3 +1263,7 @@ ul.DataList div.Meta strong {
    width: 200px;
    margin-right: 5px;
 }
+
+div.Popup a.Close {
+   color: #fff;
+}

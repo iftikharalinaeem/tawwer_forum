@@ -93,6 +93,10 @@ class WhosOnlineModule extends Gdn_Module {
                echo '<div class="'.$ListClass.'">';
 
                foreach ($Data as $User) {
+                  if (!$User['Photo'] && !function_exists('UserPhotoDefaultUrl')) {
+                     $User['Photo'] = Asset('/applications/dashboard/design/images/usericon.gif', TRUE);
+                  }
+                  
                   echo UserPhoto($User);
                }
 

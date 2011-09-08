@@ -439,6 +439,12 @@ class VanillaPopPlugin extends Gdn_Plugin {
       SaveToConfig(array('Garden.Registration.NameUnique' => FALSE));
       
       Gdn::Structure()
+         ->Table('User')
+         ->Column('Source', 'varchar(20)', NULL)
+         ->Column('SourceID', 'varchar(255)', NULL, 'index')
+         ->Set();
+      
+      Gdn::Structure()
          ->Table('Discussion')
          ->Column('Source', 'varchar(20)', NULL)
          ->Column('SourceID', 'varchar(255)', NULL, 'index')
