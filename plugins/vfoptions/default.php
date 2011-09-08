@@ -23,7 +23,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
     *
     * @param Gdn_Controller $Sender 
     */
-   public function ActivityController_Resend_Create($Sender) {
+   public function UtilityController_ResendEmails_Create($Sender) {
       // Grab all of the activities that did not send.
       $Data = Gdn::SQL()
          ->Select('ActivityID')
