@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['vfspoof'] = array(
    'Name' => 'VF.com Remote Spoof',
    'Description' => "This plugin allows Vanilla employees to gain access to hosted forums by logging in with a vf.com administrative user.",
-   'Version' => '0.1',
+   'Version' => '1.0',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
@@ -51,6 +51,20 @@ class VFSpoofPlugin extends Gdn_Plugin {
       if (is_object($this->_Database)) {
          $this->_Database->CloseConnection();
          $this->_Database = FALSE;
+      }
+   }
+   
+   /// Event Handlers ///
+   
+   /**
+    * @param Gdn_Controller $Sender 
+    * @since 1.0 Added the ability to spoof with an ?access_token= querystring.
+    */
+   public function Base_BeforeDispatch_Handler($Sender) {
+      if ($AccessToken = Gdn::Request()->Get('access_token')) {
+         if ($AccessToken == C('VanillaForums.AccessToken', 'e121e1c40183fc8428fa7b08657d4b1b')) {
+            Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE, FALSE);
+         }
       }
    }
    
