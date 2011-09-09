@@ -60,7 +60,12 @@ class VFSpoofPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender 
     * @since 1.0 Added the ability to spoof with an ?access_token= querystring.
     */
-   public function Base_BeforeDispatch_Handler($Sender) {
+   public function Base_BeforeControllerMethod_Handler($Sender) {
+      // Don't spoof unless this is an api request.
+      if (Gdn::Controller()->DeliveryType() != DELIVERY_TYPE_DATA) {
+         return;
+      }
+      
       if ($AccessToken = Gdn::Request()->Get('access_token')) {
          if ($AccessToken == C('VanillaForums.AccessToken', 'e121e1c40183fc8428fa7b08657d4b1b')) {
             Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE, FALSE);
