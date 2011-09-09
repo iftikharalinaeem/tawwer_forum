@@ -412,3 +412,7 @@ div.MultipleEntryMethods {
    width: 494px;
 }
 .role-administrator { background: #f5f9ff; }
+.Discussion .Comment .Meta .CommentInfo span {
+   color: #000000;
+   font-weight: bold;
+}
