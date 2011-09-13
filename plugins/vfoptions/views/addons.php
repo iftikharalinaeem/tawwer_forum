@@ -23,6 +23,8 @@ if (!is_array($AllowedPlugins))
       'WhosOnline'
    );
    
+   // $AllowedPlugins = array('Emotify','cleditor','Facebook','Twitter','OpenID','GoogleSignIn','CustomProfileFields','Flagging','Tagging','Gravatar','vanillicon','OpenID','QnA','RoleTitle','Signatures','SplitMerge','Spoof','WhosOnline','FileUpload','Voting','Quotes','Signatures','Pockets','PostCount','LastEdited','Sitemaps','ShareThis','SEOCompanion','AllViewed','Vanoogle','TrackingCodes');
+   
 $PluginManager = Gdn::PluginManager();
 $AvailablePlugins = $PluginManager->AvailablePlugins();
 $PluginCount = 0;
@@ -38,6 +40,9 @@ $DisabledCount = $PluginCount - $EnabledCount;
 
 $Session = Gdn::Session();
 ?>
+<style type="text/css">
+img.PluginIcon { height: 50px; width: 50px; }
+</style>
 <h1><?php echo $this->Data('Title') ?></h1>
 <div class="Info">
    Here are some great features you can add to your site to change or enhance its functionality.
