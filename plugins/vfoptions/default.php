@@ -84,6 +84,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
     * redirect to the domain in the config. Also includes Google Analytics on
     * all pages if the conf file contains Plugins.GoogleAnalytics.TrackerCode
     * and Plugins.GoogleAnalytics.TrackerDomain.
+    * @param Gdn_Controller $Sender
     */
    public function Base_Render_Before($Sender) {
       Gdn::Locale()->SetTranslation('PluginHelp', "Plugins allow you to add functionality to your site.");
@@ -107,7 +108,12 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New', 'style' => $Style));
          $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'position: absolute; bottom: 15px; right: 140px;')));
          $Sender->AddCssFile('plugins/vfoptions/design/vfoptions.css', 'dashboard');
+      } else {
+         $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
+         $Version = GetValue('Version', Gdn::PluginManager()->GetPluginInfo('vfoptions'));
+         $Sender->AddJsFile($AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version);
       }
+      $Sender->AddDefinition('StatsUrl', self::StatsUrl('{p}'));
       
       // Redirect if the domain in the url doesn't match that in the config (so
       // custom domains can't be accessed from their original subdomain).
@@ -732,6 +738,29 @@ pageTracker._trackPageview();
     * No setup required.
     */
    public function Setup() {}
+   
+   /**
+    * Gets a url suitable to ping the statistics server.
+    * @param type $Path
+    * @param type $Params
+    * @return string 
+    */
+   public static function StatsUrl($Path, $Params = array()) {
+      $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
+      
+      $Path = '/'.trim($Path, '/');
+      
+      $Timestamp = time();
+      $DefaultParams = array(
+          'vid' => Gdn::InstallationID(),
+          't' => $Timestamp,
+          's' => md5($Timestamp.Gdn::InstallationSecret()));
+      
+      $Params = array_merge($DefaultParams, $Params);
+      
+      $Result = $AnalyticsServer.$Path.'?'.http_build_query($Params);
+      return $Result;
+   }
    
 	private function _ApplyFeature($FeatureName, $Features, $PluginManager) {
 		$IsEnabled = C('EnabledPlugins.'.$FeatureName);
