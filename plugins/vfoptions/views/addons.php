@@ -41,7 +41,23 @@ $DisabledCount = $PluginCount - $EnabledCount;
 $Session = Gdn::Session();
 ?>
 <style type="text/css">
+/* Temporary css fixes until vfcom core can be pushed. */
 img.PluginIcon { height: 50px; width: 50px; }
+table th,
+table td {
+	padding: 6px 6px 6px 20px;
+	vertical-align: top;
+}
+table th.Less,
+table td.Less {
+	padding: 6px;
+}
+table tbody tr.More th.Less,
+table tbody tr.More td.Less,
+table tbody th,
+table tbody td {
+	border-bottom: 1px solid #e0e0e0;
+}
 </style>
 <h1><?php echo $this->Data('Title') ?></h1>
 <div class="Info">
