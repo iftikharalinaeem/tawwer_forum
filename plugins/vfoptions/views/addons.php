@@ -1,76 +1,116 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
+
+$AllowedPlugins = C('VFCom.AllowedPlugins');
+if (!is_array($AllowedPlugins))
+   $AllowedPlugins = array(
+      'Emotify',
+      'cleditor',
+      'Facebook',
+      'Twitter',
+      'OpenID',
+      'GoogleSignIn',
+      'CustomProfileFields',
+      'Flagging',
+      'Tagging',
+      'Gravatar',
+      'vanillicon',
+      'OpenID',
+      'QnA',
+      'RoleTitle',
+      'Signatures',
+      'SplitMerge',
+      'Spoof',
+      'WhosOnline'
+   );
+   
+$PluginManager = Gdn::PluginManager();
+$AvailablePlugins = $PluginManager->AvailablePlugins();
+$PluginCount = 0;
+$EnabledCount = 0;
+foreach ($AllowedPlugins as $PluginKey) {
+   if (GetValue($PluginKey, $AvailablePlugins)) {
+      $PluginCount++;
+      if (array_key_exists($PluginKey, $PluginManager->EnabledPlugins()))
+         $EnabledCount++;
+   }
+}
+$DisabledCount = $PluginCount - $EnabledCount;
+
+$Session = Gdn::Session();
+?>
 <h1><?php echo $this->Data('Title') ?></h1>
 <div class="Info">
-Hi there! This page lists some of the great things you can add to your site to change or enhance its functionality.
-Click the enable/disable buttons to enable or disable addons.
-We are always adding new features so make sure you check back from time to time.
+   Here are some great features you can add to your site to change or enhance its functionality.
+   Click the enable/disable buttons to enable or disable addons.
+   We are always adding new features so make sure you check back from time to time.
 </div>
-
+<div class="Tabs FilterTabs">
+   <ul>
+      <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('All %1$s'), Wrap($PluginCount)), 'settings/addons/all'); ?></li>
+      <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('Enabled %1$s'), Wrap($EnabledCount)), 'settings/addons/enabled'); ?></li>
+      <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo Anchor(sprintf(T('Disabled %1$s'), Wrap($DisabledCount)), 'settings/addons/disabled'); ?></li>
+   </ul>
+</div>
+<?php echo $this->Form->Errors(); ?>
+<table class="AltRows">
+   <thead>
+      <tr>
+         <th colspan="2"><?php echo T('Plugin'); ?></th>
+         <th><?php echo T('Description'); ?></th>
+      </tr>
+   </thead>
+   <tbody>
 <?php
-echo $this->Form->Errors();
-?>
-
-<?php
-function WritePlugin($Key, $Description = '') {
-   static $Alt = FALSE;
-   
-   $PM = Gdn::PluginManager();
-   $Plugin = $PM->AvailablePlugins($Key);
+$Alt = FALSE;
+foreach ($AllowedPlugins as $Key) {
+   $Plugin = GetValue($Key, $AvailablePlugins);
    if (!$Plugin)
-      return;
+      continue;
+   
 
-   $Enabled = array_key_exists($Key, $PM->EnabledPlugins());
+   $ScreenName = GetValue('Name', $Plugin, $Key);
+   $Description = GetValue('Description', $Plugin, '');
+   $Enabled = array_key_exists($Key, $PluginManager->EnabledPlugins());
+   $SettingsUrl = $Enabled ? ArrayValue('SettingsUrl', $Plugin, '') : '';
    $RowClass = $Enabled ? 'Enabled' : 'Disabled';
 
-   $IconPath = '/plugins/vfoptions/design/'.strtolower($Key).'.png';
-   if (file_exists(PATH_ROOT.$IconPath))
-      $IconPath = Asset($IconPath);
-   else
-      $IconPath = '';
+   if ($this->Filter == 'enabled' && !$Enabled)
+      continue;
    
-   echo '<tr class="'.$Alt.' '.$RowClass.'" valign="top">';
+   if ($this->Filter == 'disabled' && $Enabled)
+      continue;
 
-   echo '<td width="135">';
-
-   if ($IconPath) {
-      echo "<img src='$IconPath' class='AddonIcon' />";
-   }
-
-   if ($Enabled) {
-      $Url = Url("/dashboard/settings/addons/disable/$Key?TransientKey=".Gdn::Session()->TransientKey());
-      echo "<a href='$Url' class='SmallButton'>Disable</a>";
-   } else {
-      $Url = Url("/dashboard/settings/addons/enable/$Key?TransientKey=".Gdn::Session()->TransientKey());
-      echo "<a href='$Url' class='SmallButton'>Enable</a>";
-   }
-
-   if ($Enabled && GetValue('SettingsUrl', $Plugin)) {
-      echo " <a href='{$Plugin['SettingsUrl']}' class='SmallButton'>Settings</a>";
-   }
-
-   echo '</td>';
-
-
-   echo '<td>';
-   echo "<h2>{$Plugin['Name']}</h2>";
-
-   if (!$Description)
-      $Description = $Plugin['Description'];
-   echo "<div>{$Description}</div>";
-   echo '</td>';
-
-   echo '</tr>';
-
+   $IconPath = '/plugins/'.GetValue('Folder', $Plugin, '').'/icon.png';
+   $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'applications/dashboard/design/images/plugin-icon.png';
+   $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'plugins/vfoptions/design/plugin-icon.png';
+   ?>
+   <tr <?php echo 'id="'.Gdn_Format::Url(strtolower($Key)).'-plugin"', ' class="'.$RowClass.'"'; ?>>
+      <td class="Less">
+         <?php echo Img($IconPath, array('class' => 'PluginIcon')); ?>
+      </td>
+      <td>
+      <?php
+         echo Wrap($ScreenName, 'strong');
+         echo '<div class="Buttons">';
+         $ToggleText = $Enabled ? 'Disable' : 'Enable';
+         $Url = "/dashboard/settings/addons/".$this->Filter."/".strtolower($ToggleText)."/$Key/".Gdn::Session()->TransientKey();
+         echo Anchor(
+            T($ToggleText),
+            $Url,
+            $ToggleText . 'Addon SmallButton'
+         );
+         
+         if ($SettingsUrl != '')
+            echo Anchor(T('Settings'), $SettingsUrl, 'SmallButton');
+         
+         echo '</div>'
+      ?>
+      </td>
+      <td><?php echo Gdn_Format::Html($Description); ?></td>
+   </tr>
+   <?php   
    $Alt = !$Alt;
 }
 ?>
-<table class="Label AltRows Addons">
-   <tbody>
-   <?php
-      WritePlugin('Emotify', 'Do you know what <a href="http://en.wikipedia.org/wiki/Emoticon">emoticons</a> are? This addon will replace all of your text emoticons with pretty pictures.');
-      WritePlugin('cleditor', 'Adds a <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor to your forum so that your users can more easily enter rich text comments.');
-      WritePlugin('Facebook');
-      WritePlugin('Twitter');
-   ?>
    </tbody>
 </table>

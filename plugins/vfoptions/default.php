@@ -920,10 +920,16 @@ pageTracker._trackPageview();
       $Sender->Title('Addons');
       $Sender->Permission('Garden.Applications.Manage');
       $Sender->AddSideMenu('dashboard/settings/addons');
+		$Filter = GetValue(0, $Args);
+      $Action = GetValue(1, $Args);
+      $Key = GetValue(2, $Args);
+      $TransientKey = GetValue(3, $Args);
+		
+      if (!in_array($Filter, array('enabled', 'disabled')))
+         $Filter = 'all';
+      $Sender->Filter = $Filter;
 
-      $Action = GetValue(0, $Args);
-      $Key = GetValue(1, $Args);
-      if (Gdn::Session()->ValidateTransientKey($Sender->Request->Get('TransientKey')) && $Key) {
+      if (Gdn::Session()->ValidateTransientKey($TransientKey) && $Key) {
          try {
             switch (strtolower($Action)) {
                case 'enable':
