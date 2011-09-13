@@ -402,6 +402,9 @@ ul.PanelInfo li.Active {
 	background: none;
 	border-bottom: 1px solid #ccc;
 }
+ul.PanelInfo li:last-child {
+	border-bottom: none;
+}
 ul.PanelInfo li.Active {
 	background: #eee;
 }
