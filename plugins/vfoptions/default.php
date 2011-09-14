@@ -108,12 +108,12 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New', 'style' => $Style));
          $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'position: absolute; bottom: 15px; right: 140px;')));
          $Sender->AddCssFile('plugins/vfoptions/design/vfoptions.css', 'dashboard');
-      } else {
-         $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
-         $Version = GetValue('Version', Gdn::PluginManager()->GetPluginInfo('vfoptions'));
-         $Sender->AddJsFile($AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version);
+//      } else {
+//         $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
+//         $Version = GetValue('Version', Gdn::PluginManager()->GetPluginInfo('vfoptions'));
+//         $Sender->AddJsFile($AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version);
       }
-      $Sender->AddDefinition('StatsUrl', self::StatsUrl('{p}'));
+//      $Sender->AddDefinition('StatsUrl', self::StatsUrl('{p}'));
       
       // Redirect if the domain in the url doesn't match that in the config (so
       // custom domains can't be accessed from their original subdomain).
