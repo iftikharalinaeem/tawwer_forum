@@ -321,16 +321,23 @@ body.Entry #Content {
 	padding: 0 0 10px;
 	font-size: 12px;
 }
+body#dashboard_entry_passwordrequest #Content,
+body#dashboard_entry_passwordreset #Content,
 body#dashboard_entry_password #Content,
 body#dashboard_entry_signin #Content,
 body#dashboard_entry_index #Content {
     width: 640px;
 }
+body.Entry div.Box,
 body.Entry div.Entry {
 	position: relative;
 	z-index: 1;
 	width: auto;
 }
+body.Entry div.Box p {
+	text-align: left;
+}
+body.Entry div.Box,
 body.Entry div.Entry div.MainForm {
 	width: auto;
 	border: 10px solid #f5f5f5;
@@ -348,6 +355,16 @@ body.Entry div.Entry div.MainForm {
 	-webkit-box-shadow: 0 1px 2px #999;
 	
 }
+body#dashboard_entry_passwordrequest #Content div.Box,
+body#dashboard_entry_passwordreset #Content div.Box {
+	padding: 10px;
+	border-width: 10px;
+}
+body.Entry#dashboard_entry_passwordrequest #Content form,
+body.Entry#dashboard_entry_passwordreset #Content form {
+   padding: 0;
+}
+
 body.Entry .CreateAccount {
 	display: none;
 }
