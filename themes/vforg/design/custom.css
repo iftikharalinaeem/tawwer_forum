@@ -809,6 +809,9 @@ ul.SearchResults {
 ul.SearchResults li.Item {
 	padding: 8px;
 }
+.DataList .Meta {
+   clear: left;
+}
 ul.DataList li.Item {
 	border-bottom:1px solid #EED3A2;
    padding: 4px 8px;
