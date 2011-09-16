@@ -1447,3 +1447,19 @@ body.Discussions a.Bookmark span, body.Discussions a.Bookmarked span, body.Discu
 .Discussions .Options .Bookmark {
    display: none;
 }
+
+.Item .Addon-Icon {
+   height: 24px;
+   vertical-align: text-bottom;
+   position: relative;
+   bottom: -3px;
+}
+
+.Tag-Addon {
+   background: rgba(246, 218, 168, 0.2);
+   border: solid 1px #EED3A2;
+}
+
+.Tag-Addon a {
+   color: #045DCD !Important;
+}
