@@ -809,9 +809,12 @@ ul.SearchResults {
 ul.SearchResults li.Item {
 	padding: 8px;
 }
-ul.DataList li.Item,
-ul.MessageList li.Item {
+ul.DataList li.Item {
 	border-bottom:1px solid #EED3A2;
+   padding: 4px 8px;
+}
+.DataList .ItemContent {
+   margin: 0;
 }
 div.Preview  {
    border: 1px solid #EED3A2;
@@ -1420,7 +1423,6 @@ body.Pages div#Foot {
 	text-shadow: 0 0px 5px #fff;
 }
 .AnswersBox {
-	margin-right: 4px;
    border-top-right-radius: 2px;
    border-bottom-right-radius: 2px;
 	-webkit-border-top-right-radius: 2px;
@@ -1448,18 +1450,12 @@ body.Discussions a.Bookmark span, body.Discussions a.Bookmarked span, body.Discu
    display: none;
 }
 
-.Item .Addon-Icon {
-   height: 24px;
-   vertical-align: text-bottom;
-   position: relative;
-   bottom: -3px;
-}
-
 .Tag-Addon {
-   background: rgba(246, 218, 168, 0.2);
-   border: solid 1px #EED3A2;
+   font-size: 11px;
+   background: #8E72D6;
+/*   color: #2A529A;*/
 }
 
 .Tag-Addon a {
-   color: #045DCD !Important;
+/*   color: #2A529A !Important;*/
 }
