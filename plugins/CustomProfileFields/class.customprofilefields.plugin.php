@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['CustomProfileFields'] = array(
 	'Name' => 'Custom Profile Fields',
    'Description' => 'Allows users to add custom values to their profile, like: GamerTag, Skype ID, Relationship Status, etc. Anything goes.',
-   'Version' => '1',
+   'Version' => '1.0.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'
@@ -177,8 +177,11 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 			foreach ($CustomProfileFields as $Label => $Value) {
             if (in_array($Label, $HideFields))
                continue;
+            
+            $Value = Gdn_Format::Links(htmlspecialchars($Value));
+            
 				echo '<dt class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($Label).'">'.Gdn_Format::Text($Label).'</dt>';
-				echo '<dd class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($Label).'">'.Gdn_Format::Display($Value).'</dd>';
+				echo '<dd class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($Label).'">'.$Value.'</dd>';
 			}
 		} catch (Exception $ex) {
 			// No errors
