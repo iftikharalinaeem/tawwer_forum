@@ -266,6 +266,9 @@ body#vforg_home_index .Banner ul li a {
 body#vforg_home_index {
 	background: url('images/bg-fade.png') top left repeat-x #f1e5ca;
 }
+body#vforg_home_index #Frame {
+   background: transparent;
+}
 body#vforg_home_features #Content,
 body#vforg_download_index #Content,
 body#vforg_home_index #Content {
