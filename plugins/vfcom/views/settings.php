@@ -82,7 +82,8 @@
             "Debug Mode"   => "Detailed error reporting. Turns on/off the in-depth error page for Bonks.",
             "Update Mode"  => "Disables the site for non-admins.",
             "VF Options"   => "VF.com admin options.",
-            "VF Spoof"     => "Allows Vanilla employees to gain access to hosted forums by logging in with a vf.com administrative user."
+            "VF Spoof"     => "Allows Vanilla employees to gain access to hosted forums by logging in with a vf.com administrative user.",
+            "Advanced Stats" => "Turns on/off advanced statistics tracking."
          );
       ?>
 
@@ -90,6 +91,13 @@
          <?php
             $Alt = FALSE;
             foreach ($Settings as $SettingKey => $SettingDescription) {
+//               if (is_array($SettingDescription)) {
+//                  $ConfigKey = $SettingDescription[0];
+//                  $SettingDescription = $SettingDescription[1];
+//               } else {
+//                  $ConfigKey = 
+//               }
+               
                $Alt = !$Alt;
                $ShortSettingKey = str_replace(' ', '', $SettingKey);
                $SettingEnabled = $this->Data($ShortSettingKey);

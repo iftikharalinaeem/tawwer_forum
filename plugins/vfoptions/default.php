@@ -19,6 +19,26 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       Gdn::Authenticator()->EnableAuthenticationScheme('token');
    }
    
+   /**
+    *
+    * @param ActivityController $Sender
+    * @param array $Args 
+    */
+   public function ActivityController_Buzz_Create($Sender, $Args) {
+      $BuzzModel = new BuzzModel();
+      $Get = array_change_key_case($Sender->Request->Get());
+      
+      
+      $Slot = GetValue(1, $Args, GetValue('slot', $Get, 'w'));
+      $Date = GetValue(0, $Args, GetValue('date', $Get));
+      $Sender->AddCssFile('buzz.css', 'plugins/vfoptions');
+      $Sender->Data = $BuzzModel->Get($Slot, $Date);
+      
+      
+      $Sender->SetData('Title', T("What's the Buzz?"));
+      $Sender->Render('Buzz', '', 'plugins/vfoptions');
+   }
+   
    // Make sure token authenticator is never activated as the primary authentication scheme
    public function AuthenticationController_EnableAuthenticatorToken_Handler(&$Sender) {
       Gdn::Authenticator()->UnsetDefaultAuthenticator('token');
@@ -673,6 +693,20 @@ pageTracker._trackPageview();
             $SaveFields['Email'] = $Email;
             
          $this->_SaveAcrossForums($SaveFields, $VFUserID, $VFAccountID);
+      }
+   }
+   
+   /**
+    * @param UserModel $Sender
+    * @param array $Args 
+    */
+   public function UserModel_BeforeInsertUser_Handler($Sender, $Args) {
+      // Check for the tracker cookie and save that with the user.
+      $TrackerCookie = GetValue('__vna', $_COOKIE);
+      if ($TrackerCookie) {
+         $Parts = explode('.', $TrackerCookie);
+         $DateFirstVisit = Gdn_Format::ToDateTime($Parts[0]);
+         $Args['InsertFields']['DateFirstVisit'] = $DateFirstVisit;
       }
    }
 

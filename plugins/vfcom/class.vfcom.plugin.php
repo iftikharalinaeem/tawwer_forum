@@ -45,7 +45,9 @@ class VfcomPlugin extends Gdn_Plugin {
    protected $WhitelistDomain = 'vanillaforums.com';
    
    public function __construct() {
-      
+      if (!defined('CLIENT_NAME'))
+         define('CLIENT_NAME', 'unkown.vanillaforums.com');
+         
       $ClientParts = explode('.', CLIENT_NAME);
       // Name of this client (usually the <prefix> part of http://<prefix>.<hostname>.com)
       $this->VfcomClient = array_shift($ClientParts);
@@ -94,6 +96,15 @@ class VfcomPlugin extends Gdn_Plugin {
    
    public function MakeAutoStatic($URL) {
       return CombinePaths(array($this->AutoStaticURL, $URL));
+   }
+   
+   public function Base_Render_Before($Sender, $Args) {
+      if (C('Garden.Analytics.Advanced') && $Sender->MasterView != 'admin') {
+         $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
+         $Version = GetValue('Version', Gdn::PluginManager()->GetPluginInfo('vfcom'));
+         $Sender->AddJsFile($AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version);
+         $Sender->AddDefinition('StatsUrl', self::StatsUrl('{p}'));
+      }
    }
 
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
@@ -228,6 +239,12 @@ class VfcomPlugin extends Gdn_Plugin {
             
             $Sender->InformMessage(sprintf("VF Spoof has been turned %s.",(($NewVFSpoof) ? 'on': 'off')));
          }
+         
+         if (Gdn::Request()->GetValue("{$FormPrefix}Plugin_vfcom_ToggleAdvancedStats", FALSE) !== FALSE) {
+            $NewStats = !C('Garden.Analytics.Advanced');
+            SaveToConfig('Garden.Analytics.Advanced', $NewStats, array('RemoveEmpty' => TRUE));
+            $Sender->InformMessage(sprintf("Advanced Statistics have been turned %s.",(($NewStats) ? 'on': 'off')));
+         }
       }
       
       $Sender->SetData('Caching', Gdn::Cache()->ActiveEnabled());
@@ -235,6 +252,7 @@ class VfcomPlugin extends Gdn_Plugin {
       $Sender->SetData('UpdateMode', C('Garden.UpdateMode', FALSE));
       $Sender->SetData('VFOptions', Gdn::PluginManager()->CheckPlugin('vfoptions'));
       $Sender->SetData('VFSpoof', Gdn::PluginManager()->CheckPlugin('vfspoof'));
+      $Sender->SetData('AdvancedStats', C('Garden.Analytics.Advanced'));
       
       $Sender->Render('settings','','plugins/vfcom');
    }
@@ -422,7 +440,29 @@ class VfcomPlugin extends Gdn_Plugin {
    }
    
    public function Setup() {
+   }
       
+   /**
+    * Gets a url suitable to ping the statistics server.
+    * @param type $Path
+    * @param type $Params
+    * @return string 
+    */
+   public static function StatsUrl($Path, $Params = array()) {
+      $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
+      
+      $Path = '/'.trim($Path, '/');
+      
+      $Timestamp = time();
+      $DefaultParams = array(
+          'vid' => Gdn::InstallationID(),
+          't' => $Timestamp,
+          's' => md5($Timestamp.Gdn::InstallationSecret()));
+      
+      $Params = array_merge($DefaultParams, $Params);
+      
+      $Result = $AnalyticsServer.$Path.'?'.http_build_query($Params);
+      return $Result;
    }
    
 }

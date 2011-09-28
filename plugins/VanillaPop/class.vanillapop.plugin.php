@@ -8,7 +8,7 @@
 $PluginInfo['VanillaPop'] = array(
    'Name' => 'Vanilla Pop',
    'Description' => "Integrates your forum with Vanilla's email service.",
-   'Version' => '1.0a',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -19,6 +19,11 @@ $PluginInfo['VanillaPop'] = array(
 
 class VanillaPopPlugin extends Gdn_Plugin {
    /// Properties ///
+   static $FormatDefaults = array(
+          'DiscussionSubject' => '[{Title}] {Name}',
+          'DiscussionBody' => "{Body}\n\n-- \n{Signature}",
+          'CommentSubject' => 'Re: [{Title}] {Discussion.Name}',
+          'CommentBody' => "{Body}\n\n-- \n{Signature}");
    
    /// Methods ///
    
@@ -39,7 +44,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       
       if ($Format != 'Text')
          $Result = Gdn_Format::Text($Result, FALSE);
-      $Result = html_entity_decode($Result, ENT_QUOTES, 'UTF-8');
+      $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
       return $Result;
    }
    
@@ -62,6 +67,17 @@ class VanillaPopPlugin extends Gdn_Plugin {
       
       $Result = FormatString(T('EmailTemplate'), array('Body' => $Body, 'Signature' => $Signature, 'Quote' => $Quote));
       return $Result;
+   }
+   
+   public static function EmailSignature($Route = '') {
+      if ($Route) {
+         $Signature = FormatString(T('ReplyOrFollow'))."\n".ExternalUrl($Route);
+      } elseif ($Route === FALSE) {
+         $Signature = ExternalUrl('/');
+      } else {
+         $Signature = FormatString(T('ReplyOnly'));
+      }
+      return $Signature;
    }
    
    public static function FormatQuoteText($Text) {
@@ -595,44 +611,70 @@ class VanillaPopPlugin extends Gdn_Plugin {
    public function ActivityModel_BeforeSendNotification_Handler($Sender, $Args) {
       list($Type, $ID) = self::ParseRoute(GetValue('Route', $Args));
       
+      
+      
+      $FormatData = array('Title' => C('Garden.Title'), 'Signature' => self::EmailSignature(GetValue('Route', $Args)));
+      
       if (in_array($Type, array('Discussion', 'Comment', 'Conversation', 'Message'))) {
          $Email = $Args['Email']; //new Gdn_Email(); //
          $Story = GetValue('Story', $Args);
          
          if (GetValueR('Activity.ActivityType', $Args) == 'NewDiscussion') {
             // Format the new discussion notification a bit nicer.
-            $Discussion = Gdn::SQL()->GetWhere('Discussion', array('DiscussionID' => $ID))->FirstRow(DATASET_TYPE_ARRAY);
+            $DiscussionModel = new DiscussionModel();
+            $Discussion = $DiscussionModel->GetID($ID);
             if ($Discussion) {
-               $Args['Headline'] = self::FormatPlainText($Discussion['Name'], 'Text');
-               $Story = self::FormatPlainText($Discussion['Body'], $Discussion['Format']);
-               $Message = self::FormatEmailBody($Story, GetValue('Route', $Args));
+               $Discussion = (array)$Discussion;
+               $Discussion['Name'] = self::FormatPlainText($Discussion['Name'], 'Text');
+               $Discussion['Body'] = self::FormatPlainText($Discussion['Body'], $Discussion['Format']);
+               $Discussion['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
+               $Discussion['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
+               $FormatData = array_merge($FormatData, $Discussion);
+               
+               $Message = FormatString(C('EmailFormat.DiscussionBody', self::$FormatDefaults['DiscussionBody']), $FormatData);
                $Email->Message($Message);
+               
+               $Subject = FormatString(C('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
+               $Email->Subject($Subject);
+               
+               $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Discussion', GetValue('DiscussionID', $Discussion)));
             }
-            
-            $Email->Subject(sprintf(T('[%1$s] %2$s'), Gdn::Config('Garden.Title'), $Args['Headline']));
-            $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Discussion', GetValue('DiscussionID', $Discussion)));
          } else {
             // Add the In-Reply-To field.
             switch ($Type) {
                case 'Comment':
                   $CommentModel = new CommentModel();
                   $Comment = $CommentModel->GetID($ID, DATASET_TYPE_ARRAY);
+                  
                   if ($Comment) {
+                     $Comment['Body'] = self::FormatPlainText($Comment['Body'], $Comment['Format']);
+                     $Comment['Url'] = ExternalUrl(GetValue('Route', $Args));
+                     $Comment = array($Comment);
+                     Gdn::UserModel()->JoinUsers($Comment, array('InsertUserID', 'UpdateUserID'));
+                     $Comment = $Comment[0];
+                     $FormatData = array_merge($FormatData, $Comment);
+                     
                      $this->SetFrom($Email, $Comment['InsertUserID']);
                      
                      $DiscussionModel = new DiscussionModel();
-                     $Discussion = $DiscussionModel->GetID($Comment['DiscussionID']);
+                     $Discussion = (array)$DiscussionModel->GetID($Comment['DiscussionID']);
                      
                      // See if the user has permission to view this discussion on the site.
                      $CanView = Gdn::UserModel()->GetCategoryViewPermission(GetValueR('Activity.RegardingUserID', $Args), GetValue('CategoryID', $Discussion));
-                     $Story = self::FormatPlainText($Comment['Body'], $Comment['Format']);
-                     
-                     $Message = self::FormatEmailBody($Story, $CanView ? GetValue('Route', $Args) : '');
-                     
-                     $Email->Message($Message);
+                     $FormatData['Signature'] = self::EmailSignature($CanView ? GetValue('Route', $Args) : '');
                      
                      if ($Discussion) {
-                        $Email->Subject(sprintf(T('Re: [%1$s] %2$s'), Gdn::Config('Garden.Title'), self::FormatPlainText(GetValue('Name', $Discussion), 'Text')));
+                        $Discussion['Name'] = self::FormatPlainText($Discussion['Name'], 'Text');
+                        $Discussion['Body'] = self::FormatPlainText($Discussion['Body'], $Discussion['Format']);
+                        $Discussion['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
+                        $FormatData['Discussion'] = $Discussion;
+                        $FormatData['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
+                        
+                        $Message = FormatString(C('EmailFormat.CommentBody', self::$FormatDefaults['CommentBody']), $FormatData);
+                        $Email->Message($Message);
+                        
+                        $Subject = FormatString(C('EmailFormat.CommentSubject', self::$FormatDefaults['CommentSubject']), $FormatData);
+                        $Email->Subject($Subject);
                         
                         $Source = GetValue('Source', $Discussion);
                         if ($Source == 'Email')
@@ -832,14 +874,23 @@ class VanillaPopPlugin extends Gdn_Plugin {
     */
    public function SettingsController_VanillaPop_Create($Sender, $Args) {
       $Sender->Permission('Garden.Settings.Manage');
-
-      $Conf = new ConfigurationModule($Sender);
-      $Conf->Initialize(array(
+      
+      $ConfSettings = array(
           'Plugins.VanillaPop.DefaultCategoryID' => array('Control' => 'CategoryDropDown', 'Description' => 'Place discussions started through email in the following category.'),
           'Plugins.VanillaPop.AllowUserRegistration' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow new users to be registered through email.'),
           'Plugins.VanillaPop.AugmentFrom' => array('Control' => 'CheckBox', 'LabelCode' => 'Add information into the from field in email addresses to help with replies (recommended).', 'Default' => TRUE),
           'Garden.Email.SupportAddress' => array('Control' => 'TextBox', 'LabelCode' => 'Outgoing Email Address', 'Description' => 'This is the address that will show up in the from field of emails sent from the application.')
-      ));
+      );
+      
+      foreach (self::$FormatDefaults as $Name => $Default) {
+         $Options = array();
+         if (StringEndsWith($Name, 'Body'))
+            $Options['Multiline'] = TRUE;
+         $ConfSettings['EmailFormat.'.$Name] = array('Control' => 'TextBox', 'Default' => $Default, 'Options' => $Options);   
+      }
+
+      $Conf = new ConfigurationModule($Sender);
+      $Conf->Initialize($ConfSettings);
 
       $Sender->AddSideMenu();
       $Sender->SetData('Title', T('Incoming Email'));
