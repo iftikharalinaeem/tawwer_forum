@@ -14,7 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $ThemeInfo['CarTalk'] = array(
    'Name' => 'Car Talk',
    'Description' => "Custom theme for Car Talk Forum",
-   'Version' => '1.2.2',
+   'Version' => '1.2.4',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
    'AuthorUrl' => 'http://brendanserashriar.com',

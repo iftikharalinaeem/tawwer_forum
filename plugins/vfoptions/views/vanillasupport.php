@@ -41,7 +41,8 @@ $PlanUrl = 'http://vanillaforums.com/'.($SiteID > 0 ? 'account/changeplan/'.$Sit
             To get more support requests from the Vanilla team, <a href="<?php echo $PlanUrl; ?>">upgrade your plan here</a>.
             <?php } else { ?>
             Your plan does not allow for any direct support requests from the Vanilla team.
-            If you'd like to get Vanilla support, <a href="<?php echo $PlanUrl; ?>">upgrade your plan here</a>.
+            If you'd like to get Vanilla support, <a href="<?php echo $PlanUrl; ?>">upgrade your plan here</a>
+            <strong><a href="http://vanillaforums.com/help">OR GET HELP ONLINE RIGHT NOW</a></strong>.
             <?php } ?>
          </div>
       </li>

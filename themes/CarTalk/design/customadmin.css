@@ -15,3 +15,11 @@
 .Tag-CarMake:hover, .Tag-CarModel:hover {
    background: #C83219;
 }
+
+.Cartalk-Help ul {
+   list-style:disc;
+}
+
+.Cartalk-Help li {
+   margin: 5px 0;
+}
