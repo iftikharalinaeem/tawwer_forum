@@ -375,9 +375,6 @@ div.DownloadPanelBox h4 {
 
 
 /* DataList */
-ul.Addons {
-	background: #FEF7DF;
-}
 ul.Addons li.Item {
    margin: 0;
    padding: 6px;
