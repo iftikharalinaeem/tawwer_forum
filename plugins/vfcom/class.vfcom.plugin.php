@@ -199,7 +199,7 @@ class VfcomPlugin extends Gdn_Plugin {
          }
          
          if (Gdn::Request()->GetValue("{$FormPrefix}Plugin_vfcom_ReloadConfig", FALSE) !== FALSE) {
-            $ConfigFileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, PATH_CONF.'/config.php');
+            $ConfigFileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, PATH_LOCAL_CONF.'/config.php');
             Gdn::Cache()->Remove($ConfigFileKey, array(
                 Gdn_Cache::FEATURE_NOPREFIX => TRUE
             ));
