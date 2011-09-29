@@ -46,9 +46,11 @@ a.BlueButton {
 	background:-moz-linear-gradient(top, #458fdd, #2465cf);
 	-pie-background:linear-gradient(top, #458fdd, #2465cf);
 	background:linear-gradient(top, #458fdd, #2465cf);
+   
    border: solid 1px #2A529A;
-   border-top-color: #77C2ED;
-
+   
+   box-shadow: 0 1px 0 #77C2ED inset;
+   
 	color: #FFFFFF;
 	text-shadow:0 1px 1px #111196;
 }
