@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['CustomProfileFields'] = array(
 	'Name' => 'Custom Profile Fields',
    'Description' => 'Allows users to add custom values to their profile, like: GamerTag, Skype ID, Relationship Status, etc. Anything goes.',
-   'Version' => '1.0.1',
+   'Version' => '1.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'
@@ -129,6 +129,7 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 	 * Save the custom profile fields when saving the user.
 	 */
 	public function UserModel_AfterSave_Handler($Sender) {
+      $ValueLimit = Gdn::Session()->CheckPermission('Garden.Moderation.Manage') ? 255 : C('Plugins.CustomProfileFields.ValueLength', 255);
 		$UserID = GetValue('UserID', $Sender->EventArguments);
 		$FormPostValues = GetValue('FormPostValues', $Sender->EventArguments);
 		$CustomProfileFieldLabels = FALSE;
@@ -139,7 +140,7 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 			$CustomProfileFieldValues = GetValue('CustomProfileFieldValue', $FormPostValues);
 			if (is_array($CustomProfileFieldLabels) && is_array($CustomProfileFieldValues)) {
 				$this->_TrimValues($CustomProfileFieldLabels, 50);
-				$this->_TrimValues($CustomProfileFieldValues, 255);
+				$this->_TrimValues($CustomProfileFieldValues, $ValueLimit);
 				$CustomProfileFields = array_combine($CustomProfileFieldLabels, $CustomProfileFieldValues);
 			}
 			
