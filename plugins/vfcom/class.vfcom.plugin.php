@@ -106,6 +106,14 @@ class VfcomPlugin extends Gdn_Plugin {
          $Sender->AddDefinition('StatsUrl', self::StatsUrl('{p}'));
       }
    }
+   
+   public function InfrastructurePermission() {
+      Gdn::Controller()->Permission('Garden.Settings.Manage');
+      
+      if (!StringEndsWith(GetValue('Email', Gdn::Session()->User, NULL), "@{$this->WhitelistDomain}")) {
+         throw PermissionException();
+      }
+   }
 
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       
@@ -269,7 +277,40 @@ class VfcomPlugin extends Gdn_Plugin {
       $Sender->EventArguments['SystemUser']['Email'] = 'system@vanillaforums.com';
    }
    
-   
+   /**
+    *
+    * @param Gdn_Controller $Sender
+    * @param type $Args 
+    */
+   public function UtilityController_Config_Create($Sender, $Args) {
+      $this->InfrastructurePermission();
+      $Key = $Sender->Request->Get('k', FALSE);
+      $Value =$Sender->Request->Get('v', FALSE);
+      
+      if ($Key === FALSE) {
+         throw new Exception('Key is required', 400);
+      }
+      $Sender->SetData('Key', $Key);
+      if ($Value === FALSE) {
+         $Sender->SetData('Value', C($Key, NULL));
+         $Sender->Render();
+         return;
+      }
+      if (StringBeginsWith($Key, 'Garden.Database', TRUE)) {
+         throw new Exception("You can't set this setting.", 400);
+      }
+      if ($Value === 'NULL') {
+         RemoveFromConfig($Key);
+      } else {
+         if (strtolower($Value) == 'true')
+            $Value = TRUE;
+         elseif (strtolower($Value) == 'false')
+            $Value = FALSE;
+         SaveToConfig($Key, $Value);
+      }
+      $Sender->SetData('Value', C($Key, NULL));
+      $Sender->Render();
+   }
    
    /**
     * Resend emails that errored out.
