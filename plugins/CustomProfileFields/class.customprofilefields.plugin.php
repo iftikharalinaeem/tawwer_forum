@@ -178,8 +178,11 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 			foreach ($CustomProfileFields as $Label => $Value) {
             if (in_array($Label, $HideFields))
                continue;
+            
+            $Value = Gdn_Format::Links(htmlspecialchars($Value));
+            
 				echo '<dt class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($Label).'">'.Gdn_Format::Text($Label).'</dt>';
-				echo '<dd class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($Label).'">'.Gdn_Format::Display($Value).'</dd>';
+				echo '<dd class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($Label).'">'.$Value.'</dd>';
 			}
 		} catch (Exception $ex) {
 			// No errors

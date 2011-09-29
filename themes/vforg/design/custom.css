@@ -46,9 +46,11 @@ a.BlueButton {
 	background:-moz-linear-gradient(top, #458fdd, #2465cf);
 	-pie-background:linear-gradient(top, #458fdd, #2465cf);
 	background:linear-gradient(top, #458fdd, #2465cf);
+   
    border: solid 1px #2A529A;
-   border-top-color: #77C2ED;
-
+   
+   box-shadow: 0 1px 0 #77C2ED inset;
+   
 	color: #FFFFFF;
 	text-shadow:0 1px 1px #111196;
 }
@@ -265,6 +267,9 @@ body#vforg_home_index .Banner ul li a {
 /* Homepage Customizations */
 body#vforg_home_index {
 	background: url('images/bg-fade.png') top left repeat-x #f1e5ca;
+}
+body#vforg_home_index #Frame {
+   background: transparent;
 }
 body#vforg_home_features #Content,
 body#vforg_download_index #Content,

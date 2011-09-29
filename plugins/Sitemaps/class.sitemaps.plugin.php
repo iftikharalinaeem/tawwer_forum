@@ -36,7 +36,7 @@ class SitemapsPlugin extends Gdn_Plugin {
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    
-   public function Base_Render_Before(&$Sender) {
+   public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
       if (($Filename = Gdn::Request()->Filename()) && $Filename != 'default') {
          $Parts = explode('.',$Filename);
          $Prefix = array_shift($Parts); $Suffix = array_pop($Parts);
@@ -77,7 +77,7 @@ class SitemapsPlugin extends Gdn_Plugin {
       $MapDir = CombinePaths(array(PATH_CACHE,C('Plugin.Sitemaps.MapDir', 'Sitemaps')));
       if (!is_dir($MapDir)) return;
       
-      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+      $Sender->EventArguments['Controller']->DeliveryType(DELIVERY_TYPE_VIEW);
       
       $MapFile = CombinePaths(array($MapDir,$Filename));
       if (!file_exists($MapFile) || !is_file($MapFile)) return;
@@ -201,7 +201,7 @@ class SitemapsPlugin extends Gdn_Plugin {
       if (!is_dir($MapDir)) mkdir($MapDir);
       if (!is_dir($MapDir)) return;
    
-      $IndexName = 'sitemap.index';
+      $IndexName = 'sitemap';
       $IndexFile = CombinePaths(array($MapDir, $IndexName.'.xml'));
       
       $MapDirScan = scandir($MapDir);

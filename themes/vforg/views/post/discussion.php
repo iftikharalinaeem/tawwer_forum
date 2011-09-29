@@ -64,8 +64,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       $this->FireEvent('AfterFormButtons');
       echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
       echo '</div>';
-
-      echo '<div>';
+      echo '</div>';
       echo $this->Form->Close();
    ?>
 </div>
