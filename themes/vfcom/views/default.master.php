@@ -6,6 +6,7 @@ $Session = Gdn::Session();
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
 <head>
    <?php $this->RenderAsset('Head'); ?>
+   <meta name="google-site-verification" content="T7dDWEaTeqt989RCxDJTfoOkbOADnRWLLJTauXxMHVA" />
 </head>
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
 <div id="Head" class="Wrapper">
