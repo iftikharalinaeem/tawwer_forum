@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Sitemaps'] = array(
    'Name' => 'Sitemaps',
    'Description' => "This plugin creates http://www.sitemaps.org compatible XML sitemaps for your forum.",
-   'Version' => '0.9.1',
+   'Version' => '1.0b',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
@@ -25,249 +25,111 @@ $PluginInfo['Sitemaps'] = array(
 );
 
 class SitemapsPlugin extends Gdn_Plugin {
-   
-   protected $Sitemaps;
-   protected $Entries;
-   protected $Sitemap;
-   protected $Root;
-   protected $Lastmod;
-
-   public function PluginController_Sitemaps_Create($Sender) {
-		$this->Dispatch($Sender, $Sender->RequestArgs);
-   }
-   
-   public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
-      if (($Filename = Gdn::Request()->Filename()) && $Filename != 'default') {
-         $Parts = explode('.',$Filename);
-         $Prefix = array_shift($Parts); $Suffix = array_pop($Parts);
-         if ($Prefix == 'sitemap' && $Suffix == 'xml') {
-            $this->RenderMap($Sender, $Filename);
-            exit();
-         }
-      }
-   }
-   
-   public function PostController_AfterDiscussionSave_Handler($Sender) {
-      $Discussion = $Sender->EventArguments['Discussion'];
-      $DiscussionPostDate = strtotime($Discussion->DateInserted);
-      $DiscussionPostIndex = (int)date('Y',$DiscussionPostDate) + (int)date('d',$DiscussionPostDate);
-      
-      $LastDiscussionIndex = C('Plugin.Sitemaps.LastDiscussionIndex',0);
-      
-      if ($DiscussionPostIndex > $LastDiscussionIndex) {
-         SaveToConfig('Plugin.Sitemaps.LastDiscussionIndex', $DiscussionPostIndex);
-         SaveToConfig('Plugin.Sitemaps.Regenerate', TRUE);
-      }
-   }
-   
-   public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
-      if (!C('Plugin.Sitemaps.Regenerate')) return;
-      RemoveFromConfig('Plugin.Sitemaps.Regenerate');
-      $Sender->AddJsFile($this->GetResource('js/sitemaps.js',FALSE,FALSE));
-   }
-   
-   public function Controller_Build(&$Sender) {
-      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+   /**
+    * @param Gdn_Controller $Sender 
+    */
+   public function UtilityController_Robots_Create($Sender) {
+      // Clear the session to mimic a crawler.
+      Gdn::Session()->UserID = 0;
+      Gdn::Session()->User = FALSE;
       $Sender->DeliveryMethod(DELIVERY_METHOD_XHTML);
-      $this->Build();
-      $Sender->Render($this->GetView('showfile.php'));
+      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+      $Sender->SetHeader('Content-Type', 'text/plain');
+      
+      $Sender->Render('Robots', '', 'plugins/Sitemaps');
    }
    
-   public function RenderMap($Sender, $Filename) {
-      $MapDir = CombinePaths(array(PATH_CACHE,C('Plugin.Sitemaps.MapDir', 'Sitemaps')));
-      if (!is_dir($MapDir)) return;
+   /**
+    * @param Gdn_Controller $Sender
+    * @param type $Args 
+    */
+   public function UtilityController_SiteMapIndex_Create($Sender, $Args) {
+      // Clear the session to mimic a crawler.
+      Gdn::Session()->UserID = 0;
+      Gdn::Session()->User = FALSE;
+      $Sender->DeliveryMethod(DELIVERY_METHOD_XHTML);
+      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+      $Sender->SetHeader('Content-Type', 'text/xml');
       
-      $Sender->EventArguments['Controller']->DeliveryType(DELIVERY_TYPE_VIEW);
+      $SiteMaps = array();
       
-      $MapFile = CombinePaths(array($MapDir,$Filename));
-      if (!file_exists($MapFile) || !is_file($MapFile)) return;
-      header('Content-Type: text/xml');
-      readfile($MapFile);
-   }
-   
-   protected function Build() {
-      $DiscussionModel = new DiscussionModel();
-      
-      $Offset = 0; $Limit = 1000;
-      while ($Discussions = $DiscussionModel->Get($Offset, $Limit)) {
-         if (!$Discussions->NumRows()) break;
-         $Offset += $Discussions->NumRows();
-         
-         $Day = 24*3600; $Week = 7*$Day; $Month = 4*$Week; $Year = 12*$Month;
-         $PriorityMatrix = array(
-            'hourly'    => 1,
-            'daily'     => 0.8,
-            'weekly'    => 0.6,
-            'monthly'   => 0.4,
-            'yearly'    => 0.2
-         );
-         while ($Discussion = $Discussions->NextRow()) {
-            $ChangeFreq = 'hourly';
-            $DiffDate = time() - strtotime($Discussion->DateLastComment);
-            $Priority = 1;
+      if (class_exists('CategoryModel')) {
+         $Categories = CategoryModel::Categories();
+         foreach ($Categories as $Category) {
+            if (!$Category['PermsDiscussionsView'] || $Category['CategoryID'] < 0)
+               continue;
             
-            if ($DiffDate < $Day)
-               $ChangeFreq = 'hourly';
-            elseif ($DiffDate < $Week)
-               $ChangeFreq = 'daily';
-            elseif ($DiffDate < $Month)
-               $ChangeFreq = 'weekly';
-            elseif ($DiffDate < $Year)
-               $ChangeFreq = 'monthly';
-            else
-               $ChangeFreq = 'yearly';
-               
-            $this->MapItem(
-               DiscussionLink($Discussion, FALSE),
-               date('Y-m-d', strtotime($Discussion->DateLastComment)),
-               $ChangeFreq,
-               $PriorityMatrix[$ChangeFreq]
+            $SiteMap = array(
+                'Loc' => Url('/sitemap-category-'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'.xml', TRUE),
+                'LastMod' => $Category['DateLastComment'],
+                'ChangeFreq' => '',
+                'Priority' => ''
             );
+            $SiteMaps[] = $SiteMap;
          }
       }
-      
-      $this->WriteIndex();
+      $Sender->SetData('SiteMaps', $SiteMaps);
+      $Sender->Render('SiteMapIndex', '', 'plugins/Sitemaps');
    }
    
-   protected function NewSitemap($CloseOnly = FALSE) {
-      $this->CloseSitemap();
+   public function UtilityController_SiteMap_Create($Sender, $Args) {
+      Gdn::Session()->UserID = 0;
+      Gdn::Session()->User = FALSE;
+      $Sender->DeliveryMethod(DELIVERY_METHOD_XHTML);
+      $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
+      $Sender->SetHeader('Content-Type', 'text/xml');
       
-      $Document = $this->CreateDocument('urlset', 'http://www.sitemaps.org/schemas/sitemap/0.9');
-      $this->Root = $Document->Root;
-      $this->Sitemap = $Document;
-      $this->Lastmod = NULL;
-      $this->Entries = 0;
+      $Arg = StringEndsWith(GetValue(0, $Args), '.xml', TRUE, TRUE);
+      $Parts = explode('-', $Arg, 2);
+      $Type = strtolower($Parts[0]);
+      $Arg = GetValue(1, $Parts, '');
       
-      return TRUE;
+      $Urls = array();
+      switch ($Type) {
+         case 'category':
+            // Build the category site map.
+            $this->BuildCategorySiteMap($Arg, $Urls);
+            break;
+         default:
+            // See if a plugin can build the sitemap.
+            $this->EventArguments['Type'] = $Type;
+            $this->EventArguments['Arg'] = $Arg;
+            $this->EventArguments['Urls'] =& $Urls;
+            $this->FireEvent('SiteMap'.ucfirst($Type));
+            break;
+      }
+      
+      $Sender->SetData('Urls', $Urls);
+      $Sender->Render('SiteMap', '', 'plugins/Sitemaps');
    }
    
-   protected function CloseSitemap() {
-      if (!is_null($this->Sitemap)) {
-         
-         $MapDir = CombinePaths(array(PATH_CACHE,C('Plugin.Sitemaps.MapDir', 'Sitemaps')));
-         if (!is_dir($MapDir)) mkdir($MapDir);
-         if (!is_dir($MapDir)) return;
+   public function BuildCategorySiteMap($UrlCode, &$Urls) {
+      $Category = CategoryModel::Categories($UrlCode);
+      if (!$Category)
+         return;
       
-         $MapUnique = uniqid().'-'.microtime(true).'-'.mt_rand().'-'.mt_rand();
-         $MapHash = sha1($MapUnique);
-         $MapName = "sitemap.{$MapHash}.xml";
-         $MapFile = CombinePaths(array($MapDir, $MapName));
-         $this->Sitemap->save($MapFile);
-         $this->Sitemap = NULL;
-         $this->Sitemaps[] = array(
-            'loc'       => Url(basename($MapFile),TRUE),
-            'file'      => basename($MapFile),
-            'hash'      => $MapHash,
-            'lastmod'   => (!is_null($this->Lastmod)) ? $this->Lastmod : date('Y-m-d')
-         );
-      }
-   }
-   
-   protected function Ready() {
-      if (is_null($this->Sitemap)) return FALSE;
-      if ($this->Entries > 45000) return FALSE;
-      
-      return TRUE;
-   }
-   
-   protected function WriteIndex() {
-      $this->CloseSitemap();
-      
-      $Document = $this->CreateDocument('sitemapindex', 'http://www.sitemaps.org/schemas/sitemap/0.9');
-      $Root = $Document->Root;
-      
-      $MapFiles = array();
-      foreach ($this->Sitemaps as $SitemapData) {
-         $Sitemap = $Document->createElement('sitemap');
-         $MapFiles[] = $SitemapData['file'];
-         
-         if ($SitemapData['loc']) {
-            $Item = $Document->createElement('loc');
-            $Item->appendChild($Document->createTextNode($SitemapData['loc'])); 
-            $Sitemap->appendChild($Item);
-         }
-         
-         if ($SitemapData['lastmod']) {
-            $Item = $Document->createElement('lastmod');
-            $Item->appendChild($Document->createTextNode($SitemapData['lastmod'])); 
-            $Sitemap->appendChild($Item);
-         }
-         
-         $Root->appendChild($Sitemap);
-      }
-      $MapFiles = array_flip($MapFiles);
-      
-      $MapDir = CombinePaths(array(PATH_CACHE,C('Plugin.Sitemaps.MapDir', 'Sitemaps')));
-      if (!is_dir($MapDir)) mkdir($MapDir);
-      if (!is_dir($MapDir)) return;
-   
-      $IndexName = 'sitemap';
-      $IndexFile = CombinePaths(array($MapDir, $IndexName.'.xml'));
-      
-      $MapDirScan = scandir($MapDir);
-      if (is_array($MapDirScan)) {
-         foreach ($MapDirScan as $MapDirFile) {
-            if (in_array($MapDirFile,array('.','..'))) continue;
-            if (!array_key_exists($MapDirFile, $MapFiles))
-               unlink(CombinePaths(array($MapDir, $MapDirFile)));
-         }
-      }
-      $Document->save($IndexFile);
-   }
-   
-   protected function MapItem($Url, $Lastmod = NULL, $ChangeFreq = NULL, $Priority = NULL) {
-      $Entry = array('loc' => $Url);
-      
-      if (!is_null($Lastmod))
-         $Entry['lastmod'] = $Lastmod;
-      if (!is_null($ChangeFreq))
-         $Entry['changefreq'] = $ChangeFreq;
-      if (!is_null($Priority))
-         $Entry['priority'] = $Priority;
-      
-      if (!$this->Ready())
-         $this->NewSitemap();
-         
-      $this->Entries++;
-      if (is_null($this->Lastmod) || (!is_null($Lastmod) && strtotime($Lastmod) > strtotime($this->Lastmod))) {
-         $this->Lastmod = $Lastmod;
-      }
-      
-      $Url = $this->Sitemap->createElement('url');
-      
-      foreach ($Entry as $EntryItem => $ItemValue) {
-         $Item = $this->Sitemap->createElement($EntryItem);
-         $Item->appendChild($this->Sitemap->createTextNode($ItemValue)); 
-         $Url->appendChild($Item);
-      }
-      $this->Root->appendChild($Url);
+      $CountDiscussions = $Category['CountDiscussions'];
+      $PageCount = PageNumber($CountDiscussions, C('Vanilla.Discussions.PerPage', 30));
+      $Loc = Url('/categories/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']), TRUE).'/{Page}';
 
-   }
-   
-   protected function CreateDocument($RootNode, $RootNamespace) {
-      $Document = new DOMDocument();
-      $Document->preserveWhiteSpace = false;
-      $Document->formatOutput = true; 
-      $Document->encoding = 'UTF-8';
-      $Document->xmlVersion = '1.0';
-      
-      // Create root 'urlset' element
-      $Root = $Document->createElement($RootNode);
-      $SitemapNS = $Document->createAttribute('xmlns');
-      $SitemapNS->appendChild($Document->createTextNode($RootNamespace));
-      $Root->appendChild($SitemapNS);
-      $Document->appendChild($Root);
-      $Document->Root = $Root;
-      
-      return $Document;
+      $Url = array(
+          'Loc' => $Loc,
+          'LastMode' => '',
+          'ChangeFreq' => '',
+          'PageCount' => $PageCount
+      );
+
+      $Urls[] = $Url;
    }
    
    public function Setup() {
-      // Nothing to do here!
+      $this->Structure();
    }
    
    public function Structure() {
-      // Nothing to do here!
+      Gdn::Router()->SetRoute('sitemapindex.xml', '/utility/sitemapindex.xml', 'Internal');
+      Gdn::Router()->SetRoute('sitemap-(.+)', '/utility/sitemap/$1', 'Internal');
+      Gdn::Router()->SetRoute('robots.txt', '/utility/robots', 'Internal');
    }
          
 }
