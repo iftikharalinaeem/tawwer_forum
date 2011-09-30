@@ -3,6 +3,7 @@
 $AllowedPlugins = C('VFCom.AllowedPlugins');
 if (!is_array($AllowedPlugins))
    $AllowedPlugins = array(
+      'embedvanilla',
       'Emotify',
       'cleditor',
       'Facebook',
@@ -14,10 +15,10 @@ if (!is_array($AllowedPlugins))
       'Tagging',
       'Gravatar',
       'vanillicon',
-      'OpenID',
       'QnA',
       'RoleTitle',
       'Signatures',
+      'Sitemaps',
       'SplitMerge',
       'Spoof',
       'WhosOnline'
@@ -57,6 +58,9 @@ table tbody tr.More td.Less,
 table tbody th,
 table tbody td {
 	border-bottom: 1px solid #e0e0e0;
+}
+.AddonName .Buttons {
+   white-space: nowrap;
 }
 </style>
 <h1><?php echo $this->Data('Title') ?></h1>
@@ -109,7 +113,7 @@ foreach ($AllowedPlugins as $Key) {
       <td class="Less">
          <?php echo Img($IconPath, array('class' => 'PluginIcon')); ?>
       </td>
-      <td>
+      <td class="AddonName">
       <?php
          echo Wrap($ScreenName, 'strong');
          echo '<div class="Buttons">';
