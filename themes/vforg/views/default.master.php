@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
 <head>
    <?php $this->RenderAsset('Head'); ?>
+   <meta name="google-site-verification" content="Y2ak1oCyCerNGT04Up_vTgn4SLsPzSNnBjnzHCB66VI" />
 </head>
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
 	<div class="Wrap">
