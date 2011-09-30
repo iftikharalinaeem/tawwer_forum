@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Sitemaps'] = array(
    'Name' => 'Sitemaps',
    'Description' => "This plugin creates http://www.sitemaps.org compatible XML sitemaps for your forum.",
-   'Version' => '1.0b',
+   'Version' => '1.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
@@ -21,10 +21,53 @@ $PluginInfo['Sitemaps'] = array(
    'RegisterPermissions' => FALSE,
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'SettingsUrl' => '/settings/sitemaps',
+   'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
 class SitemapsPlugin extends Gdn_Plugin {
+   
+   /// Methods ///
+   
+   public function BuildCategorySiteMap($UrlCode, &$Urls) {
+      $Category = CategoryModel::Categories($UrlCode);
+      if (!$Category)
+         return;
+      
+      $CountDiscussions = $Category['CountDiscussions'];
+      $PageCount = PageNumber($CountDiscussions, C('Vanilla.Discussions.PerPage', 30));
+      $Loc = Url('/categories/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']), TRUE).'/{Page}';
+
+      $Url = array(
+          'Loc' => $Loc,
+          'LastMode' => '',
+          'ChangeFreq' => '',
+          'PageCount' => $PageCount
+      );
+
+      $Urls[] = $Url;
+   }
+   
+   public function Setup() {
+      $this->Structure();
+   }
+   
+   public function Structure() {
+      Gdn::Router()->SetRoute('sitemapindex.xml', '/utility/sitemapindex.xml', 'Internal');
+      Gdn::Router()->SetRoute('sitemap-(.+)', '/utility/sitemap/$1', 'Internal');
+      Gdn::Router()->SetRoute('robots.txt', '/utility/robots', 'Internal');
+   } 
+   
+   
+   /// Event Handlers ///
+   
+   public function SettingsController_Sitemaps_Create($Sender) {
+      $Sender->SetData('Title', T('Sitemap Settings'));
+      $Sender->AddSideMenu();
+      $Sender->Render('Settings', '', 'plugins/Sitemaps');
+   }
+   
    /**
     * @param Gdn_Controller $Sender 
     */
@@ -101,35 +144,5 @@ class SitemapsPlugin extends Gdn_Plugin {
       
       $Sender->SetData('Urls', $Urls);
       $Sender->Render('SiteMap', '', 'plugins/Sitemaps');
-   }
-   
-   public function BuildCategorySiteMap($UrlCode, &$Urls) {
-      $Category = CategoryModel::Categories($UrlCode);
-      if (!$Category)
-         return;
-      
-      $CountDiscussions = $Category['CountDiscussions'];
-      $PageCount = PageNumber($CountDiscussions, C('Vanilla.Discussions.PerPage', 30));
-      $Loc = Url('/categories/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']), TRUE).'/{Page}';
-
-      $Url = array(
-          'Loc' => $Loc,
-          'LastMode' => '',
-          'ChangeFreq' => '',
-          'PageCount' => $PageCount
-      );
-
-      $Urls[] = $Url;
-   }
-   
-   public function Setup() {
-      $this->Structure();
-   }
-   
-   public function Structure() {
-      Gdn::Router()->SetRoute('sitemapindex.xml', '/utility/sitemapindex.xml', 'Internal');
-      Gdn::Router()->SetRoute('sitemap-(.+)', '/utility/sitemap/$1', 'Internal');
-      Gdn::Router()->SetRoute('robots.txt', '/utility/robots', 'Internal');
-   }
-         
+   }       
 }
