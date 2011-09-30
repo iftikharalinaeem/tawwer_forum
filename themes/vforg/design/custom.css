@@ -620,7 +620,7 @@ body.connect div.Box {
 
 /* DataList & Headings */
 .Tabs, .Headings {
-   background: #fff;
+   background: transparent;
    border-bottom-color: #BEC8CC;
    padding: 4px 0;
 }
@@ -1176,9 +1176,6 @@ div.Feature h4 {
 .FeaturePanel img {
 	float: right;
 }
-body.Discussion a.Bookmark {
-	margin: 0 0 0 8px
-}
 
 .Pages #Panel {
    display: none;
@@ -1251,19 +1248,19 @@ body.Pages div#Foot {
    white-space: nowrap;
    width: 40px;
 }
-.Bookmark, a.Bookmark, a.Bookmarked, a.Bookmarking {
+.DataList .Bookmark, .DataList a.Bookmark, .DataList a.Bookmarked, .DataList a.Bookmarking {
    background: #f6cf8a;
    display: inline-block;
    height: 38px;
    width: inherit;
 }
 
-a.Bookmarked {
+.DataList a.Bookmarked {
    background: #9fd8f6;
    color: #00379a;
 }
 
-a.Bookmarking {
+.DataList a.Bookmarking {
    background: #f6c46c;
 }
 

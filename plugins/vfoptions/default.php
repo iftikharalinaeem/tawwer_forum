@@ -965,13 +965,21 @@ pageTracker._trackPageview();
 
       if (Gdn::Session()->ValidateTransientKey($TransientKey) && $Key) {
          try {
-            switch (strtolower($Action)) {
+            $Action = strtolower($Action);
+            switch ($Action) {
                case 'enable':
                   Gdn::PluginManager()->EnablePlugin($Key, NULL);
+                  if ($Filter != 'all')
+                     $Filter = 'enabled';
                   break;
                case 'disable':
                   Gdn::PluginManager()->DisablePlugin($Key, NULL);
+                  if ($Filter != 'all')
+                     $Filter = 'disabled';
+                  break;
             }
+            $Url = '/settings/addons/'.rawurlencode($Filter).'#'.urlencode(strtolower($Key)).'-plugin';
+            Redirect($Url);
          } catch (Exception $Ex) {
             $Sender->Form->AddError($Ex);
          }
