@@ -86,10 +86,9 @@ class SitemapsPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     * @param type $Args 
     */
-   public function UtilityController_SiteMapIndex_Create($Sender, $Args) {
+   public function UtilityController_SiteMapIndex_Create($Sender  ) {
       // Clear the session to mimic a crawler.
-      Gdn::Session()->UserID = 0;
-      Gdn::Session()->User = FALSE;
+      Gdn::Session()->Start(0, FALSE, FALSE);
       $Sender->DeliveryMethod(DELIVERY_METHOD_XHTML);
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       $Sender->SetHeader('Content-Type', 'text/xml');
@@ -116,8 +115,7 @@ class SitemapsPlugin extends Gdn_Plugin {
    }
    
    public function UtilityController_SiteMap_Create($Sender, $Args) {
-      Gdn::Session()->UserID = 0;
-      Gdn::Session()->User = FALSE;
+      Gdn::Session()->Start(0, FALSE, FALSE);
       $Sender->DeliveryMethod(DELIVERY_METHOD_XHTML);
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       $Sender->SetHeader('Content-Type', 'text/xml');
