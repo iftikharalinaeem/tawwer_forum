@@ -22,7 +22,7 @@ $PluginInfo['Sitemaps'] = array(
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',
-   'SettingsUrl' => '/settings/sitemaps',
+   //'SettingsUrl' => '/settings/sitemaps',
    'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
@@ -62,11 +62,13 @@ class SitemapsPlugin extends Gdn_Plugin {
    
    /// Event Handlers ///
    
+   /*
    public function SettingsController_Sitemaps_Create($Sender) {
       $Sender->SetData('Title', T('Sitemap Settings'));
       $Sender->AddSideMenu();
       $Sender->Render('Settings', '', 'plugins/Sitemaps');
    }
+   */
    
    /**
     * @param Gdn_Controller $Sender 
