@@ -129,6 +129,12 @@ class BuzzModel {
       $Result['CountDiscussionsContributed'] += $CountDiscussionUsers;
       $Result['CountDiscussionContributors'] += $CountDiscussionUsers;
       
+      $Row = Gdn::Database()->Query("select count(UserID) as CountUsers, sum(unix_timestamp(DateInserted) - unix_timestamp(DateFirstVisit)) as C
+         from {$Px}User
+         where DateInserted > DateFirstVisit")->FirstRow();
+      $Result['TimeToRegister'] = GetValue('C', $Row, 0);
+      $Result['CountToRegister'] = GetValue('CountUsers', $Row, 0);
+      
       return $Result;
    }
    
