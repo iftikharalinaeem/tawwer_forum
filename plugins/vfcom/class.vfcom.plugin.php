@@ -98,6 +98,30 @@ class VfcomPlugin extends Gdn_Plugin {
       return CombinePaths(array($this->AutoStaticURL, $URL));
    }
    
+   /**
+    *
+    * @param ActivityController $Sender
+    * @param array $Args 
+    */
+   public function ActivityController_Buzz_Create($Sender, $Date = FALSE, $Slot = 'w') {
+      $BuzzModel = new BuzzModel();
+      $Get = array_change_key_case($Sender->Request->Get());
+      
+      $Sender->AddCssFile('buzz.css', 'plugins/vfcom');
+      $Sender->Data = $BuzzModel->Get($Slot, $Date);
+      
+      $Sender->SetData('Title', T("What's the Buzz?"));
+      $Sender->Render();
+   }
+   
+   public function UtilityController_Stats_Create($Sender, $Type) {
+      $Type = strtolower($Type);
+      
+      switch ($Type) {
+         case 'firstdate':
+      }
+   }
+   
    public function Base_Render_Before($Sender, $Args) {
       if (C('Garden.Analytics.Advanced') && $Sender->MasterView != 'admin') {
          $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
