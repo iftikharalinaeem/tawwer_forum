@@ -111,7 +111,7 @@ class VfcomPlugin extends Gdn_Plugin {
       $Sender->Data = $BuzzModel->Get($Slot, $Date);
       
       $Sender->SetData('Title', T("What's the Buzz?"));
-      $Sender->Render();
+      $Sender->Render('Buzz', 'Activity', 'plugins/vfcom');
    }
    
    public function UtilityController_Stats_Create($Sender, $Type) {
