@@ -62,19 +62,28 @@ class BuzzModel {
          from {$Px}Discussion r
          where $ModWhere")->Value('CountUsers', 0);
       $Result['CountModContributors'] = $CountModDiscussionUsers + $CountModCommentUsers;
+     
+      $QnA = FALSE;
+      if (array_key_exists('QnA', Gdn::PluginManager()->EnabledPlugins())) {
+         $QnA = TRUE;
+      }
       
-      $Row = Gdn::SQL()
+      Gdn::SQL()
          ->Select('r.CommentID', 'count', 'CountAnswers')
          ->Select('sum(unix_timestamp(r.DateInserted) - unix_timestamp(d.DateInserted))', '', 'TimeTillAnswer')
          ->From('Comment r')
          ->Join('Discussion d', 'd.DiscussionID = r.DiscussionID and d.FirstCommentID = r.CommentID')
-         ->Where(self::RangeWhere($SlotRange, 'r.DateInserted'))
-         ->Get()->FirstRow();
+         ->Where(self::RangeWhere($SlotRange, 'r.DateInserted'));
+      if ($QnA)
+         Gdn::SQL()->Where('d.Type', 'Question');
+      $Row =    Gdn::SQL()->Get()->FirstRow();
             
        $Result['CountAnswers'] = GetValue('CountAnswers', $Row, 0);
        $Result['TimeToAnswer'] = GetValue('TimeTillAnswer', $Row, 0);
       
       // Count all the discussions without a comment.
+      if ($QnA)
+         Gdn::SQL()->Where('r.Type', 'Question');
       $CountUnanswered1 = Gdn::SQL()
          ->Select('r.DiscussionID', 'count', 'C')
          ->From('Discussion r')
@@ -82,8 +91,11 @@ class BuzzModel {
          ->Where('r.FirstCommentID', NULL)
          ->Where('r.DateInserted <', $SlotRange[1])
          ->Get()->Value('C');
-      
+
       // Count all of the discussions that were not answered by this timeframe.
+      if ($QnA)
+         Gdn::SQL()->Where('r.Type', 'Question');
+      
       $CountUnanswered2 = Gdn::SQL()
          ->Select('r.DiscussionID', 'count', 'C')
          ->From('Discussion r')
@@ -92,7 +104,7 @@ class BuzzModel {
          ->Where('r.DateInserted <', $SlotRange[1])
          ->Where('c.DateInserted >=', $SlotRange[1])
          ->Get()->Value('C');
-       
+
       $Result['CountUnanswered'] = $CountUnanswered1 + $CountUnanswered2;
       
       // Users per discussion involves a tricky select.
