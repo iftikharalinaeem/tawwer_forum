@@ -15,7 +15,7 @@ function _WriteBuzz($Field, $Data, $Label = '') {
       '</span>';
 }
 
-_WriteBuzz('CountNewUsers', $this->Data);
+_WriteBuzz('CountUsers', $this->Data);
 _WriteBuzz('CountDiscussions', $this->Data);
 _WriteBuzz('CountComments', $this->Data);
 _WriteBuzz('CountContributors', $this->Data);

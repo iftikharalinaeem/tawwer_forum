@@ -4,7 +4,12 @@
 #Panel {
    float: left;
 }
-
+body.add #Panel {
+   display: block;
+}
+body.add #Content {
+   width: 680px;
+}
 .AddonRow .Icon .IconWrap {
    /* border: 1px solid #ddd; */
    padding: 1px;
@@ -569,4 +574,21 @@ table.Data .Alt {
 
 .DateColumn {
    text-align: right;
+}
+
+body.add #Content h1,
+body.newversion #Content h1,
+body.icon #Content h1,
+body.addpicture #Content h1 {
+   padding: 0;
+   margin: 0;
+}
+body.add #Content .Info,
+body.newversion #Content .Info,
+body.icon #Content .Info,
+body.addpicture #Content .Info {
+   font-size: 11px;
+   padding: 0;
+   border: none;
+   background: none;
 }
