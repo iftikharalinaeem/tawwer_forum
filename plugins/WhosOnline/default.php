@@ -4,7 +4,7 @@
 $PluginInfo['WhosOnline'] = array(
    'Name' => 'Whos Online',
    'Description' => "Lists the users currently browsing the forum.",
-   'Version' => '1.3.2',
+   'Version' => '1.3.3',
    'Author' => "Gary Mardell",
    'AuthorEmail' => 'gary@vanillaplugins.com',
    'AuthorUrl' => 'http://vanillaplugins.com',
@@ -20,7 +20,7 @@ $PluginInfo['WhosOnline'] = array(
 
 class WhosOnlinePlugin extends Gdn_Plugin {
    
-   public function PluginController_WhosOnline_Create(&$Sender) {
+   public function PluginController_WhosOnline_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->AddSideMenu('plugin/whosonline');
       $Sender->SetData('Title', T("Who's Online Settings"));
@@ -55,7 +55,7 @@ class WhosOnlinePlugin extends Gdn_Plugin {
 //      $Sender->Render($this->GetView('whosonline.php'));
    }
 
-   public function PluginController_ImOnline_Create(&$Sender) {
+   public function PluginController_ImOnline_Create($Sender) {
       
       $Session = Gdn::Session();
       $UserMetaData = $this->GetUserMeta($Session->UserID, '%'); 
@@ -131,7 +131,7 @@ class WhosOnlinePlugin extends Gdn_Plugin {
       }
    }
    
-   public function ProfileController_Whosonline_Create(&$Sender) {
+   public function ProfileController_Whosonline_Create($Sender) {
       
       $Session = Gdn::Session();
       $UserID = $Session->IsValid() ? $Session->UserID : 0;
