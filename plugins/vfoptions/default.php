@@ -675,20 +675,6 @@ pageTracker._trackPageview();
          $this->_SaveAcrossForums($SaveFields, $VFUserID, $VFAccountID);
       }
    }
-   
-   /**
-    * @param UserModel $Sender
-    * @param array $Args 
-    */
-   public function UserModel_BeforeInsertUser_Handler($Sender, $Args) {
-      // Check for the tracker cookie and save that with the user.
-      $TrackerCookie = GetValue('__vna', $_COOKIE);
-      if ($TrackerCookie) {
-         $Parts = explode('.', $TrackerCookie);
-         $DateFirstVisit = Gdn_Format::ToDateTime($Parts[0]);
-         $Args['InsertFields']['DateFirstVisit'] = $DateFirstVisit;
-      }
-   }
 
    /**
     * Before any forum's administrative user (UserID == 1) is saved, validate
