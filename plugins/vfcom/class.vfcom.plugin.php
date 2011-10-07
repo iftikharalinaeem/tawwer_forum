@@ -124,7 +124,9 @@ class VfcomPlugin extends Gdn_Plugin {
       if ($TrackerCookie) {
          $Parts = explode('.', $TrackerCookie);
          $DateFirstVisit = Gdn_Format::ToDateTime($Parts[0]);
-         $Args['InsertFields']['DateFirstVisit'] = $DateFirstVisit;
+         $SignedIn = GetValue(2, $Parts);
+         if (!$SignedIn)
+            $Args['InsertFields']['DateFirstVisit'] = $DateFirstVisit;
       }
    }
    
