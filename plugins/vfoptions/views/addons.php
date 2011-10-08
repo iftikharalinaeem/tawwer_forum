@@ -21,6 +21,7 @@ if (!is_array($AllowedPlugins))
       'Sitemaps',
       'SplitMerge',
       'Spoof',
+      'StopForumSpam',
       'WhosOnline'
    );
    
