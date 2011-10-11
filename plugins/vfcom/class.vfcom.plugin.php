@@ -98,6 +98,46 @@ class VfcomPlugin extends Gdn_Plugin {
       return CombinePaths(array($this->AutoStaticURL, $URL));
    }
    
+   /**
+    *
+    * @param ActivityController $Sender
+    * @param array $Args 
+    */
+   public function ActivityController_Buzz_Create($Sender, $Date = FALSE, $Slot = 'w') {
+      $BuzzModel = new BuzzModel();
+      $Get = array_change_key_case($Sender->Request->Get());
+      
+      $Sender->AddCssFile('buzz.css', 'plugins/vfcom');
+      $Sender->Data = $BuzzModel->Get($Slot, $Date);
+      
+      $Sender->SetData('Title', T("What's the Buzz?"));
+      $Sender->Render('Buzz', 'Activity', 'plugins/vfcom');
+   }
+   
+   /**
+    * @param UserModel $Sender
+    * @param array $Args 
+    */
+   public function UserModel_BeforeInsertUser_Handler($Sender, $Args) {
+      // Check for the tracker cookie and save that with the user.
+      $TrackerCookie = GetValue('__vna', $_COOKIE);
+      if ($TrackerCookie) {
+         $Parts = explode('.', $TrackerCookie);
+         $DateFirstVisit = Gdn_Format::ToDateTime($Parts[0]);
+         $SignedIn = GetValue(2, $Parts);
+         if (!$SignedIn)
+            $Args['InsertFields']['DateFirstVisit'] = $DateFirstVisit;
+      }
+   }
+   
+   public function UtilityController_Stats_Create($Sender, $Type) {
+      $Type = strtolower($Type);
+      
+      switch ($Type) {
+         case 'firstdate':
+      }
+   }
+   
    public function Base_Render_Before($Sender, $Args) {
       if (C('Garden.Analytics.Advanced') && $Sender->MasterView != 'admin') {
          $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
