@@ -671,6 +671,6 @@ table.PreferenceGroup tbody td {
 	border-bottom: 1px solid #777;
 }
 
-.Tag {
+.Tag.Category {
    background-color: #777777;
 }
