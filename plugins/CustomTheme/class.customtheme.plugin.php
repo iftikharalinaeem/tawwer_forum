@@ -188,7 +188,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 
 	}
 	
-   public function SettingsController_CustomTheme_Create($Sender, $EventArguments) {
+   public function SettingsController_CustomTheme_Create($Sender) {
 		$Session = Gdn::Session();
 		$UserModel = Gdn::UserModel();
       $Sender->Permission('Garden.Settings.Manage');
@@ -414,7 +414,7 @@ Here are some things you should know before you begin:
 		}
 	}
 	
-   public function SettingsController_CustomThemeUpgrade_Create(&$Sender, $EventArguments) {
+   public function SettingsController_CustomThemeUpgrade_Create($Sender, $EventArguments) {
 		$Sender->Render(PATH_PLUGINS . DS . 'CustomTheme' . DS . 'views' . DS . 'upgrade.php');
 	}
 	
