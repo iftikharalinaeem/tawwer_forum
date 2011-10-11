@@ -433,3 +433,20 @@ div.MultipleEntryMethods {
    color: #000000;
    font-weight: bold;
 }
+
+/* Search box on discussion list */
+#Content .SearchForm {
+	border: 1px solid #ddd;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	margin: 0 0 8px;
+	padding: 8px;
+	background: #F6F8FE;
+	-moz-box-shadow: inset 0 0 4px #fff;
+}
+#Content .SearchForm .InputBox {
+	font-size: 13px;
+	margin-right: 6px;
+	width: 582px;
+}
