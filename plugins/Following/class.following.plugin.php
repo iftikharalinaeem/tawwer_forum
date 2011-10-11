@@ -25,7 +25,7 @@ $PluginInfo['Following'] = array(
 
 class FollowingPlugin extends Gdn_Plugin {
 
-   public function ProfileController_AfterAddSideMenu_Handler(&$Sender) {
+   public function ProfileController_AfterAddSideMenu_Handler($Sender) {
       $ViewingUserID = Gdn::Session()->UserID;
       if ($ViewingUserID == $Sender->User->UserID) return;
       
@@ -36,7 +36,7 @@ class FollowingPlugin extends Gdn_Plugin {
       $SideMenu->AddLink('Options', sprintf(T($FollowText),$Sender->User->Name), "/profile/{$FollowAction}/".$Sender->User->UserID.'/'.Gdn_Format::Url($Sender->User->Name), FALSE);
    }
    
-   public function ProfileController_Follow_Create(&$Sender) {
+   public function ProfileController_Follow_Create($Sender) {
       $ViewingUserID = Gdn::Session()->UserID;
       $Args = $Sender->RequestArgs;
       
@@ -59,7 +59,7 @@ class FollowingPlugin extends Gdn_Plugin {
       return ($IsValidUser) ? $Sender->Activity($FollowedUserID, $ValidUserName) : $Sender->Index();
    }
    
-   public function ProfileController_Unfollow_Create(&$Sender) {
+   public function ProfileController_Unfollow_Create($Sender) {
       $ViewingUserID = Gdn::Session()->UserID;
       $Args = $Sender->RequestArgs;
       
@@ -81,7 +81,7 @@ class FollowingPlugin extends Gdn_Plugin {
       return ($IsValidUser) ? $Sender->Index($FollowedUserID, $ValidUserName) : $Sender->Index();
    }
    
-   public function Base_Render_Before(&$Sender) {
+   public function Base_Render_Before($Sender) {
       if ($Sender->ControllerName != 'profilecontroller') return; 
       
       $Sender->AddCssFile($this->GetResource('css/following.css', FALSE, FALSE));

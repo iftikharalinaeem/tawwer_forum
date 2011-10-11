@@ -45,7 +45,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       } catch (Exception $e) {}
    }
 
-   public function SettingsController_ProxyConnect_Create($Sender, $EventArguments) {
+   public function SettingsController_ProxyConnect_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Proxy Connect SSO');
 		$Sender->Form = new Gdn_Form();
