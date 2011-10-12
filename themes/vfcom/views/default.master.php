@@ -50,7 +50,20 @@ $Session = Gdn::Session();
 
    <div id="Frame">
       <div id="Body">
-         <div id="Content"><?php $this->RenderAsset('Content'); ?></div>
+         <div id="Content"><?php
+			if (in_array(strtolower($this->ControllerName), array('discussionscontroller', 'categoriescontroller'))) {
+				echo '<div class="SearchForm">';
+				$Form = Gdn::Factory('Form');
+				$Form->InputPrefix = '';
+				echo 
+					$Form->Open(array('action' => Url('/search'), 'method' => 'get')),
+					$Form->TextBox('Search'),
+					$Form->Button('Search', array('Name' => '')),
+					$Form->Close()
+					.'</div>';
+			}
+			$this->RenderAsset('Content');
+			?></div>
          <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
       </div>
    </div>
