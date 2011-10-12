@@ -5,19 +5,19 @@
  */
 
 // Define the plugin:
-$PluginInfo['VanillaSpam'] = array(
-   'Name' => 'Vanilla Spam',
-   'Description' => "Anti-spam services from Vanilla",
+$PluginInfo['VanillaLabs'] = array(
+   'Name' => 'Vanilla Labs',
+   'Description' => "Get a preview of some of the features we are working on for the next release of Vanilla.",
    'Version' => '1.0a',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'SettingsUrl' => '/settings/reactions',
+   'SettingsUrl' => '/settings/labs',
    'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
-class VanillaSpamPlugin extends Gdn_Plugin {
+class VanillaLabsPlugin extends Gdn_Plugin {
    public function Button($Label, $Operation, $Type, $ID, $Wrap = TRUE) {
       $Get = array('id' => $ID, 'tk' => Gdn::Session()->TransientKey());
       $Url = '/moderation/mod/'.$Operation."/$Type?".http_build_query($Get);
