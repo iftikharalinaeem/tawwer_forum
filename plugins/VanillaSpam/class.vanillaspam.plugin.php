@@ -12,13 +12,22 @@ $PluginInfo['VanillaSpam'] = array(
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
-//   'SettingsUrl' => '/settings/vanillaspam',
-//   'SettingsPermission' => 'Garden.Settings.Manage'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+   'SettingsUrl' => '/settings/reactions',
+   'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
 class VanillaSpamPlugin extends Gdn_Plugin {
-   
+   public function Button($Label, $Operation, $Type, $ID, $Wrap = TRUE) {
+      $Get = array('id' => $ID, 'tk' => Gdn::Session()->TransientKey());
+      $Url = '/moderation/mod/'.$Operation."/$Type?".http_build_query($Get);
+      
+      $Button = Anchor($Label, $Url, 'Hijack');
+      if ($Wrap) {
+         $Button = '<span class="MItem Mod-Button Mod-'.ucfirst(StringBeginsWith($Operation, 'Undo', TRUE, TRUE)).'">'.$Button.'</span>';
+      }
+      return $Button;
+   }
    
    public function CheckSpam($RecordType, $Data) {
       $Result = $this->Request('check', $Data);
@@ -34,14 +43,52 @@ class VanillaSpamPlugin extends Gdn_Plugin {
    public static function DefineSpamColumns($TableName) {
       Gdn::Structure()
          ->Table($TableName)
-         ->Column('Spam', 'tinyint', 0)
+         ->Column('Likes', 'usmallint', 0)
+         ->Column('Spam', 'usmallint', 0)
+//         ->Column('SpamScore', 'tinyint', TRUE)
+         ->Column('Abuse', 'usmallint', 0)
          ->Set();
    }
    
-   public function MarkSpam($RecordType, $Data) {
-   }
-   
-   public function MarkHam($RecordType, $Data) {
+   public function GetRow($Type, $ID, $Operation) {
+      switch ($Type) {
+         case 'Comment':
+            $Model = new CommentModel();
+            $Row = $Model->GetID($ID, DATASET_TYPE_ARRAY);
+            break;
+         case 'Discussion':
+            $Model = new DiscussionModel();
+            $Row = $Model->GetID($ID);
+            break;
+         default:
+            throw NotFoundException(ucfirst($Type));
+      }
+      
+      $Log = NULL;
+      if (!$Row) {
+         // The row may have been logged so try and grab it.
+         $LogModel = new LogModel();
+         $Log = $LogModel->GetWhere(array('RecordType' => $Type, 'RecordID' => $ID, 'Operation' => $Operation));
+         
+         if (count($Log) == 0)
+            throw NotFoundException($Type);
+         $Log = $Log[0];
+         $Row = $Log['Data'];
+      }
+      $Row = (array)$Row;
+      
+      // Make sure the attributes are in the row and unserialized.
+      $Attributes = GetValue('Attributes', $Row, array());
+      if (is_string($Attributes))
+         $Attributes = unserialize($Attributes);
+      if (!is_array($Attributes))
+         $Attributes = array();
+      $UserIDs = GetValue('ModUserIDs', $Attributes);
+      if (!is_array($UserIDs)) {
+         $Attributes['ModUserIDs'] = array();
+      }
+      $Row['Attributes'] = $Attributes;
+      return array($Row, $Model, $Log);
    }
    
    public function Request($Path, $Data) {
@@ -50,19 +97,23 @@ class VanillaSpamPlugin extends Gdn_Plugin {
       
       $Url = $Domain.'/'.ltrim($Path, '/');
       
+      $RequestData = array('body' => $Data['Body']);
+      $IP = GetValue('IPAddress', $Data, GetValue('InertIPAddress', $Data));
+      $RequestData['ipaddress'] = $IP;
+      
       // Curl the data to the spam server.
       $C = curl_init();
       curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
       curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
       curl_setopt($C, CURLOPT_URL, $Url);
       curl_setopt($C, CURLOPT_POST, TRUE);
-      curl_setopt($C, CURLOPT_POSTFIELDS, $Data);
+      curl_setopt($C, CURLOPT_POSTFIELDS, $RequestData);
       $Contents = curl_exec($C);
-      decho($Contents);
-      die();
-      if (!$Contents)
+      //decho($Contents);
+      //die();
+      //if (!$Contents)
          return FALSE;
-      return json_decode($Contents);
+      //return json_decode($Contents);
    }
    
    public function Setup() {
@@ -93,36 +144,50 @@ class VanillaSpamPlugin extends Gdn_Plugin {
       return C('Plugins.VanillaSpam.UserID', NULL);
    }
    
-   /// EVENT HANDLERS ///
-
-   public function Base_CheckSpam_Handler($Sender, $Args) {
-      if ($Args['IsSpam'])
-         return; // don't double check
-
-      $RecordType = $Args['RecordType'];
-      $Data =& $Args['Data'];
-
-
-      switch ($RecordType) {
-         case 'User':
-//            $Data['Name'] = '';
-//            $Data['Body'] = GetValue('DiscoveryText', $Data);
-//            $Result = $this->CheckAkismet($RecordType, $Data);
-            break;
-         case 'Comment':
-         case 'Discussion':
-         case 'Activity':
-            $Result = $this->CheckSpam($RecordType, $Data);
-            if ($Result)
-               $Data['Log_InsertUserID'] = $this->UserID();
-            break;
+   public function Likes($Row, $Wrap = TRUE) {
+      $Likes = GetValue('Likes', $Row);
+      $Result = '';
+      if ($Likes > 0) {
+         $Result = '<span class="Tag Tag-Likes">'.Plural($Likes, '%s like', '%s likes').'</span>';
       }
-      $Sender->EventArguments['IsSpam'] = $Result;
+      if ($Wrap) {
+         $Result = '<span class="Mod-Likes">'.$Result.'</span>';
+      }
+      return $Result;
    }
    
+   /// EVENT HANDLERS ///
+
+//   public function Base_CheckSpam_Handler($Sender, $Args) {
+//      if ($Args['IsSpam'])
+//         return; // don't double check
+//
+//      $RecordType = $Args['RecordType'];
+//      $Data =& $Args['Data'];
+//
+//
+//      switch ($RecordType) {
+//         case 'User':
+////            $Data['Name'] = '';
+////            $Data['Body'] = GetValue('DiscoveryText', $Data);
+////            $Result = $this->CheckAkismet($RecordType, $Data);
+//            break;
+//         case 'Comment':
+//         case 'Discussion':
+//         case 'Activity':
+//            $Result = $this->CheckSpam($RecordType, $Data);
+//            if ($Result)
+//               $Data['Log_InsertUserID'] = $this->UserID();
+//            break;
+//      }
+//      $Sender->EventArguments['IsSpam'] = $Result;
+//   }
+   
    public function Base_CommentOptions_Handler($Sender) {
-      // You can't report or 'awesome' your own posts
-      // if (GetValue('InsertUserID', $Sender->EventArguments['Object']) == GDN::Session()->UserID) return;
+      if (GetValue('InsertUserID', $Sender->EventArguments['Object']) == GDN::Session()->UserID && !Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
+         return;
+      if (!Gdn::Session()->CheckPermission('Garden.SignIn.Allow'))
+         return;
       
       $Type = strtolower($Sender->EventArguments['Type']);
 
@@ -135,7 +200,7 @@ class VanillaSpamPlugin extends Gdn_Plugin {
          case 'discussion':
             $ID = $Sender->EventArguments['Discussion']->DiscussionID;
             $Attributes = $Sender->EventArguments['Discussion']->Attributes;
-            $Target = '/discussion/$ID/x';
+            $Target = '/discussion/$ID/'.Gdn_Format::Url($Sender->EventArguments['Discussion']->Name);
             break;
          default:
             return;
@@ -147,10 +212,38 @@ class VanillaSpamPlugin extends Gdn_Plugin {
          return;
       
       $Get = array('TK' => Gdn::Session()->TransientKey());
-      $Url = "/discussion/spam/$Type/$ID?".http_build_query($Get);
+      $Url = "/moderation/spam/$Type/$ID?".http_build_query($Get);
       
-      $Button = '<span class="Mod-Spam">'.Anchor(T('Report Spam', 'Spam'), $Url, 'Hijack').'</span>';
-      echo $Button;
+      
+      $LikeButton = $this->Button(T('Like'), 'like', $Type, $ID);
+      $SpamButton = $this->Button(T('Report Spam', 'Spam'), 'spam', $Type, $ID);
+      $AbuseButton = $this->Button(T('Report Abuse', 'Abuse'), 'abuse', $Type, $ID);
+      echo $LikeButton, $SpamButton, $AbuseButton;
+   }
+   
+   public function Base_CommentInfo_Handler($Sender, $Args) {
+      $Likes = $this->Likes($Sender->EventArguments['Object']);
+      echo ' '.$Likes.' ';
+   }
+   
+   public function ModerationController_Mod_Create($Sender, $Op, $Type, $ID, $TK) {
+      if (!Gdn::Session()->ValidateTransientKey($TK))
+         throw PermissionException();
+      
+      $Sender->Permission('Garden.SignIn.Allow');
+      
+      $Undo = '';
+      $Op = strtolower($Op);
+      $Op2 = $Op;
+      if (StringBeginsWith($Op, 'undo-')) {
+         $Undo = 'undo';
+         $Op2 = StringBeginsWith($Op, 'undo-', TRUE, TRUE);
+      }
+      
+      if (!in_array($Op2, array('like', 'spam', 'abuse')))
+         throw NotFoundException();
+      
+      $this->SaveOperation($Sender, $Type, $ID, $Op);
    }
    
    /**
@@ -159,99 +252,187 @@ class VanillaSpamPlugin extends Gdn_Plugin {
     * @param string $Type
     * @param int $ID 
     */
-   public function DiscussionController_Spam_Create($Sender, $Type, $ID, $TK) {
-      $Sender->Permission('Garden.SignIn.Allow');
+//   public function DiscussionController_Ham_Create($Sender, $Type, $ID, $TK) {
+//      $Sender->Permission('Garden.Moderation.Manage');
+//      
+//      if (!Gdn::Session()->ValidateTransientKey($TK))
+//         throw PermissionException();
+//      
+//      list($Row, $Model) = $this->GetRow($Type, $ID);
+//      
+//      $UserIDs = $Row['Attributes']['ModUserIDs'];
+//      if (array_key_exists(Gdn::Session()->UserID, $UserIDs)) {
+//         throw new Gdn_UserException(sprintf(T('You already flagged this %s.'), T($Type)));
+//      }
+//      $UserIDs[Gdn::Session()->UserID] = 'H'; // h is for ham
+//      $Spam = 0;
+//      $Row['Attributes']['ModUserIDs'] = $UserIDs;
+//      
+//      $Row['Spam'] = $Spam;
+//      // Save the hamness to the db.
+//      $Model->SetProperty($ID,
+//            array('Spam' => $Row['Spam'], 'Attributes' => serialize($Row['Attributes'])),
+//            ''
+//         );
+//      // Tell the filter.
+//      $this->Request('ham', $Row);
+//   }
+   
+   /**
+    *
+    * @param Gdn_Controller $Sender
+    * @param type $Type
+    * @param type $ID
+    * @param type $Operation 
+    */
+   public function SaveOperation($Sender, $Type, $ID, $Operation) {
+      $Undo = FALSE;
+      if (StringBeginsWith($Operation, 'Undo-', TRUE)) {
+         $Undo = TRUE;
+         $Operation = StringBeginsWith($Operation, 'Undo-', TRUE, TRUE);
+      }
+      $Type = ucfirst($Type);
+      $Operation = strtolower($Operation);
+      $Column = ucfirst($Operation);
+      if ($Operation == 'like')
+         $Column = 'Likes';
+      $Abbrev = strtoupper(substr($Operation, 0, 1));
+      $LogOperation = $Operation == 'spam' ? 'Spam' : 'Moderate';
       
-      $Threshold = C('Plugins.VanillaSpam.Threshold', 5);
-      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-         $Inc = C('Plugins.VanillaSpam.ModeratorIncrement', 5);
+      list($Row, $Model, $Log) = $this->GetRow($Type, $ID, $LogOperation);
+      
+      // Make sure the user has/hasn't already flagged the row.
+      $UserIDs = $Row['Attributes']['ModUserIDs'];
+      if (array_key_exists(Gdn::Session()->UserID, $UserIDs)) {
+         if (!$Undo)
+            throw new Gdn_UserException(sprintf(T('You already flagged this %s.'), T($Type)));
+      } else {
+         if ($Undo)
+            throw new Gdn_UserException(sprintf(T('You haven\'t flagged this %s.'), T($Type)));
+      }
+      
+      // Figure out the increment.
+      if (in_array($Operation, array('spam', 'abuse')) && Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         $Inc = C('Vanilla.ModeratorIncrement.ModeratorIncrement', 5);
       } else {
          $Inc = 1;
       }
       
-      switch ($Type) {
-         case 'comment':
-            $Model = new CommentModel();
-            $Row = $Model->GetID($ID, DATASET_TYPE_ARRAY);
-            if (!$Row)
-               throw NotFoundException();
-            break;
-         case 'discussion':
-            $Model = new DiscussionModel();
-            $Row = $Model->GetID($ID);
-            if (!$Row)
-               throw NotFoundException();
-            $Row = (array)$Row;
-            break;
-         default:
-            throw NotFoundException(ucfirst($Type));
+      $Value = $Row[$Column];
+      
+      // Update the row values with the operation.
+      if ($Undo) {
+         $Value -= $Inc;
+         unset($UserIDs[Gdn::Session()->UserID]);
+      } else {
+         $Value += $Inc;
+         $UserIDs[Gdn::Session()->UserID] = $Abbrev;
       }
+      if ($Value < 0)
+         $Value = 0;
+      $Row[$Column] = $Value;
+      $Row['Attributes']['ModUserIDs'] = $UserIDs;
       
-      // Make sure the user hasn't already marked the comment as spam.
-      $Attibutes = GetValue('Attributes', $Row, array());
-      if (is_string($Attibutes))
-         $Attibutes = unserialize($Attibutes);
-      if (!is_array($Attibutes))
-         $Attibutes = array();
-      $UserIDs = (array)GetValue('ModUserIDs', $Attibutes, array());
-      if (array_key_exists(Gdn::Session()->UserID, $UserIDs)) {
-         throw new Gdn_UserException(T('You already marked this.'));
-      }
-      $UserIDs[Gdn::Session()->UserID] = 'S'; // s is for spam
-      $Spam = $Row['Spam'] + $Inc;
-      $Attibutes['ModUserIDs'] = $UserIDs;
       
-      $Row['Spam'] = $Spam;
-      $Row['Attributes'] = serialize($Attibutes);
+      // Now deciede whether we need to log or delete the record.
+      $LogThresholds = array(
+          'spam' => C('Vanilla.Moderation.SpamThreshold1', 5),
+          'abuse' => C('Vanilla.Moderation.AbuseThreshold1', 5)
+      );
+      $LogThreshold = GetValue($Operation, $LogThresholds);
       
-      if ($Spam >= $Threshold) {
+      $DeleteThresholds = array(
+          'spam' => C('Vanilla.Moderation.SpamThreshold2', 5),
+          'abuse' => C('Vanilla.Moderation.AbuseThreshold2', 10)
+      );
+      $DeleteThreshold = GetValue($Operation, $DeleteThresholds);
+      
+      if ($Undo)
+         $UndoButton = $this->Button(T('Report '.ucfirst($Operation), ucfirst($Operation)), $Operation, $Type, $ID, FALSE);
+      else
+         $UndoButton = $this->Button(T('Undo '.ucfirst($Operation), 'Undo'), 'undo-'.$Operation, $Type, $ID, FALSE);
+      
+      
+      $Targets = array();
+      $Message = array('<span class="InformSprite Flag"></span> '.sprintf(T('The %s has been flagged. Thanks!'), T($Type)), array('CssClass' => 'Dismissable AutoDismiss HasSprite', 'id' => 'mod'));
+      
+      if ($Undo) {
+         if ($Log) {
+            // The row was logged and now must be restored.
+            $LogModel = new LogModel();
+            $Log['Data'] = $Row;
+            $LogModel->Restore($Log);
+
+            if ($Type == 'Comment') {
+               $Targets[] = array('Target' => "#{$Type}_$ID", 'Type' => 'SlideDown');
+            } else {
+               // Send back a refresh command. It's a bit too complicated to reveal everything.
+               $Sender->RedirectUrl = Url("/discussion/{$Row['DiscussionID']}/".Gdn_Format::Url($Row['Name']));
+            }
+         } else {
+            // The row just needs to be updated.
+            $Model->SetProperty($ID,
+               array($Column => $Row[$Column], 'Attributes' => serialize($Row['Attributes'])),
+               ''
+            );
+         }
+         $Message[0] = '';
+      } else {
          $LogOptions = array('GroupBy' => array('RecordID'));
          // Get the User IDs that marked as spam.
          $OtherUserIDs = array();
-         foreach ($UserIDs as $UserID => $Value) {
-            if ($Value == 'S' && $UserID != Gdn::Session()->UserID)
+         
+         foreach ($UserIDs as $UserID => $Val) {
+            if ($Val == $Abbrev && $UserID != Gdn::Session()->UserID)
                $OtherUserIDs[] = $UserID;
          }
          $LogOptions['OtherUserIDs'] = $OtherUserIDs;
-
-         // Add the row to moderation.
-         LogModel::Insert('Spam', ucfirst($Type), $Row, $LogOptions);
          
-         if ($Type == 'comment') {
-            // Remove the row.
-            $Model->Delete($ID, array('Log' => FALSE));
-            $Sender->InformMessage(sprintf(T('The %s has been removed for moderation.'), T($Type)));
-         
-            // Send back a command to remove the row in the browser.
-            $Target = array('Target' => "#Comment_$ID", 'Type' => 'SlideUp');
-            $Sender->SetJson('Targets', array($Target));
-         } else {
-            // Don't remove the discussion.
+         if ($DeleteThreshold && $Value >= $DeleteThreshold) {
+            // We still need to update the row before deleting to get the right values in there.
             $Model->SetProperty($ID,
-               array('Spam' => $Row['Spam'], 'Attributes' => $Row['Attributes']),
+               array($Column => $Row[$Column], 'Attributes' => serialize($Row['Attributes'])),
                ''
             );
             
-            $Target = array('Target' => "#Discussion_$ID .Mod-Spam", 'Type' => 'Remove');
-            $Sender->SetJson('Targets', array($Target));
-            $Sender->InformMessage(sprintf(T('The %s has been flagged. Thanks!'), T($Type)));
-         }
-      } else {
-         // This isn't spam yet, but save the flag.
-         $Model->SetProperty($ID,
-            array('Spam' => $Row['Spam'], 'Attributes' => $Row['Attributes']),
-            ''
-         );
-         
-         // Send back a command to remove the button in the browser.
-         if ($Type == 'comment') {
-            $Target = array('Target' => "#Comment_$ID .Mod-Spam", 'Type' => 'Remove');
+            // The row needs to be deleted.
+            $Model->Delete($ID, array('Log' => $LogOperation, 'LogOptions' => $LogOptions));
+            $Message = array(
+            sprintf(T('The %s has been removed for moderation.'), T($Type))
+               .' '.$UndoButton,
+               array('CssClass' => 'Dismissable', 'id' => 'mod')
+            );
+            // Send back a command to remove the row in the browser.
+            if ($Type == 'Discussion') {
+               $Targets[] = array('Target' => 'ul.Discussion', 'Type' => 'SlideUp');
+               $Targets[] = array('Target' => '.CommentForm', 'Type' => 'SlideUp');
+            } else
+               $Targets[] = array('Target' => "#{$Type}_$ID", 'Type' => 'SlideUp');
+         } elseif ($LogThreshold && $Value >= $LogThreshold) {
+            // The row needs to be logged and updated.
+            $Model->SetProperty($ID,
+               array($Column => $Row[$Column], 'Attributes' => serialize($Row['Attributes'])),
+               ''
+            );
+            
+            LogModel::Insert($LogOperation, $Type, $Row, $LogOptions);
          } else {
-            $Target = array('Target' => "#Discussion_$ID .Mod-Spam", 'Type' => 'Remove');
+            // The row needs to just be updated.
+            $Model->SetProperty($ID,
+               array($Column => $Row[$Column], 'Attributes' => serialize($Row['Attributes'])),
+               ''
+            );
          }
-         $Sender->SetJson('Targets', array($Target));
-         $Sender->InformMessage(sprintf(T('The %s has been flagged. Thanks!'), T($Type)));
       }
+      
+      // Send back a button to undo/redo the operation.
+      $Targets[] = array('Target' => "#{$Type}_$ID .Mod-".ucfirst($Operation), 'Type' => 'Html', 'Data' => $UndoButton);
+         
+      // Send back the likes.
+      $Targets[] = array('Target' => "#{$Type}_$ID .Mod-Likes", 'Type' => 'Html', 'Data' => $this->Likes($Row, FALSE));
+      $Sender->InformMessage($Message[0], $Message[1]);
+      
+      $Sender->SetJson('Targets', $Targets);
       $Sender->Render('Blank', 'Utility', 'dashboard');
    }
    
@@ -259,8 +440,6 @@ class VanillaSpamPlugin extends Gdn_Plugin {
       $Log = $Args['Log'];
       if ($Log['Operation'] != 'Spam')
          return;
-      
-      
    }
    
    public function LogModel_BeforeRestore_Handler($Sender, $Args) {
@@ -269,13 +448,20 @@ class VanillaSpamPlugin extends Gdn_Plugin {
          return;
    }
 
-//   public function SettingsController_Akismet_Create($Sender, $Args) {
-//      $Sender->SetData('Title', T('Vanilla Spam Settings'));
-//
-//      $Cf = new ConfigurationModule($Sender);
-//      $Cf->Initialize(array('Plugins.Akismet.Key' => array('Description' => 'Enter the key you obtained from <a href="http://akismet.com">akismet.com</a>')));
-//
-//      $Sender->AddSideMenu('dashboard/settings/plugins');
-//      $Cf->RenderAll();
-//   }
+   public function SettingsController_Reactions_Create($Sender, $Args) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $Sender->SetData('Title', T('Reaction Settings'));
+
+      $Cf = new ConfigurationModule($Sender);
+      $Cf->Initialize(array(
+			'Vanilla.Moderation.SpamThreshold1' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 5, 'Description' => 'Posts will be logged as spam after this many reports.'),
+			'Vanilla.Moderation.SpamThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 5, 'Description' => 'Posts will be removed after this many reports of spam.'),
+         'Vanilla.Moderation.AbuseThreshold1' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 5, 'Description' => 'Posts will be logged for moderation after this many reports.'),
+			'Vanilla.Moderation.AbuseThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 10, 'Description' => 'Posts will be removed after this many reports of abuse.'),
+         'Vanilla.ModeratorIncrement.ModeratorIncrement' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 5, 'Description' => 'Moderators that report posts have a higher weight than normal users.')
+		));
+
+      $Sender->AddSideMenu('dashboard/settings/plugins');
+      $Cf->RenderAll();
+   }
 }
