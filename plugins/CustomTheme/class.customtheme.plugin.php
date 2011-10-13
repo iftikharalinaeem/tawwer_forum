@@ -414,7 +414,7 @@ Here are some things you should know before you begin:
 		}
 	}
 	
-   public function SettingsController_CustomThemeUpgrade_Create($Sender, $EventArguments) {
+   public function SettingsController_CustomThemeUpgrade_Create($Sender, $EventArguments = array()) {
 		$Sender->Render(PATH_PLUGINS . DS . 'CustomTheme' . DS . 'views' . DS . 'upgrade.php');
 	}
 	
