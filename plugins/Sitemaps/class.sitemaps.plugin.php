@@ -116,7 +116,7 @@ class SitemapsPlugin extends Gdn_Plugin {
       $Sender->Render('SiteMapIndex', '', 'plugins/Sitemaps');
    }
    
-   public function UtilityController_SiteMap_Create($Sender, $Args) {
+   public function UtilityController_SiteMap_Create($Sender, $Args = array()) {
       Gdn::Session()->Start(0, FALSE, FALSE);
       $Sender->DeliveryMethod(DELIVERY_METHOD_XHTML);
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);

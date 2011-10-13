@@ -123,7 +123,7 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
       $this->SaveStep('Plugins.GettingStartedHosting.Discussions');
    }
    
-   public function PluginController_DismissGettingStarted_Create(&$Sender) {
+   public function PluginController_DismissGettingStarted_Create($Sender) {
       $PluginManager = Gdn::Factory('PluginManager');
       $PluginManager->DisablePlugin('GettingStartedHosting');
       echo 'TRUE';

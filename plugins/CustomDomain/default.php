@@ -25,7 +25,7 @@ class CustomDomainPlugin implements Gdn_IPlugin {
     * & implement a custom domain.
     */
    public $AddSideMenu = TRUE;
-   public function SettingsController_CustomDomain_Create($Sender, $EventArguments) {
+   public function SettingsController_CustomDomain_Create($Sender, $EventArguments = array()) {
       $Session = Gdn::Session();
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Custom Domain Name');

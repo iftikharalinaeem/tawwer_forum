@@ -41,7 +41,7 @@ class AmazonS3Plugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     * @param array $Args
     */
-   public function SettingsController_AmazonS3_Create($Sender, $Args) {
+   public function SettingsController_AmazonS3_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Settings.Manage');
 
       $Conf = new ConfigurationModule($Sender);

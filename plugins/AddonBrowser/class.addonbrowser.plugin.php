@@ -256,7 +256,7 @@ class AddonBrowserPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     * @param array $Args
     */
-   public function SettingsController_Addons_Create($Sender, $Args) {
+   public function SettingsController_Addons_Create($Sender, $Args = array()) {
       $Sender->Title('Addons');
       $Sender->Permission('Garden.Applications.Manage');
       $Sender->AddSideMenu('dashboard/settings/addons');

@@ -1,6 +1,6 @@
 <?php
 class SuperHeroineForumsThemeHooks extends Gdn_Plugin {
-    public function EntryController_Disclaimer_Create($Sender, $Args) {
+    public function EntryController_Disclaimer_Create($Sender, $Args = array()) {
        if (GetValue('disclaimed', $_COOKIE))
           Redirect('/discussions');
        $Sender->Render(dirname(__FILE__).'/views/disclaimer.tpl');

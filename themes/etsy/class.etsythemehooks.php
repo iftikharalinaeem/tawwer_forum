@@ -34,7 +34,7 @@ class EtsyThemeHooks implements Gdn_IPlugin {
       // Discussions from deleted categories are placed in the Questions category.
    }
    
-   public function SettingsController_Index_Create(&$Sender) {
+   public function SettingsController_Index_Create($Sender) {
       $Sender->AddJsFile('settings.js');
       $Sender->Title(T('Dashboard'));
          

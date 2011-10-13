@@ -84,7 +84,7 @@ TWITCODE;
       // Nothing to do here!
    }
    
-   public function PluginController_Twitter_Create(&$Sender) {
+   public function PluginController_Twitter_Create($Sender) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Twitter Plugin Settings');
       $Sender->AddSideMenu('plugin/twitter');
