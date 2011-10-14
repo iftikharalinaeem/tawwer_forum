@@ -29,7 +29,7 @@
 		<div id="vanilla-comments"></div>
 <script type="text/javascript">
 // Configuration Settings: Edit before pasting into your web page
-var vanilla_forum_url = 'http://localhost/vanilla'; // Required: the full http url & path to your vanilla forum
+var vanilla_forum_url = 'http://forumaboutforums.com/'; // Required: the full http url & path to your vanilla forum
 var vanilla_identifier = '<?php echo $post->ID; ?>'; // Required: a unique identifier for the web page & comments
 var vanilla_category_id = 3; // vanilla category id to force the discussion to be inserted into?
 // var vanilla_url = 'http://localhost/wordpress/building-an-online-commuity/building-an-online-community-around-your-content/';
