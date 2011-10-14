@@ -52,7 +52,7 @@ class FeedDiscussionsPlugin extends Gdn_Plugin {
    /**
     * Act as a mini dispatcher for API requests to the plugin app
     */
-   public function PluginController_FeedDiscussions_Create(&$Sender) {
+   public function PluginController_FeedDiscussions_Create($Sender) {
 		$this->Dispatch($Sender, $Sender->RequestArgs);
    }
    

@@ -49,7 +49,7 @@ class SphinxPlugin extends Gdn_Plugin {
     * @param SettingsController $Sender
     * @param array $Args
     */
-   public function SettingsController_Sphinx_Create($Sender, $Args) {
+   public function SettingsController_Sphinx_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Settings.Manage');
 
       switch (strtolower(GetValue(0, $Args))) {

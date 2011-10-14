@@ -27,7 +27,7 @@ class SingleSignOnPlugin implements Gdn_IPlugin {
       $Menu->AddLink('Site Settings', 'Single Sign-on', 'dashboard/plugin/singlesignon', 'Garden.Settings.Manage');
    }
 
-   public function PluginController_SingleSignOn_Create($Sender, $EventArguments) {
+   public function PluginController_SingleSignOn_Create($Sender, $EventArguments = array()) {
       $Sender->Permission('Garden.Admin.Only');
       $Sender->Title('Single Sign-on');
       $Sender->AddSideMenu('dashboard/plugin/singlesignon');
