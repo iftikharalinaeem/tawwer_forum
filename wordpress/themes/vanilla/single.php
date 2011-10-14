@@ -19,13 +19,15 @@
 			</div>
 			<?php the_content('Continued...'); ?>
 		</div>
-		<div id="respond"><?php
-		/*
-		comments_template();
-		?></div>
-		<?php
-		*/
-		?>
+		
+   <?php if (strtotime($post->post_date) < strtotime('10 October 2011')) : ?>
+   
+		<div id="respond">
+      <?php comments_template(); ?>
+		</div>
+		
+   <?php else : ?>
+   
 		<div id="vanilla-comments"></div>
 <script type="text/javascript">
 // Configuration Settings: Edit before pasting into your web page
@@ -55,6 +57,9 @@ var vanilla_category_id = 3; // vanilla category id to force the discussion to b
 <div class="vanilla-credit"><a class="vanilla-anchor" href="http://vanillaforums.com">Comments by <span class="vanilla-logo">Vanilla</span></a></div>
 
 		</div>
+		
+   <?php endif; # Date check ?>
+   
 		<?php endwhile; ?>
 
 	<?php else : ?>
