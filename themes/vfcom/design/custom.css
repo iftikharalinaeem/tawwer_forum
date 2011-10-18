@@ -100,6 +100,8 @@ i.SpriteRarrDown {
 .VFMenu a:hover {
 	background: url('sprite-menu.png') 0 -40px repeat-x;
 }
+body.Solutions .VFMenu .Solutions a,
+body.plans .VFMenu .Plans a,
 body.Account .VFMenu .Account a,
 body.Entry .VFMenu .SignIn a,
 body.Features .VFMenu .Features a,
@@ -111,22 +113,27 @@ body.Features .VFMenu .Features a,
 	text-shadow: 0 1px 1px #003f87;
 	color: #cef1fc;
 }
+i.SpriteSolutions,
 i.SpriteHome,
 i.SpritePlans,
 i.SpriteFeatures,
 i.SpriteBlog,
 i.SpriteSignIn {
 	vertical-align: middle;
-	height: 15px;
+	height: 16px;
 	width: 14px;
 	background-position: -19px 0px;
 }
-i.SpriteHome { background-position: -19px -19px; }
-i.SpritePlans { background-position: -19px -36px; }
-i.SpriteFeatures { background-position: -19px -58px; }
-i.SpriteBlog { background-position: -19px -152px; }
+i.SpriteHome { background-position: -19px -18px; }
+i.SpritePlans { background-position: -19px -35px; }
+i.SpriteFeatures { background-position: -19px -57px; }
+i.SpriteBlog { background-position: -19px -151px; }
+i.SpriteSolutions { background-position: -17px -171px; }
 .VFMenu a:focus i.SpriteHome { background-position: 0 -19px; }
+body.plans .VFMenu .Plans a i.SpritePlans,
 .VFMenu a:focus i.SpritePlans { background-position: 0 -36px; }
+body.Solutions .VFMenu .Solutions a i.SpriteSolutions,
+.VFMenu a:focus i.SpriteSolutions { background-position: 2px -171px; }
 body.Features .VFMenu .Features a i.SpriteFeatures,
 .VFMenu a:focus i.SpriteFeatures { background-position: 0 -58px; }
 .VFMenu a:focus i.SpriteBlog { background-position: 0 -152px; }
