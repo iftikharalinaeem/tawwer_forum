@@ -421,7 +421,7 @@ ul.MessageList div.Meta div.CommentInfo span {
    padding-right: 10px;
 }
 ul.MessageList li.Item div.Comment {
-   padding: 5px 10px 10px 10px;
+   padding: 10px;
 }
 ul.MessageList li.Item div.Message a {
    color: #fff;

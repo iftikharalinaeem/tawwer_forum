@@ -14,7 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $ThemeInfo['MetalUprising'] = array(
    'Name' => 'MetalUprising.com',
    'Description' => "Custom theme for MetalUprising.com forums.",
-   'Version' => '1.0.0',
+   'Version' => '1.0.1',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://timgunter.ca',
