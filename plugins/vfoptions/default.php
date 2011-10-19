@@ -248,7 +248,7 @@ pageTracker._trackPageview();
    /**
     * Creates a "Create a New Forum" page where users can do just that.
     */
-   public function PluginController_CreateForum_Create($Sender, $EventArguments) {
+   public function PluginController_CreateForum_Create($Sender) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Create a New Forum');
       $Sender->AddSideMenu('dashboard/plugin/myforums');
@@ -295,7 +295,7 @@ pageTracker._trackPageview();
     * Creates a "Delete Forum" page where users can completely remove their
     * forum.
     */
-   public function PluginController_DeleteForum_Create($Sender, $EventArguments) {
+   public function PluginController_DeleteForum_Create($Sender) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Delete Forum');
       $Sender->AddSideMenu('dashboard/plugin/myforums');
@@ -303,8 +303,8 @@ pageTracker._trackPageview();
       $Folder = $Domain == 'vanillaforums' ? 'vanillaforumscom' : 'vanilladev';
       
       $Session = Gdn::Session();
-      $SiteID = ArrayValue(0, $EventArguments, '');
-      $TransientKey = ArrayValue(1, $EventArguments, '');
+      $SiteID = ArrayValue(0, $Sender->EventArguments, '');
+      $TransientKey = ArrayValue(1, $Sender->EventArguments, '');
       $Site = FALSE;
       if (is_numeric($SiteID) && $SiteID > 0) {
          $Site = $this->_GetDatabase()->SQL()->Select('s.*')
@@ -363,14 +363,14 @@ pageTracker._trackPageview();
     * VanillaForums.com subdomain. Note: this ONLY works for vf.com subdomains,
     * and it will cause symlinks to break on custom-domains if used.
     */
-   public function PluginController_RenameForum_Create($Sender, $EventArguments) {
+   public function PluginController_RenameForum_Create($Sender) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Rename Forum');
       $Sender->AddSideMenu('dashboard/plugin/myforums');
       
       $Session = Gdn::Session();
-      $SiteID = ArrayValue(0, $EventArguments, '');
-      $TransientKey = ArrayValue(1, $EventArguments, '');
+      $SiteID = ArrayValue(0, $Sender->EventArguments, '');
+      $TransientKey = ArrayValue(1, $Sender->EventArguments, '');
       $Site = FALSE;
       if (is_numeric($SiteID) && $SiteID > 0) {
          $Site = $this->_GetDatabase()->SQL()->Select('s.*')
@@ -571,7 +571,7 @@ pageTracker._trackPageview();
    /**
     * Creates a Support form that customers can use to send us support requests.
     */
-   public function SettingsController_VanillaSupport_Create($Sender, $EventArguments) {
+   public function SettingsController_VanillaSupport_Create($Sender) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Vanilla Support');
       $Sender->AddSideMenu('dashboard/settings/vanillasupport');
@@ -916,7 +916,7 @@ pageTracker._trackPageview();
     * @param SettingsController $Sender
     * @param array $Args
     */
-   public function SettingsController_Addons_Create($Sender, $Args) {
+   public function SettingsController_Addons_Create($Sender, $Args = array()) {
       $Sender->Title('Addons');
       $Sender->Permission('Garden.Applications.Manage');
       $Sender->AddSideMenu('dashboard/settings/addons');

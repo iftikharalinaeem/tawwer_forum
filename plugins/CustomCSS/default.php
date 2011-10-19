@@ -49,7 +49,7 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 		}
 	}
 	
-   public function PluginController_CustomCSS_Create(&$Sender, $EventArguments) {
+   public function PluginController_CustomCSS_Create($Sender, $EventArguments = array()) {
 		require_once('kses.php');
 		$Session = Gdn::Session();
 		$UserModel = Gdn::UserModel();

@@ -29,7 +29,7 @@ $PluginInfo['VanillaConnect'] = array(
 Gdn_LibraryMap::SafeCache('library','class.handshakeauthenticator.php',dirname(__FILE__).DS.'class.handshakeauthenticator.php');
 class VanillaConnectPlugin extends Gdn_Plugin {
    
-   public function SettingsController_VanillaConnect_Create($Sender, $EventArguments) {
+   public function SettingsController_VanillaConnect_Create($Sender, $EventArguments = array()) {
       $Sender->Title('Vanilla Connect SSO');
 		$Sender->Form = new Gdn_Form();
 		

@@ -22,6 +22,9 @@ $PluginInfo['PrivateCommunity'] = array(
 class PrivateCommunityPlugin extends Gdn_Plugin {
 
    public function RoleController_AfterRolesInfo_Handler($Sender) {
+      if (!Gdn::Session()->CheckPermission('Garden.Users.Manage'))
+         return;
+
       $Private = C('Garden.PrivateCommunity');
       echo '<div style="padding: 10px 0;">';
       $Style = array('style' => 'background: #ff0; padding: 2px 4px; margin: 0 10px 2px 0; display: inline-block;');

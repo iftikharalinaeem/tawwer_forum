@@ -47,7 +47,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
    }
    
    // CONTEXT: DiscussionModel
-   public function DiscussionModel_GetParticipated_Create(&$Sender) {
+   public function DiscussionModel_GetParticipated_Create($Sender) {
       
       $UserID = GetValue(0, $Sender->EventArguments);
       $Offset = GetValue(1, $Sender->EventArguments);
@@ -69,7 +69,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
          ->Get();
    }
    
-   public function DiscussionModel_GetCountParticipated_Create(&$Sender) {
+   public function DiscussionModel_GetCountParticipated_Create($Sender) {
       
       $UserID = GetValue(0, $Sender->EventArguments);
       
@@ -98,7 +98,7 @@ class ParticipatedPlugin extends Gdn_Plugin {
    }
    
    // CONTEXT: DiscussionsController
-   public function DiscussionsController_Participated_Create(&$Sender, $Args) {
+   public function DiscussionsController_Participated_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.SignIn.Allow');
       
       $Page = GetValue(0, $Args);

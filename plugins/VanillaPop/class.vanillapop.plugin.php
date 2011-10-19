@@ -779,11 +779,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $Args['BlockExceptions']['`post/sendgrid(\/.*)?$`'] = Gdn_Dispatcher::BLOCK_NEVER;
    }
    
-   public function PostController_Email_Create($Sender, $Args) {
+   public function PostController_Email_Create($Sender, $Args = array()) {
       $this->UtilityController_Email_Create($Sender, $Args);
    }
    
-   public function UtilityController_Email_Create($Sender, $Args) {
+   public function UtilityController_Email_Create($Sender, $Args = array()) {
       if (Gdn::Session()->UserID == 0) {
          Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE);
          Gdn::Session()->User->Admin = FALSE;
@@ -803,7 +803,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $Sender->Render('Email', '', 'plugins/VanillaPop');
    }
    
-   public function PostController_Sendgrid_Create($Sender, $Args) {
+   public function PostController_Sendgrid_Create($Sender, $Args = array()) {
       $this->UtilityController_Sendgrid_Create($Sender, $Args);
    }
    
@@ -812,7 +812,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
     * @param PostController $Sender
     * @param array $Args 
     */
-   public function UtilityController_Sendgrid_Create($Sender, $Args) {
+   public function UtilityController_Sendgrid_Create($Sender, $Args = array()) {
       try {
          Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE);
          Gdn::Session()->User->Admin = FALSE;
@@ -874,7 +874,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
     * @param SettingsController $Sender
     * @param array $Args
     */
-   public function SettingsController_VanillaPop_Create($Sender, $Args) {
+   public function SettingsController_VanillaPop_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Settings.Manage');
       
       $ConfSettings = array(

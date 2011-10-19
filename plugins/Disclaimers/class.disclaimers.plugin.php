@@ -59,7 +59,7 @@ class DisclaimersPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     * @param array $Args
     */
-   public function EntryController_Disclaimer_Create($Sender, $Args) {
+   public function EntryController_Disclaimer_Create($Sender, $Args = array()) {
       if (count($Args) <= 0)
          throw NotFoundException();
 
@@ -107,7 +107,7 @@ class DisclaimersPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     * @param array $Args
     */
-   public function SettingsController_Disclaimers_Create($Sender, $Args) {
+   public function SettingsController_Disclaimers_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->AddSideMenu('settings/disclaimers');
 

@@ -169,7 +169,7 @@ class AdNetworkPlugin implements Gdn_IPlugin {
    /**
 	 * Hidden administrative ad control panel.
     */
-   public function SettingsController_AdNetwork_Create($Sender, $Args) {
+   public function SettingsController_AdNetwork_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Applications.Manage');
 		$BannerAds = array('LijitWide', 'LijitBlock', 'LijitSkyscraper');
 		$Conf = new ConfigurationModule($Sender);

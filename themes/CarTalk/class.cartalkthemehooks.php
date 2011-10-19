@@ -11,10 +11,10 @@ class CarTalkThemeHooks extends Gdn_Plugin {
       if (in_array($Controller, array('discussion', 'discussions', 'profile', 'categories', 'activity')))
          $this->AddAssets();
    }
-   public function DiscussionsController_Rules_Create($Sender, $Args) {
+   public function DiscussionsController_Rules_Create($Sender, $Args = array()) {
       $Sender->Render();
    }
-   public function DiscussionsController_Toolbox_Create($Sender, $Args) {
+   public function DiscussionsController_Toolbox_Create($Sender, $Args = array()) {
       $Sender->Render();
    }
    
@@ -25,7 +25,7 @@ class CarTalkThemeHooks extends Gdn_Plugin {
     * @param DiscussionsController $Sender
     * @param array $Args 
     */
-   public function DiscussionsController_Popular_Create($Sender, $Args) {
+   public function DiscussionsController_Popular_Create($Sender, $Args = array()) {
       $Sender->Title('Popular Discussions');
       $Sender->View = 'Index';
       $Sender->SetData('_PagerUrl', 'discussions/popular/{Page}');
@@ -65,7 +65,7 @@ class CarTalkThemeHooks extends Gdn_Plugin {
          ->Where('d.Announce', 0);
    }
 
-   public function UtilityController_Serve_Create($Sender, $Args) {
+   public function UtilityController_Serve_Create($Sender, $Args = array()) {
       $Filename = GetValue(0, $Args);
       $Path = dirname(__FILE__).'/'.$Filename;
       if (file_exists($Path)) {
@@ -77,7 +77,7 @@ class CarTalkThemeHooks extends Gdn_Plugin {
 
    }
 
-   public function SearchController_Index_Create($Sender, $Args) {
+   public function SearchController_Index_Create($Sender, $Args = array()) {
       $Sender->Render();
    }
 

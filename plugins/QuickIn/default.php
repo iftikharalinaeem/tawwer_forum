@@ -30,7 +30,7 @@ class QuickInPlugin implements Gdn_IPlugin {
    /**
     * A url through which external apps can call via js to share user information.
     */
-   public function EntryController_QuickIn_Create($Sender, $EventArguments) {
+   public function EntryController_QuickIn_Create($Sender, $EventArguments = array()) {
       $QuickIn = $this->_QuickInGet();
       if ($QuickIn) {
          // Store this information in a cookie
@@ -80,7 +80,7 @@ class QuickInPlugin implements Gdn_IPlugin {
       }
    }
 
-   public function SettingsController_QuickIn_Create($Sender, $EventArguments) {
+   public function SettingsController_QuickIn_Create($Sender, $EventArguments = array()) {
       $Sender->Permission('Garden.Admin.Only');
       $Sender->Title('QuickIn');
       $Sender->AddSideMenu('dashboard/settings/quickin');
