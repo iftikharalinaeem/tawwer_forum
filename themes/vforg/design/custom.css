@@ -1322,9 +1322,9 @@ body.Discussions ul.DataList div.Options {
     margin-right: 4px !Important;
 }
 
-.Meta .CommentCount {
+/* .Meta .CommentCount {
    display: none;
-}
+} */
 
 .Meta .HasNew {
    position: absolute;
