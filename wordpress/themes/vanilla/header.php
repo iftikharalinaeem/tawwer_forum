@@ -31,6 +31,7 @@
 			<div class="Home"><a href="http://vanillaforums.com/"><i class="Sprite SpriteHome"></i> Home</a></div>
 			<div class="Plans"><a href="http://vanillaforums.com/plans"><i class="Sprite SpritePlans"></i> Plans &amp; Pricing</a></div>
 			<div class="Features"><a href="http://vanillaforums.com/features"><i class="Sprite SpriteFeatures"></i> Features</a></div>
+			<div class="Solutions"><a href="http://vanillaforums.com/solutions"><i class="Sprite SpriteSolutions"></i> Solutions</a></div>
 			<div class="Blog"><a href="http://vanillaforums.com/blog"><i class="Sprite SpriteBlog"></i> Blog</a></div>
 			<div class="SignIn"><a href="https://vanillaforums.com/entry/signin"><i class="Sprite SpriteSignIn"></i> Sign In</a></div>
       </div>

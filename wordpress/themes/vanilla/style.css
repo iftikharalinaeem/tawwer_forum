@@ -93,6 +93,7 @@ i.SpriteLogo {
 i.SpriteHome,
 i.SpritePlans,
 i.SpriteFeatures,
+i.SpriteSolutions,
 i.SpriteBlog,
 i.SpriteSignIn {
 	vertical-align: middle;
@@ -103,10 +104,12 @@ i.SpriteSignIn {
 i.SpriteHome { background-position: -19px -19px; }
 i.SpritePlans { background-position: -19px -36px; }
 i.SpriteFeatures { background-position: -19px -58px; }
+i.SpriteSolutions { background-position: -19px -171px; }
 i.SpriteBlog { background-position: -19px -152px; }
 .VFMenu a:focus i.SpriteHome { background-position: 0 -19px; }
 .VFMenu a:focus i.SpritePlans { background-position: 0 -36px; }
 .VFMenu a:focus i.SpriteFeatures { background-position: 0 -58px; }
+.VFMenu a:focus i.SpriteSolutions { background-position: 0 -171px; }
 .VFMenu .Blog a i.SpriteBlog,
 .VFMenu a:focus i.SpriteBlog { background-position: 0 -152px; }
 .VFMenu a:focus i.SpriteSignIn { background-position: 0 0; }

@@ -18,6 +18,7 @@ $Session = Gdn::Session();
 			<div class="Home"><?php echo Anchor('<i class="Sprite SpriteHome"></i> Home', '/', '', array('SSL' => FALSE)); ?></div>
 			<div class="Plans"><?php echo Anchor('<i class="Sprite SpritePlans"></i> Plans &amp; Pricing', '/plans', '', array('SSL' => FALSE)); ?></div>
 			<div class="Features"><?php echo Anchor('<i class="Sprite SpriteFeatures"></i> Features', '/features', '', array('SSL' => FALSE)); ?></div>
+			<div class="Solutions"><?php echo Anchor('<i class="Sprite SpriteSolutions"></i> Solutions', '/solutions', '', array('SSL' => FALSE)); ?></div>
 			<div class="Blog"><?php echo Anchor('<i class="Sprite SpriteBlog"></i> Blog', '/blog', '', array('SSL' => FALSE)); ?></div>
 			<div class="<?php echo $Session->IsValid() ? 'Account' : 'SignIn'; ?>"><?php
 			$Text = 'Sign In';
