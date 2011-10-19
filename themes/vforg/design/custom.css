@@ -1333,3 +1333,12 @@ body.Discussions ul.DataList div.Options {
    margin-left: -10px;
    white-space: nowrap;
 }
+
+ul.Discussions .AdminCheck {
+    left: 254px;
+    position: absolute;
+    top: 0;
+}
+.Tabs .AdminCheck {
+   right: -22px;
+}
