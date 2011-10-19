@@ -20,7 +20,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    }
    
    // Make sure token authenticator is never activated as the primary authentication scheme
-   public function AuthenticationController_EnableAuthenticatorToken_Handler(&$Sender) {
+   public function AuthenticationController_EnableAuthenticatorToken_Handler($Sender) {
       Gdn::Authenticator()->UnsetDefaultAuthenticator('token');
    }
 
@@ -248,7 +248,7 @@ pageTracker._trackPageview();
    /**
     * Creates a "Create a New Forum" page where users can do just that.
     */
-   public function PluginController_CreateForum_Create(&$Sender, $EventArguments) {
+   public function PluginController_CreateForum_Create($Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Create a New Forum');
       $Sender->AddSideMenu('dashboard/plugin/myforums');
@@ -295,7 +295,7 @@ pageTracker._trackPageview();
     * Creates a "Delete Forum" page where users can completely remove their
     * forum.
     */
-   public function PluginController_DeleteForum_Create(&$Sender, $EventArguments) {
+   public function PluginController_DeleteForum_Create($Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Delete Forum');
       $Sender->AddSideMenu('dashboard/plugin/myforums');
@@ -363,7 +363,7 @@ pageTracker._trackPageview();
     * VanillaForums.com subdomain. Note: this ONLY works for vf.com subdomains,
     * and it will cause symlinks to break on custom-domains if used.
     */
-   public function PluginController_RenameForum_Create(&$Sender, $EventArguments) {
+   public function PluginController_RenameForum_Create($Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Rename Forum');
       $Sender->AddSideMenu('dashboard/plugin/myforums');
@@ -533,7 +533,7 @@ pageTracker._trackPageview();
     * Appearance" section.
     * @param Gdn_Controller $Sender
     */
-   public function SettingsController_Render_Before(&$Sender) {
+   public function SettingsController_Render_Before($Sender) {
       if (
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
@@ -571,7 +571,7 @@ pageTracker._trackPageview();
    /**
     * Creates a Support form that customers can use to send us support requests.
     */
-   public function SettingsController_VanillaSupport_Create(&$Sender, $EventArguments) {
+   public function SettingsController_VanillaSupport_Create($Sender, $EventArguments) {
       $Sender->Permission('Garden.AdminUser.Only');
       $Sender->Title('Vanilla Support');
       $Sender->AddSideMenu('dashboard/settings/vanillasupport');
@@ -652,7 +652,7 @@ pageTracker._trackPageview();
     * changes across all of the user's forums, including the VanillaForums.com
     * database.
     */
-   public function UserModel_AfterSave_Handler(&$Sender, $EventArguments = '') {
+   public function UserModel_AfterSave_Handler($Sender, $EventArguments = '') {
       $Fields = ArrayValue('Fields', $EventArguments);
       $UserID = ArrayValue('UserID', $Fields, -1);
       if ($UserID == -1)
@@ -681,7 +681,7 @@ pageTracker._trackPageview();
     * that the email address being saved isn't being used by any other user in
     * any of their forums, or in the VanillaForums.com database.
     */
-   public function UserModel_BeforeSave_Handler(&$Sender, $EventArguments = '') {
+   public function UserModel_BeforeSave_Handler($Sender, $EventArguments = '') {
       $Fields = ArrayValue('Fields', $EventArguments);
       $UserID = ArrayValue('UserID', $Fields, -1);
       if ($UserID == -1)
@@ -818,7 +818,7 @@ pageTracker._trackPageview();
    /**
     * Re-authenticates a user with the current configuration.
     */
-   private function _ReAuthenticate(&$Sender, $RedirectTo = '') {
+   private function _ReAuthenticate($Sender, $RedirectTo = '') {
       // If there was a request to reauthenticate (ie. we've been shifted to a custom domain and the user needs to reauthenticate)
       // Check the user's transientkey to make sure they're not a spoofer, and then authenticate them.
       if (ArrayValue(0, $Sender->RequestArgs, '') == 'auth') {
