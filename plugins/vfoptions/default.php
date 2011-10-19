@@ -71,6 +71,8 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $Menu->AddItem('Vanilla Support', 'Vanilla Support', FALSE, array('class' => 'Support'));
       $Menu->AddLink('Vanilla Support', FALSE, '/dashboard/settings/vanillasupport', 'Garden.AdminUser.Only');
 		
+		// Add stats menu option
+      $Menu->AddLink('Dashboard', 'Statistics', '/dashboard/settings/statistics', 'Garden.Settings.Manage');
 		
    		
 		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
@@ -645,6 +647,16 @@ pageTracker._trackPageview();
 		}
 		
 		$Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'vanillasupport.php');
+   }
+
+   /**
+    * Creates an analytics page to load remote analytics data.
+    */
+   public function SettingsController_Statistics_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $Sender->Title('Site Statistics');
+      $Sender->AddSideMenu('dashboard/settings/stats');
+		$Sender->Render('stats', '', 'plugins/vfoptions');
    }
 
    /**
