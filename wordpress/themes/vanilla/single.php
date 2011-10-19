@@ -59,9 +59,9 @@ var vanilla_category_id = 3; // vanilla category id to force the discussion to b
 <noscript>Please enable JavaScript to view the <a href="http://vanillaforums.com/?ref_noscript">comments powered by Vanilla.</a></noscript>
 <div class="vanilla-credit"><a class="vanilla-anchor" href="http://vanillaforums.com">Comments by <span class="vanilla-logo">Vanilla</span></a></div>
 
+   <?php endif; # Date check ?>
 		</div>
 		
-   <?php endif; # Date check ?>
    
 		<?php endwhile; ?>
 
