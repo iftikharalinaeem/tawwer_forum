@@ -8,7 +8,7 @@
 $PluginInfo['VanillaPop'] = array(
    'Name' => 'Vanilla Pop',
    'Description' => "Integrates your forum with Vanilla's email service.",
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -206,7 +206,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       // Save the full post for debugging.
       $Data['Attributes'] = serialize(ArrayTranslate($Data, array('Headers', 'Source')));
       
-//      $Data['Body'] = self::StripEmail($Data['Body']);
+      $Data['Body'] = self::StripEmail($Data['Body']);
       if (!$Data['Body'])
          $Data['Body'] = T('(empty message)');
       
