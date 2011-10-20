@@ -204,7 +204,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 //      file_put_contents($Path, print_r($Data, TRUE));
       
       // Save the full post for debugging.
-      $Data['Attributes'] = ArrayTranslate($Data, array('Headers', 'Source'));
+      $Data['Attributes'] = serialize(ArrayTranslate($Data, array('Headers', 'Source')));
       
 //      $Data['Body'] = self::StripEmail($Data['Body']);
       if (!$Data['Body'])
