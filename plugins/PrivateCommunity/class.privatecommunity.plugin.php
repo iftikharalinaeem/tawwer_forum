@@ -22,7 +22,7 @@ $PluginInfo['PrivateCommunity'] = array(
 class PrivateCommunityPlugin extends Gdn_Plugin {
 
    public function RoleController_AfterRolesInfo_Handler($Sender) {
-      if (!Gdn::Session()->CheckPermission('Garden.Users.Manage'))
+      if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
          return;
 
       $Private = C('Garden.PrivateCommunity');
@@ -45,7 +45,7 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
       if (
          in_array($Switch, array('on', 'off'))
          && $Session->ValidateTransientKey($TransientKey)
-         && $Session->CheckPermission('Garden.Users.Manage')
+         && $Session->CheckPermission('Garden.Settings.Manage')
       ) {
          SaveToConfig('Garden.PrivateCommunity', $Switch == 'on' ? FALSE : TRUE);
       }
