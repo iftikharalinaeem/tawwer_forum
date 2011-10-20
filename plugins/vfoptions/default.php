@@ -71,9 +71,10 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $Menu->AddItem('Vanilla Support', 'Vanilla Support', FALSE, array('class' => 'Support'));
       $Menu->AddLink('Vanilla Support', FALSE, '/dashboard/settings/vanillasupport', 'Garden.AdminUser.Only');
 		
-		// Add stats menu option
-      $Menu->AddLink('Dashboard', 'Statistics', '/dashboard/settings/statistics', 'Garden.Settings.Manage');
-		
+		// Add stats menu option.
+      if (C('Garden.Analytics.Advanced')) {
+         $Menu->AddLink('Dashboard', 'Statistics', '/dashboard/settings/statistics', 'Garden.Settings.Manage');
+      }
    		
 		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
    too large to upload directly to this page you can
