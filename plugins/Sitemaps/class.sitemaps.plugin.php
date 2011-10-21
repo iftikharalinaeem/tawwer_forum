@@ -62,13 +62,11 @@ class SitemapsPlugin extends Gdn_Plugin {
    
    /// Event Handlers ///
    
-   /*
    public function SettingsController_Sitemaps_Create($Sender) {
       $Sender->SetData('Title', T('Sitemap Settings'));
       $Sender->AddSideMenu();
       $Sender->Render('Settings', '', 'plugins/Sitemaps');
    }
-   */
    
    /**
     * @param Gdn_Controller $Sender 
