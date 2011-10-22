@@ -637,6 +637,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                   $Subject = FormatString(C('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
                   $Email->Subject($Subject);
 
+                  $this->SetFrom($Email, $Discussion['InsertUserID']);
                   $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Discussion', GetValue('DiscussionID', $Discussion)));
                }
                break;
