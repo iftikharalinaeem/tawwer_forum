@@ -651,16 +651,6 @@ pageTracker._trackPageview();
    }
 
    /**
-    * Creates an analytics page to load remote analytics data.
-    */
-   public function SettingsController_Statistics_Create($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
-      $Sender->Title('Site Statistics');
-      $Sender->AddSideMenu('dashboard/settings/stats');
-		$Sender->Render('stats', '', 'plugins/vfoptions');
-   }
-
-   /**
     * When an administrative user (UserID == 1) is saved, make sure to save the
     * changes across all of the user's forums, including the VanillaForums.com
     * database.
