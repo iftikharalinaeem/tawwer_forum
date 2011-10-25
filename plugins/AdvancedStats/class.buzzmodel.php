@@ -1,8 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 
 class BuzzModel {
+   public $SlotRange;
+   public $ModUserIDs;
+   
    public function Get($Slot = 'w', $Date = FALSE) {
       $SlotRange = self::SlotDateRange($Slot, $Date);
+      $this->SlotRange = $SlotRange;
       $RoleModel = new RoleModel();
       $ModRoleIDs = $RoleModel->GetByPermission('Garden.Moderation.Manage')->ResultArray();
       $ModRoleIDs = ConsolidateArrayValuesByKey($ModRoleIDs, 'RoleID');
@@ -16,6 +20,8 @@ class BuzzModel {
       $ModUserIDs = ConsolidateArrayValuesByKey($ModUserIDs, 'UserID');
       if (count($ModUserIDs) == 0)
          $ModUserIDs[0] = 0;
+      $this->ModUserIDs = $ModUserIDs;
+      
       $ModIn = '('.implode(',', $ModUserIDs).')';
       
       $Result = array(
@@ -62,50 +68,6 @@ class BuzzModel {
          from {$Px}Discussion r
          where $ModWhere")->Value('CountUsers', 0);
       $Result['CountModContributors'] = $CountModDiscussionUsers + $CountModCommentUsers;
-     
-      $QnA = FALSE;
-      if (array_key_exists('QnA', Gdn::PluginManager()->EnabledPlugins())) {
-         $QnA = TRUE;
-      }
-      
-      Gdn::SQL()
-         ->Select('r.CommentID', 'count', 'CountAnswers')
-         ->Select('sum(unix_timestamp(r.DateInserted) - unix_timestamp(d.DateInserted))', '', 'TimeTillAnswer')
-         ->From('Comment r')
-         ->Join('Discussion d', 'd.DiscussionID = r.DiscussionID and d.FirstCommentID = r.CommentID')
-         ->Where(self::RangeWhere($SlotRange, 'r.DateInserted'));
-      if ($QnA)
-         Gdn::SQL()->Where('d.Type', 'Question');
-      $Row =    Gdn::SQL()->Get()->FirstRow();
-            
-       $Result['CountAnswers'] = GetValue('CountAnswers', $Row, 0);
-       $Result['TimeToAnswer'] = GetValue('TimeTillAnswer', $Row, 0);
-      
-      // Count all the discussions without a comment.
-      if ($QnA)
-         Gdn::SQL()->Where('r.Type', 'Question');
-      $CountUnanswered1 = Gdn::SQL()
-         ->Select('r.DiscussionID', 'count', 'C')
-         ->From('Discussion r')
-         ->Where('r.Announce', 0)
-         ->Where('r.FirstCommentID', NULL)
-         ->Where('r.DateInserted <', $SlotRange[1])
-         ->Get()->Value('C');
-
-      // Count all of the discussions that were not answered by this timeframe.
-      if ($QnA)
-         Gdn::SQL()->Where('r.Type', 'Question');
-      
-      $CountUnanswered2 = Gdn::SQL()
-         ->Select('r.DiscussionID', 'count', 'C')
-         ->From('Discussion r')
-         ->Where('r.Announce', 0)
-         ->Join('Comment c', 'r.DiscussionID = c.DiscussionID and r.FirstCommentID = c.CommentID')
-         ->Where('r.DateInserted <', $SlotRange[1])
-         ->Where('c.DateInserted >=', $SlotRange[1])
-         ->Get()->Value('C');
-
-      $Result['CountUnanswered'] = $CountUnanswered1 + $CountUnanswered2;
       
       // Users per discussion involves a tricky select.
       // The +1 user is for the user that started the discussion.
@@ -147,7 +109,70 @@ class BuzzModel {
       $Result['TimeToRegister'] = GetValue('C', $Row, 0);
       $Result['CountToRegister'] = GetValue('CountUsers', $Row, 0);
       
+      $this->QnAStats($Result);
+      
       return $Result;
+   }
+   
+   protected function QnAStats(&$Result) {
+      if (!array_key_exists('QnA', Gdn::PluginManager()->EnabledPlugins())) {
+         return;
+      }
+      
+      $SlotRange = $this->SlotRange;
+      $ModUserIDs = $this->ModUserIDs;
+      
+      // Count all of the questions.
+      $Result['CountQuestions'] = Gdn::SQL()
+         ->Where('Type', 'Question')
+         ->GetCount('Discussion', self::RangeWhere($SlotRange));
+      $Result['CountModQuestions'] = Gdn::SQL()
+         ->Where('Type', 'Question')
+         ->WhereIn('InsertUserID', $ModUserIDs)
+         ->GetCount('Discussion', self::RangeWhere($SlotRange));
+      
+      
+      // Count all of the answers.
+      $Result['CountAnswers'] = Gdn::SQL()
+         ->Select('r.CommentID', 'count', 'CountAnswers')
+         ->From('Comment r')
+         ->Join('Discussion d', 'd.DiscussionID = r.DiscussionID and d.FirstCommentID = r.CommentID')
+         ->Where(self::RangeWhere($SlotRange, 'r.DateInserted'))
+         ->Where('d.Type', 'Question')
+         ->Get()->Value('CountAnswers');
+      
+      // Count all of the accepted answers.
+      $Row = Gdn::SQL()
+         ->Select('d.DiscussionID', 'count', 'CountAcceptedAnswers')
+         ->Select('unix_timestamp(d.DateOfAnswer) - unix_timestamp(d.DateInserted)', 'sum', 'TimeToAnswer')
+         ->From('Discussion d')
+         ->Where(self::RangeWhere($SlotRange, 'd.DateAccepted'))
+         ->Get()->FirstRow();
+      
+      $Result['CountAcceptedAnswers'] = GetValue('CountAcceptedAnswers', $Row, 0);
+      $Result['TimeToAnswer'] = GetValue('TimeToAnswer', $Row, 0);
+      
+      // Count the unanswered questions. This takes some doing...
+      
+      // Count all the questions without an accepted answer.
+      $CountUnanswered1 = Gdn::SQL()
+         ->Select('r.DiscussionID', 'count', 'C')
+         ->From('Discussion r')
+         ->Where('r.DateAccepted', NULL)
+         ->Where('r.DateInserted <', $SlotRange[1])
+         ->Where('r.Type', 'Question')
+         ->Get()->Value('C');
+
+      // Count all of the questions that were not answered by this timeframe.
+      $CountUnanswered2 = Gdn::SQL()
+         ->Select('r.DiscussionID', 'count', 'C')
+         ->From('Discussion r')
+         ->Where('r.DateInserted <', $SlotRange[1])
+         ->Where('r.DateAccepted >=', $SlotRange[1])
+         ->Where('r.Type', 'Question')
+         ->Get()->Value('C');
+
+      $Result['CountUnanswered'] = $CountUnanswered1 + $CountUnanswered2;
    }
    
    protected static function RangeWhere($Range, $FieldName = 'DateInserted') {
