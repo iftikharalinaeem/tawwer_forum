@@ -17,6 +17,37 @@ $PluginInfo['AdvancedStats'] = array(
 
 class AdvancedStatsPlugin extends Gdn_Plugin {
    /// Methods ///
+   
+   /**
+    * The first date that stats can be considered.
+    * @return datetime
+    */
+   public static function FirstDate() {
+      $MinDate = '2000-01-01';
+      $MinTimestamp = strtotime($MinDate);
+      
+      $FirstUserDate = Gdn::SQL()
+         ->Select('DateInserted', 'min')
+         ->From('User')
+         ->Where('DateInserted >', '1976-01-01')
+         ->Get()->Value('DateInserted');
+      
+      if (Gdn_Format::ToTimestamp($FirstUserDate) <= $MinTimestamp)
+         return $MinDate;
+      
+      $FirstDiscussionDate = Gdn::SQL()
+         ->Select('DateInserted', 'min')
+         ->From('Discussion')
+         ->Where('DateInserted >', '1976-01-01')
+         ->Get()->Value('DateInserted');
+      
+      if (Gdn_Format::ToTimestamp($FirstDiscussionDate) <= $MinTimestamp)
+         return $MinDate;
+      
+      $FirstDate = Gdn_Format::ToDateTime(min(Gdn_Format::ToTimestamp($FirstUserDate), Gdn_Format::ToTimestamp($FirstDiscussionDate)));
+      
+      return $FirstDate;
+   }
       
    /**
     * Gets a url suitable to ping the statistics server.
@@ -107,7 +138,7 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
    
    public function UtilityController_Ping_Create($Sender) {
       $Sender->SetData('VanillaID', Gdn::InstallationID());
-      $Sender->SetData('DateFirstStats', Gdn_Statistics::FirstDate());
+      $Sender->SetData('DateFirstStats', self::FirstDate());
       $Sender->Render();
    }
 }
