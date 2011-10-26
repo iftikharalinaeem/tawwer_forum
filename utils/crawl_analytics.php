@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 ini_set('display_errors', 'on');
@@ -14,6 +15,7 @@ $Sites = $Data['Sites'];
 if (count($Sites) == 0)
    echo "No sites to crawl.\n";
 
+// Loop through each site and crawl it.
 foreach ($Sites as $Site) {
    $VanillaID = $Site['VanillaID'];
    echo "Crawling {$Site['Hostname']}...";
