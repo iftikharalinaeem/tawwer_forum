@@ -97,8 +97,10 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
     */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
-		// Add stats menu option.
-      $Menu->AddLink('Dashboard', 'Statistics', '/dashboard/settings/statistics', 'Garden.Settings.Manage');
+      if (C('Garden.Analytics.Advanced')) {
+         // Add stats menu option.
+         $Menu->AddLink('Dashboard', 'Statistics', '/dashboard/settings/statistics', 'Garden.Settings.Manage');
+      }
    }
    
    public function Base_Render_Before($Sender, $Args) {
