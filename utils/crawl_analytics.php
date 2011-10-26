@@ -3,6 +3,7 @@
 error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 ini_set('display_errors', 'on');
 ini_set('track_errors', 1);
+putenv("MAILTO=todd@vanillaforums.com");
 
 $Domain = "analytics.vanillaforums.com";
 $AccessToken = FALSE;
