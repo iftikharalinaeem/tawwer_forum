@@ -10,7 +10,7 @@ $AccessToken = FALSE;
 require_once dirname(realpath(__FILE__)).'/functions.commandline.php';
 
 // Get a list of sites to crawl.
-$Data = Curl("http://$Domain/stats/browse.json?Advanced=1&access_token=$AccessToken");
+$Data = Curl("http://$Domain/stats/browse.json?Advanced=1&Pingable=1&access_token=$AccessToken");
 $Sites = $Data['Sites'];
 
 if (count($Sites) == 0)
