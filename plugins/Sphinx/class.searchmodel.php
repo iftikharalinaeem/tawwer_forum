@@ -405,6 +405,14 @@ searchd {
       if ($Cats !== TRUE)
          $Sphinx->setFilter('CategoryID', (array)$Cats);
       $Search = $Sphinx->query($Search, implode(' ', $Indexes));
+      if (!$Search) {
+         if (GetValue('error', $Sphinx)) {
+            LogMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Error: '.$Sphinx->error);
+         } elseif (GetValue('warning', $Sphinx)) {
+            LogMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Warning: '.$Sphinx->warning);
+         }
+      }
+      
       $Result = $this->GetDocuments($Search);
       
       $Total = GetValue('total', $Search);
