@@ -126,13 +126,13 @@ class EmailRouterController extends Gdn_Controller {
             }
             
             list($Name, $Email) = self::ParseEmailAddress($To);
-            if (preg_match('`([^+@]+)([^@]*)@([^]+)`', $Email, $Matches)) {
+            if (preg_match('`([^+@]+)([^@]*)@(.+)`', $Email, $Matches)) {
                $ClientName = $Matches[1];
                $Domain = $Matches[3];
                
                $Url = "http://$ClientName.vanillaforums.com/utility/email.json";
             } else {
-               throw Exception("Invalid to: $To\n".var_dump($_POST));
+               throw new Exception("Invalid to: $To, $Email\n".var_dump($_POST));
 //               $this->SetData('Error', "Invalid to: $To");
 //               $this->Render();
 //               return;
