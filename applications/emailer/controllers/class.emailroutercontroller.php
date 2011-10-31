@@ -112,11 +112,10 @@ class EmailRouterController extends Gdn_Controller {
                
                $Url = "http://$ClientName.vanillaforums.com/utility/email.json";
             } else {
-               if ($this->DeliveryType() != DELIVERY_TYPE_ALL)
-                  throw Exception("Invalid to: $To\n".var_dump($_POST));
-               $this->SetData('Error', "Invalid to: $To");
-               $this->Render();
-               return;
+               throw Exception("Invalid to: $To\n".var_dump($_POST));
+//               $this->SetData('Error', "Invalid to: $To");
+//               $this->Render();
+//               return;
             }
             
             // Curl the data to the new forum.
