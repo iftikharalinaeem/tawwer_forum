@@ -127,10 +127,15 @@ class EmailRouterController extends Gdn_Controller {
             curl_setopt($C, CURLOPT_POSTFIELDS, $Data);
             
             $Result = curl_exec($C);
-            $ResultInfo = curl_getinfo($C);
-            $ResultData = @json_decode($Result);
-            if ($ResultData) {
-               $this->Data = $Data;
+            $Code = curl_getinfo($C, CURLINFO_HTTP_CODE);
+            
+            if ($Code == 200) {
+               $ResultData = @json_decode($Result);
+               if ($ResultData) {
+                  $this->Data = $Data;
+               }
+            } else {
+               throw new Exception(curl_error($C), $Code);
             }
          }
 
