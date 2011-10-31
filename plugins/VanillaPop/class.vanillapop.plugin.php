@@ -364,11 +364,18 @@ class VanillaPopPlugin extends Gdn_Plugin {
             
             $CommentModel = new CommentModel();
             $CommentID = $CommentModel->Save($Data);
-            $CommentModel->Save2($CommentID, TRUE);
+            if (!$CommentID) {
+               throw new Excption($CommentModel->Validation->ResultsText().print_r($Data, TRUE), 400);
+            } else {
+               $CommentModel->Save2($CommentID, TRUE);
+            }
             return $CommentID;
          case 'Message':
             $MessageModel = new ConversationMessageModel();
             $MessageID = $MessageModel->Save($Data);
+            if (!$MessageID) {
+               throw new Excption($MessageModel->Validation->ResultsText().print_r($Data, TRUE), 400);
+            }
             return $MessageID;
          default:
             // Check the permission on the discussion.
@@ -381,10 +388,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $Data['Name'] = $Data['Subject'];
             $Data['UpdateUserID'] = $Data['InsertUserID'];
             $DiscussionModel = new DiscussionModel();
-            $DiscussionID = $DiscussionModel->Save($Data);            
+            $DiscussionID = $DiscussionModel->Save($Data);
             if (!$DiscussionID) {
                throw new Exception($DiscussionModel->Validation->ResultsText().print_r($Data, TRUE), 400);
             }
+            $DiscussionModel->UpdateDiscussionCount($Data['CategoryID'], $DiscussionID);
             return $DiscussionID;
       }
    }
