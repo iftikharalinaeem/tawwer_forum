@@ -67,6 +67,12 @@ class EmailRouterController extends Gdn_Controller {
 
 //            self::Log("Getting post...");
             $Post = $this->Form->FormValues();
+            
+            $Path = PATH_UPLOADS .'/Email/'.date('Y-m-d_H-i-sP').'.txt';
+            if (!file_exists(dirname($Path)))
+               mkdir(dirname($Path), 0777, TRUE);
+            file_put_contents($Path, print_r($Post, TRUE));
+            
 //            self::Log("Post got...");
             $Data = ArrayTranslate($Post, array(
                 'from' => 'From',
@@ -106,6 +112,8 @@ class EmailRouterController extends Gdn_Controller {
                
                $Url = "http://$ClientName.vanillaforums.com/utility/email.json";
             } else {
+               if ($this->DeliveryType() != DELIVERY_TYPE_ALL)
+                  throw Exception("Invalid to: $To\n".var_dump($_POST));
                $this->SetData('Error', "Invalid to: $To");
                $this->Render();
                return;

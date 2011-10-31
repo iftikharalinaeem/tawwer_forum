@@ -14,7 +14,11 @@ $PluginInfo['VanillaPop'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
    'SettingsUrl' => '/settings/vanillapop',
-   'SettingsPermission' => 'Garden.Settings.Manage'
+   'SettingsPermission' => 'Garden.Settings.Manage',
+   'RegisterPermissions' => array(
+      'Email.Discussions.Add' => 'Garden.Profiles.Edit',
+      'Email.Comments.Add' => 'Garden.Profiles.Edit',
+      'Email.Conversations.Add' => 'Garden.Profiles.Edit')
 );
 
 class VanillaPopPlugin extends Gdn_Plugin {
