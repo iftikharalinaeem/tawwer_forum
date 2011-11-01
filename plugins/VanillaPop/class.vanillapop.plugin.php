@@ -467,6 +467,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
    }
    
    public function Structure() {
+      Gdn::PermissionModel()->Define(array(
+         'Email.Discussions.Add' => 'Garden.Profiles.Edit',
+         'Email.Comments.Add' => 'Garden.Profiles.Edit',
+         'Email.Conversations.Add' => 'Garden.Profiles.Edit'));
       
       Gdn::Structure()
          ->Table('User')
