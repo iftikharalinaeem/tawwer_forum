@@ -1,5 +1,17 @@
 /* ========================================= VanillaForums.org Customizations */
 
+@font-face {
+	font-family: Archer;
+   font-weight: normal;
+	src: url('fonts/Archer-Medium-Pro.otf');
+}
+
+@font-face {
+	font-family: Archer;
+	font-weight: bold;
+	src: url('fonts/Archer-Semibold-Pro.otf');
+}
+
 a {
    color: #045dcd;
 }
@@ -33,6 +45,7 @@ a:hover {
 #Content h5 {
    font-size: 80%;
 }
+
 a.Button,
 .Button {
 	color:#583100;
@@ -268,6 +281,9 @@ body#vforg_home_index .Banner ul li a {
 body#vforg_home_index {
 	background: url('images/bg-fade.png') top left repeat-x #f1e5ca;
 }
+body#vforg_download_index {
+   background: url('images/bg-tile.png') top left repeat #f1e5ca;
+}
 body#vforg_home_index #Frame {
    background: transparent;
 }
@@ -293,6 +309,8 @@ body#vforg_home_index h2 {
 	font-size: 18px;
 	white-space: nowrap;
 	overflow: visible;
+   font-family: Archer, Georgia, Arial;
+   font-weight: bold;
 }
 body#vforg_home_index div.Wrap {
 	background:url("images/bg-shines.png") no-repeat scroll center top transparent;
@@ -390,11 +408,13 @@ a.Get:focus {
 	background: #2274d5;
 }
 a.Get strong {
+   font-family: Archer, Georgia;
 	font-weight: normal;
 	padding: 0 0 2px;
-	font-size: 24px;
+	font-size: 23.5px;
 	display: block;
 	color: #fff;
+   text-shadow: 0 1px 1px #00007e;
 }
 /* News & Events */
 div.NewsAndEvents {
