@@ -235,7 +235,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 'Name' => $FromName,
                 'Email' => $FromEmail,
                 'Password' => RandomString(10),
-                'HashMethod' => 'Email',
+                'HashMethod' => 'Random',
                 'Source' => 'Email',
                 'SourceID' => $FromEmail
                 );
