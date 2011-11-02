@@ -4,7 +4,7 @@
 <?php
 echo $this->Form->Open(), $this->Form->Errors();
 
-VanillaPopPlugin::SimpleForm($this->Form, array(
+echo $this->Form->Simple(array(
     'from' => 'TextBox',
     'to' => 'TextBox',
     'subject' => 'TextBox',
