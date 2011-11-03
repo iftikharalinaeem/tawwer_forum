@@ -183,6 +183,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
    public static function ParseType($Email) {
       if (preg_match('`\+([a-z]+-?[0-9]+)@`', $Email, $Matches)) {
          list($Type, $ID) = self::ParseUID($Matches[1]);
+      } elseif (preg_match('`\+noreply@`i', $Email, $Matches)) {
+         $Type = 'noreply';
+         $ID = NULL;
       } else {
          $Type = NULL;
          $ID = NULL;
@@ -196,6 +199,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
       // Strip off email stuff.
       if (preg_match('`<([^@]+)@`', $UID, $Matches)) {
          $UID = trim(trim($Matches[1]), '"');
+      }
+      
+      if (strcasecmp($UID, 'noreply') == 0) {
+         return array('noreply', NULL);
       }
       
       if (preg_match('`([a-z]+)-?([0-9]+)`i', $UID, $Matches)) {
@@ -212,13 +219,28 @@ class VanillaPopPlugin extends Gdn_Plugin {
    }
    
    protected function Save($Data, $Sender) {
-      // Save the email so we know what's going on.
-//      $Path = PATH_LOCAL_UPLOADS.'/email/'.time().'.txt';
-//      if (!file_exists(dirname($Path)))
-//         mkdir(dirname($Path), 0777, TRUE);
+      $ReplyType = NULL;
+      $ReplyID = NULL;
       
-//      $Sender->Data['_Status'][] = "Saving backup to $Path.";
-//      file_put_contents($Path, print_r($Data, TRUE));
+      if (GetValue('ReplyTo', $Data)) {
+         // See if we are replying to something specifically.
+         list($ReplyType, $ReplyID) = self::ParseUID($Data['ReplyTo']);
+      }
+      
+      if (!$ReplyType) {
+         // Grab the reply from the to.
+         list($ToName, $ToEmail) = self::ParseEmailAddress(GetValue('To', $Data));
+         list($ReplyType, $ReplyID) = self::ParseType($ToEmail);
+      }
+      
+      if (!$ReplyType && GetValue('ReplyTo', $Data)) {
+         // This may be replying to the SourceID rather than the UID.
+         $SaveType = $this->SaveTypeFromRepyTo($Data);
+      }
+      
+      if (strcasecmp($ReplyType, 'noreply') == 0) {
+         return TRUE;
+      }
       
       // Save the full post for debugging.
       $Data['Attributes'] = serialize(ArrayTranslate($Data, array('Headers', 'Source')));
@@ -269,25 +291,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
       }
       Gdn::Session()->Start($User['UserID'], FALSE);
       $Data['InsertUserID'] = $User['UserID'];
-      
-      $ReplyType = NULL;
-      $ReplyID = NULL;
-      
-      if (GetValue('ReplyTo', $Data)) {
-         // See if we are replying to something specifically.
-         list($ReplyType, $ReplyID) = self::ParseUID($Data['ReplyTo']);
-      }
-      
-      if (!$ReplyType) {
-         // Grab the reply from the to.
-         list($ToName, $ToEmail) = self::ParseEmailAddress(GetValue('To', $Data));
-         list($ReplyType, $ReplyID) = self::ParseType($ToEmail);
-      }
-      
-      if (!$ReplyType && GetValue('ReplyTo', $Data)) {
-         // This may be replying to the SourceID rather than the UID.
-         $SaveType = $this->SaveTypeFromRepyTo($Data);
-      }
       
       // Get the parent record and make sure the post is going in the right place.
       if (!isset($SaveType)) {
@@ -406,7 +409,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             // Check the permission on the discussion.
             if (!Gdn::Session()->CheckPermission('Email.Discussions.Add')) {
                $this->SendEmail($FromEmail, '',
-                  T("Sorry! You don't have permission to post through email."), $Data);
+                  T("Sorry! You don't have permission to post discussions/questions through email."), $Data);
                return TRUE;
             } elseif (!Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'CategoryID', $PermissionCategoryID)) {
                $this->SendEmail($FromEmail, '',
@@ -452,6 +455,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $Email = new Gdn_Email();
       $Email->To($To);
       $Email->Subject(sprintf('[%s] %s', C('Garden.Title'), $Subject));
+      $From = $Email->PhpMailer->From;
+      $Email->PhpMailer->From = self::AddIDToEmail($From, 'noreply');
       
       if (is_array($Quote)) {
          $MessageID = GetValue('MessageID', $Quote);
