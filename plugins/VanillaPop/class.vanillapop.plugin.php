@@ -28,7 +28,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
           'DiscussionBody' => "{Body}\n\n-- \n{Signature}",
           'CommentSubject' => 'Re: [{Title}] {Discussion.Name}',
           'CommentBody' => "{Body}\n\n-- \n{Signature}",
-          'ConfirmationSubject' => 'Re: {Name} (ticket #{ID})',
           'ConfirmationBody' => "Your request has been received (ticket #{ID}).\n\nThis is just a confirmation email, but you can reply directly to follow up.\n\nYou wrote:\n{Quote}\n\n-- \n{Signature}");
    
    /// Methods ///
@@ -507,6 +506,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
     */
    public function SendConfirmationEmail($Discussion, $User) {
       $FormatData = $Discussion;
+      $FormatData['ID'] = $Discussion['DiscussionID'];
+      $FormatData['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
+      $FormatData['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
+      
       $FormatData['Quote'] = self::FormatQuoteText($FormatData['Body']);
       
       $CanView = Gdn::UserModel()->GetCategoryViewPermission($User['UserID'], GetValue('CategoryID', $Discussion));
@@ -519,7 +522,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $Message = FormatString(C('EmailFormat.ConfirmationBody', self::$FormatDefaults['ConfirmationBody']), $FormatData);
       $Email->Message($Message);
 
-      $Subject = FormatString(C('EmailFormat.ConfirmationSubject', self::$FormatDefaults['ConfirmationSubject']), $FormatData);
+      // We are using the standard confirmation subject because some email clients won't group emails unless their subject are the exact same.
+      $Subject = FormatString(C('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
       $Email->Subject($Subject);
       
       $Email->PhpMailer->MessageID = self::UID('Discussion', $Discussion['DiscussionID'], 'email');
@@ -537,7 +541,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
          $Email->Send();
       } catch (Exception $Ex) {
          // Do nothing for now...
-         throw $Ex;
+         if (Debug())
+            throw $Ex;
       }
    }
    
@@ -984,6 +989,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
     */
    public function SettingsController_VanillaPop_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Settings.Manage');
+      
+      if (defined('CLIENT_NAME')) {
+         if (StringEndsWith(CLIENT_NAME, '.vanillaforums.com'))
+            $IncomingAddress = StringEndsWith(CLIENT_NAME, '.vanillaforums.com', TRUE, TRUE).'@email.vanillaforums.com';
+         else
+            $IncomingAddress = CLIENT_NAME.'@email.vanillaforums.com';
+         $Sender->SetData('IncomingAddress', $IncomingAddress);
+      }
       
       $ConfSettings = array(
           'Plugins.VanillaPop.DefaultCategoryID' => array('Control' => 'CategoryDropDown', 'Description' => 'Place discussions started through email in the following category.'),
