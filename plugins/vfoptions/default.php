@@ -644,96 +644,9 @@ pageTracker._trackPageview();
 			}
 		}
 		
-		$Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'vanillasupport.php');
+		$Sender->Render('vanillasupport','','plugins/vfoptions');
    }
-
-   /**
-    * When an administrative user (UserID == 1) is saved, make sure to save the
-    * changes across all of the user's forums, including the VanillaForums.com
-    * database.
-    */
-   public function UserModel_AfterSave_Handler(&$Sender, $EventArguments = '') {
-      $Fields = ArrayValue('Fields', $EventArguments);
-      $UserID = ArrayValue('UserID', $Fields, -1);
-      if ($UserID == -1)
-         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
-         
-      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
-      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
-      $Email = ArrayValue('Email', $Fields);
-      $Password = ArrayValue('Password', $Fields); // <-- This was encrypted in the model
-      $SaveFields = array();
-      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
-         // If a new password was specified, save it
-         if ($Password !== FALSE)
-            $SaveFields['Password'] = $Password;
-            
-         // If a new email was specified, save that too
-         if ($Email !== FALSE)
-            $SaveFields['Email'] = $Email;
-            
-         $this->_SaveAcrossForums($SaveFields, $VFUserID, $VFAccountID);
-      }
-   }
-
-   /**
-    * Before any forum's administrative user (UserID == 1) is saved, validate
-    * that the email address being saved isn't being used by any other user in
-    * any of their forums, or in the VanillaForums.com database.
-    */
-   public function UserModel_BeforeSave_Handler(&$Sender, $EventArguments = '') {
-      $Fields = ArrayValue('Fields', $EventArguments);
-      $UserID = ArrayValue('UserID', $Fields, -1);
-      if ($UserID == -1)
-         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
-
-      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
-      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
-      $Email = ArrayValue('Email', $Fields);
-      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
-         // Retrieve all of the user's sites
-         $SiteData = $this->_GetDatabase()->SQL()
-            ->Select('DatabaseName, Path')
-            ->From('Site')
-            ->Where('AccountID', $VFAccountID)
-            ->Get();
-
-         // If the user is trying to change the email address...
-         if ($this->_GetDatabase()->SQL()
-            ->Select('UserID')
-            ->From('User')
-            ->Where('UserID <> ', $VFUserID)
-            ->Where('Email', $Email)
-            ->Get()
-            ->NumRows() > 0) {
-            $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
-         } else {
-            // Now check it against all forums the user owns, as well
-            if (is_numeric($VFAccountID) && $VFAccountID > 0) {
-               $Cnn = @mysql_connect(
-                  Gdn::Config('Database.Host', ''),
-                  Gdn::Config('Database.User', ''),
-                  Gdn::Config('Database.Password', '')
-               );
-               if ($Cnn) {
-                  foreach ($SiteData as $Site) {
-                     if ($Site->Path != '') {
-                        mysql_select_db($Site->DatabaseName, $Cnn);
-                        $Result = mysql_query("select UserID from GDN_User where UserID <> 1 and Email = '".mysql_real_escape_string($Email, $Cnn)."'");
-                        if ($Result && mysql_num_rows($Result) > 0) {
-                           $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
-                           break;
-                        }
-                     }
-                  }
-                  mysql_close($Cnn);
-               }
-            }
-         }
-         $this->_CloseDatabase();
-      }
-   }
-
+   
    /**
     * No setup required.
     */
