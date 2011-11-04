@@ -1,14 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @license Proprietary
  */
 
 // Define the plugin:
 $PluginInfo['VanillaPop'] = array(
    'Name' => 'Vanilla Pop',
    'Description' => "Integrates your forum with Vanilla's email service.",
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -158,6 +158,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
       } elseif (preg_match('`/?(?:conversations/)?messages/\d+#(\d+)`i', $Route, $Matches)) {
          $Type = 'Message';
          $ID = $Matches[1];
+      } else {
+         return array(NULL, NULL);
       }
       
       return array($Type, $ID);
@@ -204,9 +206,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
 //      file_put_contents($Path, print_r($Data, TRUE));
       
       // Save the full post for debugging.
-      $Data['Attributes'] = ArrayTranslate($Data, array('Headers', 'Source'));
+      $Data['Attributes'] = serialize(ArrayTranslate($Data, array('Headers', 'Source')));
       
-//      $Data['Body'] = self::StripEmail($Data['Body']);
+      $Data['Body'] = self::StripEmail($Data['Body']);
       if (!$Data['Body'])
          $Data['Body'] = T('(empty message)');
       
@@ -223,6 +225,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $User = $UserModel->GetByEmail($FromEmail);
       if (!$User) {
          if (C('Plugins.VanillaPop.AllowUserRegistration')) {
+            SaveToConfig('Garden.Registration.NameUnique', FALSE, FALSE);
             $Sender->Data['_Status'][] = 'Creating user.';
             $User = array(
                 'Name' => $FromName,
@@ -452,7 +455,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
    }
    
    public function Structure() {
-      SaveToConfig(array('Garden.Registration.NameUnique' => FALSE));
       
       Gdn::Structure()
          ->Table('User')
@@ -611,117 +613,118 @@ class VanillaPopPlugin extends Gdn_Plugin {
    public function ActivityModel_BeforeSendNotification_Handler($Sender, $Args) {
       list($Type, $ID) = self::ParseRoute(GetValue('Route', $Args));
       
-      
-      
       $FormatData = array('Title' => C('Garden.Title'), 'Signature' => self::EmailSignature(GetValue('Route', $Args)));
       
       if (in_array($Type, array('Discussion', 'Comment', 'Conversation', 'Message'))) {
          $Email = $Args['Email']; //new Gdn_Email(); //
          $Story = GetValue('Story', $Args);
          
-         if (GetValueR('Activity.ActivityType', $Args) == 'NewDiscussion') {
-            // Format the new discussion notification a bit nicer.
-            $DiscussionModel = new DiscussionModel();
-            $Discussion = $DiscussionModel->GetID($ID);
-            if ($Discussion) {
-               $Discussion = (array)$Discussion;
-               $Discussion['Name'] = self::FormatPlainText($Discussion['Name'], 'Text');
-               $Discussion['Body'] = self::FormatPlainText($Discussion['Body'], $Discussion['Format']);
-               $Discussion['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
-               $Discussion['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
-               $FormatData = array_merge($FormatData, $Discussion);
-               
-               $Message = FormatString(C('EmailFormat.DiscussionBody', self::$FormatDefaults['DiscussionBody']), $FormatData);
-               $Email->Message($Message);
-               
-               $Subject = FormatString(C('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
-               $Email->Subject($Subject);
-               
-               $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Discussion', GetValue('DiscussionID', $Discussion)));
-            }
-         } else {
-            // Add the In-Reply-To field.
-            switch ($Type) {
-               case 'Comment':
-                  $CommentModel = new CommentModel();
-                  $Comment = $CommentModel->GetID($ID, DATASET_TYPE_ARRAY);
-                  
-                  if ($Comment) {
-                     $Comment['Body'] = self::FormatPlainText($Comment['Body'], $Comment['Format']);
-                     $Comment['Url'] = ExternalUrl(GetValue('Route', $Args));
-                     $Comment = array($Comment);
-                     Gdn::UserModel()->JoinUsers($Comment, array('InsertUserID', 'UpdateUserID'));
-                     $Comment = $Comment[0];
-                     $FormatData = array_merge($FormatData, $Comment);
-                     
-                     $this->SetFrom($Email, $Comment['InsertUserID']);
-                     
-                     $DiscussionModel = new DiscussionModel();
-                     $Discussion = (array)$DiscussionModel->GetID($Comment['DiscussionID']);
-                     
-                     // See if the user has permission to view this discussion on the site.
-                     $CanView = Gdn::UserModel()->GetCategoryViewPermission(GetValueR('Activity.RegardingUserID', $Args), GetValue('CategoryID', $Discussion));
-                     $FormatData['Signature'] = self::EmailSignature($CanView ? GetValue('Route', $Args) : '');
-                     
-                     if ($Discussion) {
-                        $Discussion['Name'] = self::FormatPlainText($Discussion['Name'], 'Text');
-                        $Discussion['Body'] = self::FormatPlainText($Discussion['Body'], $Discussion['Format']);
-                        $Discussion['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
-                        $FormatData['Discussion'] = $Discussion;
-                        $FormatData['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
-                        
-                        $Message = FormatString(C('EmailFormat.CommentBody', self::$FormatDefaults['CommentBody']), $FormatData);
-                        $Email->Message($Message);
-                        
-                        $Subject = FormatString(C('EmailFormat.CommentSubject', self::$FormatDefaults['CommentSubject']), $FormatData);
-                        $Email->Subject($Subject);
-                        
-                        $Source = GetValue('Source', $Discussion);
-                        if ($Source == 'Email')
-                           $ReplyTo = GetValue('SourceID', $Discussion); // replying to an email...
-                        else
-                           $ReplyTo = self::UID('Discussion', GetValue('DiscussionID', $Discussion), 'email');
+         switch ($Type) {
+            case 'Discussion':
+               $DiscussionModel = new DiscussionModel();
+               $Discussion = $DiscussionModel->GetID($ID);
+               if ($Discussion) {
+                  $Discussion = (array)$Discussion;
+                  $Discussion['Name'] = self::FormatPlainText($Discussion['Name'], 'Text');
+                  $Discussion['Body'] = self::FormatPlainText($Discussion['Body'], $Discussion['Format']);
+                  $Discussion['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
+                  $Discussion['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
+                  $FormatData = array_merge($FormatData, $Discussion);
 
-                        $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Discussion', GetValue('DiscussionID', $Discussion)));
-                     }
+                  $Message = FormatString(C('EmailFormat.DiscussionBody', self::$FormatDefaults['DiscussionBody']), $FormatData);
+                  $Email->Message($Message);
+
+                  $Subject = FormatString(C('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
+                  $Email->Subject($Subject);
+
+                  $this->SetFrom($Email, $Discussion['InsertUserID']);
+                  $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Discussion', GetValue('DiscussionID', $Discussion)));
+               }
+               break;
+            case 'Comment':
+               $CommentModel = new CommentModel();
+               $Comment = $CommentModel->GetID($ID, DATASET_TYPE_ARRAY);
+
+               if ($Comment) {
+                  $Comment['Body'] = self::FormatPlainText($Comment['Body'], $Comment['Format']);
+                  $Comment['Url'] = ExternalUrl(GetValue('Route', $Args));
+                  $Comment = array($Comment);
+                  Gdn::UserModel()->JoinUsers($Comment, array('InsertUserID', 'UpdateUserID'));
+                  $Comment = $Comment[0];
+                  
+                  if (in_array(GetValueR('Activity.ActivityType', $Args), array('AnswerAccepted'))) {
+                     $Comment['Body'] = self::FormatPlainText($Args['Headline'], 'Html')."\n\n".$Comment['Body'];
                   }
                   
-                  break;
-               case 'Message':
-                  // Get this message.
-                  $Message = Gdn::SQL()->GetWhere('ConversationMessage', array('MessageID' => $ID))->FirstRow(DATASET_TYPE_ARRAY);
-                  if ($Message) {
-                     $ConversationID = $Message['ConversationID'];
-                     $this->SetFrom($Email, $Message['InsertUserID']);
-                  
-                     // Get the message before this one.
-                     $Message2 = Gdn::SQL()
-                        ->Select('*')
-                        ->From('ConversationMessage')
-                        ->Where('ConversationID', $ConversationID)
-                        ->Where('MessageID <', $ID)
-                        ->OrderBy('MessageID', 'desc')
-                        ->Limit(1)
-                        ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+                  $FormatData = array_merge($FormatData, $Comment);
 
-                     if ($Message2) {
-                        if ($Message2['Source'] == 'Email')
-                           $ReplyTo = $Message2['SourceID'];
-                        else
-                           $ReplyTo = self::UID('Message', $Message2['MessageID'], 'email');
-                     }
-                     
-                     $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Message', GetValue('MessageID', $Message)));
+                  $this->SetFrom($Email, $Comment['InsertUserID']);
+
+                  $DiscussionModel = new DiscussionModel();
+                  $Discussion = (array)$DiscussionModel->GetID($Comment['DiscussionID']);
+
+                  // See if the user has permission to view this discussion on the site.
+                  $CanView = Gdn::UserModel()->GetCategoryViewPermission(GetValueR('Activity.RegardingUserID', $Args), GetValue('CategoryID', $Discussion));
+                  $FormatData['Signature'] = self::EmailSignature($CanView ? GetValue('Route', $Args) : '');
+
+                  if ($Discussion) {
+                     $Discussion['Name'] = self::FormatPlainText($Discussion['Name'], 'Text');
+                     $Discussion['Body'] = self::FormatPlainText($Discussion['Body'], $Discussion['Format']);
+                     $Discussion['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
+                     $FormatData['Discussion'] = $Discussion;
+                     $FormatData['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
+
+                     $Message = FormatString(C('EmailFormat.CommentBody', self::$FormatDefaults['CommentBody']), $FormatData);
+                     $Email->Message($Message);
+
+                     $Subject = FormatString(C('EmailFormat.CommentSubject', self::$FormatDefaults['CommentSubject']), $FormatData);
+                     $Email->Subject($Subject);
+
+                     $Source = GetValue('Source', $Discussion);
+                     if ($Source == 'Email')
+                        $ReplyTo = GetValue('SourceID', $Discussion); // replying to an email...
+                     else
+                        $ReplyTo = self::UID('Discussion', GetValue('DiscussionID', $Discussion), 'email');
+
+                     $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Discussion', GetValue('DiscussionID', $Discussion)));
                   }
-                  
-                  $Email->Message(self::FormatEmailBody($Story, GetValue('Route', $Args)));
-                  
-                  break;
-            }
-            if (isset($ReplyTo)) {
-               $Email->PhpMailer->AddCustomHeader("In-Reply-To:$ReplyTo");
-               $Email->PhpMailer->AddCustomHeader("References:$ReplyTo");
-            }
+               }
+
+               break;
+            case 'Message':
+               // Get this message.
+               $Message = Gdn::SQL()->GetWhere('ConversationMessage', array('MessageID' => $ID))->FirstRow(DATASET_TYPE_ARRAY);
+               if ($Message) {
+                  $ConversationID = $Message['ConversationID'];
+                  $this->SetFrom($Email, $Message['InsertUserID']);
+
+                  // Get the message before this one.
+                  $Message2 = Gdn::SQL()
+                     ->Select('*')
+                     ->From('ConversationMessage')
+                     ->Where('ConversationID', $ConversationID)
+                     ->Where('MessageID <', $ID)
+                     ->OrderBy('MessageID', 'desc')
+                     ->Limit(1)
+                     ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+
+                  if ($Message2) {
+                     if ($Message2['Source'] == 'Email')
+                        $ReplyTo = $Message2['SourceID'];
+                     else
+                        $ReplyTo = self::UID('Message', $Message2['MessageID'], 'email');
+                  }
+
+                  $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Message', GetValue('MessageID', $Message)));
+               }
+
+               $Email->Message(self::FormatEmailBody($Story, GetValue('Route', $Args)));
+
+               break;
+         }
+         if (isset($ReplyTo)) {
+            $Email->PhpMailer->AddCustomHeader("In-Reply-To:$ReplyTo");
+            $Email->PhpMailer->AddCustomHeader("References:$ReplyTo");
          }
          $Email->PhpMailer->MessageID = self::UID($Type, $ID, 'email');
       }

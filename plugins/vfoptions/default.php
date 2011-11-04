@@ -20,7 +20,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    }
    
    // Make sure token authenticator is never activated as the primary authentication scheme
-   public function AuthenticationController_EnableAuthenticatorToken_Handler(&$Sender) {
+   public function AuthenticationController_EnableAuthenticatorToken_Handler($Sender) {
       Gdn::Authenticator()->UnsetDefaultAuthenticator('token');
    }
 
@@ -71,7 +71,10 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $Menu->AddItem('Vanilla Support', 'Vanilla Support', FALSE, array('class' => 'Support'));
       $Menu->AddLink('Vanilla Support', FALSE, '/dashboard/settings/vanillasupport', 'Garden.AdminUser.Only');
 		
-		
+		// Add stats menu option.
+//      if (C('Garden.Analytics.Advanced')) {
+//         $Menu->AddLink('Dashboard', 'Statistics', '/dashboard/settings/statistics', 'Garden.Settings.Manage');
+//      }
    		
 		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
    too large to upload directly to this page you can
@@ -533,7 +536,7 @@ pageTracker._trackPageview();
     * Appearance" section.
     * @param Gdn_Controller $Sender
     */
-   public function SettingsController_Render_Before(&$Sender) {
+   public function SettingsController_Render_Before($Sender) {
       if (
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
@@ -561,8 +564,8 @@ pageTracker._trackPageview();
          }
       }
       
-      if ($Sender->RequestMethod == 'banner')
-         $Sender->View = PATH_PLUGINS.'/vfoptions/views/banner.php';
+//      if ($Sender->RequestMethod == 'banner')
+//         $Sender->View = PATH_PLUGINS.'/vfoptions/views/banner.php';
 
       if ($Sender->RequestMethod == 'registration')
          $Sender->View = PATH_PLUGINS.'/vfoptions/views/registration.php';
@@ -731,7 +734,7 @@ pageTracker._trackPageview();
    /**
     * Re-authenticates a user with the current configuration.
     */
-   private function _ReAuthenticate(&$Sender, $RedirectTo = '') {
+   private function _ReAuthenticate($Sender, $RedirectTo = '') {
       // If there was a request to reauthenticate (ie. we've been shifted to a custom domain and the user needs to reauthenticate)
       // Check the user's transientkey to make sure they're not a spoofer, and then authenticate them.
       if (ArrayValue(0, $Sender->RequestArgs, '') == 'auth') {
