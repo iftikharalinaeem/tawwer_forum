@@ -506,6 +506,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
     */
    public function SendConfirmationEmail($Discussion, $User) {
       $FormatData = $Discussion;
+      $FormatData['Title'] = C('Garden.Title');
       $FormatData['ID'] = $Discussion['DiscussionID'];
       $FormatData['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
       $FormatData['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
