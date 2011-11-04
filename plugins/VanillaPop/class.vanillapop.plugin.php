@@ -23,7 +23,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
           'DiscussionSubject' => '[{Title}] {Name}',
           'DiscussionBody' => "{Body}\n\n-- \n{Signature}",
           'CommentSubject' => 'Re: [{Title}] {Discussion.Name}',
-          'CommentBody' => "{Body}\n\n-- \n{Signature}");
+          'CommentBody' => "{Body}\n\n-- \n{Signature}",
+          'ConfirmationSubject' => 'Re: {Name} (ticket #{ID})',
+          'ConfirmationBody' => "Your request has been received (ticket #{ID}).\n\n{Quote}\n\n-- \n{Signature}");
    
    /// Methods ///
    
@@ -328,7 +330,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
                   $SaveType = 'Discussion';
                } else {
                   // TODO: Check permission.
-                  
                   $SaveType = 'Message';
                   $Data['ConversationID'] = $Message['ConversationID'];
                }
@@ -370,6 +371,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $MessageModel = new ConversationMessageModel();
             $MessageID = $MessageModel->Save($Data);
             return $MessageID;
+         case 'Discussion':
          default:
             // Check the permission on the discussion.
             if (!Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'CategoryID', $PermissionCategoryID)) {
@@ -385,6 +387,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
             if (!$DiscussionID) {
                throw new Exception($DiscussionModel->Validation->ResultsText().print_r($Data, TRUE), 400);
             }
+            
+            // Send a confirmation email.
+            if ('Plugins.VanillaPop.SendConfirmationEmail') {
+               $Data['DiscussionID'] = $DiscussionID;
+               $this->SendConfirmationEmail($Discussion, $User);
+            }
+            
             return $DiscussionID;
       }
    }
@@ -448,6 +457,19 @@ class VanillaPopPlugin extends Gdn_Plugin {
          $User = Gdn::UserModel()->GetID($User);
       
       $Email->PhpMailer->FromName = GetValue('Name', $User);
+   }
+   
+   /**
+    * Send the initial confirmation email when a discussion is first started through email.
+    * @param type $Discussion
+    * @param type $User 
+    */
+   public function SendConfirmationEmail($Discussion, $User) {
+      $FormatData = $Discussion;
+      $FormatData['Quote'] = self::FormatQuoteText($FormatData['Body']);
+      
+      $CanView = 
+      
    }
    
    public function Setup() {
@@ -882,7 +904,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
           'Plugins.VanillaPop.DefaultCategoryID' => array('Control' => 'CategoryDropDown', 'Description' => 'Place discussions started through email in the following category.'),
           'Plugins.VanillaPop.AllowUserRegistration' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow new users to be registered through email.'),
           'Plugins.VanillaPop.AugmentFrom' => array('Control' => 'CheckBox', 'LabelCode' => 'Add information into the from field in email addresses to help with replies (recommended).', 'Default' => TRUE),
-          'Garden.Email.SupportAddress' => array('Control' => 'TextBox', 'LabelCode' => 'Outgoing Email Address', 'Description' => 'This is the address that will show up in the from field of emails sent from the application.')
+          'Garden.Email.SupportAddress' => array('Control' => 'TextBox', 'LabelCode' => 'Outgoing Email Address', 'Description' => 'This is the address that will show up in the from field of emails sent from the application.'),
+          'EmailFormat.DiscussionSubject' => array(),
+          'EmailFormat.DiscussionBody' => array(),
+          'EmailFormat.CommentSubject' => array(),
+          'EmailFormat.CommentBody' => array(),
+          'Plugins.VanillaPop.SendConfirmationEmail' => array('Control' => 'CheckBox', 'LabelCode' => 'Send a confirmation email when people ask a question or start a discussion over email.'),
+          'EmailFormat.ConfirmationSubject' => array(),
+          'EmailFormat.ConfirmationBody' => array()
       );
       
       foreach (self::$FormatDefaults as $Name => $Default) {
