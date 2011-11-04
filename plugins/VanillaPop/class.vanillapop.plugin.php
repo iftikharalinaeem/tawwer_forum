@@ -1008,7 +1008,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
           'EmailFormat.CommentSubject' => array(),
           'EmailFormat.CommentBody' => array(),
           'Plugins.VanillaPop.SendConfirmationEmail' => array('Control' => 'CheckBox', 'LabelCode' => 'Send a confirmation email when people ask a question or start a discussion over email.'),
-          'EmailFormat.ConfirmationSubject' => array(),
           'EmailFormat.ConfirmationBody' => array()
       );
       
