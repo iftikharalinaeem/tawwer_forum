@@ -4,7 +4,7 @@
 $PluginInfo['WhosOnline'] = array(
    'Name' => 'Whos Online',
    'Description' => "Lists the users currently browsing the forum.",
-   'Version' => '1.3.3',
+   'Version' => '1.3.4',
    'Author' => "Gary Mardell",
    'AuthorEmail' => 'gary@vanillaplugins.com',
    'AuthorUrl' => 'http://vanillaplugins.com',
@@ -56,7 +56,6 @@ class WhosOnlinePlugin extends Gdn_Plugin {
    }
 
    public function PluginController_ImOnline_Create($Sender) {
-      
       $Session = Gdn::Session();
       $UserMetaData = $this->GetUserMeta($Session->UserID, '%'); 
       
