@@ -226,9 +226,9 @@ div.Center {
 	font-style:italic;
 }
 .post h2 {
-	font-size:24px;
+	font-size:18px;
 	margin:25px 0 10px 0;
-	font-weight:normal;
+	font-weight:bold;
 }
 .post h1,
 .post h1 a {
@@ -252,9 +252,6 @@ div.Center {
 }
 .post h4, #page h4 {
 	font-size:18px;
-}
-.post h1:hover, .post h2:hover, .post h3:hover, .post h4:hover, #page h4:hover {
-	color:#FF0084;
 }
 .post .indent {
 	padding-left:10px;

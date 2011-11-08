@@ -20,7 +20,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    }
    
    // Make sure token authenticator is never activated as the primary authentication scheme
-   public function AuthenticationController_EnableAuthenticatorToken_Handler(&$Sender) {
+   public function AuthenticationController_EnableAuthenticatorToken_Handler($Sender) {
       Gdn::Authenticator()->UnsetDefaultAuthenticator('token');
    }
 
@@ -71,7 +71,10 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $Menu->AddItem('Vanilla Support', 'Vanilla Support', FALSE, array('class' => 'Support'));
       $Menu->AddLink('Vanilla Support', FALSE, '/dashboard/settings/vanillasupport', 'Garden.AdminUser.Only');
 		
-		
+		// Add stats menu option.
+//      if (C('Garden.Analytics.Advanced')) {
+//         $Menu->AddLink('Dashboard', 'Statistics', '/dashboard/settings/statistics', 'Garden.Settings.Manage');
+//      }
    		
 		Gdn::Locale()->SetTranslation('You can place files in your /uploads folder.', 'If your file is
    too large to upload directly to this page you can
@@ -533,7 +536,7 @@ pageTracker._trackPageview();
     * Appearance" section.
     * @param Gdn_Controller $Sender
     */
-   public function SettingsController_Render_Before(&$Sender) {
+   public function SettingsController_Render_Before($Sender) {
       if (
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
@@ -561,8 +564,8 @@ pageTracker._trackPageview();
          }
       }
       
-      if ($Sender->RequestMethod == 'banner')
-         $Sender->View = PATH_PLUGINS.'/vfoptions/views/banner.php';
+//      if ($Sender->RequestMethod == 'banner')
+//         $Sender->View = PATH_PLUGINS.'/vfoptions/views/banner.php';
 
       if ($Sender->RequestMethod == 'registration')
          $Sender->View = PATH_PLUGINS.'/vfoptions/views/registration.php';
@@ -644,96 +647,9 @@ pageTracker._trackPageview();
 			}
 		}
 		
-		$Sender->Render(PATH_PLUGINS . DS . 'vfoptions' . DS . 'views' . DS . 'vanillasupport.php');
+		$Sender->Render('vanillasupport','','plugins/vfoptions');
    }
-
-   /**
-    * When an administrative user (UserID == 1) is saved, make sure to save the
-    * changes across all of the user's forums, including the VanillaForums.com
-    * database.
-    */
-   public function UserModel_AfterSave_Handler(&$Sender, $EventArguments = '') {
-      $Fields = ArrayValue('Fields', $EventArguments);
-      $UserID = ArrayValue('UserID', $Fields, -1);
-      if ($UserID == -1)
-         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
-         
-      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
-      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
-      $Email = ArrayValue('Email', $Fields);
-      $Password = ArrayValue('Password', $Fields); // <-- This was encrypted in the model
-      $SaveFields = array();
-      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
-         // If a new password was specified, save it
-         if ($Password !== FALSE)
-            $SaveFields['Password'] = $Password;
-            
-         // If a new email was specified, save that too
-         if ($Email !== FALSE)
-            $SaveFields['Email'] = $Email;
-            
-         $this->_SaveAcrossForums($SaveFields, $VFUserID, $VFAccountID);
-      }
-   }
-
-   /**
-    * Before any forum's administrative user (UserID == 1) is saved, validate
-    * that the email address being saved isn't being used by any other user in
-    * any of their forums, or in the VanillaForums.com database.
-    */
-   public function UserModel_BeforeSave_Handler(&$Sender, $EventArguments = '') {
-      $Fields = ArrayValue('Fields', $EventArguments);
-      $UserID = ArrayValue('UserID', $Fields, -1);
-      if ($UserID == -1)
-         $UserID = $this->_GetUserIDByName(ArrayValue('Name', $Fields, ''));
-
-      $VFUserID = Gdn::Config('VanillaForums.UserID', -1);
-      $VFAccountID = Gdn::Config('VanillaForums.AccountID', -1);
-      $Email = ArrayValue('Email', $Fields);
-      if (is_numeric($UserID) && $UserID == 1 && is_numeric($VFUserID) && $VFUserID > 0) {
-         // Retrieve all of the user's sites
-         $SiteData = $this->_GetDatabase()->SQL()
-            ->Select('DatabaseName, Path')
-            ->From('Site')
-            ->Where('AccountID', $VFAccountID)
-            ->Get();
-
-         // If the user is trying to change the email address...
-         if ($this->_GetDatabase()->SQL()
-            ->Select('UserID')
-            ->From('User')
-            ->Where('UserID <> ', $VFUserID)
-            ->Where('Email', $Email)
-            ->Get()
-            ->NumRows() > 0) {
-            $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
-         } else {
-            // Now check it against all forums the user owns, as well
-            if (is_numeric($VFAccountID) && $VFAccountID > 0) {
-               $Cnn = @mysql_connect(
-                  Gdn::Config('Database.Host', ''),
-                  Gdn::Config('Database.User', ''),
-                  Gdn::Config('Database.Password', '')
-               );
-               if ($Cnn) {
-                  foreach ($SiteData as $Site) {
-                     if ($Site->Path != '') {
-                        mysql_select_db($Site->DatabaseName, $Cnn);
-                        $Result = mysql_query("select UserID from GDN_User where UserID <> 1 and Email = '".mysql_real_escape_string($Email, $Cnn)."'");
-                        if ($Result && mysql_num_rows($Result) > 0) {
-                           $Sender->Validation->AddValidationResult('Email', 'Email address is already taken by another user.');
-                           break;
-                        }
-                     }
-                  }
-                  mysql_close($Cnn);
-               }
-            }
-         }
-         $this->_CloseDatabase();
-      }
-   }
-
+   
    /**
     * No setup required.
     */
@@ -818,7 +734,7 @@ pageTracker._trackPageview();
    /**
     * Re-authenticates a user with the current configuration.
     */
-   private function _ReAuthenticate(&$Sender, $RedirectTo = '') {
+   private function _ReAuthenticate($Sender, $RedirectTo = '') {
       // If there was a request to reauthenticate (ie. we've been shifted to a custom domain and the user needs to reauthenticate)
       // Check the user's transientkey to make sure they're not a spoofer, and then authenticate them.
       if (ArrayValue(0, $Sender->RequestArgs, '') == 'auth') {

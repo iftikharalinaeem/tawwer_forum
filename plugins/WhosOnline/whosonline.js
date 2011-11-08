@@ -1,7 +1,16 @@
 $(document).ready(function() {
+   var frequency = gdn.definition('WhosOnlineFrequency') * 1000;
+   if (frequency <= 0)
+      return;
+   
+   var gettingOnline = 0;
+   
 	function GetOnline() {
 		var url = gdn.url('/plugin/imonline');
-		
+      if (gettingOnline > 0)
+         return;
+		gettingOnline++;
+      
 		$.ajax({
 			url: url,
 			global: false,
@@ -10,12 +19,14 @@ $(document).ready(function() {
 			dataType: "html",
 			success: function(Data){
 				$("#WhosOnline").replaceWith(Data);
-				setTimeout(GetOnline, gdn.definition('WhosOnlineFrequency') * 1000);
-			}
+			},
+         complete: function() {
+            gettingOnline--;
+         }
 		});
-	}
+	}   
 
-	setTimeout(GetOnline, gdn.definition('WhosOnlineFrequency') * 1000);
+	window.setInterval(GetOnline, frequency);
 });
 
 

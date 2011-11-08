@@ -24,17 +24,17 @@ class VFOrgThemeHooks implements Gdn_IPlugin {
          $Sender->Head->Title('Vanilla - Free, Open-Source Forum Software');
    }
    
-   public function DiscussionsController_Render_Before($Sender) {
-      $DevActivityModule = new RecentActivityModule($Sender);
-      $DevActivityModule->ActivityModuleTitle = T('News from the Developers');
-      $DevActivityModule->GetData(5, 16);
-      $Sender->AddModule($DevActivityModule);
-
-      $RecentActivityModule = new RecentActivityModule($Sender);
-      $RecentActivityModule->ActivityModuleTitle = T('Recent User Activity');
-      $RecentActivityModule->GetData();
-      $Sender->AddModule($RecentActivityModule);
-   }
+//   public function DiscussionsController_Render_Before($Sender) {
+//      $DevActivityModule = new RecentActivityModule($Sender);
+//      $DevActivityModule->ActivityModuleTitle = T('News from the Developers');
+//      $DevActivityModule->GetData(5, 16);
+//      $Sender->AddModule($DevActivityModule);
+//
+//      $RecentActivityModule = new RecentActivityModule($Sender);
+//      $RecentActivityModule->ActivityModuleTitle = T('Recent User Activity');
+//      $RecentActivityModule->GetData();
+//      $Sender->AddModule($RecentActivityModule);
+//   }
 
    public function CategoriesController_AfterBreadcrumbs_Handler($Sender, $Args) {
       $Description = $Sender->Data('Category.Description');
