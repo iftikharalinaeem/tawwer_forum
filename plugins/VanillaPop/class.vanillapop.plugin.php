@@ -427,7 +427,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             }
             
             // Send a confirmation email.
-            if ('Plugins.VanillaPop.SendConfirmationEmail') {
+            if (C('Plugins.VanillaPop.SendConfirmationEmail')) {
                $Data['DiscussionID'] = $DiscussionID;
                $this->SendConfirmationEmail($Data, $User);
             }
