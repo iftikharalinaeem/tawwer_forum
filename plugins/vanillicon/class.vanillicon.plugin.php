@@ -9,8 +9,8 @@
 $PluginInfo['vanillicon'] = array(
    'Name' => 'Vanillicon',
    'Description' => "Provides fun default user icons from vanillicon.com.",
-   'Version' => '1.0b',
-   'RequiredApplications' => array('Vanilla' => '2.0.18b2'),
+   'Version' => '1.0',
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
