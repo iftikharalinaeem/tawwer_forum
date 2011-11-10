@@ -78,6 +78,7 @@ i.SpriteRarrDown {
     display: inline;
     padding-left: 3px;
 }
+.BlueButton,
 .VFMenu a {
 	background: url('sprite-menu.png') 0 0 repeat-x;
 	display: inline-block;
@@ -94,12 +95,18 @@ i.SpriteRarrDown {
 	-webkit-border-radius: 3px;
 	border: 1px solid #003168;
 }
+.BlueButton {
+	padding: 0 10px;
+}
 .VFMenu i.Sprite {
 	padding-right: 2px;
 }
+.BlueButton:hover,
 .VFMenu a:hover {
 	background: url('sprite-menu.png') 0 -40px repeat-x;
+	color: #003f87;
 }
+.BlueButton:focus,
 body.Solutions .VFMenu .Solutions a,
 body.plans .VFMenu .Plans a,
 body.Account .VFMenu .Account a,
@@ -112,6 +119,9 @@ body.Features .VFMenu .Features a,
 	background: url('sprite-menu.png') 0 -80px repeat-x;
 	text-shadow: 0 1px 1px #003f87;
 	color: #cef1fc;
+}
+.BlueButton:focus {
+	border: 1px solid #82a6c5;
 }
 i.SpriteSolutions,
 i.SpriteHome,
