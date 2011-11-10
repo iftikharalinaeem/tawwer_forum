@@ -55,8 +55,12 @@ class WhosOnlineModule extends Gdn_Module {
       }
       
       Gdn::UserModel()->JoinUsers($Data, array('UserID'));
-
-		$this->_OnlineUsers = $Data;
+      $OnlineUsers = array();
+      foreach ($Data as $User)
+         $OnlineUsers[$User['Name']] = $User;
+      
+      ksort($OnlineUsers);
+      $this->_OnlineUsers = $OnlineUsers;
 	}
 
 	public function AssetTarget() {

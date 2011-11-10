@@ -40,13 +40,13 @@ class VanillaLabsPlugin extends Gdn_Plugin {
     *
     * @param Gdn_DatabaseStructure $Structure 
     */
-   public static function DefineSpamColumns($TableName) {
+   public static function DefineSpamColumns($TableName, $Type = 'usmallint') {
       Gdn::Structure()
          ->Table($TableName)
-         ->Column('Likes', 'usmallint', 0)
-         ->Column('Spam', 'usmallint', 0)
+         ->Column('Likes', $Type, 0)
+         ->Column('Spam', $Type, 0)
 //         ->Column('SpamScore', 'tinyint', TRUE)
-         ->Column('Abuse', 'usmallint', 0)
+         ->Column('Abuse', $Type, 0)
          ->Set();
    }
    
@@ -89,6 +89,13 @@ class VanillaLabsPlugin extends Gdn_Plugin {
       }
       $Row['Attributes'] = $Attributes;
       return array($Row, $Model, $Log);
+   }
+   
+   public function IncrementUser($UserID, $Column, $Inc) {
+      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+      $Curr = GetValue($Column, $User, 0);
+      $Value = $Curr + $Inc;
+      Gdn::UserModel()->SetField($UserID, $Column, $Value);
    }
    
    public function Request($Path, $Data) {
@@ -136,8 +143,29 @@ class VanillaLabsPlugin extends Gdn_Plugin {
       }
       SaveToConfig('Plugins.VanillaSpam.UserID', $UserID, array('CheckExisting' => TRUE));
       
+      $St = Gdn::Structure()->Table('Discussion');
+      $Recalc = $St->ColumnExists('Spam');
+      
       $this->DefineSpamColumns('Discussion');
       $this->DefineSpamColumns('Comment');
+      
+      $St = Gdn::Structure()->Table('User');
+      $Recalc &= !$St->ColumnExists('Spam');
+      $this->DefineSpamColumns('User', 'uint');
+      if ($Recalc) {
+         $Px = $St->DatabasePrefix();
+         // Calculate the user sums.
+         $Columns = array('Likes', 'Spam', 'Abuse');
+         foreach ($Columns as $Column) {
+            $Sql = "update {$Px}User u set $Column = 
+               coalesce((select sum($Column) from {$Px}Discussion d where d.InsertUserID = u.UserID), 0)
+             + coalesce((select sum($Column) from {$Px}Comment c where c.InsertUserID = u.UserID), 0)";
+             
+            Gdn::SQL()->Query($Sql, 'update');
+         }
+         // Clear the cache to make sure the user columns update.
+         Gdn::Cache()->IncrementRevision();
+      }
    }
    
    public function UserID() {
@@ -155,6 +183,10 @@ class VanillaLabsPlugin extends Gdn_Plugin {
       }
       return $Result;
    }
+   
+//   public function Tag($Column, $Row, $Wrap = TRUE) {
+//      $Sing = strtolower(StringEndsWith($Column, 
+//   }
    
    /// EVENT HANDLERS ///
 
@@ -354,7 +386,13 @@ class VanillaLabsPlugin extends Gdn_Plugin {
       
       
       $Targets = array();
-      $Message = array('<span class="InformSprite Flag"></span> '.sprintf(T('The %s has been flagged. Thanks!'), T($Type)), array('CssClass' => 'Dismissable AutoDismiss HasSprite', 'id' => 'mod'));
+      if ($Operation == 'like') 
+         $MessageBody = sprintf('You liked the %s. Thanks!', strtolower($Type));
+      else
+         $MessageBody = sprintf('The %s has been flagged. Thanks!', strtolower($Type));
+      
+      $MessageBody = T($MessageBody);
+      $Message = array('<span class="InformSprite Flag"></span> '.$MessageBody, array('CssClass' => 'Dismissable AutoDismiss HasSprite', 'id' => 'mod'));
       
       if ($Undo) {
          if ($Log) {
@@ -424,6 +462,10 @@ class VanillaLabsPlugin extends Gdn_Plugin {
             );
          }
       }
+      // Increment the user.
+      if ($Undo)
+         $Inc = -$Inc;
+      $this->IncrementUser($Row['InsertUserID'], $Column, $Inc);
       
       // Send back a button to undo/redo the operation.
       $Targets[] = array('Target' => "#{$Type}_$ID .Mod-".ucfirst($Operation), 'Type' => 'Html', 'Data' => $UndoButton);

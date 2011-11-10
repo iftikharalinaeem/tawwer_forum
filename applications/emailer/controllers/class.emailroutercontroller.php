@@ -30,6 +30,25 @@ class EmailRouterController extends Gdn_Controller {
       parent::Initialize();
    }
    
+   public static function ParseEmailAddress($Email) {
+      $Name = '';
+      if (preg_match('`([^<]*)<([^>]+)>`', $Email, $Matches)) {
+         $Name = trim(trim($Matches[1]), '"');
+         $Email = trim($Matches[2]);
+      }
+         
+      if (!$Name) {
+         $Name = trim(substr($Email, 0, strpos($Email, '@')), '@');
+         
+         $NameParts = explode('.', $Name);
+         $NameParts = array_map('ucfirst', $NameParts);
+         $Name = implode(' ', $NameParts);
+      }
+      
+      $Result = array($Name, $Email);
+      return $Result;
+   }
+   
    public static function ParseEmailHeader($Header) {
       $Result = array();
       $Parts = explode("\n", $Header);
@@ -100,12 +119,24 @@ class EmailRouterController extends Gdn_Controller {
                $To = $Data['To'];
             }
             
-            if (preg_match('`([^+@]+)([^@]*)@(.+)`', $To, $Matches)) {
+            list($Name, $Email) = self::ParseEmailAddress($To);
+            if (preg_match('`([^+@]+)([^@]*)@(.+)`', $Email, $Matches)) {
                $ClientName = $Matches[1];
                $Domain = $Matches[3];
                
-               $Url = "http://$ClientName.vanillaforums.com/utility/email.json";
+               if (strpos($ClientName, '.') !== FALSE) {
+                  if (StringBeginsWith($ClientName, 'https.', TRUE)) {
+                     $ClientName = StringBeginsWith($ClientName, 'https.', TRUE, TRUE);
+                     $Px = 'https://';
+                  } else
+                     $Px = 'http://';
+                  $Url = $Px.$ClientName.'/utility/email.json';
+               } else {
+                  $Url = "http://$ClientName.vanillaforums.com/utility/email.json";
+               }
             } else {
+               if (Debug())
+                  throw new Exception("Invalid to: $To, $Email\n".var_dump($_POST));
                $this->SetData('Error', "Invalid to: $To");
                $this->Render();
                return;
@@ -120,10 +151,15 @@ class EmailRouterController extends Gdn_Controller {
             curl_setopt($C, CURLOPT_POSTFIELDS, $Data);
             
             $Result = curl_exec($C);
-            $ResultInfo = curl_getinfo($C);
-            $ResultData = @json_decode($Result);
-            if ($ResultData) {
-               $this->Data = $Data;
+            $Code = curl_getinfo($C, CURLINFO_HTTP_CODE);
+            
+            if ($Code == 200) {
+               $ResultData = @json_decode($Result);
+               if ($ResultData) {
+                  $this->Data = $Data;
+               }
+            } else {
+               throw new Exception(curl_error($C), $Code);
             }
          }
 

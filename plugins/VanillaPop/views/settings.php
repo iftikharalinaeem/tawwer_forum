@@ -9,8 +9,8 @@
 </div>
 <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
-$IncomingAddress = C('Plugins.VanillaPop.EmailAddress');
-$OutgoingAddress = C();
+$IncomingAddress = $this->Data('IncomingAddress');
+//$OutgoingAddress = C();
 if ($IncomingAddress):
 ?>
 <div class="Info">
