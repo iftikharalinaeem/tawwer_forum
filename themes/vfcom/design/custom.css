@@ -107,6 +107,7 @@ i.SpriteRarrDown {
 	color: #003f87;
 }
 .BlueButton:focus,
+body#vfcom_info_index .VFMenu .Home a,
 body.Solutions .VFMenu .Solutions a,
 body.plans .VFMenu .Plans a,
 body.Account .VFMenu .Account a,
@@ -139,6 +140,7 @@ i.SpritePlans { background-position: -19px -35px; }
 i.SpriteFeatures { background-position: -19px -57px; }
 i.SpriteBlog { background-position: -19px -151px; }
 i.SpriteSolutions { background-position: -17px -171px; }
+body#vfcom_info_index .VFMenu .Home a i.SpriteHome,
 .VFMenu a:focus i.SpriteHome { background-position: 0 -19px; }
 body.plans .VFMenu .Plans a i.SpritePlans,
 .VFMenu a:focus i.SpritePlans { background-position: 0 -36px; }
