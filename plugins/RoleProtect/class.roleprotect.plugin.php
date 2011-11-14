@@ -12,14 +12,13 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['RoleProtect'] = array(
    'Name' => 'Role Protection',
    'Description' => 'Prevents certain privileged roles from escalating their permissions or deleting other privileged users.',
-   'Version' => '1.0b',
+   'Version' => '1.0',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
    'RegisterPermissions' => array('Garden.Roles.Selective' => 0),
-   'SettingsUrl' => '/settings/pennyarcade',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'
@@ -30,7 +29,6 @@ class RoleProtectPlugin extends Gdn_Plugin {
    public function __construct() {
       
    }
-   
    
    public function UserController_BeforeUserAdd_Handler($Sender) {
       
@@ -185,6 +183,66 @@ class RoleProtectPlugin extends Gdn_Plugin {
          }
       }
 
+   }
+   
+   public function CheckRolePermission($PerformUserID, $TargetUserID) {
+      
+      // Roles the logged-in user can modify
+      $EditableRoleData = array();
+      
+      // Roles that, if present in the target user, protect him from  being edited
+      $ProtectedRoleData = array();
+      
+      // Loop over the logged-in user's roles
+      $MyRoleData = Gdn::UserModel()->GetRoles($PerformUserID)->Result();
+      $RoleIDs = ConsolidateArrayValuesByKey($MyRoleData, 'RoleID');
+      $RoleNames = ConsolidateArrayValuesByKey($MyRoleData, 'Name');
+      $MyRoles = ArrayCombine($RoleIDs, $RoleNames);
+      foreach ($MyRoles as $RoleID => $RoleName) {
+         $EditableRolesList = C("Plugins.RoleProtect.{$RoleID}.CanAffect", NULL);
+         if (!is_null($EditableRolesList)) {
+            $EditableRolesList = explode(',', $EditableRolesList);
+            if (is_array($EditableRolesList) && sizeof($EditableRolesList))
+               $EditableRoleData = array_merge($EditableRoleData, $EditableRolesList);
+         }
+         
+         $ProtectedRolesList = C("Plugins.RoleProtect.{$RoleID}.Protected", NULL);
+         if (!is_null($ProtectedRolesList)) {
+            $ProtectedRolesList = explode(',', $ProtectedRolesList);
+            if (is_array($ProtectedRolesList) && sizeof($ProtectedRolesList))
+               $ProtectedRoleData = array_merge($ProtectedRoleData, $ProtectedRolesList);
+         }
+      }
+      
+      // Format EditableRoleData into a nice ASSOC array
+      $EditableRoleData = array_flip($EditableRoleData);
+      $EditableRoles = array();
+      foreach ($EditableRoleData as $EditableRoleID => $Trash)
+         $EditableRoles[$EditableRoleID] = GetValue($EditableRoleID, $RoleData);
+      
+      // Format ProtectedRoleData into a nice ASSOC array
+      $ProtectedRoleData = array_flip($ProtectedRoleData);
+      $ProtectedRoles = array();
+      foreach ($ProtectedRoleData as $ProtectedRoleID => $Trash)
+         $ProtectedRoles[$ProtectedRoleID] = GetValue($ProtectedRoleID, $RoleData);
+      
+      // Nothing configured for this role - allow all operations
+      if (!sizeof($EditableRoles) && !sizeof($ProtectedRoles)) return;
+      
+      // Get all the roles of the user we're trying to edit
+      $TheirRoleData = Gdn::UserModel()->GetRoles($TargetUserID)->Result();
+      $TheirRoleIDs = ConsolidateArrayValuesByKey($TheirRoleData, 'RoleID');
+      $TheirRoleNames = ConsolidateArrayValuesByKey($TheirRoleData, 'Name');
+      $TheirRoles = ArrayCombine($TheirRoleIDs, $TheirRoleNames);
+      
+      foreach ($TheirRoles as $TheirRoleID => $TheirRoleName) {
+         if (array_key_exists($TheirRoleID, $ProtectedRoles)) {
+            // Short circuit rendering, we can't edit this person
+            return FALSE;
+         }
+      }
+      
+      return TRUE;
    }
    
 }
