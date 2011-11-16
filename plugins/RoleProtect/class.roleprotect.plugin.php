@@ -71,14 +71,14 @@ class RoleProtectPlugin extends Gdn_Plugin {
       $EditableRoleData = array_flip($EditableRoleData);
       $EditableRoles = array();
       foreach ($EditableRoleData as $EditableRoleID => $Trash)
-         $EditableRoles[$EditableRoleID] = GetValue($EditableRoleID, $RoleData);
+         $EditableRoles[$EditableRoleID] = GetValue($EditableRoleID, $this->Roles);
       $this->EditableRoles = $EditableRoles;
       
       // Format ProtectedRoleData into a nice ASSOC array
       $ProtectedRoleData = array_flip($ProtectedRoleData);
       $ProtectedRoles = array();
       foreach ($ProtectedRoleData as $ProtectedRoleID => $Trash)
-         $ProtectedRoles[$ProtectedRoleID] = GetValue($ProtectedRoleID, $RoleData);
+         $ProtectedRoles[$ProtectedRoleID] = GetValue($ProtectedRoleID, $this->Role);
       $this->ProtectedRoles = $ProtectedRoles;
    }
    
