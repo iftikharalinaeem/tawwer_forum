@@ -11,15 +11,6 @@
 <link rel="shortcut icon" href="http://www.vanillaforums.com/themes/vfcom/design/favicon.png" type="image/x-icon" />
 <?php wp_head(); ?>
 <script src="http://vanillaforums.com/js/library/jquery.js" type="text/javascript"></script>
-<script src="http://vanillaforums.com/applications/vfcom/js/cufon-yui.js" type="text/javascript"></script>
-<script src="http://vanillaforums.com/applications/vfcom/js/archer.font.js" type="text/javascript"></script>
-<script type="text/javascript">
-   Cufon.replace('.post h1 a', {
-      fontFamily: 'Archer',
-		fontSize: '24px'
-   });
-</script>
-
 </head>
 <body>
 <div id="Head" class="Wrapper">
