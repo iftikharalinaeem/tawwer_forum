@@ -18,7 +18,12 @@ $PluginInfo['vanillicon'] = array(
 );
 
 class VanilliconPlugin extends Gdn_Plugin {
-   
+   public function ProfileController_AfterAddSideMenu_Handler($Sender, $Args) {
+      if (!$Sender->User->Photo) {
+         $Email = GetValue('Email', $Sender->User);
+         $Sender->User->Photo = 'http://vanillicon.com/'.md5($Email).'_200.png';
+      }
+   }
 }
 
 if (!function_exists('UserPhotoDefaultUrl')) {
