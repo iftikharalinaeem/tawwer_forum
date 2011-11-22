@@ -1,20 +1,25 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+
+/**
+ * ProxyConnect Plugin
+ * 
+ * Enables SingleSignOn (SSO) between forums and other authorized consumers on 
+ * the same domain, via cookie sharing.
+ *
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Addons
+ * @since 1.0
+ */
 
 // Define the plugin:
 $PluginInfo['ProxyConnect'] = array(
 	'Name' => 'Vanilla Proxyconnect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
-   'Version' => '1.9.7',
+   'Version' => '1.9.8',
    'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.0.17.9'),
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/dashboard/authentication/proxy',
@@ -26,7 +31,6 @@ $PluginInfo['ProxyConnect'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
-Gdn_LibraryMap::SafeCache('library','class.proxyauthenticator.php',dirname(__FILE__).DS.'class.proxyauthenticator.php');
 class ProxyConnectPlugin extends Gdn_Plugin {
    
    public function __construct() {
@@ -129,7 +133,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $Sender->SetData('PreFocusIntegration', $this->IntegrationManager);
       
       $Sender->SliceConfig = $this->RenderSliceConfig();
-      $Sender->Render($this->GetView('proxyconnect.php'));
+      $Sender->Render('proxyconnect','','plugins/ProxyConnect');
    }
    
    public function Controller_Integrate($Sender) {
@@ -158,6 +162,91 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       }
 
       $Sender->Render($this->IntegrationConfigurationPath);
+   }
+   
+   public function Controller_Test($Sender) {
+      $Sender->AddSideMenu('dashboard/authentication');
+      $Sender->Form = new Gdn_Form();
+      
+      // Load Provider
+      $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
+      $Provider = $Authenticator->GetProvider();
+      if (!$Provider) {
+         $Sender->SetData("Provider", FALSE);
+         $Sender->Form->AddError("Authentication Provider information has not been configured");
+      } else { $Sender->SetData("Provider", $Provider); }
+      
+      // No response by default
+      $Sender->SetData('ConnectResponse', NULL);
+      $Sender->SetData('Connected', FALSE);
+      $Sender->SetData('ConnectedAs', FALSE);
+      $Sender->SetData('Attempt', FALSE);
+      
+      if ($Sender->Form->IsPostBack()) {
+         
+         if (!$Sender->Form->ErrorCount()) {
+            
+            $Sender->SetData('Attempt', TRUE);
+            
+            // Do remote ping
+            $Connect = new ProxyRequest();
+            $AuthenticateURL = GetValue('AuthenticateUrl', $Provider);
+            $Response = $Connect->Request(array(
+               'URL'       => $AuthenticateURL,
+               'Cookies'   => TRUE
+            ));
+            
+            $Response = RandomString(64);
+
+            if ($Response) {
+               
+               // Store serialized struct
+               $Sender->SetData('RawResponse', $Response);
+               $Sender->SetData('ConnectResponse', $Response);
+               
+               $ReadMode = strtolower(C("Garden.Authenticators.proxy.RemoteFormat", "ini"));
+               switch ($ReadMode) {
+                  case 'ini':
+                     $Result = @parse_ini_string($Response);
+                     break;
+
+                  case 'json':
+                     $Result = @json_decode($Response);
+                     break;
+
+                  default:
+                     throw new Exception("Unexpected value '$ReadMode' for 'Garden.Authenticators.proxy.RemoteFormat'");
+               }
+               
+               if ($Result) {
+                  
+                  // Store parsed struct
+                  $Sender->SetData('ConnectResponse', $Result);
+                  
+                  $UniqueID = GetValue('UniqueID', $Result, NULL);
+                  $Email = GetValue('Email', $Result, NULL);
+                  if (is_null($Email) || is_null($UniqueID)) return FALSE;
+
+                  $ReturnArray = array(
+                     'Email'        => $Email,
+                     'UniqueID'     => $UniqueID,
+                     'Name'         => GetValue('Name', $Result, NULL),
+                     'TransientKey' => GetValue('TransientKey', $Result, NULL)
+                  );
+                  
+                  $Sender->SetData('Connected', $ReturnArray);
+                  $Sender->SetData('ConnectedAs', GetValue('Name', $ReturnArray));
+                  
+               } else {
+                  $Sender->SetData('NoParse', TRUE);
+               }
+
+            }
+
+         }
+      }
+      
+      $Sender->Render('test','','plugins/ProxyConnect');
    }
    
    protected function SetIntegrationManager($ManagerName) {
