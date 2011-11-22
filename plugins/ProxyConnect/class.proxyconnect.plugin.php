@@ -210,10 +210,18 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    
    public function EntryController_SignIn_Handler(&$Sender) {
       if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
-      $this->SigninLoopback($Sender);
+      $AllowCallout = !Gdn::Request()->GetValue('Landing', FALSE);
+      $this->SigninLoopback($Sender, $AllowCallout);
    }
    
-   protected function SigninLoopback($Sender) {
+   /**
+    * Perform proxyconnect loop
+    * 
+    * @param EntryController $Sender 
+    * @param boolean $AllowCallout Whether to allow redirection to the remote login
+    * @return type 
+    */
+   protected function SigninLoopback($Sender, $AllowCallout = TRUE) {
       if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
       $Redirect = Gdn::Request()->GetValue('HTTP_REFERER');
       
@@ -258,7 +266,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
 //         Gdn::Authenticator()->Trigger($AuthResponse,$UserEventData);
          
          if (Gdn::Authenticator()->GetIdentity()) {
-
+            
             // That worked, so redirect to the default page. The user is now signed in.
             Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
             
@@ -272,7 +280,10 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             // The user really isnt signed in. Delete their cookie and send them to the remote login page.
             $Authenticator->SetIdentity(NULL);
             $Authenticator->DeleteCookie();
-            return Redirect($SigninURL,302);
+            if ($AllowCallout)
+               Redirect($SigninURL,302);
+            else
+               return;
             
          }
       } else {
@@ -282,10 +293,23 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          } else {
             // We have no cookie for this user. Send them to the remote login page.
             $Authenticator->SetIdentity(NULL);
-            Redirect($SigninURL,302);
+            if ($AllowCallout)
+               Redirect($SigninURL,302);
+            else
+               return;
          }
       }
       exit();
+   }
+   
+   public function EntryController_Land_Create($Sender) {
+      if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
+      $LandingRequest = Gdn_Request::Create()->FromImport(Gdn::Request())
+         ->WithURI("/dashboard/entry/signin")
+         ->WithCustomArgs(array(
+            'Landing'   => NULL
+         ));
+      return Gdn::Dispatcher()->Dispatch($LandingRequest);
    }
    
    public function EntryController_BeforeSignOut_Handler(&$Sender) {
