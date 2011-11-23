@@ -69,7 +69,7 @@ $Session = Gdn::Session();
       <?php
       // echo Anchor('Addons', '/addons');
       // echo Anchor('Contact Us', '/page/contact');
-      echo Anchor('Host Your Forum With Us', 'http://vanillaforums.com');		
+      echo Anchor('Host Your Community With Us', 'http://vanillaforums.com');		
 		$this->RenderAsset('Foot');
       ?>
 	</div>
