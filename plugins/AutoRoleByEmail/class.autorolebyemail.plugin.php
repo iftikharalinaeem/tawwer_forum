@@ -11,8 +11,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['AutoRoleByEmail'] = array(
    'Name' => 'Auto-Role By Email',
-   'Description' => 'Assigns new members from a specific email domain to a role (in addition to default role).',
-   'Version' => '0.1',
+   'Description' => 'Adds new users to roles based on their email domain (in addition to default role).',
+   'Version' => '1.0',
+   'SettingsUrl' => '/settings/registration',
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'matt@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com'
@@ -20,25 +21,52 @@ $PluginInfo['AutoRoleByEmail'] = array(
 
 class AutoRoleByEmailPlugin extends Gdn_Plugin {
 	/**
-	 * Hacky setup for Hubspot.
-	 */
-   public function Setup() {
-      SaveToConfig('Plugins.AutoRoleByEmail.Domain', 'hubspot.com');
-      SaveToConfig('Plugins.AutoRoleByEmail.Role', 'Hubspotter');
-   }
+    * Add 'Domains' box to Edit Role page.
+    */
+   public function RoleController_BeforeRolePermissions_Handler($Sender) {
+      echo Wrap($Sender->Form->Label('Domains', 'Domains') .
+         Wrap(T('RoleDomainInfo', "Assign new users to this role if their email is from one of these domains (space-separated)."), 'div', array('class' => 'Info')) .
+         $Sender->Form->TextBox('Domains', array('MultiLine' => TRUE)), 'li');
+	}
    
    /**
     * If new user's email is @domain, add to special role.
     */
    public function UserModel_BeforeInsertUser_Handler($Sender) {
-      $Domain = C('Plugins.AutoRoleByEmail.Domain', FALSE);
-      $Role = C('Plugins.AutoRoleByEmail.Role', FALSE);
+      // Get new user's email domain
       $Email = $Sender->EventArguments['InsertFields']['Email'];
-      $EscapedDomain = str_replace('.', '\.', $Domain);
-      if ($Domain && $Role && preg_match('/@'.$EscapedDomain.'$/', $Email)) {
+      list($Junk, $Domain) = explode('@', $Email);
+      
+      // Any roles assigned?
+      $RoleModel = new RoleModel();
+      $RoleData = $RoleModel->SQL->GetWhereLike('Role', array('Domains' => $Domain));
+      foreach ($RoleData->Result() as $Result) {
+         // Confirm it wasn't a sloppy match
+         $DomainList = explode(' ', $Result->Domains);
+         if (in_array($Domain, $DomainList)) {
+            // Add the role to the user
+            $Sender->EventArguments['InsertFields']['Roles'][] = $Result->RoleID;
+         }
+      }
+   }
+   
+   /**
+    * Add 'Domains' column to Role table.
+    */
+   public function Setup() {      
+      Gdn::Structure()->Table('Role')
+         ->Column('Domains', 'text', NULL)
+         ->Set();
+         
+      // Backwards compatibility with 0.1
+      if (C('Plugins.AutoRoleByEmail.Domain', FALSE)) {
          $RoleModel = new RoleModel();
-         $RoleID = $RoleModel->GetWhere(array('Name' => $Role))->FirstRow()->RoleID;
-         $Sender->EventArguments['InsertFields']['Roles'][] = $RoleID;
+         $RoleModel->Update(
+            array('Domains' => C('Plugins.AutoRoleByEmail.Domain')), 
+            array('Name' => C('Plugins.AutoRoleByEmail.Role'))
+         );
+         RemoveFromConfig('Plugins.AutoRoleByEmail.Domain');
+         RemoveFromConfig('Plugins.AutoRoleByEmail.Role');
       }
    }
 }

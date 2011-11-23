@@ -6,7 +6,7 @@
    <div class="Info">
       <div class="ProxyConnectInfo">
          <?php echo T('This authenticator allows users from your remote application or website to be automatically registered and signed into Vanilla. For a detailed explanation of how Proxy Connect works, please <a href="http://vanillaforums.org/page/singlesignon">read our documentation</a>.'); ?>
-         <?php echo T('Proxy Connect ships with several pre-built <b>Remote Integration Managers</b>, each designed to automate the setup process. If your remote application is listed in the dropdown below, select it now, otherwise choose "Manual Setup".'); ?>
+         <?php echo T('Proxy Connect ships with several pre-built <b>Remote Integration Managers</b>, each designed to automate the setup process. If your remote application is listed in the dropdown below, select it now, otherwise choose "Manual Integration".'); ?>
          <div class="IntegrationChooser">
             <?php
                echo $this->Form->Open(array(
@@ -42,7 +42,7 @@
          $('select.IntegrationChooser').bind('change',function(e){
             var Chooser = $(e.target);
             var SliceElement = $('div.IntegrationManagerConfigure');
-            var SliceObj = SliceElement.attr('Slice');
+            var SliceObj = SliceElement.prop('Slice');
             
             var ChooserVal = Chooser.val();
             var ChosenURL = (ConfigureList[ChooserVal]) ? ConfigureList[ChooserVal] : ((ConfigureList[ChooserVal] != 'undefined') ? '/dashboard/settings/proxyconnect/integrate/'+ChooserVal : false);
@@ -51,6 +51,21 @@
          });
       });
    </script>
+   
+   <style type="text/css">
+      .VanillaConfig .ProxyConnectManualSettings span {
+         color: #7A7A7A;
+      }
+      .VanillaConfig .HighlightBox.TestSettings {
+         margin-top: 20px;
+      }
+      .VanillaConfig .HighlightBox p {
+         margin: 15px 0px 0px 0px;
+      }
+      .VanillaConfig .HighlightBox p .Button {
+         margin-left: 0px;
+      }
+   </style>
    
    <?php
       $IntegrationSuffix = (!$this->Data('PreFocusIntegration')) ? NULL : "/".$this->Data('PreFocusIntegration');

@@ -13,9 +13,13 @@
                echo $this->Form->Hidden('AuthenticationKey', $this->ConsumerKey);
             ?>
             <div>
-               <div class="Box HighlightBox"><?php echo T("If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin's configuration screen."); ?></div>
+               <div class="Box HighlightBox">
+                  <?php 
+                     echo T("ProxyConnect.RimBlurb", "If you are using ProxyConnect with an officially supported remote application plugin such as our wordpress-proxyconnect plugin, these values will be available in that plugin's configuration screen.");
+                  ?>
+               </div>
             </div>
-            <ul>
+            <ul class="ProxyConnectManualSettings">
                <li><?php
                   echo $this->Form->Label(T('Main Site URL'), 'Url');
                   echo $this->Form->TextBox('URL');
@@ -43,10 +47,17 @@
                ?></li>
             </ul>
             <?php
-               echo $this->Form->Close('Save', '', array(
+               echo $this->Form->Close('Save Settings', '', array(
                                  'class' => 'SliceSubmit Button'
                               ));
             ?>
+            
+            <div class="Box HighlightBox TestSettings">
+               <?php
+                  echo T("ProxyConnect.TestSettings", "Once you have configured ProxyConnect below, <b>and saved your changes</b>, you can test your new settings by pressing 'Test ProxyConnect Settings'");
+                  echo Wrap(Anchor("Test ProxyConnect Settings","/settings/proxyconnect/test","Button"), 'p');
+               ?>
+            </div>
          </td>
          
          <td class="RemoteConfig">

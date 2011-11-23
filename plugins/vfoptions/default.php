@@ -16,6 +16,16 @@ Gdn_LibraryMap::SafeCache('library','class.tokenauthenticator.php',dirname(__FIL
 class VFOptionsPlugin implements Gdn_IPlugin {
 
    public function __construct() {
+      $ForumName = Gdn::Request()->Host();
+
+      $HostingDomain = C('VanillaForums.Hostname', 'vanillaforums.com');
+      $RegexHostingDomain = str_replace('.','\.', $HostingDomain);
+      $HasCluster = preg_match("/\.cl[0-9]+\.{$RegexHostingDomain}\$/i", $ForumName);
+      if ($HasCluster) {
+         $ForumName = preg_replace("/\.cl[0-9]+\.{$RegexHostingDomain}\$/i", ".{$HostingDomain}", $ForumName);
+         SaveToConfig('Garden.AutoDomainSwitch', FALSE);
+      }
+      
       Gdn::Authenticator()->EnableAuthenticationScheme('token');
    }
    
@@ -120,7 +130,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       
       // Redirect if the domain in the url doesn't match that in the config (so
       // custom domains can't be accessed from their original subdomain).
-      if (!defined('CLIENT_NAME')) {
+      if (!defined('CLIENT_NAME') && C('Garden.AutoDomainSwitch', TRUE)) {
          $Domain = Gdn::Config('Garden.Domain', '');
          $ServerName = ArrayValue('SERVER_NAME', $_SERVER, '');
          if ($ServerName == '')
