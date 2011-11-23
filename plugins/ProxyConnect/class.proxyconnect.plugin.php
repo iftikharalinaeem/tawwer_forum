@@ -394,7 +394,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $LandingRequest = Gdn_Request::Create()->FromImport(Gdn::Request())
          ->WithURI("/dashboard/entry/signin")
          ->WithCustomArgs(array(
-            'Landing'   => NULL
+            'Landing'   => TRUE
          ));
       return Gdn::Dispatcher()->Dispatch($LandingRequest);
    }
