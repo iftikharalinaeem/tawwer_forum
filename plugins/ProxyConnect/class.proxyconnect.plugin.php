@@ -370,7 +370,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             if ($AllowCallout)
                Redirect($SigninURL,302);
             else
-               return;
+               Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
             
          }
       } else {
@@ -383,7 +383,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             if ($AllowCallout)
                Redirect($SigninURL,302);
             else
-               return;
+               Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
          }
       }
       exit();
