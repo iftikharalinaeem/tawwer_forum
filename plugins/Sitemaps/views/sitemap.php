@@ -11,7 +11,7 @@ foreach ($this->Data('Urls') as $Url) {
    for ($i = 1; $i <= $PageCount; $i++) {
       $Loc = str_replace('{Page}', 'p'.$i, $Url['Loc']);
       
-      echo '<sitemap>';
+      echo '<url>';
       echo '<loc>'.$Loc.'</loc>';
       if (GetValue('LastMod', $Url))
          echo '<lastmod>'.date('c', strtotime($Url['LastMod'])).'</lastmod>';
@@ -19,7 +19,7 @@ foreach ($this->Data('Urls') as $Url) {
          echo '<changefreq>'.$Url['ChangeFreq'].'<changefreq>';
       if (GetValue('Priority', $Url))
          echo '<priority>'.$Url['Priority'].'</priority>';
-      echo "</sitemap>\n";
+      echo "</url>\n";
       $Total++;
       
       if ($Total >= 50000)

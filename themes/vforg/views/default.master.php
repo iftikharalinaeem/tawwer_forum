@@ -16,13 +16,13 @@ $Session = Gdn::Session();
          <a href="/"><i class="Sprite SpriteLogo"><span>Vanilla Forums</span></i></a>
       </div>
       <div class="VFMenu">
-			<div class="Home"><?php echo Anchor('Home', '/', ''); ?></div>
-			<div class="Addons"><?php echo Anchor('Addons', '/addons'); ?></div>
-			<div class="Community"><?php echo Anchor('Community', '/discussions'); ?></div>
-			<div class="Documentation"><?php echo Anchor('Documentation', '/docs'); ?></div>
-			<div class="Blog"><?php echo Anchor('Blog', 'http://vanillaforums.com/blog'); ?></div>
-			<div class="Hosting"><?php echo Anchor('Hosting', 'http://vanillaforums.com'); ?></div>
-			<div class="Download"><?php echo Anchor('Download', '/download'); ?></div>
+			<div class="Home" title="An overview of Vanilla."><?php echo Anchor('Home', '/', ''); ?></div>
+			<div class="Addons" title="Browse Vanlla addons."><?php echo Anchor('Addons', '/addons'); ?></div>
+			<div class="Community" title="Get support from other people that use Vanilla."><?php echo Anchor('Community', '/discussions'); ?></div>
+			<div class="Documentation" title="Read through Vanilla's documentation."><?php echo Anchor('Documentation', '/docs'); ?></div>
+			<div class="Blog" title="See what the Vanilla team is up to."><?php echo Anchor('Blog', 'http://vanillaforums.com/blog'); ?></div>
+			<div class="Hosting" title="Host with us!"><?php echo Anchor('Hosting', 'http://vanillaforums.com'); ?></div>
+			<div class="Download" title="Download the latest version of Vanilla."><?php echo Anchor('Download', '/download'); ?></div>
       </div>
 	</div>
 	<div class="Divider"></div>

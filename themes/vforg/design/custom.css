@@ -1367,6 +1367,7 @@ body.Discussions ul.DataList div.Options {
 
 .Count {
    background-color: #286AD1;
+   text-shadow: none;
 }
 
 .DataList .Meta .Tag {
