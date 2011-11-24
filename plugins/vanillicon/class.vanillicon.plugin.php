@@ -34,7 +34,7 @@ if (!function_exists('UserPhotoDefaultUrl')) {
          $Email = GetValue('UserID', $User, 100);
       }
 
-      $PhotoUrl = 'http://vanillicon.com/'.md5($Email).'.png';
+      $PhotoUrl = 'http://vanillicon.com/'.md5($Email).'_50.png';
       return $PhotoUrl;
    }
 }
