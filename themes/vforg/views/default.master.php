@@ -1,56 +1,80 @@
+<?php
+echo '<?xml version="1.0" encoding="utf-8"?>';
+$Session = Gdn::Session();
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
 <head>
    <?php $this->RenderAsset('Head'); ?>
-   <meta name="google-site-verification" content="Y2ak1oCyCerNGT04Up_vTgn4SLsPzSNnBjnzHCB66VI" />
+   <meta name="google-site-verification" content="T7dDWEaTeqt989RCxDJTfoOkbOADnRWLLJTauXxMHVA" />
+	<meta name="alexaVerifyID" content="cn9a0DueZ_LLZItlOjDwtxnL2to" />
 </head>
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
-	<div class="Wrap">
-		<div class="Banner">
-			<div class="BannerWrapper">
-				<h1><a href="<?php echo Url('/'); ?>"><span><?php echo Gdn_Theme::Logo(); ?></span></a></h1>
-				<ul>
-					<!-- Put your own menu items here -->
-					<li class="Home"><?php echo Anchor('Home', '/'); ?></li>
-					<li class="Features"><?php echo Anchor('Features', '/features'); ?></li>
-					<li class="Addons"><?php echo Anchor('Addons', '/addons'); ?></li>
-					<li class="Community"><?php echo Anchor('Community', '/discussions'); ?></li>
-					<li class="Documentation"><?php echo Anchor('Documentation', '/docs'); ?></li>
-					<li class="Blog"><?php echo Anchor('Blog', 'http://vanillaforums.com/blog'); ?></li>
-					<li class="Services"><?php echo Anchor('Services', '/services'); ?></li>
-					<li class="Download"><?php echo Anchor('Download', '/download'); ?></li>
-					<!-- End Menu Items -->
-				</ul>
-			</div>
-		</div>
-		<div id="Frame">
-			<div id="Body">
-				<div id="Content"><?php $this->RenderAsset('Content'); ?></div>
-				<div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
-			</div>
-			<div id="Foot">
-				<div>
-					<span style="float: right;">
-						<?php
-				      $Session = Gdn::Session();
-						$Authenticator = Gdn::Authenticator();
-						if ($Session->IsValid()) {
-							echo Anchor($Session->User->Name, '/profile/'.$Session->User->UserID.'/'.Gdn_Format::Url($Session->User->Name));
-							echo Wrap('&bull;', 'span', array('style' => 'font-size: 10px; padding: 0 10px;'));
-							echo Anchor(T('Sign Out'), $Authenticator->SignOutUrl(), 'SignOut');
-						} else {
-							$CssClass = (C('Garden.SignIn.Popup') && strpos(Gdn::Request()->Url(), 'entry') === FALSE) ? 'SignInPopup' : '';
-							echo Anchor(T('Sign In'), $Authenticator->SignInUrl($this->SelfUrl), $CssClass);
-						}
-						?>
-					</span>
-					<?php
-					$this->RenderAsset('Foot');
-					printf(Gdn::Translate('Powered by %s'), '<a href="http://vanillaforums.org"><span>Vanilla</span></a>');
-				?></div>
-			</div>
-		</div>
+<div id="Head" class="Wrapper">
+   <div class="Center">
+      <div class="Logo">
+         <a href="/"><i class="Sprite SpriteLogo"><span>Vanilla Forums</span></i></a>
+      </div>
+      <div class="VFMenu">
+			<div class="Home" title="An overview of Vanilla."><?php echo Anchor('Home', '/', ''); ?></div>
+			<div class="Addons" title="Browse Vanlla addons."><?php echo Anchor('Addons', '/addons'); ?></div>
+			<div class="Community" title="Get support from other people that use Vanilla."><?php echo Anchor('Community', '/discussions'); ?></div>
+			<div class="Documentation" title="Read through Vanilla's documentation."><?php echo Anchor('Documentation', '/docs'); ?></div>
+			<div class="Blog" title="See what the Vanilla team is up to."><?php echo Anchor('Blog', 'http://vanillaforums.com/blog'); ?></div>
+			<div class="Hosting" title="Host with us!"><?php echo Anchor('Hosting', 'http://vanillaforums.com'); ?></div>
+			<div class="Download" title="Download the latest version of Vanilla."><?php echo Anchor('Download', '/download'); ?></div>
+      </div>
 	</div>
-	<?php $this->FireEvent('AfterBody'); ?>
+	<div class="Divider"></div>
+	<div class="SubNav Wrapper">
+		<div class="Center"><?php
+			// echo Anchor('Community Discussions', '/discussions', 'Home');
+			echo '&nbsp;';
+			echo Gdn_Theme::Link('dashboard');
+			echo Gdn_Theme::Link('profile', 'Profile', '<a href="%url" class="Profile">Profile</a>');
+			$Text = 'Sign In';
+			$Link = SignInUrl();
+			if ($Session->IsValid()) {
+				$Text = 'Sign Out';
+				$Link = SignOutUrl();
+			}
+			echo Anchor($Text, $Link, 'Entry');
+		?></div>
+	</div>
+</div>
+
+   <div id="Frame">
+      <div id="Body">
+         <div id="Content"><?php
+			/*
+			if (in_array(strtolower($this->ControllerName), array('discussionscontroller', 'categoriescontroller'))) {
+				echo '<div class="SearchForm">';
+				$Form = Gdn::Factory('Form');
+				$Form->InputPrefix = '';
+				echo 
+					$Form->Open(array('action' => Url('/search'), 'method' => 'get')),
+					$Form->TextBox('Search'),
+					$Form->Button('Search', array('Name' => '')),
+					$Form->Close()
+					.'</div>';
+			}
+			*/
+			$this->RenderAsset('Content');
+			?></div>
+         <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
+      </div>
+   </div>
+
+<div id="Foot" class="Foot Wrapper">
+	<div class="Center">
+      <?php
+      // echo Anchor('Addons', '/addons');
+      // echo Anchor('Contact Us', '/page/contact');
+      echo Anchor('Host Your Community With Us', 'http://vanillaforums.com');		
+		$this->RenderAsset('Foot');
+      ?>
+	</div>
+</div>
+<?php $this->FireEvent('AfterBody'); ?>
 </body>
 </html>

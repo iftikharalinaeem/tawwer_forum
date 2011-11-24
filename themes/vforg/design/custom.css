@@ -12,6 +12,18 @@
 	src: url('fonts/Archer-Semibold-Pro.otf');
 }
 
+@font-face {
+	font-family: Aarcher;
+   font-weight: normal;
+	src: url('fonts/Archer-Medium-Pro.otf');
+}
+
+@font-face {
+	font-family: Aarcher;
+	font-weight: bold;
+	src: url('fonts/Archer-Semibold-Pro.otf');
+}
+
 a {
    color: #045dcd;
 }
@@ -19,7 +31,7 @@ a:hover {
    color: #ff0084;
 }
 
-/* ---- General Styles ---- */
+/* ---- General Styles ---- 
 #Content h1,
 #Content h2,
 #Content h3,
@@ -28,7 +40,6 @@ a:hover {
    color: #744000;
    font-size: 130%;
    font-weight: bold;
-/*	border-bottom: 1px solid #EED3A2;*/
 	padding: 0;
 	margin-bottom: 4px;
 }
@@ -45,34 +56,12 @@ a:hover {
 #Content h5 {
    font-size: 80%;
 }
+*/
 
 a.Button,
 .Button {
 	color:#583100;
 }
-
-a.GreenButton,
-a.BigButton,
-a.BlueButton {
-   background: url('images/bg-button-blue.png') 0 -140px repeat-x;
-   background:-webkit-gradient(linear, center bottom, center top, from(#2465cf), to(#458fdd));
-	background:-moz-linear-gradient(top, #458fdd, #2465cf);
-	-pie-background:linear-gradient(top, #458fdd, #2465cf);
-	background:linear-gradient(top, #458fdd, #2465cf);
-   
-   border: solid 1px #2A529A;
-   
-   box-shadow: 0 1px 0 #77C2ED inset;
-   
-	color: #FFFFFF;
-	text-shadow:0 1px 1px #111196;
-}
-a.GreenButton:hover,
-a.BigButton:hover,
-a.BlueButton:hover {
-   color: #fff;
-}
-
 .Button:hover {
 	text-decoration: none;
 }
@@ -89,7 +78,7 @@ a.BlueButton:hover {
 div#Content {
 	margin-bottom: 0;
 }
-div#Foot {
+/*div#Foot {
    color: #777;
    padding: 0;
    margin: 30px 0 0;  
@@ -110,6 +99,7 @@ div#Foot div a:hover {
 	text-decoration: none;
 	color: #B76600;
 }
+*/
 
 /* Sprites */
 i.Sprite {
@@ -164,7 +154,209 @@ i.SpriteFour { background-position: 0 -126px; }
 i.SpriteFive { background-position: 0 -148px; }
 
 /* ---- Banner ---- */
+i.Sprite {
+	display: inline-block;
+	background-image: url('images/sprites.png');
+	background-repeat: no-repeat;
+}
+i.Sprite span {
+	display: none !important;
+}
+i.SpriteLogo {
+	height: 40px;
+	width: 142px;
+	background-position: top left;
+}
 
+/* MENU */
+.VFMenu {
+   padding: 10px 0 4px;
+}
+.VFMenu div {
+    display: inline;
+    padding-left: 3px;
+}
+a.BigButton,
+.BlueButton,
+.OrangeButton,
+.GreenButton,
+.VFMenu a {
+	background: url("images/sprite-menu.png") 0 0 repeat-x;
+	display: inline-block;
+	overflow: hidden;
+	font-weight: bold;
+	line-height: 2.5;
+	padding: 0 10px 0 10px;
+	height: 30px;
+	font-size: 12px;
+	text-shadow: 0 1px 1px #FEE369;
+	color: #744000;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border: 1px solid #ce3601;
+}
+.OrangeButton:hover,
+.VFMenu a:hover {
+	background-position: 0 -40px;
+}
+.OrangeButton:focus,
+body.Addons .VFMenu .Addons a,
+body.Pages .VFMenu .Documentation a,
+body#vforg_home_index .VFMenu .Home a,
+body.Vanilla .VFMenu .Community a,
+.VFMenu a:focus {
+	border: 1px solid #c5570d;
+	border-top: 1px solid #893907;
+	border-bottom: 1px solid #fdb45a;
+	background-position: 0 -80px;
+	text-shadow: 0 1px 1px #4C2305;
+	color: #fff;
+}
+a.BigButton,
+.BlueButton,
+.VFMenu .Hosting a {
+	background-position: 0 -120px;
+	text-shadow: 0 1px 1px #111196;
+	color: #ffffff;
+	border: 1px solid #045dcd;
+}
+a.BigButton:hover,
+.BlueButton:hover,
+.VFMenu .Hosting a:hover {
+	background-position: 0 -160px;
+	color: #fff;
+}
+a.BigButton:focus,
+.BlueButton:focus,
+.VFMenu .Hosting a:focus {
+	background: url("images/sprite-menu.png") 0 -200px repeat-x !important;
+	border: 1px solid #045ECE;
+	border-top: 1px solid #0657b9;
+	border-bottom: 1px solid #89d8f7;
+	text-shadow: 0 1px 1px #003679;
+	color: #fff;
+}
+.BlueButton {
+	height: auto;
+}
+a.BigButton {
+	height: auto;
+	font-size: 14px;
+	display: block;
+}
+.GreenButton,
+.VFMenu .Download a {
+	background-position: 0 -240px;
+	text-shadow: 0 1px 1px #1d4909;
+	color: #ffffff;
+	border: 1px solid #237300;
+}
+.GreenButton:hover,
+.VFMenu .Download a:hover {
+	background-position: 0 -280px;
+}
+.GreenButton:focus,
+.VFMenu .Download a:focus {
+	border: 1px solid #237300;
+	border-top: 1px solid #1d4909;
+	border-bottom: 1px solid #7de702;
+	background-position: 0 -320px;
+	text-shadow: 0 1px 1px #153607;
+	color: #fff;
+}
+
+
+div.Wrapper {
+   text-align: center;
+}
+div.Center {
+   text-align: left;
+   width: 960px;
+   margin: 0 auto;
+}
+#Head div.Center {
+   text-align: right;
+}
+#Head div.Logo {
+	margin: 6px 0 0 0;
+   float: left;
+}
+#Head {
+   background: url('images/bg-title.png') top left repeat-x #014381;
+}
+#Head .Logo img {
+   padding: 10px 0 0;
+}
+.Divider {
+	height: 1px;
+	border-top: 2px solid #27b1d9;
+	background: #66deff;
+	border-bottom: 1px solid #7b939a;
+}
+body.Info .SubNav {
+	display: none;
+}
+body.Info #Frame {
+	border-top: 1px solid #b9dde8;
+}
+.SubNav {
+	border-top: 1px solid #b9dde8;
+	background: #FEF7DF;
+	border-bottom: 1px solid #EED3A2;
+	padding: 6px 0;
+}
+.SubNav .Center {
+	position: relative;
+}
+.SubNav a {
+	font-size: 12px;
+	color: #999;
+	margin: 0 0 0 20px;
+	font-weight: bold;
+}
+.SubNav a.Entry {
+	font-weight: normal;
+}
+body.Account .SubNav a.Account,
+body.Profile .SubNav a.Profile,
+body.Vanilla .SubNav a.Home {
+	color: #744000;
+}
+.SubNav a:hover {
+	color: #744000;
+	text-decoration: underline;
+}
+.SubNav a.Home {
+	position: absolute;
+	left: 0;
+	margin: 0;
+}
+.SubNav span.Alert {
+	font-size: 9px;
+   background: #744000;
+}
+/* Hide the SubNav on select pages */
+body.Home .SubNav {
+	display: none;
+}
+
+.Foot {
+	background: transparent;
+	border: none;
+}
+.Foot a {
+	margin: 0 8px;
+   padding: 2px 4px;	
+}
+#Foot div {
+	text-align: center;
+}
+
+
+
+
+/*
 .Banner {
 	background: url('images/bg-title.png') top center repeat-x #e15b10;
 	text-align: center;
@@ -260,7 +452,9 @@ body.Activity .Banner ul li.Community a {
 	color: #fff;
 	text-shadow: 0 1px 1px #4C2305;
 }
+*/
 /* Reposition sprites for splash page/alternate bg */
+/*
 body#vforg_home_index .Banner ul li { background-position: left -128px; }
 body#vforg_home_index .Banner ul li a { background-position: right -128px; }
 body#vforg_home_index .Banner ul li:hover { background-position: left -160px; }
@@ -277,7 +471,9 @@ body#vforg_home_index .Banner ul li {
 body#vforg_home_index .Banner ul li a {
 	padding: 0 8px 0 4px;
 }
+*/
 /* Homepage Customizations */
+/*
 body#vforg_home_index {
 	background: url('images/bg-fade.png') top left repeat-x #f1e5ca;
 }
@@ -416,10 +612,11 @@ a.Get strong {
 	color: #fff;
    text-shadow: 0 1px 1px #00007e;
 }
+*/
 /* News & Events */
+/*
 div.NewsAndEvents {
 	margin: 0;
-	/* background: url('images/bg-horizontal-div.png') top center no-repeat; */
 }
 div.News,
 div.Events {
@@ -462,29 +659,7 @@ div.Feed a:hover {
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 }
-
-
-/* Foot */
-div.Foot {
-	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
-	font-size: 12px;
-	clear: both;
-}
-div.Foot div.Center {
-	text-align: center;
-}
-div.Foot a {
-	padding: 2px 4px;
-	margin: 0 8px;
-	color: #744000;
-}
-div.Foot a:hover {
-	color: #ffffff;
-	background: #CB7100;
-	-moz-border-radius: 2px;
-}
-
-
+*/
 
 
 /* Move Errors Back Into Page */
@@ -894,8 +1069,11 @@ div.Examples div.Bad strong { background: #f00; }
 
 
 /* Download Form */
-body#vforg_download_index #Frame {
-	background: url('images/bg-divider.png') center 20px no-repeat;
+body.Download #Content {
+	width: auto;
+}
+body.Download #Panel {
+	display: none;
 }
 .DownloadForm,
 .HostingForm {
@@ -909,13 +1087,10 @@ body#vforg_download_index #Frame {
 }
 #Content .DownloadForm h1,
 #Content .HostingForm h1 {
-	padding: 0 0 30px 60px;
+	padding: 0 0 0 60px;
 	color: #0155ba;
 	border: none;
 	font-size: 25px;
-}
-#Content .DownloadForm h1 {
-	padding-bottom: 25px;
 }
 i.SpriteTools,
 i.SpriteSuit {
@@ -953,7 +1128,6 @@ a.RenderedDownloadButton span {
 	display: none;
 }
 a.RenderedDownloadButton {
-	margin-top: 23px;
 	display:block;
 	height: 60px;
 	width: 370px;
@@ -1052,149 +1226,6 @@ ul.DataList div.Meta a.Category {
    line-height: 100%;
    margin: 2px 0;
    padding: 1px 3px;
-}
-
-/* Features Page */
-i.SpriteWand,
-i.SpriteColors,
-i.SpriteBars {
-	float: left;
-	display: block;
-	margin-right: 6px;
-	background-image: url('images/sprite-icons.png');
-	background-repeat: no-repeat;
-}
-i.SpriteWand {
-	height: 41px;
-	width: 41px;
-	background-position: -81px 0;
-}
-i.SpriteColors {
-	height: 44px;
-	width: 42px;
-	background-position: -127px 0;
-}
-i.SpriteBars {
-	height: 46px;
-	width: 41px;
-	background-position: -173px 0;
-}
-.PlansWrapper {
-	padding-top: 30px;
-}
-div.SubHead {
-	clear: both;
-}
-div.Feature,
-.FeatureSections {
-	text-align: left;
-	float: left;
-	width: 100%;
-	background: url('images/bg-shade.png') top left repeat-x;
-	padding: 10px 0;
-	margin: 20px 0 4px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-   box-shadow: 0 1px 0 #fbf7ea;
-	-moz-box-shadow: 0 1px 0 #fbf7ea;
-	-webkit-box-shadow: 0 1px 0 #fbf7ea;
-}
-.FeatureSections {
-	margin: 20px 0 40px;
-}
-div#Features {
-	color: #744000;
-}
-div#Features ol li {
-	list-style: decimal;
-}
-div#Features h2 {
-	font-size: 25px;
-	border: none;
-}
-div#Features h4 {
-	font-size: 22px;
-	border: none;
-}
-div#Features div.Feature h4 {
-	padding-left: 12px;
-}
-div.Feature {
-	padding: 10px 0 0;
-	text-align: left;
-}
-.FeatureSections div {
-	float: left;
-	width: 290px;
-	margin: 0 15px;
-}
-.PlansWrapper {
-	padding-top: 30px;
-	clear: left;
-}
-.FeaturePage .Feature {
-	height: auto;
-	margin-bottom: 20px;
-}
-.FeaturePage .Feature div {
-	float: none;
-	width: auto;
-	margin: 0;
-}
-.Feature h4,
-.FeatureSections h4 {
-	margin: 0;
-	padding: 0;
-	color: #fff;
-	font-weight: 400;
-	text-shadow: 0 1px 0 #000;
-	font-size: 22px;
-	line-height: 2;
-}
-div.Feature h4 {
-	padding: 0 10px;	
-}
-.Feature ol {
-	margin: 0 32px;
-	padding: 0 50px;
-}
-.FeaturePage p,
-.Feature li,
-.FeatureSections p.About {
-	clear: left;
-	font-size: 13px;
-	line-height: 1.4;
-	text-shadow: 0 1px 0 #fff;
-	margin: 0;
-	padding: 6px 3px 10px;
-}
-.Feature li,
-.FeaturePage .Feature p.About {
-	font-weight: bold;
-}
-.Feature img {
-	padding-left: 10px;
-}
-.FeaturePage .Feature p {
-	padding: 0 64px;
-}
-.FeaturePanel span.Description {
-	display: block;
-	clear: both;
-	padding: 0 0 0 35px;
-}
-.FeaturePanel span.Description strong {
-	font-weight: bold;
-	font-size: 16px;
-	display: block;
-	padding: 30px 0 0;
-}
-.FeaturePanel span.Description p {
-	font-weight: bold;
-	padding: 0;
-}
-.FeaturePanel img {
-	float: right;
 }
 
 .Pages #Panel {
@@ -1336,6 +1367,7 @@ body.Discussions ul.DataList div.Options {
 
 .Count {
    background-color: #286AD1;
+   text-shadow: none;
 }
 
 .DataList .Meta .Tag {
