@@ -19,7 +19,7 @@ $ExistingDomain = $this->Data('Site.Domain', FALSE);
       <?php if ($ExistingDomain) { ?>
       <div class="ExistingDomains"><h2>You already have a custom domain</h2><?php 
          echo '<div class="ExistingDomain">';
-         echo Anchor("remove", 'settings/customdomain/remove');
+         echo Anchor("remove", "settings/customdomain/remove/{$ExistingDomain}");
          echo Wrap($ExistingDomain, 'span');
          echo '</div>';
       ?></div>

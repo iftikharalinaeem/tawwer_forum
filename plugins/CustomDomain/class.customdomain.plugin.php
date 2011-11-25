@@ -70,7 +70,6 @@ class CustomDomainPlugin extends Gdn_Plugin {
       $Site = Infrastructure::Site();
       $Sender->SetData('Site', $Site);
       $Sender->SetData('ForumName', Infrastructure::Client());
-      $ExistingDomain = GetValue('Domain', $Site, FALSE);
       
       $ClusterName = Infrastructure::Cluster();
       $ClusterLoadbalancer = Infrastructure::Server('www');
@@ -89,6 +88,8 @@ class CustomDomainPlugin extends Gdn_Plugin {
             $this->CheckAvailable($RequestedDomain);
             $this->CheckConfiguration($RequestedDomain);
             $this->CustomDomain($RequestedDomain);
+            $Site['Domain'] = $RequestedDomain;
+            $Sender->SetData('Site', $Site);
             
          } catch (Exception $Ex) {
             $Sender->SetData('Failed', TRUE);
@@ -152,28 +153,42 @@ class CustomDomainPlugin extends Gdn_Plugin {
             throw new RecordConfigurationException("No valid CNAME exists for this {$DomainType}");
       }
       
-      if ($ExpectedRecordType == 'a') {
-         $LookupHostname = dns_get_record($Domain, DNS_A);
-         $Matched = FALSE;
-         foreach ($LookupHostname as $DnsRecord) {
-            $Target = GetValue('target', $DnsRecord);
-            if ($Target == $LoadbalancerAddress) $Matched = TRUE;
-         }
-         
-         if (!$Matched)
-            throw new RecordConfigurationException("No valid A Record exists for this {$DomainType}");
-      }
+//      if ($ExpectedRecordType == 'a') {
+//         $LookupHostname = dns_get_record($Domain, DNS_A);
+//         $Matched = FALSE;
+//         foreach ($LookupHostname as $DnsRecord) {
+//            $Target = GetValue('target', $DnsRecord);
+//            if ($Target == $LoadbalancerAddress) $Matched = TRUE;
+//         }
+//         
+//         if (!$Matched)
+//            throw new RecordConfigurationException("No valid A Record exists for this {$DomainType}");
+//      }
       
       return TRUE;
    }
    
    public function Controller_Remove($Sender) {
       
-      // Do removal
+      $Site = Infrastructure::Site();
+      $SiteID = GetValue('SiteID', $Site);
+      $SiteDomain = GetValue('Domain', $Site);
+      
+      $RemoveDomainQuery = Communication::DataServerRequest('api/forum/removedomain')
+         ->AutoToken()
+         ->Parameter('SiteID', $SiteID)
+         ->Parameter('Domain', $SiteDomain)
+         ->Send();
+      
+      if (Communication::ResponseClass($RemoveDomainQuery, '2xx')) {
+         $CookieDomain = GetValueR('CookieDomain', $RemoveDomainQuery);
+         $this->ReAuthenticate($CookieDomain);
+      }
+      
       Redirect(Url('settings/customdomain'));
    }
    
-   public function CustomDomain($Domain) {
+   protected function CustomDomain($Domain) {
       $SiteID = C('VanillaForums.SiteID', 0);
       $SetDomainQuery = Communication::DataServerRequest('api/forum/setdomain')
          ->AutoToken()
@@ -182,7 +197,10 @@ class CustomDomainPlugin extends Gdn_Plugin {
          ->Send();
       
       if (!Communication::ResponseClass($SetDomainQuery, '2xx'))
-         throw new Exception("Failed to set custom domain. Please contact support.");
+         throw new CommunicationErrorException("Failed to set custom domain. Please contact support.", $SetDomainQuery);
+      
+      $CookieDomain = GetValueR('CookieDomain', $SetDomainQuery);
+      $this->ReAuthenticate($CookieDomain);
       
       return TRUE;
    }
@@ -190,28 +208,18 @@ class CustomDomainPlugin extends Gdn_Plugin {
    /**
     * Re-authenticates a user with the current configuration.
     */
-   private function _ReAuthenticate($RedirectTo = '') {
+   private function ReAuthenticate($CookieDomain) {
       // If there was a request to reauthenticate (ie. we've been shifted to a custom domain and the user needs to reauthenticate)
-      // Check the user's transientkey to make sure they're not a spoofer, and then authenticate them.
       $UserModel = Gdn::UserModel();
-      $AdminUser = $UserModel->GetSession(1);
-      $Attributes = Gdn_Format::Unserialize($AdminUser->Attributes);
-      $TransientKey = is_array($Attributes) ? ArrayValue('TransientKey', $Attributes) : FALSE;
-      if ($TransientKey == $PostBackKey) {
-         $Identity = new Gdn_CookieIdentity();
-         $Identity->Init(array(
-            'Salt' => Gdn::Config('Garden.Cookie.Salt'),
-            'Name' => Gdn::Config('Garden.Cookie.Name'),
-            'Domain' => Gdn::Config('Garden.Cookie.Domain')
-         ));
-         $Identity->SetIdentity(1, TRUE);
-         
-         // Now that the identity has been set, redirect again so that the page loads properly
-         if ($RedirectTo != '') {
-            $this->_CloseDatabase();
-            Redirect($RedirectTo);
-         }
-      }
+      $LoggedInUser = Gdn::Session()->User;
+      
+      $Identity = new Gdn_CookieIdentity();
+      $Identity->Init(array(
+         'Salt' => Gdn::Config('Garden.Cookie.Salt'),
+         'Name' => Gdn::Config('Garden.Cookie.Name'),
+         'Domain' => $CookieDomain
+      ));
+      $Identity->SetIdentity(Gdn::Session()->UserID, TRUE);
    }
    
    /**
