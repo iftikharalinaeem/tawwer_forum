@@ -157,7 +157,7 @@ class CustomDomainPlugin extends Gdn_Plugin {
          $LookupHostname = dns_get_record($Domain, DNS_A);
          $Matched = FALSE;
          foreach ($LookupHostname as $DnsRecord) {
-            $Target = GetValue('target', $DnsRecord);
+            $Target = GetValue('ip', $DnsRecord);
             if ($Target == $LoadbalancerAddress) $Matched = TRUE;
          }
          
