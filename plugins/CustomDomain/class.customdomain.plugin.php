@@ -153,17 +153,17 @@ class CustomDomainPlugin extends Gdn_Plugin {
             throw new RecordConfigurationException("No valid CNAME exists for this {$DomainType}");
       }
       
-//      if ($ExpectedRecordType == 'a') {
-//         $LookupHostname = dns_get_record($Domain, DNS_A);
-//         $Matched = FALSE;
-//         foreach ($LookupHostname as $DnsRecord) {
-//            $Target = GetValue('target', $DnsRecord);
-//            if ($Target == $LoadbalancerAddress) $Matched = TRUE;
-//         }
-//         
-//         if (!$Matched)
-//            throw new RecordConfigurationException("No valid A Record exists for this {$DomainType}");
-//      }
+      if ($ExpectedRecordType == 'a') {
+         $LookupHostname = dns_get_record($Domain, DNS_A);
+         $Matched = FALSE;
+         foreach ($LookupHostname as $DnsRecord) {
+            $Target = GetValue('target', $DnsRecord);
+            if ($Target == $LoadbalancerAddress) $Matched = TRUE;
+         }
+         
+         if (!$Matched)
+            throw new RecordConfigurationException("No valid A Record exists for this {$DomainType}");
+      }
       
       return TRUE;
    }
