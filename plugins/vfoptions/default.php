@@ -78,8 +78,6 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $Menu->RemoveLink('Site Settings', T('Statistics'));
 
       $Menu->AddLink('Add-ons', T('Browse Addons').' <span class="New">New</span>', 'dashboard/settings/addons', 'Garden.Settings.Manage');
-      $Menu->AddItem('Vanilla Support', 'Vanilla Support', FALSE, array('class' => 'Support'));
-      $Menu->AddLink('Vanilla Support', FALSE, '/dashboard/settings/vanillasupport', 'Garden.AdminUser.Only');
 		
 		// Add stats menu option.
 //      if (C('Garden.Analytics.Advanced')) {
@@ -581,85 +579,6 @@ pageTracker._trackPageview();
          $Sender->View = PATH_PLUGINS.'/vfoptions/views/registration.php';
    }
 
-   /**
-    * Creates a Support form that customers can use to send us support requests.
-    */
-   public function SettingsController_VanillaSupport_Create($Sender) {
-      $Sender->Permission('Garden.AdminUser.Only');
-      $Sender->Title('Vanilla Support');
-      $Sender->AddSideMenu('dashboard/settings/vanillasupport');
-		$DateLastSupport = C('VanillaForums.DateLastSupportRequest');
-		
-		// Reset the # of used support requests if in a new month since the last support request
-		$UsedSupportRequests = (!$DateLastSupport || date('m', $DateLastSupport) != date('m') ? 0 : C('VanillaForums.UsedSupportRequests', 0));
-		$Sender->SetData('UsedSupportRequests', $UsedSupportRequests);
-		
-		// See how many support requests this account has per month
-      $SiteID = C('VanillaForums.SiteID', '0');
-      $FeatureData = $this->_GetDatabase()->SQL()
-         ->Select('sf.*, f.Name, f.Attributes')
-         ->From('SiteFeature sf')
-         ->Join('Feature f', 'sf.FeatureID = f.FeatureID')
-         ->Where('sf.SiteID', $SiteID)
-         ->Where('sf.Selected', '1')
-         ->Get();
-
-		$FeatureAttribs = array();   
-      foreach ($FeatureData as $Feature) {
-			$Items = unserialize($Feature->Attributes);
-			if (is_array($Items))
-				$FeatureAttribs  = array_merge($FeatureAttribs, $Items);
-		}
-		$Sender->SetData('SupportRequests', GetValue('SupportRequests', $FeatureAttribs, 0));
-      
-      $Session = Gdn::Session();
-		$Sender->Form = new Gdn_Form();
-		if (!$Sender->Form->AuthenticatedPostback()) {
-			$Sender->Form->SetFormValue('FromEmail', $Session->User->Email);
-		} else {
-			// Validate that all fields are populated
-			$FromEmail = trim($Sender->Form->GetFormValue('FromEmail'));
-			if (!ValidateEmail($FromEmail))
-				$Sender->Form->AddError('You must provide your email address.');
-			
-			$Subject = trim($Sender->Form->GetFormValue('Subject'));
-			if (StringIsNullOrEmpty($Subject))
-				$Sender->Form->AddError('You must provide a summary of your problem.');
-
-			$Message = trim($Sender->Form->GetFormValue('Message'));
-			if (StringIsNullOrEmpty($Message))
-				$Sender->Form->AddError('You must provide a detailed summary of your problem.');
-
-			// Build the email to be sent to support
-			
-			// Include: SiteID, Url, Browser
-			$Browser = $Sender->Form->GetFormValue('Browser');
-			
-			$Email = new Gdn_Email();
-			$Email->Subject(sprintf(T('[%1$s] %2$s'), $SiteID, $Subject));
-			$Email->From($FromEmail, $FromEmail);
-			$Email->To('support@vanillaforums.com', 'VanillaForums.com Support');
-			$Email->Message(
-				$Message."\r\n"
-				."\r\nUrl: ".Url('/', TRUE)
-				."\r\nBrowser: ".$Browser
-				."\r\nUsername: ".$Session->User->Name
-				."\r\nSiteID: ".$SiteID
-			);
-			
-			try {
-				$Email->Send();
-				SaveToConfig('VanillaForums.UsedSupportRequests', $UsedSupportRequests+1);
-				SaveToConfig('VanillaForums.DateLastSupportRequest', mktime());
-			} catch (Exception $ex) {
-				// GIVE THEM THE support email address!
-				$Sender->Form->AddError('Ooops. We had a problem sending your support request. Please use our support email address instead: support@vanillaforums.com');
-			}
-		}
-		
-		$Sender->Render('vanillasupport','','plugins/vfoptions');
-   }
-   
    /**
     * No setup required.
     */
