@@ -6,7 +6,7 @@
 $PluginInfo['CustomTheme'] = array(
    'Name' => 'Custom Theme',
    'Description' => 'Allows administrators to customize the CSS & master HTML template of the currently enabled theme.',
-   'Version' => '2.1',
+   'Version' => '2.1.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
@@ -188,6 +188,10 @@ class CustomThemePlugin implements Gdn_IPlugin {
 
 	}
 	
+   /**
+    *
+    * @param Gdn_Controller $Sender 
+    */
    public function SettingsController_CustomTheme_Create($Sender) {
 		$Session = Gdn::Session();
 		$UserModel = Gdn::UserModel();
@@ -201,8 +205,9 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			Redirect('/settings/customtheme');
 		}		
 		
-		$Sender->AddJsFile('/js/library/jquery.autogrow.js');
-		$Sender->AddJsFile('/plugins/CustomTheme/customtheme.js');
+//		$Sender->AddJsFile('/js/library/jquery.autogrow.js');
+		$Sender->AddJsFile('customtheme.js', 'plugins/CustomTheme');
+      $Sender->AddJsFile('jquery.textarea.js', 'plugins/CustomTheme');
 		$Sender->AddCssFile('/plugins/CustomTheme/customtheme.css');
 		
 		$ThemeManager = new Gdn_ThemeManager();
