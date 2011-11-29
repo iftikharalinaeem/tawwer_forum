@@ -862,6 +862,7 @@ div.MessageForm div.Tabs li.Active a {
 }
 div.Tabs li a span {
    background-color: #286AD1;
+   display: none; /* Lincoln hid tab counts */
 }
 body.Discussions div.Tabs div.SubTab {
 	margin: 0;
