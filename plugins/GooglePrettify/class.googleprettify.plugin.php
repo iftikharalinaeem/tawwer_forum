@@ -7,7 +7,7 @@
 // Define the plugin:
 $PluginInfo['GooglePrettify'] = array(
    'Name' => 'Syntax Prettifier',
-   'Description' => 'Adds pretty syntax highlighting to source code posted in your forum.',
+   'Description' => 'Adds pretty syntax highlighting to source code posted in your forum. This is a great addon for communities that support programmers and designers.',
    'Version' => '1.0b',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
@@ -29,7 +29,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
          $LineNums = 'linenums';
       
       $Result = "jQuery(document).ready(function($) {
-   $('pre').addClass('prettyprint $LineNums');
+   $('.Message pre').addClass('prettyprint $LineNums');
    prettyPrint();
 });";
       return $Result;
