@@ -22,6 +22,7 @@ if (!is_array($AllowedPlugins))
       'SplitMerge',
       'Spoof',
       'StopForumSpam',
+      'GooglePrettify',
       'WhosOnline',
       'cleditor'
    );
