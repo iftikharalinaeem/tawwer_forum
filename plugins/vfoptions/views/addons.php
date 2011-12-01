@@ -3,9 +3,9 @@
 $AllowedPlugins = C('VFCom.AllowedPlugins');
 if (!is_array($AllowedPlugins))
    $AllowedPlugins = array(
+      'ButtonBar', 
       'embedvanilla',
       'Emotify',
-      'cleditor',
       'Facebook',
       'Twitter',
       'OpenID',
@@ -22,7 +22,9 @@ if (!is_array($AllowedPlugins))
       'SplitMerge',
       'Spoof',
       'StopForumSpam',
-      'WhosOnline'
+      'GooglePrettify',
+      'WhosOnline',
+      'cleditor'
    );
    
    // $AllowedPlugins = array('Emotify','cleditor','Facebook','Twitter','OpenID','GoogleSignIn','CustomProfileFields','Flagging','Tagging','Gravatar','vanillicon','OpenID','QnA','RoleTitle','Signatures','SplitMerge','Spoof','WhosOnline','FileUpload','Voting','Quotes','Signatures','Pockets','PostCount','LastEdited','Sitemaps','ShareThis','SEOCompanion','AllViewed','Vanoogle','TrackingCodes');
