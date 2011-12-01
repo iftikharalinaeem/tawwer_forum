@@ -103,8 +103,12 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
       }
    }
    
+   /**
+    * @param Gdn_Controller $Sender
+    * @param type $Args 
+    */
    public function Base_Render_Before($Sender, $Args) {
-      if ($Sender->MasterView != 'admin') {
+//      if ($Sender->MasterView != 'admin') {
          $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
          $Version = GetValue('Version', Gdn::PluginManager()->GetPluginInfo('AdvancedStats'));
          
@@ -113,9 +117,9 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
          else
             $Url = $AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version;
          
-         $Sender->AddJsFile($Url);
+         $Sender->AddJsFile($Url, '', array('defer' => 'defer'));
          $Sender->AddDefinition('StatsUrl', self::StatsUrl('{p}'));
-      }
+//      }
    }
    
    /**
