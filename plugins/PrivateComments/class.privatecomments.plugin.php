@@ -17,8 +17,8 @@ $PluginInfo['PrivateComments'] = array(
 /*
  * Created custom for Headway Themes. I don't approve of this workflow. -Lincoln
  *
- * @todo Correct 'new' count, maybe commentcount too
- * @todo Bug: reveals private comments after new comment
+ * It's important the admin/privileged users NOT comment while in private mode.
+ * @todo Known deficiency: Comment count will not increment for non-privileged user making private comments.
  */
 class PrivateCommentsPlugin extends Gdn_Plugin {
    /**
@@ -27,6 +27,14 @@ class PrivateCommentsPlugin extends Gdn_Plugin {
    public function PostController_DiscussionFormOptions_Handler($Sender) {
       if (CheckPermission('Plugins.PrivateCommments.View'))
          $Sender->EventArguments['Options'] .= '<li>'.$Sender->Form->CheckBox('Private', T('Private'), array('value' => '1')).'</li>';
+   }
+   
+   /**
+    * Append '[Private Mode]' to discussion titles with privacy enabled.
+    */
+   public function DiscussionController_BeforeDiscussionTitle_Handler($Sender) {
+      if ($Sender->Discussion->Private)
+         $Sender->EventArguments['DiscussionName'] .= ' ' . T('[PRIVATE MODE]');
    }
    
    /**
@@ -57,6 +65,12 @@ class PrivateCommentsPlugin extends Gdn_Plugin {
       $this->ExcludePrivateComments($Sender);
    }
    public function CommentModel_BeforeGetCount_Handler($Sender) {
+      $this->ExcludePrivateComments($Sender);
+   }
+   public function CommentModel_BeforeGetIDData_Handler($Sender) {
+      $this->ExcludePrivateComments($Sender);
+   }
+   public function CommentModel_BeforeGetNew_Handler($Sender) {
       $this->ExcludePrivateComments($Sender);
    }
    protected function ExcludePrivateComments($Sender) {
@@ -130,7 +144,7 @@ class PrivateCommentsPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_Render_Before($Sender) {
       $Sender->CssClass .= ' PrivateCommentsEnabled';
-      $Sender->AddAsset('Head', '<style>.PrivateCommentsEnabled .CommentForm a.WriteButton { content: "Write Private Comment"; }</style>');
+      $Sender->AddAsset('Head', '<style>.PrivateCommentsEnabled .CommentForm a.WriteButton:after { content: " '.T('[PRIVATE]').'"; }</style>');
    }
    
    /**
