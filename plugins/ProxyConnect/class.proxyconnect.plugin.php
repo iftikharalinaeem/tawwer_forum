@@ -195,6 +195,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
                'URL'       => $AuthenticateURL,
                'Cookies'   => TRUE
             ));
+            $Response = trim($Response);
 
             if ($Response) {
                
