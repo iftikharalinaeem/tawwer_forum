@@ -417,7 +417,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
          $ReadMode = strtolower(C("Garden.Authenticators.proxy.RemoteFormat", "ini"));
          switch ($ReadMode) {
             case 'ini':
-               $Result = @parse_ini_string($Response);
+               $Result = @parse_ini_string($Response, FALSE, INI_SCANNER_RAW);
                break;
                
             case 'json':
