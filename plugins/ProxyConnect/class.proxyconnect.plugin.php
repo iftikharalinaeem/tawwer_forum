@@ -206,7 +206,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
                $ReadMode = strtolower(C("Garden.Authenticators.proxy.RemoteFormat", "ini"));
                switch ($ReadMode) {
                   case 'ini':
-                     $Result = @parse_ini_string($Response);
+                     $Result = @parse_ini_string($Response, FALSE, INI_SCANNER_RAW);
                      break;
 
                   case 'json':
