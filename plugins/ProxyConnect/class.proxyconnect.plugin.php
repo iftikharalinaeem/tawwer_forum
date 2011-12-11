@@ -195,6 +195,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
                'URL'       => $AuthenticateURL,
                'Cookies'   => TRUE
             ));
+            $Response = trim($Response);
 
             if ($Response) {
                
@@ -203,9 +204,22 @@ class ProxyConnectPlugin extends Gdn_Plugin {
                $Sender->SetData('ConnectResponse', $Response);
                
                $ReadMode = strtolower(C("Garden.Authenticators.proxy.RemoteFormat", "ini"));
+               $Sender->SetData('ReadMode', $ReadMode);
                switch ($ReadMode) {
                   case 'ini':
-                     $Result = @parse_ini_string($Response);
+                     $IniResult = array();
+                     $RawIni = explode("\n", $Response);
+                     foreach ($RawIni as $ResponeLine) {
+                        $ResponeLine = trim($ResponeLine);
+                        if (stristr($ResponeLine, '=') === FALSE) continue;
+                        
+                        $ResponseParts = explode("=", $ResponeLine);
+                        $ResponseKey = array_shift($ResponseParts);
+                        $ResponseValue = implode("=",$ResponseParts);
+                        $IniResult[$ResponseKey] = $ResponseValue;
+                     }
+                     if (sizeof($IniResult))
+                        $Result = $IniResult;
                      break;
 
                   case 'json':

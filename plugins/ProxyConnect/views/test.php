@@ -73,7 +73,7 @@ $SiteURL = $this->Data("Provider.URL", 'Provider');
       
       if ($NoParse = $this->Data('NoParse', FALSE)) {
          echo '<div class="ErrorTest">';
-         echo T('ProxyConnect.NoParse', "Could not understand the response received 
+         echo T('ProxyConnect.NoParse', "Could not understand the <b>".$this->Data('ReadMode')."</b> response received 
             from the AuthenticateURL. Your application is not responding in a way
             that ProxyConnect understands!");
          echo '</div>';
