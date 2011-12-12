@@ -14,6 +14,7 @@ $PluginInfo['PostAnonymous'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.18b'),
    'SettingsUrl' => '/dashboard/settings/postanonymous',
    'SettingsPermission' => 'Garden.Settings.Manage',
+   'MobileFriendly' => TRUE
 );
 
 class PostAnonymousPlugin extends Gdn_Plugin {
