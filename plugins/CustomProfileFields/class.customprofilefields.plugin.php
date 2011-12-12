@@ -181,8 +181,8 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
             
             $Value = Gdn_Format::Links(htmlspecialchars($Value));
             
-				echo '<dt class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($Label).'">'.Gdn_Format::Text($Label).'</dt>';
-				echo '<dd class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($Label).'">'.$Value.'</dd>';
+				echo ' <dt class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($Label).'">'.Gdn_Format::Text($Label).'</dt> ';
+				echo ' <dd class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($Label).'">'.$Value.'</dd> ';
 			}
 		} catch (Exception $ex) {
 			// No errors
