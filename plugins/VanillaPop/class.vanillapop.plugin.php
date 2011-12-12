@@ -50,14 +50,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
       return $Result;
    }
    
-   public static function FormatPlainText($Body, $Format) {
-      $Result = Gdn_Format::To($Body, $Format);
-      
-      if ($Format != 'Text')
-         $Result = Gdn_Format::Text($Result, FALSE);
-      $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
-      return $Result;
-   }
+//   public static function FormatPlainText($Body, $Format) {
+//      $Result = Gdn_Format::To($Body, $Format);
+//      
+//      if ($Format != 'Text')
+//         $Result = Gdn_Format::Text($Result, FALSE);
+//      $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
+//      return $Result;
+//   }
    
    public static function FormatEmailBody($Body, $Route = '', $Quote = '', $Options = FALSE) {      
       // Construct the signature.
@@ -71,7 +71,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       
       if ($Quote) {
          if (is_array($Quote))
-            $Quote = self::FormatPlainText($Quote['Body'], GetValue('Format', $Quote, 'Text'));
+            $Quote = self::PlainText($Quote['Body'], GetValue('Format', $Quote, 'Text'));
          
          $Quote = "\n\n".T('You wrote:')."\n\n".self::FormatQuoteText($Quote);
       }
@@ -387,7 +387,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $CommentModel = new CommentModel();
             $CommentID = $CommentModel->Save($Data);
             if (!$CommentID) {
-               throw new Excption($CommentModel->Validation->ResultsText().print_r($Data, TRUE), 400);
+               throw new Exception($CommentModel->Validation->ResultsText().print_r($Data, TRUE), 400);
             } else {
                $CommentModel->Save2($CommentID, TRUE);
             }
@@ -402,7 +402,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $MessageModel = new ConversationMessageModel();
             $MessageID = $MessageModel->Save($Data);
             if (!$MessageID) {
-               throw new Excption($MessageModel->Validation->ResultsText().print_r($Data, TRUE), 400);
+               throw new Exception($MessageModel->Validation->ResultsText().print_r($Data, TRUE), 400);
             }
             return $MessageID;
          case 'Discussion':
@@ -715,7 +715,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       list($Type, $ID) = self::ParseRoute(GetValue('Route', $Args));
       
       $FormatData = array('Title' => C('Garden.Title'), 'Signature' => self::EmailSignature(GetValue('Route', $Args)));
-      $RegardingUserID = GetValueR('Activity.RegardingUserID', $Args);
+      $NotifyUserID = GetValueR('Activity.NotifyUserID', $Args);
       
       if (in_array($Type, array('Discussion', 'Comment', 'Conversation', 'Message'))) {
          $Email = $Args['Email']; //new Gdn_Email(); //
@@ -727,13 +727,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
                $Discussion = $DiscussionModel->GetID($ID);
                if ($Discussion) {
                   // See if the user has permission to view this discussion on the site.
-                  $CanView = Gdn::UserModel()->GetCategoryViewPermission($RegardingUserID, GetValue('CategoryID', $Discussion));
-                  $CanReply = self::CheckUserPermission($RegardingUserID, 'Email.Comments.Add');
+                  $CanView = Gdn::UserModel()->GetCategoryViewPermission($NotifyUserID, GetValue('CategoryID', $Discussion));
+                  $CanReply = self::CheckUserPermission($NotifyUserID, 'Email.Comments.Add');
                   $FormatData['Signature'] = self::EmailSignature(GetValue('Route', $Args), $CanView, $CanReply);
                   
                   $Discussion = (array)$Discussion;
-                  $Discussion['Name'] = self::FormatPlainText($Discussion['Name'], 'Text');
-                  $Discussion['Body'] = self::FormatPlainText($Discussion['Body'], $Discussion['Format']);
+                  $Discussion['Name'] = Gdn_Format::PlainText($Discussion['Name'], 'Text');
+                  $Discussion['Body'] = Gdn_Format::PlainText($Discussion['Body'], $Discussion['Format']);
                   $Discussion['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
                   $Discussion['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
                   $FormatData = array_merge($FormatData, $Discussion);
@@ -753,14 +753,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
                $Comment = $CommentModel->GetID($ID, DATASET_TYPE_ARRAY);
 
                if ($Comment) {
-                  $Comment['Body'] = self::FormatPlainText($Comment['Body'], $Comment['Format']);
+                  $Comment['Body'] = Gdn_Format::PlainText($Comment['Body'], $Comment['Format']);
                   $Comment['Url'] = ExternalUrl(GetValue('Route', $Args));
                   $Comment = array($Comment);
                   Gdn::UserModel()->JoinUsers($Comment, array('InsertUserID', 'UpdateUserID'));
                   $Comment = $Comment[0];
                   
                   if (in_array(GetValueR('Activity.ActivityType', $Args), array('AnswerAccepted'))) {
-                     $Comment['Body'] = self::FormatPlainText($Args['Headline'], 'Html')."\n\n".$Comment['Body'];
+                     $Comment['Body'] = Gdn_Format::PlainText($Args['Headline'], 'Html')."\n\n".$Comment['Body'];
                   }
                   
                   $FormatData = array_merge($FormatData, $Comment);
@@ -772,12 +772,12 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
                   if ($Discussion) {
                      // See if the user has permission to view this discussion on the site.
-                     $CanView = Gdn::UserModel()->GetCategoryViewPermission($RegardingUserID, GetValue('CategoryID', $Discussion));
-                     $CanReply = self::CheckUserPermission($RegardingUserID, 'Email.Comments.Add');
-                     $FormatData['Signature'] = self::EmailSignature(GetValue('Route', $Args), $CanView, $CanReply);
+                     $CanView = Gdn::UserModel()->GetCategoryViewPermission($NotifyUserID, GetValue('CategoryID', $Discussion));
+                     $CanReply = self::CheckUserPermission($NotifyUserID, 'Email.Comments.Add');
+                     $FormatData['Signature'] = self::EmailSignature(GetValue('Route', $Args), $CanView, $CanReply); //.print_r(array('CanView' => $CanView, 'CanReply' => $CanReply), TRUE);
                      
-                     $Discussion['Name'] = self::FormatPlainText($Discussion['Name'], 'Text');
-                     $Discussion['Body'] = self::FormatPlainText($Discussion['Body'], $Discussion['Format']);
+                     $Discussion['Name'] = Gdn_Format::PlainText($Discussion['Name'], 'Text');
+                     $Discussion['Body'] = Gdn_Format::PlainText($Discussion['Body'], $Discussion['Format']);
                      $Discussion['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
                      $FormatData['Discussion'] = $Discussion;
                      $FormatData['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
@@ -828,9 +828,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
                
                // See if the user has permission to view this discussion on the site.
                $CanView = TRUE;
-               $CanReply = self::CheckUserPermission($RegardingUserID, 'Email.Conversations.Add');
+               $CanReply = self::CheckUserPermission($NotifyUserID, 'Email.Conversations.Add');
                $FormatData['Signature'] = self::EmailSignature(GetValue('Route', $Args), $CanView, $CanReply);
-               $Message = self::FormatPlainText($Message['Body'], $Message['Format'])."\n\n-- \n".$FormatData['Signature'];
+               $Message = Gdn_Format::PlainText($Message['Body'], $Message['Format'])."\n\n-- \n".$FormatData['Signature'];
                $Email->Message($Message);
 
                break;

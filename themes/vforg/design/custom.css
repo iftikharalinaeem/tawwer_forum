@@ -833,6 +833,8 @@ div#MessageForm h2 {
    background-color: #F6DAA8;
    border-color: #9a6e1f;
    color: #764412;
+   display: inline-block;
+   line-height: 1.2;
 }
 .Active .TabLink {
    background: #F6E5C6;
@@ -854,8 +856,8 @@ a.Active {
    background: #FEF7DF;
    color: #744000;
 }
-div.MessageForm div.Tabs {
-	margin-left: 6px;
+.CommentTabs {
+	margin-bottom: 6px;
 }
 div.MessageForm div.Tabs li.Active a {
 	top: 0;
