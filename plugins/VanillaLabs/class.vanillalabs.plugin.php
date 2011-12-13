@@ -96,6 +96,11 @@ class VanillaLabsPlugin extends Gdn_Plugin {
       $Curr = GetValue($Column, $User, 0);
       $Value = $Curr + $Inc;
       Gdn::UserModel()->SetField($UserID, $Column, $Value);
+      
+      $this->EventArguments['UserID'] = $UserID;
+      $this->EventArguments['Column'] = $Column;
+      $this->EventArguments['Inc'] = $Inc;
+      $this->FireEvent('IncrementUser');
    }
    
    public function Request($Path, $Data) {
