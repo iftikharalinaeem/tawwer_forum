@@ -31,6 +31,7 @@ $Session = Gdn::Session();
 			// echo Anchor('Community Discussions', '/discussions', 'Home');
 			echo '&nbsp;';
 			echo Gdn_Theme::Link('dashboard');
+         echo Gdn_Theme::Link('activity', 'Activity', '<a href="%url" class="Activity">Activity</a>');
 			echo Gdn_Theme::Link('profile', 'Profile', '<a href="%url" class="Profile">Profile</a>');
 			$Text = 'Sign In';
 			$Link = SignInUrl();
