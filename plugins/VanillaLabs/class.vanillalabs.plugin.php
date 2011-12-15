@@ -14,7 +14,8 @@ $PluginInfo['VanillaLabs'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
    'SettingsUrl' => '/settings/labs',
-   'SettingsPermission' => 'Garden.Settings.Manage'
+   'SettingsPermission' => 'Garden.Settings.Manage',
+   'MobileFriendly' => TRUE
 );
 
 class VanillaLabsPlugin extends Gdn_Plugin {
