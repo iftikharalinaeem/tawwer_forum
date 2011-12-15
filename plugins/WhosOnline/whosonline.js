@@ -6,6 +6,9 @@ $(document).ready(function() {
    var gettingOnline = 0;
    
 	function GetOnline() {
+      if (!gdn.focused)
+         return;
+      
 		var url = gdn.url('/plugin/imonline');
       if (gettingOnline > 0)
          return;
