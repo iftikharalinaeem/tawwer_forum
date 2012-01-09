@@ -4,7 +4,7 @@
 $PluginInfo['WhosOnline'] = array(
    'Name' => 'Whos Online',
    'Description' => "Lists the users currently browsing the forum.",
-   'Version' => '1.3.4',
+   'Version' => '1.3.5',
    'Author' => "Gary Mardell",
    'AuthorEmail' => 'gary@vanillaplugins.com',
    'AuthorUrl' => 'http://vanillaplugins.com',

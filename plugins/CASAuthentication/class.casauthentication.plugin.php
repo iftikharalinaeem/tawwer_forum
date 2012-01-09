@@ -109,7 +109,7 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
          die('Failed');
       } else {
          // We now have a user so we need to get some info.
-         $Url = 'http://www.crn.com/jive/util/get_user_profile.htm?email='.urlencode($Email);
+         $Url = sprintf(C('Plugins.CASAuthentication.ProfileUrl', 'http://www.crn.com/jive/util/get_user_profile.htm?email=%s'), urlencode($Email));
          $Data = file_get_contents($Url);
 
          $Xml = (array)simplexml_load_string($Data);
@@ -157,7 +157,8 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
       $Cf->Initialize(array(
           'Plugins.CASAuthentication.Host',
           'Plugins.CASAuthentication.Context' => array('Control' => 'TextBox', 'Default' => '/cas'),
-          'Plugins.CASAuthentication.Port' => array('Control' => 'TextBox', 'Default' => 443)
+          'Plugins.CASAuthentication.Port' => array('Control' => 'TextBox', 'Default' => 443),
+          'Plugins.CASAuthentication.ProfileUrl' => array('Control' => 'TextBox', 'Default' => 'http://www.crn.com/jive/util/get_user_profile.htm?email=%s')
       ));
       
       $Sender->AddSideMenu();
