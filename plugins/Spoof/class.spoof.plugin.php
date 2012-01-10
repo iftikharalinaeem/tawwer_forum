@@ -21,14 +21,14 @@ class SpoofPlugin implements Gdn_IPlugin {
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       // Clean out entire menu & re-add everything
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Users', T('Spoof'), 'dashboard/user/spoof', 'Garden.Admin.Only');
+      $Menu->AddLink('Users', T('Spoof'), 'dashboard/user/spoof', 'Garden.Settings.Manage');
 	}
    
 	/**
 	 * Admin screen for spoofing a user.
 	 */
    public function UserController_Spoof_Create($Sender) {
-		$Sender->Permission('Garden.Admin.Only');
+		$Sender->Permission('Garden.Settings.Manage');
       $Sender->AddSideMenu('dashboard/user/spoof');
 		$this->_SpoofMethod($Sender);
 	}
@@ -41,7 +41,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 		$SpoofUserID = GetValue('0', $Sender->RequestArgs);
 		$TransientKey = GetValue('1', $Sender->RequestArgs);
 		// Validate the transient key && permissions
-		if (Gdn::Session()->ValidateTransientKey($TransientKey) && Gdn::Session()->CheckPermission('Garden.Admin.Only')) {
+		if (Gdn::Session()->ValidateTransientKey($TransientKey) && Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
 			$Identity = new Gdn_CookieIdentity();
 			$Identity->Init(array(
 				'Salt' => Gdn::Config('Garden.Cookie.Salt'),
@@ -57,7 +57,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 	 * Adds a "Spoof" link to the user management list.
 	 */
 	public function UserController_UserListOptions_Handler($Sender) {
-		if (!Gdn::Session()->CheckPermission('Garden.Admin.Only'))
+		if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
 			return;
 		
       $User = GetValue('User', $Sender->EventArguments);
@@ -69,7 +69,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 	 * Adds a "Spoof" link to the site management list.
 	 */
 	public function ManageController_SiteListOptions_Handler($Sender) {
-		if (!Gdn::Session()->CheckPermission('Garden.Admin.Only'))
+		if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
 			return;
 		
 		$Site = GetValue('Site', $Sender->EventArguments);
@@ -78,7 +78,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 	}
 	
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
-		if (!Gdn::Session()->CheckPermission('Garden.Admin.Only'))
+		if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
 			return;
 		
       $SideMenu = $Sender->EventArguments['SideMenu'];
