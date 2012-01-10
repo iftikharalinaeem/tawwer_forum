@@ -268,7 +268,7 @@ class WhispersPlugin extends Gdn_Plugin {
          $Users[$InsertUserID] = array('UserID' => $InsertUserID);
 
       if (!isset($Users[Gdn::Session()->UserID]))
-         $Users[Gdn::Session()->UserID] = array('UserID' => $InsertUserID);
+         $Users[Gdn::Session()->UserID] = array('UserID' => Gdn::Session()->UserID);
 
       Gdn::UserModel()->JoinUsers($Users, array('UserID'));
       uasort($Users, array($this, 'UserRowCompare'));
