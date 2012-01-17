@@ -9,7 +9,7 @@
 $PluginInfo['vanillicon'] = array(
    'Name' => 'Vanillicon',
    'Description' => "Provides fun default user icons from vanillicon.com.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -21,7 +21,8 @@ class VanilliconPlugin extends Gdn_Plugin {
    public function ProfileController_AfterAddSideMenu_Handler($Sender, $Args) {
       if (!$Sender->User->Photo) {
          $Email = GetValue('Email', $Sender->User);
-         $Sender->User->Photo = 'http://vanillicon.com/'.md5($Email).'_200.png';
+         $Hash = md5($Email);
+         $Sender->User->Photo = 'http://w'.substr($Hash, 0, 1).'.vanillicon.com/'.$Hash.'_200.png';
       }
    }
 }
@@ -33,8 +34,8 @@ if (!function_exists('UserPhotoDefaultUrl')) {
       if (!$Email) {
          $Email = GetValue('UserID', $User, 100);
       }
-
-      $PhotoUrl = 'http://vanillicon.com/'.md5($Email).'_50.png';
+      $Hash = md5($Email);
+      $PhotoUrl = 'http://w'.substr($Hash, 0, 1).'.vanillicon.com/'.$Hash.'_50.png';
       return $PhotoUrl;
    }
 }

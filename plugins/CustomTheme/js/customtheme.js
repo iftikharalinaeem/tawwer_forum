@@ -1,6 +1,5 @@
 // This file contains javascript that is specific to the dashboard/profile controller.
 jQuery(document).ready(function($) {
-   
    // Load tab content on tab-click
    $('.Tabs li a').click(function() {
       $('.Tabs li').removeClass('Active');
@@ -19,5 +18,6 @@ jQuery(document).ready(function($) {
    });
    
    $('a.Apply').popup();
-
+   
+   $("textarea").tabby();
 });

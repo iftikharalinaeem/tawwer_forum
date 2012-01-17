@@ -14,7 +14,8 @@ $PluginInfo['VanillaLabs'] = array(
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
    'SettingsUrl' => '/settings/labs',
-   'SettingsPermission' => 'Garden.Settings.Manage'
+   'SettingsPermission' => 'Garden.Settings.Manage',
+   'MobileFriendly' => TRUE
 );
 
 class VanillaLabsPlugin extends Gdn_Plugin {
@@ -96,6 +97,11 @@ class VanillaLabsPlugin extends Gdn_Plugin {
       $Curr = GetValue($Column, $User, 0);
       $Value = $Curr + $Inc;
       Gdn::UserModel()->SetField($UserID, $Column, $Value);
+      
+      $this->EventArguments['UserID'] = $UserID;
+      $this->EventArguments['Column'] = $Column;
+      $this->EventArguments['Inc'] = $Inc;
+      $this->FireEvent('IncrementUser');
    }
    
    public function Request($Path, $Data) {

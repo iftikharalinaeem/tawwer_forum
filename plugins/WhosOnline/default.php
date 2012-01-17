@@ -4,11 +4,12 @@
 $PluginInfo['WhosOnline'] = array(
    'Name' => 'Whos Online',
    'Description' => "Lists the users currently browsing the forum.",
-   'Version' => '1.3.4',
+   'Version' => '1.4',
    'Author' => "Gary Mardell",
    'AuthorEmail' => 'gary@vanillaplugins.com',
    'AuthorUrl' => 'http://vanillaplugins.com',
    'RegisterPermissions' => array('Plugins.WhosOnline.ViewHidden'),
+   'SettingsUrl' => '/plugin/whosonline',
    'SettingsPermission' => array('Garden.Settings.Manage')
 );
 
@@ -17,17 +18,27 @@ $PluginInfo['WhosOnline'] = array(
  * Admin option to allow users it hide the module
  * User Meta table to store if they are hidden or not
  */
+ 
+// Changelog
+// 1.3.1 ??
+// 1.3.2 ??
+// 1.3.3 ??
+// 1.3.4 ??
+// 1.3.5 ??
+// 1.4 Added ability to target only lists, made pinger work on all pages, replace dash menu item w/settings button, adds docs -Lincoln
 
 class WhosOnlinePlugin extends Gdn_Plugin {
-   
+   /**
+    * Settings page.
+    */
    public function PluginController_WhosOnline_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->AddSideMenu('plugin/whosonline');
-      $Sender->SetData('Title', T("Who's Online Settings"));
+      $Sender->SetData('Title', T("Who&rsquo;s Online Settings"));
       
       $Config = new ConfigurationModule($Sender);
       $Config->Initialize(array(
-          'WhosOnline.Location.Show' => array('Control' => 'RadioList', 'Description' => "This setting determins where the list of online users is displayed.", 'Items' => array('every' => 'Every page', 'discussion' => 'In discussions only'), 'Default' => 'every'),
+          'WhosOnline.Location.Show' => array('Control' => 'RadioList', 'Description' => "This setting determins where the list of online users is displayed.", 'Items' => array('every' => 'Every page', 'discussion' => 'All discussion pages', 'discussionsonly' => 'Only discussions and categories list'), 'Default' => 'every'),
           'WhosOnline.Hide' => array('Control' => 'CheckBox', 'LabelCode' => "Hide the who's online module for guests."),
           'WhosOnline.DisplayStyle' => array('Control' => 'RadioList', 'Items' => array('list' => 'List', 'pictures' => 'Pictures'), 'Default' => 'list')
       ));
@@ -55,6 +66,9 @@ class WhosOnlinePlugin extends Gdn_Plugin {
 //      $Sender->Render($this->GetView('whosonline.php'));
    }
 
+   /**
+    * Page for Javascript to ping to signal user is still online.
+    */
    public function PluginController_ImOnline_Create($Sender) {
       $Session = Gdn::Session();
       $UserMetaData = $this->GetUserMeta($Session->UserID, '%'); 
@@ -66,17 +80,21 @@ class WhosOnlinePlugin extends Gdn_Plugin {
       echo $WhosOnlineModule->ToString();
    }
    
+   /**
+    * Add module to specified pages and include Javascript pinger.
+    */
    public function Base_Render_Before(&$Sender) {
       $ConfigItem = C('WhosOnline.Location.Show', 'every');
       $Controller = $Sender->ControllerName;
       $Application = $Sender->ApplicationFolder;
       $Session = Gdn::Session();
 
-		// Check if its visible to users
+		// Check if it's visible to users
 		if (C('WhosOnline.Hide', TRUE) && !$Session->IsValid()) {
 			return;
 		}
 		
+		// Is this a page for including the module?
 		$ShowOnController = array();		
 		switch($ConfigItem) {
 			case 'every':
@@ -88,48 +106,56 @@ class WhosOnlinePlugin extends Gdn_Plugin {
 					'activitycontroller'
 				);
 				break;
-			case 'discussion':
-			default:
+			case 'discussionsonly':
 				$ShowOnController = array(
+					'discussionscontroller',
+					'categoriescontroller'
+				);	
+				break;
+			case 'discussion':
+         default:
+			   $ShowOnController = array(
 					'discussioncontroller',
 					'discussionscontroller',
 					'categoriescontroller'
-				);				
+				);	
+			   break;						
 		}
 		
-      if (!InArrayI($Controller, $ShowOnController)) return; 
-
-	   $UserMetaData = $this->GetUserMeta($Session->UserID, '%');     
-	   include_once(PATH_PLUGINS.DS.'WhosOnline'.DS.'class.whosonlinemodule.php');
-	   $WhosOnlineModule = new WhosOnlineModule($Sender);
-	   $WhosOnlineModule->GetData(ArrayValue('Plugin.WhosOnline.Invisible', $UserMetaData));
-	   $Sender->AddModule($WhosOnlineModule);
-
+		// Include the module
+      if (InArrayI($Controller, $ShowOnController)) {
+   	   $UserMetaData = $this->GetUserMeta($Session->UserID, '%');     
+   	   include_once(PATH_PLUGINS.DS.'WhosOnline'.DS.'class.whosonlinemodule.php');
+   	   $WhosOnlineModule = new WhosOnlineModule($Sender);
+   	   $WhosOnlineModule->GetData(ArrayValue('Plugin.WhosOnline.Invisible', $UserMetaData));
+   	   $Sender->AddModule($WhosOnlineModule);
+      }
+      
+      // Ping the server when still online
 	   $Sender->AddJsFile('/plugins/WhosOnline/whosonline.js');
 	   $Frequency = C('WhosOnline.Frequency', 60);
 	   if (!is_numeric($Frequency))
 	      $Frequency = 60;
-      
 	   $Sender->AddDefinition('WhosOnlineFrequency', $Frequency);
       
    }
-
-   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
-      $Menu = $Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Add-ons', 'Whos Online', 'plugin/whosonline', 'Garden.Themes.Manage');
-   }
    
-   // User Settings
+   /**
+    * Add privacy settings to profile menu.
+    */
    public function ProfileController_AfterAddSideMenu_Handler(&$Sender) {
       $SideMenu = $Sender->EventArguments['SideMenu'];
       $Session = Gdn::Session();
       $ViewingUserID = $Session->UserID;
       
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', T('Who\'s Online Settings'), '/profile/whosonline', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', T('Privacy Settings'), '/profile/whosonline', FALSE, array('class' => 'Popup'));
       }
    }
    
+   /**
+    * Let users modify their privacy settings.
+    */
    public function ProfileController_Whosonline_Create($Sender) {
       
       $Session = Gdn::Session();
@@ -159,7 +185,6 @@ class WhosOnlinePlugin extends Gdn_Plugin {
 
       $Sender->Render($this->GetView('settings.php'));
    }
-   
 
    public function Setup() { 
       $this->Structure();
