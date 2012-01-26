@@ -16,26 +16,77 @@ $PluginInfo['Reactions'] = array(
 );
 
 class ReactionsPlugin extends Gdn_Plugin {
+   /// Methods ///
+   
+   private function AddJs($Sender) {
+      $Sender->AddJsFile('reactions.js', 'plugins/Reactions');
+   }
 
    public function Setup() {
       $this->Structure();
    }
    
    public function Structure() {
+      $St = Gdn::Structure();
+      $Sql = Gdn::SQL();
+      
+      $St->Table('ReactionType')
+         ->Column('UrlCode', 'varchar(20)', FALSE, 'primary')
+         ->Column('Name', 'varchar(20)')
+         ->Column('Description', 'text', TRUE)
+         ->Column('TagID', 'int')
+         ->Column('Attributes', 'text', TRUE)
+         ->Set();
+      
+      $St->Table('UserTag')
+         ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Activity', 'ActivityComment'), FALSE, 'primary')
+         ->Column('RecordID', 'int', FALSE, 'primary')
+         ->Column('TagID', 'int', FALSE, 'primary')
+         ->Column('UserID', 'int', FALSE, array('primary', 'key'))
+         ->Column('DateInserted', 'datetime')
+         ->Column('Total', 'int', 0)
+         ->Set();
+      
+      $Rm = new ReactionModel();
+      
+      // Insert some default tags.
+      $Rm->DefineReactionType(array('UrlCode' => 'Spam', 'Name' => 'Spam', 'Log' => 'Spam', 'LogThreshold' => 5, 'RemoveThreshold' => 5, 'ModeratorInc' => 5));
+      $Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Log' => 'Moderation', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5));
+      $Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Log' => 'Moderation', 'LogThreshold' => 5, 'ModeratorInc' => 5));
+      
+      $Rm->DefineReactionType(array('UrlCode' => 'Agree', 'Name' => 'Agree', 'IncrementColumn' => 'Score'));
+      $Rm->DefineReactionType(array('UrlCode' => 'Disagree', 'Name' => 'Disagree'));
+      $Rm->DefineReactionType(array('UrlCode' => 'Awesome', 'Name' => 'Awesome', 'IncrementColumn' => 'Score'));
+      $Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic'));
    }
    
+   /// Event Handlers ///
+   
+   /**
+    * 
+    * @param Gdn_Controller $Sender 
+    */
    public function DiscussionController_Render_Before($Sender) {
       $Sender->ReactionsVersion = 2;
       
       if ($Sender->ReactionsVersion == 1) {
-         $Sender->AddCssFile($this->GetResource('design/style-1.css', FALSE, FALSE));
+         $Sender->AddCssFile('reactions-1.css', 'plugins/Reactions');
       } else {
-         $Sender->AddCssFile($this->GetResource('design/style.css', FALSE, FALSE));
+         $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
          $this->AddJs($Sender);
       }
+      
+      include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }
    
-   public function DiscussionController_AfterCommentBody_Handler($Sender) {
+   public function DiscussionController_AfterDiscussionBody_Handler($Sender, $Args) {
+      WriteReactionBar($Args['Discussion']);
+   }
+   
+   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
+      WriteReactionBar($Args['Comment']);
+      return;
+      
       if ($Sender->ReactionsVersion == 2) {
       // Here's version 2
       ?>
@@ -95,41 +146,29 @@ class ReactionsPlugin extends Gdn_Plugin {
       }
    }
    
-   private function AddJs($Sender) {
-      $String = <<<'EOD'
-      <script type="text/javascript">
-      jQuery(document).ready(function($) {
-         $('.Reactions .Handle').live('click', function() {
-            var flagContainer = $(this).parents('.Reactions').find('.Flag');
-            var reactContainer = $(this).parents('.Reactions').find('.React');
-            
-            if ($(this).parents('.React').length > 0) {
-               reactContainer.find('.Handle').hide(); // Hide react handle
-               flagContainer.find('.Options').hide(); // Hide flag options
-               flagContainer.find('.Handle').show(); // Show flag handle
-               reactContainer.find('.Options').show('slide', {direction: 'right'}, 200); // Show react options
-            } else {
-               flagContainer.find('.Handle').hide(); // Hide flag handle
-               reactContainer.find('.Options').hide(); // Hide react options
-               reactContainer.find('.Handle').show(); // Show react handle
-               flagContainer.find('.Options').show('slide', {direction: 'left'}, 200); // Show flag options
-            }
-            return false;
-         });
-         $('.Flag .Options strong').live('click', function() {
-            var flagContainer = $(this).parents('.Flag');
-            var reactContainer = $(this).parents('.Reactions').find('.React');
-
-            reactContainer.find('.Handle').hide(); // Hide react handle
-            flagContainer.find('.Options').hide(); // Hide flag options
-            flagContainer.find('.Handle').show(); // Show flag handle
-            reactContainer.find('.Options').show('slide', {direction: 'right'}, 200); // Show react options
-
-            return false;
-         });
-      });
-      </script>
-EOD;
-      $Sender->Head->AddString($String);
+   /**
+    *
+    * @param Gdn_Controller $Sender
+    * @param string $RecordType
+    * @param string $ReactionType
+    * @param int $ID
+    * @param bool $Undo 
+    */
+   public function RootController_React_Create($Sender, $RecordType, $Reaction, $ID) {
+      if (!Gdn::Session()->IsValid()) {
+         throw new Gdn_UserException(T('You need to sign in before you can do this.'), 403);
+      }
+      
+      include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+      
+      if (count($Sender->Request->Post()) == 0)
+         die('Requires Javascript');
+      
+      $ReactionType = ReactionModel::ReactionTypes($Reaction);
+      
+      $ReactionModel = new ReactionModel();
+      $ReactionModel->React($RecordType, $ID, $Reaction);
+      
+      $Sender->Render('Blank', 'Utility', 'Dashboard');
    }
 }
