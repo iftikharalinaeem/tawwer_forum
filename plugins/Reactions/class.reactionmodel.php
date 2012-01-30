@@ -184,6 +184,14 @@ class ReactionModel {
          }
       }
       
+      // Send back the current scores.
+      foreach ($Set as $Column => $Value) {
+         Gdn::Controller()->JsonTarget(
+               "#{$RecordType}_{$Data['RecordID']} .Column-".$Column, 
+               $Value,
+               'Html');
+      }
+      
       $Record['Attributes']['React'] = $React;
       $Set['Attributes'] = serialize($Record['Attributes']);
       $this->SQL->Put($Data['RecordType'],
