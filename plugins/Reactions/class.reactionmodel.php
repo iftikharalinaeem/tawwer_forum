@@ -1,6 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
 
 class ReactionModel {
+   /// Constants ///
+   const USERID_SUM = 0;
+   const USERID_OTHER = -1;
+   
    /// Properties ///
    
    public static $ReactionTypes = NULL;
@@ -151,17 +155,18 @@ class ReactionModel {
          $Args[':Total2'] = $Args[':Total'];
 
          // Increment the record total.
-         $Args[':UserID'] = 0;
+         $Args[':UserID'] = self::USERID_SUM;
          $this->SQL->Database->Query($Sql, $Args);
 
          // Increment the user total.
          $Args[':RecordType'] = 'User';
          $Args[':RecordID'] = $Record['InsertUserID'];
+         $Args[':UserID'] = self::USERID_OTHER;
          $this->SQL->Database->Query($Sql, $Args);
       }
       
       // Recalculate the counts for the record.
-      $TotalTags = $this->SQL->GetWhere('UserTag', array('RecordType' => $Data['RecordType'], 'RecordID' => $Data['RecordID'], 'UserID' => 0))->ResultArray();
+      $TotalTags = $this->SQL->GetWhere('UserTag', array('RecordType' => $Data['RecordType'], 'RecordID' => $Data['RecordID'], 'UserID' => self::USERID_SUM))->ResultArray();
       $TotalTags = Gdn_DataSet::Index($TotalTags, array('TagID'));
       $ReactionTypes = self::ReactionTypes();
       $React = array();
@@ -197,6 +202,8 @@ class ReactionModel {
       $this->SQL->Put($Data['RecordType'],
          $Set,
          array($Data['RecordType'].'ID' => $Data['RecordID']));
+      
+      
       
       // Generate the new button for the reaction.
       Gdn::Controller()->SetData('Diffs', $Diffs);
