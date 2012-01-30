@@ -8,7 +8,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.0b',
+   'Version' => '1.1b',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -20,6 +20,53 @@ class ReactionsPlugin extends Gdn_Plugin {
    
    private function AddJs($Sender) {
       $Sender->AddJsFile('reactions.js', 'plugins/Reactions');
+   }
+   
+   protected static $_CommentOrder;
+   public static function CommentOrder() {
+      if (!self::$_CommentOrder) {
+         $SetPreference = FALSE;
+         
+         if (!Gdn::Session()->IsValid()) {
+            if (Gdn::Controller() != NULL && strcasecmp(Gdn::Controller()->RequestMethod, 'embed') == 0)
+               $OrderColumn = C('Plugins.Reactions.DefaultEmbedOrderBy', 'Score');
+            else
+               $OrderColumn = C('Plugins.Reactions.DefaultOrderBy', 'DateInserted');
+         } else {
+            $DefaultOrderParts = array('DateInserted', 'asc');
+            
+            $OrderBy = Gdn::Request()->Get('orderby', '');
+            if ($OrderBy) {
+               $SetPreference = TRUE;
+            } else {
+               $OrderBy = Gdn::Session()->GetPreference('Comments.OrderBy');
+            }
+            $OrderParts = explode(' ', $OrderBy);
+            $OrderColumn = GetValue(0, $OrderParts, $DefaultOrderParts[0]);
+            
+
+            // Make sure the order is correct.
+            if (!in_array($OrderColumn, array('DateInserted', 'Score')))
+               $OrderColumn = 'DateInserted';
+            
+
+            if ($SetPreference) {
+               Gdn::Session()->SetPreference('Comments.OrderBy', $OrderColumn);
+            }
+         }
+         $OrderDirection = $OrderColumn == 'Score' ? 'desc' : 'asc';
+         
+         $CommentOrder = array('c.'.$OrderColumn.' '.$OrderDirection);
+         
+         // Add a unique order if we aren't ordering by a unique column.
+         if (!in_array($OrderColumn, array('DateInserted', 'CommentID'))) {
+            $CommentOrder[] = 'c.DateInserted asc';
+         }
+
+         self::$_CommentOrder = $CommentOrder;
+      }
+      
+      return self::$_CommentOrder;
    }
 
    public function Setup() {
@@ -63,11 +110,27 @@ class ReactionsPlugin extends Gdn_Plugin {
    /// Event Handlers ///
    
    /**
+    *
+    * @param CommentModel $Sender
+    * @param array $Args 
+    */
+   public function CommentModel_AfterConstruct_Handler($Sender, $Args) {
+      $OrderBy = self::CommentOrder($Sender);
+      $Sender->OrderBy($OrderBy);
+   }
+   
+   /**
     * 
     * @param Gdn_Controller $Sender 
     */
    public function DiscussionController_Render_Before($Sender) {
       $Sender->ReactionsVersion = 2;
+      
+      $OrderBy = self::CommentOrder();
+      list($OrderColumn, $OrderDirection) = explode(' ', GetValue('0', self::CommentOrder()));
+      $OrderColumn = StringBeginsWith($OrderColumn, 'c.', TRUE, TRUE);
+      
+      $Sender->SetData('CommentOrder', array('Column' => $OrderColumn, 'Direction' => $OrderDirection));
       
       if ($Sender->ReactionsVersion == 1) {
          $Sender->AddCssFile('reactions-1.css', 'plugins/Reactions');
@@ -144,6 +207,10 @@ class ReactionsPlugin extends Gdn_Plugin {
       </div>
       <?php
       }
+   }
+   
+   public function DiscussionController_CommentHeading_Handler($Sender, $Args) {
+      WriteOrderByButtons();
    }
    
    /**

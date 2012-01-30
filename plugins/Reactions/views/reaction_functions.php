@@ -1,56 +1,18 @@
 <?php if (!defined('APPLICATION')) exit();
 
-if (!function_exists('WriteReactionBar')):
+function OrderByButton($Column, $Label = FALSE, $DefaultOrder = '') {
+   $Url = Gdn::Controller()->SelfUrl.'?orderby='.urlencode($Column);
+   if (!$Label)
+      $Label = T('by '.$Column);
    
-function WriteReactionBar($Row) {
-   $Attributes = GetValue('Attributes', $Row);
-   if (is_string($Attributes)) {
-      $Attributes = @unserialize($Attributes);
-      SetValue('Attributes', $Row, $Attributes);
+   $CssClass = '';
+   $CurrentColumn = Gdn::Controller()->Data('CommentOrder.Column');
+   if ($Column == $CurrentColumn) {
+      $CssClass .= ' OrderBy-'.ucfirst(Gdn::Controller()->Data('CommentOrder.Direction')).' Selected';
    }
    
-   decho($Row->Score, 'Score');
-   
-   echo '<div class="Reactions">';
-   
-   // Write the flags.
-   echo '<div class="Flag">';
-   echo '<div class="Handle FlagHandle"><a href="#"><span class="ReactSprite ReactFlag"></span> <span class="ReactLabel">Flag</span></a></div>';
-   
-   echo '<div class="ReactButtons" style="display:none">';
-   echo '<a href="#" class="ReactHeading">'.T('Flag »').'</a> ';
-   echo ReactionButton($Row, 'Abuse');
-   echo ReactionButton($Row, 'Spam');
-   echo ReactionButton($Row, 'Troll');
-   
-   echo '</div>';
-   
-   echo '</div>';
-   
-   
-   echo '<div class="Nub">&#160;</div>';
-   
-   // Write the reactions.
-   echo '<div class="React">';
-   
-   
-   echo '<div class="ReactButtons">';
-   
-   echo ReactionButton($Row, 'OffTopic');
-   echo ReactionButton($Row, 'Disagree');
-   echo ReactionButton($Row, 'Agree');
-   echo ReactionButton($Row, 'Awesome');
-   echo ' <a href="#" class="ReactHeading">'.T('« React').'</a>';
-   echo '</div>';
-   
-   echo '<div class="Handle ReactHandle" style="display:none"><a href="#"><span class="ReactSprite ReactAgree"></span> <span class="ReactLabel">React</span></a></div>';
-   echo '</div>';
-   
-   echo '</div>';
+   return Anchor($Label, $Url, 'FilterButton OrderByButton OrderBy-'.$Column.$CssClass, array('rel' => 'nofollow'));
 }
-
-endif;
-
 
 if (!function_exists('ReactionButton')):
    
@@ -84,6 +46,69 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
 EOT;
    
    return $Result;
+}
+
+endif;
+
+
+function WriteOrderByButtons() {
+   if (!Gdn::Session()->IsValid())
+      return;
+   
+   echo '<span class="OrderByButtons">'.
+      OrderByButton('DateInserted', T('by Date')).
+      ' '.
+      OrderByButton('Score').
+      '</span>';
+}
+
+
+if (!function_exists('WriteReactionBar')):
+   
+function WriteReactionBar($Row) {
+   $Attributes = GetValue('Attributes', $Row);
+   if (is_string($Attributes)) {
+      $Attributes = @unserialize($Attributes);
+      SetValue('Attributes', $Row, $Attributes);
+   }
+   
+//   echo 'Score: <span class="Column-Score">'.GetValue('Score', $Row).'</span>';
+   echo '<div class="Reactions">';
+   
+   // Write the flags.
+   echo '<div class="Flag">';
+   echo '<div class="Handle FlagHandle"><a href="#"><span class="ReactSprite ReactFlag"></span> <span class="ReactLabel">Flag</span></a></div>';
+   
+   echo '<div class="ReactButtons" style="display:none">';
+   echo '<a href="#" class="ReactHeading">'.T('Flag »').'</a> ';
+   echo ReactionButton($Row, 'Abuse');
+   echo ReactionButton($Row, 'Spam');
+   echo ReactionButton($Row, 'Troll');
+   
+   echo '</div>';
+   
+   echo '</div>';
+   
+   
+   echo '<div class="Nub">&#160;</div>';
+   
+   // Write the reactions.
+   echo '<div class="React">';
+   
+   
+   echo '<div class="ReactButtons">';
+   
+   echo ReactionButton($Row, 'OffTopic');
+   echo ReactionButton($Row, 'Disagree');
+   echo ReactionButton($Row, 'Agree');
+   echo ReactionButton($Row, 'Awesome');
+   echo ' <a href="#" class="ReactHeading">'.T('« React').'</a>';
+   echo '</div>';
+   
+   echo '<div class="Handle ReactHandle" style="display:none"><a href="#"><span class="ReactSprite ReactAgree">&#160;</span> <span class="ReactLabel">React</span></a></div>';
+   echo '</div>';
+   
+   echo '</div>';
 }
 
 endif;

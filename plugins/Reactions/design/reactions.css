@@ -5,7 +5,6 @@
    font-size: 11px;
    line-height: 18px;
    border-radius: 4px;
-   min-height: 27px;
 }
 
 .Reactions .Handle {
@@ -64,14 +63,14 @@
 }
 
 .ReactLabel {
-   vertical-align: middle;
+   vertical-align: top;
 }
 
 .Reactions .Count {
    border-radius: 6px;
    -moz-border-radius: 6px;
    -webkit-border-radius: 6px;
-   vertical-align: middle;
+   vertical-align: top;
    background: #494949;
    background: rgba(0, 0, 0, 0.7);
 }
@@ -86,7 +85,7 @@
    height: 18px;
    width: 18px;
    display: inline-block;
-   vertical-align: middle;
+   vertical-align: top;
 }
 
 .InProgress span {
@@ -135,3 +134,9 @@
 .ReactButton:hover .ReactAgree { background-position: -90px -36px; }
 .HasCount .ReactAwesome,
 .ReactButton:hover .ReactAwesome { background-position: -108px -36px; }
+
+
+.FilterButton.Selected {
+   color: #000;
+   font-weight: bold;
+}
