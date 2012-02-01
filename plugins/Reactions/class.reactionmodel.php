@@ -9,6 +9,7 @@ class ReactionModel {
    
    public static $ReactionTypes = NULL;
    
+   
    /**
     * @var Gdn_SQL 
     */
@@ -125,6 +126,16 @@ class ReactionModel {
       return $Data;
    }
    
+   public function GetRecordsWhere($Where, $OrderFields = '', $OrderDirection = '', $Limit = 30, $Offset = 0) {
+      // Grab the user tags.
+      $UserTags = $this->SQL
+         ->Limit($Limit, $Offset)
+         ->GetWhere('UserTag', $Where, $OrderFields, $OrderDirection)->ResultArray();
+      self::JoinRecords($UserTags);
+      
+      return $UserTags;
+   }
+   
    public function GetRow($Type, $ID, $Operation) {
       switch ($Type) {
          case 'Comment':
@@ -163,11 +174,55 @@ class ReactionModel {
       return array($Row, $Model, $Log);
    }
    
+   public static function JoinRecords(&$Data) {
+      $IDs = array();
+      // Gather all of the ids to fetch.
+      foreach ($Data as &$Row) {
+         $RecordType = StringEndsWith($Row['RecordType'], '-Total', TRUE, TRUE);
+         $Row['RecordType'] = $RecordType;
+         $ID = $Row['RecordID'];
+         $IDs[$RecordType][$ID] = $ID;
+      }
+      
+      // Fetch all of the data in turn.
+      $JoinData = array();
+      foreach ($IDs as $RecordType => $RecordIDs) {
+         $Rows = Gdn::SQL()->WhereIn($RecordType.'ID', array_values($RecordIDs))->Get($RecordType)->ResultArray();
+         $JoinData[$RecordType] = Gdn_DataSet::Index($Rows, array($RecordType.'ID'));
+      }
+      
+      // Join the rows.
+      foreach ($Data as &$Row) {
+         $RecordType = $Row['RecordType'];
+         $ID = $Row['RecordID'];
+         
+         $Record = $JoinData[$RecordType][$ID];
+         $Row = array_merge($Row, $Record);
+         
+         switch ($RecordType) {
+            case 'Discussion':
+               $Url = Url("/discussion/$ID/".Gdn_Format::Url($Row['Name']));
+               break;
+            case 'Comment':
+               $Url = Url("/discussion/comment/$ID");
+               break;
+            default:
+               $Url = '';
+         }
+         $Row['Url'] = $Url;
+      }
+      
+      // Join the users.
+      Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'));
+   }
+   
    public function ToggleUserTag(&$Data, &$Record) {
       $Inc = GetValue('Total', $Data, 1);
       
       TouchValue('Total', $Data, $Inc);
       TouchValue('DateInserted', $Data, Gdn_Format::ToDateTime());
+      $ReactionTypes = self::ReactionTypes();
+      $ReactionTypes = Gdn_DataSet::Index($ReactionTypes, array('TagID'));
       
       // See if there is already a user tag.
       $Where = ArrayTranslate($Data, array('RecordType', 'RecordID', 'UserID'));
