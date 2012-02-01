@@ -20,6 +20,70 @@ class ReactionModel {
       $this->SQL = Gdn::SQL();
    }
    
+   public function ConvertVanillaLabs() {
+      $RecordTypes = array('Discussion', 'Comment');
+      $Columns = array('Likes' => 'Awesome', 'Spam' => 'Spam', 'Abuse' => 'Abuse');
+      $ReactionTypes = self::ReactionTypes();
+      $Convert = array('L' => 'awesome', 'S' => 'spam', 'A' => 'abuse');
+      
+      $Count = 0;
+      $RecordCount = 0;
+      
+      foreach ($RecordTypes as $RecordType) {
+         foreach ($Columns as $Column => $ReactionCode) {
+            $Data = $this->SQL
+               ->Select()
+               ->From($RecordType)
+               ->Where($Column.'<>', 0)
+               ->Get()->ResultArray();
+            
+            foreach ($Data as $Row) {
+               $RecordCount++;
+               
+               $RecordID = $Row[$RecordType.'ID'];
+               $Attributes = @unserialize($Row['Attributes']);
+               if (!is_array($Attributes))
+                  $Attributes = array();
+               $ModUserIDs = GetValue('ModUserIDs', $Attributes);
+               
+               if (is_array($ModUserIDs)) {
+                  foreach ($ModUserIDs as $UserID => $Code) {
+                     if (!isset($Convert[$Code])) {
+                        continue;
+                     }
+                     $UrlCode = $Convert[$Code];
+                     $TagID = $ReactionTypes[$UrlCode]['TagID'];
+                   
+                     // Insert the tag.
+                     $this->SQL->Options('Ignore', TRUE)
+                        ->Insert('UserTag', array(
+                            'RecordType' => $RecordType,
+                            'RecordID' => $RecordID,
+                            'TagID' => $TagID,
+                            'UserID' => $UserID,
+                            'DateInserted' => Gdn_Format::ToDateTime(),
+                            'Total' => 1));
+                     
+                     $Count++;
+                  }
+                  // Now that all of the tags are processed we want to clear the labs information.
+                  $Set = array_fill_keys(array_keys($Columns), 0);
+                  unset($Attributes['ModUserIDs']);
+                  if (empty($Attributes))
+                     $Set['Attributes'] = NULL;
+                  else
+                     $Set['Attributes'] = serialize($Attributes);
+                  $this->SQL->Put($RecordType, $Set, array($RecordType.'ID' => $RecordID));
+               }
+               unset($Attributes['ModUserIDs']);
+            }
+         }
+      }
+      
+      $Result = array('CountReactions' => $Count, 'CountRecords' => $RecordCount);
+      return $Result;
+   }
+   
    public function DefineReactionType($Data) {
       $UrlCode = $Data['UrlCode'];
       
