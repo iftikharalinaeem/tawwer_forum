@@ -263,6 +263,9 @@ class ReactionModel {
          values (:RecordType, :RecordID, :TagID, :UserID, :DateInserted, :Total)
          on duplicate key update Total = Total + :Total2";
       
+      
+      $Points = 0;
+      
       foreach ($UserTags as $Row) {
          $Args = ArrayTranslate($Row, array(
              'RecordType' => ':RecordType', 
@@ -274,7 +277,8 @@ class ReactionModel {
          $Args[':Total2'] = $Args[':Total'];
 
          // Increment the record total.
-         $Args[':UserID'] = self::USERID_SUM;
+         $Args[':RecordType'] = $RecordType.'-Total';
+         $Args[':UserID'] = $Record['InsertUserID'];
          $this->SQL->Database->Query($Sql, $Args);
 
          // Increment the user total.
@@ -282,17 +286,25 @@ class ReactionModel {
          $Args[':RecordID'] = $Record['InsertUserID'];
          $Args[':UserID'] = self::USERID_OTHER;
          $this->SQL->Database->Query($Sql, $Args);
+         
+         // See what kind of points this reaction gives.
+         $ReactionType = $ReactionTypes[$Row['TagID']];
+         if ($ReactionPoints = GetValue('Points', $ReactionType)) {
+            if ($Row['Total'] < 1) {
+               $Points += $ReactionPoints;
+            } else {
+               $Points += -$ReactionPoints;
+            }
+         }
       }
       
       // Recalculate the counts for the record.
-      $TotalTags = $this->SQL->GetWhere('UserTag', array('RecordType' => $Data['RecordType'], 'RecordID' => $Data['RecordID'], 'UserID' => self::USERID_SUM))->ResultArray();
+      $TotalTags = $this->SQL->GetWhere('UserTag', array('RecordType' => $Data['RecordType'].'-Total', 'RecordID' => $Data['RecordID']))->ResultArray();
       $TotalTags = Gdn_DataSet::Index($TotalTags, array('TagID'));
-      $ReactionTypes = self::ReactionTypes();
       $React = array();
       $Diffs = array();
       $Set = array();
-      foreach ($ReactionTypes as $UrlCode => $Type) {
-         $TagID = $Type['TagID'];
+      foreach ($ReactionTypes as $TagID => $Type) {
          if (isset($TotalTags[$TagID])) {
             $React[$Type['UrlCode']] = $TotalTags[$TagID]['Total'];
             
@@ -322,8 +334,6 @@ class ReactionModel {
          $Set,
          array($Data['RecordType'].'ID' => $Data['RecordID']));
       
-      
-      
       // Generate the new button for the reaction.
       Gdn::Controller()->SetData('Diffs', $Diffs);
       if (function_exists('ReactionButton')) {
@@ -334,6 +344,11 @@ class ReactionModel {
                $Button,
                'ReplaceWith');
          }
+      }
+      
+      // Give points for the reaction.
+      if ($Points <> 0 && class_exists('UserBadgeModel')) {
+         UserBadgeModel::GivePoints($Record['InsertUserID'], $Points, 'Reactions');
       }
    }
    
