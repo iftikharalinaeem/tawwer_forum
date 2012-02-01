@@ -19,6 +19,7 @@ class ReactionsPlugin extends Gdn_Plugin {
    /// Methods ///
    
    private function AddJs($Sender) {
+      $Sender->AddJsFile('jquery-ui-1.8.17.custom.min.js');
       $Sender->AddJsFile('reactions.js', 'plugins/Reactions');
    }
    
@@ -83,10 +84,11 @@ class ReactionsPlugin extends Gdn_Plugin {
          ->Column('Description', 'text', TRUE)
          ->Column('TagID', 'int')
          ->Column('Attributes', 'text', TRUE)
+         ->Column('Active', 'tinyint(1)', 1)
          ->Set();
       
       $St->Table('UserTag')
-         ->Column('RecordType', array('Discussion', 'Comment', 'User', 'Activity', 'ActivityComment'), FALSE, 'primary')
+         ->Column('RecordType', array('Discussion', 'Discussion-Total', 'Comment', 'Comment-Total', 'User', 'Activity', 'ActivityComment'), FALSE, 'primary')
          ->Column('RecordID', 'int', FALSE, 'primary')
          ->Column('TagID', 'int', FALSE, 'primary')
          ->Column('UserID', 'int', FALSE, array('primary', 'key'))
@@ -211,6 +213,73 @@ class ReactionsPlugin extends Gdn_Plugin {
    
    public function DiscussionController_CommentHeading_Handler($Sender, $Args) {
       WriteOrderByButtons();
+   }
+   
+   public function Base_BeforeUserInfo_Handler($Sender, $Args) {
+      // Fetch the view helper functions.
+      include_once Gdn::Controller()->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+      
+      WriteProfileCounts();
+   }
+   
+   /**
+    *
+    * @param ProfileController $Sender
+    * @param type $Args 
+    */
+   public function ProfileController_Reactions_Create($Sender, $UserID, $Username, $Reaction, $Page = '') {
+      $Sender->Permission('Garden.Profiles.View');
+      
+      $ReactionType = ReactionModel::ReactionTypes($Reaction);
+      if (!$ReactionType)
+         throw NotFoundException();
+      
+      list($Offset, $Limit) = OffsetLimit($Page, 5);
+      
+      $Sender->SetData('_PageSize', 5);
+      
+      $ReactionModel = new ReactionModel();
+      $Data = $ReactionModel->GetRecordsWhere(array('TagID' => $ReactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'UserID' => $UserID, 'Total >' => 0),
+         'DateInserted', 'desc',
+         $Limit, $Offset);
+      $Sender->SetData('Data', $Data);
+      
+      $Sender->GetUserInfo($UserID, $Username);
+      $Sender->_SetBreadcrumbs($ReactionType['Name'], $Sender->CanonicalUrl());
+      $Sender->SetTabView('Reactions', 'DataList', '', 'plugins/Reactions');
+      
+      $this->AddJs($Sender);
+      $Sender->AddJsFile('jquery.expander.js');
+      $Sender->AddDefinition('ExpandText', T('(more)'));
+      $Sender->AddDefinition('CollapseText', T('(less)'));
+      
+      $Sender->Render();
+   }
+   
+   public function ProfileController_Render_Before($Sender, $Args) {
+      // Grab all of the counts for the user.
+      $Data = Gdn::SQL()
+         ->GetWhere('UserTag', array('RecordID' => $Sender->Data('Profile.UserID'), 'RecordType' => 'User', 'UserID' => ReactionModel::USERID_OTHER))->ResultArray();
+      $Data = Gdn_DataSet::Index($Data, array('TagID'));
+      
+      $Counts = $Sender->Data('Counts');
+      foreach (ReactionModel::ReactionTypes() as $Code => $Type) {
+         if (!$Type['Active'])
+            continue;
+         
+         $Row = array(
+             'Name' => $Type['Name'], 
+             'Url' => Url("/profile/reactions/".$Sender->Data('Profile.UserID').'/'.rawurlencode($Sender->Data('Profile.Name')).'/'.rawurlencode($Code), TRUE), 
+             'Total' => 0);
+         
+         if (isset($Data[$Type['TagID']])) {
+            $Row['Total'] = $Data[$Type['TagID']]['Total'];
+         }
+         $Counts[$Type['Name']] = $Row;
+      }
+      $Sender->SetData('Counts', $Counts);
+      
+      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
    }
    
    /**

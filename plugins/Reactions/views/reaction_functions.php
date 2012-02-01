@@ -63,6 +63,27 @@ function WriteOrderByButtons() {
 }
 
 
+function WriteProfileCounts() {
+   echo '<div class="DataCounts">';
+   
+   foreach (Gdn::Controller()->Data('Counts', array()) as $Row) {
+      echo ' <span class="CountItem">';
+      
+      if ($Row['Url'])
+         echo '<a href="'.htmlspecialchars($Row['Url']).'">';
+      
+      echo ' <span class="CountTotal">'.Gdn_Format::BigNumber($Row['Total'], 'html').'</span> ';
+      echo ' <span class="CountLabel">'.$Row['Name'].'</span>';
+      
+      if ($Row['Url'])
+         echo '</a>';
+      
+      echo '</span> ';
+   }
+   
+   echo '</div>';
+}
+
 if (!function_exists('WriteReactionBar')):
    
 function WriteReactionBar($Row) {

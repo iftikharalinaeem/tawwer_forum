@@ -140,3 +140,47 @@
    color: #000;
    font-weight: bold;
 }
+
+.DataCounts {
+   overflow: hidden;
+   margin: 5px 0;
+}
+
+.DataCounts a {
+   color: #000;
+}
+
+.DataCounts a:hover {
+   color: #ff0084;
+}
+
+.CountTotal {
+   display: block;
+   line-height: 100%;
+   font-size: 32px;
+}
+
+.CountItem {
+   float: left;
+   display: block;
+   width: 14%;
+   text-align: center;
+}
+
+.Compact .Item .Author img {
+   height: 24px;
+   width: 24px;
+   margin: 0 5px 4px 0;
+}
+
+.Compact .Title {
+   font-sixe: 13px;
+}
+
+.Compact .Reactions {
+   margin-top: 5px;
+}
+
+.Compact p {
+   margin: 5px 0;
+}

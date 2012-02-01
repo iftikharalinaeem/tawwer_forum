@@ -583,9 +583,189 @@ class ReactionModel {
       }
       
       if ($UrlCode) {
-         return self::$ReactionTypes[strtolower($UrlCode)];
+         return GetValue(strtolower($UrlCode), self::$ReactionTypes, NULL);
       }
       
       return self::$ReactionTypes;
+   }
+   
+   public function RecalculateTotals() {
+      // Calculate all of the record totals.
+      $this->SQL
+         ->WhereIn('RecordType', array('Discussion-Total', 'Comment-Total'))
+         ->Delete('UserTag');
+      
+      $RecordTypes = array('Discussion', 'Comment');
+      foreach ($RecordTypes as $RecordType) {
+         $Sql = "insert ignore GDN_UserTag (
+            RecordType,
+            RecordID,
+            TagID,
+            UserID,
+            DateInserted,
+            Total
+         )
+         select
+            '{$RecordType}-Total',
+            ut.RecordID,
+            ut.TagID,
+            t.InsertUserID,
+            min(ut.DateInserted),
+            sum(ut.Total) as SumTotal
+         from GDN_UserTag ut
+         join GDN_{$RecordType} t
+            on ut.RecordType = '{$RecordType}' and ut.RecordID = {$RecordType}ID
+         group by
+            RecordType,
+            RecordID,
+            TagID,
+            t.InsertUserID";
+         $this->SQL->Query($Sql);
+      }      
+      
+      // Calculate the user totals.
+      $this->SQL->Delete('UserTag', array('UserID' => self::USERID_OTHER));
+      
+      $Sql = "insert ignore GDN_UserTag (
+         RecordType,
+         RecordID,
+         TagID,
+         UserID,
+         DateInserted,
+         Total
+      )
+      select
+         'User',
+         ut.UserID,
+         ut.TagID,
+         -1,
+         min(ut.DateInserted),
+         sum(ut.Total) as SumTotal
+      from GDN_UserTag ut
+      where ut.RecordType in ('Discussion-Total', 'Comment-Total')
+      group by
+         ut.UserID,
+         ut.TagID";
+      $this->SQL->Query($Sql);
+      
+      // Now we need to update the caches on the individual discussion/comment rows.
+      $TotalData = $this->SQL->GetWhere('UserTag', 
+         array('RecordType' => array('Discussion-Total', 'Comment-Total')),
+         'RecordType, RecordID')->ResultArray();
+      
+      $React = array();
+      $RecordType = NULL;
+      $RecordID = NULL;
+      
+      $ReactionTagIDs = self::ReactionTypes();
+      $ReactionTagIDs = Gdn_DataSet::Index($ReactionTagIDs, array('TagID'));
+      
+      foreach ($TotalData as $Row) {
+         $StrippedRecordType = GetValue(0, explode('-', $Row['RecordType'], 2));
+         $NewRecord = $StrippedRecordType != $RecordType || $Row['RecordID'] != $RecordID;
+         
+         if ($NewRecord) {
+            if ($RecordID)
+               $this->_SaveRecordReact($RecordType, $RecordID, $React);
+            
+            $RecordType = $StrippedRecordType;
+            $RecordID = $Row['RecordID'];
+            $React = array();
+         }
+         $React[$ReactionTagIDs[$Row['TagID']]['UrlCode']] = $Row['Total'];
+      }
+      
+      if ($RecordID)
+         $this->_SaveRecordReact($RecordType, $RecordID, $React);
+   }
+   
+   protected function _SaveRecordReact($RecordType, $RecordID, $React) {
+      $Set = array();
+      
+      $Row = $this->SQL->GetWhere($RecordType, array($RecordType.'ID' => $RecordID))->FirstRow(DATASET_TYPE_ARRAY);
+      $Attributes = @unserialize($Row['Attributes']);
+      if (!is_array($Attributes))
+         $Attributes = array();
+      
+      if (empty($React))
+         unset($Attributes['React']);
+      else
+         $Attributes['React'] = $React;
+      
+      if (empty($Attributes))
+         $Attributes = NULL;
+      else
+         $Attributes = serialize($Attributes);
+      $Set['Attributes'] = $Attributes;   
+      
+      // Calculate the record's score too.
+      foreach (self::ReactionTypes() as $Type) {
+         if (($Column = GetValue('IncrementColumn', $Type)) && isset($React[$Type['UrlCode']])) {
+            // This reaction type also increments a column so do that too.
+            TouchValue($Column, $Set, 0);
+            $Set[$Column] += $React[$Type['UrlCode']];
+         }
+      }
+      
+      // Check to see if the record is changing.
+      foreach ($Set as $Key => $Value) {
+         if ($Row[$Key] == $Value)
+            unset($Set[$Key]);
+      }
+      
+      if (!empty($Set)) {
+         $this->SQL->Put($RecordType, $Set, array($RecordType.'ID' => $RecordID));
+      }
+   }
+   
+   public function InsertOrUpdate($Table, $Set, $Key = NULL, $DontUpdate = array(), $Op = '=') {
+      if ($Key == NULL) {
+         $Key = $Table.'ID';
+      } elseif (is_numeric($Key)) {
+         $Key = array_slice(array_keys($Set), 0, $Key);
+      }
+      
+      $Key = array_combine($Key, $Key);
+      $DontUpdate = array_fill_keys($DontUpdate, FALSE);
+      
+      // Make an array of the values.
+      $Values = array_diff_key($Set, $Key, $DontUpdate);
+      
+      $Px = $this->SQL->Database->DatabasePrefix;
+      $Sql = "insert {$Px}$Table 
+         (".implode(', ', array_keys($Set)).')
+         values (:'.implode(', :', array_keys($Set)).')
+         on duplicate key update ';
+      
+      $Update = '';
+      foreach ($Values as $Key => $Value) {
+         if ($Update)
+            $Update .= ', ';
+         if ($Op == '=')
+            $Update .= "$Key = :{$Key}_Up";
+         else
+            $Update .= "$Key = $Key $Op :{$Key}_Up";
+      }
+      $Sql .= $Update;
+      
+      // Construct the arguments list.
+      $Args = array();
+      foreach ($Set as $Key => $Value) {
+         $Args[':'.$Key] = $Value;
+      }
+      foreach ($Values as $Key => $Value) {
+         $Args[':'.$Key.'_Up'] = $Value;
+      }
+      
+
+      
+      // Do the final query.
+      try {
+         $this->SQL->Database->Query($Sql, $Args);
+      } catch (Exception $Ex) {
+         decho($Sql);
+         decho($Args);
+         die();
+      }
    }
 }
