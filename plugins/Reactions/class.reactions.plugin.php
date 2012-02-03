@@ -149,6 +149,9 @@ class ReactionsPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
+      if (!isset($Args['Comment']))
+         return;
+      
       WriteReactionBar($Args['Comment']);
       return;
       
