@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
    };
    
    $(document).delegate('.FlagHandle,.React .ReactHeading', 'click', function() {
-      $container = $(this).closest('.Reactions');
+      var $container = $(this).closest('.Reactions');
       
       toggleButtons($('.Flag', $container), true, 'left');
       toggleButtons($('.React', $container), false, 'right');
@@ -22,11 +22,14 @@ jQuery(document).ready(function($) {
    });
    
    $(document).delegate('.ReactHandle,.Flag .ReactHeading', 'click', function() {
-      $container = $(this).closest('.Reactions');
+      var $container = $(this).closest('.Reactions');
       
       toggleButtons($('.React', $container), true, 'right');
       toggleButtons($('.Flag', $container), false, 'left');
       
       return false;
    });
+   
+   if ($.fn.expander)
+      $('.Expander').expander({slicePoint: 200, expandText: gdn.definition('ExpandText'), userCollapseText: gdn.definition('CollapseText')});
 });
