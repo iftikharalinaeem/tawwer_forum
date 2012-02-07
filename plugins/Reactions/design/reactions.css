@@ -184,3 +184,10 @@
 .Compact p {
    margin: 5px 0;
 }
+
+.CountItem.Selected {
+    background: rgba(55, 173, 227, 0.1);
+    border: solid 2px rgba(55, 173, 227, .2);
+    border-radius: 4px;
+    padding: 4px
+}

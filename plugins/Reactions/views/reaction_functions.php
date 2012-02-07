@@ -22,19 +22,26 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
    $Name = $ReactionType['Name'];
    $Label = $Name;
    $SpriteClass = GetValue('SpriteClass', $ReactionType, "React$UrlCode");
-   $Count = GetValueR("Attributes.React.$UrlCode", $Row, 0);
+   
+   if ($ID = GetValue('CommentID', $Row)) {
+      $RecordType = 'comment';
+   } elseif ($ID = GetValue('ActivityID', $Row)) {
+      $RecordType = 'activity';
+   } else {
+      $RecordType = 'discussion';
+      $ID = GetValue('DiscussionID', $Row);
+   }
+   
+   if ($RecordType == 'activity')
+      $Count = GetValueR("Data.React.$UrlCode", $Row, 0);
+   else
+      $Count = GetValueR("Attributes.React.$UrlCode", $Row, 0);
+   
    $CountHtml = '';
    $LinkClass = "ReactButton-$UrlCode";
    if ($Count) {
       $CountHtml = ' <span class="Count">'.$Count.'</span>';
       $LinkClass .= ' HasCount';
-   }
-   
-   if (!$ID = GetValue('CommentID', $Row)) {
-      $RecordType = 'discussion';
-      $ID = GetValue('DiscussionID', $Row);
-   } else {
-      $RecordType = 'comment';
    }
    
    $UrlCode2 = strtolower($UrlCode);
@@ -64,10 +71,16 @@ function WriteOrderByButtons() {
 
 
 function WriteProfileCounts() {
+   $CurrentUrl = Url('', TRUE);
+   
    echo '<div class="DataCounts">';
    
    foreach (Gdn::Controller()->Data('Counts', array()) as $Row) {
-      echo ' <span class="CountItem">';
+      $ItemClass = 'CountItem';
+      if (StringBeginsWith($CurrentUrl, $Row['Url']))
+         $ItemClass .= ' Selected';
+      
+      echo ' <span class="'.$ItemClass.'">';
       
       if ($Row['Url'])
          echo '<a href="'.htmlspecialchars($Row['Url']).'">';
@@ -93,7 +106,8 @@ function WriteReactionBar($Row) {
       SetValue('Attributes', $Row, $Attributes);
    }
    
-//   echo 'Score: <span class="Column-Score">'.GetValue('Score', $Row).'</span>';
+//   decho($Row, 'Row');
+   
    echo '<div class="Reactions">';
    
    // Write the flags.
