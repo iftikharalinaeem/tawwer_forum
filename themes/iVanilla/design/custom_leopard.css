@@ -1,31 +1,20 @@
-/*
-
-*/
-
-body {
-	background:#07060c;
-	color:#333333;
-	font-family:Arial,Helvetica,sans-serif;
-	font-weight:normal;
-	text-align:center;
+html {
+   background: #000; 
 }
-
-#Body {
-	margin:0 auto;
+body {
+	background:#42AFDC url(images/html-bg.gif) repeat-x;
+	color: #000;
 }
 
 #Frame{
-	background:transparent url(space-desktop.jpg) no-repeat center top;
-	min-height:838px;
+	background:transparent url(images/space-desktop.jpg) no-repeat center top;
 }
 
 a, a:link, a:visited, a:active {
 	color:#000000;
 }
-
 a:hover{
-	color:#fd7bee;
-	/*text-decoration:underline;*/
+	color:#9e9e9e;
 }
 
 div.Box h4 {
@@ -33,51 +22,27 @@ div.Box h4 {
 }
 
 a.BigButton {
-	-moz-box-shadow:0 0 0px #fff;
-	background:transparent url(BigBitton_up_leopard.png) no-repeat;
-	border:0px solid #fff;
+	background: url('images/big-button-sprite-leopard.png') 0 0 repeat-x;
+	border:1px solid #b211b0;
 	color:#000;
 	text-shadow:0 1px 0 #fff;
-	width:250px;
-	height:41px;
-	-moz-border-radius:0px;
-	-webkit-border-radius:0px;
-	margin:0;
-	
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
 }
 
-a.BigButton:hover {
-	background:transparent url(BigBitton_over_leopard.png) no-repeat;
-    color: #000;
-    border: 0px solid #fff;
-	box-shadow: 0;
-	-moz-box-shadow:0 0 0px #fff;
-	width:250px;
-	height:41px;
-	  
-}
+a.BigButton:hover,
 a.BigButton:focus {
-   background:transparent url(BigBitton_over.png) no-repeat;
-    color: #000;
-    border: 0px solid #fff;
-	box-shadow: 0;
-	-moz-box-shadow:0 0 0px #fff;
-	width:250px;
-	height:41px;
-	  
+	background-position: 0 -100px;
+	border:1px solid #b211b0;
+
 }
 
 input.Button {
-	font-size:12px;
 	font-weight:bold;
 }
 
 a.Button,
 .Button, #AttachFileLink {
-   cursor: pointer;
-   margin: 0;
-   font-size: 11px;
-   padding: 2px;
    background:#f2f2f2;
    color: #282828;
 	text-shadow: 0 1px 0 #fff;
@@ -87,18 +52,17 @@ a.Button,
 	box-shadow: 0px 0px 0px #fff;
 	-moz-box-shadow: 0px 0px 0px #fff;
 	-webkit-box-shadow: 0px 0px 0px #fff;  
-   }
+}
 
 .Button:hover, #AttachFileLink {
    color: #282828;
    border: 1px solid #282828;
 }
 .Button:focus {
-   background: #BF00A9;
+   background: #00baff;
 }
 
 ul.DataList a.Delete {
-	padding: 4px;
     background:#f2f2f2;
     color: #000000;
     border: 1px solid #ddd;
@@ -114,92 +78,14 @@ ul.DataList a.Delete:hover {
 /* ============================================================= Header */
 
 #Head {
-	background: transparent url(header_bg.gif) repeat-x scroll left top;
-	padding:0;
-	text-align:right;
-	height:72px;
+   background: none;
 }
-
-div.Menu {
-	text-align:left;
-}
-
-ul#Menu {
-	float:right;
-	padding:25px 0 0 10px;
-}
-
-div.logo {
-	margin:0 auto;
-	text-align:right;
-	width:960px;
-}
-
-body #Head h1 {
-	border:0 none;
-	display:block;
-	float:left;
-	font-weight:bold;
-	line-height:1;
-	margin:0 0 0 10px;
-	padding:21px 7px 0 0;
-}
-
 #Head h1.Title a{
-	color:#fff;
-	font-size:1.7em;
-
+	color: #fff;
 }
 
 #Head h1.Title a:hover{
-	color:#BF00A9;
-	font-size:1.7em;
-}
-
-#nav {
-	background: url(content-top-bg.png) no-repeat left top;
-	height: 26px;
-}
-#nav ul{
-	list-style: none;
-	margin: 0px 0px 0px 25px;
-	padding: 0px;
-	font: bold 12px/100% Arial, Helvetica, sans-serif;
-}
-#nav ul li{
-	margin: 0px 1px 0px 0px;
-	padding: 0px;
-	float: left;
-}
-#nav ul li a{
-	padding: 5px 7px 6px 7px;
-	text-decoration: none;
-	color: #000000;
-	display: block;
-}
-#nav li a:visited{
-	text-decoration: none;
-	color: #000000;
-}
-#nav li a:hover{
-	text-decoration: none;
-	background: #BF00A9;
-	color: #ffffff;
-}
-
-#nav  a span, #nav  li.Active a span, #nav  li.Highlight a:hover span {
-
-	-moz-border-radius:3px;
-	-webkit-border-radius:3px;
-	background:#BF00A9;
-	border:1px solid #BF00A9;
-	color:#fff;
-	padding:1px;
-	font-size:9px;
-}
-
-div.Tabs div.SubTab {
-	background:#fff;
+	color: #000;
 }
 
 div.Preview {
@@ -207,15 +93,8 @@ div.Preview {
 }
 
 /* ============================================================= Entry Screen */
-body.Entry #Content {
-	float:left;
-}
+
 body.Entry #Content h1 {
-    font-size:19px;
-	font-weight:normal;
-	line-height:22px;
-	padding:20px 0 10px 10px;
-	font-family:Arial,Helvetica,sans-serif;
 	color:#000000;
 }
 
@@ -227,35 +106,17 @@ body.Entry form ul li label {
 	color:#000000;
 }
 
-body.Entry #Content {
-	float:left;
-	margin:0 auto;
-	text-align:left;
-	width:670px;
-}
-
 /* ============================================================= content */
 
 #Content {
 	background:#fff;
-	float:left;
-	margin:0 0 40px;
-	padding:10px;
-	width:670px;
-	min-height:340px;
-}
-
-body.Profile #Content {
-	float:left;
-	margin:0 0 40px;
-	width:670px;
-}
-
-div.MessageForm, div.Tabs {
-	background:#f2f2f2;
-	border:1px solid #c4c4c4;
-	display:block;
-	padding:5px 8px;
+	padding: 5px 10px 10px 10px;	
+	-webkit-border-top-left-radius: 5px;
+   -webkit-border-top-right-radius: 5px;
+   -moz-border-radius-topleft: 5px;
+   -moz-border-radius-topright: 5px;
+   border-top-left-radius: 5px;
+   border-top-right-radius: 5px;
 }
 
 a.Active, div.Tabs li.Active a {
@@ -263,22 +124,8 @@ a.Active, div.Tabs li.Active a {
 	color:#000000;
 }
 
-div.MessageForm a.Cancel, div.MessageForm a.Cancel:link, div.MessageForm a.Cancel:active, div.MessageForm a.Cancel:visited, div.MorePager a, div.MorePager a:link,  div.MorePager a:active, div.MorePager a:visited, a.TabLink, a.TabLink:link,  a.TabLink:active, a.TabLink:visited, div.Tabs li a, div.Tabs li a:link, div.Tabs li a:active, div.Tabs li a:visited {
-	background:#ffffff;
-	border:1px solid #c4c4c4;
-	font-size:12px;
-	color:#000000;
-}
-
-div.MessageForm a.Cancel:hover, div.MorePager a:hover, a.TabLink:hover, div.Tabs li a:hover {
-	background:#e1e1e1;
-	border:1px solid #c4c4c4;
-	font-size:12px;
-}
-
 ul.DataList li.Item {
 	border-bottom:1px solid #e1e1e1;
-	padding:4px 0;
 }
 
 .Mine {
@@ -286,29 +133,21 @@ ul.DataList li.Item {
 }
 
 ul.DataList a.Title {
-	font-size:19px;
-	font-weight:normal;
-	line-height:22px;
-	padding:7px 0 5px;
-	font-family:Arial,Helvetica,sans-serif;
 	color:#000000;
-}
-ul.DataList a:hover.Title {
-	color:#fd7bee;
 }
 
 div.Tabs li a span {
-	background:#BF00A9;
+	background:#00baff;
 	color:#fff;
 }
 
 ul.DataList div.Meta strong {
-	background:#BF00A9;
+	background:#00baff;
 	color:#fff;
 }
 
 ul.DataList div.Meta span.Announcement {
-	background:#BF00A9;
+	background:#00baff;
 	color:#fff;
 }
 
@@ -331,49 +170,15 @@ ul.Options li.Active ul {
 	-webkit-box-shadow: 0px 0px 0px #fff;     
 }
 
-a.Bookmark,
-a.Bookmarking {
-	float: right;
-   display: block;
-   background: url(star_sprite.png) top center no-repeat;
-   height: 22px;
-   width: 22px;
-   margin: 2px 4px 0 4px;
-}
-a.Bookmark span,
-a.Bookmarking span {
-   display: none;
-}
-a.Bookmarked {
-   background: url(star_sprite.png) center center no-repeat;
-}
-a.Bookmarking {
-   background: url(star_sprite.png) bottom center no-repeat;
-}
-
 /* ============================================================= discussions */
 
 #DiscussionForm h2 {
-	font-size:19px;
-	font-weight:normal;
-	line-height:22px;
-	padding:7px 0 5px;
-	font-family:Arial,Helvetica,sans-serif;
 	color:#000000;
 }
 
 #DiscussionForm form {
 	background:#f2f2f2;
 	border:1px solid #c4c4c4;
-	margin:0;
-	padding:20px;
-}
-
-div.CommentForm textarea {
-	height:100px;
-	margin:0 0 6px;
-	min-height:100px;
-	width:645px;
 }
 
 li.Editing {
@@ -381,7 +186,6 @@ li.Editing {
 }
 
 /* ============================================================= activities */
-
 
 ul.Activities div.Excerpt a,
 ul.Activities div.Meta a {
@@ -397,73 +201,29 @@ ul.Activities ul.DataList li {
 	border:1px solid #C4C4C4;
 }
 
-ul.Activities li.CommentForm input.Button {
-	-moz-box-shadow:0 0 0px #fff;
-	font-size:12px;
-}
-
-#MessageForm textarea {
-	height:100px;
-	margin-bottom:2px;
-	min-height:100px;
-	width:645px;
-}
-
-form.Activity textarea {
-	height:60px;
-	margin-bottom:2px;
-	min-height:60px;
-	width:645px;
-}
-
 div.Popup #ConversationForm h2 {
 	color:#282828;
-	font-size:100%;
 	font-weight:bold;
-	padding:6px 30px 4px;
 }
 
 /* ==================================================== New Conversation Form */
 
-body.Post #Content {
-	width:670px;
-}
-
-#DiscussionForm input.InputBox {
-	margin-bottom:10px;
-	width:620px;
-}
-
-#DiscussionForm textarea {
-	height:100px;
-	margin:0 0 6px;
-	min-height:100px;
-	width:620px;
-}
-
 #ConversationForm h2 {
-	font-size:19px;
-	font-weight:normal;
-	line-height:22px;
-	padding:7px 0 5px;
-	font-family:Arial,Helvetica,sans-serif;
 	color:#000000;
 }
 
 #ConversationForm form {
 	background:#f2f2f2;
 	border:1px solid #c4c4c4;
-	margin:0;
-	padding:20px;
 }
 
 .ac_over {
-	background:#BF00A9;
+	background:#00baff;
 	color:#000000;
 }
 
 .ac_over strong {
-	background:#BF00A9;
+	background:#00baff;
 	font-weight:normal;
 }
 
@@ -474,56 +234,29 @@ body.Post #Content {
 #MessageForm h2 {
 	color:#000000;
 }
+.AddPeople form div {
+   padding: 0 7px 3px 3px;
+}
 
 /* ============================================================= profile page */
 
-body.Profile #Content {
-	float:left;
-	margin:0 0 40px 0;
-	width:670px;
-}
-
-body.Profile #Panel {
-	float:right;
-	width:250px;
-}
-
-body.Profile #Panel .Photo{
-	width:250px;
-	margin:0 auto;
-	text-align:center;
-}
-
 div.User h1 {
-	margin:15px 0 20px 0;
-	font-size:19px;
-	font-weight:normal;
-	line-height:22px;
-	font-family:Arial,Helvetica,sans-serif;
 	color:#000000;
 }
 
 div.Photo img{
 	border:1px solid #000000;
-	padding:2px;
-	margin-bottom:0;
-
 }
 
 ul.DataList div.Photo img {
 	border:1px solid #000000;
-	padding:2px;
-}
-
-ul.PanelInfo li {
-	padding:5px;
 }
 
 body.Profile ul.PanelInfo{
-	border:1px solid #f2f2f2;
+	border: 1px solid #f2f2f2;
 }
 body.Profile ul.PanelInfo li{
-	background:#f2f2f2;
+	background: #f2f2f2;
 }
 
 div.Box dl {
@@ -535,141 +268,88 @@ div.Box dl {
 div.Popup div.Body {
 	border:0px solid #000000;
 }
-
 div.Popup h1, div.Popup h2 {
-	background:#DDDDDD url(div-box-top-bg-dot.png) no-repeat scroll 0 50%;
-	border-bottom:0px solid #000;
-	color:#000;
-	height:17px !important;
-	padding:0 30px 5px;
-	font-size:100%;
+	background: #DDDDDD;
+	border-bottom: 0px solid #000;
+	color: #000;
 }
-
 div.Popup .Footer {
-	background:#fff;
-	border-top:0px solid #fff;
-	padding:2px 6px 0 0;
-
+	background: #fff;
+	border-top: 0px solid #fff;
 }
-
 
 
 /* ============================================================= search */
 
 #Search {	
-	background:transparent url(searchform-bg.png) no-repeat right bottom;
-	display:block;
-	margin:0 0 15px;
-	padding:7px;
+	background: transparent url(images/searchform-bg.png) no-repeat right bottom;
 }
-
 
 #Head form input.InputBox {
-	background:#FFFFFF;
-	border:1px solid #f2f2f2;
-	color:#000000;
-	width:150px;
-}
-
-#Panel input.InputBox, div.AddPeople textarea.MultiComplete {
-	margin:0 5px 2px 5px;
-	width:180px;
-}
-
-input.DateBox, input.InputBox, input.SmallInput, textarea {
-	border:1px solid #000000;
-	font-family:Georgia,"Times New Roman",Times,serif;;
-	font-size:12px;
-	padding:3px;
+	background: #FFFFFF;
+	border: 1px solid #f2f2f2;
+	color: #000000;
 }
 
 /* ============================================================= sidebar */
 
-#DivBoxTop{
-	background:transparent url(div-box-top-bg.png) top no-repeat;
-	width:250px;
-	margin:0;
+.Box {	
+	background: #FFF none repeat scroll 0 0;
+	color: #000000;
+	margin-bottom: 15px;
+	-webkit-border-top-left-radius: 5px;
+   -webkit-border-top-right-radius: 5px;
+   -moz-border-radius-topleft: 5px;
+   -moz-border-radius-topright: 5px;
+   border-top-left-radius: 5px;
+   border-top-right-radius: 5px;
+   padding: 5px;
+}
+.BoxDiscussionFilter {
+   -webkit-border-top-left-radius: 0;
+   -webkit-border-top-right-radius: 0;
+   -moz-border-radius-topleft: 0;
+   -moz-border-radius-topright: 0;
+   border-top-left-radius: 0;
+   border-top-right-radius: 0;
 }
 
-div.Box {	
-	background:#f2f2f2 none repeat scroll 0 0;
-	color:#000000;
-	margin:0 0 15px 0;
+.Box h4 {
+	color: #000;
+	font-weight: bold;
 }
-
-#DivBoxTop h4 {
-	color:#000;
-	font-size:100%;
-	font-weight:bold;
-	margin:0;
-	padding:0 0 1px 30px;
-}
-
-#Panel {
-	float:right;
-	margin-bottom:50px;
-	margin-top:-25px;
-	width:250px;
-}
-
-
 ul.PanelInfo {
-	border-top:1px solid #c4c4c4;
-}
 
+}
 ul.PanelInfo li.Active {
-	border-bottom:1px solid #C4C4C4;
+	border-bottom: 1px solid #C4C4C4;
 }
-
 ul.PanelInfo li {
-	background:#e1e1e1;
-	border-bottom:1px solid #c4c4c4;
+	background: #e1e1e1;
+	border-bottom: 1px solid #c4c4c4;
 }
-
 ul.PanelInfo li.Active a {
-	color:#000000;
+	color: #000000;
 }
-
 ul.PanelInfo div.Meta strong {
-	background:#BF00A9;
-	color:#fff;
+	background: #00baff;
+	color: #fff;
 }
 
 /* ============================================================= footer */
 
 #Foot {
-	clear:both;
-	color:#fff;
+	color: #000;
 }
-
-#Foot div {
-	margin:0 auto;
-	text-align:left;
-	width:960px;
-}
-
-
 #Foot a, #Foot a:link, #Foot a:visited, #Foot a:active {
-	color:#fff;
+	color: #000000;
 }
-
-
 #Foot a:hover{
-	color:#ddd;
-	/*text-decoration:underline;*/
+	color: #000;
 }
-#Foot .vanilla-ico {
-	background:url(vanilla_ico_leopard.png) no-repeat;
-	float:left;
-	width:15px;
-	height:15px;
-	margin:0;
-	padding:0 7px 7px 0;
-}
-
 .Foot {
-	background:#f2f2f2;
-	border-bottom:1px solid #c4c4c4;
+	background: #f2f2f2;
+	border-bottom: 1px solid #c4c4c4;
 }
 
 /* ============================================================= plugins */
