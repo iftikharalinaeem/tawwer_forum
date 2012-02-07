@@ -75,6 +75,8 @@ class ReactionsPlugin extends Gdn_Plugin {
    }
    
    public function Structure() {
+      include_once dirname(__FILE__).'/class.reactionmodel.php';
+      
       $St = Gdn::Structure();
       $Sql = Gdn::SQL();
       
@@ -88,7 +90,7 @@ class ReactionsPlugin extends Gdn_Plugin {
          ->Set();
       
       $St->Table('UserTag')
-         ->Column('RecordType', array('Discussion', 'Discussion-Total', 'Comment', 'Comment-Total', 'User', 'Activity', 'ActivityComment'), FALSE, 'primary')
+         ->Column('RecordType', array('Discussion', 'Discussion-Total', 'Comment', 'Comment-Total', 'User', 'User-Total', 'Activity', 'Activity-Total', 'ActivityComment', 'ActivityComment-Total'), FALSE, 'primary')
          ->Column('RecordID', 'int', FALSE, 'primary')
          ->Column('TagID', 'int', FALSE, 'primary')
          ->Column('UserID', 'int', FALSE, array('primary', 'key'))
@@ -107,6 +109,12 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Rm->DefineReactionType(array('UrlCode' => 'Disagree', 'Name' => 'Disagree'));
       $Rm->DefineReactionType(array('UrlCode' => 'Awesome', 'Name' => 'Awesome', 'IncrementColumn' => 'Score', 'Points' => 1));
       $Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic'));
+   }
+   
+   public function ActivityController_Render_Before($Sender) {
+      $this->AddJs($Sender);
+      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
+      include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }
    
    /// Event Handlers ///
@@ -144,6 +152,13 @@ class ReactionsPlugin extends Gdn_Plugin {
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }
    
+   public function ActivityController_AfterActivityBody_Handler($Sender, $Args) {
+      $Activity = $Args['Activity'];
+      if (in_array(GetValue('ActivityType', $Activity), array('Status', 'WallPost'))) {
+         WriteReactionBar($Activity);
+      }
+   }
+   
    public function DiscussionController_AfterDiscussionBody_Handler($Sender, $Args) {
       WriteReactionBar($Args['Discussion']);
    }
@@ -153,75 +168,17 @@ class ReactionsPlugin extends Gdn_Plugin {
          return;
       
       WriteReactionBar($Args['Comment']);
-      return;
-      
-      if ($Sender->ReactionsVersion == 2) {
-      // Here's version 2
-      ?>
-      <div class="Reactions">
-         <div class="Flag">
-            <div class="Handle">
-               <a href="#"><span class="ReactSprite ReactFlag"></span> <label>Flag</label></a>
-            </div>
-            <div class="Options">
-               <strong>Flag &raquo;</strong>
-               <a href="#"><span class="ReactSprite ReactFlag"></span> <label>Abuse</label></a>
-               <a href="#"><span class="ReactSprite ReactSpam HasCount"></span> <label>Spam</label> <span class="Count">1</span></a>
-               <a href="#"><span class="ReactSprite ReactTroll HasCount"></span> <label>Troll</label> <span class="Count">2</span></a>
-            </div>
-         </div>
-         <div class="React">
-            <div class="Handle">
-               <a href="#"><span class="ReactSprite ReactAgree"></span> <label>React</label></a>
-            </div>
-            <div class="Options">
-               <a href="#"><span class="ReactSprite ReactOffTopic"></span> <label>Off Topic</label></a>
-               <a href="#"><span class="ReactSprite ReactDisagree"></span> <label>Disagree</label></a>
-               <a href="#"><span class="ReactSprite ReactAgree"></span> <label>Agree</label></a>
-               <a href="#"><span class="ReactSprite ReactAwesome HasCount"></span> <label>Awesome</label> <span class="Count">6</span></a>
-               <strong>&laquo; React</strong>
-            </div>
-         </div>
-      </div>
-      <?php
-      } else {
-      // Here's version 1
-      ?>
-      <div class="Reactions">
-         <div class="Flag">
-            <div class="Closed">
-               <a href="#"><span class="ReactSprite ReactFlag"></span> <label>Flag</label></a>
-            </div>
-            <div class="Open">
-               <a href="#"><span class="ReactSprite ReactFlag"></span> <label>Abuse</label></a>
-               <a href="#"><span class="ReactSprite ReactSpam HasCount"></span> <label>Spam</label> <span class="Count">1</span></a>
-               <a href="#"><span class="ReactSprite ReactTroll HasCount"></span> <label>Troll</label> <span class="Count">2</span></a>
-            </div>
-         </div>
-         <div class="React">
-            <div class="Closed">
-               <a href="#"><span class="ReactSprite ReactAgree"></span> <label>React</label></a>
-            </div>
-            <div class="Open">
-               <a href="#"><span class="ReactSprite ReactOffTopic"></span> <label>Off Topic</label></a>
-               <a href="#"><span class="ReactSprite ReactDisagree"></span> <label>Disagree</label></a>
-               <a href="#"><span class="ReactSprite ReactAgree"></span> <label>Agree</label></a>
-               <a href="#"><span class="ReactSprite ReactAwesome HasCount"></span> <label>Awesome</label> <span class="Count">6</span></a>
-            </div>
-         </div>
-      </div>
-      <?php
-      }
    }
    
    public function DiscussionController_CommentHeading_Handler($Sender, $Args) {
       WriteOrderByButtons();
    }
    
-   public function Base_BeforeUserInfo_Handler($Sender, $Args) {
+   public function Base_AfterUserInfo_Handler($Sender, $Args) {
       // Fetch the view helper functions.
       include_once Gdn::Controller()->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
       
+      echo '<h2>'.T('Reactions').'</h2>';
       WriteProfileCounts();
    }
    
@@ -239,18 +196,23 @@ class ReactionsPlugin extends Gdn_Plugin {
       
       list($Offset, $Limit) = OffsetLimit($Page, 5);
       
-      $Sender->SetData('_PageSize', 5);
+      $Sender->SetData('_Limit', $Limit + 1);
       
       $ReactionModel = new ReactionModel();
       $Data = $ReactionModel->GetRecordsWhere(array('TagID' => $ReactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'UserID' => $UserID, 'Total >' => 0),
          'DateInserted', 'desc',
-         $Limit, $Offset);
-      $Sender->SetData('Data', $Data);
+         $Limit + 1, $Offset);
       
+      $Sender->SetData('_CurrentRecords', count($Data));
+      if (count($Data) > $Limit) {
+         array_pop($Data);
+      }
+      
+      $Sender->SetData('Data', $Data);
+      $Sender->SetData('EditMode', FALSE, TRUE);
       $Sender->GetUserInfo($UserID, $Username);
       $Sender->_SetBreadcrumbs($ReactionType['Name'], $Sender->CanonicalUrl());
       $Sender->SetTabView('Reactions', 'DataList', '', 'plugins/Reactions');
-      
       $this->AddJs($Sender);
       $Sender->AddJsFile('jquery.expander.js');
       $Sender->AddDefinition('ExpandText', T('(more)'));
@@ -283,6 +245,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->SetData('Counts', $Counts);
       
       $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
+      $this->AddJs($Sender);
    }
    
    /**
@@ -301,7 +264,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
       
       if (count($Sender->Request->Post()) == 0)
-         die('Requires Javascript');
+         throw PermissionException('Javascript');
       
       $ReactionType = ReactionModel::ReactionTypes($Reaction);
       

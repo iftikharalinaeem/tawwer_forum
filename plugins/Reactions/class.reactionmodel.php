@@ -137,6 +137,8 @@ class ReactionModel {
    }
    
    public function GetRow($Type, $ID, $Operation) {
+      $AttrColumn = 'Attributes';
+      
       switch ($Type) {
          case 'Comment':
             $Model = new CommentModel();
@@ -145,6 +147,11 @@ class ReactionModel {
          case 'Discussion':
             $Model = new DiscussionModel();
             $Row = $Model->GetID($ID);
+            break;
+         case 'Activity':
+            $Model = new ActivityModel();
+            $Row = $Model->GetID($ID, DATASET_TYPE_ARRAY);
+            $AttrColumn = 'Data';
             break;
          default:
             throw NotFoundException(ucfirst($Type));
@@ -164,13 +171,13 @@ class ReactionModel {
       $Row = (array)$Row;
       
       // Make sure the attributes are in the row and unserialized.
-      $Attributes = GetValue('Attributes', $Row, array());
+      $Attributes = GetValue($AttrColumn, $Row, array());
       if (is_string($Attributes))
          $Attributes = @unserialize($Attributes);
       if (!is_array($Attributes))
          $Attributes = array();
       
-      $Row['Attributes'] = $Attributes;
+      $Row[$AttrColumn] = $Attributes;
       return array($Row, $Model, $Log);
    }
    
@@ -216,7 +223,13 @@ class ReactionModel {
       Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'));
    }
    
-   public function ToggleUserTag(&$Data, &$Record) {
+   /**
+    *
+    * @param type $Data
+    * @param array $Record
+    * @param Gdn_Model $Model 
+    */
+   public function ToggleUserTag(&$Data, &$Record, $Model) {
       $Inc = GetValue('Total', $Data, 1);
       
       TouchValue('Total', $Data, $Inc);
@@ -240,6 +253,7 @@ class ReactionModel {
       }
       
       $RecordType = $Data['RecordType'];
+      $AttrColumn = $RecordType == 'Activity' ? 'Data' : 'Attributes';
       
       // Delete all of the tags.
       if (count($UserTags) > 0) {
@@ -315,7 +329,7 @@ class ReactionModel {
             }
          }
          
-         if (GetValueR("Attributes.React.{$Type['UrlCode']}", $Record) != GetValue($Type['UrlCode'], $React)) {
+         if (GetValueR("$AttrColumn.React.{$Type['UrlCode']}", $Record) != GetValue($Type['UrlCode'], $React)) {
             $Diffs[] = $Type['UrlCode'];
          }
       }
@@ -328,11 +342,13 @@ class ReactionModel {
                'Html');
       }
       
-      $Record['Attributes']['React'] = $React;
-      $Set['Attributes'] = serialize($Record['Attributes']);
-      $this->SQL->Put($Data['RecordType'],
-         $Set,
-         array($Data['RecordType'].'ID' => $Data['RecordID']));
+      $Record[$AttrColumn]['React'] = $React;
+      $Set[$AttrColumn] = serialize($Record[$AttrColumn]);
+      
+      $Model->SetField($Data['RecordID'], $Set);
+//      $this->SQL->Put($Data['RecordType'],
+//         $Set,
+//         array($Data['RecordType'].'ID' => $Data['RecordID']));
       
       // Generate the new button for the reaction.
       Gdn::Controller()->SetData('Diffs', $Diffs);
@@ -370,6 +386,8 @@ class ReactionModel {
       $RecordType = ucfirst($RecordType);
       $Reaction = strtolower($Reaction);
       $ReactionType = self::ReactionTypes($Reaction);
+      $AttrColumn = $RecordType == 'Activity' ? 'Data' : 'Attributes';
+      
       if (!$ReactionType)
          throw NotFoundException($Reaction);
       
@@ -396,16 +414,16 @@ class ReactionModel {
           'UserID' => $UserID,
           'Total' => $Inc
           );
-      $this->ToggleUserTag($Data, $Row);
+      $this->ToggleUserTag($Data, $Row, $Model);
       
       $Message = array(T(GetValue('InformMessage', $ReactionType, 'Thanks for the reaction!')), 'Dismissable AutoDismiss');
       
       // Now deciede whether we need to log or delete the record.
-      $Score = GetValueR('Attributes.React.'.$ReactionType['UrlCode'], $Row);
+      $Score = GetValueR($AttrColumn.'.React.'.$ReactionType['UrlCode'], $Row);
       $LogThreshold = GetValue('LogThreshold', $ReactionType, 10000000);
       $RemoveThreshold = GetValue('RemoveThreshold', $ReactionType, 10000000);
       
-      if (!GetValueR('Attributes.RestoreUserID', $Row)) {
+      if (!GetValueR($AttrColumn.'.RestoreUserID', $Row)) {
          // We are only going to remove stuff if the record has not been verified.
          $Log = GetValue('Log', $ReactionType, 'Moderation');
          
@@ -423,7 +441,6 @@ class ReactionModel {
             }
             $LogOptions['OtherUserIDs'] = $OtherUserIDs;
          }
-         
          
          if ($Score >= $RemoveThreshold) {
             // Remove the record to the log.
@@ -451,8 +468,8 @@ class ReactionModel {
          }
       } else {
          if ($Score >= min($LogThreshold, $RemoveThreshold)) {
-            $RestoreUser = Gdn::UserModel()->GetID(GetValueR('Attributes.RestoreUserID', $Row));
-            $DateRestored = GetValueR('Attributes.DateRestored', $Row);
+            $RestoreUser = Gdn::UserModel()->GetID(GetValueR($AttrColumn.'.RestoreUserID', $Row));
+            $DateRestored = GetValueR($AttrColumn.'.DateRestored', $Row);
             
             // The post would have been logged, but since it has been restored we won't do that again.
             $Message = array(
@@ -681,9 +698,10 @@ class ReactionModel {
    
    protected function _SaveRecordReact($RecordType, $RecordID, $React) {
       $Set = array();
+      $AttrColumn = $RecordType = 'Activity' ? 'Data' : 'Attributes';
       
       $Row = $this->SQL->GetWhere($RecordType, array($RecordType.'ID' => $RecordID))->FirstRow(DATASET_TYPE_ARRAY);
-      $Attributes = @unserialize($Row['Attributes']);
+      $Attributes = @unserialize($Row[$AttrColumn]);
       if (!is_array($Attributes))
          $Attributes = array();
       
@@ -696,7 +714,7 @@ class ReactionModel {
          $Attributes = NULL;
       else
          $Attributes = serialize($Attributes);
-      $Set['Attributes'] = $Attributes;   
+      $Set[$AttrColumn] = $Attributes;   
       
       // Calculate the record's score too.
       foreach (self::ReactionTypes() as $Type) {
