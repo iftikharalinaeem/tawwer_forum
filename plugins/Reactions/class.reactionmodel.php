@@ -593,7 +593,7 @@ class ReactionModel {
 
                self::$ReactionTypes[strtolower($Row['UrlCode'])] = $Row;
             }
-            Gdn::Cache()->Store('ReactionTypes', $ReactionTypes);
+            Gdn::Cache()->Store('ReactionTypes', self::$ReactionTypes);
          } else {
             self::$ReactionTypes = $ReactionTypes;
          }
