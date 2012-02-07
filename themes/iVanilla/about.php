@@ -12,17 +12,17 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['iVanilla'] = array(
-   'Description' => "A mac inspired theme",
-   'Version' => '1.1',
-   'Author' => "Brendan Sera-Shriar",
-   'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://brendanserashriar.com',
+   'Name' => "iVanilla",
+   'Description' => "An Apple-inspired theme.",
+   'Version' => '2.0',
+   'Author' => "Matt Lincoln Russell",
+   'AuthorEmail' => 'lincoln@vanillaforums.com',
+   'AuthorUrl' => 'http://lincolnwebs.com',
    'Options' => array(
-		'Description' => '<strong>iVanilla</strong> has <font color="red">2 background</font> options. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">"Theme Options"</a>.',
-         
-		 'Styles' => array(
-            'iVanilla - Leopard' => '%s_leopard',
-            'iVanilla - Default ' => '%s'),
-         
+		'Description' => 'iVanilla has 2 background options.',
+      'Styles' => array(
+         'Default ' => '%s',
+         'Leopard' => '%s_leopard'
+      ),
    )
 );
