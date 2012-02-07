@@ -64,7 +64,6 @@ input.Button {
    background:#fff;
    color: #282828 ;
 	text-shadow: 0 1px 0 #fff;
-   border: 1px solid #00BAFF;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
 	border-radius: 3px;
@@ -286,12 +285,7 @@ ul.Activities ul.DataList li {
 }
 
 .ac_over {
-	background:#00baff;
 	color:#282828;
-}
-
-.ac_over strong {
-	background:#00baff;
 }
 
 #MessageForm {
@@ -345,17 +339,12 @@ div.Popup .Footer {
 /* ============================================================= search */
 #Search {	
 	background:#D8F4FF none repeat scroll 0 0;
-	border:1px solid #00BAFF;
 }
 
 #Head form input.InputBox {
 	background:#FFFFFF;
 	border:1px solid #f2f2f2;
 	color:#282828;
-}
-
-input.DateBox, input.InputBox, input.SmallInput, textarea {
-	border:1px solid #00BAFF;
 }
 
 /* ============================================================= sidebar */
