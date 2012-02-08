@@ -340,7 +340,15 @@ class ReactionModel {
                "#{$RecordType}_{$Data['RecordID']} .Column-".$Column, 
                FormatScore($Value),
                'Html');
+               
+         $Record[$Column] = $Value;
       }
+      // Send back the css class.
+      list($AddCss, $RemoveCss) = ScoreCssClass($Record, TRUE);
+      if ($RemoveCss)
+         Gdn::Controller()->JsonTarget("#{$RecordType}_{$Data['RecordID']}", $RemoveCss, 'RemoveClass');
+      if ($AddCss)
+         Gdn::Controller()->JsonTarget("#{$RecordType}_{$Data['RecordID']}", $AddCss, 'AddClass');
       
       $Record[$AttrColumn]['React'] = $React;
       $Set[$AttrColumn] = serialize($Record[$AttrColumn]);

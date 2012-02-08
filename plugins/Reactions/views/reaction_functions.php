@@ -66,6 +66,26 @@ EOT;
 endif;
 
 
+if (!function_exists('ScoreCssClass')):
+   
+function ScoreCssClass($Row, $All = FALSE) {
+   $Score = GetValue('Score', $Row);
+   
+   if ($Score < 0)
+      $Result = 'Score-Low';
+   elseif ($Score > 10)
+      $Result = 'Score-High';
+   else
+      $Result = '';
+   
+   if ($All)
+      return array($Result, 'Score-Low Score-High');
+   else
+      return $Result;
+}
+
+endif;
+
 function WriteOrderByButtons() {
    if (!Gdn::Session()->IsValid())
       return;
