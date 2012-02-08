@@ -12,8 +12,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['light grunge'] = array(
-   'Description' => "A light grungy forum",
-   'Version' => '1.0',
+   'Description' => "A light grungy forum.",
+   'Version' => '1.1',
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
    'AuthorUrl' => 'http://brendanserashriar.com'

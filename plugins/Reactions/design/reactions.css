@@ -1,0 +1,193 @@
+.Reactions {
+   position: relative;
+   background: rgba(0,0,0,0.01);
+   margin-top: 12px;
+   font-size: 11px;
+   line-height: 18px;
+   border-radius: 4px;
+}
+
+.Reactions .Handle {
+   display: inline-block;
+   padding: 4px;
+}
+
+.Nub {
+   padding: 4px;
+}
+
+.React {
+   position: absolute;
+   right: 0;
+   top: 0;
+}
+
+.Flag {
+   position: absolute;
+}
+
+.ReactHeading {
+   display: inline-block;
+   padding: 4px 6px;
+   background: rgba(0,0,0,0.04);
+   color: rgba(0,0,0,0.4);
+}
+
+.Flag .ReactHeading {
+   border-radius: 4px 0 0 4px;
+}
+
+.React .ReactHeading {
+   border-radius: 0 4px 4px 0;
+}
+
+.Item:hover .ReactHeading {
+   background: rgba(0,0,0,0.8);
+   color: #fff;
+}
+
+.ReactButton {
+   display: inline-block;
+   padding: 4px 2px;
+}
+
+/* Hover Mechanics */
+.Reactions a {
+   color: rgba(0,0,0,0.4);
+}
+.Reactions a:hover {
+   color: rgba(0,0,0,0.8);
+}
+.Item:hover .Reactions {
+   background: rgba(0,0,0,0.03);
+}
+
+.ReactLabel {
+   vertical-align: top;
+}
+
+.Reactions .Count {
+   border-radius: 6px;
+   -moz-border-radius: 6px;
+   -webkit-border-radius: 6px;
+   vertical-align: top;
+   background: #494949;
+   background: rgba(0, 0, 0, 0.7);
+}
+
+.HasCount .ReactLabel {
+   color: #494949;
+   color: rgba(0, 0, 0, 0.7);
+}
+
+.ReactSprite {
+   background: url('reaction-sprites.png') 0 0 no-repeat transparent;
+   height: 18px;
+   width: 18px;
+   display: inline-block;
+   vertical-align: top;
+}
+
+.InProgress span {
+   background: transparent;
+}
+
+/* Color */
+.ReactSpam { background-position: 0px -36px; }
+.ReactFlag, .ReactAbuse { background-position: -18px -36px; }
+.ReactTroll { background-position: -36px -36px; }
+.ReactDisagree { background-position: -54px -36px; }
+.ReactOffTopic { background-position: -72px -36px; }
+.ReactAgree { background-position: -90px -36px; }
+.ReactAwesome { background-position: -108px -36px; }
+
+/* Black */
+.ReactSpam { background-position: 0px -18px; }
+.ReactFlag, .ReactAbuse { background-position: -18px -18px; }
+.ReactTroll { background-position: -36px -18px; }
+.ReactDisagree { background-position: -54px -18px; }
+.ReactOffTopic { background-position: -72px -18px; }
+.ReactAgree { background-position: -90px -18px; }
+.ReactAwesome { background-position: -108px -18px; }
+
+/* Grey */
+.ReactSpam { background-position: 0px 0px; }
+.ReactFlag, .ReactAbuse { background-position: -18px 0px; }
+.ReactTroll { background-position: -36px 0px; }
+.ReactDisagree { background-position: -54px 0px; }
+.ReactOffTopic { background-position: -72px 0px; }
+.ReactAgree { background-position: -90px 0px; }
+.ReactAwesome { background-position: -108px 0px; }
+
+/* Color on Hover or when has count */
+.HasCount .ReactSpam,
+.ReactButton:hover .ReactSpam { background-position: 0px -36px; }
+.HasCount .ReactFlag, .HasCount .ReactAbuse, .ReactButton:hover .ReactAbuse,
+.ReactButton:hover .ReactFlag { background-position: -18px -36px; }
+.HasCount .ReactTroll,
+.ReactButton:hover .ReactTroll { background-position: -36px -36px; }
+.HasCount .ReactDisagree,
+.ReactButton:hover .ReactDisagree { background-position: -54px -36px; }
+.HasCount .ReactOffTopic,
+.ReactButton:hover .ReactOffTopic { background-position: -72px -36px; }
+.HasCount .ReactAgree,
+.ReactButton:hover .ReactAgree { background-position: -90px -36px; }
+.HasCount .ReactAwesome,
+.ReactButton:hover .ReactAwesome { background-position: -108px -36px; }
+
+
+.FilterButton.Selected {
+   color: #000;
+   font-weight: bold;
+}
+
+.DataCounts {
+   overflow: hidden;
+   margin: 5px 0;
+}
+
+.DataCounts a {
+   color: #000;
+}
+
+.DataCounts a:hover {
+   color: #ff0084;
+}
+
+.CountTotal {
+   display: block;
+   line-height: 100%;
+   font-size: 32px;
+}
+
+.CountItem {
+   float: left;
+   display: block;
+   width: 14%;
+   text-align: center;
+}
+
+.Compact .Item .Author img {
+   height: 24px;
+   width: 24px;
+   margin: 0 5px 4px 0;
+}
+
+.Compact .Title {
+   font-sixe: 13px;
+}
+
+.Compact .Reactions {
+   margin-top: 5px;
+}
+
+.Compact p {
+   margin: 5px 0;
+}
+
+.CountItem.Selected {
+    background: rgba(55, 173, 227, 0.1);
+    border: solid 2px rgba(55, 173, 227, .2);
+    border-radius: 4px;
+    padding: 4px
+}
