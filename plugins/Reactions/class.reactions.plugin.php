@@ -170,9 +170,9 @@ class ReactionsPlugin extends Gdn_Plugin {
       WriteReactionBar($Args['Comment']);
    }
    
-   public function DiscussionController_CommentHeading_Handler($Sender, $Args) {
-      WriteOrderByButtons();
-   }
+//   public function DiscussionController_CommentHeading_Handler($Sender, $Args) {
+//      WriteOrderByButtons();
+//   }
    
    public function Base_AfterUserInfo_Handler($Sender, $Args) {
       // Fetch the view helper functions.
