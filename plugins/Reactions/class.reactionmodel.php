@@ -325,7 +325,7 @@ class ReactionModel {
             if ($Column = GetValue('IncrementColumn', $Type)) {
                // This reaction type also increments a column so do that too.
                TouchValue($Column, $Set, 0);
-               $Set[$Column] += $TotalTags[$TagID]['Total'];
+               $Set[$Column] += $TotalTags[$TagID]['Total'] * GetValue('IncrementValue', $Type, 1);
             }
          }
          
@@ -346,10 +346,7 @@ class ReactionModel {
       $Set[$AttrColumn] = serialize($Record[$AttrColumn]);
       
       $Model->SetField($Data['RecordID'], $Set);
-//      $this->SQL->Put($Data['RecordType'],
-//         $Set,
-//         array($Data['RecordType'].'ID' => $Data['RecordID']));
-      
+
       // Generate the new button for the reaction.
       Gdn::Controller()->SetData('Diffs', $Diffs);
       if (function_exists('ReactionButton')) {
@@ -721,7 +718,7 @@ class ReactionModel {
          if (($Column = GetValue('IncrementColumn', $Type)) && isset($React[$Type['UrlCode']])) {
             // This reaction type also increments a column so do that too.
             TouchValue($Column, $Set, 0);
-            $Set[$Column] += $React[$Type['UrlCode']];
+            $Set[$Column] += $React[$Type['UrlCode']] * GetValue('IncrementValue', $Type, 1);
          }
       }
       
