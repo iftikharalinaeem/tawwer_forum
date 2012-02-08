@@ -338,7 +338,7 @@ class ReactionModel {
       foreach ($Set as $Column => $Value) {
          Gdn::Controller()->JsonTarget(
                "#{$RecordType}_{$Data['RecordID']} .Column-".$Column, 
-               $Value,
+               FormatScore($Value),
                'Html');
       }
       

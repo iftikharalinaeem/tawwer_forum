@@ -1,5 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 
+if (!function_exists('FormatScore')):
+   
+function FormatScore($Score) {
+   return $Score;
+}
+
+endif;
+
 function OrderByButton($Column, $Label = FALSE, $DefaultOrder = '') {
    $Url = Gdn::Controller()->SelfUrl.'?orderby='.urlencode($Column);
    if (!$Label)
