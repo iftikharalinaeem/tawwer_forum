@@ -421,7 +421,7 @@ class ReactionModel {
           );
       $this->ToggleUserTag($Data, $Row, $Model);
       
-      $Message = array(T(GetValue('InformMessage', $ReactionType, 'Thanks for the reaction!')), 'Dismissable AutoDismiss');
+      $Message = array(T(GetValue('InformMessage', $ReactionType, '')), 'Dismissable AutoDismiss');
       
       // Now deciede whether we need to log or delete the record.
       $Score = GetValueR($AttrColumn.'.React.'.$ReactionType['UrlCode'], $Row);
