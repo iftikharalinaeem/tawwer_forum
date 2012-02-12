@@ -15,8 +15,8 @@ class WhosOnlineModule extends Gdn_Module {
 		// $this->_OnlineUsers = $SQL
 		// insert or update entry into table
 		$Session = Gdn::Session();
-
-		$Invisible = ($Invisible ? 1 : 0);
+      $Invisible = Gdn::UserMetaModel()->GetUserMeta($Session->UserID, 'Plugin.WhosOnline.Invisible', FALSE);
+//		$Invisible = ($Invisible ? 1 : 0);
 
 		if ($Session->UserID) {
          $Timestamp = Gdn_Format::ToDateTime();

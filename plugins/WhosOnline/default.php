@@ -38,7 +38,7 @@ class WhosOnlinePlugin extends Gdn_Plugin {
       
       $Config = new ConfigurationModule($Sender);
       $Config->Initialize(array(
-          'WhosOnline.Location.Show' => array('Control' => 'RadioList', 'Description' => "This setting determins where the list of online users is displayed.", 'Items' => array('every' => 'Every page', 'discussion' => 'All discussion pages', 'discussionsonly' => 'Only discussions and categories list'), 'Default' => 'every'),
+          'WhosOnline.Location.Show' => array('Control' => 'RadioList', 'Description' => "This setting determins where the list of online users is displayed.", 'Items' => array('every' => 'Every page', 'discussion' => 'All discussion pages', 'discussionsonly' => 'Only discussions and categories list', 'custom' => 'Use your custom theme'), 'Default' => 'every'),
           'WhosOnline.Hide' => array('Control' => 'CheckBox', 'LabelCode' => "Hide the who's online module for guests."),
           'WhosOnline.DisplayStyle' => array('Control' => 'RadioList', 'Items' => array('list' => 'List', 'pictures' => 'Pictures'), 'Default' => 'list')
       ));
@@ -97,6 +97,8 @@ class WhosOnlinePlugin extends Gdn_Plugin {
 		// Is this a page for including the module?
 		$ShowOnController = array();		
 		switch($ConfigItem) {
+         case 'custom':
+            return;
 			case 'every':
 				$ShowOnController = array(
 					'discussioncontroller',
@@ -124,11 +126,7 @@ class WhosOnlinePlugin extends Gdn_Plugin {
 		
 		// Include the module
       if (InArrayI($Controller, $ShowOnController)) {
-   	   $UserMetaData = $this->GetUserMeta($Session->UserID, '%');     
-   	   include_once(PATH_PLUGINS.DS.'WhosOnline'.DS.'class.whosonlinemodule.php');
-   	   $WhosOnlineModule = new WhosOnlineModule($Sender);
-   	   $WhosOnlineModule->GetData(ArrayValue('Plugin.WhosOnline.Invisible', $UserMetaData));
-   	   $Sender->AddModule($WhosOnlineModule);
+   	   $Sender->AddModule('WhosOnlineModule');
       }
       
       // Ping the server when still online
