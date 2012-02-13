@@ -188,7 +188,10 @@ div.Center {
 	overflow: visible;
 }
 .post, .postBuzz {
-	margin-bottom:50px
+	margin: 25px 0;
+}
+#content > .post:first-child {
+	margin-top: 0;
 }
 .postBuzz{
 	background: #f9f9f9;
@@ -237,6 +240,12 @@ div.Center {
 	margin: 0;
 	font-weight:bold;
 	color:#000;
+}
+.pagetitle {
+	font-weight: bold;
+	background: #F3F4F8;
+	border: 1px solid #ddd;
+	padding: 6px 8px;
 }
 .post.postBuzz h1{
 	margin: 0;
@@ -350,15 +359,60 @@ blockquote {
 	font-size:18px;
 }
 #sidebar .block {
-	padding: 0 0 20px;
+	margin: 20px 0;
 }
+#sidebar > :first-child {
+	margin-top: 0;
+}
+#sidebar .search label,
 #sidebar .block strong {
 	display: block;
 	font-weight: bold;
 	font-size: 14px;
 }
-#sidebar .team {
-	padding-bottom: 30px;
+#searchsubmit {
+   margin: 0;
+   border-radius: .5ex;
+	-moz-border-radius: .5ex;
+	-webkit-border-radius: .5ex;
+	background: #3fbcf3;
+	background:-webkit-gradient(linear, center bottom, center top, from(#3fbcf3), to(#aee7fe));
+	background:-moz-linear-gradient(top, #aee7fe, #3fbcf3);
+	-pie-background:linear-gradient(top, #aee7fe, #3fbcf3);
+	background:linear-gradient(top, #aee7fe, #3fbcf3);
+	border:1px solid #0F7FE6;
+	color:#003673;
+	cursor:pointer;
+	font-size:12px;
+	padding:4px 8px;
+	text-decoration:none;
+	text-shadow:0 1px 0 #B7F5FD;
+   font-weight: normal;
+   display: inline-block;
+   box-shadow: 0px 0px 2px #999;
+   -moz-box-shadow: 0px 0px 2px #999;
+   -webkit-box-shadow: 0px 0px 2px #999;
+	font-weight:bold;
+   margin: 0;
+	vertical-align: top;
+}
+#s {
+   font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+   color: #333;
+   font-size: 15px;
+   padding: 3px;
+   margin: 0;
+   width: 220px;
+	box-shadow: 0 0 3px rgba(0, 0, 0, 0.3) inset; 
+	-moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.3) inset;
+	-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.3) inset;
+	background: #fff;
+	border: 1px solid #999;
+	border: 1px solid rgba(0, 0, 0, 0.4);
+	padding: 3px;	
+}
+#s:focus {
+	background: #ffe;
 }
 #sidebar .team img {
 	padding: 1px;
@@ -386,13 +440,23 @@ blockquote {
 	white-space: nowrap;
 	overflow: visible;
 }
+/*
 #sidebar .team .team-mark .about {
 	left: auto;
 	right: -36px;
 }
+*/
 #sidebar .team .team-lincoln .about {
 	left: auto;
-	right: 5px;
+	right: -35px;
+}
+#sidebar .team .team-mark .about {
+	left: auto;
+	right: -75px;
+}
+#sidebar .team .team-luc .about {
+	left: auto;
+	right: 4px;
 }
 #sidebar .team .about strong {
 	padding: 0;
@@ -426,6 +490,7 @@ a img, a:hover img{
 
 .navigation {
 	position: relative;
+	margin: 10px 0;
 }
 .navigation .alignright {
 	position: absolute;

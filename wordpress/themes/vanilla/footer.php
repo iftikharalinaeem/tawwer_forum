@@ -28,18 +28,6 @@ var hs_ppa = "vanillaforums.app9.hubspot.com";
 document.write(unescape("%3Cscript src='" + document.location.protocol + "//" + hs_ppa + "/salog.js.aspx' type='text/javascript'%3E%3C/script%3E"));
 </script>
 <!-- End of HubSpot Logging Code -->
-
-<script type="text/javascript">
-var vanilla_forum_url = 'http://vanillaforums.com/'; // Required: the full http url & path to your vanilla forum
-/*** DON'T EDIT BELOW THIS LINE ***/
-(function() {
-   var timestamp = new Date().getTime();
-   var vanilla_count = document.createElement('script');
-   vanilla_count.type = 'text/javascript';
-   vanilla_count.src = vanilla_forum_url + '/js/count.js?time='+timestamp;
-   (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanilla_count);
-})();
-</script>
-
+<?php wp_footer(); ?>
 </body>
 </html>
