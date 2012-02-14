@@ -11,11 +11,7 @@
 				<div class="post-category"><?php the_category(', ') ?></div>
 				<?php if ( $user_ID ) : ?><div class="post-options"><?php edit_post_link('Edit'); ?></div><?php endif; ?>
 				<div class="post-comments">
-				   <?php if (strtotime($post->post_date) < strtotime('10 October 2011')) : ?>
 					<?php comments_popup_link('No Comments &#187;', '1 Comment &#187;', '% Comments &#187;'); ?>					
-				   <?php else : ?>
-					<a href="<?php the_permalink(); ?>#vanilla_comments" vanilla-identifier="<?php echo $post->ID; ?>">Comments</a>
-					<?php endif; # Date check ?>
 				</div>
 			</div>
 			<?php the_content('Continued...'); ?>
