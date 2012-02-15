@@ -423,7 +423,7 @@ searchd {
       
       foreach ($Result as $Key => $Value) {
 			if (isset($Value['Summary'])) {
-				$Value['Summary'] = Gdn_Format::Text(Gdn_Format::To($Value['Summary'], GetValue('Format', $Value, 'Html')));
+            $Value['Summary'] = Condense(Gdn_Format::To($Value['Summary'], GetValue('Format', $Value, 'Html')));
 				$Result[$Key] = $Value;
 			}
 		}
