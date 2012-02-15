@@ -329,10 +329,9 @@ body.Entry #Content {
 	position: absolute;
 	right: 10px;
 	text-align: left;
-	top: 38px;
 	width: 300px;
 	z-index: 2;
-	/* background: #fff; */
+	margin-top: -180px;
 }
 .LoginHelp p {
 	color: #777;
@@ -374,6 +373,15 @@ body.Entry div.Entry div.MainForm {
 	-webkit-box-shadow: 0 1px 2px #999;
 	
 }
+body.Entry.register div.Box {
+	border-width: 10px;
+}
+body.Entry.register #Content form {
+   padding: 0;
+}
+body.Entry div.Entry div.MainForm {
+	min-height: 150px;
+}
 body#dashboard_entry_passwordrequest #Content div.Box,
 body#dashboard_entry_passwordreset #Content div.Box {
 	padding: 10px;
@@ -382,10 +390,6 @@ body#dashboard_entry_passwordreset #Content div.Box {
 body.Entry#dashboard_entry_passwordrequest #Content form,
 body.Entry#dashboard_entry_passwordreset #Content form {
    padding: 0;
-}
-
-body.Entry .CreateAccount {
-	display: none;
 }
 /* Forms */
 #DiscussionForm form {

@@ -1,6 +1,20 @@
-<?php get_header(); ?>
+<?php
+/**
+ * @package WordPress
+ * @subpackage Default_Theme
+ */
+
+get_header(); ?>
 	<div id="content">
 	<?php if (have_posts()) : ?>
+
+		<h2 class="pagetitle">Search Results</h2>
+
+		<div class="navigation">
+			<div class="alignleft"><?php next_posts_link('&laquo; Older Entries') ?></div>
+			<div class="alignright"><?php previous_posts_link('Newer Entries &raquo;') ?></div>
+		</div>
+
 		<?php while (have_posts()) : the_post(); ?>
 		
 		<div class="post">
@@ -11,7 +25,11 @@
 				<div class="post-category"><?php the_category(', ') ?></div>
 				<?php if ( $user_ID ) : ?><div class="post-options"><?php edit_post_link('Edit'); ?></div><?php endif; ?>
 				<div class="post-comments">
+				   <?php if (strtotime($post->post_date) < strtotime('10 October 2011')) : ?>
 					<?php comments_popup_link('No Comments &#187;', '1 Comment &#187;', '% Comments &#187;'); ?>					
+				   <?php else : ?>
+					<a href="<?php the_permalink(); ?>#vanilla_comments" vanilla-identifier="<?php echo $post->ID; ?>">Comments</a>
+					<?php endif; # Date check ?>
 				</div>
 			</div>
 			<?php the_content('Continued...'); ?>
@@ -20,8 +38,8 @@
 		<?php endwhile; ?>
 
 		<div class="navigation">
-			<div class="alignleft"><?php next_posts_link('Older Posts') ?></div>
-			<div class="alignright"><?php previous_posts_link('Newer Posts') ?></div>
+			<div class="alignleft"><?php next_posts_link('&laquo; Older Entries') ?></div>
+			<div class="alignright"><?php previous_posts_link('Newer Entries &raquo;') ?></div>
 		</div>
 
 	<?php else : ?>

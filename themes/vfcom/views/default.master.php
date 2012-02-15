@@ -84,5 +84,12 @@ $Session = Gdn::Session();
 	</div>
 </div>
 <?php $this->FireEvent('AfterBody'); ?>
+<?php /*
+<script type="text/javascript">
+document.write(unescape("%3Cscript src='" + ((document.location.protocol=="https:")?"https://snapabug.appspot.com":"http://www.snapengage.com") + "/snapabug.js' type='text/javascript'%3E%3C/script%3E"));</script><script type="text/javascript">
+SnapABug.setButton("http://vanillaforums.com/applications/vfcom/design/images/help-tab.png");
+SnapABug.addButton("34737bd0-1d78-43ac-be67-b2769cb5f6ae","0","30%");
+</script>
+		*/ ?>
 </body>
 </html>

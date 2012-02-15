@@ -8,12 +8,14 @@ function FormatScore($Score) {
 
 endif;
 
-function OrderByButton($Column, $Label = FALSE, $DefaultOrder = '') {
-   $Url = Gdn::Controller()->SelfUrl.'?orderby='.urlencode($Column);
+function OrderByButton($Column, $Label = FALSE, $DefaultOrder = '', $CssClass = '') {
+   $QSParams = $_GET;
+   $QSParams['orderby'] = urlencode($Column);
+   $Url = Gdn::Controller()->SelfUrl.'?'.http_build_query($QSParams);
    if (!$Label)
       $Label = T('by '.$Column);
    
-   $CssClass = '';
+   $CssClass = ' '.$CssClass;
    $CurrentColumn = Gdn::Controller()->Data('CommentOrder.Column');
    if ($Column == $CurrentColumn) {
       $CssClass .= ' OrderBy-'.ucfirst(Gdn::Controller()->Data('CommentOrder.Direction')).' Selected';

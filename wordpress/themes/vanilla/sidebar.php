@@ -1,4 +1,5 @@
 <div id="sidebar">
+	
 	<div class="block">
 		<strong>About Us</strong>
 		<p>We build fast, scalable, customizable community solutions.</p>
@@ -24,24 +25,34 @@
 			<img src="<?php bloginfo('template_directory'); ?>/team-tim.jpg" />
 			<span class="about"><strong>Tim Gunter</strong> Developer & System Administrator</span>
 		</a>
-		<a class="team-greg" href="http://vanillaforums.com/profile/greg">
-			<img src="<?php bloginfo('template_directory'); ?>/team-greg.jpg" />
-			<span class="about"><strong>Greg Marlin</strong> VP Sales & Marketing</span>
-		</a>
 		<a class="team-lizzie" href="http://www.facebook.com/Semcglinchey">
-			<img src="<?php bloginfo('template_directory'); ?>/team-lizzie.jpg" />
+			<img src="<?php bloginfo('template_directory'); ?>/team-lizzie.png" />
 			<span class="about"><strong>Lizzie McGlinchey</strong> Project Manager</span>
 		</a>
 		<a class="team-mark" href="http://markosullivan.ca">
 			<img src="<?php bloginfo('template_directory'); ?>/team-mark.jpg" />
-			<span class="about"><strong>Mark O'Sullivan</strong> CEO, Co-Founder</span>
+			<span class="about"><strong>Mark O'Sullivan</strong> CPO, Co-Founder, Sandwich Expert</span>
 		</a>
 		<a class="team-lincoln" href="http://twitter.com/lincolnwebs">
 			<img src="<?php bloginfo('template_directory'); ?>/team-lincoln.jpg" />
 			<span class="about"><strong>Matt Lincoln Russell</strong> Developer</span>
 		</a>
+		<a class="team-luc" href="http://vanillaforums.com/profile/luc">
+			<img src="<?php bloginfo('template_directory'); ?>/team-luc.jpg" />
+			<span class="about"><strong>Luc Vezina</strong> CEO</span>
+		</a>
 	</div>
 
+	<div class="block search">
+		<form role="search" method="get" id="searchform" action="<?php echo home_url( '/' ); ?>">
+			<div>
+					<label class="screen-reader-text" for="s">Search</label>
+					<input type="text" value="" name="s" id="s" />
+					<input type="submit" id="searchsubmit" value="Go" />
+			</div>
+		</form>
+	</div>
+	
 <span class="hs-cta-wrapper" id="hs-cta-wrapper-8dba70d4-4330-4b96-be78-91371f2ee42d">
 <!--HubSpot Call-to-Action Code -->
 <span class="hs-cta-node hs-cta-8dba70d4-4330-4b96-be78-91371f2ee42d" id="hs-cta-8dba70d4-4330-4b96-be78-91371f2ee42d">
@@ -133,4 +144,5 @@ setTimeout(function() {document.getElementById("hs-cta-8dba70d4-4330-4b96-be78-9
 		?>
 		<div><a href="http://flickr.com/photos/vanillaforums">Check out all of our photos on Flickr.</a></div>
 	</div>
+	
 </div>
