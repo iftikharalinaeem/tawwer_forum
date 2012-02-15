@@ -130,7 +130,7 @@ class WhosOnlinePlugin extends Gdn_Plugin {
       }
       
       // Ping the server when still online
-	   $Sender->AddJsFile('/plugins/WhosOnline/whosonline.js');
+	   $Sender->AddJsFile('whosonline.js', 'plugins/WhosOnline');
 	   $Frequency = C('WhosOnline.Frequency', 60);
 	   if (!is_numeric($Frequency))
 	      $Frequency = 60;
