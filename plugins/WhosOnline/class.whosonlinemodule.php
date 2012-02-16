@@ -17,7 +17,7 @@ class WhosOnlineModule extends Gdn_Module {
 		$Session = Gdn::Session();
       $Invisible = Gdn::UserMetaModel()->GetUserMeta($Session->UserID, 'Plugin.WhosOnline.Invisible', FALSE);
       $Invisible = $Invisible['Plugin.WhosOnline.Invisible'];
-//		$Invisible = ($Invisible ? 1 : 0);
+		$Invisible = ($Invisible ? 1 : 0);
 
 		if ($Session->UserID) {
          $Timestamp = Gdn_Format::ToDateTime();
