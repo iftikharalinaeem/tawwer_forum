@@ -151,6 +151,9 @@ class ReactionsPlugin extends Gdn_Plugin {
       
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }
+   public function PostController_Render_Before($Sender) {
+      include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+   }
    
    public function ActivityController_AfterActivityBody_Handler($Sender, $Args) {
       $Activity = $Args['Activity'];
