@@ -102,8 +102,8 @@ class ReactionsPlugin extends Gdn_Plugin {
       
       // Insert some default tags.
       $Rm->DefineReactionType(array('UrlCode' => 'Spam', 'Name' => 'Spam', 'Log' => 'Spam', 'LogThreshold' => 5, 'RemoveThreshold' => 5, 'ModeratorInc' => 5));
-      $Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Log' => 'Moderation', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5));
-      $Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Log' => 'Moderation', 'LogThreshold' => 5, 'ModeratorInc' => 5));
+      $Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Log' => 'Moderate', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5));
+      $Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Log' => 'Moderate', 'LogThreshold' => 5, 'ModeratorInc' => 5));
       
       $Rm->DefineReactionType(array('UrlCode' => 'Agree', 'Name' => 'Agree', 'IncrementColumn' => 'Score', 'Points' => 1));
       $Rm->DefineReactionType(array('UrlCode' => 'Disagree', 'Name' => 'Disagree'));

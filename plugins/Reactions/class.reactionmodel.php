@@ -199,9 +199,15 @@ class ReactionModel {
       }
       
       // Join the rows.
-      foreach ($Data as &$Row) {
+      $Unset = array();
+      foreach ($Data as $Index => &$Row) {
          $RecordType = $Row['RecordType'];
          $ID = $Row['RecordID'];
+         
+         if (!isset($JoinData[$RecordType][$ID])) {
+            $Unset[] = $Index;
+            continue; // orphaned?
+         }
          
          $Record = $JoinData[$RecordType][$ID];
          $Row = array_merge($Row, $Record);
@@ -219,8 +225,15 @@ class ReactionModel {
          $Row['Url'] = $Url;
       }
       
+      foreach ($Unset as $Index) {
+         unset($Data[$Index]);
+      }
+      
       // Join the users.
       Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'));
+      
+      if (!empty($Unset))
+         $Data = array_values($Data);
    }
    
    /**
@@ -300,6 +313,11 @@ class ReactionModel {
          $Args[':RecordID'] = $Record['InsertUserID'];
          $Args[':UserID'] = self::USERID_OTHER;
          $this->SQL->Database->Query($Sql, $Args);
+         
+         // Possibly give the user a badge.
+         if ($Args[':Total'] > 0) {
+            
+         }
          
          // See what kind of points this reaction gives.
          $ReactionType = $ReactionTypes[$Row['TagID']];
@@ -439,10 +457,10 @@ class ReactionModel {
             // Get all of the userIDs that flagged this.
             $OtherUserData = $this->SQL->GetWhere('UserTag', array('RecordType' => $RecordType, 'RecordID' => $ID, 'TagID' => $ReactionType['TagID']))->ResultArray();
             $OtherUserIDs = array();
-            foreach ($OtherUserData as $Row) {
-               if ($Row['UserID'] == $UserID || !$Row['UserID'])
+            foreach ($OtherUserData as $UserRow) {
+               if ($UserRow['UserID'] == $UserID || !$Row['UserID'])
                   continue;
-               $OtherUserIDs[] = $Row['UserID'];
+               $OtherUserIDs[] = $UserRow['UserID'];
             }
             $LogOptions['OtherUserIDs'] = $OtherUserIDs;
          }
