@@ -91,6 +91,10 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
       $Sender->Render('Buzz', 'Activity', 'plugins/AdvancedStats');
    }
    
+   public function UtilityController_Buzz_Create($Sender, $Date = FALSE, $Slot = 'w') {
+      $this->ActivityController_Buzz_Create($Sender, $Date, $Slot);
+   }
+   
    
    /**
     * Adds & removes dashboard menu options.
