@@ -37,7 +37,7 @@
 			<img src="<?php bloginfo('template_directory'); ?>/team-lincoln.jpg" />
 			<span class="about"><strong>Matt Lincoln Russell</strong> Developer</span>
 		</a>
-		<a class="team-luc" href="http://vanillaforums.com/profile/luc">
+		<a class="team-luc" href="http://vanillaforums.com/profile/lvez">
 			<img src="<?php bloginfo('template_directory'); ?>/team-luc.jpg" />
 			<span class="about"><strong>Luc Vezina</strong> CEO</span>
 		</a>
@@ -52,7 +52,6 @@
 			</div>
 		</form>
 	</div>
-	
 <span class="hs-cta-wrapper" id="hs-cta-wrapper-8dba70d4-4330-4b96-be78-91371f2ee42d">
 <!--HubSpot Call-to-Action Code -->
 <span class="hs-cta-node hs-cta-8dba70d4-4330-4b96-be78-91371f2ee42d" id="hs-cta-8dba70d4-4330-4b96-be78-91371f2ee42d">
@@ -96,7 +95,6 @@ setTimeout(function() {document.getElementById("hs-cta-8dba70d4-4330-4b96-be78-9
 <!-- START Vimeo Badge ... info at http://vimeo.com/widget -->
 <style type="text/css">
 <!-- 
-/* You can modify these CSS styles */
 .vimeoBadge { margin: 0; padding: 0; font: normal 11px verdana,sans-serif; }
 .vimeoBadge img { border: 0; padding: 1px; border: 1px solid #ddd; }
 .vimeoBadge a:hover img { border: 1px solid #777; }

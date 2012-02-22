@@ -329,8 +329,10 @@ div.Center {
 blockquote {
 	background: none repeat scroll 0 0 #EEEEEE;
 	border-bottom: 1px solid #CCCCCC;
-	margin: 0 0 0 20px;
+	margin: 14px 0 14px 20px;
+   padding: 1px 8px;
 	width: 90%;
+   font-style: italic;
 }
 .post pre {
 	font-family:courier;
@@ -484,10 +486,11 @@ blockquote {
 img.subscribe{
 	border: none;
 }
+/*
 a img, a:hover img{
 	border: none;
 }
-
+*/
 .navigation {
 	position: relative;
 	margin: 10px 0;
