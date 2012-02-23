@@ -142,6 +142,7 @@ class BuzzModel {
          ->From('TagDiscussion')
          ->WhereIn('TagID', $TagIDs)
          ->Where(self::RangeWhere($SlotRange))
+         ->GroupBy('TagID')
          ->Get()->ResultArray();
       $TagCounts = Gdn_DataSet::Index($TagCounts, array('TagID'));
       
