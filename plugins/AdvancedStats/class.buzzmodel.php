@@ -127,6 +127,7 @@ class BuzzModel {
       $i = 1;
       foreach ($Tags as $Tag) {
          $CustomConfig['Custom'.$i] = $Tag;
+         $i++;
       }
       
       $SlotRange = $this->SlotRange;
