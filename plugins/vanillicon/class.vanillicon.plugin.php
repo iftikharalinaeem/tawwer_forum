@@ -29,13 +29,16 @@ class VanilliconPlugin extends Gdn_Plugin {
 
 if (!function_exists('UserPhotoDefaultUrl')) {
    function UserPhotoDefaultUrl($User, $Options = array()) {
+      static $IconSize = NULL;
+      if ($IconSize === NULL)
+         $IconSize = C('Plugins.Vanillicon.Size', 50);
 
       $Email = GetValue('Email', $User);
       if (!$Email) {
          $Email = GetValue('UserID', $User, 100);
       }
       $Hash = md5($Email);
-      $PhotoUrl = 'http://w'.substr($Hash, 0, 1).'.vanillicon.com/'.$Hash.'_50.png';
+      $PhotoUrl = 'http://w'.substr($Hash, 0, 1).".vanillicon.com/{$Hash}_{$IconSize}.png";
       return $PhotoUrl;
    }
 }
