@@ -120,16 +120,23 @@ if (!function_exists('ScoreCssClass')):
    
 function ScoreCssClass($Row, $All = FALSE) {
    $Score = GetValue('Score', $Row);
+   if (!$Score)
+      $Score = 0;
+   if (Debug())
+      $Inc = 1;
+   else
+      $Inc = 5;
    
-   if ($Score < 0)
-      $Result = 'Score-Low';
-   elseif ($Score > 10)
-      $Result = 'Score-High';
+   
+   if ($Score <= -$Inc)
+      $Result = $All ? 'Un-Buried' : 'Buried';
+   elseif ($Score >= $Inc)
+      $Result = 'Promoted';
    else
       $Result = '';
    
    if ($All)
-      return array($Result, 'Score-Low Score-High');
+      return array($Result, 'Promoted Buried Un-Buried');
    else
       return $Result;
 }
