@@ -28,6 +28,51 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
       $TrackerDomain = C('Plugins.GoogleAnalytics.TrackerDomain');
       if ($TrackerCode && $TrackerCode != '' && $Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          $Script = "<script type=\"text/javascript\">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', '".$TrackerCode."']);";
+      if ($TrackerDomain)
+         $Script .= "
+  _gaq.push(['_setDomainName', '".$TrackerDomain."']);";
+      
+      /** 
+       * Not sure what to do. New method is documented at url below, but old 
+       * method is not documented on Google or by whoever wrote this "extras" 
+       * feature here in Vanilla. Will need to comment out for now. 
+       * 
+       * http://code.google.com/apis/analytics/docs/tracking/gaTrackingCustomVariables.html
+       * 
+      $Extra = C('Plugins.GoogleAnalytics.Extra', NULL);
+      if (!is_null($Extra)) {
+         $Username = (Gdn::Session()->UserID) ? Gdn::Session()->User->Name : 'unknown';
+         $TrackerParams = array(
+               'Username' => $Username,
+               'IP' => Gdn::Request()->GetValue('REMOTE_ADDR'),
+               'UserID' => Gdn::Session()->UserID,
+               'Email' => Gdn::Session()->User->Email
+         );
+
+         $Extra = FormatString($Extra, $TrackerParams);
+
+         $Script .= "
+_gaq.push(['_setCustomVar', ????? ".$Extra."']);";
+*/      
+      
+      $Script .= "
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>";
+         
+         /*
+         
+         
+         $Script = "<script type=\"text/javascript\">
 var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");
 document.write(unescape(\"%3Cscript src='\" + gaJsHost + \"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E\"));
 </script>
@@ -61,7 +106,7 @@ pageTracker._setVar("'.$Extra.'");';
          $Script .= "
 pageTracker._trackPageview();
 } catch(err) {}</script>";
-
+*/
          $Sender->AddAsset('Foot', $Script);
       }
    }
