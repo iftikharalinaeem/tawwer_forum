@@ -126,6 +126,33 @@ class ReactionModel {
       return $Data;
    }
    
+   public static function GetReactionTypes($Where) {
+      $Types = self::ReactionTypes();
+      $Result = array();
+      foreach ($Types as $Index => $Type) {
+         if (self::Filter($Type, $Where))
+            $Result[$Index] = $Type;
+      }
+      return $Result;
+   }
+   
+   public static function Filter($Row, $Where) {
+      foreach ($Where as $Column => $Value) {
+         if (!isset($Row[$Column]) && $Value)
+            return FALSE;
+         
+         $RowValue = $Row[$Column];
+         if (is_array($Value)) {
+            if (!in_array($RowValue, $Value))
+               return FALSE;
+         } else {
+            if ($RowValue != $Value)
+               return FALSE;
+         }
+      }
+      return TRUE;
+   }
+   
    public function GetRecordsWhere($Where, $OrderFields = '', $OrderDirection = '', $Limit = 30, $Offset = 0) {
       // Grab the user tags.
       $UserTags = $this->SQL
