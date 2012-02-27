@@ -182,9 +182,8 @@ function WriteProfileCounts() {
    echo '</div>';
 }
 
-if (!function_exists('WriteReactionBar')):
-   
-function WriteReactionBar($Row) {
+if (!function_exists('WriteReactions')):
+function WriteReactions($Row) {
    $Attributes = GetValue('Attributes', $Row);
    if (is_string($Attributes)) {
       $Attributes = @unserialize($Attributes);
@@ -196,37 +195,63 @@ function WriteReactionBar($Row) {
    echo '<div class="Reactions">';
    
    // Write the flags.
-   echo '<div class="Flag">';
-   echo '<div class="Handle FlagHandle"><a href="#"><span class="ReactSprite ReactFlag"></span> <span class="ReactLabel">Flag</span></a></div>';
+   static $Flags = NULL, $FlagCodes = NULL;
+   if ($Flags === NULL) {
+      $Flags = ReactionModel::GetReactionTypes(array('Class' => 'Flag', 'Active' => 1));
+      $FlagCodes = array();
+      foreach ($Flags as $Flag) {
+         $FlagCodes[] = $Flag['UrlCode'];
+      }
+   }
+      
+   if (!empty($Flags)) {
+      echo '<span class="Flag ToggleFlyout">';
+
+      // Write the handle.
+      echo ReactionButton($Row, 'Flag');
+      
+      echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
+      foreach ($Flags as $Flag) {
+         echo '<li>'.ReactionButton($Row, $Flag['UrlCode']);
+      }
+      echo '</ul>';
+
+      echo '</span>';
+   }
    
-   echo '<div class="ReactButtons" style="display:none">';
-   echo '<a href="#" class="ReactHeading">'.T('Flag »').'</a> ';
-   echo ReactionButton($Row, 'Abuse');
-   echo ReactionButton($Row, 'Spam');
-   echo ReactionButton($Row, 'Troll');
+//   echo '<div class="Flag">';
+//   echo '<div class="Handle FlagHandle"><a href="#"><span class="ReactSprite ReactFlag"></span> <span class="ReactLabel">Flag</span></a></div>';
+//   
+//   echo '<div class="ReactButtons" style="display:none">';
+//   echo '<a href="#" class="ReactHeading">'.T('Flag »').'</a> ';
+//   echo ReactionButton($Row, 'Abuse');
+//   echo ReactionButton($Row, 'Spam');
+//   echo ReactionButton($Row, 'Troll');
+//   
+//   echo '</div>';
+//   
+//   echo '</div>';
    
-   echo '</div>';
    
-   echo '</div>';
+//   echo '<span class="Nub">&#160;</span>';
    
-   
-   echo '<div class="Nub">&#160;</div>';
+   static $Types = NULL;
+   if ($Types === NULL)
+      $Types = ReactionModel::GetReactionTypes(array('Class' => array('Good', 'Bad'), 'Active' => 1));
    
    // Write the reactions.
-   echo '<div class="React">';
+   echo '<span class="React">';
+//   echo '<span class="Column-Score">'.GetValue('Score', $Row).'</span>';
    
    
-   echo '<div class="ReactButtons">';
+   echo '<span class="ReactButtons">';
+   foreach ($Types as $Type) {
+      echo ReactionButton($Row, $Type['UrlCode']);
+   }
+   echo '</span>';
    
-   echo ReactionButton($Row, 'OffTopic');
-   echo ReactionButton($Row, 'Disagree');
-   echo ReactionButton($Row, 'Agree');
-   echo ReactionButton($Row, 'Awesome');
-   echo ' <a href="#" class="ReactHeading">'.T('« React').'</a>';
-   echo '</div>';
-   
-   echo '<div class="Handle ReactHandle" style="display:none"><a href="#"><span class="ReactSprite ReactAgree">&#160;</span> <span class="ReactLabel">React</span></a></div>';
-   echo '</div>';
+//   echo ' <span class="Handle ReactHandle"><span class="ReactSprite ReactReact">&#160;</span> <span class="ReactLabel">React</span></span>';
+   echo '</span>';
    
    echo '</div>';
 }
