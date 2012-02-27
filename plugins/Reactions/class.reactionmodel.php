@@ -101,7 +101,10 @@ class ReactionModel {
       } else {
          $TagID = $Row['TagID'];
          if ($Row['Type'] != 'Reaction') {
-            Gdn::SQL()->Put('Tag', array('Name' => $UrlCode, 'Type' => 'Reaction'), array('TagID' => $TagID));
+            Gdn::SQL()->Put('Tag', array(
+                'Name' => $UrlCode, 
+                'Type' => 'Reaction'
+                ), array('TagID' => $TagID));
          }
       }
       $Data['TagID'] = $TagID;
@@ -403,6 +406,7 @@ class ReactionModel {
       // Generate the new button for the reaction.
       Gdn::Controller()->SetData('Diffs', $Diffs);
       if (function_exists('ReactionButton')) {
+         $Diffs[] = 'Flag'; // always send back flag button.
          foreach ($Diffs as $UrlCode) {
             $Button = ReactionButton($Record, $UrlCode);
             Gdn::Controller()->JsonTarget(
