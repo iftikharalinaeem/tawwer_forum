@@ -107,7 +107,7 @@ class ReactionModel {
       $Data['TagID'] = $TagID;
       
       $Row = array();
-      $Columns = array('UrlCode', 'Name', 'Description', 'TagID');
+      $Columns = array('UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID');
       foreach ($Columns as $Column) {
          if (isset($Data[$Column])) {
             $Row[$Column] = $Data[$Column];
@@ -630,7 +630,7 @@ class ReactionModel {
          $ReactionTypes = Gdn::Cache()->Get('ReactionTypes');
          
          if ($ReactionTypes === Gdn_Cache::CACHEOP_FAILURE) {
-            $ReactionTypes = Gdn::SQL()->Get('ReactionType')->ResultArray();
+            $ReactionTypes = Gdn::SQL()->Get('ReactionType', 'Sort, Name')->ResultArray();
             foreach ($ReactionTypes as $Type) {
                $Row = $Type;
                $Attributes = @unserialize($Row['Attributes']);

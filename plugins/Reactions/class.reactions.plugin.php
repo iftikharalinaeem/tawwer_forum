@@ -25,6 +25,7 @@ class ReactionsPlugin extends Gdn_Plugin {
    
    protected static $_CommentOrder;
    public static function CommentOrder() {
+//      die();
       if (!self::$_CommentOrder) {
          $SetPreference = FALSE;
          
@@ -84,8 +85,10 @@ class ReactionsPlugin extends Gdn_Plugin {
          ->Column('UrlCode', 'varchar(20)', FALSE, 'primary')
          ->Column('Name', 'varchar(20)')
          ->Column('Description', 'text', TRUE)
+         ->Column('Class', 'varchar(10)', TRUE)
          ->Column('TagID', 'int')
          ->Column('Attributes', 'text', TRUE)
+         ->Column('Sort', 'smallint', TRUE)
          ->Column('Active', 'tinyint(1)', 1)
          ->Set();
       
@@ -101,14 +104,26 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Rm = new ReactionModel();
       
       // Insert some default tags.
-      $Rm->DefineReactionType(array('UrlCode' => 'Spam', 'Name' => 'Spam', 'Log' => 'Spam', 'LogThreshold' => 5, 'RemoveThreshold' => 5, 'ModeratorInc' => 5, 'Points' => -1));
-      $Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Log' => 'Moderate', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5, 'Points' => -1));
-      $Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Log' => 'Moderate', 'LogThreshold' => 5, 'ModeratorInc' => 5, 'Points' => -1));
+      $Rm->DefineReactionType(array('UrlCode' => 'Spam', 'Name' => 'Spam', 'Sort' => 1, 'Class' => 'Flag', 'Log' => 'Spam', 'LogThreshold' => 5, 'RemoveThreshold' => 5, 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
+      $Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Sort' => 2, 'Class' => 'Flag', 'Log' => 'Moderate', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
+      $Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Sort' => 3, 'Class' => 'Flag', 'Log' => 'Moderate', 'LogThreshold' => 5, 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
       
-      $Rm->DefineReactionType(array('UrlCode' => 'Agree', 'Name' => 'Agree', 'IncrementColumn' => 'Score', 'Points' => 1));
-      $Rm->DefineReactionType(array('UrlCode' => 'Disagree', 'Name' => 'Disagree'));
-      $Rm->DefineReactionType(array('UrlCode' => 'Awesome', 'Name' => 'Awesome', 'IncrementColumn' => 'Score', 'Points' => 1));
-      $Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic', 'Points' => -1));
+      $Rm->DefineReactionType(array('UrlCode' => 'Promote', 'Name' => 'Promote', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1, 'Permission' => 'Garden.Moderation.Manage'));
+      
+      $Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic', 'Sort' => 1, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
+      
+      $Rm->DefineReactionType(array('UrlCode' => 'Disagree', 'Name' => 'Disagree', 'Sort' => 2, 'Class' => 'Bad'));
+      $Rm->DefineReactionType(array('UrlCode' => 'Agree', 'Name' => 'Agree', 'Sort' => 3, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
+      
+      $Rm->DefineReactionType(array('UrlCode' => 'Dislike', 'Name' => 'Dislike', 'Sort' => 4, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
+      $Rm->DefineReactionType(array('UrlCode' => 'Like', 'Name' => 'Like', 'Sort' => 5, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
+      
+      $Rm->DefineReactionType(array('UrlCode' => 'Down', 'Name' => 'Vote Down', 'Sort' => 6, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
+      $Rm->DefineReactionType(array('UrlCode' => 'Up', 'Name' => 'Vote Up', 'Sort' => 7, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
+
+      $Rm->DefineReactionType(array('UrlCode' => 'WTF', 'Name' => 'WTF', 'Sort' => 8, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
+      $Rm->DefineReactionType(array('UrlCode' => 'Awesome', 'Name' => 'Awesome', 'Sort' => 9, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
+      $Rm->DefineReactionType(array('UrlCode' => 'LOL', 'Name' => 'LOL', 'Sort' => 10, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
    }
    
    public function ActivityController_Render_Before($Sender) {
