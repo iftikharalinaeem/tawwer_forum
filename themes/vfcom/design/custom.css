@@ -37,18 +37,8 @@ body > .Body {
    background: #fff;
    padding-top: 20px;
    border-top: 1px solid #B9DDE8;
-}
-#Panel {
    float: left;
-}
-#Content {
-   float: none;
-   padding: 0 0 40px;
-   margin: 0 0 0 220px;
-   width: auto;
-}
-body.VFCom #Content {
-   margin: 0;
+   width: 100%;
 }
 body > .Foot {
    -moz-box-shadow: inset 0px 4px 2px #111;
@@ -84,47 +74,9 @@ body > .Foot {
    font-size: 13px;
    line-height: 1.6;
 }
-/*
-.SubNav {
-	background: #F3F4F8;
-	border-bottom: 1px solid #ddd;
-	padding: 6px 0;
-}
-.SubNav .Center {
-	position: relative;
-}
-.SubNav a {
-	font-size: 12px;
-	color: #999;
-	margin: 0 0 0 20px;
-	font-weight: bold;
-}
-.SubNav a.SignOut {
-	font-weight: normal;
-}
-body.Account .SubNav a.Account,
-body.Profile .SubNav a.Profile,
-body.Vanilla .SubNav a.Home {
-	color: #003f87;
-}
-.SubNav a:hover {
-	color: #003f87;
-	text-decoration: underline;
-}
-.SubNav a.Home {
-	position: absolute;
-	left: 0;
-	margin: 0;
-}
-.SubNav span.Alert {
-	font-size: 9px;
-   background: #014381;
-}
-*/
-
 h1.Logo {
-	top: 10px !important;
-	left: 0 !important;
+	top: 10px;
+	left: 0;
 	position: absolute !important;
 	margin: 0 !important;
 	padding: 0 !important;
@@ -140,6 +92,20 @@ h1.Logo a {
 	text-indent: -1000px;
 	background: url('images/vanilla-forums-logo-light-132px.png') 0 0 no-repeat;
 }
+/* Contact used on narrow master view */
+.Head .Contact {
+	position: absolute;
+	top: 26px;
+	right: 0;
+	font-size: 13px;
+	color: #ffda30;
+}
+.Head .Contact strong {
+	font-weight: normal;
+	color: #fff;
+	font-size: 20px;
+}
+
 
 /* MENU */
 .Menus {
@@ -187,6 +153,8 @@ body.Account .AccountMenu a.Account {
 }
 .OrangeButton,
 .OrangeButton:hover,
+.BigButton,
+.BigButton:hover,
 .PurpleButton,
 .PurpleButton:hover,
 .GreenButton,
@@ -207,9 +175,12 @@ body.Account .AccountMenu a.Account {
    display: inline-block;
 	overflow: hidden;
 	font-weight: bold;
-	line-height: 34px;
+	/* line-height: 34px;
 	padding: 0 14px;
 	height: 34px;
+ */
+   line-height: 27px;
+   padding: 4px 14px;
 	font-size: 12px;
 	text-shadow: 0 1px 1px #fff;
 	color: #003f87;
@@ -218,6 +189,23 @@ body.Account .AccountMenu a.Account {
    border-radius: 3px;
    -moz-border-radius: 3px;
    -webkit-border-radius: 3px;
+}
+input.OrangeButton,
+input.OrangeButton:hover,
+input.BigButton,
+input.BigButton:hover,
+input.PurpleButton,
+input.PurpleButton:hover,
+input.GreenButton,
+input.GreenButton:hover,
+input.SmallBlueButton,
+input.SmallBlueButton:hover,
+input.BlueButton,
+input.BlueButton:hover,
+input.RedButton,
+input.RedButton:hover {
+   font-size: 14px;
+   padding: 10px 14px;
 }
 .VFMenu a {
 	border-color: #3bb6f3;
@@ -348,6 +336,9 @@ body.Features .VFMenu a.Features{
 	background: #1f6600;
 	border-color: #0a2100;
 }
+.BigButton,
+.BigButton:hover,
+.BigButton:focus,
 .PurpleButton,
 .PurpleButton:hover,
 .PurpleButton:focus {
@@ -366,11 +357,21 @@ body.Features .VFMenu a.Features{
 	-webkit-box-shadow: 0 0 4px #001329,
         inset 0 0 1px #ff8af8;
 }
+.BigButton:hover,
 .PurpleButton:hover {
 	background: #981d5a;
 }
+.BigButton:focus,
 .PurpleButton:focus {
-	background: #8b114f;
+   background: #8b114f;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+}
+.BigButton,
+.BigButton:hover,
+.BigButton:focus {
+   display: block;
 }
 .RedButton,
 .RedButton:hover,
@@ -413,12 +414,11 @@ body.Features .VFMenu a.Features{
    top: 31px;
    right: 422px;
 }
-#DiscussionForm form {
-   padding: 6px 10px 20px;
-}
-#DiscussionForm .Tabs {
-   margin: 0 -10px;
-	background: none;
+body.Conversations.add .FormWrapper,
+body.Vanilla.Post .FormWrapper {
+   background: none;
+   margin: 0;
+   padding: 0;
 }
 a.ApplyButton {
 	display: none;
@@ -610,4 +610,25 @@ div.MultipleEntryMethods {
    text-align: center;
    top: -8px;
    width: 36px;
+}
+/* Forum Fixes */
+.ClearFix { clear: none; display: none; }
+.Message { clear: none;}
+.UserSignature { overflow: auto; }
+body.filenotfound #Panel {
+   display: none;
+}
+body.filenotfound #Content {
+   float: none;
+   width: 500px;
+   margin: 0 auto 30px;
+	border: 10px solid #f5f5f5;
+	border-width: 10px;
+	background: #fafafa;
+	padding: 10px;
+	-moz-border-radius: 4px;
+	box-shadow: 0 1px 2px #999;
+	-moz-box-shadow: 0 0 2px #999;
+	-webkit-box-shadow: 0 1px 2px #999;
+   
 }

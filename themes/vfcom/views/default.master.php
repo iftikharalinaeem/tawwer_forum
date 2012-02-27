@@ -14,7 +14,10 @@ $Session = Gdn::Session();
       <div class="InnerWrapper">
          <div class="Center">
             <h1 class="Logo">
-               <a title="Discussion Forums Evolved, VanillaForums.com" href="/">Discussion Forums Evolved, VanillaForums.com</a>
+               <?php 
+               $Text = 'Discussion Forums Evolved, VanillaForums.com';
+               echo Anchor($Text, '/', array('title' => $Text));
+               ?>
             </h1>
             <div class="Menus">
                <div class="AccountMenu">
@@ -91,19 +94,19 @@ $Session = Gdn::Session();
             <div class="Column4">
                <strong>Features</strong>
                <?php
-               echo Anchor('Features', '/features', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Support Communities', '/features/support-communities', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Migrate Legacy Forum', '/features/legacy-migration', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Comments Integration', '/features/blog-comments', '', array('SSL' => FALSE));
+               echo Anchor('Features', '/features#toc', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Support Communities', '/resources/customer-support-forums#toc', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Migrate Legacy Forum', '/resources/migrating-legacy-forums#toc', '', array('SSL' => FALSE));
+               // echo '<br />'.Anchor('Comments Integration', '/features/blog-comments', '', array('SSL' => FALSE));
                ?>
             </div>
             <div class="Column4">
                <strong>Resources</strong>
                <?php
                echo Anchor('Resources', '/resources', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Case Studies', '/case-studies', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Professional Services', '/professional-services', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Free Version', '/free-version', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Case Studies', '/resources/penny-arcade#toc', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Professional Services', '/resources/custom-plugins#toc', '', array('SSL' => FALSE));
+               // echo '<br />'.Anchor('Free Version', '/free-version', '', array('SSL' => FALSE));
                ?>
             </div>
 				<div class="Column4">
