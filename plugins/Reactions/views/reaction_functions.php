@@ -60,6 +60,13 @@ if (!function_exists('ReactionButton')):
 function ReactionButton($Row, $UrlCode, $Options = array()) {
    $ReactionType = ReactionModel::ReactionTypes($UrlCode);
    
+   $IsHeading = FALSE;
+   if (!$ReactionType) {
+      $ReactionType = array('UrlCode' => $UrlCode, 'Name' => T($UrlCode));
+      $IsHeading = TRUE;
+   }
+   
+   
    $Name = $ReactionType['Name'];
    $Label = $Name;
    $SpriteClass = GetValue('SpriteClass', $ReactionType, "React$UrlCode");
@@ -73,11 +80,18 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
       $ID = GetValue('DiscussionID', $Row);
    }
    
-   if ($RecordType == 'activity')
-      $Count = GetValueR("Data.React.$UrlCode", $Row, 0);
-   else
-      $Count = GetValueR("Attributes.React.$UrlCode", $Row, 0);
-   
+   if ($IsHeading) {
+      static $Types = array();
+      if (!isset($Types[$UrlCode]))
+         $Types[$UrlCode] = ReactionModel::GetReactionTypes(array('Class' => $UrlCode, 'Active' => 1));
+      
+      $Count = ReactionCount($Row, $Types[$UrlCode]);
+   } else {
+      if ($RecordType == 'activity')
+         $Count = GetValueR("Data.React.$UrlCode", $Row, 0);
+      else
+         $Count = GetValueR("Attributes.React.$UrlCode", $Row, 0);  
+   }
    $CountHtml = '';
    $LinkClass = "ReactButton-$UrlCode";
    if ($Count) {
@@ -86,7 +100,10 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
    }
    
    $UrlCode2 = strtolower($UrlCode);
-   $Url = Url("/react/$RecordType/$UrlCode2?id=$ID");
+   if ($IsHeading)
+      $Url = '';
+   else
+      $Url = Url("/react/$RecordType/$UrlCode2?id=$ID");
    
    $Result = <<<EOT
 <a class="Hijack ReactButton $LinkClass" href="$Url" title="$Label" rel="nofollow"><span class="ReactSprite $SpriteClass"></span> <span class="ReactLabel">$Label</span>$CountHtml</a>
