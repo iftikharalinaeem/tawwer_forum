@@ -24,6 +24,37 @@ function OrderByButton($Column, $Label = FALSE, $DefaultOrder = '', $CssClass = 
    return Anchor($Label, $Url, 'FilterButton OrderByButton OrderBy-'.$Column.$CssClass, array('rel' => 'nofollow'));
 }
 
+function ReactionCount($Row, $UrlCodes) {
+   if ($ID = GetValue('CommentID', $Row)) {
+      $RecordType = 'comment';
+   } elseif ($ID = GetValue('ActivityID', $Row)) {
+      $RecordType = 'activity';
+   } else {
+      $RecordType = 'discussion';
+      $ID = GetValue('DiscussionID', $Row);
+   }
+   
+   if ($RecordType == 'activity')
+      $Data = GetValueR('Data.React', $Row, array());
+   else
+      $Data = GetValueR("Attributes.React", $Row, array());
+   
+   if (!is_array($Data)) {
+      return 0;
+   }
+   
+   $UrlCodes = (array)$UrlCodes;
+   
+   $Count = 0;
+   foreach ($UrlCodes as $UrlCode) {
+      if (is_array($UrlCode))
+         $Count += GetValue($UrlCode['UrlCode'], $Data, 0);
+      else
+         $Count += GetValue($UrlCode, $Data, 0);
+   }
+   return $Count;
+}
+
 if (!function_exists('ReactionButton')):
    
 function ReactionButton($Row, $UrlCode, $Options = array()) {
