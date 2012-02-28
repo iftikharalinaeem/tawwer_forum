@@ -169,14 +169,16 @@
 .CountTotal {
    display: block;
    line-height: 100%;
-   font-size: 32px;
+   font-size: 28px;
 }
 
 .CountItem {
    float: left;
    display: block;
-   width: 14%;
    text-align: center;
+   border: solid 2px transparent;
+   padding: 4px;
+   width: 10%;
 }
 
 .Compact .Item .Author img {
