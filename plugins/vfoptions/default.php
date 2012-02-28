@@ -58,9 +58,21 @@ class VFOptionsPlugin implements Gdn_IPlugin {
     * Adds & removes dashboard menu options.
     */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      $Menu = &$Sender->EventArguments['SideMenu'];
+      
+      // Give Vanilla admins option to suspend this plugin per session
+      $IsSytemUser = (Gdn::Session()->UserID == Gdn::UserModel()->GetSystemUserID());
+      if (CheckPermission('Garden.Admin.Only') && $IsSytemUser) {
+         $SuspendText = (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE)) ? 'Resume' : 'Suspend';
+         $Menu->AddLink('Dashboard', T($SuspendText.' VFOptions'), 'plugin/suspendvfoptions', 'Garden.Admin.Only');
+      }
+         
+      // If suspended, quit
+      if (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE))
+         return;
+   
 		$New = ' <span class="New">New</span>';
       // Clean out options hosting customers should not see
-      $Menu = &$Sender->EventArguments['SideMenu'];
 		$Menu->RemoveLink('Add-ons', T('Plugins'));
 		$Menu->RemoveLink('Add-ons', T('Applications'));
 		$Menu->RemoveLink('Add-ons', T('Locales'));
@@ -98,6 +110,8 @@ class VFOptionsPlugin implements Gdn_IPlugin {
     * @param Gdn_Controller $Sender
     */
    public function Base_Render_Before($Sender) {
+      if (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE)) return; // Temp suspend option
+      
       Gdn::Locale()->SetTranslation('PluginHelp', "Plugins allow you to add functionality to your site.");
       Gdn::Locale()->SetTranslation('ApplicationHelp', "Applications allow you to add large groups of functionality to your site.");
       Gdn::Locale()->SetTranslation('ThemeHelp', "Themes allow you to change the look &amp; feel of your site.");
@@ -165,7 +179,7 @@ pageTracker._trackPageview();
       }
    }
 
-   public function AddonBrowserPlugin_AddonSettings_Handler($Sender) {
+   public function AddonBrowserPlugin_AddonSettings_Handler($Sender) {      
       $Sender->Installer = new LinkAddonInstaller('/srv/www/source/stable/addons');
       $Sender->ShowHidden = FALSE;
    }
@@ -445,6 +459,25 @@ pageTracker._trackPageview();
    }
    
    /**
+    * Suspend this plugin for the rest of this session.
+    */
+   public function PluginController_SuspendVFOptions_Create($Sender) {
+      // Permission check
+      $IsSytemUser = (Gdn::Session()->UserID == Gdn::UserModel()->GetSystemUserID());
+      if (!CheckPermission('Garden.Admin.Only') || !$IsSytemUser) 
+         return;
+      
+      // Toggle
+      $Active = Gdn::Session()->Stash('SuspendVFOptions', '', FALSE);
+      if (!$Active)
+         Gdn::Session()->Stash('SuspendVFOptions', TRUE);
+      else
+         Gdn::Session()->Stash('SuspendVFOptions', FALSE);
+         
+      Redirect('/dashboard/settings');
+   }
+   
+   /**
     * Grabs the features for this site from the vfcom database and makes sure
     * that their db status matches their actual status (enables or disables
     * them). This may redirect away if required (ie. the domain has been changed).
@@ -583,6 +616,8 @@ pageTracker._trackPageview();
     * @param Gdn_Controller $Sender
     */
    public function SettingsController_Render_Before($Sender) {
+      if (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE)) return; // Temp suspend option
+
       if (
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
