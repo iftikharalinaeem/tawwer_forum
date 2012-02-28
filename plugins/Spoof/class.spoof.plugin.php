@@ -6,7 +6,7 @@
 // Define the plugin:
 $PluginInfo['Spoof'] = array(
    'Name' => 'Spoof',
-   'Description' => 'Allows users with admin role to "spoof" users in their system. Helpful for debugging permission issues.',
+   'Description' => 'Administrators may "spoof" other users, meaning they temporarily sign in as that user. Helpful for debugging permission problems.',
    'Version' => '1.2',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',

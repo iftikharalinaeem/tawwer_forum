@@ -8,7 +8,7 @@
 $PluginInfo['GooglePrettify'] = array(
    'Name' => 'Syntax Prettifier',
    'Description' => 'Adds pretty syntax highlighting to source code posted in your forum. This is a great addon for communities that support programmers and designers.',
-   'Version' => '1.0b',
+   'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',

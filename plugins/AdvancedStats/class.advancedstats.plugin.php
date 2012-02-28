@@ -7,8 +7,8 @@
 // Define the plugin:
 $PluginInfo['AdvancedStats'] = array(
    'Name' => 'Advanced Stats',
-   'Description' => "Allows forums to track and access advanced statistics.",
-   'Version' => '1.0a',
+   'Description' => "Track and access advanced statistics to better monitor the health of your site.",
+   'Version' => '1.0',
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',

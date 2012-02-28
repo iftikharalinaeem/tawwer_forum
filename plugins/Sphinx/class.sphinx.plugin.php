@@ -6,8 +6,8 @@
 // Define the plugin:
 $PluginInfo['Sphinx'] = array(
    'Name' => 'Sphinx Search',
-   'Description' => "Allows Vanilla's search functionality to use sphinx instead of MySQL fulltext search.",
-   'Version' => '1.0b',
+   'Description' => "Upgrades search to use the powerful Sphinx engine instead of the default search.",
+   'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',

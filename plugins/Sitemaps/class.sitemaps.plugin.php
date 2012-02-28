@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Sitemaps'] = array(
    'Name' => 'Sitemaps',
-   'Description' => "This plugin creates http://www.sitemaps.org compatible XML sitemaps for your forum.",
+   'Description' => "Creates an XML sitemap based on http://www.sitemaps.org.",
    'Version' => '1.2.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,

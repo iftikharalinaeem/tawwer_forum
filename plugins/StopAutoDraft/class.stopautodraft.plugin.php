@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['StopAutoDraft'] = array(
    'Name' => 'Stop Auto Draft',
-   'Description' => 'Comments are auto-saved in Vanilla by default. This plugin removes the feature so that drafts are only saved if the "save draft" button is clicked.',
+   'Description' => 'Comments are auto-saved as a user types. This plugin disables that feature so that drafts are only saved if the "Save Draft" button is clicked.',
    'Version' => '1.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',

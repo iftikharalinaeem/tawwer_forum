@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['PostCount'] = array(
    'Name' => 'Post Count',
-   'Description' => "This plugin shows each user's post count along with their messages.",
+   'Description' => "Shows each user's comment total by their name in each comment.",
    'Version' => '1.0.3',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => FALSE,

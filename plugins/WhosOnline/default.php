@@ -2,8 +2,8 @@
 
 // Define the plugin:
 $PluginInfo['WhosOnline'] = array(
-   'Name' => 'Whos Online',
-   'Description' => "Lists the users currently browsing the forum.",
+   'Name' => 'Who&rsquo;s Online',
+   'Description' => "Adds a list of users currently browsing your site to the sidebar.",
    'Version' => '1.4',
    'Author' => "Gary Mardell",
    'AuthorEmail' => 'gary@vanillaplugins.com',

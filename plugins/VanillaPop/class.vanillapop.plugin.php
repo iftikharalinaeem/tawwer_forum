@@ -7,7 +7,7 @@
 // Define the plugin:
 $PluginInfo['VanillaPop'] = array(
    'Name' => 'Vanilla Pop',
-   'Description' => "Integrates your forum with Vanilla's email service.",
+   'Description' => "Users may start discussions, make comments, and even automatically register for your site via email.",
    'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
    'Author' => 'Todd Burry',
