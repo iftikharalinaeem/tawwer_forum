@@ -1,0 +1,103 @@
+
+div.CustomThemeForm {
+   float: left;
+   width: 70%;
+}
+textarea.CustomThemeBox {
+   width: 99%;
+   min-height: 400px;
+   max-height: none;
+   font-family: monospace;
+   font-size: 12px;
+   color: #000;
+   margin: 0 0 10px;
+}
+textarea.CustomThemeBox:focus {
+   background: #ffe;
+}
+div.InfoBox {
+   color: #333;
+   background: #F3F9FC;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	border: 1px solid #D2EEFC;
+	margin: 0 0 10px;
+	padding: 10px;
+}
+div.CustomThemeOptions {
+	padding: 0;
+   margin-left: 73%;
+/* IE7 Hack */
+   ^margin-left: 60%;
+}
+
+div.CustomThemeOptions div.RevisionOptions ul {
+   margin: 0 0 10px;
+   border-bottom: 1px dotted #aaa;
+}
+div.CustomThemeOptions div.RevisionOptions ul li {
+   margin-bottom: 6px;
+}
+div.CustomThemeOptions div.RevisionOptions ul li label {
+   display: block;
+   font-size: 11px;
+   color: #555;
+}
+div.Buttons {
+	text-align: right;
+}
+a.Apply {
+	display: inline-block;
+   padding: 6px 10px;
+	line-height: 15px;
+}
+input.TextButton {
+	padding: 6px 0;
+	font-size: 12px;
+	font-weight: bold;
+	float: left;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	color: #003673;
+}
+input.TextButton:hover {
+	text-decoration: underline;
+}
+div.RecentRevisions div.NewDay {
+   font-weight: bold;
+}
+div.RecentRevisions div.Revision a {
+   padding-left: 6px;
+   margin-right: 6px;
+}
+div.RecentRevisions div.LiveRevision {
+   font-weight: bold;
+}
+
+div.Container {
+   float: left;
+   width: 100%;
+   background: #DBF3FC;
+   margin: 0;
+	border: 1px solid #A5D0E7;
+	border-right: none;
+	border-left: none;
+}
+div.Container ul li {
+   padding: 10px;
+}
+div.Container ul li li {
+   padding: 0;
+}
+#Content form ul {
+	padding: 0;
+}
+form ul li {
+	font-size: inherit;
+	margin-bottom: inherit;
+	padding: inherit;
+}
+#Content form input.Button {
+	margin: 0;
+}
