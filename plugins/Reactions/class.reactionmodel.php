@@ -344,11 +344,6 @@ class ReactionModel {
          $Args[':UserID'] = self::USERID_OTHER;
          $this->SQL->Database->Query($Sql, $Args);
          
-         // Possibly give the user a badge.
-         if ($Args[':Total'] > 0) {
-            
-         }
-         
          // See what kind of points this reaction gives.
          $ReactionType = $ReactionTypes[$Row['TagID']];
          if ($ReactionPoints = GetValue('Points', $ReactionType)) {
@@ -533,6 +528,9 @@ class ReactionModel {
          }
       }
       
+      // Check to see if we need to give the user a badge.
+      $this->CheckBadges($Row['InsertUserID'], $ReactionType);
+      
       if ($Message)
          Gdn::Controller()->InformMessage($Message[0], $Message[1]);
       
@@ -626,6 +624,31 @@ class ReactionModel {
 //      // Send back the likes.
 //      $Targets[] = array('Target' => "#{$RecordType}_$ID .Mod-Likes", 'Type' => 'Html', 'Data' => $this->Likes($Row, FALSE));
 //      $Sender->InformMessage($Message[0], $Message[1]);
+   }
+   
+   public function CheckBadges($UserID, $ReactionType) {
+      if (!class_exists('BadgeModel'))
+         return;
+      
+      // Get the score on the user.
+      $CountRow = $this->SQL->GetWhere('UserTag', array(
+          'RecordType' => 'User',
+          'RecordID' => $UserID,
+          'UserID' => self::USERID_OTHER,
+          'TagID' => $ReactionType['TagID']
+      ))->FirstRow(DATASET_TYPE_ARRAY);
+      
+      $Score = $CountRow['Total'];
+      
+      $BadgeModel = new BadgeModel();
+      $UserBadgeModel = new UserBadgeModel();
+      
+      $Badges = $BadgeModel->GetWhere(array('Type' => 'Reaction', 'Class' => $ReactionType['UrlCode']), 'Threshold')->ResultArray();
+      foreach ($Badges as $Badge) {
+         if ($Score > $Badge['Threshold']) {
+            $UserBadgeModel->Give($UserID, $Badge);
+         }
+      }
    }
    
    public static function ReactionTypes($UrlCode = NULL) {
