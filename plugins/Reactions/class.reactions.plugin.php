@@ -173,19 +173,8 @@ class ReactionsPlugin extends Gdn_Plugin {
    public function ActivityController_AfterActivityBody_Handler($Sender, $Args) {
       $Activity = $Args['Activity'];
       if (in_array(GetValue('ActivityType', $Activity), array('Status', 'WallPost'))) {
-         WriteReactionBar($Activity);
+         WriteReactions($Activity);
       }
-   }
-   
-   public function DiscussionController_AfterDiscussionBody_Handler($Sender, $Args) {
-      WriteReactionBar($Args['Discussion']);
-   }
-   
-   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
-      if (!isset($Args['Comment']))
-         return;
-      
-      WriteReactionBar($Args['Comment']);
    }
    
 //   public function DiscussionController_CommentHeading_Handler($Sender, $Args) {
