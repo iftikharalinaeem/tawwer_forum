@@ -200,6 +200,13 @@ class ReactionsPlugin extends Gdn_Plugin {
       WriteProfileCounts();
    }
    
+   public function Base_BeforeCommentDisplay_Handler($Sender, $Args) {
+      $CssClass = ScoreCssClass($Args['Object']);
+      if ($CssClass) {
+         $Args['CssClass'] .= ' '.$CssClass;
+      }
+   }
+   
    /**
     *
     * @param ProfileController $Sender
