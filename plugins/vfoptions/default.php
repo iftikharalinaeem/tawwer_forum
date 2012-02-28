@@ -65,7 +65,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		$Menu->RemoveLink('Add-ons', T('Applications'));
 		$Menu->RemoveLink('Add-ons', T('Locales'));
 		$Menu->RemoveLink('Site Settings', T('Routes'));
-		$Menu->RemoveLink('Site Settings', T('Outgoing Email'));
+		//$Menu->RemoveLink('Site Settings', T('Outgoing Email'));
 		$Menu->RemoveLink('Users', T('Authentication'));
 		$Menu->AddLink('Users', T('Authentication').$New, 'dashboard/authentication', 'Garden.Settings.Manage');
 
@@ -537,6 +537,44 @@ pageTracker._trackPageview();
 
 		Redirect('/dashboard/settings/gettingstarted');
    }
+   
+   /**
+    * Overrides Outgoing Email management screen.
+    *
+    * @access public
+    */
+   public function SettingsController_Email_Create($Sender, $Args = array()) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $Sender->AddSideMenu('dashboard/settings/email');
+      $Sender->AddJsFile('email.js');
+      $Sender->Title(T('Outgoing Email'));
+      
+      $Validation = new Gdn_Validation();
+      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+      $ConfigurationModel->SetField(array(
+         'Garden.Email.SupportName',
+         'Garden.Email.SupportAddress'
+      ));
+      
+      // Set the model on the form.
+      $Sender->Form->SetModel($ConfigurationModel);
+      
+      // If seeing the form for the first time...
+      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+         // Apply the config settings to the form.
+         $Sender->Form->SetData($ConfigurationModel->Data);
+      } else {
+         // Define some validation rules for the fields being saved
+         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportName', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Required');
+         $ConfigurationModel->Validation->ApplyRule('Garden.Email.SupportAddress', 'Email');
+         
+         if ($Sender->Form->Save() !== FALSE)
+            $Sender->InformMessage(T("Your settings have been saved."));
+      }
+      
+      $Sender->Render('Email', '', 'plugins/vfoptions');      
+   }      
 
    /**
     * Don't let the users access the items under the "Add-ons" menu section of
