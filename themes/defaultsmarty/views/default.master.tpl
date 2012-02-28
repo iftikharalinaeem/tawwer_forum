@@ -15,8 +15,8 @@
          {discussions_link}
          {activity_link}
          {inbox_link}
-         {profile_link}
          {custom_menu}
+         {profile_link}
          {signinout_link}
       </ul>
       <div id="Search">{searchbox}</div>
