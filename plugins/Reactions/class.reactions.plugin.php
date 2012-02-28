@@ -301,4 +301,130 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->AddSideMenu();
       $Sender->Render('ReactionTypes', '', 'plugins/Reactions');
    }
+   
+   /** 
+    * Add the "Best Of..." link to the main menu.
+    */
+   public function Base_Render_Before($Sender) {
+      if (is_object($Menu = GetValue('Menu', $Sender))) {
+         $Menu->AddLink('BestOf', T('Best Of...'), '/bestof/everything');
+      }
+      
+   }
+      
+   
+   /** 
+    * Add a "Best Of" view for reacted content.
+    * 
+    * @param type $Sender Controller firing the event.
+    * @param string $ReactionType Type of reaction content to show
+    * @param int $Page The current page of content
+    */
+   public function RootController_BestOf_Create($Sender, $ReactionType = 'everything', $Page = '') {
+      // Load all of the reaction types
+      $ReactionTypes = array('everything');
+      try {
+         $ReactionModel = new ReactionModel();
+         $ReactionTypeData = $ReactionModel::ReactionTypes();
+         // Scrub the reaction type data a bit
+         foreach ($ReactionTypeData as $Key => $ReactionType) {
+            $Name = GetValue('Name', $ReactionType, '');
+            $UrlCode = GetValue('UrlCode', $ReactionType, '');
+            $Active = GetValue('Active', $ReactionType);
+            $Permission = GetValue('Permission', $ReactionType);
+            if (
+               !$Active
+               || in_array($UrlCode, explode(',','Spam,Abuse')) // Don't include stuff you straight up don't want SEO'd
+               || ($Permission && !Gdn::Session()->CheckPermission($Permission)) // Admin-only stuff
+               )
+               unset($ReactionTypeData[$Key]);
+         }
+         $Sender->SetData('ReactionTypeData', $ReactionTypeData);
+         $ReactionTypes = array_merge($ReactionTypes, ConsolidateArrayValuesByKey($ReactionTypeData, 'UrlCode'));
+         array_map('strtolower', $ReactionTypes);
+      } catch (Exception $ex) {
+         $Sender->SetData('ReactionTypeData', array());
+      }
+      if (!in_array($ReactionType, $ReactionTypes)) $ReactionType = 'everything';
+      $Sender->SetData('CurrentReactionType', $ReactionType);
+
+      // Define the query offset & limit.
+      $Limit = C('Vanilla.Comments.PerPage', 30);
+      $OffsetProvided = $Page != '';
+      list($Offset, $Limit) = OffsetLimit($Page, $Limit);
+      if ($Offset == '') $Offset = 0;
+      if ($Offset < 0) $Offset = 0;
+      $Sender->SetData('Offset', $Offset);
+      $Sender->SetData('Limit', $Limit);
+      
+      // Load some sample data
+      $CommentModel = new CommentModel();
+      $CommentModel->CommentQuery();
+      if ($ReactionType != 'everything')
+         $CommentModel->SQL->Where('ReactionType', $ReactionType);
+
+      $Data = $CommentModel->SQL      
+            ->OrderBy('c.CommentID', 'desc')
+            ->Limit($Limit, $Offset)
+            ->Get();
+      
+      $ResultData = $Data->ResultArray();
+      
+      // Kludge my test data a little bit
+      foreach ($ResultData as $Index => $Row) {
+         $Row['RecordType'] = 'Comment';
+         $Row['RecordID'] = $Row['CommentID'];
+         $Row['Url'] = 'discussion/comment/'.$Row['CommentID'];
+         $ResultData[$Index] = $Row;
+      }
+      $Sender->SetData('Data', $ResultData);
+      
+      // Build a pager
+      $PagerFactory = new Gdn_PagerFactory();
+		$Sender->EventArguments['PagerType'] = 'Pager';
+		$Sender->FireEvent('BeforeBuildPager');
+      $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $Sender);
+      $Sender->Pager->ClientID = 'Pager';
+         
+      $Sender->Pager->Configure(
+         $Offset,
+         $Limit,
+         $Data->NumRows(),
+         'bestof/'.$ReactionType.'/%1$s'
+      );
+      $Sender->FireEvent('AfterBuildPager');
+      
+      // Deliver JSON data if necessary
+      if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL) {
+         $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
+         $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
+         $Sender->View = 'comments';
+      }
+      
+      // Set up head
+      $Sender->Head = new HeadModule($Sender);
+      $Sender->AddJsFile('jquery.js');
+      $Sender->AddJsFile('jquery.livequery.js');
+      $Sender->AddJsFile('global.js');
+      $Sender->AddCssFile('style.css');
+      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
+      
+      // Set the title, breadcrumbs, canonical
+      $Sender->Title(T('Best Of'));
+      $Sender->SetData('Breadcrumbs', 'BestOf');
+      $Sender->CanonicalUrl(
+         Url(
+            ConcatSep('/', 'bestof/'.$ReactionType.'/', PageNumber($Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), 
+            TRUE), 
+         Gdn::Session()->UserID == 0
+      );
+      
+      // Modules
+      $Sender->AddModule('GuestModule');
+      $Sender->AddModule('SignedInModule');
+      
+
+      // Render the page
+      $Sender->Render('bestof', '', 'plugins/Reactions');
+   }
 }
