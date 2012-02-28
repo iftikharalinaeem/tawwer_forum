@@ -29,11 +29,11 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
       if ($TrackerCode && $TrackerCode != '' && $Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          $Script = "<script type=\"text/javascript\">
 
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', '".$TrackerCode."']);";
+   var _gaq = _gaq || [];
+   _gaq.push(['_setAccount', '".$TrackerCode."']);";
       if ($TrackerDomain)
          $Script .= "
-  _gaq.push(['_setDomainName', '".$TrackerDomain."']);";
+   _gaq.push(['_setDomainName', '".$TrackerDomain."']);";
       
       /** 
        * Not sure what to do. New method is documented at url below, but old 
@@ -57,8 +57,8 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
          $Script .= "
 _gaq.push(['_setCustomVar', ????? ".$Extra."']);";
 */    
-      if ($Sender->Data('GoogleAnalytics.FunnelPage', FALSE)) {
-         $FunnelPageName = $Sender->Data('GoogleAnalytics.FunnelPage');
+      if ($Sender->Data('AnalyticsFunnelPage', FALSE)) {
+         $FunnelPageName = $Sender->Data('AnalyticsFunnelPage');
          $Script .= "
    _gaq.push(['_trackPageview','{$FunnelPageName}']);";
       } else {
