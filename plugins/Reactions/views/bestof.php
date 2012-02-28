@@ -13,7 +13,7 @@ function ReactionFilterButton($Name, $Code, $CurrentReactionType) {
 }   
 echo Wrap($this->Data('Title'), 'h1');
 echo '<div class="ReactionFilters">';
-   echo ReactionFilterButton('Everything', 'everything', $CurrentReactionType);
+   echo ReactionFilterButton('Everything', 'Everything', $CurrentReactionType);
    $ReactionTypeData = $this->Data('ReactionTypeData');
    foreach ($ReactionTypeData as $Key => $ReactionType) {
       // decho($ReactionType);

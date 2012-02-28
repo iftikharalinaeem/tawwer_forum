@@ -131,6 +131,7 @@
    visibility: hidden;
 }
 
+.ReactEverything,
 .ReactReact {        background-position: -7px; }
 .ReactFlag {         background-position: -39px; }
 .ReactSpam {         background-position: -71px; }
@@ -294,10 +295,21 @@
 }
 
 /* Begin "Best Of" */
-.ReactionFilters .ReactButton {
-   opacity: 1;
-   
+.ReactionFilters {
+   margin: 8px 0;
 }
-
+.ReactionFilters .ReactButton {
+   opacity: 1;  
+   margin-right: 6px;
+}
+.ReactionFilters .ReactButton .ReactSprite {
+   background-image: url('reaction-sprites-color.png') !important;
+}
+.ReactionFilters .ReactLabel {
+   padding-left: 4px;
+}
+.BestOfData .DataList li:first-child {
+   border-top: 1px solid #BEC8CC;
+}
 
 /* End "Best Of" */
