@@ -1,34 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$AllowedPlugins = C('VFCom.AllowedPlugins');
-if (!is_array($AllowedPlugins))
-   $AllowedPlugins = array(
-      'ButtonBar', 
-      'embedvanilla',
-      'Emotify',
-      'Facebook',
-      'Twitter',
-      'OpenID',
-      'GoogleSignIn',
-      'CustomProfileFields',
-      'Flagging',
-      'Tagging',
-      'Gravatar',
-      'vanillicon',
-      'QnA',
-      'RoleTitle',
-      'Signatures',
-      'Sitemaps',
-      'SplitMerge',
-      'Spoof',
-      'StopForumSpam',
-      'GooglePrettify',
-      'WhosOnline',
-      'cleditor'
-   );
-   
-   // $AllowedPlugins = array('Emotify','cleditor','Facebook','Twitter','OpenID','GoogleSignIn','CustomProfileFields','Flagging','Tagging','Gravatar','vanillicon','OpenID','QnA','RoleTitle','Signatures','SplitMerge','Spoof','WhosOnline','FileUpload','Voting','Quotes','Signatures','Pockets','PostCount','LastEdited','Sitemaps','ShareThis','SEOCompanion','AllViewed','Vanoogle','TrackingCodes');
-   
+$DisallowedPlugins = C('VFCom.Plugins.RequireAdmin', array());
+$Plan = Infrastructure::Plan();
+$AllowedPlugins = json_decode(GetValue('Plugins', GetValue('Addons', $Plan)));
+
 $PluginManager = Gdn::PluginManager();
 $AvailablePlugins = $PluginManager->AvailablePlugins();
 $PluginCount = 0;
@@ -94,7 +69,6 @@ foreach ($AllowedPlugins as $Key) {
    $Plugin = GetValue($Key, $AvailablePlugins);
    if (!$Plugin)
       continue;
-   
 
    $ScreenName = GetValue('Name', $Plugin, $Key);
    $Description = GetValue('Description', $Plugin, '');
@@ -120,12 +94,20 @@ foreach ($AllowedPlugins as $Key) {
       <?php
          echo Wrap($ScreenName, 'strong');
          echo '<div class="Buttons">';
-         $ToggleText = $Enabled ? 'Disable' : 'Enable';
+         $ToggleText = $ToggleClass = $Enabled ? 'Disable' : 'Enable';
          $Url = "/dashboard/settings/addons/".$this->Filter."/".strtolower($ToggleText)."/$Key/".Gdn::Session()->TransientKey();
+         
+         // Override for plugins that need admin intervention
+         // Doesn't stop URL circumvention; if they wanna break their forum, let 'em.
+         if (!$Enabled && in_array($Key, $DisallowedPlugins)) {
+            $Url = '/dashboard/settings/vanillasupport';
+            $ToggleText = 'Contact Us';
+         }
+         
          echo Anchor(
             T($ToggleText),
             $Url,
-            $ToggleText . 'Addon SmallButton'
+            $ToggleClass . 'Addon SmallButton'
          );
          
          if ($SettingsUrl != '')
