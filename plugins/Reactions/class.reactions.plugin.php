@@ -139,10 +139,10 @@ class ReactionsPlugin extends Gdn_Plugin {
     * @param CommentModel $Sender
     * @param array $Args 
     */
-   public function CommentModel_AfterConstruct_Handler($Sender, $Args) {
-      $OrderBy = self::CommentOrder($Sender);
-      $Sender->OrderBy($OrderBy);
-   }
+//   public function CommentModel_AfterConstruct_Handler($Sender, $Args) {
+//      $OrderBy = self::CommentOrder($Sender);
+//      $Sender->OrderBy($OrderBy);
+//   }
    
    /**
     * 
