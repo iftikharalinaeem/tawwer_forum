@@ -110,7 +110,7 @@ class ReactionModel {
       $Data['TagID'] = $TagID;
       
       $Row = array();
-      $Columns = array('UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID');
+      $Columns = array('UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active');
       foreach ($Columns as $Column) {
          if (isset($Data[$Column])) {
             $Row[$Column] = $Data[$Column];
@@ -129,7 +129,7 @@ class ReactionModel {
       return $Data;
    }
    
-   public static function GetReactionTypes($Where) {
+   public static function GetReactionTypes($Where = array()) {
       $Types = self::ReactionTypes();
       $Result = array();
       foreach ($Types as $Index => $Type) {

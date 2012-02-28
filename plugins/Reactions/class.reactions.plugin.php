@@ -76,85 +76,7 @@ class ReactionsPlugin extends Gdn_Plugin {
    }
    
    public function Structure() {
-      include_once dirname(__FILE__).'/class.reactionmodel.php';
-      
-      $St = Gdn::Structure();
-      $Sql = Gdn::SQL();
-      
-      $St->Table('ReactionType')
-         ->Column('UrlCode', 'varchar(20)', FALSE, 'primary')
-         ->Column('Name', 'varchar(20)')
-         ->Column('Description', 'text', TRUE)
-         ->Column('Class', 'varchar(10)', TRUE)
-         ->Column('TagID', 'int')
-         ->Column('Attributes', 'text', TRUE)
-         ->Column('Sort', 'smallint', TRUE)
-         ->Column('Active', 'tinyint(1)', 1)
-         ->Set();
-      
-      $St->Table('UserTag')
-         ->Column('RecordType', array('Discussion', 'Discussion-Total', 'Comment', 'Comment-Total', 'User', 'User-Total', 'Activity', 'Activity-Total', 'ActivityComment', 'ActivityComment-Total'), FALSE, 'primary')
-         ->Column('RecordID', 'int', FALSE, 'primary')
-         ->Column('TagID', 'int', FALSE, 'primary')
-         ->Column('UserID', 'int', FALSE, array('primary', 'key'))
-         ->Column('DateInserted', 'datetime')
-         ->Column('Total', 'int', 0)
-         ->Set();
-      
-      $Rm = new ReactionModel();
-      
-      // Insert some default tags.
-      $Rm->DefineReactionType(array('UrlCode' => 'Spam', 'Name' => 'Spam', 'Sort' => 100, 'Class' => 'Flag', 'Log' => 'Spam', 'LogThreshold' => 5, 'RemoveThreshold' => 5, 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
-      $Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Sort' => 101, 'Class' => 'Flag', 'Log' => 'Moderate', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
-      $Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Sort' => 102, 'Class' => 'Flag', 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
-      
-      $Rm->DefineReactionType(array('UrlCode' => 'Promote', 'Name' => 'Promote', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1, 'Permission' => 'Garden.Moderation.Manage'));
-      
-      $Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic', 'Sort' => 1, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
-      
-      $Rm->DefineReactionType(array('UrlCode' => 'Disagree', 'Name' => 'Disagree', 'Sort' => 2, 'Class' => 'Bad'));
-      $Rm->DefineReactionType(array('UrlCode' => 'Agree', 'Name' => 'Agree', 'Sort' => 3, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
-      
-      $Rm->DefineReactionType(array('UrlCode' => 'Dislike', 'Name' => 'Dislike', 'Sort' => 4, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
-      $Rm->DefineReactionType(array('UrlCode' => 'Like', 'Name' => 'Like', 'Sort' => 5, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
-      
-      $Rm->DefineReactionType(array('UrlCode' => 'Down', 'Name' => 'Vote Down', 'Sort' => 6, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
-      $Rm->DefineReactionType(array('UrlCode' => 'Up', 'Name' => 'Vote Up', 'Sort' => 7, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
-
-      $Rm->DefineReactionType(array('UrlCode' => 'WTF', 'Name' => 'WTF', 'Sort' => 8, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
-      $Rm->DefineReactionType(array('UrlCode' => 'Awesome', 'Name' => 'Awesome', 'Sort' => 9, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
-      $Rm->DefineReactionType(array('UrlCode' => 'LOL', 'Name' => 'LOL', 'Sort' => 10, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
-   
-      
-      if (class_exists('BadgeModel')) {
-         // Define some badges for the reactions.
-         $BadgeModel = new BadgeModel();
-         
-         $Reactions = array('Agree' => 'Agrees', 'Like' => 'Likes', 'Up' => 'Up Votes', 'Awesome' => 'Awesomes', 'LOL' => 'LOLs'); 
-         $Thresholds = array(1 => 5, 2 => 25, 3 => 100, 4 => 250, 5 => 500);
-         
-         foreach ($Reactions as $Class => $NameSuffix) {
-            $ClassSlug = strtolower($Class);
-            foreach ($Thresholds as $Level => $Threshold) {
-               $Points = round($Threshold / 10);
-               if ($Points < 10)
-                  $Points = 10;
-               
-               //foreach ($Likes as $Count => $Body) {
-               $BadgeModel->Define(array(
-                   'Name' => "$Threshold $NameSuffix",
-                   'Slug' => "$ClassSlug-$Threshold",
-                   'Type' => 'Reaction',
-                   'Body' => '',
-                   'Photo' => "http://badges.vni.la/100/$ClassSlug-$Level.png",
-                   'Points' => $Points,
-                   'Threshold' => $Threshold,
-                   'Class' => $Class,
-                   'Level' => $Level
-               ));
-            }
-         }
-      }
+      include dirname(__FILE__).'/structure.php';
    }
    
    public function ActivityController_Render_Before($Sender) {
@@ -164,6 +86,17 @@ class ReactionsPlugin extends Gdn_Plugin {
    }
    
    /// Event Handlers ///
+   
+   /**
+    * Adds items to Dashboard menu.
+    * 
+    * @since 1.0.0
+    * @param object $Sender DashboardController.
+    */
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      $Menu = $Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Reputation', T('Reactions'), 'settings/reactiontypes', 'Garden.Settings.Manage');
+   }
    
    /**
     *
@@ -321,5 +254,51 @@ class ReactionsPlugin extends Gdn_Plugin {
       $ReactionModel->React($RecordType, $ID, $Reaction);
       
       $Sender->Render('Blank', 'Utility', 'Dashboard');
+   }
+   
+   /**
+    *
+    * @param SettingsController $Sender
+    * @param type $Type
+    * @param type $Active 
+    */
+   public function SettingsController_ActivateReactionType_Create($Sender, $Type, $Active) {
+      $Sender->Permission('Garden.Settings.Manage');
+      
+      $Sender->Form->InputPrefix = '';
+      if (!$Sender->Form->IsMyPostBack()) {
+         throw PermissionException('PostBack');
+      }
+      
+      $ReactionType = ReactionModel::ReactionTypes($Type);
+      if (!$ReactionType)
+         throw NotFoundException('Reaction Type');
+      
+      $ReactionModel = new ReactionModel();
+      $ReactionType['Active'] = $Active;
+      $Set = ArrayTranslate($ReactionType, array('UrlCode', 'Active'));
+      $ReactionModel->DefineReactionType($Set);
+      
+      // Send back the new button.
+      include_once $Sender->FetchViewLocation('settings_functions', '', 'plugins/Reactions');
+      $Sender->DeliveryType(DELIVERY_METHOD_JSON);
+      
+      $Sender->JsonTarget("#ReactionType_{$ReactionType['UrlCode']} .ActivateSlider", ActivateButton($ReactionType), 'ReplaceWith');
+      
+      $Sender->JsonTarget("#ReactionType_{$ReactionType['UrlCode']}", 'InActive', $ReactionType['Active'] ? 'RemoveClass' : 'AddClass');      
+      
+      $Sender->Render('Blank', 'Utility', 'Dashboard');
+   }
+   
+   public function SettingsController_ReactionTypes_Create($Sender) {
+      // Grab all of the reaction types.
+      $ReactionModel = new ReactionModel();
+      $ReactionTypes = ReactionModel::GetReactionTypes();
+      
+      $Sender->SetData('ReactionTypes', $ReactionTypes);
+      include_once $Sender->FetchViewLocation('settings_functions', '', 'plugins/Reactions');
+      $Sender->Title(T('Reaction Types'));
+      $Sender->AddSideMenu();
+      $Sender->Render('ReactionTypes', '', 'plugins/Reactions');
    }
 }
