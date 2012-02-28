@@ -66,6 +66,10 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
       $IsHeading = TRUE;
    }
    
+   if ($Permission = GetValue('Permission', $ReactionType)) {
+      if (!Gdn::Session()->CheckPermission($Permission))
+         return '';
+   }
    
    $Name = $ReactionType['Name'];
    $Label = $Name;
