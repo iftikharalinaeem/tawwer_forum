@@ -1,19 +1,13 @@
 .Reactions {
    position: relative;
-   background: rgba(0,0,0,0.01);
-   margin-top: 12px;
+   margin-top: 5px;
    font-size: 11px;
    line-height: 18px;
-   border-radius: 4px;
 }
 
 .Reactions .Handle {
    display: inline-block;
-   padding: 4px;
-}
-
-.Nub {
-   padding: 4px;
+   opacity: .3;
 }
 
 .React {
@@ -22,13 +16,9 @@
    top: 0;
 }
 
-.Flag {
-   position: absolute;
-}
-
 .ReactHeading {
    display: inline-block;
-   padding: 4px 6px;
+   padding: 0px 6px;
    background: rgba(0,0,0,0.04);
    color: rgba(0,0,0,0.4);
 }
@@ -48,18 +38,22 @@
 
 .ReactButton {
    display: inline-block;
-   padding: 4px 2px;
+   padding: 0px 2px;
+   border-radius: 12px;
+   
+   margin: 0 2px;
+   padding: 0 3px 0 0;
 }
 
 /* Hover Mechanics */
 .Reactions a {
-   color: rgba(0,0,0,0.4);
-}
-.Reactions a:hover {
-   color: rgba(0,0,0,0.8);
-}
-.Item:hover .Reactions {
-   background: rgba(0,0,0,0.03);
+   color: #000;
+
+/*   -webkit-transition: all .3s ease-in-out;
+	-moz-transition: all .3s ease-in-out;
+	-o-transition: all .3s ease-in-out;
+	-ms-transition: all .3s ease-in-out;
+	transition: all .3s ease-in-out;*/
 }
 
 .ReactLabel {
@@ -75,66 +69,85 @@
    background: rgba(0, 0, 0, 0.7);
 }
 
-.HasCount .ReactLabel {
-   color: #494949;
-   color: rgba(0, 0, 0, 0.7);
-}
-
 .ReactSprite {
-   background: url('reaction-sprites.png') 0 0 no-repeat transparent;
+   background: url('reaction-sprites-black.png') 1px no-repeat transparent;
    height: 18px;
    width: 18px;
    display: inline-block;
    vertical-align: top;
+   
+   border-radius: 18px;
 }
 
-.InProgress span {
-   background: transparent;
+.MenuItems .ReactSprite {
+   background-image: url('reaction-sprites-grey.png');
 }
 
-/* Color */
-.ReactSpam { background-position: 0px -36px; }
-.ReactFlag, .ReactAbuse { background-position: -18px -36px; }
-.ReactTroll { background-position: -36px -36px; }
-.ReactDisagree { background-position: -54px -36px; }
-.ReactOffTopic { background-position: -72px -36px; }
-.ReactAgree { background-position: -90px -36px; }
-.ReactAwesome { background-position: -108px -36px; }
+.ReactButton {
+   opacity: .3;
+   line-height: 18px;
+}
 
-/* Black */
-.ReactSpam { background-position: 0px -18px; }
-.ReactFlag, .ReactAbuse { background-position: -18px -18px; }
-.ReactTroll { background-position: -36px -18px; }
-.ReactDisagree { background-position: -54px -18px; }
-.ReactOffTopic { background-position: -72px -18px; }
-.ReactAgree { background-position: -90px -18px; }
-.ReactAwesome { background-position: -108px -18px; }
+.Item:hover .Reactions .Handle {
+   opacity: .75;
+}
 
-/* Grey */
-.ReactSpam { background-position: 0px 0px; }
-.ReactFlag, .ReactAbuse { background-position: -18px 0px; }
-.ReactTroll { background-position: -36px 0px; }
-.ReactDisagree { background-position: -54px 0px; }
-.ReactOffTopic { background-position: -72px 0px; }
-.ReactAgree { background-position: -90px 0px; }
-.ReactAwesome { background-position: -108px 0px; }
+.Reactions .ReactHandle {
+   display: none;
+}
 
-/* Color on Hover or when has count */
-.HasCount .ReactSpam,
-.ReactButton:hover .ReactSpam { background-position: 0px -36px; }
-.HasCount .ReactFlag, .HasCount .ReactAbuse, .ReactButton:hover .ReactAbuse,
-.ReactButton:hover .ReactFlag { background-position: -18px -36px; }
-.HasCount .ReactTroll,
-.ReactButton:hover .ReactTroll { background-position: -36px -36px; }
-.HasCount .ReactDisagree,
-.ReactButton:hover .ReactDisagree { background-position: -54px -36px; }
-.HasCount .ReactOffTopic,
-.ReactButton:hover .ReactOffTopic { background-position: -72px -36px; }
-.HasCount .ReactAgree,
-.ReactButton:hover .ReactAgree { background-position: -90px -36px; }
-.HasCount .ReactAwesome,
-.ReactButton:hover .ReactAwesome { background-position: -108px -36px; }
+/*.Item {
+   -webkit-transition: all .3s ease-in-out;
+   -moz-transition: all .3s ease-in-out;
+   -o-transition: all .3s ease-in-out;
+   -ms-transition: all .3s ease-in-out;
+   transition: all .3s ease-in-out;
+}*/
 
+.Item:hover {
+   background: #F0FAFF;
+}
+
+.Item:hover .Reactions a {
+   opacity: .8;
+   width: inherit;
+}
+
+.ReactButton:hover .ReactSprite,
+.HasCount .ReactSprite {
+   background-image: url('reaction-sprites-color.png');
+}
+.Reactions a.HasCount {
+   display: inline-block;
+   opacity: 1 !Important;
+}
+
+.InProgress .ReactSprite {
+   background-image: none !Important;
+   background: transparent !Important;
+}
+.InProgress .Count {
+   visibility: hidden;
+}
+
+.ReactReact { background-position: -1px; }
+.ReactFlag { background-position: -20px; }
+
+.ReactSpam { background-position: -39px; }
+.ReactAbuse { background-position: -58px; }
+.ReactTroll { background-position: -77px; }
+
+.ReactAgree { background-position: -134px; }
+.ReactLike { background-position: -153px; }
+.ReactAwesome { background-position: -191px; }
+.ReactLOL { background-position: -210px; }
+.ReactUp { background-position: -248px; }
+
+.ReactDisagree { background-position: -96px; }
+.ReactOffTopic { background-position: -115px; }
+.ReactDislike { background-position: -172px; }
+.ReactWTF { background-position: -229px; }
+.ReactDown { background-position: -267px; }
 
 .FilterButton.Selected {
    font-weight: bold;
@@ -189,4 +202,91 @@
     border: solid 2px rgba(55, 173, 227, .2);
     border-radius: 4px;
     padding: 4px
+}
+
+.Buried {
+    padding: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.Buried, .Buried a {
+    color: #aaa;
+    font-size: 12px;
+}
+
+.Buried .MItem {
+    display: none;
+}
+
+.Buried .Author .ProfilePhotoMedium {
+    height: 21px;
+    width: 21px;
+    margin: 0 3px 0 0;
+    opacity: .4;
+}
+
+.Buried .Reactions {
+    display: none;
+}
+
+.Buried * {
+   display: inline;
+   margin: 0;
+   white-space: nowrap;
+   padding-top: 0;
+   padding-bottom: 0;
+}
+
+.Buried .CommentInfo {
+    display: none;
+}
+
+.Buried:hover:before {
+    content: "Post is buried, click here to show the rest.";
+    display: block;
+    position: absolute;
+    background: rgba(0,0,0,.75);
+    color: #fff;
+    text-shadow: 0 1px 1px #000;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 40px; /* approx, could cause problems */
+}
+
+.Promoted {
+    box-shadow: inset 0 80px 600px #fffcdc;
+    border-top: solid 1px #fff;
+}
+
+.Promoted .Message {
+    font-size: 110%;
+}
+
+.Promoted .Author .ProfilePhotoMedium {
+    box-shadow: 0px -1px 8px #fff;
+}
+
+/* Menu stuff */
+
+.Flyout.Flags {
+    left: -8px;
+    top: 25px;
+    z-index: 1000;
+}
+
+.Flyout.Flags:before {
+   border-bottom: 7px solid #444444;
+   border-left: 7px solid transparent;
+   border-right: 7px solid transparent;
+   content: "";
+   left: 9px;
+   position: absolute;
+   top: -7px;
 }
