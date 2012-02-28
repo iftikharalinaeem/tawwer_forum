@@ -3,7 +3,7 @@
 $PluginInfo['GoogleAnalytics'] = array(
    'Name' => 'Google Analytics',
    'Description' => 'Adds google analytics script to pages if related configuration options are set.',
-   'Version' => '1.2.1',
+   'Version' => '1.3',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'
@@ -56,10 +56,17 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
 
          $Script .= "
 _gaq.push(['_setCustomVar', ????? ".$Extra."']);";
-*/      
+*/    
+      if ($Sender->Data('GoogleAnalytics.FunnelPage', FALSE)) {
+         $FunnelPageName = $Sender->Data('GoogleAnalytics.FunnelPage');
+         $Script .= "
+   _gaq.push(['_trackPageview','{$FunnelPageName}']);";
+      } else {
+         $Script .= "
+   _gaq.push(['_trackPageview']);";
+      }
       
       $Script .= "
-  _gaq.push(['_trackPageview']);
 
   (function() {
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
