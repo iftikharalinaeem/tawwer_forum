@@ -522,8 +522,8 @@ pageTracker._trackPageview();
 		$this->_ApplyFeature('CustomDomain', $ApplyFeatures, $PluginManager);
 		// BannerLogo
 		$this->_ApplyConfig('BannerLogo', $ApplyFeatures, 'VanillaForums.BannerLogo.CanUpload');
-		$this->_ApplyFeature('VanillaConnect', $ApplyFeatures, $PluginManager);
-		$this->_ApplyFeature('FileUpload', $ApplyFeatures, $PluginManager);
+		//$this->_ApplyFeature('VanillaConnect', $ApplyFeatures, $PluginManager);
+		//$this->_ApplyFeature('FileUpload', $ApplyFeatures, $PluginManager);
 		$this->_ApplyConfig('UserManagement', $ApplyFeatures, 'Garden.Roles.Manage');
 		//$this->_ApplyConfig('UserManagement', $ApplyFeatures, 'Garden.Registration.Manage');
 		$this->_ApplyFeature('PrivateCommunity', $ApplyFeatures, $PluginManager);
