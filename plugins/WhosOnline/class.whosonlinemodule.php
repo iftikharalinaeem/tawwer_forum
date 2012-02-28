@@ -16,7 +16,7 @@ class WhosOnlineModule extends Gdn_Module {
 		// insert or update entry into table
 		$Session = Gdn::Session();
       $Invisible = Gdn::UserMetaModel()->GetUserMeta($Session->UserID, 'Plugin.WhosOnline.Invisible', FALSE);
-      $Invisible = $Invisible['Plugin.WhosOnline.Invisible'];
+      $Invisible = GetValue('Plugin.WhosOnline.Invisible', $Invisible);
 		$Invisible = ($Invisible ? 1 : 0);
 
 		if ($Session->UserID) {
@@ -62,6 +62,10 @@ class WhosOnlineModule extends Gdn_Module {
       
       ksort($OnlineUsers);
       $this->_OnlineUsers = $OnlineUsers;
+      $CountUsers = count($this->_OnlineUsers);
+      $GuestCount = WhosOnlinePlugin::GuestCount();
+      $this->_Count = $CountUsers + $GuestCount;
+      $this->_GuestCount = $GuestCount;
 	}
 
 	public function AssetTarget() {
@@ -74,6 +78,7 @@ class WhosOnlineModule extends Gdn_Module {
          $this->GetData();
       
       $Data = $this->_OnlineUsers;
+      $Count = $this->_Count;
       
 //      for ($i = 0; $i < 20; $i++) {
 //         $Data[] = $Data[0];
@@ -85,12 +90,12 @@ class WhosOnlineModule extends Gdn_Module {
       $DisplayStyle = C('WhosOnline.DisplayStyle', 'list');
 		?>
       <div id="WhosOnline" class="Box">
-         <h4><?php echo T("Who's Online"); ?> <span class="Count"><?php echo count($Data) ?></span></h4>
+         <h4><?php echo T("Who's Online"); ?> <span class="Count"><?php echo Gdn_Format::BigNumber($Count, 'html') ?></span></h4>
          <?php
-         if (count($Data) > 0) {
+         if ($Count > 0) {
             if ($DisplayStyle == 'pictures') {
                if (count($Data) > 10) {
-                  $ListClass= 'PhotoGridSmall';
+                  $ListClass= 'PhotoGrid PhotoGridSmall';
                } else {
                   $ListClass= 'PhotoGrid';
                }
@@ -104,6 +109,15 @@ class WhosOnlineModule extends Gdn_Module {
                   
                   echo UserPhoto($User);
                }
+               
+               if ($this->_GuestCount) {
+                  $GuestCount = Gdn_Format::BigNumber($this->_GuestCount, 'html');
+                  $GuestsText = Plural($this->_GuestCount, 'guest', 'guests');
+                  $Plus = $Count == $GuestCount ? '' : '+';
+                  echo <<<EOT
+ <span class="GuestCountBox"><span class="GuestCount">{$Plus}$GuestCount</span> <span class="GuestLabel">$GuestsText</span></span>
+EOT;
+               }
 
                echo '</div>';
             } else {
@@ -111,6 +125,10 @@ class WhosOnlineModule extends Gdn_Module {
 
                foreach ($Data as $User) {
                   echo '<li><strong>'.UserAnchor($User).'</strong><br /></li>';
+               }
+               
+               if ($this->_GuestCount) {
+                  echo '<li><strong>'.sprintf(T('+%s Guests'), Gdn_Format::BigNumber($this->_GuestCount, 'html')).'</strong></li>';
                }
 
                echo '</ul>';

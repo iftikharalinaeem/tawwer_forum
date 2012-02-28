@@ -11,7 +11,7 @@
 				<div class="post-category"><?php the_category(', ') ?></div>
 				<?php if ( $user_ID ) : ?><div class="post-options"><?php edit_post_link('Edit'); ?></div><?php endif; ?>
 				<div class="post-comments">
-					<?php comments_popup_link('No Comments &#187;', '1 Comment &#187;', '% Comments &#187;'); ?>					
+					<?php comments_popup_link('No Comments &#187;', '1 Comment &#187;', '% Comments &#187;'); ?>
 				</div>
 			</div>
 			<?php the_content('Continued...'); ?>

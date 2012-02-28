@@ -131,6 +131,7 @@ class WhosOnlinePlugin extends Gdn_Plugin {
       
       // Ping the server when still online
 	   $Sender->AddJsFile('whosonline.js', 'plugins/WhosOnline');
+      $Sender->AddCssFile('whosonline.css', 'plugins/WhosOnline');
 	   $Frequency = C('WhosOnline.Frequency', 60);
 	   if (!is_numeric($Frequency))
 	      $Frequency = 60;
@@ -183,6 +184,11 @@ class WhosOnlinePlugin extends Gdn_Plugin {
 
       $Sender->Render($this->GetView('settings.php'));
    }
+   
+   public function Gdn_Statistics_Tick_Handler($Sender, $Args) {
+      if (!Gdn::Session()->IsValid())
+         $this->IncrementGuest();
+   }
 
    public function Setup() { 
       $this->Structure();
@@ -195,5 +201,97 @@ class WhosOnlinePlugin extends Gdn_Plugin {
        	->Column('Timestamp', 'datetime')
 			->Column('Invisible', 'int(1)', 0)
          ->Set(FALSE, FALSE); 
+   
+   }
+   
+   public static function GuestCount() {
+      if (!Gdn::Cache()->ActiveEnabled())
+         return 0;
+      
+      try {
+         $Names = array('__vnOz0', '__vnOz1');
+
+         $Time = time();
+         list($Expire0, $Expire1, $Active) = self::Expiries($Time);
+
+         // Get bot keys from the cache.
+         $Cache = Gdn::Cache()->Get($Names);
+
+         $Debug = array(
+             'Cache' => $Cache, 
+             'Active' => $Active);
+         Gdn::Controller()->SetData('GuestCountCache', $Debug);
+
+         if (isset($Cache[$Names[$Active]]))
+            return $Cache[$Names[$Active]];
+         elseif (count($Cache) > 0) {
+            // Maybe the key expired, but the other key is still there.
+            return array_pop($Cache);
+         }
+      } catch (Exception $Ex) {
+         echo $Ex->getMessage();
+      }
+   }
+   
+   public static function Expiries($Time) {
+      $Timespan = 600; // 10 mins.
+      
+      $Expiry0 = $Time - $Time % $Timespan + $Timespan;
+
+      $Expiry1 = $Expiry0 - $Timespan / 2;
+      if ($Expiry1 <= $Time)
+         $Expiry1 = $Expiry0 + $Timespan / 2;
+
+      $Active = $Expiry0 < $Expiry1 ? 0 : 1;
+
+      return array($Expiry0, $Expiry1, $Active);
+   }
+   
+   protected static function _IncrementCache($Name, $Expiry) {
+      $Value = Gdn::Cache()->Increment($Name, 1, array(Gdn_Cache::FEATURE_EXPIRY => $Expiry));
+      
+      if (!$Value) {
+         $Value = 1;
+         $R = Gdn::Cache()->Store($Name, $Value, array(Gdn_Cache::FEATURE_EXPIRY => $Expiry));
+      }
+      
+      return $Value;
+   }
+   
+   public function IncrementGuest() {
+      if (!Gdn::Cache()->ActiveEnabled())
+         return FALSE;
+      
+      $Now = time();
+      
+      $TempName = C('Garden.Cookie.Name').'-Vv';
+      $TempCookie = GetValue($TempName, $_COOKIE);
+      if (!$TempCookie) {
+         setcookie($TempName, $Now, $Now + 1200, C('Garden.Cookie.Path', '/'));
+         return;
+      }
+      // We are going to be checking one of two cookies and flipping them once every 10 minutes.
+      // When we read from one cookie
+      $Name0 = '__vnOz0';
+      $Name1 = '__vnOz1';
+      
+      list($Expire0, $Expire1) = self::Expiries($Now);
+      
+      if (!Gdn::Session()->IsValid()) {
+         // Check to see if this guest has been counted.
+         if (!isset($_COOKIE[$Name0]) && !isset($_COOKIE[$Name1])) {
+            setcookie($Name0, $Now, $Expire0 + 30, '/'); // cookies expire a little after the cache so they'll definitely be counted in the next one
+            $Counts[$Name0] = self::_IncrementCache($Name0, $Expire0);
+
+            setcookie($Name1, $Now, $Expire1 + 30, '/'); // We want both cookies expiring at different times.
+            $Counts[$Name1] = self::_IncrementCache($Name1, $Expire1);
+         } elseif (!isset($_COOKIE[$Name0])) {
+            setcookie($Name0, $Now, $Expire0 + 30, '/');
+            $Counts[$Name0] = self::_IncrementCache($Name0, $Expire0);
+         } elseif (!isset($_COOKIE[$Name1])) {
+            setcookie($Name1, $Now, $Expire1 + 30, '/');
+            $Counts[$Name1] = self::_IncrementCache($Name1, $Expire1);
+         }
+      }
    }
 }

@@ -110,8 +110,48 @@ class BuzzModel {
       $Result['CountToRegister'] = GetValue('CountUsers', $Row, 0);
       
       $this->QnAStats($Result);
+      $this->TagStats($Result);
       
       return $Result;
+   }
+   
+   protected function TagStats(&$Result) {
+      $Tags = C('Plugins.AdvancedStats.TrackTags');
+      if (!$Tags)
+         return;
+      if (is_string($Tags)) {
+         $Tags = explode(',', $Tags);
+      }
+      
+      $CustomConfig = array();
+      $i = 1;
+      foreach ($Tags as $Tag) {
+         $CustomConfig['Custom'.$i] = $Tag;
+      }
+      
+      $SlotRange = $this->SlotRange;
+      $TagRows = Gdn::SQL()->WhereIn('Name', $Tags)->Get('Tag')->ResultArray();
+      $TagRows = Gdn_DataSet::Index($TagRows, array('Name'));
+      $TagIDs = ConsolidateArrayValuesByKey($TagRows, 'TagID');
+      
+      // Get all of the tag stats.
+      $TagCounts = Gdn::SQL()
+         ->Select('TagID')
+         ->Select('DiscussionID', 'count', 'CountDiscussions')
+         ->From('TagDiscussion')
+         ->WhereIn('TagID', $TagIDs)
+         ->Where(self::RangeWhere($SlotRange))
+         ->Get()->ResultArray();
+      $TagCounts = Gdn_DataSet::Index($TagCounts, array('TagID'));
+      
+      array_change_key_case($TagRows);
+      foreach($CustomConfig as $Field => $Tag) {
+         $TagID = GetValueR(strtolower($Tag).'.TagID', $TagRows, 0);
+         $Count = GetValueR($TagID.'.CountDiscussions', $TagCounts, 0);
+         $Result[$Field] = $Count;
+      }
+      
+      $Result['CustomDef'] = $CustomConfig;
    }
    
    protected function QnAStats(&$Result) {

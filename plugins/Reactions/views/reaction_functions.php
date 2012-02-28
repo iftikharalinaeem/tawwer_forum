@@ -24,10 +24,52 @@ function OrderByButton($Column, $Label = FALSE, $DefaultOrder = '', $CssClass = 
    return Anchor($Label, $Url, 'FilterButton OrderByButton OrderBy-'.$Column.$CssClass, array('rel' => 'nofollow'));
 }
 
+function ReactionCount($Row, $UrlCodes) {
+   if ($ID = GetValue('CommentID', $Row)) {
+      $RecordType = 'comment';
+   } elseif ($ID = GetValue('ActivityID', $Row)) {
+      $RecordType = 'activity';
+   } else {
+      $RecordType = 'discussion';
+      $ID = GetValue('DiscussionID', $Row);
+   }
+   
+   if ($RecordType == 'activity')
+      $Data = GetValueR('Data.React', $Row, array());
+   else
+      $Data = GetValueR("Attributes.React", $Row, array());
+   
+   if (!is_array($Data)) {
+      return 0;
+   }
+   
+   $UrlCodes = (array)$UrlCodes;
+   
+   $Count = 0;
+   foreach ($UrlCodes as $UrlCode) {
+      if (is_array($UrlCode))
+         $Count += GetValue($UrlCode['UrlCode'], $Data, 0);
+      else
+         $Count += GetValue($UrlCode, $Data, 0);
+   }
+   return $Count;
+}
+
 if (!function_exists('ReactionButton')):
    
 function ReactionButton($Row, $UrlCode, $Options = array()) {
    $ReactionType = ReactionModel::ReactionTypes($UrlCode);
+   
+   $IsHeading = FALSE;
+   if (!$ReactionType) {
+      $ReactionType = array('UrlCode' => $UrlCode, 'Name' => T($UrlCode));
+      $IsHeading = TRUE;
+   }
+   
+   if ($Permission = GetValue('Permission', $ReactionType)) {
+      if (!Gdn::Session()->CheckPermission($Permission))
+         return '';
+   }
    
    $Name = $ReactionType['Name'];
    $Label = $Name;
@@ -42,11 +84,18 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
       $ID = GetValue('DiscussionID', $Row);
    }
    
-   if ($RecordType == 'activity')
-      $Count = GetValueR("Data.React.$UrlCode", $Row, 0);
-   else
-      $Count = GetValueR("Attributes.React.$UrlCode", $Row, 0);
-   
+   if ($IsHeading) {
+      static $Types = array();
+      if (!isset($Types[$UrlCode]))
+         $Types[$UrlCode] = ReactionModel::GetReactionTypes(array('Class' => $UrlCode, 'Active' => 1));
+      
+      $Count = ReactionCount($Row, $Types[$UrlCode]);
+   } else {
+      if ($RecordType == 'activity')
+         $Count = GetValueR("Data.React.$UrlCode", $Row, 0);
+      else
+         $Count = GetValueR("Attributes.React.$UrlCode", $Row, 0);  
+   }
    $CountHtml = '';
    $LinkClass = "ReactButton-$UrlCode";
    if ($Count) {
@@ -55,7 +104,10 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
    }
    
    $UrlCode2 = strtolower($UrlCode);
-   $Url = Url("/react/$RecordType/$UrlCode2?id=$ID");
+   if ($IsHeading)
+      $Url = '';
+   else
+      $Url = Url("/react/$RecordType/$UrlCode2?id=$ID");
    
    $Result = <<<EOT
 <a class="Hijack ReactButton $LinkClass" href="$Url" title="$Label" rel="nofollow"><span class="ReactSprite $SpriteClass"></span> <span class="ReactLabel">$Label</span>$CountHtml</a>
@@ -72,16 +124,23 @@ if (!function_exists('ScoreCssClass')):
    
 function ScoreCssClass($Row, $All = FALSE) {
    $Score = GetValue('Score', $Row);
+   if (!$Score)
+      $Score = 0;
+   if (Debug())
+      $Inc = 1;
+   else
+      $Inc = 5;
    
-   if ($Score < 0)
-      $Result = 'Score-Low';
-   elseif ($Score > 10)
-      $Result = 'Score-High';
+   
+   if ($Score <= -$Inc)
+      $Result = $All ? 'Un-Buried' : 'Buried';
+   elseif ($Score >= $Inc)
+      $Result = 'Promoted';
    else
       $Result = '';
    
    if ($All)
-      return array($Result, 'Score-Low Score-High');
+      return array($Result, 'Promoted Buried Un-Buried');
    else
       return $Result;
 }
@@ -127,9 +186,8 @@ function WriteProfileCounts() {
    echo '</div>';
 }
 
-if (!function_exists('WriteReactionBar')):
-   
-function WriteReactionBar($Row) {
+if (!function_exists('WriteReactions')):
+function WriteReactions($Row) {
    $Attributes = GetValue('Attributes', $Row);
    if (is_string($Attributes)) {
       $Attributes = @unserialize($Attributes);
@@ -141,37 +199,63 @@ function WriteReactionBar($Row) {
    echo '<div class="Reactions">';
    
    // Write the flags.
-   echo '<div class="Flag">';
-   echo '<div class="Handle FlagHandle"><a href="#"><span class="ReactSprite ReactFlag"></span> <span class="ReactLabel">Flag</span></a></div>';
+   static $Flags = NULL, $FlagCodes = NULL;
+   if ($Flags === NULL) {
+      $Flags = ReactionModel::GetReactionTypes(array('Class' => 'Flag', 'Active' => 1));
+      $FlagCodes = array();
+      foreach ($Flags as $Flag) {
+         $FlagCodes[] = $Flag['UrlCode'];
+      }
+   }
+      
+   if (!empty($Flags)) {
+      echo '<span class="Flag ToggleFlyout">';
+
+      // Write the handle.
+      echo ReactionButton($Row, 'Flag');
+      
+      echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
+      foreach ($Flags as $Flag) {
+         echo '<li>'.ReactionButton($Row, $Flag['UrlCode']);
+      }
+      echo '</ul>';
+
+      echo '</span>';
+   }
    
-   echo '<div class="ReactButtons" style="display:none">';
-   echo '<a href="#" class="ReactHeading">'.T('Flag »').'</a> ';
-   echo ReactionButton($Row, 'Abuse');
-   echo ReactionButton($Row, 'Spam');
-   echo ReactionButton($Row, 'Troll');
+//   echo '<div class="Flag">';
+//   echo '<div class="Handle FlagHandle"><a href="#"><span class="ReactSprite ReactFlag"></span> <span class="ReactLabel">Flag</span></a></div>';
+//   
+//   echo '<div class="ReactButtons" style="display:none">';
+//   echo '<a href="#" class="ReactHeading">'.T('Flag »').'</a> ';
+//   echo ReactionButton($Row, 'Abuse');
+//   echo ReactionButton($Row, 'Spam');
+//   echo ReactionButton($Row, 'Troll');
+//   
+//   echo '</div>';
+//   
+//   echo '</div>';
    
-   echo '</div>';
    
-   echo '</div>';
+//   echo '<span class="Nub">&#160;</span>';
    
-   
-   echo '<div class="Nub">&#160;</div>';
+   static $Types = NULL;
+   if ($Types === NULL)
+      $Types = ReactionModel::GetReactionTypes(array('Class' => array('Good', 'Bad'), 'Active' => 1));
    
    // Write the reactions.
-   echo '<div class="React">';
+   echo '<span class="React">';
+//   echo '<span class="Column-Score">'.GetValue('Score', $Row).'</span>';
    
    
-   echo '<div class="ReactButtons">';
+   echo '<span class="ReactButtons">';
+   foreach ($Types as $Type) {
+      echo ReactionButton($Row, $Type['UrlCode']);
+   }
+   echo '</span>';
    
-   echo ReactionButton($Row, 'OffTopic');
-   echo ReactionButton($Row, 'Disagree');
-   echo ReactionButton($Row, 'Agree');
-   echo ReactionButton($Row, 'Awesome');
-   echo ' <a href="#" class="ReactHeading">'.T('« React').'</a>';
-   echo '</div>';
-   
-   echo '<div class="Handle ReactHandle" style="display:none"><a href="#"><span class="ReactSprite ReactAgree">&#160;</span> <span class="ReactLabel">React</span></a></div>';
-   echo '</div>';
+//   echo ' <span class="Handle ReactHandle"><span class="ReactSprite ReactReact">&#160;</span> <span class="ReactLabel">React</span></span>';
+   echo '</span>';
    
    echo '</div>';
 }

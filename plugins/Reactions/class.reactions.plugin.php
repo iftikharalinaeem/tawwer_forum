@@ -25,6 +25,7 @@ class ReactionsPlugin extends Gdn_Plugin {
    
    protected static $_CommentOrder;
    public static function CommentOrder() {
+//      die();
       if (!self::$_CommentOrder) {
          $SetPreference = FALSE;
          
@@ -84,8 +85,10 @@ class ReactionsPlugin extends Gdn_Plugin {
          ->Column('UrlCode', 'varchar(20)', FALSE, 'primary')
          ->Column('Name', 'varchar(20)')
          ->Column('Description', 'text', TRUE)
+         ->Column('Class', 'varchar(10)', TRUE)
          ->Column('TagID', 'int')
          ->Column('Attributes', 'text', TRUE)
+         ->Column('Sort', 'smallint', TRUE)
          ->Column('Active', 'tinyint(1)', 1)
          ->Set();
       
@@ -101,14 +104,57 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Rm = new ReactionModel();
       
       // Insert some default tags.
-      $Rm->DefineReactionType(array('UrlCode' => 'Spam', 'Name' => 'Spam', 'Log' => 'Spam', 'LogThreshold' => 5, 'RemoveThreshold' => 5, 'ModeratorInc' => 5));
-      $Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Log' => 'Moderation', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5));
-      $Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Log' => 'Moderation', 'LogThreshold' => 5, 'ModeratorInc' => 5));
+      $Rm->DefineReactionType(array('UrlCode' => 'Spam', 'Name' => 'Spam', 'Sort' => 100, 'Class' => 'Flag', 'Log' => 'Spam', 'LogThreshold' => 5, 'RemoveThreshold' => 5, 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
+      $Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Sort' => 101, 'Class' => 'Flag', 'Log' => 'Moderate', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
+      $Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Sort' => 102, 'Class' => 'Flag', 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
       
-      $Rm->DefineReactionType(array('UrlCode' => 'Agree', 'Name' => 'Agree', 'IncrementColumn' => 'Score', 'Points' => 1));
-      $Rm->DefineReactionType(array('UrlCode' => 'Disagree', 'Name' => 'Disagree'));
-      $Rm->DefineReactionType(array('UrlCode' => 'Awesome', 'Name' => 'Awesome', 'IncrementColumn' => 'Score', 'Points' => 1));
-      $Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic'));
+      $Rm->DefineReactionType(array('UrlCode' => 'Promote', 'Name' => 'Promote', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1, 'Permission' => 'Garden.Moderation.Manage'));
+      
+      $Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic', 'Sort' => 1, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
+      
+      $Rm->DefineReactionType(array('UrlCode' => 'Disagree', 'Name' => 'Disagree', 'Sort' => 2, 'Class' => 'Bad'));
+      $Rm->DefineReactionType(array('UrlCode' => 'Agree', 'Name' => 'Agree', 'Sort' => 3, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
+      
+      $Rm->DefineReactionType(array('UrlCode' => 'Dislike', 'Name' => 'Dislike', 'Sort' => 4, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
+      $Rm->DefineReactionType(array('UrlCode' => 'Like', 'Name' => 'Like', 'Sort' => 5, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
+      
+      $Rm->DefineReactionType(array('UrlCode' => 'Down', 'Name' => 'Vote Down', 'Sort' => 6, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
+      $Rm->DefineReactionType(array('UrlCode' => 'Up', 'Name' => 'Vote Up', 'Sort' => 7, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
+
+      $Rm->DefineReactionType(array('UrlCode' => 'WTF', 'Name' => 'WTF', 'Sort' => 8, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1));
+      $Rm->DefineReactionType(array('UrlCode' => 'Awesome', 'Name' => 'Awesome', 'Sort' => 9, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
+      $Rm->DefineReactionType(array('UrlCode' => 'LOL', 'Name' => 'LOL', 'Sort' => 10, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1));
+   
+      
+      if (class_exists('BadgeModel')) {
+         // Define some badges for the reactions.
+         $BadgeModel = new BadgeModel();
+         
+         $Reactions = array('Agree' => 'Agrees', 'Like' => 'Likes', 'Up' => 'Up Votes', 'Awesome' => 'Awesomes', 'LOL' => 'LOLs'); 
+         $Thresholds = array(1 => 5, 2 => 25, 3 => 100, 4 => 250, 5 => 500);
+         
+         foreach ($Reactions as $Class => $NameSuffix) {
+            $ClassSlug = strtolower($Class);
+            foreach ($Thresholds as $Level => $Threshold) {
+               $Points = round($Threshold / 10);
+               if ($Points < 10)
+                  $Points = 10;
+               
+               //foreach ($Likes as $Count => $Body) {
+               $BadgeModel->Define(array(
+                   'Name' => "$Threshold $NameSuffix",
+                   'Slug' => "$ClassSlug-$Threshold",
+                   'Type' => 'Reaction',
+                   'Body' => '',
+                   'Photo' => "http://badges.vni.la/100/$ClassSlug-$Level.png",
+                   'Points' => $Points,
+                   'Threshold' => $Threshold,
+                   'Class' => $Class,
+                   'Level' => $Level
+               ));
+            }
+         }
+      }
    }
    
    public function ActivityController_Render_Before($Sender) {
@@ -124,10 +170,10 @@ class ReactionsPlugin extends Gdn_Plugin {
     * @param CommentModel $Sender
     * @param array $Args 
     */
-   public function CommentModel_AfterConstruct_Handler($Sender, $Args) {
-      $OrderBy = self::CommentOrder($Sender);
-      $Sender->OrderBy($OrderBy);
-   }
+//   public function CommentModel_AfterConstruct_Handler($Sender, $Args) {
+//      $OrderBy = self::CommentOrder($Sender);
+//      $Sender->OrderBy($OrderBy);
+//   }
    
    /**
     * 
@@ -151,23 +197,15 @@ class ReactionsPlugin extends Gdn_Plugin {
       
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }
+   public function PostController_Render_Before($Sender) {
+      include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+   }
    
    public function ActivityController_AfterActivityBody_Handler($Sender, $Args) {
       $Activity = $Args['Activity'];
       if (in_array(GetValue('ActivityType', $Activity), array('Status', 'WallPost'))) {
-         WriteReactionBar($Activity);
+         WriteReactions($Activity);
       }
-   }
-   
-   public function DiscussionController_AfterDiscussionBody_Handler($Sender, $Args) {
-      WriteReactionBar($Args['Discussion']);
-   }
-   
-   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
-      if (!isset($Args['Comment']))
-         return;
-      
-      WriteReactionBar($Args['Comment']);
    }
    
 //   public function DiscussionController_CommentHeading_Handler($Sender, $Args) {
@@ -180,6 +218,13 @@ class ReactionsPlugin extends Gdn_Plugin {
       
       echo '<h2>'.T('Reactions').'</h2>';
       WriteProfileCounts();
+   }
+   
+   public function Base_BeforeCommentDisplay_Handler($Sender, $Args) {
+      $CssClass = ScoreCssClass($Args['Object']);
+      if ($CssClass) {
+         $Args['CssClass'] .= ' '.$CssClass;
+      }
    }
    
    /**
@@ -267,6 +312,10 @@ class ReactionsPlugin extends Gdn_Plugin {
          throw PermissionException('Javascript');
       
       $ReactionType = ReactionModel::ReactionTypes($Reaction);
+      
+      if ($Permission = GetValue('Permission', $ReactionType)) {
+         $Sender->Permission($Permission);
+      }
       
       $ReactionModel = new ReactionModel();
       $ReactionModel->React($RecordType, $ID, $Reaction);

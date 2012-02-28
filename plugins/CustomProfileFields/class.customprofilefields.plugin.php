@@ -55,11 +55,18 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 		$CountFields = 0;
 		foreach ($SuggestedFields as $Field) {
 			$CountFields++;
-			$Value = $IsPostBack ? GetValue($Field, $_POST, '') : GetValue($Field, $ProfileFields, '');
+			$Value = $IsPostBack ? $Sender->Form->GetValue($Field, '') : GetValue($Field, $ProfileFields, '');
+         
+         $CustomFieldOptions = array('value' => $Value);
+         $Sender->EventArguments['CustomField'] = $Field;
+         $Sender->EventArguments['CustomFieldValue'] = &$Value;
+         $Sender->EventArguments['CustomFieldOptions'] = &$CustomFieldOptions;
+         $Sender->FireAs('CustomProfileFieldsPlugin')->FireEvent('BeforeCustomField');
+         
 			echo '<li>';
 				echo $Sender->Form->Hidden('CustomProfileFieldLabel[]', array('value' => $Field));
 				echo $Sender->Form->Label($Field, 'CustomProfileFieldValue[]');
-				echo $Sender->Form->TextBox('CustomProfileFieldValue[]', array('value' => $Value));
+				echo $Sender->Form->TextBox('CustomProfileFieldValue[]', $CustomFieldOptions);
 			echo '</li>';
 		}
 		if (!C('Plugins.CustomProfileFields.Disallow')) {
@@ -111,9 +118,16 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
                      $Value = GetValue($CountFields, $CustomProfileFieldValue, '');
                   }
                   $CountFields++;
+                  
+                  $CustomFieldOptions = array('value' => $Value, 'class' => 'CustomProfileFieldValue');
+                  $Sender->EventArguments['CustomField'] = $Field;
+                  $Sender->EventArguments['CustomFieldValue'] = &$Value;
+                  $Sender->EventArguments['CustomFieldOptions'] = &$CustomFieldOptions;
+                  $Sender->FireAs('CustomProfileFieldsPlugin')->FireEvent('BeforeCustomField');
+                  
                   echo '<li>';
                      echo $Sender->Form->TextBox('CustomProfileFieldLabel[]', array('value' => $Field, 'class' => 'CustomProfileFieldLabel'));
-                     echo $Sender->Form->TextBox('CustomProfileFieldValue[]', array('value' => $Value, 'class' => 'CustomProfileFieldValue'));
+                     echo $Sender->Form->TextBox('CustomProfileFieldValue[]', $CustomFieldOptions);
                   echo '</li>';
                }
             }

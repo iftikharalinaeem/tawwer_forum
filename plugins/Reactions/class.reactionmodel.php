@@ -101,13 +101,16 @@ class ReactionModel {
       } else {
          $TagID = $Row['TagID'];
          if ($Row['Type'] != 'Reaction') {
-            Gdn::SQL()->Put('Tag', array('Name' => $UrlCode, 'Type' => 'Reaction'), array('TagID' => $TagID));
+            Gdn::SQL()->Put('Tag', array(
+                'Name' => $UrlCode, 
+                'Type' => 'Reaction'
+                ), array('TagID' => $TagID));
          }
       }
       $Data['TagID'] = $TagID;
       
       $Row = array();
-      $Columns = array('UrlCode', 'Name', 'Description', 'TagID');
+      $Columns = array('UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID');
       foreach ($Columns as $Column) {
          if (isset($Data[$Column])) {
             $Row[$Column] = $Data[$Column];
@@ -124,6 +127,33 @@ class ReactionModel {
       Gdn::Cache()->Remove('ReactionTypes');
       
       return $Data;
+   }
+   
+   public static function GetReactionTypes($Where) {
+      $Types = self::ReactionTypes();
+      $Result = array();
+      foreach ($Types as $Index => $Type) {
+         if (self::Filter($Type, $Where))
+            $Result[$Index] = $Type;
+      }
+      return $Result;
+   }
+   
+   public static function Filter($Row, $Where) {
+      foreach ($Where as $Column => $Value) {
+         if (!isset($Row[$Column]) && $Value)
+            return FALSE;
+         
+         $RowValue = $Row[$Column];
+         if (is_array($Value)) {
+            if (!in_array($RowValue, $Value))
+               return FALSE;
+         } else {
+            if ($RowValue != $Value)
+               return FALSE;
+         }
+      }
+      return TRUE;
    }
    
    public function GetRecordsWhere($Where, $OrderFields = '', $OrderDirection = '', $Limit = 30, $Offset = 0) {
@@ -199,9 +229,15 @@ class ReactionModel {
       }
       
       // Join the rows.
-      foreach ($Data as &$Row) {
+      $Unset = array();
+      foreach ($Data as $Index => &$Row) {
          $RecordType = $Row['RecordType'];
          $ID = $Row['RecordID'];
+         
+         if (!isset($JoinData[$RecordType][$ID])) {
+            $Unset[] = $Index;
+            continue; // orphaned?
+         }
          
          $Record = $JoinData[$RecordType][$ID];
          $Row = array_merge($Row, $Record);
@@ -219,8 +255,15 @@ class ReactionModel {
          $Row['Url'] = $Url;
       }
       
+      foreach ($Unset as $Index) {
+         unset($Data[$Index]);
+      }
+      
       // Join the users.
       Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'));
+      
+      if (!empty($Unset))
+         $Data = array_values($Data);
    }
    
    /**
@@ -358,6 +401,7 @@ class ReactionModel {
       // Generate the new button for the reaction.
       Gdn::Controller()->SetData('Diffs', $Diffs);
       if (function_exists('ReactionButton')) {
+         $Diffs[] = 'Flag'; // always send back flag button.
          foreach ($Diffs as $UrlCode) {
             $Button = ReactionButton($Record, $UrlCode);
             Gdn::Controller()->JsonTarget(
@@ -439,10 +483,10 @@ class ReactionModel {
             // Get all of the userIDs that flagged this.
             $OtherUserData = $this->SQL->GetWhere('UserTag', array('RecordType' => $RecordType, 'RecordID' => $ID, 'TagID' => $ReactionType['TagID']))->ResultArray();
             $OtherUserIDs = array();
-            foreach ($OtherUserData as $Row) {
-               if ($Row['UserID'] == $UserID || !$Row['UserID'])
+            foreach ($OtherUserData as $UserRow) {
+               if ($UserRow['UserID'] == $UserID || !$Row['UserID'])
                   continue;
-               $OtherUserIDs[] = $Row['UserID'];
+               $OtherUserIDs[] = $UserRow['UserID'];
             }
             $LogOptions['OtherUserIDs'] = $OtherUserIDs;
          }
@@ -483,6 +527,9 @@ class ReactionModel {
             );
          }
       }
+      
+      // Check to see if we need to give the user a badge.
+      $this->CheckBadges($Row['InsertUserID'], $ReactionType);
       
       if ($Message)
          Gdn::Controller()->InformMessage($Message[0], $Message[1]);
@@ -579,13 +626,38 @@ class ReactionModel {
 //      $Sender->InformMessage($Message[0], $Message[1]);
    }
    
+   public function CheckBadges($UserID, $ReactionType) {
+      if (!class_exists('BadgeModel'))
+         return;
+      
+      // Get the score on the user.
+      $CountRow = $this->SQL->GetWhere('UserTag', array(
+          'RecordType' => 'User',
+          'RecordID' => $UserID,
+          'UserID' => self::USERID_OTHER,
+          'TagID' => $ReactionType['TagID']
+      ))->FirstRow(DATASET_TYPE_ARRAY);
+      
+      $Score = $CountRow['Total'];
+      
+      $BadgeModel = new BadgeModel();
+      $UserBadgeModel = new UserBadgeModel();
+      
+      $Badges = $BadgeModel->GetWhere(array('Type' => 'Reaction', 'Class' => $ReactionType['UrlCode']), 'Threshold')->ResultArray();
+      foreach ($Badges as $Badge) {
+         if ($Score > $Badge['Threshold']) {
+            $UserBadgeModel->Give($UserID, $Badge);
+         }
+      }
+   }
+   
    public static function ReactionTypes($UrlCode = NULL) {
       if (self::$ReactionTypes === NULL) {
          // Check the cache first.
          $ReactionTypes = Gdn::Cache()->Get('ReactionTypes');
          
          if ($ReactionTypes === Gdn_Cache::CACHEOP_FAILURE) {
-            $ReactionTypes = Gdn::SQL()->Get('ReactionType')->ResultArray();
+            $ReactionTypes = Gdn::SQL()->Get('ReactionType', 'Sort, Name')->ResultArray();
             foreach ($ReactionTypes as $Type) {
                $Row = $Type;
                $Attributes = @unserialize($Row['Attributes']);
