@@ -26,7 +26,7 @@ $Session = Gdn::Session();
                      echo Gdn_Theme::Link('dashboard');
                      echo Anchor('Support', '/help', 'Support');
                      // Show account link if user has an account
-                     $Session->User->CountNotifications = 12;
+                     // $Session->User->CountNotifications = 12;
                      if (isset($Session->User->AccountID) && is_numeric($Session->User->AccountID) && $Session->User->AccountID > 0)
                         echo Anchor('Account', '/account', 'Account');
 
