@@ -439,6 +439,15 @@ Here are some things you should know before you begin:
 			->Column('InsertUserID', 'int', TRUE, 'key')
 			->Column('DateInserted', 'datetime')
          ->Set();
+      
+      // Make sure the theme revision exists in the database.
+      $RevisionID = C('Plugins.CustomTheme.LiveRevisionID');
+      if ($RevisionID) {
+         $Row = Gdn::SQL()->GetWhere('CustomThemeRevision', array('RevisionID' => $RevisionID))->FirstRow();
+         if (!$Row) {
+            RemoveFromConfig('Plugins.CustomTheme.LiveRevisionID');
+         }
+      }
    }
 	
 	/**
