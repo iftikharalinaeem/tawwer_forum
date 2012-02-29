@@ -36,10 +36,10 @@ $Rm->DefineReactionType(array('UrlCode' => 'Spam', 'Name' => 'Spam', 'Sort' => 1
 $Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Sort' => 101, 'Class' => 'Flag', 'Log' => 'Moderate', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
    'Description' => "Report posts that are abusive or violate your terms of service so that they can be alerted to a moderator's attention."));
 $Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Sort' => 102, 'Class' => 'Flag', 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
-   'Description' => "Trollish posts are those that are trying to elicit a heated argument from other people. Posts that are flagged as trolls will be buried."));
+   'Description' => "Troll posts are typically trying to elicit a heated argument from other people. Trolls are community poison, making your community a scary place for new members. Troll posts will be buried."));
 
 $Rm->DefineReactionType(array('UrlCode' => 'Promote', 'Name' => 'Promote', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 3, 'Permission' => 'Garden.Moderation.Manage',
-   'Description' => "Moderators can can promote the absolute best posts in the community. This way they can be remembered or read by new visitors that weren't here when they were originally posted."));
+   'Description' => "Moderators have the ability to promote the best posts in the community. This way they can be featured for new visitors."));
 
 $Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic', 'Sort' => 1, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
    'Description' => "Off topic posts are not releveant to the topic being discussed. If a post gets enough off-topic votes then it will be buried so it won't derail the discussion."));
@@ -62,7 +62,7 @@ $Rm->DefineReactionType(array('UrlCode' => 'Up', 'Name' => 'Vote Up', 'Sort' => 
    'Description' => "An up vote is a general disapproval of a post. Enough dislikes will bury a post."));
 
 $Rm->DefineReactionType(array('UrlCode' => 'WTF', 'Name' => 'WTF', 'Sort' => 9, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
-   'Description' => 'WTF stands for "What the F___?" You usually react this way when a post makes absolutely no sense.'));
+   'Description' => 'WTF stands for "What the Fuh?" You usually react this way when a post makes absolutely no sense.'));
 $Rm->DefineReactionType(array('UrlCode' => 'Awesome', 'Name' => 'Awesome', 'Sort' => 10, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => 'Awesome posts amaze you. You want to repeat them to your friends and remember them later.'));
 $Rm->DefineReactionType(array('UrlCode' => 'LOL', 'Name' => 'LOL', 'Sort' => 11, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,

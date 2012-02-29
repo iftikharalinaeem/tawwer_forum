@@ -5,7 +5,11 @@
     width: 80px;
     background: #001F44;
     border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
     box-shadow: 0 -5px 10px #0B64C6 inset;;
+    -moz-box-shadow: 0 -5px 10px #0B64C6 inset;;
+    -webkit-box-shadow: 0 -5px 10px #0B64C6 inset;;
    }
 
    .ActivateSlider-Active {
@@ -59,7 +63,7 @@
 <h1><?php echo $this->Data('Title'); ?></h1>
 <div class="Info PageInfo">
    <p><b>Heads up!</b> Here are all of the reactions you can use on your site.
-      Which reactions you use really depends on your community, but we recommend keeping a coupld of points in mind.
+      Which reactions you use really depends on your community, but we recommend keeping a couple of points in mind.
    </p>
    <ol>
       <li>
@@ -75,6 +79,7 @@
       <tr>
          <th class="NameColumn"><?php echo T('Reaction'); ?></th>
          <th><?php echo T('Description'); ?></th>
+         <th><?php echo T('Actions Based on Votes'); ?></th>
          <th class="Options"><?php echo T('Active'); ?></th>
       </tr>
    </thead>
@@ -90,16 +95,12 @@
             echo $ReactionType['Name'];
             ?></div>
          </td>
+         <td><?php echo $ReactionType['Description']; ?></td>
          <td>
-            <?php
-            echo $ReactionType['Description'];
-            
+            <?php            
             $AutoDescription = implode(' ', AutoDescription($ReactionType));
-            if ($AutoDescription) {
-               echo '<div class="AutoDescription">';
+            if ($AutoDescription) 
                echo $AutoDescription;
-               echo '</div>';
-            }
             ?>
          </td>
          <td>
