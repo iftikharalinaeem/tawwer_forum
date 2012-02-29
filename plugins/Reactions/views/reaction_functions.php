@@ -167,7 +167,7 @@ function WriteProfileCounts() {
       if (StringBeginsWith($CurrentUrl, $Row['Url']))
          $ItemClass .= ' Selected';
       
-      echo ' <span class="'.$ItemClass.'">';
+      echo ' <span class="CountItemWrap"><span class="'.$ItemClass.'">';
       
       if ($Row['Url'])
          echo '<a href="'.htmlspecialchars($Row['Url']).'">';
@@ -178,7 +178,7 @@ function WriteProfileCounts() {
       if ($Row['Url'])
          echo '</a>';
       
-      echo '</span> ';
+      echo '</span></span> ';
    }
    
    echo '</div>';
