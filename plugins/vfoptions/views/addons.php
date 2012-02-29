@@ -26,11 +26,28 @@ if (!is_array($AllowedPlugins))
       'WhosOnline',
       'cleditor'
    );
-   
-   // $AllowedPlugins = array('Emotify','cleditor','Facebook','Twitter','OpenID','GoogleSignIn','CustomProfileFields','Flagging','Tagging','Gravatar','vanillicon','OpenID','QnA','RoleTitle','Signatures','SplitMerge','Spoof','WhosOnline','FileUpload','Voting','Quotes','Signatures','Pockets','PostCount','LastEdited','Sitemaps','ShareThis','SEOCompanion','AllViewed','Vanoogle','TrackingCodes');
-   
+
+$Addons = array();
+foreach ($AllowedPlugins as $Key) {
+   $Addons[$Key] = array('Type' => 'Plugin');
+}
+
+if ($this->Data('Plan.Subscription.PlanCode') != 'free') {
+   // Add non-free addons.
+   $Addons2 = array(
+       'Reputation' => array('Type' => 'Application', 'Name' => 'Badges', 'IconUrl' => 'http://badges.vni.la/100/lol-2.png'),
+      'Reactions' => array('Type' => 'Plugin'));
+   $Addons = array_merge($Addons2, $Addons);
+}
+
 $PluginManager = Gdn::PluginManager();
 $AvailablePlugins = $PluginManager->AvailablePlugins();
+
+$ApplicationManager = Gdn::ApplicationManager();
+$AvailableApplications = $ApplicationManager->AvailableApplications();
+
+$AllAvailable = array_merge($AvailablePlugins, $AvailableApplications);
+
 $PluginCount = 0;
 $EnabledCount = 0;
 foreach ($AllowedPlugins as $PluginKey) {
@@ -90,16 +107,22 @@ table tbody td {
    <tbody>
 <?php
 $Alt = FALSE;
-foreach ($AllowedPlugins as $Key) {
-   $Plugin = GetValue($Key, $AvailablePlugins);
-   if (!$Plugin)
+foreach ($Addons as $Key => $Info) {
+   $Addon = GetValue($Key, $AllAvailable);
+   if (!$Addon)
       continue;
    
+   $Type = $Info['Type'];
+   
 
-   $ScreenName = GetValue('Name', $Plugin, $Key);
-   $Description = GetValue('Description', $Plugin, '');
-   $Enabled = array_key_exists($Key, $PluginManager->EnabledPlugins());
-   $SettingsUrl = $Enabled ? ArrayValue('SettingsUrl', $Plugin, '') : '';
+   $ScreenName = GetValue('Name', $Info, GetValue('Name', $Addon, $Key));
+   $Description = GetValue('Description', $Addon, '');
+   if ($Type == 'Plugin')
+      $Enabled = array_key_exists($Key, $PluginManager->EnabledPlugins());
+   else
+      $Enabled = array_key_exists($Key, $ApplicationManager->EnabledApplications());
+   
+   $SettingsUrl = $Enabled ? ArrayValue('SettingsUrl', $Addon, '') : '';
    $RowClass = $Enabled ? 'Enabled' : 'Disabled';
 
    if ($this->Filter == 'enabled' && !$Enabled)
@@ -108,13 +131,16 @@ foreach ($AllowedPlugins as $Key) {
    if ($this->Filter == 'disabled' && $Enabled)
       continue;
 
-   $IconPath = '/plugins/'.GetValue('Folder', $Plugin, '').'/icon.png';
-   $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'applications/dashboard/design/images/plugin-icon.png';
-   $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'plugins/vfoptions/design/plugin-icon.png';
+   if (!$IconUrl = GetValue('IconUrl', $Info)) {
+      $IconPath = '/plugins/'.GetValue('Folder', $Addon, '').'/icon.png';
+      $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'applications/dashboard/design/images/plugin-icon.png';
+      $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'plugins/vfoptions/design/plugin-icon.png';
+      $IconUrl = $IconPath;
+   }
    ?>
    <tr <?php echo 'id="'.Gdn_Format::Url(strtolower($Key)).'-plugin"', ' class="'.$RowClass.'"'; ?>>
       <td class="Less">
-         <?php echo Img($IconPath, array('class' => 'PluginIcon')); ?>
+         <?php echo Img($IconUrl, array('class' => 'PluginIcon')); ?>
       </td>
       <td class="AddonName">
       <?php

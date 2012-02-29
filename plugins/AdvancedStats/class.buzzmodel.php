@@ -127,6 +127,7 @@ class BuzzModel {
       $i = 1;
       foreach ($Tags as $Tag) {
          $CustomConfig['Custom'.$i] = $Tag;
+         $i++;
       }
       
       $SlotRange = $this->SlotRange;
@@ -141,6 +142,7 @@ class BuzzModel {
          ->From('TagDiscussion')
          ->WhereIn('TagID', $TagIDs)
          ->Where(self::RangeWhere($SlotRange))
+         ->GroupBy('TagID')
          ->Get()->ResultArray();
       $TagCounts = Gdn_DataSet::Index($TagCounts, array('TagID'));
       
