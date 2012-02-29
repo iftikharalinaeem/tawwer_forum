@@ -155,8 +155,8 @@
 }
 
 .DataCounts {
-   overflow: hidden;
    margin: 5px 0;
+   text-align: center;
 }
 
 .DataCounts a {
@@ -173,13 +173,21 @@
    font-size: 28px;
 }
 
+.CountTotal img {
+   height: 40px;
+}
+
+.CountItemWrap {
+   width: 10%;
+   display: inline-block;
+}
+
 .CountItem {
-   float: left;
+/*   float: left;*/
    display: block;
    text-align: center;
    border: solid 2px transparent;
    padding: 4px;
-   width: 10%;
 }
 
 .Compact .Item .Author img {
@@ -241,6 +249,10 @@
    white-space: nowrap;
    padding-top: 0;
    padding-bottom: 0;
+}
+
+.Buried .Options {
+   display: none;
 }
 
 .Buried .CommentInfo {
@@ -308,7 +320,7 @@
 .ReactionFilters .ReactLabel {
    padding-left: 4px;
 }
-.BestOfData .DataList li:first-child {
+.BestOfData .DataList .Item:first-child {
    border-top: 1px solid #BEC8CC;
 }
 
