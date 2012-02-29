@@ -10,11 +10,11 @@
             </div>
             <div class="Column4">
                <strong>Features</strong>
-               <a href="/features">Features</a><br /><a href="/features/support-communities">Support Communities</a><br /><a href="/features/legacy-migration">Migrate Legacy Forum</a><br /><a href="/features/blog-comments">Comments Integration</a>            
+               <a href="/features">Features</a><br /><a href="/resources/customer-support-forums">Support Communities</a><br /><a href="/resources/migrating-legacy-forums">Migrate Legacy Forum</a>          
             </div>
             <div class="Column4">
                <strong>Resources</strong>
-               <a href="/resources">Resources</a><br /><a href="/case-studies">Case Studies</a><br /><a href="/professional-services">Professional Services</a><br /><a href="/free-version">Free Version</a>            
+               <a href="/resources">Resources</a><br /><a href="/resources/penny-arcade">Case Studies</a><br /><a href="/resources/custom-plugins">Professional Services</a>
             </div>
             <div class="Column4">
 					<strong>Legal Stuff</strong>
