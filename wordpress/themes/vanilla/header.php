@@ -21,13 +21,13 @@
             </h1>
             <div class="Menus">
                <div class="AccountMenu">
-                  <a href="/vanilla/entry/signin" class="SignIn">Sign In</a>
+                  <a href="/entry/signin" class="SignIn">Sign In</a>
                </div>
                <div class="VFMenu">
-                  <a href="/vanilla/" class="Home"><span class="Sprite SpHome"></span>Home</a><a href="/vanilla/plans" class="Plans"><span class="Sprite SpPlans"></span>Plans &amp; Pricing</a><a href="/vanilla/features" class="Features"><span class="Sprite SpFeatures"></span>Features</a><a href="/vanilla/resources" class="Resources"><span class="Sprite SpResources"></span>Resources</a><a href="/vanilla/blog" class="Blog"><span class="Sprite SpBlog"></span>Blog</a>               
+                  <a href="/" class="Home"><span class="Sprite SpHome"></span>Home</a><a href="/plans" class="Plans"><span class="Sprite SpPlans"></span>Plans &amp; Pricing</a><a href="/features" class="Features"><span class="Sprite SpFeatures"></span>Features</a><a href="/resources" class="Resources"><span class="Sprite SpResources"></span>Resources</a><a href="/blog" class="Blog"><span class="Sprite SpBlog"></span>Blog</a>               
                </div>
             </div>
-            <a href="/vanilla/plans" class="GreenButton SignUpButton">Sign Up</a>
+            <a href="/plans" class="GreenButton SignUpButton">Sign Up</a>
          </div>
 		</div>
 	</div>
