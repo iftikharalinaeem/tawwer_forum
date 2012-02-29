@@ -47,6 +47,14 @@
       padding: 5px 0 0 0;
    }
 </style>
+<div class="Help Aside">
+   <?php
+   echo '<h2>', T('Need More Help?'), '</h2>';
+   echo '<ul>';
+   echo Wrap(Anchor(T("Introducing Vanilla Reactions and Badges"), 'http://vanillaforums.com/blog/news/introducing-vanilla-reactions-and-badges'), 'li');
+   echo '</ul>';
+   ?>
+</div>
 
 <h1><?php echo $this->Data('Title'); ?></h1>
 <div class="Info PageInfo">
