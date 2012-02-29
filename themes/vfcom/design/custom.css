@@ -559,9 +559,7 @@ a.Close, a.Close:hover {
 div.MultipleEntryMethods {
    width: 494px;
 }
-.role-administrator,
-.Role_Administrator { background: #f5f9ff; }
-.Discussion .Comment .Meta .CommentInfo span {
+.RoleTitle {
    color: #000000;
    font-weight: bold;
 }
@@ -632,4 +630,10 @@ body.filenotfound #Content {
 	-moz-box-shadow: 0 0 2px #999;
 	-webkit-box-shadow: 0 1px 2px #999;
    
+}
+
+.Tag {  
+   background: #96DAF9;
+   border: 1px solid #057EEE;
+   color: #195388;
 }
