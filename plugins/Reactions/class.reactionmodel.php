@@ -85,28 +85,33 @@ class ReactionModel {
       return $Result;
    }
    
-   public function DefineReactionType($Data) {
-      $UrlCode = $Data['UrlCode'];
-      
-      // Grab the tag.
-      $Row = Gdn::SQL()->GetWhere('Tag', array('Name' => $UrlCode))->FirstRow(DATASET_TYPE_ARRAY);
+   public function DefineTag($Name, $Type) {
+      $Row = Gdn::SQL()->GetWhere('Tag', array('Name' => $Name))->FirstRow(DATASET_TYPE_ARRAY);
       
       if (!$Row) {
          $TagID = Gdn::SQL()->Insert('Tag', array(
-             'Name' => $UrlCode,
+             'Name' => $Name,
              'Type' => 'Reaction',
              'InsertUserID' => Gdn::Session()->UserID,
              'DateInserted' => Gdn_Format::ToDateTime())
          );
       } else {
          $TagID = $Row['TagID'];
-         if ($Row['Type'] != 'Reaction') {
+         if ($Row['Type'] != $Type) {
             Gdn::SQL()->Put('Tag', array(
-                'Name' => $UrlCode, 
-                'Type' => 'Reaction'
+                'Name' => $Name, 
+                'Type' => $Type
                 ), array('TagID' => $TagID));
          }
       }
+      return $TagID;
+   }
+   
+   public function DefineReactionType($Data) {
+      $UrlCode = $Data['UrlCode'];
+      
+      // Grab the tag.
+      $TagID = $this->DefineTag($Data['UrlCode'], 'Reaction');
       $Data['TagID'] = $TagID;
       
       $Row = array();
@@ -224,7 +229,11 @@ class ReactionModel {
       // Fetch all of the data in turn.
       $JoinData = array();
       foreach ($IDs as $RecordType => $RecordIDs) {
-         $Rows = Gdn::SQL()->WhereIn($RecordType.'ID', array_values($RecordIDs))->Get($RecordType)->ResultArray();
+         if ($RecordType == 'Comment') {
+            Gdn::SQL()->Select('d.Name')->Join('Discussion d', 'd.DiscussionID = r.DiscussionID');
+         }
+         
+         $Rows = Gdn::SQL()->Select('r.*')->WhereIn($RecordType.'ID', array_values($RecordIDs))->Get($RecordType. ' r')->ResultArray();
          $JoinData[$RecordType] = Gdn_DataSet::Index($Rows, array($RecordType.'ID'));
       }
       
@@ -392,6 +401,27 @@ class ReactionModel {
          Gdn::Controller()->JsonTarget("#{$RecordType}_{$Data['RecordID']}", $RemoveCss, 'RemoveClass');
       if ($AddCss)
          Gdn::Controller()->JsonTarget("#{$RecordType}_{$Data['RecordID']}", $AddCss, 'AddClass');
+         
+      // Kludge, add the promoted tag to promote content.
+      if ($AddCss == 'Promoted') {
+         $PromotedTagID = $this->DefineTag($AddCss, 'BestOf');
+         $this->SQL
+            ->Options('Ignore', TRUE)
+            ->Insert('UserTag', array(
+                'RecordType' => $RecordType,
+                'RecordID' => $Data['RecordID'],
+                'UserID' => self::USERID_OTHER,
+                'TagID' => $PromotedTagID,
+                'DateInserted' => Gdn_Format::ToDateTime()));
+         
+         
+//         $Sql = "insert GDN_UserTag set 
+//            RecordType = :RecordType, 
+//            RecordID = :RecordID, 
+//            UserID = :UserID, 
+//            DateInserted = :DateInserted
+//            ";
+      }
       
       $Record[$AttrColumn]['React'] = $React;
       $Set[$AttrColumn] = serialize($Record[$AttrColumn]);
@@ -643,7 +673,7 @@ class ReactionModel {
       $BadgeModel = new BadgeModel();
       $UserBadgeModel = new UserBadgeModel();
       
-      $Badges = $BadgeModel->GetWhere(array('Type' => 'Reaction', 'Class' => $ReactionType['UrlCode']), 'Threshold')->ResultArray();
+      $Badges = $BadgeModel->GetWhere(array('Type' => 'Reaction', 'Class' => $ReactionType['UrlCode']), 'Threshold', 'desc')->ResultArray();
       foreach ($Badges as $Badge) {
          if ($Score > $Badge['Threshold']) {
             $UserBadgeModel->Give($UserID, $Badge);
