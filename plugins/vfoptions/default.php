@@ -69,10 +69,10 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		$Menu->RemoveLink('Users', T('Authentication'));
 		$Menu->AddLink('Users', T('Authentication').$New, 'dashboard/authentication', 'Garden.Settings.Manage');
 
-      if (C('EnabledPlugins.embedvanilla')) {
-			$Menu->RemoveLink('Add-ons', T('&lt;Embed&gt; Vanilla'));
-			$Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla').$New, 'plugin/embed', 'Garden.Settings.Manage');
-      }
+//      if (C('EnabledPlugins.embedvanilla')) {
+//			$Menu->RemoveLink('Add-ons', T('&lt;Embed&gt; Vanilla'));
+//			$Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla').$New, 'plugin/embed', 'Garden.Settings.Manage');
+//      }
 	
 		$Menu->RemoveLink('Forum', T('Statistics'));
       $Menu->RemoveLink('Site Settings', T('Statistics'));
@@ -773,6 +773,11 @@ pageTracker._trackPageview();
       if (!in_array($Filter, array('enabled', 'disabled')))
          $Filter = 'all';
       $Sender->Filter = $Filter;
+      
+      if (class_exists('Infrastrucure')) {
+         $Plan = Infrastructure::Plan();
+         $Sender->SetData('Plan', $Plan);
+      }
 
       if (Gdn::Session()->ValidateTransientKey($TransientKey) && $Key) {
          try {
