@@ -6,19 +6,19 @@
          <div class="Columns">
             <div class="Column4">
                <strong>About Us</strong>
-               <a href="/vanilla/info/contact">Contact Us</a><br /><a href="/vanilla/info/hiring">We're Hiring!</a><br /><a href="http://vanillaforums.totemapp.com/">Press Releases</a><br /><a href="http://www.facebook.com/vanillaforums">Follow us on Facebook</a><br /><a href="http://www.twitter.com/vanilla">Follow us on Twitter</a><br /><a href="/vanilla/blog">Read Our Blog</a>            
+               <a href="/info/contact">Contact Us</a><br /><a href="/info/hiring">We're Hiring!</a><br /><a href="http://vanillaforums.totemapp.com/">Press Releases</a><br /><a href="http://www.facebook.com/vanillaforums">Follow us on Facebook</a><br /><a href="http://www.twitter.com/vanilla">Follow us on Twitter</a><br /><a href="/blog">Read Our Blog</a>            
             </div>
             <div class="Column4">
                <strong>Features</strong>
-               <a href="/vanilla/features">Features</a><br /><a href="/vanilla/features/support-communities">Support Communities</a><br /><a href="/vanilla/features/legacy-migration">Migrate Legacy Forum</a><br /><a href="/vanilla/features/blog-comments">Comments Integration</a>            
+               <a href="/features">Features</a><br /><a href="/resources/customer-support-forums">Support Communities</a><br /><a href="/resources/migrating-legacy-forums">Migrate Legacy Forum</a>          
             </div>
             <div class="Column4">
                <strong>Resources</strong>
-               <a href="/vanilla/resources">Resources</a><br /><a href="/vanilla/case-studies">Case Studies</a><br /><a href="/vanilla/professional-services">Professional Services</a><br /><a href="/vanilla/free-version">Free Version</a>            
+               <a href="/resources">Resources</a><br /><a href="/resources/penny-arcade">Case Studies</a><br /><a href="/resources/custom-plugins">Professional Services</a>
             </div>
             <div class="Column4">
 					<strong>Legal Stuff</strong>
-					<a href="/vanilla/info/privacy">Privacy Policy</a><br /><a href="/vanilla/info/termsofservice">Terms of Service</a><br /><a href="/vanilla/info/refund">Refund Policy</a>				
+					<a href="/info/privacy">Privacy Policy</a><br /><a href="/info/termsofservice">Terms of Service</a><br /><a href="/info/refund">Refund Policy</a>				
             </div>
          </div>
       </div>
