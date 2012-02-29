@@ -39,6 +39,8 @@
       Gdn::Controller()->EventArguments['Object'] = $RowObject;
       Gdn::Controller()->EventArguments[$Row['RecordType']] = $RowObject;
       Gdn::Controller()->FireAs('DiscussionController')->FireEvent("After{$Row['RecordType']}Body");
+      
+      WriteReactions($Row);
       ?>
    </li>
    <?php endforeach; ?>
