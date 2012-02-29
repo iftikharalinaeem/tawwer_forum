@@ -774,7 +774,7 @@ pageTracker._trackPageview();
          $Filter = 'all';
       $Sender->Filter = $Filter;
       
-      if (class_exists('Infrastrucure')) {
+      if (class_exists('Infrastructure')) {
          $Plan = Infrastructure::Plan();
          $Sender->SetData('Plan', $Plan);
       }
