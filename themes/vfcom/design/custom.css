@@ -457,6 +457,7 @@ body#dashboard_entry_password #Content,
 body#dashboard_entry_signin #Content,
 body#dashboard_entry_index #Content {
     width: 640px;
+    margin-bottom: 40px;
 }
 body.Entry div.Box,
 body.Entry div.Entry {
