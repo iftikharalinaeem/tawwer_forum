@@ -157,6 +157,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       $CssClass = ScoreCssClass($Args['Object']);
       if ($CssClass) {
          $Args['CssClass'] .= ' '.$CssClass;
+         SetValue('_CssClass', $Args['Object'], $CssClass);
       }
    }
    
@@ -320,87 +321,51 @@ class ReactionsPlugin extends Gdn_Plugin {
     * @param string $ReactionType Type of reaction content to show
     * @param int $Page The current page of content
     */
-   public function RootController_BestOf_Create($Sender, $ReactionType = 'everything', $Page = '') {
-      // Load all of the reaction types
-      $ReactionTypes = array('everything');
+   public function RootController_BestOf_Create($Sender, $Reaction = 'everything', $Page = '') {
+      // Load all of the reaction types.
       try {
          $ReactionModel = new ReactionModel();
-         $ReactionTypeData = $ReactionModel::ReactionTypes();
-         // Scrub the reaction type data a bit
-         foreach ($ReactionTypeData as $Key => $ReactionType) {
-            $Name = GetValue('Name', $ReactionType, '');
-            $UrlCode = GetValue('UrlCode', $ReactionType, '');
-            $Active = GetValue('Active', $ReactionType);
-            $Permission = GetValue('Permission', $ReactionType);
-            if (
-               !$Active
-               || in_array($UrlCode, explode(',','Spam,Abuse')) // Don't include stuff you straight up don't want SEO'd
-               || ($Permission && !Gdn::Session()->CheckPermission($Permission)) // Admin-only stuff
-               )
-               unset($ReactionTypeData[$Key]);
-         }
-         $Sender->SetData('ReactionTypeData', $ReactionTypeData);
-         $ReactionTypes = array_merge($ReactionTypes, ConsolidateArrayValuesByKey($ReactionTypeData, 'UrlCode'));
-         array_map('strtolower', $ReactionTypes);
+         $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Good', 'Active' => 1));
+         
+         $Sender->SetData('ReactionTypes', $ReactionTypes);
+//         $ReactionTypes = array_merge($ReactionTypes, ConsolidateArrayValuesByKey($ReactionTypeData, 'UrlCode'));
+//         array_map('strtolower', $ReactionTypes);
       } catch (Exception $ex) {
-         $Sender->SetData('ReactionTypeData', array());
+         $Sender->SetData('ReactionTypes', array());
       }
-      if (!in_array($ReactionType, $ReactionTypes)) $ReactionType = 'everything';
-      $Sender->SetData('CurrentReactionType', $ReactionType);
+      if (!isset($ReactionTypes[$Reaction])) {
+         $Reaction = 'everything';
+      }
+      $Sender->SetData('CurrentReaction', $Reaction);
 
       // Define the query offset & limit.
       $Limit = C('Vanilla.Comments.PerPage', 30);
-      $OffsetProvided = $Page != '';
+      //      $OffsetProvided = $Page != '';
       list($Offset, $Limit) = OffsetLimit($Page, $Limit);
-      if ($Offset == '') $Offset = 0;
-      if ($Offset < 0) $Offset = 0;
-      $Sender->SetData('Offset', $Offset);
-      $Sender->SetData('Limit', $Limit);
       
-      // Load some sample data
-      $CommentModel = new CommentModel();
-      $CommentModel->CommentQuery();
-      if ($ReactionType != 'everything')
-         $CommentModel->SQL->Where('ReactionType', $ReactionType);
+      $Sender->SetData('_Limit', $Limit + 1);
+      
+      $ReactionModel = new ReactionModel();
+      if ($Reaction == 'everything') {
+         $PromotedTagID = $ReactionModel->DefineTag('Promoted', 'BestOf');
+         $Data = $ReactionModel->GetRecordsWhere(
+            array('TagID' => $PromotedTagID, 'RecordType' => array('Discussion', 'Comment')),
+            'DateInserted', 'desc',
+            $Limit + 1, $Offset);
+      } else {
+         $ReactionType = $ReactionTypes[$Reaction];
+         $Data = $ReactionModel->GetRecordsWhere(
+            array('TagID' => $ReactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'Total >=' => 1),
+            'DateInserted', 'desc',
+            $Limit + 1, $Offset);
+      }
+      
+      $Sender->SetData('_CurrentRecords', count($Data));
+      if (count($Data) > $Limit) {
+         array_pop($Data);
+      }
+      $Sender->SetData('Data', $Data);
 
-      $Data = $CommentModel->SQL      
-            ->OrderBy('c.CommentID', 'desc')
-            ->Limit($Limit, $Offset)
-            ->Get();
-      
-      $ResultData = $Data->ResultArray();
-      
-      // Kludge my test data a little bit
-      foreach ($ResultData as $Index => $Row) {
-         $Row['RecordType'] = 'Comment';
-         $Row['RecordID'] = $Row['CommentID'];
-         $Row['Url'] = 'discussion/comment/'.$Row['CommentID'];
-         $ResultData[$Index] = $Row;
-      }
-      $Sender->SetData('Data', $ResultData);
-      
-      // Build a pager
-      $PagerFactory = new Gdn_PagerFactory();
-		$Sender->EventArguments['PagerType'] = 'Pager';
-		$Sender->FireEvent('BeforeBuildPager');
-      $Sender->Pager = $PagerFactory->GetPager($Sender->EventArguments['PagerType'], $Sender);
-      $Sender->Pager->ClientID = 'Pager';
-         
-      $Sender->Pager->Configure(
-         $Offset,
-         $Limit,
-         $Data->NumRows(),
-         'bestof/'.$ReactionType.'/%1$s'
-      );
-      $Sender->FireEvent('AfterBuildPager');
-      
-      // Deliver JSON data if necessary
-      if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL) {
-         $Sender->SetJson('LessRow', $Sender->Pager->ToString('less'));
-         $Sender->SetJson('MoreRow', $Sender->Pager->ToString('more'));
-         $Sender->View = 'comments';
-      }
-      
       // Set up head
       $Sender->Head = new HeadModule($Sender);
       $Sender->AddJsFile('jquery.js');
@@ -414,7 +379,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->SetData('Breadcrumbs', 'BestOf');
       $Sender->CanonicalUrl(
          Url(
-            ConcatSep('/', 'bestof/'.$ReactionType.'/', PageNumber($Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), 
+            ConcatSep('/', 'bestof/'.$Reaction.'/', PageNumber($Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), 
             TRUE), 
          Gdn::Session()->UserID == 0
       );
@@ -424,7 +389,14 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->AddModule('SignedInModule');
       
 
-      // Render the page
+      // Render the page.
+      if (class_exists('LeaderBoardModule')) {
+         $Sender->AddModule('LeaderBoardModule');
+
+         $Module = new LeaderBoardModule();
+         $Module->SlotType = 'a';
+         $Sender->AddModule($Module);
+      }
       $Sender->Render('bestof', '', 'plugins/Reactions');
    }
 }
