@@ -77,7 +77,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		$Menu->RemoveLink('Add-ons', T('Applications'));
 		$Menu->RemoveLink('Add-ons', T('Locales'));
 		$Menu->RemoveLink('Site Settings', T('Routes'));
-		$Menu->RemoveLink('Site Settings', T('Outgoing Email'));
+//		$Menu->RemoveLink('Site Settings', T('Outgoing Email'));
 //		$Menu->RemoveLink('Users', T('Authentication'));
 //		$Menu->AddLink('Users', T('Authentication').$New, 'dashboard/authentication', 'Garden.Settings.Manage');
 
