@@ -3,7 +3,7 @@
 $PluginInfo['GoogleAnalytics'] = array(
    'Name' => 'Google Analytics',
    'Description' => 'Adds google analytics script to pages if related configuration options are set.',
-   'Version' => '1.2.1',
+   'Version' => '1.3',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com'
@@ -29,11 +29,11 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
       if ($TrackerCode && $TrackerCode != '' && $Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          $Script = "<script type=\"text/javascript\">
 
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', '".$TrackerCode."']);";
+   var _gaq = _gaq || [];
+   _gaq.push(['_setAccount', '".$TrackerCode."']);";
       if ($TrackerDomain)
          $Script .= "
-  _gaq.push(['_setDomainName', '".$TrackerDomain."']);";
+   _gaq.push(['_setDomainName', '".$TrackerDomain."']);";
       
       /** 
        * Not sure what to do. New method is documented at url below, but old 
@@ -56,10 +56,17 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
 
          $Script .= "
 _gaq.push(['_setCustomVar', ????? ".$Extra."']);";
-*/      
+*/    
+      if ($Sender->Data('AnalyticsFunnelPage', FALSE)) {
+         $FunnelPageName = $Sender->Data('AnalyticsFunnelPage');
+         $Script .= "
+   _gaq.push(['_trackPageview','{$FunnelPageName}']);";
+      } else {
+         $Script .= "
+   _gaq.push(['_trackPageview']);";
+      }
       
       $Script .= "
-  _gaq.push(['_trackPageview']);
 
   (function() {
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;

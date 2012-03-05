@@ -70,7 +70,7 @@
 }
 
 .ReactSprite {
-   background: url('reaction-sprites-black.png') 1px no-repeat transparent;
+   background: url('reaction-sprites-grey.png') 1px no-repeat transparent;
    height: 18px;
    width: 18px;
    display: inline-block;
@@ -80,7 +80,7 @@
 }
 
 .MenuItems .ReactSprite {
-   background-image: url('reaction-sprites-grey.png');
+   background-image: url('reaction-sprites-light-grey.png');
 }
 
 .ReactButton {
@@ -113,6 +113,7 @@
    width: inherit;
 }
 
+.MenuItems li:hover .ReactButton .ReactSprite,
 .ReactButton:hover .ReactSprite,
 .HasCount .ReactSprite {
    background-image: url('reaction-sprites-color.png');
@@ -130,32 +131,32 @@
    visibility: hidden;
 }
 
-.ReactReact { background-position: -1px; }
-.ReactFlag { background-position: -20px; }
-
-.ReactSpam { background-position: -39px; }
-.ReactAbuse { background-position: -58px; }
-.ReactTroll { background-position: -77px; }
-
-.ReactAgree { background-position: -134px; }
-.ReactLike { background-position: -153px; }
-.ReactAwesome { background-position: -191px; }
-.ReactLOL { background-position: -210px; }
-.ReactUp { background-position: -248px; }
-
-.ReactDisagree { background-position: -96px; }
-.ReactOffTopic { background-position: -115px; }
-.ReactDislike { background-position: -172px; }
-.ReactWTF { background-position: -229px; }
-.ReactDown { background-position: -267px; }
+.ReactEverything,
+.ReactReact {        background-position: -7px; }
+.ReactFlag {         background-position: -39px; }
+.ReactSpam {         background-position: -71px; }
+.ReactAbuse {        background-position: -103px; }
+.ReactTroll {        background-position: -135px; }
+.ReactDisagree {     background-position: -167px; }
+.ReactOffTopic {     background-position: -199px; }
+.ReactAgree {        background-position: -231px; }
+.ReactLike {         background-position: -263px; }
+.ReactDislike {      background-position: -295px; }
+.ReactAwesome {      background-position: -327px; }
+.ReactLOL {          background-position: -359px; }
+.ReactWTF {          background-position: -391px; }
+.ReactUp {           background-position: -423px; }
+.ReactDown {         background-position: -455px; }
+.ReactPromote {      background-position: -487px; }
+.ReactInsightful {   background-position: -519px; }
 
 .FilterButton.Selected {
    font-weight: bold;
 }
 
 .DataCounts {
-   overflow: hidden;
    margin: 5px 0;
+   text-align: center;
 }
 
 .DataCounts a {
@@ -169,14 +170,24 @@
 .CountTotal {
    display: block;
    line-height: 100%;
-   font-size: 32px;
+   font-size: 28px;
+}
+
+.CountTotal img {
+   height: 40px;
+}
+
+.CountItemWrap {
+   width: 10%;
+   display: inline-block;
 }
 
 .CountItem {
-   float: left;
+/*   float: left;*/
    display: block;
-   width: 14%;
    text-align: center;
+   border: solid 2px transparent;
+   padding: 4px;
 }
 
 .Compact .Item .Author img {
@@ -240,6 +251,10 @@
    padding-bottom: 0;
 }
 
+.Buried .Options {
+   display: none;
+}
+
 .Buried .CommentInfo {
     display: none;
 }
@@ -290,3 +305,23 @@
    position: absolute;
    top: -7px;
 }
+
+/* Begin "Best Of" */
+.ReactionFilters {
+   margin: 8px 0;
+}
+.ReactionFilters .ReactButton {
+   opacity: 1;  
+   margin-right: 6px;
+}
+.ReactionFilters .ReactButton .ReactSprite {
+   background-image: url('reaction-sprites-color.png') !important;
+}
+.ReactionFilters .ReactLabel {
+   padding-left: 4px;
+}
+.BestOfData .DataList .Item:first-child {
+   border-top: 1px solid #BEC8CC;
+}
+
+/* End "Best Of" */

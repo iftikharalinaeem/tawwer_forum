@@ -77,14 +77,14 @@ class VFOptionsPlugin implements Gdn_IPlugin {
 		$Menu->RemoveLink('Add-ons', T('Applications'));
 		$Menu->RemoveLink('Add-ons', T('Locales'));
 		$Menu->RemoveLink('Site Settings', T('Routes'));
-		//$Menu->RemoveLink('Site Settings', T('Outgoing Email'));
-		$Menu->RemoveLink('Users', T('Authentication'));
-		$Menu->AddLink('Users', T('Authentication').$New, 'dashboard/authentication', 'Garden.Settings.Manage');
+		$Menu->RemoveLink('Site Settings', T('Outgoing Email'));
+//		$Menu->RemoveLink('Users', T('Authentication'));
+//		$Menu->AddLink('Users', T('Authentication').$New, 'dashboard/authentication', 'Garden.Settings.Manage');
 
-      if (C('EnabledPlugins.embedvanilla')) {
-			$Menu->RemoveLink('Add-ons', T('&lt;Embed&gt; Vanilla'));
-			$Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla').$New, 'plugin/embed', 'Garden.Settings.Manage');
-      }
+//      if (C('EnabledPlugins.embedvanilla')) {
+//			$Menu->RemoveLink('Add-ons', T('&lt;Embed&gt; Vanilla'));
+//			$Menu->AddLink('Add-ons', T('&lt;Embed&gt; Vanilla').$New, 'plugin/embed', 'Garden.Settings.Manage');
+//      }
 	
 		$Menu->RemoveLink('Forum', T('Statistics'));
       $Menu->RemoveLink('Site Settings', T('Statistics'));
@@ -846,18 +846,32 @@ pageTracker._trackPageview();
       if (!in_array($Filter, array('enabled', 'disabled')))
          $Filter = 'all';
       $Sender->Filter = $Filter;
+      
+      if (class_exists('Infrastructure')) {
+         $Plan = Infrastructure::Plan();
+         $Sender->SetData('Plan', $Plan);
+      }
 
       if (Gdn::Session()->ValidateTransientKey($TransientKey) && $Key) {
          try {
+            
+            
             $Action = strtolower($Action);
             switch ($Action) {
                case 'enable':
-                  Gdn::PluginManager()->EnablePlugin($Key, NULL);
+                  if (GetValue($Key, Gdn::PluginManager()->AvailablePlugins()))
+                     Gdn::PluginManager()->EnablePlugin($Key, NULL);
+                  else
+                     Gdn::ApplicationManager()->EnableApplication($Key, NULL);
+                  
                   if ($Filter != 'all')
                      $Filter = 'enabled';
                   break;
                case 'disable':
-                  Gdn::PluginManager()->DisablePlugin($Key, NULL);
+                  if (GetValue($Key, Gdn::PluginManager()->AvailablePlugins()))
+                     Gdn::PluginManager()->DisablePlugin($Key, NULL);
+                  else
+                     Gdn::ApplicationManager()->DisableApplication($Key, NULL);
                   if ($Filter != 'all')
                      $Filter = 'disabled';
                   break;

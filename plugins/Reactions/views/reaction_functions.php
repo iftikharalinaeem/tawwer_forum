@@ -126,15 +126,13 @@ function ScoreCssClass($Row, $All = FALSE) {
    $Score = GetValue('Score', $Row);
    if (!$Score)
       $Score = 0;
-   if (Debug())
-      $Inc = 1;
-   else
-      $Inc = 5;
    
+   $Bury = C('Reactions.BuryValue', -5);
+   $Promote = C('Reactions.PromoteValue', 5);
    
-   if ($Score <= -$Inc)
+   if ($Score <= $Bury)
       $Result = $All ? 'Un-Buried' : 'Buried';
-   elseif ($Score >= $Inc)
+   elseif ($Score >= $Promote)
       $Result = 'Promoted';
    else
       $Result = '';
@@ -169,7 +167,7 @@ function WriteProfileCounts() {
       if (StringBeginsWith($CurrentUrl, $Row['Url']))
          $ItemClass .= ' Selected';
       
-      echo ' <span class="'.$ItemClass.'">';
+      echo ' <span class="CountItemWrap"><span class="'.$ItemClass.'">';
       
       if ($Row['Url'])
          echo '<a href="'.htmlspecialchars($Row['Url']).'">';
@@ -180,7 +178,7 @@ function WriteProfileCounts() {
       if ($Row['Url'])
          echo '</a>';
       
-      echo '</span> ';
+      echo '</span></span> ';
    }
    
    echo '</div>';
