@@ -1,21 +1,36 @@
 <?php if (!defined('APPLICATION')) exit();
 
+function PluginSort($a, $b) {
+    return strcmp(GetValue('Name', $a), GetValue('Name', $b));
+}
+
 $PluginManager = Gdn::PluginManager();
 $ApplicationManager = Gdn::ApplicationManager();
 
+// Build AllAvailable array (plugins + apps)
+$AvailablePlugins = $PluginManager->AvailablePlugins();
+$AvailableApplications = $ApplicationManager->AvailableApplications();
+$AllAvailable = array_merge($AvailablePlugins, $AvailableApplications);
+
 // Addons to show 'Contact Us' instead of 'Enable'
-$LockedPlugins = C('VFCom.Plugins.RequireAdmin', array());
+$LockedPlugins = C('VFCom.Plugins.RequireAdmin', array('jsConnect', 'Multilingual', 'Pockets', 'Sphinx', 'TrackingCodes', 'VanillaPop', 'Whispers'));
 
 // Allowed plugins list per client's plan
 $Plan = GetValue('Plan', Infrastructure::Plan());
-$AllowedPlugins = GetValue('Plugins', json_decode(GetValue('Addons', $Plan)));
+$AllowedPluginNames = GetValue('Plugins', json_decode(GetValue('Addons', $Plan)));
+$AllowedPlugins = array();
+foreach($AllowedPluginNames as $Name) {
+   if ($Info = GetValue($Name, $AvailablePlugins))
+      $AllowedPlugins[$Name] = $Info;
+}
+
 $EnabledPlugins = $PluginManager->EnabledPlugins();
-$ShowPlugins = array_merge($AllowedPlugins, $EnabledPlugins);
+
+$Addons = array_merge($AllowedPlugins, $EnabledPlugins);
 
 // Add 'Plugin' type
-$Addons = array();
-foreach ($ShowPlugins as $Key) {
-   $Addons[$Key] = array('Type' => 'Plugin');
+foreach ($Addons as $Key => &$Info) {
+   $Info['Type'] = 'Plugin';
 }
 
 // Kludge on the Reputation app
@@ -24,15 +39,12 @@ if ($this->Data('Plan.Subscription.PlanCode') != 'free') {
    $Addons = array_merge($Reputation, $Addons);
 }
 
-// Build AllAvailable array (plugins + apps)
-$AvailablePlugins = $PluginManager->AvailablePlugins();
-$AvailableApplications = $ApplicationManager->AvailableApplications();
-$AllAvailable = array_merge($AvailablePlugins, $AvailableApplications);
+uasort($Addons, 'PluginSort');
 
 // Get counts
 $PluginCount = 0;
 $EnabledCount = 0;
-foreach ($ShowPlugins as $PluginKey) {
+foreach ($Addons as $PluginKey) {
    if (GetValue($PluginKey, $AvailablePlugins)) {
       $PluginCount++;
       if (array_key_exists($PluginKey, $EnabledPlugins))
@@ -91,7 +103,7 @@ table tbody td {
 $Alt = FALSE;
 
 // Display addons list
-foreach ($ShowPlugins as $Key => $Info) {
+foreach ($Addons as $Key => $Info) {
    // Confirm each addon is available & grab info
    $Addon = GetValue($Key, $AllAvailable);
    if (!$Addon)
