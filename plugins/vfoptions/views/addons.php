@@ -1,11 +1,20 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$DisallowedPlugins = C('VFCom.Plugins.RequireAdmin', array());
+$PluginManager = Gdn::PluginManager();
+$ApplicationManager = Gdn::ApplicationManager();
+
+// Addons to show 'Contact Us' instead of 'Enable'
+$LockedPlugins = C('VFCom.Plugins.RequireAdmin', array());
+
+// Allowed plugins list per client's plan
 $Plan = Infrastructure::Plan();
 $AllowedPlugins = json_decode(GetValue('Plugins', GetValue('Addons', $Plan)));
+$EnabledPlugins = $PluginManager->EnabledPlugins();
+$ShowPlugins = array_merge($AllowedPlugins, $EnabledPlugins);
 
+// Add 'Plugin' type
 $Addons = array();
-foreach ($AllowedPlugins as $Key) {
+foreach ($ShowPlugins as $Key) {
    $Addons[$Key] = array('Type' => 'Plugin');
 }
 
@@ -15,20 +24,18 @@ if ($this->Data('Plan.Subscription.PlanCode') != 'free') {
    $Addons = array_merge($Reputation, $Addons);
 }
 
-$PluginManager = Gdn::PluginManager();
+// Build AllAvailable array (plugins + apps)
 $AvailablePlugins = $PluginManager->AvailablePlugins();
-
-$ApplicationManager = Gdn::ApplicationManager();
 $AvailableApplications = $ApplicationManager->AvailableApplications();
-
 $AllAvailable = array_merge($AvailablePlugins, $AvailableApplications);
 
+// Get counts
 $PluginCount = 0;
 $EnabledCount = 0;
-foreach ($AllowedPlugins as $PluginKey) {
+foreach ($ShowPlugins as $PluginKey) {
    if (GetValue($PluginKey, $AvailablePlugins)) {
       $PluginCount++;
-      if (array_key_exists($PluginKey, $PluginManager->EnabledPlugins()))
+      if (array_key_exists($PluginKey, $EnabledPlugins))
          $EnabledCount++;
    }
 }
@@ -82,7 +89,10 @@ table tbody td {
    <tbody>
 <?php
 $Alt = FALSE;
-foreach ($Addons as $Key => $Info) {
+
+// Display addons list
+foreach ($ShowPlugins as $Key => $Info) {
+   // Confirm each addon is available & grab info
    $Addon = GetValue($Key, $AllAvailable);
    if (!$Addon)
       continue;
@@ -90,6 +100,8 @@ foreach ($Addons as $Key => $Info) {
    $Type = $Info['Type'];
    $ScreenName = GetValue('Name', $Info, GetValue('Name', $Addon, $Key));
    $Description = GetValue('Description', $Addon, '');
+   
+   // Is the addon enabled?
    if ($Type == 'Plugin')
       $Enabled = array_key_exists($Key, $PluginManager->EnabledPlugins());
    else
@@ -97,13 +109,14 @@ foreach ($Addons as $Key => $Info) {
    
    $SettingsUrl = $Enabled ? ArrayValue('SettingsUrl', $Addon, '') : '';
    $RowClass = $Enabled ? 'Enabled' : 'Disabled';
-
+   
+   // Apply filters
    if ($this->Filter == 'enabled' && !$Enabled)
       continue;
-   
    if ($this->Filter == 'disabled' && $Enabled)
       continue;
-
+   
+   // Find addon's icon
    if (!$IconUrl = GetValue('IconUrl', $Info)) {
       $IconPath = '/plugins/'.GetValue('Folder', $Addon, '').'/icon.png';
       $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'applications/dashboard/design/images/plugin-icon.png';
@@ -124,7 +137,7 @@ foreach ($Addons as $Key => $Info) {
          
          // Override for plugins that need admin intervention
          // Doesn't stop URL circumvention; if they wanna break their forum, let 'em.
-         if (!$Enabled && in_array($Key, $DisallowedPlugins)) {
+         if (!$Enabled && in_array($Key, $LockedPlugins)) {
             $Url = '/dashboard/settings/vanillasupport';
             $ToggleText = 'Contact Us';
          }
