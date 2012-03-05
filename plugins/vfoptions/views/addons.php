@@ -17,7 +17,7 @@ $LockedPlugins = C('VFCom.Plugins.RequireAdmin', array('jsConnect', 'Multilingua
 
 // Allowed plugins list per client's plan
 $Plan = GetValue('Plan', Infrastructure::Plan());
-$AllowedPluginNames = GetValue('Plugins', json_decode(GetValue('Addons', $Plan)));
+$AllowedPluginNames = GetValue('Plugins', json_decode(GetValue('Addons', $Plan)), array());
 $AllowedPlugins = array();
 foreach($AllowedPluginNames as $Name) {
    if ($Info = GetValue($Name, $AvailablePlugins))
