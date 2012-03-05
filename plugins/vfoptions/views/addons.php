@@ -8,7 +8,7 @@ $LockedPlugins = C('VFCom.Plugins.RequireAdmin', array());
 
 // Allowed plugins list per client's plan
 $Plan = Infrastructure::Plan();
-$AllowedPlugins = GetValue('Plugins', GetValue('Addons', json_decode($Plan)));
+$AllowedPlugins = GetValue('Plugins', json_decode(GetValue('Addons', $Plan)));
 $EnabledPlugins = $PluginManager->EnabledPlugins();
 $ShowPlugins = array_merge($AllowedPlugins, $EnabledPlugins);
 
