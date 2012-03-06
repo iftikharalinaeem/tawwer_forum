@@ -16,7 +16,7 @@ a {
 a:hover {
    color: #003467;
 }
-
+/*
 #Body {
    margin: 20px 20px 0;
 }
@@ -31,7 +31,7 @@ body.Profile #Content {
    float: none;
    margin: 0 0 40px 270px;
 }
-
+*/
 /* Get rid of tabs & replace with side menu module 
 .DiscussionsTabs {
    display: none;
@@ -40,8 +40,8 @@ body.Profile #Content {
 
 /* WidthWrapper takes care of defining the width of the content. These defs
   are here to override the wacky setup of style.css */
+
 #Foot,
-#Content,
 #Body,
 .Menu {
    width: auto !important;
@@ -194,8 +194,8 @@ body.Profile ul.Activities {
    border: none;
 }
 .DataList .Item {
-   padding: 4px 0;
-   margin: 0 0 10px;
+   padding: 12px 0;
+   /* margin: 0 0 10px; */
    border-bottom: 1px dotted #BEC8CC;
 }
 .DataList .Item:first-child {
@@ -228,24 +228,187 @@ body.Profile ul.Activities {
    border: none;
 }
 a.Button,
-.Button {
-   color: #333;
-}
-a.BigButton,
-a.BigButton:hover {
-	background:-webkit-gradient(linear, center bottom, center top, from(#CC3300), to(#AA1100));
-   background: -moz-linear-gradient(center top , #CC3300 0%, #AA1100 100%) repeat scroll 0 0 transparent;
-	-pie-background:linear-gradient(top, #AA1100, #CC3300);
-	background:linear-gradient(top, #AA1100, #CC3300);
+a.Button:hover,
+a.Button:focus {
+   position: relative;
+	background:-webkit-gradient(linear, center bottom, center top, from(#AA1100), to(#CC3300));
+   background: -moz-linear-gradient(center top , #AA1100 0%, #CC3300 100%) repeat scroll 0 0 transparent;
+	-pie-background:linear-gradient(top, #CC3300, #AA1100);
+	background:linear-gradient(top, #CC3300, #AA1100);
    color: white !important;
-   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.3);
+   text-shadow: 0 1px 1px #6f0b00;
    border: none;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   top: 3px;
+   box-shadow: 0 2px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 3px 0 #333,
+      -1px 3px 0 #333,
+      2px 4px 0 #888,
+      -2px 4px 0 #888;
+   -moz-box-shadow: 0 2px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 3px 0 #333,
+      -1px 3px 0 #333,
+      2px 4px 0 #888,
+      -2px 4px 0 #888;
+   -webkit-box-shadow: 0 2px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 3px 0 #333,
+      -1px 3px 0 #333,
+      2px 4px 0 #888,
+      -2px 4px 0 #888;
 }
+a.Button:hover {
+   top: 0;
+   box-shadow: 0 5px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 6px 0 #333,
+      -1px 6px 0 #333,
+      2px 7px 0 #888,
+      -2px 7px 0 #888;
+   -moz-box-shadow: 0 5px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 6px 0 #333,
+      -1px 6px 0 #333,
+      2px 7px 0 #888,
+      -2px 7px 0 #888;
+   -webkit-box-shadow: 0 5px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 6px 0 #333,
+      -1px 6px 0 #333,
+      2px 7px 0 #888,
+      -2px 7px 0 #888;
+}
+a.Button:focus {
+   top: 4px;
+   box-shadow: 0 0 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 2px 0 #333,
+      -1px 2px 0 #333,
+      2px 3px 0 #888,
+      -2px 3px 0 #888;
+   -moz-box-shadow: 0 0 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 2px 0 #333,
+      -1px 2px 0 #333,
+      2px 3px 0 #888,
+      -2px 3px 0 #888;
+   -webkit-box-shadow: 0 0 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 2px 0 #333,
+      -1px 2px 0 #333,
+      2px 3px 0 #888,
+      -2px 3px 0 #888;
+}
+
+a.BigButton {
+   -webkit-transition: all .3s ease-in-out;
+ -moz-transition: all .3s ease-in-out;
+ -o-transition: all .3s ease-in-out;
+ -ms-transition: all .3s ease-in-out;
+ transition: all .3s ease-in-out;
+}
+#Content input.Button,
+#Content input.Button:hover,
+#Content input.Button:focus,
+a.BigButton,
+a.BigButton:hover,
+a.BigButton:focus {
+   position: relative;
+	background:-webkit-gradient(linear, center bottom, center top, from(#AA1100), to(#CC3300));
+   background: -moz-linear-gradient(center top , #AA1100 0%, #CC3300 100%) repeat scroll 0 0 transparent;
+	-pie-background:linear-gradient(top, #CC3300, #AA1100);
+	background:linear-gradient(top, #CC3300, #AA1100);
+   color: white !important;
+   text-shadow: 0 1px 1px #6f0b00;
+   border: none;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   top: 5px;
+   box-shadow: 0 5px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 6px 0 #333,
+      -1px 6px 0 #333,
+      2px 7px 0 #888,
+      -2px 7px 0 #888;
+   -moz-box-shadow: 0 5px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 6px 0 #333,
+      -1px 6px 0 #333,
+      2px 7px 0 #888,
+      -2px 7px 0 #888;
+   -webkit-box-shadow: 0 5px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 6px 0 #333,
+      -1px 6px 0 #333,
+      2px 7px 0 #888,
+      -2px 7px 0 #888;
+}
+#Content input.Button:hover,
 a.BigButton:hover {
-	background:-webkit-gradient(linear, center bottom, center top, from(#CC3300), to(#8E0E00));
-   background: -moz-linear-gradient(center top , #CC3300 0%, #8E0E00 100%) repeat scroll 0 0 transparent;
-	-pie-background:linear-gradient(top, #8E0E00, #CC3300);
-	background:linear-gradient(top, #8E0E00, #CC3300);
+   top: 0;
+   box-shadow: 0 10px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 11px 0 #333,
+      -1px 11px 0 #333,
+      2px 12px 0 #888,
+      -2px 12px 0 #888;
+   -moz-box-shadow: 0 10px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 11px 0 #333,
+      -1px 11px 0 #333,
+      2px 12px 0 #888,
+      -2px 12px 0 #888;
+   -webkit-box-shadow: 0 10px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 11px 0 #333,
+      -1px 11px 0 #333,
+      2px 12px 0 #888,
+      -2px 12px 0 #888;
+}
+#Content input.Button:focus,
+a.BigButton:focus {
+   top: 8px;
+   box-shadow: 0 2px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 3px 0 #333,
+      -1px 3px 0 #333,
+      2px 4px 0 #888,
+      -2px 4px 0 #888;
+   -moz-box-shadow: 0 2px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 3px 0 #333,
+      -1px 3px 0 #333,
+      2px 4px 0 #888,
+      -2px 4px 0 #888;
+   -webkit-box-shadow: 0 2px 0  #AA1100,
+      inset 0 -1px 1px #d56b16,
+      inset 0 1px 1px #6f0b00,
+      1px 3px 0 #333,
+      -1px 3px 0 #333,
+      2px 4px 0 #888,
+      -2px 4px 0 #888;
 }
 #Panel a.BigButton {
    margin-bottom: 30px;
