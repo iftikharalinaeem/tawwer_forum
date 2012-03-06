@@ -85,8 +85,12 @@ class ReactionModel {
       return $Result;
    }
    
-   public function DefineTag($Name, $Type) {
+   public function DefineTag($Name, $Type, $OldName = FALSE) {
       $Row = Gdn::SQL()->GetWhere('Tag', array('Name' => $Name))->FirstRow(DATASET_TYPE_ARRAY);
+      
+      if (!$Row && $OldName) {
+         $Row = Gdn::SQL()->GetWhere('Tag', array('Name' => $OldName))->FirstRow(DATASET_TYPE_ARRAY);
+      }
       
       if (!$Row) {
          $TagID = Gdn::SQL()->Insert('Tag', array(
@@ -97,7 +101,7 @@ class ReactionModel {
          );
       } else {
          $TagID = $Row['TagID'];
-         if ($Row['Type'] != $Type) {
+         if ($Row['Type'] != $Type || $Row['Name'] != $Name) {
             Gdn::SQL()->Put('Tag', array(
                 'Name' => $Name, 
                 'Type' => $Type
@@ -107,11 +111,11 @@ class ReactionModel {
       return $TagID;
    }
    
-   public function DefineReactionType($Data) {
+   public function DefineReactionType($Data, $OldCode = FALSE) {
       $UrlCode = $Data['UrlCode'];
       
       // Grab the tag.
-      $TagID = $this->DefineTag($Data['UrlCode'], 'Reaction');
+      $TagID = $this->DefineTag($Data['UrlCode'], 'Reaction', $OldCode);
       $Data['TagID'] = $TagID;
       
       $Row = array();
@@ -805,7 +809,7 @@ class ReactionModel {
    
    protected function _SaveRecordReact($RecordType, $RecordID, $React) {
       $Set = array();
-      $AttrColumn = $RecordType = 'Activity' ? 'Data' : 'Attributes';
+      $AttrColumn = $RecordType == 'Activity' ? 'Data' : 'Attributes';
       
       $Row = $this->SQL->GetWhere($RecordType, array($RecordType.'ID' => $RecordID))->FirstRow(DATASET_TYPE_ARRAY);
       $Attributes = @unserialize($Row[$AttrColumn]);
