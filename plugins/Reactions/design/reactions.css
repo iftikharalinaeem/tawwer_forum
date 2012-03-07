@@ -232,7 +232,7 @@
     display: none;
 }
 
-.Buried .Author .ProfilePhotoMedium {
+.Buried .Author .ProfilePhoto {
     height: 21px;
     width: 21px;
     margin: 0 3px 0 0;
@@ -249,6 +249,10 @@
    white-space: nowrap;
    padding-top: 0;
    padding-bottom: 0;
+}
+
+.Buried br {
+   display: none;
 }
 
 .Buried .Options {
