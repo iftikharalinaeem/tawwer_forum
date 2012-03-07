@@ -242,9 +242,11 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			$HtmlContents = $ThemeData->Html;
 			$CSSContents = $ThemeData->CSS;
 			$IncludeThemeCSS = $ThemeData->IncludeThemeCSS;
+         $Label = $ThemeData->Label;
 		} else {
 			$IncludeThemeCSS = 'Yes';
 			$CSSContents = '';
+         $Label = '';
 			if (file_exists($Folder . DS . 'design' . DS . 'customtheme.css'))
 				$CSSContents = file_get_contents ($Folder . DS . 'design' . DS . 'customtheme.css');
 				
@@ -283,6 +285,7 @@ Here are some things you should know before you begin:
 			$Sender->Form->SetFormValue('CustomCSS', $CSSContents);
 			$Sender->Form->SetFormValue('CustomHtml', $HtmlContents);
 			$Sender->Form->SetFormValue('IncludeThemeCSS', $IncludeThemeCSS);
+         $Sender->Form->SetFormValue('Label', $Label);
 		} else {
 			// If saving the form
 			$IsApply = $Sender->Form->GetFormValue('Apply') ? TRUE : FALSE;
@@ -299,6 +302,7 @@ Here are some things you should know before you begin:
 			// Save the changes (if there are changes to save):
 			$NewCSS = $Sender->Form->GetFormValue('CustomCSS', '');
 			$NewHtml = $Sender->Form->GetFormValue('CustomHtml', '');
+         $NewLabel = $Sender->Form->GetFormValue('Label', NULL);
 			$NewIncludeThemeCSS = $Sender->Form->GetFormValue('IncludeThemeCSS', 'Yes');
 			$SmartyCompileError = FALSE;
 			if ($CSSContents != $NewCSS || $HtmlContents != $NewHtml || $IncludeThemeCSS != $NewIncludeThemeCSS) {
@@ -306,13 +310,16 @@ Here are some things you should know before you begin:
 					'ThemeName' => C('Garden.Theme'),
 					'Html' => $NewHtml,
 					'CSS' => $NewCSS,
+               'Label' => $NewLabel,
 					'IncludeThemeCSS' => $NewIncludeThemeCSS,
 					'InsertUserID' => $Session->UserID,
 					'DateInserted' => Gdn_Format::ToDateTime()
 				));
 				SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', $WorkingRevisionID);
 				SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', $NewIncludeThemeCSS);
-			}
+			} elseif ($NewLabel != $Label && $WorkingRevisionID) {
+            Gdn::SQL()->Put('CustomThemeRevision', array('Label' => $NewLabel), array('RevisionID' => $WorkingRevisionID));
+         }
 
 			// Check to see if there are any fatal errors in the smarty template
 			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', TRUE);
@@ -436,6 +443,7 @@ Here are some things you should know before you begin:
       Gdn::Structure()
          ->Table('CustomThemeRevision')
 			->PrimaryKey('RevisionID')
+         ->Column('Label', 'varchar(50)', TRUE)
          ->Column('ThemeName', 'varchar(255)')
 			->Column('Html', 'text', null)
 			->Column('CSS', 'text', null)
