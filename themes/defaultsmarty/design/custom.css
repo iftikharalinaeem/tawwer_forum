@@ -15,13 +15,13 @@
 body.Profile #Content {
    float: right;
    margin: 0 0 40px;
-   width: 730px;
+   width: 720px;
 }
 
 body.Profile #Panel {
    float: left;
    overflow: hidden;
-   width: 200px;
+   width: 250px;
 }
 
 /** Side Panel and Box **/
@@ -36,4 +36,9 @@ body.Profile #Panel {
 }
 .Box :last-child {
    margin-bottom: 0;
+}
+
+/** Misc **/
+.ProfilePhotoLarge {
+    width: 250px;
 }

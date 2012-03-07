@@ -14,7 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $ThemeInfo['DefaultSmarty'] = array(
    'Name' => 'Vanilla Default',
    'Description' => "A customizable default theme for Vanilla. This theme has 7 color options.",
-   'Version' => '1.0',
+   'Version' => '2.0a',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
