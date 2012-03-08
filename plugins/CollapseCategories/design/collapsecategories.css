@@ -15,6 +15,10 @@
    color: transparent !Important;
 }
 
+.CollapseCategoryButton span {
+   visibility: hidden;
+}
+
 .Collapsed .CollapseCategoryButton {
    background-position: 0 3px;
 }
