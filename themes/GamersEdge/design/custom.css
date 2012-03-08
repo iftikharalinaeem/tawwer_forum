@@ -1,0 +1,829 @@
+/*
+
+*/
+
+body {
+	background:#000;
+	color:#333333;
+	font-family:Georgia,"Times New Roman",Times,serif;
+	font-weight:normal;
+	text-align:center;
+}
+
+#Frame{
+	margin:0 auto;
+	width:100%;
+	background:#000/*1A2022 url(main-bg.gif) repeat-x*/;
+}
+
+#Body {
+	margin:0 auto;
+}
+
+a, a:link, a:visited, a:active {
+	color:#000000;
+}
+
+a:hover{
+	color:#9e9e9e;
+	/*text-decoration:underline;*/
+}
+
+body.Discussion .Back a{
+	color:#DCEBF6;
+}
+
+body.Discussion .Back a:hover{
+	color:#DDDDDD;
+}
+
+h1, h2 {
+	border-bottom:0px solid #BBBBBB;
+	font-size:140%;
+	font-weight:bold;
+	margin:5px 0 0 0;
+	color:#DCEBF6;
+}
+
+#TitleBg{
+	background:#0e1314 url(content-top.gif) no-repeat top ;
+	height:30px;
+	margin:-52px 0 0 0;
+	padding:5px 0 5px 10px;
+	
+	border-left:1px solid #000;
+	border-right:1px solid #000;
+	
+	
+	
+}
+
+div.Box h4, 
+ul.Reviews h4 {
+	color:#DCEBF6;
+	margin-bottom:5px;
+	font-weight:bold;
+	padding:0 0 1px;
+}
+
+div.Box h4 a, 
+ul.Reviews h4 a{
+	color:#DCEBF6;
+
+}
+
+a.BigButton {
+	-moz-box-shadow:0 0 0px #fff;
+	background:#1A2022 ;
+	border:1px solid #282828;
+	color:#DCEBF6;
+	text-shadow:0 1px 0 #000;
+}
+
+a.BigButton:hover {
+    color: #fff;
+    border: 1px solid #282828;
+	background:#000 ;
+	box-shadow: 0;
+	-moz-box-shadow:0 0 0px #fff;
+	  
+}
+a.BigButton:focus {
+    background: #000000;
+	color: #fff;
+	box-shadow: 0;
+	-moz-box-shadow:0 0 0px #fff;
+	  
+}
+
+input.Button {
+	font-size:12px;
+	font-weight:bold;
+}
+
+a.Button,
+.Button {
+   cursor: pointer;
+   margin: 0;
+   font-size: 11px;
+   padding: 2px;
+   background:#DCEBF6  ;
+	border:1px solid #fff;
+	color:#000;
+	text-shadow: 0 1px 0 #fff;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+	box-shadow: 0px 0px 0px #fff;
+	-moz-box-shadow: 0px 0px 0px #fff;
+	-webkit-box-shadow: 0px 0px 0px #fff;  
+   }
+
+.Button:hover {
+   background:#fff ;
+	border:1px solid #fff;
+	color:#000;
+}
+.Button:focus {
+   background: #DCEBF6 ;
+}
+
+ul.DataList a.Delete {
+	padding: 4px;
+    background:#f2f2f2;
+    color: #000000;
+    border: 1px solid #ddd;
+}
+
+ul.DataList a.Delete:hover {
+    border: 1px solid #000000;
+    background: #c4c4c4;
+}
+
+div.Box {
+	background:transparent url(divbox-bg.gif) repeat-y;
+	border:1px solid #000;
+	color:#DCEBF6;
+	-moz-box-shadow:0 0 0px #fff;
+}
+
+#AdBlock {
+ margin-top:10px;
+
+}
+#AdBlockMid {
+ margin:10px;
+
+}
+
+
+
+div.Center {
+   text-align: left;
+   width: 960px;
+   margin: 0 auto;
+}
+
+/* ============================================================= Header */
+
+#HeadWrapper{
+	margin:0 auto;
+	width:100%;
+	background:#061951;
+}
+
+#Head {
+	background: url(header_bg.png) no-repeat top center;
+	padding:0;
+	text-align:right;
+	height:177px;
+	border-bottom:1px solid #303f43;
+}
+
+#TopBar{
+	margin:0 auto;
+	width:100%;
+	height:50px;
+	background: #000000 /*url(top_bar_bg.png)*/;
+	border-bottom:1px solid #303f43;
+}
+
+div.Menu {
+	float:left;
+	padding:10px;
+	
+}
+
+
+
+.Logo{
+	/*margin:20px 0 20px 0;*/
+	padding-top:10px;
+	text-align:center;
+	
+}
+
+
+
+ul#Menu {
+	float:left;
+	padding:0;
+	width:900px;
+}
+
+
+
+#Menu a, #Menu li.Active a {
+	
+	color:#dcebf6;
+}
+
+#Menu li a:hover,#Menu li.Active a:hover {
+	
+	color:#fff  !important;
+}
+
+#Menu li ul li a:hover,#Menu li.Active ul li a:hover {
+	
+	background:#000 ;
+	color:#fff!important;
+}
+
+#Menu ul, #Menu li.Active {
+	
+	color:#dcebf6;
+}
+
+#Menu li.NonTab, #Menu li.NonTab a {
+
+
+	color:#dcebf6;
+}
+
+#Menu a:hover {
+	color:#fff;
+   background: #000;
+}
+
+
+#Menu a span, #Menu li.Active a span, #Menu li.Highlight a:hover span {
+	background:#2873BA ;
+	color:#FFFFFF;
+}
+
+/* ============================================================= Entry Screen */
+body.Entry #Content {
+	float:left;
+}
+
+body.Entry #Content a{
+	color:#fff;
+}
+body.Entry #Content h1 {
+    font-size:19px;
+	font-weight:normal;
+	line-height:22px;
+	padding:20px 0 5px 30px;
+	font-family:Arial,Helvetica,sans-serif;
+	color:#fff;
+}
+
+body.Entry #Content div.Box {
+	background:#000;
+	border:1px solid #000;
+}
+body.Entry form ul li label {
+	color:#fff;
+}
+
+/* ============================================================= content */
+
+
+
+#Content{
+	margin:0;
+	padding:0 10px 10px 10px;
+	width:662px;
+	
+}
+
+#ContentInner{
+	padding:10px;
+	background:url(content-bg.gif) repeat-y;
+	border:1px solid #000;
+	margin:0 0 80px 0;
+	
+}
+ul.MessageList, ul.MessageList li {
+	padding:10px;
+	background:url(content-bg.gif) repeat-y;
+	
+}
+
+.Comment{
+	background:#/*1A2022*/1A2022;
+	color:#DCEBF6;
+}
+
+ul.Reviews{
+	float:left;
+	width:300px;
+	background:#101415;
+	border-top:2px solid #314046;
+	border-right:1px solid #282828;
+	border-bottom:1px solid #282828;
+	border-left:1px solid #282828;
+	margin:20px 10px 0 10px;
+	padding:10px;
+}
+
+ul.Reviews li{
+	
+	border-bottom:1px solid #282828;
+
+}
+
+ul.Reviews li, ul.Reviews li a{
+	background:#000000;
+	padding:5px;
+	color:#DCEBF6;
+}
+
+
+ul.Reviews li a:hover{
+	
+	color:#fff;
+}
+
+
+div.MessageForm, div.Tabs {
+	background:#0e1314 url(content-top.gif) no-repeat top ;
+	border-bottom:1px solid #181e1f;
+	display:block;
+	margin:20px 0 80px 0;
+	padding:5px 8px;
+}
+
+div.MessageForm, div.DiscussionTabs {
+	background:#0e1314 url(content-top.gif) no-repeat top ;
+	border-bottom:1px solid #181e1f;
+	display:block;
+	margin:20px 0 0 0;
+	padding:5px 8px;
+}
+
+div.MessageForm, div.CommentTabs {
+	background:#0e1314 url(content-top.gif) no-repeat top ;
+	border-bottom:1px solid #181e1f;
+	display:block;
+	margin:20px 0 0 0;
+	padding:5px 8px;
+}
+div.MessageForm, div.ActivityTabs {
+	background:#0e1314 url(content-top.gif) no-repeat top ;
+	border-bottom:1px solid #181e1f;
+	display:block;
+	margin:20px 0 0 0;
+	padding:5px 8px;
+}
+div.MessageForm, div.ConversationsTabs {
+	background:#0e1314 url(content-top.gif) no-repeat top ;
+	border-bottom:1px solid #181e1f;
+	display:block;
+	margin:20px 0 0 0;
+	padding:5px 8px;
+}
+div.MessageForm, div.ProfileTabs {
+	background:#0e1314 url(content-top.gif) no-repeat top ;
+	border-bottom:1px solid #181e1f;
+	display:block;
+	margin:20px 0 0 0;
+	padding:5px 8px;
+}
+a.Active, div.Tabs li.Active a {
+	background:#FFFFFF;
+	color:#000000;
+}
+
+div.MessageForm a.Cancel, div.MessageForm a.Cancel:link, div.MessageForm a.Cancel:active, div.MessageForm a.Cancel:visited, div.MorePager a, div.MorePager a:link,  div.MorePager a:active, div.MorePager a:visited, a.TabLink, a.TabLink:link,  a.TabLink:active, a.TabLink:visited, div.Tabs li a, div.Tabs li a:link, div.Tabs li a:active, div.Tabs li a:visited {
+	background:transparent;
+	border:0px solid #000;
+	font-size:12px;
+	color:#DEF1FB;
+	margin:0 10px 0 0;
+}
+
+div.MessageForm a.Cancel:hover, div.MorePager a:hover, a.TabLink:hover, div.Tabs li a:hover {
+	background:transparent;
+	border:0px solid #000;
+	color:#fff;
+	font-size:12px;
+}
+
+
+
+ul.DataList li.Item {
+	background:#1A2022;
+	border-bottom:1px solid #5F717F;
+	margin:0;
+	padding:5px;
+}
+
+
+
+
+.Mine {
+	background:#0F314F !important;
+}
+
+ul.DataList a.Title {
+	font-size:19px;
+	font-weight:normal;
+	line-height:22px;
+	padding:7px 0 5px;
+	font-family:Arial,Helvetica,sans-serif;
+	color:#DCEBF6;
+}
+
+div.Tabs li a span {
+	background:#2873BA ;
+	color:#fff;
+}
+
+ul.DataList div.Meta strong {
+	background:#2873BA;
+	color:#fff;
+}
+
+ul.DataList div.Meta span.Announcement {
+	background:#2873BA;
+	color:#fff;
+}
+ul.DataList div.Meta a {
+	color:#DCEBF6 ;
+}
+
+ul.DataList div.Meta a.Category {
+	color:#000;
+	background:#DCEBF6;
+	padding:2px 4px;
+}
+ul.DataList li.Mine div.Meta a.Category {
+	background:#DCEBF6;
+}
+
+ul.Options li.Parent strong {
+	background:#DCEBF6;
+	border:1px solid #ddd;
+	color:#000000;
+}
+
+ul.Options li.Parent strong:hover,
+ul.Options li.Active strong:hover,
+ul.Options li.Active strong,
+ul.Options li.Active ul {
+  	box-shadow: 0px 0px 0px #fff;
+	-moz-box-shadow: 0 0 0px #fff;
+	-webkit-box-shadow: 0px 0px 0px #fff;     
+}
+
+a.Bookmark,
+a.Bookmarking {
+	float: right;
+   display: block;
+   background: url(star_sprite.png) top center no-repeat;
+   height: 22px;
+   width: 22px;
+   margin: 2px 4px 0 4px;
+}
+a.Bookmark span,
+a.Bookmarking span {
+   display: none;
+}
+a.Bookmarked {
+   background: url(star_sprite.png) center center no-repeat;
+}
+a.Bookmarking {
+   background: url(star_sprite.png) bottom center no-repeat;
+}
+
+ul.MessageList div.Meta, ul.MessageList div.Meta a {
+	color:#777777;
+	font-size:11px;
+}
+
+ul.MessageList div.Meta, ul.MessageList div.Meta a:hover {
+	color:#fff;
+	font-size:11px;
+}
+
+div.HeadingTabs div.SubTab {
+	color:#DCEBF6;
+}
+
+ul.MessageList li.Item {
+
+	background:#1A2022 ;
+	border-bottom:1px solid #5F717F;
+
+}
+
+div.CommentForm textarea {
+	
+	background:#DCEBF6;
+	height:100px;
+	margin:0 0 6px;
+	min-height:100px;
+	width:640px;
+}
+
+/* ============================================================= discussions */
+
+#DiscussionForm h2 {
+	font-size:19px;
+	font-weight:normal;
+	line-height:22px;
+	padding:7px 0 5px;
+	font-family:Arial,Helvetica,sans-serif;
+	color:#DCEBF6;
+}
+#DiscussionForm form a{
+	color:#fff;
+}
+#DiscussionForm form a:hover{
+	color:#ddd;
+}
+#DiscussionForm form {
+	background:#101415 none repeat scroll 0 0;
+	border:1px solid #314046;
+	margin:0;
+	padding:20px;
+}
+
+#DiscussionForm label {
+	color:#DCEBF6;
+	font-size:14px;
+	font-weight:bold;
+}
+#DiscussionForm textarea {
+	background:#808086;
+	color:#fff;
+}
+
+/* ============================================================= activities */
+
+ul.DataList.Activities{
+	background:transparent url(content-bg.gif) repeat-y scroll 0 0;
+	border-bottom:1px solid #1A2022;
+	margin:0;
+	padding:10px;
+}
+ul.DataList li.Item.Activity{
+	background:transparent;
+	border-bottom:1px solid #282828;
+	margin:0;
+	padding:5px;
+}
+
+ul.DataList li.Item.Activity a{
+	color:#DCEBF6;
+}
+
+ul.DataList li.Item.Activity a:hover{
+	color:#DDDDDD;
+}
+
+ul.Activities li.Condensed div.Excerpt, ul.Activities  {
+	color:#80828C;
+
+}
+
+
+
+ul.Activities ul.DataList li {
+	background:#000 none repeat scroll 0 0;
+	border:1px solid #000;
+}
+
+ul.Activities li.CommentForm input.Button {
+	-moz-box-shadow:0 0 0px #fff;
+	font-size:12px;
+}
+ul.Activities li.CommentForm textarea.TextBox {
+	background:#80828C;
+
+}
+/* ==================================================== New Conversation Form */
+
+#ConversationForm h2 {
+	font-size:19px;
+	font-weight:normal;
+	line-height:22px;
+	padding:7px 0 5px;
+	font-family:Arial,Helvetica,sans-serif;
+	color:#000000;
+}
+
+#ConversationForm form {
+	background:#f2f2f2;
+	border:1px solid #c4c4c4;
+	margin:0;
+	padding:20px;
+}
+
+.ac_over {
+	background:#000000;
+	color:#000000;
+}
+
+.ac_over strong {
+	background:#000000;
+	font-weight:normal;
+}
+
+#MessageForm {
+	background:#F2F2F2;
+}
+
+#MessageForm h2 {
+	color:#000000;
+}
+
+/* ============================================================= profile page */
+
+body.Profile #Content {
+	float:right;
+	margin:0 0 40px 20px;
+	width:650px;
+}
+
+form.Activity textarea {
+
+	width:620px;
+}
+
+div.User h1 {
+	margin:15px 0 20px 0;
+	font-size:19px;
+	font-weight:normal;
+	line-height:22px;
+	font-family:Arial,Helvetica,sans-serif;
+	color:#000000;
+}
+
+div.Photo img{
+	border:1px solid #000000;
+	padding:2px;
+	margin-bottom:10px;
+
+}
+
+ul.DataList div.Photo img {
+	border:1px solid #000000;
+	padding:2px;
+}
+
+ul.PanelInfo li {
+	padding:5px;
+}
+
+body.Profile ul.PanelInfo{
+	border:1px solid #000;
+	background:#000;
+}
+body.Profile ul.PanelInfo li{
+	background:#000;
+}
+
+div.Box dl {
+	background:#000 none repeat scroll 0 0;
+	border-bottom:1px solid #000;
+	border-top:1px solid #000;
+	overflow:hidden;
+	padding:3px;
+}
+
+div.Box dl a{
+	color:#fff;
+}
+
+div.Popup div.Body {
+	border:4px solid #000000;
+}
+
+div.Popup h1, div.Popup h2 {
+	background:#000000;
+	border-bottom:1px solid #ddd;
+	margin:0;
+}
+
+div.Popup .Footer {
+	background:#fff;
+	border-top:1px solid #fff;
+	padding:2px 6px 0 0;
+
+}
+
+
+ul.Conversations{
+	background:transparent url(content-bg.gif) repeat-y scroll 0 0;
+	border:1px solid #000;
+	padding:10px;
+}
+
+
+
+/* ============================================================= search */
+
+#Search {	
+	background:#0e1314 url(content-top.gif) no-repeat top ;
+	border:1px solid #181e1f;
+	display:block;
+	margin:20px 0 30px;
+	padding:7px;
+}
+
+
+#Head form input.InputBox {
+	background:#FFFFFF;
+	border:1px solid #f2f2f2;
+	color:#000000;
+	width:150px;
+}
+
+#Panel input.InputBox, div.AddPeople textarea.MultiComplete {
+	margin:0 5px 2px 5px;
+	width:180px;
+	background:#000;
+	border:1px solid #1A2022 ;
+	color:#DEF1FB;
+}
+
+input.DateBox, input.InputBox, input.SmallInput, textarea {
+	border:1px solid #000000;
+		background:#808086;
+	color:#fff;
+	font-family:Georgia,"Times New Roman",Times,serif;;
+	font-size:12px;
+	padding:3px;
+}
+
+/* ============================================================= sidebar */
+
+
+
+#Panel {
+	float:right;
+	margin-bottom:50px;
+	width:250px;
+}
+
+
+ul.PanelInfo {
+	border-top:0;
+}
+
+ul.PanelInfo li.Active {
+	border-bottom:1px solid #282828;
+}
+
+ul.PanelInfo li {
+	background:#000;
+	border-bottom:1px solid #282828;
+}
+
+ul.PanelInfo li a {
+	color:#DCEBF6;
+}
+
+ul.PanelInfo li a:hover {
+	color:#fff;
+}
+ 
+
+ul.PanelInfo li.Active{
+	background:#1A2022;
+	
+}
+
+ul.PanelInfo li.Active a {
+	color:#DCEBF6;
+}
+ul.PanelInfo li.Active a {
+	color:#fff;
+}
+ul.PanelInfo div.Meta strong {
+	background:#000000;
+	color:#fff;
+}
+
+/* ============================================================= footer */
+
+#Foot {
+	clear:both;
+	border-top:#314046 2px solid;
+	color:#70727C;
+	background:#101415;
+}
+
+#Foot a, #Foot a:link, #Foot a:visited, #Foot a:active {
+	color:#DCEBF6 ;
+}
+
+#Foot a:hover{
+	color:#fff;
+	/*text-decoration:underline;*/
+}
+#Foot .vanilla-ico {
+	background:url(vanilla_ico.png) no-repeat;
+	float:left;
+	width:15px;
+	height:15px;
+	margin:0;
+	padding:0 7px 7px 0;
+}
+
+.Foot {
+	background:#f2f2f2;
+	border-bottom:1px solid #c4c4c4;
+}
+

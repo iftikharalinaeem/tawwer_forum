@@ -1,0 +1,50 @@
+<?php if (!defined('APPLICATION')) exit(); ?>
+
+<ul class="DataList Compact">
+   <?php foreach ($this->Data('Data', array()) as $Row): ?>
+   <li id="<?php echo "{$Row['RecordType']}_{$Row['RecordID']}" ?>" class="Item">
+      <?php
+      if ($Name = GetValue('Name', $Row)) {
+         echo Wrap(htmlspecialchars($Name), 'h3', array('class' => 'Title'));
+      }
+      ?>
+      
+      <div class="Meta">
+         <span class="Author">
+            <?php
+            echo UserPhoto($Row, array('Px' => 'Insert'));
+            echo ' ';
+            echo UserAnchor($Row, array('Px' => 'Insert'));
+            ?>
+         </span>
+         <span class="MItem DateCreated">
+            <?php
+            echo Anchor(
+               Gdn_Format::Date($Row['DateInserted'], 'html'),
+               $Row['Url'],
+               'Permalink'
+               );
+            ?>
+         </span>
+      </div>
+      
+      <div class="Message Expander">
+         <?php
+         echo Gdn_Format::To($Row['Body'], $Row['Format']);
+         ?>
+      </div>
+      
+      <?php
+      $RowObject = (object)$Row;
+      Gdn::Controller()->EventArguments['Object'] = $RowObject;
+      Gdn::Controller()->EventArguments[$Row['RecordType']] = $RowObject;
+      Gdn::Controller()->FireAs('DiscussionController')->FireEvent("After{$Row['RecordType']}Body");
+      
+      WriteReactions($Row);
+      ?>
+   </li>
+   <?php endforeach; ?>
+</ul>
+<?php
+echo PagerModule::Write();
+?>

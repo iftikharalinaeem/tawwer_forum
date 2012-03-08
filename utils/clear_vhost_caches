@@ -1,0 +1,14 @@
+#!/bin/bash
+
+PATH=/srv/www/vhosts/
+
+for DIR in `/bin/ls /srv/www/vhosts`
+do
+
+echo $DIR
+   # Remove cache files
+   /bin/rm ${PATH}${DIR}/cache/controller_mappings.php
+   /bin/rm ${PATH}${DIR}/cache/library_mappings.php
+   /bin/rm ${PATH}${DIR}/cache/locale_mappings.php
+
+done

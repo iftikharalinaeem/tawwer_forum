@@ -1,0 +1,403 @@
+body {
+    font-family: 'lucida grande','Lucida Sans Unicode',tahoma,sans-serif;
+    font-size: 13px;
+}
+#Body {
+	margin: 0;
+	width: 99.9%;
+	position: relative;
+}
+#Head {
+	background: #3B5998;
+	padding:0;
+	margin: 20px 20px 0;
+	text-align: left;
+	position: relative;
+}
+#container-wrap{
+	width:100%;
+	margin:0 auto;
+}
+
+#container {
+	 background: none repeat scroll 0 0 #FFFFFF;
+    border: 3px solid #014381;
+    margin: 20px auto;
+    width: 970px;
+
+}
+
+a {
+    color: #014381;
+    text-decoration: none;
+}
+a:hover {
+    color: #ff0084 !important;
+}
+a:visited {
+    color: #014381;
+}
+h1, h2, h3 {
+    color: #000;
+}
+h1 {
+    font: bold 18px Arial;
+    padding: 0 0 20px;
+}
+h2 {
+    color: #000;
+    font: bold 16px Arial;
+    padding: 20px 0;
+}
+h3 {
+    color: #000;
+    font: bold 14px Arial;
+}
+a.BigButton, a.Button, .Button {
+	color: #014381;
+}
+.Button:hover{
+	color: #ff0084;
+}
+.TitleBanner{
+      font-size: 30px;
+    padding: 10px;
+    text-align: left;
+    text-shadow: 0 1px 1px #FFFFFF;
+    width: 970px;
+}
+#AdBanner{
+    background: #f5f5f5;
+    border-top: 1px solid #014381;
+    border-bottom: 1px solid #014381;
+    position: relative;
+    width:970px;
+    min-height: 90px;
+	 padding: 10px 0;
+}
+div.Popup h1,
+div.Popup h2 {
+	background: #EDF6FF;
+	border: none;
+	color: #014381;
+}
+.Banner {
+	padding: 10px;
+	text-align: left;
+	position: relative;
+}
+.Banner ul {
+	background: #fff;
+	padding: 0;
+	margin: 0;
+}
+.Banner ul li {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+.Banner ul li a {
+	font-weight: bold;
+	padding: 3px 6px;
+	font-size: 14px;
+	color: #014381;
+	display: inline-block;
+	text-decoration: underline;
+}
+.Banner ul li a:hover {
+	background: #fff;
+	color: #E57F16;
+	text-decoration: none;
+}
+.Banner ul li a.SignOut {
+	font-weight: normal;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+.Banner ul li a span {
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	padding: 1px 2px 0 1px;
+	background: #f00;
+	border-right: 1px solid #fff;
+	border-bottom: 1px solid #fff;
+	color: #fff;
+	font-size: 9px;
+	position: relative;
+	top: -3px;
+}
+#Content {
+	float: none;
+	width: auto;
+	margin: 0 280px 0 10px;
+}
+#Panel {
+	float: right;
+	margin-right: 10px;
+}
+#Panel div.SearchBox input.InputBox {
+	width: 200px;
+	margin-right: 4px;
+}
+div.SearchBox {
+	margin-bottom: 6px;
+}
+body.Profile div.SearchBox {
+	display: none;
+}
+body.Profile #Content {
+	float:none;
+	width: auto;
+	margin: 0 10px 0 280px;
+}
+body.Profile #Panel {
+	margin: 0 0 0 10px;
+}
+form.Activity textarea {
+	width:99%;
+}
+#Foot div {
+	width: auto;
+}
+body.Post #Content {
+	width: auto;
+	margin:0 20px;
+}
+#ConversationForm textarea.MultiComplete,
+#ConversationForm .TextBox,
+#MessageForm textarea,
+div.Comment div.CommentForm,
+div.Comment div.CommentForm textarea,
+div.CommentForm textarea,
+#DiscussionForm input.InputBox,
+#DiscussionForm textarea {
+	width:99%;
+}
+
+/* Tabs */
+div.Tabs {
+	background: none;
+	padding: 0;
+	border-bottom: 1px solid #aaa;
+}
+div.Tabs ul {
+	padding: 0 8px;
+	white-space: nowrap;
+}
+div.MessageForm {
+	padding: 8px 8px 5px;
+	background: #EDF6FF;
+}
+div.MessageForm div.Tabs {
+	padding: 0 8px;
+}
+div.MessageForm, div.Tabs, div.Headings{
+	border-bottom: 1px solid #aaa;
+}
+/* css fix for message spacing - Brand-Friendly 1.2 */
+
+	div.Preview div.Message, ul.MessageList div.Message {
+		clear: none;
+		font-size: 100%;
+		line-height: 140%;
+	}
+
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+	font-size: 11px;
+   margin: 0;
+   border: none;
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   background: none;
+   color: #014381;
+   text-decoration: none;
+   padding: 8px 10px;
+	line-height: 11px;
+}
+div.Tabs li a:hover {
+   text-decoration: underline;
+}
+a.Active,
+div.Tabs li.Active a {
+   background: #fff;
+   color: #474747;
+   margin: 0;
+   border: 1px solid #aaa;
+	border-bottom: none;
+   border-radius: 3px 3px 0 0;
+   -moz-border-radius: 3px 3px 0 0;
+   -webkit-border-radius: 3px 3px 0 0;
+   display: inline-block;
+	font-size: 12px;
+	line-height: 12px;
+   font-weight: bold;
+   text-decoration: none;
+   padding: 6px 10px;
+	position: relative;
+	top: 1px;
+}
+div.Tabs li a span {
+   line-height: 1;
+   font-size: 80%;
+   padding: 0 3px;
+   border-radius: 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   font-weight: normal;
+	background: #014381;
+   color: #ffffff;
+   margin: 0 0 0 4px;
+}
+div.DiscussionsTabs div.SubTab {
+	font-size: 11px;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-top: 1px solid #aaa;
+	background: #f3f3f3;
+	margin:0;
+	padding:4px 8px;
+}
+div.HeadingTabs ul {
+	margin: 4px 0 0;
+}
+body.Discussion a.Bookmark {
+	margin: 3px 2px;
+}
+div.Preview {
+	border: 1px solid #aaa;
+	background: #fff;
+	margin:0 0 8px;
+	padding: 8px;
+}
+.Foot {
+	background: none;
+	border: none;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:visited,
+div.MorePager a:active,
+div.MorePager a:hover {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	background: none;
+	border: none;
+	color: #1e79a7;
+	line-height: 1;
+	padding: 0;
+	text-decoration: none;	
+}
+div.MorePager a:hover {
+	color: #ff0084;
+	text-decoration: underline;
+}
+body.add #Content {
+	margin: 0 10px;
+}
+
+/* Panel Boxes */
+div.Box {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	background: none;
+	padding: 0;
+}
+div.Box h4 {
+	color: #333;
+}
+ul.PanelInfo {
+	border-top:1px solid #ccc;
+}
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+	background: none;
+	border-bottom: 1px solid #ccc;
+}
+ul.PanelInfo li.Active {
+	background: #EDF6FF;
+}
+body.Profile ul.PanelInfo {
+	border: none;
+}
+body.Profile ul.PanelInfo li {
+	margin: 0;
+	padding: 0;
+}
+body.Profile ul.PanelInfo li a {
+	font-size: 12px;
+	display: block;
+	padding: 0 6px;
+}
+body.Profile ul.PanelInfo li a:hover {
+	background: #ffffff;
+}
+
+/* Sign In Page */
+body.Entry #Content div.Box {
+	background: #efefef;
+}
+body.Entry #Panel {
+	display: none;
+}
+
+/* overwrites */
+.Mine{
+	background: #f5f5f5;
+}
+.Alt{
+	background: #EDF6FF;
+}
+div.HeadingTabs div.SubTab {
+    color: #014381;
+    font: bold 20px "Trebuchet MS";
+}
+ul.PanelInfo li.Active a {
+    color: #014381;
+}
+ul.DataList li.Mine div.Meta a.Category {
+    background: #83C1FC;
+    color: #fff;
+}
+ul.Activities div.Excerpt a, ul.Activities div.Meta a {
+    color: #014381;
+}
+ul.Activities ul.DataList li {
+    background: #EDF6FF;
+
+}
+ul.Conversations div.Meta a.Name {
+    color: #014381;
+}
+#MessageForm {
+    background: #EDF6FF;
+}
+#MessageForm h2 {
+    color: #014381;
+}
+a.Close {
+    color: #014381;
+}
+#Status {
+    background: #fff;
+    padding: 8px 8px 10px;
+}
+ul.DataList a.Delete:hover {
+    background: #EDF6FF;
+    color: #000;
+}
+#DiscussionForm form {
+    background: #EDF6FF;
+}

@@ -1,0 +1,27 @@
+<VirtualHost *:80>
+        ServerAdmin support@techstars.org
+        ServerName startup.techstars.org
+#	DocumentRoot /srv/www/vanilla_down
+        DocumentRoot /srv/www/subdomains/techstars
+
+#	<Directory /srv/www/vanilla_down/>        
+        <Directory /srv/www/subdomains/techstars/>
+                Options FollowSymLinks MultiViews
+		# Options MultiViews
+                AllowOverride All
+	        # Temporarily passwd protecting these sites                                                                                                                                             
+	        # AuthUserFile /home/mark/.htpasswd                                                                                                                                                       
+	        # AuthGroupFile /dev/null                                                                                                                                                                 
+	        # AuthName "Soon, Friends. Soon."                                                                                                                                                         
+	        # AuthType Basic                                                                                                                                                                          
+	        # <Limit GET>                                                                                                                                                                             
+		#        require valid-user                                                                                                                                                                      
+	        # </Limit>   
+        </Directory>
+
+        ErrorLog /srv/log/vanillaforumscom/error.log
+        LogLevel warn
+        CustomLog /srv/log/vanillaforumscom/access.log combined
+        
+        ServerSignature Off
+</VirtualHost>

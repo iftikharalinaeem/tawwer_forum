@@ -1,0 +1,44 @@
+/** Wireframe **/
+
+#Content {
+    float: left;
+    margin: 0 0 40px;
+    width: 680px;
+}
+
+#Panel {
+    float: right;
+    overflow: hidden;
+    width: 250px;
+}
+
+body.Profile #Content {
+   float: right;
+   margin: 0 0 40px;
+   width: 720px;
+}
+
+body.Profile #Panel {
+   float: left;
+   overflow: hidden;
+   width: 250px;
+}
+
+/** Side Panel and Box **/
+.Box {
+   background: #CFECFF;
+   border-radius: 2px;
+   padding: 6px 10px;
+}
+
+.Box :first-child {
+   margin-top: 0;
+}
+.Box :last-child {
+   margin-bottom: 0;
+}
+
+/** Misc **/
+.ProfilePhotoLarge {
+    width: 250px;
+}

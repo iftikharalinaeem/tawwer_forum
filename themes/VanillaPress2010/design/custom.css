@@ -1,0 +1,611 @@
+/* VanillaPress */
+
+/* The main theme structure */
+
+a,
+a:link,
+a:visited,
+a:active {
+   text-decoration: none;
+   color: #000000;
+}
+a:hover {
+   text-decoration: none;
+   color: #ff0000;
+}
+
+#access .menu-header,
+div.menu,
+#colophon,
+#branding,
+#main,
+#wrapper {
+	margin: 0 auto;
+	width: 940px;
+}
+#wrapper {
+	margin: 0 auto;
+	width: 940px;
+}
+#wrapper {
+	background: #fff;
+	margin-top: 20px;
+	padding: 0 20px;
+}
+#header {
+	padding: 30px 0 40px 0;
+}
+#site-title {
+	float:left;
+	font-size:30px;
+	line-height:36px;
+	margin:0 0 18px;
+	width:700px;
+}
+#site-description {
+	clear:right;
+	float:right;
+	font-style:italic;
+	margin:14px 0 18px;
+	width:220px;
+}
+body, input, textarea {
+	background:#F1F1F1;
+	color:#666666;
+	font-size:12px;
+	line-height:18px;
+}
+
+h1 {
+	color:#000000;
+	border:none;
+	text-align:left;
+}
+
+/* =Menu
+-------------------------------------------------------------- */
+
+#access {
+	background: #000;
+	display: block;
+	float: left;
+	margin: 0 auto;
+	width: 940px;
+}
+#access .menu-header,
+div.menu {
+	font-size: 13px;
+	margin-left: 12px;
+	width: 928px;
+}
+#access .menu-header ul,
+div.menu ul {
+	list-style: none;
+	margin: 0;
+}
+#access .menu-header li,
+div.menu li {
+	float: left;
+	position: relative;
+}
+#access a {
+	color: #aaa;
+	display: block;
+	line-height: 38px;
+	padding: 0 10px;
+	text-decoration: none;
+}
+#access ul ul {
+	box-shadow: 0px 3px 3px rgba(0,0,0,0.2);
+	-moz-box-shadow: 0px 3px 3px rgba(0,0,0,0.2);
+	-webkit-box-shadow: 0px 3px 3px rgba(0,0,0,0.2);
+	display: none;
+	position: absolute;
+	top: 38px;
+	left: 0;
+	float: left;
+	width: 180px;
+	z-index: 99999;
+}
+#access ul ul li {
+	min-width: 180px;
+}
+#access ul ul ul {
+	left: 100%;
+	top: 0;
+}
+#access ul ul a {
+	background: #333;
+	line-height: 1em;
+	padding: 10px;
+	width: 160px;
+	height: auto;
+}
+#access li:hover > a,
+#access ul ul :hover > a {
+	background: #333;
+	color: #fff;
+}
+#access ul li:hover > ul {
+	display: block;
+}
+#access ul li.current_page_item > a,
+#access ul li.current-menu-ancestor > a,
+#access ul li.current-menu-item > a,
+#access ul li.current-menu-parent > a {
+	color: #fff;
+}
+* html #access ul li.current_page_item a,
+* html #access ul li.current-menu-ancestor a,
+* html #access ul li.current-menu-item a,
+* html #access ul li.current-menu-parent a,
+* html #access ul li a:hover {
+	color: #fff;
+}
+#branding img {
+	border-bottom:1px solid #000000;
+	border-top:4px solid #000000;
+	clear:both;
+	display:block;
+}
+#footer {
+	clear: both;
+	width: 100%;
+	margin-bottom:20px;
+	
+}
+#colophon {
+	border-top:4px solid #000000;
+	margin-top:-4px;
+	overflow:hidden;
+	padding:18px 0;
+}
+#site-info {
+	float:left;
+	font-size:14px;
+	font-weight:bold;
+	width:700px;
+	text-align:left;
+}
+
+
+#site-generator {
+	font-style:italic;
+	position:relative;
+	float:right;
+	width:220px;
+}
+
+/* =Vanilla resets
+-------------------------------------------------------------- */
+
+#Body {
+	margin:15px auto 0;
+	text-align:left;
+	width:940px;
+}
+/* Tab Menu */
+
+div.MessageForm,
+div.Tabs {
+	display: block;
+   border-bottom: 1px solid #ddd;
+   padding: 5px 8px;
+   margin: 0;
+   background: #f9f9f9;
+}
+
+div.MessageForm a.Back,
+div.MessageForm a.Back:link,
+div.MessageForm a.Back:hover,
+div.MessageForm a.Back:active,
+div.MessageForm a.Back:visited,
+div.MessageForm a.Cancel,
+div.MessageForm a.Cancel:link,
+div.MessageForm a.Cancel:hover,
+div.MessageForm a.Cancel:active,
+div.MessageForm a.Cancel:visited,
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited,
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   margin: 0;
+   border: 1px solid #ddd;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #fff;
+   display: inline;
+   font-weight: bold;
+   color: #333;
+   text-decoration: none;
+   padding: 5px 10px;
+	/*line-height: 2.6;*/
+}
+
+div.MessageForm a.Back:hover,
+div.MessageForm a.Cancel:hover,
+div.MorePager li a:hover,
+a.TabLink:hover,
+div.Tabs li a:hover {
+   background: #ddd;
+}
+a.Active,
+div.Tabs li.Active a {
+   background: #fff;
+   color: #333;
+}
+div.Tabs li a span {
+   line-height: 1;
+   font-size: 80%;
+   padding: 0 3px;
+   border-radius: 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   font-weight: normal;
+   background: #333;
+   color: #f9f9f9;
+   margin: 0 0 0 4px;
+}
+div.Tabs div.SubTab {
+	margin: 10px 0 0;
+	padding: 4px 8px;
+	background: #f9f9f9;
+   border-radius: 2px;
+   -webkit-border-radius: 2px;
+   -moz-border-radius: 2px;
+}
+
+/*  DataList (Search Results) */
+
+ul.DataList li.Item {
+   margin: 0;
+   padding: 4px 0;
+   border-bottom: 1px solid #ddd;
+}
+
+ul.DataList div.Meta {
+   font-size: 11px;
+   color: #70727c;
+}
+
+ul.DataList div.Excerpt a {
+   color: #333;
+	display: block;
+}
+
+ul.DataList div.Meta strong {
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	/*
+	box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+	-webkit-box-shadow: 0px 0px 2px #777;
+	*/
+	background: #FF0;
+	color:#000;
+	font-size:9px;
+	font-weight:bold;
+	padding: 3px;
+	line-height: 1;
+}
+ul.DataList div.Meta a {
+   color: #2b2d33;
+}
+ul.DataList a.Delete {
+   width: auto;
+   padding: 0 5px;
+   margin: 0 1px 0 0;
+   font-size: 11px;
+   font-weight: normal;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   color: #555;
+   cursor: pointer;
+   line-height: 1;
+}
+ul.DataList a.Delete:hover {
+	padding: 4px;
+   color: #333;
+   border: 1px solid #888;
+   background: url('images/buttonbg.png') repeat-x center left #f8f8f8;
+}
+ul.DataList a.Delete:focus {
+   background: #f8f8f8;
+}
+
+ul.DataList div.Photo img {
+	display: block;
+	height: 43px;
+	width: 43px;
+	overflow: hidden;
+	background: #eee;
+}
+
+/* Discussions */
+
+
+.Mine { background: #fff; }
+
+ul.DataList div.Meta a.Category {
+   background: #fafafa;
+   padding: 2px 4px;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+}
+ul.DataList li.Mine div.Meta a.Category {
+   background: #eff7ff;
+}
+
+ul.DataList div.Meta span.Announcement {
+	background: #aaa;
+	color: #ffffff;
+	padding: 1px 4px;
+   border-radius: 2px;
+	-moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   border-radius: 2px;
+   font-weight: bold;
+}
+ul.DataList div.Meta span.Closed {
+	background: #555555;
+   color: #ffffff;
+   font-weight: bold;
+	padding: 1px 4px;
+   border-radius: 2px;
+	-moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   border-radius: 2px;
+}
+
+/* Discussion & Comment Forms */
+li.Editing {
+	background: #f9f9f9;
+}
+
+#DiscussionForm form {
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background: #f9f9f9 none repeat scroll 0 0;
+   border: 1px solid #ddd;
+   margin: 0;
+   padding: 20px;
+   width:900px
+}
+#DiscussionForm textarea {
+   width: 890px;
+   height: 100px;
+   min-height: 100px;
+   margin: 0 0 6px;
+}
+#DiscussionForm input.InputBox {
+   width: 890px;
+   margin-bottom: 10px;
+}
+#DiscussionForm h2 {
+
+   color: #333;
+
+}
+
+div.Preview {
+
+	background: #fff;
+
+}
+a:hover.Close {
+	color:#ddd;
+}
+
+/*  Panels / Sidebars */
+
+div.Box {
+   border-radius: 1px;
+   -moz-border-radius: 1px;
+   -webkit-border-radius: 1px;
+   background: #fff;
+   color: #333;
+   padding: 6px 10px;
+   margin: 0 0 10px;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
+}
+div.Box h4 {
+   font-size: 110%;
+   color: #333;
+   font-weight: bold;
+   margin: 0;
+   padding: 0 0 1px;
+}
+div.Box dl {
+   border-top: 1px solid #ddd;
+   border-bottom: 1px solid #ddd;
+   background: #f9f9f9;
+   padding: 3px;
+   overflow: hidden;
+}
+div.Box dl dt {
+   float: left;
+   width: 80px;
+   color: #555;
+}
+div.Box dl dd {
+   margin-left: 80px;
+}
+div.Box p {
+   font-size: 100%;
+   padding: 0 0 4px;
+   color: #555;
+}
+ul.PanelActivity {
+   border-top: 1px solid #ddd;
+	border-bottom: 0;
+}
+ul.PanelActivity li {
+   background: #f9f9f9;
+   border-bottom: 1px solid #ddd;
+   padding: 2px 4px;
+	color: #555;
+}
+
+ul.PanelInfo li {
+   background: #f9f9f9;
+   border-bottom: 1px solid #ddd;
+   padding: 2px 4px;
+   text-align: left;
+}
+ul.PanelInfo {
+   border-top: 1px solid #ddd;
+	border-bottom: 0;
+}
+
+ul.PanelInfo div.Meta strong {
+	display: inline;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	/*
+	box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+	-webkit-box-shadow: 0px 0px 2px #777;
+	*/
+	background: #FF0;
+	color:#000;
+	font-size:9px;
+	font-weight:bold;
+	padding: 3px;
+	line-height: 1;
+}
+
+ul.PanelInfo li.Active {
+   background: #fff;
+   border-bottom: 1px solid #a3e6ff;
+}
+ul.PanelInfo li.Active a {
+   color: #1e79a7;
+}
+
+body.Profile ul.PanelInfo {
+   border-bottom: 1px solid #abdafb;
+}
+
+
+a.Button, .Button {
+	
+	color:#333;
+
+}
+
+/* MISC */
+
+ul.Activities ul.DataList li {
+
+	background:#ddd;
+
+}
+
+ul.Activities div.Excerpt a:hover,
+ul.Activities div.Meta a:hover {
+   color: #ff0000;
+}
+#MessageForm {
+
+	background:#f9f9f9 ;
+
+}
+#MessageForm h2 {
+
+	color:#333;
+
+}
+
+div.Popup #ConversationForm h2 {
+	color:#333;
+
+}
+div.Popup h1, div.Popup h2 {
+
+	background:#fff;
+	border-bottom:1px solid #ddd;
+	color:#333;
+
+}
+#ConversationForm form {
+
+	border:1px solid #ddd;
+
+}
+body.Profile #Content {
+	width:650px;
+}
+form.Activity textarea {
+
+	width:600px;
+}
+body.Profile ul.PanelInfo {
+	border-bottom:1px solid #ddd;
+}
+
+body.Entry #Content {
+	float:left;
+	margin:0 0 20px;
+	width:500px;
+}
+body.Entry #Content h1 {
+
+	color:#333;
+
+}
+body.Entry #Content div.Box {
+
+	background:#f9f9f9;
+
+}
+.Foot {
+
+	background:#ddd none repeat scroll 0 0;
+	border-bottom:1px solid #bbb;
+
+}
+
+/* Slide Panel */
+#panel {
+	display: none;
+}
+.slide {
+	margin: 0;
+	padding: 0;
+	border-top: solid 4px #333;
+	background: url(btn-slide.gif) no-repeat center top;
+}
+.btn-slide {
+	background: url(white-arrow.gif) no-repeat right -50px;
+	text-align: center;
+	width: 144px;
+	height: 31px;
+	padding: 10px 10px 0 0;
+	margin: 0 auto;
+	display: block;
+	font: bold 120%/100% Arial, Helvetica, sans-serif;
+	color: #fff;
+	text-decoration: none;
+}
+.active {
+	background-position: right 12px;
+}

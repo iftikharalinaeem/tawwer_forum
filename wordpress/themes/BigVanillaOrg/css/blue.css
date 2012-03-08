@@ -1,0 +1,384 @@
+a,
+a:link,
+a:visited,
+a:active {
+   text-decoration: none;
+   color: #045dcd;
+}
+a:hover {
+   text-decoration: none;
+   color: #ff0084;
+	text-decoration: none;
+}
+body {
+	background: #F9F1DC url(../images/bg-tile.png) repeat;
+}
+
+  /* ---- Banner ---- */
+
+/* Head */
+div.Wrapper {
+   text-align: center;
+}
+div.Center {
+   text-align: left;
+   width: 960px;
+   margin: 0 auto;
+}
+#Head div.Center {
+   text-align: right;
+}
+#Head div.Logo {
+	margin: 6px 0 0 0;
+   float: left;
+}
+#Head {
+   background:#E15B10 url(../images/bg-title.png) repeat-x scroll center center;
+   border-bottom: 1px solid #BD6A01;
+}
+#Head .Logo img {
+   padding: 10px 0 0;
+}
+
+/* Sprites */
+i.Sprite {
+	display: inline-block;
+	background-image: url(../images/sprites.png);
+	background-repeat: no-repeat;
+}
+i.Sprite span {
+	display: none;
+}
+i.SpriteScreen {
+	display: block;
+	float: left;
+	height: 34px;
+	width: 40px;
+	margin: 2px 10px 10px 0;
+	background-position: 0 -131px;
+}
+i.SpriteSmile {
+	display: block;
+	float: left;
+	height: 44px;
+	width: 42px;
+	margin: 2px 8px 0 0;
+	background-position: 0 -165px;
+}
+i.SpriteDot {
+	height: 20px;
+	width: 20px;
+}
+i.SpriteDotOn { background-position:  0 -212px; }
+i.SpriteDotOff { background-position:  0 -230px; }
+i.SpriteTools,
+i.SpriteSuit {
+	display: block;
+	height: 48px;
+	width: 48px;
+}
+i.SpriteTools { background-position: -48px -136px; }
+i.SpriteSuit { background-position: -48px -184px; }
+
+/* ---- Banner ---- */
+
+.Banner {
+	background: url(../images/bg-title.png) center center repeat-x #e15b10;
+   border-bottom: 1px solid #bd6a01;
+	text-align: center;
+}
+.BannerWrapper {
+	width: 960px;
+	margin: 0 auto;
+	text-align: right;
+	position: relative;
+}
+.Banner div.UserOptions {
+	display: none;
+}
+.Banner h1 {
+   border: 0;
+   margin: 0;
+   padding: 0;
+}
+.Banner h1 a {
+	position: absolute;
+	top: 5px;
+	left: 0;
+	height: 40px;
+	width: 142px;
+	background: url(../images/sprites.png) top left;
+}
+.Banner h1 a span {
+	display: none;
+}
+.Banner ul {
+   list-style: none;
+	padding: 10px 0;
+}
+.Banner ul li {
+	display: inline-block;
+	height: 32px;
+	padding-left: 4px;
+	margin-left: 4px;
+	background: url(../images/sprite-menu-buttons.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+}
+.Banner ul li a {
+   display: block;
+   font-family:'lucida grande','Lucida Sans Unicode',tahoma,sans-serif;
+   font-size:12px;
+   font-weight:bold;
+   text-decoration: none;
+   color: #744000;
+   text-shadow:0 1px 1px #FEE369;
+	height: 32px;
+	line-height: 31px;
+	padding: 0 14px 0 10px;
+	background: url(../images/sprite-menu-buttons.png);
+	background-repeat: no-repeat;
+	background-position: right top;
+}
+.Banner ul li:hover { background-position: left -32px; }
+.Banner ul li:hover a { background-position: right -32px; }
+.Banner ul li.Download { background-position: left -96px; }
+.Banner ul li.Download a {
+	color: #ffffff;
+	text-shadow: 0 1px 1px #111196;
+	background-position: right -96px;
+}
+
+.Banner ul li.Services a {
+	background-position:right -256px;
+	color:#FFFFFF;
+	text-shadow:0 1px 1px #1A5300;
+}
+#top-bar-wrapper{
+	margin:0;
+	padding-top:10px;
+	background:#FEF7DF  ;
+	border-top:1px solid #E15B10;
+}
+
+body.signin div.Menu div.SignIn a,
+body.features div.Menu div.Features a,
+body.plans div.Menu div.Plans a,
+body.compare div.Menu div.Plans a,
+div.Menu a:focus {
+	background: url(../images/sprite-darkmenu-btn-left.png) bottom left no-repeat;
+}
+body.signin div.Menu div.SignIn a span,
+body.features div.Menu div.Features a span,
+body.plans div.Menu div.Plans a span,
+body.compare div.Menu div.Plans a span,
+div.Menu a:focus span {
+	background: url(../images/sprite-darkmenu-btn-right.png) bottom right no-repeat;
+	text-shadow: 0 1px 1px #003f87;
+	color: #cef1fc;
+}
+body.signin div.Menu div.SignIn a i.SpriteSignIn,
+div.Menu a:focus i.SpriteSignIn { background-position: 0px 0px; }
+div.Menu a:focus i.SpriteHome { background-position: 0px -19px; }
+body.plans div.Menu div.Plans a i.SpritePlans,
+body.compare div.Menu div.Plans a i.SpritePlans,
+div.Menu a:focus i.SpritePlans { background-position: 0px -36px; }
+body.features div.Menu div.Features a i.SpriteFeatures,
+div.Menu a:focus i.SpriteFeatures { background-position: 0px -58px; }
+
+
+.Banner ul li.Blog a {
+background-position:right -64px;
+color:#FFFFFF;
+text-shadow:0 1px 1px #4C2305;
+}
+
+.Banner ul li.Blog {
+background-position:left -64px;
+}
+
+/* sidebar */
+
+#side-box {
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	background:#FEF7DF none repeat scroll 0 0;
+	border:1px solid #EED3A2;
+	width:250px;
+	padding:10px;
+}
+
+
+
+#side-box, #side-box a, #side-box span{
+	color:#045dcd;
+}
+
+#side-box strong{
+	/*color:#4CBC01;*/
+	font-weight:bold;
+	text-shadow:0 0px 0px #000000;
+}
+#side-box a{
+	text-decoration:underline;
+}
+
+#side-box li a{
+	text-decoration:none;
+}
+
+
+#side-box a:hover{
+	color:#ff0084  ;
+}
+
+#side-box li.categories {
+	list-style-type:none;
+}
+#side-box .postform {
+      width: 250px;
+      border: 1px solid #FEF7DF;
+      font-size: 13px;
+      color: #155A9A ;
+      background: none;
+}
+span.light-blue{
+	background:#BFEAFF;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	padding:5px;
+	margin:10px 0 5px 0;
+	display:block;
+	color:#2B2D33;
+	text-shadow:0 1px 0 #FFFFFF;
+	width:900px;
+	margin:10px 0 20px 20px;
+}
+
+span.blue a{
+	text-decoration:underline;
+}
+
+/* footer */
+
+div#Foot {
+
+background:/*#BFEAFF*/#FEF7DF;
+margin:0;
+padding:0;
+
+}
+
+#Foot {
+clear:both;
+border-top:3px solid /*#014381*/#EED3A2 ;
+color:/*#014381*/#000 ;
+font-size:13px;
+line-height:1;
+margin:2px 0;
+padding:4px 9px;
+text-align:center;
+}
+
+div#Foot div#TableOfContents {
+border-bottom:1px solid /*#014381*/#EED3A2;
+margin:0 0 20px;
+padding:12px 0 15px;
+}
+
+div#Foot div, div#Foot div a {
+color:/*#014381*/#045dcd ;
+}
+div#Foot div a:hover {
+	color: #ff0084;
+text-decoration:underline;
+}
+
+div#Foot div {
+border:0 none;
+margin:0 auto;
+padding:12px 0 10px;
+}
+
+#Foot div {
+margin:0 auto;
+}
+
+#Foot div {
+font-family:'lucida grande','Lucida Sans Unicode','helvetica neue',helvetica,arial,sans-serif;
+margin:20px auto 0;
+padding:6px 0;
+text-align:left;
+width:960px;
+}
+
+#Foot div strong {
+color:#000;
+font-weight:bold;
+}
+
+#TableOfContents table {
+margin:0 auto;
+width:960px;
+}
+
+table {
+border-collapse:separate;
+border-spacing:0;
+}
+
+#TableOfContents table td {
+color:#744000 ;
+font-size:90%;
+width:25%;
+}
+
+caption, th, td {
+font-weight:normal;
+text-align:left;
+}
+
+#TableOfContents ul {
+padding:10px 0 14px;
+}
+
+#TableOfContents ul, #TableOfContents li {
+list-style-image:none;
+list-style-position:outside;
+list-style-type:none;
+margin:0;
+}
+
+#TableOfContents table td ul li {
+line-height:normal;
+padding:5px 0;
+}
+
+#TableOfContents ul, #TableOfContents li {
+list-style-image:none;
+list-style-position:outside;
+list-style-type:none;
+margin:0;
+}
+
+#TableOfContents table td ul li a {
+padding:0 20px 0 0;
+}
+
+pre.Css {
+
+background:#FFFFAA none repeat scroll 0 0;
+border:1px solid #555555;
+font-family:monospace;
+font-size:13px;
+line-height:18px;
+margin:0 0 12px;
+overflow:auto;
+padding:10px 12px;
+color:#000;
+text-shadow: 0px 0px 0px #000;
+}
+
+.aktt_tweets li {
+	padding:5px 0 5px 0;
+}

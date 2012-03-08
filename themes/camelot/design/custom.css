@@ -1,0 +1,531 @@
+/* Global Anchor Color Change */
+a {
+   text-decoration: none;
+   color: #000;
+}
+a:hover {
+   text-decoration: none;
+   color: #704c1b;
+}
+div.Box h4 a{
+    color: #B68F5B;
+}
+div.Box h4 a:hover{
+    color: #704c1b;
+}
+/* Fluid Width */
+#Body,
+div.Menu {
+	width: auto;
+	padding: 0 10px;
+}
+#Panel {
+	width: 200px;
+}
+body.Profile #Panel {
+   width: 250px;
+}
+body.Profile #Panel div.Photo img {
+	max-width: 250px;
+}
+#Content {
+	width: auto;
+	float: none;
+	margin: 0 215px 0 0;
+}
+body.Profile #Content {
+	width: auto;
+	float: none;
+	margin: 0 0 0 265px;
+}
+#Foot div {
+	width: auto;
+}
+
+/* Head */
+#Head {
+		background: #000 url(header_bg.jpg) repeat-x;
+
+}
+ul#Menu {
+	margin: auto;
+}
+#Head .Search {
+	display: none;
+}
+#Menu a {
+	font-weight: normal;
+	color: #fff;
+}
+#Menu a span{
+	font-weight: normal;
+	color: #704c1b;
+}
+
+#Menu a:hover,
+#Menu li.Active a,
+#Menu li.Active a span,
+#Menu li.Highlight a:hover span {
+   background: none;
+   color: #b68f5b;
+	font-weight: normal;
+}
+#Menu a:hover,
+#Menu a:hover span {
+	color: #b68f5b !important;
+}
+
+/*#Head {
+   height: 50px;
+}*/
+
+#Head .FacebookButton {
+   position: absolute;
+   right: 10px;
+   bottom: 0;
+}
+
+/* Body */
+
+html, body {
+   background: #000;
+/*   height: 700px;*/
+}
+
+#Body, body.Entry {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	background: url('bg.png') top left no-repeat;
+   min-height: 732px;
+}
+div.Body {
+	padding: 10px;
+}
+div.Popup div.Body {
+	padding: 0;
+}
+#Foot {
+	display: none;
+}
+
+/* Popups */
+div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
+	background: #000;
+	color: #fff;
+	border: none;
+}
+h1, h2 {
+   text-shadow: 0 1px 1px #EFD6AA;
+}
+
+/* Voting Plugin Fixes */
+ul.DataList div.Meta strong, ul.PanelInfo div.Meta strong {
+   box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+   left: auto;
+   position: inherit;
+   top: auto;
+   background: none repeat scroll 0 0 #2E472E;
+    color: #FFFFFF;
+}
+.StatBox, .StatBox a {
+   color: #d6cb9b;
+}
+.StatBox {
+   background: #233423;
+}
+.ViewsBox {
+	background: #2e472e;
+	color: #ffffcc;
+}
+ul.MessageList div.Meta span.Votes {
+   display: inline-block;
+   float: right;
+	position: relative;
+	top: auto;
+	right: auto;
+}
+span.Votes a {
+	background: #233423;
+}
+span.Votes a:hover {
+	background: #233423;
+}
+ul.MessageList div.Meta span.Votes span {
+	background: #2e472e;
+	color: #ffffcc !important;
+}
+
+
+/* Tabs */
+div.HeadingTabs div.SubTab {
+    font-size: 16px;
+}
+div.Tabs, div.Headings {
+   background: none;
+	padding: 5px 8px 2px;
+	border: none;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited,
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   margin: 0;
+   border: none;
+   border-radius: 3px 3px 0 0;
+   -moz-border-radius: 3px 3px 0 0;
+   -webkit-border-radius: 3px 3px 0 0;
+   background: #f1f1f1;
+   background-color:rgba(255,255,255,0.7);
+   color: #7f4802;   
+   font-weight: bold;
+   padding: 5px 10px 4px;
+	line-height: 1;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited {
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+div.MorePager li a:hover,
+a.TabLink:hover,
+div.Tabs li a:hover {
+   background: #f3e6d4;
+}
+a.Active,
+div.Tabs li.Active a {
+   background: #f1f1f1;
+   background-color:rgba(255,255,255,0.7);
+   color: #7f4802;
+	padding: 5px 10px;
+}
+div.Tabs li a span {
+   background: #746e00;
+   color: #fff;
+}
+#MessageForm,
+form.Activity,
+div.MessageForm {
+	background: #B68F5B;
+	background-color:rgba(182,143,91,0.7);
+	border-bottom: 1px solid #B68F5B;
+
+}
+ul.Activities ul.DataList li {
+   background: #B68F5B;
+	background-color:rgba(182,143,91,0.7);
+}
+a.Back, a.Cancel{
+	color: #000;
+}
+#MessageForm h2 {
+	color: #333;
+}
+form.Activity {
+	padding-bottom: 6px;
+	margin-bottom: 1px;
+}
+div.MessageForm div.Tabs {
+	padding: 5px 0 2px;
+}
+div.HeadingTabs ul {
+	margin: 18px 0 0;
+}
+div.AnswerTabs {
+	bottom: -1px;
+}
+#Panel input.InputBox, div.AddPeople textarea.MultiComplete {
+   width: 172px;
+}
+
+/* DataList */
+ul.DataList a.Title{
+	color: #291903;
+}
+ul.MessageList li.Item,
+ul.DataList li.Item {
+   background: #f1f1f1;
+	background-color:rgba(255,255,255,0.7);
+	border-bottom: none;
+	margin-bottom: 1px;
+}
+ul.MessageList li.Item:nth-child(even),
+ul.DataList li.Item:nth-child(even) {
+	background: #d7d7d7;
+	background-color:rgba(255,255,255,0.5);
+}
+ul.DataList li.Mine div.Meta a.Category,
+ul.DataList div.Meta a.Category {
+	background: none;
+}
+.NumberedPager a.Highlight {
+	color: #cf9d78;
+}
+.NumberedPager a {
+	color: #ffffcc;
+}
+.NumberedPager span {
+	color: #cf9d78;
+}
+ul.MessageList div.Message {
+	clear: none;
+}
+ul.DataList.SearchResults li.Item,
+ul.DataList.Activities li.Item {
+	padding: 4px;
+}
+.Foot {
+	background: none;
+	border: none;
+}
+ul.DataList div.Meta span.Announcement {
+    background: #bf8e56;
+}
+ul.DataList div.Meta {
+    color: #233423;
+}
+ul.DataList div.Meta a {
+    color: #000000;
+}
+div.AnswerTabs strong {
+    color: #FFFFFF;
+}
+body.Activity a, 
+ul.Activities div.Excerpt a, 
+ul.Activities div.Meta a,
+ul.Conversations div.Meta a.Name {
+   text-decoration: none;
+   color: #704c1b;
+}
+body.Activity a:hover, 
+ul.Activities div.Excerpt a:hover, 
+ul.Activities div.Meta a:hover {
+   text-decoration: none;
+   color: #b68f5b;
+}
+
+body.Messages div.HeadingTabs div.SubTab a{
+	color: #fff;
+}
+#ConversationForm label {
+    color: #000;
+}
+
+#DiscussionForm form {
+   background: #B68F5B;
+	background-color:rgba(182,143,91,0.7);
+	border: 1px solid #B68F5B;
+}
+#DiscussionForm label {
+    color: #000;
+
+}
+ul.Activities div.Excerpt {
+    color: #222222;
+}
+
+/* Panel */
+
+a.Button {
+   display: inline-block;
+   padding:0 4px;
+   margin:3px 0;
+}
+
+a.BigButton, a.Button, .Button  {
+   background: #1d2f1f; /* old browsers */
+   background: -moz-linear-gradient(top, #263626 0%, #1d2f1f 100%); /* firefox */
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#263626), color-stop(100%,#1d2f1f)); /* webkit */
+   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#263626', endColorstr='#1d2f1f',GradientType=0 ); /* ie */
+   color: #e3d6a4;
+	text-shadow: 0 1px 0 #131d14;
+   border: 1px solid #162c16;
+    box-shadow: 0 0 0px #999999;
+}
+* html a.BigButton {
+   background: #1d2f1f;
+}
+a.BigButton:hover, .Button:hover {
+	background: #263626; /* old browsers */
+   background: -moz-linear-gradient(top, #1d2f1f 0%, #263626 100%); /* firefox */
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1d2f1f), color-stop(100%,#263626)); /* webkit */
+   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1d2f1f', endColorstr='#263626',GradientType=0 ); /* ie */
+    color: #e3d6a4;
+	text-shadow: 0 1px 0 #131d14;
+   border: 1px solid #162c16;
+    box-shadow: 0 0 0px #999999;
+}
+* html a.BigButton:hover {
+   background: #263626;
+}
+a.BigButton:active {
+	color: #e3d6a4;
+	background: #1d2f1f;
+   border: 1px solid #162c16;
+}
+a.BigButton.NewConversation {
+	font-size: 13px;
+}
+div.Box, body.connect div.Box {
+	border: 1px solid #000;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	   background-color:rgba(0,0,0,0.6);
+	   
+	    box-shadow: 0 0 0px #999999;
+	
+}
+div.Box p {
+    color: #fff;
+
+}
+
+body.Entry input.InputBox {
+   width: auto;
+}
+div.Box h4 {
+	color: #b68f5b;
+}
+ul.PanelInfo {
+	border-top: 1px solid #382a12;
+}
+ul.PanelInfo a{
+	color:#fff;
+}
+ul.PanelInfo a:hover{
+	color:#ccc;
+}
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+   background: none;
+   border-bottom: 1px solid #382a12;
+}
+ul.PanelInfo li.Active {
+	background: #bdbcba;
+}
+ul.PanelInfo li.Active a {
+	color: #000;
+}
+ul.PanelInfo li:last-child {
+	border-bottom: none;
+}
+
+/* Profile */
+#Status {
+	background: none;
+	padding: 0;
+	color: #333;
+}
+body.Profile ul.PanelInfo {
+	border: none;
+}
+ul.Condensed li, li.Condensed {
+   clear: none;
+}
+body.Profile ul.Activities {
+   margin-top: 1px;
+}
+
+div.DismissMessage,
+div.DismissMessage.Info {
+	color: #f3e6d4;
+	background: none;
+	border: none;
+	padding: 0;
+}
+div.DismissMessage a {
+	color: #b00;
+	text-decoration: underline;
+}
+div.DismissMessage a:hover {
+	text-decoration: none;
+}
+
+div.DismissMessage.Warning {
+	background: #d00;
+	padding: 4px 8px;
+}
+div.DismissMessage.Box {
+	border: none;
+	background: #f3e6d4;
+	color: #333;
+	padding: 4px 8px;
+}
+
+/* Hide unwanted functionality */
+body.Discussion a.Bookmark,
+div.FollowsBox,
+div.Tabs ul li a.MyDrafts,
+div.Tabs ul li a.MyBookmarks {
+	display: none;
+}
+
+
+div.Popup #ConversationForm form {
+    background: #b68f5b;
+
+}
+
+div.Popup div.Body {
+   background: #b68f5b;
+}
+
+div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
+    background: #000;
+    color: #fff;
+    border-bottom: 1px solid #000;
+    text-shadow: 0 0 0px #000;
+}
+
+a.Close {
+   color: #fff;
+}
+
+* html div.InformMessages {
+  position: absolute;
+  top: auto;
+  margin-left: 20px;
+  overflow: visible;
+  bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
+  width: auto;
+}
+
+body.Entry #Content h1 {
+	text-shadow: none;
+	color: #fff;
+}
+body.Entry .MainForm {
+   background: #EBCBA5;
+	border-radius: 1px;
+	-moz-border-radius: 1px;
+	-webkit-border-radius: 1px;
+	padding: 10px;
+}
+
+.CommentInfo,
+.Meta {
+	color: #000;
+}

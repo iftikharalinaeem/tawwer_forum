@@ -1,0 +1,49 @@
+#!/bin/sh
+# Changes the existing symlinks in a subdomain from source to stage, or vice versa
+# This script assumes 2 arguments are passed: the name of the subdomain to create, and source or stage (whichever you want to symlink to).
+
+# Variables
+PATH=/srv/www/subdomains/${1}/
+SOURCE=/srv/www/vanilla_${2}/
+	
+echo "Updating symlinks for: ${PATH} to ${SOURCE}"
+
+# Delete all existing symlinks first
+# WARNING: Do not use a trailing slash on symlinked folders when rm'ing, or it will remove the source!
+/bin/rm "${PATH}applications/conversations"
+/bin/rm "${PATH}applications/dashboard"
+/bin/rm "${PATH}applications/vanilla"
+/bin/rm "${PATH}plugins/VanillaInThisDiscussion"
+/bin/rm "${PATH}plugins/HtmlPurifier"
+/bin/rm "${PATH}plugins/googleadsense"
+/bin/rm "${PATH}themes/default"
+/bin/rm "${PATH}themes/vfcom"
+/bin/rm "${PATH}conf/config-defaults.php"                                                                                                                 
+/bin/rm "${PATH}conf/constants.php"
+/bin/rm "${PATH}conf/locale.php"                                                                                                                             
+/bin/rm "${PATH}js"                                                                                                                                                             		
+/bin/rm "${PATH}library"
+/bin/rm "${PATH}.htaccess"
+/bin/rm "${PATH}bootstrap.php"
+
+# Now relink to the new place
+/bin/ln -s "${SOURCE}applications/conversations" "${PATH}applications/conversations"
+/bin/ln -s "${SOURCE}applications/dashboard" "${PATH}applications/dashboard"
+/bin/ln -s "${SOURCE}applications/vanilla" "${PATH}applications/vanilla"
+/bin/ln -s "${SOURCE}plugins/VanillaInThisDiscussion" "${PATH}plugins/VanillaInThisDiscussion"
+/bin/ln -s "${SOURCE}plugins/HtmlPurifier" "${PATH}plugins/HtmlPurifier"
+/bin/ln -s "${SOURCE}plugins/googleadsense" "${PATH}plugins/googleadsense"
+/bin/ln -s "${SOURCE}themes/vfcom" "${PATH}themes/default"
+/bin/ln -s "${SOURCE}themes/vfcom" "${PATH}themes/vfcom"
+/bin/ln -s "${SOURCE}conf/config-defaults.php" "${PATH}conf/config-defaults.php"                                                                                                                 
+/bin/ln -s "${SOURCE}conf/constants.php" "${PATH}conf/constants.php"
+/bin/ln -s "${SOURCE}conf/locale.php" "${PATH}conf/locale.php"                                                                                                                             
+/bin/ln -s "${SOURCE}js" "${PATH}js"                                                                                                                                                             		
+/bin/ln -s "${SOURCE}library" "${PATH}library"
+/bin/ln -s "${SOURCE}.htaccess" "${PATH}.htaccess"
+/bin/ln -s "${SOURCE}bootstrap.php" "${PATH}bootstrap.php"
+
+# Need to copy the index.php file because it defines the PATH_ROOT and the symbolic link will treat it as though it were in ${SOURCE}
+/bin/cp "${SOURCE}index.php" "${PATH}index.php"    
+
+exit

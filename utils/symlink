@@ -1,0 +1,9 @@
+#!/bin/sh
+# Creates a symbolic link
+# This script assumes 2 arguments are passed:
+# 1. The path to the source of the symlink.
+# 2. The new symlink path.
+	
+/bin/ln -s "${1}" "${2}"
+
+exit

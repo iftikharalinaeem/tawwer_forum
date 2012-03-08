@@ -1,0 +1,464 @@
+body {
+   background: #EDEDED;
+}
+#header * {
+   font-family: "lucida grande",tahoma,verdana,arial,sans-serif;
+}
+#container * {
+   font-family: HelveticaNeue,Helvetica,Arial,sans-serif;
+}
+#container {
+    margin: 0 auto;
+    width: 1024px;
+}
+#header {
+   background-color: #7A8187;
+}
+#ad-header {
+    height: 96px;
+    padding: 0 0 15px;
+}
+#ad-header .inner-wrapper {
+    margin: 0 auto;
+    text-align: center;
+    width: 1028px;
+}
+#ad-header span.ad-728x90 {
+    display: inline-block;
+    height: 90px;
+    margin: 10px 0;
+    width: 728px;
+}
+#sub-header {
+    background: url("http://www.9to5mac.com/wp-content/themes/9to5mac/images/bg/sub-header.png") repeat-x scroll 0 0 transparent;
+    height: 52px;
+}
+#sub-header a:hover {
+    background-color: #D8D7D7;
+}
+#sub-header .inner-wrapper {
+    color: #CCCCCC;
+    margin: 0 auto;
+    width: 1028px;
+}
+#sub-header .login-create-link {
+    color: #292929;
+    display: inline-block;
+    font-size: 14px;
+    margin: 16px 0 0;
+}
+#sub-header .logout-link {
+    color: #292929;
+    display: inline-block;
+    font-size: 14px;
+    margin: 16px 0 0;
+}
+#sub-header .login-create-link span {
+    color: #909090;
+    font-size: 13px;
+}
+#sub-header .input-holder {
+    float: right;
+    margin: 9px 0 0;
+    width: 579px;
+}
+#sub-header .input-holder span.tipsbox {
+    float: left;
+    margin-right: 10px;
+    position: relative;
+    z-index: 100;
+}
+#sub-header .input-holder span.tipsbox h1 {
+    color: #000000;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+#sub-header .input-holder span.tipsbox a#close-tips {
+    bottom: 17px;
+    color: red;
+    font-size: 12px;
+    left: 15px;
+    position: absolute;
+}
+#sub-header .input-holder span.tipsbox a#close-tips:hover {
+    background: none repeat scroll 0 0 transparent;
+    cursor: pointer;
+}
+#sub-header .input-holder span.tipsbox #tips-form {
+    background-color: #8DD0FF;
+    border: 1px solid #36AAFB;
+    float: left;
+    left: 0;
+    padding: 10px;
+    position: absolute;
+    top: 0;
+}
+#sub-header .input-holder span.tipsbox div textarea {
+    border: medium none;
+    font-family: Helvetica;
+    font-size: 13px;
+    height: 100px;
+    overflow: auto;
+    padding: 10px;
+    width: 300px;
+}
+#sub-header .input-holder span.tipsbox div textarea:focus {
+    outline: medium none;
+}
+#sub-header .input-holder span.tipsbox div .submit-btn {
+    float: right;
+}
+#sub-header .input-holder span.tipsbox input[type="text"] {
+    -moz-border-radius: 2px 2px 2px 2px;
+    border: 1px solid #999999;
+    color: #999999;
+    font-size: 13px;
+    padding: 6px;
+    width: 200px;
+}
+#sub-header input[type="text"]:focus {
+    outline: medium none;
+}
+#sub-header .input-holder span.searchbox {
+    float: left;
+}
+#sub-header .input-holder span.searchbox input {
+    -moz-border-radius: 2px 2px 2px 2px;
+    border: 1px solid #999999;
+    color: #999999;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 6px;
+    width: 200px;
+}
+#sub-header .input-holder span.rss-icon {
+    float: right;
+    margin: 2px 0 0 5px;
+}
+#sub-header .input-holder span.twitter-icon {
+    float: right;
+    margin: 2px 0 0 5px;
+}
+#sub-header .input-holder span.facebook-icon {
+    float: right;
+    margin: 2px 0 0 5px;
+}
+#top-nav {
+    padding: 25px 0;
+}
+#top-nav img.logo {
+    float: left;
+}
+#top-nav .menu {
+    float: right;
+    margin: 10px 0;
+}
+#top-nav ul.menu li a {
+    -moz-border-radius: 2px 2px 2px 2px;
+    background-color: #D6D9DB;
+    color: #3C4349;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 8px 16px;
+	 line-height: 13px;
+}
+#top-nav ul.menu li.current-cat a {
+    background-color: #0096FF;
+    color: #FFFFFF;
+}
+#top-nav ul.menu li {
+    float: left;
+    margin-left: 5px;
+}
+#top-nav ul.menu li a:hover {
+    background-color: #0096FF;
+    color: #FFFFFF;
+}
+
+/* Vanilla CSS */
+a, a:link, a:visited, a:active, a:hover {
+   color: #2081C5;
+}
+div.Buttons a:hover,
+.NumberedPager a:hover,
+div.Comment a:hover {
+   color: #2081C5;
+	background: #f1f1f1;
+}
+a.BigButton {
+	color: #145987;
+}
+#Head,
+#Body,
+#Foot {
+	width: 1024px;
+	margin: 0 auto;
+}
+#Foot div {
+	width: auto;
+}
+#Panel {
+	margin: 0 0 0 9px;
+}
+body.Profile #Panel {
+	margin: 0;
+}
+#Panel div.Search input.InputBox {
+	width: 170px;
+	margin-right: 5px;
+}
+body.Search #Panel {
+	display: none;
+}
+#Content {
+	width: 727px;
+	margin: 0;
+	background: #fff;
+	border: 1px solid #ccc;
+	padding: 3px 18px 18px;
+}
+body.Profile #Content {
+	margin: 0;
+   width: 727px;
+}
+#Head {
+	background: transparent;
+}
+div.Menu {
+	width: auto;
+}
+div.Menu a {
+	background: #D6D9DB;
+	color: #3C4349;
+	display: inline-block;
+	font-size: 12px;
+	font-weight: bold;
+	padding: 6px 16px;
+	margin: 0 0 8px;
+	line-height: 1.4;
+}
+div.Menu a span {
+	font-weight: normal;
+	color: #fff;
+	background: #3C4349;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	padding: 0 2px;
+	font-size: 11px;
+}
+div.Menu a:first-child {
+	border-radius: 2px 0 0 2px;
+	-moz-border-radius: 2px 0 0 2px;
+	-webkit-border-radius: 2px 0 0 2px;
+}
+div.Menu a:last-child {
+	border-radius: 0 2px 2px 0;
+	-moz-border-radius: 0 2px 2px 0;
+	-webkit-border-radius: 0 2px 2px 0;
+}
+div.Menu a:hover {
+   background-color: #0096FF;
+   color: #FFFFFF;
+}
+
+#Panel div.PanelBox {
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+   background: #C2C8CD;
+   border: 1px solid #A2ABB3;
+   margin-bottom: 15px;
+   padding: 15px 10px;
+}
+div.Box {
+	background: none;
+	padding: 0;
+	border: none;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+}
+div.Box.GuestBox,
+div.Box.AddPeople {
+	background: #fff;
+}
+div.Box.GuestBox {
+	padding-bottom: 6px;
+}
+div.Box.GuestBox p {
+	padding: 0 6px 4px;
+}
+	.P {
+    	padding-left: 6px;
+	}
+	
+div.Box.GuestBox a.PopupWindow {
+	margin-left: 6px;
+}
+div.Box.AddPeople form {
+	padding: 4px;
+}
+#Panel input.InputBox, div.AddPeople textarea.MultiComplete {
+	width: 99%;
+}
+div.Box h4 {
+	background: #535353;
+   color: #FFFFFF;
+   font-size: 14px;
+   margin: 0;
+   padding: 7px 0 7px 11px;
+   position: relative;
+}
+div.Box h4 a {
+   color: #FFFFFF;
+   font-size: 14px;
+}
+div.Box dl {
+	background: #fff;
+	padding: 4px;
+}
+ul.PanelInfo {
+	border: none !important;
+}
+ul.PanelInfo li {
+   background: #fff;
+	border-bottom: none !important;
+	font-size: 13px;
+	padding: 2px 10px;
+}
+div.Tabs, div.Headings {
+	background: transparent;
+	border-bottom: 1px solid #ccc;
+	padding: 5px 0;
+}
+div.Tabs div.SubTab {
+	background: #f2f2f2;
+}
+#MessageForm h2 {
+	display: inline-block;
+   background: #145987;
+   color: #fff;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+   font-weight: bold;
+   line-height: 2;
+   margin: 6px 0;
+   padding: 0 10px;
+   text-decoration: none;
+	font-size: 13px;
+	font-family: 'lucida grande','Lucida Sans Unicode',tahoma,sans-serif;
+}
+#MessageForm,
+div.MessageForm {
+	background: transparent;
+	border: none;
+	padding: 0;
+}
+div.MorePager a, div.MorePager a:link, div.MorePager a:hover, div.MorePager a:active, div.MorePager a:visited, a.TabLink, a.TabLink:link, a.TabLink:hover, a.TabLink:active, a.TabLink:visited, div.Tabs li a, div.Tabs li a:link, div.Tabs li a:hover, div.Tabs li a:active, div.Tabs li a:visited {
+	border: none;
+	background: #f2f2f2;
+	color: #145987;
+}
+div.MorePager a:hover,
+div.Tabs li a span,
+a.Active,
+div.Tabs li.Active a,
+div.MorePager li a:hover,
+a.TabLink:hover,
+div.Tabs li a:hover {
+   background: #145987;
+   color: #fff;
+}
+div.Tabs li a:hover span {
+	background: #f2f2f2;
+	color: #145987;
+}
+div.HeadingTabs {
+   padding: 8px 0px;
+}
+form.Activity {
+	padding: 10px 0 0;
+}
+.Foot {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+   background: transparent;
+   border: none;
+   padding: 6px 0 0;
+}
+div.User {
+	padding: 10px 0 0;
+}
+#Status {
+	background: none;
+	padding: 0;
+	margin: 0;
+}
+#Panel div.Photo img {
+	width: 100%;
+	display: block;
+}
+/* Popups */
+div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
+	color: #fff;
+	background: #145987;
+   border: none;
+}
+a.Close {
+	color: #fff;
+}
+/* Autocomplete */
+.ac_results {
+   border: 1px solid #d7d8da;
+	color: #000;
+   border-top: 0;
+   background-color: white;
+}
+.ac_results li {
+   border-bottom: 1px solid #d7d8da;
+}
+.ac_lastitem {
+   border-bottom: 0 !important;
+}
+.ac_results strong {
+   background: #dbe1ec;
+}
+.ac_over strong {
+   background: #5670a6;
+}
+.ac_over {
+   background: #3b5998;
+   color: #fff;
+}
+
+/* voting */
+
+.VotesBox, .AnswerBox {
+    background: #145987;
+}
+.FollowsBox {
+   background: #0075C4;
+}
+.ViewsBox {
+    background: #0096FF;
+}
+.StatBox a {
+    color: #84C7F6 !important;
+}
+
+ul.MessageList div.Meta span.Votes {
+    right: 0;
+}
+div.Preview div.Message, div.Preview div.Message p, ul.MessageList div.Message, ul.MessageList div.Message p {
+    margin: 8px 50px;
+}
+
+ul.DataList div.Meta strong {
+   left: auto;
+   right: -33px;
+}

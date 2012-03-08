@@ -1,0 +1,88 @@
+.CustomDomain {
+   width: 700px;
+}
+
+.CustomSteps {
+   padding: 0px 15px;
+   margin: 20px;
+}
+.CustomSteps li {
+   margin: 5px 0px;
+   text-indent: -28px;
+   padding-left: 28px;
+   line-height: 1.3;
+}
+.CustomSteps li span {
+   font-size: 22px;
+   font-weight: bold;
+   color: #80b012;
+   padding-right: 4px;
+}
+.CustomSteps .MultiOption {
+   text-indent: -17px;
+   padding-left: 17px;
+}
+.CustomSteps .MultiOption div {
+   margin: 5px 0px;
+}
+
+.CustomDomain .DNSInformation,
+.CustomDomain .NewDomain,
+.CustomDomain .CustomFailed,
+.CustomDomain .CustomSuccess {
+   background: #F1F1F1;
+   padding: 15px;
+   margin: 20px;
+}
+
+.CustomDomain .Info {
+   padding: 0px;
+   margin: 20px;
+}
+.CustomDomain .DNSInformation h2 {
+   margin: 0px;
+}
+.CustomDomain .DNSInformation .DNSRecords div,
+.CustomDomain .DNSInformation .ExistingDomains div {
+   margin-left: 10px;
+}
+.CustomDomain .DNSInformation .ExistingDomains h2 {
+   margin-top: 10px;
+}
+.CustomDomain .DNSInformation span {
+   font-weight: bold;
+   width: 150px;
+   float: left;
+}
+.CustomDomain .DNSInformation .ExistingDomains .ExistingDomain {
+   height: 100%;
+   overflow: hidden;
+}
+.CustomDomain .DNSInformation .ExistingDomains a {
+   float: left;
+   margin-right: 8px;
+}
+.CustomDomain .DNSInformation .ExistingDomains span {
+   float: none;
+}
+
+#Content .CustomDomain .NewDomain form ul {
+   padding: 0px;
+}
+
+#Content .CustomDomain .NewDomain form .Button {
+   margin-left: 0px;
+}
+
+.CustomDomain .CustomFailed {
+   background: #ffd8d8;
+   color: #a00000;
+   font-weight: bold;
+}
+
+.CustomDomain .CustomSuccess {
+   background: #ebffd7 url('/applications/dashboard/design/images/check.png') no-repeat 15px 20px;
+   padding-left: 60px;
+   border: 1px solid #cfff9e;
+   font-weight: bold;
+}

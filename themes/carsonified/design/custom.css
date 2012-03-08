@@ -1,0 +1,435 @@
+/* =============================================== Carsonified Customizations */
+body,
+div.Popup div.Body {
+   background: #fffeef;
+}
+div.Popup .Content {
+	border-bottom: 1px solid #e8e7d7;
+}
+div.Popup .Footer {
+	background: #F8F7E7;
+}
+ul.Activities div.Excerpt a,
+ul.Activities div.Meta a,
+a,
+a:link,
+a:visited,
+a:active {
+   color: #e62727;
+}
+ul.Activities div.Excerpt a:hover,
+ul.Activities div.Meta a:hover,
+a:hover {
+   color: #e62727;
+   text-decoration: underline;
+}
+#Head {
+   background: #1b1a00 /* Banner Background Color */;
+   height: 140px;
+}
+body #Head h1 {
+   margin: 25px 0 0;
+   padding: 0;
+   border: 0;
+}
+#Head h1 a span {
+	color:#fff;
+	text-shadow: none;
+}
+#Head form {
+   margin: 80px 0 0;
+}
+#Head form input.InputBox {
+   font-size: 12px;
+}
+#Head form input.Button {
+   background: #e62727 /* Panel Background Color */;
+   color: #fff /* Panel Font Color */;
+}
+ul#Menu {
+   margin: 0;
+   padding: 82px 0 0 10px;
+}
+#Menu ul {
+   background: #5b5a40 /* Menu Background Color */;
+   -moz-border-radius-bottomright: 4px;
+   -moz-border-radius-bottomleft: 4px;
+}
+#Menu li.Active {
+	background: none;
+}
+#Menu li.Active ul {
+   background: #5b5a40 /* Menu Background Color */;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+}
+#Menu li.Active a {
+   color: #fff /* Menu Font Color */;
+}
+#Menu a {
+   color: #fff /* Banner Font Color */;
+   font-size: 13px;
+   font-weight: normal;
+   font-family: arial;
+	padding: 0 6px;
+}
+#Menu a:hover {
+   color: #e62727 /* Menu Hover Font Color */ !important;
+   background: #1b1a00 /* Menu Hover Background Color */;
+}
+#Menu li li a:hover {
+	background: #5b5a40;
+}
+#Menu li.NonTab,
+#Menu li.NonTab a {
+   background: transparent;
+}
+#Menu li.NonTab a:hover {
+   color: #fff /* Menu Hover Font Color */ !important;
+}
+#Menu a span,
+#Menu li.Active a span,
+#Menu li.Highlight a:hover span {
+   background: #fffeef;
+   color: #1b1a00;
+}
+a.NewDiscussion {
+   color: #fff;
+   background: #e62727;
+}
+a.NewDiscussion:hover {
+   text-decoration: none;
+}
+.Mine {
+   background: #f2f1e7;
+}
+.MorePager,
+div.Box {
+   background: #e8e7d7 !important;
+	border: 0 !important;
+}
+div.Box h4 {
+   border: 0;
+   color: #1b1a00;
+}
+div.Box dl {
+	background: none;
+	border: 0;
+}
+div.Box dl dt {
+	color: #1b1a00;
+}
+.MorePager a,
+.MorePager a:hover {
+   color: #1b1a00 !important;
+   text-decoration: none !important;
+}
+ul.PanelInfo,
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+   border: 0;
+   background: none;
+}
+ul.PanelInfo li.Active a {
+   color: #1b1a00;
+}
+ul.PanelInfo li,
+ul.PanelInfo li.Active,
+ul.PanelDiscussions li {
+   background: none;
+   border: 0;
+   border-top: 1px solid #d8d7c7;
+}
+ul.DataList li ul li.Meta a.Category {
+   background: none !important;
+}
+ul.DataList li ul li.Meta strong {
+   background: #ff5;
+}
+input.InputBox:focus,
+input.SmallInput:focus,
+textarea:focus {
+   background: #fff;
+}
+#Status {
+	background: #e8e7d7;
+}
+ul.Activities ul.Comments li {
+	background: #e8e7d7;
+}
+ul.Activities li h3 em {
+	color: #4b4a30;
+}
+ul.SideMenu li ul li {
+	border-bottom: 1px solid #ddd;
+}
+ul.SideMenu li ul li a {
+	color: #e62727;
+}
+ul.SideMenu li ul li a:hover {
+	background: none;
+	color: #e62727;
+}
+a.Close {
+	color: #aaa;
+}
+body.Profile ul.PanelInfo {
+	border-bottom: 0;
+}
+div.Popup h1,
+div.Popup h2 {
+	font-family: 'lucida grande';
+	font-size:120%;
+	font-weight:bold;
+	margin-bottom: 0;
+	color: #fff;
+	background: #1B1A00;
+	border-bottom: 0;
+	text-shadow: none;
+	padding: 6px 9px 4px;
+}
+div.Popup .Footer {
+  background: #E8E7D7;
+  text-align: right;
+  padding: 0 6px 2px 0;
+  border-top:1px solid #D8D7C7;
+  -moz-border-radius-bottomleft: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+  -webkit-border-bottom-right-radius: 5px;
+}
+div.Tabs {
+   background: #E8E7D7;
+   border-bottom: 1px solid #D8D7C7;
+}
+div.MessageForm a.Cancel,
+div.MessageForm a.Cancel:link,
+div.MessageForm a.Cancel:hover,
+div.MessageForm a.Cancel:active,
+div.MessageForm a.Cancel:visited,
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited,
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   color: #5B5A40;
+   border: 1px solid #D8D7C7;
+   background: #EEEEDE;
+}
+div.MessageForm a.Cancel:hover,
+div.MorePager a:hover,
+a.TabLink:hover,
+div.Tabs li a:hover {
+   background: #fEfEeE;
+}
+a.Active,
+div.Tabs li.Active a {
+   background: #fff;
+   color: #454545;
+}
+div.Tabs li a span {
+   background: #5B5A40;
+   color: #eee;
+}
+div.Tabs div.SubTab {
+	background: none;
+}
+a.BigButton {
+   color: #fff;
+   background: #e62727;
+	text-shadow: 0 1px 0 #000;
+   border: 0;
+	box-shadow: 0px 0px 2px #333;
+	-moz-box-shadow: 0px 0px 2px #333;
+	-webkit-box-shadow: 0px 0px 2px #333;  
+}
+a.BigButton:hover {
+   text-decoration: none;
+	color: #fff;
+   border: 0;
+	box-shadow: 0px 0px 5px #666;
+	-moz-box-shadow: 0px 0px 5px #666;
+	-webkit-box-shadow: 0px 0px 5px #666;  
+}
+a.BigButton:focus {
+   background: #D32424;
+}
+ul.Activities ul.DataList li {
+	background: #E8E7D7;
+}
+.Foot {
+	border: 0;
+}
+
+/* ============================================================ Conversations */
+
+
+
+/* =============================================== Carsonified Customizations */
+#Conversations li.Active {
+  background: #ffd;
+}
+#Conversations li a.Message {
+	text-decoration: none;
+}
+#ConversationForm,
+body.Index #Content form {
+	background: #E8E7D7;
+}
+#ConversationForm h2 {
+	border: 0;
+}
+#MessageForm h2,
+#ConversationForm h2,
+body.Index #Content form h3 {
+	color: #1B1A00;
+}
+a.ClearConversation {
+	color: #fff;
+	text-decoration: none;
+}
+a.NewConversation {
+   color: #fff;
+   background: #e62727;
+	text-shadow: none;
+}
+a.NewConversation:hover {
+   text-decoration: none;
+}
+.Mine {
+   background: #f2f1e7;
+}
+div.MessageForm {
+	background: #E8E7D7;
+	border: none;
+}
+.ac_results {
+   padding: 0;
+   border: 1px solid #bbb;
+   border-top: 0;
+   background-color: white;
+   overflow: hidden;
+   z-index: 99999;
+}
+.ac_results ul {
+   width: 100%;
+   list-style-position: outside;
+   list-style: none;
+   padding: 0;
+   margin: 0;
+}
+.ac_results li {
+   margin: 0;
+   padding: 5px;
+   cursor: default;
+   display: block;
+   /* 
+   if width will be 100% horizontal scrollbar will apear 
+   when scroll mode will be used
+   */
+   /*width: 100%;*/
+   font-size: 12px;
+   /* 
+   it is very important, if line-height not setted or setted 
+   in relative units scroll will be broken in firefox
+   */
+	font-family: 'lucida grande';
+   line-height: 16px;
+   overflow: hidden;
+   border-bottom: 1px solid #bbb;
+   text-align: left;
+}
+.ac_lastitem {
+   border-bottom: 0 !important;
+}
+.ac_results strong {
+   font-weight: bold;
+   background: #d8dfea;
+}
+.ac_over strong {
+   font-weight: bold;
+   background: #5670a6;
+}
+.ac_over {
+   background: #31599e;
+   color: #fff;
+}
+/* =================================================== Vanilla Customizations */
+.Mine {
+   background: #f2f1e7;
+}
+.MorePager,
+div.Box {
+   background: #e8e7d7;
+}
+div.Box h4 {
+   border: 0;
+   color: #1b1a00;
+}
+ul.PanelDiscussions li {
+   background: none;
+   border: 0;
+   border-top: 1px solid #d8d7c7;
+}
+ul.DataList li ul li.Title strong a {
+   color: #e62727;
+}
+ul.DataList li ul li.Meta a.Category {
+   background: none !important;
+}
+ul.DataList li ul li.Meta strong {
+   background: #ff5;
+}
+div.Back,
+#CommentForm,
+#DiscussionForm {
+   background: #e8e7d7 !important;
+   border: 0 !important;
+}
+div.Back a {
+   color: #E62727;
+}
+#DiscussionForm h2,
+body.Discussion #CommentForm h2 {
+   color: #1b1a00 !important;
+}
+#DiscussionForm form {
+	background: none;
+	border: none;
+	padding:0 10px 10px;
+}
+input.InputBox:focus,
+input.SmallInput:focus,
+textarea:focus {
+   background: #fff;
+}
+ul.DataList li ul li.Title h3 a {
+   color: #e62727;
+}
+a.Close {
+	color: #aaa;
+}
+div.Info {
+	background: #f8f7e7;
+}
+div.Info {
+	border: 1px solid #e8e7d7;
+}
+div.Popup #ConversationForm form ,
+#ConversationForm form {
+	background:none;
+	border: none;
+}
+div.Preview {
+	background: #F2F1E7;
+}

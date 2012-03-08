@@ -1,0 +1,68 @@
+.Addons {
+   border-top: 1px solid #8bc1de;
+}
+
+.Addons .Addon {
+   border-bottom: solid 1px #E0E0E0;
+   padding: 0;
+}
+
+.Addon .Foot {
+   clear: left;
+}
+
+.Addons .Enabled{
+   background-color: #FFFF88;
+}
+
+.Addons .AddonIcon {
+   float: left;
+   margin-right: 10px;
+   margin-bottom: 10px;
+}
+
+.Addons .Buttons {
+   clear: both;
+   display: inline-block;
+   width: 120px;
+   margin-right: 10px;
+   padding-left: 8px;
+}
+
+.Addons .Meta {
+   display: inline-block;
+}
+
+.Addons .Theme .AddonIcon {
+   width: 124px;
+   border: solid 1px #777;
+   padding: 1px;
+}
+
+.Addons .Enabled {
+   background: url(gradient.png) repeat-x;
+}
+
+.Addons td.Addon {
+   width: 50%;
+}
+
+.Addons td.Addon .SmallButton {
+   margin: 0;
+}
+
+.Addons td.Addon .Con {
+   padding: 10px 10px;
+   position: relative;
+   overflow: hidden;
+}
+
+.Addons .Con img.PlanRequirement {
+   position: absolute;
+   left: 8px;
+   top: 8px;
+}
+
+body.addons .Errors {
+   border-top: 1px solid #8BC1DE;
+}

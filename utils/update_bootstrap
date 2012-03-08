@@ -1,0 +1,12 @@
+#!/bin/bash
+
+PATH=/srv/www/subdomains/
+
+for DIR in `/bin/ls /srv/www/subdomains`
+do
+
+echo $DIR
+   # Add symlink to bootstrap
+   /bin/ln -s /srv/www/vanilla_source/conf/bootstrap.before.php ${PATH}${DIR}/conf/bootstrap.before.php
+
+done
