@@ -15,7 +15,7 @@
 body.Profile #Content {
    float: right;
    margin: 0 0 40px;
-   width: 720px;
+   width: 680px;
 }
 
 body.Profile #Panel {
@@ -28,6 +28,7 @@ body.Profile #Panel {
 .Box {
    background: #CFECFF;
    border-radius: 2px;
+   color: #06486A;
    padding: 6px 10px;
 }
 
@@ -36,6 +37,19 @@ body.Profile #Panel {
 }
 .Box :last-child {
    margin-bottom: 0;
+}
+
+/** Popup **/
+
+div.Popup h1, div.Popup h2 {
+   background: #38ABE3;
+   color: #fff;
+   margin: -10px -10px 10px;
+   padding: 5px 10px;
+}
+
+a.Close {
+   color: #fff;
 }
 
 /** Misc **/
