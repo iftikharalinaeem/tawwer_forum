@@ -314,11 +314,11 @@ a.Button:focus {
 }
 
 a.BigButton {
-   -webkit-transition: all .3s ease-in-out;
- -moz-transition: all .3s ease-in-out;
- -o-transition: all .3s ease-in-out;
- -ms-transition: all .3s ease-in-out;
- transition: all .3s ease-in-out;
+   -webkit-transition: all .1s ease-in-out;
+ -moz-transition: all .1s ease-in-out;
+ -o-transition: all .1s ease-in-out;
+ -ms-transition: all .1s ease-in-out;
+ transition: all .1s ease-in-out;
 }
 #Content input.Button,
 #Content input.Button:hover,
@@ -337,7 +337,7 @@ a.BigButton:focus {
    border-radius: 4px;
    -moz-border-radius: 4px;
    -webkit-border-radius: 4px;
-   top: 5px;
+   top: 2px;
    box-shadow: 0 5px 0  #AA1100,
       inset 0 -1px 1px #d56b16,
       inset 0 1px 1px #6f0b00,
@@ -363,31 +363,31 @@ a.BigButton:focus {
 #Content input.Button:hover,
 a.BigButton:hover {
    top: 0;
-   box-shadow: 0 10px 0  #AA1100,
+   box-shadow: 0 7px 0  #AA1100,
       inset 0 -1px 1px #d56b16,
       inset 0 1px 1px #6f0b00,
-      1px 11px 0 #333,
-      -1px 11px 0 #333,
-      2px 12px 0 #888,
-      -2px 12px 0 #888;
-   -moz-box-shadow: 0 10px 0  #AA1100,
+      1px 8px 0 #333,
+      -1px 8px 0 #333,
+      2px 9px 0 #888,
+      -2px 9px 0 #888;
+   -moz-box-shadow: 0 7px 0  #AA1100,
       inset 0 -1px 1px #d56b16,
       inset 0 1px 1px #6f0b00,
-      1px 11px 0 #333,
-      -1px 11px 0 #333,
-      2px 12px 0 #888,
-      -2px 12px 0 #888;
-   -webkit-box-shadow: 0 10px 0  #AA1100,
+      1px 8px 0 #333,
+      -1px 8px 0 #333,
+      2px 9px 0 #888,
+      -2px 9px 0 #888;
+   -webkit-box-shadow: 0 7px 0  #AA1100,
       inset 0 -1px 1px #d56b16,
       inset 0 1px 1px #6f0b00,
-      1px 11px 0 #333,
-      -1px 11px 0 #333,
-      2px 12px 0 #888,
-      -2px 12px 0 #888;
+      1px 8px 0 #333,
+      -1px 8px 0 #333,
+      2px 9px 0 #888,
+      -2px 9px 0 #888;
 }
 #Content input.Button:focus,
 a.BigButton:focus {
-   top: 8px;
+   top: 5px;
    box-shadow: 0 2px 0  #AA1100,
       inset 0 -1px 1px #d56b16,
       inset 0 1px 1px #6f0b00,
