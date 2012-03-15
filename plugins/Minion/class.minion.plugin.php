@@ -10,6 +10,7 @@
  *  1.0     Release
  *  1.0.1   Fix data tracking issues
  *  1.0.2   Fix typo bug
+ *  1.0.4   Only flag people when fingerprint checking is on
  * 
  *  1.1     Only autoban newer accounts than existing banned ones
  *  1.2     Prevent people from posting autoplay embeds
@@ -23,7 +24,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.0.3',
+   'Version' => '1.0.4',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -96,6 +97,8 @@ class MinionPlugin extends Gdn_Plugin {
     * @param PostController $Sender 
     */
    protected function CheckFingerprintBan($Sender) {
+      if (!C('Plugins.Minion.Features.Fingerprint', TRUE)) return;
+      
       if (!Gdn::Session()->IsValid()) return;
       $FlagMeta = $this->GetUserMeta(Gdn::Session()->UserID, "FingerprintCheck", FALSE);
       
