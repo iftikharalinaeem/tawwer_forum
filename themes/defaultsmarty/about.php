@@ -12,9 +12,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['DefaultSmarty'] = array(
-   'Name' => 'Vanilla Default',
-   'Description' => "A customizable default theme for Vanilla. This theme has 7 color options.",
-   'Version' => '1.0',
+   'Name' => 'Compatibility 2011',
+   'Description' => "An older version of the default theme for backwards-compatibility.",
+   'Version' => '2.0a',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',

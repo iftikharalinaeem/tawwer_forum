@@ -455,8 +455,8 @@ class WhispersPlugin extends Gdn_Plugin {
             $Sender->Form->SetFormValue('Whisper', TRUE);
             $Sender->Form->SetFormValue('ConversationID', $WhisperConversationID);
          }
-
-         $Whisper = $Sender->Form->GetFormValue('Whisper');
+         
+         $Whisper = $Sender->Form->GetFormValue('Whisper') && GetIncomingValue('Type') != 'Draft';
          $WhisperTo = trim($Sender->Form->GetFormValue('To'));
          $ConversationID = $Sender->Form->GetFormValue('ConversationID');
 

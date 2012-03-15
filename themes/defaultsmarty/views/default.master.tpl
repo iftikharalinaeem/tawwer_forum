@@ -22,14 +22,12 @@
       <div id="Search">{searchbox}</div>
     </div>
   </div>
-  <div class="BreadcrumbWrap TopBreadcrumb">{breadcrumbs}</div>
   <div id="Body">
     <div id="Content">
       {asset name="Content"}
     </div>
     <div id="Panel">{asset name="Panel"}</div>
   </div>
-  <div class="BreadcrumbWrap BottomBreadcrumb">{breadcrumbs}</div>
   <div id="Foot">
     <div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
     {asset name="Foot"}

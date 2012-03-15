@@ -19,6 +19,7 @@ function WriteRevisions($Sender, $Tab = '') {
 
       echo '<div class="Revision'.($Row->RevisionID == $LiveRevisionID ? ' LiveRevision' : '').'">&rarr;'
          .Anchor(date("g:i:sa", Gdn_Format::ToTimeStamp($Row->DateInserted)), 'settings/customtheme/revision/'.$Tab.'/'.$Row->RevisionID)
+         .($Row->Label ? htmlspecialchars($Row->Label).' ' : '')
          .($Row->RevisionID == $LiveRevisionID ? ' Live Version' : '')
       .'</div>';
    }  
@@ -101,6 +102,12 @@ echo $this->Form->Errors();
          <div class="CustomThemeOptions">
             <strong>Revision Options</strong>
             <div class="InfoBox RevisionOptions">
+               <div class="P">
+                  <?php
+                  echo $this->Form->Label('Label this Revision', 'Label');
+                  echo $this->Form->TextBox('Label', array('Wrap' => TRUE));
+                  ?>
+               </div>
                <div class="Buttons">
                <?php
                echo $this->Form->Button('Preview', array('class' => 'TextButton'));
@@ -126,4 +133,3 @@ echo $this->Form->Errors();
 </div>
 <?php
 echo $this->Form->Close();
-

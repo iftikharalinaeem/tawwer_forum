@@ -1,6 +1,17 @@
 jQuery(document).ready(function($) {
+   if(!Array.indexOf){
+	    Array.prototype.indexOf = function(obj){
+	        for(var i=0; i<this.length; i++){
+	            if(this[i]==obj){
+	                return i;
+	            }
+	        }
+	        return -1;
+	    }
+	}
+   
    // Add the plus-minus icons.
-   $('.CategoryList .Title').before('<a href="#" class="CollapseCategoryButton">-</a> ');
+   $('.CategoryList .Title').before('<a href="#" class="CollapseCategoryButton"><span>-</span></a> ');
    
    $('.CollapseCategoryButton').click(function(e) {
       e.preventDefault();
@@ -16,13 +27,13 @@ jQuery(document).ready(function($) {
       // Expand/Collapse the item.
       if (collapsed) {
          $item.addClass('Collapsed');
-         $button.text('+');
+         $button.html('<span>+</span>');
          
          if (collapsedCookie.indexOf(id) < 0)
             collapsedCookie.push(id);
       } else {
          $item.removeClass('Collapsed');
-         $button.text('-');
+         $button.html('<span>-</span>');
          
          var index = collapsedCookie.indexOf(id);
          if (index >= 0) {

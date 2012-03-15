@@ -14,10 +14,6 @@ h1, h2, h3, h4, h5, h6 {
    color: #000;
 
 }
-h1, h2 {
-   border-bottom:1px solid #bbb;
-
-}
 h4 {
    color: #6C6C6C;
 }
@@ -108,7 +104,6 @@ div.Deleted {
 }
 .Alert {
    background: #d00;
-   border: 1px solid #b00;
    color: #fff;
 
 }
@@ -248,10 +243,6 @@ div.Box {
 
    background: #ddd;
    color: #888;
-
-	box-shadow: 0px 0px 2px #999;
-	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;  
 }
 div.Box h4 {
    color: #282828;
@@ -285,11 +276,11 @@ ul.PanelActivity li em {
 
 ul.PanelInfo li {
    background: #eee;
-   border-bottom: 1px solid #c3c3c3;
+   border-color: #c3c3c3;
 
 }
 ul.PanelInfo {
-   border-top: 1px solid #ddd;
+   border-color: #ddd;
 }
 ul.PanelInfo div.Meta strong {
 
@@ -311,18 +302,11 @@ a.BigButton {
    background: #f8f8f8;
    color: #000;
 	text-shadow: 0 1px 0 #fff;
-   border: 1px solid #999;
-
-	box-shadow: 0px 0px 2px #999;
-	-moz-box-shadow: 0px 0px 2px #999;
-	-webkit-box-shadow: 0px 0px 2px #999;  
+   border-color: #999;
    }
 a.BigButton:hover {
    color: #000;
    border: 1px solid #666;
-	box-shadow: 0px 0px 5px #aaa;
-	-moz-box-shadow: 0px 0px 5px #aaa;
-	-webkit-box-shadow: 0px 0px 5px #aaa;  
 }
 a.BigButton:focus {
    background: #eee;
@@ -335,10 +319,10 @@ a.BigButton:focus {
 /* ============================================================= Entry Screen */
 body#dashboard_entrycontroller_handshake ul.NewAccount {
 
-	border-right: 1px solid #A5D0E7;
+	border-color: #A5D0E7;
 }
 body#dashboard_entrycontroller_handshake div.Info {
-	border: 1px solid #A5D0E7;
+	border-color: #A5D0E7;
 	background: #D3F0FF;
 	color: #02475A;
 }
@@ -389,7 +373,7 @@ ul.DataList a.Delete {
 }
 ul.DataList a.Delete:hover {
    color: #333;
-   border: 1px solid #888;
+   border-color: #888;
    background:#f8f8f8;
 }
 ul.DataList a.Delete:focus {
@@ -419,7 +403,7 @@ ul.Activities div.Meta a:hover {
    color: #bbb;
 }
 ul.Activities div.Excerpt img {
-	border: 1px solid #999;
+	border-color: #999;
 }
 ul.Activities ul.DataList li {
 	background: #ddd;
@@ -430,13 +414,8 @@ ul.Activities a.CommentLink:hover {
 
    background: #fff;
    color: #bbb !important;
-   border: 1px solid #aaa;
+   border-color: #aaa;
 
-}
-ul.Activities li.CommentForm input.Button {
-	box-shadow: 0 0 1px #999;
-	-moz-box-shadow: 0 0 1px #999;
-	-webkit-box-shadow: 0 0 1px #999;  
 }
 
 
@@ -503,7 +482,7 @@ div.User form {
 #Form_Invitation table {
 
 	background: #F2FBFF;
-	border: 1px solid #C0E7F5;
+	border-color: #C0E7F5;
 }
 #Form_Invitation table th,
 #Form_Invitation table td {
@@ -558,7 +537,7 @@ div.Tabs li a:link,
 div.Tabs li a:hover,
 div.Tabs li a:active,
 div.Tabs li a:visited {
-   border: 1px solid #666;
+   border-color: #666;
 
    background: #aaa;
 
@@ -616,13 +595,6 @@ div.Popup div.Errors ul {
 div.Popup div.Body {
    background: #fff;
  
-}
-div.Popup h1,
-div.Popup h2 {
-
-	color: #fff;
-	background: #282828;
-	border-bottom: 1px solid #282828;
 }
 div.Popup .Footer {
   background: #fff;
