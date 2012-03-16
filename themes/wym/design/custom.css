@@ -4,12 +4,18 @@
 	background-color: #333;
 }
 #Frame #Head h1 { padding: 0; }
-#Head a.Title {
+.SiteTitle a {
 	background: url('forum-logo.png') no-repeat 0 22px;
 	text-indent: -999em;
-	display: block;
+	display: inline-block;
 	height: 50px;
 	width: 220px;
+}
+.SiteMenu {
+   vertical-align: bottom;
+}
+#Head .SiteSearch {
+   bottom: -20px;
 }
 #Menu a:hover, #Menu li.NonTab a:hover, #Menu .Highlight, #Menu .Highlight a {
 	background-color: #fff;
@@ -132,3 +138,38 @@ span.Votes a:hover i.SpriteDown { background-position: bottom left; }
 /* Misc
    --------------- */
 ul.MessageList div.Meta span.Author img { background: none; }
+
+
+/** Compatibility Fixes **/
+.Menu,
+#Body { 
+    width: 960px;
+    margin: 0 auto;
+}
+#Content {
+    width: 680px;
+    margin: 0 0 40px;
+    float: left;
+}
+#Panel {
+    float: right;
+    width: 250px;
+}
+#Panel .BigButton {
+    margin: 10px 0;
+}
+#Head h1 {
+   display: inline-block;
+}
+ul#Menu li {
+    display: inline;
+}
+ul#Menu li a {
+   line-height: 1.6;
+    display: inline-block;
+    background: #efefef;
+    padding: 6px !important;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+}
