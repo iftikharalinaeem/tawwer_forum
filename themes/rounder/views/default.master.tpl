@@ -1,87 +1,47 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
+<!DOCTYPE html>
+<html>
 <head>
   {asset name='Head'}
 </head>
+
 <body id="{$BodyID}" class="{$BodyClass}">
-   <div id="Frame">
-   
-   <div id="container-wrap">
-      <div id="container">
-      <div id="Head">
-        
 
-				<!--Load custom logo from banner options-->
-            
-            	<h1 class="Title"><a href="{link path="/"}">{logo}</a></h1>
-                
-                <div id="t-right">
-					<p class="intro">{text code="Header Text" default="This is just place holder text. Use the theme options to put whatever you want here!"}</p>
-				</div>
-
-                
-                  <!-- Start menu -->
-                 <div class="Menu">
-                  <ul id="Menu">
-                    {if CheckPermission('Garden.Settings.Manage')}
-                       <li><a href="{link path="dashboard/settings"}">Dashboard</a></li>
-                    {/if}
-                    <li><a href="{link path="discussions"}">Discussions</a></li>
-                    <li><a href="{link path="activity"}">Activity</a></li>
-                    {if $User.SignedIn}
-                       <li>
-                         <a href="{link path="messages/inbox"}">Inbox
-                         {if $User.CountUnreadConversations} <span>{$User.CountUnreadConversations}</span>{/if}</a>
-                       </li>
-                       <li>
-                         <a href="{link path="profile"}">{$User.Name}
-                         {if $User.CountNotifications} <span>{$User.CountNotifications}</span>{/if}</a>
-                       </li>
-                    {/if}
-                    {custom_menu}
-                    <li>{link path="signinout"}</li>
-                  </ul>
-                  
-                  <!-- End menu -->
-            
-         </div>
+<div id="Frame">
+ <div id="Head">
+   <div class="Row">
+      <div class="Banner">
+         <strong class="SiteTitle"><a href="{link path="/"}">{logo}</a></strong>
+         <strong class="SiteDescription">{text code="Header Text" default="This is just place holder text. Use the theme options to put whatever you want here!"}</strong>
       </div>
-      
-      <div id="Body">
-      
-         <!-- Start body content: helper menu and discussion list -->
-      
-      
-      
-         <div id="Content">{asset name="Content"}</div>
-         
-         <!-- End body content -->
-         
-         <!-- Start panel modules: search, categories, and bookmarked discussions -->
-         
-         <div id="Panel">
-		 
-         <div id="Search">{searchbox}</div>
-		 
-		 {asset name="Panel"}
-         
-         </div>
-         
-         <!-- End panel -->
-
-         
-      </div>
-      
-      <!-- Start foot -->
-      
-      <div id="Foot">
-			<div><div class="vanilla-ico"></div> Powered by <a href="{vanillaurl}"><span>Vanilla</span></a></div>
-    {asset name="Foot"}
-		</div>
-        
-      <!-- End foot -->  
-        </div>
-        </div>
+     <ul class="SiteMenu">
+      {dashboard_link}
+      {discussions_link}
+      {activity_link}
+      {inbox_link}
+      {custom_menu}
+      {profile_link}
+      {signinout_link}
+     </ul>
+     <div class="SiteSearch">{searchbox}</div>
    </div>
+  </div>
+  <div id="Body">
+    <div class="Row">
+      <div class="BreadcrumbsWrapper P">{breadcrumbs}</div>
+      <div class="Column PanelColumn" id="Panel">
+         {module name="MeModule"}
+         {asset name="Panel"}
+      </div>
+      <div class="Column ContentColumn" id="Content">{asset name="Content"}</div>
+    </div>
+  </div>
+  <div id="Foot">
+    <div class="Row">
+      <a href="{vanillaurl}" class="PoweredByVanilla">Powered by Vanilla</a>
+      {asset name="Foot"}
+    </div>
+  </div>
+</div>
+{event name="AfterBody"}
 </body>
 </html>

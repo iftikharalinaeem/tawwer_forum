@@ -5,8 +5,9 @@
 
 $ThemeInfo['Simple'] = array(
    'Description' => "A simple forum.",
-   'Version' => '2.0',
-   'Author' => "Matt Lincoln Russell",
+   'Version' => '3.0',
+   'Author' => "Mark Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
-   'AuthorUrl' => 'http://lincolnwebs.com'
+   'AuthorUrl' => 'http://lincolnwebs.com',
+   'Archived' => TRUE
 );
