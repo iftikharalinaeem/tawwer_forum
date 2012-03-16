@@ -14,8 +14,9 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $ThemeInfo['v1grey'] = array(
    'Name' => 'Vanilla 1 Grey',
    'Description' => "Go classic with a Vanilla 1 grey lookalike theme.",
-   'Version' => '1.0.1',
+   'Version' => '2.0',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'Archived' => true
 );
