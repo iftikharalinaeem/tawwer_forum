@@ -13,9 +13,11 @@ body {
 h1, h2, h3, h4, h5, h6 {
    color: #000;
 }
-h1, h2 {
+
+/*h1, h2 {
    border-bottom:1px solid #bbb;
 }
+*/
 h4 {
    color: #6C6C6C;
 }
