@@ -13,19 +13,19 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  */
 $ThemeInfo['minalla'] = array(
    'Name' => 'Minalla',
-   'Description' => "A minimilist forum - simple and clean. This theme has 5 style options.",
-   'Version' => '1.5',
-   'Author' => "Brendan Sera-Shriar",
-   'AuthorEmail' => 'brendan@vanillaforums.com',
-   'AuthorUrl' => 'http://brendanserashriar.com',
+   'Description' => "A minimilist forum. This theme has 5 style options.",
+   'Version' => '2.0',
+   'Author' => "Mark O'Sullivan",
+   'AuthorEmail' => 'mark@vanillaforums.com',
+   'AuthorUrl' => 'http://markosullivan.ca',
    'Options' => array(
-         'Description' => '<strong>Minalla</strong> has <font color="red">5 color</font> options. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">"Theme Options"</a>.',
-
+         'Description' => 'This theme has 5 color options, choose one using Theme Options.',
          'Styles' => array(
             'Minalla Blue' => '%s_blue',
             'Minalla Green' => '%s_green',
             'Minalla Red' => '%s_red',
-            'Minalla Grey' => '%s_grey',
-            'Minalla Yellow' => '%s'),
-   )
+            'Minalla Grey' => '%s',
+            'Minalla Yellow' => '%s_yellow'),
+   ),
+   'Archived' => TRUE
 );
