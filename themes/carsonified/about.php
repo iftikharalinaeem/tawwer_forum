@@ -18,5 +18,6 @@ $ThemeInfo['carsonified'] = array(
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
-   'Site' => 'carsonified.vanillaforums.com'
+   'Site' => 'carsonified.vanillaforums.com',
+   'Archived' => TRUE
 );
