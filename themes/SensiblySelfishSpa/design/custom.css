@@ -124,6 +124,7 @@ div.Popup #ConversationForm h2 {
 	margin: 0 270px 0 0;
 }
 #Panel {
+   width: 250px;
 	float: right;
 	font-family: verdana;
 	margin-top: 24px;

@@ -2,20 +2,29 @@
    --------------- */
 #Head {
 	background-color: #333;
+   padding: 0;
 }
 #Frame #Head h1 { padding: 0; }
 .SiteTitle a {
 	background: url('forum-logo.png') no-repeat 0 22px;
-	text-indent: -999em;
+   overflow: hidden;
+   line-height: 900px;
+   font-size: 0;
 	display: inline-block;
 	height: 50px;
 	width: 220px;
 }
+.SiteSearch {
+   bottom: -30px;
+}
+.BreadcrumbsWrapper {
+   border-bottom: 1px dashed #f0f0f0;
+   padding-bottom: 4px;
+   margin: 10px 0 10px;
+   font-size: 12px;
+}
 .SiteMenu {
    vertical-align: bottom;
-}
-#Head .SiteSearch {
-   bottom: -20px;
 }
 #Menu a:hover, #Menu li.NonTab a:hover, #Menu .Highlight, #Menu .Highlight a {
 	background-color: #fff;
@@ -147,13 +156,7 @@ ul.MessageList div.Meta span.Author img { background: none; }
     margin: 0 auto;
 }
 #Content {
-    width: 680px;
     margin: 0 0 40px;
-    float: left;
-}
-#Panel {
-    float: right;
-    width: 250px;
 }
 #Panel .BigButton {
     margin: 10px 0;
