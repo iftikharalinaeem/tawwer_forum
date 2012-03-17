@@ -25,6 +25,10 @@ div.Menu {
    text-align: right;
    padding-top: 10px;
    width: 981px;
+   margin: 0 auto;
+}
+#Head {
+   padding: 0;
 }
 div.SiteMenu {
    position: relative;
@@ -33,6 +37,7 @@ div.SiteMenu {
    background: #627AAD;
    border: 1px solid #1D4088;
    border-bottom: 0;
+   display: block;
 }
 div.SiteMenu a {
    display: inline-block;
@@ -59,7 +64,7 @@ div.SiteMenu a:hover {
    background: #fff;
    line-height: 11px;
    padding: 1px 0;
-   width: 300px;
+   width: 230px;
 }
 #Head form {
    float: none;
@@ -77,10 +82,11 @@ div.SiteMenu a:hover {
    color: #777;
    margin: 0 5px 0 0;
    padding: 0;
-   width: 268px;
+   width: 200px;
    border-radius: 0;
    -moz-border-radius: 0;
    -webkit-border-radius: 0;
+   border: none;
 }
 #Head form input.Button {
    border-radius: 0;
@@ -237,6 +243,9 @@ body.Profile ul.PanelInfo li a:hover,
 .MainMenu a.Bookmarked {
 	height: auto;
 	width: auto;
+   margin: 0;
+   text-indent: 0;
+   font-size: 11px;
 }
 .MainMenu a.Bookmarked { background-position: 8px -1192px; }
 .MainMenu a.Mine { background-position: 8px -1225px; }
@@ -400,7 +409,6 @@ div.ProfileInfo {
 div.ProfileInfo img {
    float: left;
    margin-right: 8px;
-   height: 50px;
 }
 div.ProfileInfo a {
    font-size: 11px;
@@ -677,6 +685,7 @@ div.MorePager a:hover {
 a.Loading:hover {
    text-decoration: none !important;
 }
+/*
 a.Bookmark,
 a.Bookmarking
 a.Bookmarked {
@@ -699,6 +708,7 @@ body.Discussion a.Bookmarking {
    top: 20px;
    right: 20px;
 }
+*/
 ul.Options li.Active strong,
 ul.Options li.Active strong:hover,
 ul.Options li.Parent strong {
