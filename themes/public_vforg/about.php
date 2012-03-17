@@ -5,5 +5,6 @@ $ThemeInfo['public_vforg'] = array(
    'Version' => '1.0.4',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'Archived' => TRUE
 );

@@ -18,5 +18,6 @@ $ThemeInfo['o8'] = array(
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
-   'Site' => 'meaninglessandshallow.vanillaforums.com'
+   'Site' => 'meaninglessandshallow.vanillaforums.com',
+   'Archived' => TRUE
 );
