@@ -18,5 +18,6 @@ $ThemeInfo['ForumAboutForums'] = array(
    'Author' => "Brendan Sera-Shriar",
    'AuthorEmail' => 'brendan@vanillaforums.com',
    'AuthorUrl' => 'http://brendanserashriar.com',
-   'Site' => 'forumaboutforums.vanillaforums.com'
+   'Site' => 'forumaboutforums.vanillaforums.com',
+   'Archived' => TRUE
 );
