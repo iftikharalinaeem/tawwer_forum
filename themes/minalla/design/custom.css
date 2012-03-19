@@ -20,7 +20,7 @@
 .SiteMenu { float: right; }
 
 
-/** Vanilla compatibility fixes **/
+/** Vanilla compatibility fixes for people with customized themes 
 .Menu,
 #Body { 
     width: 960px;
@@ -57,3 +57,4 @@ ul#Menu li a {
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
 }
+**/
