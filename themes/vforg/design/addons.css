@@ -1,9 +1,10 @@
-#Content {
+/*#Content {
    float: right;
 }
 #Panel {
    float: left;
 }
+*/
 body.add #Panel {
    display: block;
 }
@@ -96,7 +97,7 @@ div.Testing h3 {
    font-weight: normal;
 }
 #addons_addon_index #Content .Legal {
-   width: 656px;
+   width: 706px;
    float: left;
    background: #FEF7DF;
    padding: 12px;
@@ -427,10 +428,15 @@ ul.DataList li a:hover {
    color: #111;
    text-decoration: none;
 }
+/*
+BUG
 li.AddonRow div.Meta {
    clear: left;
 }
-
+*/
+body.Addons .SearchForm .Options {
+   float: none;
+}
 ul.DataList li div.Meta span span {
    color: #333;
    padding: 2px 4px;

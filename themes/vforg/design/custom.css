@@ -30,7 +30,9 @@ a {
 a:hover {
    color: #ff0084;
 }
-
+#Head {
+   padding: 0;
+}
 /* ---- General Styles ---- 
 #Content h1,
 #Content h2,
@@ -77,6 +79,9 @@ a.Button,
 }
 div#Content {
 	margin-bottom: 0;
+}
+#vforg_home_index #Content {
+   margin: 0;
 }
 /*div#Foot {
    color: #777;
@@ -180,7 +185,7 @@ a.BigButton,
 .BlueButton,
 .OrangeButton,
 .GreenButton,
-.VFMenu a {
+#Head .VFMenu a {
 	background: url("images/sprite-menu.png") 0 0 repeat-x;
 	display: inline-block;
 	overflow: hidden;
@@ -197,7 +202,7 @@ a.BigButton,
 	border: 1px solid #ce3601;
 }
 .OrangeButton:hover,
-.VFMenu a:hover {
+#Head .VFMenu a:hover {
 	background-position: 0 -40px;
 }
 .OrangeButton:focus,
@@ -205,7 +210,7 @@ body.Addons .VFMenu .Addons a,
 body.Pages .VFMenu .Documentation a,
 body#vforg_home_index .VFMenu .Home a,
 body.Vanilla .VFMenu .Community a,
-.VFMenu a:focus {
+#Head .VFMenu a:focus {
 	border: 1px solid #c5570d;
 	border-top: 1px solid #893907;
 	border-bottom: 1px solid #fdb45a;
@@ -215,7 +220,7 @@ body.Vanilla .VFMenu .Community a,
 }
 a.BigButton,
 .BlueButton,
-.VFMenu .Hosting a {
+#Head .VFMenu .Hosting a {
 	background-position: 0 -120px;
 	text-shadow: 0 1px 1px #111196;
 	color: #ffffff;
@@ -223,13 +228,13 @@ a.BigButton,
 }
 a.BigButton:hover,
 .BlueButton:hover,
-.VFMenu .Hosting a:hover {
+#Head .VFMenu .Hosting a:hover {
 	background-position: 0 -160px;
 	color: #fff;
 }
 a.BigButton:focus,
 .BlueButton:focus,
-.VFMenu .Hosting a:focus {
+#Head .VFMenu .Hosting a:focus {
 	background: url("images/sprite-menu.png") 0 -200px repeat-x !important;
 	border: 1px solid #045ECE;
 	border-top: 1px solid #0657b9;
@@ -246,18 +251,18 @@ a.BigButton {
 	display: block;
 }
 .GreenButton,
-.VFMenu .Download a {
+#Head .VFMenu .Download a {
 	background-position: 0 -240px;
 	text-shadow: 0 1px 1px #1d4909;
 	color: #ffffff;
 	border: 1px solid #237300;
 }
 .GreenButton:hover,
-.VFMenu .Download a:hover {
+#Head .VFMenu .Download a:hover {
 	background-position: 0 -280px;
 }
 .GreenButton:focus,
-.VFMenu .Download a:focus {
+#Head .VFMenu .Download a:focus {
 	border: 1px solid #237300;
 	border-top: 1px solid #1d4909;
 	border-bottom: 1px solid #7de702;
@@ -309,7 +314,7 @@ body.Info #Frame {
 .SubNav .Center {
 	position: relative;
 }
-.SubNav a {
+#Head .SubNav a {
 	font-size: 12px;
 	color: #999;
 	margin: 0 0 0 20px;
@@ -894,9 +899,12 @@ ul.SearchResults {
 ul.SearchResults li.Item {
 	padding: 8px;
 }
+/*
+clears cause breakage!
 .DataList .Meta {
    clear: left;
 }
+*/
 
 div.Preview  {
    border: 1px solid #EED3A2;
