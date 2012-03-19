@@ -425,23 +425,16 @@ a.ApplyButton {
 }
 
 /* Login Page */
-body.Entry #Content h1 {
-	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
-	color: #000;
-	font-size: 18px;
-	font-weight: bold;
-	padding: 0 0 6px;
-}
 body.Entry #Content {
 	position: relative;
 }
 .LoginHelp {
 	font-size: 13px;
 	padding: 10px;
-	position: absolute;
-	right: 10px;
 	text-align: left;
 	width: 300px;
+	position: absolute;
+	right: 10px;
 	z-index: 2;
 	margin-top: -180px;
 }
@@ -456,6 +449,7 @@ body#dashboard_entry_passwordreset #Content,
 body#dashboard_entry_password #Content,
 body#dashboard_entry_signin #Content,
 body#dashboard_entry_index #Content {
+   max-width: 640px;
     width: 640px;
     margin-bottom: 40px;
 }
@@ -474,11 +468,15 @@ body.Entry div.Entry div.MainForm {
 	border: 10px solid #f5f5f5;
 	border-width: 10px 340px 10px 10px;
 	background: #fafafa;
-	padding: 10px;
+	padding: 0 10px 10px;
 	-moz-border-radius: 4px;
 	box-shadow: 0 1px 2px #999;
 	-moz-box-shadow: 0 0 2px #999;
 	-webkit-box-shadow: 0 1px 2px #999;
+}
+#Form_User_Password .ForgotPassword {
+   display: block;
+   margin-left: 0;
 }
 body.Entry.register div.Box {
 	border-width: 10px;
@@ -527,7 +525,7 @@ div.Popup div.Body {
    -webkit-border-radius: 7px;
 }
 .Popup .Body {
-   border: 2px solid #27b1d9;
+   border: 2px solid #27b1d9 !important;
    border-radius: 6px;
    -moz-border-radius: 6px;
    -webkit-border-radius: 6px;
@@ -537,6 +535,7 @@ div.Popup div.Body {
    -moz-border-radius: 5px;
    -webkit-border-radius: 5px;
 }
+/*
 div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
    border: 1px solid #004487;
    border-radius: 4px 4px 0 0;
@@ -544,6 +543,10 @@ div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
    -webkit-border-radius: 4px 4px 0 0;
    background: url('images/bg-heading-tile.png') 0 -1px repeat-x #004d99;
    color: #FFFFFF;
+}
+*/
+div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
+   margin: 0 0 5px;
 }
 div.Popup div.MultipleEntryMethods h1 {
    padding: 5px 9px 4px;
@@ -636,4 +639,31 @@ body.filenotfound #Content {
    background: #96DAF9;
    border: 1px solid #057EEE;
    color: #195388;
+}
+
+.BreadcrumbWrap {
+    border-top: 1px solid #B9DDE8;
+    background: #F6F8FE;
+    border-bottom: 1px solid #ddd;
+    color: #999;
+    font-size: 11px;
+}
+
+.BreadcrumbWrap a {
+    color: #444;
+}
+
+.BreadcrumbWrap a:hover {
+   text-decoration: underline;
+}
+
+.Body {
+    border: none !important;
+}
+
+.Pager {
+   font-size: 14px;
+}
+#Content {
+    padding-bottom: 40px;
 }
