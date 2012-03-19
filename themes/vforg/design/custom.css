@@ -33,6 +33,9 @@ a:hover {
 #Head {
    padding: 0;
 }
+body.Pages #Content {
+   margin: 0;
+}
 /* ---- General Styles ---- 
 #Content h1,
 #Content h2,
