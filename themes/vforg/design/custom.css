@@ -274,18 +274,10 @@ a.BigButton {
 	color: #fff;
 }
 
+.Aside {
+   float: right;
+}
 
-div.Wrapper {
-   text-align: center;
-}
-div.Center {
-   text-align: left;
-   width: 960px;
-   margin: 0 auto;
-}
-#Head div.Center {
-   text-align: right;
-}
 #Head div.Logo {
 	margin: 6px 0 0 0;
    float: left;
@@ -313,14 +305,15 @@ body.Info #Frame {
 	background: #FEF7DF;
 	border-bottom: 1px solid #EED3A2;
 	padding: 6px 0;
+   color: #9C713A
 }
 .SubNav .Center {
 	position: relative;
 }
 #Head .SubNav a {
 	font-size: 12px;
-	color: #999;
-	margin: 0 0 0 20px;
+	color: #9C713A;
+	margin: 0;
 	font-weight: bold;
 }
 .SubNav a.Entry {
