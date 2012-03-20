@@ -55,11 +55,12 @@
 	-ms-transition: all .3s ease-in-out;
 	transition: all .3s ease-in-out;*/
 }
-
+/*
+This was causing text-decoration: underline to float above the text of the label in cartalk.
 .ReactLabel {
    vertical-align: top;
 }
-
+*/
 .Reactions .Count {
    border-radius: 6px;
    -moz-border-radius: 6px;
@@ -103,10 +104,12 @@
    -ms-transition: all .3s ease-in-out;
    transition: all .3s ease-in-out;
 }*/
-
+/*
+TOO DESTRUCTIVE FOR A PLUGIN!
 .Item:hover {
    background: #F0FAFF;
 }
+*/
 
 .Item:hover .Reactions a {
    opacity: .8;
@@ -188,6 +191,12 @@
    text-align: center;
    border: solid 2px transparent;
    padding: 4px;
+   margin: 0 4px;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   white-space: nowrap;
+   overflow: visible;
 }
 
 .Compact .Item .Author img {
@@ -211,7 +220,6 @@
 .CountItem.Selected {
     background: rgba(55, 173, 227, 0.1);
     border: solid 2px rgba(55, 173, 227, .2);
-    border-radius: 4px;
     padding: 4px
 }
 

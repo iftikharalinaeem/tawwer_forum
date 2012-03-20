@@ -11,6 +11,7 @@ $Session = Gdn::Session();
 </head>
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
 <div id="Head" class="Wrapper">
+   <div class="Row">
    <div class="Center">
       <div class="Logo">
          <a href="/"><i class="Sprite SpriteLogo"><span>Vanilla Forums</span></i></a>
@@ -25,8 +26,10 @@ $Session = Gdn::Session();
 			<div class="Download" title="Download the latest version of Vanilla."><?php echo Anchor('Download', '/download'); ?></div>
       </div>
 	</div>
+   </div>
 	<div class="Divider"></div>
 	<div class="SubNav Wrapper">
+   <div class="Row">
 		<div class="Center"><?php
 			// echo Anchor('Community Discussions', '/discussions', 'Home');
 			echo '&nbsp;';
@@ -41,12 +44,15 @@ $Session = Gdn::Session();
 			}
 			echo Anchor($Text, $Link, 'Entry');
 		?></div>
+   </div>
 	</div>
 </div>
 
    <div id="Frame">
       <div id="Body">
-         <div id="Content"><?php
+         <div class="Row">
+         <div id="Panel" class="Column PanelColumn"><?php $this->RenderAsset('Panel'); ?></div>
+         <div id="Content" class="Column ContentColumn"><?php
 			/*
 			if (in_array(strtolower($this->ControllerName), array('discussionscontroller', 'categoriescontroller'))) {
 				echo '<div class="SearchForm">';
@@ -62,11 +68,12 @@ $Session = Gdn::Session();
 			*/
 			$this->RenderAsset('Content');
 			?></div>
-         <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
+         </div>
       </div>
    </div>
 
 <div id="Foot" class="Foot Wrapper">
+   <div class="Row">
 	<div class="Center">
       <?php
       // echo Anchor('Addons', '/addons');
@@ -75,6 +82,7 @@ $Session = Gdn::Session();
 		$this->RenderAsset('Foot');
       ?>
 	</div>
+   </div>
 </div>
 <?php $this->FireEvent('AfterBody'); ?>
 </body>

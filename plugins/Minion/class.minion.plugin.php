@@ -3,15 +3,16 @@
 /**
  * Minion Plugin
  * 
- * This plugin creates a 'minion' that performs certain administrative tasks in
- * a public way.
+ * This plugin creates a 'minion' that performs certain administrative tasks
+ * automatically.
  * 
  * Changes: 
  *  1.0     Release
  *  1.0.1   Fix data tracking issues
  *  1.0.2   Fix typo bug
+ *  1.0.4   Only flag people when fingerprint checking is on
  * 
- *  1.1     Only ban newer accounts
+ *  1.1     Only autoban newer accounts than existing banned ones
  *  1.2     Prevent people from posting autoplay embeds
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
@@ -22,8 +23,8 @@
 
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
-   'Description' => "Creates a 'minion' that performs adminstrative tasks publicly.",
-   'Version' => '1.0.2',
+   'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
+   'Version' => '1.0.4',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -96,6 +97,8 @@ class MinionPlugin extends Gdn_Plugin {
     * @param PostController $Sender 
     */
    protected function CheckFingerprintBan($Sender) {
+      if (!C('Plugins.Minion.Features.Fingerprint', TRUE)) return;
+      
       if (!Gdn::Session()->IsValid()) return;
       $FlagMeta = $this->GetUserMeta(Gdn::Session()->UserID, "FingerprintCheck", FALSE);
       
@@ -111,7 +114,7 @@ class MinionPlugin extends Gdn_Plugin {
     * @param PostController $Sender 
     */
    protected function CheckAutoplay($Sender) {
-      if (!C('Plugin.Minion.Features.Autoplay', TRUE)) return;
+      if (!C('Plugins.Minion.Features.Autoplay', TRUE)) return;
       
       // Admins can do whatever they want
       if (Gdn::Session()->CheckPermission('Garden.Settings.Manage')) return;
@@ -338,7 +341,7 @@ USER BANNED
       
       $Sender->SetData('ActivityUpdate', TRUE);
       
-      $HitChance = mt_rand(1,370);
+      $HitChance = mt_rand(1,400);
       if ($HitChance != 1)
          return;
       
@@ -355,7 +358,9 @@ USER BANNED
          'ALLOCATING ADDITIONAL COMPUTATION NODES',
          'ENFORCING LIST INTEGRITY WITH AGGRESSIVE PRUNING',
          'SLEEP MODE',
-         'UNDERGOING SCHEDULED MAINTENANCE'
+         'UNDERGOING SCHEDULED MAINTENANCE',
+         'PC LOAD LETTER',
+         'TRIMMING PRIVATE KEYS'
       );
       
       $QuoteLength = sizeof($QuotesArray);

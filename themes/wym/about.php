@@ -17,5 +17,6 @@ $ThemeInfo['default'] = array(
    'Version' => APPLICATION_VERSION,
    'Author' => "Jonatan Lundin",
    'AuthorEmail' => 'jonatan.lundin@gmail.com',
-   'AuthorUrl' => 'http://www.wymeditor.org'
+   'AuthorUrl' => 'http://www.wymeditor.org',
+   'Archived' => TRUE
 );

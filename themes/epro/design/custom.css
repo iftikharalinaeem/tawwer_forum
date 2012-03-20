@@ -135,6 +135,7 @@ div.Popup h2 {
 	margin: 0 280px 0 10px;
 }
 #Panel {
+   width: 250px;
 	float: right;
 	margin-right: 10px;
 }

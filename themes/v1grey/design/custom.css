@@ -4,9 +4,6 @@ body {
    color: #CCCCCC;
 }
 a,
-a:link,
-a:visited,
-a:active,
 ul.Activities div.Excerpt a,
 ul.Activities div.Meta a {
    text-decoration: none;
@@ -40,6 +37,7 @@ body.Profile #Content,
    width: auto;
 }
 #Head {
+   padding: 0;
    background: url('waves.dark.gif') top left repeat-x #333;
 }
 #Head h1 a:hover span,
@@ -52,6 +50,8 @@ div.Menu {
 	position: inherit;
 }
 body #Head h1 {
+   font-size: 185%;
+   margin: 0;
    padding: 10px 0;
    float: none;
 }
@@ -81,6 +81,7 @@ ul#Menu {
    -moz-border-radius-topright: 2px;
    -webkit-border-top-left-radius: 2px;
    -webkit-border-top-right-radius: 2px;
+   font-size: 11px;
 }
 body.Discussions #Menu li.DiscussionsTab a,
 body.Activity #Menu li.ActivityTab a,
@@ -126,6 +127,9 @@ ul.DataList li.Item {
    background: url("new-post.gif") repeat-x center top #494949;
    border: 0;
    margin-bottom: 2px;
+}
+.DataList .Item:first-child {
+   border: none;
 }
 ul.DataList div.Meta a {
     color:#ddd;
@@ -277,7 +281,7 @@ ul.PanelInfo li.Active a {
    color: #fff;
 }
 #Panel input.InputBox, div.AddPeople textarea.MultiComplete {
-   width:180px;
+   width:160px;
    margin-right: 4px;
    border: 0;
    font-size: 12px;
@@ -336,13 +340,13 @@ ul.DataList div.Excerpt a {
 }
 a.Bookmark,
 a.Bookmarking {
-   background: url('star_sprite.png') top center no-repeat;
+   background: url('star_sprite.png') top center no-repeat !important;
 }
 a.Bookmarked {
-   background: url('star_sprite.png') center center no-repeat;
+   background: url('star_sprite.png') center center no-repeat !important;
 }
 a.Bookmarking {
-   background: url('star_sprite.png') bottom center no-repeat;
+   background: url('star_sprite.png') bottom center no-repeat !important;
 }
 .OptionsMenu .MenuItems {
    right: 0;
@@ -382,11 +386,7 @@ ul.MessageList div.Message pre {
 
 /* Profile Page */
 form.Activity {
-   text-align: left;
-   padding: 10px 0 0 6px;
-}
-form.Activity textarea {
-   width: 98%;
+   margin: 0;
 }
 body.Profile ul.Activities {
    border: 0;
@@ -419,9 +419,7 @@ body.Entry #Content h1,
    width: 99%;
 }
 body.Entry #Content div.Box,
-#MessageForm,
-#DiscussionForm form,
-#ConversationForm form {
+#MessageForm {
    border: 0;
    background: #666;
 }
@@ -481,12 +479,14 @@ div.AddPeople form div {
 div.Border {
 	background: none repeat scroll 0 0 rgba(200, 200, 200, 0.7);
 }
+/*
 div.Connect h1, div.Connect h2,
 div.Popup h1, div.Popup h2 {
    background: #333;
    border-bottom: 1px solid #222;
    color:#ccc;
 }
+*/
 div.Popup div.Footer,
 div.Popup div.Body,
 div.Popup div.Body form ul li label {

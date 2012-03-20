@@ -111,7 +111,7 @@ class SpoofPlugin implements Gdn_IPlugin {
 			// if (1 == 1) {
          if (is_object($UserData) && $UserData->Admin) {
 				if (is_numeric($UserReference)) {
-					$SpoofUser = $UserModel->Get($UserReference);
+					$SpoofUser = $UserModel->GetID($UserReference);
 				} else {
 				   $SpoofUser = $UserModel->GetByUsername($UserReference);
 				}

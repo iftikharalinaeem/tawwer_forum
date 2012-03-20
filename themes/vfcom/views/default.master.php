@@ -2,8 +2,8 @@
 echo '<?xml version="1.0" encoding="utf-8"?>';
 $Session = Gdn::Session();
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-ca">
+<!DOCTYPE html>
+<html>
 <head>
    <?php $this->RenderAsset('Head'); ?>
    <meta name="google-site-verification" content="T7dDWEaTeqt989RCxDJTfoOkbOADnRWLLJTauXxMHVA" />
@@ -53,12 +53,21 @@ $Session = Gdn::Session();
 	</div>
 </div>
 <div class="Divider"></div>
-<div class="Body">
+<div class="BreadcrumbWrap">
 	<div class="Wrapper">
       <div class="InnerWrapper">
-         <div class="Center">
-            <div id="Panel"><?php $this->RenderAsset('Panel'); ?></div>
-            <div id="Content"><?php
+         <div class="Row Center">
+            <?php echo Gdn_Theme::Breadcrumbs($this->Data('Breadcrumbs')); ?>
+         </div>
+      </div>
+   </div>
+</div>
+<div class="Body" id="Body">
+	<div class="Wrapper">
+      <div class="InnerWrapper">
+         <div class="Row Center">
+            <div id="Panel" class="Column PanelColumn""><?php $this->RenderAsset('Panel'); ?></div>
+            <div id="Content" class="Column ContentColumn"><?php
             if (in_array(strtolower($this->ControllerName), array('discussionscontroller', 'categoriescontroller'))) {
                echo '<div class="SearchForm">';
                $Form = Gdn::Factory('Form');
@@ -78,7 +87,7 @@ $Session = Gdn::Session();
 </div>
 <div class="Foot">
 	<div class="Wrapper">
-		<div class="Center">
+		<div class="Center Row">
          <div class="Columns">
             <div class="Column4">
                <strong>About Us</strong>

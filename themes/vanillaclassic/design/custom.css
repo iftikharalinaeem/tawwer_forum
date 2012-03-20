@@ -3,12 +3,8 @@ body {
    background: #fff;
 }
 a,
-a:link,
-a:visited,
-a:active,
 ul.Activities div.Excerpt a,
 ul.Activities div.Meta a {
-   text-decoration: underline;
 	color:#3354AA;
 }
 a.Dismiss {
@@ -54,6 +50,7 @@ body.Profile #Content,
    background: url('waves.blue.gif') top left repeat-x;
 	border-top:1px solid #ACBEDF;
 	border-bottom:1px solid #ACBEDF;
+   padding: 0;
 }
 #Head h1 a:hover,
 #Head h1 a,

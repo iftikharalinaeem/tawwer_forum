@@ -224,7 +224,7 @@ class WhosOnlinePlugin extends Gdn_Plugin {
 
          if (isset($Cache[$Names[$Active]]))
             return $Cache[$Names[$Active]];
-         elseif (count($Cache) > 0) {
+         elseif (is_array($Cache) && count($Cache) > 0) {
             // Maybe the key expired, but the other key is still there.
             return array_pop($Cache);
          }

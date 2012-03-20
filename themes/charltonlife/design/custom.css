@@ -345,6 +345,7 @@ div.Preview div.Message, ul.MessageList div.Message {
 	 float: none;
 }
 #Panel {
+   width: 250px;
    float: left;
    padding: 0 20px;
 /*	 float: none;

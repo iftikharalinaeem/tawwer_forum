@@ -29,7 +29,8 @@
 		{if !$User.SignedIn}
 			<a href="{link path="entry/register"}">Create an Account</a>
 		{/if}
-    </div></div>
+    </div>
+   </div>
         
    <div class="navigation">
        <table border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -41,34 +42,33 @@
          </tr>
        </table> 
    </div>
-
-   </div></div>
-
- <div id="Frame">
+   </div>
+  </div>
+    <div id="Frame">
   <div id="Body">
-   <div id="Content">
+    <div class="Row">
+      <div class="BreadcrumbsWrapper">{breadcrumbs}</div>
+      <div class="Column PanelColumn" id="Panel">
+         {module name="MeModule"}
+         {asset name="Panel"}
+      </div>
+      <div class="Column ContentColumn" id="Content">
+
       {if $Discussions}
       <div class="SearchForm">{searchbox}</div>
       {/if}
-      {asset name="Content"}
-   </div>
-   <div id="Panel">{asset name="Panel"}</div>
+         {asset name="Content"}
+      </div>
+    </div>
   </div>
   <div id="Foot">
-  <div><a href=http://www.ntfs.com><span>NTFS 2010</span></a></div>
-  {asset name="Foot"}
- </div></div>
+    <div class="Row">
+      <a href="{vanillaurl}" class="PoweredByVanilla">Powered by Vanilla</a>
+      <a href=http://www.ntfs.com><span>NTFS 2010</span></a>
+      {asset name="Foot"}
+    </div>
+  </div>
+</div>
+{event name="AfterBody"}
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-

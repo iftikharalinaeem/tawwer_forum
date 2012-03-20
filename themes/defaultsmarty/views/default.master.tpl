@@ -23,7 +23,6 @@
     </div>
   </div>
   <div id="Body">
-    <div class="P">{breadcrumbs}</div>
     <div id="Content">
       {asset name="Content"}
     </div>

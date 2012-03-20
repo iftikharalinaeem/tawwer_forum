@@ -14,15 +14,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $ThemeInfo['iVanilla'] = array(
    'Name' => "iVanilla",
    'Description' => "An Apple-inspired theme.",
-   'Version' => '2.0',
-   'Author' => "Matt Lincoln Russell",
-   'AuthorEmail' => 'lincoln@vanillaforums.com',
-   'AuthorUrl' => 'http://lincolnwebs.com',
+   'Version' => '3.0',
+   'Author' => "Mark O'Sullivan",
+   'AuthorEmail' => 'mark@vanillaforums.com',
+   'AuthorUrl' => 'http://markosullivan.ca',
    'Options' => array(
 		'Description' => 'iVanilla has 2 background options.',
       'Styles' => array(
          'Default ' => '%s',
          'Leopard' => '%s_leopard'
       ),
-   )
+   ),
+   'Archived' => TRUE
 );
