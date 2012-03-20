@@ -72,17 +72,17 @@ jQuery(document).ready(function($) {
       echo '<div class="StatBoxes">';
       
       // Follows
-		$Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
-      $CssClass2 = $Discussion->Bookmarked ? ' Bookmarked' : '';
-		if ($Session->IsValid()) {
-			echo Anchor(
-				Wrap(T('Follows'), 'div', array('class' => 'Stats-Label')) . Wrap(Gdn_Format::BigNumber($Discussion->CountBookmarks, 'html'), 'div', array('class' => 'Stats-Number CountBookmarks')),
-				'/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
-				'StatBox Bookmark'.$CssClass2,
-				array('title' => $Title));
-		} else {
-			echo ''; //Wrap(Wrap(T('Follows')) . Wrap($Discussion->CountBookmarks, 'div', array('class' => 'CountBookmarks')), 'div', array('class' => 'StatBox FollowsBox'));
-		}
+//		$Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
+//      $CssClass2 = $Discussion->Bookmarked ? ' Bookmarked' : '';
+//		if ($Session->IsValid()) {
+//			echo Anchor(
+//				Wrap(T('Follows'), 'div', array('class' => 'Stats-Label')) . Wrap(Gdn_Format::BigNumber($Discussion->CountBookmarks, 'html'), 'div', array('class' => 'Stats-Number CountBookmarks')),
+//				'/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
+//				'StatBox Bookmark'.$CssClass2,
+//				array('title' => $Title));
+//		} else {
+//			echo ''; //Wrap(Wrap(T('Follows')) . Wrap($Discussion->CountBookmarks, 'div', array('class' => 'CountBookmarks')), 'div', array('class' => 'StatBox FollowsBox'));
+//		}
       
 		// Views
 		echo Wrap(
