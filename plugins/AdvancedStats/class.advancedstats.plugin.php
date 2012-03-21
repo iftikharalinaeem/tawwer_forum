@@ -116,9 +116,11 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
          $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
          $Version = GetValue('Version', Gdn::PluginManager()->GetPluginInfo('AdvancedStats'));
          
-         if ($AnalyticsServer == 'http://analytics.vanillaforums.com')
-            $Url = "http://autostatic.cl1.vanilladev.com/analytics.vanillaforums.com/applications/vanillastats/js/track.min.js?v=$Version";
-         else
+         
+         
+         if ($AnalyticsServer == 'http://analytics.vanillaforums.com') {            
+            $Url = "http://autostatic-cl1.vanilladev.com/analytics.vanillaforums.com/applications/vanillastats/js/track.min.js?v=$Version";
+         } else
             $Url = $AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version;
          
          $Sender->AddJsFile($Url, '', array('defer' => 'defer'));
