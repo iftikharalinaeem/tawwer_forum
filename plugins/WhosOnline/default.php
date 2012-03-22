@@ -4,7 +4,7 @@
 $PluginInfo['WhosOnline'] = array(
    'Name' => 'Who&rsquo;s Online',
    'Description' => "Adds a list of users currently browsing your site to the sidebar.",
-   'Version' => '1.4',
+   'Version' => '1.4.5',
    'Author' => "Gary Mardell",
    'AuthorEmail' => 'gary@vanillaplugins.com',
    'AuthorUrl' => 'http://vanillaplugins.com',
@@ -313,6 +313,14 @@ class WhosOnlinePlugin extends Gdn_Plugin {
       $Sql = "insert {$Px}Whosonline (UserID, Timestamp, Invisible) values ({$Session->UserID}, :Timestamp, :Invisible) on duplicate key update Timestamp = :Timestamp1, Invisible = :Invisible1";
       $Sender->SQL->Database->Query($Sql, array(':Timestamp' => $Timestamp, ':Invisible' => $Invisible, ':Timestamp1' => $Timestamp, ':Invisible1' => $Invisible));
 
+      
+      // Do some cleanup of old entries.
+      $Frequency = C('WhosOnline.Frequency', 60);
+		$History = time() - 6 * $Frequency; // give bit of buffer
+      
+      $Sql = "delete from {$Px}Whosonline where Timestamp < :Timestamp limit 10";
+      $Sender->SQL->Database->Query($Sql, array(':Timestamp' => Gdn_Format::ToDateTime($History)));
+      
       //			$SQL->Replace('Whosonline', array(
       //				'UserID' => $Session->UserID,
       //				'Timestamp' => Gdn_Format::ToDateTime(),
