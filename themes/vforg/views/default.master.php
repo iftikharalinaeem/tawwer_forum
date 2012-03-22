@@ -30,19 +30,24 @@ $Session = Gdn::Session();
 	<div class="Divider"></div>
 	<div class="SubNav Wrapper">
    <div class="Row">
-		<div class="Center"><?php
-			// echo Anchor('Community Discussions', '/discussions', 'Home');
-			echo '&nbsp;';
-			echo Gdn_Theme::Link('dashboard');
-         echo Gdn_Theme::Link('activity', 'Activity', '<a href="%url" class="Activity">Activity</a>');
-			echo Gdn_Theme::Link('profile', 'Profile', '<a href="%url" class="Profile">Profile</a>');
+      <?php echo Gdn_Theme::Breadcrumbs(Gdn::Controller()->Data('Breadcrumbs', array())); ?>
+		<div class="Aside"><?php
+       	// echo Anchor('Community Discussions', '/discussions', 'Home');
+         $Links = array();
+      
+      
+			$Links[] = Gdn_Theme::Link('dashboard');
+         $Links[] = Gdn_Theme::Link('activity', 'Activity', '<a href="%url" class="Activity">Activity</a>');
+			$Links[] = Gdn_Theme::Link('profile', 'Profile', '<a href="%url" class="Profile">Profile</a>');
 			$Text = 'Sign In';
 			$Link = SignInUrl();
 			if ($Session->IsValid()) {
 				$Text = 'Sign Out';
 				$Link = SignOutUrl();
 			}
-			echo Anchor($Text, $Link, 'Entry');
+			$Links[] = Anchor($Text, $Link, 'Entry');
+         $Links = array_filter($Links, 'trim');
+         echo implode(' <span class="Bullet">•</span> ', $Links);
 		?></div>
    </div>
 	</div>
