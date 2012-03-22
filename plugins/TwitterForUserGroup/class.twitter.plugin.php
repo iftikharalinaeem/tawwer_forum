@@ -11,8 +11,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['Twitter'] = array(
    'Name' => 'Twitter',
-   'Description' => 'This plugin provides the capability to deploy a twitter feed box to the forum proper.',
-   'Version' => '1.0',
+   'Description' => 'This plugin provides the capability to deploy a twitter feed box to the forum panel.',
+   'Version' => '1.1',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -46,7 +46,7 @@ new TWTR.Widget({
   type: 'profile',
   rpp: {$NumTweets},
   interval: 6000,
-  width: 250,
+  width: '100%',
   height: 300,
   theme: {
     shell: {
@@ -85,25 +85,17 @@ TWITCODE;
    }
    
    public function PluginController_Twitter_Create($Sender) {
-      $Sender->Permission('Garden.AdminUser.Only');
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Twitter Plugin Settings');
       $Sender->AddSideMenu('plugin/twitter');
       $Sender->Form = new Gdn_Form();
-      $this->Dispatch($Sender, $Sender->RequestArgs);
-   }
-   
-   public function Controller_Index(&$Sender) {
-      //$Sender->AddCssFile($this->GetWebResource('css/twitter.css'));
       $Sender->AddCssFile('admin.css');
       
-      $TwitterUsername = C('Vanilla.Plugin.Username', 'vanilla');
+      $TwitterUsername = C('Plugin.Twitter.Username', 'vanilla');
       
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      
-      $ConfigArray = array(
-         'Plugin.Twitter.Username'
-      );
+      $ConfigArray = array('Plugin.Twitter.Username');
       if ($Sender->Form->AuthenticatedPostBack() === FALSE)
          $ConfigArray['Plugin.Twitter.Username'] = $TwitterUsername;
       
