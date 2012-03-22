@@ -54,8 +54,15 @@ class CustomThemePlugin implements Gdn_IPlugin {
 	private function _CanCustomizeTheme() {
 		$ThemeManager = new Gdn_ThemeManager();
 		$ThemeInfo = $ThemeManager->EnabledThemeInfo();
-		// Make sure the current theme uses a smarty master template instead of php
-		return file_exists(PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '').'/views/default.master.tpl');
+      $Folder = GetValue('Folder', $ThemeInfo, '');
+      
+		// Current theme uses a Smarty master template instead of PHP
+		if (file_exists(PATH_THEMES.'/'.$Folder.'/views/default.master.tpl'))
+         return TRUE;
+      
+      // Using new baseline theme
+      if ($Folder == 'default' && file_exists(PATH_APPLICATIONS.'/dashboard/views/default.master.tpl'))
+         return TRUE;
 	}
 	
 	/**
@@ -278,6 +285,8 @@ Here are some things you should know before you begin:
 			$HtmlContents = '';
 			if (file_exists($Folder . DS . 'views' . DS . 'default.master.tpl'))
 				$HtmlContents = file_get_contents ($Folder . DS . 'views' . DS . 'default.master.tpl');
+			elseif ($CurrentThemeFolder == 'default' && file_exists(PATH_APPLICATIONS . DS . 'dashboard' . DS. 'views' . DS . 'default.master.tpl'))
+			   $HtmlContents = file_get_contents (PATH_APPLICATIONS . DS . 'dashboard' . DS . 'views' . DS . 'default.master.tpl');
 		}
 			
 		// If viewing the form for the first time
