@@ -19,21 +19,6 @@ class WhosOnlineModule extends Gdn_Module {
       $Invisible = GetValue('Plugin.WhosOnline.Invisible', $Invisible);
 		$Invisible = ($Invisible ? 1 : 0);
 
-		if ($Session->UserID) {
-         $Timestamp = Gdn_Format::ToDateTime();
-         
-         $Px = $SQL->Database->DatabasePrefix;
-         $Sql = "insert {$Px}Whosonline (UserID, Timestamp, Invisible) values ({$Session->UserID}, :Timestamp, :Invisible) on duplicate key update Timestamp = :Timestamp1, Invisible = :Invisible1";
-         $SQL->Database->Query($Sql, array(':Timestamp' => $Timestamp, ':Invisible' => $Invisible, ':Timestamp1' => $Timestamp, ':Invisible1' => $Invisible));
-         
-//			$SQL->Replace('Whosonline', array(
-//				'UserID' => $Session->UserID,
-//				'Timestamp' => Gdn_Format::ToDateTime(),
-//				'Invisible' => $Invisible),
-//				array('UserID' => $Session->UserID)
-//			);
-      }
-
 		$Frequency = C('WhosOnline.Frequency', 60);
 		$History = time() - 2 * $Frequency; // give bit of buffer
       

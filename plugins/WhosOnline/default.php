@@ -294,4 +294,30 @@ class WhosOnlinePlugin extends Gdn_Plugin {
          }
       }
    }
+   
+   /**
+    * @param UserModel $Sender
+    * @return type 
+    */
+   public function UserModel_UpdateVisit_Handler($Sender) {
+      $Session = Gdn::Session();
+      if (!$Session->UserID)
+         return;
+      
+      $Invisible = Gdn::UserMetaModel()->GetUserMeta($Session->UserID, 'Plugin.WhosOnline.Invisible', FALSE);
+      $Invisible = GetValue('Plugin.WhosOnline.Invisible', $Invisible);
+		$Invisible = ($Invisible ? 1 : 0);
+      
+      $Timestamp = Gdn_Format::ToDateTime();
+      $Px = $Sender->SQL->Database->DatabasePrefix;
+      $Sql = "insert {$Px}Whosonline (UserID, Timestamp, Invisible) values ({$Session->UserID}, :Timestamp, :Invisible) on duplicate key update Timestamp = :Timestamp1, Invisible = :Invisible1";
+      $Sender->SQL->Database->Query($Sql, array(':Timestamp' => $Timestamp, ':Invisible' => $Invisible, ':Timestamp1' => $Timestamp, ':Invisible1' => $Invisible));
+
+      //			$SQL->Replace('Whosonline', array(
+      //				'UserID' => $Session->UserID,
+      //				'Timestamp' => Gdn_Format::ToDateTime(),
+      //				'Invisible' => $Invisible),
+      //				array('UserID' => $Session->UserID)
+      //			);
+   }
 }
