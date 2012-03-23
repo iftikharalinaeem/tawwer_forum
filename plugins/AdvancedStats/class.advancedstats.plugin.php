@@ -8,7 +8,7 @@
 $PluginInfo['AdvancedStats'] = array(
    'Name' => 'Advanced Stats',
    'Description' => "Track and access advanced statistics to better monitor the health of your site.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -117,7 +117,7 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
          $Version = GetValue('Version', Gdn::PluginManager()->GetPluginInfo('AdvancedStats'));
          
          if ($AnalyticsServer == 'http://analytics.vanillaforums.com')
-            $Url = "http://autostatic.cl1.vanilladev.com/analytics.vanillaforums.com/applications/vanillastats/js/track.min.js?v=$Version";
+            $Url = "http://autostatic-cl1.vanilladev.com/analytics.vanillaforums.com/applications/vanillastats/js/track.min.js?v=$Version";
          else
             $Url = $AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version;
          
