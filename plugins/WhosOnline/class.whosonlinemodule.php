@@ -36,7 +36,6 @@ class WhosOnlineModule extends Gdn_Module {
          $Data = Gdn_DataSet::Index($Data, 'UserID');
          Gdn::Cache()->Store('WhosOnline', $Data, array(Gdn_Cache::FEATURE_EXPIRY => $Frequency));
       }
-      $Data = array();
       // Make sure the current user is shown as online.
       if ($Session->UserID && !isset($Data[$UserID])) {
          $Data[$Session->UserID] = array(
