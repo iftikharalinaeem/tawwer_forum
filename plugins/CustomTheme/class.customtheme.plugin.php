@@ -6,7 +6,7 @@
 $PluginInfo['CustomTheme'] = array(
    'Name' => 'Custom Theme',
    'Description' => 'Allows administrators to customize the CSS & master HTML template of the currently enabled theme.',
-   'Version' => '2.1.1',
+   'Version' => '2.1.2',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
@@ -54,8 +54,9 @@ class CustomThemePlugin implements Gdn_IPlugin {
 	private function _CanCustomizeTheme() {
 		$ThemeManager = new Gdn_ThemeManager();
 		$ThemeInfo = $ThemeManager->EnabledThemeInfo();
+      
 		// Make sure the current theme uses a smarty master template instead of php
-		return file_exists(PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '').'/views/default.master.tpl');
+		return $ThemeInfo['Index'] == 'default' || file_exists(PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '').'/views/default.master.tpl');
 	}
 	
 	/**
@@ -278,6 +279,8 @@ Here are some things you should know before you begin:
 			$HtmlContents = '';
 			if (file_exists($Folder . DS . 'views' . DS . 'default.master.tpl'))
 				$HtmlContents = file_get_contents ($Folder . DS . 'views' . DS . 'default.master.tpl');
+         else
+            $HtmlContents = file_get_contents(PATH_APPLICATIONS.'/dashboard/views/default.master.tpl');
 		}
 			
 		// If viewing the form for the first time
