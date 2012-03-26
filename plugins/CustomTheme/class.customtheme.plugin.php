@@ -6,7 +6,7 @@
 $PluginInfo['CustomTheme'] = array(
    'Name' => 'Custom Theme',
    'Description' => 'Allows administrators to customize the CSS & master HTML template of the currently enabled theme.',
-   'Version' => '2.1.1',
+   'Version' => '2.1.3',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
@@ -14,6 +14,22 @@ $PluginInfo['CustomTheme'] = array(
 );
 
 class CustomThemePlugin implements Gdn_IPlugin {
+   
+   public static function GetRevisionID($Key) {
+      if (StringEndsWith($Key, 'ID'))
+         $Value = C("Plugins.CustomTheme.$Key", '0');
+      else
+         $Value = $Key;
+      
+      $Parts = explode('_', $Value, 2);
+      return $Parts[0];
+   }
+   
+   public static function SetRevisionID($RevisionID, $Time) {
+      return $RevisionID.'_'.str_replace(array(' ', ':'), '-', $Time);
+   }
+   
+   /// Event Handlers ///
    
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
 		if (!$this->_CanCustomizeTheme())
@@ -54,15 +70,9 @@ class CustomThemePlugin implements Gdn_IPlugin {
 	private function _CanCustomizeTheme() {
 		$ThemeManager = new Gdn_ThemeManager();
 		$ThemeInfo = $ThemeManager->EnabledThemeInfo();
-      $Folder = GetValue('Folder', $ThemeInfo, '');
       
-		// Current theme uses a Smarty master template instead of PHP
-		if (file_exists(PATH_THEMES.'/'.$Folder.'/views/default.master.tpl'))
-         return TRUE;
-      
-      // Using new baseline theme
-      if ($Folder == 'default' && file_exists(PATH_APPLICATIONS.'/dashboard/views/default.master.tpl'))
-         return TRUE;
+		// Make sure the current theme uses a smarty master template instead of php
+		return $ThemeInfo['Index'] == 'default' || file_exists(PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '').'/views/default.master.tpl');
 	}
 	
 	/**
@@ -159,6 +169,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		
 		// Note: the _css and _tpl is because PHP replaces url dots with underscores automatically.
 		$Revision = str_replace(array('default_master_', 'rev_', 'custom_', '.css', '.tpl', '_css', '_tpl'), array('', '', '', '', '', '', ''), $FileName);
+      $Revision = self::GetRevisionID($Revision);
 		return is_numeric($Revision) ? $Revision : $Default;
 	}
 	
@@ -226,8 +237,8 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$PreviewCSSFile = C('Plugins.CustomTheme.PreviewCSS', 'custom_0.css');
 		$PreviewHtmlFile = C('Plugins.CustomTheme.PreviewHtml', 'custom_0.tpl');
 		// This is the new method:
-		$LiveRevisionID = C('Plugins.CustomTheme.LiveRevisionID', 0);
-		$WorkingRevisionID = C('Plugins.CustomTheme.WorkingRevisionID', 0);
+		$LiveRevisionID = self::GetRevisionID('LiveRevisionID');      
+		$WorkingRevisionID = self::GetRevisionID('WorkingRevisionID');
 		
 		// Are we switching back to a previous revision (css OR html)?
 		if (!$Sender->Form->AuthenticatedPostBack()) {
@@ -250,6 +261,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			$CSSContents = $ThemeData->CSS;
 			$IncludeThemeCSS = $ThemeData->IncludeThemeCSS;
          $Label = $ThemeData->Label;
+         $SaveWorkingRevisionID = self::SetRevisionID($WorkingRevisionID, $ThemeData->DateInserted);
 		} else {
 			$IncludeThemeCSS = 'Yes';
 			$CSSContents = '';
@@ -285,8 +297,8 @@ Here are some things you should know before you begin:
 			$HtmlContents = '';
 			if (file_exists($Folder . DS . 'views' . DS . 'default.master.tpl'))
 				$HtmlContents = file_get_contents ($Folder . DS . 'views' . DS . 'default.master.tpl');
-			elseif ($CurrentThemeFolder == 'default' && file_exists(PATH_APPLICATIONS . DS . 'dashboard' . DS. 'views' . DS . 'default.master.tpl'))
-			   $HtmlContents = file_get_contents (PATH_APPLICATIONS . DS . 'dashboard' . DS . 'views' . DS . 'default.master.tpl');
+         else
+            $HtmlContents = file_get_contents(PATH_APPLICATIONS.'/dashboard/views/default.master.tpl');
 		}
 			
 		// If viewing the form for the first time
@@ -315,16 +327,29 @@ Here are some things you should know before you begin:
 			$NewIncludeThemeCSS = $Sender->Form->GetFormValue('IncludeThemeCSS', 'Yes');
 			$SmartyCompileError = FALSE;
 			if ($CSSContents != $NewCSS || $HtmlContents != $NewHtml || $IncludeThemeCSS != $NewIncludeThemeCSS) {
-				$WorkingRevisionID = Gdn::SQL()->Insert('CustomThemeRevision', array(
-					'ThemeName' => C('Garden.Theme'),
-					'Html' => $NewHtml,
-					'CSS' => $NewCSS,
-               'Label' => $NewLabel,
-					'IncludeThemeCSS' => $NewIncludeThemeCSS,
-					'InsertUserID' => $Session->UserID,
-					'DateInserted' => Gdn_Format::ToDateTime()
-				));
-				SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', $WorkingRevisionID);
+            $Set = array(
+                  'ThemeName' => C('Garden.Theme'),
+                  'Html' => $NewHtml,
+                  'CSS' => $NewCSS,
+                  'Label' => $NewLabel,
+                  'IncludeThemeCSS' => $NewIncludeThemeCSS,
+                  'InsertUserID' => $Session->UserID,
+                  'DateInserted' => Gdn_Format::ToDateTime(),
+                  'Live' => 2
+               );
+
+            // Look for an existing working revision.
+            $WorkingRow = Gdn::SQL()->GetWhere('CustomThemeRevision', 
+               array('ThemeName' => C('Garden.Theme'), 'Live' => 2))->FirstRow(DATASET_TYPE_ARRAY);
+            
+            if ($WorkingRow) {
+               $WorkingRevisionID = $WorkingRow['RevisionID'];
+               Gdn::SQL()->Put('CustomThemeRevision', $Set, array('RevisionID' => $WorkingRevisionID));
+            } else {
+               $WorkingRevisionID = Gdn::SQL()->Insert('CustomThemeRevision', $Set);
+            }
+            $SaveWorkingRevisionID = self::SetRevisionID($WorkingRevisionID, $Set['DateInserted']);
+				SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', $SaveWorkingRevisionID);
 				SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', $NewIncludeThemeCSS);
 			} elseif ($NewLabel != $Label && $WorkingRevisionID) {
             Gdn::SQL()->Put('CustomThemeRevision', array('Label' => $NewLabel), array('RevisionID' => $WorkingRevisionID));
@@ -343,10 +368,12 @@ Here are some things you should know before you begin:
 			// If we are applying the changes, and the changes didn't cause crashes save the live revision number.
 			if (!$AssetError && !$SmartyCompileError && ($IsApply || $IsApplyPreview)) {
 				$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
+            
 				$LiveRevisionID = $WorkingRevisionID;
-				SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', $WorkingRevisionID);
+            $SaveLiveRevisionID = isset($SaveWorkingRevisionID) ? $SaveWorkingRevisionID : $WorkingRevisionID;
+				SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', $SaveLiveRevisionID);
 				SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', $NewIncludeThemeCSS);
-				SaveToConfig('Plugins.CustomTheme.LiveRevisionID', $LiveRevisionID);
+				SaveToConfig('Plugins.CustomTheme.LiveRevisionID', $SaveLiveRevisionID);
 				SaveToConfig('Plugins.CustomTheme.LiveTime', time());
 				SaveToConfig('Plugins.CustomTheme.LiveIncludeThemeCSS', $NewIncludeThemeCSS);
 				
@@ -411,10 +438,10 @@ Here are some things you should know before you begin:
 			->OrderBy('RevisionID', 'desc')
 			->Limit(1, 0)
 			->Get()
-			->FirstRow();
+			->FirstRow(DATASET_TYPE_ARRAY);
 			
 		if ($Live) {
-			SaveToConfig('Plugins.CustomTheme.LiveRevisionID', GetValue('RevisionID', $Live));
+			SaveToConfig('Plugins.CustomTheme.LiveRevisionID', self::SetRevisionID($Live['RevisionID'], $Live['DateInserted']));
 			SaveToConfig('Plugins.CustomTheme.LiveTime', time());
 			SaveToConfig('Plugins.CustomTheme.LiveIncludeThemeCSS', GetValue('IncludeThemeCSS', $Live));
 		} else {
@@ -426,13 +453,14 @@ Here are some things you should know before you begin:
 		$Working = Gdn::SQL()->Select()
 			->From('CustomThemeRevision')
 			->Where('ThemeName', $ThemeName)
+         ->Where('Live', 2)
 			->OrderBy('RevisionID', 'desc')
 			->Limit(1, 0)
 			->Get()
 			->FirstRow();
 
 		if ($Working) {
-			SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', GetValue('RevisionID', $Working));
+			SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', self::SetRevisionID($Working['RevisionID'], $Working['DateInserted']));
 			SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', GetValue('IncludeThemeCSS', $Working));
 		} else {
 			SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', 0);
