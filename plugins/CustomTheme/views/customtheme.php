@@ -19,9 +19,13 @@ function WriteRevisions($Sender, $Tab = '') {
 
       echo '<div class="Revision'.($Row->RevisionID == $LiveRevisionID ? ' LiveRevision' : '').'">&rarr;'
          .Anchor(date("g:i:sa", Gdn_Format::ToTimeStamp($Row->DateInserted)), 'settings/customtheme/revision/'.$Tab.'/'.$Row->RevisionID)
-         .($Row->Label ? htmlspecialchars($Row->Label).' ' : '')
-         .($Row->RevisionID == $LiveRevisionID ? ' Live Version' : '')
-      .'</div>';
+         .($Row->Label ? htmlspecialchars($Row->Label).' ' : '');
+      
+      if ($Row->Live == 1)
+         echo ' Live Version';
+      elseif ($Row->Live == 2)
+         echo ' Previewing';
+      echo '</div>';
    }  
    ?>
       <div class="NewDay"><?php echo Anchor(T('Original Version'), 'settings/customtheme/revision/'.$Tab.'/0'); ?></div>

@@ -17,7 +17,7 @@
 $PluginInfo['ProxyConnect'] = array(
 	'Name' => 'Vanilla Proxyconnect',
    'Description' => 'This plugin enables SingleSignOn (SSO) between your forum and other authorized consumers on the same domain, via cookie sharing.',
-   'Version' => '1.9.9',
+   'Version' => '1.9.10',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
@@ -330,6 +330,9 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       $SignoutURL = Gdn::Authenticator()->GetURL(Gdn_Authenticator::URL_SIGNOUT, NULL);
       $RealUserID = Gdn::Authenticator()->GetRealIdentity();
       $Authenticator = Gdn::Authenticator()->GetAuthenticator('proxy');
+      $Target = GetValue('Target', $_GET);
+      if (!$Target || $Target == '')
+         $Target = Gdn::Router()->GetDestination('DefaultController'); // Go to the default controller unless a target was specified.
       
       // Shortcircuit loopback if we have a Sync failure
       $Payload = $Authenticator->GetHandshake();
@@ -369,7 +372,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
          if (Gdn::Authenticator()->GetIdentity()) {
             
             // That worked, so redirect to the default page. The user is now signed in.
-            Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
+            Redirect($Target, 302);
             
          } else {
             
@@ -384,20 +387,20 @@ class ProxyConnectPlugin extends Gdn_Plugin {
             if ($AllowCallout)
                Redirect($SigninURL,302);
             else
-               Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
+               Redirect($Target, 302);
             
          }
       } else {
          if ($RealUserID) {
-            // The user is already signed in. Send them to the default page.
-            Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
+            // The user is already signed in. Send them to the default page or a target (if specified).
+            Redirect($Target, 302);
          } else {
             // We have no cookie for this user. Send them to the remote login page.
             $Authenticator->SetIdentity(NULL);
             if ($AllowCallout)
                Redirect($SigninURL,302);
             else
-               Redirect(Gdn::Router()->GetDestination('DefaultController'), 302);
+               Redirect($Target, 302);
          }
       }
       exit();
