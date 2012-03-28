@@ -376,7 +376,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       
       // Set the title, breadcrumbs, canonical
       $Sender->Title(T('Best Of'));
-      $Sender->SetData('Breadcrumbs', 'BestOf');
+      $Sender->SetData('Breadcrumbs', array(array('Name' => T('Best Of'), 'Url' => '/bestof/everything')));
       $Sender->CanonicalUrl(
          Url(
             ConcatSep('/', 'bestof/'.$Reaction.'/', PageNumber($Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), 
