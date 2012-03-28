@@ -16,22 +16,25 @@ $AllAvailable = array_merge($AvailablePlugins, $AvailableApplications);
 $LockedPlugins = C('VFCom.Plugins.RequireAdmin', array('jsConnect', 'Multilingual', 'Pockets', 'Sphinx', 'TrackingCodes', 'VanillaPop', 'Whispers'));
 
 // Addons to hide even when enabled
-$HiddenPlugins = C('VFCom.Plugins.Hidden', array('CustomTheme', 'CustomDomain', 'HtmLawed'));
+$HiddenPlugins = C('VFCom.Plugins.Hidden', array('CustomTheme', 'CustomDomain', 'CustomizeText', 'HtmLawed', 'cloudfiles', 'rackmonkey'));
 
 // Allowed plugins list per client's plan
 $Plan = GetValue('Plan', Infrastructure::Plan());
 $AllowedPluginNames = GetValue('Plugins', json_decode(GetValue('Addons', $Plan)), array());
 $AllowedPlugins = array();
 foreach($AllowedPluginNames as $Name) {
-   // Skip hidden plugins and all vf* plugins
-   if (in_array($Name, $HiddenPlugins) || strpos('vf', $Name) === 0)
-      continue;
    // Add available plugins to list to display
    if ($Info = GetValue($Name, $AvailablePlugins))
       $AllowedPlugins[$Name] = $Info;
 }
 
+// Enabled plugins minus hidden and vf*
 $EnabledPlugins = $PluginManager->EnabledPlugins();
+foreach($EnabledPlugins as $Key => $Name) {
+   // Skip all vf* plugins
+   if (in_array($Key, $HiddenPlugins) || strpos($Key, 'vf') === 0)
+      unset($EnabledPlugins[$Key]);
+}
 
 $Addons = array_merge($AllowedPlugins, $EnabledPlugins);
 
