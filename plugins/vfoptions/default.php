@@ -62,10 +62,10 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       
       // Give Vanilla admins option to suspend this plugin per session
       $IsSytemUser = (Gdn::Session()->UserID == Gdn::UserModel()->GetSystemUserID());
-      if (CheckPermission('Garden.Admin.Only') && $IsSytemUser) {
+//      if (CheckPermission('Garden.Admin.Only') && $IsSytemUser) {
 //         $SuspendText = (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE)) ? 'Resume' : 'Suspend';
-         $Menu->AddLink('Dashboard', T($SuspendText.' VFOptions'), 'plugin/suspendvfoptions', 'Garden.Admin.Only');
-      }
+//         $Menu->AddLink('Dashboard', T($SuspendText.' VFOptions'), 'plugin/suspendvfoptions', 'Garden.Admin.Only');
+//      }
          
       // If suspended, quit
 //      if (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE))
