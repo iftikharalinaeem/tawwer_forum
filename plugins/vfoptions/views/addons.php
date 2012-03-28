@@ -44,7 +44,7 @@ uasort($Addons, 'PluginSort');
 // Get counts
 $PluginCount = 0;
 $EnabledCount = 0;
-foreach ($Addons as $PluginKey) {
+foreach ($Addons as $PluginKey => $Info) {
    if (GetValue($PluginKey, $AvailablePlugins)) {
       $PluginCount++;
       if (array_key_exists($PluginKey, $EnabledPlugins))
