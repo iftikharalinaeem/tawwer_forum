@@ -5,33 +5,45 @@
    <li id="<?php echo "{$Row['RecordType']}_{$Row['RecordID']}" ?>" class="Item">
       <?php
       if ($Name = GetValue('Name', $Row)) {
-         echo Wrap(htmlspecialchars($Name), 'h3', array('class' => 'Title'));
+         echo Wrap(Gdn_Format::Text($Name), 'h3', array('class' => 'Title'));
       }
       ?>
-      
-      <div class="Meta">
-         <span class="Author">
-            <?php
-            echo UserPhoto($Row, array('Px' => 'Insert'));
-            echo ' ';
-            echo UserAnchor($Row, array('Px' => 'Insert'));
-            ?>
-         </span>
-         <span class="MItem DateCreated">
-            <?php
-            echo Anchor(
-               Gdn_Format::Date($Row['DateInserted'], 'html'),
-               $Row['Url'],
-               'Permalink'
-               );
-            ?>
-         </span>
+      <div class="Item-Header">
+         <div class="AuthorWrap">
+            <span class="Author">
+               <?php
+               echo UserPhoto($Row, array('Px' => 'Insert'));
+               echo UserAnchor($Row, array('Px' => 'Insert'));
+               ?>
+            </span>
+            <span class="AuthorInfo">
+               <?php
+               echo WrapIf(GetValue('Title', $Author), 'span', array('class' => 'MItem AuthorTitle'));
+               $this->FireEvent('AuthorInfo'); 
+               ?>
+            </span>
+         </div>
+         <div class="Meta">
+            <span class="MItem DateCreated">
+               <?php
+               echo Anchor(
+                  Gdn_Format::Date($Row['DateInserted'], 'html'),
+                  $Row['Url'],
+                  'Permalink'
+                  );
+               ?>
+            </span>
+         </div>
       </div>
       
-      <div class="Message Expander">
-         <?php
-         echo Gdn_Format::To($Row['Body'], $Row['Format']);
-         ?>
+      <div class="Item-BodyWrap">
+         <div class="Item-Body">
+            <div class="Message Expander">
+               <?php
+               echo Gdn_Format::To($Row['Body'], $Row['Format']);
+               ?>
+            </div>
+         </div>
       </div>
       
       <?php
