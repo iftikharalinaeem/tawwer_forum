@@ -9,7 +9,7 @@
 $PluginInfo['vanillicon'] = array(
    'Name' => 'Vanillicon',
    'Description' => "Provides fun default user icons from vanillicon.com.",
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -30,8 +30,10 @@ class VanilliconPlugin extends Gdn_Plugin {
 if (!function_exists('UserPhotoDefaultUrl')) {
    function UserPhotoDefaultUrl($User, $Options = array()) {
       static $IconSize = NULL;
-      if ($IconSize === NULL)
-         $IconSize = C('Plugins.Vanillicon.Size', 50);
+      if ($IconSize === NULL) {
+         $ThumbSize = C('Garden.Thumbnail.Size');
+         $IconSize = $ThumbSize <= 50 ? 50 : 100;
+      }
 
       $Email = GetValue('Email', $User);
       if (!$Email) {
