@@ -241,6 +241,7 @@ function WriteReactions($Row) {
    if ($Types === NULL)
       $Types = ReactionModel::GetReactionTypes(array('Class' => array('Good', 'Bad'), 'Active' => 1));
    
+   echo '&nbsp;'; // Kludge to fix height when there are no flag options turned on.
    // Write the reactions.
    echo '<span class="React">';
 //   echo '<span class="Column-Score">'.GetValue('Score', $Row).'</span>';
