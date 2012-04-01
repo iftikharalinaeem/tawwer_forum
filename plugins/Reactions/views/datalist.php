@@ -1,11 +1,13 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<ul class="DataList Compact">
+<ul class="DataList Compact BlogList">
    <?php foreach ($this->Data('Data', array()) as $Row): ?>
    <li id="<?php echo "{$Row['RecordType']}_{$Row['RecordID']}" ?>" class="Item">
       <?php
       if ($Name = GetValue('Name', $Row)) {
-         echo Wrap(Gdn_Format::Text($Name), 'h3', array('class' => 'Title'));
+         echo Wrap(
+            Anchor(Gdn_Format::Text($Name), $Row['Url']),
+            'h3', array('class' => 'Title'));
       }
       ?>
       <div class="Item-Header">
@@ -16,12 +18,12 @@
                echo UserAnchor($Row, array('Px' => 'Insert'));
                ?>
             </span>
-            <span class="AuthorInfo">
+<!--            <span class="AuthorInfo">
                <?php
-               echo WrapIf(GetValue('Title', $Author), 'span', array('class' => 'MItem AuthorTitle'));
+               //echo WrapIf(GetValue('Title', $Author), 'span', array('class' => 'MItem AuthorTitle'));
                $this->FireEvent('AuthorInfo'); 
                ?>
-            </span>
+            </span>-->
          </div>
          <div class="Meta">
             <span class="MItem DateCreated">
