@@ -457,7 +457,7 @@ Here are some things you should know before you begin:
 			->OrderBy('RevisionID', 'desc')
 			->Limit(1, 0)
 			->Get()
-			->FirstRow();
+			->FirstRow(DATASET_TYPE_ARRAY);
 
 		if ($Working) {
 			SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', self::SetRevisionID($Working['RevisionID'], $Working['DateInserted']));
