@@ -22,7 +22,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
    /// Methods ///
    
    public function Format($String) {
-      $String = str_replace(array('&quot;', '&#39;'), array('"', "'"), $String);
+      $String = str_replace(array('&quot;', '&#39;', '&#58;'), array('"', "'", ':'), $String);
       $String = str_replace('<#EMO_DIR#>', 'default', $String);
       $Result = $this->NBBC()->Parse($String);
       
@@ -62,7 +62,52 @@ class IPBFormatterPlugin extends Gdn_Plugin {
          $this->_NBBC = $Plugin->NBBC();
          $this->_NBBC->ignore_newlines = TRUE;
          $this->_NBBC->enable_smileys = FALSE;
+         
+         $this->_NBBC->AddRule('attachment', array(
+            'mode' => BBCODE_MODE_CALLBACK,
+            'method' => array($this, "DoAttachment"),
+            'class' => 'image',
+            'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+            'end_tag' => BBCODE_PROHIBIT,
+            'content' => BBCODE_PROHIBIT,
+            'plain_start' => "[image]",
+            'plain_content' => Array(),
+            ));
       }
       return $this->_NBBC;
+   }
+   
+   protected $_Media = NULL;
+   public function Media() {
+      if ($this->_Media === NULL) {
+         $I = Gdn::PluginManager()->GetPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
+         $M = $I->MediaCache();
+         $Media = array();
+         foreach ($M as $Key => $Data) {
+            foreach ($Data as $Row) {
+               $Media[$Row->MediaID] = $Row;
+            }
+         }
+         $this->_Media = $Media;
+      }
+      return $this->_Media;
+   }
+   
+   public function DoAttachment($bbcode, $action, $name, $default, $params, $content) {
+      $Medias = $this->Media();
+      $Parts = explode(':', $default);
+      $MediaID = $Parts[0];
+      if (isset($Medias[$MediaID])) {
+         $Media = $Medias[$MediaID];
+//         decho($Media, 'Media');
+         
+         $Src = htmlspecialchars(Gdn_Upload::Url(GetValue('Path', $Media)));
+         $Name = htmlspecialchars(GetValue('Name', $Media));
+         return <<<EOT
+<div class="Attachment"><img src="$Src" alt="$Name" /></div>
+EOT;
+      }
+      
+      return '';
    }
 }
