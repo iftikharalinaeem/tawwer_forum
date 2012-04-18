@@ -62,14 +62,14 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       
       // Give Vanilla admins option to suspend this plugin per session
       $IsSytemUser = (Gdn::Session()->UserID == Gdn::UserModel()->GetSystemUserID());
-      if (CheckPermission('Garden.Admin.Only') && $IsSytemUser) {
-         $SuspendText = (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE)) ? 'Resume' : 'Suspend';
-         $Menu->AddLink('Dashboard', T($SuspendText.' VFOptions'), 'plugin/suspendvfoptions', 'Garden.Admin.Only');
-      }
+//      if (CheckPermission('Garden.Admin.Only') && $IsSytemUser) {
+//         $SuspendText = (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE)) ? 'Resume' : 'Suspend';
+//         $Menu->AddLink('Dashboard', T($SuspendText.' VFOptions'), 'plugin/suspendvfoptions', 'Garden.Admin.Only');
+//      }
          
       // If suspended, quit
-      if (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE))
-         return;
+//      if (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE))
+//         return;
    
 		$New = ' <span class="New">New</span>';
       // Clean out options hosting customers should not see
@@ -110,7 +110,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
     * @param Gdn_Controller $Sender
     */
    public function Base_Render_Before($Sender) {
-      if (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE)) return; // Temp suspend option
+//      if (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE)) return; // Temp suspend option
       
       Gdn::Locale()->SetTranslation('PluginHelp', "Plugins allow you to add functionality to your site.");
       Gdn::Locale()->SetTranslation('ApplicationHelp', "Applications allow you to add large groups of functionality to your site.");
@@ -468,11 +468,11 @@ pageTracker._trackPageview();
          return;
       
       // Toggle
-      $Active = Gdn::Session()->Stash('SuspendVFOptions', '', FALSE);
-      if (!$Active)
-         Gdn::Session()->Stash('SuspendVFOptions', TRUE);
-      else
-         Gdn::Session()->Stash('SuspendVFOptions', FALSE);
+//      $Active = Gdn::Session()->Stash('SuspendVFOptions', '', FALSE);
+//      if (!$Active)
+//         Gdn::Session()->Stash('SuspendVFOptions', TRUE);
+//      else
+//         Gdn::Session()->Stash('SuspendVFOptions', FALSE);
          
       Redirect('/dashboard/settings');
    }
@@ -616,7 +616,7 @@ pageTracker._trackPageview();
     * @param Gdn_Controller $Sender
     */
    public function SettingsController_Render_Before($Sender) {
-      if (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE)) return; // Temp suspend option
+//      if (Gdn::Session()->Stash('SuspendVFOptions', '', FALSE)) return; // Temp suspend option
 
       if (
          strcasecmp($Sender->RequestMethod, 'plugins') == 0

@@ -15,27 +15,9 @@ class WhosOnlineModule extends Gdn_Module {
 		// $this->_OnlineUsers = $SQL
 		// insert or update entry into table
 		$Session = Gdn::Session();
-      $Invisible = Gdn::UserMetaModel()->GetUserMeta($Session->UserID, 'Plugin.WhosOnline.Invisible', FALSE);
-      $Invisible = GetValue('Plugin.WhosOnline.Invisible', $Invisible);
-		$Invisible = ($Invisible ? 1 : 0);
-
-		if ($Session->UserID) {
-         $Timestamp = Gdn_Format::ToDateTime();
-         
-         $Px = $SQL->Database->DatabasePrefix;
-         $Sql = "insert {$Px}Whosonline (UserID, Timestamp, Invisible) values ({$Session->UserID}, :Timestamp, :Invisible) on duplicate key update Timestamp = :Timestamp1, Invisible = :Invisible1";
-         $SQL->Database->Query($Sql, array(':Timestamp' => $Timestamp, ':Invisible' => $Invisible, ':Timestamp1' => $Timestamp, ':Invisible1' => $Invisible));
-         
-//			$SQL->Replace('Whosonline', array(
-//				'UserID' => $Session->UserID,
-//				'Timestamp' => Gdn_Format::ToDateTime(),
-//				'Invisible' => $Invisible),
-//				array('UserID' => $Session->UserID)
-//			);
-      }
 
 		$Frequency = C('WhosOnline.Frequency', 60);
-		$History = time() - 2 * $Frequency; // give bit of buffer
+		$History = time() - 5 * $Frequency; // give bit of buffer
       
       // Try and grab the who's online data from the cache.
       $Data = Gdn::Cache()->Get('WhosOnline');
@@ -53,6 +35,14 @@ class WhosOnlineModule extends Gdn_Module {
          $Data = $SQL->Get()->ResultArray();
          $Data = Gdn_DataSet::Index($Data, 'UserID');
          Gdn::Cache()->Store('WhosOnline', $Data, array(Gdn_Cache::FEATURE_EXPIRY => $Frequency));
+      }
+      // Make sure the current user is shown as online.
+      if ($Session->UserID && !isset($Data[$Session->UserID])) {
+         $Data[$Session->UserID] = array(
+             'UserID' => $Session->UserID,
+             'Timestamp' => Gdn_Format::ToDateTime(),
+             'Invisible' => FALSE
+         );
       }
       
       Gdn::UserModel()->JoinUsers($Data, array('UserID'));
