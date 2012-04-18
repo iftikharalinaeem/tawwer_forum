@@ -22,10 +22,26 @@ class IPBFormatterPlugin extends Gdn_Plugin {
    /// Methods ///
    
    public function Format($String) {
-      $String = html_entity_decode($String, ENT_QUOTES, 'UTF-8');
-//      $String = str_replace('<br />', "\n", $String);
-//      $String = str_replace(array('<', '>'), array('[', ']'), $String);
+      $String = str_replace(array('&quot;', '&#39;'), array('"', "'"), $String);
+      $String = str_replace('<#EMO_DIR#>', 'default', $String);
       $Result = $this->NBBC()->Parse($String);
+      
+      // Make sure to clean filter the html in the end.
+      $Config = array(
+       'anti_link_spam' => array('`.`', ''),
+       'comment' => 1,
+       'cdata' => 3,
+       'css_expression' => 1,
+       'deny_attribute' => 'on*',
+       'elements' => '*-applet-form-input-textarea-iframe-script-style', // object, embed allowed
+       'keep_bad' => 0,
+       'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
+       'valid_xml' => 2
+      );
+
+      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
+      $Result = htmLawed($Result, $Config, $Spec);
+      
       return $Result;
    }
    
@@ -40,9 +56,12 @@ class IPBFormatterPlugin extends Gdn_Plugin {
     */
    public function NBBC() {
       if ($this->_NBBC === NULL) {
+         require_once PATH_PLUGINS.'/HtmLawed/htmLawed/htmLawed.php';
+         
          $Plugin = new NBBCPlugin('BBCodeRelaxed');
          $this->_NBBC = $Plugin->NBBC();
          $this->_NBBC->ignore_newlines = TRUE;
+         $this->_NBBC->enable_smileys = FALSE;
       }
       return $this->_NBBC;
    }
