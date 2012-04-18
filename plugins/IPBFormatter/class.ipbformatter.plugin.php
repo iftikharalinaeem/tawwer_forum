@@ -1,0 +1,113 @@
+<?php if (!defined('APPLICATION')) exit();
+/**
+ * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$PluginInfo['IPBFormatter'] = array(
+    'Name' => 'IPB Formatter',
+    'Description' => 'Formats posts imported from Invision Power Board.',
+    'Version' => '1.0a',
+    'RequiredApplications' => array('Vanilla' => '2.0.2a'),
+    'RequiredPlugins' => FALSE,
+    'HasLocale' => FALSE,
+    'Author' => "Todd Burry",
+    'AuthorEmail' => 'todd@vanillaforums.com',
+    'AuthorUrl' => 'http://vanillaforums.com/profile/todd'
+);
+
+Gdn::FactoryInstall('IPBFormatter', 'IPBFormatterPlugin', __FILE__, Gdn::FactorySingleton);
+
+class IPBFormatterPlugin extends Gdn_Plugin {
+   /// Methods ///
+   
+   public function Format($String) {
+      $String = str_replace(array('&quot;', '&#39;', '&#58;'), array('"', "'", ':'), $String);
+      $String = str_replace('<#EMO_DIR#>', 'default', $String);
+      $Result = $this->NBBC()->Parse($String);
+      
+      // Make sure to clean filter the html in the end.
+      $Config = array(
+       'anti_link_spam' => array('`.`', ''),
+       'comment' => 1,
+       'cdata' => 3,
+       'css_expression' => 1,
+       'deny_attribute' => 'on*',
+       'elements' => '*-applet-form-input-textarea-iframe-script-style', // object, embed allowed
+       'keep_bad' => 0,
+       'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
+       'valid_xml' => 2
+      );
+
+      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
+      $Result = htmLawed($Result, $Config, $Spec);
+      
+      return $Result;
+   }
+   
+   /**
+    *
+    * @var BBCode
+    */
+   protected $_NBBC;
+   
+   /**
+    * @return BBCode;
+    */
+   public function NBBC() {
+      if ($this->_NBBC === NULL) {
+         require_once PATH_PLUGINS.'/HtmLawed/htmLawed/htmLawed.php';
+         
+         $Plugin = new NBBCPlugin('BBCodeRelaxed');
+         $this->_NBBC = $Plugin->NBBC();
+         $this->_NBBC->ignore_newlines = TRUE;
+         $this->_NBBC->enable_smileys = FALSE;
+         
+         $this->_NBBC->AddRule('attachment', array(
+            'mode' => BBCODE_MODE_CALLBACK,
+            'method' => array($this, "DoAttachment"),
+            'class' => 'image',
+            'allow_in' => Array('listitem', 'block', 'columns', 'inline', 'link'),
+            'end_tag' => BBCODE_PROHIBIT,
+            'content' => BBCODE_PROHIBIT,
+            'plain_start' => "[image]",
+            'plain_content' => Array(),
+            ));
+      }
+      return $this->_NBBC;
+   }
+   
+   protected $_Media = NULL;
+   public function Media() {
+      if ($this->_Media === NULL) {
+         $I = Gdn::PluginManager()->GetPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
+         $M = $I->MediaCache();
+         $Media = array();
+         foreach ($M as $Key => $Data) {
+            foreach ($Data as $Row) {
+               $Media[$Row->MediaID] = $Row;
+            }
+         }
+         $this->_Media = $Media;
+      }
+      return $this->_Media;
+   }
+   
+   public function DoAttachment($bbcode, $action, $name, $default, $params, $content) {
+      $Medias = $this->Media();
+      $Parts = explode(':', $default);
+      $MediaID = $Parts[0];
+      if (isset($Medias[$MediaID])) {
+         $Media = $Medias[$MediaID];
+//         decho($Media, 'Media');
+         
+         $Src = htmlspecialchars(Gdn_Upload::Url(GetValue('Path', $Media)));
+         $Name = htmlspecialchars(GetValue('Name', $Media));
+         return <<<EOT
+<div class="Attachment"><img src="$Src" alt="$Name" /></div>
+EOT;
+      }
+      
+      return '';
+   }
+}
