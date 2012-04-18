@@ -1,6 +1,6 @@
 <?php
 /**
- * Jive exporter tool
+ * Invision Powerboard exporter tool
  *
  * @copyright Vanilla Forums Inc. 2010
  * @license Proprietary
@@ -24,6 +24,7 @@ class IPB extends ExportController {
       $Ex->DestPrefix = 'GDN_';
       
       $Ex->SourcePrefix = 'ibf_';
+      $Cdn = 'http://cdn.vanillaforums.com/grilldome.vanillaforums.com/';
       
       // Get the characterset for the comments.
       $CharacterSet = $Ex->GetCharacterSet('posts');
@@ -47,22 +48,24 @@ class IPB extends ExportController {
          'members_display_name' => 'Name',
          'email' => 'Email',
          'joined' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
+         'firstvisit' => array('Column' => 'DateFirstVisit', 'SourceColumn' => 'joined', 'Filter' => array($Ex, 'TimestampToDate')),
          'ip_address' => 'InsertIPAddress',
          'title' => 'Title',
          'time_offset' => 'HourOffset',
          'last_activity' => array('Column' => 'DateLastActive', 'Filter' => array($Ex, 'TimestampToDate')),
          'member_banned' => 'Banned',
-         'avatar_location' => 'Photo',
+         'Photo' => 'Photo',
          'title' => 'Title',
          'location' => 'Location'
       );
       if ($Ex->Exists('member_extra')) {
          $Sql = "select
                   m.*,
+                  m.joined as firstvisit,
                   'ipb' as HashMethod,
                   !hide_email as ShowEmail,
                   concat(m.members_pass_hash, '$', m.members_pass_salt) as Password,
-                  x.avatar_location,
+                  x.avatar_location as Photo,
                   x.location
                  from ibf_members m
                  left join ibf_member_extra x
@@ -70,10 +73,17 @@ class IPB extends ExportController {
       } else {
          $Sql = "select
                   m.*,
+                  joined as firstvisit,
                   'ipb' as HashMethod,
                   !hide_email as ShowEmail,
-                  concat(m.members_pass_hash, '$', m.members_pass_salt) as Password
-                 from ibf_members m";
+                  concat(m.members_pass_hash, '$', m.members_pass_salt) as Password,
+                  case when length(p.avatar_location) <= 3 or p.avatar_location is null then null
+                  	when p.avatar_type = 'local' then concat('$Cdn', p.avatar_location)
+                  	when p.avatar_type = 'upload' then concat('$Cdn', p.avatar_location)
+                  	else p.avatar_location end as Photo
+                 from ibf_members m
+                 left join ibf_profile_portal p
+                 	on m.member_id = p.pp_member_id";
       }
       $this->ClearFilters('members', $User_Map, $Sql, 'm');
       $Ex->ExportTable('User', $Sql, $User_Map);  // ":_" will be replaced by database prefix
@@ -212,6 +222,47 @@ left join ibf_attachments_type ty
       $this->ClearFilters('Media', $Media_Map, $Sql);
       $Ex->ExportTable('Media', $Sql, $Media_Map);
       
+      
+      // Converations.
+      $Conversation_Map = array(
+          'mt_id' => 'ConversationID',
+          'mt_date' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
+          'mt_title' => 'Subject',
+          'mt_starter_id' => 'InsertUserID'
+          );
+      $Sql = "select * from ibf_message_topics where mt_is_deleted = 0";
+      $this->ClearFilters('Conversation', $Conversation_Map, $Sql);
+      $Ex->ExportTable('Conversation', $Sql, $Conversation_Map);
+      
+      // Converation Message.
+      $ConversationMessage_Map = array(
+          'msg_id' => 'MessageID',
+          'msg_topic_id' => 'ConversationID',
+          'msg_date' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
+          'msg_post' => 'Body',
+          'Format' => 'Format',
+          'msg_author_id' => 'InsertUserID',
+          'msg_ip_address' => 'InsertIPAddress'
+          );
+      $Sql = "select 
+            m.*,
+            'IPB' as Format
+         from ibf_message_posts m";
+      $this->ClearFilters('ConversationMessage', $ConversationMessage_Map, $Sql);
+      $Ex->ExportTable('ConversationMessage', $Sql, $ConversationMessage_Map);
+      
+      // User Conversation.
+      $UserConversation_Map = array(
+          'map_user_id' => 'UserID',
+          'map_topic_id' => 'ConversationID',
+          'Deleted' => 'Deleted'
+          );
+      $Sql = "select
+         t.*,
+         !map_user_active as Deleted
+      from ibf_message_topic_user_map t";
+      $Ex->ExportTable('UserConversation', $Sql, $UserConversation_Map);
+      
       $Ex->EndExport();
    }
    
@@ -225,14 +276,21 @@ left join ibf_attachments_type ty
          
          if (!is_array($Info) || !isset($Info['Filter']))
             continue;
+         
+         
          $Filter = $Info['Filter'];
+         if (isset($Info['SourceColumn']))
+            $Source = $Info['SourceColumn'];
+         else
+            $Source = $Column;
+         
          switch ($Filter[1]) {
             case 'HTMLDecoder':
                $this->Ex->HTMLDecoderDb($Table, $Column, $PK);
                unset($Map[$Column]['Filter']);
                break;
             case 'TimestampToDate':
-               $Selects[] = "from_unixtime($Column) as {$Column}_Date";
+               $Selects[] = "from_unixtime($Source) as {$Column}_Date";
                
                unset($Map[$Column]);
                $Map[$Column.'_Date'] = $Info['Column'];
