@@ -431,6 +431,7 @@ div.MessageForm {
    padding: 0 8px 5px;
    background: #EDEFF4;
    border: none;
+   clear: right;
 }
 div.MessageForm div.Tabs { padding: 0; }
 div.Tabs li a, div.Tabs li a:link, div.Tabs li a:hover, div.Tabs li a:active, div.Tabs li a:visited {
