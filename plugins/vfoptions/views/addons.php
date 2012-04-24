@@ -25,7 +25,14 @@ $Session = Gdn::Session(); ?>
    
 <?php foreach ($this->Data('Addons') as $Key => $Info) : ?>
    
-   <?php $Enabled = GetValue('Enabled', $Info); ?>
+   <?php 
+      $Enabled = GetValue('Enabled', $Info); 
+      // Apply filters
+      if ($this->Filter == 'enabled' && !$Enabled)
+         continue;
+      if ($this->Filter == 'disabled' && $Enabled)
+         continue;
+   ?>
    <tr <?php echo 'id="'.Gdn_Format::Url(strtolower($Key)).'-plugin" class="'.($Enabled ? 'Enabled' : 'Disabled').'"'; ?>>
       <td class="Less">
          <?php echo Img(GetValue('IconUrl', $Info), array('class' => 'PluginIcon')); ?>

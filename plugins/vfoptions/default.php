@@ -921,12 +921,6 @@ pageTracker._trackPageview();
       
       // Filter & add conditional data to plugins
       foreach ($Addons as $Key => $Info) {
-         // Apply filters
-         if ($Sender->Filter == 'enabled' && !$Enabled)
-            unset($Addons[$Key]);
-         if ($Sender->Filter == 'disabled' && $Enabled)
-            unset($Addons[$Key]);
-         
          // Enabled?
          $Addons[$Key]['Enabled'] = $Enabled = array_key_exists($Key, $EnabledPlugins);
          
