@@ -835,28 +835,23 @@ pageTracker._trackPageview();
     * @param array $Args
     */
    public function SettingsController_Addons_Create($Sender, $Args = array()) {
-      $Sender->Title('Addons');
+      $Sender->Title('Vanilla Addons');
       $Sender->Permission('Garden.Applications.Manage');
       $Sender->AddSideMenu('dashboard/settings/addons');
+      
+      // Parameters
 		$Filter = GetValue(0, $Args);
-      $Action = GetValue(1, $Args);
+      $Action = strtolower(GetValue(1, $Args));
       $Key = GetValue(2, $Args);
       $TransientKey = GetValue(3, $Args);
 		
+		// Filtering
       if (!in_array($Filter, array('enabled', 'disabled')))
          $Filter = 'all';
       $Sender->Filter = $Filter;
-      
-      if (class_exists('Infrastructure')) {
-         $Plan = Infrastructure::Plan();
-         $Sender->SetData('Plan', $Plan);
-      }
 
       if (Gdn::Session()->ValidateTransientKey($TransientKey) && $Key) {
-         try {
-            
-            
-            $Action = strtolower($Action);
+         try {            
             switch ($Action) {
                case 'enable':
                   if (GetValue($Key, Gdn::PluginManager()->AvailablePlugins()))
@@ -882,7 +877,120 @@ pageTracker._trackPageview();
             $Sender->Form->AddError($Ex);
          }
       }
+      
+      // Build available / enabled lists
+      $AvailablePlugins = Gdn::PluginManager()->AvailablePlugins();
+      //$AvailableApps = Gdn::ApplicationManager()->AvailableApplications();
+      $EnabledPlugins = Gdn::PluginManager()->EnabledPlugins();
+      $EnabledApps = Gdn::ApplicationManager()->EnabledApplications();
+      
+      // Determine plan's plugin availability
+      $PlanPlugins = FALSE;
+      if (class_exists('Infrastructure')) {
+         $Plan = Infrastructure::Plan();
+         $PlanPlugins = GetValue('Plugins', json_decode(GetValue('Addons', $Plan)));
+      }
+      if (!$PlanPlugins) {
+         $PlanPlugins = C('VFCom.Plugins.Default', array("ButtonBar","Emotify","Facebook",
+            "GoogleSignIn","Gravatar","OpenID","StopForumSpam","Twitter","vanillicon",
+            "AllViewed","Disqus","GooglePrettify","IndexPhotos","Liked","Participated","PostCount","PrivateCommunity",
+            "QnA","Quotes","Reactions","RoleTitle","ShareThis","Signatures","Spinx","Tagging","Voting")
+         );
+      }
+      $AllowedPlugins = array();
+      foreach($PlanPlugins as $Key) {
+         if ($Info = GetValue($Key, $AvailablePlugins))
+            $AllowedPlugins[$Key] = $Info;
+      }
+      
+      // Addons to show 'Contact Us' instead of 'Enable'
+      $LockedPlugins = C('VFCom.Plugins.Locked', array('jsConnect', 'Multilingual', 'Pockets', 'Sphinx', 'TrackingCodes', 'VanillaPop', 'Whispers'));
+      
+      // Addons to hide even when enabled
+      $HiddenPlugins = C('VFCom.Plugins.Hidden', array('CustomTheme', 'CustomDomain', 'CustomizeText', 'HtmLawed', 'cloudfiles', 'rackmonkey'));
+      
+      // Exclude hidden and vf* from enabled plugins
+      foreach($EnabledPlugins as $Key => $Name) {
+         // Skip all vf* plugins
+         if (in_array($Key, $HiddenPlugins) || strpos($Key, 'vf') === 0)
+            unset($EnabledPlugins[$Key]);
+      }
+      
+      // Show allowed + previously enabled
+      $Addons = array_merge($AllowedPlugins, $EnabledPlugins);
+      
+      // Filter & add conditional data to plugins
+      foreach ($Addons as $Key => $Info) {
+         // Apply filters
+         if ($Sender->Filter == 'enabled' && !$Enabled)
+            unset($Addons[$Key]);
+         if ($Sender->Filter == 'disabled' && $Enabled)
+            unset($Addons[$Key]);
+         
+         // Enabled?
+         $Addons[$Key]['Enabled'] = $Enabled = array_key_exists($Key, $EnabledPlugins);
+         
+         // Find icon
+         if (!$IconUrl = GetValue('IconUrl', $Info)) {
+            $IconPath = '/plugins/'.GetValue('Folder', $Info, '').'/icon.png';
+            $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'applications/dashboard/design/images/plugin-icon.png';
+            $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'plugins/vfoptions/design/plugin-icon.png';
+            $Addons[$Key]['IconUrl'] = $IconPath;
+         }
+         
+         // Toggle button
+         if (!$Enabled && in_array($Key, $LockedPlugins)) {
+            // Locked plugins need admin intervention to enable. Doesn't stop URL circumvention.
+            $Addons[$Key]['ToggleText'] = '/dashboard/settings/vanillasupport';
+            $Addons[$Key]['ToggleUrl'] = 'Contact Us';
+         }
+         else {
+            $Addons[$Key]['ToggleText'] = $ToggleText = $Enabled ? 'Disable' : 'Enable';
+            $Addons[$Key]['ToggleUrl'] = "/dashboard/settings/addons/".$Sender->Filter."/".strtolower($ToggleText)."/$Key/".Gdn::Session()->TransientKey();
+         }
+      }
 
+      // Kludge on the Reputation app as 'Badges'
+      if ($Sender->Data('Plan.Subscription.PlanCode') != 'free') {
+         $Enabled = array_key_exists('Reputation', $EnabledApps);
+         $Reputation = array('Reputation' => array(
+            'Name' => 'Badges',
+            'Description' => 'Give badges to your users to reward them for contributing to your community.',
+            'IconUrl' => 'http://badges.vni.la/100/lol-2.png',
+            'ToggleText' => ($Enabled ? 'Disable' : 'Enable'),
+            'ToggleUrl' => "/dashboard/settings/addons/".$Sender->Filter."/".($Enabled ? 'disable' : 'enable')."/Reputation/".Gdn::Session()->TransientKey(),
+            'Enabled' => $Enabled
+         ));
+         $Addons = array_merge($Reputation, $Addons);
+      }
+      
+      // Sort & set Addons
+      uasort($Addons, 'AddonSort');
+      $Sender->SetData('Addons', $Addons);
+      
+      // Get counts
+      $PluginCount = 0;
+      $EnabledCount = 0;
+      foreach ($Addons as $PluginKey => $Info) {
+         if (GetValue($PluginKey, $AvailablePlugins)) {
+            $PluginCount++;
+            if (array_key_exists($PluginKey, $EnabledPlugins)) {
+               $EnabledCount++;
+               $Addons[$Key]['Enabled'] = TRUE;
+            }
+         }
+      }
+      $Sender->SetData('PluginCount', $PluginCount);
+      $Sender->SetData('EnabledCount', $EnabledCount);
+      $Sender->SetData('DisabledCount', $PluginCount - $EnabledCount);
+      
       $Sender->Render('Addons', '', 'plugins/vfoptions');
-   }
+   }   
+}
+
+/**
+ * Sorting function for plugin info array.
+ */
+function AddonSort($PluginInfo, $PluginInfoCompare) {
+   return strcmp(GetValue('Name', $PluginInfo), GetValue('Name', $PluginInfoCompare));
 }
