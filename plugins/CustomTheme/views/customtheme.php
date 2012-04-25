@@ -60,16 +60,6 @@ echo $this->Form->Errors();
          <div class="CustomThemeOptions">
             <strong>Revision Options</strong>
             <div class="InfoBox RevisionOptions">
-               <ul>
-                  <li>
-                     <strong>How to include your Custom CSS:</strong>
-                     <?php
-                     $Default = C('Plugins.CustomCSS.IncludeThemeCSS', 'Yes');
-                     echo $this->Form->Radio('IncludeThemeCSS', 'Add my css after the theme css.', array('value' => 'Yes', 'default' => $Default));
-                     echo $this->Form->Radio('IncludeThemeCSS', "ONLY use my CSS (not recommended).", array('value' => 'No', 'default' => $Default));
-                     ?>
-                  </li>
-               </ul>
                <div class="Buttons">
                <?php
                echo $this->Form->Button('Preview', array('class' => 'TextButton'));
