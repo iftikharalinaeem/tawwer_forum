@@ -10,14 +10,6 @@
       		
 		<div class="post">
 		
-		<div class="PostIcon">
-		<?php
-			$the_categories = get_the_category();
-			get_cat_icon($the_categories);
-		?>
-		</div>
-		
-					
 			<h1>
 			<?php $link_values = get_post_custom_values("link"); if ($link_values[0] != NULL) { ?>
 			<span class="buzzSource"><?php echo $source_values[0]; ?></span> <?php } else {?>
