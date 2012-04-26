@@ -6,7 +6,7 @@
 $PluginInfo['CustomTheme'] = array(
    'Name' => 'Custom Theme',
    'Description' => 'Allows administrators to customize the CSS & master HTML template of the currently enabled theme.',
-   'Version' => '2.1.3',
+   'Version' => '2.1.4',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
@@ -46,7 +46,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		// If we are in preview mode...
 		if (Gdn::Session()->GetPreference('PreviewCustomTheme')) {
 			// Add the css file that styles the preview inform message buttons
-			$Sender->AddCssFile('previewtheme.css', 'dashboard');
+			$Sender->AddCssFile('previewtheme.css', 'plugins/CustomTheme');
 			
 			// Inform the user of the preview status
 		   $Form = new Gdn_Form();
@@ -231,7 +231,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 //		$Sender->AddJsFile('/js/library/jquery.autogrow.js');
 		$Sender->AddJsFile('customtheme.js', 'plugins/CustomTheme');
       $Sender->AddJsFile('jquery.textarea.js', 'plugins/CustomTheme');
-		$Sender->AddCssFile('/plugins/CustomTheme/customtheme.css');
+		$Sender->AddCssFile('customtheme.css', '/plugins/CustomTheme');
 		
 		$ThemeManager = new Gdn_ThemeManager();
 		$CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
@@ -517,6 +517,32 @@ Here are some things you should know before you begin:
 		}
 	}
 	
+   /**
+    *
+    * @param Gdn_Controller $Sender 
+    */
+   public function SettingsController_CustomCSS_Create($Sender) { 
+      $Sender->Permission('Garden.Settings.Manage');
+      $Sender->Title('Edit CSS');      
+      $Sender->MasterView = 'empty';
+      $Sender->ClearCSSFiles();
+      $Sender->AddCssFile('editcss.css', 'plugins/CustomTheme');
+      
+      $WorkingRevisionID = self::GetRevisionID('WorkingRevisionID');
+		$ThemeData = Gdn::SQL()
+			->Select()
+			->From('CustomThemeRevision')
+			->Where('RevisionID', $WorkingRevisionID)
+			->Get()
+			->FirstRow();
+			
+		if (!$Sender->Form->AuthenticatedPostBack()) {
+         if ($ThemeData)
+            $Sender->Form->SetFormValue('CSS', GetValue('CSS', $ThemeData));
+		}
+      
+      $Sender->Render('customcss', '', 'plugins/CustomTheme');
+   }
 }
 
 /* Smarty functions to allow reading the template from the db as a resource */
