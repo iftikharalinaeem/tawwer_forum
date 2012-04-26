@@ -118,12 +118,13 @@ class CustomThemePlugin implements Gdn_IPlugin {
 
 		// If we are using the default master view, and in preview mode, use custom css & html files
 		$DoPreview = Gdn::Session()->GetPreference('PreviewCustomTheme', FALSE);
-		$IsDefaultMaster = $Sender->MasterView == 'default' || $Sender->MasterView == '';
+      $AddCustomCss = ArrayHasValue(Gdn::Controller()->CssFiles(), 'style.css'); //
+      $IsDefaultMaster = $Sender->MasterView == 'default' || $Sender->MasterView == '';
 		$IsHead = property_exists($Sender, 'Head') && is_object($Sender->Head);
 		$WorkingRevisionID = C('Plugins.CustomTheme.WorkingRevisionID', 0);
 		$LiveRevisionID = C('Plugins.CustomTheme.LiveRevisionID', 0);
 		
-		if ($IsHead && $IsDefaultMaster) {
+		if ($IsHead && $AddCustomCss) {
 			// New method
 			if ($DoPreview && $WorkingRevisionID > 0) {
 				// $Sender->Head->AddString("\n".'<link rel="stylesheet" type="text/css" href="'.Asset('/plugin/customcss/rev_'.$WorkingRevisionID.'.css', FALSE, TRUE).'" media="all" />');
