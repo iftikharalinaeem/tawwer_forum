@@ -10,10 +10,8 @@ jQuery(document).ready(function($) {
          $('#framecover').show();
          $('#main,#framecover').css("left",e.pageX+2);
       })
-      // console.log("leaving mouseDown");
    });
    $(document).mouseup(function(e){
-      // $('#clickevent').html('in another mouseUp event' + i++);
       $(document).unbind('mousemove');
       $('#framecover').hide();
    });
@@ -22,14 +20,44 @@ jQuery(document).ready(function($) {
       if (head) {
          $("#vframe").contents().find('#editcss').remove();
          head.append('<style type="text/css" id="editcss">'+$('#Form_CSS').val()+'</style>');
-         // console.log('setting container contents');
       }
    }
-   $("#Form_CSS").keyup(function() {
+   saveCss = function(el) {
+      // Ajax/Post the form
+      var frm = $(el).parents('form');
+      var postValues = frm.serialize() + '&DeliveryType=VIEW&DeliveryMethod=JSON';
+      if ($(el).attr('id') == 'Form_Apply')
+         postValues += '&Form%2FApply=Apply';
+      
+      var action = frm.attr('action');
+      $.ajax({
+         type: "POST",
+         url: action,
+         data: postValues,
+         dataType: 'json',
+         error: function(xhr) {
+            gdn.informError(xhr);
+         },
+         success: function(json) {
+            json = $.postParseJson(json);
+            gdn.inform(json);
+         }
+      });
+      return false;
+   }
+   $("textarea").keyup(function() {
       if ($('#livepreview:checked').length > 0)
          pushCss();
    });
-   $('#save').click(pushCss);
+   $('input.Button').click(function() {
+      // Push the changes to the iframe
+      pushCss();
+      // Post/save the changes
+      saveCss(this);      
+      return false;
+   });
+   // Bind to iframe's load event and push the css when pages are navigated
+   $("#vframe").load(pushCss);
 });
 //]]>
 </script>
@@ -43,9 +71,10 @@ jQuery(document).ready(function($) {
     <div id="controls">
        <label for="livepreview"><input type="checkbox" name="livepreview" id="livepreview" checked="checked"> Live Preview Changes</label>
        <div id="buttons">
-          <input type="Button" id="save" value="Save" />
-          <input type="Button" id="apply" value="Apply" />
-          </form>
+          <?php
+          echo $this->Form->Button('Save');
+          echo $this->Form->Button('Apply');
+          ?>
        </div>
     </div>
     <?php echo $this->Form->Close(); ?>
