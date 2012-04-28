@@ -186,7 +186,7 @@ div.Warning strong {
    border:1px solid #EED3A2;
    color:#B76600;
    margin-top: 20px;
-   clear: both;
+/*   clear: both;*/
 }
 .PictureBox img {
    border: 1px solid #e5e5e5;
