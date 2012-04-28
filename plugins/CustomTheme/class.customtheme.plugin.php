@@ -76,7 +76,8 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$ThemeInfo = $ThemeManager->EnabledThemeInfo();
       
 		// Make sure the current theme uses a smarty master template instead of php
-		return $ThemeInfo['Index'] == 'default' || file_exists(PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '').'/views/default.master.tpl');
+      $ThemeRoot = PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '');
+		return $ThemeInfo['Index'] == 'default' || !file_exists($ThemeRoot.'/views/default.master.php');
 	}
 	
 	/**
