@@ -222,6 +222,14 @@ class ReactionModel {
    
    public static function JoinRecords(&$Data) {
       $IDs = array();
+      $AllowedCats = DiscussionModel::CategoryPermissions();
+      
+      if ($AllowedCats === FALSE) {
+         // This user does not have permission to view anything.
+         $Data = array();
+         return;
+      }
+      
       // Gather all of the ids to fetch.
       foreach ($Data as &$Row) {
          $RecordType = StringEndsWith($Row['RecordType'], '-Total', TRUE, TRUE);
@@ -234,7 +242,7 @@ class ReactionModel {
       $JoinData = array();
       foreach ($IDs as $RecordType => $RecordIDs) {
          if ($RecordType == 'Comment') {
-            Gdn::SQL()->Select('d.Name')->Join('Discussion d', 'd.DiscussionID = r.DiscussionID');
+            Gdn::SQL()->Select('d.Name, d.CategoryID')->Join('Discussion d', 'd.DiscussionID = r.DiscussionID');
          }
          
          $Rows = Gdn::SQL()->Select('r.*')->WhereIn($RecordType.'ID', array_values($RecordIDs))->Get($RecordType. ' r')->ResultArray();
@@ -253,11 +261,21 @@ class ReactionModel {
          }
          
          $Record = $JoinData[$RecordType][$ID];
+         
+         if ($AllowedCats !== TRUE) {
+            // Check to see if the user has permission to view this record.
+            $CategoryID = GetValue('CategoryID', $Record, -1);
+            if (!in_array($CategoryID, $AllowedCats)) {
+               $Unset[] = $Index;
+               continue;
+            }
+         }
+         
          $Row = array_merge($Row, $Record);
          
          switch ($RecordType) {
             case 'Discussion':
-               $Url = Url("/discussion/$ID/".Gdn_Format::Url($Row['Name']));
+               $Url = DiscussionUrl($Row, '', '#latest');
                break;
             case 'Comment':
                $Url = Url("/discussion/comment/$ID");

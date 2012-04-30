@@ -126,6 +126,31 @@ class IPB extends ExportController {
       );
       $Ex->ExportTable('UserRole', "select * from ibf_members", $UserRole_Map);
       
+      // UserMeta.
+      $UserMeta_Map = array(
+          'UserID' => 'UserID',
+          'Name' => 'Name',
+          'Value' => 'Value'
+          );
+      $Sql = "
+      select
+         pp_member_id as UserID,
+         'Plugin.Signatures.Sig' as Name,
+         signature as Value
+      from ibf_profile_portal
+      where length(signature) > 1
+
+      union all
+
+      select
+         pp_member_id as UserID,
+         'Plugin.Signatures.Format' as Name,
+         'IPB' as Value
+      from ibf_profile_portal
+      where length(signature) > 1
+            ";
+      $Ex->ExportTable('UserMeta', $Sql, $UserMeta_Map);
+      
       // Category.
       $Category_Map = array(
           'id' => 'CategoryID',

@@ -8,7 +8,7 @@
 $PluginInfo['AdvancedStats'] = array(
    'Name' => 'Advanced Stats',
    'Description' => "Track and access advanced statistics to better monitor the health of your site.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -134,7 +134,7 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
    public function SettingsController_Statistics_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Site Statistics');
-      $Sender->AddSideMenu('dashboard/settings/stats');
+      $Sender->AddSideMenu('dashboard/settings/statistics');
 		$Sender->Render('stats', '', 'plugins/AdvancedStats');
    }
    

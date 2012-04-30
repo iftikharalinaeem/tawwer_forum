@@ -8,79 +8,40 @@ $Database = Gdn::Database();
 
 $St->Table('Poll')
    ->PrimaryKey('PollID')
+   ->Column('Name', 'varchar(255)', FALSE)
    ->Column('DiscussionID', 'int', TRUE)
    ->Column('CountOptions', 'int', '0')
-   ->Column('CountPollVotes', 'int', '0')
-   ->Column('InsertUserID', 'int', FALSE, 'key')
-   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('CountVotes', 'int', '0')
    ->Column('DateInserted', 'datetime')
-   ->Column('DateUpdated', 'datetime')
-   ->Set($Explicit, $Drop);
+   ->Column('InsertUserID', 'int', FALSE, 'key')
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Set();
 
 $St->Table('PollOption')
    ->PrimaryKey('PollOptionID')
-   ->Column('Description', 'varchar(500)', TRUE)
-   ->Column('InsertUserID', 'int', FALSE, 'key')
-   ->Column('UpdateUserID', 'int', TRUE)
+   ->Column('PollID', 'int', FALSE, 'key')
+   ->Column('Body', 'varchar(500)', TRUE)
+   ->Column('Format', 'varchar(20)', TRUE)
+   ->Column('Sort', 'smallint', FALSE, '0')
    ->Column('DateInserted', 'datetime')
-   ->Column('DateUpdated', 'datetime')
-   ->Set($Explicit, $Drop);
+   ->Column('InsertUserID', 'int', FALSE, 'key')
+   ->Column('DateUpdated', 'datetime', TRUE)
+   ->Column('UpdateUserID', 'int', TRUE)
+   ->Set();
 
-$St->Table('PollPollOption')
-   ->Column('PollID', 'int', FALSE, 'primary')
-   ->Column('PollOptionID', 'int', FALSE, 'primary')
-   ->Column('Sort', 'int', TRUE)
-   ->Column('CountVotes', 'int', '0')
-   ->Set($Explicit, $Drop);
-
-$St->Table('PollPollOptionUser')
-   ->Column('PollID', 'int', FALSE, 'primary')
-   ->Column('PollOptionID', 'int', FALSE, 'primary')
+$St->Table('PollVote')
    ->Column('UserID', 'int', FALSE, 'primary')
-   ->Set($Explicit, $Drop);
+   ->Column('PollOptionID', 'int', FALSE, 'primary')
+   ->Set();
 
 // Define permissions
-$PermissionModel = Gdn::PermissionModel();
-$PermissionModel->Database = $Database;
-$PermissionModel->SQL = $SQL;
+//$PermissionModel = Gdn::PermissionModel();
+//$PermissionModel->Database = $Database;
+//$PermissionModel->SQL = $SQL;
 
 // Define some permissions for the Polls categories.
-$PermissionModel->Define(array(
-	'Vanilla.Polls.Add' => 0),
-	'tinyint',
-	'Category',
-	'PermissionCategoryID'
-	);
-
-// Get the root category so we can assign permissions to it.
-$GeneralCategoryID = $SQL->GetWhere('Category', array('Name' => 'General'))->Value('PermissionCategoryID', 0);
-   
-// Assign permissions to roles
-
-   // Set the intial member permissions.
-   $PermissionModel->Save(array(
-      'Role' => 'Member',
-      'JunctionTable' => 'Category',
-      'JunctionColumn' => 'PermissionCategoryID',
-      'JunctionID' => $GeneralCategoryID,
-      'Vanilla.Polls.Add' => 1
-      ), TRUE);
-
-   // Set the initial moderator permissions.
-   $PermissionModel->Save(array(
-      'Role' => 'Moderator',
-      'JunctionTable' => 'Category',
-      'JunctionColumn' => 'PermissionCategoryID',
-      'JunctionID' => $GeneralCategoryID,
-      'Vanilla.Polls.Add' => 1
-      ), TRUE);
-
-   // Set the initial administrator permissions.
-   $PermissionModel->Save(array(
-      'Role' => 'Administrator',
-      'JunctionTable' => 'Category',
-      'JunctionColumn' => 'PermissionCategoryID',
-      'JunctionID' => $GeneralCategoryID,
-      'Vanilla.Polls.Add' => 1
-      ), TRUE);
+//$PermissionModel->Define(array(
+//	'Vanilla.Polls.Add' => ''
+//));
    
