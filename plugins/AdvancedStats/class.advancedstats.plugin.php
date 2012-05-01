@@ -95,6 +95,67 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
       $this->ActivityController_Buzz_Create($Sender, $Date, $Slot);
    }
    
+   /**
+    * Gets the date range for a slot.
+    * @param string $Slot One of:
+    *  - d: Day
+    *  - w: Week
+    *  - m: Month
+    * @param string|int $Date The date or timestamp in the slot.
+    * @return array The dates in the form array(From, To).
+    */
+   public static function SlotDateRange($Slot = 'w', $Date = FALSE) {
+      if (!$Date)
+         $Timestamp = strtotime(gmdate('Y-m-d'));
+      elseif (is_numeric($Date))
+         $Timestamp = strtotime(gmdate('Y-m-d', $Date));
+      else
+         $Timestamp = strtotime(gmdate('Y-m-d', strtotime($Date)));
+
+      $Result = NULL;
+      switch ($Slot) {
+         case 'd':
+            $Result = array(Gdn_Format::ToDateTime($Timestamp), Gdn_Format::ToDateTime(strtotime('+1 day', $Timestamp)));
+            break;
+         case 'w':
+            $Sub = gmdate('N', $Timestamp) - 1;
+            $Add = 7 - $Sub;
+            $Result = array(Gdn_Format::ToDateTime(strtotime("-$Sub days", $Timestamp)), Gdn_Format::ToDateTime(strtotime("+$Add days", $Timestamp)));
+            break;
+         case 'm':
+            $Sub = gmdate('j', $Timestamp) - 1;
+            $Timestamp = strtotime("-$Sub days", $Timestamp);
+            $Result = array(Gdn_Format::ToDateTime($Timestamp), Gdn_Format::ToDateTime(strtotime("+1 month", $Timestamp)));
+            break;
+         case 'y':
+            $Timestamp = strtotime(date('Y-01-01', $Timestamp));
+            $Result = array(Gdn_Format::ToDate($Timestamp), Gdn_Format::ToDateTime(strtotime("+1 year", $Timestamp)));
+            break;
+      }
+
+      return $Result;
+   }
+   
+   protected static function RangeWhere($Range, $FieldName = 'DateInserted') {
+      return array("$FieldName >=" => $Range[0], "$FieldName <" => $Range[1]);
+   }
+  
+   public function UtilityController_BasicStats_Create($Sender, $Date = FALSE, $Slot = 'w') {
+      $SlotRange = self::SlotDateRange($Slot, $Date);
+      
+      $Result = array(
+          'SlotType' => $Slot,
+          'DateFrom' => $SlotRange[0],
+          'DateTo' => $SlotRange[1],
+      );
+      
+      $Result['CountUsers'] = Gdn::SQL()->GetCount('User', self::RangeWhere($SlotRange));
+      $Result['CountDiscussions'] = Gdn::SQL()->GetCount('Discussion', self::RangeWhere($SlotRange));
+      $Result['CountComments'] = Gdn::SQL()->GetCount('Comment', self::RangeWhere($SlotRange));
+      
+      $Sender->SetData('Stats', $Result);
+      $Sender->Render('Blank', 'Utility', 'Dashboard');
+   }
    
    /**
     * Adds & removes dashboard menu options.
