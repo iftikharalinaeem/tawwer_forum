@@ -888,7 +888,7 @@ pageTracker._trackPageview();
       $PlanPlugins = FALSE;
       if (class_exists('Infrastructure')) {
          $Plan = Infrastructure::Plan();
-         $PlanPlugins = GetValue('Plugins', json_decode(GetValue('Addons', $Plan)));
+         $PlanPlugins = GetValue('Plugins', json_decode(GetValue('Addons', GetValue('Plan', $Plan))));
       }
       if (!$PlanPlugins) {
          $PlanPlugins = C('VFCom.Plugins.Default', array("ButtonBar","Emotify","Facebook",
