@@ -47,7 +47,7 @@ class PostCountPlugin extends Gdn_Plugin {
       $User = Gdn::UserModel()->GetID($Sender->EventArguments['Author']->UserID);
       if ($User) {
          $Posts = GetValue('CountComments', $User, 0) + GetValue('CountDiscussions', $User, 0);
-         echo '<span class="MItem PostCount">'.T(Plural(number_format($Posts),'Posts: %s','Posts: %s')).'</span>';
+         echo '<span class="MItem PostCount">'.Plural(number_format($Posts), '@'.T('Posts.Singular: %s', 'Posts: %s'), '@'.T('Posts.Plural: %s', 'Posts: %s')).'</span>';
       }
    }
 
