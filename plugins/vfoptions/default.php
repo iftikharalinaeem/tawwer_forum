@@ -935,8 +935,8 @@ pageTracker._trackPageview();
          // Toggle button
          if (!$Enabled && in_array($Key, $LockedPlugins)) {
             // Locked plugins need admin intervention to enable. Doesn't stop URL circumvention.
-            $Addons[$Key]['ToggleText'] = '/dashboard/settings/vanillasupport';
-            $Addons[$Key]['ToggleUrl'] = 'Contact Us';
+            $Addons[$Key]['ToggleText'] = 'Contact Us';
+            $Addons[$Key]['ToggleUrl'] = '/dashboard/settings/vanillasupport';
          }
          else {
             $Addons[$Key]['ToggleText'] = $ToggleText = $Enabled ? 'Disable' : 'Enable';
