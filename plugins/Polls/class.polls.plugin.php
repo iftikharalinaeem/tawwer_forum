@@ -153,7 +153,6 @@ class PollsPlugin extends Gdn_Plugin {
     * @param type $Sender 
     */
    public function DiscussionController_BeforeDiscussionBody_Handler($Sender) {
-      $Sender->SetData('Answers', $this->Answers);
       echo Gdn_Theme::Module('PollModule');
    }
    
@@ -161,16 +160,18 @@ class PollsPlugin extends Gdn_Plugin {
     * Display a user's vote in their author info. 
     * @param type $Sender 
     */
-   public function DiscussionController_AuthorInfo_Handler($Sender) {
+   public function DiscussionController_BeforeCommentBody_Handler($Sender) {
       $Sender->SetData('Answers', $this->Answers);
       $Count = count($this->Answers);
       $Vote = rand(0, $Count+1);
       $CssClass = 'PollColor PollColor'.($Vote+1);
       if ($Vote <= $Count)
-         echo '<span class="AuthorVote '.$CssClass.'">'.SliceString(GetValue($Vote, $this->Answers), 30).'</span>';
+         echo '<div class="PollVote"><span class="'.$CssClass.'"></span> '.GetValue($Vote, $this->Answers).'</div>';
+         // echo '<div class="PollVote"><span class="'.$CssClass.'"></span> '.SliceString(GetValue($Vote, $this->Answers), 30).'</div>';
    }
    
    public function DiscussionController_Render_Before($Sender) {
+      $Sender->SetData('Answers', $this->Answers);
       $Sender->AddCssFile('plugins/Polls/design/style.css');
    }
 }
