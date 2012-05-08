@@ -29,6 +29,9 @@ class vfHelpPlanPlugin extends Gdn_Plugin {
    }
    
    protected function AttachPlan($Sender, $UserID) {
+      if (!CheckPermission('Garden.Moderation.Manage'))
+         return;
+      
       $User = Gdn::UserModel()->GetID($UserID);
       if (GetValue('Admin', $User))
          return;
