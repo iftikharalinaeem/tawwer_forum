@@ -226,9 +226,9 @@ input.RedButton:hover {
 	border-width: 0;
 }
 .VFMenu a:hover {
-	box-shadow: inset 0 0 8px #003f87;
-	-moz-box-shadow: inset 0 0 8px #003f87;
-	-webkit-box-shadow: inset 0 0 8px #003f87;
+	box-shadow: inset 0 0 3px #fff;
+	-moz-box-shadow: inset 0 0 3px #fff;
+	-webkit-box-shadow: inset 0 0 3px #fff;
 	color: #003f87;
 }
 .SmallBlueButton:focus,
@@ -236,8 +236,9 @@ input.RedButton:hover {
 .VFMenu a:focus,
 body#vfcom_info_index .VFMenu a.Home,
 body.Resources .VFMenu a.Resources,
+body.Tour .VFMenu a.Tour,
 body.plans .VFMenu a.Plans,
-body.Features .VFMenu a.Features{
+body.Features .VFMenu a.Features {
 	background: #002a59;
 	background:-webkit-gradient(linear, center bottom, center top, from(#024d8f), to(#002a59));
 	background:-moz-linear-gradient(top, #002a59, #024d8f);
