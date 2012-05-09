@@ -136,8 +136,8 @@ class PollsPlugin extends Gdn_Plugin {
    }
    
    // var $Answers = array('Starbucks', 'Second Cup', 'Tim Hortons', 'Lilly &amp; Ollie', 'Nicaragua', 'Juan Valdez', 'Home', 'No coffee for me!', 'DOWN WITH COMMUNISM!', 'Other');
-   // var $Answers = array('Starbucks', 'Second Cup', 'Tim Hortons', 'Other', "Don't care!");
-   var $Answers = array(
+   var $Answers = array('Starbucks', 'Second Cup', 'Tim Hortons', 'Other', "Don't care!");
+   /*var $Answers = array(
        'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
        'Proin ac congue nisl',
        'Maecenas id lectus vitae turpis ullamcorper rhoncus vel eu diam',
@@ -147,6 +147,7 @@ class PollsPlugin extends Gdn_Plugin {
        'Mauris eget velit eu nisi scelerisque pulvinar quis eget diam. Morbi et sapien eu sapien rhoncus porta',
        'Duis eu mi mauris, in bibendum erat'
    );
+    */
    
    /** 
     * Display the poll on the discussion. 
