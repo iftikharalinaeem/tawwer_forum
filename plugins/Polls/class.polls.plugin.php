@@ -16,13 +16,6 @@ $PluginInfo['Polls'] = array(
 );
 
 class PollsPlugin extends Gdn_Plugin {
-   /// Methods ///
-   
-//   private function AddJs($Sender) {
-//      $Sender->AddJsFile('jquery-ui-1.8.17.custom.min.js');
-//      $Sender->AddJsFile('reactions.js', 'plugins/Reactions');
-//   }
-   
    public function Setup() {
       $this->Structure();
    }
@@ -32,11 +25,38 @@ class PollsPlugin extends Gdn_Plugin {
    }
    
    /** 
+    * Add the "new poll" button after the new discussion button. 
+    */
+   public function Base_AfterNewDiscussionButton_Handler($Sender) {
+      echo Anchor(Sprite('SpPoll').T('New Poll'), 'post/poll', 'Button BigButton PollButton');
+   }
+   
+   public function PostController_Render_Before($Sender) {
+      $Sender->AddCssFile('plugins/Polls/design/style.css');
+      $Sender->SetJson('DEBUG', 'test2');
+      $this->_LoadVotes($Sender);
+   }
+   
+   /** 
+    * Add a css class to discussions in the discussion list if they have polls attached. 
+    */
+   public function DiscussionsController_Render_Before($Sender) {
+      $Sender->AddCssFile('plugins/Polls/design/style.css');
+      $Discussions = &$Sender->Data('Discussions');
+      if ($Discussions) {
+         foreach ($Discussions as &$Row) {
+            if (strtolower(GetValue('Type', $Row)) == 'poll')
+               SetValue('_CssClass', $Row, trim(GetValue('_CssClass', $Row).' ItemPoll'));
+         }         
+      }
+   }
+   
+   /** 
     * Add the poll form to vanilla's post page.
     */
    public function PostController_AfterForms_Handler($Sender) {
       $Forms = $Sender->Data('Forms');
-      $Forms[] = array('Name' => 'Poll', 'Label' => Sprite('SpNewPoll').T('New Poll'), 'Url' => 'post/poll');
+      $Forms[] = array('Name' => 'Poll', 'Label' => Sprite('SpPoll').T('New Poll'), 'Url' => 'post/poll');
 		$Sender->SetData('Forms', $Forms);
    }
    
@@ -44,6 +64,8 @@ class PollsPlugin extends Gdn_Plugin {
     * Create the new poll method on post controller.
     */
    public function PostController_Poll_Create($Sender) {
+      $PollModel = new PollModel();
+      
       // Override CategoryID if categories are disabled
       $Sender->CategoryID = GetValue(0, $Sender->RequestArgs);
       $UseCategories = $Sender->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
@@ -61,118 +83,154 @@ class PollsPlugin extends Gdn_Plugin {
       $Sender->Permission('Vanilla.Discussions.Add');
       
       // Set the model on the form
-      $Sender->Form->SetModel($Sender->DiscussionModel);
+      $Sender->Form->SetModel($PollModel);
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
          if ($Sender->Category !== NULL)
             $Sender->Form->SetData(array('CategoryID' => $Sender->Category->CategoryID));
       } else { // Form was submitted
-         // Save as a draft?
-         $FormValues = $this->Form->FormValues();
-         $FormValues = $this->DiscussionModel->FilterForm($FormValues);
-         $Sender->DeliveryType(GetIncomingValue('DeliveryType', $this->_DeliveryType));
-         if (!is_object($Sender->Category) && isset($FormValues['CategoryID']))
-            $Sender->Category = $CategoryData[$FormValues['CategoryID']];
-
-         if (is_object($Sender->Category)) {
-            // Check category permissions.
-            if ($Sender->Form->GetFormValue('Announce', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Announce', TRUE, 'Category', $Sender->Category->PermissionCategoryID))
-               $Sender->Form->AddError('You do not have permission to announce in this category', 'Announce');
-
-            if ($Sender->Form->GetFormValue('Close', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Close', TRUE, 'Category', $Sender->Category->PermissionCategoryID))
-               $Sender->Form->AddError('You do not have permission to close in this category', 'Close');
-
-            if ($Sender->Form->GetFormValue('Sink', '') != '' && !$Session->CheckPermission('Vanilla.Discussions.Sink', TRUE, 'Category', $Sender->Category->PermissionCategoryID))
-               $Sender->Form->AddError('You do not have permission to sink in this category', 'Sink');
-
-            if (!$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $Sender->Category->PermissionCategoryID))
-               $Sender->Form->AddError('You do not have permission to start discussions in this category', 'CategoryID');
-         }
-
-         // Make sure that the title will not be invisible after rendering
-         $Name = trim($Sender->Form->GetFormValue('Name', ''));
-         if ($Name != '' && Gdn_Format::Text($Name) == '')
-            $Sender->Form->AddError(T('You have entered an invalid discussion title'), 'Name');
-         else {
-            // Trim the name.
-            $FormValues['Name'] = $Name;
-            $Sender->Form->SetFormValue('Name', $Name);
-         }
-
+         $FormValues = $Sender->Form->FormValues();
+         $DiscussionID = $PollModel->Save($FormValues, $Sender->CommentModel);
+         $Sender->Form->SetValidationResults($PollModel->ValidationResults());
          if ($Sender->Form->ErrorCount() == 0) {
-            $DiscussionID = $Sender->DiscussionModel->Save($FormValues, $Sender->CommentModel);
-            $Sender->Form->SetValidationResults($Sender->DiscussionModel->ValidationResults());
-            if ($DiscussionID == SPAM) {
-               $Sender->StatusMessage = T('Your post has been flagged for moderation.');
-               $Sender->Render('Spam');
-               return;
-            }
-         }
-         if ($Sender->Form->ErrorCount() > 0) {
-            // Return the form errors
-            $Sender->ErrorMessage($Sender->Form->Errors());
-         } else if ($DiscussionID > 0) {
-            // Make sure that the ajax request form knows about the newly created discussion or draft id
-            $Sender->SetJson('DiscussionID', $DiscussionID);
-            
-            // Redirect to the new discussion
-            $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
-            $Sender->EventArguments['Discussion'] = $Discussion;
-            $Sender->FireEvent('AfterDiscussionSave');
-
-            if ($Sender->_DeliveryType == DELIVERY_TYPE_ALL) {
-               Redirect(DiscussionUrl($Discussion));
-            } else {
-               $Sender->RedirectUrl = DiscussionUrl($Discussion, '', TRUE);
-            }
+            $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);            
+            Redirect(DiscussionUrl($Discussion));
          }
       }
       
       // Set up the page and render
-      $Sender->FireEvent('BeforeDiscussionRender');
-		$Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/poll')));
       $Sender->Title(T('New Poll'));
+		$Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/poll')));
       $Sender->AddJsFile('jquery.duplicate.js');
       $Sender->Render('add', '', 'plugins/Polls');
    }
-   
-   // var $Answers = array('Starbucks', 'Second Cup', 'Tim Hortons', 'Lilly &amp; Ollie', 'Nicaragua', 'Juan Valdez', 'Home', 'No coffee for me!', 'DOWN WITH COMMUNISM!', 'Other');
-   var $Answers = array('Starbucks', 'Second Cup', 'Tim Hortons', 'Other', "Don't care!");
-   /*var $Answers = array(
-       'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-       'Proin ac congue nisl',
-       'Maecenas id lectus vitae turpis ullamcorper rhoncus vel eu diam',
-       'Vivamus consequat magna luctus lacus pharetra eget porttitor quam dictum',
-       'Pellentesque venenatis vulputate lobortis',
-       'Donec vel mi ut ante sollicitudin blandit',
-       'Mauris eget velit eu nisi scelerisque pulvinar quis eget diam. Morbi et sapien eu sapien rhoncus porta',
-       'Duis eu mi mauris, in bibendum erat'
-   );
-    */
    
    /** 
     * Display the poll on the discussion. 
     * @param type $Sender 
     */
-   public function DiscussionController_BeforeDiscussionBody_Handler($Sender) {
-      echo Gdn_Theme::Module('PollModule');
+   public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
+      $Discussion = $Sender->Data('Discussion');
+      if (strtolower(GetValue('Type', $Discussion)) == 'poll')
+         echo Gdn_Theme::Module('PollModule');
    }
    
    /** 
     * Display a user's vote in their author info. 
     * @param type $Sender 
     */
-   public function DiscussionController_BeforeCommentBody_Handler($Sender) {
-      $Sender->SetData('Answers', $this->Answers);
-      $Count = count($this->Answers);
-      $Vote = rand(0, $Count+1);
-      $CssClass = 'PollColor PollColor'.($Vote+1);
-      if ($Vote <= $Count)
-         echo '<div class="PollVote"><span class="'.$CssClass.'"></span> '.GetValue($Vote, $this->Answers).'</div>';
-         // echo '<div class="PollVote"><span class="'.$CssClass.'"></span> '.SliceString(GetValue($Vote, $this->Answers), 30).'</div>';
+   public function Base_BeforeCommentBody_Handler($Sender) {
+      $Comment = GetValue('Comment', $Sender->EventArguments);
+      $PollVote = GetValue('PollVote', $Comment);
+      if ($PollVote) {
+         echo '<div class="PollVote">';
+         // Use the sort as the color indicator (it should match up)
+         echo '<span class="PollColor PollColor'.GetValue('Sort', $PollVote).'"></span>';
+         echo '<span class="PollVoteAnswer">'.Gdn_Format::To(GetValue('Body', $PollVote), GetValue('Format', $PollVote)).'</span>';
+         echo '</div>';
+      }
    }
    
+   /** 
+    * Load user votes data based on the discussion in the controller data.
+    * @param type $Sender
+    * @return type 
+    */
+   private function _LoadVotes($Sender) {
+      // Does this discussion have an associated poll?
+      $Discussion = $Sender->Data('Discussion');
+      if (!$Discussion)
+         $Discussion = GetValue('Discussion', $Sender->EventArguments);
+      if (!$Discussion)
+         $Discussion = GetValue('Discussion', $Sender);
+      
+      if (strtolower(GetValue('Type', $Discussion)) == 'poll') {
+         // Load css/js files
+         $Sender->AddCssFile('plugins/Polls/design/style.css');
+         $Sender->AddJsFile('plugins/Polls/js/polls.js');
+
+         // Load the poll based on the discussion id.
+         $PollModel = new PollModel();
+         $Poll = $PollModel->GetByDiscussionID(GetValue('DiscussionID', $Discussion));
+         if (!$Poll)
+            return;
+         
+         // Don't get user votes if this poll is anonymous.
+         if (GetValue('Anonymous', $Poll))
+            return;
+         
+         // Look at all of the users in the comments, and load their associated 
+         // poll vote for displaying on their comments.
+         $CommentData = &$Sender->Data('CommentData');
+         // Grab all of the user fields that need to be joined.
+         $UserIDs = array();
+         foreach ($CommentData as $Row) {
+            $UserIDs[] = GetValue('InsertUserID', $Row);
+         }
+
+         // Get the user votes.
+         $Votes = $PollModel->GetVotesByUserID($Poll->PollID, $UserIDs);
+         
+         // Place the user votes on the comment data.
+         foreach ($CommentData as &$Row) {
+            $UserID = GetValue('InsertUserID', $Row);
+            SetValue('PollVote', $Row, GetValue($UserID, $Votes));
+         }
+      }
+   }
    public function DiscussionController_Render_Before($Sender) {
-      $Sender->SetData('Answers', $this->Answers);
-      $Sender->AddCssFile('plugins/Polls/design/style.css');
+      $this->_LoadVotes($Sender);
+   }
+   public function DiscussionController_BeforeCommentRender_Handler($Sender) {
+      $this->_LoadVotes($Sender);
+   }
+   
+   /** 
+    * Display the Poll label on the discussion list.
+    */
+   public function DiscussionsController_BeforeDiscussionMeta_Handler($Sender) {
+      $Discussion = $Sender->EventArguments['Discussion'];
+      echo Tag($Discussion, 'Type', 'Poll');
+   }
+   
+   /** 
+    * Allows users to vote on a poll. Redirects them back to poll discussion, or 
+    * returns the module html if ajax request.
+    */
+   public function DiscussionController_PollVote_Create($Sender) {
+      $Session = Gdn::Session();
+      $Form = new Gdn_Form();
+      $PollModel = new PollModel();
+      $PollOptionModel = new Gdn_Model('PollOption');
+      $PollVoteModel = new Gdn_Model('PollVote');
+
+      // Get values from the form
+      $PollID = $Form->GetFormValue('PollID', 0);
+      $PollOptionID = $Form->GetFormValue('PollOptionID', 0);
+      $PollOption = $PollOptionModel->GetID($PollOptionID);
+      $VotedForPollOptionID = 0;
+      // If this is a valid form postback, poll, poll option, and user session, record the vote.
+      if ($Form->AuthenticatedPostback() && $PollOption && $Session->IsValid())
+         $VotedForPollOptionID = $PollModel->Vote($PollOptionID);
+
+      if ($VotedForPollOptionID == 0)
+         $Sender->InformMessage(T("You didn't select an option to vote for!"));
+
+      // What should we return?
+      $Return = '/';
+      if ($PollID > 0) {
+         $Poll = $PollModel->GetID($PollID);
+         $Discussion = $Sender->DiscussionModel->GetID(GetValue('DiscussionID', $Poll));
+         if ($Discussion)
+            $Return = DiscussionUrl($Discussion);
+      }
+      
+      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
+         Redirect($Return);
+      
+      // Otherwise get the poll html & return it.
+      $PollModule = new PollModule();
+      $Sender->SetData('PollID', $PollID);
+      $Sender->SetJson('PollHtml', $PollModule->ToString());
+      $Sender->Render('Blank', 'Utility', 'Dashboard');
    }
 }

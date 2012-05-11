@@ -1,6 +1,4 @@
 <?php if (!defined('APPLICATION')) exit;
-
-// include_once dirname(__FILE__).'/class.reactionmodel.php';
       
 $St = Gdn::Structure();
 $Sql = Gdn::SQL();
@@ -12,6 +10,7 @@ $St->Table('Poll')
    ->Column('DiscussionID', 'int', TRUE)
    ->Column('CountOptions', 'int', '0')
    ->Column('CountVotes', 'int', '0')
+   ->Column('Anonymous', 'int', '0')
    ->Column('DateInserted', 'datetime')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('DateUpdated', 'datetime', TRUE)
@@ -24,6 +23,7 @@ $St->Table('PollOption')
    ->Column('Body', 'varchar(500)', TRUE)
    ->Column('Format', 'varchar(20)', TRUE)
    ->Column('Sort', 'smallint', FALSE, '0')
+   ->Column('CountVotes', 'int', '0')
    ->Column('DateInserted', 'datetime')
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('DateUpdated', 'datetime', TRUE)
