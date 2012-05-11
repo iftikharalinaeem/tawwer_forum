@@ -132,6 +132,7 @@
 .Tag-Poll {
    background-color: #fba000;
 }
+/*
 .Tag-Poll:before {
     content: '';
     display: inline-block;
@@ -140,7 +141,7 @@
     margin-right: 4px;
     background: url('sprites3.png') 0 0 no-repeat transparent;
 }
-
+*/
 
 /* New Poll Form */
 .NewPollForm .PollOption {
