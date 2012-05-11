@@ -21,10 +21,9 @@ class PollModule extends Gdn_Module {
       
       // Failing that, look for a DiscussionID
       if (!$Poll && $Discussion)
-         $Poll = $PollModel->GetByDiscussionID ($Discussion->DiscussionID);
-      
-      $this->SetData('Poll', $Poll);         
-      
+         $Poll = $PollModel->GetByDiscussionID(GetValue('DiscussionID', $Discussion));
+
+      $this->SetData('Poll', $Poll);
       if ($Poll) {
          // Load the poll options
          $PollID = GetValue('PollID', $Poll);
