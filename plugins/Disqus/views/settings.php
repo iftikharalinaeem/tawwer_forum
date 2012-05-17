@@ -7,7 +7,7 @@
 echo $this->Form->Open();
 echo $this->Form->Errors();
 
-$Form = new Gdn_Form();
+$Form = $this->Form; //new Gdn_Form();
 echo $Form->Simple(array(
     'AuthenticationKey' => array('LabelCode' => 'Consumer Key', 'Options' => array('class' => 'InputBox WideInput')),
     'AssociationSecret' => array('LabelCode' => 'Consumer Secret', 'Options' => array('class' => 'InputBox WideInput'))));
