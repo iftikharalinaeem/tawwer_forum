@@ -47,7 +47,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       echo '<div class="P">';
          echo $this->Form->Label('Poll Options', 'PollOption[]');
          echo '<ol class="PollOptions">';
-            echo '<li class="PollOption">' . $this->Form->TextBox('PollOption[]', array('class' => 'InputBox BigInput NoIE', 'placeholder' => 'Add an Option...')) . '</li>';
+            echo '<li class="PollOption">' . $this->Form->TextBox('PollOption[]', array('class' => 'InputBox BigInput NoIE')) . '</li>';
             $PollOptions = GetValue('PollOption', $this->Form->FormValues());
             if (is_array($PollOptions)) {
                foreach ($PollOptions as $PollOption) {
