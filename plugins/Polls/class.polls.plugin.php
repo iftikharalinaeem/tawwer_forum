@@ -8,7 +8,7 @@
 $PluginInfo['Polls'] = array(
    'Name' => 'Polls',
    'Description' => "Allow users to create and vote on polls.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
@@ -45,24 +45,6 @@ class PollsPlugin extends Gdn_Plugin {
          echo '<span class="PollVoteAnswer">'.Gdn_Format::To(GetValue('Body', $PollVote), GetValue('Format', $PollVote)).'</span>';
          echo '</div>';
       }
-   }
-   
-   /** 
-    * Display the poll on the discussion. 
-    * @param type $Sender 
-    */
-   public function DiscussionController_AfterDiscussionBody_Handler($Sender) {
-      $Discussion = $Sender->Data('Discussion');
-      if (strtolower(GetValue('Type', $Discussion)) == 'poll')
-         echo Gdn_Theme::Module('PollModule');
-   }
-
-   /**
-    * Load comment votes when posting.
-    * @param type $Sender 
-    */
-   public function DiscussionController_BeforeCommentRender_Handler($Sender) {
-      $this->_LoadVotes($Sender);
    }
 
    /** 
@@ -120,6 +102,56 @@ class PollsPlugin extends Gdn_Plugin {
     */
    public function Base_BeforeDiscussionMeta_Handler($Sender) {
       $Discussion = $Sender->EventArguments['Discussion'];
+      
+      if (strcasecmp(GetValue('Type', $Discussion), 'Poll') == 0)
+         echo Tag($Discussion, 'Type', 'Poll');
+   }
+   
+   /** 
+      // Get values from the form
+      $PollID = $Form->GetFormValue('PollID', 0);
+      $PollOptionID = $Form->GetFormValue('PollOptionID', 0);
+      $PollOption = $PollOptionModel->GetID($PollOptionID);
+      $VotedForPollOptionID = 0;
+      // If this is a valid form postback, poll, poll option, and user session, record the vote.
+      if ($Form->AuthenticatedPostback() && $PollOption && $Session->IsValid())
+         $VotedForPollOptionID = $PollModel->Vote($PollOptionID);
+
+      if ($VotedForPollOptionID == 0)
+         $Sender->InformMessage(T("You didn't select an option to vote for!"));
+
+      // What should we return?
+      $Return = '/';
+      if ($PollID > 0) {
+         $Poll = $PollModel->GetID($PollID);
+         $Discussion = $Sender->DiscussionModel->GetID(GetValue('DiscussionID', $Poll));
+         if ($Discussion)
+            $Return = DiscussionUrl($Discussion);
+      }
+      
+      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL)
+         Redirect($Return);
+      
+      // Otherwise get the poll html & return it.
+      $PollModule = new PollModule();
+      $Sender->SetData('PollID', $PollID);
+      $Sender->SetJson('PollHtml', $PollModule->ToString());
+      $Sender->Render('Blank', 'Utility', 'Dashboard');
+   }
+   
+   /** 
+    * Load comment votes on discussion.
+    * @param type $Sender 
+    */
+   public function DiscussionController_Render_Before($Sender) {
+      $this->_LoadVotes($Sender);
+   }
+
+   /** 
+    * Display the Poll label on the discussion list.
+    */
+   public function Base_BeforeDiscussionMeta_Handler($Sender) {
+      $Discussion = $Sender->EventArguments['Discussion'];
       echo Tag($Discussion, 'Type', 'Poll');
    }
    
@@ -127,6 +159,13 @@ class PollsPlugin extends Gdn_Plugin {
     * Add a css class to discussions in the discussion list if they have polls attached. 
     */
    public function DiscussionsController_Render_Before($Sender) {
+      $this->_AddCss($Sender);
+   }
+   public function CategoriesController_Render_Before($Sender) {
+      $this->_AddCss($Sender);
+   }
+   
+   protected function _AddCss($Sender) {
       $Sender->AddCssFile('plugins/Polls/design/style.css');
       $Discussions = &$Sender->Data('Discussions');
       if ($Discussions) {
@@ -137,6 +176,8 @@ class PollsPlugin extends Gdn_Plugin {
       }
    }
 
+   
+   
    /** 
     * Add the poll form to vanilla's post page.
     */
@@ -192,13 +233,6 @@ class PollsPlugin extends Gdn_Plugin {
    
    /** 
     * Load the vote data so the user's vote will appear on new posted comments.
-    */
-   public function PostController_Render_Before($Sender) {
-      $Sender->AddCssFile('plugins/Polls/design/style.css');
-      $this->_LoadVotes($Sender);
-   }
-   
-   /** 
     * Load user votes data based on the discussion in the controller data.
     * @param type $Sender
     * @return type 
@@ -246,5 +280,5 @@ class PollsPlugin extends Gdn_Plugin {
             }
          }
       }
-   }
+   }   
 }

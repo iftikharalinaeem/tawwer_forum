@@ -53,7 +53,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
                foreach ($PollOptions as $PollOption) {
                   $PollOption = trim(Gdn_Format::PlainText($PollOption));
                   if ($PollOption != '') 
-                     echo '<li class="PollOption">' . $this->Form->TextBox('PollOption[]', array('value' => $PollOption, 'class' => 'InputBox BigInput NoIE', 'placeholder' => 'Add an Option...')) . '</li>';
+                     echo '<li class="PollOption">' . $this->Form->TextBox('PollOption[]', array('value' => $PollOption, 'class' => 'InputBox BigInput')) . '</li>';
                }
             }
          echo '</ol>';
