@@ -42,7 +42,7 @@ else:
                   $MaxLimit = 20;
                   $Max = $CountActualVotes > $MaxLimit ? $MaxLimit : $CountActualVotes;
                   for ($i = 0; $i < $Max; $i++)
-                     echo UserPhoto($Votes[$i]);
+                     echo UserPhoto($Votes[$i], array('Size' => 'Small'));
                   ?>
                </span>
                <span class="VoteCount"><?php echo Plural($CountActualVotes, '%s vote', '%s votes'); ?></span>
