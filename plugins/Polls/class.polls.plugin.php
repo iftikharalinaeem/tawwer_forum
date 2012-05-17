@@ -8,7 +8,7 @@
 $PluginInfo['Polls'] = array(
    'Name' => 'Polls',
    'Description' => "Allow users to create and vote on polls.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
@@ -102,7 +102,9 @@ class PollsPlugin extends Gdn_Plugin {
     */
    public function Base_BeforeDiscussionMeta_Handler($Sender) {
       $Discussion = $Sender->EventArguments['Discussion'];
-      echo Tag($Discussion, 'Type', 'Poll');
+      
+      if (strcasecmp(GetValue('Type', $Discussion), 'Poll') == 0)
+         echo Tag($Discussion, 'Type', 'Poll');
    }
    
    /** 
