@@ -41,7 +41,7 @@ $Session = Gdn::Session();
                   <?php
                   echo Anchor(Sprite('SpHome').'Home', '/', 'Home', array('SSL' => FALSE));
                   echo Anchor(Sprite('SpPlans').'Plans &amp; Pricing', '/plans', 'Plans', array('SSL' => FALSE));
-                  echo Anchor(Sprite('SpFeatures').'Features', '/features', 'Features', array('SSL' => FALSE));
+                  echo Anchor(Sprite('SpTour').'Tour', '/tour', 'Tour', array('SSL' => FALSE));
                   echo Anchor(Sprite('SpResources').'Resources', '/resources', 'Resources', array('SSL' => FALSE));
                   echo Anchor(Sprite('SpBlog').'Blog', '/blog', 'Blog', array('SSL' => FALSE));
                   ?>

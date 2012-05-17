@@ -23,10 +23,12 @@ body.Addon #Content img.Icon {
    padding: 2px;
    /* border: 1px solid #ddd; */
 }
-
+.AddonRow {
+   overflow: hidden;
+}
 .AddonRow .Icon img {
-   height: 64px;
-   width: 64px;
+   height: 40px;
+   width: 40px;
 }
 
 input.Button {
@@ -97,8 +99,9 @@ div.Testing h3 {
    font-weight: normal;
 }
 #addons_addon_index #Content .Legal {
-   width: 706px;
-   float: left;
+/*   width: 706px;
+   float: left;*/
+   overflow: hidden;
    background: #FEF7DF;
    padding: 12px;
    margin: 0 0 20px;
@@ -494,15 +497,15 @@ div.Hosting div.Host img {
    margin: 0;
    padding: 0 0 4px;
 }
-#Content h2 {
+/*#Content h2 {
    margin-bottom: 0 !important;
-}
-body.Addon #Content h2.Questions {
+}*/
+/*body.Addon #Content h2.Questions {
    clear: both;
    margin-bottom: 0;
    display: block;
    position: relative;
-}
+}*/
 body.Addon h2.Questions a.TabLink {
    margin-left: 40px;
    font-size: 12px;

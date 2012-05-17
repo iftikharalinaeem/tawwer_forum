@@ -19,9 +19,13 @@ function WriteRevisions($Sender, $Tab = '') {
 
       echo '<div class="Revision'.($Row->RevisionID == $LiveRevisionID ? ' LiveRevision' : '').'">&rarr;'
          .Anchor(date("g:i:sa", Gdn_Format::ToTimeStamp($Row->DateInserted)), 'settings/customtheme/revision/'.$Tab.'/'.$Row->RevisionID)
-         .($Row->Label ? htmlspecialchars($Row->Label).' ' : '')
-         .($Row->RevisionID == $LiveRevisionID ? ' Live Version' : '')
-      .'</div>';
+         .($Row->Label ? htmlspecialchars($Row->Label).' ' : '');
+      
+      if ($Row->Live == 1)
+         echo ' Live Version';
+      elseif ($Row->Live == 2)
+         echo ' Previewing';
+      echo '</div>';
    }  
    ?>
       <div class="NewDay"><?php echo Anchor(T('Original Version'), 'settings/customtheme/revision/'.$Tab.'/0'); ?></div>
@@ -56,16 +60,6 @@ echo $this->Form->Errors();
          <div class="CustomThemeOptions">
             <strong>Revision Options</strong>
             <div class="InfoBox RevisionOptions">
-               <ul>
-                  <li>
-                     <strong>How to include your Custom CSS:</strong>
-                     <?php
-                     $Default = C('Plugins.CustomCSS.IncludeThemeCSS', 'Yes');
-                     echo $this->Form->Radio('IncludeThemeCSS', 'Add my css after the theme css.', array('value' => 'Yes', 'default' => $Default));
-                     echo $this->Form->Radio('IncludeThemeCSS', "ONLY use my CSS (not recommended).", array('value' => 'No', 'default' => $Default));
-                     ?>
-                  </li>
-               </ul>
                <div class="Buttons">
                <?php
                echo $this->Form->Button('Preview', array('class' => 'TextButton'));

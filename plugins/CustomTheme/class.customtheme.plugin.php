@@ -6,7 +6,7 @@
 $PluginInfo['CustomTheme'] = array(
    'Name' => 'Custom Theme',
    'Description' => 'Allows administrators to customize the CSS & master HTML template of the currently enabled theme.',
-   'Version' => '2.1.2',
+   'Version' => '2.1.5',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
@@ -14,6 +14,22 @@ $PluginInfo['CustomTheme'] = array(
 );
 
 class CustomThemePlugin implements Gdn_IPlugin {
+   
+   public static function GetRevisionID($Key) {
+      if (StringEndsWith($Key, 'ID'))
+         $Value = C("Plugins.CustomTheme.$Key", '0');
+      else
+         $Value = $Key;
+      
+      $Parts = explode('_', $Value, 2);
+      return $Parts[0];
+   }
+   
+   public static function SetRevisionID($RevisionID, $Time) {
+      return $RevisionID.'_'.str_replace(array(' ', ':'), '-', $Time);
+   }
+   
+   /// Event Handlers ///
    
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
 		if (!$this->_CanCustomizeTheme())
@@ -30,7 +46,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		// If we are in preview mode...
 		if (Gdn::Session()->GetPreference('PreviewCustomTheme')) {
 			// Add the css file that styles the preview inform message buttons
-			$Sender->AddCssFile('previewtheme.css', 'dashboard');
+			$Sender->AddCssFile('previewtheme.css', 'plugins/CustomTheme');
 			
 			// Inform the user of the preview status
 		   $Form = new Gdn_Form();
@@ -44,8 +60,12 @@ class CustomThemePlugin implements Gdn_IPlugin {
 				.'</div>'
 				.$Form->Close();
 				
-			$Sender->InformMessage($Message, 'NoDismiss');
-		}
+			$Sender->InformMessage($Message, array('CssClass' => 'NoDismiss', 'id' => 'InPreviewCustomTheme'));
+		} else if (Gdn::Session()->GetPreference('LiveEditCSS')) {
+			// Inform the user of the preview status
+			$Message = 'You are in "Edit CSS" mode: '.Anchor('Exit', 'settings/customtheme/exiteditcss', array('target' => '_top'));				
+			$Sender->InformMessage($Message, array('CssClass' => 'NoDismiss InLiveEditCssMode', 'id' => 'InLiveEditCssMode'));
+      }
 	}
 	
 	/**
@@ -56,7 +76,8 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$ThemeInfo = $ThemeManager->EnabledThemeInfo();
       
 		// Make sure the current theme uses a smarty master template instead of php
-		return $ThemeInfo['Index'] == 'default' || file_exists(PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '').'/views/default.master.tpl');
+      $ThemeRoot = PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '');
+		return $ThemeInfo['Index'] == 'default' || !file_exists($ThemeRoot.'/views/default.master.php');
 	}
 	
 	/**
@@ -71,12 +92,12 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$IsDefaultMaster = $Sender->MasterView == 'default' || $Sender->MasterView == '';
 		$WorkingRevisionID = C('Plugins.CustomTheme.WorkingRevisionID', 0);
 		$LiveRevisionID = C('Plugins.CustomTheme.LiveRevisionID', 0);
-		$WorkingIncludeThemeCSS = C('Plugins.CustomTheme.WorkingIncludeThemeCSS', 'Yes') == 'Yes' ? TRUE : FALSE;
-		$LiveIncludeThemeCSS = C('Plugins.CustomTheme.LiveIncludeThemeCSS', 'Yes') == 'Yes' ? TRUE : FALSE;
+		// $WorkingIncludeThemeCSS = C('Plugins.CustomTheme.WorkingIncludeThemeCSS', 'Yes') == 'Yes' ? TRUE : FALSE;
+		// $LiveIncludeThemeCSS = C('Plugins.CustomTheme.LiveIncludeThemeCSS', 'Yes') == 'Yes' ? TRUE : FALSE;
 		
 		// Wipe out master css?
-		if ($IsDefaultMaster && (!$LiveIncludeThemeCSS || ($DoPreview && !$WorkingIncludeThemeCSS)))
-			$Sender->ClearCSSFiles();
+		// if ($IsDefaultMaster && (!$LiveIncludeThemeCSS || ($DoPreview && !$WorkingIncludeThemeCSS)))
+		//	$Sender->ClearCSSFiles();
 		
 		if ($IsDefaultMaster && $WorkingRevisionID == 0 && $LiveRevisionID == 0) {
 			// Fallbacks to old method
@@ -101,13 +122,15 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$this->_Construct();
 
 		// If we are using the default master view, and in preview mode, use custom css & html files
-		$DoPreview = Gdn::Session()->GetPreference('PreviewCustomTheme', FALSE);
-		$IsDefaultMaster = $Sender->MasterView == 'default' || $Sender->MasterView == '';
+      $LiveEditCSS = Gdn::Session()->GetPreference('LiveEditCSS', FALSE);
+		$DoPreview = Gdn::Session()->GetPreference('PreviewCustomTheme', FALSE) || $LiveEditCSS;
+      $AddCustomCss = ArrayHasValue(Gdn::Controller()->CssFiles(), 'style.css'); //
+      $IsDefaultMaster = $Sender->MasterView == 'default' || $Sender->MasterView == '';
 		$IsHead = property_exists($Sender, 'Head') && is_object($Sender->Head);
 		$WorkingRevisionID = C('Plugins.CustomTheme.WorkingRevisionID', 0);
 		$LiveRevisionID = C('Plugins.CustomTheme.LiveRevisionID', 0);
 		
-		if ($IsHead && $IsDefaultMaster) {
+		if ($IsHead && $AddCustomCss) {
 			// New method
 			if ($DoPreview && $WorkingRevisionID > 0) {
 				// $Sender->Head->AddString("\n".'<link rel="stylesheet" type="text/css" href="'.Asset('/plugin/customcss/rev_'.$WorkingRevisionID.'.css', FALSE, TRUE).'" media="all" />');
@@ -117,16 +140,6 @@ class CustomThemePlugin implements Gdn_IPlugin {
 				$Sender->Head->AddCss('/plugin/customcss/'.Gdn_Format::Url(Gdn::Request()->Host()).'/rev_'.$LiveRevisionID.'.css', 'all');
 			}
 		}
-
-		// Hook smarty up with our custom template resource (functions at bottom of this file)
-		$Smarty = Gdn::Factory('Smarty');
-		// register the resource name "customtheme"
-		$Smarty->register_resource("customtheme", array(
-			"customtheme_smarty_get_template", 
-			"customtheme_smarty_get_timestamp",
-			"customtheme_smarty_get_secure",
-			"customtheme_smarty_get_trusted"
-		));
 
 		// Backwards compatibility
 		$Theme = C('Garden.Theme');
@@ -147,12 +160,27 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		}
 	}
 	
-	public static function GetRevisionFromFileName($FileName, $Default = 0) {
+   /** 
+   *	Hook smarty up with our custom template resource (functions at bottom of this file)
+   * @param type $Smarty 
+   */
+   public function Gdn_Smarty_Init_Handler($Smarty) {
+		// Register the resource name "customtheme"
+      $Smarty->register_resource("customtheme", array(
+         "customtheme_smarty_get_template", 
+         "customtheme_smarty_get_timestamp",
+         "customtheme_smarty_get_secure",
+         "customtheme_smarty_get_trusted"
+      ));
+   }
+
+   public static function GetRevisionFromFileName($FileName, $Default = 0) {
 		if ($FileName === FALSE)
 			return $Default;
 		
 		// Note: the _css and _tpl is because PHP replaces url dots with underscores automatically.
 		$Revision = str_replace(array('default_master_', 'rev_', 'custom_', '.css', '.tpl', '_css', '_tpl'), array('', '', '', '', '', '', ''), $FileName);
+      $Revision = self::GetRevisionID($Revision);
 		return is_numeric($Revision) ? $Revision : $Default;
 	}
 	
@@ -201,15 +229,16 @@ class CustomThemePlugin implements Gdn_IPlugin {
       $Sender->AddSideMenu('settings/customtheme');
 		
       $Sender->Form = new Gdn_Form();
-		if ($Sender->Form->GetFormValue('Exit_Preview') ? TRUE : FALSE) {
+		if ($Sender->Form->GetFormValue('Exit_Preview') ? TRUE : FALSE || GetValue(0, $Sender->RequestArgs, '1') == 'exiteditcss') {
 			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
+			$UserModel->SavePreference($Session->UserID, 'LiveEditCSS', FALSE);
 			Redirect('/settings/customtheme');
 		}		
 		
-//		$Sender->AddJsFile('/js/library/jquery.autogrow.js');
+		// $Sender->AddJsFile('/js/library/jquery.autogrow.js');
 		$Sender->AddJsFile('customtheme.js', 'plugins/CustomTheme');
       $Sender->AddJsFile('jquery.textarea.js', 'plugins/CustomTheme');
-		$Sender->AddCssFile('/plugins/CustomTheme/customtheme.css');
+		$Sender->AddCssFile('customtheme.css', 'plugins/CustomTheme');
 		
 		$ThemeManager = new Gdn_ThemeManager();
 		$CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
@@ -220,8 +249,8 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$PreviewCSSFile = C('Plugins.CustomTheme.PreviewCSS', 'custom_0.css');
 		$PreviewHtmlFile = C('Plugins.CustomTheme.PreviewHtml', 'custom_0.tpl');
 		// This is the new method:
-		$LiveRevisionID = C('Plugins.CustomTheme.LiveRevisionID', 0);
-		$WorkingRevisionID = C('Plugins.CustomTheme.WorkingRevisionID', 0);
+		$LiveRevisionID = self::GetRevisionID('LiveRevisionID');      
+		$WorkingRevisionID = self::GetRevisionID('WorkingRevisionID');
 		
 		// Are we switching back to a previous revision (css OR html)?
 		if (!$Sender->Form->AuthenticatedPostBack()) {
@@ -242,10 +271,11 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		if ($ThemeData) {
 			$HtmlContents = $ThemeData->Html;
 			$CSSContents = $ThemeData->CSS;
-			$IncludeThemeCSS = $ThemeData->IncludeThemeCSS;
+			// $IncludeThemeCSS = $ThemeData->IncludeThemeCSS;
          $Label = $ThemeData->Label;
+         $SaveWorkingRevisionID = self::SetRevisionID($WorkingRevisionID, $ThemeData->DateInserted);
 		} else {
-			$IncludeThemeCSS = 'Yes';
+			// $IncludeThemeCSS = 'Yes';
 			$CSSContents = '';
          $Label = '';
 			if (file_exists($Folder . DS . 'design' . DS . 'customtheme.css'))
@@ -287,7 +317,7 @@ Here are some things you should know before you begin:
 		if (!$Sender->Form->AuthenticatedPostBack()) {
 			$Sender->Form->SetFormValue('CustomCSS', $CSSContents);
 			$Sender->Form->SetFormValue('CustomHtml', $HtmlContents);
-			$Sender->Form->SetFormValue('IncludeThemeCSS', $IncludeThemeCSS);
+			// $Sender->Form->SetFormValue('IncludeThemeCSS', $IncludeThemeCSS);
          $Sender->Form->SetFormValue('Label', $Label);
 		} else {
 			// If saving the form
@@ -299,37 +329,47 @@ Here are some things you should know before you begin:
 			if ($IsApplyPreview) {
 				$Sender->Form->SetFormValue('CustomCSS', $CSSContents);
 				$Sender->Form->SetFormValue('CustomHtml', $HtmlContents);
-				$Sender->Form->SetFormValue('IncludeThemeCSS', $IncludeThemeCSS);
+				// $Sender->Form->SetFormValue('IncludeThemeCSS', $IncludeThemeCSS);
 			}
 			
 			// Save the changes (if there are changes to save):
 			$NewCSS = $Sender->Form->GetFormValue('CustomCSS', '');
 			$NewHtml = $Sender->Form->GetFormValue('CustomHtml', '');
          $NewLabel = $Sender->Form->GetFormValue('Label', NULL);
-			$NewIncludeThemeCSS = $Sender->Form->GetFormValue('IncludeThemeCSS', 'Yes');
+			// $NewIncludeThemeCSS = $Sender->Form->GetFormValue('IncludeThemeCSS', 'Yes');
 			$SmartyCompileError = FALSE;
-			if ($CSSContents != $NewCSS || $HtmlContents != $NewHtml || $IncludeThemeCSS != $NewIncludeThemeCSS) {
-				$WorkingRevisionID = Gdn::SQL()->Insert('CustomThemeRevision', array(
-					'ThemeName' => C('Garden.Theme'),
-					'Html' => $NewHtml,
-					'CSS' => $NewCSS,
-               'Label' => $NewLabel,
-					'IncludeThemeCSS' => $NewIncludeThemeCSS,
-					'InsertUserID' => $Session->UserID,
-					'DateInserted' => Gdn_Format::ToDateTime()
-				));
-				SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', $WorkingRevisionID);
-				SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', $NewIncludeThemeCSS);
+			// if ($CSSContents != $NewCSS || $HtmlContents != $NewHtml || $IncludeThemeCSS != $NewIncludeThemeCSS) {
+			if ($CSSContents != $NewCSS || $HtmlContents != $NewHtml) {
+            $Set = array(
+                  'ThemeName' => C('Garden.Theme'),
+                  'Html' => $NewHtml,
+                  'CSS' => $NewCSS,
+                  'Label' => $NewLabel,
+                  'IncludeThemeCSS' => 'Yes', // $NewIncludeThemeCSS,
+                  'InsertUserID' => $Session->UserID,
+                  'DateInserted' => Gdn_Format::ToDateTime(),
+                  'Live' => 2
+               );
+
+            // Look for an existing working revision.
+            $WorkingRow = Gdn::SQL()->GetWhere('CustomThemeRevision', 
+               array('ThemeName' => C('Garden.Theme'), 'Live' => 2))->FirstRow(DATASET_TYPE_ARRAY);
+            
+            if ($WorkingRow) {
+               $WorkingRevisionID = $WorkingRow['RevisionID'];
+               Gdn::SQL()->Put('CustomThemeRevision', $Set, array('RevisionID' => $WorkingRevisionID));
+            } else {
+               $WorkingRevisionID = Gdn::SQL()->Insert('CustomThemeRevision', $Set);
+            }
+            $SaveWorkingRevisionID = self::SetRevisionID($WorkingRevisionID, $Set['DateInserted']);
+				SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', $SaveWorkingRevisionID);
 			} elseif ($NewLabel != $Label && $WorkingRevisionID) {
             Gdn::SQL()->Put('CustomThemeRevision', array('Label' => $NewLabel), array('RevisionID' => $WorkingRevisionID));
          }
 
 			// Check to see if there are any fatal errors in the smarty template
-			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', TRUE);
-			$Result = ProxyRequest(Gdn::Request()->Url('/', TRUE), 10);
-			// echo Wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
-			$SmartyCompileError = ($Result == '' || strpos($Result, '<title>Fatal Error</title>') > 0 || strpos($Result, '<title>Bonk</title>') > 0) ? TRUE : FALSE;
-			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
+         $Smarty = new Gdn_Smarty();
+         $SmartyCompileError = !$Smarty->TestTemplate('customtheme:default_master_'.$WorkingRevisionID.'.tpl');
 			
 			// Check for required assets
 			$AssetError = (stripos($NewHtml, '{asset name="Foot"}') === FALSE) ? TRUE : FALSE;
@@ -337,12 +377,14 @@ Here are some things you should know before you begin:
 			// If we are applying the changes, and the changes didn't cause crashes save the live revision number.
 			if (!$AssetError && !$SmartyCompileError && ($IsApply || $IsApplyPreview)) {
 				$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
+            
 				$LiveRevisionID = $WorkingRevisionID;
-				SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', $WorkingRevisionID);
-				SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', $NewIncludeThemeCSS);
-				SaveToConfig('Plugins.CustomTheme.LiveRevisionID', $LiveRevisionID);
+            $SaveLiveRevisionID = isset($SaveWorkingRevisionID) ? $SaveWorkingRevisionID : $WorkingRevisionID;
+				SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', $SaveLiveRevisionID);
+				// SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', $NewIncludeThemeCSS);
+				SaveToConfig('Plugins.CustomTheme.LiveRevisionID', $SaveLiveRevisionID);
 				SaveToConfig('Plugins.CustomTheme.LiveTime', time());
-				SaveToConfig('Plugins.CustomTheme.LiveIncludeThemeCSS', $NewIncludeThemeCSS);
+				// SaveToConfig('Plugins.CustomTheme.LiveIncludeThemeCSS', $NewIncludeThemeCSS);
 				
 				// Update out old live revision row(s)
 				Gdn::SQL()->Update('CustomThemeRevision')
@@ -405,32 +447,33 @@ Here are some things you should know before you begin:
 			->OrderBy('RevisionID', 'desc')
 			->Limit(1, 0)
 			->Get()
-			->FirstRow();
+			->FirstRow(DATASET_TYPE_ARRAY);
 			
 		if ($Live) {
-			SaveToConfig('Plugins.CustomTheme.LiveRevisionID', GetValue('RevisionID', $Live));
+			SaveToConfig('Plugins.CustomTheme.LiveRevisionID', self::SetRevisionID($Live['RevisionID'], $Live['DateInserted']));
 			SaveToConfig('Plugins.CustomTheme.LiveTime', time());
-			SaveToConfig('Plugins.CustomTheme.LiveIncludeThemeCSS', GetValue('IncludeThemeCSS', $Live));
+			// SaveToConfig('Plugins.CustomTheme.LiveIncludeThemeCSS', GetValue('IncludeThemeCSS', $Live));
 		} else {
 			SaveToConfig('Plugins.CustomTheme.LiveRevisionID', 0);
 			SaveToConfig('Plugins.CustomTheme.LiveTime', time());
-			SaveToConfig('Plugins.CustomTheme.LiveIncludeThemeCSS', 0);
+			// SaveToConfig('Plugins.CustomTheme.LiveIncludeThemeCSS', 0);
 		}
 		
 		$Working = Gdn::SQL()->Select()
 			->From('CustomThemeRevision')
 			->Where('ThemeName', $ThemeName)
+         ->Where('Live', 2)
 			->OrderBy('RevisionID', 'desc')
 			->Limit(1, 0)
 			->Get()
-			->FirstRow();
+			->FirstRow(DATASET_TYPE_ARRAY);
 
 		if ($Working) {
-			SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', GetValue('RevisionID', $Working));
-			SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', GetValue('IncludeThemeCSS', $Working));
+			SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', self::SetRevisionID($Working['RevisionID'], $Working['DateInserted']));
+			// SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', GetValue('IncludeThemeCSS', $Working));
 		} else {
 			SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', 0);
-			SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', 0);
+			// SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', 0);
 		}
 	}
 	
@@ -480,6 +523,121 @@ Here are some things you should know before you begin:
 		}
 	}
 	
+   /**
+    *
+    * @param Gdn_Controller $Sender 
+    */
+   public function SettingsController_EditCSS_Create($Sender) { 
+      
+      // Set a session var so that the iframe knows we are in editcss mode
+      Gdn::Session()->SetPreference('LiveEditCSS', TRUE);
+
+
+
+// TODO:
+// If the user makes changes to master template, they need to be seeing 
+// those changes in the iframe so they get applied when this is applied.
+
+
+      
+      $Sender->Permission('Garden.Settings.Manage');
+      $Sender->Title('Edit CSS');
+      $Sender->MasterView = 'empty';
+      $Sender->ClearCSSFiles();
+      $Sender->AddDefinition('DoInform', '0'); // No automatic inform messages on this page.
+      $Sender->AddCssFile('editcss.css', 'plugins/CustomTheme');
+      
+      $WorkingRevisionID = self::GetRevisionID('WorkingRevisionID');
+		$ThemeData = Gdn::SQL()
+			->Select()
+			->From('CustomThemeRevision')
+			->Where('RevisionID', $WorkingRevisionID)
+			->Get()
+			->FirstRow();
+			
+		if (!$Sender->Form->AuthenticatedPostBack()) {
+         if ($ThemeData)
+            $Sender->Form->SetFormValue('CSS', GetValue('CSS', $ThemeData));
+         
+         $Sender->Render('editcss', '', 'plugins/CustomTheme');
+		} else {
+         $IsApply = $Sender->Form->GetFormValue('Apply') ? TRUE : FALSE;
+         $Set = array(
+            'ThemeName' => C('Garden.Theme'),
+            'Html' => '',
+            'CSS' => $Sender->Form->GetFormValue('CSS', ''),
+            'Label' => '',
+            'IncludeThemeCSS' => 'Yes', // $NewIncludeThemeCSS,
+            'InsertUserID' => Gdn::Session()->UserID,
+            'DateInserted' => Gdn_Format::ToDateTime(),
+            'Live' => 2
+         );
+
+         // Load the current working revision html & label
+         $this->_Construct();
+         /*
+         $WorkingData = Gdn::SQL()
+            ->Select()
+            ->From('CustomThemeRevision')
+            ->Where('RevisionID', $WorkingRevisionID)
+            ->Get()
+            ->FirstRow();
+*/
+         // Look for an existing working revision.
+         $WorkingData = Gdn::SQL()->GetWhere('CustomThemeRevision', 
+            array('ThemeName' => C('Garden.Theme'), 'Live' => 2))->FirstRow(DATASET_TYPE_ARRAY);
+         
+         if ($WorkingData) {
+            // If there is a working revision, update it. 
+            $Set['Label'] = GetValue('Label', $WorkingData, '');
+            $Set['Html'] = GetValue('Html', $WorkingData, '');
+            Gdn::SQL()->Put('CustomThemeRevision', $Set, array('RevisionID' => $WorkingRevisionID));
+         } else {
+            // If there isn't a working revision, create it.
+            $ThemeManager = new Gdn_ThemeManager();
+            $CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
+            $CurrentThemeFolder = basename(GetValue('ThemeRoot', $CurrentThemeInfo));
+            $Folder = PATH_THEMES . DS . $CurrentThemeFolder;
+            if (file_exists($Folder . DS . 'views' . DS . 'default.master.tpl'))
+               $Set['Html'] = file_get_contents ($Folder . DS . 'views' . DS . 'default.master.tpl');
+            else
+               $Set['Html'] = file_get_contents(PATH_APPLICATIONS.'/dashboard/views/default.master.tpl');
+
+            $WorkingRevisionID = Gdn::SQL()->Insert('CustomThemeRevision', $Set);
+         }
+
+         $SaveWorkingRevisionID = self::SetRevisionID($WorkingRevisionID, $Set['DateInserted']);
+         SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', $SaveWorkingRevisionID);
+         $Inform = 'Your changes have been saved.';
+
+         // If we are applying the changes, save the live revision number.
+         if ($IsApply) {
+            $LiveRevisionID = $WorkingRevisionID;
+            $SaveLiveRevisionID = isset($SaveWorkingRevisionID) ? $SaveWorkingRevisionID : $WorkingRevisionID;
+            SaveToConfig('Plugins.CustomTheme.WorkingRevisionID', $SaveLiveRevisionID);
+            SaveToConfig('Plugins.CustomTheme.LiveRevisionID', $SaveLiveRevisionID);
+            SaveToConfig('Plugins.CustomTheme.LiveTime', time());
+
+            // Update out old live revision row(s)
+            Gdn::SQL()->Update('CustomThemeRevision')
+               ->Set('Live', 0)
+               ->Where('ThemeName', C('Garden.Theme'))
+               ->Put();
+
+            // Update new live revision row
+            Gdn::SQL()->Update('CustomThemeRevision')
+               ->Set('Live', 1)
+               ->Where('RevisionID', $LiveRevisionID)
+               ->Put();
+
+            $Inform = 'Your changes have been applied.';
+         }
+         $Sender->InformMessage($Inform);
+         // $Sender->DeliveryType(DELIVERY_TYPE_NONE);
+         $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+         $Sender->Render('editcss', '', 'plugins/CustomTheme');
+      }
+   }
 }
 
 /* Smarty functions to allow reading the template from the db as a resource */

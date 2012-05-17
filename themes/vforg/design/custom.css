@@ -1393,12 +1393,3 @@ body.Discussions ul.DataList div.Options {
    background: #93C8FF;
    color: #04173A;
 }
-
-ul.Discussions .AdminCheck {
-    left: 254px;
-    position: absolute;
-    top: 0;
-}
-.Tabs .AdminCheck {
-   right: -22px;
-}

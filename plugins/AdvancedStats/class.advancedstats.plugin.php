@@ -177,9 +177,11 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
          $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
          $Version = GetValue('Version', Gdn::PluginManager()->GetPluginInfo('AdvancedStats'));
          
-         if ($AnalyticsServer == 'http://analytics.vanillaforums.com')
+         
+         
+         if ($AnalyticsServer == 'http://analytics.vanillaforums.com') {            
             $Url = "http://autostatic-cl1.vanilladev.com/analytics.vanillaforums.com/applications/vanillastats/js/track.min.js?v=$Version";
-         else
+         } else
             $Url = $AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version;
          
          $Sender->AddJsFile($Url, '', array('defer' => 'defer'));
@@ -193,7 +195,7 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
    public function SettingsController_Statistics_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Site Statistics');
-      $Sender->AddSideMenu('dashboard/settings/stats');
+      $Sender->AddSideMenu('dashboard/settings/statistics');
 		$Sender->Render('stats', '', 'plugins/AdvancedStats');
    }
    

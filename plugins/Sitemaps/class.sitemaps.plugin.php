@@ -14,7 +14,7 @@ $PluginInfo['Sitemaps'] = array(
    'Description' => "Creates an XML sitemap based on http://www.sitemaps.org.",
    'Version' => '1.2.1',
    'MobileFriendly' => TRUE,
-   'RequiredApplications' => FALSE,
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'HasLocale' => TRUE,
@@ -22,7 +22,7 @@ $PluginInfo['Sitemaps'] = array(
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',
-   //'SettingsUrl' => '/settings/sitemaps',
+   'SettingsUrl' => '/settings/sitemaps',
    'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
@@ -63,6 +63,7 @@ class SitemapsPlugin extends Gdn_Plugin {
    /// Event Handlers ///
    
    public function SettingsController_Sitemaps_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', T('Sitemap Settings'));
       $Sender->AddSideMenu();
       $Sender->Render('Settings', '', 'plugins/Sitemaps');
