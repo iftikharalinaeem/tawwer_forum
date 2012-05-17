@@ -41,7 +41,7 @@ $Session = Gdn::Session();
                   <?php
                   echo Anchor(Sprite('SpHome').'Home', '/', 'Home', array('SSL' => FALSE));
                   echo Anchor(Sprite('SpPlans').'Plans &amp; Pricing', '/plans', 'Plans', array('SSL' => FALSE));
-                  echo Anchor(Sprite('SpFeatures').'Features', '/features', 'Features', array('SSL' => FALSE));
+                  echo Anchor(Sprite('SpTour').'Tour', '/tour', 'Tour', array('SSL' => FALSE));
                   echo Anchor(Sprite('SpResources').'Resources', '/resources', 'Resources', array('SSL' => FALSE));
                   echo Anchor(Sprite('SpBlog').'Blog', '/blog', 'Blog', array('SSL' => FALSE));
                   ?>
@@ -108,6 +108,7 @@ $Session = Gdn::Session();
                echo '<br />'.Anchor('Migrate Legacy Forum', '/resources/migrating-legacy-forums#toc', '', array('SSL' => FALSE));
                // echo '<br />'.Anchor('Comments Integration', '/features/blog-comments', '', array('SSL' => FALSE));
                ?>
+               <div style="font-family: GoothamRound,'lucida grande','Lucida Sans Unicode',tahoma; font-size: 22px; color: #fff; position: absolute; margin: 20px 0 0;">Sales questions? Call us at: 1-866-845-0815</div>
             </div>
             <div class="Column4">
                <strong>Resources</strong>
