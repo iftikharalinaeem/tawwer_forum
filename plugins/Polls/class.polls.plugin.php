@@ -118,7 +118,7 @@ class PollsPlugin extends Gdn_Plugin {
    /** 
     * Display the Poll label on the discussion list.
     */
-   public function DiscussionsController_BeforeDiscussionMeta_Handler($Sender) {
+   public function Base_BeforeDiscussionMeta_Handler($Sender) {
       $Discussion = $Sender->EventArguments['Discussion'];
       echo Tag($Discussion, 'Type', 'Poll');
    }
@@ -228,20 +228,22 @@ class PollsPlugin extends Gdn_Plugin {
          
          // Look at all of the users in the comments, and load their associated 
          // poll vote for displaying on their comments.
-         $CommentData = &$Sender->Data('CommentData');
-         // Grab all of the user fields that need to be joined.
-         $UserIDs = array();
-         foreach ($CommentData as $Row) {
-            $UserIDs[] = GetValue('InsertUserID', $Row);
-         }
+         $Comments = $Sender->Data('Comments');
+         if ($Comments) {
+            // Grab all of the user fields that need to be joined.
+            $UserIDs = array();
+            foreach ($Comments as $Row) {
+               $UserIDs[] = GetValue('InsertUserID', $Row);
+            }
 
-         // Get the user votes.
-         $Votes = $PollModel->GetVotesByUserID($Poll->PollID, $UserIDs);
-         
-         // Place the user votes on the comment data.
-         foreach ($CommentData as &$Row) {
-            $UserID = GetValue('InsertUserID', $Row);
-            SetValue('PollVote', $Row, GetValue($UserID, $Votes));
+            // Get the user votes.
+            $Votes = $PollModel->GetVotesByUserID($Poll->PollID, $UserIDs);
+
+            // Place the user votes on the comment data.
+            foreach ($Comments as &$Row) {
+               $UserID = GetValue('InsertUserID', $Row);
+               SetValue('PollVote', $Row, GetValue($UserID, $Votes));
+            }
          }
       }
    }
