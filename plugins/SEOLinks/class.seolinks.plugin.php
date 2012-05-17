@@ -61,7 +61,12 @@ class SEOLinksPlugin extends Gdn_Plugin {
 //      decho($Sender->Routes);
 //      die();
    }
-
+   
+   public function Setup() {
+      if (class_exists('CategoryModel')) {
+         CategoryModel::ClearCache();
+      }
+   }
 }
 
 if (!function_exists('CategoryUrl')):
