@@ -36,6 +36,7 @@ if ( function_exists('register_sidebar') )
 // post icons //
 
 function get_cat_icon($the_categories) {
+   return;
 foreach( $the_categories as $category) {
 
 if ($category->cat_name == "News") {

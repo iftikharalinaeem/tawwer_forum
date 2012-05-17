@@ -57,9 +57,9 @@ $Rm->DefineReactionType(array('UrlCode' => 'Like', 'Name' => 'Like', 'Sort' => 6
    'Description' => "A like is a general approval of a post. Enough likes will promote a post."));
 
 $Rm->DefineReactionType(array('UrlCode' => 'Down', 'Name' => 'Vote Down', 'Sort' => 7, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
-   'Description' => "A down vote is a general disapproval of a post. Enough dislikes will bury a post."));
+   'Description' => "A down vote is a general disapproval of a post. Enough down votes will bury a post."));
 $Rm->DefineReactionType(array('UrlCode' => 'Up', 'Name' => 'Vote Up', 'Sort' => 8, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
-   'Description' => "An up vote is a general disapproval of a post. Enough dislikes will bury a post."));
+   'Description' => "An up vote is a general approval of a post. Enough up votes will promote a post."));
 
 $Rm->DefineReactionType(array('UrlCode' => 'WTF', 'Name' => 'WTF', 'Sort' => 9, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
    'Description' => 'WTF stands for "What the Fuh?" You usually react this way when a post makes absolutely no sense.'));

@@ -1190,3 +1190,27 @@ ul.CategoryList li.Depth2 {
 }
 
 /*border: 0 none !important;*/
+
+.DataList .MItem {
+    white-space: normal;
+}
+
+.ProfilePhotoMedium {
+    height: 40px;
+    width: 40px;
+}
+
+.DataList.Discussions .ProfilePhotoMedium {
+    float: left;
+}
+.MessageList .Comment .Item-BodyWrap,
+.MessageList .Comment .Meta {
+    margin-left: 50px;
+}
+.DataList.Discussions .ItemContent {
+    margin-left: 58px !important;
+}
+.CommentForm {
+    background: none !important;
+    margin-top: 30px;
+}
