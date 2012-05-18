@@ -332,6 +332,12 @@ class DisqusImporter extends Gdn_Plugin {
    }
    
    public function InsertComments() {
+      Gdn::Structure()
+         ->Table('Comment')
+         ->Column('ForeignID', 'varchar(32)')
+//         ->Column('Source', 'varchar(20)')
+         ->Set();
+      
       $this->_InsertUsers('zDisqusComment');
       
       
