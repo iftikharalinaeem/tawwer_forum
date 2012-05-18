@@ -19,7 +19,7 @@ $PluginInfo['DisqusImporter'] = array(
 class DisqusImporter extends Gdn_Plugin {
    /// Properties ///
    
-   public static $BufferSize = 250;
+   public $BufferSize = 250;
    
    public $Path = '';
    
@@ -226,7 +226,7 @@ class DisqusImporter extends Gdn_Plugin {
       Gdn::Structure()->Table('zDisqusDiscussion')
          ->Column('DisqusID', 'int', FALSE, 'primary')
          ->Column('DiscussionID', 'int', TRUE)
-         ->Column('ForeignID', 'varchar(200)')
+         ->Column('ForeignID', 'varchar(200)', FALSE, 'index')
          ->Column('DisqusCategoryID', 'int', FALSE)
          ->Column('CategoryID', 'int', TRUE)
          ->Column('Name', 'varchar(100)')
@@ -243,14 +243,14 @@ class DisqusImporter extends Gdn_Plugin {
          ->Column('UserFullName', 'varchar(50)', TRUE)
          ->Column('UserAnonymous', 'tinyint', 0)
          ->Column('UniqueType', 'varchar(32)', TRUE)
-         ->Column('UniqueID', 'varchar(32)', TRUE)
+         ->Column('UniqueID', 'varchar(32)', TRUE, 'index')
          ->Set(TRUE);
       Gdn::SQL()->Truncate('zDisqusDiscussion');
       
       Gdn::Structure()->Table('zDisqusComment')
          ->Column('ForeignID', 'int', FALSE, 'primary')
          ->Column('CommentID', 'int', TRUE, 'index')
-         ->Column('DisqusDiscussionID', 'int', TRUE)
+         ->Column('DisqusDiscussionID', 'int', TRUE, 'index')
          ->Column('DiscussionID', 'int', TRUE)
          ->Column('ParentForeignID', 'int', TRUE)
          ->Column('Body', 'text')
@@ -500,9 +500,9 @@ class DisqusImporter extends Gdn_Plugin {
    }
    
    public function InsertTables() {
-      $this->InsertCategories();
-      $this->InsertDiscussions();
-      $this->InsertComments();
+//      $this->InsertCategories();
+//      $this->InsertDiscussions();
+//      $this->InsertComments();
    }
    
    public function Parse() {
@@ -573,7 +573,7 @@ class DisqusImporter extends Gdn_Plugin {
       
       switch ($Step) {
          case 'load':
-            $this->Path = PATH_UPLOADS.'/cultofmac-d37f225b926cf56acc557d1302517126.xml';
+            $this->Path = PATH_UPLOADS.'/boinx-68c878a517e887cc0934e1e44d056881.xml';
 
             $this->DefineTables();
       //      $this->LoadDiscussions();
