@@ -500,9 +500,9 @@ class DisqusImporter extends Gdn_Plugin {
    }
    
    public function InsertTables() {
-//      $this->InsertCategories();
-//      $this->InsertDiscussions();
-//      $this->InsertComments();
+      $this->InsertCategories();
+      $this->InsertDiscussions();
+      $this->InsertComments();
    }
    
    public function Parse() {
