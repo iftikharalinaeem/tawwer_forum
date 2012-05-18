@@ -27,6 +27,56 @@ class DisqusImporter extends Gdn_Plugin {
    
    protected $_Categories = NULL;
    
+   public function Insert($Table, $Row = NULL) {
+      static $LastTable = NULL;
+      static $Rows = array();
+      
+      if (isset($Row['Attributes']) && is_array($Row['Attributes']))
+         $Row['Attributes'] = serialize($Row['Attributes']);
+      
+      
+      if ($Table === NULL) {
+         $this->InsertMulti($LastTable, $Rows);
+         $LastTable = NULL;
+         $Rows = array();
+         
+         return;
+      }
+      
+      if ($LastTable && $LastTable != $Table || count($Rows) >= $this->BufferSize) {
+         $this->InsertMulti($LastTable, $Rows);
+         $Rows = array();
+      }
+      
+      $LastTable = $Table;
+      $Rows[] = $Row;
+   }
+   
+   public function InsertMulti($Table, $Rows) {
+      if (empty($Rows))
+         return;
+      
+      $Px = Gdn::Database()->DatabasePrefix;
+      $PDO = Gdn::Database()->Connection();
+      
+      $Sql = '';
+      foreach ($Rows as $Row) {
+         if ($Sql)
+            $Sql .= ",\n";
+         
+         $Values = array_map(array($PDO, 'quote'), $Row);
+         $Sql .= '('.implode(',', $Values).')';
+      }
+      
+      $Sql = "insert ignore {$Px}$Table\n".
+         '('.implode(',', array_keys($Rows[0])).") values\n".
+         $Sql;
+      
+//      echo htmlspecialchars($Sql);
+      Gdn::Database()->Query($Sql);
+//      die();
+   }
+   
    public function ParseCategory($Str) {
       $Xml = new SimpleXMLElement($Str);
       $Name = html_entity_decode($Xml->title, ENT_COMPAT, 'UTF-8');
@@ -35,7 +85,7 @@ class DisqusImporter extends Gdn_Plugin {
           'Name' => $Name,
           'UrlCode' => Gdn_Format::Url($Name)
       );
-      self::Insert('zDisqusCategory', $Row);
+      $this->Insert('zDisqusCategory', $Row);
       
 //      <category xmlns="http://disqus.com" xmlns:dsq="http://disqus.com/disqus-internals" dsq:id="684542">
 //      <forum>cultofmac</forum>
@@ -85,7 +135,7 @@ class DisqusImporter extends Gdn_Plugin {
       if ($Xml->parent)
           $Row['ParentForeignID'] = $Xml->parent->attributes('dsq', TRUE)->id;
       
-      self::Insert('zDisqusComment', $Row);
+      $this->Insert('zDisqusComment', $Row);
       
 //      <post dsq:id="154441910">
 //         <id>wp_id=2</id>
@@ -141,7 +191,7 @@ class DisqusImporter extends Gdn_Plugin {
           );
       $Row['Attributes'] = serialize($Attributes);
          
-      self::Insert('zDisqusDiscussion', $Row);
+      $this->Insert('zDisqusDiscussion', $Row);
       
 //      <thread xmlns="http://disqus.com" xmlns:dsq="http://disqus.com/disqus-internals" dsq:id="237937629">
 //      <id>3</id>
@@ -449,8 +499,6 @@ class DisqusImporter extends Gdn_Plugin {
       $this->Query($Sql);
    }
    
-   
-   
    public function InsertTables() {
       $this->InsertCategories();
       $this->InsertDiscussions();
@@ -491,7 +539,7 @@ class DisqusImporter extends Gdn_Plugin {
 //         if ($i++ > 100)
 //            break;
       }
-      self::Insert(NULL);
+      $this->Insert(NULL);
       return $Counts;
    }
    
