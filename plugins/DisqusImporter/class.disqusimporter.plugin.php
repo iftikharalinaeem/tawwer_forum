@@ -23,6 +23,8 @@ class DisqusImporter extends Gdn_Plugin {
    
    public $Path = '';
    
+   public $Source = 'Disqus';
+   
    /// Methods ///
    
    protected $_Categories = NULL;
@@ -563,6 +565,20 @@ class DisqusImporter extends Gdn_Plugin {
       foreach ($Sqls as $Sql) {
          $this->Query($Sql);
       }
+   }
+   
+   public function Query($Sql, $Parameters = NULL) {
+      $Px = Gdn::Database()->DatabasePrefix;
+      if ($Px != 'GDN_')
+         $Sql = str_replace(' GDN_', ' '.$Px, $Sql);
+      $Sql = str_replace(':_', $Px, $Sql);
+      $Sql = str_replace('_source_', $this->Source, $Sql);
+      
+      $Sql = trim($Sql, ';');
+      
+      echo '<pre>'.htmlspecialchars($Sql).";\n\n</pre>";
+      
+      return Gdn::Database()->Query($Sql, $Parameters);
    }
    
    /// Event Handlers ///
