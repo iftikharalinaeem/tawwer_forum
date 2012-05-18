@@ -39,6 +39,9 @@ class SEOLinksPlugin extends Gdn_Plugin {
       // Add all of the category routes.
       $Categories = CategoryModel::Categories();
       foreach ($Categories as $Category) {
+         if (!$Category['UrlCode'])
+            continue;
+         
          $Route = '/?(' . preg_quote($Category['UrlCode']) . ')/?(p\d+)?/?';
          $Sender->Routes[$Route] = array(
              'Route' => $Route,
