@@ -605,8 +605,8 @@ class DisqusImporter extends Gdn_Plugin {
       }
       
       $Finish = time();
-      echo ($Finish - $Start).'s';
+      echo '-- '.($Finish - $Start).'s';
       echo '</pre>';
    }
-   
+
 }
