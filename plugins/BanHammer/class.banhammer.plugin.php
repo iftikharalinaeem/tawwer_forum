@@ -39,7 +39,7 @@ class BanHammerPlugin extends Gdn_Plugin {
 			$Username = Gdn::UserModel()->Get($UserID)->Name;
 		}
 		// Redirect back to the user profile
-		Redirect(Url('/profile/'.$UserID.'/'.Gdn_Format::Url($Username), TRUE));
+		Redirect(Url(UserUrl(array('UserID' => $UserID, 'Name' => $Username)), TRUE));
 	}
 	
 	public function ProfileController_Render_Before($Sender) {

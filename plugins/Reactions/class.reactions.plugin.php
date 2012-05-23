@@ -213,7 +213,7 @@ class ReactionsPlugin extends Gdn_Plugin {
          
          $Row = array(
              'Name' => $Type['Name'], 
-             'Url' => Url("/profile/reactions/".$Sender->Data('Profile.UserID').'/'.rawurlencode($Sender->Data('Profile.Name')).'/'.rawurlencode($Code), TRUE), 
+             'Url' => Url(CombinePaths(array(UserUrl($Sender->Data('Profile'), '', 'reactions'), rawurlencode($Code))), TRUE), 
              'Total' => 0);
          
          if (isset($Data[$Type['TagID']])) {
