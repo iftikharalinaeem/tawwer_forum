@@ -114,7 +114,7 @@ EOT;
                echo '<ul class="PanelInfo">';
 
                foreach ($Data as $User) {
-                  echo '<li><strong>'.UserAnchor($User).'</strong><br /></li>';
+                  echo '<li>'.UserAnchor($User).'</li>';
                }
                
                if ($this->_GuestCount) {

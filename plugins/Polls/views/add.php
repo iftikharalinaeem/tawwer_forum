@@ -47,13 +47,13 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       echo '<div class="P">';
          echo $this->Form->Label('Poll Options', 'PollOption[]');
          echo '<ol class="PollOptions">';
-            echo '<li class="PollOption">' . $this->Form->TextBox('PollOption[]', array('class' => 'InputBox BigInput', 'placeholder' => 'Add an Option...')) . '</li>';
+            echo '<li class="PollOption">' . $this->Form->TextBox('PollOption[]', array('class' => 'InputBox BigInput NoIE')) . '</li>';
             $PollOptions = GetValue('PollOption', $this->Form->FormValues());
             if (is_array($PollOptions)) {
                foreach ($PollOptions as $PollOption) {
                   $PollOption = trim(Gdn_Format::PlainText($PollOption));
                   if ($PollOption != '') 
-                     echo '<li class="PollOption">' . $this->Form->TextBox('PollOption[]', array('value' => $PollOption, 'class' => 'InputBox BigInput', 'placeholder' => 'Add an Option...')) . '</li>';
+                     echo '<li class="PollOption">' . $this->Form->TextBox('PollOption[]', array('value' => $PollOption, 'class' => 'InputBox BigInput')) . '</li>';
                }
             }
          echo '</ol>';

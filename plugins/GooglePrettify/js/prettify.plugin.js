@@ -1,4 +1,5 @@
 jQuery(document).ready(function($) {
    $('pre').addClass('prettyprint linenums');
-   prettyPrint();
+   if (typeof prettyPrint == 'function')
+      prettyPrint();
 });
