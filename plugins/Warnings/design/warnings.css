@@ -1,0 +1,95 @@
+.WarningsForm .P {
+   margin: 20px 0;
+}
+
+.WarningsWrap {
+   overflow: hidden;
+   position: relative;
+}
+
+.WarningsForm .WarningLevels {
+   margin: 20px 10px;
+}
+
+.WarningsWrap .WarnBox {
+   float: left;
+   width: 16.66%;
+}
+
+#Form_ExpireNumber {
+   margin-left: 10px;
+}
+
+.WarnBox {
+   text-align: center;
+   padding: 5px 0;
+   position: relative;
+}
+
+.WarnBox .Disabled {
+   padding: 5px;
+   border-radius: .5ex;
+   border: solid 4px transparent;
+   opacity: .5;
+}
+
+.WarnBox label {
+   display: block;
+   cursor: pointer;
+   padding: 5px;
+   border-radius: .5ex;
+   border: solid 4px transparent;
+}
+
+.WarnBox label:hover {
+   border-color: #777;
+   background: rgba(0,0,0,.05);
+}
+
+.WarnBox.Selected label {
+   border-color: #555;
+   background: rgba(0,0,0,.1);
+}
+
+.WarnBox .WarnLevel{
+   font-size: 25px;
+   padding: 10px 4px;
+}
+
+
+.Item.Expired {
+    background: rgba(0, 0, 0, .05);
+}
+
+.Item.FirstExpired {
+   border-top: 4px double #ddd;
+   border-top: 4px double rgba(0, 0, 0, 0.1);
+}
+
+.PhotoWrap.Jailed:before {
+   content: " ";
+   background: url(jailed-16.png) no-repeat transparent;
+   position: absolute;
+   height: 16px;
+   width: 16px;
+   right: -2px;
+   bottom: -2px;
+}
+
+.PhotoWrapSmall.Jailed:before {
+   background: url(jailed-12.png) no-repeat transparent;
+   height: 12px;
+   width: 12px;
+}
+
+.PhotoWrapLarge.Jailed:before {
+   background: url(jailed-80.png) no-repeat transparent;
+   height: 80px;
+   width: 80px;
+   right: -4px;
+   bottom: -4px;
+}
+
+.PhotoWrap * {
+   line-height: 1;
+}
