@@ -4,7 +4,7 @@
 $PluginInfo['WhosOnline'] = array(
    'Name' => 'Who&rsquo;s Online',
    'Description' => "Adds a list of users currently browsing your site to the sidebar.",
-   'Version' => '1.4.5',
+   'Version' => '1.5.0',
    'Author' => "Gary Mardell",
    'AuthorEmail' => 'gary@vanillaplugins.com',
    'AuthorUrl' => 'http://vanillaplugins.com',
@@ -26,6 +26,7 @@ $PluginInfo['WhosOnline'] = array(
 // 1.3.4 ??
 // 1.3.5 ??
 // 1.4 Added ability to target only lists, made pinger work on all pages, replace dash menu item w/settings button, adds docs -Lincoln
+// 1.5 Remove users from the list when they log out explicitly
 
 class WhosOnlinePlugin extends Gdn_Plugin {
    /**
@@ -83,7 +84,7 @@ class WhosOnlinePlugin extends Gdn_Plugin {
    /**
     * Add module to specified pages and include Javascript pinger.
     */
-   public function Base_Render_Before(&$Sender) {
+   public function Base_Render_Before($Sender) {
       $ConfigItem = C('WhosOnline.Location.Show', 'every');
       $Controller = $Sender->ControllerName;
       $Application = $Sender->ApplicationFolder;
@@ -139,10 +140,20 @@ class WhosOnlinePlugin extends Gdn_Plugin {
       
    }
    
+   public function EntryController_SignOut_Handler($Sender) {
+      $User = $Sender->EventArguments['SignoutUser'];
+      $UserID = GetValue('UserID', $User, FALSE);
+      if ($UserID === FALSE) return;
+      
+      Gdn::SQL()->Delete('WhosOnline', array(
+         'UserID' => GetValue('UserID', $User)
+      ));
+   }
+   
    /**
     * Add privacy settings to profile menu.
     */
-   public function ProfileController_AfterAddSideMenu_Handler(&$Sender) {
+   public function ProfileController_AfterAddSideMenu_Handler($Sender) {
       $SideMenu = $Sender->EventArguments['SideMenu'];
       $Session = Gdn::Session();
       $ViewingUserID = $Session->UserID;
