@@ -36,6 +36,7 @@ class WhosOnlineModule extends Gdn_Module {
          $Data = Gdn_DataSet::Index($Data, 'UserID');
          Gdn::Cache()->Store('WhosOnline', $Data, array(Gdn_Cache::FEATURE_EXPIRY => $Frequency));
       }
+      
       // Make sure the current user is shown as online.
       if ($Session->UserID && !isset($Data[$Session->UserID])) {
          $Data[$Session->UserID] = array(
@@ -97,7 +98,9 @@ class WhosOnlineModule extends Gdn_Module {
                      $User['Photo'] = Asset('/applications/dashboard/design/images/usericon.gif', TRUE);
                   }
                   
-                  echo UserPhoto($User);
+                  echo UserPhoto($User, array(
+                     'LinkClass' => (($User['Invisible']) ? 'Invisible' : '')
+                  ));
                }
                
                if ($this->_GuestCount) {
@@ -114,7 +117,7 @@ EOT;
                echo '<ul class="PanelInfo">';
 
                foreach ($Data as $User) {
-                  echo '<li>'.UserAnchor($User).'</li>';
+                  echo '<li>'.UserAnchor($User, ($User['Invisible']) ? 'Invisible' : '').'</li>';
                }
                
                if ($this->_GuestCount) {
