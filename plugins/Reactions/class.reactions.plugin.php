@@ -148,9 +148,10 @@ class ReactionsPlugin extends Gdn_Plugin {
    public function Base_AfterUserInfo_Handler($Sender, $Args) {
       // Fetch the view helper functions.
       include_once Gdn::Controller()->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
-      
-      echo '<h2>'.T('Reactions').'</h2>';
-      WriteProfileCounts();
+      echo '<div class="ReactionsWrap">';
+         echo '<h2 class="H">'.T('Reactions').'</h2>';
+         WriteProfileCounts();
+      echo '</div>';
    }
    
    public function Base_BeforeCommentDisplay_Handler($Sender, $Args) {
