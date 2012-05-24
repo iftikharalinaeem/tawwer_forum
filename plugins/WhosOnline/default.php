@@ -145,7 +145,7 @@ class WhosOnlinePlugin extends Gdn_Plugin {
       $UserID = GetValue('UserID', $User, FALSE);
       if ($UserID === FALSE) return;
       
-      Gdn::SQL()->Delete('WhosOnline', array(
+      Gdn::SQL()->Delete('Whosonline', array(
          'UserID' => GetValue('UserID', $User)
       ));
    }
