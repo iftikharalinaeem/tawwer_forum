@@ -4,7 +4,7 @@
 $PluginInfo['WhosOnline'] = array(
    'Name' => 'Who&rsquo;s Online',
    'Description' => "Adds a list of users currently browsing your site to the sidebar.",
-   'Version' => '1.5.0',
+   'Version' => '1.5.1',
    'Author' => "Gary Mardell",
    'AuthorEmail' => 'gary@vanillaplugins.com',
    'AuthorUrl' => 'http://vanillaplugins.com',
@@ -25,8 +25,9 @@ $PluginInfo['WhosOnline'] = array(
 // 1.3.3 ??
 // 1.3.4 ??
 // 1.3.5 ??
-// 1.4 Added ability to target only lists, made pinger work on all pages, replace dash menu item w/settings button, adds docs -Lincoln
-// 1.5 Remove users from the list when they log out explicitly
+// 1.4   Added ability to target only lists, made pinger work on all pages, replace dash menu item w/settings button, adds docs -Lincoln
+// 1.5   Remove users from the list when they log out explicitly
+// 1.5.1 Add 'Invisible' class to invisibles that are shown for admins
 
 class WhosOnlinePlugin extends Gdn_Plugin {
    /**
