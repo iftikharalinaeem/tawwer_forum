@@ -163,8 +163,10 @@ class WarningModel extends Gdn_Model {
       if ($User['Punished'] != $Punished)
          $Set['Punished'] = $Punished;
       
-      if (!empty($Set))
+      if (!empty($Set)) {
          Gdn::UserModel()->SetField($UserID, $Set);
+         Gdn::UserModel()->ClearCache($UserID);
+      }
       
       return array('WarnLevel' => $WarnLevel, 'Set' => $Set, 'ActiveWarnings' => $Warnings);
    }
