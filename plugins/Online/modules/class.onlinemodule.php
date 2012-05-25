@@ -108,7 +108,7 @@ class OnlineModule extends Gdn_Module {
                'Timestamp'                => date('Y-m-d H:i:s'),
                'Location'                 => $this->Selector,
                "{$this->SelectorField}"   => $this->SelectorID,
-               'Visible'                  => OnlinePlugin::Instance()->PrivateMode(Gdn::Session()->User)
+               'Visible'                  => !OnlinePlugin::Instance()->PrivateMode(Gdn::Session()->User)
             );
          }
          Gdn::UserModel()->JoinUsers($this->OnlineUsers, array('UserID'));
