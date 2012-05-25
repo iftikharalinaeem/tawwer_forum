@@ -163,7 +163,7 @@ class OnlineModule extends Gdn_Module {
                if (count($this->OnlineUsers) > 10)
                   $ListClass .= 'PhotoGridSmall';
 
-               echo '<div class="'.$ListClass.'">';
+               echo '<div class="'.$ListClass.'">'."\n";
                foreach ($this->OnlineUsers as $User) {
                   if (!$User['Photo'] && !function_exists('UserPhotoDefaultUrl')) {
                      $User['Photo'] = Asset('/applications/dashboard/design/images/usericon.gif', TRUE);
@@ -171,7 +171,7 @@ class OnlineModule extends Gdn_Module {
                   
                   echo UserPhoto($User, array(
                      'LinkClass' => ((!$User['Visible']) ? 'Invisible' : '')
-                  ));
+                  ))."\n";
                }
                
                if ($this->GuestCount && $this->ShowGuests) {
@@ -182,22 +182,22 @@ class OnlineModule extends Gdn_Module {
  <span class="GuestCountBox"><span class="GuestCount">{$Plus}$GuestCount</span> <span class="GuestLabel">$GuestsText</span></span>
 EOT;
                }
-               echo '</div>';
+               echo '</div>'."\n";
                
             } else {
                
-               echo '<ul class="PanelInfo">';
+               echo '<ul class="PanelInfo">'."\n";
                foreach ($this->OnlineUsers as $User) {
-                  echo '<li>'.UserAnchor($User, (!$User['Visible']) ? 'Invisible' : '').'</li>';
+                  echo '<li>'.UserAnchor($User, (!$User['Visible']) ? 'Invisible' : '')."</li>\n";
                }
                
                if ($this->GuestCount && $this->ShowGuests) {
                   $GuestCount = Gdn_Format::BigNumber($this->GuestCount, 'html');
                   $GuestsText = Plural($this->GuestCount, 'Guest', 'Guests');
                   $Plus = $this->Count == $this->GuestCount ? '' : '+';
-                  echo "<li><strong>{$Plus}{$GuestCount} {$GuestsText}</strong></li>";
+                  echo "<li><strong>{$Plus}{$GuestCount} {$GuestsText}</strong></li>\n";
                }
-               echo '</ul>';
+               echo '</ul>'."\n";
             }
          }
          ?>
