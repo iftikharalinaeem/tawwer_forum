@@ -79,14 +79,15 @@ class OnlineModule extends Gdn_Module {
             switch ($Location) {
                case 'category':
                case 'discussion':
+               case 'comment':
                   $this->ShowGuests = FALSE;
                   $this->Selector = 'category';
                   $this->SelectorField = 'CategoryID';
                   
-                  if ($Location == 'discussion')
-                     $this->SelectorID = Gdn::Controller()->Data('Discussion.CategoryID');
-                  else
+                  if ($Location == 'category')
                      $this->SelectorID = Gdn::Controller()->Data('Category.CategoryID');
+                  else
+                     $this->SelectorID = Gdn::Controller()->Data('Discussion.CategoryID');
                   
                   break;
                
@@ -147,9 +148,11 @@ class OnlineModule extends Gdn_Module {
             $Title = T("Who's Online in this Category");
             break;
          case 'discussion':
+         case 'comment':
             $Title = T("Who's Online in this Discussion");
          case 'limbo':
          case 'all':
+         default:
             $Title = T("Who's Online");
       }
       
