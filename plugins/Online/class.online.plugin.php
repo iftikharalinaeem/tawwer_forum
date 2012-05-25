@@ -8,6 +8,7 @@
  * 
  * Changes: 
  *  1.0a    Development release
+ *  1.0     Official release
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -18,9 +19,9 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.0a',
+   'Version' => '1.0',
    'MobileFriendly' => FALSE,
-   'RequiredApplications' => array('Vanilla' => '2.1a17'),
+   'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
    'SettingsUrl' => '/plugin/online',
@@ -302,23 +303,7 @@ class OnlinePlugin extends Gdn_Plugin {
       
       if ($WithSupplement) {
          // Figure out where the user is
-         $Location = 'limbo';
-         $WildLocations = array(
-            'vanilla/categories/index'   => 'category',
-            'vanilla/discussion/index'   => 'discussion',
-            'vanilla/discussion/comment' => 'comment'
-         );
-
-         $ResolvedPath = Gdn::Request()->GetValue('ResolvedPath');
-         $Location = GetValue($ResolvedPath, $WildLocations, 'limbo');
-         $ResolvedArgs = json_decode(Gdn::Request()->GetValue('ResolvedArgs'), TRUE);
-
-         // Check if we're on the categories list, or inside one, and adjust location
-         if ($Location == 'category') {
-            $CategoryIdentifier = GetValue('CategoryIdentifier', $ResolvedArgs);
-            if (empty($CategoryIdentifier))
-               $Location = 'limbo';
-         }
+         $Location = OnlinePlugin::WhereAmI();
 
          // Get the extra data we pushed into the tick with our events
          $TickExtra = @json_decode(Gdn::Request()->GetValue('TickExtra'), TRUE);
@@ -384,6 +369,31 @@ class OnlinePlugin extends Gdn_Plugin {
       
       // Cleanup some entries
       $this->Cleanup();
+   }
+   
+   public static function WhereAmI($ResolvedPath = NULL, $ResolvedArgs = NULL) {
+      $Location = 'limbo';
+      $WildLocations = array(
+         'vanilla/categories/index'   => 'category',
+         'vanilla/discussion/index'   => 'discussion',
+         'vanilla/discussion/comment' => 'comment'
+      );
+      
+      if (is_null($ResolvedPath))
+         $ResolvedPath = Gdn::Request()->GetValue('ResolvedPath');
+      
+      if (is_null($ResolvedArgs))
+         $ResolvedArgs = json_decode(Gdn::Request()->GetValue('ResolvedArgs'), TRUE);
+      
+      $Location = GetValue($ResolvedPath, $WildLocations, 'limbo');
+
+      // Check if we're on the categories list, or inside one, and adjust location
+      if ($Location == 'category') {
+         $CategoryIdentifier = GetValue('CategoryIdentifier', $ResolvedArgs);
+         if (empty($CategoryIdentifier))
+            $Location = 'limbo';
+      }
+      return $Location;
    }
    
    /**
@@ -477,8 +487,13 @@ class OnlinePlugin extends Gdn_Plugin {
             
             $SelectorSubset = array();
             foreach ($AllOnlineUsers as $UserID => $OnlineData) {
-               if ($OnlineData['Location'] != $Selector) continue;
+               
+               // Searching by SelectorField+SelectorID
                if (!is_null($SelectorID) && !is_null($SelectorField) && (!array_key_exists($SelectorField, $OnlineData) || $OnlineData[$SelectorField] != $SelectorID)) continue;
+               
+               // Searching by Location/Selector only
+               if ((is_null($SelectorID) || is_null($SelectorField)) && $OnlineData['Location'] != $Selector) continue;
+               
                $SelectorSubset[$UserID] = $OnlineData;
             }
             return $SelectorSubset;
@@ -551,7 +566,7 @@ class OnlinePlugin extends Gdn_Plugin {
    /**
     * Join in the supplement cache entries
     * 
-    * @param type $UserIDs 
+    * @param array $Users Users list, by reference
     */
    public function JoinSupplements(&$Users) {
       $UserIDs = array_keys($Users);
@@ -593,7 +608,9 @@ class OnlinePlugin extends Gdn_Plugin {
     */
    
    /**
-    * Add module to specified pages and include Javascript pinger.
+    * Add module to specified pages
+    * 
+    * @param Gdn_Controller $Sender
     */
    public function Base_Render_Before($Sender) {
       $PluginRenderLocation = C('Plugins.Online.Location', 'all');

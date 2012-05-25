@@ -13,6 +13,8 @@
 
 class OnlineCountModule extends Gdn_Module {
    
+   public $ShowGuests = TRUE;
+   
    public $Selector = NULL;
    public $SelectorID = NULL;
    public $SelectorField = NULL;
@@ -20,7 +22,7 @@ class OnlineCountModule extends Gdn_Module {
 	public function __construct(&$Sender = '') {
 		parent::__construct($Sender);
       
-      $this->Selector = 'all';
+      $this->Selector = 'auto';
 	}
    
    public function __set($Name, $Value) {
@@ -40,6 +42,38 @@ class OnlineCountModule extends Gdn_Module {
    }
 
 	public function GetData() {
+      
+      if ($this->Selector == 'auto') {
+            
+         $Location = OnlinePlugin::WhereAmI(
+            Gdn::Controller()->ResolvedPath, 
+            Gdn::Controller()->ReflectArgs
+         );
+
+         switch ($Location) {
+            case 'category':
+            case 'discussion':
+               $this->ShowGuests = FALSE;
+               $this->Selector = 'category';
+               $this->SelectorField = 'CategoryID';
+
+               if ($Location == 'discussion')
+                  $this->SelectorID = Gdn::Controller()->Data('Discussion.CategoryID');
+               else
+                  $this->SelectorID = Gdn::Controller()->Data('Category.CategoryID');
+
+               break;
+
+            case 'limbo':
+            case 'all':
+               $this->ShowGuests = TRUE;
+               $this->Selector = 'all';
+               $this->SelectorID = NULL;
+               $this->SelectorField = NULL;
+               break;
+         }
+      }
+      
       $Count = OnlinePlugin::Instance()->OnlineCount($this->Selector, $this->SelectorID, $this->SelectorField);
       $GuestCount = OnlinePlugin::Guests();
       
@@ -49,7 +83,9 @@ class OnlineCountModule extends Gdn_Module {
    public function ToString() {
       list($Count, $GuestCount) = $this->GetData();
       $CombinedCount = $Count + $GuestCount;
-      $FormattedCount = Gdn_Format::BigNumber($CombinedCount, 'html');
+      
+      $TrackedCount = $this->ShowGuests ? $CombinedCount : $Count;
+      $FormattedCount = Gdn_Format::BigNumber($TrackedCount, 'html');
       
       $OutputString = '';
 		ob_start();
