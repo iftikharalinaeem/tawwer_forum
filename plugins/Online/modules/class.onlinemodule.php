@@ -101,7 +101,7 @@ class OnlineModule extends Gdn_Module {
          }
          
          $this->OnlineUsers = OnlinePlugin::Instance()->OnlineUsers($this->Selector, $this->SelectorID, $this->SelectorField);
-         print_r($this->OnlineUsers);
+         
          if (!array_key_exists(Gdn::Session()->User->UserID, $this->OnlineUsers)) {
             $this->OnlineUsers[Gdn::Session()->UserID] = array(
                'UserID'                   => Gdn::Session()->UserID,
