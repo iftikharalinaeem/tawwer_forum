@@ -138,6 +138,22 @@ class OnlinePlugin extends Gdn_Plugin {
          $this->TrackActiveUser(FALSE);
    }
    
+   /**
+    * Hook into signout and remove the user from online status
+    * 
+    * @param EntryController $Sender
+    * @return void
+    */
+   public function EntryController_SignOut_Handler($Sender) {
+      $User = $Sender->EventArguments['SignoutUser'];
+      $UserID = GetValue('UserID', $User, FALSE);
+      if ($UserID === FALSE) return;
+      
+      Gdn::SQL()->Delete('Online', array(
+         'UserID' => GetValue('UserID', $User)
+      ));
+   }
+   
    /*
     * GUESTS
     * Logic for tracking guests
@@ -157,7 +173,7 @@ class OnlinePlugin extends Gdn_Plugin {
       // If this is the first time this person is showing up, try to set a cookie and then return
       // This prevents tracking bounces, as well as weeds out clients that don't support cookies.
       $BounceCookieName = C('Garden.Cookie.Name').'-Vv';
-      $BounceCookie = GetValue($TempName, $_COOKIE);
+      $BounceCookie = GetValue($BounceCookieName, $_COOKIE);
       if (!$BounceCookie) {
          setcookie($BounceCookieName, $Now, $Now + 1200, C('Garden.Cookie.Path', '/'));
          return;
@@ -316,7 +332,7 @@ class OnlinePlugin extends Gdn_Plugin {
          // Build an online supplement from the current state
          $OnlineSupplement = array(
             'Location'     => $Location,
-            'Visible'      => $this->PrivateMode(Gdn::Session()->User)
+            'Visible'      => !$this->PrivateMode(Gdn::Session()->User)
          );
          switch ($Location) {
             // User is viewing a category
@@ -339,6 +355,8 @@ class OnlinePlugin extends Gdn_Plugin {
 
                break;
          }
+         
+         Gdn::Controller()->SetData('OnlineSupplement', $OnlineSupplement);
 
          // Check if there are differences between this supplement and the user's existing one
          // If there are, write the new one to the cache
@@ -375,8 +393,6 @@ class OnlinePlugin extends Gdn_Plugin {
     * @return boolean 
     */
    protected function PrivateMode($User) {
-      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) return FALSE;
-      
       $OnlinePrivacy = GetValueR('Attributes.Online/PrivateMode', $User, FALSE);
       return $OnlinePrivacy;
    }

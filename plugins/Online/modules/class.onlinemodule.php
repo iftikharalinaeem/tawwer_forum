@@ -1,8 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
 
 /**
- * Renders a list of online users
+ * Online Plugin - OnlineModule
+ * 
+ * This module displays a list of users who are currently online, either in
+ * user icon format, or as a simple user list.
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @package Misc
  */
+
 class OnlineModule extends Gdn_Module {
 
    /**
@@ -110,7 +119,7 @@ class OnlineModule extends Gdn_Module {
                
                if ($this->GuestCount) {
                   $GuestCount = Gdn_Format::BigNumber($this->GuestCount, 'html');
-                  $GuestsText = Plural($this->GuestCount, 'guest', 'guests');
+                  $GuestsText = Plural($this->GuestCount, 'Guest', 'Guests');
                   $Plus = $this->Count == $this->GuestCount ? '' : '+';
                   echo <<<EOT
  <span class="GuestCountBox"><span class="GuestCount">{$Plus}$GuestCount</span> <span class="GuestLabel">$GuestsText</span></span>
@@ -127,8 +136,9 @@ EOT;
                
                if ($this->GuestCount) {
                   $GuestCount = Gdn_Format::BigNumber($this->GuestCount, 'html');
+                  $GuestsText = Plural($this->GuestCount, 'Guest', 'Guests');
                   $Plus = $this->Count == $this->GuestCount ? '' : '+';
-                  echo '<li><strong>'.sprintf(T('%s%s Guests'), $Plus, $GuestCount).'</strong></li>';
+                  echo "<li><strong>{$Plus}{$GuestCount} {$GuestsText}</strong></li>";
                }
                echo '</ul>';
             }
