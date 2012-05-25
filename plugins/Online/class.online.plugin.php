@@ -402,7 +402,7 @@ class OnlinePlugin extends Gdn_Plugin {
     * @param array $User
     * @return boolean 
     */
-   protected function PrivateMode($User) {
+   public function PrivateMode($User) {
       $OnlinePrivacy = GetValueR('Attributes.Online/PrivateMode', $User, FALSE);
       return $OnlinePrivacy;
    }

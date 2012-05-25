@@ -101,6 +101,16 @@ class OnlineModule extends Gdn_Module {
          }
          
          $this->OnlineUsers = OnlinePlugin::Instance()->OnlineUsers($this->Selector, $this->SelectorID, $this->SelectorField);
+         print_r($this->OnlineUsers);
+         if (!array_key_exists(Gdn::Session()->User->UserID, $this->OnlineUsers)) {
+            $this->OnlineUsers[Gdn::Session()->UserID] = array(
+               'UserID'                   => Gdn::Session()->UserID,
+               'Timestamp'                => date('Y-m-d H:i:s'),
+               'Location'                 => $this->Selector,
+               "{$this->SelectorField}"   => $this->SelectorID,
+               'Visible'                  => OnlinePlugin::Instance()->PrivateMode(Gdn::Session()->User)
+            );
+         }
          Gdn::UserModel()->JoinUsers($this->OnlineUsers, array('UserID'));
          
          // Strip invisibles, and index by username
