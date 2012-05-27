@@ -232,11 +232,14 @@ class ReactionModel {
    }
    
    public function JoinUserTags(&$Data, $RecordType) {
+      if (!$Data)
+         return;
+      
       $IDs = array();
       $UserIDs = array();
       $PK = $RecordType.'ID';
       
-      if (is_a($Data, 'stdClass')) {
+      if (is_a($Data, 'stdClass') || (is_array($Data) && !isset($Data[0]))) {
          $Data2 = array($Data);
       } else {
          $Data2 =& $Data;
