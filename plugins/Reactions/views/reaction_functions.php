@@ -193,6 +193,7 @@ function WriteReactions($Row) {
    }
    
 //   decho($Row, 'Row');
+   WriteRecordReactions($Row);
    
    echo '<div class="Reactions">';
    
@@ -255,6 +256,37 @@ function WriteReactions($Row) {
    
 //   echo ' <span class="Handle ReactHandle"><span class="ReactSprite ReactReact">&#160;</span> <span class="ReactLabel">React</span></span>';
    echo '</span>';
+   
+   echo '</div>';
+}
+
+endif;
+
+if (!function_exists('WriteRecordReactions')):
+
+function WriteRecordReactions($Row) {
+   $UserTags = GetValue('UserTags', $Row, array());
+   if (empty($UserTags))
+      return;
+   
+   echo '<div class="RecordReactions">';
+   
+   foreach ($UserTags as $Tag) {
+      $User = Gdn::UserModel()->GetID($Tag['UserID'], DATASET_TYPE_ARRAY);
+      $ReactionType = ReactionModel::FromTagID($Tag['TagID']);
+      if (!$ReactionType)
+         continue;
+      $UrlCode = $ReactionType['UrlCode'];
+      $SpriteClass = GetValue('SpriteClass', $ReactionType, "React$UrlCode");
+      $Title = sprintf('%s - %s on %s', $User['Name'], T($ReactionType['Name']), Gdn_Format::DateFull($Tag['DateInserted']));
+      
+      echo '<span class="UserReactionWrap" title="'.htmlspecialchars($Title).'">';
+      
+      echo UserPhoto($User, array('Size' => 'Small', 'Title' => $Title));
+      echo "<span class=\"ReactSprite $SpriteClass\"></span>";
+      
+      echo '</span>';
+   }
    
    echo '</div>';
 }

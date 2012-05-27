@@ -45,6 +45,21 @@
    padding: 0 3px 0 0;
 }
 
+.RecordReactions {
+    margin-top: 10px;
+}
+
+.UserReactionWrap {
+    position: relative;
+    line-height: 1;
+}
+
+.UserReactionWrap .ReactSprite {
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+}
+
 /* Hover Mechanics */
 .Reactions a {
    color: #000;
@@ -118,7 +133,8 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 
 .MenuItems li:hover .ReactButton .ReactSprite,
 .ReactButton:hover .ReactSprite,
-.HasCount .ReactSprite {
+.HasCount .ReactSprite,
+.UserReactionWrap .ReactSprite {
    background-image: url('reaction-sprites-color.png');
 }
 .Reactions a.HasCount {
