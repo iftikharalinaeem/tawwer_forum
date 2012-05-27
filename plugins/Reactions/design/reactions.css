@@ -1,6 +1,5 @@
 .Reactions {
    position: relative;
-   margin: 5px 0 0;
    font-size: 11px;
    line-height: 18px;
 }
@@ -46,18 +45,21 @@
 }
 
 .RecordReactions {
-    margin-top: 10px;
+    margin-top: 15px;
+    text-align: right;
 }
 
 .UserReactionWrap {
     position: relative;
     line-height: 1;
+    display: inline-block;
+    margin-right: 3px;
 }
 
 .UserReactionWrap .ReactSprite {
     position: absolute;
-    right: -1px;
-    bottom: -1px;
+    right: -2px;
+    bottom: -2px;
 }
 
 /* Hover Mechanics */
@@ -139,7 +141,7 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 }
 .Reactions a.HasCount {
    display: inline-block;
-   opacity: 1 !Important;
+/*   opacity: 1 !Important;*/
 }
 
 .InProgress .ReactSprite {
