@@ -372,7 +372,11 @@ Here are some things you should know before you begin:
          $SmartyCompileError = !$Smarty->TestTemplate('customtheme:default_master_'.$WorkingRevisionID.'.tpl');
 			
 			// Check for required assets
-			$AssetError = (stripos($NewHtml, '{asset name="Foot"}') === FALSE) ? TRUE : FALSE;
+         $NoHeadAsset = (stripos($NewHtml, '{asset name="Head"}') === FALSE) && (stripos($NewHtml, "{asset name='Head'}") === FALSE);
+         $NoContentAsset = (stripos($NewHtml, '{asset name="Content"}') === FALSE) && (stripos($NewHtml, "{asset name='Content'}") === FALSE);
+         $NoFootAsset = (stripos($NewHtml, '{asset name="Foot"}') === FALSE) && (stripos($NewHtml, "{asset name='Foot'}") === FALSE);
+         $NoAfterEvent = (stripos($NewHtml, '{event name="AfterBody"}') === FALSE) && (stripos($NewHtml, "{event name='AfterBody'}") === FALSE);
+         $AssetError = $NoHeadAsset || $NoContentAsset || $NoFootAsset || $NoAfterEvent;
 
 			// If we are applying the changes, and the changes didn't cause crashes save the live revision number.
 			if (!$AssetError && !$SmartyCompileError && ($IsApply || $IsApplyPreview)) {
@@ -407,7 +411,7 @@ Here are some things you should know before you begin:
 			if ($SmartyCompileError)
 				$Sender->Form->AddError('There was a templating error in your HTML customizations. Make sure that any javascript or inline CSS definitions are wrapped in {literal} tags, and all {if} statements have a closing {/if} tag.');
 			elseif ($AssetError)
-			   $Sender->Form->AddError('There was a templating error in your HTML customizations. Make sure you have not removed any required tags like {asset name="Foot"}.');
+			   $Sender->Form->AddError('There was a templating error in your HTML customizations. You have removed one or more required templating tags: {asset name="Head"}, {asset name="Content"}, {asset name="Foot"}, and {event name="AfterBody"}.');
 			else 
 				$Sender->StatusMessage = "Your changes have been applied.";
 				

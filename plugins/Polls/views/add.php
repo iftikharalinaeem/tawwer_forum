@@ -15,7 +15,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 <div id="NewPollForm" class="NewPollForm DiscussionForm FormTitleWrapper">
    <?php
    if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-      echo Wrap($this->Data('Title'), 'h1');
+      echo Wrap($this->Data('Title'), 'h1 class="H"');
 
    echo '<div class="FormWrapper">';
       echo $this->Form->Open();

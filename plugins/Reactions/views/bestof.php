@@ -30,7 +30,7 @@ EOT;
    return $Result;
 }
 
-echo Wrap($this->Data('Title'), 'h1');
+echo Wrap($this->Data('Title'), 'h1 class="H"');
 
 echo '<div class="DataCounts">';
    $CurrentReactionType = $this->Data('CurrentReaction');
