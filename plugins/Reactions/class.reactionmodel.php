@@ -268,7 +268,7 @@ class ReactionModel {
          $Tags[$Row['RecordID']][] = $Row;
       }
       
-      decho($Tags);
+//      decho($Tags);
       
       // Join the tags.
       foreach ($Data2 as &$Row) {
@@ -972,8 +972,8 @@ class ReactionModel {
       try {
          $this->SQL->Database->Query($Sql, $Args);
       } catch (Exception $Ex) {
-         decho($Sql);
-         decho($Args);
+//         decho($Sql);
+//         decho($Args);
          die();
       }
    }
