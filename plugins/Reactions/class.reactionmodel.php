@@ -265,23 +265,23 @@ class ReactionModel {
          ->OrderBy('DateInserted')
          ->Get()->ResultArray();
       
+      
+      
       $Tags = array();
       foreach($TagsData as $Row) {
          $UserIDs[$Row['UserID']] = 1;
          $Tags[$Row['RecordID']][] = $Row;
       }
       
-//      decho($Tags);
-      
       // Join the tags.
       foreach ($Data2 as &$Row) {
          $ID = GetValue($PK, $Row);
          if ($ID)
-            $Tags = GetValue($ID, $Tags, array());
+            $TagRow = GetValue($ID, $Tags, array());
          else
-            $Tags = array();
+            $TagRow = array();
          
-         SetValue('UserTags', $Row, $Tags);
+         SetValue('UserTags', $Row, $TagRow);
       }
    }
    
