@@ -8,7 +8,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.0.3',
+   'Version' => '1.1.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -127,6 +127,10 @@ class ReactionsPlugin extends Gdn_Plugin {
          $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
          $this->AddJs($Sender);
       }
+      
+      $ReactionModel = new ReactionModel();
+      $ReactionModel->JoinUserTags($Sender->Data['Discussion'], 'Discussion');
+      $ReactionModel->JoinUserTags($Sender->Data['Comments'], 'Comment');
       
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }

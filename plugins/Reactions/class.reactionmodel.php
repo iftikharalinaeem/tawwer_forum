@@ -8,7 +8,7 @@ class ReactionModel {
    /// Properties ///
    
    public static $ReactionTypes = NULL;
-   
+   public static $TagIDs = NULL;
    
    /**
     * @var Gdn_SQL 
@@ -165,6 +165,17 @@ class ReactionModel {
       return TRUE;
    }
    
+   public static function FromTagID($TagID) {
+      if (self::$TagIDs === NULL) {
+         $Types = self::ReactionTypes();
+//         decho($Types, 'Types');
+         self::$TagIDs = Gdn_DataSet::Index($Types, array('TagID'));
+         
+      }
+//      decho(self::$TagIDs, 'TagIDs');
+      return GetValue($TagID, self::$TagIDs);
+   }
+   
    public function GetRecordsWhere($Where, $OrderFields = '', $OrderDirection = '', $Limit = 30, $Offset = 0) {
       // Grab the user tags.
       $UserTags = $this->SQL
@@ -218,6 +229,60 @@ class ReactionModel {
       
       $Row[$AttrColumn] = $Attributes;
       return array($Row, $Model, $Log);
+   }
+   
+   public function JoinUserTags(&$Data, $RecordType) {
+      if (!$Data)
+         return;
+      
+      $IDs = array();
+      $UserIDs = array();
+      $PK = $RecordType.'ID';
+      
+      if (is_a($Data, 'stdClass') || (is_array($Data) && !isset($Data[0]))) {
+         $Data2 = array($Data);
+      } else {
+         $Data2 =& $Data;
+      }
+      
+//      decho($Data);
+      
+      foreach ($Data2 as $Row) {
+         $ID = GetValue($PK, $Row);
+         if ($ID)
+            $IDs[$ID] = 1;
+      }
+//      decho($IDs);
+      
+      $TagsData = $this->SQL
+         ->Select('RecordID')
+         ->Select('UserID')
+         ->Select('TagID')
+         ->Select('DateInserted')
+         ->From('UserTag')
+         ->Where('RecordType', $RecordType)
+         ->WhereIn('RecordID', array_keys($IDs))
+         ->OrderBy('DateInserted')
+         ->Get()->ResultArray();
+      
+      
+      
+      $Tags = array();
+      foreach($TagsData as $Row) {
+         $UserIDs[$Row['UserID']] = 1;
+         $Tags[$Row['RecordID']][] = $Row;
+      }
+      
+      // Join the tags.
+      foreach ($Data2 as &$Row) {
+         $ID = GetValue($PK, $Row);
+         if ($ID)
+            $TagRow = GetValue($ID, $Tags, array());
+         else
+            $TagRow = array();
+         
+         SetValue('UserTags', $Row, $TagRow);
+      }
    }
    
    public static function JoinRecords(&$Data) {
@@ -910,8 +975,8 @@ class ReactionModel {
       try {
          $this->SQL->Database->Query($Sql, $Args);
       } catch (Exception $Ex) {
-         decho($Sql);
-         decho($Args);
+//         decho($Sql);
+//         decho($Args);
          die();
       }
    }

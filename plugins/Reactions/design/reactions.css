@@ -1,6 +1,5 @@
 .Reactions {
    position: relative;
-   margin: 5px 0 0;
    font-size: 11px;
    line-height: 18px;
 }
@@ -43,6 +42,24 @@
    
    margin: 0 2px;
    padding: 0 3px 0 0;
+}
+
+.RecordReactions {
+    margin-top: 15px;
+    text-align: right;
+}
+
+.UserReactionWrap {
+    position: relative;
+    line-height: 1;
+    display: inline-block;
+    margin-right: 3px;
+}
+
+.UserReactionWrap .ReactSprite {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
 }
 
 /* Hover Mechanics */
@@ -118,12 +135,13 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 
 .MenuItems li:hover .ReactButton .ReactSprite,
 .ReactButton:hover .ReactSprite,
-.HasCount .ReactSprite {
+.HasCount .ReactSprite,
+.UserReactionWrap .ReactSprite {
    background-image: url('reaction-sprites-color.png');
 }
 .Reactions a.HasCount {
    display: inline-block;
-   opacity: 1 !Important;
+/*   opacity: 1 !Important;*/
 }
 
 .InProgress .ReactSprite {
