@@ -281,11 +281,10 @@ TOO DESTRUCTIVE FOR A PLUGIN!
    display: none;
 }
 
-.Buried .Options {
-   display: none;
-}
-
-.Buried .CommentInfo {
+.Buried .Options,
+.Buried .CommentInfo,
+.Buried .Signature,
+.Buried .RecordReactions {
     display: none;
 }
 
