@@ -27,7 +27,7 @@ class SEOLinksPlugin extends Gdn_Plugin {
     */
    public function Gdn_Router_AfterLoadRoutes_Handler($Sender, $Args) {
       $Routes = & $Args['Routes'];
-      $Route = '/?[^/]+/(\d+)-(.*?)(?:-(p\d+))?.html$';
+      $Route = '/?[^/]+/(\d+)-(.*?)(?:-(p\d+))?.html';
       $Sender->Routes[$Route] = array(
           'Route' => $Route,
           'Key' => base64_encode($Route),
