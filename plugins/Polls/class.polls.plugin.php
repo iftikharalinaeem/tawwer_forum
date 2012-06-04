@@ -28,7 +28,7 @@ class PollsPlugin extends Gdn_Plugin {
     * Add the "new poll" button after the new discussion button. 
     */
    public function Base_AfterNewDiscussionButton_Handler($Sender) {
-      echo Anchor(Sprite('SpPoll').T('New Poll'), 'post/poll', 'Button BigButton PollButton');
+      echo Anchor(Sprite('SpPoll').T('New Poll'), 'post/poll', 'NavButton PollButton');
    }
    
    /** 
@@ -118,7 +118,7 @@ class PollsPlugin extends Gdn_Plugin {
    }
    
    protected function _AddCss($Sender) {
-      $Sender->AddCssFile('plugins/Polls/design/style.css');
+      $Sender->AddCssFile('polls.css', 'plugins/Polls');
       $Discussions = &$Sender->Data('Discussions');
       if ($Discussions) {
          foreach ($Discussions as &$Row) {
@@ -180,6 +180,7 @@ class PollsPlugin extends Gdn_Plugin {
       $Sender->Title(T('New Poll'));
 		$Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/poll')));
       $Sender->AddJsFile('jquery.duplicate.js');
+      $this->_AddCss($Sender);
       $Sender->Render('add', '', 'plugins/Polls');
    }
    
@@ -208,8 +209,8 @@ class PollsPlugin extends Gdn_Plugin {
       
       if (strtolower(GetValue('Type', $Discussion)) == 'poll') {
          // Load css/js files
-         $Sender->AddCssFile('plugins/Polls/design/style.css');
-         $Sender->AddJsFile('plugins/Polls/js/polls.js');
+         $Sender->AddCssFile('polls.css', 'plugins/Polls');
+         $Sender->AddJsFile('polls.js', 'plugins/Polls');
 
          // Load the poll based on the discussion id.
          $PollModel = new PollModel();
