@@ -24,7 +24,8 @@ class FAQPlugin extends Gdn_Plugin {
       include dirname(__FILE__).'/structure.php';
    }
    
-   public function DiscussionController_FAQ_Create($Sender) {
+   public function InfoController_FAQs_Create($Sender) {
+      ForceNoSSL();
       // What is the FAQ category?
       $FAQCategoryID = C('Plugins.FAQ.CategoryID', 0);
       // Load all of the discussions
@@ -45,14 +46,15 @@ class FAQPlugin extends Gdn_Plugin {
          ->Limit($Limit, 0) // Don't load too many discussions (this could be a helluva lot of data)
          ->Get());
       
-      $Sender->Title('Frequently Asked Questions');
       // Render
+      $Sender->Title('Frequently Asked Questions');
+      $Sender->AddCssFile('style.css');      
       $Sender->AddCssFile('vfcom.css', 'vfcom');
       $Sender->AddAsset('Panel', $Sender->FetchView('sidemenu', 'info', 'vfcom'));
       $Sender->Render('faq', '', 'plugins/FAQ');
    }
    
    public function Base_AfterVFComSideMenu_Handler($Sender) {
-      VFComWriteMenuItem('faq', 'Frequently Asked Questions', 'discussion/faq');
+      VFComWriteMenuItem('faqs', 'Frequently Asked Questions', 'info/faqs');
    }
 }
