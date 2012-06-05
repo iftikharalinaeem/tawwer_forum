@@ -22,7 +22,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
    /// Methods ///
    
    public function Format($String) {
-      $String = str_replace(array('&quot;', '&#39;', '&#58;'), array('"', "'", ':'), $String);
+      $String = str_replace(array('&quot;', '&#39;', '&#58;', 'Â'), array('"', "'", ':', ''), $String);
       $String = str_replace('<#EMO_DIR#>', 'default', $String);
       $Result = $this->NBBC()->Parse($String);
       

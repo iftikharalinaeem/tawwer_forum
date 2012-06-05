@@ -10,7 +10,7 @@ if (!defined('APPLICATION'))
 $PluginInfo['SEOLinks'] = array(
     'Name' => 'SEO Links',
     'Description' => "Changes the links to discussions and categories for pure SEO oriented forums.",
-    'Version' => '1.0.8',
+    'Version' => '1.0.9',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'MobileFriendly' => TRUE,
     'Author' => 'Todd Burry',
@@ -27,7 +27,7 @@ class SEOLinksPlugin extends Gdn_Plugin {
     */
    public function Gdn_Router_AfterLoadRoutes_Handler($Sender, $Args) {
       $Routes = & $Args['Routes'];
-      $Route = '/?[^/]+/(\d+)-(.*?)(?:-(p\d+))?.html$';
+      $Route = '/?[^/]+/(\d+)-(.*?)(?:-(p\d+))?.html';
       $Sender->Routes[$Route] = array(
           'Route' => $Route,
           'Key' => base64_encode($Route),
@@ -42,7 +42,7 @@ class SEOLinksPlugin extends Gdn_Plugin {
          if (!$Category['UrlCode'])
             continue;
          
-         $Route = '/?(' . preg_quote($Category['UrlCode']) . ')/?(p\d+)?/?';
+         $Route = '/?(' . preg_quote($Category['UrlCode']) . ')(?:/(p\d+))?/?(\?.*)?$';
          $Sender->Routes[$Route] = array(
              'Route' => $Route,
              'Key' => base64_encode($Route),
@@ -123,22 +123,25 @@ if (!function_exists('DiscussionUrl')):
 
 endif;
 
-if (!function_exists('UserUrl')):
-
-   /**
-    * Return the url for a user.
-    * @param array|object $User The user to get the url for.
-    * @param string $Px The prefix to apply before fieldnames. @since 2.1
-    * @return string The url suitable to be passed into the Url() function.
-    */
-   function UserUrl($User, $Px = '') {
-      static $NameUnique = NULL;
-      if ($NameUnique === NULL)
-         $NameUnique = C('Garden.Registration.NameUnique');
-
-      return '/members/' . ($NameUnique ? '' : GetValue($Px . 'UserID', $User, 0) . '/') . rawurlencode(GetValue($Px . 'Name', $User));
-   }
-
-
-
-endif;
+//if (!function_exists('UserUrl')):
+//
+//   /**
+//    * Return the url for a user.
+//    * @param array|object $User The user to get the url for.
+//    * @param string $Px The prefix to apply before fieldnames. @since 2.1
+//    * @return string The url suitable to be passed into the Url() function.
+//    */
+//   function UserUrl($User, $Px = '', $Method = '') {
+//      static $NameUnique = NULL;
+//      if ($NameUnique === NULL)
+//         $NameUnique = C('Garden.Registration.NameUnique');
+//      
+//      if ($Method)
+//         $Method .= '/';
+//
+//      return '/members/' .$Method. ($NameUnique ? '' : GetValue($Px . 'UserID', $User, 0) . '/') . rawurlencode(GetValue($Px . 'Name', $User));
+//   }
+//
+//
+//
+//endif;

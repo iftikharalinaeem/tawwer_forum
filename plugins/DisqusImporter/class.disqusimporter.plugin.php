@@ -302,16 +302,14 @@ class DisqusImporter extends Gdn_Plugin {
             ParentCategoryID,
             Name,
             DateUpdated,
-            ForeignID,
-            Source
+            ForeignID
          )
          select
             i.UrlCode,
             -1 as ParentID,
             i.Name,
             curdate() as DateUpdated,
-            DisqusID,
-            'Disqus'
+            DisqusID
          from GDN_zDisqusCategory i
          left join GDN_Category t
             on i.UrlCode = t.UrlCode
@@ -334,6 +332,12 @@ class DisqusImporter extends Gdn_Plugin {
    }
    
    public function InsertComments() {
+      Gdn::Structure()
+         ->Table('Comment')
+         ->Column('ForeignID', 'varchar(32)')
+//         ->Column('Source', 'varchar(20)')
+         ->Set();
+      
       $this->_InsertUsers('zDisqusComment');
       
       
@@ -350,14 +354,13 @@ class DisqusImporter extends Gdn_Plugin {
       $Sql = "update GDN_zDisqusComment i
          join GDN_Comment t
             on i.ForeignID = t.ForeignID
-               and t.Source = 'Disqus'
          set i.CommentID = t.CommentID";
+//                     and t.Source = 'Disqus'
       $this->Query($Sql);
       
       // Insert the comments.
       $Sql = "insert GDN_Comment (
          ForeignID,
-         Source,
          DiscussionID,
          Body,
          Format,
@@ -367,7 +370,6 @@ class DisqusImporter extends Gdn_Plugin {
       )
       select
          i.ForeignID,
-         'Disqus',
          i.DiscussionID,
          i.Body,
          i.Format,
@@ -385,7 +387,6 @@ class DisqusImporter extends Gdn_Plugin {
       $Sql = "insert GDN_Discussion (
             ForeignID,
             Type,
-            Source,
             CategoryID,
             Name,
             Body,
@@ -399,7 +400,6 @@ class DisqusImporter extends Gdn_Plugin {
          select
             i.ForeignID,
             'page',
-            'Disqus',
             i.CategoryID,
             i.Name,
             i.Body,
@@ -605,8 +605,8 @@ class DisqusImporter extends Gdn_Plugin {
       }
       
       $Finish = time();
-      echo ($Finish - $Start).'s';
+      echo '-- '.($Finish - $Start).'s';
       echo '</pre>';
    }
-   
+
 }

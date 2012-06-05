@@ -15,16 +15,16 @@ class IPB extends ExportController {
     * @param ExportModel $Ex 
     */
    protected function ForumExport($Ex) {
-      $Ex->TestMode = TRUE;
+      $Ex->TestMode = FALSE;
       $Ex->TestLimit = FALSE;
       $Ex->Destination = 'database';
-      $Ex->DestDb = 'grill';
-//      $Ex->CaptureOnly = TRUE;
+      $Ex->DestDb = 'unknownworlds';
+      $Ex->CaptureOnly = TRUE;
       $Ex->ScriptCreateTable = FALSE;
       $Ex->DestPrefix = 'GDN_';
       
       $Ex->SourcePrefix = 'ibf_';
-      $Cdn = 'http://cdn.vanillaforums.com/grilldome.vanillaforums.com/';
+      $Cdn = 'http://cdn.vanillaforums.com/unknownworlds.vanillaforums.com/';
       
       // Get the characterset for the comments.
       $CharacterSet = $Ex->GetCharacterSet('posts');
@@ -42,9 +42,15 @@ class IPB extends ExportController {
       // Begin
       $Ex->BeginExport('', 'IPB 3.*', array('HashMethod' => 'ipb'));
       
+      if ($Ex->Exists('members', 'member_id') === TRUE) {
+         $MemberID = 'member_id';
+      } else {
+         $MemberID = 'id';
+      }
+      
       // Users.
       $User_Map = array(
-         'member_id' => 'UserID',
+         $MemberID => 'UserID',
          'members_display_name' => 'Name',
          'email' => 'Email',
          'joined' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
@@ -58,18 +64,37 @@ class IPB extends ExportController {
          'title' => 'Title',
          'location' => 'Location'
       );
-      if ($Ex->Exists('member_extra')) {
+      
+      $From = '';
+      $Select = '';
+      
+      if ($Ex->Exists('members', 'members_pass_hash') === true) {
+         $Select = ",concat(m.members_pass_hash, '$', m.members_pass_salt) as Password";
+      } else {
+         $Select = ",concat(mc.converge_pass_hash, '$', mc.converge_pass_salt) as Password";
+         $From = "left join ibf_members_converge mc
+            on m.$MemberID = mc.converge_id";
+      }
+      
+      if ($Ex->Exists('member_extra') === TRUE) {
          $Sql = "select
                   m.*,
                   m.joined as firstvisit,
                   'ipb' as HashMethod,
                   !hide_email as ShowEmail,
-                  concat(m.members_pass_hash, '$', m.members_pass_salt) as Password,
-                  x.avatar_location as Photo,
+                  case when x.avatar_location in ('noavatar', '') then null
+                     when x.avatar_location like 'upload:%' then concat('~cf/ipb/', right(x.avatar_location, length(x.avatar_location) - 7))
+                     when x.avatar_type = 'upload' then concat('~cf/ipb/', x.avatar_location)
+                     when x.avatar_type = 'url' then x.avatar_location
+                     when x.avatar_type = 'local' then concat('~cf/style_avatars/', x.avatar_location)
+                     else null
+                  end as Photo,
                   x.location
+                  $Select
                  from ibf_members m
                  left join ibf_member_extra x
-                  on m.member_id = x.id";
+                  on m.$MemberID = x.id
+                 $From";
       } else {
          $Sql = "select
                   m.*,
@@ -78,12 +103,15 @@ class IPB extends ExportController {
                   !hide_email as ShowEmail,
                   concat(m.members_pass_hash, '$', m.members_pass_salt) as Password,
                   case when length(p.avatar_location) <= 3 or p.avatar_location is null then null
-                  	when p.avatar_type = 'local' then concat('$Cdn', p.avatar_location)
-                  	when p.avatar_type = 'upload' then concat('$Cdn', p.avatar_location)
+                     when p.
+                  	when p.avatar_type = 'local' then concat('ipb/', p.avatar_location)
+                  	when p.avatar_type = 'upload' then concat('ipb/', p.avatar_location)
                   	else p.avatar_location end as Photo
+                 $Select
                  from ibf_members m
                  left join ibf_profile_portal p
-                 	on m.member_id = p.pp_member_id";
+                 	on m.$MemberID = p.pp_member_id
+                 $From";
       }
       $this->ClearFilters('members', $User_Map, $Sql, 'm');
       $Ex->ExportTable('User', $Sql, $User_Map);  // ":_" will be replaced by database prefix
@@ -120,9 +148,17 @@ class IPB extends ExportController {
          from ibf_groups r", $Permission_Map);
       
       // User Role.
+      
+      if ($Ex->Exists('members', 'member_group_id') === TRUE)
+         $GroupID = 'member_group_id';
+      else
+         $GroupID = 'mgroup';
+         
+      
+      
       $UserRole_Map = array(
-          'member_id' => 'UserID',
-          'member_group_id' => 'RoleID'
+          $MemberID => 'UserID',
+          $GroupID => 'RoleID'
       );
       $Ex->ExportTable('UserRole', "select * from ibf_members", $UserRole_Map);
       
@@ -132,24 +168,47 @@ class IPB extends ExportController {
           'Name' => 'Name',
           'Value' => 'Value'
           );
-      $Sql = "
-      select
-         pp_member_id as UserID,
-         'Plugin.Signatures.Sig' as Name,
-         signature as Value
-      from ibf_profile_portal
-      where length(signature) > 1
+      
+      if ($Ex->Exists('profile_portal', 'signature') === TRUE) {
+         $Sql = "
+         select
+            pp_member_id as UserID,
+            'Plugin.Signatures.Sig' as Name,
+            signature as Value
+         from ibf_profile_portal
+         where length(signature) > 1
 
-      union all
+         union all
 
-      select
-         pp_member_id as UserID,
-         'Plugin.Signatures.Format' as Name,
-         'IPB' as Value
-      from ibf_profile_portal
-      where length(signature) > 1
-            ";
-      $Ex->ExportTable('UserMeta', $Sql, $UserMeta_Map);
+         select
+            pp_member_id as UserID,
+            'Plugin.Signatures.Format' as Name,
+            'IPB' as Value
+         from ibf_profile_portal
+         where length(signature) > 1
+               ";
+      } elseif ($Ex->Exists('member_extra', array('id', 'signature')) === TRUE) {
+         $Sql = "
+         select
+            id as UserID,
+            'Plugin.Signatures.Sig' as Name,
+            signature as Value
+         from ibf_member_extra
+         where length(signature) > 1
+
+         union all
+
+         select
+            id as UserID,
+            'Plugin.Signatures.Format' as Name,
+            'IPB' as Value
+         from ibf_member_extra
+         where length(signature) > 1";
+      } else {
+         $Sql = FALSE;
+      }
+      if ($Sql)
+         $Ex->ExportTable('UserMeta', $Sql, $UserMeta_Map);
       
       // Category.
       $Category_Map = array(
@@ -171,8 +230,12 @@ class IPB extends ExportController {
           'start_date' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
           'ip_address' => 'InsertIPAddress',
           'edit_time' => array('Column' => 'DateUpdated', 'Filter' => array($Ex, 'TimestampToDate')),
+          'last_post', array('Column' => 'DateLastPost', 'Filter' => array($Ex, 'TimestampToDate')),
+          'posts' => 'CountComments',
           'views' => 'CountViews',
-          'post' => 'Body'
+          'pinned' => 'Announce',
+          'post' => 'Body',
+          'closed' => 'Closed'
           );
       $Sql = "
       select 
@@ -182,6 +245,7 @@ class IPB extends ExportController {
          	when t.description <> '' then t.description
          	else p.post
          end as post,
+         case when t.state = 'closed' then 1 else 0 end as closed,
          'IPB' as Format,
          p.ip_address,
          p.edit_time
@@ -219,7 +283,7 @@ class IPB extends ExportController {
           'attach_id' => 'MediaID',
           'atype_mimetype' => 'Type',
           'attach_file' => 'Name',
-          'attach_location' => 'Path',
+          'attach_path' => 'Path',
           'attach_date' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
           'attach_member_id' => 'InsertUserID',
           'attach_filesize' => 'Size',
@@ -231,6 +295,7 @@ class IPB extends ExportController {
       );
       $Sql = "select 
 	a.*, 
+   concat('~cf/ipb/a.attach_location') as attach_path,
 	ty.atype_mimetype,
 	case when p.pid = t.topic_firstpost then 'discussion' else 'comment' end as ForeignTable,
 	case when p.pid = t.topic_firstpost then t.tid else p.pid end as ForeignID,
@@ -247,6 +312,217 @@ left join ibf_attachments_type ty
       $this->ClearFilters('Media', $Media_Map, $Sql);
       $Ex->ExportTable('Media', $Sql, $Media_Map);
       
+      if ($Ex->Exists('message_topic_user_map')) {
+         $this->_ExportConversationsV3();
+      } else {
+         $this->_ExportConversationsV2();
+      }
+      
+      $Ex->EndExport();
+   }
+   
+   protected function _ExportConversationsV2() {
+      $Ex = $this->Ex;
+      
+      $Sql = <<<EOT
+create table tmp_to (
+	id int,
+	userid int,
+	primary key (id, userid)
+);
+
+truncate table tmp_to;
+
+insert ignore tmp_to (
+	id,
+	userid
+)
+select
+	mt_id,
+	mt_from_id
+from ibf_message_topics;
+
+insert ignore tmp_to (
+	id,
+	userid
+)
+select
+	mt_id,
+	mt_to_id
+from ibf_message_topics;
+
+create table tmp_to2 (
+	id int primary key,
+	userids varchar(255)
+);
+truncate table tmp_to2;
+
+insert tmp_to2 (
+	id,
+	userids
+)
+select
+	id,
+	group_concat(userid order by userid)
+from tmp_to
+group by id;
+
+create table tmp_conversation (
+	id int primary key,
+	title varchar(255),
+	title2 varchar(255),
+	userids varchar(255),
+	groupid int
+);
+
+replace tmp_conversation (
+	id,
+	title,
+	title2,
+	userids
+)
+select 
+	mt_id,
+	mt_title,
+	mt_title,
+	t2.userids
+from ibf_message_topics t
+join tmp_to2 t2
+	on t.mt_id = t2.id;
+
+update tmp_conversation
+set title2 = trim(right(title2, length(title2) - 3))
+where title2 like 'Re:%';
+
+update tmp_conversation
+set title2 = trim(right(title2, length(title2) - 5))
+where title2 like 'Sent:%';
+
+update tmp_conversation
+set title2 = trim(right(title2, length(title2) - 3))
+where title2 like 'Re:%';
+
+update tmp_conversation
+set title2 = trim(right(title2, length(title2) - 5))
+where title2 like 'Sent:%';
+
+update tmp_conversation
+set title2 = trim(right(title2, length(title2) - 3))
+where title2 like 'Re:%';
+
+update tmp_conversation
+set title2 = trim(right(title2, length(title2) - 5))
+where title2 like 'Sent:%';
+
+update tmp_conversation
+set title2 = trim(right(title2, length(title2) - 3))
+where title2 like 'Re:%';
+
+update tmp_conversation
+set title2 = trim(right(title2, length(title2) - 5))
+where title2 like 'Sent:%';
+
+update tmp_conversation
+set title2 = trim(right(title2, length(title2) - 3))
+where title2 like 'Re:%';
+
+update tmp_conversation
+set title2 = trim(right(title2, length(title2) - 5))
+where title2 like 'Sent:%';
+
+create table tmp_group (
+	title2 varchar(255),
+	userids varchar(255),
+	groupid int,
+	primary key (title2, userids)
+);
+
+replace tmp_group (
+	title2,
+	userids,
+	groupid
+)
+select
+	min(id),
+	title2,
+	userids
+from tmp_conversation
+group by title2, userids;
+
+create index tidx_group on tmp_group(title2, userids);
+create index tidx_conversation on tmp_conversation(title2, userids);
+
+update tmp_conversation c
+join tmp_group g
+	on c.title2 = g.title2 and c.userids = g.userids
+set c.groupid = g.groupid;
+EOT;
+      
+      $Ex->QueryN($Sql);
+      
+      // Converations.
+      $Conversation_Map = array(
+          'groupid' => 'ConversationID',
+          'title2' => 'Subject',
+          'mt_date' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
+          'mt_from_id' => 'InsertUserID'
+          );
+      $Sql = "select
+	mt.*,
+   tc.title2,
+	tc.groupid
+from ibf_message_topics mt
+join tmp_conversation tc
+	on mt.mt_id = tc.id";
+      $this->ClearFilters('Conversation', $Conversation_Map, $Sql);
+      $Ex->ExportTable('Conversation', $Sql, $Conversation_Map);
+      
+      // Converation Message.
+      $ConversationMessage_Map = array(
+          'msg_id' => 'MessageID',
+          'group_id' => 'ConversationID',
+          'msg_date' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
+          'msg_post' => 'Body',
+          'Format' => 'Format',
+          'msg_author_id' => 'InsertUserID',
+          'msg_ip_address' => 'InsertIPAddress'
+          );
+      $Sql = "select
+	tx.*,
+	tc.title2,
+	tc.groupid,
+	'IPB' as Format
+from ibf_message_text tx
+join ibf_message_topics mt
+   on mt.mt_msg_id = tx.msg_id
+join tmp_conversation tc
+	on mt.mt_id = tc.id";
+      $this->ClearFilters('ConversationMessage', $ConversationMessage_Map, $Sql);
+      $Ex->ExportTable('ConversationMessage', $Sql, $ConversationMessage_Map);
+      
+      // User Conversation.
+      $UserConversation_Map = array(
+          'userid' => 'UserID',
+          'groupid' => 'ConversationID'
+          );
+      $Sql = "select distinct
+	g.groupid,
+	t.userid
+from tmp_to t
+join tmp_group g
+	on g.groupid = t.id";
+      $Ex->ExportTable('UserConversation', $Sql, $UserConversation_Map);
+      
+      $Ex->QueryN("
+      drop table tmp_conversation;
+drop table tmp_to;
+drop table tmp_to2;
+drop table tmp_group;");
+   }
+
+
+   protected function _ExportConversationsV3() {
+      $Ex = $this->Ex;
       
       // Converations.
       $Conversation_Map = array(
@@ -287,8 +563,6 @@ left join ibf_attachments_type ty
          !map_user_active as Deleted
       from ibf_message_topic_user_map t";
       $Ex->ExportTable('UserConversation', $Sql, $UserConversation_Map);
-      
-      $Ex->EndExport();
    }
    
    public function ClearFilters($Table, &$Map, &$Sql) {
