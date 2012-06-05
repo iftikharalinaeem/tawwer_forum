@@ -7,7 +7,6 @@ $DiscussionData = $this->Data('DiscussionData');
    ul.TOC {
       font-size: 14px;
    }
-   .Answers > strong,
    ul.TOC > li > strong {
       font-size: 24px;
    }
@@ -37,6 +36,13 @@ $DiscussionData = $this->Data('DiscussionData');
    .FAQAnswer > strong:first-child {
       font-size: 16px;
       margin-bottom: 10px;
+   }
+   .Answers > strong {
+      font-size: 24px;
+      display: block;
+      margin: 40px 0 0;
+      padding: 20px 0 0;
+      border-top: 4px solid #f5f5f5;
    }
 </style>
 <h1><?php echo $this->Data('Title'); ?></h1>
