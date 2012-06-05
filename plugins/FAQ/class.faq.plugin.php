@@ -9,7 +9,7 @@ $PluginInfo['FAQ'] = array(
    'Name' => 'FAQ',
    'Description' => "Take a category of discussions & it's subcategories, organizing & displaying them as FAQs",
    'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.1a', 'vfcom' => '1.0'),
+   'RequiredApplications' => array('Vanilla' => '2.1a', 'VFCom' => '1.0'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca'
