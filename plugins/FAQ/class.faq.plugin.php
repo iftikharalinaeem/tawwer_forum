@@ -9,7 +9,7 @@ $PluginInfo['FAQ'] = array(
    'Name' => 'FAQ',
    'Description' => "Take a category of discussions & it's subcategories, organizing & displaying them as FAQs",
    'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.1a', 'vfcom' => '1.0'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca'
@@ -45,7 +45,14 @@ class FAQPlugin extends Gdn_Plugin {
          ->Limit($Limit, 0) // Don't load too many discussions (this could be a helluva lot of data)
          ->Get());
       
+      $Sender->Title('Frequently Asked Questions');
       // Render
+      $Sender->AddCssFile('vfcom.css', 'vfcom');
+      $Sender->AddAsset('Panel', $Sender->FetchView('sidemenu', 'info', 'vfcom'));
       $Sender->Render('faq', '', 'plugins/FAQ');
+   }
+   
+   public function Base_AfterVFComSideMenu_Handler($Sender) {
+      VFComWriteMenuItem('faq', 'Frequently Asked Questions', 'discussion/faq');
    }
 }

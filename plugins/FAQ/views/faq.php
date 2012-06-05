@@ -3,23 +3,45 @@ $CategoryData = $this->Data('CategoryData');
 $DiscussionData = $this->Data('DiscussionData');
 ?>
 <style type="text/css">
-   #Content ul {
-      margin: 15px 15px;
+   /* Main Container */
+   ul.TOC {
+      font-size: 14px;
    }
-   #Content ul li strong {
+   .Answers > strong,
+   ul.TOC > li > strong {
       font-size: 24px;
    }
-   ul.TOC ol {
-      margin: 15px 37px;
+   ul.TOC ul {
+      margin: 20px 0;
    }
-   ul.TOC ol li {
+   ul.TOC ul li strong {
+      font-size: 20px;
+   }
+   /* TOC Questions */
+   ol.QList {
+      margin: 15px 30px;
+   }
+   ol.QList li {
       list-style-type: decimal;
+      font-size: 14px;
+      margin: 4px 0;
+   }
+   ol.QList li > strong:first-child {
       font-size: 16px;
+   }   
+   .FAQAnswer {
+      margin: 20px 0;
+      border-top: 4px solid #f5f5f5;
+      padding: 20px 0 0;
+   }
+   .FAQAnswer > strong:first-child {
+      font-size: 16px;
+      margin-bottom: 10px;
    }
 </style>
 <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
-function FAQList($CategoryData, $DiscussionData, $Format = 'TOC') {
+function FAQList($CategoryData, $DiscussionData) {
    $List = '';
    $Depth = 1;
    foreach ($CategoryData as $CategoryRow) {
@@ -47,10 +69,12 @@ function FAQList($CategoryData, $DiscussionData, $Format = 'TOC') {
       }
       $List .= "\r\n";
       $List .= '<li>';
-      // $List .= Wrap('['.$Category->Depth.'] '.$Category->Name, 'strong');
-      $List .= Wrap($Category->Name, 'strong');
-      if ($Category->Description != '')
-         $List .= Wrap(Gdn_Format::Text($Category->Description), 'p');
+      if ($Category->Depth > 1) { // Don't write out the main container info
+         // $List .= Wrap('['.$Category->Depth.'] '.$Category->Name, 'strong');
+         $List .= Wrap($Category->Name, 'strong');
+         if ($Category->Description != '')
+            $List .= Wrap(Gdn_Format::Text($Category->Description), 'p');
+      }
       
       $Depth = $Category->Depth;
       
@@ -58,11 +82,7 @@ function FAQList($CategoryData, $DiscussionData, $Format = 'TOC') {
       $QList = '';
       foreach ($DiscussionData as $Discussion) {
          if ($Discussion->CategoryID == $Category->CategoryID) {
-            if ($Format == 'TOC') {
-               $QList .= Wrap(Anchor(Gdn_Format::PlainText($Discussion->Name), '#Q'.$Discussion->DiscussionID), 'li');
-            } else {
-               $QList .= Wrap(Wrap(Anchor('', '', array('name' => '#Q'.$Discussion->DiscussionID)).Gdn_Format::PlainText($Discussion->Name), 'strong').Gdn_Format::To($Discussion->Body, $Discussion->Format), 'li');
-            }
+            $QList .= Wrap(Anchor(Gdn_Format::PlainText($Discussion->Name), '#Q'.$Discussion->DiscussionID), 'li');
          }
       }
       $List .= $QList != '' ? Wrap($QList, 'ol class="QList"') : '';
@@ -77,11 +97,43 @@ function FAQList($CategoryData, $DiscussionData, $Format = 'TOC') {
       $Depth--;
    }
    $List .= '</li>';
-   return Wrap($List, 'ul class="'.$Format.'"');
+   return Wrap($List, 'ul class="TOC"');
+   
+}
+
+function AnswerList($CategoryData, $DiscussionData) {
+   $List = '';
+   foreach ($CategoryData as $CategoryRow) {
+      $Category = (object)$CategoryRow;
+      $CategoryID = GetValue('CategoryID', $Category);
+      
+      // Write out the FAQs in this category
+      $QList = '';
+      foreach ($DiscussionData as $Discussion) {
+         if ($Discussion->CategoryID == $Category->CategoryID) {
+            $QList .= '<div class="FAQAnswer" id="Q'.$Discussion->DiscussionID.'">';
+            $QList .= Wrap(Gdn_Format::PlainText($Discussion->Name), 'strong');
+            $QList .= Wrap(Gdn_Format::To($Discussion->Body, $Discussion->Format), 'div class="Answer"');
+            $QList .= '</div>';
+            $QList .= Anchor('Back to Top', '#top', 'ToTop');
+         }
+      }
+      if ($QList != '') {
+         if ($Category->Depth > 1)
+            $List .= Wrap($Category->Name, 'strong');
+
+         $List .= $QList;
+      }
+      
+   }
+   return $List;
    
 }
 
 echo "\r\n";
-echo FAQList($CategoryData, $DiscussionData, 'TOC');
-echo '<hr />';
-echo FAQList($CategoryData, $DiscussionData, 'FAQAnswers');
+echo '<div class="Section">';
+   echo FAQList($CategoryData, $DiscussionData);
+   echo '<div class="Answers">';
+      echo AnswerList($CategoryData, $DiscussionData);
+   echo '</div>';
+echo '</div>';
