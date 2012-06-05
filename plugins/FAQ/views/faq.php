@@ -113,7 +113,7 @@ function AnswerList($CategoryData, $DiscussionData) {
          if ($Discussion->CategoryID == $Category->CategoryID) {
             $QList .= '<div class="FAQAnswer" id="Q'.$Discussion->DiscussionID.'">';
             $QList .= Wrap(Gdn_Format::PlainText($Discussion->Name), 'strong');
-            $QList .= Wrap(Gdn_Format::To($Discussion->Body, $Discussion->Format), 'div class="Answer"');
+            $QList .= Wrap(Gdn_Format::To($Discussion->Body, $Discussion->Format), 'div class="Answer Legal"');
             $QList .= '</div>';
             $QList .= Anchor('Back to Top', '#top', 'ToTop');
          }
