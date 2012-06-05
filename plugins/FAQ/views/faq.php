@@ -16,6 +16,9 @@ $DiscussionData = $this->Data('DiscussionData');
    ul.TOC ul li strong {
       font-size: 20px;
    }
+   ul.TOC li:first-child ul {
+      margin-top: 5px;
+   }
    /* TOC Questions */
    ol.QList {
       margin: 15px 30px;
@@ -33,9 +36,10 @@ $DiscussionData = $this->Data('DiscussionData');
       border-top: 4px solid #f5f5f5;
       padding: 20px 0 0;
    }
-   .FAQAnswer > strong:first-child {
+   .FAQAnswer > strong {
       font-size: 16px;
-      margin-bottom: 10px;
+      display: block;
+      margin: 0 0 10px 0;
    }
    .Answers > strong {
       font-size: 24px;
@@ -43,6 +47,12 @@ $DiscussionData = $this->Data('DiscussionData');
       margin: 40px 0 0;
       padding: 20px 0 0;
       border-top: 4px solid #f5f5f5;
+   }
+   .ToTop {
+      font-size: 11px;
+      position: absolute;
+      right: 10px;
+      margin-top: -25px;
    }
 </style>
 <h1><?php echo $this->Data('Title'); ?></h1>
