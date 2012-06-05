@@ -36,11 +36,13 @@ class FAQPlugin extends Gdn_Plugin {
          $CategoryIDs[] = GetValue('CategoryID', $Category);
       }
       // Get all of the discussions in these categories
+      $Limit = C('Plugins.FAQ.Limit', 200);
+      if (!is_numeric($Limit)) $Limit = 200;
       $Sender->SetData('DiscussionData', Gdn::SQL()
          ->Select()
          ->From('Discussion')
          ->WhereIn('CategoryID', $CategoryIDs)
-         ->Limit(200, 0) // Don't load too many discussions (this could be a helluva lot of data)
+         ->Limit($Limit, 0) // Don't load too many discussions (this could be a helluva lot of data)
          ->Get());
       
       // Render
