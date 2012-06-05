@@ -230,7 +230,7 @@ class OnlinePlugin extends Gdn_Plugin {
     * @return array Pair of expiry times, and the index of the currently active cookie
     */
    public static function Expiries($Time) {
-      $Timespan = 600; // 10 mins.
+      $Timespan = (C('Plugins.Online.PruneDelay', 10) * 60) * 2; // Double the real amount
       
       $Expiry0 = $Time - $Time % $Timespan + $Timespan;
 

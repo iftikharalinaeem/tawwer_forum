@@ -40,6 +40,9 @@ class OnlineModule extends Gdn_Module {
    public $SelectorID = NULL;
    public $SelectorField = NULL;
    
+   public $ContextID = FALSE;
+   public $ContextField = FALSE;
+   
    public $ShowGuests = TRUE;
 
 	public function __construct(&$Sender = '') {
@@ -47,7 +50,6 @@ class OnlineModule extends Gdn_Module {
       $this->OnlineUsers = NULL;
       $this->ShowInvisible = Gdn::Session()->CheckPermission('Plugins.Online.ViewHidden');
       $this->Style = C('Plugins.Online.Style', 'pictures');
-      
       $this->Selector = 'auto';
 	}
    
@@ -84,10 +86,15 @@ class OnlineModule extends Gdn_Module {
                   $this->Selector = 'category';
                   $this->SelectorField = 'CategoryID';
                   
-                  if ($Location == 'category')
+                  if ($Location == 'category') {
                      $this->SelectorID = Gdn::Controller()->Data('Category.CategoryID');
-                  else
+                     $this->ContextField = FALSE;
+                     $this->ContextID = FALSE;
+                  } else {
                      $this->SelectorID = Gdn::Controller()->Data('Discussion.CategoryID');
+                     $this->ContextField = 'DiscussionID';
+                     $this->ContextID = Gdn::Controller()->Data('Discussion.DiscussionID');
+                  }
                   
                   break;
                
@@ -168,12 +175,17 @@ class OnlineModule extends Gdn_Module {
 
                echo '<div class="'.$ListClass.'">'."\n";
                foreach ($this->OnlineUsers as $User) {
-                  if (!$User['Photo'] && !function_exists('UserPhotoDefaultUrl')) {
+                  $LinkClass = ((!$User['Visible']) ? 'Invisible' : '');
+                  
+                  if (!$User['Photo'] && !function_exists('UserPhotoDefaultUrl'))
                      $User['Photo'] = Asset('/applications/dashboard/design/images/usericon.gif', TRUE);
-                  }
+                  
+                  if ($this->Selector == 'category' && $this->ContextField)
+                     if (GetValue($this->ContextField, $User, NULL) == $this->ContextID)
+                        $LinkClass .= ' InContext';
                   
                   echo UserPhoto($User, array(
-                     'LinkClass' => ((!$User['Visible']) ? 'Invisible' : '')
+                     'LinkClass' => $LinkClass
                   ))."\n";
                }
                
@@ -182,7 +194,7 @@ class OnlineModule extends Gdn_Module {
                   $GuestsText = Plural($this->GuestCount, 'Guest', 'Guests');
                   $Plus = $this->Count == $this->GuestCount ? '' : '+';
                   echo <<<EOT
- <span class="GuestCountBox"><span class="GuestCount">{$Plus}$GuestCount</span> <span class="GuestLabel">$GuestsText</span></span>
+<span class="GuestCountBox"><span class="GuestCount">{$Plus}$GuestCount</span> <span class="GuestLabel">$GuestsText</span></span>
 EOT;
                }
                echo '</div>'."\n";
@@ -191,7 +203,12 @@ EOT;
                
                echo '<ul class="PanelInfo">'."\n";
                foreach ($this->OnlineUsers as $User) {
-                  echo '<li>'.UserAnchor($User, (!$User['Visible']) ? 'Invisible' : '')."</li>\n";
+                  $LinkClass = ((!$User['Visible']) ? 'Invisible' : '');
+                  if ($this->Selector == 'category' && $this->ContextField)
+                     if (GetValue($this->ContextField, $User, NULL) == $this->ContextID)
+                        $LinkClass .= ' InContext';
+                     
+                  echo '<li>'.UserAnchor($User, $LinkClass)."</li>\n";
                }
                
                if ($this->GuestCount && $this->ShowGuests) {
