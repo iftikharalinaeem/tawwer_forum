@@ -8,7 +8,7 @@
 $PluginInfo['VanillaPop'] = array(
    'Name' => 'Vanilla Pop',
    'Description' => "Users may start discussions, make comments, and even automatically register for your site via email.",
-   'Version' => '1.0.2',
+   'Version' => '1.0.3',
    'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -71,7 +71,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       
       if ($Quote) {
          if (is_array($Quote))
-            $Quote = self::PlainText($Quote['Body'], GetValue('Format', $Quote, 'Text'));
+            $Quote = Gdn_Format::PlainText($Quote['Body'], GetValue('Format', $Quote, 'Text'));
          
          $Quote = "\n\n".T('You wrote:')."\n\n".self::FormatQuoteText($Quote);
       }
