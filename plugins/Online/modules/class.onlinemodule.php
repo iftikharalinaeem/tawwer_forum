@@ -171,7 +171,7 @@ class OnlineModule extends Gdn_Module {
             if ($this->Style == 'pictures') {
                $ListClass = 'PhotoGrid';
                if (count($this->OnlineUsers) > 10)
-                  $ListClass .= 'PhotoGridSmall';
+                  $ListClass .= ' PhotoGridSmall';
 
                echo '<div class="'.$ListClass.'">'."\n";
                foreach ($this->OnlineUsers as $User) {
