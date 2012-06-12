@@ -340,8 +340,6 @@ class OnlinePlugin extends Gdn_Plugin {
 
                break;
          }
-         
-         Gdn::Controller()->SetData('OnlineSupplement', $OnlineSupplement);
 
          // Check if there are differences between this supplement and the user's existing one
          // If there are, write the new one to the cache
