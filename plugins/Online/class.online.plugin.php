@@ -767,6 +767,10 @@ class OnlinePlugin extends Gdn_Plugin {
       $Sender->Render('settings','','plugins/Online');
    }
    
+   public function Setup() {
+      $this->Structure();
+   }
+   
    public function Structure() {
       Gdn::Structure()->Table('Online')
 			->Column('UserID', 'int(11)', FALSE, 'primary')
