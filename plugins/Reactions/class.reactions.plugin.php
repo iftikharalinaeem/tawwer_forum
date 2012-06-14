@@ -247,7 +247,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
       
-      if (count($Sender->Request->Post()) == 0)
+      if (!$Sender->Request->IsPostBack())
          throw PermissionException('Javascript');
       
       $ReactionType = ReactionModel::ReactionTypes($Reaction);

@@ -273,6 +273,9 @@ function WriteRecordReactions($Row) {
    
    foreach ($UserTags as $Tag) {
       $User = Gdn::UserModel()->GetID($Tag['UserID'], DATASET_TYPE_ARRAY);
+      if (!$User)
+         continue;
+      
       $ReactionType = ReactionModel::FromTagID($Tag['TagID']);
       if (!$ReactionType)
          continue;
