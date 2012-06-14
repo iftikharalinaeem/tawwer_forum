@@ -84,7 +84,7 @@
 }
 
 .PhotoWrapLarge.Jailed:before {
-   background: url(jailed-180.png) no-repeat transparent;
+   background-image: url(jailed-180.png);
 }
 
 .PhotoWrap * {
