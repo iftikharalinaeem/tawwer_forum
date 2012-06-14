@@ -99,7 +99,7 @@ ul.PanelInfo li.Heading {
 }
 
 .Item.Read {
-   background: inherit;
+   background: #353535;
    opacity: .6;
 }
 

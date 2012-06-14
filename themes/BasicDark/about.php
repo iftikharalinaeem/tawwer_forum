@@ -14,7 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $ThemeInfo['BasicDark'] = array(
    'Name' => 'Basic Dark',
    'Description' => "A dark version of Vanilla's basic theme.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://timgunter.ca'
