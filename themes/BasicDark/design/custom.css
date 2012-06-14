@@ -1,0 +1,569 @@
+/* Body & Header */
+body {
+   background: #252525;
+   color: #CCCCCC;
+}
+
+/* Head area */
+
+body > #Frame > .Head {
+   background: #000;
+   padding: 30px 0 0;
+}
+
+.Row {
+   width: auto;
+   margin: 0 30px;
+}
+
+@media (min-width: 1500px) {
+   .Row {
+      width: 1300px;
+      margin: auto;
+   }
+}
+
+/* Menu */
+
+.SiteMenuWrap {
+   padding: 8px 0;
+   background: rgb(0, 0, 0) !important;
+   background: rgba(0, 0, 0, 0.7) !important;
+}
+
+.SiteMenuWrap .SiteMenu {
+   width: 1000px;
+   text-align: left;
+   display: block;
+}
+
+.SiteMenuWrap .SiteMenu a {
+   padding: 6px 12px 6px 0px
+}
+
+.BreadcrumbsWrapper {
+   margin-bottom: 10px;
+}
+
+.BreadcrumbsWrapper .CrumbLabel span {
+   font-size: 11px;
+}
+
+/* Basic colors */
+
+a {
+   color: #CCCCCC;
+}
+
+/* Activities */
+
+.Activities a.CommentLink, 
+.Activities a.CommentLink:hover {
+   background: black;
+   border-color: #444;
+   color: white;
+}
+   
+li.Activity div.Title {
+   color: #bbb;
+}
+li.Activity ul.DataList div.Meta {
+   color: #767676;
+}
+ul.Activities li.Condensed div.Excerpt {
+   color:#999;
+}
+
+/* Filter Menus & Data List */
+
+.Item {
+   background-color: #353535;
+   border: 0;
+   margin: 1px 0px;
+}
+.Item div.Meta a {
+    color:#ddd;
+}
+.Item a.Title {
+   color: #909090;
+}
+ul.CategoryList .ItemContent {
+	border: none;
+}
+ul.PanelInfo div.Meta,
+ul.DataList div.Meta {
+   font-size: 10px;
+}
+ul.PanelInfo li.Heading {
+    color: inherit;
+}
+
+.Item.Read {
+   background: #353535;
+   opacity: .6;
+}
+
+ul.DataList li.Mine div.Meta a.Category,
+ul.DataList div.Meta a.Category {
+   background: #666;
+}
+ul.PanelInfo div.Meta strong,
+ul.DataList div.Meta strong {
+   background: #aaa;
+   color: #222;
+   padding:1px 4px;
+}
+div.HeadingTabs div.SubTab {
+   color: #252525;
+}
+
+ul.Activities ul.DataList li {
+   background: #353535;
+   background: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Panel */
+div.Box {
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   background: none;
+	box-shadow: 0 0 0;
+	-moz-box-shadow: 0 0 0;
+	-webkit-box-shadow: 0 0 0;
+   padding: 0;
+   margin: 0 0 10px;
+}
+div.Box dl dt {
+   background-color: #505050;
+   padding-left: 2px;
+   color: #D1D1D1;
+}
+div.Box dl dd {
+   padding-left: 4px;
+}
+div.Box h4 {
+   color: #bbb;
+}
+ul.PanelInfo {
+   border-top: 1px solid #777;
+}
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+   background: #444;
+   border-bottom: 1px solid #777;
+   font-size: 11px;
+}
+div.GuestBox,
+ul.PanelInfo li.Active {
+   background: #333;
+}
+div.GuestBox {
+   padding: 6px;
+}
+ul.PanelInfo li.Active a {
+   color: #fff;
+}
+
+a.PoweredByVanilla {
+   background: url('logo_footer.png') no-repeat center center;
+   clear: both;
+}
+a.VanillaLink span {
+   display: none;
+}
+
+/* Search Page */
+#dashboard_entry_signin #Panel,
+#vanilla_post_editdiscussion #Panel,
+#vanilla_post_discussion #Panel,
+#dashboard_search_index #Panel {
+   display: none;
+}
+#vanilla_post_editdiscussion #Content,
+#vanilla_post_discussion #Content,
+#dashboard_search_index #Content,
+#conversations_messages_add #Content {
+   margin: 0;
+}
+/*div.Tabs div.SubTab  {
+   background: #333;
+   color: #888;
+   margin-bottom: 2px;
+}*/
+ul.DataList div.Excerpt a {
+   color:#888;
+}
+.Foot {
+   background: none;
+   border: 0;
+}
+.OptionsMenu .MenuItems {
+   right: 0;
+   left: inherit;
+}
+
+/* Comments */
+div.Preview,
+ul.MessageList div.Message {
+   clear: none;
+   color: #ccc;
+}
+div.Preview,
+ul.MessageList li.Item {
+   border-bottom: none;
+   margin: 20px 0px;
+   background-color: #353535;
+   padding: 0px;
+}
+ul.MessageList li.Item div.Meta {
+   padding: 5px 5px 5px 10px;
+   background-color: #404040;
+   margin-right: -10px;
+   line-height: 22px;
+}
+ul.MessageList div.Meta span {
+   line-height: inherit;
+}
+ul.MessageList div.Meta div.CommentInfo {
+   line-height: normal;
+}
+ul.MessageList div.Meta div.CommentInfo span {
+   padding-left: 0px;
+   padding-right: 10px;
+}
+ul.MessageList li.Item div.Comment {
+   padding: 10px;
+}
+ul.MessageList li.Item div.Message a {
+   color: #fff;
+   text-decoration: underline;
+}
+ul.MessageList li.Item div.Message a:hover {
+   text-decoration: none;
+}
+div.FileAttachment {
+   color: #999;
+}
+div.Preview div.Message code,
+div.Preview div.Message pre,
+ul.MessageList div.Message code,
+ul.MessageList div.Message pre {
+   background: #444;
+}
+
+div.Attachment div.FileHover {
+   background: #c1c1c1;
+}
+
+.Pager .Highlight {
+   color: #D62C2C;
+}
+
+/* Panel */
+.PanelColumn .Box {
+   margin: 20px 0px;
+}
+
+/* Profile Page */
+form.Activity {
+   text-align: left;
+   padding: 10px 0 0 6px;
+}
+form.Activity textarea {
+   width: 98%;
+}
+body.Profile ul.Activities {
+   border: 0;
+}
+ul.DataList a.Delete {
+   color: #fff;
+   margin-right: 6px;
+}
+body.Profile ul.PanelInfo {
+   border-bottom:1px solid #777;
+}
+div.Box dl {
+   font-size: 11px;
+   background: #444;
+   border-bottom: 1px solid #777;
+   border-top: 1px solid #777;
+}
+
+/* Forms */
+
+#DiscussionForm {
+   margin: 0px auto;
+   width: 750px;
+}
+
+#DiscussionForm .FormWrapper {
+   background: #444;
+   border-radius: 0 0 3px 3px;
+   -moz-border-radius: 0 0 3px 3px;
+   -webkit-border-radius: 0 0 3px 3px;
+   padding: 10px 20px 20px 20px;
+}
+
+/*#DiscussionForm h1 {
+    background-color: #780000;
+    border-radius: 3px 3px 0 0;
+    -moz-border-radius: 3px 3px 0 0;
+    -webkit-border-radius: 3px 3px 0 0;
+    color: #FF3636;
+    margin: 0;
+    padding: 10px;
+}*/
+
+body.Entry #Content h1,
+#MessageForm h2,
+#DiscussionForm h2,
+#ConversationForm h2 {
+   color: #bbb;   
+}
+#MessageForm {
+   margin-top: 1px;
+}
+#MessageForm textarea {
+   width: 99%;
+}
+body.Entry #Content div.Box,
+#MessageForm,
+#DiscussionForm form,
+#ConversationForm form {
+   border: 0;
+   background: transparent;
+}
+
+body.Entry #Content div.Box {
+	padding: 6px;
+}
+body.Entry form ul li label,
+#DiscussionForm form label,
+#ConversationForm form label {
+   color: #fff;
+}
+
+/* Conversations */
+ul.Condensed li, li.Condensed {
+   clear: none;
+}
+#ConversationForm .TextBox,
+#ConversationForm textarea.MultiComplete {
+	width: 100%;
+}
+
+div.AddPeople .Buttons {
+   margin-top: 0px;
+}
+div.AddPeople form div {
+   text-align: left;
+}
+div.ConversationMessage div.Message {
+   padding: 10px;
+}
+
+/* Autocomplete */
+.ac_results {
+   border: 1px solid #000;
+	color: #000;
+   border-top: 0;
+   background-color: white;
+}
+.ac_results li {
+   border-bottom: 1px solid #000;
+}
+.ac_lastitem {
+   border-bottom: 0 !important;
+}
+.ac_results strong {
+   background: #dadada;
+}
+.ac_over strong {
+   background: #555;
+}
+.ac_over {
+   background: #333;
+   color: #fff;
+}
+
+/* Popups */
+div.Border {
+	background: none repeat scroll 0 0 rgba(200, 200, 200, 0.7);
+}
+div.Connect h1, div.Connect h2,
+div.Popup h1, div.Popup h2 {
+   background: #333;
+   border-bottom: 1px solid #222;
+   color:#ccc;
+}
+div.Popup div.Footer,
+div.Popup div.Body,
+div.Popup div.Body form ul li label {
+   background: #595959;
+   color: #ccc;
+}
+div.Popup div.Footer {
+   border: 0;
+   padding-bottom: 3px;
+}
+a.Close:hover {
+	color:#fff;
+}
+#Status {
+	background: #D62C2C;
+   color: black;
+   border-bottom-right-radius: 2px;
+   border-bottom-left-radius: 2px;
+   padding: 8px;
+}
+#Status .Change {
+   color: white;
+}
+
+dl.About dt {
+   color: #D62C2C;
+   font-weight: bold;
+}
+dl.About dd {
+   color: white;
+}
+
+div.UserSpoiler {
+   background-color: #595959;
+   color: #CCCCCC;
+}
+
+div.UserSpoiler div.SpoilerTitle span {
+   color: white;
+}
+
+div.UserSpoiler div.SpoilerTitle input {
+   border: 1px solid grey;
+   color: #232323;
+}
+
+div.UserSpoiler div.SpoilerText {
+   border-left: 1px solid grey;
+}
+div.User h1 {
+	color: #fff;
+}
+
+body ul div.Comment blockquote.UserQuote {
+   background-color: #555555;
+}
+ul.MessageList div.Message blockquote {
+	background: none;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+}
+#ConversationForm form {
+	border: none;
+}
+#ConversationForm label {
+	color: #fff;
+}
+
+div.Attachments {
+	background: #2a2a2a;
+}
+
+/* A few fixes for the voting plugin. */
+ul.MessageList div.Meta span.Votes {
+    right: 10px;
+}
+
+span.Votes a {
+    background-color: #494949;
+    color: #CCC !important;
+}
+
+span.Votes a:hover {
+    background-color: #595959;
+    color: #CCC !important;
+}
+
+span.Votes span {
+    background-color: #595959;
+    color: #CCC !important;
+}
+
+.StatBox {
+    background-color: #333333;
+}
+
+.FollowsBox, .AnswersBox {
+    background-color: #444444;
+}
+
+table.PreferenceGroup thead td {
+   background: #333;
+   border-bottom: 1px solid #222;
+   border-top: 1px solid #222;
+}
+table.PreferenceGroup tbody td {
+	border-bottom: 1px solid #777;
+}
+
+.Tag.Category {
+   background-color: #777777;
+}
+
+.MessageList .Promoted {
+   box-shadow: none;
+   background: #e1e1e1 !important;
+   color: #232323 !important;
+}
+
+.MessageList .Promoted a {
+   color: #232323 !important;
+}
+
+.MessageList .Promoted .Message {
+   color: #232323 !important;
+}
+
+.MessageList .Promoted .Meta {
+   background: #c1c1c1;
+}
+
+.MessageList .Promoted .Author .ProfilePhotoMedium {
+   box-shadow: 0px 0px 8px #232323 !important;
+}
+
+.QuoteFolding {
+   font-size: 11px;
+   text-decoration: none;
+   color: #FF3636;
+}
+
+.SpDashboard,
+.SpCog { background-position: 0 -276px; }
+.SpSettings { background-position: -16px -276px; }
+.SpNotifications,
+.SpGlobe { background-position: -32px -276px; }
+.SpSignOut,
+.SpExit { background-position: -48px -276px; }
+.SpMarker { background-position: -64px -276px; }
+.SpDocuments { background-position: -80px -276px; }
+.SpInbox,
+.SpEnvelope { background-position: 0 -292px; }
+.SpInmail { background-position: -16px -292px; }
+.SpRoundBubble { background-position: -32px -292px; }
+.SpSquareBubble { background-position: -48px -292px; }
+.SpRoundBubbles { background-position: -64px -292px; }
+.SpSquareBubbles { background-position: -80px -292px; }
+.SpTag { background-position: 0 -308px; }
+.SpWrite { background-position: -16px -308px; }
+.SpLock { background-position: -32px -308px; }
+.SpRoundAlert { background-position: -48px -308px; }
+.SpTriangleAlert { background-position: -64px -308px; }
+.SpBookmarks,
+.SpStar { background-position: -80px -308px; }
+.SpSearch { background-position: 0 -324px; }
+.SpTrash { background-position: -16px -324px; }
+.SpUser { background-position: -32px -324px; }
+.SpRefresh { background-position: -48px -324px; }
+.SpPencil { background-position: -64px -324px; }
+.SpPlus { background-position: -80px -324px; }
