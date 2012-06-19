@@ -9,7 +9,7 @@
    color: #999;
 }
 .PollOption {
-   margin: 10px 0;
+   margin: 15px 0;
 }
 .PollOption:last-child {
    margin-bottom: 0;
@@ -25,10 +25,11 @@
     max-width: 80%;
     white-space: nowrap;
     overflow: visible;
+    margin: 10px 0 5px;
 }
 .VoteBarBG, 
 .VoteBarWidth {
-    height: 10px;
+    height: 20px;
     min-width: 3px;
     line-height: 1;
     overflow: visible;
