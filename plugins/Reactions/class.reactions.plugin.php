@@ -79,9 +79,12 @@ class ReactionsPlugin extends Gdn_Plugin {
       include dirname(__FILE__).'/structure.php';
    }
    
+   public function AssetModel_StyleCss_Handler($Sender, $Args) {
+      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
+   }
+   
    public function ActivityController_Render_Before($Sender) {
       $this->AddJs($Sender);
-      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }
    
@@ -122,9 +125,9 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->SetData('CommentOrder', array('Column' => $OrderColumn, 'Direction' => $OrderDirection));
       
       if ($Sender->ReactionsVersion == 1) {
-         $Sender->AddCssFile('reactions-1.css', 'plugins/Reactions');
+//         $Sender->AddCssFile('reactions-1.css', 'plugins/Reactions');
       } else {
-         $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
+//         $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
          $this->AddJs($Sender);
       }
       
@@ -228,7 +231,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       }
       $Sender->SetData('Counts', $Counts);
       
-      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
+//      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
       $this->AddJs($Sender);
    }
    
@@ -377,7 +380,6 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('jquery.livequery.js');
       $Sender->AddJsFile('global.js');
       $Sender->AddCssFile('style.css');
-      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
       
       // Set the title, breadcrumbs, canonical
       $Sender->Title(T('Best Of'));

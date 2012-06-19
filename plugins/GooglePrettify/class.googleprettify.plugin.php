@@ -37,6 +37,16 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
    
    /// EVENT HANDLERS ///
    
+   public function AssetModel_StyleCss_Handler($Sender) {
+      if (!C('Plugins.GooglePrettify.NoCssFile'))
+         $Sender->AddCssFile('prettify.css', 'plugins/GooglePrettify');
+   }
+   
+   public function AssetModel_GenerateETag_Handler($Sender, $Args) {
+      if (!C('Plugins.GooglePrettify.NoCssFile'))
+         $Args['ETagData']['Plugins.GooglePrettify.NoCssFile'] = TRUE;
+   }
+   
    /**
     *
     * @param DiscussionController $Sender 
@@ -45,23 +55,19 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
 //      $Sender->AddJsFile('prettify.plugin.js', 'plugins/GooglePrettify');
       $Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), $this->GetJs());
       $Sender->AddJsFile('prettify.js', 'plugins/GooglePrettify', array('_sort' => 101));
-      if (!C('Plugins.GooglePrettify.NoCssFile'))
-         $Sender->AddCssFile('prettify.css', 'plugins/GooglePrettify');
    }
    
    public function SettingsController_GooglePrettify_Create($Sender, $Args) {
       $Cf = new ConfigurationModule($Sender);
-      
       $CssUrl = Asset('/plugins/GooglePrettify/design/prettify.css', TRUE);
       
       $Cf->Initialize(array(
           'Plugins.GooglePrettify.LineNumbers' => array('Control' => 'CheckBox', 'Description' => 'Add line numbers to source code.', 'Default' => FALSE),
           'Plugins.GooglePrettify.NoCssFile' => array('Control' => 'CheckBox', 'LabelCode' => 'Exclude Default CSS File', 'Description' => "If you want to define syntax highlighting in your custom theme you can disable the <a href='$CssUrl'>default css</a> with this setting.", 'Default' => FALSE)
       ));
-      
+
       $Sender->AddSideMenu();
       $Sender->SetData('Title', T('Syntax Prettifier Settings'));
       $Cf->RenderAll();
-      
    }
 }

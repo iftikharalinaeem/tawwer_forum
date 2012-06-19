@@ -99,15 +99,8 @@ class WarningsPlugin extends Gdn_Plugin {
       echo '</div>';
    }
    
-   /**
-    * @param Gdn_Controller $Sender 
-    */
-   public function Base_Render_Before($Sender) {
-      if (!InSection('Dashboard')) {
-         $Sender->AddCssFile('warnings.css', 'plugins/Warnings');
-         
-//         $Sender->AddJsFile('warnings.js', 'plugins/Warnings');
-      }
+   public function AssetModel_StyleCss_Handler($Sender, $Args) {
+      $Sender->AddCssFile('warnings.css', 'plugins/Warnings');
    }
    
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
