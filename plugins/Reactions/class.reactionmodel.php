@@ -589,9 +589,14 @@ class ReactionModel {
       $LogThreshold = GetValue('LogThreshold', $ReactionType, 10000000);
       $RemoveThreshold = GetValue('RemoveThreshold', $ReactionType, 10000000);
       
-      if (!GetValueR($AttrColumn.'.RestoreUserID', $Row)) {
+      if (!GetValueR($AttrColumn.'.RestoreUserID', $Row) || Debug()) {
          // We are only going to remove stuff if the record has not been verified.
          $Log = GetValue('Log', $ReactionType, 'Moderation');
+         
+         // Do a sanity check to not delete too many comments.
+         $NoDelete = FALSE;
+         if ($RecordType == 'Discussion' && $Row['CountComments'] > 3)
+            $NoDelete = TRUE;
          
          $LogOptions = array('GroupBy' => array('RecordID'));
          $UndoButton = '';
@@ -601,14 +606,14 @@ class ReactionModel {
             $OtherUserData = $this->SQL->GetWhere('UserTag', array('RecordType' => $RecordType, 'RecordID' => $ID, 'TagID' => $ReactionType['TagID']))->ResultArray();
             $OtherUserIDs = array();
             foreach ($OtherUserData as $UserRow) {
-               if ($UserRow['UserID'] == $UserID || !$Row['UserID'])
+               if ($UserRow['UserID'] == $UserID || !$UserRow['UserID'])
                   continue;
                $OtherUserIDs[] = $UserRow['UserID'];
             }
             $LogOptions['OtherUserIDs'] = $OtherUserIDs;
          }
          
-         if ($Score >= $RemoveThreshold) {
+         if (!$NoDelete && $Score >= $RemoveThreshold) {
             // Remove the record to the log.
             $Model->Delete($ID, array('Log' => $Log, 'LogOptions' => $LogOptions));
             $Message = array(
