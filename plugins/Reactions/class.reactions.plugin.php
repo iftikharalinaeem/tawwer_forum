@@ -8,7 +8,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.1.1',
+   'Version' => '1.1.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -131,6 +131,8 @@ class ReactionsPlugin extends Gdn_Plugin {
       $ReactionModel = new ReactionModel();
       $ReactionModel->JoinUserTags($Sender->Data['Discussion'], 'Discussion');
       $ReactionModel->JoinUserTags($Sender->Data['Comments'], 'Comment');
+      if (isset($Sender->Data['Answers']))
+         $ReactionModel->JoinUserTags($Sender->Data['Answers'], 'Comment');
       
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }
@@ -315,7 +317,6 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (is_object($Menu = GetValue('Menu', $Sender))) {
          $Menu->AddLink('BestOf', T('Best Of...'), '/bestof/everything');
       }
-      
    }
       
    

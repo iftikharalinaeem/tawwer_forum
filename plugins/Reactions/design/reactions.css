@@ -254,10 +254,6 @@ TOO DESTRUCTIVE FOR A PLUGIN!
     font-size: 12px;
 }
 
-.Buried .MItem {
-    display: none;
-}
-
 .Buried .Author .ProfilePhoto {
     height: 21px;
     width: 21px;
@@ -281,8 +277,8 @@ TOO DESTRUCTIVE FOR A PLUGIN!
    display: none;
 }
 
+.Buried .Item-BodyWrap,
 .Buried .Options,
-.Buried .CommentInfo,
 .Buried .Signature,
 .Buried .RecordReactions {
     display: none;
