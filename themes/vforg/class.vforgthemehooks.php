@@ -16,13 +16,13 @@ class VFOrgThemeHooks implements Gdn_IPlugin {
       return TRUE;
    }
    
-   public function Base_Render_Before($Sender) {
-      if (in_array(strtolower($Sender->ControllerName), array('discussionscontroller', 'categoriescontroller')))
-         $Sender->AddModule('DiscussionSearchModule');
-
-      if ($Sender->Head->Title() == C('Garden.Title'))
-         $Sender->Head->Title('Vanilla - Free, Open-Source Forum Software');
-   }
+//   public function Base_Render_Before($Sender) {
+//      if (in_array(strtolower($Sender->ControllerName), array('discussionscontroller', 'categoriescontroller')))
+//         $Sender->AddModule('DiscussionSearchModule');
+//
+//      if ($Sender->Head->Title() == C('Garden.Title'))
+//         $Sender->Head->Title('Vanilla - Free, Open-Source Forum Software');
+//   }
    
 //   public function DiscussionsController_Render_Before($Sender) {
 //      $DevActivityModule = new RecentActivityModule($Sender);
@@ -36,12 +36,12 @@ class VFOrgThemeHooks implements Gdn_IPlugin {
 //      $Sender->AddModule($RecentActivityModule);
 //   }
 
-   public function CategoriesController_AfterBreadcrumbs_Handler($Sender, $Args) {
-      $Description = $Sender->Data('Category.Description');
-      if ($Description) {
-         echo '<div class="P">'.$Description.'</div>';
-      }
-   }
+//   public function CategoriesController_AfterBreadcrumbs_Handler($Sender, $Args) {
+//      $Description = $Sender->Data('Category.Description');
+//      if ($Description) {
+//         echo '<div class="P">'.$Description.'</div>';
+//      }
+//   }
    
    public function PostController_Render_Before($Sender) {
       $Sender->Head->AddString("<script type=\"text/javascript\">
@@ -58,47 +58,47 @@ jQuery(document).ready(function($) {
    /**
 	 * Add the "Stats" buttons to the discussion list.
 	 */
-	public function Base_BeforeDiscussionContent_Handler($Sender) {
-		$Session = Gdn::Session();
-		$Discussion = GetValue('Discussion', $Sender->EventArguments);
-
-		$CountVotes = 0;
-		if (is_numeric($Discussion->Score)) // && $Discussion->Score > 0)
-			$CountVotes = $Discussion->Score;
-
-		if (!is_numeric($Discussion->CountBookmarks))
-			$Discussion->CountBookmarks = 0;
-      
-      echo '<div class="StatBoxes">';
-      
-      // Follows
-//		$Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
-//      $CssClass2 = $Discussion->Bookmarked ? ' Bookmarked' : '';
-//		if ($Session->IsValid()) {
-//			echo Anchor(
-//				Wrap(T('Follows'), 'div', array('class' => 'Stats-Label')) . Wrap(Gdn_Format::BigNumber($Discussion->CountBookmarks, 'html'), 'div', array('class' => 'Stats-Number CountBookmarks')),
-//				'/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
-//				'StatBox Bookmark'.$CssClass2,
-//				array('title' => $Title));
-//		} else {
-//			echo ''; //Wrap(Wrap(T('Follows')) . Wrap($Discussion->CountBookmarks, 'div', array('class' => 'CountBookmarks')), 'div', array('class' => 'StatBox FollowsBox'));
-//		}
-      
-		// Views
-		echo Wrap(
-			// Anchor(
-			Wrap(T('Views'), 'div', array('class' => 'Stats-Label')) . Wrap(Gdn_Format::BigNumber($Discussion->CountViews, 'html'), 'div', array('class' => 'Stats-Number'))
-			// , '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
-			// )
-			, 'span', array('class' => 'StatBox ViewsBox'));
-
-		echo Wrap(
-			// Anchor(
-			Wrap(T('Comments'), 'div', array('class' => 'Stats-Label')) . Wrap(Gdn_Format::BigNumber($Discussion->CountComments, 'html'), 'div', array('class' => 'Stats-Number'))
-			// ,'/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
-			// )
-			, 'span', array('class' => 'StatBox CommentsBox'));
-      
-      echo '</div>';
-	}
+//	public function Base_BeforeDiscussionContent_Handler($Sender) {
+//		$Session = Gdn::Session();
+//		$Discussion = GetValue('Discussion', $Sender->EventArguments);
+//
+//		$CountVotes = 0;
+//		if (is_numeric($Discussion->Score)) // && $Discussion->Score > 0)
+//			$CountVotes = $Discussion->Score;
+//
+//		if (!is_numeric($Discussion->CountBookmarks))
+//			$Discussion->CountBookmarks = 0;
+//      
+//      echo '<div class="StatBoxes">';
+//      
+//      // Follows
+////		$Title = T($Discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
+////      $CssClass2 = $Discussion->Bookmarked ? ' Bookmarked' : '';
+////		if ($Session->IsValid()) {
+////			echo Anchor(
+////				Wrap(T('Follows'), 'div', array('class' => 'Stats-Label')) . Wrap(Gdn_Format::BigNumber($Discussion->CountBookmarks, 'html'), 'div', array('class' => 'Stats-Number CountBookmarks')),
+////				'/vanilla/discussion/bookmark/'.$Discussion->DiscussionID.'/'.$Session->TransientKey().'?Target='.urlencode($Sender->SelfUrl),
+////				'StatBox Bookmark'.$CssClass2,
+////				array('title' => $Title));
+////		} else {
+////			echo ''; //Wrap(Wrap(T('Follows')) . Wrap($Discussion->CountBookmarks, 'div', array('class' => 'CountBookmarks')), 'div', array('class' => 'StatBox FollowsBox'));
+////		}
+//      
+//		// Views
+//		echo Wrap(
+//			// Anchor(
+//			Wrap(T('Views'), 'div', array('class' => 'Stats-Label')) . Wrap(Gdn_Format::BigNumber($Discussion->CountViews, 'html'), 'div', array('class' => 'Stats-Number'))
+//			// , '/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
+//			// )
+//			, 'span', array('class' => 'StatBox ViewsBox'));
+//
+//		echo Wrap(
+//			// Anchor(
+//			Wrap(T('Comments'), 'div', array('class' => 'Stats-Label')) . Wrap(Gdn_Format::BigNumber($Discussion->CountComments, 'html'), 'div', array('class' => 'Stats-Number'))
+//			// ,'/discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::Url($Discussion->Name).($Discussion->CountCommentWatch > 0 ? '/#Item_'.$Discussion->CountCommentWatch : '')
+//			// )
+//			, 'span', array('class' => 'StatBox CommentsBox'));
+//      
+//      echo '</div>';
+//	}
 }
