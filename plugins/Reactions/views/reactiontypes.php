@@ -92,7 +92,7 @@
          <td class="NameColumn"><div class="CellWrap">
             <?php
             echo Img('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png', array('ReactionImage')), ' ';
-            echo $ReactionType['Name'];
+            echo T($ReactionType['Name']);
             ?></div>
          </td>
          <td><?php echo $ReactionType['Description']; ?></td>

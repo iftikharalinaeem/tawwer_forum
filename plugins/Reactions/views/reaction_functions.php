@@ -72,7 +72,7 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
    }
    
    $Name = $ReactionType['Name'];
-   $Label = $Name;
+   $Label = T($Name);
    $SpriteClass = GetValue('SpriteClass', $ReactionType, "React$UrlCode");
    
    if ($ID = GetValue('CommentID', $Row)) {
