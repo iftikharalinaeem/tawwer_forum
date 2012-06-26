@@ -1,0 +1,21 @@
+<?php if (!defined('APPLICATION')) exit();
+
+if ($this->_DiscussionData !== FALSE && $this->_DiscussionData->NumRows() > 0) {
+   $DiscussionView = $this->FetchViewLocation('discussion');
+   ?>
+  <h4><?php echo T('Bookmarked Discussions'); ?></h4>
+<div id="Bookmarks" class="Box">
+  
+   <ul id="Bookmark_List" class="PanelInfo PanelDiscussions">
+      <?php
+      foreach ($this->_DiscussionData->Result() as $Discussion) {
+         include($DiscussionView);
+      }
+      if ($this->_DiscussionData->NumRows() >= 10) {
+      ?>
+      <li class="ShowAll"><?php echo Anchor(T('↳ Show All'), 'discussions/bookmarked'); ?></li>
+      <?php } ?>
+   </ul>
+</div>
+   <?php
+}

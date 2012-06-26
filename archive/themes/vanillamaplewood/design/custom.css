@@ -1,0 +1,482 @@
+body {
+    background: none repeat scroll 0 0 #FFFFFF;
+}
+a, a:link, a:visited, a:active, ul.Activities div.Excerpt a, ul.Activities div.Meta a {
+    color: #3354AA;
+    text-decoration: underline;
+}
+ul.Activities div.Excerpt a:hover, ul.Activities div.Meta a:hover, a:hover {
+    color: #4B6DB7;
+    text-decoration: none;
+}
+input.SmallInput:focus, input.InputBox:focus, textarea:focus {
+    background: none repeat scroll 0 0 #FFFFFF;
+}
+.Warning {
+    background: url("notice.gif") no-repeat scroll left center #FFFECC;
+    border: 1px solid #FAEBB1;
+    color: #D57D00;
+    font-size: 13px;
+    line-height: 150%;
+    margin-bottom: 20px;
+    padding: 8px 8px 8px 30px;
+}
+#Body {
+    margin: 15px auto 0;
+    text-align: left;
+    width: 100%;
+}
+#Panel, body.Profile #Panel {
+    float: left;
+    margin-left: 18px;
+    width: 184px;
+}
+body.Profile #Panel .Photo img {
+    width: 184px;
+}
+.PanelCategories {
+margin:-3px 0 0 0 !important;
+width:180px;
+list-style:none;
+background:#f5f9ff;
+    display: block;
+}
+.PanelCategories .Count {
+    display: none;
+    float: none;
+}
+.PanelCategories li {
+    display: block;
+    float: none;
+    text-align: left;
+}
+.Depth1 {
+margin-left:5px !important;
+padding:0px 5px 3px 5px !important;
+font-size:12px !important;
+font-weight: bold;
+color:#062971 !important;
+}
+.Depth1 a {
+color: #3354aa !important;
+text-decoration: underline !important;
+    font-weight: bold;
+}
+.Depth1 a:hover {
+text-decoration:none !important;
+    font-weight: bold;
+}
+
+.Depth1 li {
+border-bottom:11px solid #ccc;
+}
+
+ul.PanelInfo li {
+    text-align: left;
+}
+ul.PanelInfo li a {
+    float: none;
+}
+body.Profile #Content, #Content {
+    float: none;
+    margin: 0 20px 40px 220px;
+    width: auto;
+}
+
+body.Post #Body {
+   width: 680px;
+}
+body.Post #Content {
+    float: left;
+    margin: 0 0 40px;
+    width: 680px;
+}
+
+#PreHead {
+    float: none;
+    background:#46674c;
+    text-align: center;
+}
+
+#Ads { 
+    width: 830px;
+    margin: 0 auto;
+    float: none;
+    background:#46674c;
+    text-align: center;
+}
+
+#Ads table {
+    text-align: center;
+}
+
+#Head {
+    background: url("waves.blue.gif") repeat-x scroll left top transparent; 
+    border-bottom: 1px solid #ACBEDF;
+    border-top: 1px solid #ACBEDF;
+}
+#Head h1 a:hover, #Head h1 a, #Head h1 a:hover span, #Head h1 a span {
+    color: #000000;
+    font-family: 'Trebuchet MS',Verdana,Tahoma,Arial,sans-serif;
+    font-size: 22px;
+    font-weight: bold;
+    text-decoration: none !important;
+    text-shadow: none;
+}
+div.Menu {
+    text-align: center;
+}
+body #Head h1 {
+    float: none;
+    padding: 11px 0;
+    display: block;
+}
+ul#Menu {
+    float: none;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+#Menu li {
+    display: inline !important;
+    float: none;
+    line-height: normal;
+    margin: 0;
+    padding: 0;
+    position: inherit;
+}
+#Menu a {
+    background: none repeat scroll 0 0 #5D709F;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    color: #FFFFFF;
+    display: inline-block;
+    height: auto;
+    padding: 4px 6px 5px;
+    position: relative;
+    top: 1px;
+}
+#Menu a:hover {
+    background: none repeat scroll 0 0 #919EBE;
+    color: #FFFFFF;
+}
+
+body.Discussions #Menu li.DiscussionsTab a,
+body.Discussions #Menu li.DiscussionsTab a:hover,
+body.Activity #Menu li.ActivityTab a,
+body.Activity #Menu li.ActivityTab a:hover,
+body.last24 #Menu li.Last24Tab a,
+body.last24 #Menu li.Last24Tab a:hover,
+body.Archives #Menu li.ArchivesTab a,
+body.Archives #Menu li.ArchivesTab a:hover,
+body.FAQ #Menu li.FAQTab a,
+body.FAQ #Menu li.FAQTab a:hover,
+body.Profile #Menu li.ProfileTab a,
+body.Profile #Menu li.ProfileTab a:hover,
+body.Categories #Menu li.CategoriesTab a,
+body.Conversations #Menu li.InboxTab a {
+    -moz-border-bottom-colors: none;
+    -moz-border-image: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-color: #ACBEDF #ACBEDF -moz-use-text-color;
+    border-style: solid solid none;
+    border-width: 1px 1px medium;
+    color: #000000 !important;
+}
+#Menu li.AccountTab a {
+    background: none repeat scroll 0 0 transparent;
+    color: #5D709F;
+    font-weight: normal;
+/*    position: absolute;
+    right: 10px;
+    top: 4px;*/
+}
+#Menu li.AccountTab a:hover {
+    color: #000000 !important;
+}
+
+div.Tabs {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-bottom: 1px solid #CCCCCC;
+    padding: 5px 10px;
+}
+div.MessageForm {
+    background: none repeat scroll 0 0 #FEF9E9;
+    border-bottom: 1px solid #CCCCCC;
+    padding: 5px 10px;
+}
+div.MessageForm {
+    text-align: left;
+}
+div.MessageForm div.Buttons {
+    text-align: right;
+}
+div.CommentForm textarea {
+    width: 99%;
+}
+ul.DataList li.Item {
+    background: none repeat scroll 0 0 transparent;
+    border-bottom: 1px solid #CCCCCC;
+}
+ul.PanelInfo div.Meta, ul.DataList div.Meta {
+    font-size: 10px;
+}
+ul.DataList div.Meta span a {
+    text-decoration: none;
+}
+ul.PanelInfo div.Meta strong, ul.DataList div.Meta strong {
+    padding: 1px 4px;
+}
+div.MessageForm a.Cancel, div.MessageForm a.Cancel:link, div.MessageForm a.Cancel:hover, div.MessageForm a.Cancel:active, div.MessageForm a.Cancel:visited, div.MorePager a, div.MorePager a:link, div.MorePager a:hover, div.MorePager a:active, div.MorePager a:visited, a.TabLink, a.TabLink:link, a.TabLink:hover, a.TabLink:active, a.TabLink:visited, div.Tabs li a, div.Tabs li a:link, div.Tabs li a:hover, div.Tabs li a:active, div.Tabs li a:visited {
+    background: none repeat scroll 0 0 transparent;
+    border: medium none;
+    color: #BBBBBB;
+    padding: 5px 15px 5px 0;
+}
+.NumberedPager a {
+    text-decoration: none;
+}
+div.MessageForm a.Cancel:hover, div.MorePager li a:hover, a.TabLink:hover, div.Tabs li a:hover {
+    background: none repeat scroll 0 0 transparent;
+    color: #777777;
+}
+a.Active, div.Tabs li.Active a {
+    background: none repeat scroll 0 0 transparent;
+    border: medium none;
+    color: #000000;
+}
+a.Active:hover, div.Tabs li.Active a:hover {
+    background: none repeat scroll 0 0 transparent;
+}
+#Menu a span, #Menu li.Active a span, #Menu li.Highlight a:hover span, div.Tabs li a span {
+    background: none repeat scroll 0 0 #303A53;
+    color: #FFFFFF;
+}
+a.Button, a.BigButton {
+    background: none repeat scroll 0 0 transparent;
+    border: medium none;
+    box-shadow: none;
+    color: #CC0000;
+    padding: 6px 0;
+    text-align: left;
+    text-shadow: none;
+}
+a.Button:hover, a.BigButton:hover, a.Button:focus, a.BigButton:focus {
+    background: none repeat scroll 0 0 transparent;
+    border: medium none;
+    box-shadow: none;
+    color: #FF0000;
+}
+div.Box {
+    background: none repeat scroll 0 0 transparent;
+    border-radius: 0 0 0 0;
+    box-shadow: none;
+    margin: 0 0 10px;
+    padding: 0;
+}
+div.Box h4 {
+    color: #000000;
+    font-size: 12px;
+}
+ul.PanelInfo {
+    border-bottom: 1px solid #CCCCCC;
+    border-top: 1px solid #CCCCCC;
+}
+#Bookmarks ul.PanelInfo {
+    border-bottom: medium none;
+}
+ul.PanelInfo div.Meta {
+    border-bottom: 1px solid #CCCCCC;
+}
+ul.PanelInfo li, ul.PanelInfo li.Active {
+    background: none repeat scroll 0 0 transparent;
+    border: medium none;
+    font-size: 11px;
+    padding: 0;
+}
+div.GuestBox, ul.PanelInfo li.Active {
+    background: none repeat scroll 0 0 transparent;
+}
+div.GuestBox {
+    padding: 6px;
+}
+ul.PanelInfo li.Active a {
+    color: inherit;
+}
+#Panel input.InputBox, div.AddPeople textarea.MultiComplete {
+    border: 1px solid;
+    font-size: 12px;
+    margin-right: 4px;
+    width: 180px;
+}
+a.VanillaLink {
+    background: url("logo_footer.png") no-repeat scroll center center transparent;
+    display: block;
+    height: 32px;
+    margin: 10px 0;
+    width: 72px;
+}
+a.VanillaLink span {
+    display: none;
+}
+body.Entry #Panel, #dashboard_entrycontroller_signin #Panel, #vanilla_postcontroller_editdiscussion #Panel, #vanilla_postcontroller_discussion #Panel, #dashboard_searchcontroller_index #Panel {
+    display: none;
+}
+#vanilla_postcontroller_editdiscussion #Content, #vanilla_postcontroller_discussion #Content, #dashboard_searchcontroller_index #Content {
+    margin: 0 20px;
+}
+div.Tabs div.SubTab {
+    background: none repeat scroll 0 0 #FFFFFF;
+    color: #000000;    
+	font-size: 28px;
+    margin: 2px;
+	padding: 0;
+}
+div.SubTab  a:link, a:visited, a:active, ul.Activities div.Excerpt a, ul.Activities div.Meta a {
+    color: #000000;
+    text-decoration: none;
+}
+ul.DataList div.Photo {
+    padding: 0 6px;
+}
+div.ItemContent {
+    padding: 0 6px;
+}
+a.Name, ul.DataList div.Excerpt a {
+    text-decoration: none;
+}
+.Foot {
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+}
+ul.Options li ul li a {
+    width: 68px;
+}
+div.Preview, ul.MessageList div.Message {
+    clear: none;
+    font-size: 14px;
+}
+ul.MessageList div.Meta a {
+    text-decoration: none;
+}
+ul.MessageList div.Meta a:hover {
+    text-decoration: underline;
+}
+div.Preview, ul.MessageList li.Item {
+    border-bottom: 1px solid #CCCCCC;
+}
+ul.MessageList li.Item div.Message a {
+    text-decoration: none;
+}
+ul.MessageList li.Item div.Message a:hover {
+    text-decoration: underline;
+}
+div.FileAttachment {
+    color: #999999;
+}
+ul.Discussions div.ItemContent, ul.Drafts div.ItemContent {
+    margin: 0;
+}
+#Status {
+    background: none repeat scroll 0 0 #FEF9E9;
+    border-bottom: 1px solid #FAEBB1;
+    padding: 8px;
+}
+form.Activity {
+    padding: 10px 0 0 6px;
+    text-align: left;
+}
+form.Activity textarea {
+    width: 98%;
+}
+body.Profile ul.Activities {
+    border: 0 none;
+}
+ul.DataList a.Delete {
+    color: #FFFFFF;
+    margin-right: 6px;
+}
+body.Profile ul.PanelInfo {
+    border-bottom: 1px solid #CCCCCC;
+}
+div.Box dl {
+    background: none repeat scroll 0 0 transparent;
+    border-bottom: 1px solid #CCCCCC;
+    border-top: 1px solid #CCCCCC;
+    font-size: 11px;
+}
+ul.Activities div.Title a {
+    text-decoration: none;
+}
+body.Entry #Content h1, #MessageForm h2, #DiscussionForm h2 {
+    color: #000000;
+}
+#MessageForm {
+    margin-top: 1px;
+}
+#MessageForm textarea {
+    width: 99%;
+}
+body.Entry #Content form, #MessageForm, #DiscussionForm form {
+    -moz-border-bottom-colors: none;
+    -moz-border-image: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background: none repeat scroll 0 0 #FFFFFF;
+    border-color: #FFEDAE -moz-use-text-color;
+    border-style: solid none;
+    border-width: 1px medium;
+    padding: 10px;
+}
+a.Cancel {
+    margin-left: 20px;
+}
+body.Entry form ul li label, #DiscussionForm form label {
+    color: #834300;
+    display: block;
+}
+#DiscussionForm ul.PostOptions label {
+    color: #834300;
+}
+div.CommentForm textarea {
+    width: 99%;
+}
+ul.Condensed li, li.Condensed {
+    clear: none;
+}
+textarea.MultiComplete {
+    display: inline !important;
+    padding: 6px 3px;
+}
+div.AddPeople form div {
+    text-align: left;
+}
+div.Popup h1, div.Popup h2, div.Popup #ConversationForm h2 {
+    background: none repeat scroll 0 0 #EBECFF;
+    border-bottom: 1px solid #ACBEDF;
+    color: #000000;
+}
+div.Popup #ConversationForm form {
+    border: medium none;
+}
+div.Popup div.Footer, div.Popup div.Body, div.Popup div.Body form ul li label {
+    background: none repeat scroll 0 0 #FFFFFF;
+}
+div.Popup div.Footer {
+    border: 0 none;
+    padding-bottom: 3px;
+}
+a.Close {
+    text-decoration: none;
+}
+ul.MessageList li.Alt {
+    background-color: #F3F3F3;
+}
+ul.DataList li.New {
+    background-color: #FEFECC;
+}

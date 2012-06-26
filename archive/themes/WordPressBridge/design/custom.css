@@ -1,0 +1,28 @@
+/* Massage Vanilla into place with percentage widths instead of fixed. */
+
+#Body {
+	width: 99%;
+}
+body.Profile #Content {
+	margin:0 0 40px 0;
+	width: 72%;
+}
+body.Profile div.Photo img {
+	width: 100%;
+}
+#Content {
+	width: 72%;
+}
+body.Profile #Panel,
+#Panel {
+	width: 25%;
+	overflow: hidden;
+}
+ul.DataList div.Meta strong {
+	position:relative;
+	left:0;
+	top:0;
+}
+div.CommentForm textarea {
+	width:98%;
+}
