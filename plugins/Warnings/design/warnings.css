@@ -70,10 +70,8 @@
    content: " ";
    background: url(jailed-80.png) no-repeat transparent;
    position: absolute;
-   height: 106%;
-   width: 106%;
-   left: -3%;
-   top: -3%;
+   height: 100%;
+   width: 100%;
    
    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='.myBackground.jpg', sizingMethod='scale');
    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='myBackground.jpg', sizingMethod='scale')";
@@ -84,7 +82,11 @@
 }
 
 .PhotoWrapLarge.Jailed:before {
-   background-image: url(jailed-180.png);
+   background-image: url(jailed-200.png);
+}
+
+.Jailed .ProfilePhotoLarge {
+   height: 200px;
 }
 
 .PhotoWrap * {
