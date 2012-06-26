@@ -24,7 +24,19 @@ class IPBFormatterPlugin extends Gdn_Plugin {
    public function Format($String) {
       $String = str_replace(array('&quot;', '&#39;', '&#58;', 'Â'), array('"', "'", ':', ''), $String);
       $String = str_replace('<#EMO_DIR#>', 'default', $String);
-      $Result = $this->NBBC()->Parse($String);
+      
+      // If there is a really long string, it could cause a stack overflow in the bbcode parser.
+      // Not much we can do except try and chop the data down a touch.
+      
+      // 1. Remove html comments.
+      $String = preg_replace('/<!--(.*)-->/Uis', '', $String);
+      
+      // 2. Split the string up into chunks.
+      $Strings = (array)$String;
+      $Result = '';
+      foreach ($Strings as $String) {
+         $Result .= $this->NBBC()->Parse($String);
+      }
       
       // Make sure to clean filter the html in the end.
       $Config = array(

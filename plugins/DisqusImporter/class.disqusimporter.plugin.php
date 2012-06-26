@@ -589,7 +589,7 @@ class DisqusImporter extends Gdn_Plugin {
       
       switch ($Step) {
          case 'load':
-            $this->Path = PATH_UPLOADS.'/boinx-68c878a517e887cc0934e1e44d056881.xml';
+            $this->Path = PATH_UPLOADS.'/disqusimport.xml';
 
             $this->DefineTables();
       //      $this->LoadDiscussions();
