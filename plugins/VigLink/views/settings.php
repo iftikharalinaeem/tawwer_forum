@@ -50,10 +50,10 @@ echo $this->Form->Errors();
       <ul>
          <li>
             <?php
-               echo $this->Form->Label(T('VigLink.apikeylabel'), 'apikey');
-               echo $this->Form->TextBox('apikey');
+               echo $this->Form->Label(T('VigLink.ApiKeyLabel'), 'ApiKey');
+               echo $this->Form->TextBox('ApiKey');
             ?>
-            <p class="note"><?php echo T('VigLink.getAPIKey'); ?></p>
+            <p class="note"><?php echo T('VigLink.GetAPIKey'); ?></p>
          </li>
 
       </ul>
@@ -61,7 +61,8 @@ echo $this->Form->Errors();
    </div>
    <div class="ConfigurationHelp">
       <strong><?php echo T('VigLink.Info'); ?></strong>
-      <p><?php echo T('VigLink.supportInfo'); ?></p>
+      <p><?php echo T('VigLink.LogDescription'); ?></p>
+      <p><?php echo T('VigLink.SupportInfo'); ?></p>
    </div>
 </div>
 <?php

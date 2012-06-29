@@ -6,10 +6,9 @@
  * VigLink automatically affiliates all of your outbound links so you get paid when visitors click through and buy something.
  * VigLink's analytics dashboard tells you which outbound links are clicked most, which are making you the most money, and more.
  * This component will install the VigLink javascript on your site, without the need to edit templates.
-
+ *
  * Have questions or comments about VigLink or the plugin? Suggestions for something you'd like us to add? Please let us know!
  * http://www.VigLink.com/support
- *
  */
 
 // Define the plugin:
@@ -27,64 +26,41 @@ $PluginInfo['VigLink'] = array(
 	'AuthorUrl' => 'http://www.VigLink.com'
 );
 
-// v 1.1 - Lincoln cleaned up coding conventions. 2012-06-29
+// v 1.1 - Lincoln cleaned up coding conventions and refactored the Settings page. 2012-06-29
 
 
 class VigLinkPlugin implements Gdn_IPlugin {
    /**
 	 * Insert code.
 	 */
-	public function Base_AfterBody_Handler(&$Sender) {
-		$ApiKey = trim(C('Plugins.VigLink.ApiKey'));
-		echo $this->GenerateVigLinkCode( $ApiKey );
+	public function Base_AfterBody_Handler($Sender) {
+		echo $this->GenerateVigLinkCode( C('Plugins.VigLink.ApiKey', '') );
 	}
 	
 	/**
 	 * Settings page.
 	 */
-	public function SettingsController_VigLink_Create(&$Sender, $Args) {
-		if ($Sender->Form->IsPostBack()) {
-			$newApiKey = $Sender->Form->GetFormValue('ApiKey');
-			$ApiKey = trim(C('Plugins.VigLink.ApiKey'));
-			if ( $newApiKey === $ApiKey ) {
-				if ( empty($newApiKey) ) {
-						$Sender->SetData('ApiKeyEmpty', TRUE);
-						$Sender->StatusMessage = T("VigLink.notchanged") . '<br />' . T('VigLink.err_akempty');
-					} else {
-						$Sender->StatusMessage = T("VigLink.notchanged");
-					}
-
+	public function SettingsController_VigLink_Create($Sender, $Args) {
+		$ApiKey = C('Plugins.VigLink.ApiKey', '');
+		
+		if ($Sender->Form->AuthenticatedPostBack()) {
+			$NewKey = trim($Sender->Form->GetFormValue('ApiKey'));
+			
+			if ($this->ValidateApiKey($NewKey)) {
+				SaveToConfig('Plugins.VigLink.ApiKey', $NewKey);
+				$Sender->StatusMessage = T("VigLink.Saved");
 			} 
-			else if ($this->ValidateApiKey($newApiKey) || trim($newApiKey) === '') {
-				$Settings = array(
-					'Plugins.VigLink.ApiKey' => $newApiKey
-				);
-
-				if (SaveToConfig($Settings)) {
-					$Sender->StatusMessage = T("VigLink.saved");
-					if ( empty($newApiKey) ) {
-						$Sender->SetData('ApiKeyEmpty', TRUE);
-						$Sender->StatusMessage = T("VigLink.saved") . '<br />' . T('VigLink.err_akempty');
-					} else {
-						$Sender->StatusMessage = T("VigLink.saved");
-					}
-				} else {
-					$Sender->Form->AddError( T("VigLink.err_notsaved"), 'ApiKey');
-				}
-			} else {
-				$Sender->Form->AddError( T("VigLink.err_akinvalid"), 'ApiKey' );
-				$Sender->Form->SetFormValue('ApiKey', C('Plugins.VigLink.ApiKey'));
+			else {
+				$Sender->Form->AddError( T("VigLink.ErrorInvalid"), 'ApiKey' );
+				$Sender->Form->SetFormValue('ApiKey', $ApiKey);
 			}
-		} else {
-			$ApiKey = trim(C('Plugins.VigLink.ApiKey'));
-			if ( empty($ApiKey) ) {
-				$Sender->SetData('ApiKeyEmpty', TRUE);
-			}
+		} 
+		else {
 			$Sender->Form->SetFormValue('ApiKey', $ApiKey);
 		}
 
 		$Sender->AddSideMenu();
-		$Sender->SetData('Title', T('VigLink.VigLink_settings'));
+		$Sender->SetData('Title', T('VigLink.VigLinkSettings'));
 		$Sender->Render('Settings', '', 'plugins/VigLink');
 	}
 
@@ -92,31 +68,30 @@ class VigLinkPlugin implements Gdn_IPlugin {
 	 * Checks for a valid API Key format
 	 *
 	 * @param   array   APY Key
-	 * @return  boolean TRUE if the API key exits and follows the format
+	 * @return  boolean TRUE if the API key follows the pattern or is blank.
 	 */
-	public function ValidateApiKey( $ApiKey ) {
-		if ( preg_match('/^[0-9a-f]{32}$/', trim($ApiKey)) ) {
-			return TRUE;
-		} else {
-			return FALSE;
-		}
+	protected function ValidateApiKey( $ApiKey ) {
+		if (preg_match('/^[0-9a-f]{32}$/', $ApiKey) || $ApiKey === '')
+			return true;
+		
+		return false;
 	}
 
 	/**
 	 * Generates the VigLink code
 	 *
+	 * @param string $VigLinkKey
 	 * @return string   the VigLink code
 	 */
-	public function GenerateVigLinkCode( $VigLink_api_key ) {
-		$output = '';
-
-		if( !empty($VigLink_api_key) && $this->ValidateApiKey($VigLink_api_key) ) {
-   		$output = '
+	 protected function GenerateVigLinkCode( $VigLinkKey ) {
+   	 if (empty($VigLinkKey))
+		    return '';
+		   
+   	 return '
 			<script type="text/javascript">
 				//<![CDATA[
 				var vglnk = { api_url: \'//api.VigLink.com/api\',
-				    key: \'' . $VigLink_api_key . '\' };
-
+				    key: \'' . $VigLinkKey . '\' };
 				(function(d, t) {
 				var s = d.createElement(t); s.type = \'text/javascript\'; s.async = true;
 				s.src = (\'https:\' == document.location.protocol ? vglnk.api_url :
@@ -124,11 +99,8 @@ class VigLinkPlugin implements Gdn_IPlugin {
 				var r = d.getElementsByTagName(t)[0]; r.parentNode.insertBefore(s, r);
 				}(document, \'script\'));
 				//]]>
-			</script>
-';
+			</script>';
 		}
-		
-		return $output;
 	}
 
 	public function Setup() { }
