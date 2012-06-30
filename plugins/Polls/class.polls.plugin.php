@@ -27,8 +27,9 @@ class PollsPlugin extends Gdn_Plugin {
    /** 
     * Add the "new poll" button after the new discussion button. 
     */
-   public function Base_AfterNewDiscussionButton_Handler($Sender) {
-      echo Anchor(Sprite('SpPoll').T('New Poll'), 'post/poll', 'BigButton PollButton');
+   public function Base_BeforeNewDiscussionButton_Handler($Sender) {
+      $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
+      $NewDiscussionModule->AddButton(T('New Poll'), 'post/poll');
    }
    
    /** 
