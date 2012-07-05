@@ -129,8 +129,6 @@ class PollsPlugin extends Gdn_Plugin {
       }
    }
    
-   
-   
    /** 
     * Add the poll form to vanilla's post page.
     */
