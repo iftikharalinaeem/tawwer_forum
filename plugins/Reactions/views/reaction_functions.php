@@ -62,7 +62,7 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
    
    $IsHeading = FALSE;
    if (!$ReactionType) {
-      $ReactionType = array('UrlCode' => $UrlCode, 'Name' => T($UrlCode));
+      $ReactionType = array('UrlCode' => $UrlCode, 'Name' => $UrlCode);
       $IsHeading = TRUE;
    }
    
