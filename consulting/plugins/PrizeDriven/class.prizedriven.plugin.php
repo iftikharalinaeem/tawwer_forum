@@ -245,9 +245,7 @@ class PrizeDrivenPlugin extends Gdn_Plugin {
                   SetValue('Closed', $Sender->Data['Discussion'], TRUE);
                   Gdn::Locale()->SetTranslation('This discussion has been closed.', 'This competition is full.');
                   $Comments = new Gdn_DataSet(array());
-                  $Sender->Data['CommentData'] = $Comments;
                   $Sender->Data['Comments'] = $Comments;
-                  $Sender->CommentData = $Comments;
                }
             }
          }
