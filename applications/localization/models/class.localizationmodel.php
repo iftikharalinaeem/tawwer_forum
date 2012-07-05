@@ -577,8 +577,8 @@ group by t.Locale, c.CountGroup";
       // Generate the source files.
       $this->GenerateTransifex("$DestFolder/source/vanilla.site_core/en_CA.php", 'en-CA', 0);
       $this->GenerateTransifex("$DestFolder/source/vanilla.dash_core/en_CA.php", 'en-CA', 1);
-      $this->GeneratePO("$DestFolder/source/vanilla.test/en_CA.po", 'en-CA', 0);
-      return;
+//      $this->GeneratePO("$DestFolder/source/vanilla.test/en_CA.po", 'en-CA', 0);
+//      return;
       // Grab the active locales.
       $Locales = self::Locales();
       foreach ($Locales as $Code => $Locale) {
