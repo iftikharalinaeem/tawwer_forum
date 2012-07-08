@@ -131,22 +131,24 @@ a {
    border-radius: .2ex;
 }
 
-.MeMenu .Alert {
-   position: relative;
+.MeButton .Alert {
    font-size: 10px;
    padding: 1px 3px;
+   min-width: 16px;
+   top: -13px;
    left: 3px;
-   top: -1px;
+   right: inherit;
+   text-align: center;
+   box-shadow: 0 1px 2px rgba(0,0,0,.5);
 }
 
-.MeMenu .Alert::before {
+.MeButton .Alert::before {
    content: "";
    position: absolute;
    border: solid 4px transparent;
-   border-right-color: #d00;
-   left: -8px;
-   top: 3px;
-   vertical-align: middle;
+   border-top-color: #d00;
+   top: 100%;
+   left: 6px;
 }
 
 .BreadcrumbsWrapper {
@@ -218,10 +220,6 @@ a {
 .Box .Count {
     background: #dcdccb;
     color: #300c1c;
-}
-
-.MenuItems a:hover {
-   background: #31b5f4;
 }
 
 /** View Counts **/

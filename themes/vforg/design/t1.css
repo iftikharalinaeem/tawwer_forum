@@ -81,7 +81,7 @@ a.Bookmarking {
     right: 0;
 }
 
-.MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
+/*.MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
     color: #000 !Important;
     padding: 6px 18px;
 }
@@ -90,4 +90,4 @@ a.Bookmarking {
    border-radius: 0;
    color: #fff !Important;
    background: #0054d1;
-}
+}*/
