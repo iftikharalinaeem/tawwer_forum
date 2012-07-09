@@ -38,10 +38,14 @@
 .ReactButton {
    display: inline-block;
    padding: 0px 2px;
+   /*
    border-radius: 12px;
-   
+   */
    margin: 0 2px;
    padding: 0 3px 0 0;
+}
+.Flyout .ReactButton {
+   margin: 0;
 }
 
 .RecordReactions {
@@ -93,17 +97,20 @@ This was causing text-decoration: underline to float above the text of the label
    width: 18px;
    display: inline-block;
    vertical-align: top;
-   
+   /*
    border-radius: 18px;
+   */
 }
 
 .MenuItems .ReactSprite {
    background-image: url('reaction-sprites-light-grey.png');
 }
-
 .ReactButton {
    opacity: 0;
    line-height: 18px;
+}
+.ToggleFlyout.Open .ReactButton {
+   opacity: 1 !important;
 }
 
 .Item:hover .Reactions .Handle {
