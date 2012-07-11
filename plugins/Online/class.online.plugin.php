@@ -716,9 +716,9 @@ class OnlinePlugin extends Gdn_Plugin {
       $ViewingUserID = Gdn::Session()->UserID;
       
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', T("Who's Online"), '/profile/online', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpWhosOnline').T("Who's Online"), '/profile/online', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', T("Who's Online"), UserUrl($Sender->User, '', 'online'), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpWhosOnline').T("Who's Online"), UserUrl($Sender->User, '', 'online'), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
    
