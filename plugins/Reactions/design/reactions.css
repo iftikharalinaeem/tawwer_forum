@@ -90,21 +90,18 @@ This was causing text-decoration: underline to float above the text of the label
    background: #494949;
    background: rgba(0, 0, 0, 0.7);
 }
-
+/*
 .ReactSprite {
    background: url('reaction-sprites-grey.png') 1px no-repeat transparent;
    height: 18px;
    width: 18px;
    display: inline-block;
    vertical-align: top;
-   /*
-   border-radius: 18px;
-   */
 }
-
 .MenuItems .ReactSprite {
    background-image: url('reaction-sprites-light-grey.png');
 }
+*/
 .ReactButton {
    opacity: 0;
    line-height: 18px;
@@ -138,13 +135,14 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 /*    opacity: .8; */
    width: inherit;
 }
-
+/*
 .MenuItems li:hover .ReactButton .ReactSprite,
 .ReactButton:hover .ReactSprite,
 .HasCount .ReactSprite,
 .UserReactionWrap .ReactSprite {
    background-image: url('reaction-sprites-color.png');
 }
+*/
 .Reactions a.HasCount {
    display: inline-block;
 /*   opacity: 1 !Important;*/
@@ -154,10 +152,11 @@ TOO DESTRUCTIVE FOR A PLUGIN!
    background-image: none !Important;
    background: transparent !Important;
 }
+
 .InProgress .Count {
    visibility: hidden;
 }
-
+/*
 .ReactEverything,
 .ReactReact {        background-position: -7px; }
 .ReactFlag {         background-position: -39px; }
@@ -176,7 +175,7 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 .ReactDown {         background-position: -455px; }
 .ReactPromote {      background-position: -487px; }
 .ReactInsightful {   background-position: -519px; }
-
+*/
 .FilterButton.Selected {
    font-weight: bold;
 }
@@ -322,19 +321,9 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 /* Menu stuff */
 
 .Flyout.Flags {
-    left: -8px;
+    /* left: -8px; */
     top: 25px;
     z-index: 1000;
-}
-
-.Flyout.Flags:before {
-   border-bottom: 7px solid #444444;
-   border-left: 7px solid transparent;
-   border-right: 7px solid transparent;
-   content: "";
-   left: 9px;
-   position: absolute;
-   top: -7px;
 }
 
 /* Begin "Best Of" */
@@ -397,7 +386,7 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 */
 .Reactions .Count {
     font-size: 8px;
-    background: #666;
+    background: #555;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
@@ -406,14 +395,18 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 .Item .Reactions > * {
     visibility: hidden;
 }
+.Item.Open .Reactions > *,
 .Item:hover .Reactions > *, 
 .Item .Reactions > .FlagMenu {
     visibility: visible;
 }
 .Reactions .FlagMenu .ReactButton,
-.ReactQuote {
+.Reactions > a.React {
     margin: 0 10px;
     padding: 0;
+}
+.Reactions > a.React > .ReactSprite {
+   margin-right: 2px;
 }
 .Reactions {
    margin-left: -10px;
@@ -423,7 +416,7 @@ TOO DESTRUCTIVE FOR A PLUGIN!
     padding: 0;
 }
 .Reactions .MenuItems .ReactSprite {
-    display: none;
+    sdisplay: none;
 }
 .Reactions .FlagMenu .MenuItems .ReactButton {
    margin: 0;
@@ -436,43 +429,4 @@ TOO DESTRUCTIVE FOR A PLUGIN!
    margin: 0 6px;
 }
 
-
-/* With Icons */
-.SpQuote,
-.Reactions .ReactSprite {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  *margin-right: .3em;
-  line-height: 14px;
-  vertical-align: text-top;
-  background-image: url("glyphicons-halflings.png") !important;
-  background-position: 14px 14px;
-  background-repeat: no-repeat;
-  opacity: .75;
-}
-.Reactions .InProgress .ReactSprite {
-   background-image: none !important;
-}
-.Reactions .ReactAwesome {
-  background-position: -96px 0;
-}
-.Reactions .ReactFlag {
-  background-position: -312px -24px;
-}
-.Reactions .ReactInsightful {
-  background-position: -96px -120px;
-}
-.Reactions .ReactOffTopic {
-  background-position: -120px -120px;
-}
-.Reactions .SpQuote {
-  background-position: -336px -120px;
-  margin-right: 4px;
-}
-
-/* Hide Flag Text
-.ReactButton-Flag .ReactLabel {
-    display: none;
-}
-*/
+/* React Sprites are in Sprites plugin */
