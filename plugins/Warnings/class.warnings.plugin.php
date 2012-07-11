@@ -66,7 +66,7 @@ class WarningsPlugin extends Gdn_Plugin {
       
       if (!GetValue('EditMode', Gdn::Controller())) {
          $Sender->EventArguments['ProfileOptions'][] = array(
-             'Text' => T('Warn'),
+             'Text' => Sprite('SpWarn').T('Warn'),
              'Url' => '/profile/warn?userid='.$Args['UserID'],
              'CssClass' => 'Popup WarnButton'
          );
