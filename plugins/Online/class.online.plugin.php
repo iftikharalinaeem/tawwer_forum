@@ -9,6 +9,7 @@
  * Changes: 
  *  1.0a    Development release
  *  1.0     Official release
+ *  1.1     Add WhosOnline config import
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -19,7 +20,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.0',
+   'Version' => '1.1',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -87,12 +88,22 @@ class OnlinePlugin extends Gdn_Plugin {
    const COOKIE_GUEST_PRIMARY = '__vnOz0';
    const COOKIE_GUEST_SECONDARY = '__vnOz1';
    
+   /**
+    * Configuration Defaults 
+    */
+   const DEFAULT_PRUNE_DELAY = 15;
+   const DEFAULT_WRITE_DELAY = 60;
+   const DEFAULT_CLEAN_DELAY = 60;
+   const DEFAULT_STYLE = 'pictures';
+   const DEFAULT_LOCATION = 'every';
+   const DEFAULT_HIDE = 'true';
+   
    public function __construct() {
       parent::__construct();
       
-      $this->WriteDelay = C('Plugins.Online.WriteDelay', 60);
-      $this->PruneDelay = C('Plugins.Online.PruneDelay', 10) * 60;
-      $this->CleanDelay = C('Plugins.Online.CleanDelay', 60);
+      $this->WriteDelay = C('Plugins.Online.WriteDelay', self::DEFAULT_WRITE_DELAY);
+      $this->PruneDelay = C('Plugins.Online.PruneDelay', self::DEFAULT_PRUNE_DELAY) * 60;
+      $this->CleanDelay = C('Plugins.Online.CleanDelay', self::DEFAULT_CLEAN_DELAY);
       $this->CacheCountDelay = C('Plugins.Online.CacheCountDelay', 10);
    }
    
@@ -230,7 +241,7 @@ class OnlinePlugin extends Gdn_Plugin {
     * @return array Pair of expiry times, and the index of the currently active cookie
     */
    public static function Expiries($Time) {
-      $Timespan = (C('Plugins.Online.PruneDelay', 10) * 60) * 2; // Double the real amount
+      $Timespan = (C('Plugins.Online.PruneDelay', self::DEFAULT_PRUNE_DELAY) * 60) * 2; // Double the real amount
       
       $Expiry0 = $Time - $Time % $Timespan + $Timespan;
 
@@ -716,9 +727,9 @@ class OnlinePlugin extends Gdn_Plugin {
       $ViewingUserID = Gdn::Session()->UserID;
       
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', T("Who's Online"), '/profile/online', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpWhosOnline').T("Who's Online"), '/profile/online', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', T("Who's Online"), UserUrl($Sender->User, '', 'online'), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpWhosOnline').T("Who's Online"), UserUrl($Sender->User, '', 'online'), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
    
@@ -737,10 +748,10 @@ class OnlinePlugin extends Gdn_Plugin {
       $Sender->Form = new Gdn_Form();
       
       $Fields = array(
-         'Plugins.Online.Location'        => 'every',
-         'Plugins.Online.Style'           => 'pictures',
-         'Plugins.Online.HideForGuests'   => 'true',
-         'Plugins.Online.PruneDelay'      => 10
+         'Plugins.Online.Location'        => self::DEFAULT_LOCATION,
+         'Plugins.Online.Style'           => self::DEFAULT_STYLE,
+         'Plugins.Online.HideForGuests'   => self::DEFAULT_HIDE,
+         'Plugins.Online.PruneDelay'      => self::DEFAULT_PRUNE_DELAY
       );
       
       $Saved = FALSE;
@@ -766,7 +777,62 @@ class OnlinePlugin extends Gdn_Plugin {
    }
    
    public function Setup() {
+      
+      // Run Database adjustments
+      
       $this->Structure();
+      
+      // Disable WhosOnline
+      
+      if (Gdn::PluginManager()->CheckPlugin('WhosOnline')) {
+         Gdn::PluginManager()->DisablePlugin('WhosOnline');
+      }
+      
+      // Import WhosOnline settings if they exist
+      
+      $DisplayStyle = C('WhosOnline.DisplayStyle', NULL);
+      if (!is_null($DisplayStyle)) {
+         switch ($DisplayStyle) {
+            case 'pictures':
+               SaveToConfig('Plugins.Online.Style', 'pictures');
+               break;
+            case 'list':
+               SaveToConfig('Plugins.Online.Style', 'links');
+               break;
+         }
+         
+         RemoveFromConfig('WhosOnline.DisplayStyle');
+      }
+      
+      $DisplayLocation = C('WhosOnline.Location.Show', NULL);
+      if (!is_null($DisplayLocation)) {
+         switch ($DisplayLocation) {
+            case 'every':
+            case 'custom':
+               SaveToConfig('Plugins.Online.Location', $DisplayLocation);
+               break;
+            case 'discussion':
+               SaveToConfig('Plugins.Online.Location', 'discussions');
+               break;
+            case 'discussionsonly':
+               SaveToConfig('Plugins.Online.Location', 'discussionlists');
+               break;
+         }
+         
+         RemoveFromConfig('WhosOnline.Location.Show');
+      }
+      
+      $HideForGuests = C('WhosOnline.Hide', NULL);
+      if (!is_null($HideForGuests)) {
+         if ($HideForGuests) {
+            SaveToConfig('Plugins.Online.HideForGuests', 'true');
+         } else {
+            SaveToConfig('Plugins.Online.HideForGuests', 'false');
+         }
+         
+         RemoveFromConfig('WhosOnline.Hide');
+      }
+      
    }
    
    public function Structure() {

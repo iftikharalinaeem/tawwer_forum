@@ -110,8 +110,7 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
       $Url = Url("/react/$RecordType/$UrlCode2?id=$ID");
    
    $Result = <<<EOT
-<a class="Hijack ReactButton $LinkClass" href="$Url" title="$Label" rel="nofollow"><span class="ReactSprite $SpriteClass"></span> <span class="ReactLabel">$Label</span>$CountHtml</a>
-   
+<a class="Hijack ReactButton $LinkClass" href="$Url" title="$Label" rel="nofollow"><span class="ReactSprite $SpriteClass"></span> $CountHtml<span class="ReactLabel">$Label</span></a>
 EOT;
    
    return $Result;
@@ -197,65 +196,44 @@ function WriteReactions($Row) {
    
    echo '<div class="Reactions">';
    
-   // Write the flags.
-   static $Flags = NULL, $FlagCodes = NULL;
-   if ($Flags === NULL) {
-      $Flags = ReactionModel::GetReactionTypes(array('Class' => 'Flag', 'Active' => 1));
-      $FlagCodes = array();
-      foreach ($Flags as $Flag) {
-         $FlagCodes[] = $Flag['UrlCode'];
+      // Write the flags.
+      static $Flags = NULL, $FlagCodes = NULL;
+      if ($Flags === NULL) {
+         $Flags = ReactionModel::GetReactionTypes(array('Class' => 'Flag', 'Active' => 1));
+         $FlagCodes = array();
+         foreach ($Flags as $Flag) {
+            $FlagCodes[] = $Flag['UrlCode'];
+         }
       }
-   }
-      
-   if (!empty($Flags)) {
-      echo '<span class="Flag ToggleFlyout">';
 
-      // Write the handle.
-      echo ReactionButton($Row, 'Flag');
-      
-      echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
-      foreach ($Flags as $Flag) {
-         echo '<li>'.ReactionButton($Row, $Flag['UrlCode']);
+      if (!empty($Flags)) {
+         echo '<span class="FlagMenu ToggleFlyout">';
+            // Write the handle.
+            echo ReactionButton($Row, 'Flag');
+            echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
+            foreach ($Flags as $Flag) {
+               echo '<li>'.ReactionButton($Row, $Flag['UrlCode']).'</li>';
+            }
+            echo '</ul>';
+         echo '</span>';
+         echo Bullet();
       }
-      echo '</ul>';
 
+      static $Types = NULL;
+      if ($Types === NULL)
+         $Types = ReactionModel::GetReactionTypes(array('Class' => array('Good', 'Bad'), 'Active' => 1));
+
+      // Write the reactions.
+      echo '<span class="ReactMenu">';
+         echo '<span class="ReactButtons">';
+         foreach ($Types as $Type) {
+            echo ReactionButton($Row, $Type['UrlCode']);
+         }
+         echo '</span>';
       echo '</span>';
-   }
-   
-//   echo '<div class="Flag">';
-//   echo '<div class="Handle FlagHandle"><a href="#"><span class="ReactSprite ReactFlag"></span> <span class="ReactLabel">Flag</span></a></div>';
-//   
-//   echo '<div class="ReactButtons" style="display:none">';
-//   echo '<a href="#" class="ReactHeading">'.T('Flag »').'</a> ';
-//   echo ReactionButton($Row, 'Abuse');
-//   echo ReactionButton($Row, 'Spam');
-//   echo ReactionButton($Row, 'Troll');
-//   
-//   echo '</div>';
-//   
-//   echo '</div>';
-   
-   
-//   echo '<span class="Nub">&#160;</span>';
-   
-   static $Types = NULL;
-   if ($Types === NULL)
-      $Types = ReactionModel::GetReactionTypes(array('Class' => array('Good', 'Bad'), 'Active' => 1));
-   
-   echo '&nbsp;'; // Kludge to fix height when there are no flag options turned on.
-   // Write the reactions.
-   echo '<span class="React">';
-//   echo '<span class="Column-Score">'.GetValue('Score', $Row).'</span>';
-   
-   
-   echo '<span class="ReactButtons">';
-   foreach ($Types as $Type) {
-      echo ReactionButton($Row, $Type['UrlCode']);
-   }
-   echo '</span>';
-   
-//   echo ' <span class="Handle ReactHandle"><span class="ReactSprite ReactReact">&#160;</span> <span class="ReactLabel">React</span></span>';
-   echo '</span>';
+
+      Gdn::Controller()->EventArguments['ReactionTypes'] = $Types;
+      Gdn::Controller()->FireEvent('AfterReactions');
    
    echo '</div>';
 }

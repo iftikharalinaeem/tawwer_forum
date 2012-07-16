@@ -68,9 +68,9 @@
 
 /* Hover Mechanics */
 .Reactions a {
-   color: #000;
+/*   color: #000;
 
-/*   -webkit-transition: all .3s ease-in-out;
+   -webkit-transition: all .3s ease-in-out;
 	-moz-transition: all .3s ease-in-out;
 	-o-transition: all .3s ease-in-out;
 	-ms-transition: all .3s ease-in-out;
@@ -90,21 +90,18 @@ This was causing text-decoration: underline to float above the text of the label
    background: #494949;
    background: rgba(0, 0, 0, 0.7);
 }
-
+/*
 .ReactSprite {
    background: url('reaction-sprites-grey.png') 1px no-repeat transparent;
    height: 18px;
    width: 18px;
    display: inline-block;
    vertical-align: top;
-   /*
-   border-radius: 18px;
-   */
 }
-
 .MenuItems .ReactSprite {
    background-image: url('reaction-sprites-light-grey.png');
 }
+*/
 .ReactButton {
    opacity: 0;
    line-height: 18px;
@@ -112,7 +109,6 @@ This was causing text-decoration: underline to float above the text of the label
 .ToggleFlyout.Open .ReactButton {
    opacity: 1 !important;
 }
-
 .Item:hover .Reactions .Handle {
    opacity: .75;
 }
@@ -136,16 +132,17 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 */
 
 .Item:hover .Reactions a {
-   opacity: .8;
+/*    opacity: .8; */
    width: inherit;
 }
-
+/*
 .MenuItems li:hover .ReactButton .ReactSprite,
 .ReactButton:hover .ReactSprite,
 .HasCount .ReactSprite,
 .UserReactionWrap .ReactSprite {
    background-image: url('reaction-sprites-color.png');
 }
+*/
 .Reactions a.HasCount {
    display: inline-block;
 /*   opacity: 1 !Important;*/
@@ -155,10 +152,11 @@ TOO DESTRUCTIVE FOR A PLUGIN!
    background-image: none !Important;
    background: transparent !Important;
 }
+
 .InProgress .Count {
    visibility: hidden;
 }
-
+/*
 .ReactEverything,
 .ReactReact {        background-position: -7px; }
 .ReactFlag {         background-position: -39px; }
@@ -177,7 +175,7 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 .ReactDown {         background-position: -455px; }
 .ReactPromote {      background-position: -487px; }
 .ReactInsightful {   background-position: -519px; }
-
+*/
 .FilterButton.Selected {
    font-weight: bold;
 }
@@ -323,19 +321,9 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 /* Menu stuff */
 
 .Flyout.Flags {
-    left: -8px;
+    /* left: -8px; */
     top: 25px;
     z-index: 1000;
-}
-
-.Flyout.Flags:before {
-   border-bottom: 7px solid #444444;
-   border-left: 7px solid transparent;
-   border-right: 7px solid transparent;
-   content: "";
-   left: 9px;
-   position: absolute;
-   top: -7px;
 }
 
 /* Begin "Best Of" */
@@ -357,3 +345,88 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 }
 
 /* End "Best Of" */
+
+
+
+/* Reaction Revamp */
+.Reactions .ReactSprite {
+    display: none;
+}
+.Reactions .Bullet {
+    font-size: 9px;
+    line-height: 1;
+    color: #999;
+}
+.React {
+    position: relative;
+    top: auto;
+    right: auto;
+}
+.Reactions {
+    line-height: 1;
+    margin: 15px 0 0 0;
+}
+.RecordReactions {
+    text-align: left;
+    margin-bottom: -15px;
+}
+/*
+.Reactions .Count {
+    font-size: 8px;
+    background: #888;
+    border: 1px solid #555;
+    text-shadow: 0 1px 1px #333;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #aaa, inset 0 1px #777;
+    -moz-box-shadow: inset 0 -1px 0 #aaa, inset 0 1px #777;
+    -webkit-box-shadow: inset 0 -1px 0 #aaa, inset 0 1px #777;
+}
+*/
+.Reactions .Count {
+    font-size: 8px;
+    background: #555;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    margin-right: 4px;
+}
+.Item .Reactions > * {
+    visibility: hidden;
+}
+.Item.Open .Reactions > *,
+.Item:hover .Reactions > *, 
+.Item .Reactions > .FlagMenu {
+    visibility: visible;
+}
+.Reactions .FlagMenu .ReactButton,
+.Reactions > a.React {
+    margin: 0 10px;
+    padding: 0;
+}
+.Reactions > a.React > .ReactSprite {
+   margin-right: 2px;
+}
+.Reactions {
+   margin-left: -10px;
+}
+.ReactButton {
+    opacity: 1;
+    padding: 0;
+}
+.Reactions .MenuItems .ReactSprite {
+    sdisplay: none;
+}
+.Reactions .FlagMenu .MenuItems .ReactButton {
+   margin: 0;
+   padding: 0 15px;
+}
+.ReactMenu {
+   margin: 0 4px;
+}
+.ReactMenu .ReactButton {
+   margin: 0 6px;
+}
+
+/* React Sprites are in Sprites plugin */
