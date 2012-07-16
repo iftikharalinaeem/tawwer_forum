@@ -49,7 +49,7 @@ class OnlineModule extends Gdn_Module {
 		parent::__construct($Sender);
       $this->OnlineUsers = NULL;
       $this->ShowInvisible = Gdn::Session()->CheckPermission('Plugins.Online.ViewHidden');
-      $this->Style = C('Plugins.Online.Style', 'pictures');
+      $this->Style = C('Plugins.Online.Style', OnlinePlugin::DEFAULT_STYLE);
       $this->Selector = 'auto';
 	}
    

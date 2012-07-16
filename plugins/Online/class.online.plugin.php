@@ -782,6 +782,12 @@ class OnlinePlugin extends Gdn_Plugin {
       
       $this->Structure();
       
+      // Disable WhosOnline
+      
+      if (Gdn::PluginManager()->CheckPlugin('WhosOnline')) {
+         Gdn::PluginManager()->DisablePlugin('WhosOnline');
+      }
+      
       // Import WhosOnline settings if they exist
       
       $DisplayStyle = C('WhosOnline.DisplayStyle', NULL);
@@ -827,10 +833,6 @@ class OnlinePlugin extends Gdn_Plugin {
          RemoveFromConfig('WhosOnline.Hide');
       }
       
-      // And disable WhosOnline
-      
-      if (Gdn::PluginManager()->CheckPlugin('WhosOnline'))
-         Gdn::PluginManager()->DisablePlugin('WhosOnline');
    }
    
    public function Structure() {
