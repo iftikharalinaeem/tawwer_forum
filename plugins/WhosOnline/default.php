@@ -168,9 +168,9 @@ class WhosOnlinePlugin extends Gdn_Plugin {
     * Let users modify their privacy settings.
     */
    public function ProfileController_Whosonline_Create($Sender) {
-      
       $Session = Gdn::Session();
       $UserID = $Session->IsValid() ? $Session->UserID : 0;
+      $Sender->GetUserInfo();
       
       // Get the data
       $UserMetaData = $this->GetUserMeta($UserID, '%');
