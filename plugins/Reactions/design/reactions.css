@@ -62,7 +62,7 @@
    background: rgba(0, 0, 0, 0.7);
 }
 .ReactButton {
-   opacity: 0;
+   /* opacity: 0; */
    line-height: 18px;
 }
 .ToggleFlyout.Open .ReactButton {
