@@ -3,85 +3,56 @@
    font-size: 11px;
    line-height: 18px;
 }
-
 .Reactions .Handle {
    display: inline-block;
    opacity: .3;
 }
-
 .React {
    position: absolute;
    right: 0;
    top: 0;
 }
-
 .ReactHeading {
    display: inline-block;
    padding: 0px 6px;
    background: rgba(0,0,0,0.04);
    color: rgba(0,0,0,0.4);
 }
-
 .Flag .ReactHeading {
    border-radius: 4px 0 0 4px;
 }
-
 .React .ReactHeading {
    border-radius: 0 4px 4px 0;
 }
-
 .Item:hover .ReactHeading {
    background: rgba(0,0,0,0.8);
    color: #fff;
 }
-
 .ReactButton {
    display: inline-block;
    padding: 0px 2px;
-   /*
-   border-radius: 12px;
-   */
    margin: 0 2px;
    padding: 0 3px 0 0;
 }
 .Flyout .ReactButton {
    margin: 0;
 }
-
 .RecordReactions {
     margin-top: 15px;
     text-align: right;
 }
-
 .UserReactionWrap {
     position: relative;
     line-height: 1;
     display: inline-block;
     margin-right: 3px;
 }
-
 .UserReactionWrap .ReactSprite {
     position: absolute;
     right: -2px;
     bottom: -2px;
 }
-
 /* Hover Mechanics */
-.Reactions a {
-/*   color: #000;
-
-   -webkit-transition: all .3s ease-in-out;
-	-moz-transition: all .3s ease-in-out;
-	-o-transition: all .3s ease-in-out;
-	-ms-transition: all .3s ease-in-out;
-	transition: all .3s ease-in-out;*/
-}
-/*
-This was causing text-decoration: underline to float above the text of the label in cartalk.
-.ReactLabel {
-   vertical-align: top;
-}
-*/
 .Reactions .Count {
    border-radius: 6px;
    -moz-border-radius: 6px;
@@ -90,18 +61,6 @@ This was causing text-decoration: underline to float above the text of the label
    background: #494949;
    background: rgba(0, 0, 0, 0.7);
 }
-/*
-.ReactSprite {
-   background: url('reaction-sprites-grey.png') 1px no-repeat transparent;
-   height: 18px;
-   width: 18px;
-   display: inline-block;
-   vertical-align: top;
-}
-.MenuItems .ReactSprite {
-   background-image: url('reaction-sprites-light-grey.png');
-}
-*/
 .ReactButton {
    opacity: 0;
    line-height: 18px;
@@ -112,104 +71,48 @@ This was causing text-decoration: underline to float above the text of the label
 .Item:hover .Reactions .Handle {
    opacity: .75;
 }
-
 .Reactions .ReactHandle {
    display: none;
 }
-
-/*.Item {
-   -webkit-transition: all .3s ease-in-out;
-   -moz-transition: all .3s ease-in-out;
-   -o-transition: all .3s ease-in-out;
-   -ms-transition: all .3s ease-in-out;
-   transition: all .3s ease-in-out;
-}*/
-/*
-TOO DESTRUCTIVE FOR A PLUGIN!
-.Item:hover {
-   background: #F0FAFF;
-}
-*/
-
 .Item:hover .Reactions a {
-/*    opacity: .8; */
    width: inherit;
 }
-/*
-.MenuItems li:hover .ReactButton .ReactSprite,
-.ReactButton:hover .ReactSprite,
-.HasCount .ReactSprite,
-.UserReactionWrap .ReactSprite {
-   background-image: url('reaction-sprites-color.png');
-}
-*/
 .Reactions a.HasCount {
    display: inline-block;
-/*   opacity: 1 !Important;*/
 }
-
 .InProgress .ReactSprite {
    background-image: none !Important;
    background: transparent !Important;
 }
-
 .InProgress .Count {
    visibility: hidden;
 }
-/*
-.ReactEverything,
-.ReactReact {        background-position: -7px; }
-.ReactFlag {         background-position: -39px; }
-.ReactSpam {         background-position: -71px; }
-.ReactAbuse {        background-position: -103px; }
-.ReactTroll {        background-position: -135px; }
-.ReactDisagree {     background-position: -167px; }
-.ReactOffTopic {     background-position: -199px; }
-.ReactAgree {        background-position: -231px; }
-.ReactLike {         background-position: -263px; }
-.ReactDislike {      background-position: -295px; }
-.ReactAwesome {      background-position: -327px; }
-.ReactLOL {          background-position: -359px; }
-.ReactWTF {          background-position: -391px; }
-.ReactUp {           background-position: -423px; }
-.ReactDown {         background-position: -455px; }
-.ReactPromote {      background-position: -487px; }
-.ReactInsightful {   background-position: -519px; }
-*/
 .FilterButton.Selected {
    font-weight: bold;
 }
-
 .DataCounts {
    margin: 5px 0;
    text-align: center;
 }
-
 .DataCounts a {
    color: #000;
 }
-
 .DataCounts a:hover {
    color: #ff0084;
 }
-
 .CountTotal {
    display: block;
    line-height: 100%;
    font-size: 28px;
 }
-
 .CountTotal img {
    height: 40px;
 }
-
 .CountItemWrap {
    width: 10%;
    display: inline-block;
-}
-
+}   
 .CountItem {
-/*   float: left;*/
    display: block;
    text-align: center;
    border: solid 2px transparent;
@@ -221,31 +124,25 @@ TOO DESTRUCTIVE FOR A PLUGIN!
    white-space: nowrap;
    overflow: visible;
 }
-
 .Compact .Item .Author img {
    height: 24px;
    width: 24px;
    margin: 0 5px 4px 0;
 }
-
 .Compact .Title {
    font-sixe: 13px;
 }
-
 .Compact .Reactions {
    margin-top: 5px;
 }
-
 .Compact p {
    margin: 5px 0;
 }
-
 .CountItem.Selected {
     background: rgba(55, 173, 227, 0.1);
     border: solid 2px rgba(55, 173, 227, .2);
     padding: 4px
 }
-
 .Buried {
     padding: 2px;
     white-space: nowrap;
@@ -253,23 +150,19 @@ TOO DESTRUCTIVE FOR A PLUGIN!
     text-overflow: ellipsis;
     cursor: pointer;
 }
-
 .Buried, .Buried a {
     color: #aaa;
     font-size: 12px;
 }
-
 .Buried .Author .ProfilePhoto {
     height: 21px;
     width: 21px;
     margin: 0 3px 0 0;
     opacity: .4;
 }
-
 .Buried .Reactions {
     display: none;
 }
-
 .Buried * {
    display: inline;
    margin: 0;
@@ -277,18 +170,15 @@ TOO DESTRUCTIVE FOR A PLUGIN!
    padding-top: 0;
    padding-bottom: 0;
 }
-
 .Buried br {
    display: none;
 }
-
 .Buried .Item-BodyWrap,
 .Buried .Options,
 .Buried .Signature,
 .Buried .RecordReactions {
     display: none;
 }
-
 .Buried:hover:before {
     content: "Post is buried, click here to show the rest.";
     display: block;
@@ -304,28 +194,21 @@ TOO DESTRUCTIVE FOR A PLUGIN!
     vertical-align: middle;
     line-height: 40px; /* approx, could cause problems */
 }
-
 .Promoted {
     box-shadow: inset 0 80px 600px #fffcdc;
     border-top: solid 1px #fff;
 }
-
 .Promoted .Message {
     font-size: 110%;
 }
-
 .Promoted .Author .ProfilePhotoMedium {
     box-shadow: 0px -1px 8px #fff;
 }
-
 /* Menu stuff */
-
 .Flyout.Flags {
-    /* left: -8px; */
     top: 25px;
     z-index: 1000;
 }
-
 /* Begin "Best Of" */
 .ReactionFilters {
    margin: 8px 0;
@@ -343,10 +226,7 @@ TOO DESTRUCTIVE FOR A PLUGIN!
 .BestOfData .DataList .Item:first-child {
    border-top: 1px solid #BEC8CC;
 }
-
 /* End "Best Of" */
-
-
 
 /* Reaction Revamp */
 .Reactions .ReactSprite {
@@ -370,20 +250,6 @@ TOO DESTRUCTIVE FOR A PLUGIN!
     text-align: left;
     margin-bottom: -15px;
 }
-/*
-.Reactions .Count {
-    font-size: 8px;
-    background: #888;
-    border: 1px solid #555;
-    text-shadow: 0 1px 1px #333;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    box-shadow: inset 0 -1px 0 #aaa, inset 0 1px #777;
-    -moz-box-shadow: inset 0 -1px 0 #aaa, inset 0 1px #777;
-    -webkit-box-shadow: inset 0 -1px 0 #aaa, inset 0 1px #777;
-}
-*/
 .Reactions .Count {
     font-size: 8px;
     background: #555;
@@ -429,4 +295,44 @@ TOO DESTRUCTIVE FOR A PLUGIN!
    margin: 0 6px;
 }
 
-/* React Sprites are in Sprites plugin */
+/* === Reaction Sprites === */
+
+.Reactions .ReactSprite {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  *margin-right: .3em;
+  line-height: 14px;
+  vertical-align: text-top;
+  background-image: url("http://cdn.vanillaforums.com/images/sprites-14-000000.png");
+  background-position: 14px 14px;
+  background-repeat: no-repeat;
+}
+
+.Reactions .InProgress .ReactSprite {
+   background-image: none !important;
+}
+.Reactions .ReactAwesome { background-position: -263px 0; }
+.Reactions .ReactFlag { background-position: -48px -46px; }
+.Reactions .ReactInsightful { background-position: -143px 0; }
+.Reactions .ReactOffTopic { background-position: -167px 0; }
+.Reactions .ReactAbuse { background-position: 0 -46px; }
+.Reactions .ReactSpam { background-position: -119px 0; }
+.Reactions .ReactTroll { background-position: -95px 0; }
+.Reactions .ReactPromote { background-position: -44px -23px; }
+.Reactions .ReactDisagree { background-position: -22px 1px; }
+.Reactions .ReactAgree { background-position: 2px 1px; }
+.Reactions .ReactDislike { background-position: -22px -22px; }
+.Reactions .ReactLike { background-position: 2px -25px; }
+.Reactions .ReactDown { background-position: -214px -23px; }
+.Reactions .ReactUp { background-position: -189px -24px; }
+.Reactions .ReactWTF { background-position: -70px 1px; }
+.Reactions .ReactLOL { background-position: -46px 1px; }
+.Reactions .ReactQuote { background-position: -310px 0; }
+.Reactions .ReactInfraction { background-position: -94px -46px; }
+
+/* Switch to the white icons when hovering over a menuitem sprite */
+.Reactions .MenuItems a:hover .ReactSprite,
+.MenuItems a:hover .Sprite {
+   background-image: url('http://cdn.vanillaforums.com/images/sprites-14-ffffff.png');
+}
