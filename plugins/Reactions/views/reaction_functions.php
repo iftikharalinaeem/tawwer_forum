@@ -248,7 +248,6 @@ function WriteRecordReactions($Row) {
    if (empty($UserTags))
       return;
    
-   
    $RecordReactions = '';
    foreach ($UserTags as $Tag) {
       $User = Gdn::UserModel()->GetID($Tag['UserID'], DATASET_TYPE_ARRAY);

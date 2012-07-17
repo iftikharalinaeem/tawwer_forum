@@ -231,7 +231,7 @@ class ReactionModel {
       return array($Row, $Model, $Log);
    }
    
-   public function JoinUserTags(&$Data, $RecordType) {
+   public function JoinUserTags(&$Data, $RecordType = FALSE) {
       if (!$Data)
          return;
       
@@ -248,36 +248,55 @@ class ReactionModel {
 //      decho($Data);
       
       foreach ($Data2 as $Row) {
-         $ID = GetValue($PK, $Row);
+         if (!$RecordType)
+            $RT = GetValue('RecordType', $Row);
+         else
+            $RT = $RecordType;
+         
+         $ID = GetValue($RT.'ID', $Row);
+         
          if ($ID)
-            $IDs[$ID] = 1;
+            $IDs[$RT][$ID] = 1;
       }
 //      decho($IDs);
       
-      $TagsData = $this->SQL
-         ->Select('RecordID')
-         ->Select('UserID')
-         ->Select('TagID')
-         ->Select('DateInserted')
-         ->From('UserTag')
-         ->Where('RecordType', $RecordType)
-         ->WhereIn('RecordID', array_keys($IDs))
-         ->OrderBy('DateInserted')
-         ->Get()->ResultArray();
-      
-      
+      foreach ($IDs as $RT => $In) {
+         $TagsData[$RT] = $this->SQL
+            ->Select('RecordID')
+            ->Select('UserID')
+            ->Select('TagID')
+            ->Select('DateInserted')
+            ->From('UserTag')
+            ->Where('RecordType', $RT)
+            ->WhereIn('RecordID', array_keys($In))
+            ->OrderBy('DateInserted')
+            ->Get()->ResultArray();
+      }
       
       $Tags = array();
-      foreach($TagsData as $Row) {
-         $UserIDs[$Row['UserID']] = 1;
-         $Tags[$Row['RecordID']][] = $Row;
+      foreach($TagsData as $RT => $Rows) {
+         foreach ($Rows as $Row) {
+            $UserIDs[$Row['UserID']] = 1;
+            $Tags[$RT.'-'.$Row['RecordID']][] = $Row;
+         }
       }
+      
+//      decho($Tags, 'Tags');
+//      die();
       
       // Join the tags.
       foreach ($Data2 as &$Row) {
+         if ($RecordType)
+            $RT = $RecordType;
+         else
+            $RT = GetValue('RecordType', $Row);
+         if (!$RT)
+            $RT = 'RecordType';
+         $PK = $RT.'ID';
          $ID = GetValue($PK, $Row);
+         
          if ($ID)
-            $TagRow = GetValue($ID, $Tags, array());
+            $TagRow = GetValue($RT.'-'.$ID, $Tags, array());
          else
             $TagRow = array();
          
