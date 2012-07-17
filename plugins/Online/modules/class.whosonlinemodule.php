@@ -12,7 +12,7 @@
  * @package Misc
  */
 
-class WhosOnlineModule extends Gdn_Module {
+class WhosOnlineModule extends OnlineModule {
    
    
    
