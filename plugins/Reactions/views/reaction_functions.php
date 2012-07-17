@@ -102,6 +102,7 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
       $CountHtml = ' <span class="Count">'.$Count.'</span>';
       $LinkClass .= ' HasCount';
    }
+   $LinkClass = ConcatSep(' ', $LinkClass, GetValue('LinkClass', $Options));
    
    $UrlCode2 = strtolower($UrlCode);
    if ($IsHeading)
@@ -209,7 +210,7 @@ function WriteReactions($Row) {
       if (!empty($Flags)) {
          echo '<span class="FlagMenu ToggleFlyout">';
             // Write the handle.
-            echo ReactionButton($Row, 'Flag');
+            echo ReactionButton($Row, 'Flag', array('LinkClass' => 'FlyoutButton'));
             echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
             foreach ($Flags as $Flag) {
                echo '<li>'.ReactionButton($Row, $Flag['UrlCode']).'</li>';
