@@ -17,7 +17,7 @@ echo $Form->Errors();
 <ul>
    <li>
       <?php
-         echo $Form->Label('Accesss Token', 'AccessToken');
+         echo $Form->Label('Access Token', 'AccessToken');
          echo '<div class="Info2">This is the access token for api calls. It\'s like a password for the API. <b>Do not give this access token out to anyone.</b></div>';
          echo $Form->TextBox('AccessToken', array('class' => 'InputBox BigInput'));
       ?>
