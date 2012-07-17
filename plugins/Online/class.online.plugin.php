@@ -10,6 +10,7 @@
  *  1.0a    Development release
  *  1.0     Official release
  *  1.1     Add WhosOnline config import
+ *  1.2     Fixed breakage if no memcache support
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -20,7 +21,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.1',
+   'Version' => '1.2',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -585,6 +586,9 @@ class OnlinePlugin extends Gdn_Plugin {
          $CacheKeys[sprintf(self::CACHE_ONLINE_SUPPLEMENT_KEY, $UserIDs[$i])] = $UserIDs[$i];
       
       $UserSupplements = Gdn::Cache()->Get(array_keys($CacheKeys));
+      if (!$UserSupplements)
+         return;
+      
       foreach ($UserSupplements as $OnlineSupplementKey => $OnlineSupplement) {
          $UserID = $CacheKeys[$OnlineSupplementKey];
          if (array_key_exists($UserID, $Users)) {
