@@ -260,6 +260,7 @@ class ReactionModel {
       }
 //      decho($IDs);
       
+      $TagsData = array();
       foreach ($IDs as $RT => $In) {
          $TagsData[$RT] = $this->SQL
             ->Select('RecordID')
