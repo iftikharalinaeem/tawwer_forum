@@ -114,7 +114,17 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             }
          }
          
-         $Post = Gdn::Request()->Post();
+         if (strcasecmp(GetValue('contenttype', $_GET, ''), 'json') == 0 || strpos($_SERVER['CONTENT_TYPE'], 'json') !== FALSE) {
+            $Post = file_get_contents('php://input');
+            
+            if ($Post)
+               $Post = json_decode($Post, TRUE);
+            else
+               $Post = array();
+         } else {
+            $Post = Gdn::Request()->Post();         
+         }
+         
          self::TranslatePost($Post);
          
          Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_POST, $Post);

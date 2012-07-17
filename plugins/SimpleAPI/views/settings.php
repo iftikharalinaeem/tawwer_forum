@@ -1,5 +1,13 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php if (!defined('APPLICATION')) exit(); ?>
+<div class="Help Aside">
+   <?php
+   echo Wrap(T('Need More Help?'), 'h2');
+   echo '<ul>';
+   echo Wrap(Anchor("Vanilla API Documentation", 'http://vanillaforums.com/blog/developers/api/'), 'li');
+   echo '</ul>';
+   ?>
+</div>
+<?php
 echo '<h1>', $this->Data('Title'), '</h1>';
 
 $Form = $this->Form; //new Gdn_Form();
