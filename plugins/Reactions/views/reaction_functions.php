@@ -247,8 +247,8 @@ function WriteRecordReactions($Row) {
    if (empty($UserTags))
       return;
    
-   echo '<div class="RecordReactions">';
    
+   $RecordReactions = '';
    foreach ($UserTags as $Tag) {
       $User = Gdn::UserModel()->GetID($Tag['UserID'], DATASET_TYPE_ARRAY);
       if (!$User)
@@ -261,15 +261,18 @@ function WriteRecordReactions($Row) {
       $SpriteClass = GetValue('SpriteClass', $ReactionType, "React$UrlCode");
       $Title = sprintf('%s - %s on %s', $User['Name'], T($ReactionType['Name']), Gdn_Format::DateFull($Tag['DateInserted']));
       
-      echo '<span class="UserReactionWrap" title="'.htmlspecialchars($Title).'">';
+      $UserPhoto = UserPhoto($User, array('Size' => 'Small', 'Title' => $Title));
+      if ($UserPhoto == '')
+         continue;
       
-      echo UserPhoto($User, array('Size' => 'Small', 'Title' => $Title));
-      echo "<span class=\"ReactSprite $SpriteClass\"></span>";
-      
-      echo '</span>';
+      $RecordReactions .= '<span class="UserReactionWrap" title="'.htmlspecialchars($Title).'">'
+         .$UserPhoto
+         ."<span class=\"ReactSprite $SpriteClass\"></span>"
+      .'</span>';
    }
    
-   echo '</div>';
+   if ($RecordReactions != '')
+      echo '<div class="RecordReactions">'.$RecordReactions.'</div>';
 }
 
 endif;
