@@ -394,6 +394,27 @@ a.RenderedDownloadButton span {
    display: none;
 }
 
+.Reactions .Count {
+   background: #012f6e;
+   color: #fff;
+}
+
+.Reactions a:hover .Count {
+   background: #ff0084;
+}
+
+.ReactSprite {
+    background-image: url("sprites-14-blue.png");
+}
+
+.MenuItems .ReactSprite {
+    background-image: url("http://cdn.vanillaforums.com/images/sprites-14-000.png")
+}
+
+a:hover .ReactSprite {
+    background-image: url("sprites-14-pink.png");
+}
+
 /*.MeMenu .Sprite16 {
     background-image: url('me_sprites.png');
 }
