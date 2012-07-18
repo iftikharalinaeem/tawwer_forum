@@ -30,6 +30,12 @@ jQuery(document).ready(function($) {
             $(this).closest('.WarnBox').removeClass('Selected');
       });
    });
+   // Set the highlighted element on page load
+   $('.WarnBox').removeClass('Selected');
+   $('input[name="Level"]:checked').each(function() {
+      $(this).closest('.WarnBox').addClass('Selected');
+   });
+   
 });
 </script>
 <h1><?php echo $this->Data('Title'); ?></h1>

@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $ThemeInfo['harrypotterforum'] = array(
    'Name' => 'Harry Potter Forum',
    'Description' => "Harry Potter Black & Blue.",
-   'Version' => '1.0',
+   'Version' => '1.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://markosullivan.ca',
