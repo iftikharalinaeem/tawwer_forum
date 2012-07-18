@@ -672,3 +672,20 @@ div.EmoticonContainer {
 div.UserSpoiler,blockquote.UserQuote {
    background-color:#222222;
 }
+
+.ReactSprite {
+    background-image: url("http://cdn.vanillaforums.com/images/sprites-14-fff.png");
+}
+
+.MenuItems .ReactSprite {
+    background-image: url("http://cdn.vanillaforums.com/images/sprites-14-000.png");
+}
+
+.ProfilePhotoMedium {
+    width: 48px;
+    height: 48px;
+}
+
+.Meta.CommentMeta {
+    line-height: 0.5;
+}
