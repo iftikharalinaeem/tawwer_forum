@@ -192,8 +192,8 @@ function WriteReactions($Row) {
       SetValue('Attributes', $Row, $Attributes);
    }
    
-//   decho($Row, 'Row');
-   WriteRecordReactions($Row);
+   if (C('Plugins.Reactions.ShowUserReactions', TRUE))
+      WriteRecordReactions($Row);
    
    echo '<div class="Reactions">';
    
