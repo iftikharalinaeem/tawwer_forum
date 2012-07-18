@@ -288,3 +288,9 @@
 .ReactMenu .ReactButton {
    margin: 0 6px;
 }
+
+/* iPad/iPhone */
+@media only screen and (device-width: 768px),
+only screen and (max-device-width: 480px) {
+   .Item .Reactions > * { visibility: visible; }
+}
