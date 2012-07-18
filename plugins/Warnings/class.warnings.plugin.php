@@ -8,7 +8,7 @@
 $PluginInfo['Warnings'] = array(
    'Name' => 'Warnings',
    'Description' => "Allows moderators to warn users to help police the community.",
-   'Version' => '1.0.1b',
+   'Version' => '1.0.1c',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
