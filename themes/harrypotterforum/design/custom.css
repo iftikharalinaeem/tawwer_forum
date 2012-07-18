@@ -393,7 +393,6 @@ ul.MessageList div.Meta a:hover {
 div.Preview,
 ul.MessageList li.Item {
    border-bottom: 1px solid #ccc;
-   padding: 0px;
 }
 ul.MessageList li.Item div.Message a {
    text-decoration: none;
