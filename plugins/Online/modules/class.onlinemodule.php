@@ -186,7 +186,7 @@ class OnlineModule extends Gdn_Module {
                   
                   echo UserPhoto($User, array(
                      'LinkClass' => $LinkClass
-                  ))."\n";
+                  ));
                }
                
                if ($this->GuestCount && $this->ShowGuests) {

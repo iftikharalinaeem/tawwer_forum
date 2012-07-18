@@ -74,6 +74,11 @@
       </li>
    </ol>
 </div>
+<div class="Wrap">
+   <?php
+   echo Anchor(T('Advanced Settings'), '/settings/reactions');
+   ?>
+</div>
 <table id="Badges" class="AltColumns ManageBadges">
    <thead>
       <tr>

@@ -128,6 +128,9 @@ $Session = Gdn::Session();
 					?>
 				</div>
          </div>
+         <div class="PoweredByRackspace">
+            <a href="http://www.rackspace.com" title="Powered By Rackspace"><img src="http://cdn.vni.la/files/powered-by-rackspace-logo.png" /></a>
+         </div>
          <?php $this->RenderAsset('Foot'); ?>
 		</div>
 	</div>
