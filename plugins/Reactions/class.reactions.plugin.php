@@ -8,7 +8,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.1.3',
+   'Version' => '1.1.4',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -193,7 +193,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
-      
+      $ReactionModel->JoinUserTags($Data);
       $Sender->SetData('Data', $Data);
       $Sender->SetData('EditMode', FALSE, TRUE);
       $Sender->GetUserInfo($UserID, $Username);
@@ -370,6 +370,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
+      $ReactionModel->JoinUserTags($Data);
       $Sender->SetData('Data', $Data);
 
       // Set up head

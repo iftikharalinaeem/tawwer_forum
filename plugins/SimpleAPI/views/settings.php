@@ -1,5 +1,13 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php if (!defined('APPLICATION')) exit(); ?>
+<div class="Help Aside">
+   <?php
+   echo Wrap(T('Need More Help?'), 'h2');
+   echo '<ul>';
+   echo Wrap(Anchor("Vanilla API Documentation", 'http://vanillaforums.com/blog/developers/api/'), 'li');
+   echo '</ul>';
+   ?>
+</div>
+<?php
 echo '<h1>', $this->Data('Title'), '</h1>';
 
 $Form = $this->Form; //new Gdn_Form();
@@ -9,7 +17,7 @@ echo $Form->Errors();
 <ul>
    <li>
       <?php
-         echo $Form->Label('Accesss Token', 'AccessToken');
+         echo $Form->Label('Access Token', 'AccessToken');
          echo '<div class="Info2">This is the access token for api calls. It\'s like a password for the API. <b>Do not give this access token out to anyone.</b></div>';
          echo $Form->TextBox('AccessToken', array('class' => 'InputBox BigInput'));
       ?>
