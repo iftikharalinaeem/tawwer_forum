@@ -131,8 +131,8 @@ echo $this->Form->TextBox('ModeratorNote', array('Wrap' => TRUE));
 
 <?php
 echo '<div class="Buttons Buttons-Confirm">', 
-   $this->Form->Button(T('OK')), ' ',
-   $this->Form->Button(T('Cancel'), array('type' => 'button', 'class' => 'Button Close')),
+   $this->Form->Button('OK'), ' ',
+   $this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
    '</div>';
 echo $this->Form->Close();
 ?>
