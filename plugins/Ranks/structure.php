@@ -1,14 +1,16 @@
 <?php if (!defined('APPLICATION')) exit;
 
-$RankExists = Gdn::Structure()->TableExists('Rank');
+
+
+Gdn::Structure()->Table('Rank');
+$RankExists = Gdn::Structure()->TableExists();
 
 Gdn::Structure()
-         ->Table('Rank')
          ->PrimaryKey('RankID')
          ->Column('Name', 'varchar(100)')
          ->Column('Level', 'smallint')
          ->Column('Label', 'varchar(255)')
-         ->Column('Body', 'text')
+         ->Column('Body', 'text', TRUE)
          ->Column('Attributes', 'text', TRUE)
          ->Set();
       
