@@ -8,7 +8,7 @@
 $PluginInfo['Ranks'] = array(
    'Name' => 'Ranks',
    'Description' => "Adds user ranks to the application.",
-   'Version' => '1.0b',
+   'Version' => '1.1b',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -222,7 +222,7 @@ class RanksPlugin extends Gdn_Plugin {
    }
    
    public function UserModel_Visit_Handler($Sender, $Args) {
-      if (!Gdn::Session()->User)
+      if (!Gdn::Session()->IsValid())
          return;
       
       $RankModel = new RankModel();
