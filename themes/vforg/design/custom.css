@@ -462,3 +462,12 @@ a:hover .ReactSprite {
 .PhotoGrid .GuestLabel {
     font-size: 11px
 }
+
+.Rank.MItem:before {
+   content: " • ";
+   color: #C9C9C9;
+}
+
+.Rank.MItem {
+   color: #707070;
+}
