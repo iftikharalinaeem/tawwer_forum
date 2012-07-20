@@ -250,7 +250,7 @@ class RankModel extends Gdn_Model {
          self::$_Ranks = $Ranks;
       }
       
-      if ($RankID !== NULL)
+      if ($RankID !== FALSE && !is_bool($RankID))
          return GetValue($RankID, self::$_Ranks, NULL);
       else
          return self::$_Ranks;
