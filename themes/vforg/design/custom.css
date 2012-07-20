@@ -463,11 +463,15 @@ a:hover .ReactSprite {
     font-size: 11px
 }
 
-.Rank.MItem:before {
-   content: " • ";
-   color: #C9C9C9;
+.AuthorInfo {
+    color: #707070;
 }
 
-.Rank.MItem {
-   color: #707070;
+.AuthorInfo .MItem {
+    margin: 0;
+}
+
+.AuthorInfo .MItem:before {
+    content: " • ";
+    color: #C9C9C9;
 }
