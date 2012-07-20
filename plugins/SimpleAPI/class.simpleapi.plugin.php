@@ -122,6 +122,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          if (!file_exists($MapperFile)) throw new Exception('No such API Mapper');
          
          require_once($MapperFile);
+         if (!class_exists('ApiMapper')) throw new Exception('API Mapper is not available after inclusion');
+         
          $ApiMapper = new ApiMapper();
          
          // Lookup the mapped replacement for this request
