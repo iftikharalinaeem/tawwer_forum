@@ -36,12 +36,12 @@ $St->Table('PollVote')
    ->Set();
 
 // Define permissions
-//$PermissionModel = Gdn::PermissionModel();
-//$PermissionModel->Database = $Database;
-//$PermissionModel->SQL = $SQL;
+$PermissionModel = Gdn::PermissionModel();
+$PermissionModel->Database = $Database;
+$PermissionModel->SQL = $Sql;
 
 // Define some permissions for the Polls categories.
-//$PermissionModel->Define(array(
-//	'Vanilla.Polls.Add' => ''
-//));
+$PermissionModel->Define(array(
+	'Plugins.Polls.Add' => 'Garden.Profiles.Edit'
+));
    
