@@ -3,7 +3,7 @@
    <?php
    echo Wrap(T('Need More Help?'), 'h2');
    echo '<ul>';
-   echo Wrap(Anchor("Vanilla API Documentation", 'http://vanillaforums.com/blog/developers/api/'), 'li');
+   echo Wrap(Anchor("Vanilla API Documentation", 'http://vanillaforums.com/blog/api/'), 'li');
    echo '</ul>';
    ?>
 </div>

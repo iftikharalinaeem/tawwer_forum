@@ -8,7 +8,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.1.5',
+   'Version' => '1.1.6',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -129,10 +129,13 @@ class ReactionsPlugin extends Gdn_Plugin {
       }
       
       $ReactionModel = new ReactionModel();
-      $ReactionModel->JoinUserTags($Sender->Data['Discussion'], 'Discussion');
-      $ReactionModel->JoinUserTags($Sender->Data['Comments'], 'Comment');
-      if (isset($Sender->Data['Answers']))
-         $ReactionModel->JoinUserTags($Sender->Data['Answers'], 'Comment');
+      if (C('Plugins.Reactions.ShowUserReactions', TRUE)) {
+         $ReactionModel->JoinUserTags($Sender->Data['Discussion'], 'Discussion');
+         $ReactionModel->JoinUserTags($Sender->Data['Comments'], 'Comment');
+         
+         if (isset($Sender->Data['Answers']))
+            $ReactionModel->JoinUserTags($Sender->Data['Answers'], 'Comment');
+      }
       
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }
@@ -193,7 +196,8 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
-      $ReactionModel->JoinUserTags($Data);
+      if (C('Plugins.Reactions.ShowUserReactions', TRUE))
+         $ReactionModel->JoinUserTags($Data);
       $Sender->SetData('Data', $Data);
       $Sender->SetData('EditMode', FALSE, TRUE);
       $Sender->GetUserInfo($UserID, $Username);
@@ -299,6 +303,8 @@ class ReactionsPlugin extends Gdn_Plugin {
    }
    
    public function SettingsController_ReactionTypes_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      
       // Grab all of the reaction types.
       $ReactionModel = new ReactionModel();
       $ReactionTypes = ReactionModel::GetReactionTypes();
@@ -308,6 +314,19 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->Title(T('Reaction Types'));
       $Sender->AddSideMenu();
       $Sender->Render('ReactionTypes', '', 'plugins/Reactions');
+   }
+   
+   public function SettingsController_Reactions_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      
+      $Conf = new ConfigurationModule($Sender);
+      $Conf->Initialize(array(
+          'Plugins.Reactions.ShowUserReactions' => array('LabelCode' => 'Show who reacted below posts.', 'Control' => 'CheckBox', 'Default' => 1),
+      ));
+      
+      $Sender->Title(sprintf(T('%s Settings'), 'Reaction'));
+      $Sender->AddSideMenu();
+      $Conf->RenderAll();
    }
    
    /** 
@@ -370,7 +389,8 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
-      $ReactionModel->JoinUserTags($Data);
+      if (C('Plugins.Reactions.ShowUserReactions', TRUE))
+         $ReactionModel->JoinUserTags($Data);
       $Sender->SetData('Data', $Data);
 
       // Set up head
