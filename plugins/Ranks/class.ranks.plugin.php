@@ -8,7 +8,7 @@
 $PluginInfo['Ranks'] = array(
    'Name' => 'Ranks',
    'Description' => "Adds user ranks to the application.",
-   'Version' => '1.0a',
+   'Version' => '1.0b',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
