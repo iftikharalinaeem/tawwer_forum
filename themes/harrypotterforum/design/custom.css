@@ -379,6 +379,7 @@ div.Preview,
 ul.MessageList div.Message {
    clear: none;
    padding: 10px;
+   color: #cfe8ff;
 }
 ul.MessageList div.Meta {
    padding: 10px;
@@ -692,4 +693,21 @@ div.UserSpoiler,blockquote.UserQuote {
 
 .Pager .Highlight {
    color: red;
+}
+
+.AuthorInfo {
+    color: red;
+}
+
+.AuthorInfo .MItem {
+    margin: 0;
+}
+
+.AuthorInfo .MItem:before {
+    content: " • ";
+    color: #c5e3ff;
+}
+
+.ItemDiscussion .Meta, .DataList .Meta {
+   color: #b5c7d7;
 }
