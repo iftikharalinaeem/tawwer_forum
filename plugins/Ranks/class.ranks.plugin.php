@@ -222,7 +222,7 @@ class RanksPlugin extends Gdn_Plugin {
    }
    
    public function UserModel_Visit_Handler($Sender, $Args) {
-      if (!Gdn::Session()->User)
+      if (!Gdn::Session()->IsValid())
          return;
       
       $RankModel = new RankModel();

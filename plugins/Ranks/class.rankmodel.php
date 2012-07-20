@@ -19,6 +19,7 @@ class RankModel extends Gdn_Model {
       $Result = array('CurrentRank' => $CurrentRankID ? self::Ranks($CurrentRankID) : NULL);
       
       $Ranks = self::Ranks();
+      
       // Check the ranks backwards so we know which rank to apply.
       $Ranks = array_reverse($Ranks);
 //      decho($Ranks);
@@ -250,7 +251,7 @@ class RankModel extends Gdn_Model {
          self::$_Ranks = $Ranks;
       }
       
-      if ($RankID !== FALSE && !is_bool($RankID))
+      if (!is_null($RankID) && !is_bool($RankID))
          return GetValue($RankID, self::$_Ranks, NULL);
       else
          return self::$_Ranks;
