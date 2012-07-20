@@ -159,9 +159,6 @@ div.MessageForm {
 div.MessageForm div.Buttons {
 	text-align: right;
 }
-div.CommentForm textarea {
-	width:99%;
-}
 #DiscussionForm textarea,
 #DiscussionForm input.InputBox {
 	width:99.5%;
@@ -499,9 +496,6 @@ body.Entry form ul li label,
 }
 #DiscussionForm ul.PostOptions label {
    color:#ddd;
-}
-div.CommentForm textarea {
-	width: 99%;
 }
 /* Conversations */
 ul.Condensed li, li.Condensed {
