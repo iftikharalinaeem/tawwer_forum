@@ -167,8 +167,8 @@ div.CommentForm textarea {
 	width:99.5%;
 }
 ul.DataList li.Item {
-   background: none;
-   margin-bottom: 15px;
+   background: #091119;
+   border-bottom: 1px solid #102437;
 }
 ul.Activities ul.DataList li {
    background-color: #222222;
@@ -393,6 +393,7 @@ ul.MessageList div.Meta a:hover {
 div.Preview,
 ul.MessageList li.Item {
    background: #091119;
+   margin-bottom: 15px;
 }
 ul.MessageList li.Item div.Message a {
    text-decoration: none;
