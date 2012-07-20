@@ -234,14 +234,14 @@ a {
     text-align: center;
     line-height: 1;
     height: 35px;
+    border-radius: 0;
 }
 
 .DataList.Discussions .MCount .Number, .DataList.Discussions .HasNew .Number {
     font-size: 20px;
     display: block;
     line-height: 1;
-    margin-bottom: 3px
-;
+    margin-bottom: 3px;
 }
 
 .DataList.Discussions .ViewCount {
@@ -439,3 +439,22 @@ a:hover .ReactSprite {
     background-position: -2px -102px;
 }*/
 
+.PhotoGrid .GuestCountBox {
+    display: inline-block;
+}
+
+.PhotoGrid .GuestCountBox * {
+    line-height: 32px;
+}
+
+.PhotoGridSmall .GuestCountBox * {
+    line-height: 24px;
+}
+
+.PhotoGrid .GuestCount {
+    font-size: 16px;
+}
+
+.PhotoGrid .GuestLabel {
+    font-size: 11px
+}
