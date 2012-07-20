@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $ThemeInfo['harrypotterforum'] = array(
    'Name' => 'Harry Potter Forum',
    'Description' => "Harry Potter Black & Blue.",
-   'Version' => '1.4',
+   'Version' => '1.5',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',

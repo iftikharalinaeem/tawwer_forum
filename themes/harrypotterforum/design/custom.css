@@ -1,6 +1,7 @@
 /* Body & Header */
 body {
-   background: url('harryface2.png') 40px -40px no-repeat #000;
+/*   background: url('harryface2.png') 40px -40px no-repeat #000;*/
+   background: url('robertface.png') 30px -73px no-repeat #000;
 	color: #888;
 }
 .Message {
