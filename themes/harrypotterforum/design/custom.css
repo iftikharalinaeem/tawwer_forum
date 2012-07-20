@@ -168,7 +168,7 @@ div.CommentForm textarea {
 }
 ul.DataList li.Item {
    background: none;
-   border-bottom: 1px solid #344254;
+   margin-bottom: 15px;
 }
 ul.Activities ul.DataList li {
    background-color: #222222;
@@ -382,7 +382,7 @@ ul.MessageList div.Message {
 }
 ul.MessageList div.Meta {
    padding: 10px;
-   background-color: #222222;
+   background-color: #112333;
 }
 ul.MessageList div.Meta a {
 	text-decoration: none;
@@ -392,8 +392,7 @@ ul.MessageList div.Meta a:hover {
 }
 div.Preview,
 ul.MessageList li.Item {
-   border-bottom: 1px solid #ccc;
-   padding: 0px;
+   background: #091119;
 }
 ul.MessageList li.Item div.Message a {
    text-decoration: none;
@@ -688,4 +687,8 @@ div.UserSpoiler,blockquote.UserQuote {
 
 .Meta.CommentMeta {
     line-height: 0.5;
+}
+
+.Pager .Highlight {
+   color: red;
 }
