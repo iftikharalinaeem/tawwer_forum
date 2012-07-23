@@ -13,7 +13,7 @@
 $PluginInfo['SimpleAPI'] = array(
    'Name' => 'Simple API',
    'Description' => "Provides simple access_token API access to the forum.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -160,15 +160,16 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       
       // This can be an API request if we are only requesting data and the correct access_token is given.
       if ($Controller->DeliveryType() == DELIVERY_TYPE_DATA) {
-         $OnlyHttps = C('Plugins.SimpleAPI.OnlyHttps');
-         if ($OnlyHttps && strcasecmp(Gdn::Request()->Scheme(), 'https') != 0) {
-            throw new Exception(T('You must access the API through https.'), 401);
-         }
-         
          $AccessToken = GetValue('access_token', $_GET, NULL);
          
          if ($AccessToken !== NULL) {
             if ($AccessToken === C('Plugins.SimpleAPI.AccessToken')) {
+               // Check for only-https here because we don't want to check for https on json calls from javascript.
+               $OnlyHttps = C('Plugins.SimpleAPI.OnlyHttps');
+               if ($OnlyHttps && strcasecmp(Gdn::Request()->Scheme(), 'https') != 0) {
+                  throw new Exception(T('You must access the API through https.'), 401);
+               }
+               
                Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE, FALSE);
             } else {
                if (!Gdn::Session()->IsValid())
