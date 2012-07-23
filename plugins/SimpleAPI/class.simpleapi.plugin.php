@@ -168,14 +168,15 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          $AccessToken = GetValue('access_token', $_GET, NULL);
          
          if ($AccessToken !== NULL) {
-            if ($AccessToken == C('Plugins.SimpleAPI.AccessToken')) {
+            if ($AccessToken === C('Plugins.SimpleAPI.AccessToken')) {
                Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE, FALSE);
             } else {
-               throw new Exception(T('Invald Access Token'), 401);
+               if (!Gdn::Session()->IsValid())
+                  throw new Exception(T('Invald Access Token'), 401);
             }
          }
          
-         if (strcasecmp(GetValue('contenttype', $_GET, ''), 'json') == 0 || strpos($_SERVER['CONTENT_TYPE'], 'json') !== FALSE) {
+         if (strcasecmp(GetValue('contenttype', $_GET, ''), 'json') == 0 || strpos(GetValue('CONTENT_TYPE', $_SERVER, NULL), 'json') !== FALSE) {
             $Post = file_get_contents('php://input');
             
             if ($Post)
