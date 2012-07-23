@@ -10,9 +10,51 @@
 .Row {
     margin: 0 auto;
     width: 80%;
-    min-width: 860px;
     max-width: 1200px;
-    
+    min-width: 940px;
+}
+
+@media (max-width: 1100px) {
+   #Panel {
+      width: 220px;
+   }
+   
+   #Body .ContentColumn {
+      margin-left: 240px;
+   }
+}
+
+@media only screen 
+   and (min-device-width : 768px) 
+   and (max-device-width : 1024px) 
+   and (orientation : portrait),
+   (max-width: 960px) {
+      
+   #Panel {
+      display: none;
+   }
+
+   #Body .ContentColumn {
+      margin: 0;
+   }
+
+   .Row {
+      width: inherit;
+      margin: 0 20px;
+      min-width: inherit;
+   }
+   
+   #Head .MeWrap {
+      right: 40px !Important;
+   }
+   
+   #Content .BoxNewDiscussion {
+      display: inline-block;
+   }
+
+   #Content .BoxNewDiscussion .MenuItems {
+      min-width: 175px;
+   }
 }
 
 /** Header **/
