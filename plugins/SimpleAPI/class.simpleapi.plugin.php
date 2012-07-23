@@ -1,5 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
+
 /**
+ * Simple Vanilla API 
+ * 
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary
  */
@@ -8,7 +13,7 @@
 $PluginInfo['SimpleAPI'] = array(
    'Name' => 'Simple API',
    'Description' => "Provides simple access_token API access to the forum.",
-   'Version' => '1.0b',
+   'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -78,20 +83,76 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       ));
    }
    
-   
-   
    /// Event Handlers ///
    
    /**
-    * Adds "Media" menu option to the Forum menu on the dashboard.
+    * API Translation hook
+    * 
+    * This method fires before the dispatcher inspects the request. It allows us
+    * to translate incoming API requests according their version specifier.
+    * 
+    * If no version is specified, or if the specified version cannot be loaded,
+    * strip the version and directly pass the resulting URI without modification.
+    * 
+    * @param Gdn_Dispatcher $Sender 
     */
-   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+   public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
+      
+      $IncomingRequest = Gdn::Request()->RequestURI();
+      
+      // Detect a versioned API call
+      
+      $MatchedAPI = preg_match('`^api/(v[\d\.]+)/(.+)`i', $IncomingRequest, $URI);
+      
+      if (!$MatchedAPI)
+         return;
+      
+      $APIVersion = $URI[1];
+      $APIRequest = $URI[2];
+      
+      // Check the version slug
+      
+      try {
+         
+         $ClassFile = "class.api.{$APIVersion}.php";
+         $PluginInfo = Gdn::PluginManager()->GetPluginInfo('SimpleAPI');
+         $PluginPath = $PluginInfo['PluginRoot'];
+         $MapperFile = CombinePaths(array($PluginPath, 'library', $ClassFile));
+         
+         if (!file_exists($MapperFile)) throw new Exception('No such API Mapper');
+         
+         require_once($MapperFile);
+         if (!class_exists('ApiMapper')) throw new Exception('API Mapper is not available after inclusion');
+         
+         $ApiMapper = new ApiMapper();
+         
+         // Lookup the mapped replacement for this request
+         $MappedURI = $ApiMapper->Map($APIRequest);
+         if (!$MappedURI) throw new Exception('Unable to map request');
+         
+         // Apply the mapped replacement
+         Gdn::Request()->WithURI($MappedURI);
+         
+      } catch (Exception $Ex) {
+         
+         Gdn::Request()->WithURI($APIRequest);
+         
+      }
+   }
+   
+   /**
+    * Adds "Media" menu option to the Forum menu on the dashboard.
+    * 
+    * @param Gdn_Controller $Sender 
+    */
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Site Settings', T('API'), 'settings/api', 'Garden.Settings.Manage');
    }
    
    /**
-    *
+    * 
+    * 
     * @param Gdn_Dispatcher $Sender 
     */
    public function Gdn_Dispatcher_BeforeControllerMethod_Handler($Sender, $Args) {
@@ -107,14 +168,15 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          $AccessToken = GetValue('access_token', $_GET, NULL);
          
          if ($AccessToken !== NULL) {
-            if ($AccessToken == C('Plugins.SimpleAPI.AccessToken')) {
+            if ($AccessToken === C('Plugins.SimpleAPI.AccessToken')) {
                Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE, FALSE);
             } else {
-               throw new Exception(T('Invald Access Token'), 401);
+               if (!Gdn::Session()->IsValid())
+                  throw new Exception(T('Invald Access Token'), 401);
             }
          }
          
-         if (strcasecmp(GetValue('contenttype', $_GET, ''), 'json') == 0 || strpos($_SERVER['CONTENT_TYPE'], 'json') !== FALSE) {
+         if (strcasecmp(GetValue('contenttype', $_GET, ''), 'json') == 0 || strpos(GetValue('CONTENT_TYPE', $_SERVER, NULL), 'json') !== FALSE) {
             $Post = file_get_contents('php://input');
             
             if ($Post)

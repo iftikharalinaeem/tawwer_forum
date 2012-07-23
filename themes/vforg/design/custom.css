@@ -487,3 +487,88 @@ a:hover .ReactSprite {
 .PhotoGridSmall {
    margin: 0px;
 }
+
+.CommentsWrap .Item.Rank-Vanilla {
+   padding: 15px;
+   margin: -1px -7px -1px -7px;
+   padding-bottom: 8px;
+   background: #ECF8FF;
+   border-bottom-color: #CAE8FF;
+   border-top: 1px solid #CAE8FF;
+}
+
+.CommentsWrap .Item.Rank-Vanilla .Message {
+   position: relative;
+}
+
+.CommentsWrap .Item .Rank.Rank-Vanilla {
+   background: transparent url('images/vanilla-rank-logo.png') no-repeat 0px 14px;
+   height: 82px;
+   width: 220px;
+   color: transparent;
+   overflow: hidden;
+   line-height: 1000px;
+   
+   display: block;
+   position: absolute;
+   bottom: 0px;
+   right: 0px;
+   
+   -webkit-transition: all .3s ease-in-out;
+   -moz-transition: all .3s ease-in-out;
+   -o-transition: all .3s ease-in-out;
+   -ms-transition: all .3s ease-in-out;
+   transition: all .3s ease-in-out;
+}
+
+.CommentsWrap .Item:hover .Rank.Rank-Vanilla {
+   background-position: 0px 30px;
+}
+
+.CommentsWrap .Item .Rank.Rank-Vanilla:before {
+   content: "";
+}
+
+.CommentsWrap .Item.Rank-Vanilla::after {
+   background: transparent url('images/vanilla-rank-logo-shadow.png') no-repeat 0px 1px;
+   height: 6px;
+   width: 227px;
+   content: " ";
+   display: block;
+   position: absolute;
+   bottom: 0px;
+   right: 0px;
+}
+
+/*.Item.Rank-Vanilla .AuthorInfo::before {
+   background: transparent url('images/vanilla-rank-logo.png') no-repeat 0px 14px;
+   height: 82px;
+   width: 220px;
+   content: " ";
+   display: block;
+   position: absolute;
+   bottom: 0px;
+   right: 0px;
+   
+   -webkit-transition: all .3s ease-in-out;
+   -moz-transition: all .3s ease-in-out;
+   -o-transition: all .3s ease-in-out;
+   -ms-transition: all .3s ease-in-out;
+   transition: all .3s ease-in-out;
+}
+
+.Item.Rank-Vanilla:hover .AuthorInfo::before {
+   background-position: 0px 30px;
+
+}
+
+.Item.Rank-Vanilla::after {
+   background: transparent url('images/vanilla-rank-logo-shadow.png') no-repeat 0px 1px;
+   height: 6px;
+   width: 227px;
+   content: " ";
+   display: block;
+   position: absolute;
+   bottom: 0px;
+   right: 0px;
+}*/

@@ -1,6 +1,7 @@
 /* Body & Header */
 body {
    background: url('harryface2.png') 40px -40px no-repeat #000;
+/*   background: url('robertface.png') 30px -73px no-repeat #000;*/
 	color: #888;
 }
 .Message {
@@ -159,16 +160,13 @@ div.MessageForm {
 div.MessageForm div.Buttons {
 	text-align: right;
 }
-div.CommentForm textarea {
-	width:99%;
-}
 #DiscussionForm textarea,
 #DiscussionForm input.InputBox {
 	width:99.5%;
 }
 ul.DataList li.Item {
-   background: none;
-   margin-bottom: 15px;
+   background: #091119;
+   border-bottom: 1px solid #102437;
 }
 ul.Activities ul.DataList li {
    background-color: #222222;
@@ -379,6 +377,7 @@ div.Preview,
 ul.MessageList div.Message {
    clear: none;
    padding: 10px;
+   color: #cfe8ff;
 }
 ul.MessageList div.Meta {
    padding: 10px;
@@ -393,6 +392,7 @@ ul.MessageList div.Meta a:hover {
 div.Preview,
 ul.MessageList li.Item {
    background: #091119;
+   margin-bottom: 15px;
 }
 ul.MessageList li.Item div.Message a {
    text-decoration: none;
@@ -497,9 +497,6 @@ body.Entry form ul li label,
 }
 #DiscussionForm ul.PostOptions label {
    color:#ddd;
-}
-div.CommentForm textarea {
-	width: 99%;
 }
 /* Conversations */
 ul.Condensed li, li.Condensed {
@@ -691,4 +688,21 @@ div.UserSpoiler,blockquote.UserQuote {
 
 .Pager .Highlight {
    color: red;
+}
+
+.AuthorInfo {
+    color: red;
+}
+
+.AuthorInfo .MItem {
+    margin: 0;
+}
+
+.AuthorInfo .MItem:before {
+    content: " • ";
+    color: #c5e3ff;
+}
+
+.ItemDiscussion .Meta, .DataList .Meta {
+   color: #b5c7d7;
 }
