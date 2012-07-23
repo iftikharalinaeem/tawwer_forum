@@ -225,7 +225,7 @@ class WhispersPlugin extends Gdn_Plugin {
          return;
 
       if ($CountWhispers = GetValue('CountWhispers', $Discussion)) {
-         $Str = ' <span class="MItem MCount WhisperCount">'.Plural($CountWhispers, '%s whisper', '%s whispers').'</span> ';
+         $Str = ' <span class="MItem WhisperCount">'.Plural($CountWhispers, '%s whisper', '%s whispers').'</span> ';
 
          if (GetValue('NewWhispers', $Discussion)) {
             $Str .= ' <strong class="HasNew HasNew-Whispers">'.T('new').'</strong> ';
