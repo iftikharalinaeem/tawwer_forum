@@ -540,6 +540,12 @@ a:hover .ReactSprite {
    right: 0px;
 }
 
+select {
+   border: 1px solid #999;
+   border: 1px solid rgba(0, 0, 0, 0.4);
+   height: 28px;
+}
+
 /*.Item.Rank-Vanilla .AuthorInfo::before {
    background: transparent url('images/vanilla-rank-logo.png') no-repeat 0px 14px;
    height: 82px;
