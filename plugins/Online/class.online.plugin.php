@@ -11,6 +11,7 @@
  *  1.0     Official release
  *  1.1     Add WhosOnline config import
  *  1.2     Fixed breakage if no memcache support
+ *  1.3     Exposes GetUser() for external querying
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -21,7 +22,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.2',
+   'Version' => '1.3',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -316,7 +317,7 @@ class OnlinePlugin extends Gdn_Plugin {
       if ($WithSupplement) {
          // Figure out where the user is
          $Location = OnlinePlugin::WhereAmI();
-
+         
          // Get the extra data we pushed into the tick with our events
          $TickExtra = @json_decode(Gdn::Request()->GetValue('TickExtra'), TRUE);
          if (!is_array($TickExtra)) $TickExtra = array();
@@ -372,7 +373,10 @@ class OnlinePlugin extends Gdn_Plugin {
          return;
       
       // Write to Online table
-      $Timestamp = Gdn_Format::ToDateTime();
+      $UTC = new DateTimeZone('UTC');
+      $CurrentDate = new DateTime('now', $UTC);
+      
+      $Timestamp = $CurrentDate->format('Y-m-d H:i:s');
       $Px = Gdn::SQL()->Database->DatabasePrefix;
       $Sql = "INSERT INTO {$Px}Online (UserID, Timestamp) VALUES (:UserID, :Timestamp) ON DUPLICATE KEY UPDATE Timestamp = :Timestamp1";
       Gdn::SQL()->Database->Query($Sql, array(':UserID' => $UserID, ':Timestamp' => $Timestamp, ':Timestamp1' => $Timestamp));
@@ -381,6 +385,18 @@ class OnlinePlugin extends Gdn_Plugin {
       $this->Cleanup();
    }
    
+   /* 
+    * CONVENIENCE
+    * Helper methods to facilitate tracking
+    */
+   
+   /**
+    * Determine where the current user is on the site
+    * 
+    * @param type $ResolvedPath
+    * @param type $ResolvedArgs
+    * @return string 
+    */
    public static function WhereAmI($ResolvedPath = NULL, $ResolvedArgs = NULL) {
       $Location = 'limbo';
       $WildLocations = array(
@@ -395,6 +411,7 @@ class OnlinePlugin extends Gdn_Plugin {
       if (is_null($ResolvedArgs))
          $ResolvedArgs = json_decode(Gdn::Request()->GetValue('ResolvedArgs'), TRUE);
       
+      if (!$ResolvedPath) return $Location;
       $Location = GetValue($ResolvedPath, $WildLocations, 'limbo');
 
       // Check if we're on the categories list, or inside one, and adjust location
@@ -574,6 +591,16 @@ class OnlinePlugin extends Gdn_Plugin {
    }
    
    /**
+    * Get online information for a user
+    * 
+    * @param string $UserID
+    */
+   public function GetUser($UserID) {
+      if (!array_key_exists($UserID, $this->GetAllOnlineUsers())) return FALSE;
+      return GetValue($UserID, $this->GetAllOnlineUsers());
+   }
+   
+   /**
     * Join in the supplement cache entries
     * 
     * @param array $Users Users list, by reference
@@ -599,11 +626,23 @@ class OnlinePlugin extends Gdn_Plugin {
       }
    }
    
+   /**
+    * Getter for prune delay
+    * 
+    * @return integer
+    */
+   public function GetPruneDelay() {
+      return $this->PruneDelay;
+   }
+   
    /*
     * DATA HOOKS
     * 
     * We hook into the CategoriesController and DiscussionController in order to
     * provide Tick with some extra data.
+    * 
+    * We hook into the UserModel to add 'Online', 'LastOnlineDate' and 'Private'
+    * to user objects.
     */
    
    public function CategoriesController_BeforeCategoriesRender_Handler($Sender) {
@@ -613,6 +652,75 @@ class OnlinePlugin extends Gdn_Plugin {
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
       Gdn::Statistics()->AddExtra('CategoryID', $Sender->Data('Discussion.CategoryID'));
       Gdn::Statistics()->AddExtra('DiscussionID', $Sender->Data('Discussion.DiscussionID'));
+   }
+   
+   /**
+    * Attach users' online state to user objects
+    * 
+    * @param UserModel $Sender
+    */
+   public function UserModel_AfterGetID_Handler($Sender) {
+      $User = &$Sender->EventArguments['LoadedUser'];
+      $this->AdjustUser($User);
+   }
+   
+   /**
+    * Attach users' online state to user objects
+    * 
+    * @param UserModel $Sender
+    */
+   public function UserModel_AfterGetIDs_Handler($Sender) {
+      $LoadedUsers = &$Sender->EventArguments['LoadedUsers'];
+      
+      // Adjust user info
+      foreach ($LoadedUsers as $LoadedUserID => &$LoadedUser)
+         $this->AdjustUser($LoadedUser);
+   }
+   
+   public function AdjustUser(&$User) {
+      $UserID = GetValue('UserID', $User, NULL);
+      if (!$UserID) FALSE;
+      
+      // Already handled this one guv'na
+      if (array_key_exists('Online', $User)) return;
+      
+      $UTC = new DateTimeZone('UTC');
+      $CurrentDate = new DateTime('now', $UTC);
+      
+      $UserInfo = $this->GetUser($UserID);
+      $UserIsOnline = FALSE;
+
+      $UserLastOnline = GetValue('Timestamp', $UserInfo, NULL);
+      if (Gdn::Session()->IsValid() && $UserID == Gdn::Session()->UserID)
+         $UserLastOnline = $CurrentDate->format('Y-m-d H:i:s');
+
+      if (!is_null($UserLastOnline)) {
+         
+         $EarliestOnlineDate = new DateTime('now', $UTC);
+         $EarliestOnlineDate->sub(new DateInterval("PT{$this->PruneDelay}S"));
+         $EarliestOnlineTime = $EarliestOnlineDate->getTimestamp();
+         $EarliestOnline = $EarliestOnlineDate->format('Y-m-d H:i:s');
+         
+         $UserLastOnlineDate = DateTime::createFromFormat('Y-m-d H:i:s', $UserLastOnline, $UTC);
+         $UserLastOnlineTime = $UserLastOnlineDate->getTimestamp();
+         $UserLastOnline = $UserLastOnlineDate->format('Y-m-d H:i:s');
+         
+         $UserIsOnline = $UserLastOnlineTime >= $EarliestOnlineTime;
+      }
+
+      SetValue('Online', $User, $UserIsOnline);
+      SetValue('LastOnlineDate', $User, $UserLastOnline);
+      
+      $UserIsPrivate = $this->PrivateMode($User);
+      SetValue('Private', $User, $UserIsPrivate);
+      
+      $UserClasses = GetValue('_CssClass', $User);
+      if ($UserIsOnline && !$UserIsPrivate)
+         $UserClasses .= " Online";
+      else
+         $UserClasses .= " Offline";
+      
+      SetValue('_CssClass', $User, $UserClasses);
    }
    
    /*
