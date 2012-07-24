@@ -10,9 +10,51 @@
 .Row {
     margin: 0 auto;
     width: 80%;
-    min-width: 860px;
     max-width: 1200px;
-    
+    min-width: 940px;
+}
+
+@media (max-width: 1100px) {
+   #Panel {
+      width: 220px;
+   }
+   
+   #Body .ContentColumn {
+      margin-left: 240px;
+   }
+}
+
+@media only screen 
+   and (min-device-width : 768px) 
+   and (max-device-width : 1024px) 
+   and (orientation : portrait),
+   (max-width: 960px) {
+      
+   #Panel {
+      display: none;
+   }
+
+   #Body .ContentColumn {
+      margin: 0;
+   }
+
+   .Row {
+      width: inherit;
+      margin: 0 20px;
+      min-width: inherit;
+   }
+   
+   #Head .MeWrap {
+      right: 40px !Important;
+   }
+   
+   #Content .BoxNewDiscussion {
+      display: inline-block;
+   }
+
+   #Content .BoxNewDiscussion .MenuItems {
+      min-width: 175px;
+   }
 }
 
 /** Header **/
@@ -226,7 +268,7 @@ a {
 
 /** View Counts **/
 
-.DataList.Discussions .MCount, .DataList.Discussions .HasNew {
+.DataList.Discussions .MCount, .DataList.Discussions .CommentCount + .HasNew {
     position: absolute;
     background: #31b5f4;
     border-bottom: solid 2px #1192cf;
@@ -241,7 +283,7 @@ a {
     border-radius: 0;
 }
 
-.DataList.Discussions .MCount .Number, .DataList.Discussions .HasNew .Number {
+.DataList.Discussions .MCount .Number, .DataList.Discussions .CommentCount + .HasNew .Number {
     font-size: 20px;
     display: block;
     line-height: 1;
@@ -252,7 +294,7 @@ a {
     right: -85px;
 }
 
-.DataList.Discussions .CommentCount, .DataList.Discussions .HasNew {
+.DataList.Discussions .CommentCount, .DataList.Discussions .CommentCount + .HasNew {
     right: -167px;
 }
 
@@ -260,11 +302,15 @@ a {
     margin-right: 167px;
 }
 
-.DataList.Discussions .HasNew {
+.DataList.Discussions .CommentCount + .HasNew {
     font-weight: normal;
     background: #e78874;
     border-bottom-color: #d56e59;
     font-size: 11px;
+}
+
+.DataBox + .CommentsWrap {
+   margin-top: 15px;
 }
 
 .Item.Read {
@@ -476,6 +522,14 @@ a:hover .ReactSprite {
     color: #C9C9C9;
 }
 
+.PhotoGridSmall {
+   margin: 1px 0 0 3px;
+}
+
+.PhotoGridSmall {
+   margin: 0px;
+}
+
 .CommentsWrap .Item.Rank-Vanilla {
    padding: 15px;
    margin: -1px -7px -1px -7px;
@@ -526,6 +580,12 @@ a:hover .ReactSprite {
    position: absolute;
    bottom: 0px;
    right: 0px;
+}
+
+select {
+   border: 1px solid #999;
+   border: 1px solid rgba(0, 0, 0, 0.4);
+   height: 28px;
 }
 
 /*.Item.Rank-Vanilla .AuthorInfo::before {
