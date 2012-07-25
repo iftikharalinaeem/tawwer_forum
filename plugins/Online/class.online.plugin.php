@@ -714,7 +714,7 @@ class OnlinePlugin extends Gdn_Plugin {
       $UserIsPrivate = $this->PrivateMode($User);
       SetValue('Private', $User, $UserIsPrivate);
       
-      $UserClasses = GetValue('_CssClass', $User);
+      $UserClasses = trim(GetValue('_CssClass', $User));
       if ($UserIsOnline && !$UserIsPrivate)
          $UserClasses .= " Online";
       else
@@ -871,7 +871,7 @@ class OnlinePlugin extends Gdn_Plugin {
          $CurrentValue = C($Field, $DefaultValue);
          $Sender->Form->SetValue($Field, $CurrentValue);
          
-         if ($Sender->Form->IsMyPostBack()) {
+         if ($Sender->Form->IsPostBack()) {
             $NewValue = $Sender->Form->GetValue($Field);
             if ($NewValue != $CurrentValue) {
                SaveToConfig ($Field, $NewValue);
