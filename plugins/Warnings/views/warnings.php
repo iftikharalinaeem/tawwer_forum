@@ -1,13 +1,9 @@
 <?php if (!defined('APPLICATION')) return; ?>
 <h2 class="H"><?php echo T('Warnings'); ?></h2>
-
+<ul class="DataList Activities">
 <?php 
 if (count($this->Data('Warnings')) > 0 ): 
    $Moderator = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
-   
-?>
-<ul class="DataList Activities">
-   <?php
    $Now = time();
    $ExpiredFound = FALSE;
    
@@ -95,7 +91,8 @@ if (count($this->Data('Warnings')) > 0 ):
    </li>
    <?php 
    endforeach; 
+else:
+   echo '<li><div class="Empty">'.T('Not much happening here, yet.').'</div></li>';
+endif;
    ?>
 </ul>
-<?php
-endif;
