@@ -8,11 +8,12 @@
 $PluginInfo['Polls'] = array(
    'Name' => 'Polls',
    'Description' => "Allow users to create and vote on polls.",
-   'Version' => '1.0.2',
+   'Version' => '1.0.3',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'RegisterPermissions' => array('Plugins.Polls.Add' => 'Garden.Profiles.Edit')
 );
 
 class PollsPlugin extends Gdn_Plugin {
@@ -29,7 +30,8 @@ class PollsPlugin extends Gdn_Plugin {
     */
    public function Base_BeforeNewDiscussionButton_Handler($Sender) {
       $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
-      $NewDiscussionModule->AddButton(T('New Poll'), 'post/poll');
+      if (Gdn::Session()->CheckPermission('Plugins.Polls.Add'))
+         $NewDiscussionModule->AddButton(T('New Poll'), 'post/poll');
    }
    
    /** 
@@ -159,6 +161,7 @@ class PollsPlugin extends Gdn_Plugin {
 
       // Check permission 
       $Sender->Permission('Vanilla.Discussions.Add');
+      $Sender->Permission('Plugins.Polls.Add');
       
       // Set the model on the form
       $Sender->Form->SetModel($PollModel);
