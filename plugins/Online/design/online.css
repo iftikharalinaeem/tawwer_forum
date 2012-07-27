@@ -1,0 +1,44 @@
+.OnlineUserWrap {
+   display: inline-block;
+   position: relative;
+}
+
+.OnlineUserWrap .OnlineUserName {
+   display: inline;
+   visibility: hidden;
+   
+   position: absolute;
+   top: -20px;
+   left: 2px;
+   background: white;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   
+   border: 1px solid #909090;
+   padding: 5px;
+   z-index: 10;
+   white-space: nowrap;
+}
+
+.OnlineUserWrap .OnlineUserName:after {
+   content: "";
+   border: 5px solid white;
+   border-color: white transparent transparent transparent;
+   
+   position: absolute;
+   bottom: -10px;
+   left: 7px;
+}
+
+.OnlineUserWrap:hover .OnlineUserName {
+   visibility: visible;
+}
+
+.WhosOnline .Invisible {
+   opacity: 0.6;
+}
+
+.WhosOnline .Invisible:hover {
+   opacity: 1;
+}

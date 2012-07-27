@@ -164,15 +164,26 @@ class OnlineModule extends Gdn_Module {
       }
       
 		?>
-      <div id="WhosOnline" class="Box">
+      <div id="WhosOnline" class="WhosOnline Box">
          <h4><?php echo $Title; ?> <span class="Count"><?php echo Gdn_Format::BigNumber($TrackCount, 'html') ?></span></h4>
          <?php
+         
+         $SetUser = NULL;
+         foreach ($this->OnlineUsers as $User) {
+            $SetUser = $User;
+            break;
+         }
+         
+         $SetUser['Name'] = 'Lewie Stepdad';
+         $this->OnlineUsers = array_fill(0, 200, $SetUser);
+         $this->OnlineCount = sizeof($this->OnlineUsers);
+         
          if ($this->Count > 0) {
             if ($this->Style == 'pictures') {
                $ListClass = 'PhotoGrid';
                if (count($this->OnlineUsers) > 10)
                   $ListClass .= ' PhotoGridSmall';
-
+               
                echo '<div class="'.$ListClass.'">'."\n";
                foreach ($this->OnlineUsers as $User) {
                   $LinkClass = ((!$User['Visible']) ? 'Invisible' : '');
@@ -184,9 +195,18 @@ class OnlineModule extends Gdn_Module {
                      if (GetValue($this->ContextField, $User, NULL) == $this->ContextID)
                         $LinkClass .= ' InContext';
                   
+                  $FullUser = Gdn::UserModel()->GetID(GetValue('UserID', $User), DATASET_TYPE_ARRAY);
+                  $WrapClass = "OnlineUserWrap";
+                  $UserCssClass = GetValue('_CssClass', $FullUser);
+                  if ($UserCssClass)
+                     $WrapClass .= " {$UserCssClass}";
+                     
+                  echo "<div class=\"{$WrapClass}\">";
                   echo UserPhoto($User, array(
                      'LinkClass' => $LinkClass
                   ));
+                  echo Wrap(UserAnchor($User), 'div', array('class' => 'OnlineUserName'));
+                  echo '</div>';
                }
                
                if ($this->GuestCount && $this->ShowGuests) {
@@ -207,15 +227,23 @@ EOT;
                   if ($this->Selector == 'category' && $this->ContextField)
                      if (GetValue($this->ContextField, $User, NULL) == $this->ContextID)
                         $LinkClass .= ' InContext';
+                  
+                  $FullUser = Gdn::UserModel()->GetID(GetValue('UserID', $User), DATASET_TYPE_ARRAY);
+                  $WrapClass = "OnlineUserWrap";
+                  $UserCssClass = GetValue('_CssClass', $FullUser);
+                  if ($UserCssClass)
+                     $WrapClass .= " {$UserCssClass}";
                      
-                  echo '<li>'.UserAnchor($User, $LinkClass)."</li>\n";
+                  echo "<li class=\"{$WrapClass}\">".UserAnchor($User, $LinkClass)."</li>\n";
                }
                
                if ($this->GuestCount && $this->ShowGuests) {
                   $GuestCount = Gdn_Format::BigNumber($this->GuestCount, 'html');
                   $GuestsText = Plural($this->GuestCount, 'Guest', 'Guests');
                   $Plus = $this->Count == $this->GuestCount ? '' : '+';
-                  echo "<li><strong>{$Plus}{$GuestCount} {$GuestsText}</strong></li>\n";
+                  echo <<<EOT
+<li class="GuestCountText"><span class="GuestCount"><strong>{$Plus}{$GuestCount}</strong></span> <span class="GuestLabel"><strong>{$GuestsText}</strong></span></li>\n
+EOT;
                }
                echo '</ul>'."\n";
             }

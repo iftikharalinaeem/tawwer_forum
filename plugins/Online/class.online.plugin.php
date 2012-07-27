@@ -741,6 +741,8 @@ class OnlinePlugin extends Gdn_Plugin {
       if (C('Plugins.Online.HideForGuests', TRUE) && !Gdn::Session()->IsValid())
          return;
 		
+      $Sender->AddCssFile('online.css', 'plugins/Online');
+      
 		// Is this a page for including the module?
 		$ShowOnController = array();		
 		switch($PluginRenderLocation) {
