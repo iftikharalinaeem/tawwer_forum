@@ -168,15 +168,15 @@ class OnlineModule extends Gdn_Module {
          <h4><?php echo $Title; ?> <span class="Count"><?php echo Gdn_Format::BigNumber($TrackCount, 'html') ?></span></h4>
          <?php
          
-         $SetUser = NULL;
-         foreach ($this->OnlineUsers as $User) {
-            $SetUser = $User;
-            break;
-         }
-         
-         $SetUser['Name'] = 'Lewie Stepdad';
-         $this->OnlineUsers = array_fill(0, 200, $SetUser);
-         $this->OnlineCount = sizeof($this->OnlineUsers);
+//         $SetUser = NULL;
+//         foreach ($this->OnlineUsers as $User) {
+//            $SetUser = $User;
+//            break;
+//         }
+//         
+//         $SetUser['Name'] = 'Lewie Stepdad';
+//         $this->OnlineUsers = array_fill(0, 200, $SetUser);
+//         $this->OnlineCount = sizeof($this->OnlineUsers);
          
          if ($this->Count > 0) {
             if ($this->Style == 'pictures') {
