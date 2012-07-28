@@ -195,17 +195,15 @@ class OnlineModule extends Gdn_Module {
                      if (GetValue($this->ContextField, $User, NULL) == $this->ContextID)
                         $LinkClass .= ' InContext';
                   
-                  $FullUser = Gdn::UserModel()->GetID(GetValue('UserID', $User), DATASET_TYPE_ARRAY);
                   $WrapClass = "OnlineUserWrap";
-                  $UserCssClass = GetValue('_CssClass', $FullUser);
-                  if ($UserCssClass)
-                     $WrapClass .= " {$UserCssClass}";
-                     
                   echo "<div class=\"{$WrapClass}\">";
                   echo UserPhoto($User, array(
                      'LinkClass' => $LinkClass
                   ));
-                  echo Wrap(UserAnchor($User), 'div', array('class' => 'OnlineUserName'));
+                  
+                  $UserName = GetValue('Name', $User, FALSE);
+                  if ($UserName)
+                     echo Wrap($UserName, 'div', array('class' => 'OnlineUserName'));
                   echo '</div>';
                }
                
@@ -228,12 +226,7 @@ EOT;
                      if (GetValue($this->ContextField, $User, NULL) == $this->ContextID)
                         $LinkClass .= ' InContext';
                   
-                  $FullUser = Gdn::UserModel()->GetID(GetValue('UserID', $User), DATASET_TYPE_ARRAY);
                   $WrapClass = "OnlineUserWrap";
-                  $UserCssClass = GetValue('_CssClass', $FullUser);
-                  if ($UserCssClass)
-                     $WrapClass .= " {$UserCssClass}";
-                     
                   echo "<li class=\"{$WrapClass}\">".UserAnchor($User, $LinkClass)."</li>\n";
                }
                

@@ -12,6 +12,7 @@
  *  1.1     Add WhosOnline config import
  *  1.2     Fixed breakage if no memcache support
  *  1.3     Exposes GetUser() for external querying
+ *  1.4     Fix wasteful OnlineModule rendering, store Name in Online table
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -22,7 +23,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.3',
+   'Version' => '1.4',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -313,6 +314,7 @@ class OnlinePlugin extends Gdn_Plugin {
          return;
       
       $UserID = Gdn::Session()->UserID;
+      $UserName = Gdn::Session()->User->Name;
       
       if ($WithSupplement) {
          // Figure out where the user is
@@ -378,8 +380,8 @@ class OnlinePlugin extends Gdn_Plugin {
       
       $Timestamp = $CurrentDate->format('Y-m-d H:i:s');
       $Px = Gdn::SQL()->Database->DatabasePrefix;
-      $Sql = "INSERT INTO {$Px}Online (UserID, Timestamp) VALUES (:UserID, :Timestamp) ON DUPLICATE KEY UPDATE Timestamp = :Timestamp1";
-      Gdn::SQL()->Database->Query($Sql, array(':UserID' => $UserID, ':Timestamp' => $Timestamp, ':Timestamp1' => $Timestamp));
+      $Sql = "INSERT INTO {$Px}Online (UserID, Name, Timestamp) VALUES (:UserID, :Name, :Timestamp) ON DUPLICATE KEY UPDATE Timestamp = :Timestamp1";
+      Gdn::SQL()->Database->Query($Sql, array(':UserID' => $UserID, ':Name' => $UserName, ':Timestamp' => $Timestamp, ':Timestamp1' => $Timestamp));
       
       // Cleanup some entries
       $this->Cleanup();
@@ -952,6 +954,7 @@ class OnlinePlugin extends Gdn_Plugin {
    public function Structure() {
       Gdn::Structure()->Table('Online')
 			->Column('UserID', 'int(11)', FALSE, 'primary')
+         ->Columm('Name', 'varchar(64)', NULL)
        	->Column('Timestamp', 'datetime')
          ->Set(FALSE, FALSE); 
    }
