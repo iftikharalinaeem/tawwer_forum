@@ -186,20 +186,19 @@ class OnlineModule extends Gdn_Module {
                
                echo '<div class="'.$ListClass.'">'."\n";
                foreach ($this->OnlineUsers as $User) {
-                  $LinkClass = ((!$User['Visible']) ? 'Invisible' : '');
+                  $WrapClass = array('OnlineUserWrap', 'UserPicture');
+                  $WrapClass[] = ((!$User['Visible']) ? 'Invisible' : '');
                   
                   if (!$User['Photo'] && !function_exists('UserPhotoDefaultUrl'))
                      $User['Photo'] = Asset('/applications/dashboard/design/images/usericon.gif', TRUE);
                   
                   if ($this->Selector == 'category' && $this->ContextField)
                      if (GetValue($this->ContextField, $User, NULL) == $this->ContextID)
-                        $LinkClass .= ' InContext';
+                        $WrapClass[] = 'InContext';
                   
-                  $WrapClass = "OnlineUserWrap";
+                  $WrapClass = implode(' ', $WrapClass);
                   echo "<div class=\"{$WrapClass}\">";
-                  echo UserPhoto($User, array(
-                     'LinkClass' => $LinkClass
-                  ));
+                  echo UserPhoto($User);
                   
                   $UserName = GetValue('Name', $User, FALSE);
                   if ($UserName)
@@ -221,13 +220,14 @@ EOT;
                
                echo '<ul class="PanelInfo">'."\n";
                foreach ($this->OnlineUsers as $User) {
-                  $LinkClass = ((!$User['Visible']) ? 'Invisible' : '');
+                  $WrapClass = array('OnlineUserWrap', 'UserLink');
+                  $WrapClass[] = ((!$User['Visible']) ? 'Invisible' : '');
                   if ($this->Selector == 'category' && $this->ContextField)
                      if (GetValue($this->ContextField, $User, NULL) == $this->ContextID)
-                        $LinkClass .= ' InContext';
+                        $WrapClass .= ' InContext';
                   
-                  $WrapClass = "OnlineUserWrap";
-                  echo "<li class=\"{$WrapClass}\">".UserAnchor($User, $LinkClass)."</li>\n";
+                  $WrapClass = implode(' ', $WrapClass);
+                  echo "<li class=\"{$WrapClass}\">".UserAnchor($User)."</li>\n";
                }
                
                if ($this->GuestCount && $this->ShowGuests) {
