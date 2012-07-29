@@ -18,7 +18,7 @@ class OnlineModule extends Gdn_Module {
     * List of online users
     * @var array
     */
-	protected $OnlineUsers;
+   protected $OnlineUsers;
    
    /**
     * Whether to draw Invisible users (admin permission)
@@ -44,14 +44,14 @@ class OnlineModule extends Gdn_Module {
    public $ContextField = FALSE;
    
    public $ShowGuests = TRUE;
-
-	public function __construct(&$Sender = '') {
-		parent::__construct($Sender);
+   
+   public function __construct(&$Sender = '') {
+      parent::__construct($Sender);
       $this->OnlineUsers = NULL;
       $this->ShowInvisible = Gdn::Session()->CheckPermission('Plugins.Online.ViewHidden');
       $this->Style = C('Plugins.Online.Style', OnlinePlugin::DEFAULT_STYLE);
       $this->Selector = 'auto';
-	}
+   }
    
    public function __set($Name, $Value) {
       switch ($Name) {
@@ -69,44 +69,11 @@ class OnlineModule extends Gdn_Module {
       }
    }
 
-	public function GetData() {
-		if (is_null($this->OnlineUsers)) {
-         if ($this->Selector == 'auto') {
-            
-            $Location = OnlinePlugin::WhereAmI(
-               Gdn::Controller()->ResolvedPath, 
-               Gdn::Controller()->ReflectArgs
-            );
-            
-            switch ($Location) {
-               case 'category':
-               case 'discussion':
-               case 'comment':
-                  $this->ShowGuests = FALSE;
-                  $this->Selector = 'category';
-                  $this->SelectorField = 'CategoryID';
-                  
-                  if ($Location == 'category') {
-                     $this->SelectorID = Gdn::Controller()->Data('Category.CategoryID');
-                     $this->ContextField = FALSE;
-                     $this->ContextID = FALSE;
-                  } else {
-                     $this->SelectorID = Gdn::Controller()->Data('Discussion.CategoryID');
-                     $this->ContextField = 'DiscussionID';
-                     $this->ContextID = Gdn::Controller()->Data('Discussion.DiscussionID');
-                  }
-                  
-                  break;
-               
-               case 'limbo':
-               case 'all':
-                  $this->ShowGuests = TRUE;
-                  $this->Selector = 'all';
-                  $this->SelectorID = NULL;
-                  $this->SelectorField = NULL;
-                  break;
-            }
-         }
+   public function GetData() {
+      if (is_null($this->OnlineUsers)) {
+         
+         // Find out where we are
+         $this->LockOn();
          
          $this->OnlineUsers = OnlinePlugin::Instance()->OnlineUsers($this->Selector, $this->SelectorID, $this->SelectorField);
          
@@ -137,17 +104,87 @@ class OnlineModule extends Gdn_Module {
       $this->Count = $CountUsers + $GuestCount;
       $this->OnlineCount = $CountUsers;
       $this->GuestCount = $GuestCount;
-	}
+   }
 
-	public function AssetTarget() {
-		return 'Panel';
-	}
+   public function AssetTarget() {
+      return 'Panel';
+   }
+   
+   /**
+    * Determine current viewing location
+    * 
+    * Fill in Selector and Context.
+    */
+   public function LockOn() {
+      if ($this->Selector == 'auto') {
+            
+         $Location = OnlinePlugin::WhereAmI(
+            Gdn::Controller()->ResolvedPath, 
+            Gdn::Controller()->ReflectArgs
+         );
 
-	public function ToString() {
+         switch ($Location) {
+            case 'category':
+            case 'discussion':
+            case 'comment':
+               $this->ShowGuests = FALSE;
+               $this->Selector = 'category';
+               $this->SelectorField = 'CategoryID';
+
+               if ($Location == 'category') {
+                  $this->SelectorID = Gdn::Controller()->Data('Category.CategoryID');
+                  $this->ContextField = FALSE;
+                  $this->ContextID = FALSE;
+               } else {
+                  $this->SelectorID = Gdn::Controller()->Data('Discussion.CategoryID');
+                  $this->ContextField = 'DiscussionID';
+                  $this->ContextID = Gdn::Controller()->Data('Discussion.DiscussionID');
+               }
+
+               break;
+
+            case 'limbo':
+            case 'all':
+               $this->ShowGuests = TRUE;
+               $this->Selector = 'all';
+               $this->SelectorID = NULL;
+               $this->SelectorField = NULL;
+               break;
+         }
+      }
+   }
+
+   public function ToString() {
+      $this->LockOn();
+      
+      // Check cache
+      switch ($this->Selector) {
+         case 'category':
+         case 'discussion':
+            $SelectorID = is_null($this->SelectorID) ? 'all' : $this->SelectorID;
+            $SelectorStub = "{$SelectorID}-{$this->SelectorField}";
+            break;
+            
+         case 'limbo':
+            $SelectorStub = 'all';
+            break;
+         
+         case 'all':
+         default:
+            $SelectorStub = 'all';
+            break;
+      }
+      
+      // Check cache for matching pre-built data
+      $RenderedCacheKey = sprintf(OnlinePlugin::CACHE_ONLINE_MODULE_KEY, $Selector, $SelectorStub);
+      $PreRender = Gdn::Cache()->Get($RenderedCacheKey);
+      if ($PreRender !== Gdn_Cache::CACHEOP_FAILURE)
+         return $PreRender." FROM CACHE";
+      
       $this->GetData();
       
-		$OutputString = '';
-		ob_start();
+      $OutputString = '';
+      ob_start();
       
       $TrackCount = ($this->ShowGuests) ? $this->Count : $this->OnlineCount;
       switch ($this->Selector) {
@@ -163,7 +200,7 @@ class OnlineModule extends Gdn_Module {
             $Title = T("Who's Online");
       }
       
-		?>
+      ?>
       <div id="WhosOnline" class="WhosOnline Box">
          <h4><?php echo $Title; ?> <span class="Count"><?php echo Gdn_Format::BigNumber($TrackCount, 'html') ?></span></h4>
          <?php
@@ -242,12 +279,17 @@ EOT;
             }
          }
          ?>
-		</div>
-		<?php
+      </div>
+      <?php
       
-		$OutputString = ob_get_contents();
-		@ob_end_clean();
+      $OutputString = ob_get_contents();
+      @ob_end_clean();
       
-		return $OutputString;
-	}
+      // Store rendered data
+      Gdn::Cache()->Store($RenderedCacheKey, $OutputString, array(
+          Gdn_Cache::FEATURE_EXPIRY => OnlinePlugin::Instance()->CacheRenderDelay
+      ));
+      
+      return $OutputString." FROM RENDER";
+   }
 }

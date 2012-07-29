@@ -13,6 +13,7 @@
  *  1.2     Fixed breakage if no memcache support
  *  1.3     Exposes GetUser() for external querying
  *  1.4     Fix wasteful OnlineModule rendering, store Name in Online table
+ *  1.5     Add caching to the OnlineModule rending process
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -23,7 +24,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.4',
+   'Version' => '1.5',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -85,6 +86,12 @@ class OnlinePlugin extends Gdn_Plugin {
    const CACHE_CLEANUP_DELAY_KEY = 'plugin.online.cleanup';
    
    /**
+    * Cache rendered html for selector queries for a few seconds to reduce load.
+    * @const string 
+    */
+   const CACHE_ONLINE_MODULE_KEY = 'plugin.online.%s.%s.module';
+   
+   /**
     * Names of cookies and cache keys for tracking guests.
     * @const string 
     */
@@ -107,7 +114,8 @@ class OnlinePlugin extends Gdn_Plugin {
       $this->WriteDelay = C('Plugins.Online.WriteDelay', self::DEFAULT_WRITE_DELAY);
       $this->PruneDelay = C('Plugins.Online.PruneDelay', self::DEFAULT_PRUNE_DELAY) * 60;
       $this->CleanDelay = C('Plugins.Online.CleanDelay', self::DEFAULT_CLEAN_DELAY);
-      $this->CacheCountDelay = C('Plugins.Online.CacheCountDelay', 10);
+      $this->CacheCountDelay = C('Plugins.Online.CacheCountDelay', 20);
+      $this->CacheRenderDelay = C('Plugins.Online.CacheRenderDelay', 60);
    }
    
    /*
@@ -451,7 +459,7 @@ class OnlinePlugin extends Gdn_Plugin {
       
       Trace('OnlinePlugin->Cleanup');
       // How old does an entry have to be to get pruned?
-		$PruneTimestamp = time() - $this->PruneDelay;
+      $PruneTimestamp = time() - $this->PruneDelay;
       
       $Px = Gdn::Database()->DatabasePrefix;
       $Sql = "DELETE FROM {$Px}Online WHERE Timestamp < :Timestamp";
@@ -742,45 +750,45 @@ class OnlinePlugin extends Gdn_Plugin {
       // Don't add the module of the plugin is hidden for guests
       if (C('Plugins.Online.HideForGuests', TRUE) && !Gdn::Session()->IsValid())
          return;
-		
+      
       $Sender->AddCssFile('online.css', 'plugins/Online');
       
-		// Is this a page for including the module?
-		$ShowOnController = array();		
-		switch($PluginRenderLocation) {
+      // Is this a page for including the module?
+      $ShowOnController = array();      
+      switch($PluginRenderLocation) {
          case 'custom':
             return;
             
-			case 'every':
-				$ShowOnController = array(
-					'discussioncontroller',
-					'categoriescontroller',
-					'discussionscontroller',
-					'profilecontroller',
-					'activitycontroller'
-				);
-				break;
+         case 'every':
+            $ShowOnController = array(
+               'discussioncontroller',
+               'categoriescontroller',
+               'discussionscontroller',
+               'profilecontroller',
+               'activitycontroller'
+            );
+            break;
          
-			case 'discussions':
-				$ShowOnController = array(
-					'discussionscontroller',
-					'categoriescontroller'
-				);	
-				break;
+         case 'discussions':
+            $ShowOnController = array(
+               'discussionscontroller',
+               'categoriescontroller'
+            );   
+            break;
          
-			case 'discussion':
+         case 'discussion':
          default:
-			   $ShowOnController = array(
-					'discussioncontroller',
-					'discussionscontroller',
-					'categoriescontroller'
-				);	
-			   break;						
-		}
-		
-		// Include the module
+            $ShowOnController = array(
+               'discussioncontroller',
+               'discussionscontroller',
+               'categoriescontroller'
+            );   
+            break;                  
+      }
+      
+      // Include the module
       if (in_array($Controller, $ShowOnController))
-   	   $Sender->AddModule('OnlineModule');
+         $Sender->AddModule('OnlineModule');
    }
    
    /*
@@ -953,9 +961,9 @@ class OnlinePlugin extends Gdn_Plugin {
    
    public function Structure() {
       Gdn::Structure()->Table('Online')
-			->Column('UserID', 'int(11)', FALSE, 'primary')
-         ->Columm('Name', 'varchar(64)', NULL)
-       	->Column('Timestamp', 'datetime')
+         ->Column('UserID', 'int(11)', FALSE, 'primary')
+         ->Column('Name', 'varchar(64)', NULL)
+         ->Column('Timestamp', 'datetime')
          ->Set(FALSE, FALSE); 
    }
 }
