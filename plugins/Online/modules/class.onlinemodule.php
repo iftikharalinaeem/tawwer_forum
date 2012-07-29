@@ -179,7 +179,7 @@ class OnlineModule extends Gdn_Module {
       $RenderedCacheKey = sprintf(OnlinePlugin::CACHE_ONLINE_MODULE_KEY, $Selector, $SelectorStub);
       $PreRender = Gdn::Cache()->Get($RenderedCacheKey);
       if ($PreRender !== Gdn_Cache::CACHEOP_FAILURE)
-         return $PreRender." FROM CACHE";
+         return $PreRender;
       
       $this->GetData();
       
@@ -290,6 +290,6 @@ EOT;
           Gdn_Cache::FEATURE_EXPIRY => OnlinePlugin::Instance()->CacheRenderDelay
       ));
       
-      return $OutputString." FROM RENDER";
+      return $OutputString;
    }
 }
