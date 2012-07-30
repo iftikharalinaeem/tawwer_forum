@@ -23,8 +23,8 @@
       <div class="section_contents">
          <div class="item"><a href="/blog/api-categories-add">/categories/add</a></div>
          <div class="item"><a href="/blog/api-categories-edit">/categories/edit</a></div>
-         <div class="item"><a href="/blog/api-categories-delete">/categories/delete #</a></div>
-         <div class="item"><a href="/blog/api-categories-show">/categories/show</a></div>
+         <div class="item"><a href="/blog/api-categories-delete">/categories/delete</a></div>
+         <!-- <div class="item"><a href="/blog/api-categories-show">/categories/show</a></div> -->
          <div class="item"><a href="/blog/api-categories-list">/categories/list</a></div>
       </div>
    </div>
@@ -34,8 +34,8 @@
       <div class="section_contents">
          <div class="item"><a href="/blog/api-discussions-add">/discussions/add</a></div>
          <div class="item"><a href="/blog/api-discussions-edit">/discussions/edit</a></div>
-         <div class="item"><a href="/blog/api-discussions-delete">/discussions/delete #</a></div>
-         <div class="item"><a href="/blog/api-discussions-show">/discussions/show</a></div>
+         <!-- <div class="item"><a href="/blog/api-discussions-delete">/discussions/delete</a></div> -->
+         <!-- <div class="item"><a href="/blog/api-discussions-show">/discussions/show</a></div> -->
          <div class="item"><a href="/blog/api-discussions-list">/discussions/list</a></div>
          <div class="item"><a href="/blog/api-discussions-list-category">/discussions/category</a></div>
       </div>
@@ -46,8 +46,17 @@
       <div class="section_contents">
          <div class="item"><a href="/blog/api-comments-add">/comments/add</a></div>
          <div class="item"><a href="/blog/api-comments-edit">/comments/edit</a></div>
-         <div class="item"><a href="/blog/api-comments-delete">/comments/delete</a></div>
-         <div class="item"><a href="/blog/api-comments-show">/comments/show</a></div>
+         <!-- <div class="item"><a href="/blog/api-comments-delete">/comments/delete</a></div> -->
+         <!-- <div class="item"><a href="/blog/api-comments-show">/comments/show</a></div> -->
+      </div>
+   </div>
+
+   <div class="api_section">
+      <div class="section_heading">Badges</div>
+      <div class="section_contents">
+         <div class="item"><a href="/blog/api-badges-give">/badges/give</a></div>
+         <div class="item"><a href="/blog/api-badges-user">/badges/user</a></div>
+         <div class="item"><a href="/blog/api-badges-list">/badges/list</a></div>
       </div>
    </div>
 
