@@ -19,11 +19,11 @@ class OnlineCountModule extends Gdn_Module {
    public $SelectorID = NULL;
    public $SelectorField = NULL;
 
-	public function __construct(&$Sender = '') {
-		parent::__construct($Sender);
+   public function __construct(&$Sender = '') {
+      parent::__construct($Sender);
       
       $this->Selector = 'auto';
-	}
+   }
    
    public function __set($Name, $Value) {
       switch ($Name) {
@@ -41,7 +41,7 @@ class OnlineCountModule extends Gdn_Module {
       }
    }
 
-	public function GetData() {
+   public function GetData() {
       
       if ($this->Selector == 'auto') {
             
@@ -88,14 +88,14 @@ class OnlineCountModule extends Gdn_Module {
       $FormattedCount = Gdn_Format::BigNumber($TrackedCount, 'html');
       
       $OutputString = '';
-		ob_start();
-		?>
+      ob_start();
+      ?>
       <div class="OnlineCount"><?php echo sprintf(T("%s viewing"),$FormattedCount); ?></div>
       <?php
       
-		$OutputString = ob_get_contents();
-		@ob_end_clean();
+      $OutputString = ob_get_contents();
+      @ob_end_clean();
       
-		return $OutputString;
+      return $OutputString;
    }
 }
