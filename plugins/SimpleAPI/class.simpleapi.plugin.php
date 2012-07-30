@@ -23,13 +23,121 @@ $PluginInfo['SimpleAPI'] = array(
 
 class SimpleAPIPlugin extends Gdn_Plugin {
    
-   /// Methods ///
-   
+   /**
+    * Intercept POST data
+    * 
+    * This method inspects and potentially modifies incoming POST data to 
+    * facilitate simpler API development. 
+    * 
+    * For example, passing a KVP of:
+    *    User.Email = tim@vanillaforums.com
+    * would result in the corresponding UserID KVP being added to the POST data:
+    *    UserID = 2387
+    * 
+    * @param array $Post
+    * @param boolean $ThrowError
+    * @return boolean
+    * @throws Exception 
+    */
    public static function TranslatePost(&$Post, $ThrowError = TRUE) {
-      $Errors = array();
       
+      $Errors = array();
+      $PostData = $Post;
+      $Post = array();
+      
+      // Loop over every KVP in the POST data
+      foreach ($PostData as $Key => $Value) {
+         if ($Key == 'access_token') continue;
+            
+         // Unscrew PHP encoding of periods in POST data
+         $Key = str_replace('_', '.', $Key);
+         $Post[$Key] = $Value;
+         
+      }
+      unset($PostData);
+      
+      // Loop over every KVP in the POST data
       foreach ($Post as $Key => $Value) {
-         if (StringEndsWith($Key, 'Category')) {
+         
+         // If the Key is dot-delimited, inspect it for potential munging
+         if (strpos($Key, '.') !== FALSE) {
+            list($FieldPrefix, $ColumnLookup) = explode('.', $Key, 2);
+            
+            // We know how to lookup 'User type' fields in several ways:
+            //   Email, Name, ForeignID
+            if (StringEndsWith($FieldPrefix, 'User')) {
+               
+               // We desire the 'ID' root field
+               $LookupField = "{$FieldPrefix}ID";
+               
+               // Don't override an existing desired field
+               if (isset($Post[$LookupField]))
+                  continue;
+               
+               $LookupFieldValue = NULL;
+               switch ($ColumnLookup) {
+                  
+                  // Lookup user by email or name
+                  case 'Email':
+                  case 'Name':
+                     $User = Gdn::UserModel()->SQL->GetWhere('User u', array(
+                        "u.{$ColumnLookup}" => $Value
+                     ));
+                     if (!$User->NumRows()) {
+                        $Errors[] = self::NotFoundString('User', $Value);
+                        continue;
+                     }
+                     
+                     if ($User->NumRows() > 1) {
+                        $Errors[] = sprintf(T('Multiple %ss found by %s for "%s".'), T('User'), $ColumnLookup, $Value);
+                        continue;
+                     }
+                     
+                     $User = $User->FirstRow(DATASET_TYPE_ARRAY);
+                     $LookupFieldValue = GetValue($LookupField, $User);
+                     break;
+                  
+                  // Lookup user by foreignid
+                  case 'ForeignID':
+                     if (strpos(':', $Value) === FALSE) {
+                        $Errors[] = "Malformed ForeignID object. Should be '<provider key>:<foreign id>'.";
+                        continue;
+                     }
+                     
+                     $ProviderParts = explode(':', $Value, 2);
+                     $ProviderKey = $ProviderParts[0];
+                     $ForeignID = $ProviderParts[1];
+                     
+                     // Check if we have a provider by that key
+                     $ProviderModel = new Gdn_AuthenticationProviderModel();
+                     $Provider = $ProviderModel->GetProviderByKey($AuthenticationProviderKey);
+                     if (!$Provider) {
+                        $Errors[] = self::NotFoundString('Provider', $ProviderKey);
+                        continue;
+                     }
+                     
+                     // Check if we have an associated user for that ForeignID
+                     $UserAssociation = Gdn::Authenticator()->GetAssociation($ForeignID, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
+                     if (!$UserAssociation) {
+                        $Errors[] = self::NotFoundString('User', $Value);
+                        continue;
+                     }
+                     
+                     $LookupFieldValue = GetValue($LookupField, $UserAssociation);
+                     break;
+                  
+                  // By ID, just passthrough
+                  case 'ID':
+                     $LookupField = $Value;
+                     break;
+               }
+               
+               if (!is_null($LookupFieldValue))
+                  $Post[$LookupField] = $LookupFieldValue;
+               
+            }
+            
+         } elseif (StringEndsWith($Key, 'Category')) {
             // Translate a category column.
             $Px = StringEndsWith($Key, 'Category', TRUE, TRUE);
             $Column = $Px.'CategoryID';
@@ -52,38 +160,13 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             return $Errors;
          }
       }
+      
       return TRUE;
    }
    
    protected static function NotFoundString($Code, $Item) {
       return sprintf(T('%1$s "%2$s" not found.'), T($Code), $Item);
    }
-   
-   public function Setup() {
-      $this->Structure();
-   }
-   
-   public function Structure() {
-      // Make sure the API user is set.
-      $UserID = C('Plugins.SimpleAPI.UserID');
-      if (!$UserID)
-         $UserID = Gdn::UserModel()->GetSystemUserID();
-      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-      if (!$User)
-         $UserID = Gdn::UserModel()->GetSystemUserID();
-      
-      // Make sure the access token is set.
-      $AccessToken = C('Plugins.SimpleAPI.AccessToken');
-      if (!$AccessToken)
-         $AccessToken = md5(microtime());
-      
-      SaveToConfig(array(
-          'Plugins.SimpleAPI.UserID' => $UserID,
-          'Plugins.SimpleAPI.AccessToken' => $AccessToken
-      ));
-   }
-   
-   /// Event Handlers ///
    
    /**
     * API Translation hook
@@ -138,24 +221,16 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          Gdn::Request()->WithURI($APIRequest);
          
       }
+      
    }
    
    /**
-    * Adds "Media" menu option to the Forum menu on the dashboard.
-    * 
-    * @param Gdn_Controller $Sender 
-    */
-   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-      $Menu = $Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Site Settings', T('API'), 'settings/api', 'Garden.Settings.Manage');
-   }
-   
-   /**
-    * 
+    * Pre-API detection and setup
     * 
     * @param Gdn_Dispatcher $Sender 
     */
    public function Gdn_Dispatcher_BeforeControllerMethod_Handler($Sender, $Args) {
+      
       $Controller = $Args['Controller'];
       
       // This can be an API request if we are only requesting data and the correct access_token is given.
@@ -193,14 +268,13 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_POST, $Post);
          $_POST = $Post;
          
-//         decho($_POST, '$_POST');
-//         decho(Gdn::Request()->Post(), '$_POST');
-//         die();
       }
+      
    }
    
    /**
-    *
+    * API Settings
+    * 
     * @param SettingsController $Sender
     * @param array $Args 
     */
@@ -261,4 +335,45 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       $Sender->AddSideMenu();
       $Sender->Render('Settings', '', 'plugins/SimpleAPI');
    }
+   
+   /**
+    * Adds "API" menu option to the Forum menu on the dashboard.
+    * 
+    * @param Gdn_Controller $Sender 
+    */
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      $Menu = $Sender->EventArguments['SideMenu'];
+      $Menu->AddLink('Site Settings', T('API'), 'settings/api', 'Garden.Settings.Manage');
+   }
+   
+   /**
+    * Plugin setup
+    */
+   public function Setup() {
+      $this->Structure();
+   }
+   
+   /**
+    * Database structure 
+    */
+   public function Structure() {
+      // Make sure the API user is set.
+      $UserID = C('Plugins.SimpleAPI.UserID');
+      if (!$UserID)
+         $UserID = Gdn::UserModel()->GetSystemUserID();
+      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+      if (!$User)
+         $UserID = Gdn::UserModel()->GetSystemUserID();
+      
+      // Make sure the access token is set.
+      $AccessToken = C('Plugins.SimpleAPI.AccessToken');
+      if (!$AccessToken)
+         $AccessToken = md5(microtime());
+      
+      SaveToConfig(array(
+          'Plugins.SimpleAPI.UserID' => $UserID,
+          'Plugins.SimpleAPI.AccessToken' => $AccessToken
+      ));
+   }
+   
 }
