@@ -59,98 +59,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       // Loop over every KVP in the POST data
       foreach ($Post as $Key => $Value) {
          
-         // If the Key is dot-delimited, inspect it for potential munging
-         if (strpos($Key, '.') !== FALSE) {
-            list($FieldPrefix, $ColumnLookup) = explode('.', $Key, 2);
-            
-            // We know how to lookup 'User type' fields in several ways:
-            //   Email, Name, ForeignID
-            if (StringEndsWith($FieldPrefix, 'User')) {
-               
-               // We desire the 'ID' root field
-               $LookupField = "{$FieldPrefix}ID";
-               
-               // Don't override an existing desired field
-               if (isset($Post[$LookupField]))
-                  continue;
-               
-               $LookupFieldValue = NULL;
-               switch ($ColumnLookup) {
-                  
-                  // Lookup user by email or name
-                  case 'Email':
-                  case 'Name':
-                     $User = Gdn::UserModel()->SQL->GetWhere('User u', array(
-                        "u.{$ColumnLookup}" => $Value
-                     ));
-                     if (!$User->NumRows()) {
-                        $Errors[] = self::NotFoundString('User', $Value);
-                        continue;
-                     }
-                     
-                     if ($User->NumRows() > 1) {
-                        $Errors[] = sprintf(T('Multiple %ss found by %s for "%s".'), T('User'), $ColumnLookup, $Value);
-                        continue;
-                     }
-                     
-                     $User = $User->FirstRow(DATASET_TYPE_ARRAY);
-                     $LookupFieldValue = GetValue($LookupField, $User);
-                     break;
-                  
-                  // Lookup user by foreignid
-                  case 'ForeignID':
-                     if (strpos(':', $Value) === FALSE) {
-                        $Errors[] = "Malformed ForeignID object. Should be '<provider key>:<foreign id>'.";
-                        continue;
-                     }
-                     
-                     $ProviderParts = explode(':', $Value, 2);
-                     $ProviderKey = $ProviderParts[0];
-                     $ForeignID = $ProviderParts[1];
-                     
-                     // Check if we have a provider by that key
-                     $ProviderModel = new Gdn_AuthenticationProviderModel();
-                     $Provider = $ProviderModel->GetProviderByKey($AuthenticationProviderKey);
-                     if (!$Provider) {
-                        $Errors[] = self::NotFoundString('Provider', $ProviderKey);
-                        continue;
-                     }
-                     
-                     // Check if we have an associated user for that ForeignID
-                     $UserAssociation = Gdn::Authenticator()->GetAssociation($ForeignID, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
-                     if (!$UserAssociation) {
-                        $Errors[] = self::NotFoundString('User', $Value);
-                        continue;
-                     }
-                     
-                     $LookupFieldValue = GetValue($LookupField, $UserAssociation);
-                     break;
-                  
-                  // By ID, just passthrough
-                  case 'ID':
-                     $LookupField = $Value;
-                     break;
-               }
-               
-               if (!is_null($LookupFieldValue))
-                  $Post[$LookupField] = $LookupFieldValue;
-               
-            }
-            
-         } elseif (StringEndsWith($Key, 'Category')) {
-            // Translate a category column.
-            $Px = StringEndsWith($Key, 'Category', TRUE, TRUE);
-            $Column = $Px.'CategoryID';
-            if (isset($Post[$Column]))
-               continue;
-            
-            $Category = CategoryModel::Categories($Value);
-            if (!$Category) {
-               $Errors[] = self::NotFoundString('Category', $Value);
-            } else {
-               $Post[$Column] = (string)$Category['CategoryID'];
-            }
-         }
+         self::TranslateField($Post, $Key, $Value);
+         
       }
       
       if (count($Errors) > 0) {
@@ -162,6 +72,160 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       }
       
       return TRUE;
+   }
+
+   /**
+    * Intercept GET data
+    * 
+    * This method inspects and potentially modifies incoming GET data to 
+    * facilitate simpler API development. 
+    * 
+    * For example, passing a KVP of:
+    *    User.Email = tim@vanillaforums.com
+    * would result in the corresponding UserID KVP being added to the GET data:
+    *    UserID = 2387
+    * 
+    * @param array $Get
+    * @param boolean $ThrowError
+    * @return boolean
+    * @throws Exception 
+    */
+   public static function TranslateGet(&$Get, $ThrowError = TRUE) {
+      
+      $Errors = array();
+      $GetData = $Get;
+      $Get = array();
+      
+      // Loop over every KVP in the POST data
+      foreach ($GetData as $Key => $Value) {
+         if ($Key == 'access_token') continue;
+            
+         // Unscrew PHP encoding of periods in POST data
+         $Key = str_replace('_', '.', $Key);
+         $Get[$Key] = $Value;
+         
+      }
+      unset($GetData);
+      
+      // Loop over every KVP in the GET data
+      foreach ($Get as $Key => $Value) {
+         
+         self::TranslateField($Get, $Key, $Value);
+         
+      }
+      
+      if (count($Errors) > 0) {
+         if ($ThrowError) {
+            throw new Exception(implode(' ', $Errors), 400);
+         } else {
+            return $Errors;
+         }
+      }
+      
+      return TRUE;
+   }
+   
+   /**
+    * Translate a single field in an array
+    * 
+    * @param array $Data
+    * @param string $Field
+    * @param string $Value 
+    */
+   protected static function TranslateField(&$Data, $Field, $Value) {
+      
+      // If the Key is dot-delimited, inspect it for potential munging
+      if (strpos($Field, '.') !== FALSE) {
+         list($FieldPrefix, $ColumnLookup) = explode('.', $Field, 2);
+
+         // We know how to lookup 'User type' fields in several ways:
+         //   Email, Name, ForeignID
+         if (StringEndsWith($FieldPrefix, 'User')) {
+            
+            // We desire the 'ID' root field
+            $LookupField = "{$FieldPrefix}ID";
+
+            // Don't override an existing desired field
+            if (isset($Data[$LookupField]))
+               continue;
+
+            $LookupFieldValue = NULL;
+            switch ($ColumnLookup) {
+
+               // Lookup user by email or name
+               case 'Email':
+               case 'Name':
+                  $User = Gdn::UserModel()->SQL->GetWhere('User u', array(
+                     "u.{$ColumnLookup}" => $Value
+                  ));
+                  if (!$User->NumRows()) {
+                     $Errors[] = self::NotFoundString('User', $Value);
+                     continue;
+                  }
+
+                  if ($User->NumRows() > 1) {
+                     $Errors[] = sprintf(T('Multiple %ss found by %s for "%s".'), T('User'), $ColumnLookup, $Value);
+                     continue;
+                  }
+
+                  $User = $User->FirstRow(DATASET_TYPE_ARRAY);
+                  $LookupFieldValue = GetValue($LookupField, $User);
+                  break;
+
+               // Lookup user by foreignid
+               case 'ForeignID':
+                  if (strpos(':', $Value) === FALSE) {
+                     $Errors[] = "Malformed ForeignID object. Should be '<provider key>:<foreign id>'.";
+                     continue;
+                  }
+
+                  $ProviderParts = explode(':', $Value, 2);
+                  $ProviderKey = $ProviderParts[0];
+                  $ForeignID = $ProviderParts[1];
+
+                  // Check if we have a provider by that key
+                  $ProviderModel = new Gdn_AuthenticationProviderModel();
+                  $Provider = $ProviderModel->GetProviderByKey($AuthenticationProviderKey);
+                  if (!$Provider) {
+                     $Errors[] = self::NotFoundString('Provider', $ProviderKey);
+                     continue;
+                  }
+
+                  // Check if we have an associated user for that ForeignID
+                  $UserAssociation = Gdn::Authenticator()->GetAssociation($ForeignID, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
+                  if (!$UserAssociation) {
+                     $Errors[] = self::NotFoundString('User', $Value);
+                     continue;
+                  }
+
+                  $LookupFieldValue = GetValue($LookupField, $UserAssociation);
+                  break;
+
+               // By ID, just passthrough
+               case 'ID':
+                  $LookupField = $Value;
+                  break;
+            }
+
+            if (!is_null($LookupFieldValue))
+               $Data[$LookupField] = $LookupFieldValue;
+
+         }
+
+      } elseif (StringEndsWith($Field, 'Category')) {
+         // Translate a category column.
+         $Px = StringEndsWith($Field, 'Category', TRUE, TRUE);
+         $Column = $Px.'CategoryID';
+         if (isset($Data[$Column]))
+            continue;
+
+         $Category = CategoryModel::Categories($Value);
+         if (!$Category) {
+            $Errors[] = self::NotFoundString('Category', $Value);
+         } else {
+            $Data[$Column] = (string)$Category['CategoryID'];
+         }
+      }
    }
    
    protected static function NotFoundString($Code, $Item) {
@@ -263,10 +327,14 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             $Post = Gdn::Request()->Post();         
          }
          
+         // Translate POST data
          self::TranslatePost($Post);
-         
          Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_POST, $Post);
          $_POST = $Post;
+         
+         // Translate GET data
+         self::TranslateGet($_GET);
+         Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_GET, $_GET);
          
       }
       
