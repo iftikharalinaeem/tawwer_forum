@@ -66,7 +66,9 @@ $Session = Gdn::Session();
    <div class="Wrapper">
       <div class="InnerWrapper">
          <div class="Row Center">
-            <div id="Panel" class="Column PanelColumn""><?php $this->RenderAsset('Panel'); ?></div>
+            <div id="Panel" class="Column PanelColumn"">
+               <?php $this->AddModule('MeModule'); $this->RenderAsset('Panel'); ?>
+            </div>
             <div id="Content" class="Column ContentColumn"><?php
             if (in_array(strtolower($this->ControllerName), array('discussionscontroller', 'categoriescontroller'))) {
                echo '<div class="SearchForm">';
