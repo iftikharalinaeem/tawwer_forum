@@ -8,7 +8,7 @@
 $PluginInfo['Whispers'] = array(
    'Name' => 'Whispers',
    'Description' => "Users may 'whisper' private comments to each other in the middle of normal discussions. Caution: this can be a confusing feature for some people.",
-   'Version' => '1.1',
+   'Version' => '1.1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18a3', 'Conversations' => '2.0.18a3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -225,10 +225,10 @@ class WhispersPlugin extends Gdn_Plugin {
          return;
 
       if ($CountWhispers = GetValue('CountWhispers', $Discussion)) {
-         $Str = ' <span class="CommentCount MItem">'.Plural($CountWhispers, '%s whisper', '%s whispers').'</span> ';
+         $Str = ' <span class="MItem WhisperCount">'.Plural($CountWhispers, '%s whisper', '%s whispers').'</span> ';
 
          if (GetValue('NewWhispers', $Discussion)) {
-            $Str .= ' <strong class="HasNew">'.T('new').'</strong> ';
+            $Str .= ' <strong class="HasNew HasNew-Whispers">'.T('new').'</strong> ';
          }
          echo $Str;
       }
