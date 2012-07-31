@@ -30,8 +30,10 @@ class PollsPlugin extends Gdn_Plugin {
     */
    public function Base_BeforeNewDiscussionButton_Handler($Sender) {
       $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
-      if (Gdn::Session()->CheckPermission('Plugins.Polls.Add'))
-         $NewDiscussionModule->AddButton(T('New Poll'), 'post/poll');
+      if (Gdn::Session()->CheckPermission('Plugins.Polls.Add')) {
+         $UrlCode = GetValue('UrlCode', GetValue('Category', $Sender->Data), '');
+         $NewDiscussionModule->AddButton(T('New Poll'), '/post/poll/'.$UrlCode);
+      }
    }
    
    /** 
@@ -145,16 +147,19 @@ class PollsPlugin extends Gdn_Plugin {
     */
    public function PostController_Poll_Create($Sender) {
       $PollModel = new PollModel();
-      
-      // Override CategoryID if categories are disabled
-      $Sender->CategoryID = GetValue(0, $Sender->RequestArgs);
       $UseCategories = $Sender->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
-      if (!$UseCategories) 
+      $CategoryUrlCode = GetValue(0, $Sender->RequestArgs);
+      if ($CategoryUrlCode != '') {
+         $CategoryModel = new CategoryModel();
+         $Category = $CategoryModel->GetByCode($CategoryUrlCode);
+         $Sender->CategoryID = $Category->CategoryID;
+      }
+      if ($Category && $UseCategories)
+         $Sender->Category = (object)$Category;
+      else {
          $Sender->CategoryID = 0;
-
-      $Sender->Category = CategoryModel::Categories($Sender->CategoryID);
-      if (!is_object($Sender->Category))
          $Sender->Category = NULL;
+      }      
       
       if ($UseCategories)
 			$CategoryData = CategoryModel::Categories();
