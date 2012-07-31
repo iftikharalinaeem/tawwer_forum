@@ -13,7 +13,7 @@
 $PluginInfo['SimpleAPI'] = array(
    'Name' => 'Simple API',
    'Description' => "Provides simple access_token API access to the forum.",
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -249,7 +249,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       
       // Detect a versioned API call
       
-      $MatchedAPI = preg_match('`^api/(v[\d\.]+)/(.+)`i', $IncomingRequest, $URI);
+      $MatchedAPI = preg_match('`^/?api/(v[\d\.]+)/(.+)`i', $IncomingRequest, $URI);
       
       if (!$MatchedAPI)
          return;
