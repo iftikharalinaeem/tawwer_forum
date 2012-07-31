@@ -150,6 +150,7 @@ class PollsPlugin extends Gdn_Plugin {
       $PollModel = new PollModel();
       $UseCategories = $Sender->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
       $CategoryUrlCode = GetValue(0, $Sender->RequestArgs);
+      $Category = FALSE;
       if ($CategoryUrlCode != '') {
          $CategoryModel = new CategoryModel();
          $Category = $CategoryModel->GetByCode($CategoryUrlCode);
