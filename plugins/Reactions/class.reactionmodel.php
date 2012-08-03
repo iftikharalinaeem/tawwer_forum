@@ -128,7 +128,7 @@ class ReactionModel {
       }
       
       // Check to see if the reaction type has been customized.
-      if (!isset($Data['Custom'])) {
+      if (!isset($Row['Custom'])) {
          $Current = self::ReactionTypes($UrlCode);
          
          if ($Current && GetValue('Custom', $Current))
