@@ -21,7 +21,8 @@ $ThemeInfo['Bootstrap'] = array(
    'Options' => array(
       'Description' => 'This theme has an alternative colour scheme.',
       'Styles' => array(
+         'Default' => '%s',
          'Dark' => '%s_dark'
-   ),
-)
+      ),
+   )
 );
