@@ -119,12 +119,20 @@ class ReactionModel {
       $Data['TagID'] = $TagID;
       
       $Row = array();
-      $Columns = array('UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active');
+      $Columns = array('UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom');
       foreach ($Columns as $Column) {
          if (isset($Data[$Column])) {
             $Row[$Column] = $Data[$Column];
             unset($Data[$Column]);
          }
+      }
+      
+      // Check to see if the reaction type has been customized.
+      if (!isset($Data['Custom'])) {
+         $Current = self::ReactionTypes($UrlCode);
+         
+         if ($Current && GetValue('Custom', $Current))
+            return;
       }
       
       if (!empty($Data)) {

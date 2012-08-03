@@ -17,6 +17,7 @@ $St
    ->Column('Attributes', 'text', TRUE)
    ->Column('Sort', 'smallint', TRUE)
    ->Column('Active', 'tinyint(1)', 0)
+   ->Column('Custom', 'tinyint(1)', 0)
    ->Set();
 
 $St->Table('UserTag')
