@@ -119,7 +119,7 @@ class ReactionModel {
       $Data['TagID'] = $TagID;
       
       $Row = array();
-      $Columns = array('UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active');
+      $Columns = array('UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom');
       foreach ($Columns as $Column) {
          if (isset($Data[$Column])) {
             $Row[$Column] = $Data[$Column];
@@ -127,8 +127,18 @@ class ReactionModel {
          }
       }
       
+      // Check to see if the reaction type has been customized.
+      if (!isset($Row['Custom'])) {
+         $CurrentCustom = $this->SQL->GetWhere('ReactionType', array('UrlCode' => $UrlCode))->Value('Custom');
+         
+         if ($CurrentCustom)
+            return;
+      }
+      
       if (!empty($Data)) {
          $Row['Attributes'] = serialize($Data);
+      } else {
+         $Row['Attributes'] = NULL;
       }
       
       Gdn::SQL()->Replace('ReactionType', $Row, array('UrlCode' => $UrlCode), TRUE);
