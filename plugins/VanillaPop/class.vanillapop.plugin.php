@@ -8,7 +8,7 @@
 $PluginInfo['VanillaPop'] = array(
    'Name' => 'Vanilla Pop',
    'Description' => "Users may start discussions, make comments, and even automatically register for your site via email.",
-   'Version' => '1.0.3',
+   'Version' => '1.0.4',
    'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -712,7 +712,12 @@ class VanillaPopPlugin extends Gdn_Plugin {
     * @param type $Args
     */
    public function ActivityModel_BeforeSendNotification_Handler($Sender, $Args) {
-      list($Type, $ID) = self::ParseRoute(GetValue('Route', $Args));
+      if (isset($Args['RecordType']) && isset($Args['RecordID'])) {
+         $Type = $Args['RecordType'];
+         $ID = $Args['RecordID'];
+      } else {
+         list($Type, $ID) = self::ParseRoute(GetValue('Route', $Args));
+      }
       
       $FormatData = array('Title' => C('Garden.Title'), 'Signature' => self::EmailSignature(GetValue('Route', $Args)));
       $NotifyUserID = GetValueR('Activity.NotifyUserID', $Args);
@@ -865,13 +870,28 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $InsertUserID = GetValueR('Discussion.InsertUserID', $Args);
       if (in_array($InsertUserID, $NotifiedUsers))
          return;
-      $CommentUserID = GetValueR('Comment.InsertUserID', $Args);
-      if ($CommentUserID == $InsertUserID)
-         return;
       
+      // Construct an activity and send it.
       $ActivityModel = $Args['ActivityModel'];
-      $ActivityID = $Sender->RecordActivity($ActivityModel, $Args['Discussion'], $CommentUserID, GetValueR('Comment.CommentID', $Args), 'Force');
-//      $ActivityModel->QueueNotification($ActivityID, '');
+      
+      $Comment = $Args['Comment'];
+      $CommentID = $Comment['CommentID'];
+      $HeadlineFormat = T('HeadlineFormat.Comment', '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>');
+      
+      $Activity = array(
+         'ActivityType' => 'Comment',
+         'ActivityUserID' => $Comment['InsertUserID'],
+         'NotifyUserID' => $InsertUserID,
+         'HeadlineFormat' => $HeadlineFormat,
+         'RecordType' => 'Comment',
+         'RecordID' => $CommentID,
+         'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
+         'Data' => array('Name' => GetValue('Name', $Args['Discussion'])),
+         'Notified' => ActivityModel::SENT_OK,
+         'Emailed' => ActivityModel::SENT_PENDING
+      );
+      
+      $ActivityModel->Queue($Activity, FALSE, array('Force' => TRUE));
    }
    
 //   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
