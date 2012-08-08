@@ -588,6 +588,62 @@ select {
    height: 28px;
 }
 
+.Hero {
+   background: #EFEFEF;
+   border: solid 1px #ddd;
+   border-radius: .5ex;
+   font-size: 105%;
+}
+
+.CommentsWrap .Item.Rank-Vanilla .Message {
+   position: relative;
+}
+
+.CommentsWrap .Item .Rank.Rank-Vanilla {
+   background: transparent url('images/vanilla-rank-logo.png') no-repeat 0px 14px;
+   height: 82px;
+   width: 220px;
+   color: transparent;
+   overflow: hidden;
+   line-height: 1000px;
+   
+   display: block;
+   position: absolute;
+   bottom: 0px;
+   right: 0px;
+   
+   -webkit-transition: all .3s ease-in-out;
+   -moz-transition: all .3s ease-in-out;
+   -o-transition: all .3s ease-in-out;
+   -ms-transition: all .3s ease-in-out;
+   transition: all .3s ease-in-out;
+}
+
+.CommentsWrap .Item:hover .Rank.Rank-Vanilla {
+   background-position: 0px 30px;
+}
+
+.CommentsWrap .Item .Rank.Rank-Vanilla:before {
+   content: "";
+}
+
+.CommentsWrap .Item.Rank-Vanilla::after {
+   background: transparent url('images/vanilla-rank-logo-shadow.png') no-repeat 0px 1px;
+   height: 6px;
+   width: 227px;
+   content: " ";
+   display: block;
+   position: absolute;
+   bottom: 0px;
+   right: 0px;
+}
+
+select {
+   border: 1px solid #999;
+   border: 1px solid rgba(0, 0, 0, 0.4);
+   height: 28px;
+}
+
 /*.Item.Rank-Vanilla .AuthorInfo::before {
    background: transparent url('images/vanilla-rank-logo.png') no-repeat 0px 14px;
    height: 82px;

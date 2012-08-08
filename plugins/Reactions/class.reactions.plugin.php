@@ -8,11 +8,12 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.1.6',
+   'Version' => '1.1.7',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+   'MobileFriendly' => TRUE
 );
 
 class ReactionsPlugin extends Gdn_Plugin {

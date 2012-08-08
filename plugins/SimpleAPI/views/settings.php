@@ -1,4 +1,12 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<style class="text/css">
+   .ApiEndpoint {
+      padding: 10px !important;
+      background: #f1f1f1;
+      font-size: 16px;
+      font-family: "Courier New";
+   }
+</style>
 <div class="Help Aside">
    <?php
    echo Wrap(T('Need More Help?'), 'h2');
@@ -15,6 +23,13 @@ echo $Form->Open();
 echo $Form->Errors();
 ?>
 <ul>
+   <li>
+      <?php
+         echo $Form->Label('Endpoint', 'Endpoint');
+         echo '<div class="Info2">Access your forum\'s API through this Endpoint URL:</div>';
+         echo '<div class="ApiEndpoint">https://'.CLIENT_NAME.'/api/v1/</blockquote>';
+      ?>
+   </li>
    <li>
       <?php
          echo $Form->Label('Access Token', 'AccessToken');
