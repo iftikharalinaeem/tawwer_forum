@@ -30,6 +30,12 @@ jQuery(document).ready(function($) {
             $(this).closest('.WarnBox').removeClass('Selected');
       });
    });
+   // Set the highlighted element on page load
+   $('.WarnBox').removeClass('Selected');
+   $('input[name="Level"]:checked').each(function() {
+      $(this).closest('.WarnBox').addClass('Selected');
+   });
+   
 });
 </script>
 <h1><?php echo $this->Data('Title'); ?></h1>
@@ -125,8 +131,8 @@ echo $this->Form->TextBox('ModeratorNote', array('Wrap' => TRUE));
 
 <?php
 echo '<div class="Buttons Buttons-Confirm">', 
-   $this->Form->Button(T('OK')), ' ',
-   $this->Form->Button(T('Cancel'), array('type' => 'button', 'class' => 'Button Close')),
+   $this->Form->Button('OK'), ' ',
+   $this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
    '</div>';
 echo $this->Form->Close();
 ?>

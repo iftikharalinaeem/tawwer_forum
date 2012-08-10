@@ -9,6 +9,11 @@
  * Changes: 
  *  1.0a    Development release
  *  1.0     Official release
+ *  1.1     Add WhosOnline config import
+ *  1.2     Fixed breakage if no memcache support
+ *  1.3     Exposes GetUser() for external querying
+ *  1.4     Fix wasteful OnlineModule rendering, store Name in Online table
+ *  1.5     Add caching to the OnlineModule rending process
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -19,7 +24,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.0',
+   'Version' => '1.5',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -81,19 +86,36 @@ class OnlinePlugin extends Gdn_Plugin {
    const CACHE_CLEANUP_DELAY_KEY = 'plugin.online.cleanup';
    
    /**
+    * Cache rendered html for selector queries for a few seconds to reduce load.
+    * @const string 
+    */
+   const CACHE_ONLINE_MODULE_KEY = 'plugin.online.%s.%s.module';
+   
+   /**
     * Names of cookies and cache keys for tracking guests.
     * @const string 
     */
    const COOKIE_GUEST_PRIMARY = '__vnOz0';
    const COOKIE_GUEST_SECONDARY = '__vnOz1';
    
+   /**
+    * Configuration Defaults 
+    */
+   const DEFAULT_PRUNE_DELAY = 15;
+   const DEFAULT_WRITE_DELAY = 60;
+   const DEFAULT_CLEAN_DELAY = 60;
+   const DEFAULT_STYLE = 'pictures';
+   const DEFAULT_LOCATION = 'every';
+   const DEFAULT_HIDE = 'true';
+   
    public function __construct() {
       parent::__construct();
       
-      $this->WriteDelay = C('Plugins.Online.WriteDelay', 60);
-      $this->PruneDelay = C('Plugins.Online.PruneDelay', 10) * 60;
-      $this->CleanDelay = C('Plugins.Online.CleanDelay', 60);
-      $this->CacheCountDelay = C('Plugins.Online.CacheCountDelay', 10);
+      $this->WriteDelay = C('Plugins.Online.WriteDelay', self::DEFAULT_WRITE_DELAY);
+      $this->PruneDelay = C('Plugins.Online.PruneDelay', self::DEFAULT_PRUNE_DELAY) * 60;
+      $this->CleanDelay = C('Plugins.Online.CleanDelay', self::DEFAULT_CLEAN_DELAY);
+      $this->CacheCountDelay = C('Plugins.Online.CacheCountDelay', 20);
+      $this->CacheRenderDelay = C('Plugins.Online.CacheRenderDelay', 60);
    }
    
    /*
@@ -230,7 +252,7 @@ class OnlinePlugin extends Gdn_Plugin {
     * @return array Pair of expiry times, and the index of the currently active cookie
     */
    public static function Expiries($Time) {
-      $Timespan = (C('Plugins.Online.PruneDelay', 10) * 60) * 2; // Double the real amount
+      $Timespan = (C('Plugins.Online.PruneDelay', self::DEFAULT_PRUNE_DELAY) * 60) * 2; // Double the real amount
       
       $Expiry0 = $Time - $Time % $Timespan + $Timespan;
 
@@ -300,11 +322,12 @@ class OnlinePlugin extends Gdn_Plugin {
          return;
       
       $UserID = Gdn::Session()->UserID;
+      $UserName = Gdn::Session()->User->Name;
       
       if ($WithSupplement) {
          // Figure out where the user is
          $Location = OnlinePlugin::WhereAmI();
-
+         
          // Get the extra data we pushed into the tick with our events
          $TickExtra = @json_decode(Gdn::Request()->GetValue('TickExtra'), TRUE);
          if (!is_array($TickExtra)) $TickExtra = array();
@@ -360,15 +383,30 @@ class OnlinePlugin extends Gdn_Plugin {
          return;
       
       // Write to Online table
-      $Timestamp = Gdn_Format::ToDateTime();
+      $UTC = new DateTimeZone('UTC');
+      $CurrentDate = new DateTime('now', $UTC);
+      
+      $Timestamp = $CurrentDate->format('Y-m-d H:i:s');
       $Px = Gdn::SQL()->Database->DatabasePrefix;
-      $Sql = "INSERT INTO {$Px}Online (UserID, Timestamp) VALUES (:UserID, :Timestamp) ON DUPLICATE KEY UPDATE Timestamp = :Timestamp1";
-      Gdn::SQL()->Database->Query($Sql, array(':UserID' => $UserID, ':Timestamp' => $Timestamp, ':Timestamp1' => $Timestamp));
+      $Sql = "INSERT INTO {$Px}Online (UserID, Name, Timestamp) VALUES (:UserID, :Name, :Timestamp) ON DUPLICATE KEY UPDATE Timestamp = :Timestamp1";
+      Gdn::SQL()->Database->Query($Sql, array(':UserID' => $UserID, ':Name' => $UserName, ':Timestamp' => $Timestamp, ':Timestamp1' => $Timestamp));
       
       // Cleanup some entries
       $this->Cleanup();
    }
    
+   /* 
+    * CONVENIENCE
+    * Helper methods to facilitate tracking
+    */
+   
+   /**
+    * Determine where the current user is on the site
+    * 
+    * @param type $ResolvedPath
+    * @param type $ResolvedArgs
+    * @return string 
+    */
    public static function WhereAmI($ResolvedPath = NULL, $ResolvedArgs = NULL) {
       $Location = 'limbo';
       $WildLocations = array(
@@ -383,6 +421,7 @@ class OnlinePlugin extends Gdn_Plugin {
       if (is_null($ResolvedArgs))
          $ResolvedArgs = json_decode(Gdn::Request()->GetValue('ResolvedArgs'), TRUE);
       
+      if (!$ResolvedPath) return $Location;
       $Location = GetValue($ResolvedPath, $WildLocations, 'limbo');
 
       // Check if we're on the categories list, or inside one, and adjust location
@@ -420,7 +459,7 @@ class OnlinePlugin extends Gdn_Plugin {
       
       Trace('OnlinePlugin->Cleanup');
       // How old does an entry have to be to get pruned?
-		$PruneTimestamp = time() - $this->PruneDelay;
+      $PruneTimestamp = time() - $this->PruneDelay;
       
       $Px = Gdn::Database()->DatabasePrefix;
       $Sql = "DELETE FROM {$Px}Online WHERE Timestamp < :Timestamp";
@@ -562,6 +601,16 @@ class OnlinePlugin extends Gdn_Plugin {
    }
    
    /**
+    * Get online information for a user
+    * 
+    * @param string $UserID
+    */
+   public function GetUser($UserID) {
+      if (!array_key_exists($UserID, $this->GetAllOnlineUsers())) return FALSE;
+      return GetValue($UserID, $this->GetAllOnlineUsers());
+   }
+   
+   /**
     * Join in the supplement cache entries
     * 
     * @param array $Users Users list, by reference
@@ -574,6 +623,9 @@ class OnlinePlugin extends Gdn_Plugin {
          $CacheKeys[sprintf(self::CACHE_ONLINE_SUPPLEMENT_KEY, $UserIDs[$i])] = $UserIDs[$i];
       
       $UserSupplements = Gdn::Cache()->Get(array_keys($CacheKeys));
+      if (!$UserSupplements)
+         return;
+      
       foreach ($UserSupplements as $OnlineSupplementKey => $OnlineSupplement) {
          $UserID = $CacheKeys[$OnlineSupplementKey];
          if (array_key_exists($UserID, $Users)) {
@@ -584,11 +636,23 @@ class OnlinePlugin extends Gdn_Plugin {
       }
    }
    
+   /**
+    * Getter for prune delay
+    * 
+    * @return integer
+    */
+   public function GetPruneDelay() {
+      return $this->PruneDelay;
+   }
+   
    /*
     * DATA HOOKS
     * 
     * We hook into the CategoriesController and DiscussionController in order to
     * provide Tick with some extra data.
+    * 
+    * We hook into the UserModel to add 'Online', 'LastOnlineDate' and 'Private'
+    * to user objects.
     */
    
    public function CategoriesController_BeforeCategoriesRender_Handler($Sender) {
@@ -598,6 +662,75 @@ class OnlinePlugin extends Gdn_Plugin {
    public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
       Gdn::Statistics()->AddExtra('CategoryID', $Sender->Data('Discussion.CategoryID'));
       Gdn::Statistics()->AddExtra('DiscussionID', $Sender->Data('Discussion.DiscussionID'));
+   }
+   
+   /**
+    * Attach users' online state to user objects
+    * 
+    * @param UserModel $Sender
+    */
+   public function UserModel_AfterGetID_Handler($Sender) {
+      $User = &$Sender->EventArguments['LoadedUser'];
+      $this->AdjustUser($User);
+   }
+   
+   /**
+    * Attach users' online state to user objects
+    * 
+    * @param UserModel $Sender
+    */
+   public function UserModel_AfterGetIDs_Handler($Sender) {
+      $LoadedUsers = &$Sender->EventArguments['LoadedUsers'];
+      
+      // Adjust user info
+      foreach ($LoadedUsers as $LoadedUserID => &$LoadedUser)
+         $this->AdjustUser($LoadedUser);
+   }
+   
+   public function AdjustUser(&$User) {
+      $UserID = GetValue('UserID', $User, NULL);
+      if (!$UserID) FALSE;
+      
+      // Already handled this one guv'na
+      if (array_key_exists('Online', $User)) return;
+      
+      $UTC = new DateTimeZone('UTC');
+      $CurrentDate = new DateTime('now', $UTC);
+      
+      $UserInfo = $this->GetUser($UserID);
+      $UserIsOnline = FALSE;
+
+      $UserLastOnline = GetValue('Timestamp', $UserInfo, NULL);
+      if (Gdn::Session()->IsValid() && $UserID == Gdn::Session()->UserID)
+         $UserLastOnline = $CurrentDate->format('Y-m-d H:i:s');
+
+      if (!is_null($UserLastOnline)) {
+         
+         $EarliestOnlineDate = new DateTime('now', $UTC);
+         $EarliestOnlineDate->sub(new DateInterval("PT{$this->PruneDelay}S"));
+         $EarliestOnlineTime = $EarliestOnlineDate->getTimestamp();
+         $EarliestOnline = $EarliestOnlineDate->format('Y-m-d H:i:s');
+         
+         $UserLastOnlineDate = DateTime::createFromFormat('Y-m-d H:i:s', $UserLastOnline, $UTC);
+         $UserLastOnlineTime = $UserLastOnlineDate->getTimestamp();
+         $UserLastOnline = $UserLastOnlineDate->format('Y-m-d H:i:s');
+         
+         $UserIsOnline = $UserLastOnlineTime >= $EarliestOnlineTime;
+      }
+
+      SetValue('Online', $User, $UserIsOnline);
+      SetValue('LastOnlineDate', $User, $UserLastOnline);
+      
+      $UserIsPrivate = $this->PrivateMode($User);
+      SetValue('Private', $User, $UserIsPrivate);
+      
+      $UserClasses = trim(GetValue('_CssClass', $User));
+      if ($UserIsOnline && !$UserIsPrivate)
+         $UserClasses .= " Online";
+      else
+         $UserClasses .= " Offline";
+      
+      SetValue('_CssClass', $User, $UserClasses);
    }
    
    /*
@@ -617,43 +750,45 @@ class OnlinePlugin extends Gdn_Plugin {
       // Don't add the module of the plugin is hidden for guests
       if (C('Plugins.Online.HideForGuests', TRUE) && !Gdn::Session()->IsValid())
          return;
-		
-		// Is this a page for including the module?
-		$ShowOnController = array();		
-		switch($PluginRenderLocation) {
+      
+      $Sender->AddCssFile('online.css', 'plugins/Online');
+      
+      // Is this a page for including the module?
+      $ShowOnController = array();      
+      switch($PluginRenderLocation) {
          case 'custom':
             return;
             
-			case 'every':
-				$ShowOnController = array(
-					'discussioncontroller',
-					'categoriescontroller',
-					'discussionscontroller',
-					'profilecontroller',
-					'activitycontroller'
-				);
-				break;
+         case 'every':
+            $ShowOnController = array(
+               'discussioncontroller',
+               'categoriescontroller',
+               'discussionscontroller',
+               'profilecontroller',
+               'activitycontroller'
+            );
+            break;
          
-			case 'discussions':
-				$ShowOnController = array(
-					'discussionscontroller',
-					'categoriescontroller'
-				);	
-				break;
+         case 'discussions':
+            $ShowOnController = array(
+               'discussionscontroller',
+               'categoriescontroller'
+            );   
+            break;
          
-			case 'discussion':
+         case 'discussion':
          default:
-			   $ShowOnController = array(
-					'discussioncontroller',
-					'discussionscontroller',
-					'categoriescontroller'
-				);	
-			   break;						
-		}
-		
-		// Include the module
+            $ShowOnController = array(
+               'discussioncontroller',
+               'discussionscontroller',
+               'categoriescontroller'
+            );   
+            break;                  
+      }
+      
+      // Include the module
       if (in_array($Controller, $ShowOnController))
-   	   $Sender->AddModule('OnlineModule');
+         $Sender->AddModule('OnlineModule');
    }
    
    /*
@@ -716,9 +851,9 @@ class OnlinePlugin extends Gdn_Plugin {
       $ViewingUserID = Gdn::Session()->UserID;
       
       if ($Sender->User->UserID == $ViewingUserID) {
-         $SideMenu->AddLink('Options', T("Who's Online"), '/profile/online', FALSE, array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpWhosOnline').T("Who's Online"), '/profile/online', FALSE, array('class' => 'Popup'));
       } else {
-         $SideMenu->AddLink('Options', T("Who's Online"), UserUrl($Sender->User, '', 'online'), 'Garden.Users.Edit', array('class' => 'Popup'));
+         $SideMenu->AddLink('Options', Sprite('SpWhosOnline').T("Who's Online"), UserUrl($Sender->User, '', 'online'), 'Garden.Users.Edit', array('class' => 'Popup'));
       }
    }
    
@@ -737,10 +872,10 @@ class OnlinePlugin extends Gdn_Plugin {
       $Sender->Form = new Gdn_Form();
       
       $Fields = array(
-         'Plugins.Online.Location'        => 'every',
-         'Plugins.Online.Style'           => 'pictures',
-         'Plugins.Online.HideForGuests'   => 'true',
-         'Plugins.Online.PruneDelay'      => 10
+         'Plugins.Online.Location'        => self::DEFAULT_LOCATION,
+         'Plugins.Online.Style'           => self::DEFAULT_STYLE,
+         'Plugins.Online.HideForGuests'   => self::DEFAULT_HIDE,
+         'Plugins.Online.PruneDelay'      => self::DEFAULT_PRUNE_DELAY
       );
       
       $Saved = FALSE;
@@ -748,7 +883,7 @@ class OnlinePlugin extends Gdn_Plugin {
          $CurrentValue = C($Field, $DefaultValue);
          $Sender->Form->SetValue($Field, $CurrentValue);
          
-         if ($Sender->Form->IsMyPostBack()) {
+         if ($Sender->Form->IsPostBack()) {
             $NewValue = $Sender->Form->GetValue($Field);
             if ($NewValue != $CurrentValue) {
                SaveToConfig ($Field, $NewValue);
@@ -766,13 +901,69 @@ class OnlinePlugin extends Gdn_Plugin {
    }
    
    public function Setup() {
+      
+      // Run Database adjustments
+      
       $this->Structure();
+      
+      // Disable WhosOnline
+      
+      if (Gdn::PluginManager()->CheckPlugin('WhosOnline')) {
+         Gdn::PluginManager()->DisablePlugin('WhosOnline');
+      }
+      
+      // Import WhosOnline settings if they exist
+      
+      $DisplayStyle = C('WhosOnline.DisplayStyle', NULL);
+      if (!is_null($DisplayStyle)) {
+         switch ($DisplayStyle) {
+            case 'pictures':
+               SaveToConfig('Plugins.Online.Style', 'pictures');
+               break;
+            case 'list':
+               SaveToConfig('Plugins.Online.Style', 'links');
+               break;
+         }
+         
+         RemoveFromConfig('WhosOnline.DisplayStyle');
+      }
+      
+      $DisplayLocation = C('WhosOnline.Location.Show', NULL);
+      if (!is_null($DisplayLocation)) {
+         switch ($DisplayLocation) {
+            case 'every':
+            case 'custom':
+               SaveToConfig('Plugins.Online.Location', $DisplayLocation);
+               break;
+            case 'discussion':
+               SaveToConfig('Plugins.Online.Location', 'discussions');
+               break;
+            case 'discussionsonly':
+               SaveToConfig('Plugins.Online.Location', 'discussionlists');
+               break;
+         }
+         
+         RemoveFromConfig('WhosOnline.Location.Show');
+      }
+      
+      $HideForGuests = C('WhosOnline.Hide', NULL);
+      if (!is_null($HideForGuests)) {
+         if ($HideForGuests) {
+            SaveToConfig('Plugins.Online.HideForGuests', 'true');
+         } else {
+            SaveToConfig('Plugins.Online.HideForGuests', 'false');
+         }
+         
+         RemoveFromConfig('WhosOnline.Hide');
+      }
+      
    }
    
    public function Structure() {
       Gdn::Structure()->Table('Online')
-			->Column('UserID', 'int(11)', FALSE, 'primary')
-       	->Column('Timestamp', 'datetime')
+         ->Column('UserID', 'int(11)', FALSE, 'primary')
+         ->Column('Name', 'varchar(64)', NULL)
+         ->Column('Timestamp', 'datetime')
          ->Set(FALSE, FALSE); 
    }
 }

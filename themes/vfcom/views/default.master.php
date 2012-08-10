@@ -10,7 +10,7 @@ $Session = Gdn::Session();
 </head>
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
 <div class="Head">
-	<div class="Wrapper">
+   <div class="Wrapper">
       <div class="InnerWrapper">
          <div class="Center">
             <h1 class="Logo">
@@ -49,12 +49,12 @@ $Session = Gdn::Session();
             </div>
             <?php if (!$Session->IsValid()) echo Anchor('Sign Up', 'plans', 'GreenButton SignUpButton'); ?>
          </div>
-		</div>
-	</div>
+      </div>
+   </div>
 </div>
 <div class="Divider"></div>
 <div class="BreadcrumbWrap">
-	<div class="Wrapper">
+   <div class="Wrapper">
       <div class="InnerWrapper">
          <div class="Row Center">
             <?php echo Gdn_Theme::Breadcrumbs($this->Data('Breadcrumbs')); ?>
@@ -63,10 +63,12 @@ $Session = Gdn::Session();
    </div>
 </div>
 <div class="Body" id="Body">
-	<div class="Wrapper">
+   <div class="Wrapper">
       <div class="InnerWrapper">
          <div class="Row Center">
-            <div id="Panel" class="Column PanelColumn""><?php $this->RenderAsset('Panel'); ?></div>
+            <div id="Panel" class="Column PanelColumn"">
+               <?php $this->AddModule('MeModule'); $this->RenderAsset('Panel'); ?>
+            </div>
             <div id="Content" class="Column ContentColumn"><?php
             if (in_array(strtolower($this->ControllerName), array('discussionscontroller', 'categoriescontroller'))) {
                echo '<div class="SearchForm">';
@@ -86,15 +88,15 @@ $Session = Gdn::Session();
    </div>
 </div>
 <div class="Foot">
-	<div class="Wrapper">
-		<div class="Center Row">
+   <div class="Wrapper">
+      <div class="Center Row">
          <div class="Columns">
             <div class="Column4">
                <strong>About Us</strong>
                <?php
                echo Anchor('Contact Us', '/info/contact', '', array('SSL' => FALSE));
                echo '<br />'.Anchor("We're Hiring!", '/info/hiring', '', array('SSL' => FALSE));
-					echo '<br />'.Anchor('Press Releases', 'http://vanillaforums.totemapp.com/');
+               echo '<br />'.Anchor('Press Releases', 'http://vanillaforums.totemapp.com/');
                echo '<br />'.Anchor('Follow us on Facebook', 'http://www.facebook.com/vanillaforums', '', array('SSL' => FALSE));
                echo '<br />'.Anchor('Follow us on Twitter', 'http://www.twitter.com/vanilla', '', array('SSL' => FALSE));
                echo '<br />'.Anchor('Read Our Blog', '/blog', '', array('SSL' => FALSE));
@@ -119,18 +121,21 @@ $Session = Gdn::Session();
                // echo '<br />'.Anchor('Free Version', '/free-version', '', array('SSL' => FALSE));
                ?>
             </div>
-				<div class="Column4">
-					<strong>Legal Stuff</strong>
-					<?php
+            <div class="Column4">
+               <strong>Legal Stuff</strong>
+               <?php
                echo Anchor('Privacy Policy', '/info/privacy', '', array('SSL' => FALSE));
                echo '<br />'.Anchor('Terms of Service', '/info/termsofservice', '', array('SSL' => FALSE));
                echo '<br />'.Anchor('Refund Policy', '/info/refund', '', array('SSL' => FALSE));
-					?>
-				</div>
+               ?>
+            </div>
+         </div>
+         <div class="PoweredByRackspace">
+            <a href="http://www.rackspace.com" title="Powered By Rackspace"><img src="http://cdn.vni.la/files/powered-by-rackspace-logo-trans.png" /></a>
          </div>
          <?php $this->RenderAsset('Foot'); ?>
-		</div>
-	</div>
+      </div>
+   </div>
 </div>
 <?php $this->FireEvent('AfterBody'); ?>
 <?php /*

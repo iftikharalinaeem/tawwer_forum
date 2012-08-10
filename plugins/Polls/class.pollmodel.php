@@ -86,6 +86,13 @@ class PollModel extends Gdn_Model {
       
       // Add & apply any extra validation rules:    
       
+      // New poll? Set default category ID if none is defined.
+      if (!ArrayValue('DiscussionID', $FormPostValues, '')) {
+         if (!GetValue('CategoryID', $FormPostValues) && !C('Vanilla.Categories.Use')) {
+            $FormPostValues['CategoryID'] = GetValue('CategoryID', CategoryModel::DefaultCategory(), -1);
+         }
+      }
+      
       // This should have been done in discussion model: 
       // Validate category permissions.
       $CategoryID = GetValue('CategoryID', $FormPostValues);

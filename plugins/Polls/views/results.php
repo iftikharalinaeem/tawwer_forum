@@ -21,7 +21,6 @@ else:
             $Item = $Item + 1;
             $CountVotes = GetValue('CountVotes', $Option);
             $Votes = GetValue('Votes', $Option);
-            $CountActualVotes = count($Votes);
             $Percent = $CountPollVotes > 0 ? floor(($CountVotes * 100) / $CountPollVotes) : 0;
          ?>
          <div class="PollOption PollOption<?php echo $Item; ?>">
@@ -32,20 +31,20 @@ else:
                <span class="VotePercent"><?php echo $Percent; ?>%</span>
                <?php
                if ($Anonymous)
-                  echo Wrap(Plural($CountActualVotes, '%s vote', '%s votes'), 'span class="VoteCount"');
+                  echo Wrap(Plural($CountVotes, '%s vote', '%s votes'), 'span class="VoteCount"');
                ?>
             </div>
-            <?php if (!$Anonymous && is_array($Votes) && $CountActualVotes > 0): ?>
+            <?php if (!$Anonymous && is_array($Votes) && $CountVotes > 0): ?>
             <div class="VoteUsers">
                <span class="PhotoGrid PhotoGridSmall">
                   <?php 
                   $MaxLimit = 20;
-                  $Max = $CountActualVotes > $MaxLimit ? $MaxLimit : $CountActualVotes;
+                  $Max = $CountVotes > $MaxLimit ? $MaxLimit : $CountVotes;
                   for ($i = 0; $i < $Max; $i++)
                      echo UserPhoto($Votes[$i], array('Size' => 'Small'));
                   ?>
                </span>
-               <span class="VoteCount"><?php echo Plural($CountActualVotes, '%s vote', '%s votes'); ?></span>
+               <span class="VoteCount"><?php echo Plural($CountVotes, '%s vote', '%s votes'); ?></span>
             </div>
             <?php endif; ?>
          </div>

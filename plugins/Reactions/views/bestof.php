@@ -34,10 +34,10 @@ echo Wrap($this->Data('Title'), 'h1 class="H"');
 
 echo '<div class="DataCounts">';
    $CurrentReactionType = $this->Data('CurrentReaction');
-   echo ReactionFilterButton('Everything', 'Everything', $CurrentReactionType);
+   echo ReactionFilterButton(T('Everything'), 'Everything', $CurrentReactionType);
    $ReactionTypeData = $this->Data('ReactionTypes');
    foreach ($ReactionTypeData as $Key => $ReactionType) {
-      echo ReactionFilterButton(GetValue('Name', $ReactionType, ''), GetValue('UrlCode', $ReactionType, ''), $CurrentReactionType);
+      echo ReactionFilterButton(T(GetValue('Name', $ReactionType, '')), GetValue('UrlCode', $ReactionType, ''), $CurrentReactionType);
    }
 echo '</div>
    

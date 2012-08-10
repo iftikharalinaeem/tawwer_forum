@@ -269,7 +269,7 @@ form.Activity,
 ul.MessageList,
 ul.DataList {
 	background: #fff;
-	border: 1px solid #9fa9b9;
+	/* border: 1px solid #9fa9b9; */
 	border-top: 0;
 }
 ul.ActivityComments {
@@ -362,15 +362,18 @@ body.Profile #Panel {
 	 right: auto;
 	 left: 20px;
 }
+/*
 form.Activity textarea {
     width:99%;
 }
+*/
 #Foot div {
 	 width: auto;
 }
 body.Post #Content {
     margin:0 20px;
 }
+/*
 div.Comment div.CommentForm,
 div.Comment div.CommentForm textarea,
 div.CommentForm textarea,
@@ -378,17 +381,25 @@ div.CommentForm textarea,
 #DiscussionForm textarea {
     width:99%;
 }
-
+*/
 .Count {
    background: #444;
    color: #fff;
 }
-
+/*
 .ToggleFlyout .Flyout {
    left: auto;
    right: 0;
 }
-
+*/
 .MenuItems {
    min-width: 75px;
+}
+.DataList.Discussions .Item:first-child {
+   border-top-width: 1px;
+}
+.NavButton,
+.Button,
+.MenuItems a {
+   text-decoration: none !important;
 }

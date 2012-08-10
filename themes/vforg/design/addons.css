@@ -111,9 +111,6 @@ div.Testing h3 {
 #addons_addon_index #Content div.Approved,
 #addons_addon_index #Content div.Warning {
    font-size: 14px;
-   border: 0;
-   background: #d00;
-   color: #fff;
    padding: 8px;
    line-height: 1.5;
    padding: 10px 8px;
@@ -440,13 +437,8 @@ li.AddonRow div.Meta {
 body.Addons .SearchForm .Options {
    float: none;
 }
-ul.DataList li div.Meta span span {
+ul.DataList li.AddonRow div.Meta span span {
    color: #333;
-   padding: 2px 4px;
-   margin-left: 2px;
-   background: #ffa;
-   -moz-border-radius: 2px;
-   -webkit-border-radius: 2px;
 }
 ul.DataList div.Meta span {
    margin-right:4px;

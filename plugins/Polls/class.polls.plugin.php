@@ -8,11 +8,13 @@
 $PluginInfo['Polls'] = array(
    'Name' => 'Polls',
    'Description' => "Allow users to create and vote on polls.",
-   'Version' => '1.0.1',
+   'Version' => '1.0.3',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://markosullivan.ca'
+   'AuthorUrl' => 'http://markosullivan.ca',
+   'MobileFriendly' => TRUE,
+   'RegisterPermissions' => array('Plugins.Polls.Add' => 'Garden.Profiles.Edit')
 );
 
 class PollsPlugin extends Gdn_Plugin {
@@ -27,8 +29,12 @@ class PollsPlugin extends Gdn_Plugin {
    /** 
     * Add the "new poll" button after the new discussion button. 
     */
-   public function Base_AfterNewDiscussionButton_Handler($Sender) {
-      echo Anchor(Sprite('SpPoll').T('New Poll'), 'post/poll', 'BigButton PollButton');
+   public function Base_BeforeNewDiscussionButton_Handler($Sender) {
+      $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
+      if (Gdn::Session()->CheckPermission('Plugins.Polls.Add')) {
+         $UrlCode = GetValue('UrlCode', GetValue('Category', $Sender->Data), '');
+         $NewDiscussionModule->AddButton(T('New Poll'), '/post/poll/'.$UrlCode);
+      }
    }
    
    /** 
@@ -128,14 +134,12 @@ class PollsPlugin extends Gdn_Plugin {
       }
    }
    
-   
    /**
     * @param AssetModel $Sender
     */
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
       $Sender->AddCssFile('polls.css', 'plugins/Polls');
    }
-   
    /** 
     * Add the poll form to vanilla's post page.
     */
@@ -150,22 +154,27 @@ class PollsPlugin extends Gdn_Plugin {
     */
    public function PostController_Poll_Create($Sender) {
       $PollModel = new PollModel();
-      
-      // Override CategoryID if categories are disabled
-      $Sender->CategoryID = GetValue(0, $Sender->RequestArgs);
       $UseCategories = $Sender->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
-      if (!$UseCategories) 
+      $CategoryUrlCode = GetValue(0, $Sender->RequestArgs);
+      $Category = FALSE;
+      if ($CategoryUrlCode != '') {
+         $CategoryModel = new CategoryModel();
+         $Category = $CategoryModel->GetByCode($CategoryUrlCode);
+         $Sender->CategoryID = $Category->CategoryID;
+      }
+      if ($Category && $UseCategories)
+         $Sender->Category = (object)$Category;
+      else {
          $Sender->CategoryID = 0;
-
-      $Sender->Category = CategoryModel::Categories($Sender->CategoryID);
-      if (!is_object($Sender->Category))
          $Sender->Category = NULL;
+      }      
       
       if ($UseCategories)
 			$CategoryData = CategoryModel::Categories();
 
       // Check permission 
       $Sender->Permission('Vanilla.Discussions.Add');
+      $Sender->Permission('Plugins.Polls.Add');
       
       // Set the model on the form
       $Sender->Form->SetModel($PollModel);

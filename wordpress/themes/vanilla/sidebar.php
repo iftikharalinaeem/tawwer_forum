@@ -27,10 +27,6 @@
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-tim.jpg" />
 			<span class="about"><strong>Tim Gunter</strong> Developer & System Administrator</span>
 		</a>
-		<a class="team-lizzie" href="http://www.facebook.com/Semcglinchey">
-			<img src="<?php bloginfo('template_directory'); ?>/images/team-lizzie.png" />
-			<span class="about"><strong>Lizzie McGlinchey</strong> Project Manager</span>
-		</a>
 		<a class="team-mark" href="http://markosullivan.ca">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-mark.jpg" />
 			<span class="about"><strong>Mark O'Sullivan</strong> CPO, Co-Founder, Sandwich Expert</span>

@@ -304,7 +304,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			if (is_numeric($RequestedRevisionID) && $RequestedRevisionID >= 0)
 				$WorkingRevisionID = $RequestedRevisionID;
 		}
-
+      
 		// Get customizations from db
 		$this->_Construct();
 		$ThemeData = Gdn::SQL()
@@ -360,11 +360,11 @@ Here are some things you should know before you begin:
 		}
 			
 		// If viewing the form for the first time
-		if (!$Sender->Form->AuthenticatedPostBack()) {
-			$Sender->Form->SetFormValue('CustomCSS', $CSSContents);
-			$Sender->Form->SetFormValue('CustomHtml', $HtmlContents);
+		if (!$Sender->Form->IsPostBack()) {
+			$Sender->Form->SetValue('CustomCSS', $CSSContents);
+			$Sender->Form->SetValue('CustomHtml', $HtmlContents);
 			// $Sender->Form->SetFormValue('IncludeThemeCSS', $IncludeThemeCSS);
-         $Sender->Form->SetFormValue('Label', $Label);
+         $Sender->Form->SetValue('Label', $Label);
 		} else {
 			// If saving the form
 			$IsApply = $Sender->Form->GetFormValue('Apply') ? TRUE : FALSE;

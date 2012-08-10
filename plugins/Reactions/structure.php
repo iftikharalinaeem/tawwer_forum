@@ -17,6 +17,7 @@ $St
    ->Column('Attributes', 'text', TRUE)
    ->Column('Sort', 'smallint', TRUE)
    ->Column('Active', 'tinyint(1)', 0)
+   ->Column('Custom', 'tinyint(1)', 0)
    ->Set();
 
 $St->Table('UserTag')
@@ -82,7 +83,7 @@ if (class_exists('BadgeModel')) {
    // Define some badges for the reactions.
    $BadgeModel = new BadgeModel();
 
-   $Reactions = array('Insightful' => 'Insightfuls', 'Agree' => 'Agrees', 'Like' => 'Likes', 'Up' => 'Up Votes', 'Awesome' => 'Awesomes', 'LOL' => 'LOLs', 'WTF' => 'WTFs'); 
+   $Reactions = array('Insightful' => 'Insightfuls', 'Agree' => 'Agrees', 'Like' => 'Likes', 'Up' => 'Up Votes', 'Awesome' => 'Awesomes', 'LOL' => 'LOLs'); 
    $Thresholds = array(1 => 5, 2 => 25, 3 => 100, 4 => 250, 5 => 500);
    $Sentences = array(
        1 => "We like that.",
@@ -95,8 +96,8 @@ if (class_exists('BadgeModel')) {
       $ClassSlug = strtolower($Class);
       foreach ($Thresholds as $Level => $Threshold) {
          $Points = round($Threshold / 10);
-         if ($Points < 10)
-            $Points = 10;
+         if ($Points < 5)
+            $Points = 5;
          
          $Sentence = $Sentences[$Level];
 

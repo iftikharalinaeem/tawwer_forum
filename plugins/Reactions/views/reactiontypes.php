@@ -74,6 +74,11 @@
       </li>
    </ol>
 </div>
+<div class="Wrap">
+   <?php
+   echo Anchor(T('Advanced Settings'), '/settings/reactions');
+   ?>
+</div>
 <table id="Badges" class="AltColumns ManageBadges">
    <thead>
       <tr>
@@ -92,7 +97,7 @@
          <td class="NameColumn"><div class="CellWrap">
             <?php
             echo Img('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png', array('ReactionImage')), ' ';
-            echo $ReactionType['Name'];
+            echo T($ReactionType['Name']);
             ?></div>
          </td>
          <td><?php echo $ReactionType['Description']; ?></td>

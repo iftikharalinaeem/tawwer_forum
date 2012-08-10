@@ -1,7 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
 <ul class="DataList Compact BlogList">
-   <?php foreach ($this->Data('Data', array()) as $Row): ?>
+   <?php 
+   foreach ($this->Data('Data', array()) as $Row): 
+      $this->SetData('Record', $Row);
+   ?>
    <li id="<?php echo "{$Row['RecordType']}_{$Row['RecordID']}" ?>" class="Item">
       <?php
       if ($Name = GetValue('Name', $Row)) {

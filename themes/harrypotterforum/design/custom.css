@@ -1,6 +1,7 @@
 /* Body & Header */
 body {
    background: url('harryface2.png') 40px -40px no-repeat #000;
+/*   background: url('robertface.png') 30px -73px no-repeat #000;*/
 	color: #888;
 }
 .Message {
@@ -159,16 +160,13 @@ div.MessageForm {
 div.MessageForm div.Buttons {
 	text-align: right;
 }
-div.CommentForm textarea {
-	width:99%;
-}
 #DiscussionForm textarea,
 #DiscussionForm input.InputBox {
 	width:99.5%;
 }
 ul.DataList li.Item {
-   background: none;
-   border-bottom: 1px solid #344254;
+   background: #091119;
+   border-bottom: 1px solid #102437;
 }
 ul.Activities ul.DataList li {
    background-color: #222222;
@@ -379,10 +377,11 @@ div.Preview,
 ul.MessageList div.Message {
    clear: none;
    padding: 10px;
+   color: #cfe8ff;
 }
 ul.MessageList div.Meta {
    padding: 10px;
-   background-color: #222222;
+   background-color: #112333;
 }
 ul.MessageList div.Meta a {
 	text-decoration: none;
@@ -392,8 +391,8 @@ ul.MessageList div.Meta a:hover {
 }
 div.Preview,
 ul.MessageList li.Item {
-   border-bottom: 1px solid #ccc;
-   padding: 0px;
+   background: #091119;
+   margin-bottom: 15px;
 }
 ul.MessageList li.Item div.Message a {
    text-decoration: none;
@@ -498,9 +497,6 @@ body.Entry form ul li label,
 }
 #DiscussionForm ul.PostOptions label {
    color:#ddd;
-}
-div.CommentForm textarea {
-	width: 99%;
 }
 /* Conversations */
 ul.Condensed li, li.Condensed {
@@ -671,4 +667,41 @@ div.EmoticonContainer {
 
 div.UserSpoiler,blockquote.UserQuote {
    background-color:#222222;
+}
+
+.ReactSprite {
+    background-image: url("http://cdn.vanillaforums.com/images/sprites-14-fff.png");
+}
+
+.MenuItems .ReactSprite {
+    background-image: url("http://cdn.vanillaforums.com/images/sprites-14-000.png");
+}
+
+.ProfilePhotoMedium {
+    width: 48px;
+    height: 48px;
+}
+
+.Meta.CommentMeta {
+    line-height: 0.5;
+}
+.Pager .Highlight {
+   color: red;
+}
+
+.AuthorInfo {
+    color: red;
+}
+
+.AuthorInfo .MItem {
+    margin: 0;
+}
+
+.AuthorInfo .MItem:before {
+    content: " • ";
+    color: #c5e3ff;
+}
+
+.ItemDiscussion .Meta, .DataList .Meta {
+   color: #b5c7d7;
 }

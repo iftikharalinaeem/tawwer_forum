@@ -671,3 +671,12 @@ body.filenotfound #Content {
 #Content {
     padding-bottom: 40px;
 }
+
+.Foot .Columns {
+   height: 100%;
+   overflow: hidden;
+}
+.PoweredByRackspace {
+   margin-top: 20px;
+   text-align: center;
+}

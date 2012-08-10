@@ -8,7 +8,7 @@
 $PluginInfo['Warnings'] = array(
    'Name' => 'Warnings',
    'Description' => "Allows moderators to warn users to help police the community.",
-   'Version' => '1.0.1b',
+   'Version' => '1.0.1c',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -55,14 +55,20 @@ class WarningsPlugin extends Gdn_Plugin {
    /// Event Handlers ///
    
    /**
-    * Add "Message" option to profile options.
+    * Add Warn option to profile options.
     */
-   public function Base_AdvancedProfileOptions_Handler($Sender, $Args) {
-      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-         $Sender->Data['Advanced']['Warn'] = array(
-             'Label' => T('Warn'),
+   public function ProfileController_BeforeProfileOptions_Handler($Sender, $Args) {
+      if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
+         return;
+      
+      if (Gdn::Session()->UserID == $Sender->EventArguments['UserID'])
+         return;
+      
+      if (!GetValue('EditMode', Gdn::Controller())) {
+         $Sender->EventArguments['ProfileOptions'][] = array(
+             'Text' => Sprite('SpWarn').T('Warn'),
              'Url' => '/profile/warn?userid='.$Args['UserID'],
-             'Class' => 'Popup WarnButton'
+             'CssClass' => 'Popup WarnButton'
          );
       }
    }
@@ -123,7 +129,7 @@ class WarningsPlugin extends Gdn_Plugin {
          $UserID = $Sender->User->UserID;
          
 //         $WarningsLabel = Sprite('SpWarn').T('Warnings');
-         $WarningsLabel = T('Warnings');
+         $WarningsLabel = Sprite('SpWarnings').T('Warnings');
          
          $Count = '';
          $Level = Gdn::UserMetaModel()->GetUserMeta($UserID, 'Warnings.Level');

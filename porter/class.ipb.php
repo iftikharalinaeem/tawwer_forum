@@ -443,9 +443,9 @@ replace tmp_group (
 	groupid
 )
 select
-	min(id),
 	title2,
-	userids
+	userids,
+	min(id)
 from tmp_conversation
 group by title2, userids;
 
@@ -480,7 +480,7 @@ join tmp_conversation tc
       // Converation Message.
       $ConversationMessage_Map = array(
           'msg_id' => 'MessageID',
-          'group_id' => 'ConversationID',
+          'groupid' => 'ConversationID',
           'msg_date' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
           'msg_post' => 'Body',
           'Format' => 'Format',
