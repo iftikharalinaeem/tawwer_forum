@@ -1,0 +1,147 @@
+@import "compass/css3/images";
+
+$highlight-bg: if(lightness($bodyBackground) > 50%, darken($bodyBackground, 20%), lighten($bodyBackground, 20%));
+$highlight-color: if(lightness($bodyBackground) > 50%, darken($bodyBackground, 50%), lighten($bodyBackground, 50%));
+
+/** Typography **/
+
+body {
+   background: $bodyBackground;
+   color: $textColor;
+}
+
+a,
+.FlyoutMenu a {
+   color: $linkColor;
+}
+
+h1, h2, h3, h4, h5 {
+   color: $headingColor;
+}
+
+.Tag, .TagCloud li {
+   background: $tag-bg;
+   color: $tag-color;
+}
+
+.Tag a {
+   color: $tag-color;
+}
+
+/** DataLists **/
+
+.DataList {
+   border-color: $border-color;
+}
+
+.Item {
+   border-color: $border-color;
+}
+
+$read-color: if(lightness($bodyBackground) > 50%, rgba(0,0,0,.3), rgba(255,255,255,.3));
+
+.Item.Read {
+   background: $read-background;
+   color: $read-color;
+}
+.Item.Read a {
+   color: $read-color;
+}
+
+.Item.Read .Tag, .Item.Read .Tag a {
+   background: opacify(invert($read-color), .2) !important;
+   color: $read-color !important;
+}
+
+.ItemDiscussion .Meta, .DataList .Meta {
+   color: transparentize($read-color, .1);
+}
+
+.DataList.Discussions .MCount, .DataList.Discussions .HasNew {
+   color: $textColor;
+}
+
+/** Forms **/
+
+.Button, .NavButton {
+   background-color: $btnBackground;
+   @include background-image(linear-gradient(top, lighten($btnBackground, 10%), darken($btnBackground, 10%)));
+   border-color: darken($btnBackground, 20%);
+   color: $btnColor;
+   @if (lightness($btnColor) > 50%) {
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75);
+   }
+}
+
+.Button:hover, .NavButton:hover {
+   background-color: darken($btnBackground, 10%);
+   color: $btnColor;
+   border-color: darken($btnBackground, 20%);
+}
+
+.NavButton.Handle .Sprite, .Button.Handle .Sprite {
+   border-top-color: $btnColor;
+}
+
+.Button.Primary {
+   background-color: $btnPrimaryBackground;
+   @include background-image(linear-gradient(top, lighten($btnPrimaryBackground, 10%), darken($btnPrimaryBackground, 10%)));
+   border-color: darken($btnPrimaryBackground, 20%);
+   color: $btnPrimaryColor;
+   
+   @if (lightness($btnPrimaryColor) > 50%) {
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75);
+   }
+}
+.Button.Primary:hover {
+   background-color: darken($btnPrimaryBackground, 10%);
+   border-color: darken($btnPrimaryBackground, 20%);
+}
+
+.NavButton.Primary.Handle .Sprite, .Button.Primary.Handle .Sprite {
+   border-top-color: $btnPrimaryColor;
+}
+
+.ButtonGroup.Open .Button.Handle, .Button:focus, .Button:active {
+   background: darken($btnBackground, 5%);
+   background-image: none;
+   border-color: darken($btnBackground, 10%);
+   box-shadow: 0 2px 12px rgba(0,0,0,.4) inset;
+}
+
+.ButtonGroup.Open .Button.Primary.Handle {
+   background: darken($btnPrimaryBackground, 5%);
+   background-image: none;
+   border-color: darken($btnPrimaryBackground, 10%);
+}
+
+.Open .Handle.Primary .Sprite {
+   border-top-color: #fff;
+}
+
+.FormWrapper {
+   background-color: $formBackground;
+}
+
+/** Pagers **/
+
+.Pager a, .Pager span {
+   border-color: $border-color;
+}
+
+.Pager a:hover, .Pager .Highlight {
+   background-color: $highlight-bg;
+   color: $highlight-color;
+}
+
+/** Sprites **/
+
+@if (lightness($bodyBackground) <= 50%) {
+   .OptionsTitle, a.Bookmark, a.Bookmarked, a.Bookmarking {
+      background-image: url('ui_sprites_white.png');
+   }
+
+   .ReactSprite {
+      background-image: url("http://cdn.vanillaforums.com/images/sprites-14-fff.png");
+   }
+}

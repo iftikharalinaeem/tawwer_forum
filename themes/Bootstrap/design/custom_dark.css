@@ -90,6 +90,11 @@ h1, h2, h3, h4, h5 {
 }
 
 /* line 82, sass/_colours.scss */
+.NavButton.Handle .Sprite, .Button.Handle .Sprite {
+  border-top-color: white;
+}
+
+/* line 86, sass/_colours.scss */
 .Button.Primary {
   background-color: #f80f47;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f9416d), color-stop(100%, #ce0636));
@@ -103,13 +108,18 @@ h1, h2, h3, h4, h5 {
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75);
 }
 
-/* line 92, sass/_colours.scss */
+/* line 96, sass/_colours.scss */
 .Button.Primary:hover {
   background-color: #ce0636;
   border-color: #9c0529;
 }
 
-/* line 97, sass/_colours.scss */
+/* line 101, sass/_colours.scss */
+.NavButton.Primary.Handle .Sprite, .Button.Primary.Handle .Sprite {
+  border-top-color: white;
+}
+
+/* line 105, sass/_colours.scss */
 .ButtonGroup.Open .Button.Handle, .Button:focus, .Button:active {
   background: #3c3c3c;
   background-image: none;
@@ -117,48 +127,48 @@ h1, h2, h3, h4, h5 {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4) inset;
 }
 
-/* line 104, sass/_colours.scss */
+/* line 112, sass/_colours.scss */
 .ButtonGroup.Open .Button.Primary.Handle {
   background: #e7073d;
   background-image: none;
   border-color: #ce0636;
 }
 
-/* line 110, sass/_colours.scss */
+/* line 118, sass/_colours.scss */
 .Open .Handle.Primary .Sprite {
   border-top-color: #fff;
 }
 
-/* line 114, sass/_colours.scss */
+/* line 122, sass/_colours.scss */
 .FormWrapper {
   background-color: #2a2a2a;
 }
 
 /** Pagers **/
-/* line 120, sass/_colours.scss */
+/* line 128, sass/_colours.scss */
 .Pager a, .Pager span {
   border-color: #3c3c3c;
 }
 
-/* line 124, sass/_colours.scss */
+/* line 132, sass/_colours.scss */
 .Pager a:hover, .Pager .Highlight {
   background-color: #626262;
   color: #afafaf;
 }
 
 /** Sprites **/
-/* line 132, sass/_colours.scss */
+/* line 140, sass/_colours.scss */
 .OptionsTitle, a.Bookmark, a.Bookmarked, a.Bookmarking {
   background-image: url("ui_sprites_white.png");
 }
 
-/* line 136, sass/_colours.scss */
+/* line 144, sass/_colours.scss */
 .ReactSprite {
   background-image: url("http://cdn.vanillaforums.com/images/sprites-14-fff.png");
 }
 
 /* line 39, sass/custom_dark.scss */
-.DataList {
+.DataList, .DataTable {
   background-color: rgba(0, 0, 0, 0.3);
   box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0, rgba(0, 0, 0, 0.8) 0 1px 7px 0px inset;
   border-width: 0;
@@ -189,4 +199,24 @@ h1, h2, h3, h4, h5 {
   background-color: rgba(0, 0, 0, 0.3);
   box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0, rgba(0, 0, 0, 0.8) 0 1px 7px 0px inset;
   border-width: 0;
+}
+
+/*
+.DataTable thead td {
+   background: $bodyBackground;
+}
+*/
+/* line 66, sass/custom_dark.scss */
+.DataTable {
+  border-radius: 3px;
+}
+
+/* line 70, sass/custom_dark.scss */
+.DataTable td:first-child {
+  padding-left: 1em;
+}
+
+/* line 74, sass/custom_dark.scss */
+.DataTable td:last-child {
+  padding-right: 1em;
 }
