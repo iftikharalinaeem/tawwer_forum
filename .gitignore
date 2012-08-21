@@ -2,3 +2,11 @@ Thumbs.db
 */.sass-cache/*
 *.scssc
 *.sassc
+*.kpf
+.DS_Store
+*.swp
+_notes
+~*
+.project
+.settings
+.buildpath
