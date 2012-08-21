@@ -680,3 +680,14 @@ body.filenotfound #Content {
    margin-top: 20px;
    text-align: center;
 }
+.MultipleEntryMethods .Methods,
+#Form_User_SignIn .CreateAccount {
+   display: none !important;
+   
+}
+body.Entry li.Buttons {
+   padding-bottom: 0;
+}
+body.Entry div.Entry div.MainForm {
+   border-right-width: 365px;
+}
