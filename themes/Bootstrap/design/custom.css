@@ -23,6 +23,12 @@
       width: 220px;
    }
    
+   .PhotoWrap.Jailed .ProfilePhotoLarge,
+   .PhotoWrapLarge.Jailed:before {
+      width: 220px;
+      height: 220px;
+   }
+   
    #Body .ContentColumn {
     margin-left: 240px;
 }
@@ -61,11 +67,18 @@
       background: #EFEFEF;
       margin-bottom: 20px;
       box-shadow: 0 1px 1px #fff inset;
+      box-sizing: content-box;
    }
    
    .ProfilePhotoLarge,
    .PhotoWrap a.ChangePicture {
       width: 250px;
+   }
+   
+   .PhotoWrap.Jailed .ProfilePhotoLarge,
+   .PhotoWrapLarge.Jailed:before {
+      width: 250px;
+      height: 250px;
    }
 }
 
