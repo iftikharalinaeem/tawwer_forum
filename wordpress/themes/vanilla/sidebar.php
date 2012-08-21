@@ -2,7 +2,7 @@
 	
 	<div class="block">
 		<strong>About Us</strong>
-		<p>Vanilla’s next gen forum platform lets you build a community that will really engage your audience to drive higher participation and loyalty. </p>
+		<p>Vanilla's next gen forum platform lets you build a community that will really engage your audience to drive higher participation and loyalty. </p>
 	</div>
 
 	<div class="block team">
