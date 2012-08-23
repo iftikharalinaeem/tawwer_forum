@@ -430,7 +430,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       }
       
       // Set the video embed size for this page explicitly (in memory only).
-      SaveToConfig('Garden.Format.EmbedSize', '450x255', array('Save' => FALSE));
+      SaveToConfig('Garden.Format.EmbedSize', '435x245', array('Save' => FALSE));
       
       // Render the page (or deliver the view)
       $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'bestoflist' : 'bestof';

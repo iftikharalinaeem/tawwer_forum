@@ -5,6 +5,7 @@ $(function () {
    var $items = $('.BestOfList .Item:not(.Wide)');
    if ($items.length == 0) $items = $('.BestOfList .Item');
    var width = $items.outerWidth() + 20;
+   $('.Pager').hide();
 
    $(selector).css({opacity: 0});
    $container.imagesLoaded(function() {
@@ -21,12 +22,12 @@ $(function () {
       itemSelector : selector,
       loading: {
          finished: function() {
-            $('.Loading').hide();
+            // $('.LoadingMore').hide();
          },
-         selector: '.Loading',
+         selector: '.LoadingMore',
           finishedMsg: '&nbsp;',
           msgText: '&nbsp;',
-          img: null
+          img: 'http://cdn.vanillaforums.com/images/progress.gif'
         },
       pixelsFromNavToBottom: 800
    }, function(newElements) {
@@ -45,5 +46,5 @@ $(function () {
       <?php include_once('bestoflist.php'); ?>
    </div>
    <?php echo PagerModule::Write(array('MoreCode' => 'Load More')); ?>
-   <div class="Loading"></div>
+   <div class="LoadingMore"></div>
 </div>
