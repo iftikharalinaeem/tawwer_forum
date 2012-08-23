@@ -303,11 +303,6 @@
     float: left;
     margin: 10px;
 }
-/*
-.BestOfList .Item.Invisible {
-   display: none;
-}
-*/
 .BestOfList .Item.Wide {
    width: 480px;
 }
@@ -396,13 +391,13 @@
 }
 .BestOfList .ReactMenu .ReactButton .ReactSprite,
 .BestOfList .ReactMenu .ReactButton .Count,
-.ReactButton-Flag .ReactSprite {
+.BestOfList .ReactButton-Flag .ReactSprite {
    opacity: 0.5;
 }
 .BestOfList .ReactMenu .ReactButton:hover .ReactSprite,
 .BestOfList .ReactMenu .ReactButton:hover .Count,
-.ReactButton-Flag:hover .ReactSprite,
-.ToggleFlyout.Open .ReactButton-Flag .ReactSprite {
+.BestOfList .ReactButton-Flag:hover .ReactSprite,
+.BestOfList .ToggleFlyout.Open .ReactButton-Flag .ReactSprite {
    opacity: 1;
 }
 
