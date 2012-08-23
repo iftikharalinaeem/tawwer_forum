@@ -435,4 +435,79 @@ class ReactionsPlugin extends Gdn_Plugin {
       $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'bestoflist' : 'bestof';
       $Sender->Render($View, '', 'plugins/Reactions');
    }
+   
+   /**
+	 * Sort the comments by score if necessary
+    * @param CommentModel $CommentModel
+	 */
+   public function CommentModel_AfterConstruct_Handler($CommentModel) {
+		if (!C('Plugins.Reactions.CommentSortEnabled'))
+			return;
+
+      $Sort = self::CommentSort();
+      switch (strtolower($Sort)) {
+         case 'score':
+            $CommentModel->OrderBy(array('coalesce(c.Score, 0) desc', 'c.CommentID'));
+            break;
+         case 'date':
+         default:
+            $CommentModel->OrderBy('c.DateInserted');
+            break;
+      }
+   }
+
+   /** 
+    * Get the user's preference for comment sorting (if enabled).
+    */
+   protected static $_CommentSort;
+   public static function CommentSort() {
+		if (!C('Plugins.Reactions.CommentSortEnabled'))
+			return;
+
+      if (self::$_CommentSort)
+         return self::$_CommentSort;
+      
+      $Sort = GetIncomingValue('Sort', '');
+      if (Gdn::Session()->IsValid()) {
+         if ($Sort == '') {
+            // No sort was specified so grab it from the user's preferences.
+            $Sort = Gdn::Session()->GetPreference('Plugins.Reactions.CommentSort', 'score');
+         } else {
+            // Save the sort to the user's preferences.
+            Gdn::Session()->SetPreference('Plugins.Reactions.CommentSort', $Sort == 'score' ? '' : $Sort);
+         }
+      }
+
+      if (!in_array($Sort, array('score', 'date')))
+         $Sort = 'date';
+      
+      self::$_CommentSort = $Sort;
+      return $Sort;
+   }   
+   
+   /**
+	 * Allow comments to be sorted by score?
+	 */
+	public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
+		if (!C('Plugins.Reactions.CommentSortEnabled'))
+			return;
+
+		if (
+          GetValue('Type', $Sender->EventArguments, 'Comment') == 'Comment' 
+          && !GetValue('VoteHeaderWritten', $this)
+         ):
+         ?>
+         <li class="Item">
+            <span class="NavLabel"><?php echo T('Sort by'); ?></span>
+            <span class="DiscussionSort NavBar">
+               <?php
+               echo Anchor('Points', Url('?Sort=score', TRUE), 'Button'.(self::CommentSort() == 'score' ? ' Active' : ''), array('rel' => 'nofollow', 'alt' => T('Sort by reaction points')));
+               echo Anchor('Date Added', Url('?Sort=date', TRUE), 'Button'.(self::CommentSort() == 'date' ? ' Active' : ''), array('rel' => 'nofollow', 'alt' => T('Sort by date added')));
+            ?>
+            </span>
+         </li>
+         <?php
+         $this->VoteHeaderWritten = TRUE;
+		endif;		
+	}
 }
