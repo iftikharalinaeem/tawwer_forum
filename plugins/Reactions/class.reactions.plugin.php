@@ -347,7 +347,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     * @param string $ReactionType Type of reaction content to show
     * @param int $Page The current page of content
     */
-   public function RootController_BestOf_Create($Sender, $Reaction = 'everything', $Page = '') {
+   public function RootController_BestOf_Create($Sender, $Reaction = 'everything') {
       // Load all of the reaction types.
       try {
          $ReactionModel = new ReactionModel();
@@ -365,7 +365,8 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->SetData('CurrentReaction', $Reaction);
 
       // Define the query offset & limit.
-      $Limit = C('Vanilla.Comments.PerPage', 30);
+      $Page = 'p'.GetIncomingValue('Page', 1);
+      $Limit = C('Plugins.Reactions.BestOfPerPage', 10);
       //      $OffsetProvided = $Page != '';
       list($Offset, $Limit) = OffsetLimit($Page, $Limit);
       
@@ -399,15 +400,17 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('jquery.js');
       $Sender->AddJsFile('jquery.livequery.js');
       $Sender->AddJsFile('global.js');
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js'); // I customized this to get proper callbacks.
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
       $Sender->AddCssFile('style.css');
       $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
-      
       // Set the title, breadcrumbs, canonical
       $Sender->Title(T('Best Of'));
       $Sender->SetData('Breadcrumbs', array(array('Name' => T('Best Of'), 'Url' => '/bestof/everything')));
       $Sender->CanonicalUrl(
          Url(
-            ConcatSep('/', 'bestof/'.$Reaction.'/', PageNumber($Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), 
+            ConcatSep('/', 'bestof/'.$Reaction, PageNumber($Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), 
             TRUE), 
          Gdn::Session()->UserID == 0
       );
@@ -415,7 +418,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       // Modules
       $Sender->AddModule('GuestModule');
       $Sender->AddModule('SignedInModule');
-      
+      $Sender->AddModule('BestOfFilterModule');
 
       // Render the page.
       if (class_exists('LeaderBoardModule')) {
@@ -425,6 +428,12 @@ class ReactionsPlugin extends Gdn_Plugin {
          $Module->SlotType = 'a';
          $Sender->AddModule($Module);
       }
-      $Sender->Render('bestof', '', 'plugins/Reactions');
+      
+      // Set the video embed size for this page explicitly (in memory only).
+      SaveToConfig('Garden.Format.EmbedSize', '450x255', array('Save' => FALSE));
+      
+      // Render the page (or deliver the view)
+      $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'bestoflist' : 'bestof';
+      $Sender->Render($View, '', 'plugins/Reactions');
    }
 }
