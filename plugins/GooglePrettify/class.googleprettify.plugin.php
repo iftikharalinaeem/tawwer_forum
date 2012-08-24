@@ -7,8 +7,8 @@
 // Define the plugin:
 $PluginInfo['GooglePrettify'] = array(
    'Name' => 'Syntax Prettifier',
-   'Description' => 'Adds pretty syntax highlighting to source code posted in your forum. This is a great addon for communities that support programmers and designers.',
-   'Version' => '1.0',
+   'Description' => 'Adds pretty syntax highlighting to code in discussions and tab support to the comment box. This is a great addon for communities that support programmers and designers.',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -18,11 +18,27 @@ $PluginInfo['GooglePrettify'] = array(
    'SettingsPermission' => 'Garden.Settings.Manage',
 );
 
+// Changelog
+// v1.1 Add Tabby, docs/cleanup  -Lincoln, Aug 2012
+
 class GooglePrettifyPlugin extends Gdn_Plugin {
-   /// PROPERTIES ///
+	/**
+	 * Add Tabby to a page's text areas.
+	 */
+	public function AddTabby($Sender) {
+		if (C('Plugins.GooglePrettify.UseTabby', TRUE)) {
+      	$Sender->AddJsFile('jquery.textarea.js', 'plugins/GooglePrettify');
+      	$Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), 'jQuery(document).ready(function () {
+     $("textarea").tabby();
+});');
+      }
+	}
    
-   /// METHODS ///
-   
+   /**
+    * Prettify script initializer.
+    * 
+    * @return string
+    */
    public function GetJs() {
       $LineNums = '';
       if (C('Plugins.GooglePrettify.LineNumbers'))
@@ -34,24 +50,37 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
 });";
       return $Result;
    }
-   
-   /// EVENT HANDLERS ///
-   
+      
    /**
-    *
+    * Add Prettify formatting to discussions.
+    * 
     * @param DiscussionController $Sender 
     */
    public function DiscussionController_Render_Before($Sender) {
-//      $Sender->AddJsFile('prettify.plugin.js', 'plugins/GooglePrettify');
       $Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), $this->GetJs());
       $Sender->AddJsFile('prettify.js', 'plugins/GooglePrettify', array('_sort' => 101));
       if (!C('Plugins.GooglePrettify.NoCssFile'))
          $Sender->AddCssFile('prettify.css', 'plugins/GooglePrettify');
+      $this->AddTabby($Sender);
    }
    
+   /**
+    * Add Tabby to post textarea.
+    * 
+    * @param PostController $Sender 
+    */
+   public function PostController_Render_Before($Sender) {
+   	$this->AddTabby($Sender);
+   }
+   
+   /**
+    * Settings page.
+    * 
+    * @param unknown_type $Sender
+    * @param unknown_type $Args
+    */
    public function SettingsController_GooglePrettify_Create($Sender, $Args) {
       $Cf = new ConfigurationModule($Sender);
-      
       $CssUrl = Asset('/plugins/GooglePrettify/design/prettify.css', TRUE);
       
       $Cf->Initialize(array(
@@ -62,6 +91,5 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
       $Sender->AddSideMenu();
       $Sender->SetData('Title', T('Syntax Prettifier Settings'));
       $Cf->RenderAll();
-      
    }
 }
