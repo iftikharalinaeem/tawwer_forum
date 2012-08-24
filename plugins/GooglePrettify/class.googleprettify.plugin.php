@@ -29,7 +29,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
 		if (C('Plugins.GooglePrettify.UseTabby', TRUE)) {
       	$Sender->AddJsFile('jquery.textarea.js', 'plugins/GooglePrettify');
       	$Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), 'jQuery(document).ready(function () {
-     $("textarea").tabby();
+     $("textarea").livequery(function () {$("textarea").tabby();})
 });');
       }
 	}
