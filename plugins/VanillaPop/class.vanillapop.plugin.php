@@ -8,7 +8,7 @@
 $PluginInfo['VanillaPop'] = array(
    'Name' => 'Vanilla Pop',
    'Description' => "Users may start discussions, make comments, and even automatically register for your site via email.",
-   'Version' => '1.0.4',
+   'Version' => '1.0.5',
    'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -868,8 +868,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
       
       $NotifiedUsers = (array)GetValue('NotifiedUsers', $Args);
       $InsertUserID = GetValueR('Discussion.InsertUserID', $Args);
-      if (in_array($InsertUserID, $NotifiedUsers))
-         return;
       
       // Construct an activity and send it.
       $ActivityModel = $Args['ActivityModel'];
