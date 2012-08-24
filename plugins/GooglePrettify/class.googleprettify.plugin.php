@@ -23,6 +23,17 @@ $PluginInfo['GooglePrettify'] = array(
 
 class GooglePrettifyPlugin extends Gdn_Plugin {
 	/**
+	 * Add Prettify to page text.
+	 */
+	public function AddPretty($Sender) {
+		$Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), $this->GetJs());
+      $Sender->AddJsFile('prettify.js', 'plugins/GooglePrettify', array('_sort' => 101));
+      if (!C('Plugins.GooglePrettify.NoCssFile'))
+         $Sender->AddCssFile('prettify.css', 'plugins/GooglePrettify');
+      
+	}
+	
+	/**
 	 * Add Tabby to a page's text areas.
 	 */
 	public function AddTabby($Sender) {
@@ -45,8 +56,10 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
          $LineNums = 'linenums';
       
       $Result = "jQuery(document).ready(function($) {
-   $('.Message pre').addClass('prettyprint $LineNums');
-   prettyPrint();
+   $('.Message pre').livequery(function () { 
+   	$('.Message pre').addClass('prettyprint $LineNums');
+   	prettyPrint();
+   });
 });";
       return $Result;
    }
@@ -57,11 +70,8 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
     * @param DiscussionController $Sender 
     */
    public function DiscussionController_Render_Before($Sender) {
-      $Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), $this->GetJs());
-      $Sender->AddJsFile('prettify.js', 'plugins/GooglePrettify', array('_sort' => 101));
-      if (!C('Plugins.GooglePrettify.NoCssFile'))
-         $Sender->AddCssFile('prettify.css', 'plugins/GooglePrettify');
-      $this->AddTabby($Sender);
+      $this->AddPretty($Sender);
+   	$this->AddTabby($Sender);
    }
    
    /**
@@ -70,6 +80,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
     * @param PostController $Sender 
     */
    public function PostController_Render_Before($Sender) {
+   	$this->AddPretty($Sender);
    	$this->AddTabby($Sender);
    }
    
