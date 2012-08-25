@@ -366,6 +366,100 @@ class ReactionsPlugin extends Gdn_Plugin {
 
       // Define the query offset & limit.
       $Page = 'p'.GetIncomingValue('Page', 1);
+      $Limit = C('Plugins.Reactions.BestOfPerPage', 30);
+      //      $OffsetProvided = $Page != '';
+      list($Offset, $Limit) = OffsetLimit($Page, $Limit);
+      
+      $Sender->SetData('_Limit', $Limit + 1);
+      
+      $ReactionModel = new ReactionModel();
+      if ($Reaction == 'everything') {
+         $PromotedTagID = $ReactionModel->DefineTag('Promoted', 'BestOf');
+         $Data = $ReactionModel->GetRecordsWhere(
+            array('TagID' => $PromotedTagID, 'RecordType' => array('Discussion', 'Comment')),
+            'DateInserted', 'desc',
+            $Limit + 1, $Offset);
+      } else {
+         $ReactionType = $ReactionTypes[$Reaction];
+         $Data = $ReactionModel->GetRecordsWhere(
+            array('TagID' => $ReactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'Total >=' => 1),
+            'DateInserted', 'desc',
+            $Limit + 1, $Offset);
+      }
+      
+      $Sender->SetData('_CurrentRecords', count($Data));
+      if (count($Data) > $Limit) {
+         array_pop($Data);
+      }
+      if (C('Plugins.Reactions.ShowUserReactions', TRUE))
+         $ReactionModel->JoinUserTags($Data);
+      $Sender->SetData('Data', $Data);
+
+      // Set up head
+      $Sender->Head = new HeadModule($Sender);
+      $Sender->AddJsFile('jquery.js');
+      $Sender->AddJsFile('jquery.livequery.js');
+      $Sender->AddJsFile('global.js');
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js'); // I customized this to get proper callbacks.
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
+      $Sender->AddCssFile('style.css');
+      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
+      // Set the title, breadcrumbs, canonical
+      $Sender->Title(T('Best Of'));
+      $Sender->SetData('Breadcrumbs', array(array('Name' => T('Best Of'), 'Url' => '/bestof/everything')));
+      $Sender->CanonicalUrl(
+         Url(
+            ConcatSep('/', 'bestof/'.$Reaction, PageNumber($Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), 
+            TRUE), 
+         Gdn::Session()->UserID == 0
+      );
+      
+      // Modules
+      $Sender->AddModule('GuestModule');
+      $Sender->AddModule('SignedInModule');
+      $Sender->AddModule('BestOfFilterModule');
+
+      // Render the page.
+      if (class_exists('LeaderBoardModule')) {
+         $Sender->AddModule('LeaderBoardModule');
+
+         $Module = new LeaderBoardModule();
+         $Module->SlotType = 'a';
+         $Sender->AddModule($Module);
+      }
+      
+      // Render the page (or deliver the view)
+      $Sender->Render('bestof', '', 'plugins/Reactions');
+   }
+   
+   /** 
+    * Add a "Best Of" view for reacted content.
+    * 
+    * @param type $Sender Controller firing the event.
+    * @param string $ReactionType Type of reaction content to show
+    * @param int $Page The current page of content
+    */
+   public function RootController_BestOf2_Create($Sender, $Reaction = 'everything') {
+      Gdn_Theme::Section('BestOf');
+      // Load all of the reaction types.
+      try {
+         $ReactionModel = new ReactionModel();
+         $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Good', 'Active' => 1));
+         
+         $Sender->SetData('ReactionTypes', $ReactionTypes);
+//         $ReactionTypes = array_merge($ReactionTypes, ConsolidateArrayValuesByKey($ReactionTypeData, 'UrlCode'));
+//         array_map('strtolower', $ReactionTypes);
+      } catch (Exception $ex) {
+         $Sender->SetData('ReactionTypes', array());
+      }
+      if (!isset($ReactionTypes[$Reaction])) {
+         $Reaction = 'everything';
+      }
+      $Sender->SetData('CurrentReaction', $Reaction);
+
+      // Define the query offset & limit.
+      $Page = 'p'.GetIncomingValue('Page', 1);
       $Limit = C('Plugins.Reactions.BestOfPerPage', 10);
       //      $OffsetProvided = $Page != '';
       list($Offset, $Limit) = OffsetLimit($Page, $Limit);
@@ -433,9 +527,9 @@ class ReactionsPlugin extends Gdn_Plugin {
       SaveToConfig('Garden.Format.EmbedSize', '435x245', array('Save' => FALSE));
       
       // Render the page (or deliver the view)
-      $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'bestoflist' : 'bestof';
+      $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'bestoflist' : 'bestof2';
       $Sender->Render($View, '', 'plugins/Reactions');
-   }
+   }   
    
    /**
 	 * Sort the comments by score if necessary
