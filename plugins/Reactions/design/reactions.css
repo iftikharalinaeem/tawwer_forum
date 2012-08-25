@@ -276,7 +276,29 @@
    margin: 0 6px;
 }
 
-/* Begin "Best Of" */
+/* OLD "Best Of" */
+.ReactionFilters {
+   margin: 8px 0;
+}
+.ReactionFilters .ReactButton {
+   opacity: 1;  
+   margin-right: 6px;
+}
+.ReactionFilters .ReactButton .ReactSprite {
+   background-image: url('reaction-sprites-color.png') !important;
+}
+.ReactionFilters .ReactLabel {
+   padding-left: 4px;
+}
+.BestOfData .DataList .Item:first-child {
+   border-top: 1px solid #BEC8CC;
+}
+/* End "Best Of" */
+
+/* NEW "Best Of" */
+.Section-BestOf .BestOfData .DataList .Item:first-child {
+   border-top: none;
+}
 .Section-BestOf .BoxFilter .ReactSprite {
    margin: 1px 4px 0 0;
 }
