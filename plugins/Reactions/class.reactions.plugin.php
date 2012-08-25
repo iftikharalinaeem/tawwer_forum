@@ -569,7 +569,7 @@ class ReactionsPlugin extends Gdn_Plugin {
             $Sort = Gdn::Session()->GetPreference('Plugins.Reactions.CommentSort', 'score');
          } else {
             // Save the sort to the user's preferences.
-            Gdn::Session()->SetPreference('Plugins.Reactions.CommentSort', $Sort == 'score' ? '' : $Sort);
+            Gdn::Session()->SetPreference('Plugins.Reactions.CommentSort', $Sort == 'score' ? 'score' : $Sort);
          }
       }
 
