@@ -2,9 +2,7 @@
 	
 	<div class="block">
 		<strong>About Us</strong>
-		<p>Vanilla allows you to reward your users for positive participation. The 
-         result is a more engaged audience that brings high quality content to 
-         the forefront of your community.</p>
+		<p>Vanilla's next gen forum platform lets you build a community that will really engage your audience to drive higher participation and loyalty. </p>
 	</div>
 
 	<div class="block team">
@@ -18,24 +16,24 @@
 			});
 		});
 		</script>
-		<strong>Meet the Team</strong>
+		<strong>Blog Authors</strong>
 		<a class="team-todd" href="http://vanillaforums.com/profile/todd">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-todd.jpg" />
 			<span class="about"><strong>Todd Burry</strong> Lead Developer, Co-Founder</span>
 		</a>
 		<a class="team-tim" href="http://twitter.com/icyliquid">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-tim.jpg" />
-			<span class="about"><strong>Tim Gunter</strong> Developer & System Administrator</span>
+			<span class="about"><strong>Tim Gunter</strong>Director of Infrastructure and Ops</span>
 		</a>
 		<a class="team-mark" href="http://markosullivan.ca">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-mark.jpg" />
-			<span class="about"><strong>Mark O'Sullivan</strong> CPO, Co-Founder, Sandwich Expert</span>
+			<span class="about"><strong>Mark O'Sullivan</strong> CPO, Co-Founder</span>
 		</a>
 		<a class="team-lincoln" href="http://twitter.com/lincolnwebs">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-lincoln.jpg" />
 			<span class="about"><strong>Matt Lincoln Russell</strong> Developer</span>
 		</a>
-		<a class="team-luc" href="http://vanillaforums.com/profile/lvez">
+		<a class="team-luc" rel="author" href="https://plus.google.com/116186737263251989814/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-luc.jpg" />
 			<span class="about"><strong>Luc Vezina</strong> CEO</span>
 		</a>

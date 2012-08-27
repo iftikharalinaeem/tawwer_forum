@@ -61,7 +61,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       echo '</div>';
 
       echo '<div class="Buttons">';
-         echo $this->Form->Button('Save Poll', array('class' => 'Button PollButton'));
+         echo $this->Form->Button('Save Poll', array('class' => 'Button PollButton Primary'));
          echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
       echo '</div>';
       echo $this->Form->Close();

@@ -8,14 +8,14 @@
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
+ * @license Proprietary
  * @package Misc
  */
 
 class OnlineModule extends Gdn_Module {
 
    /**
-    * List of online users
+    * List of online users for this context
     * @var array
     */
    protected $OnlineUsers;
@@ -68,7 +68,12 @@ class OnlineModule extends Gdn_Module {
             break;
       }
    }
-
+   
+   /**
+    * Get the list of currently online users for this context
+    * 
+    * Also calculate counts.
+    */
    public function GetData() {
       if (is_null($this->OnlineUsers)) {
          
@@ -204,16 +209,6 @@ class OnlineModule extends Gdn_Module {
       <div id="WhosOnline" class="WhosOnline Box">
          <h4><?php echo $Title; ?> <span class="Count"><?php echo Gdn_Format::BigNumber($TrackCount, 'html') ?></span></h4>
          <?php
-         
-//         $SetUser = NULL;
-//         foreach ($this->OnlineUsers as $User) {
-//            $SetUser = $User;
-//            break;
-//         }
-//         
-//         $SetUser['Name'] = 'Lewie Stepdad';
-//         $this->OnlineUsers = array_fill(0, 200, $SetUser);
-//         $this->OnlineCount = sizeof($this->OnlineUsers);
          
          if ($this->Count > 0) {
             if ($this->Style == 'pictures') {

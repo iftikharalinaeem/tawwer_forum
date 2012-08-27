@@ -170,7 +170,7 @@ function WriteProfileCounts() {
       echo ' <span class="CountItemWrap"><span class="'.$ItemClass.'">';
       
       if ($Row['Url'])
-         echo '<a href="'.htmlspecialchars($Row['Url']).'">';
+         echo '<a href="'.htmlspecialchars($Row['Url']).'" class="TextColor">';
       
       echo ' <span class="CountTotal">'.Gdn_Format::BigNumber($Row['Total'], 'html').'</span> ';
       echo ' <span class="CountLabel">'.$Row['Name'].'</span>';

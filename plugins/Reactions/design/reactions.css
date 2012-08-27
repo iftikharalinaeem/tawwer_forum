@@ -91,12 +91,12 @@
    margin: 5px 0;
    text-align: center;
 }
-.DataCounts a {
+/*.DataCounts a {
    color: #000;
 }
 .DataCounts a:hover {
    color: #ff0084;
-}
+}*/
 .CountTotal {
    display: block;
    line-height: 100%;
