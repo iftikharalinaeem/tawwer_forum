@@ -8,7 +8,7 @@
 $PluginInfo['GooglePrettify'] = array(
    'Name' => 'Syntax Prettifier',
    'Description' => 'Adds pretty syntax highlighting to code in discussions and tab support to the comment box. This is a great addon for communities that support programmers and designers.',
-   'Version' => '1.1',
+   'Version' => '1.1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -34,7 +34,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
 	 * Add Tabby to a page's text areas.
 	 */
 	public function AddTabby($Sender) {
-		if (C('Plugins.GooglePrettify.UseTabby', TRUE)) {
+		if (C('Plugins.GooglePrettify.UseTabby', FALSE)) {
       	$Sender->AddJsFile('jquery.textarea.js', 'plugins/GooglePrettify');
       	$Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), 'jQuery(document).ready(function () {
      $("textarea").livequery(function () {$("textarea").tabby();})
@@ -103,7 +103,8 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
       
       $Cf->Initialize(array(
           'Plugins.GooglePrettify.LineNumbers' => array('Control' => 'CheckBox', 'Description' => 'Add line numbers to source code.', 'Default' => FALSE),
-          'Plugins.GooglePrettify.NoCssFile' => array('Control' => 'CheckBox', 'LabelCode' => 'Exclude Default CSS File', 'Description' => "If you want to define syntax highlighting in your custom theme you can disable the <a href='$CssUrl'>default css</a> with this setting.", 'Default' => FALSE)
+          'Plugins.GooglePrettify.NoCssFile' => array('Control' => 'CheckBox', 'LabelCode' => 'Exclude Default CSS File', 'Description' => "If you want to define syntax highlighting in your custom theme you can disable the <a href='$CssUrl'>default css</a> with this setting.", 'Default' => FALSE),
+          'Plugins.GooglePrettify.UseTabby' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow Tab Characters', 'Description' => "If users enter a lot of source code then enable this setting to make the tab key enter a tab instead of skipping to the next control.", 'Default' => FALSE)
       ));
 
       $Sender->AddSideMenu();
