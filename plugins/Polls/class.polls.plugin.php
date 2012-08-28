@@ -124,7 +124,7 @@ class PollsPlugin extends Gdn_Plugin {
    }
    
    protected function _AddCss($Sender) {
-      $Sender->AddCssFile('polls.css', 'plugins/Polls');
+      
       $Discussions = &$Sender->Data('Discussions');
       if ($Discussions) {
          foreach ($Discussions as &$Row) {
@@ -134,6 +134,12 @@ class PollsPlugin extends Gdn_Plugin {
       }
    }
    
+   /**
+    * @param AssetModel $Sender
+    */
+   public function AssetModel_StyleCss_Handler($Sender, $Args) {
+      $Sender->AddCssFile('polls.css', 'plugins/Polls');
+   }
    /** 
     * Add the poll form to vanilla's post page.
     */
@@ -218,7 +224,6 @@ class PollsPlugin extends Gdn_Plugin {
       
       if (strtolower(GetValue('Type', $Discussion)) == 'poll') {
          // Load css/js files
-         $Sender->AddCssFile('polls.css', 'plugins/Polls');
          $Sender->AddJsFile('polls.js', 'plugins/Polls');
 
          // Load the poll based on the discussion id.
