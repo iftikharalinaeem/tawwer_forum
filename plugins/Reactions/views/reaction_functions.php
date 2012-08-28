@@ -211,6 +211,7 @@ function WriteReactions($Row) {
          echo '<span class="FlagMenu ToggleFlyout">';
             // Write the handle.
             echo ReactionButton($Row, 'Flag', array('LinkClass' => 'FlyoutButton'));
+            echo Sprite('SpFlyoutHandle');
             echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
             foreach ($Flags as $Flag) {
                echo '<li>'.ReactionButton($Row, $Flag['UrlCode']).'</li>';

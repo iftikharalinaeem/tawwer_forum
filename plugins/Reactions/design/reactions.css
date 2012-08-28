@@ -208,24 +208,11 @@
     top: 25px;
     z-index: 1000;
 }
-/* Begin "Best Of" */
-.ReactionFilters {
-   margin: 8px 0;
+.FlagMenu > .SpFlyoutHandle {
+   left: 10px;
+   bottom: -12px;
+   z-index: 1001;
 }
-.ReactionFilters .ReactButton {
-   opacity: 1;  
-   margin-right: 6px;
-}
-.ReactionFilters .ReactButton .ReactSprite {
-   background-image: url('reaction-sprites-color.png') !important;
-}
-.ReactionFilters .ReactLabel {
-   padding-left: 4px;
-}
-.BestOfData .DataList .Item:first-child {
-   border-top: 1px solid #BEC8CC;
-}
-/* End "Best Of" */
 
 /* Reaction Revamp */
 .Reactions .Bullet {
@@ -288,6 +275,160 @@
 .ReactMenu .ReactButton {
    margin: 0 6px;
 }
+
+/* OLD "Best Of" */
+.ReactionFilters {
+   margin: 8px 0;
+}
+.ReactionFilters .ReactButton {
+   opacity: 1;  
+   margin-right: 6px;
+}
+.ReactionFilters .ReactButton .ReactSprite {
+   background-image: url('reaction-sprites-color.png') !important;
+}
+.ReactionFilters .ReactLabel {
+   padding-left: 4px;
+}
+.BestOfData .DataList .Item:first-child {
+   border-top: 1px solid #BEC8CC;
+}
+/* End "Best Of" */
+
+/* NEW "Best Of" */
+.Section-BestOf .BestOfData .DataList .Item:first-child {
+   border-top: none;
+}
+.Section-BestOf .BoxFilter .ReactSprite {
+   margin: 1px 4px 0 0;
+}
+.Section-BestOf .BestOfList .RecordReactions,
+.Section-BestOf .BestOfList .React.Quote,
+.Section-BestOf .BestOfList .Reactions .Bullet,
+.Section-BestOf .BestOfList .ReactButton-Flag .ReactLabel {
+    display: none;
+}
+.Section-BestOf .BestOfData {
+   overflow: hidden;
+}
+.Section-BestOf .BestOfList {
+    position: relative;
+    margin: 0 auto;
+}
+.Section-BestOf .BestOfList .Item {
+    width: 223px;
+    padding: 0;
+    margin: 0;
+    font-family: "helvetica neue",arial,sans-serif;
+    box-shadow: 0 0 1px #333;
+    background: #eee;
+    float: left;
+    margin: 10px;
+}
+.Section-BestOf .BestOfList .Item.Wide {
+   width: 466px;
+}
+.Section-BestOf .BestOfList .BodyWrap {
+    background: #fff;
+    padding: 10px 15px;
+}
+.Section-BestOf .BestOfList .Item h3 {
+    font-size: 12px ;
+    line-height: 1.5 ;
+    background: #fafafa;
+    margin: -10px -15px 15px;
+    padding: 10px 15px;
+}
+.Section-BestOf .BestOfList .Item .Body {
+    font-size: 11px;
+    line-height: 1.5;
+    overflow: hidden;
+}
+.Section-BestOf .BestOfList .Item .Body img {
+    max-width: 100%;
+}
+.Section-BestOf .BestOfList .FooterWrap {
+    padding: 10px 15px;
+    background: #fafafa;
+}
+.Section-BestOf .BestOfList .FooterWrap .Meta {
+    display: none;
+}
+.Section-BestOf .BestOfList .AuthorWrap,
+.Section-BestOf .BestOfList .Item .Author {
+   line-height: 1;
+}
+.Section-BestOf .BestOfList .Item .Author a {
+    font-size: 11px;
+}
+.Section-BestOf .BestOfList .ProfilePhotoMedium {
+   height: 30px !important;
+   width: 30px !important;
+}
+.Section-BestOf .BestOfList .Item .Reactions > * {
+    visibility: visible;
+}
+.Section-BestOf .BestOfList .Reactions .Count,
+.Section-BestOf .BestOfList .ReactMenu {
+    margin: 0;
+}
+.Section-BestOf .BestOfList .Reactions .FlagMenu .ReactButton-Flag {
+   margin: 0 6px 0 0;
+}
+.Section-BestOf .BestOfList .FlagMenu > .SpFlyoutHandle {
+   bottom: -14px;
+   left: 0;
+}
+.Section-BestOf .BestOfList .Flyout.Flags {
+   left: -12px;
+}
+.Section-BestOf .BestOfList .ReactButton-Flag, 
+.Section-BestOf .BestOfList .ReactMenu .ReactButton {
+    position: relative;
+}
+.Section-BestOf .BestOfList .ReactButton-Flag .ReactLabel,
+.Section-BestOf .BestOfList .ReactMenu .ReactLabel {
+   display: none;
+    background: #333;
+    color: #fff;
+    white-space: nowrap;
+   position: absolute;
+   line-height: 1;
+   padding: 3px 6px;
+   left: -4px;
+   top: -22px;
+}
+.Section-BestOf .BestOfList .ReactButton-Flag .ReactLabel:after,
+.Section-BestOf .BestOfList .ReactMenu .ReactLabel:after {
+    position: absolute;
+    content: '';
+    display: block;
+   border: 5px solid transparent;
+   border-color: #333 transparent transparent transparent;
+   bottom: -10px;
+}
+.Section-BestOf .BestOfList .ReactButton-Flag:hover .ReactLabel,
+.Section-BestOf .BestOfList .ReactMenu .ReactButton:hover .ReactLabel {
+   display: block;
+}
+.Section-BestOf .BestOfList .ReactMenu .ReactButton .ReactSprite,
+.Section-BestOf .BestOfList .ReactMenu .ReactButton .Count,
+.Section-BestOf .BestOfList .ReactButton-Flag .ReactSprite {
+   opacity: 0.5;
+}
+.Section-BestOf .BestOfList .ReactMenu .ReactButton:hover .ReactSprite,
+.Section-BestOf .BestOfList .ReactMenu .ReactButton:hover .Count,
+.Section-BestOf .BestOfList .ReactButton-Flag:hover .ReactSprite,
+.Section-BestOf .BestOfList .ToggleFlyout.Open .ReactButton-Flag .ReactSprite {
+   opacity: 1;
+}
+#infscr-loading {
+    text-align: center;
+}
+#infscr-loading img {
+    margin: 0 auto;
+}
+/* End "Best Of" */
 
 /* iPad/iPhone */
 @media only screen and (device-width: 768px),
