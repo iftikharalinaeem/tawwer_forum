@@ -28,9 +28,6 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
 	public function AddPretty($Sender) {
 		$Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), $this->GetJs());
       $Sender->AddJsFile('prettify.js', 'plugins/GooglePrettify', array('_sort' => 101));
-      if (!C('Plugins.GooglePrettify.NoCssFile'))
-         $Sender->AddCssFile('prettify.css', 'plugins/GooglePrettify');
-      
 	}
 	
 	/**
