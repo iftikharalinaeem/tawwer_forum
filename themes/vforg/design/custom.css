@@ -268,7 +268,7 @@ a {
 
 /** View Counts **/
 
-.DataList.Discussions .MCount, .DataList.Discussions .CommentCount + .HasNew {
+.DataList.Discussions .MCount, .DataList.Discussions .NewCommentCount {
     position: absolute;
     background: #31b5f4;
     border-bottom: solid 2px #1192cf;
@@ -283,7 +283,7 @@ a {
     border-radius: 0;
 }
 
-.DataList.Discussions .MCount .Number, .DataList.Discussions .CommentCount + .HasNew .Number {
+.DataList.Discussions .MCount .Number, .DataList.Discussions .NewCommentCount .Number {
     font-size: 20px;
     display: block;
     line-height: 1;
@@ -294,7 +294,7 @@ a {
     right: -85px;
 }
 
-.DataList.Discussions .CommentCount, .DataList.Discussions .CommentCount + .HasNew {
+.DataList.Discussions .CommentCount, .DataList.Discussions .NewCommentCount {
     right: -167px;
 }
 
@@ -302,7 +302,7 @@ a {
     margin-right: 167px;
 }
 
-.DataList.Discussions .CommentCount + .HasNew {
+.DataList.Discussions .NewCommentCount {
     font-weight: normal;
     background: #e78874;
     border-bottom-color: #d56e59;
