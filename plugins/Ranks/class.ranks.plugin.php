@@ -222,6 +222,14 @@ class RanksPlugin extends Gdn_Plugin {
       $Sender->Render('Ranks', '', 'plugins/Ranks');
    }
    
+   public function UserModel_AfterRegister_Handler($Sender, $Args) {
+      $UserID = $Args['UserID'];
+      $User = Gdn::UserModel()->GetID($UserID);
+      
+      $RankModel = new RankModel();
+      $RankModel->ApplyRank($User);
+   }
+   
    public function UserModel_AfterSignIn_Handler($Sender, $Args) {
       if (!Gdn::Session()->User)
          return;
