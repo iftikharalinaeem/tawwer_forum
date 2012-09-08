@@ -18,6 +18,10 @@ $PluginInfo['Ranks'] = array(
 class RanksPlugin extends Gdn_Plugin {
    /// Properties ///
    
+   public $ActivityLinks = NULL;
+   
+   public $CommentLinks = NULL;
+   
    
    /// Methods ///
    
@@ -30,6 +34,34 @@ class RanksPlugin extends Gdn_Plugin {
    }
    
    /// Event Handlers ///
+   
+   /**
+    * 
+    * 
+    * @param ActivityModel $Sender
+    * @param type $Args
+    */
+   public function ActivityModel_BeforeSave_Handler($Sender, $Args) {
+      if ($this->ActivityLinks !== 'no')
+         return;
+      
+      $Activity = $Args['Activity'];
+      
+      if (preg_match('`https?://`', $Activity['Story'])) {
+         $Sender->Validation->AddValidationResult('Story', 'You have to be around for a little while longer before you can post links.');
+      }
+   }
+   
+   public function ActivityModel_BeforeSaveComment_Handler($Sender, $Args) {
+      if ($this->ActivityLinks !== 'no')
+         return;
+      
+      $Comment = $Args['Comment'];
+      
+      if (preg_match('`https?://`', $Comment['Body'])) {
+         $Sender->Validation->AddValidationResult('Body', 'You have to be around for a little while longer before you can post links.');
+      }
+   }
    
    public function Base_AuthorInfo_Handler($Sender, $Args) {
       if (isset($Args['Comment']))
