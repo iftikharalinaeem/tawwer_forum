@@ -8,7 +8,7 @@
 $PluginInfo['Ranks'] = array(
    'Name' => 'Ranks',
    'Description' => "Adds user ranks to the application.",
-   'Version' => '1.1b',
+   'Version' => '1.1.1b',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -47,7 +47,7 @@ class RanksPlugin extends Gdn_Plugin {
       
       $Activity = $Args['Activity'];
       
-      if (preg_match('`https?://`', $Activity['Story'])) {
+      if (preg_match('`https?://`i', $Activity['Story'])) {
          $Sender->Validation->AddValidationResult('Story', 'You have to be around for a little while longer before you can post links.');
       }
    }
@@ -58,7 +58,7 @@ class RanksPlugin extends Gdn_Plugin {
       
       $Comment = $Args['Comment'];
       
-      if (preg_match('`https?://`', $Comment['Body'])) {
+      if (preg_match('`https?://`i', $Comment['Body'])) {
          $Sender->Validation->AddValidationResult('Body', 'You have to be around for a little while longer before you can post links.');
       }
    }
