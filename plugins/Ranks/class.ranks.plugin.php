@@ -8,7 +8,7 @@
 $PluginInfo['Ranks'] = array(
    'Name' => 'Ranks',
    'Description' => "Adds user ranks to the application.",
-   'Version' => '1.1b',
+   'Version' => '1.1.1b',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -17,6 +17,10 @@ $PluginInfo['Ranks'] = array(
 
 class RanksPlugin extends Gdn_Plugin {
    /// Properties ///
+   
+   public $ActivityLinks = NULL;
+   
+   public $CommentLinks = NULL;
    
    
    /// Methods ///
@@ -30,6 +34,34 @@ class RanksPlugin extends Gdn_Plugin {
    }
    
    /// Event Handlers ///
+   
+   /**
+    * 
+    * 
+    * @param ActivityModel $Sender
+    * @param type $Args
+    */
+   public function ActivityModel_BeforeSave_Handler($Sender, $Args) {
+      if ($this->ActivityLinks !== 'no')
+         return;
+      
+      $Activity = $Args['Activity'];
+      
+      if (preg_match('`https?://`i', $Activity['Story'])) {
+         $Sender->Validation->AddValidationResult('Story', 'You have to be around for a little while longer before you can post links.');
+      }
+   }
+   
+   public function ActivityModel_BeforeSaveComment_Handler($Sender, $Args) {
+      if ($this->ActivityLinks !== 'no')
+         return;
+      
+      $Comment = $Args['Comment'];
+      
+      if (preg_match('`https?://`i', $Comment['Body'])) {
+         $Sender->Validation->AddValidationResult('Body', 'You have to be around for a little while longer before you can post links.');
+      }
+   }
    
    public function Base_AuthorInfo_Handler($Sender, $Args) {
       if (isset($Args['Comment']))
@@ -188,6 +220,14 @@ class RanksPlugin extends Gdn_Plugin {
       $Sender->SetData('Ranks', $Ranks);
       $Sender->AddSideMenu();
       $Sender->Render('Ranks', '', 'plugins/Ranks');
+   }
+   
+   public function UserModel_AfterRegister_Handler($Sender, $Args) {
+      $UserID = $Args['UserID'];
+      $User = Gdn::UserModel()->GetID($UserID);
+      
+      $RankModel = new RankModel();
+      $RankModel->ApplyRank($User);
    }
    
    public function UserModel_AfterSignIn_Handler($Sender, $Args) {

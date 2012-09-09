@@ -4,6 +4,15 @@
       border: 1px solid #ccc;
       height: 28px;
    }
+   
+   label + .RadioLabel {
+      margin-left: 5px;
+   }
+   
+   .SmallLabel {
+      font-size: 12px;
+      margin: 5px 0 0 3px;
+  }
 </style>
 <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
@@ -104,6 +113,18 @@ echo $this->Form->Open(), $this->Form->Errors();
      echo $this->Form->Label('Polls', 'Abilities_Polls'),
      '<div class="Info2">'."You can give or take away the ability add polls. (Requires the polls addon)".'</div>',
       $this->Form->RadioList('Abilities_Polls', array('yes' => 'give', 'no' => 'take away', '' => 'default'));
+     ?>
+   </li>
+   <li>
+     <?php
+     echo $this->Form->Label('Post Links', 'Abilities_ActivityLinks'),
+     '<div class="Info2">'."You can take away to post links to help prevent link spammers.".'</div>',
+     
+      $this->Form->Label('Activities', 'Abilities_ActivityLinks', array('class' => 'SmallLabel')),
+      $this->Form->RadioList('Abilities_ActivityLinks', array('no' => 'take away', '' => 'default'));
+      
+//      $this->Form->Label('@'.T('Discussions').' & '.T('Comments'), 'Abilities_CommentLinks', array('class' => 'SmallLabel')),
+//      $this->Form->RadioList('Abilities_CommentLinks', array('no' => 'take away', '' => 'default'));
      ?>
    </li>
    <li>

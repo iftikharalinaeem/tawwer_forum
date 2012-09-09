@@ -598,8 +598,11 @@ class ReactionsPlugin extends Gdn_Plugin {
             <span class="NavLabel"><?php echo T('Sort by'); ?></span>
             <span class="DiscussionSort NavBar">
                <?php
-               echo Anchor('Points', Url('?Sort=score', TRUE), 'Button'.(self::CommentSort() == 'score' ? ' Active' : ''), array('rel' => 'nofollow', 'alt' => T('Sort by reaction points')));
-               echo Anchor('Date Added', Url('?Sort=date', TRUE), 'Button'.(self::CommentSort() == 'date' ? ' Active' : ''), array('rel' => 'nofollow', 'alt' => T('Sort by date added')));
+               $Query = $_GET;
+               $Query['Sort'] = 'score';
+               echo Anchor('Points', Url('?'.http_build_query($Query), TRUE), 'NoTop Button'.(self::CommentSort() == 'score' ? ' Active' : ''), array('rel' => 'nofollow', 'alt' => T('Sort by reaction points')));
+               $Query['Sort'] = 'date';
+               echo Anchor('Date Added', Url('?'.http_build_query($Query), TRUE), 'NoTop Button'.(self::CommentSort() == 'date' ? ' Active' : ''), array('rel' => 'nofollow', 'alt' => T('Sort by date added')));
             ?>
             </span>
          </li>

@@ -94,6 +94,9 @@ class RankModel extends Gdn_Model {
       self::AbilityString($Abilities, 'Signatures', 'Signatures', $Result);
       self::AbilityString($Abilities, 'Polls', 'Polls', $Result);
       
+      self::AbilityString($Abilities, 'ActivityLinks', 'Activity Links', $Result);
+//      self::AbilityString($Abilities, 'CommentLinks', 'Discussion & Comment Links', $Result);
+      
       $V = GetValue('EditContentTimeout', $Abilities, '');
       if ($V !== '') {
          $Options = self::ContentEditingOptions();
@@ -125,6 +128,8 @@ class RankModel extends Gdn_Model {
       if (!$Session->User)
          return;
       
+      $RanksPlugin = Gdn::PluginManager()->GetPluginInstance('RanksPlugin');
+      
       $Rank = self::Ranks(GetValue('RankID', $Session->User, FALSE));
       if (!$Rank)
          return;
@@ -151,6 +156,10 @@ class RankModel extends Gdn_Model {
       if ($V = GetValue('Polls', $Abilities)) {
          $Session->SetPermission('Plugins.Polls.Add', $V == 'yes' ? TRUE : FALSE);
       }
+      
+      // Links.
+      $RanksPlugin->ActivityLinks = GetValue('ActivityLinks', $Abilities);
+      $RanksPlugin->CommentLinks = GetValue('CommentLinks', $Abilities);
       
       // Edit content timeout.
       if ($V = GetValue('EditContentTimeout', $Abilities)) {
