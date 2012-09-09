@@ -13,7 +13,7 @@
 $PluginInfo['SimpleAPI'] = array(
    'Name' => 'Simple API',
    'Description' => "Provides simple access_token API access to the forum.",
-   'Version' => '1.0.3',
+   'Version' => '1.0.4',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -152,7 +152,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
             // Don't override an existing desired field
             if (isset($Data[$LookupField]))
-               continue;
+               return;
 
             $LookupFieldValue = NULL;
             switch ($ColumnLookup) {
@@ -222,7 +222,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          $Px = StringEndsWith($Field, 'Category', TRUE, TRUE);
          $Column = $Px.'CategoryID';
          if (isset($Data[$Column]))
-            continue;
+            return;
 
          $Category = CategoryModel::Categories($Value);
          if (!$Category) {
@@ -316,7 +316,14 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                   throw new Exception(T('You must access the API through https.'), 401);
                }
                
-               Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE, FALSE);
+               $UserID = C('Plugins.SimpleAPI.UserID');
+               $User = FALSE;
+               if ($UserID)
+                  $User = Gdn::UserModel()->GetID($UserID);
+               if (!$User)
+                  $UserID = Gdn::UserModel()->GetSystemUserID();
+               
+               Gdn::Session()->Start($UserID, FALSE, FALSE);
             } else {
                if (!Gdn::Session()->IsValid())
                   throw new Exception(T('Invald Access Token'), 401);
