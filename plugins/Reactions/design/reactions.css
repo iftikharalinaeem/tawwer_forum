@@ -60,7 +60,7 @@
 }
 .ReactButton {
    /* opacity: 0; */
-   line-height: 18px;
+   line-height: 14px;
 }
 .ToggleFlyout.Open .ReactButton {
    opacity: 1 !important;
