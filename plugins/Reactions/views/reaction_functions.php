@@ -252,6 +252,8 @@ function WriteReactions($Row) {
          echo '</span>';
       echo '</span>';
 
+      echo Bullet();
+      echo ' '.Wrap(T('Share'), 'span', array('class' => 'ReactButton ReactLabel')).' ';
       
       Gdn::Controller()->FireEvent('AfterReactions');
    
