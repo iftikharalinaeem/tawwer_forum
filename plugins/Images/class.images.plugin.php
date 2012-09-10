@@ -104,11 +104,11 @@ class ImagesPlugin extends Gdn_Plugin {
             $Sender->Form->SetData(array('CategoryID' => $Sender->Category->CategoryID));
       } else { // Form was submitted
          $FormValues = $Sender->Form->FormValues();
-         $DiscussionID = $ImageModel->SaveDiscussion($FormValues);
+         $DiscussionID = $ImageModel->Save($FormValues);
          $Sender->Form->SetValidationResults($ImageModel->ValidationResults());
          if ($Sender->Form->ErrorCount() == 0) {
             $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);            
-            Redirect(DiscussionUrl($Discussion));
+            Redirect(DiscussionUrl($Discussion).'#latest');
          }
       }
       
@@ -185,8 +185,13 @@ class ImagesPlugin extends Gdn_Plugin {
       $Sender->Head->AddString('<!--[if gte IE 8]><script src="'.Url('plugins/Images/library/jQuery-FileUpload/js/cors/jquery.xdr-transport.js').'"></script><![endif]-->');
    }
    
+   /* Add a link to post images on the comment form */
+   public function DiscussionController_AfterFormHeading_Handler($Sender) {
+       echo '<a href="#" class="CommentFormToggle">'.T('Post an Image').'</a>';
+   }
+   
    /* Render the comment file upload form */
-   public function DiscussionController_AfterBodyField_Handler($Sender) {
+   public function DiscussionController_BeforeCommentForm_Handler($Sender) {
       echo $Sender->FetchView('commentform', '', 'plugins/Images');
    }
 }
