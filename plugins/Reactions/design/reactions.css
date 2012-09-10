@@ -246,11 +246,19 @@
 .Item .Reactions > * {
     visibility: hidden;
 }
+.Item .Reactions > *.Visible {
+    visibility: visible;
+}
 .Item.Open .Reactions > *,
 .Item:hover .Reactions > *, 
 .Item .Reactions > .FlagMenu {
     visibility: visible;
 }
+
+.ReactButton {
+   margin: 0 6px;
+}
+
 .Reactions .FlagMenu .ReactButton,
 .Reactions > a.React {
     margin: 0 10px;
@@ -271,9 +279,6 @@
 }
 .ReactMenu {
    margin: 0 4px;
-}
-.ReactMenu .ReactButton {
-   margin: 0 6px;
 }
 
 /* OLD "Best Of" */
