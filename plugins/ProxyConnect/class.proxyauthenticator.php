@@ -409,8 +409,15 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
    protected function _GetForeignCredentials($ForeignIdentityUrl) {
    
       // Get the contents of the Authentication Url (timeout 5 seconds);
-      @session_write_close();
-      $Response = ProxyRequest($ForeignIdentityUrl, 5);
+      $ProxyRequest = new ProxyRequest(FALSE, array(
+         'Method'       => 'GET',
+         'Cookies'      => TRUE,
+         'SSLNoVerify'  => TRUE
+      ));
+      
+      $Response = $ProxyRequest->Request(array(
+         'URL'          => $ForeignIdentityUrl
+      ));
       
       if ($Response) {
       
