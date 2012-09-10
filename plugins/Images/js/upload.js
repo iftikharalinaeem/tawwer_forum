@@ -99,4 +99,10 @@ $(function () {
       return false;
    });
    
+   $('.CommentFormToggle').click(function() {
+      $('.CommentForm').show();
+      $(this).parents('.CommentForm').hide();
+      return false;
+   });
+   
 });

@@ -29,13 +29,18 @@ class ImageModel extends Gdn_Model {
    }
    
    /**
-    * Inserts a new image and returns the discussion id.
+    * Inserts new image(s) and returns the discussion id. If no DiscussionID is
+    * present in $FormPostValues, it will create a new discussion, using the 
+    * first image as the content. Subsequent images will be treated as comments.
+    * If DiscussionID is present, it will just create a new comment within that
+    * discussion for each image.
     */
-   public function SaveDiscussion($FormPostValues) {
+   public function Save($FormPostValues) {
       // Loop through all of the incoming values and validate them      
       $FormPostValues = $this->FilterForm($FormPostValues);
       $FormPostValues['Type'] = 'image'; // Force the "image" discussion type.
       
+      $DiscussionID = GetValue('DiscussionID', $FormPostValues);
       $Image = GetValue('Image', $FormPostValues);
       $Thumbnail = GetValue('Thumbnail', $FormPostValues);
       $Caption = GetValue('Caption', $FormPostValues);
@@ -56,32 +61,36 @@ class ImageModel extends Gdn_Model {
       if (count($this->Validation->Results()) > 0)
          return 0;
 
-      // Build the discussion data to be saved
-      $DiscussionFormValues = array(
-          'Type' => 'Image',
-          'Format' => 'Image',
-          'CategoryID' => GetValue('CategoryID', $FormPostValues),
-          'Name' => $Images[0]['Caption'],
-          'Body' => serialize($Images[0])
-      );
-      
-      // Save the discussion
-      $DiscussionModel = new DiscussionModel();
-      $DiscussionID = $DiscussionModel->Save($DiscussionFormValues);
-      $ValidationResults = $DiscussionModel->Validation->Results();
-      $this->Validation->AddValidationResult($ValidationResults);
-      if (count($this->Validation->Results()) > 0)
-         return 0;
+      if (!$DiscussionID) {
+         $Image = array_shift($Images);
+         
+         // Build the discussion data to be saved
+         $DiscussionFormValues = array(
+             'Type' => 'Image',
+             'Format' => 'Image',
+             'CategoryID' => GetValue('CategoryID', $FormPostValues),
+             'Name' => $Image['Caption'],
+             'Body' => serialize($Image)
+         );
+
+         // Save the discussion
+         $DiscussionModel = new DiscussionModel();
+         $DiscussionID = $DiscussionModel->Save($DiscussionFormValues);
+         $ValidationResults = $DiscussionModel->Validation->Results();
+         $this->Validation->AddValidationResult($ValidationResults);
+         if (count($this->Validation->Results()) > 0)
+            return 0;
+      }
 
       // Build & save the comments (if there is more than one image being uploaded)
-      if (count($Images) > 1) {
+      if (count($Images) > 0) {
          $CommentModel = new CommentModel();
          $CommentFormValues = array(
              'Type' => 'Image',
              'Format' => 'Image',
              'DiscussionID' => $DiscussionID
          );
-         for($i = 1; $i < count($Images); $i++) {
+         for($i = 0; $i < count($Images); $i++) {
             $CommentFormValues['Body'] = serialize($Images[$i]);
             $CommentModel->Save($CommentFormValues);
             $ValidationResults = $CommentModel->Validation->Results();
