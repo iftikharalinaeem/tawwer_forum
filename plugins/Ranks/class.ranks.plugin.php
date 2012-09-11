@@ -239,6 +239,7 @@ class RanksPlugin extends Gdn_Plugin {
    }
    
    public function UserModel_AfterSave_Handler($Sender, $Args) {
+      if (!Gdn::Controller()) return;
       $UserID = Gdn::Controller()->Data('Profile.UserID');
       if ($UserID != $Args['UserID'])
          return;
