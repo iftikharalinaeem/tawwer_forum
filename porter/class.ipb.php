@@ -15,13 +15,13 @@ class IPB extends ExportController {
     * @param ExportModel $Ex 
     */
    protected function ForumExport($Ex) {
-      $Ex->TestMode = FALSE;
-      $Ex->TestLimit = FALSE;
-      $Ex->Destination = 'database';
-      $Ex->DestDb = 'unknownworlds';
-      $Ex->CaptureOnly = TRUE;
-      $Ex->ScriptCreateTable = FALSE;
-      $Ex->DestPrefix = 'GDN_';
+//      $Ex->TestMode = FALSE;
+//      $Ex->TestLimit = FALSE;
+//      $Ex->Destination = 'database';
+//      $Ex->DestDb = 'unknownworlds';
+//      $Ex->CaptureOnly = TRUE;
+//      $Ex->ScriptCreateTable = FALSE;
+//      $Ex->DestPrefix = 'GDN_';
       
       $Ex->SourcePrefix = 'ibf_';
       $Cdn = 'http://cdn.vanillaforums.com/unknownworlds.vanillaforums.com/';
@@ -103,7 +103,6 @@ class IPB extends ExportController {
                   !hide_email as ShowEmail,
                   concat(m.members_pass_hash, '$', m.members_pass_salt) as Password,
                   case when length(p.avatar_location) <= 3 or p.avatar_location is null then null
-                     when p.
                   	when p.avatar_type = 'local' then concat('ipb/', p.avatar_location)
                   	when p.avatar_type = 'upload' then concat('ipb/', p.avatar_location)
                   	else p.avatar_location end as Photo
