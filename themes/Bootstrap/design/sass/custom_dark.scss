@@ -6,14 +6,14 @@ $headingColor: #fff;
 $linkColor: #84BCDE;
 $linkColorHover: darken($linkColor, 15%);
 
-$border-color: #3C3C3C;
+$borderColor: #3C3C3C;
 
 
 /** Forms **/
 
 $btnBackground: lighten(#2F2F2F, 10%);
 $btnColor: #fff;
-$btnPrimaryBackground: #F80F47; //#CC1507;
+$btnPrimaryBackground: #CC1507;
 $btnPrimaryColor: #fff;
 $formBackground: #2A2A2A;
 
@@ -33,6 +33,7 @@ $tag-color: #fff;
    border: solid 1px rgba(0, 0, 0, 0.5);
    box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0 inset, rgba(0,0,0,.8) 0 -1px 0 inset;
 }
+
 
 @import "_colours.scss";
 

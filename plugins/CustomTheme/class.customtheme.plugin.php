@@ -14,6 +14,7 @@ $PluginInfo['CustomTheme'] = array(
 );
 
 class CustomThemePlugin implements Gdn_IPlugin {
+   /// Methods ///
    
    public static function GetRevisionID($Key) {
       if (StringEndsWith($Key, 'ID'))
@@ -30,6 +31,48 @@ class CustomThemePlugin implements Gdn_IPlugin {
    }
    
    /// Event Handlers ///
+   
+   public function AssetModel_GenerateETag_Handler($Sender, $Args) {
+      if (IsMobile())
+			return;
+      
+      // We don't want to add the custom theme when previewing.
+      $LiveEditCSS = Gdn::Session()->GetPreference('LiveEditCSS', FALSE);
+		$DoPreview = Gdn::Session()->GetPreference('PreviewCustomTheme', FALSE) || $LiveEditCSS;
+      
+      if ($DoPreview) {
+         $Args['Suffix'] .= '-prv';
+      }
+      
+      $LiveRevisionID = C('Plugins.CustomTheme.LiveRevisionID', 0);
+      $Args['ETagData']["customtheme-$LiveRevisionID"] = TRUE;
+   }
+
+   /**
+    * @param AssetModel $Sender
+    * @return type 
+    */
+   public function AssetModel_StyleCss_Handler($Sender, $Args) {
+      if (IsMobile())
+			return;
+      
+      // We don't want to add the custom theme when previewing.
+      // TODO: Figure out a way to make this config based...
+      $ETag = GetValue('ETag', $Args);
+      $DoPreview = strpos($ETag, '-prv') !== FALSE;
+      
+      if ($DoPreview)
+         return;
+      
+      $LiveRevisionID = C('Plugins.CustomTheme.LiveRevisionID', 0);
+      $RevisionID = CustomThemePlugin::GetRevisionFromFileName($LiveRevisionID);
+		$Css = Gdn::SQL()->GetWhere('CustomThemeRevision', array('RevisionID' => $RevisionID))->Value('CSS');
+      
+      if ($Css) {
+         $Host = Gdn::Request()->Host();
+         $Sender->AddCssFile(FALSE, "/plugin/customcss/$Host/rev_$LiveRevisionID.css", array('Css' => $Css, 'Sort' => 100));
+      }
+   }
    
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
 		if (!$this->_CanCustomizeTheme())
@@ -136,8 +179,11 @@ class CustomThemePlugin implements Gdn_IPlugin {
 				$Sender->Head->AddCss('/plugin/customcss/'.Gdn_Format::Url(Gdn::Request()->Host()).'/rev_'.$WorkingRevisionID.'.css', 'all');
 			} elseif ($LiveRevisionID > 0) {
 				// $Sender->Head->AddString("\n".'<link rel="stylesheet" type="text/css" href="'.Asset('/plugin/customcss/rev_'.$LiveRevisionID.'.css', FALSE, TRUE).'" media="all" />');
-				$Sender->Head->AddCss('/plugin/customcss/'.Gdn_Format::Url(Gdn::Request()->Host()).'/rev_'.$LiveRevisionID.'.css', 'all');
-			}
+				// $Sender->Head->AddCss('/plugin/customcss/'.Gdn_Format::Url(Gdn::Request()->Host()).'/rev_'.$LiveRevisionID.'.css', 'all');
+			
+            // Don't add the css here. It's added by AssetModel_StyleCss_Handler(...)
+            
+         }
 		}
 
 		// Backwards compatibility
@@ -186,12 +232,12 @@ class CustomThemePlugin implements Gdn_IPlugin {
 	/**
 	 * Renders the requested css from the db.
 	 */
-	public function PluginController_CustomCSS_Create($Sender) {
+	public function PluginController_CustomCSS_Create($Sender, $Domain, $Filename) {
 		$this->_Construct();
 		
 		header('Content-Type: text/css', TRUE); // Force browsers to agree that this is css
 		$Sender->MasterView = 'none';
-		$FileToLoad = GetValue(1, $Sender->RequestArgs);
+		$FileToLoad = $Filename;
 		$RevisionID = CustomThemePlugin::GetRevisionFromFileName($FileToLoad);
 		$ThemeData = Gdn::SQL()
 			->Select()

@@ -92,8 +92,13 @@ class IPBFormatterPlugin extends Gdn_Plugin {
    protected $_Media = NULL;
    public function Media() {
       if ($this->_Media === NULL) {
-         $I = Gdn::PluginManager()->GetPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
-         $M = $I->MediaCache();
+         try {
+            $I = Gdn::PluginManager()->GetPluginInstance('FileUploadPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
+            $M = $I->MediaCache();
+         } catch (Exception $Ex) {
+            $M = array();
+         }
+         
          $Media = array();
          foreach ($M as $Key => $Data) {
             foreach ($Data as $Row) {

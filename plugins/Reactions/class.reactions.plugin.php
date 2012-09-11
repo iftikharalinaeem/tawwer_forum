@@ -80,9 +80,12 @@ class ReactionsPlugin extends Gdn_Plugin {
       include dirname(__FILE__).'/structure.php';
    }
    
+   public function AssetModel_StyleCss_Handler($Sender, $Args) {
+      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
+   }
+   
    public function ActivityController_Render_Before($Sender) {
       $this->AddJs($Sender);
-      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }
    
@@ -123,9 +126,9 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->SetData('CommentOrder', array('Column' => $OrderColumn, 'Direction' => $OrderDirection));
       
       if ($Sender->ReactionsVersion == 1) {
-         $Sender->AddCssFile('reactions-1.css', 'plugins/Reactions');
+//         $Sender->AddCssFile('reactions-1.css', 'plugins/Reactions');
       } else {
-         $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
+//         $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
          $this->AddJs($Sender);
       }
       
@@ -235,7 +238,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       }
       $Sender->SetData('Counts', $Counts);
       
-      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
+//      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
       $this->AddJs($Sender);
    }
    
@@ -366,6 +369,99 @@ class ReactionsPlugin extends Gdn_Plugin {
 
       // Define the query offset & limit.
       $Page = 'p'.GetIncomingValue('Page', 1);
+      $Limit = C('Plugins.Reactions.BestOfPerPage', 30);
+      //      $OffsetProvided = $Page != '';
+      list($Offset, $Limit) = OffsetLimit($Page, $Limit);
+      
+      $Sender->SetData('_Limit', $Limit + 1);
+      
+      $ReactionModel = new ReactionModel();
+      if ($Reaction == 'everything') {
+         $PromotedTagID = $ReactionModel->DefineTag('Promoted', 'BestOf');
+         $Data = $ReactionModel->GetRecordsWhere(
+            array('TagID' => $PromotedTagID, 'RecordType' => array('Discussion', 'Comment')),
+            'DateInserted', 'desc',
+            $Limit + 1, $Offset);
+      } else {
+         $ReactionType = $ReactionTypes[$Reaction];
+         $Data = $ReactionModel->GetRecordsWhere(
+            array('TagID' => $ReactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'Total >=' => 1),
+            'DateInserted', 'desc',
+            $Limit + 1, $Offset);
+      }
+      
+      $Sender->SetData('_CurrentRecords', count($Data));
+      if (count($Data) > $Limit) {
+         array_pop($Data);
+      }
+      if (C('Plugins.Reactions.ShowUserReactions', TRUE))
+         $ReactionModel->JoinUserTags($Data);
+      $Sender->SetData('Data', $Data);
+
+      // Set up head
+      $Sender->Head = new HeadModule($Sender);
+      $Sender->AddJsFile('jquery.js');
+      $Sender->AddJsFile('jquery.livequery.js');
+      $Sender->AddJsFile('global.js');
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js'); // I customized this to get proper callbacks.
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
+      $Sender->AddCssFile('style.css');
+      // Set the title, breadcrumbs, canonical
+      $Sender->Title(T('Best Of'));
+      $Sender->SetData('Breadcrumbs', array(array('Name' => T('Best Of'), 'Url' => '/bestof/everything')));
+      $Sender->CanonicalUrl(
+         Url(
+            ConcatSep('/', 'bestof/'.$Reaction, PageNumber($Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)), 
+            TRUE), 
+         Gdn::Session()->UserID == 0
+      );
+      
+      // Modules
+      $Sender->AddModule('GuestModule');
+      $Sender->AddModule('SignedInModule');
+      $Sender->AddModule('BestOfFilterModule');
+
+      // Render the page.
+      if (class_exists('LeaderBoardModule')) {
+         $Sender->AddModule('LeaderBoardModule');
+
+         $Module = new LeaderBoardModule();
+         $Module->SlotType = 'a';
+         $Sender->AddModule($Module);
+      }
+      
+      // Render the page (or deliver the view)
+      $Sender->Render('bestof', '', 'plugins/Reactions');
+   }
+   
+   /** 
+    * Add a "Best Of" view for reacted content.
+    * 
+    * @param type $Sender Controller firing the event.
+    * @param string $ReactionType Type of reaction content to show
+    * @param int $Page The current page of content
+    */
+   public function RootController_BestOf2_Create($Sender, $Reaction = 'everything') {
+      Gdn_Theme::Section('BestOf');
+      // Load all of the reaction types.
+      try {
+         $ReactionModel = new ReactionModel();
+         $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Good', 'Active' => 1));
+         
+         $Sender->SetData('ReactionTypes', $ReactionTypes);
+//         $ReactionTypes = array_merge($ReactionTypes, ConsolidateArrayValuesByKey($ReactionTypeData, 'UrlCode'));
+//         array_map('strtolower', $ReactionTypes);
+      } catch (Exception $ex) {
+         $Sender->SetData('ReactionTypes', array());
+      }
+      if (!isset($ReactionTypes[$Reaction])) {
+         $Reaction = 'everything';
+      }
+      $Sender->SetData('CurrentReaction', $Reaction);
+
+      // Define the query offset & limit.
+      $Page = 'p'.GetIncomingValue('Page', 1);
       $Limit = C('Plugins.Reactions.BestOfPerPage', 10);
       //      $OffsetProvided = $Page != '';
       list($Offset, $Limit) = OffsetLimit($Page, $Limit);
@@ -430,10 +526,88 @@ class ReactionsPlugin extends Gdn_Plugin {
       }
       
       // Set the video embed size for this page explicitly (in memory only).
-      SaveToConfig('Garden.Format.EmbedSize', '450x255', array('Save' => FALSE));
+      SaveToConfig('Garden.Format.EmbedSize', '435x245', array('Save' => FALSE));
       
       // Render the page (or deliver the view)
-      $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'bestoflist' : 'bestof';
+      $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'bestoflist' : 'bestof2';
       $Sender->Render($View, '', 'plugins/Reactions');
+   }   
+   
+   /**
+	 * Sort the comments by score if necessary
+    * @param CommentModel $CommentModel
+	 */
+   public function CommentModel_AfterConstruct_Handler($CommentModel) {
+		if (!C('Plugins.Reactions.CommentSortEnabled'))
+			return;
+
+      $Sort = self::CommentSort();
+      switch (strtolower($Sort)) {
+         case 'score':
+            $CommentModel->OrderBy(array('coalesce(c.Score, 0) desc', 'c.CommentID'));
+            break;
+         case 'date':
+         default:
+            $CommentModel->OrderBy('c.DateInserted');
+            break;
+      }
    }
+
+   /** 
+    * Get the user's preference for comment sorting (if enabled).
+    */
+   protected static $_CommentSort;
+   public static function CommentSort() {
+		if (!C('Plugins.Reactions.CommentSortEnabled'))
+			return;
+
+      if (self::$_CommentSort)
+         return self::$_CommentSort;
+      
+      $Sort = GetIncomingValue('Sort', '');
+      if (Gdn::Session()->IsValid()) {
+         if ($Sort == '') {
+            // No sort was specified so grab it from the user's preferences.
+            $Sort = Gdn::Session()->GetPreference('Plugins.Reactions.CommentSort', 'score');
+         } else {
+            // Save the sort to the user's preferences.
+            Gdn::Session()->SetPreference('Plugins.Reactions.CommentSort', $Sort == 'score' ? 'score' : $Sort);
+         }
+      }
+
+      if (!in_array($Sort, array('score', 'date')))
+         $Sort = 'date';
+      
+      self::$_CommentSort = $Sort;
+      return $Sort;
+   }   
+   
+   /**
+	 * Allow comments to be sorted by score?
+	 */
+	public function DiscussionController_BeforeCommentDisplay_Handler($Sender) {
+		if (!C('Plugins.Reactions.CommentSortEnabled'))
+			return;
+
+		if (
+          GetValue('Type', $Sender->EventArguments, 'Comment') == 'Comment' 
+          && !GetValue('VoteHeaderWritten', $this)
+         ):
+         ?>
+         <li class="Item">
+            <span class="NavLabel"><?php echo T('Sort by'); ?></span>
+            <span class="DiscussionSort NavBar">
+               <?php
+               $Query = $_GET;
+               $Query['Sort'] = 'score';
+               echo Anchor('Points', Url('?'.http_build_query($Query), TRUE), 'NoTop Button'.(self::CommentSort() == 'score' ? ' Active' : ''), array('rel' => 'nofollow', 'alt' => T('Sort by reaction points')));
+               $Query['Sort'] = 'date';
+               echo Anchor('Date Added', Url('?'.http_build_query($Query), TRUE), 'NoTop Button'.(self::CommentSort() == 'date' ? ' Active' : ''), array('rel' => 'nofollow', 'alt' => T('Sort by date added')));
+            ?>
+            </span>
+         </li>
+         <?php
+         $this->VoteHeaderWritten = TRUE;
+		endif;		
+	}
 }

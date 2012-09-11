@@ -574,6 +574,10 @@ body > #Frame > .Head {
    content: "";
 }
 
+.Item #latest {
+   margin: -50px;
+}
+
 /** Panels and Boxes **/
 
 .Box {

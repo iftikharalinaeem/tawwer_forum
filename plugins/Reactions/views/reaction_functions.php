@@ -170,7 +170,7 @@ function WriteProfileCounts() {
       echo ' <span class="CountItemWrap"><span class="'.$ItemClass.'">';
       
       if ($Row['Url'])
-         echo '<a href="'.htmlspecialchars($Row['Url']).'">';
+         echo '<a href="'.htmlspecialchars($Row['Url']).'" class="TextColor">';
       
       echo ' <span class="CountTotal">'.Gdn_Format::BigNumber($Row['Total'], 'html').'</span> ';
       echo ' <span class="CountLabel">'.$Row['Name'].'</span>';
@@ -191,6 +191,23 @@ function WriteReactions($Row) {
       $Attributes = @unserialize($Attributes);
       SetValue('Attributes', $Row, $Attributes);
    }
+   
+   static $Types = NULL;
+   if ($Types === NULL)
+      $Types = ReactionModel::GetReactionTypes(array('Class' => array('Good', 'Bad'), 'Active' => 1));
+   Gdn::Controller()->EventArguments['ReactionTypes'] = $Types;
+   
+   if ($ID = GetValue('CommentID', $Row)) {
+      $RecordType = 'comment';
+   } elseif ($ID = GetValue('ActivityID', $Row)) {
+      $RecordType = 'activity';
+   } else {
+      $RecordType = 'discussion';
+      $ID = GetValue('DiscussionID', $Row);
+   }
+   Gdn::Controller()->EventArguments['RecordType'] = $RecordType;
+   Gdn::Controller()->EventArguments['RecordID'] = $ID;
+   
    
    if (C('Plugins.Reactions.ShowUserReactions', TRUE))
       WriteRecordReactions($Row);
@@ -218,12 +235,13 @@ function WriteReactions($Row) {
             }
             echo '</ul>';
          echo '</span>';
+         
+         Gdn::Controller()->FireEvent('AfterFlag');
+         
          echo Bullet();
       }
 
-      static $Types = NULL;
-      if ($Types === NULL)
-         $Types = ReactionModel::GetReactionTypes(array('Class' => array('Good', 'Bad'), 'Active' => 1));
+      
 
       // Write the reactions.
       echo '<span class="ReactMenu">';
@@ -234,7 +252,9 @@ function WriteReactions($Row) {
          echo '</span>';
       echo '</span>';
 
-      Gdn::Controller()->EventArguments['ReactionTypes'] = $Types;
+      echo Bullet();
+      echo ' '.Wrap(T('Share'), 'span', array('class' => 'ReactButton ReactLabel')).' ';
+      
       Gdn::Controller()->FireEvent('AfterReactions');
    
    echo '</div>';

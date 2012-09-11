@@ -11,10 +11,10 @@
             <a href="{link path="/"}" class="Home">Vanilla Forums: Community Forums Evolved</a>
             <div class="Menu">
                <a href="{link path="/addons"}">Addons</a>
-               <a href="{link path="/discussions"}">Community</a>
+               <a href="{link path="/discussions"}">{t c="Community"}</a>
                <a href="{link path="/docs"}">Documentation</a>
-               <a href="http://vanillaforums.com/blog">Blog</a>
-               <a href="/download" class="Download">Download</a>
+               <a href="http://vanillaforums.com/blog">{t c="Blog"}</a>
+               <a href="/download" class="Download">{t c="Download"}</a>
                <a href="http://vanillaforums.com" class="Hosting">Hosting<span>Start Using Vanilla today</span></a>
             </div>
             {*
