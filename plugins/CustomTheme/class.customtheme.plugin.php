@@ -72,9 +72,8 @@ class CustomThemePlugin implements Gdn_IPlugin {
 	 * Can the current theme be customized?
 	 */
 	private function _CanCustomizeTheme() {
-		$ThemeManager = new Gdn_ThemeManager();
-		$ThemeInfo = $ThemeManager->EnabledThemeInfo();
-      
+		$ThemeInfo = Gdn::ThemeManager()->EnabledThemeInfo();
+      if (empty($ThemeInfo)) return FALSE;
 		// Make sure the current theme uses a smarty master template instead of php
       $ThemeRoot = PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '');
 		return $ThemeInfo['Index'] == 'default' || !file_exists($ThemeRoot.'/views/default.master.php');
