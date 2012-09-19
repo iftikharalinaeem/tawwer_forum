@@ -39,11 +39,12 @@ $Session = Gdn::Session();
                </div>
                <div class="VFMenu">
                   <?php
-                  echo Anchor(Sprite('SpHome').'Home', '/', 'Home', array('SSL' => FALSE));
+                  // echo Anchor(Sprite('SpHome').'Home', '/', 'Home', array('SSL' => FALSE));
+                  echo Anchor(Sprite('SpTour').'Tour', '/tour', 'Product Tour', array('SSL' => FALSE));
+                  echo Anchor(Sprite('SpResources').'Solutions', '/solutions', 'Solutions', array('SSL' => FALSE));
                   echo Anchor(Sprite('SpPlans').'Plans &amp; Pricing', '/plans', 'Plans', array('SSL' => FALSE));
-                  echo Anchor(Sprite('SpTour').'Tour', '/tour', 'Tour', array('SSL' => FALSE));
-                  echo Anchor(Sprite('SpResources').'Resources', '/resources', 'Resources', array('SSL' => FALSE));
                   echo Anchor(Sprite('SpBlog').'Blog', '/blog', 'Blog', array('SSL' => FALSE));
+                  echo Anchor(Sprite('SpShowcase').'Showcase', '/showcase', 'Showcase', array('SSL' => FALSE));
                   ?>
                </div>
             </div>
