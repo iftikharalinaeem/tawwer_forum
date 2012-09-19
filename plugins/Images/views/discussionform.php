@@ -39,7 +39,7 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       }
       
       echo '<div class="Buttons">';
-         echo $this->Form->Button('Post', array('class' => 'Button PostButton Primary'));
+         echo $this->Form->Button('Post', array('class' => 'Button ImageButton Primary'));
          echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
       echo '</div>';
       echo $this->Form->Close();

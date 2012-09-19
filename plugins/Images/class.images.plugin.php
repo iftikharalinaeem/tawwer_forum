@@ -104,11 +104,36 @@ class ImagesPlugin extends Gdn_Plugin {
             $Sender->Form->SetData(array('CategoryID' => $Sender->Category->CategoryID));
       } else { // Form was submitted
          $FormValues = $Sender->Form->FormValues();
-         $DiscussionID = $ImageModel->Save($FormValues);
+         $DiscussionID = GetValue('DiscussionID', $FormValues);
+         $NewDiscussion = $DiscussionID == 0;
+         $CommentIDs = array();
+         $DiscussionID = $ImageModel->Save($FormValues, $CommentIDs);
          $Sender->Form->SetValidationResults($ImageModel->ValidationResults());
          if ($Sender->Form->ErrorCount() == 0) {
             $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);            
-            Redirect(DiscussionUrl($Discussion).'#latest');
+            if ($NewDiscussion) {
+               // Redirect to the new discussion
+               Redirect(DiscussionUrl($Discussion).'#latest');
+            } elseif (count($CommentIDs) > 0) {
+               // Load/return the newly added comments.
+               sort($CommentIDs);
+               $FirstCommentID = array_shift($CommentIDs);
+               $Offset = $Sender->CommentModel->GetOffset($FirstCommentID);
+               $Comments = $Sender->CommentModel->Get($DiscussionID, 30, $Offset);
+               $Sender->SetData('Comments', $Comments);
+               $Sender->SetData('NewComments', TRUE);
+               $Sender->ClassName = 'DiscussionController';
+               $Sender->ControllerName = 'discussion';
+               $Sender->View = 'comments';
+               
+               // Make sure to set the user's discussion watch records
+               $CountComments = $Sender->CommentModel->GetCount($DiscussionID);
+               $Limit = count($CommentIDs);
+               $Sender->Offset = $CountComments - $Limit;
+               $Sender->CommentModel->SetWatch($Discussion, $Limit, $Sender->Offset, $CountComments);
+               $Sender->Render();
+               return;
+            }
          }
       }
       

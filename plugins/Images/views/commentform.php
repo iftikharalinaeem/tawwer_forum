@@ -26,7 +26,9 @@ $Session = Gdn::Session();
          <div class="Form-Body">
             <div class="FormWrapper FormWrapper-Condensed">
                <?php
+                  $OldAction = $this->Form->Action;
                   echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'id' => 'UploadForm', 'action' => Url('vanilla/post/image')));
+                  $this->Form->Action = $OldAction; // Set the form back to what it was before.
                   echo $this->Form->Errors();
 
                   // The table listing the files available for upload/download.
@@ -52,7 +54,7 @@ $Session = Gdn::Session();
                            echo Anchor($Category['Name'], $Category['Url']);
                         }
                      echo '</span>';
-                     echo $this->Form->Button('Post', array('class' => 'Button PostButton Primary'));
+                     echo $this->Form->Button('Post', array('class' => 'Button ImageButton Primary'));
                   echo '</div>';
                   echo $this->Form->Close();
                ?>
