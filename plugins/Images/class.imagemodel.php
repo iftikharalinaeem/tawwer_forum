@@ -34,8 +34,11 @@ class ImageModel extends Gdn_Model {
     * first image as the content. Subsequent images will be treated as comments.
     * If DiscussionID is present, it will just create a new comment within that
     * discussion for each image.
+    * 
+    * @var array $FormPostValues The values posted by the form for saving.
+    * @var array $CommentIDs Array of comment id's created by the save (available by reference).
     */
-   public function Save($FormPostValues) {
+   public function Save($FormPostValues, &$CommentIDs = array()) {
       // Loop through all of the incoming values and validate them      
       $FormPostValues = $this->FilterForm($FormPostValues);
       $FormPostValues['Type'] = 'image'; // Force the "image" discussion type.
@@ -92,7 +95,7 @@ class ImageModel extends Gdn_Model {
          );
          for($i = 0; $i < count($Images); $i++) {
             $CommentFormValues['Body'] = serialize($Images[$i]);
-            $CommentModel->Save($CommentFormValues);
+            $CommentIDs[] = $CommentModel->Save($CommentFormValues);
             $ValidationResults = $CommentModel->Validation->Results();
             $this->Validation->AddValidationResult($ValidationResults);
          }
