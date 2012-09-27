@@ -1,79 +1,118 @@
 /** Scaffolding **/
-/** Forms **/
 /** Typography **/
-/* line 8, sass/_colours.scss */
 body {
   background: #2f2f2f;
   color: #c6c6c6;
 }
 
-/* line 14, sass/_colours.scss */
 a,
 .FlyoutMenu a {
   color: #84bcde;
 }
 
-/* line 17, sass/_colours.scss */
 a.TextColor, a .TextColor {
   color: #c6c6c6;
 }
 
-/* line 21, sass/_colours.scss */
-h1, h2, h3, h4, h5 {
+a:hover, a.TextColor:hover, a:hover .TextColor {
+  color: #39e5ff;
+}
+
+h1, h2, h3, h4, h5,
+h1 a, h2 a, h3 a, h4 a, h5 a {
   color: white;
 }
 
-/* line 25, sass/_colours.scss */
 .Tag, .TagCloud li {
   background: #cc1507;
   color: white;
 }
 
-/* line 30, sass/_colours.scss */
 .Tag a {
   color: white;
 }
 
+.Count {
+  background: #cc1507;
+  color: white;
+}
+
+.Active .Count {
+  color: #cc1507;
+  background: white;
+}
+
+.Item .AuthorInfo .MItem, .Item .CommentInfo .MItem,
+.Item .AuthorInfo .MItem::before, .Item .CommentInfo .MItem::before,
+.Gloss {
+  color: #959595;
+}
+
+/** Navigation **/
+.NavBar {
+  background-color: black;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #333333), color-stop(100%, #000000));
+  background-image: -webkit-linear-gradient(top, #333333, #000000);
+  background-image: -moz-linear-gradient(top, #333333, #000000);
+  background-image: -o-linear-gradient(top, #333333, #000000);
+  background-image: -ms-linear-gradient(top, #333333, #000000);
+  background-image: linear-gradient(top, #333333, #000000);
+}
+
+.SiteMenu a, .NavBar .Username, .NavBar .MeBox-SignIn a {
+  color: #999999;
+}
+
+.NavBar .FlyoutButton:hover .Sprite16,
+.NavBar .Open .MeMenu .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}
+
+.BreadcrumbsWrapper {
+  background: #222222;
+  border-bottom-color: #0e0e0e;
+}
+
 /** DataLists **/
-/* line 36, sass/_colours.scss */
 .DataList {
-  border-color: #3c3c3c;
+  border-color: #242424;
 }
 
-/* line 40, sass/_colours.scss */
-.Item {
-  border-color: #3c3c3c;
+.DataList .Item, .DataList .Item {
+  border-color: #242424;
 }
 
-/* line 46, sass/_colours.scss */
 .Item.Read {
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.3);
+  background: #383838;
+  color: #959595;
 }
 
-/* line 50, sass/_colours.scss */
 .Item.Read a {
-  color: rgba(255, 255, 255, 0.3);
+  color: #959595;
 }
 
-/* line 54, sass/_colours.scss */
+.Item.Read a:hover {
+  color: #39e5ff;
+}
+
 .Item.Read .Tag, .Item.Read .Tag a {
-  background: rgba(0, 0, 0, 0.5) !important;
-  color: rgba(255, 255, 255, 0.3) !important;
+  background: #959595 !important;
+  color: #383838 !important;
 }
 
-/* line 59, sass/_colours.scss */
 .ItemDiscussion .Meta, .DataList .Meta {
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(149, 149, 149, 0.9);
 }
 
-/* line 63, sass/_colours.scss */
 .DataList.Discussions .MCount, .DataList.Discussions .HasNew {
   color: #c6c6c6;
 }
 
+.DataTable tbody td {
+  border-color: #242424;
+}
+
 /** Forms **/
-/* line 69, sass/_colours.scss */
 .Button, .NavButton {
   background-color: #494949;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #626262), color-stop(100%, #2f2f2f));
@@ -87,19 +126,20 @@ h1, h2, h3, h4, h5 {
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75);
 }
 
-/* line 79, sass/_colours.scss */
 .Button:hover, .NavButton:hover {
   background-color: #2f2f2f;
   color: white;
   border-color: #161616;
 }
 
-/* line 85, sass/_colours.scss */
 .NavButton.Handle .Sprite, .Button.Handle .Sprite {
   border-top-color: white;
 }
 
-/* line 89, sass/_colours.scss */
+.NavButton:hover, .NavButton {
+  box-shadow: 0 1px 1px #494949;
+}
+
 .Button.Primary {
   background-color: #cc1507;
   background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f7200f), color-stop(100%, #9b1005));
@@ -113,18 +153,15 @@ h1, h2, h3, h4, h5 {
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75);
 }
 
-/* line 99, sass/_colours.scss */
 .Button.Primary:hover {
   background-color: #9b1005;
   border-color: #690b04;
 }
 
-/* line 104, sass/_colours.scss */
 .NavButton.Primary.Handle .Sprite, .Button.Primary.Handle .Sprite {
   border-top-color: white;
 }
 
-/* line 108, sass/_colours.scss */
 .ButtonGroup.Open .Button.Handle, .Button:focus, .Button:active {
   background: #3c3c3c;
   background-image: none;
@@ -132,119 +169,163 @@ h1, h2, h3, h4, h5 {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4) inset;
 }
 
-/* line 115, sass/_colours.scss */
 .ButtonGroup.Open .Button.Primary.Handle {
   background: #b31206;
   background-image: none;
   border-color: #9b1005;
 }
 
-/* line 121, sass/_colours.scss */
 .Open .Handle.Primary .Sprite {
   border-top-color: #fff;
 }
 
-/* line 125, sass/_colours.scss */
 .FormWrapper {
   background-color: #2a2a2a;
 }
 
 /** Pagers **/
-/* line 131, sass/_colours.scss */
 .Pager a, .Pager span {
-  border-color: #3c3c3c;
+  border-color: #242424;
 }
 
-/* line 135, sass/_colours.scss */
 .Pager a:hover, .Pager .Highlight {
   background-color: #626262;
   color: #afafaf;
 }
 
 /** Sprites **/
-/* line 143, sass/_colours.scss */
 .OptionsTitle, a.Bookmark, a.Bookmarked, a.Bookmarking {
   background-image: url("ui_sprites_white.png");
 }
 
-/* line 147, sass/_colours.scss */
-.ReactSprite {
-  background-image: url("http://cdn.vanillaforums.com/images/sprites-14-fff.png");
+.Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-777777.png");
+}
+
+a .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-sweetx-84bcde.png");
+}
+
+a:hover .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-sweetxc-39e5ff.png");
+}
+
+.Reactions a {
+  color: #777777;
+}
+
+.Reactions a:hover {
+  color: #39e5ff;
 }
 
 /** Popups **/
-/* line 154, sass/_colours.scss */
 div.Popup .Body {
   background-color: #2f2f2f;
 }
 
-/* line 158, sass/_colours.scss */
 div.Popup h1 {
-  border-color: #3c3c3c;
+  border-color: #242424;
 }
 
-/* line 162, sass/_colours.scss */
 div.Popup .Buttons {
   background-color: #494949;
-  border-color: #3c3c3c;
+  border-color: #242424;
   box-shadow: inset 0 1px 0 #626262;
 }
 
-/* line 168, sass/_colours.scss */
 a.Close {
   color: #c6c6c6;
 }
 
-/* line 40, sass/custom_dark.scss */
-.DataList, .DataTable {
-  background-color: rgba(0, 0, 0, 0.3);
-  box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0, rgba(0, 0, 0, 0.8) 0 1px 7px 0px inset;
-  border-width: 0;
-}
-
-/* line 44, sass/custom_dark.scss */
+/** Panel **/
 .Box {
-  background-color: rgba(0, 0, 0, 0.3);
-  box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0, rgba(0, 0, 0, 0.8) 0 1px 7px 0px inset;
-  border-width: 0;
+  border-color: #242424;
 }
 
-/* line 48, sass/custom_dark.scss */
 .Box h4 {
-  background: rgba(255, 255, 255, 0.06);
-  border: solid 1px rgba(0, 0, 0, 0.5);
-  box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0 inset, rgba(0, 0, 0, 0.8) 0 -1px 0 inset;
+  background: #3c3c3c;
+  border-color: #242424;
+  box-shadow: 0 1px 1px #888888 inset;
 }
 
-/* line 52, sass/custom_dark.scss */
-.Box .DataList {
-  box-shadow: none;
-  background: transparent;
-}
-
-/* line 57, sass/custom_dark.scss */
 #Panel .FilterMenu {
-  background-color: rgba(0, 0, 0, 0.3);
-  box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0, rgba(0, 0, 0, 0.8) 0 1px 7px 0px inset;
-  border-width: 0;
+  background: #3c3c3c;
 }
 
-/*
-.DataTable thead td {
-   background: $bodyBackground;
-}
-*/
-/* line 67, sass/custom_dark.scss */
-.DataTable {
-  border-radius: 3px;
+#Panel .PanelInfo li {
+  border-color: #242424;
 }
 
-/* line 71, sass/custom_dark.scss */
-.DataTable td:first-child {
-  padding-left: 1em;
+.Hero {
+  background: #3c3c3c;
 }
 
-/* line 75, sass/custom_dark.scss */
-.DataTable td:last-child {
-  padding-right: 1em;
+#Panel .FilterMenu .Active a, #Panel .FilterMenu .Active a:hover, .PanelInfo .Active {
+  background: #cc1507;
+  color: white;
+}
+
+#Panel .FilterMenu .Active a .Sprite,
+#Panel .FilterMenu .Active a:hover .Sprite,
+.PanelInfo .Active .Sprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}
+
+/** Misc **/
+.ActivateSlider {
+  background: #3c3c3c;
+  box-shadow: 0 10px 30px #090909 inset;
+  border-color: #494949;
+}
+
+/** Me box **/
+.NavBar .MeMenu .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-999999.png");
+}
+
+/** Reactions **/
+.ReactSprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-777777.png");
+}
+
+.Reactions a:hover .ReactSprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14c-39e5ff.png");
+}
+
+/* Switch to the white icons when hovering over a menuitem sprite */
+.Reactions .MenuItems a:hover .ReactSprite,
+.MenuItems a:hover .Sprite {
+  background-image: url("http://vanillicon.local/sprites/sprites-14-ffffff.png");
+}
+
+/* Switch to bordered icons for user reaction overlays */
+.UserReactionWrap .ReactSprite {
+  background-image: url("http://vanillicon.local/sprites/sprites-14-outline-000000.png");
+}
+
+.Sprite,
+.Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-c6c6c6.png");
+}
+
+a .Sprite,
+a .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-84bcde.png");
+}
+
+a:hover .Sprite,
+a:hover .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-39e5ff.png");
+}
+
+.Button .Sprite,
+.NavButton .Sprite,
+.Button .Sprite16,
+.NavButton .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}
+
+.Button.Primary .Sprite,
+.Button.Primary .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
 }

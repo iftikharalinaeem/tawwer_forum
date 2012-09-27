@@ -14,7 +14,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $ThemeInfo['Bootstrap'] = array(
    'Name' => 'Bootstrap',
    'Description' => "A theme based on the popular Twitter Bootstrap framework.",
-   'Version' => '1.0b',
+   'Version' => '1.0.1b',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
@@ -22,7 +22,8 @@ $ThemeInfo['Bootstrap'] = array(
       'Description' => 'This theme has an alternative colour scheme.',
       'Styles' => array(
          'Default' => '%s',
-         'Dark' => '%s_dark'
-      ),
+         'Dark' => '%s_dark',
+         'Green' => '%s_green'
+      )
    )
 );

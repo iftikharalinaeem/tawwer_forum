@@ -1,0 +1,75 @@
+/// Colours ///
+
+$blue: #0687D2;
+$green: #46a546;
+$red: #cc1507;
+$yellow: #ffc40d;
+$orange: #f89406;
+$pink: #c3325f;
+$purple: #7a43b6;
+
+/** Scaffolding **/
+
+$bodyBackground: #ffffff;
+$textColor: #333333;
+$headingColor: #000000;
+
+$linkColor: #0088cc;
+$linkColorHover: #ff0084;
+
+$reactColor: #777;
+
+/// Tables ///
+
+$tableBorder: #ddd;
+
+/// Forms ///
+
+$btnBackground: #fff;
+$btnColor: #000;
+$btnPrimaryBackground: $blue;
+$btnPrimaryColor: #fff;
+
+$formBackground: #2A2A2A;
+
+/// Navigation ///
+
+$navbarText: #999;
+$navbarTextHover: #fff;
+
+/// Mixins & Functions ///
+
+@function accent($amount: 5%, $color: $bodyBackground) {
+   @if ($amount < 0) {
+      @return if(lightness($color) <= 50%, darken($color, abs($amount)), lighten($color, abs($amount)));
+   }
+   @return if(lightness($color) > 50%, darken($color, $amount), lighten($color, $amount));
+}
+
+@function isMidtone($color: $bodyBackground) {
+   @if (lightness($color) < 90%) {
+      @if (lightness($color) > 20%) {
+         @return true;
+      } @else {
+         @return false;
+      }
+   } @else {
+      @return false;
+   }
+}
+
+@function spriteUrl($color, $file: sprites-14) {
+   @return url("http://vanillicon.com/sprites/#{$file}-#{hex_str(unquote($color))}.png");
+}
+
+@mixin inset {
+   background-color: rgba(0,0,0,.3);
+   box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0, rgba(0, 0, 0, 0.8) 0 1px 7px 0px inset;
+   border-width: 0;
+}
+
+@mixin outset {
+   background: rgba(255, 255, 255, 0.06);
+   border: solid 1px rgba(0, 0, 0, 0.5);
+   box-shadow: rgba(255, 255, 255, 0.1) 0 1px 0 inset, rgba(0,0,0,.8) 0 -1px 0 inset;
+}
