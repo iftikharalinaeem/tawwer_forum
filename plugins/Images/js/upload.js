@@ -78,7 +78,7 @@ $(function () {
       var but = this;
       gdn.disable(but);
       $.ajax({
-            data: { 'inputUrl' : $('.url-input').val() },
+            data: { 'inputUrl' : $('.UrlInput').val() },
             dataType: 'json',
             url: gdn.url('vanilla/post/uploadimage/'),
             type: 'POST'
@@ -92,8 +92,8 @@ $(function () {
                files: data,
                formatFileSize: fileSize
          });
-         $('#filetable > tbody').append(html);
-         $('.url-input').val('').focus();
+         $('#filetable').append(html);
+         $('.UrlInput').val('').focus();
       }).always(function() {
          gdn.enable(but);
       });
@@ -108,8 +108,7 @@ $(function () {
    
    
    // Hijack comment form button clicks.
-   $('.ImageButton').click(function() {
-      console.log('imagebutton');
+   $('.Section-Discussion .ImageButton').click(function() {
       var btn = this;
       var parent = $(btn).parents('.NewImageForm');
       var frm = $(parent).find('form');
@@ -197,7 +196,7 @@ $(function () {
          },
          complete: function(XMLHttpRequest, textStatus) {
             console.log('complete');
-            $('#filetable > tbody').html('');
+            $('#filetable').html('');
             gdn.enable(btn);
          }
       });

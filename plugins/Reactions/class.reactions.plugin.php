@@ -529,8 +529,8 @@ class ReactionsPlugin extends Gdn_Plugin {
       SaveToConfig('Garden.Format.EmbedSize', '435x245', array('Save' => FALSE));
       
       // Render the page (or deliver the view)
-      $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'bestoflist' : 'bestof2';
-      $Sender->Render($View, '', 'plugins/Reactions');
+      $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'bestofitems' : 'bestof';
+      $Sender->Render($View, '', 'plugins/Images');
    }   
    
    /**

@@ -7,7 +7,7 @@ $Database = Gdn::Database();
 /* Body should be a serialized array of entity attributes. Examples: 
  * An image would contain: path, filesize, dimensions. 
  * A link would contain: url, all fetchpageinfo properties.
- */
+
 $St->Table('Entity')
    ->PrimaryKey('EntityID')
    ->Column('TypeID', 'int', TRUE)
@@ -24,7 +24,7 @@ $St->Table('EntityType')
    ->PrimaryKey('EntityTypeID')
    ->Column('Name', 'varchar(50)', TRUE)
    ->Set();
-
+ */
 // Define permissions
 $PermissionModel = Gdn::PermissionModel();
 $PermissionModel->Database = $Database;

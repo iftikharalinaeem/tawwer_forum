@@ -3,64 +3,35 @@ if (!defined('APPLICATION'))
    exit();
 $Session = Gdn::Session();
 ?>
-<div id="NewImageForm" class="<?php echo $this->EventArguments['FormCssClass']; ?> NewImageForm Hidden">
-   <h2 class="H"><?php echo T('Post an Image'); ?></h2>
-   <a href="#" class="CommentFormToggle"><?php echo T('Leave a Comment'); ?></a>
-   <div class="CommentFormWrap">
-      <div class="Form-HeaderWrap">
-         <div class="Form-Header">
-            <span class="Author">
-               <?php
-               if (C('Vanilla.Comment.UserPhotoFirst', TRUE)) {
-                  echo UserPhoto($Session->User);
-                  echo UserAnchor($Session->User, 'Username');
-               } else {
-                  echo UserAnchor($Session->User, 'Username');
-                  echo UserPhoto($Session->User);
-               }
+<div id="NewImageForm" class="Toggle-NewImageForm <?php echo $this->EventArguments['FormCssClass']; ?> NewImageForm Hidden">
+   <div class="FormWrapper">
+      <?php
+      echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'id' => 'UploadForm'));
+      echo $this->Form->Errors();
+      ?>
+      <div id="filetable" class="UploadFiles files" role="presentation"></div>
+      <div class="ImageFormWrap">
+         <div class="ImageControlsWrap">
+            <span class="FileInput btn btn-success fileinput-button">
+               <?php 
+               echo Sprite('SpImage');
+               echo Wrap(T('Add Image'));
+               echo '<input type="file" name="files[]" multiple>';
                ?>
-            </span>
-         </div>
-      </div>
-      <div class="Form-BodyWrap">
-         <div class="Form-Body">
-            <div class="FormWrapper FormWrapper-Condensed">
-               <?php
-                  $OldAction = $this->Form->Action;
-                  echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'id' => 'UploadForm', 'action' => Url('vanilla/post/image')));
-                  $this->Form->Action = $OldAction; // Set the form back to what it was before.
-                  echo $this->Form->Errors();
-
-                  // The table listing the files available for upload/download.
-                  echo '<table id="filetable" role="presentation" class="table table-striped"><tbody class="files" data-toggle="modal-gallery" data-target="#modal-gallery"></tbody></table>';
-                  echo '<div class="P">';
-                     echo '<span class="Button Success FileInput btn btn-success fileinput-button">';
-                           echo Sprite('SpImage');
-                           echo Wrap(T('Add image'));
-                           echo '<input type="file" name="files[]" multiple>';
-                     echo '</span>';
-                     echo Wrap(T('or'), 'span class="or"');
-                     echo '<input type="text" class="url-input" placeholder="paste the url to an image here..." />';
-                     echo ' '.Anchor('Fetch', '#', 'UrlButton Button Success');
-                     echo Wrap(T('Drag & drop allowed', 'Hint: Drag and drop images here.'), 'div style="font-size: 11px;"');
-                  echo '</div>';
-                  echo '<div class="Buttons">';
-                     echo '<span class="Back">';
-                        echo Anchor(T('Home'), '/');
-                        if ($CategoryID = $this->Data('Discussion.CategoryID')) {
-                           $Category = CategoryModel::Categories($CategoryID);
-                           if ($Category)
-                           echo ' '.Bullet().' ';
-                           echo Anchor($Category['Name'], $Category['Url']);
-                        }
-                     echo '</span>';
-                     echo $this->Form->Button('Post', array('class' => 'Button ImageButton Primary'));
-                  echo '</div>';
-                  echo $this->Form->Close();
-               ?>
+            </span><?php 
+            echo Wrap(T('Drag and Drop', 'Drag &amp; Drop'), 'span class="DropZone"'); ?>
+            <div class="FetchUrl">
+               <input type="text" class="UrlInput" placeholder="Paste image url..." />
+               <?php echo Anchor('Fetch', '#', 'UrlButton Button Success'); ?>
             </div>
          </div>
+         <div class="Buttons">
+            <?php
+            echo $this->Form->Button('Post', array('class' => 'Button ImageButton Primary'));
+            ?>
+         </div>
       </div>
+      <?php echo $this->Form->Close(); ?>
    </div>
    <?php 
    // If the form was posted back, build up an array to re-populate the uploads table.

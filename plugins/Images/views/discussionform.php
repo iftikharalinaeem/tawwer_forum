@@ -16,31 +16,34 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
       echo $this->Form->Errors();
 
       // The table listing the files available for upload/download.
-      echo '<table id="filetable" role="presentation" class="table table-striped"><tbody class="files" data-toggle="modal-gallery" data-target="#modal-gallery"></tbody></table>';
+      echo '<div id="filetable" class="UploadFiles files" role="presentation"></div>';
+      // echo '<table id="filetable" role="presentation" class="table table-striped"><tbody class="files" data-toggle="modal-gallery" data-target="#modal-gallery"></tbody></table>';
 
-      echo '<div class="P">';
-         echo '<span class="Button Success FileInput btn btn-success fileinput-button">';
+      echo '<div class="ImageFormWrap">';
+
+         echo '<div class="ImageControlsWrap">';
+            echo '<span class="FileInput btn btn-success fileinput-button">';
                echo Sprite('SpImage');
-               echo Wrap(T('Add image'));
+               echo Wrap(T('Add Image'));
                echo '<input type="file" name="files[]" multiple>';
-         echo '</span>';
-         echo Wrap(T('or'), 'span class="or"');
-         echo '<input type="text" class="url-input" placeholder="paste the url to an image here..." />';
-         echo ' '.Anchor('Fetch', '#', 'UrlButton Button Success');
-         echo Wrap(T('Drag & drop allowed', 'Hint: Drag and drop images here.'), 'div style="font-size: 11px;"');
-      echo '</div>';
-      
-      if ($this->ShowCategorySelector === TRUE) {
-         echo '<div class="P">';
-            echo '<div class="Category">';
-            echo $this->Form->CategoryDropDown('CategoryID', array('Value' => GetValue('CategoryID', $this->Category)));
+            echo '</span>';
+            echo Wrap(T('Drag and Drop', 'Drag &amp; Drop'), 'span class="DropZone"');
+            echo '<div class="FetchUrl">';
+               echo '<input type="text" class="UrlInput" placeholder="Paste image url..." />';
+               echo ' '.Anchor('Fetch', '#', 'UrlButton Button Success');
             echo '</div>';
+            if ($this->ShowCategorySelector === TRUE) {
+               echo '<div class="Category">';
+               echo $this->Form->CategoryDropDown('CategoryID', array('Value' => GetValue('CategoryID', $this->Category)));
+               echo '</div>';
+            }
          echo '</div>';
-      }
       
-      echo '<div class="Buttons">';
-         echo $this->Form->Button('Post', array('class' => 'Button ImageButton Primary'));
-         echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
+         echo '<div class="Buttons">';
+            echo $this->Form->Button('Post', array('class' => 'Button ImageButton Primary'));
+            echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
+         echo '</div>';
+
       echo '</div>';
       echo $this->Form->Close();
    echo '</div>';
@@ -57,7 +60,7 @@ if (is_array($PostedImages)) {
    foreach ($PostedImages as $Key => $PostedImage) {
       $Filename = basename($PostedImage);
       $file = new stdClass();
-      $file->name = GetValue($Key, $PostedCaptions);
+      $file->name = $file->caption = GetValue($Key, $PostedCaptions);
       $file->size = intval(GetValue($Key, $PostedSizes));
       $file->type = substr(strrchr($Filename,'.'),1);
       $file->url = $PostedImage;
@@ -75,7 +78,7 @@ if (count($Files) > 0) {
             files: ".json_encode($Files).",
             formatFileSize: fileSize
          });
-         $('#filetable > tbody').append(html);
+         $('#filetable').append(html);
       });
    </script>";
 }

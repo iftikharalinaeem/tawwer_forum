@@ -96,7 +96,6 @@ class ImagesPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('plugins/Images/js/upload.js');
       // The XDomainRequest Transport is included for cross-domain file deletion for IE8+.
       $Sender->Head->AddString('<!--[if gte IE 8]><script src="'.Url('plugins/Images/library/jQuery-FileUpload/js/cors/jquery.xdr-transport.js').'"></script><![endif]-->');
-      
       // Set the model on the form
       $Sender->Form->SetModel($ImageModel);
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
@@ -110,7 +109,7 @@ class ImagesPlugin extends Gdn_Plugin {
          $DiscussionID = $ImageModel->Save($FormValues, $CommentIDs);
          $Sender->Form->SetValidationResults($ImageModel->ValidationResults());
          if ($Sender->Form->ErrorCount() == 0) {
-            $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);            
+            $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
             if ($NewDiscussion) {
                // Redirect to the new discussion
                Redirect(DiscussionUrl($Discussion).'#latest');
@@ -136,7 +135,6 @@ class ImagesPlugin extends Gdn_Plugin {
             }
          }
       }
-      
       // Set up the page and render
       $Sender->Title(T('New Image'));
 		$Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/image')));
@@ -208,15 +206,39 @@ class ImagesPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('plugins/Images/js/upload.js');
       // The XDomainRequest Transport is included for cross-domain file deletion for IE8+.
       $Sender->Head->AddString('<!--[if gte IE 8]><script src="'.Url('plugins/Images/library/jQuery-FileUpload/js/cors/jquery.xdr-transport.js').'"></script><![endif]-->');
+      
+      // If the current discussion is of type "Image", switch to the images view
+      $Discussion = $Sender->Data('Discussion');
+      if (GetValue('Type', $Discussion) == 'Image') {
+         $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js');
+         $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
+         $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
+         $Sender->AddJsFile('plugins/Images/js/tile.js');
+         $Sender->View = PATH_PLUGINS.'/Images/views/discussion.php';
+      }
    }
    
-   /* Add a link to post images on the comment form */
-   public function DiscussionController_AfterFormHeading_Handler($Sender) {
-       echo '<a href="#" class="CommentFormToggle">'.T('Post an Image').'</a>';
+   public function RootController_Render_Before($Sender) {
+      if (InArrayI($Sender->RequestMethod, array('bestof', 'bestof2'))) {
+         $Sender->AddJsFile('plugins/Images/js/tile.js');         
+         $Sender->AddCssFile('plugins/Images/design/images.css');
+      }
    }
    
-   /* Render the comment file upload form */
+   /* Add a toggle item to the form menu. */
    public function DiscussionController_BeforeCommentForm_Handler($Sender) {
+      $FormToggleMenu = $Sender->EventArguments['FormToggleMenu'];
+      $FormToggleMenu->AddLabel(Sprite('SpNewImage').' '.T('Image'), 'NewImageForm');
+      // Is this discussion an image-type? If so, make the default response to post another image.
+      if (GetValue('Type', $Sender->Data('Discussion')) == 'Image')
+         $FormToggleMenu->CurrentLabelCode('NewImageForm'); 
+   }
+   
+   /* Render the comment file upload form. */
+   public function DiscussionController_AfterCommentFormMenu_Handler($Sender) {
+      $OldAction = $Sender->Form->Action;
+      $Sender->Form->Action = Url('vanilla/post/image');
       echo $Sender->FetchView('commentform', '', 'plugins/Images');
+      $Sender->Form->Action = $OldAction;
    }
 }
