@@ -103,8 +103,21 @@ h1 {
   margin-bottom: 10px;
 }
 
+h1, h2, h3, h4, h5 {
+  font-weight: 500;
+}
+
 .MenuItems {
   font-size: 13px;
+}
+
+.MenuItems a {
+  line-height: 16px;
+  vertical-align: top;
+}
+
+.MenuItems .Sprite:after {
+  content: " ";
 }
 
 .Tag {
@@ -223,7 +236,7 @@ body > #Frame > .Head {
 .Button, .NavButton {
   padding: 6px 10px 6px;
   font-size: 13px;
-  line-height: 14px !Important;
+  line-height: 16px;
   font-weight: normal;
   color: #333333;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
@@ -266,9 +279,10 @@ body > #Frame > .Head {
   border-bottom-color: #b3b3b3;
 }
 
-.Button.Handle {
+.Button.Handle, .NavButton.Handle {
   padding-left: 6px;
   padding-right: 6px;
+  line-height: 16px;
 }
 
 .BigButton {
@@ -424,6 +438,24 @@ body > #Frame > .Head {
   min-height: 30px;
 }
 
+.MiniPager {
+  border: solid 1px #dddddd;
+  border-radius: 2.5px;
+  line-height: 1;
+  font-size: 9px;
+}
+
+.MiniPager a {
+  display: inline-block;
+  margin: 0;
+  border-left: solid 1px #dddddd;
+  padding: 2px 5px;
+}
+
+.MiniPager :first-child {
+  border-left: none;
+}
+
 /*** Badges ***/
 .Count {
   background: #08c;
@@ -542,6 +574,10 @@ body > #Frame > .Head {
   margin: -50px;
 }
 
+.CategoryGroup + .CategoryGroup h2 {
+  margin-top: 15px;
+}
+
 /** DataTables **/
 .DataTable td {
   border: 0;
@@ -582,6 +618,14 @@ body > #Frame > .Head {
   border-bottom-right-radius: .5ex;
 }
 
+.Activities ul.DataList {
+  border: none;
+  border-radius: 0;
+}
+.Activities .DataList .Item:first-child {
+  border-radius: 0;
+}
+
 /** Panels and Boxes **/
 .Box {
   background: rgba(0, 0, 0, 0.02);
@@ -609,6 +653,22 @@ body > #Frame > .Head {
 #Panel .PanelInfo li {
   margin: 0 -10px;
   padding: 5px 10px;
+}
+
+#Panel .PanelInfo .Heading {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+#Panel .PanelInfo li .ItemLink {
+  padding: 5px 10px;
+  margin: -5px -10px;
+  display: block;
+}
+
+#Panel .PanelInfo li a:hover {
+  background-color: #f2f2f2;
 }
 
 #Panel .PanelInfo li:first-child {
@@ -639,11 +699,12 @@ body > #Frame > .Head {
   color: #666;
 }
 
-.Reactions .ReactSprite {
-  opacity: 0.75;
+.Reactions {
+  opacity: .8;
 }
 
-.Reactions .MenuItems .ReactSprite {
+.Item:hover .Reactions,
+.Open .Reactions {
   opacity: 1;
 }
 
@@ -701,31 +762,6 @@ a.Close:hover {
   padding: 8px 14px;
 }
 
-.WarningMessage {
-  color: #c09853;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  background-color: #fcf8e3;
-  border-color: #fbeed5;
-}
-
-.InfoMessage {
-  color: #3a87ad;
-  background-color: #d9edf7;
-  border-color: #bce8f1;
-}
-
-.AlertMessage {
-  color: #b94a48;
-  background-color: #f2dede;
-  border-color: #eed3d7;
-}
-
-.CasualMessage {
-  color: #468847;
-  background-color: #dff0d8;
-  border-color: #d6e9c6;
-}
-
 .DismissMessage a.Dismiss {
   color: inherit;
   padding: 1px 4px;
@@ -735,11 +771,16 @@ a.Close:hover {
 }
 
 /** General Sprite Stuff **/
+dl.About dt {
+  background: url("http://vanillicon.com/sprites/profile-sprites-666666.png") 0 0 no-repeat;
+  color: #737373;
+}
+
 .Sprite, .Sprite16 {
   width: 16px;
   height: 16px;
   line-height: 16px;
-  vertical-align: text-bottom;
+  vertical-align: text-top;
   border: solid 2px transparent;
   margin: -2px;
   display: inline-block;
@@ -863,16 +904,64 @@ a.Close:hover {
 }
 
 /** General Sprites **/
-.SpNotifications {
-  background-position: -160px -100px;
+.SpActivity {
+  background-position: -160px -120px;
+}
+
+.SpAllCategories {
+  background-position: -60px -140px;
+}
+
+.SpApplicants {
+  background-position: -260px -40px;
+}
+
+.SpBadge {
+  background-position: -240px -140px;
+}
+
+.SpBan {
+  background-position: -300px -20px;
+}
+
+.SpBookmarks {
+  background-position: -100px -80px;
+}
+
+.SpComments {
+  background-position: -160px -80px;
+}
+
+.SpDashboard {
+  background-position: -340px -20px;
+}
+
+.SpDelete {
+  background-position: -340px -140px;
+}
+
+.SpDiscussions, .SpMyDiscussions {
+  background-position: -200px -80px;
 }
 
 .SpInbox {
   background-position: -80px -100px;
 }
 
-.SpBookmarks {
-  background-position: -100px -80px;
+.SpMessage {
+  background-position: -100px -100px;
+}
+
+.SpMod {
+  background-position: -260px -60px;
+}
+
+.SpMyDrafts {
+  background-position: -180px -20px;
+}
+
+.SpNotifications {
+  background-position: -160px -100px;
 }
 
 .SpOptions {
@@ -883,90 +972,39 @@ a.Close:hover {
   background-position: -220px -40px;
 }
 
-.SpAllCategories {
-  background-position: -60px -140px;
-}
-
-.SpDiscussions, .SpMyDiscussions {
-  background-position: -200px -80px;
-}
-
-.SpActivity {
-  background-position: -160px -120px;
-}
-
-.SpMyDrafts {
-  background-position: -180px -20px;
+.SpSignOut {
+  background-position: -240px -100px;
 }
 
 .SpUnansweredQuestions {
   background-position: -60px -100px;
 }
 
-.SpApplicants {
-  background-position: -260px -40px;
+.SpWarn, .SpWarnings {
+  background-position: -200px -20px;
 }
 
-.SpSignOut {
-  background-position: -240px -100px;
+/** Profile Sprites **/
+dl.About dt.Badges,
+dl.About dt.Points {
+  background-position: 0 -120px;
 }
-
-.SpMod {
-  background-position: -260px -60px;
+dl.About dt.Email {
+  background-position: 0 -60px;
 }
-
-.SpDashboard {
-  background-position: -340px -20px;
+dl.About dt.Name {
+  background-position: 0 -80px;
 }
-
-/** Me box **/
-.NavBar .MeMenu .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-999999.png");
+dl.About dt.IP {
+  background-position: 0 -140px;
 }
-
-/** Reactions **/
-.ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-777777.png");
+dl.About dt.Joined,
+dl.About dt.LastActive {
+  background-position: 0 -40px;
 }
-
-.Reactions a:hover .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
+dl.About dt.Roles {
+  background-position: 0 -100px;
 }
-
-/* Switch to the white icons when hovering over a menuitem sprite */
-.Reactions .MenuItems a:hover .ReactSprite,
-.MenuItems a:hover .Sprite {
-  background-image: url("http://vanillicon.local/sprites/sprites-14-ffffff.png");
-}
-
-/* Switch to bordered icons for user reaction overlays */
-.UserReactionWrap .ReactSprite {
-  background-image: url("http://vanillicon.local/sprites/sprites-14-outline-000000.png");
-}
-
-.Sprite,
-.Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-333333.png");
-}
-
-a .Sprite,
-a .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-0088cc.png");
-}
-
-a:hover .Sprite,
-a:hover .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-ff0084.png");
-}
-
-.Button .Sprite,
-.NavButton .Sprite,
-.Button .Sprite16,
-.NavButton .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-000000.png");
-}
-
-.Button.Primary .Sprite,
-.Button.Primary .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+dl.About dt.Visits {
+  background-position: 0 -160px;
 }

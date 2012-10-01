@@ -2,13 +2,13 @@
 /** Me box **/
 
 .NavBar .MeMenu .Sprite16 {
-   background-image: spriteUrl($navbarText);
+   background-image: spriteUrl($navbarText, $navbarSpriteStyle);
 }
 
 /** Reactions **/
 
 .ReactSprite {
-   background-image: spriteUrl($reactColor);
+   background-image: spriteUrl($reactColor, $spriteStyle);
 }
 
 .Reactions a:hover .ReactSprite {
@@ -18,37 +18,41 @@
 /* Switch to the white icons when hovering over a menuitem sprite */
 .Reactions .MenuItems a:hover .ReactSprite,
 .MenuItems a:hover .Sprite {
-   background-image: url('http://vanillicon.local/sprites/sprites-14-ffffff.png');
+   background-image: spriteUrl(#fff);
 }
 /* Switch to bordered icons for user reaction overlays */
 .UserReactionWrap .ReactSprite {
-   background-image: url('http://vanillicon.local/sprites/sprites-14-outline-000000.png');
+   background-image: spriteUrl(#000, "sprites-14-outline");
 }
 
 .Sprite,
 .Sprite16 {
-   background-image: spriteUrl($textColor);
+   background-image: spriteUrl($textColor, $spriteStyle);
 }
 
 a .Sprite,
 a .Sprite16 {
-   background-image: spriteUrl($linkColor);
+   background-image: spriteUrl($linkColor, $spriteStyle);
 }
 
 a:hover .Sprite,
 a:hover .Sprite16 {
-   background-image: spriteUrl($linkColorHover);
+   background-image: spriteUrl($linkColorHover, $spriteStyleHover);
 }
 
 .Button .Sprite,
 .NavButton .Sprite,
 .Button .Sprite16,
-.NavButton .Sprite16
+.NavButton .Sprite16,
+.Button:hover .Sprite,
+.NavButton:hover .Sprite,
+.Button:hover .Sprite16,
+.NavButton:hover .Sprite16
 {
-   background-image: spriteUrl($btnColor, sprites-14);
+   background-image: spriteUrl($btnColor, $spriteStyle);
 }
 
 .Button.Primary .Sprite,
 .Button.Primary .Sprite16 {
-   background-image: spriteUrl($btnPrimaryColor, sprites-14);
+   background-image: spriteUrl($btnPrimaryColor, $spriteStyle);
 }

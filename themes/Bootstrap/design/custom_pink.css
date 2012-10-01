@@ -1,0 +1,408 @@
+/** Scaffolding **/
+/** Typography **/
+body {
+  background: #fde8e6;
+  color: #60364e;
+}
+
+a,
+.FlyoutMenu a {
+  color: #3d7998;
+}
+
+a.TextColor, a .TextColor {
+  color: #60364e;
+}
+
+a:hover, a.TextColor:hover, a:hover .TextColor {
+  color: #ff0084;
+}
+
+h1, h2, h3, h4, h5,
+h1 a, h2 a, h3 a, h4 a, h5 a {
+  color: #3f2433;
+  font-family: inherit;
+}
+
+.Tag, .TagCloud li {
+  background: #396178;
+  color: white;
+}
+
+.Tag a {
+  color: white;
+}
+
+.Count {
+  background: #396178;
+  color: white;
+}
+
+.Active .Count {
+  color: #396178;
+  background: white;
+}
+
+.Item .AuthorInfo .MItem, .Item .CommentInfo .MItem,
+.Item .AuthorInfo .MItem::before, .Item .CommentInfo .MItem::before,
+.Gloss {
+  color: #876274;
+}
+
+/** Navigation **/
+.NavBar {
+  background-color: #262f37;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #2c3740), color-stop(100%, #262f37));
+  background-image: -webkit-linear-gradient(top, #2c3740, #262f37);
+  background-image: -moz-linear-gradient(top, #2c3740, #262f37);
+  background-image: -o-linear-gradient(top, #2c3740, #262f37);
+  background-image: -ms-linear-gradient(top, #2c3740, #262f37);
+  background-image: linear-gradient(top, #2c3740, #262f37);
+}
+
+.SiteMenu a, .NavBar .Username, .NavBar .MeBox-SignIn a {
+  color: #d6e5ee;
+}
+
+.NavBar .FlyoutButton:hover .Sprite16,
+.NavBar .Open .MeMenu .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}
+
+.BreadcrumbsWrapper {
+  background: #fbd2ce;
+  border-bottom-color: #f8b0a9;
+}
+
+/** DataLists **/
+.DataList {
+  border-color: #fbd2ce;
+}
+
+.DataList .Item, .DataList .Item {
+  border-color: #fbd2ce;
+}
+
+.DataList .Item,
+.DataTable .Item {
+  background-color: #fef1ef;
+}
+
+.Item.Read {
+  background: #fbe0dd;
+  color: #f2a399;
+}
+
+.Item.Read a {
+  color: #f2a399;
+}
+
+.Item.Read a:hover {
+  color: #ff0084;
+}
+
+.Item.Read .Tag, .Item.Read .Tag a {
+  background: #f2a399 !important;
+  color: #fbe0dd !important;
+}
+
+.ItemDiscussion .Meta, .DataList .Meta {
+  color: #876274;
+}
+
+.DataList.Discussions .MCount, .DataList.Discussions .HasNew {
+  color: #60364e;
+}
+
+.DataTable tbody td {
+  border-color: #fbd2ce;
+}
+
+.Activities .DataList li {
+  background: #fde4e1;
+}
+
+/** Forms **/
+.Button, .NavButton {
+  background-color: white;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #fbd4d0));
+  background-image: -webkit-linear-gradient(top, #ffffff, #fbd4d0);
+  background-image: -moz-linear-gradient(top, #ffffff, #fbd4d0);
+  background-image: -o-linear-gradient(top, #ffffff, #fbd4d0);
+  background-image: -ms-linear-gradient(top, #ffffff, #fbd4d0);
+  background-image: linear-gradient(top, #ffffff, #fbd4d0);
+  border-color: #f7a8a1;
+  color: #60364e;
+}
+
+.Button:hover, .NavButton:hover {
+  background-color: #fbd4d0;
+  color: #60364e;
+  border-color: #f7a8a1;
+}
+
+.NavButton.Handle .Sprite, .Button.Handle .Sprite {
+  border-top-color: #60364e;
+}
+
+.NavButton:hover, .NavButton {
+  box-shadow: 0 1px 1px #f9bdb7;
+}
+
+.Button.Primary {
+  background-color: #396178;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #497d9b), color-stop(100%, #294555));
+  background-image: -webkit-linear-gradient(top, #497d9b, #294555);
+  background-image: -moz-linear-gradient(top, #497d9b, #294555);
+  background-image: -o-linear-gradient(top, #497d9b, #294555);
+  background-image: -ms-linear-gradient(top, #497d9b, #294555);
+  background-image: linear-gradient(top, #497d9b, #294555);
+  border-color: #294555 #294555 #182933;
+  color: white;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75);
+}
+
+.Button.Primary:hover {
+  background-color: #294555;
+  border-color: #182933;
+}
+
+.NavButton.Primary.Handle .Sprite, .Button.Primary.Handle .Sprite {
+  border-top-color: white;
+}
+
+.ButtonGroup.Open .Button.Handle,
+.ButtonGroup.Open .NavButton.Handle {
+  background: #fde9e7;
+  background-image: none;
+  border-color: #fbd4d0;
+  box-shadow: 0 2px 12px #f05142 inset;
+}
+
+.ButtonGroup.Open .Button.Primary.Handle {
+  background: #315367;
+  background-image: none;
+  border-color: #294555;
+  box-shadow: 0 2px 12px black inset;
+}
+
+.Open .Handle.Primary .Sprite {
+  border-top-color: #fff;
+}
+
+.FormWrapper {
+  background-color: #fbd2ce;
+}
+
+/** Pagers **/
+.Pager a, .Pager span {
+  border-color: #fbd2ce;
+  background-color: #fef1ef;
+}
+
+.Pager a:hover, .Pager .Highlight {
+  background-color: #f59188;
+}
+
+.Pager .Highlight {
+  color: #d32211;
+}
+
+.MiniPager {
+  border-color: #fbd2ce;
+}
+
+.MiniPager a {
+  border-color: #fbd2ce;
+}
+
+.MiniPager a:hover {
+  background-color: #fac5c0;
+}
+
+/** Sprites **/
+.OptionsTitle, a.Bookmark, a.Bookmarked, a.Bookmarking {
+  background-image: url("http://vanillicon.com/sprites/ui_sprites-16c-60364e.png");
+}
+
+.Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-sweetx-60364e.png");
+}
+
+a .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-sweetx-3d7998.png");
+}
+
+a:hover .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-sweetxc-ff0084.png");
+}
+
+dl.About dt {
+  background: url("http://vanillicon.com/sprites/profile-sprites-a15b83.png") 0 0 no-repeat;
+  color: #ab6a8f;
+}
+
+.Reactions a {
+  color: #60364e;
+}
+
+.Reactions a:hover {
+  color: #ff0084;
+}
+
+/** Popups **/
+div.Popup .Body {
+  background-color: #fde8e6;
+}
+
+div.Popup h1 {
+  border-color: #fbd2ce;
+}
+
+div.Popup .Buttons {
+  background-color: #f9bdb7;
+  border-color: #fbd2ce;
+  box-shadow: inset 0 1px 0 white;
+}
+
+a.Close {
+  color: #60364e;
+}
+
+/** Panel **/
+.Box {
+  border-color: #f8b4ad;
+  background-color: #fcdfdd;
+}
+
+.Box h4 {
+  background: #facac5;
+  border-color: #f8b4ad;
+  box-shadow: 0 1px 1px white inset;
+}
+
+@media (min-width: 1101px) {
+  .PhotoWrapLarge {
+    border-color: #f8b4ad;
+    background: #fcdfdd;
+    box-shadow: 0 1px 1px white inset;
+  }
+}
+#Panel .FilterMenu {
+  background-color: #fbd2ce;
+}
+
+#Panel .FilterMenu li a:hover {
+  background-color: #f9bdb7;
+}
+
+#Panel .PanelInfo li a:hover {
+  background-color: #facac5;
+}
+
+#Panel .PanelInfo li {
+  border-color: #f8b4ad;
+}
+
+.Hero {
+  background: #fbd2ce;
+}
+
+#Panel .FilterMenu .Active a, #Panel .FilterMenu .Active a:hover, .PanelInfo .Active {
+  background: #396178;
+  color: white;
+}
+
+#Panel .FilterMenu .Active a .Sprite,
+#Panel .FilterMenu .Active a:hover .Sprite,
+.PanelInfo .Active .Sprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}
+
+/** Messages **/
+.WarningMessage {
+  color: #b78c43;
+  background-color: #fcf8e3;
+  border-color: #d9c293;
+}
+
+.InfoMessage {
+  color: #3a87ad;
+  background-color: #d9edf7;
+  border-color: #89bad2;
+}
+
+.AlertMessage {
+  color: #a61d00;
+  background-color: #fbd2cd;
+  border-color: #d07766;
+}
+
+.CasualMessage {
+  color: #6a3c56;
+  background-color: #fef5f4;
+  border-color: #b498a5;
+}
+
+/** Misc **/
+.ActivateSlider {
+  background: #fbd2ce;
+  box-shadow: 0 10px 30px #f47b70 inset;
+  border-color: #f9bdb7;
+}
+
+/** Me box **/
+.NavBar .MeMenu .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-d6e5ee.png");
+}
+
+/** Reactions **/
+.ReactSprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-sweetx-60364e.png");
+}
+
+.Reactions a:hover .ReactSprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
+}
+
+/* Switch to the white icons when hovering over a menuitem sprite */
+.Reactions .MenuItems a:hover .ReactSprite,
+.MenuItems a:hover .Sprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}
+
+/* Switch to bordered icons for user reaction overlays */
+.UserReactionWrap .ReactSprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-outline-000000.png");
+}
+
+.Sprite,
+.Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-sweetx-60364e.png");
+}
+
+a .Sprite,
+a .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-sweetx-3d7998.png");
+}
+
+a:hover .Sprite,
+a:hover .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-sweetxc-ff0084.png");
+}
+
+.Button .Sprite,
+.NavButton .Sprite,
+.Button .Sprite16,
+.NavButton .Sprite16,
+.Button:hover .Sprite,
+.NavButton:hover .Sprite,
+.Button:hover .Sprite16,
+.NavButton:hover .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-sweetx-60364e.png");
+}
+
+.Button.Primary .Sprite,
+.Button.Primary .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-sweetx-ffffff.png");
+}

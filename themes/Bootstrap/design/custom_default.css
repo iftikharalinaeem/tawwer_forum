@@ -1,26 +1,26 @@
 /** Scaffolding **/
 /** Typography **/
 body {
-  background: #ccd9c6;
-  color: black;
+  background: white;
+  color: #333333;
 }
 
 a,
 .FlyoutMenu a {
-  color: #196ba7;
+  color: #0088cc;
 }
 
 a.TextColor, a .TextColor {
-  color: black;
+  color: #333333;
 }
 
 a:hover, a.TextColor:hover, a:hover .TextColor {
-  color: #f7075b;
+  color: #ff0084;
 }
 
 h1, h2, h3, h4, h5,
 h1 a, h2 a, h3 a, h4 a, h5 a {
-  color: #113a50;
+  color: black;
   font-family: inherit;
 }
 
@@ -46,22 +46,22 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
 .Item .AuthorInfo .MItem, .Item .CommentInfo .MItem,
 .Item .AuthorInfo .MItem::before, .Item .CommentInfo .MItem::before,
 .Gloss {
-  color: #333631;
+  color: #666666;
 }
 
 /** Navigation **/
 .NavBar {
-  background-color: #1e2621;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #35433a), color-stop(100%, #1e2621));
-  background-image: -webkit-linear-gradient(top, #35433a, #1e2621);
-  background-image: -moz-linear-gradient(top, #35433a, #1e2621);
-  background-image: -o-linear-gradient(top, #35433a, #1e2621);
-  background-image: -ms-linear-gradient(top, #35433a, #1e2621);
-  background-image: linear-gradient(top, #35433a, #1e2621);
+  background-color: #1d1d1d;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #323232), color-stop(100%, #1d1d1d));
+  background-image: -webkit-linear-gradient(top, #323232, #1d1d1d);
+  background-image: -moz-linear-gradient(top, #323232, #1d1d1d);
+  background-image: -o-linear-gradient(top, #323232, #1d1d1d);
+  background-image: -ms-linear-gradient(top, #323232, #1d1d1d);
+  background-image: linear-gradient(top, #323232, #1d1d1d);
 }
 
 .SiteMenu a, .NavBar .Username, .NavBar .MeBox-SignIn a {
-  color: #bad0c3;
+  color: #999999;
 }
 
 .NavBar .FlyoutButton:hover .Sprite16,
@@ -70,83 +70,83 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
 }
 
 .BreadcrumbsWrapper {
-  background: #becfb7;
-  border-bottom-color: #a8be9e;
+  background: #f2f2f2;
+  border-bottom-color: #dedede;
 }
 
 /** DataLists **/
 .DataList {
-  border-color: #b2c3ad;
+  border-color: #dddddd;
 }
 
 .DataList .Item, .DataList .Item {
-  border-color: #b2c3ad;
+  border-color: #dddddd;
 }
 
 .DataList .Item,
 .DataTable .Item {
-  background-color: #ccd9c6;
+  background-color: white;
 }
 
 .Item.Read {
-  background: #becfb7;
-  color: #627f54;
+  background: #f2f2f2;
+  color: #999999;
 }
 
 .Item.Read a {
-  color: #627f54;
+  color: #999999;
 }
 
 .Item.Read a:hover {
-  color: #f7075b;
+  color: #ff0084;
 }
 
 .Item.Read .Tag, .Item.Read .Tag a {
-  background: #627f54 !important;
-  color: #becfb7 !important;
+  background: #999999 !important;
+  color: #f2f2f2 !important;
 }
 
 .ItemDiscussion .Meta, .DataList .Meta {
-  color: #333631;
+  color: #666666;
 }
 
 .DataList.Discussions .MCount, .DataList.Discussions .HasNew {
-  color: black;
+  color: #333333;
 }
 
 .DataTable tbody td {
-  border-color: #b2c3ad;
+  border-color: #dddddd;
 }
 
 .Activities .DataList li {
-  background: #c4d3bd;
+  background: #f7f7f7;
 }
 
 /** Forms **/
 .Button, .NavButton {
-  background-color: #c5d7b6;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #dfe9d7), color-stop(100%, #abc595));
-  background-image: -webkit-linear-gradient(top, #dfe9d7, #abc595);
-  background-image: -moz-linear-gradient(top, #dfe9d7, #abc595);
-  background-image: -o-linear-gradient(top, #dfe9d7, #abc595);
-  background-image: -ms-linear-gradient(top, #dfe9d7, #abc595);
-  background-image: linear-gradient(top, #dfe9d7, #abc595);
-  border-color: #91b374;
-  color: #414d4c;
+  background-color: white;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #e6e6e6));
+  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: linear-gradient(top, #ffffff, #e6e6e6);
+  border-color: #cccccc;
+  color: black;
 }
 
 .Button:hover, .NavButton:hover {
-  background-color: #abc595;
-  color: #414d4c;
-  border-color: #91b374;
+  background-color: #e6e6e6;
+  color: black;
+  border-color: #cccccc;
 }
 
 .NavButton.Handle .Sprite, .Button.Handle .Sprite {
-  border-top-color: #414d4c;
+  border-top-color: black;
 }
 
 .NavButton:hover, .NavButton {
-  box-shadow: 0 1px 1px #b1c5a7;
+  box-shadow: 0 1px 1px #e6e6e6;
 }
 
 .Button.Primary {
@@ -173,10 +173,10 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
 
 .ButtonGroup.Open .Button.Handle,
 .ButtonGroup.Open .NavButton.Handle {
-  background: #b8cea6;
+  background: #f2f2f2;
   background-image: none;
-  border-color: #abc595;
-  box-shadow: 0 2px 12px #5e7d44 inset;
+  border-color: #e6e6e6;
+  box-shadow: 0 2px 12px #999999 inset;
 }
 
 .ButtonGroup.Open .Button.Primary.Handle {
@@ -191,121 +191,121 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
 }
 
 .FormWrapper {
-  background-color: #becfb7;
+  background-color: #2a2a2a;
 }
 
 /** Pagers **/
 .Pager a, .Pager span {
-  border-color: #b2c3ad;
-  background-color: #ccd9c6;
+  border-color: #dddddd;
+  background-color: white;
 }
 
 .Pager a:hover, .Pager .Highlight {
-  background-color: #95b089;
+  background-color: #cccccc;
 }
 
 .Pager .Highlight {
-  color: #4a6040;
+  color: gray;
 }
 
 .MiniPager {
-  border-color: #b2c3ad;
+  border-color: #dddddd;
 }
 
 .MiniPager a {
-  border-color: #b2c3ad;
+  border-color: #dddddd;
 }
 
 .MiniPager a:hover {
-  background-color: #b1c5a7;
+  background-color: #e6e6e6;
 }
 
 /** Sprites **/
 .OptionsTitle, a.Bookmark, a.Bookmarked, a.Bookmarking {
-  background-image: url("http://vanillicon.com/sprites/ui_sprites-16c-000000.png");
+  background-image: url("http://vanillicon.com/sprites/ui_sprites-16c-333333.png");
 }
 
 .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-000000.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14-333333.png");
 }
 
 a .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-196ba7.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14-0088cc.png");
 }
 
 a:hover .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14c-f7075b.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
 }
 
 dl.About dt {
-  background: url("http://vanillicon.com/sprites/profile-sprites-333333.png") 0 0 no-repeat;
-  color: #404040;
+  background: url("http://vanillicon.com/sprites/profile-sprites-666666.png") 0 0 no-repeat;
+  color: #737373;
 }
 
 .Reactions a {
-  color: black;
+  color: #333333;
 }
 
 .Reactions a:hover {
-  color: #f7075b;
+  color: #ff0084;
 }
 
 /** Popups **/
 div.Popup .Body {
-  background-color: #ccd9c6;
+  background-color: white;
 }
 
 div.Popup h1 {
-  border-color: #b2c3ad;
+  border-color: #dddddd;
 }
 
 div.Popup .Buttons {
-  background-color: #b1c5a7;
-  border-color: #b2c3ad;
+  background-color: #e6e6e6;
+  border-color: #dddddd;
   box-shadow: inset 0 1px 0 white;
 }
 
 a.Close {
-  color: black;
+  color: #333333;
 }
 
 /** Panel **/
 .Box {
-  border-color: #b1c5a7;
-  background-color: #ccd9c6;
+  border-color: #e6e6e6;
+  background-color: white;
 }
 
 .Box h4 {
-  background: #becfb7;
-  border-color: #b1c5a7;
+  background: #f2f2f2;
+  border-color: #e6e6e6;
   box-shadow: 0 1px 1px white inset;
 }
 
 @media (min-width: 1101px) {
   .PhotoWrapLarge {
-    border-color: #b1c5a7;
-    background: #ccd9c6;
+    border-color: #e6e6e6;
+    background: white;
     box-shadow: 0 1px 1px white inset;
   }
 }
 #Panel .FilterMenu {
-  background-color: #becfb7;
+  background-color: #f2f2f2;
 }
 
 #Panel .FilterMenu li a:hover {
-  background-color: #b1c5a7;
+  background-color: #e6e6e6;
 }
 
 #Panel .PanelInfo li a:hover {
-  background-color: #becfb7;
+  background-color: #f2f2f2;
 }
 
 #Panel .PanelInfo li {
-  border-color: #b1c5a7;
+  border-color: #e6e6e6;
 }
 
 .Hero {
-  background: #becfb7;
+  background: #f2f2f2;
 }
 
 #Panel .FilterMenu .Active a, #Panel .FilterMenu .Active a:hover, .PanelInfo .Active {
@@ -339,30 +339,30 @@ a.Close {
 }
 
 .CasualMessage {
-  color: #32412c;
-  background-color: #becfb7;
-  border-color: #788871;
+  color: #666666;
+  background-color: #f2f2f2;
+  border-color: #acacac;
 }
 
 /** Misc **/
 .ActivateSlider {
-  background: #becfb7;
-  box-shadow: 0 10px 30px #88a67a inset;
-  border-color: #b1c5a7;
+  background: #f2f2f2;
+  box-shadow: 0 10px 30px #bfbfbf inset;
+  border-color: #e6e6e6;
 }
 
 /** Me box **/
 .NavBar .MeMenu .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-bad0c3.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14-999999.png");
 }
 
 /** Reactions **/
 .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-000000.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14-333333.png");
 }
 
 .Reactions a:hover .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14c-f7075b.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
 }
 
 /* Switch to the white icons when hovering over a menuitem sprite */
@@ -378,17 +378,17 @@ a.Close {
 
 .Sprite,
 .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-000000.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14-333333.png");
 }
 
 a .Sprite,
 a .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-196ba7.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14-0088cc.png");
 }
 
 a:hover .Sprite,
 a:hover .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14c-f7075b.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
 }
 
 .Button .Sprite,
@@ -399,7 +399,7 @@ a:hover .Sprite16 {
 .NavButton:hover .Sprite,
 .Button:hover .Sprite16,
 .NavButton:hover .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-414d4c.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14-000000.png");
 }
 
 .Button.Primary .Sprite,

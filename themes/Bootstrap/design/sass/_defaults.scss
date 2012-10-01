@@ -1,6 +1,6 @@
 /// Colours ///
 
-$blue: #0687D2;
+$blue: #0668D3;
 $green: #46a546;
 $red: #cc1507;
 $yellow: #ffc40d;
@@ -12,16 +12,15 @@ $purple: #7a43b6;
 
 $bodyBackground: #ffffff;
 $textColor: #333333;
-$headingColor: #000000;
+$headingsColor: #000000;
+$headingsFontFamily: inherit;
 
 $linkColor: #0088cc;
 $linkColorHover: #ff0084;
 
-$reactColor: #777;
+/// Tables & Lists ///
 
-/// Tables ///
-
-$tableBorder: #ddd;
+$borderColor: #ddd;
 
 /// Forms ///
 
@@ -36,6 +35,30 @@ $formBackground: #2A2A2A;
 
 $navbarText: #999;
 $navbarTextHover: #fff;
+
+$navbarBackground: #1D1D1D;
+$navbarBackgroundHighlight: #323232;
+
+/// Alerts ///
+
+$warningText: #c09853;
+$warningBackground: #fcf8e3;
+
+$errorText: #b94a48;
+$errorBackground: #f2dede;
+
+$successText: #468847;
+$successBackground: #dff0d8;
+
+$infoText: #3a87ad;
+$infoBackground: #d9edf7;
+
+/// Sprites ///
+
+$spriteStyle: "sprites-14";
+$spriteStyleHover: "sprites-14c";
+
+$navbarSpriteStyle: "sprites-14";
 
 /// Mixins & Functions ///
 
@@ -60,6 +83,10 @@ $navbarTextHover: #fff;
 
 @function spriteUrl($color, $file: sprites-14) {
    @return url("http://vanillicon.com/sprites/#{$file}-#{hex_str(unquote($color))}.png");
+}
+
+@function spriteUrlLocal($color, $file: sprites-14) {
+   @return url("http://vanillicon.local/sprites/#{$file}-#{hex_str(unquote($color))}.png");
 }
 
 @mixin inset {
