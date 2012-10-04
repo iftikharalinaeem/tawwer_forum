@@ -187,7 +187,7 @@ $(function () {
                   // If this is an "image" discussion type, add to the item list.
                   var $container = $('.Tiles');
                   if ($container.length > 0) {
-                     var $newItems = $('<div class="Tile ImageWrap">test</div>'); // $(json.Data);
+                     // var $newItems = $('<div class="Tile ImageWrap">test</div>'); // Testing
                      var $newItems = $(json.Data);
                      $container.imagesLoaded(function() {
                         $newItems.animate({ opacity: 1 });
