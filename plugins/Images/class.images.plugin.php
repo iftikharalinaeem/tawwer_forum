@@ -150,7 +150,7 @@ class ImagesPlugin extends Gdn_Plugin {
     * If the discussion type is "image", use the images view (if available)
     * @param type $Sender
     */
-   public function PostController_BeforeCommentRender_Handler($Sender) {
+   public function Base_BeforeCommentRender_Handler($Sender) {
       $Discussion = $Sender->EventArguments['Discussion'];
       if (GetValue('Type', $Discussion) == 'Image') {
          // $this->ClassName = 'DiscussionController';
