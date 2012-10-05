@@ -179,10 +179,12 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
          
          
          
-         if ($AnalyticsServer == 'http://analytics.vanillaforums.com') {            
-            $Url = "http://autostatic-cl1.vanilladev.com/analytics.vanillaforums.com/applications/vanillastats/js/track.min.js?v=$Version";
-         } else
-            $Url = $AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version;
+//         if ($AnalyticsServer == 'http://analytics.vanillaforums.com') {            
+//            $Url = "http://autostatic-cl1.vanilladev.com/analytics.vanillaforums.com/applications/vanillastats/js/track.min.js?v=$Version";
+//         } else
+//            $Url = $AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version;
+         
+         $Url = $AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version;
          
          $Sender->AddJsFile($Url, '', array('defer' => 'defer'));
          $Sender->AddDefinition('StatsUrl', self::StatsUrl('{p}'));
