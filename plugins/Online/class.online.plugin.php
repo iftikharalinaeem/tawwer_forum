@@ -746,12 +746,12 @@ class OnlinePlugin extends Gdn_Plugin {
    public function Base_Render_Before($Sender) {
       $PluginRenderLocation = C('Plugins.Online.Location', 'all');
       $Controller = strtolower($Sender->ControllerName);
+      
+      $Sender->AddCssFile('online.css', 'plugins/Online');
 
       // Don't add the module of the plugin is hidden for guests
       if (C('Plugins.Online.HideForGuests', TRUE) && !Gdn::Session()->IsValid())
          return;
-      
-      $Sender->AddCssFile('online.css', 'plugins/Online');
       
       // Is this a page for including the module?
       $ShowOnController = array();      

@@ -34,8 +34,11 @@ class ImageModel extends Gdn_Model {
     * first image as the content. Subsequent images will be treated as comments.
     * If DiscussionID is present, it will just create a new comment within that
     * discussion for each image.
+    * 
+    * @var array $FormPostValues The values posted by the form for saving.
+    * @var array $CommentIDs Array of comment id's created by the save (available by reference).
     */
-   public function Save($FormPostValues) {
+   public function Save($FormPostValues, &$CommentIDs = array()) {
       // Loop through all of the incoming values and validate them      
       $FormPostValues = $this->FilterForm($FormPostValues);
       $FormPostValues['Type'] = 'image'; // Force the "image" discussion type.
@@ -44,15 +47,18 @@ class ImageModel extends Gdn_Model {
       $Image = GetValue('Image', $FormPostValues);
       $Thumbnail = GetValue('Thumbnail', $FormPostValues);
       $Caption = GetValue('Caption', $FormPostValues);
-      if (count($Image) != count($Caption))
-         $this->Validation->AddValidationResult('Image', 'You must provide a caption for each image.');
-      
+      $Size = GetValue('Size', $FormPostValues);
       $Images = array();
       foreach ($Image as $Key => $Val) {
          $Capt = trim($Caption[$Key]);
-         $Images[] = array('Image' => $Val, 'Thumbnail' => $Thumbnail[$Key], 'Caption' => $Capt);
-         if ($Capt == '')
-            $this->Validation->AddValidationResult('Caption', 'You must provide a caption for each image.');
+         $Images[] = array(
+             'Image' => $Val, 
+             'Thumbnail' => $Thumbnail[$Key], 
+             'Caption' => $Capt, 
+             'Size' => $Size[$Key]
+         );
+         if (!$DiscussionID && $Key == 0 && $Capt == '')
+            $this->Validation->AddValidationResult('Caption', 'You must provide a caption for the first image.');
       }
       
       if (count($Images) == 0)
@@ -63,14 +69,15 @@ class ImageModel extends Gdn_Model {
 
       if (!$DiscussionID) {
          $Image = array_shift($Images);
-         
+         $SerializedImage = serialize($Image);
          // Build the discussion data to be saved
          $DiscussionFormValues = array(
              'Type' => 'Image',
              'Format' => 'Image',
              'CategoryID' => GetValue('CategoryID', $FormPostValues),
              'Name' => $Image['Caption'],
-             'Body' => serialize($Image)
+             'Body' => Gdn_Format::Image($SerializedImage),
+             'Attributes' => $SerializedImage
          );
 
          // Save the discussion
@@ -91,8 +98,10 @@ class ImageModel extends Gdn_Model {
              'DiscussionID' => $DiscussionID
          );
          for($i = 0; $i < count($Images); $i++) {
-            $CommentFormValues['Body'] = serialize($Images[$i]);
-            $CommentModel->Save($CommentFormValues);
+            $SerializedImage = serialize($Images[$i]);
+            $CommentFormValues['Body'] = Gdn_Format::Image($SerializedImage);
+            $CommentFormValues['Attributes'] = $SerializedImage;
+            $CommentIDs[] = $CommentModel->Save($CommentFormValues);
             $ValidationResults = $CommentModel->Validation->Results();
             $this->Validation->AddValidationResult($ValidationResults);
          }

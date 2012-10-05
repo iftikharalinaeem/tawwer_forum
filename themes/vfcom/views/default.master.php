@@ -15,7 +15,7 @@ $Session = Gdn::Session();
          <div class="Center">
             <h1 class="Logo">
                <?php 
-               $Text = 'Discussion Forums Evolved, VanillaForums.com';
+               $Text = 'Community Forums Evolved, VanillaForums.com';
                echo Anchor($Text, '/', array('title' => $Text));
                ?>
             </h1>
@@ -39,11 +39,12 @@ $Session = Gdn::Session();
                </div>
                <div class="VFMenu">
                   <?php
-                  echo Anchor(Sprite('SpHome').'Home', '/', 'Home', array('SSL' => FALSE));
+                  // echo Anchor(Sprite('SpHome').'Home', '/', 'Home', array('SSL' => FALSE));
+                  echo Anchor(Sprite('SpTour').'Tour', '/tour', 'Product Tour', array('SSL' => FALSE));
+                  echo Anchor(Sprite('SpResources').'Solutions', '/solutions', 'Solutions', array('SSL' => FALSE));
                   echo Anchor(Sprite('SpPlans').'Plans &amp; Pricing', '/plans', 'Plans', array('SSL' => FALSE));
-                  echo Anchor(Sprite('SpTour').'Tour', '/tour', 'Tour', array('SSL' => FALSE));
-                  echo Anchor(Sprite('SpResources').'Resources', '/resources', 'Resources', array('SSL' => FALSE));
                   echo Anchor(Sprite('SpBlog').'Blog', '/blog', 'Blog', array('SSL' => FALSE));
+                  // echo Anchor(Sprite('SpShowcase').'Showcase', '/showcase', 'Showcase', array('SSL' => FALSE));
                   ?>
                </div>
             </div>
@@ -91,45 +92,32 @@ $Session = Gdn::Session();
    <div class="Wrapper">
       <div class="Center Row">
          <div class="Columns">
-            <div class="Column4">
-               <strong>About Us</strong>
+            <div class="Column3">
                <?php
-               echo Anchor('Contact Us', '/info/contact', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor("We're Hiring!", '/info/hiring', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Press Releases', 'http://vanillaforums.totemapp.com/');
-               echo '<br />'.Anchor('Follow us on Facebook', 'http://www.facebook.com/vanillaforums', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Follow us on Twitter', 'http://www.twitter.com/vanilla', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Read Our Blog', '/blog', '', array('SSL' => FALSE));
+               echo Anchor('About Us', 'info/aboutus', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Contact Us', '/info/contact', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Resources', '/resources', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor("Jobs", '/info/hiring', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Blog', '/blog', '', array('SSL' => FALSE));
                ?>
             </div>
-            <div class="Column4">
-               <strong>Features</strong>
+            <div class="Column3">
                <?php
-               echo Anchor('Features', '/features#toc', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Support Communities', '/resources/customer-support-forums#toc', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Migrate Legacy Forum', '/resources/migrating-legacy-forums#toc', '', array('SSL' => FALSE));
-               // echo '<br />'.Anchor('Comments Integration', '/features/blog-comments', '', array('SSL' => FALSE));
-               ?>
-               <div style="font-family: GoothamRound,'lucida grande','Lucida Sans Unicode',tahoma; font-size: 22px; color: #fff; position: absolute; margin: 20px 0 0;">Sales questions? Call us at: 1-866-845-0815</div>
-            </div>
-            <div class="Column4">
-               <strong>Resources</strong>
-               <?php
-               echo Anchor('Resources', '/resources', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Case Studies', '/resources/penny-arcade#toc', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Professional Services', '/resources/custom-plugins#toc', '', array('SSL' => FALSE));
-               // echo '<br />'.Anchor('Free Version', '/free-version', '', array('SSL' => FALSE));
+               echo Anchor('Tour', '/tour', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Solutions', '/solutions', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Service Offerings', '/services', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Forum Migration', '/migration', '', array('SSL' => FALSE));
                ?>
             </div>
-            <div class="Column4">
-               <strong>Legal Stuff</strong>
+            <div class="Column3">
                <?php
-               echo Anchor('Privacy Policy', '/info/privacy', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Terms of Service', '/info/termsofservice', '', array('SSL' => FALSE));
+               echo Anchor('Terms of Service', '/info/termsofservice', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Privacy Policy', '/info/privacy', '', array('SSL' => FALSE));
                echo '<br />'.Anchor('Refund Policy', '/info/refund', '', array('SSL' => FALSE));
                ?>
             </div>
          </div>
+         <div style="font-family: GoothamRound,'lucida grande','Lucida Sans Unicode',tahoma; font-size: 22px; color: #fff; margin: -20px 0 20px 0; text-align: center;">Sales questions? Call us at: 1-866-845-0815</div>
          <div class="PoweredByRackspace">
             <a href="http://www.rackspace.com" title="Powered By Rackspace"><img src="http://cdn.vni.la/files/powered-by-rackspace-logo-trans.png" /></a>
          </div>

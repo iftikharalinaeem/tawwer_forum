@@ -18,10 +18,10 @@ body {
 }
 .Head {
    background: #014381;
-   background:-webkit-gradient(linear, center bottom, center top, from(#256098), to(#014381));
-	background:-moz-linear-gradient(top, #014381, #256098);
-	-pie-background:linear-gradient(top, #014381, #256098);
-	background:linear-gradient(top, #014381, #256098);
+   xbackground:-webkit-gradient(linear, center bottom, center top, from(#256098), to(#014381));
+	xbackground:-moz-linear-gradient(top, #014381, #256098);
+	x-pie-background:linear-gradient(top, #014381, #256098);
+	xbackground:linear-gradient(top, #014381, #256098);
    box-shadow: inset 0 -4px 12px #01284c;
    -moz-box-shadow: inset 0 -4px 12px #01284c;
    -webkit-box-shadow: inset 0 -4px 12px #01284c;   
@@ -71,6 +71,13 @@ body > .Foot {
 .Column4 {
    float: left;
    width: 25%;
+   font-size: 13px;
+   line-height: 1.6;
+}
+.Column3 {
+   float: left;
+   width: 33%;
+   margin: 40px 0;
    font-size: 13px;
    line-height: 1.6;
 }
@@ -238,6 +245,8 @@ body#vfcom_info_index .VFMenu a.Home,
 body.Resources .VFMenu a.Resources,
 body.Tour .VFMenu a.Tour,
 body.plans .VFMenu a.Plans,
+body.Solutions .VFMenu a.Solutions,
+body.Showcase .VFMenu a.Showcase,
 body.Features .VFMenu a.Features {
 	background: #002a59;
 	background:-webkit-gradient(linear, center bottom, center top, from(#024d8f), to(#002a59));
@@ -675,6 +684,7 @@ body.filenotfound #Content {
 .Foot .Columns {
    height: 100%;
    overflow: hidden;
+   margin: 0 auto;
 }
 .PoweredByRackspace {
    margin-top: 20px;
