@@ -238,6 +238,17 @@
    text-overflow: ellipsis;
    margin-top: -10px;
 }
+
+.ImageWrap .Image.preview {
+   line-height: 280px;
+}
+
+.ImageWrap .Image.preview img {
+   display: inline-block;
+   vertical-align: middle;
+   max-height: 280px;
+}
+
 .NewImageForm .ImageWrap .InputBox {
     width: auto;
     border: 1px dashed #ddd;
