@@ -17,6 +17,7 @@ $headingsFontFamily: inherit;
 
 $linkColor: #0088cc;
 $linkColorHover: #ff0084;
+$reactColor: #555;
 
 /// Tables & Lists ///
 
@@ -29,7 +30,7 @@ $btnColor: #000;
 $btnPrimaryBackground: $blue;
 $btnPrimaryColor: #fff;
 
-$formBackground: #2A2A2A;
+$formBackground: accent();
 
 /// Navigation ///
 

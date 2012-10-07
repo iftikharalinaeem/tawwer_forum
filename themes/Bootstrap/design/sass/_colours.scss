@@ -193,7 +193,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a
    background: darken($btnBackground, 5%);
    background-image: none;
    border-color: darken($btnBackground, 10%);
-   box-shadow: 0 2px 12px darken($btnBackground, 40%) inset;
+   box-shadow: 0 0px 14px darken($btnBackground, 40%) inset;
 }
 
 .ButtonGroup.Open .Button.Primary.Handle {

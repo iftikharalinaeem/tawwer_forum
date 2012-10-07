@@ -121,7 +121,7 @@ h1, h2, h3, h4, h5 {
 
 .MenuItems a {
    line-height: 16px;
-   vertical-align: top;
+   vertical-align: bottom;
 }
 
 .MenuItems .Sprite:after {
@@ -342,6 +342,10 @@ body > #Frame > .Head {
    border-color: #fff transparent transparent transparent;
 }
 
+.Open .Handle .Sprite {
+   margin-top: 2px;
+}
+
 .Open .Handle.Primary .Sprite {
    border-color: #000 transparent transparent transparent;
 }
@@ -372,6 +376,8 @@ body > #Frame > .Head {
 #Panel .FilterMenu li a {
     display: block;
     padding: 3px 15px;
+    line-height: 18px;
+    vertical-align: middle;
 }
 
 #Panel .FilterMenu li a:hover {
@@ -806,10 +812,6 @@ dl.About dt {
    display: inline-block;
 }
 
-.FilterMenu .Sprite {
-   margin-right: 4px;
-}
-
 .MenuItems a .Sprite {
    background-image: spriteUrl(#333);
 }
@@ -860,18 +862,23 @@ dl.About dt {
 .SpBadge { background-position: -240px -140px; }
 .SpBan { background-position: -300px -20px; }
 .SpBookmarks { background-position: -100px -80px; }
-.SpComments { background-position: -160px -80px; }
+.SpComments, .SpComment { background-position: -160px -80px; }
+.SpConnection { background-position: -320px -20px; }
 .SpDashboard { background-position: -340px -20px }
 .SpDelete { background-position: -340px -140px; }
 .SpDiscussions, .SpMyDiscussions { background-position: -200px -80px; }
+.SpImage { background-position: -120px -140px; }
 .SpInbox { background-position: -80px -100px; }
 .SpMessage { background-position: -100px -100px;}
 .SpMod { background-position: -260px -60px; }
 .SpMyDrafts { background-position: -180px -20px; }
 .SpNotifications { background-position: -160px -100px; }
 .SpOptions { background-position: -180px -60px; }
+.SpPhoto { background-position: -160px -60px; }
 .SpProfile, .SpEditProfile { background-position: -220px -40px; }
+.SpQuote { background-position: -280px -20px ;}
 .SpSignOut { background-position: -240px -100px; }
+.SpText { background-position: -160px -80px; }
 .SpUnansweredQuestions { background-position: -60px -100px; }
 .SpWarn, .SpWarnings { background-position: -200px -20px; }
 

@@ -176,7 +176,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
   background: #f2f2f2;
   background-image: none;
   border-color: #e6e6e6;
-  box-shadow: 0 2px 12px #999999 inset;
+  box-shadow: 0 0px 14px #999999 inset;
 }
 
 .ButtonGroup.Open .Button.Primary.Handle {
@@ -191,7 +191,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
 }
 
 .FormWrapper {
-  background-color: #2a2a2a;
+  background-color: accent();
 }
 
 /** Pagers **/
@@ -226,7 +226,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
 }
 
 .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-333333.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14-555555.png");
 }
 
 a .Sprite16 {
@@ -243,7 +243,7 @@ dl.About dt {
 }
 
 .Reactions a {
-  color: #333333;
+  color: #555555;
 }
 
 .Reactions a:hover {
@@ -358,7 +358,7 @@ a.Close {
 
 /** Reactions **/
 .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-333333.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14-555555.png");
 }
 
 .Reactions a:hover .ReactSprite {
@@ -384,6 +384,11 @@ a.Close {
 a .Sprite,
 a .Sprite16 {
   background-image: url("http://vanillicon.com/sprites/sprites-14-0088cc.png");
+}
+
+a.TextColor .Sprite,
+a.TextColor .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-333333.png");
 }
 
 a:hover .Sprite,

@@ -35,6 +35,11 @@ a .Sprite16 {
    background-image: spriteUrl($linkColor, $spriteStyle);
 }
 
+a.TextColor .Sprite,
+a.TextColor .Sprite16 {
+   background-image: spriteUrl($textColor, $spriteStyle);
+}
+
 a:hover .Sprite,
 a:hover .Sprite16 {
    background-image: spriteUrl($linkColorHover, $spriteStyleHover);

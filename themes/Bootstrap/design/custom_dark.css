@@ -177,7 +177,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
   background: #3c3c3c;
   background-image: none;
   border-color: #2f2f2f;
-  box-shadow: 0 2px 12px black inset;
+  box-shadow: 0 0px 14px black inset;
 }
 
 .ButtonGroup.Open .Button.Primary.Handle {
@@ -227,7 +227,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
 }
 
 .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-c6c6c6.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14-555555.png");
 }
 
 a .Sprite16 {
@@ -244,7 +244,7 @@ dl.About dt {
 }
 
 .Reactions a {
-  color: #c6c6c6;
+  color: #555555;
 }
 
 .Reactions a:hover {
@@ -359,7 +359,7 @@ a.Close {
 
 /** Reactions **/
 .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-c6c6c6.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14-555555.png");
 }
 
 .Reactions a:hover .ReactSprite {
@@ -385,6 +385,11 @@ a.Close {
 a .Sprite,
 a .Sprite16 {
   background-image: url("http://vanillicon.com/sprites/sprites-14-84bcde.png");
+}
+
+a.TextColor .Sprite,
+a.TextColor .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-c6c6c6.png");
 }
 
 a:hover .Sprite,
