@@ -129,7 +129,7 @@ class WarningsPlugin extends Gdn_Plugin {
          $UserID = $Sender->User->UserID;
          
 //         $WarningsLabel = Sprite('SpWarn').T('Warnings');
-         $WarningsLabel = Sprite('SpWarnings').T('Warnings');
+         $WarningsLabel = Sprite('SpWarn').' '.T('Warnings');
          
          $Count = '';
          $Level = Gdn::UserMetaModel()->GetUserMeta($UserID, 'Warnings.Level');
