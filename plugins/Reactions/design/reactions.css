@@ -216,8 +216,6 @@
 
 /* Reaction Revamp */
 .Reactions .Bullet {
-    font-size: 9px;
-    line-height: 1;
     color: #999;
 }
 .React {
@@ -256,19 +254,11 @@
 }
 
 .ReactButton {
-   margin: 0 6px;
+   margin: 0 4px;
 }
 
-.Reactions .FlagMenu .ReactButton,
-.Reactions > a.React {
-    margin: 0 10px;
-    padding: 0;
-}
 .Reactions > a.React > .ReactSprite {
    margin-right: 2px;
-}
-.Reactions {
-   margin-left: -10px;
 }
 .ReactButton {
     padding: 0;
@@ -276,9 +266,6 @@
 .Reactions .FlagMenu .MenuItems .ReactButton {
    margin: 0;
    padding: 0 15px;
-}
-.ReactMenu {
-   margin: 0 4px;
 }
 
 /* OLD "Best Of" */
