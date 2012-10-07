@@ -53,11 +53,18 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
          $LineNums = 'linenums';
       
       $Result = "jQuery(document).ready(function($) {
-   $('.Message pre').livequery(function () { 
-   	$('.Message pre').addClass('prettyprint $LineNums');
-   	prettyPrint();
-   });
-});";
+         var pp = false;
+
+         $('.Message').livequery(function () { 
+            $('pre', this).addClass('prettyprint $LineNums');
+            if (pp)
+               prettyPrint();
+            $('pre', this).removeClass('prettyprint')
+         });
+         
+         prettyPrint();
+         pp = true;
+      });";
       return $Result;
    }
       
