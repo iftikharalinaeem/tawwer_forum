@@ -8,7 +8,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.1.7',
+   'Version' => '1.1.8',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -107,6 +107,13 @@ class ReactionsPlugin extends Gdn_Plugin {
 //      $OrderBy = self::CommentOrder($Sender);
 //      $Sender->OrderBy($OrderBy);
 //   }
+   
+   /* New Html method of adding to discussion filters */
+   public function Base_AfterDiscussionFilters_Handler($Sender) {
+      echo '<li class="Reactions-BestOf">'
+			.Anchor(Sprite('SpBestOf').' '.T('Best Of...').$Count, '/bestof/everything', '')
+		.'</li>';
+   }
    
    /**
     * 
