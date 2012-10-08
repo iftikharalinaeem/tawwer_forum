@@ -3,7 +3,7 @@
 if (!function_exists('FormatScore')):
    
 function FormatScore($Score) {
-   return $Score;
+   return (int)$Score;
 }
 
 endif;
@@ -220,6 +220,9 @@ function WriteReactions($Row) {
          echo '</span>';
          echo Bullet();
       }
+      
+      $Score = FormatScore(GetValue('Score', $Row));
+      echo '<span class="Column-Score Hidden">'.$Score.'</span>';
 
       static $Types = NULL;
       if ($Types === NULL)
