@@ -3,7 +3,7 @@
 if (!function_exists('FormatScore')):
    
 function FormatScore($Score) {
-   return $Score;
+   return (int)$Score;
 }
 
 endif;
@@ -241,6 +241,9 @@ function WriteReactions($Row) {
          
          Gdn::Controller()->FireEvent('AfterFlag');
       }
+      
+      $Score = FormatScore(GetValue('Score', $Row));
+      echo '<span class="Column-Score Hidden">'.$Score.'</span>';
 
       
 
