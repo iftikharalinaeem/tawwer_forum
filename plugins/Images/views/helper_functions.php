@@ -42,7 +42,8 @@ if (!function_exists('WriteImageItem')):
       }
       
       $Wide = FALSE;
-      if (stripos($Body, '<div class="Video') !== FALSE) {
+      $FormattedBody = Gdn_Format::To($Body, $Record['Format']);
+      if (stripos($FormattedBody, '<div class="Video') !== FALSE) {
          $Wide = TRUE; // Video?
       } else if (InArrayI($Record['Format'], array('Html', 'Text', 'Display')) && strlen($Body) > 800) {
          $Wide = TRUE; // Lots of text?
@@ -72,7 +73,7 @@ if (!function_exists('WriteImageItem')):
             echo '</div>';
          } else {
             echo '<div class="Body">';
-               echo Gdn_Format::To($Body, $Record['Format']);
+               echo $FormattedBody;
             echo '</div>';
          }
          ?>

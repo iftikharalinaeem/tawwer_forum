@@ -46,8 +46,36 @@ class ImagesPlugin extends Gdn_Plugin {
     */
    public function PostController_AfterForms_Handler($Sender) {
       $Forms = $Sender->Data('Forms');
+      if (!is_array($Forms))
+         $Forms = array();
+      
       $Forms[] = array('Name' => 'Image', 'Label' => Sprite('SpImage').T('New Image'), 'Url' => 'post/image');
 		$Sender->SetData('Forms', $Forms);
+
+      // Page Includes
+      $Sender->AddCssFile('plugins/Images/design/images.css');
+      // Include JS necessary in the page.
+      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/vendor/jquery.ui.widget.js');
+      // The Templates plugin is included to render the upload/download listings.
+      $Sender->AddJsFile('plugins/Images/library/Javascript-Templates/tmpl.min.js');
+      // The Load Image plugin is included for the preview images and image resizing functionality.
+      $Sender->AddJsFile('plugins/Images/library/Javascript-LoadImage/load-image.min.js');
+      // The Canvas to Blob plugin is included for image resizing functionality.
+      $Sender->AddJsFile('plugins/Images/library/JavaScript-Canvas-to-Blob/canvas-to-blob.min.js');
+      // The Iframe Transport is required for browsers without support for XHR file uploads.
+      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.iframe-transport.js');
+      // The basic File Upload plugin.
+      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload.js');
+      // The File Upload file processing plugin.
+      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload-fp.js');
+      // The File Upload user interface plugin.
+      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload-ui.js');
+      // The localization script.
+      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/locale.js');
+      // The main application script.
+      $Sender->AddJsFile('plugins/Images/js/upload.js');
+      // The XDomainRequest Transport is included for cross-domain file deletion for IE8+.
+      $Sender->Head->AddString('<!--[if gte IE 8]><script src="'.Url('plugins/Images/library/jQuery-FileUpload/js/cors/jquery.xdr-transport.js').'"></script><![endif]-->');
    }
    
    /** 
@@ -73,29 +101,6 @@ class ImagesPlugin extends Gdn_Plugin {
       if ($UseCategories)
 			$CategoryData = CategoryModel::Categories();
 
-      $Sender->AddCssFile('plugins/Images/design/images.css');
-      // Include JS necessary in the page.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/vendor/jquery.ui.widget.js');
-      // The Templates plugin is included to render the upload/download listings.
-      $Sender->AddJsFile('plugins/Images/library/Javascript-Templates/tmpl.min.js');
-      // The Load Image plugin is included for the preview images and image resizing functionality.
-      $Sender->AddJsFile('plugins/Images/library/Javascript-LoadImage/load-image.min.js');
-      // The Canvas to Blob plugin is included for image resizing functionality.
-      $Sender->AddJsFile('plugins/Images/library/JavaScript-Canvas-to-Blob/canvas-to-blob.min.js');
-      // The Iframe Transport is required for browsers without support for XHR file uploads.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.iframe-transport.js');
-      // The basic File Upload plugin.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload.js');
-      // The File Upload file processing plugin.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload-fp.js');
-      // The File Upload user interface plugin.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload-ui.js');
-      // The localization script.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/locale.js');
-      // The main application script.
-      $Sender->AddJsFile('plugins/Images/js/upload.js');
-      // The XDomainRequest Transport is included for cross-domain file deletion for IE8+.
-      $Sender->Head->AddString('<!--[if gte IE 8]><script src="'.Url('plugins/Images/library/jQuery-FileUpload/js/cors/jquery.xdr-transport.js').'"></script><![endif]-->');
       // Set the model on the form
       $Sender->Form->SetModel($ImageModel);
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
@@ -121,16 +126,16 @@ class ImagesPlugin extends Gdn_Plugin {
                $Comments = $Sender->CommentModel->Get($DiscussionID, 30, $Offset);
                $Sender->SetData('Comments', $Comments);
                $Sender->SetData('NewComments', TRUE);
-               $Sender->ClassName = 'DiscussionController';
-               $Sender->ControllerName = 'discussion';
-               $Sender->View = 'comments';
+               // $Sender->ClassName = 'DiscussionController';
+               // $Sender->ControllerName = 'discussion';
+               // $Sender->View = 'discussionitems';
                
                // Make sure to set the user's discussion watch records
                $CountComments = $Sender->CommentModel->GetCount($DiscussionID);
                $Limit = count($CommentIDs);
                $Sender->Offset = $CountComments - $Limit;
                $Sender->CommentModel->SetWatch($Discussion, $Limit, $Sender->Offset, $CountComments);
-               $Sender->Render();
+               $Sender->Render('discussionitems', '', 'plugins/Images');
                return;
             }
          }
@@ -139,6 +144,20 @@ class ImagesPlugin extends Gdn_Plugin {
       $Sender->Title(T('New Image'));
 		$Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/image')));
       $Sender->Render('discussionform', '', 'plugins/Images');
+   }
+   
+   /** 
+    * If the discussion type is "image", use the images view (if available)
+    * @param type $Sender
+    */
+   public function Base_BeforeCommentRender_Handler($Sender) {
+      $Discussion = $Sender->EventArguments['Discussion'];
+      if (GetValue('Type', $Discussion) == 'Image') {
+         // $this->ClassName = 'DiscussionController';
+         // $this->ControllerName = 'discussion';
+         $this->View = 'discussionlist';
+         $this->ApplicationFolder = 'plugins/Images';
+      }
    }
    
    public function PostController_UploadImage_Create($Sender) {

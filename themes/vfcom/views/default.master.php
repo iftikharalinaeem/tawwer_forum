@@ -15,7 +15,7 @@ $Session = Gdn::Session();
          <div class="Center">
             <h1 class="Logo">
                <?php 
-               $Text = 'Discussion Forums Evolved, VanillaForums.com';
+               $Text = 'Community Forums Evolved, VanillaForums.com';
                echo Anchor($Text, '/', array('title' => $Text));
                ?>
             </h1>
@@ -44,7 +44,7 @@ $Session = Gdn::Session();
                   echo Anchor(Sprite('SpResources').'Solutions', '/solutions', 'Solutions', array('SSL' => FALSE));
                   echo Anchor(Sprite('SpPlans').'Plans &amp; Pricing', '/plans', 'Plans', array('SSL' => FALSE));
                   echo Anchor(Sprite('SpBlog').'Blog', '/blog', 'Blog', array('SSL' => FALSE));
-                  echo Anchor(Sprite('SpShowcase').'Showcase', '/showcase', 'Showcase', array('SSL' => FALSE));
+                  // echo Anchor(Sprite('SpShowcase').'Showcase', '/showcase', 'Showcase', array('SSL' => FALSE));
                   ?>
                </div>
             </div>
@@ -94,7 +94,7 @@ $Session = Gdn::Session();
          <div class="Columns">
             <div class="Column3">
                <?php
-               echo Anchor('About Us', '#', '', array('SSL' => FALSE));
+               echo Anchor('About Us', 'info/aboutus', '', array('SSL' => FALSE));
                echo '<br />'.Anchor('Contact Us', '/info/contact', '', array('SSL' => FALSE));
                echo '<br />'.Anchor('Resources', '/resources', '', array('SSL' => FALSE));
                echo '<br />'.Anchor("Jobs", '/info/hiring', '', array('SSL' => FALSE));

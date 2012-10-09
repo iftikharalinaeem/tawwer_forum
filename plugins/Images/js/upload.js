@@ -172,7 +172,6 @@ $(function () {
                $(frm).prepend(json.ErrorMessages);
                json.ErrorMessages = null;
             } else {
-               // TODO: Clean up the form
                if (processedTargets) {
                   // Don't do anything with the data b/c it's already been handled by processTargets
                } else {
@@ -184,6 +183,16 @@ $(function () {
                   } else {
                      $(json.Data).appendTo('ul.Comments');
                      $('ul.Comments li:last').effect("highlight", {}, "slow");
+                  }
+                  // If this is an "image" discussion type, add to the item list.
+                  var $container = $('.Tiles');
+                  if ($container.length > 0) {
+                     // var $newItems = $('<div class="Tile ImageWrap">test</div>'); // Testing
+                     var $newItems = $(json.Data);
+                     $container.imagesLoaded(function() {
+                        $newItems.animate({ opacity: 1 });
+                        $container.append($newItems).masonry('appended', $newItems);
+                     });
                   }
                }
                // Remove any "More" pager links (because it is typically replaced with the latest comment by this function)

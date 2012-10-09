@@ -350,7 +350,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     * @param string $ReactionType Type of reaction content to show
     * @param int $Page The current page of content
     */
-   public function RootController_BestOf_Create($Sender, $Reaction = 'everything') {
+   public function RootController_BestOfOld_Create($Sender, $Reaction = 'everything') {
       // Load all of the reaction types.
       try {
          $ReactionModel = new ReactionModel();
@@ -432,7 +432,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       }
       
       // Render the page (or deliver the view)
-      $Sender->Render('bestof', '', 'plugins/Reactions');
+      $Sender->Render('bestof_old', '', 'plugins/Reactions');
    }
    
    /** 
@@ -442,7 +442,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     * @param string $ReactionType Type of reaction content to show
     * @param int $Page The current page of content
     */
-   public function RootController_BestOf2_Create($Sender, $Reaction = 'everything') {
+   public function RootController_BestOf_Create($Sender, $Reaction = 'everything') {
       Gdn_Theme::Section('BestOf');
       // Load all of the reaction types.
       try {
@@ -524,9 +524,6 @@ class ReactionsPlugin extends Gdn_Plugin {
          $Module->SlotType = 'a';
          $Sender->AddModule($Module);
       }
-      
-      // Set the video embed size for this page explicitly (in memory only).
-      SaveToConfig('Garden.Format.EmbedSize', '435x245', array('Save' => FALSE));
       
       // Render the page (or deliver the view)
       $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'bestofitems' : 'bestof';
