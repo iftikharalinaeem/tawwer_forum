@@ -224,6 +224,7 @@ class IPB extends ExportController {
       $Discussion_Map = array(
           'tid' => 'DiscussionID',
           'title' => 'Name',
+          'description' => array('Column' => 'SubName', 'Type' => 'varchar(255)'),
           'forum_id' => 'CategoryID',
           'starter_id' => 'InsertUserID',
           'start_date' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
