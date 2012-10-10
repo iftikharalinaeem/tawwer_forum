@@ -93,6 +93,7 @@ class RankModel extends Gdn_Model {
       self::AbilityString($Abilities, 'Titles', 'Titles', $Result);
       self::AbilityString($Abilities, 'Signatures', 'Signatures', $Result);
       self::AbilityString($Abilities, 'Polls', 'Polls', $Result);
+      self::AbilityString($Abilities, 'MeAction', 'Me Actions', $Result);
       
       self::AbilityString($Abilities, 'ActivityLinks', 'Activity Links', $Result);
 //      self::AbilityString($Abilities, 'CommentLinks', 'Discussion & Comment Links', $Result);
@@ -155,6 +156,11 @@ class RankModel extends Gdn_Model {
       // Polls.
       if ($V = GetValue('Polls', $Abilities)) {
          $Session->SetPermission('Plugins.Polls.Add', $V == 'yes' ? TRUE : FALSE);
+      }
+      
+      // MeActions.
+      if ($V = GetValue('MeAction', $Abilities)) {
+         $Session->SetPermission('Vanilla.Comments.Me', $V == 'yes' ? TRUE : FALSE);
       }
       
       // Links.

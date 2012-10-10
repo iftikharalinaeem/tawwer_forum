@@ -111,8 +111,15 @@ echo $this->Form->Open(), $this->Form->Errors();
    <li>
      <?php
      echo $this->Form->Label('Polls', 'Abilities_Polls'),
-     '<div class="Info2">'."You can give or take away the ability add polls. (Requires the polls addon)".'</div>',
+     '<div class="Info2">'."You can give or take away the ability to add polls. (Requires the polls addon)".'</div>',
       $this->Form->RadioList('Abilities_Polls', array('yes' => 'give', 'no' => 'take away', '' => 'default'));
+     ?>
+   </li>
+   <li>
+     <?php
+     echo $this->Form->Label('Me Actions', 'Abilities_MeAction'),
+     '<div class="Info2">'."You can give or take away the ability to use 'me actions'.".'</div>',
+      $this->Form->RadioList('Abilities_MeAction', array('yes' => 'give', 'no' => 'take away', '' => 'default'));
      ?>
    </li>
    <li>
