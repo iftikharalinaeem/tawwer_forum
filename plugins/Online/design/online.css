@@ -11,14 +11,24 @@
    top: -20px;
    left: 2px;
    background: white;
-   border-radius: 3px;
-   -moz-border-radius: 3px;
-   -webkit-border-radius: 3px;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
    
    border: 1px solid #909090;
    padding: 5px;
    z-index: 10;
    white-space: nowrap;
+}
+
+.OnlineUserWrap .OnlineUserName:before {
+   content: "";
+   border: 5px solid #909090;
+   border-color: #909090 transparent transparent transparent;
+   
+   position: absolute;
+   bottom: -10px;
+   left: 7px;
 }
 
 .OnlineUserWrap .OnlineUserName:after {
@@ -27,7 +37,7 @@
    border-color: white transparent transparent transparent;
    
    position: absolute;
-   bottom: -10px;
+   bottom: -9px;
    left: 7px;
 }
 

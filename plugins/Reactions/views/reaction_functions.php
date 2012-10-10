@@ -3,7 +3,7 @@
 if (!function_exists('FormatScore')):
    
 function FormatScore($Score) {
-   return $Score;
+   return (int)$Score;
 }
 
 endif;
@@ -173,7 +173,7 @@ function WriteProfileCounts() {
          echo '<a href="'.htmlspecialchars($Row['Url']).'" class="TextColor">';
       
       echo ' <span class="CountTotal">'.Gdn_Format::BigNumber($Row['Total'], 'html').'</span> ';
-      echo ' <span class="CountLabel">'.$Row['Name'].'</span>';
+      echo ' <span class="CountLabel">'.T($Row['Name']).'</span>';
       
       if ($Row['Url'])
          echo '</a>';
@@ -213,6 +213,7 @@ function WriteReactions($Row) {
       WriteRecordReactions($Row);
    
    echo '<div class="Reactions">';
+      Gdn_Theme::BulletRow();
    
       // Write the flags.
       static $Flags = NULL, $FlagCodes = NULL;
@@ -225,35 +226,36 @@ function WriteReactions($Row) {
       }
 
       if (!empty($Flags)) {
-         echo '<span class="FlagMenu ToggleFlyout">';
+         echo Gdn_Theme::BulletItem('Flags');
+         
+         echo ' <span class="FlagMenu ToggleFlyout">';
             // Write the handle.
             echo ReactionButton($Row, 'Flag', array('LinkClass' => 'FlyoutButton'));
-            echo Sprite('SpFlyoutHandle');
+            echo Sprite('SpFlyoutHandle', 'Arrow');
             echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
             foreach ($Flags as $Flag) {
                echo '<li>'.ReactionButton($Row, $Flag['UrlCode']).'</li>';
             }
             echo '</ul>';
-         echo '</span>';
+         echo '</span> ';
          
          Gdn::Controller()->FireEvent('AfterFlag');
-         
-         echo Bullet();
       }
+      
+      $Score = FormatScore(GetValue('Score', $Row));
+      echo '<span class="Column-Score Hidden">'.$Score.'</span>';
 
       
 
       // Write the reactions.
+      echo Gdn_Theme::BulletItem('Reactions');
       echo '<span class="ReactMenu">';
          echo '<span class="ReactButtons">';
          foreach ($Types as $Type) {
-            echo ReactionButton($Row, $Type['UrlCode']);
+            echo ' '.ReactionButton($Row, $Type['UrlCode']).' ';
          }
          echo '</span>';
       echo '</span>';
-
-      echo Bullet();
-      echo ' '.Wrap(T('Share'), 'span', array('class' => 'ReactButton ReactLabel')).' ';
       
       Gdn::Controller()->FireEvent('AfterReactions');
    

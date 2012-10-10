@@ -66,7 +66,7 @@ class WarningsPlugin extends Gdn_Plugin {
       
       if (!GetValue('EditMode', Gdn::Controller())) {
          $Sender->EventArguments['ProfileOptions'][] = array(
-             'Text' => Sprite('SpWarn').T('Warn'),
+             'Text' => Sprite('SpWarn').' '.T('Warn'),
              'Url' => '/profile/warn?userid='.$Args['UserID'],
              'CssClass' => 'Popup WarnButton'
          );
@@ -129,7 +129,7 @@ class WarningsPlugin extends Gdn_Plugin {
          $UserID = $Sender->User->UserID;
          
 //         $WarningsLabel = Sprite('SpWarn').T('Warnings');
-         $WarningsLabel = Sprite('SpWarnings').T('Warnings');
+         $WarningsLabel = Sprite('SpWarn').' '.T('Warnings');
          
          $Count = '';
          $Level = Gdn::UserMetaModel()->GetUserMeta($UserID, 'Warnings.Level');

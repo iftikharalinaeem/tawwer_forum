@@ -1,9 +1,9 @@
 @import "compass/css3/images";
 
-/// Tags ///
-
 $tagBackground: $btnPrimaryBackground !default;
 $tagColor: $btnPrimaryColor !default;
+
+$reactColor: $textColor !default;
 
 $breadcrumbsBackground: darken($bodyBackground, 5%) !default;
 
@@ -15,6 +15,14 @@ $navbarBackgroundHighlight: lighten($navbarBackground, 20%) !default;
 
 $hilightBackground: if(lightness($bodyBackground) > 50%, darken($bodyBackground, 20%), lighten($bodyBackground, 20%));
 $highlightColor: if(lightness($bodyBackground) > 50%, darken($bodyBackground, 50%), lighten($bodyBackground, 50%));
+
+$casualText: accent(60%) !default;
+$casualBackground: accent() !default;
+
+$uiColor: $textColor !default;
+$listBackground: $bodyBackground !default;
+$boxBackground: $bodyBackground !default;
+$boxBorder: accent(10%, $boxBackground) !default;
 
 /** Typography **/
 
@@ -38,7 +46,8 @@ a:hover, a.TextColor:hover, a:hover .TextColor {
 h1, h2, h3, h4, h5,
 h1 a, h2 a, h3 a, h4 a, h5 a
 {
-   color: $headingColor;
+   color: $headingsColor;
+   font-family: $headingsFontFamily;
 }
 
 .Tag, .TagCloud li {
@@ -63,7 +72,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a
 .Item .AuthorInfo .MItem, .Item .CommentInfo .MItem,
 .Item .AuthorInfo .MItem::before, .Item .CommentInfo .MItem::before,
 .Gloss {
-   color: accent(40%);
+   color: mix($textColor, $bodyBackground, 75%);
 }
 
 /** Navigation **/
@@ -79,7 +88,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a
 
 .NavBar .FlyoutButton:hover .Sprite16,
 .NavBar .Open .MeMenu .Sprite16 {
-   background-image: spriteUrl($navbarTextHover)
+   background-image: spriteUrl($navbarTextHover, $navbarSpriteStyle)
 }
 
 .BreadcrumbsWrapper {
@@ -90,11 +99,16 @@ h1 a, h2 a, h3 a, h4 a, h5 a
 /** DataLists **/
 
 .DataList {
-   border-color: $tableBorder;
+   border-color: $borderColor;
 }
 
 .DataList .Item, .DataList .Item {
-   border-color: $tableBorder;
+   border-color: $borderColor;
+}
+
+.DataList .Item,
+.DataTable .Item {
+   background-color: $listBackground;
 }
 
 .Item.Read {
@@ -114,7 +128,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a
 }
 
 .ItemDiscussion .Meta, .DataList .Meta {
-   color: transparentize($readColor, .1);
+   color: mix($textColor, $bodyBackground, 75%);
 }
 
 .DataList.Discussions .MCount, .DataList.Discussions .HasNew {
@@ -122,7 +136,11 @@ h1 a, h2 a, h3 a, h4 a, h5 a
 }
 
 .DataTable tbody td {
-	border-color: $tableBorder;
+	border-color: $borderColor;
+}
+
+.Activities .DataList li {
+   background: accent(3%, $listBackground);
 }
 
 /** Forms **/
@@ -154,7 +172,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a
 .Button.Primary {
    background-color: $btnPrimaryBackground;
    @include background-image(linear-gradient(top, lighten($btnPrimaryBackground, 10%), darken($btnPrimaryBackground, 10%)));
-   border-color: darken($btnPrimaryBackground, 20%);
+   border-color: darken($btnPrimaryBackground, 10%) darken($btnPrimaryBackground, 10%) darken($btnPrimaryBackground, 20%);
    color: $btnPrimaryColor;
    
    @if (lightness($btnPrimaryColor) > 50%) {
@@ -170,17 +188,19 @@ h1 a, h2 a, h3 a, h4 a, h5 a
    border-top-color: $btnPrimaryColor;
 }
 
-.ButtonGroup.Open .Button.Handle, .Button:focus, .Button:active {
+.ButtonGroup.Open .Button.Handle,
+.ButtonGroup.Open .NavButton.Handle {
    background: darken($btnBackground, 5%);
    background-image: none;
    border-color: darken($btnBackground, 10%);
-   box-shadow: 0 2px 12px rgba(0,0,0,.4) inset;
+   box-shadow: 0 0px 14px darken($btnBackground, 40%) inset;
 }
 
 .ButtonGroup.Open .Button.Primary.Handle {
    background: darken($btnPrimaryBackground, 5%);
    background-image: none;
    border-color: darken($btnPrimaryBackground, 10%);
+   box-shadow: 0 2px 12px darken($btnPrimaryBackground, 40%) inset;
 }
 
 .Open .Handle.Primary .Sprite {
@@ -194,42 +214,52 @@ h1 a, h2 a, h3 a, h4 a, h5 a
 /** Pagers **/
 
 .Pager a, .Pager span {
-   border-color: $tableBorder;
+   border-color: $borderColor;
+   background-color: $listBackground;
 }
 
 .Pager a:hover, .Pager .Highlight {
    background-color: $hilightBackground;
+}
+.Pager .Highlight {
    color: $highlightColor;
+}
+
+.MiniPager {
+   border-color: $borderColor;
+}
+
+.MiniPager a {
+   border-color: $borderColor;
+}
+
+.MiniPager a:hover {
+   background-color: accent(10%, $listBackground);
 }
 
 /** Sprites **/
 
-@if (lightness($bodyBackground) <= 50%) {
-   .OptionsTitle, a.Bookmark, a.Bookmarked, a.Bookmarking {
-      background-image: url('ui_sprites_white.png');
-   }
+.OptionsTitle, a.Bookmark, a.Bookmarked, a.Bookmarking {
+   background-image: spriteUrl($uiColor, "ui_sprites-16c");
 }
 
 .Sprite16 {
-   background-image: spriteUrl($reactColor);
+   background-image: spriteUrl($reactColor, $spriteStyle);
 }
 
-@if (midtone()) {
-   a .Sprite16 {
-      background-image: spriteUrl($linkColor, sprites-14-sweetx);
-   }
 
-   a:hover .Sprite16 {
-      background-image: spriteUrl($linkColorHover, sprites-14-sweetxc);
-   }
-} @else {
-   a .Sprite16 {
-      background-image: spriteUrl($linkColor, sprites-14);
-   }
+a .Sprite16 {
+   background-image: spriteUrl($linkColor, $spriteStyle);
+}
 
-   a:hover .Sprite16 {
-      background-image: spriteUrl($linkColorHover, sprites-14c);
-   }
+a:hover .Sprite16 {
+   background-image: spriteUrl($linkColorHover, $spriteStyleHover);
+}
+
+
+dl.About dt { 
+   background: spriteUrl(accent(20%, $textColor), "profile-sprites") 0 0 no-repeat;
+   color: accent(25%, $textColor);
 }
 
 .Reactions a {
@@ -247,12 +277,12 @@ div.Popup .Body {
 }
 
 div.Popup h1 {
-   border-color: $tableBorder;
+   border-color: $borderColor;
 }
 
 div.Popup .Buttons {
    background-color: if(lightness($bodyBackground) > 50%, darken($bodyBackground, 10%), lighten($bodyBackground, 10%));
-   border-color: $tableBorder;
+   border-color: $borderColor;
    box-shadow: inset 0 1px 0 lighten($bodyBackground, 20%);
 }
 
@@ -263,21 +293,38 @@ a.Close {
 /** Panel **/
 
 .Box {
-	border-color: $tableBorder;
+	border-color: $boxBorder;
+   background-color: $boxBackground;
 }
 
 .Box h4 {
-   background: accent();
-   border-color: $tableBorder;
-   box-shadow: 0 1px 1px lighten(accent(), 30%) inset;
+   background: accent(5%, $boxBackground);
+   border-color: $boxBorder;
+   box-shadow: 0 1px 1px lighten(accent(5%, $boxBackground), 30%) inset;
+}
+
+@media (min-width: 1101px) {
+   .PhotoWrapLarge {
+      border-color: $boxBorder;
+      background: $boxBackground;
+      box-shadow: 0 1px 1px lighten(accent(5%, $boxBackground), 30%) inset;
+   }
 }
 
 #Panel .FilterMenu {
-   background: accent();
+   background-color: accent();
+}
+
+#Panel .FilterMenu li a:hover {
+   background-color: accent(10%);
+}
+
+#Panel .PanelInfo li a:hover {
+   background-color: accent(5%, $boxBackground);
 }
 
 #Panel .PanelInfo li {
-   border-color: $tableBorder;
+   border-color: $boxBorder;
 }
 
 .Hero {
@@ -293,6 +340,32 @@ a.Close {
 #Panel .FilterMenu .Active a:hover .Sprite, 
 .PanelInfo .Active .Sprite {
    background-image: spriteUrl($tagColor);
+}
+
+/** Messages **/
+
+.WarningMessage {
+    color: $warningText;
+    background-color: $warningBackground;
+    border-color: mix($warningText, $warningBackground);
+}
+
+.InfoMessage {
+    color: $infoText;
+    background-color: $infoBackground;
+    border-color: mix($infoText, $infoBackground);
+}
+
+.AlertMessage {
+    color: $errorText;
+    background-color: $errorBackground;
+    border-color: mix($errorText, $errorBackground);
+}
+
+.CasualMessage {
+    color: $casualText;
+    background-color: $casualBackground;
+    border-color: mix($casualText, $casualBackground);
 }
 
 /** Misc **/

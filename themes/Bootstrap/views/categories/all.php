@@ -11,8 +11,8 @@ $Categories = CategoryModel::MakeTree($this->Data('Categories'));
 if (C('Vanilla.Categories.DoHeadings')) {
    foreach ($Categories as $Category) {
       ?>
-      <div id="CategoryGroup-<?php echo $Category['UrlCode']; ?>" class="CategoryGroup CategoryGroup-<?php echo Gdn_Format::AlphaNumeric($Category['UrlCode']); ?>">
-         <h2 id="Category_<?php echo $Category['CategoryID']; ?>" class="H Depth1 Depth-1 Category-<?php echo Gdn_Format::AlphaNumeric($Category['UrlCode']); ?>">
+      <div id="CategoryGroup-<?php echo $Category['UrlCode']; ?>" class="CategoryGroup CategoryGroup-<?php echo $Category['CssClass']; ?> CategoryGroup-<?php echo Gdn_Format::AlphaNumeric($Category['UrlCode']); ?>">
+         <h2 id="Category_<?php echo $Category['CategoryID']; ?>" class="H Depth1 Depth-1 <?php echo $Category['CssClass']; ?> Category-<?php echo Gdn_Format::AlphaNumeric($Category['UrlCode']); ?>">
             <?php echo Anchor($Category['Name'], $Category['Url']); ?>
          </h2>
          <?php

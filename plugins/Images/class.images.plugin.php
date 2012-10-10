@@ -162,8 +162,23 @@ class ImagesPlugin extends Gdn_Plugin {
    
    public function PostController_UploadImage_Create($Sender) {
       error_reporting(E_ALL | E_STRICT);
-      require(PATH_PLUGINS.'/Images/library/jQuery-FileUpload/server/php/upload.class.php');
-      $upload_handler = new UploadHandler(array('script_url' => Url('post/uploadimage', TRUE)));
+      
+      $Paths = array(
+          'Upload' => PATH_UPLOADS.'/image-tmp/',
+          'Thumb' => PATH_UPLOADS.'/image-tmp/thumbnails/');
+      foreach ($Paths as $Path) {
+         TouchFolder($Path);
+      }
+      
+      $upload_handler = new VanillaUploadHandler(array(
+          'script_url' => Url('post/uploadimage', TRUE),
+          'upload_dir' => $Paths['Upload'],
+          'image_versions' => array(
+            'thumbnail' => array(
+                 'upload_dir' => $Paths['Thumb']
+                ))
+         ));
+      
       header('Pragma: no-cache');
       header('Cache-Control: no-store, no-cache, must-revalidate');
       header('Content-Disposition: inline; filename="files.json"');
@@ -247,7 +262,7 @@ class ImagesPlugin extends Gdn_Plugin {
    /* Add a toggle item to the form menu. */
    public function DiscussionController_BeforeCommentForm_Handler($Sender) {
       $FormToggleMenu = $Sender->EventArguments['FormToggleMenu'];
-      $FormToggleMenu->AddLabel(Sprite('SpNewImage').' '.T('Image'), 'NewImageForm');
+      $FormToggleMenu->AddLabel(Sprite('SpImage').' '.T('Image'), 'NewImageForm');
       // Is this discussion an image-type? If so, make the default response to post another image.
       if (GetValue('Type', $Sender->Data('Discussion')) == 'Image')
          $FormToggleMenu->CurrentLabelCode('NewImageForm'); 
