@@ -7,7 +7,7 @@
 $PluginInfo['IPBFormatter'] = array(
     'Name' => 'IPB Formatter',
     'Description' => 'Formats posts imported from Invision Power Board.',
-    'Version' => '1.0a',
+    'Version' => '1.0b',
     'RequiredApplications' => array('Vanilla' => '2.0.2a'),
     'RequiredPlugins' => FALSE,
     'HasLocale' => FALSE,
@@ -24,6 +24,7 @@ class IPBFormatterPlugin extends Gdn_Plugin {
    public function Format($String) {
       $String = str_replace(array('&quot;', '&#39;', '&#58;', 'Â'), array('"', "'", ':', ''), $String);
       $String = str_replace('<#EMO_DIR#>', 'default', $String);
+      $String = str_replace('<{POST_SNAPBACK}>', '<span class="SnapBack">»</span>', $String);
       
       // If there is a really long string, it could cause a stack overflow in the bbcode parser.
       // Not much we can do except try and chop the data down a touch.
