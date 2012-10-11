@@ -74,7 +74,8 @@ function Route($request) {
    // Figure out the controller and method.
    $pathParts = $request->Path();
    $get = array_change_key_case($request->Get());
-
+   $requestMethod = $request->Method();
+   
    // Look for a controller/method in the form: controller/method, controller[/index], [/index]method, [/index].
    $dispatchParts = array();
    $indexedArgs = array();
@@ -83,31 +84,53 @@ function Route($request) {
       $pathParts[1] = 'index';
    }
    
+   $routed = FALSE;
+   
    $className = ucfirst($pathParts[0]).'Controller';
    if (class_exists($className)) {
       $dispatchParts[0] = $pathParts[0];
-
-      if (isset($pathParts[1]) && method_exists($className, $pathParts[1])) {
+      
+      // Method with HTTP verb prefix?
+      if (isset($pathParts[1]) && CheckRoute($className, "{$requestMethod}_{$pathParts[1]}", $routed)) {
+         $dispatchParts[1] = "{$requestMethod}_{$pathParts[1]}";
+         $indexedArgs = array_slice($pathParts, 2);
+         
+      // Method without HTTP verb prefix?
+      } elseif (isset($pathParts[1]) && CheckRoute($className, $pathParts[1], $routed)) {
          $dispatchParts[1] = $pathParts[1];
          $indexedArgs = array_slice($pathParts, 2);
-      } elseif (method_exists($className, 'Index')) {
+      
+      // Controller with index method, HTTP verb prefix?
+      } elseif (CheckRoute($className, "{$requestMethod}_Index", $routed)) {
+         $dispatchParts[1] = "{$requestMethod}_index";
+         $indexedArgs = array_slice($pathParts, 1);
+         
+      // Controller with index method, no HTTP verb prefix?
+      } elseif (CheckRoute($className, 'Index', $routed)) {
          $dispatchParts[1] = 'index';
          $indexedArgs = array_slice($pathParts, 1);
-      } else {
-         $dispatchParts[0] = 'home';
-         $dispatchParts[1] = 'notfound';
-         $get = array('url' => $request->Url());
       }
-   } else {
-      if (class_exists('IndexController') && method_exists('IndexController', $pathParts[0])) {
-         $dispatchParts[0] = 'index';
-         $dispatchParts[1] = $pathParts[0];
-         $indexedArgs = array_slice($pathParts, 1);
-      } else {
-         $dispatchParts[0] = 'home';
-         $dispatchParts[1] = 'notfound';
-         $get = array('url' => $request->Url());
-      }
+   }
+   
+   // Index Controller, method with HTTP verb prefix?
+   if (CheckRoute('IndexController', "{$requestMethod}_{$pathParts[0]}", $routed)) {
+      $dispatchParts[0] = 'index';
+      $dispatchParts[1] = "{$requestMethod}_{$pathParts[0]}";
+      $indexedArgs = array_slice($pathParts, 1);
+   }
+   
+   // Index Controller, method without HTTP verb prefix?
+   if (CheckRoute('IndexController', $pathParts[0], $routed)) {
+      $dispatchParts[0] = 'index';
+      $dispatchParts[1] = $pathParts[0];
+      $indexedArgs = array_slice($pathParts, 1);
+   }
+   
+   // Home NotFound
+   if (!$routed) {
+      $dispatchParts[0] = 'home';
+      $dispatchParts[1] = 'notfound';
+      $get = array('url' => $request->Url());
    }
    
    $result = new Request(
@@ -117,6 +140,13 @@ function Route($request) {
    $result->PathArgs($indexedArgs);
    
    return $result;
+}
+
+function CheckRoute($className, $methodName, &$routed) {
+   if ($routed) return FALSE;
+   if (class_exists($className) && method_exists($className, $methodName))
+      return $routed = TRUE;
+   return $routed = FALSE;
 }
 
 /**

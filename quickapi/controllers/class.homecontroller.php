@@ -6,8 +6,4 @@ class HomeController extends Controller {
       header('Not Found', TRUE, 404);
    }
    
-   public function Test() {
-      $this->SetData('success', true);
-   }
-   
 }

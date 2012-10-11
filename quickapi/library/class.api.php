@@ -42,14 +42,28 @@ class Api {
       $methodName = ucfirst($request->Path(1));
 
       $controller = new $className();
-      $controller->Request = $request;
 
       $reflectArgs = ReflectArgs($request, $className, $methodName);
 
-      call_user_func_array(array($controller, $methodName), $reflectArgs);
-
-      $view = $controller->Data();
-      unset($controller);
+      try {
+         call_user_func_array(array($controller, $methodName), $reflectArgs);
+         
+         $view = $controller->Data();
+         unset($controller);
+      } catch (HTTPException $ex) {
+         Controller::Status($ex->getCode(), $ex->getMessage());
+         $view = array(
+            'Exception' => $ex->getMessage(),
+            'Code'      => $ex->getCode()
+         );
+      } catch (Exception $ex) {
+         Controller::Status(500);
+         $view = array(
+            'Exception' => $ex->getMessage(),
+            'Code'      => 500
+         );
+      }
+      
       Api::Render($view);
    }
    
@@ -63,3 +77,5 @@ class Api {
          echo json_encode($view);
    }
 }
+
+class HTTPException extends Exception {}
