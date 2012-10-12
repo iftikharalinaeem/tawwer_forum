@@ -114,6 +114,11 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
   color: #c6c6c6;
 }
 
+.DataList.Discussions .HasNew {
+  background: #cc1507;
+  color: white;
+}
+
 .DataTable tbody td {
   border-color: #242424;
 }
