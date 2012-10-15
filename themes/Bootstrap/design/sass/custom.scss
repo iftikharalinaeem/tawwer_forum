@@ -398,6 +398,20 @@ body > #Frame > .Head {
    color: #ffffff;
 }
 
+#Panel .SideMenu .PanelInfo li {
+   padding: 0;
+   
+   a {
+      padding: 5px 10px;
+      display: block;
+      text-shadow: none;
+      
+      &:hover {
+         color: $linkColorHover;
+      }
+   }
+}
+
 /*** Pagination ***/
 
 .PagerWrap {
