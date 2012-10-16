@@ -261,6 +261,7 @@ class ImagesPlugin extends Gdn_Plugin {
    
    /* Add a toggle item to the form menu. */
    public function DiscussionController_BeforeCommentForm_Handler($Sender) {
+      return;
       $FormToggleMenu = $Sender->EventArguments['FormToggleMenu'];
       $FormToggleMenu->AddLabel(Sprite('SpImage').' '.T('Image'), 'NewImageForm');
       // Is this discussion an image-type? If so, make the default response to post another image.

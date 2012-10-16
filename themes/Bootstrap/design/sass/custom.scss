@@ -398,6 +398,20 @@ body > #Frame > .Head {
    color: #ffffff;
 }
 
+#Panel .SideMenu .PanelInfo li {
+   padding: 0;
+   
+   a {
+      padding: 5px 10px;
+      display: block;
+      text-shadow: none;
+      
+      &:hover {
+         color: $linkColorHover;
+      }
+   }
+}
+
 /*** Pagination ***/
 
 .PagerWrap {
@@ -481,14 +495,13 @@ body > #Frame > .Head {
 /*** Badges ***/
 
 .Count {
-   background: #08c;
    border-radius: .4ex;
 }
 
 /*** Datalist ***/
 
 .DataList {
-    border: solid 1px #ddd;
+    border: solid 1px $borderColor;
     border-radius: .5ex;
 }
 
@@ -549,8 +562,6 @@ body > #Frame > .Head {
 
 .DataList.Discussions .HasNew {
     font-weight: normal;
-    background: #0088cc;
-    color: #fff;
     font-size: 11px;
 }
 
@@ -797,11 +808,6 @@ a.Close:hover {
 
 /** General Sprite Stuff **/
 
-dl.About dt { 
-   background: spriteUrl(accent(20%, $textColor), "profile-sprites") 0 0 no-repeat;
-   color: accent(25%, $textColor);
-}
-
 .Sprite, .Sprite16 {
    width: 16px;
    height: 16px;
@@ -896,3 +902,5 @@ dl.About {
    dt.Roles { background-position: 0 -100px; }
    dt.Visits { background-position: 0 -160px; }
 }
+
+@import "colours";
