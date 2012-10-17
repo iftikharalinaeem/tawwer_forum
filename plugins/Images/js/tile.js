@@ -1,9 +1,9 @@
-$(function () {
+jQuery(document).ready(function($) {
    var selector = '.Tiles > .Tile', $container = $('.Tiles');
    var $items = $('.Tiles .Tile:not(.Wide)');
    if ($items.length == 0) $items = $('.Tiles .Tile');
    var width = $items.outerWidth() + 15;
-
+   
    $(selector).css({opacity: 0});
    $container.imagesLoaded(function() {
       $(selector).animate({ opacity: 1 });
