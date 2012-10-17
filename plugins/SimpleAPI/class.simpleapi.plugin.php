@@ -190,7 +190,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
                   // Check if we have a provider by that key
                   $ProviderModel = new Gdn_AuthenticationProviderModel();
-                  $Provider = $ProviderModel->GetProviderByKey($AuthenticationProviderKey);
+                  $Provider = $ProviderModel->GetProviderByKey($ProviderKey);
                   if (!$Provider) {
                      $Errors[] = self::NotFoundString('Provider', $ProviderKey);
                      continue;
