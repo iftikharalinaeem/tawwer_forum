@@ -183,7 +183,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     * @param ProfileController $Sender
     * @param type $Args 
     */
-   public function ProfileController_Reactions_Create($Sender, $UserID, $Username, $Reaction, $Page = '') {
+   public function ProfileController_Reactions_Create($Sender, $UserID, $Username = '', $Reaction = '', $Page = '') {
       $Sender->Permission('Garden.Profiles.View');
       
       $ReactionType = ReactionModel::ReactionTypes($Reaction);
@@ -231,7 +231,7 @@ class ReactionsPlugin extends Gdn_Plugin {
          
          $Row = array(
              'Name' => $Type['Name'], 
-             'Url' => Url(CombinePaths(array(UserUrl($Sender->Data('Profile'), '', 'reactions'), rawurlencode($Code))), TRUE), 
+             'Url' => Url(UserUrl($Sender->Data('Profile'), '', 'reactions').'?reaction='.urlencode($Code), TRUE), 
              'Total' => 0);
          
          if (isset($Data[$Type['TagID']])) {
