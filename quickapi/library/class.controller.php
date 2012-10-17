@@ -90,6 +90,8 @@ class Controller {
       return $value;
    }
    
+   public function Initialize();
+   
    public static function Status($statusCode, $message = NULL) {
       if (is_null($message))
          $message = self::GetStatusMessage($statusCode);
