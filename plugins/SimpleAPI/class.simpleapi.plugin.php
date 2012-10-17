@@ -179,8 +179,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
                // Lookup user by foreignid
                case 'ForeignID':
-                  if (strpos(':', $Value) === FALSE) {
-                     $Errors[] = "Malformed ForeignID object. Should be '<provider key>:<foreign id>'.";
+                  if (strpos($Value, ':') === FALSE) {
+                     $Errors[] = "Malformed ForeignID object '{$Value}'. Should be '[provider key]:[foreign id]'.";
                      continue;
                   }
 
