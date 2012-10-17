@@ -617,6 +617,11 @@ body > #Frame > .Head {
   padding-right: 10px;
 }
 
+.DataTable td.CheckBoxColumn {
+  padding-left: 4px !important;
+  width: 20px;
+}
+
 .DataTable tbody tr:first-child td:first-child {
   border-top-left-radius: .5ex;
 }

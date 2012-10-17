@@ -7,7 +7,7 @@
 $PluginInfo['Images'] = array(
    'Name' => 'Images',
    'Description' => "Upload images as discussions, comments, and activities.",
-   'Version' => '1.0',
+   'Version' => '1.0.1a',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
@@ -15,12 +15,51 @@ $PluginInfo['Images'] = array(
 );
 
 class ImagesPlugin extends Gdn_Plugin {
+   /// Methods ///
+   
    public function Setup() {
       $this->Structure();
    }
    
    public function Structure() {
       include dirname(__FILE__).'/structure.php';
+   }
+   
+   /**
+    * @param Gdn_Controller $Sender
+    */
+   public function AddJsFiles($Sender = NULL) {
+      if (!$Sender)
+         $Sender = Gdn::Controller();
+      
+      // Include JS necessary in the page.
+      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/vendor/jquery.ui.widget.js');
+      // The Templates plugin is included to render the upload/download listings.
+      $Sender->AddJsFile('plugins/Images/library/Javascript-Templates/tmpl.min.js');
+      // The Load Image plugin is included for the preview images and image resizing functionality.
+      $Sender->AddJsFile('plugins/Images/library/Javascript-LoadImage/load-image.min.js');
+      // The Canvas to Blob plugin is included for image resizing functionality.
+      $Sender->AddJsFile('plugins/Images/library/JavaScript-Canvas-to-Blob/canvas-to-blob.min.js');
+      // The Iframe Transport is required for browsers without support for XHR file uploads.
+      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.iframe-transport.js');
+      // The basic File Upload plugin.
+      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload.js');
+      // The File Upload file processing plugin.
+      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload-fp.js');
+      // The File Upload user interface plugin.
+      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload-ui.js');
+      // The localization script.
+      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/locale.js');
+      // The main application script.
+      $Sender->AddJsFile('plugins/Images/js/upload.js');
+      // The XDomainRequest Transport is included for cross-domain file deletion for IE8+.
+      $Sender->Head->AddString('<!--[if gte IE 8]><script src="'.Url('plugins/Images/library/jQuery-FileUpload/js/cors/jquery.xdr-transport.js').'"></script><![endif]-->');
+   }
+   
+   /// Event Handlers ///
+   
+   public function AssetModel_StyleCss_Handler($Sender, $Args) {
+      $Sender->AddCssFile('images.css', 'plugins/Images');
    }
    
    /** 
@@ -52,30 +91,6 @@ class ImagesPlugin extends Gdn_Plugin {
       $Forms[] = array('Name' => 'Image', 'Label' => Sprite('SpImage').T('New Image'), 'Url' => 'post/image');
 		$Sender->SetData('Forms', $Forms);
 
-      // Page Includes
-      $Sender->AddCssFile('plugins/Images/design/images.css');
-      // Include JS necessary in the page.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/vendor/jquery.ui.widget.js');
-      // The Templates plugin is included to render the upload/download listings.
-      $Sender->AddJsFile('plugins/Images/library/Javascript-Templates/tmpl.min.js');
-      // The Load Image plugin is included for the preview images and image resizing functionality.
-      $Sender->AddJsFile('plugins/Images/library/Javascript-LoadImage/load-image.min.js');
-      // The Canvas to Blob plugin is included for image resizing functionality.
-      $Sender->AddJsFile('plugins/Images/library/JavaScript-Canvas-to-Blob/canvas-to-blob.min.js');
-      // The Iframe Transport is required for browsers without support for XHR file uploads.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.iframe-transport.js');
-      // The basic File Upload plugin.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload.js');
-      // The File Upload file processing plugin.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload-fp.js');
-      // The File Upload user interface plugin.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload-ui.js');
-      // The localization script.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/locale.js');
-      // The main application script.
-      $Sender->AddJsFile('plugins/Images/js/upload.js');
-      // The XDomainRequest Transport is included for cross-domain file deletion for IE8+.
-      $Sender->Head->AddString('<!--[if gte IE 8]><script src="'.Url('plugins/Images/library/jQuery-FileUpload/js/cors/jquery.xdr-transport.js').'"></script><![endif]-->');
    }
    
    /** 
@@ -103,7 +118,7 @@ class ImagesPlugin extends Gdn_Plugin {
 
       // Set the model on the form
       $Sender->Form->SetModel($ImageModel);
-      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+      if (!$Sender->Form->IsPostBack()) {
          if ($Sender->Category !== NULL)
             $Sender->Form->SetData(array('CategoryID' => $Sender->Category->CategoryID));
       } else { // Form was submitted
@@ -143,6 +158,7 @@ class ImagesPlugin extends Gdn_Plugin {
       // Set up the page and render
       $Sender->Title(T('New Image'));
 		$Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/image')));
+      $this->AddJsFiles();
       $Sender->Render('discussionform', '', 'plugins/Images');
    }
    
@@ -215,47 +231,29 @@ class ImagesPlugin extends Gdn_Plugin {
    
    /** 
     * Add the js to the discussion form for file uploads.
+    * @param Gdn_Controller $Sender
     */
    public function DiscussionController_Render_Before($Sender) {
-      $Sender->AddCssFile('plugins/Images/design/images.css');
+      $Discussion = $Sender->Data('Discussion');
+      if (GetValue('Type', $Discussion) != 'Image')
+         return;
+
       // Include JS necessary in the page.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/vendor/jquery.ui.widget.js');
-      // The Templates plugin is included to render the upload/download listings.
-      $Sender->AddJsFile('plugins/Images/library/Javascript-Templates/tmpl.min.js');
-      // The Load Image plugin is included for the preview images and image resizing functionality.
-      $Sender->AddJsFile('plugins/Images/library/Javascript-LoadImage/load-image.min.js');
-      // The Canvas to Blob plugin is included for image resizing functionality.
-      $Sender->AddJsFile('plugins/Images/library/JavaScript-Canvas-to-Blob/canvas-to-blob.min.js');
-      // The Iframe Transport is required for browsers without support for XHR file uploads.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.iframe-transport.js');
-      // The basic File Upload plugin.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload.js');
-      // The File Upload file processing plugin.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload-fp.js');
-      // The File Upload user interface plugin.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload-ui.js');
-      // The localization script.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/locale.js');
-      // The main application script.
-      $Sender->AddJsFile('plugins/Images/js/upload.js');
-      // The XDomainRequest Transport is included for cross-domain file deletion for IE8+.
-      $Sender->Head->AddString('<!--[if gte IE 8]><script src="'.Url('plugins/Images/library/jQuery-FileUpload/js/cors/jquery.xdr-transport.js').'"></script><![endif]-->');
+//      $this->AddJsFiles();
       
       // If the current discussion is of type "Image", switch to the images view
-      $Discussion = $Sender->Data('Discussion');
-      if (GetValue('Type', $Discussion) == 'Image') {
-         $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js');
-         $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
-         $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
-         $Sender->AddJsFile('plugins/Images/js/tile.js');
-         $Sender->View = PATH_PLUGINS.'/Images/views/discussion.php';
-      }
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js');
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
+      $Sender->AddJsFile('plugins/Images/js/tile.js');
+      $Sender->View = PATH_PLUGINS.'/Images/views/discussion.php';
+      
+      $Sender->CssClass .= ' NoPanel';
    }
    
    public function RootController_Render_Before($Sender) {
       if (InArrayI($Sender->RequestMethod, array('bestof', 'bestof2'))) {
          $Sender->AddJsFile('plugins/Images/js/tile.js');         
-         $Sender->AddCssFile('plugins/Images/design/images.css');
       }
    }
    
