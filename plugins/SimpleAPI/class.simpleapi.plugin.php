@@ -59,7 +59,9 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       // Loop over every KVP in the POST data
       foreach ($Post as $Key => $Value) {
          
-         self::TranslateField($Post, $Key, $Value);
+         $TranslateErrors = self::TranslateField($Post, $Key, $Value);
+         if (is_array($TranslateErrors))
+            $Errors = array_merge($Errors, $TranslateErrors);
          
       }
       
@@ -110,7 +112,9 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       // Loop over every KVP in the GET data
       foreach ($Get as $Key => $Value) {
          
-         self::TranslateField($Get, $Key, $Value);
+         $TranslateErrors = self::TranslateField($Get, $Key, $Value);
+         if (is_array($TranslateErrors))
+            $Errors = array_merge($Errors, $TranslateErrors);
          
       }
       
@@ -133,6 +137,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     * @param string $Value 
     */
    protected static function TranslateField(&$Data, $Field, $Value) {
+      $Errors = array();
       
       // If the Key is dot-delimited, inspect it for potential munging
       if (strpos($Field, '.') !== FALSE) {
@@ -174,8 +179,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
                // Lookup user by foreignid
                case 'ForeignID':
-                  if (strpos(':', $Value) === FALSE) {
-                     $Errors[] = "Malformed ForeignID object. Should be '<provider key>:<foreign id>'.";
+                  if (strpos($Value, ':') === FALSE) {
+                     $Errors[] = "Malformed ForeignID object '{$Value}'. Should be '[provider key]:[foreign id]'.";
                      continue;
                   }
 
@@ -185,7 +190,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
                   // Check if we have a provider by that key
                   $ProviderModel = new Gdn_AuthenticationProviderModel();
-                  $Provider = $ProviderModel->GetProviderByKey($AuthenticationProviderKey);
+                  $Provider = $ProviderModel->GetProviderByKey($ProviderKey);
                   if (!$Provider) {
                      $Errors[] = self::NotFoundString('Provider', $ProviderKey);
                      continue;
@@ -206,7 +211,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                   $LookupField = $Value;
                   break;
             }
-
+            
             if (!is_null($LookupFieldValue))
                $Data[$LookupField] = $LookupFieldValue;
 
@@ -226,6 +231,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             $Data[$Column] = (string)$Category['CategoryID'];
          }
       }
+      
+      return $Errors;
    }
    
    protected static function NotFoundString($Code, $Item) {
@@ -293,7 +300,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     * 
     * @param Gdn_Dispatcher $Sender 
     */
-   public function Gdn_Dispatcher_BeforeControllerMethod_Handler($Sender, $Args) {
+   public function Gdn_Dispatcher_AfterControllerInit_Handler($Sender, $Args) {
       
       $Controller = $Args['Controller'];
       

@@ -46,6 +46,7 @@ class Api {
       $reflectArgs = ReflectArgs($request, $className, $methodName);
 
       try {
+         $controller->Initialize();
          call_user_func_array(array($controller, $methodName), $reflectArgs);
          
          $view = $controller->Data();

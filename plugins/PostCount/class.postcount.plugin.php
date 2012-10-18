@@ -35,11 +35,11 @@ class PostCountPlugin extends Gdn_Plugin {
       }
    }
    
-   public function DiscussionController_CommentInfo_Handler(&$Sender) {
+   public function DiscussionController_AuthorInfo_Handler(&$Sender) {
       $this->_AttachPostCount($Sender);
    }
    
-   public function PostController_CommentInfo_Handler(&$Sender) {
+   public function PostController_AuthorInfo_Handler(&$Sender) {
       $this->_AttachPostCount($Sender);
    }
    
@@ -47,7 +47,7 @@ class PostCountPlugin extends Gdn_Plugin {
       $User = Gdn::UserModel()->GetID($Sender->EventArguments['Author']->UserID);
       if ($User) {
          $Posts = GetValue('CountComments', $User, 0) + GetValue('CountDiscussions', $User, 0);
-         echo '<span class="MItem PostCount">'.Plural(number_format($Posts), '@'.T('Posts.Singular: %s', 'Posts: %s'), '@'.T('Posts.Plural: %s', 'Posts: %s')).'</span>';
+         echo '<span class="MItem PostCount">'.Plural(number_format($Posts), '@'.T('Posts.Singular: %s', 'Posts: <b>%s</b>'), '@'.T('Posts.Plural: %s', 'Posts: <b>%s</b>')).'</span>';
       }
    }
 
