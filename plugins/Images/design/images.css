@@ -440,6 +440,11 @@
 .ImageWrap .ToggleFlyout.Open .ReactButton-Flag .ReactSprite {
    opacity: 1;
 }
+
+.ImageWrap .ReactButton.Quote {
+   display: none;
+}
+
 .Invisible {
    opacity: 0;
 }

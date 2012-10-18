@@ -66,7 +66,7 @@ if (!function_exists('WriteImageItem')):
          
          if ($Image) {
             echo '<div class="Image">';
-               echo Anchor(Img($Image['Image'], array('alt' => $Image['Caption'], 'title' => $Image['Caption'])), $Image['Image'], array('target' => '_blank'));
+               echo Anchor(Img($Image['Thumbnail'], array('alt' => $Image['Caption'], 'title' => $Image['Caption'])), $Image['Image'], array('target' => '_blank'));
             echo '</div>'; 
             echo '<div class="Caption">';
                echo Gdn_Format::PlainText($Image['Caption']);

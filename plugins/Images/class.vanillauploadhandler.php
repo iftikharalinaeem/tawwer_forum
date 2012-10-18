@@ -60,24 +60,31 @@ class VanillaUploadHandler extends UploadHandler {
    
    public function handle_file_wget($url) {
       // Temporarily copy the file locally.
-      $filename = basename($url);
-      $dest = $this->options['upload_dir'].$filename;
+      $Filename = basename($url);
+      $dest = $this->options['upload_dir'].$Filename;
+      
+      TouchFolder(dirname($dest));
       copy($url, $dest);
-      $size = filesize($filepath);
+      $size = filesize($dest);
       $file = new stdClass();
-      $file->name = $filename;
+      $file->name = $Filename;
       $file->size = intval($size);
       $file->type = mime_content_type($dest);
       $file->url = $url;
       $this->make_image_versions($file);
       
-      
       // Move the thumbnail.
       $Upload = new Gdn_Upload();
       $Source = $this->options['image_versions']['thumbnail']['upload_dir'].$Filename;
-      $Target = "thumbnails/$Name";
+      
+      if (!file_exists($Source)) {
+         die("Thumbnail doesn't exist: ".$Source);
+      }
+      
+      $Target = "thumbnails/$Filename";
       $Parsed = $Upload->SaveAs($Source, $Target);
-      $Result->thumbnail_url = $Parsed['Url'];
+      
+      $file->thumbnail_url = $Parsed['Url'];
       
       // Delete the temporary file.
       unlink($dest);

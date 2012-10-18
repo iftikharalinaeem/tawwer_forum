@@ -55,16 +55,20 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
 $PostedImages = $this->Form->GetFormValue('Image');
 $PostedSizes = $this->Form->GetFormValue('Size');
 $PostedCaptions = $this->Form->GetFormValue('Caption');
+$Thumbnails = $this->Form->GetFormValue('Thumbnail', array());
 $Files = array();
+
 if (is_array($PostedImages)) {
    foreach ($PostedImages as $Key => $PostedImage) {
       $Filename = basename($PostedImage);
+      $Thumbnail = GetValue($Key, $Thumbnails);
+      
       $file = new stdClass();
       $file->name = $file->caption = GetValue($Key, $PostedCaptions);
       $file->size = intval(GetValue($Key, $PostedSizes));
       $file->type = substr(strrchr($Filename,'.'),1);
       $file->url = $PostedImage;
-      $file->thumbnail_url = Url('uploads/thumbnails/'.$Filename, TRUE);
+      $file->thumbnail_url = $Thumbnail;
       $file->delete_url = Url('vanilla/post/uploadimage/', TRUE).'?file='.urlencode($Filename);
       $file->delete_type = 'DELETE';
       $Files[] = $file;
