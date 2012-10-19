@@ -206,11 +206,9 @@
 .ImageWrap {
     background: #fff;
     padding: 10px;
-    box-shadow: 0 0 1px #333;
     border-radius: 1px;
-    border: 0px solid #ddd;
-    border-bottom-width: 1px;
-    width: 280px; /* 300 with padding */
+    border: 1px solid #ddd;
+    width: 278px; /* 300 with padding */
     display: inline-block;
     vertical-align: top;
     position: relative;
@@ -221,13 +219,10 @@
     text-align: center;
     margin-bottom: 10px;
 }
-.UploadFiles {
-   margin: 0 -5px;
-}
 .ImageWrap .Image img {
     margin: 0 auto;
     display: block;
-    max-width: 280px;
+    max-width: 100%;
 }
 .ImageWrap .Image .ImageResized {
    display: none;
@@ -237,16 +232,6 @@
    overflow: hidden;
    text-overflow: ellipsis;
    margin-top: -10px;
-}
-
-.ImageWrap .Image.preview {
-   line-height: 280px;
-}
-
-.ImageWrap .Image.preview img {
-   display: inline-block;
-   vertical-align: middle;
-   max-height: 280px;
 }
 
 .NewImageForm .ImageWrap .InputBox {
@@ -346,7 +331,7 @@
     margin: 0 auto;
 }
 .ImageWrap.Wide {
-   width: 594px;
+   width: 592px;
 }
 .ImageWrap .Title {
    font-size: 12px ;
@@ -358,10 +343,10 @@
 }
 .ImagesWrap .Caption,
 .ImagesWrap .Body {
-    font-size: 11px;
+    /*font-size: 11px;*/
     line-height: 1.5;
     overflow: hidden;
-    margin: 10px 0;
+    margin: 0 0 10px;
 }
 /*.Section-BestOf .BestOfList .Item .Body img {
     max-width: 100%;
@@ -429,11 +414,6 @@
 .ImageWrap .ReactMenu .ReactButton:hover .ReactLabel {
    display: block;
 }
-.ImageWrap .ReactMenu .ReactButton .ReactSprite,
-.ImageWrap .ReactMenu .ReactButton .Count,
-.ImageWrap .ReactButton-Flag .ReactSprite {
-   opacity: 0.5;
-}
 .ImageWrap .ReactMenu .ReactButton:hover .ReactSprite,
 .ImageWrap .ReactMenu .ReactButton:hover .Count,
 .ImageWrap .ReactButton-Flag:hover .ReactSprite,
@@ -444,6 +424,17 @@
 .ImageWrap .ReactButton.Quote {
    display: none;
 }
+
+.Tiles .ImageWrap {
+   float: left;
+}
+
+.Tiles:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 
 .Invisible {
    opacity: 0;

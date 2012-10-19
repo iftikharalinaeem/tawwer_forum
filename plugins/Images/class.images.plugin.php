@@ -159,6 +159,8 @@ class ImagesPlugin extends Gdn_Plugin {
       $Sender->Title(T('New Image'));
 		$Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/image')));
       $this->AddJsFiles();
+      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js');
+      
       $Sender->Render('discussionform', '', 'plugins/Images');
    }
    
@@ -243,8 +245,8 @@ class ImagesPlugin extends Gdn_Plugin {
       
       // If the current discussion is of type "Image", switch to the images view
       $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js');
-      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
-      $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
+//      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
+//      $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
       $Sender->AddJsFile('plugins/Images/js/tile.js');
       $Sender->View = PATH_PLUGINS.'/Images/views/discussion.php';
       

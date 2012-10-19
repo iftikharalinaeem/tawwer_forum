@@ -58,6 +58,12 @@ $(function () {
                action: 'save'
             }
       ]
+   })
+   .bind('fileuploadsent', function(e, data) {
+      $('#filetable').masonry('reload');
+   })
+   .bind('fileuploadcompleted', function(e, data) {
+      data.filesContainer.imagesLoaded(function() { data.filesContainer.masonry('reload'); }); // todo: just the new files.
    });
    
    // Upload server status check for browsers with CORS support:
@@ -92,13 +98,18 @@ $(function () {
                files: data,
                formatFileSize: fileSize
          });
-         $('#filetable').append(html);
+         var $html = $(html);
+         $('#filetable').append($html).masonry('appended', $html);
          $('.UrlInput').val('').focus();
       }).always(function() {
          gdn.enable(but);
       });
       return false;
    });
+   
+//   $('.NewImageForm .Tiles').masonry({
+//      itemSelector: '.ImageWrap'
+//   });
    
    $('.CommentFormToggle').click(function() {
       $('.CommentForm').show();

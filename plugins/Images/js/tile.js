@@ -9,7 +9,7 @@ jQuery(document).ready(function($) {
       $(selector).animate({ opacity: 1 });
       $container.masonry({
          itemSelector: selector,
-         columnWidth: width
+         // columnWidth: width
       });
    });
    
