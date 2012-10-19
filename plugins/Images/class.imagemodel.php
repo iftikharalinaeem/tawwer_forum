@@ -66,6 +66,9 @@ class ImageModel extends Gdn_Model {
       
       if (count($this->Validation->Results()) > 0)
          return 0;
+      
+      // We need to space the post time of the comments out so the caching won't break.
+      $Timestamp = time();
 
       if (!$DiscussionID) {
          $Image = array_shift($Images);
@@ -100,6 +103,7 @@ class ImageModel extends Gdn_Model {
          for($i = 0; $i < count($Images); $i++) {
             $SerializedImage = serialize($Images[$i]);
             $CommentFormValues['Body'] = Gdn_Format::Image($SerializedImage);
+            $CommentFormValues['DateInserted'] = Gdn_Format::ToDateTime($Timestamp++);
             $CommentFormValues['Attributes'] = $SerializedImage;
             $CommentIDs[] = $CommentModel->Save($CommentFormValues);
             $ValidationResults = $CommentModel->Validation->Results();

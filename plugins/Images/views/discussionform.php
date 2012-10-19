@@ -11,14 +11,10 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
    if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
       echo Wrap($this->Data('Title'), 'h1 class="H"');
 
-   echo '<div class="FormWrapper">';
+   echo '<div class="FormWrapperz">';
       echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'id' => 'UploadForm'));
       echo $this->Form->Errors();
-
-      // The table listing the files available for upload/download.
-      echo '<div id="filetable" class="UploadFiles files" role="presentation"></div>';
-      // echo '<table id="filetable" role="presentation" class="table table-striped"><tbody class="files" data-toggle="modal-gallery" data-target="#modal-gallery"></tbody></table>';
-
+      
       echo '<div class="ImageFormWrap">';
 
          echo '<div class="ImageControlsWrap">';
@@ -39,12 +35,16 @@ if (C('Vanilla.Categories.Use') && is_object($this->Category))
             }
          echo '</div>';
       
-         echo '<div class="Buttons">';
-            echo $this->Form->Button('Post', array('class' => 'Button ImageButton Primary'));
-            echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
-         echo '</div>';
-
+      echo '</div>'; // ImageFormWrap
+      
+      // The table listing the files available for upload/download.
+      echo '<div id="filetable" class="Tiles UploadFiles files" role="presentation"></div>';
+      
+      echo '<div class="Buttons">';
+         echo $this->Form->Button('Post', array('class' => 'Button ImageButton Primary'));
+         echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
       echo '</div>';
+      
       echo $this->Form->Close();
    echo '</div>';
    ?>
@@ -83,8 +83,25 @@ if (count($Files) > 0) {
             formatFileSize: fileSize
          });
          $('#filetable').append(html);
+         
+
       });
    </script>";
 }
+
+?>
+<script type="text/javascript">
+   $(function() {
+      $('.Tiles').imagesLoaded(function($images, $proper, $broken) {
+         console.log('images loaded');
+
+         this.masonry({
+            itemSelector: '.ImageWrap',
+            animate: true
+         });
+      });
+   });
+</script>
+<?php
 
 include_once($this->FetchViewLocation('template', '', 'plugins/Images'));

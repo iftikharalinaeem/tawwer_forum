@@ -90,3 +90,23 @@ if (!function_exists('WriteImageItem')):
       <?php
    }
 endif;
+
+function WriteFileUpload($ShowCategorySelector = FALSE) {
+   echo '<div class="ImageControlsWrap">';
+      echo '<span class="FileInput btn btn-success fileinput-button">';
+         echo Sprite('SpImage');
+         echo Wrap(T('Add Image'));
+         echo '<input type="file" name="files[]" multiple>';
+      echo '</span>';
+      echo Wrap(T('Drag and Drop', 'Drag &amp; Drop'), 'span class="DropZone"');
+      echo '<div class="FetchUrl">';
+         echo '<input type="text" class="UrlInput" placeholder="Paste image url..." />';
+         echo ' '.Anchor('Fetch', '#', 'UrlButton Button Success');
+      echo '</div>';
+      if ($ShowCategorySelector) {
+         echo '<div class="Category">';
+         echo Gdn::Controller()->Form->CategoryDropDown('CategoryID');
+         echo '</div>';
+      }
+   echo '</div>';
+}
