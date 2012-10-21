@@ -518,19 +518,7 @@ class ReactionsPlugin extends Gdn_Plugin {
          Gdn::Session()->UserID == 0
       );
       
-      // Modules
-      $Sender->AddModule('GuestModule');
-      $Sender->AddModule('SignedInModule');
-      $Sender->AddModule('BestOfFilterModule');
-
-      // Render the page.
-      if (class_exists('LeaderBoardModule')) {
-         $Sender->AddModule('LeaderBoardModule');
-
-         $Module = new LeaderBoardModule();
-         $Module->SlotType = 'a';
-         $Sender->AddModule($Module);
-      }
+      $Sender->CssClass .= ' NoPanel';
       
       // Render the page (or deliver the view)
       $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'bestofitems' : 'bestof';
