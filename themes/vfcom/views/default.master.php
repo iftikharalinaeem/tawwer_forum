@@ -105,8 +105,8 @@ $Session = Gdn::Session();
                <?php
                echo Anchor('Tour', '/tour', '', array('SSL' => FALSE));
                echo '<br />'.Anchor('Solutions', '/solutions', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Service Offerings', '/services', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Forum Migration', '/migration', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Service Offerings', '/solutions#services', '', array('SSL' => FALSE));
+               echo '<br />'.Anchor('Forum Migration', '/solutions#migration', '', array('SSL' => FALSE));
                ?>
             </div>
             <div class="Column3">
