@@ -580,6 +580,7 @@ class ReactionModel {
     */
    public function React($RecordType, $ID, $Reaction) {
       $IsModerator = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
+      $IsCurator = Gdn::Session()->CheckPermission('Garden.Curation.Manage');
       
       $Undo = FALSE;
       if (StringBeginsWith($Reaction, 'Undo-', TRUE)) {
@@ -604,7 +605,7 @@ class ReactionModel {
       }
       
       // Figure out the increment.
-      if ($IsModerator) {
+      if ($IsCurator) {
          $Inc = GetValue('ModeratorInc', $ReactionType, 1);
       } else {
          $Inc = 1;

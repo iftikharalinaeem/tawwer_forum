@@ -39,7 +39,7 @@ $Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Sort' =>
 $Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Sort' => 102, 'Class' => 'Flag', 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
    'Description' => "Troll posts are typically trying to elicit a heated argument from other people. Trolls are community poison, making your community a scary place for new members. Troll posts will be buried."));
 
-$Rm->DefineReactionType(array('UrlCode' => 'Promote', 'Name' => 'Promote', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 3, 'Permission' => 'Garden.Moderation.Manage',
+$Rm->DefineReactionType(array('UrlCode' => 'Promote', 'Name' => 'Promote', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 3, 'Permission' => 'Garden.Curation.Manage',
    'Description' => "Moderators have the ability to promote the best posts in the community. This way they can be featured for new visitors."));
 
 $Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic', 'Sort' => 1, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
