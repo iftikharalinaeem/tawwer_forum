@@ -94,6 +94,7 @@ class RankModel extends Gdn_Model {
       self::AbilityString($Abilities, 'Signatures', 'Signatures', $Result);
       self::AbilityString($Abilities, 'Polls', 'Polls', $Result);
       self::AbilityString($Abilities, 'MeAction', 'Me Actions', $Result);
+      self::AbilityString($Abilities, 'Curation', 'Content Curation', $Result);
       
       self::AbilityString($Abilities, 'ActivityLinks', 'Activity Links', $Result);
 //      self::AbilityString($Abilities, 'CommentLinks', 'Discussion & Comment Links', $Result);
@@ -161,6 +162,11 @@ class RankModel extends Gdn_Model {
       // MeActions.
       if ($V = GetValue('MeAction', $Abilities)) {
          $Session->SetPermission('Vanilla.Comments.Me', $V == 'yes' ? TRUE : FALSE);
+      }
+      
+      /// Content curation.
+      if ($V = GetValue('Curation', $Abilities)) {
+         $Session->SetPermission('Garden.Curation.Manage', $V == 'yes' ? TRUE : FALSE);
       }
       
       // Links.

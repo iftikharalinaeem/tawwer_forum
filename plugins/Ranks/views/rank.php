@@ -135,6 +135,13 @@ echo $this->Form->Open(), $this->Form->Errors();
      ?>
    </li>
    <li>
+     <?php
+     echo $this->Form->Label('Content Curation', 'Abilities_Curation'),
+     '<div class="Info2">'."You have enhanced content curation abilities. This is a good ability to give users that you want to give a little moderation ability, but not make full moderators.".'</div>',
+      $this->Form->RadioList('Abilities_Curation', array('yes' => 'give', 'no' => 'take away', '' => 'default'));
+     ?>
+   </li>
+   <li>
       <?php
          $Options = RankModel::ContentEditingOptions();
          $Fields = array('TextField' => 'Text', 'ValueField' => 'Code');
