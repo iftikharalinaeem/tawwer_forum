@@ -34,7 +34,6 @@ class BestOfFilterModule extends Gdn_Module {
       $ReactionTypeData = $Controller->Data('ReactionTypes');
       $FilterMenu = '';
       $FilterMenu .= '<div class="BoxFilter BoxBestOfFilter">';
-         $FilterMenu .= Wrap(T('Best Of'), 'h4');
          $FilterMenu .= '<ul class="FilterMenu">';
             $FilterMenu .= $this->_Button(T('Everything'), 'Everything', $CurrentReactionType);
             foreach ($ReactionTypeData as $Key => $ReactionType) {

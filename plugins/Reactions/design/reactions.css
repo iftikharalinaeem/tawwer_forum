@@ -288,11 +288,14 @@
 /* End "Best Of" */
 
 /* NEW "Best Of" */
+.Section-BestOf #Content .BoxFilter {
+   display: block;
+}
 .Section-BestOf .BestOfData .DataList .Item:first-child {
    border-top: none;
 }
 .Section-BestOf .BoxFilter .ReactSprite {
-   margin: 1px 4px 0 0;
+   margin: 2px 4px 0 0;
 }
 .Section-BestOf .BestOfList .RecordReactions,
 .Section-BestOf .BestOfList .React.Quote,

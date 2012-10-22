@@ -395,6 +395,38 @@ body > #Frame > .Head {
   color: #ff0084;
 }
 
+#Content .BoxFilter h4 {
+   display: none;
+}
+
+#Content .FilterMenu {
+   min-height: 20px;
+   margin-bottom: 20px;
+   background-color: #f5f5f5;
+   border: 1px solid #eee;
+   border: 1px solid rgba(0, 0, 0, 0.05);
+   padding: 0px;
+   -webkit-border-radius: 4px;
+   -moz-border-radius: 4px;
+   border-radius: 4px;
+   padding: 0px 10px;
+}
+#Content .FilterMenu li {
+   margin: 0px !important;
+   padding: 0px;
+}
+#Content .FilterMenu li a {
+   border: 0px !important;
+   padding: 8px 16px !important;
+   margin: 0px !important;
+}
+#Content .FilterMenu li a:hover {
+   background: #E6E6E6;
+}
+#Content .FilterMenu li.Active a {
+   background: #0668D3;
+   color: white;
+}
 /*** Pagination ***/
 .PagerWrap {
   margin: 10px 0;
@@ -1414,7 +1446,17 @@ a.Close {
 /* Switch to the white icons when hovering over a menuitem sprite */
 .Reactions .MenuItems a:hover .ReactSprite,
 .MenuItems a:hover .Sprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+   background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}
+.FilterMenu .ReactSprite {
+   background-image: url("http://vanillicon.com/sprites/sprites-14-0668d3.png");
+}
+.FilterMenu a:hover .ReactSprite {
+   background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
+}
+.FilterMenu .Active a .ReactSprite,
+.FilterMenu .Active a:hover .ReactSprite {
+   background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
 }
 
 /* Switch to bordered icons for user reaction overlays */

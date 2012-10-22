@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['TwitterForUserGroup'] = array(
-   'Name' => 'Twitter',
+   'Name' => 'Twitter Box',
    'Description' => 'This plugin provides the capability to deploy a twitter feed box to the forum panel.',
    'Version' => '1.1',
    'RequiredApplications' => FALSE,
@@ -25,7 +25,7 @@ $PluginInfo['TwitterForUserGroup'] = array(
    'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
-class TwitterPlugin extends Gdn_Plugin {
+class TwitterForUserGroupPlugin extends Gdn_Plugin {
 
    public function Base_Render_Before(&$Sender) {
       
