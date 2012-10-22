@@ -412,12 +412,16 @@ body > #Frame > .Head {
    padding: 0px 10px;
 }
 #Content .FilterMenu li {
-   margin: 0px;
+   margin: 0px !important;
    padding: 0px;
 }
 #Content .FilterMenu li a {
-   border: 0px;
-   padding: 8px 12px !important;
+   border: 0px !important;
+   padding: 8px 16px !important;
+   margin: 0px !important;
+}
+#Content .FilterMenu li a:hover {
+   background: #E6E6E6;
 }
 #Content .FilterMenu li.Active a {
    background: #0668D3;
