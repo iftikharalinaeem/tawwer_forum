@@ -1,0 +1,17 @@
+#!/bin/bash
+repos=(
+    "/srv/www/vanilla_stage/"
+    "/srv/www/vanilla_source/"
+    "/srv/www/vanilla_source/themes/vanillaforumscom/"
+    "/srv/www/vanillaforumscom/"
+    "/srv/www/vanillaforumscom/applications/vanillaforumscom/"
+)
+	       
+echo "Checking" ${#repos[@]} "repositories for updates"
+	       
+for repo in "${repos[@]}"
+do
+    echo "Updating" ${repo}
+    cd "${repo}"
+    git pull
+done

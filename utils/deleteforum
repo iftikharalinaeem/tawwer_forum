@@ -1,0 +1,8 @@
+#!/bin/sh
+# Generates a new forum structure in /srv/www/subdomains/
+# This script assumes 1 argument is passed: the name of the subdomain to "delete"
+	
+echo "Moving subdomain to deleted folder: ${1}"
+/bin/mv /srv/www/subdomains/${1}/ /srv/www/deleted/${1}/
+
+exit

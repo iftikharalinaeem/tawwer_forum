@@ -1,0 +1,1501 @@
+/** Scaffolding **/
+/** Grid **/
+#Panel {
+  width: 300px;
+}
+
+#Body .ContentColumn {
+  margin-left: 340px;
+}
+
+.Row {
+  margin: 0 auto;
+  width: 80%;
+  max-width: 1240px;
+  min-width: 940px;
+}
+
+@media (max-width: 1100px) {
+  #Panel {
+    width: 220px;
+  }
+
+  .ProfilePhotoLarge {
+    width: 220px;
+  }
+
+  .PhotoWrap.Jailed .ProfilePhotoLarge,
+  .PhotoWrapLarge.Jailed:before {
+    width: 220px;
+    height: 220px;
+  }
+
+  #Body .ContentColumn {
+    margin-left: 240px;
+  }
+}
+@media only screen 
+   and (min-device-width : 768px) 
+   and (max-device-width : 1024px) 
+   and (orientation : portrait), (max-width: 960px) {
+  #Panel {
+    display: none;
+  }
+
+  #Body .ContentColumn {
+    margin: 0;
+  }
+
+  .Row {
+    width: inherit;
+    margin: 0 20px;
+    min-width: inherit;
+  }
+
+  .NavBar .MeWrap {
+    right: 40px !Important;
+  }
+}
+@media (min-width: 1101px) {
+  .PhotoWrapLarge {
+    border: solid 1px #ddd;
+    padding: 24px;
+    border-radius: .5ex;
+    background: #EFEFEF;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 1px #fff inset;
+    box-sizing: content-box;
+  }
+
+  .ProfilePhotoLarge,
+  .PhotoWrap a.ChangePicture {
+    width: 250px;
+  }
+
+  .PhotoWrap.Jailed .ProfilePhotoLarge,
+  .PhotoWrapLarge.Jailed:before {
+    width: 250px;
+    height: 250px;
+  }
+}
+/*** Typography ***/
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  /*   line-height: 18px;*/
+  color: #333333;
+}
+
+a,
+.FlyoutMenu a {
+  color: #0088cc;
+}
+
+/*a:hover {
+   color: #005580;
+}*/
+.Message a:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+h1, h2, h3, h4, h5 {
+  font-weight: 500;
+}
+
+.MenuItems {
+  font-size: 13px;
+}
+
+.MenuItems a {
+  line-height: 16px;
+  vertical-align: bottom;
+}
+
+.MenuItems .Sprite:after {
+  content: " ";
+}
+
+.Tag {
+  background: #0088CC;
+  display: inline-block;
+  border-radius: .4ex;
+}
+
+/** Head **/
+.NavBar {
+  background-color: #2c2c2c;
+  background-image: -moz-linear-gradient(top, #333333, #222222);
+  background-image: -ms-linear-gradient(top, #333333, #222222);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#333333), to(#222222));
+  background-image: -webkit-linear-gradient(top, #333333, #222222);
+  background-image: -o-linear-gradient(top, #333333, #222222);
+  background-image: linear-gradient(top, #333333, #222222);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  top: 0;
+}
+
+.NavBar .SiteMenu a
+.NavBar .Username {
+  font-weight: normal;
+  color: #999999;
+  text-shadow: rgba(0, 0, 0, 0.246) 0px -1px 0px;
+}
+
+body > #Frame > .Head {
+  padding: 0;
+}
+
+.SiteMenu a {
+  font-size: 13px;
+  padding: 9px 10px 11px;
+}
+
+.SiteMenu a,
+.NavBar .Username,
+.NavBar .MeBox-SignIn a {
+  color: #999;
+}
+
+.SiteMenu a:hover,
+.NavBar .Username:hover,
+.NavBar .MeBox-SignIn a:hover {
+  text-decoration: none;
+  color: #fff !Important;
+}
+
+.NavBar .Bullet {
+  color: #777777;
+}
+
+.NavBar .Row {
+  position: relative;
+}
+
+.NavBar .MeWrap {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 4px 0;
+}
+
+.NavBar .SiteTitle a {
+  color: #fff;
+  font-weight: bold;
+  line-height: 34px;
+  font-size: 21px;
+  letter-spacing: .1ex;
+}
+
+.MeBox-SignIn.Inline * {
+  line-height: 16px;
+  vertical-align: bottom;
+}
+
+/*** Subnav ***/
+.BreadcrumbsWrapper {
+  padding: 38px 0 4px;
+  background-color: #eeeeee;
+  background-repeat: repeat-x;
+  background-image: -moz-linear-gradient(top, #f5f5f5 0%, #eeeeee 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f5f5f5), color-stop(100%, #eeeeee));
+  background-image: -webkit-linear-gradient(top, #f5f5f5 0%, #eeeeee 100%);
+  background-image: -ms-linear-gradient(top, #f5f5f5 0%, #eeeeee 100%);
+  background-image: -o-linear-gradient(top, #f5f5f5 0%, #eeeeee 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f5f5f5', endColorstr='#eeeeee',GradientType=0 );
+  background-image: linear-gradient(top, #f5f5f5 0%, #eeeeee 100%);
+  margin-bottom: 25px;
+  border-bottom: solid 1px #ddd;
+  font-weight: 300;
+}
+
+/*** Forms ***/
+.FormWrapper {
+  min-height: 20px;
+  padding: 19px;
+  margin-bottom: 20px;
+  background-color: #f5f5f5;
+  border: 1px solid #eee;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+/*** Buttons ***/
+.Button, .NavButton {
+  padding: 6px 10px 6px;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: normal;
+  color: #333333;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+  vertical-align: middle;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  background-image: -ms-linear-gradient(top, white, #e6e6e6);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#e6e6e6));
+  background-image: -webkit-linear-gradient(top, white, #e6e6e6);
+  background-image: -o-linear-gradient(top, white, #e6e6e6);
+  background-image: linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -moz-linear-gradient(top, white, #e6e6e6);
+  background-repeat: repeat-x;
+  border: 1px solid #cccccc;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+  border-bottom-color: #b3b3b3;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0);
+  filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.Button:hover, .NavButton:hover {
+  color: #333333;
+  text-decoration: none;
+  background-color: #e6e6e6;
+  background-position: 0 -15px;
+  -webkit-transition: background-position 0.1s linear;
+  -moz-transition: background-position 0.1s linear;
+  -ms-transition: background-position 0.1s linear;
+  -o-transition: background-position 0.1s linear;
+  transition: background-position 0.1s linear;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+  border-bottom-color: #b3b3b3;
+}
+
+.Button.Handle, .NavButton.Handle {
+  padding-left: 6px;
+  padding-right: 6px;
+  line-height: 16px;
+}
+
+.BigButton {
+  padding: 9px 14px;
+  font-size: 15px;
+  line-height: normal;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.ButtonGroup.Big .Button {
+  line-height: 1;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  max-width: 180px;
+}
+
+.Button.Primary {
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #0074cc;
+  background-image: -ms-linear-gradient(top, #0088cc, #0055cc);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0055cc));
+  background-image: -webkit-linear-gradient(top, #0088cc, #0055cc);
+  background-image: -o-linear-gradient(top, #0088cc, #0055cc);
+  background-image: -moz-linear-gradient(top, #0088cc, #0055cc);
+  background-image: linear-gradient(top, #0088cc, #0055cc);
+  background-repeat: repeat-x;
+  border-color: #0055cc #0055cc #003580;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#0088cc', endColorstr='#0055cc', GradientType=0);
+  filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+}
+
+.Button.Primary:hover {
+  background-color: #0055cc;
+  border-color: #0055cc #0055cc #003580;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.Handle.Primary .Sprite {
+  border-color: #fff transparent transparent transparent;
+}
+
+.Open .Handle .Sprite {
+  margin-top: 2px;
+}
+
+.Open .Handle.Primary .Sprite {
+  border-color: #000 transparent transparent transparent;
+}
+
+/*** Navigation ***/
+#Panel .FilterMenu {
+  min-height: 20px;
+  margin-bottom: 20px;
+  background-color: #f5f5f5;
+  border: 1px solid #eee;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 8px 0;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+#Panel .FilterMenu li {
+  border: none !Important;
+  padding: 0;
+}
+
+#Panel .FilterMenu li {
+  padding: 0;
+}
+
+#Panel .FilterMenu li a {
+  display: block;
+  padding: 3px 15px;
+  line-height: 18px;
+  vertical-align: middle;
+}
+
+#Panel .FilterMenu li a:hover {
+  background-color: #eeeeee;
+}
+
+#Panel .FilterMenu .Active a,
+#Panel .FilterMenu .Active a:hover,
+.PanelInfo .Active {
+  color: #ffffff;
+  font-weight: normal;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+  background-color: #0088cc;
+}
+
+#Panel .FilterMenu .Active a,
+.PanelInfo .Active a {
+  color: #ffffff;
+}
+
+#Panel .SideMenu .PanelInfo li {
+  padding: 0;
+}
+#Panel .SideMenu .PanelInfo li a {
+  padding: 5px 10px;
+  display: block;
+  text-shadow: none;
+}
+#Panel .SideMenu .PanelInfo li a:hover {
+  color: #ff0084;
+}
+
+#Content .BoxFilter h4 {
+   display: none;
+}
+
+#Content .FilterMenu {
+   min-height: 20px;
+   margin-bottom: 20px;
+   background-color: #f5f5f5;
+   border: 1px solid #eee;
+   border: 1px solid rgba(0, 0, 0, 0.05);
+   padding: 0px;
+   -webkit-border-radius: 4px;
+   -moz-border-radius: 4px;
+   border-radius: 4px;
+   padding: 0px 10px;
+}
+#Content .FilterMenu li {
+   margin: 0px !important;
+   padding: 0px;
+}
+#Content .FilterMenu li a {
+   border: 0px !important;
+   padding: 8px 16px !important;
+   margin: 0px !important;
+}
+#Content .FilterMenu li a:hover {
+   background: #E6E6E6;
+}
+#Content .FilterMenu li.Active a {
+   background: #0668D3;
+   color: white;
+}
+/*** Pagination ***/
+.PagerWrap {
+  margin: 10px 0;
+}
+
+.Pager a, .Pager span {
+  border: 1px solid #ddd;
+  border-left-width: 0;
+  padding: 0 11px;
+  line-height: 28px;
+  margin: 0;
+  font-weight: normal;
+  font-size: 13px;
+}
+
+.NumberedPager .Previous {
+  border-left-width: 1px;
+  border-radius: 3px 0 0 3px;
+}
+
+.NumberedPager .Next {
+  border-radius: 0 3px 3px 0;
+}
+
+.PrevNextPager a {
+  border-width: 1px;
+  border-radius: 3px;
+}
+
+.Pager a:hover, .Pager .Highlight {
+  background-color: #f5f5f5;
+}
+
+.Pager .Highlight {
+  color: #999999;
+}
+
+#Content .BoxNewDiscussion {
+  display: inline-block;
+}
+
+#Content .BoxNewDiscussion .MenuItems {
+  min-width: 175px;
+}
+
+#Panel .BoxNewDiscussion {
+  display: none;
+}
+
+#Panel .BoxNewDiscussion + div {
+  margin-top: 0;
+}
+
+.MenuItems a {
+  text-shadow: none !Important;
+}
+
+.PageControls {
+  min-height: 30px;
+}
+
+.MiniPager {
+  border: solid 1px #dddddd;
+  border-radius: 2.5px;
+  line-height: 1;
+  font-size: 9px;
+}
+
+.MiniPager a {
+  display: inline-block;
+  margin: 0;
+  border-left: solid 1px #dddddd;
+  padding: 2px 5px;
+}
+
+.MiniPager :first-child {
+  border-left: none;
+}
+
+/*** Badges ***/
+.Count {
+  border-radius: .4ex;
+}
+
+/*** Datalist ***/
+.DataList {
+  border: solid 1px #dddddd;
+  border-radius: .5ex;
+}
+
+.Item {
+  padding: 10px;
+}
+
+.DataList.Discussions .Item {
+  padding: 10px 170px 8px 12px;
+}
+
+.DataList .Item:first-child {
+  border-top-right-radius: .5ex;
+  border-top-left-radius: .5ex;
+}
+
+.DataList .Item:last-child {
+  border-bottom: none;
+  border-bottom-right-radius: .5ex;
+  border-bottom-left-radius: .5ex;
+}
+
+.DataList.Discussions .MCount, .DataList.Discussions .HasNew {
+  position: absolute;
+  background: #f5f5f5;
+  background: rgba(0, 0, 0, 0.04);
+  color: #000;
+  width: 75px;
+  padding: 6px 2px;
+  margin: 0;
+  top: 6px;
+  text-align: center;
+  line-height: 1;
+  height: 38px;
+  border-radius: .5ex;
+}
+
+.DataList.Discussions .MCount .Number, .DataList.Discussions .HasNew .Number {
+  font-size: 20px;
+  font-weight: bold;
+  display: block;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+
+.DataList.Discussions .ViewCount {
+  right: 85px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.DataList.Discussions .CommentCount, .DataList.Discussions .HasNew {
+  right: 6px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.DataList.Discussions .HasNew {
+  font-weight: normal;
+  font-size: 11px;
+}
+
+.Item.Read {
+  opacity: 1;
+  background: #efefef;
+}
+
+.Item.Read a {
+  color: #777;
+}
+
+.Item.Read .Tag, .Item.Read .Tag a {
+  background: #bbb !Important;
+  color: #f7f7f7 !Important;
+}
+
+.DataList.Discussions .Item.Read .MCount, .DataList.Discussions .Item.Read .HasNew {
+  color: #777;
+}
+
+.CommentHeading {
+  min-height: 30px;
+  /* make room for pager */
+  margin: 10px 0;
+}
+
+.Item .AuthorInfo .MItem,
+.Item .CommentInfo .MItem {
+  margin: 0;
+  color: #777;
+}
+
+.Item .AuthorInfo .MItem:before,
+.Item .CommentInfo .MItem:before {
+  content: " • ";
+  color: #bbb;
+}
+
+.Item .CommentInfo .MItem:first-child:before {
+  content: "";
+}
+
+.Item #latest {
+  margin: -50px;
+}
+
+.CategoryGroup + .CategoryGroup h2 {
+  margin-top: 15px;
+}
+
+/** DataTables **/
+.DataTable td {
+  border: 0;
+}
+
+.DataTable tbody td {
+  border: solid 0px #ddd;
+  border-bottom-width: 1px;
+}
+
+.DataTable tbody tr:first-child td {
+  border-top-width: 1px;
+}
+
+.DataTable tbody td:first-child {
+  border-left-width: 1px;
+  padding-left: 10px;
+}
+
+.DataTable tbody td:last-child {
+  border-right-width: 1px;
+  padding-right: 10px;
+}
+
+.DataTable td.CheckBoxColumn {
+  padding-left: 4px !important;
+  width: 20px;
+}
+
+.DataTable tbody tr:first-child td:first-child {
+  border-top-left-radius: .5ex;
+}
+
+.DataTable tbody tr:first-child td:last-child {
+  border-top-right-radius: .5ex;
+}
+
+.DataTable tbody tr:last-child td:first-child {
+  border-bottom-left-radius: .5ex;
+}
+
+.DataTable tbody tr:last-child td:last-child {
+  border-bottom-right-radius: .5ex;
+}
+
+.Activities ul.DataList {
+  border: none;
+  border-radius: 0;
+}
+.Activities .DataList .Item:first-child {
+  border-radius: 0;
+}
+
+/** Panels and Boxes **/
+.Box {
+  background: rgba(0, 0, 0, 0.02);
+  padding: 10px;
+  border: solid 1px #ddd;
+  border-radius: .5ex;
+  margin: 20px 0;
+}
+
+.Box h4 {
+  background: rgba(0, 0, 0, 0.02);
+  margin: -10px -10px 10px;
+  padding: 15px 10px;
+  line-height: 1;
+  border-radius: .5ex .5ex 0 0;
+  border-bottom: solid 1px #ddd;
+  box-shadow: 0 1px 1px #fff inset;
+}
+
+.Box h4 + .PanelInfo {
+  margin-top: -10px;
+  margin-bottom: -10px;
+}
+
+#Panel .PanelInfo li {
+  margin: 0 -10px;
+  padding: 5px 10px;
+}
+
+#Panel .PanelInfo .Heading {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+#Panel .PanelInfo li .ItemLink {
+  padding: 5px 10px;
+  margin: -5px -10px;
+  display: block;
+}
+
+#Panel .PanelInfo li a:hover {
+  background-color: #f2f2f2;
+}
+
+#Panel .PanelInfo li:first-child {
+  border-top: none;
+}
+
+#Panel .PanelInfo li:last-child {
+  border-bottom: none;
+}
+
+.TagCloud li .Count {
+  display: none;
+}
+
+.TagCloud li {
+  background: #08c;
+  border: 0;
+  border-radius: .4ex;
+  padding: 3px 6px;
+}
+
+.TagCloud li a {
+  color: #fff;
+}
+
+/** Reactions **/
+.Reactions a {
+  color: #666;
+}
+
+.Reactions {
+  opacity: .8;
+}
+
+.Item:hover .Reactions,
+.Open .Reactions {
+  opacity: 1;
+}
+
+/** Popups **/
+div.Popup .Body {
+  min-width: 300px;
+  padding: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+}
+
+div.Popup .Border {
+  background: none;
+}
+
+.Overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+div.Popup h1 {
+  margin: -15px -15px 15px;
+  padding: 9px 15px;
+  border-bottom: solid 1px #eee;
+  font-size: 18px;
+  line-height: 27px;
+}
+
+div.Popup .Buttons {
+  margin: 15px -15px -15px;
+  padding: 15px;
+  background: #f5f5f5;
+  border-top: 1px solid #ddd;
+  box-shadow: inset 0 1px 0 #ffffff;
+  border-radius: 0 0 6px 6px;
+}
+
+a.Close {
+  font-family: inherit;
+  top: 9px;
+  right: 15px;
+  opacity: .4;
+}
+
+a.Close:hover {
+  opacity: 1;
+}
+
+/** Messages **/
+.DismissMessage {
+  border-radius: .5ex;
+  margin-bottom: 15px;
+  font-size: 14px;
+  padding: 8px 14px;
+}
+
+.DismissMessage a.Dismiss {
+  color: inherit;
+  padding: 1px 4px;
+  text-shadow: none;
+  top: 0;
+  right: 0;
+}
+
+/** General Sprite Stuff **/
+.Sprite, .Sprite16 {
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  vertical-align: text-top;
+  border: solid 2px transparent;
+  margin: -2px;
+  display: inline-block;
+}
+
+.MenuItems a .Sprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-333333.png");
+}
+
+.ReactButton {
+  line-height: 16px;
+}
+
+.ReactSprite {
+  height: 16px;
+  width: 16px;
+}
+
+.ReactLabel {
+  line-height: 16px;
+}
+
+.ReactEverything {
+  background-position: -360px -100px;
+}
+
+.ReactAwesome {
+  background-position: -240px -20px;
+}
+
+.ReactFlag {
+  background-position: -60px -60px;
+}
+
+.ReactInsightful {
+  background-position: -140px -20px;
+}
+
+.ReactOffTopic {
+  background-position: -160px -20px;
+}
+
+.ReactAbuse {
+  background-position: -20px -60px;
+}
+
+.SpSpam, .ReactSpam {
+  background-position: -120px -20px;
+}
+
+.ReactTroll {
+  background-position: -100px -20px;
+}
+
+.ReactPromote {
+  background-position: -60px -40px;
+}
+
+.ReactDisagree {
+  background-position: -40px -20px;
+}
+
+.ReactAgree {
+  background-position: -20px -20px;
+}
+
+.ReactDislike {
+  background-position: -40px -40px;
+}
+
+.ReactLike {
+  background-position: -20px -40px;
+}
+
+.ReactDown {
+  background-position: -200px -40px;
+}
+
+.ReactUp {
+  background-position: -180px -40px;
+}
+
+.ReactWTF {
+  background-position: -80px -20px;
+}
+
+.ReactLOL {
+  background-position: -60px -20px;
+}
+
+.ReactQuote {
+  background-position: -280px -20px;
+}
+
+.ReactInfraction {
+  background-position: -200px -20px;
+}
+
+.ReactAccept {
+  background-position: -20px -100px;
+}
+
+.ReactReject {
+  background-position: -40px -100px;
+}
+
+.ReactFacebook {
+  background-position: -40px -120px;
+}
+
+.ReactTwitter {
+  background-position: -60px -120px;
+}
+
+.ReactGooglePlus {
+  background-position: -80px -120px;
+}
+
+/** General Sprites **/
+.SpActivity {
+  background-position: -160px -120px;
+}
+
+.SpAllCategories {
+  background-position: -60px -140px;
+}
+
+.SpApplicants {
+  background-position: -260px -40px;
+}
+
+.SpBadge {
+  background-position: -240px -140px;
+}
+
+.SpBan {
+  background-position: -300px -20px;
+}
+
+.SpBookmarks {
+  background-position: -100px -80px;
+}
+
+.SpComments, .SpComment {
+  background-position: -160px -80px;
+}
+
+.SpConnection {
+  background-position: -320px -20px;
+}
+
+.SpDashboard {
+  background-position: -340px -20px;
+}
+
+.SpDelete {
+  background-position: -340px -140px;
+}
+
+.SpDiscussions, .SpMyDiscussions {
+  background-position: -200px -80px;
+}
+
+.SpImage {
+  background-position: -120px -140px;
+}
+
+.SpInbox {
+  background-position: -80px -100px;
+}
+
+.SpMessage {
+  background-position: -100px -100px;
+}
+
+.SpMod {
+  background-position: -260px -60px;
+}
+
+.SpMyDrafts {
+  background-position: -180px -20px;
+}
+
+.SpNotifications {
+  background-position: -160px -100px;
+}
+
+.SpOptions {
+  background-position: -180px -60px;
+}
+
+.SpPhoto {
+  background-position: -160px -60px;
+}
+
+.SpProfile, .SpEditProfile {
+  background-position: -220px -40px;
+}
+
+.SpQuote {
+  background-position: -280px -20px;
+}
+
+.SpSignOut {
+  background-position: -240px -100px;
+}
+
+.SpText {
+  background-position: -160px -80px;
+}
+
+.SpUnansweredQuestions {
+  background-position: -60px -100px;
+}
+
+.SpWarn, .SpWarnings {
+  background-position: -200px -20px;
+}
+
+/** Profile Sprites **/
+dl.About dt.Badges,
+dl.About dt.Points {
+  background-position: 0 -120px;
+}
+dl.About dt.Email {
+  background-position: 0 -60px;
+}
+dl.About dt.Name {
+  background-position: 0 -80px;
+}
+dl.About dt.IP {
+  background-position: 0 -140px;
+}
+dl.About dt.Joined,
+dl.About dt.LastActive {
+  background-position: 0 -40px;
+}
+dl.About dt.Roles {
+  background-position: 0 -100px;
+}
+dl.About dt.Visits {
+  background-position: 0 -160px;
+}
+
+/** Typography **/
+body {
+  background: white;
+  color: #333333;
+}
+
+a,
+.FlyoutMenu a {
+  color: #0088cc;
+}
+
+a.TextColor, a .TextColor {
+  color: #333333;
+}
+
+a:hover, a.TextColor:hover, a:hover .TextColor {
+  color: #ff0084;
+}
+
+h1, h2, h3, h4, h5,
+h1 a, h2 a, h3 a, h4 a, h5 a {
+  color: black;
+  font-family: inherit;
+}
+
+.Tag, .TagCloud li {
+  background: #0668d3;
+  color: white;
+}
+
+.Tag a {
+  color: white;
+}
+
+.Count {
+  background: #0668d3;
+  color: white;
+}
+
+.Active .Count {
+  color: #0668d3;
+  background: white;
+}
+
+.Item .AuthorInfo .MItem, .Item .CommentInfo .MItem,
+.Item .AuthorInfo .MItem::before, .Item .CommentInfo .MItem::before,
+.Gloss {
+  color: #666666;
+}
+
+/** Navigation **/
+.NavBar {
+  background-color: #1d1d1d;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #323232), color-stop(100%, #1d1d1d));
+  background-image: -webkit-linear-gradient(top, #323232, #1d1d1d);
+  background-image: -moz-linear-gradient(top, #323232, #1d1d1d);
+  background-image: -o-linear-gradient(top, #323232, #1d1d1d);
+  background-image: -ms-linear-gradient(top, #323232, #1d1d1d);
+  background-image: linear-gradient(top, #323232, #1d1d1d);
+}
+
+.SiteMenu a, .NavBar .Username, .NavBar .MeBox-SignIn a {
+  color: #999999;
+}
+
+.NavBar .FlyoutButton:hover .Sprite16,
+.NavBar .Open .MeMenu .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}
+
+.BreadcrumbsWrapper {
+  background: #f2f2f2;
+  border-bottom-color: #dedede;
+}
+
+/** DataLists **/
+.DataList {
+  border-color: #dddddd;
+}
+
+.DataList .Item, .DataList .Item {
+  border-color: #dddddd;
+}
+
+.DataList .Item,
+.DataTable .Item {
+  background-color: white;
+}
+
+.Item.Read {
+  background: #f2f2f2;
+  color: #999999;
+}
+
+.Item.Read a {
+  color: #999999;
+}
+
+.Item.Read a:hover {
+  color: #ff0084;
+}
+
+.Item.Read .Tag, .Item.Read .Tag a {
+  background: #999999 !important;
+  color: #f2f2f2 !important;
+}
+
+.ItemDiscussion .Meta, .DataList .Meta {
+  color: #666666;
+}
+
+.DataList.Discussions .MCount, .DataList.Discussions .HasNew {
+  color: #333333;
+}
+
+.DataList.Discussions .HasNew {
+  background: #0668d3;
+  color: white;
+}
+
+.DataTable tbody td {
+  border-color: #dddddd;
+}
+
+.Activities .DataList li {
+  background: #f7f7f7;
+}
+
+/** Forms **/
+.Button, .NavButton {
+  background-color: white;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #e6e6e6));
+  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: linear-gradient(top, #ffffff, #e6e6e6);
+  border-color: #cccccc;
+  color: black;
+}
+
+.Button:hover, .NavButton:hover {
+  background-color: #e6e6e6;
+  color: black;
+  border-color: #cccccc;
+}
+
+.NavButton.Handle .Sprite, .Button.Handle .Sprite {
+  border-top-color: black;
+}
+
+.NavButton:hover, .NavButton {
+  box-shadow: 0 1px 1px #e6e6e6;
+}
+
+.Button.Primary {
+  background-color: #0668d3;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #1481f8), color-stop(100%, #0550a1));
+  background-image: -webkit-linear-gradient(top, #1481f8, #0550a1);
+  background-image: -moz-linear-gradient(top, #1481f8, #0550a1);
+  background-image: -o-linear-gradient(top, #1481f8, #0550a1);
+  background-image: -ms-linear-gradient(top, #1481f8, #0550a1);
+  background-image: linear-gradient(top, #1481f8, #0550a1);
+  border-color: #0550a1 #0550a1 #033770;
+  color: white;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.75);
+}
+
+.Button.Primary:hover {
+  background-color: #0550a1;
+  border-color: #033770;
+}
+
+.NavButton.Primary.Handle .Sprite, .Button.Primary.Handle .Sprite {
+  border-top-color: white;
+}
+
+.ButtonGroup.Open .Button.Handle,
+.ButtonGroup.Open .NavButton.Handle {
+  background: #f2f2f2;
+  background-image: none;
+  border-color: #e6e6e6;
+  box-shadow: 0 0px 14px #999999 inset;
+}
+
+.ButtonGroup.Open .Button.Primary.Handle {
+  background: #055cba;
+  background-image: none;
+  border-color: #0550a1;
+  box-shadow: 0 2px 12px #00060d inset;
+}
+
+.Open .Handle.Primary .Sprite {
+  border-top-color: #fff;
+}
+
+.FormWrapper {
+  background-color: accent();
+}
+
+/** Pagers **/
+.Pager a, .Pager span {
+  border-color: #dddddd;
+  background-color: white;
+}
+
+.Pager a:hover, .Pager .Highlight {
+  background-color: #cccccc;
+}
+
+.Pager .Highlight {
+  color: gray;
+}
+
+.MiniPager {
+  border-color: #dddddd;
+}
+
+.MiniPager a {
+  border-color: #dddddd;
+}
+
+.MiniPager a:hover {
+  background-color: #e6e6e6;
+}
+
+/** Sprites **/
+.OptionsTitle, a.Bookmark, a.Bookmarked, a.Bookmarking {
+  background-image: url("http://vanillicon.com/sprites/ui_sprites-16c-333333.png");
+}
+
+.Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-555555.png");
+}
+
+a .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-0088cc.png");
+}
+
+a:hover .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
+}
+
+dl.About dt {
+  background: url("http://vanillicon.com/sprites/profile-sprites-666666.png") 0 0 no-repeat;
+  color: #737373;
+}
+
+.Reactions a {
+  color: #555555;
+}
+
+.Reactions a:hover {
+  color: #ff0084;
+}
+
+/** Popups **/
+div.Popup .Body {
+  background-color: white;
+}
+
+div.Popup h1 {
+  border-color: #dddddd;
+}
+
+div.Popup .Buttons {
+  background-color: #e6e6e6;
+  border-color: #dddddd;
+  box-shadow: inset 0 1px 0 white;
+}
+
+a.Close {
+  color: #333333;
+}
+
+/** Panel **/
+.Box {
+  border-color: #e6e6e6;
+  background-color: white;
+}
+
+.Box h4 {
+  background: #f2f2f2;
+  border-color: #e6e6e6;
+  box-shadow: 0 1px 1px white inset;
+}
+
+@media (min-width: 1101px) {
+  .PhotoWrapLarge {
+    border-color: #e6e6e6;
+    background: white;
+    box-shadow: 0 1px 1px white inset;
+  }
+}
+#Panel .FilterMenu {
+  background-color: #f2f2f2;
+}
+
+#Panel .FilterMenu li a:hover {
+  background-color: #e6e6e6;
+}
+
+#Panel .PanelInfo li a:hover {
+  background-color: #f2f2f2;
+}
+
+#Panel .PanelInfo li {
+  border-color: #e6e6e6;
+}
+
+.Hero {
+  background: #f2f2f2;
+}
+
+#Panel .FilterMenu .Active a, #Panel .FilterMenu .Active a:hover, .PanelInfo .Active {
+  background: #0668d3;
+  color: white;
+}
+
+#Panel .FilterMenu .Active a .Sprite,
+#Panel .FilterMenu .Active a:hover .Sprite,
+.PanelInfo .Active .Sprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}
+
+/** Messages **/
+.WarningMessage {
+  color: #c09853;
+  background-color: #fcf8e3;
+  border-color: #dec89b;
+}
+
+.InfoMessage {
+  color: #3a87ad;
+  background-color: #d9edf7;
+  border-color: #89bad2;
+}
+
+.AlertMessage {
+  color: #b94a48;
+  background-color: #f2dede;
+  border-color: #d59493;
+}
+
+.CasualMessage {
+  color: #666666;
+  background-color: #f2f2f2;
+  border-color: #acacac;
+}
+
+/** Misc **/
+.ActivateSlider {
+  background: #f2f2f2;
+  box-shadow: 0 10px 30px #bfbfbf inset;
+  border-color: #e6e6e6;
+}
+
+/** Me box **/
+.NavBar .MeMenu .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-999999.png");
+}
+
+/** Reactions **/
+.ReactSprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-555555.png");
+}
+
+.Reactions a:hover .ReactSprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
+}
+
+/* Switch to the white icons when hovering over a menuitem sprite */
+.Reactions .MenuItems a:hover .ReactSprite,
+.MenuItems a:hover .Sprite {
+   background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}
+.FilterMenu .ReactSprite {
+   background-image: url("http://vanillicon.com/sprites/sprites-14-0668d3.png");
+}
+.FilterMenu a:hover .ReactSprite {
+   background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
+}
+.FilterMenu .Active a .ReactSprite,
+.FilterMenu .Active a:hover .ReactSprite {
+   background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}
+
+/* Switch to bordered icons for user reaction overlays */
+.UserReactionWrap .ReactSprite {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-outline-000000.png");
+}
+
+.Sprite,
+.Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-333333.png");
+}
+
+a .Sprite,
+a .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-0088cc.png");
+}
+
+a.TextColor .Sprite,
+a.TextColor .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-333333.png");
+}
+
+a:hover .Sprite,
+a:hover .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
+}
+
+.Button .Sprite,
+.NavButton .Sprite,
+.Button .Sprite16,
+.NavButton .Sprite16,
+.Button:hover .Sprite,
+.NavButton:hover .Sprite,
+.Button:hover .Sprite16,
+.NavButton:hover .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-000000.png");
+}
+
+.Button.Primary .Sprite,
+.Button.Primary .Sprite16 {
+  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}

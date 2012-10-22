@@ -1,0 +1,11 @@
+html {
+   background: #000; 
+}
+body {
+   background: #000; 
+	color: #000;
+}
+
+#Frame{
+	background:transparent url(images/space-desktop.jpg) no-repeat center top;
+}

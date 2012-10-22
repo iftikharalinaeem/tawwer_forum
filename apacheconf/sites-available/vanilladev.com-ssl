@@ -1,0 +1,22 @@
+<VirtualHost *:443>
+        ServerAdmin support@vanilladev.com
+        ServerName vanilladev.com
+		  ServerAlias www.vanilladev.com
+		  DocumentRoot /srv/www/vanilladev
+		  ErrorDocument 404 http://vanillaforums.com/filenotfound
+		  <Directory /srv/www/vanilladev/>
+					 Options FollowSymLinks MultiViews
+					 AllowOverride All
+		  </Directory>
+        ErrorLog /srv/log/vanilladev/error.log
+        LogLevel warn
+        CustomLog /srv/log/vanilladev/access.log combined
+        ServerSignature Off
+		  
+		  <IfModule mod_ssl.c>
+					 SSLEngine on
+					 SSLOptions +FakeBasicAuth +ExportCertData +StrictRequire
+					 SSLCertificateFile /etc/ssl/certs/server.crt
+					 SSLCertificateKeyFile /etc/ssl/private/server.key
+		  </IfModule>
+</VirtualHost>

@@ -1,0 +1,195 @@
+﻿/* ========================================= VanillaForums.org Customizations */
+
+/* ---- General Styles ---- */
+
+
+a {
+   color: #106294;
+}
+a:hover {
+   color: #106294;
+}
+body {
+	background: #fff;
+        overflow:scroll;
+        margin: 0;
+        padding: 0;
+}
+#Frame {
+	border-top: 1px solid #fff;
+	background: url('images/fade.jpg') top left repeat-x #fff;
+}
+
+/* ---- Banner ---- */
+.Banner {
+   background-color:#02468d;
+   border-bottom: 1px solid #183a7c;
+	text-align: center;
+	height: 130px;
+   width:100%;
+}
+
+.Logo {float:left;
+       width:324px;
+       margin-left:15px;
+       margin-top:18px;
+       height:48px;
+
+              
+}
+.navigation {width:560px; padding-top:83px; margin-left:auto; margin-right:auto;}
+a.ol3:link,a.ol3:hover,a.ol3:visited,a.ol3:active {
+font-family:'Trebuchet MS', 'helvetica nueue', helvetica;
+
+text-decoration: none;
+color: #fff;
+text-shadow: 1px 1px 1px #000; }
+
+.ol3 {display: block; 
+   font-size:15px;
+   font-weight:bold;
+   height: 46px;
+   line-height: 46px;
+   padding: 0px 16px 0 16px;
+  }
+.nav {height: 46px;  white-space:nowrap
+}
+.navforum {background: url('images/tab_nav_forum.png') no-repeat left bottom;
+height: 46px; white-space:nowrap; width:115px;}
+.navfaq {background: url('images/tab_nav_faq.png') no-repeat left bottom; width:76px;
+height: 46px; white-space:nowrap; }
+.navntfs {background: url('images/tab_nav_ntfs.png') no-repeat left bottom; width:156px;
+height: 46px; white-space:nowrap;}
+.navsoftware {background: url('images/tab_nav_software.png') no-repeat left bottom;width:199px;
+height: 46px; white-space:nowrap;}
+
+.BannerWrapper {
+	width:100%;
+	margin: auto;
+	text-align: center;
+        
+}
+.Banner div.UserOptions {
+ 	float: right; 
+	background: url('images/userinfo_left.png') left bottom no-repeat;
+}
+.Banner div.UserOptions div {
+	background: url('images/userinfo_right.png') right bottom no-repeat;
+	padding: 0 40px 4px 4px;
+	margin-left: 6px;
+}
+.Banner div.UserOptions a {
+	color: #fff;
+	text-shadow: 0 1px 0 #000;
+	margin: 0 8px;
+	font-family: 'Trebuchet MS', Arial;
+	font-size: 11px;
+}
+.Banner div.UserOptions a.Username:hover,
+.Banner div.UserOptions a.Inbox:hover {
+	text-decoration: none;
+}
+.Banner div.UserOptions a.Username:hover em,
+.Banner div.UserOptions a.Inbox:hover em {
+	text-decoration: underline;
+}
+.Banner div.UserOptions a span {
+	margin: 0 0 0 6px;
+	background: #8b8bff;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	color: #fff;
+	padding: 0 2px;
+	font-weight: normal;
+	font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+	text-shadow: 0 1px 0 #000;;
+}
+.Banner h1 {
+   border: 0;
+   margin: 0;
+   padding: 0;
+}
+.Banner h1 a {
+	margin: 10px 0 0;
+	float: left;
+   display: block;
+}
+.Banner h1 a span {
+	color: #fff;
+	font-size: 30px;
+}
+.Navigation ul {
+   list-style: none;
+
+   
+}
+.Navigation ul li {
+	float: right;
+	height: 46px;
+	padding-left: 0px;
+	margin-left: 0px;
+	margin-right:0px;
+    display:inline
+       
+     
+}
+.Navigation ul li a {
+   display: block;
+   font-family:'Trebuchet MS', 'helvetica nueue', helvetica;
+   font-size:15px;
+   font-weight:bold;
+   text-decoration: none;
+   color: #fff;
+   text-shadow:1px 1px 1px #000;
+	height: 46px;
+	line-height: 46px;
+	padding: 0 14px 0 10px;
+	white-space:nowrap
+}
+.Navigation ul li.Download {
+	background: url('images/dl_left.png') left center no-repeat;	
+}
+.Navigation ul li.Download a {
+	background: url('images/dl_right.png') right center no-repeat;
+}
+body#garden_search_index .Banner ul li.Community,
+body#vforg_home_index .Banner ul li.Home,
+body.hosting .Banner ul li.Hosting,
+body.Wiki .Banner ul li.Documentation,
+body.Addons .Banner ul li.Addons,
+body.Profile .Banner ul li.Community,
+body.Vanilla .Banner ul li.Community,
+body.Conversations .Banner ul li.Community,
+body.Activity .Banner ul li.Community {
+	background: url('images/tab_left.png') left center no-repeat;	
+}
+body#garden_search_index .Banner ul li.Community a,
+body#vforg_home_index .Banner ul li.Home a,
+body.hosting .Banner ul li.Hosting a,
+body.Wiki .Banner ul li.Documentation a,
+body.Addons .Banner ul li.Addons a,
+body.Profile .Banner ul li.Community a,
+body.Vanilla .Banner ul li.Community a,
+body.Conversations .Banner ul li.Community a,
+body.Activity .Banner ul li.Community a {
+	background: url('images/tab_right.png') right center no-repeat;
+}
+
+
+/* --- Search --- */
+div.SearchForm {
+	padding: 6px;
+	border-radius: 4px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border: 1px solid #acacac;
+	background: #fafafa;
+	margin: 0 0 10px;
+}
+div.SearchForm input.InputBox {
+	margin-right: 10px;
+   width: 630px;
+}
+.BreadcrumbsWrapper {
+   margin-bottom: 20px;
+}

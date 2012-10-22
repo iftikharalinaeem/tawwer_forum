@@ -1,0 +1,6 @@
+#Head div.User a.MyAccountLink {
+	background: url('bg-button.png') top left repeat-x;
+}
+#Head div.User a.MyAccountLink:focus {
+	background: #138b01;
+}

@@ -1,0 +1,60 @@
+@import "defaults";
+
+/// Scaffolding ///
+
+$bodyBackground: #FDE8E6;
+$textColor: #60364E;
+$headingsColor: darken($textColor, 10%);
+
+$linkColor: darken(#98c1d6, 30%);
+$linkColorHover: #ff0084;
+
+/// Tables & Lists ///
+
+$borderColor: darken($bodyBackground, 5%);
+
+/// Forms ///
+
+$btnBackground: lighten($bodyBackground, 10%);
+$btnColor: $textColor;
+$btnPrimaryBackground: #396178;
+$btnPrimaryColor: #fff;
+
+$formBackground: accent();
+
+/// Navigation ///
+
+$navbarText: lighten(#8EB8D0, 20%)  ;
+$navbarTextHover: #fff;
+$navbarSpriteStyle: "sprites-14";
+
+$navbarBackground: #262f37;
+$navbarBackgroundHighlight: lighten($navbarBackground, 3%);
+
+$spriteStyle: "sprites-14-sweetx";
+$spriteStyleHover: "sprites-14-sweetxc";
+
+$boxBackground: darken($bodyBackground, 2%);
+$listBackground: lighten($bodyBackground, 2%);
+
+$readBackground: lighten(#F8CCC6, 5%);
+$readColor: darken(#F8CCC6, 10%);
+
+/// Alerts ///
+
+$warningText: darken(#c09853, 5%);
+$warningBackground: #fcf8e3;
+
+$errorText: #A61D00;
+$errorBackground: #FBD2CD;
+
+$successText: #468847;
+$successBackground: #dff0d8;
+
+$infoText: #3a87ad;
+$infoBackground: #d9edf7;
+
+$casualText: lighten($textColor, 3%);
+$casualBackground: lighten($bodyBackground, 3%);
+
+@import "colors";

@@ -1,0 +1,67 @@
+.ColorPickerPlugin .ColorPicker {
+   background-color: #444;
+/*   border-top: solid 1px #aaa;*/
+   color: #fff;
+   display: block;
+   left: 0;
+   max-height: 50%;
+   overflow: scroll;
+   padding: 3px 9px 3px 9px;
+   position: fixed;
+   width: 100%;
+   bottom: 0px;
+   text-align: left;
+   vertical-align: top;
+   box-shadow: 0 0 10px #000;
+   -moz-box-shadow: 0 0 10px #000;
+   -webkit-box-shadow: 0 0 10px #000;
+}
+
+.ColorPickerPlugin .Groups {
+}
+
+.ColorPickerPlugin .ColorGroup {
+   display: inline-block;
+   width: 125px;
+   vertical-align: top;
+}
+
+.ColorPickerPlugin .Stub {
+   display: block;
+   background-color: #f00;
+}
+
+.ColorPickerPlugin .BigSwatch {
+   border: solid 2px #ddd;
+   cursor: pointer;
+   height: 66px; /* golden ratio, that's right! */
+   margin: 5px;
+   width: 106px;
+}
+
+.ColorPickerPlugin .Swatches {
+   width: 112px;
+   margin: 4px;
+   line-height: 6px;
+}
+
+.ColorPickerPlugin .Swatches .Swatch {
+   cursor: pointer;
+   display: inline-block;
+   height: 1em;
+   width: 1em;
+   border: solid 1px #ddd;
+   line-height: 1px;
+   margin: 1px;
+   overflow: hidden;
+   padding: 0px;
+   color: #fff;
+   text-shadow: #000 0 0 4px;
+}
+
+.ColorPickerPlugin .Hover {
+   box-shadow: 0 0 10px #ddd;
+   -moz-box-shadow: 0 0 10px #ddd;
+   -webkit-box-shadow: 0 0 10px #ddd;
+   border-color: #fff;
+}

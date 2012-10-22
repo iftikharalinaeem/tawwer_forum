@@ -1,0 +1,34 @@
+ul.DataList a.Title span {
+	background: #777;
+	color: #fff !important;
+	font-size: 11px;
+	font-weight: normal;
+	-moz-border-radius: 3px;
+	padding: 1px 3px;
+	margin-right: 6px;
+}
+ul.DataList div.Meta span.Closed {
+	background: #000;
+	-moz-border-radius: 0;
+}
+.Closed,
+.Closed a.Title,
+ul.DataList li.Closed div.Meta a,
+ul.DataList li.Closed div.Meta,
+ul.DataList li.Closed div.Meta a.Category {
+	color: #999999;
+	background: #eeeeee;
+}
+ul.DataList .Closed a.Title span {
+	color: #eeeeee;
+	background: #999999;
+}
+div.HeadingTabs div.SubTab strong {
+	background: #000;
+	color: #fff !important;
+	font-size: 12px;
+	-moz-border-radius: 3px;
+	padding: 3px;
+	margin-right: 10px;
+	letter-spacing: 1px;
+}

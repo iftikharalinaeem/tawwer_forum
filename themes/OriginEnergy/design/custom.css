@@ -1,0 +1,403 @@
+body{
+	background: #fff;
+	color: #000;
+	font-family: Arial,Verdana;
+}
+a, a:link, a:visited, a:active {
+    color: #0040F4;
+    text-decoration: none;
+}
+a:hover{
+	color: #0040F4;
+	text-decoration: none;
+}
+#Panel li a{
+	color: #0040F4;
+}
+ul.PanelInfo li.Active a {
+    color: #0040F4;
+        text-decoration: underline;
+
+}
+a.Button, .Button {
+    color: #000;
+}
+a.BigButton {
+    color: #000;
+    margin: 0 0 30px;
+}
+
+#Body {
+	width: 1000px;
+}
+
+#Head {
+	background: #000;
+	padding:0;
+	margin: 20px 20px 0;
+	text-align: left;
+	position: relative;
+}
+div.Popup h1,
+div.Popup h2 {
+	background: #3b5998;
+	border: none;
+}
+.Banner {
+	 margin: 0 auto;
+    position: relative;
+    text-align: left;
+    vertical-align: bottom;
+    width: 1000px;
+}
+#TopBanner{
+    position: relative;
+    vertical-align: bottom;
+    width: 1000px;
+    background: url(leaf_small.jpg);
+    height: 95px;
+}
+.TitleBanner{
+	 color: #FFFFFF;
+    font-size: 30px;
+    margin: 10px;
+    padding: 40px 0 0;
+    text-align: center;
+    width: 1000px;
+}
+.TitleBanner a{
+	 color: #FFFFFF;
+	  font-weight: bold;
+}
+.Banner ul {
+	 background: none repeat scroll 0 0 transparent;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    width: 1000px;
+}
+.Banner ul li {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+.Banner ul li a {
+	font-weight: bold;
+	padding: 3px 6px;
+	font-size: 12px;
+	color: #000;
+	display: inline-block;
+}
+.Banner ul li a:hover {
+	color: #ff0000;
+}
+.Banner ul li a.SignOut {
+	font-weight: normal;
+	position: absolute;
+	top: 0px;
+	right: 10px;
+}
+.Banner ul li a span {
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	padding: 1px 2px 0 1px;
+	background: #f00;
+
+	color: #fff;
+	font-size: 9px;
+	position: relative;
+	top: -3px;
+}
+#Panel {
+    margin: 0;
+}
+
+#Panel div.SearchBox input.InputBox {
+	width: 200px;
+	margin-right: 4px;
+}
+div.SearchBox {
+	margin-bottom: 6px;
+}
+body.Profile div.SearchBox {
+	display: none;
+}
+body.Profile #Content {
+	float:none;
+	width: auto;
+	margin: 0 10px 0 280px;
+}
+body.Profile #Panel {
+	margin: 0 0 0 10px;
+}
+form.Activity textarea {
+	width:99%;
+}
+#Foot div {
+	width: auto;
+}
+body.Post #Content {
+	width: auto;
+	margin:0 20px;
+}
+#ConversationForm textarea.MultiComplete,
+#ConversationForm .TextBox,
+#MessageForm textarea,
+div.Comment div.CommentForm,
+div.Comment div.CommentForm textarea,
+div.CommentForm textarea,
+#DiscussionForm input.InputBox,
+#DiscussionForm textarea {
+	width:99%;
+}
+
+.AdBanner{
+	background: url(9SHBanner6.jpg) no-repeat;
+	width: 728px;
+	height: 90px;
+	padding: 10px 0 10px;
+}
+
+/* Tabs */
+div.Tabs {
+	background: none;
+	padding: 0;
+	border-bottom: 1px solid #675251;
+}
+div.Tabs ul {
+	padding: 0 8px;
+	white-space: nowrap;
+}
+div.MessageForm {
+	padding: 8px 8px 5px;
+	background: #eee;
+    border-bottom: 1px solid #FFFFFF;
+}
+div.MessageForm div.Tabs {
+	padding: 0 8px;
+}
+
+/* css fix for message spacing - Brand-Friendly 1.2 */
+
+	div.Preview div.Message, ul.MessageList div.Message {
+		clear: none;
+		font-size: 100%;
+		line-height: 140%;
+	}
+
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+	font-size: 11px;
+   margin: 0;
+   border: none;
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   background: none;
+   color: #999;
+   text-decoration: none;
+   padding: 8px 10px;
+	line-height: 11px;
+}
+div.Tabs li a:hover {
+   text-decoration: underline;
+}
+a.Active,
+div.Tabs li.Active a {
+   background: #eee;
+   color: #000;
+   margin: 0;
+   border: 0;
+	border-bottom: none;
+   border-radius: 3px 3px 0 0;
+   -moz-border-radius: 3px 3px 0 0;
+   -webkit-border-radius: 3px 3px 0 0;
+   display: inline-block;
+	font-size: 12px;
+	line-height: 12px;
+   font-weight: bold;
+   text-decoration: none;
+   padding: 6px 10px;
+	position: relative;
+}
+div.Tabs li a span {
+   line-height: 1;
+   font-size: 80%;
+   padding: 0 3px;
+   border-radius: 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   font-weight: normal;
+	background: #ccc;
+   color: #000;
+   margin: 0 0 0 4px;
+}
+div.DiscussionsTabs div.SubTab {
+	font-size: 11px;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-top: 1px solid #aaa;
+	background: #f3f3f3;
+	margin:0;
+	padding:4px 8px;
+}
+ul.DataList a.Title {
+	color: #0040F4;
+}
+ul.DataList li.Item {
+    border-bottom: 1px solid #675251;
+}
+.Mine, .Alt, .New { 
+	background: #fff; 
+}
+
+ul.DataList li.Mine div.Meta a.Category {
+    background: #CCCCCC;
+    color: #000;
+}
+ul.DataList div.Meta a {
+    color: #ccc;
+}
+a.Bookmark {
+	visibility: hidden;
+}
+ul.MessageList li.Item {
+    border-bottom: 1px solid #675251;
+}
+ul.Activities ul.DataList li {
+    background: #eee;
+}
+ul.Conversations div.Meta a.Name {
+    color: #0040F4;
+}
+ul.DataList div.Excerpt a {
+    color: #000;
+}
+#MessageForm {
+    background: #eee;
+}
+#MessageForm h2 {
+    color: #000;
+}
+div.Popup h1, div.Popup h2 {
+    background: #000;
+}
+#Status {
+    background: #fff;
+    color: #000;
+}
+#Status a{
+	text-decoration: underline;
+}
+#Status a:hover{
+	text-decoration: none;
+}
+body.Profile ul.Activities {
+    border-top: 1px solid #675251;
+}
+div.HeadingTabs ul {
+	margin: 8px 0 0;
+}
+body.Discussion a.Bookmark {
+	margin: 6px 2px;
+}
+div.Preview {
+	border: 1px solid #aaa;
+	background: #fff;
+	margin:0 0 8px;
+	padding: 8px;
+}
+.Foot {
+	background: none;
+	border: none;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:visited,
+div.MorePager a:active,
+div.MorePager a:hover {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	background: none;
+	border: none;
+	color: #fff;
+	line-height: 1;
+	padding: 0;
+	text-decoration: none;	
+}
+div.MorePager a:hover {
+	color: #ff0000;
+	text-decoration: underline;
+}
+body.add #Content {
+	margin: 0 10px;
+}
+
+/* Panel Boxes */
+div.Box {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	background: none;
+	padding: 0;
+}
+div.Box h4 {
+	color: #000;
+}
+ul.PanelInfo {
+	border-top:1px solid #675251;
+}
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+	background: none;
+	border-bottom: 1px solid #675251;
+}
+ul.PanelInfo li.Active {
+	background: #eee;
+}
+body.Profile ul.PanelInfo {
+	border: none;
+}
+body.Profile ul.PanelInfo li {
+	margin: 0;
+	padding: 0;
+}
+body.Profile ul.PanelInfo li a {
+	font-size: 12px;
+	display: block;
+	padding: 0 6px;
+}
+body.Profile #Panel ul.PanelInfo li a:hover{
+	background: #fff;
+	color: #0040F4;
+}
+
+ul.Condensed li, li.Condensed {
+    clear: none;
+}
+
+/* Sign In Page */
+body.Entry #Content div.Box {
+	background: #efefef;
+}
+body.Entry #Panel {
+	display: none;
+}
+
+/*forms */
+input.DateBox, input.InputBox, input.SmallInput, textarea {
+    border: 1px solid #AAAAAA;
+    background: #fff;
+    color: #333333;
+    font-size: 12px;
+ 
+}

@@ -1,0 +1,1088 @@
+/*-----------------------------------------------------------------------------
+Primary Boagworld Forum Style Sheet
+
+Please do not judge me by this CSS! This is a hacked version of a template that comes with Vanilla.
+The code is terrifying. If you fancy rebuilding it from scratch drop me an email :) 
+I just dont have the time.
+
+version:   2.0
+author:    Paul Boag
+email:     paul.boag@headscape.co.uk
+website:   http://www.headscape.co.uk
+
+Update 10/05/08: Damian Poole - fixed headscape & getSignOff hover issue
+-----------------------------------------------------------------------------*/
+
+
+
+
+/*General*/
+
+body {
+	background:#d6e59b url(http://boagworld.com/wp-content/themes/Boagworld/images/altback3.jpg);
+	padding:20px 0;
+}
+
+#Frame {
+
+	background: white;
+	width:990px;
+	margin:0 auto 20px auto;
+	padding:0;
+	position:relative;
+	-moz-border-radius-topleft:20px; 
+	-webkit-border-top-left-radius:20px;
+	-moz-border-radius-bottomright:20px; 
+	-webkit-border-bottom-right-radius:20px;
+	-webkit-box-shadow : 0 0 10px #000;
+	
+	
+}
+
+#body {
+	float:left;
+	width:1000px;
+	height:auto;
+}
+
+
+a,
+a:link,
+a:active {
+	color: #e59e59;
+	text-decoration: underline;
+	cursor: pointer;
+	}
+
+a:visited {
+	color:#5c5c5c;
+	text-decoration: underline;
+}
+a:hover {
+	color: #000;
+	text-decoration: none;
+}
+#Body a,
+#Body a:link,
+#Body a:active,
+#Body a:visited {
+	color: #e59e59;
+	text-decoration: none;
+}
+#Body a:hover {
+	color: #000;
+	text-decoration: underline;
+}
+	
+input, select, textarea { background-color:#f6f6f6 !important; }
+
+input:focus, select:focus, textarea:focus { background:#fff !important; }
+
+
+#announcement {
+	background: url(notice.gif) left center no-repeat #FFFECC !important;
+	border: 1px solid #FAEBB1 !important;
+	font-size:13px !important;
+	padding: 8px 8px 8px 30px !important;
+	margin-bottom: 20px !important;
+}
+
+
+/* Footer (Foot.php) */
+
+#sContent {
+	clear:both;
+	background:#412715 url(../images/footerDivider.gif) repeat-y top center;
+	color:#d8cfc9;
+	width:100%;
+	text-shadow: 0 1px 0 #000;
+}
+
+#sContent a {
+	text-decoration: none;
+	padding:0 1px;
+	background:none;
+	border-bottom: 1px dotted #64442c;
+	color: white;
+	}
+	
+#sContent a:visited { color:#dcbea8; }
+
+#sContent a:hover {
+	background:#6c4123;
+	color:white;
+	text-decoration:none;
+}
+
+#sContent {
+	font-size:1.2em;
+	line-height:2em;
+	clear: both;
+	margin-top:20px;
+	background: #412715 url(http://boagworld.com/wp-content/themes/BoagworldV2/images/hills.png) no-repeat left top;
+	padding-top: 300px !important;
+}
+
+#sContent img {
+	display:none;
+}
+
+#sContent h2 {
+	display: none;
+}
+
+#speaking {
+	width:289px;
+	margin:0 auto 0 320px;
+}
+
+
+
+#links {
+	float:left;
+	width:289px;
+	margin-left:15px;
+	
+}
+
+#sponsors {
+	float:right;
+	width:355px;
+	margin-right:15px;
+}
+
+
+#sponsors li p {
+	margin-left:117px;
+}
+
+#sponsors li p a {
+	font-size:1.3em;
+}
+
+#speaking ul div {display:inline;}
+
+#links h3 {
+	overflow:hidden;
+	height:44px;
+	text-indent:-5000em;
+	background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/worthReading.png) no-repeat left top;
+	margin-top:8px;
+}
+
+#sContent #links li {
+	padding-left:0;
+}
+
+#sContent #links .headline a {
+	background:#6c4123;
+	color:white;
+	text-decoration:none;
+}
+
+#sContent #links .headline a:hover {
+	background:#2f1b10;
+}
+
+#links div {display: none;}
+
+#sponsors h3 a, #sponsors h3 a:hover {
+	overflow:hidden;
+	display: block;
+	height:52px;
+	text-indent:-5000em;
+	background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/headscapeLogo.png) no-repeat left top;
+	border:none;
+}
+
+#speaking h3 {
+	overflow:hidden;
+	height:44px;
+	text-indent:-5000em;
+	background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/elsewhere.png) no-repeat left top;
+	margin-top:8px;
+}
+
+
+
+#sponsors h3 {
+	margin:0;
+}
+
+#sContent h3 {
+	padding:0.5em 0;
+}
+
+#sContent li {
+	background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/arrowGreen.gif) no-repeat 40px 1em;
+	display:block;
+	padding:0.5em 0 0.5em 61px;
+}
+
+#sContent p {
+	font-size:1.2em;
+}
+
+#sponsors li p {
+	font-size:1em;
+}
+
+#sponsors li a.staff {
+	float:left;
+	display: block;
+	margin-top:0.5em;
+	margin-left:55px;
+	border:none;
+}
+
+#sponsors li a.staff:hover {
+	background: none;
+}
+
+#sponsors li img {
+	display:block;
+}
+
+
+
+#sponsors li, #sContent .subscribe li {
+	padding-left:0;
+	background:none;
+}
+
+#sContent .subscribe li { 
+		float:left;
+		border:none; 
+}
+
+
+
+#headscape a, #getSignOff a {
+	text-indent:-5000px;
+	overflow:hidden;
+	display:block;
+}
+
+#sponsors ul #headscape a, #sponsors ul #headscape a:hover {
+	background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/headscape.gif) no-repeat right top;
+	height:50px;
+}
+
+
+
+#sponsors li {
+	border:none;
+}
+
+#switchpod { text-align:right }
+
+.subscribe {
+	border-top:1px solid #2f1b10;
+	margin-top:0.5em;
+}
+
+
+
+#sContent .subscribe li a {
+	display:block;
+	float:left;
+	margin-right:1em;
+	color:#9b8d83;
+	font-size: 0.916667em;
+	padding-left:24px;
+	border-bottom: none;
+}
+
+#sContent .subscribe li a:hover {
+	color:#FFFFFF;
+}
+
+#sContent .subscribe .rss a { background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/rss.gif) no-repeat left center; }
+
+#sContent .subscribe .email a { background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/email.gif) no-repeat left center; }
+#Foot {
+	margin: 0;
+	padding: 0;
+}
+#copyright {
+	text-align: left;
+	padding: 8px 20px;
+	margin: 0;
+	background:#422816;
+	display:block;
+	clear:both;
+	-moz-border-radius-bottomright:20px; 
+	-webkit-border-bottom-right-radius:20px;
+}
+#copyright a {
+	color: #9C5D32;
+	text-decoration: none;
+	margin-right: 20px;
+}
+#copyright a:hover {
+	color: #D57F44;
+	text-decoration: underline;
+}
+.copyright {
+	display: none;
+}
+
+.headline { 
+font-size:1.3em;
+
+}
+
+
+
+
+/* Have your say */
+
+#say {
+	background:#f8f8f8;
+	margin:10px -15px 0 0;
+	padding:0 10px 0 10px !important;
+}
+
+#say ul {
+	border-bottom:1px solid #ccc;
+	padding-bottom:20px;
+}
+
+#sNav h3 {
+	margin-bottom:1.45em;
+}
+
+#say h3 {
+	text-indent:-5000em;
+	overflow:hidden;
+	height:31px;
+	background:url(http://boagworld.com/wp-content/themes/Boagworld/images/haveYourSay.gif) no-repeat 0 24px;
+	padding-top:24px;
+	border-top:1px solid #dad8d5;
+}
+
+#say p {
+	font-size:12px;
+	padding-bottom:10px;
+}
+
+#sskype a {
+	background:url(http://boagworld.com/wp-content/themes/Boagworld/images/sSkype.gif) no-repeat center left !important;
+	padding-left:50px !important;
+}
+
+#stel a {
+	background:url(http://boagworld.com/wp-content/themes/Boagworld/images/sTel.gif) no-repeat center left !important;
+	padding-left:50px !important;
+}
+
+#semail a {
+	background:url(http://boagworld.com/wp-content/themes/Boagworld/images/sEmail.gif) no-repeat center left !important;
+	padding-left:50px !important;
+}
+
+#Panel div  ul #stwitter a {
+	background:url(http://boagworld.com/wp-content/themes/Boagworld/images/sTwitter.gif) no-repeat center left;
+	padding-left:50px;
+}
+
+
+
+/* Header */
+
+
+#HeaderCont {
+	font: 0.77em/1.4 Helvetica, Arial, sans-serif;
+	text-align: left;
+}
+#header {
+	float:left;
+	margin:-11px 0 0 -11px;
+	padding:11px 0 0 11px;
+	width:100%;
+}
+
+#logo {
+	display:block;
+	float:left;
+	margin:35px 15px;
+	width:380px;
+}
+
+.Banner {
+	padding: 10px;
+	text-align: left;
+}
+.Banner ul {
+	padding: 0;
+	margin: 0;
+}
+.Banner ul li {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+.Banner ul li a {
+	font-weight: bold;
+	padding: 3px 6px;
+	font-size: 13px;
+	text-decoration: underline;
+	color: #E59E59;
+	display: inline-block;
+}
+.Banner ul li a.Selected {
+	background: #D2E89C;
+	color: #000;
+	text-decoration: none;
+}
+.Banner ul li a:hover {
+	color: #000;
+}
+.Banner ul li a.SignOut {
+	font-weight: normal;
+	position: absolute;
+	top: 92px;
+	left: 20px;
+	font-size: 12px;
+}
+.Banner ul li a span {
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	padding: 1px 2px;
+	background: #E56428;
+	color: #fff;
+	font-size: 9px;
+	position: relative;
+	top: -2px;
+}
+
+
+#nav {
+	width:495px;
+	padding:12px 0 17px 0;
+	font-size:1.2em;
+	float:right;
+	background:#FFFFFF;
+}
+
+.archiveN, .forumN {
+	width:222px;
+	float:left;
+	clear:left;
+	
+}
+
+#nav dd {
+	margin-bottom:0.3em;
+}
+
+
+
+.aboutN a, dt.searchN, .archiveN a, .forumN a {
+	height:18px;
+	width:200px;
+	display:block;
+	text-indent:-5000em;
+	overflow:hidden;
+	margin:8px 0;
+}
+
+.aboutN, dt.searchN, dd.searchN {
+	margin-left:244px;
+}
+
+.searchN form p { display:inline; }
+
+.aboutN a { background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/about.gif) no-repeat left top; }
+.archiveN a { background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/archive.gif) no-repeat left top; }
+.forumN a { background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/forum.gif) no-repeat left top; }
+dt.searchN { background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/search.gif) no-repeat left top; }
+
+.searchN button {
+	height:32px;
+	width:32px;
+	text-indent:-5000em;
+	overflow:hidden;
+	background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/go.gif) no-repeat top left;
+	border:none;
+	margin:0;
+	padding:0;
+	cursor: pointer;
+}
+
+.searchN input {
+	width:164px;
+	background:#f6f6f6;
+	border:1px solid #dbd9d6;
+	padding:4px;
+	margin-top:-3px;
+	}
+	
+.searchN  {
+	position:relative;
+	top:3px;
+	
+}
+
+
+.searchN form {
+	position:relative;
+	top:-3px;
+}
+
+
+/* =Info */
+
+.announcement {
+	background: url(http://boagworld.com/wp-content/themes/BoagworldV2/images//notice.gif) left center no-repeat #FFFECC;
+	border: 1px solid #FAEBB1;
+	padding: 15px 15px 15px 30px;
+	margin-bottom: 20px;
+	color:#d57d00;
+	-moz-border-radius-bottomright:20px; 
+	-webkit-border-bottom-right-radius:20px;
+	line-height: 1.3;
+}
+
+.announcement a {
+	color:#bd7945;
+	text-decoration:none;
+	border-bottom: dotted 1px #e4d6a1;
+}
+
+.announcement a:visited {
+	color:#d57d00;
+}
+
+.announcement a:hover {
+	background:#faebb1;
+	border-bottom: solid 1px #e4d6a1;
+	
+}
+
+#info {
+	clear:both;
+	background:#f7faec url(http://boagworld.com/wp-content/themes/BoagworldV2/images/infoBack.gif) repeat-x bottom left;
+	border-top:1px solid #d7e79e;
+	padding:35px 30px 65px 15px;
+	font-size:1.4em;
+	line-height:1.714286em;
+	position:relative;
+}
+
+#about h2  {
+	width:430px;
+	height:86px;
+	background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/aforum.gif) no-repeat top left;
+	text-indent:-5000em;
+	overflow:hidden;
+	margin-bottom:20px;
+	}
+
+#about p {
+	width:440px;
+	position:relative;
+	z-index:100;
+	text-shadow: 0 1px 0 #fff;
+}
+
+#mainEmail a, #respond .comMess a { 
+	text-decoration: none;
+	background-color: #fffecc;
+	border-bottom: 1px solid #faebb1;
+	padding:0 1px;
+	color: #bd7945;
+ }
+#info a:visited { color:#6f7e35; }
+
+#subscribe {
+	position:absolute;
+	width:377px;
+	padding-left:173px;
+	right:0;
+	bottom:30px;
+	padding-bottom:120px;
+	background: url(http://boagworld.com/wp-content/themes/BoagworldV2/images/cows.jpg) no-repeat bottom right;
+}
+
+#subscribe li {
+	color:#000000;
+	font-size: 0.857143em;
+}
+
+#itunes a, #mainRSS a {
+	display:block;
+	overflow:hidden;
+	text-indent:-5000em;
+	width:227px;
+	margin-bottom:13px;
+}
+
+#mainEmail {
+	padding-left:5px;
+}
+
+#itunes a {
+	background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/subItunes.gif) no-repeat right top;
+	height:40px;
+}
+
+#mainRSS a {
+	background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/subRSS.gif) no-repeat right top;
+	height:37px;
+	margin-bottom:12px;
+}
+/* =Info */
+
+.announcement {
+	background: url(http://boagworld.com/wp-content/themes/BoagworldV2/images//notice.gif) left center no-repeat #FFFECC;
+	border: 1px solid #FAEBB1;
+	padding: 15px 15px 15px 30px;
+	margin-bottom: 20px;
+	color:#d57d00;
+	-moz-border-radius-bottomright:20px; 
+	-webkit-border-bottom-right-radius:20px;
+	line-height: 1.3;
+}
+
+.announcement a {
+	color:#bd7945;
+	text-decoration:none;
+	border-bottom: dotted 1px #e4d6a1;
+}
+
+.announcement a:visited {
+	color:#d57d00;
+}
+
+.announcement a:hover {
+	background:#faebb1;
+	border-bottom: solid 1px #e4d6a1;
+	
+}
+
+#info {
+	clear:both;
+	background:#f7faec url(http://boagworld.com/wp-content/themes/BoagworldV2/images/infoBack.gif) repeat-x bottom left;
+	border-top:1px solid #d7e79e;
+	padding:35px 30px 65px 15px;
+	font-size:1.4em;
+	line-height:1.714286em;
+	position:relative;
+}
+
+#about h2  {
+	width:430px;
+	height:86px;
+	background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/aforum.gif) no-repeat top left;
+	text-indent:-5000em;
+	overflow:hidden;
+	margin-bottom:20px;
+	border-bottom: none;
+	}
+
+#about p {
+	width:440px;
+	position:relative;
+	z-index:100;
+	text-shadow: 0 1px 0 #fff;
+	line-height: 1.7;
+}
+#about p a {
+	text-decoration: underline;
+}
+#about p a:hover {
+	text-decoration: none;
+}
+#mainEmail a, #respond .comMess a { 
+	text-decoration: none;
+	background-color: #fffecc;
+	border-bottom: 1px solid #faebb1;
+	padding:0 1px;
+	color: #bd7945;
+ }
+#info a:visited { color:#6f7e35; }
+
+#subscribe {
+	position:absolute;
+	width:377px;
+	padding-left:173px;
+	right:0;
+	bottom:30px;
+	padding-bottom:120px;
+	background: url(http://boagworld.com/wp-content/themes/BoagworldV2/images/cows.jpg) no-repeat bottom right;
+}
+
+#subscribe li {
+	color:#000000;
+	font-size: 0.857143em;
+}
+
+#itunes a, #mainRSS a {
+	display:block;
+	overflow:hidden;
+	text-indent:-5000em;
+	width:227px;
+	margin-bottom:13px;
+}
+
+#mainEmail {
+	padding-left:5px;
+}
+
+#itunes a {
+	background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/subItunes.gif) no-repeat right top;
+	height:40px;
+}
+
+#mainRSS a {
+	background:url(http://boagworld.com/wp-content/themes/BoagworldV2/images/subRSS.gif) no-repeat right top;
+	height:37px;
+	margin-bottom:12px;
+}
+
+
+#Session {
+	position:absolute;
+	z-index:500000;
+	top:100px;
+	left:25px;
+	font-size:12px;
+	color:#5C5C5C;
+}
+
+#nav dd {
+	margin-bottom:0.3em;
+	color:#5C5C5C;
+}
+
+#forumNav {
+	margin:0 15px 20px 15px;
+	font-size:14px;
+}
+
+#forumNav li {
+	display:inline;
+}
+
+#forumNav li a {
+	margin-right:20px;
+}
+
+.TabOn a {
+	background:#D2E89C;
+	color:#000000;
+	text-decoration:none;
+	padding:5px;
+}
+
+
+#Panel h1 a {
+	display:block;
+	text-indent:-5000em;
+	overflow:hidden;
+	text-decoration:none;
+	background:url(startDiscussion.gif) no-repeat left top;
+	width:202px;
+	height:30px;
+	margin-bottom:20px;
+}
+
+
+#ads {
+	width:125px; 
+	float:right;
+}
+
+#ads p {
+	margin-bottom:10px;
+}
+
+#ads a img {
+	border:none !important;
+	text-decoration: none !important;
+}
+
+#sNav, #panelInner {margin-right:135px;}
+
+/* Content.. */
+
+.currentPage {
+	font-size:18px;
+}
+
+
+/* Vanilla Customizations */
+#Body {
+	position: relative;
+	min-height: 865px;
+}
+#Advertisements {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 133px;
+}
+#Panel {
+	width: 212px;
+	margin-right: 140px;
+}
+#Content {
+	width: 590px;
+}
+body.Profile #Panel {
+	margin: 0;
+}
+body.Profile #Content {
+	float:right;
+	margin:0 140px 40px 0;
+	width:550px;
+}
+div.Box {
+	box-shadow: 0 0 2px #555;
+	-moz-box-shadow: 0 0 2px #555;
+	-webkit-box-shadow: 0 0 2px #555;
+	background: #D7E79E;
+	padding:3px 6px;
+}
+div.Box h4 {
+	color:#000;
+}
+#Body div.Box h4 a,
+#Body div.Box h4 a:link,
+#Body div.Box h4 a:visited,
+#Body div.Box h4 a:active,
+#Body div.Box h4 a:hover {
+	color: #000;
+}
+ul.PanelInfo {
+	border-top: 1px solid #ccc;
+}
+ul.PanelInfo li {
+	background: #FEFECC;
+	border-bottom: 1px solid #ccc;
+}
+ul.PanelInfo li.Active {
+	border-bottom: 1px solid #ccc;
+}
+body.Profile ul.PanelInfo {
+	border-bottom:1px solid #ccc;
+}
+div.MessageForm, div.Tabs, div.Headings {
+	background: #D7E79E;
+	border-bottom:1px solid #ccc;
+}
+#Status {
+	background: #D7E79E;
+	color: #000;
+}
+#Body div.MorePager a,
+#Body div.MorePager a:link,
+#Body div.MorePager a:hover,
+#Body div.MorePager a:active,
+#Body div.MorePager a:visited,
+#Body a.TabLink,
+#Body a.TabLink:link,
+#Body a.TabLink:hover,
+#Body a.TabLink:active,
+#Body a.TabLink:visited,
+#Body div.Tabs li a,
+#Body div.Tabs li a:link,
+#Body div.Tabs li a:hover,
+#Body div.Tabs li a:active,
+#Body div.Tabs li a:visited {
+	border:1px solid #ccc;
+	background: #FEFECC;
+	color: #E59E59;
+}
+#Body div.MorePager a:hover,
+#Body a.TabLink:hover,
+#Body div.Tabs li a:hover {
+	border:1px solid #aaa;
+	background: #FEFECC;
+	color: #000;
+}
+div.Tabs li a span {
+	background: #E5863E;
+	color: #fff;
+}
+#Body a.Active,
+#Body div.Tabs li.Active a {
+	background: #fff;
+	color:#000;
+}
+ul.DataList li.Mine div.Meta a.Category,
+ul.DataList div.Meta a.Category,
+.Mine {
+	background: transparent;
+}
+ul.DataList li.Item.New {
+	background: #FEFECC;
+}
+#Body a.Title,
+#Body a.Title:active,
+#Body a.Title:visited,
+#Body a.Title:link {
+	color: #000;
+	text-decoration: none;
+}
+#Body a.Title:hover {
+	text-decoration: underline;
+}
+#Body a.BigButton,
+#Body input.Button,
+#Body a.Button,
+#Body .Button,
+a.Button,
+.Button {
+	color: #000;
+	text-decoration: none;
+}
+.Foot {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	background: none;
+	border: none;
+}
+ul.DataList li {
+	position: relative;
+}
+ul.DataList div.Options {
+	position: absolute;
+	right: 0;
+	float: none;
+	width:100px;
+}
+body.Discussions div.Tabs div.SubTab {
+	background: #E9FCAB;
+}
+body.Entry #Content h1 {
+	color:#000;
+}
+div.Popup h1,
+div.Popup h2,
+div.Connect h1,
+div.Connect h2,
+div.Popup #ConversationForm h2 {
+	color: #000;
+	background: #D7E79E;
+	border-bottom: 1px solid #ccc;
+}
+a.Close,
+a.Close:active,
+a.Close:visited,
+a.Close:link {
+	color:#E56C1B;
+	text-decoration: none;
+}
+a.Close:hover {
+	color: #000;
+	text-decoration: none;
+}
+#ConversationForm form {
+	border: none;
+}
+#DiscussionForm {
+	width: 85%;
+}
+body ul div.Comment blockquote.UserQuote {
+	background-color: #D7E79E;
+}
+ul.Activities ul.DataList li {
+	background: #D7E79E;
+}
+div.Attachments {
+	background-color:#D7E79E;
+}
+
+/* Paul's Customizations */
+#nav-primary {
+background:transparent url('http://boagworld.com/wp-content/themes/boagworld-v2.2/images/nav-primary.jpg') center bottom no-repeat;
+float:right;
+height:40px;
+margin:40px 30px 0 0;
+}
+
+#nav-primary li {
+border:none;
+float:left;
+}
+
+#nav-primary li a {
+color:#412715;
+font-size:14px;
+line-height:14px;
+text-decoration:none;
+text-transform:uppercase;
+padding:8px 10px 5px;
+}
+
+#nav-primary li a:hover {
+color:#FFF;
+background-color:#BD7945;
+-moz-border-radius:5px;
+-webkit-border-radius:5px;
+-o-border-radius:5px;
+border-radius:5px;
+}
+
+div.Info {
+margin-top:0;
+padding:10px 20px;
+}
+
+#Form_AddPeople1 {
+width:200px;
+}
+
+.Message blockquote {
+font-style:italic;
+font-family:Georgia, "Times New Roman", Times, serif;
+}
+
+body ul div.Comment blockquote.UserQuote {
+background-color:#fff;
+}
+
+.Banner ul li a.SignOut {
+position:inherit;
+display:inline;
+font-size:14px;
+}
+
+.Banner ul li a {
+font-weight:normal;
+padding-bottom:0;
+margin-bottom:0;
+font-size:14px;
+}
+
+.Banner ul li a.Selected {
+border-bottom-left-radius:3px 3px;
+border-bottom-right-radius:3px 3px;
+border-top-left-radius:3px 3px;
+border-top-right-radius:3px 3px;
+}
+
+.searchN input {
+width:auto;
+margin:0 5px;
+}
+
+.searchN {
+margin-left:auto;
+}
+
+.searchN form {
+padding-left:120px;
+}
+
+body.connect {
+padding: 0;
+background: #fff;
+}
+body.connect #Content {
+	width: auto;
+}

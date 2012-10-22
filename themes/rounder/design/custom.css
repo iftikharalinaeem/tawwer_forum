@@ -1,0 +1,75 @@
+body {
+	background:#22282E;
+	color:#333333;
+   padding: 50px 0;
+}
+/* Transparent Head & Menu */
+#Head {
+   background: transparent;
+   color: #000;
+   padding: 0;
+}
+#Head a {
+   color: #1E79A7;
+}
+#Head a:hover {
+   color: #ff0084;
+}
+/* White content with rounded borders */
+#Frame {
+   width: 920px;
+   padding: 20px 20px 4px;
+   background: #fff;
+   margin: 0 auto;
+   border-radius: 6px;
+}
+.Row {
+   width: auto;
+}
+/* Site Title & Description */
+.Banner {
+   background: #eee;
+   border-radius: 4px;
+   padding: 10px;
+   margin: 0 0 10px;
+   min-height: 50px;
+}
+#Head .SiteTitle {
+   font-size: 50px;
+   display: block;
+   float: left;
+   line-height: 1;
+}
+#Head .SiteTitle a {
+   color: #A2CB2D;
+   font-family: "Helvetical Neue", Helvetica, arial, sans-serif;
+}
+.SiteDescription {
+	font-family:Georgia,"Times New Roman",Times,serif;
+   font-size: 24px;
+   line-height: 1.4;
+   font-weight: normal;
+   line-height: auto;
+   display: block;
+   margin-left: 450px;
+   color: #464748;
+}
+/* Head */
+#Head .SiteSearch .InputBox {
+   border: 1px solid #ddd;
+}
+#Head .SiteMenu {
+   margin: 0;
+}
+#Head {
+   border-bottom: 1px dashed #ddd;
+   padding-bottom: 10px;
+   margin-bottom: 0;
+}
+.BreadcrumbsWrapper {
+   font-size: 11px;
+   background: #fafafa;
+   border-bottom: 1px dashed #ddd;
+   margin: 0 0 10px 0;
+   padding: 5px 4px;
+}

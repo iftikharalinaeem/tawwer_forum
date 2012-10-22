@@ -1,0 +1,472 @@
+body {
+	background: #f5f9ff;
+}
+a, a:link, a:visited, a:active {
+	color: #07378f;
+}
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'lucida grande','Lucida Sans Unicode',tahoma,sans-serif;
+}
+#Head{
+	background: none;
+}
+div.Search {
+	display: none;
+}
+div.Menu {
+	padding: 20px 0 0;
+	background: url('o8banner.png') 0 26px no-repeat;
+	text-align: left;
+	width: 650px;
+	position: relative;
+}
+body #Head h1 {
+	float: none;
+	padding: 0 7px 0 0;
+	display: block;
+}
+body #Head h1 a {
+	display: block;
+	height: 21px;
+	width: 150px;
+}
+#Head h1 a span {
+	display: none;
+}
+ul#Menu {
+	border-top: 1px dotted #c7d3ea;
+	padding: 0;
+	margin: 0 0 0 40px;
+	float: none;
+	position: relative;
+	display: block;
+}
+#Menu li {
+	float: none;
+	display: inline-block;
+	line-height: 1;
+}
+#Menu a,
+#Menu a:hover,
+#Menu li.NonTab a:hover,
+#Menu li.Active a {
+	font-size: 10px;
+	line-height: 1;
+	font-weight: normal;
+	text-transform: lowercase;
+	color: #062971 !important;
+	padding: 0;
+	margin: 0 10px 0 0;
+	background: none;
+}
+#Menu li.NonTab {
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+#Menu li.NonTab a,
+#Menu li.NonTab a:hover {
+	margin: 0;
+	color: #c7d3ea !important;
+	line-height: 2;
+}
+#Menu li.NonTab a:hover {
+	color: #062971 !important;
+}
+div.Tabs {
+	border: 1px solid #c7d3ea;
+	background: #e5eaf6;
+	font-size: 10px;
+	text-transform: uppercase;
+	color: #07378f;
+}
+div.Tabs li {
+	margin-right: 10px;
+}
+div.ConversationTabs li {
+	margin: 0;
+}
+#Menu a span,
+#Menu li.Active a span,
+#Menu li.Highlight a:hover span,
+div.Tabs li a span {
+	font-size: 9px;
+	background: #07378f;
+	color: #fff;
+}
+a.Active,
+div.Tabs li.Active a,
+div.MessageForm a.Back,
+div.MessageForm a.Back:link,
+div.MessageForm a.Back:hover,
+div.MessageForm a.Back:active,
+div.MessageForm a.Back:visited,
+div.MessageForm a.Cancel,
+div.MessageForm a.Cancel:link,
+div.MessageForm a.Cancel:hover,
+div.MessageForm a.Cancel:active,
+div.MessageForm a.Cancel:visited,
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited,
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+	background: none;
+	border: none;
+	color: #07378f;
+	line-height: 1;
+	margin:0;
+	padding: 3px 6px;
+	font-weight: bold;
+}
+div.Tabs li.Active a {
+	background: #fff;
+	border: 1px solid #C7D3EA;
+}
+ul.DataList li.Item,
+ul.DataList li.Mine {
+	background: #ffffff;
+	border: 1px solid #c7d3ea;
+	border-top: 0;
+}
+ul.ActivityComments li.Item {
+	border: none;
+}
+body.Profile ul.Activities {
+	border-top: none;
+	margin-top: 0;
+}
+ul.DataList li.New {
+	background: #f5f9ff;
+}
+#DiscussionForm a.Cancel,
+ul.DataList div.Meta,
+ul.DataList div.Meta a {
+	color: #73819e;
+	font-size: 11px;
+}
+#DiscussionForm a.Cancel:hover,
+ul.DataList div.Meta a:hover {
+	color: #07378f;
+}
+ul.DataList div.Meta a.Category,
+ul.DataList li.Mine div.Meta a.Category {
+	background: none;
+}
+
+/* Panel */
+#Panel {
+	display: none;
+}
+div.Box {
+	color: #73819E;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	background: none;
+	padding: 0;
+}
+div.Box h4 {
+	font-weight: normal;
+	font-size: 11px;
+	color: #73819E;
+	text-indent: 2px;
+}
+body.Profile ul.PanelInfo,
+ul.PanelInfo {
+	border-top: 1px solid #c7d3ea;
+}
+body.Profile ul.PanelInfo {
+	border-bottom:1px solid #c7d3ea;
+}
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+	font-size: 11px;
+	background: none;
+	border-bottom: 1px dotted #c7d3ea;
+}
+ul.PanelInfo li.Active a {
+	color: #07378f;
+}
+
+/* Content */
+#Body {
+	width: 650px;
+}
+#Content {
+	width: auto;
+	margin: 24px 0 0;
+	position: relative;
+	float: none;
+}
+body.Post #Content {
+	margin: 0;
+}
+body.Post #Body {
+	margin: 0 auto;
+}
+a.BigButton,
+a.BigButton:hover,
+a.BigButton:focus {
+	text-transform: lowercase;
+	position: absolute;
+	top: -40px;
+	right: 0;
+	display: inline;
+	border: none;
+	background: none;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	text-shadow: none;
+	font-weight: normal;
+	font-size: 11px;
+}
+ul.Conversations div.Meta a.Name,
+ul.DataList div.Excerpt a {
+	color: #062971;
+}
+.Foot {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	background: #e5eaf6;
+	border: 1px solid #c7d3ea;
+	border-top: 0;
+}
+#Foot div {
+	width:650px;
+}
+div.SingleEntryMethod {
+	width:312px;
+}
+#ConversationForm .TextBox,
+#ConversationForm textarea.MultiComplete,
+#DiscussionForm textarea,
+#DiscussionForm input.InputBox {
+	width: 99%;
+}
+#ConversationForm form,
+body.Entry #Content form,
+body#dashboard_entry_password #Content form,
+body#dashboard_entry_signin #Content form,
+div.Popup .Content form,
+#MessageForm,
+form.Activity,
+div.MessageForm,
+#DiscussionForm form {
+	background: #f9fbff;
+	border: 1px solid #C7D3EA;
+	padding: 10px 20px 20px;
+}
+div.Popup .Content form {
+	border: none;
+}
+div.MessageForm {
+	border-top: 0;
+	padding: 10px 20px 16px;
+}
+div.Preview {
+	background: #fff;
+	margin: 8px 0;
+	padding: 8px;
+}
+#MessageForm {
+	margin: 0;
+	border-top: 0;
+}
+form.Activity {
+	border-top: none;
+}
+#ConversationForm h2,
+body.Entry #Content h1,
+div.Popup h1, div.Popup h2,
+#DiscussionForm h2 {
+	text-transform: uppercase;
+	font-weight: bold;
+	font-size: 10px;
+	border: 0;
+	border-bottom: 1px solid #C7D3EA;
+	background: #E5EAF6;
+	color: #07378F;
+	margin:0;
+}
+#DiscussionForm h2 {
+	border: 1px solid #C7D3EA;
+	border-bottom: 0;
+}
+body.Entry #Content h1 {
+	border: 1px solid #C7D3EA;
+	border-bottom: none;
+}
+#Status {
+	border: 1px solid #C7D3EA;
+	border-bottom: none;
+	background: #E5EAF6;
+	padding: 8px;
+	color: #73819E;
+}
+div.Popup #ConversationForm h2 {
+	text-transform: uppercase;
+	font-weight: bold;
+	font-size: 10px;
+	color: #07378F;
+	border-bottom: 1px solid #C7D3EA;
+}
+#MessageForm h2,
+#ConversationForm label,
+#DiscussionForm label,
+#DiscussionForm ul.PostOptions label {
+	font-size: 12px;
+	font-weight: normal;
+	color: #73819e;
+}
+div.HeadingTabs {
+	padding: 2px 8px;
+}
+div.HeadingTabs div.SubTab {
+	line-height: 1;
+	margin: 0;
+	font-size: 10px;
+}
+body.Discussion a.Bookmark {
+	margin: 2px;
+}
+ul.MessageList li.Item {
+	border: 1px solid #c7d3ea;
+	border-top: none;
+	background: #ffffff;
+}
+ul.MessageList li.Mine {
+	background: #f5f9ff;
+}
+ul.Discussion {
+	margin-bottom: 0;
+}
+.NumberedPager {
+	margin: 0;
+	border: 1px solid #c7d3ea;
+	border-top: none;
+	background: #E5EAF6;
+}
+div.Comment div.CommentForm textarea,
+#MessageForm textarea,
+form.Activity textarea,
+div.CommentForm textarea {
+	width: 99%;
+}
+div.Comment div.CommentForm {
+	width:auto;
+}
+ul.DataList li.Activity {
+	padding:6px;
+}
+div.MessageForm a.Back,
+div.MessageForm a.Back:link,
+div.MessageForm a.Back:hover,
+div.MessageForm a.Back:active,
+div.MessageForm a.Back:visited {
+	font-weight: normal;
+}
+ul.Activities li.CommentForm input.Button,
+.Button,
+input.Button {
+	color: #062971;
+	background: #f5f9ff;
+	border: 1px solid #c7d3ea;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	font-weight: normal;
+	font-size: 12px;
+	text-shadow: none;
+}
+.Button:focus,
+input.Button:focus {
+	background: #E5EAF6;
+	text-shadow: none;
+}
+
+/* Profile */
+body.Profile #Panel {
+	display: block;
+}
+body.Profile #Content {
+	width: 380px;
+}
+ul.Activities li.HasPhoto div.ItemContent {
+	width: 280px;
+}
+ul.Activities ul.DataList {
+	width: 316px;
+}
+ul.Activities li.CommentForm textarea.TextBox {
+	width: 298px;
+	display: block;
+}
+ul.Activities ul.DataList {
+	width: max-width: 316px;
+}
+input.InputBox {
+	width: 230px;
+}
+body.register input.InputBox {
+	width: 310px;
+}
+body.Entry #Content {
+	width: 340px;
+}
+body.register #Content {
+	width: 360px;
+}
+input.Password {
+	width:170px;
+}
+.ac_results {
+	color: #07378F;
+	background: #fff;
+}
+.ac_results strong {
+	color: #07378F;
+	background: #E5EAF6;
+}
+.ac_over {
+	color: #07378F;
+   background: #E5EAF6;
+}
+.ac_over strong {
+	color: #07378F;
+   background: #C7D3EA;
+}
+div.Popup div.Messages ul {
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+}
+
+div.Attachments {
+	background: #F5F9FF;
+	margin-bottom:6px;
+	margin-right:7px;
+	padding:4px;
+	border: 1px solid #c7d3ea;
+}
+div.Attachments div.AttachmentHeader {
+	padding-left: 10px;
+}

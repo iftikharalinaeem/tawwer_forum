@@ -1,0 +1,66 @@
+/* 
+    Document   : filenotfound
+    Created on : Jun 1, 2011, 10:14:31 PM
+    Author     : icyliquid
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+body.filenotfound {
+   background: white url("images/crashstache-gradient.gif") repeat-x;
+   background-position: left 404px;
+}
+
+body.filenotfound #Content {
+   background: transparent;
+   border: 0px;
+   margin: 0px auto;
+   padding-top: 200px;
+   
+   width: 900px;
+   background: transparent url('images/crashstache-radial-gradient.png') no-repeat;
+   background-position: left top;
+   min-height: 404px;
+}
+
+body.filenotfound div.CrashStacheMedium {
+   margin: 0px auto;
+   
+   width: 800px;
+   min-height: 314px;
+   
+   background-color: transparent;
+   background-image: url("images/crashstache-m.png");
+   background-repeat: no-repeat;
+   background-position: center left;
+   
+   position: relative;
+}
+
+body.filenotfound div.CrashStacheMedium div.MainCrash {
+   position: absolute;
+   left: 240px;
+   top: 120px;
+   width: 500px;
+}
+
+body.filenotfound #Content div.CrashStacheMedium div.MainCrash h1 {
+   background: none;
+   border: 0px;
+   font-size: 46px;
+   padding: 0px;
+   text-transform: uppercase;
+   color: #353535;
+   line-height: 46px;
+}
+
+body.filenotfound #Content div.CrashStacheMedium div.MainCrash p {
+   color: #333333;
+   line-height: normal;
+   margin: 0px;
+}

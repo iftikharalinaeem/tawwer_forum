@@ -1,0 +1,8 @@
+#Head .SiteTitle a { color: #FFDE00; }
+.BigButton,
+.BigButton:hover,
+.BigButton:focus { 
+   background: #FFDE00; 
+   color: #fff;
+   text-shadow: 0 1px 1px #aa7700;
+}

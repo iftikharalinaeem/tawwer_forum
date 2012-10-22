@@ -1,0 +1,178 @@
+/* Head
+   --------------- */
+#Head {
+	background-color: #333;
+   padding: 0;
+}
+#Frame #Head h1 { padding: 0; }
+.SiteTitle a {
+	background: url('forum-logo.png') no-repeat 0 22px;
+   overflow: hidden;
+   line-height: 900px;
+   font-size: 0;
+	display: inline-block;
+	height: 50px;
+	width: 220px;
+}
+.SiteSearch {
+   bottom: -30px;
+}
+.BreadcrumbsWrapper {
+   border-bottom: 1px dashed #f0f0f0;
+   padding-bottom: 4px;
+   margin: 10px 0 10px;
+   font-size: 12px;
+}
+.SiteMenu {
+   vertical-align: bottom;
+}
+#Menu a:hover, #Menu li.NonTab a:hover, #Menu .Highlight, #Menu .Highlight a {
+	background-color: #fff;
+	color: #333 !important;
+}
+
+#Head form input.Button {
+	color: #555;
+	background-color: #ddd;
+}
+
+/* Boxes and "tabs"
+   --------------- */
+div.Box h4, div.Box h4 a, ul.PanelInfo li.Heading { color: #333; }
+div.MessageForm, div.Tabs, div.Headings, div.Box, #DiscussionForm form {
+	background-color: #eee;
+	border-color: #bbb;
+}
+div.AnswerTabs {
+	background-color: #f8f8f8;
+}
+div.MorePager a, div.MorePager a:link, div.MorePager a:visited, a.TabLink, a.TabLink:link, a.TabLink:visited, div.Tabs li a, div.Tabs li a:link, div.Tabs li a:visited {
+	border-color: #ccc;
+	background-color: #ddd;
+	color: #555;
+}
+div.MorePager a:hover, div.MorePager a:active,  a.TabLink:hover, a.TabLink:active, div.Tabs li a:hover, div.Tabs li a:active {
+	border-color: #bbb;
+	background-color: #cfcfcf;
+	color: #444;
+}
+a.Active, div.Tabs li.Active a {
+	background-color: #fff;
+}
+div.Tabs li a span {
+	background-color: #666;
+	color: #eee;
+}
+
+ul.PanelInfo li { 
+	background-color: #f8f8f8; 
+	border-color: #ccc;
+}
+ul.PanelInfo li.Active, ul.PanelInfo, body.Profile ul.PanelInfo {
+	border-color: #ccc;
+}
+.Foot {
+	background-color: #fff;
+	border-color: #ccc;
+}
+
+/* Buttons
+   --------------- */
+a.Button, .Button, a.BigButton {
+	color: #444;
+	text-shadow: 0 1px 0 #fff;
+	border-color: #aaa;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+
+	background: -webkit-linear-gradient(#F8F8F8, #D8D8D8);
+	background: -moz-linear-gradient(#F8F8F8, #D8D8D8);
+	position: relative;
+}
+a.BigButton {
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
+}
+a.Button:before, a.BigButton:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 3px;
+	border-top: 1px solid #fff;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+}
+.Button:hover, a.BigButton:hover {
+	color: #111;
+	border: 1px solid #999;
+	box-shadow: 0px 0px 5px #aaa;
+	-moz-box-shadow: 0px 0px 5px #aaa;
+	-webkit-box-shadow: 0px 0px 5px #aaa;  
+	background: -webkit-linear-gradient(#eee, #ccc);
+	background: -moz-linear-gradient(#eee, #ccc);
+}
+.Button:focus, a.BigButton:focus {
+	background: #eee;
+	box-shadow: 0px 0px 2px #999;
+	-moz-box-shadow: 0px 0px 2px #999;
+	-webkit-box-shadow: 0px 0px 2px #999;  
+}
+
+/* Voting
+   --------------- */
+.StatBox,
+.StatBox a { color: #999; }
+.StatBox a:hover { color: #555; text-shadow: none; }
+
+.StatBox       { background-color: #e8e8e8; }
+.FollowsBox    { background-color: #f0f0f0; }
+.ViewsBox      { background-color: #f8f8f8; min-width: 45px; }
+.AnswersBox    { background-color: #f0f0f0; }
+.HasAnswersBox { background-color: #e8e8e8; }
+
+span.Votes a       { background-color: #f8f8f8; }
+span.Votes a:hover { background-color: #e8e8e8;}
+span.Votes span    { background-color: #f8f8f8; color: #999 !important; }
+i.SpriteUp   { background-position: top right; }
+i.SpriteDown { background-position: bottom right; }
+span.Votes a:hover i.SpriteUp   { background-position: top left; }
+span.Votes a:hover i.SpriteDown { background-position: bottom left; }
+
+/* Misc
+   --------------- */
+ul.MessageList div.Meta span.Author img { background: none; }
+
+
+/** Compatibility Fixes **/
+.Menu,
+#Body { 
+    width: 960px;
+    margin: 0 auto;
+}
+#Content {
+    margin: 0 0 40px;
+}
+#Panel .BigButton {
+    margin: 10px 0;
+}
+#Head h1 {
+   display: inline-block;
+}
+ul#Menu li {
+    display: inline;
+}
+ul#Menu li a {
+   line-height: 1.6;
+    display: inline-block;
+    background: #efefef;
+    padding: 6px !important;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+}

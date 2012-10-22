@@ -1,0 +1,72 @@
+
+body {
+	background:#42AFDC url(images/html-bg.gif) repeat-x;
+	color:#333333;
+}
+
+#Frame{
+	background:transparent url(images/main-bg.jpg) no-repeat center top;
+}
+
+a, a:link, a:visited, a:active {
+	color:#000000;
+}
+a:hover{
+	color:#9e9e9e;
+}
+.BreadcrumbsWrapper {
+   color: #ddd;
+}
+.BreadcrumbsWrapper a {
+   font-size: 11px;
+   color: #fff;
+}
+#Head {
+   background: transparent;
+}
+/* Panel on the right */
+#Panel { float: right; }
+#Body .ContentColumn { margin: 0 230px 0 0; }
+
+/* White Background on content and panel */
+#Panel,
+#Content {
+   border-radius: 6px;
+   -moz-border-radius: 6px;
+   -webkit-border-radius: 6px;
+   background: #fff;
+   padding: 0 6px 6px;
+}
+#Panel { 
+   background: #f2f2f2; 
+   padding: 6px;
+}
+#Content > :first-child {
+   margin-top: 0;
+}
+
+/** Compatibility Fixes **/
+#nav ul li { display: inline; }
+#nav ul li a {
+   display: inline-block;
+   padding: 0 6px;
+   color: #fff;
+   font-size: 12px;
+   font-weight: bold;
+}
+#nav ul li a:hover {
+   text-decoration: underline;
+}
+#Head,
+#Body {
+   width: 960px;
+   margin: 0 auto;
+}
+#Content {
+   padding-top: 6px;
+   width: 700px;
+}
+#Panel input.InputBox {
+    width: 96%;
+}
+#Panel #Search { margin-bottom: 10px; }

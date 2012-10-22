@@ -1,0 +1,699 @@
+body{
+background: #ffffff;
+font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+}
+#Body {
+	margin: 0;
+	width: 99.9%;
+	position: relative;
+}
+body.Profile #Body {
+	padding-top: 20px;
+}
+#Head {
+	background: #3B5998;
+	padding:0;
+	margin: 20px 20px 0;
+	text-align: left;
+	position: relative;
+}
+a, a:link, a:visited, a:active {
+	color: #2854BB;
+	cursor: pointer;
+	text-decoration: none;
+}
+a:hover {
+	color: #000;
+	cursor: pointer;
+	text-decoration: none;
+}
+a.BigButton, a.Button, .Button {
+    background: -moz-linear-gradient(center top , #FFFFFF, #E3ECF6) repeat scroll 0 0 #E3ECF6;
+    border: 1px solid #1B5790;
+    color: #105CB6;
+    padding:2px 5px;
+    text-shadow: 0 1px 0 #FFFFFF; 
+    
+    cursor: pointer;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: bold;
+    width: auto;
+       
+    
+    /*resets */
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: 0 0 0 #999999;
+     text-shadow: 0 0 0 #FFFFFF;
+}
+a.BigButton:hover, a.Button:hover {
+	 -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+	 -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    text-decoration: none !important;
+
+}
+a.BigButton {
+	z-index: 20;
+	position: absolute;
+	top: 8px;
+	right: 280px;
+}
+ul.DataList div.Excerpt {
+	color: #666;
+}
+
+.MainMenu {
+	background: #1b5790;
+}
+.MainMenu .Wrapper {
+	position: relative;
+	text-align: left;
+}
+
+a.Home {
+	display: inline-block;
+	background: url(vanilladigg_logo.png) center center no-repeat;
+	outline: none;
+	width: 100px;
+	height: 48px;
+	vertical-align: bottom;
+}
+a.Home span {
+	display: none;
+}
+.Wrapper{
+	margin: 0 auto;
+	width: 960px;
+}
+div.Popup h1,
+div.Popup h2 {
+	background: #3b5998;
+	border: none;
+}
+.Banner {
+	display: inline-block;
+}
+.Banner ul {
+	padding: 0;
+	margin: 0;
+}
+.Banner ul li {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+.Banner ul li a {
+	border-radius: 5px 5px 0 0;
+	-moz-border-radius: 5px 5px 0 0;
+	-webkit-border-radius: 5px 5px 0 0;
+	font-weight: bold;
+	margin-top: 4px;
+	padding: 10px 17px 13px;
+	font-size: 14px;
+	color: #fff;
+	display: inline-block;
+	line-height: 1;
+}
+.Banner ul li a:hover {
+	background: #164673;
+}
+.Banner ul li a.Selected {
+	background-color: #E5ECF3;
+	color: #1B5790;
+}
+.Banner ul li a.SignInPopup,
+.Banner ul li a.SignInPopup:hover,
+.Banner ul li a.SignOut,
+.Banner ul li a.SignOut:hover {
+	line-height: 1;
+	font-weight: normal;
+	background: transparent;
+}
+.Banner ul li a span {
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	padding: 1px 2px 0 1px;
+	background: #f00;
+	border-right: 1px solid #a00;
+	border-bottom: 1px solid #a00;
+	color: #fff;
+	font-size: 9px;
+	position: relative;
+	top: -3px;
+}
+
+
+#BodyMenu {
+	float: left;
+	width: 140px;
+	margin-top: 60px;
+}
+body.Conversations #BodyMenu,
+body.Activity #BodyMenu,
+body.Profile #BodyMenu,
+body.Search #BodyMenu {
+	display: none;
+}
+#BodyMenu h4,
+#BodyMenu span.Count {
+	display: none;
+}
+#BodyMenu ul.PanelInfo li {
+	text-align: left;
+}
+#BodyMenu ul.PanelInfo li a,
+#BodyMenu ul.PanelInfo li a:link,
+#BodyMenu ul.PanelInfo li a:visited,
+#BodyMenu ul.PanelInfo li a:active,
+#BodyMenu ul.PanelInfo li a:hover {
+	color: #105CB6;
+	display: block;
+	float: none;
+	font-weight: bold;
+}
+#Panel {
+	float: right;
+	margin: 0 0 10px;
+	width: 250px;
+	font-size: 11px;
+}
+#Content {
+	float: none;
+	width: auto;
+	margin: 0 270px 0 160px;
+}
+body.Conversations #Content,
+body.Activity #Content,
+body.Profile #Content,
+body.Search #Content {
+	margin: 0 270px 0 0;
+}
+body.Search #Content {
+	padding-top: 20px;
+}
+body.Search div.Tabs div.SubTab {
+	background: transparent;
+}
+body.Discussions #Content {
+	padding-top: 60px;
+}
+
+#Panel div.SearchBox input.InputBox {
+	width: 200px;
+	margin-right: 4px;
+}
+div.SearchBox {
+   position: absolute;
+   top: 10px;
+	right: 0;
+   float: none;
+}
+
+
+
+div.SearchBox input.InputBox{
+   background: #FFFFFF;
+	border: 1px solid #000;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	color: #5A91CE;
+	display: block;
+	font-size: 1.16667em;
+	height: 20px;
+	margin-left: -10px;
+	padding: 5px 30px 5px 10px;
+	width: 198px;
+}
+div.SearchBox a.Button, div.SearchBox .Button {
+	background: url("digg_sprites.png") no-repeat scroll -2px -200px transparent;
+	border: medium none;
+	cursor: pointer;
+	height: 30px;
+	position: absolute;
+	left: 200px;
+	top: 0;
+	width: 30px;
+	-moz-border-radius: 0 0 0 0;
+	-moz-box-shadow: 0 0 0 #999999;
+}
+
+
+body.Profile #Content {
+	float:none;
+	width: auto;
+	margin: 0 10px 0 280px;
+}
+body.Profile #Panel {
+	margin: 0 0 0 10px;
+}
+form.Activity textarea {
+	width:99%;
+}
+#Foot div {
+	width: auto;
+}
+body.Post #Content {
+	margin:0 20px;
+}
+#ConversationForm textarea.MultiComplete,
+#ConversationForm .TextBox,
+#MessageForm textarea,
+div.Comment div.CommentForm,
+div.Comment div.CommentForm textarea,
+div.CommentForm textarea,
+#DiscussionForm input.InputBox,
+#DiscussionForm textarea {
+	width:99%;
+}
+
+/* Tabs */
+div.Tabs {
+	background: none;
+	border-bottom: 1px solid #CCDCEF;
+	font-size: 24px;
+	color: #373529;
+	font-weight: normal;
+	padding: 0;
+}
+div.Tabs li.Active a {
+	border: none;
+	padding: 0;
+	line-height: 24px;
+}
+div.CommentTabs li.Active a {
+	background: none repeat scroll 0 0 #FFFFFF;
+   color: #474747;
+	padding: 5px 10px;
+	border: 1px solid #ABDAFB;
+}
+div.ProfileTabs,
+div.DiscussionsTabs {
+	background: #E5ECF3;
+	border-bottom: 1px solid #E5ECF3;
+	padding: 0;
+	font-size: 12px;
+	-moz-border-radius-bottomleft: 5px;
+	-moz-border-radius-bottomright: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+}
+div.DiscussionTabs {
+	padding-top: 6px;
+}
+ul.MessageList div.Meta span.Votes {
+	float: right;
+	position: inherit;
+	right: auto;
+}
+#Status {
+	background: #e5ecf3;
+}
+body.Profile div.Profile div.User {
+	background: #e5ecf3;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+	-webkit-border-top-left-radius: 5px;
+	-webkit-border-top-right-radius: 5px;
+}
+body.Profile div.Profile div.User h1 {
+	padding: 6px 6px 0;
+}
+div.DiscussionsTabs {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 690px;
+	height: 45px;
+}
+div.HeadingTabs ul {
+    display: none;        
+}
+div.Preview div.Message, ul.MessageList div.Message {
+	clear: none;
+}
+div.Tabs ul {
+	padding: 10px 8px;
+	white-space: nowrap;
+}
+div.MessageForm {
+	padding: 8px 8px 5px;
+}
+
+div.MessageForm {
+    background: none repeat scroll 0 0 #EEEEEE;
+    border-bottom: 1px solid #999999;
+
+}
+div.MessageForm div.Tabs {
+	padding: 0 0 8px;
+	font-size: inherit;
+}
+div.MessageForm div.Tabs ul {
+	padding: 10px 0;
+}
+
+div.ProfileTabs li a,
+div.ProfileTabs li a:link,
+div.ProfileTabs li a:hover,
+div.ProfileTabs li a:active,
+div.ProfileTabs li a:visited,
+div.CommentTabs li a,
+div.CommentTabs li a:link,
+div.CommentTabs li a:hover,
+div.CommentTabs li a:active,
+div.CommentTabs li a:visited,
+div.DiscussionTabs li a,
+div.DiscussionTabs li a:link,
+div.DiscussionTabs li a:hover,
+div.DiscussionTabs li a:active,
+div.DiscussionTabs li a:visited,
+div.DiscussionsTabs li a,
+div.DiscussionsTabs li a:link,
+div.DiscussionsTabs li a:hover,
+div.DiscussionsTabs li a:active,
+div.DiscussionsTabs li a:visited {
+	-moz-border-radius: 25px;
+	-webkit-border-radius: 25px;
+	background: transparent;
+	border: medium none;
+	color: #578CCA;
+	font-size: 12px;
+	line-height: 11px;
+	font-weight: normal;
+	margin: 0;
+	padding: 4px 10px 5px;
+	text-decoration: none;
+	margin-right: 4px;
+	display: inline-block;
+}
+div.ProfileTabs li a:hover,
+div.CommentTabs li a:hover,
+div.DiscussionTabs li a:hover,
+div.DiscussionsTabs li a:hover {
+   background: #D0DDE9;
+   text-decoration: none;
+}
+div.ProfileTabs a.Active,
+div.ProfileTabs li.Active a,
+div.CommentTabs a.Active,
+div.CommentTabs li.Active a,
+div.DiscussionTabs a.Active,
+div.DiscussionTabs li.Active a,
+div.DiscussionsTabs a.Active,
+div.DiscussionsTabs li.Active a {
+	background-color: #1B5790 !important;
+	color: #FFFFFF !important;
+	font-weight: bold;
+}
+div.ProfileTabs li a span,
+div.DiscussionTabs li a span,
+div.DiscussionsTabs li a span {
+   line-height: 1;
+   font-size: 80%;
+   padding: 0 3px;
+   border-radius: 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   font-weight: normal;
+	background: #fff;
+   color: #70727C;
+   margin: 0 0 0 4px;
+}
+div.DiscussionsTabs div.SubTab {
+	display: none;
+}
+div.HeadingTabs ul {
+	margin: 8px 0 0;
+}
+body.Discussion a.Bookmark {
+	display: none;
+}
+div.AnswerTabs strong {
+	line-height: 40px;
+}
+div.Preview {
+	border: 1px solid #aaa;
+	background: #fff;
+	margin:0 0 8px;
+	padding: 8px;
+}
+.Foot {
+	background: none;
+	border: none;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:visited,
+div.MorePager a:active,
+div.MorePager a:hover {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	background: none;
+	border: none;
+	color: #1e79a7;
+	line-height: 1;
+	padding: 0;
+	text-decoration: none;	
+}
+div.MorePager a:hover {
+	color: #ff0084;
+	text-decoration: underline;
+}
+body.add #Content {
+	margin: 0 10px;
+}
+
+ul.Discussions div.ItemContent {
+    margin: 0 0 0 60px;
+}
+ul.DataList a.Title {
+    text-decoration: underline;
+}
+
+.Mine {
+    background: #fff;
+}
+
+/* Panel Boxes */
+div.Box {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	background: none;
+	padding: 0;
+}
+div.Box h4 {
+	margin: 20px 0 0;
+	font-size: 18px;
+	font-weight: bold;
+	color: #373529;
+}
+#Panel ul.PanelInfo {
+	border-top:1px solid #CCDCEF;
+}
+#Panel ul.PanelInfo li,
+#Panel ul.PanelInfo li.Active {
+	background: none;
+	border-bottom: 1px solid #CCDCEF;
+}
+#Panel ul.PanelInfo li.Active {
+	background: #ffd;
+}
+div.BoxCategories ul.PanelInfo, div.Tags ul.PanelInfo {
+	border:0;
+}
+#BodyMenu div.BoxCategories ul.PanelInfo li {
+	background: none;
+	border-bottom: 0;
+	-moz-border-radius: 25px;
+	-webkit-border-radius: 25px;
+	padding: 0 5px;
+	margin-bottom: 5px;
+}
+#BodyMenu div.BoxCategories ul.PanelInfo li.Active {
+	background: #E5ECF3;
+	padding: 0 5px;
+   border-bottom: 0;
+}
+#BodyMenu div.BoxCategories ul.PanelInfo li a {
+	padding: 0 5px;
+}
+#BodyMenu div.BoxCategories ul.PanelInfo li:hover {
+	background: #E5ECF3;
+} 
+#DiscussionForm form {
+   background: #EEEEEE;
+   border: 1px solid #999999;
+}
+#DiscussionForm h2 {
+   color: #000;
+}
+ul.Activities ul.DataList li {
+   background: #eee;
+}
+body.Profile ul.PanelInfo {
+	border: none;
+}
+body.Profile ul.PanelInfo li {
+	margin: 0;
+	padding: 0;
+}
+body.Profile ul.PanelInfo li a {
+	font-size: 12px;
+	display: block;
+	padding: 0 6px;
+}
+
+
+/* Sign In Page */
+body.Entry #Content div.Box {
+	background: #efefef;
+}
+body.Entry #Panel {
+	display: none;
+}
+
+.StatBox {
+   float: left;
+}
+.AnswersBox,
+.ViewsBox,
+.FollowsBox {
+	display: none;
+}
+.VotesBox {
+	background: #FFF2A2;
+	color:#555555;
+	border: 1px solid #DFC200;
+	position: relative;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+.VotesBox a, .VotesBox a:hover{
+	color:#716B14;
+}
+ul.MessageList div.Meta span.Votes {
+	border: 1px solid #DFC200;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+span.Votes a, span.Votes a:hover,
+span.Votes span {
+	background: #FFF2A2;
+	color: #716B14 !important;
+}
+.NumberedPager {
+	clear: both;
+	padding-top: 20px;
+}
+ul.DataList li.Item {
+	border-bottom: 1px solid #CCDCEF;
+}
+ul.DataList div.Meta strong {
+	left: auto;
+	position: relative;
+	top: auto;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+}
+ul.DataList div.Options {
+	right: 0;
+	top: 2px;
+}
+.LastCommentBy{
+	color:#82AB4D;
+}
+.LastCommentBy a {
+	color:#82AB4D;
+	border-bottom: 1px solid #82AB4D;
+}
+ul.DataList li.Mine div.Meta a.Category {
+	border-radius: 25px;
+	-webkit-border-radius: 25px;
+	-moz-border-radius: 25px;
+	background:  #E5ECF3;
+	color: #1E79A7;
+	padding: 3px 7px 3px 7px;    
+}
+ul.MessageList, ul.MessageList li {
+	margin: 0;
+	padding: 0;
+}
+
+ul.Condensed li, li.Condensed {
+	clear: none;
+}
+
+/* Popups */
+div.Popup .Loading,
+div.Popup div.Body {
+	background: -moz-linear-gradient(center top , #FFFFFF, #EAF0F5) repeat scroll 0 0 #FFFFFF;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+div.Popup .Loading {
+	background-image: url('../../../applications/dashboard/design/images/progress.gif');
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+div.Border {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	background: none;
+	padding: 0;
+}
+div.Overlay {
+	background-color: rgba(0, 0, 0, 0.3);
+	height: 100%;
+	position: fixed;
+	width: 100%;
+}
+div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
+	background: none;
+	border: none;
+	color: #29271E;
+	font-size: 30px;
+	padding: 12px 9px 8px;
+}
+a.Close {
+	color: #fff;
+	background: #900;
+	border: 3px solid #fff;
+	border-radius: 20px;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	display: block;
+	height: 20px;
+	width: 20px;
+	padding: 0;
+	margin: 0;
+	top: -10px;
+	right: -10px;
+}
+a.Close span {
+	text-align: center;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	display: block;
+	height: 20px;
+	width: 20px;
+	padding: 0;
+	margin: -11px 0 0 -10px;
+}

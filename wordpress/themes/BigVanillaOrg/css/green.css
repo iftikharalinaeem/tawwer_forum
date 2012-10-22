@@ -1,0 +1,58 @@
+body {
+	background: #3e5f2f;
+}
+a:link, a:visited {
+	color: #335026;
+	text-decoration: none;
+}
+a:hover {
+	color: #335026;
+	text-decoration: underline;
+}
+a:active {
+	color: #335026;
+	text-decoration: none;
+}
+#header_wrap {
+  background: #3e5f2f url(../images/green/background.png) repeat-x;
+}
+#header {
+  background: url(../images/green/header-bg.png) no-repeat 100% 0;
+}
+#header .subscribe {
+  color: #84b06d;
+}
+#header .navigation li a {
+	color: #f1f1f1;
+	text-shadow: #000 0 1px 0;
+	background: #23351a;
+	border-color: #23351a;
+}
+#header .navigation li a:hover, 
+#header .navigation li.current_page_item a,
+#header .navigation li.current_page_parent a {
+	color: #000;
+	text-shadow: #fff 0 1px 0;
+	background: #f1f1f1;
+	border-color: #f1f1f1;
+}
+.extend {
+  background: url(../images/green/extend.png) repeat-x;
+}
+#footer p {
+  color: #a9c09d;
+  text-shadow: none;
+  background: url(../images/green/footer-divider.gif) repeat-x left bottom;
+}
+.left_block ul {
+  background: url(../images/green/footer-divider.gif) repeat-x left top;
+}
+.left_block ul li a {
+  background: url(../images/green/footer-divider.gif) repeat-x left bottom;
+}
+.left_block ul li a:hover {
+  background-color: #304924;
+}
+.credits {
+  color: #a9c09d;
+}

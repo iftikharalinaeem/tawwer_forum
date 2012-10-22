@@ -1,0 +1,115 @@
+#!/bin/sh
+# Generates a new forum structure in /srv/www/vhosts/
+# This script assumes 1 argument is passed: the name of the vhost to create.
+
+# Variables
+if [${2} == ""]; then
+	ROOT=/srv/www
+else
+	ROOT=$2
+fi
+
+PATH=${ROOT}/vhosts/${1}/
+
+if [${3} == ""]; then
+	SOURCE=${ROOT}/source/unstable/vanilla/
+else
+	SOURCE=${ROOT}/${3}/
+fi
+PLUGINS=${ROOT}/source/unstable/misc/plugins/
+THEMES=${ROOT}/source/unstable/misc/themes/
+UTILS=${ROOT}/source/unstable/misc/utils/
+   
+echo "Creating new vhost: ${PATH}"
+
+# Don't do anything if the directory already exists
+if [ ! -d "$PATH" ]; then
+
+    # Create the new subdomain folder
+    /bin/mkdir $PATH
+    
+    # Create subfolders
+    /bin/mkdir ${PATH}applications
+    /bin/mkdir ${PATH}cache
+    /bin/mkdir ${PATH}cache/Smarty
+    /bin/mkdir ${PATH}cache/Smarty/cache
+    /bin/mkdir ${PATH}cache/Smarty/compile
+    /bin/mkdir ${PATH}cache/HtmlPurifier
+    /bin/mkdir ${PATH}conf
+    /bin/mkdir ${PATH}plugins
+    /bin/mkdir ${PATH}themes
+    /bin/mkdir ${PATH}uploads
+    /bin/mkdir ${PATH}log
+    
+    # Fill it out the symbolic links to the vanilla source code
+    
+    #Applications
+    /bin/ln -s "${SOURCE}applications/conversations" "${PATH}applications/conversations"
+    /bin/ln -s "${SOURCE}applications/dashboard" "${PATH}applications/dashboard"
+    /bin/ln -s "${SOURCE}applications/vanilla" "${PATH}applications/vanilla"
+    #End Applications
+    
+    # Core Package Plugins
+    /bin/ln -s "${SOURCE}plugins/VanillaInThisDiscussion" "${PATH}plugins/VanillaInThisDiscussion"
+    /bin/ln -s "${SOURCE}plugins/HtmLawed" "${PATH}plugins/HtmLawed"
+    /bin/ln -s "${SOURCE}plugins/Gravatar" "${PATH}plugins/Gravatar"
+    /bin/ln -s "${SOURCE}plugins/embedvanilla" "${PATH}plugins/embedvanilla"
+    
+    /bin/ln -s "${SOURCE}plugins/Facebook" "${PATH}plugins/Facebook"
+    /bin/ln -s "${SOURCE}plugins/Twitter" "${PATH}plugins/Twitter"
+    /bin/ln -s "${SOURCE}plugins/GoogleSignIn" "${PATH}plugins/GoogleSignIn"
+    /bin/ln -s "${SOURCE}plugins/OpenID" "${PATH}plugins/OpenID"
+    
+    /bin/ln -s "${SOURCE}plugins/cleditor" "${PATH}plugins/cleditor"
+    /bin/ln -s "${SOURCE}plugins/Emotify" "${PATH}plugins/Emotify"
+    # End Core Package Plugins
+
+    # Core Package Themes
+    /bin/ln -s "${SOURCE}themes/mobile" "${PATH}themes/mobile"
+    /bin/ln -s "${SOURCE}themes/EmbedFriendly" "${PATH}themes/EmbedFriendly"
+    # End Core Package Themes
+    
+    # Custom VF.com Plugins
+    /bin/ln -s "${PLUGINS}GettingStartedHosting" "${PATH}plugins/GettingStartedHosting"
+    /bin/ln -s "${PLUGINS}googleadsense" "${PATH}plugins/googleadsense"
+    /bin/ln -s "${PLUGINS}vfoptions" "${PATH}plugins/vfoptions"
+    /bin/ln -s "${PLUGINS}CustomTheme" "${PATH}plugins/CustomTheme"
+    /bin/ln -s "${PLUGINS}CustomDomain" "${PATH}plugins/CustomDomain"
+    /bin/ln -s "${PLUGINS}FileUpload" "${PATH}plugins/FileUpload"
+    /bin/ln -s "${PLUGINS}VanillaConnect" "${PATH}plugins/VanillaConnect"
+    /bin/ln -s "${PLUGINS}PrivateCommunity" "${PATH}plugins/PrivateCommunity"
+    /bin/ln -s "${PLUGINS}ProxyConnect" "${PATH}plugins/ProxyConnect"
+    /bin/ln -s "${PLUGINS}Statistics" "${PATH}plugins/Statistics"
+    # End Custom VF.com Plugins
+
+    # Themes
+    /bin/ln -s "${THEMES}defaultsmarty" "${PATH}themes/default"
+    /bin/ln -s "${THEMES}minalla" "${PATH}themes/minalla"
+    /bin/ln -s "${THEMES}light-grunge" "${PATH}themes/light-grunge"
+    /bin/ln -s "${THEMES}iVanilla" "${PATH}themes/iVanilla"
+    /bin/ln -s "${THEMES}simple" "${PATH}themes/simple"
+    /bin/ln -s "${THEMES}rounder" "${PATH}themes/rounder"
+    /bin/ln -s "${THEMES}vanilla-classic" "${PATH}themes/vanilla-classic"
+    /bin/ln -s "${THEMES}v1grey" "${PATH}themes/v1grey"
+    # End Themes
+        
+    # Misc Symlinks
+    /bin/ln -s "${SOURCE}conf/bootstrap.before.php" "${PATH}conf/bootstrap.before.php"
+    /bin/ln -s "${SOURCE}conf/config-defaults.php" "${PATH}conf/config-defaults.php"
+    /bin/ln -s "${SOURCE}conf/constants.php" "${PATH}conf/constants.php"
+    /bin/ln -s "${SOURCE}conf/locale.php" "${PATH}conf/locale.php"
+    /bin/ln -s "${SOURCE}js" "${PATH}js"
+    /bin/ln -s "${SOURCE}library" "${PATH}library"
+    /bin/ln -s "${UTILS}.htaccess" "${PATH}.htaccess"
+    /bin/ln -s "${SOURCE}bootstrap.php" "${PATH}bootstrap.php"
+    # End Misc
+    
+    # Need to copy the index.php file because it defines the PATH_ROOT and the symbolic link will treat it as though it were in ${SOURCE}
+    /bin/cp "${SOURCE}index.php" "${PATH}index.php"
+    
+    # Create a new config file
+    /usr/bin/touch ${PATH}conf/config.php
+    
+fi
+
+exit

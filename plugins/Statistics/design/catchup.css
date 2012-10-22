@@ -1,0 +1,18 @@
+div.CatchupBlock div.CatchupResults {
+   margin-left: 20px;
+}
+
+div.CatchupBlock div.CatchupResults div.Result {
+   overflow: hidden;
+   height: 100%;
+}
+
+div.CatchupBlock div.CatchupResults div.Result span {
+   width: 120px;
+   float: left;
+}
+
+div.CatchupBlock div.CatchupResults div.Result span.CatchupTitle {
+   text-align: right;
+   margin-right: 10px;
+}

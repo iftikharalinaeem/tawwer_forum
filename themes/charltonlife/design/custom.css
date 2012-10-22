@@ -1,0 +1,405 @@
+/* ========================================= VanillaForums.org Customizations */
+
+/* ---- General Styles ---- */
+a,
+a:link,
+a:visited,
+a:active {
+   text-decoration: none;
+   color: #921A29;
+}
+a:hover {
+   text-decoration: none;
+   color: #921A29;
+	text-decoration: underline;
+}
+.Button:hover {
+	text-decoration: none;
+}
+body {
+	background: #E9F9FF;
+}
+#Frame {
+	background: url('images/bg-fade.gif') top left repeat-x #fff;
+}
+#Body {
+   margin: 0 auto;
+	padding: 30px 0;
+}
+div#Content {
+	margin-bottom: 40px;
+}
+div#Foot {
+	margin: 0;
+	padding: 0;
+}
+div#Foot div {
+	padding: 10px 20px;
+	border: 0;
+	margin: 0 auto;
+}
+div#Foot div,
+div#Foot div a {
+	color: #80828C;
+}
+div#Foot div a:hover {
+	text-decoration: none;
+	color: #40424C;
+}
+
+
+/* ---- Banner ---- */
+
+.Banner {
+	background: url('images/bannerbg.jpg') top left repeat-x #000;
+	text-align: center;
+	position: relative;
+}
+.BannerWrapper {
+	width: 960px;
+	margin: 0 auto;
+}
+.Banner div.Buttons {
+}
+.Banner div.UserOptions {
+	position: absolute;
+	top: 0;
+	right: 20px;
+	background: url('images/userinfo_left.png') left bottom no-repeat;
+}
+.Banner div.UserOptions div {
+	background: url('images/userinfo_right.png') right bottom no-repeat;
+	padding: 0 10px 4px 4px;
+	margin-left: 6px;
+}
+.Banner div.UserOptions a {
+	color: #fff;
+	text-shadow: 0 1px 0 #000;
+	margin: 0 8px;
+	font-family: 'Trebuchet MS', Arial;
+	font-size: 11px;
+}
+.Banner div.UserOptions a.Username:hover,
+.Banner div.UserOptions a.Inbox:hover {
+	text-decoration: none;
+}
+.Banner div.UserOptions a.Username:hover em,
+.Banner div.UserOptions a.Inbox:hover em {
+	text-decoration: underline;
+}
+.Banner div.UserOptions a span {
+	margin: 0 0 0 6px;
+	background: #888;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	color: #fff;
+	padding: 0 2px;
+	font-weight: normal;
+	font-family: 'lucida grande','Lucida Sans Unicode', Tahoma, sans-serif;
+	text-shadow: 0 1px 0 #000;;
+}
+.Banner h1 {
+   border: 0;
+   margin: 0;
+   padding: 0;
+	position: absolute;
+	top: 0;
+	left: 20px;
+}
+.Banner h1 a {
+	margin: 10px 0 0;
+   display: block;
+}
+.Banner h1 a span {
+	color: #fff;
+	font-size: 30px;
+}
+.Banner ul {
+   list-style: none;
+   margin: 0;
+	padding: 40px 0 20px;
+}
+.Banner ul li {
+	display: inline-block;
+	height: 46px;
+	padding-left: 4px;
+	margin-left: 4px;
+}
+.Banner ul li a {
+   display: inline-block;
+   font-family:'Trebuchet MS', 'helvetica nueue', helvetica;
+   font-size:15px;
+   font-weight:bold;
+   text-decoration: none;
+   color: #fff;
+   text-shadow:1px 1px 1px #000;
+	height: 46px;
+	line-height: 46px;
+	padding: 0 14px 0 10px;
+}
+.Banner ul li.Download {
+	background: url('images/dl_left.png') left center no-repeat;	
+}
+.Banner ul li.Download a {
+	background: url('images/dl_right.png') right center no-repeat;
+}
+body#garden_search_index .Banner ul li.Community,
+body#vforg_home_index .Banner ul li.Home,
+body.hosting .Banner ul li.Hosting,
+body.Wiki .Banner ul li.Documentation,
+body.Addons .Banner ul li.Addons,
+body.Profile .Banner ul li.Community,
+body.Vanilla .Banner ul li.Community,
+body.Conversations .Banner ul li.Community,
+body.Activity .Banner ul li.Community {
+	background: url('images/tab_left.png') left center no-repeat;	
+}
+body#garden_search_index .Banner ul li.Community a,
+body#vforg_home_index .Banner ul li.Home a,
+body.hosting .Banner ul li.Hosting a,
+body.Wiki .Banner ul li.Documentation a,
+body.Addons .Banner ul li.Addons a,
+body.Profile .Banner ul li.Community a,
+body.Vanilla .Banner ul li.Community a,
+body.Conversations .Banner ul li.Community a,
+body.Activity .Banner ul li.Community a {
+	background: url('images/tab_right.png') right center no-repeat;
+}
+
+/* --- Profile Page --- */
+form.Activity,
+ul.Activities {
+	background: #fff;
+}
+ul.Activities li.Item {
+	padding: 4px; 
+}
+ul.Discussions {
+	background: #fff;
+}
+#Status {
+	background: none;
+	padding: 0 0 8px;
+	color: #333;
+}
+
+
+a.BigButton:hover {
+	text-decoration: none;
+}
+
+/* --- Search --- */
+#Search {
+	position: absolute;
+	top: 48px;
+	right: 20px;
+}
+#Search input.InputBox {
+	width: 200px;
+	font-size: 12px;
+	padding: 3px;
+	border: none;
+}
+#Search input.Button {
+	border: none;
+	background: none;
+	color: #fff;
+	text-shadow: none;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+}
+
+
+/* --- Panel --- */
+a.BigButton,
+a.BigButton:hover,
+a.BigButton:active {
+	border-radius: none;
+	-moz-border-radius: none;
+	-webkit-border-radius: none;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	background:url("images/button_green.png") left top no-repeat #5ea229;
+	color: #fff;
+	text-shadow: 0 1px 0 #333;
+	border: none;
+	padding: 0;
+	height: 46px;
+	line-height: 46px;
+}
+a.BigButton:hover { background-position: left center; }
+a.BigButton:active { background-position: left bottom; }
+
+div.Box {
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	background:none;
+	color:#888888;
+	margin:0 0 10px;
+	padding: 0;
+}
+div.Box h4 {
+	color:#444;
+	background: url('images/hr.png') bottom left repeat-x;
+}
+ul.PanelInfo {
+	border: none;
+}
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+	background: none;
+	border-bottom: 1px dotted #c8d3e2;
+}
+
+/* Tabs */
+div.Tabs {
+	background: url('images/grey_fade.png') left top repeat-x #EDF1F9;
+	border:1px solid #9fa9b9;
+	border-radius: 4px 4px 0 0;
+	-moz-border-radius: 4px 4px 0 0;
+	-webkit-border-radius: 4px 4px 0 0;
+}
+div.Tabs li.Active a {
+	border: 1px solid #9fa9b9;
+}
+form.Activity,
+ul.MessageList,
+ul.DataList {
+	background: #fff;
+	/* border: 1px solid #9fa9b9; */
+	border-top: 0;
+}
+ul.ActivityComments {
+	border: none;
+}
+form.Activity {
+	padding-bottom: 10px;
+	border-bottom: 0;
+}
+body.Profile ul.Activities {
+	margin-top:0;
+}
+body.Profile ul.PanelInfo {
+	border: none;
+}
+ul.SearchResults li.Item {
+	padding: 6px;
+}
+
+/* Popups */
+div.Popup h1, div.Popup h2 {
+	background: #2a529a;
+	border: none;
+}
+a.Close,
+a.Close:hover,
+a.Close:active,
+a.Close:focus {
+	color: #fff;
+	text-decoration: none;
+}
+
+
+/* CL Customizations */
+ul.DataList li.Item {
+	background: #FFFEEC;
+}
+ul.DataList li.New {
+	background: #FEFECC;
+}
+ul.DataList li.Mine div.Meta a.Category,
+ul.DataList div.Meta a.Category {
+	background:none;
+}
+form.Activity {
+   border-bottom: solid 1px #9FA9B9;
+}
+form.Activity .TextBoxWrapper {
+   padding: 0;
+}
+ul.MessageList, ul.DataList {
+	border-left: none;
+	border-right: none;
+	border-bottom: none;
+}
+
+div.Preview div.Message, ul.MessageList div.Message {
+    clear:none;
+}
+
+.CategoryList .ItemContent {
+   margin: 0;
+}
+
+/* Full Width */
+#Body {
+	 width: 99.9%;
+	 position: relative;
+}
+#Content {
+	 width: auto;
+	 margin: 0 20px 0 290px;
+	 float: none;
+}
+#Panel {
+   width: 250px;
+   float: left;
+   padding: 0 20px;
+/*	 float: none;
+	 position: absolute;
+	 left: 20px;
+	 top: 30px;*/
+}
+body.Profile #Content {
+	 width: auto;
+	 margin: 0 20px 0 290px;
+	 float:none;
+}
+body.Profile #Panel {
+	 right: auto;
+	 left: 20px;
+}
+/*
+form.Activity textarea {
+    width:99%;
+}
+*/
+#Foot div {
+	 width: auto;
+}
+body.Post #Content {
+    margin:0 20px;
+}
+/*
+div.Comment div.CommentForm,
+div.Comment div.CommentForm textarea,
+div.CommentForm textarea,
+#DiscussionForm input.InputBox,
+#DiscussionForm textarea {
+    width:99%;
+}
+*/
+.Count {
+   background: #444;
+   color: #fff;
+}
+/*
+.ToggleFlyout .Flyout {
+   left: auto;
+   right: 0;
+}
+*/
+.MenuItems {
+   min-width: 75px;
+}
+.DataList.Discussions .Item:first-child {
+   border-top-width: 1px;
+}
+.NavButton,
+.Button,
+.MenuItems a {
+   text-decoration: none !important;
+}

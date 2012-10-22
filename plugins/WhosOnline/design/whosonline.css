@@ -1,0 +1,25 @@
+.PhotoGrid .GuestCountBox {
+    display: inline-block;
+    margin: 2px;
+    height: 32px;
+    vertical-align: top;
+}
+
+.PhotoGrid .GuestCount {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 32px;
+}
+
+.PhotoGridSmall .GuestCountBox {
+    height: 24px;
+    line-height: 24px;
+}
+
+#WhosOnline .Invisible {
+   opacity: 0.3;
+}
+
+#WhosOnline .Invisible:hover {
+   opacity: 1;
+}

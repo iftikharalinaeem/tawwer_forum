@@ -1,0 +1,432 @@
+.Reactions {
+   position: relative;
+   font-size: 11px;
+   line-height: 18px;
+}
+.Reactions .Handle {
+   display: inline-block;
+   opacity: .3;
+}
+.React {
+   position: absolute;
+   right: 0;
+   top: 0;
+}
+.ReactHeading {
+   display: inline-block;
+   padding: 0px 6px;
+   background: rgba(0,0,0,0.04);
+   color: rgba(0,0,0,0.4);
+}
+.Flag .ReactHeading {
+   border-radius: 4px 0 0 4px;
+}
+.React .ReactHeading {
+   border-radius: 0 4px 4px 0;
+}
+.Item:hover .ReactHeading {
+   background: rgba(0,0,0,0.8);
+   color: #fff;
+}
+.ReactButton {
+   display: inline-block;
+   padding: 0px 2px;
+   margin: 0 2px;
+   padding: 0 3px 0 0;
+}
+.Flyout .ReactButton {
+   margin: 0;
+}
+
+.UserReactionWrap {
+    position: relative;
+    line-height: 1;
+    display: inline-block;
+    margin-right: 3px;
+}
+.UserReactionWrap .ReactSprite {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+}
+/* Hover Mechanics */
+.Reactions .Count {
+   border-radius: 6px;
+   -moz-border-radius: 6px;
+   -webkit-border-radius: 6px;
+   vertical-align: top;
+   background: #494949;
+   background: rgba(0, 0, 0, 0.7);
+}
+.ReactButton {
+   /* opacity: 0; */
+   line-height: 14px;
+}
+.ToggleFlyout.Open .ReactButton {
+   opacity: 1 !important;
+}
+.Item:hover .Reactions .Handle {
+   opacity: .75;
+}
+.Reactions .ReactHandle {
+   display: none;
+}
+.Item:hover .Reactions a {
+   width: inherit;
+}
+.Reactions a.HasCount {
+   display: inline-block;
+}
+.InProgress .ReactSprite {
+   background-image: none !Important;
+   background: transparent !Important;
+}
+.InProgress .Count {
+   visibility: hidden;
+}
+.FilterButton.Selected {
+   font-weight: bold;
+}
+.DataCounts {
+   margin: 5px 0;
+   text-align: center;
+}
+/*.DataCounts a {
+   color: #000;
+}
+.DataCounts a:hover {
+   color: #ff0084;
+}*/
+.CountTotal {
+   display: block;
+   line-height: 100%;
+   font-size: 28px;
+}
+.CountTotal img {
+   height: 40px;
+}
+.CountItemWrap {
+   width: 10%;
+   display: inline-block;
+}   
+.CountItem {
+   display: block;
+   text-align: center;
+   border: solid 2px transparent;
+   padding: 4px;
+   margin: 0 4px;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+   white-space: nowrap;
+   overflow: visible;
+}
+.Compact .Item .Author img {
+   height: 24px;
+   width: 24px;
+}
+.Compact .Author .PhotoWrap {
+   margin: 0 8px 4px 0;
+}
+.Compact .Title {
+   font-sixe: 13px;
+}
+.Compact .Reactions {
+   margin-top: 5px;
+}
+.Compact p {
+   margin: 5px 0;
+}
+.CountItem.Selected {
+    background: rgba(55, 173, 227, 0.1);
+    border: solid 2px rgba(55, 173, 227, .2);
+    padding: 4px
+}
+.Buried {
+    padding: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+.Buried, .Buried a {
+    color: #aaa;
+    font-size: 12px;
+}
+.Buried .Author .ProfilePhoto {
+    height: 21px;
+    width: 21px;
+    margin: 0 3px 0 0;
+    opacity: .4;
+}
+.Buried .Reactions {
+    display: none;
+}
+.Buried * {
+   display: inline;
+   margin: 0;
+   white-space: nowrap;
+   padding-top: 0;
+   padding-bottom: 0;
+}
+.Buried br {
+   display: none;
+}
+.Buried .Item-BodyWrap,
+.Buried .Options,
+.Buried .Signature,
+.Buried .RecordReactions {
+    display: none;
+}
+.Buried:hover:before {
+    content: "Post is buried, click here to show the rest.";
+    display: block;
+    position: absolute;
+    background: rgba(0,0,0,.75);
+    color: #fff;
+    text-shadow: 0 1px 1px #000;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 40px; /* approx, could cause problems */
+}
+.Promoted {
+    box-shadow: inset 0 80px 600px #fffcdc;
+    border-top: solid 1px #fff;
+}
+.Promoted .Message {
+    font-size: 110%;
+}
+.Promoted .Author .ProfilePhotoMedium {
+    box-shadow: 0px -1px 8px #fff;
+}
+/* Menu stuff */
+.Flyout.Flags {
+    top: 25px;
+    z-index: 1000;
+}
+.FlagMenu > .SpFlyoutHandle {
+   left: 10px;
+   bottom: -12px;
+   z-index: 1001;
+}
+
+/* Reaction Revamp */
+.Reactions .Bullet {
+    color: #999;
+}
+.React {
+    position: relative;
+    top: auto;
+    right: auto;
+}
+.Reactions {
+    line-height: 1;
+    margin: 15px 0 0 0;
+}
+.RecordReactions {
+    margin-top: 15px;
+}
+.RecordReactions + .Reactions {
+   margin-top: 0;
+}
+.Reactions .Count {
+    font-size: 8px;
+    background: #555;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    margin-right: 4px;
+}
+.Item .Reactions > * {
+    visibility: hidden;
+}
+.Item .Reactions > *.Visible {
+    visibility: visible;
+}
+.Item.Open .Reactions > *,
+.Item:hover .Reactions > *, 
+.Item .Reactions > .FlagMenu {
+    visibility: visible;
+}
+
+.ReactButton {
+   margin: 0 4px;
+}
+
+.Reactions > a.React > .ReactSprite {
+   margin-right: 2px;
+}
+.ReactButton {
+    padding: 0;
+}
+.Reactions .FlagMenu .MenuItems .ReactButton {
+   margin: 0;
+   padding: 0 15px;
+}
+
+/* OLD "Best Of" */
+.ReactionFilters {
+   margin: 8px 0;
+}
+.ReactionFilters .ReactButton {
+   opacity: 1;  
+   margin-right: 6px;
+}
+.ReactionFilters .ReactButton .ReactSprite {
+   background-image: url('reaction-sprites-color.png') !important;
+}
+.ReactionFilters .ReactLabel {
+   padding-left: 4px;
+}
+.BestOfData .DataList .Item:first-child {
+   border-top: 1px solid #BEC8CC;
+}
+/* End "Best Of" */
+
+/* NEW "Best Of" */
+.Section-BestOf #Content .BoxFilter {
+   display: block;
+}
+.Section-BestOf .BestOfData .DataList .Item:first-child {
+   border-top: none;
+}
+.Section-BestOf .BoxFilter .ReactSprite {
+   margin: 2px 4px 0 0;
+}
+.Section-BestOf .BestOfList .RecordReactions,
+.Section-BestOf .BestOfList .React.Quote,
+.Section-BestOf .BestOfList .Reactions .Bullet,
+.Section-BestOf .BestOfList .ReactButton-Flag .ReactLabel {
+    display: none;
+}
+.Section-BestOf .BestOfData {
+   overflow: hidden;
+}
+.Section-BestOf .BestOfList {
+    position: relative;
+    margin: 0 auto;
+}
+.Section-BestOf .BestOfList .Item {
+    width: 223px;
+    padding: 0;
+    margin: 0;
+    font-family: "helvetica neue",arial,sans-serif;
+    box-shadow: 0 0 1px #333;
+    background: #eee;
+    float: left;
+    margin: 10px;
+}
+.Section-BestOf .BestOfList .Item.Wide {
+   width: 466px;
+}
+.Section-BestOf .BestOfList .BodyWrap {
+    background: #fff;
+    padding: 10px 15px;
+}
+.Section-BestOf .BestOfList .Item h3 {
+    font-size: 12px ;
+    line-height: 1.5 ;
+    background: #fafafa;
+    margin: -10px -15px 15px;
+    padding: 10px 15px;
+}
+.Section-BestOf .BestOfList .Item .Body {
+    font-size: 11px;
+    line-height: 1.5;
+    overflow: hidden;
+}
+.Section-BestOf .BestOfList .Item .Body img {
+    max-width: 100%;
+}
+.Section-BestOf .BestOfList .FooterWrap {
+    padding: 10px 15px;
+    background: #fafafa;
+}
+.Section-BestOf .BestOfList .FooterWrap .Meta {
+    display: none;
+}
+.Section-BestOf .BestOfList .AuthorWrap,
+.Section-BestOf .BestOfList .Item .Author {
+   line-height: 1;
+}
+.Section-BestOf .BestOfList .Item .Author a {
+    font-size: 11px;
+}
+.Section-BestOf .BestOfList .ProfilePhotoMedium {
+   height: 30px !important;
+   width: 30px !important;
+}
+.Section-BestOf .BestOfList .Item .Reactions > * {
+    visibility: visible;
+}
+.Section-BestOf .BestOfList .Reactions .Count,
+.Section-BestOf .BestOfList .ReactMenu {
+    margin: 0;
+}
+.Section-BestOf .BestOfList .Reactions .FlagMenu .ReactButton-Flag {
+   margin: 0 6px 0 0;
+}
+.Section-BestOf .BestOfList .FlagMenu > .SpFlyoutHandle {
+   bottom: -14px;
+   left: 0;
+}
+.Section-BestOf .BestOfList .Flyout.Flags {
+   left: -12px;
+}
+.Section-BestOf .BestOfList .ReactButton-Flag, 
+.Section-BestOf .BestOfList .ReactMenu .ReactButton {
+    position: relative;
+}
+.Section-BestOf .BestOfList .ReactButton-Flag .ReactLabel,
+.Section-BestOf .BestOfList .ReactMenu .ReactLabel {
+   display: none;
+    background: #333;
+    color: #fff;
+    white-space: nowrap;
+   position: absolute;
+   line-height: 1;
+   padding: 3px 6px;
+   left: -4px;
+   top: -22px;
+}
+.Section-BestOf .BestOfList .ReactButton-Flag .ReactLabel:after,
+.Section-BestOf .BestOfList .ReactMenu .ReactLabel:after {
+    position: absolute;
+    content: '';
+    display: block;
+   border: 5px solid transparent;
+   border-color: #333 transparent transparent transparent;
+   bottom: -10px;
+}
+.Section-BestOf .BestOfList .ReactButton-Flag:hover .ReactLabel,
+.Section-BestOf .BestOfList .ReactMenu .ReactButton:hover .ReactLabel {
+   display: block;
+}
+.Section-BestOf .BestOfList .ReactMenu .ReactButton .ReactSprite,
+.Section-BestOf .BestOfList .ReactMenu .ReactButton .Count,
+.Section-BestOf .BestOfList .ReactButton-Flag .ReactSprite {
+   opacity: 0.5;
+}
+.Section-BestOf .BestOfList .ReactMenu .ReactButton:hover .ReactSprite,
+.Section-BestOf .BestOfList .ReactMenu .ReactButton:hover .Count,
+.Section-BestOf .BestOfList .ReactButton-Flag:hover .ReactSprite,
+.Section-BestOf .BestOfList .ToggleFlyout.Open .ReactButton-Flag .ReactSprite {
+   opacity: 1;
+}
+#infscr-loading {
+    text-align: center;
+}
+#infscr-loading img {
+    margin: 0 auto;
+}
+/* End "Best Of" */
+
+/* iPad/iPhone */
+@media only screen and (device-width: 768px),
+only screen and (max-device-width: 480px) {
+   .Item .Reactions > * { visibility: visible; }
+}

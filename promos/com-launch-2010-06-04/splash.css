@@ -1,0 +1,369 @@
+body {
+	padding: 0;
+	margin: 0;
+	font-family: arial;
+	background: url('images/bg-plans.png') top left repeat-x #6bc9f9;
+	background-position: 0 -700px;
+}
+div.Wrap {
+	background: url('images/bg-shines.png') top center no-repeat;
+}
+img {
+	border: 0;
+}
+a,
+a:link,
+a:visited,
+a:active {
+   text-decoration: none;
+   color: #2A529A;
+}
+a:hover {
+   text-decoration: none;
+   color: #ff0084;
+}
+h1 {
+   font-size: 160%;
+   font-weight: bold;
+}
+h2 {
+   font-size: 120%;
+   font-weight: bold;
+}
+h3 {
+   font-size: 110%;
+   font-weight: bold;
+}
+em {
+   font-style: italic;
+}
+strong {
+   font-weight: bold;
+}
+.Progress {
+   color:#02455B;
+   font-size: 22px;
+   font-weight: bold;
+   text-shadow:0 1px 0 #FFFFFF;
+   display: block;
+   padding: 6px 0 7px 50px;
+   margin: 0;
+   background: url('progress.gif') left center no-repeat;
+}
+#Newsletter .Progress,
+#SignIn .Progress {
+   margin: 30px 0 0;
+}
+div.Content div.Center,
+div.Head div.Center {
+	text-align: right;
+}
+div.Content div.Message {
+	width: 370px;
+	float: left;
+	text-align: left;
+}
+
+
+
+div.Content div.Preview {
+	background: url('images/screenshot.png') top right no-repeat;
+	height: 411px;
+	width: 603px;
+	margin: 10px 0 0 370px;
+}
+div.Preview img {
+	
+}
+div.ScreenNav {
+	text-align: center;
+}
+div.Logo {
+	position: absolute;
+	top: 28px;
+	margin-left: 82px;
+}
+
+/* Sprites */
+i.Sprite {
+	display: inline-block;
+	background-image: url('images/sprite-icons.png');
+	background-repeat: no-repeat;
+}
+i.Sprite span {
+	display: none;
+}
+i.SpriteScreen {
+	display: block;
+	float: left;
+	height: 38px;
+	width: 40px;
+	margin-right: 10px;
+	background-position: -38px 0px;
+}
+i.SpriteClock {
+	display: block;
+	float: left;
+	height: 38px;
+	width: 50px;
+	background-position: -36px -38px;
+}
+i.SpriteDot {
+	height: 20px;
+	width: 20px;
+}
+i.SpriteDotOn { background-position:  4px -90px; }
+i.SpriteDotOff { background-position:  -14px -90px; }
+
+i.SpriteYes {
+	background-position:0 -114px;
+	height:14px;
+	width:18px;
+}
+i.SpriteNumber {
+	background-image: url('images/sprite-numbers.png');
+	height: 38px;
+	width: 38px;
+	vertical-align: middle;
+	margin-right: 6px;
+}
+i.SpriteOne { background-position: 0 0; }
+i.SpriteTwo { background-position: 0 -42px; }
+i.SpriteThree { background-position: 0 -84px; }
+i.SpriteFour { background-position: 0 -126px; }
+i.SpriteFive { background-position: 0 -169px; }
+/* MENU */
+div.Menu {
+	padding: 25px 18px 0 0;
+}
+div.Menu div {
+	padding-left: 3px;
+	display: inline;
+}
+div.Menu a {
+	padding: 0 0 0 3px;
+	background: url('images/sprite-menu-btn-left.png') top left no-repeat;
+	display: inline-block;
+	height: 32px;
+	overflow: hidden;
+	font-weight: 400;
+}
+div.Menu a span {
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	font-weight: bold;
+	line-height: 2.5;
+	padding: 0 10px 0 5px;
+	background: url('images/sprite-menu-btn-right.png') top right no-repeat;
+	display: block;
+	height: 32px;
+	font-size: 12px;
+	text-shadow: 0 1px 1px #fff;
+	color: #003f87;
+}
+div.Menu i.Sprite {
+	padding-right: 2px;
+}
+div.Menu a:hover {
+	background: url('images/sprite-menu-btn-left.png') center left no-repeat;
+}
+div.Menu a:hover span {
+	background: url('images/sprite-menu-btn-right.png') center right no-repeat;
+}
+i.SpriteSignIn,
+i.SpriteFeatures,
+i.SpritePlans,
+i.SpriteHome {
+	vertical-align: middle;
+	height: 15px;
+	width: 14px;
+	background-position: -19px 0px;
+}
+i.SpriteHome { background-position: -19px -19px; }
+i.SpritePlans { background-position: -19px -36px; }
+i.SpriteFeatures { background-position: -19px -58px; }
+
+body.index div.Menu div.Home a,
+div.Menu a:focus {
+	background: url('images/sprite-menu-btn-left.png') bottom left no-repeat;
+}
+body.index div.Menu div.Home a span,
+div.Menu a:focus span {
+	text-shadow: 0 1px 1px #003f87;
+	color: #cef1fc;
+	background: url('images/sprite-menu-btn-right.png') bottom right no-repeat;
+}
+div.Menu a:focus i.SpriteSignIn { background-position: 0px 0px; }
+body.index div.Menu a i.SpriteHome,
+div.Menu a:focus i.SpriteHome { background-position: 0px -19px; }
+div.Menu a:focus i.SpritePlans { background-position: 0px -36px; }
+div.Menu a:focus i.SpriteFeatures { background-position: 0px -58px; }
+
+/* Head */
+div.Wrapper {
+   text-align: center;
+}
+div.Center {
+   text-align: left;
+   width: 960px;
+   margin: 0 auto;
+}
+#Head div.Center {
+   text-align: right;
+}
+div.Message h2 {
+	margin: 75px 0 20px;
+	padding: 0;
+	font-size: 18px;
+	color: #003a8a;
+}
+ol li,
+div.Message p {
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	text-shadow: 0 1px 1px #0093f8;
+	color: #fff;
+	font-size: 12px;
+	margin: 0;
+	padding: 10px 0;
+	clear: both;
+}
+ol li a {
+	text-shadow: 0 1px 1px #0093f8;
+	color: #fff !important;
+	text-decoration: none;
+}
+ol {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+ol li {
+	display: block;
+	margin: 0;
+	padding: 0;
+	line-height: 3.5;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+a.Plans {
+	margin-top: 24px;
+	display: block;
+	background: url('images/sprite-plans-btn.png') top left no-repeat;
+	height: 70px;
+	width: 370px;
+	text-align: center;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	font-size: 12px;
+	color: #184e00;
+	text-shadow: 0 1px 0 #45c408;
+}
+a.Plans:focus {
+	background-position: bottom left;
+}
+a.Plans strong {
+	padding: 12px 0 4px;
+	font-size: 20px;
+	display: block;
+	color: #fff;
+}
+
+/* Foot */
+div.Foot {
+	padding: 45px 0 15px;
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	font-size: 12px;
+	text-align: center;
+	clear: both;
+}
+div.Foot div.Center {
+	text-align: center;
+}
+div.Foot a {
+	margin: 0 12px;
+	color: #DDFFFF;
+	text-shadow: 0 1px 1px #0088E7;
+}
+div.Foot a:hover {
+	color: #FFFFFF;
+}
+/*Forms */
+input.Button {
+	font-size:12px;
+	font-weight:bold;
+}
+
+input.InputBox {
+	width:240px;
+	color:#000000;
+	font-size:16px;
+	font-weight:bold;
+	margin:0;
+	padding:3px;
+}
+.BlueButton {
+	border: 1px solid #0f7fe6;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	background: url('images/bg-button-blue.png') top left repeat-x;
+	color: #003673;
+	text-shadow: 0 1px 0 #b7f5fd;
+	font-weight: bold;
+	font-size: 12px;
+	text-decoration: none;
+	padding: 6px 10px;
+	cursor: pointer;
+}
+.BlueButton:hover {
+	border: 1px solid #0B64c6;
+	color: #001F44;
+	text-shadow: 0 1px 0 #EFF;
+}
+.BlueButton:focus {
+	background: #81cff6;
+	border: 1px solid #0B64c6;
+	color: #001F44;
+	text-shadow: 0 1px 0 #EFF;
+}
+
+
+#SignUp {
+	text-align: left;
+	margin:0;
+}
+
+#SignUp h2 {
+color:#003A8A;
+font-size:18px;
+margin:0 0 10px;
+padding:0;
+}
+
+/* -------------- slider --------------  */
+.container {
+	width: 539px;
+	padding: 0;
+	margin: 0 auto;
+}
+
+
+
+/*--Main Container--*/
+.main_view {
+	float: left;
+	position: relative;
+}
+/*--Window/Masking Styles--*/
+.window {
+	height:361px;	width: 539px;
+	overflow: hidden; /*--Hides anything outside of the set width/height--*/
+	position: relative;
+	margin: 32px 32px 0 0;
+}
+.image_reel {
+	position: absolute;
+}
+.image_reel img {float: left;}
+div.ScreenNav {
+	margin-top: 20px;
+	text-align: center;
+}

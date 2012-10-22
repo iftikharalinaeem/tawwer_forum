@@ -1,0 +1,28 @@
+#Body {
+	 margin: 15px 0 0;
+	 width: 99.9%;
+	 position: relative;
+}
+#Content {
+	 width: auto;
+	 margin: 0 290px 0 20px;
+	 float: left;
+}
+#Panel {
+	 float: none;
+	 position: absolute;
+	 right: 20px;
+	 top: 0px;
+}
+body.Profile #Content {
+	 width: auto;
+	 margin: 0 20px 0 290px;
+	 float:right;
+}
+body.Profile #Panel {
+	 right: auto;
+	 left: 20px;
+}
+#Foot div {
+	 width: auto;
+}

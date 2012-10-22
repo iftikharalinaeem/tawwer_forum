@@ -1,0 +1,44 @@
+@import "defaults";
+
+/// Scaffolding ///
+
+$bodyBackground: #2F2F2F;
+$textColor: #c6c6c6;
+$headingsColor: #fff;
+$linkColor: #84BCDE;
+$linkColorHover: #39E5FF;
+
+$borderColor: #242424;
+
+/// Forms ///
+
+$btnBackground: lighten(#2F2F2F, 10%);
+$btnColor: #fff;
+$btnPrimaryBackground: $red;
+$btnPrimaryColor: #fff;
+$formBackground: #2A2A2A;
+
+$readBackground: #383838;
+
+$navbarBackground: #000;
+
+$boxBackground: darken($bodyBackground, 2%);
+$listBackground: darken($bodyBackground, 2%);
+
+$uiColor: #f0f0f0;
+
+/// Messages ///
+
+$warningText: #fff;
+$warningBackground: $orange;
+
+$errorText: #fff;
+$errorBackground: $red;
+
+$successText: #fff;
+$successBackground: $green;
+
+$infoText: #fff;
+$infoBackground: $blue;
+
+@import "colors";

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+PATH=/srv/www/vhosts/
+
+for DIR in `/bin/ls /srv/www/vhosts`
+do
+
+echo $DIR
+   # Remove existing symlink
+   /bin/rm ${PATH}${DIR}/.htaccess
+   
+   # Add new symlink
+   /bin/ln -s /srv/www/misc/utils/.htaccess ${PATH}${DIR}/.htaccess
+
+done

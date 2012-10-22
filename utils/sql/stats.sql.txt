@@ -1,0 +1,43 @@
+/* Total active accounts */
+select
+  ss.Date,
+  count(distinct a.AccountID) as Active
+from GDN_SiteStat ss
+join GDN_Site s
+  on s.SiteID = ss.SiteID
+join GDN_Account a
+  on s.AccountID = a.AccountID
+left join GDN_SiteStat sl
+  on sl.SiteID = ss.SiteID and date_add(sl.Date, interval 1 month) = ss.Date
+where a.Internal = 0
+  and ss.CountComments > 0
+group by ss.Date;
+
+/* New active accounts */
+select
+  ss.Date,
+  count(distinct a.AccountID) as Active
+from GDN_SiteStat ss
+join GDN_Site s
+  on s.SiteID = ss.SiteID
+join GDN_Account a
+  on s.AccountID = a.AccountID
+where a.Internal = 0
+  and ss.CountComments > 0
+and not exists (select * from GDN_SiteStat ss2 where ss2.SiteID = ss.SiteID and ss2.Date < ss.Date)
+group by ss.Date;
+
+/* Paying Customers */
+select count(*) from GDN_Account where Internal = 0 and SubscriptionSubtotal > 0;
+
+/* Cancellations */
+select date_format(pa.DateInserted, '%Y-%c-1') as Date, count(pa.AccountID)
+from GDN_PaymentActivity pa
+join GDN_Account a
+  on a.AccountID = pa.AccountID
+where pa.Type = 'AccountChange'
+  and a.Internal = 0
+  /*and not exists (select * from GDN_PaymentActivity pa2 where pa2.AccountID = pa.AccountID and pa2.DateInserted < pa.DateInserted)*/
+  and Amount = 0
+  and exists (select * from GDN_PaymentActivity pa3 where pa3.AccountID = pa.AccountID and pa3.DateInserted < pa.DateInserted and pa3.Amount > 0)
+group by date_format(pa.DateInserted, '%Y-%c-1');

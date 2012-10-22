@@ -1,0 +1,163 @@
+/* =========================================================== Customizations */
+body {
+	background: #0E4490 url('bg.png') repeat-x center top;
+}
+div.Menu {
+	text-align: right;
+}
+/* Unfloat the title so the menu drops below our logo, and our logo doesn't push
+the menu to the right. */
+body #Head h1 {
+   float: left;
+   padding: 6px 0 0;
+}
+/* Set the background of the title anchor as our Vanilla logo. Make sure to set the
+display to block, and the height and width equal to the dimensions of the logo. This
+will make it so that none of the logo is cut off. */
+body #Head h1 a {
+   background: url('vanilla_logo.png') center center no-repeat;
+   display: block;
+   height: 100px;
+   width: 236px;
+} 
+/* Hide the text in the title anchor so it doesn't appear on top of our logo. */
+body #Head h1 a span {
+   display: none;
+}
+/* Change the padding & margins on various elements so everything lines up with the
+logo nicely. */
+ul#Menu {
+   padding: 6px 0 0;
+	float: right;
+}
+#Head {
+   height: 200px;
+	background: url('background-top.png') no-repeat center 110px;
+}
+
+div.Menu,
+#Body {
+	width: 880px;
+}
+#Body {
+	margin: 0 auto;
+}
+div#Body div.Wrapper {
+	float: left;
+	width: 800px;
+	padding: 0 40px;
+	background: url('background-main-repeat.png') repeat-y center top;
+}
+div#Foot {
+	background: url('background-bottom.png') no-repeat center top;
+}
+#Foot div {
+	width: 800px;
+	padding: 0 40px;
+	border: 0;
+	height: 60px;
+	color: #888;
+}
+#Content {
+	position: relative;
+	top: -65px;
+	width: 500px;
+}
+#Panel {
+	position: relative;
+	top: -42px;
+	margin: 0 16px 0 0;
+}
+h1, h2, h3, h4, h5, h6 {
+	text-shadow: 0 1px 0 #fff;
+}
+h1, h2 {
+	color: #333;
+	font-size: 200%;
+	line-height: 120%;
+}
+ul.PanelInfo {
+	border-top: 1px solid #aaa;
+}
+ul.PanelInfo li {
+	background: none;
+	border-bottom: 1px solid #888;
+}
+#Panel div.Box {
+	background: transparent;
+	color: #fff;
+	margin:0 0 10px;
+	padding: 0;
+	text-shadow: 0 1px 1px #000;
+}
+#Panel a,
+#Panel a:link,
+#Panel a:visited,
+#Panel a:active {
+	color: #fff;
+}
+#Panel a:hover {
+	text-decoration: underline;
+}
+div.Box h4 {
+	font-family:'lucida grande','Lucida Sans Unicode',tahoma,sans-serif;
+	color:#fff;
+	text-shadow: 0 1px 1px #000;
+}
+ul.PanelInfo div.Meta strong {
+	background: #555;
+	color: #fff;
+}
+#Search {
+	padding: 30px 0 0;
+}
+#Search input.InputBox {
+	width: 194px;
+	margin-right: 10px;
+	padding: 4px;
+	border: 1px solid #fff;
+}
+#Search .Button {
+	border: 1px solid #fff;
+	color: #222;
+	text-shadow: 0 1px 0 #fff;
+}
+
+/* =========================================================== Customizations */
+ul.DataList li ul li.Title {
+	width:400px;
+}
+.Mine {
+   background: transparent;
+}
+ul.DataList li {
+   border-top: 1px solid #eee;
+	border-bottom: 1px solid #ccc;
+}
+ul.DataList {
+   border-bottom: 1px solid #eee;
+}
+ul.DataList li * {
+   text-shadow: 0 1px 0 #fff;
+}
+li.New,
+ul.DataList li ul li.Meta a.Category,
+ul.DataList li.Mine ul li.Meta a.Category,
+ul.DataList li.New ul li.Meta a.Category {
+   background: transparent;
+}
+ul.DataList li ul li.Title strong {
+   padding: 6px 0 0;
+}
+ul.DataList li ul li.Meta {
+   margin-left: 0;
+}
+ul.DataList li ul li.Meta {
+   color: #333;
+}
+ul.Discussion li.Options {
+   width: 90px;
+}
+ul.DataList li ul li.Title strong a {
+   font-size: 120%;
+}

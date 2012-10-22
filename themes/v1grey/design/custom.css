@@ -1,0 +1,583 @@
+/* Body & Header */
+body {
+   background: #595959;
+   color: #CCCCCC;
+}
+a,
+ul.Activities div.Excerpt a,
+ul.Activities div.Meta a {
+   text-decoration: none;
+   color: #ccc;
+}
+ul.Activities div.Excerpt a:hover,
+ul.Activities div.Meta a:hover,
+a:hover {
+   text-decoration: none;
+   color: #fff;
+}
+.Warning  {
+	background: #000000;
+	border: none;
+	color: #FFFFFF;
+}
+#Body {
+   width: 100%;
+   text-align: left;
+   margin: 15px auto 0;
+}
+#Panel {
+   width: 250px;
+   margin-left: 20px;
+   float: left;
+}
+body.Profile #Content,
+#Content {
+   float: none;
+   margin:0 20px 40px 290px;
+   width: auto;
+}
+#Head {
+   padding: 0;
+   background: url('waves.dark.gif') top left repeat-x #333;
+}
+#Head h1 a:hover span,
+#Head h1 a span {
+   text-shadow: 0 1px 0 #333;
+   color: #7F7F7F;
+}
+div.Menu {
+   text-align: center;
+	position: inherit;
+}
+body #Head h1 {
+   font-size: 185%;
+   margin: 0;
+   padding: 10px 0;
+   float: none;
+}
+ul#Menu {
+   float: none;
+   margin: 0;
+   padding: 0;
+   text-align: center;
+   height: auto;
+	display: block;
+}
+#Menu li {
+   display: inline !important;
+   float: none;
+   line-height: normal;
+   padding: 0;
+   margin: 0;
+   position: inherit;
+}
+#Menu a {
+   display: inline-block;
+   background: url("tab-off.gif") repeat-x bottom center #414141;
+   color: #7F7F7F;
+   padding: 4px 6px 5px;
+   height: auto;
+   -moz-border-radius-topleft: 2px;
+   -moz-border-radius-topright: 2px;
+   -webkit-border-top-left-radius: 2px;
+   -webkit-border-top-right-radius: 2px;
+   font-size: 11px;
+}
+body.Discussions #Menu li.DiscussionsTab a,
+body.Activity #Menu li.ActivityTab a,
+body.Profile #Menu li.ProfileTab a,
+#Menu a:hover {
+   background: url("tab-on.gif") repeat-x top center #595959;
+   color: #fff;
+}
+#Menu li.AccountTab a {
+   background: none;
+   font-weight: normal;
+   position: absolute;
+   top: 4px;
+   right: 10px;
+}
+/* Filter Menus & Data List */
+div.MessageForm,
+div.Tabs {
+   background: none;
+   border-bottom: none;
+   background: #494949;
+   -moz-border-radius-topleft: 2px;
+   -moz-border-radius-topright: 2px;
+   -webkit-border-top-left-radius: 2px;
+   -webkit-border-top-right-radius: 2px;
+}
+div.MessageForm {
+	text-align: left;
+}
+div.MessageForm div.Buttons {
+	text-align: right;
+}
+
+div.Comment div.CommentForm,
+div.CommentForm textarea {
+	width:99.5%;
+	clear: none;
+}
+div.Tabs {
+   margin-bottom: 1px;
+}
+ul.DataList li.Item {
+   background: url("new-post.gif") repeat-x center top #494949;
+   border: 0;
+   margin-bottom: 2px;
+}
+.DataList .Item:first-child {
+   border: none;
+}
+ul.DataList div.Meta a {
+    color:#ddd;
+}
+ul.CategoryList .ItemContent {
+	border: none;
+}
+ul.PanelInfo div.Meta,
+ul.DataList div.Meta {
+   font-size: 10px;
+}
+ul.PanelInfo li.Heading {
+    color: inherit;
+}
+li.Activity div.Title {
+   color: #bbb;
+}
+li.Activity ul.DataList div.Meta {
+   color: #444;
+}
+ul.Activities li.Condensed div.Excerpt {
+   color:#999;
+}
+ul.DataList li.Mine div.Meta a.Category,
+ul.DataList div.Meta a.Category {
+   background: #666;
+}
+ul.PanelInfo div.Meta strong,
+ul.DataList div.Meta strong {
+   background: #aaa;
+   color: #222;
+   padding:1px 4px;
+}
+div.MessageForm a.Back,
+div.MessageForm a.Back:link,
+div.MessageForm a.Back:hover,
+div.MessageForm a.Back:active,
+div.MessageForm a.Back:visited,
+div.MessageForm a.Cancel,
+div.MessageForm a.Cancel:link,
+div.MessageForm a.Cancel:hover,
+div.MessageForm a.Cancel:active,
+div.MessageForm a.Cancel:visited,
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited,
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   background: url("tab-off.gif") repeat-x bottom center #414141;
+   color: #7F7F7F;
+   border: 1px solid #353535;
+}
+div.MessageForm a.Back:hover,
+div.MessageForm a.Cancel:hover,
+div.MorePager li a:hover,
+a.TabLink:hover,
+div.Tabs li a:hover {
+   background: #555;
+   color: #ccc;
+}
+a.Active,
+div.Tabs li.Active a {
+   background: url("tab-on.gif") repeat-x top center #595959;
+   color: #fff;
+   border: 1px solid #3a3a3a;
+}
+a.Active:hover,
+div.Tabs li.Active a:hover {
+   background: #777;
+}
+#Menu a span,
+#Menu li.Active a span,
+#Menu li.Highlight a:hover span,
+div.Tabs li a span {
+   background: #333;
+   color: #ccc;
+}
+ul.Activities ul.DataList li {
+   background: #777;
+}
+
+/* Panel */
+a.Button,
+a.BigButton {
+   background: url('buttonbg.png') repeat-x center left #f8f8f8;
+   color: #222;
+	text-shadow: 0 1px 0 #fff;
+   border: none;
+	box-shadow: 0px 0px 2px #333;
+	-moz-box-shadow: 0px 0px 2px #333;
+	-webkit-box-shadow: 0px 0px 2px #333;  
+   }
+a.Button:hover,
+a.BigButton:hover {
+   color: #111;
+   border: none;
+	box-shadow: 0px 0px 5px #111;
+	-moz-box-shadow: 0px 0px 5px #111;
+	-webkit-box-shadow: 0px 0px 5px #111;  
+}
+a.Button:focus,
+a.BigButton:focus {
+   color: #000;
+   background: #eee;
+	box-shadow: 0px 0px 2px #555;
+	-moz-box-shadow: 0px 0px 2px #555;
+	-webkit-box-shadow: 0px 0px 2px #555;  
+}
+div.Box {
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   background: none;
+	box-shadow: 0 0 0;
+	-moz-box-shadow: 0 0 0;
+	-webkit-box-shadow: 0 0 0;
+   padding: 0;
+   margin: 0 0 10px;
+}
+div.Box h4 {
+   color: #bbb;
+}
+ul.PanelInfo {
+   border-top: 1px solid #777;
+}
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+   background: #444;
+   border-bottom: 1px solid #777;
+   font-size: 11px;
+}
+div.GuestBox,
+ul.PanelInfo li.Active {
+   background: #333;
+}
+div.GuestBox {
+   padding: 6px;
+}
+ul.PanelInfo li.Active a {
+   color: #fff;
+}
+#Panel input.InputBox, div.AddPeople textarea.MultiComplete {
+   width:160px;
+   margin-right: 4px;
+   border: 0;
+   font-size: 12px;
+}
+input.Button {
+      color: #333;
+}
+input.Button,
+input.Button:hover {
+   border: 0;
+}
+a.VanillaLink {
+   margin: 10px 0;
+   display: block;
+   background: url('logo_footer.png') no-repeat center center;
+   height: 32px;
+   width: 72px;
+}
+a.VanillaLink span {
+   display: none;
+}
+
+/* Search Page */
+#dashboard_entry_signin #Panel,
+#vanilla_post_editdiscussion #Panel,
+#vanilla_post_discussion #Panel,
+#dashboard_search_index #Panel {
+   display: none;
+}
+#vanilla_post_editdiscussion #Content,
+#vanilla_post_discussion #Content,
+#dashboard_search_index #Content,
+#conversations_messages_add #Content {
+   margin: 0;
+}
+/*div.Tabs div.SubTab  {
+   background: #333;
+   color: #888;
+   margin-bottom: 2px;
+}*/
+ul.DataList div.Photo {
+   padding: 0 6px;
+}
+div.ItemContent {
+   padding: 0 6px;
+}
+ul.DataList div.Excerpt a {
+   color:#888;
+}
+.Foot {
+   background: none;
+   border: 0;
+}
+.Mine {
+   background: none;
+}
+a.Bookmark,
+a.Bookmarking {
+   background: url('star_sprite.png') top center no-repeat !important;
+}
+a.Bookmarked {
+   background: url('star_sprite.png') center center no-repeat !important;
+}
+a.Bookmarking {
+   background: url('star_sprite.png') bottom center no-repeat !important;
+}
+.OptionsMenu .MenuItems {
+   right: 0;
+   left: inherit;
+}
+
+
+/* Comments */
+div.Preview,
+ul.MessageList div.Message {
+   clear: none;
+   color: #ccc;
+}
+div.Preview,
+ul.MessageList li.Item {
+   border-bottom: none;
+   margin-bottom: 1px;
+   background: url("tab-off.gif") repeat-x scroll center top #333333;
+}
+ul.MessageList li.Item div.Message a {
+   color: #fff;
+   text-decoration: underline;
+}
+ul.MessageList li.Item div.Message a:hover {
+   text-decoration: none;
+}
+div.FileAttachment {
+   color: #999;
+}
+div.Preview div.Message code,
+div.Preview div.Message pre,
+ul.MessageList div.Message code,
+ul.MessageList div.Message pre {
+   background: #444;
+}
+
+
+/* Profile Page */
+form.Activity {
+   margin: 0;
+}
+body.Profile ul.Activities {
+   border: 0;
+}
+ul.DataList a.Delete {
+   color: #fff;
+   margin-right: 6px;
+}
+body.Profile ul.PanelInfo {
+   border-bottom:1px solid #777;
+}
+div.Box dl {
+   font-size: 11px;
+   background: #444;
+   border-bottom: 1px solid #777;
+   border-top: 1px solid #777;
+}
+
+/* Forms */
+body.Entry #Content h1,
+#MessageForm h2,
+#DiscussionForm h2,
+#ConversationForm h2 {
+   color: #bbb;   
+}
+#MessageForm {
+   margin-top: 1px;
+}
+#MessageForm textarea {
+   width: 99%;
+}
+body.Entry #Content div.Box,
+#MessageForm {
+   border: 0;
+   background: #666;
+}
+body.Entry #Content div.Box {
+	padding: 6px;
+}
+body.Entry form ul li label,
+#DiscussionForm form label,
+#ConversationForm form label {
+   display: block;
+   color: #fff;
+}
+#DiscussionForm ul.PostOptions label {
+   color:#333;
+}
+input.DateBox, input.InputBox, input.SmallInput, textarea {
+   border: none;
+}
+
+/* Conversations */
+ul.Condensed li, li.Condensed {
+   clear: none;
+}
+#ConversationForm .TextBox,
+#ConversationForm textarea.MultiComplete {
+	width: 100%;
+}
+div.AddPeople form div {
+   text-align: left;
+}
+
+/* Autocomplete */
+.ac_results {
+   border: 1px solid #000;
+	color: #000;
+   border-top: 0;
+   background-color: white;
+}
+.ac_results li {
+   border-bottom: 1px solid #000;
+}
+.ac_lastitem {
+   border-bottom: 0 !important;
+}
+.ac_results strong {
+   background: #dadada;
+}
+.ac_over strong {
+   background: #555;
+}
+.ac_over {
+   background: #333;
+   color: #fff;
+}
+
+/* Popups */
+div.Border {
+	background: none repeat scroll 0 0 rgba(200, 200, 200, 0.7);
+}
+/*
+div.Connect h1, div.Connect h2,
+div.Popup h1, div.Popup h2 {
+   background: #333;
+   border-bottom: 1px solid #222;
+   color:#ccc;
+}
+*/
+div.Popup div.Footer,
+div.Popup div.Body,
+div.Popup div.Body form ul li label {
+   background: #595959;
+   color: #ccc;
+}
+div.Popup div.Footer {
+   border: 0;
+   padding-bottom: 3px;
+}
+a.Close:hover {
+	color:#fff;
+}
+#Status {
+	background: #494949;
+}
+
+div.UserSpoiler {
+   background-color: #595959;
+   color: #CCCCCC;
+}
+
+div.UserSpoiler div.SpoilerTitle span {
+   color: white;
+}
+
+div.UserSpoiler div.SpoilerTitle input {
+   border: 1px solid grey;
+   color: #232323;
+}
+
+div.UserSpoiler div.SpoilerText {
+   border-left: 1px solid grey;
+}
+div.User h1 {
+	color: #fff;
+}
+
+body ul div.Comment blockquote.UserQuote {
+   background-color: #555555;
+}
+ul.MessageList div.Message blockquote {
+	background: none;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+}
+#ConversationForm form {
+	border: none;
+}
+#ConversationForm label {
+	color: #fff;
+}
+
+div.Attachments {
+	background: #2a2a2a;
+}
+
+/* A few fixes for the voting plugin. */
+ul.MessageList div.Meta span.Votes {
+    right: 10px;
+}
+
+span.Votes a {
+    background-color: #494949;
+    color: #CCC !important;
+}
+
+span.Votes a:hover {
+    background-color: #595959;
+    color: #CCC !important;
+}
+
+span.Votes span {
+    background-color: #595959;
+    color: #CCC !important;
+}
+
+.StatBox {
+    background-color: #333333;
+}
+
+.FollowsBox, .AnswersBox {
+    background-color: #444444;
+}
+
+table.PreferenceGroup thead td {
+   background: #333;
+   border-bottom: 1px solid #222;
+   border-top: 1px solid #222;
+}
+table.PreferenceGroup tbody td {
+	border-bottom: 1px solid #777;
+}

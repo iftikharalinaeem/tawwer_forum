@@ -1,0 +1,25 @@
+.Tag-CarMake, .Tag-CarModel {
+   background: #F95636;
+   color: #fff;
+   border-color: #C93219;
+}
+
+.Tag-CarMake .Count, .Tag-CarModel .Count {
+   background: #C93219;
+}
+
+.Tag-CarMake a, .Tag-CarModel a {
+   color: #fff;
+}
+
+.Tag-CarMake:hover, .Tag-CarModel:hover {
+   background: #C83219;
+}
+
+.Cartalk-Help ul {
+   list-style:disc;
+}
+
+.Cartalk-Help li {
+   margin: 5px 0;
+}

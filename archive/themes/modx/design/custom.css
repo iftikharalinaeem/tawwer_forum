@@ -1,0 +1,1273 @@
+.modxcss article,
+.modxcss aside,
+.modxcss details,
+.modxcss figcaption,
+.modxcss figure,
+.modxcss footer,
+.modxcss header,
+.modxcss hgroup,
+.modxcss menu,
+.modxcss nav,
+.modxcss section {
+   display:block;
+}
+.modxcss nav ul { list-style:none; }
+.modxcss blockquote, .modxcss q { quotes:none; }
+.modxcss blockquote:before, .modxcss blockquote:after,
+.modxcss q:before, .modxcss q:after { content:''; content:none; }
+.modxcss a { margin:0; padding:0; font-size:100%; vertical-align:baseline; background:transparent; }
+.modxcss ins { background-color:#ff9; color:#000; text-decoration:none; }
+.modxcss mark { background-color:#ff9; color:#000; font-style:italic; font-weight:bold; }
+.modxcss del { text-decoration:line-through; }
+.modxcss abbr[title], .modxcss dfn[title] { border-bottom:1px dotted; cursor:help; }
+.modxcss hr { display:block; height:2px; background:#e3e3e3; border:0; border-top:1px solid #b9b9b9; margin:1em 0; padding:0; }
+.modxcss input, .modxcss select { vertical-align:middle; }
+body .modxcss { font:13px/1.231 "Helvetica Neue", helvetica, arial, sans-serif; *font-size:small; } /* hack retained to preserve specificity */
+.modxcss .ie {font-family:arial, sans-serif;} /* set font stack for ie */
+.modxcss p { line-height:1.4; }
+.modxcss select, .modxcss input, .modxcss textarea, .modxcss button { font:99% sans-serif; }
+.modxcss pre, .modxcss code, .modxcss kbd, .modxcss samp { font-family:monospace, sans-serif; }
+body .modxcss, .modxcss select, .modxcss input, .modxcss textarea { color:#5f5f5f; }
+html {
+  /* always force a scrollbar in non-IE */
+  overflow-y:scroll;
+}
+/* Accessible focus treatment:people.opera.com/patrickl/experiments/keyboard/test */
+.modxcss a:hover, .modxcss a:active { outline:none; }
+.modxcss a, .modxcss a:active, .modxcss a:visited { color:#0F7096; }/*#607890*/
+.modxcss a:hover { color:#036; }
+.modxcss ul, .modxcss ol { margin-left:1.8em; }
+.modxcss ol { list-style-type:decimal; }
+.modxcss small { font-size:85%; }
+.modxcss strong, .modxcss th { font-weight:bold; }
+.modxcss td, .modxcss td img { vertical-align:top; }
+.modxcss sub { vertical-align:sub; font-size:smaller; }
+.modxcss sup { vertical-align:super; font-size:smaller; }
+.modxcss pre {
+  padding:15px;
+  /* www.pathf.com/blogs/2008/05/formatting-quoted-code-in-blog-posts-css21-white-space-pre-wrap/ */
+  white-space:pre; /* CSS2 */
+  white-space:pre-wrap; /* CSS 2.1 */
+  white-space:pre-line; /* CSS 3 (and 2.1 as well, actually) */
+  word-wrap:break-word; /* IE */
+}
+
+/* align checkboxes, radios, text inputs with their label
+   by:Thierry Koblentz tjkdesign.com/ez-css/css/base.css  */
+.modxcss input[type="radio"] { vertical-align:text-bottom; }
+.modxcss input[type="checkbox"] { vertical-align:baseline;}
+.modxcss .ie7 input[type="checkbox"] { vertical-align:baseline; }
+.modxcss .ie6 input { vertical-align:text-bottom; }
+
+/* hand cursor on clickable input elements */
+.modxcss label, .modxcss input[type=button], .modxcss input[type=submit], .modxcss button { cursor:pointer; }
+
+/* colors for form validity */
+.modxcss input:invalid {
+      border-radius:1px;
+    -moz-box-shadow:0px 0px 5px red;
+ -webkit-box-shadow:0px 0px 5px red;
+         box-shadow:0px 0px 5px red;
+}
+.modxcss .no-boxshadow input:invalid { background-color:#f0dddd; }
+
+
+/* These selection declarations have to be separate.
+   No text-shadow:twitter.com/miketaylr/status/12228805301
+   Also:hot pink. */
+.modxcss ::-moz-selection{ background:#84d5e8; color:#fff; text-shadow:none; }
+.modxcss ::selection { background:#84d5e8; color:#fff; text-shadow:none; }
+
+/*  j.mp/webkit-tap-highlight-color */
+.modxcss a:link { -webkit-tap-highlight-color:#FF5E99; }
+
+/* make buttons play nice in IE:
+   www.viget.com/inspire/styling-the-button-element-in-internet-explorer/ */
+.modxcss button {  width:auto; overflow:visible; }
+
+/* bicubic resizing for non-native sized IMG:
+   code.flickr.com/blog/2008/11/12/on-ui-quality-the-little-things-client-side-image-resizing/ */
+.modxcss .ie7 img { -ms-interpolation-mode:bicubic; }
+
+/* for image replacement */
+.modxcss .ir { display:block; text-indent:-999em; overflow:hidden; background-repeat:no-repeat; text-align:left; direction:ltr; }
+
+/* Hide for both screenreaders and browsers
+   css-discuss.incutio.com/wiki/Screenreader_Visibility */
+.hidden { display:none; visibility:hidden; }
+
+/* Hide only visually, but have it available for screenreaders
+   www.webaim.org/techniques/css/invisiblecontent/
+   Solution from:j.mp/visuallyhidden - Thanks Jonathan Neal! */
+.visuallyhidden { position:absolute !important;
+  clip:rect(1px 1px 1px 1px); /* IE6, IE7 */
+  clip:rect(1px, 1px, 1px, 1px); }
+
+/* Hide visually and from screenreaders, but maintain layout */
+.invisible { visibility:hidden; }
+
+/* >> The Magnificent CLEARFIX << j.mp/phayesclearfix */
+.clearfix:after  { content:"."; display:block; height:0; clear:both; visibility:hidden; }
+.clearfix { zoom:1; }
+
+ /* Primary Styles
+    Author:
+ */
+
+/* color reference
+links 137899
+
+*/
+
+body {
+   background:#efefef url(http://www.modx.com/assets/i/bg-pattern.png) repeat;
+}
+.container {
+    width:940px;
+    margin:0 auto;
+    padding:0 20px;
+    position:relative;
+}
+.contain {
+    width:960px;
+    margin:0 auto;
+    padding:0;
+    position:relative;
+}
+header {
+    position:relative;
+}
+#header {
+    background:#f5f5f5 url(http://www.modx.com/assets/i/bg-sprite.png) repeat-x;
+    padding:2px 0 0;
+    height:112px;
+}
+#global {
+    margin:0 0 0 4px;
+    height:30px;
+    border-left:1px solid #e1eef4;
+}
+#global a {
+    line-height:30px;
+    padding:0 15px;
+    border-right:1px solid #e1eef4;
+    border-left:1px solid #fff;
+    display:block;
+    float:left;
+    text-decoration:none;
+}
+#global a.active {
+    background:-webkit-gradient(linear, left top, left bottom, from(#fff), to(#f7f8f9));
+    background:-moz-linear-gradient(top, #fff, #f7f8f9);
+    -pie-background:linear-gradient(top, #fff, #f7f8f9);
+    background:linear-gradient(top, #fff, #f7f8f9);
+    border-bottom:1px solid #f7f8f9;
+}
+#user{
+    position:absolute;
+    top:0;
+    right:20px;
+    color:#4b4b4b;
+}
+#user a {
+    line-height:30px;
+    text-decoration:none;
+}
+.green { color: green; }
+.red { color: red; }
+.gray { color: gray; }
+.yellow { color: yellow; }
+.orange { color: orange; }
+.note { 
+    color: #999; 
+    text-indent: -10px;
+    padding-left: 20px;
+}
+
+/* ------------------------- [ Logo Search section ] ---*/
+
+#logo_search {
+    height:70px;
+    position:relative;
+    line-height:30px;
+}
+#logo {
+    width:350px;
+    height:63px;
+    margin:12px 0 0 -5px;
+    display:block;
+    background:transparent url(http://www.modx.com/assets/i/modx-logo.png) top left no-repeat;
+    background-position: left -63px;
+}
+#logo_search #search {
+    position:absolute;
+    top:14px;
+    right:0;
+}
+#logo_search div.links {
+    display:block;
+    float:left;
+    line-height:30px;
+}
+#logo_search div.links a {
+    float:left;
+    display:block;
+    clear:none;
+    padding:0 12px 0 10px;
+    line-height:30px;
+    color:#3b3b3b;
+    text-decoration:none;
+}
+#logo_search div.links a:hover {
+    text-decoration:underline;
+    color:#000;
+}
+#logo_search div.links span {
+    background:transparent url(http://www.modx.com/assets/i/bg-sprite.png) 0 -649px no-repeat;
+    width:1px;
+    height:39px;
+    display:block;
+    float:left;
+    margin:-5px 0 0;
+}
+#logo_search form,
+#results_search form {
+    float:left;
+    display:inline;
+}
+#logo_search input,
+#results_search input {
+    border:0px solid transparent;
+    /*line-height:30px;*/
+    height:30px;
+    margin:0 !important;
+    padding:0;
+    display:block;
+    float:left;
+}
+#main aside .search input{display:inline;}
+
+#logo_search input[type="text"],
+#results_search input[type="text"]{
+    background:#f5f5f5;
+    border:1px solid #ccc;
+    border-width:1px 0 1px 1px;
+    border-bottom-color:#efefef;
+    -moz-border-radius:6px 0 0 6px;
+    border-radius:6px 0 0 6px;
+    width:145px;
+    padding:0 0 0 5px;
+    height:28px;
+    -moz-box-shadow:inset 2px 2px 7px #d8d8d8;
+    -webkit-box-shadow:inset 2px 2px 7px #d8d8d8;
+    box-shadow:inset 2px 2px 7px #d8d8d8;
+    position:relative;
+    behavior:url(http://www.modx.com/assets/css/pie.htc);
+}
+
+#logo_search input[type=submit],
+#main #results_search input[type=submit]{
+    -moz-border-radius:0 6px 6px 0;
+    border-radius:0px 6px 6px 0px;
+    border-bottom:1px solid #76b7cb;
+    border-top:1px solid #93bbc8;
+    width:37px;
+    color:#fff;
+    font-size:14px;
+    text-shadow:1px 1px 2px #666;
+    font-weight:bold;
+    background-color:#56a9c2;
+    background-image:-webkit-gradient(linear, center bottom, center top, from(#56a9c2), to(#9ccad8));
+    background-image:-moz-linear-gradient(top, #9ccad8, #56a9c2);
+    -pie-background:#56a9c2, linear-gradient(top, #9ccad8, #56a9c2);
+    background-image:linear-gradient(top, #9ccad8, #56a9c2);
+    -moz-box-shadow:none;
+    -webkit-box-shadow:none;
+    box-shadow:none;
+    position:relative;
+    behavior:url(http://www.modx.com/assets/css/pie.htc);
+}
+#main #results_search input[type=submit]{
+    width:60px;
+}
+#main #results_search .results_count{
+    position:absolute;
+    right:20px;
+    margin:0;
+    bottom:15px;
+    text-align:right;
+}
+#main #search_results .pagingbar{
+    margin-top:40px;
+}
+#main #results_search input[type="text"]{
+    width:360px;
+}
+
+/* ------------------------- [ Mega Menu ] ---*/
+
+#section_wrap { background:#00181f url(http://www.modx.com/assets/i/headers.jpg) top center no-repeat; }
+#community #section_wrap { background:#031e16 url(http://www.modx.com/assets/i/headers.jpg) center -561px no-repeat; }
+#developer #section_wrap { background:#0b1d1a url(http://www.modx.com/assets/i/headers.jpg) center -314px no-repeat; }
+#support #section_wrap { background:#200d1a url(http://www.modx.com/assets/i/headers.jpg) center -810px no-repeat; }
+#learn #section_wrap { background:#251306 url(http://www.modx.com/assets/i/headers.jpg) center -1056px no-repeat; }
+
+#section{ margin-left:-20px; text-align: left; }
+
+#section ul {
+    margin:0;
+    position:relative;
+    z-index:999;
+}
+#section li {
+    display:inline-block;
+    color:#fff;
+    font-weight:normal;
+    background:transparent url(http://www.modx.com/assets/i/bg-sprite.png) 0 -404px no-repeat;
+    position:relative;
+    z-index:1000;
+}
+#section li.first { background:none; }
+
+#section span.Title {
+    display:block;
+    font-size:20px;
+}
+
+#section a {
+    text-decoration:none;
+    text-shadow:1px 0 10px #000;
+    color:#d2f5ff;
+    display:inline-block;
+    width:auto;
+    padding:10px 20px;
+}
+#section a span{
+    color:#fff;
+}
+
+#section .level1:hover a {
+    margin:-5px 0;
+    padding:15px 20px;
+    -moz-border-radius:5px;
+    border-radius:5px;
+    background:#4D5152;
+    background:-moz-linear-gradient(top, #4D5152 0%, #3E4143 100%);
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#4D5152), color-stop(100%,#3E4143));
+    -pie-background:linear-gradient(top, #4D5152, #3E4143);
+    -moz-box-shadow:1px 4px 5px rgba(0,0,0,.22);
+    -webkit-box-shadow:1px 4px 5px rgba(0,0,0,.22);
+    box-shadow:1px 4px 5px rgba(0,0,0,.22);
+    z-index:1000;
+    position:relative;
+   
+}
+.ie #section .level1 a{
+    border-radius:5px;
+    behavior:url(http://www.modx.com/assets/css/pie.htc);
+}
+#section .level1:hover .level2 a, #section .level1:hover .level3 a{
+    background:transparent;
+    background-image:none;
+    border:0;
+    -moz-border-radius:0;
+    border-radius:0;
+    behavior:url(http://www.modx.com/assets/css/pie.htc);
+}
+
+#section .level2{
+    float:left;
+}
+#section .level2 a{
+    font-family:"museo-slab-1","museo-slab-2", Georgia, serif;
+    font-size:16px;
+    font-weight:600;
+    color:#69cde4;
+    text-transform:uppercase;
+    text-shadow:0 0 2px #000;
+}
+#section .level3{
+    line-height:1;
+}
+#section .level3 a{
+    font-family:"Helvetica Neue", helvetica, arial, sans-serif;
+    font-size:13px;
+    font-weight:normal;
+    color:#fff;
+    text-transform:none;
+    line-height:1;
+    padding:5px 20px;
+}
+
+#section li.parent:hover a {
+    margin:-5px 0 0;
+    padding:15px 20px 10px;
+    -moz-border-radius:5px 5px 0 0;
+    border-radius:5px 5px 0 0;
+    position:relative;
+    behavior:url(http://www.modx.com/assets/css/pie.htc);
+}
+#home #section li:hover a {
+    background-color:#1a6d84;
+    background:-webkit-gradient(linear, left top, left bottom, from(#0f5a75), to(#1a6d84));
+    background:-moz-linear-gradient(top, #0f5a75, #1a6d84);
+}
+.ie#home #section .level1:hover a{-pie-background:linear-gradient(top, #0f5a75, #1a6d84);}
+.ie#home #section .level1:hover .level2 a{-pie-background:transparent;}
+
+#section li ul { display:none; }
+#section li:hover li a { background:transparent !important; }
+
+#section li:hover ul {
+    display:block;
+    position:absolute;
+    top:auto;
+    left:0;
+    padding:0 0 20px;
+    margin:0 0 0;
+    -moz-border-radius:0 0 5px 5px;
+    border-radius:0 0 5px 5px;
+    background:#3D4143;
+    background:-moz-linear-gradient(top, #3D4143 0%, #2B2F2F 100%);
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#3D4143), color-stop(100%,#2B2F2F));
+    -pie-background:linear-gradient(top, #3D4143, #2B2F2F);
+    background:linear-gradient(top, #3D4143 0%, #2B2F2F 100%);
+    -moz-box-shadow:1px 4px 5px rgba(0,0,0,.22);
+    -webkit-box-shadow:1px 4px 5px rgba(0,0,0,.22);
+    box-shadow:1px 4px 5px rgba(0,0,0,.22);
+    z-index:1001;
+    padding-top:20px;
+    behavior:url(http://www.modx.com/assets/css/pie.htc);
+}
+.ie #section li:hover ul{
+    border-radius:0 0 5px 5px;
+    behavior:url(http://www.modx.com/assets/css/pie.htc);
+}
+#section li:hover ul ul{
+    background:transparent;
+    padding:0;
+}
+#home #section li:hover ul {
+    background-color:#1a6d84;
+    background:-webkit-gradient(linear, left top, left bottom, from(#1a6d84), to(#024761));
+    background:-moz-linear-gradient(top, #1a6d84, #024761);
+    -pie-background:linear-gradient(top, #1a6d84, #024761);
+    background:linear-gradient(top, #1a6d84, #024761);    
+}
+
+#section li:hover li ul {
+    background:none !important;
+    -pie-background:transparent;
+    -moz-box-shadow:none;
+    -webkit-box-shadow:none;
+    box-shadow:none;
+    padding-top:0;
+}
+#section li:hover ul ul{
+    position:relative;
+    -moz-box-shadow:0;
+    -webkit-box-shadow:0;
+    box-shadow:0;
+    background:transparent;
+    padding-top:0;
+}
+#section .level1.last:hover ul{
+    position:absolute;
+    top:auto;
+    left:auto;
+    right:0;
+}
+#section .level1.last:hover ul ul{
+    position:relative;
+}
+#section li:hover ul li {
+    position:relative;
+    display:block;
+    float:none;
+    z-index:1001;
+    background:transparent;
+    margin:0;
+    padding:0;
+    width:auto;
+}
+#section li:hover .inner a {
+    position:relative;
+    display:block;
+    float:none;
+    padding:5px 20px;
+    margin:0;
+    background:transparent;
+    -moz-border-radius:0 0 0 0;
+    border-radius:0 0 0 0;
+    -moz-box-shadow:none;
+    -webkit-box-shadow:none;
+    box-shadow:none;
+    behavior:url(http://www.modx.com/assets/css/pie.htc);
+}
+#section li:hover .inner{
+    width:470px;
+}
+#section .level1 li.level2{
+    float:left;
+    display:block;
+    width:233px;
+    padding-top:0;
+    padding-bottom:10px;
+}
+#section li.level2:nth-child(even){
+    border-left:1px solid #555;
+    margin-left:-1px;
+}
+#section li.level2:nth-child(odd){
+    border-right:1px solid #555;
+}
+#home #section li.level2:nth-child(even){
+    border-left-color:#0F7096;
+}
+#home #section li.level2:nth-child(odd){
+    border-right-color:#0F7096;
+}
+#section li:hover .inner ul{
+    width:auto;
+}
+#section li:hover ul li a:hover:before,
+#section li:hover ul li a.current:before
+  {
+    content:"› ";
+    margin:0;
+    font-size:20px;
+    position:absolute;
+    left:9px;
+    top:0;
+}
+#section li:hover ul li a.level2:hover:before{
+    top:1px;
+}
+
+
+
+/* ------------------------- [ headlines, headers & basic styling ] ---*/
+
+.modxcss h1, .modxcss h2, .modxcss h3, .modxcss h4, .modxcss h5, .modxcss h6{
+    margin:1.5em 0 .5em;
+    line-height:1;
+}
+.modxcss h1, .modxcss h2, .modxcss h4, .modxcss h6 {
+  font-family:"museo-slab-1","museo-slab-2", Georgia, serif;
+  font-weight:normal;
+  color:#137899;
+}
+.modxcss h3, .modxcss h5, .modxcss h3 a {
+    font-weight:bold;
+    color:#494949;
+}
+.modxcss h4 {
+    color:#494949;
+    border-bottom:1px solid #e3e3e3;
+    margin:1.5em 0 .5em 0;
+    padding-bottom:.5em;
+}
+/* icon icons headers ... images need to be 12x12 px */
+.modxcss h3 img, .gap_title img {
+    float:left;
+    display:block;
+    margin:-3px 5px -3px 0;
+    background:#6fc8dc;
+    -moz-border-radius:12px;
+    border-radius:12px;
+    padding:6px;
+    width:12px;
+    height:12px;
+}
+.ie6 h3, .ie6 h5,
+.ie7 h3, .ie7 h5,
+.ie8 h3, .ie8 h5 {
+    font-family:Arial, sans-serif;
+}
+
+.modxcss h1 { font-size:25px; }
+.modxcss h2 { font-size:30px; }
+.modxcss h3 { font-size:18px; }
+.modxcss h4 { font-size:20px; }
+.modxcss h5 { font-size:16px; }
+.modxcss h6 { font-size:15px; line-height:1.3; }
+
+.modxcss h2, .modxcss h6{letter-spacing:1px;}
+
+.modxcss p { margin:10px 0 20px; }
+.modxcss em {
+  font-style:italic;
+
+}
+
+/* ------------------------- [ Site Footer including back to top anchor ] ---*/
+
+#top {
+    height:33px;
+    background:transparent url(http://www.modx.com/assets/i/destinations-home.jpg) 50% -99px repeat-x;
+}
+
+footer {
+    background-color:#f5f5f5;
+	 text-align: left;
+}
+#destinations h3 a {
+    font-size:16px;
+    font-weight:normal;
+}
+#destinations h3 {
+    margin:2em 0 .75em;
+}
+#destinations {
+    height:183px;
+    background:#00181f url(http://www.modx.com/assets/i/headers.jpg) center -132px no-repeat;
+}
+#community #destinations{
+    background:#031e16 url(http://www.modx.com/assets/i/headers.jpg) center -623px no-repeat;
+}
+#developer #destinations{
+    background:#0d1c17 url(http://www.modx.com/assets/i/headers.jpg) center -378px no-repeat;
+}
+#support #destinations{
+    background:#200d1a url(http://www.modx.com/assets/i/headers.jpg) center -870px no-repeat;
+}
+#learn #destinations{
+    background:#251306 url(http://www.modx.com/assets/i/headers.jpg) center -1116px no-repeat;
+}
+#destinations .company h3 a { color:#f04242;}
+#destinations .support h3 a  { color:#f46ca6;}
+#destinations .community h3 a  { color:#88e646;}
+#destinations .developer h3 a  { color:#66dbf6;}
+#destinations .learn h3 a  { color:#f7a432;}
+
+#destinations section {
+    float:left;
+    width:188px;
+    height:183px;
+    background:transparent url(http://www.modx.com/assets/i/bg-sprite.png) 150px -466px no-repeat;
+}
+#destinations section.last { background:none; }
+
+#destinations a {
+    text-decoration:none;
+    color:#fff;
+    font-size:13px;
+    line-height:20px;
+    text-shadow:1px 0 10px #000;
+    display:inline-block;
+    width:100%;
+}
+
+#destinations a:hover  {
+    color:#ddd;
+    position:relative;
+}
+#destinations a:hover:before  {
+    content:"› ";
+    font-size:22px;
+    position:absolute;
+    left:-10px;
+    top:-2px;
+}
+
+/* ------------------------- [ Newsletter & Site Sponsors ] ---*/
+
+#subscribe {
+    border-top:1px solid #1E4F6A;
+    background:#6B8489;
+    background:-moz-linear-gradient(top, #6B8489 0%, #3C4746 18%, #2A3234 100%);
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#6B8489), color-stop(18%,#3C4746), color-stop(100%,#2A3234));
+    filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#6B8489', endColorstr='#2A3234',GradientType=0 );
+    background:linear-gradient(top, #6B8489 0%, #3C4746 18%, #2A3234 100%);
+    height:134px;
+    padding:33px 0 0;
+    
+}
+#home #subscribe {
+    background-color:#5FA5AF;
+    background-image:-moz-linear-gradient(top, #5FA5AF 0%, #1E4F6A 19%, #02314B 100%);
+    background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#5FA5AF), color-stop(19%,#1E4F6A), color-stop(100%,#02314B));
+    filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#5FA5AF', endColorstr='#02314B',GradientType=0 );
+    position:relative;
+    z-index:1;
+    background:linear-gradient(top, #5FA5AF 0%, #1E4F6A 19%, #02314B 100%);
+}
+
+#subscribe form {
+    float:left;
+    width:253px;
+}
+#subscribe input{
+    border:0px solid transparent;
+    line-height:30px;
+    height:30px;
+    width:182px;
+    margin:0 !important;
+    padding:0;
+    display:block;
+    float:left;
+}
+#subscribe input[type="text"]{
+    -moz-border-radius:6px 0 0 6px;
+    border-radius:6px 0 0 6px;
+    width:145px;
+    padding:0 0 0 5px;
+    -moz-box-shadow:inset 2px 2px 7px #d8d8d8;
+    -webkit-box-shadow:inset 2px 2px 7px #d8d8d8;
+    box-shadow:inset 2px 2px 7px #d8d8d8;
+    position:relative;
+    behavior:url(http://www.modx.com/assets/css/pie.htc);
+}
+#subscribe input[type=submit]{
+    -moz-border-radius:0 6px 6px 0;
+    border-radius:0 6px 6px 0;
+    border-bottom:1px solid #76b7cb;
+    border-top:1px solid #93bbc8;
+    height:30px;
+    width:80px;
+    color:#fff;
+    font-size:14px;
+    text-shadow:1px 1px 2px #666;
+    font-weight:bold;
+    position:relative;
+    -moz-box-shadow:none;
+    -webkit-box-shadow:none;
+    box-shadow:none;
+    background:-webkit-gradient(linear, center bottom, center top, from(#56a9c2), to(#9ccad8));
+    background:-moz-linear-gradient(top, #9ccad8, #56a9c2);
+    -pie-background:linear-gradient(top, #9ccad8, #56a9c2);
+    background:linear-gradient(top, #9ccad8, #56a9c2);
+    behavior:url(http://www.modx.com/assets/css/pie.htc);
+}
+#subscribe p {
+    margin-top:14px;
+    line-height:1;
+}
+
+#subscribe h3,
+#sponsors h3 {
+    color:#fff;
+    font-size:17px;
+    font-weight:normal;
+    margin:0 0 24px;
+}
+#subscribe a {
+    color:#d2f5ff;
+    opacity:.8;
+    text-decoration:none;
+    margin:20px 0 0;
+}
+#subscribe p:before {
+    content:"› ";
+    margin:0 0 0 0;
+    color:#d2f5ff;
+    font-size:20px;
+}
+#subscribe a:hover {
+    opacity:1;
+    text-decoration:underline;
+}
+#sponsors {
+    float:left;
+    margin-left:20px;
+}
+#sponsors a {
+    display:block;
+    float:left;
+    margin:0 20px 0 0;
+    opacity:.4;
+}
+#sponsors a.last {
+    margin:0;
+}
+#sponsors a:hover {
+    opacity:.3;
+}
+
+#mswss,
+#firehost,
+#sponsor_modx {
+    width:209px;
+    height:46px;
+    background:transparent url(http://www.modx.com/assets/i/firehost.png) no-repeat;
+}
+#sponsors a#mswss,
+#sponsors a#sponsor_modx {
+    height:70px;
+    background-image:url(http://www.modx.com/assets/i/websitespark.png);
+    margin-top:-16px;
+}
+#sponsors a#sponsor_modx {
+    background-image:url(http://www.modx.com/assets/i/sponsor-modx.png);
+}
+
+.modxcss footer section ul{
+    margin-left:0;
+}
+#copyright {
+    height:34px;
+    padding-top:20px;
+    background:#202427;
+    background:-moz-linear-gradient(top, #202427 0%, #3C4746 30%);
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#202427), color-stop(30%,#3C4746));
+    filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#202427', endColorstr='#3C4746',GradientType=0 );
+    border-bottom:1px solid #fff;
+}
+#home #copyright {
+        background:#061C2D;
+        background:-moz-linear-gradient(top, #061C2D 0%, #13384F 30%);
+        background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#061C2D), color-stop(22%,#13384F));
+        filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#061C2D', endColorstr='#13384F',GradientType=0 );
+}
+#copyright p {
+    color:#fff;
+    opacity:.5;
+    margin-top:0;
+}
+#copyright span {
+    float:right;
+    display:block;
+}
+#copyright a {
+    color:#d2f5ff;
+    opacity:.8;
+    text-decoration:none;
+}
+#copyright a:hover {
+    opacity:1;
+    text-decoration:underline;
+}
+#post_body {
+    height:20px;
+    opacity:1;
+    background:#BCCACD;
+    background:-moz-linear-gradient(top, #BCCACD 0%, #F2F2F2 69%);
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#BCCACD), color-stop(69%,#F2F2F2));
+    filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#BCCACD', endColorstr='#F2F2F2',GradientType=0 )
+}
+
+.last { margin-right:0; }
+
+/* Begin Vanilla Customizations */
+
+#Frame {
+    margin: 15px auto 0;
+    text-align: left;
+    width: 960px;	
+}
+#Body {
+	float: left;
+	background: #ffffff;
+	background:-webkit-gradient(linear, center bottom, center top, from(#ffffff), to(#f3f3f3));
+	background:-moz-linear-gradient(top, #f3f3f3, #ffffff);
+	-pie-background:linear-gradient(top, #f3f3f3, #ffffff);
+	background:linear-gradient(top, #f3f3f3, #ffffff);
+	border: 1px solid #e3e3e3;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	box-shadow: 0 0 2px #ddd;
+	-moz-box-shadow: 0 1px 2px #ddd;
+	-webkit-box-shadow: 0 0 2px #ddd;
+}
+#Content div.CategoryBox:first-child div.CategoryTabs,
+#Content div.Tabs {
+	border-radius: 6px 0 0 0;
+	-moz-border-radius: 6px 0 0 0;
+	-webkit-border-radius: 6px 0 0 0;
+	background: #f3f3f3;
+	border: 1px solid #fff;
+}
+#Content div.CategoryBox div.CategoryTabs {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	
+}
+body.Profile #Content div.Tabs {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-top: none;
+}
+body.Profile #Content div.User {
+	border-radius: 0 6px 0 0;
+	-moz-border-radius: 0 6px 0 0;
+	-webkit-border-radius: 0 6px 0 0;
+	background: #f3f3f3;
+	border: 1px solid #fff;
+	border-bottom: none;
+	padding: 10px 10px 0;
+}
+body.Profile div.User h1 {
+	padding: 0;
+}
+#Status {
+	background: transparent;
+	padding: 4px 0 0;
+}
+#Content div.CategoryBox:last-child .Foot,
+#Content .Foot,
+#Content .NumberedPager {
+	line-height: 2;
+	margin: 0;
+	border-radius: 0 0 0 6px;
+	-moz-border-radius: 0 0 0 6px;
+	-webkit-border-radius: 0 0 0 6px;
+	background: #f3f3f3;
+	border: 1px solid #fff;
+}
+#Content div.CategoryBox .Foot {
+	border-bottom: 0;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+}
+body.Profile #Content .Foot,
+body.Profile #Content .NumberedPager {
+	border-radius: 0 0 6px 0;
+	-moz-border-radius: 0 0 6px 0;
+	-webkit-border-radius: 0 0 6px 0;
+}
+#Panel {
+	width: 263px;
+}
+#Foot {
+	clear: left;
+}
+body.Discussion #Content,
+#Content {
+	border-right: 1px solid #e3e3e3;
+	margin: 0;
+}
+body.Profile #Panel {
+	width: 253px;
+}
+body.Profile #Content {
+	width: 689px;
+	border-right: none;
+	border-left: 1px solid #e3e3e3;
+	margin: 0;
+}
+div.PanelBox {
+	padding: 16px 16px 0 0;
+}
+body.Profile div.PanelBox {
+	padding: 16px 0 0 16px;
+}
+body.Profile div.PanelBox div.Photo img {
+	max-width: 237px;
+}
+div.Box dl {
+	padding: 4px;
+}
+
+h1, h2 {
+   margin: 10px;
+}
+
+a.BigButton {
+	background: #61adc7;
+	background:-webkit-gradient(linear, center bottom, center top, from(#61adc7), to(#9fd4e6));
+	background:-moz-linear-gradient(top, #9fd4e6, #61adc7);
+	-pie-background:linear-gradient(top, #9fd4e6, #61adc7);
+	background:linear-gradient(top, #9fd4e6, #61adc7);
+	border: 1px solid #54aac1;
+	box-shadow: 0 0 2px #aaa;
+	-moz-box-shadow: 0 0 2px #aaa;
+	-webkit-box-shadow: 0 0 2px #aaa;
+	color: #fff;
+	text-shadow: 0 1px 0 #408496;
+}
+a.BigButton:hover,
+a.BigButton:active {
+	border: 1px solid #408496;
+	box-shadow: 0 0 2px #aaa;
+	-moz-box-shadow: 0 0 2px #aaa;
+	-webkit-box-shadow: 0 0 2px #aaa;
+	color: #fff;
+	text-shadow: 0 1px 0 #2E616F;
+}
+a.BigButton:active {
+	background: #61adc7;
+}
+div.Box {
+	border: 1px solid #e3e4e4;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	background: #fff;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	padding: 0;
+}
+div.Box h4 {
+	background: #eef5f7;
+	background:-webkit-gradient(linear, center bottom, center top, from(#eef5f7), to(#ffffff));
+	background:-moz-linear-gradient(top, #ffffff, #eef5f7);
+	-pie-background:linear-gradient(top, #ffffff, #eef5f7);
+	background:linear-gradient(top, #ffffff, #eef5f7);
+	color: #494949;
+	font-size: 18px;
+	padding: 10px;
+	border-radius: 6px 6px 0 0;
+	-moz-border-radius: 6px 6px 0 0;
+	-webkit-border-radius: 6px 6px 0 0;
+}
+div.Popup #ConversationForm h2,
+div.Popup h1,
+div.Popup h2,
+div.Connect h1,
+div.Connect h2 {
+	color: #494949;
+	font-size: 18px;
+	background: #eef5f7;
+	background:-webkit-gradient(linear, center bottom, center top, from(#eef5f7), to(#ffffff));
+	background:-moz-linear-gradient(top, #ffffff, #eef5f7);
+	-pie-background:linear-gradient(top, #ffffff, #eef5f7);
+	background:linear-gradient(top, #ffffff, #eef5f7);
+	border-bottom: 1px solid #e5e5e5;
+}
+a.Close, a.Close:hover {
+	color: #494949;
+}
+ul.PanelInfo {
+	border: none !important;
+}
+ul.PanelInfo li {
+	background: transparent;
+	border-top: 1px solid #e5e5e5;
+	border-bottom: none;
+}
+div.SearchBox form {
+	padding: 4px 0 4px 4px;
+}
+#Panel div.SearchBox input.InputBox {
+	padding: 4px;
+	width: 180px;
+	margin-right: 6px;
+}
+body.Profile #Panel div.SearchBox input.InputBox {
+	width: 160px;
+}
+body.Profile ul.Activities {
+	margin-top: 0;
+}
+
+#DiscussionForm form {
+    background: none;
+    border: none;
+    margin: 10px;
+    padding: 0;
+}
+
+#DiscussionForm .RadioLabel {
+   font-size: inherit;
+   font-weight: normal;
+}
+
+#Content ul.DataList,
+#Content ul.MessageList {
+	background: #fff;
+	border-top: 1px solid #e5e5e5;
+}
+ul.DataList.SearchResults li.Item,
+ul.DataList.Activities li.Item,
+ul.DataList.Conversations li.Item,
+ul.DataList.Discussions li.Item {
+	border-bottom: 1px solid #e5e5e5 !important;
+	padding: 4px 0 0 6px;
+}
+ul.DataList.Conversations li.Item {
+	min-height: 56px;
+}
+ul.DataList .Unfollow {
+   background: #eee;
+}
+ul.DataList .Unfollow a {
+   color: #888;
+}
+ul.CategoryList .ItemContent {
+	border-color: #E3E3E3;
+}
+ul.CategoryList li:last-child .ItemContent {
+	border-bottom: 0;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:hover,
+div.MorePager a:active,
+div.MorePager a:visited,
+a.TabLink,
+a.TabLink:link,
+a.TabLink:hover,
+a.TabLink:active,
+a.TabLink:visited,
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+   border: 1px solid #c7dce3;
+   border-radius: 4px;
+   -moz-border-radius: 4px;
+   -webkit-border-radius: 4px;
+	background: #e9f3f6;
+	background:-webkit-gradient(linear, center bottom, center top, from(#e9f3f6), to(#fcfeff));
+	background:-moz-linear-gradient(top, #fcfeff, #e9f3f6);
+	-pie-background:linear-gradient(top, #fcfeff, #e9f3f6);
+	background:linear-gradient(top, #fcfeff, #e9f3f6);
+   font-weight: normal;
+   color: #000;
+}
+div.MorePager a:hover,
+div.MorePager li a:hover,
+a.TabLink:hover,
+div.Tabs li a:hover {
+	background: #e2f1f6;
+	background:-webkit-gradient(linear, center bottom, center top, from(#e2f1f6), to(#f0f9fc));
+	background:-moz-linear-gradient(top, #f0f9fc, #e2f1f6);
+	-pie-background:linear-gradient(top, #f0f9fc, #e2f1f6);
+	background:linear-gradient(top, #f0f9fc, #e2f1f6);
+}
+a.Active,
+div.Tabs li.Active a {
+	border: 1px solid #e8e8e8;
+   background: #fff;
+   color: #348fa9;
+}
+div.Tabs li a span {
+   line-height: 1;
+   font-size: 80%;
+   background: transparent;
+   color: #348fa9;
+}
+div.Tabs div.SubTab {
+   background: transparent;
+   margin: 0;
+   padding: 4px 8px;
+}
+ul.DataList div.Photo {
+   padding: 6px 10px 0 0;
+}
+ul.Discussions div.ItemContent, ul.Drafts div.ItemContent {
+    margin: 0;
+}
+.Mine {
+	background: #f3f3f3;
+}
+body.Profile .Mine {
+	background: transparent;
+}
+form.Activity {
+	background: #FFFFFF;
+	border-top: 1px solid #E3E3E3;
+	padding: 10px;
+}
+ul.DataList.Activities li.Item {
+   min-height: 54px;
+}
+ul.Activities ul.DataList {
+	margin-left: 62px;
+}
+div.Box.GuestBox {
+	padding-bottom: 6px;
+}
+div.Box.CategoryFollowToggleBox p,
+div.Box.GuestBox p {
+	padding: 0 6px 4px;
+}
+div.Box.GuestBox a.PopupWindow {
+	margin-left: 6px;
+}
+a.Bookmark,
+a.Bookmarked,
+a.Bookmarking {
+   background: url('star_sprite.png') top center no-repeat;
+}
+a.Bookmarked { background-position: center center; }
+a.Bookmarking { background-position: bottom center; }
+ul.Discussion {
+    margin-bottom: 0px;
+}
+.MessageForm.CommentForm,
+#MessageForm {
+	background: #f3f3f3;
+	border: 1px solid #fff;
+	margin-top: 0 !important;
+	border-radius: 0 0 0 6px;
+	-moz-border-radius: 0 0 0 6px;
+	-webkit-border-radius: 0 0 0 6px;
+}
+div.MessageForm div.Tabs {
+	background: transparent !important;
+	border: none !important;
+}
+
+/* Dismiss Messages */
+div.DismissMessage,
+div.DismissMessage.Info,
+div.DismissMessage.Warning,
+div.DismissMessage.Box {
+	background: #ffffff;
+	background:-webkit-gradient(linear, center bottom, center top, from(#ffffff), to(#f3f3f3));
+	background:-moz-linear-gradient(top, #f3f3f3, #ffffff);
+	-pie-background:linear-gradient(top, #f3f3f3, #ffffff);
+	background:linear-gradient(top, #f3f3f3, #ffffff);
+	border: 1px solid #e3e3e3;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	box-shadow: 0 0 2px #ddd;
+	-moz-box-shadow: 0 1px 2px #ddd;
+	-webkit-box-shadow: 0 0 2px #ddd;
+	padding: 4px 8px;
+}
+div.DismissMessage.Warning {
+	background: #555;
+	color: #fff;
+}
+div.DismissMessage.Box {
+	background: #fff;
+}
+/* Autocomplete */
+.ac_results {
+   border: 1px solid #d7d8da;
+	color: #000;
+   border-top: 0;
+   background-color: white;
+}
+.ac_results li {
+   border-bottom: 1px solid #d7d8da;
+}
+.ac_lastitem {
+   border-bottom: 0 !important;
+}
+.ac_results strong {
+   background: #dbe1ec;
+}
+.ac_over strong {
+   background: #5670a6;
+}
+.ac_over {
+   background: #3b5998;
+   color: #fff;
+}
+
+.MessageList .Item {
+   position: relative;
+}
+
+.QnA-Accepted {
+   background: url('check.png') no-repeat;
+   display: block;
+   height: 40px;
+   position: absolute;
+   left: -50px;
+   top: 10px;
+   width: 40px;
+}
+.QnA-Accepted div {
+   display: none;
+}

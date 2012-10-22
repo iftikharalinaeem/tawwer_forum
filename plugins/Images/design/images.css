@@ -1,0 +1,441 @@
+@-webkit-keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@-moz-keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@-ms-keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@-o-keyframes progress-bar-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 0;
+  }
+}
+
+@keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+.progress {
+  height: 18px;
+  /* margin-bottom: 18px; */
+  overflow: hidden;
+  background-color: #f7f7f7;
+  background-image: -moz-linear-gradient(top, #f5f5f5, #f9f9f9);
+  background-image: -ms-linear-gradient(top, #f5f5f5, #f9f9f9);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f5f5f5), to(#f9f9f9));
+  background-image: -webkit-linear-gradient(top, #f5f5f5, #f9f9f9);
+  background-image: -o-linear-gradient(top, #f5f5f5, #f9f9f9);
+  background-image: linear-gradient(top, #f5f5f5, #f9f9f9);
+  background-repeat: repeat-x;
+  -webkit-border-radius: 1px;
+     -moz-border-radius: 1px;
+          border-radius: 1px;
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#f5f5f5', endColorstr='#f9f9f9', GradientType=0);
+  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+     -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+          box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.progress .bar {
+  width: 0;
+  height: 18px;
+  font-size: 12px;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-color: #0e90d2;
+  background-image: -moz-linear-gradient(top, #149bdf, #0480be);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#149bdf), to(#0480be));
+  background-image: -webkit-linear-gradient(top, #149bdf, #0480be);
+  background-image: -o-linear-gradient(top, #149bdf, #0480be);
+  background-image: linear-gradient(top, #149bdf, #0480be);
+  background-image: -ms-linear-gradient(top, #149bdf, #0480be);
+  background-repeat: repeat-x;
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#149bdf', endColorstr='#0480be', GradientType=0);
+  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+     -moz-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+          box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+      -ms-box-sizing: border-box;
+          box-sizing: border-box;
+  -webkit-transition: width 0.6s ease;
+     -moz-transition: width 0.6s ease;
+      -ms-transition: width 0.6s ease;
+       -o-transition: width 0.6s ease;
+          transition: width 0.6s ease;
+}
+.progress-striped .bar {
+  background-color: #149bdf;
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  -webkit-background-size: 40px 40px;
+     -moz-background-size: 40px 40px;
+       -o-background-size: 40px 40px;
+          background-size: 40px 40px;
+}
+.progress.active .bar {
+  -webkit-animation: progress-bar-stripes 2s linear infinite;
+     -moz-animation: progress-bar-stripes 2s linear infinite;
+      -ms-animation: progress-bar-stripes 2s linear infinite;
+       -o-animation: progress-bar-stripes 2s linear infinite;
+          animation: progress-bar-stripes 2s linear infinite;
+}
+.progress {
+  width: 280px;
+}
+
+/* New Image Form */
+.FileInput > input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  border: solid transparent;
+  border-width: 0 0 100px 200px;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  -moz-transform: translate(-300px, 0) scale(4);
+  direction: ltr;
+  cursor: pointer;
+}
+.FileInput {
+   position: relative;
+   overflow: hidden;
+   cursor: pointer;
+}
+.ImageFormWrap {
+   width: 300px;
+}
+.ImageControlsWrap {
+    background: #fff;
+    box-shadow: 0 0 1px #333;
+    border-radius: 1px;
+    border: 0px solid #ddd;
+    border-bottom-width: 1px;
+}
+.FileInput,
+.DropZone {
+    display: inline-block;
+    background: #f5f5f5;
+    height: 100px;
+    line-height: 100px;
+    width: 150px;
+    padding: 0;
+    vertical-align: middle;
+    text-align: center;
+    box-shadow: 
+       /* 0 0 1px #333, */
+      inset 0 1px 0 rgba(255,255,255,0.8)
+      /* ,inset 0 -1px 0 rgba(0,0,0,0.05) */;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 18px;
+    color: #333;
+    border-bottom: 1px solid #ccc;
+}
+.FileInput {
+   width: 149px;
+   border-right: 1px solid #ddd;
+}
+.FileInput:hover {
+    background: #eee;
+    box-shadow: none;
+}
+.DropZone {
+    cursor: move;
+}
+.FetchUrl {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+.UrlInput {
+    border: 1px solid #aaa;
+    color: #777;
+    padding: 4px;
+    width: 200px;
+}
+.UrlInput:focus {
+    color: #000;
+}
+.NewImageForm .Category {
+    padding: 10px;
+    margin: 0;
+}
+.NewImageForm .FormWrapper {
+   padding: 10px;
+}
+.NewImageForm .Buttons {
+   text-align: left;
+}
+
+
+/* Polaroid-style image cards for uploaded and in-forum display. Put this in style.css? */
+.ImageWrap {
+    background: #fff;
+    padding: 10px;
+    border-radius: 1px;
+    border: 1px solid #ddd;
+    width: 278px; /* 300 with padding */
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    margin: 0 5px 12px;
+}
+.ImageWrap .Image {
+    background: #f5f5f5;
+    text-align: center;
+    margin-bottom: 10px;
+}
+.ImageWrap .Image img {
+    margin: 0 auto;
+    display: block;
+    max-width: 100%;
+}
+.ImageWrap .Image .ImageResized {
+   display: none;
+}
+.ImageWrap .Filename {
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   margin-top: -10px;
+}
+
+.NewImageForm .ImageWrap .InputBox {
+    width: auto;
+    border: 1px dashed #ddd;
+    background: transparent;
+    font-size: 12px;
+    color: #aaa;
+    margin: 0;
+    width: 274px; /* 280 with padding & border */
+}
+.NewImageForm .ImageWrap .InputBox:focus {
+    color: #333;
+    border: 1px solid #bbb
+}
+.ImageWrap .DeleteButton {
+   visibility: hidden;
+   position: absolute;
+   top: 4px;
+   right: 4px;
+   margin: 0;
+}
+.ImageWrap:hover .DeleteButton {
+   visibility: visible;
+}
+.ImageWrap .DeleteButton:hover {
+   box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+}
+.ImageWrap .AdminCheck {
+   display: none;
+}
+.ImageWrap > .ToggleFlyout {
+   display: none;
+   position: absolute;
+   top: 4px;
+   right: 4px;
+   border-radius: 2px;
+   background: #fafafa;
+
+
+   cursor: pointer;
+   margin: 0;
+   padding: 4px 6px;
+	background: #f8f8f8;
+   border: 1px solid #999;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+   background-image: linear-gradient(bottom, #CCCCCC 0%, #FAFAFA 100%);
+   background-image: -o-linear-gradient(bottom, #CCCCCC 0%, #FAFAFA 100%);
+   background-image: -moz-linear-gradient(bottom, #CCCCCC 0%, #FAFAFA 100%);
+   background-image: -webkit-linear-gradient(bottom, #CCCCCC 0%, #FAFAFA 100%);
+   background-image: -ms-linear-gradient(bottom, #CCCCCC 0%, #FAFAFA 100%);
+   background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, #CCCCCC),
+      color-stop(1, #FAFAFA)
+   );
+   box-shadow: inset 0 1px 0 #fff, inset 0 -1px 2px #bbb;
+   -moz-box-shadow: inset 0 1px 0 #fff, inset 0 -1px 2px #bbb;
+   -webkit-box-shadow: inset 0 1px 0 #fff, inset 0 -1px 2px #bbb;
+}
+.ImageWrap > .ToggleFlyout:hover {
+   color: #111;
+   border-color: #666;
+   box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+}
+.ImageWrap > .ToggleFlyout.Open {
+   border-color: #aaa;
+   background: #f7f7f7;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;   
+}
+.ImageWrap > .ToggleFlyout .OptionsTitle {
+   width: 16px;
+}
+.ImageWrap > .OptionsMenu .Flyout {
+   top: 28px;
+   right: -8px;
+}
+.ImageWrap > .ToggleFlyout.Open,
+.ImageWrap:hover > .ToggleFlyout {
+   display: block;
+}
+
+.ImageWrap .RecordReactions,
+.ImageWrap .React.Quote,
+.ImageWrap .Reactions .Bullet,
+.ImageWrap .ReactButton-Flag .ReactLabel {
+    display: none;
+}
+.BestOfWrap {
+    position: relative;
+    margin: 0 auto;
+}
+.ImageWrap.Wide {
+   width: 592px;
+}
+.ImageWrap .Title {
+   font-size: 12px ;
+   line-height: 1.5 ;
+   background: #f7f7f7;
+   background: rgba(0, 0, 0, 0.03);
+   margin: -10px -10px 0;
+   padding: 10px;
+}
+.ImagesWrap .Caption,
+.ImagesWrap .Body {
+    /*font-size: 11px;*/
+    line-height: 1.5;
+    overflow: hidden;
+    margin: 0 0 10px;
+}
+/*.Section-BestOf .BestOfList .Item .Body img {
+    max-width: 100%;
+}
+*/
+.ImageWrap .AuthorWrap {
+   padding: 10px;
+   background: #f7f7f7;
+   background: rgba(0, 0, 0, 0.03);
+   margin: 0 -10px -10px;
+   line-height: 1;
+}
+.ImageWrap .Author {
+    font-size: 11px;
+    line-height: 1;
+}
+.ImageWrap .AuthorWrap .ProfilePhotoMedium {
+   height: 30px;
+   width: 30px;
+}
+.ImageWrap .Reactions .Count,
+.ImageWrap .ReactMenu {
+    margin: 0;
+}
+.ImageWrap .Reactions .FlagMenu .ReactButton-Flag {
+   margin: 0 6px 0 0;
+}
+.ImageWrap .FlagMenu > .SpFlyoutHandle {
+   bottom: -14px;
+   left: 0;
+}
+.ImageWrap .Flyout.Flags {
+   left: -12px;
+}
+.ImageWrap .ReactButton-Flag, 
+.ImageWrap .ReactMenu .ReactButton {
+    position: relative;
+}
+.ImageWrap .Reactions {
+   margin: 0;
+   line-height: 1.6;
+}
+.ImageWrap .ReactButton-Flag .ReactLabel,
+.ImageWrap .ReactMenu .ReactLabel {
+   display: none;
+    background: #333;
+    color: #fff;
+    white-space: nowrap;
+   position: absolute;
+   line-height: 1;
+   padding: 3px 6px 4px;
+   left: -4px;
+   top: -23px;
+}
+.ImageWrap .ReactButton-Flag .ReactLabel:after,
+.ImageWrap .ReactMenu .ReactLabel:after {
+    position: absolute;
+    content: '';
+    display: block;
+   border: 5px solid transparent;
+   border-color: #333 transparent transparent transparent;
+   bottom: -10px;
+}
+.ImageWrap .ReactButton-Flag:hover .ReactLabel,
+.ImageWrap .ReactMenu .ReactButton:hover .ReactLabel {
+   display: block;
+}
+.ImageWrap .ReactMenu .ReactButton:hover .ReactSprite,
+.ImageWrap .ReactMenu .ReactButton:hover .Count,
+.ImageWrap .ReactButton-Flag:hover .ReactSprite,
+.ImageWrap .ToggleFlyout.Open .ReactButton-Flag .ReactSprite {
+   opacity: 1;
+}
+
+.ImageWrap .ReactButton.Quote {
+   display: none;
+}
+
+.Tiles .ImageWrap {
+   float: left;
+}
+
+.Tiles:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+
+.Invisible {
+   opacity: 0;
+}

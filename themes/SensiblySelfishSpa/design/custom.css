@@ -1,0 +1,461 @@
+@font-face {
+  font-family: 'Buda';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Buda'), url('http://themes.googleusercontent.com/font?kit=LjwoG0-QkvByFM8NJaZmJQLUuEpTyoUstqEm5AMlJo4') format('woff');
+}
+@font-face {
+  font-family: 'Dancing Script';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Dancing Script'), local('DancingScript'), url('http://themes.googleusercontent.com/font?kit=DK0eTGXiZjN6yA8zAEyM2bDH3ri20rYH10B2w3wbVeU') format('woff');
+}
+
+body{
+	background: #FEE0F8/*FCEBF8*/;
+	color: #555555;
+	font-family: trebuchet MS;
+}
+a, a:link, a:visited, a:active {
+    color: #9FC7C6;
+    text-decoration: none;
+}
+a:hover{
+ color: #C83482;
+}
+a.Button, .Button, input.Button, a.BigButton {
+   background: #F6F6F6; /* old browsers */
+   background: -moz-linear-gradient(top, #FFF 0%, #FAE1F4 100%);
+   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FFF), color-stop(100%,#FAE1F4));
+   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFF', endColorstr='#FAE1F4',GradientType=0 );
+   color: #692126;
+   -moz-border-radius: 1.3ex;
+   font-family: Buda,Trebuchet MS,Tahoma,sans-serif;
+   text-transform: uppercase;
+   text-shadow: 0 1px 1px #FFF;
+   font-weight: normal;
+}
+a.Button:hover, .Button:hover, input.Button:hover, a.BigButton:hover {
+ background: -moz-linear-gradient(top, #FAE1F4 0%, #FFF 100%);
+ background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FAE1F4), color-stop(100%,#FFF));
+ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FAE1F4', endColorstr='#FFF',GradientType=0 );  
+}
+a.Close {
+    color: #C83482;
+}
+a.Close:hover{
+	color: #9FC7C6;
+}
+h1, h2, h3, h4, h5{
+   font-family: Buda, Trebuchet MS, Tahoma, sans-serif;
+   font-weight: normal;
+   text-transform: uppercase;
+}
+#Body {
+	margin: 0;
+	width: 99.9%;
+	position: relative;
+}
+#Head {
+	background: #3B5998;
+	padding:0;
+	margin: 20px 20px 0;
+	text-align: left;
+	position: relative;
+}
+div.Popup h1,
+div.Popup h2 {
+	background: #FFD8F5;
+	border: none;
+	color:#555555;
+}
+div.Popup #ConversationForm h2 {
+    color: #555555;
+}
+.Banner {
+		font-family: Verdana;
+		font-size: 27px;
+		text-align: left;
+}
+.Banner ul {
+  	padding: 0 0 10px;
+	margin: 0;
+}
+.Banner ul li {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+.Banner ul li a {
+	font-weight: normal;
+	padding: 3px 6px 0;
+	font-family: 'Buda';
+	font-variant: small-caps;
+	font-size: 18px;
+	color: #9FC7C6;
+	display: inline-block;
+	font-weight: bold;
+}
+.Banner ul li a:hover {
+	text-decoration: underline;
+}
+.Banner ul li a.SignOut {
+	font-weight: normal;
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+.Banner ul li a span {
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	padding: 1px 2px 0 1px;
+	background: #f00;
+	border-right: 1px solid #a00;
+	border-bottom: 1px solid #a00;
+	color: #fff;
+	font-size: 9px;
+	position: relative;
+	top: -3px;
+}
+#Content {
+	float: none;
+	width: auto;
+	margin: 0 270px 0 0;
+}
+#Panel {
+   width: 250px;
+	float: right;
+	font-family: verdana;
+	margin-top: 24px;
+}
+#Panel div.SearchBox input.InputBox {
+	width: 200px;
+	margin-right: 4px;
+}
+div.SearchBox {
+	margin: 11px 0 11px 0;
+}
+div.Tabs.SearchTabs{
+	border-bottom: none;
+}
+body.Search #Panel .SearchBox{
+	display: none;
+}
+body.Profile div.SearchBox {
+	display: none;
+}
+body.Profile #Content {
+	float:none;
+	width: auto;
+	margin: 0 0 0 270px;
+}
+
+form.Activity textarea {
+	width:99%;
+}
+#Foot div {
+	width: auto;
+}
+body.Post #Content {
+	width: auto;
+	margin:0 20px;
+}
+#ConversationForm textarea.MultiComplete,
+#ConversationForm .TextBox,
+#MessageForm textarea,
+div.Comment div.CommentForm,
+div.Comment div.CommentForm textarea,
+div.CommentForm textarea,
+#DiscussionForm input.InputBox,
+#DiscussionForm textarea {
+	width:99%;
+}
+
+#DiscussionForm form {
+   border-radius: 10px; 
+   -moz-border-radius: 10px;
+   -webkit-border-radius: 10px;
+}
+
+#DiscussionForm label, label {
+   color: #692154;
+}
+
+/* Tabs */
+div.Tabs {
+	background: none;
+	padding: 0;
+	border-bottom: 1px solid #aaa;
+}
+div.Tabs ul {
+	padding: 0 8px;
+	white-space: nowrap;
+}
+div.MessageForm {
+	padding: 8px 8px 5px;
+}
+div.MessageForm div.Tabs {
+	padding: 0 8px;
+}
+
+/* css fix for message spacing - Brand-Friendly 1.2 */
+
+	div.Preview div.Message, ul.MessageList div.Message {
+		clear: none;
+		font-size: 100%;
+		line-height: 140%;
+	}
+
+div.Tabs li a,
+div.Tabs li a:link,
+div.Tabs li a:hover,
+div.Tabs li a:active,
+div.Tabs li a:visited {
+	font-size: 11px;
+   margin: 0;
+   border: none;
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+   background: none;
+   color: #9FC7C6;
+   text-decoration: none;
+   padding: 8px 10px;
+	line-height: 11px;
+	font-weight: normal;
+}
+div.Tabs li a:hover {
+   text-decoration: underline;
+}
+a.Active,
+div.Tabs li.Active a {
+   background: #f6f6f6;
+   color: #555555;
+   margin: 0;
+   border: 1px solid #76252A;
+	border-bottom: none;
+   border-radius: 3px 3px 0 0;
+   -moz-border-radius: 3px 3px 0 0;
+   -webkit-border-radius: 3px 3px 0 0;
+   display: inline-block;
+	font-size: 12px;
+	line-height: 12px;
+   font-weight: normal;
+   text-decoration: none;
+   padding: 6px 10px;
+	position: relative;
+	top: 1px;
+}
+div.Tabs li a span {
+   line-height: 1;
+   font-size: 80%;
+   padding: 0 3px;
+   border-radius: 3px;
+   -webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+   font-weight: normal;
+	background: #FFB8ED;
+   color: #555555;
+   margin: 0 0 0 4px;
+}
+div.DiscussionsTabs div.SubTab {
+	font-size: 11px;
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-top: 1px solid #76252A;
+	background: #f3f3f3;
+	margin:0;
+	padding:4px 8px;
+}
+div.HeadingTabs ul {
+	margin: 8px 0 0;
+}
+body.Discussion a.Bookmark {
+	margin: 6px 2px;
+}
+div.Preview {
+	border: 1px solid #76252A;
+	background: #fff;
+	margin:0 0 8px;
+	padding: 8px;
+}
+.Foot {
+	background: none;
+	border: none;
+}
+div.MorePager a,
+div.MorePager a:link,
+div.MorePager a:visited,
+div.MorePager a:active,
+div.MorePager a:hover {
+	border-radius: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	background: none;
+	border: none;
+	color: #1e79a7;
+	line-height: 1;
+	padding: 0;
+	text-decoration: none;	
+}
+div.MorePager a:hover {
+	color: #ff0084;
+	text-decoration: underline;
+}
+body.add #Content {
+	margin: 0 10px;
+}
+
+/* Discussions */
+
+ul.DataList li.Item {
+    border-bottom: 1px solid #76252A;
+}
+
+.Mine, .Alt, .New { 
+	background: #f6f6f6; 
+}
+
+ul.DataList li.Mine div.Meta a.Category {
+   background: #FFB8ED;
+}
+ul.DataList div.Meta a.Category {
+   background: #FAE1F4;
+}
+ul.DataList div.Meta span.Announcement {
+    background: #FFB8ED;
+    color: #555555;
+}
+ul.DataList div.Meta strong {
+    background: #C83482;
+    color: #ffffff;
+}
+#DiscussionForm h2 {
+    color: #555555;
+}
+#DiscussionForm form {
+    background: #FFD8F5;
+    border: 1px solid #C83482;
+}
+div.MessageForm{
+    background: #FFD8F5;
+    border-bottom: 1px solid #C83482;
+}
+ul.MessageList li.Item, div.Tabs{
+    border-bottom: 1px solid #76252A;
+}
+
+ul.Activities ul.DataList li {
+    background: #FFD8F5;
+    border: 1px solid #C83482;
+}
+#MessageForm {
+    background: #FFD8F5;
+}
+#MessageForm h2 {
+    color: #555555;
+}
+
+#Status {
+    background: #FCEBF8;
+}
+
+div.HeadingTabs div.SubTab {
+   font-family: buda, Trebuchet MS, Tahoma, sans-serif;
+   font-size: 18px;
+   line-height: 2.4;
+}
+.Tabs, div.Tabs li a {
+   font-family: buda, Trebuchet MS, Tahoma, sans-serif;
+   font-size: 15px !Important;
+}
+    
+/* Panel Boxes */
+div.Box {
+	border-radius: 8px;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	 background-color: #FAE1F4;
+    border: 1px solid #76252A;
+    color: #555555;
+/*    font: 12px/1.5em Verdana,Geneva,sans-serif;*/
+	padding: 7px;
+}
+div.Box h4 {
+	color: #9FC7C6;
+	font-size: 18px;
+   font-weight: bold;
+   margin-left: -7px;
+   margin-right: -7px;
+   margin-bottom: 7px;
+   padding: 0 7px;
+	border-bottom:2px solid #C83482;
+}
+ul.PanelInfo {
+   border-top: none;
+}
+ul.PanelInfo li,
+ul.PanelInfo li.Active {
+	background: none;
+	border-bottom: 1px solid #C83482;
+}
+ul.PanelInfo li.Active {
+	background: #f6f6f6;
+}
+body.Profile ul.PanelInfo {
+	border: none;
+}
+body.Profile ul.PanelInfo li {
+	margin: 0;
+	padding: 0;
+}
+body.Profile ul.PanelInfo li a {
+	font-size: 12px;
+	display: block;
+	padding: 0 6px;
+}
+body.Profile ul.PanelInfo li a:hover {
+	background: #FCEBF8;
+}
+
+ul.PanelInfo div.Meta strong {
+    background: #C83482;
+    color: #ffffff;
+}
+
+/* Sign In Page */
+body.Entry #Content div.Box {
+	background: #FAE1F4;
+}
+body.Entry #Panel {
+	display: none;
+}
+
+div.Border {
+    background: rgba(200, 52, 130, 0.7);
+}
+
+body.Entry #Content div.Box {
+    background: #FAE1F4;
+}
+
+.GuestBox p {
+   margin: 7px;
+}
+
+/* Forms */
+input.DateBox, input.InputBox, input.SmallInput, textarea {
+    background:#F6F6F6;
+    border: 1px solid #76252A;
+    font-size: 12px;
+}
+
+.Count {
+   background: transparent;
+   color: #333;
+}

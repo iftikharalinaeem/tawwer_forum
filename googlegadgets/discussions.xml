@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+  <ModulePrefs title="Vanilla Community Discussions" 
+    title_url="http://vanillaforums.org/discussions" 
+    scrolling="true"
+    author="Mark O'Sullivan" 
+    author_email="mark@vanillaforums.com">
+  </ModulePrefs>
+  <UserPref name="show_date" display_name="Show Dates?" datatype="bool" default_value="false"/>
+  <UserPref name="num_entries" display_name="Number of Entries:" datatype="string" default_value="5"/>
+  <UserPref name="show_summ" display_name="Show Summaries?" datatype="bool" default_value="false"/>
+  <Content type="html">
+  <![CDATA[
+  <style> #content_div { font-size: 12px; color: #555; } div.discussion { padding: 0 2px; border-bottom: 1px solid #7AA5D6; margin: 0 2px; } </style>
+  <div id="content_div"></div>
+  <script type="text/javascript">
+
+  // Get userprefs
+  var prefs = new gadgets.Prefs();
+  var showdate = prefs.getBool("show_date");
+  var entries = prefs.getInt("num_entries");
+  var summaries = prefs.getBool("show_summ");
+
+  function getFeed() {  
+    var params = {};  
+    params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.FEED;  
+    params[gadgets.io.RequestParameters.NUM_ENTRIES] = new Number(entries);  
+    params[gadgets.io.RequestParameters.GET_SUMMARIES] = summaries; 
+    var url = "http://vanillaforums.org/rss/discussions";  
+    gadgets.io.makeRequest(url, response, params);
+  };
+
+  function response(obj) { 
+    // obj.data contains the feed data
+    var feed = obj.data;
+    var html = '';
+
+    // Access the data for a given entry
+    if (feed.Entry) {
+      for (var i = 0; i < feed.Entry.length; i++) {
+        html += '<div class="discussion">'
+          + '<a target="_blank" href="' + feed.Entry[i].Link + '">'
+          + feed.Entry[i].Title
+          + '</a> ';
+        if (showdate==true)
+        { 
+          // The feed entry Date field contains the timestamp in seconds
+          // since Jan. 1, 1970. To convert it to the milliseconds needed
+          // to initialize the JavaScript Date object with the correct date, 
+          // multiply by 1000.
+          var milliseconds = (feed.Entry[i].Date) * 1000; 
+          var date = new Date(milliseconds); 
+          html += '<em>'
+            + date.toLocaleDateString()
+            + ' '
+            + date.toLocaleTimeString()
+            + '</em>'; 
+        }
+        if (summaries==true) { 
+          html += '<div>'
+            + feed.Entry[i].Summary
+            + '</div>';
+        }
+        html += '</div>';
+      }
+    }
+    document.getElementById('content_div').innerHTML = html;
+  };
+  gadgets.util.registerOnLoadHandler(getFeed);
+  </script>
+  ]]>
+  </Content>
+</Module>
