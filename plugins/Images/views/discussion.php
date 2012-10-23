@@ -23,7 +23,9 @@ $PagerString = $this->Pager->ToString('less');
 if ($PagerString != '')
    echo Wrap($PagerString, 'div class="PageControls Top"');
 
-echo '<div class="Tiles ImagesWrap">';
+//echo '<div id="filetable" class="Tiles UploadFiles files" role="presentation">
+
+echo '<div id="filetable" class="Tiles UploadFiles ImagesWrap files" role="presentation">';
    // Write the initial discussion.
    if ($this->Data('Page') == 1) {
       $Discussion = (array)$this->Data('Discussion');
@@ -48,4 +50,23 @@ echo '<div class="PageControls Bottom">';
    echo $this->Pager->ToString('more');
 echo '</div>';
 
-WriteCommentForm();
+include dirname(__FILE__).'/commentform.php';
+include_once($this->FetchViewLocation('template', '', 'plugins/Images'));
+?>
+<script type="text/javascript">
+   jQuery(document).ready(function($) {
+      $('.Tiles').imagesLoaded(function($images, $proper, $broken) {
+         $('.Tile', this).animate({ opacity: 1 });
+         
+         console.log('images loaded');
+
+         this.masonry({
+            itemSelector: '.ImageWrap',
+            animate: true
+         });
+      });
+      
+      
+      
+   });
+</script>

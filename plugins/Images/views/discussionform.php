@@ -5,48 +5,47 @@ $Session = Gdn::Session();
 $CancelUrl = '/vanilla/discussions';
 if (C('Vanilla.Categories.Use') && is_object($this->Category))
    $CancelUrl = '/vanilla/categories/' . urlencode($this->Category->UrlCode);
+
+require_once dirname(__FILE__).'/helper_functions.php';
+
 ?>
 <div id="NewImageForm" class="NewImageForm DiscussionForm FormTitleWrapper">
    <?php
    if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
       echo Wrap($this->Data('Title'), 'h1 class="H"');
 
-   echo '<div class="FormWrapperz">';
-      echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'id' => 'UploadForm'));
-      echo $this->Form->Errors();
-      
-      echo '<div class="ImageFormWrap">';
+   echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'id' => 'UploadForm'));
+   echo $this->Form->Errors();
 
-         echo '<div class="ImageControlsWrap">';
-            echo '<span class="FileInput btn btn-success fileinput-button">';
-               echo Sprite('SpImage');
-               echo Wrap(T('Add Image'));
-               echo '<input type="file" name="files[]" multiple>';
-            echo '</span>';
-            echo Wrap(T('Drag and Drop', 'Drag &amp; Drop'), 'span class="DropZone"');
-            echo '<div class="FetchUrl">';
-               echo '<input type="text" class="UrlInput" placeholder="Paste image url..." />';
-               echo ' '.Anchor('Fetch', '#', 'UrlButton Button Success');
-            echo '</div>';
-            if ($this->ShowCategorySelector === TRUE) {
-               echo '<div class="Category">';
-               echo $this->Form->CategoryDropDown('CategoryID', array('Value' => GetValue('CategoryID', $this->Category)));
-               echo '</div>';
-            }
+   echo '<div class="FormWrapper">';
+   
+   if ($this->ShowCategorySelector === TRUE) {
+      echo '<div class="P">';
+         echo '<div class="Category">';
+         echo $this->Form->Label('Category', 'CategoryID'), ' ';
+         echo $this->Form->CategoryDropDown('CategoryID', array('Value' => GetValue('CategoryID', $this->Category)));
          echo '</div>';
-      
-      echo '</div>'; // ImageFormWrap
-      
-      // The table listing the files available for upload/download.
-      echo '<div id="filetable" class="Tiles UploadFiles files" role="presentation"></div>';
-      
-      echo '<div class="Buttons">';
-         echo $this->Form->Button('Post', array('class' => 'Button ImageButton Primary'));
-         echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
       echo '</div>';
-      
-      echo $this->Form->Close();
+   }
+
+   echo '<div class="P">';
+      echo $this->Form->Label('Name', 'Name');
+      echo Wrap($this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput')), 'div', array('class' => 'TextBoxWrapper'));
    echo '</div>';
+
+   WriteImageUpload();
+
+   echo '</div>'; // FormWrapper
+
+   // The table listing the files available for upload/download.
+   echo '<div id="filetable" class="Tiles UploadFiles files" role="presentation"></div>';
+
+   echo '<div class="Buttons">';
+      echo $this->Form->Button('Post', array('class' => 'Button ImageButton Primary'));
+      echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
+   echo '</div>';
+
+   echo $this->Form->Close();
    ?>
 </div>
 

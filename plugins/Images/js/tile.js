@@ -8,7 +8,7 @@ jQuery(document).ready(function($) {
    $container.imagesLoaded(function() {
       $(selector).animate({ opacity: 1 });
       $container.masonry({
-         itemSelector: selector,
+         itemSelector: selector
          // columnWidth: width
       });
    });

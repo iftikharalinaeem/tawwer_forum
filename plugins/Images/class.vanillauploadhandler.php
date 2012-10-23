@@ -55,6 +55,10 @@ class VanillaUploadHandler extends UploadHandler {
       $Result->delete_url = Url('/post/uploadimage.json?file='.urlencode($Parsed['SaveName']), TRUE);
       $Result->parsed = $Parsed;
       
+      $Result->RecordType = 'Temp';
+      $Result->RecordID = time();
+      $this->SaveComment($Result);
+      
       return $Result;
    }
    
@@ -91,6 +95,34 @@ class VanillaUploadHandler extends UploadHandler {
       
       $this->set_file_delete_url($file);
       
+      $file->RecordType = 'Temp';
+      $file->RecordID = time();
+      $this->SaveComment($file);
+      
+      ob_clean();
       echo json_encode(array($file));
+   }
+   
+   public function SaveComment($File) {
+      $AutoSave = Gdn::Request()->Post('AutoSave');
+      if (!$AutoSave)
+         return;
+      
+      // See if we need to save a comment.
+      $DiscussionID = Gdn::Request()->Post('DiscussionID');
+      if (!$DiscussionID)
+         return;
+         
+         
+      $Image = ArrayTranslate((array)$File, array('url' => 'Image', 'thumbnail_url' => 'Thumbnail', 'size' => 'Size'));
+      $Image['DiscussionID'] = $DiscussionID;
+      
+      $ImageModel = new ImageModel();
+      $CommentID = $ImageModel->SaveComment($Image);
+      
+      if ($CommentID) {
+         $File->RecordType = 'Comment';
+         $File->RecordID = $CommentID;
+      }
    }
 }

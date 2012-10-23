@@ -126,7 +126,8 @@ class ImagesPlugin extends Gdn_Plugin {
          $DiscussionID = GetValue('DiscussionID', $FormValues);
          $NewDiscussion = $DiscussionID == 0;
          $CommentIDs = array();
-         $DiscussionID = $ImageModel->Save($FormValues, $CommentIDs);
+         $DiscussionID = $ImageModel->Save($FormValues);
+         $CommentIDs = $ImageModel->CommentIDs;
          $Sender->Form->SetValidationResults($ImageModel->ValidationResults());
          if ($Sender->Form->ErrorCount() == 0) {
             $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
@@ -244,10 +245,9 @@ class ImagesPlugin extends Gdn_Plugin {
 //      $this->AddJsFiles();
       
       // If the current discussion is of type "Image", switch to the images view
+      $this->AddJsFiles();
       $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js');
-//      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
-//      $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
-      $Sender->AddJsFile('plugins/Images/js/tile.js');
+      
       $Sender->View = PATH_PLUGINS.'/Images/views/discussion.php';
       
       $Sender->CssClass .= ' NoPanel';
