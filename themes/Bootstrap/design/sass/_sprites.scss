@@ -20,6 +20,18 @@
 .MenuItems a:hover .Sprite {
    background-image: spriteUrl(#fff);
 }
+
+.FilterMenu .ReactSprite {
+   background-image: url("http://vanillicon.com/sprites/sprites-14-0668d3.png");
+}
+.FilterMenu a:hover .ReactSprite {
+   background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
+}
+.FilterMenu .Active a .ReactSprite,
+.FilterMenu .Active a:hover .ReactSprite {
+   background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+}
+
 /* Switch to bordered icons for user reaction overlays */
 .UserReactionWrap .ReactSprite {
    background-image: spriteUrl(#000, "sprites-14-outline");
