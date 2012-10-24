@@ -425,7 +425,6 @@ only screen and (max-device-width: 480px) {
    margin: 5px;
    padding: 10px;
    border-radius: 2px;
-   background-color: #fff;
    
    -webkit-transition: opacity .3s ease-in-out;
    -moz-transition: opacity .3s ease-in-out;
@@ -439,8 +438,11 @@ only screen and (max-device-width: 480px) {
    line-height: 1.2;
 }
 
-.Tile img {
-   max-width: 100%;
+.Tile .Image img {
+   max-width: 100% !important;
+   float: none !important;
+   margin: 0 auto 10px !important;
+   display: block;
 }
 
 .Tile .AuthorWrap {
