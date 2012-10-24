@@ -139,14 +139,22 @@ class SimpleAPIPlugin extends Gdn_Plugin {
    protected static function TranslateField(&$Data, $Field, $Value) {
       $Errors = array();
       
-      // If the Key is dot-delimited, inspect it for potential munging
-      if (strpos($Field, '.') !== FALSE) {
-         list($FieldPrefix, $ColumnLookup) = explode('.', $Field, 2);
-
-         // We know how to lookup 'User type' fields in several ways:
-         //   Email, Name, ForeignID
-         if (StringEndsWith($FieldPrefix, 'User')) {
+      try {
+         
+         // If the Key is dot-delimited, inspect it for potential munging
+         if (strpos($Field, '.') !== FALSE) {
             
+            list($FieldPrefix, $ColumnLookup) = explode('.', $Field, 2);
+
+            $TableName = $FieldPrefix;
+            if (StringEndsWith($FieldPrefix, 'User'))
+               $TableName = 'User';
+            
+            // Limit to supported tables
+            $SupportedTables = array('Badge', 'Category', 'Rank', 'Role', 'User');
+            if (!in_array($TableName, $SupportedTables))
+               throw new Exception("Table {$TableName} is not supported by SmartID", 405);
+
             // We desire the 'ID' root field
             $LookupField = "{$FieldPrefix}ID";
 
@@ -155,88 +163,92 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                return;
 
             $LookupFieldValue = NULL;
-            switch ($ColumnLookup) {
+            $LookupKey = "{$TableName}.{$ColumnLookup}";
+            $LookupMethod = 'simple';
 
-               // Lookup user by email or name
-               case 'Email':
-               case 'Name':
-                  $User = Gdn::UserModel()->SQL->GetWhere('User u', array(
-                     "u.{$ColumnLookup}" => $Value
+            if ($ColumnLookup == 'ID')
+               $LookupMethod = 'noop';
+
+            if ($LookupKey == 'User.ForeignID')
+               $LookupMethod = 'custom';
+            
+            switch ($LookupMethod) {
+
+               // Noop lookup
+               case 'noop':
+                  $LookupFieldValue = $Value;
+                  break;
+
+               // Simple table.field lookup types
+               case 'simple':
+                  $MatchRecords = Gdn::SQL()->GetWhere($TableName, array(
+                     $ColumnLookup => $Value
                   ));
-                  if (!$User->NumRows()) {
-                     $Errors[] = self::NotFoundString('User', $Value);
-                     continue;
-                  }
+                  if (!$MatchRecords->NumRows())
+                     throw new Exception(self::NotFoundString($FieldPrefix, $Value), 404);
 
-                  if ($User->NumRows() > 1) {
-                     $Errors[] = sprintf(T('Multiple %ss found by %s for "%s".'), T('User'), $ColumnLookup, $Value);
-                     continue;
-                  }
+                  if ($MatchRecords->NumRows() > 1)
+                     throw new Exception(sprintf('Multiple %ss found by %s for "%s".', T('User'), $ColumnLookup, $Value), 409);
 
-                  $User = $User->FirstRow(DATASET_TYPE_ARRAY);
-                  $LookupFieldValue = GetValue($LookupField, $User);
+                  $Record = $MatchRecords->FirstRow(DATASET_TYPE_ARRAY);
+                  $LookupFieldValue = GetValue($LookupField, $Record);
                   break;
 
-               // Lookup user by foreignid
-               case 'ForeignID':
-                  if (strpos($Value, ':') === FALSE) {
-                     $Errors[] = "Malformed ForeignID object '{$Value}'. Should be '[provider key]:[foreign id]'.";
-                     continue;
+               // Custom lookup types
+               case 'custom':
+
+                  // Special lookup for SSO users
+                  if ($LookupKey == 'User.ForeignID') {
+                     if (strpos($Value, ':') === FALSE)
+                        throw new Exception("Malformed ForeignID object '{$Value}'. Should be '[provider key]:[foreign id]'.", 400);
+
+                     $ProviderParts = explode(':', $Value, 2);
+                     $ProviderKey = $ProviderParts[0];
+                     $ForeignID = $ProviderParts[1];
+
+                     // Check if we have a provider by that key
+                     $ProviderModel = new Gdn_AuthenticationProviderModel();
+                     $Provider = $ProviderModel->GetProviderByKey($ProviderKey);
+                     if (!$Provider)
+                        throw new Exception(self::NotFoundString('Provider', $ProviderKey), 404);
+
+                     // Check if we have an associated user for that ForeignID
+                     $UserAssociation = Gdn::Authenticator()->GetAssociation($ForeignID, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
+                     if (!$UserAssociation)
+                        throw new Exception(self::NotFoundString('User', $Value), 404);
+
+                     $LookupFieldValue = GetValue($LookupField, $UserAssociation);
                   }
 
-                  $ProviderParts = explode(':', $Value, 2);
-                  $ProviderKey = $ProviderParts[0];
-                  $ForeignID = $ProviderParts[1];
-
-                  // Check if we have a provider by that key
-                  $ProviderModel = new Gdn_AuthenticationProviderModel();
-                  $Provider = $ProviderModel->GetProviderByKey($ProviderKey);
-                  if (!$Provider) {
-                     $Errors[] = self::NotFoundString('Provider', $ProviderKey);
-                     continue;
-                  }
-
-                  // Check if we have an associated user for that ForeignID
-                  $UserAssociation = Gdn::Authenticator()->GetAssociation($ForeignID, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
-                  if (!$UserAssociation) {
-                     $Errors[] = self::NotFoundString('User', $Value);
-                     continue;
-                  }
-
-                  $LookupFieldValue = GetValue($LookupField, $UserAssociation);
-                  break;
-
-               // By ID, just passthrough
-               case 'ID':
-                  $LookupField = $Value;
                   break;
             }
-            
+
             if (!is_null($LookupFieldValue))
                $Data[$LookupField] = $LookupFieldValue;
 
-         }
+         } elseif (StringEndsWith($Field, 'Category')) {
+            // Translate a category column.
+            $Px = StringEndsWith($Field, 'Category', TRUE, TRUE);
+            $Column = $Px.'CategoryID';
+            if (isset($Data[$Column]))
+               return;
 
-      } elseif (StringEndsWith($Field, 'Category')) {
-         // Translate a category column.
-         $Px = StringEndsWith($Field, 'Category', TRUE, TRUE);
-         $Column = $Px.'CategoryID';
-         if (isset($Data[$Column]))
-            return;
-
-         $Category = CategoryModel::Categories($Value);
-         if (!$Category) {
-            $Errors[] = self::NotFoundString('Category', $Value);
-         } else {
+            $Category = CategoryModel::Categories($Value);
+            if (!$Category)
+               throw new Exception(self::NotFoundString('Category', $Value), 404);
+            
             $Data[$Column] = (string)$Category['CategoryID'];
          }
+         
+      } catch (Exception $Ex) {
+         $Errors[] = $Ex->getMessage();
       }
       
       return $Errors;
    }
    
    protected static function NotFoundString($Code, $Item) {
-      return sprintf(T('%1$s "%2$s" not found.'), T($Code), $Item);
+      return sprintf('%1$s "%2$s" not found.', T($Code), $Item);
    }
    
    /**
