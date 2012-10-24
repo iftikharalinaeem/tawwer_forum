@@ -7,6 +7,7 @@ $textColor: #c6c6c6;
 $headingsColor: #fff;
 $linkColor: #84BCDE;
 $linkColorHover: #39E5FF;
+$reactColor: #999;
 
 $borderColor: #242424;
 
@@ -24,6 +25,7 @@ $navbarBackground: #000;
 
 $boxBackground: darken($bodyBackground, 2%);
 $listBackground: darken($bodyBackground, 2%);
+$boxBorder: $borderColor;
 
 $uiColor: #f0f0f0;
 

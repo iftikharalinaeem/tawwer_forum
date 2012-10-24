@@ -56,6 +56,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
   background-image: -webkit-linear-gradient(top, #35433a, #1e2621);
   background-image: -moz-linear-gradient(top, #35433a, #1e2621);
   background-image: -o-linear-gradient(top, #35433a, #1e2621);
+  background-image: -ms-linear-gradient(top, #35433a, #1e2621);
   background-image: linear-gradient(top, #35433a, #1e2621);
 }
 
@@ -133,6 +134,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
   background-image: -webkit-linear-gradient(top, #dfe9d7, #abc595);
   background-image: -moz-linear-gradient(top, #dfe9d7, #abc595);
   background-image: -o-linear-gradient(top, #dfe9d7, #abc595);
+  background-image: -ms-linear-gradient(top, #dfe9d7, #abc595);
   background-image: linear-gradient(top, #dfe9d7, #abc595);
   border-color: #91b374;
   color: #414d4c;
@@ -158,6 +160,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
   background-image: -webkit-linear-gradient(top, #1481f8, #0550a1);
   background-image: -moz-linear-gradient(top, #1481f8, #0550a1);
   background-image: -o-linear-gradient(top, #1481f8, #0550a1);
+  background-image: -ms-linear-gradient(top, #1481f8, #0550a1);
   background-image: linear-gradient(top, #1481f8, #0550a1);
   border-color: #0550a1 #0550a1 #033770;
   color: white;
@@ -273,28 +276,29 @@ a.Close {
 
 /** Panel **/
 .Box {
-  border-color: #b1c5a7;
+  border-color: #dddddd;
   background-color: #ccd9c6;
 }
 
 .Box h4 {
   background: #becfb7;
-  border-color: #b1c5a7;
+  border-color: #dddddd;
   box-shadow: 0 1px 1px white inset;
 }
 
 @media (min-width: 1101px) {
   .PhotoWrapLarge {
-    border-color: #b1c5a7;
+    border-color: #dddddd;
     background: #ccd9c6;
     box-shadow: 0 1px 1px white inset;
   }
 }
-#Panel .FilterMenu {
+.FilterMenu {
   background-color: #becfb7;
+  border-color: #dddddd;
 }
 
-#Panel .FilterMenu li a:hover {
+.FilterMenu li a:hover {
   background-color: #b1c5a7;
 }
 
@@ -303,7 +307,7 @@ a.Close {
 }
 
 #Panel .PanelInfo li {
-  border-color: #b1c5a7;
+  border-color: #dddddd;
 }
 
 .Hero {
@@ -362,6 +366,14 @@ a.Close {
   border-color: #b1c5a7;
 }
 
+.Tile {
+  background-color: #ccd9c6;
+  border-color: #dddddd;
+}
+.Tile .AuthorWrap {
+  background-color: #c7d5c0;
+}
+
 /** Me box **/
 .NavBar .MeMenu .Sprite16 {
   background-image: url("http://vanillicon.com/sprites/sprites-14-bad0c3.png");
@@ -383,11 +395,11 @@ a.Close {
 }
 
 .FilterMenu .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-0668d3.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14-196ba7.png");
 }
 
 .FilterMenu a:hover .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
+  background-image: url("http://vanillicon.com/sprites/sprites-14c-f7075b.png");
 }
 
 .FilterMenu .Active a .ReactSprite,
