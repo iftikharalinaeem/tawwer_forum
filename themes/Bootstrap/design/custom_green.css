@@ -276,26 +276,26 @@ a.Close {
 
 /** Panel **/
 .Box {
-  border-color: #dddddd;
+  border-color: #b2c3ad;
   background-color: #ccd9c6;
 }
 
 .Box h4 {
   background: #becfb7;
-  border-color: #dddddd;
+  border-color: #b2c3ad;
   box-shadow: 0 1px 1px white inset;
 }
 
 @media (min-width: 1101px) {
   .PhotoWrapLarge {
-    border-color: #dddddd;
+    border-color: #b2c3ad;
     background: #ccd9c6;
     box-shadow: 0 1px 1px white inset;
   }
 }
 .FilterMenu {
   background-color: #becfb7;
-  border-color: #dddddd;
+  border-color: #b2c3ad;
 }
 
 .FilterMenu li a:hover {
@@ -307,7 +307,7 @@ a.Close {
 }
 
 #Panel .PanelInfo li {
-  border-color: #dddddd;
+  border-color: #b2c3ad;
 }
 
 .Hero {
@@ -368,7 +368,7 @@ a.Close {
 
 .Tile {
   background-color: #ccd9c6;
-  border-color: #dddddd;
+  border-color: #b2c3ad;
 }
 .Tile .AuthorWrap {
   background-color: #c7d5c0;
