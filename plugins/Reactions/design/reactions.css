@@ -438,7 +438,8 @@ only screen and (max-device-width: 480px) {
    line-height: 1.2;
 }
 
-.Tile .Image img {
+.Tile .Image img,
+.Tile .Body img{
    max-width: 100% !important;
    float: none !important;
    margin: 0 auto 10px !important;
