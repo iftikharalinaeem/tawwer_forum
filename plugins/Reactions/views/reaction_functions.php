@@ -194,9 +194,8 @@ if (!function_exists('WriteImageItem')):
       } else if (InArrayI($Record['Format'], array('Html', 'Text', 'Display')) && strlen($Body) > 800) {
          $Wide = TRUE; // Lots of text?
       }
-      if ($Wide) $CssClass .= ' Wide';
-      $CssClass .= ' Invisible';
-      
+      if ($Wide)
+         $CssClass .= ' Wide';
       ?>
       <div id="<?php echo "{$Type}_{$RecordID}" ?>" class="<?php echo $CssClass; ?>">
          <?php
