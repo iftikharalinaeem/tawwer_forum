@@ -133,5 +133,6 @@ SnapABug.setButton("http://vanillaforums.com/applications/vfcom/design/images/he
 SnapABug.addButton("34737bd0-1d78-43ac-be67-b2769cb5f6ae","0","30%");
 </script>
 */ ?>
+<?php $this->RenderAsset('Google'); ?>
 </body>
 </html>
