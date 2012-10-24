@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-include_once 'reaction_functions.php';
+require_once Gdn::Controller()->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
 foreach ($this->Data('Data', array()) as $Row): 
    $this->SetData('Record', $Row);
    $Body = Gdn_Format::To($Row['Body'], $Row['Format']);
