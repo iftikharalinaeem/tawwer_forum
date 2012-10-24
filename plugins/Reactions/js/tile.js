@@ -1,16 +1,17 @@
 jQuery(document).ready(function($) {
-   var selector = '.Tiles > .Tile', $container = $('.Tiles');
-   var $items = $('.Tiles .Tile:not(.Wide)');
-   if ($items.length == 0) $items = $('.Tiles .Tile');
+   var selector = '.Tile', $container = $('.Tiles');
+//   var $items = $('.Tiles .Tile:not(.Wide)');
+//   if ($items.length == 0) $items = $('.Tiles .Tile');
 //   var width = $items.outerWidth() + 15;
    
-   $(selector).css({opacity: 0});
+//   $(selector).css({opacity: 0});
    $container.imagesLoaded(function() {
-      $(selector).animate({ opacity: 1 });
       $container.masonry({
          itemSelector: selector
          // columnWidth: width
       });
+      
+      $(selector, $container).removeClass('Invisible');
    });
    
    // Do inifinite scroll on the best of page.
@@ -31,10 +32,10 @@ jQuery(document).ready(function($) {
            },
          pixelsFromNavToBottom: 800
       }, function(newElements) {
-           var $newElems = $(newElements).css({ opacity: 0 });
+           var $newElems = $(newElements).addClass('Invisible');
            $newElems.imagesLoaded(function(){
-             $newElems.animate({ opacity: 1 });
-             $container.masonry( 'appended', $newElems, true ); 
+             $container.masonry('appended', $newElems, true ); 
+             $newElems.removeClass('Invisible');
            });
          }
       );   

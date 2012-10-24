@@ -316,11 +316,12 @@ a.Close {
    }
 }
 
-#Panel .FilterMenu {
+.FilterMenu {
    background-color: accent();
+   border-color: $boxBorder;
 }
 
-#Panel .FilterMenu li a:hover {
+.FilterMenu li a:hover {
    background-color: accent(10%);
 }
 
@@ -387,6 +388,15 @@ a.Close {
    background: accent(5%);
    box-shadow: 0 10px 30px darken(accent(5%), 20%) inset;
    border-color: accent(10%);
+}
+
+.Tile {
+   background-color: $bodyBackground;
+   border-color: $boxBorder;
+   
+   .AuthorWrap {
+      background-color: accent(2%);
+   }
 }
 
 @import "sprites";

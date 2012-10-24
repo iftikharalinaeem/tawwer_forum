@@ -352,12 +352,14 @@ body > #Frame > .Head {
 
 /*** Navigation ***/
 
+.FilterMenu {
+   background-color: accent();
+   border: 1px solid $boxBorder;
+}
+
 #Panel .FilterMenu {
    min-height: 20px;
    margin-bottom: 20px;
-   background-color: #f5f5f5;
-   border: 1px solid #eee;
-   border: 1px solid rgba(0, 0, 0, 0.05);
    padding: 8px 0;
    -webkit-border-radius: 4px;
    -moz-border-radius: 4px;
@@ -380,12 +382,12 @@ body > #Frame > .Head {
     vertical-align: middle;
 }
 
-#Panel .FilterMenu li a:hover {
+.FilterMenu li a:hover {
    background-color: #eeeeee;
 }
 
-#Panel .FilterMenu .Active a,
-#Panel .FilterMenu .Active a:hover,
+.FilterMenu .Active a,
+.FilterMenu .Active a:hover,
 .PanelInfo .Active {
    color: #ffffff;
    font-weight: normal;
@@ -393,7 +395,7 @@ body > #Frame > .Head {
    background-color: #0088cc;
 }
 
-#Panel .FilterMenu .Active a,
+.FilterMenu .Active a,
 .PanelInfo .Active a {
    color: #ffffff;
 }
@@ -419,9 +421,6 @@ body > #Frame > .Head {
 #Content .FilterMenu {
    min-height: 20px;
    margin-bottom: 20px;
-   background-color: #f5f5f5;
-   border: 1px solid #eee;
-   border: 1px solid rgba(0, 0, 0, 0.05);
    padding: 0px;
    -webkit-border-radius: 4px;
    -moz-border-radius: 4px;
@@ -898,6 +897,7 @@ a.Close:hover {
 .SpApplicants { background-position: -260px -40px; }
 .SpBadge { background-position: -240px -140px; }
 .SpBan { background-position: -300px -20px; }
+.SpBestOf { background-position: -80px -80px; }
 .SpBookmarks { background-position: -100px -80px; }
 .SpComments, .SpComment { background-position: -160px -80px; }
 .SpConnection { background-position: -320px -20px; }

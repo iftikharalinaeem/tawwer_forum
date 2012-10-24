@@ -8,7 +8,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.1.8',
+   'Version' => '1.1.12',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -503,12 +503,15 @@ class ReactionsPlugin extends Gdn_Plugin {
 
       // Set up head
       $Sender->Head = new HeadModule($Sender);
+      
       $Sender->AddJsFile('jquery.js');
       $Sender->AddJsFile('jquery.livequery.js');
       $Sender->AddJsFile('global.js');
       $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js'); // I customized this to get proper callbacks.
       $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
       $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
+      $Sender->AddJsFile('tile.js', 'plugins/Reactions');
+      
       $Sender->AddCssFile('style.css');
       // Set the title, breadcrumbs, canonical
       $Sender->Title(T('Best Of'));
@@ -523,7 +526,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->CssClass .= ' NoPanel';
       
       // Render the page (or deliver the view)
-      $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'tiles' : 'tile_items';
+      $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'tile_items' : 'tiles';
       $Sender->Render($View, '', 'plugins/Reactions');
    }   
    

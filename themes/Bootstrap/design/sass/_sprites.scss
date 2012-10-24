@@ -22,14 +22,14 @@
 }
 
 .FilterMenu .ReactSprite {
-   background-image: url("http://vanillicon.com/sprites/sprites-14-0668d3.png");
+   background-image: spriteUrl($linkColor, $spriteStyle);
 }
 .FilterMenu a:hover .ReactSprite {
-   background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
+   background-image: spriteUrl($linkColorHover, sprites-14c);
 }
 .FilterMenu .Active a .ReactSprite,
 .FilterMenu .Active a:hover .ReactSprite {
-   background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+   background-image: spriteUrl($tagColor, $spriteStyle);
 }
 
 /* Switch to bordered icons for user reaction overlays */
