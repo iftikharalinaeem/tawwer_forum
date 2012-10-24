@@ -211,11 +211,17 @@ class RanksPlugin extends Gdn_Plugin {
       $this->_AddEdit($Sender);
    }
    
-   public function SettingsController_Ranks_Create($Sender) {
+   public function SettingsController_Ranks_Create($Sender, $RankID = NULL) {
       $Sender->Permission('Garden.Settings.Manage');
       
       $RankModel = new RankModel();
-      $Ranks = $RankModel->GetWhere(FALSE, 'Level')->ResultArray();
+      
+      if (empty($RankID))
+         $Ranks = $RankModel->GetWhere(FALSE, 'Level')->ResultArray();
+      else {
+         $Rank = $RankModel->GetID($RankID);
+         $Ranks = array($Rank);
+      }
      
       $Sender->SetData('Ranks', $Ranks);
       $Sender->AddSideMenu();
