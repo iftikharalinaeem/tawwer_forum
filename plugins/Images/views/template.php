@@ -39,7 +39,7 @@
          <input type="hidden" name="Image[]" value="{%=file.url%}" />
          <input type="hidden" name="Thumbnail[]" value="{%=file.thumbnail_url%}" />
          <input type="hidden" name="Size[]" value="{%=file.size%}" />
-         <input type="text" name="Caption[]" class="InputBox" placeholder="Enter a caption..." value="{%=file.caption%}" />
+         <input type="text" name="Caption[]" class="InputBox CaptionBox" placeholder="<?php echo htmlspecialchars(T('Enter a caption...')); ?>" value="{%=file.caption%}" />
       </div>
     {% } %}
     <div class="Delete delete">

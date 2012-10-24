@@ -121,6 +121,7 @@
   position: absolute;
   top: 0;
   right: 0;
+  left: 0;
   margin: 0;
   border: solid transparent;
   border-width: 0 0 100px 200px;
@@ -138,69 +139,52 @@
 .ImageFormWrap {
    width: 300px;
 }
-.ImageControlsWrap {
-    background: #fff;
-    box-shadow: 0 0 1px #333;
-    border-radius: 1px;
-    border: 0px solid #ddd;
-    border-bottom-width: 1px;
-}
-.FileInput,
-.DropZone {
-    display: inline-block;
-    background: #f5f5f5;
-    height: 100px;
-    line-height: 100px;
-    width: 150px;
+.FileInput {
+    height: 80px;
+    line-height: 80px;
     padding: 0;
     vertical-align: middle;
     text-align: center;
-    box-shadow: 
-       /* 0 0 1px #333, */
-      inset 0 1px 0 rgba(255,255,255,0.8)
-      /* ,inset 0 -1px 0 rgba(0,0,0,0.05) */;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
     font-size: 18px;
-    color: #333;
-    border-bottom: 1px solid #ccc;
-}
-.FileInput {
-   width: 149px;
-   border-right: 1px solid #ddd;
+    border: dashed 3px;
+    border-radius: 6px;
+    opacity: .6;
+    margin: 5px;
 }
 .FileInput:hover {
-    background: #eee;
-    box-shadow: none;
-}
-.DropZone {
-    cursor: move;
-}
-.FetchUrl {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-.UrlInput {
-    border: 1px solid #aaa;
-    color: #777;
-    padding: 4px;
-    width: 200px;
-}
-.UrlInput:focus {
-    color: #000;
-}
-.NewImageForm .Category {
-    padding: 10px;
-    margin: 0;
-}
-.NewImageForm .FormWrapper {
-   padding: 10px;
-}
-.NewImageForm .Buttons {
-   text-align: left;
+    opacity: 1;
 }
 
+.ImageControlsWrap .Or {
+   font-size: 18px;
+   opacity: .8;
+   display: block;
+   text-align: center;
+   margin: 10px 0;
+}
+
+.FetchUrl * {
+   line-height: 18px !important;
+   padding: 6px !important;
+   margin: 0 !important;
+   display: inline-block;
+   vertical-align: top;
+}
+
+.FetchUrl {
+   position: relative;
+   text-align: center;
+}
+
+.FetchUrl input.InputBox {
+   width: 80%;
+}
+
+.FetchUrl .Button {
+   
+}
 
 /* Polaroid-style image cards for uploaded and in-forum display. Put this in style.css? */
 .ImageWrap {
@@ -234,14 +218,15 @@
    margin-top: -10px;
 }
 
-.NewImageForm .ImageWrap .InputBox {
+input.CaptionBox {
     width: auto;
     border: 1px dashed #ddd;
     background: transparent;
     font-size: 12px;
     color: #aaa;
     margin: 0;
-    width: 274px; /* 280 with padding & border */
+    width: 100%;
+    box-sizing: border-box;
 }
 .NewImageForm .ImageWrap .InputBox:focus {
     color: #333;
@@ -370,9 +355,6 @@
 .ImageWrap .Reactions .Count,
 .ImageWrap .ReactMenu {
     margin: 0;
-}
-.ImageWrap .Reactions .FlagMenu .ReactButton-Flag {
-   margin: 0 6px 0 0;
 }
 .ImageWrap .FlagMenu > .SpFlyoutHandle {
    bottom: -14px;

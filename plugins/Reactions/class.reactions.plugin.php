@@ -413,6 +413,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js'); // I customized this to get proper callbacks.
       $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
       $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
+      $Sender->AddJsFile('tile.js', 'plugins/Reactions');
       $Sender->AddCssFile('style.css');
       // Set the title, breadcrumbs, canonical
       $Sender->Title(T('Best Of'));
@@ -466,6 +467,7 @@ class ReactionsPlugin extends Gdn_Plugin {
          $Reaction = 'everything';
       }
       $Sender->SetData('CurrentReaction', $Reaction);
+      
 
       // Define the query offset & limit.
       $Page = 'p'.GetIncomingValue('Page', 1);
@@ -476,6 +478,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->SetData('_Limit', $Limit + 1);
       
       $ReactionModel = new ReactionModel();
+      SaveToConfig('Plugins.Reactions.ShowUserReactions', FALSE, FALSE);
       if ($Reaction == 'everything') {
          $PromotedTagID = $ReactionModel->DefineTag('Promoted', 'BestOf');
          $Data = $ReactionModel->GetRecordsWhere(
@@ -507,7 +510,6 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
       $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
       $Sender->AddCssFile('style.css');
-      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
       // Set the title, breadcrumbs, canonical
       $Sender->Title(T('Best Of'));
       $Sender->SetData('Breadcrumbs', array(array('Name' => T('Best Of'), 'Url' => '/bestof/everything')));
@@ -521,8 +523,8 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->CssClass .= ' NoPanel';
       
       // Render the page (or deliver the view)
-      $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'bestofitems' : 'bestof';
-      $Sender->Render($View, '', 'plugins/Images');
+      $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'tiles' : 'tile_items';
+      $Sender->Render($View, '', 'plugins/Reactions');
    }   
    
    /**

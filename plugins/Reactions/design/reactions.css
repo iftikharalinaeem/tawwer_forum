@@ -30,9 +30,8 @@
 }
 .ReactButton {
    display: inline-block;
-   padding: 0px 2px;
    margin: 0 2px;
-   padding: 0 3px 0 0;
+   line-height: 14px;
 }
 .Flyout .ReactButton {
    margin: 0;
@@ -57,10 +56,6 @@
    vertical-align: top;
    background: #494949;
    background: rgba(0, 0, 0, 0.7);
-}
-.ReactButton {
-   /* opacity: 0; */
-   line-height: 14px;
 }
 .ToggleFlyout.Open .ReactButton {
    opacity: 1 !important;
@@ -253,15 +248,8 @@
     visibility: visible;
 }
 
-.ReactButton {
-   margin: 0 4px;
-}
-
 .Reactions > a.React > .ReactSprite {
    margin-right: 2px;
-}
-.ReactButton {
-    padding: 0;
 }
 .Reactions .FlagMenu .MenuItems .ReactButton {
    margin: 0;
@@ -367,9 +355,6 @@
 .Section-BestOf .BestOfList .ReactMenu {
     margin: 0;
 }
-.Section-BestOf .BestOfList .Reactions .FlagMenu .ReactButton-Flag {
-   margin: 0 6px 0 0;
-}
 .Section-BestOf .BestOfList .FlagMenu > .SpFlyoutHandle {
    bottom: -14px;
    left: 0;
@@ -406,7 +391,7 @@
 .Section-BestOf .BestOfList .ReactMenu .ReactButton:hover .ReactLabel {
    display: block;
 }
-.Section-BestOf .BestOfList .ReactMenu .ReactButton .ReactSprite,
+/*.Section-BestOf .BestOfList .ReactMenu .ReactButton .ReactSprite,
 .Section-BestOf .BestOfList .ReactMenu .ReactButton .Count,
 .Section-BestOf .BestOfList .ReactButton-Flag .ReactSprite {
    opacity: 0.5;
@@ -416,7 +401,7 @@
 .Section-BestOf .BestOfList .ReactButton-Flag:hover .ReactSprite,
 .Section-BestOf .BestOfList .ToggleFlyout.Open .ReactButton-Flag .ReactSprite {
    opacity: 1;
-}
+}*/
 #infscr-loading {
     text-align: center;
 }
@@ -429,4 +414,61 @@
 @media only screen and (device-width: 768px),
 only screen and (max-device-width: 480px) {
    .Item .Reactions > * { visibility: visible; }
+}
+
+/** Best of tiling stuff. **/
+
+.Tile {
+   float: left;
+   width: 278px;
+   border: solid 1px #ddd;
+   margin: 5px;
+   padding: 10px;
+   border-radius: 2px;
+}
+
+.Tile > h3 {
+   margin-top: 0;
+   line-height: 1.2;
+}
+
+.Tile img {
+   max-width: 100%;
+}
+
+.Tile .AuthorWrap {
+   margin: 0 -10px -10px;
+   padding: 10px;
+   background: rgba(0,0,0,.03);
+}
+
+.Tile .AuthorWrap .ProfilePhoto {
+   height: 32px;
+   width: 32px;
+}
+
+.Tile .Reactions {
+   margin: 0;
+   line-height: 1.6;
+}
+
+.Tile .ReactButton {
+   position: relative;
+}
+
+.Tile .ReactLabel {
+   display: none;
+   background: #fff;
+   color: #000;
+   white-space: nowrap;
+   position: absolute;
+   line-height: 1;
+   padding: 3px 6px 4px;
+   left: -4px;
+   top: -23px;
+}
+
+.Tile .Reactions .Bullet,
+.Tile .Reactions .Count {
+   display: none;
 }

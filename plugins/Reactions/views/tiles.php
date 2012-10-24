@@ -5,9 +5,6 @@ SaveToConfig('Garden.Format.EmbedSize', '594x335', array('Save' => FALSE));
 if (!function_exists('WriteReactions'))
    include $this->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
 
-if (!function_exists('WriteImageItem'))
-   include $this->FetchViewLocation('helper_functions', '', 'plugins/Images');
-
 echo Wrap($this->Data('Title'), 'h1 class="H"');
 echo '<div class="BestOfWrap">';
    echo Gdn_Theme::Module('BestOfFilterModule');

@@ -28,6 +28,15 @@ class ImageModel extends Gdn_Model {
       parent::__construct('Image');
    }
    
+   protected $_CommentModel = NULL;
+   
+   public function CommentModel() {
+      if ($this->_CommentModel === NULL)
+         $this->_CommentModel = new CommentModel();
+      
+      return $this->_CommentModel;
+   }
+   
    /**
     * Inserts new image(s) and returns the discussion id. If no DiscussionID is
     * present in $FormPostValues, it will create a new discussion, using the 
@@ -38,10 +47,11 @@ class ImageModel extends Gdn_Model {
     * @var array $FormPostValues The values posted by the form for saving.
     * @var array $CommentIDs Array of comment id's created by the save (available by reference).
     */
-   public function Save($FormPostValues, &$CommentIDs = array()) {
+   public function Save($FormPostValues, $Settings = FALSE) {
       // Loop through all of the incoming values and validate them      
       $FormPostValues = $this->FilterForm($FormPostValues);
       $FormPostValues['Type'] = 'image'; // Force the "image" discussion type.
+      
       
       $DiscussionID = GetValue('DiscussionID', $FormPostValues);
       $Image = GetValue('Image', $FormPostValues);
@@ -57,8 +67,6 @@ class ImageModel extends Gdn_Model {
              'Caption' => $Capt, 
              'Size' => $Size[$Key]
          );
-         if (!$DiscussionID && $Key == 0 && $Capt == '')
-            $this->Validation->AddValidationResult('Caption', 'You must provide a caption for the first image.');
       }
       
       if (count($Images) == 0)
@@ -78,7 +86,7 @@ class ImageModel extends Gdn_Model {
              'Type' => 'Image',
              'Format' => 'Image',
              'CategoryID' => GetValue('CategoryID', $FormPostValues),
-             'Name' => $Image['Caption'],
+             'Name' => GetValue('Name', $FormPostValues),
              'Body' => Gdn_Format::Image($SerializedImage),
              'Attributes' => $SerializedImage
          );
@@ -93,25 +101,38 @@ class ImageModel extends Gdn_Model {
       }
 
       // Build & save the comments (if there is more than one image being uploaded)
-      if (count($Images) > 0) {
-         $CommentModel = new CommentModel();
-         $CommentFormValues = array(
-             'Type' => 'Image',
-             'Format' => 'Image',
-             'DiscussionID' => $DiscussionID
-         );
-         for($i = 0; $i < count($Images); $i++) {
-            $SerializedImage = serialize($Images[$i]);
-            $CommentFormValues['Body'] = Gdn_Format::Image($SerializedImage);
-            $CommentFormValues['DateInserted'] = Gdn_Format::ToDateTime($Timestamp++);
-            $CommentFormValues['Attributes'] = $SerializedImage;
-            $CommentIDs[] = $CommentModel->Save($CommentFormValues);
-            $ValidationResults = $CommentModel->Validation->Results();
-            $this->Validation->AddValidationResult($ValidationResults);
-         }
+      $CommentIDs = array();
+      for($i = 0; $i < count($Images); $i++) {
+         $Image = $Images[$i];
+         $Image['DiscussionID'] = $DiscussionID;
+         $CommentID = $this->SaveComment($Image);
+         $CommentIDs[] = $CommentID;
       }
-      
+      $this->CommentIDs = $CommentIDs;
+         
       // Return the discussion id
       return $DiscussionID;
-   }   
+   }
+   
+   public function SaveComment($Image, &$Timestamp = NULL) {
+      $CommentModel = $this->CommentModel();
+      if ($Timestamp === NULL)
+         $Timestamp = time();
+      
+      $S = serialize($Image);
+      $Row = array(
+            'Type' => 'Image',
+            'Format' => 'Image',
+            'DiscussionID' => $Image['DiscussionID'],
+            'Body' => Gdn_Format::Image($Image),
+            'DateInserted' => Gdn_Format::ToDateTime($Timestamp++),
+            'Attributes' => $S
+        );
+      
+      $CommentID = $CommentModel->Save($Row);
+      $ValidationResults = $CommentModel->Validation->Results();
+      $this->Validation->AddValidationResult($ValidationResults);
+      
+      return $CommentID;
+   }
 }

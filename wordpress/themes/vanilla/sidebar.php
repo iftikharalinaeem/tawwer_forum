@@ -2,7 +2,7 @@
 	
 	<div class="block">
 		<strong>About Us</strong>
-		<p>Vanilla's next gen forum platform lets you build a community that will really engage your audience to drive higher participation and loyalty. </p>
+		<p>Vanilla's next gen forum platform lets you build a community that will really engage your audience to drive participation and advocacy. </p>
 	</div>
 
 	<div class="block team">
@@ -17,23 +17,23 @@
 		});
 		</script>
 		<strong>Blog Authors</strong>
-		<a class="team-todd" href="http://vanillaforums.com/profile/todd">
+		<a class="team-todd" href="http://vanillaforums.com/blog/author/todd/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-todd.jpg" />
-			<span class="about"><strong>Todd Burry</strong> Lead Developer, Co-Founder</span>
+			<span class="about"><strong>Todd Burry</strong> Chief Product Officer, Co-Founder</span>
 		</a>
-		<a class="team-tim" href="http://twitter.com/icyliquid">
+		<a class="team-tim" href="http://vanillaforums.com/blog/author/tim/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-tim.jpg" />
 			<span class="about"><strong>Tim Gunter</strong>Director of Infrastructure and Ops</span>
 		</a>
-		<a class="team-mark" href="http://markosullivan.ca">
+		<a class="team-mark" href="http://vanillaforums.com/blog/author/mark/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-mark.jpg" />
-			<span class="about"><strong>Mark O'Sullivan</strong> CPO, Co-Founder</span>
+			<span class="about"><strong>Mark O'Sullivan</strong>Co-Founder</span>
 		</a>
-		<a class="team-lincoln" href="http://twitter.com/lincolnwebs">
+		<a class="team-lincoln" href="http://vanillaforums.com/blog/author/linclon/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-lincoln.jpg" />
 			<span class="about"><strong>Matt Lincoln Russell</strong> Developer</span>
 		</a>
-		<a class="team-luc" rel="author" href="https://plus.google.com/116186737263251989814/">
+		<a class="team-luc" rel="author" href="http://vanillaforums.com/blog/author/luc/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-luc.jpg" />
 			<span class="about"><strong>Luc Vezina</strong> CEO</span>
 		</a>
@@ -86,11 +86,11 @@ setTimeout(function() {document.getElementById("hs-cta-8dba70d4-4330-4b96-be78-9
 		<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
 	</div>
 
-	<div class="block video">
+<!--	<div class="block video">
 		<strong>Recent Video</strong>
-<!-- START Vimeo Badge ... info at http://vimeo.com/widget -->
+<!-- START Vimeo Badge ... info at http://vimeo.com/widget 
+
 <style type="text/css">
-<!-- 
 .vimeoBadge { margin: 0; padding: 0; font: normal 11px verdana,sans-serif; }
 .vimeoBadge img { border: 0; padding: 1px; border: 1px solid #ddd; }
 .vimeoBadge a:hover img { border: 1px solid #777; }
@@ -101,16 +101,17 @@ setTimeout(function() {document.getElementById("hs-cta-8dba70d4-4330-4b96-be78-9
 .vimeoBadge .clip { padding:0; float:left; margin:0 10px 10px 0; width:80px; line-height:0; }
 .vimeoBadge .caption { font: normal 11px verdana,sans-serif; overflow:hidden; width:80px; height: 30px; }
 .vimeoBadge .clear { display: block; clear: both; visibility: hidden; } 
--->
+
 </style>
 <div class="vimeoBadge">
 	<script type="text/javascript" src="http://vimeo.com/vanillaforums/badgeo/?stream=uploaded&amp;stream_id=&amp;count=3&amp;thumbnail_width=80&amp;show_titles=yes"></script>
 </div>
-<!-- END Vimeo Badge -->
+<!-- END Vimeo Badge
 		<div><a href="http://vimeo.com/vanillaforums">Check out all of our videos on Vimeo.</a></div>
-	</div>
+	</div> 
+-->
 
-	<div class="block photos">
+<!--	<div class="block photos">
 		<strong>Recent Photos</strong>
 		<style type="text/css">
 		.flickr_badge_image {
@@ -138,5 +139,11 @@ setTimeout(function() {document.getElementById("hs-cta-8dba70d4-4330-4b96-be78-9
 		?>
 		<div><a href="http://flickr.com/photos/vanillaforums">Check out all of our photos on Flickr.</a></div>
 	</div>
-	
+	-->
+        
+        <div>
+        <?php if(function_exists('tptn_show_pop_posts')) tptn_show_pop_posts(); ?>
+        </div>
+        
+
 </div>
