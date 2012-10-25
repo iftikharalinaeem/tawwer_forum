@@ -8,7 +8,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.1.13',
+   'Version' => '1.1.14',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -115,7 +115,7 @@ class ReactionsPlugin extends Gdn_Plugin {
    /* New Html method of adding to discussion filters */
    public function Base_AfterDiscussionFilters_Handler($Sender) {
       echo '<li class="Reactions-BestOf">'
-			.Anchor(Sprite('SpBestOf').' '.T('Best of...').$Count, '/bestof/everything', '')
+			.Anchor(Sprite('SpBestOf').' '.T('Best of...'), '/bestof/everything', '')
 		.'</li>';
    }
    

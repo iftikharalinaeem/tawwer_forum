@@ -340,6 +340,10 @@ only screen and (max-device-width: 480px) {
    position: relative;
 }
 
+.Tile .Message {
+   margin: 0;
+}
+
 .Tile .ReactLabel {
    display: none;
    background: #fff;
