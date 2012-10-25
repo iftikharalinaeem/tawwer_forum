@@ -329,9 +329,8 @@ function WriteReactions($Row) {
             }
             echo '</ul>';
          echo '</span> ';
-         
-         Gdn::Controller()->FireEvent('AfterFlag');
       }
+      Gdn::Controller()->FireEvent('AfterFlag');
       
       $Score = FormatScore(GetValue('Score', $Row));
       echo '<span class="Column-Score Hidden">'.$Score.'</span>';
