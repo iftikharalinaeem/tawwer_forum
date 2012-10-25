@@ -74,7 +74,7 @@
       <div class="section_heading">Roles</div>
       <div class="section_contents">
          <div class="item"><a href="/blog/api-roles-list">/roles/list</a></div>
-         <div class="item"><a href="/blog/api-roles-list">/roles/get</a></div>
+         <div class="item"><a href="/blog/api-roles-get">/roles/get</a></div>
       </div>
    </div>
    
