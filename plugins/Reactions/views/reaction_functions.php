@@ -217,7 +217,7 @@ if (!function_exists('WriteImageItem')):
                echo Gdn_Format::PlainText($Image['Caption']);
             echo '</div>';
          } else {
-            echo '<div class="Body">';
+            echo '<div class="Body Message">';
                echo $FormattedBody;
             echo '</div>';
          }
