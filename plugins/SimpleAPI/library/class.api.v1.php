@@ -45,9 +45,11 @@ class ApiMapper implements IApiMapper {
           
          // Roles
          'roles/list'            => 'dashboard/role',
+         'roles/get'             => 'dashboard/role',
          
          // Ranks
-         'ranks/list'            => 'dashboard/settings/ranks'
+         'ranks/list'            => 'dashboard/settings/ranks',
+         'ranks/get'             => 'dashboard/settings/ranks'
       );
       
       $this->Filter = array(
