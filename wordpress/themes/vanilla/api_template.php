@@ -59,11 +59,30 @@
          <div class="item"><a href="/blog/api-badges-list">/badges/list</a></div>
       </div>
    </div>
-
+   
    <div class="api_section">
-      <div class="section_heading">Profile</div>
+      <div class="section_heading">Users</div>
       <div class="section_contents">
-         <div class="item"><a href="/blog/api-profile-show">/profile</a></div>
+         <div class="item"><a href="/blog/api-users-edit">/users/edit</a></div>
+         <div class="item"><a href="/blog/api-users-multi">/users/multi</a></div>
+         <div class="item"><a href="/blog/api-users-notifications">/users/notifications</a></div>
+         <div class="item"><a href="/blog/api-users-show">/users/get</a></div>
+      </div>
+   </div>
+   
+   <div class="api_section">
+      <div class="section_heading">Roles</div>
+      <div class="section_contents">
+         <div class="item"><a href="/blog/api-roles-list">/roles/list</a></div>
+         <div class="item"><a href="/blog/api-roles-list">/roles/get</a></div>
+      </div>
+   </div>
+   
+   <div class="api_section">
+      <div class="section_heading">Ranks</div>
+      <div class="section_contents">
+         <div class="item"><a href="/blog/api-ranks-list">/ranks/list</a></div>
+         <div class="item"><a href="/blog/api-ranks-get">/ranks/get</a></div>
       </div>
    </div>
 </div>

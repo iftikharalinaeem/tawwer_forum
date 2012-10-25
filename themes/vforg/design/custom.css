@@ -644,7 +644,7 @@ select {
    height: 28px;
 }
 
-.Sprite16 {
+.MeButton .Sprite16 {
    width: 16px;
    height: 16px;
    line-height: 16px;
@@ -653,6 +653,10 @@ select {
    margin: -2px;
    display: inline-block;
    background-image: url(http://vanillicon.com/sprites/sprites-14-777777.png);
+}
+
+.UserReactionWrap .ReactSprite {
+   background-image: url(http://vanillicon.com/sprites/sprites-14-outline-28519F.png);
 }
 
 .ReactEverything { background-position: -360px -100px; }
