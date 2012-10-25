@@ -333,6 +333,11 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Conf = new ConfigurationModule($Sender);
       $Conf->Initialize(array(
           'Plugins.Reactions.ShowUserReactions' => array('LabelCode' => 'Show who reacted below posts.', 'Control' => 'CheckBox', 'Default' => 1),
+          'Plugins.Reactions.BestOfStyle' => array('LabelCode' => 'Best of Style', 'Control' => 'RadioList', 'Items' => array('Tiles' => 'Tiles', 'List' => 'List'), 'Default' => 'Tiles'),
+          'Plugins.Reactions.DefaultOrderBy' => array('LabelCode' => 'Order Comments By', 'Control' => 'RadioList', 'Items' => array('DateInserted' => 'Date', 'Score' => 'Score'), 'Default' => 'DateInserted',
+              'Description' => 'You can order your comments based on reactions. We recommend ordering the comments by date.'),
+          'Plugins.Reactions.DefaultEmbedOrderBy' => array('LabelCode' => 'Order Embedded Comments By', 'Control' => 'RadioList', 'Items' => array('DateInserted' => 'Date', 'Score' => 'Score'), 'Default' => 'Score',
+              'Description' => 'Ordering your embedded comments by reaction will show just the best comments. Then users can head into the community to see the full discussion.')
       ));
       
       $Sender->Title(sprintf(T('%s Settings'), 'Reaction'));
@@ -507,10 +512,20 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('jquery.js');
       $Sender->AddJsFile('jquery.livequery.js');
       $Sender->AddJsFile('global.js');
-      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js'); // I customized this to get proper callbacks.
-      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
-      $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
-      $Sender->AddJsFile('tile.js', 'plugins/Reactions');
+      
+      if (C('Plugins.Reactions.BestOfStyle', 'Tiles') == 'Tiles') {
+         $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js'); // I customized this to get proper callbacks.
+         $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
+         $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
+         $Sender->AddJsFile('tile.js', 'plugins/Reactions');
+         $Sender->CssClass .= ' NoPanel';
+         $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'tile_items' : 'tiles';
+      } else {
+         $View = 'BestOf';
+         $Sender->AddModule('GuestModule');
+         $Sender->AddModule('SignedInModule');
+         $Sender->AddModule('BestOfFilterModule');
+      }
       
       $Sender->AddCssFile('style.css');
       // Set the title, breadcrumbs, canonical
@@ -523,10 +538,7 @@ class ReactionsPlugin extends Gdn_Plugin {
          Gdn::Session()->UserID == 0
       );
       
-      $Sender->CssClass .= ' NoPanel';
-      
       // Render the page (or deliver the view)
-      $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'tile_items' : 'tiles';
       $Sender->Render($View, '', 'plugins/Reactions');
    }   
    

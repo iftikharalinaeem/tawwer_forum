@@ -24,7 +24,7 @@ class BestOfFilterModule extends Gdn_Module {
       if ($CurrentReactionType == $LCode)
          $CssClass .= ' Active';
 
-      return '<li class="BestOf'.$CssClass.'"><a href="'.$Url.'"><span class="ReactSprite React'.$Code.'"></span>'.$Name.'</a></li>';
+      return '<li class="BestOf'.$CssClass.'"><a href="'.$Url.'"><span class="ReactSprite React'.$Code.'"></span> '.$Name.'</a></li>';
    }
    
 

@@ -3,16 +3,7 @@ require_once Gdn::Controller()->FetchViewLocation('reaction_functions', '', 'plu
 foreach ($this->Data('Data', array()) as $Row): 
    $this->SetData('Record', $Row);
    $Body = Gdn_Format::To($Row['Body'], $Row['Format']);
-   $CssClass = 'Item Invisible';
-   $Wide = FALSE;
-   if (stripos($Body, '<div class="Video') !== FALSE) {
-      // Video?
-      $Wide = TRUE;
-   } else if (InArrayI($Row['Format'], array('Html', 'Text', 'Display')) && strlen($Body) > 800) {
-      // Lots of text?
-      $Wide = TRUE;
-   }
-   if ($Wide) $CssClass .= ' Wide';
+   $CssClass = 'Item';
 ?>
 <div id="<?php echo "{$Row['RecordType']}_{$Row['RecordID']}" ?>" class="<?php echo $CssClass; ?>">
    <div class="Item-Wrap">
@@ -25,7 +16,7 @@ foreach ($this->Data('Data', array()) as $Row):
                   'h3', array('class' => 'Title'));
             }
             ?>
-            <div class="Body">
+            <div class="Body Message">
                <?php
                echo $Body;
                unset($Body);
