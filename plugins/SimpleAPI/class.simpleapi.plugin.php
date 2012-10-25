@@ -24,6 +24,12 @@ $PluginInfo['SimpleAPI'] = array(
 class SimpleAPIPlugin extends Gdn_Plugin {
    
    /**
+    * Mapper tool
+    * @var IApiMapper
+    */
+   protected $Mapper = NULL;
+   
+   /**
     * Intercept POST data
     * 
     * This method inspects and potentially modifies incoming POST data to 
@@ -322,10 +328,10 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          require_once($MapperFile);
          if (!class_exists('ApiMapper')) throw new Exception('API Mapper is not available after inclusion');
          
-         $ApiMapper = new ApiMapper();
+         $this->Mapper = new ApiMapper();
          
          // Lookup the mapped replacement for this request
-         $MappedURI = $ApiMapper->Map($APIRequest);
+         $MappedURI = $this->Mapper->Map($APIRequest);
          if (!$MappedURI) throw new Exception('Unable to map request');
          
          // Apply the mapped replacement
@@ -396,6 +402,16 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          
       }
       
+   }
+   
+   /**
+    * Apply output filter
+    * 
+    * @param Gdn_Controller $Sender
+    */
+   public function Gdn_Controller_Finalize_Handler($Sender) {
+      if ($this->Mapper instanceof IApiMapper)
+         $this->Mapper->Filter($Sender->EventArguments['Data']);
    }
    
    /**

@@ -23,4 +23,14 @@ interface IApiMapper {
     */
    public function Map($APIRequest);
    
+   /**
+    * Output Filtering method
+    * 
+    * Takes the final controller output and performs any applicable filtering
+    * on it.
+    * 
+    * @param array $Data
+    */
+   public function Filter(&$Data);
+   
 }

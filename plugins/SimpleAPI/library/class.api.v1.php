@@ -10,6 +10,8 @@
 class ApiMapper implements IApiMapper {
    
    protected $URIMap;
+   protected $Mapping;
+   protected $Filter;
    
    public function __construct() {
       
@@ -36,29 +38,40 @@ class ApiMapper implements IApiMapper {
          'badges/list'           => 'reputation/badges/all',
          
          // Users
-         'users'                 => 'profile',
-         'users/edit'            => 'profile/edit',
-         'users/multi'           => 'profile/multi',
+         'users/edit'            => 'dashboard/profile/edit',
+         'users/multi'           => 'dashboard/profile/multi',
+         'users/notifications'   => 'dashboard/profile/preferences',
+         'users'                 => 'dashboard/profile',
           
          // Roles
-         'roles'                 => 'role',
+         'roles'                 => 'dashboard/role',
          
          // Ranks
-         'ranks'                 => 'settings/ranks'
-         
+         'ranks'                 => 'dashboard/settings/ranks'
+      );
+      
+      $this->Filter = array(
+         'users/notifications'   => array('Profile', 'Preferences')
       );
    }
 
    public function Map($APIRequest) {
-      
       $TrimmedRequest = trim($APIRequest, ' /');
-      foreach ($this->URIMap as $MatchURI => $ResolvedURI) {
-         if (preg_match("`{$MatchURI}(\.(:?json|xml))?`i", $TrimmedRequest)) {
-            return preg_replace("`{$MatchURI}(\.(:?json|xml))?`i", "{$ResolvedURI}\$1", $TrimmedRequest);
+      foreach ($this->URIMap as $MatchURI => $MapURI) {
+         if (preg_match("`{$MatchURI}(\.(:?json|xml))`i", $TrimmedRequest)) {
+            $this->Mapping = $MatchURI;
+            return preg_replace("`{$MatchURI}(\.(:?json|xml))`i", "{$MapURI}\$1", $TrimmedRequest);
          }
       }
       
       return $APIRequest;
+   }
+   
+   public function Filter(&$Data) {
+      $Filter = GetValue($this->Mapping, $this->Filter, NULL);
+      if (empty($Filter)) return;
+      
+      $Data = ArrayTranslate($Data, $Filter);
    }
    
 }
