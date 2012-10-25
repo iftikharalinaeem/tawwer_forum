@@ -41,13 +41,13 @@ class ApiMapper implements IApiMapper {
          'users/edit'            => 'dashboard/profile/edit',
          'users/multi'           => 'dashboard/profile/multi',
          'users/notifications'   => 'dashboard/profile/preferences',
-         'users'                 => 'dashboard/profile',
+         'users/get'             => 'dashboard/profile',
           
          // Roles
-         'roles'                 => 'dashboard/role',
+         'roles/list'            => 'dashboard/role',
          
          // Ranks
-         'ranks'                 => 'dashboard/settings/ranks'
+         'ranks/list'            => 'dashboard/settings/ranks'
       );
       
       $this->Filter = array(
