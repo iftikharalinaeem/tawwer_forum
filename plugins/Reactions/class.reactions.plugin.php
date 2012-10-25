@@ -222,7 +222,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->Render();
    }
    
-   public function ProfileController_Initialize_Handler($Sender) {
+   public function ProfileController_Render_Before($Sender) {
       // Grab all of the counts for the user.
       $Data = Gdn::SQL()
          ->GetWhere('UserTag', array('RecordID' => $Sender->Data('Profile.UserID'), 'RecordType' => 'User', 'UserID' => ReactionModel::USERID_OTHER))->ResultArray();
