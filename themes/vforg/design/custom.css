@@ -655,6 +655,10 @@ select {
    background-image: url(http://vanillicon.com/sprites/sprites-14-777777.png);
 }
 
+.UserReactionWrap .ReactSprite {
+   background-image: url(http://vanillicon.com/sprites/sprites-14-outline-28519F.png);
+}
+
 .ReactEverything { background-position: -360px -100px; }
 .ReactAwesome { background-position: -240px -20px; }
 .ReactFlag { background-position: -60px -60px; }
