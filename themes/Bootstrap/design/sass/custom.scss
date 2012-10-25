@@ -765,6 +765,7 @@ body > #Frame > .Head {
 }
 .Reactions {
    opacity: .8;
+   margin-left: 0;
 }
 
 .Item:hover .Reactions,
@@ -859,6 +860,10 @@ a.Close:hover {
 .ReactSprite {
    height: 16px;
    width: 16px;
+}
+
+.ReactButton > .ReactSprite {
+   vertical-align: top;
 }
 
 .ReactLabel {
