@@ -644,7 +644,7 @@ select {
    height: 28px;
 }
 
-.Sprite16 {
+.MeButton .Sprite16 {
    width: 16px;
    height: 16px;
    line-height: 16px;
