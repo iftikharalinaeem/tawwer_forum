@@ -33,7 +33,19 @@ class ApiMapper implements IApiMapper {
          // Badges
          'badges/give'           => 'reputation/badge/giveuser',
          'badges/user'           => 'reputation/badges/user',
-         'badges/list'           => 'reputation/badges/all'
+         'badges/list'           => 'reputation/badges/all',
+         
+         // Users
+         'users'                 => 'profile',
+         'users/edit'            => 'profile/edit',
+         'users/multi'           => 'profile/multi',
+          
+         // Roles
+         'roles'                 => 'role',
+         
+         // Ranks
+         'ranks'                 => 'settings/ranks'
+         
       );
    }
 

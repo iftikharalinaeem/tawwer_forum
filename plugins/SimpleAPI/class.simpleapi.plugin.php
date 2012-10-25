@@ -134,109 +134,153 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     * 
     * @param array $Data
     * @param string $Field
-    * @param string $Value 
+    * @param string $Value
     */
    protected static function TranslateField(&$Data, $Field, $Value) {
       $Errors = array();
+      $SupportedTables = array('Badge', 'Category', 'Rank', 'Role', 'User');
       
-      // If the Key is dot-delimited, inspect it for potential munging
-      if (strpos($Field, '.') !== FALSE) {
-         list($FieldPrefix, $ColumnLookup) = explode('.', $Field, 2);
-
-         // We know how to lookup 'User type' fields in several ways:
-         //   Email, Name, ForeignID
-         if (StringEndsWith($FieldPrefix, 'User')) {
+      try {
+         
+         // If the Key is dot-delimited, inspect it for potential munging
+         if (strpos($Field, '.') !== FALSE) {
             
+            list($FieldPrefix, $ColumnLookup) = explode('.', $Field, 2);
+            
+            $TableName = $FieldPrefix;
+            
+            if (StringEndsWith($FieldPrefix, 'User'))
+               $TableName = 'User';
+            if (StringEndsWith($FieldPrefix, 'Users'))
+               $TableName = 'Users';
+            
+            // Limit to supported tables
+            $TableAllowed = TRUE;
+            $Multi = FALSE;
+            if (!in_array($TableName, $SupportedTables)) {
+               $TableAllowed = FALSE;
+               
+               // First check if this is a Multi request
+               if ($SingularTableName = StringEndsWith($TableName, 's', FALSE, TRUE)) {
+                  if (in_array($SingularTableName, $SupportedTables)) {
+                     $TableName = $SingularTableName;
+                     $FieldPrefix = StringEndsWith($FieldPrefix, 's', FALSE, TRUE);
+                     $TableAllowed = TRUE;
+                     $Multi = TRUE;
+                  }
+               }
+            }
+            
+            if (!$TableAllowed)
+               throw new Exception("Table {$TableName} is not supported by SmartID", 405);
+
             // We desire the 'ID' root field
             $LookupField = "{$FieldPrefix}ID";
 
             // Don't override an existing desired field
-            if (isset($Data[$LookupField]))
+            if (isset($Data[$LookupField]) && !$Multi)
                return;
 
             $LookupFieldValue = NULL;
-            switch ($ColumnLookup) {
+            $LookupKey = "{$TableName}.{$ColumnLookup}";
+            $LookupMethod = 'simple';
 
-               // Lookup user by email or name
-               case 'Email':
-               case 'Name':
-                  $User = Gdn::UserModel()->SQL->GetWhere('User u', array(
-                     "u.{$ColumnLookup}" => $Value
-                  ));
-                  if (!$User->NumRows()) {
-                     $Errors[] = self::NotFoundString('User', $Value);
-                     continue;
-                  }
+            if ($ColumnLookup == 'ID')
+               $LookupMethod = 'noop';
 
-                  if ($User->NumRows() > 1) {
-                     $Errors[] = sprintf(T('Multiple %ss found by %s for "%s".'), T('User'), $ColumnLookup, $Value);
-                     continue;
-                  }
-
-                  $User = $User->FirstRow(DATASET_TYPE_ARRAY);
-                  $LookupFieldValue = GetValue($LookupField, $User);
-                  break;
-
-               // Lookup user by foreignid
-               case 'ForeignID':
-                  if (strpos($Value, ':') === FALSE) {
-                     $Errors[] = "Malformed ForeignID object '{$Value}'. Should be '[provider key]:[foreign id]'.";
-                     continue;
-                  }
-
-                  $ProviderParts = explode(':', $Value, 2);
-                  $ProviderKey = $ProviderParts[0];
-                  $ForeignID = $ProviderParts[1];
-
-                  // Check if we have a provider by that key
-                  $ProviderModel = new Gdn_AuthenticationProviderModel();
-                  $Provider = $ProviderModel->GetProviderByKey($ProviderKey);
-                  if (!$Provider) {
-                     $Errors[] = self::NotFoundString('Provider', $ProviderKey);
-                     continue;
-                  }
-
-                  // Check if we have an associated user for that ForeignID
-                  $UserAssociation = Gdn::Authenticator()->GetAssociation($ForeignID, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
-                  if (!$UserAssociation) {
-                     $Errors[] = self::NotFoundString('User', $Value);
-                     continue;
-                  }
-
-                  $LookupFieldValue = GetValue($LookupField, $UserAssociation);
-                  break;
-
-               // By ID, just passthrough
-               case 'ID':
-                  $LookupField = $Value;
-                  break;
-            }
+            if ($LookupKey == 'User.ForeignID')
+               $LookupMethod = 'custom';
             
-            if (!is_null($LookupFieldValue))
-               $Data[$LookupField] = $LookupFieldValue;
+            if ($Multi)
+               $Value = explode(',', $Value);
+            $Value = (array)$Value;
+            
+            foreach ($Value as $MultiValue) {
+               switch ($LookupMethod) {
 
-         }
+                  // Noop lookup
+                  case 'noop':
+                     $LookupFieldValue = $MultiValue;
+                     break;
 
-      } elseif (StringEndsWith($Field, 'Category')) {
-         // Translate a category column.
-         $Px = StringEndsWith($Field, 'Category', TRUE, TRUE);
-         $Column = $Px.'CategoryID';
-         if (isset($Data[$Column]))
-            return;
+                  // Simple table.field lookup types
+                  case 'simple':
+                     $MatchRecords = Gdn::SQL()->GetWhere($TableName, array(
+                        $ColumnLookup => $MultiValue
+                     ));
+                     if (!$MatchRecords->NumRows())
+                        throw new Exception(self::NotFoundString($FieldPrefix, $MultiValue), 404);
 
-         $Category = CategoryModel::Categories($Value);
-         if (!$Category) {
-            $Errors[] = self::NotFoundString('Category', $Value);
-         } else {
+                     if ($MatchRecords->NumRows() > 1)
+                        throw new Exception(sprintf('Multiple %ss found by %s for "%s".', T('User'), $ColumnLookup, $MultiValue), 409);
+
+                     $Record = $MatchRecords->FirstRow(DATASET_TYPE_ARRAY);
+                     $LookupFieldValue = GetValue($LookupField, $Record);
+                     break;
+
+                  // Custom lookup types
+                  case 'custom':
+
+                     // Special lookup for SSO users
+                     if ($LookupKey == 'User.ForeignID') {
+                        if (strpos($MultiValue, ':') === FALSE)
+                           throw new Exception("Malformed ForeignID object '{$MultiValue}'. Should be '[provider key]:[foreign id]'.", 400);
+
+                        $ProviderParts = explode(':', $MultiValue, 2);
+                        $ProviderKey = $ProviderParts[0];
+                        $ForeignID = $ProviderParts[1];
+
+                        // Check if we have a provider by that key
+                        $ProviderModel = new Gdn_AuthenticationProviderModel();
+                        $Provider = $ProviderModel->GetProviderByKey($ProviderKey);
+                        if (!$Provider)
+                           throw new Exception(self::NotFoundString('Provider', $ProviderKey), 404);
+
+                        // Check if we have an associated user for that ForeignID
+                        $UserAssociation = Gdn::Authenticator()->GetAssociation($ForeignID, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
+                        if (!$UserAssociation)
+                           throw new Exception(self::NotFoundString('User', $MultiValue), 404);
+
+                        $LookupFieldValue = GetValue($LookupField, $UserAssociation);
+                     }
+
+                     break;
+               }
+
+               if (!is_null($LookupFieldValue)) {
+                  if ($Multi) {
+                     if (!isset($Data[$LookupField])) $Data[$LookupField] = array();
+                     if (!is_array($Data[$LookupField])) $Data[$LookupField] = array($Data[$LookupField]);
+                     $Data[$LookupField][] = $LookupFieldValue;
+                  } else {
+                     $Data[$LookupField] = $LookupFieldValue;
+                  }
+               }
+            }
+
+         } elseif (StringEndsWith($Field, 'Category')) {
+            // Translate a category column.
+            $Px = StringEndsWith($Field, 'Category', TRUE, TRUE);
+            $Column = $Px.'CategoryID';
+            if (isset($Data[$Column]))
+               return;
+
+            $Category = CategoryModel::Categories($MultiValue);
+            if (!$Category)
+               throw new Exception(self::NotFoundString('Category', $MultiValue), 404);
+            
             $Data[$Column] = (string)$Category['CategoryID'];
          }
+         
+      } catch (Exception $Ex) {
+         $Errors[] = $Ex->getMessage();
       }
       
       return $Errors;
    }
    
    protected static function NotFoundString($Code, $Item) {
-      return sprintf(T('%1$s "%2$s" not found.'), T($Code), $Item);
+      return sprintf('%1$s "%2$s" not found.', T($Code), $Item);
    }
    
    /**
