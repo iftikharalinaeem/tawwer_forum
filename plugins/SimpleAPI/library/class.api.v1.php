@@ -7,11 +7,9 @@
  * @license Proprietary
  */
 
-class ApiMapper implements IApiMapper {
+class ApiMapper extends SimpleApiMapper {
    
-   protected $URIMap;
-   protected $Mapping;
-   protected $Filter;
+   public $Version = '1.0';
    
    public function __construct() {
       
@@ -46,17 +44,15 @@ class ApiMapper implements IApiMapper {
          // Roles
          'roles/list'            => 'dashboard/role',
          'roles/get'             => 'dashboard/role',
-         
-         // Ranks
-         'ranks/list'            => 'dashboard/settings/ranks',
-         'ranks/get'             => 'dashboard/settings/ranks'
+          
       );
       
       $this->Filter = array(
          'users/notifications'   => array('Profile', 'Preferences')
       );
+      
    }
-
+   
    public function Map($APIRequest) {
       $TrimmedRequest = trim($APIRequest, ' /');
       foreach ($this->URIMap as $MatchURI => $MapURI) {
