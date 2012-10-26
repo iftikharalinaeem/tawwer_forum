@@ -178,7 +178,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             }
             
             if (!$TableAllowed)
-               throw new Exception("Table {$TableName} is not supported by SmartID", 405);
+               return;
+               //throw new Exception("Table {$TableName} is not supported by SmartID", 405);
 
             // We desire the 'ID' root field
             $LookupField = "{$FieldPrefix}ID";

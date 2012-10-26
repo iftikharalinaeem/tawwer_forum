@@ -45,11 +45,14 @@ class ApiMapper extends SimpleApiMapper {
          'roles/list'            => 'dashboard/role',
          'roles/get'             => 'dashboard/role',
           
+         // Configuration
+         'configuration'         => 'dashboard/settings/configuration'
+          
       );
       
       $this->Filter = array(
          'users/multi'           => array('Users'),
-         'users/notifications'   => array('Profile', 'Preferences')
+         'users/notifications'   => array('Profile', 'Preferences', 'PreferenceList', 'PreferenceTypes', 'PreferenceGroups')
       );
       
    }
