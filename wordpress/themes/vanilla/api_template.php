@@ -17,6 +17,13 @@
          <div class="item"><a href="/blog/api#responsecodes">Response Codes</a></div>
       </div>
    </div>
+   
+   <div class="api_section">
+      <div class="section_heading">Forum Administration</div>
+      <div class="section_contents">
+         <div class="item"><a href="/blog/api-configuration">/configuration</a></div>
+      </div>
+   </div>
 
    <div class="api_section">
       <div class="section_heading">Categories</div>

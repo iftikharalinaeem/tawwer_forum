@@ -13,11 +13,11 @@
 $PluginInfo['SimpleAPI'] = array(
    'Name' => 'Simple API',
    'Description' => "Provides simple access_token API access to the forum.",
-   'Version' => '1.0.4',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
-   'Author' => 'Todd Burry',
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+   'Author' => 'Tim Gunter',
+   'AuthorEmail' => 'tim@vanillaforums.com',
+   'AuthorUrl' => 'http://about.me/timgunter',
    'SettingsUrl' => '/settings/api'
 );
 
@@ -25,9 +25,9 @@ class SimpleAPIPlugin extends Gdn_Plugin {
    
    /**
     * Mapper tool
-    * @var IApiMapper
+    * @var SimpleApiMapper
     */
-   protected $Mapper = NULL;
+   public $Mapper = NULL;
    
    /**
     * Intercept POST data
@@ -178,7 +178,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             }
             
             if (!$TableAllowed)
-               throw new Exception("Table {$TableName} is not supported by SmartID", 405);
+               return;
+               //throw new Exception("Table {$TableName} is not supported by SmartID", 405);
 
             // We desire the 'ID' root field
             $LookupField = "{$FieldPrefix}ID";
@@ -330,6 +331,9 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          
          $this->Mapper = new ApiMapper();
          
+         $this->EventArguments['Mapper'] = &$this->Mapper;
+         $this->FireEvent('Mapper');
+         
          // Lookup the mapped replacement for this request
          $MappedURI = $this->Mapper->Map($APIRequest);
          if (!$MappedURI) throw new Exception('Unable to map request');
@@ -410,7 +414,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender
     */
    public function Gdn_Controller_Finalize_Handler($Sender) {
-      if ($this->Mapper instanceof IApiMapper)
+      if ($this->Mapper instanceof SimpleApiMapper)
          $this->Mapper->Filter($Sender->EventArguments['Data']);
    }
    
