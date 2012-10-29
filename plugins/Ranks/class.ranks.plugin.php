@@ -8,7 +8,7 @@
 $PluginInfo['Ranks'] = array(
    'Name' => 'Ranks',
    'Description' => "Adds user ranks to the application.",
-   'Version' => '1.1.1b',
+   'Version' => '1.1.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -24,6 +24,22 @@ class RanksPlugin extends Gdn_Plugin {
    
    
    /// Methods ///
+   
+   /**
+    * Add mapper methods
+    * 
+    * @param SimpleApiPlugin $Sender
+    */
+   public function SimpleApiPlugin_Mapper_Handler($Sender) {
+      switch ($Sender->Mapper->Version) {
+         case '1.0':
+            $Sender->Mapper->AddMap(array(
+               'ranks/list'            => 'dashboard/settings/ranks',
+               'ranks/get'             => 'dashboard/settings/ranks'
+            ));
+            break;
+      }
+   }
    
    public function Setup() {
       $this->Structure();
