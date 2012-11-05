@@ -7,6 +7,7 @@
  *  1.0        Initial Release
  *  1.1        Versioning overhaul
  *  1.2        Authentication overhaul
+ *  1.2.1      Fix User lookup bug
  * 
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
@@ -18,7 +19,7 @@
 $PluginInfo['SimpleAPI'] = array(
    'Name' => 'Simple API',
    'Description' => "Provides simple access_token API access to the forum.",
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Tim Gunter',
    'AuthorEmail' => 'tim@vanillaforums.com',
@@ -162,6 +163,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             
             if (StringEndsWith($FieldPrefix, 'User'))
                $TableName = 'User';
+            
             if (StringEndsWith($FieldPrefix, 'Users'))
                $TableName = 'Users';
             
@@ -184,13 +186,16 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             
             if (!$TableAllowed)
                return;
-               //throw new Exception("Table {$TableName} is not supported by SmartID", 405);
 
             // We desire the 'ID' root field
             $LookupField = "{$FieldPrefix}ID";
+            $OutputField = $LookupField;
+            
+            if (StringEndsWith($FieldPrefix, 'User'))
+               $LookupField = "UserID";
 
             // Don't override an existing desired field
-            if (isset($Data[$LookupField]) && !$Multi)
+            if (isset($Data[$OutputField]) && !$Multi)
                return;
 
             $LookupFieldValue = NULL;
@@ -222,7 +227,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                      ));
                      if (!$MatchRecords->NumRows())
                         throw new Exception(self::NotFoundString($FieldPrefix, $MultiValue), 404);
-
+                     
                      if ($MatchRecords->NumRows() > 1)
                         throw new Exception(sprintf('Multiple %ss found by %s for "%s".', T('User'), $ColumnLookup, $MultiValue), 409);
 
@@ -261,11 +266,11 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
                if (!is_null($LookupFieldValue)) {
                   if ($Multi) {
-                     if (!isset($Data[$LookupField])) $Data[$LookupField] = array();
-                     if (!is_array($Data[$LookupField])) $Data[$LookupField] = array($Data[$LookupField]);
-                     $Data[$LookupField][] = $LookupFieldValue;
+                     if (!isset($Data[$OutputField])) $Data[$OutputField] = array();
+                     if (!is_array($Data[$OutputField])) $Data[$OutputField] = array($Data[$OutputField]);
+                     $Data[$OutputField][] = $LookupFieldValue;
                   } else {
-                     $Data[$LookupField] = $LookupFieldValue;
+                     $Data[$OutputField] = $LookupFieldValue;
                   }
                }
             }
