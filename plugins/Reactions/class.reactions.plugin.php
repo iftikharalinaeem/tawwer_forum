@@ -350,7 +350,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     */
    public function Base_Render_Before($Sender) {
       if (is_object($Menu = GetValue('Menu', $Sender))) {
-         $Menu->AddLink('BestOf', T('Best Of...'), '/bestof/everything');
+         $Menu->AddLink('BestOf', T('Best Of...'), '/bestof/everything', FALSE, array('class' => 'BestOf'));
       }
    }
       
