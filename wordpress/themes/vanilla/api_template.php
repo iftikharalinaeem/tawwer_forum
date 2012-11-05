@@ -15,6 +15,7 @@
          <div class="item"><a href="/blog/api#configuration">Configuration</a></div>
          <div class="item"><a href="/blog/api#usage">Usage</a></div>
          <div class="item"><a href="/blog/api#responsecodes">Response Codes</a></div>
+         <div class="item"><a href="/blog/api-smart-id">Smart ID</a></div>
       </div>
    </div>
    
