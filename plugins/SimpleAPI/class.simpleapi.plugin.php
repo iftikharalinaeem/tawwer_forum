@@ -3,6 +3,11 @@
 /**
  * Simple Vanilla API 
  * 
+ * Changes:
+ *  1.0        Initial Release
+ *  1.1        Versioning overhaul
+ *  1.2        Authentication overhaul
+ * 
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
@@ -13,7 +18,7 @@
 $PluginInfo['SimpleAPI'] = array(
    'Name' => 'Simple API',
    'Description' => "Provides simple access_token API access to the forum.",
-   'Version' => '1.1',
+   'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Tim Gunter',
    'AuthorEmail' => 'tim@vanillaforums.com',
@@ -341,6 +346,9 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          // Apply the mapped replacement
          Gdn::Request()->WithURI($MappedURI);
          
+         // Authenticate & prepare data
+         $this->PrepareAPI($Sender);
+         
       } catch (Exception $Ex) {
          
          Gdn::Request()->WithURI($APIRequest);
@@ -350,62 +358,54 @@ class SimpleAPIPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Pre-API detection and setup
     * 
-    * @param Gdn_Dispatcher $Sender 
+    * @param type $Sender
+    * @throws Exception
     */
-   public function Gdn_Dispatcher_AfterControllerInit_Handler($Sender, $Args) {
-      
-      $Controller = $Args['Controller'];
-      
-      // This can be an API request if we are only requesting data and the correct access_token is given.
-      if ($Controller->DeliveryType() == DELIVERY_TYPE_DATA) {
-         $AccessToken = GetValue('access_token', $_GET, NULL);
+   protected function PrepareAPI($Sender) {
+      $AccessToken = GetValue('access_token', $_GET, NULL);
          
-         if ($AccessToken !== NULL) {
-            if ($AccessToken === C('Plugins.SimpleAPI.AccessToken')) {
-               // Check for only-https here because we don't want to check for https on json calls from javascript.
-               $OnlyHttps = C('Plugins.SimpleAPI.OnlyHttps');
-               if ($OnlyHttps && strcasecmp(Gdn::Request()->Scheme(), 'https') != 0) {
-                  throw new Exception(T('You must access the API through https.'), 401);
-               }
-               
-               $UserID = C('Plugins.SimpleAPI.UserID');
-               $User = FALSE;
-               if ($UserID)
-                  $User = Gdn::UserModel()->GetID($UserID);
-               if (!$User)
-                  $UserID = Gdn::UserModel()->GetSystemUserID();
-               
-               Gdn::Session()->Start($UserID, FALSE, FALSE);
-            } else {
-               if (!Gdn::Session()->IsValid())
-                  throw new Exception(T('Invald Access Token'), 401);
+      if ($AccessToken !== NULL) {
+         if ($AccessToken === C('Plugins.SimpleAPI.AccessToken')) {
+            // Check for only-https here because we don't want to check for https on json calls from javascript.
+            $OnlyHttps = C('Plugins.SimpleAPI.OnlyHttps');
+            if ($OnlyHttps && strcasecmp(Gdn::Request()->Scheme(), 'https') != 0) {
+               throw new Exception(T('You must access the API through https.'), 401);
             }
-         }
-         
-         if (strcasecmp(GetValue('contenttype', $_GET, ''), 'json') == 0 || strpos(GetValue('CONTENT_TYPE', $_SERVER, NULL), 'json') !== FALSE) {
-            $Post = file_get_contents('php://input');
-            
-            if ($Post)
-               $Post = json_decode($Post, TRUE);
-            else
-               $Post = array();
+
+            $UserID = C('Plugins.SimpleAPI.UserID');
+            $User = FALSE;
+            if ($UserID)
+               $User = Gdn::UserModel()->GetID($UserID);
+            if (!$User)
+               $UserID = Gdn::UserModel()->GetSystemUserID();
+
+            Gdn::Session()->Start($UserID, FALSE, FALSE);
          } else {
-            $Post = Gdn::Request()->Post();         
+            if (!Gdn::Session()->IsValid())
+               throw new Exception(T('Invald Access Token'), 401);
          }
-         
-         // Translate POST data
-         self::TranslatePost($Post);
-         Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_POST, $Post);
-         $_POST = $Post;
-         
-         // Translate GET data
-         self::TranslateGet($_GET);
-         Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_GET, $_GET);
-         
       }
-      
+
+      if (strcasecmp(GetValue('contenttype', $_GET, ''), 'json') == 0 || strpos(GetValue('CONTENT_TYPE', $_SERVER, NULL), 'json') !== FALSE) {
+         $Post = file_get_contents('php://input');
+
+         if ($Post)
+            $Post = json_decode($Post, TRUE);
+         else
+            $Post = array();
+      } else {
+         $Post = Gdn::Request()->Post();         
+      }
+
+      // Translate POST data
+      self::TranslatePost($Post);
+      Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_POST, $Post);
+      $_POST = $Post;
+
+      // Translate GET data
+      self::TranslateGet($_GET);
+      Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_GET, $_GET);
    }
    
    /**
