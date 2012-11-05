@@ -8,6 +8,7 @@
  *  1.1        Versioning overhaul
  *  1.2        Authentication overhaul
  *  1.2.1      Fix User lookup bug
+ *  1.2.5      Fix early error format bug
  * 
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
@@ -19,7 +20,7 @@
 $PluginInfo['SimpleAPI'] = array(
    'Name' => 'Simple API',
    'Description' => "Provides simple access_token API access to the forum.",
-   'Version' => '1.2.1',
+   'Version' => '1.2.5',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Tim Gunter',
    'AuthorEmail' => 'tim@vanillaforums.com',
@@ -356,7 +357,51 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          
       } catch (Exception $Ex) {
          
-         Gdn::Request()->WithURI($APIRequest);
+         $Code = $HTTPCode = $Ex->getCode();
+         $Message = Gdn_Controller::GetStatusMessage($HTTPCode);
+         
+         // Send a 
+         if ($Message == 'Unknown') {
+            $HTTPCode = 500;
+            $Message = Gdn_Controller::GetStatusMessage($HTTPCode);
+         }
+         
+         header("Status: {$HTTPCode} {$Message}", TRUE, $HTTPCode);
+
+         // Set up data rray
+         $Data = array('Code' => $Code, 'Exception' => $Ex->getMessage(), 'Class' => get_class($Ex));
+
+         if (Debug()) {
+            if ($Trace = Trace()) {
+               $Data['Trace'] = $Trace;
+            }
+
+            if (!is_a($Ex, 'Gdn_UserException'))
+               $Data['StackTrace'] = $Ex->getTraceAsString();
+         }
+
+         switch (Gdn::Request()->OutputFormat()) {
+            case 'json':
+               header('Content-Type: application/json', TRUE);
+               if ($Callback = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', FALSE)) {
+                  // This is a jsonp request.
+                  exit($Callback.'('.json_encode($Data).');');
+               } else {
+                  // This is a regular json request.
+                  exit(json_encode($Data));
+               }
+               break;
+               
+            case 'xml':
+               header('Content-Type: text/xml', TRUE);
+               array_map('htmlspecialchars', $Data);
+               exit("<Exception><Code>{$Data['Code']}</Code><Class>{$Data['Class']}</Class><Message>{$Data['Exception']}</Message></Exception>");
+               break;
+            
+            default:
+               header('Content-Type: text/plain', TRUE);
+               exit($Ex->getMessage());
+         }
          
       }
       
