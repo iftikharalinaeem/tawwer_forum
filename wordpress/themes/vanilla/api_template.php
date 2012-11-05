@@ -92,6 +92,16 @@
          <div class="item"><a href="/blog/api-ranks-get">/ranks/get</a></div>
       </div>
    </div>
+   
+   <div class="api_section">
+      <div class="section_heading">Ignore</div>
+      <div class="section_contents">
+         <div class="item"><a href="/blog/api-ignore-list">/ignore/list</a></div>
+         <div class="item"><a href="/blog/api-ignore-add">/ignore/add</a></div>
+         <div class="item"><a href="/blog/api-ignore-remove">/ignore/remove</a></div>
+         <div class="item"><a href="/blog/api-ignore-restrict">/ignore/restrict</a></div>
+      </div>
+   </div>
 </div>
 
 <div id="content" class="api">
