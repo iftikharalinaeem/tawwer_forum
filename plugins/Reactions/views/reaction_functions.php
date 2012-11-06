@@ -368,7 +368,7 @@ function WriteRecordReactions($Row) {
          continue;
       
       $ReactionType = ReactionModel::FromTagID($Tag['TagID']);
-      if (!$ReactionType)
+      if (!$ReactionType || $ReactionType['Hidden'])
          continue;
       $UrlCode = $ReactionType['UrlCode'];
       $SpriteClass = GetValue('SpriteClass', $ReactionType, "React$UrlCode");
