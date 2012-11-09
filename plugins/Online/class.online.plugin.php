@@ -14,6 +14,7 @@
  *  1.3     Exposes GetUser() for external querying
  *  1.4     Fix wasteful OnlineModule rendering, store Name in Online table
  *  1.5     Add caching to the OnlineModule rending process
+ *  1.5.1   Fix inconsistent timezone handling
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -24,7 +25,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.5',
+   'Version' => '1.5.1',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -60,6 +61,12 @@ class OnlinePlugin extends Gdn_Plugin {
     * @var integer Seconds
     */
    protected $CacheCountDelay;
+   
+   /**
+    * Current UTC timestamp
+    * @var integer Seconds
+    */
+   protected static $Now;
    
    /**
     * Track when we last wrote online status back to the database.
@@ -116,6 +123,10 @@ class OnlinePlugin extends Gdn_Plugin {
       $this->CleanDelay = C('Plugins.Online.CleanDelay', self::DEFAULT_CLEAN_DELAY);
       $this->CacheCountDelay = C('Plugins.Online.CacheCountDelay', 20);
       $this->CacheRenderDelay = C('Plugins.Online.CacheRenderDelay', 60);
+      
+      $UTC = new DateTimeZone('UTC');
+      $CurrentDate = new DateTime('now', $UTC);
+      self::$Now = $CurrentDate->getTimestamp();
    }
    
    /*
@@ -191,14 +202,12 @@ class OnlinePlugin extends Gdn_Plugin {
       if (!Gdn::Cache()->ActiveEnabled())
          return;
       
-      $Now = time();
-      
       // If this is the first time this person is showing up, try to set a cookie and then return
       // This prevents tracking bounces, as well as weeds out clients that don't support cookies.
       $BounceCookieName = C('Garden.Cookie.Name').'-Vv';
       $BounceCookie = GetValue($BounceCookieName, $_COOKIE);
       if (!$BounceCookie) {
-         setcookie($BounceCookieName, $Now, $Now + 1200, C('Garden.Cookie.Path', '/'));
+         setcookie($BounceCookieName, self::$Now, self::$Now + 1200, C('Garden.Cookie.Path', '/'));
          return;
       }
       
@@ -207,21 +216,21 @@ class OnlinePlugin extends Gdn_Plugin {
       $NamePrimary = self::COOKIE_GUEST_PRIMARY;
       $NameSecondary = self::COOKIE_GUEST_SECONDARY;
       
-      list($ExpirePrimary, $ExpireSecondary) = self::Expiries($Now);
+      list($ExpirePrimary, $ExpireSecondary) = self::Expiries(self::$Now);
       
       if (!Gdn::Session()->IsValid()) {
          // Check to see if this guest has been counted.
          if (!isset($_COOKIE[$NamePrimary]) && !isset($_COOKIE[$NameSecondary])) {
-            setcookie($NamePrimary, $Now, $ExpirePrimary + 30, '/'); // cookies expire a little after the cache so they'll definitely be counted in the next one
+            setcookie($NamePrimary, self::$Now, $ExpirePrimary + 30, '/'); // cookies expire a little after the cache so they'll definitely be counted in the next one
             $Counts[$NamePrimary] = self::IncrementCache($NamePrimary, $ExpirePrimary);
 
-            setcookie($NameSecondary, $Now, $ExpireSecondary + 30, '/'); // We want both cookies expiring at different times.
+            setcookie($NameSecondary, self::$Now, $ExpireSecondary + 30, '/'); // We want both cookies expiring at different times.
             $Counts[$NameSecondary] = self::IncrementCache($NameSecondary, $ExpireSecondary);
          } elseif (!isset($_COOKIE[$NamePrimary])) {
-            setcookie($NamePrimary, $Now, $ExpirePrimary + 30, '/');
+            setcookie($NamePrimary, self::$Now, $ExpirePrimary + 30, '/');
             $Counts[$NamePrimary] = self::IncrementCache($NamePrimary, $ExpirePrimary);
          } elseif (!isset($_COOKIE[$NameSecondary])) {
-            setcookie($NameSecondary, $Now, $ExpireSecondary + 30, '/');
+            setcookie($NameSecondary, self::$Now, $ExpireSecondary + 30, '/');
             $Counts[$NameSecondary] = self::IncrementCache($NameSecondary, $ExpireSecondary);
          }
       }
@@ -276,8 +285,8 @@ class OnlinePlugin extends Gdn_Plugin {
       
       try {
          $Names = array(self::COOKIE_GUEST_PRIMARY, self::COOKIE_GUEST_SECONDARY);
-
-         $Time = time();
+         
+         $Time = OnlinePlugin::$Now;
          list($ExpirePrimary, $ExpireSecondary, $Active) = self::Expiries($Time);
 
          // Get bot keys from the cache.
@@ -459,7 +468,7 @@ class OnlinePlugin extends Gdn_Plugin {
       
       Trace('OnlinePlugin->Cleanup');
       // How old does an entry have to be to get pruned?
-      $PruneTimestamp = time() - $this->PruneDelay;
+      $PruneTimestamp = self::$Now - $this->PruneDelay;
       
       $Px = Gdn::Database()->DatabasePrefix;
       $Sql = "DELETE FROM {$Px}Online WHERE Timestamp < :Timestamp";
