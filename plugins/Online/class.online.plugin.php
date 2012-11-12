@@ -15,6 +15,7 @@
  *  1.4     Fix wasteful OnlineModule rendering, store Name in Online table
  *  1.5     Add caching to the OnlineModule rending process
  *  1.5.1   Fix inconsistent timezone handling
+ *  1.6     Add SimpleAPI hooks
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -25,7 +26,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.5.1',
+   'Version' => '1.6',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -127,6 +128,21 @@ class OnlinePlugin extends Gdn_Plugin {
       $UTC = new DateTimeZone('UTC');
       $CurrentDate = new DateTime('now', $UTC);
       self::$Now = $CurrentDate->getTimestamp();
+   }
+   
+   /**
+    * Add mapper methods
+    * 
+    * @param SimpleApiPlugin $Sender
+    */
+   public function SimpleApiPlugin_Mapper_Handler($Sender) {
+      switch ($Sender->Mapper->Version) {
+         case '1.0':
+            $Sender->Mapper->AddMap(array(
+               'online/privacy'        => 'dashboard/profile/online/privacy'
+            ));
+            break;
+      }
    }
    
    /*
@@ -806,15 +822,25 @@ class OnlinePlugin extends Gdn_Plugin {
     */
    
    /**
+    * Profile settings
+    * 
+    * @param ProfileController $Sender 
+    */
+   public function ProfileController_Online_Create($Sender) {
+      $Sender->Permission('Garden.SignIn.Allow');
+      $Sender->Title("Online Preferences");
+      
+      $this->Dispatch($Sender);
+   }
+   
+   /**
     * User-facing configuration.
     * 
     * Allows configuration of 'Invisible' status.
     * 
     * @param Gdn_Controller $Sender 
     */
-   public function ProfileController_Online_Create($Sender) {
-      $Sender->Permission('Garden.SignIn.Allow');
-      $Sender->Title("Online Preferences");
+   public function Controller_Index($Sender) {
       
       $Args = $Sender->RequestArgs;
       if (sizeof($Args) < 2)
@@ -825,6 +851,8 @@ class OnlinePlugin extends Gdn_Plugin {
       list($UserReference, $Username) = $Args;
       
       $Sender->GetUserInfo($UserReference, $Username);
+      $Sender->_SetBreadcrumbs(T('Online Preferences'), '/profile/online');
+      
       $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
       if (!is_array($UserPrefs))
          $UserPrefs = array();
@@ -850,6 +878,29 @@ class OnlinePlugin extends Gdn_Plugin {
       }
 
       $Sender->Render('online','','plugins/Online');
+   }
+   
+   public function Controller_Privacy($Sender) {
+      $Sender->Permission('Garden.Users.Edit');
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      if (!$Sender->Form->IsPostBack())
+         throw new Exception(405);
+      
+      $UserID = Gdn::Request()->Get('UserID');
+      $User = Gdn::UserModel()->GetID($UserID);
+      if (!$User)
+         throw new Exception("No such user '{$UserID}'", 404);
+         
+      $PrivateMode = GetValueR('Attributes.Online/PrivateMode', $User, FALSE);
+      $NewPrivateMode = $Sender->Form->GetValue('PrivateMode', FALSE);
+      
+      Gdn::UserModel()->SaveAttribute($UserID, 'Online/PrivateMode', $NewPrivateMode);
+      $Sender->SetData('Success', sprintf("Set Online Privacy to %s.", $NewPrivateMode ? "ON" : "OFF"));
+      $Sender->SetData('Private', $NewPrivateMode);
+      
+      $Sender->Render();
    }
    
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
