@@ -16,6 +16,7 @@
  *  1.5     Add caching to the OnlineModule rending process
  *  1.5.1   Fix inconsistent timezone handling
  *  1.6     Add SimpleAPI hooks
+ *  1.6.1   Add online/count API hook
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -26,7 +27,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.6',
+   'Version' => '1.6.1',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -139,9 +140,11 @@ class OnlinePlugin extends Gdn_Plugin {
       switch ($Sender->Mapper->Version) {
          case '1.0':
             $Sender->Mapper->AddMap(array(
-               'online/privacy'        => 'dashboard/profile/online/privacy'
+               'online/privacy'        => 'dashboard/profile/online/privacy',
+               'online/count'          => 'dashboard/profile/online/count'
             ), NULL, array(
-               'online/privacy'        => array('Success', 'Private')
+               'online/privacy'        => array('Success', 'Private'),
+               'online/count'          => array('Online')
             ));
             break;
       }
@@ -901,6 +904,31 @@ class OnlinePlugin extends Gdn_Plugin {
       Gdn::UserModel()->SaveAttribute($UserID, 'Online/PrivateMode', $PrivateMode);
       $Sender->SetData('Success', sprintf("Set Online Privacy to %s.", $PrivateMode ? "ON" : "OFF"));
       $Sender->SetData('Private', $PrivateMode);
+      
+      $Sender->Render();
+   }
+   
+   public function Controller_Count($Sender) {
+      $Sender->Permission('Garden.Settings.View');
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      $OnlineCount = new OnlineCountModule();
+      
+      $CategoryID = Gdn::Request()->Get('CategoryID', NULL);
+      if ($CategoryID) $OnlineCount->CategoryID = $CategoryID;
+      
+      $DiscussionID = Gdn::Request()->Get('DiscussionID', NULL);
+      if ($DiscussionID) $OnlineCount->DiscussionID = $DiscussionID;
+      
+      list($Count, $GuestCount) = $OnlineCount->GetData();
+      
+      $CountOutput = array(
+         'Users'  => $Count,
+         'Guests' => $GuestCount,
+         'Total'  => $Count + $GuestCount
+      );
+      $Sender->SetData('Online', $CountOutput);
       
       $Sender->Render();
    }
