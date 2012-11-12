@@ -140,6 +140,8 @@ class OnlinePlugin extends Gdn_Plugin {
          case '1.0':
             $Sender->Mapper->AddMap(array(
                'online/privacy'        => 'dashboard/profile/online/privacy'
+            ), NULL, array(
+               'online/privacy'        => array('Success', 'Private')
             ));
             break;
       }
