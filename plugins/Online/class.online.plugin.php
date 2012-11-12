@@ -895,12 +895,12 @@ class OnlinePlugin extends Gdn_Plugin {
       if (!$User)
          throw new Exception("No such user '{$UserID}'", 404);
          
-      $PrivateMode = GetValueR('Attributes.Online/PrivateMode', $User, FALSE);
-      $NewPrivateMode = $Sender->Form->GetValue('PrivateMode', FALSE);
+      $PrivateMode = strtolower(Gdn::Request()->Get('PrivateMode', 'no'));
+      $PrivateMode = in_array($PrivateMode, array('yes', 'true', 'on', TRUE)) ? TRUE : FALSE;
       
-      Gdn::UserModel()->SaveAttribute($UserID, 'Online/PrivateMode', $NewPrivateMode);
-      $Sender->SetData('Success', sprintf("Set Online Privacy to %s.", $NewPrivateMode ? "ON" : "OFF"));
-      $Sender->SetData('Private', $NewPrivateMode);
+      Gdn::UserModel()->SaveAttribute($UserID, 'Online/PrivateMode', $PrivateMode);
+      $Sender->SetData('Success', sprintf("Set Online Privacy to %s.", $PrivateMode ? "ON" : "OFF"));
+      $Sender->SetData('Private', $PrivateMode);
       
       $Sender->Render();
    }
