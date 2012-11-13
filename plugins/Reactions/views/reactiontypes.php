@@ -91,6 +91,7 @@
    <tbody>
       <?php foreach ($this->Data('ReactionTypes') as $ReactionType): ?>
       <?php
+      if (GetValue('Hidden', $ReactionType)) continue;
       $State = $ReactionType['Active'] ? 'Active' : 'InActive';
       ?>
       <tr id="ReactionType_<?php echo $ReactionType['UrlCode']; ?>" class="<?php echo $State; ?>">

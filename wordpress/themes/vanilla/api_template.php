@@ -103,6 +103,14 @@
          <div class="item"><a href="/blog/api-ignore-restrict">/ignore/restrict</a></div>
       </div>
    </div>
+   
+   <div class="api_section">
+      <div class="section_heading">Online</div>
+      <div class="section_contents">
+         <div class="item"><a href="/blog/api-online-privacy">/online/privacy</a></div>
+         <div class="item"><a href="/blog/api-online-count">/online/count</a></div>
+      </div>
+   </div>
 </div>
 
 <div id="content" class="api">

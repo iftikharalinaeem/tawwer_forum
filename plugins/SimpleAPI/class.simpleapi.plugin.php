@@ -9,6 +9,7 @@
  *  1.2        Authentication overhaul
  *  1.2.1      Fix User lookup bug
  *  1.2.5      Fix early error format bug
+ *  1.2.6      Slightly tweak API reqiest detection
  * 
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
@@ -20,7 +21,7 @@
 $PluginInfo['SimpleAPI'] = array(
    'Name' => 'Simple API',
    'Description' => "Provides simple access_token API access to the forum.",
-   'Version' => '1.2.5',
+   'Version' => '1.2.6',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Tim Gunter',
    'AuthorEmail' => 'tim@vanillaforums.com',

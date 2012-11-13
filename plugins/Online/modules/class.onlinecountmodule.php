@@ -76,6 +76,7 @@ class OnlineCountModule extends Gdn_Module {
       
       $Count = OnlinePlugin::Instance()->OnlineCount($this->Selector, $this->SelectorID, $this->SelectorField);
       $GuestCount = OnlinePlugin::Guests();
+      if (!$GuestCount) $GuestCount = 0;
       
       return array($Count, $GuestCount);
    }
