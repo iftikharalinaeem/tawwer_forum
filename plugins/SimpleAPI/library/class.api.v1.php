@@ -60,9 +60,9 @@ class ApiMapper extends SimpleApiMapper {
    public function Map($APIRequest) {
       $TrimmedRequest = trim($APIRequest, ' /');
       foreach ($this->URIMap as $MatchURI => $MapURI) {
-         if (preg_match("`{$MatchURI}(\.(:?json|xml))`i", $TrimmedRequest)) {
+         if (preg_match("`{$MatchURI}(\.(:?json|xml))?`i", $TrimmedRequest)) {
             $this->Mapping = $MatchURI;
-            return preg_replace("`{$MatchURI}(\.(:?json|xml))`i", "{$MapURI}\$1", $TrimmedRequest);
+            return preg_replace("`{$MatchURI}(\.(:?json|xml))?`i", "{$MapURI}\$1", $TrimmedRequest);
          }
       }
       
