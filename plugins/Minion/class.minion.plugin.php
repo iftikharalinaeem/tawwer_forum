@@ -233,6 +233,14 @@ class MinionPlugin extends Gdn_Plugin {
          $Command = implode(' ', $Objects);
          
          // Parse all known commands
+         
+         /*
+          * BASIC
+          */
+         
+         // Close the thread
+         if (preg_match('/report in/', $Command))
+            $Actions[] = array('report in', 'Vanilla.Comments.Edit');
 
          /*
           * THREAD CONTROL
@@ -283,11 +291,15 @@ class MinionPlugin extends Gdn_Plugin {
       $DiscussionModel = new DiscussionModel();
       $DiscussionID = GetValue('DiscussionID', $Discussion);
       switch ($Action) {
+         case 'report in':
+            $this->Acknowledge($Discussion, 'We are Legion.');
+            break;
+         
          case 'close thread':
             $Closed = GetValue('Closed', $Discussion, FALSE);
             if (!$Closed) {
                $DiscussionModel->SetField($DiscussionID, 'Closed', TRUE);
-               $this->Acknowledge($Discussion, $Action);
+               $this->Acknowledge($Discussion, 'Closing thread...');
             }
             break;
          
@@ -295,13 +307,13 @@ class MinionPlugin extends Gdn_Plugin {
             $Closed = GetValue('Closed', $Discussion, FALSE);
             if ($Closed) {
                $DiscussionModel->SetField($DiscussionID, 'Closed', FALSE);
-               $this->Acknowledge($Discussion, $Action);
+               $this->Acknowledge($Discussion, 'Opening thread...');
             }
             break;
          
          case 'stop all':
             $this->StopMonitoringDiscussion($Discussion);
-            $this->Acknowledge($Discussion, $Action);
+            $this->Acknowledge($Discussion, 'Standing down...');
             break;
       }
       
