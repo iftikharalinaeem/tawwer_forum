@@ -292,7 +292,7 @@ class MinionPlugin extends Gdn_Plugin {
       $DiscussionID = GetValue('DiscussionID', $Discussion);
       switch ($Action) {
          case 'report in':
-            $this->Acknowledge($Discussion, 'We are Legion.');
+            $this->Acknowledge($Discussion, 'We are Legion.', 'neutral');
             break;
          
          case 'close thread':
@@ -410,6 +410,10 @@ class MinionPlugin extends Gdn_Plugin {
          
          case 'negative':
             $MessageText = "Negative {User.Name}";
+            break;
+         
+         default:
+            $MessageText = "{$Command}";
             break;
       }
       
