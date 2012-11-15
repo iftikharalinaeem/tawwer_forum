@@ -420,6 +420,8 @@ class MinionPlugin extends Gdn_Plugin {
       if ($MinionCommentID) {
          $CommentModel->Save2($MinionCommentID, TRUE);
       }
+      
+      Gdn::Controller()->InformMessage($MessageText);
    }
    
    /**
