@@ -819,7 +819,7 @@ class ReactionModel {
       
       $Badges = $BadgeModel->GetWhere(array('Type' => 'Reaction', 'Class' => $ReactionType['UrlCode']), 'Threshold', 'desc')->ResultArray();
       foreach ($Badges as $Badge) {
-         if ($Score > $Badge['Threshold']) {
+         if ($Score >= $Badge['Threshold']) {
             $UserBadgeModel->Give($UserID, $Badge);
          }
       }
