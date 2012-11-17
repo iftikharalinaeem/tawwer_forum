@@ -14,6 +14,7 @@
  * 
  *  1.1     Only autoban newer accounts than existing banned ones
  *  1.2     Prevent people from posting autoplay embeds
+ *  1.3     New inline command structure
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -24,7 +25,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.0.4',
+   'Version' => '1.3',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -34,8 +35,8 @@ $PluginInfo['Minion'] = array(
 
 class MinionPlugin extends Gdn_Plugin {
    
-   protected $MinionUserID;
-   protected $Minion;
+   protected $MinionUserID = NULL;
+   protected $Minion = NULL;
    
    /**
     * Retrieves a "system user" id that can be used to perform non-real-person tasks.
@@ -64,6 +65,11 @@ class MinionPlugin extends Gdn_Plugin {
       return $MinionUserID;
    }
    
+   public function MinionName() {
+      $this->StartMinion();
+      return $MinionName = GetValue('Name', $this->Minion);
+   }
+   
    /**
     * 
     * @param PostController $Sender 
@@ -73,6 +79,7 @@ class MinionPlugin extends Gdn_Plugin {
       
       $this->CheckFingerprintBan($Sender);
       $this->CheckAutoplay($Sender);
+      $this->CheckCommands($Sender);
    }
    
    /**
@@ -84,12 +91,16 @@ class MinionPlugin extends Gdn_Plugin {
       
       $this->CheckFingerprintBan($Sender);
       $this->CheckAutoplay($Sender);
+      $this->CheckCommands($Sender);
+      $this->CheckMonitor($Sender);
    }
    
    protected function StartMinion() {
-      // Currently operating as Minion
-      $this->MinionUserID = $this->GetMinionUserID();
-      $this->Minion = Gdn::UserModel()->GetID($this->MinionUserID);
+      if (is_null($this->Minion)) {
+         // Currently operating as Minion
+         $this->MinionUserID = $this->GetMinionUserID();
+         $this->Minion = Gdn::UserModel()->GetID($this->MinionUserID);
+      }
    }
    
    /**
@@ -150,7 +161,6 @@ class MinionPlugin extends Gdn_Plugin {
             $DiscussionID = GetValue('DiscussionID',$Object);
             $MinionReportText = T("{Minion Name} DETECTED AUTOPLAY ATTEMPT
 {User Target}");
-               
 
             $MinionReportText = FormatString($MinionReportText, array(
                'Minion Name'     => $this->Minion->Name,
@@ -168,6 +178,247 @@ class MinionPlugin extends Gdn_Plugin {
          }
          
          $Sender->InformMessage("POST REMOVED DUE TO AUTOPLAY VIOLATION");
+      }
+   }
+   
+   /**
+    * Check for minion commands in comments
+    * 
+    * @param type $Sender
+    */
+   public function CheckCommands($Sender) {
+      $MinionName = GetValue('Name', $this->Minion);
+      
+      // Get the discussion and comment from args
+      $Discussion = (array)$Sender->EventArguments['Discussion'];
+      if (!is_array($Discussion['Attributes'])) {
+         $Discussion['Attributes'] = @unserialize($Discussion['Attributes']);
+         if (!is_array($Discussion['Attributes']))
+            $Discussion['Attributes'] = array();
+      }
+      
+      $Comment = NULL;
+      $Type = 'Discussion';
+      if (array_key_exists('Comment', $Sender->EventArguments)) {
+         $Comment = (array)$Sender->EventArguments['Comment'];
+         $Type = 'Comment';
+      }
+      $Object = $$Type;
+      
+      $Actions = array();
+      $this->EventArguments = array(
+         'Discussion'   => &$Discussion,
+         'Actions'      => &$Actions,
+         'CommandType'  => $Type
+      );
+      
+      if ($Type == 'Comment')
+         $this->EventArguments['Comment'] = $Comment;
+      
+      $ObjectBody = GetValue('Body', $Object);
+      $ObjectBody = strtolower(trim(strip_tags($ObjectBody)));
+      
+      // Check every line of the body to see if its a minion command
+      $ObjectLines = explode("\n", $ObjectBody);
+      unset($ObjectBody);
+      foreach ($ObjectLines as $ObjectBody) {
+         
+         $Objects = explode(' ', $ObjectBody);
+         $CallName = array_shift($Objects);
+         $CallName = trim($CallName,' ,.');
+
+         if ($CallName != strtolower($MinionName))
+            continue;
+         
+         $Command = implode(' ', $Objects);
+         
+         // Parse all known commands
+
+         /*
+          * THREAD CONTROL
+          */
+
+         // Close the thread
+         if (preg_match('/(shut it down|close\b.*\bthread)/', $Command))
+            $Actions[] = array('close thread', 'Vanilla.Comments.Edit');
+
+         // Open the thread
+         if (preg_match('/(take a break|open\b.*\bthread)/', $Command))
+            $Actions[] = array('open thread', 'Vanilla.Comments.Edit');
+
+         /*
+          * FAILSAFE
+          */
+
+         // Completely stand down
+         if (preg_match('/stand down/', $Command))
+            $Actions[] = array('stop all', 'Vanilla.Comments.Edit');
+
+         // Allow external commands
+
+         $this->EventArguments['Command'] = $Command;
+         $this->FireEvent('Command');
+         
+      }
+      
+      // Perform actions
+      
+      foreach ($Actions as $Action) {
+         $Permission = $Action[1];
+         if (!Gdn::Session()->CheckPermission($Permission)) continue;
+         
+         $Action = $Action[0];
+         $this->MinionAction($Action, $Discussion, $Comment);
+      }
+   }
+   
+   
+   /**
+    * Perform actions
+    * 
+    * @param string $Action
+    * @param array $Object
+    */
+   public function MinionAction($Action, $Discussion, $Comment) {
+      $DiscussionModel = new DiscussionModel();
+      $DiscussionID = GetValue('DiscussionID', $Discussion);
+      switch ($Action) {
+         case 'close thread':
+            $Closed = GetValue('Closed', $Discussion, FALSE);
+            if (!$Closed) {
+               $DiscussionModel->SetField($DiscussionID, 'Closed', TRUE);
+               $this->Acknowledge($Discussion, $Action);
+            }
+            break;
+         
+         case 'open thread':
+            $Closed = GetValue('Closed', $Discussion, FALSE);
+            if ($Closed) {
+               $DiscussionModel->SetField($DiscussionID, 'Closed', FALSE);
+               $this->Acknowledge($Discussion, $Action);
+            }
+            break;
+         
+         case 'stop all':
+            $this->StopMonitoringDiscussion($Discussion);
+            $this->Acknowledge($Discussion, $Action);
+            break;
+      }
+      
+      $this->EventArguments = array(
+         'Action'       => $Action,
+         'Discussion'   => $Discussion,
+         'Comment'      => $Comment
+      );
+      $this->FireEvent('Action');
+   }
+   
+   public function CheckMonitor($Sender) {
+      
+      // Get the discussion and comment from args
+      $Discussion = (array)$Sender->EventArguments['Discussion'];
+      if (!is_array($Discussion['Attributes'])) {
+         $Discussion['Attributes'] = @unserialize($Discussion['Attributes']);
+         if (!is_array($Discussion['Attributes']))
+            $Discussion['Attributes'] = array();
+      }
+      
+      $Comment = NULL;
+      $Type = 'Discussion';
+      if (array_key_exists('Comment', $Sender->EventArguments)) {
+         $Comment = (array)$Sender->EventArguments['Comment'];
+         $Type = 'Comment';
+      }
+      
+      $IsMonitoring = $this->Monitoring($Discussion);
+      if (!$IsMonitoring) return;
+      
+      $this->EventArguments = array(
+         'Discussion'   => $Discussion
+      );
+      
+      if ($Type == 'Comment')
+         $this->EventArguments['Comment'] = $Comment;
+      
+      $this->FireEvent('Monitor');
+   }
+   
+   public function Monitoring($Discussion, $Attribute = NULL, $Default = NULL) {
+      $Minion = GetValueR('Attributes.Minion', $Discussion, array());
+      
+      $IsMonitoring = GetValue('Monitor', $Minion, FALSE);
+      if (!$IsMonitoring) return FALSE;
+      
+      if (is_null($Attribute)) return TRUE;
+      return GetValue($Attribute, $Minion, $Default);
+   }
+   
+   public function MonitorDiscussion($Discussion, $Options = NULL) {
+      $DiscussionModel = new DiscussionModel();
+      
+      $Minion = (array)GetValueR('Attributes.Minion', $Discussion, array());
+      $Minion['Monitor'] = TRUE;
+      
+      if (is_array($Options)) {
+         foreach ($Options as $Option => $OpVal) {
+            if ($OpVal == NULL)
+               unset($Minion[$Option]);
+            else
+               $Minion[$Option] = $OpVal;
+         }
+      }
+      
+      // Keep attribs sparse
+      if (sizeof($Minion) == 1)
+         return $this->StopMonitoringDiscussion($Discussion);
+      
+      $DiscussionModel->SetRecordAttribute($Discussion, 'Minion', $Minion);
+      $DiscussionModel->SaveToSerializedColumn('Attributes', $Discussion['DiscussionID'], 'Minion', $Minion);
+   }
+   
+   public function StopMonitoringDiscussion($Discussion) {
+      $DiscussionModel = new DiscussionModel();
+      $DiscussionModel->SetRecordAttribute($Discussion, 'Minion', NULL);
+      $DiscussionModel->SaveToSerializedColumn('Attributes', $Discussion['DiscussionID'], 'Minion', NULL);
+   }
+   
+   public function Acknowledge($Discussion, $Command, $Type = 'positive', $User = NULL) {
+      
+      if (is_null($User))
+         $User = (array)Gdn::Session()->User;
+      
+      $DiscussionID = GetValue('DiscussionID', $Discussion);
+      $CommentModel = new CommentModel();
+      
+      $MessageText = NULL;
+      switch ($Type) {
+         case 'positive':
+            $MessageText = "Affirmative {User.Name}. {Command}";
+            break;
+         
+         case 'negative':
+            $MessageText = "Negative {User.Name}";
+            break;
+      }
+      
+      $MessageText = FormatString($MessageText, array(
+         'User'         => $User,
+         'Discussion'   => $Discussion,
+         'Command'      => $Command
+      ));
+      
+      $MinionCommentID = NULL;
+      if ($MessageText) {
+         $MinionCommentID = $CommentModel->Save(array(
+            'DiscussionID' => $DiscussionID,
+            'Body'         => $MessageText,
+            'Format'       => 'Html',
+            'InsertUserID' => $this->MinionUserID
+         ));
+      }
+      
+      if ($MinionCommentID) {
+         $CommentModel->Save2($MinionCommentID, TRUE);
       }
    }
    

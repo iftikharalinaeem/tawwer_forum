@@ -119,7 +119,7 @@ class ReactionModel {
       $Data['TagID'] = $TagID;
       
       $Row = array();
-      $Columns = array('UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom');
+      $Columns = array('UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom', 'Hidden');
       foreach ($Columns as $Column) {
          if (isset($Data[$Column])) {
             $Row[$Column] = $Data[$Column];
@@ -570,31 +570,33 @@ class ReactionModel {
       if ($Points <> 0 && class_exists('UserBadgeModel')) {
          UserBadgeModel::GivePoints($Record['InsertUserID'], $Points, 'Reactions');
       }
+      
+      return $Insert;
    }
    
    /**
     *
     * @param string $RecordType
     * @param int $ID
-    * @param string $Reaction 
+    * @param string $ReactionUrlCode 
     */
-   public function React($RecordType, $ID, $Reaction) {
+   public function React($RecordType, $ID, $ReactionUrlCode) {
       $IsModerator = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
       $IsCurator = Gdn::Session()->CheckPermission('Garden.Curation.Manage');
       
       $Undo = FALSE;
-      if (StringBeginsWith($Reaction, 'Undo-', TRUE)) {
+      if (StringBeginsWith($ReactionUrlCode, 'Undo-', TRUE)) {
          $Undo = TRUE;
-         $Reaction = StringBeginsWith($Reaction, 'Undo-', TRUE, TRUE);
+         $ReactionUrlCode = StringBeginsWith($ReactionUrlCode, 'Undo-', TRUE, TRUE);
       }
       $UserID = Gdn::Session()->UserID;
       $RecordType = ucfirst($RecordType);
-      $Reaction = strtolower($Reaction);
-      $ReactionType = self::ReactionTypes($Reaction);
+      $ReactionUrlCode = strtolower($ReactionUrlCode);
+      $ReactionType = self::ReactionTypes($ReactionUrlCode);
       $AttrColumn = $RecordType == 'Activity' ? 'Data' : 'Attributes';
       
       if (!$ReactionType)
-         throw NotFoundException($Reaction);
+         throw NotFoundException($ReactionUrlCode);
       
       $LogOperation = GetValue('Log', $ReactionType);
       
@@ -619,7 +621,7 @@ class ReactionModel {
           'UserID' => $UserID,
           'Total' => $Inc
           );
-      $this->ToggleUserTag($Data, $Row, $Model);
+      $Inserted = $this->ToggleUserTag($Data, $Row, $Model);
       
       $Message = array(T(GetValue('InformMessage', $ReactionType, '')), 'Dismissable AutoDismiss');
       
@@ -694,6 +696,17 @@ class ReactionModel {
       
       if ($Message)
          Gdn::Controller()->InformMessage($Message[0], $Message[1]);
+      
+      ReactionsPlugin::Instance()->EventArguments = array(
+         'RecordType'      => $RecordType,
+         'RecordID'        => $ID,
+         'Record'          => $Row,
+         'ReactionUrlCode' => $ReactionUrlCode,
+         'ReactionData'    => $Data,
+         'Insert'          => $Inserted,
+         'UserID'          => $UserID
+      );
+      ReactionsPlugin::Instance()->FireEvent('Reaction');
       
 //      if ($Undo)
 //         $UndoButton = $this->Button(T('Report '.ucfirst($Reaction), ucfirst($Reaction)), $Reaction, $RecordType, $ID, FALSE);

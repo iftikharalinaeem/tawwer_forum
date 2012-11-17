@@ -8,7 +8,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.1.14',
+   'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -46,7 +46,6 @@ class ReactionsPlugin extends Gdn_Plugin {
             }
             $OrderParts = explode(' ', $OrderBy);
             $OrderColumn = GetValue(0, $OrderParts, $DefaultOrderParts[0]);
-            
 
             // Make sure the order is correct.
             if (!in_array($OrderColumn, array('DateInserted', 'Score')))

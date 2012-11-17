@@ -14,6 +14,9 @@
  *  1.3     Exposes GetUser() for external querying
  *  1.4     Fix wasteful OnlineModule rendering, store Name in Online table
  *  1.5     Add caching to the OnlineModule rending process
+ *  1.5.1   Fix inconsistent timezone handling
+ *  1.6     Add SimpleAPI hooks
+ *  1.6.1   Add online/count API hook
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -24,7 +27,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.5',
+   'Version' => '1.6.2',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -32,7 +35,7 @@ $PluginInfo['Online'] = array(
    'SettingsUrl' => '/plugin/online',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/tim'
 );
 
 class OnlinePlugin extends Gdn_Plugin {
@@ -59,7 +62,19 @@ class OnlinePlugin extends Gdn_Plugin {
     * Length of time to cache counts
     * @var integer Seconds
     */
-   protected $CacheCountDelay;
+   public $CacheCountDelay;
+   
+   /**
+    * Length of time to cache pre-rendered user lists
+    * @var integer Seconds
+    */
+   public $CacheRenderDelay;
+   
+   /**
+    * Current UTC timestamp
+    * @var integer Seconds
+    */
+   protected static $Now;
    
    /**
     * Track when we last wrote online status back to the database.
@@ -116,6 +131,29 @@ class OnlinePlugin extends Gdn_Plugin {
       $this->CleanDelay = C('Plugins.Online.CleanDelay', self::DEFAULT_CLEAN_DELAY);
       $this->CacheCountDelay = C('Plugins.Online.CacheCountDelay', 20);
       $this->CacheRenderDelay = C('Plugins.Online.CacheRenderDelay', 60);
+      
+      $UTC = new DateTimeZone('UTC');
+      $CurrentDate = new DateTime('now', $UTC);
+      self::$Now = $CurrentDate->getTimestamp();
+   }
+   
+   /**
+    * Add mapper methods
+    * 
+    * @param SimpleApiPlugin $Sender
+    */
+   public function SimpleApiPlugin_Mapper_Handler($Sender) {
+      switch ($Sender->Mapper->Version) {
+         case '1.0':
+            $Sender->Mapper->AddMap(array(
+               'online/privacy'        => 'dashboard/profile/online/privacy',
+               'online/count'          => 'dashboard/profile/online/count'
+            ), NULL, array(
+               'online/privacy'        => array('Success', 'Private'),
+               'online/count'          => array('Online')
+            ));
+            break;
+      }
    }
    
    /*
@@ -191,14 +229,12 @@ class OnlinePlugin extends Gdn_Plugin {
       if (!Gdn::Cache()->ActiveEnabled())
          return;
       
-      $Now = time();
-      
       // If this is the first time this person is showing up, try to set a cookie and then return
       // This prevents tracking bounces, as well as weeds out clients that don't support cookies.
       $BounceCookieName = C('Garden.Cookie.Name').'-Vv';
       $BounceCookie = GetValue($BounceCookieName, $_COOKIE);
       if (!$BounceCookie) {
-         setcookie($BounceCookieName, $Now, $Now + 1200, C('Garden.Cookie.Path', '/'));
+         setcookie($BounceCookieName, self::$Now, self::$Now + 1200, C('Garden.Cookie.Path', '/'));
          return;
       }
       
@@ -207,21 +243,21 @@ class OnlinePlugin extends Gdn_Plugin {
       $NamePrimary = self::COOKIE_GUEST_PRIMARY;
       $NameSecondary = self::COOKIE_GUEST_SECONDARY;
       
-      list($ExpirePrimary, $ExpireSecondary) = self::Expiries($Now);
+      list($ExpirePrimary, $ExpireSecondary) = self::Expiries(self::$Now);
       
       if (!Gdn::Session()->IsValid()) {
          // Check to see if this guest has been counted.
          if (!isset($_COOKIE[$NamePrimary]) && !isset($_COOKIE[$NameSecondary])) {
-            setcookie($NamePrimary, $Now, $ExpirePrimary + 30, '/'); // cookies expire a little after the cache so they'll definitely be counted in the next one
+            setcookie($NamePrimary, self::$Now, $ExpirePrimary + 30, '/'); // cookies expire a little after the cache so they'll definitely be counted in the next one
             $Counts[$NamePrimary] = self::IncrementCache($NamePrimary, $ExpirePrimary);
 
-            setcookie($NameSecondary, $Now, $ExpireSecondary + 30, '/'); // We want both cookies expiring at different times.
+            setcookie($NameSecondary, self::$Now, $ExpireSecondary + 30, '/'); // We want both cookies expiring at different times.
             $Counts[$NameSecondary] = self::IncrementCache($NameSecondary, $ExpireSecondary);
          } elseif (!isset($_COOKIE[$NamePrimary])) {
-            setcookie($NamePrimary, $Now, $ExpirePrimary + 30, '/');
+            setcookie($NamePrimary, self::$Now, $ExpirePrimary + 30, '/');
             $Counts[$NamePrimary] = self::IncrementCache($NamePrimary, $ExpirePrimary);
          } elseif (!isset($_COOKIE[$NameSecondary])) {
-            setcookie($NameSecondary, $Now, $ExpireSecondary + 30, '/');
+            setcookie($NameSecondary, self::$Now, $ExpireSecondary + 30, '/');
             $Counts[$NameSecondary] = self::IncrementCache($NameSecondary, $ExpireSecondary);
          }
       }
@@ -276,8 +312,8 @@ class OnlinePlugin extends Gdn_Plugin {
       
       try {
          $Names = array(self::COOKIE_GUEST_PRIMARY, self::COOKIE_GUEST_SECONDARY);
-
-         $Time = time();
+         
+         $Time = OnlinePlugin::$Now;
          list($ExpirePrimary, $ExpireSecondary, $Active) = self::Expiries($Time);
 
          // Get bot keys from the cache.
@@ -459,7 +495,7 @@ class OnlinePlugin extends Gdn_Plugin {
       
       Trace('OnlinePlugin->Cleanup');
       // How old does an entry have to be to get pruned?
-      $PruneTimestamp = time() - $this->PruneDelay;
+      $PruneTimestamp = self::$Now - $this->PruneDelay;
       
       $Px = Gdn::Database()->DatabasePrefix;
       $Sql = "DELETE FROM {$Px}Online WHERE Timestamp < :Timestamp";
@@ -797,15 +833,25 @@ class OnlinePlugin extends Gdn_Plugin {
     */
    
    /**
+    * Profile settings
+    * 
+    * @param ProfileController $Sender 
+    */
+   public function ProfileController_Online_Create($Sender) {
+      $Sender->Permission('Garden.SignIn.Allow');
+      $Sender->Title("Online Preferences");
+      
+      $this->Dispatch($Sender);
+   }
+   
+   /**
     * User-facing configuration.
     * 
     * Allows configuration of 'Invisible' status.
     * 
     * @param Gdn_Controller $Sender 
     */
-   public function ProfileController_Online_Create($Sender) {
-      $Sender->Permission('Garden.SignIn.Allow');
-      $Sender->Title("Online Preferences");
+   public function Controller_Index($Sender) {
       
       $Args = $Sender->RequestArgs;
       if (sizeof($Args) < 2)
@@ -816,6 +862,8 @@ class OnlinePlugin extends Gdn_Plugin {
       list($UserReference, $Username) = $Args;
       
       $Sender->GetUserInfo($UserReference, $Username);
+      $Sender->_SetBreadcrumbs(T('Online Preferences'), '/profile/online');
+      
       $UserPrefs = Gdn_Format::Unserialize($Sender->User->Preferences);
       if (!is_array($UserPrefs))
          $UserPrefs = array();
@@ -841,6 +889,54 @@ class OnlinePlugin extends Gdn_Plugin {
       }
 
       $Sender->Render('online','','plugins/Online');
+   }
+   
+   public function Controller_Privacy($Sender) {
+      $Sender->Permission('Garden.Users.Edit');
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      if (!$Sender->Form->IsPostBack())
+         throw new Exception(405);
+      
+      $UserID = Gdn::Request()->Get('UserID');
+      $User = Gdn::UserModel()->GetID($UserID);
+      if (!$User)
+         throw new Exception("No such user '{$UserID}'", 404);
+         
+      $PrivateMode = strtolower(Gdn::Request()->Get('PrivateMode', 'no'));
+      $PrivateMode = in_array($PrivateMode, array('yes', 'true', 'on', TRUE)) ? TRUE : FALSE;
+      
+      Gdn::UserModel()->SaveAttribute($UserID, 'Online/PrivateMode', $PrivateMode);
+      $Sender->SetData('Success', sprintf("Set Online Privacy to %s.", $PrivateMode ? "ON" : "OFF"));
+      $Sender->SetData('Private', $PrivateMode);
+      
+      $Sender->Render();
+   }
+   
+   public function Controller_Count($Sender) {
+      $Sender->Permission('Garden.Settings.View');
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      $OnlineCount = new OnlineCountModule();
+      
+      $CategoryID = Gdn::Request()->Get('CategoryID', NULL);
+      if ($CategoryID) $OnlineCount->CategoryID = $CategoryID;
+      
+      $DiscussionID = Gdn::Request()->Get('DiscussionID', NULL);
+      if ($DiscussionID) $OnlineCount->DiscussionID = $DiscussionID;
+      
+      list($Count, $GuestCount) = $OnlineCount->GetData();
+      
+      $CountOutput = array(
+         'Users'  => $Count,
+         'Guests' => $GuestCount,
+         'Total'  => $Count + $GuestCount
+      );
+      $Sender->SetData('Online', $CountOutput);
+      
+      $Sender->Render();
    }
    
    public function ProfileController_AfterAddSideMenu_Handler($Sender) {
