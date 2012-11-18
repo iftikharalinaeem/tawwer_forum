@@ -14,6 +14,11 @@ jQuery(document).ready(function($) {
       $(selector, $container).removeClass('Invisible');
    });
    
+   // After images are resized, we gotta recalculate the tile heights
+   $(window).bind('ImagesResized', function() {
+      $container.masonry({ itemSelector: selector });
+   });
+   
    // Do inifinite scroll on the best of page.
    if ($('.BestOfWrap').length > 0) {
       $('.Pager').hide();
