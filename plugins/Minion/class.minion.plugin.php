@@ -358,7 +358,7 @@ class MinionPlugin extends Gdn_Plugin {
                if (!$State['Method'] && in_array($State['Token'], array('report')))
                   $this->Consume($State, 'Method', 'report in');
                
-               if (!$State['Method'] && in_array($State['Token'], array('shoot','peace', 'weapon', 'weapons', 'posture', 'free', 'defcon')))
+               if (!$State['Method'] && in_array($State['Token'], array('shoot','peace', 'weapon', 'weapons', 'posture', 'free', 'defcon', 'phasers')))
                   $this->Consume($State, 'Method', 'force');
                
                if (!$State['Method'] && in_array($State['Token'], array('stand')))
