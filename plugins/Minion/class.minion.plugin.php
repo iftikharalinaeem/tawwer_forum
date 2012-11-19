@@ -423,6 +423,487 @@ class MinionPlugin extends Gdn_Plugin {
    }
    
    /**
+    * Check for minion commands in comments
+    * 
+    * @param type $Sender
+    */
+   public function CheckCommands($Sender) {
+      $MinionName = GetValue('Name', $this->Minion);
+      
+      // Get the discussion and comment from args
+      $Discussion = (array)$Sender->EventArguments['Discussion'];
+      $Type = 'Discussion';
+      if (!is_array($Discussion['Attributes'])) {
+         $Discussion['Attributes'] = @unserialize($Discussion['Attributes']);
+         if (!is_array($Discussion['Attributes']))
+            $Discussion['Attributes'] = array();
+      }
+      
+      $Comment = NULL;
+      if (array_key_exists('Comment', $Sender->EventArguments)) {
+         $Comment = (array)$Sender->EventArguments['Comment'];
+         $Type = 'Comment';
+      }
+      $Object = $$Type;
+      
+      $Actions = array();
+      $this->EventArguments['Actions'] = &$Actions;
+      
+      $ObjectBody = GetValue('Body', $Object);
+      $ObjectBody = trim(strip_tags($ObjectBody));
+      
+      // Check every line of the body to see if its a minion command
+      $ObjectLines = explode("\n", $ObjectBody);
+      foreach ($ObjectLines as $ObjectLine) {
+         
+         $Objects = explode(' ', $ObjectLine);
+         $CallName = array_shift($Objects);
+         $CallName = trim($CallName,' ,.');
+
+         if (strtolower($CallName) != strtolower($MinionName))
+            continue;
+         
+         $Command = trim(implode(' ', $Objects));
+         
+         /*
+          * Tokenized floating detection
+          */
+
+         // Define starting state
+         $State = array(
+            'Body'      => $ObjectBody,
+            'Sources'   => array(),
+            'Targets'   => array(),
+            'Method'    => NULL,
+            'Toggle'    => NULL,
+            'Gather'    => FALSE,
+            'Command'   => $Command,
+            'Tokens'    => 0,
+            'Parsed'    => 0
+         );
+         
+         // Define sources
+         $State['Sources']['Discussion'] = $Discussion;
+         if ($Comment)
+            $State['Sources']['Comment'] = $Comment;
+
+         $this->EventArguments['State'] = &$State;
+         $State['Token'] = strtok($Command, ' ');
+         $State['Parsed']++;
+         
+         while ($State['Token'] !== FALSE) {
+            if ($State['Gather']) {
+
+               switch (GetValueR('Gather.Node', $State)) {
+                  case 'User':
+
+                     // If we need to wait for a closing quote
+                     if (!sizeof($State['Gather']['Delta']) && substr($State['Token'], 0, 1) == '"') {
+                        $State['Token'] = substr($State['Token'], 1);
+                        $State['Gather']['ExplicitClose'] = '"';
+                     }
+
+                     // If we've found our closing quote
+                     if (GetValue('ExplicitClose', $State['Gather'])) {
+                        if ($FoundPosition = stristr($State['Token'], $State['Gather']['ExplicitClose'])) {
+                           $State['Token'] = substr($State['Token'], 0, $FoundPosition);
+                           unset($State['Gather']['ExplicitClose']);
+                        }
+                     }
+
+                     // Add token
+                     $State['Gather']['Delta'] .= " {$State['Token']}";
+                     $this->Consume($State);
+
+                     // Check if this is a real user already
+                     if (sizeof($State['Gather']['Delta'])) {
+                        $CheckUser = trim($State['Gather']['Delta']);
+                        if ($GatherUser = Gdn::UserModel()->GetByUsername($CheckUser)) {
+                           $State['Gather'] = FALSE;
+                           $State['Targets']['User'] = (array)$GatherUser;
+                           break;
+                        }
+                     }
+
+                     if (!sizeof($State['Token'])) {
+                        $State['Gather'] = FALSE;
+                        continue;
+                     }
+
+                  break;
+               }
+
+            } else {
+
+               /*
+                * TOGGLERS
+                */
+
+               if (empty($State['Toggle']) && in_array($State['Token'], array('open', 'enable', 'unlock', 'allow')))
+                  $this->Consume($State, 'Toggle', 'on');
+
+               if (empty($State['Toggle']) && in_array($State['Token'], array('no', 'close', 'disable', 'lock', 'disallow', 'forbid', 'down')))
+                  $this->Consume($State, 'Toggle', 'off');
+
+               /*
+                * FORCE
+                */
+
+               if (empty($State['Force']) && in_array($State['Token'], array('stun', 'blanks')))
+                  $this->Consume($State, 'Force', 'low');
+
+               if (empty($State['Force']) && in_array($State['Token'], array('weapon', 'weapons', 'power')))
+                  $this->Consume($State, 'Force', 'medium');
+
+               if (empty($State['Force']) && in_array($State['Token'], array('kill', 'lethal', 'nuke', 'nuclear', 'destroy')))
+                  $this->Consume($State, 'Force', 'high');
+               
+               // Conditional forces
+               if (!empty($State['Method']) && empty($State['Force']) && in_array($State['Token'], array('warning', 'warn')))
+                  $this->Consume($State, 'Force', 'warn');
+
+               /*
+                * TARGETS
+                */
+
+               if (in_array($State['Token'], array('user'))) {
+                  $this->Consume($State, 'Gather', array(
+                     'Node'   => 'User',
+                     'Delta'  => ''
+                  ));
+               }
+
+               if (substr($State['Token'], 0, 1) == '@' ) {
+                  if (strlen($State['Token']) > 1) {
+                     $State['Token'] = substr($State['Token'], 1);
+                     $State['Gather'] = array(
+                        'Node'   => 'User',
+                        'Delta'  => ''
+                     );
+                     
+                     // Shortcircuit here so we can put all the user gathering in one place
+                     continue;
+                  }
+               }
+
+               /*
+                * METHODS
+                */
+               
+               if (!$State['Method'] && in_array($State['Token'], array('thread')))
+                  $this->Consume($State, 'Method', 'thread');
+
+               if (!$State['Method'] && in_array($State['Token'], array('report')))
+                  $this->Consume($State, 'Method', 'report in');
+               
+               if (!$State['Method'] && in_array($State['Token'], array('shoot','peace', 'weapon', 'weapons', 'posture', 'free', 'defcon')))
+                  $this->Consume($State, 'Method', 'force');
+               
+               if (!$State['Method'] && in_array($State['Token'], array('stand')))
+                  $this->Consume($State, 'Method', 'stop all');
+
+               $this->FireEvent('Token');
+            }
+
+            // Get a new token
+            $State['Token'] = strtok(' ');
+            if ($State['Token'])
+               $State['Parsed']++;
+            
+            // End token loop
+         }
+         
+         /*
+          * PARAMETERS
+          */
+
+         // If the rest is just gravy
+         if ($State['Method']) {
+            $CommandTokens = explode(' ', $Command);
+            $Gravy = array_slice($CommandTokens, $State['Tokens']);
+            $State['Gravy'] = implode(' ', $Gravy);
+         }
+         
+         // Parse this resolved State into potential actions
+
+         $this->ParseCommand($State, $Actions);
+         
+      }
+      
+      // Perform actions
+      $Performed = array();
+      foreach ($Actions as $Action) {
+         $ActionName = array_shift($Action);
+         $Permission = array_shift($Action);
+         if (!Gdn::Session()->CheckPermission($Permission)) continue;
+         if (in_array($Action, $Performed)) continue;
+         
+         $Performed[] = $ActionName;
+         $Args = array($ActionName, $State);
+         call_user_func_array(array($this, 'MinionAction'), $Args);
+      }
+      
+  }
+   
+   /**
+    * Consume a token
+    * 
+    * @param array $State
+    * @param string $Setting
+    * @param mixed $Value
+    */
+   public function Consume(&$State, $Setting = NULL, $Value = NULL) {
+      $State['Tokens'] = $State['Parsed'];
+      if (!is_null($Setting))
+         $State[$Setting] = $Value;
+   }
+   
+   /**
+    * Parse commands from returned States
+    * 
+    * @param array $State
+    * @param array $Actions
+    */
+   public function ParseCommand(&$State, &$Actions) {
+      switch ($State['Method']) {
+         
+         // Report in
+         case 'report in':
+            if (array_key_exists('Discussion', $State['Sources']))
+               $Actions[] = array('report in', 'Vanilla.Comments.Edit');
+            break;
+         
+         // Threads
+         case 'thread':
+            $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
+            $Actions[] = array('thread', 'Vanilla.Comments.Edit');
+            break;
+
+         // Adjust automated force level
+         case 'force':
+            $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
+            $Forces = array('warn', 'low', 'medium', 'high');
+            if (in_array($State['Force'], $Forces))
+               $Actions[] = array("force", 'Vanilla.Comments.Edit');
+            break;
+            
+         case 'stop all':
+            $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
+            $Actions[] = array("stop all", 'Vanilla.Comments.Edit');
+            break;
+      }
+      
+      $this->FireEvent('Command');
+   }
+   
+   /**
+    * Perform actions
+    * 
+    * @param string $Action
+    * @param array $Object
+    */
+   public function MinionAction($Action, $State) {
+      switch ($Action) {
+         case 'report in':
+            $this->Acknowledge($State['Sources']['Discussion'], 'We are Legion.', 'neutral');
+            break;
+         
+         case 'thread':
+            $Closed = GetValue('Closed', $State['Targets']['Discussion'], FALSE);
+            $DiscussionID = $State['Targets']['Discussion']['DiscussionID'];
+            
+            if ($State['Toggle'] == 'off') {
+               if (!$Closed) {
+                  $DiscussionModel->SetField($DiscussionID, 'Closed', TRUE);
+                  $this->Acknowledge($State['Sources']['Discussion'], 'Closing thread...');
+               }
+            }
+            
+            if ($State['Toggle'] == 'on') {
+               if ($Closed) {
+                  $DiscussionModel->SetField($DiscussionID, 'Closed', FALSE);
+                  $this->Acknowledge($State['Sources']['Discussion'], 'Opening thread...');
+               }
+            }
+            break;
+            
+         case 'force':
+            $Force = GetValue('Force', $State);
+            $this->MonitorDiscussion($State['Targets']['Discussion'], array(
+               'Force'     => $Force
+            ));
+            $this->Acknowledge($State['Sources']['Discussion'], "Setting force level to '{$Force}'.");
+            break;
+         
+         case 'stop all':
+            $this->StopMonitoringDiscussion($State['Targets']['Discussion']);
+            $this->Acknowledge($State['Sources']['Discussion'], 'Standing down...');
+            break;
+      }
+      
+      $this->EventArguments = array(
+         'Action' => $Action,
+         'State'  => $State
+      );
+      $this->FireEvent('Action');
+   }
+   
+   /**
+    * Look for a target user and comment/discussion
+    * 
+    * @param array $State
+    * @return type
+    */
+   public function MatchQuoted(&$State) {
+      $Matched = preg_match('/quote=\"([^;]*);([\d]+)\"/', $State['Body'], $Matches);
+      if ($Matched) {
+
+         $UserName = $Matches[1];
+         $User = Gdn::UserModel()->GetByUsername($UserName);
+         if (!$User) return;
+         
+         $State['Targets']['User'] = (array)$User;
+         $UserID = GetValue('UserID', $User);
+
+         $RecordID = $Matches[2];
+
+         // First look it up as a comment
+         $CommentModel = new CommentModel();
+         $DiscussionModel = new DiscussionModel();
+         
+         $Comment = $CommentModel->GetID($RecordID, DATASET_TYPE_ARRAY);
+         if ($Comment) {
+            $State['Targets']['Comment'] = $Comment;
+            
+            $Discussion = $DiscussionModel->GetID($Comment['DiscussionID'], DATASET_TYPE_ARRAY);
+            $State['Targets']['Discussion'] = $Discussion;
+            
+         }
+         
+         if (!$Comment) {
+            $Discussion = $DiscussionModel->GetID($RecordID, DATASET_TYPE_ARRAY);
+            if ($Discussion)
+               $State['Targets']['Discussion'] = $Discussion;
+         }
+         
+      }
+   }
+   
+   public function CheckMonitor($Sender) {
+      
+      // Get the discussion and comment from args
+      $Discussion = (array)$Sender->EventArguments['Discussion'];
+      if (!is_array($Discussion['Attributes'])) {
+         $Discussion['Attributes'] = @unserialize($Discussion['Attributes']);
+         if (!is_array($Discussion['Attributes']))
+            $Discussion['Attributes'] = array();
+      }
+      
+      $Comment = NULL;
+      $Type = 'Discussion';
+      if (array_key_exists('Comment', $Sender->EventArguments)) {
+         $Comment = (array)$Sender->EventArguments['Comment'];
+         $Type = 'Comment';
+      }
+      
+      $IsMonitoring = $this->Monitoring($Discussion);
+      if (!$IsMonitoring) return;
+      
+      $this->EventArguments = array(
+         'Discussion'   => $Discussion
+      );
+      
+      if ($Type == 'Comment')
+         $this->EventArguments['Comment'] = $Comment;
+      
+      $this->FireEvent('Monitor');
+   }
+   
+   public function Monitoring($Discussion, $Attribute = NULL, $Default = NULL) {
+      $Minion = GetValueR('Attributes.Minion', $Discussion, array());
+      
+      $IsMonitoring = GetValue('Monitor', $Minion, FALSE);
+      if (!$IsMonitoring) return FALSE;
+      
+      if (is_null($Attribute)) return TRUE;
+      return GetValue($Attribute, $Minion, $Default);
+   }
+   
+   public function MonitorDiscussion($Discussion, $Options = NULL) {
+      $DiscussionModel = new DiscussionModel();
+      
+      $Minion = (array)GetValueR('Attributes.Minion', $Discussion, array());
+      $Minion['Monitor'] = TRUE;
+      
+      if (is_array($Options)) {
+         foreach ($Options as $Option => $OpVal) {
+            if ($OpVal == NULL)
+               unset($Minion[$Option]);
+            else
+               $Minion[$Option] = $OpVal;
+         }
+      }
+      
+      // Keep attribs sparse
+      if (sizeof($Minion) == 1)
+         return $this->StopMonitoringDiscussion($Discussion);
+      
+      $DiscussionModel->SetRecordAttribute($Discussion, 'Minion', $Minion);
+      $DiscussionModel->SaveToSerializedColumn('Attributes', $Discussion['DiscussionID'], 'Minion', $Minion);
+   }
+   
+   public function StopMonitoringDiscussion($Discussion) {
+      $DiscussionModel = new DiscussionModel();
+      $DiscussionModel->SetRecordAttribute($Discussion, 'Minion', NULL);
+      $DiscussionModel->SaveToSerializedColumn('Attributes', $Discussion['DiscussionID'], 'Minion', NULL);
+   }
+   
+   public function Acknowledge($Discussion, $Command, $Type = 'positive', $User = NULL) {
+      if (is_null($User))
+         $User = (array)Gdn::Session()->User;
+      
+      $DiscussionID = GetValue('DiscussionID', $Discussion);
+      $CommentModel = new CommentModel();
+      
+      $MessageText = NULL;
+      switch ($Type) {
+         case 'positive':
+            $MessageText = "Affirmative {User.Name}. {Command}";
+            break;
+         
+         case 'negative':
+            $MessageText = "Negative {User.Name}";
+            break;
+         
+         default:
+            $MessageText = "{$Command}";
+            break;
+      }
+      
+      $MessageText = FormatString($MessageText, array(
+         'User'         => $User,
+         'Discussion'   => $Discussion,
+         'Command'      => $Command
+      ));
+      
+      $MinionCommentID = NULL;
+      if ($MessageText) {
+         $MinionCommentID = $CommentModel->Save(array(
+            'DiscussionID' => $DiscussionID,
+            'Body'         => $MessageText,
+            'Format'       => 'Html',
+            'InsertUserID' => $this->MinionUserID
+         ));
+      }
+      
+      if ($MinionCommentID) {
+         $CommentModel->Save2($MinionCommentID, TRUE);
+      }
+      
+      Gdn::Controller()->InformMessage($MessageText);
+   }
+   
+   /**
     *
     * @param PluginController $Sender
     */
