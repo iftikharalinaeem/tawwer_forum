@@ -215,12 +215,15 @@ class MinionPlugin extends Gdn_Plugin {
       $ObjectLines = explode("\n", $ObjectBody);
       foreach ($ObjectLines as $ObjectLine) {
          
-         $Objects = explode(' ', $ObjectLine);
-         $CallName = array_shift($Objects);
-         $CallName = trim($CallName,' ,.');
-
-         if (strtolower($CallName) != strtolower($MinionName))
+         // Check if this is a call to the bot
+         
+         if (!StringBeginsWith($ObjectLine, $MinionName, TRUE))
             continue;
+         
+         $Objects = explode(' ', $ObjectLine);
+         $MinionNameSpaces = substr_count($MinionName, ' ') + 1;
+         for ($i = 0; $i < $MinionNameSpaces; $i++)
+            array_shift($Objects);
          
          $Command = trim(implode(' ', $Objects));
          
