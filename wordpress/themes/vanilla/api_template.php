@@ -111,6 +111,14 @@
          <div class="item"><a href="/blog/api-online-count">/online/count</a></div>
       </div>
    </div>
+   
+   <div class="api_section">
+      <div class="section_heading">Signature</div>
+      <div class="section_contents">
+         <div class="item"><a href="/blog/api-signature-get">/signature/get</a></div>
+         <div class="item"><a href="/blog/api-signature-set">/signature/set</a></div>
+      </div>
+   </div>
 </div>
 
 <div id="content" class="api">

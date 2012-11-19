@@ -314,16 +314,39 @@ class MinionPlugin extends Gdn_Plugin {
                if (empty($State['Force']) && in_array($State['Token'], array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer')))
                   $this->Consume($State, 'Force', 'low');
 
-               if (empty($State['Force']) && in_array($State['Token'], array('weapon', 'weapons', 'power', 'minor')))
+               if (empty($State['Force']) && in_array($State['Token'], array('weapon', 'weapons', 'power', 'cook', 'simmer', 'minor')))
                   $this->Consume($State, 'Force', 'medium');
-
-               if (empty($State['Force']) && in_array($State['Token'], array('kill', 'lethal', 'nuke', 'nuclear', 'destroy', 'major')))
+               
+               if (empty($State['Force']) && in_array($State['Token'], array('volts', 'extreme', 'slugs', 'broil', 'sear', 'major')))
                   $this->Consume($State, 'Force', 'high');
+
+               if (empty($State['Force']) && in_array($State['Token'], array('kill', 'lethal', 'nuke', 'nuclear', 'destroy')))
+                  $this->Consume($State, 'Force', 'lethal');
+               
+               // Defcon forces
+               if ($State['Method'] == 'force' && empty($State['Force'])) {
+                  if (in_array($State['Token'], array('one', '1')))
+                     $this->Consume($State, 'Force', 'ban');
+                  
+                  if (in_array($State['Token'], array('two', '2')))
+                     $this->Consume($State, 'Force', 'high');
+                  
+                  if (in_array($State['Token'], array('three', '3')))
+                     $this->Consume($State, 'Force', 'medium');
+                  
+                  if (in_array($State['Token'], array('four', '4')))
+                     $this->Consume($State, 'Force', 'low');
+                  
+                  if (in_array($State['Token'], array('five', '5')))
+                     $this->Consume($State, 'Force', 'low');
+               }
                
                // Conditional forces
-               if (!empty($State['Method']) && empty($State['Force']) && in_array($State['Token'], array('warning', 'warn')))
-                  $this->Consume($State, 'Force', 'warn');
-
+               if (!empty($State['Method']) && empty($State['Force'])) {
+                  if (in_array($State['Token'], array('warning', 'warn')))
+                     $this->Consume($State, 'Force', 'warn');
+               }
+               
                /*
                 * TARGETS
                 */
@@ -352,11 +375,11 @@ class MinionPlugin extends Gdn_Plugin {
                 * METHODS
                 */
                
-               if (!$State['Method'] && in_array($State['Token'], array('thread')))
-                  $this->Consume($State, 'Method', 'thread');
-
                if (!$State['Method'] && in_array($State['Token'], array('report')))
                   $this->Consume($State, 'Method', 'report in');
+               
+               if (!$State['Method'] && in_array($State['Token'], array('thread')))
+                  $this->Consume($State, 'Method', 'thread');
                
                if (!$State['Method'] && in_array($State['Token'], array('shoot','peace', 'weapon', 'weapons', 'posture', 'free', 'defcon', 'phasers')))
                   $this->Consume($State, 'Method', 'force');
