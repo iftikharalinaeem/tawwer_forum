@@ -308,13 +308,13 @@ class MinionPlugin extends Gdn_Plugin {
                 * FORCE
                 */
 
-               if (empty($State['Force']) && in_array($State['Token'], array('stun', 'blanks')))
+               if (empty($State['Force']) && in_array($State['Token'], array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer')))
                   $this->Consume($State, 'Force', 'low');
 
-               if (empty($State['Force']) && in_array($State['Token'], array('weapon', 'weapons', 'power')))
+               if (empty($State['Force']) && in_array($State['Token'], array('weapon', 'weapons', 'power', 'minor')))
                   $this->Consume($State, 'Force', 'medium');
 
-               if (empty($State['Force']) && in_array($State['Token'], array('kill', 'lethal', 'nuke', 'nuclear', 'destroy')))
+               if (empty($State['Force']) && in_array($State['Token'], array('kill', 'lethal', 'nuke', 'nuclear', 'destroy', 'major')))
                   $this->Consume($State, 'Force', 'high');
                
                // Conditional forces
