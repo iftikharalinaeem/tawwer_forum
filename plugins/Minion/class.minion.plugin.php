@@ -471,6 +471,7 @@ class MinionPlugin extends Gdn_Plugin {
             break;
          
          case 'thread':
+            $DiscussionModel = new DiscussionModel();
             $Closed = GetValue('Closed', $State['Targets']['Discussion'], FALSE);
             $DiscussionID = $State['Targets']['Discussion']['DiscussionID'];
             
