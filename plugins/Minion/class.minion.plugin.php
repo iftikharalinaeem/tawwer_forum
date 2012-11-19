@@ -314,10 +314,10 @@ class MinionPlugin extends Gdn_Plugin {
                if (empty($State['Force']) && in_array($State['Token'], array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer')))
                   $this->Consume($State, 'Force', 'low');
 
-               if (empty($State['Force']) && in_array($State['Token'], array('weapon', 'weapons', 'power', 'minor')))
+               if (empty($State['Force']) && in_array($State['Token'], array('weapon', 'weapons', 'power', 'cook', 'simmer', 'minor')))
                   $this->Consume($State, 'Force', 'medium');
                
-               if (empty($State['Force']) && in_array($State['Token'], array('volts', 'extreme', 'slugs', 'sear', 'major')))
+               if (empty($State['Force']) && in_array($State['Token'], array('volts', 'extreme', 'slugs', 'broil', 'sear', 'major')))
                   $this->Consume($State, 'Force', 'high');
 
                if (empty($State['Force']) && in_array($State['Token'], array('kill', 'lethal', 'nuke', 'nuclear', 'destroy')))
