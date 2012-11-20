@@ -239,6 +239,7 @@ class MinionPlugin extends Gdn_Plugin {
             'Method'    => NULL,
             'Toggle'    => NULL,
             'Gather'    => FALSE,
+            'Consume'   => FALSE,
             'Command'   => $Command,
             'Tokens'    => 0,
             'Parsed'    => 0
@@ -386,6 +387,15 @@ class MinionPlugin extends Gdn_Plugin {
                
                if (!$State['Method'] && in_array($State['Token'], array('stand')))
                   $this->Consume($State, 'Method', 'stop all');
+               
+               /*
+                * FOR
+                */
+               
+               if (in_array($State['Token'], array('for', 'because')))
+                  $this->ConsumeUntilNextKeyword($State, 'For', FALSE, TRUE);
+               
+               $this->ConsumeUntilNextKeyword($State);
 
                $this->FireEvent('Token');
             }
@@ -402,33 +412,42 @@ class MinionPlugin extends Gdn_Plugin {
           * PARAMETERS
           */
 
-         // If the rest is just gravy
+         // Gather any remaining tokens into the 'gravy' field
          if ($State['Method']) {
             $CommandTokens = explode(' ', $Command);
             $Gravy = array_slice($CommandTokens, $State['Tokens']);
             $State['Gravy'] = implode(' ', $Gravy);
          }
          
+         if ($State['Consume']) {
+            $State['Consume']['Container'] = trim($State['Consume']['Container']);
+            unset($State['Consume']);
+         }
+         
          // Parse this resolved State into potential actions
 
+         $this->ParseFor($State);
          $this->ParseCommand($State, $Actions);
          
       }
       
-      // Perform actions
+      unset($State);
+      
+      // Perform all actions
       $Performed = array();
       foreach ($Actions as $Action) {
          $ActionName = array_shift($Action);
          $Permission = array_shift($Action);
-         if (!Gdn::Session()->CheckPermission($Permission)) continue;
+         if (!empty($Permission) && !Gdn::Session()->CheckPermission($Permission)) continue;
          if (in_array($Action, $Performed)) continue;
          
+         $State = array_shift($Action);
          $Performed[] = $ActionName;
          $Args = array($ActionName, $State);
          call_user_func_array(array($this, 'MinionAction'), $Args);
       }
       
-  }
+   }
    
    /**
     * Consume a token
@@ -438,9 +457,107 @@ class MinionPlugin extends Gdn_Plugin {
     * @param mixed $Value
     */
    public function Consume(&$State, $Setting = NULL, $Value = NULL) {
+      
       $State['Tokens'] = $State['Parsed'];
       if (!is_null($Setting))
          $State[$Setting] = $Value;
+   }
+   
+   /**
+    * Consume tokens until we encounter the next keyword
+    * 
+    * @param array $State
+    * @param string $Setting Optional. Start new consumption 
+    * @param boolean $Multi Create multiple entries if the same keyword is consumed multiple times?
+    */
+   public function ConsumeUntilNextKeyword(&$State, $Setting = NULL, $Inclusive = FALSE, $Multi = FALSE) {
+      
+      if (!is_null($Setting)) {
+         
+         // Cleanup existing Consume
+         if ($State['Consume'] !== FALSE) {
+            $State['Consume']['Container'] = trim($State['Consume']['Container']);
+            $State['Consume'] = FALSE;
+         }
+         
+         // What setting are we consuming for?
+         $State['Consume'] = array(
+            'Setting'   => $Setting,
+            'Skip'      => $Inclusive ? 0 : 1
+         );
+         
+         // Prepare the target
+         if ($Multi) {
+            if (array_key_exists($Setting, $State)) {
+               if (!is_array($State[$Setting])) {
+                  $State[$Setting] = array($State[$Setting]);
+               }
+            } else {
+               $State[$Setting] = array();
+            }
+            
+            $State['Consume']['Container'] = &$State[$Setting][];
+            $State['Consume']['Container'] = '';
+         } else {
+            $State[$Setting] = '';
+            $State['Consume']['Container'] = &$State[$Setting];
+         }
+         
+         // Never include the actual triggering keyword
+         return;
+      }
+      
+      if ($State['Consume'] !== FALSE) {
+         // If Tokens == Parsed, something else already consumed on this run, as we stop
+         if ($State['Tokens'] == $State['Parsed']) {
+            $State['Consume']['Container'] = trim($State['Consume']['Container']);
+            $State['Consume'] = FALSE;
+            return;
+         } else {
+            $State['Tokens'] = $State['Parsed'];
+         }
+         
+         // Allow skipping tokens
+         if ($State['Consume']['Skip']) {
+            $State['Consume']['Skip']--;
+            return;
+         }
+         
+         $State['Consume']['Container'] .= "{$State['Token']} ";
+      }
+   }
+   
+   /**
+    * 
+    * @param type $State
+    */
+   public static function ParseFor(&$State) {
+      if (!array_key_exists('For', $State)) return;
+      
+      $Unset = array();
+      $Fors = sizeof($State['For']);
+      for ($i = 0; $i < $Fors; $i++) {
+         $For = $State['For'][$i];
+         $Tokens = explode(' ', $For);
+         if (!sizeof($Tokens)) continue;
+         
+         // Maybe a time!
+         if (is_numeric($Tokens[0])) {
+            if (($Time = strtotime("+{$For}")) !== FALSE) {
+               $Unset[] = $i;
+               $State['Time'] = $For;
+               continue;
+            }
+         }
+         
+         // Nope, its a reason
+         $Unset[] = $i;
+         $State['Reason'] = $For;
+      }
+      
+      // Delete parsed elements
+      foreach ($Unset as $UnsetKey)
+         unset($State['For'][$UnsetKey]);
    }
    
    /**
@@ -455,13 +572,13 @@ class MinionPlugin extends Gdn_Plugin {
          // Report in
          case 'report in':
             if (array_key_exists('Discussion', $State['Sources']))
-               $Actions[] = array('report in', 'Vanilla.Comments.Edit');
+               $Actions[] = array('report in', 'Vanilla.Comments.Edit', $State);
             break;
          
          // Threads
          case 'thread':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Actions[] = array('thread', 'Vanilla.Comments.Edit');
+            $Actions[] = array('thread', 'Vanilla.Comments.Edit', $State);
             break;
 
          // Adjust automated force level
@@ -469,12 +586,12 @@ class MinionPlugin extends Gdn_Plugin {
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
             $Forces = array('warn', 'low', 'medium', 'high');
             if (in_array($State['Force'], $Forces))
-               $Actions[] = array("force", 'Vanilla.Comments.Edit');
+               $Actions[] = array("force", 'Vanilla.Comments.Edit', $State);
             break;
             
          case 'stop all':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Actions[] = array("stop all", 'Vanilla.Comments.Edit');
+            $Actions[] = array("stop all", 'Vanilla.Comments.Edit', $State);
             break;
       }
       
