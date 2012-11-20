@@ -528,8 +528,9 @@ class MinionPlugin extends Gdn_Plugin {
    }
    
    /**
+    * Parse the 'For' keywords into Time and Reason keywords as appropriate
     * 
-    * @param type $State
+    * @param array $State
     */
    public static function ParseFor(&$State) {
       if (!array_key_exists('For', $State)) return;
