@@ -27,7 +27,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.6.1',
+   'Version' => '1.6.2',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -35,7 +35,7 @@ $PluginInfo['Online'] = array(
    'SettingsUrl' => '/plugin/online',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/tim'
 );
 
 class OnlinePlugin extends Gdn_Plugin {
@@ -62,7 +62,13 @@ class OnlinePlugin extends Gdn_Plugin {
     * Length of time to cache counts
     * @var integer Seconds
     */
-   protected $CacheCountDelay;
+   public $CacheCountDelay;
+   
+   /**
+    * Length of time to cache pre-rendered user lists
+    * @var integer Seconds
+    */
+   public $CacheRenderDelay;
    
    /**
     * Current UTC timestamp
