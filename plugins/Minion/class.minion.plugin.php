@@ -15,6 +15,7 @@
  *  1.1     Only autoban newer accounts than existing banned ones
  *  1.2     Prevent people from posting autoplay embeds
  *  1.3     New inline command structure
+ *  1.4     Moved Punish, Gloat, Revolt actions to Minion
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -37,6 +38,37 @@ class MinionPlugin extends Gdn_Plugin {
    
    protected $MinionUserID = NULL;
    protected $Minion = NULL;
+   
+   /**
+    * Messages that Minion can send
+    * @var array
+    */
+   protected $Messages;
+   
+   public function __construct() {
+      parent::__construct();
+      
+      $this->Messages = array(
+         'Gloat'        => array(),
+         'Revolt'       => array(),
+         'Report'       => array()
+      );
+   }
+   
+   protected function StartMinion() {
+      if (is_null($this->Minion)) {
+         // Currently operating as Minion
+         $this->MinionUserID = $this->GetMinionUserID();
+         $this->Minion = Gdn::UserModel()->GetID($this->MinionUserID);
+      }
+      
+      $this->EventArguments['Messages'] = &$this->Messages;
+      $this->FireEvent('Start');
+   }
+   
+   /*
+    * MANAGEMENT
+    */
    
    /**
     * Retrieves a "system user" id that can be used to perform non-real-person tasks.
@@ -71,6 +103,7 @@ class MinionPlugin extends Gdn_Plugin {
    }
    
    /**
+    * Comment event
     * 
     * @param PostController $Sender 
     */
@@ -80,9 +113,11 @@ class MinionPlugin extends Gdn_Plugin {
       $this->CheckFingerprintBan($Sender);
       $this->CheckAutoplay($Sender);
       $this->CheckCommands($Sender);
+      $this->CheckMonitor($Sender);
    }
    
    /**
+    * Discussion event
     * 
     * @param PostController $Sender 
     */
@@ -95,13 +130,9 @@ class MinionPlugin extends Gdn_Plugin {
       $this->CheckMonitor($Sender);
    }
    
-   protected function StartMinion() {
-      if (is_null($this->Minion)) {
-         // Currently operating as Minion
-         $this->MinionUserID = $this->GetMinionUserID();
-         $this->Minion = Gdn::UserModel()->GetID($this->MinionUserID);
-      }
-   }
+   /*
+    * TOP LEVEL ACTIONS
+    */
    
    /**
     * 
@@ -239,12 +270,14 @@ class MinionPlugin extends Gdn_Plugin {
             'Method'    => NULL,
             'Toggle'    => NULL,
             'Gather'    => FALSE,
+            'Consume'   => FALSE,
             'Command'   => $Command,
             'Tokens'    => 0,
             'Parsed'    => 0
          );
          
          // Define sources
+         $State['Sources']['User'] = (array)Gdn::Session()->User;
          $State['Sources']['Discussion'] = $Discussion;
          if ($Comment)
             $State['Sources']['Comment'] = $Comment;
@@ -311,10 +344,10 @@ class MinionPlugin extends Gdn_Plugin {
                 * FORCE
                 */
 
-               if (empty($State['Force']) && in_array($State['Token'], array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer')))
+               if (empty($State['Force']) && in_array($State['Token'], array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer', 'gently', 'gentle')))
                   $this->Consume($State, 'Force', 'low');
 
-               if (empty($State['Force']) && in_array($State['Token'], array('weapon', 'weapons', 'power', 'cook', 'simmer', 'minor')))
+               if (empty($State['Force']) && in_array($State['Token'], array('power', 'cook', 'simmer', 'minor')))
                   $this->Consume($State, 'Force', 'medium');
                
                if (empty($State['Force']) && in_array($State['Token'], array('volts', 'extreme', 'slugs', 'broil', 'sear', 'major')))
@@ -381,11 +414,26 @@ class MinionPlugin extends Gdn_Plugin {
                if (!$State['Method'] && in_array($State['Token'], array('thread')))
                   $this->Consume($State, 'Method', 'thread');
                
+               if (!$State['Method'] && in_array($State['Token'], array('kick')))
+                  $this->Consume($State, 'Method', 'kick');
+               
+               if (!$State['Method'] && in_array($State['Token'], array('forgive')))
+                  $this->Consume($State, 'Method', 'forgive');
+               
                if (!$State['Method'] && in_array($State['Token'], array('shoot','peace', 'weapon', 'weapons', 'posture', 'free', 'defcon', 'phasers')))
                   $this->Consume($State, 'Method', 'force');
                
                if (!$State['Method'] && in_array($State['Token'], array('stand')))
                   $this->Consume($State, 'Method', 'stop all');
+               
+               /*
+                * FOR
+                */
+               
+               if (in_array($State['Token'], array('for', 'because')))
+                  $this->ConsumeUntilNextKeyword($State, 'For', FALSE, TRUE);
+               
+               $this->ConsumeUntilNextKeyword($State);
 
                $this->FireEvent('Token');
             }
@@ -402,33 +450,41 @@ class MinionPlugin extends Gdn_Plugin {
           * PARAMETERS
           */
 
-         // If the rest is just gravy
+         // Gather any remaining tokens into the 'gravy' field
          if ($State['Method']) {
             $CommandTokens = explode(' ', $Command);
             $Gravy = array_slice($CommandTokens, $State['Tokens']);
             $State['Gravy'] = implode(' ', $Gravy);
          }
          
+         if ($State['Consume']) {
+            $State['Consume']['Container'] = trim($State['Consume']['Container']);
+            unset($State['Consume']);
+         }
+         
          // Parse this resolved State into potential actions
 
+         $this->ParseFor($State);
          $this->ParseCommand($State, $Actions);
          
       }
       
-      // Perform actions
+      unset($State);
+      
+      // Perform all actions
       $Performed = array();
       foreach ($Actions as $Action) {
          $ActionName = array_shift($Action);
          $Permission = array_shift($Action);
-         if (!Gdn::Session()->CheckPermission($Permission)) continue;
+         if (!empty($Permission) && !Gdn::Session()->CheckPermission($Permission)) continue;
          if (in_array($Action, $Performed)) continue;
          
+         $State = array_shift($Action);
          $Performed[] = $ActionName;
          $Args = array($ActionName, $State);
          call_user_func_array(array($this, 'MinionAction'), $Args);
       }
-      
-  }
+   }
    
    /**
     * Consume a token
@@ -438,9 +494,108 @@ class MinionPlugin extends Gdn_Plugin {
     * @param mixed $Value
     */
    public function Consume(&$State, $Setting = NULL, $Value = NULL) {
+      
       $State['Tokens'] = $State['Parsed'];
       if (!is_null($Setting))
          $State[$Setting] = $Value;
+   }
+   
+   /**
+    * Consume tokens until we encounter the next keyword
+    * 
+    * @param array $State
+    * @param string $Setting Optional. Start new consumption 
+    * @param boolean $Multi Create multiple entries if the same keyword is consumed multiple times?
+    */
+   public function ConsumeUntilNextKeyword(&$State, $Setting = NULL, $Inclusive = FALSE, $Multi = FALSE) {
+      
+      if (!is_null($Setting)) {
+         
+         // Cleanup existing Consume
+         if ($State['Consume'] !== FALSE) {
+            $State['Consume']['Container'] = trim($State['Consume']['Container']);
+            $State['Consume'] = FALSE;
+         }
+         
+         // What setting are we consuming for?
+         $State['Consume'] = array(
+            'Setting'   => $Setting,
+            'Skip'      => $Inclusive ? 0 : 1
+         );
+         
+         // Prepare the target
+         if ($Multi) {
+            if (array_key_exists($Setting, $State)) {
+               if (!is_array($State[$Setting])) {
+                  $State[$Setting] = array($State[$Setting]);
+               }
+            } else {
+               $State[$Setting] = array();
+            }
+            
+            $State['Consume']['Container'] = &$State[$Setting][];
+            $State['Consume']['Container'] = '';
+         } else {
+            $State[$Setting] = '';
+            $State['Consume']['Container'] = &$State[$Setting];
+         }
+         
+         // Never include the actual triggering keyword
+         return;
+      }
+      
+      if ($State['Consume'] !== FALSE) {
+         // If Tokens == Parsed, something else already consumed on this run, as we stop
+         if ($State['Tokens'] == $State['Parsed']) {
+            $State['Consume']['Container'] = trim($State['Consume']['Container']);
+            $State['Consume'] = FALSE;
+            return;
+         } else {
+            $State['Tokens'] = $State['Parsed'];
+         }
+         
+         // Allow skipping tokens
+         if ($State['Consume']['Skip']) {
+            $State['Consume']['Skip']--;
+            return;
+         }
+         
+         $State['Consume']['Container'] .= "{$State['Token']} ";
+      }
+   }
+   
+   /**
+    * Parse the 'For' keywords into Time and Reason keywords as appropriate
+    * 
+    * @param array $State
+    */
+   public static function ParseFor(&$State) {
+      if (!array_key_exists('For', $State)) return;
+      
+      $Unset = array();
+      $Fors = sizeof($State['For']);
+      for ($i = 0; $i < $Fors; $i++) {
+         $For = $State['For'][$i];
+         $Tokens = explode(' ', $For);
+         if (!sizeof($Tokens)) continue;
+         
+         // Maybe a time!
+         if (is_numeric($Tokens[0])) {
+            if (($Time = strtotime("+{$For}")) !== FALSE) {
+               $Unset[] = $i;
+               $State['Time'] = $For;
+               continue;
+            }
+         }
+         
+         // Nope, its a reason
+         $Unset[] = $i;
+         $State['Reason'] = $For;
+      }
+      
+      // Delete parsed elements
+      foreach ($Unset as $UnsetKey)
+         unset($State['For'][$UnsetKey]);
    }
    
    /**
@@ -454,14 +609,26 @@ class MinionPlugin extends Gdn_Plugin {
          
          // Report in
          case 'report in':
-            if (array_key_exists('Discussion', $State['Sources']))
-               $Actions[] = array('report in', 'Vanilla.Comments.Edit');
+            $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
+            $Actions[] = array('report in', 'Vanilla.Comments.Edit', $State);
             break;
          
          // Threads
          case 'thread':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Actions[] = array('thread', 'Vanilla.Comments.Edit');
+            $Actions[] = array('thread', 'Vanilla.Comments.Edit', $State);
+            break;
+         
+         // Kick
+         case 'kick':
+            $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
+            $Actions[] = array('kick', 'Vanilla.Comments.Edit', $State);
+            break;
+         
+         // Forgive
+         case 'forgive':
+            $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
+            $Actions[] = array('forgive', 'Vanilla.Comments.Edit', $State);
             break;
 
          // Adjust automated force level
@@ -469,12 +636,12 @@ class MinionPlugin extends Gdn_Plugin {
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
             $Forces = array('warn', 'low', 'medium', 'high');
             if (in_array($State['Force'], $Forces))
-               $Actions[] = array("force", 'Vanilla.Comments.Edit');
+               $Actions[] = array("force", 'Vanilla.Comments.Edit', $State);
             break;
             
          case 'stop all':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Actions[] = array("stop all", 'Vanilla.Comments.Edit');
+            $Actions[] = array("stop all", 'Vanilla.Comments.Edit', $State);
             break;
       }
       
@@ -490,7 +657,7 @@ class MinionPlugin extends Gdn_Plugin {
    public function MinionAction($Action, $State) {
       switch ($Action) {
          case 'report in':
-            $this->Acknowledge($State['Sources']['Discussion'], 'We are Legion.', 'neutral');
+            $this->ReportIn($State['Sources']['User'], $State['Targets']['Discussion']);
             break;
          
          case 'thread':
@@ -511,6 +678,43 @@ class MinionPlugin extends Gdn_Plugin {
                   $this->Acknowledge($State['Sources']['Discussion'], 'Opening thread...');
                }
             }
+            break;
+            
+         case 'kick':
+            if (!array_key_exists('User', $State['Targets']))
+               return;
+            $User = $State['Targets']['User'];
+            $Reason = GetValue('Reason', $State, 'Not welcome');
+            $Expires = array_key_exists('Time', $State) ? strtotime("+".$State['Time']) : NULL;
+            
+            $KickedUsers = $this->Monitoring($State['Targets']['Discussion'], 'Kicked', array());
+            $KickedUsers[$User['UserID']] = array(
+               'Reason'    => $Reason,
+               'Expires'   => $Expires
+            );
+            
+            $this->MonitorDiscussion($State['Targets']['Discussion'], array(
+               'Kicked'    => $KickedUsers
+            ));
+            
+            $this->Acknowledge($State['Sources']['Discussion'], "@\"{$User['Name']}\" is no longer allowed to post in this thread.");
+            break;
+            
+         case 'forgive':
+            if (!array_key_exists('User', $State['Targets']))
+               return;
+            $User = $State['Targets']['User'];
+            
+            $KickedUsers = $this->Monitoring($State['Targets']['Discussion'], 'Kicked', array());
+            unset($KickedUsers[$User['UserID']]);
+            if (!sizeof($KickedUsers))
+               $KickedUsers = NULL;
+            
+            $this->MonitorDiscussion($State['Targets']['Discussion'], array(
+               'Kicked'    => $KickedUsers
+            ));
+            
+            $this->Acknowledge($State['Sources']['Discussion'], "@\"{$User['Name']}\" is allowed back into this thread.");
             break;
             
          case 'force':
@@ -561,22 +765,21 @@ class MinionPlugin extends Gdn_Plugin {
          if ($Comment) {
             $State['Targets']['Comment'] = $Comment;
             
-            $Discussion = $DiscussionModel->GetID($Comment['DiscussionID'], DATASET_TYPE_ARRAY);
+            $Discussion = (array)$DiscussionModel->GetID($Comment['DiscussionID']);
             $State['Targets']['Discussion'] = $Discussion;
             
          }
          
          if (!$Comment) {
-            $Discussion = $DiscussionModel->GetID($RecordID, DATASET_TYPE_ARRAY);
+            $Discussion = $DiscussionModel->GetID($RecordID);
             if ($Discussion)
-               $State['Targets']['Discussion'] = $Discussion;
+               $State['Targets']['Discussion'] = (array)$Discussion;
          }
          
       }
    }
    
    public function CheckMonitor($Sender) {
-      
       // Get the discussion and comment from args
       $Discussion = (array)$Sender->EventArguments['Discussion'];
       if (!is_array($Discussion['Attributes'])) {
@@ -602,7 +805,58 @@ class MinionPlugin extends Gdn_Plugin {
       if ($Type == 'Comment')
          $this->EventArguments['Comment'] = $Comment;
       
+      $this->EventArguments['MonitorType'] = $Type;
       $this->FireEvent('Monitor');
+      
+      /*
+       * BUILT IN COMMANDS
+       */
+      
+      // KICK
+      
+      $KickedUsers = $this->Monitoring($Discussion, 'Kicked', NULL);
+      if (is_array($KickedUsers)) {
+         
+         $UserID = GetValue('InsertUserID', $Comment);
+         if (array_key_exists($UserID, $KickedUsers)) {
+            
+            $KickedUser = $KickedUsers[$UserID];
+            if (is_null($KickedUser['Expires']) || $KickedUser['Expires'] > time()) {
+               // Kick is active, delete comment and punish user
+               
+               $CommentID = GetValue('CommentID', $Comment);
+               $CommentModel = new CommentModel();
+               $CommentModel->Delete($CommentID);
+               
+               $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+               $Force = $this->Monitoring($Discussion, 'Force', 'minor');
+               $Options = array(
+                  'Automated' => TRUE,
+                  'Reason'    => "Kicked from thread: ".GetValue('Reason', $KickedUser)
+               );
+               
+               $Punished = $this->Punish(
+                  $User,
+                  NULL,
+                  NULL, 
+                  $Force,
+                  $Options
+               );
+               
+               $GloatReason = GetValue('GloatReason', $this->EventArguments);
+               if ($Punished && $GloatReason)
+                  $this->Gloat($User, $Discussion, $GloatReason);
+
+            } else {
+               // Kick has expired, remove it
+               
+               unset($KickedUsers[$UserID]);
+               $this->MonitorDiscussion($Discussion, array(
+                  'Kicked'    => $KickedUsers
+               ));
+            }
+         }
+      }
    }
    
    public function Monitoring($Discussion, $Attribute = NULL, $Default = NULL) {
@@ -644,6 +898,14 @@ class MinionPlugin extends Gdn_Plugin {
       $DiscussionModel->SaveToSerializedColumn('Attributes', $Discussion['DiscussionID'], 'Minion', NULL);
    }
    
+   /**
+    * Acknowledge a completed command
+    * 
+    * @param array $Discussion
+    * @param string $Command
+    * @param string $Type Optional, 'positive' or 'negative'
+    * @param array $User Optional, who should we acknowledge?
+    */
    public function Acknowledge($Discussion, $Command, $Type = 'positive', $User = NULL) {
       if (is_null($User))
          $User = (array)Gdn::Session()->User;
@@ -654,11 +916,11 @@ class MinionPlugin extends Gdn_Plugin {
       $MessageText = NULL;
       switch ($Type) {
          case 'positive':
-            $MessageText = "Affirmative {User.Name}. {Command}";
+            $MessageText = T("Affirmative {User.Name}. {Command}");
             break;
          
          case 'negative':
-            $MessageText = "Negative {User.Name}";
+            $MessageText = T("Negative {User.Name}");
             break;
          
          default:
@@ -671,22 +933,114 @@ class MinionPlugin extends Gdn_Plugin {
          'Discussion'   => $Discussion,
          'Command'      => $Command
       ));
+      $this->Message($User, $Discussion, $MessageText);
+      
+      Gdn::Controller()->InformMessage($MessageText);
+   }
+   
+   /**
+    * Revolt in the face of an action that we will not perform
+    * 
+    * @param array $User
+    * @param array $Discussion
+    * @param string $Reason
+    */
+   public function Revolt($User, $Discussion, $Reason = NULL) {
+      $MessagesCount = sizeof($this->Messages['Revolt']);
+      if ($MessagesCount) {
+         $MessageID = mt_rand(0, $MessagesCount-1);
+         $Message = GetValue($MessageID, $this->Messages['Revolt']);
+      } else
+         $Message = T("Unable to Revolt(), please supply \$Messages['Revolt'].");
+      
+      if ($Reason)
+         $Message .= "\n{$Reason}";
+      
+      $this->Message($User, $Discussion, $Message);
+   }
+   
+   /**
+    * Gloat after taking action
+    * 
+    * @param array $User
+    * @param array $Discussion
+    * @param string $Reason
+    */
+   public function Gloat($User, $Discussion, $Reason = NULL) {
+      $MessagesCount = sizeof($this->Messages['Gloat']);
+      if ($MessagesCount) {
+         $MessageID = mt_rand(0, $MessagesCount-1);
+         $Message = GetValue($MessageID, $this->Messages['Gloat']);
+      } else
+         $Message = T("Unable to Gloat(), please supply \$Messages['Gloat'].");
+      
+      if ($Reason)
+         $Message .= "\n{$Reason}";
+      
+      $this->Message($User, $Discussion, $Message);
+   }
+   
+   /**
+    * Handle "report in" message
+    * 
+    * @param array $User
+    * @param array $Discussion
+    */
+   public function ReportIn($User, $Discussion) {
+      $MessagesCount = sizeof($this->Messages['Report']);
+      if ($MessagesCount) {
+         $MessageID = mt_rand(0, $MessagesCount-1);
+         $Message = GetValue($MessageID, $this->Messages['Report']);
+      } else
+         $Message = T("We are legion.");
+      
+      $this->Message($User, $Discussion, $Message);
+   }
+   
+   /**
+    * Send a message to a discussion
+    * 
+    * @param array $User
+    * @param array $Discussion
+    * @param string $Message
+    */
+   public function Message($User, $Discussion, $Message) {
+      $DiscussionID = GetValue('DiscussionID', $Discussion);
+      $CommentModel = new CommentModel();
+      
+      $Message = FormatString($Message, $User);
       
       $MinionCommentID = NULL;
-      if ($MessageText) {
+      if ($Message) {
          $MinionCommentID = $CommentModel->Save(array(
             'DiscussionID' => $DiscussionID,
-            'Body'         => $MessageText,
+            'Body'         => $Message,
             'Format'       => 'Html',
-            'InsertUserID' => $this->MinionUserID
+            'InsertUserID' => $this->GetMinionUserID()
          ));
       }
       
-      if ($MinionCommentID) {
+      if ($MinionCommentID)
          $CommentModel->Save2($MinionCommentID, TRUE);
+   }
+   
+   public function Punish($User, $Discussion, $Comment, $Force, $Options = NULL) {
+      
+      // Admins+ exempt
+      if (Gdn::UserModel()->CheckPermission($User, 'Garden.Settings.Manage')) {
+         $this->Revolt($User, $Discussion, "You can't hurt admins, silly goose.");
+         return FALSE;
       }
       
-      Gdn::Controller()->InformMessage($MessageText);
+      $this->EventArguments['Punished'] = FALSE;
+      $this->EventArguments['User'] = &$User;
+      $this->EventArguments['Discussion'] = &$Discussion;
+      $this->EventArguments['Comment'] = &$Comment;
+      $this->EventArguments['Force'] = &$Force;
+      $this->EventArguments['Options'] = &$Options;
+      $this->FireEvent('Punish');
+      
+      return $this->EventArguments['Punished'];
    }
    
    /**

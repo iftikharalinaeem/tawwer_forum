@@ -188,6 +188,8 @@ class OnlineModule extends Gdn_Module {
       
       $this->GetData();
       
+      uksort($this->OnlineUsers, 'strnatcasecmp');
+      
       $OutputString = '';
       ob_start();
       

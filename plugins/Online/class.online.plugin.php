@@ -17,6 +17,7 @@
  *  1.5.1   Fix inconsistent timezone handling
  *  1.6     Add SimpleAPI hooks
  *  1.6.1   Add online/count API hook
+ *  1.6.3   Natsort OnlineUsers before rendering
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -27,7 +28,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.6.2',
+   'Version' => '1.6.3',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
