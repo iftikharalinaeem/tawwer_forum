@@ -1020,9 +1020,8 @@ class MinionPlugin extends Gdn_Plugin {
          ));
       }
       
-      if ($MinionCommentID) {
+      if ($MinionCommentID)
          $CommentModel->Save2($MinionCommentID, TRUE);
-      }
    }
    
    public function Punish($User, $Discussion, $Comment, $Force, $Options = NULL) {
