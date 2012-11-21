@@ -26,7 +26,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.3',
+   'Version' => '1.4.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -344,7 +344,7 @@ class MinionPlugin extends Gdn_Plugin {
                 * FORCE
                 */
 
-               if (empty($State['Force']) && in_array($State['Token'], array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer', 'gently', 'gentle')))
+               if (empty($State['Force']) && in_array($State['Token'], array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer', 'gently', 'gentle', 'peacekeeper')))
                   $this->Consume($State, 'Force', 'low');
 
                if (empty($State['Force']) && in_array($State['Token'], array('power', 'cook', 'simmer', 'minor')))
@@ -420,7 +420,7 @@ class MinionPlugin extends Gdn_Plugin {
                if (!$State['Method'] && in_array($State['Token'], array('forgive')))
                   $this->Consume($State, 'Method', 'forgive');
                
-               if (!$State['Method'] && in_array($State['Token'], array('shoot','peace', 'weapon', 'weapons', 'posture', 'free', 'defcon', 'phasers')))
+               if (!$State['Method'] && in_array($State['Token'], array('shoot', 'weapon', 'weapons', 'posture', 'free', 'defcon', 'phasers', 'engage')))
                   $this->Consume($State, 'Method', 'force');
                
                if (!$State['Method'] && in_array($State['Token'], array('stand')))
@@ -634,7 +634,7 @@ class MinionPlugin extends Gdn_Plugin {
          // Adjust automated force level
          case 'force':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Forces = array('warn', 'low', 'medium', 'high');
+            $Forces = array('low', 'medium', 'high', 'lethal');
             if (in_array($State['Force'], $Forces))
                $Actions[] = array("force", 'Vanilla.Comments.Edit', $State);
             break;
