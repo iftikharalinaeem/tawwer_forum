@@ -13,7 +13,7 @@
 $PluginInfo['ModList'] = array(
    'Name' => 'Mod List',
    'Description' => "Adds a list of moderators to categories.",
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Tim Gunter',
    'AuthorEmail' => 'tim@vanillaforums.com',
@@ -87,7 +87,7 @@ class ModListPlugin extends Gdn_Plugin {
          }
       }
       
-      $Sender->SetData($Data);
+      $Sender->SetData('Tokens', $Data);
       
       $Sender->Render();
    }
