@@ -187,7 +187,6 @@ class ModListPlugin extends Gdn_Plugin {
     */
    public function SettingsController_AddEditCategory_Handler($Sender) {
       if (!$Sender->Form->IsPostBack()) return;
-      DebugMethod(__METHOD__);
       
       $CategoryID = $Sender->Form->GetValue('CategoryID');
       $ModeratorListEnabled = $Sender->Form->GetValue('CategoryModerators');
