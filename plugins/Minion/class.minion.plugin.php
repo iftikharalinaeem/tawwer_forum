@@ -16,6 +16,7 @@
  *  1.2     Prevent people from posting autoplay embeds
  *  1.3     New inline command structure
  *  1.4     Moved Punish, Gloat, Revolt actions to Minion
+ *  1.4.1   Fix forcelevels
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
