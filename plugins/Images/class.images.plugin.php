@@ -33,25 +33,25 @@ class ImagesPlugin extends Gdn_Plugin {
          $Sender = Gdn::Controller();
       
       // Include JS necessary in the page.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/vendor/jquery.ui.widget.js');
+      $Sender->AddJsFile('library/jQuery-FileUpload/js/vendor/jquery.ui.widget.js', 'plugins/Images');
       // The Templates plugin is included to render the upload/download listings.
-      $Sender->AddJsFile('plugins/Images/library/Javascript-Templates/tmpl.min.js');
+      $Sender->AddJsFile('library/Javascript-Templates/tmpl.min.js', 'plugins/Images');
       // The Load Image plugin is included for the preview images and image resizing functionality.
-      $Sender->AddJsFile('plugins/Images/library/Javascript-LoadImage/load-image.min.js');
+      $Sender->AddJsFile('library/Javascript-LoadImage/load-image.min.js', 'plugins/Images');
       // The Canvas to Blob plugin is included for image resizing functionality.
-      $Sender->AddJsFile('plugins/Images/library/JavaScript-Canvas-to-Blob/canvas-to-blob.min.js');
+      $Sender->AddJsFile('library/JavaScript-Canvas-to-Blob/canvas-to-blob.min.js', 'plugins/Images');
       // The Iframe Transport is required for browsers without support for XHR file uploads.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.iframe-transport.js');
+      $Sender->AddJsFile('library/jQuery-FileUpload/js/jquery.iframe-transport.js', 'plugins/Images');
       // The basic File Upload plugin.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload.js');
+      $Sender->AddJsFile('library/jQuery-FileUpload/js/jquery.fileupload.js', 'plugins/Images');
       // The File Upload file processing plugin.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload-fp.js');
+      $Sender->AddJsFile('library/jQuery-FileUpload/js/jquery.fileupload-fp.js', 'plugins/Images');
       // The File Upload user interface plugin.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/jquery.fileupload-ui.js');
+      $Sender->AddJsFile('library/jQuery-FileUpload/js/jquery.fileupload-ui.js', 'plugins/Images');
       // The localization script.
-      $Sender->AddJsFile('plugins/Images/library/jQuery-FileUpload/js/locale.js');
+      $Sender->AddJsFile('library/jQuery-FileUpload/js/locale.js', 'plugins/Images');
       // The main application script.
-      $Sender->AddJsFile('plugins/Images/js/upload.js');
+      $Sender->AddJsFile('upload.js', 'plugins/Images');
       // The XDomainRequest Transport is included for cross-domain file deletion for IE8+.
       $Sender->Head->AddString('<!--[if gte IE 8]><script src="'.Url('plugins/Images/library/jQuery-FileUpload/js/cors/jquery.xdr-transport.js').'"></script><![endif]-->');
    }
@@ -160,7 +160,7 @@ class ImagesPlugin extends Gdn_Plugin {
       $Sender->Title(T('New Image'));
 		$Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/image')));
       $this->AddJsFiles();
-      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js');
+      $Sender->AddJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugin/Reactions');
       
       $Sender->Render('discussionform', '', 'plugins/Images');
    }
@@ -246,7 +246,7 @@ class ImagesPlugin extends Gdn_Plugin {
       
       // If the current discussion is of type "Image", switch to the images view
       $this->AddJsFiles();
-      $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js');
+      $Sender->AddJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions');
       
       $Sender->View = PATH_PLUGINS.'/Images/views/discussion.php';
       
@@ -255,7 +255,7 @@ class ImagesPlugin extends Gdn_Plugin {
    
    public function RootController_Render_Before($Sender) {
       if (InArrayI($Sender->RequestMethod, array('bestof', 'bestof2'))) {
-         $Sender->AddJsFile('plugins/Images/js/tile.js');         
+         $Sender->AddJsFile('tile.js', 'plugins/Images');
       }
    }
    

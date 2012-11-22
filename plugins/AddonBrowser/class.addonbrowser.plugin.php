@@ -260,7 +260,7 @@ class AddonBrowserPlugin extends Gdn_Plugin {
       $Sender->Title('Addons');
       $Sender->Permission('Garden.Applications.Manage');
       $Sender->AddSideMenu('dashboard/settings/addons');
-      $Sender->AddCssFile('addonbrowser.css', 'plugins/addonbrowser');
+      $Sender->AddCssFile('addonbrowser.css', 'plugins/AddonBrowser');
 
       $Sections = array('enabled' => 'Enabled', 'downloaded' => 'Downloaded', 'browse' => 'Browse');
       if (!$this->ShowDownloads)

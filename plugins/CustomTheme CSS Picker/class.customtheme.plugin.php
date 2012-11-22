@@ -296,12 +296,12 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			Redirect('/settings/customtheme');
 		}		
 		
-		$Sender->AddJsFile('/js/library/jquery.autogrow.js');
-		$Sender->AddJsFile('/plugins/CustomTheme/customtheme.js');
-		$Sender->AddCssFile('/plugins/CustomTheme/customtheme.css');
-
-		$Sender->AddJsFile('/plugins/CustomTheme/colorpicker/js/colorpicker.js');
-		$Sender->AddCssFile('/plugins/CustomTheme/colorpicker/css/colorpicker.css');
+      $Sender->AddJsFile('customtheme.js', 'plugins/CustomTheme');
+      $Sender->AddJsFile('jquery.textarea.js', 'plugins/CustomTheme');
+		$Sender->AddCssFile('customtheme.css', 'plugins/CustomTheme');
+      
+		$Sender->AddJsFile('colorpicker/js/colorpicker.js', 'plugins/CustomTheme');
+		$Sender->AddCssFile('colorpicker/css/colorpicker.css', 'plugins/CustomTheme');
 		
 		$ThemeManager = new Gdn_ThemeManager();
 		$CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();

@@ -59,8 +59,8 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->Title('Statistics');
       $Sender->AddSideMenu('plugin/statistics');
       $Sender->Form = new Gdn_Form();
-      $Sender->AddJsFile($this->GetResource('js/catchup.js', FALSE, FALSE));
-      $Sender->AddCssFile($this->GetResource('design/catchup.css', FALSE, FALSE));
+      $Sender->AddJsFile('catchup.js', 'plugins/Statistics');
+      $Sender->AddCssFile('catchup.css', 'plugins/Statistics');
       
       $this->EnableSlicing($Sender);
       $this->Dispatch($Sender, $Sender->RequestArgs);
@@ -605,9 +605,9 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->RaphaelLocation = Asset('/plugins/Statistics/js/raphael.js');
       $Sender->GraphLocation = Asset('/plugins/Statistics/js/graph.js');
       $Sender->PickerLocation = Asset('/plugins/Statistics/js/picker.js');
-      $Sender->AddJsFile('plugins/Statistics/js/loader.js');
-      $Sender->AddCSSFile('plugins/Statistics/design/graph.css');
-      $Sender->AddCSSFile('plugins/Statistics/design/picker.css');
+      $Sender->AddJsFile('loader.js', 'plugins/Statistics');
+      $Sender->AddCSSFile('graph.css', 'plugins/Statistics');
+      $Sender->AddCSSFile('picker.css', 'plugins/Statistics');
       $Sender->Title(T('Dashboard'));
       $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
@@ -628,7 +628,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       $this->ConfigureRange($Sender);
       
       // Render the custom dashboard view
-      $Sender->Render(PATH_PLUGINS.'/Statistics/views/dashboard.php');
+      $Sender->Render('dashboard', '', 'plugins/Statistics');
    }
    
    public function SettingsController_DashboardSummaries_Create($Sender) {

@@ -69,6 +69,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$Css = Gdn::SQL()->GetWhere('CustomThemeRevision', array('RevisionID' => $RevisionID))->Value('CSS');
       
       if ($Css) {
+         die('bitchez');
          $Host = Gdn::Request()->Host();
          $Sender->AddCssFile(FALSE, "/plugin/customcss/$Host/rev_$LiveRevisionID.css", array('Css' => $Css, 'Sort' => 100));
       }
@@ -280,7 +281,6 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			Redirect('/settings/customtheme');
 		}		
 		
-		// $Sender->AddJsFile('/js/library/jquery.autogrow.js');
 		$Sender->AddJsFile('customtheme.js', 'plugins/CustomTheme');
       $Sender->AddJsFile('jquery.textarea.js', 'plugins/CustomTheme');
 		$Sender->AddCssFile('customtheme.css', 'plugins/CustomTheme');

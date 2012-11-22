@@ -6,7 +6,7 @@
 $PluginInfo['TwitterFeeds'] = array(
 	'Name' =>		'Twitter Feeds',
 	'Description' => 'Allows Users to add their Twitter Feed to their Profile.',
-	'Version' =>	'1.0',
+	'Version' =>	'1.0.1',
 	'Author' =>		'Oliver Raduner',
 	'AuthorEmail' => 'vanilla@raduner.ch',
 	'AuthorUrl' =>	'http://raduner.ch/',
@@ -85,7 +85,7 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 			/**
 			 * Construct the Tweets Output
 			 */
-			$Sender->AddCssFile('plugins/TwitterFeeds/twitterfeeds.css');
+			$Sender->AddCssFile('twitterfeeds.css', 'plugins/TwitterFeeds');
 			$HtmlOut .= '<div id="TwitterFeeds" class="Box">';
 			$HtmlOut .= '<div id="TwitterFeedsTitle">';
 			  $HtmlOut .= '<div id="TwitterIcon"></div>';

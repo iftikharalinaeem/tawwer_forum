@@ -84,7 +84,7 @@ class FollowingPlugin extends Gdn_Plugin {
    public function Base_Render_Before($Sender) {
       if ($Sender->ControllerName != 'profilecontroller') return; 
       
-      $Sender->AddCssFile($this->GetResource('css/following.css', FALSE, FALSE));
+      $Sender->AddCssFile('following.css', 'plugins/Following');
       $UserID = $Sender->User->UserID;
       include_once(PATH_PLUGINS.DS.'Following'.DS.'class.followingmodule.php');
       $Module = new FollowingModule($Sender);
