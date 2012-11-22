@@ -241,10 +241,13 @@ class MinionPlugin extends Gdn_Plugin {
       $this->EventArguments['Actions'] = &$Actions;
       
       $ObjectBody = GetValue('Body', $Object);
-      $ObjectBody = trim(strip_tags($ObjectBody));
+      $StrippedBody = trim(strip_tags($ObjectBody));
+      
+      // Remove quote areas
+      $ParseBody = $this->ParseBody($Object);
       
       // Check every line of the body to see if its a minion command
-      $ObjectLines = explode("\n", $ObjectBody);
+      $ObjectLines = explode("\n", $ParseBody);
       foreach ($ObjectLines as $ObjectLine) {
          
          // Check if this is a call to the bot
@@ -265,7 +268,7 @@ class MinionPlugin extends Gdn_Plugin {
 
          // Define starting state
          $State = array(
-            'Body'      => $ObjectBody,
+            'Body'      => $StrippedBody,
             'Sources'   => array(),
             'Targets'   => array(),
             'Method'    => NULL,
@@ -285,6 +288,7 @@ class MinionPlugin extends Gdn_Plugin {
 
          $this->EventArguments['State'] = &$State;
          $State['Token'] = strtok($Command, ' ');
+         $State['CompareToken'] = preg_replace('/[^\w]/i', '', strtolower($State['Token']));
          $State['Parsed']++;
          
          while ($State['Token'] !== FALSE) {
@@ -335,49 +339,49 @@ class MinionPlugin extends Gdn_Plugin {
                 * TOGGLERS
                 */
 
-               if (empty($State['Toggle']) && in_array($State['Token'], array('open', 'enable', 'unlock', 'allow')))
+               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('open', 'enable', 'unlock', 'allow')))
                   $this->Consume($State, 'Toggle', 'on');
 
-               if (empty($State['Toggle']) && in_array($State['Token'], array('no', 'close', 'disable', 'lock', 'disallow', 'forbid', 'down')))
+               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('no', 'close', 'disable', 'lock', 'disallow', 'forbid', 'down')))
                   $this->Consume($State, 'Toggle', 'off');
 
                /*
                 * FORCE
                 */
 
-               if (empty($State['Force']) && in_array($State['Token'], array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer', 'gently', 'gentle', 'peacekeeper')))
+               if (empty($State['Force']) && in_array($State['CompareToken'], array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer', 'gently', 'gentle', 'peacekeeper')))
                   $this->Consume($State, 'Force', 'low');
 
-               if (empty($State['Force']) && in_array($State['Token'], array('power', 'cook', 'simmer', 'minor')))
+               if (empty($State['Force']) && in_array($State['CompareToken'], array('power', 'cook', 'simmer', 'minor')))
                   $this->Consume($State, 'Force', 'medium');
                
-               if (empty($State['Force']) && in_array($State['Token'], array('volts', 'extreme', 'slugs', 'broil', 'sear', 'major')))
+               if (empty($State['Force']) && in_array($State['CompareToken'], array('volts', 'extreme', 'slugs', 'broil', 'sear', 'major')))
                   $this->Consume($State, 'Force', 'high');
 
-               if (empty($State['Force']) && in_array($State['Token'], array('kill', 'lethal', 'nuke', 'nuclear', 'destroy')))
+               if (empty($State['Force']) && in_array($State['CompareToken'], array('kill', 'lethal', 'nuke', 'nuclear', 'destroy')))
                   $this->Consume($State, 'Force', 'lethal');
                
                // Defcon forces
                if ($State['Method'] == 'force' && empty($State['Force'])) {
-                  if (in_array($State['Token'], array('one', '1')))
-                     $this->Consume($State, 'Force', 'ban');
+                  if (in_array($State['CompareToken'], array('one', '1')))
+                     $this->Consume($State, 'Force', 'lethal');
                   
-                  if (in_array($State['Token'], array('two', '2')))
+                  if (in_array($State['CompareToken'], array('two', '2')))
                      $this->Consume($State, 'Force', 'high');
                   
-                  if (in_array($State['Token'], array('three', '3')))
+                  if (in_array($State['CompareToken'], array('three', '3')))
                      $this->Consume($State, 'Force', 'medium');
                   
-                  if (in_array($State['Token'], array('four', '4')))
+                  if (in_array($State['CompareToken'], array('four', '4')))
                      $this->Consume($State, 'Force', 'low');
                   
-                  if (in_array($State['Token'], array('five', '5')))
+                  if (in_array($State['CompareToken'], array('five', '5')))
                      $this->Consume($State, 'Force', 'low');
                }
                
                // Conditional forces
                if (!empty($State['Method']) && empty($State['Force'])) {
-                  if (in_array($State['Token'], array('warning', 'warn')))
+                  if (in_array($State['CompareToken'], array('warning', 'warn')))
                      $this->Consume($State, 'Force', 'warn');
                }
                
@@ -385,7 +389,7 @@ class MinionPlugin extends Gdn_Plugin {
                 * TARGETS
                 */
 
-               if (in_array($State['Token'], array('user'))) {
+               if (in_array($State['CompareToken'], array('user'))) {
                   $this->Consume($State, 'Gather', array(
                      'Node'   => 'User',
                      'Delta'  => ''
@@ -409,29 +413,29 @@ class MinionPlugin extends Gdn_Plugin {
                 * METHODS
                 */
                
-               if (!$State['Method'] && in_array($State['Token'], array('report')))
+               if (empty($State['Method']) && in_array($State['CompareToken'], array('report')))
                   $this->Consume($State, 'Method', 'report in');
                
-               if (!$State['Method'] && in_array($State['Token'], array('thread')))
+               if (empty($State['Method']) && in_array($State['CompareToken'], array('thread')))
                   $this->Consume($State, 'Method', 'thread');
                
-               if (!$State['Method'] && in_array($State['Token'], array('kick')))
+               if (empty($State['Method']) && in_array($State['CompareToken'], array('kick')))
                   $this->Consume($State, 'Method', 'kick');
                
-               if (!$State['Method'] && in_array($State['Token'], array('forgive')))
+               if (empty($State['Method']) && in_array($State['CompareToken'], array('forgive')))
                   $this->Consume($State, 'Method', 'forgive');
                
-               if (!$State['Method'] && in_array($State['Token'], array('shoot', 'weapon', 'weapons', 'posture', 'free', 'defcon', 'phasers', 'engage')))
+               if (empty($State['Method']) && in_array($State['CompareToken'], array('shoot', 'weapon', 'weapons', 'posture', 'free', 'defcon', 'phasers', 'engage')))
                   $this->Consume($State, 'Method', 'force');
                
-               if (!$State['Method'] && in_array($State['Token'], array('stand')))
+               if (empty($State['Method']) && in_array($State['CompareToken'], array('stand')))
                   $this->Consume($State, 'Method', 'stop all');
                
                /*
                 * FOR
                 */
                
-               if (in_array($State['Token'], array('for', 'because')))
+               if (in_array($State['CompareToken'], array('for', 'because')))
                   $this->ConsumeUntilNextKeyword($State, 'For', FALSE, TRUE);
                
                $this->ConsumeUntilNextKeyword($State);
@@ -441,6 +445,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             // Get a new token
             $State['Token'] = strtok(' ');
+            $State['CompareToken'] = preg_replace('/[^\w]/i', '', strtolower($State['Token']));
             if ($State['Token'])
                $State['Parsed']++;
             
@@ -597,6 +602,37 @@ class MinionPlugin extends Gdn_Plugin {
       // Delete parsed elements
       foreach ($Unset as $UnsetKey)
          unset($State['For'][$UnsetKey]);
+   }
+   
+   public function ParseBody($Object) {
+      Gdn::PluginManager()->GetPluginInstance('HtmLawed', Gdn_PluginManager::ACCESS_PLUGINNAME);
+      $Html = Gdn_Format::To($Object['Body'], $Object['Format']);
+      $Config = array(
+         'anti_link_spam' => array('`.`', ''),
+         'comment' => 1,
+         'cdata' => 3,
+         'css_expression' => 1,
+         'deny_attribute' => 'on*',
+         'unique_ids' => 0,
+         'elements' => '*',
+         'keep_bad' => 0,
+         'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
+         'valid_xhtml' => 0,
+         'direct_list_nest' => 1,
+         'balance' => 1
+      );
+      $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
+      $Cleaned = htmLawed($Html, $Config, $Spec);
+      
+      $Dom = new DOMDocument();
+      $Dom->loadHTML($Cleaned);
+      $Dom->preserveWhiteSpace = false;
+      $Elements = $Dom->getElementsByTagName('blockquote');
+      
+      foreach($Elements as $Element)
+         $Element->parentNode->removeChild($Element);
+      
+      return trim(strip_tags($Dom->saveHTML()));
    }
    
    /**
@@ -935,8 +971,6 @@ class MinionPlugin extends Gdn_Plugin {
          'Command'      => $Command
       ));
       $this->Message($User, $Discussion, $MessageText);
-      
-      Gdn::Controller()->InformMessage($MessageText);
    }
    
    /**
@@ -1023,6 +1057,9 @@ class MinionPlugin extends Gdn_Plugin {
       
       if ($MinionCommentID)
          $CommentModel->Save2($MinionCommentID, TRUE);
+      
+      $Informer = Gdn_Format::To($Message, 'Html');
+      Gdn::Controller()->InformMessage($Informer);
    }
    
    public function Punish($User, $Discussion, $Comment, $Force, $Options = NULL) {
