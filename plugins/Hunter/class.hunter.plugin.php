@@ -50,7 +50,14 @@ class HunterPlugin extends Gdn_Plugin {
       
       $this->Messages = array(
          'Stalker'      => array(
-            "You can't shake the feeling that you're being watched..."
+            "You can't shake the feeling that you're being watched...",
+            "A cold breeze stirs through the forum. You shiver and hurry on you way.",
+            "The comments rustle ominously, as though something very large is trying to move quietly through them.",
+            "The muffled sound of an avatar snapping underfoot reaches your ears from somewhere nearby...",
+            "A low whirring sound seems to draw nearer for a while, and then abruptly diappears.",
+            "Out of the corner of your eye you catch something shiny glinting in the dim light. And then it vanishes.",
+            "The hairs on the back of your neck stand up. You whirl around, but find nothing.",
+            "A large shadow falls across the ground. You sut your eyes tighly for a moment, and when you open them again, the shadow is gone."
          ),
          'Catch'        => array(
             "Thanks to {Player.Name}, {Fugitive.Name} has been taken into custody and will be processed for... 'questioning'."
