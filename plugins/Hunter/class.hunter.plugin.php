@@ -533,7 +533,7 @@ class HunterPlugin extends Gdn_Plugin {
           'Name' => 'Accessory',
           'Slug' => 'accessory',
           'Type' => 'Manual',
-          'Body' => "You're were an accessory after the fact, and the criminal escaped. For shame.",
+          'Body' => "You were an accessory after the fact, and the criminal escaped. For shame.",
           'Photo' => 'http://badges.vni.la/100/accessory.png',
           'Points' => 1,
           'Class' => 'Hunter',
