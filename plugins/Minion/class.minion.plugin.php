@@ -840,10 +840,8 @@ class MinionPlugin extends Gdn_Plugin {
       }
       
       $IsMonitoringDiscussion = $this->Monitoring($Discussion);
-      if (!$IsMonitoringDiscussion) return;
-      
       $IsMonitoringUser = $this->Monitoring($User);
-      if (!$IsMonitoringUser) return;
+      if (!$IsMonitoringDiscussion && !$IsMonitoringUser) return;
       
       $this->EventArguments = array(
          'User'         => $User,
