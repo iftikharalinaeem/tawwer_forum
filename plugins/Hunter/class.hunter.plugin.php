@@ -502,5 +502,31 @@ class HunterPlugin extends Gdn_Plugin {
           'Level' => 1,
           'CanDelete' => 0
       ));
+      
+      // Snitch
+      $BadgeModel->Define(array(
+          'Name' => 'Snitch',
+          'Slug' => 'snitch',
+          'Type' => 'Manual',
+          'Body' => "There's no nice way to say this. You're a snitch.",
+          'Photo' => 'http://badges.vni.la/100/snitch.png',
+          'Points' => 1,
+          'Class' => 'Hunter',
+          'Level' => 1,
+          'CanDelete' => 0
+      ));
+      
+      // Accessory
+      $BadgeModel->Define(array(
+          'Name' => 'Accessory',
+          'Slug' => 'accessory',
+          'Type' => 'Manual',
+          'Body' => "You're were an accessory after the fact. For shame.",
+          'Photo' => 'http://badges.vni.la/100/accessory.png',
+          'Points' => 1,
+          'Class' => 'Hunter',
+          'Level' => 1,
+          'CanDelete' => 0
+      ));
    }
 }
