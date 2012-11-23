@@ -185,6 +185,10 @@ class HunterPlugin extends Gdn_Plugin {
       switch ($State['Method']) {
          case 'hunt':
             
+            // If we don't know the originating user, try to detect by a quote
+            if (!array_key_exists('User', $State['Targets']))
+               $Sender->MatchQuoted($State);
+            
             if (!array_key_exists('User', $State['Targets']))
                return;
 
