@@ -22,7 +22,7 @@
 $PluginInfo['Hunter'] = array(
    'Name' => 'Hunter',
    'Description' => "Creates a 'wanted user' game.",
-   'Version' => '1.0b1',
+   'Version' => '1.0',
    'RequiredApplications' => array(
       'Vanilla' => '2.1a',
       'Reputation' => '1.0'
@@ -82,11 +82,17 @@ class HunterPlugin extends Gdn_Plugin {
     */
    public function FugitiveCatch($User, $Record, $Player) {
       
-      // Award the Criminal badge
+      // Badges
       $BadgeModel = new BadgeModel();
-      $Badge = $BadgeModel->GetID('criminal');
       $UserBadgeModel = new UserBadgeModel();
-      $UserBadgeModel->Give($User['UserID'], $Badge['BadgeID']);
+      
+      // Award the Criminal badge
+      $CriminalBadge = $BadgeModel->GetID('criminal');
+      $UserBadgeModel->Give($User['UserID'], $CriminalBadge['BadgeID']);
+      
+      // Award the Snitch badge
+      $SnitchBadge = $BadgeModel->GetID('snitch');
+      $UserBadgeModel->Give($Player['UserID'], $SnitchBadge['BadgeID']);
       
       // Gloat
       $MessagesCount = sizeof($this->Messages['Catch']);
@@ -121,11 +127,17 @@ class HunterPlugin extends Gdn_Plugin {
     */
    public function FugitiveEscape($User, $Record, $Player) {
       
-      // Award the Escapee badge
+      // Badges
       $BadgeModel = new BadgeModel();
-      $Badge = $BadgeModel->GetID('escapee');
       $UserBadgeModel = new UserBadgeModel();
-      $UserBadgeModel->Give($User['UserID'], $Badge['BadgeID']);
+      
+      // Award the Escapee badge
+      $EscapeeBadge = $BadgeModel->GetID('escapee');
+      $UserBadgeModel->Give($User['UserID'], $EscapeeBadge['BadgeID']);
+      
+      // Award the Accessory badge
+      $AccessoryBadge = $BadgeModel->GetID('accessory');
+      $UserBadgeModel->Give($Player['UserID'], $AccessoryBadge['BadgeID']);
       
       // Rage
       $MessagesCount = sizeof($this->Messages['Escape']);
@@ -508,7 +520,7 @@ class HunterPlugin extends Gdn_Plugin {
           'Name' => 'Snitch',
           'Slug' => 'snitch',
           'Type' => 'Manual',
-          'Body' => "There's no nice way to say this. You're a snitch.",
+          'Body' => "There's no nice way to say this. You're a dirty snitch.",
           'Photo' => 'http://badges.vni.la/100/snitch.png',
           'Points' => 1,
           'Class' => 'Hunter',
@@ -521,7 +533,7 @@ class HunterPlugin extends Gdn_Plugin {
           'Name' => 'Accessory',
           'Slug' => 'accessory',
           'Type' => 'Manual',
-          'Body' => "You're were an accessory after the fact. For shame.",
+          'Body' => "You're were an accessory after the fact, and the criminal escaped. For shame.",
           'Photo' => 'http://badges.vni.la/100/accessory.png',
           'Points' => 1,
           'Class' => 'Hunter',
