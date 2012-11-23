@@ -85,7 +85,7 @@ class HunterPlugin extends Gdn_Plugin {
       $MessagesCount = sizeof($this->Messages['Catch']);
       if ($MessagesCount) {
          $MessageID = mt_rand(0, $MessagesCount-1);
-         $Message = GetValue($MessageID, $this->Messages['Stalker']);
+         $Message = GetValue($MessageID, $this->Messages['Catch']);
       } else
          $Message = T("Unable to Gloat, please supply \$Messages['Catch'].");
       
@@ -121,10 +121,10 @@ class HunterPlugin extends Gdn_Plugin {
       $UserBadgeModel->Give($User['UserID'], $Badge['BadgeID']);
       
       // Rage
-      $MessagesCount = sizeof($this->Messages['Catch']);
+      $MessagesCount = sizeof($this->Messages['Escape']);
       if ($MessagesCount) {
          $MessageID = mt_rand(0, $MessagesCount-1);
-         $Message = GetValue($MessageID, $this->Messages['Stalker']);
+         $Message = GetValue($MessageID, $this->Messages['Escape']);
       } else
          $Message = T("Unable to Rage, please supply \$Messages['Escape'].");
       
