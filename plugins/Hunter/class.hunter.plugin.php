@@ -51,7 +51,7 @@ class HunterPlugin extends Gdn_Plugin {
       $this->Messages = array(
          'Stalker'      => array(
             "You can't shake the feeling that you're being watched...",
-            "A cold breeze stirs through the forum. You shiver and hurry on you way.",
+            "A cold breeze stirs through the forum. You shiver and hurry on your way.",
             "The comments rustle ominously, as though something very large is trying to move quietly through them.",
             "The muffled sound of an avatar snapping underfoot reaches your ears from somewhere nearby...",
             "A low whirring sound seems to draw nearer for a while, and then abruptly diappears.",
@@ -60,10 +60,10 @@ class HunterPlugin extends Gdn_Plugin {
             "A large shadow falls across the ground. You sut your eyes tighly for a moment, and when you open them again, the shadow is gone."
          ),
          'Catch'        => array(
-            "Thanks to {Player.Name}, {Fugitive.Name} has been taken into custody and will be processed for... 'questioning'."
+            "Thanks to @\"{Player.Name}\", @\"{Fugitive.Name}\" has been taken into custody and will be processed for... 'questioning'."
          ),
          'Escape'       => array(
-            "{Fugitive.Name} has escaped across international lines. Ending pursuit protocols. Suspect {Player.Name} may require additional investigation."
+            "@\"{Fugitive.Name}\" has escaped across international lines. Ending pursuit protocols. Suspect @\"{Player.Name}\" may warrant additional investigation..."
          )
       );
       
