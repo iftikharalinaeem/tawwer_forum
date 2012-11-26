@@ -27,7 +27,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.4.1',
+   'Version' => '1.4.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -101,6 +101,11 @@ class MinionPlugin extends Gdn_Plugin {
    public function MinionName() {
       $this->StartMinion();
       return $MinionName = GetValue('Name', $this->Minion);
+   }
+   
+   public function Minion() {
+      $this->StartMinion();
+      return $this->Minion;
    }
    
    /**
@@ -339,10 +344,10 @@ class MinionPlugin extends Gdn_Plugin {
                 * TOGGLERS
                 */
 
-               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('open', 'enable', 'unlock', 'allow')))
+               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('open', 'enable', 'unlock', 'allow', 'on')))
                   $this->Consume($State, 'Toggle', 'on');
 
-               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('no', 'close', 'disable', 'lock', 'disallow', 'forbid', 'down')))
+               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('no', 'close', 'disable', 'lock', 'disallow', 'forbid', 'down', 'off')))
                   $this->Consume($State, 'Toggle', 'off');
 
                /*
@@ -730,7 +735,7 @@ class MinionPlugin extends Gdn_Plugin {
                'Expires'   => $Expires
             );
             
-            $this->MonitorDiscussion($State['Targets']['Discussion'], array(
+            $this->Monitor($State['Targets']['Discussion'], array(
                'Kicked'    => $KickedUsers
             ));
             
@@ -747,7 +752,7 @@ class MinionPlugin extends Gdn_Plugin {
             if (!sizeof($KickedUsers))
                $KickedUsers = NULL;
             
-            $this->MonitorDiscussion($State['Targets']['Discussion'], array(
+            $this->Monitor($State['Targets']['Discussion'], array(
                'Kicked'    => $KickedUsers
             ));
             
@@ -756,14 +761,14 @@ class MinionPlugin extends Gdn_Plugin {
             
          case 'force':
             $Force = GetValue('Force', $State);
-            $this->MonitorDiscussion($State['Targets']['Discussion'], array(
+            $this->Monitor($State['Targets']['Discussion'], array(
                'Force'     => $Force
             ));
             $this->Acknowledge($State['Sources']['Discussion'], "Setting force level to '{$Force}'.");
             break;
          
          case 'stop all':
-            $this->StopMonitoringDiscussion($State['Targets']['Discussion']);
+            $this->StopMonitoring($State['Targets']['Discussion']);
             $this->Acknowledge($State['Sources']['Discussion'], 'Standing down...');
             break;
       }
@@ -817,6 +822,8 @@ class MinionPlugin extends Gdn_Plugin {
    }
    
    public function CheckMonitor($Sender) {
+      $User = (array)Gdn::Session()->User;
+      
       // Get the discussion and comment from args
       $Discussion = (array)$Sender->EventArguments['Discussion'];
       if (!is_array($Discussion['Attributes'])) {
@@ -832,10 +839,12 @@ class MinionPlugin extends Gdn_Plugin {
          $Type = 'Comment';
       }
       
-      $IsMonitoring = $this->Monitoring($Discussion);
-      if (!$IsMonitoring) return;
+      $IsMonitoringDiscussion = $this->Monitoring($Discussion);
+      $IsMonitoringUser = $this->Monitoring($User);
+      if (!$IsMonitoringDiscussion && !$IsMonitoringUser) return;
       
       $this->EventArguments = array(
+         'User'         => $User,
          'Discussion'   => $Discussion
       );
       
@@ -888,7 +897,7 @@ class MinionPlugin extends Gdn_Plugin {
                // Kick has expired, remove it
                
                unset($KickedUsers[$UserID]);
-               $this->MonitorDiscussion($Discussion, array(
+               $this->Monitor($Discussion, array(
                   'Kicked'    => $KickedUsers
                ));
             }
@@ -896,8 +905,8 @@ class MinionPlugin extends Gdn_Plugin {
       }
    }
    
-   public function Monitoring($Discussion, $Attribute = NULL, $Default = NULL) {
-      $Minion = GetValueR('Attributes.Minion', $Discussion, array());
+   public function Monitoring($Object, $Attribute = NULL, $Default = NULL) {
+      $Minion = GetValueR('Attributes.Minion', $Object, array());
       
       $IsMonitoring = GetValue('Monitor', $Minion, FALSE);
       if (!$IsMonitoring) return FALSE;
@@ -906,10 +915,23 @@ class MinionPlugin extends Gdn_Plugin {
       return GetValue($Attribute, $Minion, $Default);
    }
    
-   public function MonitorDiscussion($Discussion, $Options = NULL) {
-      $DiscussionModel = new DiscussionModel();
+   public function Monitor($Object, $Options = NULL) {
+      $Type = NULL;
       
-      $Minion = (array)GetValueR('Attributes.Minion', $Discussion, array());
+      if (array_key_exists('CommentID', $Object)) {
+         $Type = 'Comment';
+      } else if (array_key_exists('DiscussionID', $Object)) {
+         $Type = 'Discussion';
+      } else if (array_key_exists('UserID', $Object)) {
+         $Type = 'User';
+      }
+      
+      if (!$Type) return;
+      $KeyField = "{$Type}ID";
+      $ObjectModelName = "{$Type}Model";
+      $ObjectModel = new $ObjectModelName();
+      
+      $Minion = (array)GetValueR('Attributes.Minion', $Object, array());
       $Minion['Monitor'] = TRUE;
       
       if (is_array($Options)) {
@@ -923,16 +945,30 @@ class MinionPlugin extends Gdn_Plugin {
       
       // Keep attribs sparse
       if (sizeof($Minion) == 1)
-         return $this->StopMonitoringDiscussion($Discussion);
+         return $this->StopMonitoring($Object, $Type);
       
-      $DiscussionModel->SetRecordAttribute($Discussion, 'Minion', $Minion);
-      $DiscussionModel->SaveToSerializedColumn('Attributes', $Discussion['DiscussionID'], 'Minion', $Minion);
+      $ObjectModel->SetRecordAttribute($Object, 'Minion', $Minion);
+      $ObjectModel->SaveToSerializedColumn('Attributes', $Object[$KeyField], 'Minion', $Minion);
    }
    
-   public function StopMonitoringDiscussion($Discussion) {
-      $DiscussionModel = new DiscussionModel();
-      $DiscussionModel->SetRecordAttribute($Discussion, 'Minion', NULL);
-      $DiscussionModel->SaveToSerializedColumn('Attributes', $Discussion['DiscussionID'], 'Minion', NULL);
+   public function StopMonitoring($Object, $Type = NULL) {
+      if (is_null($Type)) {
+         if (array_key_exists('CommentID', $Object)) {
+            $Type = 'Comment';
+         } else if (array_key_exists('DiscussionID', $Object)) {
+            $Type = 'Discussion';
+         } else if (array_key_exists('UserID', $Object)) {
+            $Type = 'User';
+         }
+      }
+      
+      if (!$Type) return;
+      $KeyField = "{$Type}ID";
+      $ObjectModelName = "{$Type}Model";
+      $ObjectModel = new $ObjectModelName();
+      
+      $ObjectModel->SetRecordAttribute($Object, 'Minion', NULL);
+      $ObjectModel->SaveToSerializedColumn('Attributes', $Object[$KeyField], 'Minion', NULL);
    }
    
    /**
