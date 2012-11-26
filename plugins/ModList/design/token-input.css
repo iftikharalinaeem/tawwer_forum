@@ -34,16 +34,15 @@ li.token-input-token {
     height: auto !important; 
     height: 1%;
     margin: 3px;
-    padding: 1px 3px;
+    padding: 3px;
     line-height: 1;
-    background-color: #eff2f7;
-    color: #000;
+    background-color: #efefef;
     cursor: default;
-    border: 1px solid #ccd5e4;
+    border: 1px solid #ccc;
     font-size: 11px;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
+    border-radius: 1px;
+    -moz-border-radius: 1px;
+    -webkit-border-radius: 1px;
     float: left;
 }
 li.token-input-token p {
@@ -54,13 +53,13 @@ li.token-input-token p {
     vertical-align: middle;
 }
 li.token-input-token span {
-    color: #a6b3cf;
     margin-left: 5px;
     font-weight: bold;
     cursor: pointer;
     font-family:arial;
     font-size: 13px;
     vertical-align: middle;
+    opacity: .9;
 }
 li.token-input-selected-token {
     background-color: #5670a6;
