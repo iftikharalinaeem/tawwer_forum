@@ -852,6 +852,9 @@ $.TokenList = function (input, url_or_data, settings) {
 
         // Attach the success callback
         ajax_params.success = function(results) {
+          if (results && results.hasOwnProperty('Tokens'))
+             results = results['Tokens'];
+          
           if($.isFunction(settings.onResult)) {
             results = settings.onResult.call(hidden_input, results);
           }

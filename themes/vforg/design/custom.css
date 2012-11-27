@@ -63,7 +63,7 @@
    background: url('images/vanilla-forums-logo-132x61.png') center center no-repeat;
    display: block;
    height: 61px;
-   width: 132px;
+   width: 135px;
    overflow: hidden;
    color: transparent;
    font-size: 1px;
@@ -71,6 +71,24 @@
    white-space: nowrap;
    margin: 0 0 0 20px;
 }
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (   min--moz-device-pixel-ratio: 2),
+only screen and (     -o-min-device-pixel-ratio: 2/1),
+only screen and (        min-device-pixel-ratio: 2),
+only screen and (                min-resolution: 192dpi),
+only screen and (                min-resolution: 2dppx) {
+   .Head .Home {
+      background-image: url('images/vanilla_logo.png');
+      background-size: 135px;
+   }
+   
+   .PoweredByVanilla {
+      background-image: url('images/vanilla_logo.png');
+      background-size: 70px;
+   }
+}
+
 a {
     color: #012f6e;
     text-decoration: none;
@@ -453,18 +471,6 @@ a.RenderedDownloadButton span {
    background: #ff0084;
 }
 
-.ReactSprite {
-    background-image: url("http://vanillicon.com/sprites/sprites-14-012f6e.png");
-}
-
-.MenuItems .ReactSprite {
-    background-image: url("http://vanillicon.com/sprites/sprites-14-000000.png");
-}
-
-a:hover .ReactSprite {
-    background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
-}
-
 /*.MeMenu .Sprite16 {
     background-image: url('me_sprites.png');
 }
@@ -644,6 +650,27 @@ select {
    height: 28px;
 }
 
+.ReactSprite {
+    background-image: url("http://vanillicon.com/sprites/sprites-14-012f6e.png");
+    background-size: 396px;
+    width: 16px;
+    height: 16px;
+}
+
+.MenuItems .ReactSprite {
+    background-image: url("http://vanillicon.com/sprites/sprites-14-000000.png");
+    background-size: 396px;
+}
+
+.Reactions .MenuItems a:hover .ReactSprite, .MenuItems a:hover .Sprite {
+   background-image: url('http://vanillicon.com/sprites/sprites-14-ffffff.png');
+}
+
+a:hover .ReactSprite {
+    background-image: url("http://vanillicon.com/sprites/sprites-14c-ff0084.png");
+    background-size: 396px;
+}
+
 .MeButton .Sprite16 {
    width: 16px;
    height: 16px;
@@ -653,10 +680,55 @@ select {
    margin: -2px;
    display: inline-block;
    background-image: url(http://vanillicon.com/sprites/sprites-14-777777.png);
+   background-size: 396px;
 }
 
 .UserReactionWrap .ReactSprite {
    background-image: url(http://vanillicon.com/sprites/sprites-14-outline-28519F.png);
+   background-size: 396px;
+}
+
+.OptionsTitle,
+a.Bookmark,
+a.Bookmarked,
+a.Bookmarking {
+   background-image: url("http://vanillicon.com/sprites/ui_sprites-16c-000000.png");
+}
+
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (   min--moz-device-pixel-ratio: 2),
+only screen and (     -o-min-device-pixel-ratio: 2/1),
+only screen and (        min-device-pixel-ratio: 2),
+only screen and (                min-resolution: 192dpi),
+only screen and (                min-resolution: 2dppx) {
+   .ReactSprite {
+      background-image: url("http://vanillicon.com/sprites/sprites-28-012f6e.png");
+   }
+   
+   a:hover .ReactSprite {
+      background-image: url("http://vanillicon.com/sprites/sprites-28c-ff0084.png");
+   }
+   
+   .MenuItems .ReactSprite {
+      background-image: url("http://vanillicon.com/sprites/sprites-28-000000.png");
+   }
+   
+   .Reactions .MenuItems a:hover .ReactSprite, .MenuItems a:hover .Sprite {
+      background-image: url('http://vanillicon.com/sprites/sprites-28-ffffff.png');
+   }
+   
+   .MeButton .Sprite16 {
+      background-image: url(http://vanillicon.local/sprites/sprites-28-777777.png);
+   }
+   
+   .OptionsTitle,
+   a.Bookmark,
+   a.Bookmarked,
+   a.Bookmarking {
+      background-image: url("http://vanillicon.com/sprites/ui_sprites-32c-000000.png");
+      background-size: 30px;
+   }
 }
 
 .ReactEverything { background-position: -360px -100px; }
