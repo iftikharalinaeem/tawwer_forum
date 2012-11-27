@@ -30,8 +30,8 @@ class EventiPlugin extends Gdn_Plugin {
    }
    
    public function Base_Render_Before($Sender) {
-      $Sender->AddCssFile($this->GetResource('design/eventi.css', FALSE, FALSE));
-      $Sender->AddJsFile($this->GetResource('js/eventi.js', FALSE, FALSE));
+      $Sender->AddCssFile('eventi.css', 'plugins/Eventi');
+      $Sender->AddJsFile('eventi.js', 'plugins/Eventi');
    }
    
    public function Base_All_Handler($Sender, $Args, $Key) {

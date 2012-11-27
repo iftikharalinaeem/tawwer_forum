@@ -20,7 +20,7 @@ class IaThemeHooks implements Gdn_IPlugin {
    public function DiscussionsController_AfterInitialize_Handler($Sender) {
       // echo 'test';
       // die();
-      $Sender->AddJsFile('js/library/jquery.autogrow.js');
+      $Sender->AddJsFile('jquery.autogrow.js');
       // $Sender->ClearJsFiles();
    }
    

@@ -159,7 +159,7 @@ class SupportThemeHooks implements Gdn_IPlugin {
       if ($Sender->Head) {
          $Sender->AddJsFile('discussions.js');
          $Sender->AddJsFile('bookmark.js');
-			$Sender->AddJsFile('js/library/jquery.menu.js');
+			$Sender->AddJsFile('jquery.menu.js');
          $Sender->AddJsFile('options.js');
          $Sender->Head->AddRss($Sender->SelfUrl.'/feed.rss', $Sender->Head->Title());
       }

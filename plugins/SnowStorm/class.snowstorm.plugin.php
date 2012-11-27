@@ -43,11 +43,11 @@ class SnowStormPlugin extends Gdn_Plugin
 	public function Base_Render_Before($Sender)
 	{
 		// Show the Plugin only on the discussions page
-		$DisplayOn =  array('discussionscontroller');
+		$DisplayOn =  array('discussionscontroller', 'categoriescontroller');
 		if (!InArrayI($Sender->ControllerName, $DisplayOn)) return;
 		
 		// Attach the Plugin's JavaScript to the site
-		$Sender->AddJsFile($this->GetResource('snowstorm-min.js', FALSE, FALSE));
+		$Sender->AddJsFile('snowstorm-min.js', 'plugins/SnowStorm');
 		
 		// Edit some config
 		// For the list of options, see http://www.schillmania.com/projects/snowstorm/

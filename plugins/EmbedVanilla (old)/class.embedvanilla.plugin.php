@@ -21,9 +21,9 @@ $PluginInfo['EmbedVanilla'] = array(
 class EmbedVanillaPlugin extends Gdn_Plugin {
    
 	public function Base_Render_Before($Sender) {
-		$Sender->AddJsFile('plugins/EmbedVanilla/local.js');
+		$Sender->AddJsFile('local.js');
 		if ($Sender->MasterView == 'default' || $Sender->MasterView == '')
-			$Sender->AddCssFile('plugins/EmbedVanilla/fullwidth.css');
+			$Sender->AddCssFile('fullwidth.css', 'plugins/EmbedVanilla');
 	}
 	
 	/**
@@ -31,7 +31,7 @@ class EmbedVanillaPlugin extends Gdn_Plugin {
 	 */
 	public function VanillaController_Embed_Create($Sender) {
 		$Sender->DeliveryType(DELIVERY_TYPE_VIEW);
-		$Sender->Render('plugins/EmbedVanilla/views/embed.php');
+		$Sender->Render('embed', '', 'plugins/EmbedVanilla');
 	}
 
    public function Setup() {

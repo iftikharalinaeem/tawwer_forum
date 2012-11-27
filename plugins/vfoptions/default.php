@@ -124,7 +124,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             .' | '
             .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New', 'style' => $Style));
          $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'position: absolute; bottom: 15px; right: 140px;')));
-         $Sender->AddCssFile('plugins/vfoptions/design/vfoptions.css', 'dashboard');
+         $Sender->AddCssFile('vfoptions.css', 'plugins/vfoptions');
 //      } else {
 //         $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
 //         $Version = GetValue('Version', Gdn::PluginManager()->GetPluginInfo('vfoptions'));

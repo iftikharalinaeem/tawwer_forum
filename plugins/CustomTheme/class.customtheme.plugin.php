@@ -280,7 +280,6 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			Redirect('/settings/customtheme');
 		}		
 		
-		// $Sender->AddJsFile('/js/library/jquery.autogrow.js');
 		$Sender->AddJsFile('customtheme.js', 'plugins/CustomTheme');
       $Sender->AddJsFile('jquery.textarea.js', 'plugins/CustomTheme');
 		$Sender->AddCssFile('customtheme.css', 'plugins/CustomTheme');

@@ -37,7 +37,7 @@ class BugTrackerPlugin extends Gdn_Plugin {
    */
    public function PostController_BeforeDiscussionRender_Handler($Sender) {
       // Include our own CSS
-      $Sender->AddCssFile($this->GetWebResource('design/postbug.css'));
+      $Sender->AddCssFile('postbug.css', 'plugins/BugTracker');
       
       // We want to draw our own selector for the component
       $Sender->ShowCategorySelector = FALSE;
