@@ -181,7 +181,7 @@ class OnlineModule extends Gdn_Module {
       }
       
       // Check cache for matching pre-built data
-      $RenderedCacheKey = sprintf(OnlinePlugin::CACHE_ONLINE_MODULE_KEY, $Selector, $SelectorStub);
+      $RenderedCacheKey = sprintf(OnlinePlugin::CACHE_ONLINE_MODULE_KEY, $this->Selector, $SelectorStub);
       $PreRender = Gdn::Cache()->Get($RenderedCacheKey);
       if ($PreRender !== Gdn_Cache::CACHEOP_FAILURE)
          return $PreRender;
