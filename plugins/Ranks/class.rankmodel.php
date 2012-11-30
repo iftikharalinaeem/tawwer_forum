@@ -199,6 +199,10 @@ class RankModel extends Gdn_Model {
          $Result[] = Plural($V, '%s point', '%s points');
       }
       
+      if ($V = GetValue('CountPosts', $Criteria)) {
+         $Result[] = Plural($V, '%s post', '%s posts');
+      }
+      
       if (isset($Criteria['Permission'])) {
          $Permissions = (array)$Criteria['Permission'];
          foreach ($Permissions as $Permission) {
@@ -344,6 +348,12 @@ class RankModel extends Gdn_Model {
 
       if (isset($Criteria['Points'])) {
          if ($UserPoints < $Criteria['Points'])
+            return FALSE;
+      }
+      
+      if (isset($Criteria['CountPosts'])) {
+         $CountPosts = GetValue('CountDiscussions', $User, 0) + GetValue('CountComments', $User, 0);
+         if ($CountPosts < $Criteria['CountPosts'])
             return FALSE;
       }
 
