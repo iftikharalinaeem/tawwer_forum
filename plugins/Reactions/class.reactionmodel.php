@@ -835,7 +835,7 @@ class ReactionModel {
             foreach ($ReactionTypes as $Type) {
                $Row = $Type;
                $Attributes = @unserialize($Row['Attributes']);
-               unset($Row['Attributes']);
+               //unset($Row['Attributes']); // No! Wipes field when it's re-saved.
                if (is_array($Attributes)) {
                   foreach ($Attributes as $Name => $Value) {
                      $Row[$Name] = $Value;

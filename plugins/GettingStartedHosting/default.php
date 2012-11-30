@@ -36,8 +36,6 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
 
       // Add messages & their css on dashboard
       if (strcasecmp($Sender->RequestMethod, 'index') == 0) {
-         $Sender->AddCssFile('style.css', 'plugins/GettingStartedHosting');
-         
          $Session = Gdn::Session();
          $WelcomeMessage = '<div class="GettingStartedHosting">'
             .Anchor('×', '/dashboard/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
