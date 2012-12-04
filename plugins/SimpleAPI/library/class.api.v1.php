@@ -40,6 +40,7 @@ class ApiMapper extends SimpleApiMapper {
          'users/multi'           => 'dashboard/profile/multi',
          'users/notifications'   => 'dashboard/profile/preferences',
          'users/get'             => 'dashboard/profile',
+         'users/save'             => 'dashboard/user/save',
          'users/sso'             => 'dashboard/user/sso',
           
          // Roles
