@@ -8,7 +8,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.2.1',
+   'Version' => '1.2.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -149,6 +149,19 @@ class ReactionsPlugin extends Gdn_Plugin {
       
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }
+   
+   public function CommentModel_BeforeUpdateCommentCount_Handler($Sender, $Args) {
+      if (!isset($Args['Discussion']))
+         return;
+      
+      // A discussion with a low score counts as sunk.
+      $Discussion =& $Args['Discussion'];
+      if ((int)GetValue('Score', $Discussion) <= -5) {
+         Gdn::Controller()->SetData('Score', GetValue('Score', $Discussion));
+         SetValue('Sink', $Discussion, TRUE);
+      }
+   }
+   
    public function PostController_Render_Before($Sender) {
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }

@@ -8,7 +8,7 @@
 $PluginInfo['Ranks'] = array(
    'Name' => 'Ranks',
    'Description' => "Adds user ranks to the application.",
-   'Version' => '1.1.4',
+   'Version' => '1.1.5',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -22,7 +22,6 @@ class RanksPlugin extends Gdn_Plugin {
    public $ActivityLinks = NULL;
    
    public $CommentLinks = NULL;
-   
    
    /// Methods ///
    
@@ -97,6 +96,37 @@ class RanksPlugin extends Gdn_Plugin {
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Reputation', T('Ranks'), 'settings/ranks', 'Garden.Settings.Manage');
+   }
+   
+   public function Base_Render_Before($Sender) {
+      if (InSection('Dashboard') || !Gdn::Session()->IsValid())
+         return;
+      
+      $RankID = Gdn::Session()->User->RankID;
+      if (!$RankID)
+         return;
+      
+      $Rank = RankModel::Ranks($RankID);
+      if (!$Rank || !GetValue('Message', $Rank))
+         return;
+      
+      $ID = "Rank_$RankID";
+      
+      $DismissedMessages = Gdn::Session()->GetPreference('DismissedMessages', array());
+      if (in_array($ID, $DismissedMessages))
+         return;
+      
+      $Message = array(
+         'MessageID' => $ID,
+         'Content' => $Rank['Message'],
+         'Format' => 'Html',
+         'AllowDismiss' => TRUE,
+         'Enabled' => TRUE,
+         'AssetTarget' => 'Content',
+         'CssClass' => 'Info'
+      );
+      $MessageModule = new MessageModule($Sender, $Message);
+      $Sender->AddModule($MessageModule);
    }
    
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {

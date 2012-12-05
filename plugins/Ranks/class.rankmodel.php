@@ -90,6 +90,7 @@ class RankModel extends Gdn_Model {
       $Result = array();
       
       self::AbilityString($Abilities, 'DiscussionsAdd', 'Add Discussions', $Result);
+      self::AbilityString($Abilities, 'CommentsAdd', 'Add Comments', $Result);
       self::AbilityString($Abilities, 'Titles', 'Titles', $Result);
       self::AbilityString($Abilities, 'Signatures', 'Signatures', $Result);
       self::AbilityString($Abilities, 'Polls', 'Polls', $Result);
@@ -142,6 +143,12 @@ class RankModel extends Gdn_Model {
       if ($V = GetValue('DiscussionsAdd', $Abilities)) {
          if ($V == 'no')
             $Session->SetPermission('Vanilla.Discussions.Add', array());
+      }
+      
+      /// Add comments.
+      if ($V = GetValue('CommentsAdd', $Abilities)) {
+         if ($V == 'no')
+            $Session->SetPermission('Vanilla.Comments.Add', array());
       }
       
       // Titles.
