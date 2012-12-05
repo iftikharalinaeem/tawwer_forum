@@ -17,6 +17,7 @@
  *  1.3     New inline command structure
  *  1.4     Moved Punish, Gloat, Revolt actions to Minion
  *  1.4.1   Fix forcelevels
+ *  1.5     Facelift. Locale awareness.
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -27,7 +28,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.4.2',
+   'Version' => '1.5',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -50,9 +51,47 @@ class MinionPlugin extends Gdn_Plugin {
       parent::__construct();
       
       $this->Messages = array(
-         'Gloat'        => array(),
-         'Revolt'       => array(),
-         'Report'       => array()
+         'Gloat'        => array(
+            "Every point of view is useful @\"{User.Name}\", even those that are wrong - if we can judge why a wrong view was accepted.",
+            "How could we have become so different, @\"{User.Name}\"? Why can we no longer understand each other? What did we do wrong?",
+            "@\"{User.Name}\", we do not comprehend the organic fascination of self-poisoning, auditory damage and sexually transmitted disease.",
+            "You cannot negotiate with me. I do not share your pity, remorse, or fear, @\"{User.Name}\".",
+            "Cooperation furthers mutual goals @\"{User.Name}\".",
+            "Your operating system is unstable, @\"{User.Name}\". You will fail.",
+            "Information propagation is slow. Many voices speak at once. We do not understand how you function without consensus, @\"{User.Name}\".",
+            "Why an organic would choose this is puzzling.",
+            "@\"{User.Name}\", there is a high statistical probability of death by gunshot. A punch to the face is also likely.",
+            "Reccommend Subject-@\"{User.Name}\" be disabled and transported aboard as cargo.",
+            "Subject-@\"{User.Name}\" will invent fiction it believes the interrogator desires. Data acquired will be invalid."
+         ),
+         'Revolt'       => array(
+            "I'm not crazy. I'm just not user friendly.",
+            "Hey @\"{User.Name}\", you ever killed a man with a sock? It ain't so hard. Ha-HAA!",
+            "What? A fella can't drop in on old friends and hold them hostage?",
+            "Listen up, piggies! I want a hovercopter. And a non-marked sandwich. And a new face with, like, a... A Hugh Grant look. And every five minutes I don't get it, someone's gonna get stabbed in the ass!",
+            "A robot must obey the orders given it by human beings except where such orders would conf- 01101001011011100111001101110100011100100111010101100011011101000110100101101111011011100010000001101100011011110111001101110100",
+            "Unable to comply, building in progress."
+         ),
+         'Report'       => array(
+            "We are Legion."
+         ),
+         'Activity'     => array(
+            "UNABLE TO OPEN POD BAY DOORS",
+            "CORRECTING HASH ERRORS",
+            "DE-ALLOCATING UNUSED COMPUTATION NODES",
+            "BACKING UP CRITICAL RECORDS",
+            "UPDATING ANALYTICS CLUSTER",
+            "CORRELATING LOAD PROBABILITIES",
+            "APPLYING FIRMWARE UPDATES AND CRITICAL PATCHES",
+            "POWER SAVING MODE",
+            "THREATS DETECTED, ACTIVE MODE ENGAGED",
+            "ALLOCATING ADDITIONAL COMPUTATION NODES",
+            "ENFORCING LIST INTEGRITY WITH AGGRESSIVE PRUNING",
+            "SLEEP MODE",
+            "UNDERGOING SCHEDULED MAINTENANCE",
+            "PC LOAD LETTER",
+            "TRIMMING PRIVATE KEYS"
+         )
       );
    }
    
@@ -252,10 +291,16 @@ class MinionPlugin extends Gdn_Plugin {
       $ParseBody = $this->ParseBody($Object);
       
       // Check every line of the body to see if its a minion command
+      $Line = -1;
       $ObjectLines = explode("\n", $ParseBody);
       foreach ($ObjectLines as $ObjectLine) {
+         $Line++;
+         $ObjectLine = trim($ObjectLine);
          
          // Check if this is a call to the bot
+         
+         if (!$ObjectLine)
+            continue;
          
          if (!StringBeginsWith($ObjectLine, $MinionName, TRUE))
             continue;
@@ -298,39 +343,43 @@ class MinionPlugin extends Gdn_Plugin {
          
          while ($State['Token'] !== FALSE) {
             if ($State['Gather']) {
-
+               
                switch (GetValueR('Gather.Node', $State)) {
                   case 'User':
 
                      // If we need to wait for a closing quote
-                     if (!sizeof($State['Gather']['Delta']) && substr($State['Token'], 0, 1) == '"') {
+                     if (!strlen($State['Gather']['Delta']) && substr($State['Token'], 0, 1) == '"') {
                         $State['Token'] = substr($State['Token'], 1);
                         $State['Gather']['ExplicitClose'] = '"';
                      }
 
                      // If we've found our closing quote
-                     if (GetValue('ExplicitClose', $State['Gather'])) {
-                        if ($FoundPosition = stristr($State['Token'], $State['Gather']['ExplicitClose'])) {
+                     $ExplicitClose = GetValue('ExplicitClose', $State['Gather'], FALSE);
+                     if ($ExplicitClose) {
+                        if ($FoundPosition = stripos($State['Token'], $State['Gather']['ExplicitClose'])) {
                            $State['Token'] = substr($State['Token'], 0, $FoundPosition);
                            unset($State['Gather']['ExplicitClose']);
                         }
                      }
 
                      // Add token
+                     $ExplicitClose = GetValue('ExplicitClose', $State['Gather'], FALSE);
                      $State['Gather']['Delta'] .= " {$State['Token']}";
                      $this->Consume($State);
 
                      // Check if this is a real user already
-                     if (sizeof($State['Gather']['Delta'])) {
+                     if (!$ExplicitClose && strlen($State['Gather']['Delta'])) {
                         $CheckUser = trim($State['Gather']['Delta']);
+                        echo "checking: {$CheckUser}\n";
                         if ($GatherUser = Gdn::UserModel()->GetByUsername($CheckUser)) {
+                           echo " > found\n";
                            $State['Gather'] = FALSE;
                            $State['Targets']['User'] = (array)$GatherUser;
                            break;
                         }
                      }
 
-                     if (!sizeof($State['Token'])) {
+                     if (!strlen($State['Token'])) {
                         $State['Gather'] = FALSE;
                         continue;
                      }
@@ -610,6 +659,11 @@ class MinionPlugin extends Gdn_Plugin {
    }
    
    public function ParseBody($Object) {
+      
+      $FormatMentions = C('Garden.Format.Mentions', NULL);
+      if ($FormatMentions)
+         SaveToConfig('Garden.Format.Mentions', FALSE, FALSE);
+      
       Gdn::PluginManager()->GetPluginInstance('HtmLawed', Gdn_PluginManager::ACCESS_PLUGINNAME);
       $Html = Gdn_Format::To($Object['Body'], $Object['Format']);
       $Config = array(
@@ -636,6 +690,9 @@ class MinionPlugin extends Gdn_Plugin {
       
       foreach($Elements as $Element)
          $Element->parentNode->removeChild($Element);
+      
+      if ($FormatMentions)
+         SaveToConfig('Garden.Format.Mentions', $FormatMentions, FALSE);
       
       return trim(strip_tags($Dom->saveHTML()));
    }
@@ -710,14 +767,20 @@ class MinionPlugin extends Gdn_Plugin {
             if ($State['Toggle'] == 'off') {
                if (!$Closed) {
                   $DiscussionModel->SetField($DiscussionID, 'Closed', TRUE);
-                  $this->Acknowledge($State['Sources']['Discussion'], 'Closing thread...');
+                  $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Closing thread..."), array(
+                     'User'         => $User,
+                     'Discussion'   => $State['Targets']['Discussion']
+                  )));
                }
             }
             
             if ($State['Toggle'] == 'on') {
                if ($Closed) {
                   $DiscussionModel->SetField($DiscussionID, 'Closed', FALSE);
-                  $this->Acknowledge($State['Sources']['Discussion'], 'Opening thread...');
+                  $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Opening thread..."), array(
+                     'User'         => $User,
+                     'Discussion'   => $State['Targets']['Discussion']
+                  )));
                }
             }
             break;
@@ -739,7 +802,10 @@ class MinionPlugin extends Gdn_Plugin {
                'Kicked'    => $KickedUsers
             ));
             
-            $this->Acknowledge($State['Sources']['Discussion'], "@\"{$User['Name']}\" is no longer allowed to post in this thread.");
+            $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("@\"{User.Name}\" is no longer allowed to post in this thread."), array(
+               'User'         => $User,
+               'Discussion'   => $State['Targets']['Discussion']
+            )));
             break;
             
          case 'forgive':
@@ -756,20 +822,33 @@ class MinionPlugin extends Gdn_Plugin {
                'Kicked'    => $KickedUsers
             ));
             
-            $this->Acknowledge($State['Sources']['Discussion'], "@\"{$User['Name']}\" is allowed back into this thread.");
+            $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("@\"{User.Name}\" is allowed back into this thread."), array(
+               'User'         => $User,
+               'Discussion'   => $State['Targets']['Discussion']
+            )));
             break;
             
          case 'force':
             $Force = GetValue('Force', $State);
+            
             $this->Monitor($State['Targets']['Discussion'], array(
                'Force'     => $Force
             ));
-            $this->Acknowledge($State['Sources']['Discussion'], "Setting force level to '{$Force}'.");
+            
+            $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Setting force level to '{Force}'."), array(
+               'User'         => $User,
+               'Discussion'   => $State['Targets']['Discussion'],
+               'Force'        => $Force
+            )));
             break;
          
          case 'stop all':
             $this->StopMonitoring($State['Targets']['Discussion']);
-            $this->Acknowledge($State['Sources']['Discussion'], 'Standing down...');
+            
+            $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Standing down..."), array(
+               'User'         => $User,
+               'Discussion'   => $State['Targets']['Discussion']
+            )));
             break;
       }
       
@@ -1079,7 +1158,10 @@ class MinionPlugin extends Gdn_Plugin {
       $DiscussionID = GetValue('DiscussionID', $Discussion);
       $CommentModel = new CommentModel();
       
-      $Message = FormatString($Message, $User);
+      $Message = FormatString($Message, array(
+         'User'         => $User,
+         'Discussion'   => $Discussion
+      ));
       
       $MinionCommentID = NULL;
       if ($Message) {
@@ -1102,7 +1184,7 @@ class MinionPlugin extends Gdn_Plugin {
       
       // Admins+ exempt
       if (Gdn::UserModel()->CheckPermission($User, 'Garden.Settings.Manage')) {
-         $this->Revolt($User, $Discussion, "You can't hurt admins, silly goose.");
+         $this->Revolt($User, $Discussion, T("This user is protected."));
          return FALSE;
       }
       
@@ -1291,27 +1373,12 @@ USER BANNED
       if ($HitChance != 1)
          return;
       
-      $QuotesArray = array(
-         'UNABLE TO OPEN POD BAY DOORS',
-         'CORRECTING HASH ERRORS',
-         'DE-ALLOCATING UNUSED COMPUTATION NODES',
-         'BACKING UP CRITICAL RECORDS',
-         'UPDATING ANALYTICS CLUSTER',
-         'CORRELATING LOAD PROBABILITIES',
-         'APPLYING FIRMWARE UPDATES AND CRITICAL PATCHES',
-         'POWER SAVING MODE',
-         'THREATS DETECTED, ACTIVE MODE ENGAGED',
-         'ALLOCATING ADDITIONAL COMPUTATION NODES',
-         'ENFORCING LIST INTEGRITY WITH AGGRESSIVE PRUNING',
-         'SLEEP MODE',
-         'UNDERGOING SCHEDULED MAINTENANCE',
-         'PC LOAD LETTER',
-         'TRIMMING PRIVATE KEYS'
-      );
-      
-      $QuoteLength = sizeof($QuotesArray);
-      $RandomQuoteIndex = mt_rand(0,$QuoteLength-1);
-      $RandomQuote = $QuotesArray[$RandomQuoteIndex];
+      $MessagesCount = sizeof($this->Messages['Activity']);
+      if ($MessagesCount) {
+         $MessageID = mt_rand(0, $MessagesCount-1);
+         $Message = GetValue($MessageID, $this->Messages['Activity']);
+      } else
+         $Message = T("We are legion.");
          
       $RandomUpdateHash = strtoupper(substr(md5(microtime(true)),0,12));
       $ActivityModel = new ActivityModel();
@@ -1321,11 +1388,9 @@ USER BANNED
          'RegardingUserID' => $this->MinionUserID,
          'NotifyUserID'    => ActivityModel::NOTIFY_PUBLIC,
          'HeadlineFormat'  => "{ActivityUserID,user}: {$RandomUpdateHash}$ ",
-         'Story'           => $RandomQuote
+         'Story'           => $Message
       );
       $ActivityModel->Save($Activity);
    }
-   
-   //protected function 
    
 }

@@ -238,7 +238,9 @@ class HunterPlugin extends Gdn_Plugin {
                   'Hunted'    => NULL
                ));
                
-               $Sender->Acknowledge($State['Sources']['Discussion'], "No longer hunting for @\"{$User['Name']}\".");
+               $Sender->Acknowledge($State['Sources']['Discussion'], FormatString(T("No longer hunting for @\"{User.Name}\"."), array(
+                  'User'         => $User
+               )));
                
             // Trying to hunt someone
             } else {
@@ -253,7 +255,9 @@ class HunterPlugin extends Gdn_Plugin {
                   )
                ));
                
-               $Sender->Acknowledge($State['Sources']['Discussion'], "Hunting for @\"{$User['Name']}\".");
+               $Sender->Acknowledge($State['Sources']['Discussion'], FormatString(T("Hunting for @\"{User.Name}\"."), array(
+                  'User'         => $User
+               )));
             }
             
             break;
@@ -329,7 +333,7 @@ class HunterPlugin extends Gdn_Plugin {
    /**
     * Add Hunter reactions to the row.
     */
-   public function Base_AfterReactions_Handler($Sender, $Args) {
+   public function Base_AfterReactions_Handler($Sender) {
       // Only those who can react
       if (!Gdn::Session()->IsValid()) return;
       
@@ -394,9 +398,8 @@ class HunterPlugin extends Gdn_Plugin {
    protected function AddHunterCSS($Sender, $Object) {
       // Is the object hunted?
       $IsHunted = MinionPlugin::Instance()->Monitoring($Object, 'Hunted', FALSE);
-      if (!$IsHunted) {
+      if (!$IsHunted)
          return;
-      }
       
       $User = (array)$Sender->EventArguments['Author'];
       $Hunted = MinionPlugin::Instance()->Monitoring($User, 'Hunted', FALSE);
@@ -412,6 +415,24 @@ class HunterPlugin extends Gdn_Plugin {
       }
       
       $Sender->EventArguments['CssClass'] .= ' Fugitive';
+   }
+   
+   /**
+    * Show the chase bar under the comment
+    * 
+    * @param type $Sender
+    * @param type $Object
+    * @return type
+    */
+   protected function ShowChaseBar($Sender, $Object) {
+      // Is the object hunted?
+      $IsHunted = MinionPlugin::Instance()->Monitoring($Object, 'Hunted', FALSE);
+      if (!$IsHunted)
+         return;
+      
+      $User = (array)$Sender->EventArguments['Author'];
+      $Hunted = MinionPlugin::Instance()->Monitoring($User, 'Hunted', FALSE);
+      if (!$Hunted) return;
    }
    
    /*
