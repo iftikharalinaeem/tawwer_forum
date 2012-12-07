@@ -8,7 +8,7 @@
 $PluginInfo['AutoSignout'] = array(
 	'Name' => 'Auto Signout Timer',
    'Description' => 'Automatically signs people out if they have not been active for a period of time',
-   'Version' => '1.0.1b',
+   'Version' => '1.0.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
 	'MobileFriendly' => TRUE,
    'SettingsUrl' => '/dashboard/settings/autosignout',
