@@ -54,6 +54,13 @@ echo $this->Form->Open(), $this->Form->Errors();
       $this->Form->TextBox('Body', array('Multiline' => TRUE));
      ?>
    </li>
+   <li>
+      <?php
+      echo $this->Form->Label('Message', 'Message'),
+      '<div class="Info2">'."Enter a message for the users that will display at the top of the page.".'</div>',
+      $this->Form->TextBox('Message', array('Multiline' => TRUE));
+     ?>
+   </li>
 </ul>
 <h3>Criteria</h3>
 <div class="Info">
@@ -92,6 +99,13 @@ echo $this->Form->Open(), $this->Form->Errors();
      echo $this->Form->Label('Start Discussions', 'Abilities_DiscussionsAdd'),
      '<div class="Info2">'."You can remove the ability to start discussions from lower-rankig members.".'</div>',
       $this->Form->RadioList('Abilities_DiscussionsAdd', array('no' => 'take away', '' => 'default'));
+     ?>
+   </li>
+   <li>
+     <?php
+     echo $this->Form->Label('Add Comments', 'Abilities_CommentsAdd'),
+     '<div class="Info2">'."You can remove the ability to add comments from lower-rankig (or punished) members.".'</div>',
+      $this->Form->RadioList('Abilities_CommentsAdd', array('no' => 'take away', '' => 'default'));
      ?>
    </li>
    <li>
