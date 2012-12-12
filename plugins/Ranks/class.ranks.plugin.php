@@ -8,7 +8,7 @@
 $PluginInfo['Ranks'] = array(
    'Name' => 'Ranks',
    'Description' => "Adds user ranks to the application.",
-   'Version' => '1.1.5',
+   'Version' => '1.1.6',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -200,6 +200,13 @@ class RanksPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
       
       $RankModel = new RankModel();
+      
+      $DefaultFormat = strtolower(C('Garden.InputFormatter'));
+      if ($DefaultFormat == 'textex')
+         $DefaultFormat = 'text, links, youtube';
+      
+      $Formats = array('Text' => 'text', 'TextEx' => 'text, links, and youtube', '' => sprintf('default (%s)', $DefaultFormat));
+      $Sender->SetData('_Formats', $Formats);
       
       if ($Sender->Form->IsPostBack()) {
          $Data = $Sender->Form->FormValues();

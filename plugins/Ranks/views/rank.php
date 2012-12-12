@@ -109,6 +109,25 @@ echo $this->Form->Open(), $this->Form->Errors();
      ?>
    </li>
    <li>
+      <?php
+      echo $this->Form->Label('Formatting Posts', 'Abilities_Format'),
+         '<div class="Info2">'."You can limit the formatting options on posts for lower-ranking (or punished) members.".'</div>',
+         $this->Form->RadioList('Abilities_Format', $this->Data('_Formats'));
+      ?>
+   </li>
+   <li>
+     <?php
+     echo $this->Form->Label('Post Links', 'Abilities_ActivityLinks'),
+     '<div class="Info2">'."You can take away the ability to post links to help prevent link spammers.".'</div>',
+     
+      $this->Form->Label('Activities', 'Abilities_ActivityLinks', array('class' => 'SmallLabel')),
+      $this->Form->RadioList('Abilities_ActivityLinks', array('no' => 'take away', '' => 'default'));
+      
+//      $this->Form->Label('@'.T('Discussions').' & '.T('Comments'), 'Abilities_CommentLinks', array('class' => 'SmallLabel')),
+//      $this->Form->RadioList('Abilities_CommentLinks', array('no' => 'take away', '' => 'default'));
+     ?>
+   </li>
+   <li>
      <?php
      echo $this->Form->Label('Titles', 'Abilities_Titles'),
      '<div class="Info2">'."You can give or take away the ability to have a user title.".'</div>',
@@ -134,18 +153,6 @@ echo $this->Form->Open(), $this->Form->Errors();
      echo $this->Form->Label('Me Actions', 'Abilities_MeAction'),
      '<div class="Info2">'."You can give or take away the ability to use 'me actions'.".'</div>',
       $this->Form->RadioList('Abilities_MeAction', array('yes' => 'give', 'no' => 'take away', '' => 'default'));
-     ?>
-   </li>
-   <li>
-     <?php
-     echo $this->Form->Label('Post Links', 'Abilities_ActivityLinks'),
-     '<div class="Info2">'."You can take away to post links to help prevent link spammers.".'</div>',
-     
-      $this->Form->Label('Activities', 'Abilities_ActivityLinks', array('class' => 'SmallLabel')),
-      $this->Form->RadioList('Abilities_ActivityLinks', array('no' => 'take away', '' => 'default'));
-      
-//      $this->Form->Label('@'.T('Discussions').' & '.T('Comments'), 'Abilities_CommentLinks', array('class' => 'SmallLabel')),
-//      $this->Form->RadioList('Abilities_CommentLinks', array('no' => 'take away', '' => 'default'));
      ?>
    </li>
    <li>
