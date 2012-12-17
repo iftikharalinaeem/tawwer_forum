@@ -193,7 +193,7 @@
     border-top: solid 1px #fff;
 }
 .Promoted .Message {
-    font-size: 110%;
+    /*font-size: 110%;*/
 }
 .Promoted .Author .ProfilePhotoMedium {
     box-shadow: 0px -1px 8px #fff;

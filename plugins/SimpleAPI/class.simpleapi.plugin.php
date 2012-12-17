@@ -161,6 +161,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             
             list($FieldPrefix, $ColumnLookup) = explode('.', $Field, 2);
             
+            $FieldPrefix = ucfirst($FieldPrefix); // support some form of case-insensitivity.
             $TableName = $FieldPrefix;
             
             if (StringEndsWith($FieldPrefix, 'User'))
@@ -188,17 +189,23 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             
             if (!$TableAllowed)
                return;
-
+            
             // We desire the 'ID' root field
             $LookupField = "{$FieldPrefix}ID";
             $OutputField = $LookupField;
             
             if (StringEndsWith($FieldPrefix, 'User'))
                $LookupField = "UserID";
-
+            
             // Don't override an existing desired field
             if (isset($Data[$OutputField]) && !$Multi)
                return;
+            
+            // Allow a lookup to set a field to null.
+            if ($Value === NULL || $Value === '') {
+               $Data[$OutputField] = NULL;
+               return;
+            }
 
             $LookupFieldValue = NULL;
             $LookupKey = "{$TableName}.{$ColumnLookup}";
@@ -206,6 +213,11 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
             if ($ColumnLookup == 'ID')
                $LookupMethod = 'noop';
+            
+            // Sucks, but jsConnect always sends lowercase.
+            if (strtolower($ColumnLookup) == $ColumnLookup) {
+               $ColumnLookup = ucfirst($ColumnLookup);
+            }
 
             if ($LookupKey == 'User.ForeignID')
                $LookupMethod = 'custom';

@@ -75,6 +75,8 @@
          <div class="item"><a href="/blog/api-users-multi">/users/multi</a></div>
          <div class="item"><a href="/blog/api-users-notifications">/users/notifications</a></div>
          <div class="item"><a href="/blog/api-users-show">/users/get</a></div>
+         <div class="item"><a href="/blog/api-users-sso">/users/sso</a></div>
+         <div class="item"><a href="/blog/api-users-delete">/users/delete</a></div>
       </div>
    </div>
    
@@ -109,6 +111,14 @@
       <div class="section_contents">
          <div class="item"><a href="/blog/api-online-privacy">/online/privacy</a></div>
          <div class="item"><a href="/blog/api-online-count">/online/count</a></div>
+      </div>
+   </div>
+   
+   <div class="api_section">
+      <div class="section_heading">Signature</div>
+      <div class="section_contents">
+         <div class="item"><a href="/blog/api-signature-get">/signature/get</a></div>
+         <div class="item"><a href="/blog/api-signature-set">/signature/set</a></div>
       </div>
    </div>
 </div>

@@ -570,6 +570,8 @@ class ReactionModel {
       if ($Points <> 0 && class_exists('UserBadgeModel')) {
          UserBadgeModel::GivePoints($Record['InsertUserID'], $Points, 'Reactions');
       }
+      
+      return $Insert;
    }
    
    /**
@@ -619,7 +621,7 @@ class ReactionModel {
           'UserID' => $UserID,
           'Total' => $Inc
           );
-      $this->ToggleUserTag($Data, $Row, $Model);
+      $Inserted = $this->ToggleUserTag($Data, $Row, $Model);
       
       $Message = array(T(GetValue('InformMessage', $ReactionType, '')), 'Dismissable AutoDismiss');
       
@@ -694,6 +696,17 @@ class ReactionModel {
       
       if ($Message)
          Gdn::Controller()->InformMessage($Message[0], $Message[1]);
+      
+      ReactionsPlugin::Instance()->EventArguments = array(
+         'RecordType'      => $RecordType,
+         'RecordID'        => $ID,
+         'Record'          => $Row,
+         'ReactionUrlCode' => $ReactionUrlCode,
+         'ReactionData'    => $Data,
+         'Insert'          => $Inserted,
+         'UserID'          => $UserID
+      );
+      ReactionsPlugin::Instance()->FireEvent('Reaction');
       
 //      if ($Undo)
 //         $UndoButton = $this->Button(T('Report '.ucfirst($Reaction), ucfirst($Reaction)), $Reaction, $RecordType, $ID, FALSE);
@@ -806,7 +819,7 @@ class ReactionModel {
       
       $Badges = $BadgeModel->GetWhere(array('Type' => 'Reaction', 'Class' => $ReactionType['UrlCode']), 'Threshold', 'desc')->ResultArray();
       foreach ($Badges as $Badge) {
-         if ($Score > $Badge['Threshold']) {
+         if ($Score >= $Badge['Threshold']) {
             $UserBadgeModel->Give($UserID, $Badge);
          }
       }
@@ -822,7 +835,7 @@ class ReactionModel {
             foreach ($ReactionTypes as $Type) {
                $Row = $Type;
                $Attributes = @unserialize($Row['Attributes']);
-               unset($Row['Attributes']);
+               //unset($Row['Attributes']); // No! Wipes field when it's re-saved.
                if (is_array($Attributes)) {
                   foreach ($Attributes as $Name => $Value) {
                      $Row[$Name] = $Value;

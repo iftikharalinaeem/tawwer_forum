@@ -24,7 +24,6 @@ class IPB extends ExportController {
 //      $Ex->DestPrefix = 'GDN_';
       
       $Ex->SourcePrefix = 'ibf_';
-      $Cdn = 'http://cdn.vanillaforums.com/unknownworlds.vanillaforums.com/';
       
       // Get the characterset for the comments.
       $CharacterSet = $Ex->GetCharacterSet('posts');
@@ -76,12 +75,18 @@ class IPB extends ExportController {
             on m.$MemberID = mc.converge_id";
       }
       
+      if ($Ex->Exists('members', 'hide_email') === true) {
+         $ShowEmail = '!hide_email';
+      } else {
+         $ShowEmail = '0';
+      }
+      
       if ($Ex->Exists('member_extra') === TRUE) {
          $Sql = "select
                   m.*,
                   m.joined as firstvisit,
                   'ipb' as HashMethod,
-                  !hide_email as ShowEmail,
+                  $ShowEmail as ShowEmail,
                   case when x.avatar_location in ('noavatar', '') then null
                      when x.avatar_location like 'upload:%' then concat('~cf/ipb/', right(x.avatar_location, length(x.avatar_location) - 7))
                      when x.avatar_type = 'upload' then concat('~cf/ipb/', x.avatar_location)
@@ -100,7 +105,7 @@ class IPB extends ExportController {
                   m.*,
                   joined as firstvisit,
                   'ipb' as HashMethod,
-                  !hide_email as ShowEmail,
+                  $ShowEmail as ShowEmail,
                   concat(m.members_pass_hash, '$', m.members_pass_salt) as Password,
                   case when length(p.avatar_location) <= 3 or p.avatar_location is null then null
                   	when p.avatar_type = 'local' then concat('ipb/', p.avatar_location)
@@ -230,7 +235,7 @@ class IPB extends ExportController {
           'start_date' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
           'ip_address' => 'InsertIPAddress',
           'edit_time' => array('Column' => 'DateUpdated', 'Filter' => array($Ex, 'TimestampToDate')),
-          'last_post', array('Column' => 'DateLastPost', 'Filter' => array($Ex, 'TimestampToDate')),
+//          'last_post' => array('Column' => 'DateLastPost', 'Filter' => array($Ex, 'TimestampToDate')),
           'posts' => 'CountComments',
           'views' => 'CountViews',
           'pinned' => 'Announce',

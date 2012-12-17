@@ -17,6 +17,7 @@
  *  1.5.1   Fix inconsistent timezone handling
  *  1.6     Add SimpleAPI hooks
  *  1.6.1   Add online/count API hook
+ *  1.6.3   Natsort OnlineUsers before rendering
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -27,7 +28,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.6.1',
+   'Version' => '1.6.3',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -35,7 +36,7 @@ $PluginInfo['Online'] = array(
    'SettingsUrl' => '/plugin/online',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/tim'
 );
 
 class OnlinePlugin extends Gdn_Plugin {
@@ -62,7 +63,13 @@ class OnlinePlugin extends Gdn_Plugin {
     * Length of time to cache counts
     * @var integer Seconds
     */
-   protected $CacheCountDelay;
+   public $CacheCountDelay;
+   
+   /**
+    * Length of time to cache pre-rendered user lists
+    * @var integer Seconds
+    */
+   public $CacheRenderDelay;
    
    /**
     * Current UTC timestamp
@@ -891,7 +898,7 @@ class OnlinePlugin extends Gdn_Plugin {
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
       if (!$Sender->Form->IsPostBack())
-         throw new Exception(405);
+         throw new Exception('Post required.', 405);
       
       $UserID = Gdn::Request()->Get('UserID');
       $User = Gdn::UserModel()->GetID($UserID);
