@@ -1,0 +1,47 @@
+/** Popups **/
+
+div.Popup .Body {
+    padding: 15px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+    background-color: $bodyBackground;
+}
+
+div.Popup .Border {
+    background: none;
+}
+
+.Overlay {
+    background: rgba(0,0,0,.4);
+}
+
+div.Popup h1 {
+    margin: -15px -15px 15px;
+    padding: 9px 15px;
+    border-bottom: solid 1px $borderColor;
+    font-size: 18px;
+    line-height: 27px;
+}
+
+div.Popup .Buttons {
+    margin: 15px -15px -15px;
+    padding: 15px;
+    background: accent(10%);
+    border-top: 1px solid $borderColor;
+    box-shadow: inset 0 1px 0 lighten($bodyBackground, 20%);
+    border-radius: 0 0 6px 6px;
+}
+
+a.Close {
+   color: $textColor;
+   font-family: inherit;
+   top: 9px;
+   right: 15px;
+   opacity: .4;
+}
+
+a.Close:hover {
+    opacity: 1;
+}
