@@ -199,6 +199,10 @@ class RankModel extends Gdn_Model {
          $Result[] = Plural($V, '%s point', '%s points');
       }
       
+      if ($V = GetValue('CountPosts', $Criteria)) {
+         $Result[] = Plural($V, '%s posts', '%s posts');
+      }
+      
       if (isset($Criteria['Permission'])) {
          $Permissions = (array)$Criteria['Permission'];
          foreach ($Permissions as $Permission) {
