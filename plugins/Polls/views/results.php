@@ -38,7 +38,7 @@ else:
             <div class="VoteUsers">
                <span class="PhotoGrid PhotoGridSmall">
                   <?php 
-                  $MaxLimit = 20;
+                  $MaxLimit = C('Plugins.Polls.MaxShowVotes', 20);
                   $Max = $CountVotes > $MaxLimit ? $MaxLimit : $CountVotes;
                   for ($i = 0; $i < $Max; $i++)
                      echo UserPhoto($Votes[$i], array('Size' => 'Small'));
