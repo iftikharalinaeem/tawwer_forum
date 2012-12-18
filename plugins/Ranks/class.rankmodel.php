@@ -91,14 +91,24 @@ class RankModel extends Gdn_Model {
       
       self::AbilityString($Abilities, 'DiscussionsAdd', 'Add Discussions', $Result);
       self::AbilityString($Abilities, 'CommentsAdd', 'Add Comments', $Result);
+      
+      $V = GetValue('Format', $Abilities);
+      if ($V) {
+         $V = strtolower($V);
+         if ($V == 'textex')
+            $V = 'text, links, youtube';
+         
+         $Result[] = '<b>Post Format</b>: '.$V;
+      }
+      
+      self::AbilityString($Abilities, 'ActivityLinks', 'Activity Links', $Result);
+//      self::AbilityString($Abilities, 'CommentLinks', 'Discussion & Comment Links', $Result);
+      
       self::AbilityString($Abilities, 'Titles', 'Titles', $Result);
       self::AbilityString($Abilities, 'Signatures', 'Signatures', $Result);
       self::AbilityString($Abilities, 'Polls', 'Polls', $Result);
       self::AbilityString($Abilities, 'MeAction', 'Me Actions', $Result);
       self::AbilityString($Abilities, 'Curation', 'Content Curation', $Result);
-      
-      self::AbilityString($Abilities, 'ActivityLinks', 'Activity Links', $Result);
-//      self::AbilityString($Abilities, 'CommentLinks', 'Discussion & Comment Links', $Result);
       
       $V = GetValue('EditContentTimeout', $Abilities, '');
       if ($V !== '') {
@@ -125,7 +135,6 @@ class RankModel extends Gdn_Model {
       }
    }
    
-   
    public static function ApplyAbilities() {
       $Session = Gdn::Session();
       if (!$Session->User)
@@ -139,16 +148,24 @@ class RankModel extends Gdn_Model {
       
       $Abilities = GetValue('Abilities', $Rank, array());
       
-      /// Post discussions.
+      // Post discussions.
       if ($V = GetValue('DiscussionsAdd', $Abilities)) {
          if ($V == 'no')
             $Session->SetPermission('Vanilla.Discussions.Add', array());
       }
       
-      /// Add comments.
+      // Add comments.
       if ($V = GetValue('CommentsAdd', $Abilities)) {
          if ($V == 'no')
             $Session->SetPermission('Vanilla.Comments.Add', array());
+      }
+      
+      // Post Format.
+      if ($V = GetValue('Format', $Abilities)) {
+         SaveToConfig(array(
+            'Garden.InputFormatter' => $V,
+            'Gardem.ForceInputFormatter' => TRUE),
+            NULL, FALSE);
       }
       
       // Titles.
@@ -204,6 +221,10 @@ class RankModel extends Gdn_Model {
       
       if ($V = GetValue('Points', $Criteria)) {
          $Result[] = Plural($V, '%s point', '%s points');
+      }
+      
+      if ($V = GetValue('CountPosts', $Criteria)) {
+         $Result[] = Plural($V, '%s posts', '%s posts');
       }
       
       if (isset($Criteria['Permission'])) {

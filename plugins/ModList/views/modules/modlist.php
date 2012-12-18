@@ -1,11 +1,11 @@
 <?php if (!defined('APPLICATION')) exit; ?>
 <div id="ModList" class="ModList Box">
-   <h2 class="H"><?php echo T('Category Moderators'); ?></h2>
+   <h2 class="H"><?php echo T('Category Moderators', 'Moderators'); ?></h2>
    <div class="Moderators"><?php 
          
       if ($this->Style == 'pictures') {
          
-         $ListClass = 'PhotoGrid';
+         $ListClass = 'PhotoGrid PhotoGridSmall';
          if (count($this->Data('Moder')) > 10)
             $ListClass .= ' PhotoGridSmall';
 
@@ -17,13 +17,13 @@
                $User['Photo'] = Asset('/applications/dashboard/design/images/usericon.gif', TRUE);
 
             $WrapClass = implode(' ', $WrapClass);
-            echo "<div class=\"{$WrapClass}\">";
-            echo UserPhoto($User);
+            echo " <span class=\"{$WrapClass}\">";
+            echo UserPhoto($User, array('Size' => 'Small'));
 
             $UserName = GetValue('Name', $User, FALSE);
             if ($UserName)
-               echo Wrap($UserName, 'div', array('class' => 'CategoryModeratorName'));
-            echo '</div>';
+               echo ' '.UserAnchor($User, 'Username CategoryModeratorName');
+            echo '</span> ';
          }
          echo '</div>'."\n";
 

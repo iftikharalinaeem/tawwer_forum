@@ -196,10 +196,16 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             
             if (StringEndsWith($FieldPrefix, 'User'))
                $LookupField = "UserID";
-
+            
             // Don't override an existing desired field
             if (isset($Data[$OutputField]) && !$Multi)
                return;
+            
+            // Allow a lookup to set a field to null.
+            if ($Value === NULL || $Value === '') {
+               $Data[$OutputField] = NULL;
+               return;
+            }
 
             $LookupFieldValue = NULL;
             $LookupKey = "{$TableName}.{$ColumnLookup}";
