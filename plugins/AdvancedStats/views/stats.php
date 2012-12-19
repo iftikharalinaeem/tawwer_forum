@@ -5,7 +5,7 @@ if (!$InstallationID)
 ?>
 <div id="vanilla-comments" class="Loading" style="padding: 0;"></div>
 <script type="text/javascript">
-var vanilla_forum_url = '<?php echo C('Garden.Analytics.Remote','http://analytics.vanillaforums.com')?>';
+var vanilla_forum_url = '<?php echo C('Garden.Analytics.Remote','//analytics.vanillaforums.com')?>';
 var vanilla_path = 'stats/remote/<?php echo $InstallationID; ?>';
 (function() {
    var vanilla = document.createElement('script');
