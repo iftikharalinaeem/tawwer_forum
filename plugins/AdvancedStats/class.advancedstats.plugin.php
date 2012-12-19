@@ -8,7 +8,7 @@
 $PluginInfo['AdvancedStats'] = array(
    'Name' => 'Advanced Stats',
    'Description' => "Track and access advanced statistics to better monitor the health of your site.",
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -56,7 +56,7 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
     * @return string 
     */
    public static function StatsUrl($Path, $Params = array()) {
-      $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
+      $AnalyticsServer = C('Garden.Analytics.Remote','//analytics.vanillaforums.com');
       
       $Path = '/'.trim($Path, '/');
       
@@ -174,7 +174,7 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
     */
    public function Base_Render_Before($Sender, $Args) {
 //      if ($Sender->MasterView != 'admin') {
-         $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
+         $AnalyticsServer = C('Garden.Analytics.Remote', '//analytics.vanillaforums.com');
          $Version = GetValue('Version', Gdn::PluginManager()->GetPluginInfo('AdvancedStats'));
          
          
