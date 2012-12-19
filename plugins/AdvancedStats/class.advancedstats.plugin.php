@@ -8,7 +8,7 @@
 $PluginInfo['AdvancedStats'] = array(
    'Name' => 'Advanced Stats',
    'Description' => "Track and access advanced statistics to better monitor the health of your site.",
-   'Version' => '1.0.2',
+   'Version' => '1.0.3',
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
