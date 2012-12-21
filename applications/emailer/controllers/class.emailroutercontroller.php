@@ -151,7 +151,7 @@ class EmailRouterController extends Gdn_Controller {
             curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
             curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($C, CURLOPT_POST, 1);
-            curl_setopt($C, CURLOPT_POSTFIELDS, $Data);
+            curl_setopt($C, CURLOPT_POSTFIELDS, http_build_query($Data));
             
             $Result = curl_exec($C);
             $Code = curl_getinfo($C, CURLINFO_HTTP_CODE);
