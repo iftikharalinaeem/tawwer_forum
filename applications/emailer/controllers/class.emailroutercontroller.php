@@ -146,6 +146,7 @@ class EmailRouterController extends Gdn_Controller {
                } else {
                   $Url = "http://$ClientName.vanillaforums.com/utility/email.json";
                }
+               $LogModel->SetField($LogID, array('Url' => $Url));
             } else {
                $LogModel->SetField($LogID, array('Response' => 400, 'ResponseText' => "Invalid to: $To, $Email."));
                if (Debug())
