@@ -65,7 +65,10 @@ class EmailRouterController extends Gdn_Controller {
 //            self::Log("Headerline: $Part");
             list($Name, $Value) = explode(':', $Part, 2);
             $i = trim($Name);
-            $Result[$i] = ltrim($Value);
+            if (isset($Result[$i]))
+               $Result[$i] .= "\n".ltrim($Value);
+            else
+               $Result[$i] = ltrim($Value);
          }
       }
 
@@ -99,6 +102,7 @@ class EmailRouterController extends Gdn_Controller {
             $Headers = self::ParseEmailHeader(GetValue('headers', $Post, ''));
    //         self::Log('Headers: '.print_r($Headers, TRUE));
             $Headers = array_change_key_case($Headers);
+            
             $HeaderData = ArrayTranslate($Headers, array('message-id' => 'MessageID', 'references' => 'References', 'in-reply-to' => 'ReplyTo'));
             $Data = array_merge($Data, $HeaderData);
 
@@ -109,14 +113,19 @@ class EmailRouterController extends Gdn_Controller {
                $Data['Body'] = self::StripEmail($Post['text']);
                $Data['Format'] = 'Html';
             }
-
+            
 //            self::Log("Saving data...");
             $this->Data['_Status'][] = 'Saving data.';
             
             // Figure out the url from the email's address.
             $To = GetValue('x-forwarded-to', $Headers);
             if (!$To) {
-               $To = $Data['To'];
+               // Check received header.
+               if (preg_match('`<([^<>@]+@email.vanillaforums.com)>`', $Headers['received'], $Matches)) {
+                  $To = $Matches[1];
+               } else {
+                  $To = $Data['To'];
+               }
             }
             
             $LogModel = new Gdn_Model('EmailLog');
