@@ -119,6 +119,9 @@ class EmailRouterController extends Gdn_Controller {
                $To = $Data['To'];
             }
             
+            $LogModel = new Gdn_Model('EmailLog');
+            $LogID = $LogModel->Insert($Data);
+            
             list($Name, $Email) = self::ParseEmailAddress($To);
             if (preg_match('`([^+@]+)([^@]*)@(.+)`', $Email, $Matches)) {
                $ClientName = $Matches[1];
@@ -158,8 +161,11 @@ class EmailRouterController extends Gdn_Controller {
                if ($ResultData) {
                   $this->Data = $Data;
                }
+               $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Result));
             } else {
-               throw new Exception(curl_error($C), $Code);
+               $Error = curl_error($C);
+               $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Error));
+               throw new Exception($Error, $Code);
             }
          }
 
@@ -169,7 +175,7 @@ class EmailRouterController extends Gdn_Controller {
          $Contents = $Ex->getMessage()."\n"
             .$Ex->getTraceAsString()."\n"
             .print_r($_POST, TRUE);
-         file_put_contents(PATH_UPLOADS.'/email/error_'.time().'.txt', $Contents);
+//         file_put_contents(PATH_UPLOADS.'/email/error_'.time().'.txt', $Contents);
          
          throw $Ex;
       }
