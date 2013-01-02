@@ -672,8 +672,8 @@ h1.Logo a {
    padding: 5px 0 5px 5px;
 }
 .post ul, .post ol{
-   background: none repeat scroll 0 0 #EBF2F8;
-   border: 1px solid #BFD1E1;
+   background: none; 
+   border: none;
    padding: 10px 20px;
 }
 .post .wp-caption {
