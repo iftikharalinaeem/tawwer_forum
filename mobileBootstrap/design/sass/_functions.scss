@@ -1,0 +1,22 @@
+@import "compass/css3/images";
+@import "compass/utilities/general/clearfix";
+
+@function accent($amount: 5%, $color: $bodyBackground) {
+   @if ($amount < 0) {
+      @return if(lightness($color) <= 50%, darken($color, abs($amount)), lighten($color, abs($amount)));
+   }
+   @return if(lightness($color) > 50%, darken($color, $amount), lighten($color, $amount));
+}
+
+@function spriteUrl($color, $file: sprites-14) {
+   @return url("//vanillicon.com/sprites/#{$file}-#{hex_str(unquote($color))}.png");
+}
+
+@function hoverColor($color, $hoverColor: $linkColorHover, $altHoverColor: $altLinkColorHover) {
+   @return if($color == $hoverColor, $altHoverColor, $hoverColor);
+}
+
+@mixin edgepop {
+   margin-left: -5px;
+   margin-right: -5px;
+}

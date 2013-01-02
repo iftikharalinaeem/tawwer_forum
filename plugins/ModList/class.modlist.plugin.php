@@ -13,7 +13,7 @@
 $PluginInfo['ModList'] = array(
    'Name' => 'Mod List',
    'Description' => "Adds a list of moderators to categories.",
-   'Version' => '1.2.1',
+   'Version' => '1.2.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Tim Gunter',
    'AuthorEmail' => 'tim@vanillaforums.com',
@@ -123,6 +123,8 @@ class ModListPlugin extends Gdn_Plugin {
       if ($Cascade) {
          $Ancestors = CategoryModel::GetAncestors($CategoryID);
          $CategoryIDs = array_keys($Ancestors);
+//         if (!in_array(-1, $CategoryIDs))
+//            $CategoryIDs[] = -1;
       }
       
       $Moderators = Gdn::SQL()->Select('*')

@@ -76,6 +76,7 @@
          <div class="item"><a href="/blog/api-users-notifications">/users/notifications</a></div>
          <div class="item"><a href="/blog/api-users-show">/users/get</a></div>
          <div class="item"><a href="/blog/api-users-sso">/users/sso</a></div>
+         <div class="item"><a href="/blog/api-users-delete">/users/delete</a></div>
       </div>
    </div>
    

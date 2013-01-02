@@ -25,12 +25,12 @@
       <div id="Body">
          <div class="BreadcrumbsWrapper">
             <div class="Row">
+               <div class="SiteSearch">{searchbox}</div>
                {breadcrumbs}
             </div>
          </div>
          <div class="Row">
             <div class="Column PanelColumn" id="Panel">
-               
                {asset name="Panel"}
             </div>
             <div class="Column ContentColumn" id="Content">{asset name="Content"}</div>

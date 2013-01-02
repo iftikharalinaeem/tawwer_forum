@@ -898,7 +898,7 @@ class OnlinePlugin extends Gdn_Plugin {
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
       if (!$Sender->Form->IsPostBack())
-         throw new Exception(405);
+         throw new Exception('Post required.', 405);
       
       $UserID = Gdn::Request()->Get('UserID');
       $User = Gdn::UserModel()->GetID($UserID);
