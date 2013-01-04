@@ -33,7 +33,7 @@
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-lincoln.jpg" />
 			<span class="about"><strong>Matt Lincoln Russell</strong> Developer</span>
 		</a>
-		<a class="team-luc" rel="author" href="http://vanillaforums.com/blog/author/luc/">
+		<a class="team-luc" href="http://vanillaforums.com/blog/author/luc/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-luc.jpg" />
 			<span class="about"><strong>Luc Vezina</strong> CEO</span>
 		</a>
