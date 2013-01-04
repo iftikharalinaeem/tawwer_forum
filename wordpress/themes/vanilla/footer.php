@@ -6,7 +6,13 @@
          <div class="Columns">
             <div class="Column4">
                <strong>About Us</strong>
-               <a href="/info/contact">Contact Us</a><br /><a href="/info/hiring">We're Hiring!</a><br /><a href="http://vanillaforums.totemapp.com/">Press Releases</a><br /><a href="http://www.facebook.com/vanillaforums">Follow us on Facebook</a><br /><a href="http://www.twitter.com/vanilla">Follow us on Twitter</a><br /><a href="/blog">Read Our Blog</a>            
+               <a href="/info/contact">Contact Us</a><br />
+               <a href="/info/hiring">We're Hiring!</a><br />
+               <a href="http://vanillaforums.totemapp.com/">Press Releases</a><br />
+               <a href="http://www.facebook.com/vanillaforums">Follow us on Facebook</a><br />
+               <a href="http://www.twitter.com/vanilla">Follow us on Twitter</a><br />
+               <a href="https://plus.google.com/114911737178548458245" rel="publisher">Find us on Google+</a><br />
+               <a href="/blog">Read Our Blog</a>            
             </div>
             <div class="Column4">
                <strong>Features</strong>
