@@ -100,6 +100,7 @@ $Session = Gdn::Session();
                echo '<br />'.Anchor('Resources', '/resources', '', array('SSL' => FALSE));
                echo '<br />'.Anchor("Jobs", '/info/hiring', '', array('SSL' => FALSE));
                echo '<br />'.Anchor('Blog', '/blog', '', array('SSL' => FALSE));
+               echo '<br /><a href="https://plus.google.com/114911737178548458245" rel="publisher">Google+</a>';
                ?>
             </div>
             <div class="Column3">
