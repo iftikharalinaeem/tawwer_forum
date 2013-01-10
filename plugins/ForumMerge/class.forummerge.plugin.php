@@ -13,6 +13,9 @@ $PluginInfo['ForumMerge'] = array(
 
 /**
  * Forum Merge plugin.
+ * 
+ * @todo Allow multiple merges by resetting OldID to NULL before run.
+ * @todo Add additional datatypes (noted at end of script)
  */
 class ForumMergePlugin implements Gdn_IPlugin {
 	/**
@@ -84,8 +87,8 @@ class ForumMergePlugin implements Gdn_IPlugin {
          select u.UserID, um.Name, um.Value
          from '.$NewPrefix.'User u, '.$OldDatabase.'.'.$OldPrefix.'UserMeta um
          where u.OldID = um.UserID');
-		
-      
+
+
       
 		// ROLES //
 		$RoleColumns = $this->GetColumns('Role', $OldDatabase, $OldPrefix);
@@ -160,7 +163,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
       
       
       // COMMENTS //
-      /*$CommentColumns = $this->GetColumns('Comment', $OldDatabase, $OldPrefix);
+      $CommentColumns = $this->GetColumns('Comment', $OldDatabase, $OldPrefix);
       
       // Copy over all comments
       Gdn::SQL()->Query('insert into '.$NewPrefix.'Comment ('.$CommentColumns.', OldID) 
@@ -179,7 +182,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
       Gdn::SQL()->Query('update '.$NewPrefix.'Comment c
         set c.DiscussionID = (SELECT d.DiscussionID from '.$NewPrefix.'Discussion d where d.OldID = c.DiscussionID)
         where c.OldID > 0');
-      */
+      
       
       
 		// MEDIA //
@@ -196,9 +199,9 @@ class ForumMergePlugin implements Gdn_IPlugin {
         where m.OldID > 0');
       
       // ForeignID / ForeignTable
-      /*Gdn::SQL()->Query('update '.$NewPrefix.'Media m
-        set m.ForeignID = (SELECT c.CommentID from '.$NewPrefix.'Comment c where c.OldID = m.ForeignID)
-        where m.OldID > 0 and m.ForeignTable = \'comment\'');*/
+      //Gdn::SQL()->Query('update '.$NewPrefix.'Media m
+      //  set m.ForeignID = (SELECT c.CommentID from '.$NewPrefix.'Comment c where c.OldID = m.ForeignID)
+      //  where m.OldID > 0 and m.ForeignTable = \'comment\'');
       Gdn::SQL()->Query('update '.$NewPrefix.'Media m
         set m.ForeignID = (SELECT d.DiscussionID from '.$NewPrefix.'Discussion d where d.OldID = m.ForeignID)
         where m.OldID > 0 and m.ForeignTable = \'discussion\'');
@@ -206,14 +209,12 @@ class ForumMergePlugin implements Gdn_IPlugin {
       
       
 		// CONVERSATION //
-		/*
 		$ConversationColumns = $this->GetColumns('Conversation', $OldDatabase, $OldPrefix);
-      
+
       // Copy over all Conversations
       Gdn::SQL()->Query('insert into '.$NewPrefix.'Conversation ('.$ConversationColumns.', OldID) 
          select '.$ConversationColumns.', ConversationID 
          from '.$OldDatabase.'.'.$OldPrefix.'Conversation');
-      
       // InsertUserID
       Gdn::SQL()->Query('update '.$NewPrefix.'Conversation c
         set c.InsertUserID = (SELECT u.UserID from '.$NewPrefix.'User u where u.OldID = c.InsertUserID)
@@ -223,18 +224,58 @@ class ForumMergePlugin implements Gdn_IPlugin {
         set c.UpdateUserID = (SELECT u.UserID from '.$NewPrefix.'User u where u.OldID = c.UpdateUserID)
         where c.OldID > 0');
       // Contributors
-      //
-      //
+      // a. Build userid lookup
+      /*$Users = Gdn::SQL()->Query('select UserID, OldID from '.$NewPrefix.'User');
+      $UserIDLookup = array();
+      foreach($Users->Result() as $User) {
+         $OldID = GetValue('OldID', $User);
+         $UserIDLookup[$OldID] = GetValue('UserID', $User);
+      }
+      // b. Translate contributor userids
+      $Conversations = Gdn::SQL()->Query('select ConversationID, Contributors 
+         from '.$NewPrefix.'Conversation 
+         where Contributors <> ""');
+      foreach($Conversations->Result() as $Conversation) {
+         $Contributors = unserialize(GetValue('Contributors', $Conversation));
+         if (!is_array($Contributors))
+            continue;
+         $UpdatedContributors = array();
+         foreach($Contributors as $UserID) {
+            if (isset($UserIDLookup[$UserID]))
+               $UpdatedContributors[] = $UserIDLookup[$UserID];
+         }
+         // c. Update each conversation
+         $ConversationID = GetValue('ConversationID', $Conversation);
+         Gdn::SQL()->Query('update '.$NewPrefix.'Conversation 
+            set Contributors = "'.mysql_real_escape_string(serialize($UpdatedContributors)).'"
+            where ConversationID = '.$ConversationID);
+      }*/
 		
 		// ConversationMessage      
       // Copy over all ConversationMessages
-      Gdn::SQL()->Query('insert into '.$NewPrefix.'ConversationMessage (ConversationID,Body,Format,InsertUserID,DateInserted,InsertIPAddress,OldID) 
+      Gdn::SQL()->Query('insert into '.$NewPrefix.'ConversationMessage (ConversationID,Body,Format,
+            InsertUserID,DateInserted,InsertIPAddress,OldID) 
          select ConversationID,Body,Format,InsertUserID,DateInserted,InsertIPAddress,MessageID 
          from '.$OldDatabase.'.'.$OldPrefix.'ConversationMessage');
-      
+      // ConversationID
+      Gdn::SQL()->Query('update '.$NewPrefix.'ConversationMessage cm
+        set cm.ConversationID = 
+           (SELECT c.ConversationID from '.$NewPrefix.'Conversation c where c.OldID = cm.ConversationID)
+        where cm.OldID > 0');
       // InsertUserID
       Gdn::SQL()->Query('update '.$NewPrefix.'ConversationMessage c
         set c.InsertUserID = (SELECT u.UserID from '.$NewPrefix.'User u where u.OldID = c.InsertUserID)
+        where c.OldID > 0');
+        
+      // Conversation FirstMessageID
+      Gdn::SQL()->Query('update '.$NewPrefix.'Conversation c
+        set c.FirstMessageID = 
+           (SELECT cm.MessageID from '.$NewPrefix.'ConversationMessage cm where cm.OldID = c.FirstMessageID)
+        where c.OldID > 0');
+      // Conversation LastMessageID
+      Gdn::SQL()->Query('update '.$NewPrefix.'Conversation c
+        set c.LastMessageID = 
+           (SELECT cm.MessageID from '.$NewPrefix.'ConversationMessage cm where cm.OldID = c.LastMessageID)
         where c.OldID > 0');
       
 		// UserConversation
@@ -246,7 +287,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
          from '.$NewPrefix.'User u, '.$NewPrefix.'Conversation c, '.$OldDatabase.'.'.$OldPrefix.'UserConversation uc
          where u.OldID = (uc.UserID) and c.OldID = (uc.ConversationID)');    
 		
-      */
+      
       
 		////
 		
