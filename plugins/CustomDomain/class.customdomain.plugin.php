@@ -20,7 +20,7 @@
 $PluginInfo['CustomDomain'] = array(
    'Name' => 'Custom Domain',
    'Description' => 'Make your Vanilla Forum accessible from a different domain.',
-   'Version' => '2.0',
+   'Version' => '2.0.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
@@ -83,7 +83,7 @@ class CustomDomainPlugin extends Gdn_Plugin {
       
       if ($Sender->Form->IsPostBack()) {
          try {
-            $RequestedDomain = $Sender->Form->GetValue('CustomDomain');
+            $RequestedDomain = trim(strtolower($Sender->Form->GetValue('CustomDomain')));
             
             $this->CheckAvailable($RequestedDomain);
             $this->CheckConfiguration($RequestedDomain);
