@@ -4,7 +4,7 @@
 $PluginInfo['vfoptions'] = array(
    'Name' => 'VF.com Admin Options',
    'Description' => 'VF.com admin options.',
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'MobileFriendly' => TRUE,
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
@@ -151,7 +151,9 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       $TrackerCode = Gdn::Config('Plugins.GoogleAnalytics.TrackerCode');
       $TrackerDomain = Gdn::Config('Plugins.GoogleAnalytics.TrackerDomain');
       
-      if ($TrackerCode && $TrackerCode != '' && $Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
+      $VanillaCode = 'UA-12713112-1';
+      
+      if ($TrackerCode && $TrackerCode != '' && $TrackerCode != $VanillaCode && $Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          $Script = "<script type=\"text/javascript\">
 var gaJsHost = ((\"https:\" == document.location.protocol) ? \"https://ssl.\" : \"http://www.\");
 document.write(unescape(\"%3Cscript src='\" + gaJsHost + \"google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E\"));
