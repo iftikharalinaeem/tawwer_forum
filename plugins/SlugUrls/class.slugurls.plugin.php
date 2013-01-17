@@ -50,7 +50,7 @@ class SlugUrlsPlugin extends Gdn_Plugin {
              'Key' => base64_encode($Route),
              'Destination' => '/discussion/slug/$2?page=$3&category=$1',
              'Reserved' => FALSE,
-             'Type' => 'Test'
+             'Type' => 'Internal'
          );
       }
    }
