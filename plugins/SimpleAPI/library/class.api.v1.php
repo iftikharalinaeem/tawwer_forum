@@ -55,7 +55,7 @@ class ApiMapper extends SimpleApiMapper {
       
       $this->Filter = array(
          'users/multi'           => array('Users'),
-         'users/notifications'   => array('Profile', 'Preferences', 'PreferenceList', 'PreferenceTypes', 'PreferenceGroups')
+         'users/notifications'   => array('Profile', 'Preferences', 'PreferenceList')
       );
       
    }
