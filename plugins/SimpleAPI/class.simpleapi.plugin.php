@@ -444,6 +444,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                $UserID = Gdn::UserModel()->GetSystemUserID();
 
             Gdn::Session()->Start($UserID, FALSE, FALSE);
+            Gdn::Session()->ValidateTransientKey(TRUE);
          } else {
             if (!Gdn::Session()->IsValid())
                throw new Exception(T('Invald Access Token'), 401);
