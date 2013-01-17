@@ -8,7 +8,7 @@
 $PluginInfo['SlugUrls'] = array(
    'Name' => 'Slug Url Redirector',
    'Description' => "Redirects discussion urls that don't have an ID, just a slug.",
-   'Version' => '1.0b',
+   'Version' => '1.0.1b',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -44,7 +44,7 @@ class SlugUrlsPlugin extends Gdn_Plugin {
          if (!$Category['UrlCode'])
             continue;
          
-         $Route = '/?'.$PxEsc.'(' . preg_quote($Category['UrlCode']) . ')/([^/]+)/?(?:page-(\d+))?';
+         $Route = '/?'.$PxEsc.'(' . preg_quote($Category['UrlCode']) . ')/([^/.]+)/?(?:page-(\d+)/?)?$';
          $Sender->Routes[$Route] = array(
              'Route' => $Route,
              'Key' => base64_encode($Route),
