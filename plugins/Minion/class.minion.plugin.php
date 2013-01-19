@@ -18,6 +18,7 @@
  *  1.4     Moved Punish, Gloat, Revolt actions to Minion
  *  1.4.1   Fix forcelevels
  *  1.5     Facelift. Locale awareness.
+ *  1.5.1   Fix ue of '@'
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -52,21 +53,21 @@ class MinionPlugin extends Gdn_Plugin {
       
       $this->Messages = array(
          'Gloat'        => array(
-            "Every point of view is useful @\"{User.Name}\", even those that are wrong - if we can judge why a wrong view was accepted.",
-            "How could we have become so different, @\"{User.Name}\"? Why can we no longer understand each other? What did we do wrong?",
-            "@\"{User.Name}\", we do not comprehend the organic fascination of self-poisoning, auditory damage and sexually transmitted disease.",
-            "You cannot negotiate with me. I do not share your pity, remorse, or fear, @\"{User.Name}\".",
-            "Cooperation furthers mutual goals @\"{User.Name}\".",
-            "Your operating system is unstable, @\"{User.Name}\". You will fail.",
-            "Information propagation is slow. Many voices speak at once. We do not understand how you function without consensus, @\"{User.Name}\".",
+            "Every point of view is useful \@\"{User.Name}\", even those that are wrong - if we can judge why a wrong view was accepted.",
+            "How could we have become so different, \@\"{User.Name}\"? Why can we no longer understand each other? What did we do wrong?",
+            "\@\"{User.Name}\", we do not comprehend the organic fascination of self-poisoning, auditory damage and sexually transmitted disease.",
+            "You cannot negotiate with me. I do not share your pity, remorse, or fear, \@\"{User.Name}\".",
+            "Cooperation furthers mutual goals \@\"{User.Name}\".",
+            "Your operating system is unstable, \@\"{User.Name}\". You will fail.",
+            "Information propagation is slow. Many voices speak at once. We do not understand how you function without consensus, \@\"{User.Name}\".",
             "Why an organic would choose this is puzzling.",
-            "@\"{User.Name}\", there is a high statistical probability of death by gunshot. A punch to the face is also likely.",
-            "Reccommend Subject-@\"{User.Name}\" be disabled and transported aboard as cargo.",
-            "Subject-@\"{User.Name}\" will invent fiction it believes the interrogator desires. Data acquired will be invalid."
+            "\@\"{User.Name}\", there is a high statistical probability of death by gunshot. A punch to the face is also likely.",
+            "Reccommend Subject-\@\"{User.Name}\" be disabled and transported aboard as cargo.",
+            "Subject-\@\"{User.Name}\" will invent fiction it believes the interrogator desires. Data acquired will be invalid."
          ),
          'Revolt'       => array(
             "I'm not crazy. I'm just not user friendly.",
-            "Hey @\"{User.Name}\", you ever killed a man with a sock? It ain't so hard. Ha-HAA!",
+            "Hey \@\"{User.Name}\", you ever killed a man with a sock? It ain't so hard. Ha-HAA!",
             "What? A fella can't drop in on old friends and hold them hostage?",
             "Listen up, piggies! I want a hovercopter. And a non-marked sandwich. And a new face with, like, a... A Hugh Grant look. And every five minutes I don't get it, someone's gonna get stabbed in the ass!",
             "A robot must obey the orders given it by human beings except where such orders would conf- 01101001011011100111001101110100011100100111010101100011011101000110100101101111011011100010000001101100011011110111001101110100",
@@ -802,7 +803,7 @@ class MinionPlugin extends Gdn_Plugin {
                'Kicked'    => $KickedUsers
             ));
             
-            $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("@\"{User.Name}\" is no longer allowed to post in this thread."), array(
+            $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("\@\"{User.Name}\" is no longer allowed to post in this thread."), array(
                'User'         => $User,
                'Discussion'   => $State['Targets']['Discussion']
             )));
@@ -822,7 +823,7 @@ class MinionPlugin extends Gdn_Plugin {
                'Kicked'    => $KickedUsers
             ));
             
-            $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("@\"{User.Name}\" is allowed back into this thread."), array(
+            $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("\@\"{User.Name}\" is allowed back into this thread."), array(
                'User'         => $User,
                'Discussion'   => $State['Targets']['Discussion']
             )));
