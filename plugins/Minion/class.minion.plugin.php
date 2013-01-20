@@ -20,6 +20,7 @@
  *  1.5     Facelift. Locale awareness.
  *  1.5.1   Fix use of '@'
  *  1.6     Add word bans
+ *  1.6.1   Fix word ban detection
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -1103,7 +1104,7 @@ class MinionPlugin extends Gdn_Plugin {
             if (is_null($PhraseOptions['Expires']) || $PhraseOptions['Expires'] > time()) {
                
                // Match
-               $Matches = stristr($MatchBody, $Phrase);
+               $Matches = preg_match("\b{$Phrase}\b", $MatchBody);
                
                if ($Matches) {
                   $CommentID = GetValue('CommentID', $Comment);
