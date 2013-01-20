@@ -1104,7 +1104,7 @@ class MinionPlugin extends Gdn_Plugin {
             if (is_null($PhraseOptions['Expires']) || $PhraseOptions['Expires'] > time()) {
                
                // Match
-               $Matches = preg_match("\b{$Phrase}\b", $MatchBody);
+               $Matches = preg_match("`\b{$Phrase}\b`i", $MatchBody);
                
                if ($Matches) {
                   $CommentID = GetValue('CommentID', $Comment);
