@@ -62,7 +62,7 @@ class MinionPlugin extends Gdn_Plugin {
             "Information propagation is slow. Many voices speak at once. We do not understand how you function without consensus, @\"{User.Name}\".",
             "Why an organic would choose this is puzzling.",
             " @\"{User.Name}\", there is a high statistical probability of death by gunshot. A punch to the face is also likely.",
-            "Reccommend Subject-@\"{User.Name}\" be disabled and transported aboard as cargo.",
+            "Recommend Subject-@\"{User.Name}\" be disabled and transported aboard as cargo.",
             "Subject-@\"{User.Name}\" will invent fiction it believes the interrogator desires. Data acquired will be invalid."
          ),
          'Revolt'       => array(
