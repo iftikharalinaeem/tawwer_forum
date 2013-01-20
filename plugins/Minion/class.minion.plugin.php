@@ -894,7 +894,7 @@ class MinionPlugin extends Gdn_Plugin {
                return;
             
             $Phrase = strtolower($State['Targets']['Phrase']);
-            $Reason = GetValue('Reason', $State, 'Prohibited phrase');
+            $Reason = GetValue('Reason', $State, "Prohibited phrase \"{$Phrase}\"");
             $Expires = array_key_exists('Time', $State) ? strtotime("+".$State['Time']) : NULL;
             
             $BannedPhrases = $this->Monitoring($State['Targets']['Discussion'], 'Phrases', array());
