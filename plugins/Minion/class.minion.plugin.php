@@ -18,7 +18,8 @@
  *  1.4     Moved Punish, Gloat, Revolt actions to Minion
  *  1.4.1   Fix forcelevels
  *  1.5     Facelift. Locale awareness.
- *  1.5.1   Fix ue of '@'
+ *  1.5.1   Fix use of '@'
+ *  1.6     Add word bans
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -158,8 +159,9 @@ class MinionPlugin extends Gdn_Plugin {
       
       $this->CheckFingerprintBan($Sender);
       $this->CheckAutoplay($Sender);
-      $this->CheckCommands($Sender);
-      $this->CheckMonitor($Sender);
+      $Performed = $this->CheckCommands($Sender);
+      if (!$Performed)
+         $this->CheckMonitor($Sender);
    }
    
    /**
@@ -172,8 +174,9 @@ class MinionPlugin extends Gdn_Plugin {
       
       $this->CheckFingerprintBan($Sender);
       $this->CheckAutoplay($Sender);
-      $this->CheckCommands($Sender);
-      $this->CheckMonitor($Sender);
+      $Performed = $this->CheckCommands($Sender);
+      if (!$Performed)
+         $this->CheckMonitor($Sender);
    }
    
    /*
@@ -371,15 +374,48 @@ class MinionPlugin extends Gdn_Plugin {
                      // Check if this is a real user already
                      if (!$ExplicitClose && strlen($State['Gather']['Delta'])) {
                         $CheckUser = trim($State['Gather']['Delta']);
-                        echo "checking: {$CheckUser}\n";
                         if ($GatherUser = Gdn::UserModel()->GetByUsername($CheckUser)) {
-                           echo " > found\n";
                            $State['Gather'] = FALSE;
                            $State['Targets']['User'] = (array)$GatherUser;
                            break;
                         }
                      }
 
+                     if (!strlen($State['Token'])) {
+                        $State['Gather'] = FALSE;
+                        continue;
+                     }
+                     
+                  case 'Phrase':
+                     
+                     // If we need to wait for a closing quote
+                     if (!strlen($State['Gather']['Delta']) && substr($State['Token'], 0, 1) == '"') {
+                        $State['Token'] = substr($State['Token'], 1);
+                        $State['Gather']['ExplicitClose'] = '"';
+                     }
+
+                     // If we've found our closing quote
+                     $ExplicitClose = GetValue('ExplicitClose', $State['Gather'], FALSE);
+                     if ($ExplicitClose) {
+                        if ($FoundPosition = stripos($State['Token'], $State['Gather']['ExplicitClose'])) {
+                           $State['Token'] = substr($State['Token'], 0, $FoundPosition);
+                           unset($State['Gather']['ExplicitClose']);
+                           $ExplicitlyClosed = TRUE;
+                        }
+                     }
+                     
+                     // Add token
+                     $ExplicitClose = GetValue('ExplicitClose', $State['Gather'], FALSE);
+                     $State['Gather']['Delta'] .= " {$State['Token']}";
+                     $this->Consume($State);
+                     
+                     // If we're closed, close up
+                     if ($ExplicitlyClosed || (!$ExplicitClose && strlen($State['Gather']['Delta']))) {
+                        $State['Targets']['Phrase'] = trim($State['Gather']['Delta']);
+                        $State['Gather'] = FALSE;
+                        break;
+                     }
+                     
                      if (!strlen($State['Token'])) {
                         $State['Gather'] = FALSE;
                         continue;
@@ -394,10 +430,10 @@ class MinionPlugin extends Gdn_Plugin {
                 * TOGGLERS
                 */
 
-               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('open', 'enable', 'unlock', 'allow', 'on')))
+               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('open', 'enable', 'unlock', 'allow', 'allowed', 'on')))
                   $this->Consume($State, 'Toggle', 'on');
 
-               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('no', 'close', 'disable', 'lock', 'disallow', 'forbid', 'down', 'off')))
+               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off')))
                   $this->Consume($State, 'Toggle', 'off');
 
                /*
@@ -439,30 +475,6 @@ class MinionPlugin extends Gdn_Plugin {
                   if (in_array($State['CompareToken'], array('warning', 'warn')))
                      $this->Consume($State, 'Force', 'warn');
                }
-               
-               /*
-                * TARGETS
-                */
-
-               if (in_array($State['CompareToken'], array('user'))) {
-                  $this->Consume($State, 'Gather', array(
-                     'Node'   => 'User',
-                     'Delta'  => ''
-                  ));
-               }
-
-               if (substr($State['Token'], 0, 1) == '@' ) {
-                  if (strlen($State['Token']) > 1) {
-                     $State['Token'] = substr($State['Token'], 1);
-                     $State['Gather'] = array(
-                        'Node'   => 'User',
-                        'Delta'  => ''
-                     );
-                     
-                     // Shortcircuit here so we can put all the user gathering in one place
-                     continue;
-                  }
-               }
 
                /*
                 * METHODS
@@ -485,6 +497,44 @@ class MinionPlugin extends Gdn_Plugin {
                
                if (empty($State['Method']) && in_array($State['CompareToken'], array('stand')))
                   $this->Consume($State, 'Method', 'stop all');
+               
+               if (empty($State['Method']) && in_array($State['CompareToken'], array('word', 'phrase')))
+                  $this->Consume($State, 'Method', 'phrase');
+               
+/*
+                * TARGETS
+                */
+
+               // Gather a user
+               
+               if (in_array($State['CompareToken'], array('user'))) {
+                  $this->Consume($State, 'Gather', array(
+                     'Node'   => 'User',
+                     'Delta'  => ''
+                  ));
+               }
+
+               if (substr($State['Token'], 0, 1) == '@' ) {
+                  if (strlen($State['Token']) > 1) {
+                     $State['Token'] = substr($State['Token'], 1);
+                     $State['Gather'] = array(
+                        'Node'   => 'User',
+                        'Delta'  => ''
+                     );
+                     
+                     // Shortcircuit here so we can put all the user gathering in one place
+                     continue;
+                  }
+               }
+               
+               // Gather a phrase
+               
+               if ($State['Method'] == 'phrase' && !isset($State['Targets']['Phrase'])) {
+                  $this->Consume($State, 'Gather', array(
+                     'Node'   => 'Phrase',
+                     'Delta'  => ''
+                  ));
+               }
                
                /*
                 * FOR
@@ -524,7 +574,6 @@ class MinionPlugin extends Gdn_Plugin {
          }
          
          // Parse this resolved State into potential actions
-
          $this->ParseFor($State);
          $this->ParseCommand($State, $Actions);
          
@@ -545,6 +594,9 @@ class MinionPlugin extends Gdn_Plugin {
          $Args = array($ActionName, $State);
          call_user_func_array(array($this, 'MinionAction'), $Args);
       }
+      
+      if (sizeof($Performed)) return TRUE;
+      return FALSE;
    }
    
    /**
@@ -730,6 +782,12 @@ class MinionPlugin extends Gdn_Plugin {
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
             $Actions[] = array('forgive', 'Vanilla.Comments.Edit', $State);
             break;
+         
+         // Ban/unban the specified phrase from this thread
+         case 'phrase':
+            $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
+            $Actions[] = array("phrase", 'Vanilla.Comments.Edit', $State);
+            break;
 
          // Adjust automated force level
          case 'force':
@@ -738,7 +796,8 @@ class MinionPlugin extends Gdn_Plugin {
             if (in_array($State['Force'], $Forces))
                $Actions[] = array("force", 'Vanilla.Comments.Edit', $State);
             break;
-            
+         
+         // Stop all thread actions
          case 'stop all':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
             $Actions[] = array("stop all", 'Vanilla.Comments.Edit', $State);
@@ -829,6 +888,53 @@ class MinionPlugin extends Gdn_Plugin {
             )));
             break;
             
+         case 'phrase':
+            if (!array_key_exists('Phrase', $State['Targets']))
+               return;
+            
+            $Phrase = strtolower($State['Targets']['Phrase']);
+            $Reason = GetValue('Reason', $State, 'Prohibited phrase');
+            $Expires = array_key_exists('Time', $State) ? strtotime("+".$State['Time']) : NULL;
+            
+            $BannedPhrases = $this->Monitoring($State['Targets']['Discussion'], 'Phrases', array());
+            
+            // Ban the phrase
+            if ($State['Toggle'] == 'off') {
+               $BannedPhrases[$Phrase] = array(
+                  'Reason'    => $Reason,
+                  'Expires'   => $Expires
+               );
+
+               $this->Monitor($State['Targets']['Discussion'], array(
+                  'Phrases'   => $BannedPhrases
+               ));
+
+               $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("\"{Phrase}\" is forbidden in this thread."), array(
+                  'Phrase'       => $Phrase,
+                  'Discussion'   => $State['Targets']['Discussion']
+               )));
+            }
+            
+            // Allow the phrase
+            if ($State['Toggle'] == 'on') {
+               if (!array_key_exists($Phrase, $BannedPhrases))
+                  return;
+               
+               unset($BannedPhrases[$Phrase]);
+               if (!sizeof($BannedPhrases))
+                  $BannedPhrases = NULL;
+               
+               $this->Monitor($State['Targets']['Discussion'], array(
+                  'Phrases'   => $BannedPhrases
+               ));
+
+               $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("\"{Phrase}\" is no longer forbidden in this thread."), array(
+                  'Phrase'       => $Phrase,
+                  'Discussion'   => $State['Targets']['Discussion']
+               )));
+            }
+            break;
+            
          case 'force':
             $Force = GetValue('Force', $State);
             
@@ -902,7 +1008,7 @@ class MinionPlugin extends Gdn_Plugin {
    }
    
    public function CheckMonitor($Sender) {
-      $User = (array)Gdn::Session()->User;
+      $SessionUser = (array)Gdn::Session()->User;
       
       // Get the discussion and comment from args
       $Discussion = (array)$Sender->EventArguments['Discussion'];
@@ -920,11 +1026,11 @@ class MinionPlugin extends Gdn_Plugin {
       }
       
       $IsMonitoringDiscussion = $this->Monitoring($Discussion);
-      $IsMonitoringUser = $this->Monitoring($User);
+      $IsMonitoringUser = $this->Monitoring($SessionUser);
       if (!$IsMonitoringDiscussion && !$IsMonitoringUser) return;
       
       $this->EventArguments = array(
-         'User'         => $User,
+         'User'         => $SessionUser,
          'Discussion'   => $Discussion
       );
       
@@ -954,7 +1060,7 @@ class MinionPlugin extends Gdn_Plugin {
                $CommentModel = new CommentModel();
                $CommentModel->Delete($CommentID);
                
-               $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+               $TriggerUser = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
                $Force = $this->Monitoring($Discussion, 'Force', 'minor');
                $Options = array(
                   'Automated' => TRUE,
@@ -962,7 +1068,7 @@ class MinionPlugin extends Gdn_Plugin {
                );
                
                $Punished = $this->Punish(
-                  $User,
+                  $TriggerUser,
                   NULL,
                   NULL, 
                   $Force,
@@ -971,7 +1077,7 @@ class MinionPlugin extends Gdn_Plugin {
                
                $GloatReason = GetValue('GloatReason', $this->EventArguments);
                if ($Punished && $GloatReason)
-                  $this->Gloat($User, $Discussion, $GloatReason);
+                  $this->Gloat($TriggerUser, $Discussion, $GloatReason);
 
             } else {
                // Kick has expired, remove it
@@ -982,6 +1088,62 @@ class MinionPlugin extends Gdn_Plugin {
                ));
             }
          }
+      }
+      
+      // PHRASE
+      
+      $BannedPhrases = $this->Monitoring($Discussion, 'Phrases', NULL);
+      if (is_array($BannedPhrases)) {
+         
+         $MatchBody = GetValue('Body', $Comment);
+         $UserID = GetValue('InsertUserID', $Comment);
+         
+         $ModBannedPhrases = $BannedPhrases;
+         foreach ($BannedPhrases as $Phrase => $PhraseOptions) {
+            if (is_null($PhraseOptions['Expires']) || $PhraseOptions['Expires'] > time()) {
+               
+               // Match
+               $Matches = stristr($MatchBody, $Phrase);
+               
+               if ($Matches) {
+                  $CommentID = GetValue('CommentID', $Comment);
+                  $CommentModel = new CommentModel();
+                  //$CommentModel->Delete($CommentID);
+
+                  $TriggerUser = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+                  $Force = $this->Monitoring($Discussion, 'Force', 'minor');
+                  $Options = array(
+                     'Automated' => TRUE,
+                     'Reason'    => "Disallowed phrase: ".GetValue('Reason', $PhraseOptions)
+                  );
+
+                  $Punished = $this->Punish(
+                     $TriggerUser,
+                     $Discussion,
+                     $Comment, 
+                     $Force,
+                     $Options
+                  );
+
+                  $GloatReason = GetValue('GloatReason', $this->EventArguments);
+                  if ($Punished && $GloatReason)
+                     $this->Gloat($TriggerUser, $Discussion, $GloatReason);
+               }
+               
+            } else {
+               
+               // Phrase ban has expired, remove it
+               unset($ModBannedPhrases[$Phrase]);
+            }
+         }
+         
+         // Remove expiries
+         if ($ModBannedPhrases != $BannedPhrases) {
+            $this->Monitor($Discussion, array(
+               'Phrases'   => $ModBannedPhrases
+            ));
+         }
+         
       }
    }
    
