@@ -21,6 +21,7 @@
  *  1.5.1   Fix use of '@'
  *  1.6     Add word bans
  *  1.6.1   Fix word ban detection
+ *  1.7     Support per-command force levels
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -707,6 +708,8 @@ class MinionPlugin extends Gdn_Plugin {
          $State['Reason'] = $For;
       }
       
+      $State['Reason'] = rtrim($State['Reason'], '.');
+      
       // Delete parsed elements
       foreach ($Unset as $UnsetKey)
          unset($State['For'][$UnsetKey]);
@@ -852,6 +855,7 @@ class MinionPlugin extends Gdn_Plugin {
             $User = $State['Targets']['User'];
             $Reason = GetValue('Reason', $State, 'Not welcome');
             $Expires = array_key_exists('Time', $State) ? strtotime("+".$State['Time']) : NULL;
+            $MicroForce = GetValue('Force', $State, NULL);
             
             $KickedUsers = $this->Monitoring($State['Targets']['Discussion'], 'Kicked', array());
             $KickedUsers[$User['UserID']] = array(
@@ -859,13 +863,21 @@ class MinionPlugin extends Gdn_Plugin {
                'Expires'   => $Expires
             );
             
+            if (!is_null($MicroForce))
+               $KickedUsers[$User['UserID']]['Force'] = $MicroForce;
+            
             $this->Monitor($State['Targets']['Discussion'], array(
                'Kicked'    => $KickedUsers
             ));
             
-            $this->Acknowledge($State['Sources']['Discussion'], FormatString(T(" @\"{User.Name}\" is no longer allowed to post in this thread."), array(
+            $Acknowledge = T(" @\"{User.Name}\" banned from this thread{Time}{Reason}.{Force}");
+            
+            $this->Acknowledge($State['Sources']['Discussion'], FormatString($Acknowledge, array(
                'User'         => $User,
-               'Discussion'   => $State['Targets']['Discussion']
+               'Discussion'   => $State['Targets']['Discussion'],
+               'Time'         => $State['Time'] ? " for {$State['Time']}" : '',
+               'Reason'       => $State['Reason'] ? " for {$State['Reason']}" : '',
+               'Force'        => $State['Force'] ? " Weapons are {$State['Force']}." : ''
             )));
             break;
             
@@ -896,6 +908,7 @@ class MinionPlugin extends Gdn_Plugin {
             $Phrase = strtolower($State['Targets']['Phrase']);
             $Reason = GetValue('Reason', $State, "Prohibited phrase \"{$Phrase}\"");
             $Expires = array_key_exists('Time', $State) ? strtotime("+".$State['Time']) : NULL;
+            $MicroForce = GetValue('Force', $State, NULL);
             
             $BannedPhrases = $this->Monitoring($State['Targets']['Discussion'], 'Phrases', array());
             
@@ -905,14 +918,22 @@ class MinionPlugin extends Gdn_Plugin {
                   'Reason'    => $Reason,
                   'Expires'   => $Expires
                );
+               
+               if (!is_null($MicroForce))
+                  $BannedPhrases[$Phrase]['Force'] = $MicroForce;
 
                $this->Monitor($State['Targets']['Discussion'], array(
                   'Phrases'   => $BannedPhrases
                ));
 
-               $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("\"{Phrase}\" is forbidden in this thread."), array(
+               $Acknowledge = T("\"{Phrase}\" is forbidden in this thread{Time}{Reason}.{Force}");
+               
+               $this->Acknowledge($State['Sources']['Discussion'], FormatString($Acknowledge, array(
                   'Phrase'       => $Phrase,
-                  'Discussion'   => $State['Targets']['Discussion']
+                  'Discussion'   => $State['Targets']['Discussion'],
+                  'Time'         => $State['Time'] ? " for {$State['Time']}" : '',
+                  'Reason'       => $State['Reason'] ? " for {$State['Reason']}" : '',
+                  'Force'        => $State['Force'] ? " Weapons are {$State['Force']}." : ''
                )));
             }
             
@@ -1062,7 +1083,9 @@ class MinionPlugin extends Gdn_Plugin {
                $CommentModel->Delete($CommentID);
                
                $TriggerUser = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-               $Force = $this->Monitoring($Discussion, 'Force', 'minor');
+               $DefaultForce = $this->Monitoring($Discussion, 'Force', 'minor');
+               $Force = GetValue('Force', $KickedUser, $DefaultForce);
+               
                $Options = array(
                   'Automated' => TRUE,
                   'Reason'    => "Kicked from thread: ".GetValue('Reason', $KickedUser)
@@ -1104,7 +1127,8 @@ class MinionPlugin extends Gdn_Plugin {
             if (is_null($PhraseOptions['Expires']) || $PhraseOptions['Expires'] > time()) {
                
                // Match
-               $Matches = preg_match("`\b{$Phrase}\b`i", $MatchBody);
+               $MatchPhrase = preg_quote($Phrase);
+               $Matches = preg_match("`\b{$MatchPhrase}\b`i", $MatchBody);
                
                if ($Matches) {
                   $CommentID = GetValue('CommentID', $Comment);
@@ -1112,7 +1136,9 @@ class MinionPlugin extends Gdn_Plugin {
                   //$CommentModel->Delete($CommentID);
 
                   $TriggerUser = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-                  $Force = $this->Monitoring($Discussion, 'Force', 'minor');
+                  $DefaultForce = $this->Monitoring($Discussion, 'Force', 'minor');
+                  $Force = GetValue('Force', $PhraseOptions, $DefaultForce);
+                  
                   $Options = array(
                      'Automated' => TRUE,
                      'Reason'    => "Disallowed phrase: ".GetValue('Reason', $PhraseOptions)
