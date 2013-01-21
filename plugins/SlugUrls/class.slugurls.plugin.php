@@ -8,7 +8,7 @@
 $PluginInfo['SlugUrls'] = array(
    'Name' => 'Slug Url Redirector',
    'Description' => "Redirects discussion urls that don't have an ID, just a slug.",
-   'Version' => '1.0.1b',
+   'Version' => '1.0.2b',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -30,7 +30,7 @@ class SlugUrlsPlugin extends Gdn_Plugin {
          ->Set();
       
       // Add a url for SimplePress.
-      Gdn::Router()->SetRoute('/?([^/]+)/([^/]+)/?(?:page-(\d+))?', '/discussion/slug/$2?category=$1&page=$3', 'Test');
+//      Gdn::Router()->SetRoute('/?([^/]+)/([^/]+)/?(?:page-(\d+))?', '/discussion/slug/$2?category=$1&page=$3', 'Test');
    }
    
    public function Gdn_Router_AfterLoadRoutes_Handler($Sender, $Args) {
