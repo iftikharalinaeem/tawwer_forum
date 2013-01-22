@@ -23,7 +23,8 @@
  *  1.6.1   Fix word ban detection
  *  1.7     Support per-command force levels
  *  1.7.1   Fix multi-word username parsing
- * 
+ *  1.7.2   Normalize kick word characters
+ *  1.8     Add status command
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -34,7 +35,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.7.1',
+   'Version' => '1.8',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -402,6 +403,7 @@ class MinionPlugin extends Gdn_Plugin {
 
                      // If we've found our closing quote
                      $ExplicitClose = GetValue('ExplicitClose', $State['Gather'], FALSE);
+                     $ExplicitlyClosed = NULL;
                      if ($ExplicitClose) {
                         if ($FoundPosition = stripos($State['Token'], $State['Gather']['ExplicitClose'])) {
                            $State['Token'] = substr($State['Token'], 0, $FoundPosition);
@@ -498,16 +500,20 @@ class MinionPlugin extends Gdn_Plugin {
                if (empty($State['Method']) && in_array($State['CompareToken'], array('forgive')))
                   $this->Consume($State, 'Method', 'forgive');
                
+               if (empty($State['Method']) && in_array($State['CompareToken'], array('word', 'phrase')))
+                  $this->Consume($State, 'Method', 'phrase');
+               
+               if (empty($State['Method']) && in_array($State['CompareToken'], array('status')))
+                  $this->Consume($State, 'Method', 'status');
+               
                if (empty($State['Method']) && in_array($State['CompareToken'], array('shoot', 'weapon', 'weapons', 'posture', 'free', 'defcon', 'phasers', 'engage')))
                   $this->Consume($State, 'Method', 'force');
                
                if (empty($State['Method']) && in_array($State['CompareToken'], array('stand')))
                   $this->Consume($State, 'Method', 'stop all');
+
                
-               if (empty($State['Method']) && in_array($State['CompareToken'], array('word', 'phrase')))
-                  $this->Consume($State, 'Method', 'phrase');
-               
-/*
+               /*
                 * TARGETS
                 */
 
@@ -743,6 +749,7 @@ class MinionPlugin extends Gdn_Plugin {
       );
       $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
       $Cleaned = htmLawed($Html, $Config, $Spec);
+      $Cleaned = utf8_decode($Cleaned);
       
       $Dom = new DOMDocument();
       $Dom->loadHTML($Cleaned);
@@ -755,7 +762,8 @@ class MinionPlugin extends Gdn_Plugin {
       if ($FormatMentions)
          SaveToConfig('Garden.Format.Mentions', $FormatMentions, FALSE);
       
-      return trim(strip_tags($Dom->saveHTML()));
+      $Parsed = html_entity_decode(trim(strip_tags($Dom->saveHTML())));
+      return $Parsed;
    }
    
    /**
@@ -795,6 +803,12 @@ class MinionPlugin extends Gdn_Plugin {
          case 'phrase':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
             $Actions[] = array("phrase", 'Vanilla.Comments.Edit', $State);
+            break;
+         
+         // Find out what special rules are in place
+         case 'status':
+            $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
+            $Actions[] = array("status", 'Vanilla.Comments.Edit', $State);
             break;
 
          // Adjust automated force level
@@ -864,6 +878,7 @@ class MinionPlugin extends Gdn_Plugin {
             $KickedUsers = $this->Monitoring($State['Targets']['Discussion'], 'Kicked', array());
             $KickedUsers[$User['UserID']] = array(
                'Reason'    => $Reason,
+               'Name'      => $User['Name'],
                'Expires'   => $Expires
             );
             
@@ -909,7 +924,10 @@ class MinionPlugin extends Gdn_Plugin {
             if (!array_key_exists('Phrase', $State['Targets']))
                return;
             
-            $Phrase = strtolower($State['Targets']['Phrase']);
+            // Clean up phrase
+            $Phrase = $State['Targets']['Phrase'];
+            $Phrase = self::Clean($Phrase);
+            
             $Reason = GetValue('Reason', $State, "Prohibited phrase \"{$Phrase}\"");
             $Expires = array_key_exists('Time', $State) ? strtotime("+".$State['Time']) : NULL;
             $MicroForce = GetValue('Force', $State, NULL);
@@ -959,6 +977,47 @@ class MinionPlugin extends Gdn_Plugin {
                   'Discussion'   => $State['Targets']['Discussion']
                )));
             }
+            break;
+            
+         case 'status':
+            $KickedUsers = $this->Monitoring($State['Targets']['Discussion'], 'Kicked', NULL);
+            $BannedPhrases = $this->Monitoring($State['Targets']['Discussion'], 'Phrases', NULL);
+            $Force = $this->Monitoring($State['Targets']['Discussion'], 'Force', NULL);
+            
+            // Nothing happening?
+            if (!($KickedUsers | $BannedPhrases | $Force)) {
+               $this->Message($State['Sources']['User'], $State['Targets']['Discussion'], T("Nothing to report."));
+               return;
+            }
+            
+            $Message = T("Situation report:\n\n{Kicked}{Phrases}{Force}");
+            $Options = array(
+               'User'      => $State['Sources']['User']
+            );
+            
+            if ($KickedUsers) {
+               $KickedUsersList = array();
+               foreach ($KickedUsers as $KickedUserID => $KickedUser) {
+                  $KickedUserName = GetValue('Name', $KickedUser, NULL);
+                  if (!$KickedUserName) {
+                     $KickedUserObj = Gdn::UserModel()->GetID($KickedUserID);
+                     $KickedUserName = GetValue('Name', $KickedUserObj);
+                     unset($KickedUserObj);
+                  }
+                  $KickedUsersList[] = $KickedUserName;
+               }
+               
+               $Options['Kicked'] = "Banned users: ".implode(', ', $KickedUsersList)."\n";
+            }
+            
+            if ($BannedPhrases)
+               $Options['Phrases'] = "Forbidden phrases: ".implode(', ', array_keys($BannedPhrases))."\n";
+            
+            if ($Force)
+               $Options['Force'] = "Force level: {$Force}\n";
+               
+            $Message = FormatString($Message, $Options);
+            $this->Message($State['Sources']['User'], $State['Targets']['Discussion'], $Message);
             break;
             
          case 'force':
@@ -1123,7 +1182,10 @@ class MinionPlugin extends Gdn_Plugin {
       $BannedPhrases = $this->Monitoring($Discussion, 'Phrases', NULL);
       if (is_array($BannedPhrases)) {
          
+         // Get and clean body
          $MatchBody = GetValue('Body', $Comment);
+         $MatchBody = self::Clean($MatchBody, TRUE);
+         
          $UserID = GetValue('InsertUserID', $Comment);
          
          $ModBannedPhrases = $BannedPhrases;
@@ -1585,6 +1647,36 @@ USER BANNED
          'Story'           => $Message
       );
       $ActivityModel->Save($Activity);
+   }
+   
+   public static function Clean($Text, $Deep = FALSE) {
+      
+      $L = setlocale(LC_ALL, 0);
+      setlocale(LC_ALL, 'en_US.UTF8');
+      $Text = str_replace(array("ä", "ö", "ü", "ß"), array("ae", "oe", "ue", "ss"), $Text);
+      
+      $r = '';
+      $s1 = @iconv('UTF-8', 'ASCII//TRANSLIT', $Text);
+      $j = 0;
+      for ($i = 0; $i < strlen($s1); $i++) {
+          $ch1 = $s1[$i];
+          $ch2 = @mb_substr($Text, $j++, 1, 'UTF-8');
+          if (strstr('`^~\'"', $ch1) !== false) {
+              if ($ch1 <> $ch2) {
+                  --$j;
+                  continue;
+              }
+          }
+          $r .= ($ch1=='?') ? $ch2 : $ch1;
+      }
+      
+      setlocale(LC_ALL, $L);
+      $r = strtolower($r);
+      
+      if ($Deep)
+         $r = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $r);
+      
+      return $r;
    }
    
 }
