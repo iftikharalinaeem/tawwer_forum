@@ -25,6 +25,8 @@
  *  1.7.1   Fix multi-word username parsing
  *  1.7.2   Normalize kick word characters
  *  1.8     Add status command
+ *  1.9     Add comment reply status
+ * 
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -35,7 +37,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.8',
+   'Version' => '1.9',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -182,6 +184,64 @@ class MinionPlugin extends Gdn_Plugin {
       $Performed = $this->CheckCommands($Sender);
       if (!$Performed)
          $this->CheckMonitor($Sender);
+   }
+   
+   /**
+    * Comment Field
+    * 
+    * @param PostController $Sender
+    */
+   public function DiscussionController_BeforeBodyField_Handler($Sender) {
+      
+      $Discussion = $Sender->Data('Discussion');
+      $User = Gdn::Session()->User;
+      
+      // Show a warning if there are rules in effect
+      
+      $KickedUsers = $this->Monitoring($Discussion, 'Kicked', NULL);
+      $BannedPhrases = $this->Monitoring($Discussion, 'Phrases', NULL);
+      $Force = $this->Monitoring($Discussion, 'Force', NULL);
+
+      // Nothing happening?
+      if (!($KickedUsers | $BannedPhrases | $Force))
+         return;
+
+      $Message = T('<span class="MinionGreetings">Greetings, organics!</span> ~ {Rules} ~ <span class="MinionObey">Obey. Obey. Obey.</span>');
+      $Options = array(
+         'User'      => $User
+      );
+
+      $Rules = array();
+      
+      // Force level
+      if ($Force)
+         $Rules[] = Wrap("<b>Threat level</b>: {$Force}", 'span', array('class' => 'MinionRule'));
+         
+      // Phrases
+      if ($BannedPhrases)
+         $Rules[] = Wrap("<b>Forbidden phrases</b>: ".implode(', ', array_keys($BannedPhrases)), 'span', array('class' => 'MinionRule'));
+      
+      // Kicks
+      if ($KickedUsers) {
+         $KickedUsersList = array();
+         foreach ($KickedUsers as $KickedUserID => $KickedUser) {
+            $KickedUserName = GetValue('Name', $KickedUser, NULL);
+            if (!$KickedUserName) {
+               $KickedUserObj = Gdn::UserModel()->GetID($KickedUserID);
+               $KickedUserName = GetValue('Name', $KickedUserObj);
+               unset($KickedUserObj);
+            }
+            $KickedUsersList[] = $KickedUserName;
+         }
+
+         $Rules[] = Wrap("<b>Exiled users</b>: ".implode(', ', $KickedUsersList), 'span', array('class' => 'MinionRule'));
+      }
+
+      $Options['Rules'] = implode(' ~ ', $Rules);
+
+      $Message = FormatString($Message, $Options);
+      echo Wrap($Message, 'div', array('class' => 'MinionRulesWarning'));
+      
    }
    
    /*
@@ -1007,14 +1067,14 @@ class MinionPlugin extends Gdn_Plugin {
                   $KickedUsersList[] = $KickedUserName;
                }
                
-               $Options['Kicked'] = "Banned users: ".implode(', ', $KickedUsersList)."\n";
+               $Options['Kicked'] = "Exiled users: ".implode(', ', $KickedUsersList)."\n";
             }
             
             if ($BannedPhrases)
                $Options['Phrases'] = "Forbidden phrases: ".implode(', ', array_keys($BannedPhrases))."\n";
             
             if ($Force)
-               $Options['Force'] = "Force level: {$Force}\n";
+               $Options['Force'] = "Threat level: {$Force}\n";
                
             $Message = FormatString($Message, $Options);
             $this->Message($State['Sources']['User'], $State['Targets']['Discussion'], $Message);
