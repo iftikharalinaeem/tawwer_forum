@@ -145,9 +145,9 @@ class ReactionModel {
       
       if (!empty($Data)) {
          $Row['Attributes'] = serialize($Data);
-      } else {
-         $Row['Attributes'] = NULL;
-      }
+      } //else {
+         //$Row['Attributes'] = NULL; // No! Wipes field incorrectly when partial data is passed.
+      //}
       
       Gdn::SQL()->Replace('ReactionType', $Row, array('UrlCode' => $UrlCode), TRUE);
       
