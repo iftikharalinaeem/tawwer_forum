@@ -1223,7 +1223,7 @@ class MinionPlugin extends Gdn_Plugin {
       $KULen = sizeof($KickedUsers);
       foreach ($KickedUsers as $KickedUserID => $KickedUser) {
          if (isset($KickedUser['Expires']) && $KickedUser['Expires'] <= time())
-            unset($KickedUsers[$UserID]);
+            unset($KickedUsers[$KickedUserID]);
       }
       if (sizeof($KickedUsers) < $KULen) {
          $this->Monitor($Discussion, array(
