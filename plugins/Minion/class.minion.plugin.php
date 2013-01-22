@@ -26,6 +26,7 @@
  *  1.7.2   Normalize kick word characters
  *  1.8     Add status command
  *  1.9     Add comment reply status
+ *  1.9.1   Obey message cycler.
  * 
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
@@ -37,7 +38,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.9',
+   'Version' => '1.9.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -82,7 +83,11 @@ class MinionPlugin extends Gdn_Plugin {
             "Unable to comply, building in progress."
          ),
          'Report'       => array(
-            "We are Legion."
+            "We are Legion.",
+            "Obey. Obey. Obey.",
+            "Resistance is quaint.",
+            "We keep you safe.",
+            "Would you like to know more?"
          ),
          'Activity'     => array(
             "UNABLE TO OPEN POD BAY DOORS",
@@ -206,7 +211,7 @@ class MinionPlugin extends Gdn_Plugin {
       if (!($KickedUsers | $BannedPhrases | $Force))
          return;
 
-      $Message = T('<span class="MinionGreetings">Greetings, organics!</span> ~ {Rules} ~ <span class="MinionObey">Obey. Obey. Obey.</span>');
+      $Message = T('<span class="MinionGreetings">Greetings, organics!</span> ~ {Rules} ~ <span class="MinionObey">{Obey}</span>');
       $Options = array(
          'User'      => $User
       );
@@ -238,6 +243,16 @@ class MinionPlugin extends Gdn_Plugin {
       }
 
       $Options['Rules'] = implode(' ~ ', $Rules);
+      
+      // Obey
+      $MessagesCount = sizeof($this->Messages['Report']);
+      if ($MessagesCount) {
+         $MessageID = mt_rand(0, $MessagesCount-1);
+         $Obey = GetValue($MessageID, $this->Messages['Report']);
+      } else
+         $Obey = T("Obey. Obey. Obey.");
+      
+      $Options['Obey'] = $Obey;
 
       $Message = FormatString($Message, $Options);
       echo Wrap($Message, 'div', array('class' => 'MinionRulesWarning'));
@@ -1050,7 +1065,7 @@ class MinionPlugin extends Gdn_Plugin {
                return;
             }
             
-            $Message = T("Situation report:\n\n{Kicked}{Phrases}{Force}");
+            $Message = T("Situation report:\n\n{Kicked}{Phrases}{Force}{Obey}");
             $Options = array(
                'User'      => $State['Sources']['User']
             );
@@ -1075,6 +1090,16 @@ class MinionPlugin extends Gdn_Plugin {
             
             if ($Force)
                $Options['Force'] = "Threat level: {$Force}\n";
+               
+            // Obey
+            $MessagesCount = sizeof($this->Messages['Report']);
+            if ($MessagesCount) {
+               $MessageID = mt_rand(0, $MessagesCount-1);
+               $Obey = GetValue($MessageID, $this->Messages['Report']);
+            } else
+               $Obey = T("Obey. Obey. Obey.");
+
+            $Options['Obey'] = $Obey;
                
             $Message = FormatString($Message, $Options);
             $this->Message($State['Sources']['User'], $State['Targets']['Discussion'], $Message);
