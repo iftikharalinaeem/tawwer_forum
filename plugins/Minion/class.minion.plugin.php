@@ -11,7 +11,6 @@
  *  1.0.1   Fix data tracking issues
  *  1.0.2   Fix typo bug
  *  1.0.4   Only flag people when fingerprint checking is on
- * 
  *  1.1     Only autoban newer accounts than existing banned ones
  *  1.2     Prevent people from posting autoplay embeds
  *  1.3     New inline command structure
@@ -27,18 +26,19 @@
  *  1.8     Add status command
  *  1.9     Add comment reply status
  *  1.9.1   Obey message cycler.
+ *  1.9.2   Fix time limited operations expiry
  * 
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Addons
+ * @license Proprietary
+ * @package misc
  */
 
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.9.1',
+   'Version' => '1.9.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -1214,112 +1214,111 @@ class MinionPlugin extends Gdn_Plugin {
        * BUILT IN COMMANDS
        */
       
+      $UserID = GetValue('InsertUserID', $Comment);
+      
       // KICK
       
+      // Check expiry times and remove if expires
       $KickedUsers = $this->Monitoring($Discussion, 'Kicked', NULL);
-      if (is_array($KickedUsers)) {
+      $KULen = sizeof($KickedUsers);
+      foreach ($KickedUsers as $KickedUserID => $KickedUser) {
+         if (isset($KickedUser['Expires']) && $KickedUser['Expires'] <= time())
+            unset($KickedUsers[$UserID]);
+      }
+      if (sizeof($KickedUsers) < $KULen) {
+         $this->Monitor($Discussion, array(
+            'Kicked'    => $KickedUsers
+         ));
+      }
+      
+      if (is_array($KickedUsers) && sizeof($KickedUsers)) {
          
-         $UserID = GetValue('InsertUserID', $Comment);
          if (array_key_exists($UserID, $KickedUsers)) {
             
             $KickedUser = $KickedUsers[$UserID];
-            if (is_null($KickedUser['Expires']) || $KickedUser['Expires'] > time()) {
-               // Kick is active, delete comment and punish user
-               
-               $CommentID = GetValue('CommentID', $Comment);
-               $CommentModel = new CommentModel();
-               $CommentModel->Delete($CommentID);
-               
-               $TriggerUser = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-               $DefaultForce = $this->Monitoring($Discussion, 'Force', 'minor');
-               $Force = GetValue('Force', $KickedUser, $DefaultForce);
-               
-               $Options = array(
-                  'Automated' => TRUE,
-                  'Reason'    => "Kicked from thread: ".GetValue('Reason', $KickedUser)
-               );
-               
-               $Punished = $this->Punish(
-                  $TriggerUser,
-                  NULL,
-                  NULL, 
-                  $Force,
-                  $Options
-               );
-               
-               $GloatReason = GetValue('GloatReason', $this->EventArguments);
-               if ($Punished && $GloatReason)
-                  $this->Gloat($TriggerUser, $Discussion, $GloatReason);
 
-            } else {
-               // Kick has expired, remove it
-               
-               unset($KickedUsers[$UserID]);
-               $this->Monitor($Discussion, array(
-                  'Kicked'    => $KickedUsers
-               ));
-            }
+            $CommentID = GetValue('CommentID', $Comment);
+            $CommentModel = new CommentModel();
+            $CommentModel->Delete($CommentID);
+
+            $TriggerUser = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+            $DefaultForce = $this->Monitoring($Discussion, 'Force', 'minor');
+            $Force = GetValue('Force', $KickedUser, $DefaultForce);
+
+            $Options = array(
+               'Automated' => TRUE,
+               'Reason'    => "Kicked from thread: ".GetValue('Reason', $KickedUser)
+            );
+
+            $Punished = $this->Punish(
+               $TriggerUser,
+               NULL,
+               NULL, 
+               $Force,
+               $Options
+            );
+
+            $GloatReason = GetValue('GloatReason', $this->EventArguments);
+            if ($Punished && $GloatReason)
+               $this->Gloat($TriggerUser, $Discussion, $GloatReason);
+
          }
       }
       
       // PHRASE
       
+      // Check expiry times and remove if expires
       $BannedPhrases = $this->Monitoring($Discussion, 'Phrases', NULL);
-      if (is_array($BannedPhrases)) {
+      $BPLen = sizeof($BannedPhrases);
+      foreach ($BannedPhrases as $BannedPhraseWord => $BannedPhrase) {
+         if (isset($BannedPhrase['Expires']) && $BannedPhrase['Expires'] <= time())
+            unset($BannedPhrases[$BannedPhraseWord]);
+      }
+      if (sizeof($BannedPhrases) < $BPLen) {
+         $this->Monitor($Discussion, array(
+            'Phrases'   => $BannedPhrases
+         ));
+      }
+      
+      if (is_array($BannedPhrases) && sizeof($BannedPhrases)) {
          
          // Get and clean body
          $MatchBody = GetValue('Body', $Comment);
          $MatchBody = self::Clean($MatchBody, TRUE);
          
-         $UserID = GetValue('InsertUserID', $Comment);
-         
-         $ModBannedPhrases = $BannedPhrases;
          foreach ($BannedPhrases as $Phrase => $PhraseOptions) {
-            if (is_null($PhraseOptions['Expires']) || $PhraseOptions['Expires'] > time()) {
                
-               // Match
-               $MatchPhrase = preg_quote($Phrase);
-               $Matches = preg_match("`\b{$MatchPhrase}\b`i", $MatchBody);
-               
-               if ($Matches) {
-                  $CommentID = GetValue('CommentID', $Comment);
-                  $CommentModel = new CommentModel();
-                  //$CommentModel->Delete($CommentID);
+            // Match
+            $MatchPhrase = preg_quote($Phrase);
+            $Matches = preg_match("`\b{$MatchPhrase}\b`i", $MatchBody);
 
-                  $TriggerUser = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-                  $DefaultForce = $this->Monitoring($Discussion, 'Force', 'minor');
-                  $Force = GetValue('Force', $PhraseOptions, $DefaultForce);
-                  
-                  $Options = array(
-                     'Automated' => TRUE,
-                     'Reason'    => "Disallowed phrase: ".GetValue('Reason', $PhraseOptions)
-                  );
+            if ($Matches) {
+               $CommentID = GetValue('CommentID', $Comment);
+               $CommentModel = new CommentModel();
+               //$CommentModel->Delete($CommentID);
 
-                  $Punished = $this->Punish(
-                     $TriggerUser,
-                     $Discussion,
-                     $Comment, 
-                     $Force,
-                     $Options
-                  );
+               $TriggerUser = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+               $DefaultForce = $this->Monitoring($Discussion, 'Force', 'minor');
+               $Force = GetValue('Force', $PhraseOptions, $DefaultForce);
 
-                  $GloatReason = GetValue('GloatReason', $this->EventArguments);
-                  if ($Punished && $GloatReason)
-                     $this->Gloat($TriggerUser, $Discussion, $GloatReason);
-               }
-               
-            } else {
-               
-               // Phrase ban has expired, remove it
-               unset($ModBannedPhrases[$Phrase]);
+               $Options = array(
+                  'Automated' => TRUE,
+                  'Reason'    => "Disallowed phrase: ".GetValue('Reason', $PhraseOptions)
+               );
+
+               $Punished = $this->Punish(
+                  $TriggerUser,
+                  $Discussion,
+                  $Comment, 
+                  $Force,
+                  $Options
+               );
+
+               $GloatReason = GetValue('GloatReason', $this->EventArguments);
+               if ($Punished && $GloatReason)
+                  $this->Gloat($TriggerUser, $Discussion, $GloatReason);
             }
-         }
-         
-         // Remove expiries
-         if ($ModBannedPhrases != $BannedPhrases) {
-            $this->Monitor($Discussion, array(
-               'Phrases'   => $ModBannedPhrases
-            ));
+               
          }
          
       }
