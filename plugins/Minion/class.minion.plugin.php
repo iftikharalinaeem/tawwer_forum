@@ -1222,7 +1222,7 @@ class MinionPlugin extends Gdn_Plugin {
       $KickedUsers = $this->Monitoring($Discussion, 'Kicked', NULL);
       $KULen = sizeof($KickedUsers);
       foreach ($KickedUsers as $KickedUserID => $KickedUser) {
-         if (isset($KickedUser['Expires']) && $KickedUser['Expires'] <= time())
+         if (!is_null($KickedUser['Expires']) && $KickedUser['Expires'] <= time())
             unset($KickedUsers[$KickedUserID]);
       }
       if (sizeof($KickedUsers) < $KULen) {
@@ -1271,7 +1271,7 @@ class MinionPlugin extends Gdn_Plugin {
       $BannedPhrases = $this->Monitoring($Discussion, 'Phrases', NULL);
       $BPLen = sizeof($BannedPhrases);
       foreach ($BannedPhrases as $BannedPhraseWord => $BannedPhrase) {
-         if (isset($BannedPhrase['Expires']) && $BannedPhrase['Expires'] <= time())
+         if (!is_null($BannedPhrase['Expires']) && $BannedPhrase['Expires'] <= time())
             unset($BannedPhrases[$BannedPhraseWord]);
       }
       if (sizeof($BannedPhrases) < $BPLen) {
