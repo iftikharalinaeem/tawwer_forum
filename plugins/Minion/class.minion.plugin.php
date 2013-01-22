@@ -22,6 +22,8 @@
  *  1.6     Add word bans
  *  1.6.1   Fix word ban detection
  *  1.7     Support per-command force levels
+ *  1.7.1   Fix multi-word username parsing
+ * 
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -32,7 +34,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.5',
+   'Version' => '1.7.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -341,7 +343,7 @@ class MinionPlugin extends Gdn_Plugin {
          $State['Sources']['Discussion'] = $Discussion;
          if ($Comment)
             $State['Sources']['Comment'] = $Comment;
-
+         
          $this->EventArguments['State'] = &$State;
          $State['Token'] = strtok($Command, ' ');
          $State['CompareToken'] = preg_replace('/[^\w]/i', '', strtolower($State['Token']));
@@ -387,6 +389,8 @@ class MinionPlugin extends Gdn_Plugin {
                         $State['Gather'] = FALSE;
                         continue;
                      }
+                     
+                  break;
                      
                   case 'Phrase':
                      
