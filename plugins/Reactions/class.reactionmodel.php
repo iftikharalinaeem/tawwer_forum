@@ -407,9 +407,6 @@ class ReactionModel {
     * @param Gdn_Model $Model 
     */
    public function ToggleUserTag(&$Data, &$Record, $Model) {
-      if (!function_exists('FormatScore'))
-         require_once('views/reaction_functions.php');
-      
       $Inc = GetValue('Total', $Data, 1);
       
       TouchValue('Total', $Data, $Inc);
@@ -518,7 +515,7 @@ class ReactionModel {
       foreach ($Set as $Column => $Value) {
          Gdn::Controller()->JsonTarget(
                "#{$RecordType}_{$Data['RecordID']} .Column-".$Column, 
-               FormatScore($Value),
+               self::FormatScore($Value),
                'Html');
                
          $Record[$Column] = $Value;
@@ -1048,5 +1045,10 @@ class ReactionModel {
 //         decho($Args);
          die();
       }
+   }
+   
+   public static function FormatScore($Score) {
+      if (function_exists('FormatScore')) return FormatScore ($Score);
+      return (int)$Score;
    }
 }
