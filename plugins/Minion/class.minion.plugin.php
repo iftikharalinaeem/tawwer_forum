@@ -27,6 +27,7 @@
  *  1.9     Add comment reply status
  *  1.9.1   Obey message cycler.
  *  1.9.2   Fix time limited operations expiry
+ *  1.9.3   Eventize sanction list
  * 
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
@@ -201,22 +202,52 @@ class MinionPlugin extends Gdn_Plugin {
       $Discussion = $Sender->Data('Discussion');
       $User = Gdn::Session()->User;
       
+      $Rules = array();
+      $this->EventArguments['Discussion'] = $Discussion;
+      $this->EventArguments['User'] = $User;
+      $this->EventArguments['Rules'] = &$Rules;
+      $this->FireEvent('Sanctions');
+      if (!sizeof($Rules)) return;
+      
+      // Condense warnings
+      
+      $Message = T('<span class="MinionGreetings">Greetings, organics!</span> ~ {Rules} ~ <span class="MinionObey">{Obey}</span>');
+
+      $Options['Rules'] = implode(' ~ ', $Rules);
+      
+      // Obey
+      $MessagesCount = sizeof($this->Messages['Report']);
+      if ($MessagesCount) {
+         $MessageID = mt_rand(0, $MessagesCount-1);
+         $Obey = GetValue($MessageID, $this->Messages['Report']);
+      } else
+         $Obey = T("Obey. Obey. Obey.");
+      
+      $Options['Obey'] = $Obey;
+
+      $Message = FormatString($Message, $Options);
+      echo Wrap($Message, 'div', array('class' => 'MinionRulesWarning'));
+      
+   }
+   
+   /**
+    * Add to rules
+    * 
+    * @param MinionPlugin $Sender
+    */
+   public function MinionPlugin_Sanctions_Handler($Sender) {
+      
       // Show a warning if there are rules in effect
       
-      $KickedUsers = $this->Monitoring($Discussion, 'Kicked', NULL);
-      $BannedPhrases = $this->Monitoring($Discussion, 'Phrases', NULL);
-      $Force = $this->Monitoring($Discussion, 'Force', NULL);
+      $KickedUsers = $this->Monitoring($Sender->EventArguments['Discussion'], 'Kicked', NULL);
+      $BannedPhrases = $this->Monitoring($Sender->EventArguments['Discussion'], 'Phrases', NULL);
+      $Force = $this->Monitoring($Sender->EventArguments['Discussion'], 'Force', NULL);
 
       // Nothing happening?
       if (!($KickedUsers | $BannedPhrases | $Force))
          return;
 
-      $Message = T('<span class="MinionGreetings">Greetings, organics!</span> ~ {Rules} ~ <span class="MinionObey">{Obey}</span>');
-      $Options = array(
-         'User'      => $User
-      );
-
-      $Rules = array();
+      $Rules = &$Sender->EventArguments['Rules'];
       
       // Force level
       if ($Force)
@@ -241,21 +272,6 @@ class MinionPlugin extends Gdn_Plugin {
 
          $Rules[] = Wrap("<b>Exiled users</b>: ".implode(', ', $KickedUsersList), 'span', array('class' => 'MinionRule'));
       }
-
-      $Options['Rules'] = implode(' ~ ', $Rules);
-      
-      // Obey
-      $MessagesCount = sizeof($this->Messages['Report']);
-      if ($MessagesCount) {
-         $MessageID = mt_rand(0, $MessagesCount-1);
-         $Obey = GetValue($MessageID, $this->Messages['Report']);
-      } else
-         $Obey = T("Obey. Obey. Obey.");
-      
-      $Options['Obey'] = $Obey;
-
-      $Message = FormatString($Message, $Options);
-      echo Wrap($Message, 'div', array('class' => 'MinionRulesWarning'));
       
    }
    
@@ -944,7 +960,7 @@ class MinionPlugin extends Gdn_Plugin {
             
          case 'kick':
             if (!array_key_exists('User', $State['Targets']))
-               return;
+               break;
             $User = $State['Targets']['User'];
             $Reason = GetValue('Reason', $State, 'Not welcome');
             $Expires = array_key_exists('Time', $State) ? strtotime("+".$State['Time']) : NULL;
@@ -977,7 +993,7 @@ class MinionPlugin extends Gdn_Plugin {
             
          case 'forgive':
             if (!array_key_exists('User', $State['Targets']))
-               return;
+               break;
             $User = $State['Targets']['User'];
             
             $KickedUsers = $this->Monitoring($State['Targets']['Discussion'], 'Kicked', array());
@@ -1055,41 +1071,24 @@ class MinionPlugin extends Gdn_Plugin {
             break;
             
          case 'status':
-            $KickedUsers = $this->Monitoring($State['Targets']['Discussion'], 'Kicked', NULL);
-            $BannedPhrases = $this->Monitoring($State['Targets']['Discussion'], 'Phrases', NULL);
-            $Force = $this->Monitoring($State['Targets']['Discussion'], 'Force', NULL);
+            
+            $Rules = array();
+            $this->EventArguments['Discussion'] = $State['Targets']['Discussion'];
+            $this->EventArguments['User'] = $State['Sources']['User'];
+            $this->EventArguments['Rules'] = &$Rules;
+            $this->FireEvent('Sanctions');
             
             // Nothing happening?
-            if (!($KickedUsers | $BannedPhrases | $Force)) {
+            if (!sizeof($Rules)) {
                $this->Message($State['Sources']['User'], $State['Targets']['Discussion'], T("Nothing to report."));
-               return;
+               break;
             }
             
-            $Message = T("Situation report:\n\n{Kicked}{Phrases}{Force}{Obey}");
+            $Message = T("Situation report:\n\n{Rules}\n{Obey}");
             $Options = array(
-               'User'      => $State['Sources']['User']
+               'User'      => $State['Sources']['User'],
+               'Rules'     => implode("\n", $Rules)
             );
-            
-            if ($KickedUsers) {
-               $KickedUsersList = array();
-               foreach ($KickedUsers as $KickedUserID => $KickedUser) {
-                  $KickedUserName = GetValue('Name', $KickedUser, NULL);
-                  if (!$KickedUserName) {
-                     $KickedUserObj = Gdn::UserModel()->GetID($KickedUserID);
-                     $KickedUserName = GetValue('Name', $KickedUserObj);
-                     unset($KickedUserObj);
-                  }
-                  $KickedUsersList[] = $KickedUserName;
-               }
-               
-               $Options['Kicked'] = "Exiled users: ".implode(', ', $KickedUsersList)."\n";
-            }
-            
-            if ($BannedPhrases)
-               $Options['Phrases'] = "Forbidden phrases: ".implode(', ', array_keys($BannedPhrases))."\n";
-            
-            if ($Force)
-               $Options['Force'] = "Threat level: {$Force}\n";
                
             // Obey
             $MessagesCount = sizeof($this->Messages['Report']);
@@ -1197,18 +1196,27 @@ class MinionPlugin extends Gdn_Plugin {
       
       $IsMonitoringDiscussion = $this->Monitoring($Discussion);
       $IsMonitoringUser = $this->Monitoring($SessionUser);
-      if (!$IsMonitoringDiscussion && !$IsMonitoringUser) return;
       
       $this->EventArguments = array(
          'User'         => $SessionUser,
-         'Discussion'   => $Discussion
+         'Discussion'   => $Discussion,
+         'MatchID'      => $Discussion['DiscussionID']
       );
       
-      if ($Type == 'Comment')
+      if ($Type == 'Comment') {
          $this->EventArguments['Comment'] = $Comment;
+         $this->EventArguments['MatchID'] = $Comment['CommentID'];
+      }
+      
+      // Get and clean body
+      $MatchBody = GetValue('Body', $this->EventArguments[$Type]);
+      $MatchBody = self::Clean($MatchBody, TRUE);
+      $this->EventArguments['MatchBody'] = $MatchBody;
       
       $this->EventArguments['MonitorType'] = $Type;
       $this->FireEvent('Monitor');
+      
+      if (!$IsMonitoringDiscussion && !$IsMonitoringUser) return;
       
       /*
        * BUILT IN COMMANDS
@@ -1219,7 +1227,7 @@ class MinionPlugin extends Gdn_Plugin {
       // KICK
       
       // Check expiry times and remove if expires
-      $KickedUsers = $this->Monitoring($Discussion, 'Kicked', NULL);
+      $KickedUsers = $this->Monitoring($Discussion, 'Kicked', array());
       $KULen = sizeof($KickedUsers);
       foreach ($KickedUsers as $KickedUserID => $KickedUser) {
          if (!is_null($KickedUser['Expires']) && $KickedUser['Expires'] <= time())
@@ -1268,7 +1276,7 @@ class MinionPlugin extends Gdn_Plugin {
       // PHRASE
       
       // Check expiry times and remove if expires
-      $BannedPhrases = $this->Monitoring($Discussion, 'Phrases', NULL);
+      $BannedPhrases = $this->Monitoring($Discussion, 'Phrases', array());
       $BPLen = sizeof($BannedPhrases);
       foreach ($BannedPhrases as $BannedPhraseWord => $BannedPhrase) {
          if (!is_null($BannedPhrase['Expires']) && $BannedPhrase['Expires'] <= time())
@@ -1281,10 +1289,6 @@ class MinionPlugin extends Gdn_Plugin {
       }
       
       if (is_array($BannedPhrases) && sizeof($BannedPhrases)) {
-         
-         // Get and clean body
-         $MatchBody = GetValue('Body', $Comment);
-         $MatchBody = self::Clean($MatchBody, TRUE);
          
          foreach ($BannedPhrases as $Phrase => $PhraseOptions) {
                
