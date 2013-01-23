@@ -407,6 +407,9 @@ class ReactionModel {
     * @param Gdn_Model $Model 
     */
    public function ToggleUserTag(&$Data, &$Record, $Model) {
+      if (!function_exists('FormatScore'))
+         require_once('views/reaction_functions.php');
+      
       $Inc = GetValue('Total', $Data, 1);
       
       TouchValue('Total', $Data, $Inc);
@@ -580,16 +583,25 @@ class ReactionModel {
     * @param int $ID
     * @param string $ReactionUrlCode 
     */
-   public function React($RecordType, $ID, $ReactionUrlCode) {
-      $IsModerator = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
-      $IsCurator = Gdn::Session()->CheckPermission('Garden.Curation.Manage');
+   public function React($RecordType, $ID, $ReactionUrlCode, $UserID = NULL) {
+      if (is_null($UserID)) {
+         $UserID = Gdn::Session()->UserID;
+         $User = Gdn::Session()->User;
+         
+         $IsModerator = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
+         $IsCurator = Gdn::Session()->CheckPermission('Garden.Curation.Manage');
+      } else {
+         $User = Gdn::UserModel()->GetID($UserID);
+         
+         $IsModerator = Gdn::UserModel()->CheckPermission($User, 'Garden.Moderation.Manage');
+         $IsCurator = Gdn::UserModel()->CheckPermission($User, 'Garden.Curation.Manage');
+      }
       
       $Undo = FALSE;
       if (StringBeginsWith($ReactionUrlCode, 'Undo-', TRUE)) {
          $Undo = TRUE;
          $ReactionUrlCode = StringBeginsWith($ReactionUrlCode, 'Undo-', TRUE, TRUE);
       }
-      $UserID = Gdn::Session()->UserID;
       $RecordType = ucfirst($RecordType);
       $ReactionUrlCode = strtolower($ReactionUrlCode);
       $ReactionType = self::ReactionTypes($ReactionUrlCode);

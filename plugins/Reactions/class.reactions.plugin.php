@@ -1,5 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
+
 /**
+ * 
+ * Changes:
+ *  1.0     Release
+ *  1.2.3   Allow ReactionModel() to react from any source user
+ * 
+ * 
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary
  */
@@ -8,7 +15,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.2.2',
+   'Version' => '1.2.3',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
