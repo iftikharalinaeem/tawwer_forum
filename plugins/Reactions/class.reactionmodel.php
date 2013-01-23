@@ -521,7 +521,7 @@ class ReactionModel {
          $Record[$Column] = $Value;
       }
       // Send back the css class.
-      list($AddCss, $RemoveCss) = ScoreCssClass($Record, TRUE);
+      list($AddCss, $RemoveCss) = self::ScoreCssClass($Record, TRUE);
       if ($RemoveCss)
          Gdn::Controller()->JsonTarget("#{$RecordType}_{$Data['RecordID']}", $RemoveCss, 'RemoveClass');
       if ($AddCss)
@@ -1048,7 +1048,30 @@ class ReactionModel {
    }
    
    public static function FormatScore($Score) {
-      if (function_exists('FormatScore')) return FormatScore ($Score);
+      if (function_exists('FormatScore')) return FormatScore($Score);
       return (int)$Score;
+   }
+   
+   public static function ScoreCssClass($Row, $All = FALSE) {
+      if (function_exists('ScoreCssClass')) return ScoreCssClass($Row, $All);
+      
+      $Score = GetValue('Score', $Row);
+      if (!$Score)
+         $Score = 0;
+
+      $Bury = C('Reactions.BuryValue', -5);
+      $Promote = C('Reactions.PromoteValue', 5);
+
+      if ($Score <= $Bury)
+         $Result = $All ? 'Un-Buried' : 'Buried';
+      elseif ($Score >= $Promote)
+         $Result = 'Promoted';
+      else
+         $Result = '';
+
+      if ($All)
+         return array($Result, 'Promoted Buried Un-Buried');
+      else
+         return $Result;
    }
 }
