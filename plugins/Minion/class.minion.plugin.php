@@ -28,6 +28,7 @@
  *  1.9.1   Obey message cycler.
  *  1.9.2   Fix time limited operations expiry
  *  1.9.3   Eventize sanction list
+ *  1.10    Add 'Log' method and Plugins.Minion.LogThreadID
  * 
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
@@ -39,7 +40,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.9.2',
+   'Version' => '1.10',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -1499,6 +1500,17 @@ class MinionPlugin extends Gdn_Plugin {
     * @param string $Message
     */
    public function Message($User, $Discussion, $Message) {
+      if (is_numeric($User)) {
+         $User = Gdn::UserModel()->GetID($User);
+         if (!$User) return FALSE;
+      }
+      
+      if (is_numeric($Discussion)) {
+         $DiscussionModel = new DiscussionModel();
+         $Discussion = $DiscussionModel->GetID($Discussion);
+         if (!$Discussion) return FALSE;
+      }
+      
       $DiscussionID = GetValue('DiscussionID', $Discussion);
       $CommentModel = new CommentModel();
       
@@ -1735,6 +1747,19 @@ USER BANNED
          'Story'           => $Message
       );
       $ActivityModel->Save($Activity);
+   }
+   
+   /**
+    * Log Minion actions
+    * 
+    * @param string $Message
+    * @return type
+    */
+   public function Log($Message) {
+      $LogThreadID = C('Plugins.Minion.LogThreadID', FALSE);
+      if ($LogThreadID === FALSE) return;
+      
+      return $this->Message($this->Minion(), $LogThreadID, $Message);
    }
    
    public static function Clean($Text, $Deep = FALSE) {
