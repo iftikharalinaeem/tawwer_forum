@@ -4,6 +4,8 @@ $St = Gdn::Structure();
 
 $St->Table('EmailLog')
    ->PrimaryKey('LogID')
+   ->Column('MessageID', 'varchar(255)', TRUE)
+   ->Column('ReplyTo', 'varchar(255)', TRUE)
    ->Column('From', 'varchar(255)', TRUE)
    ->Column('To', 'varchar(255)', TRUE)
    ->Column('Subject', 'varchar(500)', TRUE)

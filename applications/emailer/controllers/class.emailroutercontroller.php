@@ -132,7 +132,7 @@ class EmailRouterController extends Gdn_Controller {
             $LogID = $LogModel->Insert($Data);
             
             list($Name, $Email) = self::ParseEmailAddress($To);
-            if (preg_match('`([^+@]+)([^@]*)@(.+)`', $Email, $Matches)) {
+            if (preg_match('`([^+@]+)([^@]*)@email.vanillaforums.com`', $Email, $Matches)) {
                $ClientName = $Matches[1];
                $Domain = $Matches[3];
                
@@ -160,6 +160,9 @@ class EmailRouterController extends Gdn_Controller {
             $C = curl_init();
             curl_setopt($C, CURLOPT_URL, $Url);
             curl_setopt($C, CURLOPT_RETURNTRANSFER, TRUE);
+//            curl_setopt($C, CURLOPT_HEADER, FALSE);
+//            curl_setopt($C, CURLINFO_HEADER_OUT, TRUE);
+//            curl_setopt($C, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
             curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($C, CURLOPT_POST, 1);
             curl_setopt($C, CURLOPT_POSTFIELDS, http_build_query($Data));
@@ -174,7 +177,7 @@ class EmailRouterController extends Gdn_Controller {
                }
                $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Result));
             } else {
-               $Error = curl_error($C);
+               $Error = curl_error($C)."\n\n{$this->LastHeaderString}\n\n$Result";
                $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Error));
                throw new Exception($Error, $Code);
             }
@@ -190,6 +193,10 @@ class EmailRouterController extends Gdn_Controller {
          
          throw $Ex;
       }
+   }
+   
+   protected function CurlHeader($Handler, $HeaderString) {
+      $this->LastHeaderString = $HeaderString;
    }
    
    public static function StripEmail($Body) {
