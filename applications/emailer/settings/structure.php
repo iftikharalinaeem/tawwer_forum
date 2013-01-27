@@ -15,6 +15,7 @@ $St->Table('EmailLog')
    ->Column('Format', 'varchar(100)', TRUE)
    ->Column('DateInserted', 'datetime')
    ->Column('Url', 'varchar(255)', TRUE)
+   ->Column('Post', 'text', TRUE)
    ->Column('Response', 'smallint', TRUE)
    ->Column('ResponseText', 'varchar(500)', TRUE)
    ->Set();

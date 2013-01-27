@@ -129,6 +129,7 @@ class EmailRouterController extends Gdn_Controller {
             }
             
             $LogModel = new Gdn_Model('EmailLog');
+            $Data['Post'] = http_build_query($Data, '', '&');
             $LogID = $LogModel->Insert($Data);
             
             list($Name, $Email) = self::ParseEmailAddress($To);
@@ -165,7 +166,7 @@ class EmailRouterController extends Gdn_Controller {
 //            curl_setopt($C, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
             curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($C, CURLOPT_POST, 1);
-            curl_setopt($C, CURLOPT_POSTFIELDS, http_build_query($Data));
+            curl_setopt($C, CURLOPT_POSTFIELDS, $Data['Post']);
             
             $Result = curl_exec($C);
             $Code = curl_getinfo($C, CURLINFO_HTTP_CODE);
