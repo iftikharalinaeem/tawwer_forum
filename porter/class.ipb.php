@@ -24,6 +24,7 @@ class IPB extends ExportController {
 //      $Ex->DestPrefix = 'GDN_';
       
       $Ex->SourcePrefix = 'ibf_';
+      $Cdn = $this->CdnPrefix();
       
       // Get the characterset for the comments.
       $CharacterSet = $Ex->GetCharacterSet('posts');
@@ -81,42 +82,21 @@ class IPB extends ExportController {
          $ShowEmail = '0';
       }
       
-      if ($Ex->Exists('member_extra') === TRUE) {
-         $Sql = "select
-                  m.*,
-                  m.joined as firstvisit,
-                  'ipb' as HashMethod,
-                  $ShowEmail as ShowEmail,
-                  case when x.avatar_location in ('noavatar', '') then null
-                     when x.avatar_location like 'upload:%' then concat('~cf/ipb/', right(x.avatar_location, length(x.avatar_location) - 7))
-                     when x.avatar_type = 'upload' then concat('~cf/ipb/', x.avatar_location)
-                     when x.avatar_type = 'url' then x.avatar_location
-                     when x.avatar_type = 'local' then concat('~cf/style_avatars/', x.avatar_location)
-                     else null
-                  end as Photo,
-                  x.location
-                  $Select
-                 from ibf_members m
-                 left join ibf_member_extra x
-                  on m.$MemberID = x.id
-                 $From";
-      } else {
-         $Sql = "select
+      $Sql = "select
                   m.*,
                   joined as firstvisit,
                   'ipb' as HashMethod,
                   $ShowEmail as ShowEmail,
-                  concat(m.members_pass_hash, '$', m.members_pass_salt) as Password,
-                  case when length(p.avatar_location) <= 3 or p.avatar_location is null then null
-                  	when p.avatar_type = 'local' then concat('ipb/', p.avatar_location)
-                  	when p.avatar_type = 'upload' then concat('ipb/', p.avatar_location)
-                  	else p.avatar_location end as Photo
-                 $Select
-                 from ibf_members m
-                 left join ibf_profile_portal p
-                 	on m.$MemberID = p.pp_member_id
-                 $From";
-      }
+                  case when length(p.pp_main_photo) <= 3 or p.pp_main_photo is null then null
+                     when p.pp_main_photo like '%//%' then p.pp_main_photo
+                     else concat('{$Cdn}ipb/', p.pp_main_photo)
+                  end as Photo
+                  $Select
+              from ibf_members m
+              left join ibf_profile_portal p
+                  on m.$MemberID = p.pp_member_id
+              $From";
+                     
       $this->ClearFilters('members', $User_Map, $Sql, 'm');
       $Ex->ExportTable('User', $Sql, $User_Map);  // ":_" will be replaced by database prefix
       
