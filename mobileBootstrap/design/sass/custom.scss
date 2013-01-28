@@ -1,0 +1,237 @@
+@import "functions";
+@import "constants";
+@import "custom_emyth";
+@import "variables";
+
+body {
+   background-color: $bodyBackground;
+   color: $textColor;
+   font-family: $baseFontFamily;
+   font-size: $baseFontSize;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	color: $headingsColor;
+	font-family: $headingsFontFamily;
+	font-size: 16px;
+	font-weight: $headingsFontWeight;
+   
+   a {
+      color: $headingsColor;
+   }
+}
+
+a,
+.FlyoutMenu a {
+   color: $linkColor;
+}
+a.TextColor, a .TextColor {
+   color: $textColor;
+}
+
+a:hover, a.TextColor:hover, a:hover .TextColor {
+   color: hoverColor($linkColor);
+}
+
+.PullRight {
+   float: right;
+}
+
+/* Entry Pages */
+.MultipleEntryMethods {
+	width: 290px;
+}
+body#dashboard_entry_password .Methods,
+body#dashboard_entry_signin .Methods,
+.Methods {
+	background: #D3D8E7;
+	border-left: none;
+	position: relative;
+	left: auto;
+	right: auto;
+	top: auto;
+	bottom: auto;
+	font-size: 14px;
+	color: #02475A;
+	font-weight: bold;
+	text-align: left;
+}
+.Methods .Method {
+	padding: 10px 3px 0;
+}
+
+/* Foot */
+.FootMenu {
+	margin: 10px 0;
+}
+.FootMenu span {
+	color: #444;
+	margin: 0 6px;
+}
+#Foot a.SignIn {
+	color: #3B5998;
+}
+
+/* Autocomplete */
+.ac_results {
+   border: 1px solid #d7d8da;
+	color: #000;
+   border-top: 0;
+   background-color: white;
+}
+.ac_results li {
+   border-bottom: 1px solid #d7d8da;
+}
+.ac_lastitem {
+   border-bottom: 0 !important;
+}
+.ac_results strong {
+   background: #dbe1ec;
+}
+.ac_over strong {
+   background: #5670a6;
+}
+.ac_over {
+   background: #3b5998;
+   color: #fff;
+}
+
+.Tag, .TagCloud li {
+   background: $tagBackground;
+   color: $tagColor;
+}
+
+.Tag a {
+   color: $tagColor;
+}
+
+.Count {
+	background: $tagBackground;
+	color: $tagColor;
+}
+
+.Active .Count {
+   color: $tagBackground;
+	background: $tagColor;
+}
+
+.Tabs li a span {
+   background: #F8FAFE;
+   color: #485F8F;
+}
+.RssButton {
+   display: none;
+}
+
+/* Datatable stuff */
+
+.DataTable thead {
+   color: $headingsColor;
+   
+   a {
+      color: $headingsColor;
+   }
+}
+
+/*** Pagination ***/
+
+.PagerWrap {
+   margin: 10px 0;
+}
+
+.Pager a, .Pager span {
+   background: $paginationBackground;
+   border: 1px solid $paginationBorder;
+   border-left-width: 0;
+   padding: 0 11px;
+   line-height: 28px;
+   margin: 0;
+   font-weight: normal;
+   font-size: 13px;
+}
+
+.NumberedPager .Previous {
+   border-left-width: 1px;
+   border-radius: 3px 0 0 3px;
+}
+
+.NumberedPager .Next {
+   border-radius: 0 3px 3px 0;
+}
+
+.PrevNextPager a {
+   border-width: 1px;
+   border-radius: 3px;
+}
+
+.Pager a:hover, .Pager .Highlight {
+   background-color: #f5f5f5;
+}
+
+.Pager .Highlight {
+   background: $paginationActiveBackground;
+   color: #999999;
+}
+
+.PageControls {
+   min-height: 30px;
+}
+
+.MiniPager {
+   border: solid 1px $borderColor;
+   border-radius: 2.5px;
+   line-height: 1;
+   font-size: 9px;
+}
+
+.MiniPager a {
+   display: inline-block;
+   margin: 0;
+   border-left: solid 1px $borderColor;
+   padding: 2px 5px;
+}
+
+.MiniPager :first-child {
+   border-left: none;
+}
+
+/** Messages **/
+
+.WarningMessage {
+    color: $warningText;
+    background-color: $warningBackground;
+    border-color: mix($warningText, $warningBackground);
+}
+
+.InfoMessage {
+    color: $infoText;
+    background-color: $infoBackground;
+    border-color: mix($infoText, $infoBackground);
+}
+
+.AlertMessage {
+    color: $errorText;
+    background-color: $errorBackground;
+    border-color: mix($errorText, $errorBackground);
+}
+
+.CasualMessage {
+    color: $casualText;
+    background-color: $casualBackground;
+    border-color: mix($casualText, $casualBackground);
+}
+
+/** Hero **/
+
+.Hero {
+   background: $heroUnitBackground;
+   
+   h1, h2, h3, h4, h5 {
+      color: $heroUnitHeadingColor;
+   }
+}
+
+@import "navbar";
+@import "sprites";
+@import "mobile";
+@import "popups";

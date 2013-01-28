@@ -1,0 +1,103 @@
+/** Reactions **/
+
+.ReactSprite {
+   height: 16px;
+   width: 16px;
+   background-image: spriteUrl($reactColor, $spriteStyle);
+}
+
+.ReactButton > .ReactSprite {
+   vertical-align: top;
+}
+
+.ReactButton {
+   line-height: 16px;
+   color: $reactColor;
+}
+
+.Reactions a:hover {
+   .ReactSprite {
+      background-image: spriteUrl(hoverColor($reactColor), sprites-14c);
+   }
+   
+   .ReactLabel {
+      color: hoverColor($reactColor);
+   }
+}
+
+/* Switch to the white icons when hovering over a menuitem sprite */
+.Reactions .MenuItems a:hover .ReactSprite,
+.MenuItems a:hover .Sprite {
+   background-image: spriteUrl(#fff);
+}
+
+.FilterMenu .ReactSprite {
+   background-image: spriteUrl($linkColor, $spriteStyle);
+}
+.FilterMenu a:hover .ReactSprite {
+   background-image: spriteUrl($linkColorHover, sprites-14c);
+}
+.FilterMenu .Active a .ReactSprite,
+.FilterMenu .Active a:hover .ReactSprite {
+   background-image: spriteUrl($tagColor, $spriteStyle);
+}
+
+/* Switch to bordered icons for user reaction overlays */
+.UserReactionWrap .ReactSprite {
+   background-image: spriteUrl(#000, "sprites-14-outline");
+}
+
+
+.ReactEverything { background-position: -360px -100px; }
+.ReactAwesome { background-position: -240px -20px; }
+.ReactFlag { background-position: -60px -60px; }
+.ReactInsightful { background-position: -140px -20px; }
+.ReactOffTopic { background-position: -160px -20px; }
+.ReactAbuse { background-position: -20px -60px; }
+.SpSpam, .ReactSpam { background-position: -120px -20px; }
+.ReactTroll { background-position: -100px -20px; }
+.ReactPromote { background-position: -60px -40px; }
+.ReactDisagree { background-position: -40px -20px; }
+.ReactAgree { background-position: -20px -20px; }
+.ReactDislike { background-position: -40px -40px; }
+.ReactLike { background-position: -20px -40px; }
+.ReactDown { background-position: -200px -40px; }
+.ReactUp { background-position: -180px -40px; }
+.ReactWTF { background-position: -80px -20px; }
+.ReactLOL { background-position: -60px -20px; }
+.ReactQuote { background-position: -280px -20px; }
+.ReactInfraction { background-position: -200px -20px; }
+.ReactAccept { background-position: -20px -100px; }
+.ReactReject { background-position: -40px -100px; }
+.ReactFacebook { background-position: -40px -120px; }
+.ReactTwitter { background-position: -60px -120px; }
+.ReactGooglePlus { background-position: -80px -120px; }
+
+/** General Sprites **/
+
+.SpActivity { background-position: -160px -120px; }
+.SpAllCategories { background-position: -60px -140px; }
+.SpApplicants { background-position: -260px -40px; }
+.SpBadge { background-position: -240px -140px; }
+.SpBan { background-position: -300px -20px; }
+.SpBestOf { background-position: -80px -80px; }
+.SpBookmarks { background-position: -100px -80px; }
+.SpComments, .SpComment { background-position: -160px -80px; }
+.SpConnection { background-position: -320px -20px; }
+.SpDashboard { background-position: -340px -20px }
+.SpDelete { background-position: -340px -140px; }
+.SpDiscussion, .SpDiscussions, .SpMyDiscussions { background-position: -200px -80px; }
+.SpImage { background-position: -120px -140px; }
+.SpInbox { background-position: -80px -100px; }
+.SpMessage { background-position: -100px -100px;}
+.SpMod { background-position: -260px -60px; }
+.SpMyDrafts { background-position: -180px -20px; }
+.SpNotifications { background-position: -160px -100px; }
+.SpOptions { background-position: -180px -60px; }
+.SpPhoto { background-position: -160px -60px; }
+.SpProfile, .SpEditProfile { background-position: -220px -40px; }
+.SpQuote { background-position: -280px -20px ;}
+.SpSignOut { background-position: -240px -100px; }
+.SpText { background-position: -160px -80px; }
+.SpUnansweredQuestions { background-position: -60px -100px; }
+.SpWarn, .SpWarnings { background-position: -200px -20px; }

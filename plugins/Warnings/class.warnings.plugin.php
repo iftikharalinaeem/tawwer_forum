@@ -99,7 +99,7 @@ class WarningsPlugin extends Gdn_Plugin {
       echo "<ul>
    <li>Can't post discussions.</li>
    <li>Can't post as often.</li>
-   <li>Signature removed.</li>
+   <li>Signature hidden.</li>
 </ul>";
       
       echo '</div>';

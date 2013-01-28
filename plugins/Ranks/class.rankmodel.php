@@ -164,6 +164,7 @@ class RankModel extends Gdn_Model {
       if ($V = GetValue('Format', $Abilities)) {
          SaveToConfig(array(
             'Garden.InputFormatter' => $V,
+            'Garden.InputFormatterBak' => C('Garden.InputFormatter'),
             'Gardem.ForceInputFormatter' => TRUE),
             NULL, FALSE);
       }

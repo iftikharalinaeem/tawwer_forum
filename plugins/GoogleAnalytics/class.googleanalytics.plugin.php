@@ -16,8 +16,13 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
     * Includes Google Analytics on all pages if the conf file contains
     * Plugins.GoogleAnalytics.TrackerCode and
     * Plugins.GoogleAnalytics.TrackerDomain.
+    * 
+    * @param Gdn_Controller $Sender
     */
-   public function Base_Render_Before(&$Sender) {
+   public function Base_AfterRenderAsset_Handler($Sender, $Args) {
+      if ($Args['AssetName'] != 'Head')
+         return;
+      
       $Blacklist = C('Plugins.GoogleAnalytics.ControllerBlacklist', FALSE);
       if (!$Blacklist && strtolower($Sender->MasterView) == 'admin') {
          return;
@@ -73,8 +78,9 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
   })();
 
 </script>";
-         if ($AlphaIndex > 0)
-            $Sender->AddAsset('Foot', $Script);
+         if ($AlphaIndex > 0) {
+            echo $Script;
+         }
       }
    }
    
