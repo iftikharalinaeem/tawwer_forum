@@ -76,6 +76,13 @@ echo $this->Form->Open(), $this->Form->Errors();
    </li>
    <li>
      <?php
+     echo $this->Form->Label('Posts', 'Criteria_CountPosts'),
+     '<div class="Info2">'."Users will need this many posts to gain this rank.".'</div>',
+      $this->Form->TextBox('Criteria_CountPosts', array('class' => 'Input SmallInput'));
+     ?>
+   </li>
+   <li>
+     <?php
      echo $this->Form->Label('Permission', 'Criteria_Permission'),
      '<div class="Info2">'."Users will need this permission to gain this rank.".'</div>',
       $this->Form->DropDown('Criteria_Permission', array('' => '', 'Garden.Moderation.Manage' => 'Moderator', 'Garden.Settings.Manage' => 'Administrator'));

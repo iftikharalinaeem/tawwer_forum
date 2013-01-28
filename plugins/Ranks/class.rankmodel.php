@@ -375,6 +375,12 @@ class RankModel extends Gdn_Model {
          if ($UserPoints < $Criteria['Points'])
             return FALSE;
       }
+      
+      if (isset($Criteria['CountPosts'])) {
+         $CountPosts = GetValue('CountDiscussions', $User, 0) + GetValue('CountComments', $User, 0);
+         if ($CountPosts < $Criteria['CountPosts'])
+            return FALSE;
+      }
 
       if (isset($Criteria['Permission'])) {
          $Permissions = (array)$Criteria['Permission'];
