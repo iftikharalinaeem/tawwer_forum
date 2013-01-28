@@ -7,9 +7,98 @@
  * @package VanillaPorter
  */
 
-$Supported['ipb'] = array('name'=> 'Invision Powerboard (IPB) 3.*', 'prefix'=>'ibf_');
+$Supported['ipb'] = array('name' => 'Invision Powerboard (IPB) 3.*', 'prefix'=>'ibf_');
+$Supported['ipb']['CommandLine'] = array(
+   'folder' => array('Location of source avatars.', 'Sx' => ':', 'Field' => 'folder')
+);
 
 class IPB extends ExportController {
+   
+   /**
+    * Export avatars into vanilla-compatibles names
+    * 
+    */
+   public function DoAvatars() {
+      
+      // Check source folder
+
+      $SourceFolder = $_POST['folder'];
+      if (!is_dir($SourceFolder))
+         trigger_error("Source avatar folder '{$_POST['folder']}' does not exist.");
+
+      
+      // Set up a target folder
+         
+      $TargetFolder = CombinePaths(array($SourceFolder, 'ipb'));
+      if (!is_dir($SourceFolder)) {
+         @$Made = mkdir($TargetFolder, 0777, TRUE);
+         if (!$Made) trigger_error("Target avatar folder '{$TargetFolder}' could not be created.");
+      }
+      
+      $this->Ex->Prefix = 'ibf_';
+      $this->Ex->SourcePrefix = 'ibf_';
+      
+      $UserList = $this->Ex->Query("select 
+            pp_member_id as member_id,
+            pp_main_photo as main_photo,
+            pp_thumb_photo as thumb_photo,
+            coalesce(pp_main_photo,pp_thumb_photo,0) as photo
+         from ibf_profile_portal
+         where length(coalesce(pp_main_photo,pp_thumb_photo,0)) > 3
+         order by pp_member_id asc");
+      
+      $Processed = 0;
+      $Errors = array();
+      while (($Row = mysql_fetch_assoc($UserList)) !== FALSE) {
+         $Processed++;
+         
+         $UserID = $Row['member_id'];
+         
+         // Determine target paths and name
+         $Photo = trim($Row['photo']);
+         $PhotoFileName = basename($Photo);
+         $PhotoPath = dirname($Photo);
+         $PhotoFolder = CombinePaths(array($TargetFolder, $PhotoPath));
+         @mkdir($PhotoFolder, 0777, TRUE);
+         
+         $PhotoSrc = CombinePaths(array($SourceFolder, $Photo));
+         if (!file_exists($PhotoSrc)) {
+            $Errors[] = "Missing file: {$PhotoSrc}";
+            continue;
+         }
+         
+         $MainPhoto = trim($Row['main_photo']);
+         $ThumbPhoto = trim($Row['thumb_photo']);
+         
+         // Main Photo
+         if (!$MainPhoto) $MainPhoto = $Photo;
+         $MainSrc = CombinePaths(array($SourceFolder, $MainPhoto));
+         $MainDest = CombinePaths(array($PhotoFolder, "p".$PhotoFileName));
+         $Copied = @copy($MainSrc, $MainDest);
+         if (!$Copied) {
+            $Errors[] = "! failed to copy main photo '{$MainSrc}' for user {$UserID} (-> {$MainDest}).";
+         }
+            
+         // Thumb Photo
+         if (!$ThumbPhoto) $ThumbPhoto = $Photo;
+         $ThumbSrc = CombinePaths(array($SourceFolder, $MainPhoto));
+         $ThumbDest = CombinePaths(array($PhotoFolder,"n".$PhotoFileName));
+         $Copied = @copy($ThumbSrc, $ThumbDest);
+         if (!$Copied) {
+            $Errors[] = "! failed to copy thumbnail '{$ThumbSrc}' for user {$UserID} (-> {$ThumbDest}).";
+         }
+         
+         if (!($Processed % 100))
+            echo " - processed {$Processed}\n";
+      }
+      
+      $nErrors = sizeof($Errors);
+      if ($nErrors) {
+         echo "{$nErrors} errors:\n";
+         foreach ($Errors as $Error)
+            echo "{$Error}\n";
+      }
+   }
    
    /**
     * @param ExportModel $Ex 
