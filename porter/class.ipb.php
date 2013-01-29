@@ -139,7 +139,7 @@ class IPB extends ExportController {
       // Users.
       $User_Map = array(
          $MemberID => 'UserID',
-         'members_display_name' => 'Name',
+         'members_display_name' => array('Column' => 'Name', 'Filter' => 'HtmlDecoder'),
          'email' => 'Email',
          'joined' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
          'firstvisit' => array('Column' => 'DateFirstVisit', 'SourceColumn' => 'joined', 'Filter' => array($Ex, 'TimestampToDate')),
@@ -170,6 +170,8 @@ class IPB extends ExportController {
          $ShowEmail = '0';
       }
       
+      $Cdn = $this->CdnPrefix();
+      
       if ($Ex->Exists('member_extra') === TRUE) {
          $Sql = "select
                   m.*,
@@ -177,10 +179,10 @@ class IPB extends ExportController {
                   'ipb' as HashMethod,
                   $ShowEmail as ShowEmail,
                   case when x.avatar_location in ('noavatar', '') then null
-                     when x.avatar_location like 'upload:%' then concat('~cf/ipb/', right(x.avatar_location, length(x.avatar_location) - 7))
-                     when x.avatar_type = 'upload' then concat('~cf/ipb/', x.avatar_location)
+                     when x.avatar_location like 'upload:%' then concat('{$Cdn}ipb/', right(x.avatar_location, length(x.avatar_location) - 7))
+                     when x.avatar_type = 'upload' then concat('{$Cdn}ipb/', x.avatar_location)
                      when x.avatar_type = 'url' then x.avatar_location
-                     when x.avatar_type = 'local' then concat('~cf/style_avatars/', x.avatar_location)
+                     when x.avatar_type = 'local' then concat('{$Cdn}style_avatars/', x.avatar_location)
                      else null
                   end as Photo,
                   x.location
@@ -195,11 +197,10 @@ class IPB extends ExportController {
                   joined as firstvisit,
                   'ipb' as HashMethod,
                   $ShowEmail as ShowEmail,
-                  concat(m.members_pass_hash, '$', m.members_pass_salt) as Password,
-                  case when length(p.avatar_location) <= 3 or p.avatar_location is null then null
-                  	when p.avatar_type = 'local' then concat('ipb/', p.avatar_location)
-                  	when p.avatar_type = 'upload' then concat('ipb/', p.avatar_location)
-                  	else p.avatar_location end as Photo
+                  case when length(p.pp_main_photo) <= 3 or p.pp_main_photo is null then null
+                     when p.pp_main_photo like '%//%' then p.pp_main_photo
+                     else concat('{$Cdn}ipb/', p.pp_main_photo)
+                  end as Photo
                  $Select
                  from ibf_members m
                  left join ibf_profile_portal p
@@ -246,14 +247,29 @@ class IPB extends ExportController {
          $GroupID = 'member_group_id';
       else
          $GroupID = 'mgroup';
-         
-      
       
       $UserRole_Map = array(
           $MemberID => 'UserID',
           $GroupID => 'RoleID'
       );
-      $Ex->ExportTable('UserRole', "select * from ibf_members", $UserRole_Map);
+      
+      $Sql = "
+         select
+            m.$MemberID, m.$GroupID
+         from ibf_members m";
+      
+      if ($Ex->Exists('members', 'mgroup_others')) {
+         $Sql .= "
+            union all
+            
+            select m.$MemberID, g.g_id
+            from ibf_members m
+            join ibf_groups g
+               on find_in_set(g.g_id, m.mgroup_others)";
+
+      }
+      
+      $Ex->ExportTable('UserRole', $Sql, $UserRole_Map);
       
       // UserMeta.
       $UserMeta_Map = array(
@@ -306,7 +322,7 @@ class IPB extends ExportController {
       // Category.
       $Category_Map = array(
           'id' => 'CategoryID',
-          'name' => 'Name',
+          'name' => array('Column' => 'Name', 'Filter' => 'HtmlDecoder'),
           'name_seo' => 'UrlCode',
           'description' => 'Description',
           'parent_id' => 'ParentCategoryID',
