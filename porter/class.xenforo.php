@@ -8,8 +8,115 @@
  * @package VanillaPorter
  */
 $Supported['xenforo'] = array('name' => 'Xenforo', 'prefix' => 'xf_');
+$Supported['xenforo']['CommandLine'] = array(
+   'folder' => array('Location of source avatars.', 'Sx' => ':', 'Field' => 'folder')
+);
 
 class Xenforo extends ExportController {
+   
+   protected $Processed;
+   protected $SourceFolder;
+   protected $TargetFolder;
+   protected $Folders;
+   protected $Types;
+   
+   /**
+    * Export avatars into vanilla-compatibles names
+    * 
+    */
+   public function DoAvatars() {
+      
+      // Check source folder
+
+      $this->SourceFolder = $_POST['folder'];
+      if (!is_dir($this->SourceFolder))
+         trigger_error("Source avatar folder '{$this->SourceFolder}' does not exist.");
+      
+      // Set up a target folder
+         
+      $this->TargetFolder = CombinePaths(array($this->SourceFolder, 'xf'));
+      if (!is_dir($this->TargetFolder)) {
+         @$Made = mkdir($this->TargetFolder, 0777, TRUE);
+         if (!$Made) trigger_error("Target avatar folder '{$this->TargetFolder}' could not be created.");
+      }
+      
+      // Iterate
+      $this->Folders = array(
+         'Thumb'     => 'm',
+         'Profile'   => 'l'
+      );
+      
+      $this->Types = array(
+         'Thumb'     => 'n',
+         'Profile'   => 'p'
+      );
+      
+      foreach ($this->Folders as $Type => $Folder) {
+         
+         $this->Processed = 0;
+         $Errors = array();
+         
+         $TypeSourceFolder = CombinePaths(array($this->SourceFolder, $Folder));
+         echo "Processing '{$Type}' files in {$TypeSourceFolder}:\n";
+         $this->AvatarFolder($TypeSourceFolder, $Type, $Errors);
+         
+         $nErrors = sizeof($Errors);
+         if ($nErrors) {
+            echo "{$nErrors} errors:\n";
+            foreach ($Errors as $Error)
+               echo "{$Error}\n";
+         }
+         
+      }
+   }
+   
+   protected function AvatarFolder($Folder, $Type, &$Errors) {
+      if (!is_dir($Folder)) trigger_error("Target avatar folder '{$Folder}' does not exist.");
+      $ResFolder = opendir($Folder);
+
+      $Errors = array();
+      while (($File = readdir($ResFolder)) !== FALSE) {
+         if ($File == '.' || $File == '..') continue;
+         
+         $FullPath = CombinePaths(array($Folder, $File));
+         
+         // Folder? Recurse
+         if (is_dir($FullPath)) {
+            $this->AvatarFolder ($FullPath, $Type, $Errors);
+            continue;
+         }
+
+         $this->Processed++;
+
+         // Determine target paths and name
+         $Photo = trim($File);
+         $PhotoSrc = CombinePaths(array($Folder, $Photo));
+         $PhotoFileName = basename($PhotoSrc);
+         $PhotoPath = dirname($PhotoSrc);
+         
+         $StubFolder = GetValue($Type, $this->Folders);
+         $TrimFolder = CombinePaths(array($this->SourceFolder, $StubFolder));
+         $PhotoPath = str_replace($TrimFolder, '', $PhotoPath);
+         $PhotoFolder = CombinePaths(array($this->TargetFolder, $PhotoPath));
+         @mkdir($PhotoFolder, 0777, TRUE);
+         
+         if (!file_exists($PhotoSrc)) {
+            $Errors[] = "Missing file: {$PhotoSrc}";
+            continue;
+         }
+         
+         $TypePrefix = GetValue($Type, $this->Types);
+         $PhotoDest = CombinePaths(array($PhotoFolder, "{$TypePrefix}{$PhotoFileName}"));
+         $Copied = @copy($PhotoSrc, $PhotoDest);
+         if (!$Copied) {
+            $Errors[] = "! failed to copy photo '{$PhotoSrc}' (-> {$PhotoDest}).";
+         }
+         
+         if (!($this->Processed % 100))
+            echo " - processed {$this->Processed}\n";
+      }
+   }
+
    /*
     * Forum-specific export format.
     * @param ExportModel $Ex

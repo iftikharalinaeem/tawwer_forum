@@ -25,7 +25,6 @@ class IPB extends ExportController {
       $SourceFolder = $_POST['folder'];
       if (!is_dir($SourceFolder))
          trigger_error("Source avatar folder '{$_POST['folder']}' does not exist.");
-
       
       // Set up a target folder
          
@@ -35,7 +34,6 @@ class IPB extends ExportController {
          if (!$Made) trigger_error("Target avatar folder '{$TargetFolder}' could not be created.");
       }
       
-      $this->Ex->Prefix = 'ibf_';
       $this->Ex->SourcePrefix = 'ibf_';
       
       $UserList = $this->Ex->Query("select 
