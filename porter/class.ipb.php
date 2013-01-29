@@ -9,7 +9,8 @@
 
 $Supported['ipb'] = array('name' => 'Invision Powerboard (IPB) 3.*', 'prefix'=>'ibf_');
 $Supported['ipb']['CommandLine'] = array(
-   'folder' => array('Location of source avatars.', 'Sx' => ':', 'Field' => 'folder')
+   'folder' => array('Location of source avatars.', 'Sx' => ':', 'Field' => 'folder'),
+   'source' => array('Source user table.', 'Sx' => ':', 'Field' => 'sourcetable')
 );
 
 class IPB extends ExportController {
@@ -19,6 +20,10 @@ class IPB extends ExportController {
     * 
     */
    public function DoAvatars() {
+      
+      // Source table
+      
+      $SourceTable = GetValue('sourcetable', $_POST, 'profile_portal');
       
       // Check source folder
 
@@ -36,66 +41,101 @@ class IPB extends ExportController {
       
       $this->Ex->SourcePrefix = 'ibf_';
       
-      $UserList = $this->Ex->Query("select 
-            pp_member_id as member_id,
-            pp_main_photo as main_photo,
-            pp_thumb_photo as thumb_photo,
-            coalesce(pp_main_photo,pp_thumb_photo,0) as photo
-         from ibf_profile_portal
-         where length(coalesce(pp_main_photo,pp_thumb_photo,0)) > 3
-         order by pp_member_id asc");
+      switch ($SourceTable) {
+         case 'profile_portal':
+      
+            $UserList = $this->Ex->Query("select 
+                  pp_member_id as member_id,
+                  pp_main_photo as main_photo,
+                  pp_thumb_photo as thumb_photo,
+                  coalesce(pp_main_photo,pp_thumb_photo,0) as photo
+               from ibf_profile_portal
+               where length(coalesce(pp_main_photo,pp_thumb_photo,0)) > 3
+               order by pp_member_id asc");
+            
+            break;
+         
+         case 'member_extra':
+            
+            $UserList = $this->Ex->Query("select 
+                  id as member_id,
+                  avatar_location as photo
+               from ibf_member_extra
+               where 
+                  length(avatar_location) > 3 and
+                  avatar_location <> 'noavatar'
+               order by id asc");
+
+            break;
+      }
       
       $Processed = 0;
+      $Skipped = 0;
+      $Completed = 0;
       $Errors = array();
       while (($Row = mysql_fetch_assoc($UserList)) !== FALSE) {
          $Processed++;
-         
+         $Error = FALSE;
+
          $UserID = $Row['member_id'];
-         
+
          // Determine target paths and name
          $Photo = trim($Row['photo']);
+         $Photo = preg_replace('`^upload:`', '', $Photo);
+         if (preg_match('`^https?:`i', $Photo)) {
+            $Skipped++;
+            continue;
+         }
+         
          $PhotoFileName = basename($Photo);
          $PhotoPath = dirname($Photo);
          $PhotoFolder = CombinePaths(array($TargetFolder, $PhotoPath));
          @mkdir($PhotoFolder, 0777, TRUE);
-         
+
          $PhotoSrc = CombinePaths(array($SourceFolder, $Photo));
          if (!file_exists($PhotoSrc)) {
             $Errors[] = "Missing file: {$PhotoSrc}";
             continue;
          }
-         
-         $MainPhoto = trim($Row['main_photo']);
-         $ThumbPhoto = trim($Row['thumb_photo']);
-         
+
+         $MainPhoto = trim(GetValue('main_photo', $Row, NULL));
+         $ThumbPhoto = trim(GetValue('thumb_photo', $Row, NULL));
+
          // Main Photo
          if (!$MainPhoto) $MainPhoto = $Photo;
          $MainSrc = CombinePaths(array($SourceFolder, $MainPhoto));
          $MainDest = CombinePaths(array($PhotoFolder, "p".$PhotoFileName));
          $Copied = @copy($MainSrc, $MainDest);
          if (!$Copied) {
+            $Error |= TRUE;
             $Errors[] = "! failed to copy main photo '{$MainSrc}' for user {$UserID} (-> {$MainDest}).";
          }
-            
+
          // Thumb Photo
          if (!$ThumbPhoto) $ThumbPhoto = $Photo;
          $ThumbSrc = CombinePaths(array($SourceFolder, $MainPhoto));
          $ThumbDest = CombinePaths(array($PhotoFolder,"n".$PhotoFileName));
          $Copied = @copy($ThumbSrc, $ThumbDest);
          if (!$Copied) {
+            $Error |= TRUE;
             $Errors[] = "! failed to copy thumbnail '{$ThumbSrc}' for user {$UserID} (-> {$ThumbDest}).";
          }
+
+         if (!$Error) $Completed++;
          
          if (!($Processed % 100))
             echo " - processed {$Processed}\n";
       }
-      
+
       $nErrors = sizeof($Errors);
       if ($nErrors) {
          echo "{$nErrors} errors:\n";
          foreach ($Errors as $Error)
             echo "{$Error}\n";
       }
+      
+      echo "Completed: {$Completed}\n";
+      echo "Skipped: {$Skipped}\n";
    }
    
    /**
