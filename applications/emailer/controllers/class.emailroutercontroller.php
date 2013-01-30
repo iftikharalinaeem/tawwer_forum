@@ -130,6 +130,7 @@ class EmailRouterController extends Gdn_Controller {
             
             $LogModel = new Gdn_Model('EmailLog');
             $Data['Post'] = http_build_query($Data, '', '&');
+            $Data['Charsets'] = GetValue('charsets', $Post, NULL);
             $LogID = $LogModel->Insert($Data);
             
             list($Name, $Email) = self::ParseEmailAddress($To);
