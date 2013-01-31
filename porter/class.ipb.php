@@ -151,7 +151,6 @@ class IPB extends ExportController {
 //      $Ex->DestPrefix = 'GDN_';
       
       $Ex->SourcePrefix = 'ibf_';
-      $Cdn = $this->CdnPrefix();
       
       // Get the characterset for the comments.
       $CharacterSet = $Ex->GetCharacterSet('posts');
@@ -178,7 +177,7 @@ class IPB extends ExportController {
       // Users.
       $User_Map = array(
          $MemberID => 'UserID',
-         'members_display_name' => 'Name',
+         'members_display_name' => array('Column' => 'Name', 'Filter' => 'HtmlDecoder'),
          'email' => 'Email',
          'joined' => array('Column' => 'DateInserted', 'Filter' => array($Ex, 'TimestampToDate')),
          'firstvisit' => array('Column' => 'DateFirstVisit', 'SourceColumn' => 'joined', 'Filter' => array($Ex, 'TimestampToDate')),
@@ -209,7 +208,29 @@ class IPB extends ExportController {
          $ShowEmail = '0';
       }
       
-      $Sql = "select
+      $Cdn = $this->CdnPrefix();
+      
+      if ($Ex->Exists('member_extra') === TRUE) {
+         $Sql = "select
+                  m.*,
+                  m.joined as firstvisit,
+                  'ipb' as HashMethod,
+                  $ShowEmail as ShowEmail,
+                  case when x.avatar_location in ('noavatar', '') then null
+                     when x.avatar_location like 'upload:%' then concat('{$Cdn}ipb/', right(x.avatar_location, length(x.avatar_location) - 7))
+                     when x.avatar_type = 'upload' then concat('{$Cdn}ipb/', x.avatar_location)
+                     when x.avatar_type = 'url' then x.avatar_location
+                     when x.avatar_type = 'local' then concat('{$Cdn}style_avatars/', x.avatar_location)
+                     else null
+                  end as Photo,
+                  x.location
+                  $Select
+                 from ibf_members m
+                 left join ibf_member_extra x
+                  on m.$MemberID = x.id
+                 $From";
+      } else {
+         $Sql = "select
                   m.*,
                   joined as firstvisit,
                   'ipb' as HashMethod,
@@ -218,12 +239,12 @@ class IPB extends ExportController {
                      when p.pp_main_photo like '%//%' then p.pp_main_photo
                      else concat('{$Cdn}ipb/', p.pp_main_photo)
                   end as Photo
-                  $Select
-              from ibf_members m
-              left join ibf_profile_portal p
-                  on m.$MemberID = p.pp_member_id
-              $From";
-                     
+                 $Select
+                 from ibf_members m
+                 left join ibf_profile_portal p
+                 	on m.$MemberID = p.pp_member_id
+                 $From";
+      }
       $this->ClearFilters('members', $User_Map, $Sql, 'm');
       $Ex->ExportTable('User', $Sql, $User_Map);  // ":_" will be replaced by database prefix
       
@@ -264,14 +285,29 @@ class IPB extends ExportController {
          $GroupID = 'member_group_id';
       else
          $GroupID = 'mgroup';
-         
-      
       
       $UserRole_Map = array(
           $MemberID => 'UserID',
           $GroupID => 'RoleID'
       );
-      $Ex->ExportTable('UserRole', "select * from ibf_members", $UserRole_Map);
+      
+      $Sql = "
+         select
+            m.$MemberID, m.$GroupID
+         from ibf_members m";
+      
+      if ($Ex->Exists('members', 'mgroup_others')) {
+         $Sql .= "
+            union all
+            
+            select m.$MemberID, g.g_id
+            from ibf_members m
+            join ibf_groups g
+               on find_in_set(g.g_id, m.mgroup_others)";
+
+      }
+      
+      $Ex->ExportTable('UserRole', $Sql, $UserRole_Map);
       
       // UserMeta.
       $UserMeta_Map = array(
@@ -324,7 +360,7 @@ class IPB extends ExportController {
       // Category.
       $Category_Map = array(
           'id' => 'CategoryID',
-          'name' => 'Name',
+          'name' => array('Column' => 'Name', 'Filter' => 'HtmlDecoder'),
           'name_seo' => 'UrlCode',
           'description' => 'Description',
           'parent_id' => 'ParentCategoryID',
