@@ -32,6 +32,7 @@ class ApiMapper extends SimpleApiMapper {
           
          // Badges
          'badges/give'           => 'reputation/badge/giveuser',
+         'badges/revoke'         => 'reputation/badge/revoke',
          'badges/user'           => 'reputation/badges/user',
          'badges/list'           => 'reputation/badges/all',
          
