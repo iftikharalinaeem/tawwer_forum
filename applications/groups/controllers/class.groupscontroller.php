@@ -34,6 +34,7 @@ class GroupsController extends Gdn_Controller {
    }
    
    public function Index() {
+      Gdn_Theme::Section('GroupList');
       
       // Get popular groups.
       $Groups = $this->GroupModel->Get('CountMembers', 'desc', 10)->ResultArray();

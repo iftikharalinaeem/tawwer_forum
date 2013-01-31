@@ -36,13 +36,21 @@ class GroupController extends Gdn_Controller {
    }
    
    /**
+    * The homepage for a group.
     * 
     * @param string $Group Url friendly code for the group in the form ID-url-friendly-name
     */
-   public function Index($Group) {
-      $Group = $this->GroupModel->GetID($Group);
+   public function Index($ID) {
+      Gdn_Theme::Section('Group');
+      
+      $Group = $this->GroupModel->GetID($ID);
       if (!$Group)
          throw NotFoundException('Group');
+      
+      // Force the canonical url.
+      if ($ID != GroupSlug($Group))
+         Redirect(GroupUrl($Group), 301);
+      $this->CanonicalUrl(Url(GroupUrl($Group), '//'));
       
       $this->SetData('Group', $Group);
       
@@ -50,5 +58,14 @@ class GroupController extends Gdn_Controller {
       require_once $this->FetchViewLocation('group_functions');
       $this->CssClass .= ' NoPanel';
       $this->Render('Group');
+   }
+   
+   /**
+    * The member list of a group.
+    * 
+    * @param string $Group
+    * @param string $Page
+    */
+   public function Members($Group, $Page = FALSE) {
    }
 }

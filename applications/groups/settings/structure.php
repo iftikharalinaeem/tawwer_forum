@@ -46,6 +46,7 @@ $St->Table('GroupApplicant')
    ->Column('GroupID', 'int', FALSE, 'primary')
    ->Column('UserID', 'int', FALSE, array('primary', 'key'))
    ->Column('Type', array('Application', 'Invitation', 'Banned'))
+   ->Column('Reason', 'text', TRUE) // reason for wanting to join.
    ->Column('DateInserted', 'datetime')
    ->Column('InsertUserID', 'int')
    ->Column('DateUpdated', 'datetime', TRUE)

@@ -1,13 +1,44 @@
 <?php
 
+if (!function_exists('WriteDiscussionBlog')):
+   
+function WriteDiscussionBlog($Discussions) {
+}
+   
+endif;
+
+if (!function_exists('WriteDiscussionList')):
+
+function WriteDiscussionList($Dicussions) {
+   
+}
+   
+endif;
+
+if (!function_exists('WriteEventList')):
+   
+function WriteEventList($Events) {
+}
+   
+endif;
+
 if (!function_exists('WriteGroupBanner')):
    
-function WriteGroupBanner($Group) {
+function WriteGroupBanner() {
+   $Group = Gdn::Controller()->Data('Group');
+   
    if (!$Group['Banner'])
       return;
    
    echo Img(Gdn_Upload::Url($Group['Banner']));
 }
+endif;
+
+if (!function_exists('WriteGroupButtons')):
+   
+function WriteGroupButtons() {
+}
+   
 endif;
 
 if (!function_exists('WriteGroupCards')):
@@ -23,7 +54,9 @@ endif;
 
 if (!function_exists('WriteGroupIcon')):
 
-function WriteGroupIcon($Group) {
+function WriteGroupIcon() {
+   $Group = Gdn::Controller()->Data('Group');
+   
    if (!$Group['Icon'])
       return;
    
@@ -31,7 +64,6 @@ function WriteGroupIcon($Group) {
 }
    
 endif;
-
 
 if (!function_exists('WriteGroupList')):
 
