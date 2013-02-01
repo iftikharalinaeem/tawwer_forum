@@ -10,14 +10,22 @@
 <!-- Join/Apply Button area. -->
 <?php WriteGroupButtons(); ?>
 
-<h2><?php echo T('Upcoming Events'); ?></h2>
-<?php WriteEventList($this->Data('Events')); ?>
-
-<h2><?php echo T('Announcements'); ?></h2>
-<?php WriteDiscussionBlog($this->Data('Announcements')); ?>
-
-<h2><?php echo T('Discussions'); ?></h2>
-<?php WriteDiscussionList($this->Data('Discussions')); ?>
+<div class="Group-Content">
+   <div class="Group-Box">
+   <h2><?php echo T('Upcoming Events'); ?></h2>
+   <?php WriteEventList($this->Data('Events')); ?>
+   </div>
+   
+   <div class="Group-Block">
+   <h2><?php echo T('Announcements'); ?></h2>
+   <?php WriteDiscussionBlog($this->Data('Announcements')); ?>
+   </div>
+   
+   <div class="Group-Block">
+   <h2><?php echo T('Discussions'); ?></h2>
+   <?php WriteDiscussionList($this->Data('Discussions')); ?>
+   </div>
+</div>
 
 <div class="Box">
 <h2><?php echo sprintf(T('More About %s'), htmlspecialchars($this->Data('Group.Name'))); ?></h2>
