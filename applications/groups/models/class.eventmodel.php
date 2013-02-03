@@ -32,17 +32,70 @@ class EventModel extends Gdn_Model {
    }
    
    /**
+    * Invite someone to an event
+    * 
+    * @param integer $UserID
+    * @param integer $EventID
+    */
+   public function Invite($UserID, $EventID) {
+      return $this->SQL->Insert('UserEvent', array(
+         'EventID'      => $EventID,
+         'UserID'       => $UserID,
+         'Attending'    => 'Invited'
+      ));
+   }
+   
+   /**
+    * Get list of invited
+    * @param type $EventID
+    * @return type
+    */
+   public function Invited($EventID) {
+      $CollapsedInvited = $this->SQL->GetWhere('UserEvent', array(
+         'EventID'   => $EventID
+      ))->ResultArray();
+      Gdn::UserModel()->JoinUsers($CollapsedInvited, array('UserID'));
+      $Invited = array();
+      foreach ($CollapsedInvited as $Invitee)
+         $Invited[$Invitee['Attending']][] = $Invitee;
+      return $Invited;
+   }
+   
+   /**
     * Check if a User is invited to an Event
     * 
     * @param integer $UserID
     * @param integer $EventID
     */
    public function IsInvited($UserID, $EventID) {
-      $IsMember = $this->SQL->GetCount('UserEvent', array(
+      $IsInvited = $this->SQL->GetWhere('UserEvent', array(
          'UserID'    => $UserID,
          'EventID'   => $EventID
+      ))->FirstRow(DATASET_TYPE_ARRAY);
+      $IsInvited = GetValue('Attending', $IsInvited, FALSE);
+      return $IsInvited;
+   }
+   
+   /**
+    * Change user attending status for event
+    * 
+    * @param integer $UserID
+    * @param integer $EventID
+    * @param enum $Attending [Yes, No, Maybe, Invited]
+    */
+   public function Attend($UserID, $EventID, $Attending) {
+      $Px = Gdn::Database()->DatabasePrefix;
+      $Sql = "insert into {$Px}UserEvent (EventID, UserID, DateInserted, Attending)
+         values (:EventID, :UserID, :DateInserted, :Attending)
+         on duplicate key update Attending = :Attending1";
+      
+      $this->Database->Query($Sql, array(
+         ':EventID'      => $EventID,
+         ':UserID'       => $UserID,
+         ':DateInserted' => date('Y-m-d H:i:s'),
+         ':Attending'    => $Attending,
+         ':Attending1'   => $Attending
       ));
-      return $IsMember > 0;
    }
    
    /**
@@ -52,7 +105,7 @@ class EventModel extends Gdn_Model {
     * @staticvar array $Timezones
     * @return array
     */
-   public static function Timezones() {
+   public static function Timezones($LookupTimezone = NULL) {
       static $Built = NULL;
       static $Timezones = array(
          'Pacific/Midway'       => "Midway Island",
@@ -197,7 +250,9 @@ class EventModel extends Gdn_Model {
             $Built[$BuildTimezone['Timezone']] = trim($BuildTimezone['Label']);
       }
       
-      return $Built;
+      if (is_null($LookupTimezone))
+         return $Built;
+      return GetValue($LookupTimezone, $Built);
    }
    
 }

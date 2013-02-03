@@ -44,10 +44,11 @@ function WriteDiscussionList($Discussions, $EmptyMessage = '') {
    //if (C('Vanilla.Discussions.Layout') == 'table')
    //WriteDiscussionRow($Discussion, $this, $Session, $Alt);
    if (is_array($Discussions)) {
-      include_once(PATH_APPLICATIONS .'/vanilla/views/discussions/helper_functions.php');   
+      include_once(PATH_APPLICATIONS .'/vanilla/views/discussions/helper_functions.php');
+      include_once(PATH_APPLICATIONS .'/vanilla/views/modules/helper_functions.php');   
       echo '<ul class="DataList Discussions">';
       foreach ($Discussions as $Discussion) {
-         WriteDiscussion((object)$Discussion, Gdn::Controller(), Gdn::Session());
+         WriteModuleDiscussion((object)$Discussion, 'Group');
       }
       echo '</ul>';
    }
@@ -203,7 +204,14 @@ if (!function_exists('WriteMemberCards')) :
  * @param array $Members
  */
 function WriteMemberCards($Members) {
-   //decho($Members, 'Member Cards');
+   if (!$Members)
+      echo WriteEmptyState("No one has joined yet. Spread the word!");
+   
+   if (is_array($Members)) {
+      foreach ($Members as $Member) {
+         echo Gdn_Format::Text($Member['Name']).', ';
+      } 
+   }
 }
 endif;
 
