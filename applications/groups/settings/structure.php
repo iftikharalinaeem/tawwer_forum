@@ -66,6 +66,7 @@ $St->Table('Event')
    ->Column('Format', 'varchar(10)', TRUE)
    ->Column('DateStarts', 'datetime')
    ->Column('DateEnds', 'datetime', TRUE)
+   ->Column('Timezone', 'varchar(64)')
    ->Column('AllDayEvent', 'tinyint', '0')
    ->Column('Location', 'varchar(255)')
    ->Column('DateInserted', 'datetime')
@@ -79,7 +80,7 @@ $St->Table('UserEvent')
    ->Column('EventID', 'int', FALSE, 'primary')
    ->Column('UserID', 'int', FALSE, array('primary', 'key'))
    ->Column('DateInserted', 'datetime')
-   ->Column('Attending', array('Yes', 'No', 'Maybe'))
+   ->Column('Attending', array('Yes', 'No', 'Maybe', 'Invited'), 'Invited')
    ->Set($Explicit, $Drop);
 
 // Make sure the activity table has an index that the event wall can use.

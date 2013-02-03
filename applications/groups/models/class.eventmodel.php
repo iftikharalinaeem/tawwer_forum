@@ -1,13 +1,14 @@
 <?php
 
-class GroupModel extends Gdn_Model {
+class EventModel extends Gdn_Model {
+   
    /**
     * Class constructor. Defines the related database table name.
     * 
     * @access public
     */
    public function __construct() {
-      parent::__construct('Group');
+      parent::__construct('Event');
    }
    
    public function GetByUser($UserID) {
@@ -31,19 +32,17 @@ class GroupModel extends Gdn_Model {
    }
    
    /**
-    * Check if a User is a member of a Group
+    * Check if a User is invited to an Event
     * 
     * @param integer $UserID
-    * @param integer $GroupID
+    * @param integer $EventID
     */
-   public function IsMember($UserID, $GroupID) {
-      $IsMember = $this->SQL->GetCount('UserGroup', array(
+   public function IsInvited($UserID, $EventID) {
+      $IsMember = $this->SQL->GetCount('UserEvent', array(
          'UserID'    => $UserID,
-         'GroupID'   => $GroupID
+         'EventID'   => $EventID
       ));
       return $IsMember > 0;
    }
-   
-   
    
 }
