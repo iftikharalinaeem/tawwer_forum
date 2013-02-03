@@ -4,6 +4,7 @@
 @import "columns";
 @import "datetile";
 @import "empty";
+@import "event";
 
 .Group-Banner {
    height: 200px;
@@ -25,7 +26,6 @@
    font-size: 36px;
    line-height: 1;
 }
-
 .Group-Description {
    line-height: 1.4;
 }
@@ -33,6 +33,10 @@
 .Group-Buttons {
    margin-top: 10px;
    float: right;
+   
+   .BigButton {
+      display: inline-block;
+   }
 }
 
 .Group-Content {
@@ -52,11 +56,15 @@
 }
 .Group-Discussions .ItemDiscussion {
    padding: 8px 0; 
+
+.Group-Header {
+   @include pie-clearfix;
 }
 
 .Group-Footer {
    border-top: 1px solid $boxBorder; // Panel nav
-   @include background-image(linear-gradient($shaded, white)); 
+   @include background-image(linear-gradient($shaded, white));
+   @include pie-clearfix;
 }
 .Group-Footer .Group-Box {
    width: 200px;

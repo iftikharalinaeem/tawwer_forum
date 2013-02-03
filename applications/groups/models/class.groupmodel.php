@@ -10,6 +10,117 @@ class GroupModel extends Gdn_Model {
       parent::__construct('Group');
    }
    
+   /**
+    * Check permission on a group.
+    * 
+    * @param string $Permission The permission to check. Valid values are:
+    *  - Member: User is a member of the group.
+    *  - Leader: User is a leader of the group.
+    *  - Join: User can join the group.
+    *  - Leave: User can leave the group.
+    *  - Edit: The user may edit the group.
+    *  - Delete: User can delete the group.
+    *  - View: The user may view the group's contents.
+    *  - Moderate: The user may moderate the group.
+    * @param int $GroupID
+    * @return boolean
+    */
+   public function CheckPermission($Permission, $GroupID) {
+      static $Permissions = array();
+      
+      $UserID = Gdn::Session()->UserID;
+      
+      if (!isset($Permissions[$UserID])) {
+         // Get the data for the group.
+         if (is_array($GroupID)) {
+            $Group = $GroupID;
+            $GroupID = $Group['GroupID'];
+         } else
+            $Group = $this->GetID($GroupID);
+         $UserGroup = Gdn::SQL()->GetWhere('UserGroup', array('GroupID' => $GroupID, 'UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
+         $GroupApplicant = Gdn::SQL()->GetWhere('GroupApplicant', array('GroupID' => $GroupID, 'UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
+         
+         
+         // Set the default permissions.
+         $Perms = array(
+            'Member' => FALSE,
+            'Leader' => FALSE,
+            'Join' => Gdn::Session()->IsValid(),
+            'Leave' => FALSE,
+            'Edit' => FALSE,
+            'Delete' => FALSE,
+            'Moderate' => FALSE,
+            'View' => TRUE);
+         
+         // The group creator is always a member and leader.
+         if ($UserID == $Group['InsertUserID']) {
+            $Perms['Delete'] = TRUE;
+            
+            if (!$UserGroup)
+               $UserGroup = array('Role' => 'Leader');
+         }
+            
+         if ($UserGroup) {
+            $Perms['Join'] = FALSE;
+            $Perms['Join.Reason'] = T('You are already a member of this group.');
+            
+            $Perms['Member'] = TRUE;
+            $Perms['Leader'] = ($UserGroup['Role'] == 'Leader');
+            $Perms['Edit'] = $Perms['Leader'];
+            $Perms['Moderate'] = $Perms['Leader'];
+            
+            if ($UserID != $Group['InsertUserID']) {
+               $Perms['Leave'] = TRUE;
+            } else {
+               $Perms['Leave.Reason'] = T("You can't leave the group you started.");
+            }
+         } else {
+            if ($Group['Visibility'] != 'Public') {
+               $Perms['View'] = FALSE;
+               $Perms['View.Reason'] = T('Join this group to view its content.');
+            }
+         }
+         
+         if ($GroupApplicant) {
+            $Perms['Join'] = FALSE; // Already applied or banned.
+         }
+         
+         // Moderators can view and edit all groups.
+         if ($UserID == Gdn::Session()->UserID && Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+            $Perms['Edit'] = TRUE;
+            $Perms['Delete'] = TRUE;
+            $Perms['View'] = TRUE;
+            unset($Perms['View.Reason']);
+            $Perms['Moderate'] = TRUE;
+         }
+         
+         $Permissions[$UserID] = $Perms;
+      }
+      
+      $Perms = $Permissions[$UserID];
+      
+      if (!$Permission)
+         return $Perms;
+      
+      if (!isset($Perms[$Permission])) {
+         if (strpos($Permission, '.Reason') === FALSE) {
+            trigger_error("Invalid group permission $Permission.");
+            return FALSE;
+         } else {
+            $Permission = StringEndsWith($Permission, '.Reason', TRUE, TRUE);
+            if (in_array($Permission, array('Member', 'Leader'))) {
+               $Message = T(sprintf("You aren't a %s of this group.", strtolower($Permission)));
+            } else {
+               $Message = sprintf(T("You aren't allowed to %s this group."), T(strtolower($Permission)));
+            }
+            
+            return $Message;
+         }
+      } else {
+         return $Perms[$Permission];
+      }
+   }
+   
    public function GetByUser($UserID) {
       $UserGroups = $this->SQL->GetWhere('UserGroup', array('UserID' => $UserID))->ResultArray();
       $IDs = ConsolidateArrayValuesByKey($UserGroups, 'GroupID');
@@ -19,9 +130,15 @@ class GroupModel extends Gdn_Model {
    }
    
    public function GetID($ID, $DatasetType = DATASET_TYPE_ARRAY) {
+      static $Cache = array();
+      
       $ID = self::ParseID($ID);
+      if (isset($Cache[$ID]))
+         return $Cache[$ID];
       
       $Row = parent::GetID($ID, $DatasetType);
+      $Cache[$ID] = $Row;
+      
       return $Row;
    }
    
@@ -44,6 +161,71 @@ class GroupModel extends Gdn_Model {
       return $IsMember > 0;
    }
    
+   public function Join($Data) {
+      $Valid = $this->ValidateJoin($Data);
+      if (!$Valid) {
+         return FALSE;
+      }
+      
+      $Group = $this->GetID(GetValue('GroupID', $Data));
+      Trace($Group, 'Group');
+      
+      switch (strtolower($Group['Registration'])) {
+         case 'public':
+            
+            // This is a public group, go ahead and add the user.
+            TouchValue('Role', $Data, 'Member');
+            $Model = new Gdn_Model('UserGroup');
+            $Saved = $Model->Insert($Data);
+            $this->Validation = $Model->Validation;
+            return count($this->ValidationResults()) == 0;
+            
+         case 'approval':
+            // The user must apply to this group.
+            $Model = new Gdn_Model('GroupApplication');
+            $Saved = $Model->Insert($Data);
+            $this->Validation = $Model->Validation;
+            return count($this->ValidationResults()) == 0;
+            
+         case 'invite':
+         default:
+            throw new Gdn_UserException("Registration type {$Group['Registration']} not supported.");
+            // TODO: The user must be invited.
+            return FALSE;
+      }
+   }
    
+   /**
+    * Approve a membership application.
+    * 
+    * @param type $Data
+    */
+   public function JoinApprove($Data) {
+      
+   }
    
+   public function Leave($Data) {
+      $this->SQL->Delete('UserGroup', array(
+         'UserID' => GetValue('UserID', $Data),
+         'GroupID' => GetValue('GroupID', $Data)));
+   }
+   
+   public function ValidateJoin($Data) {
+      $this->Validation->ApplyRule('UserID', 'ValidateRequired');
+      $this->Validation->ApplyRule('GroupID', 'ValidateRequired');
+      
+      $GroupID = GetValue('GroupID', $Data);
+      if ($GroupID) {
+         $Group = $this->GetID($GroupID);
+         
+         switch (strtolower($Group['Registration'])) {
+            case 'approval':
+               $this->Validation->ApplyRule('Reason', 'ValidateRequired', 'Why do you want to join?');
+         }
+      }
+      
+      // First validate the basic field requirements.
+      $Valid = $this->Validation->Validate($Data);
+      return $Valid;
+   }
 }

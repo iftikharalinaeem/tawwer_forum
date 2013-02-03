@@ -1,158 +1,65 @@
-/* line 4, sass/_columns.scss */
-.Group-Content {
-  -webkit-column-count: 3;
-  -moz-column-count: 3;
-  -ms-column-count: 3;
-  -o-column-count: 3;
-  column-count: 3;
-  -webkit-column-gap: 30px;
-  -moz-column-gap: 30px;
-  -ms-column-gap: 30px;
-  -o-column-gap: 30px;
-  column-gap: 30px;
-}
+/*
+Syntax error: Invalid CSS after "}": expected "}", was ""
+        on line 77 of /Users/destruction/Repos/VFMisc/applications/groups/design/sass/groups.scss
 
-/* line 11, sass/_columns.scss */
-.Group-Content .Group-Box {
-  -webkit-column-break-inside: avoid;
-  column-break-inside: avoid;
-  overflow: hidden;
-  *zoom: 1;
-}
-
-/* line 18, sass/_columns.scss */
-.Group-Events {
-  -webkit-column-break-after: always;
-  column-break-after: always;
-}
-
-/* line 1, sass/_datetile.scss */
-.DateTile {
-  display: block;
-  float: left;
-  width: 40px;
-  text-align: center;
-  margin: 2px 10px 0 0;
-  padding: 4px 0 3px;
-  line-height: 1.1;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  -ms-border-radius: 5px;
-  -o-border-radius: 5px;
-  border-radius: 5px;
-  background-color: #333333;
-  color: white;
-}
-
-/* line 13, sass/_datetile.scss */
-.DateTile .Month {
-  display: block;
-  font-size: 10px;
-  text-transform: uppercase;
-}
-
-/* line 18, sass/_datetile.scss */
-.DateTile .Day {
-  font-size: 18px;
-  display: block;
-}
-
-/* line 2, sass/_empty.scss */
-.EmptyMessage {
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  -ms-border-radius: 10px;
-  -o-border-radius: 10px;
-  border-radius: 10px;
-  text-align: center;
-  margin: 20px auto;
-  padding: 15px 5px;
-  width: 90%;
-  background: #f7f7f7;
-  border: 1px solid #dddddd;
-  color: #70727c;
-}
-
-/* line 8, sass/groups.scss */
-.Group-Banner {
-  height: 200px;
-  width: 100%;
-  background-position: center top;
-  background-repeat: no-repeat;
-}
-
-/* line 16, sass/groups.scss */
-.Group-Icon {
-  max-width: 100px;
-  max-height: 100px;
-  padding: 10px 15px 0 0;
-  float: left;
-}
-
-/* line 23, sass/groups.scss */
-.Group-Title {
-  margin: 10px 0 10px;
-  font-size: 36px;
-  line-height: 1;
-}
-
-/* line 29, sass/groups.scss */
-.Group-Description {
-  line-height: 1.4;
-}
-
-/* line 33, sass/groups.scss */
-.Group-Buttons {
-  margin-top: 10px;
-  float: right;
-}
-
-/* line 38, sass/groups.scss */
-.Group-Content {
-  clear: left;
-  margin: 10px 0;
-  padding-bottom: 20px;
-}
-
-/* line 44, sass/groups.scss */
-.Group-Discussions .HasNew {
-  margin-right: 8px;
-}
-
-/* line 47, sass/groups.scss */
-.Group-Discussions .MItem {
-  margin-left: 0;
-}
-
-/* line 50, sass/groups.scss */
-.Group-Discussions .MItem time {
-  padding-right: 8px;
-}
-
-/* line 53, sass/groups.scss */
-.Group-Discussions .ItemDiscussion {
-  padding: 8px 0;
-}
-
-/* line 57, sass/groups.scss */
-.Group-Footer {
-  border-top: 1px solid #dddddd;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f7f7f7), color-stop(100%, #ffffff));
-  background-image: -webkit-linear-gradient(#f7f7f7, #ffffff);
-  background-image: -moz-linear-gradient(#f7f7f7, #ffffff);
-  background-image: -o-linear-gradient(#f7f7f7, #ffffff);
-  background-image: linear-gradient(#f7f7f7, #ffffff);
-}
-
-/* line 61, sass/groups.scss */
-.Group-Footer .Group-Box {
-  width: 200px;
-  margin-right: 30px;
-  float: left;
-}
-
-/* line 66, sass/groups.scss */
-.Group-Footer .Group-Members {
-  width: 480px;
-  margin-right: 0;
-}
+Backtrace:
+/Users/destruction/Repos/VFMisc/applications/groups/design/sass/groups.scss:77
+/Library/Ruby/Gems/1.8/gems/sass-3.2.1/lib/sass/../sass/scss/parser.rb:1130:in `expected'
+/Library/Ruby/Gems/1.8/gems/sass-3.2.1/lib/sass/../sass/scss/parser.rb:1066:in `expected'
+/Library/Ruby/Gems/1.8/gems/sass-3.2.1/lib/sass/../sass/scss/parser.rb:1061:in `tok!'
+/Library/Ruby/Gems/1.8/gems/sass-3.2.1/lib/sass/../sass/scss/parser.rb:519:in `block'
+/Library/Ruby/Gems/1.8/gems/sass-3.2.1/lib/sass/../sass/scss/parser.rb:512:in `ruleset'
+/Library/Ruby/Gems/1.8/gems/sass-3.2.1/lib/sass/../sass/scss/parser.rb:536:in `block_child'
+/Library/Ruby/Gems/1.8/gems/sass-3.2.1/lib/sass/../sass/scss/parser.rb:529:in `block_contents'
+/Library/Ruby/Gems/1.8/gems/sass-3.2.1/lib/sass/../sass/scss/parser.rb:70:in `stylesheet'
+/Library/Ruby/Gems/1.8/gems/sass-3.2.1/lib/sass/../sass/scss/parser.rb:27:in `parse'
+/Library/Ruby/Gems/1.8/gems/sass-3.2.1/lib/sass/../sass/engine.rb:342:in `_to_tree'
+/Library/Ruby/Gems/1.8/gems/sass-3.2.1/lib/sass/../sass/engine.rb:315:in `_render'
+/Library/Ruby/Gems/1.8/gems/sass-3.2.1/lib/sass/../sass/engine.rb:262:in `render'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/compiler.rb:140:in `compile'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/compiler.rb:126:in `timed'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/compiler.rb:139:in `compile'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/logger.rb:45:in `red'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/compiler.rb:138:in `compile'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/compiler.rb:118:in `compile_if_required'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/compiler.rb:103:in `run'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/compiler.rb:101:in `each'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/compiler.rb:101:in `run'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/compiler.rb:126:in `timed'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/compiler.rb:100:in `run'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/commands/watch_project.rb:147:in `recompile'
+/Library/Ruby/Site/1.8/rubygems/custom_require.rb:36:in `to_proc'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/path.rb:73:in `call'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/path.rb:73:in `run_callback'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/path.rb:55:in `callback_action'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/path.rb:35:in `update'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/state/directory.rb:39:in `modified'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/state/directory.rb:37:in `each'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/state/directory.rb:37:in `modified'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/state/directory.rb:18:in `refresh'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/backends/rbfsevent.rb:30:in `temporary_multipath_handler'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/backends/rbfsevent.rb:27:in `each'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/backends/rbfsevent.rb:27:in `temporary_multipath_handler'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/backends/rbfsevent.rb:17:in `run'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/backends/rbfsevent.rb:16:in `each'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/backends/rbfsevent.rb:16:in `run'
+/Library/Ruby/Gems/1.8/gems/rb-fsevent-0.9.3/lib/rb-fsevent/fsevent.rb:43:in `call'
+/Library/Ruby/Gems/1.8/gems/rb-fsevent-0.9.3/lib/rb-fsevent/fsevent.rb:43:in `run'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/backends/rbfsevent.rb:20:in `run'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm/monitor.rb:26:in `run'
+/Library/Ruby/Gems/1.8/gems/fssm-0.2.9/lib/fssm.rb:70:in `monitor'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/commands/watch_project.rb:87:in `perform'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/commands/base.rb:18:in `execute'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/commands/project_base.rb:19:in `execute'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/exec/sub_command_ui.rb:43:in `perform!'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/lib/compass/exec/sub_command_ui.rb:15:in `run!'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/bin/compass:30
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/bin/compass:44:in `call'
+/Library/Ruby/Gems/1.8/gems/compass-0.12.2/bin/compass:44
+/usr/bin/compass:23:in `load'
+/usr/bin/compass:23
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Syntax error: Invalid CSS after \"}\": expected \"}\", was \"\"\A         on line 77 of /Users/destruction/Repos/VFMisc/applications/groups/design/sass/groups.scss"; }
