@@ -148,6 +148,7 @@ class EventController extends Gdn_Controller {
          
       }
       
+      $this->View = 'add';
       return $this->Render();
    }
    
@@ -167,6 +168,9 @@ class EventController extends Gdn_Controller {
       if (!$Event) throw NotFoundException('Event');
       $ViewEvent = FALSE;
       
+      // Check our invite status
+      $InvitedToEvent = $EventModel->IsInvited(Gdn::Session()->UserID, $EventID);
+      
       // Lookup group, if there is one
       $GroupID = GetValue('GroupID', $Event, FALSE);
       if ($GroupID) {
@@ -180,6 +184,7 @@ class EventController extends Gdn_Controller {
          if ($MemberOfGroup || Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
             $ViewEvent = TRUE;
          
+         $this->AddBreadcrumb('Groups', Url('/groups'));
          $this->AddBreadcrumb($Group['Name'], Url("/group/{$GroupID}"));
          
       } else {
@@ -189,9 +194,10 @@ class EventController extends Gdn_Controller {
             $ViewEvent = TRUE;
          
          // No group, so user has to have been invited to view
-         $InvitedToEvent = $EventModel->IsInvited(Gdn::Session()->UserID, $EventID);
          if ($InvitedToEvent || Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
             $ViewEvent = TRUE;
+         
+         $this->AddBreadcrumb('Events', Url('/events'));
       }
       
       // No permission
@@ -201,9 +207,99 @@ class EventController extends Gdn_Controller {
       $this->Title($Event['Name']);
       $this->AddBreadcrumb($this->Title());
       
+      $OrganizerID = $Event['InsertUserID'];
+      $Organizer = Gdn::UserModel()->GetID($OrganizerID, DATASET_TYPE_ARRAY);
+      $Event['Organizer'] = $Organizer;
       
+      $this->SetData('Event', $Event);
+      $this->SetData('Attending', $InvitedToEvent);
       
+      if ($InvitedToEvent != 'Invited')
+         $this->Form->SetValue('Attending', $InvitedToEvent);
+      
+      // Invited
+      $Invited = $EventModel->Invited($EventID);
+      $this->SetData('Invited', $Invited);
+      
+      $this->RequestMethod = 'show';
+      $this->View = 'show';
       return $this->Render();
+   }
+   
+   /**
+    * AJAX callback stating this user's state on the event
+    * 
+    * @param integer $EventID
+    * @param enum $Attending [Yes, No, Maybe]
+    */
+   public function Attending($EventID, $Attending) {
+      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $this->Permission('Garden.Signin.Allow');
+      
+      // Lookup event
+      $EventModel = new EventModel();
+      $Event = $EventModel->GetID($EventID, DATASET_TYPE_ARRAY);
+      if (!$Event) throw NotFoundException('Event');
+      $AttendEvent = FALSE;
+      
+      // Check our invite status
+      $InvitedToEvent = $EventModel->IsInvited(Gdn::Session()->UserID, $EventID);
+      
+      // Lookup group, if there is one
+      $GroupID = GetValue('GroupID', $Event, FALSE);
+      if ($GroupID) {
+         
+         $GroupModel = new GroupModel();
+         $Group = $GroupModel->GetID($GroupID, DATASET_TYPE_ARRAY);
+         if (!$Group) throw NotFoundException('Group');
+         
+         // Check if this person is a member of the group or a moderator
+         $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $GroupID);
+         if ($MemberOfGroup)
+            $AttendEvent = TRUE;
+         
+         $this->AddBreadcrumb('Groups', Url('/groups'));
+         $this->AddBreadcrumb($Group['Name'], Url("/group/{$GroupID}"));
+         
+      } else {
+         
+         // Group organizer
+         if ($Event['InsertUserID'] == Gdn::Session()->UserID)
+            $AttendEvent = TRUE;
+         
+         // No group, so user has to have been invited to view
+         if ($InvitedToEvent)
+            $AttendEvent = TRUE;
+         
+         $this->AddBreadcrumb('Events', Url('/events'));
+      }
+      
+      // No permission
+      if (!$AttendEvent)
+         throw ForbiddenException('attend this event');
+      
+      $EventModel->Attend(Gdn::Session()->UserID, $EventID, $Attending);
+      $this->InformMessage(sprintf(T('Your status for this event is now: <b>%s</b>'), $Attending));
+      $this->JsonTarget('#EventAttendees', $this->Attendees($EventID));
+      
+      $this->Render('blank', 'utility', 'dashboard');
+   }
+   
+   /**
+    * Generate Attendee list
+    * 
+    * @param integer $EventID
+    * @return string
+    */
+   protected function Attendees($EventID) {
+      $EventModel = new EventModel();
+      $Invited = $EventModel->Invited($EventID);
+      $this->SetData('Invited', $Invited);
+      
+      $AttendeesView = $this->FetchView('attendees', 'event', 'groups');
+      unset($this->Data['Invited']);
+      
+      return $AttendeesView;
    }
    
    /**
