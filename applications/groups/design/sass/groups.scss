@@ -41,6 +41,19 @@
    padding-bottom: 20px;
 }
 
+.Group-Discussions .HasNew {
+   margin-right: 8px;
+}
+.Group-Discussions .MItem {
+   margin-left: 0;
+}
+.Group-Discussions .MItem time {
+   padding-right: 8px;
+}
+.Group-Discussions .ItemDiscussion {
+   padding: 8px 0; 
+}
+
 .Group-Footer {
    border-top: 1px solid $boxBorder; // Panel nav
    @include background-image(linear-gradient($shaded, white)); 
