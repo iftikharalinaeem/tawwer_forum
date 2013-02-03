@@ -8,7 +8,7 @@
 
 .Group-Banner {
    height: 200px;
-   // Fluid width centering
+   /* Fluid width centering */
    width: 100%;
    background-position: center top;
    background-repeat: no-repeat;
@@ -56,13 +56,13 @@
 }
 .Group-Discussions .ItemDiscussion {
    padding: 8px 0; 
-
+}
 .Group-Header {
    @include pie-clearfix;
 }
 
 .Group-Footer {
-   border-top: 1px solid $boxBorder; // Panel nav
+   border-top: 1px solid $boxBorder; /* Panel nav */
    @include background-image(linear-gradient($shaded, white));
    @include pie-clearfix;
 }
