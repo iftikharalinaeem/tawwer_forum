@@ -50,7 +50,7 @@ class GroupModel extends Gdn_Model {
             'Edit' => FALSE,
             'Delete' => FALSE,
             'Moderate' => FALSE,
-            'View' => $Group['Visibility'] == 'Public');
+            'View' => TRUE);
          
          // The group creator is always a member and leader.
          if ($UserID == $Group['InsertUserID']) {
@@ -74,6 +74,11 @@ class GroupModel extends Gdn_Model {
             } else {
                $Perms['Leave.Reason'] = T("You can't leave the group you started.");
             }
+         } else {
+            if ($Group['Visibility'] != 'Public') {
+               $Perms['View'] = FALSE;
+               $Perms['View.Reason'] = T('Join this group to view its content.');
+            }
          }
          
          if ($GroupApplicant) {
@@ -85,6 +90,7 @@ class GroupModel extends Gdn_Model {
             $Perms['Edit'] = TRUE;
             $Perms['Delete'] = TRUE;
             $Perms['View'] = TRUE;
+            unset($Perms['View.Reason']);
             $Perms['Moderate'] = TRUE;
          }
          
