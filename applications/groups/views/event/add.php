@@ -19,8 +19,8 @@
          </div>
 
          <div class="P Where">
-            <?php echo $this->Form->Label('Where', 'Where'); ?>
-            <div><?php echo $this->Form->TextBox('Where'); ?></div>
+            <?php echo $this->Form->Label('Where', 'Location'); ?>
+            <div><?php echo $this->Form->TextBox('Location'); ?></div>
          </div>
          
          <div class="EventTime">

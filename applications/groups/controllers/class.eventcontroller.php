@@ -57,6 +57,8 @@ class EventController extends Gdn_Controller {
     * @throws Exception
     */
    public function Add($GroupID = NULL) {
+      Gdn_Theme::Section('Event');
+      $this->Permission('Garden.Signin.Allow');
       
       $this->AddJsFile('jquery.timepicker.min.js');
       $this->AddJsFile('jquery.dropdown.js');
@@ -91,8 +93,47 @@ class EventController extends Gdn_Controller {
       if ($this->Form->IsPostBack()) {
          $Event = $this->Form->FormValues();
          
-         print_r($Event);
-         die();
+         try {
+            // Timezone
+            $Timezone = new DateTimeZone($Event['Timezone']);
+            $UTC = new DateTimeZone('UTC');
+         
+            // Date starts
+            if (!empty($Event['DateStarts'])) {
+               $DateStartsStr = $Event['DateStarts'];
+               if (!empty($Event['TimeStarts']))
+                  $DateStartsStr .= " {$Event['TimeStarts']}";
+               
+               $EventDateStarts = DateTime::createFromFormat('m/d/Y h:ia', $DateStartsStr, $Timezone);
+               $EventDateStarts->setTimezone($UTC);
+               $Event['DateStarts'] = $EventDateStarts->format('Y-m-d H:i');
+            } else { unset($Event['DateStarts']); }
+            unset($Event['TimeStarts']);
+            
+            // Date ends
+            if (!empty($Event['DateEnds'])) {
+               $DateEndsStr = $Event['DateEnds'];
+               if (!empty($Event['TimeEnds']))
+                  $DateEndsStr .= " {$Event['TimeEnds']}";
+               
+               $EventDateEnds = DateTime::createFromFormat('m/d/Y h:ia', $DateEndsStr, $Timezone);
+               $EventDateStarts->setTimezone($UTC);
+               $Event['DateEnds'] = $EventDateEnds->format('Y-m-d H:i');
+            } else { unset($Event['DateEnds']); }
+            unset($Event['TimeEnds']);
+            
+            // Validate
+            $this->Form->ClearInputs();
+            $this->Form->SetFormValue($Event);
+            
+            if ($this->Form->Save()) {
+               $this->InformMessage(FormatString(T("New event created for <b>'{Name}'</b>"), $Event));
+            }
+            
+         } catch (Exception $Ex) {
+            $this->Form->AddError($Ex->getMessage());
+         }
+         
       }
       
       return $this->Render();
@@ -106,6 +147,7 @@ class EventController extends Gdn_Controller {
     * @throws Exception
     */
    public function Show($EventID) {
+      Gdn_Theme::Section('Event');
       
       // Lookup event
       $EventModel = new EventModel();
