@@ -57,13 +57,13 @@ class GroupController extends Gdn_Controller {
       $this->SetData('Group', $Group);
       
       // Get Discussions
-      Gdn::Controller()->CountCommentsPerPage = 10;
-      Gdn::Controller()->ShowOptions = FALSE;
+      //Gdn::Controller()->CountCommentsPerPage = 10;
+      //Gdn::Controller()->ShowOptions = FALSE;
       $DiscussionModel = new DiscussionModel();
       $Discussions = $DiscussionModel->GetWhere(array('DiscussionID <' => 10))->ResultArray(); // FAKE IT
-      $this->SetData('Discussions', $Discussions);
+      //$this->SetData('Discussions', $Discussions);
       
-      $Discussions = $DiscussionModel->GetWhere(array('DiscussionID <' => 5))->ResultArray(); // FAKE IT
+      $Discussions = $DiscussionModel->GetWhere(array('DiscussionID <' => 4))->ResultArray(); // FAKE IT
       $this->SetData('Announcements', $Discussions);
       
       // Get Events
