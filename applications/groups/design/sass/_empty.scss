@@ -1,8 +1,4 @@
-@import "compass/css3";
-@import "compass/utilities";
-
 // Empty state boxes
-
 .EmptyMessage {
    @include border-radius(10px);
    text-align: center;

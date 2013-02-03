@@ -37,6 +37,7 @@
    <!-- Leaders -->
    <div class="Group-Box Group-Leaders">
       <h3><?php echo T('GroupLeaders', 'Leaders'); ?></h3>
+      <?php WriteMemberSimpleList($this->Data('Leaders')); ?>
    </div>
    
    <!-- Info -->
@@ -44,15 +45,13 @@
       <h3><?php echo T('GroupInfo', 'Group Info'); ?></h3>
       <dl>
          <dt>Created</dt>
-         <dd>(date)</dd>
+         <dd><?php echo Gdn_Format::Date($this->Data('Group.DateInserted')); ?></dd>
       </dl>
    </div>
     
    <!-- Members -->
    <div class="Group-Box Group-Members">
       <h3><?php echo T('GroupMembers', 'Members'); ?></h3>
-      <div class="PhotoGrid PhotoGridSmall">
-         
-      </div>
+      <?php WriteMemberGrid($this->Data('Members')); ?>
    </div>
 </div>

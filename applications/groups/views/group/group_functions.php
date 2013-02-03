@@ -1,5 +1,21 @@
 <?php if (!defined('APPLICATION')) exit(); 
 
+if (!function_exists('DateTile')):
+/**
+ * Get HTML to display date as a calendar tile block.
+ * 
+ * @param string $Date
+ */
+function DateTile($Date) {
+   return '
+   <span class="DateTile">
+      <span class="Month">Dec</span>
+      <span class="Day">29</span>
+   </span>';
+}
+endif;
+
+
 if (!function_exists('WriteDiscussionBlog')):
 /**
  * Output discussions in expanded format with excerpts.
@@ -27,7 +43,16 @@ function WriteDiscussionList($Discussions, $EmptyMessage = '') {
    if (!$Discussions)
       WriteEmptyState($EmptyMessage);
    
-   
+   //if (C('Vanilla.Discussions.Layout') == 'table')
+   //WriteDiscussionRow($Discussion, $this, $Session, $Alt);
+   if (is_array($Discussions)) {
+      include_once(PATH_APPLICATIONS .'/vanilla/views/discussions/helper_functions.php');   
+      echo '<ul class="DataList Discussions">';
+      foreach ($Discussions as $Discussion) {
+         WriteDiscussion((object)$Discussion, Gdn::Controller(), Gdn::Session());
+      }
+      echo '</ul>';
+   }
 }
 endif;
 
@@ -56,11 +81,18 @@ function WriteEventList($Events, $EmptyMessage = '') {
    if (!$Events)
       WriteEmptyState($EmptyMessage);
    
-   // 
    if (is_array($Events)) {
+      echo '<ul class="DataList DataList-Events">';
       foreach ($Events as $Event) {
-         
+         echo 
+         '<li class="Event">
+            '.DateTile($Event['DateScheduled']).'
+            <h3 class="Event-Title">'.Gdn_Format::Text($Event['Title']).'</h3>
+            <span class="Event-Time MItem">5pm</span>
+            <p class="Event-Description"'.Gdn_Format::Text($Event['Description']).'</p>
+         </li>';
       }
+      echo '</ul>';
    }   
 }
 endif;
@@ -143,5 +175,43 @@ function WriteGroupList($Groups) {
       
       echo '</ul>';
    }
+}
+endif;
+
+
+if (!function_exists('WriteMemberCards')) :
+/**
+ * Write a list of members out as cards.
+ * 
+ * @param array $Members
+ */
+function WriteMemberCards($Members) {
+   //decho($Members, 'Member Cards');
+}
+endif;
+
+
+if (!function_exists('WriteMemberGrid')) :
+/**
+ * Output just the linked user photos in rows.
+ * 
+ * @param array $Members
+ */
+function WriteMemberGrid($Members) {
+   echo '<div class="PhotoGrid PhotoGridSmall">';
+         
+   echo '</div>';
+}
+endif;
+
+
+if (!function_exists('WriteMemberSimpleList')) :
+/**
+ * Output just the photo and linked username in a column.
+ * 
+ * @param array $Members
+ */
+function WriteMemberSimpleList($Members) {
+   //decho($Members, 'Member Simple List');
 }
 endif;
