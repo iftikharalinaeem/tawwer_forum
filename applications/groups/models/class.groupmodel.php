@@ -83,6 +83,14 @@ class GroupModel extends Gdn_Model {
          
          if ($GroupApplicant) {
             $Perms['Join'] = FALSE; // Already applied or banned.
+            switch (strtolower($GroupApplicant['Type'])) {
+               case 'application':
+                  $Perms['Join.Reason'] = T("You've applied to join this group.");
+                  break;
+               case 'ban':
+                  $Perms['Join.Reason'] = T("You're banned from joining this group.");
+                  break;
+            }
          }
          
          // Moderators can view and edit all groups.
@@ -172,18 +180,18 @@ class GroupModel extends Gdn_Model {
       
       switch (strtolower($Group['Registration'])) {
          case 'public':
-            
             // This is a public group, go ahead and add the user.
             TouchValue('Role', $Data, 'Member');
             $Model = new Gdn_Model('UserGroup');
-            $Saved = $Model->Insert($Data);
+            $Model->Insert($Data);
             $this->Validation = $Model->Validation;
             return count($this->ValidationResults()) == 0;
             
          case 'approval':
             // The user must apply to this group.
-            $Model = new Gdn_Model('GroupApplication');
-            $Saved = $Model->Insert($Data);
+            $Data['Type'] = 'Application';
+            $Model = new Gdn_Model('GroupApplicant');
+            $Model->Insert($Data);
             $this->Validation = $Model->Validation;
             return count($this->ValidationResults()) == 0;
             
@@ -210,9 +218,16 @@ class GroupModel extends Gdn_Model {
          'GroupID' => GetValue('GroupID', $Data)));
    }
    
+   protected function ValidateRule($FieldName, $Data, $Rule, $CustomError = FALSE) {
+      $Value = GetValue($FieldName, $Data);
+      $Valid = $this->Validation->ValidateRule($Value, $FieldName, $Rule, $CustomError);
+      if ($Valid !== TRUE)
+         $this->Validation->AddValidationResult($FieldName, $Valid.$Value);
+   }
+   
    public function ValidateJoin($Data) {
-      $this->Validation->ApplyRule('UserID', 'ValidateRequired');
-      $this->Validation->ApplyRule('GroupID', 'ValidateRequired');
+      $this->ValidateRule('UserID', $Data, 'ValidateRequired');
+      $this->ValidateRule('GroupID', $Data, 'ValidateRequired');
       
       $GroupID = GetValue('GroupID', $Data);
       if ($GroupID) {
@@ -220,7 +235,7 @@ class GroupModel extends Gdn_Model {
          
          switch (strtolower($Group['Registration'])) {
             case 'approval':
-               $this->Validation->ApplyRule('Reason', 'ValidateRequired', 'Why do you want to join?');
+               $this->ValidateRule('Reason', $Data, 'ValidateRequired', 'Why do you want to join?');
          }
       }
       
