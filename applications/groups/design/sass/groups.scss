@@ -4,6 +4,7 @@
 @import "columns";
 @import "datetile";
 @import "empty";
+@import "event";
 
 .Group-Banner {
    height: 200px;
@@ -25,7 +26,6 @@
    font-size: 36px;
    line-height: 1;
 }
-
 .Group-Description {
    line-height: 1.4;
 }

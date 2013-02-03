@@ -11,7 +11,15 @@
  */
 
 class EventController extends Gdn_Controller {
-      
+   
+   protected $Uses = array('Form');
+   
+   /**
+    * Form
+    * @var Gdn_Form
+    */
+   protected $Form;
+   
    /**
     * Include JS, CSS, and modules used by all methods.
     *
@@ -23,12 +31,16 @@ class EventController extends Gdn_Controller {
       // Set up head
       $this->Head = new HeadModule($this);
       $this->AddJsFile('jquery.js');
-      $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
+      $this->AddJsFile('jquery.livequery.js');
+      $this->AddJsFile('jquery-ui-1.10.0.custom.min.js');
       $this->AddJsFile('jquery.form.js');
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
+      $this->AddJsFile('event.js');
+      
       $this->AddCssFile('style.css');
+      $this->AddCssFile('groups.css');
       
       parent::Initialize();
    }
@@ -44,7 +56,15 @@ class EventController extends Gdn_Controller {
     * @return type
     * @throws Exception
     */
-   public function NewEvent($GroupID = NULL) {
+   public function Add($GroupID = NULL) {
+      Gdn_Theme::Section('Event');
+      $this->Permission('Garden.Signin.Allow');
+      
+      $this->AddJsFile('jquery.timepicker.min.js');
+      $this->AddJsFile('jquery.dropdown.js');
+      $this->AddJsFile('jstz.min.js');
+      
+      $this->AddCssFile('jquery.dropdown.css');
       
       // Lookup group, if there is one
       if ($GroupID) {
@@ -61,8 +81,60 @@ class EventController extends Gdn_Controller {
       }
       
       $this->Title(T('New Event'));
+      $this->AddBreadcrumb($this->Title());
       
       // TODO: Event create permission
+      
+      // Timezones
+      $this->SetData('Timezones', EventModel::Timezones());
+      
+      $EventModel = new EventModel();
+      $this->Form->SetModel($EventModel);
+      if ($this->Form->IsPostBack()) {
+         $Event = $this->Form->FormValues();
+         
+         try {
+            // Timezone
+            $Timezone = new DateTimeZone($Event['Timezone']);
+            $UTC = new DateTimeZone('UTC');
+         
+            // Date starts
+            if (!empty($Event['DateStarts'])) {
+               $DateStartsStr = $Event['DateStarts'];
+               if (!empty($Event['TimeStarts']))
+                  $DateStartsStr .= " {$Event['TimeStarts']}";
+               
+               $EventDateStarts = DateTime::createFromFormat('m/d/Y h:ia', $DateStartsStr, $Timezone);
+               $EventDateStarts->setTimezone($UTC);
+               $Event['DateStarts'] = $EventDateStarts->format('Y-m-d H:i');
+            } else { unset($Event['DateStarts']); }
+            unset($Event['TimeStarts']);
+            
+            // Date ends
+            if (!empty($Event['DateEnds'])) {
+               $DateEndsStr = $Event['DateEnds'];
+               if (!empty($Event['TimeEnds']))
+                  $DateEndsStr .= " {$Event['TimeEnds']}";
+               
+               $EventDateEnds = DateTime::createFromFormat('m/d/Y h:ia', $DateEndsStr, $Timezone);
+               $EventDateStarts->setTimezone($UTC);
+               $Event['DateEnds'] = $EventDateEnds->format('Y-m-d H:i');
+            } else { unset($Event['DateEnds']); }
+            unset($Event['TimeEnds']);
+            
+            // Validate
+            $this->Form->ClearInputs();
+            $this->Form->SetFormValue($Event);
+            
+            if ($this->Form->Save()) {
+               $this->InformMessage(FormatString(T("New event created for <b>'{Name}'</b>"), $Event));
+            }
+            
+         } catch (Exception $Ex) {
+            $this->Form->AddError($Ex->getMessage());
+         }
+         
+      }
       
       return $this->Render();
    }
@@ -75,6 +147,7 @@ class EventController extends Gdn_Controller {
     * @throws Exception
     */
    public function Show($EventID) {
+      Gdn_Theme::Section('Event');
       
       // Lookup event
       $EventModel = new EventModel();
@@ -103,12 +176,33 @@ class EventController extends Gdn_Controller {
          
       }
       
-      $this->AddBreadcrumb($Event['Name']);
       $this->Title($Event['Name']);
+      $this->AddBreadcrumb($this->Title());
       
       
       
       return $this->Render();
+   }
+   
+   /**
+    * Lookup abbreviation for timezone
+    * 
+    * @param type $TimezoneID
+    */
+   public function GetTimezoneAbbr($TimezoneID) {
+      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $this->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      $this->SetData('TimezoneID', $TimezoneID);
+      try {
+         $Timezone = new DateTimeZone($TimezoneID);
+         $Transition = array_shift($T = $Timezone->getTransitions(time(), time()));
+         $this->SetData('Abbr', $Transition['abbr']);
+      } catch (Exception $Ex) {
+         $this->SetData('Abbr', 'unknown');
+      }
+      
+      $this->Render();
    }
    
 }
