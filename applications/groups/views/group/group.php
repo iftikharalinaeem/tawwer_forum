@@ -1,6 +1,5 @@
 <?php WriteGroupBanner(); ?>
 
-
 <?php WriteGroupIcon(); ?>
 <h1><?php echo htmlspecialchars($this->Data('Group.Name')); ?></h1>
 <div class="Group-Description">
