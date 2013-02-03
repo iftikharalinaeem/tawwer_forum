@@ -26,8 +26,6 @@ if (!function_exists('WriteDiscussionBlog')):
 function WriteDiscussionBlog($Discussions, $EmptyMessage = '') {
    if (!$Discussions)
       WriteEmptyState($EmptyMessage);
-   
-   
 }
 endif;
 
@@ -68,7 +66,6 @@ function WriteEmptyState($Message) {
       echo Wrap($Message, 'p', array('class' => 'EmptyMessage'));
 }
 endif;
-
 
 if (!function_exists('WriteEventList')) :
 /**
@@ -120,10 +117,30 @@ if (!function_exists('WriteGroupButtons')) :
  * Output action buttons to join/apply to group.
  */
 function WriteGroupButtons() {
+   $Group = Gdn::Controller()->Data('Group');
    
-   $Button = Anchor(T('JoinGroupButton', 'Join This Group'), '/group/join', 'Button BigButton Primary Group-JoinButton');
+   echo '<div class="Group-Buttons">';
    
-   echo Wrap($Button, 'div', array('class' => 'Group-Buttons'));
+   if (GroupPermission('Join'))
+      echo ' '.Anchor(T('Join This Group'), GroupUrl($Group, 'join'), 'Button Primary Group-JoinButton Popup').' ';
+      
+      
+   $Options = array();
+   
+   if (GroupPermission('Edit')) {
+      $Options['Edit'] = array('Text' => T('Edit'), 'Url' => GroupUrl($Group, 'edit'));
+   }
+   if (GroupPermission('Delete')) {
+      $Options['Delete'] = array('Text' => T('Delete'), 'Url' => GroupUrl($Group, 'delete'));
+   }
+   if (GroupPermission('Member')) {
+      $Options['Leave'] = array('Text' => T('Leave Group'), 'Url' => GroupUrl($Group, 'leave'), 'CssClass' => 'Popup');
+   }
+
+   if (count($Options))
+      echo ButtonDropDown($Options, 'Button DropRight Group-OptionsButton', Sprite('SpOptions', 'Sprite16'));
+   
+   echo '</div>';
 }
 endif;
 
