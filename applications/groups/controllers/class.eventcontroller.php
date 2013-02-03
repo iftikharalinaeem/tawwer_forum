@@ -75,7 +75,7 @@ class EventController extends Gdn_Controller {
 
          $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $GroupID);
          if (!$MemberOfGroup)
-            throw PermissionException();
+            throw ForbiddenException('create a new event');
          
          $this->AddBreadcrumb($Group['Name'], Url("/group/{$GroupID}"));
       }
@@ -101,10 +101,15 @@ class EventController extends Gdn_Controller {
             // Date starts
             if (!empty($Event['DateStarts'])) {
                $DateStartsStr = $Event['DateStarts'];
-               if (!empty($Event['TimeStarts']))
+               $DateStartsFormat = '!m/d/Y';
+               if (!empty($Event['TimeStarts'])) {
                   $DateStartsStr .= " {$Event['TimeStarts']}";
+                  $DateStartsFormat .= ' h:ia';
+               } else {
+                  $Event['AllDayEvent'] = 1;
+               }
                
-               $EventDateStarts = DateTime::createFromFormat('m/d/Y h:ia', $DateStartsStr, $Timezone);
+               $EventDateStarts = DateTime::createFromFormat($DateStartsFormat, $DateStartsStr, $Timezone);
                $EventDateStarts->setTimezone($UTC);
                $Event['DateStarts'] = $EventDateStarts->format('Y-m-d H:i');
             } else { unset($Event['DateStarts']); }
@@ -113,10 +118,15 @@ class EventController extends Gdn_Controller {
             // Date ends
             if (!empty($Event['DateEnds'])) {
                $DateEndsStr = $Event['DateEnds'];
-               if (!empty($Event['TimeEnds']))
+               $DateEndsFormat = '!m/d/Y';
+               if (!empty($Event['TimeEnds'])) {
                   $DateEndsStr .= " {$Event['TimeEnds']}";
+                  $DateEndsFormat .= ' h:ia';
+               } else {
+                  $Event['AllDayEvent'] = 1;
+               }
                
-               $EventDateEnds = DateTime::createFromFormat('m/d/Y h:ia', $DateEndsStr, $Timezone);
+               $EventDateEnds = DateTime::createFromFormat($DateEndsFormat, $DateEndsStr, $Timezone);
                $EventDateStarts->setTimezone($UTC);
                $Event['DateEnds'] = $EventDateEnds->format('Y-m-d H:i');
             } else { unset($Event['DateEnds']); }
@@ -126,8 +136,10 @@ class EventController extends Gdn_Controller {
             $this->Form->ClearInputs();
             $this->Form->SetFormValue($Event);
             
-            if ($this->Form->Save()) {
+            if ($EventID = $this->Form->Save()) {
+               $Event['EventID'] = $EventID;
                $this->InformMessage(FormatString(T("New event created for <b>'{Name}'</b>"), $Event));
+               Redirect(EventUrl($Event));
             }
             
          } catch (Exception $Ex) {
@@ -153,28 +165,38 @@ class EventController extends Gdn_Controller {
       $EventModel = new EventModel();
       $Event = $EventModel->GetID($EventID, DATASET_TYPE_ARRAY);
       if (!$Event) throw NotFoundException('Event');
+      $ViewEvent = FALSE;
       
       // Lookup group, if there is one
       $GroupID = GetValue('GroupID', $Event, FALSE);
       if ($GroupID) {
+         
          $GroupModel = new GroupModel();
          $Group = $GroupModel->GetID($GroupID, DATASET_TYPE_ARRAY);
          if (!$Group) throw NotFoundException('Group');
          
          // Check if this person is a member of the group or a moderator
          $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $GroupID);
-         if (!$MemberOfGroup && !Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
-            throw PermissionException('Group.Member');
+         if ($MemberOfGroup || Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
+            $ViewEvent = TRUE;
          
          $this->AddBreadcrumb($Group['Name'], Url("/group/{$GroupID}"));
+         
       } else {
+         
+         // Group organizer
+         if ($Event['InsertUserID'] == Gdn::Session()->UserID)
+            $ViewEvent = TRUE;
          
          // No group, so user has to have been invited to view
          $InvitedToEvent = $EventModel->IsInvited(Gdn::Session()->UserID, $EventID);
-         if (!$InvitedToEvent)
-            throw PermissionException('Event.Invited');
-         
+         if ($InvitedToEvent || Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
+            $ViewEvent = TRUE;
       }
+      
+      // No permission
+      if (!$ViewEvent)
+         throw ForbiddenException('view this event');
       
       $this->Title($Event['Name']);
       $this->AddBreadcrumb($this->Title());

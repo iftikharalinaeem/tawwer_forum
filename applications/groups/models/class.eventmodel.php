@@ -32,6 +32,20 @@ class EventModel extends Gdn_Model {
    }
    
    /**
+    * Invite someone to an event
+    * 
+    * @param integer $UserID
+    * @param integer $EventID
+    */
+   public function Invite($UserID, $EventID) {
+      return $this->SQL->Insert('UserEvent', array(
+         'EventID'      => $EventID,
+         'UserID'       => $UserID,
+         'Attending'    => 'Invited'
+      ));
+   }
+   
+   /**
     * Check if a User is invited to an Event
     * 
     * @param integer $UserID
