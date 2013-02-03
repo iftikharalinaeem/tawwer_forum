@@ -7,12 +7,16 @@
       
       $DateFormatString = '{Date}';
       $DateFormat = 'l, F j, Y';
-      $TimeFormat = 'h:ia';
+      $TimeFormat = 'g:ia';
       $ShowDates = array();
+      $UTC = new DateTimeZone('UTC');
+      $TimezoneID = $this->Data('Event.Timezone');
+      $LocaleTimezone = new DateTimeZone($TimezoneID);
       
       if (!$AllDay) $DateFormatString .= ' at {Time}';
       
-      $FromDate = new DateTime($this->Data('Event.DateStarts'));
+      $FromDate = new DateTime($this->Data('Event.DateStarts'), $UTC);
+      $FromDate->setTimezone($LocaleTimezone);
       $ShowDates['From'] = FormatString($DateFormatString, array(
          'Date'   => $FromDate->format($DateFormat),
          'Time'   => $FromDate->format($TimeFormat)
@@ -21,7 +25,8 @@
       $WhenFormat = "{ShowDates.From}{AllDay}";
       if ($this->Data('Event.DateEnds')):
          
-         $ToDate = new DateTime($this->Data('Event.DateEnds'));
+         $ToDate = new DateTime($this->Data('Event.DateEnds'), $UTC);
+         $ToDate->setTimezone($LocaleTimezone);
          $ShowDates['To'] = FormatString($DateFormatString, array(
             'Date'   => $ToDate->format($DateFormat),
             'Time'   => $ToDate->format($TimeFormat)
@@ -30,14 +35,25 @@
          
       endif;
       
+      $TimezoneLabel = EventModel::Timezones($TimezoneID);
+      $Transition = array_shift($T = $LocaleTimezone->getTransitions(time(), time()));
+      if (!$TimezoneLabel) {
+         $TZLocation = $LocaleTimezone->getLocation();
+         $TimezoneLabel = GetValue('comments', $TZLocation);
+      } else {
+         preg_match('`([\w& -]+) [A-Z]+$`', $TimezoneLabel, $Matches);
+         $TimezoneLabel = $Matches[1];
+      }
+      $TimezoneAbbr = $Transition['abbr'];
+      
       ?>
-      <li><span>When</span> <?php echo FormatString($WhenFormat, array(
+      <li><span class="Label">When</span> <?php echo FormatString($WhenFormat, array(
          'ShowDates' => $ShowDates,
-         'AllDay'    => ($AllDay) ? T(', all day') : ''
+         'AllDay'    => ($AllDay) ? Wrap(T('all day'), 'span', array('class' => 'Tag Tag-AllDay')) : ''
       )); ?>
       </li>
-      <li><span>Where</span> <?php echo $this->Data('Event.Location'); ?></li>
-      <li><span>Organizer</span> <?php echo UserAnchor($this->Data('Event.Organizer')); ?></li>
+      <li><span class="Label">Where</span> <?php echo $this->Data('Event.Location'); ?> <span class="Tip">( <?php echo Wrap($TimezoneAbbr, 'a', array('title' => $TimezoneLabel)); ?> )</span></li>
+      <li><span class="Label">Organizer</span> <?php echo UserAnchor($this->Data('Event.Organizer')); ?></li>
    </ul>
    
    <div class="Body"><?php echo $this->Data('Event.Body'); ?></div>
