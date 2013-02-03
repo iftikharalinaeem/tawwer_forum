@@ -91,6 +91,63 @@ class GroupController extends Gdn_Controller {
       return $this->AddEdit();
    }
    
+   public function Join($ID) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+      
+      // Check join permission.
+      if (!$this->GroupModel->CheckPermission('Join', $Group)) {
+         throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Join.Reason', $Group));
+      }
+      
+      $this->SetData('Title', sprintf(T('Join %s'), htmlspecialchars($Group['Name'])));
+      
+      $Form = new Gdn_Form();
+      $this->Form = $Form;
+      
+      if ($Form->AuthenticatedPostBack()) {
+         // If the user posted back then we are going to add them.
+         $Data = $Form->FormValues();
+         $Data['UserID'] = Gdn::Session()->UserID;
+         $Data['GroupID'] = $Group['GroupID'];
+         $Saved = $this->GroupModel->Join($Data);
+         $Form->SetValidationResults($this->GroupModel->ValidationResults());
+         
+         if ($Saved)
+            $this->RedirectUrl = Url(GroupUrl($Group));
+      }
+      
+      $this->SetData('Group', $Group);
+      $this->Render();
+   }
+   
+   public function Leave($ID) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+      
+      // Check join permission.
+      if (!$this->GroupModel->CheckPermission('Leave', $Group)) {
+         throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Leave.Reason', $Group));
+      }
+      
+      $this->SetData('Title', sprintf(T('Leave %s'), htmlspecialchars($Group['Name'])));
+      
+      $Form = new Gdn_Form();
+      $this->Form = $Form;
+      
+      if ($Form->AuthenticatedPostBack()) {
+         $Data = array(
+            'UserID' => Gdn::Session()->UserID,
+            'GroupID' => $Group['GroupID']);
+         $this->GroupModel->Leave($Data);
+         $this->RedirectUrl = Url(GroupUrl($Group));
+      }
+      
+      $this->Render();
+   }
+   
    /**
     * Save an image from a field and delete any old image that's been uploaded.
     * This method is a canditate for putting on the form object.
@@ -166,6 +223,11 @@ class GroupController extends Gdn_Controller {
       $Form = new Gdn_Form();
       $Form->SetModel($this->GroupModel);
       
+      if ($ID) {
+         $Group = $this->GroupModel->GetID($ID);
+         $this->SetData('Group', $Group);
+      }
+      
       if ($Form->AuthenticatedPostBack()) {
          // We need to save the images before saving to the database.
          self::SaveImage($Form, 'Icon', array('Prefix' => 'groups/icons/icon_', 'Size' => C('Groups.IconSize', 100), 'Crop' => TRUE));
@@ -174,14 +236,13 @@ class GroupController extends Gdn_Controller {
          $GroupID = $Form->Save();
          if ($GroupID) {
             $Group = $this->GroupModel->GetID($GroupID);
-//            Redirect(GroupUrl($Group));
+            Redirect(GroupUrl($Group));
          }
          // If we're here then there was some error and the form has to be rendered again.
          $Form->AddHidden('GroupID');
       } else {
          if ($ID) {
             // Load the group.
-            $Group = $this->GroupModel->GetID($ID);
             $Form->SetData($Group);
             $Form->AddHidden('GroupID', $Group['GroupID']);
          } else {
@@ -192,6 +253,7 @@ class GroupController extends Gdn_Controller {
       }
       
       $this->Form = $Form;
+      $this->CssClass .= ' NoPanel';
       $this->Render('AddEdit');
    }
    

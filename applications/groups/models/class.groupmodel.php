@@ -160,4 +160,72 @@ class GroupModel extends Gdn_Model {
       ));
       return $IsMember > 0;
    }
+   
+   public function Join($Data) {
+      $Valid = $this->ValidateJoin($Data);
+      if (!$Valid) {
+         return FALSE;
+      }
+      
+      $Group = $this->GetID(GetValue('GroupID', $Data));
+      Trace($Group, 'Group');
+      
+      switch (strtolower($Group['Registration'])) {
+         case 'public':
+            
+            // This is a public group, go ahead and add the user.
+            TouchValue('Role', $Data, 'Member');
+            $Model = new Gdn_Model('UserGroup');
+            $Saved = $Model->Insert($Data);
+            $this->Validation = $Model->Validation;
+            return count($this->ValidationResults()) == 0;
+            
+         case 'approval':
+            // The user must apply to this group.
+            $Model = new Gdn_Model('GroupApplication');
+            $Saved = $Model->Insert($Data);
+            $this->Validation = $Model->Validation;
+            return count($this->ValidationResults()) == 0;
+            
+         case 'invite':
+         default:
+            throw new Gdn_UserException("Registration type {$Group['Registration']} not supported.");
+            // TODO: The user must be invited.
+            return FALSE;
+      }
+   }
+   
+   /**
+    * Approve a membership application.
+    * 
+    * @param type $Data
+    */
+   public function JoinApprove($Data) {
+      
+   }
+   
+   public function Leave($Data) {
+      $this->SQL->Delete('UserGroup', array(
+         'UserID' => GetValue('UserID', $Data),
+         'GroupID' => GetValue('GroupID', $Data)));
+   }
+   
+   public function ValidateJoin($Data) {
+      $this->Validation->ApplyRule('UserID', 'ValidateRequired');
+      $this->Validation->ApplyRule('GroupID', 'ValidateRequired');
+      
+      $GroupID = GetValue('GroupID', $Data);
+      if ($GroupID) {
+         $Group = $this->GetID($GroupID);
+         
+         switch (strtolower($Group['Registration'])) {
+            case 'approval':
+               $this->Validation->ApplyRule('Reason', 'ValidateRequired', 'Why do you want to join?');
+         }
+      }
+      
+      // First validate the basic field requirements.
+      $Valid = $this->Validation->Validate($Data);
+      return $Valid;
+   }
 }
