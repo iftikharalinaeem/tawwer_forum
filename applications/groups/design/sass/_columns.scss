@@ -2,4 +2,11 @@
 
 .Group-Content {
   @include column-count(3);
+  @include column-gap(30px);
+  min-height: 120px;
+}
+
+.Group-Content .Group-Box {
+  @include column-break-inside(avoid); 
+  min-height: 100px;
 }
