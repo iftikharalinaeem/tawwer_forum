@@ -33,6 +33,10 @@
 .Group-Buttons {
    margin-top: 10px;
    float: right;
+   
+   .BigButton {
+      display: inline-block;
+   }
 }
 
 .Group-Content {
@@ -41,9 +45,14 @@
    padding-bottom: 20px;
 }
 
+.Group-Header {
+   @include pie-clearfix;
+}
+
 .Group-Footer {
    border-top: 1px solid $boxBorder; // Panel nav
-   @include background-image(linear-gradient($shaded, white)); 
+   @include background-image(linear-gradient($shaded, white));
+   @include pie-clearfix;
 }
 .Group-Footer .Group-Box {
    width: 200px;

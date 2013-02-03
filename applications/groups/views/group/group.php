@@ -1,15 +1,17 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<?php WriteGroupBanner(); ?>
-
-<!-- Join/Apply Buttons -->
-<?php WriteGroupButtons(); ?>
-
-<?php WriteGroupIcon(); ?>
-<h1 class="Group-Title"><?php echo htmlspecialchars($this->Data('Group.Name')); ?></h1>
-<div class="Group-Description">
-   <?php echo Gdn_Format::To($this->Data('Group.Description'), $this->Data('Group.Format')); ?>
+<div class="Group-Header">
+   <?php WriteGroupBanner(); ?>
+   <!-- Join/Apply Buttons -->
+   <?php WriteGroupButtons(); ?>
+   <?php WriteGroupIcon(); ?>
+   <h1 class="Group-Title"><?php echo htmlspecialchars($this->Data('Group.Name')); ?></h1>
+   <div class="Group-Description">
+      <?php echo Gdn_Format::To($this->Data('Group.Description'), $this->Data('Group.Format')); ?>
+   </div>
 </div>
+
+<?php if (GroupPermission('View')): ?>
 
 <div class="Group-Content">
    <div class="Group-Box Group-Events">
@@ -55,3 +57,11 @@
       <?php WriteMemberGrid($this->Data('Members')); ?>
    </div>
 </div>
+
+<?php else: ?>
+<div class="Hero">
+   <?php
+   echo GroupPermission('View.Reason');
+   ?>
+</div>
+<?php endif; ?>
