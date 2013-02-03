@@ -90,6 +90,9 @@ class EventController extends Gdn_Controller {
       $this->Form->SetModel($EventModel);
       if ($this->Form->IsPostBack()) {
          $Event = $this->Form->FormValues();
+         
+         print_r($Event);
+         die();
       }
       
       return $this->Render();
