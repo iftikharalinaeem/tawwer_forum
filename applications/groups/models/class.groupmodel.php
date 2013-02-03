@@ -16,7 +16,10 @@ class GroupModel extends Gdn_Model {
     * @param string $Permission The permission to check. Valid values are:
     *  - Member: User is a member of the group.
     *  - Leader: User is a leader of the group.
+    *  - Join: User can join the group.
+    *  - Leave: User can leave the group.
     *  - Edit: The user may edit the group.
+    *  - Delete: User can delete the group.
     *  - View: The user may view the group's contents.
     *  - Moderate: The user may moderate the group.
     * @param int $GroupID
