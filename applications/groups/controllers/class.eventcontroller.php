@@ -63,7 +63,6 @@ class EventController extends Gdn_Controller {
       $this->AddJsFile('jquery.timepicker.min.js');
       $this->AddJsFile('jquery.dropdown.js');
       $this->AddJsFile('jstz.min.js');
-      
       $this->AddCssFile('jquery.dropdown.css');
       
       // Lookup group, if there is one
@@ -73,7 +72,6 @@ class EventController extends Gdn_Controller {
          $Group = $GroupModel->GetID($GroupID);
          if (!$Group) throw NotFoundException('Group');
          $this->SetData('Group', $Group);
-         $this->Form->SetValue('GroupID', $GroupID);
 
          $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $GroupID);
          if (!$MemberOfGroup)
@@ -94,7 +92,9 @@ class EventController extends Gdn_Controller {
       $this->Form->SetModel($EventModel);
       if ($this->Form->IsPostBack()) {
          $Event = $this->Form->FormValues();
-         $Event['GroupID'] = $GroupID;
+         
+         if ($GroupID)
+            $Event['GroupID'] = $GroupID;
          
          try {
             // Timezone
@@ -151,6 +151,64 @@ class EventController extends Gdn_Controller {
          } catch (Exception $Ex) {
             $this->Form->AddError($Ex->getMessage());
          }
+         
+      }
+      
+      $this->View = 'add';
+      $this->CssClass .= ' NoPanel NarrowForm';
+      return $this->Render();
+   }
+   
+   /**
+    * Edit an event
+    * 
+    * @param type $EventID
+    */
+   public function Edit($EventID) {
+      Gdn_Theme::Section('Event');
+      $this->Permission('Garden.Signin.Allow');
+      
+      $this->AddJsFile('jquery.timepicker.min.js');
+      $this->AddJsFile('jquery.dropdown.js');
+      $this->AddJsFile('jstz.min.js');
+      $this->AddCssFile('jquery.dropdown.css');
+      
+      // Lookup event
+      $EventModel = new EventModel();
+      $Event = $EventModel->GetID($EventID, DATASET_TYPE_ARRAY);
+      if (!$Event) throw NotFoundException('Event');
+      $this->SetData('Event', $Event);
+      
+      $OrganizerID = $Event['InsertUserID'];
+      $IsOrganizer = $OrganizerID == Gdn::Session()->UserID;
+      
+      if (!$IsOrganizer && !Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
+         throw ForbiddenException('edit this event');
+      
+      // Lookup group, if there is one
+      $GroupID = GetValue('GroupID', $Event, FALSE);
+      if ($GroupID) {
+         
+         $GroupModel = new GroupModel();
+         $Group = $GroupModel->GetID($GroupID, DATASET_TYPE_ARRAY);
+         if (!$Group) throw NotFoundException('Group');
+         $this->SetData('Group', $Group);
+         
+         $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+      }
+      
+      $this->Title(T('Edit Event'));
+      $this->AddBreadcrumb($Event['Name'], EventUrl($Event));
+      $this->AddBreadcrumb($this->Title());
+      
+      $this->Form->SetData($Event);
+      
+      // Timezones
+      $this->SetData('Timezones', EventModel::Timezones());
+      
+      $EventModel = new EventModel();
+      $this->Form->SetModel($EventModel);
+      if ($this->Form->IsPostBack()) {
          
       }
       
