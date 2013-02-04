@@ -150,6 +150,19 @@ class GroupModel extends Gdn_Model {
       return $Row;
    }
    
+   public function GetMembers($GroupID, $Where = array()) {
+      // First grab the members.
+      $Users = $this->SQL
+         ->From('UserGroup')
+         ->Where('GroupID', $GroupID)
+         ->Where($Where)
+         ->OrderBy('DateInserted')
+         ->Get()->ResultArray();
+      
+      Gdn::UserModel()->JoinUsers($Users, array('UserID'));
+      return $Users;
+   }
+   
    public static function ParseID($ID) {
       $Parts = explode('-', $ID, 2);
       return $Parts[0];
@@ -216,6 +229,27 @@ class GroupModel extends Gdn_Model {
       $this->SQL->Delete('UserGroup', array(
          'UserID' => GetValue('UserID', $Data),
          'GroupID' => GetValue('GroupID', $Data)));
+   }
+   
+   public function Save($Data, $Settings = FALSE) {
+      $GroupID = parent::Save($Data, $Settings);
+      
+      if ($GroupID) {
+         // Make sure the group owner is a member.
+         $Group = $this->GetID($GroupID);
+         $InsertUserID = $Group['InsertUserID'];
+         $Row = $this->SQL->GetWhere('UserGroup', array('GroupID' => $GroupID, 'UserID' => $InsertUserID))->FirstRow(DATASET_TYPE_ARRAY);
+         if (!$Row) {
+            $Row = array(
+               'GroupID' => $GroupID,
+               'UserID' => $InsertUserID,
+               'Role' => 'Leader');
+            $Model = new Gdn_Model('UserGroup');
+            $Model->Insert($Row);
+            $this->Validation = $Model->Validation;
+         }
+      }
+      return $GroupID;
    }
    
    protected function ValidateRule($FieldName, $Data, $Rule, $CustomError = FALSE) {
