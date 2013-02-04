@@ -127,7 +127,7 @@ class EventController extends Gdn_Controller {
                }
                
                $EventDateEnds = DateTime::createFromFormat($DateEndsFormat, $DateEndsStr, $Timezone);
-               $EventDateStarts->setTimezone($UTC);
+               $EventDateEnds->setTimezone($UTC);
                $Event['DateEnds'] = $EventDateEnds->format('Y-m-d H:i');
             } else { unset($Event['DateEnds']); }
             unset($Event['TimeEnds']);

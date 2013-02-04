@@ -105,7 +105,7 @@ class EventModel extends Gdn_Model {
     * @staticvar array $Timezones
     * @return array
     */
-   public static function Timezones() {
+   public static function Timezones($LookupTimezone = NULL) {
       static $Built = NULL;
       static $Timezones = array(
          'Pacific/Midway'       => "Midway Island",
@@ -250,7 +250,9 @@ class EventModel extends Gdn_Model {
             $Built[$BuildTimezone['Timezone']] = trim($BuildTimezone['Label']);
       }
       
-      return $Built;
+      if (is_null($LookupTimezone))
+         return $Built;
+      return GetValue($LookupTimezone, $Built);
    }
    
 }

@@ -94,7 +94,7 @@
   display: inline-block;
 }
 /* line 25, sass/_event.scss */
-.Event.add .EventTime .EndTime, .Event.add .EventTime .NoEndTime {
+.Event.add .EventTime .EndTime {
   float: right;
 }
 /* line 29, sass/_event.scss */
@@ -150,35 +150,53 @@
   line-height: 1.5em;
 }
 /* line 92, sass/_event.scss */
-.Event.show .EventInfo li span {
+.Event.show .EventInfo li span.Label {
   display: inline-block;
   font-weight: bold;
   width: 70px;
 }
 /* line 98, sass/_event.scss */
+.Event.show .EventInfo span.Tag {
+  margin-left: 10px;
+  background: #979797;
+  color: white;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+/* line 106, sass/_event.scss */
+.Event.show .EventInfo span.Tip {
+  color: #979797;
+  font-size: 11px;
+}
+/* line 111, sass/_event.scss */
+.Event.show .EventInfo span.Tip a {
+  border-bottom: 1px dotted;
+  cursor: pointer;
+}
+/* line 116, sass/_event.scss */
 .Event.show .EventInfo .Body {
   margin: 20px 0px;
 }
-/* line 103, sass/_event.scss */
+/* line 121, sass/_event.scss */
 .Event.show .Attending {
   margin: 0px;
 }
-/* line 108, sass/_event.scss */
+/* line 126, sass/_event.scss */
 .Event.show .Attendees .AttendeeList {
   display: block;
   padding: 2px;
 }
-/* line 113, sass/_event.scss */
+/* line 131, sass/_event.scss */
 .Event.show .Attendees .AttendeeList h3 {
   display: block;
   text-transform: uppercase;
   font-size: 18px;
 }
-/* line 119, sass/_event.scss */
+/* line 137, sass/_event.scss */
 .Event.show .Attendees .AttendeeList .PhotoWrap {
   margin-right: 4px;
 }
-/* line 125, sass/_event.scss */
+/* line 143, sass/_event.scss */
 .Event.show .Attendees .Negatives {
   -webkit-column-count: 2;
   -moz-column-count: 2;
@@ -191,13 +209,13 @@
   -o-column-gap: 30px;
   column-gap: 30px;
 }
-/* line 130, sass/_event.scss */
+/* line 148, sass/_event.scss */
 .Event.show .Attendees .Negatives .AttendeeList {
   -webkit-column-break-inside: avoid;
   column-break-inside: avoid;
 }
 
-/* line 138, sass/_event.scss */
+/* line 156, sass/_event.scss */
 .ui-timepicker-list {
   overflow-y: auto;
   height: 150px;
@@ -215,23 +233,23 @@
   z-index: 10001;
 }
 
-/* line 155, sass/_event.scss */
+/* line 173, sass/_event.scss */
 .ui-timepicker-list.ui-timepicker-with-duration {
   width: 11em;
 }
 
-/* line 159, sass/_event.scss */
+/* line 177, sass/_event.scss */
 .ui-timepicker-duration {
   margin-left: 5px;
   color: #888;
 }
 
-/* line 163, sass/_event.scss */
+/* line 181, sass/_event.scss */
 .ui-timepicker-list:hover .ui-timepicker-duration {
   color: #888;
 }
 
-/* line 167, sass/_event.scss */
+/* line 185, sass/_event.scss */
 .ui-timepicker-list li {
   padding: 3px 0 3px 5px;
   cursor: pointer;
@@ -241,13 +259,13 @@
   margin: 0;
 }
 
-/* line 176, sass/_event.scss */
+/* line 194, sass/_event.scss */
 .ui-timepicker-list:hover .ui-timepicker-selected {
   background: #fff;
   color: #000;
 }
 
-/* line 182, sass/_event.scss */
+/* line 200, sass/_event.scss */
 li.ui-timepicker-selected,
 .ui-timepicker-list li:hover,
 .ui-timepicker-list:hover .ui-timepicker-selected:hover {
@@ -255,7 +273,7 @@ li.ui-timepicker-selected,
   color: #fff;
 }
 
-/* line 187, sass/_event.scss */
+/* line 205, sass/_event.scss */
 li.ui-timepicker-selected .ui-timepicker-duration,
 .ui-timepicker-list li:hover .ui-timepicker-duration {
   color: #ccc;
@@ -264,6 +282,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 /* line 9, sass/groups.scss */
 .Group-Banner {
   height: 200px;
+  /* Fluid width centering */
   width: 100%;
   background-position: center top;
   background-repeat: no-repeat;

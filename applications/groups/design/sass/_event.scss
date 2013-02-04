@@ -22,7 +22,7 @@
          display: inline-block;
       }
       
-      .EndTime, .NoEndTime {
+      .EndTime {
          float: right;
       }
       
@@ -89,10 +89,28 @@
          line-height: 1.5em;
       }
       
-      li span {
+      li span.Label {
          display: inline-block;
          font-weight: bold;
          width: 70px;
+      }
+      
+      span.Tag {
+         margin-left: 10px;
+         background: #979797;
+         color: white;
+         font-size: 11px;
+         text-transform: uppercase;
+      }
+      
+      span.Tip {
+         color: #979797;
+         font-size: 11px;
+      }
+      
+      span.Tip a {
+         border-bottom: 1px dotted;
+         cursor: pointer;
       }
       
       .Body {
