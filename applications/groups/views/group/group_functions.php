@@ -172,6 +172,8 @@ endif;
 if (!function_exists('WriteGroupButtons')) :
 /**
  * Output action buttons to join/apply to group.
+ * 
+ * @param array $Group Optional. Uses data array's Group if none is provided. 
  */
 function WriteGroupButtons($Group = FALSE) {
    if (!$Group)
@@ -208,6 +210,7 @@ if (!function_exists('WriteGroupCards')) :
  * Write a list of groups out as cards.
  * 
  * @param array $Groups
+ * @param string $EmptyMessage
  */
 function WriteGroupCards($Groups, $EmptyMessage = '') {
    if (!$Groups)
@@ -234,6 +237,8 @@ endif;
 if (!function_exists('WriteGroupIcon')) :
 /**
  * Output group icon image.
+ * 
+ * @param array $Group Optional. Uses data array's Group if none is provided.
  */
 function WriteGroupIcon($Group = FALSE) {
    if (!$Group)
@@ -251,9 +256,7 @@ if (!function_exists('WriteGroupList')) :
  * 
  * @param array $Groups
  */
-function WriteGroupList($Groups) {
-   
-   
+function WriteGroupList($Groups) {   
    if (is_array($Groups)) {
       echo '<ul class="DataList DataList-Groups">';
       foreach ($Groups as $Group) {
@@ -279,9 +282,24 @@ function WriteMemberCards($Members) {
    
    if (is_array($Members)) {
       foreach ($Members as $Member) {
-         echo Gdn_Format::Text($Member['Name']).', ';
+         WriteMemberCard($Member);
       } 
    }
+}
+endif;
+
+
+if (!function_exists('WriteMemberCard')) :
+/**
+ * Write a list of members out as cards.
+ * 
+ * @param array $Members
+ */
+function WriteMemberCard($Member) {
+   $Card = UserPhoto($Member).' '.UserAnchor($Member);
+   $Card .= Wrap(sprintf(T('GroupMemberJoined', 'Joined %s'), Gdn_Format::Date($Member['DateInserted'])), 'span', 'MItem DateJoined');
+   $Card .= '[buttons]';
+   echo Wrap($Card, 'span', 'Group-MemberCard');
 }
 endif;
 

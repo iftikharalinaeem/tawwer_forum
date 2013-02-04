@@ -402,6 +402,15 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   clear: both;
 }
 
+.Group-MembersPage .Group-Icon {
+  max-width: 36px;
+  max-height: 36px;
+  padding-top: 0;
+}
+.Group-MembersPage h2 {
+  font-size: 24px;
+}
+
 .UserTile {
   vertical-align: middle;
   margin: 2px 0;

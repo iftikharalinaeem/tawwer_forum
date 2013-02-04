@@ -288,6 +288,7 @@ class GroupController extends Gdn_Controller {
       
       $this->SetData('Group', $Group);
       $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+      $this->AddBreadcrumb(T('GroupMembers', 'Members'));
       
       // Get Leaders
       $UserModel = new UserModel();
