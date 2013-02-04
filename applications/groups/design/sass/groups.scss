@@ -50,9 +50,17 @@ $borderRadius: 10px;
 }
 
 .Group-Box {
+   position: relative;
+   
+   h2 {
+      min-height: 40px;
+   }
+   
    .Buttons {
-      text-align: right;
-      margin: 5px 0 10px;
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 0;
       
       .Dropdown {
          text-align: left;
@@ -86,8 +94,6 @@ $borderRadius: 10px;
 }
 
 .Group-Footer {
-   border-top: 1px solid $boxBorder;
-   @include background-image(linear-gradient($shaded, white));
    @include pie-clearfix;
    
    .Group-Box {
@@ -192,10 +198,6 @@ $borderRadius: 10px;
     }
 }
 .Group-Leaders {
-    border: 1px solid $boxBorder;
-    padding: 10px 15px;
-    margin: 15px 0 5px;
-    @include border-radius($borderRadius);
     @include pie-clearfix;
 }
 .Group-Members {

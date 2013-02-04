@@ -173,9 +173,6 @@
   column-break-inside: avoid;
 }
 
-.Groups.Group .Group-Events {
-  position: relative;
-}
 .Groups.Group .Group-Events .DataList-Events {
   padding: 12px 0px;
 }
@@ -298,9 +295,17 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   padding-bottom: 20px;
 }
 
+.Group-Box {
+  position: relative;
+}
+.Group-Box h2 {
+  min-height: 40px;
+}
 .Group-Box .Buttons {
-  text-align: right;
-  margin: 5px 0 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
 }
 .Group-Box .Buttons .Dropdown {
   text-align: left;
@@ -333,12 +338,6 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 
 .Group-Footer {
-  border-top: 1px solid #dddddd;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f7f7f7), color-stop(100%, #ffffff));
-  background-image: -webkit-linear-gradient(#f7f7f7, #ffffff);
-  background-image: -moz-linear-gradient(#f7f7f7, #ffffff);
-  background-image: -o-linear-gradient(#f7f7f7, #ffffff);
-  background-image: linear-gradient(#f7f7f7, #ffffff);
   *zoom: 1;
 }
 .Group-Footer:after {
@@ -458,14 +457,6 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 
 .Group-Leaders {
-  border: 1px solid #dddddd;
-  padding: 10px 15px;
-  margin: 15px 0 5px;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  -ms-border-radius: 10px;
-  -o-border-radius: 10px;
-  border-radius: 10px;
   *zoom: 1;
 }
 .Group-Leaders:after {
