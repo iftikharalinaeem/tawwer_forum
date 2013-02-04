@@ -78,7 +78,7 @@ class EventController extends Gdn_Controller {
          if (!$MemberOfGroup)
             throw ForbiddenException('create a new event');
          
-         $this->AddBreadcrumb($Group['Name'], Url("/group/{$GroupID}"));
+         $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       }
       
       $this->Title(T('New Event'));
@@ -93,6 +93,7 @@ class EventController extends Gdn_Controller {
       $this->Form->SetModel($EventModel);
       if ($this->Form->IsPostBack()) {
          $Event = $this->Form->FormValues();
+         $Event['GroupID'] = $GroupID;
          
          try {
             // Timezone
@@ -226,6 +227,7 @@ class EventController extends Gdn_Controller {
       $Invited = $EventModel->Invited($EventID);
       $this->SetData('Invited', $Invited);
       
+      $this->AddModule('DiscussionFilterModule');
       $this->RequestMethod = 'show';
       $this->View = 'show';
       return $this->Render();
