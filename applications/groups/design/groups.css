@@ -216,6 +216,50 @@
 }
 
 /* line 156, sass/_event.scss */
+.Groups.Group .Group-Events {
+  position: relative;
+}
+/* line 160, sass/_event.scss */
+.Groups.Group .Group-Events .Group-NewEventButton {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+/* line 166, sass/_event.scss */
+.Groups.Group .Group-Events .DataList-Events {
+  padding: 12px 0px;
+}
+/* line 169, sass/_event.scss */
+.Groups.Group .Group-Events .DataList-Events :first-child {
+  margin-top: 0px;
+}
+/* line 172, sass/_event.scss */
+.Groups.Group .Group-Events .DataList-Events :last-child {
+  margin-bottom: 0px;
+}
+/* line 177, sass/_event.scss */
+.Groups.Group .Group-Events .Event {
+  margin: 12px 0px;
+}
+/* line 180, sass/_event.scss */
+.Groups.Group .Group-Events .Event .Event-Title {
+  margin-bottom: 0px;
+}
+/* line 183, sass/_event.scss */
+.Groups.Group .Group-Events .Event .Event-Time {
+  font-weight: normal;
+  font-size: 12px;
+}
+/* line 187, sass/_event.scss */
+.Groups.Group .Group-Events .Event .Event-Location {
+  line-height: 1.2em;
+}
+/* line 190, sass/_event.scss */
+.Groups.Group .Group-Events .Event .Event-Description {
+  display: none;
+}
+
+/* line 197, sass/_event.scss */
 .ui-timepicker-list {
   overflow-y: auto;
   height: 150px;
@@ -233,23 +277,23 @@
   z-index: 10001;
 }
 
-/* line 173, sass/_event.scss */
+/* line 214, sass/_event.scss */
 .ui-timepicker-list.ui-timepicker-with-duration {
   width: 11em;
 }
 
-/* line 177, sass/_event.scss */
+/* line 218, sass/_event.scss */
 .ui-timepicker-duration {
   margin-left: 5px;
   color: #888;
 }
 
-/* line 181, sass/_event.scss */
+/* line 222, sass/_event.scss */
 .ui-timepicker-list:hover .ui-timepicker-duration {
   color: #888;
 }
 
-/* line 185, sass/_event.scss */
+/* line 226, sass/_event.scss */
 .ui-timepicker-list li {
   padding: 3px 0 3px 5px;
   cursor: pointer;
@@ -259,13 +303,13 @@
   margin: 0;
 }
 
-/* line 194, sass/_event.scss */
+/* line 235, sass/_event.scss */
 .ui-timepicker-list:hover .ui-timepicker-selected {
   background: #fff;
   color: #000;
 }
 
-/* line 200, sass/_event.scss */
+/* line 241, sass/_event.scss */
 li.ui-timepicker-selected,
 .ui-timepicker-list li:hover,
 .ui-timepicker-list:hover .ui-timepicker-selected:hover {
@@ -273,7 +317,7 @@ li.ui-timepicker-selected,
   color: #fff;
 }
 
-/* line 205, sass/_event.scss */
+/* line 246, sass/_event.scss */
 li.ui-timepicker-selected .ui-timepicker-duration,
 .ui-timepicker-list li:hover .ui-timepicker-duration {
   color: #ccc;

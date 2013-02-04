@@ -7,10 +7,13 @@ if (!function_exists('DateTile')):
  * @param string $Date
  */
 function DateTile($Date) {
+   if (is_string($Date))
+      $Date = new DateTime($Date);
+   
    return '
    <span class="DateTile">
-      <span class="Month">Dec</span>
-      <span class="Day">29</span>
+      <span class="Month">'.$Date->format('M').'</span>
+      <span class="Day">'.$Date->format('j').'</span>
    </span>';
 }
 endif;
@@ -75,19 +78,25 @@ if (!function_exists('WriteEventList')) :
  * @param array $Events 
  * @param string $EmptyMessage What to show when there's no content.
  */   
-function WriteEventList($Events, $EmptyMessage = '') {
+function WriteEventList($Events, $Group = NULL, $EmptyMessage = '') {
    if (!$Events)
       WriteEmptyState($EmptyMessage);
    
    if (is_array($Events)) {
+      $GroupID = GetValue('GroupID', $Group, '');
+      if (GroupPermission('Member')) {
+         echo ' '.Anchor(T('New Event'), Url("/event/add/{$GroupID}"), 'Button Primary Group-NewEventButton').' ';
+      }
       echo '<ul class="DataList DataList-Events">';
       foreach ($Events as $Event) {
+         $DateStarts = new DateTime($Event['DateStarts']);
          echo 
          '<li class="Event">
-            '.DateTile($Event['DateScheduled']).'
-            <h3 class="Event-Title">'.Gdn_Format::Text($Event['Title']).'</h3>
-            <span class="Event-Time MItem">5pm</span>
-            <p class="Event-Description"'.Gdn_Format::Text($Event['Description']).'</p>
+            '.DateTile($DateStarts->format('Y-m-d')).'
+            <h3 class="Event-Title">'.Gdn_Format::Text($Event['Name']).' <span class="Event-Time MItem">'.$DateStarts->format('g:ia').'</span></h3>
+            
+            <div class="Event-Location">'.Gdn_Format::Text($Event['Location']).'</div>
+            <p class="Event-Description"'.SliceParagraph(Gdn_Format::Text($Event['Body']), 100).'</p>
          </li>';
       }
       echo '</ul>';
