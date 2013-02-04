@@ -82,7 +82,7 @@ class GroupController extends Gdn_Controller {
       $this->SetData('Leaders', $Users);
       
       // Get Members
-      $Users = $this->GroupModel->GetMembers($GroupID, array('Role' => 'Member'));
+      $Users = $this->GroupModel->GetMembers($GroupID, array('Role' => 'Member'), 30);
       $this->SetData('Members', $Users);
       
       $this->Title(htmlspecialchars($Group['Name']));

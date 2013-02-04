@@ -13,7 +13,8 @@ if (!isset($Explicit))
 $Sql = Gdn::SQL();
 $St = Gdn::Structure();
 
-Gdn::PermissionModel()->Define('Groups.Group.Add');
+Gdn::PermissionModel()->Define(array(
+   'Groups.Group.Add' => 'Garden.Profiles.Edit'));
 
 // Define the groups table.
 $St->Table('Group')

@@ -126,7 +126,7 @@ if (!function_exists('WriteEventList')) :
 function WriteEventList($Events, $Group = NULL, $EmptyMessage = '') {
    $GroupID = GetValue('GroupID', $Group, '');
    if (GroupPermission('Member')) {
-      echo '<div class="Buttons">';
+      echo '<div class="Button-Controls">';
       echo ' '.Anchor(T('New Event'), Url("/event/add/{$GroupID}"), 'Button Primary Group-NewEventButton').' ';
       echo '</div>';
    }
@@ -225,7 +225,7 @@ function WriteGroupCards($Groups, $EmptyMessage = '') {
             
                WriteGroupIcon($Group, 'Group-Icon Card-Icon');
                echo '<h3 class="Group-Name">'.htmlspecialchars($Group['Name']).'</h3>';
-               echo '<p class="Group-Description">'.Gdn_Format::PlainText($Group['Description'], $Group['Format']).'</p>';
+               echo '<p class="Group-Description">'.SliceString(htmlspecialchars(Gdn_Format::PlainText($Group['Description'], $Group['Format'])), 160).'</p>';
                echo '</a>';
 //            echo '</div>';
             WriteGroupButtons($Group);

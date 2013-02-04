@@ -31,7 +31,7 @@
       
       <?php
       if (GroupPermission('Member')) {
-         echo '<div class="Buttons">';
+         echo '<div class="Button-Controls">';
          echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$this->Data('Group.GroupID')));
          echo '</div>';
       }

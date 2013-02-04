@@ -154,13 +154,14 @@ class GroupModel extends Gdn_Model {
       return $Row;
    }
    
-   public function GetMembers($GroupID, $Where = array()) {
+   public function GetMembers($GroupID, $Where = array(), $Limit = FALSE, $Offset = FALSE) {
       // First grab the members.
       $Users = $this->SQL
          ->From('UserGroup')
          ->Where('GroupID', $GroupID)
          ->Where($Where)
          ->OrderBy('DateInserted')
+         ->Limit($Limit, $Offset)
          ->Get()->ResultArray();
       
       Gdn::UserModel()->JoinUsers($Users, array('UserID'));
