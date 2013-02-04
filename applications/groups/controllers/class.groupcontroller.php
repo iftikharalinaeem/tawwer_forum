@@ -62,10 +62,10 @@ class GroupController extends Gdn_Controller {
       
       // Get Discussions
       $DiscussionModel = new DiscussionModel();
-      $Discussions = $DiscussionModel->GetWhere(array('DiscussionID <' => 10))->ResultArray(); // FAKE IT
+      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0))->ResultArray();
       $this->SetData('Discussions', $Discussions);
       
-      $Discussions = $DiscussionModel->GetWhere(array('DiscussionID <' => 6))->ResultArray(); // FAKE IT
+      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce >' => 0))->ResultArray();
       $this->SetData('Announcements', $Discussions);
       
       // Get Events
@@ -83,6 +83,10 @@ class GroupController extends Gdn_Controller {
       $this->SetData('Members', $Users);
       
       $this->Title(htmlspecialchars($Group['Name']));
+      $this->Description(Gdn_Format::PlainText($Group['Description'], $Group['Format']));
+      if ($Group['Icon']) {
+         $this->Image(Gdn_Upload::Url($Group['Icon']));
+      }
       require_once $this->FetchViewLocation('group_functions');
       $this->CssClass .= ' NoPanel';
       $this->Render('Group');
@@ -259,7 +263,7 @@ class GroupController extends Gdn_Controller {
       }
       
       $this->Form = $Form;
-      $this->CssClass .= ' NoPanel';
+      $this->CssClass .= ' NoPanel NarrowForm';
       $this->Render('AddEdit');
    }
    

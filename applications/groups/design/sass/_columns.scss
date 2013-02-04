@@ -12,7 +12,7 @@
   @include column-break-inside(avoid); 
   //min-height: 100px;
   //display: inline-block;
-  @include clearfix;
+  @include pie-clearfix;
 }
 
 .Group-Events {

@@ -91,7 +91,7 @@ function WriteDiscussionList($Discussions, $EmptyMessage = '') {
    
    //if (C('Vanilla.Discussions.Layout') == 'table')
    //WriteDiscussionRow($Discussion, $this, $Session, $Alt);
-   if (is_array($Discussions)) {
+   if (is_array($Discussions) && count($Discussions) > 0) {
       include_once(PATH_APPLICATIONS .'/vanilla/views/discussions/helper_functions.php');
       include_once(PATH_APPLICATIONS .'/vanilla/views/modules/helper_functions.php');   
       echo '<ul class="DataList Discussions">';
@@ -124,14 +124,16 @@ if (!function_exists('WriteEventList')) :
  * @param string $EmptyMessage What to show when there's no content.
  */   
 function WriteEventList($Events, $Group = NULL, $EmptyMessage = '') {
+   $GroupID = GetValue('GroupID', $Group, '');
+   if (GroupPermission('Member')) {
+      echo '<div class="Buttons">';
+      echo ' '.Anchor(T('New Event'), Url("/event/add/{$GroupID}"), 'Button Primary Group-NewEventButton').' ';
+      echo '</div>';
+   }
+   
    if (!$Events)
       WriteEmptyState($EmptyMessage);
-   
-   if (is_array($Events)) {
-      $GroupID = GetValue('GroupID', $Group, '');
-      if (GroupPermission('Member')) {
-         echo ' '.Anchor(T('New Event'), Url("/event/add/{$GroupID}"), 'Button Primary Group-NewEventButton').' ';
-      }
+   else {
       echo '<ul class="DataList DataList-Events">';
       foreach ($Events as $Event) {
          $DateStarts = new DateTime($Event['DateStarts']);

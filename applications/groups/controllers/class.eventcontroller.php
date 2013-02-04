@@ -72,12 +72,14 @@ class EventController extends Gdn_Controller {
          $GroupModel = new GroupModel();
          $Group = $GroupModel->GetID($GroupID);
          if (!$Group) throw NotFoundException('Group');
+         $this->SetData('Group', $Group);
+         $this->Form->SetValue('GroupID', $GroupID);
 
          $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $GroupID);
          if (!$MemberOfGroup)
             throw ForbiddenException('create a new event');
          
-         $this->AddBreadcrumb($Group['Name'], Url("/group/{$GroupID}"));
+         $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       }
       
       $this->Title(T('New Event'));
@@ -92,6 +94,7 @@ class EventController extends Gdn_Controller {
       $this->Form->SetModel($EventModel);
       if ($this->Form->IsPostBack()) {
          $Event = $this->Form->FormValues();
+         $Event['GroupID'] = $GroupID;
          
          try {
             // Timezone
@@ -138,6 +141,9 @@ class EventController extends Gdn_Controller {
             
             if ($EventID = $this->Form->Save()) {
                $Event['EventID'] = $EventID;
+               if ($GroupID)
+                  $EventModel->InviteGroup($EventID, $GroupID);
+               
                $this->InformMessage(FormatString(T("New event created for <b>'{Name}'</b>"), $Event));
                Redirect(EventUrl($Event));
             }
@@ -149,6 +155,7 @@ class EventController extends Gdn_Controller {
       }
       
       $this->View = 'add';
+      $this->CssClass .= ' NoPanel NarrowForm';
       return $this->Render();
    }
    
@@ -178,6 +185,7 @@ class EventController extends Gdn_Controller {
          $GroupModel = new GroupModel();
          $Group = $GroupModel->GetID($GroupID, DATASET_TYPE_ARRAY);
          if (!$Group) throw NotFoundException('Group');
+         $this->SetData('Group', $Group);
          
          // Check if this person is a member of the group or a moderator
          $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $GroupID);
@@ -185,7 +193,7 @@ class EventController extends Gdn_Controller {
             $ViewEvent = TRUE;
          
          $this->AddBreadcrumb('Groups', Url('/groups'));
-         $this->AddBreadcrumb($Group['Name'], Url("/group/{$GroupID}"));
+         $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
          
       } else {
          
@@ -221,6 +229,7 @@ class EventController extends Gdn_Controller {
       $Invited = $EventModel->Invited($EventID);
       $this->SetData('Invited', $Invited);
       
+      $this->AddModule('DiscussionFilterModule');
       $this->RequestMethod = 'show';
       $this->View = 'show';
       return $this->Render();
@@ -259,7 +268,7 @@ class EventController extends Gdn_Controller {
             $AttendEvent = TRUE;
          
          $this->AddBreadcrumb('Groups', Url('/groups'));
-         $this->AddBreadcrumb($Group['Name'], Url("/group/{$GroupID}"));
+         $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
          
       } else {
          

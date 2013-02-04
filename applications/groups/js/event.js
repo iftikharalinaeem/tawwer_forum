@@ -34,6 +34,15 @@ jQuery(document).ready(function($) {
 
       var DateNow = new Date();
       $('.DatePicker').val(DateNow.getMonth()+'/'+DateNow.getDate()+'/'+DateNow.getFullYear());
+      
+      $('.Event .CancelButton').on('click', function(e){
+         var Event = $(e.target).closest('.Event');
+         var GroupID = Event.data('groupid');
+         if (GroupID)
+            window.location.replace(gdn.url('/group/'+GroupID));
+         else
+            window.location.replace(gdn.url('/groups'));
+      });
 
       var DefaultTimezone = jstz.determine();
       DefaultTimezone = DefaultTimezone.name();

@@ -6,6 +6,7 @@
 @import "empty";
 @import "event";
 
+
 .Group-Banner {
    height: 200px;
    /* Fluid width centering */
@@ -43,6 +44,20 @@
    clear: left;
    margin: 10px 0;
    padding-bottom: 20px;
+}
+
+.Group-Box {
+   .Buttons {
+      text-align: right;
+      margin: 5px 0 10px;
+      
+      .Dropdown {
+         text-align: left;
+         left: auto;
+         right: 0;
+         min-width: 100px !important;
+      }
+   }
 }
 
 .Group-Announcements {
