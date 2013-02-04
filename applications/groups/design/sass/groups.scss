@@ -6,6 +6,8 @@
 @import "empty";
 @import "event";
 
+$borderRadius: 10px;
+
 
 .Group-Banner {
    height: 200px;
@@ -147,8 +149,58 @@
        padding-top: 0;  
     }
     h2 {
-       font-size: 24px;  
+       font-size: 24px;
+       line-height: 1.2;
+       margin: 0 0 5px; 
     }
+    .Card {
+       display: block;
+       height: 70px;
+       width: 270px;
+       margin-right: 15px;
+       padding: 5px 10px;
+       float: left;
+       vertical-align: top;
+       @include pie-clearfix;      
+       
+       .PhotoWrap {
+          float: left;
+          margin: 5px 5px 0 0;
+       }
+       a {
+          font-weight: bold;  
+       }
+       .DateJoined {
+          display: block;
+          line-height: 1;
+       }
+       .Group-MemberOptions {
+          padding-top: 10px;
+          margin-left: 45px;
+          display: none;  
+       }
+    }
+    .Card:hover {
+       background-color: $shaded;
+       border: 1px solid $boxBorder;
+       @include border-radius($borderRadius/2);
+       padding: 4px 9px;
+       
+       .Group-MemberOptions {
+          display: block;  
+       }
+    }
+}
+.Group-Leaders {
+    border: 1px solid $boxBorder;
+    padding: 10px 15px;
+    margin: 15px 0 5px;
+    @include border-radius($borderRadius);
+    @include pie-clearfix;
+}
+.Group-Members {
+    padding: 15px;
+    @include pie-clearfix;
 }
 
 // Generic style
