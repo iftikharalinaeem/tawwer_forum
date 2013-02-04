@@ -281,9 +281,13 @@ function WriteMemberCards($Members) {
       echo WriteEmptyState(T("GroupMembersEmpty", "No one has joined yet. Spread the word!"));
    
    if (is_array($Members)) {
+      echo '<ul class="Group-MemberList">';
       foreach ($Members as $Member) {
+         echo '<li class="Card">';
          WriteMemberCard($Member);
+         echo '</li>';
       } 
+      echo '</ul>';
    }
 }
 endif;
@@ -296,10 +300,15 @@ if (!function_exists('WriteMemberCard')) :
  * @param array $Members
  */
 function WriteMemberCard($Member) {
-   $Card = UserPhoto($Member).' '.UserAnchor($Member);
-   $Card .= Wrap(sprintf(T('GroupMemberJoined', 'Joined %s'), Gdn_Format::Date($Member['DateInserted'])), 'span', 'MItem DateJoined');
-   $Card .= '[buttons]';
-   echo Wrap($Card, 'span', 'Group-MemberCard');
+   echo UserPhoto($Member).' '.UserAnchor($Member).' ';
+   echo Wrap(sprintf(T('GroupMemberJoined', 'Joined %s'), Gdn_Format::Date($Member['DateInserted'])), 
+      'span', array('class' => 'MItem DateJoined')).' ';
+   if (GroupPermission('Edit')) {
+      echo '<div class="Group-MemberOptions">';
+      echo Anchor(T('GroupLeaderAction', 'Leader'), 'groups', 'Group-MakeLeader Popup').' ';
+      echo Anchor(T('GroupRemoveAction', 'Remove'), 'groups', 'Group-RemoveMember Popup').' ';
+      echo '</div>';
+   }
 }
 endif;
 

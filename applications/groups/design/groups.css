@@ -393,6 +393,79 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 .Group-MembersPage h2 {
   font-size: 24px;
+  line-height: 1.2;
+  margin: 0 0 5px;
+}
+.Group-MembersPage .Card {
+  display: block;
+  height: 70px;
+  width: 270px;
+  margin-right: 15px;
+  padding: 5px 10px;
+  float: left;
+  vertical-align: top;
+  *zoom: 1;
+}
+.Group-MembersPage .Card:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.Group-MembersPage .Card .PhotoWrap {
+  float: left;
+  margin: 5px 5px 0 0;
+}
+.Group-MembersPage .Card a {
+  font-weight: bold;
+}
+.Group-MembersPage .Card .DateJoined {
+  display: block;
+  line-height: 1;
+}
+.Group-MembersPage .Card .Group-MemberOptions {
+  padding-top: 10px;
+  margin-left: 45px;
+  display: none;
+}
+.Group-MembersPage .Card:hover {
+  background-color: #f7f7f7;
+  border: 1px solid #dddddd;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  padding: 4px 9px;
+}
+.Group-MembersPage .Card:hover .Group-MemberOptions {
+  display: block;
+}
+
+.Group-Leaders {
+  border: 1px solid #dddddd;
+  padding: 10px 15px;
+  margin: 15px 0 5px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+  *zoom: 1;
+}
+.Group-Leaders:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.Group-Members {
+  padding: 15px;
+  *zoom: 1;
+}
+.Group-Members:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .UserTile {
