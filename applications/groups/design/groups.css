@@ -218,7 +218,7 @@
   width: 6.5em;
   background: #fff;
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -318,9 +318,6 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   min-width: 100px !important;
 }
 
-.Group-Announcements .ItemDiscussion {
-  padding: 8px 0;
-}
 .Group-Announcements .DiscussionsBlog time {
   padding-left: 8px;
 }
@@ -333,9 +330,6 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 .Group-Discussions .MItem time {
   padding-right: 8px;
-}
-.Group-Discussions .ItemDiscussion {
-  padding: 8px 0;
 }
 
 .Group-Header {

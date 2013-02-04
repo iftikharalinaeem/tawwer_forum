@@ -33,7 +33,7 @@ function WriteDiscussionBlogList($Discussions, $EmptyMessage = '') {
    if (is_array($Discussions)) {
       include_once(PATH_APPLICATIONS .'/vanilla/views/discussions/helper_functions.php');
       //include_once(PATH_APPLICATIONS .'/vanilla/views/modules/helper_functions.php');   
-      echo '<ul class="DataList Discussions DiscussionsBlog">';
+      echo '<ul class="NarrowList Discussions DiscussionsBlog">';
       foreach ($Discussions as $Discussion) {
          WriteDiscussionBlog((object)$Discussion, 'Group');
       }
@@ -96,7 +96,7 @@ function WriteDiscussionList($Discussions, $EmptyMessage = '') {
    if (is_array($Discussions) && count($Discussions) > 0) {
       include_once(PATH_APPLICATIONS .'/vanilla/views/discussions/helper_functions.php');
       include_once(PATH_APPLICATIONS .'/vanilla/views/modules/helper_functions.php');   
-      echo '<ul class="DataList Discussions">';
+      echo '<ul class="NarrowList Discussions">';
       foreach ($Discussions as $Discussion) {
          WriteModuleDiscussion((object)$Discussion, 'Group');
       }
@@ -136,7 +136,7 @@ function WriteEventList($Events, $Group = NULL, $EmptyMessage = '') {
    if (!$Events)
       WriteEmptyState($EmptyMessage);
    else {
-      echo '<ul class="DataList DataList-Events">';
+      echo '<ul class="NarrowList DataList-Events">';
       foreach ($Events as $Event) {
          $DateStarts = new DateTime($Event['DateStarts']);
          echo 
