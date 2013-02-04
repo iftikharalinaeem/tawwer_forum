@@ -61,7 +61,7 @@
    </div>
     
    <!-- Members -->
-   <div class="Group-Box Group-Members">
+   <div class="Group-Box Group-MembersPreview">
       <h3><?php echo T('GroupMembers', 'Members'); ?></h3>
       <?php WriteMemberGrid($this->Data('Members')); ?>
    </div>

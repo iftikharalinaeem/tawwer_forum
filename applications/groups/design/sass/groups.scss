@@ -3,11 +3,7 @@
 @import "colors";
 @import "columns";
 @import "datetile";
-@import "empty";
 @import "event";
-
-$borderRadius: 10px;
-
 
 .Group-Banner {
    height: 200px;
@@ -155,15 +151,13 @@ $borderRadius: 10px;
        padding-top: 0;  
     }
     h2 {
-       font-size: 24px;
-       line-height: 1.2;
-       margin: 0 0 5px; 
+       clear: both;
     }
     .Card {
        display: block;
        height: 70px;
        width: 270px;
-       margin-right: 15px;
+       margin: 0 15px 15px 0;
        padding: 5px 10px;
        float: left;
        vertical-align: top;
@@ -181,29 +175,24 @@ $borderRadius: 10px;
           line-height: 1;
        }
        .Group-MemberOptions {
-          padding-top: 10px;
+          padding-top: 5px;
           margin-left: 45px;
           display: none;  
        }
     }
     .Card:hover {
        background-color: $shaded;
-       border: 1px solid $boxBorder;
-       @include border-radius($borderRadius/2);
-       padding: 4px 9px;
        
        .Group-MemberOptions {
           display: block;  
        }
     }
 }
-.Group-Leaders {
-    @include pie-clearfix;
-}
+.Group-Leaders,
 .Group-Members {
-    padding: 15px;
     @include pie-clearfix;
 }
+
 
 // Generic style
 .UserTile {
@@ -213,4 +202,10 @@ $borderRadius: 10px;
       height: 24px;
       width: 24px;  
    }
+}
+
+// Empty state boxes
+.EmptyMessage {
+   text-align: center;
+   color: $lightText;
 }
