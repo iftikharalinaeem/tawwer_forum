@@ -990,6 +990,7 @@ class MinionPlugin extends Gdn_Plugin {
                'Reason'       => $State['Reason'] ? " for {$State['Reason']}" : '',
                'Force'        => $State['Force'] ? " Weapons are {$State['Force']}." : ''
             )));
+            $this->Log(FormatString());
             break;
             
          case 'forgive':
@@ -1256,7 +1257,8 @@ class MinionPlugin extends Gdn_Plugin {
 
             $Options = array(
                'Automated' => TRUE,
-               'Reason'    => "Kicked from thread: ".GetValue('Reason', $KickedUser)
+               'Reason'    => "Kicked from thread: ".GetValue('Reason', $KickedUser),
+               'Cause'     => "posting while banned from thread"
             );
 
             $Punished = $this->Punish(
@@ -1308,7 +1310,8 @@ class MinionPlugin extends Gdn_Plugin {
 
                $Options = array(
                   'Automated' => TRUE,
-                  'Reason'    => "Disallowed phrase: ".GetValue('Reason', $PhraseOptions)
+                  'Reason'    => "Disallowed phrase: ".GetValue('Reason', $PhraseOptions),
+                  'Cause'     => "using a forbidden phrase in a thread"
                );
 
                $Punished = $this->Punish(
@@ -1541,6 +1544,7 @@ class MinionPlugin extends Gdn_Plugin {
       // Admins+ exempt
       if (Gdn::UserModel()->CheckPermission($User, 'Garden.Settings.Manage')) {
          $this->Revolt($User, $Discussion, T("This user is protected."));
+         $this->Log(FormatString("Refusing to punish {User.Name}", array('User' => $User)));
          return FALSE;
       }
       

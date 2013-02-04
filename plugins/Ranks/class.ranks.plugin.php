@@ -201,8 +201,9 @@ class RanksPlugin extends Gdn_Plugin {
       
       $RankModel = new RankModel();
       
-      $DefaultFormat = strtolower(C('Garden.InputFormatter'));
-      if ($DefaultFormat == 'textex')
+      // Load the default from the bak first because the user editing this rank may not have
+      $DefaultFormat = strtolower(C('Garden.InputFormatterBak', C('Garden.InputFormatter')));
+      if ($DefaultFormat === 'textex')
          $DefaultFormat = 'text, links, youtube';
       
       $Formats = array('Text' => 'text', 'TextEx' => 'text, links, and youtube', '' => sprintf('default (%s)', $DefaultFormat));

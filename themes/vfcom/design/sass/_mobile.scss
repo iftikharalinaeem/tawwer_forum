@@ -1,0 +1,192 @@
+@media (max-width: 960px) {
+   .Center {
+      width: auto;
+   }
+   .Head .Center, .Splash {
+      margin: 0 20px;
+   }
+   
+   div.Tour {
+      margin: 20px !important;
+   }
+   
+   .TRow .Col {
+      @include box-sizing(border-box);
+      width: 50% !important;
+   }
+   
+   .TRow img {
+      width: 100% !important;
+   }
+   
+   .Splash .Feature {
+      width: 50% !important;
+      
+      #slideshow {
+         img {
+            width: 100% !important;
+         }
+      }
+   }
+   
+   .Splash-Info {
+      width: 50%;
+      margin-right: 0;
+   }
+}
+
+@media (max-width: 600px) {
+   .Head .Center {
+      margin: 0;
+      height: 90px;
+   }
+   
+   .Menus {
+      .VFMenu {
+         @include border-radius(0);
+         width: 100%;
+         top: 60px !important;
+         text-align: center;
+
+         a {
+             &:first-child, &:last-child {
+                @include border-radius(0);
+             }
+         }
+      }
+
+      .AccountMenu {
+         width: 100%;
+         left: 0;
+         top: 30px !important;
+         text-align: right;
+         padding: 0 10px;
+         @include box-sizing(border-box);
+      }
+   }
+   
+   h1.Logo a {
+      height: 40px;
+      background-size: auto 40px;
+      margin-left: 10px
+   }
+   
+   body#vfcom_info_index {
+      h1.Logo {
+         top: 10px !important;
+         left: 0 !important;
+         a {
+            height: 40px;
+            background-size: auto 40px !important;
+         }
+      }
+      
+      .Column3 {
+         float: none;
+         width: auto;
+         margin: 0 20px;
+         
+         img.Bordered {
+            width: 100%;
+            @include box-sizing(border-box);
+         }
+      }
+      
+      .SplashBox {
+         margin-top: 20px;
+      }
+   }
+   
+   .Splash h1 {
+      margin-top: 10px !important;
+   }
+   
+   .Splash .Feature {
+      display: none;
+   }
+   
+   .Splash-Info {
+      width: 100%;
+      margin-right: 0;
+      
+      .CTAButtons {
+         text-align: center;
+         
+         a {
+            min-width: 75px;
+         }
+      }
+   }
+   
+   .TRow .Col {
+      float: none !important;
+      width: 100% !important;
+   }
+   
+   .TRow .Col1 {
+      padding-right: 0 !important;
+   }
+   
+   #Panel {
+      display: none;
+   }
+
+   #Body .ContentColumn {
+      margin: 0;
+   }
+
+   .Row {
+      width: inherit;
+      margin: 0 20px;
+      min-width: inherit;
+   }
+   
+   #Head .MeWrap {
+      right: 40px !Important;
+   }
+   
+   #Content {
+      .BoxNewDiscussion {
+         display: inline-block;
+      }
+      
+      .SearchForm {
+         display: none;
+      }
+
+      .BoxNewDiscussion .MenuItems {
+         min-width: 175px;
+      }
+
+      .DataList {
+         margin-right: -20px;
+         margin-left: -20px;
+      }
+   }
+   
+   .Addons ul li {
+      text-align: left !important;
+      width: auto !important;
+      margin-right: 0 !important;
+      display: block !important;
+      
+      strong, em {
+         float: none !important;
+         display: block;
+      }
+   }
+   
+   .FAQ {
+      display: block !important;
+      width: auto !important;
+      padding: 0 !important;
+   }
+}
+
+@media (max-width: 500px) {
+   .Card {
+      width: auto !important;
+      margin-right: 0 !important;
+      float: none !important;
+   }
+}
