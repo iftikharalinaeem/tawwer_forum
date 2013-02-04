@@ -247,8 +247,15 @@ function WriteGroupIcon($Group = FALSE, $Class = 'Group-Icon') {
    if (!$Group)
       $Group = Gdn::Controller()->Data('Group');
    
+   $Icon = '';
    if ($Group['Icon'])
-      echo Img(Gdn_Upload::Url($Group['Icon']), array('class' => $Class));
+      $Icon = $Group['Icon'];
+   else
+      $Icon = C('Groups.DefaultIcon', '');
+      
+   if ($Icon)
+      echo Img(Gdn_Upload::Url($Icon), array('class' => $Class));
+   
 }
 endif;
 
