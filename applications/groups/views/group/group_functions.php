@@ -226,7 +226,7 @@ function WriteGroupCards($Groups, $EmptyMessage = '') {
                echo '<p class="Group-Description">'.
                   SliceString(
                      Gdn_Format::PlainText($Group['Description'], $Group['Format']), 
-                     C('Groups.CardDescription.ExcerptLength', 140)).'</p>';
+                     C('Groups.CardDescription.ExcerptLength', 150)).'</p>';
             echo '</a>';
             WriteGroupButtons($Group);
          echo '</div></div>';
