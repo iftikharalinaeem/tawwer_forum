@@ -17,6 +17,56 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
    
+   public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
+      $GroupID = Gdn::Request()->Get('groupid');
+      if ($GroupID) {
+         $Model = new GroupModel();
+         $Group = $Model->GetID($GroupID);
+         
+         if ($Group) {
+            // TODO: Check permissions.
+            $Args['FormPostValues']['CategoryID'] = $Group['CategoryID'];
+            $Args['FormPostValues']['GroupID'] = $GroupID;
+         }
+      }
+   }
+   
+   /**
+    * 
+    * @param DiscussionController $Sender
+    */
+   public function DiscussionController_Render_Before($Sender) {
+      $GroupID = $Sender->Data('Discussion.GroupID');
+      if ($GroupID) {
+         // This is a group discussion. Modify the breadcrumbs.
+         $Model = new GroupModel();
+         $Group = $Model->GetID($GroupID);
+         if ($Group) {
+            $Sender->SetData('Breadcrumbs', array());
+            $Sender->AddBreadcrumb(T('Groups'), '/groups');
+            $Sender->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+         }
+      }
+   }
+   
+   /**
+    * 
+    * @param PostController $Sender
+    */
+   public function PostController_Render_Before($Sender) {
+      $GroupID = Gdn::Request()->Get('groupid');
+      if ($GroupID) {
+         // TODO: Check permissions.
+         $Model = new GroupModel();
+         $Group = $Model->GetID($GroupID);
+         if ($Group) {
+            // Hide the category drop-down.
+            $Sender->ShowCategorySelector = FALSE;
+         }
+         
+      }
+   }
+   
    /**
     * Configure Groups/Events notification preferences
     * 

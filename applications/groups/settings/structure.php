@@ -35,16 +35,18 @@ $St->Table('Group')
    ->Set($Explicit, $Drop);
 
 $St->Table('UserGroup')
-   ->Column('GroupID', 'int', FALSE, 'primary')
-   ->Column('UserID', 'int', FALSE, array('primary', 'key'))
+   ->PrimaryKey('UserGroupID')
+   ->Column('GroupID', 'int', FALSE, 'unique')
+   ->Column('UserID', 'int', FALSE, array('unique', 'key'))
    ->Column('DateInserted', 'datetime')
    ->Column('InsertUserID', 'int')
    ->Column('Role', array('Leader', 'Member'))
    ->Set($Explicit, $Drop);
 
 $St->Table('GroupApplicant')
-   ->Column('GroupID', 'int', FALSE, 'primary')
-   ->Column('UserID', 'int', FALSE, array('primary', 'key'))
+   ->PrimaryKey('GroupApplicantID')
+   ->Column('GroupID', 'int', FALSE, 'unique')
+   ->Column('UserID', 'int', FALSE, array('unique', 'key'))
    ->Column('Type', array('Application', 'Invitation', 'Banned'))
    ->Column('Reason', 'text', TRUE) // reason for wanting to join.
    ->Column('DateInserted', 'datetime')

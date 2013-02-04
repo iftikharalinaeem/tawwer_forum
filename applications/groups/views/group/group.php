@@ -28,9 +28,15 @@
    
    <div class="Group-Box Group-Discussions">
       <h2><?php echo T('Discussions'); ?></h2>
+      
       <?php
-      echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary'));
+      if (GroupPermission('Member')) {
+         echo '<div class="Buttons">';
+         echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$this->Data('Group.GroupID')));
+         echo '</div>';
+      }
       ?>
+      
       <?php $EmptyMessage = T('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"); ?>
       <?php WriteDiscussionList($this->Data('Discussions'), $EmptyMessage); ?>
    </div>

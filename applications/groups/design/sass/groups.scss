@@ -46,6 +46,20 @@
    padding-bottom: 20px;
 }
 
+.Group-Box {
+   .Buttons {
+      text-align: right;
+      margin: 5px 0 10px;
+      
+      .Dropdown {
+         text-align: left;
+         left: auto;
+         right: 0;
+         min-width: 100px !important;
+      }
+   }
+}
+
 .Group-Announcements {
    .ItemDiscussion {
       padding: 8px 0; 

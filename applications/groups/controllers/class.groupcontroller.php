@@ -62,10 +62,10 @@ class GroupController extends Gdn_Controller {
       
       // Get Discussions
       $DiscussionModel = new DiscussionModel();
-      $Discussions = $DiscussionModel->GetWhere(array('DiscussionID <' => 10))->ResultArray(); // FAKE IT
+      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0))->ResultArray();
       $this->SetData('Discussions', $Discussions);
       
-      $Discussions = $DiscussionModel->GetWhere(array('DiscussionID <' => 6))->ResultArray(); // FAKE IT
+      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce >' => 0))->ResultArray();
       $this->SetData('Announcements', $Discussions);
       
       // Get Events
@@ -263,7 +263,7 @@ class GroupController extends Gdn_Controller {
       }
       
       $this->Form = $Form;
-      $this->CssClass .= ' NoPanel';
+      $this->CssClass .= ' NoPanel NarrowForm';
       $this->Render('AddEdit');
    }
    

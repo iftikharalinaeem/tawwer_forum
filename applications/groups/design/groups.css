@@ -14,8 +14,12 @@
 .Group-Content .Group-Box {
   -webkit-column-break-inside: avoid;
   column-break-inside: avoid;
-  overflow: hidden;
   *zoom: 1;
+}
+.Group-Content .Group-Box:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .Group-Events {
@@ -179,6 +183,35 @@
   column-break-inside: avoid;
 }
 
+.Groups.Group .Group-Events {
+  position: relative;
+}
+.Groups.Group .Group-Events .DataList-Events {
+  padding: 12px 0px;
+}
+.Groups.Group .Group-Events .DataList-Events :first-child {
+  margin-top: 0px;
+}
+.Groups.Group .Group-Events .DataList-Events :last-child {
+  margin-bottom: 0px;
+}
+.Groups.Group .Group-Events .Event {
+  margin: 12px 0px;
+}
+.Groups.Group .Group-Events .Event .Event-Title {
+  margin-bottom: 0px;
+}
+.Groups.Group .Group-Events .Event .Event-Time {
+  font-weight: normal;
+  font-size: 12px;
+}
+.Groups.Group .Group-Events .Event .Event-Location {
+  line-height: 1.2em;
+}
+.Groups.Group .Group-Events .Event .Event-Description {
+  display: none;
+}
+
 .ui-timepicker-list {
   overflow-y: auto;
   height: 150px;
@@ -272,6 +305,17 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   clear: left;
   margin: 10px 0;
   padding-bottom: 20px;
+}
+
+.Group-Box .Buttons {
+  text-align: right;
+  margin: 5px 0 10px;
+}
+.Group-Box .Buttons .Dropdown {
+  text-align: left;
+  left: auto;
+  right: 0;
+  min-width: 100px !important;
 }
 
 .Group-Announcements .ItemDiscussion {
