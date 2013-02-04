@@ -63,7 +63,6 @@ class EventController extends Gdn_Controller {
       $this->AddJsFile('jquery.timepicker.min.js');
       $this->AddJsFile('jquery.dropdown.js');
       $this->AddJsFile('jstz.min.js');
-      
       $this->AddCssFile('jquery.dropdown.css');
       
       // Lookup group, if there is one
@@ -167,6 +166,12 @@ class EventController extends Gdn_Controller {
     */
    public function Edit($EventID) {
       Gdn_Theme::Section('Event');
+      $this->Permission('Garden.Signin.Allow');
+      
+      $this->AddJsFile('jquery.timepicker.min.js');
+      $this->AddJsFile('jquery.dropdown.js');
+      $this->AddJsFile('jstz.min.js');
+      $this->AddCssFile('jquery.dropdown.css');
       
       // Lookup event
       $EventModel = new EventModel();
@@ -189,9 +194,23 @@ class EventController extends Gdn_Controller {
          if (!$Group) throw NotFoundException('Group');
          $this->SetData('Group', $Group);
          
+         $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       }
       
+      $this->Title(T('Edit Event'));
+      $this->AddBreadcrumb($Event['Name'], EventUrl($Event));
+      $this->AddBreadcrumb($this->Title());
       
+      $this->Form->SetData($Event);
+      
+      // Timezones
+      $this->SetData('Timezones', EventModel::Timezones());
+      
+      $EventModel = new EventModel();
+      $this->Form->SetModel($EventModel);
+      if ($this->Form->IsPostBack()) {
+         
+      }
       
       $this->View = 'add';
       $this->CssClass .= ' NoPanel NarrowForm';
