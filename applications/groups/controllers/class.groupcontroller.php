@@ -82,6 +82,10 @@ class GroupController extends Gdn_Controller {
       $this->SetData('Members', $Users);
       
       $this->Title(htmlspecialchars($Group['Name']));
+      $this->Description(Gdn_Format::PlainText($Group['Description'], $Group['Format']));
+      if ($Group['Icon']) {
+         $this->Image(Gdn_Upload::Url($Group['Icon']));
+      }
       require_once $this->FetchViewLocation('group_functions');
       $this->CssClass .= ' NoPanel';
       $this->Render('Group');

@@ -88,3 +88,6 @@ $St->Table('Activity')
    ->Column('RecordType', 'varchar(20)', TRUE, 'index.Record')
    ->Column('RecordID', 'int', TRUE, 'index.Record')
    ->Set();
+
+$ActivityModel = new ActivityModel();
+$ActivityModel->DefineType('GroupApplication');
