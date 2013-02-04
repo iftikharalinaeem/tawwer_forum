@@ -46,6 +46,35 @@ class EventModel extends Gdn_Model {
    }
    
    /**
+    * Invite an entire group to this event
+    * 
+    * @param integer $EventID
+    * @param integer $GroupID
+    */
+   public function InviteGroup($EventID, $GroupID) {
+      $Event = $this->GetID($EventID, DATASET_TYPE_ARRAY);
+      $GroupModel = new GroupModel();
+      $GroupMembers = $GroupModel->GetMembers($GroupID);
+      
+      // Notify the users of the invitation
+      $ActivityModel = new ActivityModel();
+      foreach ($GroupMembers as $GroupMember) {
+         $ActivityID = $ActivityModel->Add(
+            Gdn::Session()->UserID,
+            'Events',
+            '',
+            $GroupMember['UserID'],
+            '',
+            EventUrl($Event),
+            FALSE
+         );
+         
+         $Story = GetValue('Name', $Event, '');
+         $ActivityModel->SendNotification($ActivityID, $Story);
+      }
+   }
+   
+   /**
     * Get list of invited
     * @param type $EventID
     * @return type

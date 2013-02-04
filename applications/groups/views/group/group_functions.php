@@ -175,8 +175,9 @@ if (!function_exists('WriteGroupButtons')) :
 /**
  * Output action buttons to join/apply to group.
  */
-function WriteGroupButtons() {
-   $Group = Gdn::Controller()->Data('Group');
+function WriteGroupButtons($Group = FALSE) {
+   if (!$Group)
+      $Group = Gdn::Controller()->Data('Group');
    
    echo '<div class="Group-Buttons">';
    
@@ -210,8 +211,22 @@ if (!function_exists('WriteGroupCards')) :
  * 
  * @param array $Groups
  */
-function WriteGroupCards($Groups) {
-   decho($Groups, 'Group Cards');
+function WriteGroupCards($Groups, $EmptyMessage = '') {
+   if (!$Groups)
+      WriteEmptyState($EmptyMessage);
+   
+   if (is_array($Groups)) {
+      echo '<div class="Cards Cards-Groups">';
+      foreach ($Groups as $Group) {
+         echo '<div class="Group Card">';
+            echo '<h3 class="Group-Name">'.Anchor(Gdn_Format::Text($Group['Name']), GroupUrl($Group)).'</h3>';
+            WriteGroupIcon($Group);
+            echo '<p class="Group-Description">'.Gdn_Format::Text($Group['Description']).'</p>';
+            WriteGroupButtons($Group);
+         echo '</div>';
+      }
+      echo '</div>';
+   }
 }
 endif;
 
@@ -220,8 +235,9 @@ if (!function_exists('WriteGroupIcon')) :
 /**
  * Output group icon image.
  */
-function WriteGroupIcon() {
-   $Group = Gdn::Controller()->Data('Group');
+function WriteGroupIcon($Group = FALSE) {
+   if (!$Group)
+      $Group = Gdn::Controller()->Data('Group');
    
    if ($Group['Icon'])
       echo Img(Gdn_Upload::Url($Group['Icon']), array('class' => 'Group-Icon'));
@@ -240,15 +256,11 @@ function WriteGroupList($Groups) {
    
    if (is_array($Groups)) {
       echo '<ul class="DataList DataList-Groups">';
-      
       foreach ($Groups as $Group) {
          echo '<li class="Item Item-Group">';
-         
-         echo Anchor(htmlspecialchars($Group['Name']), GroupUrl($Group));
-         
+         echo Anchor(Gdn_Format::Text($Group['Name']), GroupUrl($Group));
          echo '</li>';
       }
-      
       echo '</ul>';
    }
 }
