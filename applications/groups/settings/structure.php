@@ -90,4 +90,5 @@ $St->Table('Activity')
    ->Set();
 
 $ActivityModel = new ActivityModel();
-$ActivityModel->DefineType('GroupApplication');
+$ActivityModel->DefineType('Groups');
+$ActivityModel->DefineType('Events');

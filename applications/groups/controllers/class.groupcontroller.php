@@ -69,8 +69,9 @@ class GroupController extends Gdn_Controller {
       $this->SetData('Announcements', $Discussions);
       
       // Get Events
+      $MaxEvents = C('Groups.Events.MaxList', 5);
       $EventModel = new EventModel();
-      $Events = $EventModel->GetWhere(array('EventID <' => 5))->ResultArray(); // FAKE IT
+      $Events = $EventModel->GetWhere(array('DateStarts >' => date('Y-m-d H:i:s')), 'DateStarts', 'asc', $MaxEvents)->ResultArray();
       $this->SetData('Events', $Events);
       
       // Get Leaders
