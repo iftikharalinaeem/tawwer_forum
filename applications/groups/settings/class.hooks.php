@@ -49,6 +49,10 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
    
+   public function Base_AfterDiscussionFilters_Handler($Sender) {
+      echo '<li class="Groups">'.Anchor(Sprite('SpGroups').' '.T('Groups'), '/groups').'</li> ';
+   }
+   
    /**
     * 
     * @param PostController $Sender
