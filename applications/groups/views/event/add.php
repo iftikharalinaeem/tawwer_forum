@@ -5,9 +5,6 @@
       <?php 
          echo $this->Form->Errors(); 
          echo $this->Form->Open();
-         
-         if ($this->Data('Group'))
-            echo $this->Form->Hidden('GroupID');
       ?>
 
       <div class="Event" data-groupid="<?php echo $this->Data('Group.GroupID'); ?>">

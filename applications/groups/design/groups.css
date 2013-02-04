@@ -60,58 +60,58 @@
   margin: 20px auto;
 }
 
-.Event.add .DatePicker {
+.Event.add .DatePicker, .Event.edit .DatePicker {
   width: 120px;
 }
-.Event.add .TimePicker {
+.Event.add .TimePicker, .Event.edit .TimePicker {
   width: 100px;
 }
-.Event.add .EventTime .P > div {
+.Event.add .EventTime .P > div, .Event.edit .EventTime .P > div {
   display: inline-block;
 }
-.Event.add .EventTime .To {
+.Event.add .EventTime .To, .Event.edit .EventTime .To {
   display: none;
 }
-.Event.add .EventTime .Timezone {
+.Event.add .EventTime .Timezone, .Event.edit .EventTime .Timezone {
   display: inline-block;
 }
-.Event.add .EventTime .EndTime {
+.Event.add .EventTime .EndTime, .Event.edit .EventTime .EndTime {
   float: right;
 }
-.Event.add .EventTime label {
+.Event.add .EventTime label, .Event.edit .EventTime label {
   display: none;
   width: 50px;
 }
-.Event.add .EventTime label.When {
+.Event.add .EventTime label.When, .Event.edit .EventTime label.When {
   display: inline-block;
 }
-.Event.add .EventTime .Timebased {
+.Event.add .EventTime .Timebased, .Event.edit .EventTime .Timebased {
   display: none !important;
 }
-.Event.add .EventTime .Timezone select {
+.Event.add .EventTime .Timezone select, .Event.edit .EventTime .Timezone select {
   position: absolute;
   visibility: hidden;
   top: 16px;
 }
-.Event.add .EventTime .Timezone .EventTimezoneDisplay {
+.Event.add .EventTime .Timezone .EventTimezoneDisplay, .Event.edit .EventTime .Timezone .EventTimezoneDisplay {
   cursor: pointer;
 }
-.Event.add .EventTime .Timezone .EventTimezoneDisplay:hover {
+.Event.add .EventTime .Timezone .EventTimezoneDisplay:hover, .Event.edit .EventTime .Timezone .EventTimezoneDisplay:hover {
   text-decoration: underline;
 }
-.Event.add .EventTime.Times .Timebased {
+.Event.add .EventTime.Times .Timebased, .Event.edit .EventTime.Times .Timebased {
   display: inline-block !important;
 }
-.Event.add .EventTime.Both .To {
+.Event.add .EventTime.Both .To, .Event.edit .EventTime.Both .To {
   display: block;
 }
-.Event.add .EventTime.Both label {
+.Event.add .EventTime.Both label, .Event.edit .EventTime.Both label {
   display: inline-block;
 }
-.Event.add .EventTime.Both label.When {
+.Event.add .EventTime.Both label.When, .Event.edit .EventTime.Both label.When {
   display: none;
 }
-.Event.add .EventTime.Both .EndTime {
+.Event.add .EventTime.Both .EndTime, .Event.edit .EventTime.Both .EndTime {
   display: none !important;
 }
 
