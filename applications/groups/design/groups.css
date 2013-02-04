@@ -56,18 +56,8 @@
 }
 
 .EmptyMessage {
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  -ms-border-radius: 10px;
-  -o-border-radius: 10px;
-  border-radius: 10px;
   text-align: center;
   margin: 20px auto;
-  padding: 15px 5px;
-  width: 90%;
-  background: #f7f7f7;
-  border: 1px solid #dddddd;
-  color: #70727c;
 }
 
 .Event.add .DatePicker {

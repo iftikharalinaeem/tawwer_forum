@@ -1,12 +1,5 @@
 // Empty state boxes
 .EmptyMessage {
-   @include border-radius(10px);
    text-align: center;
    margin: 20px auto;
-   padding: 15px 5px;
-   width: 90%;
-   
-   background: $shaded; // Base Vanilla highlight
-   border: 1px solid $boxBorder; // Panel nav
-   color: $lightText; // Meta
 }
