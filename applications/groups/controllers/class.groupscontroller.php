@@ -32,6 +32,8 @@ class GroupsController extends Gdn_Controller {
       $this->AddCssFile('style.css');
       $this->AddCssFile('groups.css');
       
+      $this->AddBreadcrumb(T('Groups'), Url('/groups'));
+      
       parent::Initialize();
    }
    

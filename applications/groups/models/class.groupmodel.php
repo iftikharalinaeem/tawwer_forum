@@ -83,6 +83,14 @@ class GroupModel extends Gdn_Model {
          
          if ($GroupApplicant) {
             $Perms['Join'] = FALSE; // Already applied or banned.
+            switch (strtolower($GroupApplicant['Type'])) {
+               case 'application':
+                  $Perms['Join.Reason'] = T("You've applied to join this group.");
+                  break;
+               case 'ban':
+                  $Perms['Join.Reason'] = T("You're banned from joining this group.");
+                  break;
+            }
          }
          
          // Moderators can view and edit all groups.
@@ -142,6 +150,19 @@ class GroupModel extends Gdn_Model {
       return $Row;
    }
    
+   public function GetMembers($GroupID, $Where = array()) {
+      // First grab the members.
+      $Users = $this->SQL
+         ->From('UserGroup')
+         ->Where('GroupID', $GroupID)
+         ->Where($Where)
+         ->OrderBy('DateInserted')
+         ->Get()->ResultArray();
+      
+      Gdn::UserModel()->JoinUsers($Users, array('UserID'));
+      return $Users;
+   }
+   
    public static function ParseID($ID) {
       $Parts = explode('-', $ID, 2);
       return $Parts[0];
@@ -172,18 +193,18 @@ class GroupModel extends Gdn_Model {
       
       switch (strtolower($Group['Registration'])) {
          case 'public':
-            
             // This is a public group, go ahead and add the user.
             TouchValue('Role', $Data, 'Member');
             $Model = new Gdn_Model('UserGroup');
-            $Saved = $Model->Insert($Data);
+            $Model->Insert($Data);
             $this->Validation = $Model->Validation;
             return count($this->ValidationResults()) == 0;
             
          case 'approval':
             // The user must apply to this group.
-            $Model = new Gdn_Model('GroupApplication');
-            $Saved = $Model->Insert($Data);
+            $Data['Type'] = 'Application';
+            $Model = new Gdn_Model('GroupApplicant');
+            $Model->Insert($Data);
             $this->Validation = $Model->Validation;
             return count($this->ValidationResults()) == 0;
             
@@ -210,9 +231,37 @@ class GroupModel extends Gdn_Model {
          'GroupID' => GetValue('GroupID', $Data)));
    }
    
+   public function Save($Data, $Settings = FALSE) {
+      $GroupID = parent::Save($Data, $Settings);
+      
+      if ($GroupID) {
+         // Make sure the group owner is a member.
+         $Group = $this->GetID($GroupID);
+         $InsertUserID = $Group['InsertUserID'];
+         $Row = $this->SQL->GetWhere('UserGroup', array('GroupID' => $GroupID, 'UserID' => $InsertUserID))->FirstRow(DATASET_TYPE_ARRAY);
+         if (!$Row) {
+            $Row = array(
+               'GroupID' => $GroupID,
+               'UserID' => $InsertUserID,
+               'Role' => 'Leader');
+            $Model = new Gdn_Model('UserGroup');
+            $Model->Insert($Row);
+            $this->Validation = $Model->Validation;
+         }
+      }
+      return $GroupID;
+   }
+   
+   protected function ValidateRule($FieldName, $Data, $Rule, $CustomError = FALSE) {
+      $Value = GetValue($FieldName, $Data);
+      $Valid = $this->Validation->ValidateRule($Value, $FieldName, $Rule, $CustomError);
+      if ($Valid !== TRUE)
+         $this->Validation->AddValidationResult($FieldName, $Valid.$Value);
+   }
+   
    public function ValidateJoin($Data) {
-      $this->Validation->ApplyRule('UserID', 'ValidateRequired');
-      $this->Validation->ApplyRule('GroupID', 'ValidateRequired');
+      $this->ValidateRule('UserID', $Data, 'ValidateRequired');
+      $this->ValidateRule('GroupID', $Data, 'ValidateRequired');
       
       $GroupID = GetValue('GroupID', $Data);
       if ($GroupID) {
@@ -220,7 +269,7 @@ class GroupModel extends Gdn_Model {
          
          switch (strtolower($Group['Registration'])) {
             case 'approval':
-               $this->Validation->ApplyRule('Reason', 'ValidateRequired', 'Why do you want to join?');
+               $this->ValidateRule('Reason', $Data, 'ValidateRequired', 'Why do you want to join?');
          }
       }
       

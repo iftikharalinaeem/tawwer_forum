@@ -19,19 +19,66 @@ function DateTile($Date) {
 endif;
 
 
-if (!function_exists('WriteDiscussionBlog')):
+if (!function_exists('WriteDiscussionBlogList')):
 /**
  * Output discussions in expanded format with excerpts.
  * 
  * @param array $Discussions 
  * @param string $EmptyMessage What to show when there's no content.
  */
-function WriteDiscussionBlog($Discussions, $EmptyMessage = '') {
+function WriteDiscussionBlogList($Discussions, $EmptyMessage = '') {
    if (!$Discussions)
       WriteEmptyState($EmptyMessage);
+   
+   if (is_array($Discussions)) {
+      include_once(PATH_APPLICATIONS .'/vanilla/views/discussions/helper_functions.php');
+      //include_once(PATH_APPLICATIONS .'/vanilla/views/modules/helper_functions.php');   
+      echo '<ul class="DataList Discussions DiscussionsBlog">';
+      foreach ($Discussions as $Discussion) {
+         WriteDiscussionBlog((object)$Discussion, 'Group');
+      }
+      echo '</ul>';
+   }
 }
 endif;
 
+
+if (!function_exists('WriteDiscussionBlog')):
+/**
+ * Output discussions in expanded format with excerpts.
+ * 
+ * @param object $Discussion
+ * @param string $Px 
+ */
+function WriteDiscussionBlog($Discussion, $Px = 'Bookmark') {
+?>
+<li id="<?php echo "{$Px}_{$Discussion->DiscussionID}"; ?>" class="<?php echo CssClass($Discussion); ?>">
+   <span class="Options">
+      <?php
+      echo BookmarkButton($Discussion);
+      ?>
+   </span>
+   <div class="Title"><?php
+      echo Anchor(Gdn_Format::Text($Discussion->Name, FALSE), DiscussionUrl($Discussion).($Discussion->CountCommentWatch > 0 ? '#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
+   ?></div>
+   <div class="Excerpt"><?php
+      echo SliceString(Gdn_Format::Text($Discussion->Body, FALSE), C('Groups.Announcements.ExcerptLength', 240));
+   ?></div>
+   <div class="Meta">
+      <?php   
+         $First = new stdClass();
+         $First->UserID = $Discussion->InsertUserID;
+         $First->Name = $Discussion->FirstName;
+         echo '<span class="MItem UserTile">'.
+            UserPhoto($First).' '.
+            UserAnchor($First).' '.
+            Gdn_Format::Date($Discussion->DateInserted, 'html').'</span>';   
+      ?>
+   </div>
+</li>
+<?php
+}
+endif;
 
 if (!function_exists('WriteDiscussionList')):
 /**
@@ -132,7 +179,7 @@ function WriteGroupButtons() {
    echo '<div class="Group-Buttons">';
    
    if (GroupPermission('Join'))
-      echo ' '.Anchor(T('Join This Group'), GroupUrl($Group, 'join'), 'Button Primary Group-JoinButton Popup').' ';
+      echo ' '.Anchor(T('Join This Group'), GroupUrl($Group, 'join'), 'Button BigButton Primary Group-JoinButton Popup').' ';
       
       
    $Options = array();
@@ -140,15 +187,15 @@ function WriteGroupButtons() {
    if (GroupPermission('Edit')) {
       $Options['Edit'] = array('Text' => T('Edit'), 'Url' => GroupUrl($Group, 'edit'));
    }
-   if (GroupPermission('Delete')) {
-      $Options['Delete'] = array('Text' => T('Delete'), 'Url' => GroupUrl($Group, 'delete'));
-   }
-   if (GroupPermission('Member')) {
+//   if (GroupPermission('Delete')) {
+//      $Options['Delete'] = array('Text' => T('Delete'), 'Url' => GroupUrl($Group, 'delete'));
+//   }
+   if (GroupPermission('Leave')) {
       $Options['Leave'] = array('Text' => T('Leave Group'), 'Url' => GroupUrl($Group, 'leave'), 'CssClass' => 'Popup');
    }
 
    if (count($Options))
-      echo ButtonDropDown($Options, 'Button DropRight Group-OptionsButton', Sprite('SpOptions', 'Sprite16'));
+      echo ButtonDropDown($Options, 'Button BigButton DropRight Group-OptionsButton', Sprite('SpOptions', 'Sprite16'));
    
    echo '</div>';
 }
@@ -214,7 +261,7 @@ if (!function_exists('WriteMemberCards')) :
  */
 function WriteMemberCards($Members) {
    if (!$Members)
-      echo WriteEmptyState("No one has joined yet. Spread the word!");
+      echo WriteEmptyState(T("GroupMembersEmpty", "No one has joined yet. Spread the word!"));
    
    if (is_array($Members)) {
       foreach ($Members as $Member) {
@@ -228,13 +275,18 @@ endif;
 if (!function_exists('WriteMemberGrid')) :
 /**
  * Output just the linked user photos in rows.
+ * No empty state because there is always at least 1 member.
  * 
  * @param array $Members
  */
 function WriteMemberGrid($Members) {
-   echo '<div class="PhotoGrid PhotoGridSmall">';
-         
-   echo '</div>';
+   if (is_array($Members)) {
+      echo '<div class="PhotoGrid PhotoGridSmall">';
+      foreach ($Members as $Member) {
+          echo UserPhoto($Member);
+      }
+      echo '</div>';
+   }
 }
 endif;
 
@@ -242,10 +294,17 @@ endif;
 if (!function_exists('WriteMemberSimpleList')) :
 /**
  * Output just the photo and linked username in a column.
+ * No empty state because there is always at least 1 member.
  * 
  * @param array $Members
  */
-function WriteMemberSimpleList($Members) {
-   //decho($Members, 'Member Simple List');
+function WriteMemberSimpleList($Members) {   
+   if (is_array($Members)) {
+      echo '<ul class="Group-MemberList">';
+      foreach ($Members as $Member) {
+         echo '<li class="Group-Member UserTile">'.UserPhoto($Member).' '.UserAnchor($Member)."</li>\n";
+      }
+      echo '</ul>';
+   }
 }
 endif;

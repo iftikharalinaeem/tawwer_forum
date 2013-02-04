@@ -12,7 +12,6 @@ class GroupController extends Gdn_Controller {
     * @var GroupModel
     */
    public $GroupModel;
-   
       
    /**
     * Include JS, CSS, and modules used by all methods.
@@ -34,6 +33,8 @@ class GroupController extends Gdn_Controller {
       $this->AddCssFile('style.css');
       $this->AddCssFile('groups.css');
       
+      $this->AddBreadcrumb(T('Groups'), Url('/groups'));
+      
       parent::Initialize();
    }
    
@@ -49,21 +50,22 @@ class GroupController extends Gdn_Controller {
       if (!$Group)
          throw NotFoundException('Group');
       
+      $GroupID = $Group['GroupID'];
+      
       // Force the canonical url.
       if ($ID != GroupSlug($Group))
          Redirect(GroupUrl($Group), 301);
       $this->CanonicalUrl(Url(GroupUrl($Group), '//'));
       
       $this->SetData('Group', $Group);
+      $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       
       // Get Discussions
-      //Gdn::Controller()->CountCommentsPerPage = 10;
-      //Gdn::Controller()->ShowOptions = FALSE;
       $DiscussionModel = new DiscussionModel();
       $Discussions = $DiscussionModel->GetWhere(array('DiscussionID <' => 10))->ResultArray(); // FAKE IT
-      //$this->SetData('Discussions', $Discussions);
+      $this->SetData('Discussions', $Discussions);
       
-      $Discussions = $DiscussionModel->GetWhere(array('DiscussionID <' => 4))->ResultArray(); // FAKE IT
+      $Discussions = $DiscussionModel->GetWhere(array('DiscussionID <' => 6))->ResultArray(); // FAKE IT
       $this->SetData('Announcements', $Discussions);
       
       // Get Events
@@ -73,12 +75,11 @@ class GroupController extends Gdn_Controller {
       $this->SetData('Events', $Events);
       
       // Get Leaders
-      $UserModel = new UserModel();
-      $Users = $UserModel->GetWhere(array('UserID <' => 5))->ResultArray(); // FAKE IT
+      $Users = $this->GroupModel->GetMembers($GroupID, array('Role' => 'Leader'));
       $this->SetData('Leaders', $Users);
       
       // Get Members
-      $Users = $UserModel->GetWhere(array('UserID <' => 50))->ResultArray(); // FAKE IT
+      $Users = $this->GroupModel->GetMembers($GroupID, array('Role' => 'Member'));
       $this->SetData('Members', $Users);
       
       $this->Title(htmlspecialchars($Group['Name']));
@@ -120,6 +121,7 @@ class GroupController extends Gdn_Controller {
       }
       
       $this->SetData('Group', $Group);
+      $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       $this->Render();
    }
    
@@ -146,6 +148,8 @@ class GroupController extends Gdn_Controller {
          $this->RedirectUrl = Url(GroupUrl($Group));
       }
       
+      $this->SetData('Group', $Group);
+      $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       $this->Render();
    }
    
@@ -227,6 +231,7 @@ class GroupController extends Gdn_Controller {
       if ($ID) {
          $Group = $this->GroupModel->GetID($ID);
          $this->SetData('Group', $Group);
+         $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       }
       
       if ($Form->AuthenticatedPostBack()) {
@@ -278,6 +283,7 @@ class GroupController extends Gdn_Controller {
          throw NotFoundException('Group');
       
       $this->SetData('Group', $Group);
+      $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       
       // Get Leaders
       $UserModel = new UserModel();
