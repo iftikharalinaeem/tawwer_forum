@@ -215,14 +215,13 @@ if (!function_exists('WriteGroupCards')) :
 function WriteGroupCards($Groups, $EmptyMessage = '') {
    if (!$Groups)
       WriteEmptyState($EmptyMessage);
-   
-   if (is_array($Groups)) {
+   else {
       echo '<div class="Cards Cards-Groups">';
       foreach ($Groups as $Group) {
          echo '<div class="Group Card">';
             echo '<div class="GroupCardWrapper">';
-               echo '<h3 class="Group-Name">'.Anchor(Gdn_Format::Text($Group['Name']), GroupUrl($Group)).'</h3>';
                WriteGroupIcon($Group);
+               echo '<h3 class="Group-Name">'.Anchor(Gdn_Format::Text($Group['Name']), GroupUrl($Group)).'</h3>';
                echo '<p class="Group-Description">'.Gdn_Format::Text($Group['Description']).'</p>';
             echo '</div>';
             WriteGroupButtons($Group);
@@ -258,7 +257,7 @@ if (!function_exists('WriteGroupList')) :
  */
 function WriteGroupList($Groups) {   
    if (is_array($Groups)) {
-      echo '<ul class="DataList DataList-Groups">';
+      echo '<ul class="NarrowList DataList-Groups">';
       foreach ($Groups as $Group) {
          echo '<li class="Item Item-Group">';
          echo Anchor(Gdn_Format::Text($Group['Name']), GroupUrl($Group));
