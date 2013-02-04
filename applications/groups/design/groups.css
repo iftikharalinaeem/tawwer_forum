@@ -22,7 +22,8 @@
   clear: both;
 }
 
-.Group-Events {
+.Group-Events,
+.Group-Announcements {
   -webkit-column-break-after: always;
   column-break-after: always;
 }
