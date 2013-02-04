@@ -89,6 +89,32 @@
    }
 }
 
+.Cards-Groups {
+   
+   .Card {
+      width: 310px;
+      margin: 30px 30px 0 0;
+      padding: 10px;
+      float: left;
+      border: 1px solid $boxBorder;
+      @include border-radius(10px);
+      
+      h3 {
+         font-size: 18px;
+         line-height: 1.2;
+         margin: 0;
+      }
+      img {
+         height: 80px;
+         width: 80px;  
+      }
+   }
+   .GroupCardWrapper {
+      height: 200px;  
+      @include pie-clearfix; 
+   }
+}
+
 
 // Generic style
 .UserTile {

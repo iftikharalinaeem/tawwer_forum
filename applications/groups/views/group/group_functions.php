@@ -66,12 +66,10 @@ function WriteDiscussionBlog($Discussion, $Px = 'Bookmark') {
    ?></div>
    <div class="Meta">
       <?php   
-         $First = new stdClass();
-         $First->UserID = $Discussion->InsertUserID;
-         $First->Name = $Discussion->FirstName;
+         $FirstUser = UserBuilder($Discussion, 'First');
          echo '<span class="MItem UserTile">'.
-            UserPhoto($First).' '.
-            UserAnchor($First).' '.
+            UserPhoto($FirstUser).' '.
+            UserAnchor($FirstUser).' '.
             Gdn_Format::Date($Discussion->DateInserted, 'html').'</span>';   
       ?>
    </div>
@@ -180,7 +178,7 @@ function WriteGroupButtons($Group = FALSE) {
    echo '<div class="Group-Buttons">';
    
    if (GroupPermission('Join'))
-      echo ' '.Anchor(T('Join This Group'), GroupUrl($Group, 'join'), 'Button BigButton Primary Group-JoinButton Popup').' ';
+      echo ' '.Anchor(T('Join This Group'), GroupUrl($Group, 'join'), 'Button Primary Group-JoinButton Popup').' ';
       
       
    $Options = array();
@@ -196,7 +194,7 @@ function WriteGroupButtons($Group = FALSE) {
    }
 
    if (count($Options))
-      echo ButtonDropDown($Options, 'Button BigButton DropRight Group-OptionsButton', Sprite('SpOptions', 'Sprite16'));
+      echo ButtonDropDown($Options, 'Button DropRight Group-OptionsButton', Sprite('SpOptions', 'Sprite16'));
    
    echo '</div>';
 }
@@ -217,9 +215,11 @@ function WriteGroupCards($Groups, $EmptyMessage = '') {
       echo '<div class="Cards Cards-Groups">';
       foreach ($Groups as $Group) {
          echo '<div class="Group Card">';
-            echo '<h3 class="Group-Name">'.Anchor(Gdn_Format::Text($Group['Name']), GroupUrl($Group)).'</h3>';
-            WriteGroupIcon($Group);
-            echo '<p class="Group-Description">'.Gdn_Format::Text($Group['Description']).'</p>';
+            echo '<div class="GroupCardWrapper">';
+               echo '<h3 class="Group-Name">'.Anchor(Gdn_Format::Text($Group['Name']), GroupUrl($Group)).'</h3>';
+               WriteGroupIcon($Group);
+               echo '<p class="Group-Description">'.Gdn_Format::Text($Group['Description']).'</p>';
+            echo '</div>';
             WriteGroupButtons($Group);
          echo '</div>';
       }

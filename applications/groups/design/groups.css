@@ -219,7 +219,7 @@
   width: 6.5em;
   background: #fff;
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -359,6 +359,37 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .Group-Footer .Group-Members {
   width: 480px;
   margin-right: 0;
+}
+
+.Cards-Groups .Card {
+  width: 310px;
+  margin: 30px 30px 0 0;
+  padding: 10px;
+  float: left;
+  border: 1px solid #dddddd;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+}
+.Cards-Groups .Card h3 {
+  font-size: 18px;
+  line-height: 1.2;
+  margin: 0;
+}
+.Cards-Groups .Card img {
+  height: 80px;
+  width: 80px;
+}
+.Cards-Groups .GroupCardWrapper {
+  height: 200px;
+  *zoom: 1;
+}
+.Cards-Groups .GroupCardWrapper:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .UserTile {
