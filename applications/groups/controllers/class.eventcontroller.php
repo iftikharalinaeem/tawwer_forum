@@ -93,7 +93,9 @@ class EventController extends Gdn_Controller {
       $this->Form->SetModel($EventModel);
       if ($this->Form->IsPostBack()) {
          $Event = $this->Form->FormValues();
-         $Event['GroupID'] = $GroupID;
+         
+         if ($GroupID)
+            $Event['GroupID'] = $GroupID;
          
          try {
             // Timezone
