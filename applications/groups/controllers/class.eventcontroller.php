@@ -73,7 +73,6 @@ class EventController extends Gdn_Controller {
          $Group = $GroupModel->GetID($GroupID);
          if (!$Group) throw NotFoundException('Group');
          $this->SetData('Group', $Group);
-         $this->Form->SetValue('GroupID', $GroupID);
 
          $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $GroupID);
          if (!$MemberOfGroup)
@@ -152,6 +151,44 @@ class EventController extends Gdn_Controller {
          }
          
       }
+      
+      $this->View = 'add';
+      $this->CssClass .= ' NoPanel NarrowForm';
+      return $this->Render();
+   }
+   
+   /**
+    * Edit an event
+    * 
+    * @param type $EventID
+    */
+   public function Edit($EventID) {
+      Gdn_Theme::Section('Event');
+      
+      // Lookup event
+      $EventModel = new EventModel();
+      $Event = $EventModel->GetID($EventID, DATASET_TYPE_ARRAY);
+      if (!$Event) throw NotFoundException('Event');
+      $this->SetData('Event', $Event);
+      
+      $OrganizerID = $Event['InsertUserID'];
+      $IsOrganizer = $OrganizerID == Gdn::Session()->UserID;
+      
+      if (!$IsOrganizer && !Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
+         throw ForbiddenException('edit this event');
+      
+      // Lookup group, if there is one
+      $GroupID = GetValue('GroupID', $Event, FALSE);
+      if ($GroupID) {
+         
+         $GroupModel = new GroupModel();
+         $Group = $GroupModel->GetID($GroupID, DATASET_TYPE_ARRAY);
+         if (!$Group) throw NotFoundException('Group');
+         $this->SetData('Group', $Group);
+         
+      }
+      
+      
       
       $this->View = 'add';
       $this->CssClass .= ' NoPanel NarrowForm';
