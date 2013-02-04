@@ -372,9 +372,10 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   line-height: 1.2;
   margin: 0;
 }
-.Cards-Groups .Card img {
+.Cards-Groups .Card .Group-Icon {
   height: 80px;
   width: 80px;
+  padding: 0 10px 10px 0;
 }
 .Cards-Groups .GroupCardWrapper {
   height: 200px;
