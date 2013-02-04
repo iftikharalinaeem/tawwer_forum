@@ -109,7 +109,8 @@
       }
       
       span.Tip a {
-         text-decoration: dotted;
+         border-bottom: 1px dotted;
+         cursor: pointer;
       }
       
       .Body {
