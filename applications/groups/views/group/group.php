@@ -23,7 +23,7 @@
    <div class="Group-Box Group-Announcements">
       <h2><?php echo T('Announcements'); ?></h2>
       <?php $EmptyMessage = T('GroupEmptyAnnouncements', "Important stuff will go here one day."); ?>
-      <?php WriteDiscussionBlog($this->Data('Announcements'), $EmptyMessage); ?>
+      <?php WriteDiscussionBlogList($this->Data('Announcements'), $EmptyMessage); ?>
    </div>
    
    <div class="Group-Box Group-Discussions">
