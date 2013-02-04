@@ -144,7 +144,7 @@ class EventModel extends Gdn_Model {
          $Event['DateEnds'] = $DateEnds->format('Y-m-d H:i:s');
       }
       
-      parent::Save($Event);
+      return parent::Save($Event);
    }
    
    /**
