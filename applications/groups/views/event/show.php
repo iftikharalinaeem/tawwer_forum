@@ -53,6 +53,9 @@
       )); ?>
       </li>
       <li><span class="Label">Where</span> <?php echo $this->Data('Event.Location'); ?> <span class="Tip">( <?php echo Wrap($TimezoneAbbr, 'a', array('title' => $TimezoneLabel)); ?> )</span></li>
+      <?php if ($this->Data('Group')): ?>
+         <li><span class="Label">Group</span> <?php echo Anchor(GetValue('Name', $this->Data('Group')), GroupUrl($this->Data('Group'))); ?></li>
+      <?php endif; ?>
       <li><span class="Label">Organizer</span> <?php echo UserAnchor($this->Data('Event.Organizer')); ?></li>
    </ul>
    

@@ -72,8 +72,9 @@ class EventController extends Gdn_Controller {
          $GroupModel = new GroupModel();
          $Group = $GroupModel->GetID($GroupID);
          if (!$Group) throw NotFoundException('Group');
+         $this->SetData('Group', $Group);
+         $this->Form->SetValue('GroupID', $GroupID);
 
-         $this->SetData('GroupID', $GroupID);
          $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $GroupID);
          if (!$MemberOfGroup)
             throw ForbiddenException('create a new event');
@@ -183,6 +184,7 @@ class EventController extends Gdn_Controller {
          $GroupModel = new GroupModel();
          $Group = $GroupModel->GetID($GroupID, DATASET_TYPE_ARRAY);
          if (!$Group) throw NotFoundException('Group');
+         $this->SetData('Group', $Group);
          
          // Check if this person is a member of the group or a moderator
          $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $GroupID);
@@ -190,7 +192,7 @@ class EventController extends Gdn_Controller {
             $ViewEvent = TRUE;
          
          $this->AddBreadcrumb('Groups', Url('/groups'));
-         $this->AddBreadcrumb($Group['Name'], Url("/group/{$GroupID}"));
+         $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
          
       } else {
          
@@ -264,7 +266,7 @@ class EventController extends Gdn_Controller {
             $AttendEvent = TRUE;
          
          $this->AddBreadcrumb('Groups', Url('/groups'));
-         $this->AddBreadcrumb($Group['Name'], Url("/group/{$GroupID}"));
+         $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
          
       } else {
          
