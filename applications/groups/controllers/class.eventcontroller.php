@@ -73,6 +73,7 @@ class EventController extends Gdn_Controller {
          $Group = $GroupModel->GetID($GroupID);
          if (!$Group) throw NotFoundException('Group');
 
+         $this->SetData('GroupID', $GroupID);
          $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $GroupID);
          if (!$MemberOfGroup)
             throw ForbiddenException('create a new event');
@@ -138,6 +139,9 @@ class EventController extends Gdn_Controller {
             
             if ($EventID = $this->Form->Save()) {
                $Event['EventID'] = $EventID;
+               if ($GroupID)
+                  $EventModel->InviteGroup($EventID, $GroupID);
+               
                $this->InformMessage(FormatString(T("New event created for <b>'{Name}'</b>"), $Event));
                Redirect(EventUrl($Event));
             }
@@ -149,6 +153,7 @@ class EventController extends Gdn_Controller {
       }
       
       $this->View = 'add';
+      $this->CssClass .= ' NoPanel NarrowForm';
       return $this->Render();
    }
    

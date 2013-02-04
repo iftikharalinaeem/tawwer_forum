@@ -7,7 +7,7 @@
          echo $this->Form->Open();
       ?>
 
-      <div class="Event">
+      <div class="Event" data-groupid="<?php echo $this->Data('GroupID'); ?>">
          <div class="P Name">
             <?php echo $this->Form->Label('Name of the Event', 'Name'); ?>
             <div><?php echo $this->Form->TextBox('Name'); ?></div>
@@ -63,7 +63,7 @@
 
          <div class="Buttons">
             <?php echo $this->Form->Button('Create Event', array('Type' => 'submit', 'class' => 'Button Primary')); ?> 
-            <?php echo $this->Form->Button('Cancel', array('Type' => 'button', 'class' => 'PopupClose Button CancelButton')); ?>
+            <?php echo $this->Form->Button('Cancel', array('Type' => 'button', 'class' => 'Button CancelButton')); ?>
          </div>
          
          <?php
