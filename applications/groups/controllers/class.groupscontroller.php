@@ -57,6 +57,7 @@ class GroupsController extends Gdn_Controller {
       $this->Title(T('Groups'));
       
       require_once $this->FetchViewLocation('group_functions', 'Group');
+      $this->CssClass .= ' NoPanel';
       $this->Render('Groups');
    }
 }

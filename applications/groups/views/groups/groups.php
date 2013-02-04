@@ -8,28 +8,27 @@ if (CheckPermission('Groups.Group.Add')) {
 }
 ?>
 
-<?php WriteGroupCards($this->Data('Groups'), 
-   T('GroupsEmpty', "No groups were found. What a lonesome world you must live in.")); ?>
-
-<!-- All of the panel stuff goes here. -->
-
-<?php Gdn_Theme::AssetBegin('Panel'); ?>
-
 <?php if ($this->Data('MyGroups')): ?>
-<div class="Box">
-   <h4><?php echo T('My Groups'); ?></h4>
-   <?php WriteGroupList($this->Data('MyGroups'), 
-      T('MyGroupsEmpty', "You haven&rsquo;t joined any groups yet!")); ?>
-</div>
+<div class="Box-Cards">
+<h2><?php echo T('My Groups'); ?></h2>
+<?php WriteGroupCards($this->Data('MyGroups'), 
+   T("You haven't joined any groups yet.")); ?>
+</div>      
 <?php endif; ?>
 
 <?php if ($this->Data('NewGroups')) : ?>
-<div class="Box">
-   <h4><?php echo T('New Groups'); ?></h4>
-   <?php
-   WriteGroupList($this->Data('NewGroups'));
-   ?>
+<div class="Box-Cards">
+<h2><?php echo T('New Groups'); ?></h2>
+<?php
+WriteGroupCards($this->Data('NewGroups'));
+?>
 </div>
 <?php endif; ?>
 
-<?php Gdn_Theme::AssetEnd(); ?>
+<div class="Box-Cards">
+   <h2><?php echo T('Popular Groups'); ?></h2>
+<?php
+WriteGroupCards($this->Data('Groups'), 
+   T("There aren't any groups yet."));
+?>
+</div>

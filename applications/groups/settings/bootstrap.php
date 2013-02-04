@@ -21,7 +21,7 @@ function EventUrl($Event) {
 
 function GroupPermission($Permission = NULL, $GroupID = NULL) {
    if ($GroupID === NULL) {
-      $GroupID = Gdn::Controller()->Data('Group.GroupID');
+      $GroupID = Gdn::Controller()->Data('Group');
    }
    
    if (isset(Gdn::Controller()->GroupModel))

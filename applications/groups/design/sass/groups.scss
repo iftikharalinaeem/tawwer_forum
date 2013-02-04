@@ -13,12 +13,13 @@
    width: 100%;
    background-position: center top;
    background-repeat: no-repeat;
+   margin: 15px 0;
 }
 
 .Group-Icon {
    max-width: 100px;
    max-height: 100px;
-   padding: 10px 15px 0 0;
+   margin: 0 15px 15px 0;
    float: left;
 }
 
@@ -98,29 +99,44 @@
    }
 }
 
-.Cards-Groups {
-   .Card {
-      width: 310px;
-      margin: 30px 30px 0 0;
-      padding: 10px;
-      float: left;
-      border: 1px solid $boxBorder;
-      @include border-radius(10px);
-      
-      h3 {
-         font-size: 18px;
-         line-height: 1.2;
-         margin: 0;
-      }
-      .Group-Icon {
-         height: 80px;
-         width: 80px;  
-         padding: 0 10px 10px 0;
-      }
+.Card {
+   @include box-sizing(border-box);
+   border: 1px solid $boxBorder;
+   padding: 10px;
+   position: relative;
+   
+   .Card-Icon {
+      margin: 0 10px 10px 0;
+      height: 75px;
+      width: 75px;
    }
-   .GroupCardWrapper {
-      height: 200px;  
-      @include pie-clearfix; 
+   
+   h3 {
+      vertical-align: top;
+      margin-top: 0;
+   }
+}
+
+.Cards {
+   @include pie-clearfix;
+   margin: 0 -$cardSpacing;
+   
+   .CardWrap {
+      width: 33%;
+      float: left;
+      padding: $cardSpacing;
+      @include box-sizing(border-box);
+   }
+}
+
+.Cards-Groups .Card {
+   height: 150px;
+   
+   .Group-Buttons {
+      position: absolute;
+      padding: $cardSpacing;
+      right: 0;
+      bottom: 0;
    }
 }
 

@@ -30,12 +30,16 @@ class GroupModel extends Gdn_Model {
       
       $UserID = Gdn::Session()->UserID;
       
-      if (!isset($Permissions[$UserID])) {
+      if (is_array($GroupID)) {
+         $Group = $GroupID;
+         $GroupID = $Group['GroupID'];
+      }
+
+      $Key = "$UserID-$GroupID";
+      
+      if (!isset($Permissions[$Key])) {
          // Get the data for the group.
-         if (is_array($GroupID)) {
-            $Group = $GroupID;
-            $GroupID = $Group['GroupID'];
-         } else
+         if (!isset($Group))
             $Group = $this->GetID($GroupID);
          $UserGroup = Gdn::SQL()->GetWhere('UserGroup', array('GroupID' => $GroupID, 'UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
          $GroupApplicant = Gdn::SQL()->GetWhere('GroupApplicant', array('GroupID' => $GroupID, 'UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
@@ -102,10 +106,10 @@ class GroupModel extends Gdn_Model {
             $Perms['Moderate'] = TRUE;
          }
          
-         $Permissions[$UserID] = $Perms;
+         $Permissions[$Key] = $Perms;
       }
       
-      $Perms = $Permissions[$UserID];
+      $Perms = $Permissions[$Key];
       
       if (!$Permission)
          return $Perms;

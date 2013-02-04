@@ -175,25 +175,25 @@ if (!function_exists('WriteGroupButtons')) :
  * 
  * @param array $Group Optional. Uses data array's Group if none is provided. 
  */
-function WriteGroupButtons($Group = FALSE) {
+function WriteGroupButtons($Group = NULL) {
    if (!$Group)
       $Group = Gdn::Controller()->Data('Group');
    
    echo '<div class="Group-Buttons">';
    
-   if (GroupPermission('Join'))
+   if (GroupPermission('Join', $Group))
       echo ' '.Anchor(T('Join This Group'), GroupUrl($Group, 'join'), 'Button Primary Group-JoinButton Popup').' ';
       
       
    $Options = array();
    
-   if (GroupPermission('Edit')) {
+   if (GroupPermission('Edit', $Group)) {
       $Options['Edit'] = array('Text' => T('Edit'), 'Url' => GroupUrl($Group, 'edit'));
    }
 //   if (GroupPermission('Delete')) {
 //      $Options['Delete'] = array('Text' => T('Delete'), 'Url' => GroupUrl($Group, 'delete'));
 //   }
-   if (GroupPermission('Leave')) {
+   if (GroupPermission('Leave', $Group)) {
       $Options['Leave'] = array('Text' => T('Leave Group'), 'Url' => GroupUrl($Group, 'leave'), 'CssClass' => 'Popup');
    }
 
@@ -218,14 +218,14 @@ function WriteGroupCards($Groups, $EmptyMessage = '') {
    else {
       echo '<div class="Cards Cards-Groups">';
       foreach ($Groups as $Group) {
-         echo '<div class="Group Card">';
-            echo '<div class="GroupCardWrapper">';
-               WriteGroupIcon($Group);
+         echo '<div class="CardWrap"><div class="Group Card">';
+//            echo '<div class="GroupCardWrapper">';
+               WriteGroupIcon($Group, 'Group-Icon Card-Icon');
                echo '<h3 class="Group-Name">'.Anchor(Gdn_Format::Text($Group['Name']), GroupUrl($Group)).'</h3>';
                echo '<p class="Group-Description">'.Gdn_Format::Text($Group['Description']).'</p>';
-            echo '</div>';
+//            echo '</div>';
             WriteGroupButtons($Group);
-         echo '</div>';
+         echo '</div></div>';
       }
       echo '</div>';
    }
@@ -239,12 +239,12 @@ if (!function_exists('WriteGroupIcon')) :
  * 
  * @param array $Group Optional. Uses data array's Group if none is provided.
  */
-function WriteGroupIcon($Group = FALSE) {
+function WriteGroupIcon($Group = FALSE, $Class = 'Group-Icon') {
    if (!$Group)
       $Group = Gdn::Controller()->Data('Group');
    
    if ($Group['Icon'])
-      echo Img(Gdn_Upload::Url($Group['Icon']), array('class' => 'Group-Icon'));
+      echo Img(Gdn_Upload::Url($Group['Icon']), array('class' => $Class));
 }
 endif;
 
@@ -281,7 +281,7 @@ function WriteMemberCards($Members) {
    
    if (is_array($Members)) {
       foreach ($Members as $Member) {
-         WriteMemberCard($Member);
+         WriteMemberCard($Member, 'Card-Icon Group-Icon');
       } 
    }
 }
