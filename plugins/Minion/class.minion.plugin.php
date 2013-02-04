@@ -29,7 +29,7 @@
  *  1.9.2   Fix time limited operations expiry
  *  1.9.3   Eventize sanction list
  *  1.10    Add 'Log' method and Plugins.Minion.LogThreadID
- * 
+ *  1.10.1  Fix Log messages
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -40,7 +40,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.10',
+   'Version' => '1.10.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -981,16 +981,17 @@ class MinionPlugin extends Gdn_Plugin {
                'Kicked'    => $KickedUsers
             ));
             
-            $Acknowledge = T(" @\"{User.Name}\" banned from this thread{Time}{Reason}.{Force}");
-            
-            $this->Acknowledge($State['Sources']['Discussion'], FormatString($Acknowledge, array(
+            $Acknowledge = T("@@\"{User.Name}\" banned from this thread{Time}{Reason}.{Force}");
+            $Acknowledged = FormatString($Acknowledge, array(
                'User'         => $User,
                'Discussion'   => $State['Targets']['Discussion'],
                'Time'         => $State['Time'] ? " for {$State['Time']}" : '',
                'Reason'       => $State['Reason'] ? " for {$State['Reason']}" : '',
                'Force'        => $State['Force'] ? " Weapons are {$State['Force']}." : ''
-            )));
-            $this->Log(FormatString());
+            ));
+            
+            $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
+            $this->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
             break;
             
          case 'forgive':
@@ -1007,10 +1008,14 @@ class MinionPlugin extends Gdn_Plugin {
                'Kicked'    => $KickedUsers
             ));
             
-            $this->Acknowledge($State['Sources']['Discussion'], FormatString(T(" @\"{User.Name}\" is allowed back into this thread."), array(
+            $Acknowledge = T(" @\"{User.Name}\" is allowed back into this thread.");
+            $Acknowledged = FormatString($Acknowledge, array(
                'User'         => $User,
                'Discussion'   => $State['Targets']['Discussion']
-            )));
+            ));
+                
+            $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
+            $this->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
             break;
             
          case 'phrase':
@@ -1042,14 +1047,16 @@ class MinionPlugin extends Gdn_Plugin {
                ));
 
                $Acknowledge = T("\"{Phrase}\" is forbidden in this thread{Time}{Reason}.{Force}");
-               
-               $this->Acknowledge($State['Sources']['Discussion'], FormatString($Acknowledge, array(
+               $Acknowledged = FormatString($Acknowledge, array(
                   'Phrase'       => $Phrase,
                   'Discussion'   => $State['Targets']['Discussion'],
                   'Time'         => $State['Time'] ? " for {$State['Time']}" : '',
                   'Reason'       => $State['Reason'] ? " for {$State['Reason']}" : '',
                   'Force'        => $State['Force'] ? " Weapons are {$State['Force']}." : ''
-               )));
+               ));
+                  
+               $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
+               $this->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
             }
             
             // Allow the phrase
@@ -1065,10 +1072,14 @@ class MinionPlugin extends Gdn_Plugin {
                   'Phrases'   => $BannedPhrases
                ));
 
-               $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("\"{Phrase}\" is no longer forbidden in this thread."), array(
+               $Acknowledge = T("\"{Phrase}\" is no longer forbidden in this thread.");
+               $Acknowledged = FormatString($Acknowledge, array(
                   'Phrase'       => $Phrase,
                   'Discussion'   => $State['Targets']['Discussion']
-               )));
+               ));
+               
+               $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
+               $this->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
             }
             break;
             
@@ -1544,7 +1555,7 @@ class MinionPlugin extends Gdn_Plugin {
       // Admins+ exempt
       if (Gdn::UserModel()->CheckPermission($User, 'Garden.Settings.Manage')) {
          $this->Revolt($User, $Discussion, T("This user is protected."));
-         $this->Log(FormatString("Refusing to punish {User.Name}", array('User' => $User)));
+         $this->Log(FormatString(T("Refusing to punish @\"{User.Name}\""), array('User' => $User)));
          return FALSE;
       }
       
@@ -1555,6 +1566,15 @@ class MinionPlugin extends Gdn_Plugin {
       $this->EventArguments['Force'] = &$Force;
       $this->EventArguments['Options'] = &$Options;
       $this->FireEvent('Punish');
+      
+      if ($this->EventArguments['Punished']) {
+         $this->Log(FormatString(T("Delivered {Force} punishment to @\"{User.Name}\" for {Options.Reason}.\nCause: {Options.Cause}"), array(
+            'User'         => $User,
+            'Discussion'   => $Discussion,
+            'Force'        => $Force,
+            'Options'      => $Options
+         )), $Discussion);
+      }
       
       return $this->EventArguments['Punished'];
    }
@@ -1759,9 +1779,15 @@ USER BANNED
     * @param string $Message
     * @return type
     */
-   public function Log($Message) {
+   public function Log($Message, $TargetDiscussion = NULL, $InvokeUser = NULL) {
       $LogThreadID = C('Plugins.Minion.LogThreadID', FALSE);
       if ($LogThreadID === FALSE) return;
+      
+      if (!is_null($TargetDiscussion))
+         $Message .= "\n".Anchor(GetValue('Name', $TargetDiscussion), DiscussionUrl($TargetDiscussion));
+      
+      if (!is_null($InvokeUser))
+         $Message .= "\nInvoked by ".UserAnchor($InvokeUser);
       
       return $this->Message($this->Minion(), $LogThreadID, $Message);
    }
