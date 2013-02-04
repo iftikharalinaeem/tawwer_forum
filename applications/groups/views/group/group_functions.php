@@ -131,10 +131,10 @@ function WriteGroupButtons() {
    if (GroupPermission('Edit')) {
       $Options['Edit'] = array('Text' => T('Edit'), 'Url' => GroupUrl($Group, 'edit'));
    }
-   if (GroupPermission('Delete')) {
-      $Options['Delete'] = array('Text' => T('Delete'), 'Url' => GroupUrl($Group, 'delete'));
-   }
-   if (GroupPermission('Member')) {
+//   if (GroupPermission('Delete')) {
+//      $Options['Delete'] = array('Text' => T('Delete'), 'Url' => GroupUrl($Group, 'delete'));
+//   }
+   if (GroupPermission('Leave')) {
       $Options['Leave'] = array('Text' => T('Leave Group'), 'Url' => GroupUrl($Group, 'leave'), 'CssClass' => 'Popup');
    }
 
