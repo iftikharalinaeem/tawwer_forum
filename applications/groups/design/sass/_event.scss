@@ -153,6 +153,47 @@
    
 }
 
+.Groups.Group .Group-Events {
+   
+   position: relative;
+   
+   .Group-NewEventButton {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+   }
+   
+   .DataList-Events {
+      padding: 12px 0px;
+   
+      :first-child {
+         margin-top: 0px;
+      }
+      :last-child {
+         margin-bottom: 0px;
+      }
+   }
+   
+   .Event {
+      margin: 12px 0px;
+   
+      .Event-Title {
+         margin-bottom: 0px;
+      }
+      .Event-Time {
+         font-weight: normal;
+         font-size: 12px;
+      }
+      .Event-Location {
+         line-height: 1.2em;
+      }
+      .Event-Description {
+         display: none;
+      }
+   }
+   
+}
+
 .ui-timepicker-list {
 	overflow-y: auto;
 	height: 150px;

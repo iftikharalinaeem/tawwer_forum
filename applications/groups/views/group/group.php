@@ -17,7 +17,7 @@
    <div class="Group-Box Group-Events">
       <h2><?php echo T('Upcoming Events'); ?></h2>
       <?php $EmptyMessage = T('GroupEmptyEvents', "Aw snap, no events are coming up."); ?>
-      <?php WriteEventList($this->Data('Events'), $EmptyMessage); ?>
+      <?php WriteEventList($this->Data('Events'), $this->Data('Group'), $EmptyMessage); ?>
    </div>
    
    <div class="Group-Box Group-Announcements">
