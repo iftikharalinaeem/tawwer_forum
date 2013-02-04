@@ -220,9 +220,13 @@ function WriteGroupCards($Groups, $EmptyMessage = '') {
       foreach ($Groups as $Group) {
          echo '<div class="CardWrap"><div class="Group Card">';
 //            echo '<div class="GroupCardWrapper">';
+               $Url = GroupUrl($Group);
+               echo "<a href=\"$Url\" class=\"TextColor\">";
+            
                WriteGroupIcon($Group, 'Group-Icon Card-Icon');
-               echo '<h3 class="Group-Name">'.Anchor(Gdn_Format::Text($Group['Name']), GroupUrl($Group)).'</h3>';
-               echo '<p class="Group-Description">'.Gdn_Format::Text($Group['Description']).'</p>';
+               echo '<h3 class="Group-Name">'.htmlspecialchars($Group['Name']).'</h3>';
+               echo '<p class="Group-Description">'.Gdn_Format::PlainText($Group['Description'], $Group['Format']).'</p>';
+               echo '</a>';
 //            echo '</div>';
             WriteGroupButtons($Group);
          echo '</div></div>';
