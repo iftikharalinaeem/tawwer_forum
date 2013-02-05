@@ -72,7 +72,7 @@ $St->Table('Event')
    ->Column('DateEnds', 'datetime', TRUE)
    ->Column('Timezone', 'varchar(64)')
    ->Column('AllDayEvent', 'tinyint', '0')
-   ->Column('Location', 'varchar(255)')
+   ->Column('Location', 'varchar(255)', TRUE)
    ->Column('DateInserted', 'datetime')
    ->Column('InsertUserID', 'int') // organizer
    ->Column('DateUpdated', 'datetime', TRUE)
