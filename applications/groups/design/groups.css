@@ -294,9 +294,6 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .Group-Box {
   position: relative;
 }
-.Group-Box h2 {
-  min-height: 40px;
-}
 .Group-Box .Button-Controls {
   position: absolute;
   top: 0;
@@ -308,6 +305,9 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   left: auto;
   right: 0;
   min-width: 100px !important;
+}
+.Group-Box .Button-Controls + .NarrowList {
+  margin-top: 20px;
 }
 
 .Group-Announcements .DiscussionsBlog time {
@@ -322,6 +322,21 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 .Group-Discussions .MItem time {
   padding-right: 8px;
+}
+
+.Item .Applicant-Reason {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.Item:hover .Applicant-Reason {
+  overflow: visible;
+  white-space: normal;
+}
+
+.Join-Approved .Button-Approve,
+.Join-Denied .Button-Deny {
+  opacity: .5;
 }
 
 .Group-Header {

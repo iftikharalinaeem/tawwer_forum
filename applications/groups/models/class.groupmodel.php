@@ -41,9 +41,14 @@ class GroupModel extends Gdn_Model {
          // Get the data for the group.
          if (!isset($Group))
             $Group = $this->GetID($GroupID);
-         $UserGroup = Gdn::SQL()->GetWhere('UserGroup', array('GroupID' => $GroupID, 'UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
-         $GroupApplicant = Gdn::SQL()->GetWhere('GroupApplicant', array('GroupID' => $GroupID, 'UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
          
+         if ($UserID) {
+            $UserGroup = Gdn::SQL()->GetWhere('UserGroup', array('GroupID' => $GroupID, 'UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
+            $GroupApplicant = Gdn::SQL()->GetWhere('GroupApplicant', array('GroupID' => $GroupID, 'UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
+         } else {
+            $UserGroup = FALSE;
+            $GroupApplicant = FALSE;
+         }
          
          // Set the default permissions.
          $Perms = array(
@@ -91,6 +96,9 @@ class GroupModel extends Gdn_Model {
                case 'application':
                   $Perms['Join.Reason'] = T("You've applied to join this group.");
                   break;
+               case 'denied':
+                  $Perms['Join.Reason'] = T("You're application for this group was denied.");
+                  break;
                case 'ban':
                   $Perms['Join.Reason'] = T("You're banned from joining this group.");
                   break;
@@ -120,6 +128,9 @@ class GroupModel extends Gdn_Model {
             return FALSE;
          } else {
             $Permission = StringEndsWith($Permission, '.Reason', TRUE, TRUE);
+            if ($Perms[$Permission])
+               return '';
+            
             if (in_array($Permission, array('Member', 'Leader'))) {
                $Message = T(sprintf("You aren't a %s of this group.", strtolower($Permission)));
             } else {
@@ -152,6 +163,20 @@ class GroupModel extends Gdn_Model {
       $Cache[$ID] = $Row;
       
       return $Row;
+   }
+   
+   public function GetApplicants($GroupID, $Where = array(), $Limit = FALSE, $Offset = FALSE) {
+      // First grab the members.
+      $Users = $this->SQL
+         ->From('GroupApplicant')
+         ->Where('GroupID', $GroupID)
+         ->Where($Where)
+         ->OrderBy('DateInserted')
+         ->Limit($Limit, $Offset)
+         ->Get()->ResultArray();
+      
+      Gdn::UserModel()->JoinUsers($Users, array('UserID'));
+      return $Users;
    }
    
    public function GetMembers($GroupID, $Where = array(), $Limit = FALSE, $Offset = FALSE) {
@@ -224,10 +249,45 @@ class GroupModel extends Gdn_Model {
    /**
     * Approve a membership application.
     * 
-    * @param type $Data
+    * @param array $Data
     */
    public function JoinApprove($Data) {
+      // Grab the applicant row.
+      $ID = $Data['GroupApplicantID'];
+      $Row = $this->SQL->GetWhere('GroupApplicant', array('GroupApplicantID' => $ID))->FirstRow(DATASET_TYPE_ARRAY);
+      if (!$Row)
+         throw NotFoundException('Applicant');
       
+      $Value = GetValue('Type', $Data);
+      if (!in_array($Value, array('Approved', 'Denied')))
+         throw new Gdn_UserException(T('Type must be either approved or denied.'));
+      
+      if ($Value == 'Approved') {
+         // Add the user to the group.
+         $Model = new Gdn_Model('UserGroup');
+         $Inserted = $Model->Insert(array(
+            'UserID' => $Row['UserID'],
+            'GroupID' => $Row['GroupID'],
+            'Role' => GetValue('Role', $Data, 'Member')
+            ));
+         $this->Validation = $Model->Validation;
+         
+         if ($Inserted) {
+            $this->SQL->Delete('GroupApplicant', array('GroupApplicantID' => $ID));
+            
+            // TODO: Notify the user.
+         }
+         
+         return $Inserted;
+      } else {
+         $Model = new Gdn_Model('GroupApplicant');
+         $Saved = $Model->Save(array(
+            'GroupApplicantID' => $ID,
+            'Type' => $Value
+            ));
+         
+         return $Saved;
+      }
    }
    
    public function Leave($Data) {

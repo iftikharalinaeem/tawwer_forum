@@ -168,6 +168,41 @@ function WriteGroupBanner() {
 }
 endif;
 
+if (!function_exists('WriteGroupApplicants')):
+function WriteGroupApplicants($Applicants) {
+   if (!$Applicants)
+      return;
+   
+   $Group = Gdn::Controller()->Data('Group');
+   
+   echo '<div class="Group-Box Group-Applicants">'.
+      '<h2>'.T('Applicants').'</h2>'.
+      '<ul class="NarrowList Applicants">';
+   
+   
+   foreach ($Applicants as $Row) {
+      echo '<li id="GroupApplicant_'.$Row['GroupApplicantID'].'" class="Item">';
+         echo UserAnchor($Row);
+         echo ' <span class="Aside">';
+         
+         echo Anchor(T('Approve Applicant', 'Approve'), GroupUrl($Group, 'approve')."?id={$Row['GroupApplicantID']}", 'Button SmallButton Hijack Button-Approve').
+            ' '.
+            Anchor(T('Deny Applicant', 'Deny'), GroupUrl($Group, 'approve')."?id={$Row['GroupApplicantID']}&value=denied", 'Button SmallButton Hijack Button-Deny');
+         
+         echo '</span> ';
+         
+         echo '<p class="Applicant-Reason">'.
+            htmlspecialchars($Row['Reason']).
+            '</p>';
+      echo '</li>';
+   }
+   
+   echo '</ul>'.
+      '</div>';
+}
+   
+endif;
+
 
 if (!function_exists('WriteGroupButtons')) :
 /**
@@ -181,9 +216,13 @@ function WriteGroupButtons($Group = NULL) {
    
    echo '<div class="Group-Buttons">';
    
-   if (GroupPermission('Join', $Group))
-      echo ' '.Anchor(T('Join This Group'), GroupUrl($Group, 'join'), 'Button Primary Group-JoinButton Popup').' ';
-      
+   if (!GroupPermission('Member', $Group)) {
+      if (GroupPermission('Join', $Group)) {
+         echo ' '.Anchor(T('Join this Group'), GroupUrl($Group, 'join'), 'Button Primary Group-JoinButton Popup').' ';
+      } else {
+         echo ' '.Wrap(T('Join this Group'), 'span', array('class' => 'Button Primary Group-JoinButton Disabled', 'title' => GroupPermission('Join.Reason'))).' ';
+      }
+   }
       
    $Options = array();
    
