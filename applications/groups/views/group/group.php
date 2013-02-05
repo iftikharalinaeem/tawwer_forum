@@ -14,6 +14,10 @@
 <?php if (GroupPermission('View')): ?>
 
 <div class="Group-Content">
+   <?php
+   WriteGroupApplicants($this->Data('Applicants'));
+   ?>
+   
    <div class="Group-Box Group-Events">
       <h2><?php echo T('Upcoming Events'); ?></h2>
       <?php $EmptyMessage = T('GroupEmptyEvents', "Aw snap, no events are coming up."); ?>

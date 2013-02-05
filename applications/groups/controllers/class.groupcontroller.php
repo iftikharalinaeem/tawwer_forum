@@ -62,10 +62,10 @@ class GroupController extends Gdn_Controller {
       
       // Get Discussions
       $DiscussionModel = new DiscussionModel();
-      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0))->ResultArray();
+      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, 10)->ResultArray();
       $this->SetData('Discussions', $Discussions);
       
-      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce >' => 0))->ResultArray();
+      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce >' => 0), 0, 10)->ResultArray();
       $this->SetData('Announcements', $Discussions);
       
       // Get Events
@@ -73,9 +73,14 @@ class GroupController extends Gdn_Controller {
       $EventModel = new EventModel();
       $Events = $EventModel->GetWhere(array(
          'GroupID'      => $GroupID,
-         'DateStarts >' => date('Y-m-d H:i:s'
-      )), 'DateStarts', 'asc', $MaxEvents)->ResultArray();
+         'DateEnds >=' => gmdate('Y-m-d H:i:s')
+         ),
+         'DateStarts', 'asc', $MaxEvents)->ResultArray();
       $this->SetData('Events', $Events);
+      
+      // Get applicants.
+      $Applicants = $this->GroupModel->GetApplicants($GroupID, array('Type' => 'Application'), 20);
+      $this->SetData('Applicants', $Applicants);
       
       // Get Leaders
       $Users = $this->GroupModel->GetMembers($GroupID, array('Role' => 'Leader'));
@@ -98,6 +103,32 @@ class GroupController extends Gdn_Controller {
    public function Add() {
       $this->Title(sprintf(T('New %s'), T('Group')));
       return $this->AddEdit();
+   }
+   
+   public function Approve($Group, $ID, $Value = 'approved') {
+      $Group = $this->GroupModel->GetID($Group);
+      if (!$Group)
+         throw NotFoundException('Group');
+      
+      // Check leader permission.
+      if (!$this->GroupModel->CheckPermission('Leader', $Group)) {
+         throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Leader.Reason', $Group));
+      }
+      
+      $Value = ucfirst($Value);
+      
+      $this->GroupModel->JoinApprove(array(
+         'GroupApplicantID' => $ID,
+         'Type' => $Value
+      ));
+      
+      if ($Value == 'Approved') {
+         $this->JsonTarget("#GroupApplicant_$ID", "", 'SlideUp');
+      } else {
+         $this->JsonTarget("#GroupApplicant_$ID", "Read Join-Denied", 'AddClass');
+      }
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
    
    public function Join($ID) {
@@ -188,7 +219,9 @@ class GroupController extends Gdn_Controller {
       }
       
       // Get the file extension of the file.
-      $Ext = trim($Upload->GetUploadedFileExtension(), '.');
+      $Ext = GetValue('OutputType', $Options, trim($Upload->GetUploadedFileExtension(), '.'));
+      if ($Ext == 'jpeg')
+         $Ext = 'jpg';
       Trace($Ext, 'Ext');
       
       // The file is valid so let's come up with its new name.
@@ -244,7 +277,7 @@ class GroupController extends Gdn_Controller {
       if ($Form->AuthenticatedPostBack()) {
          // We need to save the images before saving to the database.
          self::SaveImage($Form, 'Icon', array('Prefix' => 'groups/icons/icon_', 'Size' => C('Groups.IconSize', 100), 'Crop' => TRUE));
-         self::SaveImage($Form, 'Banner', array('Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => TRUE));
+         self::SaveImage($Form, 'Banner', array('Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => TRUE, 'OutputType' => 'jpeg'));
          
          $GroupID = $Form->Save();
          if ($GroupID) {
