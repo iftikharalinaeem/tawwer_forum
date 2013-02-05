@@ -130,7 +130,7 @@
   color: #979797;
   font-size: 11px;
 }
-.Event.show .EventInfo span.Tip a {
+.Event.show .EventInfo span.Tip .Timezone {
   border-bottom: 1px dotted;
   cursor: pointer;
 }
@@ -201,7 +201,7 @@
   width: 6.5em;
   background: #fff;
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #ddd;
+  border: 1px solid #dddddd;
   margin: 0;
   padding: 0;
   list-style: none;
