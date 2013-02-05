@@ -89,6 +89,28 @@ class EmailRouterController extends Gdn_Controller {
 
 //            self::Log("Getting post...");
             $Post = $this->Form->FormValues();
+            
+            // All of the post data can come in a variety of encodings.
+            $Charsets = @json_decode($Post['charsets']);
+
+            if (is_array($Charsets)) {
+               // Convert all of the encodings to utf-8.
+               $Encodings = array_map('strtolower', mb_list_encodings());
+
+               foreach ($Charsets as $Key => $Charset) {
+                  $Charset = strtolower($Charset);
+                  if ($Charset == 'utf-8')
+                     continue;
+                  if (!in_array($Charset, $Encodings))
+                     continue;
+                  if (!isset($Post[$Key]))
+                     continue;
+
+                  Trace("Converting $Key from $Charset to utf-8.");
+                  $Post[$Key] = mb_convert_encoding($Post[$Key], 'utf-8', $Charset);
+               }
+            }
+            
 //            self::Log("Post got...");
             $Data = ArrayTranslate($Post, array(
                 'from' => 'From',

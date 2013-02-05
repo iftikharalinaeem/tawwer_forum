@@ -11,6 +11,7 @@
   @include pie-clearfix;
 }
 
-.Group-Events {
+.Group-Events,
+.Group-Announcements {
    @include column-break-after(always);
 }

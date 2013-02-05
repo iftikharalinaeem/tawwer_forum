@@ -22,7 +22,8 @@
   clear: both;
 }
 
-.Group-Events {
+.Group-Events,
+.Group-Announcements {
   -webkit-column-break-after: always;
   column-break-after: always;
 }
@@ -296,13 +297,13 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .Group-Box h2 {
   min-height: 40px;
 }
-.Group-Box .Buttons {
+.Group-Box .Button-Controls {
   position: absolute;
   top: 0;
   right: 0;
   margin: 0;
 }
-.Group-Box .Buttons .Dropdown {
+.Group-Box .Button-Controls .Dropdown {
   text-align: left;
   left: auto;
   right: 0;
