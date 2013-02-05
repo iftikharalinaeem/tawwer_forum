@@ -175,6 +175,9 @@ function WriteGroupApplicants($Applicants) {
    
    $Group = Gdn::Controller()->Data('Group');
    
+   if (!GroupPermission('Leader', $Group))
+      return;
+   
    echo '<div class="Group-Box Group-Applicants">'.
       '<h2>'.T('Applicants').'</h2>'.
       '<ul class="NarrowList Applicants">';
@@ -216,11 +219,11 @@ function WriteGroupButtons($Group = NULL) {
    
    echo '<div class="Group-Buttons">';
    
-   if (!GroupPermission('Member', $Group)) {
+   if (Gdn::Session()->IsValid() && !GroupPermission('Member', $Group)) {
       if (GroupPermission('Join', $Group)) {
          echo ' '.Anchor(T('Join this Group'), GroupUrl($Group, 'join'), 'Button Primary Group-JoinButton Popup').' ';
       } else {
-         echo ' '.Wrap(T('Join this Group'), 'span', array('class' => 'Button Primary Group-JoinButton Disabled', 'title' => GroupPermission('Join.Reason'))).' ';
+         echo ' '.Wrap(T('Join this Group'), 'span', array('class' => 'Button Primary Group-JoinButton Disabled', 'title' => GroupPermission('Join.Reason', $Group))).' ';
       }
    }
       

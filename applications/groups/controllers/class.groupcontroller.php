@@ -73,8 +73,9 @@ class GroupController extends Gdn_Controller {
       $EventModel = new EventModel();
       $Events = $EventModel->GetWhere(array(
          'GroupID'      => $GroupID,
-         'DateStarts >' => date('Y-m-d H:i:s'
-      )), 'DateStarts', 'asc', $MaxEvents)->ResultArray();
+         'DateEnds >=' => gmdate('Y-m-d H:i:s')
+         ),
+         'DateStarts', 'asc', $MaxEvents)->ResultArray();
       $this->SetData('Events', $Events);
       
       // Get applicants.
