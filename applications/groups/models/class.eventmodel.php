@@ -128,6 +128,26 @@ class EventModel extends Gdn_Model {
    }
    
    /**
+    * Override event save
+    * 
+    * @param array $Event
+    */
+   public function Save($Event) {
+      
+      // Force a sane end date
+      if (!isset($Event['DateEnds']) || is_null($Event['DateEnds'])) {
+         $UTC = new DateTimeZone('UTC');
+         $DateStartsTime = strtotime($Event['DateStarts']);
+         $DateEndsTime = strtotime('midnight tomorrow', $DateStartsTime);
+         $DateEnds = DateTime::createFromFormat('U', $DateEndsTime, $UTC);
+         
+         $Event['DateEnds'] = $DateEnds->format('Y-m-d H:i:s');
+      }
+      
+      return parent::Save($Event);
+   }
+   
+   /**
     * Get precompiled timezone list
     * 
     * @staticvar array $Built
