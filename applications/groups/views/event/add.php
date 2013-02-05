@@ -8,6 +8,14 @@
       ?>
 
       <div class="Event" data-groupid="<?php echo $this->Data('Group.GroupID'); ?>">
+         
+         <?php if ($this->Data('Group')): ?>
+         <div class="P Group">
+            <?php echo $this->Form->Label('Group', 'Group'); ?>
+            <?php WriteGroupCard($this->Data('Group'), FALSE); ?>
+         </div>
+         <?php endif; ?>
+         
          <div class="P Name">
             <?php echo $this->Form->Label('Name of the Event', 'Name'); ?>
             <div><?php echo $this->Form->TextBox('Name'); ?></div>
@@ -23,7 +31,7 @@
             <div><?php echo $this->Form->TextBox('Location'); ?></div>
          </div>
          
-         <div class="EventTime">
+         <div class="EventTime Times">
             
             <div class="P From">
                <?php echo $this->Form->Label('When', 'DateStarts', array('class' => 'When')); ?>

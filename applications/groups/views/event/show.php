@@ -5,7 +5,7 @@
       <?php
       $AllDay = (bool)$this->Data('Event.AllDayEvent');
       
-      $DateFormatString = '{Date}';
+      $DateFormatString = '{Date} at {Time}';
       $DateFormat = 'l, F j, Y';
       $TimeFormat = 'g:ia';
       $ShowDates = array();
@@ -13,17 +13,24 @@
       $TimezoneID = $this->Data('Event.Timezone');
       $LocaleTimezone = new DateTimeZone($TimezoneID);
       
-      if (!$AllDay) $DateFormatString .= ' at {Time}';
-      
       $FromDate = new DateTime($this->Data('Event.DateStarts'), $UTC);
       $FromDate->setTimezone($LocaleTimezone);
+      $FromDateSlot = $FromDate->format('Ymd');
+      
+      $ToDate = new DateTime($this->Data('Event.DateEnds'), $UTC);
+      $ToDate->setTimezone($LocaleTimezone);
+      $ToDateSlot = $ToDate->format('Ymd');
+      
+      // If we're 'all day' and only on one day
+      if ($AllDay && $FromDateSlot == $ToDateSlot) $DateFormatString = '{Date}';
+      
       $ShowDates['From'] = FormatString($DateFormatString, array(
          'Date'   => $FromDate->format($DateFormat),
          'Time'   => $FromDate->format($TimeFormat)
       ));
       
-      $WhenFormat = "{ShowDates.From}{AllDay}";
-      if ($this->Data('Event.DateEnds')):
+      // If we're not 'all day', or if 'all day' spans multiple days
+      if (!$AllDay || $FromDateSlot != $ToDateSlot):
          
          $ToDate = new DateTime($this->Data('Event.DateEnds'), $UTC);
          $ToDate->setTimezone($LocaleTimezone);
@@ -31,9 +38,13 @@
             'Date'   => $ToDate->format($DateFormat),
             'Time'   => $ToDate->format($TimeFormat)
          ));
-         $WhenFormat = "{ShowDates.From} <b>until</b> {ShowDates.To}{AllDay}";
          
       endif;
+      
+      // Output format
+      $WhenFormat = "{ShowDates.From}{AllDay}";
+      if (sizeof($ShowDates) > 1)
+         $WhenFormat = "{ShowDates.From} <b>until</b> {ShowDates.To}{AllDay}";
       
       $TimezoneLabel = EventModel::Timezones($TimezoneID);
       $Transition = array_shift($T = $LocaleTimezone->getTransitions(time(), time()));

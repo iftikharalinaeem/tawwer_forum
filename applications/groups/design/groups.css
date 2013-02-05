@@ -57,6 +57,17 @@
 .Event.add .TimePicker, .Event.edit .TimePicker {
   width: 100px;
 }
+.Event.add .Group.Card h3, .Event.edit .Group.Card h3 {
+  margin: 0px;
+}
+.Event.add .Group.Card .Group-Description, .Event.edit .Group.Card .Group-Description {
+  display: none;
+}
+.Event.add .Group.Card .Card-Icon, .Event.edit .Group.Card .Card-Icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 0px;
+}
 .Event.add .EventTime .P > div, .Event.edit .EventTime .P > div {
   display: inline-block;
 }
@@ -362,12 +373,18 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 
 .Card {
+  *zoom: 1;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   border: 1px solid #dddddd;
   padding: 10px;
   position: relative;
+}
+.Card:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 .Card .Card-Icon {
   margin: 0 10px 10px 0;

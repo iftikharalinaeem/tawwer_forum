@@ -123,6 +123,7 @@
 }
 
 .Card {
+   @include pie-clearfix;
    @include box-sizing(border-box);
    border: 1px solid $boxBorder;
    padding: 10px;
