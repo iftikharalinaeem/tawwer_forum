@@ -1,0 +1,16 @@
+@import "compass/css3/columns";
+@import "compass/utilities/general/clearfix";
+
+.Group-Content {
+  @include column-count(3);
+  @include column-gap(30px);
+}
+
+.Group-Content .Group-Box {
+  @include column-break-inside(avoid); 
+  @include pie-clearfix;
+}
+
+.Group-Events {
+   @include column-break-after(always);
+}

@@ -1,0 +1,239 @@
+.Event.add, .Event.edit {
+
+   .DatePicker {
+      width: 120px;
+   }
+   
+   .TimePicker {
+      width: 100px;
+   }
+   
+   .EventTime {
+      
+      .P > div {
+         display: inline-block;
+      }
+      
+      .To {
+         display: none;
+      }
+      
+      .Timezone {
+         display: inline-block;
+      }
+      
+      .EndTime {
+         float: right;
+      }
+      
+      label {
+         display: none;
+         width: 50px;
+      }
+      
+      label.When {
+         display: inline-block;
+      }
+      
+      .Timebased {
+         display: none !important;
+      }
+      
+      .Timezone select {
+         position: absolute;
+         visibility: hidden;
+         top: 16px;
+      }
+      
+      .Timezone .EventTimezoneDisplay {
+         cursor: pointer;
+      }
+      .Timezone .EventTimezoneDisplay:hover {
+         text-decoration: underline;
+      }
+   }
+   
+   .EventTime.Times {
+      
+      .Timebased {
+         display: inline-block !important;
+      }
+      
+   }
+   
+   .EventTime.Both {
+      
+      .To {
+         display: block;
+      }
+      
+      label {
+         display: inline-block;
+      }
+      
+      label.When {
+         display: none;
+      }
+      
+      .EndTime {
+         display: none !important;
+      }
+   }
+
+}
+
+.Event.show {
+   
+   .EventInfo {
+      li {
+         line-height: 1.5em;
+      }
+      
+      li span.Label {
+         display: inline-block;
+         font-weight: bold;
+         width: 70px;
+      }
+      
+      span.Tag {
+         margin-left: 10px;
+         background: #979797;
+         color: white;
+         font-size: 11px;
+         text-transform: uppercase;
+      }
+      
+      span.Tip {
+         color: #979797;
+         font-size: 11px;
+      }
+      
+      span.Tip a {
+         border-bottom: 1px dotted;
+         cursor: pointer;
+      }
+      
+      .Body {
+         margin: 20px 0px;
+      }
+   }
+   
+   .Attending {
+      margin: 0px;
+   }
+   
+   .Attendees {
+      .AttendeeList {
+      
+         display: block;
+         padding: 2px;
+         
+         h3 {
+            display: block;
+            text-transform: uppercase;
+            font-size: 18px;
+         }
+         
+         .PhotoWrap {
+            margin-right: 4px;
+         }
+      
+      }
+      
+      .Negatives {
+         
+         @include column-count(2);
+         @include column-gap(30px);
+         
+         .AttendeeList {
+            @include column-break-inside(avoid);
+         }
+      }
+   }
+   
+}
+
+.Groups.Group .Group-Events {
+   .DataList-Events {
+      padding: 12px 0px;
+   
+      :first-child {
+         margin-top: 0px;
+      }
+      :last-child {
+         margin-bottom: 0px;
+      }
+   }
+   
+   .Event {
+      margin: 12px 0px;
+   
+      .Event-Title {
+         margin-bottom: 0px;
+      }
+      .Event-Time {
+         font-weight: normal;
+         font-size: 12px;
+      }
+      .Event-Location {
+         line-height: 1.2em;
+      }
+      .Event-Description {
+         display: none;
+      }
+   }
+   
+}
+
+.ui-timepicker-list {
+	overflow-y: auto;
+	height: 150px;
+	width: 6.5em;
+	background: #fff;
+   background: rgba(255,255,255,0.9);
+	border: 1px solid #ddd;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	-webkit-box-shadow:0 5px 10px rgba(0,0,0,0.2);
+	-moz-box-shadow:0 5px 10px rgba(0,0,0,0.2);
+	box-shadow:0 5px 10px rgba(0,0,0,0.2);
+	outline: none;
+	z-index: 10001;
+}
+
+.ui-timepicker-list.ui-timepicker-with-duration {
+	width: 11em;
+}
+
+.ui-timepicker-duration {
+	margin-left: 5px; color: #888;
+}
+
+.ui-timepicker-list:hover .ui-timepicker-duration {
+	color: #888;
+}
+
+.ui-timepicker-list li {
+	padding: 3px 0 3px 5px;
+	cursor: pointer;
+	white-space: nowrap;
+	color: #000;
+	list-style: none;
+	margin: 0;
+}
+
+.ui-timepicker-list:hover .ui-timepicker-selected {
+	background: #fff; color: #000;
+}
+
+li.ui-timepicker-selected,
+.ui-timepicker-list li:hover,
+.ui-timepicker-list:hover .ui-timepicker-selected:hover {
+	background: #1980EC; color: #fff;
+}
+
+li.ui-timepicker-selected .ui-timepicker-duration,
+.ui-timepicker-list li:hover .ui-timepicker-duration {
+	color: #ccc;
+}
