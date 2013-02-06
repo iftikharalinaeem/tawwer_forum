@@ -96,63 +96,24 @@ class EventController extends Gdn_Controller {
          if ($GroupID)
             $Event['GroupID'] = $GroupID;
          
-         try {
-            // Timezone
-            $Timezone = new DateTimeZone($Event['Timezone']);
-            $UTC = new DateTimeZone('UTC');
+         // Apply munged event data back to form
+         $this->Form->ClearInputs();
+         $this->Form->SetFormValue($Event);
          
-            // Date starts
-            if (!empty($Event['DateStarts'])) {
-               $DateStartsStr = $Event['DateStarts'];
-               $DateStartsFormat = '!m/d/Y';
-               if (!empty($Event['TimeStarts'])) {
-                  $DateStartsStr .= " {$Event['TimeStarts']}";
-                  $DateStartsFormat .= ' h:ia';
-               } else {
-                  $Event['AllDayEvent'] = 1;
-               }
-               
-               $EventDateStarts = DateTime::createFromFormat($DateStartsFormat, $DateStartsStr, $Timezone);
-               $EventDateStarts->setTimezone($UTC);
-               $Event['DateStarts'] = $EventDateStarts->format('Y-m-d H:i');
-            } else { unset($Event['DateStarts']); }
-            unset($Event['TimeStarts']);
-            
-            // Date ends
-            if (!empty($Event['DateEnds'])) {
-               $DateEndsStr = $Event['DateEnds'];
-               $DateEndsFormat = '!m/d/Y';
-               if (!empty($Event['TimeEnds'])) {
-                  $DateEndsStr .= " {$Event['TimeEnds']}";
-                  $DateEndsFormat .= ' h:ia';
-               } else {
-                  $Event['AllDayEvent'] = 1;
-               }
-               
-               $EventDateEnds = DateTime::createFromFormat($DateEndsFormat, $DateEndsStr, $Timezone);
-               $EventDateEnds->setTimezone($UTC);
-               $Event['DateEnds'] = $EventDateEnds->format('Y-m-d H:i');
-            } else { unset($Event['DateEnds']); }
-            unset($Event['TimeEnds']);
-            
-            // Validate
-            $this->Form->ClearInputs();
-            $this->Form->SetFormValue($Event);
-            
-            if ($EventID = $this->Form->Save()) {
-               $Event['EventID'] = $EventID;
-               if ($GroupID)
-                  $EventModel->InviteGroup($EventID, $GroupID);
-               
-               $this->InformMessage(FormatString(T("New event created for <b>'{Name}'</b>"), $Event));
-               Redirect(EventUrl($Event));
-            }
-            
-         } catch (Exception $Ex) {
-            $this->Form->AddError($Ex->getMessage());
+         if ($EventID = $this->Form->Save()) {
+            $Event['EventID'] = $EventID;
+            if (GetValue('GroupID',$Event, FALSE))
+               $EventModel->InviteGroup($EventID, $GroupID);
+
+            $this->InformMessage(FormatString(T("New event created for <b>'{Name}'</b>"), $Event));
+            Redirect(EventUrl($Event));
          }
          
       }
+      
+      // Pull in group and event functions
+      require_once $this->FetchViewLocation('event_functions', 'Event');
+      require_once $this->FetchViewLocation('group_functions', 'Group');
       
       $this->View = 'add';
       $this->CssClass .= ' NoPanel NarrowForm';
@@ -211,6 +172,10 @@ class EventController extends Gdn_Controller {
       if ($this->Form->IsPostBack()) {
          
       }
+      
+      // Pull in group functions
+      require_once $this->FetchViewLocation('event_functions', 'Event');
+      require_once $this->FetchViewLocation('group_functions', 'Group');
       
       $this->View = 'add';
       $this->CssClass .= ' NoPanel NarrowForm';
@@ -286,6 +251,10 @@ class EventController extends Gdn_Controller {
       // Invited
       $Invited = $EventModel->Invited($EventID);
       $this->SetData('Invited', $Invited);
+      
+      // Pull in group functions
+      require_once $this->FetchViewLocation('event_functions', 'Event');
+      require_once $this->FetchViewLocation('group_functions', 'Group');
       
       $this->AddModule('DiscussionFilterModule');
       $this->RequestMethod = 'show';

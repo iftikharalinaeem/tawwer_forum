@@ -130,19 +130,97 @@ class EventModel extends Gdn_Model {
    /**
     * Override event save
     * 
+    * Set 'Fix' = FALSE to bypass date munging
+    * 
     * @param array $Event
     */
    public function Save($Event) {
       
-      // Force a sane end date
-      if (!isset($Event['DateEnds']) || is_null($Event['DateEnds'])) {
-         $UTC = new DateTimeZone('UTC');
-         $DateStartsTime = strtotime($Event['DateStarts']);
-         $DateEndsTime = strtotime('midnight tomorrow', $DateStartsTime);
-         $DateEnds = DateTime::createFromFormat('U', $DateEndsTime, $UTC);
+      // Fix malformed or partial dates
+      if (GetValue('Fix', $Event, TRUE)) {
          
-         $Event['DateEnds'] = $DateEnds->format('Y-m-d H:i:s');
+         $Event['AllDayEvent'] = 0;
+         
+         // Get some Timezone objects
+         $Timezone = new DateTimeZone($Event['Timezone']);
+         $UTC = new DateTimeZone('UTC');
+
+         // Check if DateStarts triggers 'AllDay' mode
+         if (!empty($Event['DateStarts'])) {
+            
+            if (empty($Event['TimeStarts']))
+               $Event['AllDayEvent'] = 1;
+            
+         } else { unset($Event['DateStarts']); }
+
+         // Check if DateEnds triggers 'AllDay' mode
+         if (!empty($Event['DateEnds'])) {
+            
+            if (empty($Event['TimeEnds']))
+               $Event['AllDayEvent'] = 1;
+            
+         } else { unset($Event['DateEnds']); }
+
+         // If we're 'AllDay', munge the times to midnight
+         $ForceEndTime = FALSE;
+         if ($Event['AllDayEvent']) {
+            $Event['TimeStarts'] = '12:00am';
+            if (empty($Event['TimeEnds'])) {
+               $Event['TimeEnds'] = '11:59pm';
+               $ForceEndTime = TRUE;
+            }
+         }
+         
+         $InputDateFormat = '!m/d/Y h:ia';
+         $OneDay = new DateInterval('P1D');
+         
+         // Load and format start date
+         try {
+            $EventDateStartsStr = "{$Event['DateStarts']} {$Event['TimeStarts']}";
+            $EventDateStarts = DateTime::createFromFormat($InputDateFormat, $EventDateStartsStr, $Timezone);
+            if (!$EventDateStarts) throw new Exception();
+            $EventDateStarts->setTimezone($UTC);
+            $Event['DateStarts'] = $EventDateStarts->format('Y-m-d H:i:00');
+         } catch (Exception $Ex) {
+            $this->Validation->AddValidationResult('DateStarts', 'ValidateDate');
+         }
+
+         // Load and format end date
+         try {
+            // Force a sane end date
+            if (!isset($Event['DateEnds']) || is_null($Event['DateEnds'])) {
+               $DateEnds = DateTime::createFromFormat($InputDateFormat, $EventDateStartsStr, $Timezone);
+               $DateEnds->modify($Event['TimeEnds']);
+               $ForceEndTime = FALSE;
+
+               $Event['DateEnds'] = $DateEnds->format('m/d/Y');
+               $Event['TimeEnds'] = $DateEnds->format('h:ia');
+               unset($DateEnds);
+            }
+
+            $EventDateEndsStr = "{$Event['DateEnds']} {$Event['TimeEnds']}";
+            $EventDateEnds = DateTime::createFromFormat($InputDateFormat, $EventDateEndsStr, $Timezone);
+            if (!$EventDateEnds) throw new Exception();
+            $EventDateEnds->setTimezone($UTC);
+            $Event['DateEnds'] = $EventDateEnds->format('Y-m-d H:i:00');
+         } catch (Exception $Ex) {
+            $this->Validation->AddValidationResult('DateEnds', 'ValidateDate');
+         }
+         
+         // Fix clean up
+         unset($OneDay);
+         unset($EventDateStarts);
+         unset($EventDateEnds);
+         unset($Timezone);
+         unset($UTC);
       }
+      
+      // Default clean up
+      unset($Event['TimeStarts']);
+      unset($Event['TimeEnds']);
+      
+      $this->Validation->ApplyRule('DateStarts', 'ValidateDate');
+      $this->Validation->ApplyRule('DateEnds', 'ValidateDate');
       
       return parent::Save($Event);
    }

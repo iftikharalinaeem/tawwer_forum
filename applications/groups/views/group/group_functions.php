@@ -260,24 +260,39 @@ function WriteGroupCards($Groups, $EmptyMessage = '') {
    else {
       echo '<div class="Cards Cards-Groups">';
       foreach ($Groups as $Group) {
-         echo '<div class="CardWrap"><div class="Group Card">';
-            $Url = GroupUrl($Group);
-            echo "<a href=\"$Url\" class=\"TextColor\">";
-               WriteGroupIcon($Group, 'Group-Icon Card-Icon');
-               echo '<h3 class="Group-Name">'.htmlspecialchars($Group['Name']).'</h3>';
-               echo '<p class="Group-Description">'.
-                  SliceString(
-                     Gdn_Format::PlainText($Group['Description'], $Group['Format']), 
-                     C('Groups.CardDescription.ExcerptLength', 150)).'</p>';
-            echo '</a>';
-            WriteGroupButtons($Group);
-         echo '</div></div>';
+         WriteGroupCard($Group);
       }
       echo '</div>';
    }
 }
 endif;
 
+
+if (!function_exists('WriteGroupCard')) :
+/**
+ * Write a group card
+ * 
+ * @param array $Group
+ * @param bool $WithButtons Optional. Whether to show group management option cog
+ */
+function WriteGroupCard($Group, $WithButtons = TRUE) {
+   echo '<div class="CardWrap"><div class="Group Card">';
+      $Url = GroupUrl($Group);
+      echo "<a href=\"$Url\" class=\"TextColor\">";
+         WriteGroupIcon($Group, 'Group-Icon Card-Icon');
+         echo '<h3 class="Group-Name">'.htmlspecialchars($Group['Name']).'</h3>';
+         echo '<p class="Group-Description">'.
+            SliceString(
+               Gdn_Format::PlainText($Group['Description'], $Group['Format']), 
+               C('Groups.CardDescription.ExcerptLength', 150)).'</p>';
+         echo '<div class="Group-Members">'.sprintf(Plural($Group['CountMembers'], '%d member','%d members', number_format($Group['CountMembers'])), $Group['CountMembers']).'</div>';
+      echo '</a>';
+      
+      if ($WithButtons)
+         WriteGroupButtons($Group);
+   echo '</div></div>';
+}
+endif;
 
 if (!function_exists('WriteGroupIcon')) :
 /**
