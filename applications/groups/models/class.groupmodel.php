@@ -152,6 +152,26 @@ class GroupModel extends Gdn_Model {
       return $Result;
    }
    
+   public function GetCount($Wheres = '') {
+      if ($Wheres)
+         return parent::GetCount($Wheres);
+      
+      $Key = 'Group.Count';
+      
+      if ($Wheres === NULL) {
+         Gdn::Cache()->Remove($Key);
+         return NULL;
+      }
+         
+      $Count = Gdn::Cache()->Get($Key);
+      if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
+         $Count = parent::GetCount();
+         Gdn::Cache()->Store($Key, $Count);
+      }
+      
+      return $Count;
+   }
+   
    public function GetID($ID, $DatasetType = DATASET_TYPE_ARRAY) {
       static $Cache = array();
       
@@ -298,6 +318,7 @@ class GroupModel extends Gdn_Model {
    
    public function Save($Data, $Settings = FALSE) {
       $GroupID = parent::Save($Data, $Settings);
+      $this->GetCount(NULL); // clear cache.
       
       if ($GroupID) {
          // Make sure the group owner is a member.

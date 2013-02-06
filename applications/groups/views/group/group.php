@@ -60,7 +60,7 @@
       <h3><?php echo T('GroupInfo', 'Group Info'); ?></h3>
       <dl>
          <dt>Created</dt>
-         <dd><?php echo Gdn_Format::Date($this->Data('Group.DateInserted')); ?></dd>
+         <dd><?php echo Gdn_Format::Date($this->Data('Group.DateInserted'), 'html'); ?></dd>
       </dl>
    </div>
     

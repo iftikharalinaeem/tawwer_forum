@@ -1,17 +1,21 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+
+if (!defined('APPLICATION'))
+   exit();
+
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary
  */
-
 class GroupsController extends Gdn_Controller {
+
    public $Uses = array('GroupModel');
-   
+
    /**
     * @var GroupModel
     */
    public $GroupModel;
-   
+
    /**
     * Include JS, CSS, and modules used by all methods.
     *
@@ -31,33 +35,67 @@ class GroupsController extends Gdn_Controller {
       $this->AddJsFile('global.js');
       $this->AddCssFile('style.css');
       $this->AddCssFile('groups.css');
-      
+
       $this->AddBreadcrumb(T('Groups'), Url('/groups'));
-      
+
       parent::Initialize();
    }
-   
+
    public function Index() {
       Gdn_Theme::Section('GroupList');
-      
+
       // Get popular groups.
-      $Groups = $this->GroupModel->Get('CountMembers', 'desc', 10)->ResultArray();
+      $Groups = $this->GroupModel->Get('CountMembers', 'desc', 9)->ResultArray();
       $this->SetData('Groups', $Groups);
-      
+
       // Get new groups.
-      $NewGroups = $this->GroupModel->Get('DateInserted', 'desc', 10)->ResultArray();
+      $NewGroups = $this->GroupModel->Get('DateInserted', 'desc', 9)->ResultArray();
       $this->SetData('NewGroups', $NewGroups);
-      
+
       // Get my groups.
       if (Gdn::Session()->IsValid()) {
          $MyGroups = $this->GroupModel->GetByUser(Gdn::Session()->UserID);
          $this->SetData('MyGroups', $MyGroups);
       }
-      
+
       $this->Title(T('Groups'));
-      
+
       require_once $this->FetchViewLocation('group_functions', 'Group');
       $this->CssClass .= ' NoPanel';
       $this->Render('Groups');
+   }
+   
+   public function Browse($Sort = 'newest', $Page = '') {
+      Gdn_Theme::Section('GroupList');
+      $Sort = strtolower($Sort);
+      
+      $Sorts = array(
+         'newest' => array('Title' => T('Newest Groups'), 'OrderBy' => 'DateInserted'),
+         'popular' => array('Title' => T('Popular Groups'), 'OrderBy' => 'CountMembers'),
+         'updated' => array('Title' => T('Recently Updated Groups'), 'OrderBy' => 'DateLastComment'));
+      
+      if (!array_key_exists($Sort, $Sorts)) {
+         $Sort = array_pop(array_keys($Sorts));
+      }
+      
+      $SortRow = $Sorts[$Sort];
+      $PageSize = 24; // good size for 4, 3, 2 columns.
+      list($Offset, $Limit) = OffsetLimit($Page, $PageSize);
+      $PageNumber = PageNumber($Offset, $Limit);
+      
+      $Groups = $this->GroupModel->Get($SortRow['OrderBy'], 'desc', $Limit, $PageNumber)->ResultArray();
+      $this->SetData('Groups', $Groups);
+      
+      // Set the pager data.
+      $this->SetData('_Limit', $Limit);
+      $this->SetData('_CurrentRecords', count($Groups));
+      $TotalRecords = $this->GroupModel->GetCount();
+      
+      $Pager = PagerModule::Current();
+      $Pager->Configure($Offset, $Limit, $TotalRecords, "groups/browse/$Sort/{Page}");
+      
+      $this->Title($SortRow['Title']);
+      require_once $this->FetchViewLocation('group_functions', 'Group');
+      $this->Render();
    }
 }
