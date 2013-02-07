@@ -41,6 +41,7 @@ class EventController extends Gdn_Controller {
       
       $this->AddCssFile('style.css');
       $this->AddCssFile('groups.css');
+      Gdn_Theme::Section('Event');
       
       parent::Initialize();
    }
@@ -57,7 +58,6 @@ class EventController extends Gdn_Controller {
     * @throws Exception
     */
    public function Add($GroupID = NULL) {
-      Gdn_Theme::Section('Event');
       $this->Permission('Garden.Signin.Allow');
       
       $this->AddJsFile('jquery.timepicker.min.js');
@@ -126,7 +126,6 @@ class EventController extends Gdn_Controller {
     * @param type $EventID
     */
    public function Edit($EventID) {
-      Gdn_Theme::Section('Event');
       $this->Permission('Garden.Signin.Allow');
       
       $this->AddJsFile('jquery.timepicker.min.js');
@@ -190,7 +189,6 @@ class EventController extends Gdn_Controller {
     * @throws Exception
     */
    public function Show($EventID) {
-      Gdn_Theme::Section('Event');
       
       // Lookup event
       $EventModel = new EventModel();
