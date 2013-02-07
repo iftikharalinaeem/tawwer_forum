@@ -136,6 +136,15 @@ class RanksPlugin extends Gdn_Plugin {
       RankModel::ApplyAbilities();
    }
    
+   public function ProfileController_Render_Before($Sender, $Args) {
+      $RankID = $Sender->Data('Profile.RankID');
+      $Rank = RankModel::Ranks($RankID);
+      if ($Rank) {
+         $Rank = ArrayTranslate($Rank, array('RankID', 'Level', 'Name', 'Label'));
+         $Sender->SetData('Rank', $Rank);
+      }
+   }
+   
    public function ProfileController_UsernameMeta_Handler($Sender, $Args) {
       $User = $Sender->Data('Profile');
       if ($User){

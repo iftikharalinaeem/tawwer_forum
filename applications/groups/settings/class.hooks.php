@@ -8,6 +8,10 @@ class GroupsHooks extends Gdn_Plugin {
       include(dirname(__FILE__).'/structure.php');
    }
    
+   public function AssetModel_StyleCss_Handler($Sender, $Args) {
+      $Sender->AddCssFile('groups.css', 'groups');
+   }
+   
    /** 
     * Add the "Groups" link to the main menu.
     */

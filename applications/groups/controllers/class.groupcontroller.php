@@ -31,7 +31,6 @@ class GroupController extends Gdn_Controller {
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
       $this->AddCssFile('style.css');
-      $this->AddCssFile('groups.css');
       
       $this->AddBreadcrumb(T('Groups'), Url('/groups'));
       
@@ -328,16 +327,104 @@ class GroupController extends Gdn_Controller {
       
       // Get Leaders
       $UserModel = new UserModel();
-      $Users = $UserModel->GetWhere(array('UserID <' => 5))->ResultArray(); // FAKE IT
+      $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Leader'));
       $this->SetData('Leaders', $Users);
       
       // Get Members
-      $Users = $UserModel->GetWhere(array('UserID <' => 50))->ResultArray(); // FAKE IT
+      $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Member'));
       $this->SetData('Members', $Users);
       
-      $this->Title(htmlspecialchars($Group['Name']));
+      $this->Title(T('Members').' - '.htmlspecialchars($Group['Name']));
       require_once $this->FetchViewLocation('group_functions');
       $this->CssClass .= ' NoPanel';
       $this->Render('Members');
+   }
+   
+   public function SetRole($ID, $UserID, $Role) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+      
+      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+      if (!$User)
+         throw NotFoundException('User');
+      
+      if (!$this->GroupModel->CheckPermission('Edit', $Group))
+         throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Edit.Reason', $Group));
+      
+      $GroupID = $Group['GroupID'];
+      
+      $Member = $this->GroupModel->GetMembers($Group['GroupID'], array('UserID' => $UserID));
+      $Member = array_pop($Member);
+      if (!$Member)
+         throw NotFoundException('Member');
+      
+      // You can't demote the user that started the group.
+      if ($UserID == $Group['InsertUserID']) {
+         throw ForbiddenException('@'.T("The user that started the group has to be a leader."));
+      }
+      
+      if ($this->Request->IsPostBack()) {
+         $Role = ucfirst($Role);
+         $this->GroupModel->SetRole($GroupID, $UserID, $Role);
+         
+         $this->InformMessage(sprintf(T('%s is now a %s.'), htmlspecialchars($User['Name']), $Role));
+      }
+      
+      $this->SetData('Group', $Group);
+      $this->SetData('User', $User);
+      $this->Title(T('Group Role'));
+      $this->Render();
+   }
+   
+   public function RemoveMember($ID, $UserID) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+      
+      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+      if (!$User)
+         throw NotFoundException('User');
+      
+      if ($UserID == Gdn::Session()->UserID) {
+         Gdn::Dispatcher()->Dispatch(GroupUrl($Group, 'leave'));
+         return;
+      }
+      
+      if (!$this->GroupModel->CheckPermission('Moderate', $Group))
+         throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Moderate.Reason', $Group));
+      
+      $GroupID = $Group['GroupID'];
+      
+      $Member = $this->GroupModel->GetMembers($Group['GroupID'], array('UserID' => $UserID));
+      $Member = array_pop($Member);
+      if (!$Member)
+         throw NotFoundException('Member');
+      
+      // You can't remove the user that started the group.
+      if ($UserID == $Group['InsertUserID']) {
+         throw ForbiddenException('@'.T("You can't remove the creator of the group."));
+      }
+      
+      // Only users that can edit the group can remove leaders.
+      if ($Member['Role'] == 'Leader' && !GroupPermission('Edit')) {
+         throw ForbiddenException('@'.T("You can't remove another leader of the group."));
+      }
+      
+      $Form = new Gdn_Form();
+      $this->Form = $Form;
+      
+      if ($Form->AuthenticatedPostBack()) {
+         $this->GroupModel->RemoveMember($GroupID, $UserID, $this->Form->GetFormValue('Type'));
+         
+         $this->JsonTarget("#Member_$UserID", NULL, "Remove");
+      } else {
+         $Form->SetValue('Type', 'Removed');
+      }
+      
+      $this->SetData('Group', $Group);
+      $this->SetData('User', $User);
+      $this->Title(T('Remove Member'));
+      $this->Render();
    }
 }

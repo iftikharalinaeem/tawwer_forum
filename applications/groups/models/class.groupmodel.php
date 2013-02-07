@@ -152,6 +152,26 @@ class GroupModel extends Gdn_Model {
       return $Result;
    }
    
+   public function GetCount($Wheres = '') {
+      if ($Wheres)
+         return parent::GetCount($Wheres);
+      
+      $Key = 'Group.Count';
+      
+      if ($Wheres === NULL) {
+         Gdn::Cache()->Remove($Key);
+         return NULL;
+      }
+         
+      $Count = Gdn::Cache()->Get($Key);
+      if ($Count === Gdn_Cache::CACHEOP_FAILURE) {
+         $Count = parent::GetCount();
+         Gdn::Cache()->Store($Key, $Count);
+      }
+      
+      return $Count;
+   }
+   
    public function GetID($ID, $DatasetType = DATASET_TYPE_ARRAY) {
       static $Cache = array();
       
@@ -298,6 +318,7 @@ class GroupModel extends Gdn_Model {
    
    public function Save($Data, $Settings = FALSE) {
       $GroupID = parent::Save($Data, $Settings);
+      $this->GetCount(NULL); // clear cache.
       
       if ($GroupID) {
          // Make sure the group owner is a member.
@@ -315,6 +336,31 @@ class GroupModel extends Gdn_Model {
          }
       }
       return $GroupID;
+   }
+   
+   public function SetRole($GroupID, $UserID, $Role) {
+      $this->SQL->Put('UserGroup', array(
+            'Role' => $Role
+         ), array(
+            'UserID' => $UserID,
+            'GroupID' => $GroupID
+         ));
+   }
+   
+   public function RemoveMember($GroupID, $UserID, $Type = FALSE) {
+      // Remove the member.
+      $this->SQL->Delete('UserGroup', array('GroupID' => $GroupID, 'UserID' => $UserID));
+      
+      // If the user was banned then let's add the ban.
+      if (in_array($Type, array('Banned', 'Denied'))) {
+         $Model = new Gdn_Model('GroupApplicant');
+         $Model->Delete(array('GroupID' => $GroupID, 'UserID' => $UserID));
+         $Model->Insert(array(
+            'GroupID' => $GroupID,
+            'UserID' => $UserID,
+            'Type' => $Type
+         ));
+      }
    }
    
    protected function ValidateRule($FieldName, $Data, $Rule, $CustomError = FALSE) {

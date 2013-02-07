@@ -51,23 +51,26 @@
    
    <!-- Leaders -->
    <div class="Group-Box Group-Leaders">
-      <h3><?php echo T('GroupLeaders', 'Leaders'); ?></h3>
+      <h3><?php echo Anchor(T('Group Leaders', 'Leaders'), GroupUrl($this->Data('Group'), 'members')); ?></h3>
       <?php WriteMemberSimpleList($this->Data('Leaders')); ?>
    </div>
    
    <!-- Info -->
    <div class="Group-Box Group-Info">
-      <h3><?php echo T('GroupInfo', 'Group Info'); ?></h3>
+      <h3><?php echo T('Group Info'); ?></h3>
       <dl>
          <dt>Created</dt>
-         <dd><?php echo Gdn_Format::Date($this->Data('Group.DateInserted')); ?></dd>
+         <dd><?php echo Gdn_Format::Date($this->Data('Group.DateInserted'), 'html'); ?></dd>
       </dl>
    </div>
     
    <!-- Members -->
    <div class="Group-Box Group-MembersPreview">
-      <h3><?php echo T('GroupMembers', 'Members'); ?></h3>
+      <h3><?php echo Anchor(T('Group Members', 'Members'), GroupUrl($this->Data('Group'), 'members'));?></h3>
       <?php WriteMemberGrid($this->Data('Members')); ?>
+      <div class="MoreWrap">
+         <?php echo Anchor(T('All Members'), GroupUrl($this->Data('Group'), 'members'));?>
+      </div>
    </div>
 </div>
 
