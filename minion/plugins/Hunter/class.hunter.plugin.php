@@ -20,7 +20,7 @@
  */
 
 $PluginInfo['Hunter'] = array(
-   'Name' => 'Hunter',
+   'Name' => 'Minion: Hunter',
    'Description' => "Creates a 'wanted user' game.",
    'Version' => '1.0',
    'RequiredApplications' => array(

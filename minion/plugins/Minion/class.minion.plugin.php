@@ -1343,6 +1343,14 @@ class MinionPlugin extends Gdn_Plugin {
       }
    }
    
+   /**
+    * Check for and retrieve monitoring data for the given attribute
+    * 
+    * @param array $Object
+    * @param string $Attribute
+    * @param mixed $Default
+    * @return mixed
+    */
    public function Monitoring($Object, $Attribute = NULL, $Default = NULL) {
       $Minion = GetValueR('Attributes.Minion', $Object, array());
       
