@@ -9,7 +9,7 @@ class GroupsHooks extends Gdn_Plugin {
    }
    
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
-      $Sender->AddCssFile('groups.css', 'Groups');
+      $Sender->AddCssFile('groups.css', 'groups');
    }
    
    /** 
