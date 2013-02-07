@@ -207,7 +207,7 @@
   width: 6.5em;
   background: #fff;
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -354,6 +354,18 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   clear: both;
 }
 
+.Group-SmallHeader {
+  *zoom: 1;
+}
+.Group-SmallHeader:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.Group-SmallHeader .Group-Icon {
+  height: 40px;
+}
+
 .Group-Footer {
   *zoom: 1;
 }
@@ -388,8 +400,11 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 .Card .Card-Icon {
   margin: 0 10px 10px 0;
-  height: 75px;
-  width: 75px;
+  float: left;
+}
+.Card .Card-Buttons {
+  clear: left;
+  float: right;
 }
 .Card h3 {
   vertical-align: top;
@@ -417,6 +432,9 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .Cards-Groups .Card {
   height: 180px;
 }
+.Cards-Groups .Card .Card-Icon {
+  max-height: 75px;
+}
 .Cards-Groups .Card .Group-Buttons {
   position: absolute;
   padding: 10px;
@@ -424,63 +442,58 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   bottom: 0;
 }
 
-.Group-MembersPage .Group-Icon {
-  max-width: 36px;
-  max-height: 36px;
-  padding-top: 0;
-}
-.Group-MembersPage h2 {
-  clear: both;
-}
-.Group-MembersPage .Card {
-  display: block;
-  height: 70px;
-  width: 270px;
-  margin: 0 15px 15px 0;
-  padding: 5px 10px;
-  float: left;
-  vertical-align: top;
-  *zoom: 1;
-}
-.Group-MembersPage .Card:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-.Group-MembersPage .Card .PhotoWrap {
-  float: left;
-  margin: 5px 5px 0 0;
-}
-.Group-MembersPage .Card a {
-  font-weight: bold;
-}
-.Group-MembersPage .Card .DateJoined {
-  display: block;
-  line-height: 1;
-}
-.Group-MembersPage .Card .Group-MemberOptions {
-  padding-top: 5px;
-  margin-left: 45px;
-  display: none;
-}
-.Group-MembersPage .Card:hover {
-  background-color: #f7f7f7;
-}
-.Group-MembersPage .Card:hover .Group-MemberOptions {
-  display: block;
+.Cards-Members .Card {
+  height: 107px;
 }
 
+/*.Group-MembersPage {
+    .Group-Icon {
+       max-width: 36px;
+       max-height: 36px;
+       padding-top: 0;  
+    }
+    h2 {
+       clear: both;
+    }
+    .Card {
+       display: block;
+       height: 70px;
+       width: 270px;
+       margin: 0 15px 15px 0;
+       padding: 5px 10px;
+       float: left;
+       vertical-align: top;
+       @include pie-clearfix;      
+       
+       .PhotoWrap {
+          float: left;
+          margin: 5px 5px 0 0;
+       }
+       a {
+          font-weight: bold;  
+       }
+       .DateJoined {
+          display: block;
+          line-height: 1;
+       }
+       .Group-MemberOptions {
+          padding-top: 5px;
+          margin-left: 45px;
+          display: none;  
+       }
+    }
+    .Card:hover {
+       background-color: $shaded;
+       
+       .Group-MemberOptions {
+          display: block;  
+       }
+    }
+}
 .Group-Leaders,
 .Group-Members {
-  *zoom: 1;
-}
-.Group-Leaders:after,
-.Group-Members:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
+    @include pie-clearfix;
+}*/
 .UserTile {
   vertical-align: middle;
   margin: 2px 0;

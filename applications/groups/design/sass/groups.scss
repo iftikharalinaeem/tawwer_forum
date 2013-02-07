@@ -108,6 +108,13 @@
    @include pie-clearfix;
 }
 
+.Group-SmallHeader {
+   @include pie-clearfix;
+   .Group-Icon {
+      height: 40px;
+   }
+}
+
 .Group-Footer {
    @include pie-clearfix;
    
@@ -131,8 +138,12 @@
    
    .Card-Icon {
       margin: 0 10px 10px 0;
-      height: 75px;
-      width: 75px;
+      float: left;
+   }
+   
+   .Card-Buttons {
+      clear: left;
+      float: right;
    }
    
    h3 {
@@ -156,6 +167,10 @@
 .Cards-Groups .Card {
    height: 180px;
    
+   .Card-Icon {
+      max-height: 75px;
+   }
+   
    .Group-Buttons {
       position: absolute;
       padding: $cardSpacing;
@@ -164,7 +179,11 @@
    }
 }
 
-.Group-MembersPage {
+.Cards-Members .Card {
+   height: 107px;
+}
+
+/*.Group-MembersPage {
     .Group-Icon {
        max-width: 36px;
        max-height: 36px;
@@ -211,7 +230,7 @@
 .Group-Leaders,
 .Group-Members {
     @include pie-clearfix;
-}
+}*/
 
 
 // Generic style

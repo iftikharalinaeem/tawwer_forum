@@ -34,7 +34,6 @@ class GroupsController extends Gdn_Controller {
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
       $this->AddCssFile('style.css');
-      $this->AddCssFile('groups.css');
 
       $this->AddBreadcrumb(T('Groups'), Url('/groups'));
 
@@ -95,6 +94,8 @@ class GroupsController extends Gdn_Controller {
       $Pager->Configure($Offset, $Limit, $TotalRecords, "groups/browse/$Sort/{Page}");
       
       $this->Title($SortRow['Title']);
+      $this->AddBreadcrumb($this->Title(), Url("/groups/browse/$Sort"));
+      
       require_once $this->FetchViewLocation('group_functions', 'Group');
       $this->Render();
    }

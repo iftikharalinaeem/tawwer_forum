@@ -338,6 +338,31 @@ class GroupModel extends Gdn_Model {
       return $GroupID;
    }
    
+   public function SetRole($GroupID, $UserID, $Role) {
+      $this->SQL->Put('UserGroup', array(
+            'Role' => $Role
+         ), array(
+            'UserID' => $UserID,
+            'GroupID' => $GroupID
+         ));
+   }
+   
+   public function RemoveMember($GroupID, $UserID, $Type = FALSE) {
+      // Remove the member.
+      $this->SQL->Delete('UserGroup', array('GroupID' => $GroupID, 'UserID' => $UserID));
+      
+      // If the user was banned then let's add the ban.
+      if (in_array($Type, array('Banned', 'Denied'))) {
+         $Model = new Gdn_Model('GroupApplicant');
+         $Model->Delete(array('GroupID' => $GroupID, 'UserID' => $UserID));
+         $Model->Insert(array(
+            'GroupID' => $GroupID,
+            'UserID' => $UserID,
+            'Type' => $Type
+         ));
+      }
+   }
+   
    protected function ValidateRule($FieldName, $Data, $Rule, $CustomError = FALSE) {
       $Value = GetValue($FieldName, $Data);
       $Valid = $this->Validation->ValidateRule($Value, $FieldName, $Rule, $CustomError);

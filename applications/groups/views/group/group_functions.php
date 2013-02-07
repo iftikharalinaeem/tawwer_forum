@@ -281,12 +281,13 @@ function WriteGroupCard($Group, $WithButtons = TRUE) {
       echo "<a href=\"$Url\" class=\"TextColor\">";
          WriteGroupIcon($Group, 'Group-Icon Card-Icon');
          echo '<h3 class="Group-Name">'.htmlspecialchars($Group['Name']).'</h3>';
-         echo '<p class="Group-Description">'.
-            SliceString(
-               Gdn_Format::PlainText($Group['Description'], $Group['Format']), 
-               C('Groups.CardDescription.ExcerptLength', 150)).'</p>';
-         echo '<div class="Group-Members">'.sprintf(Plural($Group['CountMembers'], '%d member','%d members', number_format($Group['CountMembers'])), $Group['CountMembers']).'</div>';
-      echo '</a>';
+      echo '</a>';   
+      
+      echo '<p class="Group-Description">'.
+         SliceString(
+            Gdn_Format::PlainText($Group['Description'], $Group['Format']), 
+            C('Groups.CardDescription.ExcerptLength', 150)).'</p>';
+      echo '<div class="Group-Members">'.sprintf(Plural($Group['CountMembers'], '%d member','%d members', number_format($Group['CountMembers'])), $Group['CountMembers']).'</div>';
       
       if ($WithButtons)
          WriteGroupButtons($Group);
@@ -348,12 +349,12 @@ function WriteMemberCards($Members) {
       echo WriteEmptyState(T("GroupMembersEmpty", "No one has joined yet. Spread the word!"));
    
    if (is_array($Members)) {
-      echo '<ul class="Group-MemberList">';
+      echo '<ul class="Cards Cards-Members">';
       foreach ($Members as $Member) {
-         echo '<li class="Card">';
+         echo "<li id=\"Member_{$Member['UserID']}\" class=\"CardWrap\">";
          WriteMemberCard($Member);
          echo '</li>';
-      } 
+      }
       echo '</ul>';
    }
 }
@@ -367,15 +368,35 @@ if (!function_exists('WriteMemberCard')) :
  * @param array $Members
  */
 function WriteMemberCard($Member) {
-   echo UserPhoto($Member).' '.UserAnchor($Member).' ';
-   echo Wrap(sprintf(T('GroupMemberJoined', 'Joined %s'), Gdn_Format::Date($Member['DateInserted'])), 
+   $UserID = $Member['UserID'];
+   $Group = Gdn::Controller()->Data('Group');
+   
+   echo '<div class="Card Card-Member">';
+   
+   echo UserPhoto($Member, array('LinkClass' => 'Card-Icon')).' '.UserAnchor($Member).' ';
+   echo Wrap(sprintf(T('GroupMemberJoined', 'Joined %s'), Gdn_Format::Date($Member['DateInserted'], 'html')), 
       'span', array('class' => 'MItem DateJoined')).' ';
-   if (GroupPermission('Edit')) {
-      echo '<div class="Group-MemberOptions">';
-      echo Anchor(T('GroupLeaderAction', 'Leader'), 'groups', 'Group-MakeLeader Popup').' ';
-      echo Anchor(T('GroupRemoveAction', 'Remove'), 'groups', 'Group-RemoveMember Popup').' ';
+   
+   $Options = array();
+   
+   if (GroupPermission('Moderate') && $Group['InsertUserID'] != $Member['UserID']) {
+      if (GroupPermission('Edit')) {
+         if ($Member['Role'] == 'Leader')
+            $Options['SetRole'] = array('Text' => T('Make Member', 'Member'), 'Url' => GroupUrl($Group, 'setrole')."?userid=$UserID&role=member", 'CssClass' => 'Group-MakeLeader Hijack');
+         else
+            $Options['SetRole'] = array('Text' => T('Make Leader', 'Leader'), 'Url' => GroupUrl($Group, 'setrole')."?userid=$UserID&role=leader", 'CssClass' => 'Group-MakeLeader Hijack');
+      }
+      $Options['Remove'] = array('Text' => T('Remove from Group', 'Remove'), 'Url' => GroupUrl($Group, 'removemember')."?userid=$UserID", 'CssClass' => 'Group-RemoveMember Popup');
+      
+   }
+   
+   if (count($Options)) {
+      echo '<div class="Card-Buttons Group-MemberOptions">';
+      echo ButtonDropDown($Options, 'Button DropRight Member-OptionsButton', Sprite('SpOptions', 'Sprite16'));
       echo '</div>';
    }
+   
+   echo '</div>';
 }
 endif;
 

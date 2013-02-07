@@ -40,7 +40,6 @@ class EventController extends Gdn_Controller {
       $this->AddJsFile('event.js');
       
       $this->AddCssFile('style.css');
-      $this->AddCssFile('groups.css');
       
       parent::Initialize();
    }
