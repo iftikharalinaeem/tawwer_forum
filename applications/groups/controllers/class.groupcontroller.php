@@ -273,6 +273,11 @@ class GroupController extends Gdn_Controller {
          $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       }
       
+      // Get a list of categories suitable for the category dropdown.
+      $Categories = array_filter(CategoryModel::Categories(), function($Row) { return $Row['AllowGroups']; });
+      $Categories = ConsolidateArrayValuesByKey($Categories, 'CategoryID', 'Name');
+      $this->SetData('Categories', $Categories);
+      
       if ($Form->AuthenticatedPostBack()) {
          // We need to save the images before saving to the database.
          self::SaveImage($Form, 'Icon', array('Prefix' => 'groups/icons/icon_', 'Size' => C('Groups.IconSize', 100), 'Crop' => TRUE));
@@ -282,9 +287,10 @@ class GroupController extends Gdn_Controller {
          if ($GroupID) {
             $Group = $this->GroupModel->GetID($GroupID);
             Redirect(GroupUrl($Group));
+         } else {
+            Trace($Form->FormValues());
+            $Form->AddError('What!?!?');
          }
-         // If we're here then there was some error and the form has to be rendered again.
-         $Form->AddHidden('GroupID');
       } else {
          if ($ID) {
             // Load the group.
@@ -294,12 +300,64 @@ class GroupController extends Gdn_Controller {
             // Set some default settings.
             $Form->SetValue('Registration', 'Public');
             $Form->SetValue('Visibility', 'Public');
+            
+            if (Count($Categories == 1)) {
+               $Form->SetValue('CategoryID', array_pop(array_keys($Categories)));
+            }
          }
       }
-      
       $this->Form = $Form;
       $this->CssClass .= ' NoPanel NarrowForm';
       $this->Render('AddEdit');
+   }
+   
+   public function Discussions($ID, $Page = FALSE) {
+      Gdn_Theme::Section('DiscussionList');
+      
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+      
+      $this->SetData('Group', $Group);
+      
+      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+      $DiscussionModel = new DiscussionModel();
+      $this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->GetWhere(array('GroupID' => $Group['GroupID']), $Offset, $Limit));
+      $this->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
+      $this->SetData('_ShowCategoryLink', FALSE);
+      
+      // Add modules
+      $NewDiscussionModule = new NewDiscussionModule();
+      $NewDiscussionModule->QueryString = 'groupid='.$Group['GroupID'];
+      $this->AddModule($NewDiscussionModule);
+      $this->AddModule('DiscussionFilterModule');
+      $this->AddModule('CategoriesModule');
+      $this->AddModule('BookmarkedModule');
+      
+      $this->SetData('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary', 'QueryString' => $NewDiscussionModule->QueryString));
+      
+      $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+      $this->AddBreadcrumb(T('Discussions'));
+      
+      $Layout = C('Vanilla.Discussions.Layout');
+      switch($Layout) {
+         case 'table':
+            if ($this->SyndicationMethod == SYNDICATION_NONE)
+               $this->View = 'table';
+            break;
+         default:
+             $this->View = 'index';
+            break;
+      }
+      
+      if ($this->Head) {
+         $this->AddJsFile('discussions.js');
+         $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
+      }
+      
+      $this->Title(GetValue('Name', $Group, ''));
+      $this->Description(GetValue('Description', $Group), TRUE);
+      $this->Render($this->View, 'Discussions', 'Vanilla');
    }
    
    public function Edit($ID) {

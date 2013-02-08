@@ -58,19 +58,15 @@
    <!-- Info -->
    <div class="Group-Box Group-Info">
       <h3><?php echo T('Group Info'); ?></h3>
-      <dl>
-         <dt>Created</dt>
-         <dd><?php echo Gdn_Format::Date($this->Data('Group.DateInserted'), 'html'); ?></dd>
-      </dl>
+      <?php
+      WriteGroupInfo();
+      ?>
    </div>
     
    <!-- Members -->
    <div class="Group-Box Group-MembersPreview">
       <h3><?php echo Anchor(T('Group Members', 'Members'), GroupUrl($this->Data('Group'), 'members'));?></h3>
-      <?php WriteMemberGrid($this->Data('Members')); ?>
-      <div class="MoreWrap">
-         <?php echo Anchor(T('All Members'), GroupUrl($this->Data('Group'), 'members'));?>
-      </div>
+      <?php WriteMemberGrid($this->Data('Members'), Anchor(T('All Members'), GroupUrl($this->Data('Group'), 'members'), 'MoreWrap')); ?>
    </div>
 </div>
 

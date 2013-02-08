@@ -144,6 +144,21 @@ class GroupModel extends Gdn_Model {
       }
    }
    
+   public function Counts($Column, $From = FALSE, $To = FALSE, $Max = FALSE) {
+      $Result = array('Complete' => TRUE);
+      switch ($Column) {
+         case 'CountMembers':
+            $this->Database->Query(DBAModel::GetCountSQL('count', 'Group', 'UserGroup', $Column, 'UserGroupID'));
+            break;
+         case 'DateLastComment':
+            $this->Database->Query(DBAModel::GetCountSQL('max', 'Group', 'Discussion', $Column, 'DateLastComment'));
+            break;
+         default:
+            throw new Gdn_UserException("Unknown column $Column");
+      }
+      return $Result;
+   }
+   
    public function GetByUser($UserID) {
       $UserGroups = $this->SQL->GetWhere('UserGroup', array('UserID' => $UserID))->ResultArray();
       $IDs = ConsolidateArrayValuesByKey($UserGroups, 'GroupID');
@@ -248,6 +263,7 @@ class GroupModel extends Gdn_Model {
             $Model = new Gdn_Model('UserGroup');
             $Model->Insert($Data);
             $this->Validation = $Model->Validation;
+            $this->UpdateCount($Group['GroupID'], 'CountMembers');
             return count($this->ValidationResults()) == 0;
             
          case 'approval':
@@ -293,6 +309,7 @@ class GroupModel extends Gdn_Model {
          $this->Validation = $Model->Validation;
          
          if ($Inserted) {
+            $this->UpdateCount($Row['GroupID'], 'CountMembers');
             $this->SQL->Delete('GroupApplicant', array('GroupApplicantID' => $ID));
             
             // TODO: Notify the user.
@@ -314,11 +331,12 @@ class GroupModel extends Gdn_Model {
       $this->SQL->Delete('UserGroup', array(
          'UserID' => GetValue('UserID', $Data),
          'GroupID' => GetValue('GroupID', $Data)));
+      
+      $this->UpdateCount($Data['GroupID'], 'CountMembers');
    }
    
    public function Save($Data, $Settings = FALSE) {
       $GroupID = parent::Save($Data, $Settings);
-      $this->GetCount(NULL); // clear cache.
       
       if ($GroupID) {
          // Make sure the group owner is a member.
@@ -334,6 +352,8 @@ class GroupModel extends Gdn_Model {
             $Model->Insert($Row);
             $this->Validation = $Model->Validation;
          }
+         $this->UpdateCount($GroupID, 'CountMembers');
+         $this->GetCount(NULL); // clear cache.
       }
       return $GroupID;
    }
@@ -361,6 +381,21 @@ class GroupModel extends Gdn_Model {
             'Type' => $Type
          ));
       }
+   }
+   
+   public function UpdateCount($GroupID, $Column) {
+      switch ($Column) {
+         case 'CountMembers':
+            $Sql = DBAModel::GetCountSQL('count', 'Group', 'UserGroup', $Column, 'UserGroupID');
+            break;
+         case 'DateLastComment':
+            $Sql = DBAModel::GetCountSQL('max', 'Group', 'Discussion', $Column, 'DateLastComment');
+            break;
+         default:
+            throw new Gdn_UserException("Unknown column $Column");
+      }
+      $Sql .= " where p.GroupID = $GroupID";
+      $this->Database->Query($Sql);
    }
    
    protected function ValidateRule($FieldName, $Data, $Rule, $CustomError = FALSE) {

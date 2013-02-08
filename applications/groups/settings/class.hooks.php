@@ -21,6 +21,25 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
    
+   /**
+    *
+    * @param DbaController $Sender 
+    */
+   public function DbaController_CountJobs_Handler($Sender) {
+      $Counts = array(
+          'Group' => array('CountMembers', 'DateLastComment')
+      );
+      
+      foreach ($Counts as $Table => $Columns) {
+         foreach ($Columns as $Column) {
+            $Name = "Recalculate $Table.$Column";
+            $Url = "/dba/counts.json?".http_build_query(array('table' => $Table, 'column' => $Column));
+            
+            $Sender->Data['Jobs'][$Name] = $Url;
+         }
+      }
+   }
+   
    public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
       $GroupID = Gdn::Request()->Get('groupid');
       if ($GroupID) {
@@ -31,6 +50,8 @@ class GroupsHooks extends Gdn_Plugin {
             // TODO: Check permissions.
             $Args['FormPostValues']['CategoryID'] = $Group['CategoryID'];
             $Args['FormPostValues']['GroupID'] = $GroupID;
+            
+            Trace($Args, 'Group set');
          }
       }
    }

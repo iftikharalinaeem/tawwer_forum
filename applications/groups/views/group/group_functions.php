@@ -317,6 +317,35 @@ function WriteGroupIcon($Group = FALSE, $Class = 'Group-Icon') {
 }
 endif;
 
+if (!function_exists('WriteGroupInfo')) :
+function WriteGroupInfo() {
+   $c = Gdn::Controller();
+   
+   $Owner = Gdn::UserModel()->GetID($c->Data('Group.InsertUserID'));
+   
+   $Info = array(
+      'Created' => Gdn_Format::Date($c->Data('Group.DateInserted'), 'html'),
+      'Owner' => UserAnchor($Owner),
+      'Member Count' => array('Members', $c->Data('Group.CountMembers'))
+      );
+   
+   
+   echo '<dl class="Group-Info">';
+   foreach ($Info as $Code => $Row) {
+      if (is_array($Row)) {
+         $Label = T($Code, $Row[0]);
+         $Value = $Row[1];
+      } else {
+         $Label = T($Code);
+         $Value = $Row;
+      }
+      
+      echo '<dt>'.$Label.'</dt>';
+      echo '<dd>'.$Value.'</dd>';
+   }
+   echo '</dl>';
+}
+endif;
 
 if (!function_exists('WriteGroupList')) :
 /**
@@ -408,11 +437,15 @@ if (!function_exists('WriteMemberGrid')) :
  * 
  * @param array $Members
  */
-function WriteMemberGrid($Members) {
+function WriteMemberGrid($Members, $More = '') {
    if (is_array($Members)) {
       echo '<div class="PhotoGrid PhotoGridSmall">';
       foreach ($Members as $Member) {
           echo UserPhoto($Member);
+      }
+      if ($More) {
+         
+         echo $More;
       }
       echo '</div>';
    }
