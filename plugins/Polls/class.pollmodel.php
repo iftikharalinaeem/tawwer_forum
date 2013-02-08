@@ -111,6 +111,10 @@ class PollModel extends Gdn_Model {
          // Trim the name.
          $FormPostValues['Name'] = $Name;
       }
+      
+      $this->EventArguments['FormPostValues'] = &$FormPostValues;
+		$this->EventArguments['DiscussionID'] = $DiscussionID;
+		$this->FireAs('DiscussionModel')->FireEvent('BeforeSaveDiscussion');
 
       // Validate the discussion model's form fields
       $DiscussionModel->Validate($FormPostValues, TRUE);

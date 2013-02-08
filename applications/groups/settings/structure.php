@@ -57,6 +57,32 @@ $St->Table('GroupApplicant')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Set($Explicit, $Drop);
 
+if ($St->TableExists('Category')) {
+   $St->Table('Category');
+   $AllowGroupsExists = $St->ColumnExists('AllowGroups');
+   $St->Table('Category')
+      ->Column('AllowGroups', 'tinyint', '0')
+      ->Set();
+   
+   if (!$AllowGroupsExists) {
+      // Create a category for groups.
+      $Model = new CategoryModel();
+      $Row = CategoryModel::Categories('social-groups');
+      if ($Row) {
+         $Model->SetField($Row['CategoryID'], 'AllowGroups', 1);
+      } else {
+         $Row = array(
+            'Name' => 'Social Groups',
+            'UrlCode' => 'social-groups',
+            'HideAllDiscussions' => 1,
+            'DisplayAs' => 'Discussions',
+            'AllowGroups' => 1,
+            'Sort' => 1000);
+         $Model->Save($Row);
+      }
+   }
+}
+
 if ($St->TableExists('Discussion')) {
    $St->Table('Discussion')
       ->Column('GroupID', 'int', TRUE, 'key')

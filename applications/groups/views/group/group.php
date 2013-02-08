@@ -30,7 +30,7 @@
       <?php WriteDiscussionBlogList($this->Data('Announcements'), $EmptyMessage); ?>
    </div>
    
-   <div class="Group-Box Group-Discussions">
+   <div class="Group-Box Group-Discussions Section-DiscussionList">
       <h2><?php echo T('Discussions'); ?></h2>
       
       <?php
@@ -43,6 +43,13 @@
       
       <?php $EmptyMessage = T('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"); ?>
       <?php WriteDiscussionList($this->Data('Discussions'), $EmptyMessage); ?>
+      <?php
+      if ($this->Data('Discussions')) {
+         echo '<div class="MoreWrap">'.
+            Anchor(T('All Discussions'), GroupUrl($this->Data('Group'), 'discussions')).
+            '</div>';
+      }
+      ?>
    </div>
 </div>
 
@@ -58,19 +65,15 @@
    <!-- Info -->
    <div class="Group-Box Group-Info">
       <h3><?php echo T('Group Info'); ?></h3>
-      <dl>
-         <dt>Created</dt>
-         <dd><?php echo Gdn_Format::Date($this->Data('Group.DateInserted'), 'html'); ?></dd>
-      </dl>
+      <?php
+      WriteGroupInfo();
+      ?>
    </div>
     
    <!-- Members -->
    <div class="Group-Box Group-MembersPreview">
       <h3><?php echo Anchor(T('Group Members', 'Members'), GroupUrl($this->Data('Group'), 'members'));?></h3>
-      <?php WriteMemberGrid($this->Data('Members')); ?>
-      <div class="MoreWrap">
-         <?php echo Anchor(T('All Members'), GroupUrl($this->Data('Group'), 'members'));?>
-      </div>
+      <?php WriteMemberGrid($this->Data('Members'), Anchor(T('All Members'), GroupUrl($this->Data('Group'), 'members'), 'MoreWrap')); ?>
    </div>
 </div>
 

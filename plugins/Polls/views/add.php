@@ -2,9 +2,12 @@
 if (!defined('APPLICATION'))
    exit();
 $Session = Gdn::Session();
-$CancelUrl = '/vanilla/discussions';
-if (C('Vanilla.Categories.Use') && is_object($this->Category))
+$CancelUrl = $this->Data('_CancelUrl');
+if (!$CancelUrl) {
+   $CancelUrl = '/vanilla/discussions';
+   if (C('Vanilla.Categories.Use') && is_object($this->Category))
    $CancelUrl = '/vanilla/categories/' . urlencode($this->Category->UrlCode);
+}
 ?>
 <script type="text/javascript">
    jQuery(document).ready(function($){

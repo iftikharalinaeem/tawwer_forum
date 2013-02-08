@@ -454,7 +454,8 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   height: 180px;
 }
 .Cards-Groups .Card .Card-Icon {
-  max-height: 75px;
+  width: 75px;
+  max-height: 100px;
 }
 .Cards-Groups .Card .Group-Buttons {
   position: absolute;
