@@ -42,6 +42,7 @@ class GroupController extends Gdn_Controller {
       $this->AddCssFile('style.css');
       
       $this->AddBreadcrumb(T('Groups'), Url('/groups'));
+      $this->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
       
       parent::Initialize();
    }

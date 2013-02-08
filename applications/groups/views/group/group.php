@@ -30,7 +30,7 @@
       <?php WriteDiscussionBlogList($this->Data('Announcements'), $EmptyMessage); ?>
    </div>
    
-   <div class="Group-Box Group-Discussions">
+   <div class="Group-Box Group-Discussions Section-DiscussionList">
       <h2><?php echo T('Discussions'); ?></h2>
       
       <?php
