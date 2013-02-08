@@ -93,9 +93,9 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       }
       
       if (sizeof($Eligible) >= 2) {
-         $SecondaryMessage .= T("{Secondary.Mention} is backup");
+         $SecondaryMessage .= T("{Secondary.Mention} is backup\n");
          $Acknowledge .= $SecondaryMessage;
-         $Secondary = $Eligible[0];
+         $Secondary = $Eligible[1];
          $Secondary['Mention'] = "@{$Secondary['Name']}";
          $Options['Secondary'] = $Secondary;
          $Options['SecondaryMessage'] = FormatString($SecondaryMessage, array(
