@@ -91,6 +91,7 @@ class GroupsHooks extends Gdn_Plugin {
          if ($Group) {
             // Hide the category drop-down.
             $Sender->ShowCategorySelector = FALSE;
+            $Sender->SetData('_CancelUrl', GroupUrl($Group));
          }
          
       }

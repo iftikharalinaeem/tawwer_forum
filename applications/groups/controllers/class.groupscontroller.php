@@ -8,6 +8,7 @@ if (!defined('APPLICATION'))
  * @license Proprietary
  */
 class GroupsController extends Gdn_Controller {
+   
 
    public $Uses = array('GroupModel');
 
@@ -15,6 +16,7 @@ class GroupsController extends Gdn_Controller {
     * @var GroupModel
     */
    public $GroupModel;
+   
 
    /**
     * Include JS, CSS, and modules used by all methods.

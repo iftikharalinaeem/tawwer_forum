@@ -43,6 +43,13 @@
       
       <?php $EmptyMessage = T('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"); ?>
       <?php WriteDiscussionList($this->Data('Discussions'), $EmptyMessage); ?>
+      <?php
+      if ($this->Data('Discussions')) {
+         echo '<div class="MoreWrap">'.
+            Anchor(T('All Discussions'), GroupUrl($this->Data('Group'), 'discussions')).
+            '</div>';
+      }
+      ?>
    </div>
 </div>
 

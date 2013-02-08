@@ -12,6 +12,15 @@ class GroupController extends Gdn_Controller {
     * @var GroupModel
     */
    public $GroupModel;
+   
+   /**
+    * Should the discussions have their options available.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var bool
+    */
+   public $ShowOptions = TRUE;
       
    /**
     * Include JS, CSS, and modules used by all methods.
