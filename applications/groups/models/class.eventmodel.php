@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * Groups Application - Event Model
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license Proprietary
+ * @package groups
+ * @since 1.0
+ */
+
 class EventModel extends Gdn_Model {
    
    /**
@@ -24,6 +34,50 @@ class EventModel extends Gdn_Model {
       
       $Row = parent::GetID($ID, $DatasetType);
       return $Row;
+   }
+   
+   public function GetUpcoming($Future, $Where = NULL, $Ended = FALSE) {
+      $UTC = new DateTimeZone('UTC');
+      $StartDate = new DateTime('now', $UTC);
+      if ($Future) {
+         $LimitDate = new DateTime('now', $UTC);
+         $LimitDate->modify($Future);
+      }
+      
+      // Handle 'invited' state manually
+      if ($InvitedUserID = GetValue('Invited', $Where)) {
+         unset($Where['Invited']);
+      }
+      
+      // Limit to a future date, but after right now
+      if ($LimitDate > $StartDate) {
+         $Where['DateStarts >'] = $StartDate->format('Y-m-d H:i:s');
+         if ($Future)
+            $Where['DateStarts <='] = $LimitDate->format('Y-m-d H:i:s');
+      } else {
+         $Where['DateStarts <'] = $StartDate->format('Y-m-d H:i:s');
+         if ($Future)
+            $Where['DateStarts >='] = $LimitDate->format('Y-m-d H:i:s');
+      }
+      
+      // Only events that are over
+      if ($Ended)
+         $Where['DateEnds <='] = $StartDate->format('Y-m-d H:i:s');
+      
+      $EventsQuery = $this->SQL
+         ->Select('e.*')
+         ->Where($Where)
+         ->OrderBy('DateStarts', 'asc');
+      
+      if ($InvitedUserID) {
+         $EventsQuery
+            ->From('UserEvent ue')
+            ->Join('Event e', 'eu.EventID = e.EventID');
+      } else {
+         $EventsQuery->From('Event e');
+      }
+      
+      return $EventsQuery->Get()->ResultArray();
    }
    
    public static function ParseID($ID) {

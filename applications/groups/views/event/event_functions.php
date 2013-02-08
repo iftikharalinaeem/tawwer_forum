@@ -4,17 +4,46 @@ if (!function_exists('WriteEventCard')) :
 /**
  * Write an event card
  * 
+ * Optionally write rich listing
+ * 
  * @param array $Event
  */
 function WriteEventCard($Event) {
    $DateStarts = new DateTime($Event['DateStarts']);
-   echo 
-   '<li class="Event">
-      '.DateTile($DateStarts->format('Y-m-d')).'
-      <h3 class="Event-Title">'.Anchor(Gdn_Format::Text($Event['Name']), EventUrl($Event)).' <span class="Event-Time MItem">'.$DateStarts->format('g:ia').'</span></h3>
+   if (GetValue('Rich', $Event)) {
+      
+      
+      
+   } else {
+      echo 
+      '<div class="Event">
+         '.DateTile($DateStarts->format('Y-m-d')).'
+         <h3 class="Event-Title">'.Anchor(Gdn_Format::Text($Event['Name']), EventUrl($Event)).' <span class="Event-Time MItem">'.$DateStarts->format('g:ia').'</span></h3>
 
-      <div class="Event-Location">'.Gdn_Format::Text($Event['Location']).'</div>
-      <p class="Event-Description"'.SliceParagraph(Gdn_Format::Text($Event['Body']), 100).'</p>
-   </li>';
+         <div class="Event-Location">'.Gdn_Format::Text($Event['Location']).'</div>
+         <p class="Event-Description">'.SliceParagraph(Gdn_Format::Text($Event['Body']), 100).'</p>
+      </div>';
+   }
+}
+endif;
+
+
+if (!function_exists('WriteEventCards')) :
+/**
+ * Write a list of events out as cards.
+ * 
+ * @param array $Events
+ * @param string $EmptyMessage
+ */
+function WriteEventCards($Events, $EmptyMessage = '') {
+   if (!$Events)
+      WriteEmptyState($EmptyMessage);
+   else {
+      echo '<div class="Cards Cards-Events">';
+      foreach ($Events as $Event) {
+         WriteEventCard($Event);
+      }
+      echo '</div>';
+   }
 }
 endif;

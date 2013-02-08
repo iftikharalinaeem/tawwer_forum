@@ -159,7 +159,25 @@
    
 }
 
-.Groups.Group .Group-Events {
+.Events.events {
+   .Cards {
+      margin: 0px;
+   }
+   
+   .UpcomingEvents {
+      margin-top: 20px;
+      
+      .Event {
+         margin: 20px 0px;
+         
+         .Event-Title { font-size: 120%; margin: 0px; }
+         .Event-Time { font-size: 12px; font-weight: normal; }
+         .Event-Location { line-height: 1.2em; }
+      }
+   }
+}
+
+.Box-Events {
    .DataList-Events {
       padding: 12px 0px;
    

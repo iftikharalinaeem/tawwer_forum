@@ -1,7 +1,7 @@
 <?php
 
 class GroupsHooks extends Gdn_Plugin {
-      /**
+   /**
     * Run structure & default badges.
     */
    public function Setup() {

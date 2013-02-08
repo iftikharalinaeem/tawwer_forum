@@ -14,57 +14,101 @@
 
 class EventModule extends Gdn_Module {
    
-   protected $Filter;
-   protected $FilterBy;
+   protected $Filter = NULL;
+   protected $FilterBy = NULL;
+   protected $Type = NULL;
+   protected $Button = NULL;
    
-   protected $Events = NULL;
-   
-   public function __construct() {
+   public function __construct($Type = NULL, $FilterBy = NULL, $Filter = NULL, $Button = NULL) {
       parent::__construct();
       $this->_ApplicationFolder = 'groups';
+      
+      if (!is_null($Type))
+         $this->Type = $Type;
+      
+      if (!is_null($FilterBy))
+         $this->FilterBy = $FilterBy;
+      
+      if (!is_null($Filter))
+         $this->Filter = $Filter;
+      
+      if (!is_null($Button))
+         $this->Button = $Button;
    }
       
    public function __set($Name, $Value) {
+      $Name = strtolower($Name);
       switch ($Name) {
-         case 'GroupID':
+         case 'groupid':
             $this->Filter = $Value;
             $this->FilterBy = 'group';
             break;
          
-         case 'UserID':
+         case 'userid':
             $this->Filter = $Value;
             $this->FilterBy = 'user';
             break;
+         
+         case 'type':
+            $this->Type = $Value;
+            break;
+         
+         case 'button':
+            $this->Button = $Value;
+            break;
       }
+      
+      return $this;
    }
    
    public function GetData() {
       
-      // Callable multiple times
-      if (!is_null($this->Events)) return;
+      // Only callable if configured
+      if (!$this->Type) return;
       
+      // Callable multiple times
+      if (!is_null($this->Data('Events', NULL))) return;
+      
+      $EventCriteria = array();
       switch ($this->FilterBy) {
          case 'group':
             $GroupModel = new GroupModel();
             $Group = $GroupModel->GetID($this->Filter, DATASET_TYPE_ARRAY);
+            $this->SetData('Group', $Group);
+            $EventCriteria['GroupID'] = $Group['GroupID'];
             break;
          
          case 'user':
             $User = Gdn::UserModel()->GetID($this->Filter, DATASET_TYPE_ARRAY);
+            $this->SetData('User', $User);
+            $EventCriteria['Invited'] = $User['UserID'];
             break;
       }
       
-      $this->Events = array();
+      switch ($this->Type) {
+         case 'upcoming':
+            $FilterDate = C('Groups.Events.UpcomingRange', '+30 days');
+            $Ended = FALSE;
+            $this->SetData('Title', T('Upcoming Events'));
+            break;
+         
+         case 'recent':
+            $FilterDate = C('Groups.Events.RecentRange', '-10 days');
+            $Ended = TRUE;
+            $this->SetData('Title', T('Recent Events'));
+            break;
+      }
       
-      $Query = array();
-      $EventModule = new EventModel();
-      $Events = $EventModule->GetWhere($Query);
+      $EventModel = new EventModel();
+      $this->SetData('Events', $EventModel->GetUpcoming($FilterDate, $EventCriteria, $Ended));
       
-      $this->Events = $Events;
    }
    
    public function ToString() {
       $this->GetData();
+      if (!is_null($this->Button))
+         $this->SetData('Button', $this->Button);
+      return $this->FetchView();
    }
    
 }
