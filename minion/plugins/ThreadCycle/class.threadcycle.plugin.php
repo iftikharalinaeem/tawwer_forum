@@ -7,6 +7,7 @@
  * 
  * Changes: 
  *  1.0     Release
+ *  1.1     Improve new thread creator choices
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -17,7 +18,7 @@
 $PluginInfo['ThreadCycle'] = array(
    'Name' => 'Minion: ThreadCycle',
    'Description' => "Provide command to automatically cycle a thread after N pages.",
-   'Version' => '1.0',
+   'Version' => '1.1',
    'RequiredApplications' => array(
       'Vanilla' => '2.1a'
     ),
@@ -58,9 +59,6 @@ class ThreadCyclePlugin extends Gdn_Plugin {
          'Join'   => array('Name', 'Jailed', 'Points')
       ));
       
-      // Sort by points, descending
-      uasort($Commenters, array('ThreadCyclePlugin', 'CompareUsers'));
-      
       // Weed out jailed and offline people
       $Eligible = array();
       foreach ($Commenters as $Commenter) {
@@ -71,10 +69,17 @@ class ThreadCyclePlugin extends Gdn_Plugin {
          if (!$UserOnline) 
             continue;
          
+         $Commenter['LastOnline'] = time() - strtotime($UserOnline['Timestamp']);
          $Eligible[] = $Commenter;
-         if (sizeof($Eligible) == 2) break;
       }
       unset($Commenters);
+      
+      // Sort by points, descending
+      usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByPoints'));
+      
+      // Get the top 10 by points, and choose the 2 most recently online
+      $Eligible = array_slice($Eligible, 0, 10);
+      usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByLastOnline'));
       
       // Alert everyone
       $Message = T("This thread is no longer active, and will be recycled.\n{PrimaryMessage}{SecondaryMessage}");
@@ -114,8 +119,12 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       ));
    }
    
-   public static function CompareUsers($a, $b) {
+   public static function CompareUsersByPoints($a, $b) {
       return $b['Points'] - $a['Points'];
+   }
+   
+   public static function CompareUsersByLastOnline($a, $b) {
+      return $a['LastOnline'] - $a['LastOnline'];
    }
    
    /*
