@@ -56,7 +56,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
          ->Get()->ResultArray();
       
       Gdn::UserModel()->JoinUsers($Commenters, array('UserID'), array(
-         'Join'   => array('Name', 'Jailed', 'Points')
+         'Join'   => array('UserID', 'Name', 'Email', 'Photo', 'Jailed', 'Points')
       ));
       
       // Weed out jailed and offline people
@@ -80,32 +80,32 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       // Get the top 10 by points, and choose the 2 most recently online
       $Eligible = array_slice($Eligible, 0, 10);
       usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByLastOnline'));
+      $Primary = GetValue(0, $Eligible, array());
+      $Secondary = Getvalue(1, $Eligible, array());
       
       // Alert everyone
-      $Message = T("This thread is no longer active, and will be recycled.\n{PrimaryMessage}{SecondaryMessage}");
+      $Message = T("This thread is no longer active, and will be recycled.\n");
       $Acknowledge = T("Thread has been recycled.\n");
       
-      $Options = array();
-      if (sizeof($Eligible) >= 1) {
-         $PrimaryMessage = T("{Primary.Mention} will create the new thread\n");
-         $Acknowledge .= $PrimaryMessage;
-         $Primary = $Eligible[0];
-         $Primary['Mention'] = "@{$Primary['Name']}";
-         $Options['Primary'] = $Primary;
-         $Options['PrimaryMessage'] = FormatString($PrimaryMessage, array(
-            'Primary'   => $Primary
-         ));
+      $Options = array(
+         'Primary'   => &$Primary,
+         'Secondary' => &$Secondary
+      );
+      
+      if (sizeof($Primary)) {
+         $Message .= $PrimaryMessage = T("{Primary.Mention} will create the new thread\n");
+         $Acknowledge .= str_replace('.Mention', '.Anchor', $PrimaryMessage);
+         
+         $Primary['Mention'] = "@\"{$Primary['Name']}\"";
+         $Primary['Anchor'] = UserAnchor($Primary);
       }
       
-      if (sizeof($Eligible) >= 2) {
-         $SecondaryMessage .= T("{Secondary.Mention} is backup\n");
-         $Acknowledge .= $SecondaryMessage;
-         $Secondary = $Eligible[1];
-         $Secondary['Mention'] = "@{$Secondary['Name']}";
-         $Options['Secondary'] = $Secondary;
-         $Options['SecondaryMessage'] = FormatString($SecondaryMessage, array(
-            'Secondary' => $Secondary
-         ));
+      if (sizeof($Secondary)) {
+         $Message .= $SecondaryMessage = T("{Secondary.Mention} is backup\n");
+         $Acknowledge .= str_replace('.Mention', '.Anchor', $SecondaryMessage);
+         
+         $Secondary['Mention'] = "@\"{$Secondary['Name']}\"";
+         $Secondary['Anchor'] = UserAnchor($Secondary);
       }
       
       $Message = FormatString($Message, $Options);
