@@ -23,7 +23,7 @@ $PluginInfo['ThreadCycle'] = array(
     ),
    'RequiredPlugins' => array(
       'Minion' => '1.4.2',
-      'Onlin'  => '1.6.3'
+      'Online' => '1.6.3'
    ),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
