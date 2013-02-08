@@ -107,7 +107,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       MinionPlugin::Instance()->Message($Primary, $Discussion, $Message);
       
       $Acknowledged = FormatString($Acknowledge, $Options);
-      MinionPlugin::Instance()->Log($Acknowledge, $Discussion);
+      MinionPlugin::Instance()->Log($Acknowledged, $Discussion);
       
       MinionPlugin::Instance()->Monitor($Discussion, array(
          'ThreadCycle' => NULL
