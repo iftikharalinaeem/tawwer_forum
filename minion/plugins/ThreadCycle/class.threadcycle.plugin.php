@@ -93,7 +93,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       );
       
       if (sizeof($Primary)) {
-         $Message .= $PrimaryMessage = T("{Primary.Mention} will create the new thread\n");
+         $Message .= $PrimaryMessage = T(" {Primary.Mention} will create the new thread\n");
          $Acknowledge .= str_replace('.Mention', '.Anchor', $PrimaryMessage);
          
          $Primary['Mention'] = "@\"{$Primary['Name']}\"";
@@ -101,7 +101,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       }
       
       if (sizeof($Secondary)) {
-         $Message .= $SecondaryMessage = T("{Secondary.Mention} is backup\n");
+         $Message .= $SecondaryMessage = T(" {Secondary.Mention} is backup\n");
          $Acknowledge .= str_replace('.Mention', '.Anchor', $SecondaryMessage);
          
          $Secondary['Mention'] = "@\"{$Secondary['Name']}\"";
@@ -109,7 +109,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       }
       
       $Message = FormatString($Message, $Options);
-      MinionPlugin::Instance()->Message($Primary, $Discussion, $Message);
+      MinionPlugin::Instance()->Message($Primary, $Discussion, $Message, FALSE);
       
       $Acknowledged = FormatString($Acknowledge, $Options);
       MinionPlugin::Instance()->Log($Acknowledged, $Discussion);

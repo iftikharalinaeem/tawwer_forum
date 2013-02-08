@@ -1533,7 +1533,7 @@ class MinionPlugin extends Gdn_Plugin {
     * @param array $Discussion
     * @param string $Message
     */
-   public function Message($User, $Discussion, $Message) {
+   public function Message($User, $Discussion, $Message, $Format = TRUE) {
       if (is_numeric($User)) {
          $User = Gdn::UserModel()->GetID($User);
          if (!$User) return FALSE;
@@ -1548,10 +1548,12 @@ class MinionPlugin extends Gdn_Plugin {
       $DiscussionID = GetValue('DiscussionID', $Discussion);
       $CommentModel = new CommentModel();
       
-      $Message = FormatString($Message, array(
-         'User'         => $User,
-         'Discussion'   => $Discussion
-      ));
+      if ($Format) {
+         $Message = FormatString($Message, array(
+            'User'         => $User,
+            'Discussion'   => $Discussion
+         ));
+      }
       
       $MinionCommentID = NULL;
       if ($Message) {
