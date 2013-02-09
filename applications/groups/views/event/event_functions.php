@@ -10,20 +10,21 @@ if (!function_exists('WriteEventCard')) :
  */
 function WriteEventCard($Event) {
    $DateStarts = new DateTime($Event['DateStarts']);
+   echo '<div class="Event">';
    if (GetValue('Rich', $Event)) {
       
       
       
    } else {
-      echo 
-      '<div class="Event">
-         '.DateTile($DateStarts->format('Y-m-d')).'
+      
+      echo DateTile($DateStarts->format('Y-m-d')).'
          <h3 class="Event-Title">'.Anchor(Gdn_Format::Text($Event['Name']), EventUrl($Event)).' <span class="Event-Time MItem">'.$DateStarts->format('g:ia').'</span></h3>
 
          <div class="Event-Location">'.Gdn_Format::Text($Event['Location']).'</div>
-         <p class="Event-Description">'.SliceParagraph(Gdn_Format::Text($Event['Body']), 100).'</p>
-      </div>';
+         <p class="Event-Description">'.SliceParagraph(Gdn_Format::Text($Event['Body']), 100).'</p>';
+      
    }
+   echo '</div>';
 }
 endif;
 

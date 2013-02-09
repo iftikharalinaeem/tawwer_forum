@@ -3,5 +3,5 @@
 <h1><?php echo $this->Data('Title')?></h1>
 
 <div class="UpcomingEvents">
-   <?php WriteDetailedEventCards($this->Data('UpcomingEvents')); ?>
+   <?php WriteEventCards($this->Data('UpcomingEvents')); ?>
 </div>
