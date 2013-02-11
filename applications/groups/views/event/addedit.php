@@ -37,7 +37,7 @@
             <div class="P From">
                <?php echo $this->Form->Label('When', 'DateStarts', array('class' => 'When')); ?>
                <?php echo $this->Form->Label('From', 'DateStarts'); ?>
-               <div>
+               <span>
                   <?php echo $this->Form->TextBox('DateStarts', array(
                      'class'        => 'InputBox DatePicker',
                      'title'        => "Date. Expects 'mm/dd/yyyy'."
@@ -46,18 +46,18 @@
                      'class'        => 'InputBox TimePicker',
                      'placeholder'  => 'Add a time?'
                   )); ?>
-               </div>
-               <div class="Timebased Timezone">
+               </span>
+               <span class="Timebased Timezone">
                   <?php echo $this->Form->Hidden('Timezone', array('class' => 'EventTimezone')); ?>
                   <?php echo $this->Form->Hidden('TimezoneAbbr', array('class' => 'EventTimezoneAbbr')); ?>
                   <a class="EventTimezoneDisplay" data-dropdown="#dropdown-timezone"><?php echo $this->Data('Event.TimezoneAbbr'); ?></a>
-               </div>
-               <div class="Timebased EndTime"><?php echo Anchor(T('End time?'), '#'); ?></div>
+               </span>
+               <span class="Timebased EndTime"><?php echo Anchor(T('End time?'), '#'); ?></span>
             </div>
 
             <div class="P To">
                <?php echo $this->Form->Label('To', 'DateEnds'); ?>
-               <div>
+               <span>
                   <?php echo $this->Form->TextBox('DateEnds', array(
                      'class'        => 'InputBox DatePicker',
                      'title'        => "Date. Expects 'mm/dd/yyyy'."
@@ -66,8 +66,8 @@
                      'class'        => 'InputBox TimePicker',
                      'placeholder'  => 'Add a time?'
                   )); ?>
-               </div>
-               <div class="Timebased NoEndTime"><?php echo Anchor(T('x'), '#'); ?></div>
+               </span>
+               <span class="Timebased NoEndTime"><?php echo Anchor(T('x'), '#'); ?></span>
             </div>
          </div>
 

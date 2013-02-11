@@ -240,6 +240,10 @@ function WriteGroupButtons($Group = NULL) {
    if (GroupPermission('Leave', $Group)) {
       $Options['Leave'] = array('Text' => T('Leave Group'), 'Url' => GroupUrl($Group, 'leave'), 'CssClass' => 'Popup');
    }
+   
+   if (GroupPermission('Leader', $Group)) {
+      $Options['Delete'] = array('Text' => T('Delete Group'), 'Url' => GroupUrl($Group, 'delete'), 'CssClass' => 'Popup');
+   }
 
    if (count($Options))
       echo ButtonDropDown($Options, 'Button DropRight Group-OptionsButton', Sprite('SpOptions', 'Sprite16'));

@@ -241,6 +241,38 @@ class GroupController extends Gdn_Controller {
       $this->Render();
    }
    
+   public function Delete($ID) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+      $this->SetData('Group', $Group);
+      
+      if (!GroupPermission('Leader'))
+         throw ForbiddenException('delete this group');
+      
+      $Form = new Gdn_Form();
+      $this->Form = $Form;
+      
+      if ($this->Form->IsPostBack()) {
+         $GroupModel = new GroupModel();
+         $GroupDeleted = $GroupModel->Delete(array('GroupID' => $Group['GroupID']));
+         
+         $EventModel = new EventModel();
+         $EventDeleted = $EventModel->Delete(array('GroupID' => $Group['EventID']));
+
+         if ($GroupDeleted) {
+            $this->InformMessage(FormatString(T('<b>{Name}</b> deleted.'), $Group));
+            $this->RedirectUrl = Url('/groups');
+         } else {
+            $this->InformMessage(T('Failed to delete group.'));
+         }
+      }
+      
+      $this->SetData('Title', T('Delete Group'));
+      
+      $this->Render();
+   }
+   
    /**
     * Save an image from a field and delete any old image that's been uploaded.
     * This method is a canditate for putting on the form object.

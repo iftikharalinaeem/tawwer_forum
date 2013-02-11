@@ -437,4 +437,34 @@ class GroupModel extends Gdn_Model {
       $Valid = $this->Validation->Validate($Data);
       return $Valid;
    }
+   
+   /**
+    * Delete a group
+    * 
+    * @param array $Where
+    * @param integer $Limit
+    * @param boolean $ResetData
+    * @return Gdn_DataSet
+    */
+   public function Delete($Where = '', $Limit = FALSE, $ResetData = FALSE) {
+      // Get list of matching groups
+      $MatchGroups = $this->GetWhere($Where,'','',$Limit);
+      
+      // Delete groups
+      $Deleted = parent::Delete($Where, $Limit, $ResetData);
+      
+      // Clean up UserGroups
+      $GroupIDs = array();
+      foreach ($MatchGroups as $Event)
+         $GroupIDs[] = GetValue('GroupID', $Event);
+      $this->SQL->Delete('UserGroup', array(
+         'GroupID'   => $GroupIDs
+      ));
+      $this->SQL->Delete('GroupApplicant', array(
+         'GroupID'   => $GroupIDs
+      ));
+      
+      return $Deleted;
+   }
+   
 }
