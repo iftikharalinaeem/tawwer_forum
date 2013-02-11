@@ -105,104 +105,75 @@ class EventModel extends Gdn_Model {
     * Check permission on a event.
     * 
     * @param string $Permission The permission to check. Valid values are:
-    *  - Member: User is a member of the group.
-    *  - Leader: User is a leader of the group.
-    *  - Join: User can join the group.
-    *  - Leave: User can leave the group.
-    *  - Edit: The user may edit the group.
-    *  - Delete: User can delete the group.
-    *  - View: The user may view the group's contents.
-    *  - Moderate: The user may moderate the group.
-    * @param int $GroupID
+    *  - Organizer: User is a leader of the event.
+    *  - Member: User is a member of the event.
+    *  - Edit: User can edit the event.
+    *  - View: The user may view the event's contents.
+    * @param int $EventID
     * @return boolean
     */
-   public function CheckPermission($Permission, $GroupID) {
+   public function CheckPermission($Permission, $EventID) {
       static $Permissions = array();
       
       $UserID = Gdn::Session()->UserID;
       
-      if (is_array($GroupID)) {
-         $Group = $GroupID;
-         $GroupID = $Group['GroupID'];
+      if (is_array($EventID)) {
+         $Event = $EventID;
+         $EventID = $Event['EventID'];
       }
 
-      $Key = "{$UserID}-{$GroupID}";
+      $Key = "{$UserID}-{$EventID}";
       
       if (!isset($Permissions[$Key])) {
          // Get the data for the group.
-         if (!isset($Group))
-            $Group = $this->GetID($GroupID);
+         if (!isset($Event))
+            $Event = $this->GetID($EventID);
          
          if ($UserID) {
-            $UserGroup = Gdn::SQL()->GetWhere('UserGroup', array('GroupID' => $GroupID, 'UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
-            $GroupApplicant = Gdn::SQL()->GetWhere('GroupApplicant', array('GroupID' => $GroupID, 'UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
+            $UserEvent = Gdn::SQL()->GetWhere('UserEvent', array('EventID' => $EventID, 'UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
          } else {
-            $UserGroup = FALSE;
-            $GroupApplicant = FALSE;
+            $UserEvent = FALSE;
          }
          
          // Set the default permissions.
          $Perms = array(
-            'Member' => FALSE,
-            'Leader' => FALSE,
-            'Join' => Gdn::Session()->IsValid(),
-            'Leave' => FALSE,
+            'Organizer' => FALSE,
             'Edit' => FALSE,
-            'Delete' => FALSE,
-            'Moderate' => FALSE,
-            'View' => TRUE);
+            'Member' => FALSE,
+            'View' => TRUE
+         );
          
          // The group creator is always a member and leader.
-         if ($UserID == $Group['InsertUserID']) {
-            $Perms['Delete'] = TRUE;
-            
-            if (!$UserGroup)
-               $UserGroup = array('Role' => 'Leader');
-         }
-            
-         if ($UserGroup) {
-            $Perms['Join'] = FALSE;
-            $Perms['Join.Reason'] = T('You are already a member of this group.');
-            
+         if ($UserID == $Event['InsertUserID']) {
+            $Perms['Leader'] = TRUE;
+            $Perms['Edit'] = TRUE;
             $Perms['Member'] = TRUE;
-            $Perms['Leader'] = ($UserGroup['Role'] == 'Leader');
-            $Perms['Edit'] = $Perms['Leader'];
-            $Perms['Moderate'] = $Perms['Leader'];
-            
-            if ($UserID != $Group['InsertUserID']) {
-               $Perms['Leave'] = TRUE;
-            } else {
-               $Perms['Leave.Reason'] = T("You can't leave the group you started.");
-            }
+            $Perms['View'] = TRUE;
+         }
+         
+         if ($UserEvent) {
+            $Perms['Member'] = TRUE;
+            $Perms['View'] = TRUE;
          } else {
-            if ($Group['Visibility'] != 'Public') {
-               $Perms['View'] = FALSE;
-               $Perms['View.Reason'] = T('Join this group to view its content.');
+            
+            // Check if we're in a group
+            $EventGroupID = GetValue('GroupID', $Event, NULL);
+            if ($EventGroupID) {
+               $GroupModel = new GroupModel();
+               $EventGroup = $GroupModel->GetID($EventGroupID);
+               
+               if (GroupPermission('Member', $EventGroupID)) {
+                  $Perms['Member'] = TRUE;
+                  $Perms['View'] = TRUE;
+               }
             }
+            
          }
          
-         if ($GroupApplicant) {
-            $Perms['Join'] = FALSE; // Already applied or banned.
-            switch (strtolower($GroupApplicant['Type'])) {
-               case 'application':
-                  $Perms['Join.Reason'] = T("You've applied to join this group.");
-                  break;
-               case 'denied':
-                  $Perms['Join.Reason'] = T("You're application for this group was denied.");
-                  break;
-               case 'ban':
-                  $Perms['Join.Reason'] = T("You're banned from joining this group.");
-                  break;
-            }
-         }
-         
-         // Moderators can view and edit all groups.
+         // Moderators can view and edit all events.
          if ($UserID == Gdn::Session()->UserID && Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
             $Perms['Edit'] = TRUE;
-            $Perms['Delete'] = TRUE;
             $Perms['View'] = TRUE;
-            unset($Perms['View.Reason']);
-            $Perms['Moderate'] = TRUE;
          }
          
          $Permissions[$Key] = $Perms;
@@ -223,9 +194,9 @@ class EventModel extends Gdn_Model {
                return '';
             
             if (in_array($Permission, array('Member', 'Leader'))) {
-               $Message = T(sprintf("You aren't a %s of this group.", strtolower($Permission)));
+               $Message = T(sprintf("You aren't a %s of this event.", strtolower($Permission)));
             } else {
-               $Message = sprintf(T("You aren't allowed to %s this group."), T(strtolower($Permission)));
+               $Message = sprintf(T("You aren't allowed to %s this event."), T(strtolower($Permission)));
             }
             
             return $Message;

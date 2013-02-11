@@ -46,7 +46,7 @@ class EventController extends Gdn_Controller {
    }
    
    public function Index($EventID) {
-      return $this->Show($EventID);
+      return $this->Event($EventID);
    }
    
    /**
@@ -187,7 +187,7 @@ class EventController extends Gdn_Controller {
     * @return type
     * @throws Exception
     */
-   public function Show($EventID) {
+   public function Event($EventID) {
       
       // Lookup event
       $EventModel = new EventModel();
@@ -254,8 +254,8 @@ class EventController extends Gdn_Controller {
       require_once $this->FetchViewLocation('group_functions', 'Group');
       
       $this->AddModule('DiscussionFilterModule');
-      $this->RequestMethod = 'show';
-      $this->View = 'show';
+      $this->RequestMethod = 'event';
+      $this->View = 'event';
       return $this->Render();
    }
    

@@ -15,8 +15,12 @@ function EventSlug($Event) {
    return $Event['EventID'].'-'.Gdn_Format::Url($Event['Name']);
 }
 
-function EventUrl($Event) {
-   return '/event/'.EventSlug($Event);
+function EventUrl($Event, $Method = NULL) {
+   if ($Method) {
+      return Url("/event/$Method/".EventSlug($Event), '//');
+   } else {
+      return Url('/event/'.EventSlug($Event), '//');
+   }
 }
 
 function GroupPermission($Permission = NULL, $GroupID = NULL) {

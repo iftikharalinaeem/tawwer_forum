@@ -1,4 +1,8 @@
-<h1><?php echo T($this->Data['Title']); ?></h1>
+<div class="Event-Header">
+   <!-- Edit/Delete Buttons -->
+   <?php WriteEventButtons(); ?>
+   <h1 class="Event-Title"><?php echo htmlspecialchars($this->Data('Event.Name')); ?></h1>
+</div>
 
 <div class="P EventInfo" data-eventid="<?php echo $this->Data('Event.EventID'); ?>">
    <ul>

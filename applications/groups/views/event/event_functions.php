@@ -15,26 +15,13 @@ function WriteEventButtons($Event = NULL) {
    
    echo '<div class="Event-Buttons">';
    
-   if (Gdn::Session()->IsValid() && !EventPermission('Member', $Event)) {
-      if (EventPermission('Join', $Event)) {
-         echo ' '.Anchor(T('Join this Event'), EventUrl($Event, 'join'), 'Button Primary Event-JoinButton Popup').' ';
-      } else {
-         echo ' '.Wrap(T('Join this Event'), 'span', array('class' => 'Button Primary Event-JoinButton Disabled', 'title' => EventPermission('Join.Reason', $Event))).' ';
-      }
-   }
-      
    $Options = array();
    
    if (EventPermission('Edit', $Event)) {
       $Options['Edit'] = array('Text' => T('Edit'), 'Url' => EventUrl($Event, 'edit'));
+      $Options['Delete'] = array('Text' => T('Delete'), 'Url' => EventUrl($Event, 'delete'));
    }
-//   if (EventPermission('Delete')) {
-//      $Options['Delete'] = array('Text' => T('Delete'), 'Url' => EventUrl($Event, 'delete'));
-//   }
-   if (EventPermission('Leave', $Event)) {
-      $Options['Leave'] = array('Text' => T('Leave Event'), 'Url' => EventUrl($Event, 'leave'), 'CssClass' => 'Popup');
-   }
-
+   
    if (count($Options))
       echo ButtonDropDown($Options, 'Button DropRight Event-OptionsButton', Sprite('SpOptions', 'Sprite16'));
    
