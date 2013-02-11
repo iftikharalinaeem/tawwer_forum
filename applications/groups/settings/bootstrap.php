@@ -29,3 +29,14 @@ function GroupPermission($Permission = NULL, $GroupID = NULL) {
    $GroupModel = new GroupModel();
    return $GroupModel->CheckPermission($Permission, $GroupID);
 }
+
+function EventPermission($Permission = NULL, $EventID = NULL) {
+   if ($EventID === NULL) {
+      $EventID = Gdn::Controller()->Data('Event');
+   }
+   
+   if (isset(Gdn::Controller()->EventModel))
+      return Gdn::Controller()->EventModel->CheckPermission($Permission, $EventID);
+   $EventModel = new EventModel();
+   return $EventModel->CheckPermission($Permission, $EventID);
+}

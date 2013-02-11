@@ -216,7 +216,8 @@ if (!function_exists('WriteGroupButtons')) :
 function WriteGroupButtons($Group = NULL) {
    if (!$Group)
       $Group = Gdn::Controller()->Data('Group');
-   
+   if (!$Group) 
+      return;
    echo '<div class="Group-Buttons">';
    
    if (Gdn::Session()->IsValid() && !GroupPermission('Member', $Group)) {
