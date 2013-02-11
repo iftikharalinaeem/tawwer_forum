@@ -6,9 +6,9 @@ function GroupSlug($Group) {
 
 function GroupUrl($Group, $Method = NULL) {
    if ($Method) {
-      return Url("/group/$Method/".GroupSlug($Group));
+      return Url("/group/$Method/".GroupSlug($Group), '//');
    } else {
-      return Url('/group/'.GroupSlug($Group));
+      return Url('/group/'.GroupSlug($Group), '//');
    }
 }
 function EventSlug($Event) {

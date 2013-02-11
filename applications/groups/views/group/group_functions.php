@@ -127,7 +127,7 @@ function WriteEventList($Events, $Group = NULL, $EmptyMessage = '', $Button = TR
    $GroupID = GetValue('GroupID', $Group, '');
    if (GroupPermission('Member') && $Button) {
       echo '<div class="Button-Controls">';
-      echo ' '.Anchor(T('New Event'), Url("/event/add/{$GroupID}"), 'Button Primary Group-NewEventButton').' ';
+      echo ' '.Anchor(T('New Event'), "/event/add/{$GroupID}", 'Button Primary Group-NewEventButton').' ';
       echo '</div>';
    }
    
