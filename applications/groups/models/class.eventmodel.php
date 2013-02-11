@@ -102,7 +102,7 @@ class EventModel extends Gdn_Model {
    }
    
    /**
-    * Check permission on a group.
+    * Check permission on a event.
     * 
     * @param string $Permission The permission to check. Valid values are:
     *  - Member: User is a member of the group.
@@ -380,10 +380,8 @@ class EventModel extends Gdn_Model {
          $ForceEndTime = FALSE;
          if ($Event['AllDayEvent']) {
             $Event['TimeStarts'] = '12:00am';
-            if (empty($Event['TimeEnds'])) {
-               $Event['TimeEnds'] = '11:59pm';
-               $ForceEndTime = TRUE;
-            }
+            $Event['TimeEnds'] = '11:59pm';
+            $ForceEndTime = TRUE;
          }
          
          $InputDateFormat = '!m/d/Y h:ia';
