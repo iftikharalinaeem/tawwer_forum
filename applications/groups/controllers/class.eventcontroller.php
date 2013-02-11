@@ -50,13 +50,11 @@ class EventController extends Gdn_Controller {
    }
    
    /**
-    * Create a new event
+    * Common add/edit functionality
     * 
-    * @param integer $GroupID Optional, if we're creating a group event
-    * @return type
-    * @throws Exception
+    * @param integer $EventID
     */
-   public function Add($GroupID = NULL) {
+   protected function AddEdit($EventID = NULL, $GroupID = NULL) {
       $this->Permission('Garden.SignIn.Allow');
       
       $this->AddJsFile('jquery.timepicker.min.js');
@@ -64,28 +62,59 @@ class EventController extends Gdn_Controller {
       $this->AddJsFile('jstz.min.js');
       $this->AddCssFile('jquery.dropdown.css');
       
+      $Event = NULL;
+      $Group = NULL;
+      
+      // Lookup event
+      if ($EventID) {
+         $EventModel = new EventModel();
+         $Event = $EventModel->GetID($EventID, DATASET_TYPE_ARRAY);
+         if (!$Event) throw NotFoundException('Event');
+         $this->SetData('Event', $Event);
+         $GroupID = $Event['GroupID'];
+      }
+      
       // Lookup group, if there is one
       if ($GroupID) {
-         // Lookup group
          $GroupModel = new GroupModel();
          $Group = $GroupModel->GetID($GroupID);
          if (!$Group) throw NotFoundException('Group');
          $this->SetData('Group', $Group);
-
+      }
+      
+      // Add breadcrumbs
+      if ($Group)
+         $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+      
+      if ($Event)
+         $this->AddBreadcrumb($Event['Name'], EventUrl($Event));
+      
+      // Timezones
+      $this->SetData('Timezones', EventModel::Timezones());
+      
+      return array($Event, $Group);
+   }
+   
+   /**
+    * Create a new event
+    * 
+    * @param integer $GroupID Optional, if we're creating a group event
+    * @return type
+    * @throws Exception
+    */
+   public function Add($GroupID = NULL) {
+      list($Event, $Group) = $this->AddEdit(NULL, $GroupID);
+      
+      if ($Group) {
          $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $GroupID);
          if (!$MemberOfGroup)
             throw ForbiddenException('create a new event');
-         
-         $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       }
       
       $this->Title(T('New Event'));
       $this->AddBreadcrumb($this->Title());
       
       // TODO: Event create permission
-      
-      // Timezones
-      $this->SetData('Timezones', EventModel::Timezones());
       
       $EventModel = new EventModel();
       $this->Form->SetModel($EventModel);
@@ -114,7 +143,7 @@ class EventController extends Gdn_Controller {
       require_once $this->FetchViewLocation('event_functions', 'Event');
       require_once $this->FetchViewLocation('group_functions', 'Group');
       
-      $this->View = 'add';
+      $this->View = 'addedit';
       $this->CssClass .= ' NoPanel NarrowForm';
       return $this->Render();
    }
@@ -125,57 +154,64 @@ class EventController extends Gdn_Controller {
     * @param type $EventID
     */
    public function Edit($EventID) {
-      $this->Permission('Garden.SignIn.Allow');
+      list($Event, $Group) = $this->AddEdit($EventID);
       
-      $this->AddJsFile('jquery.timepicker.min.js');
-      $this->AddJsFile('jquery.dropdown.js');
-      $this->AddJsFile('jstz.min.js');
-      $this->AddCssFile('jquery.dropdown.css');
-      
-      // Lookup event
-      $EventModel = new EventModel();
-      $Event = $EventModel->GetID($EventID, DATASET_TYPE_ARRAY);
-      if (!$Event) throw NotFoundException('Event');
-      $this->SetData('Event', $Event);
-      
-      $OrganizerID = $Event['InsertUserID'];
-      $IsOrganizer = $OrganizerID == Gdn::Session()->UserID;
-      
-      if (!$IsOrganizer && !Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
+      if (!EventPermission('Edit'))
          throw ForbiddenException('edit this event');
       
-      // Lookup group, if there is one
-      $GroupID = GetValue('GroupID', $Event, FALSE);
-      if ($GroupID) {
-         
-         $GroupModel = new GroupModel();
-         $Group = $GroupModel->GetID($GroupID, DATASET_TYPE_ARRAY);
-         if (!$Group) throw NotFoundException('Group');
-         $this->SetData('Group', $Group);
-         
-         $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
-      }
-      
       $this->Title(T('Edit Event'));
-      $this->AddBreadcrumb($Event['Name'], EventUrl($Event));
       $this->AddBreadcrumb($this->Title());
       
-      $this->Form->SetData($Event);
+      // Pre-fill form
+      if ($Event) {
+         $UTC = new DateTimeZone('UTC');
+         $Timezone = new DateTimeZone($Event['Timezone']);
+         
+         // Get TZ transition
+         $Transition = array_shift($T = $Timezone->getTransitions(time(), time()));
+         $Event['TimezoneAbbr'] = $Transition['abbr'];
+         
+         $EventStarts = new DateTime($Event['DateStarts'], $UTC);
+         $EventStarts->setTimezone($Timezone);
+         $Event['DateStarts'] = $EventStarts->format('m/d/Y');
+         $Event['TimeStarts'] = $EventStarts->format('h:ia');
+
+         $EventEnds = new DateTime($Event['DateEnds'], $UTC);
+         $EventEnds->setTimezone($Timezone);
+         $Event['DateEnds'] = $EventEnds->format('m/d/Y');
+         $Event['TimeEnds'] = $EventEnds->format('h:ia');
+      }
       
-      // Timezones
-      $this->SetData('Timezones', EventModel::Timezones());
+      $this->Form->SetData($Event);
       
       $EventModel = new EventModel();
       $this->Form->SetModel($EventModel);
       if ($this->Form->IsPostBack()) {
+         $EventData = $this->Form->FormValues();
          
+         // Re-assign IDs
+         $EventData['EventID'] = $Event['EventID'];
+         $EventData['GroupID'] = $Event['GroupID'];
+         
+         // Apply munged event data back to form
+         $this->Form->ClearInputs();
+         $this->Form->SetFormValue($EventData);
+         
+         if ($EventID = $this->Form->Save()) {
+            $EventData['EventID'] = $EventID;
+            if (GetValue('GroupID',$EventData, FALSE))
+               $EventModel->InviteGroup($EventID, $GroupID);
+
+            $this->InformMessage(FormatString(T("<b>'{Name}'</b> has been updated"), $EventData));
+            Redirect(EventUrl($Event));
+         }
       }
       
       // Pull in group functions
       require_once $this->FetchViewLocation('event_functions', 'Event');
       require_once $this->FetchViewLocation('group_functions', 'Group');
       
-      $this->View = 'add';
+      $this->View = 'addedit';
       $this->CssClass .= ' NoPanel NarrowForm';
       return $this->Render();
    }
@@ -347,8 +383,13 @@ class EventController extends Gdn_Controller {
       $this->SetData('TimezoneID', $TimezoneID);
       try {
          $Timezone = new DateTimeZone($TimezoneID);
+         $NowTime = new DateTime('now', $Timezone);
+         
          $Transition = array_shift($T = $Timezone->getTransitions(time(), time()));
          $this->SetData('Abbr', $Transition['abbr']);
+         $Offset = $Timezone->getOffset($NowTime);
+         $OffsetHours = ($Offset / 3600);
+         $this->SetData('Offset', 'GMT '.(($OffsetHours >= 0) ? "+{$OffsetHours}" : $OffsetHours));
       } catch (Exception $Ex) {
          $this->SetData('Abbr', 'unknown');
       }
