@@ -1373,7 +1373,7 @@ class MinionPlugin extends Gdn_Plugin {
       return GetValue($Attribute, $Minion, $Default);
    }
    
-   public function Monitor($Object, $Options = NULL) {
+   public function Monitor(&$Object, $Options = NULL) {
       $Type = NULL;
       
       if (array_key_exists('CommentID', $Object)) {
@@ -1389,7 +1389,8 @@ class MinionPlugin extends Gdn_Plugin {
       $ObjectModelName = "{$Type}Model";
       $ObjectModel = new $ObjectModelName();
       
-      $Minion = (array)GetValueR('Attributes.Minion', $Object, array());
+      $Attributes = (array)GetValue('Attributes', $Object, array());
+      $Minion = (array)GetValue('Minion', $Attributes, array());
       $Minion['Monitor'] = TRUE;
       
       if (is_array($Options)) {
@@ -1407,6 +1408,9 @@ class MinionPlugin extends Gdn_Plugin {
       
       $ObjectModel->SetRecordAttribute($Object, 'Minion', $Minion);
       $ObjectModel->SaveToSerializedColumn('Attributes', $Object[$KeyField], 'Minion', $Minion);
+      
+      $Attributes['Minion'] = $Minion;
+      SetValue('Attributes', $Object, $Attributes);
    }
    
    public function StopMonitoring($Object, $Type = NULL) {
