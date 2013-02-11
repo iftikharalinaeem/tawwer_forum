@@ -30,6 +30,7 @@
  *  1.9.3   Eventize sanction list
  *  1.10    Add 'Log' method and Plugins.Minion.LogThreadID
  *  1.10.1  Fix Log messages
+ *  1.10.2  Fix mentions
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -40,7 +41,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.10.1',
+   'Version' => '1.10.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -50,7 +51,16 @@ $PluginInfo['Minion'] = array(
 
 class MinionPlugin extends Gdn_Plugin {
    
+   /**
+    * Minion UserID
+    * @var integer
+    */
    protected $MinionUserID = NULL;
+   
+   /**
+    * Minion user array
+    * @var array
+    */
    protected $Minion = NULL;
    
    /**
@@ -445,6 +455,8 @@ class MinionPlugin extends Gdn_Plugin {
          while ($State['Token'] !== FALSE) {
             if ($State['Gather']) {
                
+               $this->FireEvent('TokenGather');
+               
                switch (GetValueR('Gather.Node', $State)) {
                   case 'User':
 
@@ -533,7 +545,7 @@ class MinionPlugin extends Gdn_Plugin {
                if (empty($State['Toggle']) && in_array($State['CompareToken'], array('open', 'enable', 'unlock', 'allow', 'allowed', 'on')))
                   $this->Consume($State, 'Toggle', 'on');
 
-               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off')))
+               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off')))
                   $this->Consume($State, 'Toggle', 'off');
 
                /*
@@ -1343,6 +1355,14 @@ class MinionPlugin extends Gdn_Plugin {
       }
    }
    
+   /**
+    * Check for and retrieve monitoring data for the given attribute
+    * 
+    * @param array $Object
+    * @param string $Attribute
+    * @param mixed $Default
+    * @return mixed
+    */
    public function Monitoring($Object, $Attribute = NULL, $Default = NULL) {
       $Minion = GetValueR('Attributes.Minion', $Object, array());
       
@@ -1353,7 +1373,7 @@ class MinionPlugin extends Gdn_Plugin {
       return GetValue($Attribute, $Minion, $Default);
    }
    
-   public function Monitor($Object, $Options = NULL) {
+   public function Monitor(&$Object, $Options = NULL) {
       $Type = NULL;
       
       if (array_key_exists('CommentID', $Object)) {
@@ -1369,7 +1389,8 @@ class MinionPlugin extends Gdn_Plugin {
       $ObjectModelName = "{$Type}Model";
       $ObjectModel = new $ObjectModelName();
       
-      $Minion = (array)GetValueR('Attributes.Minion', $Object, array());
+      $Attributes = (array)GetValue('Attributes', $Object, array());
+      $Minion = (array)GetValue('Minion', $Attributes, array());
       $Minion['Monitor'] = TRUE;
       
       if (is_array($Options)) {
@@ -1387,6 +1408,9 @@ class MinionPlugin extends Gdn_Plugin {
       
       $ObjectModel->SetRecordAttribute($Object, 'Minion', $Minion);
       $ObjectModel->SaveToSerializedColumn('Attributes', $Object[$KeyField], 'Minion', $Minion);
+      
+      $Attributes['Minion'] = $Minion;
+      SetValue('Attributes', $Object, $Attributes);
    }
    
    public function StopMonitoring($Object, $Type = NULL) {
@@ -1513,7 +1537,7 @@ class MinionPlugin extends Gdn_Plugin {
     * @param array $Discussion
     * @param string $Message
     */
-   public function Message($User, $Discussion, $Message) {
+   public function Message($User, $Discussion, $Message, $Format = TRUE) {
       if (is_numeric($User)) {
          $User = Gdn::UserModel()->GetID($User);
          if (!$User) return FALSE;
@@ -1528,23 +1552,36 @@ class MinionPlugin extends Gdn_Plugin {
       $DiscussionID = GetValue('DiscussionID', $Discussion);
       $CommentModel = new CommentModel();
       
-      $Message = FormatString($Message, array(
-         'User'         => $User,
-         'Discussion'   => $Discussion
-      ));
+      if ($Format) {
+         $Message = FormatString($Message, array(
+            'User'         => $User,
+            'Discussion'   => $Discussion
+         ));
+      }
       
       $MinionCommentID = NULL;
       if ($Message) {
+         
+         // Temporarily become Minion
+         $SessionUser = Gdn::Session()->User;
+         $SessionUserID = Gdn::Session()->UserID;
+         Gdn::Session()->User = (object)$this->Minion();
+         Gdn::Session()->UserID = $this->MinionUserID;
+         
          $MinionCommentID = $CommentModel->Save(array(
             'DiscussionID' => $DiscussionID,
             'Body'         => $Message,
             'Format'       => 'Html',
             'InsertUserID' => $this->GetMinionUserID()
          ));
-      }
       
-      if ($MinionCommentID)
-         $CommentModel->Save2($MinionCommentID, TRUE);
+         if ($MinionCommentID)
+            $CommentModel->Save2($MinionCommentID, TRUE);
+         
+         // Become normal again
+         Gdn::Session()->User = $SessionUser;
+         Gdn::Session()->UserID = $SessionUserID;
+      }
       
       $Informer = Gdn_Format::To($Message, 'Html');
       Gdn::Controller()->InformMessage($Informer);

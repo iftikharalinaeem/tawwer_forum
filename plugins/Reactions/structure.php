@@ -9,8 +9,8 @@ $St->Table('ReactionType');
 $ReactionTypeExists = $St->TableExists();
 
 $St
-   ->Column('UrlCode', 'varchar(20)', FALSE, 'primary')
-   ->Column('Name', 'varchar(20)')
+   ->Column('UrlCode', 'varchar(32)', FALSE, 'primary')
+   ->Column('Name', 'varchar(32)')
    ->Column('Description', 'text', TRUE)
    ->Column('Class', 'varchar(10)', TRUE)
    ->Column('TagID', 'int')
