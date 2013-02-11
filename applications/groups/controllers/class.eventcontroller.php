@@ -105,11 +105,8 @@ class EventController extends Gdn_Controller {
    public function Add($GroupID = NULL) {
       list($Event, $Group) = $this->AddEdit(NULL, $GroupID);
       
-      if ($Group) {
-         $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $GroupID);
-         if (!$MemberOfGroup)
-            throw ForbiddenException('create a new event');
-      }
+      if (!EventPermission('Create'))
+         throw ForbiddenException('create a new event');
       
       $this->Title(T('New Event'));
       $this->AddBreadcrumb($this->Title());
