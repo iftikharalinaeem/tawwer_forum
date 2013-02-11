@@ -377,11 +377,9 @@ class EventModel extends Gdn_Model {
          } else { unset($Event['DateEnds']); }
 
          // If we're 'AllDay', munge the times to midnight
-         $ForceEndTime = FALSE;
          if ($Event['AllDayEvent']) {
             $Event['TimeStarts'] = '12:00am';
             $Event['TimeEnds'] = '11:59pm';
-            $ForceEndTime = TRUE;
          }
          
          $InputDateFormat = '!m/d/Y h:ia';
@@ -404,7 +402,6 @@ class EventModel extends Gdn_Model {
             if (!isset($Event['DateEnds']) || is_null($Event['DateEnds'])) {
                $DateEnds = DateTime::createFromFormat($InputDateFormat, $EventDateStartsStr, $Timezone);
                $DateEnds->modify($Event['TimeEnds']);
-               $ForceEndTime = FALSE;
 
                $Event['DateEnds'] = $DateEnds->format('m/d/Y');
                $Event['TimeEnds'] = $DateEnds->format('h:ia');
