@@ -12,7 +12,7 @@ jQuery(document).ready(function($) {
    if ($('.Event.edit').length)
       EventAddEdit($);
    
-   if ($('.Event.show').length)
+   if ($('.Event.event').length)
       EventShow($);
    
    function UpdateTimezoneDisplay(TimezoneID, TimezoneLabel) {
