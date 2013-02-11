@@ -49,7 +49,7 @@ class EventsController extends Gdn_Controller {
     * @param integer $ContextID
     */
    public function Events($Context = NULL, $ContextID = NULL) {
-      $this->Permission('Garden.Signin.Allow');
+      $this->Permission('Garden.SignIn.Allow');
       
       $EventModel = new EventModel();
       $EventCriteria = array();
