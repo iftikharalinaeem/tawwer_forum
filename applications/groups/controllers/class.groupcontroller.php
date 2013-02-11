@@ -104,6 +104,8 @@ class GroupController extends Gdn_Controller {
       if ($Group['Icon']) {
          $this->Image(Gdn_Upload::Url($Group['Icon']));
       }
+      
+      require_once $this->FetchViewLocation('event_functions', 'event');
       require_once $this->FetchViewLocation('group_functions');
       $this->CssClass .= ' NoPanel';
       $this->Render('Group');

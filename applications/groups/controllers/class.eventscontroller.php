@@ -31,14 +31,13 @@ class EventsController extends Gdn_Controller {
       $this->AddJsFile('global.js');
       
       $this->AddCssFile('style.css');
-      $this->AddCssFile('groups.css');
       Gdn_Theme::Section('Events');
       
       parent::Initialize();
    }
    
    public function Index($Context = NULL, $ContextID = NULL) {
-      return $this->All($Context, $ContextID);
+      return $this->Events($Context, $ContextID);
    }
    
    /**
@@ -49,8 +48,15 @@ class EventsController extends Gdn_Controller {
     * @param string $Context
     * @param integer $ContextID
     */
-   public function All($Context = NULL, $ContextID = NULL) {
-      Gdn_Theme::Section('Events');
+   public function Events($Context = NULL, $ContextID = NULL) {
+      $this->Permission('Garden.Signin.Allow');
+      
+      $EventModel = new EventModel();
+      $EventCriteria = array();
+      
+      // Prepare RecentEventsModule
+      $RecentEventsModule = new EventModule('recent');
+      $RecentEventsModule->Button = FALSE;
       
       // Determine context
       switch ($Context) {
@@ -59,29 +65,59 @@ class EventsController extends Gdn_Controller {
          case 'group':
             $GroupModel = new GroupModel();
             $Group = $GroupModel->GetID($ContextID, DATASET_TYPE_ARRAY);
-            if (!$Group) throw NotFoundException('Group');
+            if (!$Group) 
+               throw NotFoundException('Group');
             $this->SetData('Group', $Group);
 
             // Check if this person is a member of the group or a moderator
-            $MemberOfGroup = $GroupModel->IsMember(Gdn::Session()->UserID, $ContextID);
-            if ($MemberOfGroup || Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
-               $ViewEvent = TRUE;
+            $ViewGroupEvents = GroupPermission('View');
+            if (!$ViewGroupEvents && !Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
+               throw PermissionException();
 
             $this->AddBreadcrumb('Groups', Url('/groups'));
             $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+            
+            // Register GroupID as criteria
+            $EventCriteria['GroupID'] = $Group['GroupID'];
+            
+            $RecentEventsModule->GroupID = $Group['GroupID'];
+            
+            $GroupModule = new GroupModule();
+            $GroupModule->GroupID = $Group['GroupID'];
+            $this->AddModule($GroupModule, 'Panel');
+            
             break;
          
          // Events this user is invited to
          default:
             
+            // Register logged-in user being invited as criteria
+            $EventCriteria['Invited'] = Gdn::Session()->UserID;
+            $RecentEventsModule->UserID = $User['UserID'];
+            
             break;
       }
       
-      $this->Title(T('Events'));
+      $this->Title(T('Upcoming Events'));
       $this->AddBreadcrumb($this->Title());
       
-      $this->RequestMethod = 'all';
-      $this->View = 'all';
+      // Upcoming events
+      $UpcomingRange = C('Groups.Events.UpcomingRange', '+30 days');
+      $Events = $EventModel->GetUpcoming($UpcomingRange, $EventCriteria);
+      $this->SetData('UpcomingEvents', $Events);
+      
+      // Recent events
+//      $RecentRange = C('Groups.Events.RecentRange', '-10 days');
+//      $Events = $EventModel->GetUpcoming($RecentRange, $EventCriteria);
+//      $this->SetData('RecentEvents', $Events);
+      
+      $this->AddModule($RecentEventsModule, 'Panel');
+      
+      $this->FetchView('event_functions', 'event', 'groups');
+      $this->FetchView('group_functions', 'group', 'groups');
+      
+      $this->RequestMethod = 'events';
+      $this->View = 'events';
       $this->Render();
    }
    

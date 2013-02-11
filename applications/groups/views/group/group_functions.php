@@ -123,9 +123,9 @@ if (!function_exists('WriteEventList')) :
  * @param array $Events 
  * @param string $EmptyMessage What to show when there's no content.
  */   
-function WriteEventList($Events, $Group = NULL, $EmptyMessage = '') {
+function WriteEventList($Events, $Group = NULL, $EmptyMessage = '', $Button = TRUE) {
    $GroupID = GetValue('GroupID', $Group, '');
-   if (GroupPermission('Member')) {
+   if (GroupPermission('Member') && $Button) {
       echo '<div class="Button-Controls">';
       echo ' '.Anchor(T('New Event'), Url("/event/add/{$GroupID}"), 'Button Primary Group-NewEventButton').' ';
       echo '</div>';
@@ -147,7 +147,7 @@ function WriteEventList($Events, $Group = NULL, $EmptyMessage = '') {
          </li>';
       }
       echo '</ul>';
-   }   
+   }
 }
 endif;
 

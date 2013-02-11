@@ -175,29 +175,50 @@
   column-break-inside: avoid;
 }
 
-.Groups.Group .Group-Events .DataList-Events {
+.Events.events .Cards {
+  margin: 0px;
+}
+.Events.events .UpcomingEvents {
+  margin-top: 20px;
+}
+.Events.events .UpcomingEvents .Event {
+  margin: 20px 0px;
+}
+.Events.events .UpcomingEvents .Event .Event-Title {
+  font-size: 120%;
+  margin: 0px;
+}
+.Events.events .UpcomingEvents .Event .Event-Time {
+  font-size: 12px;
+  font-weight: normal;
+}
+.Events.events .UpcomingEvents .Event .Event-Location {
+  line-height: 1.2em;
+}
+
+.Box-Events .DataList-Events {
   padding: 12px 0px;
 }
-.Groups.Group .Group-Events .DataList-Events :first-child {
+.Box-Events .DataList-Events :first-child {
   margin-top: 0px;
 }
-.Groups.Group .Group-Events .DataList-Events :last-child {
+.Box-Events .DataList-Events :last-child {
   margin-bottom: 0px;
 }
-.Groups.Group .Group-Events .Event {
+.Box-Events .Event {
   margin: 12px 0px;
 }
-.Groups.Group .Group-Events .Event .Event-Title {
+.Box-Events .Event .Event-Title {
   margin-bottom: 0px;
 }
-.Groups.Group .Group-Events .Event .Event-Time {
+.Box-Events .Event .Event-Time {
   font-weight: normal;
   font-size: 12px;
 }
-.Groups.Group .Group-Events .Event .Event-Location {
+.Box-Events .Event .Event-Location {
   line-height: 1.2em;
 }
-.Groups.Group .Group-Events .Event .Event-Description {
+.Box-Events .Event .Event-Description {
   display: none;
 }
 
@@ -207,7 +228,7 @@
   width: 6.5em;
   background: #fff;
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #ddd;
+  border: 1px solid #dddddd;
   margin: 0;
   padding: 0;
   list-style: none;
