@@ -57,7 +57,7 @@ class EventController extends Gdn_Controller {
     * @throws Exception
     */
    public function Add($GroupID = NULL) {
-      $this->Permission('Garden.Signin.Allow');
+      $this->Permission('Garden.SignIn.Allow');
       
       $this->AddJsFile('jquery.timepicker.min.js');
       $this->AddJsFile('jquery.dropdown.js');
@@ -125,7 +125,7 @@ class EventController extends Gdn_Controller {
     * @param type $EventID
     */
    public function Edit($EventID) {
-      $this->Permission('Garden.Signin.Allow');
+      $this->Permission('Garden.SignIn.Allow');
       
       $this->AddJsFile('jquery.timepicker.min.js');
       $this->AddJsFile('jquery.dropdown.js');
@@ -267,7 +267,7 @@ class EventController extends Gdn_Controller {
     */
    public function Attending($EventID, $Attending) {
       $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-      $this->Permission('Garden.Signin.Allow');
+      $this->Permission('Garden.SignIn.Allow');
       
       // Lookup event
       $EventModel = new EventModel();
