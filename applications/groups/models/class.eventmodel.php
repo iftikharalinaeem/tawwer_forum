@@ -107,6 +107,7 @@ class EventModel extends Gdn_Model {
     * @param string $Permission The permission to check. Valid values are:
     *  - Organizer: User is a leader of the event.
     *  - Member: User is a member of the event.
+    *  - Create: User can create events.
     *  - Edit: User can edit the event.
     *  - View: The user may view the event's contents.
     * @param int $EventID
@@ -137,6 +138,7 @@ class EventModel extends Gdn_Model {
          // Set the default permissions.
          $Perms = array(
             'Organizer' => FALSE,
+            'Create' => TRUE,
             'Edit' => FALSE,
             'Member' => FALSE,
             'View' => TRUE
@@ -164,6 +166,8 @@ class EventModel extends Gdn_Model {
                if (GroupPermission('Member', $EventGroupID)) {
                   $Perms['Member'] = TRUE;
                   $Perms['View'] = TRUE;
+               } else {
+                  $Perms['Create'] = FALSE;
                }
             }
             
