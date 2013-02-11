@@ -35,7 +35,7 @@ function WriteDiscussionBlogList($Discussions, $EmptyMessage = '') {
       //include_once(PATH_APPLICATIONS .'/vanilla/views/modules/helper_functions.php');   
       echo '<ul class="NarrowList Discussions DiscussionsBlog">';
       foreach ($Discussions as $Discussion) {
-         WriteDiscussionBlog((object)$Discussion, 'Group');
+         WriteDiscussionBlog((object)$Discussion, 'Discussion');
       }
       echo '</ul>';
    }
@@ -50,17 +50,18 @@ if (!function_exists('WriteDiscussionBlog')):
  * @param object $Discussion
  * @param string $Px 
  */
-function WriteDiscussionBlog($Discussion, $Px = 'Bookmark') {
+function WriteDiscussionBlog($Discussion, $Px = 'Discussion') {
 ?>
 <li id="<?php echo "{$Px}_{$Discussion->DiscussionID}"; ?>" class="<?php echo CssClass($Discussion); ?>">
    <span class="Options">
       <?php
       echo BookmarkButton($Discussion);
+      echo OptionsList($Discussion);
       ?>
    </span>
-   <div class="Title"><?php
+   <h3 class="Title"><?php
       echo Anchor(Gdn_Format::Text($Discussion->Name, FALSE), DiscussionUrl($Discussion).($Discussion->CountCommentWatch > 0 ? '#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
-   ?></div>
+   ?></h3>
    <div class="Excerpt"><?php
       echo SliceString(Gdn_Format::Text($Discussion->Body, FALSE), C('Groups.Announcements.ExcerptLength', 240));
    ?></div>
@@ -68,7 +69,7 @@ function WriteDiscussionBlog($Discussion, $Px = 'Bookmark') {
       <?php   
          $FirstUser = UserBuilder($Discussion, 'First');
          echo '<span class="MItem UserTile">'.
-            UserPhoto($FirstUser).' '.
+            T('by').' '.
             UserAnchor($FirstUser).' '.
             Gdn_Format::Date($Discussion->DateInserted, 'html').'</span>';   
       ?>

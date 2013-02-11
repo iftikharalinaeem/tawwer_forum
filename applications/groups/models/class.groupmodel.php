@@ -335,6 +335,20 @@ class GroupModel extends Gdn_Model {
       $this->UpdateCount($Data['GroupID'], 'CountMembers');
    }
    
+   public function OverridePermissions($Group) {
+      if ($this->CheckPermission('Moderate', $Group)) {
+         $CategoryID = GetValue('CategoryID', $Group);
+         $Category = CategoryModel::Categories($CategoryID);
+         if ($Category) {
+            $CategoryID = $Category['PermissionCategoryID'];
+            Gdn::Session()->SetPermission('Vanilla.Discussions.Announce', array($CategoryID));
+            Gdn::Session()->SetPermission('Vanilla.Discussions.Close', array($CategoryID));
+            Gdn::Session()->SetPermission('Vanilla.Discussions.Edit', array($CategoryID));
+            Gdn::Session()->SetPermission('Vanilla.Discussions.Delete', array($CategoryID));
+         }
+      }
+   }
+   
    public function Save($Data, $Settings = FALSE) {
       $GroupID = parent::Save($Data, $Settings);
       
