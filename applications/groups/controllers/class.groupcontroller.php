@@ -76,7 +76,7 @@ class GroupController extends Gdn_Controller {
       $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, 10)->ResultArray();
       $this->SetData('Discussions', $Discussions);
       
-      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce >' => 0), 0, 10)->ResultArray();
+      $Discussions = $DiscussionModel->GetAnnouncements(array('d.GroupID' => $GroupID), 0, 10)->ResultArray();
       $this->SetData('Announcements', $Discussions);
       
       // Get Events

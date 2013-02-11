@@ -166,16 +166,17 @@ class GroupsHooks extends Gdn_Plugin {
     * @param PostController $Sender
     */
    public function PostController_Render_Before($Sender) {
-      $GroupID = Gdn::Request()->Get('groupid');
-      if ($GroupID) {
-         // TODO: Check permissions.
-         $Model = new GroupModel();
-         $Group = $Model->GetID($GroupID);
-         if ($Group) {
-            // Hide the category drop-down.
-            $Sender->ShowCategorySelector = FALSE;
-            $Sender->SetData('Group', $Group);
-         }
+      $Group = $Sender->Data('Group');
+      
+      if ($Group) {
+         // Hide the category drop-down.
+         $Sender->ShowCategorySelector = FALSE;
+         
+         // Reduce the announce options.
+         $Options = array(
+            2 => '@'.T('Announce'),
+            0 => '@'.T("Don't announce."));
+         $Sender->SetData('_AnnounceOptions', $Options);
       }
       
       $this->SetBreadcrumbs();
