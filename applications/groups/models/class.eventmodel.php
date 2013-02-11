@@ -121,16 +121,15 @@ class EventModel extends Gdn_Model {
          $Event = $EventID;
          $EventID = $Event['EventID'];
       }
-
-      $Key = "{$UserID}-{$EventID}";
       
+      $Key = "{$UserID}-{$EventID}";
       if (!isset($Permissions[$Key])) {
          // Get the data for the group.
          if (!isset($Event))
             $Event = $this->GetID($EventID);
          
          if ($UserID) {
-            $UserEvent = Gdn::SQL()->GetWhere('UserEvent', array('EventID' => $EventID, 'UserID' => Gdn::Session()->UserID))->FirstRow(DATASET_TYPE_ARRAY);
+            $UserEvent = Gdn::SQL()->GetWhere('UserEvent', array('EventID' => $EventID, 'UserID' => $UserID))->FirstRow(DATASET_TYPE_ARRAY);
          } else {
             $UserEvent = FALSE;
          }
@@ -145,7 +144,7 @@ class EventModel extends Gdn_Model {
          
          // The group creator is always a member and leader.
          if ($UserID == $Event['InsertUserID']) {
-            $Perms['Leader'] = TRUE;
+            $Perms['Organizer'] = TRUE;
             $Perms['Edit'] = TRUE;
             $Perms['Member'] = TRUE;
             $Perms['View'] = TRUE;
@@ -561,6 +560,32 @@ class EventModel extends Gdn_Model {
       if (is_null($LookupTimezone))
          return $Built;
       return GetValue($LookupTimezone, $Built);
+   }
+   
+   /**
+    * Delete an event
+    * 
+    * @param array $Where
+    * @param integer $Limit
+    * @param boolean $ResetData
+    * @return Gdn_DataSet
+    */
+   public function Delete($Where = '', $Limit = FALSE, $ResetData = FALSE) {
+      // Get list of matching events
+      $MatchEvents = $this->GetWhere($Where,'','',$Limit);
+      
+      // Delete events
+      $Deleted = parent::Delete($Where, $Limit, $ResetData);
+      
+      // Clean up UserEvents
+      $EventIDs = array();
+      foreach ($MatchEvents as $Event)
+         $EventIDs[] = GetValue('EventID', $Event);
+      $this->SQL->Delete('UserEvent', array(
+         'EventID'   => $EventIDs
+      ));
+      
+      return $Deleted;
    }
    
 }

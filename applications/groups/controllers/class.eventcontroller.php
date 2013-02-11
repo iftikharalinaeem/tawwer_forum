@@ -296,6 +296,36 @@ class EventController extends Gdn_Controller {
    }
    
    /**
+    * Delete an event
+    * 
+    * @param integer $EventID
+    */
+   public function Delete($EventID) {
+      list($Event, $Group) = $this->AddEdit($EventID);
+      
+      if (!EventPermission('Organizer'))
+         throw ForbiddenException('delete this event');
+      
+      if ($this->Form->IsPostBack()) {
+         $EventModel = new EventModel();
+         $Deleted = $EventModel->Delete(array('EventID' => $EventID));
+
+         if ($Deleted) {
+            $this->InformMessage(FormatString(T('<b>{Name}</b> deleted.'), $Event));
+            if ($Group)
+               $this->RedirectUrl = GroupUrl($Group);
+            else
+               $this->RedirectUrl = Url('/groups');
+         } else {
+            $this->InformMessage(T('Failed to delete event.'));
+         }
+      }
+      
+      $this->SetData('Title', T('Delete Event'));
+      return $this->Render();
+   }
+   
+   /**
     * AJAX callback stating this user's state on the event
     * 
     * @param integer $EventID

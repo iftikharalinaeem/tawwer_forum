@@ -19,7 +19,7 @@ function WriteEventButtons($Event = NULL) {
    
    if (EventPermission('Edit', $Event)) {
       $Options['Edit'] = array('Text' => T('Edit'), 'Url' => EventUrl($Event, 'edit'));
-      $Options['Delete'] = array('Text' => T('Delete'), 'Url' => EventUrl($Event, 'delete'));
+      $Options['Delete'] = array('Text' => T('Delete'), 'Url' => EventUrl($Event, 'delete'), 'CssClass' => 'Popup');
    }
    
    if (count($Options))
