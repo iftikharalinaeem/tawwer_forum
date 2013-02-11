@@ -57,6 +57,9 @@
 .Event.add .TimePicker, .Event.edit .TimePicker {
   width: 100px;
 }
+.Event.add .Group.Card, .Event.edit .Group.Card {
+  background-color: white;
+}
 .Event.add .Group.Card h3, .Event.edit .Group.Card h3 {
   margin: 0px;
 }
