@@ -20,7 +20,7 @@
  */
 
 $PluginInfo['Hunter'] = array(
-   'Name' => 'Hunter',
+   'Name' => 'Minion: Hunter',
    'Description' => "Creates a 'wanted user' game.",
    'Version' => '1.0',
    'RequiredApplications' => array(
@@ -415,24 +415,6 @@ class HunterPlugin extends Gdn_Plugin {
       }
       
       $Sender->EventArguments['CssClass'] .= ' Fugitive';
-   }
-   
-   /**
-    * Show the chase bar under the comment
-    * 
-    * @param type $Sender
-    * @param type $Object
-    * @return type
-    */
-   protected function ShowChaseBar($Sender, $Object) {
-      // Is the object hunted?
-      $IsHunted = MinionPlugin::Instance()->Monitoring($Object, 'Hunted', FALSE);
-      if (!$IsHunted)
-         return;
-      
-      $User = (array)$Sender->EventArguments['Author'];
-      $Hunted = MinionPlugin::Instance()->Monitoring($User, 'Hunted', FALSE);
-      if (!$Hunted) return;
    }
    
    /*

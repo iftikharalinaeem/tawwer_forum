@@ -88,7 +88,7 @@
 
 }
 
-.Event.show {
+.Event.event {
    
    .EventInfo {
       li {
@@ -157,6 +157,14 @@
       }
    }
    
+}
+
+.Event-Buttons {
+  margin-top: 10px;
+  float: right;
+}
+.Event-Buttons .BigButton, .Event-Buttons .ButtonGroup.Big {
+  display: inline-block;
 }
 
 .Events.events {

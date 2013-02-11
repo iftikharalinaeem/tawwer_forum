@@ -117,48 +117,48 @@
   display: none !important;
 }
 
-.Event.show .EventInfo li {
+.Event.event .EventInfo li {
   line-height: 1.5em;
 }
-.Event.show .EventInfo li span.Label {
+.Event.event .EventInfo li span.Label {
   display: inline-block;
   font-weight: bold;
   width: 70px;
 }
-.Event.show .EventInfo span.Tag {
+.Event.event .EventInfo span.Tag {
   margin-left: 10px;
   background: #979797;
   color: white;
   font-size: 11px;
   text-transform: uppercase;
 }
-.Event.show .EventInfo span.Tip {
+.Event.event .EventInfo span.Tip {
   color: #979797;
   font-size: 11px;
 }
-.Event.show .EventInfo span.Tip .Timezone {
+.Event.event .EventInfo span.Tip .Timezone {
   border-bottom: 1px dotted;
   cursor: pointer;
 }
-.Event.show .EventInfo .Body {
+.Event.event .EventInfo .Body {
   margin: 20px 0px;
 }
-.Event.show .Attending {
+.Event.event .Attending {
   margin: 0px;
 }
-.Event.show .Attendees .AttendeeList {
+.Event.event .Attendees .AttendeeList {
   display: block;
   padding: 2px;
 }
-.Event.show .Attendees .AttendeeList h3 {
+.Event.event .Attendees .AttendeeList h3 {
   display: block;
   text-transform: uppercase;
   font-size: 18px;
 }
-.Event.show .Attendees .AttendeeList .PhotoWrap {
+.Event.event .Attendees .AttendeeList .PhotoWrap {
   margin-right: 4px;
 }
-.Event.show .Attendees .Negatives {
+.Event.event .Attendees .Negatives {
   -webkit-column-count: 2;
   -moz-column-count: 2;
   -ms-column-count: 2;
@@ -170,9 +170,18 @@
   -o-column-gap: 30px;
   column-gap: 30px;
 }
-.Event.show .Attendees .Negatives .AttendeeList {
+.Event.event .Attendees .Negatives .AttendeeList {
   -webkit-column-break-inside: avoid;
   column-break-inside: avoid;
+}
+
+.Event-Buttons {
+  margin-top: 10px;
+  float: right;
+}
+
+.Event-Buttons .BigButton, .Event-Buttons .ButtonGroup.Big {
+  display: inline-block;
 }
 
 .Events.events .Cards {

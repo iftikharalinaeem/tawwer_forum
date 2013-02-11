@@ -22,6 +22,11 @@
       <h2><?php echo T('Upcoming Events'); ?></h2>
       <?php $EmptyMessage = T('GroupEmptyEvents', "Aw snap, no events are coming up."); ?>
       <?php WriteEventList($this->Data('Events'), $this->Data('Group'), $EmptyMessage); ?>
+      <?php
+      if ($this->Data('Events')) {
+         echo '<div class="MoreWrap">'.Anchor(T('All Events'), Url(CombinePaths(array("/events/", GroupUrl($this->Data('Group')))))).'</div>';
+      }
+      ?>
    </div>
    
    <div class="Group-Box Group-Announcements">

@@ -31,7 +31,8 @@
             <div><?php echo $this->Form->TextBox('Location'); ?></div>
          </div>
          
-         <div class="EventTime Times">
+         <?php $Both = $this->Data('Event.DateEnds') ? ' Both' : ''; ?>
+         <div class="EventTime Times <?php echo $Both; ?>">
             
             <div class="P From">
                <?php echo $this->Form->Label('When', 'DateStarts', array('class' => 'When')); ?>
@@ -48,7 +49,8 @@
                </div>
                <div class="Timebased Timezone">
                   <?php echo $this->Form->Hidden('Timezone', array('class' => 'EventTimezone')); ?>
-                  <a class="EventTimezoneDisplay" data-dropdown="#dropdown-timezone">Test</a>
+                  <?php echo $this->Form->Hidden('TimezoneAbbr', array('class' => 'EventTimezoneAbbr')); ?>
+                  <a class="EventTimezoneDisplay" data-dropdown="#dropdown-timezone"><?php echo $this->Data('Event.TimezoneAbbr'); ?></a>
                </div>
                <div class="Timebased EndTime"><?php echo Anchor(T('End time?'), '#'); ?></div>
             </div>
@@ -70,7 +72,7 @@
          </div>
 
          <div class="Buttons">
-            <?php echo $this->Form->Button('Create Event', array('Type' => 'submit', 'class' => 'Button Primary')); ?> 
+            <?php echo $this->Form->Button('Save', array('Type' => 'submit', 'class' => 'Button Primary')); ?> 
             <?php echo $this->Form->Button('Cancel', array('Type' => 'button', 'class' => 'Button CancelButton')); ?>
          </div>
          

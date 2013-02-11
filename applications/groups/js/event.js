@@ -7,7 +7,10 @@
 jQuery(document).ready(function($) {
    
    if ($('.Event.add').length)
-      EventAdd($);
+      EventAddEdit($);
+   
+   if ($('.Event.edit').length)
+      EventAddEdit($);
    
    if ($('.Event.show').length)
       EventShow($);
@@ -26,7 +29,7 @@ jQuery(document).ready(function($) {
     * Handle event/add
     * 
     */
-   function EventAdd($) {
+   function EventAddEdit($) {
       $('.TimePicker').timepicker({
          'step': 5,
          'forceRoundTime': true
@@ -48,14 +51,34 @@ jQuery(document).ready(function($) {
       var DefaultTimezone = jstz.determine();
       DefaultTimezone = DefaultTimezone.name();
 
+      var Timezone = $('.Event .EventTimezone');
+      var TimezoneAbbr = $('.Event .EventTimezoneAbbr');
+      
+      // Lookup timezone automatically
+      var TimezoneRequestData = {
+         'TimezoneID': DefaultTimezone,
+         'Auto': true
+      }
+      
+      // If TZ was supplied in form, use that
+      if (Timezone.val()) {
+         TimezoneRequestData.TimezoneID = Timezone.val();
+         TimezoneRequestData.Auto = false;
+      }
+      
       $.ajax({
          url: gdn.url('/event/gettimezoneabbr'),
-         data: {'TimezoneID': DefaultTimezone},
+         data: TimezoneRequestData,
          dataType: 'json',
          method: 'GET',
          success: function(data, str, xhr) {
             if (data.Abbr != 'unknown') {
-               UpdateTimezoneDisplay(data.TimezoneID, "Automatically detected "+data.Abbr);
+               if (TimezoneRequestData.Auto)
+                  var TimezoneLabel = "("+data.Offset+") Automatically detected "+data.Abbr;
+               else
+                  var TimezoneLabel = "("+data.Offset+") "+data.Abbr;
+               
+               UpdateTimezoneDisplay(data.TimezoneID, TimezoneLabel);
             }
          }
       });
