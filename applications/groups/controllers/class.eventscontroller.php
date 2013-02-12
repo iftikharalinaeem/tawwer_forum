@@ -98,7 +98,7 @@ class EventsController extends Gdn_Controller {
             break;
       }
       
-      $this->Title(T('Upcoming Events'));
+      $this->Title(T('Events'));
       $this->AddBreadcrumb($this->Title());
       
       // Upcoming events
@@ -107,11 +107,9 @@ class EventsController extends Gdn_Controller {
       $this->SetData('UpcomingEvents', $Events);
       
       // Recent events
-//      $RecentRange = C('Groups.Events.RecentRange', '-10 days');
-//      $Events = $EventModel->GetUpcoming($RecentRange, $EventCriteria);
-//      $this->SetData('RecentEvents', $Events);
-      
-      $this->AddModule($RecentEventsModule, 'Panel');
+      $RecentRange = C('Groups.Events.RecentRange', '-10 days');
+      $Events = $EventModel->GetUpcoming($RecentRange, $EventCriteria);
+      $this->SetData('RecentEvents', $Events);
       
       $this->FetchView('event_functions', 'event', 'groups');
       $this->FetchView('group_functions', 'group', 'groups');
