@@ -108,7 +108,7 @@ class EventsController extends Gdn_Controller {
       
       // Recent events
       $RecentRange = C('Groups.Events.RecentRange', '-10 days');
-      $Events = $EventModel->GetUpcoming($RecentRange, $EventCriteria);
+      $Events = $EventModel->GetUpcoming($RecentRange, $EventCriteria, TRUE);
       $this->SetData('RecentEvents', $Events);
       
       $this->FetchView('event_functions', 'event', 'groups');
