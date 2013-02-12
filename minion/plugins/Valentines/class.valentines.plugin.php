@@ -44,7 +44,7 @@ $PluginInfo['Valentines'] = array(
       'Reputation' => '1.0'
     ),
    'RequiredPlugins' => array(
-      'Minion' => '1.4.2',
+      'Minion' => '1.11',
       'Reactions' => '1.2.1'
    ),
    'MobileFriendly' => TRUE,
@@ -122,6 +122,24 @@ class ValentinesPlugin extends Gdn_Plugin {
    protected $DesiredExpiry;
    
    /**
+    * How low does the available pool have to be before caches are deployed (decimal percent)
+    * @var float
+    */
+   protected $RefillTriggerRatio;
+   
+   /**
+    * How big does the pool have to be before caches are deployed (num arrows)
+    * @var integer
+    */
+   protected $RefillThreshold;
+   
+   /**
+    * How much of the total pool should be in each cache (decimal percent)
+    * @var float 
+    */
+   protected $RefillCacheRatio;
+   
+   /**
     * Lounge CategoryID
     * @var integer
     */
@@ -141,13 +159,11 @@ class ValentinesPlugin extends Gdn_Plugin {
       parent::__construct();
       $this->Enabled = (date('nd') == '214');
       $this->DayAfter = (date('nd') == '215');
-      $this->Enabled = TRUE;
-      $this->DayAfter = FALSE;
+//      $this->Enabled = TRUE;
+//      $this->DayAfter = FALSE;
+      
       $this->Year = date('Y');
       $this->ExpiredCheck = FALSE;
-
-      $this->Minion = MinionPlugin::Instance();
-      $this->MinionUser = (array)$this->Minion->Minion();
       
       $this->ReactionModel = new ReactionModel();
       $this->BadgeModel = new BadgeModel();
@@ -158,15 +174,43 @@ class ValentinesPlugin extends Gdn_Plugin {
       $this->RequiredArrows = C('Plugins.Valentines.RequiredArrows', 5);
       $this->StartArrows = C('Plugins.Valentines.StartArrows', 3);
       $this->DesiredExpiry = C('Plugins.Valentines.DesiredExpiry', 7200);
+      $this->RefillTriggerRatio = C('Plugins.Valentines.RefillRatio', 0.4);
+      $this->RefillThreshold = C('Plugins.Valentines.RefillThreshold', 51);
+      $this->RefillCacheRatio = C('Plugins.Valentines.RefillThreshold', 0.05);
       $this->LoungeID = C('Plugins.Valentines.LoungeID');
    }
    
    /**
-    * Give people who log in on Valentines Day a badge
+    * Hook into minion startup
+    * 
+    * @param MinionPlugin $Sender
+    */
+   public function MinionPlugin_Start_Handler($Sender) {
+      
+      // Register persona
+      $this->Minion->Persona('Valentines', array(
+         'Name'      => 'Robot Cupid',
+         'Photo'     => 'http://cdn.vanillaforums.com/minion/valentines.jpg',
+         'Title'     => 'Happiness Droid',
+         'Location'  => 'Cloud Nine'
+      ));
+            
+      // Change persona
+      if ($this->Enabled || $this->DayAfter)
+         $this->Minion->Persona('Valentines');
+   }
+   
+   /**
+    * Hook early and perform valentines actions
     * 
     * @param Gdn_Dispatcher $Sender
+    * @return type
     */
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
+      $this->Minion = MinionPlugin::Instance();
+      $this->MinionUser = (array)$this->Minion->Minion();
+      
+      // Valentines events
       if (!$this->Enabled) return;
       if (!Gdn::Session()->IsValid() || !Gdn::Session()->UserID) return;
       if (Gdn::Session()->User->Admin == 2) return;
@@ -199,13 +243,14 @@ class ValentinesPlugin extends Gdn_Plugin {
          'Count'     => 0
       )));
       
+      // Track arrow counts
+      $this->ArrowPool($this->StartArrows);
+      
       // Notify
       $MinionUserID = $this->MinionUser['UserID'];
       $Activity = array(
-         'ActivityType' => 'Valentines',
          'ActivityUserID' => $MinionUserID,
          'NotifyUserID' => Gdn::Session()->UserID,
-         'Force' => TRUE,
          'HeadlineFormat' => T("{ActivityUserID,user} has placed {Data.StartArrows} arrows in your quiver."),
          'RecordType' => 'Conversation',
          'RecordID' => 3751,
@@ -215,7 +260,7 @@ class ValentinesPlugin extends Gdn_Plugin {
              'Minion'         => $this->MinionUser
           )
       );
-      $this->ActivityModel->Save($Activity);
+      $this->Activity($Activity);
    }
    
    /*
@@ -379,7 +424,6 @@ VALENTINES;
       
       // Notify
       $Activity = array(
-         'ActivityType' => 'Valentines',
          'ActivityUserID' => $PairedUserID,
          'NotifyUserID' => $DesiredUserID,
          'HeadlineFormat' => T("You've been shot by {ActivityUserID,user}! <a href=\"{Url,html}\">What now</a>?"),
@@ -391,10 +435,9 @@ VALENTINES;
             'Minion'    => $this->Minion->Minion()
          )
       );
-      $this->ActivityModel->Save($Activity);
+      $this->Activity($Activity);
       
       $Activity = array(
-         'ActivityType' => 'Valentines',
          'ActivityUserID' => $DesiredUserID,
          'NotifyUserID' => $PairedUserID,
          'HeadlineFormat' => T("You shot {ActivityUserID,user} in the neck! <a href=\"{Url,html}\">What now</a>?"),
@@ -406,7 +449,7 @@ VALENTINES;
              'Minion'   => $this->Minion->Minion()
           )
       );
-      $this->ActivityModel->Save($Activity);
+      $this->Activity($Activity);
       
       // Save
       $this->Minion->Monitor($DesiredUser, array('Valentines' => $DesiredValentines));
@@ -574,6 +617,15 @@ EXTENDEDVALENTINES;
       // Save
       $this->Minion->Monitor($Discussion, array('Valentines' => $Valentines));
    }
+      
+   /**
+    * Drop an arrow cache
+    * 
+    * @param integer $CacheSize
+    */
+   public function DropCache($CacheSize) {
+      
+   }
    
    /**
     * Create a new discussion in the lounge
@@ -602,6 +654,51 @@ EXTENDEDVALENTINES;
       $DiscussionModel->UpdateDiscussionCount($this->LoungeID);
       $Discussion = (array)$DiscussionModel->GetID($DiscussionID);
       return $Discussion;
+   }
+   
+   /**
+    * Create an activity with defaults
+    * 
+    * @param array $Activity
+    */
+   protected function Activity($Activity) {
+      $Activity = array_merge(array(
+         'ActivityType'    => 'Valentines',
+         'Force'           => TRUE,
+         'Notified'        => ActivityModel::SENT_PENDING
+      ), $Activity);
+      $this->ActivityModel->Save($Activity);
+   }
+   
+   /**
+    * Add arrows to the total pool
+    * 
+    * @param integer $Arrows
+    */
+   protected function ArrowPool($Arrows = NULL) {
+      $PoolKey = "Arrows.".date('Y').".Pool";
+      $ArrowPool = $this->GetUserMeta($this->MinionUser['UserID'], $PoolKey, 0);
+      if (is_null($Arrows)) return $ArrowPool;
+      
+      $ArrowPool += $Arrows;
+      $this->SetUserMeta($this->MinionUser['UserID'], $PoolKey, $ArrowPool);
+      $this->Arrows($Arrows);
+      return $ArrowPool;
+   }
+   
+   /**
+    * Add or remove arrows from the available pool
+    * 
+    * @param integer $Arrows
+    */
+   protected function Arrows($Arrows = NULL) {
+      $AvailableKey = "Arrows.".date('Y').".Available";
+      $ArrowPool = $this->GetUserMeta($this->MinionUser['UserID'], $AvailableKey, 0);
+      if (is_null($Arrows)) return $ArrowPool;
+      
+      $ArrowPool += $Arrows;
+      $this->SetUserMeta($this->MinionUser['UserID'], $AvailableKey, $ArrowPool);
+      return $ArrowPool;
    }
    
    /**
@@ -705,7 +802,10 @@ FORWARDVALENTINES;
    }
    
    /**
-    * Run expiry checks based on cache key cooldown
+    * Run time based actions
+    * 
+    *  - Expiry check
+    *  - Random arrow deployment
     * 
     * @param Gdn_Statistics $Sender
     */
@@ -716,7 +816,7 @@ FORWARDVALENTINES;
       if (!$NextCheckTime || $NextCheckTime < microtime(true)) {
          Gdn::Cache()->Store($ExpiryCheckKey, microtime(true)+60);
          
-         // Run check
+         // Run expiry check
          $MetaKey = $this->MakeMetaKey('Desired.Expiry');
          $ExpiredUsers = Gdn::SQL()->Select('UserID')
             ->From('UserMeta')
@@ -728,6 +828,20 @@ FORWARDVALENTINES;
             $ExpiredUserID = GetValue('UserID', $ExpiredUser);
             $ExpiredUser = Gdn::UserModel()->GetID($ExpiredUserID);
             $this->Expire($User);
+         }
+         
+         // Run arrow check
+         $ArrowPool = $this->ArrowPool();
+         $Arrows = $this->Arrows();
+         $Ratio = $Arrows / $ArrowPool;
+         
+         // When X% or less arrows remain unfired
+         if ($Ratio <= $this->RefillTriggerRatio) {
+            if ($ArrowPool >= $this->RefillThreshold) {
+               // Create a cache with enough arrows for a round number of users
+               $RefillCacheSize = ceil(($this->RefillCacheRatio * $ArrowPool) / $this->StartArrows) * $this->StartArrows;
+               $this->DropCache($RefillCacheSize);
+            }
          }
       }
    }
@@ -998,6 +1112,7 @@ FORWARDVALENTINES;
          $Player['Quiver'] -= $Increment;
          $Player['Fired'] += $Increment;
          $Target['Hit'] += $Increment;
+         $this->Arrows($Increment);
          
          // Register arrow fired
          $ArrowRecord = "Arrow.{$TargetID}.{$Target['Count']}";
