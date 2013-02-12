@@ -52,12 +52,12 @@ class EventModel extends Gdn_Model {
    /**
     * Get events by date
     * 
-    * @param strtotime $Future Relateive time offset. Like "+30 days"
+    * @param strtotime $Future Relative time offset. Like "+30 days"
     * @param array $Where
     * @param boolean $Ended Optional. Only events that have ended?
     * @return type
     */
-   public function GetUpcoming($Future, $Where = NULL, $Ended = FALSE) {
+   public function GetUpcoming($Future, $Where = NULL, $Ended = NULL) {
       $UTC = new DateTimeZone('UTC');
       $StartDate = new DateTime('now', $UTC);
       if ($Future) {
@@ -72,7 +72,11 @@ class EventModel extends Gdn_Model {
       
       // Limit to a future date, but after right now
       if ($LimitDate > $StartDate) {
-         $Where['DateStarts >'] = $StartDate->format('Y-m-d H:i:s');
+         if ($Ended === FALSE)
+            $Where['DateEnds >='] = $StartDate->format('Y-m-d H:i:s');
+         else
+            $Where['DateStarts >='] = $StartDate->format('Y-m-d H:i:s');
+         
          if ($Future)
             $Where['DateStarts <='] = $LimitDate->format('Y-m-d H:i:s');
       } else {
