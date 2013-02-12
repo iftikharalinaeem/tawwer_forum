@@ -93,7 +93,7 @@ class EventsController extends Gdn_Controller {
             
             // Register logged-in user being invited as criteria
             $EventCriteria['Invited'] = Gdn::Session()->UserID;
-            $RecentEventsModule->UserID = $User['UserID'];
+            $RecentEventsModule->UserID = Gdn::Session()->UserID;
             
             break;
       }
