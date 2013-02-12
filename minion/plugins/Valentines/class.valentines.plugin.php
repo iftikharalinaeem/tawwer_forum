@@ -162,11 +162,6 @@ class ValentinesPlugin extends Gdn_Plugin {
 //      $this->Enabled = TRUE;
 //      $this->DayAfter = FALSE;
       
-//      $DefaultRoles = C('Garden.Registration.DefaultRoles');
-//      $DefaultMemberRole = GetValue(0, $DefaultRoles);
-//      print_r($DefaultMemberRole);
-//      die();
-      
       $this->Year = date('Y');
       $this->ExpiredCheck = FALSE;
       
