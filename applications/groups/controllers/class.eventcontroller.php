@@ -303,7 +303,7 @@ class EventController extends Gdn_Controller {
       if (!EventPermission('Organizer'))
          throw ForbiddenException('delete this event');
       
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          $EventModel = new EventModel();
          $Deleted = $EventModel->Delete(array('EventID' => $EventID));
 
