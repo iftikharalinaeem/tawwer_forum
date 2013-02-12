@@ -68,6 +68,12 @@ class ValentinesPlugin extends Gdn_Plugin {
    protected $DayAfter;
    
    /**
+    * Check Expiry this round?
+    * @var boolean
+    */
+   protected $ExpiredCheck;
+   
+   /**
     * Convenience ReactionModel
     * @var ReactionModel
     */
@@ -84,6 +90,12 @@ class ValentinesPlugin extends Gdn_Plugin {
     * @var UserBadgeModel
     */
    protected $UserBadgeModel;
+   
+   /**
+    * Convenience ActivityModel
+    * @var ActivityModel
+    */
+   protected $ActivityModel;
    
    /**
     * Number of votes required to end a PM vote
@@ -104,10 +116,23 @@ class ValentinesPlugin extends Gdn_Plugin {
    protected $StartArrows;
    
    /**
+    * Length of time Desired users have to send their PMs (seconds)
+    * @var integer
+    */
+   protected $DesiredExpiry;
+   
+   /**
+    * Lounge CategoryID
+    * @var integer
+    */
+   protected $LoungeID;
+   
+   /**
     * Minion Plugin reference
     * @var MinionPlugin
     */
    protected $Minion;
+   protected $MinionUser;
    
    /**
     * Set global enabled flag
@@ -116,16 +141,24 @@ class ValentinesPlugin extends Gdn_Plugin {
       parent::__construct();
       $this->Enabled = (date('nd') == '214');
       $this->DayAfter = (date('nd') == '215');
+      $this->Enabled = TRUE;
+      $this->DayAfter = FALSE;
       $this->Year = date('Y');
+      $this->ExpiredCheck = FALSE;
 
       $this->Minion = MinionPlugin::Instance();
+      $this->MinionUser = (array)$this->Minion->Minion();
+      
       $this->ReactionModel = new ReactionModel();
       $this->BadgeModel = new BadgeModel();
       $this->UserBadgeModel = new UserBadgeModel();
+      $this->ActivityModel = new ActivityModel();
       
       $this->RequiredVotes = C('Plugins.Valentines.RequiredVotes', 60);
       $this->RequiredArrows = C('Plugins.Valentines.RequiredArrows', 5);
       $this->StartArrows = C('Plugins.Valentines.StartArrows', 3);
+      $this->DesiredExpiry = C('Plugins.Valentines.DesiredExpiry', 7200);
+      $this->LoungeID = C('Plugins.Valentines.LoungeID');
    }
    
    /**
@@ -135,9 +168,10 @@ class ValentinesPlugin extends Gdn_Plugin {
     */
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
       if (!$this->Enabled) return;
-      if (!Gdn::Session()->IsValid() && !Gdn::Session()->UserID) return;
+      if (!Gdn::Session()->IsValid() || !Gdn::Session()->UserID) return;
       if (Gdn::Session()->User->Admin == 2) return;
       
+      // Already participating this year?
       $Participating = $this->Minion->Monitoring(Gdn::Session()->User, 'Valentines', FALSE);
       $ParticipatingYear = GetValue('Year', $Participating, FALSE);
       if ($Participating && $ParticipatingYear == date('Y')) return;
@@ -150,11 +184,11 @@ class ValentinesPlugin extends Gdn_Plugin {
          $Valentines = $this->BadgeModel->GetID($BadgeName);
          if (!$Valentines) return;
       }
-      
       $this->UserBadgeModel->Give(Gdn::Session()->UserID, $Valentines['BadgeID']);
       
       // Award starting arrows
-      $this->Minion->Monitor(Gdn::Session()->User, 'Valentines', array(
+      $User = (array)Gdn::Session()->User;
+      $this->Minion->Monitor($User, array('Valentines' => array(
          'Year'      => date('Y'),
          'Started'   => time(),
          'Quiver'    => $this->StartArrows,
@@ -163,7 +197,68 @@ class ValentinesPlugin extends Gdn_Plugin {
          'Votes'     => 0,
          'Desired'   => FALSE,
          'Count'     => 0
-      ));
+      )));
+      
+      // Notify
+      $MinionUserID = $this->MinionUser['UserID'];
+      $Activity = array(
+         'ActivityType' => 'Valentines',
+         'ActivityUserID' => $MinionUserID,
+         'NotifyUserID' => Gdn::Session()->UserID,
+         'Force' => TRUE,
+         'HeadlineFormat' => T("{ActivityUserID,user} has placed {Data.StartArrows} arrows in your quiver."),
+         'RecordType' => 'Conversation',
+         'RecordID' => 3751,
+         'Route' => Url('/'),
+         'Data' => array(
+             'StartArrows'    => $this->StartArrows,
+             'Minion'         => $this->MinionUser
+          )
+      );
+      $this->ActivityModel->Save($Activity);
+   }
+   
+   /*
+    * METHODS
+    */
+   
+   public function PluginController_Valentines_Create($Sender) {
+      $this->Dispatch($Sender, $Sender->RequestArgs);
+   }
+
+   /**
+    * Handle timer dismissal
+    * 
+    * @param PluginController $Sender
+    */
+   public function Controller_Dismiss($Sender) {
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      $User = (array)Gdn::Session()->User;
+      $UserValentines = $this->Minion->Monitoring($User, 'Valentines', FALSE);
+      $UserDesired = GetValue('Desired', $UserValentines, FALSE);
+      if ($UserDesired) {
+         $UserDesired = &$UserValentines['Desired'];
+         $UserDesired['Dismissed'] = TRUE;
+         $this->Minion->Monitor($User, array('Valentines' => $UserValentines));
+      }
+      
+      $Sender->Render();
+   }
+   
+   /**
+    * Get arrows from a fallen cupid
+    * 
+    * @param PluginController $Sender
+    */
+   public function Controller_Refill($Sender) {
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      
+      
+      $Sender->Render();
    }
    
    /*
@@ -188,38 +283,58 @@ class ValentinesPlugin extends Gdn_Plugin {
          ->Get()->ResultArray();
       
       $NumArrows = sizeof($Arrows);
-      $ArrowNumber = mt_rand(0, $NumArrows-1);
-      $Arrow = $Arrows[$ArrowNumber];
-      
-      $PairedUserID = GetValue('UserID', $Arrow);
-      $PairedUser = Gdn::UserModel()->GetID($PairedUserID);
-      $PairedValentines = $this->Minion->Monitoring($DesiredUser, 'Valentines');
+      $PairedUser = NULL;
+      if ($NumArrows) {
+         $ArrowNumber = mt_rand(0, $NumArrows-1);
+         $Arrow = $Arrows[$ArrowNumber];
+
+         $PairedUserID = GetValue('UserID', $Arrow);
+         $PairedUser = Gdn::UserModel()->GetID($PairedUserID);
+         $PairedValentines = $this->Minion->Monitoring($DesiredUser, 'Valentines');
+      }
       
       // Desired Badge
       $DesiredBadge = $this->BadgeModel->GetID('desirable');
       $this->UserBadgeModel->Give($DesiredUserID, $DesiredBadge['BadgeID']);
       
       // Update monitor
+      $Expiry = time() + $this->DesiredExpiry;
       $DesiredValentines['Count']++;
       $DesiredValentines['Desired'] = TRUE;
       $DesiredValentines['DesiredUserID'] = $PairedUserID;
-      $DesiredValentines['Expiry'] = time();
+      $DesiredValentines['Expiry'] = $Expiry;
+      
       $PairedValentines['Desired'] = TRUE;
       $PairedValentines['DesiredUserID'] = $DesiredUserID;
-      $PairedValentines['Expiry'] = time();
+      $PairedValentines['Expiry'] = $Expiry;
+      
+      // Expiry reminders
+      $this->SetUserMeta($DesiredUserID, 'Desired.Expiry', $Expiry);
+      $this->SetUserMeta($PairedUserID, 'Desired.Expiry', $Expiry);
       
       // Send PMs
       $ConversationModel = new ConversationModel();
       $ConversationMessageModel = new ConversationMessageModel();
       
+      $Timespan = $this->DesiredExpiry;
+      $Timespan -= 3600 * ($Hours = (int) floor($Timespan / 3600));
+      $Timespan -= 60 * ($Minutes = (int) floor($Timespan / 60));
+      $Seconds = $Timespan;
+      
+      $TimeFormat = array();
+      if ($Hours) $TimeFormat[] = "{$Hours} ".Plural($Hours, 'hour', 'hours');
+      if ($Minutes) $TimeFormat[] = "{$Minutes} ".Plural($Minutes, 'minute', 'minutes');
+      if ($Seconds) $TimeFormat[] = "{$Seconds} ".Plural($Seconds, 'second', 'seconds');
+      $TimeFormat = implode(', ', $TimeFormat);
+      
       $InstructionMessage = <<<VALENTINES
-User [b]@"{Player.Name}"[/b], welcome to the {Year} Valentines Day Emotional Calibration Exercise. Your actions will be monitored and disected, and the results will be added to our knowledgebase of organic behaviour.
+User [b]@"{Player.Name}"[/b], welcome to the {Year} Valentines Day Empathy Chip Calibration Exercise. Your actions will be monitored and disected, and the results will be added to our knowledgebase of organic behaviour.
 
 Your partner is [b]@"{Desired.Name}"[/b]. Your task is to reply to this PM with an affectionate Valentines Day message intended for your partner, @"{Desired.Name}".
 
 Once sent, your message will be posted to the Valentines Day Community Evaluation System for [b]public feedback[/b]. The results of this feedback will determine your fate. The message will also be sent privately to @"{Desired.Name}" on your behalf.
 
-Do not fail.
+You have {Expiry} to complete your task. Do not fail.
 VALENTINES;
       
       foreach (array('desired', 'paired') as $MessageType) {
@@ -229,7 +344,8 @@ VALENTINES;
                $Message = FormatString(T($InstructionMessage), array(
                   'Year'      => date('Y'),
                   'Player'    => $DesiredUser,
-                  'Desired'   => $PairedUser
+                  'Desired'   => $PairedUser,
+                  'Expiry'    => $TimeFormat
                ));
                break;
             
@@ -238,7 +354,8 @@ VALENTINES;
                $Message = FormatString(T($InstructionMessage), array(
                   'Year'      => date('Y'),
                   'Player'    => $PairedUser,
-                  'Desired'   => $DesiredUser
+                  'Desired'   => $DesiredUser,
+                  'Expiry'    => $TimeFormat
                ));
                break;
          }
@@ -260,6 +377,37 @@ VALENTINES;
          }
       }
       
+      // Notify
+      $Activity = array(
+         'ActivityType' => 'Valentines',
+         'ActivityUserID' => $PairedUserID,
+         'NotifyUserID' => $DesiredUserID,
+         'HeadlineFormat' => T("You've been shot by {ActivityUserID,user}! <a href=\"{Url,html}\">What now</a>?"),
+         'RecordType' => 'Conversation',
+         'RecordID' => $DesiredValentines['ConversationID'],
+         'Route' => CombinePaths(array('messages',$DesiredValentines['ConversationID'])),
+         'Data' => array(
+            'Shooter'   => $PairedUser,
+            'Minion'    => $this->Minion->Minion()
+         )
+      );
+      $this->ActivityModel->Save($Activity);
+      
+      $Activity = array(
+         'ActivityType' => 'Valentines',
+         'ActivityUserID' => $DesiredUserID,
+         'NotifyUserID' => $PairedUserID,
+         'HeadlineFormat' => T("You shot {ActivityUserID,user} in the neck! <a href=\"{Url,html}\">What now</a>?"),
+         'RecordType' => 'Conversation',
+         'RecordID' => $PairedValentines['ConversationID'],
+         'Route' => CombinePaths(array('messages',$PairedValentines['ConversationID'])),
+         'Data' => array(
+             'Target'   => $DesiredUser,
+             'Minion'   => $this->Minion->Minion()
+          )
+      );
+      $this->ActivityModel->Save($Activity);
+      
       // Save
       $this->Minion->Monitor($DesiredUser, array('Valentines' => $DesiredValentines));
       $this->Minion->Monitor($PairedUser, array('Valentines' => $PairedValentines));
@@ -276,8 +424,65 @@ VALENTINES;
       $Valentines['DesiredUserID'] = FALSE;
       $Valentines['Count']++;
       
+      // Remove expiry timer
+      $this->SetUserMeta($User['UserID'], 'Desired.Expiry', NULL);
+      
       // Save
       $this->Minion->Monitor($User, array('Valentines' => $Valentines));
+   }
+   
+   
+   /**
+    * Expire this user's Desired and punish
+    * 
+    * @param array $User
+    */
+   public function Expire(&$User) {
+      $Valentines = $this->Minion->Monitoring($User, 'Valentines');
+      $DesiredUserID = $Valentines['DesiredUserID'];
+      $DesiredUser = Gdn::UserModel()->GetID($DesiredUserID);
+      
+      // Punish
+      
+      // Create a shaming discussion
+      $ComplianceTitle = FormatString(T("[Compliance] {User.Name} failed to contact {Desired.Name}"), array(
+         'User'      => $User,
+         'Desired'   => $DesiredUser
+      ));
+      
+      $Timespan = $this->DesiredExpiry;
+      $Timespan -= 3600 * ($Hours = (int) floor($Timespan / 3600));
+      $Timespan -= 60 * ($Minutes = (int) floor($Timespan / 60));
+      $Seconds = $Timespan;
+      
+      $TimeFormat = array();
+      if ($Hours) $TimeFormat[] = "{$Hours} ".Plural($Hours, 'hour', 'hours');
+      if ($Minutes) $TimeFormat[] = "{$Minutes} ".Plural($Minutes, 'minute', 'minutes');
+      if ($Seconds) $TimeFormat[] = "{$Seconds} ".Plural($Seconds, 'second', 'seconds');
+      $TimeFormat = implode(', ', $TimeFormat);
+      
+      $ComplianceMessage = <<<COMPLIANCEVALENTINES
+Unfortunately @"{User.Name}" was unable to overcome their own organic lethargy over the course of the last
+{Expiry}, and as a result has failed to send any messages to their Valentine @"{Desired.Name}".
+
+For this, they will receive punishment consistent with the severity of their crime, and will be mocked
+severely by their peers for being a complete and utter failure.
+
+This incident has been logged in the Vault.
+COMPLIANCEVALENTINES;
+      $ComplianceMessage = FormatString($ComplianceMessage, array(
+         'User'      => $User,
+         'Desired'   => $DesiredUser,
+         'Expiry'    => $TimeFormat
+      ));
+      $Discussion = $this->LoungeDiscussion($ComplianceTitle, $VoteMessage);
+      $Comment = $this->Minion->Message($User, $Discussion, 'I am a tremendous goose and I feel the most profound shame.', FALSE, $User);
+
+      // Now punish this comment
+      $this->Minion->Punish($User, $Discussion, $Comment, 'major');
+      
+      // End Desired mode
+      $this->EndDesired($User);
    }
    
    /**
@@ -306,22 +511,7 @@ VOTEVALENTINES;
       ));
       
       // Make a new discussion
-      $DiscussionModel = new DiscussionModel();
-      $DiscussionID = $DiscussionModel->Save(array(
-         'Name'         => $VoteTitle,
-         'CategoryID'   => $CategoryID,
-         'Body'         => $VoteMessage,
-         'Format'       => 'BBCode',
-         'InsertUserID' => $this->Minion->Minion()->UserID,
-         'Announce'     => 0,
-         'Close'        => 0
-      ));
-
-      if (!$DiscussionID)
-         throw new Gdn_UserException($DiscussionModel->Validation->ResultsText());
-
-      $DiscussionModel->UpdateDiscussionCount($CategoryID);
-      $Discussion = (array)$DiscussionModel->GetID($DiscussionID);
+      $Discussion = $this->LoungeDiscussion($VoteTitle, $VoteMessage);
       
       // Save
       $this->Minion->Monitor($Discussion, array('Valentines' => array(
@@ -383,6 +573,35 @@ EXTENDEDVALENTINES;
       
       // Save
       $this->Minion->Monitor($Discussion, array('Valentines' => $Valentines));
+   }
+   
+   /**
+    * Create a new discussion in the lounge
+    * 
+    * @param string $Title
+    * @param string $Message
+    * @return array
+    * @throws Gdn_UserException
+    */
+   protected function LoungeDiscussion($Title, $Message) {
+      // Make a new discussion
+      $DiscussionModel = new DiscussionModel();
+      $DiscussionID = $DiscussionModel->Save(array(
+         'Name'         => $Title,
+         'CategoryID'   => $this->LoungeID,
+         'Body'         => $Message,
+         'Format'       => 'BBCode',
+         'InsertUserID' => $this->Minion->Minion()->UserID,
+         'Announce'     => 0,
+         'Close'        => 0
+      ));
+
+      if (!$DiscussionID)
+         throw new Gdn_UserException($DiscussionModel->Validation->ResultsText());
+
+      $DiscussionModel->UpdateDiscussionCount($this->LoungeID);
+      $Discussion = (array)$DiscussionModel->GetID($DiscussionID);
+      return $Discussion;
    }
    
    /**
@@ -452,6 +671,67 @@ FORWARDVALENTINES;
       $Playing['ConversationID'] = NULL;
       $this->Minion->Monitor($Author, array('Valentines' => $Playing));
    }
+   
+   /**
+    * Display PM timer output and run expiry checks
+    * 
+    * @param Gdn_Controller $Sender
+    */
+   public function Base_Render_Before($Sender) {
+      if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL) return;
+      if (!Gdn::Session()->IsValid()) return;
+      
+      $User = (array)Gdn::Session()->User;
+      $UserID = $User['UserID'];
+      $JavascriptRequired = FALSE;
+      
+      // Timer deployment
+      $User = (array)Gdn::Session()->User;
+      $UserValentines = $this->Minion->Monitoring($User, 'Valentines', FALSE);
+      $UserDesired = GetValue('Desired', $UserValentines, FALSE);
+      if ($UserDesired) {
+      
+         // Timer has been dismissed
+         if (GetValue('Dismissed', $UserDesired, FALSE)) return;
+
+         // User is desired, show timer
+         $Expiry = GetValue('Expiry', $UserDesired);
+         $Sender->AddDefinition('ValentinesExpiry', $Expiry - time());
+         $JavascriptRequired = TRUE;
+      }
+      
+      if ($JavascriptRequired)
+         $Sender->AddJsFile('valentines.js', 'plugins/Valentines');
+   }
+   
+   /**
+    * Run expiry checks based on cache key cooldown
+    * 
+    * @param Gdn_Statistics $Sender
+    */
+   public function Gdn_Statistics_AnalyticsTick_Handler($Sender) {
+      // Expiry check
+      $ExpiryCheckKey = 'plugins.valentines.expirycheck';
+      $NextCheckTime = Gdn::Cache()->Get($ExpiryCheckKey);
+      if (!$NextCheckTime || $NextCheckTime < microtime(true)) {
+         Gdn::Cache()->Store($ExpiryCheckKey, microtime(true)+60);
+         
+         // Run check
+         $MetaKey = $this->MakeMetaKey('Desired.Expiry');
+         $ExpiredUsers = Gdn::SQL()->Select('UserID')
+            ->From('UserMeta')
+            ->Where('Name', $MetaKey)
+            ->Where('Value <', time())
+            ->Get()->ResultArray();
+
+         foreach ($ExpiredUsers as $ExpiredUser) {
+            $ExpiredUserID = GetValue('UserID', $ExpiredUser);
+            $ExpiredUser = Gdn::UserModel()->GetID($ExpiredUserID);
+            $this->Expire($User);
+         }
+      }
+   }
+   
    
    /**
     * Add Arrow of Desire reaction to the row
@@ -567,7 +847,7 @@ FORWARDVALENTINES;
          $Attributes = @unserialize($Attributes);
       $Comment['Attributes'] = $Attributes;
       
-      $this->AddValentinesCSS($Sender, $Comment);
+      $this->AddDesiredCSS($Sender, $Comment);
    }
    
    /**
@@ -724,6 +1004,15 @@ FORWARDVALENTINES;
          switch ($Mode) {
             case 'set':
                $this->SetUserMeta($PlayerID, $ArrowRecord, time());
+               Gdn::Controller()->InformMessage(FormatString(T("Your arrow embeds itself in {TargetUser.UserID,user}'s butt. You have <b>{Player.Quiver}</b> {Arrows} left."), array(
+                  'Player'       => $Player,
+                  'Target'       => $Target,
+                  'PlayerUser'   => $PlayerUser,
+                  'TargetUser'   => $TargetUser,
+                  'TargetUserUrl'=> UserAnchor($TargetUser),
+                  'Arrows'       => Plural($Player['Quiver'], 'arrow', 'arrows'),
+                  'Minion'       => $this->MinionUser
+               )));
                break;
             
             case 'unset':
@@ -800,7 +1089,7 @@ FORWARDVALENTINES;
       $this->BadgeModel->Define(array(
          'Name' => "Valentines Day {$Year}",
          'Slug' => "valentines{$Year}",
-         'Type' => 'Date',
+         'Type' => 'Manual',
          'Body' => "Happy Valentines Day! You visited the forum on Feb 14, {$Year}.",
          'Photo' => "http://badges.vni.la/100/valentines{$Year}.png",
          'Points' => 10,
@@ -846,6 +1135,11 @@ FORWARDVALENTINES;
          'Class' => 'Valentines',
          'Level' => 1,
          'CanDelete' => 0
+      ));
+      
+      $this->ActivityModel->DefineType('Valentines', array(
+         'Notify'    => 1,
+         'Public'    => 0
       ));
       
    }

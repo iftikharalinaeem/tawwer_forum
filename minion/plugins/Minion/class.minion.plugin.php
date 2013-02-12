@@ -1537,7 +1537,7 @@ class MinionPlugin extends Gdn_Plugin {
     * @param array $Discussion
     * @param string $Message
     */
-   public function Message($User, $Discussion, $Message, $Format = TRUE) {
+   public function Message($User, $Discussion, $Message, $Format = TRUE, $PostAs = 'minion') {
       if (is_numeric($User)) {
          $User = Gdn::UserModel()->GetID($User);
          if (!$User) return FALSE;
@@ -1565,18 +1565,28 @@ class MinionPlugin extends Gdn_Plugin {
          // Temporarily become Minion
          $SessionUser = Gdn::Session()->User;
          $SessionUserID = Gdn::Session()->UserID;
-         Gdn::Session()->User = (object)$this->Minion();
-         Gdn::Session()->UserID = $this->MinionUserID;
          
-         $MinionCommentID = $CommentModel->Save(array(
+         if ($PostAs == 'minion') {
+            $PostAsUser = (object)$this->Minion();
+            $PostAsUserID = $this->MinionUserID;
+         } else {
+            $PostAsUser = (object)$PostAs;
+            $PostAsUserID = GetValue('UserID', $PostAsUser);
+         }
+         Gdn::Session()->User = $PostAsUser;
+         Gdn::Session()->UserID = $PostAsUserID;
+         
+         $MinionCommentID = $CommentModel->Save($Comment = array(
             'DiscussionID' => $DiscussionID,
             'Body'         => $Message,
             'Format'       => 'Html',
             'InsertUserID' => $this->GetMinionUserID()
          ));
       
-         if ($MinionCommentID)
+         if ($MinionCommentID) {
+            $Comment['UserID'] = $MinionCommentID;
             $CommentModel->Save2($MinionCommentID, TRUE);
+         }
          
          // Become normal again
          Gdn::Session()->User = $SessionUser;
@@ -1585,6 +1595,8 @@ class MinionPlugin extends Gdn_Plugin {
       
       $Informer = Gdn_Format::To($Message, 'Html');
       Gdn::Controller()->InformMessage($Informer);
+      
+      if ($Message) return $Comment;
    }
    
    public function Punish($User, $Discussion, $Comment, $Force, $Options = NULL) {
