@@ -253,7 +253,7 @@ class GroupController extends Gdn_Controller {
       $Form = new Gdn_Form();
       $this->Form = $Form;
       
-      if ($this->Form->IsPostBack()) {
+      if ($this->Form->AuthenticatedPostBack()) {
          $GroupModel = new GroupModel();
          $GroupDeleted = $GroupModel->Delete(array('GroupID' => $Group['GroupID']));
          

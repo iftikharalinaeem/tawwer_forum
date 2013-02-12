@@ -93,7 +93,7 @@ class EventModel extends Gdn_Model {
       if ($InvitedUserID) {
          $EventsQuery
             ->From('UserEvent ue')
-            ->Join('Event e', 'eu.EventID = e.EventID');
+            ->Join('Event e', 'ue.EventID = e.EventID');
       } else {
          $EventsQuery->From('Event e');
       }
@@ -375,10 +375,10 @@ class EventModel extends Gdn_Model {
             // Force a sane end date
             if (!isset($Event['DateEnds']) || is_null($Event['DateEnds'])) {
                $DateEnds = DateTime::createFromFormat($InputDateFormat, $EventDateStartsStr, $Timezone);
-               $DateEnds->modify($Event['TimeEnds']);
-
+               
                $Event['DateEnds'] = $DateEnds->format('m/d/Y');
-               $Event['TimeEnds'] = $DateEnds->format('h:ia');
+               if (!$Event['TimeEnds'])
+                  $Event['TimeEnds'] = $DateEnds->format('h:ia');
                unset($DateEnds);
             }
 
