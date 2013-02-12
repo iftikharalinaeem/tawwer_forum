@@ -70,8 +70,8 @@ class EventsController extends Gdn_Controller {
             $this->SetData('Group', $Group);
 
             // Check if this person is a member of the group or a moderator
-            $ViewGroupEvents = GroupPermission('View');
-            if (!$ViewGroupEvents && !Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
+            $ViewGroupEvents = GroupPermission('View', $Group);
+            if (!$ViewGroupEvents)
                throw PermissionException();
 
             $this->AddBreadcrumb('Groups', Url('/groups'));
