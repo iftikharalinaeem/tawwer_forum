@@ -31,6 +31,7 @@
  *  1.10    Add 'Log' method and Plugins.Minion.LogThreadID
  *  1.10.1  Fix Log messages
  *  1.10.2  Fix mentions
+ *  1.11    Personas
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -41,7 +42,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.10.2',
+   'Version' => '1.11',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -69,8 +70,23 @@ class MinionPlugin extends Gdn_Plugin {
     */
    protected $Messages;
    
+   /**
+    * List of registered personas
+    * @var array
+    */
+   protected $Personas;
+   
+   /**
+    * Current persona key
+    * @var string
+    */
+   protected $Persona;
+   
    public function __construct() {
       parent::__construct();
+      
+      $this->Personas = array();
+      $this->Persona = NULL;
       
       $this->Messages = array(
          'Gloat'        => array(
@@ -121,7 +137,19 @@ class MinionPlugin extends Gdn_Plugin {
       );
    }
    
+   /**
+    * Load minion persona
+    */
    protected function StartMinion() {
+      
+      // Register default persona
+      $this->Persona('Minion', array(
+         'Name'      => 'Minion',
+         'Photo'     => 'http://cdn.vanillaforums.com/minion.png',
+         'Title'     => 'Forum Robot',
+         'Location'  => 'Vanilla Forums - '.time()
+      ));
+      
       if (is_null($this->Minion)) {
          // Currently operating as Minion
          $this->MinionUserID = $this->GetMinionUserID();
@@ -130,6 +158,10 @@ class MinionPlugin extends Gdn_Plugin {
       
       $this->EventArguments['Messages'] = &$this->Messages;
       $this->FireEvent('Start');
+      
+      // Conditionally apply default persona
+      if (!$this->Persona())
+         $this->Persona('Minion');
    }
    
    /*
@@ -140,6 +172,7 @@ class MinionPlugin extends Gdn_Plugin {
     * Retrieves a "system user" id that can be used to perform non-real-person tasks.
     */
    public function GetMinionUserID() {
+      
       $MinionUserID = C('Plugins.Minion.UserID');
       if ($MinionUserID)
          return $MinionUserID;
@@ -168,9 +201,53 @@ class MinionPlugin extends Gdn_Plugin {
       return $MinionName = GetValue('Name', $this->Minion);
    }
    
+   /**
+    * Get minion user object
+    * 
+    * @return type
+    */
    public function Minion() {
       $this->StartMinion();
       return $this->Minion;
+   }
+   
+   /**
+    * Register a persona
+    * 
+    * @param string $PersonaName
+    * @param array $Persona
+    */
+   public function Persona($PersonaName = NULL, $Persona = NULL) {
+      
+      // Get current person
+      if (is_null($PersonaName))
+         return GetValue($this->Persona, $this->Personas, NULL);
+      
+      // Apply an existing persona
+      if (!is_null($PersonaName) && is_null($Persona)) {
+         
+         // Don't re-apply
+         $CurrentPersona = Gdn::UserModel()->GetAttribute($this->MinionUserID, 'Persona', NULL);
+         if (!is_null($CurrentPersona) && $PersonaName == $CurrentPersona) return;
+         
+         // Get persona
+         $ApplyPersona = GetValue($PersonaName, $this->Personas, NULL);
+         if (is_null($ApplyPersona))
+            return;
+         
+         // Apply minion
+         $Minion = array_merge($ApplyPersona, array('UserID' => $this->MinionUserID));
+         Gdn::UserModel()->Save($Minion);
+         Gdn::UserModel()->SaveAttribute($this->MinionUserID, 'Persona', $PersonaName);
+         $this->Minion = Gdn::UserModel()->GetID($this->MinionUserID);
+         $this->Persona = $PersonaName;
+      }
+      
+      // Register a persona
+      if (!is_null($PersonaName) && !is_null($Persona)) {
+         $this->Personas[$PersonaName] = $Persona;
+         return;
+      }
    }
    
    /**
