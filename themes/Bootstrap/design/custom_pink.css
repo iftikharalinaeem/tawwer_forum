@@ -56,7 +56,6 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
   background-image: -webkit-linear-gradient(top, #2c3740, #262f37);
   background-image: -moz-linear-gradient(top, #2c3740, #262f37);
   background-image: -o-linear-gradient(top, #2c3740, #262f37);
-  background-image: -ms-linear-gradient(top, #2c3740, #262f37);
   background-image: linear-gradient(top, #2c3740, #262f37);
 }
 
@@ -134,7 +133,6 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
   background-image: -webkit-linear-gradient(top, #ffffff, #fbd4d0);
   background-image: -moz-linear-gradient(top, #ffffff, #fbd4d0);
   background-image: -o-linear-gradient(top, #ffffff, #fbd4d0);
-  background-image: -ms-linear-gradient(top, #ffffff, #fbd4d0);
   background-image: linear-gradient(top, #ffffff, #fbd4d0);
   border-color: #f7a8a1;
   color: #60364e;
@@ -160,7 +158,6 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
   background-image: -webkit-linear-gradient(top, #497d9b, #294555);
   background-image: -moz-linear-gradient(top, #497d9b, #294555);
   background-image: -o-linear-gradient(top, #497d9b, #294555);
-  background-image: -ms-linear-gradient(top, #497d9b, #294555);
   background-image: linear-gradient(top, #497d9b, #294555);
   border-color: #294555 #294555 #182933;
   color: white;

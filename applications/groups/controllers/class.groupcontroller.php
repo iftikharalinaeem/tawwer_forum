@@ -69,12 +69,14 @@ class GroupController extends Gdn_Controller {
       $this->SetData('Group', $Group);
       $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       
+      $this->GroupModel->OverridePermissions($Group);
+      
       // Get Discussions
       $DiscussionModel = new DiscussionModel();
       $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, 10)->ResultArray();
       $this->SetData('Discussions', $Discussions);
       
-      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce >' => 0), 0, 10)->ResultArray();
+      $Discussions = $DiscussionModel->GetAnnouncements(array('d.GroupID' => $GroupID), 0, 10)->ResultArray();
       $this->SetData('Announcements', $Discussions);
       
       // Get Events
@@ -114,6 +116,43 @@ class GroupController extends Gdn_Controller {
    public function Add() {
       $this->Title(sprintf(T('New %s'), T('Group')));
       return $this->AddEdit();
+   }
+   
+   public function Announcement($Group) {
+      $Group = $this->GroupModel->GetID($Group);
+      if (!$Group)
+         throw NotFoundException('Group');
+      
+      // Check leader permission.
+      if (!$this->GroupModel->CheckPermission('Moderate', $Group)) {
+         throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Moderate.Reason', $Group));
+      }
+      
+      $this->SetData('Group', $Group);
+      
+      $Form = new Gdn_Form();
+      $this->Form = $Form;
+      
+      if ($Form->AuthenticatedPostBack()) {
+         // Let's save the announcement.
+         $Form->SetFormValue('CategoryID', $Group['CategoryID']);
+         $Form->SetFormValue('GroupID', $Group['GroupID']);
+         $Form->SetFormValue('Announce', 2); // Announce within group.
+         
+         
+         $Model = new DiscussionModel();
+         $Form->SetModel($Model);
+         
+         if ($Form->Save()) {
+            $this->RedirectUrl = GroupUrl($Group);
+         } else {
+            $Form->SetValidationResults($Model->ValidationResults());
+         }
+      }
+      
+      $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+      $this->Title(T('New Announcement'));
+      $this->Render();
    }
    
    public function Approve($Group, $ID, $Value = 'approved') {

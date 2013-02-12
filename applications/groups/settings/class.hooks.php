@@ -8,6 +8,20 @@ class GroupsHooks extends Gdn_Plugin {
       include(dirname(__FILE__).'/structure.php');
    }
    
+   protected function SetBreadcrumbs($Group = NULL) {
+      if (!$Group)
+         $Group = Gdn::Controller()->Data('Group', NULL);
+      
+      if ($Group) {
+         $Sender = Gdn::Controller();
+         $Sender->SetData('Breadcrumbs', array());
+         $Sender->AddBreadcrumb(T('Groups'), '/groups');
+         $Sender->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+         
+         $Sender->SetData('_CancelUrl', GroupUrl($Group));
+      }
+   }
+   
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
       $Sender->AddCssFile('groups.css', 'groups');
    }
@@ -56,6 +70,37 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
    
+   protected function OverridePermissions($Sender) {
+      $Dicussion = $Sender->DiscussionModel->GetID($Sender->ReflectArgs['DiscussionID']);
+      $GroupID = GetValue('GroupID', $Dicussion);
+      if (!$GroupID)
+         return;
+      
+      $Model = new GroupModel();
+      $Group = $Model->GetID($GroupID);
+      if (!$Group)
+         return;
+      
+      $Model->OverridePermissions($Group);
+   }
+   
+   /**
+    * 
+    * @param DiscussionController $Sender
+    * @return type
+    */
+   public function DiscussionController_Announce_Before($Sender) {
+      $this->OverridePermissions($Sender);
+   }
+   
+   public function DiscussionController_Close_Before($Sender) {
+      $this->OverridePermissions($Sender);
+   }
+   
+   public function DiscussionController_Delete_Before($Sender) {
+      $this->OverridePermissions($Sender);
+   }
+   
    /**
     * 
     * @param DiscussionController $Sender
@@ -79,22 +124,62 @@ class GroupsHooks extends Gdn_Plugin {
    }
    
    /**
+    * @param PostController $Sender
+    */
+   public function PostController_Discussion_Before($Sender) {
+      $GroupID = $Sender->Request->Get('groupid');
+      
+      if (!$GroupID)
+         return;
+      
+      $Model = new GroupModel();
+      $Group = $Model->GetID($GroupID);
+      if (!$Group)
+         return;
+      
+      $Sender->SetData('Group', $Group);
+      
+      $Model->OverridePermissions($Group);
+   }
+   
+   public function PostController_EditDiscussion_Before($Sender) {
+      $DiscussionID = GetValue('DiscussionID', $Sender->ReflectArgs);
+      if ($DiscussionID) {
+         $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
+         $GroupID = GetValue('GroupID', $Discussion);
+      }
+      
+      if (!$GroupID)
+         return;
+      
+      $Model = new GroupModel();
+      $Group = $Model->GetID($GroupID);
+      if (!$Group)
+         return;
+      
+      $Sender->SetData('Group', $Group);
+      $Model->OverridePermissions($Group);
+   }
+   
+   /**
     * 
     * @param PostController $Sender
     */
    public function PostController_Render_Before($Sender) {
-      $GroupID = Gdn::Request()->Get('groupid');
-      if ($GroupID) {
-         // TODO: Check permissions.
-         $Model = new GroupModel();
-         $Group = $Model->GetID($GroupID);
-         if ($Group) {
-            // Hide the category drop-down.
-            $Sender->ShowCategorySelector = FALSE;
-            $Sender->SetData('_CancelUrl', GroupUrl($Group));
-         }
+      $Group = $Sender->Data('Group');
+      
+      if ($Group) {
+         // Hide the category drop-down.
+         $Sender->ShowCategorySelector = FALSE;
          
+         // Reduce the announce options.
+         $Options = array(
+            2 => '@'.T('Announce'),
+            0 => '@'.T("Don't announce."));
+         $Sender->SetData('_AnnounceOptions', $Options);
       }
+      
+      $this->SetBreadcrumbs();
    }
    
    /**

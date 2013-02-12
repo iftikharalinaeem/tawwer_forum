@@ -32,6 +32,15 @@
    <div class="Group-Box Group-Announcements">
       <h2><?php echo T('Announcements'); ?></h2>
       <?php $EmptyMessage = T('GroupEmptyAnnouncements', "Important stuff will go here one day."); ?>
+      
+      <?php
+      if (GroupPermission('Moderate')) {
+         echo '<div class="Button-Controls">';
+         echo Anchor(T('New Announcement'), GroupUrl($this->Data('Group'), 'announcement'), 'Button');
+         echo '</div>';
+      }
+      ?>
+      
       <?php WriteDiscussionBlogList($this->Data('Announcements'), $EmptyMessage); ?>
    </div>
    

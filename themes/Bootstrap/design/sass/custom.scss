@@ -224,6 +224,10 @@ body > #Frame > .Head {
    margin-bottom: 25px;
    border-bottom: solid 1px #ddd;
    font-weight: 300;
+   
+   .SiteSearch {
+      float: right;
+   }
 }
 
 /*** Forms ***/
@@ -306,6 +310,10 @@ body > #Frame > .Head {
    -webkit-border-radius: 5px;
    -moz-border-radius: 5px;
    border-radius: 5px;
+}
+
+.SmallButton {
+   padding: 4px 6px;
 }
 
 .ButtonGroup.Big .Button {
@@ -909,6 +917,7 @@ a.Close:hover {
 .SpDashboard { background-position: -340px -20px }
 .SpDelete { background-position: -340px -140px; }
 .SpDiscussions, .SpMyDiscussions { background-position: -200px -80px; }
+.SpGroups { background-position: -240px -40px; }
 .SpImage { background-position: -120px -140px; }
 .SpInbox { background-position: -80px -100px; }
 .SpMessage { background-position: -100px -100px;}
