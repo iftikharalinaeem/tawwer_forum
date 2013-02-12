@@ -116,22 +116,22 @@ class EventController extends Gdn_Controller {
       $EventModel = new EventModel();
       $this->Form->SetModel($EventModel);
       if ($this->Form->IsPostBack()) {
-         $Event = $this->Form->FormValues();
+         $EventData = $this->Form->FormValues();
          
          if ($GroupID)
-            $Event['GroupID'] = $GroupID;
+            $EventData['GroupID'] = $GroupID;
          
          // Apply munged event data back to form
          $this->Form->ClearInputs();
-         $this->Form->SetFormValue($Event);
+         $this->Form->SetFormValue($EventData);
          
          if ($EventID = $this->Form->Save()) {
-            $Event['EventID'] = $EventID;
-            if (GetValue('GroupID',$Event, FALSE))
+            $EventData['EventID'] = $EventID;
+            if (GetValue('GroupID',$EventData, FALSE))
                $EventModel->InviteGroup($EventID, $GroupID);
 
-            $this->InformMessage(FormatString(T("New event created for <b>'{Name}'</b>"), $Event));
-            Redirect(EventUrl($Event));
+            $this->InformMessage(FormatString(T("New event created for <b>'{Name}'</b>"), $EventData));
+            Redirect(EventUrl($EventData));
          }
          
       }
