@@ -247,8 +247,8 @@ class GroupController extends Gdn_Controller {
          throw NotFoundException('Group');
       $this->SetData('Group', $Group);
       
-      if (!GroupPermission('Leader'))
-         throw ForbiddenException('delete this group');
+      if (!GroupPermission('Edit'))
+         throw ForbiddenException('@'.GroupPermission('Edit.Reason'));
       
       $Form = new Gdn_Form();
       $this->Form = $Form;
