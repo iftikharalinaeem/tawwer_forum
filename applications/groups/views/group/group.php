@@ -23,7 +23,7 @@
       <?php $EmptyMessage = T('GroupEmptyEvents', "Aw snap, no events are coming up."); ?>
       <?php WriteEventList($this->Data('Events'), $this->Data('Group'), $EmptyMessage); ?>
       <?php
-      echo '<div class="MoreWrap">'.Anchor(T('All Events'), Url(CombinePaths(array("/events/", GroupUrl($this->Data('Group')))))).'</div>';
+      echo '<div class="MoreWrap">'.Anchor(T('All Events'), CombinePaths(array("/events/", GroupUrl($this->Data('Group'))))).'</div>';
       ?>
    </div>
    
