@@ -162,6 +162,11 @@ class ValentinesPlugin extends Gdn_Plugin {
 //      $this->Enabled = TRUE;
 //      $this->DayAfter = FALSE;
       
+//      $DefaultRoles = C('Garden.Registration.DefaultRoles');
+//      $DefaultMemberRole = GetValue(0, $DefaultRoles);
+//      print_r($DefaultMemberRole);
+//      die();
+      
       $this->Year = date('Y');
       $this->ExpiredCheck = FALSE;
       
@@ -624,7 +629,29 @@ EXTENDEDVALENTINES;
     * @param integer $CacheSize
     */
    public function DropCache($CacheSize) {
+      $RecentComments = Gdn::SQL()
+         ->Select('DiscussionID')
+         ->Select('CategoryID')
+         ->From('Comment')
+         ->Where('DateInserted >', date('Y-m-d H:i:s', strtotime('2 minutes ago')))
+         ->Get()->ResultArray();
       
+      shuffle($RecentComments);
+      $Comment = array_pop($RecentComments);
+      while ($Comment = array_pop($RecentComments)) {
+         $CategoryID = $Comment['CategoryID'];
+         $Category = CategoryModel::Categories($CategoryID);
+         $PermissionCategoryID = $Category['PermissionCategoryID'];
+         
+         $DefaultRoles = C('Garden.Registration.DefaultRoles');
+         $DefaultMemberRole = GetValue(0, $DefaultRoles);
+         print_r($DefaultMemberRole);
+         $Result = $PermissionModel->GetRolePermissions($RoleID, $Permission, 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
+         return (GetValue($Permission, GetValue(0, $Result), FALSE)) ? TRUE : FALSE;
+         
+         // Check permission
+         
+      }
    }
    
    /**
