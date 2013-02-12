@@ -93,7 +93,7 @@ class EventModel extends Gdn_Model {
       if ($InvitedUserID) {
          $EventsQuery
             ->From('UserEvent ue')
-            ->Join('Event e', 'eu.EventID = e.EventID');
+            ->Join('Event e', 'ue.EventID = e.EventID');
       } else {
          $EventsQuery->From('Event e');
       }
