@@ -311,7 +311,7 @@ class ValentinesPlugin extends Gdn_Plugin {
    public function MinionPlugin_Start_Handler($Sender) {
       
       // Register persona
-      $this->Minion->Persona('Valentines', array(
+      $Sender->Persona('Valentines', array(
          'Name'      => 'Robot Cupid',
          'Photo'     => 'http://cdn.vanillaforums.com/minion/valentines.jpg',
          'Title'     => 'Happiness Droid',
@@ -320,7 +320,7 @@ class ValentinesPlugin extends Gdn_Plugin {
             
       // Change persona
       if ($this->Enabled || $this->DayAfter)
-         $this->Minion->Persona('Valentines');
+         $Sender->Persona('Valentines');
    }
    
    /**
