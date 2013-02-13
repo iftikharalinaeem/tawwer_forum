@@ -145,7 +145,7 @@ class MinionPlugin extends Gdn_Plugin {
       // Register default persona
       $this->Persona('Minion', array(
          'Name'      => 'Minion',
-         'Photo'     => 'http://cdn.vanillaforums.com/minion.png',
+         'Photo'     => 'http://cdn.vanillaforums.com/minion/minion.png',
          'Title'     => 'Forum Robot',
          'Location'  => 'Vanilla Forums - '.time()
       ));
@@ -160,8 +160,9 @@ class MinionPlugin extends Gdn_Plugin {
       $this->FireEvent('Start');
       
       // Conditionally apply default persona
-      if (!$this->Persona())
+      if (!$this->Persona()) {
          $this->Persona('Minion');
+      }
    }
    
    /*
@@ -225,10 +226,12 @@ class MinionPlugin extends Gdn_Plugin {
       
       // Apply an existing persona
       if (!is_null($PersonaName) && is_null($Persona)) {
-         
          // Don't re-apply
          $CurrentPersona = Gdn::UserModel()->GetAttribute($this->MinionUserID, 'Persona', NULL);
-         if (!is_null($CurrentPersona) && $PersonaName == $CurrentPersona) return;
+         if (!is_null($CurrentPersona) && $PersonaName == $CurrentPersona) {
+            $this->Persona = $PersonaName;
+            return;
+         }
          
          // Get persona
          $ApplyPersona = GetValue($PersonaName, $this->Personas, NULL);
