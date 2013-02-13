@@ -27,7 +27,7 @@
       ?>
    </div>
    
-   <div class="Group-Box Group-Announcements">
+   <div class="Group-Box Group-Announcements Section-DiscussionList">
       <h2><?php echo T('Announcements'); ?></h2>
       <?php $EmptyMessage = T('GroupEmptyAnnouncements', "Important stuff will go here one day."); ?>
       

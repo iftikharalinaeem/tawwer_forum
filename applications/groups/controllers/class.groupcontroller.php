@@ -110,6 +110,7 @@ class GroupController extends Gdn_Controller {
       require_once $this->FetchViewLocation('event_functions', 'event');
       require_once $this->FetchViewLocation('group_functions');
       $this->CssClass .= ' NoPanel';
+      $this->AddJsFile('discussions.js', 'vanilla');
       $this->Render('Group');
    }
    
@@ -434,7 +435,7 @@ class GroupController extends Gdn_Controller {
       }
       
       if ($this->Head) {
-         $this->AddJsFile('discussions.js');
+         $this->AddJsFile('discussions.js', 'vanilla');
          $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
       }
       
