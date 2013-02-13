@@ -166,12 +166,12 @@ class ValentinesPlugin extends Gdn_Plugin {
     */
    public function __construct() {
       parent::__construct();
-      $this->Enabled = (date('nd') == '214');
-      $this->DayAfter = (date('nd') == '215');
-      $this->Enabled = TRUE;
-      $this->DayAfter = FALSE;
+      $Timezone = new DateTimeZone('America/New_York');
+      $CurrentDate = new DateTime('now', $Timezone);
+      $this->Enabled = ($CurrentDate->format('nd') == '214');
+      $this->DayAfter = ($CurrentDate->format('nd') == '215');
       
-      $this->Year = date('Y');
+      $this->Year = $CurrentDate->format('Y');
       $this->ExpiredCheck = FALSE;
       
       $this->ReactionModel = new ReactionModel();
@@ -523,7 +523,6 @@ class ValentinesPlugin extends Gdn_Plugin {
       $this->SetUserMeta($PairedUserID, 'Desired.Expiry', $Expiry);
       
       // Send PMs
-      
       $Timespan = $this->DesiredExpiry;
       $Timespan -= 3600 * ($Hours = (int) floor($Timespan / 3600));
       $Timespan -= 60 * ($Minutes = (int) floor($Timespan / 60));
@@ -762,10 +761,12 @@ VOTEVALENTINES;
     * @param array $Discussion
     */
    public function EndVote(&$Discussion) {
-      $Valentines = $this->Minion->Monitoring($Object, 'Valentines', FALSE);
+      $Valentines = $this->Minion->Monitoring($Discussion, 'Valentines', FALSE);
       TouchValue('Voting', $Valentines, array());
       $Voting = &$Valentines['Voting'];
       $IsVoting = (bool)GetValue('Voting', $Voting, FALSE);
+      
+      $Author = Gdn::UserModel()->GetID($Voting['AuthorUserID'], DATASET_TYPE_ARRAY);
       
       // Measure
       $Badge = NULL;
@@ -773,27 +774,50 @@ VOTEVALENTINES;
          // Love Fool
          $Voting['Voting'] = FALSE;
          $Badge = $this->BadgeModel->GetID('lovefool');
+         
+         // Create thread comment
+         $EndVoteMessage = <<<EXTENDEDVALENTINES
+What a surprise, @"{Player.Name}" is suffering for the organic weakness of "fondness", and has earned the {BadgeUrl} {BadgeWord}.
+EXTENDEDVALENTINES;
+         $EndVoteMessage = FormatString(T($EndVoteMessage), array(
+            'Player'    => $Author,
+            'Badge'     => $Badge,
+            'BadgeWord' => T('badge'),
+            'BadgeUrl'  => Anchor($Badge['Name'], CombinePaths(array('badge',$Badge['BadgeID'])))
+         ));
       } elseif ($Voting['Score'] < 0) {
          // Cold Hearted
          $Voting['Voting'] = FALSE;
          $Badge = $this->BadgeModel->GetID('coldhearted');
+         
+         // Create thread comment
+         $EndVoteMessage = <<<EXTENDEDVALENTINES
+The court of public opinion has revealed that @"{Player.Name}" has a cold heart, earning them the {BadgeUrl} {BadgeWord}.
+EXTENDEDVALENTINES;
+         $EndVoteMessage = FormatString(T($EndVoteMessage), array(
+            'Player'    => $Author,
+            'Badge'     => $Badge,
+            'BadgeWord' => T('badge'),
+            'BadgeUrl'  => Anchor($Badge['Name'], CombinePaths(array('badge',$Badge['BadgeID'])))
+         ));
       } else {
          // Tie, extend voting
          $AdditionalVotes = ceil($this->RequiredVotes * 0.5);
          $Voting['MaxVotes'] += $AdditionalVotes;
          
-         // Comment on thread
-         $ExtendedMessage = <<<EXTENDEDVALENTINES
+         // Create thread comment
+         $EndVoteMessage = <<<EXTENDEDVALENTINES
 Consensus has not been achieved. Voting has been extended.
 EXTENDEDVALENTINES;
-         $ExtendedMessage = T($ExtendedMessage);
-         $this->Minion->Message(NULL, $Discussion, $ExtendedMessage);
+         $EndVoteMessage = T($EndVoteMessage);
       }
       
       // Give badge
-      if ($Badge) {
+      if ($Badge)
          $this->UserBadgeModel->Give($Voting['AuthorUserID'], $Badge['BadgeID']);
-      }
+      
+      // Comment on thread
+      $this->Minion->Message(NULL, $Discussion, $EndVoteMessage);
       
       // Save
       $this->Minion->Monitor($Discussion, array('Valentines' => $Valentines));
@@ -1445,9 +1469,11 @@ FORWARDVALENTINES;
          $this->Minion->Monitor($TargetUser, array('Valentines' => $Target));
          
          // Check if threshold reached
+         
          $LowThreshold = $Target['Count'] * $this->RequiredArrows;
-         if ($Target['Hit'] > $LowThreshold && !($Target['Hit'] % $this->RequiredArrows))
+         if ($Target['Hit'] > $LowThreshold && ($Target['Hit'] % $this->RequiredArrows) == 0) {
             $this->Desired($TargetUser);
+         }
          
       }
       
