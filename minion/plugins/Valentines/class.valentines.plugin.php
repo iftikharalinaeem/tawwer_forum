@@ -309,7 +309,7 @@ class ValentinesPlugin extends Gdn_Plugin {
       
       $CacheID = GetValue(1, $Sender->RequestArgs);
       $CacheKey = "Cache.{$CacheID}";
-      $Cache = $this->GetUserMeta(0, $CacheKey, 0, TRUE);
+      $Cache = $this->GetUserMeta($this->MinionUser['UserID'], $CacheKey, 0, TRUE);
       try {
          if (!$Cache || $Cache < 1)
             throw new Exception(T('This arrow cache is empty.'));
@@ -324,7 +324,7 @@ class ValentinesPlugin extends Gdn_Plugin {
             if ($Cache < $Arrows) $Arrows = $Cache;
             $Cache -= $Arrows;
             if ($Cache < 0) $Cache = 0;
-            $this->SetUserMeta(0, $CacheKey, $Cache);
+            $this->SetUserMeta($this->MinionUser['UserID'], $CacheKey, $Cache);
             $this->SetUserMeta(Gdn::Session()->UserID, $CacheLootedKey, TRUE);
             
             // Award arrows to player
@@ -558,7 +558,7 @@ COMPLIANCEVALENTINES;
          'Desired'   => $DesiredUser,
          'Expiry'    => $TimeFormat
       ));
-      $Discussion = $this->LoungeDiscussion($ComplianceTitle, $VoteMessage);
+      $Discussion = $this->LoungeDiscussion($ComplianceTitle, $ComplianceMessage);
       $Comment = $this->Minion->Message($User, $Discussion, 'I am a tremendous goose and I feel the most profound shame.', array(
          'Format' => FALSE, 
          'PostAs' => $User
@@ -711,10 +711,11 @@ EXTENDEDVALENTINES;
 <div class="FallenCupid" data-cacheid="{CacheID}">
    <img src="http://cdn.vanillaforums.com/minion/fallencupid.png" />
    <p>Unidentified Aerial Target has been detected and destroyed. Moving to recover debris at crash site.</p>
-   <div><a class="FallenCupidLink" rel="{CacheID}">Search the debris for arrows</a></div>
+   <div><a class="FallenCupidLink" href="{CacheUrl}" rel="{CacheID}">Search the debris for arrows</a></div>
 </div>
 CACHEVALENTINES;
          $CacheMessage = FormatString($CacheMessage, array(
+            'CacheUrl'     => Url("/plugin/valentines/cache/{$CacheID}"),
             'CacheID'      => $CacheID
          ));
          $Comment = $this->Minion->Message(NULL, $Discussion, $CacheMessage, array(
@@ -739,7 +740,7 @@ CACHEVALENTINES;
    protected function CreateCache($CacheSize) {
       $CacheID = uniqid('cache');
       $CacheKey = "Cache.{$CacheID}";
-      $this->SetUserMeta(0, $CacheKey, $CacheSize);
+      $this->SetUserMeta($this->MinionUser['UserID'], $CacheKey, $CacheSize);
       return $CacheID;
    }
    
@@ -954,6 +955,7 @@ FORWARDVALENTINES;
          // When X% or less arrows remain unfired
          if ($Ratio <= $this->RefillTriggerRatio) {
             if ($ArrowPool >= $this->RefillThreshold) {
+               
                // Create a cache with enough arrows for a round number of users
                $RefillCacheSize = ceil(($this->RefillCacheRatio * $ArrowPool) / $this->StartArrows) * $this->StartArrows;
                $this->DropCache($RefillCacheSize);
