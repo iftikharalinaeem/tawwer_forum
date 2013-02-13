@@ -72,7 +72,8 @@ jQuery(document).ready(function($) {
          return EndValentines();
       
       var ExpiryFormatTime = String(ExpiryDelay).toFormatTime();
-      var ComplianceMessage = '<div class="Compliance" style="">Compliance in: <span style="color:#51CEFF;">'+ExpiryFormatTime+'</span></div>';
+      var ConversationID = gdn.definition('ValentinesConversation', 0);
+      var ComplianceMessage = '<div class="Compliance" style="">Compliance in: <a href="/messages/'+ConversationID+'"><span style="color:#51CEFF;">'+ExpiryFormatTime+'</span></a></div>';
          
       var ValentinesTimerInform = $('#ValentinesTimer');
       if (!ValentinesTimerInform.length) {
@@ -87,7 +88,7 @@ jQuery(document).ready(function($) {
          gdn.inform(ValentinesInform);
          return;
       }
-      //return;
+      
       ValentinesTimerInform.find('.InformMessage .Compliance').html(ComplianceMessage);
       return;
    }

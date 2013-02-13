@@ -1670,7 +1670,7 @@ class MinionPlugin extends Gdn_Plugin {
             'DiscussionID' => $DiscussionID,
             'Body'         => $Message,
             'Format'       => 'Html',
-            'InsertUserID' => $this->GetMinionUserID()
+            'InsertUserID' => $PostAsUserID
          ));
       
          if ($MinionCommentID) {
