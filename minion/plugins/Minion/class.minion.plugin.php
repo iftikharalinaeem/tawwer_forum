@@ -1330,6 +1330,8 @@ class MinionPlugin extends Gdn_Plugin {
       
       // Check expiry times and remove if expires
       $KickedUsers = $this->Monitoring($Discussion, 'Kicked', array());
+      var_dump($KickedUsers);
+      die();
       $KULen = sizeof($KickedUsers);
       foreach ($KickedUsers as $KickedUserID => $KickedUser) {
          if (!is_null($KickedUser['Expires']) && $KickedUser['Expires'] <= time())
@@ -1440,13 +1442,13 @@ class MinionPlugin extends Gdn_Plugin {
     * @param mixed $Default
     * @return mixed
     */
-   public function Monitoring($Object, $Attribute = NULL, $Default = NULL) {
+   public function Monitoring(&$Object, $Attribute = NULL, $Default = NULL) {
       $Minion = GetValueR('Attributes.Minion', $Object, array());
       
       $IsMonitoring = GetValue('Monitor', $Minion, FALSE);
-      if (!$IsMonitoring) return FALSE;
+      if (!$IsMonitoring) return $Default;
       
-      if (is_null($Attribute)) return TRUE;
+      if (is_null($Attribute)) return $Default;
       return GetValue($Attribute, $Minion, $Default);
    }
    
@@ -1614,7 +1616,15 @@ class MinionPlugin extends Gdn_Plugin {
     * @param array $Discussion
     * @param string $Message
     */
-   public function Message($User, $Discussion, $Message, $Format = TRUE, $PostAs = 'minion') {
+   public function Message($User, $Discussion, $Message, $Options = NULL) {
+      if (!is_array($Options))
+         $Options = array();
+      
+      // Options
+      $Format = GetValue('Format', $Options, TRUE);
+      $PostAs = GetValue('PostAs', $Options, 'minion');
+      $Inform = GetValue('Inform', $Options, TRUE);
+      
       if (is_numeric($User)) {
          $User = Gdn::UserModel()->GetID($User);
          if (!$User) return FALSE;
@@ -1661,8 +1671,8 @@ class MinionPlugin extends Gdn_Plugin {
          ));
       
          if ($MinionCommentID) {
-            $Comment['UserID'] = $MinionCommentID;
             $CommentModel->Save2($MinionCommentID, TRUE);
+            $Comment = $CommentModel->GetID($MinionCommentID, DATASET_TYPE_ARRAY);
          }
          
          // Become normal again
@@ -1670,8 +1680,10 @@ class MinionPlugin extends Gdn_Plugin {
          Gdn::Session()->UserID = $SessionUserID;
       }
       
-      $Informer = Gdn_Format::To($Message, 'Html');
-      Gdn::Controller()->InformMessage($Informer);
+      if ($Inform && Gdn::Controller() instanceof Gdn_Controller) {
+         $Informer = Gdn_Format::To($Message, 'Html');
+         Gdn::Controller()->InformMessage($Informer);
+      }
       
       if ($Message) return $Comment;
    }

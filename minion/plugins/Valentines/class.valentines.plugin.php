@@ -159,8 +159,8 @@ class ValentinesPlugin extends Gdn_Plugin {
       parent::__construct();
       $this->Enabled = (date('nd') == '214');
       $this->DayAfter = (date('nd') == '215');
-//      $this->Enabled = TRUE;
-//      $this->DayAfter = FALSE;
+      $this->Enabled = TRUE;
+      $this->DayAfter = FALSE;
       
       $this->Year = date('Y');
       $this->ExpiredCheck = FALSE;
@@ -209,6 +209,8 @@ class ValentinesPlugin extends Gdn_Plugin {
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
       $this->Minion = MinionPlugin::Instance();
       $this->MinionUser = (array)$this->Minion->Minion();
+      
+      $this->DropCache(51);
       
       // Valentines events
       if (!$this->Enabled) return;
@@ -297,11 +299,49 @@ class ValentinesPlugin extends Gdn_Plugin {
     * 
     * @param PluginController $Sender
     */
-   public function Controller_Refill($Sender) {
+   public function Controller_Cache($Sender) {
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
-      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      $Sender->DeliveryType(DELIVERY_TYPE_BOOL);
       
+      // Must be logged in
+      if (!Gdn::Session()->IsValid())
+         throw PermissionException();
       
+      $CacheID = GetValue(1, $Sender->RequestArgs);
+      $CacheKey = "Cache.{$CacheID}";
+      $Cache = $this->GetUserMeta(0, $CacheKey, 0, TRUE);
+      try {
+         if (!$Cache || $Cache < 1)
+            throw new Exception(T('This arrow cache is empty.'));
+         else {
+            $CacheLootedKey = "Cache.{$CacheID}.Looted";
+            $CacheLooted = $this->GetUserMeta(Gdn::Session()->UserID, $CacheLootedKey, FALSE, TRUE);
+            if ($CacheLooted)
+               throw new Exception(T('You have already looted this arrow cache!'));
+            
+            // Remove arrows from Cupid's Quiver
+            $Arrows = mt_rand($this->StartArrows - 1, $this->StartArrows + 1);
+            if ($Cache < $Arrows) $Arrows = $Cache;
+            $Cache -= $Arrows;
+            if ($Cache < 0) $Cache = 0;
+            $this->SetUserMeta(0, $CacheKey, $Cache);
+            $this->SetUserMeta(Gdn::Session()->UserID, $CacheLootedKey, TRUE);
+            
+            // Award arrows to player
+            $Player = (array)Gdn::Session()->User;
+            $Valentines = $this->Minion->Monitoring($Player, 'Valentines', array());
+            $Valentines['Quiver'] += $Arrows;
+            $this->ArrowPool($Arrows);
+            $this->Minion->Monitor($Player, array('Valentines' => $Valentines));
+            $Sender->InformMessage(FormatString(T("You found <b>{Arrows} {ArrowsStr}</b> in the fallen cherub's quiver."), array(
+               'User'      => $Player,
+               'Arrows'    => $Arrows,
+               'ArrowsStr' => Plural($Arrows, 'arrow', 'arrows')
+            )));
+         }
+      } catch (Exception $Ex) {
+         $Sender->InformMessage($Ex->getMessage());
+      }
       
       $Sender->Render();
    }
@@ -519,7 +559,10 @@ COMPLIANCEVALENTINES;
          'Expiry'    => $TimeFormat
       ));
       $Discussion = $this->LoungeDiscussion($ComplianceTitle, $VoteMessage);
-      $Comment = $this->Minion->Message($User, $Discussion, 'I am a tremendous goose and I feel the most profound shame.', FALSE, $User);
+      $Comment = $this->Minion->Message($User, $Discussion, 'I am a tremendous goose and I feel the most profound shame.', array(
+         'Format' => FALSE, 
+         'PostAs' => $User
+      ));
 
       // Now punish this comment
       $this->Minion->Punish($User, $Discussion, $Comment, 'major');
@@ -624,29 +667,80 @@ EXTENDEDVALENTINES;
     * @param integer $CacheSize
     */
    public function DropCache($CacheSize) {
-      $RecentComments = Gdn::SQL()
+      return;
+      $RecentDiscussions = Gdn::SQL()
          ->Select('DiscussionID')
          ->Select('CategoryID')
-         ->From('Comment')
-         ->Where('DateInserted >', date('Y-m-d H:i:s', strtotime('2 minutes ago')))
+         ->From('Discussion')
+         ->Where('DateLastComment >', date('Y-m-d H:i:s', strtotime('5 minutes ago')))
          ->Get()->ResultArray();
       
-      shuffle($RecentComments);
-      $Comment = array_pop($RecentComments);
-      while ($Comment = array_pop($RecentComments)) {
-         $CategoryID = $Comment['CategoryID'];
+      shuffle($RecentDiscussions);
+      $PermissionModel = new PermissionModel();
+      do { 
+         $Discussion = array_pop($RecentDiscussions);
+         
+         // Check permission
+         $CategoryID = $Discussion['CategoryID'];
          $Category = CategoryModel::Categories($CategoryID);
          $PermissionCategoryID = $Category['PermissionCategoryID'];
          
          $DefaultRoles = C('Garden.Registration.DefaultRoles');
-         $DefaultMemberRole = GetValue(0, $DefaultRoles);
-         print_r($DefaultMemberRole);
-         $Result = $PermissionModel->GetRolePermissions($RoleID, $Permission, 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
-         return (GetValue($Permission, GetValue(0, $Result), FALSE)) ? TRUE : FALSE;
+         $DefaultMemberRoleID = GetValue(0, $DefaultRoles);
          
-         // Check permission
+         $Result = $PermissionModel->GetRolePermissions($DefaultMemberRoleID, '', 'Category', 'PermissionCategoryID', 'CategoryID', $PermissionCategoryID);
+         $Permission = GetValue(0, $Result);
          
-      }
+         $CanView = (GetValue('Vanilla.Discussions.View', GetValue(0, $Result), FALSE)) ? TRUE : FALSE;
+         $CanPost = (GetValue('Vanilla.Discussions.Add', GetValue(0, $Result), FALSE)) ? TRUE : FALSE;
+         
+         if (!$CanView || !$CanPost)
+            continue;
+         
+         $DiscussionID = $Discussion['DiscussionID'];
+         $DiscussionModel = new DiscussionModel();
+         $Discussion = (array)$DiscussionModel->GetID($DiscussionID);
+         if ($Discussion['Closed']) continue;
+         
+         // Create
+         
+         // Cache GUID
+         $CacheID = $this->CreateCache($CacheSize);
+         
+         $CacheMessage = <<<CACHEVALENTINES
+<div class="FallenCupid" data-cacheid="{CacheID}">
+   <img src="http://cdn.vanillaforums.com/minion/fallencupid.png" />
+   <p>Unidentified Aerial Target has been detected and destroyed. Moving to recover debris at crash site.</p>
+   <div><a class="FallenCupidLink" rel="{CacheID}">Search the debris for arrows</a></div>
+</div>
+CACHEVALENTINES;
+         $CacheMessage = FormatString($CacheMessage, array(
+            'CacheID'      => $CacheID
+         ));
+         $Comment = $this->Minion->Message(NULL, $Discussion, $CacheMessage, array(
+            'Format' => FALSE,
+            'Inform' => FALSE
+         ));
+         
+         $this->Minion->Monitor($Comment, array('Valentines' => array(
+            'Cache'  => $CacheID
+         )));
+         break;
+         
+      } while (sizeof($RecentDiscussions));
+      
+   }
+   
+   /**
+    * Create a cache and return its ID
+    * 
+    * @param integer $CacheSize
+    */
+   protected function CreateCache($CacheSize) {
+      $CacheID = uniqid('cache');
+      $CacheKey = "Cache.{$CacheID}";
+      $this->SetUserMeta(0, $CacheKey, $CacheSize);
+      return $CacheID;
    }
    
    /**
@@ -699,7 +793,7 @@ EXTENDEDVALENTINES;
     */
    protected function ArrowPool($Arrows = NULL) {
       $PoolKey = "Arrows.".date('Y').".Pool";
-      $ArrowPool = $this->GetUserMeta($this->MinionUser['UserID'], $PoolKey, 0);
+      $ArrowPool = $this->GetUserMeta($this->MinionUser['UserID'], $PoolKey, 0, TRUE);
       if (is_null($Arrows)) return $ArrowPool;
       
       $ArrowPool += $Arrows;
@@ -715,7 +809,7 @@ EXTENDEDVALENTINES;
     */
    protected function Arrows($Arrows = NULL) {
       $AvailableKey = "Arrows.".date('Y').".Available";
-      $ArrowPool = $this->GetUserMeta($this->MinionUser['UserID'], $AvailableKey, 0);
+      $ArrowPool = $this->GetUserMeta($this->MinionUser['UserID'], $AvailableKey, 0, TRUE);
       if (is_null($Arrows)) return $ArrowPool;
       
       $ArrowPool += $Arrows;
@@ -1004,10 +1098,20 @@ FORWARDVALENTINES;
    /**
     * Add Desired CSS to the row
     * 
+    * @param Gdn_Controller $Sender
     * @param array $Object
     */
    protected function AddDesiredCSS($Sender, $Object) {
       $User = (array)$Sender->EventArguments['Author'];
+      
+      // Check for Cache
+      $Post = $this->Minion->Monitoring($Object, 'Valentines', FALSE);
+      if (!$Post) return;
+         
+      if ($CacheID = GetValue('Cache', $Post, FALSE)) {
+         $Sender->EventArguments['CssClass'] .= ' ArrowCache';
+         $Sender->AddJsFile('valentines.js', 'plugins/Valentines');
+      }
       
       // Is this person playing the game?
       $Playing = $this->Minion->Monitoring($User, 'Valentines', FALSE);
@@ -1017,11 +1121,11 @@ FORWARDVALENTINES;
       $ValentinesYear = GetValue('Year', $Playing, FALSE);
       if ($ValentinesYear != date('Y')) return;
       
-      // Only add CSS for desired people
+      // Add CSS for desired people
       $Desired = GetValue('Desired', $Playing, FALSE);
-      if (!$Desired) return;
-      
-      $Sender->EventArguments['CssClass'] .= ' Desired';
+      if ($Desired) {
+         $Sender->EventArguments['CssClass'] .= ' Desired';
+      }
    }
    
    /*

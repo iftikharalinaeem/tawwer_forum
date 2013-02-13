@@ -30,6 +30,31 @@ jQuery(document).ready(function($) {
       RefreshValentines();
    }
    
+   $('.Item.ArrowCache').each(function(i,el){
+      var Item = $(el);
+      var Cache = Item.find('.FallenCupid');
+      var CacheLink = Cache.find('a.FallenCupidLink');
+      var CacheID = CacheLink.attr('rel');
+      if (!CacheID) return;
+      
+      CacheLink.on('click', function(){
+         $.ajax({
+            url: gdn.url('/plugin/valentines/cache/'+CacheID),
+            dataType: 'json',
+            method: 'GET',
+            success: function(json) {
+               json = $.postParseJson(json);
+               var processedTargets = false;
+               // If there are targets, process them
+               if (json.Targets && json.Targets.length > 0)
+                  gdn.processTargets(json.Targets);
+               
+               gdn.inform(json);
+            }
+         });
+      });
+   });
+   
    function RefreshValentines() {
       
       EndValentines();
