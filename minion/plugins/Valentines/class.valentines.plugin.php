@@ -159,8 +159,6 @@ class ValentinesPlugin extends Gdn_Plugin {
       parent::__construct();
       $this->Enabled = (date('nd') == '214');
       $this->DayAfter = (date('nd') == '215');
-      $this->Enabled = TRUE;
-      $this->DayAfter = FALSE;
       
       $this->Year = date('Y');
       $this->ExpiredCheck = FALSE;
