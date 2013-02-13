@@ -1285,8 +1285,6 @@ FORWARDVALENTINES;
       
       // Check for Cache
       $Post = $this->Minion->Monitoring($Object, 'Valentines', FALSE);
-      if (!$Post) return;
-         
       if ($CacheID = GetValue('Cache', $Post, FALSE)) {
          $Sender->EventArguments['CssClass'] .= ' ArrowCache';
          $Sender->AddJsFile('valentines.js', 'plugins/Valentines');
