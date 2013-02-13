@@ -16,13 +16,20 @@
       $UTC = new DateTimeZone('UTC');
       $TimezoneID = $this->Data('Event.Timezone');
       $LocaleTimezone = new DateTimeZone($TimezoneID);
+      $RefDate = new DateTime($this->Data('Event.DateStarts'), $UTC);
+      $RefDate->setTimezone($LocaleTimezone);
+      $TimezoneOffset = $LocaleTimezone->getOffset($RefDate);
+      $TimezoneOffset /= 3600;
+      
+      if (Gdn::Session()->IsValid())
+         $HourOffset = Gdn::Session()->User->HourOffset ? Gdn::Session()->User->HourOffset : FALSE;
       
       $FromDate = new DateTime($this->Data('Event.DateStarts'), $UTC);
-      $FromDate->setTimezone($LocaleTimezone);
+      if ($HourOffset) $FromDate->modify("{$HourOffset} hours");
       $FromDateSlot = $FromDate->format('Ymd');
       
       $ToDate = new DateTime($this->Data('Event.DateEnds'), $UTC);
-      $ToDate->setTimezone($LocaleTimezone);
+      if ($HourOffset) $ToDate->modify("{$HourOffset} hours");
       $ToDateSlot = $ToDate->format('Ymd');
       
       // If we're 'all day' and only on one day
@@ -36,8 +43,6 @@
       // If we're not 'all day', or if 'all day' spans multiple days
       if (!$AllDay || $FromDateSlot != $ToDateSlot):
          
-         $ToDate = new DateTime($this->Data('Event.DateEnds'), $UTC);
-         $ToDate->setTimezone($LocaleTimezone);
          $ShowDates['To'] = FormatString($DateFormatString, array(
             'Date'   => $ToDate->format($DateFormat),
             'Time'   => $ToDate->format($TimeFormat)
@@ -62,16 +67,33 @@
       $TimezoneAbbr = $Transition['abbr'];
       
       ?>
-      <li><span class="Label">When</span> <?php echo FormatString($WhenFormat, array(
-         'ShowDates' => $ShowDates,
-         'AllDay'    => ($AllDay) ? Wrap(T('all day'), 'span', array('class' => 'Tag Tag-AllDay')) : ''
-      )); ?>
+      
+      <li>
+         <span class="Label"><?php echo T('When'); ?></span> 
+         <?php echo FormatString($WhenFormat, array(
+            'ShowDates' => $ShowDates,
+            'AllDay'    => ''
+//                 ($AllDay) ? Wrap(T('all day'), 'span', array('class' => 'Tag Tag-AllDay')) : ''
+         )); ?>
       </li>
-      <li><span class="Label">Where</span> <?php echo $this->Data('Event.Location'); ?> <span class="Tip">( <?php echo Wrap($TimezoneAbbr, 'span', array('class' => 'Timezone', 'title' => $TimezoneLabel)); ?> )</span></li>
-      <?php if ($this->Data('Group')): ?>
-         <li><span class="Label">Group</span> <?php echo Anchor(GetValue('Name', $this->Data('Group')), GroupUrl($this->Data('Group'))); ?></li>
+      
+      <?php if ($HourOffset != $TimezoneOffset): ?>
+      <li>
+         <span class="Label"></span> 
+         <span class="Tip"><?php echo T('These times have been converted to your timezone.'); ?></span>
+      </li>
       <?php endif; ?>
-      <li><span class="Label">Organizer</span> <?php echo UserAnchor($this->Data('Event.Organizer')); ?></li>
+      
+      <li>
+         <span class="Label"><?php echo T('Where'); ?></span> <?php echo $this->Data('Event.Location'); ?> 
+         <span class="Tip">( <?php echo Wrap($TimezoneAbbr, 'span', array('class' => 'Timezone', 'title' => $TimezoneLabel)); ?> )</span>
+      </li>
+      
+      <?php if ($this->Data('Group')): ?>
+         <li><span class="Label"><?php echo T('Group'); ?></span> <?php echo Anchor(GetValue('Name', $this->Data('Group')), GroupUrl($this->Data('Group'))); ?></li>
+      <?php endif; ?>
+         
+      <li><span class="Label"><?php echo T('Organizer'); ?></span> <?php echo UserAnchor($this->Data('Event.Organizer')); ?></li>
    </ul>
    
    <div class="Body"><?php echo $this->Data('Event.Body'); ?></div>
