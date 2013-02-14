@@ -1168,13 +1168,13 @@ FORWARDVALENTINES;
          
          if ($ArrowPool >= $this->RefillThreshold) {
             
+            // Create a cache with enough arrows for a round number of users
+            $RefillCacheSize = ceil(($this->RefillCacheRatio * $ArrowPool) / $this->StartArrows) * $this->StartArrows;
+            $this->DropCache($RefillCacheSize);
+            
             // When X% or less arrows remain unfired
-            if ($Ratio <= $this->RefillTriggerRatio) {
-               
-               // Create a cache with enough arrows for a round number of users
-               $RefillCacheSize = ceil(($this->RefillCacheRatio * $ArrowPool) / $this->StartArrows) * $this->StartArrows;
-               $this->DropCache($RefillCacheSize);
-            }
+            //if ($Ratio <= $this->RefillTriggerRatio) {
+            //}
          }
       }
    }
