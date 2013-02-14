@@ -541,10 +541,12 @@ class ValentinesPlugin extends Gdn_Plugin {
       $DesiredValentines['Desired'] = TRUE;
       $DesiredValentines['DesiredUserID'] = $PairedUserID;
       $DesiredValentines['Expiry'] = $Expiry;
+      $DesiredValentines['Quiver'] += $this->StartArrows;
       
       $PairedValentines['Desired'] = TRUE;
       $PairedValentines['DesiredUserID'] = $DesiredUserID;
       $PairedValentines['Expiry'] = $Expiry;
+      $PairedValentines['Quiver'] += $this->StartArrows;
       
       // Expiry reminders
       $this->SetUserMeta($DesiredUserID, 'Desired.Expiry', $Expiry);
@@ -631,13 +633,14 @@ VALENTINES;
       $Activity = array(
          'ActivityUserID' => $PairedUserID,
          'NotifyUserID' => $DesiredUserID,
-         'HeadlineFormat' => T("You've been shot by {ActivityUserID,user}! <a href=\"{Url,html}\">What now</a>?"),
+         'HeadlineFormat' => T("You've been shot by {ActivityUserID,user}! <a href=\"{Url,html}\">What now</a>? (+{Arrows} arrows in your quiver)"),
          'RecordType' => 'Conversation',
          'RecordID' => $DesiredValentines['ConversationID'],
          'Route' => CombinePaths(array('messages',$DesiredValentines['ConversationID'])),
          'Data' => array(
             'Shooter'   => $PairedUser,
-            'Minion'    => $this->Minion->Minion()
+            'Minion'    => $this->Minion->Minion(),
+            'Arrows'    => $this->StartArrows
          )
       );
       $this->Activity($Activity);
@@ -645,19 +648,24 @@ VALENTINES;
       $Activity = array(
          'ActivityUserID' => $DesiredUserID,
          'NotifyUserID' => $PairedUserID,
-         'HeadlineFormat' => T("You shot {ActivityUserID,user} in the neck! <a href=\"{Url,html}\">What now</a>?"),
+         'HeadlineFormat' => T("You shot {ActivityUserID,user} in the neck! <a href=\"{Url,html}\">What now</a>? (+{Data.Arrows} arrows in your quiver)"),
          'RecordType' => 'Conversation',
          'RecordID' => $PairedValentines['ConversationID'],
          'Route' => CombinePaths(array('messages',$PairedValentines['ConversationID'])),
          'Data' => array(
              'Target'   => $DesiredUser,
-             'Minion'   => $this->Minion->Minion()
+             'Minion'   => $this->Minion->Minion(),
+             'Arrows'    => $this->StartArrows
           )
       );
       $this->Activity($Activity);
       
       // Save
+      
+      $this->ArrowPool($this->StartArrows);
       $this->Minion->Monitor($DesiredUser, array('Valentines' => $DesiredValentines));
+      
+      $this->ArrowPool($this->StartArrows);
       $this->Minion->Monitor($PairedUser, array('Valentines' => $PairedValentines));
    }
    
@@ -1156,10 +1164,12 @@ FORWARDVALENTINES;
          $ArrowPool = $this->ArrowPool();
          $Arrows = $this->Arrows();
          $Ratio = $Arrows / $ArrowPool;
+         $Fired = $ArrowPool - $Arrows;
          
-         // When X% or less arrows remain unfired
-         if ($Ratio <= $this->RefillTriggerRatio) {
-            if ($ArrowPool >= $this->RefillThreshold) {
+         if ($ArrowPool >= $this->RefillThreshold) {
+            
+            // When X% or less arrows remain unfired
+            if ($Ratio <= $this->RefillTriggerRatio) {
                
                // Create a cache with enough arrows for a round number of users
                $RefillCacheSize = ceil(($this->RefillCacheRatio * $ArrowPool) / $this->StartArrows) * $this->StartArrows;
