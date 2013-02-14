@@ -513,7 +513,8 @@ class ValentinesPlugin extends Gdn_Plugin {
       $CountDiscussions = 0;
       $CountMatched = 0; $Matches = array();
       $Skipped = array();
-         
+      
+      $DiscussionIDs = array();
       $Page = 0; $PerPage = 50;
       do {
          $Offset = $Page * $PerPage;
@@ -527,6 +528,12 @@ class ValentinesPlugin extends Gdn_Plugin {
          $Page++;
 
          foreach ($Discussions as $Discussion) {
+            
+            // Don't re-parse multiple discussions
+            $DiscussionID = $Discussion['DiscussionID'];
+            if (in_array($DiscussionID, $DiscussionIDs)) continue;
+            $DiscussionIDs[] = $DiscussionID;
+            
             $Valentines = $this->Minion->Monitoring($Discussion, 'Valentines', array());
             TouchValue('Voting', $Valentines, FALSE);
             $Voting = &$Valentines['Voting'];
