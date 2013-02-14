@@ -524,7 +524,6 @@ class ValentinesPlugin extends Gdn_Plugin {
             'InsertUserID'       => $this->MinionUser['UserID']
          ), $Offset, $Limit)->ResultArray();
          $NumDiscussions = sizeof($Discussions);
-         $CountDiscussions += $NumDiscussions;
          $Page++;
 
          foreach ($Discussions as $Discussion) {
@@ -534,6 +533,7 @@ class ValentinesPlugin extends Gdn_Plugin {
             if (in_array($DiscussionID, $DiscussionIDs)) continue;
             $DiscussionIDs[] = $DiscussionID;
             
+            $CountDiscussions++;
             $Valentines = $this->Minion->Monitoring($Discussion, 'Valentines', array());
             TouchValue('Voting', $Valentines, FALSE);
             $Voting = &$Valentines['Voting'];
