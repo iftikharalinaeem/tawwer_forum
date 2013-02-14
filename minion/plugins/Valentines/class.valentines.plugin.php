@@ -779,7 +779,7 @@ VALENTINES;
       $Activity = array(
          'ActivityUserID' => $PairedUserID,
          'NotifyUserID' => $DesiredUserID,
-         'HeadlineFormat' => T("You've been shot by {ActivityUserID,user}! <a href=\"{Url,html}\">What now</a>? (+{Arrows} arrows in your quiver)"),
+         'HeadlineFormat' => T("You've been shot by {ActivityUserID,user}! <a href=\"{Url,html}\">What now</a>? (+{Data.Arrows} arrows in your quiver)"),
          'RecordType' => 'Conversation',
          'RecordID' => $DesiredValentines['ConversationID'],
          'Route' => CombinePaths(array('messages',$DesiredValentines['ConversationID'])),
@@ -1691,6 +1691,11 @@ FORWARDVALENTINES;
     * Database structure
     */
    public function Structure() {
+      
+      // Add 'Attributes' to Conversations
+      if (!Gdn::Structure()->Table('ReactionType')->ColumnExists('Attributes')) {
+         
+      }
       
       // Define 'Arrow of Desire' reactions
 
