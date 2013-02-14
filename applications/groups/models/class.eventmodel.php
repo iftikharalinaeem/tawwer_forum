@@ -245,25 +245,26 @@ class EventModel extends Gdn_Model {
     * @param integer $GroupID
     */
    public function InviteGroup($EventID, $GroupID) {
+      return;
       $Event = $this->GetID($EventID, DATASET_TYPE_ARRAY);
       $GroupModel = new GroupModel();
       $GroupMembers = $GroupModel->GetMembers($GroupID);
       
       // Notify the users of the invitation
       $ActivityModel = new ActivityModel();
-      foreach ($GroupMembers as $GroupMember) {
-         $ActivityID = $ActivityModel->Add(
-            Gdn::Session()->UserID,
-            'Events',
-            '',
-            $GroupMember['UserID'],
-            '',
-            EventUrl($Event),
-            FALSE
+      $Activity = array(
+         'ActivityType' => 'Events',
+         'ActivityUserID' => $Event['InsertUserID'],
+         'HeadlineFormat' => T('Activity.NewEvent', '{ActivityUserID,User} added a new event: <a href="{Url,html}">{Data.Name,text}</a>.'),
+         'RecordType' => 'Event',
+         'RecordID' => 'EventID',
+         'Route' => EventUrl($Event),
+         'Data' => array('Name' => $Event['Name'])
          );
-         
-         $Story = GetValue('Name', $Event, '');
-         $ActivityModel->SendNotification($ActivityID, $Story);
+      
+      foreach ($GroupMembers as $GroupMember) {
+         $Activity['NotifyUserID'] = $GroupMember['UserID'];
+         $ActivityID = $ActivityModel->Queue($Activity);
       }
    }
    
