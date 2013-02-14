@@ -490,6 +490,7 @@ class ValentinesPlugin extends Gdn_Plugin {
          'Count'     => $DesiredValentines['Count'],
          'ObjectID'  => '%'
       ));
+      $ArrowRecord = str_replace('..','.0.',$ArrowRecord);
       $ArrowMetaKey = $this->MakeMetaKey($ArrowRecord);
       $Arrows = Gdn::UserMetaModel()->SQL->Select('*')
          ->From('UserMeta')
@@ -1427,6 +1428,7 @@ FORWARDVALENTINES;
             'Count'     => $Target['Count'],
             'ObjectID'  => $ObjectID
          ));
+         $ArrowRecord = str_replace('..','.0.',$ArrowRecord);
 
          // Register arrow fired
          switch ($Mode) {
