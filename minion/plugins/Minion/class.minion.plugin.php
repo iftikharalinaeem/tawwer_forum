@@ -159,6 +159,9 @@ class MinionPlugin extends Gdn_Plugin {
       $this->EventArguments['Messages'] = &$this->Messages;
       $this->FireEvent('Start');
       
+      // Apply whatever was set
+      $this->Persona(TRUE);
+      
       // Conditionally apply default persona
       if (!$this->Persona()) {
          $this->Persona('Minion');
@@ -224,6 +227,20 @@ class MinionPlugin extends Gdn_Plugin {
       if (is_null($PersonaName))
          return GetValue($this->Persona, $this->Personas, NULL);
       
+      // Apply queued persona
+      if ($PersonaName === TRUE) {
+         // Get persona
+         $ApplyPersona = GetValue($this->Persona, $this->Personas, NULL);
+         if (is_null($ApplyPersona))
+            return;
+         
+         // Apply minion
+         $Minion = array_merge($ApplyPersona, array('UserID' => $this->MinionUserID));
+         Gdn::UserModel()->Save($Minion);
+         Gdn::UserModel()->SaveAttribute($this->MinionUserID, 'Persona', $PersonaName);
+         $this->Minion = Gdn::UserModel()->GetID($this->MinionUserID);
+      }
+      
       // Apply an existing persona
       if (!is_null($PersonaName) && is_null($Persona)) {
          // Don't re-apply
@@ -238,11 +255,6 @@ class MinionPlugin extends Gdn_Plugin {
          if (is_null($ApplyPersona))
             return;
          
-         // Apply minion
-         $Minion = array_merge($ApplyPersona, array('UserID' => $this->MinionUserID));
-         Gdn::UserModel()->Save($Minion);
-         Gdn::UserModel()->SaveAttribute($this->MinionUserID, 'Persona', $PersonaName);
-         $this->Minion = Gdn::UserModel()->GetID($this->MinionUserID);
          $this->Persona = $PersonaName;
       }
       
