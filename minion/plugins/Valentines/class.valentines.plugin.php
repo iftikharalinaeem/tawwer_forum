@@ -599,6 +599,7 @@ class ValentinesPlugin extends Gdn_Plugin {
                // Move to retirement village
                $DiscussionModel->SetField($DiscussionID, 'CategoryID', $this->RetirementID);
                $DiscussionModel->UpdateDiscussionCount($this->RetirementID);
+               $DiscussionModel->UpdateDiscussionCount($this->LoungeID);
                
                continue;
             }
@@ -1019,6 +1020,7 @@ EXTENDEDVALENTINES;
          
          // Update category
          $DiscussionModel->UpdateDiscussionCount($this->RetirementID);
+         $DiscussionModel->UpdateDiscussionCount($this->LoungeID);
       }
       
       return $Response;
