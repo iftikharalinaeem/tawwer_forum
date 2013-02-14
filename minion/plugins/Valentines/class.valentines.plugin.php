@@ -1677,7 +1677,7 @@ FORWARDVALENTINES;
             'tonsils',
             'lower intestine'
          );
-         shuffle($BodyParts)
+         shuffle($BodyParts);
          $BodyPart = array_pop($BodyParts);
          
          if ($Mode == 'set' && $Arrow) {
