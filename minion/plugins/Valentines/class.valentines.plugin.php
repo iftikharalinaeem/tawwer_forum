@@ -507,6 +507,7 @@ class ValentinesPlugin extends Gdn_Plugin {
       $DiscussionModel = new DiscussionModel();
       
       $Perform = (bool)Gdn::Request()->Get('perform', FALSE);
+      $IgnoreVotes = (bool)Gdn::Request()->Get('ignore', FALSE);
       $Sender->SetData('Discussions', 0);
       $Sender->SetData('Matched', 0);
       
@@ -561,7 +562,7 @@ class ValentinesPlugin extends Gdn_Plugin {
                'Name'         => $Discussion['Name'],
                'Voting'       => $Voting
             );
-            if ($Voting['Votes'] >= $Voting['MaxVotes']) {
+            if ($Voting['Votes'] >= $Voting['MaxVotes'] || $IgnoreVotes) {
                // Run adjudication
                $Judgement = 'dry run';
                if ($Perform) $Judgement = $this->EndVote($Discussion);
