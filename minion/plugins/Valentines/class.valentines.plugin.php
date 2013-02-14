@@ -10,7 +10,8 @@
  * 
  * Anyone who logs in on Valentines Day will receive a badge. Each user
  * will also be given 3 "arrows". These arrows can be shot at other users via
- * a reaction button called "Arrow of Desire" that will appear on posts. 
+ * a reaction button called "Arrow of Desire" that will appear on posts. Only
+ * other people who have logged on during V-Day will be eligible to be shot.
  * 
  * Once a given user is hit by 5 arrows, they become "Desired", and part 2 of 
  * the game begins. The robot will randomly select one of the "shooters" and 
@@ -18,12 +19,14 @@
  * 
  * The robot will message each member of the Pair and instruct them to send a
  * love note to the other, via a reply to the robot's initial PM. Once the 
- * exchange has occured, the robot will post the resulting PMs to the eval
- * thread for voting.
+ * exchange has occured, the robot will post the resulting PMs to the evaluation
+ * category for voting. This category will be automatically created by the bot
+ * at midnight on Feb 14.
  * 
- * After 30 votes, the PM will have been judged. If it is deemed affectionate,
+ * After 60 votes, the PM will have been judged. If it is deemed affectionate,
  * a positive badge will be awarded to the author. If not, a negative badge
- * will be awarded.
+ * will be awarded. If no PM is sent within 2 hours, the user will be infracted
+ * for 3 points. A countdown will be visible on-screen.
  * 
  * 
  * Changes: 
@@ -31,8 +34,8 @@
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Addons
+ * @license Proprietary
+ * @package misc
  */
 
 $PluginInfo['Valentines'] = array(
