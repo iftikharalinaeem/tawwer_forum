@@ -505,57 +505,72 @@ class ValentinesPlugin extends Gdn_Plugin {
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
       $DiscussionModel = new DiscussionModel();
-      $Discussions = $DiscussionModel->GetWhere(array(
-         'CategoryID'         => $this->LoungeID,
-         'InsertUserID'       => $this->MinionUser['UserID']
-      ))->ResultArray();
       
-      $Sender->SetData('Discussions', sizeof($Discussions));
+      $Sender->SetData('Discussions', 0);
       $Sender->SetData('Matched', 0);
-      $Matched = 0; $Matches = array();
+      
+      $CountDiscussions = 0;
+      $CountMatched = 0; $Matches = array();
       $Skipped = array();
-      foreach ($Discussions as $Discussion) {
-         $Valentines = $this->Minion->Monitoring($Discussion, 'Valentines', array());
-         TouchValue('Voting', $Valentines, FALSE);
-         $Voting = &$Valentines['Voting'];
-         if (!$Voting) {
-            $Skipped[] = "not vote thread. {$Discussion['Name']}";
-            continue;
+         
+      $Page = 0; $PerPage = 50;
+      do {
+         $Offset = $Page * $PerPage;
+         $Limit = ($Page + 1) * $PerPage;
+         $Discussions = $DiscussionModel->GetWhere(array(
+            'CategoryID'         => $this->LoungeID,
+            'InsertUserID'       => $this->MinionUser['UserID']
+         ), $Offset, $Limit)->ResultArray();
+         $NumDiscussions = sizeof($Discussions);
+         $CountDiscussions += $NumDiscussions;
+         $Page++;
+
+         foreach ($Discussions as $Discussion) {
+            $Valentines = $this->Minion->Monitoring($Discussion, 'Valentines', array());
+            TouchValue('Voting', $Valentines, FALSE);
+            $Voting = &$Valentines['Voting'];
+            if (!$Voting) {
+               $Skipped[] = "not vote thread. {$Discussion['Name']}";
+               continue;
+            }
+
+            // No voting is occuring here
+            $IsVoting = (bool)$Voting['Voting'];
+            if (!$IsVoting) {
+               $Skipped[] = "vote ended. ({$Discussion['DiscussionID']}) {$Discussion['Name']}";
+               continue;
+            }
+
+            $CountMatched++;
+            $Voting['MaxVotes'] = $this->RequiredVotes;
+
+            // Save before judgement
+            $this->Minion->Monitor($Discussion, array('Valentines' => $Valentines));
+
+            $Match = array(
+               'DiscussionID' => $Discussion['DiscussionID'],
+               'Name'         => $Discussion['Name'],
+               'Voting'       => $Voting
+            );
+            if ($Voting['Votes'] >= $Voting['MaxVotes']) {
+               // Run adjudication
+               $Judgement = $this->EndVote($Discussion);
+               $Match = array_merge($Match, array(
+                  'Judgement'    => $Judgement
+               ));
+            } else {
+               $Match = array_merge($Match, array(
+                  'Judgement'    => "insufficient votes ({$Voting['Votes']})"
+               ));
+            }
+            $Matches[] = $Match;
          }
          
-         // No voting is occuring here
-         $IsVoting = (bool)$Voting['Voting'];
-         if (!$IsVoting) {
-            $Skipped[] = "vote ended. ({$Discussion['DiscussionID']}) {$Discussion['Name']}";
-            continue;
-         }
-         
-         $Matched++;
-         $Voting['MaxVotes'] = $this->RequiredVotes;
-         
-         // Save before judgement
-         $this->Minion->Monitor($Discussion, array('Valentines' => $Valentines));
-         
-         $Match = array(
-            'DiscussionID' => $Discussion['DiscussionID'],
-            'Name'         => $Discussion['Name'],
-            'Voting'       => $Voting
-         );
-         if ($Voting['Votes'] >= $Voting['MaxVotes']) {
-            // Run adjudication
-            $Judgement = $this->EndVote($Discussion);
-            $Match = array_merge($Match, array(
-               'Judgement'    => $Judgement
-            ));
-         } else {
-            $Match = array_merge($Match, array(
-               'Judgement'    => "insufficient votes ({$Voting['Votes']})"
-            ));
-         }
-         $Matches[] = $Match;
-      }
+      } while ($NumDiscussions);
+      
+      $Sender->SetData('Discussions', $CountDiscussions);
+      $Sender->SetData('Matched', $CountMatched);
       $Sender->SetData('Matches', $Matches);
-      $Sender->SetData('Matched', $Matched);
       $Sender->SetData('Skipped', $Skipped);
       
       $Sender->Render();
