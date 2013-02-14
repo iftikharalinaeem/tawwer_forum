@@ -1655,8 +1655,33 @@ FORWARDVALENTINES;
             $this->Arrows(-$Increment);
          }
          
+         $BodyParts = array(
+            'butt',
+            'neck',
+            'boob',
+            'foot',
+            'toe',
+            'eye',
+            'finger',
+            'left ankle',
+            'peehole',
+            'belly button',
+            'ear',
+            'mouth',
+            'liver',
+            'gizzard',
+            'fat',
+            'tongue',
+            'eyebrow',
+            'knee',
+            'tonsils',
+            'lower intestine'
+         );
+         shuffle($BodyParts)
+         $BodyPart = array_pop($BodyParts);
+         
          if ($Mode == 'set' && $Arrow) {
-            Gdn::Controller()->InformMessage(FormatString(T("Your arrow embeds itself in {TargetUser.UserID,user}'s butt. You have <b>{ArrowsLeft}</b> {Arrows} left."), array(
+            Gdn::Controller()->InformMessage(FormatString(T("Your arrow embeds itself in {TargetUser.UserID,user}'s {BodyPart}. You have <b>{ArrowsLeft}</b> {Arrows} left."), array(
                'Player'       => $Player,
                'Target'       => $Target,
                'PlayerUser'   => $PlayerUser,
@@ -1664,7 +1689,8 @@ FORWARDVALENTINES;
                'TargetUserUrl'=> UserAnchor($TargetUser),
                'ArrowsLeft'   => $Player['Quiver'] ? $Player['Quiver'] : 'no',
                'Arrows'       => Plural($Player['Quiver'], 'arrow', 'arrows'),
-               'Minion'       => $this->MinionUser
+               'Minion'       => $this->MinionUser,
+               'BodyPart'     => $BodyPart
             )));
          }
          
