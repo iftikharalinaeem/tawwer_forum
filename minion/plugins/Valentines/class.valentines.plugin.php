@@ -276,6 +276,11 @@ class ValentinesPlugin extends Gdn_Plugin {
             SaveToConfig('Plugins.Valentines.LoungeOpen', date('Y'));
          }
          
+         // Let jailed users post.
+         $Permissions = Gdn_Format::Unserialize(Gdn::Session()->User->Permissions);
+         unset($Permissions['Vanilla.Discussions.Add']);
+         Gdn::Session()->User->Permissions = Gdn_Format::Serialize($Permissions);
+         
       } else if (!$this->DayAfter) {
          
          // Close lounge
