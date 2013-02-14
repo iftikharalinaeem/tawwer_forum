@@ -307,19 +307,19 @@ class ValentinesPlugin extends Gdn_Plugin {
       }
    }
    
-   public function UserModel_AfterGetSession_Handler($Sender) {
-      if (!$this->Enabled && !$this->DayAfter) return;
-      $User = $Sender->EventArguments['User'];
-      $UserID = $User->UserID;
-      
-      $InfractionsCache = InfractionsPlugin::GetInfractionCache($UserID);
-      if (!GetValue('Jailed', $InfractionsCache)) return;
-      
-      // Remove Discussions.Add permissions
-      $Permissions = Gdn_Format::Unserialize($User->Permissions);
-      $Permissions['Vanilla.Discussions.Add'] = 1;
-      $User->Permissions = Gdn_Format::Serialize($Permissions);
-   }
+//   public function UserModel_AfterGetSession_Handler($Sender) {
+//      if (!$this->Enabled && !$this->DayAfter) return;
+//      $User = $Sender->EventArguments['User'];
+//      $UserID = $User->UserID;
+//      
+//      $InfractionsCache = InfractionsPlugin::GetInfractionCache($UserID);
+//      if (!GetValue('Jailed', $InfractionsCache)) return;
+//      
+//      // Remove Discussions.Add permissions
+//      $Permissions = Gdn_Format::Unserialize($User->Permissions);
+//      $Permissions['Vanilla.Discussions.Add'] = 1;
+//      $User->Permissions = Gdn_Format::Serialize($Permissions);
+//   }
    
    /**
     * Hook into minion startup
