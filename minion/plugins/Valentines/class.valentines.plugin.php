@@ -278,7 +278,7 @@ class ValentinesPlugin extends Gdn_Plugin {
          
          // Let jailed users post.
          $Permissions = Gdn_Format::Unserialize(Gdn::Session()->User->Permissions);
-         unset($Permissions['Vanilla.Discussions.Add']);
+         $Permissions['Vanilla.Discussions.Add'] = 1;
          Gdn::Session()->User->Permissions = Gdn_Format::Serialize($Permissions);
          
       } else if (!$this->DayAfter) {
