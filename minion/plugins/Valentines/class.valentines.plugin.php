@@ -872,7 +872,7 @@ EXTENDEDVALENTINES;
       // Dont drop too often
       $ArrowCacheCheckKey = 'plugins.valentines.arrowcachecheck';
       $NextCheckTime = Gdn::Cache()->Get($ArrowCacheCheckKey);
-      if ($NextCheckTime || $NextCheckTime >= microtime(true))
+      if ($NextCheckTime && $NextCheckTime >= microtime(true))
          return;
       
       // Set the cooldown
