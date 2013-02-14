@@ -231,10 +231,8 @@ class MinionPlugin extends Gdn_Plugin {
       if ($PersonaName === TRUE) {
          // Don't re-apply
          $CurrentPersona = GetValueR('Attributes.Persona', $this->Minion, NULL);
-         if (!is_null($CurrentPersona) && $PersonaName == $CurrentPersona) {
-            $this->Persona = $PersonaName;
+         if (!is_null($CurrentPersona) && $PersonaName == $CurrentPersona)
             return;
-         }
          
          // Get persona
          $ApplyPersona = GetValue($this->Persona, $this->Personas, NULL);

@@ -193,6 +193,60 @@ class ValentinesPlugin extends Gdn_Plugin {
       $this->RefillCooldown = C('Plugins.Valentines.RefillCooldown', 900);
       $this->LoungeID = C('Plugins.Valentines.LoungeID', NULL);
       
+   }
+
+   public function UserModel_AfterGetSession_Handler($Sender) {
+      if (!$this->Enabled && !$this->DayAfter) return;
+      $User = &$Sender->EventArguments['User'];
+      $UserID = $User->UserID;
+      
+      // Remove Discussions.Add permissions
+      $Permissions = Gdn_Format::Unserialize($User->Permissions);
+      
+      if (Gdn::PluginManager()->CheckPlugin('Infractions')) {
+         $InfractionsCache = InfractionsPlugin::GetInfractionCache($UserID);
+         if (!GetValue('Jailed', $InfractionsCache)) return;
+
+         // Remove Discussions.Add permissions
+         $Permissions = Gdn_Format::Unserialize($User->Permissions);
+         if (!array_key_exists('Vanilla.Discussions.Add', $Permissions) || !is_array($Permissions['Vanilla.Discussions.Add']))
+            $Permissions['Vanilla.Discussions.Add'] = array();
+         
+         $Permissions['Vanilla.Discussions.Add'][] = $this->LoungeID;
+         $User->Permissions = Gdn_Format::Serialize($Permissions);
+      }
+   }
+   
+   /**
+    * Hook into minion startup
+    * 
+    * @param MinionPlugin $Sender
+    */
+   public function MinionPlugin_Start_Handler($Sender) {
+      
+      // Register persona
+      $Sender->Persona('Valentines', array(
+         'Name'      => 'Robot Cupid',
+         'Photo'     => 'http://cdn.vanillaforums.com/minion/valentines.jpg',
+         'Title'     => 'Happiness Droid',
+         'Location'  => 'Cloud Nine'
+      ));
+            
+      // Change persona
+      if ($this->Enabled || $this->DayAfter)
+         $Sender->Persona('Valentines');
+   }
+   
+   /**
+    * Hook early and perform valentines actions
+    * 
+    * @param Gdn_Dispatcher $Sender
+    * @return type
+    */
+   public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
+      $this->Minion = MinionPlugin::Instance();
+      $this->MinionUser = (array)$this->Minion->Minion();
+
       // Has the lounge been opened this year?
       $LoungeOpen = (C('Plugins.Valentines.LoungeOpen', FALSE) == date('Y'));
       
@@ -305,51 +359,6 @@ class ValentinesPlugin extends Gdn_Plugin {
          }
          
       }
-   }
-   
-//   public function UserModel_AfterGetSession_Handler($Sender) {
-//      if (!$this->Enabled && !$this->DayAfter) return;
-//      $User = $Sender->EventArguments['User'];
-//      $UserID = $User->UserID;
-//      
-//      $InfractionsCache = InfractionsPlugin::GetInfractionCache($UserID);
-//      if (!GetValue('Jailed', $InfractionsCache)) return;
-//      
-//      // Remove Discussions.Add permissions
-//      $Permissions = Gdn_Format::Unserialize($User->Permissions);
-//      $Permissions['Vanilla.Discussions.Add'] = 1;
-//      $User->Permissions = Gdn_Format::Serialize($Permissions);
-//   }
-   
-   /**
-    * Hook into minion startup
-    * 
-    * @param MinionPlugin $Sender
-    */
-   public function MinionPlugin_Start_Handler($Sender) {
-      
-      // Register persona
-      $Sender->Persona('Valentines', array(
-         'Name'      => 'Robot Cupid',
-         'Photo'     => 'http://cdn.vanillaforums.com/minion/valentines.jpg',
-         'Title'     => 'Happiness Droid',
-         'Location'  => 'Cloud Nine'
-      ));
-            
-      // Change persona
-      if ($this->Enabled || $this->DayAfter)
-         $Sender->Persona('Valentines');
-   }
-   
-   /**
-    * Hook early and perform valentines actions
-    * 
-    * @param Gdn_Dispatcher $Sender
-    * @return type
-    */
-   public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
-      $this->Minion = MinionPlugin::Instance();
-      $this->MinionUser = (array)$this->Minion->Minion();
       
       // Valentines events
       if (!$this->Enabled) return;
