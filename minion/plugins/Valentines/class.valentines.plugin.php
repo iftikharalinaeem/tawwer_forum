@@ -270,6 +270,8 @@ class ValentinesPlugin extends Gdn_Plugin {
             SaveToConfig('Plugins.Valentines.LoungeID', NULL);
             SaveToConfig('Plugins.Valentines.LoungeOpen', FALSE);
             $this->LoungeID = NULL;
+         } else {
+            $LoungeWrapperID = $this->Lounge['ParentCategoryID'];
          }
          
          // Defense against deleted lounge
@@ -331,7 +333,7 @@ class ValentinesPlugin extends Gdn_Plugin {
          }
          
          // Create valentines retirement village
-         if (!$this->Retirement) {
+         if (!$this->RetirementID) {
                         
             // Lounge
             $RetirementID = $CategoryModel->Save(array(
@@ -595,8 +597,7 @@ class ValentinesPlugin extends Gdn_Plugin {
                $Skipped[] = "vote ended. ({$Discussion['DiscussionID']}) {$Discussion['Name']}";
                
                // Move to retirement village
-               $Discussion['CategoryID'] = $this->RetirementID;
-               $DiscussionModel->Save($Discussion);
+               $DiscussionModel->SetField($DiscussionID, 'CategoryID', $this->RetirementID);
                $DiscussionModel->UpdateDiscussionCount($this->RetirementID);
                
                continue;
@@ -1011,12 +1012,11 @@ EXTENDEDVALENTINES;
       
       // Move done posts to retirement village
       if ($Badge) {
-         $Discussion['CategoryID'] = $this->RetirementID;
          $DiscussionModel = new DiscussionModel();
-         $DiscussionModel->Save($Discussion);
+         $DiscussionModel->SetField($Discussion['DiscussionID'], 'CategoryID', $this->RetirementID);
          
          // Update category
-         $DiscussionModel->UpdateDiscussionCount($this->RetirementID, $Discussion);
+         $DiscussionModel->UpdateDiscussionCount($this->RetirementID);
       }
       
       return $Response;
