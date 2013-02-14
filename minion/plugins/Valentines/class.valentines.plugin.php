@@ -157,6 +157,13 @@ class ValentinesPlugin extends Gdn_Plugin {
    protected $Lounge;
    
    /**
+    * Retirement CategoryID
+    * @var integer
+    */
+   protected $RetirementID;
+   protected $Retirement;
+   
+   /**
     * Minion Plugin reference
     * @var MinionPlugin
     */
@@ -192,6 +199,7 @@ class ValentinesPlugin extends Gdn_Plugin {
       $this->RefillCacheRatio = C('Plugins.Valentines.RefillCacheRatio', 0.05);
       $this->RefillCooldown = C('Plugins.Valentines.RefillCooldown', 900);
       $this->LoungeID = C('Plugins.Valentines.LoungeID', NULL);
+      $this->RetirementID = C('Plugins.Valentines.RetirementID', NULL);
       
    }
 
@@ -255,12 +263,19 @@ class ValentinesPlugin extends Gdn_Plugin {
       $PermissionModel = new PermissionModel();
       if ($this->Enabled) {
          $this->Lounge = CategoryModel::Categories($this->LoungeID);
+         $this->Retirement = CategoryModel::Categories($this->RetirementID);
          
          // Defense against deleted lounge
          if (!$this->Lounge) {
             SaveToConfig('Plugins.Valentines.LoungeID', NULL);
             SaveToConfig('Plugins.Valentines.LoungeOpen', FALSE);
             $this->LoungeID = NULL;
+         }
+         
+         // Defense against deleted lounge
+         if (!$this->Retirement) {
+            SaveToConfig('Plugins.Valentines.RetirementID', NULL);
+            $this->RetirementID = NULL;
          }
          
          // Get default role
@@ -295,7 +310,7 @@ class ValentinesPlugin extends Gdn_Plugin {
                'CustomPermissions' => 1,
                'AllowDiscussions' => 1
             ));
-            // Default no permissions
+            // Default sparse permissions
             $PermissionModel->Save(array(
                'RoleID'          => $DefaultMemberRoleID,
                'JunctionTable'   => 'Category',
@@ -312,6 +327,37 @@ class ValentinesPlugin extends Gdn_Plugin {
             CategoryModel::ClearCache();
             CategoryModel::$Categories = NULL;
             $this->Lounge = CategoryModel::Categories($LoungeID);
+            
+         }
+         
+         // Create valentines retirement village
+         if (!$this->Retirement) {
+                        
+            // Lounge
+            $RetirementID = $CategoryModel->Save(array(
+               'Name'            => T('Retirement Village'),
+               'ParentCategoryID'=> $LoungeWrapperID,
+               'UrlCode'         => 'retirement',
+               'CssClass'        => 'RetirementVillage',
+               'CustomPermissions' => 1,
+               'AllowDiscussions' => 1
+            ));
+            // Default sparse permissions
+            $PermissionModel->Save(array(
+               'RoleID'          => $DefaultMemberRoleID,
+               'JunctionTable'   => 'Category',
+               'JunctionColumn'  => 'PermissionCategoryID',
+               'JunctionID'      => $RetirementID,
+               'Vanilla.Discussions.View' => 1,
+               'Vanilla.Comments.Add'     => 1
+            ));
+            
+            SaveToConfig('Plugins.Valentines.RetirementID', $RetirementID);
+            $this->RetirementID = $RetirementID;
+            
+            CategoryModel::ClearCache();
+            CategoryModel::$Categories = NULL;
+            $this->Retirement = CategoryModel::Categories($RetirementID);
          }
          
          // Open the lounge if needed
@@ -547,6 +593,12 @@ class ValentinesPlugin extends Gdn_Plugin {
             $IsVoting = (bool)$Voting['Voting'];
             if (!$IsVoting) {
                $Skipped[] = "vote ended. ({$Discussion['DiscussionID']}) {$Discussion['Name']}";
+               
+               // Move to retirement village
+               $Discussion['CategoryID'] = $this->RetirementID;
+               $DiscussionModel->Save($Discussion);
+               $DiscussionModel->UpdateDiscussionCount($this->RetirementID);
+               
                continue;
             }
 
@@ -956,6 +1008,17 @@ EXTENDEDVALENTINES;
       
       // Save
       $this->Minion->Monitor($Discussion, array('Valentines' => $Valentines));
+      
+      // Move done posts to retirement village
+      if ($Badge) {
+         $Discussion['CategoryID'] = $this->RetirementID;
+         $DiscussionModel = new DiscussionModel();
+         $DiscussionModel->Save($Discussion);
+         
+         // Update category
+         $DiscussionModel->UpdateDiscussionCount($this->RetirementID, $Discussion);
+      }
+      
       return $Response;
    }
       
