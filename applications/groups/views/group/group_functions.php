@@ -137,18 +137,48 @@ function WriteEventList($Events, $Group = NULL, $EmptyMessage = '', $Button = TR
    else {
       echo '<ul class="NarrowList DataList-Events">';
       foreach ($Events as $Event) {
-         $DateStarts = new DateTime($Event['DateStarts']);
-         echo 
-         '<li class="Event">
-            '.DateTile($DateStarts->format('Y-m-d')).'
-            <h3 class="Event-Title">'.Anchor(Gdn_Format::Text($Event['Name']), EventUrl($Event)).' <span class="Event-Time MItem">'.$DateStarts->format('g:ia').'</span></h3>
-            
-            <div class="Event-Location">'.Gdn_Format::Text($Event['Location']).'</div>
-            <p class="Event-Description"'.SliceParagraph(Gdn_Format::Text($Event['Body']), 100).'</p>
-         </li>';
+         echo '<li>';
+         WriteEventCard($Event);
+         echo '</li>';
       }
       echo '</ul>';
    }
+}
+endif;
+
+if (!function_exists('WriteEventCard')) :
+/**
+ * Write an event card
+ * 
+ * Optionally write rich listing
+ * 
+ * @param array $Event
+ */
+function WriteEventCard($Event) {
+   $UTC = new DateTimeZone('UTC');
+   $Timezone = new DateTimeZone($Event['Timezone']);
+   $DateStarts = new DateTime($Event['DateStarts'], $UTC);
+   if (Gdn::Session()->IsValid() && $HourOffset = Gdn::Session()->User->HourOffset)
+      $DateStarts->modify("{$HourOffset} hours");
+   
+   echo '<div class="Event">';
+   if (GetValue('Rich', $Event)) {
+      
+      
+      
+   } else {
+      
+      echo DateTile($DateStarts->format('Y-m-d'));
+      echo '<h3 class="Event-Title">'.Anchor(Gdn_Format::Text($Event['Name']), EventUrl($Event));
+      if ($DateStarts->format('g:ia') != '12:00am')
+         echo ' <span class="Event-Time MItem">'.$DateStarts->format('g:ia').'</span>';
+      echo '</h3>';
+
+      echo '<div class="Event-Location">'.Gdn_Format::Text($Event['Location']).'</div>';
+      echo '<p class="Event-Description">'.SliceParagraph(Gdn_Format::Text($Event['Body']), 100).'</p>';
+      
+   }
+   echo '</div>';
 }
 endif;
 
