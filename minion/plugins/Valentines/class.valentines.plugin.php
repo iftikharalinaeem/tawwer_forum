@@ -494,6 +494,61 @@ class ValentinesPlugin extends Gdn_Plugin {
       $Sender->Render();
    }
    
+   /**
+    * Force an evaluation of all vote threads
+    * 
+    * @param type $Sender
+    */
+   public function Controller_Adjudicate($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      $DiscussionModel = new DiscussionModel();
+      $Discussions = $DiscussionModel->GetWhere(array(
+         'CategoryID'         => $this->LoungeID,
+         'InsertUserID'       => $this->MinionUser['UserID']
+      ))->ResultArray();
+      
+      $Sender->SetData('Discussions', sizeof($Discussions));
+      $Sender->SetData('Matched', 0);
+      $Matched = 0; $Matches = array();
+      foreach ($Discussions as $Discussion) {
+         $Valentines = $this->Minion->Monitoring($Discussion, 'Valentines', array());
+         TouchValue('Voting', $Valentines, FALSE);
+         $Voting = &$Valentines['Voting'];
+         if (!$Voting) continue;
+         
+         // No voting is occuring here
+         $IsVoting = (bool)$Voting['Voting'];
+         if (!$IsVoting) continue;
+         
+         // Discussion is already in good shape
+         $MaxVotes = $Voting['MaxVotes'];
+         if ($MaxVotes == $this->RequiredVotes) continue;
+         
+         $Matched++;
+         $Voting['MaxVotes'] = $this->RequiredVotes;
+         
+         // Save before judgement
+         $this->Minion->Monitoring($Discussion, array('Valentines' => $Valentines));
+         
+         if ($Voting['Votes'] >= $Voting['MaxVotes']) {
+            // Run adjudication
+            $Judgement = $this->EndVote($Discussion);
+            $Matches[] = array(
+               'DiscussionID' => $Discussion['DiscussionID'],
+               'Name'         => $Discussion['Name'],
+               'Judgement'    => $Judgement
+            );
+         }
+      }
+      $Sender->SetData('Matches', $Matches);
+      $Sender->SetData('Matched', $Matched);
+      
+      $Sender->Render();
+   }
+   
    /*
     * ACTIONS
     */
@@ -810,6 +865,7 @@ VOTEVALENTINES;
       // Measure
       $Badge = NULL;
       if ($Voting['Score'] > 0) {
+         $Response = 'lovefool';
          // Love Fool
          $Voting['Voting'] = FALSE;
          $Badge = $this->BadgeModel->GetID('lovefool');
@@ -825,6 +881,7 @@ EXTENDEDVALENTINES;
             'BadgeUrl'  => Anchor($Badge['Name'], CombinePaths(array('badge',$Badge['BadgeID'])))
          ));
       } elseif ($Voting['Score'] < 0) {
+         $Response = 'coldhearted';
          // Cold Hearted
          $Voting['Voting'] = FALSE;
          $Badge = $this->BadgeModel->GetID('coldhearted');
@@ -840,6 +897,7 @@ EXTENDEDVALENTINES;
             'BadgeUrl'  => Anchor($Badge['Name'], CombinePaths(array('badge',$Badge['BadgeID'])))
          ));
       } else {
+         $Response = 'extend';
          // Tie, extend voting
          $AdditionalVotes = ceil($this->RequiredVotes * 0.5);
          $Voting['MaxVotes'] += $AdditionalVotes;
@@ -860,6 +918,7 @@ EXTENDEDVALENTINES;
       
       // Save
       $this->Minion->Monitor($Discussion, array('Valentines' => $Valentines));
+      return $Response;
    }
       
    /**
