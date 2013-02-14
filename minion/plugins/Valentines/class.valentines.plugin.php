@@ -1455,7 +1455,7 @@ FORWARDVALENTINES;
             $Player['Quiver'] -= $Increment;
             $Player['Fired'] += $Increment;
             $Target['Hit'] += $Increment;
-            $this->Arrows($Increment);
+            $this->Arrows(-$Increment);
          }
          
          if ($Mode == 'set' && $Arrow) {
