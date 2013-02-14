@@ -816,7 +816,7 @@ VOTEVALENTINES;
          
          // Create thread comment
          $EndVoteMessage = <<<EXTENDEDVALENTINES
-What a surprise, @"{Player.Name}" is suffering for the organic weakness of "fondness", and has earned the {BadgeUrl} {BadgeWord}.
+What a surprise, @"{Player.Name}" is suffering from the organic weakness of "fondness", and has earned the {BadgeUrl} {BadgeWord}.
 EXTENDEDVALENTINES;
          $EndVoteMessage = FormatString(T($EndVoteMessage), array(
             'Player'    => $Author,
