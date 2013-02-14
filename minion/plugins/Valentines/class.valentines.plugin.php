@@ -506,6 +506,7 @@ class ValentinesPlugin extends Gdn_Plugin {
       
       $DiscussionModel = new DiscussionModel();
       
+      $Perform = (bool)Gdn::Request()->Get('perform', FALSE);
       $Sender->SetData('Discussions', 0);
       $Sender->SetData('Matched', 0);
       
@@ -545,7 +546,8 @@ class ValentinesPlugin extends Gdn_Plugin {
             $Voting['MaxVotes'] = $this->RequiredVotes;
 
             // Save before judgement
-            $this->Minion->Monitor($Discussion, array('Valentines' => $Valentines));
+            if ($Perform)
+               $this->Minion->Monitor($Discussion, array('Valentines' => $Valentines));
 
             $Match = array(
                'DiscussionID' => $Discussion['DiscussionID'],
@@ -554,7 +556,8 @@ class ValentinesPlugin extends Gdn_Plugin {
             );
             if ($Voting['Votes'] >= $Voting['MaxVotes']) {
                // Run adjudication
-               $Judgement = $this->EndVote($Discussion);
+               $Judgement = 'dry run';
+               if ($Perform) $Judgement = $this->EndVote($Discussion);
                $Match = array_merge($Match, array(
                   'Judgement'    => $Judgement
                ));
