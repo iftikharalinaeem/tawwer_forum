@@ -686,11 +686,13 @@ class ValentinesPlugin extends Gdn_Plugin {
       $DesiredValentines['Count']++;
       $DesiredValentines['Desired'] = TRUE;
       $DesiredValentines['DesiredUserID'] = $PairedUserID;
+      $DesiredValentines['Dismissed'] = FALSE;
       $DesiredValentines['Expiry'] = $Expiry;
       $DesiredValentines['Quiver'] += $this->StartArrows;
       
       $PairedValentines['Desired'] = TRUE;
       $PairedValentines['DesiredUserID'] = $DesiredUserID;
+      $PairedValentines['Dismissed'] = FALSE;
       $PairedValentines['Expiry'] = $Expiry;
       $PairedValentines['Quiver'] += $this->StartArrows;
       
