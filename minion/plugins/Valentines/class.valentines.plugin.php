@@ -31,6 +31,7 @@
  * 
  * Changes: 
  *  1.0     Release
+ *  1.0.1   Punishment expiry
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -41,7 +42,7 @@
 $PluginInfo['Valentines'] = array(
    'Name' => 'Minion: Valentines',
    'Description' => "Valentines day game and badges.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'RequiredApplications' => array(
       'Vanilla' => '2.1a',
       'Reputation' => '1.0'
@@ -706,7 +707,10 @@ COMPLIANCEVALENTINES;
       ));
 
       // Now punish this comment
-      $this->Minion->Punish($User, $Discussion, $Comment, 'major');
+      $this->Minion->Punish($User, $Discussion, $Comment, 'major', array(
+         'Reason'       => T('Insufficient Valentines Day commitment'),
+         'Expires'      => "2 days"
+      ));
       
       // End Desired mode
       $this->EndDesired($User);
