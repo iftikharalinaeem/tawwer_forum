@@ -525,15 +525,8 @@ class ValentinesPlugin extends Gdn_Plugin {
          
          // No voting is occuring here
          $IsVoting = (bool)$Voting['Voting'];
-         $IsVoting = TRUE;
          if (!$IsVoting) {
             $Skipped[] = "vote ended. ({$Discussion['DiscussionID']}) {$Discussion['Name']}";
-            continue;
-         }
-         
-         // Discussion is already in good shape
-         if ($Voting['MaxVotes'] == $this->RequiredVotes) {
-            $Skipped[] = "votes == maxvotes. {$Discussion['Name']}";
             continue;
          }
          
