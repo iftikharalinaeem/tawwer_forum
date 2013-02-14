@@ -234,7 +234,7 @@ class GroupController extends Gdn_Controller {
             'UserID' => Gdn::Session()->UserID,
             'GroupID' => $Group['GroupID']);
          $this->GroupModel->Leave($Data);
-         $this->RedirectUrl = Url(GroupUrl($Group));
+         $this->JsonTarget('', '', 'Refresh');
       }
       
       $this->SetData('Group', $Group);
