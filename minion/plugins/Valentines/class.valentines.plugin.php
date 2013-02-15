@@ -1263,9 +1263,12 @@ CACHEVALENTINES;
          $DesiredConversationID = GetValue('ConversationID', $Playing, FALSE);
          if ($DesiredConversationID != $ConversationID) return;
          
+         $DesiredUserID = GetValue('DesiredUserID', $Playing, FALSE);
+         if (!$DesiredUserID) return;
+         
          $Valentines = array(
             'AuthorUserID' => $AuthorID,
-            'TargetUserID' => $DesiredConversationID,
+            'TargetUserID' => $DesiredUserID,
             'Pending'      => TRUE
          );
       }
