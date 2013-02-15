@@ -1385,7 +1385,7 @@ FORWARDVALENTINES;
          case 'statistics':
             
             $StatisticsResponse = <<<STATISTICS
-Valentines Day [b]{Playing.Year}[/b] Situation Report
+[b]{Player.Name}[/b] Valentines Day [b]{Playing.Year}[/b] Situation Report
    
 [b]Arrows[/b]:
 Quiver: [b]{Playing.Quiver}[/b]
