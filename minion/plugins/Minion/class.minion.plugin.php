@@ -32,6 +32,7 @@
  *  1.10.1  Fix Log messages
  *  1.10.2  Fix mentions
  *  1.11    Personas
+ *  1.12    Conversations support
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -1456,7 +1457,14 @@ class MinionPlugin extends Gdn_Plugin {
     * @return mixed
     */
    public function Monitoring(&$Object, $Attribute = NULL, $Default = NULL) {
-      $Minion = GetValueR('Attributes.Minion', $Object, array());
+      $Attributes = GetValue('Attributes', $Object, array());
+      if (!is_array($Attributes) && strlen($Attributes))
+         $Attributes = @unserialize($Attributes);
+      if (!is_array($Attributes))
+         $Attributes = array();
+      
+      SetValue('Attributes', $Object, $Attributes);
+      $Minion = GetValueR('Attributes.Minion', $Object);
       
       $IsMonitoring = GetValue('Monitor', $Minion, FALSE);
       if (!$IsMonitoring) return $Default;
@@ -1468,7 +1476,11 @@ class MinionPlugin extends Gdn_Plugin {
    public function Monitor(&$Object, $Options = NULL) {
       $Type = NULL;
       
-      if (array_key_exists('CommentID', $Object)) {
+      if (array_key_exists('ConversationMessageID', $Object)) {
+         $Type = 'ConversationMessage';
+      } else if (array_key_exists('ConversationID', $Object)) {
+         $Type = 'Conversation';
+      } else if (array_key_exists('CommentID', $Object)) {
          $Type = 'Comment';
       } else if (array_key_exists('DiscussionID', $Object)) {
          $Type = 'Discussion';
@@ -1482,6 +1494,10 @@ class MinionPlugin extends Gdn_Plugin {
       $ObjectModel = new $ObjectModelName();
       
       $Attributes = (array)GetValue('Attributes', $Object, array());
+      if (!is_array($Attributes) && strlen($Attributes))
+         $Attributes = @unserialize($Attributes);
+      if (!is_array($Attributes)) $Attributes = array();
+      
       $Minion = (array)GetValue('Minion', $Attributes, array());
       $Minion['Monitor'] = TRUE;
       
@@ -1507,7 +1523,11 @@ class MinionPlugin extends Gdn_Plugin {
    
    public function StopMonitoring($Object, $Type = NULL) {
       if (is_null($Type)) {
-         if (array_key_exists('CommentID', $Object)) {
+         if (array_key_exists('ConversationMessageID', $Object)) {
+            $Type = 'ConversationMessage';
+         } else if (array_key_exists('ConversationID', $Object)) {
+            $Type = 'Conversation';
+         } else if (array_key_exists('CommentID', $Object)) {
             $Type = 'Comment';
          } else if (array_key_exists('DiscussionID', $Object)) {
             $Type = 'Discussion';
@@ -1971,6 +1991,26 @@ USER BANNED
          $r = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $r);
       
       return $r;
+   }
+   
+   /*
+    * SETUP
+    */
+   
+   public function Setup() {
+      $this->Structure();
+   }
+   
+   /**
+    * Database structure
+    */
+   public function Structure() {
+      // Add 'Attributes' to Conversations
+      if (!Gdn::Structure()->Table('Conversation')->ColumnExists('Attributes')) {
+         Gdn::Structure()->Table('Conversation')
+            ->Column('Attributes', 'text', TRUE)
+            ->Set(FALSE, FALSE);
+      }
    }
    
 }

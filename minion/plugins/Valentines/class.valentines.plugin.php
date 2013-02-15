@@ -32,6 +32,7 @@
  * Changes: 
  *  1.0     Release
  *  1.0.1   Punishment expiry
+ *  1.1     Conversations integration
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -42,13 +43,13 @@
 $PluginInfo['Valentines'] = array(
    'Name' => 'Minion: Valentines',
    'Description' => "Valentines day game and badges.",
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'RequiredApplications' => array(
       'Vanilla' => '2.1a',
       'Reputation' => '1.0'
     ),
    'RequiredPlugins' => array(
-      'Minion' => '1.11',
+      'Minion' => '1.12',
       'Reactions' => '1.2.1'
    ),
    'MobileFriendly' => TRUE,
@@ -171,6 +172,7 @@ class ValentinesPlugin extends Gdn_Plugin {
    protected $MinionUser;
    
    const ARROW_RECORD = "Arrow.{UserID}.{Count}.{ObjectID}";
+   const EXPIRY_RECORD = "Desired.{UserID}.{KeyID}.Expiry";
    
    /**
     * Set global enabled flag
@@ -191,7 +193,9 @@ class ValentinesPlugin extends Gdn_Plugin {
       $this->ActivityModel = new ActivityModel();
       
       $this->RequiredVotes = C('Plugins.Valentines.RequiredVotes', 60);
+      $this->RequiredVotes = 1;
       $this->RequiredArrows = C('Plugins.Valentines.RequiredArrows', 5);
+      $this->RequiredArrows = 1;
       $this->StartArrows = C('Plugins.Valentines.StartArrows', 3);
       $this->DesiredExpiry = C('Plugins.Valentines.DesiredExpiry', 7200);
       $this->RefillTriggerRatio = C('Plugins.Valentines.RefillRatio', 0.4);
@@ -676,6 +680,8 @@ class ValentinesPlugin extends Gdn_Plugin {
          $PairedUserID = GetValue('UserID', $Arrow);
          $PairedUser = Gdn::UserModel()->GetID($PairedUserID, DATASET_TYPE_ARRAY);
          $PairedValentines = $this->Minion->Monitoring($PairedUser, 'Valentines', array());
+      } else {
+         return;
       }
       
       // Desired Badge
@@ -686,20 +692,12 @@ class ValentinesPlugin extends Gdn_Plugin {
       $Expiry = time() + $this->DesiredExpiry;
       $DesiredValentines['Count']++;
       $DesiredValentines['Desired'] = TRUE;
-      $DesiredValentines['DesiredUserID'] = $PairedUserID;
       $DesiredValentines['Dismissed'] = FALSE;
-      $DesiredValentines['Expiry'] = $Expiry;
       $DesiredValentines['Quiver'] += $this->StartArrows;
       
       $PairedValentines['Desired'] = TRUE;
-      $PairedValentines['DesiredUserID'] = $DesiredUserID;
       $PairedValentines['Dismissed'] = FALSE;
-      $PairedValentines['Expiry'] = $Expiry;
       $PairedValentines['Quiver'] += $this->StartArrows;
-      
-      // Expiry reminders
-      $this->SetUserMeta($DesiredUserID, 'Desired.Expiry', $Expiry);
-      $this->SetUserMeta($PairedUserID, 'Desired.Expiry', $Expiry);
       
       // Send PMs
       $Timespan = $this->DesiredExpiry;
@@ -734,6 +732,8 @@ VALENTINES;
          
          switch ($MessageType) {
             case 'desired':
+               $AuthorUserID = $DesiredUserID;
+               $TargetUserID = $PairedUserID;
                $UserList = array($this->MinionUser['UserID'], $DesiredUserID);
                $Message = FormatString(T($InstructionMessage), array(
                   'Year'      => date('Y'),
@@ -744,6 +744,8 @@ VALENTINES;
                break;
             
             case 'paired':
+               $AuthorUserID = $PairedUserID;
+               $TargetUserID = $DesiredUserID;
                $UserList = array($this->MinionUser['UserID'], $PairedUserID);
                $Message = FormatString(T($InstructionMessage), array(
                   'Year'      => date('Y'),
@@ -762,6 +764,20 @@ VALENTINES;
             'InsertUserID'    => $this->MinionUser['UserID'],
             'RecipientUserID' => $UserList,
          ), $ConversationMessageModel);
+         $Conversation = (array)$ConversationModel->GetID($ConversationID);
+         $ConversationValentines = array(
+            'Pending'         => TRUE,
+            'AuthorUserID'    => $AuthorUserID,
+            'TargetUserID'    => $TargetUserID
+         );
+         $this->Minion->Monitor($Conversation, array('Valentines' => $ConversationValentines));
+         
+         // Expiry reminder
+         $ExpiryKey = FormatString(self::EXPIRY_RECORD, array(
+            'UserID' => $TargetUserID,
+            'KeyID'  => $ConversationID
+         ));
+         $this->SetUserMeta($AuthorUserID, $ExpiryKey, $Expiry);
          
          switch ($MessageType) {
             case 'desired':
@@ -822,21 +838,32 @@ VALENTINES;
     * Remove a user's Desired mark
     * 
     * @param array $User
+    * @param integer $DesiredUserID
     */
-   public function EndDesired(&$User) {
+   public function EndDesired(&$User, $DesiredUserID) {
       $UserID = GetValue('UserID', $User);
-      $Valentines = $this->Minion->Monitoring($User, 'Valentines');
-      $Valentines['Desired'] = FALSE;
-      $Valentines['Expiry'] = NULL;
-      $Valentines['DesiredUserID'] = NULL;
-      $Valentines['ConversationID'] = NULL;
-      $Valentines['Count']++;
       
-      // Remove expiry timer
-      $this->SetUserMeta($UserID, 'Desired.Expiry', NULL);
+      // Expire this target's usermeta
+      $DesiredExpiryKey = FormatString(self::EXPIRY_RECORD, array(
+         'UserID' => $DesiredUserID,
+         'KeyID'  => '%'
+      ));
+      $this->SetUserMeta($UserID, $DesiredExpiryKey, NULL);
+      
+      // Check for additional UserMetas
+      $WildDesiredExpiryKey = FormatString(self::EXPIRY_RECORD, array(
+         'UserID' => '%',
+         'KeyID'  => '%'
+      ));
+      $Targets = $this->GetUserMeta($UserID, $WildDesiredExpiryKey, NULL);
+      $NumTargets = sizeof($Targets);
       
       // Save
-      $this->Minion->Monitor($User, array('Valentines' => $Valentines));
+      if (!$NumTargets) {
+         $Valentines = $this->Minion->Monitoring($User, 'Valentines');
+         $Valentines['Desired'] = FALSE;
+         $this->Minion->Monitor($User, array('Valentines' => $Valentines));
+      }
    }
    
    
@@ -844,8 +871,9 @@ VALENTINES;
     * Expire this user's Desired and punish
     * 
     * @param array $User
+    * @param interger $DesiredUserID
     */
-   public function Expire(&$User) {
+   public function Expire(&$User, $DesiredUserID) {
       $Valentines = $this->Minion->Monitoring($User, 'Valentines');
       $DesiredUserID = GetValue('DesiredUserID', $Valentines);
       $DesiredUser = Gdn::UserModel()->GetID($DesiredUserID);
@@ -894,7 +922,7 @@ COMPLIANCEVALENTINES;
       ));
       
       // End Desired mode
-      $this->EndDesired($User);
+      $this->EndDesired($User, $DesiredUserID);
    }
    
    /**
@@ -937,7 +965,7 @@ VOTEVALENTINES;
       )));
       
       // End author's desired state
-      $this->EndDesired($Author);
+      $this->EndDesired($Author, $Target['UserID']);
       
       // Notify
    }
@@ -1212,53 +1240,77 @@ CACHEVALENTINES;
       $Message = (array)$Sender->EventArguments['Message'];
       
       $AuthorID = $Message['InsertUserID'];
-      $Author = Gdn::UserModel()->GetID($AuthorID, DATASET_TYPE_ARRAY);
+      $AuthorUser = Gdn::UserModel()->GetID($AuthorID, DATASET_TYPE_ARRAY);
       
-      // Is this person playing the game?
-      $Playing = $this->Minion->Monitoring($Author, 'Valentines');
-      if (!$Playing) return;
+      $Valentines = $this->Minion->Monitoring($Conversation, 'Valentines', FALSE);
+      
+      // Fallback, check player
+      if (!$Valentines) {
+         
+         // Is this person playing the game?
+         $Playing = $this->Minion->Monitoring($AuthorUser, 'Valentines', FALSE);
+         if (!$Playing) return;
+         
+         // Only care about people who are playing this year
+         $ValentinesYear = GetValue('Year', $Playing, FALSE);
+         if ($ValentinesYear != date('Y')) return;
 
-      // Only care about people who are playing this year
-      $ValentinesYear = GetValue('Year', $Playing, FALSE);
-      if ($ValentinesYear != date('Y')) return;
+         // Only care about messages from people who are desired
+         $Desired = GetValue('Desired', $Playing, FALSE);
+         if (!$Desired) return;
 
-      // Only care about messages from people who are desired
-      $Desired = GetValue('Desired', $Playing, FALSE);
-      if (!$Desired) return;
+         // Only care about messages within a Valentines conversation
+         $DesiredConversationID = GetValue('ConversationID', $Playing, FALSE);
+         if ($DesiredConversationID != $ConversationID) return;
+         
+         $Valentines = array(
+            'AuthorUserID' => $AuthorID,
+            'TargetUserID' => $DesiredConversationID,
+            'Pending'      => TRUE
+         );
+      }
       
-      // Only care about messages within a Valentines conversation
-      $DesiredConversationID = GetValue('ConversationID', $Playing, FALSE);
-      if ($DesiredConversationID != $ConversationID) return;
-      
-      // Everything is ok, do what needs doing
-      
-      $DesiredUserID = GetValue('DesiredUserID', $Playing);
-      $DesiredUser = Gdn::UserModel()->GetID($DesiredUserID, DATASET_TYPE_ARRAY);
-      
-      $MessageBody = GetValue('Body', $Message);
-      $this->Vote($Author, $DesiredUser, $MessageBody);
-      
-      // Send PM to target on behalf of player
-      $ForwardedMessage = <<<FORWARDVALENTINES
-User @"{Desired.Name}", your partner @"{Player.Name}" had the following message for you on Valentines Day:
+      if ($Valentines) {
+         $Pending = GetValue('Pending', $Valentines);
+         if (!$Pending) return;
+         
+         $AuthorUserID = GetValue('AuthorUserID', $Valentines);
+         $TargetUserID = GetValue('TargetUserID', $Valentines);
 
-[quote="{Player.Name}"]{Message.Body}[/quote]
+         // Only the author can send replies
+         if ($AuthorID != $AuthorUserID) return;
+         $TargetUser = Gdn::UserModel()->GetID($TargetUserID, DATASET_TYPE_ARRAY);
+         
+         // Do the vote!
+         $MessageBody = GetValue('Body', $Message);
+         $this->Vote($AuthorUser, $TargetUser, $MessageBody);
+
+         // Send PM to target on behalf of player
+         $ForwardedMessage = <<<FORWARDVALENTINES
+   User @"{Desired.Name}", your partner @"{Player.Name}" had the following message for you on Valentines Day:
+
+   [quote="{Player.Name}"]{Message.Body}[/quote]
 FORWARDVALENTINES;
-      $ForwardedMessage = FormatString(T($ForwardedMessage), array(
-         'Player'    => $Author,
-         'Desired'   => $DesiredUser,
-         'Message'   => $Message
-      ));
-      $UserList = array($AuthorID, $DesiredUserID);
-      
-      $ConversationModel = new ConversationModel();
-      $ConversationMessageModel = new ConversationMessageModel();
-      $ForwardedConversationID = $ConversationModel->Save(array(
-         'Body'            => $ForwardedMessage,
-         'Format'          => 'BBCode',
-         'RecipientUserID' => $UserList,
-      ), $ConversationMessageModel);
-      
+         $ForwardedMessage = FormatString(T($ForwardedMessage), array(
+            'Player'    => $AuthorUser,
+            'Desired'   => $TargetUser,
+            'Message'   => $Message
+         ));
+         $UserList = array($AuthorID, $TargetUserID);
+
+         $ConversationModel = new ConversationModel();
+         $ConversationMessageModel = new ConversationMessageModel();
+         $ForwardedConversationID = $ConversationModel->Save(array(
+            'Body'            => $ForwardedMessage,
+            'Format'          => 'BBCode',
+            'RecipientUserID' => $UserList,
+         ), $ConversationMessageModel);
+         
+         // Save conversation as 'done'
+         $Valentines['Pending'] = FALSE;
+         $Valentines['FinalConversationID'] = $ForwardedConversationID;
+         $this->Minion->Monitor($Conversation, array('Valentines' => $Valentines));
+      }
    }
    
    /**
@@ -1282,11 +1334,30 @@ FORWARDVALENTINES;
          if (GetValue('Dismissed', $UserValentines, FALSE)) return;
 
          // User is desired, show timer
-         $Expiry = GetValue('Expiry', $UserValentines);
-         $Sender->AddDefinition('ValentinesExpiry', $Expiry - time());
-         $ConversationID = GetValue('ConversationID', $UserValentines);
-         $Sender->AddDefinition('ValentinesConversation', $ConversationID);
-         $JavascriptRequired = TRUE;
+         $WildMetaKey = $this->MakeMetaKey(FormatString(self::EXPIRY_RECORD, array(
+            'UserID' => '%',
+            'KeyID'  => '%'
+         )));
+         $Expiries = $this->GetUserMeta($User['UserID'], $WildMetaKey);
+         if (sizeof($Expiries)) {
+            $MinExpiry = NULL; $MinKey = NULL;
+            foreach ($Expiries as $ExpiryKey => $Expiry) {
+               if (is_null($MinExpiry) || $Expiry < $MinExpiry) {
+                  $MinExpiry = $Expiry;
+                  $MinKey = $ExpiryKey;
+               }
+            }
+
+            $Matched = preg_match('`([\d]+)\.([\d]+)`i', $MinKey, $KeyMatches);
+            if ($Matched) {
+               $DesiredUserID = $KeyMatches[1];
+               $DesiredConversationID = $KeyMatches[2];
+
+               $Sender->AddDefinition('ValentinesExpiry', $MinExpiry - time());
+               $Sender->AddDefinition('ValentinesConversation', $DesiredConversationID);
+               $JavascriptRequired = TRUE;
+            }
+         }
       }
       
       if ($JavascriptRequired)
@@ -1309,19 +1380,28 @@ FORWARDVALENTINES;
          Gdn::Cache()->Store($ExpiryCheckKey, microtime(true)+60);
          
          // Run expiry check
-         $MetaKey = $this->MakeMetaKey('Desired.Expiry');
+         $WildMetaKey = $this->MakeMetaKey(FormatString(self::EXPIRY_RECORD, array(
+            'UserID' => '%',
+            'KeyID'  => '%'
+         )));
          $ExpiredUsers = Gdn::SQL()
-            ->Select('UserID')
-            ->Select('Value')
+            ->Select('*')
             ->From('UserMeta')
-            ->Where('Name', $MetaKey)
+            ->Like('Name', $WildMetaKey)
             ->Where('Value <', time())
             ->Get()->ResultArray();
 
-         foreach ($ExpiredUsers as $ExpiredUser) {
-            $ExpiredUserID = GetValue('UserID', $ExpiredUser);
+         foreach ($ExpiredUsers as $ExpiredUserData) {
+            $ExpiredUserID = $ExpiredUserData['UserID'];
             $ExpiredUser = Gdn::UserModel()->GetID($ExpiredUserID, DATASET_TYPE_ARRAY);
-            $this->Expire($ExpiredUser);
+            
+            $Matched = preg_match('`([\d]+)\.([\d]+)`i', $ExpiredUserData['Name'], $KeyMatches);
+            if ($Matched) {
+               $DesiredUserID = $KeyMatches[1];
+               $DesiredConversationID = $KeyMatches[2];
+            
+               $this->Expire($ExpiredUser, $DesiredUserID);
+            }
          }
          
          // Run arrow check
@@ -1657,7 +1737,10 @@ FORWARDVALENTINES;
          
          $BodyParts = array(
             'butt',
-            'neck',
+            'throat',
+            'elbow',
+            'tummy',
+            'chin',
             'boob',
             'foot',
             'toe',
@@ -1675,7 +1758,10 @@ FORWARDVALENTINES;
             'eyebrow',
             'knee',
             'tonsils',
-            'lower intestine'
+            'lower intestine',
+            'nostril',
+            'hand',
+            'arm'
          );
          shuffle($BodyParts);
          $BodyPart = array_pop($BodyParts);
@@ -1721,11 +1807,6 @@ FORWARDVALENTINES;
     * Database structure
     */
    public function Structure() {
-      
-      // Add 'Attributes' to Conversations
-      if (!Gdn::Structure()->Table('ReactionType')->ColumnExists('Attributes')) {
-         
-      }
       
       // Define 'Arrow of Desire' reactions
 
