@@ -193,9 +193,7 @@ class ValentinesPlugin extends Gdn_Plugin {
       $this->ActivityModel = new ActivityModel();
       
       $this->RequiredVotes = C('Plugins.Valentines.RequiredVotes', 60);
-      $this->RequiredVotes = 1;
       $this->RequiredArrows = C('Plugins.Valentines.RequiredArrows', 5);
-      $this->RequiredArrows = 1;
       $this->StartArrows = C('Plugins.Valentines.StartArrows', 3);
       $this->DesiredExpiry = C('Plugins.Valentines.DesiredExpiry', 7200);
       $this->RefillTriggerRatio = C('Plugins.Valentines.RefillRatio', 0.4);
