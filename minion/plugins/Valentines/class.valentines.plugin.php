@@ -1228,7 +1228,26 @@ CACHEVALENTINES;
     * 
     * @param ConversationMessageModel $Sender
     */
-   public function ConversationMessageModel_AfterSave_Handler($Sender) {
+   public function ConversationMessageModel_AfterAdd_Handler($Sender) {
+      
+      // Max 1 day to send PMs
+      if (!$this->Enabled && !$this->DayAfter) return;
+      
+      $Conversation = (array)$Sender->EventArguments['Conversation'];
+      $Message = (array)$Sender->EventArguments['Message'];
+      if ($Message['InsertUserID'] == $this->MinionUser['UserID']) return;
+      
+      $AuthorUser = Gdn::UserModel()->GetID($Message['InsertUserID'], DATASET_TYPE_ARRAY);
+      
+      $Result = $this->ConversationValentine($Sender, $Conversation, $Message, $AuthorUser);
+      if ($Result === FALSE) return;
+      
+      $Result = $this->ConversationCommand($Sender, $Conversation, $Message, $AuthorUser);
+      if ($Result === FALSE) return;
+      
+   }
+   
+   public function ConversationModel_AfterAdd_Handler($Sender) {
       
       // Max 1 day to send PMs
       if (!$this->Enabled && !$this->DayAfter) return;
@@ -1436,7 +1455,8 @@ STATISTICS;
       }
       
       if ($Response) {
-         $Sender->Save(array(
+         $ConversationMessageModel = new ConversationMessageModel();
+         $ConversationMessageModel->Save(array(
             'ConversationID'     => $ConversationID,
             'Body'               => $Response,
             'Format'             => 'BBCode',
