@@ -1229,26 +1229,47 @@ CACHEVALENTINES;
     * @param ConversationMessageModel $Sender
     */
    public function ConversationMessageModel_AfterSave_Handler($Sender) {
+      
       // Max 1 day to send PMs
       if (!$this->Enabled && !$this->DayAfter) return;
-      $MinionID = $this->MinionUser['UserID'];
       
       $Conversation = (array)$Sender->EventArguments['Conversation'];
-      $ConversationID = $Conversation['ConversationID'];
       $Message = (array)$Sender->EventArguments['Message'];
+      if ($Message['InsertUserID'] == $this->MinionUser['UserID']) return;
       
+      $AuthorUser = Gdn::UserModel()->GetID($Message['InsertUserID'], DATASET_TYPE_ARRAY);
+      
+      $Result = $this->ConversationValentine($Sender, $Conversation, $Message, $AuthorUser);
+      if ($Result === FALSE) return;
+      
+      $Result = $this->ConversationCommand($Sender, $Conversation, $Message, $AuthorUser);
+      if ($Result === FALSE) return;
+      
+   }
+   
+   /**
+    * Process a conversation valentine
+    * 
+    * Possibly. Otherwise if its not, just return.
+    * 
+    * @param ConversationMessageModel $Sender
+    * @param array $Conversation
+    * @param array $Message
+    * @param array $AuthorUser
+    */
+   protected function ConversationValentine($Sender, $Conversation, $Message, $AuthorUser) {
+      $ConversationID = $Conversation['ConversationID'];
       $AuthorID = $Message['InsertUserID'];
-      $AuthorUser = Gdn::UserModel()->GetID($AuthorID, DATASET_TYPE_ARRAY);
       
       $Valentines = $this->Minion->Monitoring($Conversation, 'Valentines', FALSE);
-      
+
       // Fallback, check player
       if (!$Valentines) {
-         
+
          // Is this person playing the game?
          $Playing = $this->Minion->Monitoring($AuthorUser, 'Valentines', FALSE);
          if (!$Playing) return;
-         
+
          // Only care about people who are playing this year
          $ValentinesYear = GetValue('Year', $Playing, FALSE);
          if ($ValentinesYear != date('Y')) return;
@@ -1260,28 +1281,28 @@ CACHEVALENTINES;
          // Only care about messages within a Valentines conversation
          $DesiredConversationID = GetValue('ConversationID', $Playing, FALSE);
          if ($DesiredConversationID != $ConversationID) return;
-         
+
          $DesiredUserID = GetValue('DesiredUserID', $Playing, FALSE);
          if (!$DesiredUserID) return;
-         
+
          $Valentines = array(
             'AuthorUserID' => $AuthorID,
             'TargetUserID' => $DesiredUserID,
             'Pending'      => TRUE
          );
       }
-      
+
       if ($Valentines) {
          $Pending = GetValue('Pending', $Valentines);
-         if (!$Pending) return;
-         
+         if (!$Pending) return FALSE;
+
          $AuthorUserID = GetValue('AuthorUserID', $Valentines);
          $TargetUserID = GetValue('TargetUserID', $Valentines);
 
          // Only the author can send replies
-         if ($AuthorID != $AuthorUserID) return;
+         if ($AuthorID != $AuthorUserID) return FALSE;
          $TargetUser = Gdn::UserModel()->GetID($TargetUserID, DATASET_TYPE_ARRAY);
-         
+
          // Do the vote!
          $MessageBody = GetValue('Body', $Message);
          $this->Vote($AuthorUser, $TargetUser, $MessageBody);
@@ -1306,12 +1327,121 @@ FORWARDVALENTINES;
             'Format'          => 'BBCode',
             'RecipientUserID' => $UserList,
          ), $ConversationMessageModel);
-         
+
          // Save conversation as 'done'
          $Valentines['Pending'] = FALSE;
          $Valentines['FinalConversationID'] = $ForwardedConversationID;
          $this->Minion->Monitor($Conversation, array('Valentines' => $Valentines));
+         
+         return FALSE;
       }
+   }
+   
+   /**
+    * Process a conversation command
+    * 
+    * Possibly. Otherwise if its not, just return.
+    * 
+    * @param ConversationMessageModel $Sender
+    * @param array $Conversation
+    * @param array $Message
+    * @param array $AuthorUser
+    */
+   protected function ConversationCommand($Sender, $Conversation, $Message, $AuthorUser) {
+      
+      $ConversationID = $Conversation['ConversationID'];
+      $AuthorID = $Message['InsertUserID'];
+      
+      $ConversationModel = new ConversationModel();
+      $Recipients = $ConversationModel->GetRecipients($ConversationID)->ResultArray();
+      $Recipients = Gdn_DataSet::Index($Recipients, 'UserID');
+      
+      if (!array_key_exists($this->MinionUser['UserID'], $Recipients)) return;
+      
+      $MessageBody = strtolower($Message['Body']);
+      
+      $Playing = $this->Minion->Monitoring($AuthorUser, 'Valentines');
+      $Response = NULL;
+      switch ($MessageBody) {
+         case 'statistics':
+            
+            $StatisticsResponse = <<<STATISTICS
+Your Valentines Day [b]{Playing.Year}[/b] Statistics:
+
+Quiver: [b]{Playing.Quiver}[/b]
+You've fired: [b]{Playing.Fired}[/b]
+You've been hit: [b]{Playing.Hit}[/b]
+
+Votes cast: [b]{Playing.Votes}[/b]
+Times Desired: [b]{Playing.Count}[/b]
+STATISTICS;
+            
+            $FormatOptions = array(
+               'Player'    => $AuthorUser,
+               'Playing'   => $Playing
+            );
+            
+            $WildArrowKey = FormatString(self::ARROW_RECORD, array(
+               'UserID'    => '%',
+               'Count'     => '%',
+               'ObjectID'  => '%'
+            ));
+            $Arrows = $this->GetUserMeta($AuthorID, $WildArrowKey, NULL);
+            
+            if (sizeof($Arrows)) {
+               $Targets = array();
+               foreach ($Arrows as $Arrow => $ArrowValue) {
+                  $Matched = preg_match('`([\d]+)\.([\d]+)\.([\d]+)`i', $Arrow, $ArrowInfo);
+                  if (!$Matched) continue;
+
+                  $UserID = $ArrowInfo[1];
+                  $Count = $ArrowInfo[2];
+                  $ObjectID = $ArrowInfo[3];
+
+                  TouchValue($UserID, $Targets, 0);
+                  $Targets[$UserID]++;
+               }
+               asort($Targets);
+               
+               if (sizeof($Targets)) {
+                  $StatisticsResponse .= "[b]Targets[/b]:\n";
+                  $MostShotUser = array_slice($Targets, -1, 1);
+                  foreach ($MostShotUser as $MostShotUserID => $ShotHits) {
+                     $MostShotUser = Gdn::UserModel()->GetID($MostShotUserID, DATASET_TYPE_ARRAY);
+                     $MostShotUser['Hits'] = $ShotHits;
+                  }
+                  
+                  $StatisticsResponse .= "Highest priority: [b]{Highest.Name}[/b] ({Highest.Hits})\n";
+                  $FormatOptions['Highest'] = $MostShotUser;
+               }
+               
+               if (sizeof($Targets) > 1) {
+                  $LeastShotUser = array_slice($Targets, 0, 1);
+                  foreach ($LeastShotUser as $LeastShotUserID => $ShotHits) {
+                     $LeastShotUser = Gdn::UserModel()->GetID($LeastShotUserID, DATASET_TYPE_ARRAY);
+                     $LeastShotUser['Hits'] = $ShotHits;
+                  }
+                  
+                  $StatisticsResponse .= "Lowest priority: {Lowest.Name}[/b] ({Lowest.Hits})\n";
+                  $FormatOptions['Lowest'] = $LeastShotUser;
+               }
+               
+            }
+            
+            $Response = FormatString(T($StatisticsResponse), $FormatOptions);
+            
+            break;
+      }
+      
+      if ($Response) {
+         $Sender->Save(array(
+            'ConversationID'     => $ConversationID,
+            'Body'               => $Response,
+            'Format'             => 'BBCode',
+            'InsertUserID'       => $this->MinionUser['UserID']
+         ), $Conversation);
+      }
+      
    }
    
    /**
