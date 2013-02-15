@@ -1366,8 +1366,9 @@ FORWARDVALENTINES;
          case 'statistics':
             
             $StatisticsResponse = <<<STATISTICS
-Your Valentines Day [b]{Playing.Year}[/b] Statistics:
-
+Valentines Day [b]{Playing.Year}[/b] Situation Report
+   
+[b]Arrows[/b]:
 Quiver: [b]{Playing.Quiver}[/b]
 You've fired: [b]{Playing.Fired}[/b]
 You've been hit: [b]{Playing.Hit}[/b]
@@ -1402,27 +1403,28 @@ STATISTICS;
                   $Targets[$UserID]++;
                }
                asort($Targets);
+               $TargetKeys = array_keys($Targets);
                
-               if (sizeof($Targets)) {
-                  $StatisticsResponse .= "[b]Targets[/b]:\n";
-                  $MostShotUser = array_slice($Targets, -1, 1);
-                  foreach ($MostShotUser as $MostShotUserID => $ShotHits) {
-                     $MostShotUser = Gdn::UserModel()->GetID($MostShotUserID, DATASET_TYPE_ARRAY);
-                     $MostShotUser['Hits'] = $ShotHits;
-                  }
+               if (sizeof($Targets))
+                  $StatisticsResponse .= "\n\n[b]Targets[/b]:\n";
+               
+               // Highest priority
+               if (sizeof($Targets)) {   
+                  $MostShotUserID = array_pop($TargetKeys);
+                  $MostShotUser = Gdn::UserModel()->GetID($MostShotUserID, DATASET_TYPE_ARRAY);
+                  $MostShotUser['Hits'] = $Targets[$MostShotUserID];
                   
                   $StatisticsResponse .= "Highest priority: [b]{Highest.Name}[/b] ({Highest.Hits})\n";
                   $FormatOptions['Highest'] = $MostShotUser;
                }
                
-               if (sizeof($Targets) > 1) {
-                  $LeastShotUser = array_slice($Targets, 0, 1);
-                  foreach ($LeastShotUser as $LeastShotUserID => $ShotHits) {
-                     $LeastShotUser = Gdn::UserModel()->GetID($LeastShotUserID, DATASET_TYPE_ARRAY);
-                     $LeastShotUser['Hits'] = $ShotHits;
-                  }
+               // Lowest priority
+               if (sizeof($Targets)) {
+                  $LeastShotUserID = array_shift($TargetKeys);
+                  $LeastShotUser = Gdn::UserModel()->GetID($LeastShotUserID, DATASET_TYPE_ARRAY);
+                  $LeastShotUser['Hits'] = $Targets[$LeastShotUserID];
                   
-                  $StatisticsResponse .= "Lowest priority: {Lowest.Name}[/b] ({Lowest.Hits})\n";
+                  $StatisticsResponse .= "Lowest priority: [b]{Lowest.Name}[/b] ({Lowest.Hits})\n";
                   $FormatOptions['Lowest'] = $LeastShotUser;
                }
                
