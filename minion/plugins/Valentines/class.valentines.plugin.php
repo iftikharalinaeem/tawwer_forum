@@ -1526,52 +1526,56 @@ STATISTICS;
     * @param Gdn_Statistics $Sender
     */
    public function Gdn_Statistics_AnalyticsTick_Handler($Sender) {
-      // Expiry check
-      $ExpiryCheckKey = 'plugins.valentines.expirycheck';
-      $NextCheckTime = Gdn::Cache()->Get($ExpiryCheckKey);
-      if (!$NextCheckTime || $NextCheckTime < microtime(true)) {
-         Gdn::Cache()->Store($ExpiryCheckKey, microtime(true)+60);
-         
-         // Run expiry check
-         $WildMetaKey = $this->MakeMetaKey(FormatString(self::EXPIRY_RECORD, array(
-            'UserID' => '%',
-            'KeyID'  => '%'
-         )));
-         $ExpiredUsers = Gdn::SQL()
-            ->Select('*')
-            ->From('UserMeta')
-            ->Like('Name', $WildMetaKey)
-            ->Where('Value <', time())
-            ->Get()->ResultArray();
+      if ($this->Enabled || $this->DayAfter) {
+         // Expiry check
+         $ExpiryCheckKey = 'plugins.valentines.expirycheck';
+         $NextCheckTime = Gdn::Cache()->Get($ExpiryCheckKey);
+         if (!$NextCheckTime || $NextCheckTime < microtime(true)) {
+            Gdn::Cache()->Store($ExpiryCheckKey, microtime(true)+60);
 
-         foreach ($ExpiredUsers as $ExpiredUserData) {
-            $ExpiredUserID = $ExpiredUserData['UserID'];
-            $ExpiredUser = Gdn::UserModel()->GetID($ExpiredUserID, DATASET_TYPE_ARRAY);
-            
-            $Matched = preg_match('`([\d]+)\.([\d]+)`i', $ExpiredUserData['Name'], $KeyMatches);
-            if ($Matched) {
-               $DesiredUserID = $KeyMatches[1];
-               $DesiredConversationID = $KeyMatches[2];
-            
-               $this->Expire($ExpiredUser, $DesiredUserID);
+            // Run expiry check
+            $WildMetaKey = $this->MakeMetaKey(FormatString(self::EXPIRY_RECORD, array(
+               'UserID' => '%',
+               'KeyID'  => '%'
+            )));
+            $ExpiredUsers = Gdn::SQL()
+               ->Select('*')
+               ->From('UserMeta')
+               ->Like('Name', $WildMetaKey)
+               ->Where('Value <', time())
+               ->Get()->ResultArray();
+
+            foreach ($ExpiredUsers as $ExpiredUserData) {
+               $ExpiredUserID = $ExpiredUserData['UserID'];
+               $ExpiredUser = Gdn::UserModel()->GetID($ExpiredUserID, DATASET_TYPE_ARRAY);
+
+               $Matched = preg_match('`([\d]+)\.([\d]+)`i', $ExpiredUserData['Name'], $KeyMatches);
+               if ($Matched) {
+                  $DesiredUserID = $KeyMatches[1];
+                  $DesiredConversationID = $KeyMatches[2];
+
+                  $this->Expire($ExpiredUser, $DesiredUserID);
+               }
             }
-         }
-         
-         // Run arrow check
-         $ArrowPool = $this->ArrowPool();
-         $Arrows = $this->Arrows();
-         $Ratio = $Arrows / $ArrowPool;
-         $Fired = $ArrowPool - $Arrows;
-         
-         if ($ArrowPool >= $this->RefillThreshold) {
-            
-            // Create a cache with enough arrows for a round number of users
-            $RefillCacheSize = ceil(($this->RefillCacheRatio * $Fired) / $this->StartArrows) * $this->StartArrows;
-            $this->DropCache($RefillCacheSize);
-            
-            // When X% or less arrows remain unfired
-            //if ($Ratio <= $this->RefillTriggerRatio) {
-            //}
+
+            if ($this->Enabled) {
+               // Run arrow check
+               $ArrowPool = $this->ArrowPool();
+               $Arrows = $this->Arrows();
+               $Ratio = $Arrows / $ArrowPool;
+               $Fired = $ArrowPool - $Arrows;
+
+               if ($ArrowPool >= $this->RefillThreshold) {
+
+                  // Create a cache with enough arrows for a round number of users
+                  $RefillCacheSize = ceil(($this->RefillCacheRatio * $Fired) / $this->StartArrows) * $this->StartArrows;
+                  $this->DropCache($RefillCacheSize);
+
+                  // When X% or less arrows remain unfired
+                  //if ($Ratio <= $this->RefillTriggerRatio) {
+                  //}
+               }
+            }
          }
       }
    }
