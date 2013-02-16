@@ -1474,6 +1474,7 @@ STATISTICS;
                $Shooters[$ShooterUserID]++;
             }
             asort($Shooters);
+            $Shooters = array_reverse($Shooters, TRUE);
             
             $StatisticsResponse .= "\n\n[b]Shooter breakdown[/b] (people who shot you):\n";
             $ShooterKeys = array_keys($Shooters);
