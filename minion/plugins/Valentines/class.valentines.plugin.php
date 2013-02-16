@@ -1394,6 +1394,7 @@ You've been hit: [b]{Playing.Hit}[/b]
 
 Votes cast: [b]{Playing.Votes}[/b]
 Times Desired: [b]{Playing.Count}[/b]
+
 STATISTICS;
          
          foreach ($Playing as $PlayingKey => &$PlayingVal)
@@ -1476,7 +1477,7 @@ STATISTICS;
             asort($Shooters);
             $Shooters = array_reverse($Shooters, TRUE);
             
-            $StatisticsResponse .= "\n\n[b]Shooter breakdown[/b] (people who shot you):\n";
+            $StatisticsResponse .= "\n[b]Shooter breakdown[/b] (people who shot you):\n";
             $ShooterKeys = array_keys($Shooters);
             $ShooterUsers = Gdn::UserModel()->GetIDs($ShooterKeys);
             foreach ($ShooterKeys as $ShooterUserID) {
