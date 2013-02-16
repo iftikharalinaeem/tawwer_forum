@@ -1478,8 +1478,10 @@ STATISTICS;
             
             $StatisticsResponse .= "\n\n[b]Shooter breakdown[/b] (people who shot you):\n";
             $ShooterKeys = array_keys($Shooters);
+            $ShooterUsers = Gdn::UserModel()->GetIDs($ShooterKeys);
             foreach ($ShooterKeys as $ShooterUserID) {
-               $ShooterUser = Gdn::UserModel()->GetID($ShooterUserID, DATASET_TYPE_ARRAY);
+               $ShooterUser = GetValue($ShooterUserID, $ShooterUsers, NULL);
+               if (is_null($ShooterUser)) continue;
                $StatisticsResponse .= "[url=\"/profile/{$ShooterUserID}/".Gdn_Format::Url($ShooterUser['Name'])."\"]{$ShooterUser['Name']}[/url] ({$Shooters[$ShooterUserID]})\n";
             }
          }
