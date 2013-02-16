@@ -224,14 +224,15 @@ class MinionPlugin extends Gdn_Plugin {
    public function Persona($PersonaName = NULL, $Persona = NULL) {
       
       // Get current person
-      if (is_null($PersonaName))
+      if (is_null($PersonaName)) {
          return GetValue($this->Persona, $this->Personas, NULL);
+      }
       
       // Apply queued persona
       if ($PersonaName === TRUE) {
          // Don't re-apply
          $CurrentPersona = GetValueR('Attributes.Persona', $this->Minion, NULL);
-         if (!is_null($CurrentPersona) && $this->Persona === $CurrentPersona)
+         if (!is_null($CurrentPersona) && !is_bool($this->Persona) && $this->Persona === $CurrentPersona)
             return;
          
          // Get persona
@@ -248,7 +249,6 @@ class MinionPlugin extends Gdn_Plugin {
       
       // Apply an existing persona
       if (!is_null($PersonaName) && is_null($Persona)) {
-         
          // Get persona
          $ApplyPersona = GetValue($PersonaName, $this->Personas, NULL);
          if (is_null($ApplyPersona))

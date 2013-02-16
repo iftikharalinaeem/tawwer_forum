@@ -15,7 +15,8 @@
  * 
  * Once a given user is hit by 5 arrows, they become "Desired", and part 2 of 
  * the game begins. The robot will randomly select one of the "shooters" and 
- * pair them with their target. This forms a "Pair".
+ * pair them with their target. This forms a "Pair". Each member of a pair is
+ * rewarded with +3 arrows.
  * 
  * The robot will message each member of the Pair and instruct them to send a
  * love note to the other, via a reply to the robot's initial PM. Once the 
@@ -23,7 +24,7 @@
  * category for voting. This category will be automatically created by the bot
  * at midnight on Feb 14.
  * 
- * After 60 votes, the PM will have been judged. If it is deemed affectionate,
+ * After 30 votes, the PM will have been judged. If it is deemed affectionate,
  * a positive badge will be awarded to the author. If not, a negative badge
  * will be awarded. If no PM is sent within 2 hours, the user will be infracted
  * for 3 points. A countdown will be visible on-screen.
@@ -1230,17 +1231,17 @@ CACHEVALENTINES;
     */
    public function ConversationMessageModel_AfterAdd_Handler($Sender) {
       
-      // Max 1 day to send PMs
-      if (!$this->Enabled && !$this->DayAfter) return;
-      
       $Conversation = (array)$Sender->EventArguments['Conversation'];
       $Message = (array)$Sender->EventArguments['Message'];
       if ($Message['InsertUserID'] == $this->MinionUser['UserID']) return;
       
       $AuthorUser = Gdn::UserModel()->GetID($Message['InsertUserID'], DATASET_TYPE_ARRAY);
       
-      $Result = $this->ConversationValentine($Sender, $Conversation, $Message, $AuthorUser);
-      if ($Result === FALSE) return;
+      // Max 1 day to send PMs
+      if ($this->Enabled || $this->DayAfter) {
+         $Result = $this->ConversationValentine($Sender, $Conversation, $Message, $AuthorUser);
+         if ($Result === FALSE) return;
+      }
       
       $Result = $this->ConversationCommand($Sender, $Conversation, $Message, $AuthorUser);
       if ($Result === FALSE) return;
@@ -1249,17 +1250,17 @@ CACHEVALENTINES;
    
    public function ConversationModel_AfterAdd_Handler($Sender) {
       
-      // Max 1 day to send PMs
-      if (!$this->Enabled && !$this->DayAfter) return;
-      
       $Conversation = (array)$Sender->EventArguments['Conversation'];
       $Message = (array)$Sender->EventArguments['Message'];
       if ($Message['InsertUserID'] == $this->MinionUser['UserID']) return;
       
       $AuthorUser = Gdn::UserModel()->GetID($Message['InsertUserID'], DATASET_TYPE_ARRAY);
       
-      $Result = $this->ConversationValentine($Sender, $Conversation, $Message, $AuthorUser);
-      if ($Result === FALSE) return;
+      // Max 1 day to send PMs
+      if ($this->Enabled || $this->DayAfter) {
+         $Result = $this->ConversationValentine($Sender, $Conversation, $Message, $AuthorUser);
+         if ($Result === FALSE) return;
+      }
       
       $Result = $this->ConversationCommand($Sender, $Conversation, $Message, $AuthorUser);
       if ($Result === FALSE) return;
@@ -1381,12 +1382,11 @@ FORWARDVALENTINES;
       
       $Playing = $this->Minion->Monitoring($AuthorUser, 'Valentines');
       $Response = NULL;
-      switch ($MessageBody) {
-         case 'statistics':
+      if (preg_match('`(statistics)`i', $MessageBody)) {
             
-            $StatisticsResponse = <<<STATISTICS
+         $StatisticsResponse = <<<STATISTICS
 [b]{Player.Name}[/b] Valentines Day [b]{Playing.Year}[/b] Situation Report
-   
+
 [b]Arrows[/b]:
 Quiver: [b]{Playing.Quiver}[/b]
 You've fired: [b]{Playing.Fired}[/b]
@@ -1395,63 +1395,96 @@ You've been hit: [b]{Playing.Hit}[/b]
 Votes cast: [b]{Playing.Votes}[/b]
 Times Desired: [b]{Playing.Count}[/b]
 STATISTICS;
+         
+         foreach ($Playing as $PlayingKey => &$PlayingVal)
+            if ($PlayingVal === 0 || $PlayingVal === '0') $PlayingVal = 'none';
+
+         $FormatOptions = array(
+            'Player'    => $AuthorUser,
+            'Playing'   => $Playing
+         );
+
+         $WildShotArrowKey = FormatString(self::ARROW_RECORD, array(
+            'UserID'    => '%',
+            'Count'     => '%',
+            'ObjectID'  => '%'
+         ));
+         $ShotArrows = $this->GetUserMeta($AuthorID, $WildShotArrowKey, NULL);
+
+         if (sizeof($ShotArrows)) {
+            $Targets = array();
+            foreach ($ShotArrows as $Arrow => $ArrowValue) {
+               $Matched = preg_match('`([\d]+)\.([\d]+)\.([\d]+)`i', $Arrow, $ArrowInfo);
+               if (!$Matched) continue;
+
+               $UserID = $ArrowInfo[1];
+               $Count = $ArrowInfo[2];
+               $ObjectID = $ArrowInfo[3];
+
+               TouchValue($UserID, $Targets, 0);
+               $Targets[$UserID]++;
+            }
+            asort($Targets);
+            $TargetKeys = array_keys($Targets);
+
+            if (sizeof($Targets))
+               $StatisticsResponse .= "\n\n[b]Targets[/b]:\n";
+
+            // Highest priority
+            if (sizeof($Targets)) {   
+               $MostShotUserID = array_pop($TargetKeys);
+               $MostShotUser = Gdn::UserModel()->GetID($MostShotUserID, DATASET_TYPE_ARRAY);
+               $MostShotUser['Hits'] = $Targets[$MostShotUserID];
+
+               $StatisticsResponse .= "Highest priority: [b]{Highest.Name}[/b] ({Highest.Hits})\n";
+               $FormatOptions['Highest'] = $MostShotUser;
+            }
+
+            // Lowest priority
+            if (sizeof($Targets)) {
+               $LeastShotUserID = array_shift($TargetKeys);
+               $LeastShotUser = Gdn::UserModel()->GetID($LeastShotUserID, DATASET_TYPE_ARRAY);
+               $LeastShotUser['Hits'] = $Targets[$LeastShotUserID];
+
+               $StatisticsResponse .= "Lowest priority: [b]{Lowest.Name}[/b] ({Lowest.Hits})\n";
+               $FormatOptions['Lowest'] = $LeastShotUser;
+            }
+            unset($Targets);
+            unset($TargetKeys);
+
+         }
+         
+         // Extended list
+         if (preg_match('`(extended)`i', $MessageBody)) {
             
-            $FormatOptions = array(
-               'Player'    => $AuthorUser,
-               'Playing'   => $Playing
-            );
-            
-            $WildArrowKey = FormatString(self::ARROW_RECORD, array(
-               'UserID'    => '%',
+            $WildShotByArrowKey = FormatString(self::ARROW_RECORD, array(
+               'UserID'    => $AuthorID,
                'Count'     => '%',
                'ObjectID'  => '%'
             ));
-            $Arrows = $this->GetUserMeta($AuthorID, $WildArrowKey, NULL);
+            $ShotByArrows = Gdn::SQL()->Select('*')
+               ->From('UserMeta')
+               ->Like('Name', $WildShotByArrowKey)
+               ->Get()->ResultArray();
             
-            if (sizeof($Arrows)) {
-               $Targets = array();
-               foreach ($Arrows as $Arrow => $ArrowValue) {
-                  $Matched = preg_match('`([\d]+)\.([\d]+)\.([\d]+)`i', $Arrow, $ArrowInfo);
-                  if (!$Matched) continue;
-
-                  $UserID = $ArrowInfo[1];
-                  $Count = $ArrowInfo[2];
-                  $ObjectID = $ArrowInfo[3];
-
-                  TouchValue($UserID, $Targets, 0);
-                  $Targets[$UserID]++;
-               }
-               asort($Targets);
-               $TargetKeys = array_keys($Targets);
-               
-               if (sizeof($Targets))
-                  $StatisticsResponse .= "\n\n[b]Targets[/b]:\n";
-               
-               // Highest priority
-               if (sizeof($Targets)) {   
-                  $MostShotUserID = array_pop($TargetKeys);
-                  $MostShotUser = Gdn::UserModel()->GetID($MostShotUserID, DATASET_TYPE_ARRAY);
-                  $MostShotUser['Hits'] = $Targets[$MostShotUserID];
-                  
-                  $StatisticsResponse .= "Highest priority: [b]{Highest.Name}[/b] ({Highest.Hits})\n";
-                  $FormatOptions['Highest'] = $MostShotUser;
-               }
-               
-               // Lowest priority
-               if (sizeof($Targets)) {
-                  $LeastShotUserID = array_shift($TargetKeys);
-                  $LeastShotUser = Gdn::UserModel()->GetID($LeastShotUserID, DATASET_TYPE_ARRAY);
-                  $LeastShotUser['Hits'] = $Targets[$LeastShotUserID];
-                  
-                  $StatisticsResponse .= "Lowest priority: [b]{Lowest.Name}[/b] ({Lowest.Hits})\n";
-                  $FormatOptions['Lowest'] = $LeastShotUser;
-               }
-               
+            $Shooters = array();
+            foreach ($ShotByArrows as $Arrow) {
+               $ShooterUserID = $Arrow['UserID'];
+               TouchValue($ShooterUserID, $Shooters, 0);
+               $Shooters[$ShooterUserID]++;
             }
+            asort($Shooters);
             
-            $Response = FormatString(T($StatisticsResponse), $FormatOptions);
+            $StatisticsResponse .= "\n\n[b]Shooter breakdown[/b] (people who shot you):\n";
+            $ShooterKeys = array_keys($Shooters);
+            foreach ($ShooterKeys as $ShooterUserID) {
+               $ShooterUser = Gdn::UserModel()->GetID($ShooterUserID, DATASET_TYPE_ARRAY);
+               $StatisticsResponse .= "[url=\"/profile/{$ShooterUserID}/".Gdn_Format::Url($ShooterUser['Name'])."\"]{$ShooterUser['Name']}[/url] ({$Shooters[$ShooterUserID]})\n";
+            }
+         }
+
+         $Response = FormatString(T($StatisticsResponse), $FormatOptions);
             
-            break;
       }
       
       if ($Response) {
