@@ -43,7 +43,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.11',
+   'Version' => '1.12',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
