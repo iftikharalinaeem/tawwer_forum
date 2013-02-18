@@ -636,7 +636,7 @@ class MinionPlugin extends Gdn_Plugin {
                if (empty($State['Toggle']) && in_array($State['CompareToken'], array('open', 'enable', 'unlock', 'allow', 'allowed', 'on')))
                   $this->Consume($State, 'Toggle', 'on');
 
-               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off')))
+               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off', 'revoke')))
                   $this->Consume($State, 'Toggle', 'off');
 
                /*
@@ -804,7 +804,11 @@ class MinionPlugin extends Gdn_Plugin {
       
       // Check if this person has had their access revoked.
       $Access = $this->GetUserMeta(Gdn::Session()->UserID, 'Access', NULL, TRUE);
-      if ($Access === FALSE) return FALSE;
+      if ($Access === FALSE) {
+         $this->Revolt($State['Sources']['User'], $Discussion, T("Access has been revoked."));
+         $this->Log(FormatString(T("Refusing to obey @\"{User.Name}\""), array('User' => $User)));
+         return FALSE;
+      }
       
       // Perform all actions
       $Performed = array();
@@ -1254,13 +1258,14 @@ class MinionPlugin extends Gdn_Plugin {
                break;
             $User = $State['Targets']['User'];
             
+            $Force = GetValue('Force', $State, 'normal');
             if ($State['Toggle'] == 'on') {
                
                $AccessLevel = NULL;
-               if ($State['Force'] == 'unrestricted') $AccessLevel = TRUE;
-               else if ($State['Force'] == 'normal') $AccessLevel = NULL;
+               if ($Force == 'unrestricted') $AccessLevel = TRUE;
+               else if ($Force == 'normal') $AccessLevel = NULL;
                else {
-                  $State['Force'] = 'normal';
+                  $Force = 'normal';
                   $AccessLevel = NULL;
                }
                
@@ -1275,7 +1280,8 @@ class MinionPlugin extends Gdn_Plugin {
             
             $Acknowledged = FormatString($Acknowledge, array(
                'User'         => $User,
-               'Discussion'   => $State['Targets']['Discussion']
+               'Discussion'   => $State['Targets']['Discussion'],
+               'Force'
             ));
                 
             $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
