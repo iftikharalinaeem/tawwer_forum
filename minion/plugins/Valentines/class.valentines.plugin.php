@@ -644,6 +644,64 @@ class ValentinesPlugin extends Gdn_Plugin {
       $Sender->Render();
    }
    
+   /**
+    * Finalize and calculate statistics
+    * 
+    * @param PluginController $Sender
+    */
+   public function Controller_Finalize($Sender) {
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      // Arrows
+      $ArrowsAwarded = $this->ArrowPool();
+      $ArrowsAvailable = $this->Arrows();
+      $ArrowsFired = $ArrowsAwarded - $ArrowsAvailable;
+      $Sender->SetData('Arrows', array(
+         'Total'     => $ArrowsAwarded,
+         'Fired'     => $ArrowsFired,
+         'Available' => $ArrowsAvailable
+      ));
+      
+      // User information
+      $Statistics = array(
+         'Users'              => 0,
+         'Players'            => 0,
+         ''
+      );
+      
+      $Desired = 0;
+      $Votes = 0;
+      $CalcDesired = 0;
+      $Hit = array();
+      
+      // Loop all users
+      $ChunkSize = 500;
+      $Page = 0;
+      do {
+         $Limit = $ChunkSize; 
+         $Offset = $Page * $ChunkSize;
+         $Users = Gdn::UserModel()->GetWhere(FALSE, 'UserID', 'asc', $Limit, $Offset);
+         $NumResults = $Users->NumRows();
+         
+         while ($User = $Users->NextRow(DATASET_TYPE_ARRAY)) {
+            $Playing = $this->Minion->Monitoring($User, 'Valentines', FALSE);
+            if (!$Playing || $Playing['Year'] != date('Y')) {
+               $NonParticipants++;
+               continue;
+            }
+            
+            $Participants++;
+            $Hit = $Playing['Hit'];
+            $Desired = $Playing['Hit'];
+         }
+         
+         $Page++;
+      } while ($NumResults);
+      
+      $Sender->Render();
+   }
+   
    /*
     * ACTIONS
     */
@@ -1393,9 +1451,10 @@ You've fired: [b]{Playing.Fired}[/b]
 You've been hit: [b]{Playing.Hit}[/b]
 
 Votes cast: [b]{Playing.Votes}[/b]
-Times Desired: [b]{Playing.Count}[/b]
+Times Desired: [b]{Playing.CalcCount}[/b]
 
 STATISTICS;
+         $Playing['CalcCount'] = floor($Playing['Hit'] / $this->RequiredArrows);
          
          foreach ($Playing as $PlayingKey => &$PlayingVal)
             if ($PlayingVal === 0 || $PlayingVal === '0') $PlayingVal = 'none';
