@@ -803,7 +803,7 @@ class MinionPlugin extends Gdn_Plugin {
       unset($State);
       
       // Check if this person has had their access revoked.
-      $Access = $this->GetUserMeta(Gdn::Session()->UserID, 'Access', NULL);
+      $Access = $this->GetUserMeta(Gdn::Session()->UserID, 'Access', NULL, TRUE);
       if ($Access === FALSE) return FALSE;
       
       // Perform all actions
