@@ -803,11 +803,13 @@ class MinionPlugin extends Gdn_Plugin {
       unset($State);
       
       // Check if this person has had their access revoked.
-      $Access = $this->GetUserMeta(Gdn::Session()->UserID, 'Access', NULL, TRUE);
-      if ($Access === FALSE) {
-         $this->Revolt($State['Sources']['User'], $Discussion, T("Access has been revoked."));
-         $this->Log(FormatString(T("Refusing to obey @\"{User.Name}\""), array('User' => $User)));
-         return FALSE;
+      if (sizeof($Actions)) {
+         $Access = $this->GetUserMeta(Gdn::Session()->UserID, 'Access', NULL, TRUE);
+         if ($Access === FALSE) {
+            $this->Revolt($State['Sources']['User'], $Discussion, T("Access has been revoked."));
+            $this->Log(FormatString(T("Refusing to obey @\"{User.Name}\""), array('User' => $State['Sources']['User'])));
+            return FALSE;
+         }
       }
       
       // Perform all actions
