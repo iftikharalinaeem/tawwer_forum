@@ -655,6 +655,17 @@ class MinionPlugin extends Gdn_Plugin {
                if (empty($State['Force']) && in_array($State['CompareToken'], array('kill', 'lethal', 'nuke', 'nuclear', 'destroy')))
                   $this->Consume($State, 'Force', 'lethal');
                
+               if ($State['Method'] == 'access') {
+                  if (in_array($State['CompareToken'], array('unrestricted')))
+                     $this->Consume($State, 'Force', 'unrestricted');
+                  
+                  if (empty($State['Force']) && in_array($State['CompareToken'], array('normal')))
+                     $this->Consume($State, 'Force', 'normal');
+                  
+                  if (empty($State['Force']) && in_array($State['CompareToken'], array('moderator')))
+                     $this->Consume($State, 'Force', 'moderator');
+               }
+               
                // Defcon forces
                if ($State['Method'] == 'force' && empty($State['Force'])) {
                   if (in_array($State['CompareToken'], array('one', '1')))
@@ -700,6 +711,9 @@ class MinionPlugin extends Gdn_Plugin {
                
                if (empty($State['Method']) && in_array($State['CompareToken'], array('status')))
                   $this->Consume($State, 'Method', 'status');
+               
+               if (empty($State['Method']) && in_array($State['CompareToken'], array('access')))
+                  $this->Consume($State, 'Method', 'access');
                
                if (empty($State['Method']) && in_array($State['CompareToken'], array('shoot', 'weapon', 'weapons', 'posture', 'free', 'defcon', 'phasers', 'engage')))
                   $this->Consume($State, 'Method', 'force');
@@ -788,12 +802,20 @@ class MinionPlugin extends Gdn_Plugin {
       
       unset($State);
       
+      // Check if this person has had their access revoked.
+      $Access = $this->GetUserMeta(Gdn::Session()->UserID, 'Access', NULL);
+      if ($Access === FALSE) return FALSE;
+      
       // Perform all actions
       $Performed = array();
       foreach ($Actions as $Action) {
          $ActionName = array_shift($Action);
          $Permission = array_shift($Action);
-         if (!empty($Permission) && !Gdn::Session()->CheckPermission($Permission)) continue;
+         
+         // Check permission if we don't have global blanket permission
+         if ($Access !== TRUE) {
+            if (!empty($Permission) && !Gdn::Session()->CheckPermission($Permission)) continue;
+         }
          if (in_array($Action, $Performed)) continue;
          
          $State = array_shift($Action);
@@ -1004,6 +1026,12 @@ class MinionPlugin extends Gdn_Plugin {
          case 'status':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
             $Actions[] = array("status", 'Vanilla.Comments.Edit', $State);
+            break;
+         
+         // Allow giving/removing access
+         case 'access':
+            $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
+            $Actions[] = array("access", 'Garden.Settings.Manage', $State);
             break;
 
          // Adjust automated force level
@@ -1218,6 +1246,40 @@ class MinionPlugin extends Gdn_Plugin {
                
             $Message = FormatString($Message, $Options);
             $this->Message($State['Sources']['User'], $State['Targets']['Discussion'], $Message);
+            break;
+            
+         case 'access':
+            
+            if (!array_key_exists('User', $State['Targets']))
+               break;
+            $User = $State['Targets']['User'];
+            
+            if ($State['Toggle'] == 'on') {
+               
+               $AccessLevel = NULL;
+               if ($State['Force'] == 'unrestricted') $AccessLevel = TRUE;
+               else if ($State['Force'] == 'normal') $AccessLevel = NULL;
+               else {
+                  $State['Force'] = 'normal';
+                  $AccessLevel = NULL;
+               }
+               
+               $this->SetUserMeta($User['UserID'], 'Access', $AccessLevel);
+               $Acknowledge = T(" @\"{User.Name}\" has been granted {Force} level access to command structures.");
+            } else if ($State['Toggle'] == 'off') {
+               $this->SetUserMeta($User['UserID'], 'Access', FALSE);
+               $Acknowledge = T(" @\"{User.Name}\" is forbidden from accessing command structures.");
+            } else {
+               break;
+            }
+            
+            $Acknowledged = FormatString($Acknowledge, array(
+               'User'         => $User,
+               'Discussion'   => $State['Targets']['Discussion']
+            ));
+                
+            $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
+            $this->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
             break;
             
          case 'force':
