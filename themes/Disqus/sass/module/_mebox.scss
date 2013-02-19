@@ -1,0 +1,50 @@
+.MeBox {
+    float: right;
+    height: 35px;
+    padding: 4px 0 4px 20px;
+    margin: 0;
+
+    &.MeBox-SignIn {
+        display: none;
+    }
+
+    a {
+        color: #2E9FFF;
+        font-weight: normal;
+
+        &:hover {
+            color: #1977CA;
+        }
+
+    }
+
+    hr {
+        border: {
+            bottom: 1px solid #E2E2E2;
+        }
+    }
+
+    .Bullet {
+        display: none;
+    }
+
+    .Username {
+        font-weight: bold;
+    }
+
+    .MenuItems {
+
+        &:before,
+        &:after {
+            display: block;
+        }
+
+        li {
+            border: {
+                bottom: none;
+            }
+        }
+
+    }
+
+}
