@@ -33,6 +33,7 @@
  *  1.10.2  Fix mentions
  *  1.11    Personas
  *  1.12    Conversations support
+ *  1.13    Convert moderator permission check to Garden.Moderation.Manage
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -308,6 +309,7 @@ class MinionPlugin extends Gdn_Plugin {
       $this->EventArguments['Discussion'] = $Discussion;
       $this->EventArguments['User'] = $User;
       $this->EventArguments['Rules'] = &$Rules;
+      $this->EventArguments['Type'] = 'bar';
       $this->FireEvent('Sanctions');
       if (!sizeof($Rules)) return;
       
@@ -1001,37 +1003,37 @@ class MinionPlugin extends Gdn_Plugin {
          // Report in
          case 'report in':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Actions[] = array('report in', 'Vanilla.Comments.Edit', $State);
+            $Actions[] = array('report in', 'Garden.Moderation.Manage', $State);
             break;
          
          // Threads
          case 'thread':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Actions[] = array('thread', 'Vanilla.Comments.Edit', $State);
+            $Actions[] = array('thread', 'Garden.Moderation.Manage', $State);
             break;
          
          // Kick
          case 'kick':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Actions[] = array('kick', 'Vanilla.Comments.Edit', $State);
+            $Actions[] = array('kick', 'Garden.Moderation.Manage', $State);
             break;
          
          // Forgive
          case 'forgive':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Actions[] = array('forgive', 'Vanilla.Comments.Edit', $State);
+            $Actions[] = array('forgive', 'Garden.Moderation.Manage', $State);
             break;
          
          // Ban/unban the specified phrase from this thread
          case 'phrase':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Actions[] = array("phrase", 'Vanilla.Comments.Edit', $State);
+            $Actions[] = array("phrase", 'Garden.Moderation.Manage', $State);
             break;
          
          // Find out what special rules are in place
          case 'status':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Actions[] = array("status", 'Vanilla.Comments.Edit', $State);
+            $Actions[] = array("status", 'Garden.Moderation.Manage', $State);
             break;
          
          // Allow giving/removing access
@@ -1045,13 +1047,13 @@ class MinionPlugin extends Gdn_Plugin {
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
             $Forces = array('low', 'medium', 'high', 'lethal');
             if (in_array($State['Force'], $Forces))
-               $Actions[] = array("force", 'Vanilla.Comments.Edit', $State);
+               $Actions[] = array("force", 'Garden.Moderation.Manage', $State);
             break;
          
          // Stop all thread actions
          case 'stop all':
             $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Actions[] = array("stop all", 'Vanilla.Comments.Edit', $State);
+            $Actions[] = array("stop all", 'Garden.Moderation.Manage', $State);
             break;
       }
       
@@ -1226,6 +1228,7 @@ class MinionPlugin extends Gdn_Plugin {
             $this->EventArguments['Discussion'] = $State['Targets']['Discussion'];
             $this->EventArguments['User'] = $State['Sources']['User'];
             $this->EventArguments['Rules'] = &$Rules;
+            $this->EventArguments['Type'] = 'rules';
             $this->FireEvent('Sanctions');
             
             // Nothing happening?
