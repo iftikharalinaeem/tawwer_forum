@@ -7,6 +7,7 @@ $ThemeInfo["Disqus"] = array(
     "Version" => "1.0.0",
     "Author" => "Kasper K. Isager",
     "AuthorEmail" => "kasperisager@gmail.com",
-    "AuthorUrl" => "https://github.com/kasperisager"
+    "AuthorUrl" => "https://github.com/kasperisager",
+    "Site" => "none"
 
 );
