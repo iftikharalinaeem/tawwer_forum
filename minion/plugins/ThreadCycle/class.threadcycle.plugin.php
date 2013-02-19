@@ -292,4 +292,33 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       }
    }
    
+   /**
+    * Add to rules
+    * 
+    * @param MinionPlugin $Sender
+    */
+   public function MinionPlugin_Sanctions_Handler($Sender) {
+      
+      // Don't care about the rule bar
+      
+      $Type = GetValue('Type', $Sender->EventArguments, 'rules');
+      if ($Type == 'bar') return;
+      
+      // Show a warning if there are rules in effect
+      
+      $ThreadCycle = $Sender->Monitoring($Sender->EventArguments['Discussion'], 'ThreadCycle', NULL);
+
+      // Nothing happening?
+      if (!$ThreadCycle)
+         return;
+
+      $Rules = $Sender->EventArguments['Rules'];
+      
+      // Stopped reactions
+      if ($ThreadCycle) {
+         $Page = GetValue('Page', $ThreadCycle);
+         $Rules[] = Wrap("<b>Thread Recycle</b>: page {$Path}", 'span', array('class' => 'MinionRule'));
+      }
+   }
+   
 }
