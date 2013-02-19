@@ -1,0 +1,466 @@
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {
+  display: block;
+}
+
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 100%;
+}
+
+body {
+  color: #444444;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  -webkit-transition: color linear;
+  -webkit-transition-delay: 0.1s;
+  -moz-transition: color linear 0.1s;
+  -o-transition: color linear 0.1s;
+  transition: color linear 0.1s;
+  color: #2E9FFF;
+}
+a:hover {
+  color: #1977CA;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 300;
+}
+
+.Row {
+  *zoom: 1;
+  min-width: 960px;
+  width: auto !important;
+  width: 960px;
+  max-width: 1180px;
+  padding: 0 20px;
+}
+.Row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+#Panel {
+  float: left;
+  width: 220px;
+  padding-right: 20px;
+}
+
+#Content {
+  margin-left: 220px;
+}
+
+#Head {
+  padding: 20px 0;
+  background: #2E9FFF;
+}
+#Head .Logo {
+  float: left;
+  margin: 0;
+  color: #FFFFFF;
+  font-size: 26px;
+  font-weight: normal;
+  line-height: 36px;
+}
+#Head .SiteSearch {
+  float: right;
+}
+#Head .SiteSearch .InputBox {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  height: 36px;
+  width: 280px;
+  padding: 8px;
+  background: #FFFFFF;
+  border: 1px solid #058cff;
+  font-size: 13px;
+}
+#Head .SiteSearch .InputBox.placeholder {
+  color: #aaaaaa;
+}
+#Head .SiteSearch .InputBox:-moz-placeholder {
+  color: #aaaaaa;
+}
+#Head .SiteSearch .InputBox::-webkit-input-placeholder {
+  color: #aaaaaa;
+}
+#Head .SiteSearch .Button {
+  top: 0;
+  right: 0;
+  margin: 10px;
+}
+
+#Body,
+#Body .Nav {
+  margin: 20px 0;
+}
+#Body .BreadcrumbsWrapper {
+  *zoom: 1;
+  margin-right: 280px;
+  font-size: 16px;
+  line-height: 35px;
+}
+#Body .BreadcrumbsWrapper:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+#Body .BreadcrumbsWrapper,
+#Body .BreadcrumbsWrapper a,
+#Body .BreadcrumbsWrapper span {
+  display: block;
+}
+#Body .BreadcrumbsWrapper a,
+#Body .BreadcrumbsWrapper span {
+  display: block;
+  float: left;
+}
+#Body .BreadcrumbsWrapper .Crumb {
+  padding: 0 5px;
+}
+#Body .BreadcrumbsWrapper .Crumb + span:last-of-type a,
+#Body .BreadcrumbsWrapper .Crumb + span:last-of-type span {
+  color: #777777;
+}
+#Body #Content .SearchForm {
+  display: none;
+}
+
+#Foot {
+  padding: 20px 0;
+  color: #444444;
+  background: aliceblue;
+  text-align: left;
+}
+#Foot a {
+  color: #444444;
+}
+#Foot a:hover {
+  color: #444444;
+  text-decoration: underline;
+}
+
+.Button,
+.NavButton {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f6f6f6), color-stop(100%, #e3e3e3));
+  background-image: -webkit-linear-gradient(#f6f6f6, #e3e3e3);
+  background-image: -moz-linear-gradient(#f6f6f6, #e3e3e3);
+  background-image: -o-linear-gradient(#f6f6f6, #e3e3e3);
+  background-image: linear-gradient(#f6f6f6, #e3e3e3);
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 6px rgba(255, 255, 255, 0.55);
+  -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 6px rgba(255, 255, 255, 0.55);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 6px rgba(255, 255, 255, 0.55);
+  padding: 9px 16px;
+  background-color: #E3E3E3;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.Button:hover,
+.NavButton:hover {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f6f6f6), color-stop(100%, #f1f1f1));
+  background-image: -webkit-linear-gradient(#f6f6f6, #f1f1f1);
+  background-image: -moz-linear-gradient(#f6f6f6, #f1f1f1);
+  background-image: -o-linear-gradient(#f6f6f6, #f1f1f1);
+  background-image: linear-gradient(#f6f6f6, #f1f1f1);
+  background-color: #F1F1F1;
+}
+.Button.Active, .Button:focus, .Button:active,
+.NavButton.Active,
+.NavButton:focus,
+.NavButton:active {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #e2e2e2), color-stop(100%, #f6f6f6));
+  background-image: -webkit-linear-gradient(#e2e2e2, #f6f6f6);
+  background-image: -moz-linear-gradient(#e2e2e2, #f6f6f6);
+  background-image: -o-linear-gradient(#e2e2e2, #f6f6f6);
+  background-image: linear-gradient(#e2e2e2, #f6f6f6);
+  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+  background-color: #F6F6F6;
+}
+.Button, .Button:hover,
+.NavButton,
+.NavButton:hover {
+  border: 1px solid rgba(75, 83, 94, 0.45);
+}
+.Button, .Button:hover, .Button:active,
+.NavButton,
+.NavButton:hover,
+.NavButton:active {
+  color: #555555;
+}
+.Button.InProgress, .Button.Loading,
+.Button [disabled],
+.NavButton.InProgress,
+.NavButton.Loading,
+.NavButton [disabled] {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  transition: none;
+}
+
+.ButtonGroup .Button {
+  display: block;
+  height: 33px;
+  width: auto !important;
+  margin-right: 25px;
+}
+.ButtonGroup .Button.Handle {
+  float: right;
+  width: 25px !important;
+  margin-top: -33px;
+  margin-right: 0;
+}
+.ButtonGroup.Open .Button.Handle {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #e2e2e2), color-stop(100%, #f6f6f6));
+  background-image: -webkit-linear-gradient(#e2e2e2, #f6f6f6);
+  background-image: -moz-linear-gradient(#e2e2e2, #f6f6f6);
+  background-image: -o-linear-gradient(#e2e2e2, #f6f6f6);
+  background-image: linear-gradient(#e2e2e2, #f6f6f6);
+  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+  background-color: #F6F6F6;
+}
+
+.FormWrapper {
+  background: none;
+}
+
+.TextBoxWrapper {
+  padding-right: 0;
+}
+
+input,
+input.DateBox,
+input.InputBox,
+input.SmallInput,
+textarea {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+  -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+  -webkit-transition: all 0.15s ease-in-out;
+  -moz-transition: all 0.15s ease-in-out;
+  -o-transition: all 0.15s ease-in-out;
+  transition: all 0.15s ease-in-out;
+  position: relative;
+  padding: 5px;
+  border: 1px solid #c0c8d2;
+  border: 1px solid rgba(75, 83, 94, 0.45);
+  color: #444;
+  color: rgba(0, 0, 0, 0.8);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+input, input:focus,
+input.DateBox,
+input.DateBox:focus,
+input.InputBox,
+input.InputBox:focus,
+input.SmallInput,
+input.SmallInput:focus,
+textarea,
+textarea:focus {
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, rgba(245, 245, 245, 0)), color-stop(100%, rgba(255, 255, 255, 0.45)));
+  background-image: -webkit-linear-gradient(rgba(245, 245, 245, 0), rgba(255, 255, 255, 0.45));
+  background-image: -moz-linear-gradient(rgba(245, 245, 245, 0), rgba(255, 255, 255, 0.45));
+  background-image: -o-linear-gradient(rgba(245, 245, 245, 0), rgba(255, 255, 255, 0.45));
+  background-image: linear-gradient(rgba(245, 245, 245, 0), rgba(255, 255, 255, 0.45));
+  background-color: rgba(255, 255, 255, 0.45);
+}
+
+textarea {
+  resize: none;
+}
+.DiscussionForm textarea {
+  min-height: 50px;
+  height: 50px;
+}
+.DiscussionForm textarea:focus {
+  min-height: 69px;
+  height: 69px;
+}
+
+.SiteMenu {
+  float: right;
+  border-bottom: 2px solid rgba(0, 49, 79, 0.08);
+}
+.SiteMenu li {
+  float: left;
+}
+.SiteMenu li:last-child a:after {
+  display: none;
+}
+.SiteMenu a {
+  min-width: 110px;
+  width: auto !important;
+  width: 110px;
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  color: #777777;
+  font-weight: bold;
+  font-size: 13px;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.SiteMenu a:hover {
+  color: #5E5E5E;
+  text-decoration: none;
+}
+.SiteMenu a:after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 11px;
+  display: block;
+  width: 1px;
+  height: 11px;
+  border-right: 1px solid #b5bec9;
+  border-right: 1px solid rgba(75, 83, 94, 0.18);
+}
+.SiteMenu a.Selected {
+  margin-bottom: -2px;
+  color: #5E5E5E;
+  border-bottom: 2px solid #2e9dff;
+}
+
+.Flyout {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  -webkit-transition: opacity 0.2s;
+  -moz-transition: opacity 0.2s;
+  -o-transition: opacity 0.2s;
+  transition: opacity 0.2s;
+  background: #FFFFFF;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #94a1b1;
+  border: 1px solid rgba(75, 83, 94, 0.45);
+  font-size: 13px;
+}
+.OptionsMenu .Flyout {
+  right: 0;
+}
+
+.MenuItems {
+  min-width: 130px;
+}
+.MenuItems li {
+  border-bottom: 1px solid #e2e2e2;
+}
+.MenuItems li:last-child {
+  border-bottom: none;
+}
+.MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
+  display: block;
+  clear: both;
+  padding: 3px 15px;
+  color: #848a92 !important;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.MenuItems a:hover {
+  color: white !important;
+  background-color: #2e9fff !important;
+}
+.MenuItems:after, .MenuItems:before {
+  display: none;
+}
+
+.OptionsMenu.Open .OptionsTitle {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=65);
+  opacity: 0.65;
+}
+.OptionsMenu.Open .OptionsTitle:after {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
+}
+
+.OptionsTitle {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=55);
+  opacity: 0.55;
+  width: 28px;
+  padding-right: 12px;
+}
+.OptionsTitle:hover {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=65);
+  opacity: 0.65;
+}
+.OptionsTitle:hover:after {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
+}
+.OptionsTitle:after {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=30);
+  opacity: 0.3;
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 1px;
+  display: block;
+  border-top: 4px solid black;
+  border-right: 4px solid rgba(0, 0, 0, 0);
+  border-left: 4px solid rgba(0, 0, 0, 0);
+}
+
+.MeBox {
+  float: right;
+  height: 35px;
+  padding: 4px 0 4px 20px;
+  margin: 0;
+}
+.MeBox.MeBox-SignIn {
+  display: none;
+}
+.MeBox a {
+  color: #2E9FFF;
+  font-weight: normal;
+}
+.MeBox a:hover {
+  color: #1977CA;
+}
+.MeBox hr {
+  border-bottom: 1px solid #e2e2e2;
+}
+.MeBox .Bullet {
+  display: none;
+}
+.MeBox .Username {
+  font-weight: bold;
+}
+.MeBox .MenuItems:before, .MeBox .MenuItems:after {
+  display: block;
+}
+.MeBox .MenuItems li {
+  border-bottom: none;
+}
