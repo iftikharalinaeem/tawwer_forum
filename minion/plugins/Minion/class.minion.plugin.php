@@ -467,7 +467,12 @@ class MinionPlugin extends Gdn_Plugin {
     * @param type $Sender
     */
    public function CheckCommands($Sender) {
-      $MinionName = GetValue('Name', $this->Minion);
+      $MinionNames = array();
+      foreach ($this->Personas as $Persona) {
+         $PersonaName = GetValue('Name',$Persona);
+         if ($PersonaName)
+            $MinionNames[] = $PersonaName;
+      }
       
       // Get the discussion and comment from args
       $Discussion = (array)$Sender->EventArguments['Discussion'];
@@ -506,8 +511,15 @@ class MinionPlugin extends Gdn_Plugin {
          if (!$ObjectLine)
             continue;
          
-         if (!StringBeginsWith($ObjectLine, $MinionName, TRUE))
-            continue;
+         // Minion called as
+         $MinionCall = NULL;
+         foreach ($MinionNames as $MinionName) {
+            if (StringBeginsWith($ObjectLine, $MinionName, TRUE)) {
+               $MinionCall = $MinionName;
+               break;
+            }
+         }
+         if (is_null($MinionCall)) continue;
          
          $Objects = explode(' ', $ObjectLine);
          $MinionNameSpaces = substr_count($MinionName, ' ') + 1;
