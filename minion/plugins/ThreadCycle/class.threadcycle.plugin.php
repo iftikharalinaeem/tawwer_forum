@@ -307,18 +307,17 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       // Show a warning if there are rules in effect
       
       $ThreadCycle = $Sender->Monitoring($Sender->EventArguments['Discussion'], 'ThreadCycle', NULL);
-
+      
       // Nothing happening?
       if (!$ThreadCycle)
          return;
 
-      $Rules = $Sender->EventArguments['Rules'];
+      $Rules = &$Sender->EventArguments['Rules'];
       
-      // Stopped reactions
-      if ($ThreadCycle) {
-         $Page = GetValue('Page', $ThreadCycle);
-         $Rules[] = Wrap("<b>Thread Recycle</b>: page {$Path}", 'span', array('class' => 'MinionRule'));
-      }
+      // Thread is queued for recycled
+      $Page = GetValue('Page', $ThreadCycle);
+      $Rules[] = Wrap("<b>Thread Recycle</b>: page {$Page}", 'span', array('class' => 'MinionRule'));
+      
    }
    
 }
