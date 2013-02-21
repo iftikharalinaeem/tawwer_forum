@@ -339,16 +339,12 @@ Here are some things you should know before you begin:
    this page. If you switch back to your custom theme, your changes will be
    present.
 	
-2. By default, your custom css definitions will be included *after* the theme
+2. Your custom css definitions will be included *after* the theme
    css files. So, your definitions will take precedence over the theme ones.
-
-3. You can choose to not include the theme css files at all, and instead only
-   include your custom css definitions with the "Revision Options" to the
-   top-right.
 	
-4. When you preview your changes, you are the only one who can see the preview.
+3. When you preview your changes, you are the only one who can see the preview.
 
-5. Feel free to delete these comments!
+4. Feel free to delete these comments!
 
 */';
 			$HtmlContents = '';
