@@ -33,7 +33,8 @@ jQuery(document).ready(function($) {
       });
 
       var DateNow = new Date();
-      $('.DatePicker').val(DateNow.getMonth()+'/'+DateNow.getDate()+'/'+DateNow.getFullYear());
+      var DateNowStr = (DateNow.getMonth()+1)+'/'+DateNow.getDate()+'/'+DateNow.getFullYear();
+      $('.DatePicker').val(DateNowStr);
       
       $('.Event .CancelButton').on('click', function(e){
          var Event = $(e.target).closest('.Event');

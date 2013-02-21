@@ -518,12 +518,17 @@ class OnlinePlugin extends Gdn_Plugin {
    public function GetAllOnlineUsers() {
       static $AllOnlineUsers = NULL;
       if (is_null($AllOnlineUsers)) {
-         $AllOnlineUsersResult = Gdn::SQL()
-            ->Select('UserID, Timestamp')
-            ->From('Online')
-            ->Get();
-
          $AllOnlineUsers = array();
+         try {
+            $AllOnlineUsersResult = Gdn::SQL()
+               ->Select('UserID, Timestamp')
+               ->From('Online')
+               ->Get();
+         } catch (Exception $Ex) {
+            Gdn::SQL()->Reset();
+            return $AllOnlineUsers;
+         }
+
          while ($OnlineUser = $AllOnlineUsersResult->NextRow(DATASET_TYPE_ARRAY))
             $AllOnlineUsers[$OnlineUser['UserID']] = $OnlineUser;
 
@@ -1057,6 +1062,7 @@ class OnlinePlugin extends Gdn_Plugin {
    }
    
    public function Structure() {
+      Gdn::Structure()->Reset();
       Gdn::Structure()->Table('Online')
          ->Column('UserID', 'int(11)', FALSE, 'primary')
          ->Column('Name', 'varchar(64)', NULL)

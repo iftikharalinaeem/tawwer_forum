@@ -1,0 +1,173 @@
+.SiteMenu {
+    float: right;
+    border: {
+        bottom: 2px solid rgba(0,49,79,0.08);
+    }
+
+    li {
+        float: left;
+
+        &:last-child {
+
+            a:after {
+                display: none;
+            }
+
+        }
+
+    }
+
+    a {
+        @include min-width(110px);
+        position: relative;
+        display: block;
+        padding: 10px 15px;
+        color: #777777;
+        font-weight: bold;
+        font-size: 13px;
+        line-height: 1;
+        text-align: center;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+
+        &:hover {
+            color: #5E5E5E;
+            text-decoration: none;
+        }
+
+        &:after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 11px;
+            display: block;
+            width: 1px;
+            height: 11px;
+            border: {
+                right: 1px solid #B5BEC9;
+                right: 1px solid rgba(75, 83, 94, 0.18);
+            }
+        }
+
+        &.Selected {
+            margin: {
+                bottom: -2px;
+            }
+            color: #5E5E5E;
+            border: {
+                bottom: 2px solid #2E9DFF;
+            }
+        }
+
+    }
+
+}
+
+.Flyout {
+    @include border-radius(3px);
+    @include box-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
+    @include transition(opacity .2s);
+    background: #FFFFFF;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #94A1B1;
+    border: 1px solid rgba(75, 83, 94, 0.45);
+    font-size: 13px;
+
+    .OptionsMenu & {
+        right: 0;
+    }
+
+}
+
+.MenuItems {
+    min-width: 130px;
+
+    li {
+        border: {
+            bottom: 1px solid #E2E2E2;
+        }
+
+        &:last-child {
+            border: {
+                bottom: none;
+            }
+        }
+
+    }
+
+    a {
+
+        &,
+        &:link,
+        &:visited,
+        &:active {
+            display: block;
+            clear: both;
+            padding: 3px 15px;
+            color: #848A92 !important;
+            font-weight: 500;
+            line-height: 18px;
+            white-space: nowrap;
+        }
+
+        &:hover {
+            color: #FFFFFF !important;
+            background-color: #2E9FFF !important;
+        }
+
+    }
+
+    &:after,
+    &:before {
+        display: none;
+    }
+
+}
+
+.OptionsMenu {
+
+    &.Open {
+
+        .OptionsTitle {
+            @include opacity(0.65);
+
+            &:after {
+                @include opacity(1);
+            }
+
+        }
+
+    }
+
+}
+
+.OptionsTitle {
+    @include opacity(0.55);
+    width: 28px;
+    padding: {
+        right: 12px;
+    }
+
+    &:hover {
+        @include opacity(0.65);
+
+        &:after {
+            @include opacity(1);
+        }
+
+    }
+
+    &:after {
+        @include opacity(0.3);
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 1px;
+        display: block;
+        border: {
+            top: 4px solid #000;
+            right: 4px solid rgba(0, 0, 0, 0);
+            left: 4px solid rgba(0, 0, 0, 0);
+        }
+    }
+
+}

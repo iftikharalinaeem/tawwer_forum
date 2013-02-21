@@ -72,6 +72,7 @@
       <div class="section_heading">Users</div>
       <div class="section_contents">
          <div class="item"><a href="/blog/api-users-edit">/users/edit</a></div>
+         <div class="item"><a href="/blog/api-users-photo">/users/photo</a></div>
          <div class="item"><a href="/blog/api-users-multi">/users/multi</a></div>
          <div class="item"><a href="/blog/api-users-notifications">/users/notifications</a></div>
          <div class="item"><a href="/blog/api-users-show">/users/get</a></div>

@@ -55,11 +55,6 @@
   display: block;
 }
 
-.EmptyMessage {
-  text-align: center;
-  margin: 20px auto;
-}
-
 .Event.add .DatePicker, .Event.edit .DatePicker {
   width: 120px;
 }
@@ -392,7 +387,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 
 .Cards-Groups .Card {
-  height: 150px;
+  height: 180px;
 }
 .Cards-Groups .Card .Group-Buttons {
   position: absolute;
@@ -407,15 +402,13 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   padding-top: 0;
 }
 .Group-MembersPage h2 {
-  font-size: 24px;
-  line-height: 1.2;
-  margin: 0 0 5px;
+  clear: both;
 }
 .Group-MembersPage .Card {
   display: block;
   height: 70px;
   width: 270px;
-  margin-right: 15px;
+  margin: 0 15px 15px 0;
   padding: 5px 10px;
   float: left;
   vertical-align: top;
@@ -438,37 +431,22 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   line-height: 1;
 }
 .Group-MembersPage .Card .Group-MemberOptions {
-  padding-top: 10px;
+  padding-top: 5px;
   margin-left: 45px;
   display: none;
 }
 .Group-MembersPage .Card:hover {
   background-color: #f7f7f7;
-  border: 1px solid #dddddd;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  -ms-border-radius: 5px;
-  -o-border-radius: 5px;
-  border-radius: 5px;
-  padding: 4px 9px;
 }
 .Group-MembersPage .Card:hover .Group-MemberOptions {
   display: block;
 }
 
-.Group-Leaders {
-  *zoom: 1;
-}
-.Group-Leaders:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
+.Group-Leaders,
 .Group-Members {
-  padding: 15px;
   *zoom: 1;
 }
+.Group-Leaders:after,
 .Group-Members:after {
   content: "";
   display: table;
@@ -482,4 +460,9 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .UserTile img {
   height: 24px;
   width: 24px;
+}
+
+.EmptyMessage {
+  text-align: center;
+  color: #555555;
 }
