@@ -39,13 +39,6 @@ class EtsyThemeHooks implements Gdn_IPlugin {
       $Sender->Title(T('Dashboard'));
          
       $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Routes.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Applications.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Plugins.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Themes.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Registration.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Applicants.Manage';
-      $Sender->RequiredAdminPermissions[] = 'Garden.Roles.Manage';
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
