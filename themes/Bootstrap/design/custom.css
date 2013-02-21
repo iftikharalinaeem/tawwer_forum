@@ -2,10 +2,22 @@
 /** Grid **/
 #Panel {
   width: 300px;
+  *zoom: 1;
+}
+#Panel:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 #Body .ContentColumn {
   margin-left: 340px;
+  *zoom: 1;
+}
+#Body .ContentColumn:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .Row {
@@ -672,6 +684,9 @@ body > #Frame > .Head {
 .Activities ul.DataList {
   border: none;
   border-radius: 0;
+}
+.Activities .Item {
+  min-height: 40px;
 }
 .Activities .DataList .Item:first-child {
   border-radius: 0;

@@ -1,12 +1,16 @@
+@import "compass/css3";
+@import "compass/utilities/general/clearfix";
 @import "defaults";
 
 /** Grid **/
 
 #Panel {
     width: 300px;
+   @include pie-clearfix;
 }
 #Body .ContentColumn {
     margin-left: 340px;
+   @include pie-clearfix;
 }
 
 .Row {
@@ -691,6 +695,10 @@ body > #Frame > .Head {
    ul.DataList {
       border: none;
       border-radius: 0;
+   }
+   
+   .Item {
+      min-height: 40px;
    }
    
    .DataList .Item:first-child {
