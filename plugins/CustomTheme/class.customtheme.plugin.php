@@ -355,7 +355,7 @@ Here are some things you should know before you begin:
 		}
 			
 		// If viewing the form for the first time
-		if (!$Sender->Form->IsPostBack()) {
+		if (!$Sender->Form->AuthenticatedPostBack()) {
 			$Sender->Form->SetValue('CustomCSS', $CSSContents);
 			$Sender->Form->SetValue('CustomHtml', $HtmlContents);
 			// $Sender->Form->SetFormValue('IncludeThemeCSS', $IncludeThemeCSS);
