@@ -74,12 +74,12 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       }
       unset($Commenters);
       
-      // Sort by points, descending
-      usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByPoints'));
-      
-      // Get the top 10 by points, and choose the 2 most recently online
-      $Eligible = array_slice($Eligible, 0, 10);
+      // Sort by online, descending
       usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByLastOnline'));
+      
+      // Get the top 10 by online, and choose the 2 by most points
+      $Eligible = array_slice($Eligible, 0, 10);
+      usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByPoints'));
       $Primary = GetValue(0, $Eligible, array());
       $Secondary = Getvalue(1, $Eligible, array());
       
