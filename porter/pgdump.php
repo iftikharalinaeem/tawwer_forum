@@ -1,12 +1,11 @@
 <?php
-/// Hey Peeps!, this file needs to be symlinked into the porter folder. Call it from there!
-
+/// Hey Peeps!, Make sure functions.commandline.php is symlinked into this folder.
 
 error_reporting(E_ALL); //E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 ini_set('display_errors', 'on');
 ini_set('track_errors', 1);
 
-require_once getcwd().'/functions.commandline.php';
+require_once dirname(__FILE__).'/functions.commandline.php';
 
 header('Content-Type: text/plain; charset=UTF-8');
 
