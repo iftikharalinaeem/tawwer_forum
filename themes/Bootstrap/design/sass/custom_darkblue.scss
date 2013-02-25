@@ -43,10 +43,17 @@ $successBackground: $green;
 $infoText: #fff;
 $infoBackground: $blue;
 
-@import "colors";
-
 .Item-Header.CommentHeader {
    margin: -8px -8px 0px -8px;
    padding: 8px;
    background: darken($bodyBackground, 4%);
 }
+
+.PasswordStrength .Background {
+   background-color: #333333;
+}
+.PasswordStrength .Separator {
+   background-color: black;
+}
+
+@import "colors";

@@ -1,4 +1,18 @@
 /** Scaffolding **/
+.Item-Header.CommentHeader {
+  margin: -8px -8px 0px -8px;
+  padding: 8px;
+  background: #252525;
+}
+
+.PasswordStrength .Background {
+  background-color: #333333;
+}
+
+.PasswordStrength .Separator {
+  background-color: black;
+}
+
 /** Typography **/
 body {
   background: #2f2f2f;
@@ -444,10 +458,4 @@ a:hover .Sprite16 {
 .Button.Primary .Sprite,
 .Button.Primary .Sprite16 {
   background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
-}
-
-.Item-Header.CommentHeader {
-  margin: -8px -8px 0px -8px;
-  padding: 8px;
-  background: #252525;
 }
