@@ -652,6 +652,7 @@ class ValentinesPlugin extends Gdn_Plugin {
    public function Controller_Finalize($Sender) {
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      $Sender->Permission('Garden.Settings.Manage');
       
       // Arrows
       $ArrowsAwarded = $this->ArrowPool();
