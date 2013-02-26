@@ -46,7 +46,6 @@ class ModNotifyPlugin extends Gdn_Plugin {
          ->WhereIn('Name', array('Preferences.Email.ModQueue', 'Preferences.Popup.ModQueue'))
          ->Get('UserMeta')->ResultArray();
       
-      print_r($Data); 
       // Prep notification list
       $NotifyUsers = array();
       foreach ($Data as $Row) {
@@ -61,9 +60,7 @@ class ModNotifyPlugin extends Gdn_Plugin {
             $NotifyUsers[$UserID]['Notified'] = ActivityModel::SENT_PENDING;
          }
       }
-      
-      print_r($NotifyUsers);
-      
+            
       // Prep the activity
       $ActivityModel = new ActivityModel();
       switch ($Log['Operation']) {
@@ -100,7 +97,6 @@ class ModNotifyPlugin extends Gdn_Plugin {
       
       // Send all notifications.
       $ActivityModel->SaveQueue();
-      die('end');
    }
 
    public function Setup() {
