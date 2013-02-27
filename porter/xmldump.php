@@ -6,61 +6,168 @@ error_reporting(E_ALL); //E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E
 ini_set('display_errors', 'on');
 ini_set('track_errors', 1);
 
-require_once dirname(__FILE__) . '/functions.commandline.php';
+require_once __DIR__.'/functions.core.php';
+require_once __DIR__.'/functions.commandline.php';
+require_once __DIR__.'/class.mysqldb.php';
 
 function main() {
    $opts = array(
+      'host' => array('Connect to host.', CMDLINE_SHORT => 'h', CMDLINE_DEFAULT => '127.0.0.1'),
+      'database' => array('Database to use.', CMDLINE_SHORT => 'd', CMDLINE_FLAGS => CMDLINE_REQUIRED),
+      'user' => array('User for login if not current user.', CMDLINE_SHORT => 'u'),
+      'password' => array('Password to use when connecting to server.', CMDLINE_SHORT => 'p'),
+      'mode' => array('What mode to use to dump the data.', 'valid' => array(Db::MODE_ECHO, Db::MODE_EXEC), 'default' => Db::MODE_EXEC),
+      'movedir' => array('Move completed files to this directory.')
    );
-   $files = array('inputpath');
+   $files = array('file');
 
-   $options = parseCommandLine($opts, $files);
-   $path = $options['inputpath'];
+   $options = parseCommandLine('xmldump', $opts, $files);
+   
+   $path = $options['file'];
+   
    if (!file_exists($path)) {
       echo "File does not exist: $path\n";
       die();
    }
+   
+   $db = new MySqlDb('localhost', 'root', '', 'xo_imp');
+   $db->px = 'GDN_z';
 
    $formats = array(
       'Discussion' => array(
          'columns' => array(
-            'DiscussionKey.KeyWithoutForumKey' => array('ForeignID', 'type' => 'varchar(32)', 'filter' => 'stripNamespace'),
-            'CategoryID' => array('CategoryID', 'type' => 'int'), // from row filter
-            'CategoryName' => array('Category.Name'),
-            'CategoryKey.Key' => array('Category.ParentKey'),
+            'DiscussionKey.KeyWithoutForumKey' => array('ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'primary' => true),
+            'ForumKey.KeyWithoutCategoryKey' => array('Category.ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace'),
+            'CategoryKey.Key' => array('Category.ParentKey', 'filter' => 'stripNamespace'),
+            'RowType' => array('Type', 'type' => 'varchar(255)'),
             'Body' => array('Body', 'type' => 'text'),
             'Format' => array('Format', 'type' => 'varchar(10)'),
             'Title' => array('Name'),
             'IsSticky' => array('Announce', 'type' => 'tinyint'),
             'IsClosed' => array('Closed', 'type' => 'tinyint'),
-            'RowType' => array('Type', 'type' => 'varchar(255)'),
             'Owner.Key' => array('InsertUserKey'),
             'CreatedOn' => array('DateInserted', 'type' => 'datetime'),
-            'SiteOfOriginKey' => array('Site', 'filter' => 'stripSubdomain')
+            'SiteOfOriginKey' => array('Site', 'filter' => 'stripSubdomain'),
+            '_file' => array('ImportFile'),
+            'Raw' => array('Raw', 'type' => 'mediumtext')
             ),
          'rowfilter' => function(&$row) {
-            // Parse the forum info.
-            $forumKey = val('ForumKey.Key', $row, '');
-            $parts = explode(':', $forumKey);
-            $row['CategoryID'] = val(2, $parts);
-            $row['CategoryName'] = html_entity_decode(val(1, $parts));
+            $row['Body'] = extractBase64Images($row['Body'], __DIR__.'/imp-images', '~cf/imp-images');
+            $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
             
             $row['Format'] = 'Html';
+            
+            $row['RowType'] = null;
+            if (val('IsPoll', $row))
+               $row['RowType'] = 'Poll';
          }),
       'Post' => array(
-         
+            'tablename' => 'Comment',
+            'columns' => array(
+               'Key.KeyWithoutDiscussionKey' => array('ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'primary' => true),
+               'DiscussionKey.KeyWithoutForumKey' => array('Discussion.ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'required' => true),
+               'Body' => array('Body', 'type' => 'text'),
+               'ContentCreatedOn' => array('DateInserted', 'type' => 'datetime'),
+               'Owner.Key' => array('InsertUserKey'),
+               'LastEditTimeStamp' => array('DateUpdated', 'type' => 'datetime'),
+               'LastEditedBy.Key' => array('UpdateUserID'),
+               'SiteOfOriginKey' => array('Site', 'filter' => 'stripSubdomain'),
+               '_file' => array('ImportFile'),
+               'Raw' => array('Raw', 'type' => 'mediumtext')
+            ),
+            'rowfilter' => function(&$row) {
+               $row['Body'] = extractBase64Images($row['Body'], __DIR__.'/imp-images', '~cf/imp-images');
+               $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
+               
+               $row['Format'] = 'Html';
+            }
          )
    );
-
-   dumpXmlFile($path, $formats);
+         
+   $db->mode = $options['mode'];
+   
+   $movedir = val('movedir', $options);
+   if ($movedir) {
+      $movedir = rtrim($movedir, '/');
+      if (!file_exists($movedir)) {
+         mkdir($movedir, 0777, true);
+         if (!file_exists($movedir)) {
+            die("Count not create movedir $movedir\n");
+         }
+      } elseif (!is_dir($movedir)) {
+         fwrite(STDERR, "The directory supplied for movedir is not a directory. ($movedir)\n");
+         die();
+      }
+   }
+   
+   if (is_dir($path)) {
+      $paths = scandir($path);
+      
+      // Sort the paths so that if they have a date somewhere we can insert most recent over top of older data..
+      natcasesort($paths);
+      
+      $dir = rtrim($path, '/').'/';
+   } else {
+      $paths = (array)$path;
+      $dir = '';
+   }
+   
+   
+   $total = count($paths);
+   $i = 0;
+   foreach ($paths as $path) {
+      $path = $dir.$path;
+      if (!is_file($path) || substr(basename($path), 0, 1) == '.')
+         continue;
+      dumpXmlFile($path, $formats, $db);
+      
+      if ($movedir) {
+         // Move the file into the completed dir.
+         rename($path, $movedir.'/'.basename($path));
+      }
+      
+      $i++;
+      $percent = $i * 100 / $total;
+      fprintf(STDERR, ", %d/%d (%.1f%%)\n", $i, $total, $percent);
+   }
 }
 
-function dumpXmlFile($path, $formats) {
+/**
+ * 
+ * @param type $path
+ * @param type $formats
+ * @param MySqlDb $db
+ */
+function dumpXmlFile($path, $formats, $db) {
    $formats = getFullFormats($formats);
    $counts = array_fill_keys(array_keys($formats), 0);
    $names = array();
+   
+   // First make sure we define the tables.
+   foreach ($formats as $format) {
+      $columns = array();
+      foreach ($format['columns'] as $source => $def) {
+         $columns[$def[0]] = $def;
+      }
+      
+      $db->defineTable($format['tablename'], $columns);
+   }
 
+   fwrite(STDERR, "Dumping $path\n");
    $xml = new XmlReader();
-   $xml->open($path);
+   $opened = $xml->open($path);
+   if (!$opened) {
+      trigger_error("Could not open $path.", E_USER_WARNING);
+      return;
+   }
+   
+   $extraData = array('_path' => $path, '_file' => basename($path));
+   
+   $inserts = array();
+   
+   $countRead = 0;
+   $countInsertRows = 0;
+   $countInserted = 0;
    
    while ($xml->read()) {
       if ($xml->nodeType != XMLReader::ELEMENT)
@@ -73,46 +180,64 @@ function dumpXmlFile($path, $formats) {
       }
 
       if (isset($formats[$name])) {
+         $format = $formats[$name];
          $str = $xml->readOuterXml();
-         parseXmlRow($str, $formats[$name]);
          $xml->next();
-         die();
+         $row = parseXmlRow($str, $format, $extraData);
+         $countRead++;
+         
+         $table = $format['tablename'];
+         $inserts[$table][] = $row;
+         if (count($inserts[$table]) >= 10) {
+            $countInsertRows += count($inserts[$table]);
+            $countInserted += $db->insertMulti($table, $inserts[$table], array(Db::INSERT_REPLACE => true));            
+            $inserts[$table] = array();
+            fwrite(STDERR, percentDot($countInserted, $countInsertRows));
+         }
       }
-
-//      switch ($name) {
-//         case 'wp:author':
-//            $Str = $xml->readOuterXml();
-//            $xml->next();
-//            break;
-//         case 'wp:category':
-//            $Str = $xml->readOuterXml();
-//            $xml->next();
-//            break;
-//         case 'item':
-////               $Dom = $Xml->expand();
-////               $Str = $Xml->readString();
-//
-//            $Str = $xml->readOuterXml();
-////               if ($Str) {
-//               $this->ParseDiscussion($Str);
-//               $xml->next();
-////               }
-//            break;
-////            case 'wp:comment':
-////               $Str = $Xml->readOuterXml();
-////               $this->ParseComment($Str);
-////               $Xml->next();
-////               
-////               $Counts['Comments']++;
-////               
-////               
-////               break;
-//      }
    }
    
-   ksort($names);
+   // Insert all of the remaining data.
+   foreach ($inserts as $table => $rows) {
+      $countInsertRows += count($rows);
+      $countInserted += $db->insertMulti($table, $rows, array(Db::INSERT_REPLACE => true));
+      fwrite(STDERR, percentDot($countInserted, $countInsertRows));
+   }
    
-   var_dump($names);
+   // Write the final status.
+   switch ($db->mode) {
+      case Db::MODE_EXEC:
+         fwrite(STDERR, " $countRead read, $countInsertRows inserts sent, $countInserted inserted");
+         break;
+      case Db::MODE_ECHO:
+         echo "\n-- $countRead read\n";
+         break;
+   }
+}
+
+function extractBase64Images($str, $dir, $prefix) {
+   $cb = function ($match) use ($dir, $prefix) {
+      $data = base64_decode(trim($match[2]));
+      
+      // This file will get a filename coresponding to the data so we don't create duplicate files.
+      $filename = sha1($data).'.'.mimeToExt($match[1]);
+      
+      if (!file_exists($dir)) {
+         mkdir($dir, 0777, true);
+      }
+      $path = "$dir/$filename";
+      file_put_contents($path, $data);
+      
+      return "src=\"$prefix/$filename\"";
+   };
+   
+   $regex = <<<EOT
+`src=['"].*?data:(\w+/\w+);base64,([^'"]+)['"]`i
+EOT;
+   
+   $str = preg_replace_callback($regex, $cb, $str);
+   
+   return $str;
 }
 
 /**
@@ -139,24 +264,6 @@ function flattenArray($row) {
    };
    $f($row);
    return $result;
-}
-
-/**
- * Force a value to be an integer.
- * 
- * @param type $value
- */
-function forceInt($value) {
-   if (is_string($value)) {
-      switch (strtolower($value)) {
-         case 'false':
-         case 'no':
-         case '':
-            return 0;
-      }
-      return 1;
-   }
-   return intval($value);
 }
 
 function getFullFormats($formats) {
@@ -195,13 +302,21 @@ function getFullFormats($formats) {
    return $result;
 }
 
-function parseXmlRow($str, $format) {
+function parseXmlRow($str, $format, $data = array()) {
    $xmli = new SimpleXMLIterator($str);
 
    $row = xmlIteratorToArray($xmli);
    $row = flattenArray($row);
-//   $row = translateRow($row, $format);
-   var_export($row);
+   
+   // Set any data that was passed to this function.
+   foreach ($data as $key => $value) {
+      $row[$key] = $value;
+   }
+   
+   $row = translateRow($row, $format);
+   
+//   var_export($row);
+   return $row;
 }
 
 function stripNamespace($val) {
@@ -242,7 +357,11 @@ function translateRow(&$row, $format) {
    
    $result = array();
    foreach ($format[TRANSLATE_COLUMNS] as $key => $opts) {
-      $value = val($key, $row, null);
+      if (!array_key_exists($key, $row)) {
+         trigger_error("{$format['tablename']}.$key does not exist in the source row.", E_USER_NOTICE);
+      } else {
+         $value = val($key, $row, null);
+      }
       
       // Check to filter the value.
       if (isset($opts['filter'])) {
@@ -267,6 +386,18 @@ function translateRow(&$row, $format) {
    }
    
    return $result;
+}
+
+function percentDot($num, $den) {
+   if ($den == 0)
+      return '.';
+   $percent = $num / $den;
+   
+   if ($percent < .1)
+      return '.';
+   if ($percent < .5)
+      return '-';
+   return '+';
 }
 
 /**
@@ -298,11 +429,6 @@ function xmlIteratorToArray($sxi) {
       }
    }
    return $a;
-}
-
-function touchValue($key, &$array, $default) {
-   if (!array_key_exists($key, $array))
-      $array[$key] = $default;
 }
 
 main();
