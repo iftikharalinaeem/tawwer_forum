@@ -32,12 +32,42 @@ function forceInt($value) {
       switch (strtolower($value)) {
          case 'false':
          case 'no':
+         case 'off':
          case '':
             return 0;
+         case 'true':
+         case 'yes':
+         case 'on':
+            return 1;
       }
-      return 1;
    }
    return intval($value);
+}
+
+/**
+ * Get the file extension from a mime-type.
+ * @param string $mime
+ * @param string $ext If this argument is specified then this extension will be added to the list of known types.
+ * @return string The file extension without the dot.
+ */
+function mimeToExt($mime, $ext = null) {
+   static $known = array('text/plain' => 'txt', 'image/jpeg' => 'jpg');
+   $mime = strtolower($mime);
+   
+   if ($ext !== null) {
+      $known[$mime] = ltrim($ext, '.');
+   }
+   
+   if (array_key_exists($mime, $known))
+      return $known[$mime];
+   
+   // We don't know the mime type so we need to just return the second part as the extension.
+   $result = trim(strrchr($mime, '/'), '/');
+   
+   if (substr($result, 0, 2) === 'x-')
+      $result = substr($result, 2);
+   
+   return $result;
 }
 
 /**
@@ -64,4 +94,23 @@ function val($key, $array, $default = null) {
    if (array_key_exists($key, $array))
       return $array[$key];
    return $default;
+}
+
+/**
+ * Look up an item in an array and return a different value depending on whether or not that value is true/false.
+ * 
+ * @param string|int $key The key of the array.
+ * @param array $array The array to look at.
+ * @param mixed $trueValue The value to return if we have true.
+ * @param mixed $falseValue The value to return if we have true.
+ * @param bool $default The default value of the key isn't in the array.
+ * @return mixed Either $trueValue or $falseValue.
+ */
+function valif($key, $array, $trueValue, $falseValue = null, $default = false) {
+   if (!array_key_exists($key, $array))
+      return $default ? $trueValue : $falseValue;
+   elseif ($array[$key])
+      return $trueValue;
+   else
+      return $falseValue;
 }
