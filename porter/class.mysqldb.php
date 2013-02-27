@@ -1,33 +1,48 @@
 <?php
-
-define('DBOPT_IGNORE', 'ignore');
-define('DBOPT_UPSERT', 'upsert');
-define('DBOPT_UNBUFFERED', 'unbuffered');
-
-define('DBOPT_READ', 'read');
-define('DBOPT_DEFINE', 'define');
-define('DBOPT_WRITE', 'write');
-
-define('DBOPT_MODE_EXEC', 'exec');
-define('DBOPT_MODE_CAPTURE', 'capture');
-define('DBOPT_MODE_ECHO', 'echo');
-
-class MySqlDb {
+/**
+ * Base class for all database access.
+ */
+class Db {
+   /// Constants ///
    
-   public $mode = DBOPT_MODE_EXEC;
+   const GET_UNBUFFERED = 'unbuffered';
+   const INSERT_REPLACE = 'replace';
+   const INSERT_IGNORE = 'ignore';
+   const UPDATE_UPSERT = 'upsert';
+   
+   const MODE_EXEC = 'exec';
+   const MODE_CAPTURE = 'capture';
+   const MODE_ECHO = 'echo';
+   
+   const QUERY_DEFINE = 'define';
+   const QUERY_READ = 'read';
+   const QUERY_WRITE = 'write';
+}
+
+class MySqlDb extends Db {
+   public $mode = Db::MODE_EXEC;
    
    /**
     * @var mysqli 
     */
-   public $mysqli;
+//   public $mysqli;
+   
+   /**
+    *
+    * @var PDO
+    */
+   public $pdo;
    
    public $px = 'GDN_';
    
    /// Methods ///
    
    public function __construct($host, $username, $password, $dbname) {
-      $this->mysqli = new mysqli($host, $username, $password, $dbname);
-      $this->mysqli->set_charset('utf8');
+//      $this->mysqli = new mysqli($host, $username, $password, $dbname);
+//      $this->mysqli->set_charset('utf8');
+      
+      $this->pdo = new PDO("mysql:dbname=$dbname;host=$host", $username, $password);
+      $this->pdo->query('set names utf8'); // send this statement outside our query function.
    }
    
    public function defineTable($table, $columns) {
@@ -45,7 +60,7 @@ class MySqlDb {
             implode(",\n  ", $parts).
             "\n)";
          
-         $this->query($sql, DBOPT_DEFINE);
+         $this->query($sql, Db::QUERY_DEFINE);
       } else {
          // This is an alter table.
          $currentColumns = $currentDef['columns'];
@@ -84,7 +99,7 @@ class MySqlDb {
             $sql = "alter table `{$this->px}$table` \n  ".
                implode(",\n  ", $parts);
          
-            $this->query($sql, DBOPT_DEFINE);
+            $this->query($sql, Db::QUERY_DEFINE);
          }
       }
    }
@@ -114,8 +129,10 @@ class MySqlDb {
    
    public function insert($table, $row, $options = array()) {
       $result = $this->insertMulti($table, array($row), $options);
-      if ($result)
-         $result = $this->mysqli->insert_id;
+      if ($result) {
+         $result = $this->pdo->lastInsertId();
+//         $result = $this->mysqli->insert_id;
+      }
       return $result;
    }
    
@@ -127,9 +144,12 @@ class MySqlDb {
       $columns = array_keys(current($rows));
       
       // Build the insert statement.
-      $sql = 'insert ';
-      if (val(DBOPT_IGNORE, $options))
-         $sql .= 'ignore ';
+      if (val(Db::INSERT_REPLACE, $options)) {
+         $sql = 'replace ';
+      } else {
+         $sql = 'insert '.valif(Db::INSERT_IGNORE, $options, 'ignore ');
+      }
+      
       $sql .= "`{$this->px}$table`\n";
       
       $sql .= bracketList($columns, '`')."\n".
@@ -143,35 +163,48 @@ class MySqlDb {
             $sql .= ",\n";
          
          // Escape the values.
-         $row = array_map(array($this->mysqli, 'real_escape_string'), $row);
-         $sql .= bracketList($row);
+         $row = array_map(array($this->pdo, 'quote'), $row);
+//         $row = array_map(array($this->mysqli, 'real_escape_string'), $row);
+         $sql .= bracketList($row, '');
       }
      
-      $result = $this->query($sql, DBOPT_WRITE, $options);
-      if ($result !== false)
-         $result = $this->mysqli->affected_rows;
+      $result = $this->query($sql, Db::QUERY_WRITE, $options);
+      if (is_a($result, 'PDOStatement')) {
+         $result = $result->rowCount();
+      }
       return $result;
    }
    
-   protected function query($sql, $type = DBOPT_READ, $options = array()) {
-      $resultmode = val(DBOPT_UNBUFFERED, $options) ? MYSQLI_USE_RESULT : MYSQLI_STORE_RESULT;
+   /**
+    * 
+    * @param type $sql
+    * @param type $type
+    * @param type $options
+    * @return boolean|\MySqliResultIterator
+    */
+   protected function query($sql, $type = Db::QUERY_READ, $options = array()) {
+      $this->pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, !val(Db::GET_UNBUFFERED, $options, false));
       
-      if ($this->mode == DBOPT_MODE_ECHO && $type != DBOPT_READ) {
+      if ($this->mode === Db::MODE_ECHO && $type != Db::QUERY_READ) {
          echo rtrim($sql, ';').";\n\n";
          return true;
       } else {
-         $result = $this->mysqli->query($sql, $resultmode);
+//         $result = $this->mysqli->query($sql, $resultmode);
+         $result = $this->pdo->query($sql);
          
          if (!$result) {
-            trigger_error($this->mysqli->error."\n\n".$sql, E_USER_ERROR);
+            list($code, $dbCode, $message) = $this->pdo->errorInfo();
+            die($message);
+            trigger_error($message, E_USER_ERROR);
+//            trigger_error($this->mysqli->error."\n\n".$sql, E_USER_ERROR);
          }
       }
       
-      if ($type == DBOPT_READ) {
-         if ($resultmode == MYSQLI_STORE_RESULT) {
-            $result = $result->fetch_all(MYSQLI_ASSOC);
-         } else {
-            $result = new MySqliResultIterator($result);
+      if ($type == Db::QUERY_READ) {
+         $result->setFetchMode(PDO::FETCH_ASSOC);
+         if (!val(Db::GET_UNBUFFERED, $options)) {
+            $result = $result->fetchAll();
+//            $result = $result->fetch_all(MYSQLI_ASSOC);
          }
       }
       
@@ -254,7 +287,7 @@ class MySqlDb {
    
    public function tableExists($table) {
       $sql = "show tables like '{$this->px}$table'";
-      $data = $this->query($sql, DBOPT_READ);
+      $data = $this->query($sql, Db::QUERY_READ);
       return (count($data) > 0);
    }
    
