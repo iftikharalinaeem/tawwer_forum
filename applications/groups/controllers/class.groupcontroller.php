@@ -373,7 +373,6 @@ class GroupController extends Gdn_Controller {
             Redirect(GroupUrl($Group));
          } else {
             Trace($Form->FormValues());
-            $Form->AddError('What!?!?');
          }
       } else {
          if ($ID) {
