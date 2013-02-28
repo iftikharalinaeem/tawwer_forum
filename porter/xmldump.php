@@ -36,8 +36,8 @@ function main() {
    $formats = array(
       'Discussion' => array(
          'columns' => array(
-            'DiscussionKey.KeyWithoutForumKey' => array('ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'primary' => true),
-            'ForumKey.KeyWithoutCategoryKey' => array('Category.ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace'),
+            'DiscussionKey.KeyWithoutForumKey' => array('ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'index' => Db::INDEX_PK),
+            'ForumKey.KeyWithoutCategoryKey' => array('Category.ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'index' => Db::INDEX_FK),
             'CategoryKey.Key' => array('Category.ParentKey', 'filter' => 'stripNamespace'),
             'RowType' => array('Type', 'type' => 'varchar(255)'),
             'Body' => array('Body', 'type' => 'text'),
@@ -47,7 +47,7 @@ function main() {
             'IsClosed' => array('Closed', 'type' => 'tinyint'),
             'Owner.Key' => array('InsertUserKey'),
             'CreatedOn' => array('DateInserted', 'type' => 'datetime'),
-            'SiteOfOriginKey' => array('Site', 'filter' => 'stripSubdomain'),
+            'SiteOfOriginKey' => array('Site', 'filter' => 'stripSubdomain', 'index' => Db::INDEX_IX),
             '_file' => array('ImportFile'),
             'Raw' => array('Raw', 'type' => 'mediumtext')
             ),
@@ -64,7 +64,7 @@ function main() {
       'Post' => array(
             'tablename' => 'Comment',
             'columns' => array(
-               'Key.KeyWithoutDiscussionKey' => array('ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'primary' => true),
+               'Key.KeyWithoutDiscussionKey' => array('ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'index' => Db::INDEX_PK),
                'DiscussionKey.KeyWithoutForumKey' => array('Discussion.ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'required' => true),
                'Body' => array('Body', 'type' => 'text'),
                'ContentCreatedOn' => array('DateInserted', 'type' => 'datetime'),
@@ -85,6 +85,17 @@ function main() {
    );
          
    $db->mode = $options['mode'];
+   
+   // First make sure we define the tables.
+   $formats = getFullFormats($formats);
+   foreach ($formats as $format) {
+      $columns = array();
+      foreach ($format['columns'] as $source => $def) {
+         $columns[$def[0]] = $def;
+      }
+      
+      $db->defineTable($format['tablename'], $columns);
+   }
    
    $movedir = val('movedir', $options);
    if ($movedir) {
@@ -142,16 +153,6 @@ function dumpXmlFile($path, $formats, $db) {
    $formats = getFullFormats($formats);
    $counts = array_fill_keys(array_keys($formats), 0);
    $names = array();
-   
-   // First make sure we define the tables.
-   foreach ($formats as $format) {
-      $columns = array();
-      foreach ($format['columns'] as $source => $def) {
-         $columns[$def[0]] = $def;
-      }
-      
-      $db->defineTable($format['tablename'], $columns);
-   }
 
    fwrite(STDERR, "Dumping $path\n");
    $xml = new XmlReader();
