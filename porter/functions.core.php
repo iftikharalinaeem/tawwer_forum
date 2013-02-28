@@ -1,5 +1,9 @@
 <?php
 
+function trace($value, $prefix = 'debug') {
+   fwrite(STDERR, "$prefix: ".var_export($value, true)."\n");
+}
+
 /**
  * Force a value into a boolean.
  * 
