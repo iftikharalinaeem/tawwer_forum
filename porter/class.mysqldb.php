@@ -10,6 +10,11 @@ class Db {
    const INSERT_IGNORE = 'ignore';
    const UPDATE_UPSERT = 'upsert';
    
+   const INDEX_PK = 'primary';
+   const INDEX_FK = 'key';
+   const INDEX_IX = 'index';
+   const INDEX_UNIQUE = 'unique';
+   
    const MODE_EXEC = 'exec';
    const MODE_CAPTURE = 'capture';
    const MODE_ECHO = 'echo';
@@ -45,7 +50,184 @@ class MySqlDb extends Db {
       $this->pdo->query('set names utf8'); // send this statement outside our query function.
    }
    
+   protected function columnDef($name, $def) {
+      $result = "`$name` ".$this->parseType($def['type']);
+      
+      if (val('required', $def))
+         $result .= ' not null';
+      
+      if (val('autoincrement', $def))
+         $result .= ' auto_increment';
+      
+      if (val('primary', $def)) {
+         $result .= ' primary key';
+      }
+      return $result;
+   }
+   
+   /**
+    * Get the index definitions for a table.
+    * 
+    * @param string $table The name of the table
+    * @return array An array in the form:
+    * 
+    *    array (
+    *       index name => array('columns' => array('column'), 'type' => Db::INDEX_TYPE)
+    *    )
+    * 
+    */
+   public function indexDefinitions($table) {
+      // Keep an internal cache for repeated calls to this function.
+      static $cache = array();
+      
+      if (isset($cache[$table]))
+         return $cache[$table];
+      
+      // Query the indexes from the database.
+      $rawdata = $this->query("show indexes from `{$this->px}$table`");
+      
+      // Parse them into their correct place.
+      $result = array();
+      foreach ($rawdata as $row) {
+         $name = $row['Key_name'];
+         
+         // Figure out the type.
+         if (strcasecmp($name, 'PRIMARY') === 0)
+            $type = Db::INDEX_PK;
+         elseif ($row['Non_unique'] == 0)
+            $type = Db::INDEX_UNIQUE;
+         elseif (strcasecmp(substr($name, 0, 2), 'fk') === 0)
+            $type = Db::INDEX_FK;
+         else
+            $type = Db::INDEX_IX;
+         
+         $result[$name]['columns'][] = $row['Column_name'];
+         $result[$name]['type'] = $type;
+      }
+      $cache[$table] = $result;
+      
+      return $result;
+   }
+   
+   /**
+    * Define an index in the database.
+    * 
+    * @param string $table The name of the table that the index is on.
+    * @param array|string $column The name(s) of the columns in the index.
+    * @param string $type One of the Db::INDEX_* constants.
+    * @param string $suffix Optional. By default the index will be named based on the column that it's on.
+    *    This suffix overrides that.
+    */
+   public function defineIndex($table, $column, $type, $suffix = null) {
+      $columns = (array)$column;
+      
+      // Determine the name of the new index.
+      if ($type === Db::INDEX_PK) {
+         $name = 'PRIMARY';
+      } else {
+         $prefixes = array(Db::INDEX_FK => 'FK_', Db::INDEX_IX => 'IX_', Db::INDEX_UNIQUE => 'UX_');
+         $px = val($type, $prefixes, 'IX_');
+         if (!$suffix && $type != Db::INDEX_UNIQUE)
+            $suffix = implode('', $columns);
+         $name = "{$px}{$table}".($suffix ? "_{$suffix}" : '');
+      }
+      
+      // Get the current definitions.
+      $currentIndexes = $this->indexDefinitions($table);
+      
+      // See if we have to drop and/or add the index.
+      $dropIndex = false;
+      $addIndex = false;
+      if (isset($currentIndexes[$name])) {
+         $row = $currentIndexes[$name];
+         if ($row['type'] !== $type || $row['columns'] != $columns) {
+            // The name is the same, but the definition is different.
+            $currentName = $name;
+            $currentType = $row['type'];
+            $dropIndex = true;
+         }
+      } else {
+         // The index name doesn't exist so we know were adding a new one.
+         $addIndex = true;
+         
+         // See if there is already an index related to these columns and type.
+         foreach ($currentIndexes as $key => $row) {
+            if ($row['type'] === $type && $row['columns'] == $columns) {
+               // The index exists, but with a differnt name so we need to drop it.
+               $currentName = $key;
+               $currentType = $row['type'];
+               $dropIndex = true;
+            }
+         }
+      }
+      
+      // Now that we know what we have to do build the SQL and execute it.
+      $sqls = array();
+      $pxtable = $this->px.$table;
+      
+      if ($dropIndex) {
+         if ($currentType === Db::INDEX_PK) {
+            $sqls[] = "alter table `$pxtable` drop primary key";
+         } else {
+            $sqls[] = "alter table `$pxtable` drop index `$currentName`";
+         }
+      }
+      
+      if ($addIndex) {
+         if ($type === Db::INDEX_PK) {
+            $sqls[] = "alter table `$pxtable` add primary key ".bracketList($columns, '`');
+         } else {
+            $sqls[] = "create".
+               ($type === Db::INDEX_UNIQUE ? ' unique' : '').
+               " index `$name` on `$pxtable` ".bracketList($columns, '`');
+         }
+      }
+      
+      foreach ($sqls as $sql) {
+         $this->query($sql, Db::QUERY_DEFINE);
+      }
+      
+      return $name;
+   }
+   
+   /**
+    * Define a table in the database.
+    * 
+    * @param string $table The name of the table.
+    * @param array $columns An array of columns in the following format:
+    * 
+    *    array(
+    *       columnName => array('type' => 'dbtype' [,'required' => bool] [, 'index' => string|array])
+    */
    public function defineTable($table, $columns) {
+      // Go through the table and build the indexes.
+      $indexes = array();
+      foreach ($columns as $name => $def) {
+         $index = val('index', $def);
+         if ($index) {
+            // The column has one or more indexes on them.
+            foreach ((array)$index as $typeString) {
+               $parts = explode('.', $typeString, 2);
+               $type = strtolower($parts[0]);
+               $suffix = val(1, $parts);
+               
+               if ($type == Db::INDEX_PK)
+                  $columns[$name]['required'] = true;
+               
+               // Save the index for later.
+               if ($type == Db::INDEX_PK || $type == Db::INDEX_UNIQUE || $suffix) {
+                  // There is only one index of this type.
+                  $indexes[$typeString]['columns'][] = $name;
+                  $indexes[$typeString]['type'] = $type;
+                  $indexes[$typeString]['suffix'] = $suffix;
+               } else {
+                  // One columns, one index.
+                  $indexes[] = array('columns' => $name, 'type' => $type);
+               }
+            }
+         }
+      }
+      
       // Get the current definition.
       $currentDef = $this->tableDefinition($table);
       
@@ -70,21 +252,17 @@ class MySqlDb extends Db {
          
          // Get the columns to alter.
          $alterColumns = array_intersect_key($columns, $currentColumns);
+         $alter = array();
          foreach ($alterColumns as $name => $def) {
-            if (val('primary', $def))
-               $def['required'] = true;
-            
             $currentDef = $currentColumns[$name];
             if ($currentDef['type'] !== $this->parseType($def['type']) ||
                $currentDef['required'] != val('required', $def, false)) {
                
-               // The column has changed, continue.
-               continue;
+               // The column has changed.
+               $alter[$name] = true;
             }
-            
-            // The column has not changed.
-            unset($alterColumns[$name]);
          }
+         $alterColumns = array_intersect_key($alterColumns, $alter);
          
          $parts = array();
          foreach ($addColumns as $name => $def) {
@@ -102,21 +280,11 @@ class MySqlDb extends Db {
             $this->query($sql, Db::QUERY_DEFINE);
          }
       }
-   }
-   
-   protected function columnDef($name, $def) {
-      $result = "`$name` ".$this->parseType($def['type']);
       
-      if (val('required', $def))
-         $result .= ' not null';
-      
-      if (val('autoincrement', $def))
-         $result .= ' auto_increment';
-      
-      if (val('primary', $def)) {
-         $result .= ' primary key';
+      // Now that the table has been defined we can add the indexes.
+      foreach ($indexes as $def) {
+         $this->defineIndex($table, $def['columns'], $def['type'], val('suffix', $def));
       }
-      return $result;
    }
    
    public function delete($table, $where) {
@@ -176,11 +344,26 @@ class MySqlDb extends Db {
    }
    
    /**
+    * Execute a query on the database.
     * 
-    * @param type $sql
-    * @param type $type
-    * @param type $options
-    * @return boolean|\MySqliResultIterator
+    * @param string $sql The sql query to execute.
+    * @param string $type One of the Db::QUERY_* constants.
+    * 
+    * Db::QUERY_READ
+    * : The query reads from the database.
+    * 
+    * Db::QUERY_WRITE
+    * : The query writes to the database.
+    * 
+    * Db::QUERY_DEFINE
+    * : The query alters the structure of the datbase.
+    * 
+    * @param array $options Additional options for the query.
+    * Db::GET_UNBUFFERED
+    * : Don't internally buffer the data when selecting from the database.
+    * 
+    * @return array|PDOStatement|boolean The result of the query.
+    *  - array: When selecting from the database
     */
    protected function query($sql, $type = Db::QUERY_READ, $options = array()) {
       $this->pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, !val(Db::GET_UNBUFFERED, $options, false));
@@ -251,8 +434,10 @@ class MySqlDb extends Db {
          }
       }
 
-      if (!$type)
+      if (!$type) {
+         debug_print_backtrace();
          trigger_error("Couldn't parse type $typeString", E_USER_ERROR);
+      }
 
       return $type;
    }
