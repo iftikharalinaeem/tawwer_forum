@@ -62,8 +62,9 @@ class GroupController extends Gdn_Controller {
       $GroupID = $Group['GroupID'];
       
       // Force the canonical url.
-      if ($ID != GroupSlug($Group))
+      if (rawurlencode($ID) != GroupSlug($Group)) {
          Redirect(GroupUrl($Group), 301);
+      }
       $this->CanonicalUrl(Url(GroupUrl($Group), '//'));
       
       $this->SetData('Group', $Group);

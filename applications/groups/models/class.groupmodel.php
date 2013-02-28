@@ -412,6 +412,24 @@ class GroupModel extends Gdn_Model {
       $this->Database->Query($Sql);
    }
    
+   public function Validate($FormPostValues, $Insert = FALSE) {
+      $Valid = parent::Validate($FormPostValues, $Insert);
+      
+      // Check to see if there is another group with the same name.
+      if (trim(GetValue('Name', $FormPostValues))) {
+         $Rows = $this->SQL->GetWhere('Group', array('Name' => $FormPostValues['Name']))->ResultArray();
+         
+         $GroupID = GetValue('GroupID', $FormPostValues);
+         foreach ($Rows as $Row) {
+            if (!$GroupID || $GroupID != $Row['GroupID']) {
+               $Valid = FALSE;
+               $this->Validation->AddValidationResult('Name', '@'.sprintf(T("There's already a %s with the name %s."), T('group'), htmlspecialchars($FormPostValues['Name'])));
+            }
+         }
+      }
+      return $Valid;
+   }
+   
    protected function ValidateRule($FieldName, $Data, $Rule, $CustomError = FALSE) {
       $Value = GetValue($FieldName, $Data);
       $Valid = $this->Validation->ValidateRule($Value, $FieldName, $Rule, $CustomError);
