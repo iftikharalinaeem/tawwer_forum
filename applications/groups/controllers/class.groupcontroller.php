@@ -367,13 +367,16 @@ class GroupController extends Gdn_Controller {
          self::SaveImage($Form, 'Icon', array('Prefix' => 'groups/icons/icon_', 'Size' => C('Groups.IconSize', 100), 'Crop' => TRUE));
          self::SaveImage($Form, 'Banner', array('Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => TRUE, 'OutputType' => 'jpeg'));
          
-         $GroupID = $Form->Save();
+         try {
+            $GroupID = $Form->Save();
+         } catch (Exception $Ex) {
+            $Form->AddError($Ex);
+         }
          if ($GroupID) {
             $Group = $this->GroupModel->GetID($GroupID);
             Redirect(GroupUrl($Group));
          } else {
             Trace($Form->FormValues());
-            $Form->AddError('What!?!?');
          }
       } else {
          if ($ID) {
