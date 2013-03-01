@@ -1,6 +1,10 @@
 <?php
 
-function trace($value, $prefix = 'debug') {
+/**
+ * @param type $value
+ * @param type $prefix
+ */
+function decho($value, $prefix = 'debug') {
    fwrite(STDERR, "$prefix: ".var_export($value, true)."\n");
 }
 

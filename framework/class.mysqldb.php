@@ -1,28 +1,4 @@
 <?php
-/**
- * Base class for all database access.
- */
-class Db {
-   /// Constants ///
-   
-   const GET_UNBUFFERED = 'unbuffered';
-   const INSERT_REPLACE = 'replace';
-   const INSERT_IGNORE = 'ignore';
-   const UPDATE_UPSERT = 'upsert';
-   
-   const INDEX_PK = 'primary';
-   const INDEX_FK = 'key';
-   const INDEX_IX = 'index';
-   const INDEX_UNIQUE = 'unique';
-   
-   const MODE_EXEC = 'exec';
-   const MODE_CAPTURE = 'capture';
-   const MODE_ECHO = 'echo';
-   
-   const QUERY_DEFINE = 'define';
-   const QUERY_READ = 'read';
-   const QUERY_WRITE = 'write';
-}
 
 class MySqlDb extends Db {
    public $mode = Db::MODE_EXEC;
@@ -69,6 +45,9 @@ class MySqlDb extends Db {
     * Get the index definitions for a table.
     * 
     * @param string $table The name of the table
+    * 
+    * - Foo
+    * - Bar
     * @return array An array in the form:
     * 
     *    array (
@@ -115,7 +94,7 @@ class MySqlDb extends Db {
     * @param string $table The name of the table that the index is on.
     * @param array|string $column The name(s) of the columns in the index.
     * @param string $type One of the Db::INDEX_* constants.
-    * @param string $suffix Optional. By default the index will be named based on the column that it's on.
+    * @param string $suffix Optional. By default the index will be named based on the column that it's on.  
     *    This suffix overrides that.
     */
    public function defineIndex($table, $column, $type, $suffix = null) {
@@ -196,8 +175,9 @@ class MySqlDb extends Db {
     * @param string $table The name of the table.
     * @param array $columns An array of columns in the following format:
     * 
-    *    array(
-    *       columnName => array('type' => 'dbtype' [,'required' => bool] [, 'index' => string|array])
+    *  array(
+    *      columnName => array('type' => 'dbtype' [,'required' => bool] [, 'index' => string|array])
+    *  )
     */
    public function defineTable($table, $columns) {
       // Go through the table and build the indexes.
@@ -291,8 +271,57 @@ class MySqlDb extends Db {
       trigger_error(__CLASS__.'->'.__FUNCTION__.'() not implemented', E_USER_ERROR);
    }
    
-   public function get($table, $where, $options = array()) {
-      trigger_error(__CLASS__.'->'.__FUNCTION__.'() not implemented', E_USER_ERROR);
+   public function get($table, $where, $order = array(), $limit = false, $options = array()) {
+      $sql = '';
+      
+      // Build the select clause.
+      $sql .= "select *";
+      
+      // Build the from clause.
+      $sql .= "\nfrom `$table`";
+      
+      // Build the where clause.
+      $whereString = $this->whereString($where);
+      if ($whereString)
+         $sql .= "\nwhere ".$whereString;
+      
+      // Build the order.
+      if (!empty($order)) {
+         $orders = array();
+         foreach ($order as $key => $value) {
+            if (is_int($key)) {
+               // This is just a column.
+               $orders[] = "`$value`";
+            } else {
+               // This is a column with a direction.
+               switch ($value) {
+                  case OP_ASC:
+                  case OP_DESC:
+                     $orders[] = "`$key` $value";
+                     break;
+                  default:
+                     trigger_error("Invalid sort direction '$value' for column '$key'.", E_USER_WARNING); 
+               }
+            }
+         }
+         
+         $sql .= "\norder by ".implode(', ', $orders);
+      }
+      
+      // Build the limit, offset.
+      if ($limit) {
+         if (is_numeric($limit))
+            $sql .= "\nlimit $limit";
+         elseif (is_array($limit)) {
+            // The limit is in the form (limit, offset) or (limit, 'page' => page)
+            if (isset($limit['page']))
+               $offset = $limit[0] * ($limit['page'] - 1);
+            else
+               list($limit, $offset) = $limit;
+            
+            $sql .= "\nlimit $limit offset $offset";
+         }
+      }
    }
    
    public function insert($table, $row, $options = array()) {
@@ -359,11 +388,16 @@ class MySqlDb extends Db {
     * : The query alters the structure of the datbase.
     * 
     * @param array $options Additional options for the query.
+    * 
     * Db::GET_UNBUFFERED
     * : Don't internally buffer the data when selecting from the database.
     * 
     * @return array|PDOStatement|boolean The result of the query.
-    *  - array: When selecting from the database
+    * 
+    * - array: When selecting from the database.
+    * - PDOStatement: When performing an unbuffered query.
+    * - int: When performing an update or an insert this will return the number of rows affected.
+    * - false: When the query was not successful.
     */
    protected function query($sql, $type = Db::QUERY_READ, $options = array()) {
       $this->pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, !val(Db::GET_UNBUFFERED, $options, false));
@@ -479,60 +513,64 @@ class MySqlDb extends Db {
    public function update($table, $row, $where, $options = array()) {
       trigger_error(__CLASS__.'->'.__FUNCTION__.'() not implemented', E_USER_ERROR);
    }
-}
-
-class MySqliResultIterator implements Iterator {
-   protected $current = false;
-   
-   
-   public $position = -1;
    
    /**
-    * @var mysqli_result
+    * Build a where clause from a where array.
+    * 
+    * @param array $where
     */
-   public $result;
-   
-   public function __construct($result) {
-      $this->result = $result;
-      $this->position = -1;
-      $this->current = false;
-   }
-   
-   public function current() {
-      if ($this->current === false) {
-         // We are before the beginning of the dataset.
-         $this->current = $this->result->fetch_assoc();
-         if ($this->current)
-            $this->position++;
+   protected function whereString($where, $op = OP_AND) {
+      static $map = array(OP_GT => '>', OP_GTE => '>=', OP_LT => '<', OP_LTE => '<=');
+      $result = '';
+      
+      foreach ($where as $column => $value) {
+         if ($result)
+            $result .= ' and ';
+         
+         if (is_array($value)) {
+            $op = array_shift($value);
+            $rval = array_shift($value);
+            
+            switch ($op) {
+               case OP_AND:
+               case OP_OR:
+                  $result .= '('.$this->whereString($rval, $op).')';
+                  break;
+               case OP_EQ:
+                  if ($value === null)
+                     $result .= "`$column` is null";
+                  else
+                     $result .= "`$column` = ".$this->pdo->quote($rval);
+                  break;
+               case OP_GT:
+               case OP_GTE:
+               case OP_LT:
+               case OP_LTE:
+                  $result .= "`$column` {$map[$op]} ".$this->pdo->quote($rval);
+                  break;
+               case OP_IN:
+                  // Quote the in values.
+                  $rval = array_map(array($this->pdo, 'quote'), (array)$rval);
+                  $result .= "`$column` in (".implode(', ', $rval).')';
+                  break;
+               case OP_NE:
+                  if ($value === null)
+                     $result .= "`$column` is null";
+                  else
+                     $result .= "`$column` = ".$this->pdo->quote($rval);
+                  break;
+            }
+         } else {
+            // This is just an equality operator.
+            if ($value === null)
+               $result .= "`$column` is null";
+            else
+               $result .= "`$column` = ".$this->pdo->quote($value);
+         }
       }
-      return $this->current;
-   }
-   
-   public function key() {
-      return $this->position;
-   }
-   
-   public function next() {
-      $this->current = $this->result->fetch_assoc();
-      if ($this->current)
-         $this->position++;
-   }
-   
-   public function rewind() {
-      $this->result->data_seek(0);
-      $this->current = false;
-      $this->position = -1;
-   }
-   
-   public function valid() {
-      return $this->current !== null;
    }
 }
 
 function bracketList($row, $quote = "'") {
    return "($quote".implode("$quote, $quote", $row)."$quote)";
-}
-
-function addBackticks($str) {
-   return "`$str`";
 }
