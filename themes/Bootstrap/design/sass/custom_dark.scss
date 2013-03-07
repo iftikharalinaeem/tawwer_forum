@@ -43,4 +43,11 @@ $successBackground: $green;
 $infoText: #fff;
 $infoBackground: $blue;
 
+.PasswordStrength .Background {
+   background-color: #333333;
+}
+.PasswordStrength .Separator {
+   background-color: black;
+}
+
 @import "colors";

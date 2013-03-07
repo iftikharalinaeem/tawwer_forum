@@ -74,12 +74,12 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       }
       unset($Commenters);
       
-      // Sort by points, descending
-      usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByPoints'));
-      
-      // Get the top 10 by points, and choose the 2 most recently online
-      $Eligible = array_slice($Eligible, 0, 10);
+      // Sort by online, descending
       usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByLastOnline'));
+      
+      // Get the top 10 by online, and choose the 2 by most points
+      $Eligible = array_slice($Eligible, 0, 10);
+      usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByPoints'));
       $Primary = GetValue(0, $Eligible, array());
       $Secondary = Getvalue(1, $Eligible, array());
       
@@ -290,6 +290,34 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       if ($Comments == $CycleCommentNumber) {
          $this->CycleThread($Discussion);
       }
+   }
+   
+   /**
+    * Add to rules
+    * 
+    * @param MinionPlugin $Sender
+    */
+   public function MinionPlugin_Sanctions_Handler($Sender) {
+      
+      // Don't care about the rule bar
+      
+      $Type = GetValue('Type', $Sender->EventArguments, 'rules');
+      if ($Type == 'bar') return;
+      
+      // Show a warning if there are rules in effect
+      
+      $ThreadCycle = $Sender->Monitoring($Sender->EventArguments['Discussion'], 'ThreadCycle', NULL);
+      
+      // Nothing happening?
+      if (!$ThreadCycle)
+         return;
+
+      $Rules = &$Sender->EventArguments['Rules'];
+      
+      // Thread is queued for recycled
+      $Page = GetValue('Page', $ThreadCycle);
+      $Rules[] = Wrap("<b>Thread Recycle</b>: page {$Page}", 'span', array('class' => 'MinionRule'));
+      
    }
    
 }

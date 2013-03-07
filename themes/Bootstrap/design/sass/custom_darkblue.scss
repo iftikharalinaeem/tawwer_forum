@@ -1,3 +1,5 @@
+@import "defaults";
+
 /// Scaffolding ///
 
 $bodyBackground: #2F2F2F;
@@ -13,11 +15,13 @@ $borderColor: #242424;
 
 $btnBackground: lighten(#2F2F2F, 10%);
 $btnColor: #fff;
-$btnPrimaryBackground: $red;
+$btnPrimaryBackground: #075ECC;
 $btnPrimaryColor: #fff;
 $formBackground: #2A2A2A;
 
 $readBackground: #383838;
+
+$navbarBackground: #000;
 
 $boxBackground: darken($bodyBackground, 2%);
 $listBackground: darken($bodyBackground, 2%);
@@ -38,3 +42,18 @@ $successBackground: $green;
 
 $infoText: #fff;
 $infoBackground: $blue;
+
+.Item-Header.CommentHeader {
+   margin: -8px -8px 0px -8px;
+   padding: 8px;
+   background: darken($bodyBackground, 4%);
+}
+
+.PasswordStrength .Background {
+   background-color: #333333;
+}
+.PasswordStrength .Separator {
+   background-color: black;
+}
+
+@import "colors";
