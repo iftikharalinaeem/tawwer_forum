@@ -5,7 +5,7 @@ error_reporting(E_ALL); //E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E
 ini_set('display_errors', 'on');
 ini_set('track_errors', 1);
 
-require_once dirname(__FILE__).'/functions.commandline.php';
+require_once __DIR__.'/../framework/bootstrap.php';
 
 header('Content-Type: text/plain; charset=UTF-8');
 
@@ -163,16 +163,16 @@ function writeRows($table, $rows) {
 }
 
 $options = array(
-   'host' => array('Host to connect to (IP address or hostname).', 'Sx' => ':', 'Field' => 'dbhost', 'Default' => '127.0.0.1'),
-   'dbname' => array('The name of the database.', 'Req' => TRUE, 'Sx' => ':', 'Field' => 'dbname'),
-   'user' => array('The username of the database.', 'Req' => FALSE, 'Sx' => ':', 'Field' => 'dbuser', 'Short' => 'u', 'Default' => ''),
-   'password' => array('The password to use when connecting to the server.', 'Sx' => '::', 'Field' => 'dbpass', 'Short' => 'p', 'Default' => ''),
+   'host' => array('Host to connect to (IP address or hostname).', 'default' => '127.0.0.1'),
+   'dbname' => array('The name of the database.'),
+   'user' => array('The username of the database.', 'default' => ''),
+   'password' => array('The password to use when connecting to the server.', 'default' => ''),
    'help' => array('Show help.')
 );
 
 // Grab the options.
-ParseCommandLine($options);
+$opts = ParseCommandLine('pgdump', $options);
 
-$pg = pgConnect($_POST['dbhost'], $_POST['dbname'], $_POST['dbuser'], $_POST['dbpass']);
+$pg = pgConnect($opts['host'], $opts['dbname'], $opts['user'], $opts['password']);
 pgDefineTables($pg, $schemas);
 pgDumpTables($pg, $schemas);

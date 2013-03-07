@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /// Hey Peeps!, this file needs to be symlinked into the porter folder. Call it from there!
 
@@ -47,8 +48,9 @@ function writeTableDef($tablename, $row) {
 
 function writeRows($table, $rows) {
    // Write the insert statement.
-   $columns = array_map(function($val) { return "`$val`"; }, array_keys($rows[0]));
-   echo "insert `$table` (".implode(', ', $columns).") values\n";
+   $columns = array_keys($rows[0]);
+   $icolumns = array_map(function($val) { return "`$val`"; }, $columns);
+   echo "insert `$table` (".implode(', ', $icolumns).") values\n";
    
    $first = true;
    foreach ($rows as $row) {
@@ -58,7 +60,14 @@ function writeRows($table, $rows) {
          $first = false;
       }
       
-      $values = array_map('mysql_real_escape_string', $row);
+      $values = array_fill_keys($columns, '');
+      
+      foreach ($values as $key => $value) {
+         if (array_key_exists($key, $row))
+            $values[$key] = $row[$key];
+      }
+      
+      $values = array_map('mysql_real_escape_string', $values);
       
       echo "('".
          implode("','", $values).

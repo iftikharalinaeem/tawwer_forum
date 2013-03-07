@@ -6,9 +6,8 @@ error_reporting(E_ALL); //E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E
 ini_set('display_errors', 'on');
 ini_set('track_errors', 1);
 
-require_once __DIR__.'/functions.core.php';
-require_once __DIR__.'/functions.commandline.php';
-require_once __DIR__.'/class.mysqldb.php';
+require_once __DIR__.'/framework/boostrap.php';
+
 
 function main() {
    $opts = array(
@@ -51,6 +50,7 @@ function main() {
             '_file' => array('ImportFile'),
             'Raw' => array('Raw', 'type' => 'mediumtext')
             ),
+         'tableoptions' => array('collate' => 'utf8_unicode_ci'),
          'rowfilter' => function(&$row) {
             $row['Body'] = extractBase64Images($row['Body'], __DIR__.'/imp-images', '~cf/imp-images');
             $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
@@ -62,26 +62,27 @@ function main() {
                $row['RowType'] = 'Poll';
          }),
       'Post' => array(
-            'tablename' => 'Comment',
-            'columns' => array(
-               'Key.KeyWithoutDiscussionKey' => array('ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'index' => Db::INDEX_PK),
-               'DiscussionKey.KeyWithoutForumKey' => array('Discussion.ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'required' => true),
-               'Body' => array('Body', 'type' => 'text'),
-               'ContentCreatedOn' => array('DateInserted', 'type' => 'datetime'),
-               'Owner.Key' => array('InsertUserKey'),
-               'LastEditTimeStamp' => array('DateUpdated', 'type' => 'datetime'),
-               'LastEditedBy.Key' => array('UpdateUserID'),
-               'SiteOfOriginKey' => array('Site', 'filter' => 'stripSubdomain'),
-               '_file' => array('ImportFile'),
-               'Raw' => array('Raw', 'type' => 'mediumtext')
-            ),
-            'rowfilter' => function(&$row) {
-               $row['Body'] = extractBase64Images($row['Body'], __DIR__.'/imp-images', '~cf/imp-images');
-               $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
-               
-               $row['Format'] = 'Html';
-            }
-         )
+         'tablename' => 'Comment',
+         'columns' => array(
+            'Key.KeyWithoutDiscussionKey' => array('ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'index' => Db::INDEX_PK),
+            'DiscussionKey.KeyWithoutForumKey' => array('Discussion.ForeignID', 'type' => 'varchar(40)', 'filter' => 'stripNamespace', 'required' => true),
+            'Body' => array('Body', 'type' => 'text'),
+            'ContentCreatedOn' => array('DateInserted', 'type' => 'datetime'),
+            'Owner.Key' => array('InsertUserKey'),
+            'LastEditTimeStamp' => array('DateUpdated', 'type' => 'datetime'),
+            'LastEditedBy.Key' => array('UpdateUserID'),
+            'SiteOfOriginKey' => array('Site', 'filter' => 'stripSubdomain'),
+            '_file' => array('ImportFile'),
+            'Raw' => array('Raw', 'type' => 'mediumtext')
+         ),
+         'tableoptions' => array('collate' => 'utf8_unicode_ci'),
+         'rowfilter' => function(&$row) {
+            $row['Body'] = extractBase64Images($row['Body'], __DIR__.'/imp-images', '~cf/imp-images');
+            $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
+
+            $row['Format'] = 'Html';
+         }
+      )
    );
          
    $db->mode = $options['mode'];
@@ -94,7 +95,7 @@ function main() {
          $columns[$def[0]] = $def;
       }
       
-      $db->defineTable($format['tablename'], $columns);
+      $db->defineTable($format['tablename'], $columns, val('tableoptions', $format));
    }
    
    $movedir = val('movedir', $options);
