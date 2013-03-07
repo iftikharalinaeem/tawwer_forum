@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * A connection between Vanilla and MySQL.
+ */
 class MySqlDb extends Db {
    public $mode = Db::MODE_EXEC;
    
@@ -45,15 +48,11 @@ class MySqlDb extends Db {
     * Get the index definitions for a table.
     * 
     * @param string $table The name of the table
-    * 
-    * - Foo
-    * - Bar
     * @return array An array in the form:
     * 
-    *    array (
-    *       index name => array('columns' => array('column'), 'type' => Db::INDEX_TYPE)
-    *    )
-    * 
+    *     array (
+    *        index name => array('columns' => array('column'), 'type' => Db::INDEX_TYPE)
+    *     )
     */
    public function indexDefinitions($table) {
       // Keep an internal cache for repeated calls to this function.
@@ -91,11 +90,27 @@ class MySqlDb extends Db {
    /**
     * Define an index in the database.
     * 
+    * Db->defineIndex() will check to see if the index already exists, and if it doesn't then it will create it.
+    * 
     * @param string $table The name of the table that the index is on.
     * @param array|string $column The name(s) of the columns in the index.
     * @param string $type One of the Db::INDEX_* constants.
-    * @param string $suffix Optional. By default the index will be named based on the column that it's on.  
+    * 
+    * Db::INDEX_PK
+    * : This index is the primary key
+    * 
+    * Db::INDEX_FK
+    * : This index is a foreign key. Its column(s) point to the primary key of another table.
+    * 
+    * Db::INDEX_IX
+    * : This is a regular index.
+    * 
+    * Db::INDEX_UNIQUE
+    * : This is a unique index.
+    * 
+    * @param string $suffix By default the index will be named based on the column that it's on.  
     *    This suffix overrides that.
+    * @return string The name of the index.
     */
    public function defineIndex($table, $column, $type, $suffix = null) {
       $columns = (array)$column;
@@ -221,6 +236,10 @@ class MySqlDb extends Db {
          $sql = "create table `{$this->px}$table` (\n  ".
             implode(",\n  ", $parts).
             "\n)";
+         
+         if (val('collate', $options)) {
+            $sql .= "\n collate {$options['collate']}";
+         }
          
          $this->query($sql, Db::QUERY_DEFINE);
       } else {
@@ -372,6 +391,10 @@ class MySqlDb extends Db {
       return $result;
    }
    
+   public function join(&$data, $on, $childcolumns = array(), $options = array()) {
+      parent::join($data, $on, $childcolumns, $options);
+   }
+   
    /**
     * Execute a query on the database.
     * 
@@ -392,7 +415,7 @@ class MySqlDb extends Db {
     * Db::GET_UNBUFFERED
     * : Don't internally buffer the data when selecting from the database.
     * 
-    * @return array|PDOStatement|boolean The result of the query.
+    * @return array|PDOStatement|bool The result of the query.
     * 
     * - array: When selecting from the database.
     * - PDOStatement: When performing an unbuffered query.
@@ -571,6 +594,12 @@ class MySqlDb extends Db {
    }
 }
 
+/**
+ * 
+ * @param type $row
+ * @param type $quote
+ * @return type
+ */
 function bracketList($row, $quote = "'") {
    return "($quote".implode("$quote, $quote", $row)."$quote)";
 }

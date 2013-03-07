@@ -1,7 +1,9 @@
 <?php
-namespace Framework;
 
-class ErrorException  extends \ErrorException {
+/**
+ * An ErrorException that also contains the context from the error.
+ */
+class ExceptionFromError  extends ErrorException {
    protected $context;
    
    public function __construct($message, $errno, $file, $line, $context) {
@@ -14,6 +16,17 @@ class ErrorException  extends \ErrorException {
    }
 }
 
+/**
+ * The base error handler that changes an error into an exception.
+ * 
+ * @param int $errno The code of the error.
+ * @param string $message The error message.
+ * @param string $file The file that the error occurred in.
+ * @param int $line The line that the error occurred on.
+ * @param array $context All of the variables that are currently defined. 
+ * @return boolean Returns false if the error is below the current error reporting level.
+ * @throws ExceptionFromError All errors that are thrown throw this exception.
+ */
 function errorHandler($errno, $message, $file, $line, $context) {
    $reporting = error_reporting();
    
@@ -39,7 +52,7 @@ function errorHandler($errno, $message, $file, $line, $context) {
 //      return FALSE;
 //   }
    
-   throw new ErrorException($message, $errno, $file, $line, $context);
+   throw new ExceptionFromError($message, $errno, $file, $line, $context);
 }
 
-set_error_handler('Framework\errorHandler', E_ALL);
+set_error_handler('errorHandler', E_ALL);
