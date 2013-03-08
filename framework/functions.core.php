@@ -138,16 +138,17 @@ function touchValue($key, &$array, $default) {
 }
 
 /**
- * Safely get a value out of an array by returning a default value of the key doesn't exist in the array.
+ * Safely get a value out of an array.
  * 
- * This function is one of the biggest workhorses of Vanilla and shows up a lot throughout other code.
+ * This function will always return a value even if the array key doesn't exist.
+ * The val() function is one of the biggest workhorses of Vanilla and shows up a lot throughout other code.
  * It's much preferable to use this function if your not sure whether or not an array key exists rather than
- * using `@` error suppression.
+ * using @ error suppression.
  * 
  * @param string|int $key The array key.
  * @param array $array The array to get the value from.
  * @param mixed $default The default value to return if the key doesn't exist.
- * @return mixed
+ * @return mixed The item from the array or `$default` if the array key doesn't exist.
  */
 function val($key, $array, $default = null) {
    if (array_key_exists($key, $array))
