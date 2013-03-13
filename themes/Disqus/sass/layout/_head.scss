@@ -1,0 +1,36 @@
+#Head {
+    padding: 20px 0;
+    background: #2E9FFF;
+
+    .Logo {
+        float: left;
+        margin: 0;
+        color: #FFFFFF;
+        font-size: 26px;
+        font-weight: normal;
+        line-height: 36px;
+    }
+
+    .SiteSearch {
+        float: right;
+
+        .InputBox {
+            @include box-shadow(none);
+            @include input-placeholder(#AAAAAA);
+            height: 36px;
+            width: 280px;
+            padding: 8px;
+            background: #FFFFFF;
+            border: 1px solid darken(#2E9FFF, 8%);
+            font-size: 13px;
+        }
+
+        .Button {
+            top: 0;
+            right: 0;
+            margin: 10px;
+        }
+
+    }
+
+}

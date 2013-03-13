@@ -56,7 +56,7 @@ class VigLinkPlugin implements Gdn_IPlugin {
          }
       } 
       else {
-         $Sender->Form->SetFormValue('ApiKey', $ApiKey);
+         $Sender->Form->SetValue('ApiKey', $ApiKey);
       }
 
       $Sender->AddSideMenu();

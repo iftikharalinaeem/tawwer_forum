@@ -15,8 +15,8 @@
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Addons
+ * @license Proprietary
+ * @package misc
  */
 
 $PluginInfo['Hunter'] = array(
