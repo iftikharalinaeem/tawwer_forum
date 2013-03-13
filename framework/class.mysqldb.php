@@ -17,15 +17,16 @@ class MySqlDb extends Db {
     */
    public $pdo;
    
-   public $px = 'GDN_';
+   public $px = 'gdn_';
    
    /// Methods ///
    
-   public function __construct($host, $username, $password, $dbname) {
-//      $this->mysqli = new mysqli($host, $username, $password, $dbname);
-//      $this->mysqli->set_charset('utf8');
+   public function __construct($host, $username, $password, $dbname, $port = null) {
+      $dsn = array('dbname' => $dbname, 'host' => $host);
+      if ($port)
+         $dsn['port'] = $port;
       
-      $this->pdo = new PDO("mysql:dbname=$dbname;host=$host", $username, $password);
+      $this->pdo = new PDO('mysql:'.http_build_query($dsn, null, ';'), $username, $password);
       $this->pdo->query('set names utf8'); // send this statement outside our query function.
    }
    
@@ -35,8 +36,10 @@ class MySqlDb extends Db {
       if (val('required', $def))
          $result .= ' not null';
       
-      if (val('autoincrement', $def))
+      if (val('autoincrement', $def)) {
          $result .= ' auto_increment';
+         $def['primary'] = true;
+      }
       
       if (val('primary', $def)) {
          $result .= ' primary key';
@@ -184,17 +187,7 @@ class MySqlDb extends Db {
       return $name;
    }
    
-   /**
-    * Define a table in the database.
-    * 
-    * @param string $table The name of the table.
-    * @param array $columns An array of columns in the following format:
-    * 
-    *  array(
-    *      columnName => array('type' => 'dbtype' [,'required' => bool] [, 'index' => string|array])
-    *  )
-    */
-   public function defineTable($table, $columns) {
+   public function defineTable($table, $columns, $options = array()) {
       // Go through the table and build the indexes.
       $indexes = array();
       foreach ($columns as $name => $def) {
@@ -434,7 +427,8 @@ class MySqlDb extends Db {
          
          if (!$result) {
             list($code, $dbCode, $message) = $this->pdo->errorInfo();
-            die($message);
+//            die($message);
+            fwrite(STDERR, $sql);
             trigger_error($message, E_USER_ERROR);
 //            trigger_error($this->mysqli->error."\n\n".$sql, E_USER_ERROR);
          }

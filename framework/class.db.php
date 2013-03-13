@@ -53,4 +53,21 @@ abstract class Db {
    function join(&$data, $on, $childcolumns = array(), $options = array()) {
       
    }
+   
+   /**
+    * Define a table in the database.
+    * 
+    * @param string $table The name of the table.
+    * @param array $columns An array of columns in the following format:
+    * 
+    *  array(
+    *      columnName => array('type' => 'dbtype' [,'required' => bool] [, 'index' => string|array])
+    *  )
+    * 
+    * @param array $options Additional options for the table.
+    * 
+    * collate
+    * : The database collation for the table.
+    */
+   abstract function defineTable($table, $columns, $options = array());
 }
