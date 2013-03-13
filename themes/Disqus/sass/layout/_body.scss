@@ -1,0 +1,56 @@
+#Body {
+
+    &,
+    .Nav {
+        margin: 20px 0;
+    }
+
+    .BreadcrumbsWrapper {
+        @include pie-clearfix;
+        margin: {
+            right: 280px;
+        }
+        font-size: 16px;
+        line-height: 35px;
+
+        &,
+        a,
+        span {
+            display: block;
+        }
+
+        a,
+        span {
+            display: block;
+            float: left;
+        }
+
+        .Crumb {
+            padding: 0 5px;
+
+            + span {
+
+                &:last-of-type {
+
+                    a,
+                    span {
+                        color: #777777;
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    #Content {
+
+        .SearchForm {
+            display: none;
+        }
+
+    }
+
+}

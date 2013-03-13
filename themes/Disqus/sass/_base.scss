@@ -1,0 +1,30 @@
+@include reset-html5;
+
+* {
+    @include box-sizing(border-box);
+}
+
+html {
+    font-size: 100%;
+}
+
+body {
+    color: #444444;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    @include transition(color linear .1s);
+    color: #2E9FFF;
+
+    &:hover {
+        color: #1977CA;
+    }
+
+}
+
+#{headings(6)} {
+    font-weight: 300;
+}
