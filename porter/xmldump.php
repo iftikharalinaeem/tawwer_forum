@@ -1,12 +1,12 @@
 <?php
-
-/// Hey Peeps!, Make sure functions.commandline.php is symlinked into this folder.
+define('APPLICATION', 'xmldump');
 
 error_reporting(E_ALL); //E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 ini_set('display_errors', 'on');
 ini_set('track_errors', 1);
 
-require_once __DIR__.'/framework/boostrap.php';
+require_once __DIR__.'/framework/bootstrap.php';
+require_once __DIR__.'/framework/functions.commandline.php';
 
 
 function main() {
@@ -42,6 +42,8 @@ function main() {
             'Body' => array('Body', 'type' => 'text'),
             'Format' => array('Format', 'type' => 'varchar(10)'),
             'Title' => array('Name'),
+            'Slug' => array('Slug', 'type' => 'varchar(50)'),
+            'ShortTitle' => array('ShortTitle', 'type' => 'varchar(50)'),
             'IsSticky' => array('Announce', 'type' => 'tinyint'),
             'IsClosed' => array('Closed', 'type' => 'tinyint'),
             'Owner.Key' => array('InsertUserKey'),
@@ -54,6 +56,7 @@ function main() {
          'rowfilter' => function(&$row) {
             $row['Body'] = extractBase64Images($row['Body'], __DIR__.'/imp-images', '~cf/imp-images');
             $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
+            $row['Slug'] = formatUrl($row['ShortTitle']);
             
             $row['Format'] = 'Html';
             
