@@ -615,6 +615,13 @@ class ReactionModel {
          throw new Gdn_UserException(T("You can't react to your own post."));
       }
       
+      // Check and see if moderators are protected.
+      if (GetValue('Protected', $ReactionType)) {
+         $InsertUser = Gdn::UserModel()->GetID($Row['InsertUserID']);
+         if (Gdn::UserModel()->CheckPermission($InsertUser, 'Garden.Moderation.Manage'))
+            throw new Gdn_UserException(T("You can't flag a moderator's post."));
+      }
+      
       // Figure out the increment.
       if ($IsCurator) {
          $Inc = GetValue('ModeratorInc', $ReactionType, 1);

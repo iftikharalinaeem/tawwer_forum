@@ -4,7 +4,8 @@
  * 
  * Changes:
  *  1.0     Release
- *  1.2.3   Allow ReactionModel() to react from any source user
+ *  1.2.3   Allow ReactionModel() to react from any source user.
+ *  1.2.4   Allow some reactions to be protected so that users can't flag moderator posts.
  * 
  * 
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
@@ -15,7 +16,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.2.3',
+   'Version' => '1.2.4',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
