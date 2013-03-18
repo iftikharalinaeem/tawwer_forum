@@ -1429,8 +1429,6 @@ class MinionPlugin extends Gdn_Plugin {
       
       // Check expiry times and remove if expires
       $KickedUsers = $this->Monitoring($Discussion, 'Kicked', array());
-      var_dump($KickedUsers);
-      die();
       $KULen = sizeof($KickedUsers);
       foreach ($KickedUsers as $KickedUserID => $KickedUser) {
          if (!is_null($KickedUser['Expires']) && $KickedUser['Expires'] <= time())
