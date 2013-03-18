@@ -18,6 +18,7 @@
  *  1.6     Add SimpleAPI hooks
  *  1.6.1   Add online/count API hook
  *  1.6.3   Natsort OnlineUsers before rendering
+ *  1.6.4   Some tweaks to the css.
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -28,7 +29,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.6.3',
+   'Version' => '1.6.4',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
