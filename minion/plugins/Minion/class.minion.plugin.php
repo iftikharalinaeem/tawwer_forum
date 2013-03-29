@@ -44,7 +44,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.12',
+   'Version' => '1.13',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -1429,8 +1429,6 @@ class MinionPlugin extends Gdn_Plugin {
       
       // Check expiry times and remove if expires
       $KickedUsers = $this->Monitoring($Discussion, 'Kicked', array());
-      var_dump($KickedUsers);
-      die();
       $KULen = sizeof($KickedUsers);
       foreach ($KickedUsers as $KickedUserID => $KickedUser) {
          if (!is_null($KickedUser['Expires']) && $KickedUser['Expires'] <= time())
