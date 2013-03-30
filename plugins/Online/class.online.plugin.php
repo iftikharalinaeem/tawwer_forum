@@ -732,7 +732,7 @@ class OnlinePlugin extends Gdn_Plugin {
    
    public function AdjustUser(&$User) {
       $UserID = GetValue('UserID', $User, NULL);
-      if (!$UserID) FALSE;
+      if (!$UserID) return FALSE;
       
       // Already handled this one guv'na
       if (array_key_exists('Online', $User)) return;
