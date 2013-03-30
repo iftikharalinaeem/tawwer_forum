@@ -38,6 +38,12 @@ class SimpleAPIPlugin extends Gdn_Plugin {
    public $Mapper = NULL;
    
    /**
+    * Detect API calls
+    * @var boolean
+    */
+   public $API = false;
+   
+   /**
     * Intercept POST data
     * 
     * This method inspects and potentially modifies incoming POST data to 
@@ -326,7 +332,6 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     * @param Gdn_Dispatcher $Sender 
     */
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
-      
       $IncomingRequest = Gdn::Request()->RequestURI();
       
       // Detect a versioned API call
@@ -336,6 +341,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       if (!$MatchedAPI)
          return;
       
+      $this->API = true;
       $APIVersion = $URI[1];
       $APIRequest = $URI[2];
       
@@ -470,6 +476,19 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       // Translate GET data
       self::TranslateGet($_GET);
       Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_GET, $_GET);
+   }
+   
+   /**
+    * Add POST data to existing GET for reflection purposes
+    * 
+    * @param Gdn_Dispatcher $Sender
+    */
+   public function Gdn_Dispatcher_BeforeReflect_Handler($Sender) {
+      if (!$this->API) return;
+      
+      $Request = $Sender->EventArguments['Request'];
+      $ReflectionArguments = &$Sender->EventArguments['Arguments'];
+      $ReflectionArguments = array_merge($ReflectionArguments, $Request->Post());
    }
    
    /**
