@@ -967,7 +967,7 @@ EOT;
          // Run informant conversion
          $FreeSomeone = false;
          $FreeSomeoneChance = mt_rand(0,100);
-         if ($FreeSomeoneChance > 70)
+         if ($FreeSomeoneChance > 60)
             $FreeSomeone = true;
          
          if ($FreeSomeone) {
