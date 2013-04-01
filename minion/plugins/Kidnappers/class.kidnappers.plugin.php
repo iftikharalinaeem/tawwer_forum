@@ -13,6 +13,7 @@
  * Changes: 
  *  1.0     Release
  *  1.1     Add reaction icons
+ *  1.2     Add kidnapper mini tutorial
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -23,7 +24,7 @@
 $PluginInfo['Kidnappers'] = array(
    'Name' => 'Minion: Kidnappers',
    'Description' => "Kidnappers game and badges.",
-   'Version' => '1.1',
+   'Version' => '1.2',
    'RequiredApplications' => array(
       'Vanilla' => '2.1a',
       'Reputation' => '1.0'
@@ -472,6 +473,16 @@ KIDNAP;
       
       $this->SetUserMeta($VictimID, self::KIDNAPPER_KEY, json_encode($KidnapperData));
       
+      $Activity = array(
+         'ActivityUserID' => $UserID,
+         'NotifyUserID' => $VictimID,
+         'HeadlineFormat' => T("You've become a kidnapper, working for the infamous {Data.Minion.UserID,user}. Click 'Kidnap' on someone's post to kidnap them, but remember: you'll have to wait 15 minutes to kidnap again!"),
+         'Data' => array(
+            'Minion'         => $this->MinionUser
+         )
+      );
+      $this->Activity($Activity);
+      
    }
    
    /**
@@ -537,9 +548,6 @@ KIDNAP;
       }
       $this->UserBadgeModel->Give($VictimID, $Stockholm['BadgeID']);
       
-      // Create kidnapper
-      $this->Kidnapper($VictimID);
-      
       $Activity = array(
          'ActivityUserID' => $this->MinionUser['UserID'],
          'NotifyUserID' => $VictimID,
@@ -550,6 +558,8 @@ KIDNAP;
       );
       $this->Activity($Activity);
       
+      // Create kidnapper
+      $this->Kidnapper($VictimID);
    }
    
    /**
