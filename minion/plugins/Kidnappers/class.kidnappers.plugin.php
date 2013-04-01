@@ -424,7 +424,7 @@ class KidnappersPlugin extends Gdn_Plugin {
       $Kidnapper['Victims']++;
       
       $IsInformant = GetValue('Informant', $Kidnapper, false);
-      $CooldownTime = $IsInformant ? $this->KidnapCooldown*3 : $this->KidnapCooldown;
+      $CooldownTime = $IsInformant ? $this->KidnapCooldown * 2 : $this->KidnapCooldown;
       $Kidnapper['Cooldown'] = time() + $CooldownTime;
       $this->SetUserMeta($UserID, self::KIDNAPPER_KEY, json_encode($Kidnapper));
       
@@ -549,7 +549,7 @@ KIDNAP;
       $this->UserBadgeModel->Give($VictimID, $Informant['BadgeID']);
       
       $UserID = !is_null($UserID) ? $UserID : $this->MinionUser['UserID'];
-      $KidnapCooldownMinutes = ($this->KidnapCooldown * 3) / 60;
+      $KidnapCooldownMinutes = ($this->KidnapCooldown * 2) / 60;
       $Activity = array(
          'ActivityUserID' => $UserID,
          'NotifyUserID' => $VictimID,
@@ -973,7 +973,7 @@ EOT;
          // Run informant conversion
          $FreeSomeone = false;
          $FreeSomeoneChance = mt_rand(0,100);
-         if ($FreeSomeoneChance > 70)
+         if ($FreeSomeoneChance > 80)
             $FreeSomeone = true;
          
          if ($FreeSomeone) {
@@ -986,7 +986,7 @@ EOT;
                ->NotLike('Value', '%Victims":0%')
                ->Get()->NumRows();
 
-            $Items = 5;
+            $Items = 2;
             $Pages = floor($NumKidnappers / $Items);
             $Page = mt_rand(0,$Pages);
             $KidnapperUsers = Gdn::SQL()
