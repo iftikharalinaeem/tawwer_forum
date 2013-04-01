@@ -474,6 +474,17 @@ KIDNAP;
          $this->Minion->Message($Victim, $DiscussionID, $KidnapMessage);
       }
       
+      // Notify
+      $Activity = array(
+         'ActivityUserID' => $UserID,
+         'NotifyUserID' => $VictimID,
+         'HeadlineFormat' => T("You've been kidnapped by {ActivityUserID,user}!"),
+         'Data' => array(
+            'Minion'       => $this->MinionUser
+         )
+      );
+      $this->Activity($Activity);
+      
    }
    
    /**
@@ -549,6 +560,7 @@ KIDNAP;
       }
       $this->UserBadgeModel->Give($VictimID, $Informant['BadgeID']);
       
+      // Notify
       $UserID = !is_null($UserID) ? $UserID : $this->MinionUser['UserID'];
       $KidnapCooldownMinutes = ($this->KidnapCooldown * 2) / 60;
       $Activity = array(
@@ -599,6 +611,8 @@ KIDNAP;
          ));
          $this->Minion->Message($Victim, $DiscussionID, $RescueMessage);
       }
+      
+      // Notify
       $Activity = array(
          'ActivityUserID' => $UserID,
          'NotifyUserID' => $VictimID,
