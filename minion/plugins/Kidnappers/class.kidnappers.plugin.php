@@ -16,6 +16,7 @@
  *  1.2     Add kidnapper mini tutorial
  *  1.3     Change wording to hint at forumer
  *  1.4     Added hints and new CSS for mobile
+ *  1.5     Show informants differently
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -26,7 +27,7 @@
 $PluginInfo['Kidnappers'] = array(
    'Name' => 'Minion: Kidnappers',
    'Description' => "Kidnappers game and badges.",
-   'Version' => '1.3',
+   'Version' => '1.5',
    'RequiredApplications' => array(
       'Vanilla' => '2.1a',
       'Reputation' => '1.0'
@@ -800,11 +801,16 @@ KIDNAP;
       
       // ...for author
       $AuthorKidnapper = $this->IsKidnapper($AuthorID);
+      $AuthorInformant = $this->IsInformant($AuthorID);
       $AuthorKidnapped = (!$AuthorKidnapper) ? $this->IsKidnapped($AuthorID) : false;
       
       // Author is a kidnapper
-      if ($AuthorKidnapper) {
+      if ($AuthorKidnapper && !$AuthorInformant) {
          $Sender->EventArguments['CssClass'] .= ' Kidnapper';
+      }
+      
+      if ($AuthorKidnapper && $AuthorInformant) {
+         $Sender->EventArguments['CssClass'] .= ' Informant';
       }
       
       // Author was kidnapped

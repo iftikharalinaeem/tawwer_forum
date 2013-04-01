@@ -28,6 +28,16 @@
    background: transparent url('images/mask.png') no-repeat top left;
 }
 
+.Item.Informant .AuthorWrap .PhotoWrap:after{
+   content: '';
+   position: absolute;
+   width: 100px;
+   height: 124px;
+   top: 10px;
+   left: 52px;
+   background: transparent url('images/informant.png') no-repeat top left;
+}
+
 .Item.Kidnapped .AuthorWrap .PhotoWrap:after{
    content: '';
    position: absolute;
