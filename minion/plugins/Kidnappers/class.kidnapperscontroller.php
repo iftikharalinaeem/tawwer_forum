@@ -6,7 +6,7 @@
  * @since 1.0.0
  * @package Reputation
  */
-class KidnappersController extends Gdn_Controller {
+class KidnappersController extends VanillaController {
    
    public function Initialize() {
       parent::Initialize();
