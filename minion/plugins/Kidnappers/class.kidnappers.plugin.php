@@ -518,7 +518,7 @@ KIDNAP;
          $RescueMessage = <<<KIDNAP
 {Victim.UserID,user} has been rescued by {User.UserID,user}.
 KIDNAP;
-         $RescueMessage = FormatString($KidnapMessage, array(
+         $RescueMessage = FormatString($RescueMessage, array(
             'Victim'    => $Victim,
             'User'      => $User
          ));
