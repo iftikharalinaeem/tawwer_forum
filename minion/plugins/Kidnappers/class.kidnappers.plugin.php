@@ -12,6 +12,7 @@
  * 
  * Changes: 
  *  1.0     Release
+ *  1.1     Add reaction icons
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -22,7 +23,7 @@
 $PluginInfo['Kidnappers'] = array(
    'Name' => 'Minion: Kidnappers',
    'Description' => "Kidnappers game and badges.",
-   'Version' => '1.0',
+   'Version' => '1.1',
    'RequiredApplications' => array(
       'Vanilla' => '2.1a',
       'Reputation' => '1.0'
@@ -905,7 +906,7 @@ EOT;
          // Kidnapper
          $this->ReactionModel->DefineReactionType(array(
             'UrlCode' => 'Kidnapper', 
-            'Name' => 'Kidnapper', 
+            'Name' => 'Make Kidnapper', 
             'Sort' => 0, 
             'Class' => 'Good', 
             'Hidden' => 1,

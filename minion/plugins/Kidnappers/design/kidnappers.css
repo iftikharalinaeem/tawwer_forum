@@ -36,3 +36,15 @@
    left: 42px;
    background: transparent url('images/tied.png') no-repeat top left;
 }
+
+.ReactSprite.ReactKidnapper {
+   background-position: -101px -5px;
+}
+
+.ReactSprite.ReactRescue {
+   background-position: -244px -53px;
+}
+
+.ReactSprite.ReactKidnap {
+   background-position: -149px -5px;
+}
