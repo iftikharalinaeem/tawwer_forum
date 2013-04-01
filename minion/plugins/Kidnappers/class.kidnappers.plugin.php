@@ -973,7 +973,7 @@ EOT;
          // Run informant conversion
          $FreeSomeone = false;
          $FreeSomeoneChance = mt_rand(0,100);
-         if ($FreeSomeoneChance > 50)
+         if ($FreeSomeoneChance > 30)
             $FreeSomeone = true;
          
          if ($FreeSomeone) {
@@ -982,6 +982,7 @@ EOT;
                ->Select('UserID')
                ->From('UserMeta')
                ->Where('Name', $KidnapperMetaKey)
+               ->NotLike('Value', '%Informant%')
                ->NotLike('Value', '%Victims":0%')
                ->Get()->NumRows();
 
@@ -992,6 +993,7 @@ EOT;
                ->Select('*')
                ->From('UserMeta')
                ->Where('Name', $KidnapperMetaKey)
+               ->NotLike('Value', '%Informant%')
                ->NotLike('Value', '%Victims":0%')
                ->Limit($Items)
                ->Offset($Page)
