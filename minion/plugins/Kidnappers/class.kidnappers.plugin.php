@@ -133,6 +133,7 @@ class KidnappersPlugin extends Gdn_Plugin {
       $this->KidnapExpiry = C('Plugins.Kidnappers.Expiry', 900);
       $this->KidnapCooldown = C('Plugins.Kidnappers.KidnapCooldown', 600);
       $this->MinionAnnounce = C('Plugins.Kidnappers.Announce', false);
+      $this->InformantChance = C('Plugins.Kidnappers.InformantChance', 10);
       
       $this->Kidnappers = array();
       $this->Kidnapped = array();
@@ -973,7 +974,8 @@ EOT;
          // Run informant conversion
          $FreeSomeone = false;
          $FreeSomeoneChance = mt_rand(0,100);
-         if ($FreeSomeoneChance > 80)
+         $Chance = 100 - $this->InformantChance;
+         if ($FreeSomeoneChance > $Chance)
             $FreeSomeone = true;
          
          if ($FreeSomeone) {
