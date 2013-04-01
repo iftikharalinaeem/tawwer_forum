@@ -264,6 +264,22 @@ class KidnappersPlugin extends Gdn_Plugin {
       return true;
    }
    
+   /**
+    * Check if this person is and informant
+    * 
+    * Checks IsKidnapper, then looks for the Informant flag. Informants can kidnap
+    * and rescue at the same time.
+    * 
+    * @param integer $UserID
+    * @return boolean
+    */
+   public function IsInformant($UserID) {
+      $Kidnapper = $this->IsKidnapper($UserID);
+      if (!$Kidnapper) return false;
+      
+      return (bool)GetValue('Informant', $Kidnapper, false);
+   }
+   
    /*
     * METHODS
     */
@@ -318,6 +334,7 @@ class KidnappersPlugin extends Gdn_Plugin {
       
       // ...for viewing user
       $UserKidnapper = $this->IsKidnapper($UserID);
+      $UserInformant = $this->IsInformant($UserID);
       $UserCanKidnap = ($UserKidnapper) ? $this->CanKidnap($UserID) : false;
       $UserKidnapped = (!$UserKidnapper) ? $this->IsKidnapped($UserID) : false;
       // Victims cannot do anything special
@@ -363,7 +380,7 @@ class KidnappersPlugin extends Gdn_Plugin {
             $Sender->SetData('Hint', $Hint);
             
             // Check answer
-            if ($Sender->Form->AuthenticatedPostback() && $AuthorKidnapped) {
+            if ($Sender->Form->AuthenticatedPostback() && ($AuthorKidnapped && (!$UserKidnapper || $UserInformant))) {
                $Guess = strtolower($Sender->Form->GetValue('Guess'));
                $Answer = strtolower(GetValue('Answer', $Hint));
                if ($Guess == $Answer) {
@@ -403,7 +420,10 @@ class KidnappersPlugin extends Gdn_Plugin {
       $Kidnapper = $this->IsKidnapper($UserID);
       TouchValue('Victims', $Kidnapper, 0);
       $Kidnapper['Victims']++;
-      $Kidnapper['Cooldown'] = time() + $this->KidnapCooldown;
+      
+      $IsInformant = GetValue('Informant', $Kidnapper, false);
+      $CooldownTime = $IsInformant ? $this->KidnapCooldown*3 : $this->KidnapCooldown;
+      $Kidnapper['Cooldown'] = time() + $CooldownTime;
       $this->SetUserMeta($UserID, self::KIDNAPPER_KEY, json_encode($Kidnapper));
       
       // Create victim
@@ -428,13 +448,13 @@ class KidnappersPlugin extends Gdn_Plugin {
       
       // Award kidnapped badge
       $BadgeName = "kidnapped";
-      $Rescuer = $this->BadgeModel->GetID($BadgeName);
-      if (!$Rescuer) {
+      $Kidnapped = $this->BadgeModel->GetID($BadgeName);
+      if (!$Kidnapped) {
          $this->Structure();
-         $Rescuer = $this->BadgeModel->GetID($BadgeName);
-         if (!$Rescuer) return;
+         $Kidnapped = $this->BadgeModel->GetID($BadgeName);
+         if (!$Kidnapped) return;
       }
-      $this->UserBadgeModel->Give($VictimID, $Rescuer['BadgeID']);
+      $this->UserBadgeModel->Give($VictimID, $Kidnapped['BadgeID']);
       
       // Broadcast the kidnapping
       if (!is_null($DiscussionID)) {
@@ -476,11 +496,62 @@ KIDNAP;
       
       $this->SetUserMeta($VictimID, self::KIDNAPPER_KEY, json_encode($KidnapperData));
       
+      $UserID = !is_null($UserID) ? $UserID : $this->MinionUser['UserID'];
       $KidnapCooldownMinutes = $this->KidnapCooldown / 60;
       $Activity = array(
          'ActivityUserID' => $UserID,
          'NotifyUserID' => $VictimID,
          'HeadlineFormat' => T("You've become a kidnapper, working for the infamous {Data.Minion.UserID,user}. Click 'Kidnap' on someone's post to kidnap them, but remember: you'll have to wait {Data.Cooldown} minutes to kidnap again!"),
+         'Data' => array(
+            'Minion'       => $this->MinionUser,
+            'Cooldown'     => $KidnapCooldownMinutes
+         )
+      );
+      $this->Activity($Activity);
+      
+   }
+   
+   /**
+    * Turn this person into an informant
+    * 
+    * @param integer $VictimID
+    * @param integer $UserID
+    */
+   public function Informant($VictimID, $UserID = null) {
+      
+      $Kidnapper = $this->IsKidnapper($VictimID);
+      if (!$Kidnapper) {
+         // Remove special statuses from user
+         $this->Normalize($VictimID);
+      
+         // Make this person a kidnapper first
+         $this->Kidnapper($VictimID, $UserID);
+         $Kidnapper = $this->IsKidnapper($VictimID);
+      }
+      
+      // Create kidnapper
+      $KidnapperData = array_merge($Kidnapper, array(
+         'Informant' => true
+      ));
+      
+      $this->SetUserMeta($VictimID, self::KIDNAPPER_KEY, json_encode($KidnapperData));
+      
+      // Award informant badge
+      $BadgeName = "informant";
+      $Informant = $this->BadgeModel->GetID($BadgeName);
+      if (!$Informant) {
+         $this->Structure();
+         $Informant = $this->BadgeModel->GetID($BadgeName);
+         if (!$Informant) return;
+      }
+      $this->UserBadgeModel->Give($VictimID, $Informant['BadgeID']);
+      
+      $UserID = !is_null($UserID) ? $UserID : $this->MinionUser['UserID'];
+      $KidnapCooldownMinutes = ($this->KidnapCooldown * 3) / 60;
+      $Activity = array(
+         'ActivityUserID' => $UserID,
+         'NotifyUserID' => $VictimID,
+         'HeadlineFormat' => T("You've become an informant, working for the Robot Police to spy on the infamous {Data.Minion.UserID,user}. You can't kidnap as often, but you can now rescue."),
          'Data' => array(
             'Minion'       => $this->MinionUser,
             'Cooldown'     => $KidnapCooldownMinutes
@@ -631,6 +702,7 @@ KIDNAP;
       
       // ...for viewing user
       $UserKidnapper = $this->IsKidnapper($UserID);
+      $UserInformant = $this->IsInformant($UserID);
       $UserCanKidnap = ($UserKidnapper) ? $this->CanKidnap($UserID) : false;
       $UserKidnapped = (!$UserKidnapper) ? $this->IsKidnapped($UserID) : false;
       // Victims cannot do anything special
@@ -651,7 +723,7 @@ KIDNAP;
          $Buttons[] = 'Kidnap';
       
       // Allow rescuing kidnappees
-      if ($AuthorKidnapped && !$UserKidnapper)
+      if ($AuthorKidnapped && (!$UserKidnapper || $UserInformant))
          $Buttons[] = 'Rescue';
       
       // Moderators can create new kidnappers
@@ -878,18 +950,54 @@ EOT;
       if (!$NextCheckTime || $NextCheckTime < microtime(true)) {
          Gdn::Cache()->Store(self::EXPIRY_CHECK_CACHE, microtime(true)+60);
 
-         // Run expiry check
+         // Run stockholm check
          $StockholmMetaKey = $this->MakeMetaKey(self::STOCKHOLM_KEY);
          $StockholmUsers = Gdn::SQL()
             ->Select('*')
             ->From('UserMeta')
-            ->Like('Name', $StockholmMetaKey)
+            ->Where('Name', $StockholmMetaKey)
             ->Where('Value <', time())
             ->Get()->ResultArray();
 
          foreach ($StockholmUsers as $Victim) {
             $VictimID = $Victim['UserID'];
             $this->Stockholm($VictimID);
+         }
+         
+         // Run informant conversion
+         $FreeSomeone = false;
+         $FreeSomeoneChance = mt_rand(0,100);
+         if ($FreeSomeoneChance > 70)
+            $FreeSomeone = true;
+         
+         if ($FreeSomeone) {
+            $KidnapperMetaKey = $this->MakeMetaKey(self::KIDNAPPER_KEY);
+            $NumKidnappers =  Gdn::SQL()
+               ->GetCount('UserMeta', array(
+                  'Name'  => $KidnapperMetaKey
+               ));
+
+            $Items = 5;
+            $Pages = floor($NumKidnappers / $Items);
+            $Page = mt_rand(0,$Pages);
+            $KidnapperUsers = Gdn::SQL()
+               ->Select('*')
+               ->From('UserMeta')
+               ->Where('Name', $KidnapperMetaKey)
+               ->Limit($Items)
+               ->Offset($Page)
+               ->Get()->ResultArray();
+
+            // Make some informants!
+            foreach ($KidnapperUsers as $KidnapperUser) {
+               $KidnapperUserID = GetValue('UserID', $KidnapperUser);
+               $Kidnapper = @json_decode(GetValue('Value', $KidnapperUser), true);
+               if (!$Kidnapper) continue;
+               $IsInformant = (bool)GetValue('Informant', $Kidnapper, false);
+               if ($IsInformant) continue;
+               
+               $this->Informant($KidnapperUserID, $this->MinionUser['UserID']);
+            }
          }
       }
    }
@@ -1015,6 +1123,19 @@ EOT;
          'Type' => 'Manual',
          'Body' => "You spent too much time with your captors, so now you're one of them!",
          'Photo' => 'http://badges.vni.la/100/stockholm.png',
+         'Points' => 10,
+         'Class' => 'Kidnappers',
+         'Level' => 1,
+         'CanDelete' => 0
+      ));
+      
+      // Traitor
+      $this->BadgeModel->Define(array(
+         'Name' => 'Informant',
+         'Slug' => 'informant',
+         'Type' => 'Manual',
+         'Body' => "The Robot Police have turned you! You're now an infiltrator.",
+         'Photo' => 'http://badges.vni.la/100/informant.png',
          'Points' => 10,
          'Class' => 'Kidnappers',
          'Level' => 1,
