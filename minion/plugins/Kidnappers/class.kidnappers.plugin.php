@@ -767,8 +767,9 @@ KIDNAP;
          }
 
          $NewBody = "<p><em>Faint muffled sounds reach your ears...</em></p><p class=\"KidnappersMuffled\">{$NewBody}</p>";
-         $NewBody .= FormatString('<div>{Minion.UserID,user} says:</div><div class="KidnappersHint">{Hint.Clue}<br/><b>Which forumer am I?</b></div>', array(
+         $NewBody .= FormatString('<div>{Minion.UserID,user} says:</div><div class="KidnappersHint">{Hint.Clue}<br/><b>Which forumer am I?</b></div>Hurry, or {Author.UserID,user} might develop some kind of... Stockholm Syndrome!', array(
             'Minion' => $this->MinionUser,
+            'Author' => $Author,
             'Hint'   => $Hint
          ));
 
