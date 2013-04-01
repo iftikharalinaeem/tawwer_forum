@@ -15,6 +15,7 @@
  *  1.1     Add reaction icons
  *  1.2     Add kidnapper mini tutorial
  *  1.3     Change wording to hint at forumer
+ *  1.4     Added hints and new CSS for mobile
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
