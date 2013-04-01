@@ -14,6 +14,7 @@
  *  1.0     Release
  *  1.1     Add reaction icons
  *  1.2     Add kidnapper mini tutorial
+ *  1.3     Change wording to hint at forumer
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -24,7 +25,7 @@
 $PluginInfo['Kidnappers'] = array(
    'Name' => 'Minion: Kidnappers',
    'Description' => "Kidnappers game and badges.",
-   'Version' => '1.2',
+   'Version' => '1.3',
    'RequiredApplications' => array(
       'Vanilla' => '2.1a',
       'Reputation' => '1.0'
@@ -168,7 +169,8 @@ class KidnappersPlugin extends Gdn_Plugin {
       ));
             
       // Change persona
-      $Sender->Persona('Kidnapper');
+      if ($this->Enabled)
+         $Sender->Persona('Kidnapper');
    }
    
    /**
@@ -438,7 +440,7 @@ class KidnappersPlugin extends Gdn_Plugin {
          $KidnapMessage = <<<KIDNAP
 {Victim.UserID,user} has been kidnapped by {User.UserID,user} and is being held for ransom! Solve the riddle to set em' free, or I'll hand em' over to Clamps!
    
-<div class="KidnappersHint">{Hint.Clue}<br/><b>Who am I?</b></div>
+<div class="KidnappersHint">{Hint.Clue}<br/><b>Which forumer am I?</b></div>
 KIDNAP;
          $KidnapMessage = FormatString($KidnapMessage, array(
             'Victim'    => $Victim,
@@ -765,7 +767,7 @@ KIDNAP;
          }
 
          $NewBody = "<p><em>Faint muffled sounds reach your ears...</em></p><p class=\"KidnappersMuffled\">{$NewBody}</p>";
-         $NewBody .= FormatString('<div>{Minion.UserID,user} says:</div><div class="KidnappersHint">{Hint.Clue}<br/><b>Who am I?</b></div>', array(
+         $NewBody .= FormatString('<div>{Minion.UserID,user} says:</div><div class="KidnappersHint">{Hint.Clue}<br/><b>Which forumer am I?</b></div>', array(
             'Minion' => $this->MinionUser,
             'Hint'   => $Hint
          ));

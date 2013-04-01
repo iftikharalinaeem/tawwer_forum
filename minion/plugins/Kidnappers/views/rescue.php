@@ -8,7 +8,7 @@ echo $this->Form->Errors();
 ?>
 <div class="P KidnappersHint"><?php echo $this->Data('Hint.Clue'); ?></div>
 <div class="P"><?php 
-   echo Wrap($this->Form->Label('Who am I?', 'Guess'), 'b');
+   echo Wrap($this->Form->Label('Which forumer am I?', 'Guess'), 'b');
    echo Wrap($this->Form->TextBox('Guess'), 'div');
 ?></div>
 
