@@ -605,13 +605,18 @@ KIDNAP;
       if (array_key_exists('Discussion', $Sender->EventArguments)) {
          $Object = (array)$Sender->EventArguments['Discussion'];
          $ObjectType = 'Discussion';
+         $Discussion = $Object;
       }
       
       if (array_key_exists('Comment', $Sender->EventArguments)) {
          $Object = (array)$Sender->EventArguments['Comment'];
          $ObjectType = 'Comment';
+         $DiscussionID = GetValue('DiscussionID', $Object);
+         $DiscussionModel = new DiscussionModel();
+         $Discussion = (array)$DiscussionModel->GetID($DiscussionID);
       }
       
+      if ($Discussion['Closed']) return;
       if (!$Object) return;
       
       // Don't show custom reactions for user viewing his own post
