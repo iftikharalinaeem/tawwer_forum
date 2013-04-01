@@ -84,11 +84,11 @@ $navbarSpriteStyle: "sprites-14";
 }
 
 @function spriteUrl($color, $file: sprites-14) {
-   @return url("http://vanillicon.com/sprites/#{$file}-#{hex_str(unquote($color))}.png");
+   @return url("//vanillicon.com/sprites/#{$file}-#{hex_str(unquote($color))}.png");
 }
 
 @function spriteUrlLocal($color, $file: sprites-14) {
-   @return url("http://vanillicon.com/sprites/#{$file}-#{hex_str(unquote($color))}.png");
+   @return url("//vanillicon.local/sprites/#{$file}-#{hex_str(unquote($color))}.png");
 }
 
 @mixin inset {
