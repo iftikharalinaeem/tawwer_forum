@@ -132,6 +132,7 @@ class KidnappersPlugin extends Gdn_Plugin {
       
       $this->KidnapExpiry = C('Plugins.Kidnappers.Expiry', 900);
       $this->KidnapCooldown = C('Plugins.Kidnappers.KidnapCooldown', 600);
+      $this->MinionAnnounce = C('Plugins.Kidnappers.Announce', false);
       
       $this->Kidnappers = array();
       $this->Kidnapped = array();
@@ -458,7 +459,7 @@ class KidnappersPlugin extends Gdn_Plugin {
       $this->UserBadgeModel->Give($VictimID, $Kidnapped['BadgeID']);
       
       // Broadcast the kidnapping
-      if (!is_null($DiscussionID)) {
+      if (!is_null($DiscussionID) && $this->MinionAnnounce) {
          $KidnapMessage = <<<KIDNAP
 {Victim.UserID,user} has been kidnapped by {User.UserID,user} and is being held for ransom! Solve the riddle to set em' free, or I'll hand em' over to Clamps!
    
@@ -587,7 +588,7 @@ KIDNAP;
       $this->UserBadgeModel->Give($UserID, $Rescuer['BadgeID']);
       
       // Broadcast the rescue
-      if (!is_null($DiscussionID)) {
+      if (!is_null($DiscussionID) && $this->MinionAnnounce) {
          $RescueMessage = <<<KIDNAP
 {Victim.UserID,user} has been rescued by {User.UserID,user}.
 KIDNAP;
@@ -596,17 +597,16 @@ KIDNAP;
             'User'      => $User
          ));
          $this->Minion->Message($Victim, $DiscussionID, $RescueMessage);
-         
-         $Activity = array(
-            'ActivityUserID' => $UserID,
-            'NotifyUserID' => $VictimID,
-            'HeadlineFormat' => T("{ActivityUserID,user} mounted a daring rescue, saving you in the nick of time from the evil clutches of {Data.Minion.UserID,user}!"),
-            'Data' => array(
-               'Minion'         => $this->MinionUser
-            )
-         );
-         $this->Activity($Activity);
       }
+      $Activity = array(
+         'ActivityUserID' => $UserID,
+         'NotifyUserID' => $VictimID,
+         'HeadlineFormat' => T("{ActivityUserID,user} mounted a daring rescue, saving you in the nick of time from the evil clutches of {Data.Minion.UserID,user}!"),
+         'Data' => array(
+            'Minion'         => $this->MinionUser
+         )
+      );
+      $this->Activity($Activity);
    }
    
    /**
