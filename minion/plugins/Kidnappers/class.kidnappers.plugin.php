@@ -479,7 +479,7 @@ KIDNAP;
       $Activity = array(
          'ActivityUserID' => $UserID,
          'NotifyUserID' => $VictimID,
-         'HeadlineFormat' => T("You've become a kidnapper, working for the infamous {Data.Minion.UserID,user}. Click 'Kidnap' on someone's post to kidnap them, but remember: you'll have to wait {Cooldown} minutes to kidnap again!"),
+         'HeadlineFormat' => T("You've become a kidnapper, working for the infamous {Data.Minion.UserID,user}. Click 'Kidnap' on someone's post to kidnap them, but remember: you'll have to wait {Data.Cooldown} minutes to kidnap again!"),
          'Data' => array(
             'Minion'       => $this->MinionUser,
             'Cooldown'     => $KidnapCooldownMinutes
