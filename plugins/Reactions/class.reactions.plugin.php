@@ -91,9 +91,15 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
    }
    
+   /**
+    * 
+    * @param ActivityController $Sender
+    */
    public function ActivityController_Render_Before($Sender) {
-      $this->AddJs($Sender);
-      include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+      if ($Sender->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
+         $this->AddJs($Sender);
+         include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+      }
    }
    
    /// Event Handlers ///
