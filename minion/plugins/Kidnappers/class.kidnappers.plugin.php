@@ -973,9 +973,11 @@ EOT;
          if ($FreeSomeone) {
             $KidnapperMetaKey = $this->MakeMetaKey(self::KIDNAPPER_KEY);
             $NumKidnappers =  Gdn::SQL()
-               ->GetCount('UserMeta', array(
-                  'Name'  => $KidnapperMetaKey
-               ));
+               ->Select('UserID')
+               ->From('UserMeta')
+               ->Where('Name', $KidnapperMetaKey)
+               ->NotLike('Value', '%Victims":0%')
+               ->Get()->NumRows();
 
             $Items = 5;
             $Pages = floor($NumKidnappers / $Items);
@@ -984,6 +986,7 @@ EOT;
                ->Select('*')
                ->From('UserMeta')
                ->Where('Name', $KidnapperMetaKey)
+               ->NotLike('Value', '%Victims":0%')
                ->Limit($Items)
                ->Offset($Page)
                ->Get()->ResultArray();
@@ -1129,7 +1132,7 @@ EOT;
          'CanDelete' => 0
       ));
       
-      // Traitor
+      // Informant
       $this->BadgeModel->Define(array(
          'Name' => 'Informant',
          'Slug' => 'informant',
