@@ -104,15 +104,22 @@ echo $this->Form->Open(), $this->Form->Errors();
    <li>
      <?php
      echo $this->Form->Label('Start Discussions', 'Abilities_DiscussionsAdd'),
-     '<div class="Info2">'."You can remove the ability to start discussions from lower-rankig members.".'</div>',
+     '<div class="Info2">'."You can remove the ability to start discussions from lower-ranking members.".'</div>',
       $this->Form->RadioList('Abilities_DiscussionsAdd', array('no' => 'take away', '' => 'default'));
      ?>
    </li>
    <li>
      <?php
      echo $this->Form->Label('Add Comments', 'Abilities_CommentsAdd'),
-     '<div class="Info2">'."You can remove the ability to add comments from lower-rankig (or punished) members.".'</div>',
+     '<div class="Info2">'."You can remove the ability to add comments from lower-ranking (or punished) members.".'</div>',
       $this->Form->RadioList('Abilities_CommentsAdd', array('no' => 'take away', '' => 'default'));
+     ?>
+   </li>
+   <li>
+     <?php
+     echo $this->Form->Label('Verified', 'Abilities_Verified'),
+     '<div class="Info2">'."You make higher-ranking users bypass the spam checking system.".'</div>',
+      $this->Form->RadioList('Abilities_Verified', array('yes' => 'bypass', 'no' => 'force check', '' => 'default'));
      ?>
    </li>
    <li>

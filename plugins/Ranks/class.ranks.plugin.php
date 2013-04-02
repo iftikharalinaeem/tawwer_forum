@@ -335,16 +335,32 @@ class RanksPlugin extends Gdn_Plugin {
       $RankID = GetValue('RankID', $Args['User'], 0);
       $Rank = RankModel::Ranks($RankID);
       
-      if ($Rank && isset($Rank['CssClass'])) {
-         $CssClass = GetValue('_CssClass', $Args['User']);
-         $CssClass .= ' '.$Rank['CssClass'];
-         SetValue('_CssClass', $Args['User'], trim($CssClass));
+      if ($Rank) {
+         
+         if (isset($Rank['CssClass'])) {
+            $CssClass = GetValue('_CssClass', $Args['User']);
+            $CssClass .= ' '.$Rank['CssClass'];
+            SetValue('_CssClass', $Args['User'], trim($CssClass));
+         }
          
          if (GetValueR('Abilities.Signatures', $Rank) == 'no') {
             SetValue('HideSignature', $Args['User'], TRUE);
          }
+         
          if (GetValueR('Abilities.Titles', $Rank) == 'no') {
             SetValue('Title', $Args['User'], '');
+         }
+         
+         $V = GetValueR('Abilities.Verified', $Rank, null);
+         if (!is_null($V)) {
+            $Verified = array(
+               'yes' => 1,
+               'no'  => 0
+            );
+            $Verified = GetValue($V, $Verified, null);
+            if (is_integer($Verified)) {
+               SetValue('Verified', $Args['User'], $Verified);
+            }
          }
       }
    }
