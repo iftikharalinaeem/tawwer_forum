@@ -26,6 +26,42 @@ $PluginInfo['Reactions'] = array(
 
 class ReactionsPlugin extends Gdn_Plugin {
    /// Methods ///
+   /**
+    * Include ReactionsController for /reactions requests
+    * 
+    * Manually detect and include reactions controller when a request comes in
+    * that probably uses it.
+    * 
+    * @param Gdn_Dispatcher $Sender
+    */
+   public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender, $Args) {
+      if (!isset($Args['Request']))
+        return;
+      
+      $Path = $Args['Request']->Path();
+      if (preg_match('`^/?reactions`i', $Path)) {
+         require_once($this->GetResource('class.reactionscontroller.php'));
+      }
+   }
+   
+   /**
+    * Add mapper methods
+    * 
+    * @param SimpleApiPlugin $Sender
+    */
+   public function SimpleApiPlugin_Mapper_Handler($Sender) {
+      switch ($Sender->Mapper->Version) {
+         case '1.0':
+            $Sender->Mapper->AddMap(array(
+               'reactions/list'        => 'reactions',
+               'reactions/get'         => 'reactions/get',
+               'reactions/add'         => 'reactions/add',
+               'reactions/edit'        => 'reactions/edit',
+               'reactions/toggle'      => 'reactions/toggle'
+            ));
+            break;
+      }
+   }
    
    private function AddJs($Sender) {
       $Sender->AddJsFile('jquery-ui-1.8.17.custom.min.js');
@@ -580,6 +616,10 @@ class ReactionsPlugin extends Gdn_Plugin {
             $CommentModel->OrderBy('c.DateInserted');
             break;
       }
+   }
+   
+   public function SettingsController_AddEditCategory_Handler($Sender) {
+      $Sender->ShowCustomPoints = TRUE;
    }
 
    /** 
