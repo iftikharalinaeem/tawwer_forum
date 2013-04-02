@@ -34,8 +34,11 @@ class ReactionsPlugin extends Gdn_Plugin {
     * 
     * @param Gdn_Dispatcher $Sender
     */
-   public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender) {
-      $Path = $Sender->EventArguments['Request']->Path();
+   public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender, $Args) {
+      if (!isset($Args['Request']))
+        return;
+      
+      $Path = $Args['Request']->Path();
       if (preg_match('`^/?reactions`i', $Path)) {
          require_once($this->GetResource('class.reactionscontroller.php'));
       }
@@ -553,6 +556,10 @@ class ReactionsPlugin extends Gdn_Plugin {
             $CommentModel->OrderBy('c.DateInserted');
             break;
       }
+   }
+   
+   public function SettingsController_AddEditCategory_Handler($Sender) {
+      $Sender->ShowCustomPoints = TRUE;
    }
 
    /** 
