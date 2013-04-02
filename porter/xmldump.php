@@ -1,13 +1,14 @@
 <?php
 define('APPLICATION', 'xmldump');
 
-error_reporting(E_ALL); //E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
+error_reporting(E_ALL & ~E_USER_NOTICE); //E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 ini_set('display_errors', 'on');
 ini_set('track_errors', 1);
 
 require_once __DIR__.'/framework/bootstrap.php';
-require_once __DIR__.'/framework/functions.commandline.php';
+requireFeature(FEATURE_COMMANDLINE, FEATURE_FORMATTING, FEATURE_SIMPLEHTMLDOM);
 
+$noisewords = array("a", "about", "all", "an", "and", "any", "are", "as", "at", "be", "been", "best", "both", "by", "click", "com", "do", "does", "each", "either", "every", "facts", "few", "find", "for", "free", "from", "get", "go", "had", "has", "have", "he", "help", "how", "i", "if", "in", "inc", "into", "is", "it", "know", "lbs", "link", "make", "makes", "me", "more", "most", "my", "no", "note", "often", "on", "or", "our", "ours", "oz", "page", "since", "site", "so", "some", "take", "tbsp", "than", "that", "the", "them", "therefore", "these", "they", "to", "too", "us", "view", "was", "we", "web", "what", "when", "where", "which", "while", "who", "whose", "why", "with", "without", "you", "youre", "your", "yours");
 
 function main() {
    $opts = array(
@@ -19,6 +20,8 @@ function main() {
       'movedir' => array('Move completed files to this directory.')
    );
    $files = array('file');
+   $xodomains = array('theknot.com', 'weddingchannel.com', 'weddings.com', 'thebump.com', 'thenest.com');
+   $cdn = "http://cdn.vanillaforums.com/xogrp";
 
    $options = parseCommandLine('xmldump', $opts, $files);
    
@@ -42,10 +45,12 @@ function main() {
             'Body' => array('Body', 'type' => 'text'),
             'Format' => array('Format', 'type' => 'varchar(10)'),
             'Title' => array('Name'),
-            'Slug' => array('Slug', 'type' => 'varchar(50)'),
+            'Slug' => array('Slug', 'type' => 'varchar(150)'),
+            'ShortSlug' => array('ShortSlug', 'type' => 'varchar(150)'),
             'ShortTitle' => array('ShortTitle', 'type' => 'varchar(50)'),
             'IsSticky' => array('Announce', 'type' => 'tinyint'),
             'IsClosed' => array('Closed', 'type' => 'tinyint'),
+            'ContentBlockingState' => array('Blocked', 'type' => 'varchar(50)'),
             'Owner.Key' => array('InsertUserKey'),
             'CreatedOn' => array('DateInserted', 'type' => 'datetime'),
             'SiteOfOriginKey' => array('Site', 'filter' => 'stripSubdomain', 'index' => Db::INDEX_IX),
@@ -53,15 +58,17 @@ function main() {
             'Raw' => array('Raw', 'type' => 'mediumtext')
             ),
          'tableoptions' => array('collate' => 'utf8_unicode_ci'),
-         'rowfilter' => function(&$row) {
-            $row['Body'] = extractBase64Images($row['Body'], __DIR__.'/imp-images', '~cf/imp-images');
+         'rowfilter' => function(&$row) use ($cdn, $xodomains) {
+            $row['Body'] = extractBase64Images($row['Body'], __DIR__.'/xogrp/b64-images', "$cdn/b64-images");
+            $row['Body'] = downloadImages($row['Body'], $xodomains, __DIR__.'/xogrp/downloaded', "$cdn/downloaded");
             $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
-            $row['Slug'] = formatUrl($row['ShortTitle']);
+            $row['Slug'] = formatUrl($row['Title']);
+            $row['ShortSlug'] = removeNoiseWords($row['Slug']);
             
             $row['Format'] = 'Html';
             
             $row['RowType'] = null;
-            if (val('IsPoll', $row))
+            if (forceBool(val('IsPoll', $row)))
                $row['RowType'] = 'Poll';
          }),
       'Post' => array(
@@ -74,13 +81,15 @@ function main() {
             'Owner.Key' => array('InsertUserKey'),
             'LastEditTimeStamp' => array('DateUpdated', 'type' => 'datetime'),
             'LastEditedBy.Key' => array('UpdateUserID'),
+            'ContentBlockingState' => array('Blocked', 'type' => 'varchar(50)'),
             'SiteOfOriginKey' => array('Site', 'filter' => 'stripSubdomain'),
             '_file' => array('ImportFile'),
             'Raw' => array('Raw', 'type' => 'mediumtext')
          ),
          'tableoptions' => array('collate' => 'utf8_unicode_ci'),
-         'rowfilter' => function(&$row) {
-            $row['Body'] = extractBase64Images($row['Body'], __DIR__.'/imp-images', '~cf/imp-images');
+         'rowfilter' => function(&$row) use ($cdn, $xodomains) {
+            $row['Body'] = extractBase64Images($row['Body'], __DIR__.'/xogrp/b64-images', "$cdn/b64-images");
+            $row['Body'] = downloadImages($row['Body'], $xodomains, __DIR__.'/xogrp/downloaded', "$cdn/downloaded");
             $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
 
             $row['Format'] = 'Html';
@@ -93,12 +102,15 @@ function main() {
    // First make sure we define the tables.
    $formats = getFullFormats($formats);
    foreach ($formats as $format) {
+      $tdef = $format;
       $columns = array();
-      foreach ($format['columns'] as $source => $def) {
-         $columns[$def[0]] = $def;
+      foreach ($format['columns'] as $source => $cdef) {
+         $columns[$cdef[0]] = $cdef;
       }
+      touchValue('name', $tdef, $tdef['tablename']);
+      $tdef['columns'] = $columns;
       
-      $db->defineTable($format['tablename'], $columns, val('tableoptions', $format));
+      $db->defineTable($tdef, val('tableoptions', $format));
    }
    
    $movedir = val('movedir', $options);
@@ -220,6 +232,86 @@ function dumpXmlFile($path, $formats, $db) {
    }
 }
 
+function downloadImages($str, $domains, $dir, $prefix) {
+   $dom = str_get_html($str);
+   
+   if (!is_object($dom)) {
+      trigger_error("Could not parse:\n$str", E_USER_NOTICE);
+      return $str;
+   }
+   
+   // Loop throug all of the images in the post.
+   foreach ($dom->find('img') as $img) {
+      $src = $img->src;
+      $urlparts = parse_url($src);
+      if ($urlparts === false || !isset($urlparts['host'], $urlparts['path']))
+         continue;
+      
+      
+      $domain = strtolower(stripSubdomain($urlparts['host']));
+      if (!in_array($domain, $domains)) {
+         continue;
+      }
+      
+      $newsrc = downloadImage($src, $urlparts['path'], $dir, $prefix);
+      $img->src = $newsrc;
+      
+      // See if the image is wrapped in a link that is also an image.
+      $parent = $img->parent();
+      if ($parent->tag == 'a') {
+         if (!isset($parent->title) || $parent->title != 'Click to view a larger photo')
+            continue;
+         
+         // Check to see if the image has .Medium.ext'
+         $href = $parent->href;
+         $hrefparts = parse_url($href);
+         if ($hrefparts === false || !isset($hrefparts['path']))
+            continue;
+
+         $ext = strtolower(pathinfo($hrefparts['path'], PATHINFO_EXTENSION));
+         if (in_array($ext, array('jpg', 'jpeg', 'gif', 'png'))) {
+            $newhref = downloadImage($href, $hrefparts['path'], $dir, $prefix);
+            $parent->href = $newhref;
+            $parent->class = "PhotoLink";
+         } elseif (stripos($src, '.Medium.')) {
+            $largesrc = str_ireplace('.Medium.', '.Large.', $src);
+            $largesrcparts = parse_url($largesrc);
+            $newhref = downloadImage($largesrc, $largesrcparts['path'], $dir, $prefix);
+            $parent->href = $newhref;
+            $parent->class = "PhotoLink";
+         }
+      }
+   }
+   $newstr = $dom->save();
+   return $newstr;
+}
+
+$lastDownload = microtime(true);
+
+function downloadImage($url, $subpath, $dir, $prefix) {
+   global $lastDownload;
+
+   // Make sure not to flood the downloads.
+   $sleep = microtime(true) - ($lastDownload + 1);
+   if ($sleep > 0.1)
+      usleep($sleep * 1000000);
+   
+   $subpath = '/'.ltrim($subpath, '/');
+   $path = $dir.$subpath;
+   $newurl = $prefix.$subpath;
+
+   if (!file_exists($path)) {
+      ensureDir(dirname($path));
+      $r = copy($url, $path);
+      if (!$r) {
+         trigger_error("Couldn't download $url.", E_USER_WARNING);
+      }
+   }
+   
+   $lastDownload = microtime(true);
+   return $newurl;
+}
+
 function extractBase64Images($str, $dir, $prefix) {
    $cb = function ($match) use ($dir, $prefix) {
       $data = base64_decode(trim($match[2]));
@@ -322,6 +414,15 @@ function parseXmlRow($str, $format, $data = array()) {
    
 //   var_export($row);
    return $row;
+}
+
+function removeNoiseWords($slug) {
+   global $noisewords;
+   $parts = explode('-', $slug);
+   $parts = array_filter($parts, function($val) use ($noisewords) {
+      return !in_array($val, $noisewords);
+   });
+   return implode('-', $parts);
 }
 
 function stripNamespace($val) {
