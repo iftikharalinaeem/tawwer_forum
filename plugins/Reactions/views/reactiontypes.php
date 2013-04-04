@@ -76,7 +76,7 @@
 </div>
 <div class="Wrap">
    <?php
-   echo Anchor(T('Advanced Settings'), '/settings/reactions');
+   echo Anchor(T('Advanced Settings'), '/reactions/advanced');
    ?>
 </div>
 <table id="Badges" class="AltColumns ManageBadges">
@@ -92,13 +92,14 @@
       <?php foreach ($this->Data('ReactionTypes') as $ReactionType): ?>
       <?php
       if (GetValue('Hidden', $ReactionType)) continue;
+      $UrlCode = $ReactionType['UrlCode'];
       $State = $ReactionType['Active'] ? 'Active' : 'InActive';
       ?>
       <tr id="ReactionType_<?php echo $ReactionType['UrlCode']; ?>" class="<?php echo $State; ?>">
          <td class="NameColumn"><div class="CellWrap">
             <?php
             echo Img('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png', array('ReactionImage')), ' ';
-            echo T($ReactionType['Name']);
+            echo Anchor(T($ReactionType['Name']), "/reactions/edit/{$UrlCode}");
             ?></div>
          </td>
          <td><?php echo $ReactionType['Description']; ?></td>

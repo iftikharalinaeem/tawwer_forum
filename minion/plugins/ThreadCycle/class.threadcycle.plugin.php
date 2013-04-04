@@ -40,14 +40,84 @@ class ThreadCyclePlugin extends Gdn_Plugin {
     * @param array $Discussion
     */
    public function CycleThread($Discussion) {
+      $CommentsPerPage = C('Vanilla.Comments.PerPage', 40);
       $DiscussionID = GetValue('DiscussionID', $Discussion);
       
       // Close the thread
       $DiscussionModel = new DiscussionModel();
       $DiscussionModel->SetField($DiscussionID, 'Closed', TRUE);
       
+      // Determine speed
+      $StartTime = strtotime(GetValue('DateInserted', $Discussion));
+      $EndTime = time();
+      $Elapsed = $EndTime - $StartTime;
+      $CPM = (GetValue('CountComments', $Discussion) / $Elapsed) * 60;
+      
+      $MinWarp = 1;
+      $MaxWarp = 11;
+      
+      // Rate determination
+//      $TargetWarp = 6.5;
+//      $TargetComments = ;
+//      $CPMPerWarp = ;
+//      $MinWarpCPM = 0.4;
+//      $MaxWarpCPM = ;
+      
+      $Scales = array(
+          array(
+             'min'         => 0,
+             'max'         => 0.1,
+             'name'        => 'thrusters'
+          ),
+          array(
+             'min'         => 0.1,
+             'max'         => $MinWarpCPM,
+             'name'        => 'impulse',
+             'format'      => '{speed} {scale}',
+             'divisions'   => 4,
+             'divtype'     => 'fractions'
+          ),
+          array(
+             'min'         => 0.4,
+             'max'         => $MaxWarpCPM,
+             'name'        => 'warp',
+             'format'      => '{scale} {speed}',
+             'divisions'   => 10
+          ),
+          array(
+             'min'         => $MaxWarpCPM,
+             'max'         => null,
+             'name'        => 'transwarp'
+          )
+      );
+      
+      $Scale = null;
+      foreach ($Scales as $ScaleInfo) {
+         $Max = $ScaleInfo['max'];
+         $Min = $ScaleInfo['min'];
+         if ($CPM >= $Min && $CPM < $Max) {
+            $Scale = $ScaleInfo['name'];
+            $Format = GetValue('format', $ScaleInfo, '{scale}');
+            $Speed = 1;
+            
+            $Divisions = GetValue('divisions', $ScaleInfo, null);
+            if ($Divisions && $Max) {
+               $DivType = GetValue('divtype', $ScaleInfo, 'whole');
+               switch ($DivType) {
+                  case 'fractions':
+                     //$Range = 
+                     break;
+                  
+                  case 'whole':
+                  default:
+                     break;
+               }
+            }
+            break;
+         }
+      }
+      
       // Find the last page of commenters.
-      $CommentsPerPage = C('Vanilla.Comments.PerPage', 40);
       $Commenters = Gdn::SQL()->Select('InsertUserID', 'DISTINCT', 'UserID')
          ->From('Comment')
          ->Where('DiscussionID', $DiscussionID)
