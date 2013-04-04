@@ -6,7 +6,7 @@ ini_set('display_errors', 'on');
 ini_set('track_errors', 1);
 
 require_once __DIR__.'/framework/bootstrap.php';
-requireFeature(FEATURE_COMMANDLINE, FEATURE_FORMATTING, FEATURE_SIMPLEHTMLDOM);
+requireFeatures(FEATURE_COMMANDLINE, FEATURE_FORMATTING, FEATURE_SIMPLEHTMLDOM);
 
 $noisewords = array("a", "about", "all", "an", "and", "any", "are", "as", "at", "be", "been", "best", "both", "by", "click", "com", "do", "does", "each", "either", "every", "facts", "few", "find", "for", "free", "from", "get", "go", "had", "has", "have", "he", "help", "how", "i", "if", "in", "inc", "into", "is", "it", "know", "lbs", "link", "make", "makes", "me", "more", "most", "my", "no", "note", "often", "on", "or", "our", "ours", "oz", "page", "since", "site", "so", "some", "take", "tbsp", "than", "that", "the", "them", "therefore", "these", "they", "to", "too", "us", "view", "was", "we", "web", "what", "when", "where", "which", "while", "who", "whose", "why", "with", "without", "you", "youre", "your", "yours");
 
