@@ -132,7 +132,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     * @param ActivityController $Sender
     */
    public function ActivityController_Render_Before($Sender) {
-      if ($Sender->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
+      if ($Sender->DeliveryMethod() == DELIVERY_METHOD_XHTML || $Sender->DeliveryType() == DELIVERY_TYPE_VIEW) {
          $this->AddJs($Sender);
          include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
       }
