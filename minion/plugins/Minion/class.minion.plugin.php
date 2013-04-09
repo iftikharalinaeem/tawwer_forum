@@ -1552,7 +1552,7 @@ class MinionPlugin extends Gdn_Plugin {
       $IsMonitoring = GetValue('Monitor', $Minion, FALSE);
       if (!$IsMonitoring) return $Default;
       
-      if (is_null($Attribute)) return $Default;
+      if (is_null($Attribute)) return $IsMonitoring;
       return GetValue($Attribute, $Minion, $Default);
    }
    

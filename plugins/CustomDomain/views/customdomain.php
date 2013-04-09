@@ -13,7 +13,7 @@ $ExistingDomain = $this->Data('Site.Domain', FALSE);
       <div class="DNSRecords">
          <h2>DNS Information</h2>
          <div><span>Vanilla Hostname</span> <?php echo $this->Data('ForumName'); ?></div>
-         <div><span>IP Address</span> <?php echo $this->Data('ClusterLoadbalancerAddress'); ?></div>
+         <div><span>IP Address</span> <?php echo $this->Data('ClusterAddress'); ?></div>
       </div>
       
       <?php if ($ExistingDomain) { ?>

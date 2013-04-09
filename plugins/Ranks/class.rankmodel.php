@@ -91,6 +91,7 @@ class RankModel extends Gdn_Model {
       
       self::AbilityString($Abilities, 'DiscussionsAdd', 'Add Discussions', $Result);
       self::AbilityString($Abilities, 'CommentsAdd', 'Add Comments', $Result);
+      self::AbilityString($Abilities, 'Verified', 'Verified', $Result);
       
       $V = GetValue('Format', $Abilities);
       if ($V) {
@@ -158,6 +159,17 @@ class RankModel extends Gdn_Model {
       if ($V = GetValue('CommentsAdd', $Abilities)) {
          if ($V == 'no')
             $Session->SetPermission('Vanilla.Comments.Add', array());
+      }
+      
+      // Verified.
+      if ($V = GetValue('Verified', $Abilities)) {
+         $Verified = array(
+            'yes' => 1,
+            'no'  => 0
+         );
+         $Verified = GetValue($V, $Verified, null);
+         if (is_integer($Verified))
+            $Session->User->Verified = $Verified;
       }
       
       // Post Format.
