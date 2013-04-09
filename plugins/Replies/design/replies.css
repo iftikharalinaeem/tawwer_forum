@@ -1,0 +1,34 @@
+.DataList-Replies .Item {
+  overflow: hidden;
+}
+.DataList-Replies .Item:last-child {
+  border-bottom: 0;
+}
+.DataList-Replies .PhotoWrap {
+  float: left;
+}
+.DataList-Replies .PhotoWrap img {
+  height: 30px;
+  width: 30px;
+}
+.DataList-Replies .ItemContent {
+  margin-left: 40px;
+}
+.DataList-Replies .FormPlaceholder {
+  display: block;
+  border: solid 1px #ddd;
+  padding: 3px;
+  background: #fff;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 30px;
+  line-height: 22px;
+}
+.DataList-Replies .Buttons {
+  text-align: right;
+}
+.DataList-Replies textarea.TextBox {
+  height: 60px;
+  min-height: 60px;
+}
