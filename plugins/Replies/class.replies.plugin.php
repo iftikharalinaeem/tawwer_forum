@@ -94,6 +94,9 @@ class RepliesPlugin extends Gdn_Plugin {
       if (!isset($Args['Comment']))
          return;
       
+      if (!Gdn::Session()->CheckPermission('Vanilla.Replies.Add'))
+         return;
+      
       echo Gdn_Theme::BulletItem('Flags');
       WriteReplyButton($Args['Comment']);
    }

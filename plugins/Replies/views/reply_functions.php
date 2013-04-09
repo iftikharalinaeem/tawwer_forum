@@ -13,11 +13,11 @@ function WriteReply($Reply) {
    echo '<div class="ItemContent ItemContent-Reply">';
 
    echo '<div class="Reply-Header">';
-      echo UserAnchor($User);
-      echo ' '.Gdn_Format::Date($Reply['DateInserted']);
+      echo UserAnchor($User, 'Username');
+      echo ' '.Wrap(Gdn_Format::Date($Reply['DateInserted'], 'html'), 'span', array('class' => 'Meta DateInserted'));
    echo '</div>';
 
-   echo '<div class="Reply-Body">';
+   echo '<div class="Reply-Body Message">';
       echo Gdn_Format::Text($Reply['Body']);
    echo '</div>';
 
@@ -57,7 +57,7 @@ function WriteReplyForm($Comment) {
       $Form = Gdn::Controller()->ReplyForm;
          
       // Write the regular link.
-      echo Anchor(T('Write a reply'), '#', 'FormPlaceholder InputBox', array('style' => $Form->ErrorCount() ? 'display: none' : ''));
+      echo Anchor(T('Reply here...'), '#', 'FormPlaceholder InputBox', array('style' => $Form->ErrorCount() ? 'display: none' : ''));
       
       // Write the form.
       $Form->IDPrefix = 'Reply_';

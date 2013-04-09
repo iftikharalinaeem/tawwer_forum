@@ -1,6 +1,3 @@
-.DataList-Replies .Item {
-  overflow: hidden;
-}
 .DataList-Replies .Item:last-child {
   border-bottom: 0;
 }
