@@ -10,6 +10,7 @@
  *  2.0     Compatibility with Infrastructure
  *  2.1     Improvement to UI
  *  2.1.1   Fix resolve detection
+ *  2.1.2   Fix the fix
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @author Mark O'Sullivan <mark@vanillaforums.com>
@@ -21,7 +22,7 @@
 $PluginInfo['CustomDomain'] = array(
    'Name' => 'Custom Domain',
    'Description' => 'Make your Vanilla Forum accessible from a different domain.',
-   'Version' => '2.1.1',
+   'Version' => '2.1.2',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
@@ -70,12 +71,13 @@ class CustomDomainPlugin extends Gdn_Plugin {
       
       $Site = Infrastructure::Site();
       $Sender->SetData('Site', $Site);
-      $Sender->SetData('ForumName', Infrastructure::Client());
+      $Client = Infrastructure::Client();
+      $Sender->SetData('ForumName', $Client);
       
       $ClusterName = Infrastructure::Cluster();
       $ClusterLoadbalancer = Infrastructure::Server('www');
       //$ClusterLoadbalancerAddress = gethostbyname($ClusterLoadbalancer);
-      $ClusterAddress = gethostbyname($Site);
+      $ClusterAddress = gethostbyname($Client);
       
       $Sender->SetData('ClusterName', $ClusterName);
       $Sender->SetData('ClusterLoadbalancer', $ClusterLoadbalancer);
@@ -134,8 +136,8 @@ class CustomDomainPlugin extends Gdn_Plugin {
    private function CheckConfiguration($Domain) {
       $Loadbalancer = Infrastructure::Server('www');
       //$LoadbalancerAddress = gethostbyname($Loadbalancer);
-      $Site = Infrastructure::Site();
-      $ClusterAddress = gethostbyname($Site);
+      $Client = Infrastructure::Client();
+      $ClusterAddress = gethostbyname($Client);
       
       $DomainAddress = gethostbyname($Domain);
       $DomainType = explode('.', $Domain);
