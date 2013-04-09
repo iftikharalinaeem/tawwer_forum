@@ -350,6 +350,7 @@ function WriteReactions($Row) {
       Gdn::Controller()->FireEvent('AfterReactions');
    
    echo '</div>';
+   Gdn::Controller()->FireEvent('Replies');
 }
 
 endif;
