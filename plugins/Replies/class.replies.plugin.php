@@ -39,6 +39,10 @@ class RepliesPlugin extends Gdn_Plugin {
          ->Column('DateUpdated', 'datetime', TRUE)
          ->Column('UpdateUserID', 'int', TRUE)
          ->Set();
+      
+      Gdn::PermissionModel()->Define(array(
+         'Vanilla.Replies.Add' => 'Garden.Profiles.Edit'
+      ));
    }
    
    /// Event Handlers.
