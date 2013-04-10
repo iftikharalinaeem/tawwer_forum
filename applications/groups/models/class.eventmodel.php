@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * Groups Application - Event Model
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license Proprietary
+ * @package groups
+ * @since 1.0
+ */
+
 class EventModel extends Gdn_Model {
    
    /**
@@ -11,6 +21,12 @@ class EventModel extends Gdn_Model {
       parent::__construct('Event');
    }
    
+   /**
+    * Get events that this user is invited to
+    * 
+    * @param integer $UserID
+    * @return type
+    */
    public function GetByUser($UserID) {
       $UserGroups = $this->SQL->GetWhere('UserGroup', array('UserID' => $UserID))->ResultArray();
       $IDs = ConsolidateArrayValuesByKey($UserGroups, 'GroupID');
@@ -19,13 +35,190 @@ class EventModel extends Gdn_Model {
       return $Result;
    }
    
-   public function GetID($ID, $DatasetType = DATASET_TYPE_ARRAY) {
-      $ID = self::ParseID($ID);
+   /**
+    * Get an event by ID
+    * 
+    * @param integer $EventID
+    * @param integer $DatasetType
+    * @return type
+    */
+   public function GetID($EventID, $DatasetType = DATASET_TYPE_ARRAY) {
+      $EventID = self::ParseID($EventID);
       
-      $Row = parent::GetID($ID, $DatasetType);
+      $Row = parent::GetID($EventID, $DatasetType);
       return $Row;
    }
    
+   /**
+    * Get events by date
+    * 
+    * @param strtotime $Future Relative time offset. Like "+30 days"
+    * @param array $Where
+    * @param boolean $Ended Optional. Only events that have ended?
+    * @return type
+    */
+   public function GetUpcoming($Future, $Where = NULL, $Ended = NULL) {
+      $UTC = new DateTimeZone('UTC');
+      $StartDate = new DateTime('now', $UTC);
+      if ($Future) {
+         $LimitDate = new DateTime('now', $UTC);
+         $LimitDate->modify($Future);
+      }
+      
+      // Handle 'invited' state manually
+      if ($InvitedUserID = GetValue('Invited', $Where)) {
+         unset($Where['Invited']);
+      }
+      
+      // Limit to a future date, but after right now
+      if ($LimitDate > $StartDate) {
+         if ($Ended === FALSE)
+            $Where['DateEnds >='] = $StartDate->format('Y-m-d H:i:s');
+         else
+            $Where['DateStarts >='] = $StartDate->format('Y-m-d H:i:s');
+         
+         if ($Future)
+            $Where['DateStarts <='] = $LimitDate->format('Y-m-d H:i:s');
+      } else {
+         $Where['DateStarts <'] = $StartDate->format('Y-m-d H:i:s');
+         if ($Future)
+            $Where['DateStarts >='] = $LimitDate->format('Y-m-d H:i:s');
+      }
+      
+      // Only events that are over
+      if ($Ended)
+         $Where['DateEnds <='] = $StartDate->format('Y-m-d H:i:s');
+      
+      $EventsQuery = $this->SQL
+         ->Select('e.*')
+         ->Where($Where)
+         ->OrderBy('DateStarts', 'asc');
+      
+      if ($InvitedUserID) {
+         $EventsQuery
+            ->From('UserEvent ue')
+            ->Join('Event e', 'ue.EventID = e.EventID');
+      } else {
+         $EventsQuery->From('Event e');
+      }
+      
+      return $EventsQuery->Get()->ResultArray();
+   }
+   
+   /**
+    * Check permission on a event.
+    * 
+    * @param string $Permission The permission to check. Valid values are:
+    *  - Organizer: User is a leader of the event.
+    *  - Member: User is a member of the event.
+    *  - Create: User can create events.
+    *  - Edit: User can edit the event.
+    *  - View: The user may view the event's contents.
+    * @param int $EventID
+    * @return boolean
+    */
+   public function CheckPermission($Permission, $EventID) {
+      static $Permissions = array();
+      
+      $UserID = Gdn::Session()->UserID;
+      
+      if (is_array($EventID)) {
+         $Event = $EventID;
+         $EventID = $Event['EventID'];
+      }
+      
+      $Key = "{$UserID}-{$EventID}";
+      if (!isset($Permissions[$Key])) {
+         // Get the data for the group.
+         if (!isset($Event))
+            $Event = $this->GetID($EventID);
+         
+         if ($UserID) {
+            $UserEvent = Gdn::SQL()->GetWhere('UserEvent', array('EventID' => $EventID, 'UserID' => $UserID))->FirstRow(DATASET_TYPE_ARRAY);
+         } else {
+            $UserEvent = FALSE;
+         }
+         
+         // Set the default permissions.
+         $Perms = array(
+            'Organizer' => FALSE,
+            'Create' => TRUE,
+            'Edit' => FALSE,
+            'Member' => FALSE,
+            'View' => TRUE
+         );
+         
+         // The group creator is always a member and leader.
+         if ($UserID == $Event['InsertUserID']) {
+            $Perms['Organizer'] = TRUE;
+            $Perms['Edit'] = TRUE;
+            $Perms['Member'] = TRUE;
+            $Perms['View'] = TRUE;
+         }
+         
+         if ($UserEvent) {
+            $Perms['Member'] = TRUE;
+            $Perms['View'] = TRUE;
+         } else {
+            
+            // Check if we're in a group
+            $EventGroupID = GetValue('GroupID', $Event, NULL);
+            if ($EventGroupID) {
+               $GroupModel = new GroupModel();
+               $EventGroup = $GroupModel->GetID($EventGroupID);
+               
+               if (GroupPermission('Member', $EventGroupID)) {
+                  $Perms['Member'] = TRUE;
+                  $Perms['View'] = TRUE;
+               } else {
+                  $Perms['Create'] = FALSE;
+               }
+            }
+            
+         }
+         
+         // Moderators can view and edit all events.
+         if ($UserID == Gdn::Session()->UserID && Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+            $Perms['Edit'] = TRUE;
+            $Perms['View'] = TRUE;
+         }
+         
+         $Permissions[$Key] = $Perms;
+      }
+      
+      $Perms = $Permissions[$Key];
+      
+      if (!$Permission)
+         return $Perms;
+      
+      if (!isset($Perms[$Permission])) {
+         if (strpos($Permission, '.Reason') === FALSE) {
+            trigger_error("Invalid group permission $Permission.");
+            return FALSE;
+         } else {
+            $Permission = StringEndsWith($Permission, '.Reason', TRUE, TRUE);
+            if ($Perms[$Permission])
+               return '';
+            
+            if (in_array($Permission, array('Member', 'Leader'))) {
+               $Message = T(sprintf("You aren't a %s of this event.", strtolower($Permission)));
+            } else {
+               $Message = sprintf(T("You aren't allowed to %s this event."), T(strtolower($Permission)));
+            }
+            
+            return $Message;
+         }
+      } else {
+         return $Perms[$Permission];
+      }
+   }
+   
+   /**
+    * Parse the ID out of a slug
+    * 
+    * @param type $ID
+    * @return type
+    */
    public static function ParseID($ID) {
       $Parts = explode('-', $ID, 2);
       return $Parts[0];
@@ -52,25 +245,26 @@ class EventModel extends Gdn_Model {
     * @param integer $GroupID
     */
    public function InviteGroup($EventID, $GroupID) {
+      return;
       $Event = $this->GetID($EventID, DATASET_TYPE_ARRAY);
       $GroupModel = new GroupModel();
       $GroupMembers = $GroupModel->GetMembers($GroupID);
       
       // Notify the users of the invitation
       $ActivityModel = new ActivityModel();
-      foreach ($GroupMembers as $GroupMember) {
-         $ActivityID = $ActivityModel->Add(
-            Gdn::Session()->UserID,
-            'Events',
-            '',
-            $GroupMember['UserID'],
-            '',
-            EventUrl($Event),
-            FALSE
+      $Activity = array(
+         'ActivityType' => 'Events',
+         'ActivityUserID' => $Event['InsertUserID'],
+         'HeadlineFormat' => T('Activity.NewEvent', '{ActivityUserID,User} added a new event: <a href="{Url,html}">{Data.Name,text}</a>.'),
+         'RecordType' => 'Event',
+         'RecordID' => 'EventID',
+         'Route' => EventUrl($Event),
+         'Data' => array('Name' => $Event['Name'])
          );
-         
-         $Story = GetValue('Name', $Event, '');
-         $ActivityModel->SendNotification($ActivityID, $Story);
+      
+      foreach ($GroupMembers as $GroupMember) {
+         $Activity['NotifyUserID'] = $GroupMember['UserID'];
+         $ActivityID = $ActivityModel->Queue($Activity);
       }
    }
    
@@ -125,6 +319,99 @@ class EventModel extends Gdn_Model {
          ':Attending'    => $Attending,
          ':Attending1'   => $Attending
       ));
+   }
+   
+   /**
+    * Override event save
+    * 
+    * Set 'Fix' = FALSE to bypass date munging
+    * 
+    * @param array $Event
+    */
+   public function Save($Event) {
+      
+      // Fix malformed or partial dates
+      if (GetValue('Fix', $Event, TRUE)) {
+         
+         $Event['AllDayEvent'] = 0;
+         
+         // Get some Timezone objects
+         $Timezone = new DateTimeZone($Event['Timezone']);
+         $UTC = new DateTimeZone('UTC');
+
+         // Check if DateStarts triggers 'AllDay' mode
+         if (!empty($Event['DateStarts'])) {
+            
+            if (empty($Event['TimeStarts']))
+               $Event['AllDayEvent'] = 1;
+            
+         } else { unset($Event['DateStarts']); }
+
+         // Check if DateEnds triggers 'AllDay' mode
+         if (!empty($Event['DateEnds'])) {
+            
+            if (empty($Event['TimeEnds']))
+               $Event['AllDayEvent'] = 1;
+            
+         } else { unset($Event['DateEnds']); }
+
+         // If we're 'AllDay', munge the times to midnight
+         if ($Event['AllDayEvent']) {
+            $Event['TimeStarts'] = '12:00am';
+            $Event['TimeEnds'] = '11:59pm';
+         }
+         
+         $InputDateFormat = '!m/d/Y h:ia';
+         $OneDay = new DateInterval('P1D');
+         
+         // Load and format start date
+         try {
+            $EventDateStartsStr = "{$Event['DateStarts']} {$Event['TimeStarts']}";
+            $EventDateStarts = DateTime::createFromFormat($InputDateFormat, $EventDateStartsStr, $Timezone);
+            if (!$EventDateStarts) throw new Exception();
+            $EventDateStarts->setTimezone($UTC);
+            $Event['DateStarts'] = $EventDateStarts->format('Y-m-d H:i:00');
+         } catch (Exception $Ex) {
+            $this->Validation->AddValidationResult('DateStarts', 'ValidateDate');
+         }
+
+         // Load and format end date
+         try {
+            // Force a sane end date
+            if (!isset($Event['DateEnds']) || is_null($Event['DateEnds'])) {
+               $DateEnds = DateTime::createFromFormat($InputDateFormat, $EventDateStartsStr, $Timezone);
+               
+               $Event['DateEnds'] = $DateEnds->format('m/d/Y');
+               if (!$Event['TimeEnds'])
+                  $Event['TimeEnds'] = $DateEnds->format('h:ia');
+               unset($DateEnds);
+            }
+
+            $EventDateEndsStr = "{$Event['DateEnds']} {$Event['TimeEnds']}";
+            $EventDateEnds = DateTime::createFromFormat($InputDateFormat, $EventDateEndsStr, $Timezone);
+            if (!$EventDateEnds) throw new Exception();
+            $EventDateEnds->setTimezone($UTC);
+            $Event['DateEnds'] = $EventDateEnds->format('Y-m-d H:i:00');
+         } catch (Exception $Ex) {
+            $this->Validation->AddValidationResult('DateEnds', 'ValidateDate');
+         }
+         
+         // Fix clean up
+         unset($OneDay);
+         unset($EventDateStarts);
+         unset($EventDateEnds);
+         unset($Timezone);
+         unset($UTC);
+      }
+      
+      // Default clean up
+      unset($Event['TimeStarts']);
+      unset($Event['TimeEnds']);
+      
+      $this->Validation->ApplyRule('DateStarts', 'ValidateDate');
+      $this->Validation->ApplyRule('DateEnds', 'ValidateDate');
+      
+      return parent::Save($Event);
    }
    
    /**
@@ -282,6 +569,32 @@ class EventModel extends Gdn_Model {
       if (is_null($LookupTimezone))
          return $Built;
       return GetValue($LookupTimezone, $Built);
+   }
+   
+   /**
+    * Delete an event
+    * 
+    * @param array $Where
+    * @param integer $Limit
+    * @param boolean $ResetData
+    * @return Gdn_DataSet
+    */
+   public function Delete($Where = '', $Limit = FALSE, $ResetData = FALSE) {
+      // Get list of matching events
+      $MatchEvents = $this->GetWhere($Where,'','',$Limit);
+      
+      // Delete events
+      $Deleted = parent::Delete($Where, $Limit, $ResetData);
+      
+      // Clean up UserEvents
+      $EventIDs = array();
+      foreach ($MatchEvents as $Event)
+         $EventIDs[] = GetValue('EventID', $Event);
+      $this->SQL->Delete('UserEvent', array(
+         'EventID'   => $EventIDs
+      ));
+      
+      return $Deleted;
    }
    
 }

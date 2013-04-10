@@ -7,9 +7,12 @@
 jQuery(document).ready(function($) {
    
    if ($('.Event.add').length)
-      EventAdd($);
+      EventAddEdit($);
    
-   if ($('.Event.show').length)
+   if ($('.Event.edit').length)
+      EventAddEdit($);
+   
+   if ($('.Event.event').length)
       EventShow($);
    
    function UpdateTimezoneDisplay(TimezoneID, TimezoneLabel) {
@@ -26,14 +29,15 @@ jQuery(document).ready(function($) {
     * Handle event/add
     * 
     */
-   function EventAdd($) {
+   function EventAddEdit($) {
       $('.TimePicker').timepicker({
          'step': 5,
          'forceRoundTime': true
       });
 
       var DateNow = new Date();
-      $('.DatePicker').val(DateNow.getMonth()+'/'+DateNow.getDate()+'/'+DateNow.getFullYear());
+      var DateNowStr = (DateNow.getMonth()+1)+'/'+DateNow.getDate()+'/'+DateNow.getFullYear();
+      $('.DatePicker').val(DateNowStr);
       
       $('.Event .CancelButton').on('click', function(e){
          var Event = $(e.target).closest('.Event');
@@ -47,14 +51,34 @@ jQuery(document).ready(function($) {
       var DefaultTimezone = jstz.determine();
       DefaultTimezone = DefaultTimezone.name();
 
+      var Timezone = $('.Event .EventTimezone');
+      var TimezoneAbbr = $('.Event .EventTimezoneAbbr');
+      
+      // Lookup timezone automatically
+      var TimezoneRequestData = {
+         'TimezoneID': DefaultTimezone,
+         'Auto': true
+      }
+      
+      // If TZ was supplied in form, use that
+      if (Timezone.val()) {
+         TimezoneRequestData.TimezoneID = Timezone.val();
+         TimezoneRequestData.Auto = false;
+      }
+      
       $.ajax({
          url: gdn.url('/event/gettimezoneabbr'),
-         data: {'TimezoneID': DefaultTimezone},
+         data: TimezoneRequestData,
          dataType: 'json',
          method: 'GET',
          success: function(data, str, xhr) {
             if (data.Abbr != 'unknown') {
-               UpdateTimezoneDisplay(data.TimezoneID, "Automatically detected "+data.Abbr);
+               if (TimezoneRequestData.Auto)
+                  var TimezoneLabel = "("+data.Offset+") Automatically detected "+data.Abbr;
+               else
+                  var TimezoneLabel = "("+data.Offset+") "+data.Abbr;
+               
+               UpdateTimezoneDisplay(data.TimezoneID, TimezoneLabel);
             }
          }
       });

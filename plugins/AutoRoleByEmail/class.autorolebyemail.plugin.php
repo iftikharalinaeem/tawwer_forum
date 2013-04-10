@@ -51,12 +51,10 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
    }
    
    /**
-    * Add 'Domains' column to Role table.
+    * One time on enable.
     */
    public function Setup() {      
-      Gdn::Structure()->Table('Role')
-         ->Column('Domains', 'text', NULL)
-         ->Set();
+      $this->Structure();
          
       // Backwards compatibility with 0.1
       if (C('Plugins.AutoRoleByEmail.Domain', FALSE)) {
@@ -68,5 +66,14 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
          RemoveFromConfig('Plugins.AutoRoleByEmail.Domain');
          RemoveFromConfig('Plugins.AutoRoleByEmail.Role');
       }
+   }
+   
+   /**
+    * Add 'Domains' column to Role table.
+    */
+   public function Structure() {
+      Gdn::Structure()->Table('Role')
+         ->Column('Domains', 'text', NULL)
+         ->Set();  
    }
 }

@@ -38,12 +38,14 @@ class ApiMapper extends SimpleApiMapper {
          
          // Users
          'users/edit'            => 'dashboard/profile/edit',
+         'users/photo'           => 'dashboard/profile/picture',
          'users/multi'           => 'dashboard/profile/multi',
          'users/notifications'   => 'dashboard/profile/preferences',
          'users/get'             => 'dashboard/profile',
          'users/save'            => 'dashboard/user/save',
          'users/sso'             => 'dashboard/user/sso',
          'users/delete'          => 'dashboard/user/delete2',
+         'users/merge'           => 'dashboard/user/merge',
           
          // Roles
          'roles/list'            => 'dashboard/role',

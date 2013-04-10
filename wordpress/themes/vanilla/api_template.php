@@ -58,20 +58,12 @@
          <!-- <div class="item"><a href="/blog/api-comments-show">/comments/show</a></div> -->
       </div>
    </div>
-
-   <div class="api_section">
-      <div class="section_heading">Badges</div>
-      <div class="section_contents">
-         <div class="item"><a href="/blog/api-badges-give">/badges/give</a></div>
-         <div class="item"><a href="/blog/api-badges-user">/badges/user</a></div>
-         <div class="item"><a href="/blog/api-badges-list">/badges/list</a></div>
-      </div>
-   </div>
    
    <div class="api_section">
       <div class="section_heading">Users</div>
       <div class="section_contents">
          <div class="item"><a href="/blog/api-users-edit">/users/edit</a></div>
+         <div class="item"><a href="/blog/api-users-photo">/users/photo</a></div>
          <div class="item"><a href="/blog/api-users-multi">/users/multi</a></div>
          <div class="item"><a href="/blog/api-users-notifications">/users/notifications</a></div>
          <div class="item"><a href="/blog/api-users-show">/users/get</a></div>
@@ -93,6 +85,29 @@
       <div class="section_contents">
          <div class="item"><a href="/blog/api-ranks-list">/ranks/list</a></div>
          <div class="item"><a href="/blog/api-ranks-get">/ranks/get</a></div>
+      </div>
+   </div>
+
+   <div class="api_section">
+      <div class="section_heading">Badges</div>
+      <div class="section_contents">
+         <div class="item"><a href="/blog/api-badges-list">/badges/list</a></div>
+         <div class="item"><a href="/blog/api-badges-get">/badges/get</a></div>
+         <div class="item"><a href="/blog/api-badges-user">/badges/user</a></div>
+         <div class="item"><a href="/blog/api-badges-add">/badges/add</a></div>
+         <div class="item"><a href="/blog/api-badges-edit">/badges/edit</a></div>
+         <div class="item"><a href="/blog/api-badges-give">/badges/give</a></div>
+      </div>
+   </div>
+   
+   <div class="api_section">
+      <div class="section_heading">Reactions</div>
+      <div class="section_contents">
+         <div class="item"><a href="/blog/api-reactions-list">/reactions/list</a></div>
+         <div class="item"><a href="/blog/api-reactions-get">/reactions/get</a></div>
+         <div class="item"><a href="/blog/api-reactions-add">/reactions/add</a></div>
+         <div class="item"><a href="/blog/api-reactions-edit">/reactions/edit</a></div>
+         <div class="item"><a href="/blog/api-reactions-toggle">/reactions/toggle</a></div>
       </div>
    </div>
    

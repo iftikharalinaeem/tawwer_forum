@@ -1,0 +1,77 @@
+.Button,
+.NavButton {
+    @include background-image(linear-gradient(#F6F6F6, #E3E3E3));
+    @include border-radius(3px);
+    @include box-shadow(0 1px 2px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,.25),inset 0 -2px 6px rgba(255,255,255,.55));
+    padding: 9px 16px;
+    background-color: #E3E3E3;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+
+    &:hover {
+        @include background-image(linear-gradient(#F6F6F6, #F1F1F1));
+        background-color: #F1F1F1;
+    }
+
+    &.Active,
+    &:focus,
+    &:active {
+        @include background-image(linear-gradient(#E2E2E2, #F6F6F6));
+        @include box-shadow(inset 0 1px 2px rgba(0, 0, 0, 0.15));
+        background-color: #F6F6F6;
+    }
+
+    &,
+    &:hover {
+        border: 1px solid rgba(75, 83, 94, 0.45);
+    }
+    
+    &,
+    &:hover,
+    &:active {
+        color: #555555;
+    }
+
+    &.InProgress,
+    &.Loading,
+    [disabled] {
+        @include transition(none);
+    }
+
+}
+
+.ButtonGroup {
+
+    .Button {
+        display: block;
+        height: 33px;
+        width: auto !important;
+        margin: {
+            right: 25px;
+        }
+
+        &.Handle {
+            float: right;
+            width: 25px !important;
+            margin: {
+                top: -33px;
+                right: 0;
+            }
+        }
+
+    }
+
+    &.Open {
+
+        .Button {
+
+            &.Handle {
+                @include background-image(linear-gradient(#E2E2E2, #F6F6F6));
+                @include box-shadow(inset 0 1px 2px rgba(0, 0, 0, 0.15));
+                background-color: #F6F6F6;
+            }
+
+        }
+
+    }
+
+}

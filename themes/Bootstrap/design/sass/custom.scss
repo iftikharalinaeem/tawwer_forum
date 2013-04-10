@@ -1,12 +1,16 @@
+@import "compass/css3";
+@import "compass/utilities/general/clearfix";
 @import "defaults";
 
 /** Grid **/
 
 #Panel {
     width: 300px;
+   @include pie-clearfix;
 }
 #Body .ContentColumn {
     margin-left: 340px;
+   @include pie-clearfix;
 }
 
 .Row {
@@ -224,6 +228,16 @@ body > #Frame > .Head {
    margin-bottom: 25px;
    border-bottom: solid 1px #ddd;
    font-weight: 300;
+   
+   .SiteSearch {
+      float: right;
+   }
+}
+
+.SiteSearch .InputBox {
+   float: right;
+   padding: 4px 25px 4px 5px;
+   border: 1px solid #ddd;
 }
 
 /*** Forms ***/
@@ -306,6 +320,10 @@ body > #Frame > .Head {
    -webkit-border-radius: 5px;
    -moz-border-radius: 5px;
    border-radius: 5px;
+}
+
+.SmallButton {
+   padding: 4px 6px;
 }
 
 .ButtonGroup.Big .Button {
@@ -685,6 +703,10 @@ body > #Frame > .Head {
       border-radius: 0;
    }
    
+   .Item {
+      min-height: 40px;
+   }
+   
    .DataList .Item:first-child {
       border-radius: 0;
    }
@@ -909,6 +931,7 @@ a.Close:hover {
 .SpDashboard { background-position: -340px -20px }
 .SpDelete { background-position: -340px -140px; }
 .SpDiscussions, .SpMyDiscussions { background-position: -200px -80px; }
+.SpGroups { background-position: -240px -40px; }
 .SpImage { background-position: -120px -140px; }
 .SpInbox { background-position: -80px -100px; }
 .SpMessage { background-position: -100px -100px;}

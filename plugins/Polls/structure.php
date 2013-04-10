@@ -32,7 +32,7 @@ $St->Table('PollOption')
 
 $St->Table('PollVote')
    ->Column('UserID', 'int', FALSE, 'primary')
-   ->Column('PollOptionID', 'int', FALSE, 'primary')
+   ->Column('PollOptionID', 'int', FALSE, array('primary', 'key'))
    ->Set();
 
 // Define permissions

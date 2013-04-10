@@ -1,0 +1,17 @@
+#Foot {
+    padding: 20px 0;
+    color: #444444;
+    background: lighten(#2E9FFF, 38%);
+    text-align: left;
+
+    a {
+        color: #444444;
+
+        &:hover {
+            color: #444444;
+            text-decoration: underline;
+        }
+
+    }
+
+}

@@ -567,8 +567,19 @@ class ReactionModel {
       }
       
       // Give points for the reaction.
-      if ($Points <> 0 && class_exists('UserBadgeModel')) {
-         UserBadgeModel::GivePoints($Record['InsertUserID'], $Points, 'Reactions');
+      if ($Points <> 0) {
+         if (method_exists('CategoryModel', 'GivePoints')) {
+            $CategoryID = 0;
+            if (isset($Record['CategoryID']))
+               $CategoryID = $Record['CategoryID'];
+            elseif (isset($Record['DiscussionID'])) {
+               $CategoryID = $this->SQL->GetWhere('Discussion', array('DiscussionID' => $Record['DiscussionID']))->Value('CategoryID');
+            }
+            
+            CategoryModel::GivePoints($Record['InsertUserID'], $Points, 'Reactions', $CategoryID);
+         } else {
+            UserModel::GivePoints($Record['InsertUserID'], $Points, 'Reactions');
+         }
       }
       
       return $Insert;
@@ -613,6 +624,13 @@ class ReactionModel {
       
       if (!$IsModerator && $Row['InsertUserID'] == $UserID) {
          throw new Gdn_UserException(T("You can't react to your own post."));
+      }
+      
+      // Check and see if moderators are protected.
+      if (GetValue('Protected', $ReactionType)) {
+         $InsertUser = Gdn::UserModel()->GetID($Row['InsertUserID']);
+         if (Gdn::UserModel()->CheckPermission($InsertUser, 'Garden.Moderation.Manage'))
+            throw new Gdn_UserException(T("You can't flag a moderator's post."));
       }
       
       // Figure out the increment.

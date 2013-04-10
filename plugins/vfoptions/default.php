@@ -308,7 +308,7 @@ pageTracker._trackPageview();
     */
    public function SettingsController_Addons_Create($Sender, $Args = array()) {
       $Sender->Title('Vanilla Addons');
-      $Sender->Permission('Garden.Applications.Manage');
+      $Sender->Permission('Garden.Settings.Manage');
       $Sender->AddSideMenu('dashboard/settings/addons');
       
       // Parameters

@@ -12,6 +12,15 @@ class GroupController extends Gdn_Controller {
     * @var GroupModel
     */
    public $GroupModel;
+   
+   /**
+    * Should the discussions have their options available.
+    * 
+    * @since 2.0.0
+    * @access public
+    * @var bool
+    */
+   public $ShowOptions = TRUE;
       
    /**
     * Include JS, CSS, and modules used by all methods.
@@ -31,9 +40,9 @@ class GroupController extends Gdn_Controller {
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
       $this->AddCssFile('style.css');
-      $this->AddCssFile('groups.css');
       
-      $this->AddBreadcrumb(T('Groups'), Url('/groups'));
+      $this->AddBreadcrumb(T('Groups'), '/groups');
+      $this->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
       
       parent::Initialize();
    }
@@ -53,19 +62,22 @@ class GroupController extends Gdn_Controller {
       $GroupID = $Group['GroupID'];
       
       // Force the canonical url.
-      if ($ID != GroupSlug($Group))
+      if (rawurlencode($ID) != GroupSlug($Group)) {
          Redirect(GroupUrl($Group), 301);
+      }
       $this->CanonicalUrl(Url(GroupUrl($Group), '//'));
       
       $this->SetData('Group', $Group);
       $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       
+      $this->GroupModel->OverridePermissions($Group);
+      
       // Get Discussions
       $DiscussionModel = new DiscussionModel();
-      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0))->ResultArray();
+      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, 10)->ResultArray();
       $this->SetData('Discussions', $Discussions);
       
-      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce >' => 0))->ResultArray();
+      $Discussions = $DiscussionModel->GetAnnouncements(array('d.GroupID' => $GroupID), 0, 10)->ResultArray();
       $this->SetData('Announcements', $Discussions);
       
       // Get Events
@@ -73,9 +85,14 @@ class GroupController extends Gdn_Controller {
       $EventModel = new EventModel();
       $Events = $EventModel->GetWhere(array(
          'GroupID'      => $GroupID,
-         'DateStarts >' => date('Y-m-d H:i:s'
-      )), 'DateStarts', 'asc', $MaxEvents)->ResultArray();
+         'DateEnds >=' => gmdate('Y-m-d H:i:s')
+         ),
+         'DateStarts', 'asc', $MaxEvents)->ResultArray();
       $this->SetData('Events', $Events);
+      
+      // Get applicants.
+      $Applicants = $this->GroupModel->GetApplicants($GroupID, array('Type' => 'Application'), 20);
+      $this->SetData('Applicants', $Applicants);
       
       // Get Leaders
       $Users = $this->GroupModel->GetMembers($GroupID, array('Role' => 'Leader'));
@@ -90,14 +107,80 @@ class GroupController extends Gdn_Controller {
       if ($Group['Icon']) {
          $this->Image(Gdn_Upload::Url($Group['Icon']));
       }
+      
+      require_once $this->FetchViewLocation('event_functions', 'event');
       require_once $this->FetchViewLocation('group_functions');
       $this->CssClass .= ' NoPanel';
+      $this->AddJsFile('discussions.js', 'vanilla');
       $this->Render('Group');
    }
    
    public function Add() {
       $this->Title(sprintf(T('New %s'), T('Group')));
       return $this->AddEdit();
+   }
+   
+   public function Announcement($Group) {
+      $Group = $this->GroupModel->GetID($Group);
+      if (!$Group)
+         throw NotFoundException('Group');
+      
+      // Check leader permission.
+      if (!$this->GroupModel->CheckPermission('Moderate', $Group)) {
+         throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Moderate.Reason', $Group));
+      }
+      
+      $this->SetData('Group', $Group);
+      
+      $Form = new Gdn_Form();
+      $this->Form = $Form;
+      
+      if ($Form->AuthenticatedPostBack()) {
+         // Let's save the announcement.
+         $Form->SetFormValue('CategoryID', $Group['CategoryID']);
+         $Form->SetFormValue('GroupID', $Group['GroupID']);
+         $Form->SetFormValue('Announce', 2); // Announce within group.
+         
+         
+         $Model = new DiscussionModel();
+         $Form->SetModel($Model);
+         
+         if ($Form->Save()) {
+            $this->RedirectUrl = GroupUrl($Group);
+         } else {
+            $Form->SetValidationResults($Model->ValidationResults());
+         }
+      }
+      
+      $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+      $this->Title(T('New Announcement'));
+      $this->Render();
+   }
+   
+   public function Approve($Group, $ID, $Value = 'approved') {
+      $Group = $this->GroupModel->GetID($Group);
+      if (!$Group)
+         throw NotFoundException('Group');
+      
+      // Check leader permission.
+      if (!$this->GroupModel->CheckPermission('Leader', $Group)) {
+         throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Leader.Reason', $Group));
+      }
+      
+      $Value = ucfirst($Value);
+      
+      $this->GroupModel->JoinApprove(array(
+         'GroupApplicantID' => $ID,
+         'Type' => $Value
+      ));
+      
+      if ($Value == 'Approved') {
+         $this->JsonTarget("#GroupApplicant_$ID", "", 'SlideUp');
+      } else {
+         $this->JsonTarget("#GroupApplicant_$ID", "Read Join-Denied", 'AddClass');
+      }
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
    
    public function Join($ID) {
@@ -152,11 +235,43 @@ class GroupController extends Gdn_Controller {
             'UserID' => Gdn::Session()->UserID,
             'GroupID' => $Group['GroupID']);
          $this->GroupModel->Leave($Data);
-         $this->RedirectUrl = Url(GroupUrl($Group));
+         $this->JsonTarget('', '', 'Refresh');
       }
       
       $this->SetData('Group', $Group);
       $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+      $this->Render();
+   }
+   
+   public function Delete($ID) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+      $this->SetData('Group', $Group);
+      
+      if (!GroupPermission('Edit'))
+         throw ForbiddenException('@'.GroupPermission('Edit.Reason'));
+      
+      $Form = new Gdn_Form();
+      $this->Form = $Form;
+      
+      if ($this->Form->AuthenticatedPostBack()) {
+         $GroupModel = new GroupModel();
+         $GroupDeleted = $GroupModel->Delete(array('GroupID' => $Group['GroupID']));
+         
+         $EventModel = new EventModel();
+         $EventDeleted = $EventModel->Delete(array('GroupID' => $Group['EventID']));
+
+         if ($GroupDeleted) {
+            $this->InformMessage(FormatString(T('<b>{Name}</b> deleted.'), $Group));
+            $this->RedirectUrl = Url('/groups');
+         } else {
+            $this->InformMessage(T('Failed to delete group.'));
+         }
+      }
+      
+      $this->SetData('Title', T('Delete Group'));
+      
       $this->Render();
    }
    
@@ -188,7 +303,9 @@ class GroupController extends Gdn_Controller {
       }
       
       // Get the file extension of the file.
-      $Ext = trim($Upload->GetUploadedFileExtension(), '.');
+      $Ext = GetValue('OutputType', $Options, trim($Upload->GetUploadedFileExtension(), '.'));
+      if ($Ext == 'jpeg')
+         $Ext = 'jpg';
       Trace($Ext, 'Ext');
       
       // The file is valid so let's come up with its new name.
@@ -241,18 +358,27 @@ class GroupController extends Gdn_Controller {
          $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       }
       
+      // Get a list of categories suitable for the category dropdown.
+      $Categories = array_filter(CategoryModel::Categories(), function($Row) { return $Row['AllowGroups']; });
+      $Categories = ConsolidateArrayValuesByKey($Categories, 'CategoryID', 'Name');
+      $this->SetData('Categories', $Categories);
+      
       if ($Form->AuthenticatedPostBack()) {
          // We need to save the images before saving to the database.
          self::SaveImage($Form, 'Icon', array('Prefix' => 'groups/icons/icon_', 'Size' => C('Groups.IconSize', 100), 'Crop' => TRUE));
-         self::SaveImage($Form, 'Banner', array('Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => TRUE));
+         self::SaveImage($Form, 'Banner', array('Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => TRUE, 'OutputType' => 'jpeg'));
          
-         $GroupID = $Form->Save();
+         try {
+            $GroupID = $Form->Save();
+         } catch (Exception $Ex) {
+            $Form->AddError($Ex);
+         }
          if ($GroupID) {
             $Group = $this->GroupModel->GetID($GroupID);
             Redirect(GroupUrl($Group));
+         } else {
+            Trace($Form->FormValues());
          }
-         // If we're here then there was some error and the form has to be rendered again.
-         $Form->AddHidden('GroupID');
       } else {
          if ($ID) {
             // Load the group.
@@ -262,12 +388,64 @@ class GroupController extends Gdn_Controller {
             // Set some default settings.
             $Form->SetValue('Registration', 'Public');
             $Form->SetValue('Visibility', 'Public');
+            
+            if (Count($Categories == 1)) {
+               $Form->SetValue('CategoryID', array_pop(array_keys($Categories)));
+            }
          }
       }
-      
       $this->Form = $Form;
       $this->CssClass .= ' NoPanel NarrowForm';
       $this->Render('AddEdit');
+   }
+   
+   public function Discussions($ID, $Page = FALSE) {
+      Gdn_Theme::Section('DiscussionList');
+      
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+      
+      $this->SetData('Group', $Group);
+      
+      list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
+      $DiscussionModel = new DiscussionModel();
+      $this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->GetWhere(array('GroupID' => $Group['GroupID']), $Offset, $Limit));
+      $this->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
+      $this->SetData('_ShowCategoryLink', FALSE);
+      
+      // Add modules
+      $NewDiscussionModule = new NewDiscussionModule();
+      $NewDiscussionModule->QueryString = 'groupid='.$Group['GroupID'];
+      $this->AddModule($NewDiscussionModule);
+      $this->AddModule('DiscussionFilterModule');
+      $this->AddModule('CategoriesModule');
+      $this->AddModule('BookmarkedModule');
+      
+      $this->SetData('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary', 'QueryString' => $NewDiscussionModule->QueryString));
+      
+      $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+      $this->AddBreadcrumb(T('Discussions'));
+      
+      $Layout = C('Vanilla.Discussions.Layout');
+      switch($Layout) {
+         case 'table':
+            if ($this->SyndicationMethod == SYNDICATION_NONE)
+               $this->View = 'table';
+            break;
+         default:
+             $this->View = 'index';
+            break;
+      }
+      
+      if ($this->Head) {
+         $this->AddJsFile('discussions.js', 'vanilla');
+         $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->Title());
+      }
+      
+      $this->Title(GetValue('Name', $Group, ''));
+      $this->Description(GetValue('Description', $Group), TRUE);
+      $this->Render($this->View, 'Discussions', 'Vanilla');
    }
    
    public function Edit($ID) {
@@ -295,16 +473,104 @@ class GroupController extends Gdn_Controller {
       
       // Get Leaders
       $UserModel = new UserModel();
-      $Users = $UserModel->GetWhere(array('UserID <' => 5))->ResultArray(); // FAKE IT
+      $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Leader'));
       $this->SetData('Leaders', $Users);
       
       // Get Members
-      $Users = $UserModel->GetWhere(array('UserID <' => 50))->ResultArray(); // FAKE IT
+      $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Member'));
       $this->SetData('Members', $Users);
       
-      $this->Title(htmlspecialchars($Group['Name']));
+      $this->Title(T('Members').' - '.htmlspecialchars($Group['Name']));
       require_once $this->FetchViewLocation('group_functions');
       $this->CssClass .= ' NoPanel';
       $this->Render('Members');
+   }
+   
+   public function SetRole($ID, $UserID, $Role) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+      
+      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+      if (!$User)
+         throw NotFoundException('User');
+      
+      if (!$this->GroupModel->CheckPermission('Edit', $Group))
+         throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Edit.Reason', $Group));
+      
+      $GroupID = $Group['GroupID'];
+      
+      $Member = $this->GroupModel->GetMembers($Group['GroupID'], array('UserID' => $UserID));
+      $Member = array_pop($Member);
+      if (!$Member)
+         throw NotFoundException('Member');
+      
+      // You can't demote the user that started the group.
+      if ($UserID == $Group['InsertUserID']) {
+         throw ForbiddenException('@'.T("The user that started the group has to be a leader."));
+      }
+      
+      if ($this->Request->IsPostBack()) {
+         $Role = ucfirst($Role);
+         $this->GroupModel->SetRole($GroupID, $UserID, $Role);
+         
+         $this->InformMessage(sprintf(T('%s is now a %s.'), htmlspecialchars($User['Name']), $Role));
+      }
+      
+      $this->SetData('Group', $Group);
+      $this->SetData('User', $User);
+      $this->Title(T('Group Role'));
+      $this->Render();
+   }
+   
+   public function RemoveMember($ID, $UserID) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+      
+      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+      if (!$User)
+         throw NotFoundException('User');
+      
+      if ($UserID == Gdn::Session()->UserID) {
+         Gdn::Dispatcher()->Dispatch(GroupUrl($Group, 'leave'));
+         return;
+      }
+      
+      if (!$this->GroupModel->CheckPermission('Moderate', $Group))
+         throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Moderate.Reason', $Group));
+      
+      $GroupID = $Group['GroupID'];
+      
+      $Member = $this->GroupModel->GetMembers($Group['GroupID'], array('UserID' => $UserID));
+      $Member = array_pop($Member);
+      if (!$Member)
+         throw NotFoundException('Member');
+      
+      // You can't remove the user that started the group.
+      if ($UserID == $Group['InsertUserID']) {
+         throw ForbiddenException('@'.T("You can't remove the creator of the group."));
+      }
+      
+      // Only users that can edit the group can remove leaders.
+      if ($Member['Role'] == 'Leader' && !GroupPermission('Edit')) {
+         throw ForbiddenException('@'.T("You can't remove another leader of the group."));
+      }
+      
+      $Form = new Gdn_Form();
+      $this->Form = $Form;
+      
+      if ($Form->AuthenticatedPostBack()) {
+         $this->GroupModel->RemoveMember($GroupID, $UserID, $this->Form->GetFormValue('Type'));
+         
+         $this->JsonTarget("#Member_$UserID", NULL, "Remove");
+      } else {
+         $Form->SetValue('Type', 'Removed');
+      }
+      
+      $this->SetData('Group', $Group);
+      $this->SetData('User', $User);
+      $this->Title(T('Remove Member'));
+      $this->Render();
    }
 }

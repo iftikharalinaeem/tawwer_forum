@@ -9,8 +9,8 @@ $St->Table('ReactionType');
 $ReactionTypeExists = $St->TableExists();
 
 $St
-   ->Column('UrlCode', 'varchar(20)', FALSE, 'primary')
-   ->Column('Name', 'varchar(20)')
+   ->Column('UrlCode', 'varchar(32)', FALSE, 'primary')
+   ->Column('Name', 'varchar(32)')
    ->Column('Description', 'text', TRUE)
    ->Column('Class', 'varchar(10)', TRUE)
    ->Column('TagID', 'int')
@@ -33,11 +33,11 @@ $St->Table('UserTag')
 $Rm = new ReactionModel();
 
 // Insert some default tags.
-$Rm->DefineReactionType(array('UrlCode' => 'Spam', 'Name' => 'Spam', 'Sort' => 100, 'Class' => 'Flag', 'Log' => 'Spam', 'LogThreshold' => 5, 'RemoveThreshold' => 5, 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
+$Rm->DefineReactionType(array('UrlCode' => 'Spam', 'Name' => 'Spam', 'Sort' => 100, 'Class' => 'Flag', 'Log' => 'Spam', 'LogThreshold' => 5, 'RemoveThreshold' => 5, 'ModeratorInc' => 5, 'Protected' => TRUE, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
    'Description' => "Allow your community to report any spam that get's posted so that it can be removed as quickly as possible."));
-$Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Sort' => 101, 'Class' => 'Flag', 'Log' => 'Moderate', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
+$Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Sort' => 101, 'Class' => 'Flag', 'Log' => 'Moderate', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5, 'Protected' => TRUE, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
    'Description' => "Report posts that are abusive or violate your terms of service so that they can be alerted to a moderator's attention."));
-$Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Sort' => 102, 'Class' => 'Flag', 'ModeratorInc' => 5, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
+$Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Sort' => 102, 'Class' => 'Flag', 'ModeratorInc' => 5, 'Protected' => TRUE, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
    'Description' => "Troll posts are typically trying to elicit a heated argument from other people. Trolls are community poison, making your community a scary place for new members. Troll posts will be buried."));
 
 $Rm->DefineReactionType(array('UrlCode' => 'Promote', 'Name' => 'Promote', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 3, 'Permission' => 'Garden.Curation.Manage',

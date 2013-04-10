@@ -18,6 +18,7 @@
  *  1.6     Add SimpleAPI hooks
  *  1.6.1   Add online/count API hook
  *  1.6.3   Natsort OnlineUsers before rendering
+ *  1.6.4   Some tweaks to the css.
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -28,7 +29,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.6.3',
+   'Version' => '1.6.4',
    'MobileFriendly' => FALSE,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => FALSE, 
@@ -518,12 +519,17 @@ class OnlinePlugin extends Gdn_Plugin {
    public function GetAllOnlineUsers() {
       static $AllOnlineUsers = NULL;
       if (is_null($AllOnlineUsers)) {
-         $AllOnlineUsersResult = Gdn::SQL()
-            ->Select('UserID, Timestamp')
-            ->From('Online')
-            ->Get();
-
          $AllOnlineUsers = array();
+         try {
+            $AllOnlineUsersResult = Gdn::SQL()
+               ->Select('UserID, Timestamp')
+               ->From('Online')
+               ->Get();
+         } catch (Exception $Ex) {
+            Gdn::SQL()->Reset();
+            return $AllOnlineUsers;
+         }
+
          while ($OnlineUser = $AllOnlineUsersResult->NextRow(DATASET_TYPE_ARRAY))
             $AllOnlineUsers[$OnlineUser['UserID']] = $OnlineUser;
 
@@ -726,7 +732,7 @@ class OnlinePlugin extends Gdn_Plugin {
    
    public function AdjustUser(&$User) {
       $UserID = GetValue('UserID', $User, NULL);
-      if (!$UserID) FALSE;
+      if (!$UserID) return FALSE;
       
       // Already handled this one guv'na
       if (array_key_exists('Online', $User)) return;
@@ -1057,6 +1063,7 @@ class OnlinePlugin extends Gdn_Plugin {
    }
    
    public function Structure() {
+      Gdn::Structure()->Reset();
       Gdn::Structure()->Table('Online')
          ->Column('UserID', 'int(11)', FALSE, 'primary')
          ->Column('Name', 'varchar(64)', NULL)

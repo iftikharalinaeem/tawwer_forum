@@ -56,7 +56,6 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
   background-image: -webkit-linear-gradient(top, #35433a, #1e2621);
   background-image: -moz-linear-gradient(top, #35433a, #1e2621);
   background-image: -o-linear-gradient(top, #35433a, #1e2621);
-  background-image: -ms-linear-gradient(top, #35433a, #1e2621);
   background-image: linear-gradient(top, #35433a, #1e2621);
 }
 
@@ -66,7 +65,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
 
 .NavBar .FlyoutButton:hover .Sprite16,
 .NavBar .Open .MeMenu .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-ffffff.png");
 }
 
 .BreadcrumbsWrapper {
@@ -134,7 +133,6 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
   background-image: -webkit-linear-gradient(top, #dfe9d7, #abc595);
   background-image: -moz-linear-gradient(top, #dfe9d7, #abc595);
   background-image: -o-linear-gradient(top, #dfe9d7, #abc595);
-  background-image: -ms-linear-gradient(top, #dfe9d7, #abc595);
   background-image: linear-gradient(top, #dfe9d7, #abc595);
   border-color: #91b374;
   color: #414d4c;
@@ -160,7 +158,6 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
   background-image: -webkit-linear-gradient(top, #1481f8, #0550a1);
   background-image: -moz-linear-gradient(top, #1481f8, #0550a1);
   background-image: -o-linear-gradient(top, #1481f8, #0550a1);
-  background-image: -ms-linear-gradient(top, #1481f8, #0550a1);
   background-image: linear-gradient(top, #1481f8, #0550a1);
   border-color: #0550a1 #0550a1 #033770;
   color: white;
@@ -227,23 +224,23 @@ h1 a, h2 a, h3 a, h4 a, h5 a {
 
 /** Sprites **/
 .OptionsTitle, a.Bookmark, a.Bookmarked, a.Bookmarking {
-  background-image: url("http://vanillicon.com/sprites/ui_sprites-16c-000000.png");
+  background-image: url("//vanillicon.com/sprites/ui_sprites-16c-000000.png");
 }
 
 .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-555555.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-555555.png");
 }
 
 a .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-196ba7.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-196ba7.png");
 }
 
 a:hover .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14c-f7075b.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14c-f7075b.png");
 }
 
 dl.About dt {
-  background: url("http://vanillicon.com/sprites/profile-sprites-333333.png") 0 0 no-repeat;
+  background: url("//vanillicon.com/sprites/profile-sprites-333333.png") 0 0 no-repeat;
   color: #404040;
 }
 
@@ -322,7 +319,7 @@ a.Close {
 #Panel .FilterMenu .Active a .Sprite,
 #Panel .FilterMenu .Active a:hover .Sprite,
 .PanelInfo .Active .Sprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-ffffff.png");
 }
 
 #Content .FilterMenu li a:hover {
@@ -376,60 +373,60 @@ a.Close {
 
 /** Me box **/
 .NavBar .MeMenu .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-bad0c3.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-bad0c3.png");
 }
 
 /** Reactions **/
 .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-555555.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-555555.png");
 }
 
 .Reactions a:hover .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14c-f7075b.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14c-f7075b.png");
 }
 
 /* Switch to the white icons when hovering over a menuitem sprite */
 .Reactions .MenuItems a:hover .ReactSprite,
 .MenuItems a:hover .Sprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-ffffff.png");
 }
 
 .FilterMenu .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-196ba7.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-196ba7.png");
 }
 
 .FilterMenu a:hover .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14c-f7075b.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14c-f7075b.png");
 }
 
 .FilterMenu .Active a .ReactSprite,
 .FilterMenu .Active a:hover .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-ffffff.png");
 }
 
 /* Switch to bordered icons for user reaction overlays */
 .UserReactionWrap .ReactSprite {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-outline-000000.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-outline-000000.png");
 }
 
 .Sprite,
 .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-000000.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-000000.png");
 }
 
 a .Sprite,
 a .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-196ba7.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-196ba7.png");
 }
 
 a.TextColor .Sprite,
 a.TextColor .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-000000.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-000000.png");
 }
 
 a:hover .Sprite,
 a:hover .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14c-f7075b.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14c-f7075b.png");
 }
 
 .Button .Sprite,
@@ -440,10 +437,10 @@ a:hover .Sprite16 {
 .NavButton:hover .Sprite,
 .Button:hover .Sprite16,
 .NavButton:hover .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-414d4c.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-414d4c.png");
 }
 
 .Button.Primary .Sprite,
 .Button.Primary .Sprite16 {
-  background-image: url("http://vanillicon.com/sprites/sprites-14-ffffff.png");
+  background-image: url("//vanillicon.com/sprites/sprites-14-ffffff.png");
 }

@@ -44,12 +44,12 @@ function AutoDescription($ReactionType) {
 
 function ActivateButton($ReactionType) {
    $Qs = array(
-       'type' => $ReactionType['UrlCode'],
+       'urlcode' => $ReactionType['UrlCode'],
        'active' => !$ReactionType['Active']);
    
    $State = ($ReactionType['Active'] ? 'Active' : 'InActive');
    
    return '<span class="ActivateSlider ActivateSlider-'.$State.'">'.
-      Anchor($State, '/settings/activatereactiontype?'.http_build_query($Qs), "SmallButton Hijack").
+      Anchor($State, '/reactions/toggle?'.http_build_query($Qs), "SmallButton Hijack").
       '</span>';   
 }

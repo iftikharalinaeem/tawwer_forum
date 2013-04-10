@@ -8,6 +8,12 @@
       width: 100px;
    }
    
+   .Group.Card {
+      h3 { margin: 0px; }
+      .Group-Description { display: none; }
+      .Card-Icon { width: 48px; height: 48px; margin-bottom: 0px; }
+   }
+   
    .EventTime {
       
       .P > div {
@@ -23,7 +29,7 @@
       }
       
       .EndTime {
-         float: right;
+         margin-left: 20px;
       }
       
       label {
@@ -82,7 +88,7 @@
 
 }
 
-.Event.show {
+.Event.event {
    
    .EventInfo {
       li {
@@ -108,7 +114,7 @@
          font-size: 11px;
       }
       
-      span.Tip a {
+      span.Tip .Timezone {
          border-bottom: 1px dotted;
          cursor: pointer;
       }
@@ -153,7 +159,33 @@
    
 }
 
-.Groups.Group .Group-Events {
+.Event-Buttons {
+  margin-top: 10px;
+  float: right;
+}
+.Event-Buttons .BigButton, .Event-Buttons .ButtonGroup.Big {
+  display: inline-block;
+}
+
+.Events.events {
+   .Cards {
+      margin: 0px;
+   }
+   
+   .UpcomingEvents {
+      margin-top: 20px;
+      
+      .Event {
+         margin: 20px 0px;
+         
+         .Event-Title { font-size: 120%; margin: 0px; }
+         .Event-Time { font-size: 12px; font-weight: normal; }
+         .Event-Location { line-height: 1.2em; }
+      }
+   }
+}
+
+.Box-Events {
    .DataList-Events {
       padding: 12px 0px;
    

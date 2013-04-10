@@ -4,7 +4,8 @@
  * 
  * Changes:
  *  1.0     Release
- *  1.2.3   Allow ReactionModel() to react from any source user
+ *  1.2.3   Allow ReactionModel() to react from any source user.
+ *  1.2.4   Allow some reactions to be protected so that users can't flag moderator posts.
  * 
  * 
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
@@ -15,7 +16,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.2.3',
+   'Version' => '1.2.4',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -24,7 +25,43 @@ $PluginInfo['Reactions'] = array(
 );
 
 class ReactionsPlugin extends Gdn_Plugin {
-   /// Methods ///
+   
+   /**
+    * Include ReactionsController for /reactions requests
+    * 
+    * Manually detect and include reactions controller when a request comes in
+    * that probably uses it.
+    * 
+    * @param Gdn_Dispatcher $Sender
+    */
+   public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender, $Args) {
+      if (!isset($Args['Request']))
+        return;
+      
+      $Path = $Args['Request']->Path();
+      if (preg_match('`^/?reactions`i', $Path)) {
+         require_once($this->GetResource('class.reactionscontroller.php'));
+      }
+   }
+   
+   /**
+    * Add mapper methods
+    * 
+    * @param SimpleApiPlugin $Sender
+    */
+   public function SimpleApiPlugin_Mapper_Handler($Sender) {
+      switch ($Sender->Mapper->Version) {
+         case '1.0':
+            $Sender->Mapper->AddMap(array(
+               'reactions/list'        => 'reactions',
+               'reactions/get'         => 'reactions/get',
+               'reactions/add'         => 'reactions/add',
+               'reactions/edit'        => 'reactions/edit',
+               'reactions/toggle'      => 'reactions/toggle'
+            ));
+            break;
+      }
+   }
    
    private function AddJs($Sender) {
       $Sender->AddJsFile('jquery-ui-1.8.17.custom.min.js');
@@ -90,9 +127,15 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
    }
    
+   /**
+    * 
+    * @param ActivityController $Sender
+    */
    public function ActivityController_Render_Before($Sender) {
-      $this->AddJs($Sender);
-      include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+      if ($Sender->DeliveryMethod() == DELIVERY_METHOD_XHTML || $Sender->DeliveryType() == DELIVERY_TYPE_VIEW) {
+         $this->AddJs($Sender);
+         include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+      }
    }
    
    /// Event Handlers ///
@@ -105,7 +148,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Reputation', T('Reactions'), 'settings/reactiontypes', 'Garden.Settings.Manage');
+      $Menu->AddLink('Reputation', T('Reactions'), 'reactions', 'Garden.Settings.Manage');
    }
    
    /**
@@ -296,72 +339,6 @@ class ReactionsPlugin extends Gdn_Plugin {
       $ReactionModel->React($RecordType, $ID, $Reaction);
       
       $Sender->Render('Blank', 'Utility', 'Dashboard');
-   }
-   
-   /**
-    *
-    * @param SettingsController $Sender
-    * @param type $Type
-    * @param type $Active 
-    */
-   public function SettingsController_ActivateReactionType_Create($Sender, $Type, $Active) {
-      $Sender->Permission('Garden.Settings.Manage');
-      
-      $Sender->Form->InputPrefix = '';
-      if (!$Sender->Form->IsMyPostBack()) {
-         throw PermissionException('PostBack');
-      }
-      
-      $ReactionType = ReactionModel::ReactionTypes($Type);
-      if (!$ReactionType)
-         throw NotFoundException('Reaction Type');
-      
-      $ReactionModel = new ReactionModel();
-      $ReactionType['Active'] = $Active;
-      $Set = ArrayTranslate($ReactionType, array('UrlCode', 'Active'));
-      $ReactionModel->DefineReactionType($Set);
-      
-      // Send back the new button.
-      include_once $Sender->FetchViewLocation('settings_functions', '', 'plugins/Reactions');
-      $Sender->DeliveryType(DELIVERY_METHOD_JSON);
-      
-      $Sender->JsonTarget("#ReactionType_{$ReactionType['UrlCode']} .ActivateSlider", ActivateButton($ReactionType), 'ReplaceWith');
-      
-      $Sender->JsonTarget("#ReactionType_{$ReactionType['UrlCode']}", 'InActive', $ReactionType['Active'] ? 'RemoveClass' : 'AddClass');      
-      
-      $Sender->Render('Blank', 'Utility', 'Dashboard');
-   }
-   
-   public function SettingsController_ReactionTypes_Create($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
-      
-      // Grab all of the reaction types.
-      $ReactionModel = new ReactionModel();
-      $ReactionTypes = ReactionModel::GetReactionTypes();
-      
-      $Sender->SetData('ReactionTypes', $ReactionTypes);
-      include_once $Sender->FetchViewLocation('settings_functions', '', 'plugins/Reactions');
-      $Sender->Title(T('Reaction Types'));
-      $Sender->AddSideMenu();
-      $Sender->Render('ReactionTypes', '', 'plugins/Reactions');
-   }
-   
-   public function SettingsController_Reactions_Create($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
-      
-      $Conf = new ConfigurationModule($Sender);
-      $Conf->Initialize(array(
-          'Plugins.Reactions.ShowUserReactions' => array('LabelCode' => 'Show who reacted below posts.', 'Control' => 'CheckBox', 'Default' => 1),
-          'Plugins.Reactions.BestOfStyle' => array('LabelCode' => 'Best of Style', 'Control' => 'RadioList', 'Items' => array('Tiles' => 'Tiles', 'List' => 'List'), 'Default' => 'Tiles'),
-          'Plugins.Reactions.DefaultOrderBy' => array('LabelCode' => 'Order Comments By', 'Control' => 'RadioList', 'Items' => array('DateInserted' => 'Date', 'Score' => 'Score'), 'Default' => 'DateInserted',
-              'Description' => 'You can order your comments based on reactions. We recommend ordering the comments by date.'),
-          'Plugins.Reactions.DefaultEmbedOrderBy' => array('LabelCode' => 'Order Embedded Comments By', 'Control' => 'RadioList', 'Items' => array('DateInserted' => 'Date', 'Score' => 'Score'), 'Default' => 'Score',
-              'Description' => 'Ordering your embedded comments by reaction will show just the best comments. Then users can head into the community to see the full discussion.')
-      ));
-      
-      $Sender->Title(sprintf(T('%s Settings'), 'Reaction'));
-      $Sender->AddSideMenu();
-      $Conf->RenderAll();
    }
    
    /** 
@@ -579,6 +556,10 @@ class ReactionsPlugin extends Gdn_Plugin {
             $CommentModel->OrderBy('c.DateInserted');
             break;
       }
+   }
+   
+   public function SettingsController_AddEditCategory_Handler($Sender) {
+      $Sender->ShowCustomPoints = TRUE;
    }
 
    /** 

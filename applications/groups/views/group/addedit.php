@@ -18,12 +18,18 @@
          echo $this->Form->BodyBox('Description');
          ?>
       </div>
-      <div class="P P-Category">
-         <?php
+      <?php
+      $Categories = $this->Data('Categories');
+      if (count($Categories) == 1) {
+         $Row = array_pop($Categories);
+         echo $this->Form->Hidden('CategoryID');
+      } else {
+         echo '<div class="P P-Category">';
          echo $this->Form->Label('Category', 'CategoryID', array('class' => 'B'));
-         echo ' '.$this->Form->CategoryDropDown('CategoryID', array('IncludeNull' => TRUE));
-         ?>
-      </div>
+         echo ' '.$this->Form->DropDown('CategoryID', $Categories, array('IncludeNull' => TRUE));
+         echo '</div>';
+      }
+      ?>
       <div class="P P-Icon">
          <?php
          echo $this->Form->Label('Icon', 'Icon_New', array('class' => 'B'));

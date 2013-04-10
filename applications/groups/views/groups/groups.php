@@ -22,6 +22,9 @@ if (CheckPermission('Groups.Group.Add')) {
 <?php
 WriteGroupCards($this->Data('NewGroups'));
 ?>
+<div class="MoreWrap">
+   <?php echo Anchor(sprintf(T('All %s...'), T('New Groups')), '/groups/browse/newest'); ?>
+</div>
 </div>
 <?php endif; ?>
 
@@ -31,4 +34,7 @@ WriteGroupCards($this->Data('NewGroups'));
 WriteGroupCards($this->Data('Groups'), 
    T("There aren't any groups yet."));
 ?>
+<div class="MoreWrap">
+   <?php echo Anchor(sprintf(T('All %s...'), T('Popular Groups')), '/groups/browse/popular'); ?>
+</div>
 </div>

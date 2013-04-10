@@ -10,7 +10,7 @@ if (Gdn::Config('Garden.Profile.ShowAbout')) {
       <dt><?php echo T('Name'); ?></dt>
       <dd><?php echo $this->User->Name; ?></dd>
       <?php               
-      if ($this->User->ShowEmail == 1 || $Session->CheckPermission('Garden.Registration.Manage')) {
+      if ($this->User->ShowEmail == 1 || $Session->CheckPermission('Garden.Moderation.Manage')) {
          echo '<dt>'.T('Email').'</dt>
          <dd>'.Gdn_Format::Email($this->User->Email).'</dd>';
       }

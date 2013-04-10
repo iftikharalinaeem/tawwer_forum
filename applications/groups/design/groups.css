@@ -36,11 +36,6 @@
   margin: 2px 10px 0 0;
   padding: 4px 0 3px;
   line-height: 1.1;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  -ms-border-radius: 5px;
-  -o-border-radius: 5px;
-  border-radius: 5px;
   background-color: #333333;
   color: white;
 }
@@ -62,6 +57,17 @@
 .Event.add .TimePicker, .Event.edit .TimePicker {
   width: 100px;
 }
+.Event.add .Group.Card h3, .Event.edit .Group.Card h3 {
+  margin: 0px;
+}
+.Event.add .Group.Card .Group-Description, .Event.edit .Group.Card .Group-Description {
+  display: none;
+}
+.Event.add .Group.Card .Card-Icon, .Event.edit .Group.Card .Card-Icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 0px;
+}
 .Event.add .EventTime .P > div, .Event.edit .EventTime .P > div {
   display: inline-block;
 }
@@ -72,7 +78,7 @@
   display: inline-block;
 }
 .Event.add .EventTime .EndTime, .Event.edit .EventTime .EndTime {
-  float: right;
+  margin-left: 20px;
 }
 .Event.add .EventTime label, .Event.edit .EventTime label {
   display: none;
@@ -111,48 +117,48 @@
   display: none !important;
 }
 
-.Event.show .EventInfo li {
+.Event.event .EventInfo li {
   line-height: 1.5em;
 }
-.Event.show .EventInfo li span.Label {
+.Event.event .EventInfo li span.Label {
   display: inline-block;
   font-weight: bold;
   width: 70px;
 }
-.Event.show .EventInfo span.Tag {
+.Event.event .EventInfo span.Tag {
   margin-left: 10px;
   background: #979797;
   color: white;
   font-size: 11px;
   text-transform: uppercase;
 }
-.Event.show .EventInfo span.Tip {
+.Event.event .EventInfo span.Tip {
   color: #979797;
   font-size: 11px;
 }
-.Event.show .EventInfo span.Tip a {
+.Event.event .EventInfo span.Tip .Timezone {
   border-bottom: 1px dotted;
   cursor: pointer;
 }
-.Event.show .EventInfo .Body {
+.Event.event .EventInfo .Body {
   margin: 20px 0px;
 }
-.Event.show .Attending {
+.Event.event .Attending {
   margin: 0px;
 }
-.Event.show .Attendees .AttendeeList {
+.Event.event .Attendees .AttendeeList {
   display: block;
   padding: 2px;
 }
-.Event.show .Attendees .AttendeeList h3 {
+.Event.event .Attendees .AttendeeList h3 {
   display: block;
   text-transform: uppercase;
   font-size: 18px;
 }
-.Event.show .Attendees .AttendeeList .PhotoWrap {
+.Event.event .Attendees .AttendeeList .PhotoWrap {
   margin-right: 4px;
 }
-.Event.show .Attendees .Negatives {
+.Event.event .Attendees .Negatives {
   -webkit-column-count: 2;
   -moz-column-count: 2;
   -ms-column-count: 2;
@@ -164,34 +170,64 @@
   -o-column-gap: 30px;
   column-gap: 30px;
 }
-.Event.show .Attendees .Negatives .AttendeeList {
+.Event.event .Attendees .Negatives .AttendeeList {
   -webkit-column-break-inside: avoid;
   column-break-inside: avoid;
 }
 
-.Groups.Group .Group-Events .DataList-Events {
+.Event-Buttons {
+  margin-top: 10px;
+  float: right;
+}
+
+.Event-Buttons .BigButton, .Event-Buttons .ButtonGroup.Big {
+  display: inline-block;
+}
+
+.Events.events .Cards {
+  margin: 0px;
+}
+.Events.events .UpcomingEvents {
+  margin-top: 20px;
+}
+.Events.events .UpcomingEvents .Event {
+  margin: 20px 0px;
+}
+.Events.events .UpcomingEvents .Event .Event-Title {
+  font-size: 120%;
+  margin: 0px;
+}
+.Events.events .UpcomingEvents .Event .Event-Time {
+  font-size: 12px;
+  font-weight: normal;
+}
+.Events.events .UpcomingEvents .Event .Event-Location {
+  line-height: 1.2em;
+}
+
+.Box-Events .DataList-Events {
   padding: 12px 0px;
 }
-.Groups.Group .Group-Events .DataList-Events :first-child {
+.Box-Events .DataList-Events :first-child {
   margin-top: 0px;
 }
-.Groups.Group .Group-Events .DataList-Events :last-child {
+.Box-Events .DataList-Events :last-child {
   margin-bottom: 0px;
 }
-.Groups.Group .Group-Events .Event {
+.Box-Events .Event {
   margin: 12px 0px;
 }
-.Groups.Group .Group-Events .Event .Event-Title {
+.Box-Events .Event .Event-Title {
   margin-bottom: 0px;
 }
-.Groups.Group .Group-Events .Event .Event-Time {
+.Box-Events .Event .Event-Time {
   font-weight: normal;
   font-size: 12px;
 }
-.Groups.Group .Group-Events .Event .Event-Location {
+.Box-Events .Event .Event-Location {
   line-height: 1.2em;
 }
-.Groups.Group .Group-Events .Event .Event-Description {
+.Box-Events .Event .Event-Description {
   display: none;
 }
 
@@ -201,7 +237,7 @@
   width: 6.5em;
   background: #fff;
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #ddd;
+  border: 1px solid #dddddd;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -294,9 +330,6 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .Group-Box {
   position: relative;
 }
-.Group-Box h2 {
-  min-height: 40px;
-}
 .Group-Box .Button-Controls {
   position: absolute;
   top: 0;
@@ -308,6 +341,9 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   left: auto;
   right: 0;
   min-width: 100px !important;
+}
+.Group-Box .Button-Controls + .NarrowList {
+  margin-top: 20px;
 }
 
 .Group-Announcements .DiscussionsBlog time {
@@ -324,6 +360,21 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   padding-right: 8px;
 }
 
+.Item .Applicant-Reason {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.Item:hover .Applicant-Reason {
+  overflow: visible;
+  white-space: normal;
+}
+
+.Join-Approved .Button-Approve,
+.Join-Denied .Button-Deny {
+  opacity: .5;
+}
+
 .Group-Header {
   *zoom: 1;
 }
@@ -331,6 +382,18 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   content: "";
   display: table;
   clear: both;
+}
+
+.Group-SmallHeader {
+  *zoom: 1;
+}
+.Group-SmallHeader:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.Group-SmallHeader .Group-Icon {
+  height: 40px;
 }
 
 .Group-Footer {
@@ -352,6 +415,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 
 .Card {
+  *zoom: 1;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -359,10 +423,18 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   padding: 10px;
   position: relative;
 }
+.Card:after {
+  content: "";
+  display: table;
+  clear: both;
+}
 .Card .Card-Icon {
   margin: 0 10px 10px 0;
-  height: 75px;
-  width: 75px;
+  float: left;
+}
+.Card .Card-Buttons {
+  clear: left;
+  float: right;
 }
 .Card h3 {
   vertical-align: top;
@@ -390,6 +462,10 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .Cards-Groups .Card {
   height: 180px;
 }
+.Cards-Groups .Card .Card-Icon {
+  width: 75px;
+  max-height: 100px;
+}
 .Cards-Groups .Card .Group-Buttons {
   position: absolute;
   padding: 10px;
@@ -397,63 +473,58 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   bottom: 0;
 }
 
-.Group-MembersPage .Group-Icon {
-  max-width: 36px;
-  max-height: 36px;
-  padding-top: 0;
-}
-.Group-MembersPage h2 {
-  clear: both;
-}
-.Group-MembersPage .Card {
-  display: block;
-  height: 70px;
-  width: 270px;
-  margin: 0 15px 15px 0;
-  padding: 5px 10px;
-  float: left;
-  vertical-align: top;
-  *zoom: 1;
-}
-.Group-MembersPage .Card:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-.Group-MembersPage .Card .PhotoWrap {
-  float: left;
-  margin: 5px 5px 0 0;
-}
-.Group-MembersPage .Card a {
-  font-weight: bold;
-}
-.Group-MembersPage .Card .DateJoined {
-  display: block;
-  line-height: 1;
-}
-.Group-MembersPage .Card .Group-MemberOptions {
-  padding-top: 5px;
-  margin-left: 45px;
-  display: none;
-}
-.Group-MembersPage .Card:hover {
-  background-color: #f7f7f7;
-}
-.Group-MembersPage .Card:hover .Group-MemberOptions {
-  display: block;
+.Cards-Members .Card {
+  height: 107px;
 }
 
+/*.Group-MembersPage {
+    .Group-Icon {
+       max-width: 36px;
+       max-height: 36px;
+       padding-top: 0;  
+    }
+    h2 {
+       clear: both;
+    }
+    .Card {
+       display: block;
+       height: 70px;
+       width: 270px;
+       margin: 0 15px 15px 0;
+       padding: 5px 10px;
+       float: left;
+       vertical-align: top;
+       @include pie-clearfix;      
+       
+       .PhotoWrap {
+          float: left;
+          margin: 5px 5px 0 0;
+       }
+       a {
+          font-weight: bold;  
+       }
+       .DateJoined {
+          display: block;
+          line-height: 1;
+       }
+       .Group-MemberOptions {
+          padding-top: 5px;
+          margin-left: 45px;
+          display: none;  
+       }
+    }
+    .Card:hover {
+       background-color: $shaded;
+       
+       .Group-MemberOptions {
+          display: block;  
+       }
+    }
+}
 .Group-Leaders,
 .Group-Members {
-  *zoom: 1;
-}
-.Group-Leaders:after,
-.Group-Members:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
+    @include pie-clearfix;
+}*/
 .UserTile {
   vertical-align: middle;
   margin: 2px 0;
