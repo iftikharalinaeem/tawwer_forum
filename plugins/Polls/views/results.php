@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); 
 $Poll = $this->Data('Poll');
-$Anonymous = GetValue('Anonymous', $Poll);
+$Anonymous = GetValue('Anonymous', $Poll) || C('Plugins.Polls.AnonymousPolls');
 $CountPollVotes = GetValue('CountVotes', $Poll);
 $PollOptions = $this->Data('PollOptions');
 if (!$Poll):

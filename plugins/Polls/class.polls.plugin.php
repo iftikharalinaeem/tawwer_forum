@@ -8,7 +8,7 @@
 $PluginInfo['Polls'] = array(
    'Name' => 'Polls',
    'Description' => "Allow users to create and vote on polls.",
-   'Version' => '1.0.3',
+   'Version' => '1.0.4',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
@@ -194,6 +194,7 @@ class PollsPlugin extends Gdn_Plugin {
       // Set up the page and render
       $Sender->Title(T('New Poll'));
 		$Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/poll')));
+      $Sender->SetData('_AnonymousPolls', C('Plugins.Polls.AnonymousPolls'));
       $Sender->AddJsFile('jquery.duplicate.js');
       $this->_AddCss($Sender);
       $Sender->Render('add', '', 'plugins/Polls');
@@ -233,7 +234,7 @@ class PollsPlugin extends Gdn_Plugin {
             return;
          
          // Don't get user votes if this poll is anonymous.
-         if (GetValue('Anonymous', $Poll))
+         if (GetValue('Anonymous', $Poll) || C('Plugins.Polls.AnonymousPolls'))
             return;
          
          // Look at all of the users in the comments, and load their associated 
