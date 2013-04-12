@@ -55,6 +55,29 @@ class RepliesPlugin extends Gdn_Plugin {
       $Sender->AddCssFile('replies.css', 'plugins/Replies');
    }
    
+//   public function Base_BeforeCommentRender_Handler($Sender, $Args) {
+//      if (!isset($Args['Comment']))
+//         return;
+//      
+//      $Data = array($Args['Comment']);
+//      $Model = new ReplyModel();
+//      $D = NULL;
+//      $Model->JoinReplies($D, $Data);
+//   }
+   
+   /**
+    * 
+    * @param PostController $Sender
+    * @param type $Args
+    */
+   public function PostController_Render_Before($Sender, $Args) {
+      if ($Sender->Request->IsPostBack() && isset($Sender->Data['Comments']) && strcasecmp($Sender->RequestMethod, 'editcomment') == 0) {
+         $Model = new ReplyModel();
+         $Discussion = NULL;
+         $Model->JoinReplies($Discussion, $Sender->Data['Comments']);
+      }
+   }
+   
    /**
     * 
     * @param Gdn_Controller $Sender
@@ -86,7 +109,7 @@ class RepliesPlugin extends Gdn_Plugin {
    public function DiscussionController_EditReply_Create($Sender, $ReplyID) {
       $Model = new ReplyModel();
       $Reply = $Model->GetID($ReplyID, DATASET_TYPE_ARRAY);
-      $Discussion = $Model->GetRecord($Reply);
+      $Discussion = $Model->GetRecord($Reply, TRUE);
       
       $Category = CategoryModel::Categories($Discussion['CategoryID']);
       $Sender->SetData('Category', $Category);
@@ -127,7 +150,7 @@ class RepliesPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_DeleteReply_Create($Sender, $ReplyID) {
       $Model = new ReplyModel();
-      $Discussion = $Model->GetRecord($ReplyID);
+      $Discussion = $Model->GetRecord($ReplyID, TRUE);
       
       $Category = CategoryModel::Categories($Discussion['CategoryID']);
       $Sender->Permission('Vanilla.Comments.Delete', TRUE, 'Category', $Category['PermissionCategoryID']);
@@ -153,6 +176,7 @@ class RepliesPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_Replies_Handler($Sender, $Args) {
       $Sender->ReplyForm = new Gdn_Form();
+      $this->ClearForm($Sender->ReplyForm, array('reply', 'editreply'));
       
       if (isset($Args['Comment'])) {
          WriteReplies($Args['Comment']);
@@ -216,10 +240,23 @@ class RepliesPlugin extends Gdn_Plugin {
       $Sender->Render('ReplyToComment', '', 'plugins/Replies');
    }
    
+   /**
+    * 
+    * @param Gdn_Form $Form
+    * @param type $AllowedMethods
+    */
+   protected function ClearForm($Form, $AllowedMethods) {
+     $AllowedMethods = (array)$AllowedMethods;
+     if (!in_array(Gdn::Controller()->RequestMethod, $AllowedMethods)) {
+        $Form->SetData(array());
+        $Form->FormValues(array());
+     }
+   }
+   
    public function DiscussionController_ReplyToComment_Create($Sender, $ReplyID) {
       $Model = new ReplyModel();
       $Reply = $Model->GetID($ReplyID, DATASET_TYPE_ARRAY);
-      $Discussion = $Model->GetRecord($Reply);
+      $Discussion = $Model->GetRecord($Reply, TRUE);
       
       $Category = CategoryModel::Categories($Discussion['CategoryID']);
       $Sender->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
@@ -250,7 +287,7 @@ class RepliesPlugin extends Gdn_Plugin {
    /**
     * Add 'Quote' option to Discussion.
     */
-   public function DiscussionController_AfterFlag_Handler($Sender, $Args) {
+   public function Base_AfterFlag_Handler($Sender, $Args) {
       if (!Gdn::Session()->CheckPermission('Vanilla.Replies.Add'))
          return;
       
