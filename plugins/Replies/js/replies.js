@@ -69,6 +69,7 @@ $(document).on('submit', '.Item-ReplyForm form', function(e) {
    e.preventDefault();
    
    var $form = $(this);
+   var $list = $form.closest('.DataList-Replies');
    
    if($(':submit', $form).hasClass('InProgress'))
       return;
@@ -79,7 +80,7 @@ $(document).on('submit', '.Item-ReplyForm form', function(e) {
       success: function(data) {
          if (data) {
             gdn.processTargets(data.Targets);
-            $form.closest('.DataList-Replies').removeClass('Open');
+            $list.toggleReplyForm(false);
          }
       },
       complete: function() {

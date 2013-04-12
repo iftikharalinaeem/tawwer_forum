@@ -13,7 +13,7 @@
 $PluginInfo['Replies'] = array(
    'Name' => 'Inline Replies',
    'Description' => "Adds one level of inline replies to comments.",
-   'Version' => '1.0b1.1',
+   'Version' => '1.0b1.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -306,7 +306,25 @@ class RepliesPlugin extends Gdn_Plugin {
     * @param type $CommentID
     */
    public function PostController_Reply_Create($Sender, $CommentID) {
+      $Sender->Permission('Vanilla.Replies.Add');
+      
       $Model = new ReplyModel();
+      
+      // Make sure we have permission.
+      $DiscussionModel = new DiscussionModel();
+      if ($CommentID < 0) {
+         $Discussion = $DiscussionModel->GetID(-$CommentID);
+      } else {
+         $CommentModel = new CommentModel();
+         $Comment = $CommentModel->GetID($CommentID);
+         $Discussion = $DiscussionModel->GetID(GetValue('DiscussionID', $Comment));
+      }
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
+      $Category = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
+      $Sender->Permission('Vanilla.Comments.Add', TRUE, 'Category', $Category['PermissionCategoryID']);
+      $Sender->SetData('Category', $Category);
       
       $Form = new Gdn_Form();
       $Sender->ReplyForm = $Form;
