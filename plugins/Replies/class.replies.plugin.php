@@ -13,7 +13,7 @@
 $PluginInfo['Replies'] = array(
    'Name' => 'Inline Replies',
    'Description' => "Adds one level of inline replies to comments.",
-   'Version' => '1.0b',
+   'Version' => '1.0b1.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
