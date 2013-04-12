@@ -712,68 +712,63 @@ class OnlinePlugin extends Gdn_Plugin {
     * 
     * @param UserModel $Sender
     */
-   public function UserModel_AfterGetID_Handler($Sender) {
-      $User = &$Sender->EventArguments['LoadedUser'];
+   public function UserModel_SetCalculatedFields_Handler($Sender) {
+      $User = &$Sender->EventArguments['User'];
       $this->AdjustUser($User);
-   }
-   
-   /**
-    * Attach users' online state to user objects
-    * 
-    * @param UserModel $Sender
-    */
-   public function UserModel_AfterGetIDs_Handler($Sender) {
-      $LoadedUsers = &$Sender->EventArguments['LoadedUsers'];
-      
-      // Adjust user info
-      foreach ($LoadedUsers as $LoadedUserID => &$LoadedUser)
-         $this->AdjustUser($LoadedUser);
    }
    
    public function AdjustUser(&$User) {
       $UserID = GetValue('UserID', $User, NULL);
-      if (!$UserID) return FALSE;
       
-      // Already handled this one guv'na
-      if (array_key_exists('Online', $User)) return;
+      if (!$UserID) return false;
       
-      $UTC = new DateTimeZone('UTC');
-      $CurrentDate = new DateTime('now', $UTC);
-      
-      $UserInfo = $this->GetUser($UserID);
-      $UserIsOnline = FALSE;
+      // Need to apply 'online' state
+      $Online = GetValue('Online', $User, null);
+      if (is_null($Online)) {
+         $UTC = new DateTimeZone('UTC');
+         $CurrentDate = new DateTime('now', $UTC);
 
-      $UserLastOnline = GetValue('Timestamp', $UserInfo, NULL);
-      if (Gdn::Session()->IsValid() && $UserID == Gdn::Session()->UserID)
-         $UserLastOnline = $CurrentDate->format('Y-m-d H:i:s');
+         $UserInfo = $this->GetUser($UserID);
+         $UserIsOnline = false;
 
-      if (!is_null($UserLastOnline)) {
-         
-         $EarliestOnlineDate = new DateTime('now', $UTC);
-         $EarliestOnlineDate->sub(new DateInterval("PT{$this->PruneDelay}S"));
-         $EarliestOnlineTime = $EarliestOnlineDate->getTimestamp();
-         $EarliestOnline = $EarliestOnlineDate->format('Y-m-d H:i:s');
-         
-         $UserLastOnlineDate = DateTime::createFromFormat('Y-m-d H:i:s', $UserLastOnline, $UTC);
-         $UserLastOnlineTime = $UserLastOnlineDate->getTimestamp();
-         $UserLastOnline = $UserLastOnlineDate->format('Y-m-d H:i:s');
-         
-         $UserIsOnline = $UserLastOnlineTime >= $EarliestOnlineTime;
+         $UserLastOnline = GetValue('Timestamp', $UserInfo, null);
+         if (Gdn::Session()->IsValid() && $UserID == Gdn::Session()->UserID)
+            $UserLastOnline = $CurrentDate->format('Y-m-d H:i:s');
+
+         if (!is_null($UserLastOnline)) {
+
+            $EarliestOnlineDate = new DateTime('now', $UTC);
+            $EarliestOnlineDate->sub(new DateInterval("PT{$this->PruneDelay}S"));
+            $EarliestOnlineTime = $EarliestOnlineDate->getTimestamp();
+            $EarliestOnline = $EarliestOnlineDate->format('Y-m-d H:i:s');
+
+            $UserLastOnlineDate = DateTime::createFromFormat('Y-m-d H:i:s', $UserLastOnline, $UTC);
+            $UserLastOnlineTime = $UserLastOnlineDate->getTimestamp();
+            $UserLastOnline = $UserLastOnlineDate->format('Y-m-d H:i:s');
+
+            $UserIsOnline = $UserLastOnlineTime >= $EarliestOnlineTime;
+         }
+
+         SetValue('Online', $User, $UserIsOnline);
+         SetValue('LastOnlineDate', $User, $UserLastOnline);
+
+         $UserIsPrivate = $this->PrivateMode($User);
+         SetValue('Private', $User, $UserIsPrivate);
       }
-
-      SetValue('Online', $User, $UserIsOnline);
-      SetValue('LastOnlineDate', $User, $UserLastOnline);
       
-      $UserIsPrivate = $this->PrivateMode($User);
-      SetValue('Private', $User, $UserIsPrivate);
-      
+      // Apply CSS classes if needed
       $UserClasses = trim(GetValue('_CssClass', $User));
-      if ($UserIsOnline && !$UserIsPrivate)
-         $UserClasses .= " Online";
-      else
-         $UserClasses .= " Offline";
+      if (!preg_match('`(On|Off)line`i', $UserClasses)) {
+         $UserIsOnline = GetValue('Online', $User, false);
+         $UserIsPrivate = GetValue('Private', $User, false);
       
-      SetValue('_CssClass', $User, $UserClasses);
+         if ($UserIsOnline && !$UserIsPrivate)
+            $UserClasses .= " Online";
+         else
+            $UserClasses .= " Offline";
+      
+         SetValue('_CssClass', $User, $UserClasses);
+      }
    }
    
    /*

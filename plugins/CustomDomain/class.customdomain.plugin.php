@@ -9,6 +9,8 @@
  * Changes: 
  *  2.0     Compatibility with Infrastructure
  *  2.1     Improvement to UI
+ *  2.1.1   Fix resolve detection
+ *  2.1.2   Fix the fix
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @author Mark O'Sullivan <mark@vanillaforums.com>
@@ -20,7 +22,7 @@
 $PluginInfo['CustomDomain'] = array(
    'Name' => 'Custom Domain',
    'Description' => 'Make your Vanilla Forum accessible from a different domain.',
-   'Version' => '2.0.1',
+   'Version' => '2.1.2',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
@@ -69,14 +71,17 @@ class CustomDomainPlugin extends Gdn_Plugin {
       
       $Site = Infrastructure::Site();
       $Sender->SetData('Site', $Site);
-      $Sender->SetData('ForumName', Infrastructure::Client());
+      $Client = Infrastructure::Client();
+      $Sender->SetData('ForumName', $Client);
       
       $ClusterName = Infrastructure::Cluster();
       $ClusterLoadbalancer = Infrastructure::Server('www');
-      $ClusterLoadbalancerAddress = gethostbyname($ClusterLoadbalancer);
+      //$ClusterLoadbalancerAddress = gethostbyname($ClusterLoadbalancer);
+      $ClusterAddress = gethostbyname($Client);
+      
       $Sender->SetData('ClusterName', $ClusterName);
       $Sender->SetData('ClusterLoadbalancer', $ClusterLoadbalancer);
-      $Sender->SetData('ClusterLoadbalancerAddress', $ClusterLoadbalancerAddress);
+      $Sender->SetData('ClusterAddress', $ClusterAddress);
       
       $Sender->SetData('Steps', TRUE);
       $Sender->SetData('Attempt', $Sender->Form->IsPostBack());
@@ -130,13 +135,15 @@ class CustomDomainPlugin extends Gdn_Plugin {
    
    private function CheckConfiguration($Domain) {
       $Loadbalancer = Infrastructure::Server('www');
-      $LoadbalancerAddress = gethostbyname($Loadbalancer);
+      //$LoadbalancerAddress = gethostbyname($Loadbalancer);
+      $Client = Infrastructure::Client();
+      $ClusterAddress = gethostbyname($Client);
       
       $DomainAddress = gethostbyname($Domain);
       $DomainType = explode('.', $Domain);
       $DomainType = sizeof($DomainType) > 2 ? 'subdomain' : 'domain';
       
-      if ($DomainAddress != $LoadbalancerAddress)
+      if ($DomainAddress != $ClusterAddress)
          throw new AddressMismatchDomainException("That {$DomainType} does not resolve to the correct IP");
       
       $ExpectedRecordType = $DomainType == 'domain' ? 'a' : 'cname';
@@ -158,7 +165,7 @@ class CustomDomainPlugin extends Gdn_Plugin {
          $Matched = FALSE;
          foreach ($LookupHostname as $DnsRecord) {
             $Target = GetValue('ip', $DnsRecord);
-            if ($Target == $LoadbalancerAddress) $Matched = TRUE;
+            if ($Target == $ClusterAddress) $Matched = TRUE;
          }
          
          if (!$Matched)
