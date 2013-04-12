@@ -6,6 +6,15 @@
       &:last-child {
          border-bottom: 0;
       }
+      
+      .OptionsTitle {
+         visibility: hidden;
+      }
+      
+      &.Open .OptionsTitle,
+      &:hover .OptionsTitle {
+         visibility: visible;
+      }
    }
    
    .PhotoWrap {
@@ -24,11 +33,11 @@
    .FormPlaceholder {
       display: block;
       border: solid 1px #ddd;
-      padding: 3px;
+      padding: 0 3px;
       background: #fff;
       @include box-sizing(border-box);
       height: 30px;
-      line-height: 22px;
+      line-height: 30px;
    }
    
    .Buttons {

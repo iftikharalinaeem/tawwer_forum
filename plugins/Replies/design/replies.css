@@ -1,6 +1,12 @@
 .DataList-Replies .Item:last-child {
   border-bottom: 0;
 }
+.DataList-Replies .Item .OptionsTitle {
+  visibility: hidden;
+}
+.DataList-Replies .Item.Open .OptionsTitle, .DataList-Replies .Item:hover .OptionsTitle {
+  visibility: visible;
+}
 .DataList-Replies .PhotoWrap {
   float: left;
 }
@@ -14,13 +20,13 @@
 .DataList-Replies .FormPlaceholder {
   display: block;
   border: solid 1px #ddd;
-  padding: 3px;
+  padding: 0 3px;
   background: #fff;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   height: 30px;
-  line-height: 22px;
+  line-height: 30px;
 }
 .DataList-Replies .Buttons {
   text-align: right;

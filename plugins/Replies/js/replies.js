@@ -9,6 +9,7 @@ $.fn.toggleReplyForm = function(open) {
    if (open) {
       // Open the form.
       $('.FormPlaceholder', $list).hide();
+      $list.addClass('Open');
       $('form', $list).show();
       $list.show();
       
@@ -24,6 +25,7 @@ $.fn.toggleReplyForm = function(open) {
          $('.FormPlaceholder', $list).show();
       }
       
+      $list.removeClass('Open');
       $button.removeClass('Open');
    }
 };
@@ -33,7 +35,7 @@ $(document).on('click', '.FormPlaceholder', function(e) {
    $(this).toggleReplyForm(true);
 });
 
-$(document).on('click', '.DataList-Replies .Cancel', function(e) {
+$(document).on('click', '.Item-ReplyForm .Cancel', function(e) {
    e.preventDefault();
    $(this).toggleReplyForm(false);
 });
@@ -41,6 +43,26 @@ $(document).on('click', '.DataList-Replies .Cancel', function(e) {
 $(document).on('click', '.ReactButton.Reply', function(e) {
    e.preventDefault();
    $(this).closest('.Item-Body').find('.DataList-Replies').toggleReplyForm();
+});
+
+$(document).on('click', '.Option-EditReply', function(e) {
+   e.preventDefault();
+   
+   $container = $(this).closest('.Item-Reply');
+   
+   // Grab the form.
+   $.ajax({
+      url: $(this).attr('href'),
+      data: { DeliveryType: 'VIEW' },
+      success: function(r) {
+         var $new = $('<div>'+r+'</div>');
+         $container.replaceWith($new);
+         $('form', $new).ajaxForm({
+            target: $new,
+            data: { DeliveryType: 'VIEW' }
+         });
+      }
+   });
 });
 
 $(document).on('submit', '.Item-ReplyForm form', function(e) {
@@ -55,8 +77,13 @@ $(document).on('submit', '.Item-ReplyForm form', function(e) {
    
    $form.ajaxSubmit({
       success: function(data) {
-         if (data)
+         if (data) {
             gdn.processTargets(data.Targets);
+            $form.closest('.DataList-Replies').removeClass('Open');
+         }
+      },
+      complete: function() {
+         $(':submit', $form).removeClass('InProgress');
       }
    });
 });

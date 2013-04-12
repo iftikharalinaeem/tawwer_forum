@@ -32,12 +32,13 @@ class RepliesPlugin extends Gdn_Plugin {
       Gdn::Structure()
          ->Table('Reply')
          ->PrimaryKey('ReplyID')
-         ->Column('CommentID', 'int', FALSE, 'key')
+         ->Column('CommentID', 'int', FALSE, 'key') // negative are on discussions
          ->Column('Body', 'text') // Only textex
          ->Column('DateInserted', 'datetime')
          ->Column('InsertUserID', 'int')
          ->Column('DateUpdated', 'datetime', TRUE)
          ->Column('UpdateUserID', 'int', TRUE)
+         ->Column('OldCommentID', 'int', FALSE)
          ->Set();
       
       Gdn::PermissionModel()->Define(array(
@@ -73,8 +74,75 @@ class RepliesPlugin extends Gdn_Plugin {
    public function DiscussionController_Render_Before($Sender) {
       if (isset($Sender->Data['Comments'])) {
          $Model = new ReplyModel();
-         $Model->JoinReplies($Sender->Data['Comments']->Result());
+         $Model->JoinReplies($Sender->Data['Discussion'], $Sender->Data['Comments']->Result());
       }
+   }
+   
+   /**
+    * 
+    * @param Gdn_Controller $Sender
+    * @param int $ReplyID
+    */
+   public function DiscussionController_EditReply_Create($Sender, $ReplyID) {
+      $Model = new ReplyModel();
+      $Reply = $Model->GetID($ReplyID, DATASET_TYPE_ARRAY);
+      $Discussion = $Model->GetRecord($Reply);
+      
+      $Category = CategoryModel::Categories($Discussion['CategoryID']);
+      $Sender->SetData('Category', $Category);
+      $Sender->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
+      
+      $Form = new Gdn_Form();
+      $Form->SetModel($Model);
+      $Sender->ReplyForm = $Form;
+      
+      if ($Form->AuthenticatedPostBack()) {
+         // Save the reply.
+         $Form->SetFormValue('ReplyID', $ReplyID);
+         
+         if ($Form->GetFormValue('Cancel')) {
+            $View = 'Reply';
+         } elseif ($Form->Save()) {
+            $Reply = $Model->GetID($ReplyID, DATASET_TYPE_ARRAY);
+            $View = 'Reply';
+         } else {
+            $View = 'EditReply';
+         }
+      } else {
+         $Form->SetData($Reply);
+         $View = 'EditReply';
+      }
+      $Sender->SetData('Reply', $Reply);
+      
+      $Sender->Title(sprintf(T('Delete %s'), T('Reply')));
+      $Sender->Render($View, '', 'plugins/Replies');
+      
+   }
+   
+   /**
+    * 
+    * @param Gdn_Controller $Sender
+    * @param type $RepyID
+    * @throws type
+    */
+   public function DiscussionController_DeleteReply_Create($Sender, $ReplyID) {
+      $Model = new ReplyModel();
+      $Discussion = $Model->GetRecord($ReplyID);
+      
+      $Category = CategoryModel::Categories($Discussion['CategoryID']);
+      $Sender->Permission('Vanilla.Comments.Delete', TRUE, 'Category', $Category['PermissionCategoryID']);
+      
+      $Form = new Gdn_Form();
+      if ($Form->AuthenticatedPostBack()) {
+         // Delete the reply.
+         $Deleted = $Model->Delete(array('ReplyID' => $ReplyID));
+         if ($Deleted) {
+            $Sender->JsonTarget('#'.ReplyElementID($ReplyID), '', 'SlideUp');
+         }
+      }
+      
+      $Sender->Title(sprintf(T('Delete %s'), T('Reply')));
+      $Sender->Render('DeleteReply', '', 'plugins/Replies');
    }
    
    /**
@@ -84,25 +152,115 @@ class RepliesPlugin extends Gdn_Plugin {
     * @return type
     */
    public function DiscussionController_Replies_Handler($Sender, $Args) {
-      if (!isset($Args['Comment']))
-         return;
-      
       $Sender->ReplyForm = new Gdn_Form();
-      WriteReplies($Args['Comment']);
+      
+      if (isset($Args['Comment'])) {
+         WriteReplies($Args['Comment']);
+      } elseif (isset($Args['Discussion'])) {
+         WriteReplies($Args['Discussion']);
+      }
+   }
+   
+   public function DiscussionController_CommentToReply_Create($Sender, $CommentID) {
+      $ReplyModel = new ReplyModel();
+      $CommentModel = new CommentModel();
+      $DiscussionModel = new DiscussionModel();
+      
+      $Comment = $CommentModel->GetID($CommentID, DATASET_TYPE_ARRAY);
+      if (!$Comment)
+         throw NotFoundException('Comment');
+      
+      $Discussion = (array)$DiscussionModel->GetID($Comment['DiscussionID']);
+      if (!$Discussion)
+         throw NotFoundException('Discussion');
+      
+      $Category = CategoryModel::Categories($Discussion['CategoryID']);
+      $Sender->Permission('Vanilla.Comments.Edit', 'CategoryID', $Category['PermissionCategoryID']);
+      
+      if ($Sender->Form->AuthenticationPostBack()) {
+         $ReplyToCommentID = $this->Form->GetFormValue('CommentID');
+         if (!$ReplyToCommentID) {
+            $Form = new Gdn_Form();
+            $Sender->Form->AddError('ValidateRequred', 'Target');
+         } else {
+            $ReplyID = $ReplyModel->MoveFromComment($Comment, $ReplyToCommentID);
+            
+            if ($ReplyID) {
+               // Redirect to the comment or the discussion to show the new reply.
+               $Row = $ReplyModel->GetRecord($ReplyID);
+               if ($ReplyToCommentID < 0)
+                  $Sender->RedirectUrl = DiscussionUrl($Row);
+               else
+                  $Sender->RedirectUrl = CommentUrl($Row);
+            } else {
+               $Sender->Form->SetValidationResults($ReplyModel->ValidationResults());
+            }
+         }
+      }
+      
+      // We need to get a list of comments so that the user can select which to move to.
+      
+      
+      switch (strtolower($Discussion['Type'])) {
+         case 'question':
+            $Code = 'Answer';
+            $Sender->SetData('MoveMessage', T('You are about to make this answer a reply.'));
+            break;
+         default:
+            $Code = 'Comment';
+            $Sender->SetData('MoveMessage', T('You are about to make this comment a reply.'));
+            break;
+      }
+      
+      $Sender->Title(sprintf(T('Move %s'), T($Code)));
+      $Sender->Render('ReplyToComment', '', 'plugins/Replies');
+   }
+   
+   public function DiscussionController_ReplyToComment_Create($Sender, $ReplyID) {
+      $Model = new ReplyModel();
+      $Reply = $Model->GetID($ReplyID, DATASET_TYPE_ARRAY);
+      $Discussion = $Model->GetRecord($Reply);
+      
+      $Category = CategoryModel::Categories($Discussion['CategoryID']);
+      $Sender->Permission('Vanilla.Comments.Edit', TRUE, 'Category', $Category['PermissionCategoryID']);
+      
+      if ($Sender->Form->AuthenticatedPostBack()) {
+         $CommentID = $Model->MoveToComment($Reply, $Discussion);
+         if ($CommentID) {
+            $CommentModel = new CommentModel();
+            $Comment = $CommentModel->GetID($CommentID);
+            $Sender->RedirectUrl = CommentUrl($Comment);
+         } else {
+            $Sender->Form->SetValidationResults($Model->ValidationResults());
+         }
+      }
+      
+      switch (strtolower($Discussion['Type'])) {
+         case 'question':
+            $Sender->SetData('MoveMessage', T('You are about to make this reply an answer.'));
+            break;
+         default:
+            $Sender->SetData('MoveMessage', T('You are about to make this reply a comment.'));
+            break;
+      }
+      $Sender->Title(sprintf(T('Move %s'), T('Reply')));
+      $Sender->Render('ReplyToComment', '', 'plugins/Replies');
    }
    
    /**
     * Add 'Quote' option to Discussion.
     */
    public function DiscussionController_AfterFlag_Handler($Sender, $Args) {
-      if (!isset($Args['Comment']))
-         return;
-      
       if (!Gdn::Session()->CheckPermission('Vanilla.Replies.Add'))
          return;
       
-      echo Gdn_Theme::BulletItem('Flags');
-      WriteReplyButton($Args['Comment']);
+      if (isset($Args['Comment'])) {
+         echo Gdn_Theme::BulletItem('Flags');
+         WriteReplyButton($Args['Comment']);
+      } elseif (isset($Args['Discussion'])) {
+         echo Gdn_Theme::BulletItem('Flags');
+         WriteReplyButton($Args['Discussion']);
+      }
    }
    
    /**
@@ -122,7 +280,7 @@ class RepliesPlugin extends Gdn_Plugin {
       $Sender->DeliveryType(DELIVERY_TYPE_VIEW);
       
       if ($Form->AuthenticatedPostBack()) {
-         $Container = '#Replies_'.$CommentID;
+         $Container = '#'.RepliesElementID($CommentID);
          
          $Form->SetFormValue('CommentID', $CommentID);
          if ($ReplyID = $Form->Save()) {
@@ -147,4 +305,56 @@ class RepliesPlugin extends Gdn_Plugin {
       
       $Sender->Render('Blank', 'Utility', 'Dashboard');
    }
+}
+
+function ReplyRecordID($Row) {
+   $ID = GetValue('CommentID', $Row);
+   if (!$ID)
+      $ID = -GetValue('DiscussionID', $Row);
+   return $ID;
+}
+
+function ReplyElementID($ID) {
+   return 'Reply_'.$ID;
+}
+
+function RepliesElementID($ID) {
+   if (is_array($ID) || is_object($ID))
+      $ID = ReplyRecordID($ID);
+   
+   return 'Replies_'.str_replace('-', 'd', $ID);
+}
+
+function GetReplyOptions($Reply) {
+   static $Permissions = null;
+   if (!isset($Permissions)) {
+      $Category = Gdn::Controller()->Data('Category');
+      if ($Category) {
+         $Permissions = array(
+               'Delete' => Gdn::Session()->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $Category['PermissionCategoryID']),
+               'Edit' => Gdn::Session()->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', $Category['PermissionCategoryID'])
+            );
+      } else {
+         $Permissions = array(
+            'Delete' => FALSE,
+            'Edit' => FALSE
+            );
+      }
+   }
+   
+   $ID = GetValue('ReplyID', $Reply);
+   
+   $Result = array();
+   
+   if ($Permissions['Edit']) {
+      $Result['EditReply'] = array('Label' => T('Edit'), 'Url' => "/discussion/editreply?replyid=$ID");
+   }
+   if ($Permissions['Delete'])
+      $Result['DeleteReply'] = array('Label' => T('Delete'), 'Url' => "/discussion/deletereply?replyid=$ID", 'Class' => 'Popup');
+   if ($Permissions['Edit']) {
+      $Result['ReplyToComment'] = array('Label' => T('Move'), 'Url' => "/discussion/replytocomment?replyid=$ID", 'Class' => 'Popup');
+   }
+   
+   
+   return $Result;
 }
