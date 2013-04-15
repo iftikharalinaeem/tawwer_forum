@@ -67,7 +67,7 @@ if (!$CancelUrl) {
 
       echo '<div class="Buttons">';
          echo $this->Form->Button('Save Poll', array('class' => 'Button PollButton Primary'));
-         echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
+         echo ' '.Anchor(T('Cancel'), $CancelUrl, 'Button Cancel');
       echo '</div>';
       echo $this->Form->Close();
    echo '</div>';
