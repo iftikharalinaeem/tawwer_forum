@@ -56,13 +56,18 @@ class ThreadCyclePlugin extends Gdn_Plugin {
          ->Get()->ResultArray();
       
       Gdn::UserModel()->JoinUsers($Commenters, array('UserID'), array(
-         'Join'   => array('UserID', 'Name', 'Email', 'Photo', 'Jailed', 'Points')
+         'Join'   => array('UserID', 'Name', 'Email', 'Photo', 'Jailed', 'Banned', 'Points')
       ));
       
       // Weed out jailed and offline people
       $Eligible = array();
       foreach ($Commenters as $Commenter) {
+         // No jailed users
          if ($Commenter['Jailed'])
+            continue;
+         
+         // No banned users
+         if ($Commenter['Banned'])
             continue;
          
          $UserOnline = OnlinePlugin::Instance()->GetUser($Commenter['UserID']);
@@ -77,7 +82,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       // Sort by online, descending
       usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByLastOnline'));
       
-      // Get the top 10 by online, and choose the 2 by most points
+      // Get the top 10 by online, and choose the top 2 by points
       $Eligible = array_slice($Eligible, 0, 10);
       usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByPoints'));
       $Primary = GetValue(0, $Eligible, array());
@@ -124,7 +129,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
    }
    
    public static function CompareUsersByLastOnline($a, $b) {
-      return $a['LastOnline'] - $a['LastOnline'];
+      return $a['LastOnline'] - $b['LastOnline'];
    }
    
    /*
