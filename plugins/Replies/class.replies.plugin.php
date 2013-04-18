@@ -65,6 +65,16 @@ class RepliesPlugin extends Gdn_Plugin {
 //      $Model->JoinReplies($D, $Data);
 //   }
    
+   
+   public function Base_CommentOptions_Handler($Sender, $Args) {
+      $Options =& $Args['CommentOptions'];
+      
+      if (isset($Options['EditComment'])) {
+         $ID = GetValueR('Comment.CommentID', $Args);
+         $Options['CommentToReply'] = array('Label' => T('Make Reply...'), 'Url' => "/discussion/commenttoreply?commentid=$ID", 'Class' => 'Popup');
+      }
+   }
+   
    /**
     * 
     * @param PostController $Sender
@@ -95,7 +105,7 @@ class RepliesPlugin extends Gdn_Plugin {
    }
    
    public function DiscussionController_Render_Before($Sender) {
-      if (isset($Sender->Data['Comments'])) {
+      if (isset($Sender->Data['Comments']) && is_a($Sender->Data['Comments'], 'Gdn_DataSet')) {
          $Model = new ReplyModel();
          $Model->JoinReplies($Sender->Data['Discussion'], $Sender->Data['Comments']->Result());
       }
@@ -201,10 +211,10 @@ class RepliesPlugin extends Gdn_Plugin {
       $Category = CategoryModel::Categories($Discussion['CategoryID']);
       $Sender->Permission('Vanilla.Comments.Edit', 'CategoryID', $Category['PermissionCategoryID']);
       
-      if ($Sender->Form->AuthenticationPostBack()) {
-         $ReplyToCommentID = $this->Form->GetFormValue('CommentID');
+      if ($Sender->Form->AuthenticatedPostBack()) {
+         $ReplyToCommentID = $Sender->Form->GetFormValue('CommentID');
          if (!$ReplyToCommentID) {
-            $Form = new Gdn_Form();
+//            $Form = new Gdn_Form();
             $Sender->Form->AddError('ValidateRequred', 'Target');
          } else {
             $ReplyID = $ReplyModel->MoveFromComment($Comment, $ReplyToCommentID);
@@ -216,6 +226,7 @@ class RepliesPlugin extends Gdn_Plugin {
                   $Sender->RedirectUrl = DiscussionUrl($Row);
                else
                   $Sender->RedirectUrl = CommentUrl($Row);
+               $Sender->Render('Blank', 'Utility', 'Dashboard');
             } else {
                $Sender->Form->SetValidationResults($ReplyModel->ValidationResults());
             }
@@ -223,6 +234,30 @@ class RepliesPlugin extends Gdn_Plugin {
       }
       
       // We need to get a list of comments so that the user can select which to move to.
+      // We'll select a window of comments around when the comment is.
+      $Date = $Comment['DateInserted'];
+      $CommentModel = new CommentModel();
+      $CommentsBefore = $CommentModel->GetWhere(array('DiscussionID' => $Discussion['DiscussionID'], 'DateInserted <' => $Date), 'DateInserted', 'desc', 10)->ResultArray();
+      $CommentsBefore = array_reverse($CommentsBefore);
+      $CommentsAfter = $CommentModel->GetWhere(array('DiscussionID' => $Discussion['DiscussionID'], 'DateInserted >' => $Date), 'DateInserted', 'asc', 10)->ResultArray();
+      
+      $Comments = array_merge($CommentsBefore, $CommentsAfter);
+      
+      // Add a summary.
+      foreach ($Comments as $Index => &$Row) {
+         $Summary = SliceParagraph(Gdn_Format::PlainText($Row['Body'], $Row['Format']), 160);
+         $Row['Summary'] = $Summary;
+         if ($Row['CommentID'] == $Comment['CommentID'])
+            $MyIndex = $Index;
+      }
+      if (isset($MyIndex))
+         unset($Comments[$MyIndex]);
+      
+      $Discussion['Summary'] = $Discussion['Name'];
+      array_unshift($Comments, $Discussion);
+      
+      Gdn::UserModel()->JoinUsers($Comments, array('InsertUserID'));
+      $Sender->SetData('Comments', $Comments);
       
       
       switch (strtolower($Discussion['Type'])) {
@@ -237,7 +272,7 @@ class RepliesPlugin extends Gdn_Plugin {
       }
       
       $Sender->Title(sprintf(T('Move %s'), T($Code)));
-      $Sender->Render('ReplyToComment', '', 'plugins/Replies');
+      $Sender->Render('CommentToReply', '', 'plugins/Replies');
    }
    
    /**
@@ -407,7 +442,7 @@ function GetReplyOptions($Reply) {
    if ($Permissions['Delete'])
       $Result['DeleteReply'] = array('Label' => T('Delete'), 'Url' => "/discussion/deletereply?replyid=$ID", 'Class' => 'Popup');
    if ($Permissions['Edit']) {
-      $Result['ReplyToComment'] = array('Label' => T('Move'), 'Url' => "/discussion/replytocomment?replyid=$ID", 'Class' => 'Popup');
+      $Result['ReplyToComment'] = array('Label' => T('Make Comment'), 'Url' => "/discussion/replytocomment?replyid=$ID", 'Class' => 'Popup');
    }
    
    

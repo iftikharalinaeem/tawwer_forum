@@ -29,6 +29,7 @@ class ReplyModel extends Gdn_Model {
                throw NotFoundException('Discussion');
             return (array)$Discussion;
          }
+         return $Comment;
       } else {
          $DiscussionModel = new DiscussionModel();
          $Discussion = $DiscussionModel->GetID(-$CommentID);
@@ -47,7 +48,7 @@ class ReplyModel extends Gdn_Model {
          $CommentIDs[] = -$DiscussionID;
       }
       
-      $Replies = $this->GetWhere(array('CommentID' => $CommentIDs))->ResultArray();
+      $Replies = $this->GetWhere(array('CommentID' => $CommentIDs), 'DateInserted')->ResultArray();
       $Replies = Gdn_DataSet::Index($Replies, array('CommentID'), array('Unique' => false));
       
       if ($Discussion) {
@@ -97,7 +98,7 @@ class ReplyModel extends Gdn_Model {
             array('CommentID' => $ReplyToCommentID),
             array('CommentID' => GetValue('CommentID', $Comment)));
          
-         $CommentModel->Delete(array('CommentID' => GetValue('CommentID', $Comment)));
+         $CommentModel->Delete(GetValue('CommentID', $Comment), array('Log' => FALSE));
       }
       return $ReplyID;
    }
