@@ -8,6 +8,7 @@
  * Changes: 
  *  1.0     Release
  *  1.1     Improve new thread creator choices
+ *  1.2     Further improve new thread creator choices
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -18,7 +19,7 @@
 $PluginInfo['ThreadCycle'] = array(
    'Name' => 'Minion: ThreadCycle',
    'Description' => "Provide command to automatically cycle a thread after N pages.",
-   'Version' => '1.1',
+   'Version' => '1.2',
    'RequiredApplications' => array(
       'Vanilla' => '2.1a'
     ),
@@ -79,12 +80,18 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       }
       unset($Commenters);
       
-      // Sort by online, descending
+      // Sort by online, ascending
       usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByLastOnline'));
       
-      // Get the top 10 by online, and choose the top 2 by points
+      // Get the top 10 by online, and choose the top 5 by points
       $Eligible = array_slice($Eligible, 0, 10);
       usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByPoints'));
+      $Eligible = array_slice($Eligible, 0, 5);
+      
+      // Shuffle
+      shuffle($Eligible);
+      
+      // Get the top 2
       $Primary = GetValue(0, $Eligible, array());
       $Secondary = Getvalue(1, $Eligible, array());
       
