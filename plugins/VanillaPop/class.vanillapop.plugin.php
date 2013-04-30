@@ -1078,7 +1078,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $NotifyOptions = array(
          0 => 'Notify these users normally using their preferences (recommended)', 
          1 => 'Notify these users for every new comment and discussion', 
-         2 => 'Notify these users for every new comment in announcements'
+         2 => 'Notify these users for new announcements'
       );
       
       $Sender->Data['_ExtendedFields']['ForceNotify'] = array(
@@ -1107,7 +1107,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       // Get effected roles.
       $RoleModel = new RoleModel();
       $RoleIDs = array();
-      if ($ActivityType == 'Comment' && GetValue('Announce', $Args['Discussion'])) {
+      if ($ActivityType == 'Discussion' && GetValue('Announce', $Args['Discussion'])) {
          // Add everyone with force notify all OR announcement-only option.
          $Wheres = array('ForceNotify >' => 0);
       }
