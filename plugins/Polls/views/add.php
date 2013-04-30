@@ -43,9 +43,11 @@ if (!$CancelUrl) {
          echo Wrap($this->Form->TextBox('Body', array('MultiLine' => TRUE, 'format' => $this->Data('Discussion.Format'))), 'div', array('class' => 'TextBoxWrapper'));
       echo '</div>';
 
-      echo '<div class="P PostOptions" style="margin-bottom: 10px;">';
-         echo $this->Form->CheckBox('Anonymous', T('Make this poll anonymous (user votes are not made public).'), array('value' => '1'));
-      echo '</div>';
+      if (!$this->Data('_AnonymousPolls')) {
+         echo '<div class="P PostOptions" style="margin-bottom: 10px;">';
+            echo $this->Form->CheckBox('Anonymous', T('Make this poll anonymous (user votes are not made public).'), array('value' => '1'));
+         echo '</div>';
+      }
 
       echo '<div class="P">';
          echo $this->Form->Label('Poll Options', 'PollOption[]');
@@ -65,7 +67,7 @@ if (!$CancelUrl) {
 
       echo '<div class="Buttons">';
          echo $this->Form->Button('Save Poll', array('class' => 'Button PollButton Primary'));
-         echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
+         echo ' '.Anchor(T('Cancel'), $CancelUrl, 'Button Cancel');
       echo '</div>';
       echo $this->Form->Close();
    echo '</div>';

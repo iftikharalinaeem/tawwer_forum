@@ -72,6 +72,8 @@ class PollModel extends Gdn_Model {
       $FormPostValues = $this->FilterForm($FormPostValues);
       $this->AddInsertFields($FormPostValues);
       $this->AddUpdateFields($FormPostValues);
+      if (C('Plugins.Polls.AnonymousPolls'))
+         $FormPostValues['Anonymous'] = 1;
       $Session = Gdn::Session();
       $FormPostValues['Type'] = 'poll'; // Force the "poll" discussion type.
       $DiscussionID = 0;

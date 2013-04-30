@@ -23,7 +23,7 @@ else:
             echo '</div>';
          }
          if (Gdn::Session()->IsValid())
-            echo $Form->Button('Vote');
+            echo $Form->Button('Vote', array('class' => 'Button Primary'));
          else {
             $ReturnUrl = Gdn::Request()->PathAndQuery();
             $AuthenticationUrl = SignInUrl($ReturnUrl); 

@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 define('APPLICATION', 'xmldump');
 
@@ -9,7 +10,6 @@ require_once __DIR__.'/framework/bootstrap.php';
 requireFeatures(FEATURE_COMMANDLINE, FEATURE_FORMATTING, FEATURE_SIMPLEHTMLDOM);
 
 $noisewords = array("a", "about", "all", "an", "and", "any", "are", "as", "at", "be", "been", "best", "both", "by", "click", "com", "do", "does", "each", "either", "every", "facts", "few", "find", "for", "free", "from", "get", "go", "had", "has", "have", "he", "help", "how", "i", "if", "in", "inc", "into", "is", "it", "know", "lbs", "link", "make", "makes", "me", "more", "most", "my", "no", "note", "often", "on", "or", "our", "ours", "oz", "page", "since", "site", "so", "some", "take", "tbsp", "than", "that", "the", "them", "therefore", "these", "they", "to", "too", "us", "view", "was", "we", "web", "what", "when", "where", "which", "while", "who", "whose", "why", "with", "without", "you", "youre", "your", "yours");
-
 function main() {
    $opts = array(
       'host' => array('Connect to host.', CMDLINE_SHORT => 'h', CMDLINE_DEFAULT => '127.0.0.1'),
@@ -22,6 +22,9 @@ function main() {
    $files = array('file');
    $xodomains = array('theknot.com', 'weddingchannel.com', 'weddings.com', 'thebump.com', 'thenest.com');
    $cdn = "http://cdn.vanillaforums.com/xogrp";
+   global $fileroot;
+   $fileroot = '/www/xogrpfiles';
+   $startTime = microtime(true);
 
    $options = parseCommandLine('xmldump', $opts, $files);
    
@@ -53,17 +56,22 @@ function main() {
             'ContentBlockingState' => array('Blocked', 'type' => 'varchar(50)'),
             'Owner.Key' => array('InsertUserKey'),
             'CreatedOn' => array('DateInserted', 'type' => 'datetime'),
+            'LatestTimeStamp' => array('DateUpdated', 'type' => 'datetime'),
             'SiteOfOriginKey' => array('Site', 'filter' => 'stripSubdomain', 'index' => Db::INDEX_IX),
             '_file' => array('ImportFile'),
-            'Raw' => array('Raw', 'type' => 'mediumtext')
+            'Raw' => array('Raw', 'type' => 'mediumtext'),
+            'Count' => array('Count', 'type' => 'int')
             ),
          'tableoptions' => array('collate' => 'utf8_unicode_ci'),
          'rowfilter' => function(&$row) use ($cdn, $xodomains) {
-            $row['Body'] = extractBase64Images($row['Body'], __DIR__.'/xogrp/b64-images', "$cdn/b64-images");
-            $row['Body'] = downloadImages($row['Body'], $xodomains, __DIR__.'/xogrp/downloaded', "$cdn/downloaded");
+            global $fileroot;
+      
+            $row['Body'] = extractBase64Images($row['Body'], $fileroot.'/xogrp/b64-images', "$cdn/b64-images");
+            $row['Body'] = downloadImages($row['Body'], $xodomains, $fileroot.'/xogrp/downloaded', "$cdn/downloaded");
             $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
             $row['Slug'] = formatUrl($row['Title']);
             $row['ShortSlug'] = removeNoiseWords($row['Slug']);
+            $row['Count'] = 1;
             
             $row['Format'] = 'Html';
             
@@ -79,18 +87,21 @@ function main() {
             'Body' => array('Body', 'type' => 'text'),
             'ContentCreatedOn' => array('DateInserted', 'type' => 'datetime'),
             'Owner.Key' => array('InsertUserKey'),
-            'LastEditTimeStamp' => array('DateUpdated', 'type' => 'datetime'),
+            'LastUpdated' => array('DateUpdated', 'type' => 'datetime'),
             'LastEditedBy.Key' => array('UpdateUserID'),
             'ContentBlockingState' => array('Blocked', 'type' => 'varchar(50)'),
             'SiteOfOriginKey' => array('Site', 'filter' => 'stripSubdomain'),
             '_file' => array('ImportFile'),
-            'Raw' => array('Raw', 'type' => 'mediumtext')
+            'Raw' => array('Raw', 'type' => 'mediumtext'),
+            'Count' => array('Count', 'type' => 'int')
          ),
          'tableoptions' => array('collate' => 'utf8_unicode_ci'),
          'rowfilter' => function(&$row) use ($cdn, $xodomains) {
-            $row['Body'] = extractBase64Images($row['Body'], __DIR__.'/xogrp/b64-images', "$cdn/b64-images");
-            $row['Body'] = downloadImages($row['Body'], $xodomains, __DIR__.'/xogrp/downloaded', "$cdn/downloaded");
+            global $fileroot;
+            $row['Body'] = extractBase64Images($row['Body'], $fileroot.'/xogrp/b64-images', "$cdn/b64-images");
+            $row['Body'] = downloadImages($row['Body'], $xodomains, $fileroot.'/xogrp/downloaded', "$cdn/downloaded");
             $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
+            $row['Count'] = 1;
 
             $row['Format'] = 'Html';
          }
@@ -134,6 +145,8 @@ function main() {
       natcasesort($paths);
       
       $dir = rtrim($path, '/').'/';
+      
+      $fileroot .= '/'.basename($path);
    } else {
       $paths = (array)$path;
       $dir = '';
@@ -155,7 +168,15 @@ function main() {
       
       $i++;
       $percent = $i * 100 / $total;
-      fprintf(STDERR, ", %d/%d (%.1f%%)\n", $i, $total, $percent);
+      if ($percent > 0) {
+         $elapsed = microtime(true) - $startTime;
+         $totalTime = 100 * $elapsed / $percent;
+         $timeLeft = $totalTime - $elapsed;
+         $timeLeft = formatTimespan($timeLeft);
+      } else {
+         $timeLeft = 'unknown';
+      }
+      fprintf(STDERR, ", %d/%d (%.1f%%, %s left)\n", $i, $total, $percent, $timeLeft);
    }
 }
 
@@ -169,8 +190,15 @@ function dumpXmlFile($path, $formats, $db) {
    $formats = getFullFormats($formats);
    $counts = array_fill_keys(array_keys($formats), 0);
    $names = array();
+   
+   $filesize = (int)filesize($path);
 
-   fwrite(STDERR, "Dumping $path\n");
+   fwrite(STDERR, "Dumping $path $filesize\n");
+   if (!filesize($path)) {
+      echo "  empty\n";
+      return;
+   }
+   
    $xml = new XmlReader();
    $opened = $xml->open($path);
    if (!$opened) {
@@ -185,6 +213,7 @@ function dumpXmlFile($path, $formats, $db) {
    $countRead = 0;
    $countInsertRows = 0;
    $countInserted = 0;
+   $countSkipped = 0;
    
    while ($xml->read()) {
       if ($xml->nodeType != XMLReader::ELEMENT)
@@ -204,6 +233,23 @@ function dumpXmlFile($path, $formats, $db) {
          $countRead++;
          
          $table = $format['tablename'];
+         
+         // We need to see if there is a more recent record in the db.
+         $currentRow = $db->get($table, array('ForeignID' => $row['ForeignID']));
+         if ($currentRow) {
+            $currentRow = array_pop($currentRow);
+            if (dateCompare($currentRow['DateUpdated'], $row['DateUpdated']) >= 0) {
+               if ($currentRow['Body'] != $row['Body']) {
+                  fwrite(STDERR, "\n$table {$row['ForeignID']}, bodies don't match.\n");
+               }
+               
+               $countSkipped++;
+               continue;
+            } else {
+               $row['Count']++;
+            }
+         }
+         
          $inserts[$table][] = $row;
          if (count($inserts[$table]) >= 10) {
             $countInsertRows += count($inserts[$table]);
@@ -224,7 +270,7 @@ function dumpXmlFile($path, $formats, $db) {
    // Write the final status.
    switch ($db->mode) {
       case Db::MODE_EXEC:
-         fwrite(STDERR, " $countRead read, $countInsertRows inserts sent, $countInserted inserted");
+         fwrite(STDERR, " $countRead read, $countInsertRows inserts sent, $countInserted inserted, $countSkipped skipped");
          break;
       case Db::MODE_ECHO:
          echo "\n-- $countRead read\n";
@@ -233,14 +279,20 @@ function dumpXmlFile($path, $formats, $db) {
 }
 
 function downloadImages($str, $domains, $dir, $prefix) {
-   $dom = str_get_html($str);
+//   echo "\n--\n$str\n";
+   try {
+      $dom = str_get_html($str);
+   } catch (Exception $e) {
+      fwrite(STDERR, "\nCould not parse html, continuing...\n");
+      return $str;
+   }
    
    if (!is_object($dom)) {
       trigger_error("Could not parse:\n$str", E_USER_NOTICE);
       return $str;
    }
    
-   // Loop throug all of the images in the post.
+   // Loop through all of the images in the post.
    foreach ($dom->find('img') as $img) {
       $src = $img->src;
       $urlparts = parse_url($src);
@@ -253,8 +305,13 @@ function downloadImages($str, $domains, $dir, $prefix) {
          continue;
       }
       
-      $newsrc = downloadImage($src, $urlparts['path'], $dir, $prefix);
-      $img->src = $newsrc;
+      $ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
+      if (in_array($ext, array('jpg', 'jpeg', 'gif', 'png', 'bmp'))) {
+         $newsrc = downloadImage($src, $urlparts['path'], $dir, $prefix);
+         $img->src = $newsrc;
+      } else {
+         echo "\nNot downloading $src\n";
+      }
       
       // See if the image is wrapped in a link that is also an image.
       $parent = $img->parent();
@@ -267,9 +324,14 @@ function downloadImages($str, $domains, $dir, $prefix) {
          $hrefparts = parse_url($href);
          if ($hrefparts === false || !isset($hrefparts['path']))
             continue;
+         
+         $domain = strtolower(stripSubdomain(val('host', $hrefparts)));
+         if (!$domain || !in_array($domain, $domains)) {
+            continue;
+         }
 
          $ext = strtolower(pathinfo($hrefparts['path'], PATHINFO_EXTENSION));
-         if (in_array($ext, array('jpg', 'jpeg', 'gif', 'png'))) {
+         if (in_array($ext, array('jpg', 'jpeg', 'gif', 'png', 'bmp'))) {
             $newhref = downloadImage($href, $hrefparts['path'], $dir, $prefix);
             $parent->href = $newhref;
             $parent->class = "PhotoLink";
@@ -293,18 +355,34 @@ function downloadImage($url, $subpath, $dir, $prefix) {
 
    // Make sure not to flood the downloads.
    $sleep = microtime(true) - ($lastDownload + 1);
-   if ($sleep > 0.1)
-      usleep($sleep * 1000000);
+//   if ($sleep > 0.1)
+//      usleep($sleep * 1000000);
    
    $subpath = '/'.ltrim($subpath, '/');
-   $path = $dir.$subpath;
+   $path = realpath2($dir.$subpath);
    $newurl = $prefix.$subpath;
 
    if (!file_exists($path)) {
       ensureDir(dirname($path));
-      $r = copy($url, $path);
+      for ($i = 0; $i < 5; $i++) {
+         $r = @copy($url, $path);
+         if ($r) {
+//            fwrite(STDERR, "\nDownloaded $url.\n");
+            
+            break;
+         } else {
+            if (preg_match('`HTTP/1\.\d\s(\d+)`', val(0, $http_response_header), $m)) {
+               $code = $m[1];
+               if ($code >= 400 && $code <=600) {
+                  // This was an error. Just leave it.
+                  fwrite(STDERR, "\n$url $code\n");
+                  return $url;
+               }
+            }
+         }
+      }
       if (!$r) {
-         trigger_error("Couldn't download $url.", E_USER_WARNING);
+         trigger_error("Couldn't download $url after $i tries ($code).", E_USER_WARNING);
       }
    }
    
@@ -485,6 +563,8 @@ function translateRow(&$row, $format) {
          case 'datetime':
             if (is_numeric($value))
                $value = gmdate('c', $value);
+            else
+               $value = gmdate('c', strtotime($value));
             break;
       }
       
@@ -535,6 +615,30 @@ function xmlIteratorToArray($sxi) {
       }
    }
    return $a;
+}
+
+/**
+ * A function similar to realpath, but it doesn't follow symlinks.
+ * @param string $path The path to the file.
+ * @return string
+ */
+function realpath2($path) {
+   if (substr($path, 0, 2) == '//' || strpos($path, '://'))
+      return $path;
+   
+   $parts = explode('/', str_replace('\\', '/', $path));
+   $result = array();
+   
+   foreach ($parts as $part) {
+      if (!$part || $part == '.')
+         continue;
+      if ($part == '..')
+         array_pop($result);
+      else
+         $result[] = $part;
+   }
+   $result = '/'.implode('/', $result);
+   return $result;
 }
 
 main();

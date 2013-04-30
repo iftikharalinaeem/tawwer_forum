@@ -212,7 +212,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       }
    }
    
-   public function PostController_Render_Before($Sender) {
+   public function Base_BeforeCommentRender_Handler($Sender) {
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }
    
