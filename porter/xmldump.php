@@ -20,7 +20,7 @@ function main() {
    
    $opts = array(
       'host' => array('Connect to host.', CMDLINE_SHORT => 'h', CMDLINE_DEFAULT => '127.0.0.1'),
-      'database' => array('Database to use.', CMDLINE_SHORT => 'd', CMDLINE_FLAGS => CMDLINE_REQUIRED),
+      'dbname' => array('Database to use.', CMDLINE_SHORT => 'd', CMDLINE_FLAGS => CMDLINE_REQUIRED),
       'user' => array('User for login if not current user.', CMDLINE_SHORT => 'u'),
       'password' => array('Password to use when connecting to server.', CMDLINE_SHORT => 'p'),
       'mode' => array('What mode to use to dump the data.', 'valid' => array(Db::MODE_ECHO, Db::MODE_EXEC), 'default' => Db::MODE_EXEC),
@@ -28,7 +28,7 @@ function main() {
    );
    $files = array('file');
    $xodomains = array('theknot.com', 'weddingchannel.com', 'weddings.com', 'thebump.com', 'thenest.com');
-   $cdn = "http://cdn.vanillaforums.com/xogrp";
+   $cdn = "http://cdn.cl9.vanillaforums.com";
    global $fileroot;
    $fileroot = '/www/xogrpfiles';
    $startTime = microtime(true);
@@ -42,7 +42,7 @@ function main() {
       die();
    }
    
-   $db = new MySqlDb('localhost', 'root', '', 'xo_imp');
+   $db = MySqlDb::fromArgs($options);
    $db->px = 'GDN_z';
 
    $formats = array(
@@ -74,8 +74,8 @@ function main() {
             global $fileroot;
       
             $row['Body'] = extractBase64Images($row['Body'], $fileroot.'/xogrp/b64-images', "$cdn/b64-images");
-            $row['Body'] = downloadImages($row['Body'], $xodomains, $fileroot.'/xogrp/downloaded', "$cdn/downloaded");
-            $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
+            $row['Body'] = downloadImages($row['Body'], $xodomains, $fileroot.'/xogrp/imported', "$cdn");
+            $row['Raw'] = json_encode($row);
             $row['Slug'] = formatUrl($row['Title']);
             $row['ShortSlug'] = removeNoiseWords($row['Slug']);
             $row['Count'] = 1;
@@ -107,7 +107,7 @@ function main() {
             global $fileroot;
             $row['Body'] = extractBase64Images($row['Body'], $fileroot.'/xogrp/b64-images', "$cdn/b64-images");
             $row['Body'] = downloadImages($row['Body'], $xodomains, $fileroot.'/xogrp/downloaded', "$cdn/downloaded");
-            $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
+            $row['Raw'] = json_encode($row);
             $row['Count'] = 1;
 
             $row['Format'] = 'Html';
@@ -401,7 +401,7 @@ function downloadImage($url, $subpath, $dir, $prefix, $queue = false) {
    
    $subpath = '/'.ltrim($subpath, '/');
    $path = realpath2($dir.$subpath);
-   $newurl = $prefix.$subpath;
+   $newurl = strtolower($prefix.$subpath);
    
    if ($queue) {
       $count = $db->insertMulti('download', array(array(
