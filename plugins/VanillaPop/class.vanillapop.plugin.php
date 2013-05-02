@@ -1018,10 +1018,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
       
       if (defined('CLIENT_NAME')) {
          if (StringEndsWith(CLIENT_NAME, '.vanillaforums.com'))
-            $IncomingAddress = StringEndsWith(CLIENT_NAME, '.vanillaforums.com', TRUE, TRUE).'@email.vanillaforums.com';
+            $IncomingTo = StringEndsWith(CLIENT_NAME, '.vanillaforums.com', TRUE, TRUE);
          else
-            $IncomingAddress = CLIENT_NAME.'@email.vanillaforums.com';
-         $Sender->SetData('IncomingAddress', $IncomingAddress);
+            $IncomingTo = CLIENT_NAME;
+         $Sender->SetData('IncomingAddress', $IncomingTo.'@email.vanillaforums.com');
+         if (strpos($IncomingTo, '.') === FALSE)
+            $Sender->SetData('CategoryAddress', "categorycode.$IncomingTo@email.vanillaforums.com");
+         else
+            $Sender->SetData('CategoryAddress', "$IncomingTo+categorycode@email.vanillaforums.com");
       }
       
       $ConfSettings = array(

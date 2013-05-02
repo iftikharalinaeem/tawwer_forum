@@ -14,9 +14,14 @@ $IncomingAddress = $this->Data('IncomingAddress');
 if ($IncomingAddress):
 ?>
 <div class="Info">
-   Your forum's email address is <code><?php echo $IncomingAddress ?></code>.
+   <p>Your forum's email address is <code><?php echo $IncomingAddress ?></code>.
    If you want to set up your own email address for the site then forward it to this one.
-   We recommend using the same account as your outgoing address so that people can reply to email sent by the application.
+   We recommend using the same account as your outgoing address so that people can reply to email sent by the application.</p>
+   
+   <p>
+      <b>New!</b> You can also set up additional email addresses to forward to individual categories.
+      To do this forward email to <code><?php echo $this->Data('CategoryAddress'); ?></code>.
+   </p>
 </div>
 <?php endif; ?>
 
