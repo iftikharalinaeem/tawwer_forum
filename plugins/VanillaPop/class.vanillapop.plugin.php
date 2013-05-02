@@ -208,14 +208,17 @@ class VanillaPopPlugin extends Gdn_Plugin {
       
       if (preg_match('`([a-z]+)-?([0-9]+)`i', $UID, $Matches)) {
          $Type = GetValue($Matches[1], self::$Types, NULL);
-         if ($Type)
+         if ($Type) {
             $ID = $Matches[2];
-         else
-            $ID = NULL;
-         return array($Type, $ID);
-         
+            return array($Type, $ID);
+         }
       } else {
-         return array(NULL, NULL);
+         // This might be a category.
+         $Category = CategoryModel::Categories($UID);
+         if ($Category)
+            return array('Category', $Category['CategoryID']);
+         else
+            return array(NULL, NULL);
       }
    }
    
@@ -253,7 +256,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
       list($FromName, $FromEmail) = self::ParseEmailAddress($Data['From']);
       
       // Check for a category.
-      $CategoryID = C('Plugins.VanillaPop.DefaultCategoryID', -1);
+      if ($ReplyType == 'Category') {
+         $CategoryID = $ReplyID;
+      } else {
+         $CategoryID = C('Plugins.VanillaPop.DefaultCategoryID', -1);
+      }
       if (!$CategoryID)
          $CategoryID = -1;
       TouchValue('CategoryID', $Data, $CategoryID);
