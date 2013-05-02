@@ -172,7 +172,7 @@ class EmailRouterController extends Gdn_Controller {
                
                if (count($ToParts) > 1) {
                   // Check for a full domain. We are just going to support a few tlds because this is a legacy format.
-                  $Part = array_shift($ToParts);
+                  $Part = array_pop($ToParts);
                   if (count($ToParts) > 1 || in_array($Part, array('com', 'org', 'net'))) {
                      $Domain = implode($ToParts).'.'.$Part;
                   } else {
@@ -218,7 +218,7 @@ class EmailRouterController extends Gdn_Controller {
                }
                $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Result));
             } else {
-               $Error = curl_error($C)."\n\n{$this->LastHeaderString}\n\n$Result";
+               $Error = curl_error($C)."\n\n$Result";
                $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Error));
                throw new Exception($Error, $Code);
             }
