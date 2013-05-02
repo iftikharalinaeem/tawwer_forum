@@ -134,20 +134,37 @@ class EmailRouterController extends Gdn_Controller {
             $LogID = $LogModel->Insert($Data);
             
             list($Name, $Email) = self::ParseEmailAddress($To);
-            if (preg_match('`([^+@]+)([^@]*)@email.vanillaforums.com`', $Email, $Matches)) {
-               $ClientName = $Matches[1];
-               $Domain = $Matches[3];
+            if (preg_match('`([^+@]+)([^@]*)@email[a-z]*.vanillaforums.com`', $Email, $Matches)) {
+               $ToParts = explode('.', strtolower($Matches[1]));
+               $Args = $Matches[0];
+               $Scheme = 'http';
                
-               if (strpos($ClientName, '.') !== FALSE) {
-                  if (StringBeginsWith($ClientName, 'https.', TRUE)) {
-                     $ClientName = StringBeginsWith($ClientName, 'https.', TRUE, TRUE);
-                     $Px = 'https://';
-                  } else
-                     $Px = 'http://';
-                  $Url = $Px.$ClientName.'/utility/email.json';
-               } else {
-                  $Url = "http://$ClientName.vanillaforums.com/utility/email.json";
+               if (count($ToParts) > 1) {
+                  // Check for http or https.
+                  $Part = array_shift($ToParts);
+                  if (in_array($Part, array('http', 'https')))
+                     $Scheme = $Part;
+                  else
+                     array_unshift($ToParts, $Part);
                }
+               
+               if (count($ToParts) > 1) {
+                  // Check for a full domain. We are just going to support a few tlds because this is a legacy format.
+                  $Part = array_shift($ToParts);
+                  if (count($ToParts) > 1 || in_array($Part, array('com', 'org', 'net'))) {
+                     $Domain = implode($ToParts).'.'.$Part;
+                  } else {
+                     // This is a to in the form of category.site.
+                     $Domain = $Part.'.vanillaforums.com';
+                     $Args = array_shift($ToParts);
+                     $To = "$Part+$Args@email.vanillaforums.com";
+                     $Data[$To] = $To;
+                  }
+               } else {
+                  $Domain = $ToParts[0].'.vanillaforums.com';
+               }
+               
+               $Url = "$Scheme://$Domain/utility/email.json";
                $LogModel->SetField($LogID, array('Url' => $Url));
             } else {
                $LogModel->SetField($LogID, array('Response' => 400, 'ResponseText' => "Invalid to: $To, $Email."));
