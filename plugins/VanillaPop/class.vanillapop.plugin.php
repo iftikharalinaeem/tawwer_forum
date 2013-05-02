@@ -185,14 +185,25 @@ class VanillaPopPlugin extends Gdn_Plugin {
    }
    
    public static function ParseType($Email) {
+      $Type = NULL;
+      $ID = NULL;
       if (preg_match('`\+([a-z]+-?[0-9]+)@`', $Email, $Matches)) {
          list($Type, $ID) = self::ParseUID($Matches[1]);
       } elseif (preg_match('`\+noreply@`i', $Email, $Matches)) {
          $Type = 'noreply';
          $ID = NULL;
       } else {
-         $Type = NULL;
-         $ID = NULL;
+         // See if there is a category in the email address.
+         $Parts = explode('@', $Email);
+         $Codes = explode('.', $Parts[0]);
+         
+         if (count($Codes) > 0) {
+            $Category = CategoryModel::Categories($Codes[0]);
+            if ($Category) {
+               $Type = 'Category';
+               $ID = $Category['CategoryID'];
+            }
+         }
       }
       return array($Type, $ID);
    }
@@ -240,7 +251,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
          list($ReplyType, $ReplyID) = self::ParseType($ToEmail);
       }
       
-      if (!$ReplyType && GetValue('ReplyTo', $Data)) {
+      if ((!$ReplyType || $ReplyType == 'Category') && GetValue('ReplyTo', $Data)) {
          // This may be replying to the SourceID rather than the UID.
          $SaveType = $this->SaveTypeFromRepyTo($Data);
       }
