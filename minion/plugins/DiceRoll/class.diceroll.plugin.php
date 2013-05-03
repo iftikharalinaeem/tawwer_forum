@@ -125,6 +125,8 @@ class GamingPlugin extends Gdn_Plugin {
       if ($numDie > 10) $numDie = 10;
       if (!$numDie) $numDie = 1;
       $diceSides = abs($matches[2]);
+      if (!$diceSides) $diceSides = 1;
+      
       $modifier = sizeof($matches) == 5 ? $matches[3] : 0;
       $intModifier = intval($modifier);
       $dice = "{$numDie}d{$diceSides}";
