@@ -98,7 +98,10 @@ class GamingPlugin extends Gdn_Plugin {
             
             $user = GetValueR('Sources.User', $State);
             $limited = $this->limited($user);
-            if ($limited) return false;
+            if ($limited) {
+               Gdn::Controller()->InformMessage('Calm down buttercup, you might have a problem');
+               return false;
+            }
             
             $dice = strtolower(GetValueR('Targets.Phrase', $State));
             
