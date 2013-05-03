@@ -120,6 +120,9 @@ class GamingPlugin extends Gdn_Plugin {
    public function roll($die, $discussion, $user) {
       
       $die = explode(' ', $die);
+      if (sizeof($die) > 6)
+         $die = array_slice($die, 0, 6);
+      
       $rolls = array();
       $j = 0;
       foreach ($die as $dice) {
