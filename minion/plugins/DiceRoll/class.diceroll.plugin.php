@@ -5,6 +5,7 @@
  * 
  * Changes: 
  *  1.0     Release
+ *  1.1     Multi dice rolls
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -15,7 +16,7 @@
 $PluginInfo['DiceRoll'] = array(
    'Name' => 'Minion: Dice Roll',
    'Description' => "Roll some die.",
-   'Version' => '1.0',
+   'Version' => '1.1',
    'RequiredApplications' => array(
       'Vanilla' => '2.1a'
     ),
@@ -112,55 +113,74 @@ class GamingPlugin extends Gdn_Plugin {
    /**
     * Rolls some die
     * 
-    * @param string $dice
+    * @param string $die
     * @param array $discussion
     * @param array $user
     */
-   public function roll($dice, $discussion, $user) {
+   public function roll($die, $discussion, $user) {
       
-      $validDice = preg_match('/([\d]+)d([\d]+)((\+|\-)[\d]+)?/', $dice, $matches);
-      if (!$validDice) return false;
-      
-      $numDie = abs($matches[1]);
-      if ($numDie > 10) $numDie = 10;
-      if (!$numDie) $numDie = 1;
-      $diceSides = abs($matches[2]);
-      if (!$diceSides) $diceSides = 1;
-      
-      $modifier = sizeof($matches) == 5 ? $matches[3] : 0;
-      $intModifier = intval($modifier);
-      $dice = "{$numDie}d{$diceSides}";
-      
+      $die = explode(' ', $die);
       $rolls = array();
-      for ($i = 1; $i <= $numDie; $i++) {
-         $roll = mt_rand(1,$diceSides) + $intModifier;
-         $rolls[] = $roll;
+      $j = 0;
+      foreach ($die as $dice) {
+         $j++; // Number of dice types
+         
+         $validDice = preg_match('/([\d]+)d([\d]+)((\+|\-)[\d]+)?/', $dice, $matches);
+         if (!$validDice) continue;
+
+         $numDie = abs($matches[1]);
+         if ($numDie > 10) $numDie = 10;
+         if (!$numDie) $numDie = 1;
+         $diceSides = abs($matches[2]);
+         if (!$diceSides) $diceSides = 1;
+
+         $modifier = sizeof($matches) == 5 ? $matches[3] : 0;
+         $intModifier = intval($modifier);
+         $dice = "{$numDie}d{$diceSides}";
+         $diceRoll = "{$dice}";
+         $diceRoll .= $modifier ? "({$modifier})" : '';
+
+         $diceRolls = array();
+         for ($i = 1; $i <= $numDie; $i++) {
+            $roll = mt_rand(1,$diceSides) + $intModifier;
+            $diceRolls[] = $roll;
+         }
+         $rolls[] = array(
+            'dice'      => $dice,
+            'modifier'  => $modifier,
+            'diceName'  => $diceRoll,
+            'rolls'     => $diceRolls
+         );
       }
       
+      // Output
       if (sizeof($rolls)) {
-         
-         $rolls = implode(', ', $rolls);
-         $diceRoll = "{$dice}";
-         $diceRoll .= $modifier ? " ({$modifier})" : '';
-         
-         $message = <<<ROLL
-/me rolls $diceRoll... [b]{$rolls}[/b]
-ROLL;
-         $inform = <<<ROLLINFORM
-{Minion.UserID,user} rolls $diceRoll... <b>{$rolls}</b>
-ROLLINFORM;
 
+         $message = "/me rolls ";
+         $strRolls = array();
+         foreach ($rolls as $roll) {
+            $sum = array_sum($roll['rolls']);
+            
+            $strRolls[] = sprintf("[b]%s[/b] -> %s (sum:%d)", $roll['dice'], implode(',',$roll['rolls']), $sum);
+         }
+         $strRolls = implode(', ', $strRolls);
+         $message .= $strRolls;
+        
          $minion = Gdn::PluginManager()->GetPluginInstance('MinionPlugin');
          $minion->Message($user, $discussion, $message, array(
             'InputFormat'  => 'BBCode',
             'Inform'       => false
          ));
-         
-         $inform = FormatString($inform, array(
-            'Minion'    => $minion->Minion()
-         ));
+
+         $inform = Gdn_Format::BBCode($message);
+         $inform = preg_replace('/^\/me/', UserAnchor($minion->Minion()), $inform);
+
          Gdn::Controller()->InformMessage($inform);
+         
+         return true;
       }
+      
+      return false;
    }
    
    /**
@@ -170,7 +190,7 @@ ROLLINFORM;
     * @param bool $limit
     */
    public function limited($user, $limit = null) {
-      $key = sprintf(self::LIMIT_KEY, $user['UserID']);
+      $key = sprintf(self::LIMIT_KEY, GetValue('UserID', $user));
       
       // Check
       if (is_null($limit))
