@@ -125,11 +125,12 @@ class GamingPlugin extends Gdn_Plugin {
       if ($numDie > 10) $numDie = 10;
       if (!$numDie) $numDie = 1;
       $diceSides = abs($matches[2]);
-      $modifier = intval(sizeof($matches) == 5 ? $matches[3] : 0);
+      $modifier = sizeof($matches) == 5 ? $matches[3] : 0;
+      $intModifier = intval($modifier);
       
       $rolls = array();
       for ($i = 1; $i <= $numDie; $i++) {
-         $roll = mt_rand(1,$diceSides) + $modifier;
+         $roll = mt_rand(1,$diceSides) + $intModifier;
          $rolls[] = $roll;
       }
       
