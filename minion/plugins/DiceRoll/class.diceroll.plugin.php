@@ -118,17 +118,18 @@ class GamingPlugin extends Gdn_Plugin {
     */
    public function roll($dice, $discussion, $user) {
       
-      $validDice = preg_match('/([\d]+)d([\d]+)/', $dice, $matches);
+      $validDice = preg_match('/([\d]+)d([\d]+)(\+([\d]+))?/', $dice, $matches);
       if (!$validDice) return false;
       
       $numDie = abs($matches[1]);
       if ($numDie > 10) $numDie = 10;
       if (!$numDie) $numDie = 1;
       $diceSides = abs($matches[2]);
+      $modifier = sizeof($matches) > 3 ? $matches[4] : 0;
       
       $rolls = array();
       for ($i = 1; $i <= $numDie; $i++) {
-         $roll = mt_rand(1,$diceSides);
+         $roll = mt_rand(1,$diceSides) + $modifier;
          $rolls[] = $roll;
       }
       
@@ -137,10 +138,10 @@ class GamingPlugin extends Gdn_Plugin {
          $rolls = implode(', ', $rolls);
          
          $message = <<<ROLL
-/me rolls $dice... [b]{$rolls}[/b]
+/me rolls $dice ({$modifier})... [b]{$rolls}[/b]
 ROLL;
          $inform = <<<ROLLINFORM
-{Minion.UserID,user} rolls $dice... <b>{$rolls}</b>
+{Minion.UserID,user} rolls $dice ({$modifier})... <b>{$rolls}</b>
 ROLLINFORM;
 
          $minion = Gdn::PluginManager()->GetPluginInstance('MinionPlugin');
