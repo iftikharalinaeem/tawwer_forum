@@ -96,14 +96,14 @@ class GamingPlugin extends Gdn_Plugin {
                return;
             
             $user = GetValueR('Sources.User', $State);
-            $canRoll = $this->limit($user);
-            if (!$canRoll) return false;
+            $limited = $this->limited($user);
+            if ($limited) return false;
             
             $dice = strtolower(GetValueR('Targets.Phrase', $State));
             
             $rolled = $this->roll($dice, GetValueR('Sources.Discussion', $State), $user);
             if ($rolled && !Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
-               $this->limit($user, true);
+               $this->limited($user, true);
             
             break;
       }
@@ -164,17 +164,17 @@ ROLLINFORM;
    }
    
    /**
-    * 
+    * Check/Set roll limits
     * 
     * @param array $user
     * @param bool $limit
     */
-   public function limit($user, $limit = null) {
+   public function limited($user, $limit = null) {
       $key = sprintf(self::LIMIT_KEY, $user['UserID']);
       
       // Check
       if (is_null($limit))
-         return !(bool)Gdn::Cache()->Get($key);
+         return (bool)Gdn::Cache()->Get($key);
       
       // Set
       Gdn::Cache()->Store($key, true, array(
