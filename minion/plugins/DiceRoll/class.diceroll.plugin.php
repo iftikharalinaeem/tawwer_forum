@@ -29,9 +29,10 @@ $PluginInfo['DiceRoll'] = array(
    'AuthorUrl' => 'http://vanillaforums.com'
 );
 
-class GamingPlugin extends Gdn_Plugin {
+class DiceRollPlugin extends Gdn_Plugin {
    
    const LIMIT_KEY = 'minion.dice.limit.%d';
+   const MAX = 2147483647;
    
    /**
     * Parse a token from the current state
@@ -139,9 +140,13 @@ class GamingPlugin extends Gdn_Plugin {
          if (!$numDie) $numDie = 1;
          $diceSides = abs($matches[2]);
          if (!$diceSides) $diceSides = 1;
+         if ($diceSides > self::MAX) $diceSides = self::MAX;
 
          $modifier = sizeof($matches) == 5 ? $matches[3] : 0;
          $intModifier = intval($modifier);
+         if ($intModifier > self::MAX) $intModifier = self::MAX;
+         if ($intModifier < -self::MAX) $intModifier = -self::MAX;
+         
          $dice = "{$numDie}d{$diceSides}";
          $diceRoll = "{$dice}";
          $diceRoll .= $modifier ? "({$modifier})" : '';
