@@ -172,7 +172,7 @@ class DiceRollPlugin extends Gdn_Plugin {
          foreach ($rolls as $roll) {
             $sum = array_sum($roll['rolls']);
             
-            $strRolls[] = sprintf("[b]%s[/b] -> %s (sum:%d)", $roll['dice'], implode(',',$roll['rolls']), $sum);
+            $strRolls[] = sprintf("[b]%s[/b] -> %s (sum:%d)", $roll['diceName'], implode(',',$roll['rolls']), $sum);
          }
          $strRolls = implode(', ', $strRolls);
          $message .= $strRolls;
