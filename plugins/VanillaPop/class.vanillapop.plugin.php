@@ -8,7 +8,7 @@
 $PluginInfo['VanillaPop'] = array(
    'Name' => 'Vanilla Pop',
    'Description' => "Users may start discussions, make comments, and even automatically register for your site via email.",
-   'Version' => '1.0.5',
+   'Version' => '1.0.6',
    'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -20,6 +20,9 @@ $PluginInfo['VanillaPop'] = array(
       'Email.Comments.Add' => 'Garden.Profiles.Edit',
       'Email.Conversations.Add' => 'Garden.Profiles.Edit')
 );
+
+// 1.0.6 - Lincoln, Apr 2013
+// -- Adds 'Force Notify' feature for roles
 
 class VanillaPopPlugin extends Gdn_Plugin {
    /// Properties ///
@@ -182,14 +185,25 @@ class VanillaPopPlugin extends Gdn_Plugin {
    }
    
    public static function ParseType($Email) {
+      $Type = NULL;
+      $ID = NULL;
       if (preg_match('`\+([a-z]+-?[0-9]+)@`', $Email, $Matches)) {
          list($Type, $ID) = self::ParseUID($Matches[1]);
       } elseif (preg_match('`\+noreply@`i', $Email, $Matches)) {
          $Type = 'noreply';
          $ID = NULL;
       } else {
-         $Type = NULL;
-         $ID = NULL;
+         // See if there is a category in the email address.
+         $Parts = explode('@', $Email);
+         $Codes = explode('.', $Parts[0]);
+         
+         if (count($Codes) > 0) {
+            $Category = CategoryModel::Categories($Codes[0]);
+            if ($Category) {
+               $Type = 'Category';
+               $ID = $Category['CategoryID'];
+            }
+         }
       }
       return array($Type, $ID);
    }
@@ -208,14 +222,17 @@ class VanillaPopPlugin extends Gdn_Plugin {
       
       if (preg_match('`([a-z]+)-?([0-9]+)`i', $UID, $Matches)) {
          $Type = GetValue($Matches[1], self::$Types, NULL);
-         if ($Type)
+         if ($Type) {
             $ID = $Matches[2];
-         else
-            $ID = NULL;
-         return array($Type, $ID);
-         
+            return array($Type, $ID);
+         }
       } else {
-         return array(NULL, NULL);
+         // This might be a category.
+         $Category = CategoryModel::Categories($UID);
+         if ($Category)
+            return array('Category', $Category['CategoryID']);
+         else
+            return array(NULL, NULL);
       }
    }
    
@@ -234,7 +251,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
          list($ReplyType, $ReplyID) = self::ParseType($ToEmail);
       }
       
-      if (!$ReplyType && GetValue('ReplyTo', $Data)) {
+      if ((!$ReplyType || $ReplyType == 'Category') && GetValue('ReplyTo', $Data)) {
          // This may be replying to the SourceID rather than the UID.
          $SaveType = $this->SaveTypeFromRepyTo($Data);
       }
@@ -253,7 +270,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
       list($FromName, $FromEmail) = self::ParseEmailAddress($Data['From']);
       
       // Check for a category.
-      $CategoryID = C('Plugins.VanillaPop.DefaultCategoryID', -1);
+      if ($ReplyType == 'Category') {
+         $CategoryID = $ReplyID;
+      } else {
+         $CategoryID = C('Plugins.VanillaPop.DefaultCategoryID', -1);
+      }
       if (!$CategoryID)
          $CategoryID = -1;
       TouchValue('CategoryID', $Data, $CategoryID);
@@ -580,6 +601,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
          ->Column('Source', 'varchar(20)', NULL)
          ->Column('SourceID', 'varchar(255)', NULL, 'index')
          ->Set();
+         
+      Gdn::Structure()
+         ->Table('Role')
+         ->Column('ForceNotify', 'tinyint(1)', '0')
+         ->Set();
    }
    
    public static function SimpleForm($Form, $Schema) {
@@ -859,37 +885,48 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $Menu->AddLink('Site Settings', T('Incoming Email'), '/settings/vanillapop', 'Garden.Settings.Manage', array('After' => 'dashboard/settings/email'));
    }
    
-   
+   /**
+    * Add notifications.
+    */
    public function CommentModel_BeforeNotification_Handler($Sender, $Args) {
       // Make sure the discussion's user is notified if they started the discussion by email.
-      if (GetValueR('Discussion.Source', $Args) != 'Email') {
-         return;
+      if (GetValueR('Discussion.Source', $Args) == 'Email') {
+         $NotifiedUsers = (array)GetValue('NotifiedUsers', $Args);
+         $InsertUserID = GetValueR('Discussion.InsertUserID', $Args);
+         
+         // Construct an activity and send it.
+         $ActivityModel = $Args['ActivityModel'];
+         
+         $Comment = $Args['Comment'];
+         $CommentID = $Comment['CommentID'];
+         $HeadlineFormat = T('HeadlineFormat.Comment', '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>');
+         
+         $Activity = array(
+            'ActivityType' => 'Comment',
+            'ActivityUserID' => $Comment['InsertUserID'],
+            'NotifyUserID' => $InsertUserID,
+            'HeadlineFormat' => $HeadlineFormat,
+            'RecordType' => 'Comment',
+            'RecordID' => $CommentID,
+            'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
+            'Data' => array('Name' => GetValue('Name', $Args['Discussion'])),
+            'Notified' => ActivityModel::SENT_OK,
+            'Emailed' => ActivityModel::SENT_PENDING
+         );
+         
+         $ActivityModel->Queue($Activity, FALSE, array('Force' => TRUE));
       }
-      
-      $NotifiedUsers = (array)GetValue('NotifiedUsers', $Args);
-      $InsertUserID = GetValueR('Discussion.InsertUserID', $Args);
-      
-      // Construct an activity and send it.
-      $ActivityModel = $Args['ActivityModel'];
-      
-      $Comment = $Args['Comment'];
-      $CommentID = $Comment['CommentID'];
-      $HeadlineFormat = T('HeadlineFormat.Comment', '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>');
-      
-      $Activity = array(
-         'ActivityType' => 'Comment',
-         'ActivityUserID' => $Comment['InsertUserID'],
-         'NotifyUserID' => $InsertUserID,
-         'HeadlineFormat' => $HeadlineFormat,
-         'RecordType' => 'Comment',
-         'RecordID' => $CommentID,
-         'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
-         'Data' => array('Name' => GetValue('Name', $Args['Discussion'])),
-         'Notified' => ActivityModel::SENT_OK,
-         'Emailed' => ActivityModel::SENT_PENDING
-      );
-      
-      $ActivityModel->Queue($Activity, FALSE, array('Force' => TRUE));
+
+      // Notify anyone in a ForceNotify role
+      $this->ForceNotify($Sender, $Args);
+   }
+
+   /**
+    * Add notifications.
+    */
+   public function DiscussionModel_BeforeNotification_Handler($Sender, $Args) {
+      // Notify anyone in a ForceNotify role
+      $this->ForceNotify($Sender, $Args);
    }
    
 //   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
@@ -1011,10 +1048,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
       
       if (defined('CLIENT_NAME')) {
          if (StringEndsWith(CLIENT_NAME, '.vanillaforums.com'))
-            $IncomingAddress = StringEndsWith(CLIENT_NAME, '.vanillaforums.com', TRUE, TRUE).'@email.vanillaforums.com';
+            $IncomingTo = StringEndsWith(CLIENT_NAME, '.vanillaforums.com', TRUE, TRUE);
          else
-            $IncomingAddress = CLIENT_NAME.'@email.vanillaforums.com';
-         $Sender->SetData('IncomingAddress', $IncomingAddress);
+            $IncomingTo = CLIENT_NAME;
+         $Sender->SetData('IncomingAddress', $IncomingTo.'@email.vanillaforums.com');
+         if (strpos($IncomingTo, '.') === FALSE)
+            $Sender->SetData('CategoryAddress', "categorycode.$IncomingTo@email.vanillaforums.com");
+         else
+            $Sender->SetData('CategoryAddress', "$IncomingTo+categorycode@email.vanillaforums.com");
       }
       
       $ConfSettings = array(
@@ -1027,7 +1068,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
           'EmailFormat.CommentSubject' => array(),
           'EmailFormat.CommentBody' => array(),
           'Plugins.VanillaPop.SendConfirmationEmail' => array('Control' => 'CheckBox', 'LabelCode' => 'Send a confirmation email when people ask a question or start a discussion over email.'),
-          'EmailFormat.ConfirmationBody' => array()
+          'EmailFormat.ConfirmationBody' => array(),
+          'Plugins.VanillaPop.AllowForceNotify' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow roles to be configured to force email notifications to users.'),
+          
       );
       
       foreach (self::$FormatDefaults as $Name => $Default) {
@@ -1046,4 +1089,74 @@ class VanillaPopPlugin extends Gdn_Plugin {
 //      $Conf->RenderAll();
       $Sender->Render('Settings', '', 'plugins/VanillaPop');
    }
+
+   /**
+    * Allow roles to be configured to force email notifications.
+    */
+   public function Base_BeforeRolePermissions_Handler($Sender) {
+      if (!C('Plugins.VanillaPop.AllowForceNotify'))
+         return;
+      
+      $NotifyOptions = array(
+         0 => 'Notify these users normally using their preferences (recommended)', 
+         1 => 'Notify these users for every new comment and discussion', 
+         2 => 'Notify these users for new announcements'
+      );
+      
+      $Sender->Data['_ExtendedFields']['ForceNotify'] = array(
+         'LabelCode' => 'Notifications Override',
+         'Control' => 'DropDown', 
+         'Items' => $NotifyOptions
+      );
+      
+   }
+   
+   /**
+    * Send forced email notifications.
+    */
+   public function ForceNotify($Sender, $Args) {
+      if (!C('Plugins.VanillaPop.AllowForceNotify'))
+         return;
+      
+      $Activity = $Args['Activity'];
+      $ActivityModel = $Args['ActivityModel'];
+      $ActivityType = (isset($Args['Comment'])) ? 'Comment' : 'Discussion';
+      $Fields = $Args[$ActivityType]; 
+      
+      // Email them.
+      $Activity['Emailed'] = ActivityModel::SENT_PENDING;
+      
+      // Get effected roles.
+      $RoleModel = new RoleModel();
+      $RoleIDs = array();
+      if ($ActivityType == 'Discussion' && GetValue('Announce', $Args['Discussion'])) {
+         // Add everyone with force notify all OR announcement-only option.
+         $Wheres = array('ForceNotify >' => 0);
+      }
+      else {
+         // Only get users with force notify all. 
+         $Wheres = array('ForceNotify' => 1);
+      }
+
+      $Roles = $RoleModel->GetWhere($Wheres)->ResultArray();
+      foreach ($Roles as $Role) {
+         $RoleIDs[] = GetValue('RoleID', $Role);
+      }
+      
+      // Get users in those roles.
+      $UserRoles = $Sender->SQL
+         ->Select('UserID')
+         ->Distinct()
+         ->From('UserRole')
+         ->WhereIn('RoleID', $RoleIDs)
+         ->Get()->ResultArray();      
+      
+      // Add an activity for each person and pray we don't melt the wibbles.
+      foreach ($UserRoles as $UserRole) {
+         $Activity['ActivityUserID'] = $UserRole['UserID'];
+         $Activity['NotifyUserID'] = $UserRole['UserID'];
+         $ActivityModel->Queue($Activity, FALSE, array('Force' => TRUE));
+      }
+   }
+   
 }
