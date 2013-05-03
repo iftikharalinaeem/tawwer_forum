@@ -121,8 +121,11 @@ class GamingPlugin extends Gdn_Plugin {
       $validDice = preg_match('/([\d]+)d([\d]+)/', $dice, $matches);
       if (!$validDice) return false;
       
-      $numDie = $matches[1];
-      $diceSides = $matches[2];
+      $numDie = abs($matches[1]);
+      if ($numDie > 10) $numDie = 10;
+      if (!$numDie) $numDie = 1;
+      $diceSides = abs($matches[2]);
+      
       $rolls = array();
       for ($i = 1; $i <= $numDie; $i++) {
          $roll = mt_rand(1,$diceSides);
