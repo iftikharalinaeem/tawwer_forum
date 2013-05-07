@@ -383,7 +383,7 @@ searchd {
       $Sphinx->setMatchMode(SPH_MATCH_EXTENDED);
 //      $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
       $Sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'DateInserted');
-      $Sphinx->setLimits($Offset, $Limit);
+      $Sphinx->setLimits($Offset, $Limit, 1000);
       $Sphinx->setMaxQueryTime(5000);
 
       // Allow the client to be overridden.
@@ -406,10 +406,16 @@ searchd {
          $Sphinx->setFilter('CategoryID', (array)$Cats);
       $Search = $Sphinx->query($Search, implode(' ', $Indexes));
       if (!$Search) {
-         if (GetValue('error', $Sphinx)) {
+         Trace($Sphinx->getLastError(), TRACE_ERROR);
+         Trace($Sphinx->getLastWarning(), TRACE_WARNING);
+         $Warning = $Sphinx->getLastWarning();
+         if (isset($Sphinx->error)) {
             LogMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Error: '.$Sphinx->error);
          } elseif (GetValue('warning', $Sphinx)) {
             LogMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Warning: '.$Sphinx->warning);
+         } else {
+            Trace($Sphinx);
+            Trace('Sphinx returned an error', TRACE_ERROR);
          }
       }
       
