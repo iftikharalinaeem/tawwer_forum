@@ -230,9 +230,9 @@ class LinkedInPlugin extends Gdn_Plugin {
    /**
     * @param AssetModel $Sender
     */
-   public function AssetModel_StyleCss_Handler($Sender, $Args) {
-      $Sender->AddCssFile('linkedin.css', 'plugins/LinkedIn');
-   }
+//   public function AssetModel_StyleCss_Handler($Sender, $Args) {
+//      $Sender->AddCssFile('linkedin.css', 'plugins/LinkedIn');
+//   }
    
    public function Base_SignInIcons_Handler($Sender, $Args) {
 		echo ' '.$this->SignInButton('icon').' ';
@@ -380,7 +380,9 @@ class LinkedInPlugin extends Gdn_Plugin {
           'Plugins.LinkedIn.Secret' => array('LabelCode' => 'Secret Key')
           ));
 
-      $Sender->AddSideMenu('dashboard/settings/plugins');
-      $Cf->RenderAll();
+      $Sender->AddSideMenu('dashboard/social');
+      $Sender->SetData('Title', sprintf(T('%s Settings'), 'LinkedIn'));
+      $Sender->ConfigurationModule = $Cf;
+      $Sender->Render('Settings', '', 'plugins/LinkedIn');
    }
 }
