@@ -8,7 +8,7 @@
 $PluginInfo['LinkedIn'] = array(
    'Name' => 'Linked In Social Connect',
    'Description' => "Allow users to sign in via linked in.",
-   'Version' => '1.0a',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -369,7 +369,9 @@ class LinkedInPlugin extends Gdn_Plugin {
           'Plugins.LinkedIn.Secret' => array('LabelCode' => 'Secret Key')
           ));
 
-      $Sender->AddSideMenu('dashboard/settings/plugins');
-      $Cf->RenderAll();
+      $Sender->AddSideMenu('dashboard/social');
+      $Sender->SetData('Title', sprintf(T('%s Settings'), 'LinkedIn'));
+      $Sender->ConfigurationModule = $Cf;
+      $Sender->Render('Settings', '', 'plugins/LinkedIn');
    }
 }

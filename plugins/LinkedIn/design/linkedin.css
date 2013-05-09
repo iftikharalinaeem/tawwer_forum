@@ -24,7 +24,7 @@
   }
 }
 .SocialIcon .Text {
-  padding-left: 6px;
+  padding: 0 6px;
   border-left: 1px solid rgba(0, 0, 0, 0.1);
 }
 .SocialIcon,
