@@ -74,7 +74,7 @@ function main() {
             global $fileroot;
       
             $row['Body'] = extractBase64Images($row['Body'], $fileroot.'/xogrp/b64-images', "$cdn/b64-images");
-            $row['Body'] = downloadImages($row['Body'], $xodomains, $fileroot.'/xogrp/imported', "$cdn");
+            $row['Body'] = downloadImages($row['Body'], $xodomains, $fileroot.'/xogrp/downloaded', "$cdn/downloaded");
             $row['Raw'] = json_encode($row);
             $row['Slug'] = formatUrl($row['Title']);
             $row['ShortSlug'] = removeNoiseWords($row['Slug']);
@@ -298,6 +298,7 @@ function dumpXmlFile($path, $formats, $db) {
 }
 
 function downloadImages($str, $domains, $dir, $prefix) {
+//   echo $prefix."\n";
 //   echo "\n--\n$str\n";
    try {
       $dom = str_get_dom($str);
