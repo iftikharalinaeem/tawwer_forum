@@ -34,6 +34,7 @@
  *  1.11    Personas
  *  1.12    Conversations support
  *  1.13    Convert moderator permission check to Garden.Moderation.Manage
+ *  1.14    Add custom reaction button renderer
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -44,7 +45,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.13',
+   'Version' => '1.14',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => TRUE,
    'Author' => "Tim Gunter",
@@ -647,10 +648,10 @@ class MinionPlugin extends Gdn_Plugin {
                 * TOGGLERS
                 */
 
-               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('open', 'enable', 'unlock', 'allow', 'allowed', 'on')))
+               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('open', 'enable', 'unlock', 'allow', 'allowed', 'on', 'start')))
                   $this->Consume($State, 'Toggle', 'on');
 
-               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off', 'revoke')))
+               if (empty($State['Toggle']) && in_array($State['CompareToken'], array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off', 'revoke', 'stop')))
                   $this->Consume($State, 'Toggle', 'off');
 
                /*
@@ -1629,6 +1630,83 @@ class MinionPlugin extends Gdn_Plugin {
    }
    
    /**
+    * Custom Reaction Button renderer
+    * 
+    * @param type $Row
+    * @param type $UrlCode
+    * @param type $Options
+    * @return string
+    */
+   public function ActionButton($Row, $UrlCode, $Options = array()) {
+      $ReactionType = ReactionModel::ReactionTypes($UrlCode);
+
+      $IsHeading = FALSE;
+      if (!$ReactionType) {
+         $ReactionType = array('UrlCode' => $UrlCode, 'Name' => $UrlCode);
+         $IsHeading = TRUE;
+      }
+
+      if ($Permission = GetValue('Permission', $ReactionType)) {
+         if (!Gdn::Session()->CheckPermission($Permission))
+            return '';
+      }
+
+      $Name = $ReactionType['Name'];
+      $Label = T($Name);
+      $SpriteClass = GetValue('SpriteClass', $ReactionType, "React$UrlCode");
+
+      if ($ID = GetValue('CommentID', $Row)) {
+         $RecordType = 'comment';
+      } elseif ($ID = GetValue('ActivityID', $Row)) {
+         $RecordType = 'activity';
+      } else {
+         $RecordType = 'discussion';
+         $ID = GetValue('DiscussionID', $Row);
+      }
+
+      if ($IsHeading) {
+         static $Types = array();
+         if (!isset($Types[$UrlCode]))
+            $Types[$UrlCode] = ReactionModel::GetReactionTypes(array('Class' => $UrlCode, 'Active' => 1));
+
+         $Count = ReactionCount($Row, $Types[$UrlCode]);
+      } else {
+         if ($RecordType == 'activity')
+            $Count = GetValueR("Data.React.$UrlCode", $Row, 0);
+         else
+            $Count = GetValueR("Attributes.React.$UrlCode", $Row, 0);  
+      }
+      $CountHtml = '';
+      $LinkClass = "ReactButton-$UrlCode";
+      if ($Count) {
+         $CountHtml = ' <span class="Count">'.$Count.'</span>';
+         $LinkClass .= ' HasCount';
+      }
+      $LinkClass = ConcatSep(' ', $LinkClass, GetValue('LinkClass', $Options));
+
+      $UrlClassType = 'Hijack';
+      $UrlCodeLower = strtolower($UrlCode);
+      if ($IsHeading)
+         $Url = '';
+      else
+         $Url = Url("/react/$RecordType/$UrlCodeLower?id=$ID");
+
+      $CustomType = GetValue('CustomType', $ReactionType, false);
+      switch ($CustomType) {
+         case 'url':
+            $Url = GetValue('Url', $ReactionType)."?type={$RecordType}&id={$ID}";
+            $UrlClassType = GetValue('UrlType', $ReactionType, 'Hijack');
+            break;
+      }
+      
+      $Result = <<<EOT
+   <a class="{$UrlClassType} ReactButton {$LinkClass}" href="{$Url}" title="{$Label}" rel="nofollow"><span class="ReactSprite {$SpriteClass}"></span> {$CountHtml}<span class="ReactLabel">{$Label}</span></a>
+EOT;
+
+      return $Result;
+   }
+   
+   /**
     * Acknowledge a completed command
     * 
     * @param array $Discussion
@@ -1740,6 +1818,7 @@ class MinionPlugin extends Gdn_Plugin {
       $Format = GetValue('Format', $Options, TRUE);
       $PostAs = GetValue('PostAs', $Options, 'minion');
       $Inform = GetValue('Inform', $Options, TRUE);
+      $InputFormat = GetValue('InputFormat', $Options, 'Html');
       
       if (is_numeric($User)) {
          $User = Gdn::UserModel()->GetID($User);
@@ -1758,6 +1837,7 @@ class MinionPlugin extends Gdn_Plugin {
       if ($Format) {
          $Message = FormatString($Message, array(
             'User'         => $User,
+            'Minion'       => $this->Minion,
             'Discussion'   => $Discussion
          ));
       }
@@ -1782,7 +1862,7 @@ class MinionPlugin extends Gdn_Plugin {
          $MinionCommentID = $CommentModel->Save($Comment = array(
             'DiscussionID' => $DiscussionID,
             'Body'         => $Message,
-            'Format'       => 'Html',
+            'Format'       => $InputFormat,
             'InsertUserID' => $PostAsUserID
          ));
       
