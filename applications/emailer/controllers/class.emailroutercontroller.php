@@ -89,6 +89,28 @@ class EmailRouterController extends Gdn_Controller {
 
 //            self::Log("Getting post...");
             $Post = $this->Form->FormValues();
+            
+            // All of the post data can come in a variety of encodings.
+            $Charsets = @json_decode($Post['charsets']);
+
+            if (is_array($Charsets)) {
+               // Convert all of the encodings to utf-8.
+               $Encodings = array_map('strtolower', mb_list_encodings());
+
+               foreach ($Charsets as $Key => $Charset) {
+                  $Charset = strtolower($Charset);
+                  if ($Charset == 'utf-8')
+                     continue;
+                  if (!in_array($Charset, $Encodings))
+                     continue;
+                  if (!isset($Post[$Key]))
+                     continue;
+
+                  Trace("Converting $Key from $Charset to utf-8.");
+                  $Post[$Key] = mb_convert_encoding($Post[$Key], 'utf-8', $Charset);
+               }
+            }
+            
 //            self::Log("Post got...");
             $Data = ArrayTranslate($Post, array(
                 'from' => 'From',
@@ -134,20 +156,37 @@ class EmailRouterController extends Gdn_Controller {
             $LogID = $LogModel->Insert($Data);
             
             list($Name, $Email) = self::ParseEmailAddress($To);
-            if (preg_match('`([^+@]+)([^@]*)@email.vanillaforums.com`', $Email, $Matches)) {
-               $ClientName = $Matches[1];
-               $Domain = $Matches[3];
+            if (preg_match('`([^+@]+)([^@]*)@email[a-z]*.vanillaforums.com`', $Email, $Matches)) {
+               $ToParts = explode('.', strtolower($Matches[1]));
+               $Args = $Matches[0];
+               $Scheme = 'http';
                
-               if (strpos($ClientName, '.') !== FALSE) {
-                  if (StringBeginsWith($ClientName, 'https.', TRUE)) {
-                     $ClientName = StringBeginsWith($ClientName, 'https.', TRUE, TRUE);
-                     $Px = 'https://';
-                  } else
-                     $Px = 'http://';
-                  $Url = $Px.$ClientName.'/utility/email.json';
-               } else {
-                  $Url = "http://$ClientName.vanillaforums.com/utility/email.json";
+               if (count($ToParts) > 1) {
+                  // Check for http or https.
+                  $Part = array_shift($ToParts);
+                  if (in_array($Part, array('http', 'https')))
+                     $Scheme = $Part;
+                  else
+                     array_unshift($ToParts, $Part);
                }
+               
+               if (count($ToParts) > 1) {
+                  // Check for a full domain. We are just going to support a few tlds because this is a legacy format.
+                  $Part = array_pop($ToParts);
+                  if (count($ToParts) > 1 || in_array($Part, array('com', 'org', 'net'))) {
+                     $Domain = implode($ToParts).'.'.$Part;
+                  } else {
+                     // This is a to in the form of category.site.
+                     $Domain = $Part.'.vanillaforums.com';
+                     $Args = array_shift($ToParts);
+                     $To = "$Part+$Args@email.vanillaforums.com";
+                     $Data[$To] = $To;
+                  }
+               } else {
+                  $Domain = $ToParts[0].'.vanillaforums.com';
+               }
+               
+               $Url = "$Scheme://$Domain/utility/email.json";
                $LogModel->SetField($LogID, array('Url' => $Url));
             } else {
                $LogModel->SetField($LogID, array('Response' => 400, 'ResponseText' => "Invalid to: $To, $Email."));
@@ -179,7 +218,7 @@ class EmailRouterController extends Gdn_Controller {
                }
                $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Result));
             } else {
-               $Error = curl_error($C)."\n\n{$this->LastHeaderString}\n\n$Result";
+               $Error = curl_error($C)."\n\n$Result";
                $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Error));
                throw new Exception($Error, $Code);
             }
