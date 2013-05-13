@@ -32,3 +32,7 @@ join GDN_Discussion d
 	on d.CategoryID = cat.CategoryID and d.DateLastComment = cat.LastDateInserted
 set cat.LastCommentID = d.LastCommentID,
 	cat.LastDiscussionID = d.DiscussionID;
+
+update GDN_User
+set DateFirstVisit = DateInserted
+where DateFirstVisit is null;
