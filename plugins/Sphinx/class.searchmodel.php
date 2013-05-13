@@ -95,29 +95,35 @@ searchd {
 
    public function GetComments($IDs) {
       $Result = Gdn::SQL()
-			->Select('c.CommentID as PrimaryID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID')
-			->Select("'/discussion/comment/', c.CommentID, '/#Comment_', c.CommentID", "concat", 'Url')
-			->Select('c.DateInserted')
-			->Select('c.InsertUserID as UserID, u.Name, u.Photo')
+			->Select('c.CommentID as PrimaryID, c.CommentID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID')
+			->Select('c.DateInserted, c.Score')
+			->Select('c.InsertUserID as UserID')
 			->From('Comment c')
 			->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
-			->Join('User u', 'u.UserID = c.InsertUserID', 'left')
          ->WhereIn('c.CommentID', $IDs)
          ->Get()->ResultArray();
+      
+      foreach ($Result as &$Row) {
+         $Row['Url'] = CommentUrl($Row, '/');
+      }
 
       return $Result;
    }
 
    public function GetDiscussions($IDs) {
       $Result = Gdn::SQL()
-			->Select('d.DiscussionID as PrimaryID, d.Name as Title, d.Body as Summary, d.Format, d.CategoryID')
-			->Select('d.DiscussionID', "concat('/discussion/', %s)", 'Url')
-			->Select('d.DateInserted')
-			->Select('d.InsertUserID as UserID, u.Name, u.Photo')
+			->Select('d.DiscussionID as PrimaryID, d.DiscussionID, d.Name as Title, d.Body as Summary, d.Format, d.CategoryID')
+			->Select('d.DateInserted, d.Score')
+			->Select('d.InsertUserID as UserID')
 			->From('Discussion d')
-			->Join('User u', 'd.InsertUserID = u.UserID', 'left')
          ->WhereIn('d.DiscussionID', $IDs)
          ->Get()->ResultArray();
+      
+      foreach ($Result as &$Row) {
+         $Row['Name'] = $Row['Title'];
+         $Row['Url'] = DiscussionUrl($Row, '', '/');
+         unset($Row['Name']);
+      }
 
       return $Result;
    }
@@ -359,7 +365,161 @@ searchd {
          $SearchModel->WriteConfSourceEnd();
       }
    }
+   
+   public function AdvancedSearch($Search, $Offset = 0, $Limit = 10) {
+      $Sphinx = $this->SphinxClient();
+      $Sphinx->setMatchMode(SPH_MATCH_EXTENDED); // Default match mode.
+      
+      // Make the search terms case-insensitive.
+      $Search = AdvancedSearchPlugin::MassageSearch($Search);
+      $DoSearch = $Search['dosearch'];
+      $Filtered = FALSE;
+      $Indexes = $this->Indexes();
+      $Query = '';
+      $Terms = array();
 
+      if (isset($Search['search'])) {
+         list($Query, $Terms) = $this->splitTags($Search['search']);
+      }
+      
+      // Set the filters based on the search.
+      if (isset($Search['categoryid'])) {
+         $Sphinx->setFilter('CategoryID', (array)$Search['categoryid']);
+         $Filtered &= count($Search['categoryid']) == 1;
+      }
+      
+      if (isset($Search['timestamp-from'])) {
+         $Sphinx->setFilterRange('DateInserted', $Search['timestamp-from'], $Search['timestamp-to']);
+         $Filtered = TRUE;
+      }
+      
+      if (isset($Search['title'])) {
+         $Indexes = $this->Indexes('Discussion');
+         list($TitleQuery, $TitleTerms) = $this->splitTags($Search['title']);
+         $Query .= ' @name '.$TitleQuery;
+         $Terms = array_merge($Terms, $TitleTerms);
+      }
+      
+      if (isset($Search['users'])) {
+         $Sphinx->setFilter('InsertUserID', ConsolidateArrayValuesByKey($Search['users'], 'UserID'));
+         $Filtered = TRUE;
+      }
+      
+      if (isset($Search['tags'])) {
+         if (GetValue('tags-op', $Search) == 'and') {
+            foreach ($Search['tags'] as $Row) {
+               $Sphinx->setFilter('Tags', (array)$Row['TagID']);
+            }
+         } else {
+            $Sphinx->setFilter('Tags', ConsolidateArrayValuesByKey($Search['tags'], 'TagID'));
+         }
+           
+         $Filtered = TRUE;
+      }
+      
+      if ($DoSearch) {
+         if ($Filtered && empty($Query))
+            $Sphinx->setMatchMode(SPH_MATCH_ALL);
+         $Results = $this->DoSearch($Sphinx, $Query, $Indexes);
+         $Results['SearchTerms'] = array_unique($Terms);
+      } else {
+         $Results = array('SearchResults' => array(), 'RecordCount' => 0, 'SearchTerms' => $Terms);
+      }
+      $Results['CalculatedSearch'] = $Search;
+      return $Results;
+   }
+   
+   public function autoComplete($str) {
+      $sphinx = $this->SphinxClient();
+      $indexes = $this->Indexes('Discussion');
+      list ($query, $terms) = $this->splitTags($str);
+      
+      $categories = array_keys(CategoryModel::GetByPermission('Discussions.View', NULL, array('Archived' => 0)));
+      if ($categories !== true)
+         $sphinx->setFilter('CategoryID', (array)$categories);
+      
+      $results = $this->DoSearch($sphinx, $query, $indexes);
+      $results['SearchTerms'] = $terms;
+      return $results;
+   }
+   
+   protected function DoSearch($Sphinx, $Query, $Indexes) {
+      $this->EventArguments['SphinxClient'] = $Sphinx;
+      $this->FireEvent('BeforeSphinxSearch');
+      Trace($Query, 'Query');
+      Trace($Indexes, 'indexes');
+      
+      $Search = $Sphinx->query($Query, implode(' ', $Indexes));
+      if (!$Search) {
+         Trace($Sphinx->getLastError(), TRACE_ERROR);
+         Trace($Sphinx->getLastWarning(), TRACE_WARNING);
+         $Warning = $Sphinx->getLastWarning();
+         if (isset($Sphinx->error)) {
+            LogMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Error: '.$Sphinx->error);
+         } elseif (GetValue('warning', $Sphinx)) {
+            LogMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Warning: '.$Sphinx->warning);
+         } else {
+            Trace($Sphinx);
+            Trace('Sphinx returned an error', TRACE_ERROR);
+         }
+      }
+      
+      $Results = $this->GetDocuments($Search);
+      $Total = $Total = GetValue('total', $Search);
+      $SearchTerms = GetValue('words', $Search);
+      if (is_array($SearchTerms))
+         $SearchTerms = array_keys($SearchTerms);
+      else
+         $SearchTerms = array();
+      
+      return array(
+         'SearchResults' => $Results,
+         'RecordCount' => $Total,
+         'SearchTerms' => $SearchTerms);
+   }
+   
+   public function Indexes($Type = NULL) {
+      $Indexes = $this->Types;
+
+      if ($Type !== NULL) {
+         $Indexes = array_intersect($this->Types, (array)$Type);
+      }
+
+
+      $Prefix = C('Database.Name').'_';
+      foreach ($Indexes as &$Name) {
+         $Name = $Prefix.$Name;
+      }
+      unset($Name);
+
+      if ($this->UseDeltas) {
+         foreach ($Indexes as $Name) {
+            $Indexes[] = $Name.'_Delta';
+         }
+      }
+      return $Indexes;
+   }
+   
+   protected $_SphinxClient = null;
+   /**
+    * @return SphinxClient
+    */
+   public function SphinxClient() {
+      if ($this->_SphinxClient === null) {
+         $SphinxHost = C('Plugins.Sphinx.Server', C('Database.Host', 'localhost'));
+         $SphinxPort = C('Plugins.Sphinx.Port', 9312);
+
+         $Sphinx = new SphinxClient();
+         $Sphinx->setServer($SphinxHost, $SphinxPort);
+         
+         // Set some defaults.
+         $Sphinx->setMatchMode(SPH_MATCH_EXTENDED);
+         $Sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'DateInserted');
+         $Sphinx->setMaxQueryTime(5000);
+      }
+      return $Sphinx;
+   }
+   
 	public function Search($Search, $Offset = 0, $Limit = 20) {
       $Indexes = $this->Types;
       $Prefix = C('Database.Name').'_';
@@ -436,7 +596,81 @@ searchd {
       
       return $Result;
 	}
+   
+   public function splitTags($search) {
+      $sphinx = $this->SphinxClient();
+      $search = preg_replace('`\s`', ' ', $search);
+      $tokens = preg_split('`([\s"+-])`', $search, -1, PREG_SPLIT_DELIM_CAPTURE);
+      $tokens = array_filter($tokens);
+      $inquote = false;
 
+      $queries = array();
+      $terms = array();
+      $query = array('', '', '');
+
+      foreach ($tokens as $c) {
+         // Figure out where to push the token.
+         switch ($c) {
+            case '+':
+            case '-':
+               if ($inquote) {
+                  $query[1] .= $c;
+               } elseif(!$query[0]) {
+                  $query[0] .= $c;
+               } else {
+                  $query[1] .= $c;
+               }
+               break;
+            case '"':
+               if ($inquote) {
+                  $query[2] = $c;
+                  $inquote = false;
+               } else {
+                  $query[0] .= $c;
+                  $inquote = true;
+               }
+
+               break;
+            case ' ':
+               if ($inquote) {
+                  $query[1] .= $c;
+               }
+               break;
+            default:
+               $query[1] .= $c;
+               break;
+         }
+
+         // Now split the query into terms and move on.
+         if ($query[2] || ($query[1] && !$inquote)) {
+            $queries[] = $query[0].$sphinx->escapeString($query[1]).$query[2];
+            $terms[] = $query[1];
+            $query = array('', '', '');
+         }
+      }
+      // Account for someone missing their last quote.
+      if ($inquote && $query[1]) {
+         $queries[] = $query[0].$sphinx->escapeString($query[1]).'"';
+         $terms[] = $query[1];
+      }
+
+      // Now we need to convert the queries into sphinx syntax.
+      $firstmod = false; // whether first term had a modifier.
+      foreach ($queries as $i => &$query) {
+         $c = substr($query, 0, 1);
+         if ($c == '+') {
+            $query = substr($query, 1);
+            $firstmod = $i == 0;
+         } elseif ($c == '-') {
+            $firstmod = $i == 0;
+         } elseif (!$firstmod && $i > 0) {
+            $query = '| '.$query;
+         }
+      }
+
+      return array(implode(' ', $queries), array_unique($terms));
+   }
+   
    public function WriteConf($String, $Newline = TRUE) {
       fwrite($this->_fp, $String.($Newline ? "\n" : ''));
    }

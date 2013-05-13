@@ -7,7 +7,7 @@
 $PluginInfo['Sphinx'] = array(
    'Name' => 'Sphinx Search',
    'Description' => "Upgrades search to use the powerful Sphinx engine instead of the default search.",
-   'Version' => '1.0',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
