@@ -1,0 +1,258 @@
+button .Sprite {
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  background: url("//vanillicon.com/sprites/sprites-14-000000.png") no-repeat;
+}
+button .SpSearch {
+  background-position: -220px -100px;
+}
+
+.AdvancedSearch {
+  margin-bottom: 15px;
+  padding-right: 75px;
+}
+.AdvancedSearch select {
+  height: 32px;
+  border: solid 1px #999;
+  vertical-align: top;
+}
+.AdvancedSearch select, .AdvancedSearch input, .AdvancedSearch button {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.AdvancedSearch .BigInput {
+  width: 100%;
+}
+.AdvancedSearch .Gloss {
+  line-height: 30px;
+  display: inline-block;
+}
+.AdvancedSearch .InputBox, .AdvancedSearch .Button {
+  padding: 0 5px;
+  line-height: 30px;
+  height: 30px;
+}
+.AdvancedSearch .Button {
+  vertical-align: middle;
+  min-width: 70px;
+  padding: 0 15px;
+}
+.AdvancedSearch .Button .Sprite {
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+.AdvancedSearch .DateBox {
+  min-width: 100px;
+  max-width: 140px;
+}
+.AdvancedSearch .P {
+  margin: 10px 0;
+}
+.AdvancedSearch .P label {
+  display: block;
+}
+.AdvancedSearch .P.Inline {
+  margin: 15px 0;
+}
+.AdvancedSearch .P.Inline label {
+  display: inline-block;
+}
+.AdvancedSearch .InputAndButton {
+  position: relative;
+}
+.AdvancedSearch .InputAndButton .Button {
+  width: 70px;
+  position: absolute;
+  top: 0;
+  right: -75px;
+}
+.AdvancedSearch .InputAndButton .Handle {
+  position: absolute;
+  top: 12px;
+  right: 8px;
+  height: 0;
+  width: 0;
+  border: solid 8px;
+  border-color: #555 transparent transparent transparent;
+}
+.AdvancedSearch .AdvancedWrap {
+  display: none;
+}
+.AdvancedSearch.Open .InputAndButton .Handle {
+  top: 3px;
+  border-color: transparent transparent #555 transparent;
+}
+.AdvancedSearch.Open .AdvancedWrap {
+  display: block;
+}
+
+ul.token-input-list {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border: 1px solid #aaa;
+  color: #333;
+  font-size: 15px;
+  margin: 0 !important;
+  padding: 3px;
+  overflow: hidden;
+  height: auto !important;
+  height: 1%;
+  width: 100%;
+  cursor: text;
+  min-height: 1px;
+  z-index: 999;
+  background-color: #fff;
+  list-style-type: none;
+}
+
+ul.token-input-list-focus,
+ul.token-input-list-focus input {
+  background: #ffe;
+}
+
+/*#DiscussionForm input.Button {
+    margin-top: 20px;
+}*/
+ul.token-input-list li input {
+  border: 0;
+  width: 100px;
+  padding: 3px 3px;
+  margin: 2px 0;
+}
+
+li.token-input-token {
+  overflow: hidden;
+  height: auto !important;
+  height: 1%;
+  margin-right: 3px;
+  padding: 1px 5px;
+  line-height: 20px;
+  cursor: default;
+  border: 1px solid #999;
+  border-radius: 2px;
+  float: left;
+  font-size: 13px;
+}
+
+li.token-input-token.not-allowed {
+  background-color: #FFC2C2;
+  color: #C91313;
+  border: 1px solid #FF3232;
+}
+li.token-input-token.not-allowed span {
+  color: #C91313;
+}
+
+li.token-input-token p {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+li.token-input-token span {
+  margin-left: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: arial;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+li.token-input-selected-token {
+  background-color: #eee;
+}
+
+li.token-input-selected-token.not-allowed {
+  background-color: red;
+  color: #ffffff;
+  border: 1px solid #FF3232;
+}
+
+li.token-input-selected-token.not-allowed span {
+  color: #ffffff;
+}
+
+li.token-input-input-token {
+  float: left;
+}
+
+div.token-input-dropdown {
+  position: absolute;
+  background-color: #fff;
+  overflow: hidden;
+  border: 1px solid #aaa;
+  border-top-width: 0;
+  cursor: default;
+  z-index: 1;
+  padding: 0 3px;
+}
+div.token-input-dropdown p {
+  margin: 0;
+  padding: 5px;
+}
+div.token-input-dropdown ul {
+  margin: 0 -3px !important;
+  padding: 0;
+}
+div.token-input-dropdown ul li {
+  background-color: #fff;
+  padding: 3px 6px;
+}
+div.token-input-dropdown ul li.token-input-dropdown-item {
+  background-color: #fff;
+}
+div.token-input-dropdown ul li.token-input-dropdown-item2 {
+  background-color: #fff;
+}
+div.token-input-dropdown ul li em {
+  font-weight: bold;
+  font-style: none;
+}
+div.token-input-dropdown ul li.token-input-selected-dropdown-item {
+  background-color: #eee;
+}
+
+/*
+ * jQuery UI Autocomplete 1.10.3
+ * http://jqueryui.com
+ *
+ * Copyright 2013 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Autocomplete#theming
+ */
+.ui-autocomplete {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.ui-helper-hidden-accessible {
+  display: none;
+}
+
+.ui-menu .ui-menu-item a.ui-state-focus,
+.ui-menu .ui-menu-item a.ui-state-active {
+  font-weight: normal;
+  background: #eee;
+}
+
+.MenuItems-Input {
+  padding: 0 2px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-top: -1px;
+}
+.MenuItems-Input > li {
+  margin: 0 -2px;
+}
+
+/*@import "jquery.ui.core";*/
+/*@import "jquery.ui.menu";*/

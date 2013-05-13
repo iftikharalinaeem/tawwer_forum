@@ -1,0 +1,125 @@
+@import "compass";
+
+$buttonWidth: 70px;
+
+@function spriteUrl($color, $file: sprites-14) {
+   @return url("//vanillicon.com/sprites/#{$file}-#{hex_str(unquote($color))}.png");
+}
+
+button {
+   .Sprite {
+      display: inline-block;
+      height: 16px;
+      width: 16px;
+      background: spriteUrl(#000) no-repeat;
+   }
+   
+   .SpSearch {
+      background-position: -220px -100px;
+   }
+}
+
+.AdvancedSearch {
+   margin-bottom: 15px;
+   padding-right: $buttonWidth + 5px;
+   
+   select {
+      height: 32px;
+      border: solid 1px #999;
+      vertical-align: top;
+   }
+   
+   select, input, button {
+      @include box-sizing(border-box);
+   }
+   
+   .BigInput {
+      width: 100%;
+   }
+   
+   .Gloss {
+      line-height: 30px;
+      display: inline-block;
+   }
+   
+   .InputBox, .Button {
+      padding: 0 5px;
+      line-height: 30px;
+      height: 30px;
+   }
+   
+   .Button {
+      vertical-align: middle;
+      min-width: $buttonWidth;
+      padding: 0 15px;
+         
+      .Sprite {
+         vertical-align: middle;
+         position: relative;
+         top: -1px;
+      }
+   }
+   
+   .DateBox {
+      min-width: 100px;
+      max-width: 140px;
+   }
+   
+   // This is for the advanced search form.
+   .P {
+      margin: 10px 0;
+      
+      label {
+         display: block;
+      }
+      
+      &.Inline {
+         margin: 15px 0;
+         label {
+            display: inline-block;
+         }
+      }
+   }
+   
+   // This is for the keywords stuff.
+   .InputAndButton {
+      position: relative;
+      
+      .Button {
+         width: $buttonWidth;
+         position: absolute;
+         top: 0;
+         right: -($buttonWidth + 5px);
+      }
+      
+      .Handle {
+         position: absolute;
+         top: 12px;
+         right: 8px;
+         height: 0;
+         width: 0;
+         border: solid 8px;
+         border-color: #555 transparent transparent transparent;
+      }
+   }
+   
+   .AdvancedWrap {
+      display: none;
+   }
+   
+   &.Open {
+      .InputAndButton .Handle {
+         top: 3px;
+         border-color: transparent transparent #555 transparent;
+      }
+      
+      .AdvancedWrap {
+         display: block;
+      }
+   }
+}
+
+@import "jquery.tokeninput";
+@import "jquery.ui.autocomplete";
+/*@import "jquery.ui.core";*/
+/*@import "jquery.ui.menu";*/

@@ -1,0 +1,37 @@
+/*!
+ * jQuery UI Autocomplete 1.10.3
+ * http://jqueryui.com
+ *
+ * Copyright 2013 jQuery Foundation and other contributors
+ * Released under the MIT license.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Autocomplete#theming
+ */
+.ui-autocomplete {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.ui-helper-hidden-accessible {
+   display: none;
+}
+
+.ui-menu .ui-menu-item a.ui-state-focus,
+.ui-menu .ui-menu-item a.ui-state-active {
+	font-weight: normal;
+	background: #eee;
+}
+   
+// Menu items to match an input box.
+.MenuItems-Input {
+   padding: 0 2px;
+   border-top-left-radius: 0;
+   border-top-right-radius: 0;
+   margin-top: -1px;
+   
+   & > li {
+      margin: 0 -2px;
+   }
+}
