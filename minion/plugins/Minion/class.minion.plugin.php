@@ -939,6 +939,7 @@ class MinionPlugin extends Gdn_Plugin {
    public static function ParseFor(&$State) {
       if (!array_key_exists('For', $State)) return;
       
+      $Reasons = array();
       $Unset = array();
       $Fors = sizeof($State['For']);
       for ($i = 0; $i < $Fors; $i++) {
@@ -957,10 +958,10 @@ class MinionPlugin extends Gdn_Plugin {
          
          // Nope, its a reason
          $Unset[] = $i;
-         $State['Reason'] = $For;
+         $Reasons[] = $For;
       }
       
-      $State['Reason'] = rtrim($State['Reason'], '.');
+      $State['Reason'] = rtrim(implode(' for ', $Reasons), '.');
       
       // Delete parsed elements
       foreach ($Unset as $UnsetKey)
