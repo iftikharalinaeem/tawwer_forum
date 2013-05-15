@@ -165,6 +165,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       $Sender->Title('MailChimp Settings');
       $Sender->AddSideMenu();
       $Sender->Form = new Gdn_Form();
+      $Sender->Sync = new Gdn_Form();
       
       $Sender->AddJsFile('mailchimp.js', 'plugins/MailChimpPush');
       
@@ -182,10 +183,10 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       }
       extract($SettingValues);
       
-      // Get data
+      // Prepare sync data
       
       $Sender->SetData('ConfirmEmail', C('Garden.Registration.ConfirmEmail', false));
-      $Sender->Form->SetData(array(
+      $Sender->Sync->SetData(array(
          'SyncBanned'      => false,
          'SyncDeleted'     => false,
          'SyncUnconfirmed' => false

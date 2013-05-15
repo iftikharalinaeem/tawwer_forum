@@ -3,14 +3,15 @@
    .MailChimpSettings {
       padding-bottom: 15px;
    }
-   .MailChimpSettings ul {
-      padding-bottom: 15px !important;
+   .MailChimpSettings form ul {
+      padding-bottom: 10px !important;
    }
    
-   /* Base */
-   #Content .MailChimpSync form ul {
+   #Content form ul.MailingList,
+   #Content form ul.SyncList {
       padding-top: 0px;
    }
+   
    .MailChimpSync .Synchronization {
       padding: 15px;
       margin: 15px 20px;
@@ -89,10 +90,10 @@
    ?>
    
    <div class="Info">
-      <?php echo T('About MailChimpPush', "MailChimp Push synchronizes your users' email addresses with a MailChimp
-      mailing list of your choice. When a new user signs up, or when an existing
-      user changed their email, Vanilla will send a notification to MailChimp to
-      add or update the user."); ?>
+      <?php echo T('About MailChimpPush', "MailChimp Push synchronizes your users' 
+      email addresses with a MailChimp mailing list of your choice. When a new 
+      user signs up, or when an existing user changed their email, Vanilla will 
+      send a notification to MailChimp to add or update the user."); ?>
    </div>
    
    <div class="Warning"><?php echo T('API Authentication settings'); ?></div>
@@ -105,7 +106,12 @@
    
    <?php if ($this->Data('Configured')): ?>
    <div class="Warning"><?php echo T('Mailing List settings'); ?></div>
-   <ul>
+   <div class="Info">
+      <?php echo T('MailChimpPush List Settings', "Choose which list MailChimp 
+         will synchronize to when new users register, or existing ones change 
+         their email address."); ?>
+   </div>
+   <ul class="MailingList">
       <li><?php
          echo $this->Form->Label("Mailing List", "ListID");
          echo $this->Form->DropDown('ListID', $this->Data('Lists'), array('IncludeNull' => TRUE));
@@ -124,8 +130,8 @@
 <div class="InfoRow MailChimpSync">
    
    <?php if (!defined('APPLICATION')) exit();
-   echo $this->Form->Open();
-   echo $this->Form->Errors();
+   echo $this->Sync->Open();
+   echo $this->Sync->Errors();
    ?>
    
    <div class="Warning"><?php echo T('Mass Synchronization'); ?></div>
@@ -140,32 +146,32 @@
       <div class="SyncBar"><div class="SyncProgress"></div></div>
    </div>
    
-   <ul>
+   <ul class="SyncList">
       <li><?php
-         echo $this->Form->Label("Sync to List", "SyncListID");
-         echo $this->Form->DropDown('SyncListID', $this->Data('Lists'), array('IncludeNull' => TRUE));
+         echo $this->Sync->Label("Sync to List", "SyncListID");
+         echo $this->Sync->DropDown('SyncListID', $this->Data('Lists'), array('IncludeNull' => TRUE));
       ?></li>
       <li><?php
-         echo $this->Form->CheckBox('SyncConfirmJoin', 'Send confirmation email?');
+         echo $this->Sync->CheckBox('SyncConfirmJoin', 'Send confirmation email?');
       ?></li>
       <li><?php
-         echo $this->Form->Label("User Selection");
-         echo $this->Form->CheckBox('SyncBanned', 'Sync banned users');
-         echo $this->Form->CheckBox('SyncDeleted', 'Sync deleted users');
+         echo $this->Sync->Label("User Selection");
+         echo $this->Sync->CheckBox('SyncBanned', 'Sync banned users');
+         echo $this->Sync->CheckBox('SyncDeleted', 'Sync deleted users');
          
          if ($this->Data('ConfirmEmail', false))
-            echo $this->Form->CheckBox('SyncUnconfirmed', 'Sync users with unconfirmed email addreses');
+            echo $this->Sync->CheckBox('SyncUnconfirmed', 'Sync users with unconfirmed email addreses');
       ?></li>
    </ul>
    
    <div class="Buttons">
-      <?php echo $this->Form->Button('Synchronize', array(
+      <?php echo $this->Sync->Button('Synchronize', array(
           'class' => 'Button',
           'type' => 'button',
           'id' => 'MailChimp-Synchronize'
       )); ?>
    </div>
    
-   <?php echo $this->Form->Close(); ?>
+   <?php echo $this->Sync->Close(); ?>
 </div>
 <?php endif; ?>
