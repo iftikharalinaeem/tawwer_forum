@@ -115,7 +115,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          $Emails[] = array('EMAIL' => $EmailAddress, 'EMAIL_TYPE' => $Options['Format']);
       
       // Send request
-      return $this->MCAPI()->listBatchSubscribe($ListID, $Emails, $ConfirmJoin, true);
+      return $this->MCAPI()->listBatchSubscribe($ListID, $Emails, $Options['ConfirmJoin'], true);
    }
    
    /**
@@ -256,15 +256,14 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
       
-      $ChunkSize = 25;
       try {
          
          $Opts = array(
             'Offset'          => 0, 
             'SyncListID'      => false,
-            'SyncConfirmJoin' => false, 
-            'SyncBanned'      => false,
-            'SyncDeleted'     => false,
+            'SyncConfirmJoin' => 0, 
+            'SyncBanned'      => 0,
+            'SyncDeleted'     => 0,
             'SyncUnconfirmed' => null
          );
          $RequiredOpts = array('SyncListID', 'SyncBanned', 'SyncDeleted');
@@ -276,8 +275,10 @@ class MailChimpPushPlugin extends Gdn_Plugin {
                throw new Exception(sprintf(T("%s is required."), $Opt),400);
             $Options[$Opt] = is_null($Val) ? $Default : $Val;
          }
-         
          extract($Options);
+         
+         // Chunk size depends on whether we're sending confirmation emails
+         $ChunkSize = $SyncConfirmJoin ? 25 : 200;
          
          $Criteria = array();
          
@@ -309,7 +310,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             // Subscribe users
             $Start = microtime(true);
             $Response = $this->Add($SyncListID, $Emails, array(
-               'ConfirmJoin'  => $SyncConfirmJoin
+               'ConfirmJoin'  => (bool)$SyncConfirmJoin
             ));
             $Elapsed = microtime(true) - $Start;
             
