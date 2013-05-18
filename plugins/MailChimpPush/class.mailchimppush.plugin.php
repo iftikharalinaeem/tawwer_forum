@@ -13,7 +13,7 @@
 $PluginInfo['MailChimpPush'] = array(
    'Name' => 'MailChimp Push',
    'Description' => "Updates MailChimp when users adjust their email address.",
-   'Version' => '1.0',
+   'Version' => '2.0',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Tim Gunter',
    'AuthorEmail' => 'tim@vanillaforums.com',
@@ -23,8 +23,8 @@ $PluginInfo['MailChimpPush'] = array(
 
 class MailChimpPushPlugin extends Gdn_Plugin {
    
-   protected $MCAPI = NULL;
-   protected $Provider = NULL;
+   protected $MCAPI = null;
+   protected $Provider = null;
    
    protected static $Settings = array('ListID', 'ConfirmJoin');
    
@@ -72,48 +72,60 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     * @return type
     */
    public function UserModel_AfterSave_Handler($Sender) {
-      $SuppliedEmail = GetValue('Email', $Sender->EventArguments['Fields'], NULL);
+      $SuppliedEmail = GetValue('Email', $Sender->EventArguments['Fields'], null);
       if (empty($SuppliedEmail)) return;
       
-      $OriginalEmail = GetValue('Email', $Sender->EventArguments['User'], NULL);
+      $OriginalEmail = GetValue('Email', $Sender->EventArguments['User'], null);
       
+      $ListID = GetValue('ListID', $this->Provider(), null);
       if (empty($OriginalEmail)) {
          // Post update to Chimp List
-         $this->Add($SuppliedEmail, (array)$Sender->EventArguments['User']);
+         $this->Add($ListID, $SuppliedEmail, (array)$Sender->EventArguments['User']);
       } else if ($OriginalEmail != $SuppliedEmail) {
          // Post update to Chimp List
-         $this->Update($OriginalEmail, $SuppliedEmail, (array)$Sender->EventArguments['User']);
+         $this->Update($ListID, $OriginalEmail, $SuppliedEmail, (array)$Sender->EventArguments['User']);
       }
    }
    
    /**
     * Add an address to Mail Chimp
+    * 
+    * @param string $ListID
     * @param string $Email
     * @param array $User
     */
-   public function Add($Email, $User) {
-      $ListID = GetValue('ListID', $this->Provider(), NULL);
-      
+   public function Add($ListID, $Email, $Options = null, $User = null) {
       if (!$ListID)
          return;
       
+      // Configure subscription
+      $Defaults = array(
+         'ConfirmJoin'     => GetValue('ConfirmJoin', $this->Provider(), false),
+         'Format'          => 'html'
+      );
+      $Options = (array)$Options;
+      $Options = array_merge($Defaults, $Options);
+      
       // Subscribe user to list
-      $ConfirmJoin = GetValue('ConfirmJoin', $this->Provider(), FALSE);
-      $this->MCAPI()->listSubscribe($ListID, $Email, array(
-         'EMAIL'  => $Email
-      ), 'html', $ConfirmJoin, TRUE);
+      if (!is_array($Email))
+         $Email = array($Email);
+      
+      $Emails = array();
+      foreach ($Email as $EmailAddress)
+         $Emails[] = array('EMAIL' => $EmailAddress, 'EMAIL_TYPE' => $Options['Format']);
+      
+      // Send request
+      return $this->MCAPI()->listBatchSubscribe($ListID, $Emails, $Options['ConfirmJoin'], true);
    }
    
    /**
     * Try to update an existing address in Mail Chimp
     * 
-    * @param string $Email
-    * @param string $NewEmail
+    * @param string $Email Old/current email address
+    * @param string $NewEmail New email address
     * @param array $User
     */
-   public function Update($Email, $NewEmail, $User) {
-      $ListID = GetValue('ListID', $this->Provider(), NULL);
-      
+   public function Update($ListID, $Email, $NewEmail, $Options = null, $User = null) {
       if (!$ListID)
          return;
       
@@ -122,13 +134,21 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       
       // Add member if they don't exist
       if (!$MemberInfo)
-         return $this->Add($NewEmail, $User);
+         return $this->Add($ListID, $NewEmail, $Options, $User);
+      
+      // Configure subscription
+      $Defaults = array(
+         'ConfirmJoin'     => false,
+         'Format'          => 'html'
+      );
+      $Options = (array)$Options;
+      $Options = array_merge($Defaults, $Options);
       
       // Update existing user
-      $ConfirmJoin = GetValue('ConfirmJoin', $this->Provider(), FALSE);
-      $this->MCAPI()->listSubscribe($ListID, $Email, array(
+      $ConfirmJoin = GetValue('ConfirmJoin', $this->Provider(), false);
+      return $this->MCAPI()->listSubscribe($ListID, $Email, array(
          'EMAIL'  => $NewEmail
-      ), 'html', FALSE, TRUE);
+      ), $Options['Format'], $Options['ConfirmJoin'], true);
    }
    
    /**
@@ -136,11 +156,18 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     * 
     * @param PluginController $Sender
     */
-   public function PluginController_MailChimpPush_Create($Sender) {
+   public function PluginController_MailChimp_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
+      $this->Dispatch($Sender);
+   }
+   
+   public function Controller_Index($Sender) {
       $Sender->Title('MailChimp Settings');
       $Sender->AddSideMenu();
       $Sender->Form = new Gdn_Form();
+      $Sender->Sync = new Gdn_Form();
+      
+      $Sender->AddJsFile('mailchimp.js', 'plugins/MailChimpPush');
       
       $Provider = $this->Provider();
       
@@ -156,13 +183,24 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       }
       extract($SettingValues);
       
+      // Prepare sync data
+      
+      $Sender->SetData('ConfirmEmail', C('Garden.Registration.ConfirmEmail', false));
+      $Sender->Sync->SetData(array(
+         'SyncBanned'      => false,
+         'SyncDeleted'     => false,
+         'SyncUnconfirmed' => false
+      ));
+      
       // Validate form
       if ($Sender->Form->IsPostBack()) {
+         $Modified = false;
          
          // Update API Key?
          
          $SuppliedApiKey = $Sender->Form->GetValue('ApiKey');
          if ($SuppliedApiKey && $SuppliedApiKey != $ApiKey) {
+            $Modified = true;
             $ProviderModel = new Gdn_AuthenticationProviderModel();
             
             if (!$Provider) {
@@ -172,7 +210,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
                   'AssociationSecret'           => $SuppliedApiKey
                ));
                
-               unset($this->Provider);
+               $this->Provider = null;
                $Provider = $this->Provider();
             } else {
                $Provider['AssociationSecret'] = $SuppliedApiKey;
@@ -186,19 +224,21 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          foreach (self::$Settings as $Setting) {
             $SuppliedSettingValue = $Sender->Form->GetValue($Setting);
             if ($SuppliedSettingValue != $SettingValues[$Setting]) {
+               $Modified = true;
                $this->SetUserMeta(0, $Setting, $SuppliedSettingValue);
                $Provider[$Setting] = $SuppliedSettingValue;
             }
          }
          
-         $Sender->InformMessage(T("Changes saved"));
+         if ($Modified)
+            $Sender->InformMessage(T("Changes saved"));
       }
       
       $ApiKey = GetValue('AssociationSecret', $Provider);
       if (!empty($ApiKey)) {
          $Ping = $this->MCAPI()->ping();
          if ($Ping == self::MAILCHIMP_OK) {
-            $Sender->SetData('Configured', TRUE);
+            $Sender->SetData('Configured', true);
             $ListsResponse = $this->MCAPI()->lists();
             $Lists = GetValue('data', $ListsResponse);
             $Lists = Gdn_DataSet::Index($Lists, 'id');
@@ -212,5 +252,90 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       $Sender->Render('settings','','plugins/MailChimpPush');
    }
    
+   public function Controller_Sync($Sender) {
+      $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+      $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+      
+      try {
+         
+         $Opts = array(
+            'Offset'          => 0, 
+            'SyncListID'      => false,
+            'SyncConfirmJoin' => 0, 
+            'SyncBanned'      => 0,
+            'SyncDeleted'     => 0,
+            'SyncUnconfirmed' => null
+         );
+         $RequiredOpts = array('SyncListID', 'SyncBanned', 'SyncDeleted');
+         
+         $Options = array();
+         foreach ($Opts as $Opt => $Default) {
+            $Val = Gdn::Request()->GetValue($Opt, null);
+            if ((!isset($Val) || $Val == '') && in_array($Opt, $RequiredOpts))
+               throw new Exception(sprintf(T("%s is required."), $Opt),400);
+            $Options[$Opt] = is_null($Val) ? $Default : $Val;
+         }
+         extract($Options);
+         
+         // Chunk size depends on whether we're sending confirmation emails
+         $ChunkSize = $SyncConfirmJoin ? 25 : 200;
+         
+         $Criteria = array();
+         
+         // Only if true do we care
+         if (!$SyncBanned)
+            $Criteria['Banned'] = 0;
+         
+         if (!$SyncDeleted)
+            $Criteria['Deleted'] = 0;
+         
+         // Only if supplied and false do we care
+         if ($SyncUnconfirmed == false)
+            $Criteria['Confirmed'] = 1;
+         
+         $TotalUsers = Gdn::UserModel()->GetCount($Criteria);
+         if ($TotalUsers) {
+            
+            // Fetch users
+            $ProcessUsers = Gdn::UserModel()->GetWhere($Criteria, 'UserID', 'desc', $ChunkSize, $Offset);
+            $NewOffset = $Offset+$ProcessUsers->NumRows();
+            
+            // Extract email addresses
+            $Emails = array();
+            while ($ProcessUser = $ProcessUsers->NextRow(DATASET_TYPE_ARRAY)) {
+               if (!empty($ProcessUser['Email']))
+                  $Emails[] = $ProcessUser['Email'];
+            }
+            
+            // Subscribe users
+            $Start = microtime(true);
+            $Response = $this->Add($SyncListID, $Emails, array(
+               'ConfirmJoin'  => (bool)$SyncConfirmJoin
+            ));
+            $Elapsed = microtime(true) - $Start;
+            
+            $SPU = $Elapsed / sizeof($Emails);
+            $ETA = ceil(($TotalUsers - $NewOffset) * $SPU);
+            $ETAMin = ceil($ETA / 60);
+            $Sender->SetData('ETA', $ETA);
+            $Sender->SetData('ETAMinutes', $ETAMin);
+            
+            $Progress = round(($NewOffset / $TotalUsers) * 100, 2);
+            $Sender->SetData('Progress', $Progress);
+            $Sender->SetData('Offset', $NewOffset);
+            $Sender->SetData('Count', sizeof($Emails));
+         } else {
+            throw new Exception('No users match criteria', 400);
+         }
+         
+      } catch (Exception $Ex) {
+         $Sender->SetData('Error', $Ex->getMessage());
+         
+         if ($Ex->getCode() == 400)
+            $Sender->SetData('Fatal', true);
+      }
+      
+      $Sender->Render();
+   }
    
 }
