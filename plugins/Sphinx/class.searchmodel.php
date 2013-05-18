@@ -3,6 +3,9 @@
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  */
 
+if (!defined('SPH_RANK_SPH04'))
+   define('SPH_RANK_SPH04', 7);
+
 class SearchModel extends Gdn_Model {
 	/// PROPERTIES ///
 
@@ -12,6 +15,20 @@ class SearchModel extends Gdn_Model {
    public $LogPath = '/var/log/searchd';
    public $RunPath = '/var/run/searchd';
    public $UseDeltas;
+   
+   public static $MaxResults = 1000;
+   
+   public static $Ranker = array();
+   
+   public static $RankingMode = SPH_RANK_SPH04; //SPH_RANK_PROXIMITY_BM25;
+   
+   public static $TypeMap = array(
+      'd' => 0,
+      'c' => 100,
+      'question' => 1,
+      'poll' => 2,
+      'answer' => 101
+      );
 
    protected $_fp = NULL;
 
@@ -33,9 +50,39 @@ class SearchModel extends Gdn_Model {
          $this->AddTypeInfo('Page', array($this, 'GetPages'), array($this, 'IndexPages'));
       }
       
+      self::$Ranker['score'] = array(
+         'items' => array(-5, 0, 1, 3, 5, 10, 19), 
+         'add' => -1, 
+         'weight' => 1);
+      
+      self::$Ranker['dateinserted'] = array(
+         'items' => array(
+            strtotime('-2 years'),
+            strtotime('-1 year'),
+            strtotime('-6 months'),
+            strtotime('-3 months'),
+            strtotime('-1 month'),
+            strtotime('-1 week'),
+            strtotime('-1 day')),
+         'add' => -4,
+         'weight' => 1
+            );
+      
       parent::__construct();
    }
-
+   
+   public static function interval($val, $items) {
+      if ($val < $items[0])
+         return -0;
+      
+      foreach ($items as $i => $val2) {
+         if ($val <= $val2) {
+            return $i + 1;
+         }
+      }
+      return $i + 1;
+   }
+   
    public function AddTypeInfo($Type, $GetCallback, $IndexCallback = NULL) {
       if (!is_numeric($Type)) {
          $Type = array_search($Type, $this->Types);
@@ -46,8 +93,8 @@ class SearchModel extends Gdn_Model {
 
    public function GetComments($IDs) {
       $Result = Gdn::SQL()
-			->Select('c.CommentID as PrimaryID, c.CommentID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID')
-			->Select('c.DateInserted, c.Score')
+			->Select('c.CommentID as PrimaryID, c.CommentID, d.DiscussionID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID')
+			->Select('c.DateInserted, c.Score, d.Type')
 			->Select('c.InsertUserID as UserID')
 			->From('Comment c')
 			->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
@@ -64,7 +111,7 @@ class SearchModel extends Gdn_Model {
    public function GetDiscussions($IDs) {
       $Result = Gdn::SQL()
 			->Select('d.DiscussionID as PrimaryID, d.DiscussionID, d.Name as Title, d.Body as Summary, d.Format, d.CategoryID')
-			->Select('d.DateInserted, d.Score')
+			->Select('d.DateInserted, d.Score, d.Type')
 			->Select('d.InsertUserID as UserID')
 			->From('Discussion d')
          ->WhereIn('d.DiscussionID', $IDs)
@@ -148,17 +195,21 @@ class SearchModel extends Gdn_Model {
             continue;
 
          $Row['Relevance'] = $Info['weight'];
+         $Row['Score'] = $Info['attrs']['score'];
+         $Row['Count'] = GetValue('@count', $Info['attrs'], 1);
          $Result[] = $Row;
       }
       return $Result;
    }
    
-   public function AdvancedSearch($Search, $Offset = 0, $Limit = 10) {
+   public function AdvancedSearch($Search, $Offset = 0, $Limit = 10, $Massage = true) {
       $Sphinx = $this->SphinxClient();
+      $Sphinx->setLimits($Offset, $Limit, self::$MaxResults);
       $Sphinx->setMatchMode(SPH_MATCH_EXTENDED); // Default match mode.
       
-      // Make the search terms case-insensitive.
-      $Search = AdvancedSearchPlugin::MassageSearch($Search);
+      // Filter the search into proper terms.
+      if ($Massage)
+         $Search = AdvancedSearchPlugin::MassageSearch($Search);
       $DoSearch = $Search['dosearch'];
       $Filtered = FALSE;
       $Indexes = $this->Indexes();
@@ -168,11 +219,12 @@ class SearchModel extends Gdn_Model {
       if (isset($Search['search'])) {
          list($Query, $Terms) = $this->splitTags($Search['search']);
       }
+      $this->setSort($Sphinx, $Terms, $Search);
       
       // Set the filters based on the search.
-      if (isset($Search['categoryid'])) {
-         $Sphinx->setFilter('CategoryID', (array)$Search['categoryid']);
-         $Filtered &= count($Search['categoryid']) == 1;
+      if (isset($Search['cat'])) {
+         $Sphinx->setFilter('CategoryID', (array)$Search['cat']);
+         $Filtered &= (count($Search['cat']) > 0);
       }
       
       if (isset($Search['timestamp-from'])) {
@@ -204,11 +256,50 @@ class SearchModel extends Gdn_Model {
          $Filtered = TRUE;
       }
       
+      if (isset($Search['types'])) {
+         $Indexes = array();
+         $values = array();
+         
+         foreach ($Search['types'] as $table => $types) {
+            $Indexes[] = ucfirst($table);
+            
+            foreach ($types as $t) {
+               $v = GetValue($t, self::$TypeMap);
+               if ($v !== false)
+                  $values[] = $v;
+            }
+         }
+         Trace($values, "dtype");
+         $Sphinx->setFilter('dtype', $values);
+         $Indexes = $this->Indexes($Indexes);
+      }
+      
+      if (isset($Search['discussionid'])) {
+         $Sphinx->setFilter('DiscussionID', (array)$Search['discussionid']);
+      }
+      
+      if ($Search['group'])
+         $Sphinx->setGroupBy('DiscussionID', SPH_GROUPBY_ATTR);
+
+      $Results['Search'] = $Search;
+      
       if ($DoSearch) {
          if ($Filtered && empty($Query))
             $Sphinx->setMatchMode(SPH_MATCH_ALL);
          $Results = $this->DoSearch($Sphinx, $Query, $Indexes);
          $Results['SearchTerms'] = array_unique($Terms);
+         
+//         if ($Search['group']) {
+//            // This was a grouped search so join the sub-documents.
+//            $Subsearch = $Search;
+//            $Subsearch['group'] = false;
+//            $Subsearch['discussionid'] = ConsolidateArrayValuesByKey($Results['SearchResults'], 'DiscussionID');
+//            unset($Subsearch['cat']);
+//            $Sphinx->resetFilters();
+//            $Sphinx->resetGroupBy();
+//            $ChildResults = $this->AdvancedSearch($Subsearch, 0, 50, false);
+//            $Results['ChildResults'] = $ChildResults['SearchResults'];
+//         }
       } else {
          $Results = array('SearchResults' => array(), 'RecordCount' => 0, 'SearchTerms' => $Terms);
       }
@@ -216,17 +307,27 @@ class SearchModel extends Gdn_Model {
       return $Results;
    }
    
-   public function autoComplete($str) {
+   public function autoComplete($search, $limit = 10) {
       $sphinx = $this->SphinxClient();
+      $sphinx->setLimits(0, $limit, 100);
       $indexes = $this->Indexes('Discussion');
+      
+      $search = AdvancedSearchPlugin::MassageSearch($search);
+      
+      $str = $search['search'];
       list ($query, $terms) = $this->splitTags($str);
       
-      $categories = array_keys(CategoryModel::GetByPermission('Discussions.View', NULL, array('Archived' => 0)));
-      if ($categories !== true)
-         $sphinx->setFilter('CategoryID', (array)$categories);
+      if (isset($search['cat']))
+         $sphinx->setFilter('CategoryID', (array)$search['cat']);
+      if (isset($search['discussionid'])) {
+         $indexes = $this->Indexes(array('Discussion', 'Comment'));
+         $sphinx->setFilter('DiscussionID', (array)$search['discussionid']);
+      }
       
+      $this->setSort($sphinx, $terms, $search);
       $results = $this->DoSearch($sphinx, $query, $indexes);
       $results['SearchTerms'] = $terms;
+      
       return $results;
    }
    
@@ -249,6 +350,8 @@ class SearchModel extends Gdn_Model {
             Trace($Sphinx);
             Trace('Sphinx returned an error', TRACE_ERROR);
          }
+//      } else {
+//         Trace($Search, 'search');
       }
       
       $Results = $this->GetDocuments($Search);
@@ -268,7 +371,7 @@ class SearchModel extends Gdn_Model {
    public function Indexes($Type = NULL) {
       $Indexes = $this->Types;
 
-      if ($Type !== NULL) {
+      if (!empty($Type)) {
          $Indexes = array_intersect($this->Types, (array)$Type);
       }
 
@@ -301,8 +404,13 @@ class SearchModel extends Gdn_Model {
          
          // Set some defaults.
          $Sphinx->setMatchMode(SPH_MATCH_EXTENDED);
-         $Sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'DateInserted');
+         $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
+//         $Sphinx->setRankingMode(SPH_RANK_SPH04);
+//         $Sphinx->setRankingMode(SPH_RANK_PROXIMITY_BM25);
+//         $Sphinx->setRankingMode(SPH_RANK_BM25);
+         $Sphinx->setRankingMode(self::$RankingMode);
          $Sphinx->setMaxQueryTime(5000);
+         $Sphinx->setFieldWeights(array('name' => 3, 'body' => 1));
       }
       return $Sphinx;
    }
@@ -330,7 +438,7 @@ class SearchModel extends Gdn_Model {
       $Sphinx->setMatchMode(SPH_MATCH_EXTENDED);
 //      $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
       $Sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'DateInserted');
-      $Sphinx->setLimits($Offset, $Limit, 1000);
+      $Sphinx->setLimits($Offset, $Limit, self::$MaxResults);
       $Sphinx->setMaxQueryTime(5000);
 
       // Allow the client to be overridden.
@@ -384,22 +492,98 @@ class SearchModel extends Gdn_Model {
       return $Result;
 	}
    
+   public function setSort($sphinx, $terms, $search) {
+      $funcs = array();
+      foreach (self::$Ranker as $field => $row) {
+         $items = $row['items'];
+         $weight = $row['weight'];
+         $add = $row['add'];
+         
+         $func = "interval($field, ".implode(', ', $items).")";
+         if ($add > 0)
+            $func = "($func +$add)";
+         elseif ($add < 0)
+            $func = "($func $add)";
+         
+         if ($weight != 1)
+            $func .= " * $weight";
+         
+         $funcs[] = "$func";
+      }
+      $maxScore = self::maxScore();
+      
+      if ($maxScore > 0) {
+         $mult = 1 + 1 / $maxScore;
+         
+         $fullfunc = implode(' + ', $funcs);
+         $sort = "($fullfunc) * $mult * @weight";
+         Trace($sort, 'sort');
+         $sphinx->setSortMode(SPH_SORT_EXPR, $sort);
+      }
+   }
+   
+   public static function addNotes(&$row, $terms) {
+      $map = array('score' => array('Score', 'score'), 'dateinserted' => array('DateInserted', 'date'));
+      $maxscore = self::maxScore();
+      
+      if ($maxscore == 0)
+         return '';
+      
+      $notes = array('rank: '.$row['Relevance']);
+      $mult = 1 / $maxscore;
+      $totalInt = 0;
+     
+      
+      foreach (self::$Ranker as $name => $info) {
+         list($field, $label) = $map[$name];
+         
+         $val = $row[$field];
+         if ($name == 'dateinserted')
+            $val = strtotime($val);
+         
+         $int = (self::interval($val, $info['items']) + $info['add']);
+         $totalInt += $int;
+         $notes[] = sprintf('%s: %+d%%', $label, $int*100 * $mult);
+      }
+      
+      $calcRank = (1 + $mult * $totalInt) * $row['Relevance'];
+      $notes[] = sprintf('total: %d', $calcRank);
+      
+//      $notes[] = "mult: ".round($mult);
+      return implode(' ', $notes);
+   }
+   
+   protected static function maxScore() {
+      $maxScore = 0;
+      foreach (self::$Ranker as $field => $row) {
+         $items = $row['items'];
+         $weight = $row['weight'];
+         $add = $row['add'];
+         $maxScore += $weight * (count($items) + $add);
+      }
+      
+      return $maxScore;
+   }
+   
    public function splitTags($search) {
       $sphinx = $this->SphinxClient();
       $search = preg_replace('`\s`', ' ', $search);
-      $tokens = preg_split('`([\s"+-])`', $search, -1, PREG_SPLIT_DELIM_CAPTURE);
+      $tokens = preg_split('`([\s"+=-])`', $search, -1, PREG_SPLIT_DELIM_CAPTURE);
       $tokens = array_filter($tokens);
       $inquote = false;
 
       $queries = array();
       $terms = array();
       $query = array('', '', '');
+      
+      $hasops = false; // whether or not search has operators
 
       foreach ($tokens as $c) {
          // Figure out where to push the token.
          switch ($c) {
             case '+':
             case '-':
+            case '=':
                if ($inquote) {
                   $query[1] .= $c;
                } elseif(!$query[0]) {
@@ -407,6 +591,7 @@ class SearchModel extends Gdn_Model {
                } else {
                   $query[1] .= $c;
                }
+               $hasops = true;
                break;
             case '"':
                if ($inquote) {
@@ -416,7 +601,7 @@ class SearchModel extends Gdn_Model {
                   $query[0] .= $c;
                   $inquote = true;
                }
-
+               $hasops = true;
                break;
             case ' ':
                if ($inquote) {
@@ -440,42 +625,40 @@ class SearchModel extends Gdn_Model {
          $queries[] = $query[0].$sphinx->escapeString($query[1]).'"';
          $terms[] = $query[1];
       }
-
+      
       // Now we need to convert the queries into sphinx syntax.
       $firstmod = false; // whether first term had a modifier.
-      foreach ($queries as $i => &$query) {
+      $finalqueries = array();
+      $quorums = array();
+      
+      foreach ($queries as $i => $query) {
          $c = substr($query, 0, 1);
          if ($c == '+') {
-            $query = substr($query, 1);
+            $finalqueries[] = substr($query, 1);
             $firstmod = $i == 0;
-         } elseif ($c == '-') {
+         } elseif ($c == '-' || $c == '=') {
+            $finalqueries[] = $c.substr($query, 1);
             $firstmod = $i == 0;
-         } elseif (!$firstmod && $i > 0) {
-            $query = '| '.$query;
+         } elseif ($c == '"') {
+            if (!$firstmod && count($finalqueries) > 0)
+               $query = '| '.$query;
+            $finalqueries[] = $query;
+         } else {
+            // Collect this term into a list for the quorum operator.
+            $quorums[] = $query;
          }
       }
+      // Calculate the quorum.
+      if (count($quorums) <= 2)
+         $quorum = implode(' ', $quorums);
+      else
+         $quorum = '"'.implode(' ', $quorums).'"/'.round(count($quorums) * .6); // must have at least 60% of search terms
 
-      return array(implode(' ', $queries), array_unique($terms));
-   }
-   
-   public function WriteConf($String, $Newline = TRUE) {
-      fwrite($this->_fp, $String.($Newline ? "\n" : ''));
-   }
-
-   public function WriteConfValue($Name, $Value) {
-      $this->WriteConf("  $Name = ".str_replace("\n", "\\\n", $Value));
-   }
-
-   public function WriteConfSourceBegin($Name) {
-      $this->WriteConf("source $Name {");
-      $this->WriteConfValue('type', 'mysql');
-      $this->WriteConfValue('sql_host', C('Database.Host'));
-      $this->WriteConfValue('sql_user', C('Database.User'));
-      $this->WriteConfValue('sql_pass', C('Database.Password'));
-      $this->WriteConfValue('sql_db', C('Database.Name'));
-   }
-
-   public function WriteConfSourceEnd() {
-      $this->WriteConf("}\n");
+      $finalquery = implode(' ', $finalqueries).' '.$quorum;
+      
+      
+//      return array($search, array_unique($terms));
+      return array($finalquery, array_unique($terms));
+      
    }
 }
