@@ -15,7 +15,9 @@ class AdvancedSearchModule extends Gdn_Module {
    
    public $IncludeTags = NULL;
    
-   public $Results = FALSE;
+   public $Results = FALSE; // whether or not to show results in the form.
+   
+   public $Types = array();
    
    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
       $this->_ApplicationFolder = 'plugins/AdvancedSearch';
@@ -30,6 +32,14 @@ class AdvancedSearchModule extends Gdn_Module {
          '6 months' => Plural(6, '%s month', '%s months'),
          '1 year' => Plural(1, '%s year', '%s years')
       );
+      
+      // Set the initial types.
+      foreach (AdvancedSearchPlugin::$Types as $table => $types) {
+         foreach ($types as $type => $label) {
+            $value = $table.'_'.$type;
+            $this->Types[$value] = $label;
+         }
+      }
    }
    
    public static function AddAssets() {
@@ -51,6 +61,20 @@ class AdvancedSearchModule extends Gdn_Module {
       if ($this->Results) {
          $Get = array_change_key_case(Gdn::Request()->Get());
          $Form->FormValues($Get);
+      }
+      
+      // See whether or not to check all of the  types.
+      $onechecked = false;
+      foreach ($this->Types as $name => $label) {
+         if ($Form->GetFormValue($name)) {
+            $onechecked = true;
+            break;
+         }
+      }
+      if (!$onechecked) {
+         foreach ($this->Types as $name => $label) {
+            $Form->SetFormValue($name, true);
+         }
       }
       
       return parent::ToString();

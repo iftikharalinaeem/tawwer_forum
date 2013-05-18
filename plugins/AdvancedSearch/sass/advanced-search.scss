@@ -6,12 +6,20 @@ $buttonWidth: 70px;
    @return url("//vanillicon.com/sprites/#{$file}-#{hex_str(unquote($color))}.png");
 }
 
-button {
+button, .QuickSearch {
    .Sprite {
       display: inline-block;
       height: 16px;
       width: 16px;
       background: spriteUrl(#000) no-repeat;
+      padding: 0;
+      
+      @media (-webkit-min-device-pixel-ratio: 2), (-moz-min-device-pixel-ratio: 2) {
+         & {
+           background-image: spriteUrl(#000, sprites-28);
+           background-size: 396px;
+         }
+       }
    }
    
    .SpSearch {
@@ -20,8 +28,9 @@ button {
 }
 
 .AdvancedSearch {
-   margin-bottom: 15px;
+   margin: 15px auto;
    padding-right: $buttonWidth + 5px;
+   max-width: 750px;
    
    select {
       height: 32px;
@@ -38,20 +47,23 @@ button {
    }
    
    .Gloss {
+      line-height: 20px; 
+      text-align: right;
+   }
+   
+   .Inline .Gloss {
       line-height: 30px;
       display: inline-block;
    }
    
-   .InputBox, .Button {
+   .InputBox {
       padding: 0 5px;
       line-height: 30px;
       height: 30px;
    }
    
    .Button {
-      vertical-align: middle;
       min-width: $buttonWidth;
-      padding: 0 15px;
          
       .Sprite {
          vertical-align: middle;
@@ -69,15 +81,19 @@ button {
    .P {
       margin: 10px 0;
       
-      label {
-         display: block;
-      }
-      
       &.Inline {
          margin: 15px 0;
-         label {
-            display: inline-block;
-         }
+      }
+   }
+   
+   label.Heading {
+      display: block;
+      line-height: 20px;
+   }
+   
+   .Inline {
+      label {
+         display: inline-block;
       }
    }
    
@@ -85,37 +101,146 @@ button {
    .InputAndButton {
       position: relative;
       
-      .Button {
-         width: $buttonWidth;
+      .bwrap {
          position: absolute;
          top: 0;
          right: -($buttonWidth + 5px);
       }
       
+      .Button {
+         padding: 0 5px;
+         line-height: 30px;
+         height: 30px;
+         width: $buttonWidth;
+      }
+      
       .Handle {
+         // background: rgba(255,255,0,.5);
          position: absolute;
-         top: 12px;
-         right: 8px;
-         height: 0;
-         width: 0;
-         border: solid 8px;
-         border-color: #555 transparent transparent transparent;
+         top: 0;
+         right: 0;
+         width: 32px;
+         height: 30px;
+         opacity: .5;
+         
+         &:hover {
+            opacity: 1;
+         }
+         
+         .Arrow {
+            position: absolute;
+            top: 12px;
+            right: 8px;
+            height: 0;
+            width: 0;
+            border: solid 8px;
+            border-color: #000 transparent transparent transparent;
+         }
       }
    }
    
    .AdvancedWrap {
       display: none;
+      
+/*      .P:first-child {
+         margin-top: 0px;;   
+      }*/
    }
    
    &.Open {
-      .InputAndButton .Handle {
+      .InputAndButton .Arrow {
          top: 3px;
-         border-color: transparent transparent #555 transparent;
+         border-color: transparent transparent #000 transparent;
       }
       
       .AdvancedWrap {
          display: block;
       }
+   }
+}
+
+.DataList-Search {
+   & > .Item {
+      line-height: 20px; // 2x picture height.   
+   }
+   .Breadcrumbs {
+      line-height: 20px;
+   }
+   h3 {
+      margin-bottom: 5px;   
+   }
+   .Excerpt {
+      margin: 5px 0 10px;
+   }
+   .Media {
+      margin-top: 0;
+   }
+}
+
+.Media {
+   margin: 5px 0 10px;
+   
+   &, .Media-Body {
+      overflow:hidden;
+      _overflow:visible;
+      zoom:1;
+   }
+   
+   .Img {
+      float:left; margin-right: 10px;
+      
+      img {
+         display:block;
+      }
+   }
+   
+   .ImgExt {
+      float:right; margin-left: 10px;
+   }
+}
+
+.QuickSearch {
+   display: inline;
+   
+   .MenuItems {
+      padding: 10px;
+      display: none;
+      position: absolute;
+      right: 0;
+      z-index: 100;
+   }
+   
+   &.Open {
+      .MenuItems {
+         display: block;
+      }
+   }
+   
+   form {
+      position: relative;
+   }
+   
+   select, input, button {
+      font-size: 12px;
+      @include box-sizing(border-box);
+      line-height: 24px;
+      height: 24px;
+      padding: 0 4px;
+   }
+   
+   .InputBox {
+      width: 300px;
+      margin-right: 50px;
+   }
+   
+   .bwrap {
+      position: absolute;
+      top: 0;
+      right: 0;
+   }
+   
+   .Button {
+      width: 40px;
    }
 }
 

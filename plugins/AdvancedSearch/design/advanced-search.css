@@ -1,16 +1,24 @@
-button .Sprite {
+button .Sprite, .QuickSearch .Sprite {
   display: inline-block;
   height: 16px;
   width: 16px;
   background: url("//vanillicon.com/sprites/sprites-14-000000.png") no-repeat;
+  padding: 0;
 }
-button .SpSearch {
+@media (-webkit-min-device-pixel-ratio: 2), (-moz-min-device-pixel-ratio: 2) {
+  button .Sprite, .QuickSearch .Sprite {
+    background-image: url("//vanillicon.com/sprites/sprites-28-000000.png");
+    background-size: 396px;
+  }
+}
+button .SpSearch, .QuickSearch .SpSearch {
   background-position: -220px -100px;
 }
 
 .AdvancedSearch {
-  margin-bottom: 15px;
+  margin: 15px auto;
   padding-right: 75px;
+  max-width: 750px;
 }
 .AdvancedSearch select {
   height: 32px;
@@ -26,18 +34,20 @@ button .SpSearch {
   width: 100%;
 }
 .AdvancedSearch .Gloss {
+  line-height: 20px;
+  text-align: right;
+}
+.AdvancedSearch .Inline .Gloss {
   line-height: 30px;
   display: inline-block;
 }
-.AdvancedSearch .InputBox, .AdvancedSearch .Button {
+.AdvancedSearch .InputBox {
   padding: 0 5px;
   line-height: 30px;
   height: 30px;
 }
 .AdvancedSearch .Button {
-  vertical-align: middle;
   min-width: 70px;
-  padding: 0 15px;
 }
 .AdvancedSearch .Button .Sprite {
   vertical-align: middle;
@@ -51,42 +61,136 @@ button .SpSearch {
 .AdvancedSearch .P {
   margin: 10px 0;
 }
-.AdvancedSearch .P label {
-  display: block;
-}
 .AdvancedSearch .P.Inline {
   margin: 15px 0;
 }
-.AdvancedSearch .P.Inline label {
+.AdvancedSearch label.Heading {
+  display: block;
+  line-height: 20px;
+}
+.AdvancedSearch .Inline label {
   display: inline-block;
 }
 .AdvancedSearch .InputAndButton {
   position: relative;
 }
-.AdvancedSearch .InputAndButton .Button {
-  width: 70px;
+.AdvancedSearch .InputAndButton .bwrap {
   position: absolute;
   top: 0;
   right: -75px;
 }
+.AdvancedSearch .InputAndButton .Button {
+  padding: 0 5px;
+  line-height: 30px;
+  height: 30px;
+  width: 70px;
+}
 .AdvancedSearch .InputAndButton .Handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 32px;
+  height: 30px;
+  opacity: .5;
+}
+.AdvancedSearch .InputAndButton .Handle:hover {
+  opacity: 1;
+}
+.AdvancedSearch .InputAndButton .Handle .Arrow {
   position: absolute;
   top: 12px;
   right: 8px;
   height: 0;
   width: 0;
   border: solid 8px;
-  border-color: #555 transparent transparent transparent;
+  border-color: #000 transparent transparent transparent;
 }
 .AdvancedSearch .AdvancedWrap {
   display: none;
+  /*      .P:first-child {
+           margin-top: 0px;;   
+        }*/
 }
-.AdvancedSearch.Open .InputAndButton .Handle {
+.AdvancedSearch.Open .InputAndButton .Arrow {
   top: 3px;
-  border-color: transparent transparent #555 transparent;
+  border-color: transparent transparent #000 transparent;
 }
 .AdvancedSearch.Open .AdvancedWrap {
   display: block;
+}
+
+.DataList-Search > .Item {
+  line-height: 20px;
+}
+.DataList-Search .Breadcrumbs {
+  line-height: 20px;
+}
+.DataList-Search h3 {
+  margin-bottom: 5px;
+}
+.DataList-Search .Excerpt {
+  margin: 5px 0 10px;
+}
+.DataList-Search .Media {
+  margin-top: 0;
+}
+
+.Media {
+  margin: 5px 0 10px;
+}
+.Media, .Media .Media-Body {
+  overflow: hidden;
+  _overflow: visible;
+  zoom: 1;
+}
+.Media .Img {
+  float: left;
+  margin-right: 10px;
+}
+.Media .Img img {
+  display: block;
+}
+.Media .ImgExt {
+  float: right;
+  margin-left: 10px;
+}
+
+.QuickSearch {
+  display: inline;
+}
+.QuickSearch .MenuItems {
+  padding: 10px;
+  display: none;
+  position: absolute;
+  right: 0;
+  z-index: 100;
+}
+.QuickSearch.Open .MenuItems {
+  display: block;
+}
+.QuickSearch form {
+  position: relative;
+}
+.QuickSearch select, .QuickSearch input, .QuickSearch button {
+  font-size: 12px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  line-height: 24px;
+  height: 24px;
+  padding: 0 4px;
+}
+.QuickSearch .InputBox {
+  width: 300px;
+  margin-right: 50px;
+}
+.QuickSearch .bwrap {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.QuickSearch .Button {
+  width: 40px;
 }
 
 ul.token-input-list {
@@ -235,7 +339,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .ui-helper-hidden-accessible {
-  display: none;
+  display: none !important;
 }
 
 .ui-menu .ui-menu-item a.ui-state-focus,
@@ -244,14 +348,35 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   background: #eee;
 }
 
+.MenuItems mark {
+  background: transparent;
+  font-weight: bold;
+  color: inherit;
+}
+.MenuItems .Aside {
+  float: right;
+  opacity: .8;
+}
+
 .MenuItems-Input {
   padding: 0 2px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   margin-top: -1px;
+  z-index: 1000;
 }
 .MenuItems-Input > li {
   margin: 0 -2px;
+  border-bottom: solid 1px;
+  border-color: #eee;
+  overflow: hidden;
+}
+.MenuItems-Input > li .Gloss {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 100%;
 }
 
 /*@import "jquery.ui.core";*/

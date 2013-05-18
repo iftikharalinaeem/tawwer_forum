@@ -16,11 +16,35 @@ $PluginInfo['AdvancedSearch'] = array(
 );
 
 class AdvancedSearchPlugin extends Gdn_Plugin {
+   /// Properties ///
+   
+   public static $Types;
+   
    /// Methods ///
+   
+   public function __construct() {
+      parent::__construct();
+      
+      self::$Types = array(
+         'discussion' => array('d' => 'discussions'),
+         'comment' => array('c' => 'comments')
+      );
+      
+      if (Gdn::PluginManager()->IsEnabled('Sphinx')) {
+         if (Gdn::PluginManager()->IsEnabled('QnA')) {
+            self::$Types['discussion']['question'] = 'questions';
+            self::$Types['comment']['answer'] = 'answers';
+         }
+         
+         if (Gdn::PluginManager()->IsEnabled('Polls')) {
+            self::$Types['discussion']['poll'] = 'polls';
+         }
+      }
+   }
    
    public static function MassageSearch($Search) {
       $Search = array_change_key_case($Search);
-      $Search = array_map(function($v) { return strtolower(trim($v)); }, $Search);
+      $Search = array_map(function($v) { return is_string($v) ? trim($v) : $v; }, $Search);
       $Search = array_filter($Search);
       TouchValue('dosearch', $Search, true);
       
@@ -43,7 +67,9 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
       /// Category ///
       $CategoryFilter = array();
       $Archived = GetValue('archived', $Search, 0);
-      $CategoryID = GetValue('categoryid', $Search);
+      $CategoryID = GetValue('cat', $Search);
+      if (strcasecmp($CategoryID, 'all') === 0)
+         $CategoryID = null;
       
       if (!$CategoryID) {
          switch ($Archived) {
@@ -62,14 +88,26 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
       }
       $Categories = CategoryModel::GetByPermission('Discussions.View', NULL, $CategoryFilter);
       $Categories = array_keys($Categories);
+//      Trace($Categories, 'allowed cats');
       
       if ($CategoryID) {
-         if (!in_array($CategoryID, $Categories)) {
-            $Search['categoryid'] = FALSE;
+         TouchValue('subcats', $Search, 0);
+         if ($Search['subcats']) {
+            $CategoryID = ConsolidateArrayValuesByKey(CategoryModel::GetSubtree($CategoryID), 'CategoryID');
+            Trace($CategoryID, 'cats');
+         }
+         
+         $CategoryID = array_intersect((array)$CategoryID, $Categories);
+         
+         if (empty($CategoryID)) {
+            $Search['cat'] = FALSE;
             $Search['dosearch'] = FALSE;
+         } else {
+            $Search['cat'] = $CategoryID;
          }
       } else {
-         $Search['categoryid'] = $Categories;
+         $Search['cat'] = $Categories;
+         unset($Search['subcategories']);
       }
       
       /// Date ///
@@ -118,10 +156,85 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          }
          
       }
+      
+      /// Types ///
+      $types = array();
+      $typecount = 0;
+      $selectedcount = 0;
+      
+      foreach (self::$Types as $table => $type) {
+         $allselected = true;
+         
+         foreach ($type as $name => $label) {
+            $typecount++;
+            $key = $table.'_'.$name;
+            
+            if (GetValue($key, $Search)) {
+               $selectedcount++;
+               $types[$table][] = $name;
+            } else {
+               $allselected = false;
+            }
+            unset($Search[$key]);
+         }
+         // If all of the types are selected then don't filter.
+         if ($allselected) {
+            unset($type[$table]);
+         }
+      }
+      
+      // At least one type has to be selected to filter.
+      if ($selectedcount > 0 && $selectedcount < $typecount) {
+         $Search['types'] = $types;
+      } else {
+         unset($Search['types']);
+      }
+      
+      
+      /// Group ///
+      if (!isset($Search['group']) || $Search['group']) {
+         $group = true;
+         
+         // Check to see if we should group.
+         if (isset($Search['discussionid']))
+            $group = false; // searching within a discussion
+         elseif (isset($Search['types']) && !isset($Search['types']['comment']))
+            $group = false; // not search comments
+         
+         $Search['group'] = $group;
+      } else {
+         $Search['group'] = false;
+      }
+      
+      if (isset($Search['discussionid']))
+         unset($Search['title']);
+      
       Trace($Search, 'calc search');
       return $Search;
    }
    
+   public function quickSearch($title, $get = array()) {
+      $Form = new Gdn_Form();
+      $Form->Method = 'get';
+      
+      foreach ($get as $key => $value) {
+         $Form->AddHidden($key, $value);
+      }
+      
+      $result = ' <div class="QuickSearch">'.
+         Anchor(' ', '#', 'QuickSearchButton Sprite SpSearch').
+         '<div class="QuickSearchWrap MenuItems">';
+      
+      $result .= $Form->Open(array('action' => Url('/search'))).
+//         $Form->Label('@'.$title, 'search').
+         ' '.$Form->TextBox('search', array('placeholder' => $title)).
+         ' <div class="bwrap"><button type="submit" class="Button" title="'.T('Search').'">'.T('Go').'</button></div>'.
+         $Form->Close();
+      
+      $result .= '</div></div>';
+      
+      return $result;
+   }
    
    /// Event Handlers ///
    
@@ -138,9 +251,45 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
       }
    }
    
-   public function SearchController_AutoComplete_Create($sender, $term) {
+   public function CategoriesController_PagerInit_Handler($Sender, $Args) {
+      $categoryid = $Sender->Data('Category.CategoryID');
+      
+      if ($categoryid) {
+         $name = Gdn_Format::Text($Sender->Data('Category.Name'));
+         if (mb_strwidth($name) > 20) {
+            $name = T('category');
+         }
+         
+         $quickserch = $this->quickSearch(sprintf(T('Search %s'), $name), array('cat' => $categoryid));
+
+         $Pager = $Args['Pager'];
+         $Pager->HtmlAfter = $quickserch;
+      }
+   }
+   
+   public function DiscussionController_PagerInit_Handler($Sender, $Args) {
+      $quickserch = $this->quickSearch(sprintf(T('Search %s'), T('discussion')), array('discussionid' => $Sender->Data('Discussion.DiscussionID')));
+      
+      $Pager = $Args['Pager'];
+      $Pager->HtmlAfter = $quickserch;
+   }
+   
+   public function SearchController_AutoComplete_Create($sender, $term, $limit = 5) {
       $searchModel = new SearchModel();
-      $results = $searchModel->autoComplete($term);
+      $get = $sender->Request->Get();
+      $get['search'] = $term;
+      $results = $searchModel->autoComplete($get, $limit);
+      $this->CalculateResults($results['SearchResults'], $results['SearchTerms'], !$sender->Request->Get('nomark'), 100);
+      
+      if (isset($get['discussionid'])) {
+         // This is searching a discussion so make the user the title.
+         Gdn::UserModel()->JoinUsers($results['SearchResults'], array('UserID'));
+         foreach ($results['SearchResults'] as &$row) {
+            $row['Title'] = htmlspecialchars($row['Name']);
+         }
+      }
+      
+      header('Content-Type: application/json; charset=utf8');
       die(json_encode($results['SearchResults']));
    }
    
@@ -173,38 +322,73 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          $Results = $SearchModel->AdvancedSearch($Sender->Request->Get(), $Offset, $Limit);
          $Sender->SetData($Results);
          $SearchTerms = $Results['SearchTerms'];
+         
+         
+         // Grab the discussion if we are searching it.
+         if (isset($Results['CalculatedSearch']['discussionid'])) {
+            $DiscussionModel = new DiscussionModel();
+            $Discussion = $DiscussionModel->GetID($Results['CalculatedSearch']['discussionid']);
+            if ($Discussion) {
+               $Cat = CategoryModel::Categories(GetValue('CategoryID', $Discussion));
+//               if (GetValue('PermsDiscussionView', $Cat)) 
+                  $Sender->SetData('Discussion', $Discussion);
+            }
+         }
+         
       } else {
          $Results = $SearchModel->Search($Search, $Offset, $Limit);
          $Sender->SetData('SearchResults', $Results, TRUE);
          $SearchTerms = explode(' ', $SearchTerms);
       }
-      $this->CalculateResults($Sender->Data['SearchResults'], $SearchTerms, !$Sender->Request->Get('nomark'));
       Gdn::UserModel()->JoinUsers($Sender->Data['SearchResults'], array('UserID'));
-		$Sender->SetData('SearchTerm', implode(' ', $SearchTerms), TRUE);
+      $this->CalculateResults($Sender->Data['SearchResults'], $SearchTerms, !$Sender->Request->Get('nomark'));
+		
+      if (isset($Sender->Data['ChildResults'])) {
+         // Join the results.
+         $ChildResults = $Sender->Data['ChildResults'];
+         unset($Sender->Data['ChildResults']);
+         $this->joinResults($Sender->Data['SearchResults'], $ChildResults, $SearchTerms);
+      }
+      
+      $Sender->SetData('SearchTerm', implode(' ', $SearchTerms), TRUE);
       $Sender->SetData('SearchTerms', $SearchTerms, TRUE);
       $Sender->SetData('From', $Offset + 1);
       $Sender->SetData('To', $Offset + count($Sender->Data['SearchResults']));
       
-//      $PagerFactory = new Gdn_PagerFactory();
-//		$this->Pager = $PagerFactory->GetPager('MorePager', $this);
-//		$this->Pager->MoreCode = 'More Results';
-//		$this->Pager->LessCode = 'Previous Results';
-//		$this->Pager->ClientID = 'Pager';
-//		$this->Pager->Configure(
-//			$Offset,
-//			$Limit,
-//			$NumResults,
-//			'dashboard/search/%1$s/%2$s/?Search='.Gdn_Format::Url($Search)
-//		);
+      // Set the title from the search terms.
+      
+      
+      // Make a url for related search.
+      $get = array_change_key_case($Sender->Request->Get());
+      unset($get['page']);
+      $get['adv'] = 1;
+      $url = '/search?'.http_build_query($get);
+      $Sender->SetData('SearchUrl', $url);
+      
       
       $this->Render('Search');
    }
    
-   protected function CalculateResults(&$Data, $SearchTerms, $Mark = true) {
+   protected function joinResults(&$parentResults, $childResults, $searchTerms) {
+      // Calculate the results.
+      Gdn::UserModel()->JoinUsers($childResults, array('UserID'));
+      $this->CalculateResults($childResults, $searchTerms, !Gdn::Request()->Get('nomark'));
+      $childResults = Gdn_DataSet::Index($childResults, array('DiscussionID'), array('Unique' => false));
+      foreach ($parentResults as &$row) {
+         $row['Children'] = GetValue($row['DiscussionID'], $childResults, array());
+      }
+   }
+   
+   protected function CalculateResults(&$Data, $SearchTerms, $Mark = true, $Length = 200) {
       if (!is_array($SearchTerms)) {
          $SearchTerms = explode(' ', $SearchTerms);
          $SearchTerms = array_filter($SearchTerms, function($v) { return trim($v);  });
       }
+      
+      if (method_exists('SearchModel', 'addNotes'))
+         $calc = array('SearchModel', 'addNotes');
+      else
+         $calc = function ($r) { return null; };
       
       $UseCategories = C('Vanilla.Categories.Use');
       $Breadcrumbs = array();
@@ -213,8 +397,25 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          $Row['Title'] = MarkString($SearchTerms, Gdn_Format::Text($Row['Title'], FALSE));
          $Row['Url'] = Url($Row['Url'], true);
          $Row['Score'] = (int)$Row['Score'];
-         $Row['Body'] = $Row['Summary'];
-         $Row['Summary'] = SearchExcerpt(Gdn_Format::PlainText($Row['Body'], $Row['Format']), $SearchTerms);
+//         $Row['Body'] = $Row['Summary'];
+         $Row['Summary'] = SearchExcerpt(htmlspecialchars(Gdn_Format::PlainText($Row['Summary'], $Row['Format'])), $SearchTerms, $Length);
+         $Row['Format'] = 'Html';
+         $Row['DateHtml'] = Gdn_Format::Date($Row['DateInserted'], 'html');
+         $Row['Notes'] = $calc($Row, $SearchTerms);
+         
+         $Type = strtolower(GetValue('Type', $Row));
+         if (isset($Row['CommentID'])) {
+            if ($Type == 'question')
+               $Type = 'answer';
+            else
+               $Type = 'comment';
+         } else {
+            if (!$Type)
+               $Type = 'discussion';
+            elseif ($Type == 'page' && isset($Row['DiscussionID']))
+               $Type = 'link';
+         }
+         $Row['Type'] = $Type;
          
          // Add breadcrumbs for discussions.
          if ($UseCategories && isset($Row['CategoryID'])) {
@@ -240,7 +441,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
 if (!function_exists('SearchExcerpt')):
    
-function SearchExcerpt($PlainText, $SearchTerms, $Length = 160, $Mark = true) {
+function SearchExcerpt($PlainText, $SearchTerms, $Length = 200, $Mark = true) {
    if (is_string($SearchTerms))
       $SearchTerms = preg_split('`[\s|-]+`i', $SearchTerms);
    
@@ -253,8 +454,21 @@ function SearchExcerpt($PlainText, $SearchTerms, $Length = 160, $Mark = true) {
          continue;
       
       foreach ($SearchTerms as $Term) {
-         if (($Pos = stripos($Line, $Term)) !== FALSE) {
-            return MarkString($SearchTerms, SliceString($Line, $Length));
+         if (($Pos = mb_stripos($Line, $Term)) !== FALSE) {
+            $Line = substrWord($Line, $Term, $Length);
+            
+//            if ($Pos + mb_strlen($Term) > $Length) {
+//               $St = -(strlen($Line) - ($Pos - $Length / 4));
+//               $Pos2 = strrpos($Line, ' ', $St);
+//               if ($Pos2 !== FALSE)
+//                  $Line = '…'.substrWord($Line, $Pos2, $Length, "!!!");
+//               else
+//                  $Line = '…!'.mb_substr($Line, $St, $Length);
+//            } else {
+//               $Line = substrWord($Line, 0, $Length, '---');
+//            }
+            
+            return MarkString($SearchTerms, $Line);
          }
       }
    }
@@ -264,6 +478,49 @@ function SearchExcerpt($PlainText, $SearchTerms, $Length = 160, $Mark = true) {
       if ($Line)
          return SliceString($Line, $Length);
    }
+}
+
+function substrWord($str, $start, $length, $fix = '…') {
+   // If we are offsetting on a word then find it.
+   if (is_string($start)) {
+      $pos = mb_stripos($str, $start);
+      
+      $p = $pos + strlen($start);
+      
+      if ($pos !== false && (($pos + strlen($start)) <= $length))
+         $start = 0;
+      else
+         $start = $pos - $length / 4;
+   }
+   
+   // Find the word break from the offset.
+   if ($start > 0) {
+      $pos = mb_strpos($str, ' ', $start);
+      if ($pos !== false)
+         $start = $pos;
+   } elseif ($start < 0) {
+      $pos = mb_strrpos($str, ' ', $start);
+      if ($pos !== false)
+         $start = $pos;
+      else
+         $start = 0;
+   }
+   
+   $len = strlen($str);
+   
+   if ($start + $length > $len) {
+      if ($length - $start <= 0)
+         $start = 0;
+      else {
+         // Zoom the offset back a bit.
+         $pos = mb_strpos($str, ' ', max(0, $len - $length));
+         if ($pos === false)
+            $pos = $len - $length;
+      }
+   }
+   
+   $result = mb_substr($str, $start, $length);
+   return $result;
 }
 
 endif;
