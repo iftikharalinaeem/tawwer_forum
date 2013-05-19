@@ -92,6 +92,10 @@ button .SpSearch, .QuickSearch .SpSearch {
   width: 32px;
   height: 30px;
   opacity: .5;
+  -webkit-transition: -webkit-transform 0.3s;
+  -moz-transition: -moz-transform 0.3s;
+  -o-transition: -o-transform 0.3s;
+  transition: transform 0.3s;
 }
 .AdvancedSearch .InputAndButton .Handle:hover {
   opacity: 1;
@@ -104,6 +108,11 @@ button .SpSearch, .QuickSearch .SpSearch {
   width: 0;
   border: solid 8px;
   border-color: #000 transparent transparent transparent;
+  /*            animation-name: resize;
+              animation-duration: 1s;
+              animation-iteration-count: 4;
+              animation-direction: alternate;
+              animation-timing-function: ease-in-out;*/
 }
 .AdvancedSearch .AdvancedWrap {
   display: none;
@@ -111,9 +120,13 @@ button .SpSearch, .QuickSearch .SpSearch {
            margin-top: 0px;;   
         }*/
 }
-.AdvancedSearch.Open .InputAndButton .Arrow {
-  top: 3px;
-  border-color: transparent transparent #000 transparent;
+.AdvancedSearch.Open .InputAndButton .Handle {
+  /*@include transform-origin( 5px, 5px);*/
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 .AdvancedSearch.Open .AdvancedWrap {
   display: block;
@@ -130,9 +143,6 @@ button .SpSearch, .QuickSearch .SpSearch {
 }
 .DataList-Search .Excerpt {
   margin: 5px 0 10px;
-}
-.DataList-Search .Media {
-  margin-top: 0;
 }
 
 .Media {
@@ -153,6 +163,26 @@ button .SpSearch, .QuickSearch .SpSearch {
 .Media .ImgExt {
   float: right;
   margin-left: 10px;
+  max-height: 200px;
+  overflow: hidden;
+}
+.Media .ImgExt iframe {
+  width: 200px;
+}
+.Media .ImgExt iframe.Vimeo {
+  height: 113px;
+}
+.Media .ImgExt img {
+  width: 200px;
+}
+.Media .ImgExt.Open {
+  max-height: 306px;
+}
+.Media .ImgExt.Open iframe, .Media .ImgExt.Open img {
+  width: 400px;
+}
+.Item h2 + .Media, .Item h3 + .Media {
+  margin-top: 0;
 }
 
 .QuickSearch {

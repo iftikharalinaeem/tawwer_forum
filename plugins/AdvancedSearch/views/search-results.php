@@ -11,6 +11,22 @@
             echo $Photo;
          }
          ?>
+         <?php
+         $i = 0;
+         foreach ($Row['Media'] as $Media) {
+            $src = $Media['src'];
+
+            if (IsUrl($src)) {
+               echo '<div class="ImgExt">'.
+                  $Media['preview'].
+                  '</div>';
+               $i++;
+               
+               if ($i >= 1 || $Media['type'] == 'video')
+                  break;
+            }
+         }
+         ?>
          <div class="Media-Body">
             <div class="Meta">
             <?php

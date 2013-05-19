@@ -122,6 +122,7 @@ button, .QuickSearch {
          width: 32px;
          height: 30px;
          opacity: .5;
+         @include single-transition(transform, .3s);
          
          &:hover {
             opacity: 1;
@@ -135,6 +136,11 @@ button, .QuickSearch {
             width: 0;
             border: solid 8px;
             border-color: #000 transparent transparent transparent;
+/*            animation-name: resize;
+            animation-duration: 1s;
+            animation-iteration-count: 4;
+            animation-direction: alternate;
+            animation-timing-function: ease-in-out;*/
          }
       }
    }
@@ -148,9 +154,12 @@ button, .QuickSearch {
    }
    
    &.Open {
-      .InputAndButton .Arrow {
-         top: 3px;
-         border-color: transparent transparent #000 transparent;
+      .InputAndButton .Handle {
+         //top: 3px;
+         //border-color: transparent transparent #000 transparent;
+         /*@include transform-origin( 5px, 5px);*/
+         @include rotate(180deg);
+         
       }
       
       .AdvancedWrap {
@@ -171,9 +180,6 @@ button, .QuickSearch {
    }
    .Excerpt {
       margin: 5px 0 10px;
-   }
-   .Media {
-      margin-top: 0;
    }
 }
 
@@ -196,6 +202,27 @@ button, .QuickSearch {
    
    .ImgExt {
       float:right; margin-left: 10px;
+      
+      max-height: 200px;
+      overflow: hidden;
+
+      iframe { width: 200px; 
+
+         &.Vimeo {
+            height: 113px;
+         }
+      }
+      img { width: 200px; } //@include single-transition(width, .3s, ease-in-out);}
+
+      &.Open {
+         max-height: 306px;
+         iframe, img { width: 400px;}
+      }
+   }
+   
+   .Item h2 + &,
+   .Item h3 + & {
+      margin-top: 0;
    }
 }
 

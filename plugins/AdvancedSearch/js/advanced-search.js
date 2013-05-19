@@ -91,7 +91,7 @@ $.fn.searchAutocomplete = function(options) {
 
 jQuery(document).ready(function($) {
     /// Search box autocomplete.
-    if ($.fn.searchAutocomplete) {
+    if ($.fn.searchAutocomplete && gdn.definition('searchAutocomplete') != '0') {
         $('.AdvancedSearch #Form_search').searchAutocomplete();
         $('.SiteSearch #Form_Search').searchAutocomplete();
         
