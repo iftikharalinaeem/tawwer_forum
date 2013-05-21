@@ -504,16 +504,23 @@ class MinionPlugin extends Gdn_Plugin {
       // Check every line of the body to see if its a minion command
       $Line = -1;
       $ObjectLines = explode("\n", $ParseBody);
+      
       foreach ($ObjectLines as $ObjectLine) {
          $Line++;
          $ObjectLine = trim($ObjectLine);
-         
-         // Check if this is a call to the bot
-         
          if (!$ObjectLine)
             continue;
          
-         // Minion called as
+         // Check if spoiled
+         $Spoiled = false;
+         if (preg_match('!^spoiled (.*)$!i', $ObjectLine, $Matches)) {
+            $ObjectLine = $Matches[1];
+            $Spoiled = true;
+         }
+         
+         // Check if this is a call to the bot
+         
+         // Minion called by any other name is still Minion
          $MinionCall = null;
          foreach ($MinionNames as $MinionName) {
             if (StringBeginsWith($ObjectLine, $MinionName, true)) {
@@ -545,7 +552,8 @@ class MinionPlugin extends Gdn_Plugin {
             'Consume'   => false,
             'Command'   => $Command,
             'Tokens'    => 0,
-            'Parsed'    => 0
+            'Parsed'    => 0,
+            'Spoiled'   => $Spoiled
          );
          
          // Define sources
@@ -975,7 +983,8 @@ class MinionPlugin extends Gdn_Plugin {
          SaveToConfig('Garden.Format.Mentions', false, false);
       
       Gdn::PluginManager()->GetPluginInstance('HtmLawed', Gdn_PluginManager::ACCESS_PLUGINNAME);
-      $Html = Gdn_Format::To($Object['Body'], $Object['Format']);
+      $Body = preg_replace_callback('!^\[spoiler\](.*)\[/spoiler\]$!ism', array($this, 'FormatSpoiler'), $Object['Body']);
+      $Html = Gdn_Format::To($Body, $Object['Format']);
       $Config = array(
          'anti_link_spam' => array('`.`', ''),
          'comment' => 1,
@@ -1007,6 +1016,11 @@ class MinionPlugin extends Gdn_Plugin {
       
       $Parsed = html_entity_decode(trim(strip_tags($Dom->saveHTML())));
       return $Parsed;
+   }
+   
+   public function FormatSpoiler($Matches) {
+      $Calls = explode("\n", $Matches[1]);
+      return "spoiled ".implode("\nspoiled ", $Calls);
    }
    
    /**
