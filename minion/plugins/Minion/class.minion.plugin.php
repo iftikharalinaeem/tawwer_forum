@@ -983,7 +983,29 @@ class MinionPlugin extends Gdn_Plugin {
          SaveToConfig('Garden.Format.Mentions', false, false);
       
       Gdn::PluginManager()->GetPluginInstance('HtmLawed', Gdn_PluginManager::ACCESS_PLUGINNAME);
-      $Body = preg_replace_callback('!^\[spoiler\](.*)\[/spoiler\]$!ism', array($this, 'FormatSpoiler'), $Object['Body']);
+      $Body = $Object['Body'];
+      $Body = preg_replace('!\[spoiler\]!i', "\n[spoiler]\n", $Body);
+      $Body = preg_replace('!\[/spoiler\]!i', "\n[/spoiler]\n", $Body);
+      
+      $Spoilers = preg_match_all('!\[/spoiler\]!i', $Body);
+      if ($Spoilers) {
+         $ns = $Spoilers+1;
+         $Body = preg_replace_callback('!\[/spoiler\]!i', function($Matches) use (&$ns){
+            $ns--;
+            return "[/{$ns}spoiler]";
+         }, $Body);
+
+         $ns = 0;
+         $Body = preg_replace_callback('!\[spoiler\]!i', function($Matches) use (&$ns){
+            $ns++;
+            return "[{$ns}spoiler]";
+         }, $Body);
+
+         for ($i=$Spoilers; $i > 0; $i--) {
+            $Body = preg_replace_callback("!\[{$i}spoiler\](.*)\[/{$i}spoiler\]!ism", array($this, 'FormatSpoiler'), $Body);
+         }
+      }
+      
       $Html = Gdn_Format::To($Body, $Object['Format']);
       $Config = array(
          'anti_link_spam' => array('`.`', ''),
@@ -1019,8 +1041,18 @@ class MinionPlugin extends Gdn_Plugin {
    }
    
    public function FormatSpoiler($Matches) {
-      $Calls = explode("\n", $Matches[1]);
-      return "spoiled ".implode("\nspoiled ", $Calls);
+      if (preg_match('!\[1spoiler\]!i', $Matches[0])) {
+         $Calls = explode("\n", $Matches[1]);
+         $Out = '';
+         foreach ($Calls as $Call) {
+            if (!strlen($Call = trim($Call))) continue;
+            $Out .= "spoiled {$Call}\n";
+         }
+         return $Out;
+      } else {
+         return $Matches[1];
+      }
+      
    }
    
    /**
