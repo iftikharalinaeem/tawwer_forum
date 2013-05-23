@@ -22,7 +22,7 @@ class FollowingModule extends Gdn_Module {
          ->From('Following f')
          ->Join('User u', 'u.UserID = f.FollowedUserID')
          ->Where('f.UserID', $UserID)
-         ->Where('u.Photo IS NOT NULL')
+         ->Where('u.Photo is not null')
          ->Get();
             
       $this->NumFollowers = Gdn::SQL()
@@ -34,7 +34,7 @@ class FollowingModule extends Gdn_Module {
          ->From('Following f')
          ->Join('User u', 'u.UserID = f.UserID')
          ->Where('f.FollowedUserID', $UserID)
-         ->Where('u.Photo IS NOT NULL')
+         ->Where('u.Photo is not null')
          ->Get();
    }
 

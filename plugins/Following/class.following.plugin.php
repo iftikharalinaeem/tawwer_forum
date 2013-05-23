@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Following'] = array(
    'Name' => 'Following',
    'Description' => 'This plugin allows users to follow others.',
-   'Version' => '1.0b',
+   'Version' => '1.0.1b',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,

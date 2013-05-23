@@ -504,16 +504,23 @@ class MinionPlugin extends Gdn_Plugin {
       // Check every line of the body to see if its a minion command
       $Line = -1;
       $ObjectLines = explode("\n", $ParseBody);
+      
       foreach ($ObjectLines as $ObjectLine) {
          $Line++;
          $ObjectLine = trim($ObjectLine);
-         
-         // Check if this is a call to the bot
-         
          if (!$ObjectLine)
             continue;
          
-         // Minion called as
+         // Check if spoiled
+         $Spoiled = false;
+         if (preg_match('!^spoiled (.*)$!i', $ObjectLine, $Matches)) {
+            $ObjectLine = $Matches[1];
+            $Spoiled = true;
+         }
+         
+         // Check if this is a call to the bot
+         
+         // Minion called by any other name is still Minion
          $MinionCall = null;
          foreach ($MinionNames as $MinionName) {
             if (StringBeginsWith($ObjectLine, $MinionName, true)) {
@@ -545,7 +552,8 @@ class MinionPlugin extends Gdn_Plugin {
             'Consume'   => false,
             'Command'   => $Command,
             'Tokens'    => 0,
-            'Parsed'    => 0
+            'Parsed'    => 0,
+            'Spoiled'   => $Spoiled
          );
          
          // Define sources
@@ -939,6 +947,7 @@ class MinionPlugin extends Gdn_Plugin {
    public static function ParseFor(&$State) {
       if (!array_key_exists('For', $State)) return;
       
+      $Reasons = array();
       $Unset = array();
       $Fors = sizeof($State['For']);
       for ($i = 0; $i < $Fors; $i++) {
@@ -957,10 +966,10 @@ class MinionPlugin extends Gdn_Plugin {
          
          // Nope, its a reason
          $Unset[] = $i;
-         $State['Reason'] = $For;
+         $Reasons[] = $For;
       }
       
-      $State['Reason'] = rtrim($State['Reason'], '.');
+      $State['Reason'] = rtrim(implode(' for ', $Reasons), '.');
       
       // Delete parsed elements
       foreach ($Unset as $UnsetKey)
@@ -974,7 +983,30 @@ class MinionPlugin extends Gdn_Plugin {
          SaveToConfig('Garden.Format.Mentions', false, false);
       
       Gdn::PluginManager()->GetPluginInstance('HtmLawed', Gdn_PluginManager::ACCESS_PLUGINNAME);
-      $Html = Gdn_Format::To($Object['Body'], $Object['Format']);
+      $Body = $Object['Body'];
+      $Body = preg_replace('!\[spoiler\]!i', "\n[spoiler]\n", $Body);
+      $Body = preg_replace('!\[/spoiler\]!i', "\n[/spoiler]\n", $Body);
+      
+      $Spoilers = preg_match_all('!\[/spoiler\]!i', $Body);
+      if ($Spoilers) {
+         $ns = $Spoilers+1;
+         $Body = preg_replace_callback('!\[/spoiler\]!i', function($Matches) use (&$ns){
+            $ns--;
+            return "[/{$ns}spoiler]";
+         }, $Body);
+
+         $ns = 0;
+         $Body = preg_replace_callback('!\[spoiler\]!i', function($Matches) use (&$ns){
+            $ns++;
+            return "[{$ns}spoiler]";
+         }, $Body);
+
+         for ($i=$Spoilers; $i > 0; $i--) {
+            $Body = preg_replace_callback("!\[{$i}spoiler\](.*)\[/{$i}spoiler\]!ism", array($this, 'FormatSpoiler'), $Body);
+         }
+      }
+      
+      $Html = Gdn_Format::To($Body, $Object['Format']);
       $Config = array(
          'anti_link_spam' => array('`.`', ''),
          'comment' => 1,
@@ -1006,6 +1038,21 @@ class MinionPlugin extends Gdn_Plugin {
       
       $Parsed = html_entity_decode(trim(strip_tags($Dom->saveHTML())));
       return $Parsed;
+   }
+   
+   public function FormatSpoiler($Matches) {
+      if (preg_match('!\[1spoiler\]!i', $Matches[0])) {
+         $Calls = explode("\n", $Matches[1]);
+         $Out = '';
+         foreach ($Calls as $Call) {
+            if (!strlen($Call = trim($Call))) continue;
+            $Out .= "spoiled {$Call}\n";
+         }
+         return $Out;
+      } else {
+         return $Matches[1];
+      }
+      
    }
    
    /**
