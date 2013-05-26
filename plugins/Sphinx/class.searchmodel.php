@@ -6,6 +6,9 @@
 if (!defined('SPH_RANK_SPH04'))
    define('SPH_RANK_SPH04', 7);
 
+// Bit of a kludge, but we need these functions even if advanced search is disabled
+require_once PATH_PLUGINS.'/AdvancedSearch/class.search.php';
+
 class SearchModel extends Gdn_Model {
 	/// PROPERTIES ///
 
@@ -202,14 +205,14 @@ class SearchModel extends Gdn_Model {
       return $Result;
    }
    
-   public function AdvancedSearch($Search, $Offset = 0, $Limit = 10, $Massage = true) {
+   public function AdvancedSearch($Search, $Offset = 0, $Limit = 10, $clean = true) {
       $Sphinx = $this->SphinxClient();
       $Sphinx->setLimits($Offset, $Limit, self::$MaxResults);
       $Sphinx->setMatchMode(SPH_MATCH_EXTENDED); // Default match mode.
       
       // Filter the search into proper terms.
-      if ($Massage)
-         $Search = AdvancedSearchPlugin::MassageSearch($Search);
+      if ($clean)
+         $Search = Search::cleanSearch($Search);
       $DoSearch = $Search['dosearch'];
       $Filtered = FALSE;
       $Indexes = $this->Indexes();
@@ -312,7 +315,7 @@ class SearchModel extends Gdn_Model {
       $sphinx->setLimits(0, $limit, 100);
       $indexes = $this->Indexes('Discussion');
       
-      $search = AdvancedSearchPlugin::MassageSearch($search);
+      $search = Search::cleanSearch($search);
       
       $str = $search['search'];
       list ($query, $terms) = $this->splitTags($str);
@@ -415,7 +418,18 @@ class SearchModel extends Gdn_Model {
       return $Sphinx;
    }
    
-	public function Search($Search, $Offset = 0, $Limit = 20) {
+	public function Search($terms, $Offset = 0, $Limit = 20) {
+      $search = array('search' => $terms, 'group' => false);
+      if ($CategoryID = Gdn::Controller()->Request->Get('CategoryID'))
+         $search['cat'] = $CategoryID;
+      
+      $results = $this->AdvancedSearch($search, $Offset, $Limit);
+      return $results['SearchResults'];
+      
+//      $search = Search::cleanSearch($search);
+//      Trace($search, 'calc search');
+      
+      
       $Indexes = $this->Types;
       $Prefix = C('Database.Name').'_';
       foreach ($Indexes as &$Name) {
@@ -459,8 +473,8 @@ class SearchModel extends Gdn_Model {
 //      var_dump($Cats);
       if ($Cats !== TRUE)
          $Sphinx->setFilter('CategoryID', (array)$Cats);
-      $Search = $Sphinx->query($Search, implode(' ', $Indexes));
-      if (!$Search) {
+      $terms = $Sphinx->query($terms, implode(' ', $Indexes));
+      if (!$terms) {
          Trace($Sphinx->getLastError(), TRACE_ERROR);
          Trace($Sphinx->getLastWarning(), TRACE_WARNING);
          $Warning = $Sphinx->getLastWarning();
@@ -474,9 +488,9 @@ class SearchModel extends Gdn_Model {
          }
       }
       
-      $Result = $this->GetDocuments($Search);
+      $Result = $this->GetDocuments($terms);
       
-      $Total = GetValue('total', $Search);
+      $Total = GetValue('total', $terms);
       Gdn::Controller()->SetData('RecordCount', $Total);
 
       if (!is_array($Result))
