@@ -74,9 +74,16 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
       $Sender->AddCssFile('advanced-search.css', 'plugins/AdvancedSearch');
    }
    
+   /**
+    * @param Gdn_Controller $Sender
+    */
    public function Base_Render_Before($Sender) {
       if (!InSection('Dashboard')) {
          AdvancedSearchModule::AddAssets();
+         
+         if (!Gdn::PluginManager()->IsEnabled('Sphinx')) {
+            $Sender->AddDefinition('searchAutocomplete', '0');
+         }
       }
    }
    
@@ -165,9 +172,12 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          }
          
       } else {
-         $Results = $SearchModel->Search($Search, $Offset, $Limit);
+         $Results = $this->devancedSearch($SearchModel, $Sender->Request->Get(), $Offset, $Limit);
          $Sender->SetData('SearchResults', $Results, TRUE);
-         $SearchTerms = explode(' ', $SearchTerms);
+         if ($SearchTerms)
+            $SearchTerms = explode(' ', $SearchTerms);
+         else
+            $SearchTerms = array();
       }
       Gdn::UserModel()->JoinUsers($Sender->Data['SearchResults'], array('UserID'));
       $this->CalculateResults($Sender->Data['SearchResults'], $SearchTerms, !$Sender->Request->Get('nomark'));
@@ -185,7 +195,9 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
       $Sender->SetData('To', $Offset + count($Sender->Data['SearchResults']));
       
       // Set the title from the search terms.
+      $Sender->Title(T('Search'));
       
+      $Sender->CssClass = 'NoPanel';
       
       // Make a url for related search.
       $get = array_change_key_case($Sender->Request->Get());
@@ -209,7 +221,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
    }
    
    protected function CalculateResults(&$Data, $SearchTerms, $Mark = true, $Length = 200) {
-      if (!is_array($SearchTerms)) {
+      if ($SearchTerms && !is_array($SearchTerms)) {
          $SearchTerms = explode(' ', $SearchTerms);
          $SearchTerms = array_filter($SearchTerms, function($v) { return trim($v);  });
       }
@@ -270,5 +282,127 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             }
          }
       }
+   }
+   
+   function devancedSearch($searchModel, $search, $offset, $limit, $clean = true) {
+      $search = Search::cleanSearch($search);
+      $pdo = Gdn::Database()->Connection();
+      
+      $csearch = true;
+      $dsearch = true;
+      
+      $cwhere = array();
+      $dwhere = array();
+      
+      $dfields = array('d.Name', 'd.Body');
+      $cfields = 'c.Body';
+      
+      /// Search query ///
+      
+      $terms = GetValue('search', $search);
+      if ($terms)
+         $terms = $pdo->quote('%'.str_replace(array('%', '_'), array('\%', '\_'), $terms).'%');
+      
+      /// Title ///
+      
+      if (isset($search['title'])) {
+         $csearch = false;
+         $dwhere['d.Name like'] = $pdo->quote('%'.str_replace(array('%', '_'), array('\%', '\_'), $search['title']).'%');
+      }
+      
+      /// Author ///
+      if (isset($search['users'])) {
+         $author = ConsolidateArrayValuesByKey($search['users'], 'UserID');
+         
+         $cwhere['c.InsertUserID'] = $author;
+         $dwhere['d.InsertUserID'] = $author;
+      }
+      
+      /// Category ///
+      if (isset($search['cat'])) {
+         $cats = (array)$search['cat'];
+         
+         $cwhere['CategoryID'] = $cats;
+         $dwhere['CategoryID'] = $cats;
+      }
+      
+      /// Type ///
+      if (isset($search['types'])) {
+         $dsearch = isset($search['types']['discussion']);
+         $csearch = isset($search['types']['comment']);
+      }
+      
+      /// Date ///
+      if (isset($search['date-from'])) {
+         $dwhere['d.DateInserted >='] = $pdo->quote($search['date-from']);
+         $cwhere['c.DateInserted >='] = $pdo->quote($search['date-from']);
+      }
+      
+      if (isset($search['date-to'])) {
+         $dwhere['d.DateInserted <='] = $pdo->quote($search['date-to']);
+         $cwhere['c.DateInserted <='] = $pdo->quote($search['date-to']);
+      }
+      
+      
+      // Now that we have the wheres, lets do the search.
+      $vanillaSearch = new VanillaSearchModel();
+      $searches = array();
+      
+      if ($dsearch) {
+         $sql = $vanillaSearch->DiscussionSql($searchModel, false);
+         
+         if ($terms) {
+            $sql->BeginWhereGroup();
+            foreach ((array)$dfields as $field) {
+               $sql->OrWhere("$field like", $terms, false, false);
+            }
+            $sql->EndWhereGroup();
+         }
+         
+         foreach($dwhere as $field => $value) {
+            if (is_array($value))
+               $sql->WhereIn($field, $value);
+            else
+               $sql->Where($field, $value, false, false);
+         }
+         
+         $searches[] = $sql->GetSelect();
+         $sql->Reset();
+      }
+      
+      if ($csearch) {
+         $sql = $vanillaSearch->CommentSql($searchModel, false);
+         
+         if ($terms) {
+            foreach ((array)$cfields as $field) {
+               $sql->OrWhere("$field like", $terms, false, false);
+            }
+         }
+         
+         foreach($cwhere as $field => $value) {
+            if (is_array($value))
+               $sql->WhereIn($field, $value);
+            else
+               $sql->Where($field, $value, false, false);
+         }
+         
+         $searches[] = $sql->GetSelect();
+         $sql->Reset();
+      }
+      
+		// Perform the search by unioning all of the sql together.
+		$Sql = Gdn::SQL()
+			->Select()
+			->From('_TBL_ s')
+			->OrderBy('s.DateInserted', 'desc')
+			->Limit($limit, $offset)
+			->GetSelect();
+      Gdn::SQL()->Reset();
+		
+		$Sql = str_replace(Gdn::Database()->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $searches)."\n)", $Sql);
+		Trace(array($Sql), 'SearchSQL');
+		$Result = Gdn::Database()->Query($Sql)->ResultArray();
+      
+		return $Result;
    }
 }

@@ -6,14 +6,21 @@ $(document).on('click', '.AdvancedSearch .Handle', function(e) {
     var $adv = $container.find('input[name="adv"]');
     
     var setState = function() {
+        var method = '';
+        
         if ($container.find('.AdvancedWrap').css('display') == 'none') {
             $container.removeClass('Open');
             $adv.val('0');
-            $('#Form_search', $container).autocomplete('enable');
+            method = 'enable';
         } else {
             $container.addClass('Open');
             $adv.val('1');
-            $('#Form_search', $container).autocomplete('disable');
+            method = 'disable';
+            
+        }
+        
+        if (gdn.definition('searchAutocomplete', true) != '0') {
+           $('#Form_search', $container).autocomplete(method);
         }
     }
     
@@ -91,9 +98,8 @@ $.fn.searchAutocomplete = function(options) {
 
 jQuery(document).ready(function($) {
     /// Search box autocomplete.
-    if ($.fn.searchAutocomplete && gdn.definition('searchAutocomplete') != '0') {
-        $('.AdvancedSearch #Form_search').searchAutocomplete();
-        $('.SiteSearch #Form_Search').searchAutocomplete();
+    if ($.fn.searchAutocomplete && gdn.definition('searchAutocomplete', true) != '0') {
+        $('.AdvancedSearch #Form_search,.SiteSearch #Form_Search').searchAutocomplete();
         
         $('.QuickSearch #Form_search').each(function() {
             var $this = $(this);
