@@ -38,7 +38,7 @@ class RepliesPlugin extends Gdn_Plugin {
          ->Column('InsertUserID', 'int')
          ->Column('DateUpdated', 'datetime', TRUE)
          ->Column('UpdateUserID', 'int', TRUE)
-         ->Column('OldCommentID', 'int', FALSE)
+         ->Column('OldCommentID', 'int', TRUE)
          ->Set();
       
       Gdn::PermissionModel()->Define(array(

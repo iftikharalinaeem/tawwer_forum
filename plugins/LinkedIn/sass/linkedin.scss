@@ -1,0 +1,85 @@
+$SocialIcons: sprite-map("socialcons/*.png", $layout: smart);
+$SocialIcons-2x: sprite-map("socialcons-2x/*.png", $layout: smart);
+
+// This is temporary until the 2.2 release.
+.MultipleEntryMethods .Methods {
+   padding: 0 0 5px 15px;
+}
+
+.SocialIcon {
+   color: #FFF;
+   //font-weight: bold;
+   text-decoration: none;
+   line-height: 24px;
+   height: 24px;
+   background-color: #000;
+   display: inline-block;
+   
+   .Icon {
+      background-image: sprite-url($SocialIcons);
+      background-repeat: no-repeat;
+      width: 24px;
+      height: 24px;
+      display: inline-block;
+      
+      @media (-webkit-min-device-pixel-ratio: 2), (-o-min-device-pixel-ratio: 3/2), (min-device-pixel-ratio: 2) {
+         background-image: sprite-url($SocialIcons-2x);
+         background-size: (image-width(sprite-path($SocialIcons-2x)) / 2) (image-height(sprite-path($SocialIcons-2x)) / 2);
+      }
+   }
+
+   .Text {
+      padding: 0 6px;
+      border-left: 1px solid rgba(0, 0, 0, .1);
+   }
+
+   &,
+   .Icon,
+   .Text {
+      //@include transition(background-color 0.1s);
+      vertical-align: top;
+   }
+   
+   &.HasText {
+      width: 100%;
+      max-width: 200px;
+      height: 28px;
+      line-height: 28px;
+      
+      .Icon {
+         margin: 2px;
+      }
+   }
+   
+   &:hover {
+      color: #fff;
+   }
+   
+}
+
+@mixin SocialIcon($Name, $Icon, $Color) {
+   .SocialIcon-#{unquote($Name)} {
+      background-color: $Color;
+      .Icon {
+         @include SocialIconSprite($Icon);
+      }
+
+      &:hover {
+         background-color: darken($Color, 10%);
+
+      }
+   }
+
+}
+
+@mixin SocialIconSprite($Sprite) {
+   background-position: sprite-position($SocialIcons, $Sprite, -3px, -3px);
+}
+
+@include SocialIcon("Facebook" , "facebook", #36609E);
+@include SocialIcon("Twitter"  , "twitter" , #2AA8DF);
+@include SocialIcon("Google"   , "google"  , #DA5442);
+@include SocialIcon("OpenID"   , "openid"  , #F7921C);
+@include SocialIcon("LinkedIn" , "linkedin", #066C9A);
+@include SocialIcon("Disqus"   , "disqus"  , #2E9FFF);
+@include SocialIcon("Github"   , "github"  , #6B9ECF);

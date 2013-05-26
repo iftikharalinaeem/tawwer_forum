@@ -7,7 +7,7 @@
 $PluginInfo['Sphinx'] = array(
    'Name' => 'Sphinx Search',
    'Description' => "Upgrades search to use the powerful Sphinx engine instead of the default search.",
-   'Version' => '1.0',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.17'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -52,20 +52,13 @@ class SphinxPlugin extends Gdn_Plugin {
    public function SettingsController_Sphinx_Create($Sender, $Args = array()) {
       $Sender->Permission('Garden.Settings.Manage');
 
-      switch (strtolower(GetValue(0, $Args))) {
-         case 'sphinx.conf':
-            $this->_GenerateConf($Sender, $Args);
-            return;
-      }
-
 		// Load up config options we'll be setting
 		$Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
       $ConfigurationModel->SetField(array(
-         'Plugins.Sphinx.Server' => C('Database.Host'),
+         'Plugins.Sphinx.Server' => 'int.sphinx1.vanilladev.com',
          'Plugins.Sphinx.Port' => 9312,
-         'Plugins.Sphinx.UseDeltas',
-         'Plugins.Sphinx.ForceInnoDB'
+         'Plugins.Sphinx.UseDeltas' => TRUE
       ));
 
       // Set the model on the form.
@@ -87,33 +80,5 @@ class SphinxPlugin extends Gdn_Plugin {
 
       $Sender->AddSideMenu('/dashboard/settings/plugins');
       $Sender->Render('settings', '', 'plugins/Sphinx');
-   }
-
-   /**
-    * @param Gdn_MySQLStructure $Sender
-    * @param array $Args
-    */
-   public function Gdn_MySQLStructure_BeforeSet_Handler($Sender, $Args) {
-      $SearchModel = new SearchModel();
-
-      if (C('Plugins.Sphinx.ForceInnoDB') && in_array($Sender->TableName(), $SearchModel->Types))
-         $Sender->Engine('InnoDB');
-   }
-
-   protected function _GenerateConf($Sender, $Args) {
-      $SearchModel = new SearchModel();
-
-      @ob_end_clean();
-
-      $fp = fopen('php://output', 'ab');
-      header("Content-Disposition: attachment; filename=\"sphinx.conf\"");
-      header('Content-Type: text/plain');
-      header("Content-Transfer-Encoding: binary");
-      header('Accept-Ranges: bytes');
-      header("Cache-control: private");
-      header('Pragma: private');
-      header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-
-      $SearchModel->GenerateConfig($fp);
    }
 }

@@ -448,7 +448,7 @@ class HunterPlugin extends Gdn_Plugin {
          'Fugitive'  => $User,
          'Minion'    => MinionPlugin::Instance()->Minion()
       ));
-      $Sender->InformMessage($Message, NULL);
+      $Sender->InformMessage($Message);
    }
    
    /*

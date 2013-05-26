@@ -42,19 +42,5 @@ echo $this->Form->Errors();
          echo $this->Form->CheckBox('Plugins.Sphinx.UseDeltas', T('Use delta indexes', 'Use delta indexes (recommended for massive sites)'));
       ?>
    </li>
-   <li>
-      <?php
-         echo $this->Form->CheckBox('Plugins.Sphinx.ForceInnoDB', T('Change tables to InnoDB', 'Change tables to InnoDB (see help)'));
-      ?>
-   </li>
 </ul>
 <?php echo $this->Form->Close('Save'); ?>
-<h1><?php echo T('Tools'); ?></h1>
-<div class="Info">
-   <p>
-      <?php
-         echo T('Generate sphinx.conf'), ' ',
-            Anchor(T('Generate'), '/settings/sphinx/sphinx.conf', array('class' => 'SmallButton'));
-      ?>
-   </p>
-</div>

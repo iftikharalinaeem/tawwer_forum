@@ -1,0 +1,116 @@
+.MultipleEntryMethods .Methods {
+  padding: 0 0 5px 15px;
+}
+
+.SocialIcon {
+  color: #FFF;
+  text-decoration: none;
+  line-height: 24px;
+  height: 24px;
+  background-color: #000;
+  display: inline-block;
+}
+.SocialIcon .Icon {
+  background-image: url('../design/images/socialcons-s1528b4fd2c.png');
+  background-repeat: no-repeat;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+}
+@media (-webkit-min-device-pixel-ratio: 2), (-o-min-device-pixel-ratio: 3 / 2), (min-device-pixel-ratio: 2) {
+  .SocialIcon .Icon {
+    background-image: url('../design/images/socialcons-2x-sd84454f573.png');
+    background-size: 32px 224px;
+  }
+}
+.SocialIcon .Text {
+  padding: 0 6px;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+.SocialIcon,
+.SocialIcon .Icon,
+.SocialIcon .Text {
+  vertical-align: top;
+}
+.SocialIcon.HasText {
+  width: 100%;
+  max-width: 200px;
+  height: 28px;
+  line-height: 28px;
+}
+.SocialIcon.HasText .Icon {
+  margin: 2px;
+}
+.SocialIcon:hover {
+  color: #fff;
+}
+
+.SocialIcon-Facebook {
+  background-color: #36609e;
+}
+.SocialIcon-Facebook .Icon {
+  background-position: -3px -35px;
+}
+.SocialIcon-Facebook:hover {
+  background-color: #294978;
+}
+
+.SocialIcon-Twitter {
+  background-color: #2aa8df;
+}
+.SocialIcon-Twitter .Icon {
+  background-position: -3px -195px;
+}
+.SocialIcon-Twitter:hover {
+  background-color: #1c8aba;
+}
+
+.SocialIcon-Google {
+  background-color: #da5442;
+}
+.SocialIcon-Google .Icon {
+  background-position: -3px -99px;
+}
+.SocialIcon-Google:hover {
+  background-color: #c33926;
+}
+
+.SocialIcon-OpenID {
+  background-color: #f7921c;
+}
+.SocialIcon-OpenID .Icon {
+  background-position: -3px -163px;
+}
+.SocialIcon-OpenID:hover {
+  background-color: #d87808;
+}
+
+.SocialIcon-LinkedIn {
+  background-color: #066c9a;
+}
+.SocialIcon-LinkedIn .Icon {
+  background-position: -3px -131px;
+}
+.SocialIcon-LinkedIn:hover {
+  background-color: #044a69;
+}
+
+.SocialIcon-Disqus {
+  background-color: #2e9fff;
+}
+.SocialIcon-Disqus .Icon {
+  background-position: -3px -3px;
+}
+.SocialIcon-Disqus:hover {
+  background-color: #0087fa;
+}
+
+.SocialIcon-Github {
+  background-color: #6b9ecf;
+}
+.SocialIcon-Github .Icon {
+  background-position: -3px -67px;
+}
+.SocialIcon-Github:hover {
+  background-color: #4485c3;
+}

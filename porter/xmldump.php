@@ -7,13 +7,20 @@ ini_set('display_errors', 'on');
 ini_set('track_errors', 1);
 
 require_once __DIR__.'/framework/bootstrap.php';
-requireFeatures(FEATURE_COMMANDLINE, FEATURE_FORMATTING, FEATURE_SIMPLEHTMLDOM);
+requireFeatures(FEATURE_COMMANDLINE, FEATURE_FORMATTING, FEATURE_GANON);
+
 
 $noisewords = array("a", "about", "all", "an", "and", "any", "are", "as", "at", "be", "been", "best", "both", "by", "click", "com", "do", "does", "each", "either", "every", "facts", "few", "find", "for", "free", "from", "get", "go", "had", "has", "have", "he", "help", "how", "i", "if", "in", "inc", "into", "is", "it", "know", "lbs", "link", "make", "makes", "me", "more", "most", "my", "no", "note", "often", "on", "or", "our", "ours", "oz", "page", "since", "site", "so", "some", "take", "tbsp", "than", "that", "the", "them", "therefore", "these", "they", "to", "too", "us", "view", "was", "we", "web", "what", "when", "where", "which", "while", "who", "whose", "why", "with", "without", "you", "youre", "your", "yours");
+
+$db;
+
+
 function main() {
+   global $db;
+   
    $opts = array(
       'host' => array('Connect to host.', CMDLINE_SHORT => 'h', CMDLINE_DEFAULT => '127.0.0.1'),
-      'database' => array('Database to use.', CMDLINE_SHORT => 'd', CMDLINE_FLAGS => CMDLINE_REQUIRED),
+      'dbname' => array('Database to use.', CMDLINE_SHORT => 'd', CMDLINE_FLAGS => CMDLINE_REQUIRED),
       'user' => array('User for login if not current user.', CMDLINE_SHORT => 'u'),
       'password' => array('Password to use when connecting to server.', CMDLINE_SHORT => 'p'),
       'mode' => array('What mode to use to dump the data.', 'valid' => array(Db::MODE_ECHO, Db::MODE_EXEC), 'default' => Db::MODE_EXEC),
@@ -21,7 +28,7 @@ function main() {
    );
    $files = array('file');
    $xodomains = array('theknot.com', 'weddingchannel.com', 'weddings.com', 'thebump.com', 'thenest.com');
-   $cdn = "http://cdn.vanillaforums.com/xogrp";
+   $cdn = "http://cdn.cl9.vanillaforums.com";
    global $fileroot;
    $fileroot = '/www/xogrpfiles';
    $startTime = microtime(true);
@@ -35,7 +42,7 @@ function main() {
       die();
    }
    
-   $db = new MySqlDb('localhost', 'root', '', 'xo_imp');
+   $db = MySqlDb::fromArgs($options);
    $db->px = 'GDN_z';
 
    $formats = array(
@@ -68,7 +75,7 @@ function main() {
       
             $row['Body'] = extractBase64Images($row['Body'], $fileroot.'/xogrp/b64-images', "$cdn/b64-images");
             $row['Body'] = downloadImages($row['Body'], $xodomains, $fileroot.'/xogrp/downloaded', "$cdn/downloaded");
-            $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
+            $row['Raw'] = json_encode($row);
             $row['Slug'] = formatUrl($row['Title']);
             $row['ShortSlug'] = removeNoiseWords($row['Slug']);
             $row['Count'] = 1;
@@ -100,7 +107,7 @@ function main() {
             global $fileroot;
             $row['Body'] = extractBase64Images($row['Body'], $fileroot.'/xogrp/b64-images', "$cdn/b64-images");
             $row['Body'] = downloadImages($row['Body'], $xodomains, $fileroot.'/xogrp/downloaded', "$cdn/downloaded");
-            $row['Raw'] = json_encode($row, JSON_PRETTY_PRINT);
+            $row['Raw'] = json_encode($row);
             $row['Count'] = 1;
 
             $row['Format'] = 'Html';
@@ -159,11 +166,17 @@ function main() {
       $path = $dir.$path;
       if (!is_file($path) || substr(basename($path), 0, 1) == '.')
          continue;
-      dumpXmlFile($path, $formats, $db);
       
-      if ($movedir) {
-         // Move the file into the completed dir.
-         rename($path, $movedir.'/'.basename($path));
+      
+      try {
+         dumpXmlFile($path, $formats, $db);
+
+         if ($movedir) {
+            // Move the file into the completed dir.
+            rename($path, $movedir.'/'.basename($path));
+         }
+      } catch (Exception $ex) {
+         fwrite(STDERR, $ex->getMessage());
       }
       
       $i++;
@@ -187,11 +200,15 @@ function main() {
  * @param MySqlDb $db
  */
 function dumpXmlFile($path, $formats, $db) {
+   global $downloadTime;
+   $downloadTime = 0;
+   $db->time = 0;
+   
    $formats = getFullFormats($formats);
    $counts = array_fill_keys(array_keys($formats), 0);
    $names = array();
    
-   $filesize = (int)filesize($path);
+   $filesize = formatFileSize(filesize($path));
 
    fwrite(STDERR, "Dumping $path $filesize\n");
    if (!filesize($path)) {
@@ -239,9 +256,9 @@ function dumpXmlFile($path, $formats, $db) {
          if ($currentRow) {
             $currentRow = array_pop($currentRow);
             if (dateCompare($currentRow['DateUpdated'], $row['DateUpdated']) >= 0) {
-               if ($currentRow['Body'] != $row['Body']) {
-                  fwrite(STDERR, "\n$table {$row['ForeignID']}, bodies don't match.\n");
-               }
+//               if ($currentRow['Body'] != $row['Body']) {
+//                  fwrite(STDERR, "\n$table {$row['ForeignID']}, bodies don't match.\n");
+//               }
                
                $countSkipped++;
                continue;
@@ -270,7 +287,9 @@ function dumpXmlFile($path, $formats, $db) {
    // Write the final status.
    switch ($db->mode) {
       case Db::MODE_EXEC:
-         fwrite(STDERR, " $countRead read, $countInsertRows inserts sent, $countInserted inserted, $countSkipped skipped");
+         $fdownloadTime = formatTimespan($downloadTime);
+         $fdbTime = formatTimespan($db->time);
+         fwrite(STDERR, "\n  $countRead read, $countInsertRows inserts, $fdbTime db, $fdownloadTime dl");
          break;
       case Db::MODE_ECHO:
          echo "\n-- $countRead read\n";
@@ -279,9 +298,10 @@ function dumpXmlFile($path, $formats, $db) {
 }
 
 function downloadImages($str, $domains, $dir, $prefix) {
+//   echo $prefix."\n";
 //   echo "\n--\n$str\n";
    try {
-      $dom = str_get_html($str);
+      $dom = str_get_dom($str);
    } catch (Exception $e) {
       fwrite(STDERR, "\nCould not parse html, continuing...\n");
       return $str;
@@ -293,7 +313,7 @@ function downloadImages($str, $domains, $dir, $prefix) {
    }
    
    // Loop through all of the images in the post.
-   foreach ($dom->find('img') as $img) {
+   foreach ($dom('img') as $img) {
       $src = $img->src;
       $urlparts = parse_url($src);
       if ($urlparts === false || !isset($urlparts['host'], $urlparts['path']))
@@ -307,60 +327,92 @@ function downloadImages($str, $domains, $dir, $prefix) {
       
       $ext = strtolower(pathinfo($src, PATHINFO_EXTENSION));
       if (in_array($ext, array('jpg', 'jpeg', 'gif', 'png', 'bmp'))) {
-         $newsrc = downloadImage($src, $urlparts['path'], $dir, $prefix);
+         $newsrc = downloadImage($src, $urlparts['path'], $dir, $prefix, true);
          $img->src = $newsrc;
-      } else {
-         echo "\nNot downloading $src\n";
+//      } else {
+//         echo "\nNot downloading $src\n";
       }
       
       // See if the image is wrapped in a link that is also an image.
-      $parent = $img->parent();
+      $parent = $img->parent;
       if ($parent->tag == 'a') {
          if (!isset($parent->title) || $parent->title != 'Click to view a larger photo')
             continue;
          
          // Check to see if the image has .Medium.ext'
          $href = $parent->href;
+         
          $hrefparts = parse_url($href);
-         if ($hrefparts === false || !isset($hrefparts['path']))
+         if ($hrefparts === false)
             continue;
          
          $domain = strtolower(stripSubdomain(val('host', $hrefparts)));
-         if (!$domain || !in_array($domain, $domains)) {
+         if ($domain && !in_array($domain, $domains)) {
             continue;
          }
 
-         $ext = strtolower(pathinfo($hrefparts['path'], PATHINFO_EXTENSION));
-         if (in_array($ext, array('jpg', 'jpeg', 'gif', 'png', 'bmp'))) {
-            $newhref = downloadImage($href, $hrefparts['path'], $dir, $prefix);
-            $parent->href = $newhref;
-            $parent->class = "PhotoLink";
-         } elseif (stripos($src, '.Medium.')) {
+         $parentSrcd = false;
+         
+         if (isset($hrefparts['path'])) {
+            $ext = strtolower(pathinfo($hrefparts['path'], PATHINFO_EXTENSION));
+            if (in_array($ext, array('jpg', 'jpeg', 'gif', 'png', 'bmp'))) {
+               $newhref = downloadImage($href, $hrefparts['path'], $dir, $prefix, true);
+               $parent->href = $newhref;
+               $parent->class = "PhotoLink";
+               $parentSrcd = true;
+            }
+         }
+         
+         if (!$parentSrcd && stripos($src, '.Medium.')) {
             $largesrc = str_ireplace('.Medium.', '.Large.', $src);
             $largesrcparts = parse_url($largesrc);
-            $newhref = downloadImage($largesrc, $largesrcparts['path'], $dir, $prefix);
+            $newhref = downloadImage($largesrc, $largesrcparts['path'], $dir, $prefix, true);
             $parent->href = $newhref;
             $parent->class = "PhotoLink";
          }
       }
    }
-   $newstr = $dom->save();
+//   echo "\n\n$str\n\n";
+   $newstr = (string)$dom;
    return $newstr;
 }
 
-$lastDownload = microtime(true);
+//$lastDownload = microtime(true);
+$downloadTime = 0;
 
-function downloadImage($url, $subpath, $dir, $prefix) {
-   global $lastDownload;
-
+/**
+ * 
+ * @global type $downloadTime
+ * @global MySqlDb $db
+ * @param type $url
+ * @param string $subpath
+ * @param type $dir
+ * @param type $prefix
+ * @param type $queue
+ * @return string
+ */
+function downloadImage($url, $subpath, $dir, $prefix, $queue = false) {
+   global $downloadTime, $db;
+   
+   $startTime = microtime(true);
    // Make sure not to flood the downloads.
-   $sleep = microtime(true) - ($lastDownload + 1);
+//   $sleep = microtime(true) - ($lastDownload + 1);
 //   if ($sleep > 0.1)
 //      usleep($sleep * 1000000);
    
    $subpath = '/'.ltrim($subpath, '/');
    $path = realpath2($dir.$subpath);
-   $newurl = $prefix.$subpath;
+   $newurl = strtolower($prefix.$subpath);
+   
+   if ($queue) {
+      $count = $db->insertMulti('download', array(array(
+         'url' => $url,
+         'newurl' => $newurl
+         )), array(Db::INSERT_IGNORE => true));
+      if ($count)
+         fwrite(STDERR, 'q');
+      return $newurl;
+   }
 
    if (!file_exists($path)) {
       ensureDir(dirname($path));
@@ -368,10 +420,10 @@ function downloadImage($url, $subpath, $dir, $prefix) {
          $r = @copy($url, $path);
          if ($r) {
 //            fwrite(STDERR, "\nDownloaded $url.\n");
-            
+            fwrite(STDERR, 'd');
             break;
          } else {
-            if (preg_match('`HTTP/1\.\d\s(\d+)`', val(0, $http_response_header), $m)) {
+            if (isset($http_response_header) && preg_match('`HTTP/1\.\d\s(\d+)`', val(0, $http_response_header), $m)) {
                $code = $m[1];
                if ($code >= 400 && $code <=600) {
                   // This was an error. Just leave it.
@@ -384,9 +436,11 @@ function downloadImage($url, $subpath, $dir, $prefix) {
       if (!$r) {
          trigger_error("Couldn't download $url after $i tries ($code).", E_USER_WARNING);
       }
+   } else {
+      fwrite(STDERR, 's');
    }
    
-   $lastDownload = microtime(true);
+   $downloadTime += microtime(true) - $startTime;
    return $newurl;
 }
 

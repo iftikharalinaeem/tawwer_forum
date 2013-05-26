@@ -22,7 +22,7 @@
 
             $UserName = GetValue('Name', $User, FALSE);
             if ($UserName)
-               echo ' '.UserAnchor($User, 'Username CategoryModeratorName');
+               echo ' '.UserAnchor($User, 'Username CategoryModeratorName', array('title' => $UserName));
             echo '</span> ';
          }
          echo '</div>'."\n";
