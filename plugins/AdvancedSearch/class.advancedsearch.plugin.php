@@ -227,7 +227,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
       }
       
       if (method_exists('SearchModel', 'addNotes'))
-         $calc = array('SearchModel', 'addNotes');
+         $calc = function ($r, $t) { return SearchModel::addNotes($r, $t); };
       else
          $calc = function ($r) { return null; };
       
