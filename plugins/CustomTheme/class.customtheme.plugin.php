@@ -66,7 +66,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
       
       $LiveRevisionID = C('Plugins.CustomTheme.LiveRevisionID', 0);
       $RevisionID = CustomThemePlugin::GetRevisionFromFileName($LiveRevisionID);
-		$Css = Gdn::SQL()->GetWhere('CustomThemeRevision', array('RevisionID' => $RevisionID))->Value('CSS');
+		$Css = Gdn::SQL()->Reset()->GetWhere('CustomThemeRevision', array('RevisionID' => $RevisionID))->Value('CSS');
       
       if ($Css) {
          $Host = Gdn::Request()->Host();
