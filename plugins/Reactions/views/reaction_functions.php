@@ -248,6 +248,8 @@ function WriteOrderByButtons() {
 }
 
 
+if (!function_exists('WriteProfileCounts')):
+   
 function WriteProfileCounts() {
    $CurrentUrl = Url('', TRUE);
    
@@ -274,6 +276,8 @@ function WriteProfileCounts() {
    
    echo '</div>';
 }
+
+endif;
 
 if (!function_exists('WriteReactions')):
 function WriteReactions($Row) {
