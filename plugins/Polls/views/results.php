@@ -9,11 +9,11 @@ else:
    // Display the poll
    ?>
    <div class="Poll PollResults Hero">
-      <div class="PollQuestion"><?php 
-         echo Sprite('SpPoll'); 
+      <h2 class="PollQuestion"><?php 
+//         echo Sprite('SpPoll'); 
          echo Gdn_Format::PlainText(GetValue('Name', $Poll, ''));
          echo Wrap(Plural(GetValue('CountVotes', $Poll), '%s vote', '%s votes'), 'span class="TotalVotes"');
-      ?></div>
+      ?></h2>
       <div class="PollOptions">
          <?php
          $Item = 0;
