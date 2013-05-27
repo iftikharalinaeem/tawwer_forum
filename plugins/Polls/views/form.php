@@ -7,10 +7,9 @@ else:
    // Display the poll
    ?>
    <div class="Poll PollForm Hero">
-      <div class="PollQuestion"><?php 
-         echo Sprite('SpPoll'); 
+      <h2 class="PollQuestion"><?php 
          echo Gdn_Format::PlainText(GetValue('Name', $Poll, ''));
-      ?></div>
+      ?></h2>
       <div class="PollOptions">
          <?php
          $Form = new Gdn_Form();
