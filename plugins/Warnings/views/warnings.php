@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) return; ?>
+<div class="DataListWrap">
 <h2 class="H"><?php echo T('Warnings'); ?></h2>
 <ul class="DataList Activities">
 <?php 
@@ -96,3 +97,4 @@ else:
 endif;
    ?>
 </ul>
+</div>
