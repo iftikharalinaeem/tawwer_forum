@@ -67,8 +67,6 @@ button, .QuickSearch {
          
       .Sprite {
          vertical-align: middle;
-         position: relative;
-         top: -1px;
       }
    }
    
@@ -109,39 +107,9 @@ button, .QuickSearch {
       
       .Button {
          padding: 0 5px;
-         line-height: 30px;
+         line-height: 100%;
          height: 30px;
          width: $buttonWidth;
-      }
-      
-      .Handle {
-         // background: rgba(255,255,0,.5);
-         position: absolute;
-         top: 0;
-         right: 0;
-         width: 32px;
-         height: 30px;
-         opacity: .5;
-         @include single-transition(transform, .3s);
-         
-         &:hover {
-            opacity: 1;
-         }
-         
-         .Arrow {
-            position: absolute;
-            top: 12px;
-            right: 8px;
-            height: 0;
-            width: 0;
-            border: solid 8px;
-            border-color: #000 transparent transparent transparent;
-/*            animation-name: resize;
-            animation-duration: 1s;
-            animation-iteration-count: 4;
-            animation-direction: alternate;
-            animation-timing-function: ease-in-out;*/
-         }
       }
    }
    
@@ -164,6 +132,33 @@ button, .QuickSearch {
       
       .AdvancedWrap {
          display: block;
+      }
+   }
+}
+
+.InputAndButton {
+   .Handle {
+      // background: rgba(255,255,0,.5);
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 32px;
+      height: 30px;
+      opacity: .5;
+      @include single-transition(transform, .3s);
+
+      &:hover {
+         opacity: 1;
+      }
+
+      .Arrow {
+         position: absolute;
+         top: 12px;
+         right: 8px;
+         height: 0;
+         width: 0;
+         border: solid 8px;
+         border-color: #000 transparent transparent transparent;
       }
    }
 }
@@ -227,14 +222,16 @@ button, .QuickSearch {
 }
 
 .QuickSearch {
-   display: inline;
+   display: inline-block;
+   position: relative;
    
    .MenuItems {
       padding: 10px;
       display: none;
       position: absolute;
       right: 0;
-      z-index: 100;
+      top: 105%;
+      z-index: 1000;
    }
    
    &.Open {
@@ -269,6 +266,17 @@ button, .QuickSearch {
    .Button {
       width: 40px;
    }
+   
+   .QuickSearchButton {   .Sprite {
+      background-color: transparent;
+      border: none;
+      vertical-align: middle;
+      }
+   }
+}
+
+.PagerWrap {
+   overflow: visible; // fix for old style.css
 }
 
 @import "jquery.tokeninput";

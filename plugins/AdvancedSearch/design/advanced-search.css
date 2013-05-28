@@ -51,8 +51,6 @@ button .SpSearch, .QuickSearch .SpSearch {
 }
 .AdvancedSearch .Button .Sprite {
   vertical-align: middle;
-  position: relative;
-  top: -1px;
 }
 .AdvancedSearch .DateBox {
   min-width: 100px;
@@ -81,38 +79,9 @@ button .SpSearch, .QuickSearch .SpSearch {
 }
 .AdvancedSearch .InputAndButton .Button {
   padding: 0 5px;
-  line-height: 30px;
+  line-height: 100%;
   height: 30px;
   width: 70px;
-}
-.AdvancedSearch .InputAndButton .Handle {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 32px;
-  height: 30px;
-  opacity: .5;
-  -webkit-transition: -webkit-transform 0.3s;
-  -moz-transition: -moz-transform 0.3s;
-  -o-transition: -o-transform 0.3s;
-  transition: transform 0.3s;
-}
-.AdvancedSearch .InputAndButton .Handle:hover {
-  opacity: 1;
-}
-.AdvancedSearch .InputAndButton .Handle .Arrow {
-  position: absolute;
-  top: 12px;
-  right: 8px;
-  height: 0;
-  width: 0;
-  border: solid 8px;
-  border-color: #000 transparent transparent transparent;
-  /*            animation-name: resize;
-              animation-duration: 1s;
-              animation-iteration-count: 4;
-              animation-direction: alternate;
-              animation-timing-function: ease-in-out;*/
 }
 .AdvancedSearch .AdvancedWrap {
   display: none;
@@ -130,6 +99,31 @@ button .SpSearch, .QuickSearch .SpSearch {
 }
 .AdvancedSearch.Open .AdvancedWrap {
   display: block;
+}
+
+.InputAndButton .Handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 32px;
+  height: 30px;
+  opacity: .5;
+  -webkit-transition: -webkit-transform 0.3s;
+  -moz-transition: -moz-transform 0.3s;
+  -o-transition: -o-transform 0.3s;
+  transition: transform 0.3s;
+}
+.InputAndButton .Handle:hover {
+  opacity: 1;
+}
+.InputAndButton .Handle .Arrow {
+  position: absolute;
+  top: 12px;
+  right: 8px;
+  height: 0;
+  width: 0;
+  border: solid 8px;
+  border-color: #000 transparent transparent transparent;
 }
 
 .DataList-Search > .Item {
@@ -186,14 +180,16 @@ button .SpSearch, .QuickSearch .SpSearch {
 }
 
 .QuickSearch {
-  display: inline;
+  display: inline-block;
+  position: relative;
 }
 .QuickSearch .MenuItems {
   padding: 10px;
   display: none;
   position: absolute;
   right: 0;
-  z-index: 100;
+  top: 105%;
+  z-index: 1000;
 }
 .QuickSearch.Open .MenuItems {
   display: block;
@@ -221,6 +217,15 @@ button .SpSearch, .QuickSearch .SpSearch {
 }
 .QuickSearch .Button {
   width: 40px;
+}
+.QuickSearch .QuickSearchButton .Sprite {
+  background-color: transparent;
+  border: none;
+  vertical-align: middle;
+}
+
+.PagerWrap {
+  overflow: visible;
 }
 
 ul.token-input-list {

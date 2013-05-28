@@ -8,7 +8,7 @@
 $PluginInfo['AdvancedSearch'] = array(
    'Name' => 'Advanced Search',
    'Description' => "Enables advanced search on sites.",
-   'Version' => '1.0a',
+   'Version' => '1.0a1.1',
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -51,7 +51,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
       }
       
       $result = ' <div class="QuickSearch">'.
-         Anchor(' ', '#', 'QuickSearchButton Sprite SpSearch').
+         Anchor(Sprite('SpSearch'), '#', 'QuickSearchButton').
          '<div class="QuickSearchWrap MenuItems">';
       
       $result .= $Form->Open(array('action' => Url('/search'))).
