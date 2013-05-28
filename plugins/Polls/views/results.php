@@ -12,7 +12,7 @@ else:
       <h2 class="PollQuestion"><?php 
 //         echo Sprite('SpPoll'); 
          echo Gdn_Format::PlainText(GetValue('Name', $Poll, ''));
-         echo Wrap(Plural(GetValue('CountVotes', $Poll), '%s vote', '%s votes'), 'span class="TotalVotes"');
+         echo ' '.Wrap(Plural(GetValue('CountVotes', $Poll), '%s vote', '%s votes'), 'span class="TotalVotes Gloss"');
       ?></h2>
       <div class="PollOptions">
          <?php
@@ -31,7 +31,7 @@ else:
                <span class="VotePercent"><?php echo $Percent; ?>%</span>
                <?php
                if ($Anonymous)
-                  echo Wrap(Plural($CountVotes, '%s vote', '%s votes'), 'span class="VoteCount"');
+                  echo Wrap(Plural($CountVotes, '%s vote', '%s votes'), 'span class="Gloss VoteCount"');
                ?>
             </div>
             <?php if (!$Anonymous && is_array($Votes) && $CountVotes > 0): ?>
