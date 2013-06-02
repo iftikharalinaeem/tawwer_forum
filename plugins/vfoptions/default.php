@@ -250,17 +250,29 @@ pageTracker._trackPageview();
 				throw PermissionException();
 		}
 
-
+      // Theme pruning
       if (strcasecmp($Sender->RequestMethod, 'themes') == 0) {
+         
+         $VisibleThemes = strtolower(C('Garden.Themes.Visible', ''));
+         $VisibleThemes = explode(',', $VisibleThemes);
          $ClientName = defined('CLIENT_NAME') ? CLIENT_NAME : '';
+         
          // Remove any themes that are not available.
          $Themes = $Sender->Data('AvailableThemes');
          $Remove = array();
          foreach ($Themes as $Index => $Theme) {
+            // Check site-specific themes
             $Site = GetValue('Site', $Theme);
             if ($Site && $Site != $ClientName)
                $Remove[] = $Index;
+            
+            // Check site explicit unhides
+            $Hidden = GetValue('Hidden', $Theme);
+            if ($Hidden && !in_array(strtolower($Index), $VisibleThemes))
+               $Remove[] = $Index;
          }
+         
+         // Remove orphans
          foreach ($Remove as $Index) {
             unset($Sender->Data['AvailableThemes'][$Index]);
          }
