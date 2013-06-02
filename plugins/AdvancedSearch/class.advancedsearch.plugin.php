@@ -39,6 +39,10 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          if (Gdn::PluginManager()->IsEnabled('Polls')) {
             self::$Types['discussion']['poll'] = 'polls';
          }
+         
+         if (Gdn::ApplicationManager()->CheckApplication('Pages')) {
+            self::$Types['page']['p'] = 'docs';
+         }
       }
    }
    
@@ -255,6 +259,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
                $Type = 'answer';
             else
                $Type = 'comment';
+         } elseif(isset($Row['PageID'])) {
+            $Type = 'doc';
          } else {
             if (!$Type)
                $Type = 'discussion';

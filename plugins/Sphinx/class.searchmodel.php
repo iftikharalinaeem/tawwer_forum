@@ -76,11 +76,11 @@ class SearchModel extends Gdn_Model {
    
    public static function interval($val, $items) {
       if ($val < $items[0])
-         return -0;
+         return 0;
       
       foreach ($items as $i => $val2) {
-         if ($val <= $val2) {
-            return $i + 1;
+         if ($val < $val2) {
+            return $i;
          }
       }
       return $i + 1;
@@ -200,6 +200,11 @@ class SearchModel extends Gdn_Model {
          $Row['Relevance'] = $Info['weight'];
          $Row['Score'] = $Info['attrs']['score'];
          $Row['Count'] = GetValue('@count', $Info['attrs'], 1);
+         $Row['sort'] = GetValue('sort', $Info['attrs']);
+         
+         if (!isset($Row['DiscussionID']))
+            $Row['DiscussionID'] = GetValue('discussionid', $Info['attrs']);
+         
          $Result[] = $Row;
       }
       return $Result;
@@ -282,7 +287,7 @@ class SearchModel extends Gdn_Model {
       }
       
       if ($Search['group'])
-         $Sphinx->setGroupBy('DiscussionID', SPH_GROUPBY_ATTR);
+         $Sphinx->setGroupBy('DiscussionID', SPH_GROUPBY_ATTR, 'sort DESC');
 
       $Results['Search'] = $Search;
       
@@ -527,12 +532,15 @@ class SearchModel extends Gdn_Model {
       $maxScore = self::maxScore();
       
       if ($maxScore > 0) {
-         $mult = 1 + 1 / $maxScore;
+         $mult = 1 / $maxScore;
          
          $fullfunc = implode(' + ', $funcs);
-         $sort = "($fullfunc) * $mult * @weight";
+         $sort = "(($fullfunc) * $mult + 1) * @weight";
          Trace($sort, 'sort');
-         $sphinx->setSortMode(SPH_SORT_EXPR, $sort);
+         
+         $sphinx->setSelect("*, $sort as sort");
+         
+         $sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'sort');
       }
    }
    
@@ -557,11 +565,12 @@ class SearchModel extends Gdn_Model {
          
          $int = (self::interval($val, $info['items']) + $info['add']);
          $totalInt += $int;
-         $notes[] = sprintf('%s: %+d%%', $label, $int*100 * $mult);
+         $notes[] = sprintf('%s(%s): %+d%%', $label, $val, $int*100 * $mult);
       }
       
       $calcRank = (1 + $mult * $totalInt) * $row['Relevance'];
       $notes[] = sprintf('total: %d', $calcRank);
+      $notes[] = 'expr: '.round($row['sort']);
       
 //      $notes[] = "mult: ".round($mult);
       return implode(' ', $notes);

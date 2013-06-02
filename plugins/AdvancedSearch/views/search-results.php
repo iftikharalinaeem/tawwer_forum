@@ -45,9 +45,9 @@
                   echo ' <span class="MItem-Location">'.Gdn_Theme::Breadcrumbs($Row['Breadcrumbs'], FALSE).'</span> ';
                }
 
-//               if (isset($Row['Notes'])) {
-//                  echo ' <span class="Aside Debug">debug('.$Row['Notes'].')</span>';
-//               }
+               if (isset($Row['Notes'])) {
+                  echo ' <span class="Aside Debug">debug('.$Row['Notes'].')</span>';
+               }
             ?>
             </div>
             <div class="Summary">

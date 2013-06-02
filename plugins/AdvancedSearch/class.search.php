@@ -62,6 +62,7 @@ class Search {
         }
      }
      $Categories = CategoryModel::GetByPermission('Discussions.View', NULL, $CategoryFilter);
+     $Categories[0] = true; // allow uncategorized too.
      $Categories = array_keys($Categories);
    //      Trace($Categories, 'allowed cats');
 
@@ -273,13 +274,18 @@ EOT;
          );
          
          if (Gdn::PluginManager()->IsEnabled('QnA')) {
-            $searchTypes['discussion']['question'] = 'questions';
-            $searchTypes['comment']['answer'] = 'answers';
+            $types['discussion']['question'] = 'questions';
+            $types['comment']['answer'] = 'answers';
          }
 
          if (Gdn::PluginManager()->IsEnabled('Polls')) {
-            $searchTypes['discussion']['poll'] = 'polls';
+            $types['discussion']['poll'] = 'polls';
          }
+         
+         if (Gdn::ApplicationManager()->CheckApplication('Pages')) {
+            $types['page']['p'] = 'docs';
+         }
+         
          self::$types = $types;
       }
       
