@@ -200,6 +200,15 @@ class PollsPlugin extends Gdn_Plugin {
       $Sender->Render('add', '', 'plugins/Polls');
    }
    
+   public function PromotedContentModule_AfterBody_Handler($Sender, $Args) {
+      $Type = GetValueR('Content.Type', $Sender->EventArgs);
+      
+      if (strcasecmp($Type, 'poll') === 0 && strlen(GetValueR('Content.Body', $Sender->EventArgs)) === 0) {
+         echo ' '.Anchor(T('Click here to vote.'), $Sender->EventArgs['ContentUrl']).' ';
+         
+      }
+   }
+   
    /** 
     * Display the poll on the discussion. 
     * @param type $Sender 
