@@ -261,15 +261,18 @@ pageTracker._trackPageview();
          $Themes = $Sender->Data('AvailableThemes');
          $Remove = array();
          foreach ($Themes as $Index => $Theme) {
+            
             // Check site-specific themes
             $Site = GetValue('Site', $Theme);
             if ($Site && $Site != $ClientName)
                $Remove[] = $Index;
             
             // Check site explicit unhides
-            $Hidden = GetValue('Hidden', $Theme);
-            if ($Hidden && !in_array(strtolower($Index), $VisibleThemes))
+            $Hidden = GetValue('Hidden', $Theme, false);
+            //$Sender->Data['AvailableThemes'][$Index]['Hidden'] = false;
+            if ($Hidden && !in_array(strtolower($Index), $VisibleThemes)) {
                $Remove[] = $Index;
+            }
          }
          
          // Remove orphans
