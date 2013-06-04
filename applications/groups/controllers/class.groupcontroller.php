@@ -34,7 +34,7 @@ class GroupController extends Gdn_Controller {
       $this->Head = new HeadModule($this);
       $this->AddJsFile('jquery.js');
       $this->AddJsFile('jquery.livequery.js');
-      $this->AddJsFile('jquery-ui-1.8.17.custom.min.js');
+      $this->AddJsFile('jquery-ui.js');
       $this->AddJsFile('jquery.form.js');
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
