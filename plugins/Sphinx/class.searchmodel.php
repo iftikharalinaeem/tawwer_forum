@@ -512,35 +512,41 @@ class SearchModel extends Gdn_Model {
 	}
    
    public function setSort($sphinx, $terms, $search) {
-      $funcs = array();
-      foreach (self::$Ranker as $field => $row) {
-         $items = $row['items'];
-         $weight = $row['weight'];
-         $add = $row['add'];
-         
-         $func = "interval($field, ".implode(', ', $items).")";
-         if ($add > 0)
-            $func = "($func +$add)";
-         elseif ($add < 0)
-            $func = "($func $add)";
-         
-         if ($weight != 1)
-            $func .= " * $weight";
-         
-         $funcs[] = "$func";
-      }
-      $maxScore = self::maxScore();
-      
-      if ($maxScore > 0) {
-         $mult = 1 / $maxScore;
-         
-         $fullfunc = implode(' + ', $funcs);
-         $sort = "(($fullfunc) * $mult + 1) * @weight";
-         Trace($sort, 'sort');
-         
-         $sphinx->setSelect("*, $sort as sort");
-         
+      // If there is just one search term then we really want to just sort by date.
+      if (count($terms) < 2) {
+         $sphinx->setSelect('*, dateinserted as sort');
          $sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'sort');
+      } else {
+         $funcs = array();
+         foreach (self::$Ranker as $field => $row) {
+            $items = $row['items'];
+            $weight = $row['weight'];
+            $add = $row['add'];
+
+            $func = "interval($field, ".implode(', ', $items).")";
+            if ($add > 0)
+               $func = "($func +$add)";
+            elseif ($add < 0)
+               $func = "($func $add)";
+
+            if ($weight != 1)
+               $func .= " * $weight";
+
+            $funcs[] = "$func";
+         }
+         $maxScore = self::maxScore();
+
+         if ($maxScore > 0) {
+            $mult = 1 / $maxScore;
+
+            $fullfunc = implode(' + ', $funcs);
+            $sort = "(($fullfunc) * $mult + 1) * @weight";
+            Trace($sort, 'sort');
+
+            $sphinx->setSelect("*, $sort as sort");
+
+            $sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'sort');
+         }
       }
    }
    
@@ -572,7 +578,7 @@ class SearchModel extends Gdn_Model {
       $notes[] = sprintf('total: %d', $calcRank);
       $notes[] = 'expr: '.round($row['sort']);
       
-//      $notes[] = "mult: ".round($mult);
+      $notes[] = "mult: ".round($mult);
       return implode(' ', $notes);
    }
    
