@@ -443,6 +443,17 @@ pageTracker._trackPageview();
             'Enabled' => $Enabled
          ));
          $Addons = array_merge($Reputation, $Addons);
+         
+         $Enabled = array_key_exists('Groups', $EnabledApps);
+         $Groups = array('Groups' => array(
+            'Name' => 'Groups',
+            'Description' => 'Create user groups and schedule events within those groups.',
+            'IconUrl' => 'http://badges.vni.la/100/users.png',
+            'ToggleText' => ($Enabled ? 'Disable' : 'Enable'),
+            'ToggleUrl' => "/dashboard/settings/addons/".$Sender->Filter."/".($Enabled ? 'disable' : 'enable')."/Groups/".Gdn::Session()->TransientKey(),
+            'Enabled' => $Enabled
+         ));
+         $Addons = array_merge($Groups, $Addons);
       }
       
       // Sort & set Addons
