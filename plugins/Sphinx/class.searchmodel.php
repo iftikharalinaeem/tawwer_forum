@@ -514,7 +514,7 @@ class SearchModel extends Gdn_Model {
    public function setSort($sphinx, $terms, $search) {
       // If there is just one search term then we really want to just sort by date.
       if (count($terms) < 2) {
-         $sphinx->setSelect('*, dateinserted as sort');
+         $sphinx->setSelect('*, (dateinserted + 1) as sort');
          $sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'sort');
       } else {
          $funcs = array();
