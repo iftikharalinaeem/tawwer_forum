@@ -101,26 +101,24 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
       $settings = $this->GetSettings();
 
-		$query = $data['SAMLResponse'];
+      $samlResponse = $data['SAMLResponse'];
+//		$samlResponse = gzdeflate(base64_decode($data['SAMLResponse']));
 		$sigAlg = $data['SigAlg'];
 		$signature = $data['Signature'];
-      $signature = base64_decode($signature);
+//      $signature = base64_decode($signature);
       
       $key = new XMLSecurityKey($sigAlg, array('type' => 'public'));
       $key->loadKey($settings->idpPublicCertificate);
-
-		switch ($sigAlg) {
-		case XMLSecurityKey::RSA_SHA1:
-			if ($key->type !== XMLSecurityKey::RSA_SHA1) {
-				throw new Exception('Invalid key type for validating signature on query string.');
-			}
-			if (!$key->verifySignature($query,$signature)) {
-				return false;
-			}
-			break;
-		default:
-			throw new Exception('Unknown signature algorithm: ' . var_export($sigAlg, TRUE));
-		}
+      
+      $signedData = "SAMLResponse=".$samlResponse."&SigAlg=".$sigAlg;
+      $valid = (openssl_verify($signedData, $signature, $settings->idpPublicCertificate) == 1);
+      
+      if ($valid)
+         echo "\n\nvalid!!!\n\n";
+      else
+         echo "\n\nNOT valid!!!\n\n";
+      
+      return $valid;
 	}
    
    /// Event Handlers ///
@@ -151,10 +149,14 @@ class SamlSSOPlugin extends Gdn_Plugin {
          echo "valid";
          var_dump($valid);
          
+         var_dump($get);
+         
          $respnseXml = gzinflate(base64_decode($samlResponse));
          $response = new OneLogin_Saml_Response($settings, base64_encode($respnseXml));
          decho($response);
          die();
+         Gdn::Session()->End();
+         Redirect('/');
       } else {
          $request = new OneLogin_Saml_LogoutRequest($settings);
          $url = $request->getRedirectUrl();
