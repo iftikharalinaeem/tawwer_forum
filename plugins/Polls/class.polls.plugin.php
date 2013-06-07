@@ -31,7 +31,9 @@ class PollsPlugin extends Gdn_Plugin {
     */
    public function Base_BeforeNewDiscussionButton_Handler($Sender) {
       $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
-      if (Gdn::Session()->CheckPermission('Plugins.Polls.Add')) {
+      // Polls is currently incompatible with pre-moderation
+      $DisablePolls = (CheckRestriction('Vanilla.Approval.Require') && !GetValue('Verified', Gdn::Session()->User));
+      if (Gdn::Session()->CheckPermission('Plugins.Polls.Add') && !$DisablePolls) {
          $UrlCode = GetValue('UrlCode', GetValue('Category', $Sender->Data), '');
          $NewDiscussionModule->AddButton(T('New Poll'), '/post/poll/'.$UrlCode);
       }
@@ -175,6 +177,10 @@ class PollsPlugin extends Gdn_Plugin {
       // Check permission 
       $Sender->Permission('Vanilla.Discussions.Add');
       $Sender->Permission('Plugins.Polls.Add');
+      
+      // Polls are not compatible with pre-moderation
+      if (CheckRestriction('Vanilla.Approval.Require') && !GetValue('Verified', Gdn::Session()->User))
+         throw PermissionException();
       
       // Set the model on the form
       $Sender->Form->SetModel($PollModel);

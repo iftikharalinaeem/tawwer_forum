@@ -230,7 +230,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          $SearchTerms = array_filter($SearchTerms, function($v) { return trim($v);  });
       }
       
-      if (method_exists('SearchModel', 'addNotes'))
+      if (Debug() && method_exists('SearchModel', 'addNotes'))
          $calc = function ($r, $t) { return SearchModel::addNotes($r, $t); };
       else
          $calc = function ($r) { return null; };
