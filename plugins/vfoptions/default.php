@@ -375,7 +375,9 @@ pageTracker._trackPageview();
       $PlanPlugins = FALSE;
       if (class_exists('Infrastructure')) {
          $Plan = Infrastructure::Plan();
-         $PlanPlugins = GetValue('Plugins', json_decode(GetValue('Addons', GetValue('Plan', $Plan))));
+         $PlanPlugins = @json_decode(GetValueR('Plan.Addons', $Plan, ''));
+         if ($PlanPlugins)
+            $PlanPlugins = GetValue('Plugins', $PlanPlugins);
       }
       if (!$PlanPlugins) {
          $PlanPlugins = C('VFCom.Plugins.Default', array("ButtonBar","Emotify","Facebook",
@@ -407,27 +409,27 @@ pageTracker._trackPageview();
       $Addons = array_merge($AllowedPlugins, $EnabledPlugins);
       
       // Filter & add conditional data to plugins
-      foreach ($Addons as $Key => $Info) {
+      foreach ($Addons as $Key => &$Info) {
          // Enabled?
-         $Addons[$Key]['Enabled'] = $Enabled = array_key_exists($Key, $EnabledPlugins);
+         $Info['Enabled'] = $Enabled = array_key_exists($Key, $EnabledPlugins);
          
          // Find icon
          if (!$IconUrl = GetValue('IconUrl', $Info)) {
             $IconPath = '/plugins/'.GetValue('Folder', $Info, '').'/icon.png';
             $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'applications/dashboard/design/images/plugin-icon.png';
             $IconPath = file_exists(PATH_ROOT.$IconPath) ? $IconPath : 'plugins/vfoptions/design/plugin-icon.png';
-            $Addons[$Key]['IconUrl'] = $IconPath;
+            $Info['IconUrl'] = $IconPath;
          }
          
          // Toggle button
          if (!$Enabled && in_array($Key, $LockedPlugins)) {
             // Locked plugins need admin intervention to enable. Doesn't stop URL circumvention.
-            $Addons[$Key]['ToggleText'] = 'Contact Us';
-            $Addons[$Key]['ToggleUrl'] = '/dashboard/settings/vanillasupport';
+            $Info['ToggleText'] = 'Contact Us';
+            $Info['ToggleUrl'] = '/dashboard/settings/vanillasupport';
          }
          else {
-            $Addons[$Key]['ToggleText'] = $ToggleText = $Enabled ? 'Disable' : 'Enable';
-            $Addons[$Key]['ToggleUrl'] = "/dashboard/settings/addons/".$Sender->Filter."/".strtolower($ToggleText)."/$Key/".Gdn::Session()->TransientKey();
+            $Info['ToggleText'] = $ToggleText = $Enabled ? 'Disable' : 'Enable';
+            $Info['ToggleUrl'] = "/dashboard/settings/addons/".$Sender->Filter."/".strtolower($ToggleText)."/$Key/".Gdn::Session()->TransientKey();
          }
       }
 
@@ -463,12 +465,12 @@ pageTracker._trackPageview();
       // Get counts
       $PluginCount = 0;
       $EnabledCount = 0;
-      foreach ($Addons as $PluginKey => $Info) {
+      foreach ($Addons as $PluginKey => &$Info) {
          if (GetValue($PluginKey, $AvailablePlugins)) {
             $PluginCount++;
             if (array_key_exists($PluginKey, $EnabledPlugins)) {
                $EnabledCount++;
-               $Addons[$Key]['Enabled'] = TRUE;
+               $Info['Enabled'] = TRUE;
             }
          }
       }
