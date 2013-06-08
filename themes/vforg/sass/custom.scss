@@ -779,6 +779,39 @@ only screen and (                min-resolution: 2dppx) {
 .SpUnansweredQuestions { background-position: -60px -100px; }
 .SpWarn, .SpWarnings { background-position: -200px -20px; }
 
+/// Forms ///
+
+input[type=text],
+input[type=password],
+textarea,
+ul.token-input-list {
+   border-radius: 1px;
+}
+
+.ButtonBar + .TextBoxWrapper textarea {
+   border-radius: 0 0 1px 1px;
+}
+
+.AdvancedSearch {
+   max-width: 700px;
+   
+   .KeywordsWrap {
+      .InputBox,
+      .Button {
+         height: 34px;
+      }
+      
+      .InputBox {
+         border-width: 2px;
+         border-color: #bbb;
+      }
+      
+      .Handle {
+         top: 2px;
+      }
+   }
+}
+
 
 /// Search results ///
 
@@ -794,7 +827,6 @@ only screen and (                min-resolution: 2dppx) {
 }
 
 /// Signatures ///
-
 
 .Signature {
    font-size: 80%;
