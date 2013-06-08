@@ -510,9 +510,9 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('global.js');
       
       if (C('Plugins.Reactions.BestOfStyle', 'Tiles') == 'Tiles') {
-         $Sender->AddJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions'); // I customized this to get proper callbacks.
-         $Sender->AddJsFile('library/jQuery-Wookmark/jquery.imagesloaded.js', 'plugins/Reactions');
-         $Sender->AddJsFile('library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js', 'plugins/Reactions');
+         $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js'); // I customized this to get proper callbacks.
+         $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
+         $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
          $Sender->AddJsFile('tile.js', 'plugins/Reactions');
          $Sender->CssClass .= ' NoPanel';
          $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'tile_items' : 'tiles';
