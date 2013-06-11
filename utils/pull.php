@@ -268,8 +268,24 @@ function removeBadTranslations($arr, $removeEnglish = false) {
    return $result;
 }
 
+function strnatcasecmp2($a, $b) {
+   $la = strtolower($a);
+   $lb = strtolower($b);
+   
+   $c = strnatcmp($la, $lb);
+   if ($c !== 0)
+      return $c;
+   
+   return strnatcmp($a, $b);
+   
+//   for ($i = 0; $i < strlen($a); $i++) {
+//      $ca = $a[$i];
+//      $cb = $
+//   }
+}
+
 function saveDefs(&$defs, $path) {
-   uksort($defs, 'strnatcasecmp');
+   uksort($defs, 'strnatcasecmp2');
    
    // Backup the current file to check for changes.
    if (file_exists($path)) {
@@ -288,7 +304,7 @@ function saveDefs(&$defs, $path) {
    $last = '';
    
    foreach ($defs as $Key => $Value) {
-      $curr = substr($Key, 0, 1);
+      $curr = strtolower(substr($Key, 0, 1));
       
       if ($curr !== $last)
          fwrite($fp, "\n");
@@ -319,18 +335,21 @@ function generateFilesFromDb($locale) {
    
    $missing = array();
 
-   echo "Generating $locale from db...";
+   echo "Generating $locale from db.\n";
    
    foreach ($files as $file) {
-      echo $file.' ';
-      $path = dirname(__FILE__)."/vf_{$slug}/{$file}_core.php";
+      $path = getcwd()."/vf_{$slug}/{$file}_core.php";
+      
+      echo "  $path";
 
       $r = generateFileFromDb($locale, $path, $file, $missing);
 
       if (!$r)
-         echo '(not changed) ';
-      else
+         echo " (not changed)";
+      else 
          $changed = true;
+      
+      echo "\n";
    }
    
    @unlink(dirname(__FILE__)."/vf_{$slug}/bad_defs.php");
@@ -375,12 +394,21 @@ function loadTranslationsFromDb($locale, $type) {
    }
    
    // Load the stuff from the db.
-   $sql = "select
-      c.Name,
-      t.Translation
-   from GDN_LocaleCode c
-   join GDN_LocaleTranslation t
-      on c.CodeID = t.CodeID and t.Locale = :Locale";
+   if ($locale === 'en-CA') {
+      $sql = "select
+         c.Name,
+         coalesce(t.Translation, c.Name) as Translation
+      from GDN_LocaleCode c
+      left join GDN_LocaleTranslation t
+         on c.CodeID = t.CodeID and t.Locale = :Locale";
+   } else {
+      $sql = "select
+         c.Name,
+         t.Translation
+      from GDN_LocaleCode c
+      join GDN_LocaleTranslation t
+         on c.CodeID = t.CodeID and t.Locale = :Locale";
+   }
    
    $where = array();
    
