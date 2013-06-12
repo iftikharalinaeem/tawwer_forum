@@ -119,7 +119,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     * @param type $Args
     */
    public function Gdn_Smarty_Init_Handler($Sender, $Args) {
-      $Sender->register_function('searchbox', 'searchBoxAdvancedSmarty');
+      $Sender->register_function('searchbox_advanced', 'searchBoxAdvanced');
    }
    
    public function SearchController_AutoComplete_Create($sender, $term, $limit = 5) {
@@ -423,39 +423,15 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
 if (!function_exists('searchBoxAdvanced')):
    
-function searchBoxAdvanced($advanced = true, $options = array()) {
+function searchBoxAdvanced($options = array()) {
    $options = array_merge(array(
       'placeholder' => T('SearchBoxPlaceHolder', 'Search'),
       'value' => null,
       ), $options);
    
-   if ($advanced) {
-      echo Gdn_Theme::Module('AdvancedSearchModule', array('value' => $options['value']));
-   } else {
-      $Form = new Gdn_Form();
-      $Form->InputPrefix = '';
-      $Result =
-         $Form->Open(array('action' => Url('/search'), 'method' => 'get')).
-         $Form->TextBox('Search', array('placeholder' => $options['placeholder'])).
-         $Form->Button('Go', array('Name' => '')).
-         $Form->Close();
-   }
+   echo Gdn_Theme::Module('AdvancedSearchModule', array('value' => $options['value']));
 
    return $Result;
 }
    
-endif;
-
-
-if (!function_exists('searchBoxAdvancedSmarty')):
-
-function searchBoxAdvancedSmarty($params, &$smarty) {
-   $params = array_merge(
-      array('advanced' => false),
-      $params
-      );
-   
-   return searchBoxAdvanced($params['advanced'], $params);
-}
-
 endif;
