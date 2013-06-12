@@ -164,7 +164,7 @@ class ReactionsPlugin extends Gdn_Plugin {
    /* New Html method of adding to discussion filters */
    public function Base_AfterDiscussionFilters_Handler($Sender) {
       echo '<li class="Reactions-BestOf">'
-			.Anchor(Sprite('SpBestOf').' '.T('Best of...'), '/bestof/everything', '')
+			.Anchor(Sprite('SpBestOf').' '.T('Best Of...'), '/bestof/everything', '')
 		.'</li>';
    }
    
