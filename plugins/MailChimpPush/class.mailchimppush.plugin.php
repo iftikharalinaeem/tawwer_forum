@@ -18,7 +18,7 @@ $PluginInfo['MailChimpPush'] = array(
    'Author' => 'Tim Gunter',
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl' => 'http://about.me/timgunter',
-   'SettingsUrl' => '/plugin/mailchimppush'
+   'SettingsUrl' => '/plugin/mailchimp'
 );
 
 class MailChimpPushPlugin extends Gdn_Plugin {
