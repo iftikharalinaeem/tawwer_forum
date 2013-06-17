@@ -43,7 +43,7 @@ $Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Sort' =>
 $Rm->DefineReactionType(array('UrlCode' => 'Promote', 'Name' => 'Promote', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 3, 'Permission' => 'Garden.Curation.Manage',
    'Description' => "Moderators have the ability to promote the best posts in the community. This way they can be featured for new visitors."));
 
-$Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic', 'Sort' => 1, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
+$Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic', 'Sort' => 1, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
    'Description' => "Off topic posts are not releveant to the topic being discussed. If a post gets enough off-topic votes then it will be buried so it won't derail the discussion."));
 $Rm->DefineReactionType(array('UrlCode' => 'Insightful', 'Name' => 'Insightful', 'Sort' => 2, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => "Insightful comments bring new information or perspective to the discussion and increase the value of the conversation as a whole."));
@@ -63,7 +63,7 @@ $Rm->DefineReactionType(array('UrlCode' => 'Down', 'Name' => 'Vote Down', 'Sort'
 $Rm->DefineReactionType(array('UrlCode' => 'Up', 'Name' => 'Vote Up', 'Sort' => 8, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => "An up vote is a general approval of a post. Enough up votes will promote a post."));
 
-$Rm->DefineReactionType(array('UrlCode' => 'WTF', 'Name' => 'WTF', 'Sort' => 9, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
+$Rm->DefineReactionType(array('UrlCode' => 'WTF', 'Name' => 'WTF', 'Sort' => 9, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
    'Description' => 'WTF stands for "What the Fuh?" You usually react this way when a post makes absolutely no sense.'));
 $Rm->DefineReactionType(array('UrlCode' => 'Awesome', 'Name' => 'Awesome', 'Sort' => 10, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => 'Awesome posts amaze you. You want to repeat them to your friends and remember them later.'));
@@ -72,7 +72,7 @@ $Rm->DefineReactionType(array('UrlCode' => 'LOL', 'Name' => 'LOL', 'Sort' => 11,
 
 if (!$ReactionTypeExists) {
    // Activate the default reactions.
-   $Defaults = array('Spam', 'Abuse', 'Troll', 'Promote', 'OffTopic', 'Disagree', 'Agree', 'Like');
+   $Defaults = array('Spam', 'Abuse', 'Promote', 'LOL', 'Disagree', 'Agree', 'Like');
    $Sql->Update('ReactionType')
       ->Set('Active', 1)
       ->WhereIn('UrlCode', $Defaults)

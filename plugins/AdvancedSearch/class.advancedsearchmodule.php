@@ -19,6 +19,8 @@ class AdvancedSearchModule extends Gdn_Module {
    
    public $Types = array();
    
+   public $value = null;
+   
    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
       $this->_ApplicationFolder = 'plugins/AdvancedSearch';
       
@@ -58,9 +60,13 @@ class AdvancedSearchModule extends Gdn_Module {
       // We want the advanced search form to populate from the get and have lowercase fields.
       $Form = $this->Form = new Gdn_Form();
       $Form->Method = 'get';
+      $Get = array_change_key_case(Gdn::Request()->Get());
+      
       if ($this->Results) {
-         $Get = array_change_key_case(Gdn::Request()->Get());
          $Form->FormValues($Get);
+      } else {
+         if ($this->value !== null && !isset($Get['search']))
+            $Form->SetFormValue('search', $value);
       }
       
       // See whether or not to check all of the  types.

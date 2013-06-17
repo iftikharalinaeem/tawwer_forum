@@ -2,9 +2,9 @@
 // Add file extension to hashed phpBB attachment filenames
 
 $Database = 'ynab';
-$Directory = '/www/YNAB/';
+$Directory = '/www/ynab/files';
 
-mysqli_connect('localhost', 'root', 'root');
+mysqli_connect('localhost', 'root', '');
 mysqli_select_db($Database);
 $r = mysqli_query("select physical_filename as name, extension as ext from phpbb_attachments");
 $renamed = 0;

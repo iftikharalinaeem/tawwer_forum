@@ -1058,29 +1058,61 @@ a.Bookmarking {
   background-position: -200px -20px;
 }
 
-/* line 786, ../sass/custom.scss */
+/* line 787, ../sass/custom.scss */
+input[type=text],
+input[type=password],
+textarea,
+ul.token-input-list {
+  border-radius: 1px;
+}
+
+/* line 791, ../sass/custom.scss */
+.ButtonBar + .TextBoxWrapper textarea {
+  border-radius: 0 0 1px 1px;
+}
+
+/* line 795, ../sass/custom.scss */
+.AdvancedSearch {
+  max-width: 700px;
+}
+/* line 800, ../sass/custom.scss */
+.AdvancedSearch .KeywordsWrap .InputBox,
+.AdvancedSearch .KeywordsWrap .Button {
+  height: 34px;
+}
+/* line 804, ../sass/custom.scss */
+.AdvancedSearch .KeywordsWrap .InputBox {
+  border-width: 2px;
+  border-color: #bbb;
+}
+/* line 809, ../sass/custom.scss */
+.AdvancedSearch .KeywordsWrap .Handle {
+  top: 2px;
+}
+
+/* line 819, ../sass/custom.scss */
 .Section-SearchResults #Panel {
   display: none;
 }
-/* line 790, ../sass/custom.scss */
+/* line 823, ../sass/custom.scss */
 .Section-SearchResults #Content {
   margin: 0 auto;
   max-width: 800px;
 }
 
-/* line 799, ../sass/custom.scss */
+/* line 831, ../sass/custom.scss */
 .Signature {
   font-size: 80%;
   opacity: .8;
   line-height: 1.2;
 }
-/* line 804, ../sass/custom.scss */
+/* line 836, ../sass/custom.scss */
 .Item-Body .Signature {
   border-top: solid 1px #777;
   margin-top: 15px;
   padding-top: 5px;
 }
-/* line 809, ../sass/custom.scss */
+/* line 841, ../sass/custom.scss */
 .Item-Body .Signature :first-child {
   margin-top: 0;
 }

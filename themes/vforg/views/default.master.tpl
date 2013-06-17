@@ -46,7 +46,7 @@
             </div>
             <div class="Column ContentColumn" id="Content">
                {if InSection(array('DiscussionList', 'CategoryList'))}
-                  <div class="SiteSearch">{searchbox}</div>
+                  {searchbox_advanced}
                {/if}
                {asset name="Content"}
             </div>
