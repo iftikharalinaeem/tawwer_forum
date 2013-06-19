@@ -35,6 +35,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
 		if ($Sender->Form->IsPostBack()) {
 			$Database = $Sender->Form->GetFormValue('Database');
 			$Prefix = $Sender->Form->GetFormValue('Prefix');
+         $this->MergeCategories = ($Sender->Form->GetFormValue('MergeCategories')) ? TRUE : FALSE;
 			$this->MergeForums($Database, $Prefix);
 		}
 		
@@ -108,31 +109,39 @@ class ForumMergePlugin implements Gdn_IPlugin {
 			select r.RoleID, u.UserID 
 			from '.$NewPrefix.'User u, '.$NewPrefix.'Role r, `'.$OldDatabase.'`.'.$OldPrefix.'UserRole ur
 			where u.OldID = (ur.UserID) and r.OldID = (ur.RoleID)');
-		
-      
+
+
       
 		// CATEGORIES //
 		$CategoryColumns = $this->GetColumns('Category', $OldDatabase, $OldPrefix);
-      
-      // Merge IDs of duplicate category names
-      Gdn::SQL()->Query('update '.$NewPrefix.'Category c set c.OldID = 
-         (select c2.CategoryID from `'.$OldDatabase.'`.'.$OldPrefix.'Category c2 where c2.Name = c.Name)');
-      
-      // Copy non-duplicate categories
-      Gdn::SQL()->Query('insert into '.$NewPrefix.'Category ('.$CategoryColumns.', OldID) 
+
+      if ($this->MergeCategories) {
+         // Merge IDs of duplicate category names
+         Gdn::SQL()->Query('update '.$NewPrefix.'Category c set c.OldID =
+            (select c2.CategoryID from `'.$OldDatabase.'`.'.$OldPrefix.'Category c2 where c2.Name = c.Name)');
+
+         // Copy non-duplicate categories
+         Gdn::SQL()->Query('insert into '.$NewPrefix.'Category ('.$CategoryColumns.', OldID)
+            select '.$CategoryColumns.', CategoryID
+            from `'.$OldDatabase.'`.'.$OldPrefix.'Category
+            where Name not in (select Name from '.$NewPrefix.'Category)');
+      }
+      else {
+         // Import categories
+         Gdn::SQL()->Query('insert into '.$NewPrefix.'Category ('.$CategoryColumns.', OldID)
          select '.$CategoryColumns.', CategoryID
-         from `'.$OldDatabase.'`.'.$OldPrefix.'Category
-         where Name not in (select Name from '.$NewPrefix.'Category)');
-      
+            from `'.$OldDatabase.'`.'.$OldPrefix.'Category');
+      }
+
       // Update ParentCategoryIDs
       //
       //
-      
+
 		// UserCategory
-		// 
-		// 
+		//
+		//
 		
-		
+
 		
 		// DISCUSSIONS //
 	   $DiscussionColumns = $this->GetColumns('Discussion', $OldDatabase, $OldPrefix);
