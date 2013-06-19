@@ -67,10 +67,10 @@
    </p>
    <ol>
       <li>
-         Try and have a mix of good and bad reactions.
+         Don't use too many reactions. You don't  want to give your users information overload.
       </li>
       <li>
-         Don't use too many reactions. You don't  want to give your users information overload.
+         We recommend mostly positive reactions to encourage participation.
       </li>
    </ol>
 </div>
