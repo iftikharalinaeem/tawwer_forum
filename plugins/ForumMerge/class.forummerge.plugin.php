@@ -299,6 +299,21 @@ class ForumMergePlugin implements Gdn_IPlugin {
 		// LastCommentID
 	}
 
+   /**
+    * Nuke every OldID column before a second merge.
+    */
+   public function UtilityController_MergeReset_Create() {
+      Gdn::SQL()->Update('Activity')->Set('OldID', NULL)->Put();
+      Gdn::SQL()->Update('Category')->Set('OldID', NULL)->Put();
+      Gdn::SQL()->Update('Comment')->Set('OldID', NULL)->Put();
+      Gdn::SQL()->Update('Conversation')->Set('OldID', NULL)->Put();
+      Gdn::SQL()->Update('ConversationMessage')->Set('OldID', NULL)->Put();
+      Gdn::SQL()->Update('Discussion')->Set('OldID', NULL)->Put();
+      Gdn::SQL()->Update('Media')->Set('OldID', NULL)->Put();
+      Gdn::SQL()->Update('Media')->Set('OldID', NULL)->Put();
+      Gdn::SQL()->Update('User')->Set('OldID', NULL)->Put();
+   }
+
    public function Setup() {
    	Gdn::Structure()->Table('Activity')->Column('OldID', 'int', TRUE, 'key')->Set();
    	Gdn::Structure()->Table('Category')->Column('OldID', 'int', TRUE, 'key')->Set();
