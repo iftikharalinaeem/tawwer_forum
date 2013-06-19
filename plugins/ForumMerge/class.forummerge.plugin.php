@@ -74,18 +74,18 @@ class ForumMergePlugin implements Gdn_IPlugin {
 		
 		// Merge IDs of duplicate users
 		Gdn::SQL()->Query('update '.$NewPrefix.'User u set u.OldID = 
-			(select u2.UserID from `'.$OldDatabase.'.'.$OldPrefix.'User` u2 where u2.Email = u.Email limit 1)');
+			(select u2.UserID from `'.$OldDatabase.'`.'.$OldPrefix.'User u2 where u2.Email = u.Email limit 1)');
 		
 		// Copy non-duplicate users
 		Gdn::SQL()->Query('insert into '.$NewPrefix.'User ('.$UserColumns.', OldID) 
 			select '.$UserColumns.', UserID 
-			from `'.$OldDatabase.'.'.$OldPrefix.'User`
+			from `'.$OldDatabase.'`.'.$OldPrefix.'User
 			where Email not in (select Email from '.$NewPrefix.'User)');
       
       // UserMeta
       Gdn::SQL()->Query('insert ignore into '.$NewPrefix.'UserMeta (UserID, Name, Value) 
          select u.UserID, um.Name, um.Value
-         from '.$NewPrefix.'User u, `'.$OldDatabase.'.'.$OldPrefix.'UserMeta` um
+         from '.$NewPrefix.'User u, `'.$OldDatabase.'`.'.$OldPrefix.'UserMeta um
          where u.OldID = um.UserID');
 
 
@@ -95,18 +95,18 @@ class ForumMergePlugin implements Gdn_IPlugin {
 		
 		// Merge IDs of duplicate roles
 		Gdn::SQL()->Query('update '.$NewPrefix.'Role r set r.OldID = 
-			(select r2.RoleID from `'.$OldDatabase.'.'.$OldPrefix.'Role` r2 where r2.Name = r.Name)');
+			(select r2.RoleID from `'.$OldDatabase.'`.'.$OldPrefix.'Role r2 where r2.Name = r.Name)');
 		
 		// Copy non-duplicate roles
 		Gdn::SQL()->Query('insert into '.$NewPrefix.'Role ('.$RoleColumns.', OldID) 
 			select '.$RoleColumns.', RoleID 
-			from `'.$OldDatabase.'.'.$OldPrefix.'Role`
+			from `'.$OldDatabase.'`.'.$OldPrefix.'Role
 			where Name not in (select Name from '.$NewPrefix.'Role)');
 		
 		// UserRole
 		Gdn::SQL()->Query('insert ignore into '.$NewPrefix.'UserRole (RoleID, UserID) 
 			select r.RoleID, u.UserID 
-			from '.$NewPrefix.'User u, '.$NewPrefix.'Role r, `'.$OldDatabase.'.'.$OldPrefix.'UserRole` ur
+			from '.$NewPrefix.'User u, '.$NewPrefix.'Role r, `'.$OldDatabase.'`.'.$OldPrefix.'UserRole ur
 			where u.OldID = (ur.UserID) and r.OldID = (ur.RoleID)');
 		
       
@@ -116,12 +116,12 @@ class ForumMergePlugin implements Gdn_IPlugin {
       
       // Merge IDs of duplicate category names
       Gdn::SQL()->Query('update '.$NewPrefix.'Category c set c.OldID = 
-         (select c2.CategoryID from `'.$OldDatabase.'.'.$OldPrefix.'Category` c2 where c2.Name = c.Name)');
+         (select c2.CategoryID from `'.$OldDatabase.'`.'.$OldPrefix.'Category c2 where c2.Name = c.Name)');
       
       // Copy non-duplicate categories
       Gdn::SQL()->Query('insert into '.$NewPrefix.'Category ('.$CategoryColumns.', OldID) 
          select '.$CategoryColumns.', CategoryID
-         from `'.$OldDatabase.'.'.$OldPrefix.'Category`
+         from `'.$OldDatabase.'`.'.$OldPrefix.'Category
          where Name not in (select Name from '.$NewPrefix.'Category)');
       
       // Update ParentCategoryIDs
@@ -140,7 +140,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
       // Copy over all discussions
       Gdn::SQL()->Query('insert into '.$NewPrefix.'Discussion ('.$DiscussionColumns.', OldID) 
          select '.$DiscussionColumns.', DiscussionID 
-         from `'.$OldDatabase.'.'.$OldPrefix.'Discussion`');
+         from `'.$OldDatabase.'`.'.$OldPrefix.'Discussion');
       
       // Convert imported discussions to use new UserIDs
       Gdn::SQL()->Query('update '.$NewPrefix.'Discussion d
@@ -157,7 +157,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
       Gdn::SQL()->Query('insert ignore into '.$NewPrefix.'UserDiscussion 
             (DiscussionID, UserID, Score, CountComments, DateLastViewed, Dismissed, Bookmarked) 
          select d.DiscussionID, u.UserID, ud.Score, ud.CountComments, ud.DateLastViewed, ud.Dismissed, ud.Bookmarked
-         from '.$NewPrefix.'User u, '.$NewPrefix.'Discussion d, `'.$OldDatabase.'.'.$OldPrefix.'UserDiscussion` ud
+         from '.$NewPrefix.'User u, '.$NewPrefix.'Discussion d, `'.$OldDatabase.'`.'.$OldPrefix.'UserDiscussion ud
          where u.OldID = (ud.UserID) and d.OldID = (ud.DiscussionID)');    
       
       
@@ -168,7 +168,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
       // Copy over all comments
       Gdn::SQL()->Query('insert into '.$NewPrefix.'Comment ('.$CommentColumns.', OldID) 
          select '.$CommentColumns.', CommentID 
-         from `'.$OldDatabase.'.'.$OldPrefix.'Comment`');
+         from `'.$OldDatabase.'`.'.$OldPrefix.'Comment');
             
       // Convert imported comments to use new UserIDs
       Gdn::SQL()->Query('update '.$NewPrefix.'Comment c
@@ -191,7 +191,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
 		// Copy over all media
       Gdn::SQL()->Query('insert into '.$NewPrefix.'Media ('.$MediaColumns.', OldID) 
          select '.$MediaColumns.', MediaID 
-         from `'.$OldDatabase.'.'.$OldPrefix.'Media`');
+         from `'.$OldDatabase.'`.'.$OldPrefix.'Media');
 		
       // InsertUserID
       Gdn::SQL()->Query('update '.$NewPrefix.'Media m
@@ -214,7 +214,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
       // Copy over all Conversations
       Gdn::SQL()->Query('insert into '.$NewPrefix.'Conversation ('.$ConversationColumns.', OldID) 
          select '.$ConversationColumns.', ConversationID 
-         from `'.$OldDatabase.'.'.$OldPrefix.'Conversation`');
+         from `'.$OldDatabase.'`.'.$OldPrefix.'Conversation');
       // InsertUserID
       Gdn::SQL()->Query('update '.$NewPrefix.'Conversation c
         set c.InsertUserID = (SELECT u.UserID from '.$NewPrefix.'User u where u.OldID = c.InsertUserID)
@@ -256,7 +256,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
       Gdn::SQL()->Query('insert into '.$NewPrefix.'ConversationMessage (ConversationID,Body,Format,
             InsertUserID,DateInserted,InsertIPAddress,OldID) 
          select ConversationID,Body,Format,InsertUserID,DateInserted,InsertIPAddress,MessageID 
-         from `'.$OldDatabase.'.'.$OldPrefix.'ConversationMessage`');
+         from `'.$OldDatabase.'`.'.$OldPrefix.'ConversationMessage');
       // ConversationID
       Gdn::SQL()->Query('update '.$NewPrefix.'ConversationMessage cm
         set cm.ConversationID = 
@@ -284,7 +284,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
             Bookmarked, Deleted, DateConversationUpdated) 
          select c.ConversationID, u.UserID,  uc.CountReadMessages, uc.DateLastViewed, uc.DateCleared, 
             uc.Bookmarked, uc.Deleted, uc.DateConversationUpdated
-         from '.$NewPrefix.'User u, '.$NewPrefix.'Conversation c, `'.$OldDatabase.'.'.$OldPrefix.'UserConversation` uc
+         from '.$NewPrefix.'User u, '.$NewPrefix.'Conversation c, `'.$OldDatabase.'`.'.$OldPrefix.'UserConversation uc
          where u.OldID = (uc.UserID) and c.OldID = (uc.ConversationID)');    
 		
       
