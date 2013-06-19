@@ -364,6 +364,7 @@ class SearchModel extends Gdn_Model {
       
       $Results = $this->GetDocuments($Search);
       $Total = $Total = GetValue('total', $Search);
+      Gdn::Controller()->SetData('RecordCount', $Total);
       $SearchTerms = GetValue('words', $Search);
       if (is_array($SearchTerms))
          $SearchTerms = array_keys($SearchTerms);
