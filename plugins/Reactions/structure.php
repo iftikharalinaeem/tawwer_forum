@@ -67,7 +67,7 @@ $Rm->DefineReactionType(array('UrlCode' => 'WTF', 'Name' => 'WTF', 'Sort' => 9, 
    'Description' => 'WTF stands for "What the Fuh?" You usually react this way when a post makes absolutely no sense.'));
 $Rm->DefineReactionType(array('UrlCode' => 'Awesome', 'Name' => 'Awesome', 'Sort' => 10, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => 'Awesome posts amaze you. You want to repeat them to your friends and remember them later.'));
-$Rm->DefineReactionType(array('UrlCode' => 'LOL', 'Name' => 'LOL', 'Sort' => 11, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
+$Rm->DefineReactionType(array('UrlCode' => 'LOL', 'Name' => 'LOL', 'Sort' => 11, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 0,
    'Description' => 'For posts that make you "laugh out loud." Funny content is almost always good and is rewarded with points and promotion.'));
 
 if (!$ReactionTypeExists) {

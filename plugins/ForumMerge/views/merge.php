@@ -15,6 +15,11 @@ echo $this->Form->Errors();
       echo $this->Form->TextBox('Prefix');
       ?>
    </li>
+   <li>
+      <?php
+      echo $this->Form->CheckBox('MergeCategories', T('Merge categories'));
+      ?>
+   </li>
 </ul>
 <?php
 echo $this->Form->Close('Begin');
