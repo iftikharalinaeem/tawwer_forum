@@ -115,7 +115,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
 		// CATEGORIES //
 		$CategoryColumns = $this->GetColumns('Category', $OldDatabase, $OldPrefix);
 
-      if ($this->MergeCategories) {
+      /*if ($this->MergeCategories) {
          // Merge IDs of duplicate category names
          Gdn::SQL()->Query('update '.$NewPrefix.'Category c set c.OldID =
             (select c2.CategoryID from `'.$OldDatabase.'`.'.$OldPrefix.'Category c2 where c2.Name = c.Name)');
@@ -126,12 +126,37 @@ class ForumMergePlugin implements Gdn_IPlugin {
             from `'.$OldDatabase.'`.'.$OldPrefix.'Category
             where Name not in (select Name from '.$NewPrefix.'Category)');
       }
-      else {
+      else {*/
          // Import categories
          Gdn::SQL()->Query('insert into '.$NewPrefix.'Category ('.$CategoryColumns.', OldID)
          select '.$CategoryColumns.', CategoryID
-            from `'.$OldDatabase.'`.'.$OldPrefix.'Category');
-      }
+            from `'.$OldDatabase.'`.'.$OldPrefix.'Category
+            where Name <> "Root"');
+
+         // Remap hierarchy in the ugliest way possible
+         $CategoryMap = array();
+         $Categories = Gdn::SQL()->Select('CategoryID')
+            ->Select('ParentCategoryID')
+            ->Select('OldID')
+            ->From('Category')
+            ->Where(array('OldID >' => 0))
+            ->Get()->Result(DATASET_TYPE_ARRAY);
+         foreach ($Categories as $Category) {
+            $CategoryMap[$Category['OldID']] = $Category['CategoryID'];
+         }
+         foreach ($Categories as $Category) {
+            if ($Category['ParentCategoryID'] > 0) {
+               $ParentID = $CategoryMap[$Category['ParentCategoryID']];
+               Gdn::SQL()->Update('Category')
+                  ->Set(array('ParentCategoryID' => $ParentID))
+                  ->Where(array('CategoryID' => $Category['CategoryID']))
+                  ->Put();
+            }
+         }
+         $CategoryModel = new CategoryModel();
+         $CategoryModel->RebuildTree();
+
+      //}
 
       // Update ParentCategoryIDs
       //
