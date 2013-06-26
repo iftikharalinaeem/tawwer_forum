@@ -51,9 +51,20 @@ AUTHNREQUEST;
 
         $deflatedRequest = gzdeflate($request);
         $base64Request = base64_encode($deflatedRequest);
-        $encodedRequest = urlencode($base64Request);
-
-        return $this->_settings->idpSingleSignOutUrl . "?SAMLRequest=" . $encodedRequest;
+        $get = array('SAMLRequest' => $base64Request);
+        
+        $this->signRequest($get);
+        
+        return $this->_settings->idpSingleSignOutUrl.'?'.http_build_query($get);
+    }
+    
+    public function signRequest(&$get) {
+       // Construct the string.
+       $get['SigAlg'] = XMLSecurityKey::RSA_SHA1;
+       $msg = http_build_query($get);
+       $key = new XMLSecurityKey($get['SigAlg'], array('type' => 'private'));
+       $key->loadKey($this->_settings->spPrivateKey, false, false);
+       $get['Signature'] = base64_encode($key->signData($msg));
     }
 
     protected function _generateUniqueID()

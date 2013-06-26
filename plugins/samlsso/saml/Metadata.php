@@ -33,10 +33,21 @@ class OneLogin_Saml_Metadata
         $validUntil = $this->_getMetadataValidTimestamp();
         
         $signoutElem = '';
-        if ($this->_settings->idpSingleSignOutUrl)
+        if ($this->_settings->idpSingleSignOutUrl) {
+           $signoutUrl = Url('/entry/signout', TRUE);
+           
            $signoutElem = <<<EOT
-<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="{$this->_settings->idpSingleSignOutUrl}"/>
+<md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="{$signoutUrl}"/>
 EOT;
+        }
+        
+        $signingElem = '';
+        $encryptionElem = '';
+        
+        if ($this->_settings->spCertificate) {
+           $signingElem = $this->keyDescriptor($this->_settings->spCertificate, 'signing');
+           $encryptionElem = $this->keyDescriptor($this->_settings->spCertificate, 'encryption');
+        }
 
         return <<<METADATA_TEMPLATE
 <?xml version="1.0"?>
@@ -44,6 +55,8 @@ EOT;
                      validUntil="$validUntil"
                      entityID="{$this->_settings->spIssuer}">
     <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        $signingElem
+        $encryptionElem
         <md:NameIDFormat>{$this->_settings->requestedNameIdFormat}</md:NameIDFormat>
         $signoutElem
         <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
@@ -52,6 +65,23 @@ EOT;
     </md:SPSSODescriptor>
 </md:EntityDescriptor>
 METADATA_TEMPLATE;
+    }
+    
+    protected static function keyDescriptor($cert, $use = 'signing') {
+       $x509 = openssl_x509_read($cert);
+       openssl_x509_export($x509, $str_cert);
+       $str_cert = SamlSSOPlugin::TrimCert($str_cert);
+       
+       $result = <<<EOT
+<md:KeyDescriptor use="$use">
+   <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+      <ds:X509Data>
+         <ds:X509Certificate>$str_cert</ds:X509Certificate>
+      </ds:X509Data>
+   </ds:KeyInfo>
+</md:KeyDescriptor>
+EOT;
+       return $result;
     }
 
     protected function _getMetadataValidTimestamp()
