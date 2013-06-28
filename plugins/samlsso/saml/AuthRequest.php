@@ -57,13 +57,20 @@ AUTHNREQUEST;
         $deflatedRequest = gzdeflate($request);
         $base64Request = base64_encode($deflatedRequest);
         $get = array('SAMLRequest' => $base64Request);
-        
-        $this->signRequest($get);
+       
+        try {
+            $this->signRequest($get);
+        } catch (Exception $ex) {
+           // do nothing.
+        }
         
         return $this->_settings->idpSingleSignOnUrl.'?'.http_build_query($get);
     }
     
     public function signRequest(&$get) {
+       if (!$this->_settings->spPrivateKey)
+          return;
+       
        // Construct the string.
        $get['SigAlg'] = XMLSecurityKey::RSA_SHA1;
        $msg = http_build_query($get);

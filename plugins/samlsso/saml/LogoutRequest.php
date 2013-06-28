@@ -49,16 +49,23 @@ class OneLogin_Saml_LogoutRequest
 </samlp:LogoutRequest>
 AUTHNREQUEST;
 
-        $deflatedRequest = gzdeflate($request);
-        $base64Request = base64_encode($deflatedRequest);
-        $get = array('SAMLRequest' => $base64Request);
-        
-        $this->signRequest($get);
-        
-        return $this->_settings->idpSingleSignOutUrl.'?'.http_build_query($get);
+      $deflatedRequest = gzdeflate($request);
+      $base64Request = base64_encode($deflatedRequest);
+      $get = array('SAMLRequest' => $base64Request);
+
+      try {
+         $this->signRequest($get);
+      } catch (Exception $ex) {
+
+      }
+
+      return $this->_settings->idpSingleSignOutUrl.'?'.http_build_query($get);
     }
     
     public function signRequest(&$get) {
+       if (!$this->_settings->spPrivateKey)
+          return;
+       
        // Construct the string.
        $get['SigAlg'] = XMLSecurityKey::RSA_SHA1;
        $msg = http_build_query($get);
