@@ -8,7 +8,7 @@
 $PluginInfo['Ranks'] = array(
    'Name' => 'Ranks',
    'Description' => "Adds user ranks to the application.",
-   'Version' => '1.1.7',
+   'Version' => '1.1.8',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -153,6 +153,13 @@ class RanksPlugin extends Gdn_Plugin {
    }
    
    public function ProfileController_EditMyAccountAfter_Handler($Sender, $Args) {
+      $this->AddManualRanks($Sender);
+   }
+   public function UserController_CustomUserFields_Handler($Sender, $Argds) {
+      $this->AddManualRanks($Sender);
+   }
+   
+   protected function AddManualRanks($Sender) {
       if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
          return;
       }

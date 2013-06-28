@@ -52,6 +52,18 @@ class OneLogin_Saml_Settings
      * @var string
      */
     public $spIssuer = 'php-saml';
+    
+    /**
+     * The x509 private key used to sign requests.
+     * @var string 
+     */
+    public $spPrivateKey = '';
+    
+    /**
+     * The x509 public key sent to authenticate signed requests.
+     * @var string 
+     */
+    public $spCertificate = '';
 
     /**
      * Specifies what format to return the authentication token, i.e, the email address.
