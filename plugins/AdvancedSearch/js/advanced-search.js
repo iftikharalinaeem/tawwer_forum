@@ -133,7 +133,7 @@ jQuery(document).ready(function($) {
     $author.tokenInput(gdn.url('/user/tagsearch'), {
         hintText: gdn.definition("TagHint", "Start to type..."),
         tokenValue: 'name',
-        searchingText: '', // search text give flickery ux, don't like
+        searchingText: '', // search text gives flickery ux, don't like
         searchDelay: 300,
         minChars: 1,
         maxLength: 25,

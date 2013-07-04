@@ -3,7 +3,7 @@
 $PluginInfo['samlsso'] = array(
     'Name' => 'SAML SSO',
     'Description' => 'SAML SSO for Vanilla',
-    'Version' => '1.0a',
+    'Version' => '1.0b',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -28,11 +28,13 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $provider = $this->Provider();
       $settings->idpSingleSignOnUrl = $provider['SignInUrl'];
       $settings->idpSingleSignOutUrl = $provider['SignOutUrl'];
-      $settings->idpPublicCertificate = self::TrimCert($provider['AssociationSecret']);
+      $settings->idpPublicCertificate = $provider['AssociationSecret'];
       $settings->requestedNameIdFormat = $provider['IdentifierFormat'];
       $settings->spIssuer = GetValue('EntityID', $provider, $provider['Name']);
       $settings->spReturnUrl = Url('/entry/connect/saml', TRUE);
       $settings->spSignoutReturnUrl = Url('/entry/signout', TRUE);
+      $settings->spPrivateKey = GetValue('SpPrivateKey', $provider);
+      $settings->spCertificate = GetValue('SpCertificate', $provider);
       
       return $settings;
    }
@@ -64,8 +66,18 @@ class SamlSSOPlugin extends Gdn_Plugin {
    }
    
    public static function TrimCert($cert) {
-//      $x509 = openssl_x509_read($cert);
-//      openssl_x509_export($x509, $cert);
+      $cert = preg_replace('`-----[^-]*-----`i', '', $cert);
+      $cert = trim(str_replace(array("\r", "\n"), '', $cert));
+      return $cert;
+   }
+   
+   public static function UntrimCert($cert, $type = 'CERTIFICATE') {
+      if (strpos($cert, '---BEGIN') === FALSE) {
+         // Convert the secret to a proper x509 certificate.
+         $x509cert = trim(str_replace(array("\r", "\n"), "", $cert));
+         $x509cert = "-----BEGIN $type-----\n".chunk_split($x509cert, 64, "\n")."-----END $type-----\n";
+         $cert = $x509cert;
+      }
       return $cert;
    }
    
@@ -95,28 +107,22 @@ class SamlSSOPlugin extends Gdn_Plugin {
 	 * @param XMLSecurityKey $key  The key we should validate the query against.
 	 */
 	public function validateSignature(array $data) {
-		assert('array_key_exists("SAMLResponse", $data)');
-		assert('array_key_exists("SigAlg", $data)');
-		assert('array_key_exists("Signature", $data)');
-
+      if (!array_key_exists('SAMLResponse', $data) || !array_key_exists('SigAlg', $data) || !array_key_exists('Signature', $data))
+         return false;
+      
       $settings = $this->GetSettings();
-
-      $samlResponse = $data['SAMLResponse'];
-//		$samlResponse = gzdeflate(base64_decode($data['SAMLResponse']));
+      
 		$sigAlg = $data['SigAlg'];
 		$signature = $data['Signature'];
-//      $signature = base64_decode($signature);
+      $signature = base64_decode($signature);
       
       $key = new XMLSecurityKey($sigAlg, array('type' => 'public'));
-      $key->loadKey($settings->idpPublicCertificate);
+      $key->loadKey($settings->idpPublicCertificate, false, true);
+
+      $msgData = array('SAMLResponse' => $data['SAMLResponse'], 'SigAlg' => $data['SigAlg']);
+      $msg = http_build_query($msgData);
       
-      $signedData = "SAMLResponse=".$samlResponse."&SigAlg=".$sigAlg;
-      $valid = (openssl_verify($signedData, $signature, $settings->idpPublicCertificate) == 1);
-      
-      if ($valid)
-         echo "\n\nvalid!!!\n\n";
-      else
-         echo "\n\nNOT valid!!!\n\n";
+      $valid = $key->verifySignature($msg, $signature);
       
       return $valid;
 	}
@@ -128,6 +134,10 @@ class SamlSSOPlugin extends Gdn_Plugin {
       if ($Provider['AuthenticationSchemeAlias'] != 'saml')
          return;
       
+      $this->EntryController_Saml_Create($Sender);
+   }
+   
+   public function EntryController_Saml_Create($Sender) {
       $settings = $this->GetSettings();
       $request = new OneLogin_Saml_AuthRequest($settings);
       $url = $request->getRedirectUrl();
@@ -139,6 +149,9 @@ class SamlSSOPlugin extends Gdn_Plugin {
       if ($Provider['AuthenticationSchemeAlias'] != 'saml')
          return;
       
+      // Prevent
+      SaveToConfig('Garden.SSO.Signout', 'none', FALSE);
+      
       $get = $Sender->Request->Get();
       $samlResponse = $Sender->Request->Get('SAMLResponse');
       $settings = $this->GetSettings();
@@ -146,17 +159,10 @@ class SamlSSOPlugin extends Gdn_Plugin {
       if ($samlResponse) {
          $valid = $this->validateSignature($get);
          
-         echo "valid";
-         var_dump($valid);
-         
-         var_dump($get);
-         
-         $respnseXml = gzinflate(base64_decode($samlResponse));
-         $response = new OneLogin_Saml_Response($settings, base64_encode($respnseXml));
-         decho($response);
-         die();
-         Gdn::Session()->End();
-         Redirect('/');
+         if ($valid) {
+            Gdn::Session()->End();
+            Redirect('/');
+         }
       } else {
          $request = new OneLogin_Saml_LogoutRequest($settings);
          $url = $request->getRedirectUrl();
@@ -214,10 +220,14 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $Form->SetFormValue('Email', $this->rval('mail', $profile));
       $Form->SetFormValue('Photo', $this->rval('photo', $profile));
       
+      $this->EventArguments['Profile'] = $profile;
+      $this->EventArguments['Form'] = $Form;
+      $this->FireEvent('SamlData');
+      
       $Sender->SetData('Verified', TRUE);
    }
    
-   protected function rval($name, $array, $default = false) {
+   public function rval($name, $array, $default = false) {
       if (isset($array[$name])) {
          $val = $array[$name];
          
@@ -233,9 +243,16 @@ class SamlSSOPlugin extends Gdn_Plugin {
     * 
     * @param SettingsController $Sender
     */
-   public function SettingsController_SamlSSO_Create($Sender) {
+   public function SettingsController_SamlSSO_Create($Sender, $Action = '') {
       $Sender->Permission('Garden.Settings.Manage');
       $this->Sender = $Sender;
+      
+      switch ($Action) {
+         case 'metadata':
+         case 'metadata.xml':
+            return $this->MetaData($Sender);
+            break;
+      }
       
       $Model = new Gdn_AuthenticationProviderModel();
       $Form = new Gdn_Form();
@@ -245,6 +262,16 @@ class SamlSSOPlugin extends Gdn_Plugin {
       if ($Form->AuthenticatedPostBack()) {
          $Form->SetFormValue('AuthenticationKey', 'saml');
          
+         // Make sure the key is in the correct form.
+         $secret = $Form->GetFormValue('AssociationSecret');
+         $Form->SetFormValue('AssociationSecret', self::UntrimCert($secret));
+         
+         $key = $Form->GetFormValue('PrivateKey');
+         $Form->SetFormValue('PrivateKey', self::UntrimCert($key, 'RSA PRIVATE KEY'));
+         
+         $key = $Form->GetFormValue('PublicKey');
+         $Form->SetFormValue('PublicKey', self::UntrimCert($key, 'RSA PUBLIC KEY'));
+                                    
          if ($Form->Save()) {
             $Sender->InformMessage(T('Saved'));
          }
@@ -261,14 +288,31 @@ class SamlSSOPlugin extends Gdn_Plugin {
          'SignInUrl' => array('Options' => array('Class' => 'InputBox BigInput')),
          'SignOutUrl' => array('Options' => array('Class' => 'InputBox BigInput')),
          'RegisterUrl' => array('Options' => array('Class' => 'InputBox BigInput')),
-         'AssociationSecret' => array('LabelCode' => 'Certificate', 'Options' => array('Multiline' => TRUE, 'Class' => 'TextBox BigInput')),
+         'AssociationSecret' => array('LabelCode' => 'IDP Certificate', 'Options' => array('Multiline' => TRUE, 'Class' => 'TextBox BigInput')),
          'IdentifierFormat' => array('Options' => array('Class' => 'InputBox BigInput')),
-         'IsDefault' => array('Control' => 'CheckBox', 'LabelCode' => 'Make this connection your default signin method.')
+         'IsDefault' => array('Control' => 'CheckBox', 'LabelCode' => 'Make this connection your default signin method.'),
+         'SpPrivateKey' => array('LabelCode' => 'SP Private Key', 'Description' => 'If you want to sign your requests then you need this key.', 'Options' => array('Multiline' => TRUE, 'Class' => 'TextBox BigInput')),
+         'SpCertificate' => array('LabelCode' => 'SP Certificate', 'Description' => 'This is the certificate that you will give to your IDP.', 'Options' => array('Multiline' => TRUE, 'Class' => 'TextBox BigInput')),
+         'Metadata' => array('Control' => 'Callback', 'Callback' => function($form) {
+               return $form->Label('Metadata').
+                  '<div class="Info">'.
+                     'You can get the metadata for this service provider here: '.
+                     Anchor('get metadata', Url('/settings/samlsso/metadata.xml'), '', array('target' => '_blank')).'.'.
+                  '</div>';
+            })
          );
       $Sender->SetData('_Form', $_Form);
 
       $Sender->AddSideMenu();
       $Sender->SetData('Title', sprintf(T('%s Settings'), 'SAML SSO'));
       $this->Render('Settings');
+   }
+   
+   protected function MetaData($Sender) {
+      $Settings = $this->GetSettings();
+      $Meta = new OneLogin_Saml_Metadata($Settings);
+      
+      header('Content-Type: application/xml; charset=UTF-8');
+      die($Meta->getXml());
    }
 }
