@@ -433,8 +433,10 @@ pageTracker._trackPageview();
          }
       }
 
+      $PlanCode = $Sender->Data('Plan.Subscription.PlanCode');
+
       // Kludge on the Reputation app as 'Badges'
-      if ($Sender->Data('Plan.Subscription.PlanCode') != 'free') {
+      if ($PlanCode != 'free') {
          $Enabled = array_key_exists('Reputation', $EnabledApps);
          $Reputation = array('Reputation' => array(
             'Name' => 'Badges',
@@ -445,7 +447,10 @@ pageTracker._trackPageview();
             'Enabled' => $Enabled
          ));
          $Addons = array_merge($Reputation, $Addons);
-         
+      }
+
+      // Kludge on the Groups app
+      if ($PlanCode == 'enterprise' || $PlanCode == 'advanced' || $PlanCode == 'vip1') {
          $Enabled = array_key_exists('Groups', $EnabledApps);
          $Groups = array('Groups' => array(
             'Name' => 'Groups',
