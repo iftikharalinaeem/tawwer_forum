@@ -249,3 +249,8 @@
    text-align: center;
    color: $lightText;
 }
+
+// Override base theme
+#Content .Group-Content .BoxNewDiscussion {
+  display: block;
+}
