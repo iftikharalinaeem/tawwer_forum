@@ -24,6 +24,9 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          $ForumName = preg_replace("/\.cl[0-9]+\.{$RegexHostingDomain}\$/i", ".{$HostingDomain}", $ForumName);
          SaveToConfig('Garden.AutoDomainSwitch', FALSE);
       }
+
+      // Vanilla's Akismet key
+      SaveToConfig('Plugins.Akismet.MasterKey', '6f09cb8ec580', FALSE);
    }
 
 /*
