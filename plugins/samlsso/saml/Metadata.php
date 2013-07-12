@@ -8,7 +8,7 @@ class OneLogin_Saml_Metadata
     /**
      * How long should the metadata be valid?
      */
-    const VALIDITY_SECONDS = 604800; // 1 week
+    public $validSeconds;
 
     /**
      * Service settings
@@ -23,6 +23,7 @@ class OneLogin_Saml_Metadata
     public function __construct(OneLogin_Saml_Settings $settings)
     {
         $this->_settings = $settings;
+        $this->validSeconds = strtotime('+1 week', 0);
     }
 
     /**
@@ -88,7 +89,7 @@ EOT;
     {
         $timeZone = date_default_timezone_get();
         date_default_timezone_set('UTC');
-        $time = strftime("%Y-%m-%dT%H:%M:%SZ", time() + self::VALIDITY_SECONDS);
+        $time = strftime("%Y-%m-%dT%H:%M:%SZ", time() + $this->validSeconds);
         date_default_timezone_set($timeZone);
         return $time;
     }

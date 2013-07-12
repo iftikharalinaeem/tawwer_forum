@@ -237,7 +237,7 @@
   width: 6.5em;
   background: #fff;
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -537,4 +537,8 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .EmptyMessage {
   text-align: center;
   color: #555555;
+}
+
+#Content .Group-Content .BoxNewDiscussion {
+  display: block;
 }
