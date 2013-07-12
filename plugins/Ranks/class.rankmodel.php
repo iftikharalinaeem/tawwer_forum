@@ -39,7 +39,7 @@ class RankModel extends Gdn_Model {
       $UserID = GetValue('UserID', $User);
       Gdn::UserModel()->SetField($UserID, 'RankID', $RankID);
       
-      $Notify = $Rank['Level'] != 1;
+      $Notify = $Rank['Level'] > 1;
       
       if ($Result['CurrentRank'] && $Result['NewRank']['Level'] > $Result['CurrentRank']['Level'])
          $Notify = FALSE;
@@ -384,7 +384,11 @@ class RankModel extends Gdn_Model {
       $UserPoints = GetValue('Points', $User);
 
       if (isset($Criteria['Points'])) {
-         if ($UserPoints < $Criteria['Points'])
+         $PointsCriteria = $Criteria['Points'];
+         
+         if ($PointsCriteria >= 0 && $UserPoints < $PointsCriteria)
+            return FALSE;
+         elseif ($PointsCriteria < 0 && $UserPoints > $PointsCriteria)
             return FALSE;
       }
       

@@ -59,7 +59,7 @@ class FollowingModule extends Gdn_Module {
                   ?>
                   <div>
                      <a title="<?php echo $User['Name']; ?>" href="<?php echo Url("profile/{$User['UserID']}/{$User['Name']}", TRUE); ?>">
-                        <img src="<?php echo Url('uploads'.DS.'n'.$User['Photo'], TRUE); ?>" />
+                        <img src="<?php echo UserPhotoUrl($User); ?>" />
                      </a>
                   </div>
                   <?php

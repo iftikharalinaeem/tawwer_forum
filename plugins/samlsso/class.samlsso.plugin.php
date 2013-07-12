@@ -311,6 +311,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
    protected function MetaData($Sender) {
       $Settings = $this->GetSettings();
       $Meta = new OneLogin_Saml_Metadata($Settings);
+      $Meta->validSeconds = strtotime(C('Plugins.samlsso.ValidSeconds', '+5 years'), 0);
       
       header('Content-Type: application/xml; charset=UTF-8');
       die($Meta->getXml());
