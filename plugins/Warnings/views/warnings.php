@@ -23,7 +23,7 @@ if (count($this->Data('Warnings')) > 0 ):
    <li id="Warning_<?php echo $Row['WarningID']; ?>" class="Item HasPhoto<?php echo $CssClass; ?>">
       <?php
       if ($Moderator) {
-         echo '<div class="Options">'.Anchor('×', 'profile/removewarning?warningid='.$Row['WarningID'].'&target='.urlencode($this->SelfUrl), 'Delete Popup').'</div>';
+         echo '<div class="Options">'.Anchor('×', 'profile/removewarning?warningid='.$Row['WarningID'], 'Delete Popup').'</div>';
       }
       ?>
       
