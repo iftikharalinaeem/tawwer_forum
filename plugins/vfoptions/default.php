@@ -4,7 +4,7 @@
 $PluginInfo['vfoptions'] = array(
    'Name' => 'VF.com Admin Options',
    'Description' => 'VF.com admin options.',
-   'Version' => '1.2.1',
+   'Version' => '1.2.2',
    'MobileFriendly' => TRUE,
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
@@ -24,6 +24,16 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          $ForumName = preg_replace("/\.cl[0-9]+\.{$RegexHostingDomain}\$/i", ".{$HostingDomain}", $ForumName);
          SaveToConfig('Garden.AutoDomainSwitch', FALSE);
       }
+   }
+
+   /**
+    * Set enviroment changes at very start of the app load.
+    *
+    * @param $Sender
+    */
+   public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
+      // Vanilla's Akismet key
+      SaveToConfig('Plugins.Akismet.MasterKey', '6f09cb8ec580', FALSE);
    }
 
 /*
