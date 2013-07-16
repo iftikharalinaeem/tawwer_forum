@@ -73,6 +73,28 @@ class WarningsPlugin extends Gdn_Plugin {
       }
    }
    
+   public function ProfileController_Card_Render($Sender, $Args) {
+      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         $UserID = $Sender->Data('Profile.UserID');
+         
+         $Sender->Data['Actions']['Warn'] = array(
+            'Text' => Sprite('SpWarn'),
+            'Title' => T('Warn'),
+            'Url' => '/profile/warn?userid='.$UserID,
+            'CssClass' => 'Popup'
+            );
+         
+         $Level = Gdn::UserMetaModel()->GetUserMeta($UserID, 'Warnings.Level');
+         $Level = GetValue('Warnings.Level', $Level);
+         $Sender->Data['Actions']['Warnings'] = array(
+            'Text' => '<span class="Count">'.(int)$Level.'</span>',
+            'Title' => T('Warnings'),
+            'Url' => UserUrl($Sender->Data('Profile'), '', 'warnings'),
+            'CssClass' => 'Popup'
+            );
+      }
+   }
+   
    public function UserModel_SetCalculatedFields_Handler($Sender, $Args) {
       $Punished = GetValue('Punished', $Args['User']);
       if ($Punished) {
@@ -176,8 +198,12 @@ class WarningsPlugin extends Gdn_Plugin {
          $Form->SetValidationResults($WarningModel->ValidationResults());
          
          $WarningModel->ProcessWarnings($Warning['WarnUserID']);
-         if ($Form->ErrorCount() == 0)
-            $Sender->RedirectUrl = Url($Target);
+         if ($Form->ErrorCount() == 0) {
+            if ($Target)
+               $Sender->RedirectUrl = Url($Target);
+            else
+               $Sender->JsonTarget('', '', 'Refresh');
+         }
       } else {
          $Form->SetValue('RemoveType', 'expire');
       }
@@ -222,7 +248,7 @@ class WarningsPlugin extends Gdn_Plugin {
          $Form->SetValue('Level', $CurrentLevel);
       }
       
-      $Sender->SetData('User', $User);
+      $Sender->SetData('Profile', $User);
       $Sender->SetData('CurrentLevel', $CurrentLevel);
       $Sender->SetData('MaxLevel', 5);
       $Sender->SetData('Title', T('Add a Warning'));

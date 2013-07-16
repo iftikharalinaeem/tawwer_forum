@@ -148,7 +148,7 @@ class RanksPlugin extends Gdn_Plugin {
    public function ProfileController_UsernameMeta_Handler($Sender, $Args) {
       $User = $Sender->Data('Profile');
       if ($User){
-         echo RankTag($User, '', ' '.Bullet().' ');
+         echo RankTag($User, '', ' '.Gdn_Theme::BulletItem('Rank').' ');
       }
    }
    
