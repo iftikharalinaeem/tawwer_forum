@@ -71,7 +71,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
 		$NewPrefix = C('Database.DatabasePrefix');
 		
 		// USERS //
-		$UserColumns = $this->GetColumns('User', $OldDatabase, $OldPrefix);
+		/*$UserColumns = $this->GetColumns('User', $OldDatabase, $OldPrefix);
 		
 		// Merge IDs of duplicate users
 		Gdn::SQL()->Query('update '.$NewPrefix.'User u set u.OldID = 
@@ -87,9 +87,9 @@ class ForumMergePlugin implements Gdn_IPlugin {
       Gdn::SQL()->Query('insert ignore into '.$NewPrefix.'UserMeta (UserID, Name, Value) 
          select u.UserID, um.Name, um.Value
          from '.$NewPrefix.'User u, `'.$OldDatabase.'`.'.$OldPrefix.'UserMeta um
-         where u.OldID = um.UserID');
+         where u.OldID = um.UserID');*/
 
-
+/*
       
 		// ROLES //
 		$RoleColumns = $this->GetColumns('Role', $OldDatabase, $OldPrefix);
@@ -110,7 +110,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
 			from '.$NewPrefix.'User u, '.$NewPrefix.'Role r, `'.$OldDatabase.'`.'.$OldPrefix.'UserRole ur
 			where u.OldID = (ur.UserID) and r.OldID = (ur.RoleID)');
 
-
+*/
       
 		// CATEGORIES //
 		$CategoryColumns = $this->GetColumns('Category', $OldDatabase, $OldPrefix);
@@ -186,14 +186,14 @@ class ForumMergePlugin implements Gdn_IPlugin {
       Gdn::SQL()->Query('update '.$NewPrefix.'Discussion d
         set d.CategoryID = (SELECT c.CategoryID from '.$NewPrefix.'Category c where c.OldID = d.CategoryID)
         where d.OldID > 0');
-      
+ /*
       // UserDiscussion
       Gdn::SQL()->Query('insert ignore into '.$NewPrefix.'UserDiscussion 
             (DiscussionID, UserID, Score, CountComments, DateLastViewed, Dismissed, Bookmarked) 
          select d.DiscussionID, u.UserID, ud.Score, ud.CountComments, ud.DateLastViewed, ud.Dismissed, ud.Bookmarked
          from '.$NewPrefix.'User u, '.$NewPrefix.'Discussion d, `'.$OldDatabase.'`.'.$OldPrefix.'UserDiscussion ud
          where u.OldID = (ud.UserID) and d.OldID = (ud.DiscussionID)');    
-      
+ */
       
       
       // COMMENTS //
@@ -218,7 +218,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
         where c.OldID > 0');
       
       
-      
+/*
 		// MEDIA //
 		$MediaColumns = $this->GetColumns('Media', $OldDatabase, $OldPrefix);
       
@@ -240,7 +240,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
         set m.ForeignID = (SELECT d.DiscussionID from '.$NewPrefix.'Discussion d where d.OldID = m.ForeignID)
         where m.OldID > 0 and m.ForeignTable = \'discussion\'');
 		
-      
+
       
 		// CONVERSATION //
 		$ConversationColumns = $this->GetColumns('Conversation', $OldDatabase, $OldPrefix);
@@ -259,6 +259,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
         where c.OldID > 0');
       // Contributors
       // a. Build userid lookup
+*/
       /*$Users = Gdn::SQL()->Query('select UserID, OldID from '.$NewPrefix.'User');
       $UserIDLookup = array();
       foreach($Users->Result() as $User) {
@@ -287,7 +288,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
 		
 		// ConversationMessage      
       // Copy over all ConversationMessages
-      Gdn::SQL()->Query('insert into '.$NewPrefix.'ConversationMessage (ConversationID,Body,Format,
+/*      Gdn::SQL()->Query('insert into '.$NewPrefix.'ConversationMessage (ConversationID,Body,Format,
             InsertUserID,DateInserted,InsertIPAddress,OldID) 
          select ConversationID,Body,Format,InsertUserID,DateInserted,InsertIPAddress,MessageID 
          from `'.$OldDatabase.'`.'.$OldPrefix.'ConversationMessage');
@@ -320,7 +321,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
             uc.Bookmarked, uc.Deleted, uc.DateConversationUpdated
          from '.$NewPrefix.'User u, '.$NewPrefix.'Conversation c, `'.$OldDatabase.'`.'.$OldPrefix.'UserConversation uc
          where u.OldID = (uc.UserID) and c.OldID = (uc.ConversationID)');    
-		
+*/
       
       
 		////
