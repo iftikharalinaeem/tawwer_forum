@@ -944,8 +944,20 @@ class ReactionModel {
       $this->SQL->Query($Sql);
       
       // Now we need to update the caches on the individual discussion/comment rows.
+      $this->RecalculateRecordCache();
+   }
+   
+   public function RecalculateRecordCache($Day = FALSE) {
+      $Where = array('RecordType' => array('Discussion-Total', 'Comment-Total'));
+      
+      if ($Day) {
+         $Day = Gdn_Format::ToTimestamp($Day);
+         $Where['DateInserted >='] = gmdate('Y-m-d', $Day);
+         $Where['DateInserted <'] = gmdate('Y-m-d', strtotime('+1 day', $Day));
+      }
+      
       $TotalData = $this->SQL->GetWhere('UserTag', 
-         array('RecordType' => array('Discussion-Total', 'Comment-Total')),
+         $Where,
          'RecordType, RecordID')->ResultArray();
       
       $React = array();
@@ -955,7 +967,12 @@ class ReactionModel {
       $ReactionTagIDs = self::ReactionTypes();
       $ReactionTagIDs = Gdn_DataSet::Index($ReactionTagIDs, array('TagID'));
       
+      $Count = 0;
       foreach ($TotalData as $Row) {
+         if (!isset($ReactionTagIDs[$Row['TagID']]))
+            continue;
+         
+         $Count++;
          $StrippedRecordType = GetValue(0, explode('-', $Row['RecordType'], 2));
          $NewRecord = $StrippedRecordType != $RecordType || $Row['RecordID'] != $RecordID;
          
@@ -972,6 +989,8 @@ class ReactionModel {
       
       if ($RecordID)
          $this->_SaveRecordReact($RecordType, $RecordID, $React);
+      
+      return $Count;
    }
    
    protected function _SaveRecordReact($RecordType, $RecordID, $React) {
