@@ -33,20 +33,40 @@ class SitemapsPlugin extends Gdn_Plugin {
    public function BuildCategorySiteMap($UrlCode, &$Urls) {
       $Category = CategoryModel::Categories($UrlCode);
       if (!$Category)
-         return;
+         throw NotFoundException();
       
-      $CountDiscussions = $Category['CountDiscussions'];
-      $PageCount = PageNumber($CountDiscussions, C('Vanilla.Discussions.PerPage', 30));
-      $Loc = Url('/categories/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']), TRUE).'/{Page}';
+      // Get the min/max dates for the sitemap.
+      $Row = Gdn::SQL()
+         ->Select('DateInserted', 'min', 'MinDate')
+         ->Select('DateInserted', 'max', 'MaxDate')
+         ->From('Discussion')
+         ->Where('CategoryID', $Category['CategoryID'])
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+      
+      if ($Row) {
+         $From = strtotime('first day of this month 00:00:00', strtotime($Row['MinDate']));
+         $To = strtotime('first day of this month 00:00:00', strtotime($Row['MaxDate']));
+      } else {
+         $From = 0;
+         $To = -1;
+      }
+      
+      $Now = time();
+      
+      for ($i = $From; $i <= $To; $i = strtotime('+1 month', $i)) {
+         $Url = array(
+            'Loc' => Url('/categories/archives/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'/'.gmdate('Y-m', $i), TRUE),
+            'LastMod' => '',
+            'ChangeFreq' => ''
+         );
+         
+         $LastMod = strtotime('last day of this month', $i);
+         if ($LastMod > $Now)
+            $LastMod = $Now;
+         $Url['LastMod'] = gmdate('c', $LastMod);
 
-      $Url = array(
-          'Loc' => $Loc,
-          'LastMode' => '',
-          'ChangeFreq' => '',
-          'PageCount' => $PageCount
-      );
-
-      $Urls[] = $Url;
+         $Urls[] = $Url;
+      }
    }
    
    public function Setup() {

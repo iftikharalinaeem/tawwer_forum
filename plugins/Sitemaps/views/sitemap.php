@@ -14,7 +14,7 @@ foreach ($this->Data('Urls') as $Url) {
       echo '<url>';
       echo '<loc>'.$Loc.'</loc>';
       if (GetValue('LastMod', $Url))
-         echo '<lastmod>'.date('c', strtotime($Url['LastMod'])).'</lastmod>';
+         echo '<lastmod>'.gmdate('c', strtotime($Url['LastMod'])).'</lastmod>';
       if (GetValue('ChangeFreq', $Url))
          echo '<changefreq>'.$Url['ChangeFreq'].'<changefreq>';
       if (GetValue('Priority', $Url))
@@ -30,5 +30,4 @@ foreach ($this->Data('Urls') as $Url) {
       break;
    }
 }
-echo '
-</urlset>';
+echo '</urlset>';
