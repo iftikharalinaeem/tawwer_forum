@@ -131,6 +131,19 @@ class ReactionsController extends DashboardController {
       $this->Render('addedit', '', 'plugins/Reactions');
    }
    
+   public function RecalculateRecordCache($Day = FALSE) {
+      $this->Permission('Garden.Settings.Manage');
+      
+      if (!$this->Request->IsAuthenticatedPostBack())
+         throw ForbiddenException('GET');
+      
+      $ReactionModel = new ReactionModel();
+      $Count = $ReactionModel->RecalculateRecordCache($Day);
+      $this->SetData('Count', $Count);
+      $this->SetData('Success', TRUE);
+      $this->Render();
+   }
+   
    /**
     * Toggle a given reaction on or off
     * 
