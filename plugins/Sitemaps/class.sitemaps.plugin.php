@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Sitemaps'] = array(
    'Name' => 'Sitemaps',
    'Description' => "Creates an XML sitemap based on http://www.sitemaps.org.",
-   'Version' => '1.2.2',
+   'Version' => '2.0',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
@@ -44,16 +44,21 @@ class SitemapsPlugin extends Gdn_Plugin {
          ->Get()->FirstRow(DATASET_TYPE_ARRAY);
       
       if ($Row) {
-         $From = strtotime('first day of this month 00:00:00', strtotime($Row['MinDate']));
-         $To = strtotime('first day of this month 00:00:00', strtotime($Row['MaxDate']));
+         $From = strtotime('first day of this month 00:00:00', strtotime($Row['MaxDate']));
+         $To = strtotime('first day of this month 00:00:00', strtotime($Row['MinDate']));
+         
+         if (!$From || !$To) {
+            $From = -1;
+            $To = 0;
+         }
       } else {
-         $From = 0;
-         $To = -1;
+         $From = -1;
+         $To = 0;
       }
       
       $Now = time();
       
-      for ($i = $From; $i <= $To; $i = strtotime('+1 month', $i)) {
+      for ($i = $From; $i >= $To; $i = strtotime('-1 month', $i)) {
          $Url = array(
             'Loc' => Url('/categories/archives/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'/'.gmdate('Y-m', $i), TRUE),
             'LastMod' => '',
