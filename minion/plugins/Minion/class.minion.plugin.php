@@ -36,6 +36,7 @@
  *  1.13    Convert moderator permission check to Garden.Moderation.Manage
  *  1.14    Add custom reaction button renderer
  *  1.15    Fix ExplicitClose matching
+ *  1.15.1  Allow silent fingerprint banning
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -46,7 +47,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.15',
+   'Version' => '1.15.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => true,
    'Author' => "Tim Gunter",
@@ -2011,6 +2012,7 @@ EOT;
    
    protected function FingerprintBans($Sender) {
       if (!C('Plugins.Minion.Features.Fingerprint', true)) return;
+      $AnnounceBans = C('Plugins.Minion.Features.BanAnnounce', true);
       
       $Sender->SetData('FingerprintCheck', true);
       
@@ -2082,7 +2084,7 @@ EOT;
                'InsertUserID' => $UserID
             ), 'DateInserted', 'DESC', 1, 0)->FirstRow(DATASET_TYPE_ARRAY);
             
-            if ($LastComment) {
+            if ($LastComment && $AnnounceBans) {
                $LastDiscussionID = GetValue('DiscussionID', $LastComment);
                $UserData['NotificationDiscussionID'] = $LastDiscussionID;
                
