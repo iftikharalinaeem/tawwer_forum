@@ -84,7 +84,7 @@ class PHeaven extends ExportController {
           'Forum_ID' => 'CategoryID',
           'User_ID' => 'InsertUserID',
           'Subject' => array('Column' => 'Name', 'Filter' => array($Ex, 'HTMLDecoder')),
-          'Body2' => array('Column' => 'Body', 'Filter' => array($this, 'HexDecoder')),
+          'DecompressedBody' => 'Body',
           'EntryDate' => array('Column' => 'DateInserted'),          
           'LockedThread' => 'Closed'
           );
@@ -93,7 +93,7 @@ class PHeaven extends ExportController {
             m.LockedThread,
             m.User_ID,
             m.Subject,
-            mb.Body as Body2,
+            mb.DecompressedBody,
             m.EntryDate,
             'Html' as Format
          from Threads t
@@ -110,14 +110,15 @@ class PHeaven extends ExportController {
           'MessageID' => 'CommentID',
           'Thread_ID' => 'DiscussionID',
           'User_ID' => 'InsertUserID',
-          'Body2' => array('Column' => 'Body', 'Filter' => array($this, 'HexDecoder')),
+          'DecompressedBody' => 'Body',
           'Format' => 'Format',
           'EntryDate' => array('Column' => 'DateInserted')
       );
       $Ex->ExportTable('Comment', "
       select m.*,
          'Html' as Format,
-         mb.Body as Body2
+         mb.DecompressedBody,
+         ts.Thread_ID
       from Messages m
       left join MessageBody mb
          on m.MessageID = mb.Message_ID
