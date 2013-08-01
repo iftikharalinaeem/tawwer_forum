@@ -8,7 +8,7 @@
 $PluginInfo['AdvancedSearch'] = array(
    'Name' => 'Advanced Search',
    'Description' => "Enables advanced search on sites.",
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -89,6 +89,13 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             $Sender->AddDefinition('searchAutocomplete', '0');
          }
       }
+   }
+   
+   public function DiscussionsController_PagerInit_Handler($Sender, $Args) {
+      $quickserch = $this->quickSearch(T('SearchBoxPlaceHolder', 'Search'));
+
+      $Pager = $Args['Pager'];
+      $Pager->HtmlAfter = $quickserch;
    }
    
    public function CategoriesController_PagerInit_Handler($Sender, $Args) {
