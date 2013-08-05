@@ -8,6 +8,11 @@ $Session = Gdn::Session();
    <?php $this->RenderAsset('Head'); ?>
    <meta name="google-site-verification" content="T7dDWEaTeqt989RCxDJTfoOkbOADnRWLLJTauXxMHVA" />
    <meta name="google-site-verification" content="XNPgCc6RnVDN47M9vJPLpCr0wQDt2eOj1xf6QZsya7g" />
+   <?php
+   if (class_exists('PocketsPlugin')) {
+      echo PocketsPlugin::PocketString('google-analytics');
+   }
+   ?>
 </head>
 <body id="<?php echo $BodyIdentifier; ?>" class="<?php echo $this->CssClass; ?>">
 <div class="Head">
