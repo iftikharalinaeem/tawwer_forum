@@ -3,7 +3,7 @@
 $PluginInfo['samlsso'] = array(
     'Name' => 'SAML SSO',
     'Description' => 'SAML SSO for Vanilla',
-    'Version' => '1.0b',
+    'Version' => '1.0.1b',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
