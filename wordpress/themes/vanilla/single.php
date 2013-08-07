@@ -6,7 +6,7 @@
 		<div class="post">
 			<h1><a href="<?php the_permalink() ?>"><?php the_title(); ?></a></h1>
 			<div class="post-meta">
-				<div class="post-author"><?php the_author_posts_link(); ?></div>
+				<div class="post-author">by <?php the_author_posts_link(); ?></div>
 				<div class="post-date"><?php the_time('M j, Y') ?></div>
 				<div class="post-category"><?php the_category(', ') ?></div>
 				<?php if ( $user_ID ) : ?><div class="post-options"><?php edit_post_link('Edit'); ?></div><?php endif; ?>
