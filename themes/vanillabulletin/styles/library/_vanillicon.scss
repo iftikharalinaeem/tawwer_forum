@@ -1,0 +1,246 @@
+/// Variables ///
+
+$vanilliconUrl: "//vanillicon.com" !default;
+$btnTextStyle: "" !default;
+$optionsColor: $textColor !default;
+$userReactColor: if($textColor == #fff, #000 outline, $textColor outline) !default;
+
+$defaultStyles: glow shadow !default;
+$spriteStyles: glow shadowx !default;
+
+/// Functions & Mixins ///
+
+// Return the hex code of a byte.
+@function hex_c($c) {
+   $c1: floor($c / 16);
+   $c2: $c - 16 * $c1;
+   $hexes: ('0' '1' '2' '3' '4' '5' '6' '7' '8' '9' 'a' 'b' 'c' 'd' 'e' 'f');
+
+   @return #{unquote(nth($hexes, $c1 + 1))}#{unquote(nth($hexes, $c2 + 1))};
+}
+
+// Return the hex code of a string without the '#'.
+@function hex_str($color) {
+   @return #{hex_c(red($color))}#{hex_c(green($color))}#{hex_c(blue($color))}
+}
+
+@function spriteUrl($color, $size: 14, $type: "") {
+   @if ($type != "") {
+      $type: "-#{$type}";
+   }
+
+   @return url("#{$vanilliconUrl}/sprites/sprites-#{$size}#{$type}-#{hex_str(unquote($color))}.png");
+}
+
+@mixin sprite($color, $type: "") {
+   //height: 16px;
+   //width: 16px;
+
+   @if (type-of($color) == "list") {
+      $type: nth($color, 2);
+      $color: nth($color, 1);
+   }
+
+   @if (index($defaultStyles, $type) != false) {
+      $type: nth($spriteStyles, index($defaultStyles, $type));
+   }
+
+   background-image: spriteUrl($color, 14, $type);
+
+   @if (index("" glow glowc sweetx sweetxc shadowx shadowxc outline,$type) != false) {
+      @media
+      only screen and (-webkit-min-device-pixel-ratio: 2),
+      only screen and (   min--moz-device-pixel-ratio: 2),
+      only screen and (     -o-min-device-pixel-ratio: 2/1),
+      only screen and (        min-device-pixel-ratio: 2),
+      only screen and (                min-resolution: 192dpi),
+      only screen and (                min-resolution: 2dppx) {
+         background-image: spriteUrl($color, 28, $type);
+         background-size: 396px;
+      }
+   }
+}
+
+@function uispriteUrl($color, $size: 16) {
+   @return url("#{$vanilliconUrl}/sprites/ui_sprites-#{$size}c-#{hex_str(unquote($color))}.png");
+}
+
+@mixin uisprite($color) {
+   background-image: uispriteUrl($color);
+
+   @media
+      only screen and (-webkit-min-device-pixel-ratio: 2),
+      only screen and (   min--moz-device-pixel-ratio: 2),
+      only screen and (     -o-min-device-pixel-ratio: 2/1),
+      only screen and (        min-device-pixel-ratio: 2),
+      only screen and (                min-resolution: 192dpi),
+      only screen and (                min-resolution: 2dppx) {
+         background-image: uispriteUrl($color, 32);
+         background-size: 30px;
+      }
+}
+
+/// Sprite urls ///
+
+.Sprite, .Sprite16 {
+   @include sprite($textColor);
+}
+
+a {
+   .Sprite {
+      @include sprite($linkColor);
+   }
+
+   @if ($linkColorHover != $linkColor) {
+      .Sprite {
+         @include sprite($linkColorHover);
+      }
+   }
+}
+
+.Button, .NavButton {
+   & > .Sprite,
+   & > .Sprite16 {
+      height: 16px;
+      width: 16px;
+      display: inline-block;
+      vertical-align: top;
+      @include sprite($btnColor, $btnTextStyle);
+   }
+}
+
+.MeButton {
+   .Sprite {
+      @if ($meColor != $linkColor) {
+         @include sprite($meColor);
+      }
+   }
+
+   @if ($meColorHover != $meColor) {
+      &:hover {
+         background: none;
+         .Sprite {
+            @include sprite($meColorHover);
+         }
+      }
+   }
+}
+
+@mixin react-buttons($reactColor, $reactColorHover, $userReactColor: $userReactColor) {
+   .ReactButton {
+      color: $reactColor;
+
+      .Count {
+         background: $reactColor;
+      }
+
+      & > .ReactSprite {
+         @include sprite($reactColor);
+      }
+
+      @if ($reactColorHover != $reactColor) {
+         &:hover {
+            color: $reactColorHover;
+
+            .Count {
+               background: $reactColorHover;
+            }
+
+            & > .ReactSprite {
+               @include sprite($reactColorHover)
+            }
+         }
+      }
+   }
+
+   .UserReactionWrap .ReactSprite {
+      @include sprite($userReactColor);
+   }
+}
+@include react-buttons($reactColor, $reactColorHover, $userReactColor);
+
+
+a.Bookmark,
+a.Boomarking,
+a.Bookmarked,
+.OptionsTitle {
+   @include uisprite($optionsColor);
+}
+
+.QuickSearchButton {
+   .Sprite {
+      @include sprite($linkColor);
+   }
+}
+
+/// Menu Items ///
+
+.MenuItems li .ReactButton {
+   & > .ReactSprite {
+      @include sprite($dropdownColor);
+   }
+
+   &:hover > .ReactSprite {
+      @include sprite($dropdownLinkColorHover);
+   }
+}
+
+
+/// Sprite Positions ///
+
+.ReactEverything { background-position: -360px -100px; }
+.ReactAwesome { background-position: -240px -20px; }
+.ReactFlag { background-position: -60px -60px; }
+.ReactInsightful { background-position: -140px -20px; }
+.ReactOffTopic { background-position: -160px -20px; }
+.ReactAbuse { background-position: -20px -60px; }
+.SpSpam, .ReactSpam { background-position: -120px -20px; }
+.ReactTroll { background-position: -100px -20px; }
+.ReactPromote { background-position: -60px -40px; }
+.ReactDisagree { background-position: -40px -20px; }
+.ReactAgree { background-position: -20px -20px; }
+.ReactDislike { background-position: -40px -40px; }
+.ReactLike { background-position: -20px -40px; }
+.ReactDown { background-position: -200px -40px; }
+.ReactUp { background-position: -180px -40px; }
+.ReactWTF { background-position: -80px -20px; }
+.ReactLOL { background-position: -60px -20px; }
+.ReactQuote { background-position: -280px -20px; }
+.ReactInfraction { background-position: -200px -20px; }
+.ReactAccept { background-position: -20px -100px; }
+.ReactReject { background-position: -40px -100px; }
+.ReactFacebook { background-position: -40px -120px; }
+.ReactTwitter { background-position: -60px -120px; }
+.ReactGooglePlus { background-position: -80px -120px; }
+
+/** General Sprites **/
+
+.SpActivity { background-position: -160px -120px; }
+.SpAllCategories { background-position: -60px -140px; }
+.SpApplicants { background-position: -260px -40px; }
+.SpBadge { background-position: -240px -140px; }
+.SpBan { background-position: -300px -20px; }
+.SpBestOf { background-position: -80px -80px; }
+.SpBookmarks { background-position: -100px -80px; }
+.SpComments, .SpComment { background-position: -160px -80px; }
+.SpConnection { background-position: -320px -20px; }
+.SpDashboard { background-position: -340px -20px }
+.SpDelete { background-position: -340px -140px; }
+.SpDiscussions, .SpMyDiscussions { background-position: -200px -80px; }
+.SpGroups { background-position: -240px -40px; }
+.SpImage { background-position: -120px -140px; }
+.SpInbox { background-position: -80px -100px; }
+.SpMessage { background-position: -100px -100px;}
+.SpMod { background-position: -260px -60px; }
+.SpMyDrafts { background-position: -180px -20px; }
+.SpNotifications { background-position: -160px -100px; }
+.SpOptions { background-position: -180px -60px; }
+.SpPhoto { background-position: -160px -60px; }
+.SpProfile, .SpEditProfile { background-position: -220px -40px; }
+.SpQuote { background-position: -280px -20px ;}
+.SpReply { background-position: -140px -40px; }
+.SpSignOut { background-position: -240px -100px; }
+.SpSearch { background-position: -220px -100px; }
+.SpText { background-position: -160px -80px; }
+.SpUnansweredQuestions { background-position: -60px -100px; }
+.SpWarn, .SpWarnings { background-position: -200px -20px; }
