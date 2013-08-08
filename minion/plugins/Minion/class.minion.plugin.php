@@ -1242,6 +1242,15 @@ class MinionPlugin extends Gdn_Plugin {
                   $this->Monitor($Discussion, array(
                      'ThreadClose'  => NULL
                   ));
+                  
+                  if (!$Closed) {
+                     $ClosePage = $ThreadClose['Page'];
+                     $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Thread will no longer be closed after {Page}..."), array(
+                        'Page'         => sprintf(Plural($ClosePage, '%d page', '%d pages'), $ClosePage),
+                        'User'         => $User,
+                        'Discussion'   => $State['Targets']['Discussion']
+                     )));
+                  }
                }
                
                if ($Closed) {
