@@ -825,7 +825,7 @@ class MinionPlugin extends Gdn_Plugin {
                // Gather a page
        
                if (GetValue('Method', $State) == 'thread' && GetValue('Toggle', $State) == 'off' && in_array($State['CompareToken'], array('pages', 'page'))) {
-                  $Sender->Consume($State, 'Gather', array(
+                  $this->Consume($State, 'Gather', array(
                      'Node'   => 'Page',
                      'Delta'  => ''
                   ));
@@ -1205,7 +1205,7 @@ class MinionPlugin extends Gdn_Plugin {
                      $CommentNumber = $MinComments + mt_rand(1,$CommentsPerPage-1);
 
                      // Monitor the thread
-                     $Sender->Monitor($Discussion, array(
+                     $this->Monitor($Discussion, array(
                         'ThreadClose'  => array(
                            'Started'   => time(),
                            'Page'      => $ClosePage,
@@ -1219,8 +1219,8 @@ class MinionPlugin extends Gdn_Plugin {
                         'Discussion'   => $State['Targets']['Discussion']
                      ));
 
-                     $Sender->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
-                     $Sender->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
+                     $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
+                     $this->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
                      
                   } else {
                      
@@ -1683,7 +1683,7 @@ class MinionPlugin extends Gdn_Plugin {
       $Comments = GetValue('CountComments', $Discussion);
       if ($Comments >= $CycleCommentNumber && !$Discussion['Closed']) {
          $DiscussionModel = new DiscussionModel();
-         $DiscussionModel->Close($Discussion);
+         $DiscussionModel->SetField($Discussion, 'Closed', TRUE);
       }
    }
    
