@@ -37,6 +37,7 @@
  *  1.14    Add custom reaction button renderer
  *  1.15    Fix ExplicitClose matching
  *  1.15.1  Allow silent fingerprint banning
+ *  1.16    Incorporate 'page' gathering into core
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -47,7 +48,7 @@
 $PluginInfo['Minion'] = array(
    'Name' => 'Minion',
    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-   'Version' => '1.15.1',
+   'Version' => '1.16',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'MobileFriendly' => true,
    'Author' => "Tim Gunter",
@@ -349,6 +350,7 @@ class MinionPlugin extends Gdn_Plugin {
       $KickedUsers = $this->Monitoring($Sender->EventArguments['Discussion'], 'Kicked', null);
       $BannedPhrases = $this->Monitoring($Sender->EventArguments['Discussion'], 'Phrases', null);
       $Force = $this->Monitoring($Sender->EventArguments['Discussion'], 'Force', null);
+      $Type = GetValue('Type', $Sender->EventArguments, 'rules');
 
       // Nothing happening?
       if (!($KickedUsers | $BannedPhrases | $Force))
@@ -378,6 +380,23 @@ class MinionPlugin extends Gdn_Plugin {
          }
 
          $Rules[] = Wrap("<b>Exiled users</b>: ".implode(', ', $KickedUsersList), 'span', array('class' => 'MinionRule'));
+      }
+      
+      // Future Close
+      if ($Type != 'bar') {
+      
+         // Show a warning if there are rules in effect
+         $ThreadClose = $Sender->Monitoring($Sender->EventArguments['Discussion'], 'ThreadClose', NULL);
+
+         // Nothing happening?
+         if (!$ThreadClose)
+            return;
+
+         $Rules = &$Sender->EventArguments['Rules'];
+
+         // Thread is queued for closing
+         $Page = GetValue('Page', $ThreadClose);
+         $Rules[] = Wrap("<b>Thread Close</b>: page {$Page}", 'span', array('class' => 'MinionRule'));
       }
       
    }
@@ -650,6 +669,27 @@ class MinionPlugin extends Gdn_Plugin {
                      }
 
                   break;
+                  
+                  case 'Page':
+            
+                     // Add token
+                     $State['Gather']['Delta'] .= " {$State['Token']}";
+                     $Sender->Consume($State);
+
+                     // If we're closed, close up
+                     $CurrentDelta = trim($State['Gather']['Delta']);
+                     if (strlen($State['Gather']['Delta']) && is_numeric($CurrentDelta)) {
+                        $State['Targets']['Page'] = $CurrentDelta;
+                        $State['Gather'] = FALSE;
+                        break;
+                     }
+
+                     if (!strlen($State['Token'])) {
+                        $State['Gather'] = FALSE;
+                        continue;
+                     }
+
+                  break;
                }
 
             } else {
@@ -778,6 +818,15 @@ class MinionPlugin extends Gdn_Plugin {
                if ($State['Method'] == 'phrase' && !isset($State['Targets']['Phrase'])) {
                   $this->Consume($State, 'Gather', array(
                      'Node'   => 'Phrase',
+                     'Delta'  => ''
+                  ));
+               }
+               
+               // Gather a page
+       
+               if (GetValue('Method', $State) == 'thread' && GetValue('Toggle', $State) == 'off' && in_array($State['CompareToken'], array('pages', 'page'))) {
+                  $Sender->Consume($State, 'Gather', array(
+                     'Node'   => 'Page',
                      'Delta'  => ''
                   ));
                }
@@ -1141,18 +1190,60 @@ class MinionPlugin extends Gdn_Plugin {
             $DiscussionModel = new DiscussionModel();
             $Closed = GetValue('Closed', $State['Targets']['Discussion'], false);
             $DiscussionID = $State['Targets']['Discussion']['DiscussionID'];
+            $Discussion = $DiscussionModel->GetID($DiscussionID);
             
             if ($State['Toggle'] == 'off') {
+               
                if (!$Closed) {
-                  $DiscussionModel->SetField($DiscussionID, 'Closed', true);
-                  $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Closing thread..."), array(
-                     'User'         => $User,
-                     'Discussion'   => $State['Targets']['Discussion']
-                  )));
+                  
+                  $ClosePage = GetValue('Page', $State['Targets'], FALSE);
+                  if ($ClosePage) {
+                     
+                     // Pick somewhere to end the discussion
+                     $CommentsPerPage = C('Vanilla.Comments.PerPage', 40);
+                     $MinComments = ($ClosePage - 1) * $CommentsPerPage;
+                     $CommentNumber = $MinComments + mt_rand(1,$CommentsPerPage-1);
+
+                     // Monitor the thread
+                     $Sender->Monitor($Discussion, array(
+                        'ThreadClose'  => array(
+                           'Started'   => time(),
+                           'Page'      => $ClosePage,
+                           'Comment'   => $CommentNumber
+                        )
+                     ));
+
+                     $Acknowledge = T("Thread will be closed after {Page}.");
+                     $Acknowledged = FormatString($Acknowledge, array(
+                        'Page'         => sprintf(Plural($ClosePage, '%d page', '%d pages'), $ClosePage),
+                        'Discussion'   => $State['Targets']['Discussion']
+                     ));
+
+                     $Sender->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
+                     $Sender->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
+                     
+                  } else {
+                     
+                     $DiscussionModel->SetField($DiscussionID, 'Closed', true);
+                     $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Closing thread..."), array(
+                        'User'         => $User,
+                        'Discussion'   => $State['Targets']['Discussion']
+                     )));
+                     
+                  }
                }
             }
             
             if ($State['Toggle'] == 'on') {
+               
+               // Force remove future close
+               $ThreadClose = $Sender->Monitoring($Discussion, 'ThreadClose', false);
+               if ($ThreadClose) {
+                  $Sender->Monitor($Discussion, array(
+                     'ThreadClose'  => NULL
+                  ));
+               }
+               
                if ($Closed) {
                   $DiscussionModel->SetField($DiscussionID, 'Closed', false);
                   $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Opening thread..."), array(
@@ -1581,6 +1672,18 @@ class MinionPlugin extends Gdn_Plugin {
                
          }
          
+      }
+      
+      // FUTURE CLOSE
+      
+      $ThreadClose = $Sender->Monitoring($Discussion, 'ThreadClose', FALSE);
+      if (!$ThreadClose) return;
+      
+      $CycleCommentNumber = GetValue('Comment', $ThreadClose);
+      $Comments = GetValue('CountComments', $Discussion);
+      if ($Comments >= $CycleCommentNumber && !$Discussion['Closed']) {
+         $DiscussionModel = new DiscussionModel();
+         $DiscussionModel->Close($Discussion);
       }
    }
    
