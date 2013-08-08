@@ -1685,7 +1685,7 @@ class MinionPlugin extends Gdn_Plugin {
       
       // FUTURE CLOSE
       
-      $ThreadClose = $Sender->Monitoring($Discussion, 'ThreadClose', FALSE);
+      $ThreadClose = $this->Monitoring($Discussion, 'ThreadClose', FALSE);
       if (!$ThreadClose) return;
       
       $CycleCommentNumber = GetValue('Comment', $ThreadClose);
