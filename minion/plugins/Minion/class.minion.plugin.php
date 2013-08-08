@@ -1190,7 +1190,7 @@ class MinionPlugin extends Gdn_Plugin {
             $DiscussionModel = new DiscussionModel();
             $Closed = GetValue('Closed', $State['Targets']['Discussion'], false);
             $DiscussionID = $State['Targets']['Discussion']['DiscussionID'];
-            $Discussion = $DiscussionModel->GetID($DiscussionID);
+            $Discussion = $State['Targets']['Discussion'];
             
             if ($State['Toggle'] == 'off') {
                
@@ -1237,9 +1237,9 @@ class MinionPlugin extends Gdn_Plugin {
             if ($State['Toggle'] == 'on') {
                
                // Force remove future close
-               $ThreadClose = $Sender->Monitoring($Discussion, 'ThreadClose', false);
+               $ThreadClose = $this->Monitoring($Discussion, 'ThreadClose', false);
                if ($ThreadClose) {
-                  $Sender->Monitor($Discussion, array(
+                  $this->Monitor($Discussion, array(
                      'ThreadClose'  => NULL
                   ));
                }
