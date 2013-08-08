@@ -674,7 +674,7 @@ class MinionPlugin extends Gdn_Plugin {
             
                      // Add token
                      $State['Gather']['Delta'] .= " {$State['Token']}";
-                     $Sender->Consume($State);
+                     $this->Consume($State);
 
                      // If we're closed, close up
                      $CurrentDelta = trim($State['Gather']['Delta']);
