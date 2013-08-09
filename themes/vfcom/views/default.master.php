@@ -10,7 +10,7 @@ $Session = Gdn::Session();
    <meta name="google-site-verification" content="XNPgCc6RnVDN47M9vJPLpCr0wQDt2eOj1xf6QZsya7g" />
    <?php
    if (class_exists('PocketsPlugin')) {
-      echo PocketsPlugin::PocketString('google-analytics');
+      echo PocketsPlugin::PocketString('google-analytics', array('track_page' => $this->Data('AnalyticsFunnelPage')));
    }
    ?>
 </head>
