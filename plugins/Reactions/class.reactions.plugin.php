@@ -315,6 +315,7 @@ class ReactionsPlugin extends Gdn_Plugin {
    }
    
    /**
+    * Handle user reactions.
     *
     * @param Gdn_Controller $Sender
     * @param string $RecordType
@@ -333,11 +334,17 @@ class ReactionsPlugin extends Gdn_Plugin {
          throw PermissionException('Javascript');
       
       $ReactionType = ReactionModel::ReactionTypes($Reaction);
-      
+
+      // Only allow enabled reactions
+      if (!GetValue('Active', $ReactionType)) {
+         throw ForbiddenException("@You may not use that Reaction.");
+      }
+
+      // Check reaction's permission if one is applied
       if ($Permission = GetValue('Permission', $ReactionType)) {
          $Sender->Permission($Permission);
       }
-      
+
       $ReactionModel = new ReactionModel();
       $ReactionModel->React($RecordType, $ID, $Reaction);
       
