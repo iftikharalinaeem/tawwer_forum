@@ -142,22 +142,6 @@ class VFOptionsPlugin implements Gdn_IPlugin {
       }
 //      $Sender->AddDefinition('StatsUrl', self::StatsUrl('{p}'));
       
-      // Redirect if the domain in the url doesn't match that in the config (so
-      // custom domains can't be accessed from their original subdomain).
-      if (!defined('CLIENT_NAME') && C('Garden.AutoDomainSwitch', TRUE)) {
-         $Domain = Gdn::Config('Garden.Domain', '');
-         $ServerName = ArrayValue('SERVER_NAME', $_SERVER, '');
-         if ($ServerName == '')
-            $ServerName = ArrayValue('HTTP_HOST', $_SERVER, '');
-
-         if ($ServerName != '' && $Domain != '') {
-            $Domain = str_replace(array('http://', '/'), array('', ''), $Domain);
-            $ServerName = str_replace(array('http://', '/'), array('', ''), $ServerName);
-            if ($ServerName != $Domain)
-               Redirect('http://' . $Domain . Gdn::Request()->Url(), 301);
-         }
-      }
-      
       $TrackerCode = Gdn::Config('Plugins.GoogleAnalytics.TrackerCode');
       $TrackerDomain = Gdn::Config('Plugins.GoogleAnalytics.TrackerDomain');
       
