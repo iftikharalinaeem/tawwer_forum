@@ -29,7 +29,7 @@
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-mark.jpg" />
 			<span class="about"><strong>Mark O'Sullivan</strong>Co-Founder</span>
 		</a>
-		<a class="team-lincoln" href="http://vanillaforums.com/blog/author/linclon/">
+		<a class="team-lincoln" href="http://vanillaforums.com/blog/author/lincoln/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-lincoln.jpg" />
 			<span class="about"><strong>Matt Lincoln Russell</strong> Developer</span>
 		</a>

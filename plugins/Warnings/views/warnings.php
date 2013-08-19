@@ -31,7 +31,7 @@ if (count($this->Data('Warnings')) > 0 ):
          <?php
          $Photo = UserPhoto($Row, array('Px' => 'Insert'));
          if (!$Photo)
-            $Photo = Img('http://cdn.vanillaforums.com/images/warn_50.png', array('class' => 'ProfilePhoto'));
+            $Photo = '<span class="PhotoWrap">'.Img('http://cdn.vanillaforums.com/images/warn_50.png', array('class' => 'ProfilePhoto')).'</span>';
          echo $Photo;
          ?>
       </div>
@@ -39,9 +39,9 @@ if (count($this->Data('Warnings')) > 0 ):
          <div class="Title">
             <?php
             if ($Row['Points'] == 0) {
-               $TitleFormat = T('WarningTitleFormat.Notice', '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s points} (just a notice).');
+               $TitleFormat = T('WarningTitleFormat.Notice', '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s point} (just a notice).');
             } else {
-               $TitleFormat = T('WarningTitleFormat', '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s points}.');
+               $TitleFormat = T('WarningTitleFormat', '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s point}.');
             }
             
             $Title = FormatString($TitleFormat, $Row);

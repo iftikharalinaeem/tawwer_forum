@@ -19,12 +19,12 @@
 $PluginInfo['ThreadCycle'] = array(
    'Name' => 'Minion: ThreadCycle',
    'Description' => "Provide command to automatically cycle a thread after N pages.",
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'RequiredApplications' => array(
       'Vanilla' => '2.1a'
     ),
    'RequiredPlugins' => array(
-      'Minion' => '1.4.2',
+      'Minion' => '1.16',
       'Online' => '1.6.3'
    ),
    'MobileFriendly' => TRUE,
@@ -232,38 +232,6 @@ class ThreadCyclePlugin extends Gdn_Plugin {
          ));
       }
       
-   }
-   
-   /**
-    * Parse gathering tokens from the current state
-    * 
-    * @param MinionPlugin $Sender
-    */
-   public function MinionPlugin_TokenGather_Handler($Sender) {
-      $State = &$Sender->EventArguments['State'];
-      
-      switch (GetValueR('Gather.Node', $State)) {
-         case 'Page':
-            
-            // Add token
-            $State['Gather']['Delta'] .= " {$State['Token']}";
-            $Sender->Consume($State);
-
-            // If we're closed, close up
-            $CurrentDelta = trim($State['Gather']['Delta']);
-            if (strlen($State['Gather']['Delta']) && is_numeric($CurrentDelta)) {
-               $State['Targets']['Page'] = $CurrentDelta;
-               $State['Gather'] = FALSE;
-               break;
-            }
-
-            if (!strlen($State['Token'])) {
-               $State['Gather'] = FALSE;
-               continue;
-            }
-
-            break;
-      }
    }
    
    /**
