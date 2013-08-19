@@ -370,16 +370,20 @@ class ForumMergePlugin implements Gdn_IPlugin {
    }
 
    public function Setup() {
-   	Gdn::Structure()->Table('Activity')->Column('OldID', 'int', TRUE, 'key')->Set();
-   	Gdn::Structure()->Table('Category')->Column('OldID', 'int', TRUE, 'key')->Set();
-   	Gdn::Structure()->Table('Comment')->Column('OldID', 'int', TRUE, 'key')->Set();
-		Gdn::Structure()->Table('Conversation')->Column('OldID', 'int', TRUE, 'key')->Set();
+   	$this->Structure();
+   }
+
+   public function Structure() {
+      Gdn::Structure()->Table('Activity')->Column('OldID', 'int', TRUE, 'key')->Set();
+      Gdn::Structure()->Table('Category')->Column('OldID', 'int', TRUE, 'key')->Set();
+      Gdn::Structure()->Table('Comment')->Column('OldID', 'int', TRUE, 'key')->Set();
+      Gdn::Structure()->Table('Conversation')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('ConversationMessage')->Column('OldID', 'int', TRUE, 'key')->Set();
-		Gdn::Structure()->Table('Discussion')->Column('OldID', 'int', TRUE, 'key')->Set();
-		//Gdn::Structure()->Table('Draft')->Column('OldID', 'int', TRUE, 'key')->Set();
-		Gdn::Structure()->Table('Media')->Column('OldID', 'int', TRUE, 'key')->Set();
-		Gdn::Structure()->Table('Role')->Column('OldID', 'int', TRUE, 'key')->Set();
-		//Gdn::Structure()->Table('Tag')->Column('OldID', 'int', TRUE, 'key')->Set();
-		Gdn::Structure()->Table('User')->Column('OldID', 'int', TRUE, 'key')->Set();
+      Gdn::Structure()->Table('Discussion')->Column('OldID', 'int', TRUE, 'key')->Set();
+      //Gdn::Structure()->Table('Draft')->Column('OldID', 'int', TRUE, 'key')->Set();
+      Gdn::Structure()->Table('Media')->Column('OldID', 'int', TRUE, 'key')->Set();
+      Gdn::Structure()->Table('Role')->Column('OldID', 'int', TRUE, 'key')->Set();
+      //Gdn::Structure()->Table('Tag')->Column('OldID', 'int', TRUE, 'key')->Set();
+      Gdn::Structure()->Table('User')->Column('OldID', 'int', TRUE, 'key')->Set();
    }
 }
