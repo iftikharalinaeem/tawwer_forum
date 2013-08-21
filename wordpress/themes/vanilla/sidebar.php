@@ -89,6 +89,13 @@ setTimeout(function() {document.getElementById("hs-cta-8dba70d4-4330-4b96-be78-9
 		<a href="http://twitter.com/vanilla" class="twitter-follow-button">Follow @vanilla</a>
 		<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
 	</div>
+   
+   <div class="block">
+      <script src="//platform.linkedin.com/in.js" type="text/javascript">
+      lang: en_US
+      </script>
+      <script type="IN/FollowCompany" data-id="1531758" data-counter="right"></script>
+   </div>
 
 <!--	<div class="block video">
 		<strong>Recent Video</strong>
