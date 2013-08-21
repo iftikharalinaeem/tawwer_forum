@@ -23,7 +23,7 @@
 		</a>
 		<a class="team-tim" href="http://vanillaforums.com/blog/author/tim/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-tim.jpg" />
-			<span class="about"><strong>Tim Gunter</strong>Director of Infrastructure and Ops</span>
+			<span class="about"><strong>Tim Gunter</strong>Director of Operations</span>
 		</a>
 		<a class="team-mark" href="http://vanillaforums.com/blog/author/mark/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-mark.jpg" />
@@ -32,6 +32,10 @@
 		<a class="team-lincoln" href="http://vanillaforums.com/blog/author/lincoln/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-lincoln.jpg" />
 			<span class="about"><strong>Matt Lincoln Russell</strong> Developer</span>
+		</a>
+      <a class="team-lincoln" href="http://vanillaforums.com/blog/author/adrian/">
+			<img src="<?php bloginfo('template_directory'); ?>/images/team-adrian.jpg" />
+			<span class="about"><strong>Adrian Speyer</strong> Marketing Manager, Lead Generation</span>
 		</a>
 		<a class="team-luc" href="http://vanillaforums.com/blog/author/luc/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-luc.jpg" />
