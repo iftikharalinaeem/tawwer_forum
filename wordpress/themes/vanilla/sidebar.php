@@ -91,6 +91,7 @@ setTimeout(function() {document.getElementById("hs-cta-8dba70d4-4330-4b96-be78-9
 	</div>
    
    <div class="block">
+      <strong>Follow <a href="http://www.linkedin.com/company/vanilla-forums-inc">Vanilla</a> on LinkedIn</strong>
       <script src="//platform.linkedin.com/in.js" type="text/javascript">
       lang: en_US
       </script>
