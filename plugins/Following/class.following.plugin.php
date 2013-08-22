@@ -33,7 +33,7 @@ class FollowingPlugin extends Gdn_Plugin {
       $IsFollowing = $this->CheckIfFollowing($ViewingUserID, $Sender->User->UserID);
       $FollowText = ($IsFollowing) ? "Stop following" : "Follow";
       $FollowAction = ($IsFollowing) ? 'unfollow' : 'follow';
-      $SideMenu->AddLink('Options', sprintf(T($FollowText),$Sender->User->Name), UserUrl($Sender->User, '', $FollowAction), FALSE);
+      //$SideMenu->AddLink('Options', sprintf(T($FollowText),$Sender->User->Name), UserUrl($Sender->User, '', $FollowAction), FALSE);
       $Sender->EventArguments['ProfileOptions'][] = array(
          'Text' => sprintf(T($FollowText),$Sender->User->Name),
          'Url' => UserUrl($Sender->User, '', $FollowAction),
