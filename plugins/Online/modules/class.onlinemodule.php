@@ -207,12 +207,13 @@ class OnlineModule extends Gdn_Module {
             $title = T("Who's Online");
       }
 
+      if ($this->count > 0) {
+
       ?>
       <div id="WhosOnline" class="WhosOnline Box">
          <h4><?php echo $title; ?> <span class="Count"><?php echo Gdn_Format::bigNumber($trackCount, 'html') ?></span></h4>
          <?php
-
-         if ($this->count > 0) {
+         
             if ($this->style == 'pictures') {
                $listClass = 'PhotoGrid';
                if (count($this->onlineUsers) > 10)
@@ -278,15 +279,18 @@ EOT;
                }
                echo '</ul>'."\n";
             }
-         }
          ?>
       </div>
       <?php
 
+      }
+      
       $outputString = ob_get_contents();
       @ob_end_clean();
 
       // Store rendered data
+      $cacheRenderDelay = OnlinePlugin::instance()->cacheRenderDelay;
+      if (!$this->count) $cacheRenderDelay = 10;
       Gdn::cache()->store($renderedCacheKey, $outputString, array(
           Gdn_Cache::FEATURE_EXPIRY => OnlinePlugin::instance()->cacheRenderDelay
       ));
