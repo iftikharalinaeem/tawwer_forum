@@ -18,7 +18,27 @@ class WordpressImportModel extends CommentImportModel {
    public function DefineTables() {
       $St = Gdn::Structure();
       $Sql = Gdn::SQL();
-      
+
+      $St->Table('User')
+         ->Column('ForeignID', 'varchar(32)', TRUE, 'index')
+         ->Column('Source', 'varchar(20)', TRUE)
+         ->Set();
+
+      $St->Table('Discussion')
+         ->Column('ForeignID', 'int', TRUE)
+         ->Column('Source', 'varchar(20)', TRUE)
+         ->Set();
+
+      $St->Table('Comment')
+         ->Column('ForeignID', 'int', TRUE)
+         ->Column('Source', 'varchar(20)', TRUE)
+         ->Set();
+
+      $St->Table('Category')
+         ->Column('ForeignID', 'varchar(32)', TRUE, 'index')
+         ->Column('Source', 'varchar(20)', TRUE)
+         ->Set();
+
       $St->Table('zWordpressUser')
          ->Column('ForeignID', 'int', FALSE, 'primary')
          ->Column('Name', 'varchar(50)', FALSE, 'key')
@@ -27,26 +47,15 @@ class WordpressImportModel extends CommentImportModel {
          ->Set(TRUE);
       $Sql->Truncate('zWordpressUser');
       
-      $St->Table('User')
-         ->Column('ForeignID', 'varchar(32)', TRUE, 'index')
-         ->Column('Source', 'varchar(20)', TRUE)
-         ->Set();
-      
       $St->Table('zWordpressCategory')
          ->Column('ForeignID', 'int', FALSE, 'primary')
          ->Column('UrlCode', 'varchar(255)', FALSE, 'index')
          ->Column('Name', 'varchar(255)', FALSE)
          ->Column('ParentUrlCode', 'varchar(255)', TRUE)
-      
          ->Column('CategoryID', 'int', TRUE)
          ->Column('ParentCategoryID', 'int', TRUE)
          ->Set();
       $Sql->Truncate('zWordpressCategory');
-      
-      $St->Table('Category')
-         ->Column('ForeignID', 'varchar(32)', TRUE, 'index')
-         ->Column('Source', 'varchar(20)', TRUE)
-         ->Set();
       
       $St->Table('zWordpressDiscussion')
          ->Column('ForeignID', 'int', FALSE, 'primary')
@@ -59,10 +68,8 @@ class WordpressImportModel extends CommentImportModel {
          ->Column('Closed', 'tinyint')
          ->Column('Announce', 'tinyint')
          ->Column('Attributes', 'text', TRUE)
-      
          ->Column('DiscussionID', 'int', TRUE, 'index')
          ->Column('InsertUserID', 'int', TRUE, 'index')
-      
          ->Column('UserName', 'varchar(50)', TRUE)
          ->Set(TRUE);
       $Sql->Truncate('zWordpressDiscussion');
@@ -75,15 +82,11 @@ class WordpressImportModel extends CommentImportModel {
          ->Column('DateInserted', 'datetime', TRUE)
          ->Column('InsertIPAddress', 'varchar(15)', TRUE)
 //         ->Column('Approved', 'tinyint', 0)
-            
          ->Column('UserName', 'varchar(50)', TRUE)
          ->Column('UserEmail', 'varchar(200)', TRUE)
-            
-
          ->Column('CommentID', 'int', TRUE, 'index')
          ->Column('DiscussionID', 'int', TRUE)
          ->Column('InsertUserID', 'int', TRUE)
-
          ->Set(TRUE);
       $Sql->Truncate('zWordpressComment');
    }
@@ -446,6 +449,14 @@ class WordpressImportModel extends CommentImportModel {
           'Url' => $Url
       ));
       
+      // There are lots of category records. Find one with 'category' domain.
+      foreach ($Xml->category as $XmlCategory) {
+         if ($XmlCategory['domain'] == 'category') {
+            $CategoryUrlCode = $XmlCategory['nicename'];
+            break;
+         }
+      }
+
       // Set up the discussion row.
       $Row = array(
           'ForeignID' => (int)$Wp->post_id,
@@ -456,15 +467,11 @@ class WordpressImportModel extends CommentImportModel {
           'DateInserted' => (string)$Wp->post_date_gmt,
           'Closed' => strcasecmp($Wp->comment_status, 'closed') == 0,
           'Announce' => (int)$Wp->is_sticky,
-          
-          'CategoryUrlCode' => (string)$Xml->category['nicename'],
-          
+          'CategoryUrlCode' => (string)$CategoryUrlCode,
           'UserName' => (string)$Xml->children('dc', TRUE)->creator,
-          
           'Attributes' => array(
               'ForeignUrl' => (string)$Xml->link
           ));
-      
       
       $HasComments = FALSE;
       foreach ($Wp->comment as $CommentXml) {
