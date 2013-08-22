@@ -1,18 +1,19 @@
 <?php if (!defined('APPLICATION')) exit();
-/*
-Copyright 2008, 2009 Vanilla Forums Inc.
-This file is part of Garden.
-Garden is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-Garden is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with Garden.  If not, see <http://www.gnu.org/licenses/>.
-Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
-*/
+
+/**
+ * User following
+ * 
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license Proprietary
+ * @package Misc
+ */
 
 // Define the plugin:
 $PluginInfo['Following'] = array(
    'Name' => 'Following',
    'Description' => 'This plugin allows users to follow others.',
-   'Version' => '1.0.1b',
+   'Version' => '1.1',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
@@ -24,16 +25,20 @@ $PluginInfo['Following'] = array(
 );
 
 class FollowingPlugin extends Gdn_Plugin {
-
-   public function ProfileController_AfterAddSideMenu_Handler($Sender) {
+   
+   public function ProfileController_BeforeProfileOptions_Handler($Sender, $Args) {
       $ViewingUserID = Gdn::Session()->UserID;
       if ($ViewingUserID == $Sender->User->UserID) return;
       
-      $SideMenu = $Sender->EventArguments['SideMenu'];
-      $IsFollowing = $this->_CheckIfFollowing($ViewingUserID, $Sender->User->UserID);
-      $FollowText = ($IsFollowing) ? "Stop following" : "Follow %s";
+      $IsFollowing = $this->CheckIfFollowing($ViewingUserID, $Sender->User->UserID);
+      $FollowText = ($IsFollowing) ? "Stop following" : "Follow";
       $FollowAction = ($IsFollowing) ? 'unfollow' : 'follow';
       $SideMenu->AddLink('Options', sprintf(T($FollowText),$Sender->User->Name), UserUrl($Sender->User, '', $FollowAction), FALSE);
+      $Sender->EventArguments['ProfileOptions'][] = array(
+         'Text' => sprintf(T($FollowText),$Sender->User->Name),
+         'Url' => UserUrl($Sender->User, '', $FollowAction),
+         'CssClass' => 'Popup UserNoteButton'
+      );
    }
    
    public function ProfileController_Follow_Create($Sender) {
@@ -92,7 +97,7 @@ class FollowingPlugin extends Gdn_Plugin {
       $Sender->AddModule($Module);
    }
    
-   protected function _GetFollowersForUser($UserID) {
+   protected function GetFollowersForUser($UserID) {
       return Gdn::SQL()
          ->Select('f.UserID')
          ->From('Following f')
@@ -100,7 +105,7 @@ class FollowingPlugin extends Gdn_Plugin {
          ->Get();
    }
    
-   protected function _GetFollowsForUser($UserID) {
+   protected function GetFollowsForUser($UserID) {
       return Gdn::SQL()
          ->Select('f.FollowedUserID')
          ->From('Following f')
@@ -108,7 +113,7 @@ class FollowingPlugin extends Gdn_Plugin {
          ->Get();
    }
    
-   protected function _CheckIfFollowing($UserID, $FollowedUserID) {
+   protected function CheckIfFollowing($UserID, $FollowedUserID) {
       $IsFollowing = Gdn::SQL()
          ->Select('*')
          ->From('Following f')
