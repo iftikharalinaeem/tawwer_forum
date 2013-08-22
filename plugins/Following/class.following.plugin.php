@@ -32,11 +32,9 @@ class FollowingPlugin extends Gdn_Plugin {
       
       $IsFollowing = $this->CheckIfFollowing($ViewingUserID, $Sender->User->UserID);
       $FollowText = ($IsFollowing) ? "Unfollow" : "Follow";
-      $FollowAction = ($IsFollowing) ? 'unfollow' : 'follow';
-      //$SideMenu->AddLink('Options', sprintf(T($FollowText),$Sender->User->Name), UserUrl($Sender->User, '', $FollowAction), FALSE);
       $Sender->EventArguments['ProfileOptions'][] = array(
          'Text' => sprintf(T($FollowText),$Sender->User->Name),
-         'Url' => UserUrl($Sender->User, '', $FollowAction),
+         'Url' => UserUrl($Sender->User, '', 'following'),
          'CssClass' => 'Hijack UserFollowButton'
       );
    }
@@ -47,7 +45,7 @@ class FollowingPlugin extends Gdn_Plugin {
     * @param ProfileController $Sender
     * @return type
     */
-   public function ProfileController_Follow_Create($Sender) {
+   public function ProfileController_Following_Create($Sender) {
       $ViewingUserID = Gdn::Session()->UserID;
       $Args = $Sender->RequestArgs;
       
@@ -58,41 +56,26 @@ class FollowingPlugin extends Gdn_Plugin {
             $ValidUser = Gdn::UserModel()->GetID($FollowedUserID, DATASET_TYPE_ARRAY);
             $IsValidUser = (bool)$ValidUser;
             if ($ValidUser) {
-               Gdn::SQL() ->Insert('Following',array(
-                  'UserID' => $ViewingUserID,
-                  'FollowedUserID' => $FollowedUserID
-               ));
-               $Sender->InformMessage(sprintf(T("Following %s"), $ValidUser['Name']));
-            }
-         } catch(Exception $e) {}
-      }
-      
-      $Sender->Render('blank', 'utility', 'dashboard');
-   }
-   
-   /**
-    * 
-    * 
-    * @param ProfileController $Sender
-    * @return type
-    */
-   public function ProfileController_Unfollow_Create($Sender) {
-      $ViewingUserID = Gdn::Session()->UserID;
-      $Args = $Sender->RequestArgs;
-      
-      $IsValidUser = FALSE;
-      if (sizeof($Args)) {
-         $FollowedUserID = $Sender->RequestArgs[0];
-         try {
-            $ValidUser = Gdn::UserModel()->GetID($FollowedUserID, DATASET_TYPE_ARRAY);
-            $IsValidUser = (bool)$ValidUser;
-            Gdn::SQL()->Delete('Following',array(
-               'UserID' => $ViewingUserID,
-               'FollowedUserID' => $FollowedUserID
-            ));
-            
-            if ($ValidUser) {
-               $Sender->InformMessage(sprintf(T("No longer following %s"), $ValidUser['Name']));
+               
+               $IsFollowing = $this->CheckIfFollowing($ViewingUserID, $Sender->User->UserID);
+               if ($IsFollowing) {
+                  // Unfollow
+                  Gdn::SQL()->Delete('Following',array(
+                     'UserID' => $ViewingUserID,
+                     'FollowedUserID' => $FollowedUserID
+                  ));
+
+                  $Sender->InformMessage(sprintf(T("No longer following %s"), $ValidUser['Name']));
+                  $Sender->JsonTarget('.ProfileOptions .Dropdown .UserFollowButton', sprintf(T('Follow'), $ValidUser['Name']), 'Text');
+               } else {
+                  // Follow
+                  Gdn::SQL() ->Insert('Following',array(
+                     'UserID' => $ViewingUserID,
+                     'FollowedUserID' => $FollowedUserID
+                  ));
+                  $Sender->InformMessage(sprintf(T("Following %s"), $ValidUser['Name']));
+                  $Sender->JsonTarget('.ProfileOptions .Dropdown .UserFollowButton', sprintf(T('Unfollow'), $ValidUser['Name']), 'Text');
+               }
             }
          } catch(Exception $e) {}
       }
