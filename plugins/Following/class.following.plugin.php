@@ -91,7 +91,6 @@ class FollowingPlugin extends Gdn_Plugin {
       
       $Sender->AddCssFile('following.css', 'plugins/Following');
       $UserID = $Sender->User->UserID;
-      include_once(PATH_PLUGINS.DS.'Following'.DS.'class.followingmodule.php');
       $Module = new FollowingModule($Sender);
       $Module->SetUser($UserID);
       $Sender->AddModule($Module);
