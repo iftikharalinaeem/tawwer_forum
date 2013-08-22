@@ -254,19 +254,23 @@ class OnlinePlugin extends Gdn_Plugin {
 
             setcookie($namePrimary, self::$now, $expirePrimary + 30, '/'); // Cookies expire a little after the cache so they'll definitely be counted in the next one
             $counts[$namePrimary] = self::incrementCache($namePrimary, $expirePrimary);
+            Gdn::controller()->setData('Online.Primary', $counts[$namePrimary]);
 
             setcookie($nameSecondary, self::$now, $expireSecondary + 30, '/'); // We want both cookies expiring at different times.
             $counts[$nameSecondary] = self::incrementCache($nameSecondary, $expireSecondary);
+            Gdn::controller()->setData('Online.Secondary', $counts[$nameSecondary]);
 
          } elseif (!isset($_COOKIE[$namePrimary])) {
 
             setcookie($namePrimary, self::$now, $expirePrimary + 30, '/');
             $counts[$namePrimary] = self::incrementCache($namePrimary, $expirePrimary);
+            Gdn::controller()->setData('Online.Primary', $counts[$namePrimary]);
 
          } elseif (!isset($_COOKIE[$nameSecondary])) {
 
             setcookie($nameSecondary, self::$now, $expireSecondary + 30, '/');
             $counts[$nameSecondary] = self::incrementCache($nameSecondary, $expireSecondary);
+            Gdn::controller()->setData('Online.Secondary', $counts[$nameSecondary]);
 
          }
       }
@@ -280,7 +284,8 @@ class OnlinePlugin extends Gdn_Plugin {
     * @return int
     */
    protected static function incrementCache($name, $expiry) {
-      $value = Gdn::cache()->increment($name, 1, array(Gdn_Cache::FEATURE_EXPIRY => $expiry));
+      
+      $value = Gdn::cache()->increment($name, 1);
 
       if (!$value) {
          $value = 1;

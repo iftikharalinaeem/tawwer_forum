@@ -82,7 +82,7 @@ class OnlineModule extends Gdn_Module {
 
          $this->onlineUsers = OnlinePlugin::instance()->onlineUsers($this->selector, $this->selectorID, $this->selectorField);
 
-         if (!array_key_exists(Gdn::session()->User->UserID, $this->onlineUsers)) {
+         if (Gdn::session()->isValid() && !array_key_exists(Gdn::session()->User->UserID, $this->onlineUsers)) {
             $this->onlineUsers[Gdn::session()->UserID] = array(
                'UserID'                   => Gdn::session()->UserID,
                'Timestamp'                => date('Y-m-d H:i:s'),
