@@ -2,9 +2,9 @@
 
 /**
  * Online Plugin - OnlineCountModule
- * 
+ *
  * This module displays a count of users who are currently online.
- * 
+ *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
@@ -12,19 +12,19 @@
  */
 
 class OnlineCountModule extends Gdn_Module {
-   
+
    public $showGuests = TRUE;
-   
+
    public $selector = NULL;
    public $selectorID = NULL;
    public $selectorField = NULL;
 
    public function __construct(&$sender = '') {
       parent::__construct($sender);
-      
+
       $this->selector = 'auto';
    }
-   
+
    public function __set($name, $value) {
       switch ($name) {
          case 'CategoryID':
@@ -32,7 +32,7 @@ class OnlineCountModule extends Gdn_Module {
             $this->selectorID = $value;
             $this->selectorField = 'CategoryID';
             break;
-         
+
          case 'DiscussionID':
             $this->selector = 'discussion';
             $this->selectorID = $value;
@@ -42,11 +42,11 @@ class OnlineCountModule extends Gdn_Module {
    }
 
    public function GetData() {
-      
+
       if ($this->selector == 'auto') {
-            
+
          $location = OnlinePlugin::WhereAmI(
-            Gdn::Controller()->ResolvedPath, 
+            Gdn::Controller()->ResolvedPath,
             Gdn::Controller()->ReflectArgs
          );
 
@@ -73,30 +73,30 @@ class OnlineCountModule extends Gdn_Module {
                break;
          }
       }
-      
+
       $count = OnlinePlugin::Instance()->onlineCount($this->selector, $this->selectorID, $this->selectorField);
       $guestCount = OnlinePlugin::guests();
       if (!$guestCount) $guestCount = 0;
-      
+
       return array($count, $guestCount);
    }
-   
+
    public function ToString() {
       list($count, $guestCount) = $this->GetData();
       $combinedCount = $count + $guestCount;
-      
+
       $trackedCount = $this->showGuests ? $combinedCount : $count;
       $formattedCount = Gdn_Format::BigNumber($trackedCount, 'html');
-      
+
       $outputString = '';
       ob_start();
       ?>
       <div class="OnlineCount"><?php echo sprintf(T("%s viewing"),$formattedCount); ?></div>
       <?php
-      
+
       $outputString = ob_get_contents();
       @ob_end_clean();
-      
+
       return $outputString;
    }
 }
