@@ -133,7 +133,7 @@ class OnlinePlugin extends Gdn_Plugin {
       $this->pruneDelay = C('Plugins.Online.PruneDelay', self::DEFAULT_PRUNE_DELAY) * 60;
       $this->cleanDelay = C('Plugins.Online.CleanDelay', self::DEFAULT_CLEAN_DELAY);
       $this->cacheCountDelay = C('Plugins.Online.CacheCountDelay', 20);
-      $this->cacheRenderDelay = C('Plugins.Online.CacheRenderDelay', 60);
+      $this->cacheRenderDelay = C('Plugins.Online.CacheRenderDelay', 30);
 
       $UTC = new DateTimeZone('UTC');
       $CurrentDate = new DateTime('now', $UTC);

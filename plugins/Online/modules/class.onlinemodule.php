@@ -290,7 +290,7 @@ EOT;
 
       // Store rendered data
       $cacheRenderDelay = OnlinePlugin::instance()->cacheRenderDelay;
-      if (!$this->count) $cacheRenderDelay = 10;
+      if (!$this->count) $cacheRenderDelay = 5;
       Gdn::cache()->store($renderedCacheKey, $outputString, array(
           Gdn_Cache::FEATURE_EXPIRY => OnlinePlugin::instance()->cacheRenderDelay
       ));
