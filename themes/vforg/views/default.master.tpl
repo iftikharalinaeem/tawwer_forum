@@ -8,26 +8,15 @@
       <div class="Head">
          <div class="Row">
             <span class="OpenSource"></span>
-            <a href="{link path="/"}" class="Home">Vanilla Forums: Community Forums Evolved</a>
+            <a href="{link path="home"}" class="Home">{link path="Vanilla Forums: Community Forums Evolved"}</a>
             <div class="Menu">
-               <a href="{link path="/addons"}">Addons</a>
-               <a href="{link path="/discussions"}">{t c="Community"}</a>
-               <a href="{link path="/docs"}">Documentation</a>
-               <a href="http://vanillaforums.com/blog">{t c="Blog"}</a>
-               <a href="/download" class="Download">{t c="Download"}</a>
-               <a href="http://vanillaforums.com" class="Hosting">Hosting<span>Start Using Vanilla today</span></a>
+               <a href="{link path="/addons"}" title="{t c="Themes, plugins and applications for Vanilla"}">{t c="Addons"}</a>
+               <a href="{link path="/discussions"}" title="{t c="Vanilla Forums Developer Community"}">{t c="Community"}</a>
+               <a href="{link path="/docs"}" title="{t c="User and developer documentation for Vanilla"}">{t c="Documentation"}</a>
+               <a href="http://vanillaforums.com/blog" title="{t c="Latest news from the Vanilla Team"}">{t c="Blog"}</a>
+               <a href="{link path="/download"}" class="Download" title="{t c="Download the latest stable version of Vanilla"}">{t c="Download"}</a>
+               <a href="http://vanillaforums.com" class="Hosting" title="{t c="Use Vanilla Forums in the Cloud"}">{t c="Vanilla Cloud"}<span>{t c="Start Using Vanilla today"}</span></a>
             </div>
-            {*
-            <?php
-            echo '<div class="Menu">';
-               echo Anchor('Addons', 'addons');
-               echo Anchor('Community', 'discussions');
-               echo Anchor('Documentation', 'docs');
-               echo Anchor('Blog', 'http://vanillaforums.com/blog');
-               echo Anchor('Hosting'.Wrap('Start using Vanilla today'), 'http://vanillaforums.com', array('class' => 'Hosting'));
-               // echo Anchor('Download', 'download', array('class' => 'Download'));
-            echo '</div>';
-            ?>*}
          </div>
       </div>
       <div id="Body">
@@ -39,7 +28,7 @@
                </div>
             </div>
          </div>
-         
+
          <div class="Row">
             <div class="Column PanelColumn" id="Panel">
                {asset name="Panel"}
@@ -54,7 +43,7 @@
       </div>
       <div id="Foot">
          <div class="Row">
-            <a href="{vanillaurl}" class="PoweredByVanilla" title="Community Software by Vanilla Forums">Powered by Vanilla</a>
+            <a href="{vanillaurl}" class="PoweredByVanilla" title="{t c="Community Software by Vanilla Forums"}">{t c="Powered by Vanilla"}</a>
             {asset name="Foot"}
          </div>
       </div>
