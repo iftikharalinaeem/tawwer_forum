@@ -13,90 +13,90 @@
 
 class OnlineCountModule extends Gdn_Module {
    
-   public $ShowGuests = TRUE;
+   public $showGuests = TRUE;
    
-   public $Selector = NULL;
-   public $SelectorID = NULL;
-   public $SelectorField = NULL;
+   public $selector = NULL;
+   public $selectorID = NULL;
+   public $selectorField = NULL;
 
-   public function __construct(&$Sender = '') {
-      parent::__construct($Sender);
+   public function __construct(&$sender = '') {
+      parent::__construct($sender);
       
-      $this->Selector = 'auto';
+      $this->selector = 'auto';
    }
    
-   public function __set($Name, $Value) {
-      switch ($Name) {
+   public function __set($name, $value) {
+      switch ($name) {
          case 'CategoryID':
-            $this->Selector = 'category';
-            $this->SelectorID = $Value;
-            $this->SelectorField = 'CategoryID';
+            $this->selector = 'category';
+            $this->selectorID = $value;
+            $this->selectorField = 'CategoryID';
             break;
          
          case 'DiscussionID':
-            $this->Selector = 'discussion';
-            $this->SelectorID = $Value;
-            $this->SelectorField = 'DiscussionID';
+            $this->selector = 'discussion';
+            $this->selectorID = $value;
+            $this->selectorField = 'DiscussionID';
             break;
       }
    }
 
    public function GetData() {
       
-      if ($this->Selector == 'auto') {
+      if ($this->selector == 'auto') {
             
-         $Location = OnlinePlugin::WhereAmI(
+         $location = OnlinePlugin::WhereAmI(
             Gdn::Controller()->ResolvedPath, 
             Gdn::Controller()->ReflectArgs
          );
 
-         switch ($Location) {
+         switch ($location) {
             case 'category':
             case 'discussion':
-               $this->ShowGuests = FALSE;
-               $this->Selector = 'category';
-               $this->SelectorField = 'CategoryID';
+               $this->showGuests = FALSE;
+               $this->selector = 'category';
+               $this->selectorField = 'CategoryID';
 
-               if ($Location == 'discussion')
-                  $this->SelectorID = Gdn::Controller()->Data('Discussion.CategoryID');
+               if ($location == 'discussion')
+                  $this->selectorID = Gdn::Controller()->Data('Discussion.CategoryID');
                else
-                  $this->SelectorID = Gdn::Controller()->Data('Category.CategoryID');
+                  $this->selectorID = Gdn::Controller()->Data('Category.CategoryID');
 
                break;
 
             case 'limbo':
             case 'all':
-               $this->ShowGuests = TRUE;
-               $this->Selector = 'all';
-               $this->SelectorID = NULL;
-               $this->SelectorField = NULL;
+               $this->showGuests = TRUE;
+               $this->selector = 'all';
+               $this->selectorID = NULL;
+               $this->selectorField = NULL;
                break;
          }
       }
       
-      $Count = OnlinePlugin::Instance()->OnlineCount($this->Selector, $this->SelectorID, $this->SelectorField);
-      $GuestCount = OnlinePlugin::Guests();
-      if (!$GuestCount) $GuestCount = 0;
+      $count = OnlinePlugin::Instance()->onlineCount($this->selector, $this->selectorID, $this->selectorField);
+      $guestCount = OnlinePlugin::guests();
+      if (!$guestCount) $guestCount = 0;
       
-      return array($Count, $GuestCount);
+      return array($count, $guestCount);
    }
    
    public function ToString() {
-      list($Count, $GuestCount) = $this->GetData();
-      $CombinedCount = $Count + $GuestCount;
+      list($count, $guestCount) = $this->GetData();
+      $combinedCount = $count + $guestCount;
       
-      $TrackedCount = $this->ShowGuests ? $CombinedCount : $Count;
-      $FormattedCount = Gdn_Format::BigNumber($TrackedCount, 'html');
+      $trackedCount = $this->showGuests ? $combinedCount : $count;
+      $formattedCount = Gdn_Format::BigNumber($trackedCount, 'html');
       
-      $OutputString = '';
+      $outputString = '';
       ob_start();
       ?>
-      <div class="OnlineCount"><?php echo sprintf(T("%s viewing"),$FormattedCount); ?></div>
+      <div class="OnlineCount"><?php echo sprintf(T("%s viewing"),$formattedCount); ?></div>
       <?php
       
-      $OutputString = ob_get_contents();
+      $outputString = ob_get_contents();
       @ob_end_clean();
       
-      return $OutputString;
+      return $outputString;
    }
 }
