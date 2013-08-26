@@ -1,0 +1,146 @@
+@import "_iconfonts";
+@import "_wysiwyg";
+
+
+/**
+ * Editor toolbar 
+ */
+
+.editor {
+	background-color: #999999;
+	background-color: rgba(0, 0, 0, 0.4);
+   padding: 5px;
+   margin: 0 0 -5px 0;
+}
+
+.FormWrapper-Condensed .editor {
+   margin: 0;
+}
+
+.editor .icon {
+   display: inline;
+   padding: 5px 8px;
+   margin: 0 -1px;
+   color: #F7F7F7;
+   border: 1px solid transparent;
+}
+
+.editor .icon:hover,
+.wysihtml5-command-active,
+.wysihtml5-command-dialog-opened,
+.wysihtml5-action-active
+{
+   border-radius: 2px;
+   background-color: #666666;
+}
+
+.editor .editor-sep {
+   border-left: 1px solid #888888;
+   margin: 0 8px 0 5px;
+}
+
+.editor .ToggleFlyout {
+   display: inline-block;
+   position: relative;
+}
+
+/* For links and images, flyout */
+.editor-insert-dialog {
+   margin: 5px 0 0 -1px;
+   padding: 10px;
+   width: 300px;
+}
+
+.editor-insert-dialog input.InputBox {
+   width: 98%;
+}
+
+.editor-insert-dialog .Button {
+   display: inline;
+   margin: 0;
+}
+
+.editor-insert-dialog hr {
+   margin: 0 0 10px 0;
+}
+
+
+/**
+ * Going full page 
+ */
+
+#editor-toggle-fullpage-button {
+   cursor: pointer;
+   float: right;
+   margin: -1px 0 0 0;
+}
+
+/* Added to body class witj js, so force specificity for everything 
+below; this makes editing very easy */
+
+.js-editor-fullpage{}
+
+/* Background overlay. No need to insert empty div in markup; doing so at the 
+current location, due to event insertion, makes z-index troublesome. */
+
+.js-editor-fullpage:after {
+   content: ' ';
+   display: block;
+   position: fixed;
+   z-index: 500;
+   background-color: #fff;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+
+  animation-duration: 0.4s;
+  animation-name: editor-anim-overlay;
+}
+
+.js-editor-fullpage .FormWrapper {
+   position: absolute;
+   z-index: 1000;
+   top: 20px;
+   right: 20%;
+   left: 20%;
+   background-color: transparent;
+   animation-duration: .4s;
+   animation-name: editor-anim-editor;
+}
+
+
+/* have to be a bit rough here, because styles defined inline by wysihtml5 */
+.js-editor-fullpage .TextBoxWrapper #Form_Body,
+.js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox
+{
+   width: 100% !important;
+   height: 400px !important;
+}
+
+@keyframes editor-anim-overlay {
+  from {
+    opacity: 0;
+  }
+  to {
+   opacity: 1;
+  }
+}
+
+@keyframes editor-anim-editor {
+  0% {
+    top: -1000px;
+    opacity: 0;
+    transform: scale(1.25);
+  }
+  75% {
+   top: 60px;
+   opacity: 0.75;
+   transform: scale(0.75);
+  }
+  100% {
+   top: 20px;
+   opacity: 1;
+   transform: scale(1);
+  }
+}
