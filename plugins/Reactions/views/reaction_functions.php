@@ -351,6 +351,11 @@ function WriteReactions($Row) {
          echo '</span>';
       echo '</span>';
       
+      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Reactions.Edit'), FALSE)) {
+         echo Gdn_Theme::BulletItem('ReactionsMod').
+            Anchor(T('Log'), "/reactions/log/{$RecordType}/{$ID}", 'Popup');
+      }
+      
       Gdn::Controller()->FireEvent('AfterReactions');
    
    echo '</div>';
@@ -383,7 +388,7 @@ function WriteRecordReactions($Row) {
       if ($UserPhoto == '')
          continue;
       
-      $RecordReactions .= '<span class="UserReactionWrap" title="'.htmlspecialchars($Title).'">'
+      $RecordReactions .= '<span class="UserReactionWrap" title="'.htmlspecialchars($Title).'" data-userid="'.GetValue('UserID', $User).'">'
          .$UserPhoto
          ."<span class=\"ReactSprite $SpriteClass\"></span>"
       .'</span>';
