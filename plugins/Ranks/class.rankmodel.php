@@ -22,8 +22,6 @@ class RankModel extends Gdn_Model {
       
       // Check the ranks backwards so we know which rank to apply.
       $Ranks = array_reverse($Ranks);
-//      decho($Ranks);
-//      die();
       foreach ($Ranks as $Rank) {
          if (self::TestRank($User, $Rank)) {
             $RankID = $Rank['RankID'];
@@ -32,7 +30,7 @@ class RankModel extends Gdn_Model {
          }
       }
       
-      if (!$RankID || $RankID == $CurrentRankID)
+      if (isset($RankID) && $RankID == $CurrentRankID)
          return $Result;
       
       // Apply the rank.
@@ -41,7 +39,7 @@ class RankModel extends Gdn_Model {
       
       $Notify = $Rank['Level'] > 1;
       
-      if ($Result['CurrentRank'] && $Result['NewRank']['Level'] > $Result['CurrentRank']['Level'])
+      if (!isset($Result['NewRank']) || ($Result['CurrentRank'] && $Result['NewRank']['Level'] < $Result['CurrentRank']['Level']))
          $Notify = FALSE;
       
       if ($Notify) {
@@ -236,6 +234,10 @@ class RankModel extends Gdn_Model {
          $Result[] = Plural($V, '%s point', '%s points');
       }
       
+      if ($V = GetValue('Time', $Criteria)) {
+         $Result[] = sprintf(T('member for %s'), $V);
+      }
+      
       if ($V = GetValue('CountPosts', $Criteria)) {
          $Result[] = Plural($V, '%s post', '%s posts');
       }
@@ -389,6 +391,14 @@ class RankModel extends Gdn_Model {
          if ($PointsCriteria >= 0 && $UserPoints < $PointsCriteria)
             return FALSE;
          elseif ($PointsCriteria < 0 && $UserPoints > $PointsCriteria)
+            return FALSE;
+      }
+      
+      if (isset($Criteria['Time'])) {
+         $TimeFirstVisit = Gdn_Format::ToTimestamp(GetValue('DateFirstVisit', $User));
+         $TimeCriteria = strtotime($Criteria['Time'], 0);
+         
+         if ($TimeCriteria && ($TimeFirstVisit + $TimeCriteria > time()))
             return FALSE;
       }
       
