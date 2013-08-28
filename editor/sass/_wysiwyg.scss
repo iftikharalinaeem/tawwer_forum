@@ -135,3 +135,49 @@
 .wysiwyg-clear-left {
   clear: left;
 }
+
+
+
+/* Custom classes */
+
+/* del */
+.Delete {
+   text-decoration: line-through;
+}
+
+/* blockquote */
+.Quote {
+   padding-left: 20px;
+   border-left: 5px solid rgba(0,0,0,0.1);
+}
+
+/* blockquote */
+.CodeBlock {
+   font-family: monospace;
+   padding-left: 20px;
+   border-left: 5px solid rgba(0,0,0,0.2);
+   background-color: rgba(0,0,0,0.1);
+   white-space: nowrap;
+}
+
+/* div */
+.Spoiler {
+   color: transparent;
+   height: 20px;
+   padding: 0 20px;
+   margin: 20px 20%;
+   border: 1px solid rgba(0,0,0,0.04);
+   border-left: 0;
+   border-right: 0;
+   box-shadow: 0 -4px 5px -5px rgba(0,0,0,0.2), 0 4px 5px -5px rgba(0,0,0,0.2);
+}
+
+.Spoiler:hover {
+   transition: all 0.1s ease-in;
+   height: auto;
+   padding: 10px 20px;
+   height: inherit;
+   color: inherit;
+   background-color: rgba(0,0,0,0.04);
+}
+

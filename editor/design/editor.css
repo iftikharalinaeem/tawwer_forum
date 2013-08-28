@@ -893,10 +893,68 @@
   clear: left;
 }
 
+/* Custom classes */
+/* del */
+/* line 144, ../sass/_wysiwyg.scss */
+.Delete {
+  text-decoration: line-through;
+}
+
+/* blockquote */
+/* line 149, ../sass/_wysiwyg.scss */
+.Quote {
+  padding-left: 20px;
+  border-left: 5px solid rgba(0, 0, 0, 0.1);
+}
+
+/* blockquote */
+/* line 155, ../sass/_wysiwyg.scss */
+.CodeBlock {
+  font-family: monospace;
+  padding-left: 20px;
+  border-left: 5px solid rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+/* div */
+/* line 164, ../sass/_wysiwyg.scss */
+.Spoiler {
+  color: transparent;
+  height: 20px;
+  padding: 0 20px;
+  margin: 20px 20%;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-left: 0;
+  border-right: 0;
+  box-shadow: 0 -4px 5px -5px rgba(0, 0, 0, 0.2), 0 4px 5px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* line 175, ../sass/_wysiwyg.scss */
+.Spoiler:hover {
+  transition: all 0.1s ease-in;
+  height: auto;
+  padding: 10px 20px;
+  height: inherit;
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
 /**
  * Editor toolbar 
  */
-/* line 9, ../sass/editor.scss */
+/* If JS disabled */
+/* line 13, ../sass/editor.scss */
+.editor {
+  display: none;
+}
+
+/* line 17, ../sass/editor.scss */
+.wysihtml5-supported .editor {
+  display: block;
+}
+
+/* line 21, ../sass/editor.scss */
 .editor {
   background-color: #999999;
   background-color: rgba(0, 0, 0, 0.4);
@@ -904,69 +962,153 @@
   margin: 0 0 -5px 0;
 }
 
-/* line 16, ../sass/editor.scss */
+/* line 28, ../sass/editor.scss */
 .FormWrapper-Condensed .editor {
   margin: 0;
 }
 
-/* line 20, ../sass/editor.scss */
+/* Editing comments in a discussion */
+/* line 33, ../sass/editor.scss */
+.FormWrapper-Condensed .editorInlineGenerated {
+  margin: 0 0 -5px 0;
+}
+
+/* line 37, ../sass/editor.scss */
 .editor .icon {
   display: inline;
   padding: 5px 8px;
   margin: 0 -1px;
   color: #F7F7F7;
   border: 1px solid transparent;
+  cursor: pointer;
 }
 
-/* line 32, ../sass/editor.scss */
+/* State of icons */
+/* line 51, ../sass/editor.scss */
 .editor .icon:hover,
 .wysihtml5-command-active,
-.wysihtml5-command-dialog-opened,
-.wysihtml5-action-active {
+.wysihtml5-action-active,
+.wysihtml5-command-dialog-opened {
   border-radius: 2px;
   background-color: #666666;
 }
 
-/* line 37, ../sass/editor.scss */
+/* line 56, ../sass/editor.scss */
 .editor .editor-sep {
   border-left: 1px solid #888888;
   margin: 0 8px 0 5px;
 }
 
-/* line 42, ../sass/editor.scss */
-.editor .ToggleFlyout {
+/* line 61, ../sass/editor.scss */
+.editor .editor-dropdown {
   display: inline-block;
   position: relative;
 }
 
 /* For links and images, flyout */
-/* line 48, ../sass/editor.scss */
+/* line 67, ../sass/editor.scss */
 .editor-insert-dialog {
   margin: 5px 0 0 -1px;
-  padding: 10px;
+  padding: 5px;
   width: 300px;
+  position: absolute;
 }
 
-/* line 54, ../sass/editor.scss */
+/* line 74, ../sass/editor.scss */
 .editor-insert-dialog input.InputBox {
-  width: 98%;
+  width: 97.5%;
 }
 
-/* line 58, ../sass/editor.scss */
-.editor-insert-dialog .Button {
-  display: inline;
-  margin: 0;
-}
-
-/* line 63, ../sass/editor.scss */
+/* line 78, ../sass/editor.scss */
 .editor-insert-dialog hr {
   margin: 0 0 10px 0;
+}
+
+/* line 82, ../sass/editor.scss */
+.editor-colors-flyout {
+  width: 92px;
+}
+
+/* line 86, ../sass/editor.scss */
+.editor-colors-flyout .color {
+  width: 20px;
+  height: 20px;
+  float: left;
+  cursor: pointer;
+  margin: 1px 1px 0 0;
+  border: 1px solid transparent;
+}
+
+/* line 96, ../sass/editor.scss */
+.editor-colors-flyout .color:hover,
+.editor-colors-flyout .wysihtml5-command-active {
+  border: 1px solid #fff;
+}
+
+/* line 100, ../sass/editor.scss */
+.editor-colors-flyout .color-black {
+  background-color: black;
+}
+
+/* line 104, ../sass/editor.scss */
+.editor-colors-flyout .color-white {
+  background-color: white;
+}
+
+/* line 108, ../sass/editor.scss */
+.editor-colors-flyout .color-gray {
+  background-color: gray;
+}
+
+/* line 112, ../sass/editor.scss */
+.editor-colors-flyout .color-silver {
+  background-color: silver;
+}
+
+/* line 116, ../sass/editor.scss */
+.editor-colors-flyout .color-maroon {
+  background-color: maroon;
+}
+
+/* line 120, ../sass/editor.scss */
+.editor-colors-flyout .color-red {
+  background-color: red;
+}
+
+/* line 124, ../sass/editor.scss */
+.editor-colors-flyout .color-purple {
+  background-color: purple;
+}
+
+/* line 128, ../sass/editor.scss */
+.editor-colors-flyout .color-green {
+  background-color: green;
+}
+
+/* line 132, ../sass/editor.scss */
+.editor-colors-flyout .color-olive {
+  background-color: olive;
+}
+
+/* line 136, ../sass/editor.scss */
+.editor-colors-flyout .color-navy {
+  background-color: navy;
+}
+
+/* line 140, ../sass/editor.scss */
+.editor-colors-flyout .color-blue {
+  background-color: blue;
+}
+
+/* line 144, ../sass/editor.scss */
+.editor-colors-flyout .color-lime {
+  background-color: lime;
 }
 
 /**
  * Going full page 
  */
-/* line 72, ../sass/editor.scss */
+/* line 153, ../sass/editor.scss */
 #editor-toggle-fullpage-button {
   cursor: pointer;
   float: right;
@@ -977,7 +1119,7 @@
 below; this makes editing very easy */
 /* Background overlay. No need to insert empty div in markup; doing so at the 
 current location, due to event insertion, makes z-index troublesome. */
-/* line 86, ../sass/editor.scss */
+/* line 167, ../sass/editor.scss */
 .js-editor-fullpage:after {
   content: ' ';
   display: block;
@@ -988,11 +1130,11 @@ current location, due to event insertion, makes z-index troublesome. */
   left: 0;
   right: 0;
   bottom: 0;
-  animation-duration: 0.4s;
+  animation-duration: 0.5s;
   animation-name: editor-anim-overlay;
 }
 
-/* line 101, ../sass/editor.scss */
+/* line 181, ../sass/editor.scss */
 .js-editor-fullpage .FormWrapper {
   position: absolute;
   z-index: 1000;
@@ -1000,12 +1142,13 @@ current location, due to event insertion, makes z-index troublesome. */
   right: 20%;
   left: 20%;
   background-color: transparent;
+  width: auto;
   animation-duration: .4s;
   animation-name: editor-anim-editor;
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
-/* line 116, ../sass/editor.scss */
+/* line 196, ../sass/editor.scss */
 .js-editor-fullpage .TextBoxWrapper #Form_Body,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
   width: 100% !important;
@@ -1013,33 +1156,33 @@ current location, due to event insertion, makes z-index troublesome. */
 }
 
 @keyframes editor-anim-overlay {
-  /* line 122, ../sass/editor.scss */
+  /* line 202, ../sass/editor.scss */
   from {
     opacity: 0;
   }
 
-  /* line 125, ../sass/editor.scss */
+  /* line 205, ../sass/editor.scss */
   to {
     opacity: 1;
   }
 }
 
 @keyframes editor-anim-editor {
-  /* line 131, ../sass/editor.scss */
+  /* line 211, ../sass/editor.scss */
   0% {
     top: -1000px;
     opacity: 0;
     transform: scale(1.25);
   }
 
-  /* line 136, ../sass/editor.scss */
+  /* line 216, ../sass/editor.scss */
   75% {
     top: 60px;
     opacity: 0.75;
     transform: scale(0.75);
   }
 
-  /* line 141, ../sass/editor.scss */
+  /* line 221, ../sass/editor.scss */
   100% {
     top: 20px;
     opacity: 1;

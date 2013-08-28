@@ -6,6 +6,18 @@
  * Editor toolbar 
  */
 
+
+
+/* If JS disabled */
+
+.editor {
+   display: none;
+}
+
+.wysihtml5-supported .editor {
+   display: block;
+}
+
 .editor {
 	background-color: #999999;
 	background-color: rgba(0, 0, 0, 0.4);
@@ -17,18 +29,25 @@
    margin: 0;
 }
 
+/* Editing comments in a discussion */
+.FormWrapper-Condensed .editorInlineGenerated{
+   margin: 0 0 -5px 0;
+}
+
 .editor .icon {
    display: inline;
    padding: 5px 8px;
    margin: 0 -1px;
    color: #F7F7F7;
    border: 1px solid transparent;
+   cursor: pointer;
 }
 
+/* State of icons */
 .editor .icon:hover,
 .wysihtml5-command-active,
-.wysihtml5-command-dialog-opened,
-.wysihtml5-action-active
+.wysihtml5-action-active,
+.wysihtml5-command-dialog-opened
 {
    border-radius: 2px;
    background-color: #666666;
@@ -39,7 +58,7 @@
    margin: 0 8px 0 5px;
 }
 
-.editor .ToggleFlyout {
+.editor .editor-dropdown {
    display: inline-block;
    position: relative;
 }
@@ -47,21 +66,83 @@
 /* For links and images, flyout */
 .editor-insert-dialog {
    margin: 5px 0 0 -1px;
-   padding: 10px;
+   padding: 5px;
    width: 300px;
+   position: absolute;
 }
 
 .editor-insert-dialog input.InputBox {
-   width: 98%;
-}
-
-.editor-insert-dialog .Button {
-   display: inline;
-   margin: 0;
+   width: 97.5%;
 }
 
 .editor-insert-dialog hr {
    margin: 0 0 10px 0;
+}
+
+.editor-colors-flyout {
+   width: 92px;
+}
+
+.editor-colors-flyout .color {
+   width: 20px;
+   height: 20px;
+   float: left;
+   cursor: pointer;
+   margin: 1px 1px 0 0;
+   border: 1px solid transparent;
+}
+
+.editor-colors-flyout .color:hover,
+.editor-colors-flyout .wysihtml5-command-active {
+   border: 1px solid #fff;
+}
+
+.editor-colors-flyout .color-black {
+   background-color: black;
+}
+
+.editor-colors-flyout .color-white {
+   background-color: white;
+}
+
+.editor-colors-flyout .color-gray {
+   background-color: gray;
+}
+
+.editor-colors-flyout .color-silver {
+   background-color: silver;
+}
+
+.editor-colors-flyout .color-maroon {
+   background-color: maroon;
+}
+
+.editor-colors-flyout .color-red {
+   background-color: red;
+}
+
+.editor-colors-flyout .color-purple {
+   background-color: purple;
+}
+
+.editor-colors-flyout .color-green {
+   background-color: green;
+}
+
+.editor-colors-flyout .color-olive {
+   background-color: olive;
+}
+
+.editor-colors-flyout .color-navy {
+   background-color: navy;
+}
+
+.editor-colors-flyout .color-blue {
+   background-color: blue;
+}
+
+.editor-colors-flyout .color-lime {
+   background-color: lime;
 }
 
 
@@ -93,9 +174,8 @@ current location, due to event insertion, makes z-index troublesome. */
    left: 0;
    right: 0;
    bottom: 0;
-
-  animation-duration: 0.4s;
-  animation-name: editor-anim-overlay;
+   animation-duration: 0.5s;
+   animation-name: editor-anim-overlay;
 }
 
 .js-editor-fullpage .FormWrapper {
@@ -105,10 +185,10 @@ current location, due to event insertion, makes z-index troublesome. */
    right: 20%;
    left: 20%;
    background-color: transparent;
+   width: auto;
    animation-duration: .4s;
    animation-name: editor-anim-editor;
 }
-
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
 .js-editor-fullpage .TextBoxWrapper #Form_Body,

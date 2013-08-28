@@ -19,7 +19,7 @@
       Wysihtml5SizeMatters.prototype.setupEvents = function() {
         var _this = this;
 
-        return this.$body.on('keyup keydown paste change focus', function() {
+        return this.$body.on('keyup keydown keypress paste change focus focusin blur hover mouseover mouseenter mouseout select', function() {
           return _this.adjustHeight();
         });
       };

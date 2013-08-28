@@ -20,53 +20,38 @@ class EditorPlugin extends Gdn_Plugin {
    
    // Must be one of these formats
    protected $Formats = array('Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text');
-
-   /**
-    * Insert ButtonBar resource files on every page so they are available
-    * to any new uses of BodyBox in plugins and applications.
-    * 
-    * @param Gdn_Controller $Sender 
-    */
-   public function Base_Render_Before($Sender) {
-      
-      //$this->LoadEditorResources($Sender, C('Garden.InputFormatter','Html'));
-      
-      $Formatter = C('Garden.InputFormatter','Html');
-         
-      if (in_array($Formatter, $this->Formats)) {
-         $Sender->AddJsFile('wysihtml5.js', 'plugins/editor');
-         $Sender->AddJsFile('advanced.js', 'plugins/editor');
-         $Sender->AddJsFile('jquery.wysihtml5_size_matters.js', 'plugins/editor');
-         $Sender->AddJsFile('editor.js', 'plugins/editor');
-
-         // When manipulating textarea, store the editor format for reference.
-         $Sender->AddDefinition('InputFormat', $Formatter);
-
-         $Sender->AddDefinition('editorLinkUrlText', T('editor.LinkUrlText', 'Type the URL:'));
-         $Sender->AddDefinition('editorImageUrlText', T('editor.ImageUrlText', 'Type the image URL:'));
-         $Sender->AddDefinition('editorWysiwygHelpText', T('editor.BBCodeHelpText', 'You can use <b><a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a></b> in your post.'));
-         $Sender->AddDefinition('editorBBCodeHelpText', T('editor.BBCodeHelpText', 'You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.'));
-         $Sender->AddDefinition('editorHtmlHelpText', T('editor.HtmlHelpText', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.'));
-         $Sender->AddDefinition('editorMarkdownHelpText', T('editor.MarkdownHelpText', 'You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.'));
-      }
-   }
    
    public function AssetModel_StyleCss_Handler($Sender) {
-      
       $Sender->AddCssFile('editor.css', 'plugins/editor');
    }
       
    /**
-    * Attach editor anywhere 'BodyBox' is used.
+    * Attach editor anywhere 'BodyBox' is used. It is not being used for 
+    * editing a posted reply, so find another event to hook into.
     * 
     * @param Gdn_Controller $Sender 
     */
    public function Gdn_Form_BeforeBodyBox_Handler($Sender) {
-      
-      if (in_array(C('Garden.InputFormatter','Html'), $this->Formats)) {
-         $View = Gdn::Controller()->FetchView('editor','','plugins/editor');
-
+      if (in_array(C('Garden.InputFormatter','Html'), $this->Formats)) {         
+         Gdn::Controller()->AddJsFile('wysihtml5.js', 'plugins/editor');
+         Gdn::Controller()->AddJsFile('advanced.js', 'plugins/editor');
+         Gdn::Controller()->AddJsFile('jquery.wysihtml5_size_matters.js', 'plugins/editor');
+         Gdn::Controller()->AddJsFile('editor.js', 'plugins/editor');
+         
+         // When manipulating textarea, store the editor format for reference.
+         Gdn::Controller()->AddDefinition('InputFormat', $Formatter);
+         Gdn::Controller()->AddDefinition('editorLinkUrlText', T('editor.LinkUrlText', 'Type the URL:'));
+         Gdn::Controller()->AddDefinition('editorImageUrlText', T('editor.ImageUrlText', 'Type the image URL:'));
+         Gdn::Controller()->AddDefinition('editorWysiwygHelpText', T('editor.BBCodeHelpText', 'You can use <b><a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a></b> in your post.'));
+         Gdn::Controller()->AddDefinition('editorBBCodeHelpText', T('editor.BBCodeHelpText', 'You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.'));
+         Gdn::Controller()->AddDefinition('editorHtmlHelpText', T('editor.HtmlHelpText', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.'));
+         Gdn::Controller()->AddDefinition('editorMarkdownHelpText', T('editor.MarkdownHelpText', 'You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.'));
+         
+         // Called in JS
+         Gdn::Controller()->AddDefinition('editorPluginAssets', Url('/plugins/editor/'));
+         
          // Determine which controller (post or discussion) is invoking this.
+         $View = Gdn::Controller()->FetchView('editor','','plugins/editor');
          if (Gdn::Controller() instanceof PostController) {
             echo Wrap($View, 'div', array('class' => 'P'));
          } else {
@@ -74,17 +59,6 @@ class EditorPlugin extends Gdn_Plugin {
          }
       }
       
-   }
-   
-   /**
-    * Load editor resources
-    * 
-    * This method is abstracted because it is invoked by multiple controllers.
-    * 
-    * @param Gdn_Controller $Sender 
-    */
-   protected function LoadEditorResources($Sender, $Formatter) {
-   
    }
    
 }

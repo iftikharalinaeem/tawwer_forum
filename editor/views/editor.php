@@ -1,24 +1,46 @@
-<?php // editor toolbar ?>
-
-<div class="editor wysihtml5-toolbar" id="wysihtml5-toolbar" style="display: none;">
+<div class="editor wysihtml5-toolbar" id="wysihtml5-toolbar">
 
    <a class="icon icon-bold" data-wysihtml5-command="bold" title="Bold CTRL+B"></a>
    <a class="icon icon-italic" data-wysihtml5-command="italic" title="Italic CTRL+I"></a>
-   <a class="icon icon-underline" data-wysihtml5-command="underline" title="Underline"></a>
-   <a class="icon icon-font" data-wysihtml5-command="foreColor" data-wysihtml5-command-value="red" title="Text color"> <i class="icon-caret-down"></i></a>
+   <a class="icon icon-strikethrough" data-wysihtml5-command="strikethrough" title="Strike through text"></a>
+ 
+   <div class="ToggleFlyout editor-dropdown">
+      <a class="icon icon-font" data-wysihtml5-command-group="foreColor" title="Text color">&nbsp;<span class="icon-caret-down"></span></a>
+      <ul class="editor-insert-dialog editor-colors-flyout Flyout MenuItems" data-wysihtml5-dialog="" style="display: none;">
+         <li class="color color-black" data-wysihtml5-command-value="black" data-wysihtml5-command="foreColor"></li>
+         <li class="color color-white" data-wysihtml5-command-value="white" data-wysihtml5-command="foreColor"></li>
+         <li class="color color-gray" data-wysihtml5-command-value="gray" data-wysihtml5-command="foreColor"></li>
+         <li class="color color-silver" data-wysihtml5-command-value="silver" data-wysihtml5-command="foreColor"></li>
+         <li class="color color-maroon" data-wysihtml5-command-value="maroon" data-wysihtml5-command="foreColor"></li>
+         <li class="color color-red" data-wysihtml5-command-value="red" data-wysihtml5-command="foreColor"></li>
+         <li class="color color-purple" data-wysihtml5-command-value="purple" data-wysihtml5-command="foreColor"></li>
+         <li class="color color-green" data-wysihtml5-command-value="green" data-wysihtml5-command="foreColor"></li>
+         <li class="color color-olive" data-wysihtml5-command-value="olive" data-wysihtml5-command="foreColor"></li>
+         <li class="color color-navy" data-wysihtml5-command-value="navy" data-wysihtml5-command="foreColor"></li>
+         <li class="color color-blue" data-wysihtml5-command-value="blue" data-wysihtml5-command="foreColor"></li>
+         <li class="color color-lime" data-wysihtml5-command-value="lime" data-wysihtml5-command="foreColor"></li>
+      </ul>
+   </div>
    
    <span class="editor-sep"></span>
    
-   <div class="ToggleFlyout">
-      <a class="icon icon-link FlyoutButton" data-wysihtml5-command="createLink" title="Insert link"></a>
+   <a class="icon icon-quote" data-wysihtml5-command="blockquote" title="Quote text"></a>
+   <a class="icon icon-code" data-wysihtml5-command="code" title="Highlight code"></a>
+   <a class="icon icon-ellipsis" data-wysihtml5-command="spoiler" title="Spoiler text"></a>
+   
+   <span class="editor-sep"></span>
+   
+   <div class="editor-dropdown">
+      <a class="icon icon-link" data-wysihtml5-command="createLink" title="Insert link"></a>
       <div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink" style="display: none;">
-        <input class="InputBox" data-wysihtml5-dialog-field="href" value="http://">
-        <a data-wysihtml5-dialog-action="save" class="Button">OK</a> 
-        <a class="Button" data-wysihtml5-dialog-action="cancel">Cancel</a>
+        <input class="InputBox" data-wysihtml5-dialog-field="href" value="http://" />
+        <hr />
+         <input type="button" data-wysihtml5-dialog-action="save" class="Button" value="OK"/>
+         <input type="button" data-wysihtml5-dialog-action="cancel" class="Button" value="Cancel"/>
       </div>
    </div>
    
-   <div class="ToggleFlyout">
+   <div class="editor-dropdown">
       <a class="icon icon-picture" data-wysihtml5-command="insertImage" title="Insert image"></a>
       <div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="insertImage" style="display: none;">
          <input class="InputBox" data-wysihtml5-dialog-field="src" value="http://">
@@ -31,8 +53,8 @@
             <option value="wysiwyg-float-right">right</option>
           </select>
          </label>
-         <a data-wysihtml5-dialog-action="save" class="Button">OK</a>
-         <a data-wysihtml5-dialog-action="cancel" class="Button">Cancel</a>
+         <input type="button" data-wysihtml5-dialog-action="save" class="Button" value="OK"/>
+         <input type="button" data-wysihtml5-dialog-action="cancel" class="Button" value="Cancel"/>
       </div>
    </div>
    
@@ -44,9 +66,9 @@
    <a class="icon icon-list-ol" data-wysihtml5-command="insertOrderedList" title="Insert ordered list"></a>
    <a class="icon icon-list-ul" data-wysihtml5-command="insertUnorderedList" title="Insert unordered list"></a> 
    
-  <span class="editor-sep"></span>
+   <span class="editor-sep"></span>
    
    <a class="icon icon-source"data-wysihtml5-action="change_view" title="Toggle HTML view"></a>
+   <a class="icon icon-resize-full" id="editor-toggle-fullpage-button" title="Toggle full page"></a>
    
-   <a class="icon icon-resize-full" id="editor-toggle-fullpage-button" title="Toggle fullscreen"></a>
 </div>

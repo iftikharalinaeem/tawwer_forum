@@ -71,7 +71,11 @@ var wysihtml5ParserRules = {
         "wysiwyg-text-align-center": 1,
         "wysiwyg-text-align-justify": 1,
         "wysiwyg-text-align-left": 1,
-        "wysiwyg-text-align-right": 1
+        "wysiwyg-text-align-right": 1,
+        
+        "Spoiler": 1,
+        "Quote": 1,
+        "CodeBlock": 1
     },
     /**
 * Tag list
@@ -108,7 +112,9 @@ var wysihtml5ParserRules = {
             }
         },
         "strike": {
-            "remove": 1
+            //"remove": 1
+            "rename_tag": "del",
+            "set_class": "wysiwyg-text-decoration-line-through"
         },
         "form": {
             "rename_tag": "div"
@@ -387,7 +393,7 @@ var wysihtml5ParserRules = {
             "rename_tag": "span"
         },
         "del": {
-            "remove": 1
+            //"remove": 1
         },
         "blockquote": {
             "check_attributes": {
