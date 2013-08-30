@@ -40,7 +40,7 @@ class EditorPlugin extends Gdn_Plugin {
 
          // For developing, manually set format to toggle between views. 
          // Q: activating plugin on old edited content should do what?
-         $Format = 'Wysiwyg';
+         $Format = 'Html';
          
          $c = Gdn::Controller();
          
@@ -50,14 +50,14 @@ class EditorPlugin extends Gdn_Plugin {
          
          
          // Set definitions for JavaScript
-         $c->AddDefinition('editorInputFormat', $Format);
-         $c->AddDefinition('editorLinkUrlText', T('editor.LinkUrlText', 'Type the URL:'));
-         $c->AddDefinition('editorImageUrlText', T('editor.ImageUrlText', 'Type the image URL:'));
-         $c->AddDefinition('editorWysiwygHelpText', T('editor.BBCodeHelpText', 'You can use <b><a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a></b> in your post.'));
-         $c->AddDefinition('editorBBCodeHelpText', T('editor.BBCodeHelpText', 'You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.'));
-         $c->AddDefinition('editorHtmlHelpText', T('editor.HtmlHelpText', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.'));
-         $c->AddDefinition('editorMarkdownHelpText', T('editor.MarkdownHelpText', 'You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.'));
-         $c->AddDefinition('editorPluginAssets', Url('/plugins/editor/'));
+         $c->AddDefinition('editorInputFormat',       $Format);
+         $c->AddDefinition('editorPluginAssets',      Url('/plugins/editor/'));
+         $c->AddDefinition('editorButtonBarLinkUrl',  T('editor.LinkUrlText', 'Enter URL:'));
+         $c->AddDefinition('editorButtonBarImageUrl', T('editor.ImageUrlText', 'Enter image URL:'));
+         $c->AddDefinition('editorWysiwygHelpText',   T('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a> in your post.'));
+         $c->AddDefinition('editorBBCodeHelpText',    T('editor.BBCodeHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a> in your post.'));
+         $c->AddDefinition('editorHtmlHelpText',      T('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a> in your post.'));
+         $c->AddDefinition('editorMarkdownHelpText',  T('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
          
          
          

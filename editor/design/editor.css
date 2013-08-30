@@ -973,9 +973,14 @@
   margin: 0 0 -5px 0;
 }
 
+/* line 37, ../sass/editor.scss */
+.editor-help-text {
+  font-size: 11px;
+}
+
 /* wysihtml5 lib does not insert proper inline style to hide textarea in Chrome */
 /**/
-/* line 41, ../sass/editor.scss */
+/* line 45, ../sass/editor.scss */
 .editor .icon {
   display: inline;
   padding: 5px 8px;
@@ -986,7 +991,7 @@
 }
 
 /* State of icons */
-/* line 55, ../sass/editor.scss */
+/* line 59, ../sass/editor.scss */
 .editor .icon:hover,
 .wysihtml5-command-active,
 .wysihtml5-action-active,
@@ -995,20 +1000,33 @@
   background-color: #666666;
 }
 
-/* line 60, ../sass/editor.scss */
+/* line 64, ../sass/editor.scss */
+.editor .editor-action-disabled {
+  background-color: transparent !important;
+  opacity: 0.25;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* line 71, ../sass/editor.scss */
+.editor .editor-action-hidden {
+  display: none;
+}
+
+/* line 75, ../sass/editor.scss */
 .editor .editor-sep {
   border-left: 1px solid #888888;
   margin: 0 8px 0 5px;
 }
 
-/* line 65, ../sass/editor.scss */
+/* line 80, ../sass/editor.scss */
 .editor .editor-dropdown {
   display: inline-block;
   position: relative;
 }
 
 /* For links and images, flyout */
-/* line 71, ../sass/editor.scss */
+/* line 86, ../sass/editor.scss */
 .editor-insert-dialog {
   margin: 5px 0 0 -1px;
   padding: 5px;
@@ -1017,22 +1035,22 @@
   z-index: 100;
 }
 
-/* line 79, ../sass/editor.scss */
+/* line 94, ../sass/editor.scss */
 .editor-insert-dialog input.InputBox {
   width: 97.5%;
 }
 
-/* line 83, ../sass/editor.scss */
+/* line 98, ../sass/editor.scss */
 .editor-insert-dialog hr {
   margin: 0 0 10px 0;
 }
 
-/* line 87, ../sass/editor.scss */
+/* line 102, ../sass/editor.scss */
 .editor-colors-flyout {
   width: 92px;
 }
 
-/* line 91, ../sass/editor.scss */
+/* line 106, ../sass/editor.scss */
 .editor-colors-flyout .color {
   width: 20px;
   height: 20px;
@@ -1042,68 +1060,68 @@
   border: 1px solid transparent;
 }
 
-/* line 101, ../sass/editor.scss */
+/* line 116, ../sass/editor.scss */
 .editor-colors-flyout .color:hover,
 .editor-colors-flyout .wysihtml5-command-active {
   border: 1px solid #fff;
 }
 
-/* line 105, ../sass/editor.scss */
+/* line 120, ../sass/editor.scss */
 .editor-colors-flyout .color-black {
   background-color: black;
 }
 
-/* line 109, ../sass/editor.scss */
+/* line 124, ../sass/editor.scss */
 .editor-colors-flyout .color-white {
   background-color: white;
 }
 
-/* line 113, ../sass/editor.scss */
+/* line 128, ../sass/editor.scss */
 .editor-colors-flyout .color-gray {
   background-color: gray;
 }
 
-/* line 117, ../sass/editor.scss */
+/* line 132, ../sass/editor.scss */
 .editor-colors-flyout .color-silver {
   background-color: silver;
 }
 
-/* line 121, ../sass/editor.scss */
+/* line 136, ../sass/editor.scss */
 .editor-colors-flyout .color-maroon {
   background-color: maroon;
 }
 
-/* line 125, ../sass/editor.scss */
+/* line 140, ../sass/editor.scss */
 .editor-colors-flyout .color-red {
   background-color: red;
 }
 
-/* line 129, ../sass/editor.scss */
+/* line 144, ../sass/editor.scss */
 .editor-colors-flyout .color-purple {
   background-color: purple;
 }
 
-/* line 133, ../sass/editor.scss */
+/* line 148, ../sass/editor.scss */
 .editor-colors-flyout .color-green {
   background-color: green;
 }
 
-/* line 137, ../sass/editor.scss */
+/* line 152, ../sass/editor.scss */
 .editor-colors-flyout .color-olive {
   background-color: olive;
 }
 
-/* line 141, ../sass/editor.scss */
+/* line 156, ../sass/editor.scss */
 .editor-colors-flyout .color-navy {
   background-color: navy;
 }
 
-/* line 145, ../sass/editor.scss */
+/* line 160, ../sass/editor.scss */
 .editor-colors-flyout .color-blue {
   background-color: blue;
 }
 
-/* line 149, ../sass/editor.scss */
+/* line 164, ../sass/editor.scss */
 .editor-colors-flyout .color-lime {
   background-color: lime;
 }
@@ -1111,7 +1129,7 @@
 /**
  * Going full page 
  */
-/* line 158, ../sass/editor.scss */
+/* line 173, ../sass/editor.scss */
 .editor-toggle-fullpage-button {
   cursor: pointer;
   float: right;
@@ -1122,7 +1140,7 @@
 below; this makes editing very easy */
 /* Background overlay. No need to insert empty div in markup; doing so at the 
 current location, due to event insertion, makes z-index troublesome. */
-/* line 172, ../sass/editor.scss */
+/* line 187, ../sass/editor.scss */
 .js-editor-fullpage:after {
   content: ' ';
   display: block;
@@ -1138,7 +1156,7 @@ current location, due to event insertion, makes z-index troublesome. */
 }
 
 /* .FormWrapper */
-/* line 187, ../sass/editor.scss */
+/* line 202, ../sass/editor.scss */
 .js-editor-fullpage #editor-fullpage-candidate {
   position: absolute;
   z-index: 1000;
@@ -1154,13 +1172,13 @@ current location, due to event insertion, makes z-index troublesome. */
 
 /* Temp, take this out when you figure out the element that is restricting 
 this child from going truly absolute */
-/* line 202, ../sass/editor.scss */
+/* line 217, ../sass/editor.scss */
 .js-editor-fullpage .EditCommentForm #editor-fullpage-candidate {
   position: fixed;
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
-/* line 209, ../sass/editor.scss */
+/* line 224, ../sass/editor.scss */
 .js-editor-fullpage .TextBoxWrapper #Form_Body,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
   width: 100% !important;
@@ -1168,33 +1186,33 @@ this child from going truly absolute */
 }
 
 @keyframes editor-anim-overlay {
-  /* line 215, ../sass/editor.scss */
+  /* line 230, ../sass/editor.scss */
   from {
     opacity: 0;
   }
 
-  /* line 218, ../sass/editor.scss */
+  /* line 233, ../sass/editor.scss */
   to {
     opacity: 1;
   }
 }
 
 @keyframes editor-anim-editor {
-  /* line 224, ../sass/editor.scss */
+  /* line 239, ../sass/editor.scss */
   0% {
     top: -1000px;
     opacity: 0;
     transform: scale(1.25);
   }
 
-  /* line 229, ../sass/editor.scss */
+  /* line 244, ../sass/editor.scss */
   75% {
     top: 60px;
     opacity: 0.75;
     transform: scale(0.75);
   }
 
-  /* line 234, ../sass/editor.scss */
+  /* line 249, ../sass/editor.scss */
   100% {
     top: 20px;
     opacity: 1;

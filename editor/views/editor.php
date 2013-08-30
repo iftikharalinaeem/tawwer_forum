@@ -28,10 +28,10 @@ foreach($this->Data('_Toolbar') as $key => $val) {
 
    <a class="icon icon-bold" data-wysihtml5-command="bold" title="Bold"></a>
    <a class="icon icon-italic" data-wysihtml5-command="italic" title="Italic"></a>
-   <a class="icon icon-strikethrough" data-wysihtml5-command="strikethrough" title="Strike through text"></a>
+   <a class="icon icon-strikethrough" data-wysihtml5-command="strikethrough" title="Strike"></a>
  
    <div class="ToggleFlyout editor-dropdown">
-      <a class="icon icon-font" data-wysihtml5-command-group="foreColor" title="Text color">&nbsp;<span class="icon-caret-down"></span></a>
+      <a class="icon icon-font editor-action-disabled" data-wysihtml5-command-group="foreColor" title="Color">&nbsp;<span class="icon-caret-down"></span></a>
       <ul class="editor-insert-dialog editor-colors-flyout Flyout MenuItems" data-wysihtml5-dialog="" style="display: none;">
          <li class="color color-black" data-wysihtml5-command-value="black" data-wysihtml5-command="foreColor"></li>
          <li class="color color-white" data-wysihtml5-command-value="white" data-wysihtml5-command="foreColor"></li>
@@ -50,14 +50,14 @@ foreach($this->Data('_Toolbar') as $key => $val) {
    
    <span class="editor-sep"></span>
    
-   <a class="icon icon-quote" data-wysihtml5-command="blockquote" title="Quote text"></a>
-   <a class="icon icon-code" data-wysihtml5-command="code" title="Highlight code"></a>
-   <a class="icon icon-ellipsis" data-wysihtml5-command="spoiler" title="Spoiler text"></a>
+   <a class="icon icon-quote" data-wysihtml5-command="blockquote" title="Quote"></a>
+   <a class="icon icon-code" data-wysihtml5-command="code" title="Code"></a>
+   <a class="icon icon-ellipsis" data-wysihtml5-command="spoiler" title="Spoiler"></a>
    
    <span class="editor-sep"></span>
    
    <div class="editor-dropdown">
-      <a class="icon icon-link" data-wysihtml5-command="createLink" title="Insert link"></a>
+      <a class="icon icon-link" data-wysihtml5-command="createLink" title="Url"></a>
       <div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink" style="display: none;">
         <input class="InputBox" data-wysihtml5-dialog-field="href" value="http://" />
         <hr />
@@ -67,7 +67,7 @@ foreach($this->Data('_Toolbar') as $key => $val) {
    </div>
    
    <div class="editor-dropdown">
-      <a class="icon icon-picture" data-wysihtml5-command="insertImage" title="Insert image"></a>
+      <a class="icon icon-picture" data-wysihtml5-command="insertImage" title="Image"></a>
       <div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="insertImage" style="display: none;">
          <input class="InputBox" data-wysihtml5-dialog-field="src" value="http://">
          <hr />
@@ -86,15 +86,15 @@ foreach($this->Data('_Toolbar') as $key => $val) {
    
   <span class="editor-sep"></span>
    
-   <a class="icon icon-align-left" data-wysihtml5-command="justifyLeft" title="Align left"></a>
-   <a class="icon icon-align-justify" data-wysihtml5-command="justifyCenter" title="Align center"></a>
-   <a class="icon icon-align-right" data-wysihtml5-command="justifyRight" title="Align right"></a>
+   <a class="icon icon-align-left editor-action-disabled" data-wysihtml5-command="justifyLeft" title="Align left"></a>
+   <a class="icon icon-align-justify editor-action-disabled" data-wysihtml5-command="justifyCenter" title="Align center"></a>
+   <a class="icon icon-align-right editor-action-disabled" data-wysihtml5-command="justifyRight" title="Align right"></a>
    <a class="icon icon-list-ol" data-wysihtml5-command="insertOrderedList" title="Insert ordered list"></a>
    <a class="icon icon-list-ul" data-wysihtml5-command="insertUnorderedList" title="Insert unordered list"></a> 
    
    <span class="editor-sep"></span>
    
-   <a class="icon icon-source"data-wysihtml5-action="change_view" title="Toggle HTML view"></a>
+   <a class="icon icon-source editor-action-disabled"data-wysihtml5-action="change_view" title="Toggle HTML view"></a>
    <a class="icon icon-resize-full editor-toggle-fullpage-button" id="editor-toggle-fullpage-button" title="Toggle full page"></a>
    
 </div>

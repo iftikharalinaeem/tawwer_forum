@@ -34,6 +34,10 @@
    margin: 0 0 -5px 0;
 }
 
+.editor-help-text {
+   font-size: 11px;
+}
+
 
 /* wysihtml5 lib does not insert proper inline style to hide textarea in Chrome */
 /**/
@@ -55,6 +59,17 @@
 {
    border-radius: 2px;
    background-color: #666666;
+}
+
+.editor .editor-action-disabled {
+   background-color: transparent !important;
+   opacity: 0.25;
+   cursor: default;
+   pointer-events: none;
+}
+
+.editor .editor-action-hidden {
+   display: none;
 }
 
 .editor .editor-sep {

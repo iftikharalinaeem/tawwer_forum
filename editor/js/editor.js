@@ -12,12 +12,17 @@ jQuery(function() {
    });
    
    /**
-    * Determine editor format to load, and asset path
+    * Determine editor format to load, and asset path, default to Wysiwyg
     */
-   var format = gdn.definition('editorInputFormat', 'Wysiwyg').toLowerCase(),
-       assets = gdn.definition('editorPluginAssets'), 
-       editorRules = {}; // for wysiwyg
-
+   var formatOriginal = gdn.definition('editorInputFormat', 'Wysiwyg'),
+       format         = formatOriginal.toLowerCase(),
+       assets         = gdn.definition('editorPluginAssets'), 
+       editorRules    = {}; // for wysiwyg
+       
+   var editorToolbarId  = 'editor-format-'+ format,
+       editorTextareaId = 'Form_Body', // TODO get vanilla to assing uniques
+       editorName       = 'vanilla-editor-text';
+   
    switch (format) {
       
       /**
@@ -32,11 +37,11 @@ jQuery(function() {
              * Default editor values when first instantiated on page. Later, on DOM
              * mutations, these values are updated per editable comment.
              */
-
+/*
             var editorToolbarId  = 'editor-format-wysiwyg',
                 editorTextareaId = 'Form_Body', // TODO get vanilla to assing uniques
                 editorName       = 'vanilla-editor-text';
-
+*/
             editorRules = {
                // Give the editor a name, the name will also be set as class name on the iframe and on the iframe's body 
                name:                 editorName,
@@ -160,12 +165,58 @@ jQuery(function() {
          break;
       
       /**
+       * HTML editor 
+       */
+      case 'html':
+         
+         // Load script for wysiwyg editor async
+         $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
+            
+            
+            ButtonBar.AttachTo($('#'+editorTextareaId));
+            
+            
+            
+         });
+         
+         break;
+         
+      /**
+       * BBCode editor 
+       */
+      case 'bbcode':
+         
+         // Load script for wysiwyg editor async
+         $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
+            
+            ButtonBar.AttachTo($('#'+editorTextareaId));
+            
+         });
+         
+         break;
+         
+      /**
        * Markdown editor 
        */
       case 'markdown':
          
          // Load script for wysiwyg editor async
-         $.getScript(assets + "js/buttonbar.js", function(data, textStatus, jqxhr) {
+         $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
+
+            
+            ButtonBar.AttachTo($('#'+editorTextareaId));
+            
+         });
+         
+         break;
+
+      /**
+       * Regular text editor 
+       */
+      case 'text':
+         
+         // Load script for wysiwyg editor async
+         $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
 
             
          });
@@ -214,6 +265,7 @@ jQuery(function() {
    // If full page and the user posts comment, exit out of full page.
    // Not smart in the sense that a failed post will also exit out of 
    // full page, but the text will remain in editor, so not big issue.
+   // TODO when user clicks cancel, close as well.
    var postCommentCloseFullPageEvent = function() {
       $('.CommentButton').click(function() {
          if ($('body').hasClass('js-editor-fullpage')) { 
@@ -221,6 +273,16 @@ jQuery(function() {
          }
       });   
    }; 
+   
+   // Insert help text below every editor 
+   var editorSetHelpText = function(format, editorAreaObj) {            
+      $("<div></div>")
+         .addClass('editor-help-text')
+         .html(gdn.definition('editor'+ format +'HelpText'))
+         .insertAfter(editorAreaObj);
+    };
+   
+   editorSetHelpText(formatOriginal, $('#Form_Body'));
    
    $(".editor-toggle-fullpage-button").click(toggleFullpage);
    closeFullPageEsc();
@@ -231,11 +293,8 @@ jQuery(function() {
     * Mutation observer for attaching editor to every .BodyBox that's inserted 
     * into the DOM. Consider using livequery for wider support.
     * 
-    * TODO make even more modular so that it doesn't check for parent ids to 
-    * attach to tolbar and formbar. However, the #Form_Body would need to be 
-    * unique per. This will require abstracting the mutation anon function 
-    * and then calling it as a callback on mutation, but also just when 
-    * manually invoked
+    * TODO abstracting the mutation anon function and then calling it as a 
+    * callback on mutation, but also just when manually invoked.
     */
    $(document).ready(function() {
 
@@ -268,7 +327,7 @@ jQuery(function() {
               && currentEditorToolbar.length) {
 
               var currentEditableCommentId = (new Date()).getTime(),
-                  editorTextareaId         = currentEditableTextarea.id +'-'+ currentEditableCommentId,
+                  editorTextareaId         = currentEditableTextarea[0].id +'-'+ currentEditableCommentId,
                   editorToolbarId          = 'editor-format-'+ format +'-'+ currentEditableCommentId,
                   editorName               = 'vanilla-editor-text-'+ currentEditableCommentId;
 
@@ -280,29 +339,48 @@ jQuery(function() {
               $(currentEditableTextarea).attr('id', editorTextareaId); 
 
 
-              if (format == 'wysiwyg') {
-                  // rules updated for particular edit, look to editorRules for 
-                  // reference. Any defined here will overwrite the defaults set above.
-                  var editorRulesOTF = {
-                     name: editorName,
-                     toolbar: editorToolbarId      
-                  };
 
-                  // overwrite defaults with specific rules for this edit
-                  for (var dfr in editorRules) {
-                     if (typeof editorRulesOTF[dfr] == 'undefined') {
-                        editorRulesOTF[dfr] = editorRules[dfr];
+              // TODO add these as functions in an object, then just invoke
+              // them on format
+              switch (format) {
+                 case 'wysiwyg':
+                     // rules updated for particular edit, look to editorRules for 
+                     // reference. Any defined here will overwrite the defaults set above.
+                     var editorRulesOTF = {
+                        name: editorName,
+                        toolbar: editorToolbarId      
+                     };
+
+                     // overwrite defaults with specific rules for this edit
+                     for (var dfr in editorRules) {
+                        if (typeof editorRulesOTF[dfr] == 'undefined') {
+                           editorRulesOTF[dfr] = editorRules[dfr];
+                        }
                      }
-                  }
 
-                  // instantiate new editor
-                  var editorInline = new wysihtml5.Editor(editorTextareaId, editorRulesOTF);
+                     // instantiate new editor
+                     var editorInline = new wysihtml5.Editor(editorTextareaId, editorRulesOTF);
 
-                  editorInline.on('load', function() {
-                     // enable auto-resize
-                     $(editorInline.composer.iframe).wysihtml5_size_matters();      
-                  });
+                     editorInline.on('load', function() {
+                        // enable auto-resize
+                        $(editorInline.composer.iframe).wysihtml5_size_matters();      
+                     });
+                  break;
+                  
+                  case 'html':
+                  case 'bbcode':
+                  case 'markdown':
+                     
+                     ButtonBar.AttachTo($('#'+editorTextareaId));
+                  
+                     break;
+                  case 'text':
+                     break;
               }
+
+
+              // TODO this does not load 
+              //editorSetHelpText(format, $(editorTextareaId));
 
               // Attach fullpage listeners to newly created editor 
               $(".editor-toggle-fullpage-button").click(toggleFullpage);
