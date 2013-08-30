@@ -1,7 +1,33 @@
-<div class="editor wysihtml5-toolbar" id="wysihtml5-toolbar">
+<?php 
 
-   <a class="icon icon-bold" data-wysihtml5-command="bold" title="Bold CTRL+B"></a>
-   <a class="icon icon-italic" data-wysihtml5-command="italic" title="Italic CTRL+I"></a>
+foreach($this->Data('_Toolbar') as $key => $val) {
+   
+   $format = strtolower($val);
+   
+   
+   /*
+   switch ($Item['type']) {
+      case 'link':
+         unset($Item['type']);
+         echo Wrap('', 'a', $Item);
+         break;
+      case 'callback':
+         echo call_user_func($Item['callback'], $Item);
+         break;
+      case 'sep':
+         echo '<span class="editor-sep"></span>';
+         break;
+   }
+   */
+
+}
+
+?>
+
+<div class="editor editor-format-<?php echo $format; ?>" id="editor-format-<?php echo $format; ?>">
+
+   <a class="icon icon-bold" data-wysihtml5-command="bold" title="Bold"></a>
+   <a class="icon icon-italic" data-wysihtml5-command="italic" title="Italic"></a>
    <a class="icon icon-strikethrough" data-wysihtml5-command="strikethrough" title="Strike through text"></a>
  
    <div class="ToggleFlyout editor-dropdown">
@@ -69,6 +95,6 @@
    <span class="editor-sep"></span>
    
    <a class="icon icon-source"data-wysihtml5-action="change_view" title="Toggle HTML view"></a>
-   <a class="icon icon-resize-full" id="editor-toggle-fullpage-button" title="Toggle full page"></a>
+   <a class="icon icon-resize-full editor-toggle-fullpage-button" id="editor-toggle-fullpage-button" title="Toggle full page"></a>
    
 </div>

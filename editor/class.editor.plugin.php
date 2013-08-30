@@ -19,7 +19,7 @@ $PluginInfo['editor'] = array(
 class EditorPlugin extends Gdn_Plugin {
    
    // Must be one of these formats
-   protected $Formats = array('Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text');
+   protected $Formats = array('Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text', 'TextEx');
    
    public function AssetModel_StyleCss_Handler($Sender) {
       $Sender->AddCssFile('editor.css', 'plugins/editor');
@@ -32,27 +32,66 @@ class EditorPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $Sender 
     */
    public function Gdn_Form_BeforeBodyBox_Handler($Sender) {
-      if (in_array(C('Garden.InputFormatter','Html'), $this->Formats)) {         
-         Gdn::Controller()->AddJsFile('wysihtml5.js', 'plugins/editor');
-         Gdn::Controller()->AddJsFile('advanced.js', 'plugins/editor');
-         Gdn::Controller()->AddJsFile('jquery.wysihtml5_size_matters.js', 'plugins/editor');
-         Gdn::Controller()->AddJsFile('editor.js', 'plugins/editor');
+      
+      // Grab default format, and if none, set to Html
+      $Format = C('Garden.InputFormatter','Html');
+      
+      if (in_array($Format, $this->Formats)) {    
+
+         // For developing, manually set format to toggle between views. 
+         // Q: activating plugin on old edited content should do what?
+         $Format = 'Wysiwyg';
          
-         // When manipulating textarea, store the editor format for reference.
-         Gdn::Controller()->AddDefinition('InputFormat', $Formatter);
-         Gdn::Controller()->AddDefinition('editorLinkUrlText', T('editor.LinkUrlText', 'Type the URL:'));
-         Gdn::Controller()->AddDefinition('editorImageUrlText', T('editor.ImageUrlText', 'Type the image URL:'));
-         Gdn::Controller()->AddDefinition('editorWysiwygHelpText', T('editor.BBCodeHelpText', 'You can use <b><a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a></b> in your post.'));
-         Gdn::Controller()->AddDefinition('editorBBCodeHelpText', T('editor.BBCodeHelpText', 'You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.'));
-         Gdn::Controller()->AddDefinition('editorHtmlHelpText', T('editor.HtmlHelpText', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.'));
-         Gdn::Controller()->AddDefinition('editorMarkdownHelpText', T('editor.MarkdownHelpText', 'You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.'));
+         $c = Gdn::Controller();
          
-         // Called in JS
-         Gdn::Controller()->AddDefinition('editorPluginAssets', Url('/plugins/editor/'));
+         // This js file will asynchronously load the assets of each editor 
+         // view when required. This will prevent unnecessary requests.
+         $c->AddJsFile('editor.js', 'plugins/editor');
+         
+         
+         // Set definitions for JavaScript
+         $c->AddDefinition('editorInputFormat', $Format);
+         $c->AddDefinition('editorLinkUrlText', T('editor.LinkUrlText', 'Type the URL:'));
+         $c->AddDefinition('editorImageUrlText', T('editor.ImageUrlText', 'Type the image URL:'));
+         $c->AddDefinition('editorWysiwygHelpText', T('editor.BBCodeHelpText', 'You can use <b><a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a></b> in your post.'));
+         $c->AddDefinition('editorBBCodeHelpText', T('editor.BBCodeHelpText', 'You can use <b><a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a></b> in your post.'));
+         $c->AddDefinition('editorHtmlHelpText', T('editor.HtmlHelpText', 'You can use <b><a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a></b> in your post.'));
+         $c->AddDefinition('editorMarkdownHelpText', T('editor.MarkdownHelpText', 'You can use <b><a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a></b> in your post.'));
+         $c->AddDefinition('editorPluginAssets', Url('/plugins/editor/'));
+         
+         
+         
+         
+         // Set data for view
+         
+         //$
+         
+         // Basic editing (bold, italic, strike, headers+, colors+)
+         
+         
+         
+         
+         
+         $c->SetData('_Toolbar', array('format' => $Format));
+         
+         /*
+         if (!isset($c->Data['_Toolbar'])) {
+            $toolbar = array(
+                array('type' => 'link', 'class' => "icon icon-bold", 'data-wysihtml5-command' => "bold", 'title' => "Bold")
+            );
+            
+            $this->EventArguments['Toolbar'] =& $toolbar;
+            $this->FireEvent('InitToolbar');
+            $c->SetData('_Toolbar', $toolbar);
+         }
+          
+          */
+         //$c->SetData($Format);
+         
          
          // Determine which controller (post or discussion) is invoking this.
-         $View = Gdn::Controller()->FetchView('editor','','plugins/editor');
-         if (Gdn::Controller() instanceof PostController) {
+         $View = $c->FetchView('editor', '', 'plugins/editor');
+         if ($c instanceof PostController) {
             echo Wrap($View, 'div', array('class' => 'P'));
          } else {
             echo $View;

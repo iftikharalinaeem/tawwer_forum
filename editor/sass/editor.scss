@@ -14,7 +14,7 @@
    display: none;
 }
 
-.wysihtml5-supported .editor {
+.js-editor-active .editor {
    display: block;
 }
 
@@ -29,10 +29,14 @@
    margin: 0;
 }
 
-/* Editing comments in a discussion */
-.FormWrapper-Condensed .editorInlineGenerated{
+/* Editing comments in a discussion on the fly */
+.FormWrapper-Condensed .editor-inline-otf{
    margin: 0 0 -5px 0;
 }
+
+
+/* wysihtml5 lib does not insert proper inline style to hide textarea in Chrome */
+/**/
 
 .editor .icon {
    display: inline;
@@ -69,6 +73,7 @@
    padding: 5px;
    width: 300px;
    position: absolute;
+   z-index: 100;
 }
 
 .editor-insert-dialog input.InputBox {
@@ -150,7 +155,7 @@
  * Going full page 
  */
 
-#editor-toggle-fullpage-button {
+.editor-toggle-fullpage-button {
    cursor: pointer;
    float: right;
    margin: -1px 0 0 0;
@@ -178,16 +183,24 @@ current location, due to event insertion, makes z-index troublesome. */
    animation-name: editor-anim-overlay;
 }
 
-.js-editor-fullpage .FormWrapper {
+/* .FormWrapper */
+.js-editor-fullpage #editor-fullpage-candidate {
    position: absolute;
    z-index: 1000;
    top: 20px;
    right: 20%;
    left: 20%;
-   background-color: transparent;
    width: auto;
+   background-color: transparent;
+   padding: 0;
    animation-duration: .4s;
    animation-name: editor-anim-editor;
+}
+
+/* Temp, take this out when you figure out the element that is restricting 
+this child from going truly absolute */
+.js-editor-fullpage .EditCommentForm #editor-fullpage-candidate {
+   position: fixed;
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
