@@ -1,0 +1,1221 @@
+@font-face {
+  font-family: 'vanillicon';
+  src: url("fonts/vanillicon.eot");
+  src: url("fonts/vanillicon.eot?#iefix") format("embedded-opentype"), url("fonts/vanillicon.woff") format("woff"), url("fonts/vanillicon.ttf") format("truetype"), url("fonts/vanillicon.svg#vanillicon") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* line 12, ../sass/_iconfonts.scss */
+.icon {
+  font-family: 'vanillicon';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* line 23, ../sass/_iconfonts.scss */
+.icon-quote:before {
+  content: "\e000";
+}
+
+/* line 26, ../sass/_iconfonts.scss */
+.icon-pinterest:before {
+  content: "\e001";
+}
+
+/* line 29, ../sass/_iconfonts.scss */
+.icon-filter:before {
+  content: "\e002";
+}
+
+/* line 32, ../sass/_iconfonts.scss */
+.icon-video:before {
+  content: "\e003";
+}
+
+/* line 35, ../sass/_iconfonts.scss */
+.icon-jail:before {
+  content: "\e004";
+}
+
+/* line 38, ../sass/_iconfonts.scss */
+.icon-permalink:before {
+  content: "\e005";
+}
+
+/* line 41, ../sass/_iconfonts.scss */
+.icon-steam:before {
+  content: "\e006";
+}
+
+/* line 44, ../sass/_iconfonts.scss */
+.icon-cog:before {
+  content: "\e007";
+}
+
+/* line 47, ../sass/_iconfonts.scss */
+.icon-discussion:before {
+  content: "\e008";
+}
+
+/* line 50, ../sass/_iconfonts.scss */
+.icon-envelope-open:before {
+  content: "\e009";
+}
+
+/* line 53, ../sass/_iconfonts.scss */
+.icon-envelope:before {
+  content: "\e00a";
+}
+
+/* line 56, ../sass/_iconfonts.scss */
+.icon-group:before {
+  content: "\e00c";
+}
+
+/* line 59, ../sass/_iconfonts.scss */
+.icon-preview:before {
+  content: "\e00d";
+}
+
+/* line 62, ../sass/_iconfonts.scss */
+.icon-heart:before {
+  content: "\e00e";
+}
+
+/* line 65, ../sass/_iconfonts.scss */
+.icon-angry:before {
+  content: "\e00f";
+}
+
+/* line 68, ../sass/_iconfonts.scss */
+.icon-code:before {
+  content: "\e011";
+}
+
+/* line 71, ../sass/_iconfonts.scss */
+.icon-inbox:before {
+  content: "\e012";
+}
+
+/* line 74, ../sass/_iconfonts.scss */
+.icon-wtf:before {
+  content: "\e014";
+}
+
+/* line 77, ../sass/_iconfonts.scss */
+.icon-troll:before {
+  content: "\e015";
+}
+
+/* line 80, ../sass/_iconfonts.scss */
+.icon-user:before {
+  content: "\e019";
+}
+
+/* line 83, ../sass/_iconfonts.scss */
+.icon-rss:before {
+  content: "\e01a";
+}
+
+/* line 86, ../sass/_iconfonts.scss */
+.icon-linkedin:before {
+  content: "\e01b";
+}
+
+/* line 89, ../sass/_iconfonts.scss */
+.icon-twitter:before {
+  content: "\e01c";
+}
+
+/* line 92, ../sass/_iconfonts.scss */
+.icon-flag:before {
+  content: "\e01e";
+}
+
+/* line 95, ../sass/_iconfonts.scss */
+.icon-facebook:before {
+  content: "\e01f";
+}
+
+/* line 98, ../sass/_iconfonts.scss */
+.icon-gplus:before {
+  content: "\e020";
+}
+
+/* line 101, ../sass/_iconfonts.scss */
+.icon-warn:before {
+  content: "\e021";
+}
+
+/* line 104, ../sass/_iconfonts.scss */
+.icon-lol:before {
+  content: "\e022";
+}
+
+/* line 107, ../sass/_iconfonts.scss */
+.icon-frown:before {
+  content: "\f119";
+}
+
+/* line 110, ../sass/_iconfonts.scss */
+.icon-meh:before {
+  content: "\f11a";
+}
+
+/* line 113, ../sass/_iconfonts.scss */
+.icon-ticket:before {
+  content: "\f145";
+}
+
+/* line 116, ../sass/_iconfonts.scss */
+.icon-bullseye:before {
+  content: "\f140";
+}
+
+/* line 119, ../sass/_iconfonts.scss */
+.icon-ellipsis:before {
+  content: "\f141";
+}
+
+/* line 122, ../sass/_iconfonts.scss */
+.icon-star-half-full:before {
+  content: "\f123";
+}
+
+/* line 125, ../sass/_iconfonts.scss */
+.icon-search:before {
+  content: "\f002";
+}
+
+/* line 128, ../sass/_iconfonts.scss */
+.icon-star:before {
+  content: "\f005";
+}
+
+/* line 131, ../sass/_iconfonts.scss */
+.icon-star-empty:before {
+  content: "\f006";
+}
+
+/* line 134, ../sass/_iconfonts.scss */
+.icon-film:before {
+  content: "\f008";
+}
+
+/* line 137, ../sass/_iconfonts.scss */
+.icon-ok:before {
+  content: "\f00c";
+}
+
+/* line 140, ../sass/_iconfonts.scss */
+.icon-remove:before {
+  content: "\f00d";
+}
+
+/* line 143, ../sass/_iconfonts.scss */
+.icon-cog-2:before {
+  content: "\f013";
+}
+
+/* line 146, ../sass/_iconfonts.scss */
+.icon-trash:before {
+  content: "\f014";
+}
+
+/* line 149, ../sass/_iconfonts.scss */
+.icon-home:before {
+  content: "\f015";
+}
+
+/* line 152, ../sass/_iconfonts.scss */
+.icon-time:before {
+  content: "\f017";
+}
+
+/* line 155, ../sass/_iconfonts.scss */
+.icon-refresh:before {
+  content: "\f021";
+}
+
+/* line 158, ../sass/_iconfonts.scss */
+.icon-lock:before {
+  content: "\f023";
+}
+
+/* line 161, ../sass/_iconfonts.scss */
+.icon-tag:before {
+  content: "\f02b";
+}
+
+/* line 164, ../sass/_iconfonts.scss */
+.icon-tags:before {
+  content: "\f02c";
+}
+
+/* line 167, ../sass/_iconfonts.scss */
+.icon-bookmark:before {
+  content: "\f02e";
+}
+
+/* line 170, ../sass/_iconfonts.scss */
+.icon-font:before {
+  content: "\f031";
+}
+
+/* line 173, ../sass/_iconfonts.scss */
+.icon-bold:before {
+  content: "\f032";
+}
+
+/* line 176, ../sass/_iconfonts.scss */
+.icon-italic:before {
+  content: "\f033";
+}
+
+/* line 179, ../sass/_iconfonts.scss */
+.icon-align-left:before {
+  content: "\f036";
+}
+
+/* line 182, ../sass/_iconfonts.scss */
+.icon-align-center:before {
+  content: "\f037";
+}
+
+/* line 185, ../sass/_iconfonts.scss */
+.icon-align-right:before {
+  content: "\f038";
+}
+
+/* line 188, ../sass/_iconfonts.scss */
+.icon-align-justify:before {
+  content: "\f039";
+}
+
+/* line 191, ../sass/_iconfonts.scss */
+.icon-indent-left:before {
+  content: "\f03b";
+}
+
+/* line 194, ../sass/_iconfonts.scss */
+.icon-indent-right:before {
+  content: "\f03c";
+}
+
+/* line 197, ../sass/_iconfonts.scss */
+.icon-picture:before {
+  content: "\f03e";
+}
+
+/* line 200, ../sass/_iconfonts.scss */
+.icon-pencil:before {
+  content: "\f040";
+}
+
+/* line 203, ../sass/_iconfonts.scss */
+.icon-location:before {
+  content: "\f041";
+}
+
+/* line 206, ../sass/_iconfonts.scss */
+.icon-edit:before {
+  content: "\f044";
+}
+
+/* line 209, ../sass/_iconfonts.scss */
+.icon-share:before {
+  content: "\f045";
+}
+
+/* line 212, ../sass/_iconfonts.scss */
+.icon-chevron-left:before {
+  content: "\f053";
+}
+
+/* line 215, ../sass/_iconfonts.scss */
+.icon-chevron-right:before {
+  content: "\f054";
+}
+
+/* line 218, ../sass/_iconfonts.scss */
+.icon-remove-sign:before {
+  content: "\f057";
+}
+
+/* line 221, ../sass/_iconfonts.scss */
+.icon-ok-sign:before {
+  content: "\f058";
+}
+
+/* line 224, ../sass/_iconfonts.scss */
+.icon-question-sign:before {
+  content: "\f059";
+}
+
+/* line 227, ../sass/_iconfonts.scss */
+.icon-info-sign:before {
+  content: "\f05a";
+}
+
+/* line 230, ../sass/_iconfonts.scss */
+.icon-ban:before {
+  content: "\f05e";
+}
+
+/* line 233, ../sass/_iconfonts.scss */
+.icon-resize-full:before {
+  content: "\f065";
+}
+
+/* line 236, ../sass/_iconfonts.scss */
+.icon-resize-small:before {
+  content: "\f066";
+}
+
+/* line 239, ../sass/_iconfonts.scss */
+.icon-exclamation-sign:before {
+  content: "\f06a";
+}
+
+/* line 242, ../sass/_iconfonts.scss */
+.icon-eye-open:before {
+  content: "\f06e";
+}
+
+/* line 245, ../sass/_iconfonts.scss */
+.icon-eye-close:before {
+  content: "\f070";
+}
+
+/* line 248, ../sass/_iconfonts.scss */
+.icon-warning-sign:before {
+  content: "\f071";
+}
+
+/* line 251, ../sass/_iconfonts.scss */
+.icon-calendar:before {
+  content: "\f073";
+}
+
+/* line 254, ../sass/_iconfonts.scss */
+.icon-comment:before {
+  content: "\f075";
+}
+
+/* line 257, ../sass/_iconfonts.scss */
+.icon-chevron-up:before {
+  content: "\f077";
+}
+
+/* line 260, ../sass/_iconfonts.scss */
+.icon-chevron-down:before {
+  content: "\f078";
+}
+
+/* line 263, ../sass/_iconfonts.scss */
+.icon-retweet:before {
+  content: "\f079";
+}
+
+/* line 266, ../sass/_iconfonts.scss */
+.icon-folder-close:before {
+  content: "\f07b";
+}
+
+/* line 269, ../sass/_iconfonts.scss */
+.icon-folder-open:before {
+  content: "\f07c";
+}
+
+/* line 272, ../sass/_iconfonts.scss */
+.icon-bar-chart:before {
+  content: "\f080";
+}
+
+/* line 275, ../sass/_iconfonts.scss */
+.icon-camera-retro:before {
+  content: "\f083";
+}
+
+/* line 278, ../sass/_iconfonts.scss */
+.icon-comments:before {
+  content: "\f086";
+}
+
+/* line 281, ../sass/_iconfonts.scss */
+.icon-thumbs-up:before {
+  content: "\f087";
+}
+
+/* line 284, ../sass/_iconfonts.scss */
+.icon-thumbs-down:before {
+  content: "\f088";
+}
+
+/* line 287, ../sass/_iconfonts.scss */
+.icon-signout:before {
+  content: "\f08b";
+}
+
+/* line 290, ../sass/_iconfonts.scss */
+.icon-pushpin:before {
+  content: "\f08d";
+}
+
+/* line 293, ../sass/_iconfonts.scss */
+.icon-external-link:before {
+  content: "\f08e";
+}
+
+/* line 296, ../sass/_iconfonts.scss */
+.icon-signin:before {
+  content: "\f090";
+}
+
+/* line 299, ../sass/_iconfonts.scss */
+.icon-trophy:before {
+  content: "\f091";
+}
+
+/* line 302, ../sass/_iconfonts.scss */
+.icon-bookmark-empty:before {
+  content: "\f097";
+}
+
+/* line 305, ../sass/_iconfonts.scss */
+.icon-twitter-2:before {
+  content: "\f099";
+}
+
+/* line 308, ../sass/_iconfonts.scss */
+.icon-facebook-2:before {
+  content: "\f09a";
+}
+
+/* line 311, ../sass/_iconfonts.scss */
+.icon-unlock:before {
+  content: "\f09c";
+}
+
+/* line 314, ../sass/_iconfonts.scss */
+.icon-rss-2:before {
+  content: "\f09e";
+}
+
+/* line 317, ../sass/_iconfonts.scss */
+.icon-announcement:before {
+  content: "\f0a1";
+}
+
+/* line 320, ../sass/_iconfonts.scss */
+.icon-certificate:before {
+  content: "\f0a3";
+}
+
+/* line 323, ../sass/_iconfonts.scss */
+.icon-hand-right:before {
+  content: "\f0a4";
+}
+
+/* line 326, ../sass/_iconfonts.scss */
+.icon-hand-left:before {
+  content: "\f0a5";
+}
+
+/* line 329, ../sass/_iconfonts.scss */
+.icon-hand-up:before {
+  content: "\f0a6";
+}
+
+/* line 332, ../sass/_iconfonts.scss */
+.icon-hand-down:before {
+  content: "\f0a7";
+}
+
+/* line 335, ../sass/_iconfonts.scss */
+.icon-globe:before {
+  content: "\f0ac";
+}
+
+/* line 338, ../sass/_iconfonts.scss */
+.icon-tasks:before {
+  content: "\f0ae";
+}
+
+/* line 341, ../sass/_iconfonts.scss */
+.icon-link:before {
+  content: "\f0c1";
+}
+
+/* line 344, ../sass/_iconfonts.scss */
+.icon-cloud:before {
+  content: "\f0c2";
+}
+
+/* line 347, ../sass/_iconfonts.scss */
+.icon-attachment:before {
+  content: "\f0c6";
+}
+
+/* line 350, ../sass/_iconfonts.scss */
+.icon-menu:before {
+  content: "\f0c9";
+}
+
+/* line 353, ../sass/_iconfonts.scss */
+.icon-list-ul:before {
+  content: "\f0ca";
+}
+
+/* line 356, ../sass/_iconfonts.scss */
+.icon-list-ol:before {
+  content: "\f0cb";
+}
+
+/* line 359, ../sass/_iconfonts.scss */
+.icon-strikethrough:before {
+  content: "\f0cc";
+}
+
+/* line 362, ../sass/_iconfonts.scss */
+.icon-underline:before {
+  content: "\f0cd";
+}
+
+/* line 365, ../sass/_iconfonts.scss */
+.icon-pinterest-2:before {
+  content: "\f0d2";
+}
+
+/* line 368, ../sass/_iconfonts.scss */
+.icon-google-plus:before {
+  content: "\f0d5";
+}
+
+/* line 371, ../sass/_iconfonts.scss */
+.icon-caret-down:before {
+  content: "\f0d7";
+}
+
+/* line 374, ../sass/_iconfonts.scss */
+.icon-caret-up:before {
+  content: "\f0d8";
+}
+
+/* line 377, ../sass/_iconfonts.scss */
+.icon-caret-left:before {
+  content: "\f0d9";
+}
+
+/* line 380, ../sass/_iconfonts.scss */
+.icon-caret-right:before {
+  content: "\f0da";
+}
+
+/* line 383, ../sass/_iconfonts.scss */
+.icon-linkedin-2:before {
+  content: "\f0e1";
+}
+
+/* line 386, ../sass/_iconfonts.scss */
+.icon-dashboard:before {
+  content: "\f0e4";
+}
+
+/* line 389, ../sass/_iconfonts.scss */
+.icon-lightbulb:before {
+  content: "\f0eb";
+}
+
+/* line 392, ../sass/_iconfonts.scss */
+.icon-cloud-download:before {
+  content: "\f0ed";
+}
+
+/* line 395, ../sass/_iconfonts.scss */
+.icon-cloud-upload:before {
+  content: "\f0ee";
+}
+
+/* line 398, ../sass/_iconfonts.scss */
+.icon-bell:before {
+  content: "\f0f3";
+}
+
+/* line 401, ../sass/_iconfonts.scss */
+.icon-file-alt:before {
+  content: "\f0f6";
+}
+
+/* line 404, ../sass/_iconfonts.scss */
+.icon-reply:before {
+  content: "\f112";
+}
+
+/* line 407, ../sass/_iconfonts.scss */
+.icon-github-alt:before {
+  content: "\f113";
+}
+
+/* line 410, ../sass/_iconfonts.scss */
+.icon-source:before {
+  content: "\f121";
+}
+
+/* line 413, ../sass/_iconfonts.scss */
+.icon-reply-all:before {
+  content: "\f122";
+}
+
+/* line 416, ../sass/_iconfonts.scss */
+.icon-unlink:before {
+  content: "\f127";
+}
+
+/* line 419, ../sass/_iconfonts.scss */
+.icon-smile:before {
+  content: "\f118";
+}
+
+/* line 422, ../sass/_iconfonts.scss */
+.icon-moon:before {
+  content: "\f207";
+}
+
+/* line 425, ../sass/_iconfonts.scss */
+.icon-sun:before {
+  content: "\f206";
+}
+
+/* line 428, ../sass/_iconfonts.scss */
+.icon-hot:before {
+  content: "\e00b";
+}
+
+/* line 431, ../sass/_iconfonts.scss */
+.icon-spam:before {
+  content: "\e013";
+}
+
+/* line 434, ../sass/_iconfonts.scss */
+.icon-archive:before {
+  content: "\e010";
+}
+
+/* line 437, ../sass/_iconfonts.scss */
+.icon-plus-sign:before {
+  content: "\f055";
+}
+
+/* line 440, ../sass/_iconfonts.scss */
+.icon-mod:before {
+  content: "\e018";
+}
+
+/* line 443, ../sass/_iconfonts.scss */
+.icon-report:before {
+  content: "\e017";
+}
+
+/**
+ * Editor action styles within editor and post
+ */
+/* line 5, ../sass/_wysiwyg.scss */
+.wysiwyg-font-size-smaller {
+  font-size: smaller;
+}
+
+/* line 9, ../sass/_wysiwyg.scss */
+.wysiwyg-font-size-larger {
+  font-size: larger;
+}
+
+/* line 13, ../sass/_wysiwyg.scss */
+.wysiwyg-font-size-xx-large {
+  font-size: xx-large;
+}
+
+/* line 17, ../sass/_wysiwyg.scss */
+.wysiwyg-font-size-x-large {
+  font-size: x-large;
+}
+
+/* line 21, ../sass/_wysiwyg.scss */
+.wysiwyg-font-size-large {
+  font-size: large;
+}
+
+/* line 25, ../sass/_wysiwyg.scss */
+.wysiwyg-font-size-medium {
+  font-size: medium;
+}
+
+/* line 29, ../sass/_wysiwyg.scss */
+.wysiwyg-font-size-small {
+  font-size: small;
+}
+
+/* line 33, ../sass/_wysiwyg.scss */
+.wysiwyg-font-size-x-small {
+  font-size: x-small;
+}
+
+/* line 37, ../sass/_wysiwyg.scss */
+.wysiwyg-font-size-xx-small {
+  font-size: xx-small;
+}
+
+/* line 41, ../sass/_wysiwyg.scss */
+.wysiwyg-color-black {
+  color: black;
+}
+
+/* line 45, ../sass/_wysiwyg.scss */
+.wysiwyg-color-silver {
+  color: silver;
+}
+
+/* line 49, ../sass/_wysiwyg.scss */
+.wysiwyg-color-gray {
+  color: gray;
+}
+
+/* line 53, ../sass/_wysiwyg.scss */
+.wysiwyg-color-white {
+  color: white;
+}
+
+/* line 57, ../sass/_wysiwyg.scss */
+.wysiwyg-color-maroon {
+  color: maroon;
+}
+
+/* line 61, ../sass/_wysiwyg.scss */
+.wysiwyg-color-red {
+  color: red;
+}
+
+/* line 65, ../sass/_wysiwyg.scss */
+.wysiwyg-color-purple {
+  color: purple;
+}
+
+/* line 69, ../sass/_wysiwyg.scss */
+.wysiwyg-color-fuchsia {
+  color: fuchsia;
+}
+
+/* line 73, ../sass/_wysiwyg.scss */
+.wysiwyg-color-green {
+  color: green;
+}
+
+/* line 77, ../sass/_wysiwyg.scss */
+.wysiwyg-color-lime {
+  color: lime;
+}
+
+/* line 81, ../sass/_wysiwyg.scss */
+.wysiwyg-color-olive {
+  color: olive;
+}
+
+/* line 85, ../sass/_wysiwyg.scss */
+.wysiwyg-color-yellow {
+  color: yellow;
+}
+
+/* line 89, ../sass/_wysiwyg.scss */
+.wysiwyg-color-navy {
+  color: navy;
+}
+
+/* line 93, ../sass/_wysiwyg.scss */
+.wysiwyg-color-blue {
+  color: blue;
+}
+
+/* line 97, ../sass/_wysiwyg.scss */
+.wysiwyg-color-teal {
+  color: teal;
+}
+
+/* line 101, ../sass/_wysiwyg.scss */
+.wysiwyg-color-aqua {
+  color: aqua;
+}
+
+/* line 105, ../sass/_wysiwyg.scss */
+.wysiwyg-text-align-right {
+  text-align: right;
+}
+
+/* line 109, ../sass/_wysiwyg.scss */
+.wysiwyg-text-align-center {
+  text-align: center;
+}
+
+/* line 113, ../sass/_wysiwyg.scss */
+.wysiwyg-text-align-left {
+  text-align: left;
+}
+
+/* line 117, ../sass/_wysiwyg.scss */
+.wysiwyg-text-align-justify {
+  text-align: justify;
+}
+
+/* line 121, ../sass/_wysiwyg.scss */
+.wysiwyg-float-left {
+  float: left;
+  margin: 0 8px 8px 0;
+}
+
+/* line 126, ../sass/_wysiwyg.scss */
+.wysiwyg-float-right {
+  float: right;
+  margin: 0 0 8px 8px;
+}
+
+/* line 131, ../sass/_wysiwyg.scss */
+.wysiwyg-clear-right {
+  clear: right;
+}
+
+/* line 135, ../sass/_wysiwyg.scss */
+.wysiwyg-clear-left {
+  clear: left;
+}
+
+/* Custom classes */
+/* del */
+/* line 144, ../sass/_wysiwyg.scss */
+.Delete {
+  text-decoration: line-through;
+}
+
+/* blockquote */
+/* line 149, ../sass/_wysiwyg.scss */
+.Quote {
+  padding-left: 20px;
+  border-left: 5px solid rgba(0, 0, 0, 0.1);
+}
+
+/* blockquote */
+/* line 155, ../sass/_wysiwyg.scss */
+.CodeBlock {
+  font-family: monospace;
+  padding-left: 20px;
+  border-left: 5px solid rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+/* div */
+/* line 164, ../sass/_wysiwyg.scss */
+.Spoiler {
+  color: transparent;
+  height: 20px;
+  padding: 0 20px;
+  margin: 20px 20%;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-left: 0;
+  border-right: 0;
+  box-shadow: 0 -4px 5px -5px rgba(0, 0, 0, 0.2), 0 4px 5px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* line 175, ../sass/_wysiwyg.scss */
+.Spoiler:hover {
+  transition: all 0.1s ease-in;
+  height: auto;
+  padding: 10px 20px;
+  height: inherit;
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/**
+ * Editor toolbar 
+ */
+/* If JS disabled */
+/* line 13, ../sass/editor.scss */
+.editor {
+  display: none;
+}
+
+/* line 17, ../sass/editor.scss */
+.js-editor-active .editor {
+  display: block;
+}
+
+/* line 21, ../sass/editor.scss */
+.editor {
+  background-color: #999999;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 5px;
+  margin: 0 0 -5px 0;
+}
+
+/* line 28, ../sass/editor.scss */
+.FormWrapper-Condensed .editor {
+  margin: 0;
+}
+
+/* Editing comments in a discussion on the fly */
+/* line 33, ../sass/editor.scss */
+.FormWrapper-Condensed .editor-inline-otf {
+  margin: 0 0 -5px 0;
+}
+
+/* line 37, ../sass/editor.scss */
+.editor-help-text {
+  font-size: 11px;
+}
+
+/* wysihtml5 lib does not insert proper inline style to hide textarea in Chrome */
+/**/
+/* line 45, ../sass/editor.scss */
+.editor .icon {
+  display: inline;
+  padding: 5px 8px;
+  margin: 0 -1px;
+  color: #F7F7F7;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+/* State of icons */
+/* line 59, ../sass/editor.scss */
+.editor .icon:hover,
+.wysihtml5-command-active,
+.wysihtml5-action-active,
+.wysihtml5-command-dialog-opened {
+  border-radius: 2px;
+  background-color: #666666;
+}
+
+/* line 64, ../sass/editor.scss */
+.editor .editor-action-disabled {
+  background-color: transparent !important;
+  opacity: 0.25;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* line 71, ../sass/editor.scss */
+.editor .editor-action-hidden {
+  display: none;
+}
+
+/* line 75, ../sass/editor.scss */
+.editor .editor-sep {
+  border-left: 1px solid #888888;
+  margin: 0 8px 0 5px;
+}
+
+/* line 80, ../sass/editor.scss */
+.editor .editor-dropdown {
+  display: inline-block;
+  position: relative;
+}
+
+/* For links and images, flyout */
+/* line 86, ../sass/editor.scss */
+.editor-insert-dialog {
+  margin: 5px 0 0 -1px;
+  padding: 5px;
+  width: 300px;
+  position: absolute;
+  z-index: 100;
+}
+
+/* line 94, ../sass/editor.scss */
+.editor-insert-dialog input.InputBox {
+  width: 97.5%;
+}
+
+/* line 98, ../sass/editor.scss */
+.editor-insert-dialog hr {
+  margin: 0 0 10px 0;
+}
+
+/* line 102, ../sass/editor.scss */
+.editor-colors-flyout {
+  width: 92px;
+}
+
+/* line 106, ../sass/editor.scss */
+.editor-colors-flyout .color {
+  width: 20px;
+  height: 20px;
+  float: left;
+  cursor: pointer;
+  margin: 1px 1px 0 0;
+  border: 1px solid transparent;
+}
+
+/* line 116, ../sass/editor.scss */
+.editor-colors-flyout .color:hover,
+.editor-colors-flyout .wysihtml5-command-active {
+  border: 1px solid #fff;
+}
+
+/* line 120, ../sass/editor.scss */
+.editor-colors-flyout .color-black {
+  background-color: black;
+}
+
+/* line 124, ../sass/editor.scss */
+.editor-colors-flyout .color-white {
+  background-color: white;
+}
+
+/* line 128, ../sass/editor.scss */
+.editor-colors-flyout .color-gray {
+  background-color: gray;
+}
+
+/* line 132, ../sass/editor.scss */
+.editor-colors-flyout .color-silver {
+  background-color: silver;
+}
+
+/* line 136, ../sass/editor.scss */
+.editor-colors-flyout .color-maroon {
+  background-color: maroon;
+}
+
+/* line 140, ../sass/editor.scss */
+.editor-colors-flyout .color-red {
+  background-color: red;
+}
+
+/* line 144, ../sass/editor.scss */
+.editor-colors-flyout .color-purple {
+  background-color: purple;
+}
+
+/* line 148, ../sass/editor.scss */
+.editor-colors-flyout .color-green {
+  background-color: green;
+}
+
+/* line 152, ../sass/editor.scss */
+.editor-colors-flyout .color-olive {
+  background-color: olive;
+}
+
+/* line 156, ../sass/editor.scss */
+.editor-colors-flyout .color-navy {
+  background-color: navy;
+}
+
+/* line 160, ../sass/editor.scss */
+.editor-colors-flyout .color-blue {
+  background-color: blue;
+}
+
+/* line 164, ../sass/editor.scss */
+.editor-colors-flyout .color-lime {
+  background-color: lime;
+}
+
+/**
+ * Going full page 
+ */
+/* line 173, ../sass/editor.scss */
+.editor-toggle-fullpage-button {
+  cursor: pointer;
+  float: right;
+  margin: -1px 0 0 0;
+}
+
+/* Added to body class witj js, so force specificity for everything 
+below; this makes editing very easy */
+/* Background overlay. No need to insert empty div in markup; doing so at the 
+current location, due to event insertion, makes z-index troublesome. */
+/* line 187, ../sass/editor.scss */
+.js-editor-fullpage:after {
+  content: ' ';
+  display: block;
+  position: fixed;
+  z-index: 500;
+  background-color: #fff;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation-duration: 0.5s;
+  animation-name: editor-anim-overlay;
+}
+
+/* .FormWrapper */
+/* line 202, ../sass/editor.scss */
+.js-editor-fullpage #editor-fullpage-candidate {
+  position: absolute;
+  z-index: 1000;
+  top: 20px;
+  right: 20%;
+  left: 20%;
+  width: auto;
+  background-color: transparent;
+  padding: 0;
+  animation-duration: .4s;
+  animation-name: editor-anim-editor;
+}
+
+/* Temp, take this out when you figure out the element that is restricting 
+this child from going truly absolute */
+/* line 217, ../sass/editor.scss */
+.js-editor-fullpage .EditCommentForm #editor-fullpage-candidate {
+  position: fixed;
+}
+
+/* have to be a bit rough here, because styles defined inline by wysihtml5 */
+/* line 224, ../sass/editor.scss */
+.js-editor-fullpage .TextBoxWrapper #Form_Body,
+.js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+  width: 100% !important;
+  height: 400px !important;
+}
+
+@keyframes editor-anim-overlay {
+  /* line 230, ../sass/editor.scss */
+  from {
+    opacity: 0;
+  }
+
+  /* line 233, ../sass/editor.scss */
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes editor-anim-editor {
+  /* line 239, ../sass/editor.scss */
+  0% {
+    top: -1000px;
+    opacity: 0;
+    transform: scale(1.25);
+  }
+
+  /* line 244, ../sass/editor.scss */
+  75% {
+    top: 60px;
+    opacity: 0.75;
+    transform: scale(0.75);
+  }
+
+  /* line 249, ../sass/editor.scss */
+  100% {
+    top: 20px;
+    opacity: 1;
+    transform: scale(1);
+  }
+}

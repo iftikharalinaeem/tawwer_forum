@@ -1,0 +1,254 @@
+@import "_iconfonts";
+@import "_wysiwyg";
+
+
+/**
+ * Editor toolbar 
+ */
+
+
+
+/* If JS disabled */
+
+.editor {
+   display: none;
+}
+
+.js-editor-active .editor {
+   display: block;
+}
+
+.editor {
+	background-color: #999999;
+	background-color: rgba(0, 0, 0, 0.4);
+   padding: 5px;
+   margin: 0 0 -5px 0;
+}
+
+.FormWrapper-Condensed .editor {
+   margin: 0;
+}
+
+/* Editing comments in a discussion on the fly */
+.FormWrapper-Condensed .editor-inline-otf{
+   margin: 0 0 -5px 0;
+}
+
+.editor-help-text {
+   font-size: 11px;
+}
+
+
+/* wysihtml5 lib does not insert proper inline style to hide textarea in Chrome */
+/**/
+
+.editor .icon {
+   display: inline;
+   padding: 5px 8px;
+   margin: 0 -1px;
+   color: #F7F7F7;
+   border: 1px solid transparent;
+   cursor: pointer;
+}
+
+/* State of icons */
+.editor .icon:hover,
+.wysihtml5-command-active,
+.wysihtml5-action-active,
+.wysihtml5-command-dialog-opened
+{
+   border-radius: 2px;
+   background-color: #666666;
+}
+
+.editor .editor-action-disabled {
+   background-color: transparent !important;
+   opacity: 0.25;
+   cursor: default;
+   pointer-events: none;
+}
+
+.editor .editor-action-hidden {
+   display: none;
+}
+
+.editor .editor-sep {
+   border-left: 1px solid #888888;
+   margin: 0 8px 0 5px;
+}
+
+.editor .editor-dropdown {
+   display: inline-block;
+   position: relative;
+}
+
+/* For links and images, flyout */
+.editor-insert-dialog {
+   margin: 5px 0 0 -1px;
+   padding: 5px;
+   width: 300px;
+   position: absolute;
+   z-index: 100;
+}
+
+.editor-insert-dialog input.InputBox {
+   width: 97.5%;
+}
+
+.editor-insert-dialog hr {
+   margin: 0 0 10px 0;
+}
+
+.editor-colors-flyout {
+   width: 92px;
+}
+
+.editor-colors-flyout .color {
+   width: 20px;
+   height: 20px;
+   float: left;
+   cursor: pointer;
+   margin: 1px 1px 0 0;
+   border: 1px solid transparent;
+}
+
+.editor-colors-flyout .color:hover,
+.editor-colors-flyout .wysihtml5-command-active {
+   border: 1px solid #fff;
+}
+
+.editor-colors-flyout .color-black {
+   background-color: black;
+}
+
+.editor-colors-flyout .color-white {
+   background-color: white;
+}
+
+.editor-colors-flyout .color-gray {
+   background-color: gray;
+}
+
+.editor-colors-flyout .color-silver {
+   background-color: silver;
+}
+
+.editor-colors-flyout .color-maroon {
+   background-color: maroon;
+}
+
+.editor-colors-flyout .color-red {
+   background-color: red;
+}
+
+.editor-colors-flyout .color-purple {
+   background-color: purple;
+}
+
+.editor-colors-flyout .color-green {
+   background-color: green;
+}
+
+.editor-colors-flyout .color-olive {
+   background-color: olive;
+}
+
+.editor-colors-flyout .color-navy {
+   background-color: navy;
+}
+
+.editor-colors-flyout .color-blue {
+   background-color: blue;
+}
+
+.editor-colors-flyout .color-lime {
+   background-color: lime;
+}
+
+
+/**
+ * Going full page 
+ */
+
+.editor-toggle-fullpage-button {
+   cursor: pointer;
+   float: right;
+   margin: -1px 0 0 0;
+}
+
+/* Added to body class witj js, so force specificity for everything 
+below; this makes editing very easy */
+
+.js-editor-fullpage{}
+
+/* Background overlay. No need to insert empty div in markup; doing so at the 
+current location, due to event insertion, makes z-index troublesome. */
+
+.js-editor-fullpage:after {
+   content: ' ';
+   display: block;
+   position: fixed;
+   z-index: 500;
+   background-color: #fff;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   animation-duration: 0.5s;
+   animation-name: editor-anim-overlay;
+}
+
+/* .FormWrapper */
+.js-editor-fullpage #editor-fullpage-candidate {
+   position: absolute;
+   z-index: 1000;
+   top: 20px;
+   right: 20%;
+   left: 20%;
+   width: auto;
+   background-color: transparent;
+   padding: 0;
+   animation-duration: .4s;
+   animation-name: editor-anim-editor;
+}
+
+/* Temp, take this out when you figure out the element that is restricting 
+this child from going truly absolute */
+.js-editor-fullpage .EditCommentForm #editor-fullpage-candidate {
+   position: fixed;
+}
+
+/* have to be a bit rough here, because styles defined inline by wysihtml5 */
+.js-editor-fullpage .TextBoxWrapper #Form_Body,
+.js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox
+{
+   width: 100% !important;
+   height: 400px !important;
+}
+
+@keyframes editor-anim-overlay {
+  from {
+    opacity: 0;
+  }
+  to {
+   opacity: 1;
+  }
+}
+
+@keyframes editor-anim-editor {
+  0% {
+    top: -1000px;
+    opacity: 0;
+    transform: scale(1.25);
+  }
+  75% {
+   top: 60px;
+   opacity: 0.75;
+   transform: scale(0.75);
+  }
+  100% {
+   top: 20px;
+   opacity: 1;
+   transform: scale(1);
+  }
+}
