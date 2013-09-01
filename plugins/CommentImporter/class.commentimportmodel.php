@@ -99,7 +99,7 @@ class CommentImportModel {
    public function Import() {
       $this->DefineTables();
       $this->Parse();
-      $this->RunQueries = FALSE;
+      $this->RunQueries = TRUE; // Manually override whether to do import or just show SQL
       $this->InsertTables();
       $this->Counts();
    }

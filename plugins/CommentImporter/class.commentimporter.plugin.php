@@ -18,11 +18,13 @@ $PluginInfo['CommentImporter'] = array(
 );
 
 class CommentImporterPlugin extends Gdn_Plugin {
+   /**
+    * Add menu item.
+    */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
 		$Menu->AddLink('Import', T('Import Comments'), '/import/comments', 'Garden.Settings.Manage');
    }
-   
    
    /**
     *
@@ -68,7 +70,7 @@ class CommentImporterPlugin extends Gdn_Plugin {
       } else {
          set_time_limit(60 * 30);
          $Model = new WordpressImportModel();
-         $Model->Path = '/www/vanilla/uploads/iphonehacks2012-06-05.xml';
+         $Model->Path = '/www/techwhirl/uploads/techwhirl.wordpress.xml';
          $Model->Import();
          die('Done');
          
