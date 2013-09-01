@@ -1,0 +1,127 @@
+@import "compass";
+
+.WarningsForm .P {
+   margin: 20px 0;
+}
+
+.WarningType {
+   .RadioLabel {
+      display: inline-block;
+      min-width: 70px;
+   }
+}
+
+.PhotoWrap.Jailed:before {
+   content: " ";
+   background: url(jailed-80.png) no-repeat transparent;
+   position: absolute;
+   height: 100%;
+   width: 100%;
+   
+   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='.myBackground.jpg', sizingMethod='scale');
+   -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='myBackground.jpg', sizingMethod='scale')";
+   -webkit-background-size: cover;
+   -moz-background-size: cover;
+   -o-background-size: cover;
+   background-size: cover;
+}
+
+.PhotoWrapLarge.Jailed:before {
+   background-image: url(jailed-200.png);
+}
+
+.Jailed .ProfilePhotoLarge {
+   height: 200px;
+}
+
+.PhotoWrap {
+   display: inline-block;
+}
+
+.PhotoWrap * {
+   line-height: 1;
+}
+
+.DataList-Notes {
+   .Meta {
+      line-height: 1.4;
+   }
+}
+
+.Item-Row {
+   float: left;
+   width: 100%;
+   
+   &:hover {
+      .Options {
+         visibility: visible;
+      }
+   }
+   
+   .DataList & {
+      padding-left: 4px;
+      padding-right: 4px;
+   }
+}
+
+.Item-Col {
+   float: left;
+   @include box-sizing(border-box);
+   padding-left: 4px;
+   padding-right: 4px;
+   
+   .Media {
+      margin: 0;
+   }
+   
+   .Options {
+      visibility: hidden;
+      margin-right: 8px;
+      
+      .Sprite {
+         display: inline-block;
+         height: 16px;
+         width: 16px;
+      }
+   }
+}
+
+.User-Col {
+   .ProfilePhoto {
+      width: 32px;
+      height: 32px;
+   }
+   
+   .Media-Body, .Meta {
+      line-height: 16px;
+      font-size: 11px;
+   }
+}
+
+.SpEdit {
+   background-image: url("//vanillicon.com/sprites/sprites-14-000000.png");
+   background-position: -180px -20px;
+}
+.SpDelete {
+   background-image: url("//vanillicon.com/sprites/sprites-14-000000.png");
+   background-position: -300px -140px;
+}
+
+@for $i from 1 through 11 {
+   .Item-Col#{$i} {
+      width: percentage($i / 12);
+   }
+}
+
+.NoteType-warning {
+   color: #d50a0a;
+}
+
+.Post {
+   :first-child {
+      margin-top: 0;
+   }
+   :last-child {
+      margin-bottom: 0;
+   }
+}
