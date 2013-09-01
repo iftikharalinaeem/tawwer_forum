@@ -8,7 +8,7 @@
 $PluginInfo['Polls'] = array(
    'Name' => 'Polls',
    'Description' => "Allow users to create and vote on polls.",
-   'Version' => '1.0.5',
+   'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
@@ -29,15 +29,15 @@ class PollsPlugin extends Gdn_Plugin {
    /** 
     * Add the "new poll" button after the new discussion button. 
     */
-   public function Base_BeforeNewDiscussionButton_Handler($Sender) {
-      $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
+//   public function Base_BeforeNewDiscussionButton_Handler($Sender) {
+//      $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
       // Polls is currently incompatible with pre-moderation
-      $DisablePolls = (CheckRestriction('Vanilla.Approval.Require') && !GetValue('Verified', Gdn::Session()->User));
-      if (Gdn::Session()->CheckPermission('Plugins.Polls.Add') && !$DisablePolls) {
-         $UrlCode = GetValue('UrlCode', GetValue('Category', $Sender->Data), '');
-         $NewDiscussionModule->AddButton(T('New Poll'), '/post/poll/'.$UrlCode);
-      }
-   }
+//      $DisablePolls = (CheckRestriction('Vanilla.Approval.Require') && !GetValue('Verified', Gdn::Session()->User));
+//      if (Gdn::Session()->CheckPermission('Plugins.Polls.Add') && !$DisablePolls) {
+//         $UrlCode = GetValue('UrlCode', GetValue('Category', $Sender->Data), '');
+//         $NewDiscussionModule->AddButton(T('New Poll'), '/post/poll/'.$UrlCode);
+//      }
+//   }
    
    /** 
     * Display a user's vote in their author info. 
@@ -53,6 +53,16 @@ class PollsPlugin extends Gdn_Plugin {
          echo '<span class="PollVoteAnswer">'.Gdn_Format::To(GetValue('Body', $PollVote), GetValue('Format', $PollVote)).'</span>';
          echo '</div>';
       }
+   }
+   
+   public function Base_DiscussionTypes_Handler($Sender, $Args) {
+      $Args['Types']['Poll'] = array(
+            'Singular' => 'Poll',
+            'Plural' => 'Polls', 
+            'AddUrl' => '/post/poll',
+            'AddText' => 'New Poll',
+            'AddPermission' => 'Plugins.Polls.Add'
+            );
    }
 
    /** 
