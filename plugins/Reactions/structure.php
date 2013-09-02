@@ -37,8 +37,8 @@ $Rm->DefineReactionType(array('UrlCode' => 'Spam', 'Name' => 'Spam', 'Sort' => 1
    'Description' => "Allow your community to report any spam that get's posted so that it can be removed as quickly as possible."));
 $Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Sort' => 101, 'Class' => 'Flag', 'Log' => 'Moderate', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5, 'Protected' => TRUE, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
    'Description' => "Report posts that are abusive or violate your terms of service so that they can be alerted to a moderator's attention."));
-$Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Sort' => 102, 'Class' => 'Flag', 'ModeratorInc' => 5, 'Protected' => TRUE, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
-   'Description' => "Troll posts are typically trying to elicit a heated argument from other people. Trolls are community poison, making your community a scary place for new members. Troll posts will be buried."));
+//$Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Sort' => 102, 'Class' => 'Flag', 'ModeratorInc' => 5, 'Protected' => TRUE, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
+//   'Description' => "Troll posts are typically trying to elicit a heated argument from other people. Trolls are community poison, making your community a scary place for new members. Troll posts will be buried."));
 
 $Rm->DefineReactionType(array('UrlCode' => 'Promote', 'Name' => 'Promote', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 3, 'Permission' => 'Garden.Curation.Manage',
    'Description' => "Moderators have the ability to promote the best posts in the community. This way they can be featured for new visitors."));
@@ -53,12 +53,12 @@ $Rm->DefineReactionType(array('UrlCode' => 'Disagree', 'Name' => 'Disagree', 'So
 $Rm->DefineReactionType(array('UrlCode' => 'Agree', 'Name' => 'Agree', 'Sort' => 4, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => "Users that agree with a post can give their option with this reaction."));
 
-$Rm->DefineReactionType(array('UrlCode' => 'Dislike', 'Name' => 'Dislike', 'Sort' => 5, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
+$Rm->DefineReactionType(array('UrlCode' => 'Dislike', 'Name' => 'Dislike', 'Sort' => 5, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
    'Description' => "A dislike is a general disapproval of a post. Enough dislikes will bury a post."));
 $Rm->DefineReactionType(array('UrlCode' => 'Like', 'Name' => 'Like', 'Sort' => 6, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => "A like is a general approval of a post. Enough likes will promote a post."));
 
-$Rm->DefineReactionType(array('UrlCode' => 'Down', 'Name' => 'Vote Down', 'Sort' => 7, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
+$Rm->DefineReactionType(array('UrlCode' => 'Down', 'Name' => 'Vote Down', 'Sort' => 7, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
    'Description' => "A down vote is a general disapproval of a post. Enough down votes will bury a post."));
 $Rm->DefineReactionType(array('UrlCode' => 'Up', 'Name' => 'Vote Up', 'Sort' => 8, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => "An up vote is a general approval of a post. Enough up votes will promote a post."));
