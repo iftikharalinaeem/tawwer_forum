@@ -37,11 +37,6 @@ jQuery(function() {
              * Default editor values when first instantiated on page. Later, on DOM
              * mutations, these values are updated per editable comment.
              */
-/*
-            var editorToolbarId  = 'editor-format-wysiwyg',
-                editorTextareaId = 'Form_Body', // TODO get vanilla to assing uniques
-                editorName       = 'vanilla-editor-text';
-*/
             editorRules = {
                // Give the editor a name, the name will also be set as class name on the iframe and on the iframe's body 
                name:                 editorName,
@@ -83,6 +78,7 @@ jQuery(function() {
             editor.on('load', function() {
                $(editor.composer.iframe).wysihtml5_size_matters();      
             });  
+            
 
             /**
              * Extending functionality of wysihtml5.js
@@ -166,59 +162,16 @@ jQuery(function() {
       
       /**
        * HTML editor 
-       */
-      case 'html':
-         
-         // Load script for wysiwyg editor async
-         $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-            
-            
-            ButtonBar.AttachTo($('#'+editorTextareaId));
-            
-            
-            
-         });
-         
-         break;
-         
-      /**
        * BBCode editor 
-       */
-      case 'bbcode':
-         
-         // Load script for wysiwyg editor async
-         $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-            
-            ButtonBar.AttachTo($('#'+editorTextareaId));
-            
-         });
-         
-         break;
-         
-      /**
        * Markdown editor 
        */
+      case 'html':
+      case 'bbcode':
       case 'markdown':
          
          // Load script for wysiwyg editor async
          $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-
-            
             ButtonBar.AttachTo($('#'+editorTextareaId));
-            
-         });
-         
-         break;
-
-      /**
-       * Regular text editor 
-       */
-      case 'text':
-         
-         // Load script for wysiwyg editor async
-         $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-
-            
          });
          
          break;
@@ -280,21 +233,45 @@ jQuery(function() {
          .addClass('editor-help-text')
          .html(gdn.definition('editor'+ format +'HelpText'))
          .insertAfter(editorAreaObj);
+ 
+         //console.log(editorAreaObj);
     };
    
+   // Set up on page load
    editorSetHelpText(formatOriginal, $('#Form_Body'));
-   
    $(".editor-toggle-fullpage-button").click(toggleFullpage);
    closeFullPageEsc();
    postCommentCloseFullPageEvent();
-   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    
    /**
     * Mutation observer for attaching editor to every .BodyBox that's inserted 
     * into the DOM. Consider using livequery for wider support.
     * 
     * TODO abstracting the mutation anon function and then calling it as a 
-    * callback on mutation, but also just when manually invoked.
+    * callback on mutation, but also just when manually invoked, so less 
+    * redundant with onload above.
     */
    $(document).ready(function() {
 
@@ -320,7 +297,8 @@ jQuery(function() {
 
            var t                       = $(mutation.target),
                currentEditorToolbar    = t.find('.editor-format-'+ format),
-               currentEditableTextarea = t.find('#Form_Body');
+               currentEditableTextarea = t.find('#Form_Body'),
+               currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
 
            // if found, perform operation
            if (currentEditableTextarea.length 
@@ -337,8 +315,6 @@ jQuery(function() {
                  .addClass('editor-inline-otf');
 
               $(currentEditableTextarea).attr('id', editorTextareaId); 
-
-
 
               // TODO add these as functions in an object, then just invoke
               // them on format
@@ -374,15 +350,10 @@ jQuery(function() {
                      ButtonBar.AttachTo($('#'+editorTextareaId));
                   
                      break;
-                  case 'text':
-                     break;
               }
 
-
-              // TODO this does not load 
-              //editorSetHelpText(format, $(editorTextareaId));
-
-              // Attach fullpage listeners to newly created editor 
+              // Set up on editor load
+              editorSetHelpText(formatOriginal, currentTextBoxWrapper);
               $(".editor-toggle-fullpage-button").click(toggleFullpage);
               closeFullPageEsc();
               postCommentCloseFullPageEvent();               

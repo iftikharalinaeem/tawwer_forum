@@ -40,7 +40,7 @@ class EditorPlugin extends Gdn_Plugin {
 
          // For developing, manually set format to toggle between views. 
          // Q: activating plugin on old edited content should do what?
-         $Format = 'Html';
+         $Format = 'Wysiwyg';
          
          $c = Gdn::Controller();
          
