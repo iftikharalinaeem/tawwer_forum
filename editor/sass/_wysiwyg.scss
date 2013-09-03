@@ -1,5 +1,7 @@
 /**
  * Editor action styles within editor and post
+ *
+ * TODO go through wysihtml5.js and here and replace proprietary prefixes
  */
 
 .wysiwyg-font-size-smaller {
@@ -140,18 +142,15 @@
 
 /* Custom classes */
 
-/* del */
 .Delete {
    text-decoration: line-through;
 }
 
-/* blockquote */
 .Quote {
    padding-left: 20px;
    border-left: 5px solid rgba(0,0,0,0.1);
 }
 
-/* blockquote */
 .CodeBlock {
    font-family: monospace;
    padding-left: 20px;
@@ -160,7 +159,10 @@
    white-space: nowrap;
 }
 
-/* div */
+.CodeInline {
+   font-family: monospace;
+}
+
 .Spoiler {
    color: transparent;
    height: 20px;
@@ -181,3 +183,6 @@
    background-color: rgba(0,0,0,0.04);
 }
 
+.AlignLeft{}
+.AlignCenter{}
+.AlignRight{}

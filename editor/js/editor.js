@@ -20,8 +20,11 @@ jQuery(function() {
        editorRules    = {}; // for wysiwyg
        
    var editorToolbarId  = 'editor-format-'+ format,
-       editorTextareaId = 'Form_Body', // TODO get vanilla to assing uniques
+       editorTextareaId = 'Form_Body', 
        editorName       = 'vanilla-editor-text';
+   
+   // Set id of onload toolbar--required for proper functioning
+   $('.editor').attr('id', editorToolbarId);
    
    switch (format) {
       
@@ -31,7 +34,7 @@ jQuery(function() {
       case 'wysiwyg':
          
          // Load script for wysiwyg editor async
-         $.getScript(assets + "js/wysihtml5.js", function(data, textStatus, jqxhr) {
+         $.getScript(assets + "/js/wysihtml5.js", function(data, textStatus, jqxhr) {
             
             /**
              * Default editor values when first instantiated on page. Later, on DOM
@@ -58,7 +61,7 @@ jQuery(function() {
                // By default wysihtml5 will insert a <br> for line breaks, set this to false to use <p>
                useLineBreaks:        true,
                // Array (or single string) of stylesheet urls to be loaded in the editor's iframe
-               stylesheets:          [assets + 'design/editor.css'],
+               stylesheets:          [assets + '/design/editor.css'],
                // Placeholder text to use, defaults to the placeholder attribute on the textarea element
                placeholderText:      "Write something!",
                // Whether the composer should allow the user to manually resize images, tables etc.
@@ -97,9 +100,11 @@ jQuery(function() {
                   // If block element chosen from last string in editor, there is no way to 
                   // click out of it and continue typing below it, so set the selection 
                   // after the insertion, and insert a break, because that will set the 
-                  // caret to after the latest insertion. 
-                  composer.selection.setAfter(composer.element.lastChild);
-                  composer.commands.exec("insertHTML", "<br>");
+                  // caret to after the latest insertion.                   
+                  if ($(composer.element.lastChild).hasClass('Spoiler')) {
+                     composer.selection.setAfter(composer.element.lastChild);
+                     composer.commands.exec("insertHTML", "<br>");
+                  }
                 },
 
                 state: function(composer, command) {
@@ -120,8 +125,10 @@ jQuery(function() {
               wysihtml5.commands.blockquote = {
                 exec: function(composer, command) {
                   wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "blockquote", "Quote", REG_EXP);
-                  composer.selection.setAfter(composer.element.lastChild);
-                  composer.commands.exec("insertHTML", "<br>");
+                  if ($(composer.element.lastChild).hasClass('Quote')) {
+                     composer.selection.setAfter(composer.element.lastChild);
+                     composer.commands.exec("insertHTML", "<br>");
+                  }
                 },
 
                 state: function(composer, command) {
@@ -142,8 +149,10 @@ jQuery(function() {
               wysihtml5.commands.code = {
                 exec: function(composer, command) {
                   wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "blockquote", "CodeBlock", REG_EXP);
-                  composer.selection.setAfter(composer.element.lastChild);
-                  composer.commands.exec("insertHTML", "<br>");
+                  if ($(composer.element.lastChild).hasClass('CodeBlock')) {
+                    composer.selection.setAfter(composer.element.lastChild);
+                    composer.commands.exec("insertHTML", "<br>");
+                  }
                 },
 
                 state: function(composer, command) {
@@ -170,7 +179,7 @@ jQuery(function() {
       case 'markdown':
          
          // Load script for wysiwyg editor async
-         $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
+         $.getScript(assets + "/js/buttonbarplus.js", function(data, textStatus, jqxhr) {
             ButtonBar.AttachTo($('#'+editorTextareaId));
          });
          
@@ -215,12 +224,12 @@ jQuery(function() {
       });  
    };
 
-   // If full page and the user posts comment, exit out of full page.
+   // If full page and the user saves/cancels/previews comment, 
+   // exit out of full page.
    // Not smart in the sense that a failed post will also exit out of 
    // full page, but the text will remain in editor, so not big issue.
-   // TODO when user clicks cancel, close as well.
    var postCommentCloseFullPageEvent = function() {
-      $('.CommentButton').click(function() {
+      $('.Button').click(function() {
          if ($('body').hasClass('js-editor-fullpage')) { 
             toggleFullpage();
          }
@@ -253,9 +262,23 @@ jQuery(function() {
 
 
 
-
-
-
+   
+   // testing.
+   $(document).ready(function() {
+      
+      $('.editor-dropdown').click(function(e) {
+         var parentEl = $(e.target).parent();
+         if ($(this).hasClass('editor-dropdown') 
+         && $(this).hasClass('editor-dropdown-open')) {
+            parentEl.removeClass('editor-dropdown-open');
+         } else {
+            parentEl.addClass('editor-dropdown-open');     
+            $('.InputBox').focus();
+         }
+         
+      });
+      
+   });
 
 
 

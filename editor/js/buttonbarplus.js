@@ -226,8 +226,8 @@ jQuery(document).ready(function($) {
          // Apply the page's InputFormat to this textarea.
          $(TextArea).data('InputFormat', format);
          
-         
-         // Build button UIs
+         // Build button UIs 
+         // TODO remove redundancy, have operations dependent on another value
          $(ThisButtonBar).find('.icon').each(function(i, el){
             var Operation = $(el).attr('title').toLowerCase();
             
@@ -235,12 +235,8 @@ jQuery(document).ready(function($) {
             
             var Action = "ButtonBar"+UIOperation;
             $(el).addClass(Action);
-         });
          
-        
-         // Attach shortcut keys
-         // TODO use these for whole editor.
-         ButtonBar.BindShortcuts(TextArea);
+         });
 
          // Attach events
          $(ThisButtonBar).find('.icon').mousedown(function(event){
@@ -248,16 +244,22 @@ jQuery(document).ready(function($) {
             //var Button = $(event.target).find('span').closest('.ButtonWrap');
             var Button = $(event.target);
 
-            if ($(Button).hasClass('ButtonOff')) return;
+            //if ($(Button).hasClass('ButtonOff')) return;
 
             var TargetTextArea = $(MyButtonBar).data('ButtonBarTarget');
             if (!TargetTextArea) return false;
-            
-            var Operation = $(Button).attr('title').toLowerCase();
-            
+
+            var Operation = ($(Button).attr('title')) 
+               ? $(Button).attr('title').toLowerCase().replace(/\s+/g, '') 
+               : '';
+                  
             ButtonBar.Perform(TargetTextArea, Operation, event);
             return false;
          });
+         
+         // Attach shortcut keys
+         // TODO use these for whole editor.
+         ButtonBar.BindShortcuts(TextArea);
       
          //ButtonBar.Prepare(ThisButtonBar, TextArea);
       },
@@ -270,7 +272,7 @@ jQuery(document).ready(function($) {
          ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+L');
          ButtonBar.BindShortcut(TextArea, 'code', 'ctrl+O');
          ButtonBar.BindShortcut(TextArea, 'quote', 'ctrl+Q');
-         ButtonBar.BindShortcut(TextArea, 'quickurl', 'ctrl+shift+L');
+         //ButtonBar.BindShortcut(TextArea, 'quickurl', 'ctrl+shift+L');
          ButtonBar.BindShortcut(TextArea, 'post', 'tab');
       },
       
@@ -283,15 +285,17 @@ jQuery(document).ready(function($) {
          
          $(TextArea).bind(ShortcutMode,Shortcut,OpFunction);
          
+         /* for now title is fickle
          var UIOperation = Operation.charAt(0).toUpperCase() + Operation.slice(1);
          var Action = "ButtonBar"+UIOperation;
          
-         var ButtonBarObj = $(TextArea).closest('form').find('.ButtonBar');
+         var ButtonBarObj = $(TextArea).closest('form').find('.icon');
          var Button = $(ButtonBarObj).find('.'+Action);
          Button.attr('title', Button.attr('title')+', '+Shortcut);
+         */
          
       },
-      
+      /*
       DisableButton: function(ButtonBarObj, Operation) {
          $(ButtonBarObj).find('.ButtonWrap').each(function(i,Button){
             var ButtonOperation = $(Button).find('span').text();
@@ -299,6 +303,7 @@ jQuery(document).ready(function($) {
                $(Button).addClass('ButtonOff');
          });
       },
+      */
       /*
       Prepare: function(ButtonBarObj, TextArea) {
          var InputFormat = $(TextArea).data('InputFormat');
@@ -393,7 +398,8 @@ jQuery(document).ready(function($) {
                            
                $(TextArea).insertRoundTag('img',thisOpts);
                break;
-
+               
+            
             case 'quickurl':
                var thisOpts = $.extend(bbcodeOpts,{});
                
@@ -410,6 +416,7 @@ jQuery(document).ready(function($) {
                
                $(TextArea).insertRoundTag('url',thisOpts);
                break;
+            
 
             case 'quote':
                $(TextArea).insertRoundTag('quote',bbcodeOpts);
@@ -446,26 +453,28 @@ jQuery(document).ready(function($) {
          }
          switch (Operation) {
             case 'bold':
-               $(TextArea).insertRoundTag('b',htmlOpts);
+               $(TextArea).insertRoundTag('b',htmlOpts, {'class':'Bold'});
                break;
 
             case 'italic':
-               $(TextArea).insertRoundTag('i',htmlOpts);
+               $(TextArea).insertRoundTag('i',htmlOpts, {'class':'Italic'});
                break;
-
+               
+            /*
             case 'underline':
-               $(TextArea).insertRoundTag('u',htmlOpts);
+               $(TextArea).insertRoundTag('u',htmlOpts, {'class':'Underline'});
                break;
-
+            */
+           
             case 'strike':
-               $(TextArea).insertRoundTag('del',htmlOpts);
+               $(TextArea).insertRoundTag('del',htmlOpts, {'class':'Delete'});
                break;
 
             case 'code':
                var multiline = $(TextArea).hasSelection().indexOf('\n') >= 0;
                if (multiline) {
                   var thisOpts = $.extend(htmlOpts, {
-                     opentag:'<pre><code>',
+                     opentag:'<pre class="CodeBlock"><code>',
                      closetag:'</code></pre>',
                      opener:'',
                      closer:'',
@@ -473,7 +482,7 @@ jQuery(document).ready(function($) {
                   });
                   $(TextArea).insertRoundTag('',thisOpts);
                } else {
-                  $(TextArea).insertRoundTag('code',htmlOpts);
+                  $(TextArea).insertRoundTag('code',htmlOpts,{'class':'CodeInline'});
                }
                break;
 
@@ -484,12 +493,13 @@ jQuery(document).ready(function($) {
                });
                
                var PromptText = gdn.definition('editorButtonBarImageUrl', 'editor.ImageUrlText');
-               NewURL = prompt(PromptText);
-               urlOpts.src = NewURL;         
-               
-               $(TextArea).insertRoundTag('img',thisOpts,urlOpts);
+               //var NewURL = prompt(PromptText, 'http://');
+               if (NewURL) {
+                  urlOpts.src = NewURL;
+                  $(TextArea).insertRoundTag('img',thisOpts,urlOpts);
+               }
                break;
-
+            /*
             case 'quickurl':
                var urlOpts = {};
                var thisOpts = $.extend(htmlOpts, {
@@ -509,9 +519,10 @@ jQuery(document).ready(function($) {
                
                $(TextArea).insertRoundTag('a',thisOpts,urlOpts);
                break;
+            */
 
             case 'quote':
-               $(TextArea).insertRoundTag('blockquote',htmlOpts);
+               $(TextArea).insertRoundTag('blockquote',htmlOpts, {'class':'Quote'});
                break;
 
             case 'spoiler':
@@ -523,19 +534,31 @@ jQuery(document).ready(function($) {
                var thisOpts = $.extend(htmlOpts, {});
                
                var PromptText = gdn.definition('editorButtonBarLinkUrl', 'editor.LinkUrlText');
-               var NewURL = prompt(PromptText,'http://');
-               var GuessText = NewURL.replace('http://','').replace('www.','');
-               urlOpts.href = NewURL;
+               //var NewURL = prompt(PromptText,'http://');
+               if (NewURL) {
+                  var GuessText = NewURL.replace('http://','').replace('www.','');
+                  urlOpts.href = NewURL;
+
+                  var CurrentSelectText = GuessText;
+
+                  var CurrentSelect = $(TextArea).hasSelection();
+                  if (CurrentSelect)
+                     CurrentSelectText = CurrentSelect.toString();
+
+                  thisOpts.replace = CurrentSelectText;
+
+                  $(TextArea).insertRoundTag('a',thisOpts,urlOpts);
+               }
+               break;
                
-               var CurrentSelectText = GuessText;
-               
-               var CurrentSelect = $(TextArea).hasSelection();
-               if (CurrentSelect)
-                  CurrentSelectText = CurrentSelect.toString();
-               
-               thisOpts.replace = CurrentSelectText;
-               
-               $(TextArea).insertRoundTag('a',thisOpts,urlOpts);
+            case 'alignleft':
+               $(TextArea).insertRoundTag('div',htmlOpts,{'class':'AlignLeft'});
+               break;
+            case 'aligncenter':
+               $(TextArea).insertRoundTag('div',htmlOpts,{'class':'AlignCenter'});
+               break;
+            case 'alignright':
+               $(TextArea).insertRoundTag('div',htmlOpts,{'class':'AlignRight'});
                break;
          }
       },
