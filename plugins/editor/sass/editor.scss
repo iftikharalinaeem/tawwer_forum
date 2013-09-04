@@ -69,10 +69,11 @@
    width: 300px;
    position: absolute;
    z-index: 100;
+   display: none;
 }
 
 .editor-dropdown-open .editor-insert-dialog {
-   display: block !important;
+   display: block;
 }
 
 

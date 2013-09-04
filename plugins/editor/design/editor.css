@@ -1016,29 +1016,30 @@
   width: 300px;
   position: absolute;
   z-index: 100;
+  display: none;
 }
 
-/* line 74, ../sass/editor.scss */
+/* line 75, ../sass/editor.scss */
 .editor-dropdown-open .editor-insert-dialog {
-  display: block !important;
+  display: block;
 }
 
-/* line 80, ../sass/editor.scss */
+/* line 81, ../sass/editor.scss */
 .editor-insert-dialog input.InputBox {
   width: 97.5%;
 }
 
-/* line 84, ../sass/editor.scss */
+/* line 85, ../sass/editor.scss */
 .editor-insert-dialog hr {
   margin: 0 0 10px 0;
 }
 
-/* line 88, ../sass/editor.scss */
+/* line 89, ../sass/editor.scss */
 .editor-colors-flyout {
   width: 92px;
 }
 
-/* line 92, ../sass/editor.scss */
+/* line 93, ../sass/editor.scss */
 .editor-colors-flyout .color {
   width: 20px;
   height: 20px;
@@ -1048,68 +1049,68 @@
   border: 1px solid transparent;
 }
 
-/* line 102, ../sass/editor.scss */
+/* line 103, ../sass/editor.scss */
 .editor-colors-flyout .color:hover,
 .editor-colors-flyout .wysihtml5-command-active {
   border: 1px solid #fff;
 }
 
-/* line 106, ../sass/editor.scss */
+/* line 107, ../sass/editor.scss */
 .editor-colors-flyout .color-black {
   background-color: black;
 }
 
-/* line 110, ../sass/editor.scss */
+/* line 111, ../sass/editor.scss */
 .editor-colors-flyout .color-white {
   background-color: white;
 }
 
-/* line 114, ../sass/editor.scss */
+/* line 115, ../sass/editor.scss */
 .editor-colors-flyout .color-gray {
   background-color: gray;
 }
 
-/* line 118, ../sass/editor.scss */
+/* line 119, ../sass/editor.scss */
 .editor-colors-flyout .color-silver {
   background-color: silver;
 }
 
-/* line 122, ../sass/editor.scss */
+/* line 123, ../sass/editor.scss */
 .editor-colors-flyout .color-maroon {
   background-color: maroon;
 }
 
-/* line 126, ../sass/editor.scss */
+/* line 127, ../sass/editor.scss */
 .editor-colors-flyout .color-red {
   background-color: red;
 }
 
-/* line 130, ../sass/editor.scss */
+/* line 131, ../sass/editor.scss */
 .editor-colors-flyout .color-purple {
   background-color: purple;
 }
 
-/* line 134, ../sass/editor.scss */
+/* line 135, ../sass/editor.scss */
 .editor-colors-flyout .color-green {
   background-color: green;
 }
 
-/* line 138, ../sass/editor.scss */
+/* line 139, ../sass/editor.scss */
 .editor-colors-flyout .color-olive {
   background-color: olive;
 }
 
-/* line 142, ../sass/editor.scss */
+/* line 143, ../sass/editor.scss */
 .editor-colors-flyout .color-navy {
   background-color: navy;
 }
 
-/* line 146, ../sass/editor.scss */
+/* line 147, ../sass/editor.scss */
 .editor-colors-flyout .color-blue {
   background-color: blue;
 }
 
-/* line 150, ../sass/editor.scss */
+/* line 151, ../sass/editor.scss */
 .editor-colors-flyout .color-lime {
   background-color: lime;
 }
@@ -1117,7 +1118,7 @@
 /**
  * Going full page 
  */
-/* line 159, ../sass/editor.scss */
+/* line 160, ../sass/editor.scss */
 .editor-toggle-fullpage-button {
   cursor: pointer;
   float: right;
@@ -1128,7 +1129,7 @@
    below; this makes editing very easy */
 /* Background overlay. No need to insert empty div in markup; doing so at the 
 current location, due to event insertion, makes z-index troublesome. */
-/* line 173, ../sass/editor.scss */
+/* line 174, ../sass/editor.scss */
 .js-editor-fullpage:after {
   content: ' ';
   display: block;
@@ -1144,7 +1145,7 @@ current location, due to event insertion, makes z-index troublesome. */
 }
 
 /* .FormWrapper */
-/* line 188, ../sass/editor.scss */
+/* line 189, ../sass/editor.scss */
 .js-editor-fullpage #editor-fullpage-candidate {
   position: absolute;
   z-index: 1000;
@@ -1160,13 +1161,13 @@ current location, due to event insertion, makes z-index troublesome. */
 
 /* Temp, take this out when you figure out the element that is restricting 
    this child from going truly absolute */
-/* line 203, ../sass/editor.scss */
+/* line 204, ../sass/editor.scss */
 .js-editor-fullpage .EditCommentForm #editor-fullpage-candidate {
   position: fixed;
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
-/* line 209, ../sass/editor.scss */
+/* line 210, ../sass/editor.scss */
 .js-editor-fullpage .TextBoxWrapper #Form_Body,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
   width: 100% !important;
@@ -1174,33 +1175,33 @@ current location, due to event insertion, makes z-index troublesome. */
 }
 
 @keyframes editor-anim-overlay {
-  /* line 215, ../sass/editor.scss */
+  /* line 216, ../sass/editor.scss */
   from {
     opacity: 0;
   }
 
-  /* line 218, ../sass/editor.scss */
+  /* line 219, ../sass/editor.scss */
   to {
     opacity: 1;
   }
 }
 
 @keyframes editor-anim-editor {
-  /* line 224, ../sass/editor.scss */
+  /* line 225, ../sass/editor.scss */
   0% {
     top: -1000px;
     opacity: 0;
     transform: scale(1.25);
   }
 
-  /* line 229, ../sass/editor.scss */
+  /* line 230, ../sass/editor.scss */
   75% {
     top: 60px;
     opacity: 0.75;
     transform: scale(0.75);
   }
 
-  /* line 234, ../sass/editor.scss */
+  /* line 235, ../sass/editor.scss */
   100% {
     top: 20px;
     opacity: 1;
@@ -1209,7 +1210,7 @@ current location, due to event insertion, makes z-index troublesome. */
 }
 
 /* No need to show this to Html, BBCode, and Markdown view */
-/* line 244, ../sass/editor.scss */
+/* line 245, ../sass/editor.scss */
 .editor-format-html .editor-toggle-source,
 .editor-format-bbcode .editor-toggle-source,
 .editor-format-markdown .editor-toggle-source {
@@ -1222,17 +1223,17 @@ current location, due to event insertion, makes z-index troublesome. */
  * a last ditch effort to at least make sure editor is usable when others 
  * are enabled. 
  */
-/* line 256, ../sass/editor.scss */
+/* line 257, ../sass/editor.scss */
 .js-editor-active .cleditorMain iframe {
   display: none !important;
 }
 
-/* line 260, ../sass/editor.scss */
+/* line 261, ../sass/editor.scss */
 .js-editor-active .cleditorMain .wysihtml5-sandbox {
   display: block !important;
 }
 
-/* line 266, ../sass/editor.scss */
+/* line 267, ../sass/editor.scss */
 .js-editor-active .cleditorToolbar,
 .js-editor-active .ButtonBar,
 .js-editor-active .ButtonBarMarkupHint {
@@ -1241,19 +1242,19 @@ current location, due to event insertion, makes z-index troublesome. */
 
 /* Media query: Hiding non-essential buttons */
 @media (max-width: 767px) {
-  /* line 273, ../sass/editor.scss */
+  /* line 274, ../sass/editor.scss */
   .hidden-xs {
     display: none !important;
   }
 
-  /* line 277, ../sass/editor.scss */
+  /* line 278, ../sass/editor.scss */
   .js-editor-fullpage #editor-fullpage-candidate {
     top: -60px;
     left: 0;
     right: 0;
   }
 
-  /* line 284, ../sass/editor.scss */
+  /* line 285, ../sass/editor.scss */
   .js-editor-fullpage .TextBoxWrapper #Form_Body,
   .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
     height: auto !important;
@@ -1261,7 +1262,7 @@ current location, due to event insertion, makes z-index troublesome. */
 
   /* This is not necessary or very specific, but on mobile, apple products 
      add rounded corners */
-  /* line 290, ../sass/editor.scss */
+  /* line 291, ../sass/editor.scss */
   textarea {
     border-radius: 0;
   }

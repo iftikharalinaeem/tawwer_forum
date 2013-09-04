@@ -253,32 +253,36 @@ jQuery(function() {
    postCommentCloseFullPageEvent();
 
 
-
-
-
-
-
-
-
-
-
-   
-   // testing.
-   $(document).ready(function() {
-      
+   /**
+    * Deal with clashing JS for opening dialogs on click, and do not let 
+    * more than one dialog/dropdown appear at once. 
+    * TODO clean up. 
+    * TODO enable enter button to do the same as clicks
+    */
+   (function(){ 
       $('.editor-dropdown').click(function(e) {
          var parentEl = $(e.target).parent();
+
          if ($(this).hasClass('editor-dropdown') 
          && $(this).hasClass('editor-dropdown-open')) {
             parentEl.removeClass('editor-dropdown-open');
          } else {
-            parentEl.addClass('editor-dropdown-open');     
-            $('.InputBox').focus();
+            // clear other opened dropdowns before opening this one
+            $(this).parent('.editor').find('.editor-dropdown-open').each(function() {
+               $(this).removeClass('editor-dropdown-open');
+               $(this).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
+            });
+
+            parentEl.addClass('editor-dropdown-open');  
+            $(this).find('.InputBox').focus();
          }
-         
+
       });
-      
-   });
+
+      $('.editor-dialog-fire-close').click(function(e) {
+         $(this).closest('.editor-dropdown').removeClass('editor-dropdown-open');
+      });
+   }());
 
 
 

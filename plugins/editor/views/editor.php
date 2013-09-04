@@ -29,18 +29,18 @@
                case 'color':
                   $html_toolbar .= Wrap(
                      Wrap($html_arrow_down, 'a', $button['attr']) .''. 
-                     Wrap($html_button_dropdown_options, 'ul', array('class' => 'editor-insert-dialog editor-colors-flyout Flyout MenuItems', 'data-wysihtml5-dialog' => '', 'style' => 'display: none;'))
-                  , 'div', array('class' => 'ToggleFlyout editor-dropdown'));
+                     Wrap($html_button_dropdown_options, 'ul', array('class' => 'editor-insert-dialog editor-colors-flyout Flyout MenuItems', 'data-wysihtml5-dialog' => ''))
+                  , 'div', array('class' => 'editor-dropdown'));
                   break;
                
                case 'link':
                   $html_toolbar .= Wrap(
                      Wrap($html_arrow_down, 'a', $button['attr']) .''. 
-                     '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink" style="display: none;">
+                     '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink">
                         <input class="InputBox" data-wysihtml5-dialog-field="href" value="http://" />
                         <hr />
-                         <input type="button" data-wysihtml5-dialog-action="save" class="Button" value="OK"/>
-                         <input type="button" data-wysihtml5-dialog-action="cancel" class="Button" value="Cancel"/>
+                         <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="OK"/>
+                         <input type="button" data-wysihtml5-dialog-action="cancel" class="Button editor-dialog-fire-close" value="Cancel"/>
                       </div>'
                    , 'div', array('class' => 'editor-dropdown'));
                   break;
@@ -48,7 +48,7 @@
                case 'image':
                   $html_toolbar .= Wrap(
                      Wrap($html_arrow_down, 'a', $button['attr']) .''. 
-                     '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="insertImage" style="display: none;">
+                     '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="insertImage">
                         <input class="InputBox" data-wysihtml5-dialog-field="src" value="http://">
                         <hr />
                         <label>
@@ -59,8 +59,8 @@
                            <option value="wysiwyg-float-right">right</option>
                          </select>
                         </label>
-                        <input type="button" data-wysihtml5-dialog-action="save" class="Button" value="OK"/>
-                        <input type="button" data-wysihtml5-dialog-action="cancel" class="Button" value="Cancel"/>
+                        <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="OK"/>
+                        <input type="button" data-wysihtml5-dialog-action="cancel" class="Button editor-dialog-fire-close" value="Cancel"/>
                      </div>'
                    , 'div', array('class' => 'editor-dropdown'));
                   break;
