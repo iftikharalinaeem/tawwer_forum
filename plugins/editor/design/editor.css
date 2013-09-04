@@ -1215,7 +1215,7 @@ current location, due to event insertion, makes z-index troublesome. */
  * Html, BBCode, and Markdown views have slight differences than the Wysiwyg, 
  * so hide the particular ones 
  */
-/* line 265, ../sass/editor.scss */
+/* line 262, ../sass/editor.scss */
 .editor-format-html .editor-toggle-source,
 .editor-format-bbcode .editor-toggle-source,
 .editor-format-markdown .editor-toggle-source,
@@ -1228,9 +1228,7 @@ current location, due to event insertion, makes z-index troublesome. */
 .editor-format-markdown .icon-align-right,
 .editor-format-html .editor-image-align,
 .editor-format-bbcode .editor-image-align,
-.editor-format-markdown .editor-image-align,
-.editor-format-html .icon-list-ol,
-.editor-format-html .icon-list-ul {
+.editor-format-markdown .editor-image-align {
   display: none;
 }
 
@@ -1242,17 +1240,17 @@ current location, due to event insertion, makes z-index troublesome. */
  * a last ditch effort to at least make sure editor is usable when others 
  * are enabled. 
  */
-/* line 279, ../sass/editor.scss */
+/* line 276, ../sass/editor.scss */
 .js-editor-active .cleditorMain iframe {
   display: none !important;
 }
 
-/* line 283, ../sass/editor.scss */
+/* line 280, ../sass/editor.scss */
 .js-editor-active .cleditorMain .wysihtml5-sandbox {
   display: block !important;
 }
 
-/* line 289, ../sass/editor.scss */
+/* line 286, ../sass/editor.scss */
 .js-editor-active .cleditorToolbar,
 .js-editor-active .ButtonBar,
 .js-editor-active .ButtonBarMarkupHint {
@@ -1261,19 +1259,19 @@ current location, due to event insertion, makes z-index troublesome. */
 
 /* Media query: Hiding non-essential buttons */
 @media (max-width: 767px) {
-  /* line 296, ../sass/editor.scss */
+  /* line 293, ../sass/editor.scss */
   .hidden-xs {
     display: none !important;
   }
 
-  /* line 300, ../sass/editor.scss */
+  /* line 297, ../sass/editor.scss */
   .js-editor-fullpage #editor-fullpage-candidate {
     top: -60px;
     left: 0;
     right: 0;
   }
 
-  /* line 307, ../sass/editor.scss */
+  /* line 304, ../sass/editor.scss */
   .js-editor-fullpage .TextBoxWrapper #Form_Body,
   .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
     height: auto !important;
@@ -1281,7 +1279,7 @@ current location, due to event insertion, makes z-index troublesome. */
 
   /* This is not necessary or very specific, but on mobile, apple products 
      add rounded corners */
-  /* line 313, ../sass/editor.scss */
+  /* line 310, ../sass/editor.scss */
   textarea {
     border-radius: 0;
   }

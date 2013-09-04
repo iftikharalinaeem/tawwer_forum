@@ -396,8 +396,7 @@ jQuery(document).ready(function($) {
 
                         inputBox[0].value = ButtonBar.Const.URL_PREFIX;
                      }
-               });
-               
+               });               
                
                break;
             
@@ -409,6 +408,39 @@ jQuery(document).ready(function($) {
                break;
             case 'alignright':
                $(TextArea).insertRoundTag('right',bbcodeOpts);
+               break;
+               
+            case 'orderedlist':
+               
+               var thisOpts = $.extend(bbcodeOpts, {
+                  prefix:'',
+                  opentag:'[list=1][*] ',
+                  closetag:'[/list]',
+                  opener:'',
+                  closer:'',
+                  closeslice: ''
+               });
+               
+               $(TextArea).insertRoundTag('', thisOpts);
+               
+
+               break;
+               
+            case 'unorderedlist':
+               
+               var thisOpts = $.extend(bbcodeOpts, {
+                  prefix:'',
+                  opentag:'[list][*] ',
+                  closetag:'[/list]',
+                  opener:'',
+                  closer:'',
+                  closeslice: ''
+
+               });
+               
+               $(TextArea).insertRoundTag('', thisOpts);
+
+
                break;
          }
       },
@@ -520,6 +552,36 @@ jQuery(document).ready(function($) {
                break;
             case 'alignright':
                $(TextArea).insertRoundTag('div',htmlOpts,{'class':'AlignRight'});
+               break;
+               
+            case 'orderedlist':
+               
+               var thisOpts = $.extend(htmlOpts, {
+                  prefix:'',
+                  opentag:'<ol><li>',
+                  closetag:'</li></ol>',
+                  opener:'',
+                  closer:'',
+                  closeslice: ''
+               });
+               
+               $(TextArea).insertRoundTag('', thisOpts);
+
+               break;
+               
+            case 'unorderedlist':
+               
+               var thisOpts = $.extend(htmlOpts, {
+                  prefix:'',
+                  opentag:'<ul><li>',
+                  closetag:'</li></ul>',
+                  opener:'',
+                  closer:'',
+                  closeslice: ''
+               });
+               
+               $(TextArea).insertRoundTag('', thisOpts);
+
                break;
          }
       },
