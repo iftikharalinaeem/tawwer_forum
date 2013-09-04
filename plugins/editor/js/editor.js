@@ -26,6 +26,17 @@ jQuery(function() {
    // Set id of onload toolbar--required for proper functioning
    $('.editor').attr('id', editorToolbarId);
    
+   
+   
+   
+   
+   
+   
+   
+   /**
+    * Load correct editor view onload
+    */
+   
    switch (format) {
       
       /**
@@ -187,109 +198,13 @@ jQuery(function() {
    }
    
    
-   /**
-    * Fullpage actions--available to all editor views on page load. 
-    * 
-    * TODO bug with fullpage button losing event listener
-    */
-
-   // Toggle fulpage--to be used in three places
-   var toggleFullpage = function(e) { 
-      
-      // either user clicks on fullpage toggler button, or escapes out with key
-      var toggleButton = (typeof e != 'undefined') 
-         ? e.target 
-         : $('#editor-fullpage-candidate').find('.editor-toggle-fullpage-button');
-
-      var bodyEl      = $('body'), 
-          formWrapper = $(toggleButton).closest('.FormWrapper')[0];
-      
-      if (!bodyEl.hasClass('js-editor-fullpage')) {
-         $(formWrapper).attr('id', 'editor-fullpage-candidate');
-         bodyEl.addClass('js-editor-fullpage');
-         $(toggleButton).addClass('icon-resize-small');
-      } else {
-         $(formWrapper).attr('id', '');
-         bodyEl.removeClass('js-editor-fullpage');
-         $(toggleButton).removeClass('icon-resize-small');
-      }  
-   }
-
-   // exit fullpage on esc
-   var closeFullPageEsc = function() {
-      $(document).keyup(function(e) {
-         if ($('body').hasClass('js-editor-fullpage') && e.which == 27) {
-            toggleFullpage();
-         }
-      });  
-   };
-
-   // If full page and the user saves/cancels/previews comment, 
-   // exit out of full page.
-   // Not smart in the sense that a failed post will also exit out of 
-   // full page, but the text will remain in editor, so not big issue.
-   var postCommentCloseFullPageEvent = function() {
-      $('.Button').click(function() {
-         if ($('body').hasClass('js-editor-fullpage')) { 
-            toggleFullpage();
-         }
-      });   
-   }; 
    
-   // Insert help text below every editor 
-   var editorSetHelpText = function(format, editorAreaObj) {            
-      $("<div></div>")
-         .addClass('editor-help-text')
-         .html(gdn.definition('editor'+ format +'HelpText'))
-         .insertAfter(editorAreaObj);
- 
-         //console.log(editorAreaObj);
-    };
    
-   // Set up on page load
-   editorSetHelpText(formatOriginal, $('#Form_Body'));
-   $(".editor-toggle-fullpage-button").click(toggleFullpage);
-   closeFullPageEsc();
-   postCommentCloseFullPageEvent();
-
-
-   /**
-    * Deal with clashing JS for opening dialogs on click, and do not let 
-    * more than one dialog/dropdown appear at once. 
-    * TODO clean up. 
-    * TODO enable enter button to do the same as clicks
-    */
-   (function(){ 
-      $('.editor-dropdown').click(function(e) {
-         var parentEl = $(e.target).parent();
-
-         if ($(this).hasClass('editor-dropdown') 
-         && $(this).hasClass('editor-dropdown-open')) {
-            parentEl.removeClass('editor-dropdown-open');
-         } else {
-            // clear other opened dropdowns before opening this one
-            $(this).parent('.editor').find('.editor-dropdown-open').each(function() {
-               $(this).removeClass('editor-dropdown-open');
-               $(this).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
-            });
-
-            parentEl.addClass('editor-dropdown-open');  
-            $(this).find('.InputBox').focus();
-         }
-
-      });
-
-      $('.editor-dialog-fire-close').click(function(e) {
-         $(this).closest('.editor-dropdown').removeClass('editor-dropdown-open');
-      });
-   }());
-
-
-
-
-
-
-
+   
+   
+   
+   
+   
 
    
    /**
@@ -299,6 +214,9 @@ jQuery(function() {
     * TODO abstracting the mutation anon function and then calling it as a 
     * callback on mutation, but also just when manually invoked, so less 
     * redundant with onload above.
+    * 
+    * TODO make onload call this, essentially moving all into one, less
+    * redundant.
     */
    $(document).ready(function() {
 
@@ -383,7 +301,9 @@ jQuery(function() {
               editorSetHelpText(formatOriginal, currentTextBoxWrapper);
               $(".editor-toggle-fullpage-button").click(toggleFullpage);
               closeFullPageEsc();
-              postCommentCloseFullPageEvent();               
+              postCommentCloseFullPageEvent();    
+              
+              editorSetupDropdowns();
 
               // some() loop requires true to end loop. every() requires false.
               return true;
@@ -395,5 +315,119 @@ jQuery(function() {
      // start observing, call observer.disconnect() to stop
      observer.observe(mutationTarget, config);
    });   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   /**
+    * Helper functions called on load and on mutation.
+    * 
+    * Fullpage actions--available to all editor views on page load. 
+    * 
+    * TODO bug with fullpage button losing event listener
+    */
+
+   // Toggle fulpage--to be used in three places
+   var toggleFullpage = function(e) { 
+      
+      // either user clicks on fullpage toggler button, or escapes out with key
+      var toggleButton = (typeof e != 'undefined') 
+         ? e.target 
+         : $('#editor-fullpage-candidate').find('.editor-toggle-fullpage-button');
+
+      var bodyEl      = $('body'), 
+          formWrapper = $(toggleButton).closest('.FormWrapper')[0];
+      
+      if (!bodyEl.hasClass('js-editor-fullpage')) {
+         $(formWrapper).attr('id', 'editor-fullpage-candidate');
+         bodyEl.addClass('js-editor-fullpage');
+         $(toggleButton).addClass('icon-resize-small');
+      } else {
+         $(formWrapper).attr('id', '');
+         bodyEl.removeClass('js-editor-fullpage');
+         $(toggleButton).removeClass('icon-resize-small');
+      }  
+   }
+
+   // exit fullpage on esc
+   var closeFullPageEsc = function() {
+      $(document).keyup(function(e) {
+         if ($('body').hasClass('js-editor-fullpage') && e.which == 27) {
+            toggleFullpage();
+         }
+      });  
+   };
+
+   // If full page and the user saves/cancels/previews comment, 
+   // exit out of full page.
+   // Not smart in the sense that a failed post will also exit out of 
+   // full page, but the text will remain in editor, so not big issue.
+   var postCommentCloseFullPageEvent = function() {
+      $('.Button').click(function() {
+         if ($('body').hasClass('js-editor-fullpage')) { 
+            toggleFullpage();
+         }
+      });   
+   }; 
+   
+   // Insert help text below every editor 
+   var editorSetHelpText = function(format, editorAreaObj) {            
+      $("<div></div>")
+         .addClass('editor-help-text')
+         .html(gdn.definition('editor'+ format +'HelpText'))
+         .insertAfter(editorAreaObj);
+    };
+
+   /**
+    * Deal with clashing JS for opening dialogs on click, and do not let 
+    * more than one dialog/dropdown appear at once. 
+    * 
+    * TODO clean up. 
+    * TODO enable enter button to do the same as clicks, or disable enter.
+    */
+   var editorSetupDropdowns = function() { 
+      $('.editor-dropdown').click(function(e) {
+         var parentEl = $(e.target).parent();
+
+         if ($(this).hasClass('editor-dropdown') 
+         && $(this).hasClass('editor-dropdown-open')) {
+            parentEl.removeClass('editor-dropdown-open');
+         } else {
+            // clear other opened dropdowns before opening this one
+            $(this).parent('.editor').find('.editor-dropdown-open').each(function() {
+               $(this).removeClass('editor-dropdown-open');
+               $(this).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
+            });
+
+            parentEl.addClass('editor-dropdown-open');
+            
+            // focus and move caret to end of text
+            var inputBox      = $(this).find('.InputBox');
+            var inputVal      = inputBox[0].value;
+            inputBox[0].value = '';
+            $(this).find('.InputBox').focus();
+            inputBox[0].value = inputVal;
+         }
+
+      });
+
+      $('.editor-dialog-fire-close').click(function(e) {
+         $(this).closest('.editor-dropdown').removeClass('editor-dropdown-open');
+      });
+   };
+
+
+   // Set up on page load
+   editorSetHelpText(formatOriginal, $('#Form_Body'));
+   $(".editor-toggle-fullpage-button").click(toggleFullpage);
+   closeFullPageEsc();
+   postCommentCloseFullPageEvent();
+   editorSetupDropdowns();
 
 });

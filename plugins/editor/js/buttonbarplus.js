@@ -216,6 +216,11 @@ $.fn.insertRoundTag = function(tagName, opts, props){
 jQuery(document).ready(function($) {
    
    ButtonBar = {
+      
+      Const: {
+         URL_PREFIX: 'http://'
+      },
+      
       AttachTo: function(TextArea) {
          // Load the buttonbar and bind this textarea to it
          var ThisButtonBar = $(TextArea).closest('form').find('.editor');
@@ -260,8 +265,6 @@ jQuery(document).ready(function($) {
          // Attach shortcut keys
          // TODO use these for whole editor.
          ButtonBar.BindShortcuts(TextArea);
-      
-         //ButtonBar.Prepare(ThisButtonBar, TextArea);
       },
       
       BindShortcuts: function(TextArea) {
@@ -272,7 +275,6 @@ jQuery(document).ready(function($) {
          ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+L');
          ButtonBar.BindShortcut(TextArea, 'code', 'ctrl+O');
          ButtonBar.BindShortcut(TextArea, 'quote', 'ctrl+Q');
-         //ButtonBar.BindShortcut(TextArea, 'quickurl', 'ctrl+shift+L');
          ButtonBar.BindShortcut(TextArea, 'post', 'tab');
       },
       
@@ -295,56 +297,7 @@ jQuery(document).ready(function($) {
          */
          
       },
-      /*
-      DisableButton: function(ButtonBarObj, Operation) {
-         $(ButtonBarObj).find('.ButtonWrap').each(function(i,Button){
-            var ButtonOperation = $(Button).find('span').text();
-            if (ButtonOperation == Operation)
-               $(Button).addClass('ButtonOff');
-         });
-      },
-      */
-      /*
-      Prepare: function(ButtonBarObj, TextArea) {
-         var InputFormat = $(TextArea).data('InputFormat');
-         var PrepareMethod = 'Prepare'+InputFormat;
-         if (ButtonBar[PrepareMethod] == undefined)
-            return;
-         
-         // Call preparer
-         ButtonBar[PrepareMethod](ButtonBarObj, TextArea);
-      },
-      
-      PrepareBBCode: function(ButtonBarObj, TextArea) {
-         var HelpText = gdn.definition('ButtonBarBBCodeHelpText', 'ButtonBar.BBCodeHelp');
-         $("<div></div>")
-            .addClass('ButtonBarMarkupHint')
-            .html(HelpText)
-            .insertAfter(TextArea);
-      },
-      
-      PrepareHtml: function(ButtonBarObj, TextArea) {
-         ButtonBar.DisableButton(ButtonBarObj, 'spoiler');
-         
-         var HelpText = gdn.definition('ButtonBarHtmlHelpText', 'ButtonBar.HtmlHelp');
-         $("<div></div>")
-            .addClass('ButtonBarMarkupHint')
-            .html(HelpText)
-            .insertAfter(TextArea);
-      },
-      
-      PrepareMarkdown: function(ButtonBarObj, TextArea) {
-         ButtonBar.DisableButton(ButtonBarObj, 'underline');
-         ButtonBar.DisableButton(ButtonBarObj, 'spoiler');
-         
-         var HelpText = gdn.definition('ButtonBarMarkdownHelpText', 'ButtonBar.MarkdownHelp');
-         $("<div></div>")
-            .addClass('ButtonBarMarkupHint')
-            .html(HelpText)
-            .insertAfter(TextArea);
-      },
-      */
-      
+
       Perform: function(TextArea, Operation, Event) {
          Event.preventDefault();
          
@@ -376,10 +329,11 @@ jQuery(document).ready(function($) {
             case 'italic':
                $(TextArea).insertRoundTag('i',bbcodeOpts);
                break;
-
+            /*
             case 'underline':
                $(TextArea).insertRoundTag('u',bbcodeOpts);
                break;
+            */
 
             case 'strike':
                $(TextArea).insertRoundTag('s',bbcodeOpts);
@@ -388,35 +342,6 @@ jQuery(document).ready(function($) {
             case 'code':
                $(TextArea).insertRoundTag('code',bbcodeOpts);
                break;
-
-            case 'image':
-               var thisOpts = $.extend(bbcodeOpts,{});
-               
-               var PromptText = gdn.definition('editorButtonBarImageUrl', 'editor.ImageUrlText');
-               NewURL = prompt(PromptText);
-               thisOpts.replace = NewURL; 
-                           
-               $(TextArea).insertRoundTag('img',thisOpts);
-               break;
-               
-            
-            case 'quickurl':
-               var thisOpts = $.extend(bbcodeOpts,{});
-               
-               var hasSelection = $(TextArea).hasSelection();
-               console.log("sel: "+hasSelection);
-               var NewURL = '';
-               var PromptText = gdn.definition('editorButtonBarLinkUrl', 'editor.LinkUrlText');
-               if (hasSelection !== false)
-                  NewURL = hasSelection;
-               else
-                  NewURL = prompt(PromptText,'http://');
-               
-               thisOpts.shortprop = NewURL;
-               
-               $(TextArea).insertRoundTag('url',thisOpts);
-               break;
-            
 
             case 'quote':
                $(TextArea).insertRoundTag('quote',bbcodeOpts);
@@ -429,19 +354,61 @@ jQuery(document).ready(function($) {
             case 'url':
                var thisOpts = $.extend(bbcodeOpts, {});
                
-               var PromptText = gdn.definition('editorButtonBarLinkUrl', 'editor.LinkUrlText');
-               var NewURL = prompt(PromptText,'http://');
-               var GuessText = NewURL.replace('http://','').replace('www.','');
-               thisOpts.shortprop = NewURL;
+               // Hooking in to standardized dropdown for submitting links
+               var inputBox = $('.editor-input-url');
+               $(inputBox).parent().find('.Button')
+                  .off('click.insertData')
+                  .on('click.insertData', function(e) {
+                     if (!$(this).hasClass('Cancel')) {
+                        var val           = inputBox[0].value;
+                        var GuessText     = val.replace(ButtonBar.Const.URL_PREFIX,'').replace('www.','');
+                        var CurrentSelect = $(TextArea).hasSelection();
+
+                        CurrentSelectText = (CurrentSelect) 
+                           ? CurrentSelect.toString()
+                           : GuessText;
+
+                        thisOpts.shortprop = val;
+                        thisOpts.replace = CurrentSelectText;
+
+                        $(TextArea).insertRoundTag('url',thisOpts);
+                        
+                        inputBox[0].value = ButtonBar.Const.URL_PREFIX;
+                     }
+               });
+
+
+               break;
                
-               var CurrentSelectText = GuessText;
-               var CurrentSelect = $(TextArea).hasSelection();
-               if (CurrentSelect)
-                  CurrentSelectText = CurrentSelect.toString();
+            case 'image':
                
-               thisOpts.replace = CurrentSelectText;
+               var thisOpts = $.extend(bbcodeOpts,{});
                
-               $(TextArea).insertRoundTag('url',thisOpts);
+               // Hooking in to standardized dropdown for submitting links
+               var inputBox = $('.editor-input-image');
+               $(inputBox).parent().find('.Button')
+                  .off('click.insertData')
+                  .on('click.insertData', function(e) {
+                     if (!$(this).hasClass('Cancel')) {
+                        var val          = inputBox[0].value;
+                        thisOpts.replace = val; 
+                        $(TextArea).insertRoundTag('img',thisOpts);    
+
+                        inputBox[0].value = ButtonBar.Const.URL_PREFIX;
+                     }
+               });
+               
+               
+               break;
+            
+            case 'alignleft':
+               $(TextArea).insertRoundTag('left',bbcodeOpts);
+               break;
+            case 'aligncenter':
+               $(TextArea).insertRoundTag('center',bbcodeOpts);
+               break;
+            case 'alignright':
+               $(TextArea).insertRoundTag('right',bbcodeOpts);
                break;
          }
       },
@@ -486,41 +453,6 @@ jQuery(document).ready(function($) {
                }
                break;
 
-            case 'image':
-               var urlOpts = {};
-               var thisOpts = $.extend(htmlOpts, {
-                  closetype: 'short'
-               });
-               
-               var PromptText = gdn.definition('editorButtonBarImageUrl', 'editor.ImageUrlText');
-               //var NewURL = prompt(PromptText, 'http://');
-               if (NewURL) {
-                  urlOpts.src = NewURL;
-                  $(TextArea).insertRoundTag('img',thisOpts,urlOpts);
-               }
-               break;
-            /*
-            case 'quickurl':
-               var urlOpts = {};
-               var thisOpts = $.extend(htmlOpts, {
-                  center: 'href'
-               });
-               
-               var hasSelection = $(TextArea).hasSelection();
-               var NewURL = '';
-               var PromptText = gdn.definition('editorButtonBarLinkUrl', 'editor.LinkUrlText');
-               if (hasSelection !== false) {
-                  NewURL = hasSelection;
-                  delete thisOpts.center;
-               } else
-                  NewURL = prompt(PromptText,'http://');
-               
-               urlOpts.href = NewURL;
-               
-               $(TextArea).insertRoundTag('a',thisOpts,urlOpts);
-               break;
-            */
-
             case 'quote':
                $(TextArea).insertRoundTag('blockquote',htmlOpts, {'class':'Quote'});
                break;
@@ -532,23 +464,52 @@ jQuery(document).ready(function($) {
             case 'url':
                var urlOpts = {};
                var thisOpts = $.extend(htmlOpts, {});
+
+               // Hooking in to standardized dropdown for submitting links
+               var inputBox = $('.editor-input-url');
+               $(inputBox).parent().find('.Button')
+                  .off('click.insertData')
+                  .on('click.insertData', function(e) {
+                     if (!$(this).hasClass('Cancel')) {
+                        var val           = inputBox[0].value;
+                        var GuessText     = val.replace(ButtonBar.Const.URL_PREFIX,'').replace('www.','');
+                        var CurrentSelect = $(TextArea).hasSelection();
+
+                        CurrentSelectText = (CurrentSelect) 
+                           ? CurrentSelect.toString()
+                           : GuessText;
+
+                        urlOpts.href      = val;
+                        thisOpts.replace  = CurrentSelectText;
+
+                        $(TextArea).insertRoundTag('a',thisOpts,urlOpts);
+
+                        inputBox[0].value = ButtonBar.Const.URL_PREFIX;
+                     }
+               });
                
-               var PromptText = gdn.definition('editorButtonBarLinkUrl', 'editor.LinkUrlText');
-               //var NewURL = prompt(PromptText,'http://');
-               if (NewURL) {
-                  var GuessText = NewURL.replace('http://','').replace('www.','');
-                  urlOpts.href = NewURL;
+               break;
+               
+            case 'image':
+               var urlOpts = {};
+               var thisOpts = $.extend(htmlOpts, {
+                  closetype: 'short'
+               });
+               
+               // Hooking in to standardized dropdown for submitting links
+               var inputBox = $('.editor-input-image');
+               $(inputBox).parent().find('.Button')
+                  .off('click.insertData')
+                  .on('click.insertData', function(e) {
+                     if (!$(this).hasClass('Cancel')) {
+                        var val     = inputBox[0].value;
+                        urlOpts.src = val;
+                        $(TextArea).insertRoundTag('img',thisOpts,urlOpts);   
 
-                  var CurrentSelectText = GuessText;
+                        inputBox[0].value = ButtonBar.Const.URL_PREFIX;
+                     }
+               });
 
-                  var CurrentSelect = $(TextArea).hasSelection();
-                  if (CurrentSelect)
-                     CurrentSelectText = CurrentSelect.toString();
-
-                  thisOpts.replace = CurrentSelectText;
-
-                  $(TextArea).insertRoundTag('a',thisOpts,urlOpts);
-               }
                break;
                
             case 'alignleft':
@@ -577,14 +538,16 @@ jQuery(document).ready(function($) {
             case 'italic':
                $(TextArea).insertRoundTag('_',markdownOpts);
                break;
-
+            
+            /*
             case 'underline':
-               // DISABLED
+               // no known equivalent
                return;
                break;
-
+            */
+           
             case 'strike':
-               $(TextArea).insertRoundTag('del',{opener: '<', closer: '>'});
+               $(TextArea).insertRoundTag('~~',markdownOpts);
                break;
 
             case 'code':
@@ -603,41 +566,6 @@ jQuery(document).ready(function($) {
                }
                break;
 
-            case 'image':
-               var thisOpts = $.extend(markdownOpts, {
-                  prefix:'',
-                  opentag:'![](',
-                  closetag:')',
-                  opener:'',
-                  closer:''
-               });
-               var PromptText = gdn.definition('editorButtonBarImageUrl', 'editor.ImageUrlText');
-               var NewURL = prompt(PromptText,'');
-               thisOpts.prepend = NewURL;
-               $(TextArea).insertRoundTag('',thisOpts);
-               break;
-
-            case 'quickurl':
-               var thisOpts = $.extend(markdownOpts, {
-                  opentag:'(',
-                  closetag:')'
-               });
-               
-               var hasSelection = $(TextArea).hasSelection();
-               var PromptText = gdn.definition('editorButtonBarLinkUrl', 'editor.LinkUrlText');
-               if (hasSelection !== false)
-                  var NewURL = hasSelection;
-               else {
-                  var NewURL = prompt(PromptText,'http://');
-                  thisOpts.prepend = NewURL;
-               }
-               
-               var GuessText = NewURL.replace('http://','').replace('www.','');
-               thisOpts.prefix = '['+GuessText+']';
-               
-               $(TextArea).insertRoundTag('',thisOpts);
-               break;
-
             case 'quote':
                var thisOpts = $.extend(markdownOpts, {
                   prefix:'> ',
@@ -650,29 +578,115 @@ jQuery(document).ready(function($) {
                break;
 
             case 'spoiler':
-               // DISABLED
-               return;
+               var thisOpts = $.extend(markdownOpts, {
+                  prefix:'>! ',
+                  opentag:'',
+                  closetag:'',
+                  opener:'',
+                  closer:''
+               });
+               $(TextArea).insertRoundTag('',thisOpts);
                break;
 
             case 'url':
-               var PromptText = gdn.definition('editorButtonBarLinkUrl', 'editor.LinkUrlText');
-               var NewURL = prompt(PromptText,'http://');
-               var GuessText = NewURL.replace('http://','').replace('www.','');
+
+               // Hooking in to standardized dropdown for submitting links
+               var inputBox = $('.editor-input-url');
+               $(inputBox).parent().find('.Button')
+                  .off('click.insertData')
+                  .on('click.insertData', function(e) {
+                     if (!$(this).hasClass('Cancel')) {
+                        var val           = inputBox[0].value;
+                        var GuessText     = val.replace(ButtonBar.Const.URL_PREFIX,'').replace('www.','');
+                        var CurrentSelect = $(TextArea).hasSelection();
+
+                        CurrentSelectText = (CurrentSelect) 
+                           ? CurrentSelect.toString()
+                           : GuessText;
+
+                        var thisOpts = $.extend(markdownOpts, {
+                           prefix: '['+CurrentSelectText+']',
+                           opentag:'(',
+                           closetag:')',
+                           opener:'',
+                           closer:'',
+                           replace: val
+                        });
+                        $(TextArea).insertRoundTag('',markdownOpts);
+
+                        inputBox[0].value = ButtonBar.Const.URL_PREFIX;                     
+                     }
+               });
+
+               break;
                
-               var CurrentSelectText = GuessText;
-               var CurrentSelect = $(TextArea).hasSelection();
-               if (CurrentSelect)
-                  CurrentSelectText = CurrentSelect.toString();
+            case 'image':
                
                var thisOpts = $.extend(markdownOpts, {
-                  prefix: '['+CurrentSelectText+']',
-                  opentag:'(',
+                  prefix:'',
+                  opentag:'![](',
                   closetag:')',
                   opener:'',
-                  closer:'',
-                  replace: NewURL
+                  closer:''
                });
-               $(TextArea).insertRoundTag('',markdownOpts);
+               
+               // Hooking in to standardized dropdown for submitting links
+               var inputBox = $('.editor-input-image');
+               $(inputBox).parent().find('.Button')
+                  .off('click.insertData')
+                  .on('click.insertData', function(e) {
+                     if (!$(this).hasClass('Cancel')) {
+                        var val          = inputBox[0].value;
+                        thisOpts.prepend = val;
+                        $(TextArea).insertRoundTag('',thisOpts);    
+                        
+                        inputBox[0].value = ButtonBar.Const.URL_PREFIX;
+                     }
+               });
+
+               break;
+               
+            /* 
+            // markdown has no alignment 
+            case 'alignleft':
+               break;
+            case 'aligncenter':
+               break;
+            case 'alignright':
+               break;
+            */
+           
+            case 'orderedlist':
+               var lines = $(TextArea).hasSelection().split('\n');
+               
+               
+               // TODO modify insertRoundTag to accept array prefixes 
+               // so that numbers can increment
+               for (var i = 0, l = lines.length; i < l; i++) {
+                  //console.log(i+1 +' '+ lines[i]);
+               }        
+               
+               var i = 1;
+               
+               var thisOpts = $.extend(markdownOpts, {
+                  prefix: i+'. ',
+                  opentag:'',
+                  closetag:'',
+                  opener:'',
+                  closer:''
+               });
+               $(TextArea).insertRoundTag('',thisOpts);
+               break;
+               
+            case 'unorderedlist':
+               var thisOpts = $.extend(markdownOpts, {
+                  prefix:'* ',
+                  opentag:'',
+                  closetag:'',
+                  opener:'',
+                  closer:''
+               });
+               $(TextArea).insertRoundTag('',thisOpts);
                break;
          }
       }

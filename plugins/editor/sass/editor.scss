@@ -76,8 +76,6 @@
    display: block;
 }
 
-
-
 .editor-insert-dialog input.InputBox {
    width: 97.5%;
 }
@@ -239,15 +237,39 @@ current location, due to event insertion, makes z-index troublesome. */
   }
 }
 
-/* No need to show this to Html, BBCode, and Markdown view */
+/**
+ * Hide some actions per editor view.
+ *
+ * Html, BBCode, and Markdown views have slight differences than the Wysiwyg, 
+ * so hide the particular ones 
+ */
 .editor-format-html .editor-toggle-source,
 .editor-format-bbcode .editor-toggle-source,
-.editor-format-markdown .editor-toggle-source {
+.editor-format-markdown .editor-toggle-source, 
+.editor-format-html .sep-switches,
+.editor-format-bbcode .sep-switches,
+.editor-format-markdown .sep-switches,
+
+.editor-format-markdown .sep-format,
+.editor-format-markdown .icon-align-left,
+.editor-format-markdown .icon-align-center,
+.editor-format-markdown .icon-align-right, 
+
+.editor-format-html .editor-image-align,
+.editor-format-bbcode .editor-image-align,
+.editor-format-markdown .editor-image-align,
+
+.editor-format-html .icon-list-ol,
+.editor-format-html .icon-list-ul
+
+{
    display: none;
 }
 
 
 /**
+ * Brute force hide other editors enabled after this one.
+ *
  * In case some of the other editors were enabled after this one, just have 
  * them hidden from page, essentially making this editor the veto. This is 
  * a last ditch effort to at least make sure editor is usable when others 
