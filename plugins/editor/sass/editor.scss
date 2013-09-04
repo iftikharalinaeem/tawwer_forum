@@ -6,10 +6,7 @@
  * Editor toolbar 
  */
 
-
-
 /* If JS disabled */
-
 .editor {
    display: none;
 }
@@ -22,25 +19,13 @@
 	background-color: #999999;
 	background-color: rgba(0, 0, 0, 0.4);
    padding: 5px;
-   margin: 0 0 -5px 0;
-}
-
-.FormWrapper-Condensed .editor {
-   margin: 0;
-}
-
-/* Editing comments in a discussion on the fly */
-.FormWrapper-Condensed .editor-inline-otf{
-   margin: 0 0 -5px 0;
 }
 
 .editor-help-text {
    font-size: 11px;
 }
 
-
-/* wysihtml5 lib does not insert proper inline style to hide textarea in Chrome */
-/**/
+/* TODO wysihtml5 lib does not insert proper inline style to hide textarea in Chrome */
 
 .editor .icon {
    display: inline;
@@ -55,21 +40,9 @@
 .editor .icon:hover,
 .wysihtml5-command-active,
 .wysihtml5-action-active,
-.wysihtml5-command-dialog-opened
-{
+.wysihtml5-command-dialog-opened {
    border-radius: 2px;
    background-color: #666666;
-}
-
-.editor .editor-action-disabled {
-   background-color: transparent !important;
-   opacity: 0.25;
-   cursor: default;
-   pointer-events: none;
-}
-
-.editor .editor-action-hidden {
-   display: none;
 }
 
 .editor .editor-sep {
@@ -82,14 +55,28 @@
    position: relative;
 }
 
-/* For links and images, flyout */
+/* Clicking on down caret does nothing, so let click seep through to parent */
+.editor .icon-caret-down {
+   pointer-events: none;
+}
+
+
+
+/* For dropdowns */
 .editor-insert-dialog {
    margin: 5px 0 0 -1px;
    padding: 5px;
    width: 300px;
    position: absolute;
    z-index: 100;
+   display: none;
 }
+
+.editor-dropdown-open .editor-insert-dialog {
+   display: block;
+}
+
+
 
 .editor-insert-dialog input.InputBox {
    width: 97.5%;
@@ -177,7 +164,7 @@
 }
 
 /* Added to body class witj js, so force specificity for everything 
-below; this makes editing very easy */
+   below; this makes editing very easy */
 
 .js-editor-fullpage{}
 
@@ -207,21 +194,20 @@ current location, due to event insertion, makes z-index troublesome. */
    left: 20%;
    width: auto;
    background-color: transparent;
-   padding: 0;
+   padding: 0 0 20px 0;
    animation-duration: .4s;
    animation-name: editor-anim-editor;
 }
 
 /* Temp, take this out when you figure out the element that is restricting 
-this child from going truly absolute */
+   this child from going truly absolute */
 .js-editor-fullpage .EditCommentForm #editor-fullpage-candidate {
    position: fixed;
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
 .js-editor-fullpage .TextBoxWrapper #Form_Body,
-.js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox
-{
+.js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
    width: 100% !important;
    height: 400px !important;
 }
@@ -251,4 +237,58 @@ this child from going truly absolute */
    opacity: 1;
    transform: scale(1);
   }
+}
+
+/* No need to show this to Html, BBCode, and Markdown view */
+.editor-format-html .editor-toggle-source,
+.editor-format-bbcode .editor-toggle-source,
+.editor-format-markdown .editor-toggle-source {
+   display: none;
+}
+
+
+/**
+ * In case some of the other editors were enabled after this one, just have 
+ * them hidden from page, essentially making this editor the veto. This is 
+ * a last ditch effort to at least make sure editor is usable when others 
+ * are enabled. 
+ */
+
+.js-editor-active .cleditorMain iframe {
+   display: none !important;
+}
+
+.js-editor-active .cleditorMain .wysihtml5-sandbox {
+   display: block !important;
+}
+
+.js-editor-active .cleditorToolbar,
+.js-editor-active .ButtonBar, 
+.js-editor-active .ButtonBarMarkupHint {
+   display: none !important;
+}
+
+
+/* Media query: Hiding non-essential buttons */
+@media (max-width: 767px) {
+   .hidden-xs {
+      display: none !important;
+   }
+
+   .js-editor-fullpage #editor-fullpage-candidate {
+      top: -60px;
+      left: 0;
+      right: 0;
+   }
+
+   .js-editor-fullpage .TextBoxWrapper #Form_Body,
+   .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+      height: auto !important;
+   }
+
+   /* This is not necessary or very specific, but on mobile, apple products 
+      add rounded corners */
+   textarea {
+      border-radius: 0;
+   }
 }
