@@ -39,7 +39,7 @@ class EditorPlugin extends Gdn_Plugin {
       if (in_array($Format, $this->Formats)) {    
 
          // This is only for testing
-         //$Format = 'Markdown';
+         $Format = 'Markdown';
          
          $c = Gdn::Controller();
          
