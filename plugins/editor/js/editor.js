@@ -20,8 +20,22 @@ jQuery(function() {
        editorRules    = {}; // for wysiwyg
        
    var editorToolbarId  = 'editor-format-'+ format,
-       editorTextareaId = 'Form_Body', // TODO get vanilla to assing uniques
+       editorTextareaId = 'Form_Body', 
        editorName       = 'vanilla-editor-text';
+   
+   // Set id of onload toolbar--required for proper functioning
+   $('.editor').attr('id', editorToolbarId);
+   
+   
+   
+   
+   
+   
+   
+   
+   /**
+    * Load correct editor view onload
+    */
    
    switch (format) {
       
@@ -31,17 +45,12 @@ jQuery(function() {
       case 'wysiwyg':
          
          // Load script for wysiwyg editor async
-         $.getScript(assets + "js/wysihtml5.js", function(data, textStatus, jqxhr) {
+         $.getScript(assets + "/js/wysihtml5.js", function(data, textStatus, jqxhr) {
             
             /**
              * Default editor values when first instantiated on page. Later, on DOM
              * mutations, these values are updated per editable comment.
              */
-/*
-            var editorToolbarId  = 'editor-format-wysiwyg',
-                editorTextareaId = 'Form_Body', // TODO get vanilla to assing uniques
-                editorName       = 'vanilla-editor-text';
-*/
             editorRules = {
                // Give the editor a name, the name will also be set as class name on the iframe and on the iframe's body 
                name:                 editorName,
@@ -63,7 +72,7 @@ jQuery(function() {
                // By default wysihtml5 will insert a <br> for line breaks, set this to false to use <p>
                useLineBreaks:        true,
                // Array (or single string) of stylesheet urls to be loaded in the editor's iframe
-               stylesheets:          [assets + 'design/editor.css'],
+               stylesheets:          [assets + '/design/editor.css'],
                // Placeholder text to use, defaults to the placeholder attribute on the textarea element
                placeholderText:      "Write something!",
                // Whether the composer should allow the user to manually resize images, tables etc.
@@ -83,6 +92,7 @@ jQuery(function() {
             editor.on('load', function() {
                $(editor.composer.iframe).wysihtml5_size_matters();      
             });  
+            
 
             /**
              * Extending functionality of wysihtml5.js
@@ -101,9 +111,11 @@ jQuery(function() {
                   // If block element chosen from last string in editor, there is no way to 
                   // click out of it and continue typing below it, so set the selection 
                   // after the insertion, and insert a break, because that will set the 
-                  // caret to after the latest insertion. 
-                  composer.selection.setAfter(composer.element.lastChild);
-                  composer.commands.exec("insertHTML", "<br>");
+                  // caret to after the latest insertion.                   
+                  if ($(composer.element.lastChild).hasClass('Spoiler')) {
+                     composer.selection.setAfter(composer.element.lastChild);
+                     composer.commands.exec("insertHTML", "<br>");
+                  }
                 },
 
                 state: function(composer, command) {
@@ -124,8 +136,10 @@ jQuery(function() {
               wysihtml5.commands.blockquote = {
                 exec: function(composer, command) {
                   wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "blockquote", "Quote", REG_EXP);
-                  composer.selection.setAfter(composer.element.lastChild);
-                  composer.commands.exec("insertHTML", "<br>");
+                  if ($(composer.element.lastChild).hasClass('Quote')) {
+                     composer.selection.setAfter(composer.element.lastChild);
+                     composer.commands.exec("insertHTML", "<br>");
+                  }
                 },
 
                 state: function(composer, command) {
@@ -146,8 +160,10 @@ jQuery(function() {
               wysihtml5.commands.code = {
                 exec: function(composer, command) {
                   wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "blockquote", "CodeBlock", REG_EXP);
-                  composer.selection.setAfter(composer.element.lastChild);
-                  composer.commands.exec("insertHTML", "<br>");
+                  if ($(composer.element.lastChild).hasClass('CodeBlock')) {
+                    composer.selection.setAfter(composer.element.lastChild);
+                    composer.commands.exec("insertHTML", "<br>");
+                  }
                 },
 
                 state: function(composer, command) {
@@ -166,66 +182,152 @@ jQuery(function() {
       
       /**
        * HTML editor 
-       */
-      case 'html':
-         
-         // Load script for wysiwyg editor async
-         $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-            
-            
-            ButtonBar.AttachTo($('#'+editorTextareaId));
-            
-            
-            
-         });
-         
-         break;
-         
-      /**
        * BBCode editor 
-       */
-      case 'bbcode':
-         
-         // Load script for wysiwyg editor async
-         $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-            
-            ButtonBar.AttachTo($('#'+editorTextareaId));
-            
-         });
-         
-         break;
-         
-      /**
        * Markdown editor 
        */
+      case 'html':
+      case 'bbcode':
       case 'markdown':
          
          // Load script for wysiwyg editor async
-         $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-
-            
+         $.getScript(assets + "/js/buttonbarplus.js", function(data, textStatus, jqxhr) {
             ButtonBar.AttachTo($('#'+editorTextareaId));
-            
-         });
-         
-         break;
-
-      /**
-       * Regular text editor 
-       */
-      case 'text':
-         
-         // Load script for wysiwyg editor async
-         $.getScript(assets + "js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-
-            
          });
          
          break;
    }
    
    
+   
+   
+   
+   
+   
+   
+   
+
+   
    /**
+    * Mutation observer for attaching editor to every .BodyBox that's inserted 
+    * into the DOM. Consider using livequery for wider support.
+    * 
+    * TODO abstracting the mutation anon function and then calling it as a 
+    * callback on mutation, but also just when manually invoked, so less 
+    * redundant with onload above.
+    * 
+    * TODO make onload call this, essentially moving all into one, less
+    * redundant.
+    */
+   $(document).ready(function() {
+
+     // If there are any changes in this node, check for bodyBox.
+     var mutationTarget = $('#Content')[0];
+
+     // configuration of the observer:
+     var config = { 
+        attributes: false, 
+        childList: true, 
+        characterData: false, 
+        subtree: true 
+     }
+
+     // All modern browsers, except ie11=<
+     // Can use deprecated mutation oberservers.
+     // Polyfill available: https://github.com/Polymer/MutationObservers/blob/stable/MutationObserver.js
+     var observer = new MutationObserver(function(mutations) {
+
+        // use some loop, return true after first match, because will 
+        // list multiple mutations on the same element otherwise. ie8<
+        mutations.some(function(mutation) { 
+
+           var t                       = $(mutation.target),
+               currentEditorToolbar    = t.find('.editor-format-'+ format),
+               currentEditableTextarea = t.find('#Form_Body'),
+               currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
+
+           // if found, perform operation
+           if (currentEditableTextarea.length 
+              && currentEditorToolbar.length) {
+
+              var currentEditableCommentId = (new Date()).getTime(),
+                  editorTextareaId         = currentEditableTextarea[0].id +'-'+ currentEditableCommentId,
+                  editorToolbarId          = 'editor-format-'+ format +'-'+ currentEditableCommentId,
+                  editorName               = 'vanilla-editor-text-'+ currentEditableCommentId;
+
+              // change ids to bind new editor functionality to particular edit
+              $(currentEditorToolbar)
+                 .attr('id', editorToolbarId)
+                 .addClass('editor-inline-otf');
+
+              $(currentEditableTextarea).attr('id', editorTextareaId); 
+
+              // TODO add these as functions in an object, then just invoke
+              // them on format
+              switch (format) {
+                 case 'wysiwyg':
+                     // rules updated for particular edit, look to editorRules for 
+                     // reference. Any defined here will overwrite the defaults set above.
+                     var editorRulesOTF = {
+                        name: editorName,
+                        toolbar: editorToolbarId      
+                     };
+
+                     // overwrite defaults with specific rules for this edit
+                     for (var dfr in editorRules) {
+                        if (typeof editorRulesOTF[dfr] == 'undefined') {
+                           editorRulesOTF[dfr] = editorRules[dfr];
+                        }
+                     }
+
+                     // instantiate new editor
+                     var editorInline = new wysihtml5.Editor(editorTextareaId, editorRulesOTF);
+
+                     editorInline.on('load', function() {
+                        // enable auto-resize
+                        $(editorInline.composer.iframe).wysihtml5_size_matters();      
+                     });
+                  break;
+                  
+                  case 'html':
+                  case 'bbcode':
+                  case 'markdown':
+                     
+                     ButtonBar.AttachTo($('#'+editorTextareaId));
+                  
+                     break;
+              }
+
+              // Set up on editor load
+              editorSetHelpText(formatOriginal, currentTextBoxWrapper);
+              $(".editor-toggle-fullpage-button").click(toggleFullpage);
+              closeFullPageEsc();
+              postCommentCloseFullPageEvent();    
+              
+              editorSetupDropdowns();
+
+              // some() loop requires true to end loop. every() requires false.
+              return true;
+           }
+        });
+
+     });
+
+     // start observing, call observer.disconnect() to stop
+     observer.observe(mutationTarget, config);
+   });   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   /**
+    * Helper functions called on load and on mutation.
+    * 
     * Fullpage actions--available to all editor views on page load. 
     * 
     * TODO bug with fullpage button losing event listener
@@ -262,12 +364,12 @@ jQuery(function() {
       });  
    };
 
-   // If full page and the user posts comment, exit out of full page.
+   // If full page and the user saves/cancels/previews comment, 
+   // exit out of full page.
    // Not smart in the sense that a failed post will also exit out of 
    // full page, but the text will remain in editor, so not big issue.
-   // TODO when user clicks cancel, close as well.
    var postCommentCloseFullPageEvent = function() {
-      $('.CommentButton').click(function() {
+      $('.Button').click(function() {
          if ($('body').hasClass('js-editor-fullpage')) { 
             toggleFullpage();
          }
@@ -281,121 +383,51 @@ jQuery(function() {
          .html(gdn.definition('editor'+ format +'HelpText'))
          .insertAfter(editorAreaObj);
     };
-   
+
+   /**
+    * Deal with clashing JS for opening dialogs on click, and do not let 
+    * more than one dialog/dropdown appear at once. 
+    * 
+    * TODO clean up. 
+    * TODO enable enter button to do the same as clicks, or disable enter.
+    */
+   var editorSetupDropdowns = function() { 
+      $('.editor-dropdown').click(function(e) {
+         var parentEl = $(e.target).parent();
+
+         if ($(this).hasClass('editor-dropdown') 
+         && $(this).hasClass('editor-dropdown-open')) {
+            parentEl.removeClass('editor-dropdown-open');
+         } else {
+            // clear other opened dropdowns before opening this one
+            $(this).parent('.editor').find('.editor-dropdown-open').each(function() {
+               $(this).removeClass('editor-dropdown-open');
+               $(this).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
+            });
+
+            parentEl.addClass('editor-dropdown-open');
+            
+            // focus and move caret to end of text
+            var inputBox      = $(this).find('.InputBox');
+            var inputVal      = inputBox[0].value;
+            inputBox[0].value = '';
+            $(this).find('.InputBox').focus();
+            inputBox[0].value = inputVal;
+         }
+
+      });
+
+      $('.editor-dialog-fire-close').click(function(e) {
+         $(this).closest('.editor-dropdown').removeClass('editor-dropdown-open');
+      });
+   };
+
+
+   // Set up on page load
    editorSetHelpText(formatOriginal, $('#Form_Body'));
-   
    $(".editor-toggle-fullpage-button").click(toggleFullpage);
    closeFullPageEsc();
    postCommentCloseFullPageEvent();
-   
-   
-   /**
-    * Mutation observer for attaching editor to every .BodyBox that's inserted 
-    * into the DOM. Consider using livequery for wider support.
-    * 
-    * TODO abstracting the mutation anon function and then calling it as a 
-    * callback on mutation, but also just when manually invoked.
-    */
-   $(document).ready(function() {
-
-     // If there are any changes in this node, check for bodyBox.
-     var mutationTarget = $('#Content')[0];
-
-     // configuration of the observer:
-     var config = { 
-        attributes: false, 
-        childList: true, 
-        characterData: false, 
-        subtree: true 
-     }
-
-     // All modern browsers, except ie11=<
-     // Can use deprecated mutation oberservers.
-     // Polyfill available: https://github.com/Polymer/MutationObservers/blob/stable/MutationObserver.js
-     var observer = new MutationObserver(function(mutations) {
-
-        // use some loop, return true after first match, because will 
-        // list multiple mutations on the same element otherwise. ie8<
-        mutations.some(function(mutation) { 
-
-           var t                       = $(mutation.target),
-               currentEditorToolbar    = t.find('.editor-format-'+ format),
-               currentEditableTextarea = t.find('#Form_Body');
-
-           // if found, perform operation
-           if (currentEditableTextarea.length 
-              && currentEditorToolbar.length) {
-
-              var currentEditableCommentId = (new Date()).getTime(),
-                  editorTextareaId         = currentEditableTextarea[0].id +'-'+ currentEditableCommentId,
-                  editorToolbarId          = 'editor-format-'+ format +'-'+ currentEditableCommentId,
-                  editorName               = 'vanilla-editor-text-'+ currentEditableCommentId;
-
-              // change ids to bind new editor functionality to particular edit
-              $(currentEditorToolbar)
-                 .attr('id', editorToolbarId)
-                 .addClass('editor-inline-otf');
-
-              $(currentEditableTextarea).attr('id', editorTextareaId); 
-
-
-
-              // TODO add these as functions in an object, then just invoke
-              // them on format
-              switch (format) {
-                 case 'wysiwyg':
-                     // rules updated for particular edit, look to editorRules for 
-                     // reference. Any defined here will overwrite the defaults set above.
-                     var editorRulesOTF = {
-                        name: editorName,
-                        toolbar: editorToolbarId      
-                     };
-
-                     // overwrite defaults with specific rules for this edit
-                     for (var dfr in editorRules) {
-                        if (typeof editorRulesOTF[dfr] == 'undefined') {
-                           editorRulesOTF[dfr] = editorRules[dfr];
-                        }
-                     }
-
-                     // instantiate new editor
-                     var editorInline = new wysihtml5.Editor(editorTextareaId, editorRulesOTF);
-
-                     editorInline.on('load', function() {
-                        // enable auto-resize
-                        $(editorInline.composer.iframe).wysihtml5_size_matters();      
-                     });
-                  break;
-                  
-                  case 'html':
-                  case 'bbcode':
-                  case 'markdown':
-                     
-                     ButtonBar.AttachTo($('#'+editorTextareaId));
-                  
-                     break;
-                  case 'text':
-                     break;
-              }
-
-
-              // TODO this does not load 
-              //editorSetHelpText(format, $(editorTextareaId));
-
-              // Attach fullpage listeners to newly created editor 
-              $(".editor-toggle-fullpage-button").click(toggleFullpage);
-              closeFullPageEsc();
-              postCommentCloseFullPageEvent();               
-
-              // some() loop requires true to end loop. every() requires false.
-              return true;
-           }
-        });
-
-     });
-
-     // start observing, call observer.disconnect() to stop
-     observer.observe(mutationTarget, config);
-   });   
+   editorSetupDropdowns();
 
 });
