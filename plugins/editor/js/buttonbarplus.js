@@ -223,20 +223,21 @@ jQuery(document).ready(function($) {
          CARET_MAP: {}
       },
       
-      AttachTo: function(TextArea) {
+      AttachTo: function(TextArea, format) {
          // Load the buttonbar and bind this textarea to it
          var ThisButtonBar = $(TextArea).closest('form').find('.editor');
          $(ThisButtonBar).data('ButtonBarTarget', TextArea);
-         
-         var format = gdn.definition('editorInputFormat', 'Html');
+
+         //var format = gdn.definition('editorInputFormat', 'Html');
+         var format = format;
          
          // Apply the page's InputFormat to this textarea.
          $(TextArea).data('InputFormat', format);
          
          // Build button UIs 
          // TODO remove redundancy, have operations dependent on another value
-         $(ThisButtonBar).find('.icon').each(function(i, el){
-            var Operation = $(el).attr('title').toLowerCase();
+         $(ThisButtonBar).find('.editor-action').each(function(i, el){
+            var Operation = $(el).attr('title').toLowerCase().replace(/\s+/g, '');
             
             var UIOperation = Operation.charAt(0).toUpperCase() + Operation.slice(1);
             
@@ -246,7 +247,8 @@ jQuery(document).ready(function($) {
          });
 
          // Attach events
-         $(ThisButtonBar).find('.icon').mousedown(function(event){
+         $(ThisButtonBar).find('.editor-action').mousedown(function(event){
+                       
             var MyButtonBar = $(event.target).closest('.editor');
             //var Button = $(event.target).find('span').closest('.ButtonWrap');
             var Button = $(event.target);
@@ -316,7 +318,7 @@ jQuery(document).ready(function($) {
          var UIOperation = Operation.charAt(0).toUpperCase() + Operation.slice(1);
          var Action = "ButtonBar"+UIOperation;
          
-         var ButtonBarObj = $(TextArea).closest('form').find('.icon');
+         var ButtonBarObj = $(TextArea).closest('form').find('.editor-action');
          var Button = $(ButtonBarObj).find('.'+Action);
          Button.attr('title', Button.attr('title')+', '+Shortcut);
          */
@@ -326,7 +328,8 @@ jQuery(document).ready(function($) {
       Perform: function(TextArea, Operation, Event) {
          Event.preventDefault();
          
-         var InputFormat = $(TextArea).data('InputFormat');
+         var InputFormat = $(TextArea).data('InputFormat');         
+         
          var PerformMethod = 'Perform'+InputFormat;
          if (ButtonBar[PerformMethod] == undefined)
             return;
@@ -507,6 +510,7 @@ jQuery(document).ready(function($) {
                break;
 
             case 'italic':
+               
                $(TextArea).insertRoundTag('i',htmlOpts, {'class':'Italic'});
                break;
                
@@ -605,6 +609,13 @@ jQuery(document).ready(function($) {
                $(TextArea).insertRoundTag('div',htmlOpts,{'class':'AlignRight'});
                break;
                
+            case 'header1':
+               $(TextArea).insertRoundTag('h1',htmlOpts);
+               break;
+            case 'header2':
+               $(TextArea).insertRoundTag('h2',htmlOpts);
+               break;
+               
             case 'orderedlist':
                
                var thisOpts = $.extend(htmlOpts, {
@@ -693,6 +704,29 @@ jQuery(document).ready(function($) {
             case 'spoiler':
                var thisOpts = $.extend(markdownOpts, {
                   prefix:'>! ',
+                  opentag:'',
+                  closetag:'',
+                  opener:'',
+                  closer:''
+               });
+               $(TextArea).insertRoundTag('',thisOpts);
+               break;
+               
+               
+            case 'header1':
+               var thisOpts = $.extend(markdownOpts, {
+                  prefix:'# ',
+                  opentag:'',
+                  closetag:'',
+                  opener:'',
+                  closer:''
+               });
+               $(TextArea).insertRoundTag('',thisOpts);
+               break;
+               
+            case 'header2':
+               var thisOpts = $.extend(markdownOpts, {
+                  prefix:'## ',
                   opentag:'',
                   closetag:'',
                   opener:'',

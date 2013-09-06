@@ -21,8 +21,17 @@
 
             // Else this button has dropdown options, so generate them
             foreach ($button['type'] as $button_option) {
+               
+               $action_text = ($button_option['text']) 
+                       ? $button_option['text']
+                       : '';
+               
+               $html_tag = ($button['action'] == 'color') 
+                       ? 'li'
+                       : 'a';
+               
                // currently only color has a bunch of sub buttons
-               $html_button_dropdown_options .= Wrap('', 'li', $button_option['attr']);
+               $html_button_dropdown_options .= Wrap($action_text, $html_tag, $button_option['attr']);
             }
 
             // TODO make less redundant
@@ -32,6 +41,13 @@
                   $html_toolbar .= Wrap(
                      Wrap($html_arrow_down, 'a', $button['attr']) .''. 
                      Wrap($html_button_dropdown_options, 'ul', array('class' => 'editor-insert-dialog editor-colors-flyout Flyout MenuItems', 'data-wysihtml5-dialog' => ''))
+                  , 'div', array('class' => 'editor-dropdown'));
+                  break;
+               
+               case 'headers':
+                  $html_toolbar .= Wrap(
+                     Wrap($html_arrow_down, 'a', $button['attr']) .''. 
+                     Wrap($html_button_dropdown_options, 'div', array('class' => 'editor-insert-dialog editor-headers-flyout Flyout MenuItems', 'data-wysihtml5-dialog' => ''))
                   , 'div', array('class' => 'editor-dropdown'));
                   break;
 

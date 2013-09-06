@@ -19,9 +19,28 @@ jQuery(function() {
        assets         = gdn.definition('editorPluginAssets'), 
        editorRules    = {}; // for wysiwyg
        
-   var editorToolbarId  = 'editor-format-'+ format,
+       
+  // When editor loaded inline and accomodates an editor format based on the 
+  // original post format.
+  
+       
+       
+   var editorToolbarId  = 'editor-format-', // append format below
        editorTextareaId = 'Form_Body', 
        editorName       = 'vanilla-editor-text';
+       
+
+   var currentEditableTextarea = $('#Form_Body');
+   var currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
+   var currentEditorFormat     = $('#Form_Format')[0].value.toLowerCase();
+   
+   
+   format = (currentEditorFormat !== format) 
+      ? currentEditorFormat 
+      : format;
+   
+   editorToolbarId += currentEditorFormat;
+   
    
    // Set id of onload toolbar--required for proper functioning
    $('.editor').attr('id', editorToolbarId);
@@ -70,7 +89,7 @@ jQuery(function() {
                // Class name to add to the body when the wysihtml5 editor is supported
                bodyClassName:        "wysihtml5-supported",
                // By default wysihtml5 will insert a <br> for line breaks, set this to false to use <p>
-               useLineBreaks:        true,
+               useLineBreaks:        false,
                // Array (or single string) of stylesheet urls to be loaded in the editor's iframe
                stylesheets:          [assets + '/design/editor.css'],
                // Placeholder text to use, defaults to the placeholder attribute on the textarea element
@@ -90,7 +109,7 @@ jQuery(function() {
 
             // load resizer
             editor.on('load', function() {
-               $(editor.composer.iframe).wysihtml5_size_matters();      
+               $(editor.composer.iframe).wysihtml5_size_matters();  
             });  
             
 
@@ -159,7 +178,7 @@ jQuery(function() {
 
               wysihtml5.commands.code = {
                 exec: function(composer, command) {
-                  wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "blockquote", "CodeBlock", REG_EXP);
+                  wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "pre", "CodeBlock", REG_EXP);
                   if ($(composer.element.lastChild).hasClass('CodeBlock')) {
                     composer.selection.setAfter(composer.element.lastChild);
                     composer.commands.exec("insertHTML", "<br>");
@@ -187,11 +206,11 @@ jQuery(function() {
        */
       case 'html':
       case 'bbcode':
-      case 'markdown':
-         
+      case 'markdown':         
+      
          // Load script for wysiwyg editor async
          $.getScript(assets + "/js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-            ButtonBar.AttachTo($('#'+editorTextareaId));
+            ButtonBar.AttachTo($('#'+editorTextareaId), formatOriginal);
          });
          
          break;
@@ -240,13 +259,29 @@ jQuery(function() {
         // list multiple mutations on the same element otherwise. ie8<
         mutations.some(function(mutation) { 
 
-           var t                       = $(mutation.target),
-               currentEditorToolbar    = t.find('.editor-format-'+ format),
-               currentEditableTextarea = t.find('#Form_Body'),
-               currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
 
+
+//todo clean up. and get rid of mutate bug.
+// and now that mutate function is pretty much like onload
+// DO combine and delete redundancy.
+           var t                       = $(mutation.target);
+           
+           
+           var currentEditorFormat = t.find('#Form_Format');
+
+           if (currentEditorFormat != 'undefined') {
+     
+               formatOriginal = currentEditorFormat[0].value;
+               //currentEditorFormat = $(currentEditorFormat).val();
+               currentEditorFormat = currentEditorFormat[0].value.toLowerCase();
+               format = currentEditorFormat + '';
+               
+               var currentEditorToolbar    = t.find('.editor-format-'+ format);
+               var currentEditableTextarea = t.find('#Form_Body');
+               var currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
+           }
            // if found, perform operation
-           if (currentEditableTextarea.length 
+           if (format != 'undefined' && currentEditableTextarea.length 
               && currentEditorToolbar.length) {
 
               var currentEditableCommentId = (new Date()).getTime(),
@@ -265,35 +300,38 @@ jQuery(function() {
               // them on format
               switch (format) {
                  case 'wysiwyg':
-                     // rules updated for particular edit, look to editorRules for 
-                     // reference. Any defined here will overwrite the defaults set above.
-                     var editorRulesOTF = {
-                        name: editorName,
-                        toolbar: editorToolbarId      
-                     };
+                    $.getScript(assets + "/js/wysihtml5.js", function(data, textStatus, jqxhr) {
+                        // rules updated for particular edit, look to editorRules for 
+                        // reference. Any defined here will overwrite the defaults set above.
+                        var editorRulesOTF = {
+                           name: editorName,
+                           toolbar: editorToolbarId      
+                        };
 
-                     // overwrite defaults with specific rules for this edit
-                     for (var dfr in editorRules) {
-                        if (typeof editorRulesOTF[dfr] == 'undefined') {
-                           editorRulesOTF[dfr] = editorRules[dfr];
+                        // overwrite defaults with specific rules for this edit
+                        for (var dfr in editorRules) {
+                           if (typeof editorRulesOTF[dfr] == 'undefined') {
+                              editorRulesOTF[dfr] = editorRules[dfr];
+                           }
                         }
-                     }
 
-                     // instantiate new editor
-                     var editorInline = new wysihtml5.Editor(editorTextareaId, editorRulesOTF);
+                        // instantiate new editor
+                        var editorInline = new wysihtml5.Editor(editorTextareaId, editorRulesOTF);
 
-                     editorInline.on('load', function() {
-                        // enable auto-resize
-                        $(editorInline.composer.iframe).wysihtml5_size_matters();      
-                     });
+                        editorInline.on('load', function() {
+                           // enable auto-resize
+                           $(editorInline.composer.iframe).wysihtml5_size_matters();      
+                        });
+                    });
                   break;
                   
                   case 'html':
                   case 'bbcode':
-                  case 'markdown':
-                     
-                     ButtonBar.AttachTo($('#'+editorTextareaId));
-                  
+                  case 'markdown': 
+
+                     $.getScript(assets + "/js/buttonbarplus.js", function(data, textStatus, jqxhr) {
+                        ButtonBar.AttachTo($('#'+editorTextareaId), formatOriginal);
+                     });                  
                      break;
               }
 
@@ -352,7 +390,7 @@ jQuery(function() {
          $(formWrapper).attr('id', '');
          bodyEl.removeClass('js-editor-fullpage');
          $(toggleButton).removeClass('icon-resize-small');
-      }  
+      }
    }
 
    // exit fullpage on esc
@@ -416,10 +454,19 @@ jQuery(function() {
          }
 
       });
+      
+      // if dropdown open, cliking into an editor area should close it, but 
+      // keep it open for anything else.
+      $('.TextBoxWrapper').each(function(i, el) {
+         $(el).addClass('editor-dialog-fire-close');
+      });
 
       $('.editor-dialog-fire-close').click(function(e) {
-         $(this).closest('.editor-dropdown').removeClass('editor-dropdown-open');
+         $('.editor-dropdown').each(function(i, el) {
+            $(el).removeClass('editor-dropdown-open');
+         }); 
       });
+
    };
 
 

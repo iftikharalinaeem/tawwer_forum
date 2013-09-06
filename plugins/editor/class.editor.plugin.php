@@ -29,17 +29,17 @@ class EditorPlugin extends Gdn_Plugin {
     * Attach editor anywhere 'BodyBox' is used. It is not being used for 
     * editing a posted reply, so find another event to hook into.
     * 
-    * @param Gdn_Controller $Sender 
+    * @param Gdn_Form $Sender 
     */
    public function Gdn_Form_BeforeBodyBox_Handler($Sender) {
       
       // Grab default format, and if none, set to Wysiwyg
-      $Format = C('Garden.InputFormatter','Wysiwyg');
+      $Format = $Sender->GetValue('Format', C('Garden.InputFormatter','Html'));
       
       if (in_array($Format, $this->Formats)) {    
 
          // This is only for testing
-         $Format = 'Markdown';
+         //$Format = 'Wysiwyg';
          
          $c = Gdn::Controller();
          
@@ -69,10 +69,10 @@ class EditorPlugin extends Gdn_Plugin {
 
             $toolbar = array(
                // Basic editing (bold, italic, strike, headers+, colors+)
-               array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'icon icon-bold', 'data-wysihtml5-command' => 'bold', 'title' => 'Bold')),
-               array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'icon icon-italic', 'data-wysihtml5-command' => 'italic', 'title' => 'Italic')),
-               array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'icon icon-strikethrough', 'data-wysihtml5-command' => 'strikethrough', 'title' => 'Strike')),
-               /*
+               array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold', 'data-wysihtml5-command' => 'bold', 'title' => 'Bold')),
+               array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic', 'data-wysihtml5-command' => 'italic', 'title' => 'Italic')),
+               array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough', 'data-wysihtml5-command' => 'strikethrough', 'title' => 'Strike')),
+               
                array('edit' => 'basic', 'action'=> 'color', 'type' => array(
                    array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'attr' => array('class' => 'color color-black editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => 'black', 'title' => 'Black')),
                    array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'attr' => array('class' => 'color color-white editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => 'white', 'title' => 'White')),
@@ -87,31 +87,36 @@ class EditorPlugin extends Gdn_Plugin {
                    array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'attr' => array('class' => 'color color-blue editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => 'blue', 'title' => 'Blue')),
                    array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'attr' => array('class' => 'color color-lime editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => 'lime', 'title' => 'Lime')),
                ), 'attr' => array('class' => 'icon icon-font hidden-xs', 'data-wysihtml5-command-group' => 'foreColor', 'title' => 'Color')),
-               */
-               array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'icon icon-list-ol hidden-xs', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => 'Ordered list')),
-               array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'icon icon-list-ul hidden-xs', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => 'Unordered list')),
+               
+               array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol hidden-xs', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => 'Ordered list')),
+               array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul hidden-xs', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => 'Unordered list')),
 
-               // Unique editing (quotation, code, spoilers)
-               array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-unique hidden-xs')),
-               array('edit' => 'unique', 'action'=> 'quote', 'type' => 'button', 'attr' => array('class' => 'icon icon-quote hidden-xs', 'data-wysihtml5-command' => 'blockquote', 'title' => 'Quote')),
-               array('edit' => 'unique', 'action'=> 'code', 'type' => 'button', 'attr' => array('class' => 'icon icon-code hidden-xs', 'data-wysihtml5-command' => 'code', 'title' => 'Code')),
-               array('edit' => 'unique', 'action'=> 'spoiler', 'type' => 'button', 'attr' => array('class' => 'icon icon-ellipsis hidden-xs', 'data-wysihtml5-command' => 'spoiler', 'title' => 'Spoiler')),
-
+               // Unique / heading editing (quotation, code, spoilers)
+               array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-headers hidden-xs')),              
+               array('edit' => 'headers', 'action'=> 'headers', 'type' => array(
+                   array('edit' => 'headers', 'action'=> 'color', 'type' => 'button', 'text' => 'Heading 1', 'attr' => array('class' => 'editor-action editor-action-h1 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h1', 'title' => 'Header 1')),
+                   array('edit' => 'headers', 'action'=> 'color', 'type' => 'button', 'text' => 'Heading 2', 'attr' => array('class' => 'editor-action editor-action-h2 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h2', 'title' => 'Header 2')),
+                   array('edit' => 'headers', 'action'=> 'quote', 'type' => 'button', 'text' => 'Quote', 'attr' => array('class' => 'editor-action editor-action-quote editor-dialog-fire-close', 'data-wysihtml5-command' => 'blockquote', 'title' => 'Quote')),
+                   array('edit' => 'headers', 'action'=> 'code', 'type' => 'button', 'text' => 'Code', 'attr' => array('class' => 'editor-action editor-action-code editor-dialog-fire-close', 'data-wysihtml5-command' => 'code', 'title' => 'Code')),
+                   array('edit' => 'headers', 'action'=> 'spoiler', 'type' => 'button', 'text' => 'Spoiler', 'attr' => array('class' => 'editor-action editor-action-spoiler editor-dialog-fire-close', 'data-wysihtml5-command' => 'spoiler', 'title' => 'Spoiler')),
+               ), 'attr' => array('class' => 'icon icon-edit', 'title' => 'Headers')),
+                             
+                
                // Media editing (links, images)
                array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-media hidden-xs')),
-               array('edit' => 'media', 'action'=> 'link', 'type' => array(), 'attr' => array('class' => 'icon icon-link', 'data-wysihtml5-command' => 'createLink', 'title' => 'Url')), 
-               array('edit' => 'media', 'action'=> 'image', 'type' => array(), 'attr' => array('class' => 'icon icon-picture', 'data-wysihtml5-command' => 'insertImage', 'title' => 'Image')), 
+               array('edit' => 'media', 'action'=> 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link', 'data-wysihtml5-command' => 'createLink', 'title' => 'Url')), 
+               array('edit' => 'media', 'action'=> 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture', 'data-wysihtml5-command' => 'insertImage', 'title' => 'Image')), 
 
                // Format editing (justify, list)             
                array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-format hidden-xs')),
-               array('edit' => 'format', 'action'=> 'alignleft', 'type' => 'button', 'attr' => array('class' => 'icon icon-align-left hidden-xs', 'data-wysihtml5-command' => 'justifyLeft', 'title' => 'Align left')),
-               array('edit' => 'format', 'action'=> 'aligncenter', 'type' => 'button', 'attr' => array('class' => 'icon icon-align-center hidden-xs', 'data-wysihtml5-command' => 'justifyCenter', 'title' => 'Align center')),
-               array('edit' => 'format', 'action'=> 'alignright', 'type' => 'button', 'attr' => array('class' => 'icon icon-align-right hidden-xs', 'data-wysihtml5-command' => 'justifyRight', 'title' => 'Align right')),
+               array('edit' => 'format', 'action'=> 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left hidden-xs', 'data-wysihtml5-command' => 'justifyLeft', 'title' => 'Align left')),
+               array('edit' => 'format', 'action'=> 'aligncenter', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-center hidden-xs', 'data-wysihtml5-command' => 'justifyCenter', 'title' => 'Align center')),
+               array('edit' => 'format', 'action'=> 'alignright', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-right hidden-xs', 'data-wysihtml5-command' => 'justifyRight', 'title' => 'Align right')),
    
                // Editor switches (toggle source, fullpage)
                array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-switches hidden-xs')),
-               array('edit' => 'switches', 'action'=> 'togglehtml', 'type' => 'button', 'attr' => array('class' => 'icon icon-source editor-toggle-source hidden-xs', 'data-wysihtml5-action' => 'change_view', 'title' => 'Toggle HTML view')),
-               array('edit' => 'switches', 'action'=> 'fullpage', 'type' => 'button', 'attr' => array('class' => 'icon icon-resize-full editor-toggle-fullpage-button', 'title' => 'Toggle full page')),
+               array('edit' => 'switches', 'action'=> 'togglehtml', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-source editor-toggle-source hidden-xs', 'data-wysihtml5-action' => 'change_view', 'title' => 'Toggle HTML view')),
+               array('edit' => 'switches', 'action'=> 'fullpage', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button', 'title' => 'Toggle full page')),
             );
 
             $this->EventArguments['Toolbar'] =& $toolbar;

@@ -30,7 +30,7 @@
 .editor .icon {
    display: inline;
    padding: 5px 8px;
-   margin: 0 -1px;
+   margin: 0 1px;
    color: #F7F7F7;
    border: 1px solid transparent;
    cursor: pointer;
@@ -43,11 +43,13 @@
 .wysihtml5-command-dialog-opened {
    border-radius: 2px;
    background-color: #666666;
+	background-color: rgba(0, 0, 0, 0.2);
+   color: #fff !important;
 }
 
 .editor .editor-sep {
    border-left: 1px solid #888888;
-   margin: 0 8px 0 5px;
+   margin: 0 5px;
 }
 
 .editor .editor-dropdown {
@@ -64,7 +66,7 @@
 
 /* For dropdowns */
 .editor-insert-dialog {
-   margin: 5px 0 0 -1px;
+   margin: 5px 0 0 0;
    padding: 5px;
    width: 300px;
    position: absolute;
@@ -149,6 +151,31 @@
 .editor-colors-flyout .color-lime {
    background-color: lime;
 }
+
+
+/**
+ * Headers dropdown
+ */
+
+.editor-headers-flyout {
+   padding: 5px 0;
+   width: auto;
+}
+
+.editor-headers-flyout .wysihtml5-command-active {
+   border-radius: 0;
+}
+
+.editor-headers-flyout .editor-action-h1 {
+   font-size: 18px;
+   line-height: 28px !important;
+}
+
+.editor-headers-flyout .editor-action-h2 {
+   font-size: 16px;
+}
+
+
 
 
 /**
@@ -257,7 +284,10 @@ current location, due to event insertion, makes z-index troublesome. */
 
 .editor-format-html .editor-image-align,
 .editor-format-bbcode .editor-image-align,
-.editor-format-markdown .editor-image-align
+.editor-format-markdown .editor-image-align,
+
+.editor-format-bbcode .editor-action-h1,
+.editor-format-bbcode .editor-action-h2
 
 {
    display: none;
