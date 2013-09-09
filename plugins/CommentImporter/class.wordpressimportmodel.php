@@ -389,6 +389,9 @@ class WordpressImportModel extends CommentImportModel {
     * @param ParentXml $ParentXml
     */
    public function ParseComment($Xml, $ParentXml) {
+      if ($Xml->comment_type == 'pingback')
+         return;
+
 //      $Xml = new SimpleXMLElement($Str);
       $Row = array(
           'ForeignID' => (int)$Xml->comment_id,

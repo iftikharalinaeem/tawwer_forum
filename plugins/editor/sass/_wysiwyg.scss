@@ -1,0 +1,188 @@
+/**
+ * Editor action styles within editor and post
+ *
+ * TODO go through wysihtml5.js and here and replace proprietary prefixes
+ */
+
+.wysiwyg-font-size-smaller {
+  font-size: smaller;
+}
+
+.wysiwyg-font-size-larger {
+  font-size: larger;
+}
+
+.wysiwyg-font-size-xx-large {
+  font-size: xx-large;
+}
+
+.wysiwyg-font-size-x-large {
+  font-size: x-large;
+}
+
+.wysiwyg-font-size-large {
+  font-size: large;
+}
+
+.wysiwyg-font-size-medium {
+  font-size: medium;
+}
+
+.wysiwyg-font-size-small {
+  font-size: small;
+}
+
+.wysiwyg-font-size-x-small {
+  font-size: x-small;
+}
+
+.wysiwyg-font-size-xx-small {
+  font-size: xx-small;
+}
+
+.wysiwyg-color-black {
+  color: black;
+}
+
+.wysiwyg-color-silver {
+  color: silver;
+}
+
+.wysiwyg-color-gray {
+  color: gray;
+}
+
+.wysiwyg-color-white {
+  color: white;
+}
+
+.wysiwyg-color-maroon {
+  color: maroon;
+}
+
+.wysiwyg-color-red {
+  color: red;
+}
+
+.wysiwyg-color-purple {
+  color: purple;
+}
+
+.wysiwyg-color-fuchsia {
+  color: fuchsia;
+}
+
+.wysiwyg-color-green {
+  color: green;
+}
+
+.wysiwyg-color-lime {
+  color: lime;
+}
+
+.wysiwyg-color-olive {
+  color: olive;
+}
+
+.wysiwyg-color-yellow {
+  color: yellow;
+}
+
+.wysiwyg-color-navy {
+  color: navy;
+}
+
+.wysiwyg-color-blue {
+  color: blue;
+}
+
+.wysiwyg-color-teal {
+  color: teal;
+}
+
+.wysiwyg-color-aqua {
+  color: aqua;
+}
+
+.wysiwyg-text-align-right {
+  text-align: right;
+}
+
+.wysiwyg-text-align-center {
+  text-align: center;
+}
+
+.wysiwyg-text-align-left {
+  text-align: left;
+}
+
+.wysiwyg-text-align-justify {
+  text-align: justify;
+}
+
+.wysiwyg-float-left {
+  float: left;
+  margin: 0 8px 8px 0;
+}
+
+.wysiwyg-float-right {
+  float: right;
+  margin: 0 0 8px 8px;
+}
+
+.wysiwyg-clear-right {
+  clear: right;
+}
+
+.wysiwyg-clear-left {
+  clear: left;
+}
+
+
+
+/* Custom classes */
+
+.Delete {
+   text-decoration: line-through;
+}
+
+.Quote {
+   padding-left: 20px;
+   border-left: 5px solid rgba(0,0,0,0.1);
+}
+
+.CodeBlock {
+   font-family: monospace;
+   padding-left: 20px;
+   border-left: 5px solid rgba(0,0,0,0.2);
+   background-color: rgba(0,0,0,0.1);
+   white-space: nowrap;
+}
+
+.CodeInline {
+   font-family: monospace;
+}
+
+.Spoiler {
+   color: transparent;
+   height: 20px;
+   padding: 0 20px;
+   margin: 20px 20%;
+   border: 1px solid rgba(0,0,0,0.04);
+   border-left: 0;
+   border-right: 0;
+   box-shadow: 0 -4px 5px -5px rgba(0,0,0,0.2), 0 4px 5px -5px rgba(0,0,0,0.2);
+}
+
+.Spoiler:hover {
+   transition: all 0.1s ease-in;
+   height: auto;
+   padding: 10px 20px;
+   height: inherit;
+   color: inherit;
+   background-color: rgba(0,0,0,0.04);
+}
+
+.AlignLeft{}
+.AlignCenter{}
+.AlignRight{}

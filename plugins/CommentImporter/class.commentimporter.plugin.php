@@ -70,7 +70,7 @@ class CommentImporterPlugin extends Gdn_Plugin {
       } else {
          set_time_limit(60 * 30);
          $Model = new WordpressImportModel();
-         $Model->Path = '/www/techwhirl/uploads/techwhirl.wordpress.xml';
+         $Model->Path = '/www/techwhirl2/uploads/techwhirl.wordpress.xml';
          $Model->Import();
          die('Done');
          
