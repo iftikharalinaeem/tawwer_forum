@@ -318,6 +318,8 @@ function WriteReactions($Row) {
          foreach ($Flags as $Flag) {
             $FlagCodes[] = $Flag['UrlCode'];
          }
+         Gdn::Controller()->EventArguments['Flags'] = &$Flags;
+         Gdn::Controller()->FireEvent('Flags');
       }
 
       // Allow addons to work with flags
@@ -330,10 +332,13 @@ function WriteReactions($Row) {
          echo ' <span class="FlagMenu ToggleFlyout">';
             // Write the handle.
             echo ReactionButton($Row, 'Flag', array('LinkClass' => 'FlyoutButton'));
-            echo Sprite('SpFlyoutHandle', 'Arrow');
+//            echo Sprite('SpFlyoutHandle', 'Arrow');
             echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
             foreach ($Flags as $Flag) {
-               echo '<li>'.ReactionButton($Row, $Flag['UrlCode']).'</li>';
+               if (is_callable($Flag))
+                  echo '<li>'.call_user_func($Flag, $Row, $RecordType, $ID).'</li>';
+               else
+                  echo '<li>'.ReactionButton($Row, $Flag['UrlCode']).'</li>';
             }
             Gdn::Controller()->FireEvent('AfterFlagOptions');
             echo '</ul>';
