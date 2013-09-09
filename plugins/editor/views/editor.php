@@ -5,7 +5,7 @@
    if ($format != 'text') {
       $html_toolbar    = '<div class="editor editor-format-'. $format .'">';
       $html_separator  = '<span class="editor-sep hidden-xs"></span>';
-      $html_arrow_down = '&nbsp;<span class="icon-caret-down"></span>';
+      $html_arrow_down = '<span class="icon-caret-down"></span>';
 
       foreach($this->Data('_Toolbar') as $button) {
 
@@ -23,12 +23,17 @@
             foreach ($button['type'] as $button_option) {
                
                $action_text = ($button_option['text']) 
-                       ? $button_option['text']
-                       : '';
+                   ? $button_option['text']
+                   : '';
                
                $html_tag = ($button['action'] == 'color') 
-                       ? 'li'
-                       : 'a';
+                   ? 'li'
+                   : 'a';
+               
+               if ($button['action'] == 'emoji') {
+                  $html_tag = 'img';                  
+               }
+               
                
                // currently only color has a bunch of sub buttons
                $html_button_dropdown_options .= Wrap($action_text, $html_tag, $button_option['attr']);
@@ -51,6 +56,13 @@
                   , 'div', array('class' => 'editor-dropdown'));
                   break;
 
+               case 'emoji':
+                  $html_toolbar .= Wrap(
+                     Wrap($html_arrow_down, 'a', $button['attr']) .''. 
+                     Wrap($html_button_dropdown_options, 'div', array('class' => 'editor-insert-dialog editor-emoji-flyout Flyout MenuItems', 'data-wysihtml5-dialog' => ''))
+                  , 'div', array('class' => 'editor-dropdown'));
+                  break;               
+               
                case 'link':
                   $html_toolbar .= Wrap(
                      Wrap($html_arrow_down, 'a', $button['attr']) .''. 

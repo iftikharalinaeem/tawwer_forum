@@ -1009,11 +1009,15 @@ pre.CodeBlock {
 /* Clicking on down caret does nothing, so let click seep through to parent */
 /* line 61, ../sass/editor.scss */
 .editor .icon-caret-down {
+  font-size: 75%;
   pointer-events: none;
+  margin-left: 6px;
+  position: relative;
+  top: -2px;
 }
 
 /* For dropdowns */
-/* line 68, ../sass/editor.scss */
+/* line 72, ../sass/editor.scss */
 .editor-insert-dialog {
   margin: 5px 0 0 0;
   padding: 5px;
@@ -1023,27 +1027,27 @@ pre.CodeBlock {
   display: none;
 }
 
-/* line 77, ../sass/editor.scss */
+/* line 81, ../sass/editor.scss */
 .editor-dropdown-open .editor-insert-dialog {
   display: block;
 }
 
-/* line 81, ../sass/editor.scss */
+/* line 85, ../sass/editor.scss */
 .editor-insert-dialog input.InputBox {
   width: 97.5%;
 }
 
-/* line 85, ../sass/editor.scss */
+/* line 89, ../sass/editor.scss */
 .editor-insert-dialog hr {
   margin: 0 0 10px 0;
 }
 
-/* line 89, ../sass/editor.scss */
+/* line 93, ../sass/editor.scss */
 .editor-colors-flyout {
   width: 92px;
 }
 
-/* line 93, ../sass/editor.scss */
+/* line 97, ../sass/editor.scss */
 .editor-colors-flyout .color {
   width: 20px;
   height: 20px;
@@ -1053,68 +1057,68 @@ pre.CodeBlock {
   border: 1px solid transparent;
 }
 
-/* line 103, ../sass/editor.scss */
+/* line 107, ../sass/editor.scss */
 .editor-colors-flyout .color:hover,
 .editor-colors-flyout .wysihtml5-command-active {
   border: 1px solid #fff;
 }
 
-/* line 107, ../sass/editor.scss */
+/* line 111, ../sass/editor.scss */
 .editor-colors-flyout .color-black {
   background-color: black;
 }
 
-/* line 111, ../sass/editor.scss */
+/* line 115, ../sass/editor.scss */
 .editor-colors-flyout .color-white {
   background-color: white;
 }
 
-/* line 115, ../sass/editor.scss */
+/* line 119, ../sass/editor.scss */
 .editor-colors-flyout .color-gray {
   background-color: gray;
 }
 
-/* line 119, ../sass/editor.scss */
+/* line 123, ../sass/editor.scss */
 .editor-colors-flyout .color-silver {
   background-color: silver;
 }
 
-/* line 123, ../sass/editor.scss */
+/* line 127, ../sass/editor.scss */
 .editor-colors-flyout .color-maroon {
   background-color: maroon;
 }
 
-/* line 127, ../sass/editor.scss */
+/* line 131, ../sass/editor.scss */
 .editor-colors-flyout .color-red {
   background-color: red;
 }
 
-/* line 131, ../sass/editor.scss */
+/* line 135, ../sass/editor.scss */
 .editor-colors-flyout .color-purple {
   background-color: purple;
 }
 
-/* line 135, ../sass/editor.scss */
+/* line 139, ../sass/editor.scss */
 .editor-colors-flyout .color-green {
   background-color: green;
 }
 
-/* line 139, ../sass/editor.scss */
+/* line 143, ../sass/editor.scss */
 .editor-colors-flyout .color-olive {
   background-color: olive;
 }
 
-/* line 143, ../sass/editor.scss */
+/* line 147, ../sass/editor.scss */
 .editor-colors-flyout .color-navy {
   background-color: navy;
 }
 
-/* line 147, ../sass/editor.scss */
+/* line 151, ../sass/editor.scss */
 .editor-colors-flyout .color-blue {
   background-color: blue;
 }
 
-/* line 151, ../sass/editor.scss */
+/* line 155, ../sass/editor.scss */
 .editor-colors-flyout .color-lime {
   background-color: lime;
 }
@@ -1122,32 +1126,52 @@ pre.CodeBlock {
 /**
  * Headers dropdown
  */
-/* line 160, ../sass/editor.scss */
+/* line 164, ../sass/editor.scss */
 .editor-headers-flyout {
   padding: 5px 0;
   width: auto;
 }
 
-/* line 165, ../sass/editor.scss */
+/* line 169, ../sass/editor.scss */
 .editor-headers-flyout .wysihtml5-command-active {
   border-radius: 0;
 }
 
-/* line 169, ../sass/editor.scss */
+/* line 173, ../sass/editor.scss */
 .editor-headers-flyout .editor-action-h1 {
   font-size: 18px;
   line-height: 28px !important;
 }
 
-/* line 174, ../sass/editor.scss */
+/* line 178, ../sass/editor.scss */
 .editor-headers-flyout .editor-action-h2 {
   font-size: 16px;
 }
 
 /**
+ * Emoji dropdown
+ */
+/* line 187, ../sass/editor.scss */
+.editor-emoji-flyout {
+  width: 120px;
+}
+
+/* line 191, ../sass/editor.scss */
+.editor-emoji-flyout .emoji {
+  padding: 5px;
+}
+
+/* line 195, ../sass/editor.scss */
+.editor-emoji-flyout .emoji:hover {
+  cursor: pointer;
+  border-radius: 2px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/**
  * Going full page 
  */
-/* line 185, ../sass/editor.scss */
+/* line 205, ../sass/editor.scss */
 .editor-toggle-fullpage-button {
   cursor: pointer;
   float: right;
@@ -1158,7 +1182,7 @@ pre.CodeBlock {
    below; this makes editing very easy */
 /* Background overlay. No need to insert empty div in markup; doing so at the 
 current location, due to event insertion, makes z-index troublesome. */
-/* line 199, ../sass/editor.scss */
+/* line 219, ../sass/editor.scss */
 .js-editor-fullpage:after {
   content: ' ';
   display: block;
@@ -1174,7 +1198,7 @@ current location, due to event insertion, makes z-index troublesome. */
 }
 
 /* .FormWrapper */
-/* line 214, ../sass/editor.scss */
+/* line 234, ../sass/editor.scss */
 .js-editor-fullpage #editor-fullpage-candidate {
   position: absolute;
   z-index: 1000;
@@ -1190,13 +1214,13 @@ current location, due to event insertion, makes z-index troublesome. */
 
 /* Temp, take this out when you figure out the element that is restricting 
    this child from going truly absolute */
-/* line 229, ../sass/editor.scss */
+/* line 249, ../sass/editor.scss */
 .js-editor-fullpage .EditCommentForm #editor-fullpage-candidate {
   position: fixed;
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
-/* line 235, ../sass/editor.scss */
+/* line 255, ../sass/editor.scss */
 .js-editor-fullpage .TextBoxWrapper #Form_Body,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
   width: 100% !important;
@@ -1204,33 +1228,33 @@ current location, due to event insertion, makes z-index troublesome. */
 }
 
 @keyframes editor-anim-overlay {
-  /* line 241, ../sass/editor.scss */
+  /* line 261, ../sass/editor.scss */
   from {
     opacity: 0;
   }
 
-  /* line 244, ../sass/editor.scss */
+  /* line 264, ../sass/editor.scss */
   to {
     opacity: 1;
   }
 }
 
 @keyframes editor-anim-editor {
-  /* line 250, ../sass/editor.scss */
+  /* line 270, ../sass/editor.scss */
   0% {
     top: -1000px;
     opacity: 0;
     transform: scale(1.25);
   }
 
-  /* line 255, ../sass/editor.scss */
+  /* line 275, ../sass/editor.scss */
   75% {
     top: 60px;
     opacity: 0.75;
     transform: scale(0.75);
   }
 
-  /* line 260, ../sass/editor.scss */
+  /* line 280, ../sass/editor.scss */
   100% {
     top: 20px;
     opacity: 1;
@@ -1244,7 +1268,7 @@ current location, due to event insertion, makes z-index troublesome. */
  * Html, BBCode, and Markdown views have slight differences than the Wysiwyg, 
  * so hide the particular ones 
  */
-/* line 292, ../sass/editor.scss */
+/* line 312, ../sass/editor.scss */
 .editor-format-html .editor-toggle-source,
 .editor-format-bbcode .editor-toggle-source,
 .editor-format-markdown .editor-toggle-source,
@@ -1271,17 +1295,17 @@ current location, due to event insertion, makes z-index troublesome. */
  * a last ditch effort to at least make sure editor is usable when others 
  * are enabled. 
  */
-/* line 306, ../sass/editor.scss */
+/* line 326, ../sass/editor.scss */
 .js-editor-active .cleditorMain iframe {
   display: none !important;
 }
 
-/* line 310, ../sass/editor.scss */
+/* line 330, ../sass/editor.scss */
 .js-editor-active .cleditorMain .wysihtml5-sandbox {
   display: block !important;
 }
 
-/* line 316, ../sass/editor.scss */
+/* line 336, ../sass/editor.scss */
 .js-editor-active .cleditorToolbar,
 .js-editor-active .ButtonBar,
 .js-editor-active .ButtonBarMarkupHint {
@@ -1290,19 +1314,19 @@ current location, due to event insertion, makes z-index troublesome. */
 
 /* Media query: Hiding non-essential buttons */
 @media (max-width: 767px) {
-  /* line 323, ../sass/editor.scss */
+  /* line 343, ../sass/editor.scss */
   .hidden-xs {
     display: none !important;
   }
 
-  /* line 327, ../sass/editor.scss */
+  /* line 347, ../sass/editor.scss */
   .js-editor-fullpage #editor-fullpage-candidate {
     top: -60px;
     left: 0;
     right: 0;
   }
 
-  /* line 334, ../sass/editor.scss */
+  /* line 354, ../sass/editor.scss */
   .js-editor-fullpage .TextBoxWrapper #Form_Body,
   .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
     height: auto !important;
@@ -1310,7 +1334,7 @@ current location, due to event insertion, makes z-index troublesome. */
 
   /* This is not necessary or very specific, but on mobile, apple products 
      add rounded corners */
-  /* line 340, ../sass/editor.scss */
+  /* line 360, ../sass/editor.scss */
   textarea {
     border-radius: 0;
   }

@@ -59,7 +59,11 @@
 
 /* Clicking on down caret does nothing, so let click seep through to parent */
 .editor .icon-caret-down {
+   font-size: 75%;
    pointer-events: none;
+   margin-left: 6px;
+   position: relative;
+   top: -2px;
 }
 
 
@@ -176,7 +180,23 @@
 }
 
 
+/**
+ * Emoji dropdown
+ */
 
+.editor-emoji-flyout {
+   width: 120px;
+}
+
+.editor-emoji-flyout .emoji {
+   padding: 5px;
+}
+
+.editor-emoji-flyout .emoji:hover {
+   cursor: pointer;
+   border-radius: 2px;
+   background-color: rgba(0,0,0,0.10);
+}
 
 /**
  * Going full page 

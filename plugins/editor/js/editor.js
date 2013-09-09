@@ -451,9 +451,12 @@ jQuery(function() {
             inputBox[0].value = '';
             $(this).find('.InputBox').focus();
             inputBox[0].value = inputVal;
+
          }
 
       });
+      
+      // TODO bug when post-dependent editor loaded, loses events.
       
       // if dropdown open, cliking into an editor area should close it, but 
       // keep it open for anything else.

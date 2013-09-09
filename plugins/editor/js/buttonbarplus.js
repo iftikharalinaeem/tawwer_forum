@@ -241,6 +241,8 @@ jQuery(document).ready(function($) {
             
             var UIOperation = Operation.charAt(0).toUpperCase() + Operation.slice(1);
             
+            console.log(Operation);
+            
             var Action = "ButtonBar"+UIOperation;
             $(el).addClass(Action);
          
@@ -248,7 +250,7 @@ jQuery(document).ready(function($) {
 
          // Attach events
          $(ThisButtonBar).find('.editor-action').mousedown(function(event){
-                       
+            
             var MyButtonBar = $(event.target).closest('.editor');
             //var Button = $(event.target).find('span').closest('.ButtonWrap');
             var Button = $(event.target);
@@ -334,8 +336,10 @@ jQuery(document).ready(function($) {
          if (ButtonBar[PerformMethod] == undefined)
             return;
          
+         var Extra;
+         
          // Call performer
-         ButtonBar[PerformMethod](TextArea,Operation);
+         ButtonBar[PerformMethod](TextArea,Operation, Extra);
          
          switch (Operation) {
             case 'post':
@@ -344,7 +348,7 @@ jQuery(document).ready(function($) {
          }
       },
       
-      PerformBBCode: function(TextArea, Operation) {
+      PerformBBCode: function(TextArea, Operation, Extra) {
          bbcodeOpts = {
             opener: '[',
             closer: ']'
@@ -496,10 +500,31 @@ jQuery(document).ready(function($) {
                $(TextArea).insertRoundTag('', thisOpts);
 
                break;
+               
+               
+                        // TODO horribly ugly. Redo way that operation is passed to 
+            // buttonbar functionality, because the original way does not allow 
+            // for modularity. That issue is especially highlighted with emoji.
+            case ':)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':D': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':(': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ';)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':\\': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':o': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':s': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':p': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':\'\(': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':|': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case 'D:': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case '>:)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case 'o:)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case '8)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case '(y)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case '(n)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
          }
       },
       
-      PerformHtml: function(TextArea, Operation) {
+      PerformHtml: function(TextArea, Operation, Extra) {
          var htmlOpts = {
             opener: '<',
             closer: '>'
@@ -645,10 +670,30 @@ jQuery(document).ready(function($) {
                $(TextArea).insertRoundTag('', thisOpts);
 
                break;
+
+            // TODO horribly ugly. Redo way that operation is passed to 
+            // buttonbar functionality, because the original way does not allow 
+            // for modularity. That issue is especially highlighted with emoji.
+            case ':)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':D': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':(': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ';)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':\\': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':o': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':s': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':p': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':\'\(': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':|': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case 'D:': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case '>:)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case 'o:)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case '8)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case '(y)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case '(n)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
          }
       },
       
-      PerformMarkdown: function(TextArea, Operation) {
+      PerformMarkdown: function(TextArea, Operation, Extra) {
          var markdownOpts = {
             opener: '',
             closer: '',
@@ -884,6 +929,28 @@ jQuery(document).ready(function($) {
                    }
 
                });  
+               
+               break;
+               
+                           // TODO horribly ugly. Redo way that operation is passed to 
+            // buttonbar functionality, because the original way does not allow 
+            // for modularity. That issue is especially highlighted with emoji.
+            case ':)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':D': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':(': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ';)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':\\': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':o': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':s': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':p': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':\'\(': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case ':|': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case 'D:': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case '>:)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case 'o:)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case '8)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case '(y)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
+            case '(n)': $(TextArea).insertText(Operation, $(TextArea).getSelection().start, "collapseToEnd"); break;
                
                
                
