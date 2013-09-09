@@ -241,7 +241,6 @@ jQuery(document).ready(function($) {
             
             var UIOperation = Operation.charAt(0).toUpperCase() + Operation.slice(1);
             
-            console.log(Operation);
             
             var Action = "ButtonBar"+UIOperation;
             $(el).addClass(Action);

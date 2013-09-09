@@ -43,7 +43,7 @@ class EditorPlugin extends Gdn_Plugin
       if (in_array($this->Format, $this->Formats)) {    
 
          // This is only for testing
-         $this->Format = 'Html';
+         //$this->Format = 'Html';
          
          $c = Gdn::Controller();
          

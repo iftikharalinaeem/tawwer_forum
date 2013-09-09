@@ -259,30 +259,27 @@ jQuery(function() {
         // list multiple mutations on the same element otherwise. ie8<
         mutations.some(function(mutation) { 
 
-
-
-//todo clean up. and get rid of mutate bug.
-// and now that mutate function is pretty much like onload
-// DO combine and delete redundancy.
            var t                       = $(mutation.target);
-           
-           
-           var currentEditorFormat = t.find('#Form_Format');
+           var currentEditorFormat     = t.find('#Form_Format');
+           var currentEditorToolbar    = '';
+           var currentEditableTextarea = '';
+           var currentTextBoxWrapper   = '';
 
-           if (currentEditorFormat != 'undefined') {
+           if (currentEditorFormat.length) {
      
                formatOriginal = currentEditorFormat[0].value;
                //currentEditorFormat = $(currentEditorFormat).val();
                currentEditorFormat = currentEditorFormat[0].value.toLowerCase();
                format = currentEditorFormat + '';
                
-               var currentEditorToolbar    = t.find('.editor-format-'+ format);
-               var currentEditableTextarea = t.find('#Form_Body');
-               var currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
-           }
+               currentEditorToolbar    = t.find('.editor-format-'+ format);
+               currentEditableTextarea = t.find('#Form_Body');
+               currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
+           }          
+           
            // if found, perform operation
-           if (format != 'undefined' && currentEditableTextarea.length 
-              && currentEditorToolbar.length) {
+           if (currentEditorToolbar.length 
+           && currentEditableTextarea.length) {
 
               var currentEditableCommentId = (new Date()).getTime(),
                   editorTextareaId         = currentEditableTextarea[0].id +'-'+ currentEditableCommentId,
@@ -340,8 +337,8 @@ jQuery(function() {
               $(".editor-toggle-fullpage-button").click(toggleFullpage);
               closeFullPageEsc();
               postCommentCloseFullPageEvent();    
-              
               editorSetupDropdowns();
+              editorSetCaretFocusEnd(currentEditableTextarea[0]);
 
               // some() loop requires true to end loop. every() requires false.
               return true;
@@ -421,6 +418,21 @@ jQuery(function() {
          .html(gdn.definition('editor'+ format +'HelpText'))
          .insertAfter(editorAreaObj);
     };
+    
+    
+    // Bug with these two selection functions, but only in ButtonBar, and 
+    // issue is with Vanilla's autogrow, which depends on click to initiate,
+    // which does not work when autofocusing. Consider trigger()
+    var editorSetCaretFocusEnd = function(obj) {
+       obj.selectionStart = obj.selectionEnd = obj.value.length;
+       obj.focus();
+    };
+    
+    var editorSelectAllInput = function(obj) {
+       // selectionStart is implied 0
+       obj.selectionEnd = obj.value.length;
+       obj.focus();
+    };
 
    /**
     * Deal with clashing JS for opening dialogs on click, and do not let 
@@ -445,15 +457,12 @@ jQuery(function() {
 
             parentEl.addClass('editor-dropdown-open');
             
-            // focus and move caret to end of text
-            var inputBox      = $(this).find('.InputBox');
-            var inputVal      = inputBox[0].value;
-            inputBox[0].value = '';
-            $(this).find('.InputBox').focus();
-            inputBox[0].value = inputVal;
-
+            // if has input, focus and move caret to end of text
+            var inputBox = $(this).find('.InputBox');
+            if (inputBox.length) {
+               editorSelectAllInput(inputBox[0]);
+            }
          }
-
       });
       
       // TODO bug when post-dependent editor loaded, loses events.
@@ -479,5 +488,6 @@ jQuery(function() {
    closeFullPageEsc();
    postCommentCloseFullPageEvent();
    editorSetupDropdowns();
+   editorSetCaretFocusEnd(currentEditableTextarea[0]);
 
 });
