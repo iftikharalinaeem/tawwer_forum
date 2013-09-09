@@ -41,6 +41,19 @@ class UserAlertModel extends Gdn_Model {
    public function Save($FormPostValues, $Settings = FALSE) {
       $Row = $this->CollapseAttributes($FormPostValues);
       
-      return parent::Save($Row, $Settings);
+      $CurrentRow = $this->GetID($Row['UserID']);
+      if ($CurrentRow) {
+         $UserID = $Row['UserID'];
+         unset($Row['UserID']);
+         if ($this->Update($Row, array('UserID' => $UserID)))
+            return $UserID;
+         else
+            return FALSE;
+      } else {
+         if ($this->Insert($Row))
+            return $Row['UserID'];
+         else
+            return FALSE;
+      }
    }
 }

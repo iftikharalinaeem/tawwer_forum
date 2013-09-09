@@ -174,6 +174,7 @@ class WarningModel extends UserNoteModel {
     */
    public function Save($Data) {
       $UserID = GetValue('UserID', $Data);
+      unset($Data['AttachRecord']);
       
       // Coerce the data.
       $Data['Type'] = 'warning';
@@ -211,11 +212,20 @@ class WarningModel extends UserNoteModel {
       if (!$ID)
          return FALSE;
       
+      // Attach the warning to the record.
+      $RecordType = ucfirst(GetValue('RecordType', $Data));
+      $RecordID = GetValue('RecordID', $Data);
+      if (in_array($RecordType, array('Discussion', 'Comment')) && $RecordID) {
+         $ModelClass = $RecordType.'Model';
+         $Model = new $ModelClass;
+         $Model->SaveToSerializedColumn('Attributes', $RecordID, 'WarningID', $ID);
+      }
+      
       // Send the private message.
       $ConversationID = $this->_Notify($Data);
       if ($ConversationID) {
          // Save the conversation link back to the warning.
-         $this->SetField($ID, array('RecordType' => 'Conversation', 'RecordID' => $ConversationID));
+         $this->SetField($ID, array('ConversationID' => $ConversationID));
       }
       
       // Increment the user's alert level.

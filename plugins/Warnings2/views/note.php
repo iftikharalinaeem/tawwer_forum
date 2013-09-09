@@ -14,7 +14,7 @@ echo $this->Form->BodyBox('Body');
 </div>
    
 <div class="P Gloss">
-   <?php echo T('Notes can only be seen by moderators.'); ?>
+   <?php echo T('These notes can only be seen by moderators.'); ?>
 </div>
 
 <?php

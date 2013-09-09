@@ -48,7 +48,15 @@ echo $this->Form->Label("Private Note for Moderators", 'ModeratorNote', array('c
 echo $this->Form->TextBox('ModeratorNote', array('Wrap' => TRUE));
 ?>
 </div>
-
+   
+<?php if ($this->Data('Record')): ?>
+   
+<?php endif; ?>
+<div class="P">
+<?php
+echo $this->Form->CheckBox('AttachRecord', '@'.sprintf('Attach this warning to the %s.', T(strtolower($this->Data('RecordType')))));
+?>
+</div>
 <?php
 echo '<div class="Buttons Buttons-Confirm">', 
    $this->Form->Button('OK'), ' ',

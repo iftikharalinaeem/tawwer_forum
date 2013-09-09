@@ -52,7 +52,9 @@
 
 .Item-Col11 { width: 91.66667%; }
 
-.NoteType-warning { color: #d50a0a; }
+.NoteType-note { color: #07f; }
+
+.NoteType-warning { color: #d00; }
 
 .Post :first-child { margin-top: 0; }
 .Post :last-child { margin-bottom: 0; }

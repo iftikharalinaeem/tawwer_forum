@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) return; 
-require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings');
+require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings2');
 ?>
 <div class="DataListWrap">
 <h2 class="H"><?php echo T('Notes'); ?></h2>
@@ -13,7 +13,7 @@ require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings
          $Func($Row);
       else:
       ?>
-      <div class="Item-Col Item-Col8">
+      <div class="Item-Col Item-Col9">
          <div class="Meta">
             <div class="Options">
                <?php
@@ -30,7 +30,7 @@ require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings
             <?php echo $Row['Body']; ?>
          </div>
       </div>
-      <div class="Item-Col Item-Col4 User-Col">
+      <div class="Item-Col Item-Col3 User-Col">
          <div class="Media">
             <?php echo UserPhoto($Row, array('LinkClass' => 'Img', 'Px' => 'Insert')); ?>
             <div class="Media-Body">

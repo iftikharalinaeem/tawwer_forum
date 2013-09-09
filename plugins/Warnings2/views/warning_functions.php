@@ -5,19 +5,19 @@ if (!function_exists('WriteUserNoteWarning')):
 function WriteUserNoteWarning($Row) {   
   $Reversed = GetValue('Reversed', $Row);
   ?>
-   <div class="Item-Col Item-Col8">
+   <div class="Item-Col Item-Col9">
       <div class="Meta">
          <div class="Options">
             <?php
             Gdn_Theme::BulletRow(Bullet(' '));
-            if (GetValue('RecordType', $Row) == 'Conversation') {
+            if (GetValue('ConversationID', $Row)) {
                echo Gdn_Theme::BulletItem('Conversation').
-                  Anchor(T('message'), '/messages/'.GetValue('RecordID', $Row).'#latest', 'OptionsLink');
+                  Anchor(T('message'), '/messages/'.GetValue('ConversationID', $Row).'#latest', 'OptionsLink', array('title' => T('The private message between the user and moderator.')));
             }
             
             if (!$Reversed) {
                echo Gdn_Theme::BulletItem('Reverse').
-                  Anchor(T('reverse'), '/profile/reversewarning?id='.$Row['UserNoteID'], 'Popup OptionsLink', array('title' => T('Reverse Warning')));
+                  Anchor(T('reverse'), '/profile/reversewarning?id='.$Row['UserNoteID'], 'Popup OptionsLink', array('title' => T('Reverse this warning')));
             }
             ?>
          </div>
@@ -49,14 +49,23 @@ function WriteUserNoteWarning($Row) {
          
          if (GetValue('ModeratorNote', $Row)) {
             echo '<div class="P">'.
-               '<b>'.T('Private Note for Moderators').'</b>: '.
+               '<b>'.T('Private note for moderators').'</b>: '.
                Gdn_Format::Text($Row['ModeratorNote']).
+               '</div>';
+         }
+         
+         if (GetValue('Record', $Row)) {
+            $Record = $Row['Record'];
+            
+            echo '<div class="P">'.
+               '<b>'.T('Warned for').'</b>: '.
+               Anchor(htmlspecialchars($Record['Name']), $Record['Url']).
                '</div>';
          }
          ?>
       </div>
    </div>
-   <div class="Item-Col Item-Col4 User-Col">
+   <div class="Item-Col Item-Col3 User-Col">
       <div class="Media">
          <?php echo UserPhoto($Row, array('LinkClass' => 'Img', 'Px' => 'Insert')); ?>
          <div class="Media-Body">

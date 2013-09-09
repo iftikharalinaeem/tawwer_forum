@@ -5,7 +5,7 @@ class UserWarningModule extends Gdn_Module {
    public $UserID;
    
    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
-      $this->_ApplicationFolder = 'plugins/Warnings';
+      $this->_ApplicationFolder = 'plugins/Warnings2';
    }
    
    public function ToString() {

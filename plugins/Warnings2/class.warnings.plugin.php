@@ -6,8 +6,8 @@
 
 // Define the plugin:
 $PluginInfo['Warnings2'] = array(
-   'Name' => 'Warnings',
-   'Description' => "Allows moderators to warn users to help police the community.",
+   'Name' => 'Warnings & Notes',
+   'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
    'Version' => '2.0a',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
@@ -25,7 +25,7 @@ $PluginInfo['Warnings2'] = array(
  * Moderation.UserNotes.Add
  * Moderation.Warnings.Add
  */
-class WarningsPlugin extends Gdn_Plugin {
+class Warnings2Plugin extends Gdn_Plugin {
    /// Propeties ///
    
    /// Methods ///
@@ -36,9 +36,51 @@ class WarningsPlugin extends Gdn_Plugin {
    
    public function Structure() {
       require __DIR__.'/structure.php';
+      
+      Gdn::PluginManager()->DisablePlugin('Warnings');
+   }
+   
+   public function WarnButton($Row, $RecordType, $RecordID) {
+      $Args = array(
+         'userid' => GetValue('InsertUserID', $Row),
+         'recordtype' => $RecordType,
+         'recordid' => $RecordID);
+      
+      $Result = Anchor(
+         '<span class="ReactSprite ReactWarn"></span> '.T('Warn'),
+         '/profile/warn?'.http_build_query($Args),
+         'ReactButton ReactButton-Warn Popup'
+         );
+       return $Result;
    }
    
    /// Event Handlers ///
+   
+   public function Base_BeforeCommentBody_Handler($Sender, $Args) {
+      if (isset($Args['Comment']))
+         $Row = $Args['Comment'];
+      else
+         $Row = $Args['Discussion'];
+      
+      if (isset($Row->Attributes['WarningID'])) {
+         echo '<div class="DismissMessage Warning">'. 
+            sprintf(T('%s was warned for this post.', '%s was <a href="%s">warned</a> for this post.'), 
+               htmlspecialchars(GetValue('InsertName', $Row)),
+               UserUrl($Row, 'Insert', 'notes')),
+            '</div>';
+      }
+   }
+   
+   /**
+    * Add the warning to the list of flags.
+    * @param Gdn_Controller $Sender
+    * @param array $Args
+    */
+   public function Base_Flags_Handler($Sender, $Args) {
+      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), FALSE)) {
+         $Args['Flags']['warn'] = array($this, 'WarnButton');
+      }
+   }
    
    /**
     *
@@ -117,7 +159,7 @@ class WarningsPlugin extends Gdn_Plugin {
       }
       
       $Sender->Title(sprintf(T('Delete %s'), T('Note')));
-      $Sender->Render('deletenote', '', 'plugins/Warnings');
+      $Sender->Render('deletenote', '', 'plugins/Warnings2');
    }
    
    public function UserModel_SetCalculatedFields_Handler($Sender, $Args) {
@@ -206,8 +248,8 @@ class WarningsPlugin extends Gdn_Plugin {
       }
       
       $Sender->SetData('Profile', $User);
-      $Sender->SetData('Title', $NoteID ? T('Add Note') : T('Edit Note'));
-      $Sender->Render('note', '', 'plugins/Warnings');
+      $Sender->SetData('Title', $NoteID ? T('Edit Note') : T('Add Note'));
+      $Sender->Render('note', '', 'plugins/Warnings2');
    }
    
    public function ProfileController_ReverseWarning_Create($Sender, $ID) {
@@ -225,11 +267,11 @@ class WarningsPlugin extends Gdn_Plugin {
       }
       
       $Sender->Title(sprintf(T('Reverse %s'), T('Warning')));
-      $Sender->Render('reversewarning', '', 'plugins/Warnings');
+      $Sender->Render('reversewarning', '', 'plugins/Warnings2');
    }
    
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
-      $Sender->AddCssFile('warnings.css', 'plugins/Warnings');
+      $Sender->AddCssFile('warnings.css', 'plugins/Warnings2');
    }
    
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
@@ -260,13 +302,13 @@ class WarningsPlugin extends Gdn_Plugin {
     * @param string $Username
     * @param string $Page
     */
-   public function ProfileController_Notes_Create($Sender, $UserReference, $Username, $Page = '') {
+   public function ProfileController_Notes_Create($Sender, $UserReference, $Username = '', $Page = '') {
       $Sender->Permission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), FALSE);
       
       $Sender->EditMode(FALSE);
       $Sender->GetUserInfo($UserReference, $Username);
       $Sender->_SetBreadcrumbs(T('Notes'), UserUrl($Sender->User, '', 'notes'));
-      $Sender->SetTabView('Notes', 'Notes', '', 'plugins/Warnings');
+      $Sender->SetTabView('Notes', 'Notes', '', 'plugins/Warnings2');
       
       list($Offset, $Limit) = OffsetLimit($Page, 10);
       
@@ -277,10 +319,14 @@ class WarningsPlugin extends Gdn_Plugin {
          $Limit, $Offset
          )->ResultArray();
       $UserNoteModel->Calculate($Notes);
+      
+      // Join the records.
+      JoinRecords($Notes, 'Record');
      
       $Sender->SetData('Notes', $Notes);
       
-//      $Sender->Render('notes', '', 'plugins/Warnings');
+//      $Sender->Render('notes', '', 'plugins/Warnings2');
+      
       $Sender->Render();
    }
    
@@ -289,7 +335,7 @@ class WarningsPlugin extends Gdn_Plugin {
     * @param ProfileController $Sender
     * @param int $UserID
     */
-   public function ProfileController_Warn_Create($Sender, $UserID) {
+   public function ProfileController_Warn_Create($Sender, $UserID, $RecordType = FALSE, $RecordID = FALSE) {
       $Sender->Permission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), FALSE);
       
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
@@ -313,12 +359,24 @@ class WarningsPlugin extends Gdn_Plugin {
       $WarningTypes = Gdn::SQL()->GetWhere('WarningType', array(), 'Points')->ResultArray();
       $Sender->SetData('WarningTypes', $WarningTypes);
       
+      // Get the record.
+      if ($RecordType && $RecordID) {
+         $Row = GetRecord($RecordType, $RecordID);
+         $Sender->SetData('RecordType', $RecordType);
+         $Sender->SetData('Record', $Row);
+      }
+      
       if ($Form->AuthenticatedPostBack()) {
          $Model = new WarningModel();
          $Form->SetModel($Model);
          $Form->InputPrefix = '';
          
          $Form->SetFormValue('UserID', $UserID);
+         
+         if ($Form->GetFormValue('AttachRecord')) {
+            $Form->SetFormValue('RecordType', $RecordType);
+            $Form->SetFormValue('RecordID', $RecordID);
+         }
          
          if ($Form->Save()) {
             $Sender->InformMessage(T('Your warning was added.'));
@@ -327,11 +385,12 @@ class WarningsPlugin extends Gdn_Plugin {
       } else {
          $Type = reset($WarningTypes);
          $Form->SetValue('WarningTypeID', GetValue('WarningTypeID', $Type));
+         $Form->SetValue('AttachRecord', TRUE);
       }
       
       $Sender->SetData('Profile', $User);
       $Sender->SetData('Title', sprintf(T('Warn %s'), htmlspecialchars(GetValue('Name', $User))));
-      $Sender->Render('Warn', '', 'plugins/Warnings');
+      $Sender->Render('Warn', '', 'plugins/Warnings2');
    }
    
    /**
@@ -344,7 +403,7 @@ class WarningsPlugin extends Gdn_Plugin {
       $Sender->EditMode(FALSE);
       $Sender->GetUserInfo($UserReference, $Username);
       $Sender->_SetBreadcrumbs(T('Warnings'), UserUrl($Sender->User, '', 'warnings'));
-      $Sender->SetTabView('Warnings', 'Warnings', '', 'plugins/Warnings');
+      $Sender->SetTabView('Warnings', 'Warnings', '', 'plugins/Warnings2');
       $Sender->EditMode = FALSE;
       
       $WarningModel = new WarningModel();
@@ -382,6 +441,6 @@ class WarningsPlugin extends Gdn_Plugin {
       $Result = $WarningModel->ProcessAllWarnings();
       
       $Sender->SetData('Result', $Result);
-      $Sender->Render('Blank');
+      $Sender->Render('Blank', 'Utility', 'Dashboard');
    }
 }
