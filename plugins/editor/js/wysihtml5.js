@@ -4408,7 +4408,7 @@ wysihtml5.dom.getAsDom = (function() {
  *    // ... or ...
  *    var unorderedListElement = wysihtml5.dom.getParentElement(document.querySelector("li"), { nodeName: "UL" });
  *    // ... or ...
- *    var coloredElement = wysihtml5.dom.getParentElement(myTextNode, { nodeName: "SPAN", className: "wysiwyg-color-red", classRegExp: /wysiwyg-color-[a-z]/g });
+ *    var coloredElement = wysihtml5.dom.getParentElement(myTextNode, { nodeName: "SPAN", className: "post-color-red", classRegExp: /post-color-[a-z]/g });
  */
 wysihtml5.dom.getParentElement = (function() {
   
@@ -5085,8 +5085,8 @@ wysihtml5.dom.parse = (function() {
   var addClassMethods = {
     align_img: (function() {
       var mapping = {
-        left:   "wysiwyg-float-left",
-        right:  "wysiwyg-float-right"
+        left:   "post-float-left",
+        right:  "post-float-right"
       };
       return function(attributeValue) {
         return mapping[String(attributeValue).toLowerCase()];
@@ -5095,10 +5095,10 @@ wysihtml5.dom.parse = (function() {
     
     align_text: (function() {
       var mapping = {
-        left:     "wysiwyg-text-align-left",
-        right:    "wysiwyg-text-align-right",
-        center:   "wysiwyg-text-align-center",
-        justify:  "wysiwyg-text-align-justify"
+        left:     "post-text-align-left",
+        right:    "post-text-align-right",
+        center:   "post-text-align-center",
+        justify:  "post-text-align-justify"
       };
       return function(attributeValue) {
         return mapping[String(attributeValue).toLowerCase()];
@@ -5107,10 +5107,10 @@ wysihtml5.dom.parse = (function() {
     
     clear_br: (function() {
       var mapping = {
-        left:   "wysiwyg-clear-left",
-        right:  "wysiwyg-clear-right",
-        both:   "wysiwyg-clear-both",
-        all:    "wysiwyg-clear-both"
+        left:   "post-clear-left",
+        right:  "post-clear-right",
+        both:   "post-clear-both",
+        all:    "post-clear-both"
       };
       return function(attributeValue) {
         return mapping[String(attributeValue).toLowerCase()];
@@ -5119,15 +5119,15 @@ wysihtml5.dom.parse = (function() {
     
     size_font: (function() {
       var mapping = {
-        "1": "wysiwyg-font-size-xx-small",
-        "2": "wysiwyg-font-size-small",
-        "3": "wysiwyg-font-size-medium",
-        "4": "wysiwyg-font-size-large",
-        "5": "wysiwyg-font-size-x-large",
-        "6": "wysiwyg-font-size-xx-large",
-        "7": "wysiwyg-font-size-xx-large",
-        "-": "wysiwyg-font-size-smaller",
-        "+": "wysiwyg-font-size-larger"
+        "1": "post-font-size-xx-small",
+        "2": "post-font-size-small",
+        "3": "post-font-size-medium",
+        "4": "post-font-size-large",
+        "5": "post-font-size-x-large",
+        "6": "post-font-size-xx-large",
+        "7": "post-font-size-xx-large",
+        "-": "post-font-size-smaller",
+        "+": "post-font-size-larger"
       };
       return function(attributeValue) {
         return mapping[String(attributeValue).charAt(0)];
@@ -6985,15 +6985,15 @@ wysihtml5.Commands = Base.extend(
  */
 (function(wysihtml5) {
   var undef,
-      REG_EXP = /wysiwyg-font-size-[a-z\-]+/g;
+      REG_EXP = /post-font-size-[a-z\-]+/g;
   
   wysihtml5.commands.fontSize = {
     exec: function(composer, command, size) {
-      return wysihtml5.commands.formatInline.exec(composer, command, "span", "wysiwyg-font-size-" + size, REG_EXP);
+      return wysihtml5.commands.formatInline.exec(composer, command, "span", "post-font-size-" + size, REG_EXP);
     },
 
     state: function(composer, command, size) {
-      return wysihtml5.commands.formatInline.state(composer, command, "span", "wysiwyg-font-size-" + size, REG_EXP);
+      return wysihtml5.commands.formatInline.state(composer, command, "span", "post-font-size-" + size, REG_EXP);
     },
 
     value: function() {
@@ -7008,15 +7008,15 @@ wysihtml5.Commands = Base.extend(
  */
 (function(wysihtml5) {
   var undef,
-      REG_EXP = /wysiwyg-color-[a-z]+/g;
+      REG_EXP = /post-color-[a-z]+/g;
   
   wysihtml5.commands.foreColor = {
     exec: function(composer, command, color) {
-      return wysihtml5.commands.formatInline.exec(composer, command, "span", "wysiwyg-color-" + color, REG_EXP);
+      return wysihtml5.commands.formatInline.exec(composer, command, "span", "post-color-" + color, REG_EXP);
     },
 
     state: function(composer, command, color) {
-      return wysihtml5.commands.formatInline.state(composer, command, "span", "wysiwyg-color-" + color, REG_EXP);
+      return wysihtml5.commands.formatInline.state(composer, command, "span", "post-color-" + color, REG_EXP);
     },
 
     value: function() {
@@ -7627,8 +7627,8 @@ wysihtml5.Commands = Base.extend(
   };
 })(wysihtml5);(function(wysihtml5) {
   var undef,
-      CLASS_NAME  = "wysiwyg-text-align-center",
-      REG_EXP     = /wysiwyg-text-align-[a-z]+/g;
+      CLASS_NAME  = "post-text-align-center",
+      REG_EXP     = /post-text-align-[a-z]+/g;
   
   wysihtml5.commands.justifyCenter = {
     exec: function(composer, command) {
@@ -7645,8 +7645,8 @@ wysihtml5.Commands = Base.extend(
   };
 })(wysihtml5);(function(wysihtml5) {
   var undef,
-      CLASS_NAME  = "wysiwyg-text-align-left",
-      REG_EXP     = /wysiwyg-text-align-[a-z]+/g;
+      CLASS_NAME  = "post-text-align-left",
+      REG_EXP     = /post-text-align-[a-z]+/g;
   
   wysihtml5.commands.justifyLeft = {
     exec: function(composer, command) {
@@ -7663,8 +7663,8 @@ wysihtml5.Commands = Base.extend(
   };
 })(wysihtml5);(function(wysihtml5) {
   var undef,
-      CLASS_NAME  = "wysiwyg-text-align-right",
-      REG_EXP     = /wysiwyg-text-align-[a-z]+/g;
+      CLASS_NAME  = "post-text-align-right",
+      REG_EXP     = /post-text-align-[a-z]+/g;
   
   wysihtml5.commands.justifyRight = {
     exec: function(composer, command) {
@@ -9546,7 +9546,7 @@ wysihtml5.views.Textarea = wysihtml5.views.View.extend(
 *
 * <img align="left" src="http://foobar.com/image.png">
 * ... becomes ...
-* <img class="wysiwyg-float-left" src="http://foobar.com/image.png" alt="">
+* <img class="post-float-left" src="http://foobar.com/image.png" alt="">
 *
 * <div>foo<script>alert(document.cookie)</script></div>
 * ... becomes ...
@@ -9558,7 +9558,7 @@ wysihtml5.views.Textarea = wysihtml5.views.View.extend(
 *
 * foo <br clear="both"> bar
 * ... becomes ...
-* foo <br class="wysiwyg-clear-both"> bar
+* foo <br class="post-clear-both"> bar
 *
 * <div>hello <iframe src="http://google.com"></iframe></div>
 * ... becomes ...
@@ -9566,7 +9566,7 @@ wysihtml5.views.Textarea = wysihtml5.views.View.extend(
 *
 * <center>hello</center>
 * ... becomes ...
-* <div class="wysiwyg-text-align-center">hello</div>
+* <div class="post-text-align-center">hello</div>
 */
 var wysihtml5ParserRules = {
     /**
@@ -9574,40 +9574,40 @@ var wysihtml5ParserRules = {
 * Following CSS classes won't be removed when parsed by the wysihtml5 HTML parser
 */
     "classes": {
-        "wysiwyg-clear-both": 1,
-        "wysiwyg-clear-left": 1,
-        "wysiwyg-clear-right": 1,
-        "wysiwyg-color-aqua": 1,
-        "wysiwyg-color-black": 1,
-        "wysiwyg-color-blue": 1,
-        "wysiwyg-color-fuchsia": 1,
-        "wysiwyg-color-gray": 1,
-        "wysiwyg-color-green": 1,
-        "wysiwyg-color-lime": 1,
-        "wysiwyg-color-maroon": 1,
-        "wysiwyg-color-navy": 1,
-        "wysiwyg-color-olive": 1,
-        "wysiwyg-color-purple": 1,
-        "wysiwyg-color-red": 1,
-        "wysiwyg-color-silver": 1,
-        "wysiwyg-color-teal": 1,
-        "wysiwyg-color-white": 1,
-        "wysiwyg-color-yellow": 1,
-        "wysiwyg-float-left": 1,
-        "wysiwyg-float-right": 1,
-        "wysiwyg-font-size-large": 1,
-        "wysiwyg-font-size-larger": 1,
-        "wysiwyg-font-size-medium": 1,
-        "wysiwyg-font-size-small": 1,
-        "wysiwyg-font-size-smaller": 1,
-        "wysiwyg-font-size-x-large": 1,
-        "wysiwyg-font-size-x-small": 1,
-        "wysiwyg-font-size-xx-large": 1,
-        "wysiwyg-font-size-xx-small": 1,
-        "wysiwyg-text-align-center": 1,
-        "wysiwyg-text-align-justify": 1,
-        "wysiwyg-text-align-left": 1,
-        "wysiwyg-text-align-right": 1,
+        "post-clear-both": 1,
+        "post-clear-left": 1,
+        "post-clear-right": 1,
+        "post-color-aqua": 1,
+        "post-color-black": 1,
+        "post-color-blue": 1,
+        "post-color-fuchsia": 1,
+        "post-color-gray": 1,
+        "post-color-green": 1,
+        "post-color-lime": 1,
+        "post-color-maroon": 1,
+        "post-color-navy": 1,
+        "post-color-olive": 1,
+        "post-color-purple": 1,
+        "post-color-red": 1,
+        "post-color-silver": 1,
+        "post-color-teal": 1,
+        "post-color-white": 1,
+        "post-color-yellow": 1,
+        "post-float-left": 1,
+        "post-float-right": 1,
+        "post-font-size-large": 1,
+        "post-font-size-larger": 1,
+        "post-font-size-medium": 1,
+        "post-font-size-small": 1,
+        "post-font-size-smaller": 1,
+        "post-font-size-x-large": 1,
+        "post-font-size-x-small": 1,
+        "post-font-size-xx-large": 1,
+        "post-font-size-xx-small": 1,
+        "post-text-align-center": 1,
+        "post-text-align-justify": 1,
+        "post-text-align-left": 1,
+        "post-text-align-right": 1,
         
         "Spoiler": 1,
         "Quote": 1,
@@ -9620,11 +9620,11 @@ var wysihtml5ParserRules = {
 *
 * - add_class: converts and deletes the given HTML4 attribute (align, clear, ...) via the given method to a css class
 * The following methods are implemented in wysihtml5.dom.parse:
-* - align_text: converts align attribute values (right/left/center/justify) to their corresponding css class "wysiwyg-text-align-*")
-* <p align="center">foo</p> ... becomes ... <p> class="wysiwyg-text-align-center">foo</p>
-* - clear_br: converts clear attribute values left/right/all/both to their corresponding css class "wysiwyg-clear-*"
-* <br clear="all"> ... becomes ... <br class="wysiwyg-clear-both">
-* - align_img: converts align attribute values (right/left) on <img> to their corresponding css class "wysiwyg-float-*"
+* - align_text: converts align attribute values (right/left/center/justify) to their corresponding css class "post-text-align-*")
+* <p align="center">foo</p> ... becomes ... <p> class="post-text-align-center">foo</p>
+* - clear_br: converts clear attribute values left/right/all/both to their corresponding css class "post-clear-*"
+* <br clear="all"> ... becomes ... <br class="post-clear-both">
+* - align_img: converts align attribute values (right/left) on <img> to their corresponding css class "post-float-*"
 *
 * - remove: removes the element and its content
 *
@@ -9690,7 +9690,7 @@ var wysihtml5ParserRules = {
         },
         "small": {
             "rename_tag": "span",
-            "set_class": "wysiwyg-font-size-smaller"
+            "set_class": "post-font-size-smaller"
         },
         "area": {
             "remove": 1
@@ -9823,7 +9823,7 @@ var wysihtml5ParserRules = {
         },
         "big": {
             "rename_tag": "span",
-            "set_class": "wysiwyg-font-size-larger"
+            "set_class": "post-font-size-larger"
         },
         "button": {
             "rename_tag": "span"
@@ -10027,7 +10027,7 @@ var wysihtml5ParserRules = {
         "pre": {},
         "center": {
             "rename_tag": "div",
-            "set_class": "wysiwyg-text-align-center"
+            "set_class": "post-text-align-center"
         },
         "audio": {
             "remove": 1

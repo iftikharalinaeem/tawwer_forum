@@ -75,11 +75,15 @@
    width: 300px;
    position: absolute;
    z-index: 100;
-   display: none;
+   display: none !important;
 }
 
+/* Set important to override strange behaviour of wysihtml5 auto-adding 
+inline style to editors already loaded on page, when loading a fresh one 
+TODO disable wysihtml5 code that does this. */
+
 .editor-dropdown-open .editor-insert-dialog {
-   display: block;
+   display: block !important;
 }
 
 .editor-insert-dialog input.InputBox {
@@ -107,55 +111,6 @@
 .editor-colors-flyout .wysihtml5-command-active {
    border: 1px solid #fff;
 }
-
-.editor-colors-flyout .color-black {
-   background-color: black;
-}
-
-.editor-colors-flyout .color-white {
-   background-color: white;
-}
-
-.editor-colors-flyout .color-gray {
-   background-color: gray;
-}
-
-.editor-colors-flyout .color-silver {
-   background-color: silver;
-}
-
-.editor-colors-flyout .color-maroon {
-   background-color: maroon;
-}
-
-.editor-colors-flyout .color-red {
-   background-color: red;
-}
-
-.editor-colors-flyout .color-purple {
-   background-color: purple;
-}
-
-.editor-colors-flyout .color-green {
-   background-color: green;
-}
-
-.editor-colors-flyout .color-olive {
-   background-color: olive;
-}
-
-.editor-colors-flyout .color-navy {
-   background-color: navy;
-}
-
-.editor-colors-flyout .color-blue {
-   background-color: blue;
-}
-
-.editor-colors-flyout .color-lime {
-   background-color: lime;
-}
-
 
 /**
  * Headers dropdown

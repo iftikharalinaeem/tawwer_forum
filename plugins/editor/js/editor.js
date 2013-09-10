@@ -275,7 +275,7 @@ jQuery(function() {
                currentEditorToolbar    = t.find('.editor-format-'+ format);
                currentEditableTextarea = t.find('#Form_Body');
                currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
-           }          
+           }      
            
            // if found, perform operation
            if (currentEditorToolbar.length 
@@ -334,10 +334,8 @@ jQuery(function() {
 
               // Set up on editor load
               editorSetHelpText(formatOriginal, currentTextBoxWrapper);
-              $(".editor-toggle-fullpage-button").click(toggleFullpage);
-              closeFullPageEsc();
-              postCommentCloseFullPageEvent();    
               editorSetupDropdowns();
+              fullPageInit();
               editorSetCaretFocusEnd(currentEditableTextarea[0]);
 
               // some() loop requires true to end loop. every() requires false.
@@ -360,57 +358,69 @@ jQuery(function() {
    
    
    
-   /**
-    * Helper functions called on load and on mutation.
-    * 
+   /** 
     * Fullpage actions--available to all editor views on page load. 
-    * 
-    * TODO bug with fullpage button losing event listener
     */
-
-   // Toggle fulpage--to be used in three places
-   var toggleFullpage = function(e) { 
+   var fullPageInit = function() {
       
-      // either user clicks on fullpage toggler button, or escapes out with key
-      var toggleButton = (typeof e != 'undefined') 
-         ? e.target 
-         : $('#editor-fullpage-candidate').find('.editor-toggle-fullpage-button');
+      var toggleFullpage = function(e) {
+         // either user clicks on fullpage toggler button, or escapes out with key
+         var toggleButton = (typeof e != 'undefined') 
+            ? e.target 
+            : $('#editor-fullpage-candidate').find('.editor-toggle-fullpage-button');
 
-      var bodyEl      = $('body'), 
-          formWrapper = $(toggleButton).closest('.FormWrapper')[0];
-      
-      if (!bodyEl.hasClass('js-editor-fullpage')) {
-         $(formWrapper).attr('id', 'editor-fullpage-candidate');
-         bodyEl.addClass('js-editor-fullpage');
-         $(toggleButton).addClass('icon-resize-small');
-      } else {
-         $(formWrapper).attr('id', '');
-         bodyEl.removeClass('js-editor-fullpage');
-         $(toggleButton).removeClass('icon-resize-small');
-      }
-   }
+         var bodyEl      = $('body'), 
+             formWrapper = $(toggleButton).closest('.FormWrapper')[0];
 
-   // exit fullpage on esc
-   var closeFullPageEsc = function() {
-      $(document).keyup(function(e) {
-         if ($('body').hasClass('js-editor-fullpage') && e.which == 27) {
-            toggleFullpage();
+         if (!bodyEl.hasClass('js-editor-fullpage')) {
+            $(formWrapper).attr('id', 'editor-fullpage-candidate');
+            bodyEl.addClass('js-editor-fullpage');
+            $(toggleButton).addClass('icon-resize-small');
+         } else {
+            $(formWrapper).attr('id', '');
+            bodyEl.removeClass('js-editor-fullpage');
+            $(toggleButton).removeClass('icon-resize-small');
          }
-      });  
+      }
+      
+      var clickFullPage = (function() {
+         $(".editor-toggle-fullpage-button")
+         .off('click')
+         .on('click', toggleFullpage);
+      }());
+      
+      // exit fullpage on esc
+      var closeFullPageEsc = (function() {
+         $(document)
+         .off('keyup')
+         .on('keyup', function(e) {
+            if ($('body').hasClass('js-editor-fullpage') && e.which == 27) {
+               toggleFullpage();
+            }
+         });  
+      }());
+
+      // If full page and the user saves/cancels/previews comment, 
+      // exit out of full page.
+      // Not smart in the sense that a failed post will also exit out of 
+      // full page, but the text will remain in editor, so not big issue.
+      var postCommentCloseFullPageEvent = (function() {
+         $('.Button')
+         .off('click')
+         .on('click', function() {
+            if ($('body').hasClass('js-editor-fullpage')) { 
+               toggleFullpage();
+            }
+         });   
+      }()); 
    };
 
-   // If full page and the user saves/cancels/previews comment, 
-   // exit out of full page.
-   // Not smart in the sense that a failed post will also exit out of 
-   // full page, but the text will remain in editor, so not big issue.
-   var postCommentCloseFullPageEvent = function() {
-      $('.Button').click(function() {
-         if ($('body').hasClass('js-editor-fullpage')) { 
-            toggleFullpage();
-         }
-      });   
-   }; 
+
    
+   
+   // TODO when previewing a post, then going back to edit, the text help
+   // message will display again and again, and all the events will be 
+   // reattached. Consider namespacing events, so they overwrite.
    // Insert help text below every editor 
    var editorSetHelpText = function(format, editorAreaObj) {            
       $("<div></div>")
@@ -418,14 +428,15 @@ jQuery(function() {
          .html(gdn.definition('editor'+ format +'HelpText'))
          .insertAfter(editorAreaObj);
     };
-    
-    
-    // Bug with these two selection functions, but only in ButtonBar, and 
-    // issue is with Vanilla's autogrow, which depends on click to initiate,
-    // which does not work when autofocusing. Consider trigger()
+
     var editorSetCaretFocusEnd = function(obj) {
        obj.selectionStart = obj.selectionEnd = obj.value.length;
-       obj.focus();
+       // Hack to work around jQuery's autogrow, which requires focus to init 
+       // the feature, but setting focus immediately here prevents that. 
+       // Considered using trigger() and triggerHandler(), but do not work.
+       setTimeout(function(){
+         obj.focus();
+       }, 50);
     };
     
     var editorSelectAllInput = function(obj) {
@@ -438,11 +449,12 @@ jQuery(function() {
     * Deal with clashing JS for opening dialogs on click, and do not let 
     * more than one dialog/dropdown appear at once. 
     * 
-    * TODO clean up. 
     * TODO enable enter button to do the same as clicks, or disable enter.
     */
    var editorSetupDropdowns = function() { 
-      $('.editor-dropdown').click(function(e) {
+      $('.editor-dropdown')
+      .off('click')
+      .on('click', function(e) {
          var parentEl = $(e.target).parent();
 
          if ($(this).hasClass('editor-dropdown') 
@@ -473,21 +485,17 @@ jQuery(function() {
          $(el).addClass('editor-dialog-fire-close');
       });
 
-      $('.editor-dialog-fire-close').click(function(e) {
+      $('.editor-dialog-fire-close')
+      .on('click', function(e) {
          $('.editor-dropdown').each(function(i, el) {
             $(el).removeClass('editor-dropdown-open');
          }); 
       });
-
    };
-
 
    // Set up on page load
    editorSetHelpText(formatOriginal, $('#Form_Body'));
-   $(".editor-toggle-fullpage-button").click(toggleFullpage);
-   closeFullPageEsc();
-   postCommentCloseFullPageEvent();
    editorSetupDropdowns();
+   fullPageInit();
    editorSetCaretFocusEnd(currentEditableTextarea[0]);
-
 });
