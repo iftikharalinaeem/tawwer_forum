@@ -30,7 +30,7 @@
 .editor .icon {
    display: inline;
    padding: 5px 8px;
-   margin: 0 -1px;
+   margin: 0 1px;
    color: #F7F7F7;
    border: 1px solid transparent;
    cursor: pointer;
@@ -43,11 +43,13 @@
 .wysihtml5-command-dialog-opened {
    border-radius: 2px;
    background-color: #666666;
+	background-color: rgba(0, 0, 0, 0.2);
+   color: #fff !important;
 }
 
 .editor .editor-sep {
    border-left: 1px solid #888888;
-   margin: 0 8px 0 5px;
+   margin: 0 5px;
 }
 
 .editor .editor-dropdown {
@@ -57,26 +59,32 @@
 
 /* Clicking on down caret does nothing, so let click seep through to parent */
 .editor .icon-caret-down {
+   font-size: 75%;
    pointer-events: none;
+   margin-left: 6px;
+   position: relative;
+   top: -2px;
 }
 
 
 
 /* For dropdowns */
 .editor-insert-dialog {
-   margin: 5px 0 0 -1px;
+   margin: 5px 0 0 0;
    padding: 5px;
    width: 300px;
    position: absolute;
    z-index: 100;
-   display: none;
+   display: none !important;
 }
+
+/* Set important to override strange behaviour of wysihtml5 auto-adding 
+inline style to editors already loaded on page, when loading a fresh one 
+TODO disable wysihtml5 code that does this. */
 
 .editor-dropdown-open .editor-insert-dialog {
-   display: block;
+   display: block !important;
 }
-
-
 
 .editor-insert-dialog input.InputBox {
    width: 97.5%;
@@ -104,54 +112,46 @@
    border: 1px solid #fff;
 }
 
-.editor-colors-flyout .color-black {
-   background-color: black;
+/**
+ * Headers dropdown
+ */
+
+.editor-headers-flyout {
+   padding: 5px 0;
+   width: auto;
 }
 
-.editor-colors-flyout .color-white {
-   background-color: white;
+.editor-headers-flyout .wysihtml5-command-active {
+   border-radius: 0;
 }
 
-.editor-colors-flyout .color-gray {
-   background-color: gray;
+.editor-headers-flyout .editor-action-h1 {
+   font-size: 18px;
+   line-height: 28px !important;
 }
 
-.editor-colors-flyout .color-silver {
-   background-color: silver;
+.editor-headers-flyout .editor-action-h2 {
+   font-size: 16px;
 }
 
-.editor-colors-flyout .color-maroon {
-   background-color: maroon;
+
+/**
+ * Emoji dropdown
+ */
+
+.editor-emoji-flyout {
+   width: 120px;
 }
 
-.editor-colors-flyout .color-red {
-   background-color: red;
+.editor-emoji-flyout .emoji {
+   padding: 5px;
 }
 
-.editor-colors-flyout .color-purple {
-   background-color: purple;
+.editor-emoji-flyout .emoji:hover {
+   cursor: pointer;
+   border-radius: 2px;
+   background-color: rgba(0,0,0,0.10);
 }
-
-.editor-colors-flyout .color-green {
-   background-color: green;
-}
-
-.editor-colors-flyout .color-olive {
-   background-color: olive;
-}
-
-.editor-colors-flyout .color-navy {
-   background-color: navy;
-}
-
-.editor-colors-flyout .color-blue {
-   background-color: blue;
-}
-
-.editor-colors-flyout .color-lime {
-   background-color: lime;
-}
-
 
 /**
  * Going full page 
@@ -239,15 +239,39 @@ current location, due to event insertion, makes z-index troublesome. */
   }
 }
 
-/* No need to show this to Html, BBCode, and Markdown view */
+/**
+ * Hide some actions per editor view.
+ *
+ * Html, BBCode, and Markdown views have slight differences than the Wysiwyg, 
+ * so hide the particular ones 
+ */
 .editor-format-html .editor-toggle-source,
 .editor-format-bbcode .editor-toggle-source,
-.editor-format-markdown .editor-toggle-source {
+.editor-format-markdown .editor-toggle-source, 
+.editor-format-html .sep-switches,
+.editor-format-bbcode .sep-switches,
+.editor-format-markdown .sep-switches,
+
+.editor-format-markdown .sep-format,
+.editor-format-markdown .icon-align-left,
+.editor-format-markdown .icon-align-center,
+.editor-format-markdown .icon-align-right, 
+
+.editor-format-html .editor-image-align,
+.editor-format-bbcode .editor-image-align,
+.editor-format-markdown .editor-image-align,
+
+.editor-format-bbcode .editor-action-h1,
+.editor-format-bbcode .editor-action-h2
+
+{
    display: none;
 }
 
 
 /**
+ * Brute force hide other editors enabled after this one.
+ *
  * In case some of the other editors were enabled after this one, just have 
  * them hidden from page, essentially making this editor the veto. This is 
  * a last ditch effort to at least make sure editor is usable when others 

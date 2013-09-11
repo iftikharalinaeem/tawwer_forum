@@ -19,12 +19,42 @@ jQuery(function() {
        assets         = gdn.definition('editorPluginAssets'), 
        editorRules    = {}; // for wysiwyg
        
-   var editorToolbarId  = 'editor-format-'+ format,
+       
+  // When editor loaded inline and accomodates an editor format based on the 
+  // original post format.
+  
+       
+       
+   var editorToolbarId  = 'editor-format-', // append format below
        editorTextareaId = 'Form_Body', 
        editorName       = 'vanilla-editor-text';
+       
+
+   var currentEditableTextarea = $('#Form_Body');
+   var currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
+   var currentEditorFormat     = $('#Form_Format')[0].value.toLowerCase();
+   
+   
+   format = (currentEditorFormat !== format) 
+      ? currentEditorFormat 
+      : format;
+   
+   editorToolbarId += currentEditorFormat;
+   
    
    // Set id of onload toolbar--required for proper functioning
    $('.editor').attr('id', editorToolbarId);
+   
+   
+   
+   
+   
+   
+   
+   
+   /**
+    * Load correct editor view onload
+    */
    
    switch (format) {
       
@@ -59,7 +89,7 @@ jQuery(function() {
                // Class name to add to the body when the wysihtml5 editor is supported
                bodyClassName:        "wysihtml5-supported",
                // By default wysihtml5 will insert a <br> for line breaks, set this to false to use <p>
-               useLineBreaks:        true,
+               useLineBreaks:        false,
                // Array (or single string) of stylesheet urls to be loaded in the editor's iframe
                stylesheets:          [assets + '/design/editor.css'],
                // Placeholder text to use, defaults to the placeholder attribute on the textarea element
@@ -79,7 +109,7 @@ jQuery(function() {
 
             // load resizer
             editor.on('load', function() {
-               $(editor.composer.iframe).wysihtml5_size_matters();      
+               $(editor.composer.iframe).wysihtml5_size_matters();  
             });  
             
 
@@ -148,7 +178,7 @@ jQuery(function() {
 
               wysihtml5.commands.code = {
                 exec: function(composer, command) {
-                  wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "blockquote", "CodeBlock", REG_EXP);
+                  wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "pre", "CodeBlock", REG_EXP);
                   if ($(composer.element.lastChild).hasClass('CodeBlock')) {
                     composer.selection.setAfter(composer.element.lastChild);
                     composer.commands.exec("insertHTML", "<br>");
@@ -176,120 +206,24 @@ jQuery(function() {
        */
       case 'html':
       case 'bbcode':
-      case 'markdown':
-         
+      case 'markdown':         
+      
          // Load script for wysiwyg editor async
          $.getScript(assets + "/js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-            ButtonBar.AttachTo($('#'+editorTextareaId));
+            ButtonBar.AttachTo($('#'+editorTextareaId), formatOriginal);
          });
          
          break;
    }
    
    
-   /**
-    * Fullpage actions--available to all editor views on page load. 
-    * 
-    * TODO bug with fullpage button losing event listener
-    */
-
-   // Toggle fulpage--to be used in three places
-   var toggleFullpage = function(e) { 
-      
-      // either user clicks on fullpage toggler button, or escapes out with key
-      var toggleButton = (typeof e != 'undefined') 
-         ? e.target 
-         : $('#editor-fullpage-candidate').find('.editor-toggle-fullpage-button');
-
-      var bodyEl      = $('body'), 
-          formWrapper = $(toggleButton).closest('.FormWrapper')[0];
-      
-      if (!bodyEl.hasClass('js-editor-fullpage')) {
-         $(formWrapper).attr('id', 'editor-fullpage-candidate');
-         bodyEl.addClass('js-editor-fullpage');
-         $(toggleButton).addClass('icon-resize-small');
-      } else {
-         $(formWrapper).attr('id', '');
-         bodyEl.removeClass('js-editor-fullpage');
-         $(toggleButton).removeClass('icon-resize-small');
-      }  
-   }
-
-   // exit fullpage on esc
-   var closeFullPageEsc = function() {
-      $(document).keyup(function(e) {
-         if ($('body').hasClass('js-editor-fullpage') && e.which == 27) {
-            toggleFullpage();
-         }
-      });  
-   };
-
-   // If full page and the user saves/cancels/previews comment, 
-   // exit out of full page.
-   // Not smart in the sense that a failed post will also exit out of 
-   // full page, but the text will remain in editor, so not big issue.
-   var postCommentCloseFullPageEvent = function() {
-      $('.Button').click(function() {
-         if ($('body').hasClass('js-editor-fullpage')) { 
-            toggleFullpage();
-         }
-      });   
-   }; 
    
-   // Insert help text below every editor 
-   var editorSetHelpText = function(format, editorAreaObj) {            
-      $("<div></div>")
-         .addClass('editor-help-text')
-         .html(gdn.definition('editor'+ format +'HelpText'))
-         .insertAfter(editorAreaObj);
- 
-         //console.log(editorAreaObj);
-    };
    
-   // Set up on page load
-   editorSetHelpText(formatOriginal, $('#Form_Body'));
-   $(".editor-toggle-fullpage-button").click(toggleFullpage);
-   closeFullPageEsc();
-   postCommentCloseFullPageEvent();
-
-
-   /**
-    * Deal with clashing JS for opening dialogs on click, and do not let 
-    * more than one dialog/dropdown appear at once. 
-    * TODO clean up. 
-    * TODO enable enter button to do the same as clicks
-    */
-   (function(){ 
-      $('.editor-dropdown').click(function(e) {
-         var parentEl = $(e.target).parent();
-
-         if ($(this).hasClass('editor-dropdown') 
-         && $(this).hasClass('editor-dropdown-open')) {
-            parentEl.removeClass('editor-dropdown-open');
-         } else {
-            // clear other opened dropdowns before opening this one
-            $(this).parent('.editor').find('.editor-dropdown-open').each(function() {
-               $(this).removeClass('editor-dropdown-open');
-               $(this).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
-            });
-
-            parentEl.addClass('editor-dropdown-open');  
-            $(this).find('.InputBox').focus();
-         }
-
-      });
-
-      $('.editor-dialog-fire-close').click(function(e) {
-         $(this).closest('.editor-dropdown').removeClass('editor-dropdown-open');
-      });
-   }());
-
-
-
-
-
-
-
+   
+   
+   
+   
+   
 
    
    /**
@@ -299,6 +233,9 @@ jQuery(function() {
     * TODO abstracting the mutation anon function and then calling it as a 
     * callback on mutation, but also just when manually invoked, so less 
     * redundant with onload above.
+    * 
+    * TODO make onload call this, essentially moving all into one, less
+    * redundant.
     */
    $(document).ready(function() {
 
@@ -322,14 +259,27 @@ jQuery(function() {
         // list multiple mutations on the same element otherwise. ie8<
         mutations.some(function(mutation) { 
 
-           var t                       = $(mutation.target),
-               currentEditorToolbar    = t.find('.editor-format-'+ format),
-               currentEditableTextarea = t.find('#Form_Body'),
-               currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
+           var t                       = $(mutation.target);
+           var currentEditorFormat     = t.find('#Form_Format');
+           var currentEditorToolbar    = '';
+           var currentEditableTextarea = '';
+           var currentTextBoxWrapper   = '';
 
+           if (currentEditorFormat.length) {
+     
+               formatOriginal = currentEditorFormat[0].value;
+               //currentEditorFormat = $(currentEditorFormat).val();
+               currentEditorFormat = currentEditorFormat[0].value.toLowerCase();
+               format = currentEditorFormat + '';
+               
+               currentEditorToolbar    = t.find('.editor-format-'+ format);
+               currentEditableTextarea = t.find('#Form_Body');
+               currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
+           }      
+           
            // if found, perform operation
-           if (currentEditableTextarea.length 
-              && currentEditorToolbar.length) {
+           if (currentEditorToolbar.length 
+           && currentEditableTextarea.length) {
 
               var currentEditableCommentId = (new Date()).getTime(),
                   editorTextareaId         = currentEditableTextarea[0].id +'-'+ currentEditableCommentId,
@@ -347,43 +297,46 @@ jQuery(function() {
               // them on format
               switch (format) {
                  case 'wysiwyg':
-                     // rules updated for particular edit, look to editorRules for 
-                     // reference. Any defined here will overwrite the defaults set above.
-                     var editorRulesOTF = {
-                        name: editorName,
-                        toolbar: editorToolbarId      
-                     };
+                    $.getScript(assets + "/js/wysihtml5.js", function(data, textStatus, jqxhr) {
+                        // rules updated for particular edit, look to editorRules for 
+                        // reference. Any defined here will overwrite the defaults set above.
+                        var editorRulesOTF = {
+                           name: editorName,
+                           toolbar: editorToolbarId      
+                        };
 
-                     // overwrite defaults with specific rules for this edit
-                     for (var dfr in editorRules) {
-                        if (typeof editorRulesOTF[dfr] == 'undefined') {
-                           editorRulesOTF[dfr] = editorRules[dfr];
+                        // overwrite defaults with specific rules for this edit
+                        for (var dfr in editorRules) {
+                           if (typeof editorRulesOTF[dfr] == 'undefined') {
+                              editorRulesOTF[dfr] = editorRules[dfr];
+                           }
                         }
-                     }
 
-                     // instantiate new editor
-                     var editorInline = new wysihtml5.Editor(editorTextareaId, editorRulesOTF);
+                        // instantiate new editor
+                        var editorInline = new wysihtml5.Editor(editorTextareaId, editorRulesOTF);
 
-                     editorInline.on('load', function() {
-                        // enable auto-resize
-                        $(editorInline.composer.iframe).wysihtml5_size_matters();      
-                     });
+                        editorInline.on('load', function() {
+                           // enable auto-resize
+                           $(editorInline.composer.iframe).wysihtml5_size_matters();      
+                        });
+                    });
                   break;
                   
                   case 'html':
                   case 'bbcode':
-                  case 'markdown':
-                     
-                     ButtonBar.AttachTo($('#'+editorTextareaId));
-                  
+                  case 'markdown': 
+
+                     $.getScript(assets + "/js/buttonbarplus.js", function(data, textStatus, jqxhr) {
+                        ButtonBar.AttachTo($('#'+editorTextareaId), formatOriginal);
+                     });                  
                      break;
               }
 
               // Set up on editor load
               editorSetHelpText(formatOriginal, currentTextBoxWrapper);
-              $(".editor-toggle-fullpage-button").click(toggleFullpage);
-              closeFullPageEsc();
-              postCommentCloseFullPageEvent();               
+              editorSetupDropdowns();
+              fullPageInit();
+              editorSetCaretFocusEnd(currentEditableTextarea[0]);
 
               // some() loop requires true to end loop. every() requires false.
               return true;
@@ -395,5 +348,154 @@ jQuery(function() {
      // start observing, call observer.disconnect() to stop
      observer.observe(mutationTarget, config);
    });   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   /** 
+    * Fullpage actions--available to all editor views on page load. 
+    */
+   var fullPageInit = function() {
+      
+      var toggleFullpage = function(e) {
+         // either user clicks on fullpage toggler button, or escapes out with key
+         var toggleButton = (typeof e != 'undefined') 
+            ? e.target 
+            : $('#editor-fullpage-candidate').find('.editor-toggle-fullpage-button');
 
+         var bodyEl      = $('body'), 
+             formWrapper = $(toggleButton).closest('.FormWrapper')[0];
+
+         if (!bodyEl.hasClass('js-editor-fullpage')) {
+            $(formWrapper).attr('id', 'editor-fullpage-candidate');
+            bodyEl.addClass('js-editor-fullpage');
+            $(toggleButton).addClass('icon-resize-small');
+         } else {
+            $(formWrapper).attr('id', '');
+            bodyEl.removeClass('js-editor-fullpage');
+            $(toggleButton).removeClass('icon-resize-small');
+         }
+      }
+      
+      var clickFullPage = (function() {
+         $(".editor-toggle-fullpage-button")
+         .off('click')
+         .on('click', toggleFullpage);
+      }());
+      
+      // exit fullpage on esc
+      var closeFullPageEsc = (function() {
+         $(document)
+         .off('keyup')
+         .on('keyup', function(e) {
+            if ($('body').hasClass('js-editor-fullpage') && e.which == 27) {
+               toggleFullpage();
+            }
+         });  
+      }());
+
+      // If full page and the user saves/cancels/previews comment, 
+      // exit out of full page.
+      // Not smart in the sense that a failed post will also exit out of 
+      // full page, but the text will remain in editor, so not big issue.
+      var postCommentCloseFullPageEvent = (function() {
+         $('.Button')
+         .off('click')
+         .on('click', function() {
+            if ($('body').hasClass('js-editor-fullpage')) { 
+               toggleFullpage();
+            }
+         });   
+      }()); 
+   };
+
+
+   
+   
+   // TODO when previewing a post, then going back to edit, the text help
+   // message will display again and again, and all the events will be 
+   // reattached. Consider namespacing events, so they overwrite.
+   // Insert help text below every editor 
+   var editorSetHelpText = function(format, editorAreaObj) {            
+      $("<div></div>")
+         .addClass('editor-help-text')
+         .html(gdn.definition('editor'+ format +'HelpText'))
+         .insertAfter(editorAreaObj);
+    };
+
+    var editorSetCaretFocusEnd = function(obj) {
+       obj.selectionStart = obj.selectionEnd = obj.value.length;
+       // Hack to work around jQuery's autogrow, which requires focus to init 
+       // the feature, but setting focus immediately here prevents that. 
+       // Considered using trigger() and triggerHandler(), but do not work.
+       setTimeout(function(){
+         obj.focus();
+       }, 50);
+    };
+    
+    var editorSelectAllInput = function(obj) {
+       // selectionStart is implied 0
+       obj.selectionEnd = obj.value.length;
+       obj.focus();
+    };
+
+   /**
+    * Deal with clashing JS for opening dialogs on click, and do not let 
+    * more than one dialog/dropdown appear at once. 
+    * 
+    * TODO enable enter button to do the same as clicks, or disable enter.
+    */
+   var editorSetupDropdowns = function() { 
+      $('.editor-dropdown')
+      .off('click')
+      .on('click', function(e) {
+         var parentEl = $(e.target).parent();
+
+         if ($(this).hasClass('editor-dropdown') 
+         && $(this).hasClass('editor-dropdown-open')) {
+            parentEl.removeClass('editor-dropdown-open');
+         } else {
+            // clear other opened dropdowns before opening this one
+            $(this).parent('.editor').find('.editor-dropdown-open').each(function() {
+               $(this).removeClass('editor-dropdown-open');
+               $(this).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
+            });
+
+            parentEl.addClass('editor-dropdown-open');
+            
+            // if has input, focus and move caret to end of text
+            var inputBox = $(this).find('.InputBox');
+            if (inputBox.length) {
+               editorSelectAllInput(inputBox[0]);
+            }
+         }
+      });
+      
+      // TODO bug when post-dependent editor loaded, loses events.
+      
+      // if dropdown open, cliking into an editor area should close it, but 
+      // keep it open for anything else.
+      $('.TextBoxWrapper').each(function(i, el) {
+         $(el).addClass('editor-dialog-fire-close');
+      });
+
+      $('.editor-dialog-fire-close')
+      .on('click', function(e) {
+         $('.editor-dropdown').each(function(i, el) {
+            $(el).removeClass('editor-dropdown-open');
+         }); 
+      });
+   };
+
+   // Set up on page load
+   editorSetHelpText(formatOriginal, $('#Form_Body'));
+   editorSetupDropdowns();
+   fullPageInit();
+   editorSetCaretFocusEnd(currentEditableTextarea[0]);
 });
