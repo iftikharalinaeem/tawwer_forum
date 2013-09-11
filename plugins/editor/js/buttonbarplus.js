@@ -222,7 +222,7 @@ jQuery(document).ready(function($) {
       
       Const: {
          URL_PREFIX: 'http://', 
-         EMOJI_ALIAS_REGEX: /^[\:\)\(\;\>\<\#\|\\a-zA-Z0-9]+$/
+         EMOJI_ALIAS_REGEX: /^[\:\)\(\;\>\<\#\-\+\&\|\/\\a-zA-Z0-9]+$/
       },
       
       AttachTo: function(TextArea, format) {
@@ -245,18 +245,22 @@ jQuery(document).ready(function($) {
             var TargetTextArea = $(MyButtonBar).data('ButtonBarTarget');
             if (!TargetTextArea) return false;
 
-            var Operation = ($(Button).data('editor').action) 
-               ? $(Button).data('editor').action.toLowerCase().replace(/\s+/g, '') 
-               : '';
+            var Operation = '';
+            var Value = '';
+            
+            if ($(Button).data('editor')) {
+               Operation = $(Button).data('editor').action;
+               Value = $(Button).data('editor').value;
+            }
            
-           // when checking value, make sure user did not type their own, as 
-           // the value is being used directly below. If it fails the regex 
-           // clear it out and fail the emoji code.
-            var Value = $(Button).data('editor').value;
+            // when checking value, make sure user did not type their own, as 
+            // the value is being used directly below. If it fails the regex 
+            // clear it out and fail the emoji code.
+            
             if (Operation == 'emoji' 
             && Value.length 
             && !(ButtonBar.Const.EMOJI_ALIAS_REGEX.test(Value))) {
-               Value = ''; // was tampered with.
+               Value = 'tamp'; // was tampered with.
             }
 
             ButtonBar.Perform(TargetTextArea, Operation, event, Value);
@@ -297,8 +301,10 @@ jQuery(document).ready(function($) {
          var PerformMethod = 'Perform'+InputFormat;
          if (ButtonBar[PerformMethod] == undefined)
             return;
-         
-         var Value = Value; // for now just used for emoji to reduce redundancy
+
+         // add space on either side, in case user clicks emoji right after 
+         // bit of text
+         var Value = ' '+Value+' '; // for now just used for emoji to reduce redundancy
          
          // Call performer
          ButtonBar[PerformMethod](TextArea,Operation, Value);
@@ -367,7 +373,7 @@ jQuery(document).ready(function($) {
 
                         $(TextArea).insertRoundTag('url',thisOpts);
                         
-                        inputBox[0].value = ButtonBar.Const.URL_PREFIX;
+                        inputBox[0].value = '';
                      }
                });
 
@@ -388,7 +394,7 @@ jQuery(document).ready(function($) {
                         thisOpts.replace = val; 
                         $(TextArea).insertRoundTag('img',thisOpts);    
 
-                        inputBox[0].value = ButtonBar.Const.URL_PREFIX;
+                        inputBox[0].value = '';
                      }
                });               
                
@@ -541,7 +547,7 @@ jQuery(document).ready(function($) {
 
                         $(TextArea).insertRoundTag('a',thisOpts,urlOpts);
 
-                        inputBox[0].value = ButtonBar.Const.URL_PREFIX;
+                        inputBox[0].value = '';
                      }
                });
                
@@ -563,7 +569,7 @@ jQuery(document).ready(function($) {
                         urlOpts.src = val;
                         $(TextArea).insertRoundTag('img',thisOpts,urlOpts);   
 
-                        inputBox[0].value = ButtonBar.Const.URL_PREFIX;
+                        inputBox[0].value = '';
                      }
                });
 
@@ -735,7 +741,7 @@ jQuery(document).ready(function($) {
                         });
                         $(TextArea).insertRoundTag('',markdownOpts);
 
-                        inputBox[0].value = ButtonBar.Const.URL_PREFIX;                     
+                        inputBox[0].value = '';                     
                      }
                });
 
@@ -761,7 +767,7 @@ jQuery(document).ready(function($) {
                         thisOpts.prepend = val;
                         $(TextArea).insertRoundTag('',thisOpts);    
                         
-                        inputBox[0].value = ButtonBar.Const.URL_PREFIX;
+                        inputBox[0].value = '';
                      }
                });
 

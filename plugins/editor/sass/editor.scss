@@ -43,7 +43,7 @@
 .wysihtml5-command-dialog-opened {
    border-radius: 2px;
    background-color: #666666;
-	background-color: rgba(0, 0, 0, 0.2);
+	background-color: rgba(0, 0, 0, 0.10);
    color: #fff !important;
 }
 
@@ -94,11 +94,11 @@ TODO disable wysihtml5 code that does this. */
    margin: 0 0 10px 0;
 }
 
-.editor-colors-flyout {
+.editor-dd-color + .editor-insert-dialog {
    width: 92px;
 }
 
-.editor-colors-flyout .color {
+.editor-dd-color + .editor-insert-dialog .color {
    width: 20px;
    height: 20px;
    float: left;
@@ -107,8 +107,8 @@ TODO disable wysihtml5 code that does this. */
    border: 1px solid transparent;
 }
 
-.editor-colors-flyout .color:hover,
-.editor-colors-flyout .wysihtml5-command-active {
+.editor-dd-color + .editor-insert-dialog .color:hover,
+.editor-dd-color + .editor-insert-dialog .wysihtml5-command-active {
    border: 1px solid #fff;
 }
 
@@ -116,21 +116,21 @@ TODO disable wysihtml5 code that does this. */
  * Headers dropdown
  */
 
-.editor-headers-flyout {
+.editor-dd-format + .editor-insert-dialog {
    padding: 5px 0;
    width: auto;
 }
 
-.editor-headers-flyout .wysihtml5-command-active {
+.editor-dd-format + .editor-insert-dialog .wysihtml5-command-active {
    border-radius: 0;
 }
 
-.editor-headers-flyout .editor-action-h1 {
+.editor-dd-format + .editor-insert-dialog .editor-action-h1 {
    font-size: 18px;
    line-height: 28px !important;
 }
 
-.editor-headers-flyout .editor-action-h2 {
+.editor-dd-format + .editor-insert-dialog .editor-action-h2 {
    font-size: 16px;
 }
 
@@ -139,19 +139,23 @@ TODO disable wysihtml5 code that does this. */
  * Emoji dropdown
  */
 
-.editor-emoji-flyout {
-   width: 120px;
+.editor-dd-emoji + .editor-insert-dialog {
+width: 120px;
 }
 
-.editor-emoji-flyout .emoji {
+.editor-dd-emoji + .editor-insert-dialog .emoji {
+   display: inline-block;
    padding: 5px;
+   background-repeat: no-repeat;
+   background-position: center;
 }
 
-.editor-emoji-flyout .emoji:hover {
+.editor-dd-emoji + .editor-insert-dialog .emoji:hover {
    cursor: pointer;
    border-radius: 2px;
-   background-color: rgba(0,0,0,0.10);
+   background-color: rgba(0, 0, 0, 0.10);
 }
+
 
 /**
  * Going full page 
@@ -200,7 +204,7 @@ current location, due to event insertion, makes z-index troublesome. */
 }
 
 /* Temp, take this out when you figure out the element that is restricting 
-   this child from going truly absolute */
+   this child from going truly absolute. */
 .js-editor-fullpage .EditCommentForm #editor-fullpage-candidate {
    position: fixed;
 }
@@ -252,7 +256,7 @@ current location, due to event insertion, makes z-index troublesome. */
 .editor-format-bbcode .sep-switches,
 .editor-format-markdown .sep-switches,
 
-.editor-format-markdown .sep-format,
+.editor-format-markdown .sep-align,
 .editor-format-markdown .icon-align-left,
 .editor-format-markdown .icon-align-center,
 .editor-format-markdown .icon-align-right, 
