@@ -13,6 +13,8 @@ $PluginInfo['vfoptions'] = array(
 );
 
 class VFOptionsPlugin implements Gdn_IPlugin {
+   
+   public $WhitelistDomain = 'vanillaforums.com';
 
    public function __construct() {
       $ForumName = Gdn::Request()->Host();
@@ -24,6 +26,16 @@ class VFOptionsPlugin implements Gdn_IPlugin {
          $ForumName = preg_replace("/\.cl[0-9]+\.{$RegexHostingDomain}\$/i", ".{$HostingDomain}", $ForumName);
          SaveToConfig('Garden.AutoDomainSwitch', FALSE);
       }
+   }
+   
+   public function HasInfPermission() {
+      if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
+         return FALSE;
+
+      if (!StringEndsWith(GetValue('Email', Gdn::Session()->User, NULL), "@{$this->WhitelistDomain}"))
+         return FALSE;
+      
+      return TRUE;
    }
 
    /**
@@ -237,8 +249,9 @@ pageTracker._trackPageview();
          strcasecmp($Sender->RequestMethod, 'plugins') == 0
          || strcasecmp($Sender->RequestMethod, 'applications') == 0
       ) {
-			if (Debug()) {
-				$Sender->InformMessage('You can see this page because the site is in debug mode.');
+         
+         if ($this->HasInfPermission()) {
+				$Sender->InformMessage('You can see this page because you have special permission.');
             return;
 			} else
 				throw PermissionException();
