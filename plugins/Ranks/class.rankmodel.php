@@ -30,6 +30,9 @@ class RankModel extends Gdn_Model {
          }
       }
       
+      if (!isset($RankID))
+         return $Result;
+      
       if (isset($RankID) && $RankID == $CurrentRankID)
          return $Result;
       
