@@ -727,198 +727,201 @@
  * Editor action styles within editor and post
  */
 /* line 5, ../sass/_wysiwyg.scss */
-.wysiwyg-font-size-smaller {
+.post-font-size-smaller {
   font-size: smaller;
 }
 
 /* line 9, ../sass/_wysiwyg.scss */
-.wysiwyg-font-size-larger {
+.post-font-size-larger {
   font-size: larger;
 }
 
 /* line 13, ../sass/_wysiwyg.scss */
-.wysiwyg-font-size-xx-large {
+.post-font-size-xx-large {
   font-size: xx-large;
 }
 
 /* line 17, ../sass/_wysiwyg.scss */
-.wysiwyg-font-size-x-large {
+.post-font-size-x-large {
   font-size: x-large;
 }
 
 /* line 21, ../sass/_wysiwyg.scss */
-.wysiwyg-font-size-large {
+.post-font-size-large {
   font-size: large;
 }
 
 /* line 25, ../sass/_wysiwyg.scss */
-.wysiwyg-font-size-medium {
+.post-font-size-medium {
   font-size: medium;
 }
 
 /* line 29, ../sass/_wysiwyg.scss */
-.wysiwyg-font-size-small {
+.post-font-size-small {
   font-size: small;
 }
 
 /* line 33, ../sass/_wysiwyg.scss */
-.wysiwyg-font-size-x-small {
+.post-font-size-x-small {
   font-size: x-small;
 }
 
 /* line 37, ../sass/_wysiwyg.scss */
-.wysiwyg-font-size-xx-small {
+.post-font-size-xx-small {
   font-size: xx-small;
 }
 
 /* line 41, ../sass/_wysiwyg.scss */
-.wysiwyg-color-black {
+.post-color-black {
   color: black;
 }
 
 /* line 45, ../sass/_wysiwyg.scss */
-.wysiwyg-color-silver {
+.post-color-silver {
   color: silver;
 }
 
 /* line 49, ../sass/_wysiwyg.scss */
-.wysiwyg-color-gray {
+.post-color-gray {
   color: gray;
 }
 
 /* line 53, ../sass/_wysiwyg.scss */
-.wysiwyg-color-white {
+.post-color-white {
   color: white;
 }
 
 /* line 57, ../sass/_wysiwyg.scss */
-.wysiwyg-color-maroon {
+.post-color-maroon {
   color: maroon;
 }
 
 /* line 61, ../sass/_wysiwyg.scss */
-.wysiwyg-color-red {
+.post-color-red {
   color: red;
 }
 
 /* line 65, ../sass/_wysiwyg.scss */
-.wysiwyg-color-purple {
+.post-color-purple {
   color: purple;
 }
 
 /* line 69, ../sass/_wysiwyg.scss */
-.wysiwyg-color-fuchsia {
+.post-color-fuchsia {
   color: fuchsia;
 }
 
 /* line 73, ../sass/_wysiwyg.scss */
-.wysiwyg-color-green {
+.post-color-green {
   color: green;
 }
 
 /* line 77, ../sass/_wysiwyg.scss */
-.wysiwyg-color-lime {
+.post-color-lime {
   color: lime;
 }
 
 /* line 81, ../sass/_wysiwyg.scss */
-.wysiwyg-color-olive {
+.post-color-olive {
   color: olive;
 }
 
 /* line 85, ../sass/_wysiwyg.scss */
-.wysiwyg-color-yellow {
+.post-color-yellow {
   color: yellow;
 }
 
 /* line 89, ../sass/_wysiwyg.scss */
-.wysiwyg-color-navy {
+.post-color-navy {
   color: navy;
 }
 
 /* line 93, ../sass/_wysiwyg.scss */
-.wysiwyg-color-blue {
+.post-color-blue {
   color: blue;
 }
 
 /* line 97, ../sass/_wysiwyg.scss */
-.wysiwyg-color-teal {
+.post-color-teal {
   color: teal;
 }
 
 /* line 101, ../sass/_wysiwyg.scss */
-.wysiwyg-color-aqua {
+.post-color-aqua {
   color: aqua;
 }
 
 /* line 105, ../sass/_wysiwyg.scss */
-.wysiwyg-text-align-right {
+.post-text-align-right {
   text-align: right;
 }
 
 /* line 109, ../sass/_wysiwyg.scss */
-.wysiwyg-text-align-center {
+.post-text-align-center {
   text-align: center;
 }
 
 /* line 113, ../sass/_wysiwyg.scss */
-.wysiwyg-text-align-left {
+.post-text-align-left {
   text-align: left;
 }
 
 /* line 117, ../sass/_wysiwyg.scss */
-.wysiwyg-text-align-justify {
+.post-text-align-justify {
   text-align: justify;
 }
 
 /* line 121, ../sass/_wysiwyg.scss */
-.wysiwyg-float-left {
+.post-float-left {
   float: left;
   margin: 0 8px 8px 0;
 }
 
 /* line 126, ../sass/_wysiwyg.scss */
-.wysiwyg-float-right {
+.post-float-right {
   float: right;
   margin: 0 0 8px 8px;
 }
 
 /* line 131, ../sass/_wysiwyg.scss */
-.wysiwyg-clear-right {
+.post-clear-right {
   clear: right;
 }
 
 /* line 135, ../sass/_wysiwyg.scss */
-.wysiwyg-clear-left {
+.post-clear-left {
   clear: left;
 }
 
 /* Custom classes */
-/* del */
-/* line 144, ../sass/_wysiwyg.scss */
+/* line 143, ../sass/_wysiwyg.scss */
 .Delete {
   text-decoration: line-through;
 }
 
-/* blockquote */
-/* line 149, ../sass/_wysiwyg.scss */
+/* line 147, ../sass/_wysiwyg.scss */
 .Quote {
   padding-left: 20px;
   border-left: 5px solid rgba(0, 0, 0, 0.1);
 }
 
-/* blockquote */
-/* line 155, ../sass/_wysiwyg.scss */
-.CodeBlock {
+/* line 152, ../sass/_wysiwyg.scss */
+pre.CodeBlock {
   font-family: monospace;
+  margin: 0 !important;
   padding-left: 20px;
   border-left: 5px solid rgba(0, 0, 0, 0.2);
   background-color: rgba(0, 0, 0, 0.1);
   white-space: nowrap;
+  border: 2px solid red;
 }
 
-/* div */
-/* line 164, ../sass/_wysiwyg.scss */
+/* line 163, ../sass/_wysiwyg.scss */
+.CodeInline {
+  font-family: monospace;
+}
+
+/* line 167, ../sass/_wysiwyg.scss */
 .Spoiler {
   color: transparent;
   height: 20px;
@@ -930,7 +933,7 @@
   box-shadow: 0 -4px 5px -5px rgba(0, 0, 0, 0.2), 0 4px 5px -5px rgba(0, 0, 0, 0.2);
 }
 
-/* line 175, ../sass/_wysiwyg.scss */
+/* line 178, ../sass/_wysiwyg.scss */
 .Spoiler:hover {
   transition: all 0.1s ease-in;
   height: auto;
@@ -944,113 +947,108 @@
  * Editor toolbar 
  */
 /* If JS disabled */
-/* line 13, ../sass/editor.scss */
+/* line 10, ../sass/editor.scss */
 .editor {
   display: none;
 }
 
-/* line 17, ../sass/editor.scss */
+/* line 14, ../sass/editor.scss */
 .js-editor-active .editor {
   display: block;
 }
 
-/* line 21, ../sass/editor.scss */
+/* line 18, ../sass/editor.scss */
 .editor {
   background-color: #999999;
   background-color: rgba(0, 0, 0, 0.4);
   padding: 5px;
-  margin: 0 0 -5px 0;
 }
 
-/* line 28, ../sass/editor.scss */
-.FormWrapper-Condensed .editor {
-  margin: 0;
-}
-
-/* Editing comments in a discussion on the fly */
-/* line 33, ../sass/editor.scss */
-.FormWrapper-Condensed .editor-inline-otf {
-  margin: 0 0 -5px 0;
-}
-
-/* line 37, ../sass/editor.scss */
+/* line 24, ../sass/editor.scss */
 .editor-help-text {
   font-size: 11px;
 }
 
-/* wysihtml5 lib does not insert proper inline style to hide textarea in Chrome */
-/**/
-/* line 45, ../sass/editor.scss */
+/* TODO wysihtml5 lib does not insert proper inline style to hide textarea in Chrome */
+/* line 30, ../sass/editor.scss */
 .editor .icon {
   display: inline;
   padding: 5px 8px;
-  margin: 0 -1px;
+  margin: 0 1px;
   color: #F7F7F7;
   border: 1px solid transparent;
   cursor: pointer;
 }
 
 /* State of icons */
-/* line 59, ../sass/editor.scss */
+/* line 43, ../sass/editor.scss */
 .editor .icon:hover,
 .wysihtml5-command-active,
 .wysihtml5-action-active,
 .wysihtml5-command-dialog-opened {
   border-radius: 2px;
   background-color: #666666;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #fff !important;
 }
 
-/* line 64, ../sass/editor.scss */
-.editor .editor-action-disabled {
-  background-color: transparent !important;
-  opacity: 0.25;
-  cursor: default;
-  pointer-events: none;
-}
-
-/* line 71, ../sass/editor.scss */
-.editor .editor-action-hidden {
-  display: none;
-}
-
-/* line 75, ../sass/editor.scss */
+/* line 50, ../sass/editor.scss */
 .editor .editor-sep {
   border-left: 1px solid #888888;
-  margin: 0 8px 0 5px;
+  margin: 0 5px;
 }
 
-/* line 80, ../sass/editor.scss */
+/* line 55, ../sass/editor.scss */
 .editor .editor-dropdown {
   display: inline-block;
   position: relative;
 }
 
-/* For links and images, flyout */
-/* line 86, ../sass/editor.scss */
+/* Clicking on down caret does nothing, so let click seep through to parent */
+/* line 61, ../sass/editor.scss */
+.editor .icon-caret-down {
+  font-size: 75%;
+  pointer-events: none;
+  margin-left: 6px;
+  position: relative;
+  top: -2px;
+}
+
+/* For dropdowns */
+/* line 72, ../sass/editor.scss */
 .editor-insert-dialog {
-  margin: 5px 0 0 -1px;
+  margin: 5px 0 0 0;
   padding: 5px;
   width: 300px;
   position: absolute;
   z-index: 100;
+  display: none !important;
 }
 
-/* line 94, ../sass/editor.scss */
+/* Set important to override strange behaviour of wysihtml5 auto-adding 
+inline style to editors already loaded on page, when loading a fresh one 
+TODO disable wysihtml5 code that does this. */
+/* line 85, ../sass/editor.scss */
+.editor-dropdown-open .editor-insert-dialog {
+  display: block !important;
+}
+
+/* line 89, ../sass/editor.scss */
 .editor-insert-dialog input.InputBox {
   width: 97.5%;
 }
 
-/* line 98, ../sass/editor.scss */
+/* line 93, ../sass/editor.scss */
 .editor-insert-dialog hr {
   margin: 0 0 10px 0;
 }
 
-/* line 102, ../sass/editor.scss */
+/* line 97, ../sass/editor.scss */
 .editor-colors-flyout {
   width: 92px;
 }
 
-/* line 106, ../sass/editor.scss */
+/* line 101, ../sass/editor.scss */
 .editor-colors-flyout .color {
   width: 20px;
   height: 20px;
@@ -1060,76 +1058,61 @@
   border: 1px solid transparent;
 }
 
-/* line 116, ../sass/editor.scss */
+/* line 111, ../sass/editor.scss */
 .editor-colors-flyout .color:hover,
 .editor-colors-flyout .wysihtml5-command-active {
   border: 1px solid #fff;
 }
 
-/* line 120, ../sass/editor.scss */
-.editor-colors-flyout .color-black {
-  background-color: black;
+/**
+ * Headers dropdown
+ */
+/* line 119, ../sass/editor.scss */
+.editor-headers-flyout {
+  padding: 5px 0;
+  width: auto;
 }
 
 /* line 124, ../sass/editor.scss */
-.editor-colors-flyout .color-white {
-  background-color: white;
+.editor-headers-flyout .wysihtml5-command-active {
+  border-radius: 0;
 }
 
 /* line 128, ../sass/editor.scss */
-.editor-colors-flyout .color-gray {
-  background-color: gray;
+.editor-headers-flyout .editor-action-h1 {
+  font-size: 18px;
+  line-height: 28px !important;
 }
 
-/* line 132, ../sass/editor.scss */
-.editor-colors-flyout .color-silver {
-  background-color: silver;
+/* line 133, ../sass/editor.scss */
+.editor-headers-flyout .editor-action-h2 {
+  font-size: 16px;
 }
 
-/* line 136, ../sass/editor.scss */
-.editor-colors-flyout .color-maroon {
-  background-color: maroon;
+/**
+ * Emoji dropdown
+ */
+/* line 142, ../sass/editor.scss */
+.editor-emoji-flyout {
+  width: 120px;
 }
 
-/* line 140, ../sass/editor.scss */
-.editor-colors-flyout .color-red {
-  background-color: red;
+/* line 146, ../sass/editor.scss */
+.editor-emoji-flyout .emoji {
+  padding: 5px;
 }
 
-/* line 144, ../sass/editor.scss */
-.editor-colors-flyout .color-purple {
-  background-color: purple;
-}
-
-/* line 148, ../sass/editor.scss */
-.editor-colors-flyout .color-green {
-  background-color: green;
-}
-
-/* line 152, ../sass/editor.scss */
-.editor-colors-flyout .color-olive {
-  background-color: olive;
-}
-
-/* line 156, ../sass/editor.scss */
-.editor-colors-flyout .color-navy {
-  background-color: navy;
-}
-
-/* line 160, ../sass/editor.scss */
-.editor-colors-flyout .color-blue {
-  background-color: blue;
-}
-
-/* line 164, ../sass/editor.scss */
-.editor-colors-flyout .color-lime {
-  background-color: lime;
+/* line 150, ../sass/editor.scss */
+.editor-emoji-flyout .emoji:hover {
+  cursor: pointer;
+  border-radius: 2px;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 /**
  * Going full page 
  */
-/* line 173, ../sass/editor.scss */
+/* line 160, ../sass/editor.scss */
 .editor-toggle-fullpage-button {
   cursor: pointer;
   float: right;
@@ -1137,10 +1120,10 @@
 }
 
 /* Added to body class witj js, so force specificity for everything 
-below; this makes editing very easy */
+   below; this makes editing very easy */
 /* Background overlay. No need to insert empty div in markup; doing so at the 
 current location, due to event insertion, makes z-index troublesome. */
-/* line 187, ../sass/editor.scss */
+/* line 174, ../sass/editor.scss */
 .js-editor-fullpage:after {
   content: ' ';
   display: block;
@@ -1156,7 +1139,7 @@ current location, due to event insertion, makes z-index troublesome. */
 }
 
 /* .FormWrapper */
-/* line 202, ../sass/editor.scss */
+/* line 189, ../sass/editor.scss */
 .js-editor-fullpage #editor-fullpage-candidate {
   position: absolute;
   z-index: 1000;
@@ -1165,20 +1148,20 @@ current location, due to event insertion, makes z-index troublesome. */
   left: 20%;
   width: auto;
   background-color: transparent;
-  padding: 0;
+  padding: 0 0 20px 0;
   animation-duration: .4s;
   animation-name: editor-anim-editor;
 }
 
 /* Temp, take this out when you figure out the element that is restricting 
-this child from going truly absolute */
-/* line 217, ../sass/editor.scss */
+   this child from going truly absolute */
+/* line 204, ../sass/editor.scss */
 .js-editor-fullpage .EditCommentForm #editor-fullpage-candidate {
   position: fixed;
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
-/* line 224, ../sass/editor.scss */
+/* line 210, ../sass/editor.scss */
 .js-editor-fullpage .TextBoxWrapper #Form_Body,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
   width: 100% !important;
@@ -1186,36 +1169,114 @@ this child from going truly absolute */
 }
 
 @keyframes editor-anim-overlay {
-  /* line 230, ../sass/editor.scss */
+  /* line 216, ../sass/editor.scss */
   from {
     opacity: 0;
   }
 
-  /* line 233, ../sass/editor.scss */
+  /* line 219, ../sass/editor.scss */
   to {
     opacity: 1;
   }
 }
 
 @keyframes editor-anim-editor {
-  /* line 239, ../sass/editor.scss */
+  /* line 225, ../sass/editor.scss */
   0% {
     top: -1000px;
     opacity: 0;
     transform: scale(1.25);
   }
 
-  /* line 244, ../sass/editor.scss */
+  /* line 230, ../sass/editor.scss */
   75% {
     top: 60px;
     opacity: 0.75;
     transform: scale(0.75);
   }
 
-  /* line 249, ../sass/editor.scss */
+  /* line 235, ../sass/editor.scss */
   100% {
     top: 20px;
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/**
+ * Hide some actions per editor view.
+ *
+ * Html, BBCode, and Markdown views have slight differences than the Wysiwyg, 
+ * so hide the particular ones 
+ */
+/* line 267, ../sass/editor.scss */
+.editor-format-html .editor-toggle-source,
+.editor-format-bbcode .editor-toggle-source,
+.editor-format-markdown .editor-toggle-source,
+.editor-format-html .sep-switches,
+.editor-format-bbcode .sep-switches,
+.editor-format-markdown .sep-switches,
+.editor-format-markdown .sep-format,
+.editor-format-markdown .icon-align-left,
+.editor-format-markdown .icon-align-center,
+.editor-format-markdown .icon-align-right,
+.editor-format-html .editor-image-align,
+.editor-format-bbcode .editor-image-align,
+.editor-format-markdown .editor-image-align,
+.editor-format-bbcode .editor-action-h1,
+.editor-format-bbcode .editor-action-h2 {
+  display: none;
+}
+
+/**
+ * Brute force hide other editors enabled after this one.
+ *
+ * In case some of the other editors were enabled after this one, just have 
+ * them hidden from page, essentially making this editor the veto. This is 
+ * a last ditch effort to at least make sure editor is usable when others 
+ * are enabled. 
+ */
+/* line 281, ../sass/editor.scss */
+.js-editor-active .cleditorMain iframe {
+  display: none !important;
+}
+
+/* line 285, ../sass/editor.scss */
+.js-editor-active .cleditorMain .wysihtml5-sandbox {
+  display: block !important;
+}
+
+/* line 291, ../sass/editor.scss */
+.js-editor-active .cleditorToolbar,
+.js-editor-active .ButtonBar,
+.js-editor-active .ButtonBarMarkupHint {
+  display: none !important;
+}
+
+/* Media query: Hiding non-essential buttons */
+@media (max-width: 767px) {
+  /* line 298, ../sass/editor.scss */
+  .hidden-xs {
+    display: none !important;
+  }
+
+  /* line 302, ../sass/editor.scss */
+  .js-editor-fullpage #editor-fullpage-candidate {
+    top: -60px;
+    left: 0;
+    right: 0;
+  }
+
+  /* line 309, ../sass/editor.scss */
+  .js-editor-fullpage .TextBoxWrapper #Form_Body,
+  .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+    height: auto !important;
+  }
+
+  /* This is not necessary or very specific, but on mobile, apple products 
+     add rounded corners */
+  /* line 315, ../sass/editor.scss */
+  textarea {
+    border-radius: 0;
   }
 }

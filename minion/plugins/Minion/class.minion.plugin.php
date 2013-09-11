@@ -1037,7 +1037,7 @@ class MinionPlugin extends Gdn_Plugin {
       $Body = preg_replace('!\[spoiler\]!i', "\n[spoiler]\n", $Body);
       $Body = preg_replace('!\[/spoiler\]!i', "\n[/spoiler]\n", $Body);
       
-      $Spoilers = preg_match_all('!\[/spoiler\]!i', $Body);
+      $Spoilers = preg_match_all('!\[/spoiler\]!i', $Body, $Matches);
       if ($Spoilers) {
          $ns = $Spoilers+1;
          $Body = preg_replace_callback('!\[/spoiler\]!i', function($Matches) use (&$ns){
