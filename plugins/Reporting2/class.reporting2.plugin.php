@@ -41,9 +41,58 @@ class Reporting2Plugin extends Gdn_Plugin {
             'Sort' => 1000);
          $ID = $CategoryModel->Save($Row);
       }
+
+      // Turn off Flagging & Reporting plugins (upgrade)
+      RemoveFromConfig('EnabledPlugins.Flagging');
+      RemoveFromConfig('EnabledPlugins.Reporting');
+   }
+
+   /// Controller ///
+
+   /**
+    * Handles report actions.
+    *
+    * @param $Sender
+    * @param $RecordType
+    * @param $ReportType
+    * @param $ID
+    * @throws Gdn_UserException
+    */
+   public function RootController_Report_Create($Sender, $RecordType, $ReportType, $ID) {
+      if (!Gdn::Session()->IsValid())
+         throw new Gdn_UserException(T('You need to sign in before you can do this.'), 403);
+
+      $Sender->Form = new Gdn_Form();
+      $Sender->SetData('Title', sprintf(T('Report %1s %2s'), $ReportType, $RecordType));
+
+      
+
+      $Sender->Render('report', '', 'plugins/Reporting2');
    }
    
    /// Event Handlers ///
+
+   /**
+    * Make sure Reactions' flags are triggered, but remove Spam if present.
+    */
+   public function Base_BeforeFlag_Handler($Sender, $Args) {
+      if (empty($Args['Flags']))
+         $Args['Flags'] = TRUE;
+      elseif (isset($Args['Flags']['spam']))
+         unset($Args['Flags']['spam']);
+   }
+
+   /**
+    * Add reporting options to discussions & comments under Flag menu.
+    */
+   public function Base_AfterFlagOptions_Handler($Sender, $Args) {
+      $Options = array('Spam', 'Inappropriate');
+      foreach ($Options as $Name) {
+         $Text = Sprite('React'.$Name, 'ReactSprite').' '.Wrap(T($Name), 'span', array('class' => 'ReactLabel'));
+         echo Wrap(Anchor($Text, 'report/'.$Args['RecordType'].'/'.strtolower($Name).'/'.$Args['RecordID'],
+            'Popup ReactButton ReactButton-'.$Name, array('title'=>$Name, 'rel'=>"nofollow")), 'li');
+      }
+   }
 }
 
 if (!function_exists('FormatQuote')):
