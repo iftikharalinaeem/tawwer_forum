@@ -175,16 +175,13 @@ class EditorPlugin extends Gdn_Plugin {
          ':p'          => 'stuck_out_tongue',
          ':\'('        => 'cry',
          ':|'          => 'neutral_face',
-         'D:'          => 'anguished',
-         '8)'          => 'sunglasses',
-         'o:)'         => 'innocent',
-         ':+1:'        => '+1',
-         ':-1:'        => '-1',
-         '>:)'         => 'smiling_imp', 
+//         'D:'          => 'anguished',
+         'B)'          => 'sunglasses',
          ':#'          => 'grin',
-         ':sleeping:'  => 'sleeping',
+         'o:)'         => 'innocent',
          '<3'          => 'heart',
-         ':triumph:'   => 'triumph'
+         '(*)'         => 'star',
+         '>:)'         => 'smiling_imp'
        );
 
       return (!$emojiAlias)
@@ -268,7 +265,9 @@ class EditorPlugin extends Gdn_Plugin {
         'sleeping'                     => array('sleeping', '753'),  
         'dizzy_face'                   => array('dizzy_face', '754'),  
         'no_mouth'                     => array('no_mouth', '755'),  
-        'mask'                         => array('mask', '756'),  
+        'mask'                         => array('mask', '756'),
+        'star'                         => array('star', '123'),
+        'cookie'                       => array('cookie', '262'),
 
         // Love
         'heart'                        => array('heart', '109'),  
