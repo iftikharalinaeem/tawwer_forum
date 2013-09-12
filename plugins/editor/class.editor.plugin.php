@@ -1,13 +1,13 @@
 <?php if(!defined('APPLICATION')) die();
 
 $PluginInfo['editor'] = array(
-   'Name' => 'editor',
+   'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
    'Version' => '1.0.0',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
-   'RequiredApplications' => array('Vanilla' => '>=2'),
+   'RequiredApplications' => array('Vanilla' => '>=2.2'),
    'RequiredTheme' => false, 
    'RequiredPlugins' => false,
    'HasLocale' => false,
@@ -175,16 +175,13 @@ class EditorPlugin extends Gdn_Plugin {
          ':p'          => 'stuck_out_tongue',
          ':\'('        => 'cry',
          ':|'          => 'neutral_face',
-         'D:'          => 'anguished',
-         '8)'          => 'sunglasses',
-         'o:)'         => 'innocent',
-         ':+1:'        => '+1',
-         ':-1:'        => '-1',
-         '>:)'         => 'smiling_imp', 
+//         'D:'          => 'anguished',
+         'B)'          => 'sunglasses',
          ':#'          => 'grin',
-         ':sleeping:'  => 'sleeping',
+         'o:)'         => 'innocent',
          '<3'          => 'heart',
-         ':triumph:'   => 'triumph'
+         '(*)'         => 'star',
+         '>:)'         => 'smiling_imp'
        );
 
       return (!$emojiAlias)
@@ -268,7 +265,9 @@ class EditorPlugin extends Gdn_Plugin {
         'sleeping'                     => array('sleeping', '753'),  
         'dizzy_face'                   => array('dizzy_face', '754'),  
         'no_mouth'                     => array('no_mouth', '755'),  
-        'mask'                         => array('mask', '756'),  
+        'mask'                         => array('mask', '756'),
+        'star'                         => array('star', '123'),
+        'cookie'                       => array('cookie', '262'),
 
         // Love
         'heart'                        => array('heart', '109'),  
@@ -458,7 +457,7 @@ class EditorPlugin extends Gdn_Plugin {
              array('edit' => 'format', 'action'=> 'quote', 'type' => 'button',    'text' => 'Quote', 'attr' => array('class' => 'editor-action editor-action-quote editor-dialog-fire-close', 'data-wysihtml5-command' => 'blockquote', 'title' => 'Quote', 'data-editor' => '{"action":"quote","value":""}')),
              array('edit' => 'format', 'action'=> 'code', 'type' => 'button',     'text' => 'Code', 'attr' => array('class' => 'editor-action editor-action-code editor-dialog-fire-close', 'data-wysihtml5-command' => 'code', 'title' => 'Code', 'data-editor' => '{"action":"code","value":""}')),
              array('edit' => 'format', 'action'=> 'spoiler', 'type' => 'button', 'text' => 'Spoiler', 'attr' => array('class' => 'editor-action editor-action-spoiler editor-dialog-fire-close', 'data-wysihtml5-command' => 'spoiler', 'title' => 'Spoiler', 'data-editor' => '{"action":"spoiler","value":""}')),
-         ), 'attr' => array('class' => 'icon icon-edit editor-dd-format', 'title' => 'Format', 'data-editor' => '{"action":"format","value":""}'));
+         ), 'attr' => array('class' => 'icon icon-paragraph editor-dd-format', 'title' => 'Format', 'data-editor' => '{"action":"format","value":""}'));
       
       $editorToolbarAll['sep-media'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-media hidden-xs'));
       $editorToolbarAll['emoji'] = array('edit' => 'media', 'action'=> 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => 'Emoji'));
@@ -524,18 +523,29 @@ class EditorPlugin extends Gdn_Plugin {
     * 
     * @param Gdn_Form $Sender 
     */
-   public function Gdn_Form_BeforeBodyBox_Handler($Sender) 
-   {
+   public function Gdn_Form_BeforeBodyBox_Handler($Sender) {
       // TODO move this property to constructor
-      $this->Format = $Sender->GetValue('Format', C('Garden.InputFormatter','Html'));
+      $this->Format = $Sender->GetValue('Format');
+      
+      // Make sure we have some sort of format.
+      if (!$this->Format) {
+         $this->Format = C('Garden.InputFormatter','Html');
+         $Sender->SetValue('Format', $this->Format);
+      }
       
       if (in_array($this->Format, $this->Formats)) {    
-
          $c = Gdn::Controller();
          
          // This js file will asynchronously load the assets of each editor 
          // view when required. This will prevent unnecessary requests.
          $c->AddJsFile('editor.js', 'plugins/editor');
+         
+         switch (strtolower($this->Format)) {
+            case 'wysiwyg':
+               $c->AddJsFile('wysiwyg5.js', 'plugins/editor');
+               break;
+         }
+         
          // Set minor data for view
          $c->SetData('_EditorInputFormat', $this->Format);
          // Set definitions for JavaScript
@@ -585,7 +595,8 @@ class EditorPlugin extends Gdn_Plugin {
 	public function Setup() {        
       $pluginEditors = array(
           'cleditor', 
-          'ButtonBar'
+          'ButtonBar',
+          'Emotify'
       );
       
       foreach ($pluginEditors as $pluginName) {
