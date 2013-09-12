@@ -852,7 +852,10 @@ TODO disable wysihtml5 code that does this. */
 }
 
 .editor-insert-dialog input.InputBox {
-  width: 97.5%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .editor-insert-dialog hr {
