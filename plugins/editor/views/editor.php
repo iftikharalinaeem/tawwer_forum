@@ -23,7 +23,7 @@
             foreach ($button['type'] as $button_option) {
                
                // If any text, use it
-               $action_text = ($button_option['text']) 
+               $action_text = isset($button_option['text']) 
                    ? $button_option['text']
                    : '';
                
