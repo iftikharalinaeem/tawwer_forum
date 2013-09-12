@@ -63,11 +63,12 @@ jQuery(function() {
        */
       case 'wysiwyg':
          
-         //$(currentEditableTextarea).css('visibility', 'hidden');
+         // Slight flicker where textarea content is visible initially
+         $(currentEditableTextarea).css('visibility', 'hidden');
          
          // Load script for wysiwyg editor async
          $.getScript(assets + "/js/wysihtml5.js", function(data, textStatus, jqxhr) {
-            
+                        
             /**
              * Default editor values when first instantiated on page. Later, on DOM
              * mutations, these values are updated per editable comment.
@@ -111,7 +112,9 @@ jQuery(function() {
 
             // load resizer
             editor.on('load', function() {
-               $(editor.composer.iframe).wysihtml5_size_matters();  
+               $(editor.composer.iframe).wysihtml5_size_matters();
+               // Make visible again for Html toggling.
+               $(currentEditableTextarea).css('visibility', '');
             });  
             
 
@@ -196,7 +199,6 @@ jQuery(function() {
                 }
               };
             })(wysihtml5);
-
          });
          
          break;

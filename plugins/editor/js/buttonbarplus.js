@@ -222,7 +222,9 @@ jQuery(document).ready(function($) {
       
       Const: {
          URL_PREFIX: 'http://', 
-         EMOJI_ALIAS_REGEX: /^[\:\)\(\;\>\<\#\-\+\&\\\|\/a-zA-Z0-9]+$/
+         //EMOJI_ALIAS_REGEX: /^[\:\'\*\)\(\;\>\<\#\-\+\&\\\|\/a-zA-Z0-9]+$/
+         // let all emojis through 
+         EMOJI_ALIAS_REGEX: /./
       },
       
       AttachTo: function(TextArea, format) {
@@ -237,7 +239,7 @@ jQuery(document).ready(function($) {
          $(TextArea).data('InputFormat', format);
 
          // Attach events
-         $(ThisButtonBar).find('.editor-action').mousedown(function(event){
+         $(ThisButtonBar).find('.editor-action').on('mousedown', function(event){
             
             var MyButtonBar = $(event.target).closest('.editor');
             var Button = $(event.target);
@@ -247,10 +249,19 @@ jQuery(document).ready(function($) {
 
             var Operation = '';
             var Value = '';
-            
+
             if ($(Button).data('editor')) {
-               Operation = $(Button).data('editor').action;
-               Value = $(Button).data('editor').value;
+               // :\ and :'( break object and return string, while server 
+               // needs to add slashes. Without addslashes :\ does not work but 
+               // :'( does, while with addslashes :\ works.
+               if (typeof $(Button).data('editor') == 'object') {
+                  Operation = $(Button).data('editor').action;
+                  Value = $(Button).data('editor').value;
+               } else if (typeof $(Button).data('editor') == 'string') {
+                  var objFix = eval("("+$(Button).data('editor')+")");
+                  Operation = objFix.action;
+                  Value = objFix.value;
+               }
             }
            
             // when checking value, make sure user did not type their own, as 
@@ -260,7 +271,7 @@ jQuery(document).ready(function($) {
             if (Operation == 'emoji' 
             && Value.length 
             && !(ButtonBar.Const.EMOJI_ALIAS_REGEX.test(Value))) {
-               Value = 'tamp'; // was tampered with.
+               Value = ':warning:'; // was tampered with.
             }
 
             ButtonBar.Perform(TargetTextArea, Operation, event, Value);

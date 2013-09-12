@@ -453,7 +453,7 @@ class EditorPlugin extends Gdn_Plugin {
       foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
          $emojiFilePath          = $this->getEmojiCanonicalList($emojiCanonical);
          //$editorDataAttr         = '{"action":"emoji","value":"'. htmlentities($emojiAlias) .'"}';
-         $editorDataAttr         = '{"action":"emoji","value":"'. $emojiAlias .'"}';
+         $editorDataAttr         = '{"action":"emoji","value":"'. addslashes($emojiAlias) .'"}';
          $emojiDimension         = $this->emojiDimension;
          //$emojiStyle           = 'background-image: url('. $emojiFilePath .'); background-size: '. $emojiDimension .'px; width: '.$emojiDimension .'px; height:'. $emojiDimension .'px;';
          $emojiStyle             = '';
