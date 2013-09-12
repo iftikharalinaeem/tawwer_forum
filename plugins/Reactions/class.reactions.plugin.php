@@ -215,13 +215,14 @@ class ReactionsPlugin extends Gdn_Plugin {
    public function Base_BeforeCommentRender_Handler($Sender) {
       include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
    }
-   
-   public function ActivityController_AfterActivityBody_Handler($Sender, $Args) {
+
+   // Moved to core w/ stub
+/*   public function ActivityController_AfterActivityBody_Handler($Sender, $Args) {
       $Activity = $Args['Activity'];
       if (in_array(GetValue('ActivityType', $Activity), array('Status', 'WallPost'))) {
          WriteReactions($Activity);
       }
-   }
+   }*/
    
 //   public function DiscussionController_CommentHeading_Handler($Sender, $Args) {
 //      WriteOrderByButtons();
@@ -630,3 +631,98 @@ class ReactionsPlugin extends Gdn_Plugin {
 		endif;		
 	}
 }
+
+if (!function_exists('WriteReactions')):
+   function WriteReactions($Row) {
+      $Attributes = GetValue('Attributes', $Row);
+      if (is_string($Attributes)) {
+         $Attributes = @unserialize($Attributes);
+         SetValue('Attributes', $Row, $Attributes);
+      }
+
+      static $Types = NULL;
+      if ($Types === NULL)
+         $Types = ReactionModel::GetReactionTypes(array('Class' => array('Good', 'Bad'), 'Active' => 1));
+      Gdn::Controller()->EventArguments['ReactionTypes'] = $Types;
+
+      if ($ID = GetValue('CommentID', $Row)) {
+         $RecordType = 'comment';
+      } elseif ($ID = GetValue('ActivityID', $Row)) {
+         $RecordType = 'activity';
+      } else {
+         $RecordType = 'discussion';
+         $ID = GetValue('DiscussionID', $Row);
+      }
+      Gdn::Controller()->EventArguments['RecordType'] = $RecordType;
+      Gdn::Controller()->EventArguments['RecordID'] = $ID;
+
+
+      if (C('Plugins.Reactions.ShowUserReactions', TRUE))
+         WriteRecordReactions($Row);
+
+      echo '<div class="Reactions">';
+      Gdn_Theme::BulletRow();
+
+      // Write the flags.
+      static $Flags = NULL, $FlagCodes = NULL;
+      if ($Flags === NULL) {
+         $Flags = ReactionModel::GetReactionTypes(array('Class' => 'Flag', 'Active' => 1));
+         $FlagCodes = array();
+         foreach ($Flags as $Flag) {
+            $FlagCodes[] = $Flag['UrlCode'];
+         }
+         Gdn::Controller()->EventArguments['Flags'] = &$Flags;
+         Gdn::Controller()->FireEvent('Flags');
+      }
+
+      // Allow addons to work with flags
+      Gdn::Controller()->EventArguments['Flags'] = &$Flags;
+      Gdn::Controller()->FireEvent('BeforeFlag');
+
+      if (!empty($Flags)) {
+         echo Gdn_Theme::BulletItem('Flags');
+
+         echo ' <span class="FlagMenu ToggleFlyout">';
+         // Write the handle.
+         echo ReactionButton($Row, 'Flag', array('LinkClass' => 'FlyoutButton'));
+//            echo Sprite('SpFlyoutHandle', 'Arrow');
+         echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
+         foreach ($Flags as $Flag) {
+            if (is_callable($Flag))
+               echo '<li>'.call_user_func($Flag, $Row, $RecordType, $ID).'</li>';
+            else
+               echo '<li>'.ReactionButton($Row, $Flag['UrlCode']).'</li>';
+         }
+         Gdn::Controller()->FireEvent('AfterFlagOptions');
+         echo '</ul>';
+         echo '</span> ';
+      }
+      Gdn::Controller()->FireEvent('AfterFlag');
+
+      $Score = FormatScore(GetValue('Score', $Row));
+      echo '<span class="Column-Score Hidden">'.$Score.'</span>';
+
+
+
+      // Write the reactions.
+      echo Gdn_Theme::BulletItem('Reactions');
+      echo '<span class="ReactMenu">';
+      echo '<span class="ReactButtons">';
+      foreach ($Types as $Type) {
+         echo ' '.ReactionButton($Row, $Type['UrlCode']).' ';
+      }
+      echo '</span>';
+      echo '</span>';
+
+      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Reactions.Edit'), FALSE)) {
+         echo Gdn_Theme::BulletItem('ReactionsMod').
+            Anchor(T('Log'), "/reactions/log/{$RecordType}/{$ID}", 'Popup');
+      }
+
+      Gdn::Controller()->FireEvent('AfterReactions');
+
+      echo '</div>';
+      Gdn::Controller()->FireAs('DiscussionController')->FireEvent('Replies');
+   }
+
+endif;

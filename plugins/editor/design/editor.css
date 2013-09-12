@@ -1046,7 +1046,10 @@ pre.CodeBlock {
 
 /* line 86, ../sass/editor.scss */
 .editor-insert-dialog input.InputBox {
-  width: 97.5%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* line 90, ../sass/editor.scss */
