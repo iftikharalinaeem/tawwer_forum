@@ -222,7 +222,7 @@ jQuery(document).ready(function($) {
       
       Const: {
          URL_PREFIX: 'http://', 
-         EMOJI_ALIAS_REGEX: /^[\:\)\(\;\>\<\#\-\+\&\|\/\\a-zA-Z0-9]+$/
+         EMOJI_ALIAS_REGEX: /^[\:\)\(\;\>\<\#\-\+\&\\\|\/a-zA-Z0-9]+$/
       },
       
       AttachTo: function(TextArea, format) {
@@ -307,7 +307,7 @@ jQuery(document).ready(function($) {
          var Value = ' '+Value+' '; // for now just used for emoji to reduce redundancy
          
          // Call performer
-         ButtonBar[PerformMethod](TextArea,Operation, Value);
+         ButtonBar[PerformMethod](TextArea, Operation, Value);
          
          switch (Operation) {
             case 'post':

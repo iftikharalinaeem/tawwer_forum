@@ -75,15 +75,11 @@
    width: 300px;
    position: absolute;
    z-index: 100;
-   display: none !important;
+   display: none;
 }
 
-/* Set important to override strange behaviour of wysihtml5 auto-adding 
-inline style to editors already loaded on page, when loading a fresh one 
-TODO disable wysihtml5 code that does this. */
-
 .editor-dropdown-open .editor-insert-dialog {
-   display: block !important;
+   display: block;
 }
 
 .editor-insert-dialog input.InputBox {
@@ -170,7 +166,9 @@ width: 120px;
 /* Added to body class witj js, so force specificity for everything 
    below; this makes editing very easy */
 
-.js-editor-fullpage{}
+.js-editor-fullpage{
+   overflow: hidden;
+}
 
 /* Background overlay. No need to insert empty div in markup; doing so at the 
 current location, due to event insertion, makes z-index troublesome. */

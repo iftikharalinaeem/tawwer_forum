@@ -86,8 +86,8 @@ class EditorPlugin extends Gdn_Plugin {
     * 
     * @return array List of allowed editor actions
     */
-   public function getAllowedEditorActions() {
-      $allowedEditorActions = array(
+   public function getAllowedEditorActions($name = null, $value = null) {
+      static $allowedEditorActions = array(
           'bold' => true, 
           'italic' => true, 
           'strike' => true, 
@@ -113,7 +113,17 @@ class EditorPlugin extends Gdn_Plugin {
           'fullpage' => true 
       );
       
-      return $allowedEditorActions;
+      if ($name !== null) {
+         if (is_array($name)) {
+            $allowedEditorActions = $name;
+         } elseif ($value !== null) {
+            $allowedEditorActions[$name] = $value;
+         } else {
+            return getValue($name, $allowedEditorActions, null);
+         }
+      } else {
+         return $allowedEditorActions;
+      }
    }
    
    /**
@@ -173,7 +183,7 @@ class EditorPlugin extends Gdn_Plugin {
          ':o'          => 'open_mouth',
          ':s'          => 'confounded',
          ':p'          => 'stuck_out_tongue',
-         ':\'('        => 'cry',
+         ":'("        => 'cry',
          ':|'          => 'neutral_face',
          'D:'          => 'anguished',
          '8)'          => 'sunglasses',
@@ -184,7 +194,8 @@ class EditorPlugin extends Gdn_Plugin {
          ':#'          => 'grin',
          ':sleeping:'  => 'sleeping',
          '<3'          => 'heart',
-         ':triumph:'   => 'triumph'
+         ':triumph:'   => 'triumph', 
+          '(*)' => 'star'
        );
 
       return (!$emojiAlias)
@@ -382,7 +393,7 @@ class EditorPlugin extends Gdn_Plugin {
 			if (strpos($Text, htmlentities($emojiAlias)) !== false) {
 				$Text = preg_replace(
                '/(?<=[>\s])'.preg_quote(htmlentities($emojiAlias)).'(?=\W)/m',
-               ' <img class="post-emoji" src="'. $emojiFilePath .'" title="'. $emojiAlias .'" alt=":'. $emojiCanonical .':" width="'. $emojiDimension .'" /> ',
+               ' <img class="emoji" src="'. $emojiFilePath .'" title="'. $emojiAlias .'" alt=":'. $emojiCanonical .':" width="'. $emojiDimension .'" /> ',
 					$Text
 				);
          }

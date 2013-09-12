@@ -11,11 +11,7 @@
 
          // If the type is not an array, it's a regular button (type==button)
          if (!is_array($button['type'])) {
-            if ($button['type'] == 'separator') {
-                $html_toolbar .= Wrap('', 'span', $button['attr']);
-             } else {
-                $html_toolbar .= Wrap('', 'a', $button['attr']);
-             }
+            $html_toolbar .= Wrap('', 'span', $button['attr']);
          } else {
             // Else this button has dropdown options, so generate them
             $html_button_dropdown_options = '';
@@ -23,7 +19,7 @@
             foreach ($button['type'] as $button_option) {
                
                // If any text, use it
-               $action_text = ($button_option['text']) 
+               $action_text = (array_key_exists('text', $button_option)) 
                    ? $button_option['text']
                    : '';
                
@@ -44,7 +40,7 @@
                   $html_toolbar .= Wrap(
                      Wrap($html_arrow_down, 'a', $button['attr']) .''. 
                      '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink">
-                        <input class="InputBox editor-input-url" data-wysihtml5-dialog-field="href" placeholder="http://" />
+                        <input class="InputBox editor-input-url" data-wysihtml5-dialog-field="href" value="http://" />
                         <hr />
                          <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="OK"/>
                          <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="Cancel"/>
@@ -56,7 +52,7 @@
                   $html_toolbar .= Wrap(
                      Wrap($html_arrow_down, 'a', $button['attr']) .''. 
                      '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="insertImage">
-                        <input class="InputBox editor-input-image" data-wysihtml5-dialog-field="src" placeholder="http://">
+                        <input class="InputBox editor-input-image" data-wysihtml5-dialog-field="src" value="http://">
                         <hr />
                         <label class="editor-image-align">
                          Align:

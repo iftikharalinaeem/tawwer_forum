@@ -376,6 +376,7 @@ jQuery(function() {
             $(formWrapper).attr('id', 'editor-fullpage-candidate');
             bodyEl.addClass('js-editor-fullpage');
             $(toggleButton).addClass('icon-resize-small');
+            window.scrollTo(0, 0);
          } else {
             $(formWrapper).attr('id', '');
             bodyEl.removeClass('js-editor-fullpage');
@@ -453,18 +454,26 @@ jQuery(function() {
     */
    var editorSetupDropdowns = function() { 
       $('.editor-dropdown')
-      .off('click')
-      .on('click', function(e) {
+      .off('click.dd')
+      .on('click.dd', function(e) {
          var parentEl = $(e.target).parent();
+         
+         // Again, tackling with clash from multiple codebases.
+         $('.editor-insert-dialog').each(function(i, el) {
+            setTimeout(function() {
+               $(el).removeAttr('style');
+            }, 0);
+         });
 
          if ($(this).hasClass('editor-dropdown') 
          && $(this).hasClass('editor-dropdown-open')) {
             parentEl.removeClass('editor-dropdown-open');
+            //$(parentEl).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
          } else {
             // clear other opened dropdowns before opening this one
-            $(this).parent('.editor').find('.editor-dropdown-open').each(function() {
-               $(this).removeClass('editor-dropdown-open');
-               $(this).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
+            $(this).parent('.editor').find('.editor-dropdown-open').each(function(i, el) {
+               $(el).removeClass('editor-dropdown-open');
+               $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
             });
 
             parentEl.addClass('editor-dropdown-open');
@@ -486,9 +495,14 @@ jQuery(function() {
       });
 
       $('.editor-dialog-fire-close')
-      .on('click', function(e) {
+      .off('mouseup.fireclose')
+      .on('mouseup.fireclose', function(e) {
          $('.editor-dropdown').each(function(i, el) {
+            
+             //console.log(el);
+            
             $(el).removeClass('editor-dropdown-open');
+            $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
          }); 
       });
    };
