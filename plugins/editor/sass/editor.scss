@@ -8,6 +8,7 @@
 
 /* If JS disabled */
 .editor {
+   font-size: 14px;
    display: none;
 }
 
@@ -16,9 +17,10 @@
 }
 
 .editor {
-	background-color: #999999;
-	background-color: rgba(0, 0, 0, 0.4);
-   padding: 5px;
+   padding: 5px 0;
+   -webkit-user-select: none;  
+   -moz-user-select: none;    
+   user-select: none;
 }
 
 .editor-help-text {
@@ -28,10 +30,9 @@
 /* TODO wysihtml5 lib does not insert proper inline style to hide textarea in Chrome */
 
 .editor .icon {
-   display: inline;
+   display: inline-block;
    padding: 5px 8px;
    margin: 0 1px;
-   color: #F7F7F7;
    border: 1px solid transparent;
    cursor: pointer;
 }
@@ -44,11 +45,11 @@
    border-radius: 2px;
    background-color: #666666;
 	background-color: rgba(0, 0, 0, 0.10);
-   color: #fff !important;
 }
 
 .editor .editor-sep {
-   border-left: 1px solid #888888;
+   border-left: 1px solid #999999;
+   border-left: 1px solid rgba(0, 0, 0, 0.10);
    margin: 0 5px;
 }
 
@@ -158,9 +159,7 @@ width: 120px;
  */
 
 .editor-toggle-fullpage-button {
-   cursor: pointer;
    float: right;
-   margin: -1px 0 0 0;
 }
 
 /* Added to body class witj js, so force specificity for everything 

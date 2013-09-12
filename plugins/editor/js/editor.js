@@ -63,6 +63,8 @@ jQuery(function() {
        */
       case 'wysiwyg':
          
+         //$(currentEditableTextarea).css('visibility', 'hidden');
+         
          // Load script for wysiwyg editor async
          $.getScript(assets + "/js/wysihtml5.js", function(data, textStatus, jqxhr) {
             
@@ -423,11 +425,13 @@ jQuery(function() {
    // message will display again and again, and all the events will be 
    // reattached. Consider namespacing events, so they overwrite.
    // Insert help text below every editor 
-   var editorSetHelpText = function(format, editorAreaObj) {            
-      $("<div></div>")
-         .addClass('editor-help-text')
-         .html(gdn.definition('editor'+ format +'HelpText'))
-         .insertAfter(editorAreaObj);
+   var editorSetHelpText = function(format, editorAreaObj) {
+      if (format != 'Wysiwyg') {
+         $("<div></div>")
+            .addClass('editor-help-text')
+            .html(gdn.definition('editor'+ format +'HelpText'))
+            .insertAfter(editorAreaObj);
+      }
     };
 
     var editorSetCaretFocusEnd = function(obj) {

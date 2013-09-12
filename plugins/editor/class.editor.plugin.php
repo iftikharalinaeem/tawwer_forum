@@ -1,13 +1,13 @@
 <?php if(!defined('APPLICATION')) die();
 
 $PluginInfo['editor'] = array(
-   'Name' => 'editor',
+   'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
    'Version' => '1.0.0',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
-   'RequiredApplications' => array('Vanilla' => '>=2'),
+   'RequiredApplications' => array('Vanilla' => '>=2.2'),
    'RequiredTheme' => false, 
    'RequiredPlugins' => false,
    'HasLocale' => false,
@@ -183,19 +183,15 @@ class EditorPlugin extends Gdn_Plugin {
          ':o'          => 'open_mouth',
          ':s'          => 'confounded',
          ':p'          => 'stuck_out_tongue',
-         ":'("        => 'cry',
+         ":'("         => 'cry',
          ':|'          => 'neutral_face',
-         'D:'          => 'anguished',
-         '8)'          => 'sunglasses',
-         'o:)'         => 'innocent',
-         ':+1:'        => '+1',
-         ':-1:'        => '-1',
-         '>:)'         => 'smiling_imp', 
+       //'D:'          => 'anguished',
+         'B)'          => 'sunglasses',
          ':#'          => 'grin',
-         ':sleeping:'  => 'sleeping',
+         'o:)'         => 'innocent',
          '<3'          => 'heart',
-         ':triumph:'   => 'triumph', 
-          '(*)' => 'star'
+         '(*)'         => 'star',
+         '>:)'         => 'smiling_imp'
        );
 
       return (!$emojiAlias)
@@ -279,7 +275,10 @@ class EditorPlugin extends Gdn_Plugin {
         'sleeping'                     => array('sleeping', '753'),  
         'dizzy_face'                   => array('dizzy_face', '754'),  
         'no_mouth'                     => array('no_mouth', '755'),  
-        'mask'                         => array('mask', '756'),  
+        'mask'                         => array('mask', '756'),
+        'star'                         => array('star', '123'),
+        'cookie'                       => array('cookie', '262'),
+        'warning'                      => array('warning', '71'),
 
         // Love
         'heart'                        => array('heart', '109'),  
@@ -291,7 +290,11 @@ class EditorPlugin extends Gdn_Plugin {
         '-1'                           => array('-1', '436'),
         
         // Custom icons, canonical naming
-        'trollface'                    => array('trollface', 'trollface')
+        'trollface'                    => array('trollface', 'trollface'),
+          
+        // This is used for aliases that are set incorrectly above or point 
+        // to items not listed in the canonical list. 
+        'grey_question'                => array('grey_question', '106')
       );
       
       // Some aliases self-referencing the canonical list. Use this syntax. 
@@ -304,6 +307,12 @@ class EditorPlugin extends Gdn_Plugin {
       $emojiCanonicalList['awesome']   = &$emojiCanonicalList['heart'];
 
       $emojiFileSuffix = '.png';
+      
+      // If the $emojiCanonical does not exist in the list, deliver a 
+      // warning emoji, to degrade gracefully.
+      if ($emojiCanonical && !isset($emojiCanonicalList[$emojiCanonical])) {
+         $emojiCanonical = 'grey_question';
+      }
       
       // Return first value from canonical array
       return (!$emojiCanonical)
@@ -429,7 +438,7 @@ class EditorPlugin extends Gdn_Plugin {
          // However, the post-color-* class will still need to be defined 
          // when posting these color changes. 
          $editorStyleInline          = 'background-color: ' . $fontColor;
-         $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'attr' => array('class' => 'color color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, 'title' => $fontColor, 'data-editor' => $editorDataAttr, 'style' => $editorStyleInline));
+         $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, 'title' => $fontColor, 'data-editor' => $editorDataAttr, 'style' => $editorStyleInline));
       }
 
       /**
@@ -446,8 +455,16 @@ class EditorPlugin extends Gdn_Plugin {
          //$editorDataAttr         = '{"action":"emoji","value":"'. htmlentities($emojiAlias) .'"}';
          $editorDataAttr         = '{"action":"emoji","value":"'. $emojiAlias .'"}';
          $emojiDimension         = $this->emojiDimension;
-         $emojiStyle             = 'background-image: url('. $emojiFilePath .'); background-size: '. $emojiDimension .'px; width: '.$emojiDimension .'px; height:'. $emojiDimension .'px;';
-         $toolbarDropdownEmoji[] = array('edit' => 'media', 'action'=> 'emoji', 'type' => 'button', 'attr' => array('class' => 'editor-action emoji emoji-'. $emojiCanonical. ' editor-dialog-fire-close', 'data-wysihtml5-command' => 'insertHTML', 'data-wysihtml5-command-value' => ' '. $emojiAlias .' ', 'title' => $emojiAlias, 'data-editor' => $editorDataAttr, 'style' => $emojiStyle));
+         //$emojiStyle           = 'background-image: url('. $emojiFilePath .'); background-size: '. $emojiDimension .'px; width: '.$emojiDimension .'px; height:'. $emojiDimension .'px;';
+         $emojiStyle             = '';
+
+         // In case user creates an alias that does not match a canonical 
+         // emoji, let them know. 
+         $emojiTitle             = (strpos($emojiFilePath, 'grey_question') === false) 
+                                      ? $emojiAlias
+                                      : "Alias '$emojiCanonical' not found in canonical list.";
+
+         $toolbarDropdownEmoji[] = array('edit' => 'media', 'action'=> 'emoji', 'type' => 'button', 'html_tag' => 'img', 'attr' => array('class' => 'editor-action emoji emoji-'. $emojiCanonical. ' editor-dialog-fire-close', 'data-wysihtml5-command' => 'insertHTML', 'data-wysihtml5-command-value' => ' '. $emojiAlias .' ', 'title' => $emojiTitle, 'data-editor' => $editorDataAttr, 'src' => $emojiFilePath, 'width' => $emojiDimension, 'height' => $emojiDimension, 'style' => $emojiStyle));
       }      
 
       /**
@@ -464,12 +481,12 @@ class EditorPlugin extends Gdn_Plugin {
       
       $editorToolbarAll['sep-format'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-headers hidden-xs'));
       $editorToolbarAll['format'] = array('edit' => 'format', 'action'=> 'headers', 'type' => array(
-             array('edit' => 'format', 'action'=> 'heading1', 'type' => 'button', 'text' => 'Heading 1', 'attr' => array('class' => 'editor-action editor-action-h1 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h1', 'title' => 'Heading 1', 'data-editor' => '{"action":"heading1","value":""}')),
-             array('edit' => 'format', 'action'=> 'heading2', 'type' => 'button', 'text' => 'Heading 2', 'attr' => array('class' => 'editor-action editor-action-h2 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h2', 'title' => 'Heading 2', 'data-editor' => '{"action":"heading2","value":""}')),
-             array('edit' => 'format', 'action'=> 'quote', 'type' => 'button',    'text' => 'Quote', 'attr' => array('class' => 'editor-action editor-action-quote editor-dialog-fire-close', 'data-wysihtml5-command' => 'blockquote', 'title' => 'Quote', 'data-editor' => '{"action":"quote","value":""}')),
-             array('edit' => 'format', 'action'=> 'code', 'type' => 'button',     'text' => 'Code', 'attr' => array('class' => 'editor-action editor-action-code editor-dialog-fire-close', 'data-wysihtml5-command' => 'code', 'title' => 'Code', 'data-editor' => '{"action":"code","value":""}')),
-             array('edit' => 'format', 'action'=> 'spoiler', 'type' => 'button', 'text' => 'Spoiler', 'attr' => array('class' => 'editor-action editor-action-spoiler editor-dialog-fire-close', 'data-wysihtml5-command' => 'spoiler', 'title' => 'Spoiler', 'data-editor' => '{"action":"spoiler","value":""}')),
-         ), 'attr' => array('class' => 'icon icon-edit editor-dd-format', 'title' => 'Format', 'data-editor' => '{"action":"format","value":""}'));
+             array('edit' => 'format', 'action'=> 'heading1', 'type' => 'button', 'text' => 'Heading 1', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-h1 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h1', 'title' => 'Heading 1', 'data-editor' => '{"action":"heading1","value":""}')),
+             array('edit' => 'format', 'action'=> 'heading2', 'type' => 'button', 'text' => 'Heading 2', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-h2 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h2', 'title' => 'Heading 2', 'data-editor' => '{"action":"heading2","value":""}')),
+             array('edit' => 'format', 'action'=> 'quote', 'type' => 'button',    'text' => 'Quote', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-quote editor-dialog-fire-close', 'data-wysihtml5-command' => 'blockquote', 'title' => 'Quote', 'data-editor' => '{"action":"quote","value":""}')),
+             array('edit' => 'format', 'action'=> 'code', 'type' => 'button',     'text' => 'Code', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-code editor-dialog-fire-close', 'data-wysihtml5-command' => 'code', 'title' => 'Code', 'data-editor' => '{"action":"code","value":""}')),
+             array('edit' => 'format', 'action'=> 'spoiler', 'type' => 'button', 'text' => 'Spoiler', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-spoiler editor-dialog-fire-close', 'data-wysihtml5-command' => 'spoiler', 'title' => 'Spoiler', 'data-editor' => '{"action":"spoiler","value":""}')),
+         ), 'attr' => array('class' => 'icon icon-paragraph editor-dd-format', 'title' => 'Format', 'data-editor' => '{"action":"format","value":""}'));
       
       $editorToolbarAll['sep-media'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-media hidden-xs'));
       $editorToolbarAll['emoji'] = array('edit' => 'media', 'action'=> 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => 'Emoji'));
@@ -589,21 +606,22 @@ class EditorPlugin extends Gdn_Plugin {
    
    /**
 	 * Every time editor plugin is enabled, disable other known editors that 
-    * may clash with this one. If editor is loaded, then these two other 
+    * may clash with this one. If editor is loaded, then thes other 
     * editors loaded after, there are CSS rules that hide them. This way, 
     * the editor plugin always takes precedence.
 	 */
 	public function Setup() {        
       $pluginEditors = array(
           'cleditor', 
-          'ButtonBar'
+          'ButtonBar',
+          'Emotify'
       );
       
       foreach ($pluginEditors as $pluginName) {
          Gdn::PluginManager()->DisablePlugin($pluginName); 
       }
 
-      SaveToConfig('Plugin.editor.DefaultView', 'Wysiwyg');
+      //SaveToConfig('Plugin.editor.DefaultView', 'Wysiwyg');
 	}
    
    public function OnDisable() {
@@ -611,6 +629,6 @@ class EditorPlugin extends Gdn_Plugin {
 	}
 
    public function CleanUp() {
-		RemoveFromConfig('Plugin.editor.DefaultView');
+		//RemoveFromConfig('Plugin.editor.DefaultView');
 	}
 }

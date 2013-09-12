@@ -144,11 +144,6 @@
    text-decoration: line-through;
 }
 
-.Quote {
-   padding-left: 20px;
-   border-left: 5px solid rgba(0,0,0,0.1);
-}
-
 pre.CodeBlock {
    font-family: monospace;
    margin: 0 !important;
@@ -185,3 +180,12 @@ pre.CodeBlock {
 .AlignLeft{}
 .AlignCenter{}
 .AlignRight{}
+
+.MenuButtons {
+   margin-top: 5px;
+   text-align: right;
+   
+   .Button {
+      min-width: 55px;
+   }
+}

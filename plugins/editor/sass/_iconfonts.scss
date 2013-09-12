@@ -1,23 +1,23 @@
 @font-face {
-	font-family: 'vanillicon';
-	src:url('fonts/vanillicon.eot');
-	src:url('fonts/vanillicon.eot?#iefix') format('embedded-opentype'),
-		url('fonts/vanillicon.woff') format('woff'),
-		url('fonts/vanillicon.ttf') format('truetype'),
-		url('fonts/vanillicon.svg#vanillicon') format('svg');
-	font-weight: normal;
-	font-style: normal;
+   font-family: 'vanillicon';
+   src:url('fonts/vanillicon.eot');
+   src:url('fonts/vanillicon.eot?#iefix') format('embedded-opentype'),
+       url('fonts/vanillicon.woff') format('woff'),
+       url('fonts/vanillicon.ttf') format('truetype'),
+       url('fonts/vanillicon.svg#vanillicon') format('svg');
+   font-weight: normal;
+   font-style: normal;
 }
 
 .icon {
-	font-family: 'vanillicon';
-	speak: none;
-	font-style: normal;
-	font-weight: normal;
-	font-variant: normal;
-	text-transform: none;
-	line-height: 1;
-	-webkit-font-smoothing: antialiased;
+   font-family: 'vanillicon';
+   speak: none;
+   font-style: normal;
+   font-weight: normal;
+   font-variant: normal;
+   text-transform: none;
+   line-height: 1;
+   -webkit-font-smoothing: antialiased;
 }
 
 .icon-quote:before {
@@ -65,9 +65,6 @@
 .icon-angry:before {
    content: "\e00f";
 }
-.icon-code:before {
-   content: "\e011";
-}
 .icon-inbox:before {
    content: "\e012";
 }
@@ -86,9 +83,6 @@
 .icon-linkedin:before {
    content: "\e01b";
 }
-.icon-twitter:before {
-   content: "\e01c";
-}
 .icon-flag:before {
    content: "\e01e";
 }
@@ -98,11 +92,8 @@
 .icon-gplus:before {
    content: "\e020";
 }
-.icon-warn:before {
-   content: "\e021";
-}
 .icon-lol:before {
-   content: "\e022";
+   content: "\e01d";
 }
 .icon-frown:before {
    content: "\f119";
@@ -302,7 +293,7 @@
 .icon-bookmark-empty:before {
    content: "\f097";
 }
-.icon-twitter-2:before {
+.icon-twitter:before {
    content: "\f099";
 }
 .icon-facebook-2:before {
@@ -419,12 +410,6 @@
 .icon-smile:before {
    content: "\f118";
 }
-.icon-moon:before {
-   content: "\f207";
-}
-.icon-sun:before {
-   content: "\f206";
-}
 .icon-hot:before {
    content: "\e00b";
 }
@@ -442,4 +427,25 @@
 }
 .icon-report:before {
    content: "\e017";
+}
+.icon-twitter-2:before {
+   content: "\e01c";
+}
+.icon-warn:before {
+   content: "\e021";
+}
+.icon-contrast:before {
+   content: "\e016";
+}
+.icon-code:before {
+   content: "\e011";
+}
+.icon-circle:before {
+   content: "\f111";
+}
+.icon-circle-blank:before {
+   content: "\f10c";
+}
+.icon-paragraph:before {
+   content: "\e022";
 }
