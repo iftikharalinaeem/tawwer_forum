@@ -523,18 +523,29 @@ class EditorPlugin extends Gdn_Plugin {
     * 
     * @param Gdn_Form $Sender 
     */
-   public function Gdn_Form_BeforeBodyBox_Handler($Sender) 
-   {
+   public function Gdn_Form_BeforeBodyBox_Handler($Sender) {
       // TODO move this property to constructor
-      $this->Format = $Sender->GetValue('Format', C('Garden.InputFormatter','Html'));
+      $this->Format = $Sender->GetValue('Format');
+      
+      // Make sure we have some sort of format.
+      if (!$this->Format) {
+         $this->Format = C('Garden.InputFormatter','Html');
+         $Sender->SetValue('Format', $this->Format);
+      }
       
       if (in_array($this->Format, $this->Formats)) {    
-
          $c = Gdn::Controller();
          
          // This js file will asynchronously load the assets of each editor 
          // view when required. This will prevent unnecessary requests.
          $c->AddJsFile('editor.js', 'plugins/editor');
+         
+         switch (strtolower($this->Format)) {
+            case 'wysiwyg':
+               $c->AddJsFile('wysiwyg5.js', 'plugins/editor');
+               break;
+         }
+         
          // Set minor data for view
          $c->SetData('_EditorInputFormat', $this->Format);
          // Set definitions for JavaScript
