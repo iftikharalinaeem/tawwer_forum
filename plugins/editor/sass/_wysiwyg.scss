@@ -180,3 +180,12 @@ pre.CodeBlock {
 .AlignLeft{}
 .AlignCenter{}
 .AlignRight{}
+
+.MenuButtons {
+   margin-top: 5px;
+   text-align: right;
+   
+   .Button {
+      min-width: 55px;
+   }
+}

@@ -45,9 +45,11 @@
                      Wrap($html_arrow_down, 'a', $button['attr']) .''. 
                      '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink">
                         <input class="InputBox editor-input-url" data-wysihtml5-dialog-field="href" placeholder="http://" />
-                        <hr />
+                        
+                         <div class="MenuButtons">
                          <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="OK"/>
                          <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="Cancel"/>
+                         </div>
                       </div>'
                    , 'div', array('class' => 'editor-dropdown'));
                   break;
@@ -57,7 +59,8 @@
                      Wrap($html_arrow_down, 'a', $button['attr']) .''. 
                      '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="insertImage">
                         <input class="InputBox editor-input-image" data-wysihtml5-dialog-field="src" placeholder="http://">
-                        <hr />
+                        
+                        <div class="MenuButtons">
                         <label class="editor-image-align">
                          Align:
                          <select data-wysihtml5-dialog-field="className">
@@ -68,6 +71,7 @@
                         </label>
                         <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="OK"/>
                         <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="Cancel"/>
+                        </div>
                      </div>'
                    , 'div', array('class' => 'editor-dropdown'));
                   break;

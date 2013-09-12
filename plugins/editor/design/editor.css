@@ -764,6 +764,14 @@ pre.CodeBlock {
   background-color: rgba(0, 0, 0, 0.04);
 }
 
+.MenuButtons {
+  margin-top: 5px;
+  text-align: right;
+}
+.MenuButtons .Button {
+  min-width: 55px;
+}
+
 /**
  * Editor toolbar 
  */
