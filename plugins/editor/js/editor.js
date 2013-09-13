@@ -15,6 +15,7 @@ jQuery(function() {
     * Determine editor format to load, and asset path, default to Wysiwyg
     */
    var 
+       editor, editorInline,
        debug          = false,
        formatOriginal = gdn.definition('editorInputFormat', 'Wysiwyg'),
        format         = formatOriginal.toLowerCase(),
@@ -116,11 +117,21 @@ jQuery(function() {
                // Make visible again for Html toggling.
                $(currentEditableTextarea).css('visibility', '');  
                editorHandleQuotesPlugin(editor);
+
+               // Clear textarea/iframe content on submit.
+               $(currentEditableTextarea.closest('form')).on('clearCommentForm', function() {
+                  editor.fire('clear');
+                  editor.composer.clear();
+                  this.reset();
+               });
                
                if (debug) {
                   wysiDebug(editor);
                }
-            });  
+               
+            });
+            
+
 
             /**
              * Extending functionality of wysihtml5.js
@@ -328,6 +339,13 @@ jQuery(function() {
                            $(editorInline.composer.iframe).wysihtml5_size_matters();  
                            editorHandleQuotesPlugin(editorInline);
                            
+                           // Clear textarea/iframe content on submit.
+                           $(currentEditableTextarea.closest('form')).on('clearCommentForm', function() {
+                              editor.fire('clear');
+                              editor.composer.clear();
+                              this.reset();                       
+                           });
+                           
                            if (debug) {
                               wysiDebug(editorInline);
                            }
@@ -348,7 +366,7 @@ jQuery(function() {
               // Set up on editor load
               editorSetHelpText(formatOriginal, currentTextBoxWrapper);
               editorSetupDropdowns();
-              fullPageInit();
+              fullPageInit(editorInline);
               editorSetCaretFocusEnd(currentEditableTextarea[0]);
 
               // some() loop requires true to end loop. every() requires false.
@@ -374,7 +392,7 @@ jQuery(function() {
    /** 
     * Fullpage actions--available to all editor views on page load. 
     */
-   var fullPageInit = function() {
+   var fullPageInit = function(wysiwygInstance) {
       
       var toggleFullpage = function(e) {
          // either user clicks on fullpage toggler button, or escapes out with key
@@ -417,8 +435,15 @@ jQuery(function() {
                 }, 400);
              }
  
-            // set focus
-            editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
+             // Buggy right now. Go back and fix.
+             // Set focus--wysiwyg is slightly different
+            if (typeof wysiwygInstance != 'undefined') {
+               //wysiwygInstance.fire("focus");
+               console.log('wysi');
+            } else {
+                  console.log('foo');
+               editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
+            }
          }
       }
       
@@ -572,6 +597,7 @@ jQuery(function() {
             editor.composer.selection.setAfter(editor.composer.element.lastChild);
             editor.composer.commands.exec("insertHTML", "<br>");
          }, 400);
+         
       }); 
    };
    
@@ -579,7 +605,7 @@ jQuery(function() {
    // Set up on page load
    editorSetHelpText(formatOriginal, $('#Form_Body'));
    editorSetupDropdowns();
-   fullPageInit();
+   fullPageInit(editor);
    editorSetCaretFocusEnd(currentEditableTextarea[0]);
    
    
