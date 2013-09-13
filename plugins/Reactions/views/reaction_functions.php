@@ -111,7 +111,7 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
       $Url = Url("/react/$RecordType/$UrlCode2?id=$ID");
    
    $Result = <<<EOT
-<a class="Hijack ReactButton $LinkClass" href="$Url" title="$Label" rel="nofollow"><span class="ReactSprite $SpriteClass"></span> $CountHtml<span class="ReactLabel">$Label</span></a>
+<a class="Hijack ReactButton $LinkClass" href="$Url" title="$Label" data-reaction="$UrlCode2" rel="nofollow"><span class="ReactSprite $SpriteClass"></span> $CountHtml<span class="ReactLabel">$Label</span></a>
 EOT;
    
    return $Result;
