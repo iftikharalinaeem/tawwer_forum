@@ -140,11 +140,12 @@
 
 /* Custom classes */
 
-.Delete {
-   text-decoration: line-through;
-}
 
-pre.CodeBlock {
+del.Delete {}
+
+blockquote.Quote {}
+
+.CodeBlock {
    font-family: monospace;
    margin: 0 !important;
    padding-left: 20px;
@@ -180,12 +181,3 @@ pre.CodeBlock {
 .AlignLeft{}
 .AlignCenter{}
 .AlignRight{}
-
-.MenuButtons {
-   margin-top: 5px;
-   text-align: right;
-   
-   .Button {
-      min-width: 55px;
-   }
-}

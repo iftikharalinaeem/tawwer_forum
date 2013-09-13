@@ -904,13 +904,8 @@
 }
 
 /* Custom classes */
-/* line 143, ../sass/_wysiwyg.scss */
-.Delete {
-  text-decoration: line-through;
-}
-
-/* line 147, ../sass/_wysiwyg.scss */
-pre.CodeBlock {
+/* line 148, ../sass/_wysiwyg.scss */
+.CodeBlock {
   font-family: monospace;
   margin: 0 !important;
   padding-left: 20px;
@@ -919,12 +914,12 @@ pre.CodeBlock {
   white-space: nowrap;
 }
 
-/* line 156, ../sass/_wysiwyg.scss */
+/* line 157, ../sass/_wysiwyg.scss */
 .CodeInline {
   font-family: monospace;
 }
 
-/* line 160, ../sass/_wysiwyg.scss */
+/* line 161, ../sass/_wysiwyg.scss */
 .Spoiler {
   color: transparent;
   height: 20px;
@@ -936,7 +931,7 @@ pre.CodeBlock {
   box-shadow: 0 -4px 5px -5px rgba(0, 0, 0, 0.2), 0 4px 5px -5px rgba(0, 0, 0, 0.2);
 }
 
-/* line 171, ../sass/_wysiwyg.scss */
+/* line 172, ../sass/_wysiwyg.scss */
 .Spoiler:hover {
   transition: all 0.1s ease-in;
   height: auto;
@@ -946,46 +941,36 @@ pre.CodeBlock {
   background-color: rgba(0, 0, 0, 0.04);
 }
 
-/* line 184, ../sass/_wysiwyg.scss */
-.MenuButtons {
-  margin-top: 5px;
-  text-align: right;
-}
-/* line 188, ../sass/_wysiwyg.scss */
-.MenuButtons .Button {
-  min-width: 55px;
-}
-
 /**
  * Editor toolbar 
  */
-/* If JS disabled */
-/* line 10, ../sass/editor.scss */
+/* By default, when JS not enabled, do not display editor. */
+/* line 12, ../sass/editor.scss */
 .editor {
-  font-size: 14px;
   display: none;
 }
 
-/* line 15, ../sass/editor.scss */
+/* If JS enabled */
+/* line 17, ../sass/editor.scss */
 .js-editor-active .editor {
   display: block;
 }
 
-/* line 19, ../sass/editor.scss */
+/* line 21, ../sass/editor.scss */
 .editor {
   padding: 5px 0;
+  font-size: 14px;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
 }
 
-/* line 26, ../sass/editor.scss */
+/* line 29, ../sass/editor.scss */
 .editor-help-text {
   font-size: 11px;
 }
 
-/* TODO wysihtml5 lib does not insert proper inline style to hide textarea in Chrome */
-/* line 32, ../sass/editor.scss */
+/* line 33, ../sass/editor.scss */
 .editor .icon {
   display: inline-block;
   padding: 5px 8px;
@@ -995,31 +980,31 @@ pre.CodeBlock {
 }
 
 /* State of icons */
-/* line 44, ../sass/editor.scss */
+/* line 45, ../sass/editor.scss */
 .editor .icon:hover,
 .wysihtml5-command-active,
 .wysihtml5-action-active,
 .wysihtml5-command-dialog-opened {
   border-radius: 2px;
-  background-color: #666666;
+  background-color: #999999;
   background-color: rgba(0, 0, 0, 0.1);
 }
 
-/* line 50, ../sass/editor.scss */
+/* line 51, ../sass/editor.scss */
 .editor .editor-sep {
   border-left: 1px solid #999999;
   border-left: 1px solid rgba(0, 0, 0, 0.1);
   margin: 0 5px;
 }
 
-/* line 56, ../sass/editor.scss */
+/* line 57, ../sass/editor.scss */
 .editor .editor-dropdown {
   display: inline-block;
   position: relative;
 }
 
 /* Clicking on down caret does nothing, so let click seep through to parent */
-/* line 62, ../sass/editor.scss */
+/* line 63, ../sass/editor.scss */
 .editor .icon-caret-down {
   font-size: 75%;
   pointer-events: none;
@@ -1028,8 +1013,10 @@ pre.CodeBlock {
   top: -2px;
 }
 
-/* For dropdowns */
-/* line 73, ../sass/editor.scss */
+/**
+ * Dropdowns 
+ */
+/* line 76, ../sass/editor.scss */
 .editor-insert-dialog {
   margin: 5px 0 0 0;
   padding: 5px;
@@ -1039,12 +1026,27 @@ pre.CodeBlock {
   display: none;
 }
 
-/* line 82, ../sass/editor.scss */
+/* line 85, ../sass/editor.scss */
 .editor-dropdown-open .editor-insert-dialog {
   display: block;
 }
 
-/* line 86, ../sass/editor.scss */
+/* line 89, ../sass/editor.scss */
+.MenuButtons {
+  margin-top: 5px;
+  text-align: right;
+}
+/* line 93, ../sass/editor.scss */
+.MenuButtons .Button {
+  min-width: 55px;
+}
+
+/* line 98, ../sass/editor.scss */
+.editor-dropdown-open .editor-insert-dialog label {
+  display: inline !important;
+}
+
+/* line 102, ../sass/editor.scss */
 .editor-insert-dialog input.InputBox {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -1052,17 +1054,12 @@ pre.CodeBlock {
   width: 100%;
 }
 
-/* line 90, ../sass/editor.scss */
-.editor-insert-dialog hr {
-  margin: 0 0 10px 0;
-}
-
-/* line 94, ../sass/editor.scss */
+/* line 107, ../sass/editor.scss */
 .editor-dd-color + .editor-insert-dialog {
   width: 92px;
 }
 
-/* line 98, ../sass/editor.scss */
+/* line 111, ../sass/editor.scss */
 .editor-dd-color + .editor-insert-dialog .color {
   width: 20px;
   height: 20px;
@@ -1072,7 +1069,7 @@ pre.CodeBlock {
   border: 1px solid transparent;
 }
 
-/* line 108, ../sass/editor.scss */
+/* line 121, ../sass/editor.scss */
 .editor-dd-color + .editor-insert-dialog .color:hover,
 .editor-dd-color + .editor-insert-dialog .wysihtml5-command-active {
   border: 1px solid #fff;
@@ -1081,24 +1078,24 @@ pre.CodeBlock {
 /**
  * Headers dropdown
  */
-/* line 116, ../sass/editor.scss */
+/* line 129, ../sass/editor.scss */
 .editor-dd-format + .editor-insert-dialog {
   padding: 5px 0;
   width: auto;
 }
 
-/* line 121, ../sass/editor.scss */
+/* line 134, ../sass/editor.scss */
 .editor-dd-format + .editor-insert-dialog .wysihtml5-command-active {
   border-radius: 0;
 }
 
-/* line 125, ../sass/editor.scss */
+/* line 138, ../sass/editor.scss */
 .editor-dd-format + .editor-insert-dialog .editor-action-h1 {
   font-size: 18px;
   line-height: 28px !important;
 }
 
-/* line 130, ../sass/editor.scss */
+/* line 143, ../sass/editor.scss */
 .editor-dd-format + .editor-insert-dialog .editor-action-h2 {
   font-size: 16px;
 }
@@ -1106,12 +1103,12 @@ pre.CodeBlock {
 /**
  * Emoji dropdown
  */
-/* line 139, ../sass/editor.scss */
+/* line 152, ../sass/editor.scss */
 .editor-dd-emoji + .editor-insert-dialog {
   width: 120px;
 }
 
-/* line 143, ../sass/editor.scss */
+/* line 156, ../sass/editor.scss */
 .editor-dd-emoji + .editor-insert-dialog .emoji {
   display: inline-block;
   padding: 5px;
@@ -1119,7 +1116,7 @@ pre.CodeBlock {
   background-position: center;
 }
 
-/* line 150, ../sass/editor.scss */
+/* line 163, ../sass/editor.scss */
 .editor-dd-emoji + .editor-insert-dialog .emoji:hover {
   cursor: pointer;
   border-radius: 2px;
@@ -1129,97 +1126,89 @@ pre.CodeBlock {
 /**
  * Going full page 
  */
-/* line 161, ../sass/editor.scss */
+/* line 174, ../sass/editor.scss */
 .editor-toggle-fullpage-button {
   float: right;
 }
 
-/* Added to body class witj js, so force specificity for everything 
+/* Added to body class with JS, so force specificity for everything 
    below; this makes editing very easy */
-/* line 168, ../sass/editor.scss */
+/* line 181, ../sass/editor.scss */
 .js-editor-fullpage {
   overflow: hidden;
 }
 
+/* line 185, ../sass/editor.scss */
+.js-editor-fullpage * {
+  -moz-box-sizing: border-box !important;
+}
+
+/* Little off in fullpage due to wrapped div which can't really be specified, 
+which has some padding issue */
+/* line 191, ../sass/editor.scss */
+.js-editor-fullpage .editor-toggle-fullpage-button {
+  margin-right: 7px;
+}
+
+/* this is the problem area with funky padding that doesnt disappear
+.js-editor-fullpage #editor-fullpage-candidate > form {
+   border: 2px solid blue;
+   padding: 0;
+}*/
 /* Background overlay. No need to insert empty div in markup; doing so at the 
 current location, due to event insertion, makes z-index troublesome. */
-/* line 175, ../sass/editor.scss */
+/* line 203, ../sass/editor.scss */
 .js-editor-fullpage:after {
   content: ' ';
   display: block;
   position: fixed;
-  z-index: 500;
+  z-index: 9000;
   background-color: #fff;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  animation-duration: 0.5s;
-  animation-name: editor-anim-overlay;
 }
 
 /* .FormWrapper */
-/* line 190, ../sass/editor.scss */
+/* line 216, ../sass/editor.scss */
 .js-editor-fullpage #editor-fullpage-candidate {
   position: absolute;
-  z-index: 1000;
+  z-index: 9001;
   top: 20px;
   right: 20%;
   left: 20%;
   width: auto;
   background-color: transparent;
   padding: 0 0 20px 0;
-  animation-duration: .4s;
+  animation-duration: 1s;
   animation-name: editor-anim-editor;
+  margin: 0 auto;
+  /* This is the width that should be modified when choosing the width of 
+     the fullpage editor, not the textarea directly. */
+  max-width: 800px;
 }
 
 /* Temp, take this out when you figure out the element that is restricting 
    this child from going truly absolute. */
-/* line 205, ../sass/editor.scss */
+/* line 235, ../sass/editor.scss */
 .js-editor-fullpage .EditCommentForm #editor-fullpage-candidate {
   position: fixed;
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
-/* line 211, ../sass/editor.scss */
+/* line 241, ../sass/editor.scss */
 .js-editor-fullpage .TextBoxWrapper #Form_Body,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
   width: 100% !important;
   height: 400px !important;
-}
-
-@keyframes editor-anim-overlay {
-  /* line 217, ../sass/editor.scss */
-  from {
-    opacity: 0;
-  }
-
-  /* line 220, ../sass/editor.scss */
-  to {
-    opacity: 1;
-  }
+  padding: 20px !important;
 }
 
 @keyframes editor-anim-editor {
-  /* line 226, ../sass/editor.scss */
+  /* line 248, ../sass/editor.scss */
   0% {
-    top: -1000px;
     opacity: 0;
-    transform: scale(1.25);
-  }
-
-  /* line 231, ../sass/editor.scss */
-  75% {
-    top: 60px;
-    opacity: 0.75;
-    transform: scale(0.75);
-  }
-
-  /* line 236, ../sass/editor.scss */
-  100% {
-    top: 20px;
-    opacity: 1;
-    transform: scale(1);
   }
 }
 
@@ -1227,9 +1216,9 @@ current location, due to event insertion, makes z-index troublesome. */
  * Hide some actions per editor view.
  *
  * Html, BBCode, and Markdown views have slight differences than the Wysiwyg, 
- * so hide the particular ones 
+ * so hide the particular ones.
  */
-/* line 268, ../sass/editor.scss */
+/* line 278, ../sass/editor.scss */
 .editor-format-html .editor-toggle-source,
 .editor-format-bbcode .editor-toggle-source,
 .editor-format-markdown .editor-toggle-source,
@@ -1256,17 +1245,17 @@ current location, due to event insertion, makes z-index troublesome. */
  * a last ditch effort to at least make sure editor is usable when others 
  * are enabled. 
  */
-/* line 282, ../sass/editor.scss */
+/* line 292, ../sass/editor.scss */
 .js-editor-active .cleditorMain iframe {
   display: none !important;
 }
 
-/* line 286, ../sass/editor.scss */
+/* line 296, ../sass/editor.scss */
 .js-editor-active .cleditorMain .wysihtml5-sandbox {
   display: block !important;
 }
 
-/* line 292, ../sass/editor.scss */
+/* line 302, ../sass/editor.scss */
 .js-editor-active .cleditorToolbar,
 .js-editor-active .ButtonBar,
 .js-editor-active .ButtonBarMarkupHint {
@@ -1275,19 +1264,18 @@ current location, due to event insertion, makes z-index troublesome. */
 
 /* Media query: Hiding non-essential buttons */
 @media (max-width: 767px) {
-  /* line 299, ../sass/editor.scss */
+  /* line 309, ../sass/editor.scss */
   .hidden-xs {
     display: none !important;
   }
 
-  /* line 303, ../sass/editor.scss */
+  /* line 313, ../sass/editor.scss */
   .js-editor-fullpage #editor-fullpage-candidate {
-    top: -60px;
     left: 0;
     right: 0;
   }
 
-  /* line 310, ../sass/editor.scss */
+  /* line 319, ../sass/editor.scss */
   .js-editor-fullpage .TextBoxWrapper #Form_Body,
   .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
     height: auto !important;
@@ -1295,7 +1283,7 @@ current location, due to event insertion, makes z-index troublesome. */
 
   /* This is not necessary or very specific, but on mobile, apple products 
      add rounded corners */
-  /* line 316, ../sass/editor.scss */
+  /* line 325, ../sass/editor.scss */
   textarea {
     border-radius: 0;
   }

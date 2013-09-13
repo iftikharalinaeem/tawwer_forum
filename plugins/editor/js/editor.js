@@ -14,7 +14,9 @@ jQuery(function() {
    /**
     * Determine editor format to load, and asset path, default to Wysiwyg
     */
-   var formatOriginal = gdn.definition('editorInputFormat', 'Wysiwyg'),
+   var 
+       debug          = false,
+       formatOriginal = gdn.definition('editorInputFormat', 'Wysiwyg'),
        format         = formatOriginal.toLowerCase(),
        assets         = gdn.definition('editorPluginAssets'), 
        editorRules    = {}; // for wysiwyg
@@ -22,9 +24,7 @@ jQuery(function() {
        
   // When editor loaded inline and accomodates an editor format based on the 
   // original post format.
-  
-       
-       
+
    var editorToolbarId  = 'editor-format-', // append format below
        editorTextareaId = 'Form_Body', 
        editorName       = 'vanilla-editor-text';
@@ -114,9 +114,13 @@ jQuery(function() {
             editor.on('load', function() {
                $(editor.composer.iframe).wysihtml5_size_matters();
                // Make visible again for Html toggling.
-               $(currentEditableTextarea).css('visibility', '');
+               $(currentEditableTextarea).css('visibility', '');  
+               editorHandleQuotesPlugin(editor);
+               
+               if (debug) {
+                  wysiDebug(editor);
+               }
             });  
-            
 
             /**
              * Extending functionality of wysihtml5.js
@@ -321,7 +325,12 @@ jQuery(function() {
 
                         editorInline.on('load', function() {
                            // enable auto-resize
-                           $(editorInline.composer.iframe).wysihtml5_size_matters();      
+                           $(editorInline.composer.iframe).wysihtml5_size_matters();  
+                           editorHandleQuotesPlugin(editorInline);
+                           
+                           if (debug) {
+                              wysiDebug(editorInline);
+                           }
                         });
                     });
                   break;
@@ -373,18 +382,43 @@ jQuery(function() {
             ? e.target 
             : $('#editor-fullpage-candidate').find('.editor-toggle-fullpage-button');
 
-         var bodyEl      = $('body'), 
+         var bodyEl      = $('body'); 
              formWrapper = $(toggleButton).closest('.FormWrapper')[0];
-
+         
+         // Not all parts of the site have same surrounding markup, so if that 
+         // fails, grab nearest parent element that might enclose it. The 
+         // exception this was made for is the signatures plugin.
+         if (typeof formWrapper == 'undefined') {
+            formWrapper = $(toggleButton).parent().parent();
+         }
+         
+         // If no fullpage, enable it
          if (!bodyEl.hasClass('js-editor-fullpage')) {
             $(formWrapper).attr('id', 'editor-fullpage-candidate');
             bodyEl.addClass('js-editor-fullpage');
             $(toggleButton).addClass('icon-resize-small');
             window.scrollTo(0, 0);
          } else {
+            // else disable fullpage
             $(formWrapper).attr('id', '');
             bodyEl.removeClass('js-editor-fullpage');
             $(toggleButton).removeClass('icon-resize-small');
+            
+            // Auto scroll to correct location upon exiting fullpage.
+            var scrollto = $(toggleButton).closest('.Comment');
+            if (!scrollto.length) {
+               scrollto = $(toggleButton).closest('.CommentForm');
+            }
+            
+            // Just in case I haven't covered all bases.
+            if (scrollto.length) {
+                $('html, body').animate({
+                   scrollTop: $(scrollto).offset().top
+                }, 400);
+             }
+ 
+            // set focus
+            editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
          }
       }
       
@@ -420,9 +454,6 @@ jQuery(function() {
       }()); 
    };
 
-
-   
-   
    // TODO when previewing a post, then going back to edit, the text help
    // message will display again and again, and all the events will be 
    // reattached. Consider namespacing events, so they overwrite.
@@ -512,10 +543,103 @@ jQuery(function() {
          }); 
       });
    };
+   
+   // Editor does not play well with Quotes plugin in Wysiwyg mode. 
+   var editorHandleQuotesPlugin = function(editorInstance) {
+      var editor = editorInstance;
+     // handle Quotes plugin
+      $('a.ReactButton.Quote').on('click', function(e) {
+         // Stop animation from other plugin and let this one 
+         // handle the scroll, otherwise the scrolling jumps 
+         // all over, and really distracts the eyes. 
+         $('html, body').stop().animate({
+            scrollTop: $(editor.textarea.element).parent().parent().offset().top
+         }, 800);
+
+         // For the quotes plugin to insert the quoted text, it 
+         // requires that the textarea be pastable, which is not true 
+         // when not displayed, so momentarily toggle to it, then, 
+         // unavoidable, wait short interval to then allow wysihtml5
+         // to toggle back and render the content.
+         editor.fire("change_view", "textarea");
+         setTimeout(function() {
+            editor.fire("change_view", "composer");
+            editor.fire("focus:composer");
+            // Inserting a quote at the end prevents editor from 
+            // breaking out of quotation, which means everything 
+            // typed after the inserted quotation, will be wrapped 
+            // in a blockquote.
+            editor.composer.selection.setAfter(editor.composer.element.lastChild);
+            editor.composer.commands.exec("insertHTML", "<br>");
+         }, 400);
+      }); 
+   };
+   
 
    // Set up on page load
    editorSetHelpText(formatOriginal, $('#Form_Body'));
    editorSetupDropdowns();
    fullPageInit();
    editorSetCaretFocusEnd(currentEditableTextarea[0]);
+   
+   
+   // This will only be called when debug=true;
+   var wysiDebug = function(editorInstance) {
+      editorInstance.on("load", function() {
+        console.log('load');
+      })
+      .on("focus", function() {
+        console.log('focus');
+      })
+      .on("blur", function() {
+        console.log('blur');
+      })
+      .on("change", function() {
+        console.log('change');
+      })
+      .on("paste", function() {
+        console.log('paste');
+      })
+      .on("newword:composer", function() {
+        console.log('newword:composer');
+      })
+      .on("undo:composer", function() {
+        console.log('undo:composer');
+      })
+      .on("redo:composer", function() {
+        console.log('redo:composer');
+      })
+      .on("change:textarea", function() {
+        console.log('change:textarea');
+      })
+      .on("change:composer", function() {
+        console.log('change:composer');
+      })
+      .on("paste:textarea", function() {
+        console.log('paste:textarea');
+      })
+      .on("paste:composer", function() {
+        console.log('paste:composer');
+      })
+      .on("blur:composer", function() {
+        console.log('change:composer');
+      })
+      .on("blur:textarea", function() {
+        console.log('change:composer');
+      })
+      .on("beforecommand:composer", function() {
+        console.log('beforecommand:composer');
+      })
+      .on("aftercommand:composer", function() {
+        console.log('aftercommand:composer');
+      }); 
+   };
 });
+
+
+// Event examples that will come in handy--taken from source. 
+//editor.fire("change_view", "composer");
+//editor.fire("change_view", "textarea");
+//this.editor.observe("change_view", function(view) {
+//this.editor.observe("destroy:composer", stopInterval);
+//editor.setValue('This will do it.');
