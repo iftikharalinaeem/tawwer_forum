@@ -123,8 +123,11 @@ jQuery(function() {
                   editor.fire('clear');
                   editor.composer.clear();
                   this.reset();
-               });
+               });            
                
+               // Some browsers modify pasted content, adding superfluous tags.
+               wysiPasteFix(editor);
+
                if (debug) {
                   wysiDebug(editor);
                }
@@ -346,6 +349,8 @@ jQuery(function() {
                               this.reset();                       
                            });
                            
+                           wysiPasteFix(editorInline);
+                           
                            if (debug) {
                               wysiDebug(editorInline);
                            }
@@ -470,8 +475,8 @@ jQuery(function() {
       // full page, but the text will remain in editor, so not big issue.
       var postCommentCloseFullPageEvent = (function() {
          $('.Button')
-         .off('click')
-         .on('click', function() {
+         .off('click.closefullpage')
+         .on('click.closefullpage', function() {
             if ($('body').hasClass('js-editor-fullpage')) { 
                toggleFullpage();
             }
@@ -599,6 +604,22 @@ jQuery(function() {
          }, 400);
          
       }); 
+   };
+   
+   var wysiPasteFix = function(editorInstance) {
+      var editor = editorInstance;
+      // Chrome wraps span around content. Firefox prepends b.
+      // No real check to check browsers. 
+      editor.observe("paste:composer", function(e) {
+         // Grab paste value
+         var paste = this.composer.getValue();
+         // Just need to remove first one, and wysihtml5 will auto
+         // make sure the pasted html has all tags closed, so the 
+         // last will just be stripped automatically. sweet.
+         paste = paste.replace(/^<(span|b)>/m, ''); // just match first
+         // Insert into composer
+         this.composer.setValue(paste);
+      });
    };
    
 
