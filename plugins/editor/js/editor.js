@@ -391,16 +391,34 @@ jQuery(function() {
          if (typeof formWrapper == 'undefined') {
             formWrapper = $(toggleButton).parent().parent();
          }
-             
+         
+         // If no fullpage, enable it
          if (!bodyEl.hasClass('js-editor-fullpage')) {
             $(formWrapper).attr('id', 'editor-fullpage-candidate');
             bodyEl.addClass('js-editor-fullpage');
             $(toggleButton).addClass('icon-resize-small');
             window.scrollTo(0, 0);
          } else {
+            // else disable fullpage
             $(formWrapper).attr('id', '');
             bodyEl.removeClass('js-editor-fullpage');
             $(toggleButton).removeClass('icon-resize-small');
+            
+            // Auto scroll to correct location upon exiting fullpage.
+            var scrollto = $(toggleButton).closest('.Comment');
+            if (!scrollto.length) {
+               scrollto = $(toggleButton).closest('.CommentForm');
+            }
+            
+            // Just in case I haven't covered all bases.
+            if (scrollto.length) {
+                $('html, body').animate({
+                   scrollTop: $(scrollto).offset().top
+                }, 400);
+             }
+ 
+            // set focus
+            editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
          }
       }
       
@@ -436,9 +454,6 @@ jQuery(function() {
       }()); 
    };
 
-
-   
-   
    // TODO when previewing a post, then going back to edit, the text help
    // message will display again and again, and all the events will be 
    // reattached. Consider namespacing events, so they overwrite.
@@ -529,11 +544,11 @@ jQuery(function() {
       });
    };
    
-   
+   // Editor does not play well with Quotes plugin in Wysiwyg mode. 
    var editorHandleQuotesPlugin = function(editorInstance) {
       var editor = editorInstance;
      // handle Quotes plugin
-      $('a.ReactButton.Quote').livequery('click', function(e) {
+      $('a.ReactButton.Quote').on('click', function(e) {
          // Stop animation from other plugin and let this one 
          // handle the scroll, otherwise the scrolling jumps 
          // all over, and really distracts the eyes. 
@@ -560,7 +575,15 @@ jQuery(function() {
       }); 
    };
    
+
+   // Set up on page load
+   editorSetHelpText(formatOriginal, $('#Form_Body'));
+   editorSetupDropdowns();
+   fullPageInit();
+   editorSetCaretFocusEnd(currentEditableTextarea[0]);
    
+   
+   // This will only be called when debug=true;
    var wysiDebug = function(editorInstance) {
       editorInstance.on("load", function() {
         console.log('load');
@@ -611,12 +634,6 @@ jQuery(function() {
         console.log('aftercommand:composer');
       }); 
    };
-
-   // Set up on page load
-   editorSetHelpText(formatOriginal, $('#Form_Body'));
-   editorSetupDropdowns();
-   fullPageInit();
-   editorSetCaretFocusEnd(currentEditableTextarea[0]);
 });
 
 
