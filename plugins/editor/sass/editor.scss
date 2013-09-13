@@ -8,18 +8,19 @@
  * Editor toolbar 
  */
 
-/* If JS disabled */
+/* By default, when JS not enabled, do not display editor. */
 .editor {
-   font-size: 14px;
    display: none;
 }
 
+/* If JS enabled */
 .js-editor-active .editor {
    display: block;
 }
 
 .editor {
    padding: 5px 0;
+   font-size: 14px;
    -webkit-user-select: none;  
    -moz-user-select: none;    
    user-select: none;
@@ -28,8 +29,6 @@
 .editor-help-text {
    font-size: 11px;
 }
-
-/* TODO wysihtml5 lib does not insert proper inline style to hide textarea in Chrome */
 
 .editor .icon {
    display: inline-block;
@@ -45,7 +44,7 @@
 .wysihtml5-action-active,
 .wysihtml5-command-dialog-opened {
    border-radius: 2px;
-   background-color: #666666;
+   background-color: #999999;
 	background-color: rgba(0, 0, 0, 0.10);
 }
 
@@ -70,8 +69,10 @@
 }
 
 
+/**
+ * Dropdowns 
+ */
 
-/* For dropdowns */
 .editor-insert-dialog {
    margin: 5px 0 0 0;
    padding: 5px;
@@ -85,13 +86,22 @@
    display: block;
 }
 
+.MenuButtons {
+   margin-top: 5px;
+   text-align: right;
+   
+   .Button {
+      min-width: 55px;
+   }
+}
+
+.editor-dropdown-open .editor-insert-dialog label {
+   display: inline !important;
+}
+
 .editor-insert-dialog input.InputBox {
    @include box-sizing(border-box);
    width: 100%;
-}
-
-.editor-insert-dialog hr {
-   margin: 0 0 10px 0;
 }
 
 .editor-dd-color + .editor-insert-dialog {
@@ -140,7 +150,7 @@
  */
 
 .editor-dd-emoji + .editor-insert-dialog {
-width: 120px;
+   width: 120px;
 }
 
 .editor-dd-emoji + .editor-insert-dialog .emoji {
@@ -165,12 +175,27 @@ width: 120px;
    float: right;
 }
 
-/* Added to body class witj js, so force specificity for everything 
+/* Added to body class with JS, so force specificity for everything 
    below; this makes editing very easy */
 
-.js-editor-fullpage{
+.js-editor-fullpage {
    overflow: hidden;
 }
+
+.js-editor-fullpage *{
+   -moz-box-sizing: border-box !important;
+}
+
+/* Little off in fullpage due to wrapped div which can't really be specified, 
+which has some padding issue */
+.js-editor-fullpage .editor-toggle-fullpage-button {
+   margin-right: 7px;
+}
+/* this is the problem area with funky padding that doesnt disappear
+.js-editor-fullpage #editor-fullpage-candidate > form {
+   border: 2px solid blue;
+   padding: 0;
+}*/
 
 /* Background overlay. No need to insert empty div in markup; doing so at the 
 current location, due to event insertion, makes z-index troublesome. */
@@ -179,28 +204,31 @@ current location, due to event insertion, makes z-index troublesome. */
    content: ' ';
    display: block;
    position: fixed;
-   z-index: 500;
+   z-index: 9000;
    background-color: #fff;
    top: 0;
    left: 0;
    right: 0;
    bottom: 0;
-   animation-duration: 0.5s;
-   animation-name: editor-anim-overlay;
 }
 
 /* .FormWrapper */
 .js-editor-fullpage #editor-fullpage-candidate {
    position: absolute;
-   z-index: 1000;
+   z-index: 9001;
    top: 20px;
    right: 20%;
    left: 20%;
    width: auto;
    background-color: transparent;
    padding: 0 0 20px 0;
-   animation-duration: .4s;
+   animation-duration: 1s;
    animation-name: editor-anim-editor;
+   margin: 0 auto;
+   /* This is the width that should be modified when choosing the width of 
+      the fullpage editor, not the textarea directly. */
+   max-width: 800px;
+   opacity: 0.60;
 }
 
 /* Temp, take this out when you figure out the element that is restricting 
@@ -214,32 +242,12 @@ current location, due to event insertion, makes z-index troublesome. */
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
    width: 100% !important;
    height: 400px !important;
-}
-
-@keyframes editor-anim-overlay {
-  from {
-    opacity: 0;
-  }
-  to {
-   opacity: 1;
-  }
+   padding: 20px !important;
 }
 
 @keyframes editor-anim-editor {
   0% {
-    top: -1000px;
     opacity: 0;
-    transform: scale(1.25);
-  }
-  75% {
-   top: 60px;
-   opacity: 0.75;
-   transform: scale(0.75);
-  }
-  100% {
-   top: 20px;
-   opacity: 1;
-   transform: scale(1);
   }
 }
 
@@ -247,7 +255,7 @@ current location, due to event insertion, makes z-index troublesome. */
  * Hide some actions per editor view.
  *
  * Html, BBCode, and Markdown views have slight differences than the Wysiwyg, 
- * so hide the particular ones 
+ * so hide the particular ones.
  */
 .editor-format-html .editor-toggle-source,
 .editor-format-bbcode .editor-toggle-source,
@@ -304,7 +312,6 @@ current location, due to event insertion, makes z-index troublesome. */
    }
 
    .js-editor-fullpage #editor-fullpage-candidate {
-      top: -60px;
       left: 0;
       right: 0;
    }

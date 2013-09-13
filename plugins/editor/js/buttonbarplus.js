@@ -437,7 +437,7 @@ jQuery(document).ready(function($) {
 
                $(TextArea).replaceSelectedText(selection, 'collapseToEnd');
 
-
+/*
                // very buggy, and will reattach event over and over.
                $(TextArea).on('keyup', function (e) {
                    var textbox = $(this);
@@ -460,7 +460,7 @@ jQuery(document).ready(function($) {
 
                    }
 
-               });               
+               });    */           
 
                break;
                
@@ -831,7 +831,7 @@ jQuery(document).ready(function($) {
 
                $(TextArea).replaceSelectedText(selection, 'collapseToEnd');
 
-
+/*
                // very buggy, and will reattach event over and over.
                $(TextArea).on('keyup', function (e) {
                    var textbox = $(this);
@@ -875,6 +875,8 @@ jQuery(document).ready(function($) {
                    }
 
                });  
+                        
+                        */
                
                break;
                

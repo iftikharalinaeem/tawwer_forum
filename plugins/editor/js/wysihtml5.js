@@ -9650,7 +9650,7 @@ var wysihtml5ParserRules = {
         "strike": {
             //"remove": 1
             "rename_tag": "del",
-            "set_class": "wysiwyg-text-decoration-line-through"
+            "set_class": "post-text-decoration-line-through"
         },
         "form": {
             "rename_tag": "div"
