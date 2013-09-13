@@ -16,7 +16,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.2.6',
+   'Version' => '1.2.7',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -189,7 +189,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       }
       
       $ReactionModel = new ReactionModel();
-      if (C('Plugins.Reactions.ShowUserReactions', TRUE)) {
+      if (C('Plugins.Reactions.ShowUserReactions', 'popup') == 'avatars') {
          $ReactionModel->JoinUserTags($Sender->Data['Discussion'], 'Discussion');
          $ReactionModel->JoinUserTags($Sender->Data['Comments'], 'Comment');
          
@@ -270,7 +270,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
-      if (C('Plugins.Reactions.ShowUserReactions', TRUE))
+      if (C('Plugins.Reactions.ShowUserReactions', 'popup') == 'avatars')
          $ReactionModel->JoinUserTags($Data);
       $Sender->SetData('Data', $Data);
       $Sender->SetData('EditMode', FALSE, TRUE);
@@ -359,6 +359,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (is_object($Menu = GetValue('Menu', $Sender))) {
          $Menu->AddLink('BestOf', T('Best Of...'), '/bestof/everything', FALSE, array('class' => 'BestOf'));
       }
+      $Sender->AddDefinition('ShowUserReactions', C('Plugins.Reactions.ShowUserReactions', 'popup'));
    }
       
    
@@ -413,7 +414,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
-      if (C('Plugins.Reactions.ShowUserReactions', TRUE))
+      if (C('Plugins.Reactions.ShowUserReactions', 'popup') == 'avatars')
          $ReactionModel->JoinUserTags($Data);
       $Sender->SetData('Data', $Data);
 
@@ -509,7 +510,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
-      if (C('Plugins.Reactions.ShowUserReactions', TRUE))
+      if (C('Plugins.Reactions.ShowUserReactions', 'popup') == 'avatars')
          $ReactionModel->JoinUserTags($Data);
       $Sender->SetData('Data', $Data);
 
@@ -657,7 +658,7 @@ if (!function_exists('WriteReactions')):
       Gdn::Controller()->EventArguments['RecordID'] = $ID;
 
 
-      if (C('Plugins.Reactions.ShowUserReactions', TRUE))
+      if (C('Plugins.Reactions.ShowUserReactions', 'popup') == 'avatars')
          WriteRecordReactions($Row);
 
       echo '<div class="Reactions">';

@@ -1,47 +1,53 @@
 jQuery(document).ready(function($) {
-//   var toggleButtons = function ($container, showOrHide, direction) {
-//      // Toggle the buttons.
-//      if (showOrHide) {
-//         $('.Handle', $container).hide();
-//         $('.ReactButtons', $container).show('slide', { direction: direction }, 200);
-//      } else {
-//         $('.ReactButtons', $container).hide('slide', { direction: direction }, 200, function() {
-//            $('.Handle', $container).show();
-//         });
-//      }
-//         
-//   };
-   
-//   $(document).delegate('.FlagHandle,.React .ReactHeading', 'click', function() {
-//      var $container = $(this).closest('.Reactions');
-//      
-//      toggleButtons($('.Flag', $container), true, 'left');
-//      toggleButtons($('.React', $container), false, 'right');
-//      
-//      return false;
-//   });
-//   
-//   $(document).delegate('.ReactHandle,.Flag .ReactHeading', 'click', function() {
-//      var $container = $(this).closest('.Reactions');
-//      
-//      toggleButtons($('.React', $container), true, 'right');
-//      toggleButtons($('.Flag', $container), false, 'left');
-//      
-//      return false;
-//   });
-   
    if ($.fn.expander)
       $('.Expander').expander({slicePoint: 200, expandText: gdn.definition('ExpandText'), userCollapseText: gdn.definition('CollapseText')});
    
-   $(document).delegate('.Buried', 'click', function(e) {
+   $(document).on('click', '.Buried', function(e) {
       e.preventDefault();
       $(this).removeClass('Buried').addClass('Un-Buried');
 //      console.log('buried click');
       return false;
    });
    
-   $(document).delegate('.Un-Buried', 'click', function() {
+   $(document).on('click', '.Un-Buried', function() {
 //      console.log('unburied click');
       $(this).removeClass('Un-Buried').addClass('Buried');
+   });
+   
+   $(document).on('mouseenter', '.ReactButton', function() {
+       var $button = $(this);
+       
+       if (!gdn.definition('ShowUserReactions', false) || $('.Count', $button).length == 0)
+           return;
+       
+       var itemID = $button.closest('.Item').attr('id');
+       var $menu = $('.MenuItems-Reactions', $button);
+       
+       if ($menu.length == 0) {
+            // Construct the initial div.
+            $menu = $('<div class="MenuItems MenuItems-Reactions Up"><div class="TinyProgress" /></div>')
+                .css('visibility', 'hidden')
+                .appendTo($button);
+        
+            $.ajax({
+                url: gdn.url('/reactions/users/'+itemID.split('_').join('/')+'/'+$button.data('reaction')),
+                data: {DeliveryType: 'VIEW'},
+                success: function(data) {
+                    $menu.html(data);
+                }
+            });
+       }
+       
+       // Position the menu above the reaction button.
+       var left = ($button.outerWidth() - $menu.outerWidth()) / 2.0;
+       var bottom = $button.height();
+       
+       $menu.css({ bottom: bottom, left: left, visibility: 'visible' });
+       
+       console.log($menu);
+   });
+   
+   $(document).on('mouseleave', '.ReactButton', function() {
+       $('.MenuItems-Reactions', $(this)).css({visibility: 'hidden'});
    });
 });
