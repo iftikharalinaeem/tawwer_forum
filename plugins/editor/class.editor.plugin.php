@@ -12,8 +12,8 @@ $PluginInfo['editor'] = array(
    'RequiredPlugins' => false,
    'HasLocale' => false,
    'RegisterPermissions' => false,
-   'SettingsUrl' => false,
-   'SettingsPermission' => false
+   'SettingsUrl' => '/settings/editor',
+   'SettingsPermission' => 'Garden.Setttings.Manage'
 );
 
 class EditorPlugin extends Gdn_Plugin {
@@ -614,6 +614,37 @@ class EditorPlugin extends Gdn_Plugin {
          }
       }
    }
+   
+   /**
+    * 
+    * @param SettingsController $Sender
+    * @param array $Args
+    */
+   public function SettingsController_Editor_Create($Sender, $Args) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $Cf = new ConfigurationModule($Sender);
+
+      $Formats = array_combine($this->Formats, $this->Formats);
+      
+      $Cf->Initialize(array(
+          'Garden.InputFormatter' => array('LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p> <p><small><strong>Note:</strong> the editor will auto-detect the format of old posts when emending them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</small></p>', 'Items' => $Formats)
+      ));
+      
+      $Sender->AddSideMenu();
+      $Sender->SetData('Title', T('Advanced Editor Settings'));
+      $Cf->RenderAll();
+      //$Sender->Cf = $Cf;
+      //$Sender->Render('settings', '', 'plugins/editor');
+   }   
+   
+   /*
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      $Menu = $Sender->EventArguments['SideMenu'];
+      $Menu->AddItem('Appearance', T('Appearance'));
+      $Menu->AddLink('Appearance', 'Advanced Editor', 'settings/editor', 'Garden.Settings.Manage');
+   }
+   */
+   
    
    /**
 	 * Every time editor plugin is enabled, disable other known editors that 
