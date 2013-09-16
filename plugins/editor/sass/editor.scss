@@ -3,6 +3,16 @@
 @import "_iconfonts";
 @import "_wysiwyg";
 
+/**
+ *  Define some mixins 
+ */
+
+@mixin border-box-important {
+   -moz-box-sizing: border-box !important;
+   -webkit-box-sizing: border-box !important;
+   -box-sizing: border-box !important;
+}
+
 
 /**
  * Editor toolbar 
@@ -194,13 +204,11 @@ affect, so it's not doing anything */
 .js-editor-fullpage #editor-fullpage-candidate {
    position: fixed;
    z-index: 9001;
+   overflow-y: auto;
    top: 0;
    right: 0;
    left: 0;
    bottom: 0;
-   width: 100%;
-   height: 100%;
-   overflow-y: auto;
    padding: 0;
    background-color: #fff;
 }
@@ -228,21 +236,32 @@ affect, so it's not doing anything */
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
-.js-editor-fullpage .TextBoxWrapper #Form_Body,
+.js-editor-fullpage .TextBoxWrapper .BodyBox,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
    width: 100% !important;
-   height: 400px !important;
    padding: 10px !important;
 }
 
 /* Fix some content boxes */
-.js-editor-fullpage #editor-fullpage-candidate .editor,
 .js-editor-fullpage #editor-fullpage-candidate input, 
-.js-editor-fullpage .TextBoxWrapper #Form_Body,
+.js-editor-fullpage .TextBoxWrapper .BodyBox,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
-   -moz-box-sizing: border-box !important;
-   -box-sizing: border-box !important;
+   @include border-box-important;
 }
+
+/* Set default heights for each editor view. Regular (markdown, html, bbcode) 
+all require min-height to be set to not interfere with autogrow, while 
+wysiwgy requires height to not interfere with autogrow. */
+
+.js-editor-fullpage .TextBoxWrapper .BodyBox {
+   min-height: 400px;
+}
+
+.js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+   height: 400px !important;
+}
+
+
 
 /* Animation definition for fade in editor on fullpage */
 @keyframes editor-anim-editor {
@@ -311,12 +330,7 @@ affect, so it's not doing anything */
       display: none !important;
    }
 
-   .js-editor-fullpage #editor-fullpage-candidate {
-      left: 0;
-      right: 0;
-   }
-
-   .js-editor-fullpage .TextBoxWrapper #Form_Body,
+   .js-editor-fullpage .TextBoxWrapper .BodyBox,
    .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
       height: auto !important;
    }
