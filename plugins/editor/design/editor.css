@@ -1177,22 +1177,18 @@ affect, so it's not doing anything */
 .js-editor-fullpage #editor-fullpage-candidate form {
   margin: 0 auto;
   padding: 50px 0 10px 0;
-  position: absolute !important;
-  display: block;
-  left: 0;
-  right: 0;
   animation-duration: 0.8s;
   animation-name: editor-anim-editor;
 }
 
-/* line 230, ../sass/editor.scss */
+/* line 226, ../sass/editor.scss */
 .js-editor-fullpage #editor-fullpage-candidate .editor,
 .js-editor-fullpage #editor-fullpage-candidate form {
   max-width: 800px;
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
-/* line 236, ../sass/editor.scss */
+/* line 232, ../sass/editor.scss */
 .js-editor-fullpage .TextBoxWrapper #Form_Body,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
   width: 100% !important;
@@ -1201,7 +1197,7 @@ affect, so it's not doing anything */
 }
 
 /* Fix some content boxes */
-/* line 246, ../sass/editor.scss */
+/* line 242, ../sass/editor.scss */
 .js-editor-fullpage #editor-fullpage-candidate .editor,
 .js-editor-fullpage #editor-fullpage-candidate input,
 .js-editor-fullpage .TextBoxWrapper #Form_Body,
@@ -1212,7 +1208,7 @@ affect, so it's not doing anything */
 
 /* Animation definition for fade in editor on fullpage */
 @keyframes editor-anim-editor {
-  /* line 253, ../sass/editor.scss */
+  /* line 249, ../sass/editor.scss */
   0% {
     opacity: 0;
   }
@@ -1224,7 +1220,7 @@ affect, so it's not doing anything */
  * Html, BBCode, and Markdown views have slight differences than the Wysiwyg, 
  * so hide the particular ones.
  */
-/* line 283, ../sass/editor.scss */
+/* line 279, ../sass/editor.scss */
 .editor-format-html .editor-toggle-source,
 .editor-format-bbcode .editor-toggle-source,
 .editor-format-markdown .editor-toggle-source,
@@ -1251,17 +1247,17 @@ affect, so it's not doing anything */
  * a last ditch effort to at least make sure editor is usable when others 
  * are enabled. 
  */
-/* line 297, ../sass/editor.scss */
+/* line 293, ../sass/editor.scss */
 .js-editor-active .cleditorMain iframe {
   display: none !important;
 }
 
-/* line 301, ../sass/editor.scss */
+/* line 297, ../sass/editor.scss */
 .js-editor-active .cleditorMain .wysihtml5-sandbox {
   display: block !important;
 }
 
-/* line 307, ../sass/editor.scss */
+/* line 303, ../sass/editor.scss */
 .js-editor-active .cleditorToolbar,
 .js-editor-active .ButtonBar,
 .js-editor-active .ButtonBarMarkupHint {
@@ -1270,18 +1266,18 @@ affect, so it's not doing anything */
 
 /* Media query: Hiding non-essential buttons */
 @media (max-width: 767px) {
-  /* line 314, ../sass/editor.scss */
+  /* line 310, ../sass/editor.scss */
   .hidden-xs {
     display: none !important;
   }
 
-  /* line 318, ../sass/editor.scss */
+  /* line 314, ../sass/editor.scss */
   .js-editor-fullpage #editor-fullpage-candidate {
     left: 0;
     right: 0;
   }
 
-  /* line 324, ../sass/editor.scss */
+  /* line 320, ../sass/editor.scss */
   .js-editor-fullpage .TextBoxWrapper #Form_Body,
   .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
     height: auto !important;
@@ -1289,7 +1285,7 @@ affect, so it's not doing anything */
 
   /* This is not necessary or very specific, but on mobile, apple products 
      add rounded corners */
-  /* line 330, ../sass/editor.scss */
+  /* line 326, ../sass/editor.scss */
   textarea {
     border-radius: 0;
   }

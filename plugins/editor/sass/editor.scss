@@ -218,10 +218,6 @@ affect, so it's not doing anything */
 .js-editor-fullpage #editor-fullpage-candidate form {
    margin: 0 auto;
    padding: 50px 0 10px 0;
-   position: absolute !important;
-   display: block;
-   left: 0;
-   right: 0;
    animation-duration: 0.8s;
    animation-name: editor-anim-editor;
 }
