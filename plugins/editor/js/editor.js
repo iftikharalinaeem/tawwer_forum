@@ -444,9 +444,9 @@ jQuery(function() {
              // Set focus--wysiwyg is slightly different
             if (typeof wysiwygInstance != 'undefined') {
                //wysiwygInstance.fire("focus");
-               console.log('wysi');
+               //console.log('wysi');
             } else {
-                  console.log('foo');
+               //console.log('foo');
                editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
             }
          }
@@ -606,10 +606,10 @@ jQuery(function() {
       }); 
    };
    
+   // Chrome wraps span around content. Firefox prepends b.
+   // No real need to detect browsers.
    var wysiPasteFix = function(editorInstance) {
       var editor = editorInstance;
-      // Chrome wraps span around content. Firefox prepends b.
-      // No real check to check browsers. 
       editor.observe("paste:composer", function(e) {
          // Grab paste value
          var paste = this.composer.getValue();

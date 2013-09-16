@@ -1143,70 +1143,48 @@
   -moz-box-sizing: border-box !important;
 }
 
-/* Little off in fullpage due to wrapped div which can't really be specified, 
-which has some padding issue */
-/* line 191, ../sass/editor.scss */
-.js-editor-fullpage .editor-toggle-fullpage-button {
-  margin-right: 7px;
-}
-
-/* this is the problem area with funky padding that doesnt disappear
-.js-editor-fullpage #editor-fullpage-candidate > form {
-   border: 2px solid blue;
-   padding: 0;
-}*/
-/* Background overlay. No need to insert empty div in markup; doing so at the 
-current location, due to event insertion, makes z-index troublesome. */
-/* line 203, ../sass/editor.scss */
-.js-editor-fullpage:after {
-  content: ' ';
-  display: block;
-  position: fixed;
-  z-index: 9000;
-  background-color: #fff;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+/* For some reason this element has right padding in core that does nothing, 
+except offset the textarea in fullpage. Removing it in regular view has no 
+affect, so it's not doing anything */
+/* line 193, ../sass/editor.scss */
+.js-editor-fullpage .TextBoxWrapper {
+  padding: 0;
 }
 
 /* .FormWrapper */
-/* line 216, ../sass/editor.scss */
+/* line 198, ../sass/editor.scss */
 .js-editor-fullpage #editor-fullpage-candidate {
-  position: absolute;
+  position: fixed;
   z-index: 9001;
-  top: 20px;
-  right: 20%;
-  left: 20%;
-  width: auto;
-  background-color: transparent;
-  padding: 0 0 20px 0;
-  animation-duration: 1s;
-  animation-name: editor-anim-editor;
-  margin: 0 auto;
-  /* This is the width that should be modified when choosing the width of 
-     the fullpage editor, not the textarea directly. */
-  max-width: 800px;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0;
+  background: #fff !important;
 }
 
-/* Temp, take this out when you figure out the element that is restricting 
-   this child from going truly absolute. */
-/* line 235, ../sass/editor.scss */
-.js-editor-fullpage .EditCommentForm #editor-fullpage-candidate {
-  position: fixed;
+/* line 212, ../sass/editor.scss */
+.js-editor-fullpage #editor-fullpage-candidate form {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 10px 0;
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
-/* line 241, ../sass/editor.scss */
+/* line 220, ../sass/editor.scss */
 .js-editor-fullpage .TextBoxWrapper #Form_Body,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
   width: 100% !important;
   height: 400px !important;
-  padding: 20px !important;
+  padding: 10px !important;
 }
 
 @keyframes editor-anim-editor {
-  /* line 248, ../sass/editor.scss */
+  /* line 227, ../sass/editor.scss */
   0% {
     opacity: 0;
   }
@@ -1218,7 +1196,7 @@ current location, due to event insertion, makes z-index troublesome. */
  * Html, BBCode, and Markdown views have slight differences than the Wysiwyg, 
  * so hide the particular ones.
  */
-/* line 278, ../sass/editor.scss */
+/* line 257, ../sass/editor.scss */
 .editor-format-html .editor-toggle-source,
 .editor-format-bbcode .editor-toggle-source,
 .editor-format-markdown .editor-toggle-source,
@@ -1245,17 +1223,17 @@ current location, due to event insertion, makes z-index troublesome. */
  * a last ditch effort to at least make sure editor is usable when others 
  * are enabled. 
  */
-/* line 292, ../sass/editor.scss */
+/* line 271, ../sass/editor.scss */
 .js-editor-active .cleditorMain iframe {
   display: none !important;
 }
 
-/* line 296, ../sass/editor.scss */
+/* line 275, ../sass/editor.scss */
 .js-editor-active .cleditorMain .wysihtml5-sandbox {
   display: block !important;
 }
 
-/* line 302, ../sass/editor.scss */
+/* line 281, ../sass/editor.scss */
 .js-editor-active .cleditorToolbar,
 .js-editor-active .ButtonBar,
 .js-editor-active .ButtonBarMarkupHint {
@@ -1264,18 +1242,18 @@ current location, due to event insertion, makes z-index troublesome. */
 
 /* Media query: Hiding non-essential buttons */
 @media (max-width: 767px) {
-  /* line 309, ../sass/editor.scss */
+  /* line 288, ../sass/editor.scss */
   .hidden-xs {
     display: none !important;
   }
 
-  /* line 313, ../sass/editor.scss */
+  /* line 292, ../sass/editor.scss */
   .js-editor-fullpage #editor-fullpage-candidate {
     left: 0;
     right: 0;
   }
 
-  /* line 319, ../sass/editor.scss */
+  /* line 298, ../sass/editor.scss */
   .js-editor-fullpage .TextBoxWrapper #Form_Body,
   .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
     height: auto !important;
@@ -1283,7 +1261,7 @@ current location, due to event insertion, makes z-index troublesome. */
 
   /* This is not necessary or very specific, but on mobile, apple products 
      add rounded corners */
-  /* line 325, ../sass/editor.scss */
+  /* line 304, ../sass/editor.scss */
   textarea {
     border-radius: 0;
   }
