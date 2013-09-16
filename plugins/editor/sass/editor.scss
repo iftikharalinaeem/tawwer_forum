@@ -182,10 +182,6 @@
    overflow: hidden;
 }
 
-.js-editor-fullpage *{
-   -moz-box-sizing: border-box !important;
-}
-
 /* For some reason this element has right padding in core that does nothing, 
 except offset the textarea in fullpage. Removing it in regular view has no 
 affect, so it's not doing anything */
@@ -206,13 +202,33 @@ affect, so it's not doing anything */
    height: 100%;
    overflow-y: auto;
    padding: 0;
-   background: #fff !important;
+   background-color: #fff;
+}
+
+.js-editor-fullpage #editor-fullpage-candidate .editor {
+   border: 1px solid transparent;
+   position: fixed;
+   top: 0;
+   left: 0;
+   right: 0;
+   margin: 0 auto;
+   background-color: rgba(255,255,255,0.90);
 }
 
 .js-editor-fullpage #editor-fullpage-candidate form {
-   max-width: 800px;
    margin: 0 auto;
-   padding: 10px 0;
+   padding: 50px 0 10px 0;
+   position: absolute !important;
+   display: block;
+   left: 0;
+   right: 0;
+   animation-duration: 0.8s;
+   animation-name: editor-anim-editor;
+}
+
+.js-editor-fullpage #editor-fullpage-candidate .editor,
+.js-editor-fullpage #editor-fullpage-candidate form {
+   max-width: 800px;
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
@@ -223,6 +239,16 @@ affect, so it's not doing anything */
    padding: 10px !important;
 }
 
+/* Fix some content boxes */
+.js-editor-fullpage #editor-fullpage-candidate .editor,
+.js-editor-fullpage #editor-fullpage-candidate input, 
+.js-editor-fullpage .TextBoxWrapper #Form_Body,
+.js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+   -moz-box-sizing: border-box !important;
+   -box-sizing: border-box !important;
+}
+
+/* Animation definition for fade in editor on fullpage */
 @keyframes editor-anim-editor {
   0% {
     opacity: 0;

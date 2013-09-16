@@ -477,8 +477,11 @@ jQuery(function() {
          $('.Button')
          .off('click.closefullpage')
          .on('click.closefullpage', function() {
-            if ($('body').hasClass('js-editor-fullpage')) { 
-               toggleFullpage();
+            // Prevent auto-saving drafts from exiting fullpage
+            if (!$(this).hasClass('DraftButton')) {
+               if ($('body').hasClass('js-editor-fullpage')) { 
+                  toggleFullpage();
+               }
             }
          });   
       }()); 
