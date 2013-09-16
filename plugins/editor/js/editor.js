@@ -399,6 +399,10 @@ jQuery(function() {
     */
    var fullPageInit = function(wysiwygInstance) {
       
+      // Hack to push toolbar left 15px when vertical scrollbar appears, so it 
+      // is always aligned with the textarea. This is for clearing interval.
+      var toolbarInterval;
+
       var toggleFullpage = function(e) {
          // either user clicks on fullpage toggler button, or escapes out with key
          var toggleButton = (typeof e != 'undefined') 
@@ -415,13 +419,29 @@ jQuery(function() {
             formWrapper = $(toggleButton).parent().parent();
          }
          
+         
          // If no fullpage, enable it
          if (!bodyEl.hasClass('js-editor-fullpage')) {
             $(formWrapper).attr('id', 'editor-fullpage-candidate');
             bodyEl.addClass('js-editor-fullpage');
             $(toggleButton).addClass('icon-resize-small');
-            window.scrollTo(0, 0);
+            
+            var fullPageCandidate = $('#editor-fullpage-candidate');
+            var editorToolbar = $('.editor');
+            // Poll composer container to see if it has scrollbar
+            intervalCheck = setInterval(function() {
+               if ($(fullPageCandidate)[0].clientHeight < $(fullPageCandidate)[0].scrollHeight) {
+                  // console.log('scrollbar');
+                  $(editorToolbar).css('right', '15px');
+               } else {
+                  // console.log('no scrollbar');
+                  $(editorToolbar).css('right', '0');
+               }
+            }, 10);
+            
+            
          } else {
+            clearInterval(intervalCheck);
             // else disable fullpage
             $(formWrapper).attr('id', '');
             bodyEl.removeClass('js-editor-fullpage');
