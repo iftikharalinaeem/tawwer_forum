@@ -31,7 +31,7 @@ jQuery(function() {
        editorName       = 'vanilla-editor-text';
        
 
-   var currentEditableTextarea = $('#Form_Body');
+   var currentEditableTextarea = $('.BodyBox');
    var currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
    var currentEditorFormat     = $('#Form_Format')[0].value.toLowerCase();
    
@@ -109,10 +109,11 @@ jQuery(function() {
             /**
              * Instantiate new editor on page load, against editor already in DOM 
              */
-            var editor = new wysihtml5.Editor(editorTextareaId, editorRules);
+            var editor = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
 
             // load resizer
             editor.on('load', function() {
+               
                $(editor.composer.iframe).wysihtml5_size_matters();
                // Make visible again for Html toggling.
                $(currentEditableTextarea).css('visibility', '');  
@@ -232,7 +233,7 @@ jQuery(function() {
       
          // Load script for wysiwyg editor async
          $.getScript(assets + "/js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-            ButtonBar.AttachTo($('#'+editorTextareaId), formatOriginal);
+            ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
          });
          
          break;
@@ -335,7 +336,7 @@ jQuery(function() {
                         }
 
                         // instantiate new editor
-                        var editorInline = new wysihtml5.Editor(editorTextareaId, editorRulesOTF);
+                        var editorInline = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRulesOTF);
 
                         editorInline.on('load', function() {
                            // enable auto-resize
@@ -363,7 +364,7 @@ jQuery(function() {
                   case 'markdown': 
 
                      $.getScript(assets + "/js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-                        ButtonBar.AttachTo($('#'+editorTextareaId), formatOriginal);
+                        ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
                      });                  
                      break;
               }
@@ -420,6 +421,11 @@ jQuery(function() {
             formWrapper = $(toggleButton).parent().parent();
          }
          
+         // profile activity page has yet another difference in surrounding 
+         // markup, so make a case for that. 
+         if ($(formWrapper).closest('form').hasClass('Activity')) {
+            formWrapper = $(formWrapper).closest('form');
+         }         
          
          // If no fullpage, enable it
          if (!bodyEl.hasClass('js-editor-fullpage')) {
@@ -461,6 +467,9 @@ jQuery(function() {
                $(editorToolbar).css('right', '0');
             });
             */
+           
+           // experimental lights toggle for chrome.
+           toggleLights();
             
          } else {
             clearInterval(toolbarInterval);
@@ -469,6 +478,14 @@ jQuery(function() {
             $(formWrapper).attr('id', '');
             bodyEl.removeClass('js-editor-fullpage');
             $(toggleButton).removeClass('icon-resize-small');
+            
+            // for experimental chrome lights toggle
+            $('.editor-toggle-lights-button').attr('style', '');
+            
+            // wysiwhtml5 editor area sometimes overflows beyond wrapper 
+            // when exiting fullpage, and it reflows on window resize, so 
+            // trigger resize event to get it done. 
+            $(window).trigger('resize');
             
             // Auto scroll to correct location upon exiting fullpage.
             var scrollto = $(toggleButton).closest('.Comment');
@@ -490,7 +507,7 @@ jQuery(function() {
                //console.log('wysi');
             } else {
                //console.log('foo');
-               editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
+               //editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
             }
          }
       }
@@ -528,6 +545,23 @@ jQuery(function() {
             }
          });   
       }()); 
+      
+      
+      // Lights on/off in fullpage--experimental for chrome
+      var toggleLights = function() {
+         // Just do it for chrome right now. Very experimental.
+         if (window.chrome) {
+            var toggleLights = $('.editor-toggle-lights-button');           
+            $(toggleLights).attr('style', 'display:inline-block !important').off('click').on('click', function() {
+               var fullPageCandidate = $('#editor-fullpage-candidate');
+               if (!$(fullPageCandidate).hasClass('editor-lights-candidate')) {
+                  $(fullPageCandidate).addClass('editor-lights-candidate');
+               } else {
+                  $(fullPageCandidate).removeClass('editor-lights-candidate');
+               }
+            });
+         }
+      };
    };
 
    // TODO when previewing a post, then going back to edit, the text help

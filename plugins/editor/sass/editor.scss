@@ -225,15 +225,19 @@ affect, so it's not doing anything */
    box-shadow: 0 2px 5px -5px #000;
 }
 
-.js-editor-fullpage #editor-fullpage-candidate form {
+.js-editor-fullpage #editor-fullpage-candidate form,
+.js-editor-fullpage form#editor-fullpage-candidate > div /* Activity on profile */ {
    margin: 0 auto;
    padding: 50px 0 10px 0;
+   -webkit-animation-duration: 0.8s;
+   -webkit-animation-name: editor-anim-editor;
    animation-duration: 0.8s;
    animation-name: editor-anim-editor;
 }
 
 .js-editor-fullpage #editor-fullpage-candidate .editor,
-.js-editor-fullpage #editor-fullpage-candidate form {
+.js-editor-fullpage #editor-fullpage-candidate form,
+.js-editor-fullpage form#editor-fullpage-candidate > div /* Activity on profile */ {
    max-width: 800px;
 }
 
@@ -265,8 +269,41 @@ wysiwgy requires height to not interfere with autogrow. */
 
 
 
+/**
+ * Experimental toggle lights on/off. Just a quick demo for Chrome.
+ */
+
+.editor-toggle-lights-button {
+   display: none !important;
+}
+
+.js-editor-fullpage .editor-toggle-lights-button {
+   float: right;
+   /*display: inline-block !important;*/
+}
+
+.js-editor-fullpage .editor-lights-candidate {
+   -webkit-filter: invert(100%);
+   /* Messier in Firefox, but basic usage */
+   /*filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='invert'><feColorMatrix type='matrix' values='-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0'/></filter></svg>#invert");*/
+   -webkit-animation-duration: 0.5s;
+   -webkit-animation-name: editor-anim-lights;
+}
+
+@-webkit-keyframes editor-anim-lights {
+  0% {
+    -webkit-filter: invert(0%);
+  }
+}
+
+
 /* Animation definition for fade in editor on fullpage */
 @keyframes editor-anim-editor {
+  0% {
+    opacity: 0;
+  }
+}
+@-webkit-keyframes editor-anim-editor {
   0% {
     opacity: 0;
   }
