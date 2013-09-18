@@ -409,6 +409,7 @@ jQuery(function() {
             ? e.target 
             : $('#editor-fullpage-candidate').find('.editor-toggle-fullpage-button');
 
+
          var bodyEl      = $('body'); 
              formWrapper = $(toggleButton).closest('.FormWrapper')[0];
          
@@ -426,22 +427,44 @@ jQuery(function() {
             bodyEl.addClass('js-editor-fullpage');
             $(toggleButton).addClass('icon-resize-small');
             
+
             var fullPageCandidate = $('#editor-fullpage-candidate');
-            var editorToolbar = $('.editor');
-            // Poll composer container to see if it has scrollbar
-            intervalCheck = setInterval(function() {
-               if ($(fullPageCandidate)[0].clientHeight < $(fullPageCandidate)[0].scrollHeight) {
-                  // console.log('scrollbar');
-                  $(editorToolbar).css('right', '15px');
-               } else {
-                  // console.log('no scrollbar');
-                  $(editorToolbar).css('right', '0');
-               }
-            }, 10);
+            var editorToolbar = $(fullPageCandidate).find('.editor');
             
+            // When textarea pushes beyond viewport of its container, a 
+            // scrollbar appears, which pushes the textarea left, while the 
+            // fixed editor toolbar does not move, so push it over.
+            // Opted to go this route because support for the flow events is 
+            // limited, webkit/moz both have their own implementations, while 
+            // IE has no support for them. See below for example, commented out.
+            
+            // Only Firefox seems to have this issue (unless this is
+            // mac-specific. Chrome & Safari on mac do not shift content over.
+            if (typeof InstallTrigger !== 'undefined') {
+               toolbarInterval = setInterval(function() {
+                  if ($(fullPageCandidate)[0].clientHeight < $(fullPageCandidate)[0].scrollHeight) {
+                     // console.log('scrollbar');
+                     $(editorToolbar).css('right', '15px');
+                  } else {
+                     // console.log('no scrollbar');
+                     $(editorToolbar).css('right', '0');
+                  }
+               }, 10);
+            }
+
+            /*
+            $(fullPageCandidate).off('overflow').on('overflow', function() {
+               $(editorToolbar).css('right', '15px');
+               console.log('overflow');
+            });
+            $(fullPageCandidate).off('underflow').on('underflow', function() {
+               $(editorToolbar).css('right', '0');
+            });
+            */
             
          } else {
-            clearInterval(intervalCheck);
+            clearInterval(toolbarInterval);
+            
             // else disable fullpage
             $(formWrapper).attr('id', '');
             bodyEl.removeClass('js-editor-fullpage');

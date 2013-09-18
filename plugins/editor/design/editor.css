@@ -930,7 +930,7 @@
 /* Added to body class with JS, so force specificity for everything 
    below; this makes editing very easy */
 .js-editor-fullpage {
-  overflow: hidden;
+  overflow: hidden !important;
 }
 
 /* For some reason this element has right padding in core that does nothing, 
@@ -962,7 +962,8 @@ affect, so it's not doing anything */
   left: 0;
   right: 0;
   margin: 0 auto;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 5px -5px #000;
 }
 
 .js-editor-fullpage #editor-fullpage-candidate form {
