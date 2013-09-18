@@ -717,7 +717,7 @@ if (!function_exists('WriteReactions')):
 
       if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Reactions.Edit'), FALSE)) {
          echo Gdn_Theme::BulletItem('ReactionsMod').
-            Anchor(T('Log'), "/reactions/log/{$RecordType}/{$ID}", 'Popup');
+            Anchor(T('Log'), "/reactions/log/{$RecordType}/{$ID}", 'Popup ReactButton');
       }
 
       Gdn::Controller()->FireEvent('AfterReactions');
