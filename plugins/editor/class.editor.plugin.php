@@ -280,6 +280,7 @@ class EditorPlugin extends Gdn_Plugin {
         'star'                         => array('star', '123'),
         'cookie'                       => array('cookie', '262'),
         'warning'                      => array('warning', '71'),
+        'mrgreen'                      => array('mrgreen'),
 
         // Love
         'heart'                        => array('heart', '109'),  
