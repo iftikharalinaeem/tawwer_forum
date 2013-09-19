@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.0.0',
+   'Version' => '1.0.2',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -12,8 +12,8 @@ $PluginInfo['editor'] = array(
    'RequiredPlugins' => false,
    'HasLocale' => false,
    'RegisterPermissions' => false,
-   'SettingsUrl' => false,
-   'SettingsPermission' => false
+   'SettingsUrl' => '/settings/editor',
+   'SettingsPermission' => 'Garden.Setttings.Manage'
 );
 
 class EditorPlugin extends Gdn_Plugin {
@@ -110,7 +110,8 @@ class EditorPlugin extends Gdn_Plugin {
           
           'sep-switches' => true, // separator
           'togglehtml' => true, 
-          'fullpage' => true 
+          'fullpage' => true, 
+          'lights' => true 
       );
       
       if ($name !== null) {
@@ -472,12 +473,12 @@ class EditorPlugin extends Gdn_Plugin {
        * array. Once complete, loop through allowedEditorActions and filter 
        * out the actions that will not be allowed.
        */
-      $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold', 'data-wysihtml5-command' => 'bold', 'title' => 'Bold', 'data-editor' => '{"action":"bold","value":""}'));
-      $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic', 'data-wysihtml5-command' => 'italic', 'title' => 'Italic', 'data-editor' => '{"action":"italic","value":""}'));
-      $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough', 'data-wysihtml5-command' => 'strikethrough', 'title' => 'Strike', 'data-editor' => '{"action":"strike","value":""}'));
+      $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => 'Bold', 'data-editor' => '{"action":"bold","value":""}'));
+      $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => 'Italic', 'data-editor' => '{"action":"italic","value":""}'));
+      $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close', 'data-wysihtml5-command' => 'strikethrough', 'title' => 'Strike', 'data-editor' => '{"action":"strike","value":""}'));
       $editorToolbarAll['color'] = array('edit' => 'basic', 'action'=> 'color', 'type' => $toolbarDropdownFontColor, 'attr' => array('class' => 'icon icon-font editor-dd-color hidden-xs', 'data-wysihtml5-command-group' => 'foreColor', 'title' => 'Color', 'data-editor' => '{"action":"color","value":""}'));
-      $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol hidden-xs', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => 'Ordered list', 'data-editor' => '{"action":"orderedlist","value":""}'));
-      $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul hidden-xs', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => 'Unordered list', 'data-editor' => '{"action":"unorderedlist","value":""}'));
+      $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => 'Ordered list', 'data-editor' => '{"action":"orderedlist","value":""}'));
+      $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => 'Unordered list', 'data-editor' => '{"action":"unorderedlist","value":""}'));
       
       $editorToolbarAll['sep-format'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-headers hidden-xs'));
       $editorToolbarAll['format'] = array('edit' => 'format', 'action'=> 'headers', 'type' => array(
@@ -494,13 +495,14 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['images'] = array('edit' => 'media', 'action'=> 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => 'Image', 'data-editor' => '{"action":"image","value":""}'));
 
       $editorToolbarAll['sep-align'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-align hidden-xs'));
-      $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action'=> 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left hidden-xs', 'data-wysihtml5-command' => 'justifyLeft', 'title' => 'Align left', 'data-editor' => '{"action":"alignleft","value":""}'));
-      $editorToolbarAll['aligncenter'] = array('edit' => 'format', 'action'=> 'aligncenter', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-center hidden-xs', 'data-wysihtml5-command' => 'justifyCenter', 'title' => 'Align center', 'data-editor' => '{"action":"aligncenter","value":""}'));
-      $editorToolbarAll['alignright'] = array('edit' => 'format', 'action'=> 'alignright', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-right hidden-xs', 'data-wysihtml5-command' => 'justifyRight', 'title' => 'Align right', 'data-editor' => '{"action":"alignright","value":""}'));
+      $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action'=> 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyLeft', 'title' => 'Align left', 'data-editor' => '{"action":"alignleft","value":""}'));
+      $editorToolbarAll['aligncenter'] = array('edit' => 'format', 'action'=> 'aligncenter', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-center editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyCenter', 'title' => 'Align center', 'data-editor' => '{"action":"aligncenter","value":""}'));
+      $editorToolbarAll['alignright'] = array('edit' => 'format', 'action'=> 'alignright', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-right editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyRight', 'title' => 'Align right', 'data-editor' => '{"action":"alignright","value":""}'));
       
       $editorToolbarAll['sep-switches'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-switches hidden-xs'));     
-      $editorToolbarAll['togglehtml'] = array('edit' => 'switches', 'action'=> 'togglehtml', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-source editor-toggle-source hidden-xs', 'data-wysihtml5-action' => 'change_view', 'title' => 'Toggle HTML view', 'data-editor' => '{"action":"togglehtml","value":""}'));
-      $editorToolbarAll['fullpage'] = array('edit' => 'switches', 'action'=> 'fullpage', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button', 'title' => 'Toggle full page', 'data-editor' => '{"action":"fullpage","value":""}'));
+      $editorToolbarAll['togglehtml'] = array('edit' => 'switches', 'action'=> 'togglehtml', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-source editor-toggle-source editor-dialog-fire-close hidden-xs', 'data-wysihtml5-action' => 'change_view', 'title' => 'Toggle HTML view', 'data-editor' => '{"action":"togglehtml","value":""}'));
+      $editorToolbarAll['fullpage'] = array('edit' => 'switches', 'action'=> 'fullpage', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button editor-dialog-fire-close', 'title' => 'Toggle full page', 'data-editor' => '{"action":"fullpage","value":""}'));
+      $editorToolbarAll['lights'] = array('edit' => 'switches', 'action'=> 'lights', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-lightbulb editor-toggle-lights-button editor-dialog-fire-close hidden-xs', 'title' => 'Toggle lights', 'data-editor' => '{"action":"lights","value":""}'));
 
       // Filter out disallowed editor actions 
       foreach ($allowedEditorActions as $editorAction => $allowed) {
@@ -614,6 +616,37 @@ class EditorPlugin extends Gdn_Plugin {
          }
       }
    }
+   
+   /**
+    * 
+    * @param SettingsController $Sender
+    * @param array $Args
+    */
+   public function SettingsController_Editor_Create($Sender, $Args) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $Cf = new ConfigurationModule($Sender);
+
+      $Formats = array_combine($this->Formats, $this->Formats);
+      
+      $Cf->Initialize(array(
+          'Garden.InputFormatter' => array('LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p> <p><small><strong>Note:</strong> the editor will auto-detect the format of old posts when emending them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</small></p>', 'Items' => $Formats)
+      ));
+      
+      $Sender->AddSideMenu();
+      $Sender->SetData('Title', T('Advanced Editor Settings'));
+      $Cf->RenderAll();
+      //$Sender->Cf = $Cf;
+      //$Sender->Render('settings', '', 'plugins/editor');
+   }   
+   
+   /*
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      $Menu = $Sender->EventArguments['SideMenu'];
+      $Menu->AddItem('Appearance', T('Appearance'));
+      $Menu->AddLink('Appearance', 'Advanced Editor', 'settings/editor', 'Garden.Settings.Manage');
+   }
+   */
+   
    
    /**
 	 * Every time editor plugin is enabled, disable other known editors that 

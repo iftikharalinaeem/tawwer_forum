@@ -15,6 +15,7 @@ jQuery(function() {
     * Determine editor format to load, and asset path, default to Wysiwyg
     */
    var 
+       editor, editorInline,
        debug          = false,
        formatOriginal = gdn.definition('editorInputFormat', 'Wysiwyg'),
        format         = formatOriginal.toLowerCase(),
@@ -30,7 +31,7 @@ jQuery(function() {
        editorName       = 'vanilla-editor-text';
        
 
-   var currentEditableTextarea = $('#Form_Body');
+   var currentEditableTextarea = $('.BodyBox');
    var currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
    var currentEditorFormat     = $('#Form_Format')[0].value.toLowerCase();
    
@@ -108,19 +109,33 @@ jQuery(function() {
             /**
              * Instantiate new editor on page load, against editor already in DOM 
              */
-            var editor = new wysihtml5.Editor(editorTextareaId, editorRules);
+            var editor = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
 
             // load resizer
             editor.on('load', function() {
+               
                $(editor.composer.iframe).wysihtml5_size_matters();
                // Make visible again for Html toggling.
                $(currentEditableTextarea).css('visibility', '');  
                editorHandleQuotesPlugin(editor);
+
+               // Clear textarea/iframe content on submit.
+               $(currentEditableTextarea.closest('form')).on('clearCommentForm', function() {
+                  editor.fire('clear');
+                  editor.composer.clear();
+                  this.reset();
+               });            
                
+               // Some browsers modify pasted content, adding superfluous tags.
+               wysiPasteFix(editor);
+
                if (debug) {
                   wysiDebug(editor);
                }
-            });  
+               
+            });
+            
+
 
             /**
              * Extending functionality of wysihtml5.js
@@ -218,7 +233,7 @@ jQuery(function() {
       
          // Load script for wysiwyg editor async
          $.getScript(assets + "/js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-            ButtonBar.AttachTo($('#'+editorTextareaId), formatOriginal);
+            ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
          });
          
          break;
@@ -321,12 +336,21 @@ jQuery(function() {
                         }
 
                         // instantiate new editor
-                        var editorInline = new wysihtml5.Editor(editorTextareaId, editorRulesOTF);
+                        var editorInline = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRulesOTF);
 
                         editorInline.on('load', function() {
                            // enable auto-resize
                            $(editorInline.composer.iframe).wysihtml5_size_matters();  
                            editorHandleQuotesPlugin(editorInline);
+                           
+                           // Clear textarea/iframe content on submit.
+                           $(currentEditableTextarea.closest('form')).on('clearCommentForm', function() {
+                              editor.fire('clear');
+                              editor.composer.clear();
+                              this.reset();                       
+                           });
+                           
+                           wysiPasteFix(editorInline);
                            
                            if (debug) {
                               wysiDebug(editorInline);
@@ -340,7 +364,7 @@ jQuery(function() {
                   case 'markdown': 
 
                      $.getScript(assets + "/js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-                        ButtonBar.AttachTo($('#'+editorTextareaId), formatOriginal);
+                        ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
                      });                  
                      break;
               }
@@ -348,7 +372,7 @@ jQuery(function() {
               // Set up on editor load
               editorSetHelpText(formatOriginal, currentTextBoxWrapper);
               editorSetupDropdowns();
-              fullPageInit();
+              fullPageInit(editorInline);
               editorSetCaretFocusEnd(currentEditableTextarea[0]);
 
               // some() loop requires true to end loop. every() requires false.
@@ -374,13 +398,18 @@ jQuery(function() {
    /** 
     * Fullpage actions--available to all editor views on page load. 
     */
-   var fullPageInit = function() {
+   var fullPageInit = function(wysiwygInstance) {
       
+      // Hack to push toolbar left 15px when vertical scrollbar appears, so it 
+      // is always aligned with the textarea. This is for clearing interval.
+      var toolbarInterval;
+
       var toggleFullpage = function(e) {
          // either user clicks on fullpage toggler button, or escapes out with key
          var toggleButton = (typeof e != 'undefined') 
             ? e.target 
             : $('#editor-fullpage-candidate').find('.editor-toggle-fullpage-button');
+
 
          var bodyEl      = $('body'); 
              formWrapper = $(toggleButton).closest('.FormWrapper')[0];
@@ -392,17 +421,71 @@ jQuery(function() {
             formWrapper = $(toggleButton).parent().parent();
          }
          
+         // profile activity page has yet another difference in surrounding 
+         // markup, so make a case for that. 
+         if ($(formWrapper).closest('form').hasClass('Activity')) {
+            formWrapper = $(formWrapper).closest('form');
+         }         
+         
          // If no fullpage, enable it
          if (!bodyEl.hasClass('js-editor-fullpage')) {
             $(formWrapper).attr('id', 'editor-fullpage-candidate');
             bodyEl.addClass('js-editor-fullpage');
             $(toggleButton).addClass('icon-resize-small');
-            window.scrollTo(0, 0);
+            
+
+            var fullPageCandidate = $('#editor-fullpage-candidate');
+            var editorToolbar = $(fullPageCandidate).find('.editor');
+            
+            // When textarea pushes beyond viewport of its container, a 
+            // scrollbar appears, which pushes the textarea left, while the 
+            // fixed editor toolbar does not move, so push it over.
+            // Opted to go this route because support for the flow events is 
+            // limited, webkit/moz both have their own implementations, while 
+            // IE has no support for them. See below for example, commented out.
+            
+            // Only Firefox seems to have this issue (unless this is
+            // mac-specific. Chrome & Safari on mac do not shift content over.
+            if (typeof InstallTrigger !== 'undefined') {
+               toolbarInterval = setInterval(function() {
+                  if ($(fullPageCandidate)[0].clientHeight < $(fullPageCandidate)[0].scrollHeight) {
+                     // console.log('scrollbar');
+                     $(editorToolbar).css('right', '15px');
+                  } else {
+                     // console.log('no scrollbar');
+                     $(editorToolbar).css('right', '0');
+                  }
+               }, 10);
+            }
+
+            /*
+            $(fullPageCandidate).off('overflow').on('overflow', function() {
+               $(editorToolbar).css('right', '15px');
+               console.log('overflow');
+            });
+            $(fullPageCandidate).off('underflow').on('underflow', function() {
+               $(editorToolbar).css('right', '0');
+            });
+            */
+           
+           // experimental lights toggle for chrome.
+           toggleLights();
+            
          } else {
+            clearInterval(toolbarInterval);
+            
             // else disable fullpage
             $(formWrapper).attr('id', '');
             bodyEl.removeClass('js-editor-fullpage');
             $(toggleButton).removeClass('icon-resize-small');
+            
+            // for experimental chrome lights toggle
+            $('.editor-toggle-lights-button').attr('style', '');
+            
+            // wysiwhtml5 editor area sometimes overflows beyond wrapper 
+            // when exiting fullpage, and it reflows on window resize, so 
+            // trigger resize event to get it done. 
+            $(window).trigger('resize');
             
             // Auto scroll to correct location upon exiting fullpage.
             var scrollto = $(toggleButton).closest('.Comment');
@@ -417,8 +500,15 @@ jQuery(function() {
                 }, 400);
              }
  
-            // set focus
-            editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
+             // Buggy right now. Go back and fix.
+             // Set focus--wysiwyg is slightly different
+            if (typeof wysiwygInstance != 'undefined') {
+               //wysiwygInstance.fire("focus");
+               //console.log('wysi');
+            } else {
+               //console.log('foo');
+               //editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
+            }
          }
       }
       
@@ -445,13 +535,33 @@ jQuery(function() {
       // full page, but the text will remain in editor, so not big issue.
       var postCommentCloseFullPageEvent = (function() {
          $('.Button')
-         .off('click')
-         .on('click', function() {
-            if ($('body').hasClass('js-editor-fullpage')) { 
-               toggleFullpage();
+         .off('click.closefullpage')
+         .on('click.closefullpage', function() {
+            // Prevent auto-saving drafts from exiting fullpage
+            if (!$(this).hasClass('DraftButton')) {
+               if ($('body').hasClass('js-editor-fullpage')) { 
+                  toggleFullpage();
+               }
             }
          });   
       }()); 
+      
+      
+      // Lights on/off in fullpage--experimental for chrome
+      var toggleLights = function() {
+         // Just do it for chrome right now. Very experimental.
+         if (window.chrome) {
+            var toggleLights = $('.editor-toggle-lights-button');           
+            $(toggleLights).attr('style', 'display:inline-block !important').off('click').on('click', function() {
+               var fullPageCandidate = $('#editor-fullpage-candidate');
+               if (!$(fullPageCandidate).hasClass('editor-lights-candidate')) {
+                  $(fullPageCandidate).addClass('editor-lights-candidate');
+               } else {
+                  $(fullPageCandidate).removeClass('editor-lights-candidate');
+               }
+            });
+         }
+      };
    };
 
    // TODO when previewing a post, then going back to edit, the text help
@@ -572,14 +682,31 @@ jQuery(function() {
             editor.composer.selection.setAfter(editor.composer.element.lastChild);
             editor.composer.commands.exec("insertHTML", "<br>");
          }, 400);
+         
       }); 
+   };
+   
+   // Chrome wraps span around content. Firefox prepends b.
+   // No real need to detect browsers.
+   var wysiPasteFix = function(editorInstance) {
+      var editor = editorInstance;
+      editor.observe("paste:composer", function(e) {
+         // Grab paste value
+         var paste = this.composer.getValue();
+         // Just need to remove first one, and wysihtml5 will auto
+         // make sure the pasted html has all tags closed, so the 
+         // last will just be stripped automatically. sweet.
+         paste = paste.replace(/^<(span|b)>/m, ''); // just match first
+         // Insert into composer
+         this.composer.setValue(paste);
+      });
    };
    
 
    // Set up on page load
    editorSetHelpText(formatOriginal, $('#Form_Body'));
    editorSetupDropdowns();
-   fullPageInit();
+   fullPageInit(editor);
    editorSetCaretFocusEnd(currentEditableTextarea[0]);
    
    

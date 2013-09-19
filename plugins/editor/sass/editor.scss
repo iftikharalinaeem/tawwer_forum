@@ -3,6 +3,16 @@
 @import "_iconfonts";
 @import "_wysiwyg";
 
+/**
+ *  Define some mixins 
+ */
+
+@mixin border-box-important {
+   -moz-box-sizing: border-box !important;
+   -webkit-box-sizing: border-box !important;
+   -box-sizing: border-box !important;
+}
+
 
 /**
  * Editor toolbar 
@@ -166,7 +176,6 @@
    background-color: rgba(0, 0, 0, 0.10);
 }
 
-
 /**
  * Going full page 
  */
@@ -179,72 +188,122 @@
    below; this makes editing very easy */
 
 .js-editor-fullpage {
-   overflow: hidden;
+   overflow: hidden !important;
 }
 
-.js-editor-fullpage *{
-   -moz-box-sizing: border-box !important;
-}
+/* For some reason this element has right padding in core that does nothing, 
+except offset the textarea in fullpage. Removing it in regular view has no 
+affect, so it's not doing anything */
 
-/* Little off in fullpage due to wrapped div which can't really be specified, 
-which has some padding issue */
-.js-editor-fullpage .editor-toggle-fullpage-button {
-   margin-right: 7px;
-}
-/* this is the problem area with funky padding that doesnt disappear
-.js-editor-fullpage #editor-fullpage-candidate > form {
-   border: 2px solid blue;
+.js-editor-fullpage .TextBoxWrapper {
    padding: 0;
-}*/
-
-/* Background overlay. No need to insert empty div in markup; doing so at the 
-current location, due to event insertion, makes z-index troublesome. */
-
-.js-editor-fullpage:after {
-   content: ' ';
-   display: block;
-   position: fixed;
-   z-index: 9000;
-   background-color: #fff;
-   top: 0;
-   left: 0;
-   right: 0;
-   bottom: 0;
 }
 
 /* .FormWrapper */
 .js-editor-fullpage #editor-fullpage-candidate {
-   position: absolute;
+   position: fixed;
    z-index: 9001;
-   top: 20px;
-   right: 20%;
-   left: 20%;
-   width: auto;
-   background-color: transparent;
-   padding: 0 0 20px 0;
-   animation-duration: 1s;
-   animation-name: editor-anim-editor;
+   overflow-y: auto;
+   top: 0;
+   right: 0;
+   left: 0;
+   bottom: 0;
+   padding: 0;
+   background-color: #fff;
+   height: 100%;
+   width: 100%;
+}
+
+.js-editor-fullpage #editor-fullpage-candidate .editor {
+   border: 1px solid transparent;
+   position: fixed;
+   top: 0;
+   left: 0;
+   right: 0;
    margin: 0 auto;
-   /* This is the width that should be modified when choosing the width of 
-      the fullpage editor, not the textarea directly. */
+   background-color: rgba(255,255,255,0.95);
+   box-shadow: 0 2px 5px -5px #000;
+}
+
+.js-editor-fullpage #editor-fullpage-candidate form,
+.js-editor-fullpage form#editor-fullpage-candidate > div /* Activity on profile */ {
+   margin: 0 auto;
+   padding: 50px 0 10px 0;
+   -webkit-animation-duration: 0.8s;
+   -webkit-animation-name: editor-anim-editor;
+   animation-duration: 0.8s;
+   animation-name: editor-anim-editor;
+}
+
+.js-editor-fullpage #editor-fullpage-candidate .editor,
+.js-editor-fullpage #editor-fullpage-candidate form,
+.js-editor-fullpage form#editor-fullpage-candidate > div /* Activity on profile */ {
    max-width: 800px;
 }
 
-/* Temp, take this out when you figure out the element that is restricting 
-   this child from going truly absolute. */
-.js-editor-fullpage .EditCommentForm #editor-fullpage-candidate {
-   position: fixed;
-}
-
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
-.js-editor-fullpage .TextBoxWrapper #Form_Body,
+.js-editor-fullpage .TextBoxWrapper .BodyBox,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
    width: 100% !important;
-   height: 400px !important;
-   padding: 20px !important;
+   padding: 10px !important;
 }
 
+/* Fix some content boxes */
+.js-editor-fullpage #editor-fullpage-candidate input, 
+.js-editor-fullpage .TextBoxWrapper .BodyBox,
+.js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+   @include border-box-important;
+}
+
+/* Set default heights for each editor view. Regular (markdown, html, bbcode) 
+all require min-height to be set to not interfere with autogrow, while 
+wysiwgy requires height to not interfere with autogrow. */
+
+.js-editor-fullpage .TextBoxWrapper .BodyBox {
+   min-height: 400px;
+}
+
+.js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+   height: 400px !important;
+}
+
+
+
+/**
+ * Experimental toggle lights on/off. Just a quick demo for Chrome.
+ */
+
+.editor-toggle-lights-button {
+   display: none !important;
+}
+
+.js-editor-fullpage .editor-toggle-lights-button {
+   float: right;
+   /*display: inline-block !important;*/
+}
+
+.js-editor-fullpage .editor-lights-candidate {
+   -webkit-filter: invert(100%);
+   /* Messier in Firefox, but basic usage */
+   /*filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='invert'><feColorMatrix type='matrix' values='-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0'/></filter></svg>#invert");*/
+   -webkit-animation-duration: 0.5s;
+   -webkit-animation-name: editor-anim-lights;
+}
+
+@-webkit-keyframes editor-anim-lights {
+  0% {
+    -webkit-filter: invert(0%);
+  }
+}
+
+
+/* Animation definition for fade in editor on fullpage */
 @keyframes editor-anim-editor {
+  0% {
+    opacity: 0;
+  }
+}
+@-webkit-keyframes editor-anim-editor {
   0% {
     opacity: 0;
   }
@@ -310,12 +369,7 @@ current location, due to event insertion, makes z-index troublesome. */
       display: none !important;
    }
 
-   .js-editor-fullpage #editor-fullpage-candidate {
-      left: 0;
-      right: 0;
-   }
-
-   .js-editor-fullpage .TextBoxWrapper #Form_Body,
+   .js-editor-fullpage .TextBoxWrapper .BodyBox,
    .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
       height: auto !important;
    }
