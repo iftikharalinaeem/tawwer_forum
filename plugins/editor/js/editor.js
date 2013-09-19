@@ -345,8 +345,8 @@ jQuery(function() {
                            
                            // Clear textarea/iframe content on submit.
                            $(currentEditableTextarea.closest('form')).on('clearCommentForm', function() {
-                              editor.fire('clear');
-                              editor.composer.clear();
+                              editorInline.fire('clear');
+                              editorInline.composer.clear();
                               this.reset();                       
                            });
                            
