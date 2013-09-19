@@ -474,6 +474,12 @@ jQuery(function() {
          } else {
             clearInterval(toolbarInterval);
             
+            // wysiwhtml5 editor area sometimes overflows beyond wrapper 
+            // when exiting fullpage, and it reflows on window resize, so 
+            // trigger resize event to get it done. 
+            $('.'+editorName).css('width', '100%');
+            
+            
             // else disable fullpage
             $(formWrapper).attr('id', '');
             bodyEl.removeClass('js-editor-fullpage');
@@ -481,11 +487,6 @@ jQuery(function() {
             
             // for experimental chrome lights toggle
             $('.editor-toggle-lights-button').attr('style', '');
-            
-            // wysiwhtml5 editor area sometimes overflows beyond wrapper 
-            // when exiting fullpage, and it reflows on window resize, so 
-            // trigger resize event to get it done. 
-            $(window).trigger('resize');
             
             // Auto scroll to correct location upon exiting fullpage.
             var scrollto = $(toggleButton).closest('.Comment');
