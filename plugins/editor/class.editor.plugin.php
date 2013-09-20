@@ -574,7 +574,7 @@ class EditorPlugin extends Gdn_Plugin {
          
          switch (strtolower($this->Format)) {
             case 'wysiwyg':
-               $c->AddJsFile('wysiwyg5.js', 'plugins/editor');
+               $c->AddJsFile('wysihtml5.js', 'plugins/editor');
                break;
          }
          
