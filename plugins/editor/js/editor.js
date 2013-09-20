@@ -292,8 +292,8 @@ jQuery(function() {
            // the mutation will cause the iframe to be inserted AGAIN, thus 
            // having multiple iframes with identical properties, which, upon 
            // reverting back to editing mode, will break everything, so kill
-           // mutation callback immediately.
-           if ($(t).closest('#Form_Comment')) {
+           // mutation callback immediately, so check if iframe already exists.
+           if ($(t).find('iframe')) {
               return false;
            }
 
