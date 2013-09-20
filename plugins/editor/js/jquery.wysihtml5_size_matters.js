@@ -25,7 +25,13 @@
       };
 
       Wysihtml5SizeMatters.prototype.adjustHeight = function() {
-        return this.$iframe.css('min-height', this.$body.height() + this.extraBottomSpacing());
+        var height = this.$body.outerHeight() + this.extraBottomSpacing();
+        
+        if (this.$iframe.css('box-sizing') == 'border-box') {
+            height += parseInt(this.$iframe.css('padding-top')) + parseInt(this.$iframe.css('padding-bottom'));
+        }
+        
+        return this.$iframe.css('min-height', height);
       };
 
       Wysihtml5SizeMatters.prototype.extraBottomSpacing = function() {

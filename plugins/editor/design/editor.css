@@ -729,10 +729,7 @@
 /* Custom classes */
 .CodeBlock {
   font-family: monospace;
-  margin: 0 !important;
-  padding-left: 20px;
-  border-left: 5px solid rgba(0, 0, 0, 0.2);
-  background-color: rgba(0, 0, 0, 0.1);
+  padding-left: 5px;
   white-space: nowrap;
 }
 

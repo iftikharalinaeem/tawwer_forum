@@ -66,9 +66,9 @@ jQuery(function() {
          
          // Slight flicker where textarea content is visible initially
          $(currentEditableTextarea).css('visibility', 'hidden');
-         
+
          // Load script for wysiwyg editor async
-         $.getScript(assets + "/js/wysihtml5.js", function(data, textStatus, jqxhr) {
+         $.getScript(assets + "/js/wysihtml5-0.4.0pre.js", function(data, textStatus, jqxhr) {
                         
             /**
              * Default editor values when first instantiated on page. Later, on DOM
@@ -115,6 +115,9 @@ jQuery(function() {
             editor.on('load', function() {
                
                $(editor.composer.iframe).wysihtml5_size_matters();
+               
+               //$(editor.composer.iframe).autoResize();
+               
                // Make visible again for Html toggling.
                $(currentEditableTextarea).css('visibility', '');  
                editorHandleQuotesPlugin(editor);
@@ -330,7 +333,7 @@ jQuery(function() {
               // them on format
               switch (format) {
                  case 'wysiwyg':
-                    $.getScript(assets + "/js/wysihtml5.js", function(data, textStatus, jqxhr) {
+                    $.getScript(assets + "/js/wysihtml5-0.4.0pre.js", function(data, textStatus, jqxhr) {
                         // rules updated for particular edit, look to editorRules for 
                         // reference. Any defined here will overwrite the defaults set above.
                         var editorRulesOTF = {

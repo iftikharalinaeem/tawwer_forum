@@ -1,4 +1,4 @@
-/**
+ /**
 * Full HTML5 compatibility rule set
 * These rules define which tags and CSS classes are supported and which tags should be specially treated.
 *
@@ -10,7 +10,7 @@
 *
 * <img align="left" src="http://foobar.com/image.png">
 * ... becomes ...
-* <img class="wysiwyg-float-left" src="http://foobar.com/image.png" alt="">
+* <img class="post-float-left" src="http://foobar.com/image.png" alt="">
 *
 * <div>foo<script>alert(document.cookie)</script></div>
 * ... becomes ...
@@ -22,7 +22,7 @@
 *
 * foo <br clear="both"> bar
 * ... becomes ...
-* foo <br class="wysiwyg-clear-both"> bar
+* foo <br class="post-clear-both"> bar
 *
 * <div>hello <iframe src="http://google.com"></iframe></div>
 * ... becomes ...
@@ -30,7 +30,7 @@
 *
 * <center>hello</center>
 * ... becomes ...
-* <div class="wysiwyg-text-align-center">hello</div>
+* <div class="post-text-align-center">hello</div>
 */
 var wysihtml5ParserRules = {
     /**
@@ -38,40 +38,40 @@ var wysihtml5ParserRules = {
 * Following CSS classes won't be removed when parsed by the wysihtml5 HTML parser
 */
     "classes": {
-        "wysiwyg-clear-both": 1,
-        "wysiwyg-clear-left": 1,
-        "wysiwyg-clear-right": 1,
-        "wysiwyg-color-aqua": 1,
-        "wysiwyg-color-black": 1,
-        "wysiwyg-color-blue": 1,
-        "wysiwyg-color-fuchsia": 1,
-        "wysiwyg-color-gray": 1,
-        "wysiwyg-color-green": 1,
-        "wysiwyg-color-lime": 1,
-        "wysiwyg-color-maroon": 1,
-        "wysiwyg-color-navy": 1,
-        "wysiwyg-color-olive": 1,
-        "wysiwyg-color-purple": 1,
-        "wysiwyg-color-red": 1,
-        "wysiwyg-color-silver": 1,
-        "wysiwyg-color-teal": 1,
-        "wysiwyg-color-white": 1,
-        "wysiwyg-color-yellow": 1,
-        "wysiwyg-float-left": 1,
-        "wysiwyg-float-right": 1,
-        "wysiwyg-font-size-large": 1,
-        "wysiwyg-font-size-larger": 1,
-        "wysiwyg-font-size-medium": 1,
-        "wysiwyg-font-size-small": 1,
-        "wysiwyg-font-size-smaller": 1,
-        "wysiwyg-font-size-x-large": 1,
-        "wysiwyg-font-size-x-small": 1,
-        "wysiwyg-font-size-xx-large": 1,
-        "wysiwyg-font-size-xx-small": 1,
-        "wysiwyg-text-align-center": 1,
-        "wysiwyg-text-align-justify": 1,
-        "wysiwyg-text-align-left": 1,
-        "wysiwyg-text-align-right": 1,
+        "post-clear-both": 1,
+        "post-clear-left": 1,
+        "post-clear-right": 1,
+        "post-color-aqua": 1,
+        "post-color-black": 1,
+        "post-color-blue": 1,
+        "post-color-fuchsia": 1,
+        "post-color-gray": 1,
+        "post-color-green": 1,
+        "post-color-lime": 1,
+        "post-color-maroon": 1,
+        "post-color-navy": 1,
+        "post-color-olive": 1,
+        "post-color-purple": 1,
+        "post-color-red": 1,
+        "post-color-silver": 1,
+        "post-color-teal": 1,
+        "post-color-white": 1,
+        "post-color-yellow": 1,
+        "post-float-left": 1,
+        "post-float-right": 1,
+        "post-font-size-large": 1,
+        "post-font-size-larger": 1,
+        "post-font-size-medium": 1,
+        "post-font-size-small": 1,
+        "post-font-size-smaller": 1,
+        "post-font-size-x-large": 1,
+        "post-font-size-x-small": 1,
+        "post-font-size-xx-large": 1,
+        "post-font-size-xx-small": 1,
+        "post-text-align-center": 1,
+        "post-text-align-justify": 1,
+        "post-text-align-left": 1,
+        "post-text-align-right": 1,
         
         "Spoiler": 1,
         "Quote": 1,
@@ -84,11 +84,11 @@ var wysihtml5ParserRules = {
 *
 * - add_class: converts and deletes the given HTML4 attribute (align, clear, ...) via the given method to a css class
 * The following methods are implemented in wysihtml5.dom.parse:
-* - align_text: converts align attribute values (right/left/center/justify) to their corresponding css class "wysiwyg-text-align-*")
-* <p align="center">foo</p> ... becomes ... <p> class="wysiwyg-text-align-center">foo</p>
-* - clear_br: converts clear attribute values left/right/all/both to their corresponding css class "wysiwyg-clear-*"
-* <br clear="all"> ... becomes ... <br class="wysiwyg-clear-both">
-* - align_img: converts align attribute values (right/left) on <img> to their corresponding css class "wysiwyg-float-*"
+* - align_text: converts align attribute values (right/left/center/justify) to their corresponding css class "post-text-align-*")
+* <p align="center">foo</p> ... becomes ... <p> class="post-text-align-center">foo</p>
+* - clear_br: converts clear attribute values left/right/all/both to their corresponding css class "post-clear-*"
+* <br clear="all"> ... becomes ... <br class="post-clear-both">
+* - align_img: converts align attribute values (right/left) on <img> to their corresponding css class "post-float-*"
 *
 * - remove: removes the element and its content
 *
@@ -114,7 +114,7 @@ var wysihtml5ParserRules = {
         "strike": {
             //"remove": 1
             "rename_tag": "del",
-            "set_class": "wysiwyg-text-decoration-line-through"
+            "set_class": "post-text-decoration-line-through"
         },
         "form": {
             "rename_tag": "div"
@@ -154,7 +154,7 @@ var wysihtml5ParserRules = {
         },
         "small": {
             "rename_tag": "span",
-            "set_class": "wysiwyg-font-size-smaller"
+            "set_class": "post-font-size-smaller"
         },
         "area": {
             "remove": 1
@@ -287,7 +287,7 @@ var wysihtml5ParserRules = {
         },
         "big": {
             "rename_tag": "span",
-            "set_class": "wysiwyg-font-size-larger"
+            "set_class": "post-font-size-larger"
         },
         "button": {
             "rename_tag": "span"
@@ -491,7 +491,7 @@ var wysihtml5ParserRules = {
         "pre": {},
         "center": {
             "rename_tag": "div",
-            "set_class": "wysiwyg-text-align-center"
+            "set_class": "post-text-align-center"
         },
         "audio": {
             "remove": 1
