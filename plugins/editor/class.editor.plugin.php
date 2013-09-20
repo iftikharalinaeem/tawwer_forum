@@ -403,7 +403,7 @@ class EditorPlugin extends Gdn_Plugin {
 
 			if (strpos($Text, htmlentities($emojiAlias)) !== false) {
 				$Text = preg_replace(
-               '/(?<=[>\s])'.preg_quote(htmlentities($emojiAlias)).'(?=\W)/m',
+               '/(?<=[>\s(&nbsp;)])'.preg_quote(htmlentities($emojiAlias)).'(?=\W)/m',
                ' <img class="emoji" src="'. $emojiFilePath .'" title="'. $emojiAlias .'" alt=":'. $emojiCanonical .':" width="'. $emojiDimension .'" /> ',
 					$Text
 				);
@@ -466,7 +466,7 @@ class EditorPlugin extends Gdn_Plugin {
                                       ? $emojiAlias
                                       : "Alias '$emojiCanonical' not found in canonical list.";
 
-         $toolbarDropdownEmoji[] = array('edit' => 'media', 'action'=> 'emoji', 'type' => 'button', 'html_tag' => 'img', 'attr' => array('class' => 'editor-action emoji emoji-'. $emojiCanonical. ' editor-dialog-fire-close', 'data-wysihtml5-command' => 'insertHTML', 'data-wysihtml5-command-value' => ' '. $emojiAlias .' ', 'title' => $emojiTitle, 'data-editor' => $editorDataAttr, 'src' => $emojiFilePath, 'width' => $emojiDimension, 'height' => $emojiDimension, 'style' => $emojiStyle));
+         $toolbarDropdownEmoji[] = array('edit' => 'media', 'action'=> 'emoji', 'type' => 'button', 'html_tag' => 'img', 'attr' => array('class' => 'editor-action emoji emoji-'. $emojiCanonical. ' editor-dialog-fire-close', 'data-wysihtml5-command' => 'insertHTML', 'data-wysihtml5-command-value' => ' '.$emojiAlias .' ', 'title' => $emojiTitle, 'data-editor' => $editorDataAttr, 'src' => $emojiFilePath, 'width' => $emojiDimension, 'height' => $emojiDimension, 'style' => $emojiStyle));
       }      
 
       /**
