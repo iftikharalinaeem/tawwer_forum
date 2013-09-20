@@ -572,11 +572,12 @@ class EditorPlugin extends Gdn_Plugin {
          // view when required. This will prevent unnecessary requests.
          $c->AddJsFile('editor.js', 'plugins/editor');
          
+         /*
          switch (strtolower($this->Format)) {
             case 'wysiwyg':
                $c->AddJsFile('wysiwyg5.js', 'plugins/editor');
                break;
-         }
+         }*/
          
          // Set minor data for view
          $c->SetData('_EditorInputFormat', $this->Format);
