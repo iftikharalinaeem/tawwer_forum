@@ -293,7 +293,8 @@ jQuery(function() {
            // having multiple iframes with identical properties, which, upon 
            // reverting back to editing mode, will break everything, so kill
            // mutation callback immediately, so check if iframe already exists.
-           if ($(t).find('iframe')) {
+           
+           if ($(t).find('iframe').hasClass('vanilla-editor-text')) {
               return false;
            }
 
