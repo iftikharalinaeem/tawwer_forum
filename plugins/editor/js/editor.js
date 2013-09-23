@@ -90,7 +90,7 @@ jQuery(function() {
 
             // load resizer
             editor.on('load', function() {
-               
+                              
                $(editor.composer.iframe).wysihtml5_size_matters();
                               
                // Make visible again for Html toggling.
@@ -102,6 +102,11 @@ jQuery(function() {
                   editor.fire('clear');
                   editor.composer.clear();
                   this.reset();
+                  $(currentEditableTextarea).val('');
+                  //$('iframe').contents().find('body').empty();
+                  
+                  // The editor is not resized on post, so reset it.
+                  $(editor.composer.iframe).css({"min-height": "inherit"});
                });            
                
                // Some browsers modify pasted content, adding superfluous tags.
@@ -325,11 +330,16 @@ jQuery(function() {
                            $(editorInline.composer.iframe).wysihtml5_size_matters();  
                            editorHandleQuotesPlugin(editorInline);
                            
-                           // Clear textarea/iframe content on submit.
+                           // Clear textarea/iframe content on submit. 
+                           // This is not actually necessary here because 
+                           // the whole editor is removed from the page on post.
                            $(currentEditableTextarea.closest('form')).on('clearCommentForm', function() {
                               editorInline.fire('clear');
                               editorInline.composer.clear();
-                              this.reset();                       
+                              this.reset();           
+                              $(currentEditableTextarea).val('');
+                              //$('iframe').contents().find('body').empty();
+                              $(editorInline.composer.iframe).css({"min-height": "inherit"});
                            });
                            
                            wysiPasteFix(editorInline);
