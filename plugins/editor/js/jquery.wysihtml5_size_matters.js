@@ -1,4 +1,4 @@
-(function() {
+ (function() {
   (function($) {
     var Wysihtml5SizeMatters;
 
@@ -6,6 +6,11 @@
       function Wysihtml5SizeMatters(iframe) {
         this.$iframe = $(iframe);
         this.$body = this.findBody();
+        
+        // In 0.4.0pre the body inside the iframe has 100% height, while the 
+        // previous versions do not. This causes the editor autogrow to break. 
+        this.$body.css({ height: "auto" }).closest('html').css({ height: "auto" });
+        
         this.addBodyStyles();
         this.setupEvents();
         this.adjustHeight();
@@ -26,7 +31,7 @@
 
       Wysihtml5SizeMatters.prototype.adjustHeight = function() {
         var height = this.$body.outerHeight() + this.extraBottomSpacing();
-        
+                
         if (this.$iframe.css('box-sizing') == 'border-box') {
             height += parseInt(this.$iframe.css('padding-top')) + parseInt(this.$iframe.css('padding-bottom'));
         }

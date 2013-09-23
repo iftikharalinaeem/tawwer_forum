@@ -6,70 +6,47 @@ jQuery(function() {
    // If editor can be loaded, add class to body 
    $('body').addClass('js-editor-active');
    
-   // Enable caching of asynced assets for each editor view
-   $.ajaxSetup({
-      cache: true
-   });
-   
    /**
     * Determine editor format to load, and asset path, default to Wysiwyg
     */
-   var 
-       editor, editorInline,
-       debug          = false,
-       formatOriginal = gdn.definition('editorInputFormat', 'Wysiwyg'),
-       format         = formatOriginal.toLowerCase(),
-       assets         = gdn.definition('editorPluginAssets'), 
-       editorRules    = {}; // for wysiwyg
-       
-       
-  // When editor loaded inline and accomodates an editor format based on the 
-  // original post format.
-
-   var editorToolbarId  = 'editor-format-', // append format below
-       editorTextareaId = 'Form_Body', 
-       editorName       = 'vanilla-editor-text';
-       
-
-   var currentEditableTextarea = $('.BodyBox');
-   var currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
-   var currentEditorFormat     = $('#Form_Format')[0].value.toLowerCase();
-   
+   var editor, 
+       editorInline,
+       debug                   = false,
+       formatOriginal          = gdn.definition('editorInputFormat', 'Wysiwyg'),
+       format                  = formatOriginal.toLowerCase(),
+       assets                  = gdn.definition('editorPluginAssets'), 
+       editorRules             = {}, // for wysiwyg
+       currentEditableTextarea = $('.BodyBox'),
+       currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper'),
+       currentEditorFormat     = $('#Form_Format')[0].value.toLowerCase();
    
    format = (currentEditorFormat !== format) 
       ? currentEditorFormat 
       : format;
    
-   editorToolbarId += currentEditorFormat;
-   
+   var editorToolbarId  = 'editor-format-' + currentEditorFormat, // append format below
+       editorTextareaId = 'Form_Body', 
+       editorName       = 'vanilla-editor-text';
    
    // Set id of onload toolbar--required for proper functioning
    $('.editor').attr('id', editorToolbarId);
    
-   
-   
-   
-   
-   
-   
-   
    /**
     * Load correct editor view onload
     */
-   
    switch (format) {
-      
-      /**
-       * Wysiwyg editor
-       */
+
       case 'wysiwyg':
-         
          // Slight flicker where textarea content is visible initially
          $(currentEditableTextarea).css('visibility', 'hidden');
 
-         // Load script for wysiwyg editor async
-         $.getScript(assets + "/js/wysihtml5-0.4.0pre.js", function(data, textStatus, jqxhr) {
-                        
+         // Lazyloading scripts, then run single callback
+         $.when(
+            loadScript(assets + '/js/wysihtml5-0.4.0pre.js'),
+            loadScript(assets + '/js/advanced.js'),
+            loadScript(assets + '/js/jquery.wysihtml5_size_matters.js')
+         ).done(function(){
+  
             /**
              * Default editor values when first instantiated on page. Later, on DOM
              * mutations, these values are updated per editable comment.
@@ -115,9 +92,7 @@ jQuery(function() {
             editor.on('load', function() {
                
                $(editor.composer.iframe).wysihtml5_size_matters();
-               
-               //$(editor.composer.iframe).autoResize();
-               
+                              
                // Make visible again for Html toggling.
                $(currentEditableTextarea).css('visibility', '');  
                editorHandleQuotesPlugin(editor);
@@ -138,7 +113,6 @@ jQuery(function() {
                
             });
             
-
 
             /**
              * Extending functionality of wysihtml5.js
@@ -224,33 +198,21 @@ jQuery(function() {
          });
          
          break;
-      
-      /**
-       * HTML editor 
-       * BBCode editor 
-       * Markdown editor 
-       */
+
       case 'html':
       case 'bbcode':
       case 'markdown':         
-      
-         // Load script for wysiwyg editor async
-         $.getScript(assets + "/js/buttonbarplus.js", function(data, textStatus, jqxhr) {
-            ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
+         // Lazyloading scripts, then run single callback
+         $.when(
+            loadScript(assets + '/js/buttonbarplus.js'),
+            loadScript(assets + '/js/jquery.hotkeys.js'),
+            loadScript(assets + '/js/rangy.js')
+         ).done(function(){
+            ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);            
          });
          
          break;
    }
-   
-   
-   
-   
-   
-   
-   
-   
-   
-
    
    /**
     * Mutation observer for attaching editor to every .BodyBox that's inserted 
@@ -333,7 +295,14 @@ jQuery(function() {
               // them on format
               switch (format) {
                  case 'wysiwyg':
-                    $.getScript(assets + "/js/wysihtml5-0.4.0pre.js", function(data, textStatus, jqxhr) {
+                    
+                     // Lazyloading scripts, then run single callback
+                     $.when(
+                        loadScript(assets + '/js/wysihtml5-0.4.0pre.js'),
+                        loadScript(assets + '/js/advanced.js'),
+                        loadScript(assets + '/js/jquery.wysihtml5_size_matters.js')
+                     ).done(function(){
+                    
                         // rules updated for particular edit, look to editorRules for 
                         // reference. Any defined here will overwrite the defaults set above.
                         var editorRulesOTF = {
@@ -375,8 +344,12 @@ jQuery(function() {
                   case 'html':
                   case 'bbcode':
                   case 'markdown': 
-
-                     $.getScript(assets + "/js/buttonbarplus.js", function(data, textStatus, jqxhr) {
+                     // Lazyloading scripts, then run single callback
+                     $.when(
+                        loadScript(assets + '/js/buttonbarplus.js'),
+                        loadScript(assets + '/js/jquery.hotkeys.js'),
+                        loadScript(assets + '/js/rangy.js')
+                     ).done(function(){
                         ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
                      });                  
                      break;
@@ -716,6 +689,28 @@ jQuery(function() {
       });
    };
    
+   
+   // Debugging lazyloaded scripts impossible with jQuery getScript/get
+   // Make sure available to all 
+   // http://balpha.de/2011/10/jquery-script-insertion-and-its-consequences-for-debugging/
+   function loadScript(path) {
+      var result = $.Deferred(),
+          script = document.createElement("script");
+      script.async = "async";
+      script.type = "text/javascript";
+      script.src = path;
+      script.onload = script.onreadystatechange = function(_, isAbort) {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) {
+              if (isAbort)
+                  result.reject();
+              else
+                  result.resolve();
+          }
+      };
+      script.onerror = function () { result.reject(); };
+      $("head")[0].appendChild(script);
+      return result.promise();
+   }   
 
    // Set up on page load
    editorSetHelpText(formatOriginal, $('#Form_Body'));
@@ -784,38 +779,3 @@ jQuery(function() {
 //this.editor.observe("change_view", function(view) {
 //this.editor.observe("destroy:composer", stopInterval);
 //editor.setValue('This will do it.');
-
-
-
-//http://stackoverflow.com/questions/690781/debugging-scripts-added-via-jquery-getscript-function
-// Replace the normal jQuery getScript function with one that supports
-// debugging and which references the script files as external resources
-// rather than inline.
-jQuery.extend({
-   getScript: function(url, callback) {
-      var head = document.getElementsByTagName("head")[0];
-      var script = document.createElement("script");
-      script.src = url;
-
-      // Handle Script loading
-      var done = false;
-
-      // Attach handlers for all browsers
-      script.onload = script.onreadystatechange = function(){
-         if ( !done && (!this.readyState ||
-               this.readyState == "loaded" || this.readyState == "complete") ) {
-            done = true;
-            if (callback)
-               callback();
-
-            // Handle memory leak in IE
-            script.onload = script.onreadystatechange = null;
-         }
-      };
-
-      head.appendChild(script);
-
-      // We handle everything using the script element injection
-      return undefined;
-   },
-});
