@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.0.2',
+   'Version' => '1.0.4',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -403,7 +403,7 @@ class EditorPlugin extends Gdn_Plugin {
 
 			if (strpos($Text, htmlentities($emojiAlias)) !== false) {
 				$Text = preg_replace(
-               '/(?<=[>\s(&nbsp;)])'.preg_quote(htmlentities($emojiAlias)).'(?=\W)/m',
+               '/(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias)).'(?=\W)/m',
                ' <img class="emoji" src="'. $emojiFilePath .'" title="'. $emojiAlias .'" alt=":'. $emojiCanonical .':" width="'. $emojiDimension .'" /> ',
 					$Text
 				);
@@ -571,12 +571,6 @@ class EditorPlugin extends Gdn_Plugin {
          // This js file will asynchronously load the assets of each editor 
          // view when required. This will prevent unnecessary requests.
          $c->AddJsFile('editor.js', 'plugins/editor');
-         
-         switch (strtolower($this->Format)) {
-            case 'wysiwyg':
-               $c->AddJsFile('wysihtml5.js', 'plugins/editor');
-               break;
-         }
          
          // Set minor data for view
          $c->SetData('_EditorInputFormat', $this->Format);
