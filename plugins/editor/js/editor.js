@@ -1,7 +1,7 @@
 // TODO refactor as jQuery plugin. Allow passing arguments as json, check for
 // defaults. Enable calling plugin and it just works. 
 
-jQuery(function() {
+jQuery(document).ready(function($) {
 
    // If editor can be loaded, add class to body 
    $('body').addClass('js-editor-active');
@@ -12,6 +12,7 @@ jQuery(function() {
    var editor, 
        editorInline,
        debug                   = false,
+       editorVersion           = gdn.definition('editorVersion', Math.random()),
        formatOriginal          = gdn.definition('editorInputFormat', 'Wysiwyg'),
        format                  = formatOriginal.toLowerCase(),
        assets                  = gdn.definition('editorPluginAssets'), 
@@ -31,6 +32,32 @@ jQuery(function() {
    // Set id of onload toolbar--required for proper functioning
    $('.editor').attr('id', editorToolbarId);
    
+   
+   /**
+    * Load relevant stylesheets into editor iframe. The first one loaded is 
+    * the actual editor.css required for the plugin. The others are extra, 
+    * grabbed from the source of parent to iframe, as different communities 
+    * may have styles they want injected into the iframe. 
+    */
+
+   var stylesheetsInclude = [assets + '/design/editor.css?v=' + editorVersion];
+   
+   /*
+   // If you want to include other stylsheets from the main page in the iframe.
+   $('link').each(function(i, el) {
+      if (el.href.indexOf("style.css") !== -1 || el.href.indexOf("custom.css") !== -1) {
+         stylesheetsInclude.push(el.href);
+      }
+   });
+   */
+   
+   // Some communities may want to modify just the styling of the Wysiwyg 
+   // while editing, so this file will let them. 
+   var editorWysiwygCSS = gdn.definition('editorWysiwygCSS', '');
+   if (editorWysiwygCSS != '') {
+      stylesheetsInclude.push(editorWysiwygCSS + '?v=' + editorVersion);
+   }
+
    /**
     * Load correct editor view onload
     */
@@ -72,7 +99,7 @@ jQuery(function() {
                // By default wysihtml5 will insert a <br> for line breaks, set this to false to use <p>
                useLineBreaks:        false,
                // Array (or single string) of stylesheet urls to be loaded in the editor's iframe
-               stylesheets:          [assets + '/design/editor.css'],
+               stylesheets:          stylesheetsInclude,
                // Placeholder text to use, defaults to the placeholder attribute on the textarea element
                placeholderText:      "Write something!",
                // Whether the composer should allow the user to manually resize images, tables etc.
@@ -536,6 +563,26 @@ jQuery(function() {
             }
          });   
       }()); 
+      
+      // Toggle spoilers in posted messages.
+      var editorToggleSpoiler = (function() {
+         // Use event delegation, so that even new comments ajax posted 
+         // can be toggled 
+         $('.MessageList')
+         .on('mouseup.Spoiler', '.Spoiler', function(e) {            
+            $(this).removeClass('Spoiler');
+            $(this).addClass('Spoiled');
+         })
+         .on('mouseup.Spoiled', '.Spoiled', function(e) {
+            // If the user selects some text, don't close the spoiler, and 
+            // if there is an anchor in spoiler, do not close spoiler.
+            if (!document.getSelection().toString().length 
+            && e.target.nodeName.toLowerCase() != 'a') {
+               $(this).removeClass('Spoiled');
+               $(this).addClass('Spoiler');
+            }
+         });
+      }());
       
       
       // Lights on/off in fullpage--experimental for chrome

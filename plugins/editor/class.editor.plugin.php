@@ -26,6 +26,12 @@ class EditorPlugin extends Gdn_Plugin {
    
    /**
     *
+    * @var array Give class access to PluginInfo 
+    */
+   protected $pluginInfo = array();
+   
+   /**
+    *
     * @var array List of possible formats the editor supports. 
     */
    protected $Formats = array('Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text', 'TextEx');
@@ -77,6 +83,7 @@ class EditorPlugin extends Gdn_Plugin {
    public function __construct() {
       parent::__construct();
       $this->AssetPath = Asset('/plugins/editor');  
+      $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
    }
    
    /**
@@ -548,6 +555,13 @@ class EditorPlugin extends Gdn_Plugin {
          $Sender->EventArguments['Object'] = $Object;
       }
 	}
+   
+   
+   
+   public function Base_Render_Before(&$Sender) {
+      $c = Gdn::Controller();
+      $c->AddJsFile('editor.js', 'plugins/editor');
+   }
       
    /**
     * Attach editor anywhere 'BodyBox' is used. It is not being used for 
@@ -575,6 +589,7 @@ class EditorPlugin extends Gdn_Plugin {
          // Set minor data for view
          $c->SetData('_EditorInputFormat', $this->Format);
          // Set definitions for JavaScript
+         $c->AddDefinition('editorVersion', $this->pluginInfo['Version']);
          $c->AddDefinition('editorInputFormat',       $this->Format);
          $c->AddDefinition('editorPluginAssets',      $this->AssetPath);         
          $c->AddDefinition('editorButtonBarLinkUrl',  T('editor.LinkUrlText', 'Enter URL:'));
@@ -585,6 +600,15 @@ class EditorPlugin extends Gdn_Plugin {
          $c->AddDefinition('editorMarkdownHelpText',  T('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
          $c->AddDefinition('editorTextHelpText',      T('editor.TextHelpText', 'You are using plain text in your post.'));
 
+         // If user wants to modify styling of Wysiwyg content in editor, 
+         // they can override the styles with this file.
+         $CssInfo = AssetModel::CssPath('wysiwyg.css', 'plugins/editor');
+         if ($CssInfo) {
+           $CssPath = Asset($CssInfo[1]);
+         }
+         
+         $c->AddDefinition('editorWysiwygCSS', $CssPath);
+         
          /**
           * Get the generated editor toolbar from getEditorToolbar, and assign 
           * it data object for view.

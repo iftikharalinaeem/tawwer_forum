@@ -1,7 +1,6 @@
 @import "compass";
 @import "compass/css3";
 @import "_iconfonts";
-@import "_wysiwyg";
 
 /**
  *  Define some mixins 
@@ -380,3 +379,30 @@ wysiwgy requires height to not interfere with autogrow. */
       border-radius: 0;
    }
 }
+
+
+
+/**
+ * Target actual body within editor iframe. 
+ *
+ * Due to including multiple CSS files (style.css and custom.css), which could 
+ * have their body's defined differently, make sure body within editor is 
+ * affected as little as possible. 
+ */
+
+.wysihtml5-editor {
+   margin: 0;
+	padding: 5px;
+	border: 0;
+	font: inherit;
+   outline: none;
+}
+
+
+
+/**
+ * Modify this file to change the styling of the content 
+ * in the Wysiwyg editor. 
+ */
+
+@import "wysiwyg";
