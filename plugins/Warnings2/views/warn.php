@@ -50,12 +50,12 @@ echo $this->Form->TextBox('ModeratorNote', array('Wrap' => TRUE));
 </div>
    
 <?php if ($this->Data('Record')): ?>
-   
-<?php endif; ?>
 <div class="P">
 <?php
 echo $this->Form->CheckBox('AttachRecord', '@'.sprintf('Attach this warning to the %s.', T(strtolower($this->Data('RecordType')))));
 ?>
+<?php endif; ?>
+   
 </div>
 <?php
 echo '<div class="Buttons Buttons-Confirm">', 
