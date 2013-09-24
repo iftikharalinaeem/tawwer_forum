@@ -17,7 +17,7 @@ jQuery(document).ready(function($) {
    $(document).on('mouseenter', '.ReactButton', function() {
        var $button = $(this);
        
-       if (!gdn.definition('ShowUserReactions', false) || $('.Count', $button).length == 0)
+       if (!gdn.definition('ShowUserReactions', false) || $('.Count', $button).length == 0 || !$button.data('reaction'))
            return;
        
        var itemID = $button.closest('.Item').attr('id');
