@@ -768,11 +768,13 @@ jQuery(document).ready(function() {
    }   
 
    // Set up on page load
+   /* 
+   // FixASAP
    editorSetHelpText(formatOriginal, $('#Form_Body'));
    editorSetupDropdowns();
    fullPageInit(editor);
    editorSetCaretFocusEnd(currentEditableTextarea[0]);
-   
+   */
    
    // This will only be called when debug=true;
    var wysiDebug = function(editorInstance) {
