@@ -415,13 +415,7 @@ jQuery(function() {
          // exception this was made for is the signatures plugin.
          if (typeof formWrapper == 'undefined') {
             formWrapper = $(toggleButton).parent().parent();
-         }
-         
-         // profile activity page has yet another difference in surrounding 
-         // markup, so make a case for that. 
-         if ($(formWrapper).closest('form').hasClass('Activity')) {
-            formWrapper = $(formWrapper).closest('form');
-         }         
+         }      
          
          // If no fullpage, enable it
          if (!bodyEl.hasClass('js-editor-fullpage')) {
