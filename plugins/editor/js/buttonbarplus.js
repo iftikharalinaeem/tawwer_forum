@@ -606,31 +606,31 @@ jQuery(document).ready(function($) {
                
             case 'orderedlist':
                
-               var thisOpts = $.extend(htmlOpts, {
-                  prefix:'',
-                  opentag:'<ol>\n<li>',
-                  closetag:'</li>\n</ol>',
-                  opener:'',
-                  closer:'',
-                  closeslice: ''
-               });
-               
-               $(TextArea).insertRoundTag('', thisOpts);
+               $(TextArea).surroundSelectedText('<ol>', '\n</ol>', 'select');
+
+               var tagListItem = '\n<li> '; 
+
+               var selection = '\n' + $(TextArea).getSelection().text;
+
+               selection = selection.replace(/(\r\n|\n|\r)/gm, tagListItem);
+
+
+               $(TextArea).replaceSelectedText(selection, 'collapseToEnd');
 
                break;
                
             case 'unorderedlist':
                
-               var thisOpts = $.extend(htmlOpts, {
-                  prefix:'',
-                  opentag:'<ul>\n<li>',
-                  closetag:'</li>\n</ul>',
-                  opener:'',
-                  closer:'',
-                  closeslice: ''
-               });
-               
-               $(TextArea).insertRoundTag('', thisOpts);
+               $(TextArea).surroundSelectedText('<ul>', '\n</ul>', 'select');
+
+               var tagListItem = '\n<li> '; 
+
+               var selection = '\n' + $(TextArea).getSelection().text;
+
+               selection = selection.replace(/(\r\n|\n|\r)/gm, tagListItem);
+
+
+               $(TextArea).replaceSelectedText(selection, 'collapseToEnd');
 
                break;
 
