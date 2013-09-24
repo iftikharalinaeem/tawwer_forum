@@ -466,17 +466,18 @@ jQuery(document).ready(function($) {
                
             case 'unorderedlist':
                
-               var thisOpts = $.extend(bbcodeOpts, {
-                  prefix:'',
-                  opentag:'[list]\n[*] ',
-                  closetag:'\n[/list]',
-                  opener:'',
-                  closer:'',
-                  closeslice: ''
-
-               });
                
-               $(TextArea).insertRoundTag('', thisOpts);
+               $(TextArea).surroundSelectedText('[list]', '\n[/list]', 'select');
+
+               var tagListItem = '\n[*] '; 
+
+               var selection = '\n' + $(TextArea).getSelection().text;
+
+               selection = selection.replace(/(\r\n|\n|\r)/gm, tagListItem);
+
+
+               $(TextArea).replaceSelectedText(selection, 'collapseToEnd');
+
 
                break;
                
