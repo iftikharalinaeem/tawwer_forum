@@ -1,7 +1,7 @@
 // TODO refactor as jQuery plugin. Allow passing arguments as json, check for
 // defaults. Enable calling plugin and it just works. 
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function() {
 
    // If editor can be loaded, add class to body 
    $('body').addClass('js-editor-active');
@@ -63,7 +63,7 @@ jQuery(document).ready(function($) {
     */
    switch (format) {
 
-      case 'wysiwyg':
+      case 'wysiwyg#FixASAP':
          // Slight flicker where textarea content is visible initially
          $(currentEditableTextarea).css('visibility', 'hidden');
 
@@ -231,9 +231,9 @@ jQuery(document).ready(function($) {
          
          break;
 
-      case 'html':
-      case 'bbcode':
-      case 'markdown':         
+      case 'html#FixASAP':
+      case 'bbcode#FixASAP':
+      case 'markdown#FixASAP':         
          // Lazyloading scripts, then run single callback
          $.when(
             loadScript(assets + '/js/buttonbarplus.js'),
@@ -260,7 +260,7 @@ jQuery(document).ready(function($) {
    $(document).ready(function() {
 
      // If there are any changes in this node, check for bodyBox.
-     var mutationTarget = $('#Content')[0];
+     var mutationTarget = $('body')[0];
 
      // configuration of the observer:
      var config = { 
@@ -290,10 +290,13 @@ jQuery(document).ready(function($) {
            // having multiple iframes with identical properties, which, upon 
            // reverting back to editing mode, will break everything, so kill
            // mutation callback immediately, so check if iframe already exists.
-           
+                      
            if ($(t).find('iframe').hasClass('vanilla-editor-text')) {
               return false;
            }
+           
+           //$(t).find('iframe').closest('#Content')
+           
 
            if (currentEditorFormat.length) {
      
@@ -464,6 +467,7 @@ jQuery(document).ready(function($) {
             // Only Firefox seems to have this issue (unless this is
             // mac-specific. Chrome & Safari on mac do not shift content over.
             if (typeof InstallTrigger !== 'undefined') {
+               return; // latest version of firefox (24), does not have this issue anymore.
                toolbarInterval = setInterval(function() {
                   if ($(fullPageCandidate)[0].clientHeight < $(fullPageCandidate)[0].scrollHeight) {
                      // console.log('scrollbar');
