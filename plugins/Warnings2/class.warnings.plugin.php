@@ -122,7 +122,7 @@ class Warnings2Plugin extends Gdn_Plugin {
    public function ProfileController_Card_Render($Sender, $Args) {
       $UserID = $Sender->Data('Profile.UserID');
       
-      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Garden.Warnings.Add'), FALSE)) {
+      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), FALSE)) {
          $Sender->Data['Actions']['Warn'] = array(
             'Text' => Sprite('SpWarn'),
             'Title' => T('Warn'),
@@ -131,7 +131,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             );
       }
       
-      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Garden.Notes.Add'), FALSE)) {
+      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.Add'), FALSE)) {
          $Sender->Data['Actions']['Note'] = array(
             'Text' => Sprite('SpNote'),
             'Title' => T('Add Note'),
@@ -140,7 +140,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             );
       }
       
-      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Garden.Notes.Vie'), FALSE)) {
+      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), FALSE)) {
          $Sender->Data['Actions']['Notes'] = array(
             'Text' => '<span class="Count">notes</span>',
             'Title' => T('Notes & Warnings'),
@@ -149,7 +149,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             );
       }
       
-      if (Gdn::Session()->CheckPermission('Garden.PersonalInformation.View')) {
+      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), FALSE)) {
          $UserAlertModel = new UserAlertModel();
          $Alert = $UserAlertModel->GetID($UserID, DATASET_TYPE_ARRAY);
          $Sender->SetData('Alert', $Alert);
