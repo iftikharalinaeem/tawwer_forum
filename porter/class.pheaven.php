@@ -54,26 +54,29 @@ class PHeaven extends ExportController {
       
       // Category.
       $Category_Map = array(
-          'Parent_ID' => 'ParentCategoryID',
-          'SortOrder' => 'Sort'
+         'Parent_ID' => 'ParentCategoryID',
+         'SortOrder' => 'Sort',
+         'URLName' => 'UrlCode'
       );
       $Ex->ExportTable('Category', "
          select
             f.ForumID as CategoryID,
-            if (f.ParentForum_ID > 0, f.ParentForum_ID, f.ForumCategory_ID * 2000) as Parent_ID,
+            if (f.ParentForum_ID > 0, f.ParentForum_ID, f.ForumCategory_ID + 1200) as Parent_ID,
             f.Name,
             null,
-            d.Description
+            d.Description,
+            f.URLName
          from Forums f
          left join ForumDetails d on f.ForumID = d.Forum_ID
 
          union all
 
          select
-            c.ForumCategoryID * 2000 as CategoryID,
+            c.ForumCategoryID + 1200 as CategoryID,
             null,
             c.Name,
             c.SortOrder,
+            null,
             null
          from ForumCategories c
          ", $Category_Map);
