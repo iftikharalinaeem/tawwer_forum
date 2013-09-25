@@ -341,7 +341,7 @@
                // typed after the inserted quotation, will be wrapped 
                // in a blockquote.
                editor.composer.selection.setAfter(editor.composer.element.lastChild);
-               editor.composer.commands.exec("insertHTML", "<br>");
+               editor.composer.commands.exec("insertHTML", "<p></p>");
             }, 400);
 
          }); 
@@ -598,7 +598,7 @@
                             // caret to after the latest insertion.                   
                             if ($(composer.element.lastChild).hasClass('Spoiler')) {
                                composer.selection.setAfter(composer.element.lastChild);
-                               composer.commands.exec("insertHTML", "<br>");
+                               composer.commands.exec("insertHTML", "<p></p>");
                             }
                           },
 
@@ -622,7 +622,7 @@
                             wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "blockquote", "Quote", REG_EXP);
                             if ($(composer.element.lastChild).hasClass('Quote')) {
                                composer.selection.setAfter(composer.element.lastChild);
-                               composer.commands.exec("insertHTML", "<br>");
+                               composer.commands.exec("insertHTML", "<p></p>");
                             }
                           },
 
@@ -646,7 +646,7 @@
                             wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "pre", "CodeBlock", REG_EXP);
                             if ($(composer.element.lastChild).hasClass('CodeBlock')) {
                               composer.selection.setAfter(composer.element.lastChild);
-                              composer.commands.exec("insertHTML", "<br>");
+                              composer.commands.exec("insertHTML", "<p></p>");
                             }
                           },
 
