@@ -105,13 +105,16 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
    $LinkClass = ConcatSep(' ', $LinkClass, GetValue('LinkClass', $Options));
    
    $UrlCode2 = strtolower($UrlCode);
-   if ($IsHeading)
+   if ($IsHeading) {
       $Url = '';
-   else
+      $DataAttr = '';
+   } else {
       $Url = Url("/react/$RecordType/$UrlCode2?id=$ID");
+      $DataAttr = "data-reaction=\"$UrlCode2\"";
+   }
    
    $Result = <<<EOT
-<a class="Hijack ReactButton $LinkClass" href="$Url" title="$Label" data-reaction="$UrlCode2" rel="nofollow"><span class="ReactSprite $SpriteClass"></span> $CountHtml<span class="ReactLabel">$Label</span></a>
+<a class="Hijack ReactButton $LinkClass" href="$Url" title="$Label" $DataAttr rel="nofollow"><span class="ReactSprite $SpriteClass"></span> $CountHtml<span class="ReactLabel">$Label</span></a>
 EOT;
    
    return $Result;
