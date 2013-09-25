@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.0.0',
+   'Version' => '1.0.5',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -12,8 +12,8 @@ $PluginInfo['editor'] = array(
    'RequiredPlugins' => false,
    'HasLocale' => false,
    'RegisterPermissions' => false,
-   'SettingsUrl' => false,
-   'SettingsPermission' => false
+   'SettingsUrl' => '/settings/editor',
+   'SettingsPermission' => 'Garden.Setttings.Manage'
 );
 
 class EditorPlugin extends Gdn_Plugin {
@@ -23,6 +23,12 @@ class EditorPlugin extends Gdn_Plugin {
     * Properties
     * 
     */
+   
+   /**
+    *
+    * @var array Give class access to PluginInfo 
+    */
+   protected $pluginInfo = array();
    
    /**
     *
@@ -77,6 +83,7 @@ class EditorPlugin extends Gdn_Plugin {
    public function __construct() {
       parent::__construct();
       $this->AssetPath = Asset('/plugins/editor');  
+      $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
    }
    
    /**
@@ -86,8 +93,8 @@ class EditorPlugin extends Gdn_Plugin {
     * 
     * @return array List of allowed editor actions
     */
-   public function getAllowedEditorActions() {
-      $allowedEditorActions = array(
+   public function getAllowedEditorActions($name = null, $value = null) {
+      static $allowedEditorActions = array(
           'bold' => true, 
           'italic' => true, 
           'strike' => true, 
@@ -110,10 +117,21 @@ class EditorPlugin extends Gdn_Plugin {
           
           'sep-switches' => true, // separator
           'togglehtml' => true, 
-          'fullpage' => true 
+          'fullpage' => true, 
+          'lights' => true 
       );
       
-      return $allowedEditorActions;
+      if ($name !== null) {
+         if (is_array($name)) {
+            $allowedEditorActions = $name;
+         } elseif ($value !== null) {
+            $allowedEditorActions[$name] = $value;
+         } else {
+            return getValue($name, $allowedEditorActions, null);
+         }
+      } else {
+         return $allowedEditorActions;
+      }
    }
    
    /**
@@ -173,9 +191,9 @@ class EditorPlugin extends Gdn_Plugin {
          ':o'          => 'open_mouth',
          ':s'          => 'confounded',
          ':p'          => 'stuck_out_tongue',
-         ':\'('        => 'cry',
+         ":'("         => 'cry',
          ':|'          => 'neutral_face',
-//         'D:'          => 'anguished',
+       //'D:'          => 'anguished',
          'B)'          => 'sunglasses',
          ':#'          => 'grin',
          'o:)'         => 'innocent',
@@ -268,6 +286,8 @@ class EditorPlugin extends Gdn_Plugin {
         'mask'                         => array('mask', '756'),
         'star'                         => array('star', '123'),
         'cookie'                       => array('cookie', '262'),
+        'warning'                      => array('warning', '71'),
+        'mrgreen'                      => array('mrgreen'),
 
         // Love
         'heart'                        => array('heart', '109'),  
@@ -279,7 +299,11 @@ class EditorPlugin extends Gdn_Plugin {
         '-1'                           => array('-1', '436'),
         
         // Custom icons, canonical naming
-        'trollface'                    => array('trollface', 'trollface')
+        'trollface'                    => array('trollface', 'trollface'),
+          
+        // This is used for aliases that are set incorrectly above or point 
+        // to items not listed in the canonical list. 
+        'grey_question'                => array('grey_question', '106')
       );
       
       // Some aliases self-referencing the canonical list. Use this syntax. 
@@ -292,6 +316,12 @@ class EditorPlugin extends Gdn_Plugin {
       $emojiCanonicalList['awesome']   = &$emojiCanonicalList['heart'];
 
       $emojiFileSuffix = '.png';
+      
+      // If the $emojiCanonical does not exist in the list, deliver a 
+      // warning emoji, to degrade gracefully.
+      if ($emojiCanonical && !isset($emojiCanonicalList[$emojiCanonical])) {
+         $emojiCanonical = 'grey_question';
+      }
       
       // Return first value from canonical array
       return (!$emojiCanonical)
@@ -380,8 +410,8 @@ class EditorPlugin extends Gdn_Plugin {
 
 			if (strpos($Text, htmlentities($emojiAlias)) !== false) {
 				$Text = preg_replace(
-               '/(?<=[>\s])'.preg_quote(htmlentities($emojiAlias)).'(?=\W)/m',
-               ' <img class="post-emoji" src="'. $emojiFilePath .'" title="'. $emojiAlias .'" alt=":'. $emojiCanonical .':" width="'. $emojiDimension .'" /> ',
+               '/(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias)).'(?=\W)/m',
+               ' <img class="emoji" src="'. $emojiFilePath .'" title="'. $emojiAlias .'" alt=":'. $emojiCanonical .':" width="'. $emojiDimension .'" /> ',
 					$Text
 				);
          }
@@ -417,7 +447,7 @@ class EditorPlugin extends Gdn_Plugin {
          // However, the post-color-* class will still need to be defined 
          // when posting these color changes. 
          $editorStyleInline          = 'background-color: ' . $fontColor;
-         $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'attr' => array('class' => 'color color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, 'title' => $fontColor, 'data-editor' => $editorDataAttr, 'style' => $editorStyleInline));
+         $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, 'title' => $fontColor, 'data-editor' => $editorDataAttr, 'style' => $editorStyleInline));
       }
 
       /**
@@ -432,10 +462,18 @@ class EditorPlugin extends Gdn_Plugin {
       foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
          $emojiFilePath          = $this->getEmojiCanonicalList($emojiCanonical);
          //$editorDataAttr         = '{"action":"emoji","value":"'. htmlentities($emojiAlias) .'"}';
-         $editorDataAttr         = '{"action":"emoji","value":"'. $emojiAlias .'"}';
+         $editorDataAttr         = '{"action":"emoji","value":"'. addslashes($emojiAlias) .'"}';
          $emojiDimension         = $this->emojiDimension;
-         $emojiStyle             = 'background-image: url('. $emojiFilePath .'); background-size: '. $emojiDimension .'px; width: '.$emojiDimension .'px; height:'. $emojiDimension .'px;';
-         $toolbarDropdownEmoji[] = array('edit' => 'media', 'action'=> 'emoji', 'type' => 'button', 'attr' => array('class' => 'editor-action emoji emoji-'. $emojiCanonical. ' editor-dialog-fire-close', 'data-wysihtml5-command' => 'insertHTML', 'data-wysihtml5-command-value' => ' '. $emojiAlias .' ', 'title' => $emojiAlias, 'data-editor' => $editorDataAttr, 'style' => $emojiStyle));
+         //$emojiStyle           = 'background-image: url('. $emojiFilePath .'); background-size: '. $emojiDimension .'px; width: '.$emojiDimension .'px; height:'. $emojiDimension .'px;';
+         $emojiStyle             = '';
+
+         // In case user creates an alias that does not match a canonical 
+         // emoji, let them know. 
+         $emojiTitle             = (strpos($emojiFilePath, 'grey_question') === false) 
+                                      ? $emojiAlias
+                                      : "Alias '$emojiCanonical' not found in canonical list.";
+
+         $toolbarDropdownEmoji[] = array('edit' => 'media', 'action'=> 'emoji', 'type' => 'button', 'html_tag' => 'img', 'attr' => array('class' => 'editor-action emoji emoji-'. $emojiCanonical. ' editor-dialog-fire-close', 'data-wysihtml5-command' => 'insertHTML', 'data-wysihtml5-command-value' => ' '.$emojiAlias .' ', 'title' => $emojiTitle, 'data-editor' => $editorDataAttr, 'src' => $emojiFilePath, 'width' => $emojiDimension, 'height' => $emojiDimension, 'style' => $emojiStyle));
       }      
 
       /**
@@ -443,20 +481,20 @@ class EditorPlugin extends Gdn_Plugin {
        * array. Once complete, loop through allowedEditorActions and filter 
        * out the actions that will not be allowed.
        */
-      $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold', 'data-wysihtml5-command' => 'bold', 'title' => 'Bold', 'data-editor' => '{"action":"bold","value":""}'));
-      $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic', 'data-wysihtml5-command' => 'italic', 'title' => 'Italic', 'data-editor' => '{"action":"italic","value":""}'));
-      $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough', 'data-wysihtml5-command' => 'strikethrough', 'title' => 'Strike', 'data-editor' => '{"action":"strike","value":""}'));
+      $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => 'Bold', 'data-editor' => '{"action":"bold","value":""}'));
+      $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => 'Italic', 'data-editor' => '{"action":"italic","value":""}'));
+      $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close', 'data-wysihtml5-command' => 'strikethrough', 'title' => 'Strike', 'data-editor' => '{"action":"strike","value":""}'));
       $editorToolbarAll['color'] = array('edit' => 'basic', 'action'=> 'color', 'type' => $toolbarDropdownFontColor, 'attr' => array('class' => 'icon icon-font editor-dd-color hidden-xs', 'data-wysihtml5-command-group' => 'foreColor', 'title' => 'Color', 'data-editor' => '{"action":"color","value":""}'));
-      $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol hidden-xs', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => 'Ordered list', 'data-editor' => '{"action":"orderedlist","value":""}'));
-      $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul hidden-xs', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => 'Unordered list', 'data-editor' => '{"action":"unorderedlist","value":""}'));
+      $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => 'Ordered list', 'data-editor' => '{"action":"orderedlist","value":""}'));
+      $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => 'Unordered list', 'data-editor' => '{"action":"unorderedlist","value":""}'));
       
       $editorToolbarAll['sep-format'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-headers hidden-xs'));
       $editorToolbarAll['format'] = array('edit' => 'format', 'action'=> 'headers', 'type' => array(
-             array('edit' => 'format', 'action'=> 'heading1', 'type' => 'button', 'text' => 'Heading 1', 'attr' => array('class' => 'editor-action editor-action-h1 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h1', 'title' => 'Heading 1', 'data-editor' => '{"action":"heading1","value":""}')),
-             array('edit' => 'format', 'action'=> 'heading2', 'type' => 'button', 'text' => 'Heading 2', 'attr' => array('class' => 'editor-action editor-action-h2 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h2', 'title' => 'Heading 2', 'data-editor' => '{"action":"heading2","value":""}')),
-             array('edit' => 'format', 'action'=> 'quote', 'type' => 'button',    'text' => 'Quote', 'attr' => array('class' => 'editor-action editor-action-quote editor-dialog-fire-close', 'data-wysihtml5-command' => 'blockquote', 'title' => 'Quote', 'data-editor' => '{"action":"quote","value":""}')),
-             array('edit' => 'format', 'action'=> 'code', 'type' => 'button',     'text' => 'Code', 'attr' => array('class' => 'editor-action editor-action-code editor-dialog-fire-close', 'data-wysihtml5-command' => 'code', 'title' => 'Code', 'data-editor' => '{"action":"code","value":""}')),
-             array('edit' => 'format', 'action'=> 'spoiler', 'type' => 'button', 'text' => 'Spoiler', 'attr' => array('class' => 'editor-action editor-action-spoiler editor-dialog-fire-close', 'data-wysihtml5-command' => 'spoiler', 'title' => 'Spoiler', 'data-editor' => '{"action":"spoiler","value":""}')),
+             array('edit' => 'format', 'action'=> 'heading1', 'type' => 'button', 'text' => 'Heading 1', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-h1 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h1', 'title' => 'Heading 1', 'data-editor' => '{"action":"heading1","value":""}')),
+             array('edit' => 'format', 'action'=> 'heading2', 'type' => 'button', 'text' => 'Heading 2', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-h2 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h2', 'title' => 'Heading 2', 'data-editor' => '{"action":"heading2","value":""}')),
+             array('edit' => 'format', 'action'=> 'quote', 'type' => 'button',    'text' => 'Quote', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-quote editor-dialog-fire-close', 'data-wysihtml5-command' => 'blockquote', 'title' => 'Quote', 'data-editor' => '{"action":"quote","value":""}')),
+             array('edit' => 'format', 'action'=> 'code', 'type' => 'button',     'text' => 'Code', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-code editor-dialog-fire-close', 'data-wysihtml5-command' => 'code', 'title' => 'Code', 'data-editor' => '{"action":"code","value":""}')),
+             array('edit' => 'format', 'action'=> 'spoiler', 'type' => 'button', 'text' => 'Spoiler', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-spoiler editor-dialog-fire-close', 'data-wysihtml5-command' => 'spoiler', 'title' => 'Spoiler', 'data-editor' => '{"action":"spoiler","value":""}')),
          ), 'attr' => array('class' => 'icon icon-paragraph editor-dd-format', 'title' => 'Format', 'data-editor' => '{"action":"format","value":""}'));
       
       $editorToolbarAll['sep-media'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-media hidden-xs'));
@@ -465,13 +503,14 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['images'] = array('edit' => 'media', 'action'=> 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => 'Image', 'data-editor' => '{"action":"image","value":""}'));
 
       $editorToolbarAll['sep-align'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-align hidden-xs'));
-      $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action'=> 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left hidden-xs', 'data-wysihtml5-command' => 'justifyLeft', 'title' => 'Align left', 'data-editor' => '{"action":"alignleft","value":""}'));
-      $editorToolbarAll['aligncenter'] = array('edit' => 'format', 'action'=> 'aligncenter', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-center hidden-xs', 'data-wysihtml5-command' => 'justifyCenter', 'title' => 'Align center', 'data-editor' => '{"action":"aligncenter","value":""}'));
-      $editorToolbarAll['alignright'] = array('edit' => 'format', 'action'=> 'alignright', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-right hidden-xs', 'data-wysihtml5-command' => 'justifyRight', 'title' => 'Align right', 'data-editor' => '{"action":"alignright","value":""}'));
+      $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action'=> 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyLeft', 'title' => 'Align left', 'data-editor' => '{"action":"alignleft","value":""}'));
+      $editorToolbarAll['aligncenter'] = array('edit' => 'format', 'action'=> 'aligncenter', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-center editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyCenter', 'title' => 'Align center', 'data-editor' => '{"action":"aligncenter","value":""}'));
+      $editorToolbarAll['alignright'] = array('edit' => 'format', 'action'=> 'alignright', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-right editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyRight', 'title' => 'Align right', 'data-editor' => '{"action":"alignright","value":""}'));
       
       $editorToolbarAll['sep-switches'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-switches hidden-xs'));     
-      $editorToolbarAll['togglehtml'] = array('edit' => 'switches', 'action'=> 'togglehtml', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-source editor-toggle-source hidden-xs', 'data-wysihtml5-action' => 'change_view', 'title' => 'Toggle HTML view', 'data-editor' => '{"action":"togglehtml","value":""}'));
-      $editorToolbarAll['fullpage'] = array('edit' => 'switches', 'action'=> 'fullpage', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button', 'title' => 'Toggle full page', 'data-editor' => '{"action":"fullpage","value":""}'));
+      $editorToolbarAll['togglehtml'] = array('edit' => 'switches', 'action'=> 'togglehtml', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-source editor-toggle-source editor-dialog-fire-close hidden-xs', 'data-wysihtml5-action' => 'change_view', 'title' => 'Toggle HTML view', 'data-editor' => '{"action":"togglehtml","value":""}'));
+      $editorToolbarAll['fullpage'] = array('edit' => 'switches', 'action'=> 'fullpage', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button editor-dialog-fire-close', 'title' => 'Toggle full page', 'data-editor' => '{"action":"fullpage","value":""}'));
+      $editorToolbarAll['lights'] = array('edit' => 'switches', 'action'=> 'lights', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-lightbulb editor-toggle-lights-button editor-dialog-fire-close hidden-xs', 'title' => 'Toggle lights', 'data-editor' => '{"action":"lights","value":""}'));
 
       // Filter out disallowed editor actions 
       foreach ($allowedEditorActions as $editorAction => $allowed) {
@@ -516,6 +555,13 @@ class EditorPlugin extends Gdn_Plugin {
          $Sender->EventArguments['Object'] = $Object;
       }
 	}
+   
+   
+   
+   public function Base_Render_Before(&$Sender) {
+      $c = Gdn::Controller();
+      $c->AddJsFile('editor.js', 'plugins/editor');
+   }
       
    /**
     * Attach editor anywhere 'BodyBox' is used. It is not being used for 
@@ -540,15 +586,10 @@ class EditorPlugin extends Gdn_Plugin {
          // view when required. This will prevent unnecessary requests.
          $c->AddJsFile('editor.js', 'plugins/editor');
          
-         switch (strtolower($this->Format)) {
-            case 'wysiwyg':
-               $c->AddJsFile('wysiwyg5.js', 'plugins/editor');
-               break;
-         }
-         
          // Set minor data for view
          $c->SetData('_EditorInputFormat', $this->Format);
          // Set definitions for JavaScript
+         $c->AddDefinition('editorVersion', $this->pluginInfo['Version']);
          $c->AddDefinition('editorInputFormat',       $this->Format);
          $c->AddDefinition('editorPluginAssets',      $this->AssetPath);         
          $c->AddDefinition('editorButtonBarLinkUrl',  T('editor.LinkUrlText', 'Enter URL:'));
@@ -559,6 +600,15 @@ class EditorPlugin extends Gdn_Plugin {
          $c->AddDefinition('editorMarkdownHelpText',  T('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
          $c->AddDefinition('editorTextHelpText',      T('editor.TextHelpText', 'You are using plain text in your post.'));
 
+         // If user wants to modify styling of Wysiwyg content in editor, 
+         // they can override the styles with this file.
+         $CssInfo = AssetModel::CssPath('wysiwyg.css', 'plugins/editor');
+         if ($CssInfo) {
+           $CssPath = Asset($CssInfo[1]);
+         }
+         
+         $c->AddDefinition('editorWysiwygCSS', $CssPath);
+         
          /**
           * Get the generated editor toolbar from getEditorToolbar, and assign 
           * it data object for view.
@@ -587,8 +637,39 @@ class EditorPlugin extends Gdn_Plugin {
    }
    
    /**
+    * 
+    * @param SettingsController $Sender
+    * @param array $Args
+    */
+   public function SettingsController_Editor_Create($Sender, $Args) {
+      $Sender->Permission('Garden.Settings.Manage');
+      $Cf = new ConfigurationModule($Sender);
+
+      $Formats = array_combine($this->Formats, $this->Formats);
+      
+      $Cf->Initialize(array(
+          'Garden.InputFormatter' => array('LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p> <p><small><strong>Note:</strong> the editor will auto-detect the format of old posts when emending them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</small></p>', 'Items' => $Formats)
+      ));
+      
+      $Sender->AddSideMenu();
+      $Sender->SetData('Title', T('Advanced Editor Settings'));
+      $Cf->RenderAll();
+      //$Sender->Cf = $Cf;
+      //$Sender->Render('settings', '', 'plugins/editor');
+   }   
+   
+   /*
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+      $Menu = $Sender->EventArguments['SideMenu'];
+      $Menu->AddItem('Appearance', T('Appearance'));
+      $Menu->AddLink('Appearance', 'Advanced Editor', 'settings/editor', 'Garden.Settings.Manage');
+   }
+   */
+   
+   
+   /**
 	 * Every time editor plugin is enabled, disable other known editors that 
-    * may clash with this one. If editor is loaded, then these two other 
+    * may clash with this one. If editor is loaded, then thes other 
     * editors loaded after, there are CSS rules that hide them. This way, 
     * the editor plugin always takes precedence.
 	 */
@@ -603,7 +684,7 @@ class EditorPlugin extends Gdn_Plugin {
          Gdn::PluginManager()->DisablePlugin($pluginName); 
       }
 
-      SaveToConfig('Plugin.editor.DefaultView', 'Wysiwyg');
+      //SaveToConfig('Plugin.editor.DefaultView', 'Wysiwyg');
 	}
    
    public function OnDisable() {
@@ -611,6 +692,6 @@ class EditorPlugin extends Gdn_Plugin {
 	}
 
    public function CleanUp() {
-		RemoveFromConfig('Plugin.editor.DefaultView');
+		//RemoveFromConfig('Plugin.editor.DefaultView');
 	}
 }

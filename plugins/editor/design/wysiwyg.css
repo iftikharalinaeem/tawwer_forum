@@ -1,0 +1,190 @@
+/**
+ * Editor action styles within editor and post
+ */
+.post-font-size-smaller {
+  font-size: smaller;
+}
+
+.post-font-size-larger {
+  font-size: larger;
+}
+
+.post-font-size-xx-large {
+  font-size: xx-large;
+}
+
+.post-font-size-x-large {
+  font-size: x-large;
+}
+
+.post-font-size-large {
+  font-size: large;
+}
+
+.post-font-size-medium {
+  font-size: medium;
+}
+
+.post-font-size-small {
+  font-size: small;
+}
+
+.post-font-size-x-small {
+  font-size: x-small;
+}
+
+.post-font-size-xx-small {
+  font-size: xx-small;
+}
+
+.post-color-black {
+  color: black;
+}
+
+.post-color-silver {
+  color: silver;
+}
+
+.post-color-gray {
+  color: gray;
+}
+
+.post-color-white {
+  color: white;
+}
+
+.post-color-maroon {
+  color: maroon;
+}
+
+.post-color-red {
+  color: red;
+}
+
+.post-color-purple {
+  color: purple;
+}
+
+.post-color-fuchsia {
+  color: fuchsia;
+}
+
+.post-color-green {
+  color: green;
+}
+
+.post-color-lime {
+  color: lime;
+}
+
+.post-color-olive {
+  color: olive;
+}
+
+.post-color-yellow {
+  color: yellow;
+}
+
+.post-color-navy {
+  color: navy;
+}
+
+.post-color-blue {
+  color: blue;
+}
+
+.post-color-teal {
+  color: teal;
+}
+
+.post-color-aqua {
+  color: aqua;
+}
+
+.post-text-align-right {
+  text-align: right;
+}
+
+.post-text-align-center {
+  text-align: center;
+}
+
+.post-text-align-left {
+  text-align: left;
+}
+
+.post-text-align-justify {
+  text-align: justify;
+}
+
+.post-float-left {
+  float: left;
+  margin: 0 8px 8px 0;
+}
+
+.post-float-right {
+  float: right;
+  margin: 0 0 8px 8px;
+}
+
+.post-clear-right {
+  clear: right;
+}
+
+.post-clear-left {
+  clear: left;
+}
+
+/* Custom classes */
+.Spoiler {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  margin: 1em 0;
+  padding: 1ex 16px;
+}
+
+.Message .Spoiler {
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  height: 0;
+  width: 0;
+  margin: 5px 0;
+  padding: 8px 16px;
+  position: relative;
+  cursor: pointer;
+  font-size: 0;
+}
+
+.Message .Spoiler:hover {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.Message .Spoiler:before {
+  content: '...';
+  position: absolute;
+  top: -7px;
+  left: 9px;
+  color: rgba(0, 0, 0, 0.4);
+  font-size: 14px;
+}
+
+.Spoiled {
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  padding: 20px;
+  font-size: inherit;
+  margin: 5px 0;
+  transition: padding 0.1s ease;
+}
+
+.AlignLeft {
+  text-align: left;
+}
+
+.AlignCenter {
+  text-align: center;
+}
+
+.AlignRight {
+  text-align: right;
+}

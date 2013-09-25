@@ -11,11 +11,7 @@
 
          // If the type is not an array, it's a regular button (type==button)
          if (!is_array($button['type'])) {
-            if ($button['type'] == 'separator') {
-                $html_toolbar .= Wrap('', 'span', $button['attr']);
-             } else {
-                $html_toolbar .= Wrap('', 'a', $button['attr']);
-             }
+            $html_toolbar .= Wrap('', 'span', $button['attr']);
          } else {
             // Else this button has dropdown options, so generate them
             $html_button_dropdown_options = '';
@@ -23,18 +19,18 @@
             foreach ($button['type'] as $button_option) {
                
                // If any text, use it
-               $action_text = isset($button_option['text']) 
+               $action_text = (isset($button_option['text'])) 
                    ? $button_option['text']
                    : '';
-               
-               // Default tag to use for dropdown children elements
-               $html_tag = 'span';
-               
-               // Format dropdown uses standard anchor tags
-               if ($button_option['edit'] == 'format') {
-                  $html_tag = 'a';
-               }
 
+               // If the dropdown child elements require a different tag, 
+               // specify it in the array, then grab it here, otherwise 
+               // use the default, being a span. 
+               $html_tag = (isset($button_option['html_tag']))
+                   ? $button_option['html_tag'] 
+                   : 'span';
+
+               // Concatenate child elements 
                $html_button_dropdown_options .= Wrap($action_text, $html_tag, $button_option['attr']);
             }
             
@@ -42,10 +38,9 @@
                
                case 'link':
                   $html_toolbar .= Wrap(
-                     Wrap($html_arrow_down, 'a', $button['attr']) .''. 
+                     Wrap($html_arrow_down, 'span', $button['attr']) .''. 
                      '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink">
-                        <input class="InputBox editor-input-url" data-wysihtml5-dialog-field="href" placeholder="http://" />
-                        
+                        <input class="InputBox editor-input-url" data-wysihtml5-dialog-field="href" value="http://" />
                          <div class="MenuButtons">
                          <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="OK"/>
                          <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="Cancel"/>
@@ -56,10 +51,9 @@
 
                case 'image':
                   $html_toolbar .= Wrap(
-                     Wrap($html_arrow_down, 'a', $button['attr']) .''. 
+                     Wrap($html_arrow_down, 'span', $button['attr']) .''. 
                      '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="insertImage">
-                        <input class="InputBox editor-input-image" data-wysihtml5-dialog-field="src" placeholder="http://">
-                        
+                        <input class="InputBox editor-input-image" data-wysihtml5-dialog-field="src" value="http://">
                         <div class="MenuButtons">
                         <label class="editor-image-align">
                          Align:
@@ -79,7 +73,7 @@
                // All other dropdowns (color, format, emoji)
                default:
                   $html_toolbar .= Wrap(
-                     Wrap($html_arrow_down, 'a', $button['attr']) .''. 
+                     Wrap($html_arrow_down, 'span', $button['attr']) .''. 
                      Wrap($html_button_dropdown_options, 'div', array('class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''))
                   , 'div', array('class' => 'editor-dropdown'));
                   break;  

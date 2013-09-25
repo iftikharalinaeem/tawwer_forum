@@ -249,6 +249,23 @@ class ReactionModel {
       return array($Row, $Model, $Log);
    }
    
+   public function GetUsers($RecordType, $RecordID, $Reaction, $Offset = 0, $Limit = 10) {
+      $ReactionType = self::ReactionTypes($Reaction);
+      if (!$ReactionType)
+         return array();
+      
+      $TagID = GetValue('TagID', $ReactionType);
+      $UserTags = $this->SQL->GetWhere('UserTag', array(
+         'RecordType' => $RecordType,
+         'RecordID' => $RecordID,
+         'TagID' => $TagID),
+         'DateInserted', 'desc', $Limit, $Offset)->ResultArray();
+      
+      Gdn::UserModel()->JoinUsers($UserTags, array('UserID'));
+      
+      return $UserTags;
+   }
+   
    public function JoinUserTags(&$Data, $RecordType = FALSE) {
       if (!$Data)
          return;

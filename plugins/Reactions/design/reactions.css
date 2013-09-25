@@ -33,6 +33,7 @@
    margin: 0 2px;
    line-height: 18px;
    vertical-align: top;
+   position: relative;
 }
 .Flyout .ReactButton {
    margin: 0;
@@ -254,6 +255,22 @@ li.Buried:hover:before {
 .Reactions .FlagMenu .MenuItems .ReactButton {
    margin: 0;
    padding: 0 15px;
+}
+
+.MenuItems-Reactions {
+   position: absolute;
+   width: 160px;
+   margin-bottom: 5px;
+}
+
+.MenuItems-Reactions a {
+   display: inline-block !important;
+   padding: 2px 3px 5px !important;
+}
+
+.MenuItems-Reactions .ProfilePhotoSmall {
+   height: 20px;
+   width: 20px;
 }
 
 /* OLD "Best Of" */

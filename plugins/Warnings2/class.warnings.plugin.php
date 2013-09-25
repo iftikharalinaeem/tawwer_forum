@@ -121,22 +121,38 @@ class Warnings2Plugin extends Gdn_Plugin {
    
    public function ProfileController_Card_Render($Sender, $Args) {
       $UserID = $Sender->Data('Profile.UserID');
-      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Garden.Warnings.Add'), FALSE)) {
+      
+      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), FALSE)) {
          $Sender->Data['Actions']['Warn'] = array(
             'Text' => Sprite('SpWarn'),
             'Title' => T('Warn'),
             'Url' => '/profile/warn?userid='.$UserID,
             'CssClass' => 'Popup'
             );
-         
-         $Level = Gdn::UserMetaModel()->GetUserMeta($UserID, 'Warnings.Level');
-         $Level = GetValue('Warnings.Level', $Level);
-         $Sender->Data['Actions']['Warnings'] = array(
+      }
+      
+      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.Add'), FALSE)) {
+         $Sender->Data['Actions']['Note'] = array(
+            'Text' => Sprite('SpNote'),
+            'Title' => T('Add Note'),
+            'Url' => '/profile/note?userid='.$UserID,
+            'CssClass' => 'Popup'
+            );
+      }
+      
+      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), FALSE)) {
+         $Sender->Data['Actions']['Notes'] = array(
             'Text' => '<span class="Count">notes</span>',
             'Title' => T('Notes & Warnings'),
             'Url' => UserUrl($Sender->Data('Profile'), '', 'notes'),
             'CssClass' => 'Popup'
             );
+      }
+      
+      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), FALSE)) {
+         $UserAlertModel = new UserAlertModel();
+         $Alert = $UserAlertModel->GetID($UserID, DATASET_TYPE_ARRAY);
+         $Sender->SetData('Alert', $Alert);
       }
    }
    
@@ -411,6 +427,20 @@ class Warnings2Plugin extends Gdn_Plugin {
       $Sender->SetData('Warnings', $Warnings);
       
       $Sender->Render();
+   }
+   
+   /**
+    * 
+    * @param SettingsController $sender
+    */
+   public function SettingsController_warnings_create($sender) {
+      
+      
+      $warning_types = Gdn::sql()->getWhere('WarningType', array(), 'points', 'desc')->resultArray();
+      $sender->setData('warning_types', $warning_types);
+      
+      $sender->title(sprintf(t('%s Settings'), t('Warning')));
+      $sender->render('settings', '', 'plugins/warnings');
    }
    
    /**
