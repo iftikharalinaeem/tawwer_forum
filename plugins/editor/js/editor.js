@@ -8,14 +8,14 @@
        * Determine editor format to load, and asset path, default to Wysiwyg
        */
       var editor, 
-          editorInline,
           editorName, 
-          debug                   = false,
-          editorVersion           = gdn.definition('editorVersion', Math.random()),
+          editorRules             = {}, // for Wysiwyg
+          editorCacheBreakValue   = Math.random(), 
+          editorVersion           = gdn.definition('editorVersion', editorCacheBreakValue),
           formatOriginal          = gdn.definition('editorInputFormat', 'Wysiwyg'),
           format                  = formatOriginal.toLowerCase(),
           assets                  = gdn.definition('editorPluginAssets'), 
-          editorRules             = {}; // for wysiwyg
+          debug                   = false;
 
       /**
        * Load relevant stylesheets into editor iframe. The first one loaded is 
@@ -23,6 +23,10 @@
        * grabbed from the source of parent to iframe, as different communities 
        * may have styles they want injected into the iframe. 
        */
+      
+      if (debug) {
+         editorVersion += '&cachebreak=' + editorCacheBreakValue;
+      }
 
       var stylesheetsInclude = [assets + '/design/editor.css?v=' + editorVersion];
 
@@ -218,6 +222,7 @@
                });
             }
          };
+         
       };
 
       // TODO when previewing a post, then going back to edit, the text help
@@ -505,6 +510,9 @@
             // them on format
             switch (format) {
                case 'wysiwyg':
+               case 'ipb':
+               case 'bbhtml':
+               case 'bbwysiwyg':
 
                    // Lazyloading scripts, then run single callback
                    $.when(
@@ -547,29 +555,29 @@
                       };
 
                       // instantiate new editor
-                      var editorInline = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
+                      var editor = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
 
-                      editorInline.on('load', function() {
+                      editor.on('load', function() {
                          // enable auto-resize
-                         $(editorInline.composer.iframe).wysihtml5_size_matters();  
-                         editorHandleQuotesPlugin(editorInline);
+                         $(editor.composer.iframe).wysihtml5_size_matters();  
+                         editorHandleQuotesPlugin(editor);
 
                          // Clear textarea/iframe content on submit. 
                          // This is not actually necessary here because 
                          // the whole editor is removed from the page on post.
                          $(currentEditableTextarea.closest('form')).on('clearCommentForm', function() {
-                            editorInline.fire('clear');
-                            editorInline.composer.clear();
+                            editor.fire('clear');
+                            editor.composer.clear();
                             this.reset();           
                             $(currentEditableTextarea).val('');
                             //$('iframe').contents().find('body').empty();
-                            $(editorInline.composer.iframe).css({"min-height": "inherit"});
+                            $(editor.composer.iframe).css({"min-height": "inherit"});
                          });
 
-                         wysiPasteFix(editorInline);
+                         wysiPasteFix(editor);
 
                          if (debug) {
-                            wysiDebug(editorInline);
+                            wysiDebug(editor);
                          }
                       });
 
@@ -671,7 +679,7 @@
             // Set up on editor load
             editorSetHelpText(formatOriginal, currentTextBoxWrapper);
             editorSetupDropdowns();
-            fullPageInit(editorInline);
+            fullPageInit(editor);
             editorSetCaretFocusEnd(currentEditableTextarea[0]);
 
             // some() loop requires true to end loop. every() requires false.

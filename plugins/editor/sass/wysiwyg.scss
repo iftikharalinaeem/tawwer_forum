@@ -200,3 +200,25 @@ pre.CodeBlock {}
 .AlignRight{
    text-align: right;
 }
+
+
+/**
+ * Target iframe and actual body within editor iframe. Do not use body to set 
+ * background color of composer. By default it will be inherited from 
+ * textarea automatically, but if for some reason you want to override the 
+ * styles directly, use .editor-composer (body) for fonts and padding, and use 
+ * .wysihtml5-sandbox (iframe) to modify the iframe (do background-color on 
+ * this).
+ */
+
+/* iframe */
+.wysihtml5-sandbox{}
+
+/* body within iframe */
+.editor-composer {
+   margin: 0;
+	border: 0;
+   padding: inherit;
+	font: inherit;
+   outline: none;
+}
