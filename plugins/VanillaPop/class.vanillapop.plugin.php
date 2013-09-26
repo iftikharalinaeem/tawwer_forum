@@ -8,7 +8,7 @@
 $PluginInfo['VanillaPop'] = array(
    'Name' => 'Vanilla Pop',
    'Description' => "Users may start discussions, make comments, and even automatically register for your site via email.",
-   'Version' => '1.1',
+   'Version' => '1.1.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -241,6 +241,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $ReplyID = NULL;
       
       if (GetValue('ReplyTo', $Data)) {
+         Trace("ReplyTo: {$Data['ReplyTo']}");
          // See if we are replying to something specifically.
          list($ReplyType, $ReplyID) = self::ParseUID($Data['ReplyTo']);
       }
@@ -255,6 +256,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
          // This may be replying to the SourceID rather than the UID.
          $SaveType = $this->SaveTypeFromRepyTo($Data);
       }
+      
+      Trace("Reply type: $ReplyType, Reply id: $ReplyID");
       
       if (strcasecmp($ReplyType, 'noreply') == 0) {
          return TRUE;
@@ -377,6 +380,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 break;
          }
       }
+      Trace("Save type: $SaveType");
       
       if (isset($InvalidReply)) {
          $Data['Body'] .= "\n\n".sprintf(T('Note: The email was trying to reply to an invalid %s.'), "$ReplyType ($ReplyID)");
@@ -406,12 +410,23 @@ class VanillaPopPlugin extends Gdn_Plugin {
             }
             
             $CommentModel = new CommentModel();
+            
+            // Make sure there isn't already a comment saved from this email.
+            if ($Data['SourceID']) {
+               $ExistingComment = $CommentModel->GetWhere(array('Source' => 'Email', 'SourceID' => $Data['SourceID']))->FirstRow();
+               if ($ExistingComment) {
+                  Trace("This email has already been saved.");
+                  return TRUE;
+               }
+            }
+            
             $CommentID = $CommentModel->Save($Data);
             if (!$CommentID) {
                throw new Exception($CommentModel->Validation->ResultsText().print_r($Data, TRUE), 400);
             } else {
                $CommentModel->Save2($CommentID, TRUE);
             }
+            Trace("Saved comment $CommentID");
             return $CommentID;
          case 'Message':
             if (!Gdn::Session()->CheckPermission('Email.Conversations.Add')) {
@@ -430,10 +445,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
          default:
             // Check the permission on the discussion.
             if (!Gdn::Session()->CheckPermission('Email.Discussions.Add')) {
+               Trace("Doesn't have Email.Discussions.Add");
+               
                $this->SendEmail($FromEmail, '',
                   T("Sorry! You don't have permission to post discussions/questions through email."), $Data);
                return TRUE;
             } elseif (!Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'CategoryID', $PermissionCategoryID)) {
+               Trace("Sorry! You don't have permission to post right now.", TRACE_WARNING);
+               
                $this->SendEmail($FromEmail, '',
                   T("Sorry! You don't have permission to post right now."), $Data);
                return TRUE;
@@ -446,6 +465,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             if (!$DiscussionID) {
                throw new Exception($DiscussionModel->Validation->ResultsText().print_r($Data, TRUE), 400);
             }
+            Trace("Saved discussion $DiscussionID");
             
             // Send a confirmation email.
             if (C('Plugins.VanillaPop.SendConfirmationEmail')) {
@@ -480,6 +500,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
    }
    
    public function SendEmail($To, $Subject, $Body, $Quote = FALSE) {
+      Trace("Email: $Body");
+      
       $Email = new Gdn_Email();
       $Email->To($To);
       $Email->Subject(sprintf('[%s] %s', C('Garden.Title'), $Subject));
@@ -958,11 +980,12 @@ class VanillaPopPlugin extends Gdn_Plugin {
          Gdn::Session()->User->Admin = FALSE;
       }
       
+      
       $Sender->Form->InputPrefix = '';
       
       if ($Sender->Form->IsPostBack()) {
          $Data = $Sender->Form->FormValues();
-         $Sender->Data['_Status'][] = 'Saving data.';
+         Trace('Saving data.');
          if ($this->Save($Data, $Sender)) {
             $Sender->StatusMessage = T('Saved');
          }
