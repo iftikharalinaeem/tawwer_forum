@@ -14,7 +14,7 @@
           editorVersion           = gdn.definition('editorVersion', editorCacheBreakValue),
           formatOriginal          = gdn.definition('editorInputFormat', 'Wysiwyg'),
           format                  = formatOriginal.toLowerCase(),
-          assets                  = gdn.definition('editorPluginAssets'), 
+          assets                  = gdn.definition('editorPluginAssets', '/plugins/editor'), 
           debug                   = false;
 
       /**
@@ -690,6 +690,7 @@
       // Deprecated livequery.
       if(jQuery().livequery) {
          this.livequery(function(){    
+            console.log('q');
             editorInit('', $(this));
          });
       }
