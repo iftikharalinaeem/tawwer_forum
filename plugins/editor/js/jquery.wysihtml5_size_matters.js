@@ -1,7 +1,7 @@
  (function() {
   (function($) {
     var Wysihtml5SizeMatters;
-
+    
     Wysihtml5SizeMatters = (function() {
       function Wysihtml5SizeMatters(iframe) {
         this.$iframe = $(iframe);
@@ -10,6 +10,7 @@
         // In 0.4.0pre the body inside the iframe has 100% height, while the 
         // previous versions do not. This causes the editor autogrow to break. 
         this.$body.css({ height: "auto" }).closest('html').css({ height: "auto" });
+        
         
         this.addBodyStyles();
         this.setupEvents();
@@ -35,7 +36,15 @@
         if (this.$iframe.css('box-sizing') == 'border-box') {
             height += parseInt(this.$iframe.css('padding-top')) + parseInt(this.$iframe.css('padding-bottom'));
         }
-        
+
+        // Problem with autogrow, when padding set to iframe instead of body. 
+        // The content within composer eventually creeps out of view, so 
+        // instead of having the padding on the iframe, set it to body.
+        var textareaTemplate = this.$iframe.closest('form').find('textarea')[0]; 
+        var padding = wysihtml5.dom.getStyle("padding-top").from(textareaTemplate)
+        this.$iframe.css('padding', '0px');
+        this.$body.css('padding', padding);
+
         return this.$iframe.css('min-height', height);
       };
 

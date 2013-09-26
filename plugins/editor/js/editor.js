@@ -562,7 +562,7 @@
                          // enable auto-resize
                          $(editor.composer.iframe).wysihtml5_size_matters();  
                          editorHandleQuotesPlugin(editor);
-
+                         
                          // Clear textarea/iframe content on submit. 
                          // This is not actually necessary here because 
                          // the whole editor is removed from the page on post.
