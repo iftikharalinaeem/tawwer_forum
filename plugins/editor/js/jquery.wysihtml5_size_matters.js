@@ -11,7 +11,6 @@
         // previous versions do not. This causes the editor autogrow to break. 
         this.$body.css({ height: "auto" }).closest('html').css({ height: "auto" });
         
-        
         this.addBodyStyles();
         this.setupEvents();
         this.adjustHeight();

@@ -379,10 +379,15 @@ wysiwgy requires height to not interfere with autogrow. */
    }
 }
 
-
 /**
  * Modify this file to change the styling of the content 
  * in the Wysiwyg editor. 
  */
 
 @import "wysiwyg";
+
+/* Keep here to address iframe/body padding text creep issue, see autogrow js 
+for more information about the issue */
+.wysihtml5-sandbox {
+   padding: 0 !important;
+}

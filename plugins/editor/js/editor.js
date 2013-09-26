@@ -231,10 +231,11 @@
       // reattached. Consider namespacing events, so they overwrite.
       // Insert help text below every editor 
       var editorSetHelpText = function(format, editorAreaObj) {
-         if (format != 'Wysiwyg') {
+         format = format.toLowerCase();
+         if (format != 'wysiwyg') {
             $("<div></div>")
                .addClass('editor-help-text')
-               .html(gdn.definition('editor'+ format +'HelpText'))
+               .html(gdn.definition(format +'HelpText'))
                .insertAfter(editorAreaObj);
          }
        };
