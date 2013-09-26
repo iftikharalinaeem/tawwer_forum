@@ -559,10 +559,33 @@ class EditorPlugin extends Gdn_Plugin {
 	}
    
    
-   
+   /**
+    * Placed these components everywhere due to some Web sites loading the 
+    * editor in some areas where the values were not yet injected into HTML.
+    */
    public function Base_Render_Before(&$Sender) {
       $c = Gdn::Controller();
+      
+      // If user wants to modify styling of Wysiwyg content in editor, 
+      // they can override the styles with this file.
+      $CssInfo = AssetModel::CssPath('wysiwyg.css', 'plugins/editor');
+      if ($CssInfo) {
+        $CssPath = Asset($CssInfo[1]);
+      }
+      
+      // Load JavaScript
       $c->AddJsFile('editor.js', 'plugins/editor');
+      
+      // Set definitions for JavaScript to read
+      $c->AddDefinition('editorVersion',      $this->pluginInfo['Version']);
+      $c->AddDefinition('editorInputFormat',  $this->Format);
+      $c->AddDefinition('editorPluginAssets', $this->AssetPath);         
+      $c->AddDefinition('wysiwygHelpText',    T('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a> in your post.'));
+      $c->AddDefinition('bbcodeHelpText',     T('editor.BBCodeHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a> in your post.'));
+      $c->AddDefinition('htmlHelpText',       T('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a> in your post.'));
+      $c->AddDefinition('markdownHelpText',   T('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
+      $c->AddDefinition('textHelpText',       T('editor.TextHelpText', 'You are using plain text in your post.'));
+      $c->AddDefinition('editorWysiwygCSS',   $CssPath);
    }
       
    /**
@@ -574,8 +597,7 @@ class EditorPlugin extends Gdn_Plugin {
    public function Gdn_Form_BeforeBodyBox_Handler($Sender) {
       // TODO move this property to constructor
       $this->Format = $Sender->GetValue('Format');
-      
-      
+
       // Make sure we have some sort of format.
       if (!$this->Format) {
          $this->Format = C('Garden.InputFormatter','Html');
@@ -585,31 +607,9 @@ class EditorPlugin extends Gdn_Plugin {
       if (in_array(strtolower($this->Format), array_map('strtolower', $this->Formats))) {    
          $c = Gdn::Controller();
          
-         // This js file will asynchronously load the assets of each editor 
-         // view when required. This will prevent unnecessary requests.
-         $c->AddJsFile('editor.js', 'plugins/editor');
-         
          // Set minor data for view
          $c->SetData('_EditorInputFormat', $this->Format);
-         // Set definitions for JavaScript
-         $c->AddDefinition('editorVersion',     $this->pluginInfo['Version']);
-         $c->AddDefinition('editorInputFormat',       $this->Format);
-         $c->AddDefinition('editorPluginAssets',      $this->AssetPath);         
-         $c->AddDefinition('wysiwygHelpText',   T('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a> in your post.'));
-         $c->AddDefinition('bbcodeHelpText',    T('editor.BBCodeHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a> in your post.'));
-         $c->AddDefinition('htmlHelpText',      T('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a> in your post.'));
-         $c->AddDefinition('markdownHelpText',  T('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
-         $c->AddDefinition('textHelpText',      T('editor.TextHelpText', 'You are using plain text in your post.'));
 
-         // If user wants to modify styling of Wysiwyg content in editor, 
-         // they can override the styles with this file.
-         $CssInfo = AssetModel::CssPath('wysiwyg.css', 'plugins/editor');
-         if ($CssInfo) {
-           $CssPath = Asset($CssInfo[1]);
-         }
-         
-         $c->AddDefinition('editorWysiwygCSS', $CssPath);
-         
          /**
           * Get the generated editor toolbar from getEditorToolbar, and assign 
           * it data object for view.
