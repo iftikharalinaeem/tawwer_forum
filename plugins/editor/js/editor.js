@@ -14,6 +14,7 @@
           editorVersion           = gdn.definition('editorVersion', editorCacheBreakValue),
           formatOriginal          = gdn.definition('editorInputFormat', 'Wysiwyg'),
           format                  = formatOriginal.toLowerCase(),
+          // TODO php is passing empty var to javascript in Kixeye.
           assets                  = gdn.definition('editorPluginAssets', '/plugins/editor'), 
           debug                   = false;
 
@@ -689,8 +690,7 @@
 
       // Deprecated livequery.
       if(jQuery().livequery) {
-         this.livequery(function(){    
-            console.log('q');
+         this.livequery(function() {    
             editorInit('', $(this));
          });
       }

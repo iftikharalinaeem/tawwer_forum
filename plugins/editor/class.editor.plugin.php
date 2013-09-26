@@ -82,6 +82,8 @@ class EditorPlugin extends Gdn_Plugin {
     */
    public function __construct() {
       parent::__construct();
+      
+      // TODO in Kixeye this path is not being set.
       $this->AssetPath = Asset('/plugins/editor');  
       $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
    }
