@@ -1082,6 +1082,11 @@ wysiwgy requires height to not interfere with autogrow. */
 }
 
 /* Custom classes */
+pre.CodeBlock {
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+}
+
 .Spoiler {
   background-color: rgba(0, 0, 0, 0.05) !important;
   margin: 1em 0;
@@ -1110,7 +1115,6 @@ wysiwgy requires height to not interfere with autogrow. */
   position: absolute;
   top: -7px;
   left: 9px;
-  color: rgba(0, 0, 0, 0.4);
   font-size: 14px;
 }
 
