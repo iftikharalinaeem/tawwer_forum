@@ -70,9 +70,7 @@
             // exception this was made for is the signatures plugin.
             if (typeof formWrapper == 'undefined') {
                formWrapper = $(toggleButton).parent().parent();
-            }      
-            
-            console.log(formWrapper);
+            }
 
             // If no fullpage, enable it
             if (!bodyEl.hasClass('js-editor-fullpage')) {
@@ -308,9 +306,6 @@
          .off('mouseup.fireclose')
          .on('mouseup.fireclose', function(e) {
             $('.editor-dropdown').each(function(i, el) {
-
-                //console.log(el);
-
                $(el).removeClass('editor-dropdown-open');
                $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
             }); 
@@ -557,7 +552,7 @@
                       };
 
                       // instantiate new editor
-                      var editor = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
+                      editor = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
 
                       editor.on('load', function() {
                          // enable auto-resize
