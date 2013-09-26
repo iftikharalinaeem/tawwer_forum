@@ -71,6 +71,8 @@
             if (typeof formWrapper == 'undefined') {
                formWrapper = $(toggleButton).parent().parent();
             }      
+            
+            console.log(formWrapper);
 
             // If no fullpage, enable it
             if (!bodyEl.hasClass('js-editor-fullpage')) {
@@ -578,7 +580,6 @@
                          fullPageInit(editor);
                          editor.focus();
                          
-
                          if (debug) {
                             wysiDebug(editor);
                          }
@@ -675,8 +676,8 @@
                       loadScript(assets + '/js/rangy.js')
                    ).done(function(){
                       ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
-                      editorSetCaretFocusEnd(currentEditableTextarea[0]);
                       fullPageInit();
+                      editorSetCaretFocusEnd(currentEditableTextarea[0]);
                    });                  
                    break;
             }

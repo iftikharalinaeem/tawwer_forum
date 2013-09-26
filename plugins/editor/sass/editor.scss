@@ -224,8 +224,8 @@ affect, so it's not doing anything */
    box-shadow: 0 2px 5px -5px #000;
 }
 
-.js-editor-fullpage #editor-fullpage-candidate form,
-.js-editor-fullpage form#editor-fullpage-candidate > div /* Activity on profile */ {
+.js-editor-fullpage li#editor-fullpage-candidate .TextBoxWrapper,
+.js-editor-fullpage #editor-fullpage-candidate form {
    margin: 0 auto;
    padding: 50px 0 10px 0;
    -webkit-animation-duration: 0.8s;
@@ -234,9 +234,10 @@ affect, so it's not doing anything */
    animation-name: editor-anim-editor;
 }
 
+
+.js-editor-fullpage li#editor-fullpage-candidate .TextBoxWrapper,
 .js-editor-fullpage #editor-fullpage-candidate .editor,
-.js-editor-fullpage #editor-fullpage-candidate form,
-.js-editor-fullpage form#editor-fullpage-candidate > div /* Activity on profile */ {
+.js-editor-fullpage #editor-fullpage-candidate form {
    max-width: 800px;
 }
 
