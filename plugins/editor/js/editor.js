@@ -81,6 +81,9 @@
                var fullPageCandidate = $('#editor-fullpage-candidate');
                var editorToolbar = $(fullPageCandidate).find('.editor');
 
+              // experimental lights toggle for chrome.
+              toggleLights();
+
                // When textarea pushes beyond viewport of its container, a 
                // scrollbar appears, which pushes the textarea left, while the 
                // fixed editor toolbar does not move, so push it over.
@@ -90,8 +93,7 @@
 
                // Only Firefox seems to have this issue (unless this is
                // mac-specific. Chrome & Safari on mac do not shift content over.
-               if (typeof InstallTrigger !== 'undefined') {
-                  return; // latest version of firefox (24), does not have this issue anymore.
+               if (typeof InstallTrigger !== 'undefined' && 1===3) {
                   toolbarInterval = setInterval(function() {
                      if ($(fullPageCandidate)[0].clientHeight < $(fullPageCandidate)[0].scrollHeight) {
                         // console.log('scrollbar');
@@ -102,10 +104,6 @@
                      }
                   }, 10);
                }
-
-              // experimental lights toggle for chrome.
-              toggleLights();
-
             } else {
                clearInterval(toolbarInterval);
 
@@ -113,7 +111,6 @@
                // when exiting fullpage, and it reflows on window resize, so 
                // trigger resize event to get it done. 
                $('.'+editorName).css('width', '100%');
-
 
                // else disable fullpage
                $(formWrapper).attr('id', '');
@@ -135,16 +132,13 @@
                       scrollTop: $(scrollto).offset().top
                    }, 400);
                 }
-
-                // Buggy right now. Go back and fix.
-                // Set focus--wysiwyg is slightly different
-               if (typeof wysiwygInstance != 'undefined') {
-                  //wysiwygInstance.fire("focus");
-                  //console.log('wysi');
-               } else {
-                  //console.log('foo');
-                  //editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
-               }
+            }
+            
+            // Set focus to composer when going fullpage and exiting.
+            if (typeof wysiwygInstance != 'undefined') {
+               wysiwygInstance.focus();
+            } else {
+               editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
             }
          };
 
@@ -240,6 +234,10 @@
          }
        };
 
+       /**
+        * For non-wysiwyg views. Wysiwyg focus() automatically places caret 
+        * at the end of a string of text. 
+        */
        var editorSetCaretFocusEnd = function(obj) {
           obj.selectionStart = obj.selectionEnd = obj.value.length;
           // Hack to work around jQuery's autogrow, which requires focus to init 
@@ -247,7 +245,7 @@
           // Considered using trigger() and triggerHandler(), but do not work.
           setTimeout(function(){
             obj.focus();
-          }, 50);
+          }, 250);
        };
 
        var editorSelectAllInput = function(obj) {
@@ -577,6 +575,9 @@
                          });
 
                          wysiPasteFix(editor);
+                         fullPageInit(editor);
+                         editor.focus();
+                         
 
                          if (debug) {
                             wysiDebug(editor);
@@ -674,6 +675,8 @@
                       loadScript(assets + '/js/rangy.js')
                    ).done(function(){
                       ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
+                      editorSetCaretFocusEnd(currentEditableTextarea[0]);
+                      fullPageInit();
                    });                  
                    break;
             }
@@ -681,8 +684,6 @@
             // Set up on editor load
             editorSetHelpText(formatOriginal, currentTextBoxWrapper);
             editorSetupDropdowns();
-            fullPageInit(editor);
-            editorSetCaretFocusEnd(currentEditableTextarea[0]);
 
             // some() loop requires true to end loop. every() requires false.
             return true;
