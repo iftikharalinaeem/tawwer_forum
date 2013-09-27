@@ -107,6 +107,7 @@ class RankModel extends Gdn_Model {
 //      self::AbilityString($Abilities, 'CommentLinks', 'Discussion & Comment Links', $Result);
       
       self::AbilityString($Abilities, 'Titles', 'Titles', $Result);
+      self::AbilityString($Abilities, 'Locations', 'Locations', $Result);
       self::AbilityString($Abilities, 'Signatures', 'Signatures', $Result);
       self::AbilityString($Abilities, 'Polls', 'Polls', $Result);
       self::AbilityString($Abilities, 'MeAction', 'Me Actions', $Result);
@@ -185,6 +186,11 @@ class RankModel extends Gdn_Model {
       // Titles.
       if ($V = GetValue('Titles', $Abilities)) {
          SaveToConfig('Garden.Profile.Titles', $V == 'yes' ? TRUE : FALSE, FALSE);
+      }
+
+      // Locations.
+      if ($V = GetValue('Locations', $Abilities)) {
+         SaveToConfig('Garden.Profile.Locations', $V == 'yes' ? TRUE : FALSE, FALSE);
       }
       
       // Signatures.

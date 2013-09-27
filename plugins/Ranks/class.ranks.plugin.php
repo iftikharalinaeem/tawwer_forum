@@ -379,6 +379,10 @@ class RanksPlugin extends Gdn_Plugin {
          if (GetValueR('Abilities.Titles', $Rank) == 'no') {
             SetValue('Title', $Args['User'], '');
          }
+
+         if (GetValueR('Abilities.Locations', $Rank) == 'no') {
+            SetValue('Location', $Args['User'], '');
+         }
          
          $V = GetValueR('Abilities.Verified', $Rank, null);
          if (!is_null($V)) {
