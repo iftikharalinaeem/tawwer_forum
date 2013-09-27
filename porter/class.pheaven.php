@@ -54,26 +54,29 @@ class PHeaven extends ExportController {
       
       // Category.
       $Category_Map = array(
-          'Parent_ID' => 'ParentCategoryID',
-          'SortOrder' => 'Sort'
+         'Parent_ID' => 'ParentCategoryID',
+         'SortOrder' => 'Sort',
+         'URLName' => 'UrlCode'
       );
       $Ex->ExportTable('Category', "
          select
             f.ForumID as CategoryID,
-            if (f.ParentForum_ID > 0, f.ParentForum_ID, f.ForumCategory_ID * 2000) as Parent_ID,
+            if (f.ParentForum_ID > 0, f.ParentForum_ID, f.ForumCategory_ID + 1200) as Parent_ID,
             f.Name,
             null,
-            d.Description
+            d.Description,
+            f.URLName
          from Forums f
          left join ForumDetails d on f.ForumID = d.Forum_ID
 
          union all
 
          select
-            c.ForumCategoryID * 2000 as CategoryID,
+            c.ForumCategoryID + 1200 as CategoryID,
             null,
             c.Name,
             c.SortOrder,
+            null,
             null
          from ForumCategories c
          ", $Category_Map);
@@ -84,7 +87,7 @@ class PHeaven extends ExportController {
           'Forum_ID' => 'CategoryID',
           'User_ID' => 'InsertUserID',
           'Subject' => array('Column' => 'Name', 'Filter' => array($Ex, 'HTMLDecoder')),
-          'Body2' => array('Column' => 'Body', 'Filter' => array($this, 'HexDecoder')),
+          'DecompressedBody' => 'Body',
           'EntryDate' => array('Column' => 'DateInserted'),          
           'LockedThread' => 'Closed'
           );
@@ -93,7 +96,7 @@ class PHeaven extends ExportController {
             m.LockedThread,
             m.User_ID,
             m.Subject,
-            mb.Body as Body2,
+            mb.DecompressedBody,
             m.EntryDate,
             'Html' as Format
          from Threads t
@@ -110,14 +113,15 @@ class PHeaven extends ExportController {
           'MessageID' => 'CommentID',
           'Thread_ID' => 'DiscussionID',
           'User_ID' => 'InsertUserID',
-          'Body2' => array('Column' => 'Body', 'Filter' => array($this, 'HexDecoder')),
+          'DecompressedBody' => 'Body',
           'Format' => 'Format',
           'EntryDate' => array('Column' => 'DateInserted')
       );
       $Ex->ExportTable('Comment', "
       select m.*,
          'Html' as Format,
-         mb.Body as Body2
+         mb.DecompressedBody,
+         ts.Thread_ID
       from Messages m
       left join MessageBody mb
          on m.MessageID = mb.Message_ID

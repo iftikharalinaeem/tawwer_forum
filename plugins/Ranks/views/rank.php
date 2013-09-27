@@ -75,6 +75,14 @@ echo $this->Form->Open(), $this->Form->Errors();
      ?>
    </li>
    <li>
+      <?php
+      echo $this->Form->Label('Time', 'Criteria_Time'),
+      '<div class="Info2">'."Users need to have been members for this length of time to gain this rank.".'</div>',
+      $this->Form->TextBox('Criteria_Time', array('class' => 'Input SmallInput')),
+      ' <span class="Gloss">examples: 1 day, 3 weeks, 1 month</span>';
+      ?>
+   </li>
+   <li>
      <?php
      echo $this->Form->Label('Posts', 'Criteria_CountPosts'),
      '<div class="Info2">'."Users will need this many posts to gain this rank.".'</div>',

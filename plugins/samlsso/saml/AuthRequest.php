@@ -64,7 +64,9 @@ AUTHNREQUEST;
            // do nothing.
         }
         
-        return $this->_settings->idpSingleSignOnUrl.'?'.http_build_query($get);
+        return $this->_settings->idpSingleSignOnUrl.
+           (strpos($this->_settings->idpSingleSignOnUrl, '?') === false ? '?' : '&').
+           http_build_query($get);
     }
     
     public function signRequest(&$get) {

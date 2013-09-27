@@ -204,7 +204,7 @@ class ReactionModel {
       return $UserTags;
    }
    
-   public function GetRow($Type, $ID, $Operation) {
+   public function GetRow($Type, $ID, $Operation = NULL) {
       $AttrColumn = 'Attributes';
       
       switch ($Type) {
@@ -226,7 +226,7 @@ class ReactionModel {
       }
       
       $Log = NULL;
-      if (!$Row) {
+      if (!$Row && $Operation) {
          // The row may have been logged so try and grab it.
          $LogModel = new LogModel();
          $Log = $LogModel->GetWhere(array('RecordType' => $Type, 'RecordID' => $ID, 'Operation' => $Operation));
@@ -258,7 +258,7 @@ class ReactionModel {
       $PK = $RecordType.'ID';
       
       if (is_a($Data, 'stdClass') || (is_array($Data) && !isset($Data[0]))) {
-         $Data2 = array($Data);
+         $Data2 = array(&$Data);
       } else {
          $Data2 =& $Data;
       }
@@ -406,7 +406,7 @@ class ReactionModel {
     * @param array $Record
     * @param Gdn_Model $Model 
     */
-   public function ToggleUserTag(&$Data, &$Record, $Model) {
+   public function ToggleUserTag(&$Data, &$Record, $Model, $Delete = NULL) {
       $Inc = GetValue('Total', $Data, 1);
       
       TouchValue('Total', $Data, $Inc);
@@ -427,6 +427,10 @@ class ReactionModel {
             
          $Inc = -$UserTags[$Data['TagID']]['Total'];
          $Data['Total'] = $Inc;
+      }
+      
+      if ($Insert && $Delete === TRUE) {
+         return;
       }
       
       $RecordType = $Data['RecordType'];
@@ -526,6 +530,11 @@ class ReactionModel {
          Gdn::Controller()->JsonTarget("#{$RecordType}_{$Data['RecordID']}", $RemoveCss, 'RemoveClass');
       if ($AddCss)
          Gdn::Controller()->JsonTarget("#{$RecordType}_{$Data['RecordID']}", $AddCss, 'AddClass');
+         
+      // Send back a delete for the user reaction.
+      if (!$Insert) {
+         Gdn::Controller()->JsonTarget("#{$RecordType}_{$Data['RecordID']} .UserReactionWrap[data-userid={$Data['UserID']}]", '', 'Remove');
+      }
          
       // Kludge, add the promoted tag to promote content.
       if ($AddCss == 'Promoted') {
@@ -648,7 +657,7 @@ class ReactionModel {
           'UserID' => $UserID,
           'Total' => $Inc
           );
-      $Inserted = $this->ToggleUserTag($Data, $Row, $Model);
+      $Inserted = $this->ToggleUserTag($Data, $Row, $Model, $Undo);
       
       $Message = array(T(GetValue('InformMessage', $ReactionType, '')), 'Dismissable AutoDismiss');
       

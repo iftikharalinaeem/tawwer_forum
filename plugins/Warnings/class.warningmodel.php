@@ -37,6 +37,26 @@ class WarningModel extends Gdn_Model {
       if (!is_array($Warning))
          $Warning = $this->GetID($Warning);
       
+      if (!class_exists('ConversationModel')) {
+         $this->_NotifyActivity($Warning);
+      }
+      
+      // Send a message from the moderator to the person being warned.
+      $Model = new ConversationModel();
+      $MessageModel = new ConversationMessageModel();
+      
+      $Row = array(
+         'Subject' => T('HeadlineFormat.Warning.ToUser', "You've been warned."),
+         'Body' => $Warning['Body'],
+         'Format' => $Warning['Format'],
+         'RecipientUserID' => (array)$Warning['WarnUserID']
+         );
+      if (!$Model->Save($Row, $MessageModel)) {
+         throw new Gdn_UserException($Model->Validation->ResultsText());
+      }
+   }
+   
+   protected function _NotifyActivity($Warning) {
       $ActivityModel = new ActivityModel();
       
       // Add a notification to the user.
@@ -82,7 +102,6 @@ class WarningModel extends Gdn_Model {
       $Activity['Data']['CommentActivityID'] = $NewActivity['ActivityID'];
       
       $ModActivity = $ActivityModel->Save($Activity);
-//      decho($ModActivity);
    }
    
    public function ProcessAllWarnings() {

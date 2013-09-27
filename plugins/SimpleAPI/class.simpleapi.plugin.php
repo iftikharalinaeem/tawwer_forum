@@ -9,7 +9,8 @@
  *  1.2        Authentication overhaul
  *  1.2.1      Fix User lookup bug
  *  1.2.5      Fix early error format bug
- *  1.2.6      Slightly tweak API reqiest detection
+ *  1.2.6      Slightly tweak API request detection
+ *  1.2.7      Add ->API to Gdn_Dispatcher
  * 
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
@@ -21,7 +22,7 @@
 $PluginInfo['SimpleAPI'] = array(
    'Name' => 'Simple API',
    'Description' => "Provides simple access_token API access to the forum.",
-   'Version' => '1.2.6',
+   'Version' => '1.2.7',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Tim Gunter',
    'AuthorEmail' => 'tim@vanillaforums.com',
@@ -342,6 +343,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          return;
       
       $this->API = true;
+      $Sender->API = true;
       $APIVersion = $URI[1];
       $APIRequest = $URI[2];
       

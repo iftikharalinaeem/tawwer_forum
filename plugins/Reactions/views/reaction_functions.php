@@ -59,7 +59,7 @@ if (!function_exists('ReactionButton')):
    
 function ReactionButton($Row, $UrlCode, $Options = array()) {
    $ReactionType = ReactionModel::ReactionTypes($UrlCode);
-   
+
    $IsHeading = FALSE;
    if (!$ReactionType) {
       $ReactionType = array('UrlCode' => $UrlCode, 'Name' => $UrlCode);
@@ -320,6 +320,10 @@ function WriteReactions($Row) {
          }
       }
 
+      // Allow addons to work with flags
+      Gdn::Controller()->EventArguments['Flags'] = &$Flags;
+      Gdn::Controller()->FireEvent('BeforeFlag');
+
       if (!empty($Flags)) {
          echo Gdn_Theme::BulletItem('Flags');
          
@@ -331,6 +335,7 @@ function WriteReactions($Row) {
             foreach ($Flags as $Flag) {
                echo '<li>'.ReactionButton($Row, $Flag['UrlCode']).'</li>';
             }
+            Gdn::Controller()->FireEvent('AfterFlagOptions');
             echo '</ul>';
          echo '</span> ';
       }
@@ -350,6 +355,11 @@ function WriteReactions($Row) {
          }
          echo '</span>';
       echo '</span>';
+      
+      if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Reactions.Edit'), FALSE)) {
+         echo Gdn_Theme::BulletItem('ReactionsMod').
+            Anchor(T('Log'), "/reactions/log/{$RecordType}/{$ID}", 'Popup');
+      }
       
       Gdn::Controller()->FireEvent('AfterReactions');
    
@@ -383,7 +393,7 @@ function WriteRecordReactions($Row) {
       if ($UserPhoto == '')
          continue;
       
-      $RecordReactions .= '<span class="UserReactionWrap" title="'.htmlspecialchars($Title).'">'
+      $RecordReactions .= '<span class="UserReactionWrap" title="'.htmlspecialchars($Title).'" data-userid="'.GetValue('UserID', $User).'">'
          .$UserPhoto
          ."<span class=\"ReactSprite $SpriteClass\"></span>"
       .'</span>';

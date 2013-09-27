@@ -3,7 +3,7 @@
 $PluginInfo['samlsso'] = array(
     'Name' => 'SAML SSO',
     'Description' => 'SAML SSO for Vanilla',
-    'Version' => '1.0b',
+    'Version' => '1.0.1b',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -141,6 +141,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $settings = $this->GetSettings();
       $request = new OneLogin_Saml_AuthRequest($settings);
       $url = $request->getRedirectUrl();
+      Gdn::Session()->Stash('samlsso', NULL, TRUE);
       Redirect($url);
    }
    

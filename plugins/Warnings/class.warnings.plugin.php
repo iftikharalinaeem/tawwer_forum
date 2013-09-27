@@ -8,7 +8,7 @@
 $PluginInfo['Warnings'] = array(
    'Name' => 'Warnings',
    'Description' => "Allows moderators to warn users to help police the community.",
-   'Version' => '1.0.2',
+   'Version' => '1.0.3',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -41,6 +41,7 @@ class WarningsPlugin extends Gdn_Plugin {
          ->Column('Expired', 'tinyint(1)')
          ->Column('RecordType', 'varchar(10)', TRUE) // Warned for a something they posted?
          ->Column('RecordID', 'int', TRUE)
+         ->Column('ConversationID', 'int', TRUE, 'index')
          ->Column('Attributes', 'text', TRUE)
          ->Set();
 

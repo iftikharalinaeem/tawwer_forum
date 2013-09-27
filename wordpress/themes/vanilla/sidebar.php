@@ -23,15 +23,19 @@
 		</a>
 		<a class="team-tim" href="http://vanillaforums.com/blog/author/tim/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-tim.jpg" />
-			<span class="about"><strong>Tim Gunter</strong>Director of Infrastructure and Ops</span>
+			<span class="about"><strong>Tim Gunter</strong>Director of Operations</span>
 		</a>
 		<a class="team-mark" href="http://vanillaforums.com/blog/author/mark/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-mark.jpg" />
 			<span class="about"><strong>Mark O'Sullivan</strong>Co-Founder</span>
 		</a>
-		<a class="team-lincoln" href="http://vanillaforums.com/blog/author/linclon/">
+		<a class="team-lincoln" href="http://vanillaforums.com/blog/author/lincoln/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-lincoln.jpg" />
 			<span class="about"><strong>Matt Lincoln Russell</strong> Developer</span>
+		</a>
+      <a class="team-lincoln" href="http://vanillaforums.com/blog/author/adrian/">
+			<img src="<?php bloginfo('template_directory'); ?>/images/team-adrian.jpg" />
+			<span class="about"><strong>Adrian Speyer</strong> Marketing Manager, Lead Generation</span>
 		</a>
 		<a class="team-luc" href="http://vanillaforums.com/blog/author/luc/">
 			<img src="<?php bloginfo('template_directory'); ?>/images/team-luc.jpg" />
@@ -85,6 +89,14 @@ setTimeout(function() {document.getElementById("hs-cta-8dba70d4-4330-4b96-be78-9
 		<a href="http://twitter.com/vanilla" class="twitter-follow-button">Follow @vanilla</a>
 		<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
 	</div>
+   
+   <div class="block">
+      <strong>Follow <a href="http://www.linkedin.com/company/vanilla-forums-inc">Vanilla</a> on LinkedIn</strong>
+      <script src="//platform.linkedin.com/in.js" type="text/javascript">
+      lang: en_US
+      </script>
+      <script type="IN/FollowCompany" data-id="1531758" data-counter="right"></script>
+   </div>
 
 <!--	<div class="block video">
 		<strong>Recent Video</strong>

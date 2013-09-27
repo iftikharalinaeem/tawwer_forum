@@ -85,6 +85,18 @@ class ReactionsController extends DashboardController {
       $this->Render('addedit', '', 'plugins/Reactions');
    }
    
+   public function Undo($Type, $ID, $Reaction, $UserID) {
+      $this->Permission(array('Garden.Moderation.Manage'), FALSE);
+      include_once $this->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+      
+      $ReactionModel = new ReactionModel();
+      $ReactionModel->React($Type, $ID, 'Undo-'.$Reaction, $UserID);
+      
+      $this->JsonTarget('!parent', '', 'SlideUp');
+      
+      $this->Render('Blank', 'Utility', 'Dashboard');
+   }
+   
    /**
     * Edit a reaction
     * 
@@ -129,6 +141,27 @@ class ReactionsController extends DashboardController {
       }
       
       $this->Render('addedit', '', 'plugins/Reactions');
+   }
+   
+   public function Log($Type, $ID) {
+      $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Reactions.Edit'), FALSE);
+      $Type = ucfirst($Type);
+      
+      $ReactionModel = new ReactionModel();
+      list($Row, $Model) = $ReactionModel->GetRow($Type, $ID);
+      if (!$Row)
+         throw NotFoundException(ucfirst($Type));
+      
+      $ReactionModel->JoinUserTags($Row, $Type);
+      
+      TouchValue('UserTags', $Row, array());
+      Gdn::UserModel()->JoinUsers($Row['UserTags'], array('UserID'));
+      
+      $this->Data = $Row;
+      $this->SetData('RecordType', $Type);
+      $this->SetData('RecordID', $ID);
+      
+      $this->Render('log', 'reactions', 'plugins/Reactions');
    }
    
    public function RecalculateRecordCache($Day = FALSE) {

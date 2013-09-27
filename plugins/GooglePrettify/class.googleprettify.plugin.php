@@ -8,7 +8,7 @@
 $PluginInfo['GooglePrettify'] = array(
    'Name' => 'Syntax Prettifier',
    'Description' => 'Adds pretty syntax highlighting to code in discussions and tab support to the comment box. This is a great addon for communities that support programmers and designers.',
-   'Version' => '1.1.1',
+   'Version' => '1.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
@@ -28,6 +28,9 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
 	public function AddPretty($Sender) {
 		$Sender->Head->AddTag('script', array('type' => 'text/javascript', '_sort' => 100), $this->GetJs());
       $Sender->AddJsFile('prettify.js', 'plugins/GooglePrettify', array('_sort' => 101));
+      if ($Language = C('Plugins.GooglePrettify.Language')) {
+         $Sender->AddJsFile("lang-$Language.js", 'plugins/GooglePrettify', array('_sort' => 102));
+      }
 	}
 	
 	/**
@@ -48,15 +51,18 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
     * @return string
     */
    public function GetJs() {
-      $LineNums = '';
+      $Class = '';
       if (C('Plugins.GooglePrettify.LineNumbers'))
-         $LineNums = 'linenums';
+         $Class .= ' linenums';
+      if ($Language = C('Plugins.GooglePrettify.Language')) {
+         $Class .= " lang-$Language";
+      }
       
       $Result = "jQuery(document).ready(function($) {
          var pp = false;
 
          $('.Message').livequery(function () { 
-            $('pre', this).addClass('prettyprint $LineNums');
+            $('pre', this).addClass('prettyprint$Class');
             if (pp)
                prettyPrint();
             $('pre', this).removeClass('prettyprint')
@@ -108,10 +114,33 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
       $Cf = new ConfigurationModule($Sender);
       $CssUrl = Asset('/plugins/GooglePrettify/design/prettify.css', TRUE);
       
+      $Languages = array(
+         'apollo' => 'apollo',
+         'clj' => 'clj',
+         'css' => 'css',
+         'go' => 'go',
+         'hs' => 'hs',
+         'lisp' => 'lisp',
+         'lua' => 'lua',
+         'ml' => 'ml',
+         'n' => 'n',
+         'proto' => 'proto',
+         'scala' => 'scala',
+         'sql' => 'sql',
+         'text' => 'tex',
+         'vb' => 'visual basic',
+         'vhdl' => 'vhdl',
+         'wiki' => 'wiki',
+         'xq' => 'xq',
+         'yaml' => 'yaml'
+         );
+      
       $Cf->Initialize(array(
           'Plugins.GooglePrettify.LineNumbers' => array('Control' => 'CheckBox', 'Description' => 'Add line numbers to source code.', 'Default' => FALSE),
           'Plugins.GooglePrettify.NoCssFile' => array('Control' => 'CheckBox', 'LabelCode' => 'Exclude Default CSS File', 'Description' => "If you want to define syntax highlighting in your custom theme you can disable the <a href='$CssUrl'>default css</a> with this setting.", 'Default' => FALSE),
-          'Plugins.GooglePrettify.UseTabby' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow Tab Characters', 'Description' => "If users enter a lot of source code then enable this setting to make the tab key enter a tab instead of skipping to the next control.", 'Default' => FALSE)
+          'Plugins.GooglePrettify.UseTabby' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow Tab Characters', 'Description' => "If users enter a lot of source code then enable this setting to make the tab key enter a tab instead of skipping to the next control.", 'Default' => FALSE),
+          'Plugins.GooglePrettify.Language' => array('Control' => 'DropDown', 'Items' => $Languages, 'Options' => array('IncludeNull' => TRUE),
+             'Description' => 'We try our best to guess which language you are typing in, but if you have a more obscure language you can force all highlighting to be in that language. (Not recommended)')
       ));
 
       $Sender->AddSideMenu();
