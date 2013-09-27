@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.0.16',
+   'Version' => '1.0.17',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -82,8 +82,6 @@ class EditorPlugin extends Gdn_Plugin {
     */
    public function __construct() {
       parent::__construct();
-      
-      // TODO in Kixeye this path is not being set.
       $this->AssetPath = Asset('/plugins/editor');  
       $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
    }

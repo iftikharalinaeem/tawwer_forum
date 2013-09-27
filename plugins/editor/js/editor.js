@@ -14,7 +14,6 @@
           editorVersion           = gdn.definition('editorVersion', editorCacheBreakValue),
           formatOriginal          = gdn.definition('editorInputFormat', 'Wysiwyg'),
           format                  = formatOriginal.toLowerCase(),
-          // TODO php is passing empty var to javascript in Kixeye.
           assets                  = gdn.definition('editorPluginAssets', '/plugins/editor'), 
           debug                   = false;
 
@@ -164,10 +163,12 @@
             });  
          }());
 
-         // If full page and the user saves/cancels/previews comment, 
-         // exit out of full page.
-         // Not smart in the sense that a failed post will also exit out of 
-         // full page, but the text will remain in editor, so not big issue.
+         /**
+          * If full page and the user saves/cancels/previews comment, 
+          * exit out of full page.
+          * Not smart in the sense that a failed post will also exit out of 
+          * full page, but the text will remain in editor, so not big issue.
+          */
          var postCommentCloseFullPageEvent = (function() {
             $('.Button')
             .off('click.closefullpage')
@@ -181,7 +182,9 @@
             });   
          }()); 
 
-         // Toggle spoilers in posted messages.
+         /** 
+          * Toggle spoilers in posted messages.
+          */
          var editorToggleSpoiler = (function() {
             // Use event delegation, so that even new comments ajax posted 
             // can be toggled 
@@ -201,8 +204,9 @@
             });
          }());
 
-
-         // Lights on/off in fullpage--experimental for chrome
+         /**
+          * Lights on/off in fullpage--experimental for chrome
+          */
          var toggleLights = function() {
             // Just do it for chrome right now. Very experimental.
             if (window.chrome) {
@@ -220,17 +224,19 @@
          
       };
 
-      // TODO when previewing a post, then going back to edit, the text help
-      // message will display again and again, and all the events will be 
-      // reattached. Consider namespacing events, so they overwrite.
-      // Insert help text below every editor 
+      /**
+       * When rendering editor, load correct helpt text message
+       */
       var editorSetHelpText = function(format, editorAreaObj) {
          format = format.toLowerCase();
          if (format != 'wysiwyg') {
-            $("<div></div>")
-               .addClass('editor-help-text')
-               .html(gdn.definition(format +'HelpText'))
-               .insertAfter(editorAreaObj);
+            // If the helpt text is already there, don't insert it again.
+            if (!$(editorAreaObj).parent().find('.editor-help-text').length) {
+               $("<div></div>")
+                  .addClass('editor-help-text')
+                  .html(gdn.definition(format +'HelpText'))
+                  .insertAfter(editorAreaObj);
+            }
          }
        };
 
@@ -248,6 +254,9 @@
           }, 250);
        };
 
+       /**
+        * Helper function to select whole text of an input or textarea on focus
+        */
        var editorSelectAllInput = function(obj) {
           // selectionStart is implied 0
           obj.selectionEnd = obj.value.length;
@@ -257,10 +266,8 @@
       /**
        * Deal with clashing JS for opening dialogs on click, and do not let 
        * more than one dialog/dropdown appear at once. 
-       * 
-       * TODO enable enter button to do the same as clicks, or disable enter.
        */
-      var editorSetupDropdowns = function() { 
+      var editorSetupDropdowns = function(editorInstance) { 
          $('.editor-dropdown')
          .off('click.dd')
          .on('click.dd', function(e) {
@@ -293,18 +300,29 @@
                }
             }
          });
+         
+         // For now, do not let Enter key close and insert text, as it 
+         // causes buggy behaviour with dropdowns.
+         $('.InputBox').on('keydown', function(e) {
+            if (e.which == 13) {
+               e.stopPropagation();
+               e.preventDefault();
+               return false;
+            }
+         });
 
-         // TODO bug when post-dependent editor loaded, loses events.
-
-         // if dropdown open, cliking into an editor area should close it, but 
-         // keep it open for anything else.
-         $('.TextBoxWrapper').each(function(i, el) {
+         // Clicking into an editor area should close the dropdown, but keep 
+         // it open for anything else.
+         $('.TextBoxWrapper').add($('.wysihtml5-sandbox').contents().find('html')).each(function(i, el) {
             $(el).addClass('editor-dialog-fire-close');
          });
 
-         $('.editor-dialog-fire-close')
+         // Target all elements in the document that fire the dropdown close 
+         // (some are written directly as class in view), then add the matches 
+         // from within the iframe, and attach the relevant callbacks to events.
+         $('.editor-dialog-fire-close').add($('.wysihtml5-sandbox').contents().find('.editor-dialog-fire-close'))
          .off('mouseup.fireclose')
-         .on('mouseup.fireclose', function(e) {
+         .on('mouseup.fireclose', function(e) {   
             $('.editor-dropdown').each(function(i, el) {
                $(el).removeClass('editor-dropdown-open');
                $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
@@ -312,7 +330,9 @@
          });
       };
 
-      // Editor does not play well with Quotes plugin in Wysiwyg mode. 
+      /**
+       * Editor does not play well with Quotes plugin in Wysiwyg mode. 
+       */
       var editorHandleQuotesPlugin = function(editorInstance) {
          var editor = editorInstance;
         // handle Quotes plugin
@@ -344,8 +364,10 @@
          }); 
       };
 
-      // Chrome wraps span around content. Firefox prepends b.
-      // No real need to detect browsers.
+      /**
+       * Chrome wraps span around content. Firefox prepends b.
+       * No real need to detect browsers.
+       */ 
       var wysiPasteFix = function(editorInstance) {
          var editor = editorInstance;
          editor.observe("paste:composer", function(e) {
@@ -361,9 +383,12 @@
       };
 
 
-      // Debugging lazyloaded scripts impossible with jQuery getScript/get
-      // Make sure available to all 
-      // http://balpha.de/2011/10/jquery-script-insertion-and-its-consequences-for-debugging/
+      /**
+       * Debugging lazyloaded scripts impossible with jQuery getScript/get, 
+       * so make sure available. 
+       * 
+       * http://balpha.de/2011/10/jquery-script-insertion-and-its-consequences-for-debugging/
+       */
       function loadScript(path) {
          var result = $.Deferred(),
              script = document.createElement("script");
@@ -383,8 +408,16 @@
          return result.promise();
       }   
 
-      // This will only be called when debug=true;
+      /**
+       * This will only be called when debug=true;
+       */
       var wysiDebug = function(editorInstance) {
+         // Event examples that will come in handy--taken from source. 
+         //editor.fire("change_view", "composer");
+         //editor.fire("change_view", "textarea");
+         //this.editor.observe("change_view", function(view) {
+         //this.editor.observe("destroy:composer", stopInterval);
+         //editor.setValue('This will do it.');
          editorInstance.on("load", function() {
            console.log('load');
          })
@@ -435,7 +468,6 @@
          }); 
       };
 
-
       /**
        * Initialize editor on every .BodyBox (or other element passed to this 
        * jQuery plugin) on the page.
@@ -480,8 +512,8 @@
              format                  = currentEditorFormat + '';
              currentEditorToolbar    = t.find('.editor-format-'+ format);
              currentEditableTextarea = t.find('#Form_Body');
-
-             if (textareaObj) {
+ 
+            if (textareaObj) {
                 currentEditableTextarea = textareaObj;
              }
 
@@ -503,8 +535,6 @@
 
             $(currentEditableTextarea).attr('id', editorTextareaId); 
 
-            // TODO add these as functions in an object, then just invoke
-            // them on format
             switch (format) {
                case 'wysiwyg':
                case 'ipb':
@@ -574,6 +604,7 @@
                          wysiPasteFix(editor);
                          fullPageInit(editor);
                          editor.focus();
+                         editorSetupDropdowns(editor);
                          
                          if (debug) {
                             wysiDebug(editor);
@@ -669,17 +700,17 @@
                       loadScript(assets + '/js/buttonbarplus.js'),
                       loadScript(assets + '/js/jquery.hotkeys.js'),
                       loadScript(assets + '/js/rangy.js')
-                   ).done(function(){
+                   ).done(function() {
                       ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
                       fullPageInit();
                       editorSetCaretFocusEnd(currentEditableTextarea[0]);
+                      editorSetupDropdowns();
                    });                  
                    break;
             }
 
             // Set up on editor load
             editorSetHelpText(formatOriginal, currentTextBoxWrapper);
-            editorSetupDropdowns();
 
             // some() loop requires true to end loop. every() requires false.
             return true;
@@ -693,7 +724,7 @@
          });
       }
 
-      // Chaining
+      // jQuery chaining
       return this;
    };
 }(jQuery));
@@ -703,11 +734,3 @@
 jQuery(document).ready(function($) {
    $('.BodyBox').setAsEditor();
 });
-
-
-// Event examples that will come in handy--taken from source. 
-//editor.fire("change_view", "composer");
-//editor.fire("change_view", "textarea");
-//this.editor.observe("change_view", function(view) {
-//this.editor.observe("destroy:composer", stopInterval);
-//editor.setValue('This will do it.');
