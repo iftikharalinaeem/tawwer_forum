@@ -224,8 +224,8 @@ affect, so it's not doing anything */
    box-shadow: 0 2px 5px -5px #000;
 }
 
-.js-editor-fullpage #editor-fullpage-candidate form,
-.js-editor-fullpage form#editor-fullpage-candidate > div /* Activity on profile */ {
+.js-editor-fullpage li#editor-fullpage-candidate .TextBoxWrapper,
+.js-editor-fullpage #editor-fullpage-candidate form {
    margin: 0 auto;
    padding: 50px 0 10px 0;
    -webkit-animation-duration: 0.8s;
@@ -234,9 +234,10 @@ affect, so it's not doing anything */
    animation-name: editor-anim-editor;
 }
 
+
+.js-editor-fullpage li#editor-fullpage-candidate .TextBoxWrapper,
 .js-editor-fullpage #editor-fullpage-candidate .editor,
-.js-editor-fullpage #editor-fullpage-candidate form,
-.js-editor-fullpage form#editor-fullpage-candidate > div /* Activity on profile */ {
+.js-editor-fullpage #editor-fullpage-candidate form {
    max-width: 800px;
 }
 
@@ -244,7 +245,6 @@ affect, so it's not doing anything */
 .js-editor-fullpage .TextBoxWrapper .BodyBox,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
    width: 100% !important;
-   padding: 10px !important;
 }
 
 /* Fix some content boxes */
@@ -380,29 +380,15 @@ wysiwgy requires height to not interfere with autogrow. */
    }
 }
 
-
-
-/**
- * Target actual body within editor iframe. 
- *
- * Due to including multiple CSS files (style.css and custom.css), which could 
- * have their body's defined differently, make sure body within editor is 
- * affected as little as possible. 
- */
-
-.wysihtml5-editor {
-   margin: 0;
-	padding: 5px;
-	border: 0;
-	font: inherit;
-   outline: none;
-}
-
-
-
 /**
  * Modify this file to change the styling of the content 
  * in the Wysiwyg editor. 
  */
 
 @import "wysiwyg";
+
+/* Keep here to address iframe/body padding text creep issue, see autogrow js 
+for more information about the issue */
+.wysihtml5-sandbox {
+   padding: 0 !important;
+}

@@ -157,6 +157,13 @@ echo $this->Form->Open(), $this->Form->Errors();
      ?>
    </li>
    <li>
+      <?php
+      echo $this->Form->Label('Locations', 'Abilities_Locations'),
+         '<div class="Info2">'."You can give or take away the ability to have a user location.".'</div>',
+      $this->Form->RadioList('Abilities_Locations', array('yes' => 'give', 'no' => 'take away', '' => 'default'));
+      ?>
+   </li>
+   <li>
      <?php
      echo $this->Form->Label('Signatures', 'Abilities_Signatures'),
      '<div class="Info2">'."You can give or take away the ability to have signatures. (Requires the signatures addon)".'</div>',

@@ -136,6 +136,11 @@
 }
 
 /* Custom classes */
+pre.CodeBlock {
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+}
+
 .Spoiler {
   background-color: rgba(0, 0, 0, 0.05) !important;
   margin: 1em 0;
@@ -164,7 +169,6 @@
   position: absolute;
   top: -7px;
   left: 9px;
-  color: rgba(0, 0, 0, 0.4);
   font-size: 14px;
 }
 
@@ -187,4 +191,22 @@
 
 .AlignRight {
   text-align: right;
+}
+
+/**
+ * Target iframe and actual body within editor iframe. Do not use body to set 
+ * background color of composer. By default it will be inherited from 
+ * textarea automatically, but if for some reason you want to override the 
+ * styles directly, use .editor-composer (body) for fonts and padding, and use 
+ * .wysihtml5-sandbox (iframe) to modify the iframe (do background-color on 
+ * this).
+ */
+/* iframe */
+/* body within iframe */
+.editor-composer {
+  margin: 0;
+  border: 0;
+  padding: inherit;
+  font: inherit;
+  outline: none;
 }

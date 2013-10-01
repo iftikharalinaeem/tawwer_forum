@@ -233,10 +233,18 @@ jQuery(document).ready(function($) {
          $(ThisButtonBar).data('ButtonBarTarget', TextArea);
 
          //var format = gdn.definition('editorInputFormat', 'Html');
-         var format = format;
+         format = format.toLowerCase();
          
+         // Do this because formats provided by different sites are not all 
+         // the same: some have capitalizations, others do not.
+         var inputFormats = {
+            'bbcode': 'BBCode',
+            'html': 'Html',
+            'markdown': 'Markdown'
+         };
+
          // Apply the page's InputFormat to this textarea.
-         $(TextArea).data('InputFormat', format);
+         $(TextArea).data('InputFormat', inputFormats[format]);
 
          // Attach events
          $(ThisButtonBar).find('.editor-action').on('mousedown', function(event){
@@ -307,7 +315,8 @@ jQuery(document).ready(function($) {
       Perform: function(TextArea, Operation, Event, Value) {
          Event.preventDefault();
          
-         var InputFormat = $(TextArea).data('InputFormat');         
+         var InputFormat = $(TextArea).data('InputFormat');
+         
          
          var PerformMethod = 'Perform'+InputFormat;
          if (ButtonBar[PerformMethod] == undefined)
