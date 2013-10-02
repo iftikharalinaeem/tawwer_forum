@@ -334,34 +334,34 @@
        * Editor does not play well with Quotes plugin in Wysiwyg mode. 
        */
       var editorHandleQuotesPlugin = function(editorInstance) {
-         var editor = editorInstance;
-        // handle Quotes plugin
-         $('a.ReactButton.Quote').on('click', function(e) {
-            // Stop animation from other plugin and let this one 
-            // handle the scroll, otherwise the scrolling jumps 
-            // all over, and really distracts the eyes. 
-            $('html, body').stop().animate({
-               scrollTop: $(editor.textarea.element).parent().parent().offset().top
-            }, 800);
+         var editor = editorInstance;      
 
+         // handle Quotes plugin
+         $('.MessageList')
+         .on('mouseup.QuoteReply', 'a.ReactButton.Quote', function(e) {            
             // For the quotes plugin to insert the quoted text, it 
             // requires that the textarea be pastable, which is not true 
             // when not displayed, so momentarily toggle to it, then, 
             // unavoidable, wait short interval to then allow wysihtml5
             // to toggle back and render the content.
             editor.fire("change_view", "textarea");
-            setTimeout(function() {
-               editor.fire("change_view", "composer");
-               editor.fire("focus:composer");
-               // Inserting a quote at the end prevents editor from 
-               // breaking out of quotation, which means everything 
-               // typed after the inserted quotation, will be wrapped 
-               // in a blockquote.
-               editor.composer.selection.setAfter(editor.composer.element.lastChild);
-               editor.composer.commands.exec("insertHTML", "<p></p>");
-            }, 400);
-
-         }); 
+            $(editor.textarea.element).css({"opacity":"0.50"});
+            var initialText = $(editor.textarea.element).val();
+            var si = setInterval(function() {
+               if ($(editor.textarea.element).val() != initialText) {
+                  clearInterval(si);
+                  $(editor.textarea.element).css({"opacity":""});
+                  editor.fire("change_view", "composer");
+                  editor.fire("focus:composer");
+                  // Inserting a quote at the end prevents editor from 
+                  // breaking out of quotation, which means everything 
+                  // typed after the inserted quotation, will be wrapped 
+                  // in a blockquote.
+                  editor.composer.selection.setAfter(editor.composer.element.lastChild);
+                  editor.composer.commands.exec("insertHTML", "<p></p>");
+               }
+            }, 1);
+         });
       };
 
       /**
@@ -371,6 +371,17 @@
       var wysiPasteFix = function(editorInstance) {
          var editor = editorInstance;
          editor.observe("paste:composer", function(e) {
+            // Cancel out this function's operation for now. On the original 
+            // 0.3.0 version, pasting google docs would wrap either a span or 
+            // b tag around the content. Now, since moving to 0.4.0pre, the 
+            // paragraphing messes this up severaly. Moreover, pasting 
+            // through this function sets caret to end of composer. 
+            // Originally found this bug through Kixeye mentioning paste 
+            // issue, which opened up larger issue of pasting with new version 
+            // of wysihtml5. For now, disable paste filtering to make sure 
+            // pasting and the caret remain in same position. 
+            // TODO. 
+            return; 
             // Grab paste value
             var paste = this.composer.getValue();
             // Just need to remove first one, and wysihtml5 will auto
@@ -603,7 +614,7 @@
 
                          wysiPasteFix(editor);
                          fullPageInit(editor);
-                         editor.focus();
+                         //editor.focus();
                          editorSetupDropdowns(editor);
                          
                          if (debug) {
@@ -703,7 +714,7 @@
                    ).done(function() {
                       ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
                       fullPageInit();
-                      editorSetCaretFocusEnd(currentEditableTextarea[0]);
+                      //editorSetCaretFocusEnd(currentEditableTextarea[0]);
                       editorSetupDropdowns();
                    });                  
                    break;
