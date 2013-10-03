@@ -594,7 +594,7 @@
                 editorTextareaId         = currentEditableTextarea[0].id +'-'+ currentEditableCommentId,
                 editorToolbarId          = 'editor-format-'+ format +'-'+ currentEditableCommentId;
 
-            editorName               = 'vanilla-editor-text-'+ currentEditableCommentId;
+            var editorName               = 'vanilla-editor-text-'+ currentEditableCommentId;
 
             // change ids to bind new editor functionality to particular edit
             $(currentEditorToolbar).attr('id', editorToolbarId);
@@ -614,7 +614,7 @@
                       loadScript(assets + '/js/jquery.wysihtml5_size_matters.js')
                    ).done(function(){
 
-                      editorRules = {
+                      var editorRules = {
                          // Give the editor a name, the name will also be set as class name on the iframe and on the iframe's body 
                          name:                 editorName,
                          // Whether the editor should look like the textarea (by adopting styles)
@@ -647,7 +647,7 @@
                       };
 
                       // instantiate new editor
-                      editor = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
+                      var editor = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
 
                       editor.on('load', function() {
                          // enable auto-resize
