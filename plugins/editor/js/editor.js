@@ -727,7 +727,7 @@
                          
                          // If editor is being loaded inline, then focus it.
                          if (!singleInstance) {
-                           scrollToEditorContainer(editor.textarea.element);
+                           //scrollToEditorContainer(editor.textarea.element);
                            editor.focus();
                          }
                          
@@ -830,7 +830,7 @@
                       fullPageInit();
                       editorSetupDropdowns();
                       if (!singleInstance) {
-                         scrollToEditorContainer($(currentEditableTextarea)[0]);
+                         //scrollToEditorContainer($(currentEditableTextarea)[0]);
                          editorSetCaretFocusEnd(currentEditableTextarea[0]);
                       }
                    });                  
