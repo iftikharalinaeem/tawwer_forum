@@ -336,7 +336,7 @@
       var editorHandleQuotesPlugin = function(editorInstance) {
          var editor = editorInstance;      
 
-         // handle Quotes plugin
+         // handle Quotes plugin using own logic.
          $('.MessageList')
          .on('mouseup.QuoteReply', 'a.ReactButton.Quote', function(e) {            
             // For the quotes plugin to insert the quoted text, it 
@@ -360,8 +360,27 @@
                   editor.composer.selection.setAfter(editor.composer.element.lastChild);
                   editor.composer.commands.exec("insertHTML", "<p></p>");
                }
-            }, 1);
+            }, 0);
          });
+         
+         /*
+         // Handle quotes plugin using triggered event.
+         $('a.ReactButton.Quote').on('click', function(e) {
+            // Stop animation from other plugin and let this one
+            // handle the scroll, otherwise the scrolling jumps
+            // all over, and really distracts the eyes.
+            $('html, body').stop().animate({
+               scrollTop: $(editor.textarea.element).parent().parent().offset().top
+            }, 800);
+         });
+         
+         $(editor.textarea.element).on('appendHtml', function(e, data) {
+            editor.composer.commands.exec("insertHTML", data);
+            editor.composer.commands.exec("insertHTML", "<p></p>");
+            editor.fire("change_view", "composer");
+            editor.focus();
+         });
+         */
       };
 
       /**
@@ -584,6 +603,18 @@
              }
 
              currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');   
+             
+             // If singleInstance is false, then odds are the editor is being 
+             // loaded inline and there are other instances on page.
+             var singleInstance = true;
+             
+             // Determine if editing a comment, or not. When editing a comment, 
+             // it has a comment id, while adding a new comment has an empty 
+             // comment id. The value is a hidden input.
+             var commentId = $(currentTextBoxWrapper).parent().find('#Form_CommentID').val();
+             if (typeof commentId != 'undefined' && commentId != '') {
+                singleInstance = false;
+             }
          }
 
          // if found, perform operation
@@ -672,8 +703,12 @@
                         
                          //wysiPasteFix(editor);
                          fullPageInit(editor);
-                         //editor.focus();
                          editorSetupDropdowns(editor);
+                         
+                         // If editor is being loaded inline, then focus it.
+                         if (!singleInstance) {
+                           editor.focus();
+                         }
                          
                          if (debug) {
                             wysiDebug(editor);
@@ -772,8 +807,10 @@
                    ).done(function() {
                       ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
                       fullPageInit();
-                      //editorSetCaretFocusEnd(currentEditableTextarea[0]);
                       editorSetupDropdowns();
+                      if (!singleInstance) {
+                         editorSetCaretFocusEnd(currentEditableTextarea[0]);
+                      }
                    });                  
                    break;
             }
