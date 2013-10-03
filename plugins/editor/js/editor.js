@@ -381,15 +381,15 @@
             // of wysihtml5. For now, disable paste filtering to make sure 
             // pasting and the caret remain in same position. 
             // TODO. 
-            return; 
+            //return; 
             // Grab paste value
-            var paste = this.composer.getValue();
+            ////var paste = this.composer.getValue();
             // Just need to remove first one, and wysihtml5 will auto
             // make sure the pasted html has all tags closed, so the 
             // last will just be stripped automatically. sweet.
-            paste = paste.replace(/^<(span|b)>/m, ''); // just match first
+            ////paste = paste.replace(/^<(span|b)>/m, ''); // just match first
             // Insert into composer
-            this.composer.setValue(paste);
+            ////this.composer.setValue(paste);
          });
       };
 
@@ -417,7 +417,59 @@
          script.onerror = function () { result.reject(); };
          $("head")[0].appendChild(script);
          return result.promise();
-      }   
+      }  
+      
+      /**
+       * Strange bug when editing a comment, then returning 
+       * to main editor at bottom of discussion. For now, 
+       * just use this temp hack. I noticed that if there 
+       * was text in the main editor before choosing to edit 
+       * a comment further up the discussion, that the main 
+       * one would be fine, so insert a zero-width character 
+       * that will virtually disappear to everyone and 
+       * everything--except wysihtml5. 
+       * Actual console error: 
+       * NS_ERROR_INVALID_POINTER: Component returned failure code: 0x80004003 (NS_ERROR_INVALID_POINTER) [nsISelection.addRange]
+       * this.nativeSelection.addRange(getNativeRange(range));
+       * LINE: 2836 in wysihtml5-0.4.0pre.js
+       * 
+       * &zwnj;
+       * wysihtml5.INVISIBLE_SPACE = \uFEFF
+       */
+      var nullFix = function(editorInstance) {
+         var editor = editorInstance;
+         var text = editor.composer.getValue();
+         //editor.composer.setValue(text + "<p>&zwnj;<br></p>");
+         
+         // Problem with this is being able to post "empty", because invisible 
+         // space is counted as a character. However, many forums could 
+         // implemented a character minimum (Kixeye does), so this will 
+         // not happen everywhere. Regardless, this is only a bandaid. A real 
+         // fix will need to be figured out. The wysihtml5 source was pointing 
+         // to a few things, but it largely also utilizes hacks like this, and 
+         // in fact does insert an initial p tag in the editor to signal that 
+         // paragraphs should follow. 
+         var insertNull = function() {
+            editor.composer.commands.exec("insertHTML", "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
+            editor.fire("blur", "composer");
+            editor.focus(); 
+         };
+
+         editor.on("focus", function() {
+            if (!editor.composer.getValue().length) {
+               insertNull();
+            }
+         });
+
+         $(editor.composer.doc).on('keyup', function(e){
+            // Backspace
+            if (e.which == 8) {
+               if (!editor.composer.getValue().length) {
+                  insertNull();
+               }
+            }
+         });
+      };
 
       /**
        * This will only be called when debug=true;
@@ -476,6 +528,9 @@
          })
          .on("aftercommand:composer", function() {
            console.log('aftercommand:composer');
+         })
+         .on("destroy:composer", function() {
+           console.log('destroy:composer');
          }); 
       };
 
@@ -489,7 +544,7 @@
        * observers again. For livequery functionality, just pass empty string as 
        * first param, and the textarea object to the second. 
        */
-      function editorInit(obj, textareaObj) { 
+      var editorInit = function(obj, textareaObj) { 
          var t = $(obj);
 
          // if using mutation events, use this, and send mutation
@@ -528,7 +583,7 @@
                 currentEditableTextarea = textareaObj;
              }
 
-             currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');               
+             currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');   
          }
 
          // if found, perform operation
@@ -559,7 +614,6 @@
                       loadScript(assets + '/js/jquery.wysihtml5_size_matters.js')
                    ).done(function(){
 
-                      //
                       editorRules = {
                          // Give the editor a name, the name will also be set as class name on the iframe and on the iframe's body 
                          name:                 editorName,
@@ -611,8 +665,12 @@
                             //$('iframe').contents().find('body').empty();
                             $(editor.composer.iframe).css({"min-height": "inherit"});
                          });
-
-                         wysiPasteFix(editor);
+                         
+                         // Fix problem of editor losing its default p tag 
+                         // when loading another instance on the same page. 
+                         nullFix(editor);
+                        
+                         //wysiPasteFix(editor);
                          fullPageInit(editor);
                          //editor.focus();
                          editorSetupDropdowns(editor);

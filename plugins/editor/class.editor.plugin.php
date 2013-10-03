@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.0.19',
+   'Version' => '1.0.20',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -648,7 +648,7 @@ class EditorPlugin extends Gdn_Plugin {
       
       $Cf->Initialize(array(
           'Garden.InputFormatter' => array('LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p> <p><small><strong>Note:</strong> the editor will auto-detect the format of old posts when emending them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</small></p>', 'Items' => $Formats),
-          'Garden.ForceInputFormatter' => array('LabelCode' => 'Interpret Html as Wysiwyg', 'Control' => 'Checkbox', 'Description' => 'Check the below option to tell the editor to reinterpret old Html posts with Wysiwyg.')
+          'Garden.ForceInputFormatter' => array('LabelCode' => 'Interpret All Formats as Wysiwyg', 'Control' => 'Checkbox', 'Description' => '<p>Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.</p> <p><small><strong>Note:</strong> This setting will only take affect if Wysiwyg was chosen as the Post Format above.</p>')
       ));
       
       $Sender->AddSideMenu();
