@@ -382,6 +382,26 @@
          });
          */
       };
+      
+      /**
+       * This is just to make sure that editor, upon choosing to edit an 
+       * inline post, will be scrolled to the correct location on the page. 
+       * Some sites may have plugins that interfere on edit, so take care of 
+       * those possibilities here.
+       */
+      var scrollToEditorContainer = function(textarea) {
+         var scrollto = $(textarea).closest('.Comment');
+         
+         if (!scrollto.length) {
+            scrollto = $(textarea).closest('.CommentForm');
+         }
+
+         if (scrollto.length) {
+            $('html, body').animate({
+               scrollTop: $(scrollto).offset().top
+            }, 400);
+         } 
+      };
 
       /**
        * Chrome wraps span around content. Firefox prepends b.
@@ -607,7 +627,7 @@
              // If singleInstance is false, then odds are the editor is being 
              // loaded inline and there are other instances on page.
              var singleInstance = true;
-             
+          
              // Determine if editing a comment, or not. When editing a comment, 
              // it has a comment id, while adding a new comment has an empty 
              // comment id. The value is a hidden input.
@@ -707,6 +727,7 @@
                          
                          // If editor is being loaded inline, then focus it.
                          if (!singleInstance) {
+                           scrollToEditorContainer(editor.textarea.element);
                            editor.focus();
                          }
                          
@@ -809,6 +830,7 @@
                       fullPageInit();
                       editorSetupDropdowns();
                       if (!singleInstance) {
+                         scrollToEditorContainer($(currentEditableTextarea)[0]);
                          editorSetCaretFocusEnd(currentEditableTextarea[0]);
                       }
                    });                  
