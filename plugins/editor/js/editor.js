@@ -334,34 +334,74 @@
        * Editor does not play well with Quotes plugin in Wysiwyg mode. 
        */
       var editorHandleQuotesPlugin = function(editorInstance) {
-         var editor = editorInstance;
-        // handle Quotes plugin
-         $('a.ReactButton.Quote').on('click', function(e) {
-            // Stop animation from other plugin and let this one 
-            // handle the scroll, otherwise the scrolling jumps 
-            // all over, and really distracts the eyes. 
-            $('html, body').stop().animate({
-               scrollTop: $(editor.textarea.element).parent().parent().offset().top
-            }, 800);
+         var editor = editorInstance;      
 
+         // handle Quotes plugin using own logic.
+         $('.MessageList')
+         .on('mouseup.QuoteReply', 'a.ReactButton.Quote', function(e) {
             // For the quotes plugin to insert the quoted text, it 
             // requires that the textarea be pastable, which is not true 
             // when not displayed, so momentarily toggle to it, then, 
             // unavoidable, wait short interval to then allow wysihtml5
             // to toggle back and render the content.
             editor.fire("change_view", "textarea");
-            setTimeout(function() {
-               editor.fire("change_view", "composer");
-               editor.fire("focus:composer");
-               // Inserting a quote at the end prevents editor from 
-               // breaking out of quotation, which means everything 
-               // typed after the inserted quotation, will be wrapped 
-               // in a blockquote.
-               editor.composer.selection.setAfter(editor.composer.element.lastChild);
-               editor.composer.commands.exec("insertHTML", "<p></p>");
-            }, 400);
+            $(editor.textarea.element).css({"opacity":"0.50"});
+            var initialText = $(editor.textarea.element).val();
+            var si = setInterval(function() {
+               if ($(editor.textarea.element).val() !== initialText) {
+                  clearInterval(si);
+                  $(editor.textarea.element).css({"opacity":""});
+                  editor.fire("change_view", "composer");
+                  // Inserting a quote at the end prevents editor from 
+                  // breaking out of quotation, which means everything 
+                  // typed after the inserted quotation, will be wrapped 
+                  // in a blockquote.
+                  //editor.composer.selection.setAfter(editor.composer.element);
+                  //editor.composer.commands.exec("insertHTML", "<p><br></p>");
+                  editor.composer.setValue(editor.composer.getValue() + "<p><br></p>");
+                  editor.fire("focus:composer");
+               }
+            }, 0);
+         });
+         
+         /*
+         // Handle quotes plugin using triggered event.
+         $('a.ReactButton.Quote').on('click', function(e) {
+            // Stop animation from other plugin and let this one
+            // handle the scroll, otherwise the scrolling jumps
+            // all over, and really distracts the eyes.
+            $('html, body').stop().animate({
+               scrollTop: $(editor.textarea.element).parent().parent().offset().top
+            }, 800);
+         });
+         
+         $(editor.textarea.element).on('appendHtml', function(e, data) {
+            editor.composer.commands.exec("insertHTML", data);
+            editor.composer.commands.exec("insertHTML", "<p></p>");
+            editor.fire("change_view", "composer");
+            editor.focus();
+         });
+         */
+      };
+      
+      /**
+       * This is just to make sure that editor, upon choosing to edit an 
+       * inline post, will be scrolled to the correct location on the page. 
+       * Some sites may have plugins that interfere on edit, so take care of 
+       * those possibilities here.
+       */
+      var scrollToEditorContainer = function(textarea) {
+         var scrollto = $(textarea).closest('.Comment');
+         
+         if (!scrollto.length) {
+            scrollto = $(textarea).closest('.CommentForm');
+         }
 
-         }); 
+         if (scrollto.length) {
+            $('html, body').animate({
+               scrollTop: $(scrollto).offset().top
+            }, 400);
+         } 
       };
 
       /**
@@ -371,14 +411,25 @@
       var wysiPasteFix = function(editorInstance) {
          var editor = editorInstance;
          editor.observe("paste:composer", function(e) {
+            // Cancel out this function's operation for now. On the original 
+            // 0.3.0 version, pasting google docs would wrap either a span or 
+            // b tag around the content. Now, since moving to 0.4.0pre, the 
+            // paragraphing messes this up severaly. Moreover, pasting 
+            // through this function sets caret to end of composer. 
+            // Originally found this bug through Kixeye mentioning paste 
+            // issue, which opened up larger issue of pasting with new version 
+            // of wysihtml5. For now, disable paste filtering to make sure 
+            // pasting and the caret remain in same position. 
+            // TODO. 
+            //return; 
             // Grab paste value
-            var paste = this.composer.getValue();
+            ////var paste = this.composer.getValue();
             // Just need to remove first one, and wysihtml5 will auto
             // make sure the pasted html has all tags closed, so the 
             // last will just be stripped automatically. sweet.
-            paste = paste.replace(/^<(span|b)>/m, ''); // just match first
+            ////paste = paste.replace(/^<(span|b)>/m, ''); // just match first
             // Insert into composer
-            this.composer.setValue(paste);
+            ////this.composer.setValue(paste);
          });
       };
 
@@ -406,7 +457,66 @@
          script.onerror = function () { result.reject(); };
          $("head")[0].appendChild(script);
          return result.promise();
-      }   
+      }  
+      
+      /**
+       * Strange bug when editing a comment, then returning 
+       * to main editor at bottom of discussion. For now, 
+       * just use this temp hack. I noticed that if there 
+       * was text in the main editor before choosing to edit 
+       * a comment further up the discussion, that the main 
+       * one would be fine, so insert a zero-width character 
+       * that will virtually disappear to everyone and 
+       * everything--except wysihtml5. 
+       * Actual console error: 
+       * NS_ERROR_INVALID_POINTER: Component returned failure code: 0x80004003 (NS_ERROR_INVALID_POINTER) [nsISelection.addRange]
+       * this.nativeSelection.addRange(getNativeRange(range));
+       * LINE: 2836 in wysihtml5-0.4.0pre.js
+       * 
+       * &zwnj;
+       * wysihtml5.INVISIBLE_SPACE = \uFEFF
+       */
+      var nullFix = function(editorInstance) {
+         var editor = editorInstance;
+         var text = editor.composer.getValue();
+         //editor.composer.setValue(text + "<p>&zwnj;<br></p>");
+         
+         // Problem with this is being able to post "empty", because invisible 
+         // space is counted as a character. However, many forums could 
+         // implemented a character minimum (Kixeye does), so this will 
+         // not happen everywhere. Regardless, this is only a bandaid. A real 
+         // fix will need to be figured out. The wysihtml5 source was pointing 
+         // to a few things, but it largely also utilizes hacks like this, and 
+         // in fact does insert an initial p tag in the editor to signal that 
+         // paragraphs should follow. 
+         var insertNull = function() {
+            //editor.composer.commands.exec("insertHTML", "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
+            editor.composer.setValue(editor.composer.getValue() + "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
+            editor.fire("blur", "composer");
+            editor.focus(); 
+         };
+
+         editor.on("focus", function() {
+            if (!editor.composer.getValue().length) {
+               insertNull();
+            }
+         });
+         
+         // On Chrome, when loading page, first editing a post, then going to 
+         // reply, ctrl+a all body of new reply, delete, then start typing, 
+         // and paragraphing is gone. This is because I'm only checking and 
+         // inserting null on backspace when empty. I could just interval 
+         // check for emptiness, but this nullFix is already too hackish.
+         // OKAY no. Return to this problem in future. 
+         $(editor.composer.doc).on('keyup', function(e){
+            // Backspace
+            if (e.which == 8) {
+               if (!editor.composer.getValue().length) {
+                  insertNull();
+               }
+            }
+         });
+      };
 
       /**
        * This will only be called when debug=true;
@@ -465,6 +575,9 @@
          })
          .on("aftercommand:composer", function() {
            console.log('aftercommand:composer');
+         })
+         .on("destroy:composer", function() {
+           console.log('destroy:composer');
          }); 
       };
 
@@ -478,7 +591,7 @@
        * observers again. For livequery functionality, just pass empty string as 
        * first param, and the textarea object to the second. 
        */
-      function editorInit(obj, textareaObj) { 
+      var editorInit = function(obj, textareaObj) { 
          var t = $(obj);
 
          // if using mutation events, use this, and send mutation
@@ -517,7 +630,19 @@
                 currentEditableTextarea = textareaObj;
              }
 
-             currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');               
+             currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');   
+             
+             // If singleInstance is false, then odds are the editor is being 
+             // loaded inline and there are other instances on page.
+             var singleInstance = true;
+          
+             // Determine if editing a comment, or not. When editing a comment, 
+             // it has a comment id, while adding a new comment has an empty 
+             // comment id. The value is a hidden input.
+             var commentId = $(currentTextBoxWrapper).parent().find('#Form_CommentID').val();
+             if (typeof commentId != 'undefined' && commentId != '') {
+                singleInstance = false;
+             }
          }
 
          // if found, perform operation
@@ -528,7 +653,7 @@
                 editorTextareaId         = currentEditableTextarea[0].id +'-'+ currentEditableCommentId,
                 editorToolbarId          = 'editor-format-'+ format +'-'+ currentEditableCommentId;
 
-            editorName               = 'vanilla-editor-text-'+ currentEditableCommentId;
+            var editorName               = 'vanilla-editor-text-'+ currentEditableCommentId;
 
             // change ids to bind new editor functionality to particular edit
             $(currentEditorToolbar).attr('id', editorToolbarId);
@@ -548,8 +673,7 @@
                       loadScript(assets + '/js/jquery.wysihtml5_size_matters.js')
                    ).done(function(){
 
-                      //
-                      editorRules = {
+                      var editorRules = {
                          // Give the editor a name, the name will also be set as class name on the iframe and on the iframe's body 
                          name:                 editorName,
                          // Whether the editor should look like the textarea (by adopting styles)
@@ -557,7 +681,7 @@
                          // Id of the toolbar element or DOM node, pass false value if you don't want any toolbar logic
                          toolbar:              editorToolbarId,
                          // Whether urls, entered by the user should automatically become clickable-links
-                         autoLink:             true,
+                         autoLink:             false,
                          // Object which includes parser rules to apply when html gets inserted via copy & paste
                          // See parser_rules/*.js for examples
                          parserRules:          wysihtml5ParserRules,
@@ -582,7 +706,7 @@
                       };
 
                       // instantiate new editor
-                      editor = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
+                      var editor = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
 
                       editor.on('load', function() {
                          // enable auto-resize
@@ -600,11 +724,20 @@
                             //$('iframe').contents().find('body').empty();
                             $(editor.composer.iframe).css({"min-height": "inherit"});
                          });
-
-                         wysiPasteFix(editor);
+                         
+                         // Fix problem of editor losing its default p tag 
+                         // when loading another instance on the same page. 
+                         nullFix(editor);
+                        
+                         //wysiPasteFix(editor);
                          fullPageInit(editor);
-                         editor.focus();
                          editorSetupDropdowns(editor);
+                         
+                         // If editor is being loaded inline, then focus it.
+                         if (!singleInstance) {
+                           //scrollToEditorContainer(editor.textarea.element);
+                           editor.focus();
+                         }
                          
                          if (debug) {
                             wysiDebug(editor);
@@ -628,7 +761,7 @@
                             // caret to after the latest insertion.                   
                             if ($(composer.element.lastChild).hasClass('Spoiler')) {
                                composer.selection.setAfter(composer.element.lastChild);
-                               composer.commands.exec("insertHTML", "<p></p>");
+                               composer.commands.exec("insertHTML", "<p><br></p>");
                             }
                           },
 
@@ -652,7 +785,7 @@
                             wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "blockquote", "Quote", REG_EXP);
                             if ($(composer.element.lastChild).hasClass('Quote')) {
                                composer.selection.setAfter(composer.element.lastChild);
-                               composer.commands.exec("insertHTML", "<p></p>");
+                               composer.commands.exec("insertHTML", "<p><br></p>");
                             }
                           },
 
@@ -676,7 +809,7 @@
                             wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "pre", "CodeBlock", REG_EXP);
                             if ($(composer.element.lastChild).hasClass('CodeBlock')) {
                               composer.selection.setAfter(composer.element.lastChild);
-                              composer.commands.exec("insertHTML", "<p></p>");
+                              composer.commands.exec("insertHTML", "<p><br></p>");
                             }
                           },
 
@@ -703,8 +836,11 @@
                    ).done(function() {
                       ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
                       fullPageInit();
-                      editorSetCaretFocusEnd(currentEditableTextarea[0]);
                       editorSetupDropdowns();
+                      if (!singleInstance) {
+                         //scrollToEditorContainer($(currentEditableTextarea)[0]);
+                         editorSetCaretFocusEnd(currentEditableTextarea[0]);
+                      }
                    });                  
                    break;
             }
