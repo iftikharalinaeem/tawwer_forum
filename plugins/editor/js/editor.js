@@ -668,9 +668,9 @@
 
                    // Lazyloading scripts, then run single callback
                    $.when(
-                      loadScript(assets + '/js/wysihtml5-0.4.0pre.js'),
-                      loadScript(assets + '/js/advanced.js'),
-                      loadScript(assets + '/js/jquery.wysihtml5_size_matters.js')
+                      loadScript(assets + '/js/wysihtml5-0.4.0pre.js?v=' + editorVersion),
+                      loadScript(assets + '/js/advanced.js?v=' + editorVersion),
+                      loadScript(assets + '/js/jquery.wysihtml5_size_matters.js?v=' + editorVersion)
                    ).done(function(){
 
                       var editorRules = {
@@ -830,9 +830,9 @@
                 case 'markdown': 
                    // Lazyloading scripts, then run single callback
                    $.when(
-                      loadScript(assets + '/js/buttonbarplus.js'),
-                      loadScript(assets + '/js/jquery.hotkeys.js'),
-                      loadScript(assets + '/js/rangy.js')
+                      loadScript(assets + '/js/buttonbarplus.js?v=' + editorVersion),
+                      loadScript(assets + '/js/jquery.hotkeys.js?v=' + editorVersion),
+                      loadScript(assets + '/js/rangy.js?v=' + editorVersion)
                    ).done(function() {
                       ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
                       fullPageInit();
