@@ -270,7 +270,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
-      if (C('Plugins.Reactions.ShowUserReactions', 'popup') == 'avatars')
+      if (C('Plugins.Reactions.ShowUserReactions', 'popup') === 'avatars')
          $ReactionModel->JoinUserTags($Data);
       $Sender->SetData('Data', $Data);
       $Sender->SetData('EditMode', FALSE, TRUE);

@@ -98,7 +98,7 @@ class ReactionsController extends DashboardController {
    }
    
    public function Users($Type, $ID, $Reaction, $Page = NULL) {
-      if (!in_array(C('Plugins.Reactions.ShowUserReactions', 'popup'), array('popup', 'avatars')))
+      if (!C('Plugins.Reactions.ShowUserReactions', 'popup'))
          throw PermissionException();
       
       $Model = new ReactionModel();
