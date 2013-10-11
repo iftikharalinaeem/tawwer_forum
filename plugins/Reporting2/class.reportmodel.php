@@ -46,6 +46,7 @@ class ReportModel extends Gdn_Model {
     *  - Format: The format of the reason. TextEx is good.
     */
    public function Save($Data) {
+      // Validation and data-setting
       $this->Validation = new Gdn_Validation();
       $this->Validation->ApplyRule('RecordType', 'ValidateRequired');
       $this->Validation->ApplyRule('RecordID', 'ValidateRequired');
@@ -63,11 +64,14 @@ class ReportModel extends Gdn_Model {
       }
       
       $ForeignID = strtolower("{$Data['RecordType']}-{$Data['RecordID']}");
+
+      // Temporarily verify user so they can always submit reports
+      SetValue('Verified', Gdn::Session()->User, TRUE);
       
       // Check to see if there was already a report.
       $DiscussionModel = new DiscussionModel();
       $Discussion = $DiscussionModel->GetForeignID($ForeignID, 'report');
-      //decho($Discussion, 'discussion');
+      //decho($Discussion, 'report discussion');
       if (!$Discussion) {
          $Category = self::GetReportCategory();
          if (!$Category)
@@ -78,7 +82,6 @@ class ReportModel extends Gdn_Model {
             $ReportDiscussion = (array)$DiscussionModel->GetID(GetValue('DiscussionID', $Record));
          } else {
             $ReportDiscussion = $Record;
-            //decho($ReportDiscussion, 'report discussion');
          }
 
          // Set attributes

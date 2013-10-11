@@ -126,7 +126,8 @@ class Reporting2Plugin extends Gdn_Plugin {
     * Adds counter for Reported Posts to MeModule's Dashboard menu.
     */
    public function MeModule_BeforeFlyoutMenu_Handler($Sender, $Args) {
-      $Args['DashboardCount'] = $Args['DashboardCount'] + ReportModel::GetUnreadReportCount();
+      if (CheckPermission('Garden.Moderation.Manage'))
+         $Args['DashboardCount'] = $Args['DashboardCount'] + ReportModel::GetUnreadReportCount();
    }
 
 }
