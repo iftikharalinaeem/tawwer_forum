@@ -338,7 +338,7 @@
 
          // handle Quotes plugin using own logic.
          $('.MessageList')
-         .on('mouseup.QuoteReply', 'a.ReactButton.Quote', function(e) {            
+         .on('mouseup.QuoteReply', 'a.ReactButton.Quote', function(e) {
             // For the quotes plugin to insert the quoted text, it 
             // requires that the textarea be pastable, which is not true 
             // when not displayed, so momentarily toggle to it, then, 
@@ -348,17 +348,18 @@
             $(editor.textarea.element).css({"opacity":"0.50"});
             var initialText = $(editor.textarea.element).val();
             var si = setInterval(function() {
-               if ($(editor.textarea.element).val() != initialText) {
+               if ($(editor.textarea.element).val() !== initialText) {
                   clearInterval(si);
                   $(editor.textarea.element).css({"opacity":""});
                   editor.fire("change_view", "composer");
-                  editor.fire("focus:composer");
                   // Inserting a quote at the end prevents editor from 
                   // breaking out of quotation, which means everything 
                   // typed after the inserted quotation, will be wrapped 
                   // in a blockquote.
-                  editor.composer.selection.setAfter(editor.composer.element.lastChild);
-                  editor.composer.commands.exec("insertHTML", "<p></p>");
+                  //editor.composer.selection.setAfter(editor.composer.element);
+                  //editor.composer.commands.exec("insertHTML", "<p><br></p>");
+                  editor.composer.setValue(editor.composer.getValue() + "<p><br></p>");
+                  editor.fire("focus:composer");
                }
             }, 0);
          });
@@ -489,7 +490,8 @@
          // in fact does insert an initial p tag in the editor to signal that 
          // paragraphs should follow. 
          var insertNull = function() {
-            editor.composer.commands.exec("insertHTML", "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
+            //editor.composer.commands.exec("insertHTML", "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
+            editor.composer.setValue(editor.composer.getValue() + "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
             editor.fire("blur", "composer");
             editor.focus(); 
          };
@@ -499,7 +501,13 @@
                insertNull();
             }
          });
-
+         
+         // On Chrome, when loading page, first editing a post, then going to 
+         // reply, ctrl+a all body of new reply, delete, then start typing, 
+         // and paragraphing is gone. This is because I'm only checking and 
+         // inserting null on backspace when empty. I could just interval 
+         // check for emptiness, but this nullFix is already too hackish.
+         // OKAY no. Return to this problem in future. 
          $(editor.composer.doc).on('keyup', function(e){
             // Backspace
             if (e.which == 8) {
@@ -660,9 +668,9 @@
 
                    // Lazyloading scripts, then run single callback
                    $.when(
-                      loadScript(assets + '/js/wysihtml5-0.4.0pre.js'),
-                      loadScript(assets + '/js/advanced.js'),
-                      loadScript(assets + '/js/jquery.wysihtml5_size_matters.js')
+                      loadScript(assets + '/js/wysihtml5-0.4.0pre.js?v=' + editorVersion),
+                      loadScript(assets + '/js/advanced.js?v=' + editorVersion),
+                      loadScript(assets + '/js/jquery.wysihtml5_size_matters.js?v=' + editorVersion)
                    ).done(function(){
 
                       var editorRules = {
@@ -753,7 +761,7 @@
                             // caret to after the latest insertion.                   
                             if ($(composer.element.lastChild).hasClass('Spoiler')) {
                                composer.selection.setAfter(composer.element.lastChild);
-                               composer.commands.exec("insertHTML", "<p></p>");
+                               composer.commands.exec("insertHTML", "<p><br></p>");
                             }
                           },
 
@@ -777,7 +785,7 @@
                             wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "blockquote", "Quote", REG_EXP);
                             if ($(composer.element.lastChild).hasClass('Quote')) {
                                composer.selection.setAfter(composer.element.lastChild);
-                               composer.commands.exec("insertHTML", "<p></p>");
+                               composer.commands.exec("insertHTML", "<p><br></p>");
                             }
                           },
 
@@ -801,7 +809,7 @@
                             wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "pre", "CodeBlock", REG_EXP);
                             if ($(composer.element.lastChild).hasClass('CodeBlock')) {
                               composer.selection.setAfter(composer.element.lastChild);
-                              composer.commands.exec("insertHTML", "<p></p>");
+                              composer.commands.exec("insertHTML", "<p><br></p>");
                             }
                           },
 
@@ -822,9 +830,9 @@
                 case 'markdown': 
                    // Lazyloading scripts, then run single callback
                    $.when(
-                      loadScript(assets + '/js/buttonbarplus.js'),
-                      loadScript(assets + '/js/jquery.hotkeys.js'),
-                      loadScript(assets + '/js/rangy.js')
+                      loadScript(assets + '/js/buttonbarplus.js?v=' + editorVersion),
+                      loadScript(assets + '/js/jquery.hotkeys.js?v=' + editorVersion),
+                      loadScript(assets + '/js/rangy.js?v=' + editorVersion)
                    ).done(function() {
                       ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
                       fullPageInit();

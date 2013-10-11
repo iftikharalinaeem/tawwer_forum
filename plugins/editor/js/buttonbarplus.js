@@ -243,6 +243,27 @@ jQuery(document).ready(function($) {
             'markdown': 'Markdown'
          };
 
+         // Run autobulleting functions on load, so user can just naturally 
+         // begin bulleting and it'll be completed for them.
+         // Define as many types of bullets to auto-bullet, and the function 
+         // will take care of the rest.
+         switch(format) {
+            case 'bbcode': 
+               autoBulletTextarea(TextArea, "[*]");
+               break;
+            case 'html':
+               autoBulletTextarea(TextArea, "<li>");
+               break;
+            case 'markdown':
+               // Markdown supports multiple bulleting syntaxes, so support 
+               // ALL OF THEM.
+               autoBulletTextarea(TextArea, "1.");
+               autoBulletTextarea(TextArea, "*");
+               autoBulletTextarea(TextArea, "-");
+               autoBulletTextarea(TextArea, "+");
+               break;
+         }
+
          // Apply the page's InputFormat to this textarea.
          $(TextArea).data('InputFormat', inputFormats[format]);
 
@@ -328,7 +349,7 @@ jQuery(document).ready(function($) {
          
          // Call performer
          ButtonBar[PerformMethod](TextArea, Operation, Value);
-         
+
          switch (Operation) {
             case 'post':
                $(TextArea).closest('form').find('.CommentButton').focus();
@@ -431,63 +452,19 @@ jQuery(document).ready(function($) {
                break;
                
             case 'orderedlist':
-              
-               // all very experimental right now. alpha prototype for flow 
-               // of operations for other editor view list 
-              
                $(TextArea).surroundSelectedText('[list=1]', '\n[/list]', 'select');
-
                var tagListItem = '\n[*] '; 
-
                var selection = '\n' + $(TextArea).getSelection().text;
-
                selection = selection.replace(/(\r\n|\n|\r)/gm, tagListItem);
-
-
                $(TextArea).replaceSelectedText(selection, 'collapseToEnd');
-
-/*
-               // very buggy, and will reattach event over and over.
-               $(TextArea).on('keyup', function (e) {
-                   var textbox = $(this);
-                   var end = textbox.getSelection().end;
-                   var result = /(\[list\=1\]{1})([\S\s.]*)\n(\[\*\]){1}([\s\w\W]+)\n*$/.exec(this.value.slice(0, end+10));
-
-                   console.log(result);
-
-                   var lastWord = result ? result[0] : null;
-                   console.log(lastWord);
-
-                   if (e.which == 13) {
-
-                      if (lastWord 
-                      && lastWord.indexOf('\n[*]') >= 0) {
-                         //console.log('make new list item');
-
-                         $(TextArea).replaceSelectedText('[*] ', 'collapseToEnd');
-                      }
-
-                   }
-
-               });    */           
-
                break;
                
             case 'unorderedlist':
-               
-               
                $(TextArea).surroundSelectedText('[list]', '\n[/list]', 'select');
-
                var tagListItem = '\n[*] '; 
-
                var selection = '\n' + $(TextArea).getSelection().text;
-
                selection = selection.replace(/(\r\n|\n|\r)/gm, tagListItem);
-
-
                $(TextArea).replaceSelectedText(selection, 'collapseToEnd');
-
-
                break;
                
             case 'emoji':
@@ -614,33 +591,19 @@ jQuery(document).ready(function($) {
                break;
                
             case 'orderedlist':
-               
                $(TextArea).surroundSelectedText('<ol>', '\n</ol>', 'select');
-
                var tagListItem = '\n<li> '; 
-
                var selection = '\n' + $(TextArea).getSelection().text;
-
                selection = selection.replace(/(\r\n|\n|\r)/gm, tagListItem);
-
-
                $(TextArea).replaceSelectedText(selection, 'collapseToEnd');
-
                break;
                
             case 'unorderedlist':
-               
                $(TextArea).surroundSelectedText('<ul>', '\n</ul>', 'select');
-
                var tagListItem = '\n<li> '; 
-
                var selection = '\n' + $(TextArea).getSelection().text;
-
                selection = selection.replace(/(\r\n|\n|\r)/gm, tagListItem);
-
-
                $(TextArea).replaceSelectedText(selection, 'collapseToEnd');
-
                break;
 
             case 'emoji':
@@ -654,7 +617,8 @@ jQuery(document).ready(function($) {
             opener: '',
             closer: '',
             closeslice: ''
-         }
+         };
+
          switch (Operation) {
             case 'bold':
                $(TextArea).insertRoundTag('**',markdownOpts);
@@ -805,112 +769,145 @@ jQuery(document).ready(function($) {
             */
            
             case 'orderedlist':
-               
-               var lines = $(TextArea).hasSelection().split('\n');
-               
-               
-               // TODO modify insertRoundTag to accept array prefixes 
-               // so that numbers can increment
-               for (var i = 0, l = lines.length; i < l; i++) {
-                  //console.log(i+1 +' '+ lines[i]);
-               }        
-               
-               var i = 1;
-               
-               var thisOpts = $.extend(markdownOpts, {
-                  prefix: i+'. ',
-                  opentag:'',
-                  closetag:'',
-                  opener:'',
-                  closer:''
-               });
-               $(TextArea).insertRoundTag('',thisOpts);
+               var bullet = '1.';
+               var newLine = '\n';
+               var newList = '';
+               var lines = $(TextArea).getSelection().text.split(newLine);
+
+               for (var i = 0, l = lines.length; i < l; i++) {                  
+                  newList += i+1 +'. '+ lines[i] + newLine;
+                  
+                  // If last line, no new line, so that user can start typing 
+                  // and automatically insert a new list item 
+                  if (i+1 == l) {
+                     newList = newList.slice(0, -newLine.length);
+                  }
+               }
+
+               $(TextArea).replaceSelectedText(newList, 'collapseToEnd'); 
                break;
                
             case 'unorderedlist':
-               
-               
-               //$(TextArea).surroundSelectedText('[list=1]', '\n[/list]', 'select');
-
-               var tagListItem = '\n* '; 
-
-               var selection = '* ' + $(TextArea).getSelection().text;
-
+               var bullet = '*';
+               // When selecting several rows, place bullets before every one.
+               var tagListItem = '\n' + bullet + ' '; 
+               var selection = bullet + ' ' + $(TextArea).getSelection().text;
                selection = selection.replace(/(\r\n|\n|\r)/gm, tagListItem);
-
-
-               $(TextArea).replaceSelectedText(selection, 'collapseToEnd');
-
-/*
-               // very buggy, and will reattach event over and over.
-               $(TextArea).on('keyup', function (e) {
-                   var textbox = $(this);
-                   var end = textbox.getSelection().end;
-                   var result = /\n?(\*)+([\s\w\W]+)\n$/.exec(this.value.slice(0, end));
-                   //console.log(this.value.slice(0, end));
-
-
-                   //console.log(JSON.stringify(result[0]));
-
-                   var lastWord = result ? result[0] : null;
-                   //console.log(lastWord);
-                   
-                   
-                   
-
-                   if (e.which == 13) {
-                      console.log('01 '+lastWord);
-                      
-                      var lastLine = lastWord.split('\n');
-                      var lastLine = lastLine[lastLine.length -2];
-
-                      if (!lastLine.match(/\*\s[\w\W]+/)) {
-                         console.log('empty line: ' + lastLine);
-                         //console.log(lastLine.match(/\*[^\s\n\w\W]/));
-                      }
-
-
-                      if (lastWord 
-                      && lastWord.indexOf('*') >= 0) {
-                         //console.log('make new list item');
-                         
-                         // if last line empty
-                         if (!lastLine.match(/\*\s[\w\W]+/)) {
-                            
-                         }
-
-                         $(TextArea).replaceSelectedText('* ', 'collapseToEnd');
-                      }
-
-                   }
-
-               });  
-                        
-                        */
-               
+               $(TextArea).replaceSelectedText(selection, 'collapseToEnd');             
                break;
                
             case 'emoji':
                $(TextArea).insertText(Value, $(TextArea).getSelection().start, "collapseToEnd");
                break;
-               
-               
-               
-               
-               /*
-               var thisOpts = $.extend(markdownOpts, {
-                  prefix:'* ',
-                  opentag:'',
-                  closetag:'',
-                  opener:'',
-                  closer:''
-               });
-               $(TextArea).insertRoundTag('',thisOpts);
-               break;
-               
-               */
          }
       }
       
    }
 });
+
+/**
+ * Auto-bullet regular textareas, using any type of bullet. Simply provide the 
+ * function with the textarea to target, and the bullet string, e.g., "*" or 
+ * "-" or "1." and even the numbers will increment. 
+ * 
+ * This depends on Tim Down's rangy inputs. 
+ * 
+ * TODO clean up regexs. Go over this part, particular:
+ * ("+ RegExp.escape(bullet) +"|\\d+\\.|[\\*\\+\\-])
+ * because the last OR statement contains hardcoded values. They can be replaced
+ * by .{3}, but then any newline char space will autobullet.
+ * 
+ * For now this is in global scope and only used by buttonbarplus.
+ * TODO integrate in editor.js instead of this. Make sure it is abstracted 
+ * from everything.
+ */
+function autoBulletTextarea(textarea, bullet) {
+
+   var originalBullet = bullet;
+   var lastBullet  = bullet;
+
+   // Auto-bullet 
+   $(textarea).off('keyup.autoBullet click.autoBullet').on('keyup.autoBullet click.autoBullet', function (e) {
+      // For dynamically escaping literal characters in lineInsert, 
+      // as they could be anything
+      RegExp.escape = function(str) {
+         return str.replace(new RegExp("[\\$\\^.*+?|()\\[\\]{}\\\\]", "g"), "\\$&");
+      };
+
+      var end      = $(this).getSelection().end;
+      var result   = (new RegExp("\\n?("+ RegExp.escape(bullet) +"|\\d+\\.|[\\*\\+\\-])([\\s\\w\\W]+)\\n?$")).exec(this.value.slice(0, end));
+      var lastWord = (result) ? result[0] : null;
+
+      if (lastWord 
+      //&& lastWord.indexOf(bullet) >= 0
+      ) {
+         var lines = lastWord.split('\n');
+         var currentLine = lines[lines.length - 1];
+         var lastLine = lines[lines.length - 2];
+
+         if (e.which == 13) {
+            lastBullet = (new RegExp("^\\n?("+ RegExp.escape(bullet) +"|\\d+\\.|[\\*\\+\\-])([\\s\\w\\W]+)\\n?")).exec(lastLine);
+
+            if (lastBullet) {
+               lastBullet = lastBullet[1].toString().split(' ')[0];
+            } else {
+               lastBullet = bullet;
+            }
+
+            // If bullet is a number (for ordered lists in 
+            // markdown, for example, then increment it from 
+            // the current line that it is on.
+            if (lastBullet.match(/\d+\./)) {
+               var nextNumber = parseInt(lastLine.match(/^\d+\./)) + 1;
+               bullet = nextNumber.toString() + '.';
+            } else if (lastBullet != bullet) {
+               // This is important in case you want textarea to support 
+               // multiple bullets, on top of numbered bullets.
+               bullet = lastBullet;
+            }
+
+            // If last line does not have any bullets, just 
+            // cancel out this whole operation                        
+            if (!lastLine.match(new RegExp("^("+ RegExp.escape(bullet) +"|\\d+\\.|[\\*\\+\\-])\\s"))) {
+               // only time bullet is not original, is when incrementing a 
+               // number, so set bullet to original. For the meantime, only 
+               // markdown ordered lists will have any change here. 
+               //console.log('cancel: '+ JSON.stringify(lastLine));
+               bullet = originalBullet;
+               return false;
+            }
+
+            // Either delete the last empty bullet or add a new one
+            if(!lastLine.match(new RegExp("^("+ RegExp.escape(bullet) +"|\\d+\\.|[\\*\\+\\-])\\s(.*)?[\\w\\W]+"))) {
+               $(this).deleteText(end - bullet.length - 2, end, true); // 2 is a newline and space
+               $(this).replaceSelectedText('\n', 'collapseToEnd');
+               bullet = originalBullet;
+            } else {
+               $(this).replaceSelectedText(bullet + ' ', 'collapseToEnd');
+
+               if (lastBullet.match(/\d+\./)) {
+                  // If user adding a new numbered list in an established list, 
+                  // reflow all the numbers below it. 
+                  var initialCaretPosition = $(this).getSelection().end;
+                  var allTextBelow = this.value.slice(initialCaretPosition, this.value.length);
+                  var affectedListItems = /[\s\S]+?(\n\n)/.exec(allTextBelow);
+
+                  if (affectedListItems) {
+                     affectedListItems = affectedListItems[0];
+
+                     var reflowedItemList = affectedListItems.replace(/\n?(\d+)\.\s(.*)/gim, function(match, p1, p2) {
+                        var num = parseInt(p1)+1; 
+                        var txt = p2; 
+                        return '\n' + num + '. ' + txt;
+                     });
+
+                     $(this).deleteText(initialCaretPosition, initialCaretPosition + affectedListItems.length, false);
+                     $(this).insertText(reflowedItemList, initialCaretPosition, 'collapseToStart'); 
+                  }
+               }
+
+            }
+         }
+      }
+   }); 
+}
