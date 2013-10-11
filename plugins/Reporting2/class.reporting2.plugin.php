@@ -63,9 +63,25 @@ class Reporting2Plugin extends Gdn_Plugin {
          throw new Gdn_UserException(T('You need to sign in before you can do this.'), 403);
 
       $Sender->Form = new Gdn_Form();
+      $ReportModel = new ReportModel();
+      $Sender->Form->SetModel($ReportModel);
+
+      $Sender->Form->SetFormValue('RecordID', $ID);
+      $Sender->Form->SetFormValue('RecordType', $RecordType);
+      $Sender->Form->SetFormValue('Format', 'TextEx');
+
       $Sender->SetData('Title', sprintf(T('Report %1s %2s'), $ReportType, $RecordType));
 
-      
+      if ($Sender->Form->AuthenticatedPostBack()) {
+         if ($Sender->Form->Save())
+            $Sender->InformMessage(T('FlagSent', "Your complaint has been registered."));
+      }
+      else {
+         // Create excerpt to show in form popup
+         $Row = GetRecord($RecordType, $ID);
+         $Row['Body'] = SliceString(Gdn_Format::PlainText($Row['Body'], $Row['Format']), 150);
+         $Sender->SetData('Row', $Row);
+      }
 
       $Sender->Render('report', '', 'plugins/Reporting2');
    }
@@ -93,6 +109,26 @@ class Reporting2Plugin extends Gdn_Plugin {
             'Popup ReactButton ReactButton-'.$Name, array('title'=>$Name, 'rel'=>"nofollow")), 'li');
       }
    }
+
+   /**
+    * Adds "Reported Posts" to MeModule menu.
+    */
+   public function MeModule_FlyoutMenu_Handler($Sender) {
+      if (CheckPermission('Garden.Moderation.Manage')) {
+         $Category = ReportModel::GetReportCategory();
+         $ReportCount = ReportModel::GetUnreadReportCount();
+         $CReport = $ReportCount > 0 ? ' '.Wrap($ReportCount, 'span class="Alert"') : '';
+         echo Wrap(Sprite('SpReport').' '.Anchor($Category['Name'].$CReport, CategoryUrl($Category)), 'li', array('class' => 'ReportCategory'));
+      }
+   }
+
+   /**
+    * Adds counter for Reported Posts to MeModule's Dashboard menu.
+    */
+   public function MeModule_BeforeFlyoutMenu_Handler($Sender, $Args) {
+      $Args['DashboardCount'] = $Args['DashboardCount'] + ReportModel::GetUnreadReportCount();
+   }
+
 }
 
 if (!function_exists('FormatQuote')):
@@ -111,12 +147,12 @@ function FormatQuote($Body) {
          '<div class="Media-Body">'.
             '<div>'.UserAnchor($User).'</div>'.
             Gdn_Format::To($Body['Body'], $Body['Format']).
-         '</div>';
-         '</blocquote>';
+         '</div>'.
+         '</blockquote>';
    } else {
       $Result = '<blockquote class="Quote">'.
-         Gdn_Format::To($Body['Body'], $Body['Format']);
-         '</blocquote>';
+         Gdn_Format::To($Body['Body'], $Body['Format']).
+         '</blockquote>';
    }
    
    return $Result;
@@ -126,8 +162,76 @@ endif;
 
 if (!function_exists('Quote')):
 
-function Quote($Body) {
-   return FormatQuote($Body);
-}
-   
+   function Quote($Body) {
+      return FormatQuote($Body);
+   }
+
+endif;
+
+if (!function_exists('ReportContext')):
+   /**
+    * Create a linked sentence about the context of the report.
+    *
+    * @param $Context array or object being reported.
+    * @return string Html message to direct moderators to the content.
+    */
+   function ReportContext($Context) {
+      if (is_object($Context)) {
+         $Context = (array)$Context;
+      }
+
+      if ($ActivityID = GetValue('ActivityID', $Context)) {
+         // Point to an activity
+         $Type = GetValue('ActivityType', $Context);
+         if ($Type == 'Status') {
+            // Link to author's wall
+            $ContextHtml = sprintf(T('Report Status Context', '%1$s by <a href="%2$s">%3$s</a>'),
+               T('Activity Status', 'Status'),
+               UserUrl($Context, 'Activity').'#Activity_'.$ActivityID,
+               Gdn_Format::Text($Context['ActivityName'])
+            );
+         }
+         elseif ($Type == 'WallPost') {
+            // Link to recipient's wall
+            $ContextHtml = sprintf(T('Report WallPost Context', '<a href="%1$s">%2$s</a> from <a href="%3$s">%4$s</a> to <a href="%5$s">%6$s</a>'),
+               UserUrl($Context, 'Regarding').'#Activity_'.$ActivityID, // Post on recipient's wall
+               T('Activity WallPost', 'Wall Post'),
+               UserUrl($Context, 'Activity'), // Author's profile
+               Gdn_Format::Text($Context['ActivityName']),
+               UserUrl($Context, 'Regarding'), // Recipient's profile
+               Gdn_Format::Text($Context['RegardingName'])
+            );
+         }
+      }
+      elseif (GetValue('CommentID', $Context)) {
+         // Point to comment & its discussion
+         $DiscussionModel = new DiscussionModel();
+         $Discussion = (array)$DiscussionModel->GetID(GetValue('DiscussionID', $Context));
+         $ContextHtml = sprintf(T('Report Comment Context', '<a href="%1$s">%2$s</a> in %3$s <a href="%4$s">%5$s</a>'),
+            CommentUrl($Context),
+            T('Comment'),
+            strtolower(T('Discussion')),
+            DiscussionUrl($Discussion),
+            Gdn_Format::Text($Discussion['Name'])
+         );
+      }
+      elseif (GetValue('DiscussionID', $Context)) {
+         // Point to discussion & its category
+         $Category = CategoryModel::Categories($Context['CategoryID']);
+         $ContextHtml = sprintf(T('Report Discussion Context', '<a href="%1$s">%2$s</a> in %3$s <a href="%4$s">%5$s</a>'),
+            DiscussionUrl($Context),
+            T('Discussion'),
+            strtolower(T('Category')),
+            CategoryUrl($Category),
+            Gdn_Format::Text($Category['Name']),
+            Gdn_Format::Text($Context['Name']) // In case folks want the full discussion name
+         );
+      }
+      else {
+         throw new Exception(T("You cannot report this content."));
+      }
+
+      return $ContextHtml;
+   }
+
 endif;
