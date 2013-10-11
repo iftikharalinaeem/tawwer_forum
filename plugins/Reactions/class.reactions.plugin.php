@@ -16,7 +16,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.2.10',
+   'Version' => '1.2.11',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -361,7 +361,8 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (is_object($Menu = GetValue('Menu', $Sender))) {
          $Menu->AddLink('BestOf', T('Best Of...'), '/bestof/everything', FALSE, array('class' => 'BestOf'));
       }
-      $Sender->AddDefinition('ShowUserReactions', C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT));
+      if (!IsMobile())
+         $Sender->AddDefinition('ShowUserReactions', C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT));
    }
       
    
