@@ -26,6 +26,8 @@ $PluginInfo['Reactions'] = array(
 
 class ReactionsPlugin extends Gdn_Plugin {
    
+   const RECORD_REACTIONS_DEFAULT = 'popup';
+   
    /**
     * Include ReactionsController for /reactions requests
     * 
@@ -189,7 +191,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       }
       
       $ReactionModel = new ReactionModel();
-      if (C('Plugins.Reactions.ShowUserReactions', 'popup') == 'avatars') {
+      if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars') {
          $ReactionModel->JoinUserTags($Sender->Data['Discussion'], 'Discussion');
          $ReactionModel->JoinUserTags($Sender->Data['Comments'], 'Comment');
          
@@ -270,7 +272,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
-      if (C('Plugins.Reactions.ShowUserReactions', 'popup') === 'avatars')
+      if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) === 'avatars')
          $ReactionModel->JoinUserTags($Data);
       $Sender->SetData('Data', $Data);
       $Sender->SetData('EditMode', FALSE, TRUE);
@@ -359,7 +361,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (is_object($Menu = GetValue('Menu', $Sender))) {
          $Menu->AddLink('BestOf', T('Best Of...'), '/bestof/everything', FALSE, array('class' => 'BestOf'));
       }
-      $Sender->AddDefinition('ShowUserReactions', C('Plugins.Reactions.ShowUserReactions', 'popup'));
+      $Sender->AddDefinition('ShowUserReactions', C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT));
    }
       
    
@@ -414,7 +416,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
-      if (C('Plugins.Reactions.ShowUserReactions', 'popup') == 'avatars')
+      if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars')
          $ReactionModel->JoinUserTags($Data);
       $Sender->SetData('Data', $Data);
 
@@ -510,8 +512,6 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
-      if (C('Plugins.Reactions.ShowUserReactions', 'popup') == 'avatars')
-         $ReactionModel->JoinUserTags($Data);
       $Sender->SetData('Data', $Data);
 
       // Set up head
@@ -658,7 +658,7 @@ if (!function_exists('WriteReactions')):
       Gdn::Controller()->EventArguments['RecordID'] = $ID;
 
 
-      if (C('Plugins.Reactions.ShowUserReactions', 'popup') == 'avatars')
+      if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars')
          WriteRecordReactions($Row);
 
       echo '<div class="Reactions">';
