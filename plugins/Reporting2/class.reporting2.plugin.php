@@ -7,9 +7,9 @@
 $PluginInfo['Reporting2'] = array(
    'Name' => 'Reporting',
    'Description' => 'Allows users to report posts to moderators for abuse, terms of service violations etc.',
-   'Version' => '2.0a',
+   'Version' => '2.0b',
    'RequiredApplications' => array('Vanilla' => '2.1'),
-   'SettingsUrl' => '/settings/reporting',
+   //'SettingsUrl' => '/settings/reporting',
    'SettingsPermission' => 'Garden.Users.Manage',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -47,7 +47,7 @@ class Reporting2Plugin extends Gdn_Plugin {
          $ModeratorRoles = $RoleModel->GetByPermission('Garden.Moderation.Manage');
          $ModeratorRoleIDs = array_column($ModeratorRoles->Result(DATASET_TYPE_ARRAY), 'RoleID');
 
-         // Build & set permissions for the new category
+         // Build permissions for the new category
          $Permissions = array();
          $AllRoles = array_column(RoleModel::Roles(), 'RoleID');
          foreach ($AllRoles as $RoleID) {
@@ -55,12 +55,16 @@ class Reporting2Plugin extends Gdn_Plugin {
             $Permissions[] = array(
                'RoleID' => $RoleID,
                'JunctionTable' => 'Category',
+               'JunctionColumn' => 'PermissionCategoryID',
                'JunctionID' => $CategoryID,
                'Vanilla.Discussions.View' => $IsModerator,
                'Vanilla.Comments.Add' => $IsModerator
             );
          }
+
+         // Set category permission & mark it custom
          Gdn::PermissionModel()->SaveAll($Permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
+         $CategoryModel->SetField($CategoryID, 'PermissionCategoryID', $CategoryID);
       }
 
       // Turn off Flagging & Reporting plugins (upgrade)
