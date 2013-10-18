@@ -32,7 +32,8 @@ class ReportModel extends Gdn_Model {
    public static function GetUnreadReportCount() {
       $Category = self::GetReportCategory();
       $DiscussionModel = new DiscussionModel();
-      $Count = $DiscussionModel->GetUnreadCount(array('d.CategoryID' => $Category['CategoryID']));
+      // Add DiscussionID to shamelessly bypass the faulty cache code
+      $Count = $DiscussionModel->GetUnreadCount(array('d.CategoryID' => $Category['CategoryID'], 'd.DiscussionID >' => 0));
       return $Count;
    }
 

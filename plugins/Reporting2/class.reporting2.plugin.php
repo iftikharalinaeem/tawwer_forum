@@ -31,6 +31,7 @@ class Reporting2Plugin extends Gdn_Plugin {
       $CategoryModel = new CategoryModel();
       $Category = $CategoryModel->GetWhereCache(array('Type' => 'Reporting'));
       if (empty($Category)) {
+         // Create the category if none exists
          $Row = array(
             'Name' => 'Reported Posts',
             'UrlCode' => 'reported-posts',
@@ -39,7 +40,27 @@ class Reporting2Plugin extends Gdn_Plugin {
             'Type' => 'Reporting',
             'AllowDiscussions' => 1,
             'Sort' => 1000);
-         $ID = $CategoryModel->Save($Row);
+         $CategoryID = $CategoryModel->Save($Row);
+
+         // Get RoleIDs for moderator-empowered roles
+         $RoleModel = new RoleModel();
+         $ModeratorRoles = $RoleModel->GetByPermission('Garden.Moderation.Manage');
+         $ModeratorRoleIDs = array_column($ModeratorRoles->Result(DATASET_TYPE_ARRAY), 'RoleID');
+
+         // Build & set permissions for the new category
+         $Permissions = array();
+         $AllRoles = array_column(RoleModel::Roles(), 'RoleID');
+         foreach ($AllRoles as $RoleID) {
+            $IsModerator =  (in_array($RoleID, $ModeratorRoleIDs)) ? 1 : 0;
+            $Permissions[] = array(
+               'RoleID' => $RoleID,
+               'JunctionTable' => 'Category',
+               'JunctionID' => $CategoryID,
+               'Vanilla.Discussions.View' => $IsModerator,
+               'Vanilla.Comments.Add' => $IsModerator
+            );
+         }
+         Gdn::PermissionModel()->SaveAll($Permissions, array('JunctionID' => $CategoryID, 'JunctionTable' => 'Category'));
       }
 
       // Turn off Flagging & Reporting plugins (upgrade)
@@ -70,7 +91,7 @@ class Reporting2Plugin extends Gdn_Plugin {
       $Sender->Form->SetFormValue('RecordType', $RecordType);
       $Sender->Form->SetFormValue('Format', 'TextEx');
 
-      $Sender->SetData('Title', sprintf(T('Report %1s %2s'), $ReportType, $RecordType));
+      $Sender->SetData('Title', sprintf(T('Report %1s'), $RecordType, $ReportType));
 
       if ($Sender->Form->AuthenticatedPostBack()) {
          if ($Sender->Form->Save())
@@ -89,22 +110,22 @@ class Reporting2Plugin extends Gdn_Plugin {
    /// Event Handlers ///
 
    /**
-    * Make sure Reactions' flags are triggered, but remove Spam if present.
+    * Make sure Reactions' flags are triggered.
     */
    public function Base_BeforeFlag_Handler($Sender, $Args) {
       if (empty($Args['Flags']))
          $Args['Flags'] = TRUE;
-      elseif (isset($Args['Flags']['spam']))
-         unset($Args['Flags']['spam']);
+      //elseif (isset($Args['Flags']['spam']))
+         //unset($Args['Flags']['spam']);
    }
 
    /**
     * Add reporting options to discussions & comments under Flag menu.
     */
    public function Base_AfterFlagOptions_Handler($Sender, $Args) {
-      $Options = array('Spam', 'Inappropriate');
+      $Options = array('Report');
       foreach ($Options as $Name) {
-         $Text = Sprite('React'.$Name, 'ReactSprite').' '.Wrap(T($Name), 'span', array('class' => 'ReactLabel'));
+         $Text = Sprite('ReactFlag', 'ReactSprite').' '.Wrap(T($Name), 'span', array('class' => 'ReactLabel'));
          echo Wrap(Anchor($Text, 'report/'.$Args['RecordType'].'/'.strtolower($Name).'/'.$Args['RecordID'],
             'Popup ReactButton ReactButton-'.$Name, array('title'=>$Name, 'rel'=>"nofollow")), 'li');
       }
