@@ -356,10 +356,11 @@
                   // breaking out of quotation, which means everything 
                   // typed after the inserted quotation, will be wrapped 
                   // in a blockquote.
-                  //editor.composer.selection.setAfter(editor.composer.element);
-                  //editor.composer.commands.exec("insertHTML", "<p><br></p>");
-                  editor.composer.setValue(editor.composer.getValue() + "<p><br></p>");
-                  editor.fire("focus:composer");
+                  editor.composer.selection.setAfter(editor.composer.element.lastChild);
+                  editor.composer.commands.exec("insertHTML", "<p></p>");
+                  
+//                  editor.composer.setValue(editor.composer.getValue() + "<p><br></p>");
+//                  editor.fire("focus:composer");
                }
             }, 0);
          });
