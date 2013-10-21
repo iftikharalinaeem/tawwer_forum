@@ -98,7 +98,7 @@ class ReactionsController extends DashboardController {
    }
    
    public function Users($Type, $ID, $Reaction, $Page = NULL) {
-      if (!in_array(C('Plugins.Reactions.ShowUserReactions', 'popup'), array('popup', 'avatars')))
+      if (!C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT))
          throw PermissionException();
       
       $Model = new ReactionModel();
@@ -235,7 +235,7 @@ class ReactionsController extends DashboardController {
       
       $Conf = new ConfigurationModule($this);
       $Conf->Initialize(array(
-          'Plugins.Reactions.ShowUserReactions' => array('LabelCode' => 'Show Who Reacted to Posts', 'Control' => 'RadioList', 'Items' => array('popup' => 'In a popup', 'avatars' => 'As avatars', 'off' => "Don't show"), 'Default' => 'menu'),
+          'Plugins.Reactions.ShowUserReactions' => array('LabelCode' => 'Show Who Reacted to Posts', 'Control' => 'RadioList', 'Items' => array('popup' => 'In a popup', 'avatars' => 'As avatars', 'off' => "Don't show"), 'Default' => ReactionsPlugin::RECORD_REACTIONS_DEFAULT),
           'Plugins.Reactions.BestOfStyle' => array('LabelCode' => 'Best of Style', 'Control' => 'RadioList', 'Items' => array('Tiles' => 'Tiles', 'List' => 'List'), 'Default' => 'Tiles'),
           'Plugins.Reactions.DefaultOrderBy' => array('LabelCode' => 'Order Comments By', 'Control' => 'RadioList', 'Items' => array('DateInserted' => 'Date', 'Score' => 'Score'), 'Default' => 'DateInserted',
               'Description' => 'You can order your comments based on reactions. We recommend ordering the comments by date.'),
