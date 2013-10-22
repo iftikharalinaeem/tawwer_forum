@@ -22,7 +22,7 @@
 $PluginInfo['SimpleAPI'] = array(
    'Name' => 'Simple API',
    'Description' => "Provides simple access_token API access to the forum.",
-   'Version' => '1.2.7',
+   'Version' => '1.2.8',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Tim Gunter',
    'AuthorEmail' => 'tim@vanillaforums.com',
