@@ -64,15 +64,6 @@ class SEOLinksPlugin extends Gdn_Plugin {
          );
       }
 
-      $Route = '/?members/([^/]+)';
-      $Sender->Routes[$Route] = array(
-          'Route' => $Route,
-          'Key' => base64_encode($Route),
-          'Destination' => '/profile/$1',
-          'Reserved' => FALSE,
-          'Type' => 'Internal'
-      );
-
 //      decho($Sender->Routes);
 //      die();
    }
@@ -98,6 +89,10 @@ class SEOLinksPlugin extends Gdn_Plugin {
       if (class_exists('CategoryModel')) {
          CategoryModel::ClearCache();
       }
+
+      // Set /members route once so it is editable
+      $Router = Gdn::Router();
+      $Router->SetRoute('/?members/([^/]+)', '/profile/$1', 'Internal');
    }
 }
 
