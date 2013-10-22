@@ -181,7 +181,9 @@ class ReactionsPlugin extends Gdn_Plugin {
       list($OrderColumn, $OrderDirection) = explode(' ', GetValue('0', self::CommentOrder()));
       $OrderColumn = StringBeginsWith($OrderColumn, 'c.', TRUE, TRUE);
       
-      $Sender->SetData('CommentOrder', array('Column' => $OrderColumn, 'Direction' => $OrderDirection));
+      // Send back comment order for non-api calls.
+      if ($Sender->DeliveryType() !== DELIVERY_TYPE_DATA)
+         $Sender->SetData('CommentOrder', array('Column' => $OrderColumn, 'Direction' => $OrderDirection));
       
       if ($Sender->ReactionsVersion == 1) {
 //         $Sender->AddCssFile('reactions-1.css', 'plugins/Reactions');
