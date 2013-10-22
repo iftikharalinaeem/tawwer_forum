@@ -22,6 +22,7 @@ class ApiMapper extends SimpleApiMapper {
          
          // Discussions
          'discussions/add'       => 'vanilla/post/discussion',
+         'discussions/bookmark'  => 'vanilla/discussion/bookmark',
          'discussions/edit'      => 'vanilla/post/editdiscussion',
          'discussions/category'  => 'vanilla/categories',
          'discussions/list'      => 'vanilla/discussions',
