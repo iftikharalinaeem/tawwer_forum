@@ -336,6 +336,7 @@
       var editorHandleQuotesPlugin = function(editorInstance) {
          var editor = editorInstance;      
 
+         /*
          // handle Quotes plugin using own logic.
          $('.MessageList')
          .on('mouseup.QuoteReply', 'a.ReactButton.Quote', function(e) {
@@ -359,13 +360,13 @@
                   editor.composer.selection.setAfter(editor.composer.element.lastChild);
                   editor.composer.commands.exec("insertHTML", "<p></p>");
                   
-//                  editor.composer.setValue(editor.composer.getValue() + "<p><br></p>");
-//                  editor.fire("focus:composer");
+                  // editor.composer.setValue(editor.composer.getValue() + "<p><br></p>");
+                  // editor.fire("focus:composer");
                }
             }, 0);
          });
+         */
          
-         /*
          // Handle quotes plugin using triggered event.
          $('a.ReactButton.Quote').on('click', function(e) {
             // Stop animation from other plugin and let this one
@@ -375,14 +376,32 @@
                scrollTop: $(editor.textarea.element).parent().parent().offset().top
             }, 800);
          });
-         
+
          $(editor.textarea.element).on('appendHtml', function(e, data) {
+            // The quotes plugin tends to add line breaks to the end of the 
+            // quoted string, which upsets wysihtml5 paragraphing, so replace 
+            // it with proper block ending to make sure paragraphs continue.
+            data = data.replace(/<br\s?\/?>$/, '<p><br></p>');
+
             editor.composer.commands.exec("insertHTML", data);
-            editor.composer.commands.exec("insertHTML", "<p></p>");
-            editor.fire("change_view", "composer");
+
+            // Reported bug: Chrome does not handle wysihtml5's insertHTML
+            // command properly. The downside to this workaround is that the 
+            // caret will be placed at the beginning of the text box.
+            if (window.chrome) {    
+               var initial_value = editor.composer.getValue();
+               
+               if (!initial_value.length 
+               || initial_value.toString() === '<p></p>') {
+                  editor.composer.setValue(initial_value + data);
+               } else {
+                  editor.composer.setValue(initial_value);
+               }
+            }
+            
             editor.focus();
          });
-         */
+         
       };
       
       /**
@@ -417,7 +436,7 @@
             // b tag around the content. Now, since moving to 0.4.0pre, the 
             // paragraphing messes this up severaly. Moreover, pasting 
             // through this function sets caret to end of composer. 
-            // Originally found this bug through Kixeye mentioning paste 
+            // Originally found this bug through a client site mentioning paste 
             // issue, which opened up larger issue of pasting with new version 
             // of wysihtml5. For now, disable paste filtering to make sure 
             // pasting and the caret remain in same position. 
@@ -479,20 +498,23 @@
        */
       var nullFix = function(editorInstance) {
          var editor = editorInstance;
-         var text = editor.composer.getValue();
+         //var text = editor.composer.getValue();
          //editor.composer.setValue(text + "<p>&zwnj;<br></p>");
          
          // Problem with this is being able to post "empty", because invisible 
          // space is counted as a character. However, many forums could 
-         // implemented a character minimum (Kixeye does), so this will 
+         // implemented a character minimum, so this will 
          // not happen everywhere. Regardless, this is only a bandaid. A real 
          // fix will need to be figured out. The wysihtml5 source was pointing 
          // to a few things, but it largely also utilizes hacks like this, and 
          // in fact does insert an initial p tag in the editor to signal that 
          // paragraphs should follow. 
          var insertNull = function() {
-            //editor.composer.commands.exec("insertHTML", "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
-            editor.composer.setValue(editor.composer.getValue() + "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
+            if (!window.chrome) {
+               editor.composer.commands.exec("insertHTML", "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
+            } else {
+               editor.composer.setValue(editor.composer.getValue() + "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
+            }
             editor.fire("blur", "composer");
             editor.focus(); 
          };
