@@ -129,6 +129,11 @@ if (!function_exists('DiscussionUrl')):
          $Px = SEOLinksPlugin::Prefix();
    
       $Discussion = (object) $Discussion;
+      if (!GetValue('CategoryID', $Discussion)) {
+         // Some places call DiscussionUrl with a custom query that doesn't select CategoryID
+         $Discussion->CategoryID = NULL;
+         trigger_error("SEOLinks: You are requesting a discussion URL in a context lacking the CategoryID.", E_USER_NOTICE);
+      }
       $Cat = CategoryModel::Categories($Discussion->CategoryID);
       if ($Cat)
          $Cat = rawurlencode($Cat['UrlCode']);
