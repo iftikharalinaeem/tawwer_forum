@@ -132,9 +132,7 @@ if (!function_exists('DiscussionUrl')):
       $Cat = FALSE;
 
       // Some places call DiscussionUrl with a custom query that doesn't select CategoryID
-      if (!GetValue('CategoryID', $Discussion))
-         trigger_error("SEOLinks: You are requesting a discussion URL in a context lacking the CategoryID.", E_USER_NOTICE);
-      else
+      if (GetValue('CategoryID', $Discussion))
          $Cat = CategoryModel::Categories($Discussion->CategoryID);
 
       if ($Cat)
