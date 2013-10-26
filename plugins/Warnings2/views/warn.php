@@ -9,7 +9,7 @@ echo $this->Form->Errors();
 <div class="P">
 <?php
 
-echo $this->Form->Label('Type of Warning', 'WarningTypeID', array('class' => 'B'));
+echo $this->Form->Label('Severity', 'WarningTypeID', array('class' => 'B'));
 
 foreach ($this->Data('WarningTypes', array()) as $Row) {
    $Points = Plural($Row['Points'], '%s point', '%s points');
