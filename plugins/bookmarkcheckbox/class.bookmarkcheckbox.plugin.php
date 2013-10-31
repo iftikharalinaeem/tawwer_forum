@@ -20,7 +20,7 @@ class BookmarkCheckboxPlugin extends Gdn_Plugin {
       $this->addCheckBox($Sender);
    }
    
-   public function PostController_AfterBodyField_Handler($Sender) {
+   public function PostController_DiscussionFormOptions_Handler($Sender) {
       $this->addCheckBox($Sender);
    }
    
