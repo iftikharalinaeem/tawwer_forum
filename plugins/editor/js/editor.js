@@ -62,7 +62,8 @@
                : $('#editor-fullpage-candidate').find('.editor-toggle-fullpage-button');
 
             var bodyEl      = $('body'); 
-                formWrapper = $(toggleButton).closest('.FormWrapper')[0];
+                //formWrapper = $(toggleButton).closest('.FormWrapper')[0];
+                formWrapper = $(toggleButton).closest('.bodybox-wrap');
 
             // Not all parts of the site have same surrounding markup, so if that 
             // fails, grab nearest parent element that might enclose it. The 
