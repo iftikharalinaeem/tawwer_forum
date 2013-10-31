@@ -2,14 +2,13 @@
 
 $PluginInfo['bookmarkcheckbox'] = array(
    'Name' => 'Bookmark Checkbox',
-   'Description' => "Easily bookmark a discussion from the comment reply form by ticking a 'bookmark' checkbox.",
+   'Description' => "Easily bookmark an open discussion from the comment reply form by ticking a 'bookmark' checkbox.",
    'Version' => '1.0.0',
-   'RequiredApplications' => array('Vanilla' => '>=2.2'),
    'MobileFriendly' => true,
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'https://vanillaforums.com/profile/dane', 
-    'Hidden' => true
+   'Hidden' => false
 );
 
 class BookmarkCheckboxPlugin extends Gdn_Plugin {
