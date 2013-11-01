@@ -61,8 +61,15 @@
                ? e.target 
                : $('#editor-fullpage-candidate').find('.editor-toggle-fullpage-button');
 
-            var bodyEl      = $('body'); 
-                formWrapper = $(toggleButton).closest('.FormWrapper')[0];
+            var bodyEl = $('body'); 
+            
+            // New wrapper classes added to form. If the first is not availble, 
+            // fall back to second one. This was added to core, so core will 
+            // need to be updated alongside the plugin if site owners want 
+            // latest feature.
+            var formWrapper = ($(toggleButton).closest('.fullpage-wrap').length) 
+               ? $(toggleButton).closest('.fullpage-wrap')
+               : $(toggleButton).closest('.bodybox-wrap');
 
             // Not all parts of the site have same surrounding markup, so if that 
             // fails, grab nearest parent element that might enclose it. The 
