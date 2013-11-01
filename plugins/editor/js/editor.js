@@ -307,14 +307,18 @@
                }
             }
          });
-         
-         // For now, do not let Enter key close and insert text, as it 
-         // causes buggy behaviour with dropdowns.
-         $('.InputBox').on('keydown', function(e) {
+
+         // Handle Enter key
+         $('.editor-dropdown').find('.InputBox').on('keydown', function(e) {
             if (e.which == 13) {
-               e.stopPropagation();
-               e.preventDefault();
-               return false;
+               // Cancel enter key submissions on these values.
+               if (this.value == '' 
+               || this.value == 'http://' 
+               || this.value == 'https://') {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  return false;
+               }
             }
          });
 
