@@ -209,8 +209,6 @@ class SamlSSOPlugin extends Gdn_Plugin {
       Trace($id, 'id');
       Trace($profile, 'profile');
       
-      // TODO: Throw an event so that other plugins can add/remove stuff from the basic sso.
-      
       $Form = $Sender->Form; //new Gdn_Form();
       $Form->SetFormValue('UniqueID', $this->rval('eduPersonTargetedID', $profile));
       $Form->SetFormValue('Provider', self::ProviderKey);
@@ -221,8 +219,15 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $Form->SetFormValue('Email', $this->rval('mail', $profile));
       $Form->SetFormValue('Photo', $this->rval('photo', $profile));
       
+      // Set the target from a common items.
+      if ($returnTo = $Sender->Request->Post('ReturnTo')) {
+         $Form->SetFormValue('Target', $returnTo);
+      }
+      
       $this->EventArguments['Profile'] = $profile;
       $this->EventArguments['Form'] = $Form;
+      
+      // Throw an event so that other plugins can add/remove stuff from the basic sso.
       $this->FireEvent('SamlData');
       
       $Sender->SetData('Verified', TRUE);
