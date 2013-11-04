@@ -22,8 +22,21 @@ jQuery(document).ready(function($) {
          eventiName[0].select();
       }, 300);
       
-      // Remove fragment identifier (#) in URL, if any (from linking).
-      //location.href = location.href.split('#')[0];
+      // Remove fragment identifier (#) in URL, if any (from linking), so that 
+      // the linked to flag does not always stay visible.
+      if (location.hash.indexOf('eventi') > -1) {
+         // Only remove it if first hovered over it, then it will behave like 
+         // all the others
+         var stickiedFlagId = location.hash.substring(1).toString();
+         var hoverFlagId = $(e.target).closest('.eventi').attr('id').toString();
+
+         if (hoverFlagId == stickiedFlagId) {
+            // Make sure scroll position is maintained
+            var originalScrollTop = document.body.scrollTop;
+            location.hash = '';
+            document.body.scrollTop = originalScrollTop;
+         }
+      }
       
       // Determine whether tooltip is hitting upon the viewport edges.
       var tooltipWidth = tooltip.outerWidth();

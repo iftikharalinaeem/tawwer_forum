@@ -70,7 +70,8 @@ $PluginInfo['Eventi'] = array(
  * - Strings are now passed through htmlentities and sliced, as some may contain 
  *   HTML, which affects the output of the tooltip. 
  * - Unique fragment identifiers added for every event flag, to easily link 
- *   to flags in the page by appending the URL with #eventi-MD5String
+ *   to flags in the page by appending the URL with #eventi-MD5String, and if 
+ *   on page with flag targeted, it will be disabled on hover of itself.
  */
 
 class EventiPlugin extends Gdn_Plugin {
