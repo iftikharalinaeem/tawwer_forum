@@ -683,7 +683,7 @@ if (!function_exists('WriteReactions')):
       Gdn::Controller()->EventArguments['Flags'] = &$Flags;
       Gdn::Controller()->FireEvent('BeforeFlag');
 
-      if (!empty($Flags)) {
+      if (!empty($Flags) && is_array($Flags)) {
          echo Gdn_Theme::BulletItem('Flags');
 
          echo ' <span class="FlagMenu ToggleFlyout">';
