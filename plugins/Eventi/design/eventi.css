@@ -159,8 +159,6 @@
    padding: 10px;
    color: #777777;
    text-shadow: 0 0 1px #000;
-   border-bottom-left-radius: 2px;
-   border-bottom-right-radius: 2px;
 }
 
 .eventi .eventi-subhead {
@@ -220,16 +218,20 @@
    background: transparent;
 }
 
+.eventi li span {
+   display: inline !important;
+}
+
 .eventi-share-link {
    display: block;
    width: 100%;
    background-color: transparent;
    color: #666666;
    border: 0;
+   border-top: 1px solid #222222;
    padding: 5px 10px;
    border-bottom-left-radius: 2px;
    border-bottom-right-radius: 2px;
-   
 }
 
 /**
