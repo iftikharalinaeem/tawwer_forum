@@ -72,6 +72,24 @@ class Reporting2Plugin extends Gdn_Plugin {
       RemoveFromConfig('EnabledPlugins.Reporting');
    }
 
+   /**
+    *
+    *
+    * @param $Row
+    * @param $RecordType
+    * @param $RecordID
+    * @return string
+    */
+   public function ReportButton($Row, $RecordType, $RecordID) {
+      $Result = Anchor(
+         '<span class="ReactSprite ReactFlag"></span> '.T('Report'),
+         '/report/'.$RecordType.'/'.$RecordID,
+         'ReactButton ReactButton-Report Popup',
+         array('title'=>'Report', 'rel'=>"nofollow")
+      );
+      return $Result;
+   }
+
    /// Controller ///
 
    /**
@@ -79,11 +97,10 @@ class Reporting2Plugin extends Gdn_Plugin {
     *
     * @param $Sender
     * @param $RecordType
-    * @param $ReportType
     * @param $ID
     * @throws Gdn_UserException
     */
-   public function RootController_Report_Create($Sender, $RecordType, $ReportType, $ID) {
+   public function RootController_Report_Create($Sender, $RecordType, $ID) {
       if (!Gdn::Session()->IsValid())
          throw new Gdn_UserException(T('You need to sign in before you can do this.'), 403);
 
@@ -95,7 +112,7 @@ class Reporting2Plugin extends Gdn_Plugin {
       $Sender->Form->SetFormValue('RecordType', $RecordType);
       $Sender->Form->SetFormValue('Format', 'TextEx');
 
-      $Sender->SetData('Title', sprintf(T('Report %1s'), $RecordType, $ReportType));
+      $Sender->SetData('Title', sprintf(T('Report %1s'), $RecordType, 'Report'));
 
       if ($Sender->Form->AuthenticatedPostBack()) {
          if ($Sender->Form->Save())
@@ -117,21 +134,8 @@ class Reporting2Plugin extends Gdn_Plugin {
     * Make sure Reactions' flags are triggered.
     */
    public function Base_BeforeFlag_Handler($Sender, $Args) {
-      if (empty($Args['Flags']))
-         $Args['Flags'] = TRUE;
-      //elseif (isset($Args['Flags']['spam']))
-         //unset($Args['Flags']['spam']);
-   }
-
-   /**
-    * Add reporting options to discussions & comments under Flag menu.
-    */
-   public function Base_AfterFlagOptions_Handler($Sender, $Args) {
-      $Options = array('Report');
-      foreach ($Options as $Name) {
-         $Text = Sprite('ReactFlag', 'ReactSprite').' '.Wrap(T($Name), 'span', array('class' => 'ReactLabel'));
-         echo Wrap(Anchor($Text, 'report/'.$Args['RecordType'].'/'.strtolower($Name).'/'.$Args['RecordID'],
-            'Popup ReactButton ReactButton-'.$Name, array('title'=>$Name, 'rel'=>"nofollow")), 'li');
+      if (Gdn::Session()->CheckPermission('Garden.SignIn.Allow')) {
+         $Args['Flags']['Report'] = array($this, 'ReportButton');
       }
    }
 
