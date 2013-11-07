@@ -105,6 +105,7 @@ class FlareModel extends Gdn_Pluggable {
     * @return type
     */
    public function filterRedundantBadgeClasses($flare_array) {
+      
       $badge_groups = array();
       foreach ($flare_array as $badge_slug => $badge_info) {
          // Not all badges have classes, so just use slug, as that is unique
@@ -133,7 +134,7 @@ class FlareModel extends Gdn_Pluggable {
    }
    
    public function sortBadgesHighestToLowest(&$badges_array) {
-      uasort($badges_array, function($a, $b) {
+      usort($badges_array, function($a, $b) {
          return $a['sort'] < $b['sort'];
       });
    }

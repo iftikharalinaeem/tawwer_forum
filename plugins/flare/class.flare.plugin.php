@@ -3,7 +3,7 @@
 $PluginInfo['flare'] = array(
    'Name' => 'Flare',
    'Description' => 'Tie into Badges application.',
-   'Version' => '1.0.0',
+   'Version' => '1.0.1',
    'SettingsUrl' => '/dashboard/settings/flare',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Dane MacMillan",
