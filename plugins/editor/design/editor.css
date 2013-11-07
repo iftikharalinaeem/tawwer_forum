@@ -737,6 +737,7 @@
 }
 
 .editor-dd-emoji + .editor-insert-dialog .emoji {
+  box-sizing: content-box !important;
   display: inline-block;
   padding: 5px;
   background-repeat: no-repeat;
@@ -822,6 +823,10 @@ affect, so it's not doing anything */
   -moz-box-sizing: border-box !important;
   -webkit-box-sizing: border-box !important;
   -box-sizing: border-box !important;
+}
+
+.js-editor-fullpage #editor-fullpage-candidate .editor-help-text {
+  display: none;
 }
 
 /* Set default heights for each editor view. Regular (markdown, html, bbcode) 
