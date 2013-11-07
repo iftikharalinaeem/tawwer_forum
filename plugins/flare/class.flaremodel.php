@@ -23,7 +23,7 @@ class FlareModel extends Gdn_Pluggable {
 
          $this->addFlare($badge['Slug'], array(
             'title' => $badge['Name'], 
-            'url' => $badge['Photo'],
+            'url' => Gdn_Upload::Url($badge['Photo']),
             'class' => strtolower($badge['Class']), 
             'slug' => $badge['Slug'],
             'sort' => $badge['Level']
@@ -145,6 +145,7 @@ class FlareModel extends Gdn_Pluggable {
    public function getIds($user_ids = array()) {
       $keys = array_map('FlareModel::cacheKey', $user_ids);
       $cache_flare = Gdn::Cache()->Get($keys);
+      $result;
       
       $db_keys = array_diff(array_keys($cache_flare), $keys);
       foreach ($db_keys as $key) {
@@ -165,12 +166,14 @@ class FlareModel extends Gdn_Pluggable {
    }
    
    public static function stripCacheKey($key) {  
-      return substr(strrchr($key, '.'), 1);
+      return rtrim(strrchr($key, '.'), '.');
    }
    
    public function clearCache($user_id) {
-      $cache_key = self::cacheKey($user_id);
-      Gdn::Cache()->Remove($cache_key);
+      if ($user_id) {
+         $cache_key = self::cacheKey($user_id);
+         Gdn::Cache()->Remove($cache_key);
+      }
    }
    
    protected static $instance;

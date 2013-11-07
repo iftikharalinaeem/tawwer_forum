@@ -31,7 +31,7 @@ if (!function_exists('writeFlare')) {
       foreach ($flare_array as $flare) {
          $html_flare .= '
          <span class="flare-item flare-'. $flare['slug'] .'" title="'. $flare['title'] .'">
-            <img src="'. $flare['url'] .'" alt="'. $flare['slug'] .'" width="25" height="25" />
+            <img src="'. $flare['url'] .'" alt="'. $flare['title'] .'" />
          </span>';
          
          $count++;
