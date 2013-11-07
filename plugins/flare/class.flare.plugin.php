@@ -28,11 +28,10 @@ if (!function_exists('writeFlare')) {
       $html_flare = '<div class="flare">';
 
       $count = 0;
-      foreach ($flare_array as $key => $flare) {
-         
+      foreach ($flare_array as $flare) {
          $html_flare .= '
-         <span class="flare-item flare-'. $key .'" title="'. $flare['title'] .'">
-            <img src="'. $flare['url'] .'" alt="'. $key .'" width="25" height="25" />
+         <span class="flare-item flare-'. $flare['slug'] .'" title="'. $flare['title'] .'">
+            <img src="'. $flare['url'] .'" alt="'. $flare['slug'] .'" width="25" height="25" />
          </span>';
          
          $count++;
