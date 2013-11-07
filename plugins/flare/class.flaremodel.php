@@ -108,7 +108,7 @@ class FlareModel extends Gdn_Pluggable {
       $badge_groups = array();
       foreach ($flare_array as $badge_slug => $badge_info) {
          // Not all badges have classes, so just use slug, as that is unique
-         if (!$badge_info['class']) {
+         if (!isset($badge_info['class'])) {
             $badge_info['class'] = $badge_slug;
          }
          
@@ -145,7 +145,7 @@ class FlareModel extends Gdn_Pluggable {
    public function getIds($user_ids = array()) {
       $keys = array_map('FlareModel::cacheKey', $user_ids);
       $cache_flare = Gdn::Cache()->Get($keys);
-      $result;
+      $result = array();
       
       $db_keys = array_diff(array_keys($cache_flare), $keys);
       foreach ($db_keys as $key) {
