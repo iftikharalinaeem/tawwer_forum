@@ -166,7 +166,7 @@ class FlareModel extends Gdn_Pluggable {
    }
    
    public static function stripCacheKey($key) {  
-      return rtrim(strrchr($key, '.'), '.');
+      return ltrim(strrchr($key, '.'), '.');
    }
    
    public function clearCache($user_id) {
