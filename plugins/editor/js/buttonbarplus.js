@@ -324,8 +324,12 @@ jQuery(document).ready(function($) {
       },
       
       BindShortcut: function(TextArea, Operation, Shortcut, ShortcutMode, OpFunction) {
-         if (OpFunction == undefined)
-            OpFunction = function(e){ButtonBar.Perform(TextArea, Operation, e);}
+         if (OpFunction == undefined) {
+            OpFunction = function(e) {
+               // For now, e is empty, and last value is there as hint
+               ButtonBar.Perform(TextArea, Operation, e, 'keyshortcut');
+            }
+         }
          
          if (ShortcutMode == undefined)
             ShortcutMode = 'keydown';
@@ -393,6 +397,13 @@ jQuery(document).ready(function($) {
                break;
 
             case 'url':
+               
+               // Special handling of this case, when using keyboard shortcuts.
+               if (Value.trim() == 'keyshortcut') {
+                  var currentText = $(TextArea).getSelection().text;
+                  $(TextArea).surroundSelectedText('[url="'+ currentText +'"]', '[/url]', 'select');
+               }
+               
                var thisOpts = $.extend(bbcodeOpts, {});
                
                // Hooking in to standardized dropdown for submitting links
@@ -523,6 +534,13 @@ jQuery(document).ready(function($) {
                break;
 
             case 'url':
+               
+               // Special handling of this case, when using keyboard shortcuts.
+               if (Value.trim() == 'keyshortcut') {
+                  var currentText = $(TextArea).getSelection().text;
+                  $(TextArea).surroundSelectedText('<a href="'+ currentText +'">', '</a>', 'select');
+               }
+               
                var urlOpts = {};
                var thisOpts = $.extend(htmlOpts, {});
 
@@ -636,7 +654,7 @@ jQuery(document).ready(function($) {
             */
            
             case 'strike':
-               $(TextArea).insertRoundTag('~~',markdownOpts);
+               $(TextArea).insertRoundTag('~~',markdownOpts);               
                break;
 
             case 'code':
@@ -702,6 +720,12 @@ jQuery(document).ready(function($) {
 
             case 'url':
 
+               // Special handling of this case, when using keyboard shortcuts.
+               if (Value.trim() == 'keyshortcut') {
+                  var currentText = $(TextArea).getSelection().text;
+                  $(TextArea).surroundSelectedText('['+ currentText +'](', ')', 'select');
+               }
+               
                // Hooking in to standardized dropdown for submitting links
                var inputBox = $('.editor-input-url');
                $(inputBox).parent().find('.Button')
