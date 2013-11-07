@@ -297,13 +297,19 @@
                   $(el).removeClass('editor-dropdown-open');
                   $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                });
-
-               parentEl.addClass('editor-dropdown-open');
-
-               // if has input, focus and move caret to end of text
-               var inputBox = $(this).find('.InputBox');
-               if (inputBox.length) {
-                  editorSelectAllInput(inputBox[0]);
+               
+               // If the editor action buttons have been disabled (by switching 
+               // to HTML code view, then do not allow dropdowns. CSS pointer-
+               // events should have taken care of this, but JS still fires the 
+               // event regardless, so disable them here as well.
+               if (!parentEl.hasClass('wysihtml5-commands-disabled')) {
+                  parentEl.addClass('editor-dropdown-open');
+                  
+                  // if has input, focus and move caret to end of text
+                  var inputBox = $(this).find('.InputBox');
+                  if (inputBox.length) {
+                     editorSelectAllInput(inputBox[0]);
+                  }
                }
             }
          });

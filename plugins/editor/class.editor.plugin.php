@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.0.34',
+   'Version' => '1.0.35',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -500,7 +500,7 @@ class EditorPlugin extends Gdn_Plugin {
              array('edit' => 'format', 'action'=> 'quote', 'type' => 'button',    'text' => 'Quote', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-quote editor-dialog-fire-close', 'data-wysihtml5-command' => 'blockquote', 'title' => 'Quote', 'data-editor' => '{"action":"quote","value":""}')),
              array('edit' => 'format', 'action'=> 'code', 'type' => 'button',     'text' => 'Code', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-code editor-dialog-fire-close', 'data-wysihtml5-command' => 'code', 'title' => 'Code', 'data-editor' => '{"action":"code","value":""}')),
              array('edit' => 'format', 'action'=> 'spoiler', 'type' => 'button', 'text' => 'Spoiler', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-spoiler editor-dialog-fire-close', 'data-wysihtml5-command' => 'spoiler', 'title' => 'Spoiler', 'data-editor' => '{"action":"spoiler","value":""}')),
-         ), 'attr' => array('class' => 'icon icon-paragraph editor-dd-format', 'title' => 'Format', 'data-editor' => '{"action":"format","value":""}'));
+         ), 'attr' => array('class' => 'editor-action icon icon-paragraph editor-dd-format', 'title' => 'Format', 'data-editor' => '{"action":"format","value":""}'));
       
       $editorToolbarAll['sep-media'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-media hidden-xs'));
       $editorToolbarAll['emoji'] = array('edit' => 'media', 'action'=> 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => 'Emoji'));
