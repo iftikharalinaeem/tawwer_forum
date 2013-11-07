@@ -64,7 +64,7 @@ class FlareModel extends Gdn_Pluggable {
     */
    public function getId($user_id) {
       $cache_key = self::cacheKey($user_id);
-      $cache_expire = 10;
+      $cache_expire = 60 * 60;
       
       // Check the cache for the flare.
       $flare = Gdn::Cache()->Get($cache_key);
