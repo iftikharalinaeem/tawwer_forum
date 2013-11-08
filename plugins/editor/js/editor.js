@@ -87,9 +87,6 @@
                var fullPageCandidate = $('#editor-fullpage-candidate');
                var editorToolbar = $(fullPageCandidate).find('.editor');
 
-              // experimental lights toggle for chrome.
-              toggleLights();
-
                // When textarea pushes beyond viewport of its container, a 
                // scrollbar appears, which pushes the textarea left, while the 
                // fixed editor toolbar does not move, so push it over.
@@ -124,7 +121,7 @@
                $(toggleButton).removeClass('icon-resize-small');
 
                // for experimental chrome lights toggle
-               $('.editor-toggle-lights-button').attr('style', '');
+               //$('.editor-toggle-lights-button').attr('style', '');
 
                // Auto scroll to correct location upon exiting fullpage.
                var scrollto = $(toggleButton).closest('.Comment');
@@ -146,6 +143,10 @@
             } else {
                editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
             }
+            
+            // Toggle lights while in fullpage (lights off essentially makes 
+            // the background black and the buttons lighter.
+            toggleLights();
          };
 
          /**
@@ -212,23 +213,71 @@
          }());
 
          /**
-          * Lights on/off in fullpage--experimental for chrome
+          * Lights on/off in fullpage
+          * 
+          * Note: Wysiwyg makes styling the BodyBox more difficult as it's an 
+          * iframe. Consequently, JavaScript has to override all the styles 
+          * that skip the iframe, and tie into the focus and blur events to 
+          * override the Wysihtml5 inline style events.
           */
          var toggleLights = function() {
             // Just do it for chrome right now. Very experimental.
-            if (window.chrome) {
-               var toggleLights = $('.editor-toggle-lights-button');           
-               $(toggleLights).attr('style', 'display:inline-block !important').off('click').on('click', function() {
-                  var fullPageCandidate = $('#editor-fullpage-candidate');
-                  if (!$(fullPageCandidate).hasClass('editor-lights-candidate')) {
-                     $(fullPageCandidate).addClass('editor-lights-candidate');
-                  } else {
-                     $(fullPageCandidate).removeClass('editor-lights-candidate');
-                  }
-               });
+            var toggleLights = $('.editor-toggle-lights-button');     
+            var fullPageCandidate = $('#editor-fullpage-candidate');
+            var ifr = {};
+
+            if (fullPageCandidate.length) {
+               $(toggleLights).attr('style', 'display:inline-block !important');
+               
+               // Due to wysiwyg styles embedded inline and states changed 
+               // using JavaScript, all the styles have to be duplicated from 
+               // the external stylesheet and override the iframe inlines.
+               ifr = $(fullPageCandidate).find('.wysihtml5-sandbox');
+               if (ifr.length) {
+                  var iframeBodyBox = ifr.contents().find('.BodyBox');
+                  iframeBodyBox.css({
+                     "transition": "background-color 0.4s ease, color 0.4s ease"
+                  });
+               }
+            } else {
+               $(toggleLights).attr('style', '');
             }
+
+            $(toggleLights).off('click').on('click', function() {
+               if (!$(fullPageCandidate).hasClass('editor-lights-candidate')) {
+                  $(fullPageCandidate).addClass('editor-lights-candidate');
+                  
+                  // Again, for Wysiwyg, override styles
+                  if (ifr.length) {
+                     // if wysiwyg, need to manipulate content in iframe
+                     iframeBodyBox.css({
+                        "background-color": "#000 !important",
+                        "color": "#999999 !important"
+                     });
+
+                     iframeBodyBox.on('focus blur', function(e) {
+                        $(this).css({
+                           "background-color": "#000 !important",
+                           "color": "#999999 !important"
+                        });
+                     });
+                  }
+               } else {
+                  $(fullPageCandidate).removeClass('editor-lights-candidate');
+                  
+                  // Wysiwyg override styles
+                  if (ifr.length) {
+                     iframeBodyBox.off('focus blur');
+
+                     // if wysiwyg, need to manipulate content in iframe
+                     iframeBodyBox.css({
+                        "background-color": "",
+                        "color": ""
+                     });
+                  }
+               }
+            });
          };
-         
       };
 
       /**

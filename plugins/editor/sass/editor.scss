@@ -212,6 +212,7 @@ affect, so it's not doing anything */
    background-color: #fff;
    height: 100%;
    width: 100%;
+   transition: background-color 0.4s ease;
 }
 
 .js-editor-fullpage #editor-fullpage-candidate .editor {
@@ -223,6 +224,7 @@ affect, so it's not doing anything */
    margin: 0 auto;
    background-color: rgba(255,255,255,0.95);
    box-shadow: 0 2px 5px -5px #000;
+   transition: all 0.4s ease;
 }
 
 .js-editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
@@ -244,6 +246,7 @@ affect, so it's not doing anything */
 .js-editor-fullpage .TextBoxWrapper .BodyBox,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
    width: 100% !important;
+   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 /* Fix some content boxes */
@@ -272,7 +275,7 @@ wysiwgy requires height to not interfere with autogrow. */
 
 
 /**
- * Experimental toggle lights on/off. Just a quick demo for Chrome.
+ * Experimental toggle lights on/off.
  */
 
 .editor-toggle-lights-button {
@@ -284,20 +287,35 @@ wysiwgy requires height to not interfere with autogrow. */
    /*display: inline-block !important;*/
 }
 
-.js-editor-fullpage .editor-lights-candidate {
-   -webkit-filter: invert(100%);
-   /* Messier in Firefox, but basic usage */
-   /*filter: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='invert'><feColorMatrix type='matrix' values='-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0'/></filter></svg>#invert");*/
-   -webkit-animation-duration: 0.5s;
-   -webkit-animation-name: editor-anim-lights;
-}
+.js-editor-fullpage #editor-fullpage-candidate.editor-lights-candidate {
+   background-color: #000;
+   
+   .editor {
+      background-color: rgba(0,0,0,0.80);
+      color: #fff;
+      box-shadow: 0 5px 5px -5px #999999;
+   }
 
-@-webkit-keyframes editor-anim-lights {
-  0% {
-    -webkit-filter: invert(0%);
-  }
-}
+   .editor .icon:hover,
+   .wysihtml5-command-active,
+   .wysihtml5-action-active,
+   .wysihtml5-command-dialog-opened {
+      background-color: rgba(255, 255, 255, 0.25);
+   }
 
+   .editor .editor-sep {
+      border-left: 1px solid rgba(255, 255, 255, 0.25);
+   }
+
+   /* important due to iframe getting its styles overridden inline by JS */
+   .TextBoxWrapper .BodyBox,
+   .TextBoxWrapper .wysihtml5-sandbox {
+      background-color: #000 !important;
+      border-color: #222222 !important;
+      color: #999999 !important;
+   }
+   
+}
 
 /* Animation definition for fade in editor on fullpage */
 @keyframes editor-anim-editor {
