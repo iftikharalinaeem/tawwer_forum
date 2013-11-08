@@ -351,6 +351,7 @@ class GroupController extends Gdn_Controller {
    protected function AddEdit($ID = FALSE) {
       $Form = new Gdn_Form();
       $Form->SetModel($this->GroupModel);
+      Gdn_Theme::Section('Post');
       
       if ($ID) {
          $Group = $this->GroupModel->GetID($ID);
