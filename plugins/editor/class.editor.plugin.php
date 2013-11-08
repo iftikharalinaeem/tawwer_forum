@@ -578,6 +578,7 @@ class EditorPlugin extends Gdn_Plugin {
       
       // Load JavaScript
       $c->AddJsFile('editor.js', 'plugins/editor');
+      $c->AddJsFile('jquery.atwho.js', 'plugins/editor');
       
       // Set definitions for JavaScript to read
       $c->AddDefinition('editorVersion',      $this->pluginInfo['Version']);

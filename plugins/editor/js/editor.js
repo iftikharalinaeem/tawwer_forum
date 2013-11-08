@@ -926,8 +926,87 @@
                             return undef;
                           }
                         };
-                      })(wysihtml5);                        
+                      })(wysihtml5);   
+                      
+                      
+                      
+                      
+                                        
+                  
+                  
+                                                 /**
+          * EXPERIMENTAL AT.JS
+          */
+         
+         
+         var emojis = ["smile", "iphone", "girl", "smiley", "heart", "kiss", "copyright", "coffee"];
+
+         var names = ["Jacob", "Isabella", "Ethan", "Emma", "Michael", "Olivia", "Alexander", "Sophia", "William", "Ava", "Joshua", "Emily", "Daniel", "Madison", "Jayden", "Abigail", "Noah", "Chloe", "你好", "你你你"];
+
+         var emojis_list = $.map(emojis, function(value, i) {
+           return {'id':i, 'name':value};
+         });
+
+         var issues = [
+           { name: "1", content: "stay foolish"},
+           { name: "2", content: "stay hungry"},
+           { name: "3", content: "stay heathly"},
+           { name: "4", content: "this happiess"},
+         ];
+
+
+
+
+         
+         setTimeout(function() {
+                     ifr = $('body').find('.wysihtml5-sandbox');
+                  var iframeBodyBox = ifr.contents().find('.BodyBox');
+         
+         console.log(iframeBodyBox[0]);    
+         
+         
+         
+                  //http://a248.e.akamai.net/assets.github.com/images/icons/emoji/8.png
+         $(iframeBodyBox)
+           .atwho({
+             at: "@",
+             data: names
+           })
+           .atwho({
+             at: "#", 
+             tpl: '<li data-value="#${name}">${name} <small>${content}</small></li>',
+             data: issues
+           })
+           .atwho({
+             at: ":", 
+             tpl: "<li data-value=':${key}:'><img src='http://a248.e.akamai.net/assets.github.com/images/icons/emoji/${name}.png' height='20' width='20'/> ${name} </li>",
+             data: emojis_list
+           });
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         }, 500);
+ 
+                      
+                      
+                      
+                      
+                      
+                      
                   });
+
+                  
+                  
+                  
+                  
+                  
                 break;
 
                 case 'html':
@@ -946,6 +1025,60 @@
                          //scrollToEditorContainer($(currentEditableTextarea)[0]);
                          editorSetCaretFocusEnd(currentEditableTextarea[0]);
                       }
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                               /**
+          * EXPERIMENTAL AT.JS
+          */
+         
+         
+         var emojis = ["smile", "iphone", "girl", "smiley", "heart", "kiss", "copyright", "coffee"];
+
+         var names = ["Jacob", "Isabella", "Ethan", "Emma", "Michael", "Olivia", "Alexander", "Sophia", "William", "Ava", "Joshua", "Emily", "Daniel", "Madison", "Jayden", "Abigail", "Noah", "Chloe", "你好", "你你你"];
+
+         var emojis_list = $.map(emojis, function(value, i) {
+           return {'id':i, 'name':value};
+         });
+
+         var issues = [
+           { name: "1", content: "stay foolish"},
+           { name: "2", content: "stay hungry"},
+           { name: "3", content: "stay heathly"},
+           { name: "4", content: "this happiess"},
+         ];
+
+         //http://a248.e.akamai.net/assets.github.com/images/icons/emoji/8.png
+         $(currentEditableTextarea)
+           .atwho({
+             at: "@",
+             data: names
+           })
+           .atwho({
+             at: "#", 
+             tpl: '<li data-value="#${name}">${name} <small>${content}</small></li>',
+             data: issues
+           })
+           .atwho({
+             at: ":", 
+             tpl: "<li data-value=':${key}:'><img src='http://a248.e.akamai.net/assets.github.com/images/icons/emoji/${name}.png' height='20' width='20'/> ${name} </li>",
+             data: emojis_list
+           });
+         
+         
+         console.log('doit');      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
                    });                  
                    break;
             }
@@ -956,6 +1089,24 @@
             // some() loop requires true to end loop. every() requires false.
             return true;
          }
+         
+         
+         
+         
+         
+   
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
+         
       }
 
       // Deprecated livequery.
