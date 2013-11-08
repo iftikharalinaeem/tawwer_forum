@@ -643,7 +643,7 @@ class EditorPlugin extends Gdn_Plugin {
          // At the moment they're both the same, but in future you may want 
          // to know this information to modify it accordingly.
          $View = $c->FetchView('editor', '', 'plugins/editor');
-         
+
          $Args['BodyBox'] = $View.$Args['BodyBox'];
          
 //         if ($c instanceof PostController) {
