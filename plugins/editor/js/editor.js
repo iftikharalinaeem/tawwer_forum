@@ -265,9 +265,13 @@
         * Helper function to select whole text of an input or textarea on focus
         */
        var editorSelectAllInput = function(obj) {
-          // selectionStart is implied 0
-          obj.selectionEnd = obj.value.length;
-          obj.focus();
+          // Check if can access selection, as programmatically triggering the 
+          // dd close event throws an error here.
+          if (obj.selectionEnd) {
+            // selectionStart is implied 0
+            obj.selectionEnd = obj.value.length;
+            obj.focus();
+          }
        };
 
       /**
@@ -325,6 +329,18 @@
                   e.preventDefault();
                   return false;
                }
+               
+               // Make exception for non-wysiwyg, as wysihtml5 has custom 
+               // key handler.
+               if (!$(this).closest('.editor').hasClass('editor-format-wysiwyg')) {
+                  // Fire event programmatically to do what needs to be done in 
+                  // ButtonBar code.
+                  $(this).parent().find('.Button').trigger('click.insertData');
+
+                  e.stopPropagation();
+                  e.preventDefault();
+                  return false;
+               }
             }
          });
 
@@ -333,7 +349,7 @@
          $('.TextBoxWrapper').add($('.wysihtml5-sandbox').contents().find('html')).each(function(i, el) {
             $(el).addClass('editor-dialog-fire-close');
          });
-
+         
          // Target all elements in the document that fire the dropdown close 
          // (some are written directly as class in view), then add the matches 
          // from within the iframe, and attach the relevant callbacks to events.

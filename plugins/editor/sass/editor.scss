@@ -341,7 +341,7 @@ wysiwgy requires height to not interfere with autogrow. */
 }
 
 /**
- * When wysiwyg editor switches to code view, disable functionality of visibly 
+ * When wysiwyg editor switches to code view, disable functionality and visibly 
  * disable the common action buttons, which should no longer have any affect.
  * The class, wysihtml5-commands-disabled, is added to editor bar when 
  * the code switch button is clicked, so tie into it. 
@@ -360,9 +360,6 @@ wysiwgy requires height to not interfere with autogrow. */
       pointer-events: auto;
 
    } 
-   
-
-   
 }
 
 
