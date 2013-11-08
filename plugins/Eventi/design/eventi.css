@@ -128,7 +128,7 @@
    top: auto;
    bottom: -10px;
    border: 5px solid transparent; 
-   border-top-color: #333333; 
+   border-top-color: #000; 
 }
 
 /*
@@ -204,13 +204,15 @@
 }
 
 .eventi li {
-   padding: 2px 0;
+   margin: 0 !important;
+   padding: 2px 0 !important;
    border: 0 !important;
    font-size: 12px !important;
 }
 
 .eventi li em {
    color: #777777;
+   font-style: normal;
 }
 
 .eventi li pre {

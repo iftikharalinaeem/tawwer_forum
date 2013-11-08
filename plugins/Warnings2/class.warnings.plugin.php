@@ -55,14 +55,17 @@ class Warnings2Plugin extends Gdn_Plugin {
    }
    
    /// Event Handlers ///
-   
+
+   /**
+    * Show if this post triggered a warning to give everyone context.
+    */
    public function Base_BeforeCommentBody_Handler($Sender, $Args) {
       if (isset($Args['Comment']))
          $Row = $Args['Comment'];
       else
          $Row = $Args['Discussion'];
       
-      if (isset($Row->Attributes['WarningID'])) {
+      if (isset($Row->Attributes['WarningID']) && $Row->Attributes['WarningID']) {
          echo '<div class="DismissMessage Warning">'. 
             sprintf(T('%s was warned for this post.', '%s was <a href="%s">warned</a> for this post.'), 
                htmlspecialchars(GetValue('InsertName', $Row)),

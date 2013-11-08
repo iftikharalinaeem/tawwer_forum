@@ -10,6 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 // Define the plugin:
 $PluginInfo['Eventi'] = array(
+   'Name' => 'Eventi2', 
    'Description' => 'This plugin hooks every possible event and outputs a little chunk of signed HTML in-line.',
    'Version' => '2.0.0',
    'RequiredApplications' => array('Vanilla' => '2.0.10a'),
@@ -18,9 +19,10 @@ $PluginInfo['Eventi'] = array(
    'HasLocale' => false,
    'SettingsUrl' => false,
    'SettingsPermission' => 'Garden.AdminUser.Only',
-   'Author' => "Tim Gunter, Dane MacMillan",
-   'AuthorEmail' => 'tim@vanillaforums.com, dane@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'Author' => "Dane MacMillan",
+   'AuthorEmail' => 'dane@vanillaforums.com',
+   'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
+   //'PluginUrl' => 'http://vanillaforums.org/addons/eventi2',
    'MobileFriendly' => true
 );
 
