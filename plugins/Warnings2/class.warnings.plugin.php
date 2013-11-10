@@ -433,17 +433,16 @@ class Warnings2Plugin extends Gdn_Plugin {
    }
    
    /**
-    * 
+    * Not currently used settings page.
+    *
     * @param SettingsController $sender
     */
-   public function SettingsController_warnings_create($sender) {
-      
-      
-      $warning_types = Gdn::sql()->getWhere('WarningType', array(), 'points', 'desc')->resultArray();
-      $sender->setData('warning_types', $warning_types);
-      
-      $sender->title(sprintf(t('%s Settings'), t('Warning')));
-      $sender->render('settings', '', 'plugins/warnings');
+   public function SettingsController_Warnings_Create($Sender) {
+      $WarningTypes = Gdn::SQL()->GetWhere('WarningType', array(), 'points', 'desc')->ResultArray();
+      $Sender->SetData('WarningTypes', $WarningTypes);
+
+      $Sender->Title(sprintf(T('%s Settings'), T('Warning')));
+      $Sender->Render('settings', '', 'plugins/Warnings2');
    }
    
    /**
