@@ -64,7 +64,8 @@ class Warnings2Plugin extends Gdn_Plugin {
          $Row = $Args['Comment'];
       else
          $Row = $Args['Discussion'];
-      
+
+      $Row->Attributes = Gdn_Format::Unserialize($Row->Attributes);
       if (isset($Row->Attributes['WarningID']) && $Row->Attributes['WarningID']) {
          echo '<div class="DismissMessage Warning">'. 
             sprintf(T('%s was warned for this post.', '%s was <a href="%s">warned</a> for this post.'), 
