@@ -8,7 +8,7 @@ $PluginInfo['editor'] = array(
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
    'RequiredApplications' => array('Vanilla' => '>=2.2'),
-   'RequiredTheme' => false, 
+   'RequiredTheme' => false,
    'RequiredPlugins' => false,
    'HasLocale' => false,
    'RegisterPermissions' => false,
@@ -17,115 +17,115 @@ $PluginInfo['editor'] = array(
 );
 
 class EditorPlugin extends Gdn_Plugin {
-   
-   /**
-    * 
-    * Properties
-    * 
-    */
-   
+
    /**
     *
-    * @var array Give class access to PluginInfo 
+    * Properties
+    *
+    */
+
+   /**
+    *
+    * @var array Give class access to PluginInfo
     */
    protected $pluginInfo = array();
-   
+
    /**
     *
-    * @var array List of possible formats the editor supports. 
+    * @var array List of possible formats the editor supports.
     */
    protected $Formats = array('Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text', 'TextEx');
-   
+
    /**
     *
-    * @var string Default format being used for current rendering. Can be one of 
+    * @var string Default format being used for current rendering. Can be one of
     *             the formats listed in $Formats array above.
     */
    protected $Format;
-   
+
    /**
     *
-    * @var string Asset path for this plugin, set in Gdn_Form_BeforeBodyBox_Handler. 
+    * @var string Asset path for this plugin, set in Gdn_Form_BeforeBodyBox_Handler.
     *      TODO check how to set it at runtime in constructor.
     */
    protected $AssetPath;
-   
+
    /**
     *
-    * @var int The width and height of emoji icons are set to 20px each side. 
+    * @var int The width and height of emoji icons are set to 20px each side.
     */
    protected $emojiDimension = 20;
-   
+
    /**
     *
-    * @var bool Setting to true will allow editor to interpret emoji aliases as 
-    *           Html equivalent markup.  
+    * @var bool Setting to true will allow editor to interpret emoji aliases as
+    *           Html equivalent markup.
     */
    protected $emojiInterpretAllow = true;
-   
+
    /**
     *
-    * @var bool Same as above, except interpret all hidden aliases as well. This 
-    *           var will have no affect if the above is set to false. 
+    * @var bool Same as above, except interpret all hidden aliases as well. This
+    *           var will have no affect if the above is set to false.
     */
    protected $emojiInterpretAllowHidden = true;
-   
+
    /**
-    * 
+    *
     */
    public $ForceWysiwyg = 0;
-   
+
    /**
-    * 
+    *
     * Methods
-    * 
+    *
     */
-   
+
    /**
     * Setup some variables for instance.
     */
    public function __construct() {
       parent::__construct();
-      $this->AssetPath = Asset('/plugins/editor');  
+      $this->AssetPath = Asset('/plugins/editor');
       $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
       $this->ForceWysiwyg = C('Plugins.editor.ForceWysiwyg', false);
    }
-   
+
    /**
-    * Set the editor actions to true or false to enable or disable the action 
-    * from displaying in the editor toolbar. This will also let you toggle 
+    * Set the editor actions to true or false to enable or disable the action
+    * from displaying in the editor toolbar. This will also let you toggle
     * the separators from appearing between the loosely grouped actions.
-    * 
+    *
     * @return array List of allowed editor actions
     */
    public function getAllowedEditorActions($name = null, $value = null) {
       static $allowedEditorActions = array(
-          'bold' => true, 
-          'italic' => true, 
-          'strike' => true, 
-          'color' => false, 
-          'orderedlist' => true, 
+          'bold' => true,
+          'italic' => true,
+          'strike' => true,
+          'color' => false,
+          'orderedlist' => true,
           'unorderedlist' => true,
-          
+
           'sep-format' => true, // separator
-          'format' => true, 
-          
+          'format' => true,
+
           'sep-media' => true, // separator
-          'emoji' => true, 
-          'links' => true, 
-          'images' => true, 
-          
+          'emoji' => true,
+          'links' => true,
+          'images' => true,
+
           'sep-align' => true, // separator
-          'alignleft' => true, 
-          'aligncenter' => true, 
-          'alignright' => true, 
-          
+          'alignleft' => true,
+          'aligncenter' => true,
+          'alignright' => true,
+
           'sep-switches' => true, // separator
-          'togglehtml' => true, 
-          'fullpage' => true, 
-          'lights' => true 
+          'togglehtml' => true,
+          'fullpage' => true,
+          'lights' => true
       );
-      
+
       if ($name !== null) {
          if (is_array($name)) {
             $allowedEditorActions = $name;
@@ -138,21 +138,21 @@ class EditorPlugin extends Gdn_Plugin {
          return $allowedEditorActions;
       }
    }
-   
+
    /**
-    * To enable more colors in the dropdown, simply expand the array to 
-    * include more human-readable font color names. 
-    * 
+    * To enable more colors in the dropdown, simply expand the array to
+    * include more human-readable font color names.
+    *
     * Note: in building the dropdown, each color is styled inline, but it will
-    * still be required to add the appropriate post-color-* CSS class selectors 
-    * in the external stylesheet, so that when viewing a posted comment, the 
-    * color will appear. 
-    * 
+    * still be required to add the appropriate post-color-* CSS class selectors
+    * in the external stylesheet, so that when viewing a posted comment, the
+    * color will appear.
+    *
     * @return array Returns array of font colors to use in dropdown
     */
    protected function getFontColorList() {
       $fontColorList = array(
-         'black', 
+         'black',
          'white',
          'gray',
          'silver',
@@ -163,30 +163,30 @@ class EditorPlugin extends Gdn_Plugin {
          'olive',
          'navy',
          'blue',
-         'lime'     
+         'lime'
       );
-      
+
       return $fontColorList;
    }
-   
+
    /**
-    * Populate this with any aliases required for plugin, make sure they point 
-    * to canonical translation, and plugin will add everything to dropdown that 
-    * is listed. To expand, simply define more aliases that corresponded with 
+    * Populate this with any aliases required for plugin, make sure they point
+    * to canonical translation, and plugin will add everything to dropdown that
+    * is listed. To expand, simply define more aliases that corresponded with
     * canonical list.
-    * 
-    * Note: some aliases require htmlentities filtering, which is done directly 
-    * before output in the dropdown, and while searching for the string to 
-    * replace in the regex, NOT here. The reason for this is so the alias 
-    * list does not get littered with characters entity encodings like &lt;, 
-    * which makes it difficult to immediately know what the aliases do. Also, 
-    * htmlentities would have to be revered in areas such as title attributes, 
-    * which counteracts the usefulness of having it done here. 
-    * 
+    *
+    * Note: some aliases require htmlentities filtering, which is done directly
+    * before output in the dropdown, and while searching for the string to
+    * replace in the regex, NOT here. The reason for this is so the alias
+    * list does not get littered with characters entity encodings like &lt;,
+    * which makes it difficult to immediately know what the aliases do. Also,
+    * htmlentities would have to be revered in areas such as title attributes,
+    * which counteracts the usefulness of having it done here.
+    *
     * @param string $emojiAlias Optional string to return matching translation
     * @return string|array Canonical translation or full alias array
     */
-   protected function getEmojiAliasList($emojiAlias = '') {  
+   protected function getEmojiAliasList($emojiAlias = '') {
       $emojiAliasList = array(
          ':)'          => 'smile',
          ':D'          => 'smiley',
@@ -209,85 +209,85 @@ class EditorPlugin extends Gdn_Plugin {
 
       return (!$emojiAlias)
          ? $emojiAliasList
-         : $emojiAliasList[$emojiAlias];    
+         : $emojiAliasList[$emojiAlias];
    }
-   
+
    /**
-    * This is the canonical, e.g., official, list of emoji names along with 
-    * their associatedwith image file name. For an exhaustive list of emoji 
-    * names visit http://www.emoji-cheat-sheet.com/ and for the original image 
+    * This is the canonical, e.g., official, list of emoji names along with
+    * their associatedwith image file name. For an exhaustive list of emoji
+    * names visit http://www.emoji-cheat-sheet.com/ and for the original image
     * files being used, visit https://github.com/taninamdar/Apple-Color-Emoji
-    * 
-    * Note: every canonical emoji name points to an array of strings. This 
-    * string is ordered CurrentName, OriginalName. Due to the reset() 
-    * before returning the filename, the first element in the array will be 
-    * returned, so in this instance CurrentName will be returned. The second, 
-    * OriginalName, does not have to be written. If ever integrating more emoji 
-    * files from Apple-Color-Emoji, and wanting to rename them from numbered 
+    *
+    * Note: every canonical emoji name points to an array of strings. This
+    * string is ordered CurrentName, OriginalName. Due to the reset()
+    * before returning the filename, the first element in the array will be
+    * returned, so in this instance CurrentName will be returned. The second,
+    * OriginalName, does not have to be written. If ever integrating more emoji
+    * files from Apple-Color-Emoji, and wanting to rename them from numbered
     * files, use emojirename.php located in design/images/emoji/.
-    * 
+    *
     * @param type $emojiCanonical Optional string to return matching file name.
     * @return string|array File name or full canonical array
     */
    protected function getEmojiCanonicalList($emojiCanonical = '') {
       $emojiCanonicalList = array(
         // Smileys
-        'relaxed'                      => array('relaxed', '50'),  
-        'grinning'                     => array('grinning', '701'),  
-        'grin'                         => array('grin', '702'),  
-        'joy'                          => array('joy', '703'),  
-        'smiley'                       => array('smiley', '704'),  
-        'smile'                        => array('smile', '705'),  
-        'sweat_smile'                  => array('sweat_smile', '706'),  
-        'satisfied'                    => array('satisfied', '707'),  
-        'innocent'                     => array('innocent', '708'),  
-        'smiling_imp'                  => array('smiling_imp', '709'),  
-        'wink'                         => array('wink', '710'),  
-        'blush'                        => array('blush', '711'),  
-        'yum'                          => array('yum', '712'),  
-        'relieved'                     => array('relieved', '713'),  
-        'heart_eyes'                   => array('heart_eyes', '714'),  
-        'sunglasses'                   => array('sunglasses', '715'),  
-        'smirk'                        => array('smirk', '716'),  
-        'neutral_face'                 => array('neutral_face', '717'),  
-        'expressionless'               => array('expressionless', '718'),  
-        'unamused'                     => array('unamused', '719'),  
-        'sweat'                        => array('sweat', '720'),  
-        'pensive'                      => array('pensive', '721'),  
-        'confused'                     => array('confused', '722'),  
-        'confounded'                   => array('confounded', '723'),  
-        'kissing'                      => array('kissing', '724'),  
-        'kissing_heart'                => array('kissing_heart', '725'),  
-        'kissing_smiling_eyes'         => array('kissing_smiling_eyes', '726'),  
-        'kissing_closed_eyes'          => array('kissing_closed_eyes', '727'),  
-        'stuck_out_tongue'             => array('stuck_out_tongue', '728'),  
-        'stuck_out_tongue_winking_eye' => array('stuck_out_tongue_winking_eye', '729'),  
-        'stuck_out_tongue_closed_eyes' => array('stuck_out_tongue_closed_eyes', '730'),  
-        'disappointed'                 => array('disappointed', '731'),  
-        'worried'                      => array('worried', '732'),  
-        'angry'                        => array('angry', '733'),  
-        'rage'                         => array('rage', '734'),  
-        'cry'                          => array('cry', '735'),  
-        'persevere'                    => array('persevere', '736'),  
-        'triumph'                      => array('triumph', '737'),  
-        'disapponted_relieved'         => array('disappointed_relieved', '738'),  
-        'frowning'                     => array('frowning', '739'),  
-        'anguished'                    => array('anguished', '740'),  
-        'fearful'                      => array('fearful', '741'),  
-        'weary'                        => array('weary', '742'),  
-        'sleepy'                       => array('sleepy', '743'),  
-        'tired_face'                   => array('tired_face', '744'),  
-        'grimacing'                    => array('grimacing', '745'),  
-        'sob'                          => array('sob', '746'),  
-        'open_mouth'                   => array('open_mouth', '747'),  
-        'hushed'                       => array('hushed', '748'),  
-        'cold_sweat'                   => array('cold_sweat', '749'),  
-        'scream'                       => array('scream', '750'),  
-        'astonished'                   => array('astonished', '751'),  
-        'flushed'                      => array('flushed', '752'),  
-        'sleeping'                     => array('sleeping', '753'),  
-        'dizzy_face'                   => array('dizzy_face', '754'),  
-        'no_mouth'                     => array('no_mouth', '755'),  
+        'relaxed'                      => array('relaxed', '50'),
+        'grinning'                     => array('grinning', '701'),
+        'grin'                         => array('grin', '702'),
+        'joy'                          => array('joy', '703'),
+        'smiley'                       => array('smiley', '704'),
+        'smile'                        => array('smile', '705'),
+        'sweat_smile'                  => array('sweat_smile', '706'),
+        'satisfied'                    => array('satisfied', '707'),
+        'innocent'                     => array('innocent', '708'),
+        'smiling_imp'                  => array('smiling_imp', '709'),
+        'wink'                         => array('wink', '710'),
+        'blush'                        => array('blush', '711'),
+        'yum'                          => array('yum', '712'),
+        'relieved'                     => array('relieved', '713'),
+        'heart_eyes'                   => array('heart_eyes', '714'),
+        'sunglasses'                   => array('sunglasses', '715'),
+        'smirk'                        => array('smirk', '716'),
+        'neutral_face'                 => array('neutral_face', '717'),
+        'expressionless'               => array('expressionless', '718'),
+        'unamused'                     => array('unamused', '719'),
+        'sweat'                        => array('sweat', '720'),
+        'pensive'                      => array('pensive', '721'),
+        'confused'                     => array('confused', '722'),
+        'confounded'                   => array('confounded', '723'),
+        'kissing'                      => array('kissing', '724'),
+        'kissing_heart'                => array('kissing_heart', '725'),
+        'kissing_smiling_eyes'         => array('kissing_smiling_eyes', '726'),
+        'kissing_closed_eyes'          => array('kissing_closed_eyes', '727'),
+        'stuck_out_tongue'             => array('stuck_out_tongue', '728'),
+        'stuck_out_tongue_winking_eye' => array('stuck_out_tongue_winking_eye', '729'),
+        'stuck_out_tongue_closed_eyes' => array('stuck_out_tongue_closed_eyes', '730'),
+        'disappointed'                 => array('disappointed', '731'),
+        'worried'                      => array('worried', '732'),
+        'angry'                        => array('angry', '733'),
+        'rage'                         => array('rage', '734'),
+        'cry'                          => array('cry', '735'),
+        'persevere'                    => array('persevere', '736'),
+        'triumph'                      => array('triumph', '737'),
+        'disapponted_relieved'         => array('disappointed_relieved', '738'),
+        'frowning'                     => array('frowning', '739'),
+        'anguished'                    => array('anguished', '740'),
+        'fearful'                      => array('fearful', '741'),
+        'weary'                        => array('weary', '742'),
+        'sleepy'                       => array('sleepy', '743'),
+        'tired_face'                   => array('tired_face', '744'),
+        'grimacing'                    => array('grimacing', '745'),
+        'sob'                          => array('sob', '746'),
+        'open_mouth'                   => array('open_mouth', '747'),
+        'hushed'                       => array('hushed', '748'),
+        'cold_sweat'                   => array('cold_sweat', '749'),
+        'scream'                       => array('scream', '750'),
+        'astonished'                   => array('astonished', '751'),
+        'flushed'                      => array('flushed', '752'),
+        'sleeping'                     => array('sleeping', '753'),
+        'dizzy_face'                   => array('dizzy_face', '754'),
+        'no_mouth'                     => array('no_mouth', '755'),
         'mask'                         => array('mask', '756'),
         'star'                         => array('star', '123'),
         'cookie'                       => array('cookie', '262'),
@@ -295,24 +295,24 @@ class EditorPlugin extends Gdn_Plugin {
         'mrgreen'                      => array('mrgreen'),
 
         // Love
-        'heart'                        => array('heart', '109'),  
-        'broken_heart'                 => array('broken_heart', '506'),  
+        'heart'                        => array('heart', '109'),
+        'broken_heart'                 => array('broken_heart', '506'),
         'kiss'                         => array('kiss', '497'),
 
         // Hand gestures
-        '+1'                           => array('+1', '435'),  
+        '+1'                           => array('+1', '435'),
         '-1'                           => array('-1', '436'),
-        
+
         // Custom icons, canonical naming
         'trollface'                    => array('trollface', 'trollface'),
-          
-        // This is used for aliases that are set incorrectly above or point 
-        // to items not listed in the canonical list. 
+
+        // This is used for aliases that are set incorrectly above or point
+        // to items not listed in the canonical list.
         'grey_question'                => array('grey_question', '106')
       );
-      
-      // Some aliases self-referencing the canonical list. Use this syntax. 
-      
+
+      // Some aliases self-referencing the canonical list. Use this syntax.
+
       // Vanilla reactions, non-canonical referencing canonical
       $emojiCanonicalList['lol']       = &$emojiCanonicalList['smile'];
       $emojiCanonicalList['wtf']       = &$emojiCanonicalList['dizzy_face'];
@@ -321,68 +321,68 @@ class EditorPlugin extends Gdn_Plugin {
       $emojiCanonicalList['awesome']   = &$emojiCanonicalList['heart'];
 
       $emojiFileSuffix = '.png';
-      
-      // If the $emojiCanonical does not exist in the list, deliver a 
+
+      // If the $emojiCanonical does not exist in the list, deliver a
       // warning emoji, to degrade gracefully.
       if ($emojiCanonical && !isset($emojiCanonicalList[$emojiCanonical])) {
          $emojiCanonical = 'grey_question';
       }
-      
+
       // Return first value from canonical array
       return (!$emojiCanonical)
          ? $emojiCanonicalList
          : $this->buildEmojiFilePath(reset($emojiCanonicalList[$emojiCanonical]) . $emojiFileSuffix);
    }
-   
+
    /**
-    * Provide this method with the official emoji filename and it will return 
-    * the correct path. 
-    * 
+    * Provide this method with the official emoji filename and it will return
+    * the correct path.
+    *
     * @param string $emojiFileName File name of emoji icon.
-    * @return string Root-relative path. 
+    * @return string Root-relative path.
     */
-   protected function buildEmojiFilePath($emojiFileName) {   
+   protected function buildEmojiFilePath($emojiFileName) {
       return $this->AssetPath . '/design/images/emoji/' . $emojiFileName;
    }
-   
+
    /**
-    * This is in case you want to merge the alias list with the canonical list 
-    * and easily loop through the entire possible set of translations to 
-    * perform in, for example, the translateEmojiAliasesToHtml() method, which 
-    * loops through all the visible emojis, and the hidden canonical ones. 
-    * 
-    * @return array Returns array of alias list and canonical list, easily 
-    *               loopable. 
+    * This is in case you want to merge the alias list with the canonical list
+    * and easily loop through the entire possible set of translations to
+    * perform in, for example, the translateEmojiAliasesToHtml() method, which
+    * loops through all the visible emojis, and the hidden canonical ones.
+    *
+    * @return array Returns array of alias list and canonical list, easily
+    *               loopable.
     */
    protected function mergeAliasAndCanonicalList() {
       return array_merge($this->getEmojiAliasList(), $this->buildHiddenAliasListFromCanonicalList());
    }
-   
+
    /**
-    * This is to easily match the array of the visible alias list that all 
-    * users will be able to select from. Call the mergeAliasAndCanonicalList() 
-    * method to merge this array with the alias list, which will then be easy 
-    * to loop through all the possible emoji displayable in the forum. 
-    * 
+    * This is to easily match the array of the visible alias list that all
+    * users will be able to select from. Call the mergeAliasAndCanonicalList()
+    * method to merge this array with the alias list, which will then be easy
+    * to loop through all the possible emoji displayable in the forum.
+    *
     * An alias is [:)]=>[smile], and canonical alias is [:smile:]=>[smile]
-    * 
+    *
     * @return array Returns array that matches format of original alias list
     */
    protected function buildHiddenAliasListFromCanonicalList() {
       $caonicalListEmojiNamesCanonical = array_keys($this->getEmojiCanonicalList());
-      $caonicalListEmojiNamesAliases = $caonicalListEmojiNamesCanonical;      
+      $caonicalListEmojiNamesAliases = $caonicalListEmojiNamesCanonical;
       array_walk($caonicalListEmojiNamesAliases, array($this, 'buildAliasFormat'));
       return array_combine($caonicalListEmojiNamesAliases, $caonicalListEmojiNamesCanonical);
    }
-   
+
    /**
     * Callback method for buildHiddenAliasListFromCanonicalList.
-    * 
-    * Array passed as reference, to be used in above method, 
-    * buildHiddenAliasListFromCanonicalLi, when calling array_walk withthis 
-    * callback, which requires that the method as callback also specify object 
-    * it belongs to. 
-    * 
+    *
+    * Array passed as reference, to be used in above method,
+    * buildHiddenAliasListFromCanonicalLi, when calling array_walk withthis
+    * callback, which requires that the method as callback also specify object
+    * it belongs to.
+    *
     * @param string $val Reference to passed array value
     * @param string $key Reference to passed array key
     */
@@ -391,18 +391,18 @@ class EditorPlugin extends Gdn_Plugin {
    }
 
    /**
-    * Translate all emoji aliases to their corresponding Html image tags. 
-    * 
-    * Thanks to punbb 1.3.5 (GPL License) for function, which was largely 
+    * Translate all emoji aliases to their corresponding Html image tags.
+    *
+    * Thanks to punbb 1.3.5 (GPL License) for function, which was largely
     * inspired from their do_smilies function.
-    * 
+    *
     * @param string $Text The actual user-submitted post
     * @return string Return the emoji-formatted post
     */
    public function translateEmojiAliasesToHtml($Text) {
 		$Text = ' '. $Text .' ';
-      
-      // Determine if hidden emoji aliases are allowed, i.e., the emojis that 
+
+      // Determine if hidden emoji aliases are allowed, i.e., the emojis that
       // are not listed in the official alias list array.
       $emojiAliasList = ($this->emojiInterpretAllowHidden)
               ? $this->mergeAliasAndCanonicalList()
@@ -424,12 +424,12 @@ class EditorPlugin extends Gdn_Plugin {
 
 		return substr($Text, 1, -1);
 	}
-   
+
    /**
-    * This method will grab the permissions array from getAllowedEditorActions, 
-    * build the "kitchen sink" editor toolbar, then filter out the allowed 
-    * ones and return it. 
-    * 
+    * This method will grab the permissions array from getAllowedEditorActions,
+    * build the "kitchen sink" editor toolbar, then filter out the allowed
+    * ones and return it.
+    *
     * @param array $editorToolbar Holds the final copy of allowed editor actions
     * @param array $editorToolbarAll Holds the "kitchen sink" of editor actions
     * @return array Returns the array of allowed editor toolbar actions
@@ -438,7 +438,7 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbar        = array();
       $editorToolbarAll     = array();
       $allowedEditorActions = $this->getAllowedEditorActions();
-      
+
       /**
        * Build color dropdown from array
        */
@@ -446,20 +446,20 @@ class EditorPlugin extends Gdn_Plugin {
       $fontColorList            = $this->getFontColorList();
       foreach ($fontColorList as $fontColor) {
          $editorDataAttr             = '{"action":"color","value":"'. $fontColor .'"}';
-         // Use inline style so that list can be modified without having 
-         // to touch external CSS files. Nevertheless, color class has 
-         // been added in case users want granular customizations. 
-         // However, the post-color-* class will still need to be defined 
-         // when posting these color changes. 
+         // Use inline style so that list can be modified without having
+         // to touch external CSS files. Nevertheless, color class has
+         // been added in case users want granular customizations.
+         // However, the post-color-* class will still need to be defined
+         // when posting these color changes.
          $editorStyleInline          = 'background-color: ' . $fontColor;
          $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, 'title' => $fontColor, 'data-editor' => $editorDataAttr, 'style' => $editorStyleInline));
       }
 
       /**
        * Build emoji dropdown from array
-       * 
-       * Using CSS background images instead of img tag, because CSS images 
-       * do not download until actually displayed on page. display:none 
+       *
+       * Using CSS background images instead of img tag, because CSS images
+       * do not download until actually displayed on page. display:none
        * prevents browsers from loading the resources.
        */
       $toolbarDropdownEmoji = array();
@@ -472,18 +472,18 @@ class EditorPlugin extends Gdn_Plugin {
          //$emojiStyle           = 'background-image: url('. $emojiFilePath .'); background-size: '. $emojiDimension .'px; width: '.$emojiDimension .'px; height:'. $emojiDimension .'px;';
          $emojiStyle             = '';
 
-         // In case user creates an alias that does not match a canonical 
-         // emoji, let them know. 
-         $emojiTitle             = (strpos($emojiFilePath, 'grey_question') === false) 
+         // In case user creates an alias that does not match a canonical
+         // emoji, let them know.
+         $emojiTitle             = (strpos($emojiFilePath, 'grey_question') === false)
                                       ? $emojiAlias
                                       : "Alias '$emojiCanonical' not found in canonical list.";
 
          $toolbarDropdownEmoji[] = array('edit' => 'media', 'action'=> 'emoji', 'type' => 'button', 'html_tag' => 'img', 'attr' => array('class' => 'editor-action emoji emoji-'. $emojiCanonical. ' editor-dialog-fire-close', 'data-wysihtml5-command' => 'insertHTML', 'data-wysihtml5-command-value' => ' '.$emojiAlias .' ', 'title' => $emojiTitle, 'data-editor' => $editorDataAttr, 'src' => $emojiFilePath, 'width' => $emojiDimension, 'height' => $emojiDimension, 'style' => $emojiStyle));
-      }      
+      }
 
       /**
-       * Compile whole list of editor actions into single $editorToolbarAll 
-       * array. Once complete, loop through allowedEditorActions and filter 
+       * Compile whole list of editor actions into single $editorToolbarAll
+       * array. Once complete, loop through allowedEditorActions and filter
        * out the actions that will not be allowed.
        */
       $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => 'Bold', 'data-editor' => '{"action":"bold","value":""}'));
@@ -492,7 +492,7 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['color'] = array('edit' => 'basic', 'action'=> 'color', 'type' => $toolbarDropdownFontColor, 'attr' => array('class' => 'icon icon-font editor-dd-color hidden-xs', 'data-wysihtml5-command-group' => 'foreColor', 'title' => 'Color', 'data-editor' => '{"action":"color","value":""}'));
       $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => 'Ordered list', 'data-editor' => '{"action":"orderedlist","value":""}'));
       $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => 'Unordered list', 'data-editor' => '{"action":"unorderedlist","value":""}'));
-      
+
       $editorToolbarAll['sep-format'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-headers hidden-xs'));
       $editorToolbarAll['format'] = array('edit' => 'format', 'action'=> 'headers', 'type' => array(
              array('edit' => 'format', 'action'=> 'heading1', 'type' => 'button', 'text' => 'Heading 1', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-h1 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h1', 'title' => 'Heading 1', 'data-editor' => '{"action":"heading1","value":""}')),
@@ -501,7 +501,7 @@ class EditorPlugin extends Gdn_Plugin {
              array('edit' => 'format', 'action'=> 'code', 'type' => 'button',     'text' => 'Code', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-code editor-dialog-fire-close', 'data-wysihtml5-command' => 'code', 'title' => 'Code', 'data-editor' => '{"action":"code","value":""}')),
              array('edit' => 'format', 'action'=> 'spoiler', 'type' => 'button', 'text' => 'Spoiler', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-spoiler editor-dialog-fire-close', 'data-wysihtml5-command' => 'spoiler', 'title' => 'Spoiler', 'data-editor' => '{"action":"spoiler","value":""}')),
          ), 'attr' => array('class' => 'icon icon-paragraph editor-dd-format', 'title' => 'Format', 'data-editor' => '{"action":"format","value":""}'));
-      
+
       $editorToolbarAll['sep-media'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-media hidden-xs'));
       $editorToolbarAll['emoji'] = array('edit' => 'media', 'action'=> 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => 'Emoji'));
       $editorToolbarAll['links'] = array('edit' => 'media', 'action'=> 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link', 'data-wysihtml5-command' => 'createLink', 'title' => 'Url', 'data-editor' => '{"action":"url","value":""}'));
@@ -511,45 +511,45 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action'=> 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyLeft', 'title' => 'Align left', 'data-editor' => '{"action":"alignleft","value":""}'));
       $editorToolbarAll['aligncenter'] = array('edit' => 'format', 'action'=> 'aligncenter', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-center editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyCenter', 'title' => 'Align center', 'data-editor' => '{"action":"aligncenter","value":""}'));
       $editorToolbarAll['alignright'] = array('edit' => 'format', 'action'=> 'alignright', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-right editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyRight', 'title' => 'Align right', 'data-editor' => '{"action":"alignright","value":""}'));
-      
-      $editorToolbarAll['sep-switches'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-switches hidden-xs'));     
+
+      $editorToolbarAll['sep-switches'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-switches hidden-xs'));
       $editorToolbarAll['togglehtml'] = array('edit' => 'switches', 'action'=> 'togglehtml', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-source editor-toggle-source editor-dialog-fire-close hidden-xs', 'data-wysihtml5-action' => 'change_view', 'title' => 'Toggle HTML view', 'data-editor' => '{"action":"togglehtml","value":""}'));
       $editorToolbarAll['fullpage'] = array('edit' => 'switches', 'action'=> 'fullpage', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button editor-dialog-fire-close', 'title' => 'Toggle full page', 'data-editor' => '{"action":"fullpage","value":""}'));
       $editorToolbarAll['lights'] = array('edit' => 'switches', 'action'=> 'lights', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-lightbulb editor-toggle-lights-button editor-dialog-fire-close hidden-xs', 'title' => 'Toggle lights', 'data-editor' => '{"action":"lights","value":""}'));
 
-      // Filter out disallowed editor actions 
+      // Filter out disallowed editor actions
       foreach ($allowedEditorActions as $editorAction => $allowed) {
          if ($allowed) {
             $editorToolbar[$editorAction] = $editorToolbarAll[$editorAction];
          }
       }
-      
+
       return $editorToolbar;
    }
 
 
    /**
-    * 
+    *
     * Vanilla event handlers
-    * 
+    *
     */
-   
+
    /**
     * Load CSS into head for editor
     */
-   public function AssetModel_StyleCss_Handler($Sender) {   
+   public function AssetModel_StyleCss_Handler($Sender) {
       $Sender->AddCssFile('editor.css', 'plugins/editor');
    }
-   
+
    /**
 	 * Replace emoticons in comment preview.
 	 */
 	public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
-		if ($this->emojiInterpretAllow) {		
+		if ($this->emojiInterpretAllow) {
          $Sender->Comment->Body = $this->translateEmojiAliasesToHtml($Sender->Comment->Body);
       }
 	}
-   
+
    /**
 	 * Replace emoticons in comments.
 	 */
@@ -560,29 +560,29 @@ class EditorPlugin extends Gdn_Plugin {
          $Sender->EventArguments['Object'] = $Object;
       }
 	}
-   
-   
+
+
    /**
-    * Placed these components everywhere due to some Web sites loading the 
+    * Placed these components everywhere due to some Web sites loading the
     * editor in some areas where the values were not yet injected into HTML.
     */
    public function Base_Render_Before(&$Sender) {
       $c = Gdn::Controller();
-      
-      // If user wants to modify styling of Wysiwyg content in editor, 
+
+      // If user wants to modify styling of Wysiwyg content in editor,
       // they can override the styles with this file.
       $CssInfo = AssetModel::CssPath('wysiwyg.css', 'plugins/editor');
       if ($CssInfo) {
         $CssPath = Asset($CssInfo[1]);
       }
-      
+
       // Load JavaScript
       $c->AddJsFile('editor.js', 'plugins/editor');
-      
+
       // Set definitions for JavaScript to read
       $c->AddDefinition('editorVersion',      $this->pluginInfo['Version']);
       $c->AddDefinition('editorInputFormat',  $this->Format);
-      $c->AddDefinition('editorPluginAssets', $this->AssetPath);         
+      $c->AddDefinition('editorPluginAssets', $this->AssetPath);
       $c->AddDefinition('wysiwygHelpText',    T('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">Wysiwyg</a> in your post.'));
       $c->AddDefinition('bbcodeHelpText',     T('editor.BBCodeHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a> in your post.'));
       $c->AddDefinition('htmlHelpText',       T('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple Html</a> in your post.'));
@@ -590,12 +590,12 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddDefinition('textHelpText',       T('editor.TextHelpText', 'You are using plain text in your post.'));
       $c->AddDefinition('editorWysiwygCSS',   $CssPath);
    }
-      
+
    /**
-    * Attach editor anywhere 'BodyBox' is used. It is not being used for 
+    * Attach editor anywhere 'BodyBox' is used. It is not being used for
     * editing a posted reply, so find another event to hook into.
-    * 
-    * @param Gdn_Form $Sender 
+    *
+    * @param Gdn_Form $Sender
     */
    public function Gdn_Form_BeforeBodyBox_Handler($Sender, $Args) {
       // TODO move this property to constructor
@@ -606,56 +606,56 @@ class EditorPlugin extends Gdn_Plugin {
          $this->Format = C('Garden.InputFormatter','Html');
          $Sender->SetValue('Format', $this->Format);
       }
-      
+
       // If force Wysiwyg enabled in settings
-      if (C('Garden.InputFormatter','Wysiwyg') == 'Wysiwyg' 
-         //&& strcasecmp($this->Format, 'wysiwyg') != 0 
+      if (C('Garden.InputFormatter','Wysiwyg') == 'Wysiwyg'
+         //&& strcasecmp($this->Format, 'wysiwyg') != 0
          && $this->ForceWysiwyg == true) {
-         
+
          $wysiwygBody = Gdn_Format::To($Sender->GetValue('Body'), $this->Format);
          $Sender->SetValue('Body', $wysiwygBody);
-         
+
          $this->Format = 'Wysiwyg';
          $Sender->SetValue('Format', $this->Format);
       }
-      
-      if (in_array(strtolower($this->Format), array_map('strtolower', $this->Formats))) {    
+
+      if (in_array(strtolower($this->Format), array_map('strtolower', $this->Formats))) {
          $c = Gdn::Controller();
-         
+
          // Set minor data for view
          $c->SetData('_EditorInputFormat', $this->Format);
 
          /**
-          * Get the generated editor toolbar from getEditorToolbar, and assign 
+          * Get the generated editor toolbar from getEditorToolbar, and assign
           * it data object for view.
           */
          if ($this->Format != 'Text' && !isset($c->Data['_EditorToolbar'])) {
-            
+
             $editorToolbar = $this->getEditorToolbar();
             $this->EventArguments['EditorToolbar'] =& $editorToolbar;
             $this->FireEvent('InitEditorToolbar');
-            
+
             // Set data for view
             $c->SetData('_EditorToolbar', $editorToolbar);
          }
-         
+
          // Determine which controller (post or discussion) is invoking this.
-         // At the moment they're both the same, but in future you may want 
+         // At the moment they're both the same, but in future you may want
          // to know this information to modify it accordingly.
          $View = $c->FetchView('editor', '', 'plugins/editor');
-         
-         $Args['BodyBox'] = $View.$Args['BodyBox'];
-         
-//         if ($c instanceof PostController) {
-//            echo $View;
-//         } else {
-//            echo $View;
-//         }
+
+//         $Args['BodyBox'] = $View.$Args['BodyBox'];
+
+         if ($c instanceof PostController) {
+            echo $View;
+         } else {
+            echo $View;
+         }
       }
    }
-   
+
    /**
-    * 
+    *
     * @param SettingsController $Sender
     * @param array $Args
     */
@@ -664,24 +664,24 @@ class EditorPlugin extends Gdn_Plugin {
       $Cf = new ConfigurationModule($Sender);
 
       $Formats = array_combine($this->Formats, $this->Formats);
-      
+
       $Cf->Initialize(array(
           'Garden.InputFormatter' => array('LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p> <p><small><strong>Note:</strong> the editor will auto-detect the format of old posts when emending them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</small></p>', 'Items' => $Formats),
           'Plugins.editor.ForceWysiwyg' => array('LabelCode' => 'Reinterpret All Posts As Wysiwyg', 'Control' => 'Checkbox', 'Description' => '<p>Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.</p> <p><small><strong>Note:</strong> This setting will only take affect if Wysiwyg was chosen as the Post Format above.</p>')
       ));
-      
+
       // Add some JS and CSS to blur out option when Wysiwyg not chosen.
       $c = Gdn::Controller();
       $c->AddJsFile('settings.js', 'plugins/editor');
       $Sender->AddCssFile('settings.css', 'plugins/editor');
-      
+
       $Sender->AddSideMenu();
       $Sender->SetData('Title', T('Advanced Editor Settings'));
       $Cf->RenderAll();
       //$Sender->Cf = $Cf;
       //$Sender->Render('settings', '', 'plugins/editor');
-   }   
-   
+   }
+
    /*
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
@@ -689,30 +689,30 @@ class EditorPlugin extends Gdn_Plugin {
       $Menu->AddLink('Appearance', 'Advanced Editor', 'settings/editor', 'Garden.Settings.Manage');
    }
    */
-   
-   
+
+
    /**
-	 * Every time editor plugin is enabled, disable other known editors that 
-    * may clash with this one. If editor is loaded, then thes other 
-    * editors loaded after, there are CSS rules that hide them. This way, 
+	 * Every time editor plugin is enabled, disable other known editors that
+    * may clash with this one. If editor is loaded, then thes other
+    * editors loaded after, there are CSS rules that hide them. This way,
     * the editor plugin always takes precedence.
 	 */
-	public function Setup() {        
+	public function Setup() {
       $pluginEditors = array(
-          'cleditor', 
+          'cleditor',
           'ButtonBar',
           'Emotify'
       );
-      
+
       foreach ($pluginEditors as $pluginName) {
-         Gdn::PluginManager()->DisablePlugin($pluginName); 
+         Gdn::PluginManager()->DisablePlugin($pluginName);
       }
 
       SaveToConfig(array(
          'Plugins.editor.ForceWysiwyg' => false
       ));
 	}
-   
+
    public function OnDisable() {
 		//RemoveFromConfig('Plugin.editor.DefaultView');
 	}
