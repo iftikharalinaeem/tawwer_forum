@@ -67,7 +67,7 @@ class Warnings2Plugin extends Gdn_Plugin {
       
       if (isset($Row->Attributes['WarningID']) && $Row->Attributes['WarningID']) {
          echo '<div class="DismissMessage Warning">'. 
-            sprintf(T('%s was warned for this post.', '%s was <a href="%s">warned</a> for this post.'), 
+            sprintf(T('%s was warned for this post.', '%s was <a href="%s">warned</a> for this post with WarningID='.$Row->Attributes['WarningID'].'.'),
                htmlspecialchars(GetValue('InsertName', $Row)),
                UserUrl($Row, 'Insert', 'notes')),
             '</div>';
