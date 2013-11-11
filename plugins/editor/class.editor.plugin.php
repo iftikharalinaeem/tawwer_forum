@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.0.33',
+   'Version' => '1.0.40',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -644,13 +644,7 @@ class EditorPlugin extends Gdn_Plugin {
          // to know this information to modify it accordingly.
          $View = $c->FetchView('editor', '', 'plugins/editor');
 
-//         $Args['BodyBox'] = $View.$Args['BodyBox'];
-
-//         if ($c instanceof PostController) {
-//            echo $View;
-//         } else {
-//            echo $View;
-//         }
+         $Args['BodyBox'] = $View.$Args['BodyBox'];
       }
    }
 
