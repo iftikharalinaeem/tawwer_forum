@@ -87,9 +87,6 @@
                var fullPageCandidate = $('#editor-fullpage-candidate');
                var editorToolbar = $(fullPageCandidate).find('.editor');
 
-              // experimental lights toggle for chrome.
-              toggleLights();
-
                // When textarea pushes beyond viewport of its container, a 
                // scrollbar appears, which pushes the textarea left, while the 
                // fixed editor toolbar does not move, so push it over.
@@ -124,7 +121,7 @@
                $(toggleButton).removeClass('icon-resize-small');
 
                // for experimental chrome lights toggle
-               $('.editor-toggle-lights-button').attr('style', '');
+               //$('.editor-toggle-lights-button').attr('style', '');
 
                // Auto scroll to correct location upon exiting fullpage.
                var scrollto = $(toggleButton).closest('.Comment');
@@ -146,6 +143,10 @@
             } else {
                editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
             }
+            
+            // Toggle lights while in fullpage (lights off essentially makes 
+            // the background black and the buttons lighter.
+            toggleLights();
          };
 
          /**
@@ -212,23 +213,71 @@
          }());
 
          /**
-          * Lights on/off in fullpage--experimental for chrome
+          * Lights on/off in fullpage
+          * 
+          * Note: Wysiwyg makes styling the BodyBox more difficult as it's an 
+          * iframe. Consequently, JavaScript has to override all the styles 
+          * that skip the iframe, and tie into the focus and blur events to 
+          * override the Wysihtml5 inline style events.
           */
          var toggleLights = function() {
             // Just do it for chrome right now. Very experimental.
-            if (window.chrome) {
-               var toggleLights = $('.editor-toggle-lights-button');           
-               $(toggleLights).attr('style', 'display:inline-block !important').off('click').on('click', function() {
-                  var fullPageCandidate = $('#editor-fullpage-candidate');
-                  if (!$(fullPageCandidate).hasClass('editor-lights-candidate')) {
-                     $(fullPageCandidate).addClass('editor-lights-candidate');
-                  } else {
-                     $(fullPageCandidate).removeClass('editor-lights-candidate');
-                  }
-               });
+            var toggleLights = $('.editor-toggle-lights-button');     
+            var fullPageCandidate = $('#editor-fullpage-candidate');
+            var ifr = {};
+
+            if (fullPageCandidate.length) {
+               $(toggleLights).attr('style', 'display:inline-block !important');
+               
+               // Due to wysiwyg styles embedded inline and states changed 
+               // using JavaScript, all the styles have to be duplicated from 
+               // the external stylesheet and override the iframe inlines.
+               ifr = $(fullPageCandidate).find('.wysihtml5-sandbox');
+               if (ifr.length) {
+                  var iframeBodyBox = ifr.contents().find('.BodyBox');
+                  iframeBodyBox.css({
+                     "transition": "background-color 0.4s ease, color 0.4s ease"
+                  });
+               }
+            } else {
+               $(toggleLights).attr('style', '');
             }
+
+            $(toggleLights).off('click').on('click', function() {
+               if (!$(fullPageCandidate).hasClass('editor-lights-candidate')) {
+                  $(fullPageCandidate).addClass('editor-lights-candidate');
+                  
+                  // Again, for Wysiwyg, override styles
+                  if (ifr.length) {
+                     // if wysiwyg, need to manipulate content in iframe
+                     iframeBodyBox.css({
+                        "background-color": "#000 !important",
+                        "color": "#999999 !important"
+                     });
+
+                     iframeBodyBox.on('focus blur', function(e) {
+                        $(this).css({
+                           "background-color": "#000 !important",
+                           "color": "#999999 !important"
+                        });
+                     });
+                  }
+               } else {
+                  $(fullPageCandidate).removeClass('editor-lights-candidate');
+                  
+                  // Wysiwyg override styles
+                  if (ifr.length) {
+                     iframeBodyBox.off('focus blur');
+
+                     // if wysiwyg, need to manipulate content in iframe
+                     iframeBodyBox.css({
+                        "background-color": "",
+                        "color": ""
+                     });
+                  }
+               }
+            });
          };
-         
       };
 
       /**
@@ -265,9 +314,13 @@
         * Helper function to select whole text of an input or textarea on focus
         */
        var editorSelectAllInput = function(obj) {
-          // selectionStart is implied 0
-          obj.selectionEnd = obj.value.length;
-          obj.focus();
+          // Check if can access selection, as programmatically triggering the 
+          // dd close event throws an error here.
+          if (obj.selectionEnd) {
+            // selectionStart is implied 0
+            obj.selectionEnd = obj.value.length;
+            obj.focus();
+          }
        };
 
       /**
@@ -297,24 +350,46 @@
                   $(el).removeClass('editor-dropdown-open');
                   $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                });
-
-               parentEl.addClass('editor-dropdown-open');
-
-               // if has input, focus and move caret to end of text
-               var inputBox = $(this).find('.InputBox');
-               if (inputBox.length) {
-                  editorSelectAllInput(inputBox[0]);
+               
+               // If the editor action buttons have been disabled (by switching 
+               // to HTML code view, then do not allow dropdowns. CSS pointer-
+               // events should have taken care of this, but JS still fires the 
+               // event regardless, so disable them here as well.
+               if (!parentEl.hasClass('wysihtml5-commands-disabled')) {
+                  parentEl.addClass('editor-dropdown-open');
+                  
+                  // if has input, focus and move caret to end of text
+                  var inputBox = $(this).find('.InputBox');
+                  if (inputBox.length) {
+                     editorSelectAllInput(inputBox[0]);
+                  }
                }
             }
          });
-         
-         // For now, do not let Enter key close and insert text, as it 
-         // causes buggy behaviour with dropdowns.
-         $('.InputBox').on('keydown', function(e) {
+
+         // Handle Enter key
+         $('.editor-dropdown').find('.InputBox').on('keydown', function(e) {
             if (e.which == 13) {
-               e.stopPropagation();
-               e.preventDefault();
-               return false;
+               // Cancel enter key submissions on these values.
+               if (this.value == '' 
+               || this.value == 'http://' 
+               || this.value == 'https://') {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  return false;
+               }
+               
+               // Make exception for non-wysiwyg, as wysihtml5 has custom 
+               // key handler.
+               if (!$(this).closest('.editor').hasClass('editor-format-wysiwyg')) {
+                  // Fire event programmatically to do what needs to be done in 
+                  // ButtonBar code.
+                  $(this).parent().find('.Button').trigger('click.insertData');
+
+                  e.stopPropagation();
+                  e.preventDefault();
+                  return false;
+               }
             }
          });
 
@@ -323,7 +398,7 @@
          $('.TextBoxWrapper').add($('.wysihtml5-sandbox').contents().find('html')).each(function(i, el) {
             $(el).addClass('editor-dialog-fire-close');
          });
-
+         
          // Target all elements in the document that fire the dropdown close 
          // (some are written directly as class in view), then add the matches 
          // from within the iframe, and attach the relevant callbacks to events.
