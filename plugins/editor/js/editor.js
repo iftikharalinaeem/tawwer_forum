@@ -593,6 +593,15 @@
          // paragraphs should follow. 
          var insertNull = function() {
             if (!window.chrome) {
+               // When placeholder attribute set, Firefox does not clear it, and this 
+               // is due to this nullfix. Chrome handles it okay, though this 
+               // whole function (nullFix) is just a mess of flimflam. 
+               // Paragraphing in Wysihtml5 added many exceptions.
+               if (editor.composer.placeholderSet) {
+                  // Just clear it on Firefox, then insert null fix.
+                  editor.composer.setValue('');
+               }
+               
                editor.composer.commands.exec("insertHTML", "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
             } else {
                editor.composer.setValue(editor.composer.getValue() + "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
@@ -613,7 +622,7 @@
          // inserting null on backspace when empty. I could just interval 
          // check for emptiness, but this nullFix is already too hackish.
          // OKAY no. Return to this problem in future. 
-         $(editor.composer.doc).on('keyup', function(e){
+         $(editor.composer.doc).on('keyup', function(e) {
             // Backspace
             if (e.which == 8) {
                if (!editor.composer.getValue().length) {
@@ -683,7 +692,13 @@
          })
          .on("destroy:composer", function() {
            console.log('destroy:composer');
-         }); 
+         })
+         .on("set_placeholder", function() {
+            console.log('set_placeholder');
+         })
+         .on("unset_placeholder", function(e) {
+            console.log('unset_placeholder');
+         });
       };
 
       /**
@@ -801,7 +816,7 @@
                          // Array (or single string) of stylesheet urls to be loaded in the editor's iframe
                          stylesheets:          stylesheetsInclude,
                          // Placeholder text to use, defaults to the placeholder attribute on the textarea element
-                         placeholderText:      "Write something!",
+                         //placeholderText:      "Write something!",
                          // Whether the composer should allow the user to manually resize images, tables etc.
                          allowObjectResizing:  true,
                          // Whether the rich text editor should be rendered on touch devices (wysihtml5 >= 0.3.0 comes with basic support for iOS 5)
