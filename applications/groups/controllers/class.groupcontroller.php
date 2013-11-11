@@ -351,6 +351,7 @@ class GroupController extends Gdn_Controller {
    protected function AddEdit($ID = FALSE) {
       $Form = new Gdn_Form();
       $Form->SetModel($this->GroupModel);
+      Gdn_Theme::Section('Post');
       
       if ($ID) {
          $Group = $this->GroupModel->GetID($ID);
@@ -423,6 +424,7 @@ class GroupController extends Gdn_Controller {
       $this->AddModule('BookmarkedModule');
       
       $this->SetData('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary', 'QueryString' => $NewDiscussionModule->QueryString));
+      $this->Data['_properties']['newdiscussionmodule'] = array('CssClass' => 'Button Action Primary', 'QueryString' => $NewDiscussionModule->QueryString);
       
       $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       $this->AddBreadcrumb(T('Discussions'));

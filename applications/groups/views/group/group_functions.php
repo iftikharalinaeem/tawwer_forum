@@ -271,7 +271,7 @@ function WriteGroupButtons($Group = NULL) {
       $Options['Leave'] = array('Text' => T('Leave Group'), 'Url' => GroupUrl($Group, 'leave'), 'CssClass' => 'Popup');
    }
    
-   if (GroupPermission('Leader', $Group)) {
+   if (GroupPermission('Delete', $Group)) {
       $Options['Delete'] = array('Text' => T('Delete Group'), 'Url' => GroupUrl($Group, 'delete'), 'CssClass' => 'Popup');
    }
 
