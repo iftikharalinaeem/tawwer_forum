@@ -508,6 +508,7 @@ class WhispersPlugin extends Gdn_Plugin {
                $Sender->RedirectUrl = Url("discussion/$DiscussionID/$Name?rand=$Rand#$Hash", TRUE);
             }
          }
+         require_once $Sender->FetchViewLocation('helper_functions', 'Discussion');
          $Sender->Render();
       } else {
          return call_user_func_array(array($Sender, 'Comment'), $Args);
