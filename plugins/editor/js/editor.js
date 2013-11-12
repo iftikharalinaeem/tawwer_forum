@@ -464,6 +464,14 @@
             // quoted string, which upsets wysihtml5 paragraphing, so replace 
             // it with proper block ending to make sure paragraphs continue.
             data = data.replace(/<br\s?\/?>$/, '<p><br></p>');
+            
+            // Read nullFix function for full explanation. Essentially, 
+            // placeholder does not get removed, so remove it manually if 
+            // one is set.
+            if (editor.composer.placeholderSet) {
+               // Just clear it on Firefox, then insert null fix.
+               editor.composer.setValue('');
+            }
 
             editor.composer.commands.exec("insertHTML", data);
 
