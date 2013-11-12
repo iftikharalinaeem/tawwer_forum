@@ -2,7 +2,7 @@
 
 $PluginInfo['readless'] = array(
    'Name' => 'Read Less',
-   'Description' => 'Shortens posts in a discussion to a given length, but allows the full text to be read by clicking the Read More button.',
+   'Description' => 'Truncate posts in a discussion to a given max pixel height, but allow the full text to be read by clicking the Read More button.',
    'Version' => '1.0.0',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
@@ -18,25 +18,44 @@ $PluginInfo['readless'] = array(
 
 class ReadLess extends Gdn_Plugin {
 
+   protected $max_height;
+   protected $max_height_default = 200;
 
+   public function __construct() {
+      parent::__construct();
+      
+      $max_height = intval(C('Plugins.readless.maxheight', $this->max_height_default));
+      $this->max_height = (is_int($max_height)) 
+              ? $max_height
+              : $this->max_height_default;
+   }
+   
+   public function Base_Render_Before($sender) {
+      $c = Gdn::Controller();
+      $c->AddDefinition('readlessMaxHeight', $this->max_height);
+      $sender->AddCssFile('readless.css', 'plugins/readless');
+      $c->AddJsFile('readless.js', 'plugins/readless');
+   }
+   
    /**
-	 * Replace emoticons in comment preview.
-	 */
-	public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
-		if ($this->emojiInterpretAllow) {
-         $Sender->Comment->Body = $this->translateEmojiAliasesToHtml($Sender->Comment->Body);
-      }
-	}
+    *
+    * @param SettingsController $sender
+    * @param array $args
+    */
+   public function SettingsController_Readless_Create($sender, $args) {
+      $sender->Permission('Garden.Settings.Manage');
+      $cf = new ConfigurationModule($sender);
 
-   /**
-	 * Replace emoticons in comments.
-	 */
-	public function Base_AfterCommentFormat_Handler($Sender) {
-		if ($this->emojiInterpretAllow) {
-         $Object = $Sender->EventArguments['Object'];
-         $Object->FormatBody = $this->translateEmojiAliasesToHtml($Object->FormatBody);
-         $Sender->EventArguments['Object'] = $Object;
-      }
-	}
+      $cf->Initialize(array(
+          'Plugins.readless.maxheight' => array('LabelCode' => 'Max Height', 'Control' => 'TextBox', 'Description' => 'Set the max pixel height of each post in a discusion. When text goes beyond this limit, a "Read More" button will b displayed to allow the text to be expanded.')
+      ));
 
+      $sender->AddSideMenu();
+      $sender->SetData('Title', T('Read Less Settings'));
+      $cf->RenderAll();
+   }
+   
+   public function Setup() {
+      TouchConfig('Plugins.readless.maxheight', $this->max_height_default); 
+   }
 }
