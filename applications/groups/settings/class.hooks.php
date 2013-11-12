@@ -54,6 +54,22 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
    
+   /**
+    * Make sure the user has permission to view the group
+    * @param DiscussionController $Sender
+    * @param type $Args
+    */
+   public function DiscussionController_Index_Render($Sender, $Args) {
+      $GroupID = $Sender->Data('Discussion.GroupID');
+      if (!$GroupID)
+         return;
+      
+      $ViewPermission = GroupPermission('View', $GroupID);
+      if (!$ViewPermission) {
+         throw ForbiddenException('@'.GroupPermission('View.Reason', $GroupID));
+      }
+   }
+   
    public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
       $GroupID = Gdn::Request()->Get('groupid');
       if ($GroupID) {
