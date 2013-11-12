@@ -600,7 +600,7 @@
   border-radius: 3px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   min-width: 120px;
-  z-index: 10;
+  z-index: 10000;
 }
 
 .atwho-view .cur {
@@ -609,11 +609,11 @@
 }
 
 .atwho-view .cur small {
-  color: #fff;
+  color: white;
 }
 
 .atwho-view strong {
-  color: #36F;
+  color: #3366ff;
 }
 
 .atwho-view .cur strong {
