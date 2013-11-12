@@ -328,7 +328,7 @@
        * more than one dialog/dropdown appear at once. 
        */
       var editorSetupDropdowns = function(editorInstance) { 
-         $('.editor-dropdown')
+         $('.editor-dropdown .editor-action')
          .off('click.dd')
          .on('click.dd', function(e) {
             var parentEl = $(e.target).parent();
@@ -340,13 +340,13 @@
                }, 0);
             });
 
-            if ($(this).hasClass('editor-dropdown') 
-            && $(this).hasClass('editor-dropdown-open')) {
+            if (parentEl.hasClass('editor-dropdown') 
+            && parentEl.hasClass('editor-dropdown-open')) {
                parentEl.removeClass('editor-dropdown-open');
                //$(parentEl).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
             } else {
                // clear other opened dropdowns before opening this one
-               $(this).parent('.editor').find('.editor-dropdown-open').each(function(i, el) {
+               $(parentEl).parent('.editor').find('.editor-dropdown-open').each(function(i, el) {
                   $(el).removeClass('editor-dropdown-open');
                   $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                });
@@ -359,7 +359,7 @@
                   parentEl.addClass('editor-dropdown-open');
                   
                   // if has input, focus and move caret to end of text
-                  var inputBox = $(this).find('.InputBox');
+                  var inputBox = parentEl.find('.InputBox');
                   if (inputBox.length) {
                      editorSelectAllInput(inputBox[0]);
                   }
