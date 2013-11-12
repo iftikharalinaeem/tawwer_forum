@@ -408,7 +408,7 @@ class GroupModel extends Gdn_Model {
          default:
             throw new Gdn_UserException("Unknown column $Column");
       }
-      $Sql .= " where p.GroupID = $GroupID";
+      $Sql .= " where p.GroupID = ".$this->Database->Connection()->quote($GroupID);
       $this->Database->Query($Sql);
    }
    
