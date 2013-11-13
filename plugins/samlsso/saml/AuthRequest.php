@@ -5,7 +5,7 @@ require_once('Settings.php');
  */
 class OneLogin_Saml_AuthRequest
 {
-    const ID_PREFIX = 'ONELOGIN';
+    const ID_PREFIX = 'VANILLA';
 
     /**
      * A SamlResponse class provided to the constructor.
@@ -34,7 +34,7 @@ class OneLogin_Saml_AuthRequest
     {
         $id = $this->_generateUniqueID();
         $issueInstant = $this->_getTimestamp();
-        
+
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -57,22 +57,22 @@ AUTHNREQUEST;
         $deflatedRequest = gzdeflate($request);
         $base64Request = base64_encode($deflatedRequest);
         $get = array('SAMLRequest' => $base64Request);
-       
+
         try {
             $this->signRequest($get);
         } catch (Exception $ex) {
            // do nothing.
         }
-        
+
         return $this->_settings->idpSingleSignOnUrl.
            (strpos($this->_settings->idpSingleSignOnUrl, '?') === false ? '?' : '&').
            http_build_query($get);
     }
-    
+
     public function signRequest(&$get) {
        if (!$this->_settings->spPrivateKey)
           return;
-       
+
        // Construct the string.
        $get['SigAlg'] = XMLSecurityKey::RSA_SHA1;
        $msg = http_build_query($get);
