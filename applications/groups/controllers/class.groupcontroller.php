@@ -355,8 +355,19 @@ class GroupController extends Gdn_Controller {
       
       if ($ID) {
          $Group = $this->GroupModel->GetID($ID);
+         
+         if (!$Group) {
+            throw NotFoundException('Group');
+         }
+         
+         // Make sure the user can edit this group.
+         if (!$this->GroupModel->CheckPermission('Edit', $Group))
+            throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Edit.Reason', $Group));
+         
          $this->SetData('Group', $Group);
          $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+      } else {
+         
       }
       
       // Get a list of categories suitable for the category dropdown.
@@ -368,6 +379,10 @@ class GroupController extends Gdn_Controller {
          // We need to save the images before saving to the database.
          self::SaveImage($Form, 'Icon', array('Prefix' => 'groups/icons/icon_', 'Size' => C('Groups.IconSize', 100), 'Crop' => TRUE));
          self::SaveImage($Form, 'Banner', array('Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => TRUE, 'OutputType' => 'jpeg'));
+         
+         // Make sure the group ID can't be spoofed.
+         if ($ID)
+            $Form->SetFormValue('GroupID', $this->Data('Group.GroupID'));
          
          try {
             $GroupID = $Form->Save();
@@ -384,7 +399,6 @@ class GroupController extends Gdn_Controller {
          if ($ID) {
             // Load the group.
             $Form->SetData($Group);
-            $Form->AddHidden('GroupID', $Group['GroupID']);
          } else {
             // Set some default settings.
             $Form->SetValue('Registration', 'Public');
