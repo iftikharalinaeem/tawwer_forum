@@ -24,7 +24,7 @@ class Reporting2Plugin extends Gdn_Plugin {
    
    public function Structure() {
       Gdn::Structure()->Table('Category')
-         ->Column('Type', 'varchar(20)')
+         ->Column('Type', 'varchar(20)', TRUE)
          ->Set();
       
       // Try and find the category by type.
