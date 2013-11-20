@@ -317,13 +317,17 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
       
       $dfields = array('d.Name', 'd.Body');
       $cfields = 'c.Body';
-      
+
       /// Search query ///
-      
+
       $terms = GetValue('search', $search);
       if ($terms)
          $terms = $pdo->quote('%'.str_replace(array('%', '_'), array('\%', '\_'), $terms).'%');
-      
+
+      // Only search if we have term, user, date, or title to search
+      if (!$terms && !isset($search['users']) && !isset($search['date-from']) && !isset($search['date-to']) && !isset($search['title']))
+         return array();
+
       /// Title ///
       
       if (isset($search['title'])) {
