@@ -20,6 +20,19 @@ class SamlSSOPlugin extends Gdn_Plugin {
    /// Methods ///
 
    /**
+    * Force a saml authentication to the identity provider.
+    * @param bool $passive Whether or not to make a passive request.
+    */
+   public function authenticate($passive = false) {
+      $settings = $this->GetSettings();
+      $request = new OneLogin_Saml_AuthRequest($settings);
+      $request->isPassive = $passive;
+      $url = $request->getRedirectUrl();
+      Gdn::Session()->Stash('samlsso', NULL, TRUE);
+      Redirect($url);
+   }
+
+   /**
     * @return OneLogin_Saml_Settings
     */
    public function GetSettings() {
@@ -154,6 +167,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
    public function EntryController_Saml_Create($Sender) {
       $settings = $this->GetSettings();
       $request = new OneLogin_Saml_AuthRequest($settings);
+      $request->isPassive = (bool)$Sender->Request->Get('ispassive');
       $url = $request->getRedirectUrl();
       Gdn::Session()->Stash('samlsso', NULL, TRUE);
       Redirect($url);
@@ -226,6 +240,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
          // Grab the saml session from the saml response.
          $settings = $this->GetSettings();
          $response = new OneLogin_Saml_Response($settings, $Sender->Request->Post('SAMLResponse'));
+         $xml = $response->document->saveXML();
+
          if (!$response->isValid()) {
             throw new Gdn_UserException("The saml response was not valid.");
          }
