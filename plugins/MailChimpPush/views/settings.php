@@ -97,6 +97,10 @@
    </div>
    
    <div class="Warning"><?php echo T('API Authentication settings'); ?></div>
+   <div class="Info">
+      <?php echo Anchor(T('How to find your MailChimp API key'),
+         'http://kb.mailchimp.com/article/where-can-i-find-my-api-key'); ?>
+   </div>
    <ul>
       <li><?php
          echo $this->Form->Label("API Key", "ApiKey");
