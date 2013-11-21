@@ -328,7 +328,7 @@
        * more than one dialog/dropdown appear at once. 
        */
       var editorSetupDropdowns = function(editorInstance) { 
-         $('.editor-dropdown')
+         $('.editor-dropdown .editor-action')
          .off('click.dd')
          .on('click.dd', function(e) {
             var parentEl = $(e.target).parent();
@@ -340,13 +340,13 @@
                }, 0);
             });
 
-            if ($(this).hasClass('editor-dropdown') 
-            && $(this).hasClass('editor-dropdown-open')) {
+            if (parentEl.hasClass('editor-dropdown') 
+            && parentEl.hasClass('editor-dropdown-open')) {
                parentEl.removeClass('editor-dropdown-open');
                //$(parentEl).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
             } else {
                // clear other opened dropdowns before opening this one
-               $(this).parent('.editor').find('.editor-dropdown-open').each(function(i, el) {
+               $(parentEl).parent('.editor').find('.editor-dropdown-open').each(function(i, el) {
                   $(el).removeClass('editor-dropdown-open');
                   $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                });
@@ -359,7 +359,7 @@
                   parentEl.addClass('editor-dropdown-open');
                   
                   // if has input, focus and move caret to end of text
-                  var inputBox = $(this).find('.InputBox');
+                  var inputBox = parentEl.find('.InputBox');
                   if (inputBox.length) {
                      editorSelectAllInput(inputBox[0]);
                   }
@@ -641,6 +641,39 @@
       };
 
       /**
+       * Mobile devices don't play too well with contenteditable within an
+       * iFrame, particularly iOS.
+       */
+      var iOSwysiFix = function(editor) {
+
+         // iOS keyboard does not push content up initially,
+         // thus blocking the actual content. Typing (spaces, newlines) also
+         // jump the page up, so keep it in view.
+         if (window.parent.location != window.location 
+         && (/ipad|iphone|ipod/i).test(navigator.userAgent)) {
+
+            var contentEditable = $(editor.composer.iframe).contents().find('body');
+            contentEditable.attr('autocorrect', 'off');
+            contentEditable.attr('autocapitalize', 'off');
+
+            var iOSscrollFrame = $(window.parent.document).find('#vanilla-iframe').contents();
+            var iOSscrollTo = $(iOSscrollFrame).find('#'+editor.config.toolbar).closest('form').find('.Buttons');
+
+            contentEditable.on('keydown keyup', function(e) {
+               Vanilla.scrollTo(iOSscrollTo);
+               editor.focus();
+            });
+
+            editor.on('focus', function() {
+               //var postButton = $('#'+editor.config.toolbar).parents('form').find('.CommentButton');
+               setTimeout(function() {
+                 Vanilla.scrollTo(iOSscrollTo);
+               }, 1);
+            });
+         }
+      }
+
+      /**
        * This will only be called when debug=true;
        */
       var wysiDebug = function(editorInstance) {
@@ -732,7 +765,8 @@
             t = $(textareaObj).closest('form');
          }
 
-         var currentEditorFormat     = t.find('#Form_Format');
+         //var currentEditorFormat     = t.find('#Form_Format');
+         var currentEditorFormat     = t.find('input[name="Format"]');
          var currentEditorToolbar    = '';
          var currentEditableTextarea = '';
          var currentTextBoxWrapper   = '';
@@ -752,7 +786,8 @@
              currentEditorFormat     = currentEditorFormat[0].value.toLowerCase();
              format                  = currentEditorFormat + '';
              currentEditorToolbar    = t.find('.editor-format-'+ format);
-             currentEditableTextarea = t.find('#Form_Body');
+             //currentEditableTextarea = t.find('#Form_Body');
+             currentEditableTextarea = t.find('.BodyBox');
  
             if (textareaObj) {
                 currentEditableTextarea = textareaObj;
@@ -836,9 +871,10 @@
                       // instantiate new editor
                       var editor = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
 
-                      editor.on('load', function() {
+                      editor.on('load', function(e) {
+
                          // enable auto-resize
-                         $(editor.composer.iframe).wysihtml5_size_matters();  
+                         $(editor.composer.iframe).wysihtml5_size_matters();
                          editorHandleQuotesPlugin(editor);
                          
                          // Clear textarea/iframe content on submit. 
@@ -856,7 +892,10 @@
                          // Fix problem of editor losing its default p tag 
                          // when loading another instance on the same page. 
                          nullFix(editor);
-                        
+
+                        // iOS
+                        iOSwysiFix(editor);
+
                          //wysiPasteFix(editor);
                          fullPageInit(editor);
                          editorSetupDropdowns(editor);
@@ -866,7 +905,7 @@
                            //scrollToEditorContainer(editor.textarea.element);
                            editor.focus();
                          }
-                         
+
                          if (debug) {
                             wysiDebug(editor);
                          }
