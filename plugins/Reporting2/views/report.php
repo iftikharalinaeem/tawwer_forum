@@ -10,9 +10,18 @@ echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
    <ul>
+      <?php if ($this->Data('Reasons')) : ?>
+         <li>
+            <?php
+            echo $this->Form->Label(T('ReportingLabelReason', 'Reason'), 'Reason');
+            echo $this->Form->DropDown('Reason', $this->Data('Reasons'));
+            ?>
+         </li>
+      <?php endif; ?>
       <li>
          <?php
-         echo $this->Form->Label('Reason', 'Body');
+         $BodyLabel = $this->Data('Reasons') ? T('ReportingLabelNotes','Notes') : T('ReportingLabelReason', 'Reason');
+         echo $this->Form->Label($BodyLabel, 'Body');
          echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
          ?>
       </li>

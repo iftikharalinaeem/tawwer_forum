@@ -9,8 +9,8 @@ $PluginInfo['Reporting2'] = array(
    'Description' => 'Allows users to report posts to moderators for abuse, terms of service violations etc.',
    'Version' => '2.0b',
    'RequiredApplications' => array('Vanilla' => '2.1'),
-   //'SettingsUrl' => '/settings/reporting',
-   'SettingsPermission' => 'Garden.Users.Manage',
+   'SettingsUrl' => '/settings/reporting',
+   'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'
@@ -21,7 +21,10 @@ class Reporting2Plugin extends Gdn_Plugin {
    public function Setup()  {
       $this->Structure();
    }
-   
+
+   /**
+    * Add a category 'Type' and a special category for reports.
+    */
    public function Structure() {
       Gdn::Structure()->Table('Category')
          ->Column('Type', 'varchar(20)')
@@ -73,7 +76,7 @@ class Reporting2Plugin extends Gdn_Plugin {
    }
 
    /**
-    *
+    * Generates the 'Report' button in the Reactions Flag menu.
     *
     * @param $Row
     * @param $RecordType
@@ -91,6 +94,26 @@ class Reporting2Plugin extends Gdn_Plugin {
    }
 
    /// Controller ///
+
+   /**
+    * Set up optional default reasons.
+    */
+   public function SettingsController_Reporting_Create($Sender) {
+      $Sender->Permission('Garden.Settings.Manage');
+
+      $Conf = new ConfigurationModule($Sender);
+      $ConfItems = array(
+         'Plugins.Reporting2.Reasons' => array(
+            'Description' => 'Optionally add pre-defined reasons a user must select from to report content. One reason per line.',
+            'Options' => array('MultiLine' => TRUE, 'Class' => 'TextBox'))
+      );
+      $Conf->Initialize($ConfItems);
+
+      $Sender->AddSideMenu();
+      $Sender->SetData('Title', 'Reporting Settings');
+      $Sender->ConfigurationModule = $Conf;
+      $Conf->RenderAll();
+   }
 
    /**
     * Handles report actions.
@@ -114,7 +137,21 @@ class Reporting2Plugin extends Gdn_Plugin {
 
       $Sender->SetData('Title', sprintf(T('Report %1s'), $RecordType, 'Report'));
 
+      // Set up data for Reason dropdown
+      $Sender->SetData('Reasons', FALSE);
+      if ($Reasons = C('Plugins.Reporting2.Reasons', FALSE)) {
+         $Reasons = explode("\n",$Reasons);
+         $Sender->SetData('Reasons', array_combine($Reasons,$Reasons));
+      }
+
+      // Handle form submission / setup
       if ($Sender->Form->AuthenticatedPostBack()) {
+         // If optional Reason field is set, prepend it to the Body with labels
+         if ($Reason = $Sender->Form->GetFormValue('Reason')) {
+            $Body = 'Reason: '.$Reason."\n".'Notes: '.$Sender->Form->GetFormValue('Body');
+            $Sender->Form->SetFormValue('Body', $Body);
+         }
+
          if ($Sender->Form->Save())
             $Sender->InformMessage(T('FlagSent', "Your complaint has been registered."));
       }
@@ -163,6 +200,12 @@ class Reporting2Plugin extends Gdn_Plugin {
 
 if (!function_exists('FormatQuote')):
 
+/**
+ * Build our flagged content quote for the new discussion.
+ *
+ * @param $Body
+ * @return string
+ */
 function FormatQuote($Body) {
    if (is_object($Body)) {
       $Body = (array)$Body;
