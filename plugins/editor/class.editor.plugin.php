@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.0.42',
+   'Version' => '1.0.43',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -35,6 +35,11 @@ class EditorPlugin extends Gdn_Plugin {
     * @var array List of possible formats the editor supports.
     */
    protected $Formats = array('Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text', 'TextEx');
+
+   /**
+    * Mobile formats
+    */
+   protected $MobileFormats = array('Text', 'TextEx');
 
    /**
     *
@@ -488,7 +493,7 @@ class EditorPlugin extends Gdn_Plugin {
        */
       $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => 'Bold', 'data-editor' => '{"action":"bold","value":""}'));
       $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => 'Italic', 'data-editor' => '{"action":"italic","value":""}'));
-      $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close', 'data-wysihtml5-command' => 'strikethrough', 'title' => 'Strike', 'data-editor' => '{"action":"strike","value":""}'));
+      $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'strikethrough', 'title' => 'Strike', 'data-editor' => '{"action":"strike","value":""}'));
       $editorToolbarAll['color'] = array('edit' => 'basic', 'action'=> 'color', 'type' => $toolbarDropdownFontColor, 'attr' => array('class' => 'icon icon-font editor-dd-color hidden-xs', 'data-wysihtml5-command-group' => 'foreColor', 'title' => 'Color', 'data-editor' => '{"action":"color","value":""}'));
       $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => 'Ordered list', 'data-editor' => '{"action":"orderedlist","value":""}'));
       $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => 'Unordered list', 'data-editor' => '{"action":"unorderedlist","value":""}'));
@@ -609,14 +614,25 @@ class EditorPlugin extends Gdn_Plugin {
 
       // If force Wysiwyg enabled in settings
       if (C('Garden.InputFormatter','Wysiwyg') == 'Wysiwyg'
-         //&& strcasecmp($this->Format, 'wysiwyg') != 0
-         && $this->ForceWysiwyg == true) {
+      //&& strcasecmp($this->Format, 'wysiwyg') != 0
+      && $this->ForceWysiwyg == true) {
 
          $wysiwygBody = Gdn_Format::To($Sender->GetValue('Body'), $this->Format);
          $Sender->SetValue('Body', $wysiwygBody);
 
          $this->Format = 'Wysiwyg';
          $Sender->SetValue('Format', $this->Format);
+      }
+
+      // If mobile, Wysiwyg doesn't behave consistentyly.
+      /**
+       * The editor on iOS and potentially other mobile devices behaves
+       * inconsistently with Wysiwyg, so make sure it falls back to a
+       * safe format.
+       */
+      if (IsMobile()) {
+       // $this->Format = C('Garden.MobileInputFormatter', 'Text');
+       // $Sender->SetValue('Format', $this->Format);
       }
 
       if (in_array(strtolower($this->Format), array_map('strtolower', $this->Formats))) {
@@ -644,7 +660,7 @@ class EditorPlugin extends Gdn_Plugin {
          // to know this information to modify it accordingly.
          $View = $c->FetchView('editor', '', 'plugins/editor');
 
-         $Args['BodyBox'] = $View.$Args['BodyBox'];
+         $Args['BodyBox'] = $View.$Sender->TextBox($Args['Column'], $Args['Attributes']).$Sender->Hidden('Format');
       }
    }
 
@@ -661,7 +677,8 @@ class EditorPlugin extends Gdn_Plugin {
 
       $Cf->Initialize(array(
           'Garden.InputFormatter' => array('LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p> <p><small><strong>Note:</strong> the editor will auto-detect the format of old posts when emending them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</small></p>', 'Items' => $Formats),
-          'Plugins.editor.ForceWysiwyg' => array('LabelCode' => 'Reinterpret All Posts As Wysiwyg', 'Control' => 'Checkbox', 'Description' => '<p>Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.</p> <p><small><strong>Note:</strong> This setting will only take affect if Wysiwyg was chosen as the Post Format above.</p>')
+          'Plugins.editor.ForceWysiwyg' => array('LabelCode' => 'Reinterpret All Posts As Wysiwyg', 'Control' => 'Checkbox', 'Description' => '<p>Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.</p> <p><small><strong>Note:</strong> This setting will only take affect if Wysiwyg was chosen as the Post Format above.</p>'),
+          'Garden.MobileInputFormatter' => array('LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Some mobile devices cannot interpret more advanced editing features; providing a fallback like `Text` is recommended.</p>', 'Items' => $Formats, 'DefaultValue' => C('Garden.InputFormatter'))
       ));
 
       // Add some JS and CSS to blur out option when Wysiwyg not chosen.
