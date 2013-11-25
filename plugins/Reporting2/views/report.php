@@ -13,8 +13,9 @@ echo $this->Form->Errors();
       <?php if ($this->Data('Reasons')) : ?>
          <li>
             <?php
+            $FirstOption = array_shift(array_keys($this->Data('Reasons')));
             echo $this->Form->Label(T('ReportingLabelReason', 'Reason'), 'Reason');
-            echo $this->Form->DropDown('Reason', $this->Data('Reasons'));
+            echo $this->Form->RadioList('Reason', $this->Data('Reasons'), array('Default' => $FirstOption));
             ?>
          </li>
       <?php endif; ?>
