@@ -660,7 +660,7 @@ class EditorPlugin extends Gdn_Plugin {
          // to know this information to modify it accordingly.
          $View = $c->FetchView('editor', '', 'plugins/editor');
 
-         $Args['BodyBox'] = $View.$Sender->TextBox($Args['Column'], $Args['Attributes']).$Sender->Hidden('Format');
+         $Args['BodyBox'] .= $View;
       }
    }
 
