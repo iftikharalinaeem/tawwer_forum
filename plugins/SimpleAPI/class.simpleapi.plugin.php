@@ -45,6 +45,25 @@ class SimpleAPIPlugin extends Gdn_Plugin {
    public $API = false;
    
    /**
+    * Generate an exception from an array of errors.
+    * 
+    * @param array $errors An array of arrays in the form [code, message].
+    * @return \Exception
+    */
+   protected static function createException($errors) {
+      $max_code = 0;
+      $messages = array();
+      
+      foreach ($errors as $row) {
+         list($code, $message) = $row;
+         $max_code = max($max_code, $code);
+         $messages[] = $message;
+      }
+      
+      return new Exception(implode(' ', $messages), $max_code);
+   }
+   
+   /**
     * Intercept POST data
     * 
     * This method inspects and potentially modifies incoming POST data to 
@@ -77,9 +96,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       }
       unset($PostData);
       
-      // Loop over every KVP in the POST data
+      // Loop over every KVP in the POST data.
       foreach ($Post as $Key => $Value) {
-         
          $TranslateErrors = self::TranslateField($Post, $Key, $Value);
          if (is_array($TranslateErrors))
             $Errors = array_merge($Errors, $TranslateErrors);
@@ -88,7 +106,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       
       if (count($Errors) > 0) {
          if ($ThrowError) {
-            throw new Exception(implode(' ', $Errors), 400);
+            throw self::createException($Errors);
          } else {
             return $Errors;
          }
@@ -114,7 +132,6 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     * @throws Exception 
     */
    public static function TranslateGet(&$Get, $ThrowError = TRUE) {
-      
       $Errors = array();
       $GetData = $Get;
       $Get = array();
@@ -132,16 +149,15 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       
       // Loop over every KVP in the GET data
       foreach ($Get as $Key => $Value) {
-         
          $TranslateErrors = self::TranslateField($Get, $Key, $Value);
-         if (is_array($TranslateErrors))
+         if (is_array($TranslateErrors)) {
             $Errors = array_merge($Errors, $TranslateErrors);
-         
+         }
       }
       
       if (count($Errors) > 0) {
          if ($ThrowError) {
-            throw new Exception(implode(' ', $Errors), 400);
+            throw self::createException($Errors);
          } else {
             return $Errors;
          }
@@ -311,7 +327,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
          }
          
       } catch (Exception $Ex) {
-         $Errors[] = $Ex->getMessage();
+         $Errors[] = array($Ex->getCode(), $Ex->getMessage());
       }
       
       return $Errors;
@@ -478,6 +494,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
       // Translate GET data
       self::TranslateGet($_GET);
       Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_GET, $_GET);
+      Trace(Gdn::Request()->Post(), 'post');
+      Trace(Gdn::Request()->Get(), 'get');
    }
    
    /**
