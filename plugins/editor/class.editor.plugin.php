@@ -624,17 +624,6 @@ class EditorPlugin extends Gdn_Plugin {
          $Sender->SetValue('Format', $this->Format);
       }
 
-      // If mobile, Wysiwyg doesn't behave consistentyly.
-      /**
-       * The editor on iOS and potentially other mobile devices behaves
-       * inconsistently with Wysiwyg, so make sure it falls back to a
-       * safe format.
-       */
-      if (IsMobile()) {
-       // $this->Format = C('Garden.MobileInputFormatter', 'Text');
-       // $Sender->SetValue('Format', $this->Format);
-      }
-
       if (in_array(strtolower($this->Format), array_map('strtolower', $this->Formats))) {
          $c = Gdn::Controller();
 
