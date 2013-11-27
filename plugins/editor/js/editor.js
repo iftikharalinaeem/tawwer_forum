@@ -753,20 +753,20 @@
        * first param, and the textarea object to the second.
        */
       var editorInit = function(obj, textareaObj) {
-         var t = $(obj);
+         var $t = $(obj);
 
          // if using mutation events, use this, and send mutation
          if (typeof obj.target != 'undefined') {
-            t = $(obj.target);
+            $t = $(obj.target);
          }
 
          // if using livequery, use this, and send blank string
          if (obj == '') {
-            t = $(textareaObj).closest('form');
+            $t = $(textareaObj).closest('form');
          }
 
          //var currentEditorFormat     = t.find('#Form_Format');
-         var currentEditorFormat     = t.find('input[name="Format"]');
+         var currentEditorFormat     = $t.find('input[name="Format"]');
          var $currentEditorToolbar    = '';
          var $currentEditableTextarea = '';
          var currentTextBoxWrapper   = '';
@@ -776,7 +776,7 @@
          // having multiple iframes with identical properties, which, upon
          // reverting back to editing mode, will break everything, so kill
          // mutation callback immediately, so check if iframe already exists.
-         if ($(t).find('iframe').hasClass('vanilla-editor-text')) {
+         if ($t.find('iframe').hasClass('vanilla-editor-text')) {
             return false;
          }
 
@@ -785,9 +785,9 @@
              formatOriginal          = currentEditorFormat[0].value;
              currentEditorFormat     = currentEditorFormat[0].value.toLowerCase();
              format                  = currentEditorFormat + '';
-             $currentEditorToolbar    = t.find('.editor-format-'+ format);
+             $currentEditorToolbar    = $t.find('.editor-format-'+ format);
              //currentEditableTextarea = t.find('#Form_Body');
-             $currentEditableTextarea = t.find('.BodyBox');
+             $currentEditableTextarea = $t.find('.BodyBox');
 
             if (textareaObj) {
                 $currentEditableTextarea = textareaObj;
@@ -861,7 +861,7 @@
                       };
 
                       // instantiate new editor
-                      var editor = new wysihtml5.Editor($($currentEditableTextarea)[0], editorRules);
+                      var editor = new wysihtml5.Editor($currentEditableTextarea[0], editorRules);
 
                       editor.on('load', function(e) {
                           if (!editor.composer) {
@@ -876,11 +876,11 @@
                          // Clear textarea/iframe content on submit.
                          // This is not actually necessary here because
                          // the whole editor is removed from the page on post.
-                         $($currentEditableTextarea.closest('form')).on('clearCommentForm', function() {
+                         $currentEditableTextarea.closest('form').on('clearCommentForm', function() {
                             editor.fire('clear');
                             editor.composer.clear();
                             this.reset();
-                            $($currentEditableTextarea).val('');
+                            $currentEditableTextarea.val('');
                             //$('iframe').contents().find('body').empty();
                             $(editor.composer.iframe).css({"min-height": "inherit"});
                          });
