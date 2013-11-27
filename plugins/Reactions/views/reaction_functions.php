@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 if (!function_exists('FormatScore')):
-   
+
 function FormatScore($Score) {
    return (int)$Score;
 }
@@ -14,13 +14,13 @@ function OrderByButton($Column, $Label = FALSE, $DefaultOrder = '', $CssClass = 
    $Url = Gdn::Controller()->SelfUrl.'?'.http_build_query($QSParams);
    if (!$Label)
       $Label = T('by '.$Column);
-   
+
    $CssClass = ' '.$CssClass;
    $CurrentColumn = Gdn::Controller()->Data('CommentOrder.Column');
    if ($Column == $CurrentColumn) {
       $CssClass .= ' OrderBy-'.ucfirst(Gdn::Controller()->Data('CommentOrder.Direction')).' Selected';
    }
-   
+
    return Anchor($Label, $Url, 'FilterButton OrderByButton OrderBy-'.$Column.$CssClass, array('rel' => 'nofollow'));
 }
 
@@ -33,18 +33,18 @@ function ReactionCount($Row, $UrlCodes) {
       $RecordType = 'discussion';
       $ID = GetValue('DiscussionID', $Row);
    }
-   
+
    if ($RecordType == 'activity')
       $Data = GetValueR('Data.React', $Row, array());
    else
       $Data = GetValueR("Attributes.React", $Row, array());
-   
+
    if (!is_array($Data)) {
       return 0;
    }
-   
+
    $UrlCodes = (array)$UrlCodes;
-   
+
    $Count = 0;
    foreach ($UrlCodes as $UrlCode) {
       if (is_array($UrlCode))
@@ -56,7 +56,7 @@ function ReactionCount($Row, $UrlCodes) {
 }
 
 if (!function_exists('ReactionButton')):
-   
+
 function ReactionButton($Row, $UrlCode, $Options = array()) {
    $ReactionType = ReactionModel::ReactionTypes($UrlCode);
 
@@ -65,16 +65,16 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
       $ReactionType = array('UrlCode' => $UrlCode, 'Name' => $UrlCode);
       $IsHeading = TRUE;
    }
-   
+
    if ($Permission = GetValue('Permission', $ReactionType)) {
       if (!Gdn::Session()->CheckPermission($Permission))
          return '';
    }
-   
+
    $Name = $ReactionType['Name'];
    $Label = T($Name);
    $SpriteClass = GetValue('SpriteClass', $ReactionType, "React$UrlCode");
-   
+
    if ($ID = GetValue('CommentID', $Row)) {
       $RecordType = 'comment';
    } elseif ($ID = GetValue('ActivityID', $Row)) {
@@ -83,18 +83,18 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
       $RecordType = 'discussion';
       $ID = GetValue('DiscussionID', $Row);
    }
-   
+
    if ($IsHeading) {
       static $Types = array();
       if (!isset($Types[$UrlCode]))
          $Types[$UrlCode] = ReactionModel::GetReactionTypes(array('Class' => $UrlCode, 'Active' => 1));
-      
+
       $Count = ReactionCount($Row, $Types[$UrlCode]);
    } else {
       if ($RecordType == 'activity')
          $Count = GetValueR("Data.React.$UrlCode", $Row, 0);
       else
-         $Count = GetValueR("Attributes.React.$UrlCode", $Row, 0);  
+         $Count = GetValueR("Attributes.React.$UrlCode", $Row, 0);
    }
    $CountHtml = '';
    $LinkClass = "ReactButton-$UrlCode";
@@ -103,7 +103,7 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
       $LinkClass .= ' HasCount';
    }
    $LinkClass = ConcatSep(' ', $LinkClass, GetValue('LinkClass', $Options));
-   
+
    $UrlCode2 = strtolower($UrlCode);
    if ($IsHeading) {
       $Url = '';
@@ -112,11 +112,11 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
       $Url = Url("/react/$RecordType/$UrlCode2?id=$ID");
       $DataAttr = "data-reaction=\"$UrlCode2\"";
    }
-   
+
    $Result = <<<EOT
 <a class="Hijack ReactButton $LinkClass" href="$Url" title="$Label" $DataAttr rel="nofollow"><span class="ReactSprite $SpriteClass"></span> $CountHtml<span class="ReactLabel">$Label</span></a>
 EOT;
-   
+
    return $Result;
 }
 
@@ -124,22 +124,22 @@ endif;
 
 
 if (!function_exists('ScoreCssClass')):
-   
+
 function ScoreCssClass($Row, $All = FALSE) {
    $Score = GetValue('Score', $Row);
    if (!$Score)
       $Score = 0;
-   
+
    $Bury = C('Reactions.BuryValue', -5);
    $Promote = C('Reactions.PromoteValue', 5);
-   
+
    if ($Score <= $Bury)
       $Result = $All ? 'Un-Buried' : 'Buried';
    elseif ($Score >= $Promote)
       $Result = 'Promoted';
    else
       $Result = '';
-   
+
    if ($All)
       return array($Result, 'Promoted Buried Un-Buried');
    else
@@ -153,7 +153,7 @@ if (!function_exists('WriteImageItem')):
       $Attributes = GetValue('Attributes', $Record);
       if (!is_array($Attributes))
          $Attributes = @unserialize($Attributes);
-      
+
       $Image = FALSE;
       if (GetValue('Image', $Attributes)) {
          $Image = array(
@@ -166,12 +166,12 @@ if (!function_exists('WriteImageItem')):
       $Type = FALSE;
       $Title = FALSE;
       $Body = GetValue('Body', $Record, '');
-      
-      // A little kludge for my test data where the serialized array was put 
+
+      // A little kludge for my test data where the serialized array was put
       // directly inside the body.
       if (!$Image && is_array(@unserialize($Body)))
          $Image = unserialize($Body);
-         
+
       $RecordID = GetValue('RecordID', $Record); // Explicitly defined?
       if ($RecordID) {
          $Type = $Record['RecordType'];
@@ -189,7 +189,7 @@ if (!function_exists('WriteImageItem')):
          if ($RecordID)
             $Type = 'Discussion';
       }
-      
+
       $Wide = FALSE;
       $FormattedBody = Gdn_Format::To($Body, $Record['Format']);
       if (stripos($FormattedBody, '<div class="Video') !== FALSE) {
@@ -208,14 +208,14 @@ if (!function_exists('WriteImageItem')):
             $Comment = (object)$Record;
             WriteCommentOptions($Comment);
          }
-         
+
          if ($Title)
             echo $Title;
-         
+
          if ($Image) {
             echo '<div class="Image">';
                echo Anchor(Img($Image['Thumbnail'], array('alt' => $Image['Caption'], 'title' => $Image['Caption'])), $Image['Image'], array('target' => '_blank'));
-            echo '</div>'; 
+            echo '</div>';
             echo '<div class="Caption">';
                echo Gdn_Format::PlainText($Image['Caption']);
             echo '</div>';
@@ -242,7 +242,7 @@ endif;
 function WriteOrderByButtons() {
    if (!Gdn::Session()->IsValid())
       return;
-   
+
    echo '<span class="OrderByButtons">'.
       OrderByButton('DateInserted', T('by Date')).
       ' '.
@@ -252,31 +252,31 @@ function WriteOrderByButtons() {
 
 
 if (!function_exists('WriteProfileCounts')):
-   
+
 function WriteProfileCounts() {
    $CurrentUrl = Url('', TRUE);
-   
+
    echo '<div class="DataCounts">';
-   
-   foreach (Gdn::Controller()->Data('Counts', array()) as $Row) {
+
+   foreach (Gdn::Controller()->Data('Counts', array()) as $Key => $Row) {
       $ItemClass = 'CountItem';
       if (StringBeginsWith($CurrentUrl, $Row['Url']))
          $ItemClass .= ' Selected';
-      
-      echo ' <span class="CountItemWrap"><span class="'.$ItemClass.'">';
-      
+
+      echo ' <span class="CountItemWrap CountItemWrap-'.$Key.'"><span class="'.$ItemClass.'">';
+
       if ($Row['Url'])
          echo '<a href="'.htmlspecialchars($Row['Url']).'" class="TextColor">';
-      
+
       echo ' <span class="CountTotal">'.Gdn_Format::BigNumber($Row['Total'], 'html').'</span> ';
       echo ' <span class="CountLabel">'.T($Row['Name']).'</span>';
-      
+
       if ($Row['Url'])
          echo '</a>';
-      
+
       echo '</span></span> ';
    }
-   
+
    echo '</div>';
 }
 
@@ -290,30 +290,30 @@ function WriteRecordReactions($Row) {
    $UserTags = GetValue('UserTags', $Row, array());
    if (empty($UserTags))
       return;
-   
+
    $RecordReactions = '';
    foreach ($UserTags as $Tag) {
       $User = Gdn::UserModel()->GetID($Tag['UserID'], DATASET_TYPE_ARRAY);
       if (!$User)
          continue;
-      
+
       $ReactionType = ReactionModel::FromTagID($Tag['TagID']);
       if (!$ReactionType || $ReactionType['Hidden'])
          continue;
       $UrlCode = $ReactionType['UrlCode'];
       $SpriteClass = GetValue('SpriteClass', $ReactionType, "React$UrlCode");
       $Title = sprintf('%s - %s on %s', $User['Name'], T($ReactionType['Name']), Gdn_Format::DateFull($Tag['DateInserted']));
-      
+
       $UserPhoto = UserPhoto($User, array('Size' => 'Small', 'Title' => $Title));
       if ($UserPhoto == '')
          continue;
-      
+
       $RecordReactions .= '<span class="UserReactionWrap" title="'.htmlspecialchars($Title).'" data-userid="'.GetValue('UserID', $User).'">'
          .$UserPhoto
          ."<span class=\"ReactSprite $SpriteClass\"></span>"
       .'</span>';
    }
-   
+
    if ($RecordReactions != '')
       echo '<div class="RecordReactions">'.$RecordReactions.'</div>';
 }
