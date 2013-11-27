@@ -767,8 +767,8 @@
 
          //var currentEditorFormat     = t.find('#Form_Format');
          var currentEditorFormat     = t.find('input[name="Format"]');
-         var currentEditorToolbar    = '';
-         var currentEditableTextarea = '';
+         var $currentEditorToolbar    = '';
+         var $currentEditableTextarea = '';
          var currentTextBoxWrapper   = '';
 
          // When previewing text in standard reply discussion controller,
@@ -785,15 +785,15 @@
              formatOriginal          = currentEditorFormat[0].value;
              currentEditorFormat     = currentEditorFormat[0].value.toLowerCase();
              format                  = currentEditorFormat + '';
-             currentEditorToolbar    = t.find('.editor-format-'+ format);
+             $currentEditorToolbar    = t.find('.editor-format-'+ format);
              //currentEditableTextarea = t.find('#Form_Body');
-             currentEditableTextarea = t.find('.BodyBox');
+             $currentEditableTextarea = t.find('.BodyBox');
 
             if (textareaObj) {
-                currentEditableTextarea = textareaObj;
+                $currentEditableTextarea = textareaObj;
              }
 
-             currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');
+             currentTextBoxWrapper   = $currentEditableTextarea.parent('.TextBoxWrapper');
 
              // If singleInstance is false, then odds are the editor is being
              // loaded inline and there are other instances on page.
@@ -809,19 +809,11 @@
          }
 
          // if found, perform operation
-         if (currentEditorToolbar.length
-         && currentEditableTextarea.length) {
+         if ($currentEditorToolbar.length
+         && $currentEditableTextarea.length) {
 
-            var currentEditableCommentId = (new Date()).getTime(),
-                editorTextareaId         = currentEditableTextarea[0].id +'-'+ currentEditableCommentId,
-                editorToolbarId          = 'editor-format-'+ format +'-'+ currentEditableCommentId;
-
+            var currentEditableCommentId = (new Date()).getTime();
             var editorName               = 'vanilla-editor-text-'+ currentEditableCommentId;
-
-            // change ids to bind new editor functionality to particular edit
-            $(currentEditorToolbar).attr('id', editorToolbarId);
-
-            $(currentEditableTextarea).attr('id', editorTextareaId);
 
             switch (format) {
                case 'wysiwyg':
@@ -842,7 +834,7 @@
                          // Whether the editor should look like the textarea (by adopting styles)
                          style:                true,
                          // Id of the toolbar element or DOM node, pass false value if you don't want any toolbar logic
-                         toolbar:              editorToolbarId,
+                         toolbar:              $currentEditorToolbar.get(0),
                          // Whether urls, entered by the user should automatically become clickable-links
                          autoLink:             false,
                          // Object which includes parser rules to apply when html gets inserted via copy & paste
@@ -869,9 +861,13 @@
                       };
 
                       // instantiate new editor
-                      var editor = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
+                      var editor = new wysihtml5.Editor($($currentEditableTextarea)[0], editorRules);
 
                       editor.on('load', function(e) {
+                          if (!editor.composer) {
+                              $currentEditorToolbar.hide();
+                              return;
+                          }
 
                          // enable auto-resize
                          $(editor.composer.iframe).wysihtml5_size_matters();
@@ -880,11 +876,11 @@
                          // Clear textarea/iframe content on submit.
                          // This is not actually necessary here because
                          // the whole editor is removed from the page on post.
-                         $(currentEditableTextarea.closest('form')).on('clearCommentForm', function() {
+                         $($currentEditableTextarea.closest('form')).on('clearCommentForm', function() {
                             editor.fire('clear');
                             editor.composer.clear();
                             this.reset();
-                            $(currentEditableTextarea).val('');
+                            $($currentEditableTextarea).val('');
                             //$('iframe').contents().find('body').empty();
                             $(editor.composer.iframe).css({"min-height": "inherit"});
                          });
@@ -1001,12 +997,12 @@
                       loadScript(assets + '/js/jquery.hotkeys.js?v=' + editorVersion),
                       loadScript(assets + '/js/rangy.js?v=' + editorVersion)
                    ).done(function() {
-                      ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
+                      ButtonBar.AttachTo($($currentEditableTextarea)[0], formatOriginal);
                       fullPageInit();
                       editorSetupDropdowns();
                       if (!singleInstance) {
                          //scrollToEditorContainer($(currentEditableTextarea)[0]);
-                         editorSetCaretFocusEnd(currentEditableTextarea[0]);
+                         editorSetCaretFocusEnd($currentEditableTextarea[0]);
                       }
                    });
                    break;
