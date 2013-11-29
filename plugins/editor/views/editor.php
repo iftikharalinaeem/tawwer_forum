@@ -5,7 +5,7 @@
 
    if ($format != 'text' && $format != 'textex') {
       $html_toolbar    = '<div class="editor editor-format-'. $format .'">';
-      $html_arrow_down = '<span class="icon-caret-down"></span>';
+      $html_arrow_down = '<span class="icon icon-caret-down"></span>';
 
       foreach($this->Data('_EditorToolbar') as $button) {
 

@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.0.45',
+   'Version' => '1.0.46',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -520,7 +520,7 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['sep-switches'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-switches hidden-xs'));
       $editorToolbarAll['togglehtml'] = array('edit' => 'switches', 'action'=> 'togglehtml', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-source editor-toggle-source editor-dialog-fire-close hidden-xs', 'data-wysihtml5-action' => 'change_view', 'title' => 'Toggle HTML view', 'data-editor' => '{"action":"togglehtml","value":""}'));
       $editorToolbarAll['fullpage'] = array('edit' => 'switches', 'action'=> 'fullpage', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button editor-dialog-fire-close', 'title' => 'Toggle full page', 'data-editor' => '{"action":"fullpage","value":""}'));
-      $editorToolbarAll['lights'] = array('edit' => 'switches', 'action'=> 'lights', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-lightbulb editor-toggle-lights-button editor-dialog-fire-close hidden-xs', 'title' => 'Toggle lights', 'data-editor' => '{"action":"lights","value":""}'));
+      $editorToolbarAll['lights'] = array('edit' => 'switches', 'action'=> 'lights', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-adjust editor-toggle-lights-button editor-dialog-fire-close hidden-xs', 'title' => 'Toggle lights', 'data-editor' => '{"action":"lights","value":""}'));
 
       // Filter out disallowed editor actions
       foreach ($allowedEditorActions as $editorAction => $allowed) {
@@ -543,6 +543,7 @@ class EditorPlugin extends Gdn_Plugin {
     * Load CSS into head for editor
     */
    public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCssFile('vanillicon.css', 'static');
       $Sender->AddCssFile('editor.css', 'plugins/editor');
    }
 
