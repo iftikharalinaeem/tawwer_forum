@@ -4,7 +4,7 @@
  */
 
 class ReportModel extends Gdn_Model {
-   
+
    public function __construct($Name = '') {
       parent::__construct('Comment');
    }
@@ -30,16 +30,24 @@ class ReportModel extends Gdn_Model {
     * @return int
     */
    public static function GetUnreadReportCount() {
-      $Category = self::GetReportCategory();
-      $DiscussionModel = new DiscussionModel();
-      // Add DiscussionID to shamelessly bypass the faulty cache code
-      $Count = $DiscussionModel->GetUnreadCount(array('d.CategoryID' => $Category['CategoryID'], 'd.DiscussionID >' => 0));
+      // This methods needs to be optimized.
+      return null;
+
+      static $Count = null;
+
+      if ($Count === null) {
+         $Category = self::GetReportCategory();
+         $DiscussionModel = new DiscussionModel();
+         // Add DiscussionID to shamelessly bypass the faulty cache code
+         $Count = $DiscussionModel->GetUnreadCount(array('d.CategoryID' => $Category['CategoryID'], 'd.DiscussionID >' => 0));
+      }
+
       return $Count;
    }
 
    /**
     * Saves a new content report.
-    * 
+    *
     * @param array $Data The data to save. This takes the following fields.
     *  - RecordType: The type of record being reported on.
     *  - RecordID: The id of the record.
@@ -53,22 +61,22 @@ class ReportModel extends Gdn_Model {
       $this->Validation->ApplyRule('RecordID', 'ValidateRequired');
       $this->Validation->ApplyRule('Body', 'ValidateRequired');
       $this->Validation->ApplyRule('Format', 'ValidateRequired');
-      
+
       TouchValue('Format', $Data, C('Garden.InputFormatter'));
-      
+
       if (!$this->Validation->Validate($Data, TRUE))
          return FALSE;
-      
+
       $Record = GetRecord($Data['RecordType'], $Data['RecordID']);
       if (!$Record) {
          $this->Validation->AddValidationResult('RecordID', 'ErrorRecordNotFound');
       }
-      
+
       $ForeignID = strtolower("{$Data['RecordType']}-{$Data['RecordID']}");
 
       // Temporarily verify user so they can always submit reports
       SetValue('Verified', Gdn::Session()->User, TRUE);
-      
+
       // Check to see if there was already a report.
       $DiscussionModel = new DiscussionModel();
       $Discussion = $DiscussionModel->GetForeignID($ForeignID, 'report');
@@ -77,7 +85,7 @@ class ReportModel extends Gdn_Model {
          $Category = self::GetReportCategory();
          if (!$Category)
             $this->Validation->AddValidationResult('CategoryID', 'The category used for reporting has not been set up.');
-         
+
          // Grab the discussion that is being reported.
          if (strcasecmp($Data['RecordType'], 'Comment') == 0) {
             $ReportDiscussion = (array)$DiscussionModel->GetID(GetValue('DiscussionID', $Record));
@@ -89,7 +97,7 @@ class ReportModel extends Gdn_Model {
          $ReportAttributes = array();
          if ($CategoryID = GetValue('CategoryID', $ReportDiscussion))
             $ReportAttributes['CategoryID'] = $ReportDiscussion['CategoryID'];
-         
+
          $NewDiscussion = array(
             'Name' => $ReportDiscussion['Name'],
             'Body' => sprintf(T('Report Body Format', "%s\n\n%s"),
@@ -101,7 +109,7 @@ class ReportModel extends Gdn_Model {
             'CategoryID' => $Category['CategoryID'],
             'Attributes' => array('Report' => $ReportAttributes)
             );
-         
+
          $DiscussionID = $DiscussionModel->Save($NewDiscussion);
          if (!$DiscussionID) {
             Trace('Discussion not saved.');
@@ -111,7 +119,7 @@ class ReportModel extends Gdn_Model {
       } else {
          $DiscussionID = GetValue('DiscussionID', $Discussion);
       }
-      
+
       // Now that we have the discussion add the report.
       $NewComment = array(
          'DiscussionID' => $DiscussionID,

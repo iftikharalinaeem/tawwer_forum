@@ -1,22 +1,29 @@
-update GDN_Discussion d
-set CountComments = (select count(CommentID) from GDN_Comment c where c.DiscussionID = d.DiscussionID);
+set @minid = 0;
 
 update GDN_Discussion d
-set DateLastComment = (select max(DateInserted) from GDN_Comment c where c.DiscussionID = d.DiscussionID);
+set CountComments = (select count(CommentID) from GDN_Comment c where c.DiscussionID = d.DiscussionID)
+where d.DiscussionID >= @minid;
+
+update GDN_Discussion d
+set DateLastComment = (select max(DateInserted) from GDN_Comment c where c.DiscussionID = d.DiscussionID)
+where d.DiscussionID >= @minid;
 
 update GDN_Discussion d
 set DateLastComment = DateInserted
-where DateLastComment is null;
+where DateLastComment is null
+	and d.DiscussionID >= @minid;;
 
 update GDN_Discussion d
 join GDN_Comment c
 	on c.DiscussionID = d.DiscussionID and c.DateInserted = d.DateLastComment
-set d.LastCommentID = c.CommentID;
+set d.LastCommentID = c.CommentID
+where d.DiscussionID >= @minid;
 
 update GDN_Discussion d
 join GDN_Comment c
 	on d.LastCommentID = c.CommentID
-set d.LastCommentUserID = c.InsertUserID;
+set d.LastCommentUserID = c.InsertUserID
+where d.DiscussionID >= @minid;
 
 update GDN_Category c
 set CountDiscussions = (select count(DiscussionID) from GDN_Discussion d where d.CategoryID = c.CategoryID);
@@ -36,3 +43,9 @@ set cat.LastCommentID = d.LastCommentID,
 update GDN_User
 set DateFirstVisit = DateInserted
 where DateFirstVisit is null;
+
+update GDN_User u
+set CountDiscussions = (select count(d.InsertUserID) from GDN_Discussion d where d.InsertUserID = u.UserID);
+
+update GDN_User u
+set CountComments = (select count(d.InsertUserID) from GDN_Comment d where d.InsertUserID = u.UserID);
