@@ -163,11 +163,12 @@
  */
 
 .editor-dd-emoji + .editor-insert-dialog {
-   width: 120px;
+   @include box-sizing(border-box);
+   width: 132px;
 }
 
 .editor-dd-emoji + .editor-insert-dialog .emoji {
-   box-sizing: content-box !important;
+   @include box-sizing(content-box);
    display: inline-block;
    padding: 5px;
    background-repeat: no-repeat;

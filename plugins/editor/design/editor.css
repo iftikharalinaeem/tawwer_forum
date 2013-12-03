@@ -145,11 +145,16 @@
  * Emoji dropdown
  */
 .editor-dd-emoji + .editor-insert-dialog {
-  width: 120px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 132px;
 }
 
 .editor-dd-emoji + .editor-insert-dialog .emoji {
-  box-sizing: content-box !important;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
   display: inline-block;
   padding: 5px;
   background-repeat: no-repeat;
