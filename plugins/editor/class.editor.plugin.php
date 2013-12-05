@@ -187,14 +187,14 @@ class EditorPlugin extends Gdn_Plugin {
        * prevents browsers from loading the resources.
        */
       $toolbarDropdownEmoji = array();
-      $emojiAliasList       = Emoji::instance()->getEmojiEditorList();
+      $emoji = Emoji::instance();
+      $emojiAliasList       = $emoji->getEmojiEditorList();
       foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
-         $emojiFilePath          = Emoji::instance()->getEmojiCanonicalList($emojiCanonical);
+         $emojiFilePath          = $emoji->getEmojiCanonicalList($emojiCanonical);
          //$editorDataAttr         = '{"action":"emoji","value":"'. htmlentities($emojiAlias) .'"}';
          $editorDataAttr         = '{"action":"emoji","value":"'. addslashes($emojiAlias) .'"}';
-         $emojiDimension         = Emoji::instance()->emojiDimension;
          //$emojiStyle           = 'background-image: url('. $emojiFilePath .'); background-size: '. $emojiDimension .'px; width: '.$emojiDimension .'px; height:'. $emojiDimension .'px;';
-         $emojiStyle             = '';
+//         $emojiStyle             = '';
 
          // In case user creates an alias that does not match a canonical
          // emoji, let them know.
@@ -202,7 +202,14 @@ class EditorPlugin extends Gdn_Plugin {
                                       ? $emojiAlias
                                       : "Alias '$emojiCanonical' not found in canonical list.";
 
-         $toolbarDropdownEmoji[] = array('edit' => 'media', 'action'=> 'emoji', 'type' => 'button', 'html_tag' => 'img', 'attr' => array('class' => 'editor-action emoji emoji-'. $emojiCanonical. ' editor-dialog-fire-close', 'data-wysihtml5-command' => 'insertHTML', 'data-wysihtml5-command-value' => ' '.$emojiAlias .' ', 'title' => $emojiTitle, 'data-editor' => $editorDataAttr, 'src' => $emojiFilePath, 'width' => $emojiDimension, 'height' => $emojiDimension, 'style' => $emojiStyle));
+         $toolbarDropdownEmoji[] = array('edit' => 'media', 'action'=> 'emoji', 'type' => 'button', 'html_tag' => 'span',
+            'text' => $emoji->img($emojiFilePath, $emojiAlias),
+            'attr' => array(
+               'class' => 'editor-action emoji emoji-'. $emojiCanonical. ' editor-dialog-fire-close',
+               'data-wysihtml5-command' => 'insertHTML',
+               'data-wysihtml5-command-value' => ' '.$emojiAlias .' ',
+               'title' => $emojiTitle,
+               'data-editor' => $editorDataAttr));
       }
 
       /**
