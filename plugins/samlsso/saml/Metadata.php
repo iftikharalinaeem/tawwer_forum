@@ -32,19 +32,21 @@ class OneLogin_Saml_Metadata
     public function getXml()
     {
         $validUntil = $this->_getMetadataValidTimestamp();
-        
+
+        // Output the signout element if a sp certificate has been provided.
+        // We need the idp to use this certificate to sign logout requests.
         $signoutElem = '';
-        if ($this->_settings->idpSingleSignOutUrl) {
+        if ($this->_settings->spCertificate) {
            $signoutUrl = Url('/entry/signout', TRUE);
-           
+
            $signoutElem = <<<EOT
 <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="{$signoutUrl}"/>
 EOT;
         }
-        
+
         $signingElem = '';
         $encryptionElem = '';
-        
+
         if ($this->_settings->spCertificate) {
            $signingElem = $this->keyDescriptor($this->_settings->spCertificate, 'signing');
            $encryptionElem = $this->keyDescriptor($this->_settings->spCertificate, 'encryption');
@@ -67,12 +69,12 @@ EOT;
 </md:EntityDescriptor>
 METADATA_TEMPLATE;
     }
-    
+
     protected static function keyDescriptor($cert, $use = 'signing') {
        $x509 = openssl_x509_read($cert);
        openssl_x509_export($x509, $str_cert);
        $str_cert = SamlSSOPlugin::TrimCert($str_cert);
-       
+
        $result = <<<EOT
 <md:KeyDescriptor use="$use">
    <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
