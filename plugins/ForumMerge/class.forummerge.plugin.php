@@ -82,7 +82,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
       $this->OldDatabase = $OldDatabase;
       $this->OldPrefix = $OldPrefix;
 
-/*
+
 		// USERS //
       if ($this->OldTableExists('User')) {
          $UserColumns = $this->GetColumns('User', $OldDatabase, $OldPrefix);
@@ -129,7 +129,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
                where u.OldID = (ur.UserID) and r.OldID = (ur.RoleID)');
          }
       }
-*/
+
       
 		// CATEGORIES //
       if ($this->OldTableExists('Category')) {
