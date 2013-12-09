@@ -14,6 +14,12 @@ class OneLogin_Saml_AuthRequest
     protected $_settings;
 
     /**
+     * Whether or not this is a passive request.
+     * @var bool
+     */
+    public $isPassive = true;
+
+    /**
      * Construct the response object.
      *
      * @param OneLogin_Saml_Settings $settings
@@ -34,6 +40,7 @@ class OneLogin_Saml_AuthRequest
     {
         $id = $this->_generateUniqueID();
         $issueInstant = $this->_getTimestamp();
+        $isPassive = $this->isPassive ? 'true' : 'false';
 
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
@@ -42,6 +49,7 @@ class OneLogin_Saml_AuthRequest
     ID="$id"
     Version="2.0"
     IssueInstant="$issueInstant"
+    IsPassive="$isPassive"
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
     AssertionConsumerServiceURL="{$this->_settings->spReturnUrl}">
     <saml:Issuer>{$this->_settings->spIssuer}</saml:Issuer>

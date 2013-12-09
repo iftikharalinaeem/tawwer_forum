@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Sitemaps'] = array(
    'Name' => 'Sitemaps',
    'Description' => "Creates an XML sitemap based on http://www.sitemaps.org.",
-   'Version' => '1.2.2',
+   'Version' => '2.0',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
@@ -33,20 +33,45 @@ class SitemapsPlugin extends Gdn_Plugin {
    public function BuildCategorySiteMap($UrlCode, &$Urls) {
       $Category = CategoryModel::Categories($UrlCode);
       if (!$Category)
-         return;
+         throw NotFoundException();
       
-      $CountDiscussions = $Category['CountDiscussions'];
-      $PageCount = PageNumber($CountDiscussions, C('Vanilla.Discussions.PerPage', 30));
-      $Loc = Url('/categories/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']), TRUE).'/{Page}';
+      // Get the min/max dates for the sitemap.
+      $Row = Gdn::SQL()
+         ->Select('DateInserted', 'min', 'MinDate')
+         ->Select('DateInserted', 'max', 'MaxDate')
+         ->From('Discussion')
+         ->Where('CategoryID', $Category['CategoryID'])
+         ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+      
+      if ($Row) {
+         $From = strtotime('first day of this month 00:00:00', strtotime($Row['MaxDate']));
+         $To = strtotime('first day of this month 00:00:00', strtotime($Row['MinDate']));
+         
+         if (!$From || !$To) {
+            $From = -1;
+            $To = 0;
+         }
+      } else {
+         $From = -1;
+         $To = 0;
+      }
+      
+      $Now = time();
+      
+      for ($i = $From; $i >= $To; $i = strtotime('-1 month', $i)) {
+         $Url = array(
+            'Loc' => Url('/categories/archives/'.rawurlencode($Category['UrlCode'] ? $Category['UrlCode'] : $Category['CategoryID']).'/'.gmdate('Y-m', $i), TRUE),
+            'LastMod' => '',
+            'ChangeFreq' => ''
+         );
+         
+         $LastMod = strtotime('last day of this month', $i);
+         if ($LastMod > $Now)
+            $LastMod = $Now;
+         $Url['LastMod'] = gmdate('c', $LastMod);
 
-      $Url = array(
-          'Loc' => $Loc,
-          'LastMode' => '',
-          'ChangeFreq' => '',
-          'PageCount' => $PageCount
-      );
-
-      $Urls[] = $Url;
+         $Urls[] = $Url;
+      }
    }
    
    public function Setup() {

@@ -27,12 +27,22 @@ class Reporting2Plugin extends Gdn_Plugin {
     */
    public function Structure() {
       Gdn::Structure()->Table('Category')
-         ->Column('Type', 'varchar(20)')
+         ->Column('Type', 'varchar(20)', TRUE)
          ->Set();
-      
+
       // Try and find the category by type.
       $CategoryModel = new CategoryModel();
       $Category = $CategoryModel->GetWhereCache(array('Type' => 'Reporting'));
+
+      if (empty($Category)) {
+         // Try and get the category by slug.
+         $Category = CategoryModel::Categories('reported-posts');
+         if (!empty($Category)) {
+            // Set the reporting type on the category.
+            $CategoryModel->SetField($Category['CategoryID'], array('Type' => 'Reporting'));
+         }
+      }
+
       if (empty($Category)) {
          // Create the category if none exists
          $Row = array(
@@ -164,7 +174,7 @@ class Reporting2Plugin extends Gdn_Plugin {
 
       $Sender->Render('report', '', 'plugins/Reporting2');
    }
-   
+
    /// Event Handlers ///
 
    /**
@@ -212,7 +222,7 @@ function FormatQuote($Body) {
    } elseif (is_string($Body)) {
       return $Body;
    }
-   
+
    $User = Gdn::UserModel()->GetID(GetValue('InsertUserID', $Body));
    if ($User) {
       $Result = '<blockquote class="Quote Media">'.
@@ -227,10 +237,10 @@ function FormatQuote($Body) {
          Gdn_Format::To($Body['Body'], $Body['Format']).
          '</blockquote>';
    }
-   
+
    return $Result;
 }
-   
+
 endif;
 
 if (!function_exists('Quote')):

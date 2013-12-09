@@ -1,29 +1,29 @@
 (function($) {
    $.fn.setAsEditor = function() {
 
-      // If editor can be loaded, add class to body 
+      // If editor can be loaded, add class to body
       $('body').addClass('js-editor-active');
 
       /**
        * Determine editor format to load, and asset path, default to Wysiwyg
        */
-      var editor, 
-          editorName, 
+      var editor,
+          editorName,
           editorRules             = {}, // for Wysiwyg
-          editorCacheBreakValue   = Math.random(), 
+          editorCacheBreakValue   = Math.random(),
           editorVersion           = gdn.definition('editorVersion', editorCacheBreakValue),
           formatOriginal          = gdn.definition('editorInputFormat', 'Wysiwyg'),
           format                  = formatOriginal.toLowerCase(),
-          assets                  = gdn.definition('editorPluginAssets', '/plugins/editor'), 
+          assets                  = gdn.definition('editorPluginAssets', '/plugins/editor'),
           debug                   = false;
 
       /**
-       * Load relevant stylesheets into editor iframe. The first one loaded is 
-       * the actual editor.css required for the plugin. The others are extra, 
-       * grabbed from the source of parent to iframe, as different communities 
-       * may have styles they want injected into the iframe. 
+       * Load relevant stylesheets into editor iframe. The first one loaded is
+       * the actual editor.css required for the plugin. The others are extra,
+       * grabbed from the source of parent to iframe, as different communities
+       * may have styles they want injected into the iframe.
        */
-      
+
       if (debug) {
          editorVersion += '&cachebreak=' + editorCacheBreakValue;
       }
@@ -39,40 +39,40 @@
       });
       */
 
-      // Some communities may want to modify just the styling of the Wysiwyg 
-      // while editing, so this file will let them. 
+      // Some communities may want to modify just the styling of the Wysiwyg
+      // while editing, so this file will let them.
       var editorWysiwygCSS = gdn.definition('editorWysiwygCSS', '');
       if (editorWysiwygCSS != '') {
          stylesheetsInclude.push(editorWysiwygCSS + '?v=' + editorVersion);
       }
 
-      /** 
-       * Fullpage actions--available to all editor views on page load. 
+      /**
+       * Fullpage actions--available to all editor views on page load.
        */
       var fullPageInit = function(wysiwygInstance) {
 
-         // Hack to push toolbar left 15px when vertical scrollbar appears, so it 
+         // Hack to push toolbar left 15px when vertical scrollbar appears, so it
          // is always aligned with the textarea. This is for clearing interval.
          var toolbarInterval;
 
          var toggleFullpage = function(e) {
             // either user clicks on fullpage toggler button, or escapes out with key
-            var toggleButton = (typeof e != 'undefined') 
-               ? e.target 
+            var toggleButton = (typeof e != 'undefined')
+               ? e.target
                : $('#editor-fullpage-candidate').find('.editor-toggle-fullpage-button');
 
-            var bodyEl = $('body'); 
-            
-            // New wrapper classes added to form. If the first is not availble, 
-            // fall back to second one. This was added to core, so core will 
-            // need to be updated alongside the plugin if site owners want 
+            var bodyEl = $('body');
+
+            // New wrapper classes added to form. If the first is not availble,
+            // fall back to second one. This was added to core, so core will
+            // need to be updated alongside the plugin if site owners want
             // latest feature.
-            var formWrapper = ($(toggleButton).closest('.fullpage-wrap').length) 
+            var formWrapper = ($(toggleButton).closest('.fullpage-wrap').length)
                ? $(toggleButton).closest('.fullpage-wrap')
                : $(toggleButton).closest('.bodybox-wrap');
 
-            // Not all parts of the site have same surrounding markup, so if that 
-            // fails, grab nearest parent element that might enclose it. The 
+            // Not all parts of the site have same surrounding markup, so if that
+            // fails, grab nearest parent element that might enclose it. The
             // exception this was made for is the signatures plugin.
             if (typeof formWrapper == 'undefined') {
                formWrapper = $(toggleButton).parent().parent();
@@ -87,11 +87,11 @@
                var fullPageCandidate = $('#editor-fullpage-candidate');
                var editorToolbar = $(fullPageCandidate).find('.editor');
 
-               // When textarea pushes beyond viewport of its container, a 
-               // scrollbar appears, which pushes the textarea left, while the 
+               // When textarea pushes beyond viewport of its container, a
+               // scrollbar appears, which pushes the textarea left, while the
                // fixed editor toolbar does not move, so push it over.
-               // Opted to go this route because support for the flow events is 
-               // limited, webkit/moz both have their own implementations, while 
+               // Opted to go this route because support for the flow events is
+               // limited, webkit/moz both have their own implementations, while
                // IE has no support for them. See below for example, commented out.
 
                // Only Firefox seems to have this issue (unless this is
@@ -110,9 +110,9 @@
             } else {
                clearInterval(toolbarInterval);
 
-               // wysiwhtml5 editor area sometimes overflows beyond wrapper 
-               // when exiting fullpage, and it reflows on window resize, so 
-               // trigger resize event to get it done. 
+               // wysiwhtml5 editor area sometimes overflows beyond wrapper
+               // when exiting fullpage, and it reflows on window resize, so
+               // trigger resize event to get it done.
                $('.'+editorName).css('width', '100%');
 
                // else disable fullpage
@@ -136,7 +136,7 @@
                    }, 400);
                 }
             }
-            
+
             // Set focus to composer when going fullpage and exiting.
             if (typeof wysiwygInstance != 'undefined') {
                wysiwygInstance.focus();
@@ -150,10 +150,10 @@
          };
 
          /**
-          * Attach fullpage toggling events 
+          * Attach fullpage toggling events
           */
 
-         // click fullpage 
+         // click fullpage
          var clickFullPage = (function() {
             $(".editor-toggle-fullpage-button")
             .off('click')
@@ -168,13 +168,13 @@
                if ($('body').hasClass('js-editor-fullpage') && e.which == 27) {
                   toggleFullpage();
                }
-            });  
+            });
          }());
 
          /**
-          * If full page and the user saves/cancels/previews comment, 
+          * If full page and the user saves/cancels/previews comment,
           * exit out of full page.
-          * Not smart in the sense that a failed post will also exit out of 
+          * Not smart in the sense that a failed post will also exit out of
           * full page, but the text will remain in editor, so not big issue.
           */
          var postCommentCloseFullPageEvent = (function() {
@@ -183,28 +183,28 @@
             .on('click.closefullpage', function() {
                // Prevent auto-saving drafts from exiting fullpage
                if (!$(this).hasClass('DraftButton')) {
-                  if ($('body').hasClass('js-editor-fullpage')) { 
+                  if ($('body').hasClass('js-editor-fullpage')) {
                      toggleFullpage();
                   }
                }
-            });   
-         }()); 
+            });
+         }());
 
-         /** 
+         /**
           * Toggle spoilers in posted messages.
           */
          var editorToggleSpoiler = (function() {
-            // Use event delegation, so that even new comments ajax posted 
-            // can be toggled 
+            // Use event delegation, so that even new comments ajax posted
+            // can be toggled
             $('.MessageList')
-            .on('mouseup.Spoiler', '.Spoiler', function(e) {            
+            .on('mouseup.Spoiler', '.Spoiler', function(e) {
                $(this).removeClass('Spoiler');
                $(this).addClass('Spoiled');
             })
             .on('mouseup.Spoiled', '.Spoiled', function(e) {
-               // If the user selects some text, don't close the spoiler, and 
+               // If the user selects some text, don't close the spoiler, and
                // if there is an anchor in spoiler, do not close spoiler.
-               if (!document.getSelection().toString().length 
+               if (!document.getSelection().toString().length
                && e.target.nodeName.toLowerCase() != 'a') {
                   $(this).removeClass('Spoiled');
                   $(this).addClass('Spoiler');
@@ -214,10 +214,10 @@
 
          /**
           * Lights on/off in fullpage
-          * 
-          * Note: Wysiwyg makes styling the BodyBox more difficult as it's an 
-          * iframe. Consequently, JavaScript has to override all the styles 
-          * that skip the iframe, and tie into the focus and blur events to 
+          *
+          * Note: Wysiwyg makes styling the BodyBox more difficult as it's an
+          * iframe. Consequently, JavaScript has to override all the styles
+          * that skip the iframe, and tie into the focus and blur events to
           * override the Wysihtml5 inline style events.
           */
          var toggleLights = function() {
@@ -285,7 +285,7 @@
        */
       var editorSetHelpText = function(format, editorAreaObj) {
          format = format.toLowerCase();
-         if (format != 'wysiwyg') {
+         if (format != 'wysiwyg' && format != 'text' && format != 'textex') {
             // If the helpt text is already there, don't insert it again.
             if (!$(editorAreaObj).parent().find('.editor-help-text').length) {
                $("<div></div>")
@@ -297,13 +297,13 @@
        };
 
        /**
-        * For non-wysiwyg views. Wysiwyg focus() automatically places caret 
-        * at the end of a string of text. 
+        * For non-wysiwyg views. Wysiwyg focus() automatically places caret
+        * at the end of a string of text.
         */
        var editorSetCaretFocusEnd = function(obj) {
           obj.selectionStart = obj.selectionEnd = obj.value.length;
-          // Hack to work around jQuery's autogrow, which requires focus to init 
-          // the feature, but setting focus immediately here prevents that. 
+          // Hack to work around jQuery's autogrow, which requires focus to init
+          // the feature, but setting focus immediately here prevents that.
           // Considered using trigger() and triggerHandler(), but do not work.
           setTimeout(function(){
             obj.focus();
@@ -324,10 +324,10 @@
        };
 
       /**
-       * Deal with clashing JS for opening dialogs on click, and do not let 
-       * more than one dialog/dropdown appear at once. 
+       * Deal with clashing JS for opening dialogs on click, and do not let
+       * more than one dialog/dropdown appear at once.
        */
-      var editorSetupDropdowns = function(editorInstance) { 
+      var editorSetupDropdowns = function(editorInstance) {
          $('.editor-dropdown .editor-action')
          .off('click.dd')
          .on('click.dd', function(e) {
@@ -393,38 +393,38 @@
             }
          });
 
-         // Clicking into an editor area should close the dropdown, but keep 
+         // Clicking into an editor area should close the dropdown, but keep
          // it open for anything else.
          $('.TextBoxWrapper').add($('.wysihtml5-sandbox').contents().find('html')).each(function(i, el) {
             $(el).addClass('editor-dialog-fire-close');
          });
          
-         // Target all elements in the document that fire the dropdown close 
-         // (some are written directly as class in view), then add the matches 
+         // Target all elements in the document that fire the dropdown close
+         // (some are written directly as class in view), then add the matches
          // from within the iframe, and attach the relevant callbacks to events.
          $('.editor-dialog-fire-close').add($('.wysihtml5-sandbox').contents().find('.editor-dialog-fire-close'))
          .off('mouseup.fireclose')
-         .on('mouseup.fireclose', function(e) {   
+         .on('mouseup.fireclose', function(e) {
             $('.editor-dropdown').each(function(i, el) {
                $(el).removeClass('editor-dropdown-open');
                $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
-            }); 
+            });
          });
       };
 
       /**
-       * Editor does not play well with Quotes plugin in Wysiwyg mode. 
+       * Editor does not play well with Quotes plugin in Wysiwyg mode.
        */
       var editorHandleQuotesPlugin = function(editorInstance) {
-         var editor = editorInstance;      
+         var editor = editorInstance;
 
          /*
          // handle Quotes plugin using own logic.
          $('.MessageList')
          .on('mouseup.QuoteReply', 'a.ReactButton.Quote', function(e) {
-            // For the quotes plugin to insert the quoted text, it 
-            // requires that the textarea be pastable, which is not true 
-            // when not displayed, so momentarily toggle to it, then, 
+            // For the quotes plugin to insert the quoted text, it
+            // requires that the textarea be pastable, which is not true
+            // when not displayed, so momentarily toggle to it, then,
             // unavoidable, wait short interval to then allow wysihtml5
             // to toggle back and render the content.
             editor.fire("change_view", "textarea");
@@ -435,20 +435,20 @@
                   clearInterval(si);
                   $(editor.textarea.element).css({"opacity":""});
                   editor.fire("change_view", "composer");
-                  // Inserting a quote at the end prevents editor from 
-                  // breaking out of quotation, which means everything 
-                  // typed after the inserted quotation, will be wrapped 
+                  // Inserting a quote at the end prevents editor from
+                  // breaking out of quotation, which means everything
+                  // typed after the inserted quotation, will be wrapped
                   // in a blockquote.
                   editor.composer.selection.setAfter(editor.composer.element.lastChild);
                   editor.composer.commands.exec("insertHTML", "<p></p>");
-                  
+
                   // editor.composer.setValue(editor.composer.getValue() + "<p><br></p>");
                   // editor.fire("focus:composer");
                }
             }, 0);
          });
          */
-         
+
          // Handle quotes plugin using triggered event.
          $('a.ReactButton.Quote').on('click', function(e) {
             // Stop animation from other plugin and let this one
@@ -460,8 +460,8 @@
          });
 
          $(editor.textarea.element).on('appendHtml', function(e, data) {
-            // The quotes plugin tends to add line breaks to the end of the 
-            // quoted string, which upsets wysihtml5 paragraphing, so replace 
+            // The quotes plugin tends to add line breaks to the end of the
+            // quoted string, which upsets wysihtml5 paragraphing, so replace
             // it with proper block ending to make sure paragraphs continue.
             data = data.replace(/<br\s?\/?>$/, '<p><br></p>');
             
@@ -476,33 +476,33 @@
             editor.composer.commands.exec("insertHTML", data);
 
             // Reported bug: Chrome does not handle wysihtml5's insertHTML
-            // command properly. The downside to this workaround is that the 
+            // command properly. The downside to this workaround is that the
             // caret will be placed at the beginning of the text box.
-            if (window.chrome) {    
+            if (window.chrome) {
                var initial_value = editor.composer.getValue();
-               
-               if (!initial_value.length 
+
+               if (!initial_value.length
                || initial_value.toString() === '<p></p>') {
                   editor.composer.setValue(initial_value + data);
                } else {
                   editor.composer.setValue(initial_value);
                }
             }
-            
+
             editor.focus();
          });
-         
+
       };
-      
+
       /**
-       * This is just to make sure that editor, upon choosing to edit an 
-       * inline post, will be scrolled to the correct location on the page. 
-       * Some sites may have plugins that interfere on edit, so take care of 
+       * This is just to make sure that editor, upon choosing to edit an
+       * inline post, will be scrolled to the correct location on the page.
+       * Some sites may have plugins that interfere on edit, so take care of
        * those possibilities here.
        */
       var scrollToEditorContainer = function(textarea) {
          var scrollto = $(textarea).closest('.Comment');
-         
+
          if (!scrollto.length) {
             scrollto = $(textarea).closest('.CommentForm');
          }
@@ -511,31 +511,31 @@
             $('html, body').animate({
                scrollTop: $(scrollto).offset().top
             }, 400);
-         } 
+         }
       };
 
       /**
        * Chrome wraps span around content. Firefox prepends b.
        * No real need to detect browsers.
-       */ 
+       */
       var wysiPasteFix = function(editorInstance) {
          var editor = editorInstance;
          editor.observe("paste:composer", function(e) {
-            // Cancel out this function's operation for now. On the original 
-            // 0.3.0 version, pasting google docs would wrap either a span or 
-            // b tag around the content. Now, since moving to 0.4.0pre, the 
-            // paragraphing messes this up severaly. Moreover, pasting 
-            // through this function sets caret to end of composer. 
-            // Originally found this bug through a client site mentioning paste 
-            // issue, which opened up larger issue of pasting with new version 
-            // of wysihtml5. For now, disable paste filtering to make sure 
-            // pasting and the caret remain in same position. 
-            // TODO. 
-            //return; 
+            // Cancel out this function's operation for now. On the original
+            // 0.3.0 version, pasting google docs would wrap either a span or
+            // b tag around the content. Now, since moving to 0.4.0pre, the
+            // paragraphing messes this up severaly. Moreover, pasting
+            // through this function sets caret to end of composer.
+            // Originally found this bug through a client site mentioning paste
+            // issue, which opened up larger issue of pasting with new version
+            // of wysihtml5. For now, disable paste filtering to make sure
+            // pasting and the caret remain in same position.
+            // TODO.
+            //return;
             // Grab paste value
             ////var paste = this.composer.getValue();
             // Just need to remove first one, and wysihtml5 will auto
-            // make sure the pasted html has all tags closed, so the 
+            // make sure the pasted html has all tags closed, so the
             // last will just be stripped automatically. sweet.
             ////paste = paste.replace(/^<(span|b)>/m, ''); // just match first
             // Insert into composer
@@ -545,9 +545,9 @@
 
 
       /**
-       * Debugging lazyloaded scripts impossible with jQuery getScript/get, 
-       * so make sure available. 
-       * 
+       * Debugging lazyloaded scripts impossible with jQuery getScript/get,
+       * so make sure available.
+       *
        * http://balpha.de/2011/10/jquery-script-insertion-and-its-consequences-for-debugging/
        */
       function loadScript(path) {
@@ -567,22 +567,22 @@
          script.onerror = function () { result.reject(); };
          $("head")[0].appendChild(script);
          return result.promise();
-      }  
-      
+      }
+
       /**
-       * Strange bug when editing a comment, then returning 
-       * to main editor at bottom of discussion. For now, 
-       * just use this temp hack. I noticed that if there 
-       * was text in the main editor before choosing to edit 
-       * a comment further up the discussion, that the main 
-       * one would be fine, so insert a zero-width character 
-       * that will virtually disappear to everyone and 
-       * everything--except wysihtml5. 
-       * Actual console error: 
+       * Strange bug when editing a comment, then returning
+       * to main editor at bottom of discussion. For now,
+       * just use this temp hack. I noticed that if there
+       * was text in the main editor before choosing to edit
+       * a comment further up the discussion, that the main
+       * one would be fine, so insert a zero-width character
+       * that will virtually disappear to everyone and
+       * everything--except wysihtml5.
+       * Actual console error:
        * NS_ERROR_INVALID_POINTER: Component returned failure code: 0x80004003 (NS_ERROR_INVALID_POINTER) [nsISelection.addRange]
        * this.nativeSelection.addRange(getNativeRange(range));
        * LINE: 2836 in wysihtml5-0.4.0pre.js
-       * 
+       *
        * &zwnj;
        * wysihtml5.INVISIBLE_SPACE = \uFEFF
        */
@@ -590,15 +590,15 @@
          var editor = editorInstance;
          //var text = editor.composer.getValue();
          //editor.composer.setValue(text + "<p>&zwnj;<br></p>");
-         
-         // Problem with this is being able to post "empty", because invisible 
-         // space is counted as a character. However, many forums could 
-         // implemented a character minimum, so this will 
-         // not happen everywhere. Regardless, this is only a bandaid. A real 
-         // fix will need to be figured out. The wysihtml5 source was pointing 
-         // to a few things, but it largely also utilizes hacks like this, and 
-         // in fact does insert an initial p tag in the editor to signal that 
-         // paragraphs should follow. 
+
+         // Problem with this is being able to post "empty", because invisible
+         // space is counted as a character. However, many forums could
+         // implemented a character minimum, so this will
+         // not happen everywhere. Regardless, this is only a bandaid. A real
+         // fix will need to be figured out. The wysihtml5 source was pointing
+         // to a few things, but it largely also utilizes hacks like this, and
+         // in fact does insert an initial p tag in the editor to signal that
+         // paragraphs should follow.
          var insertNull = function() {
             if (!window.chrome) {
                // When placeholder attribute set, Firefox does not clear it, and this 
@@ -615,7 +615,7 @@
                editor.composer.setValue(editor.composer.getValue() + "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
             }
             editor.fire("blur", "composer");
-            editor.focus(); 
+            editor.focus();
          };
 
          editor.on("focus", function() {
@@ -623,13 +623,13 @@
                insertNull();
             }
          });
-         
-         // On Chrome, when loading page, first editing a post, then going to 
-         // reply, ctrl+a all body of new reply, delete, then start typing, 
-         // and paragraphing is gone. This is because I'm only checking and 
-         // inserting null on backspace when empty. I could just interval 
+
+         // On Chrome, when loading page, first editing a post, then going to
+         // reply, ctrl+a all body of new reply, delete, then start typing,
+         // and paragraphing is gone. This is because I'm only checking and
+         // inserting null on backspace when empty. I could just interval
          // check for emptiness, but this nullFix is already too hackish.
-         // OKAY no. Return to this problem in future. 
+         // OKAY no. Return to this problem in future.
          $(editor.composer.doc).on('keyup', function(e) {
             // Backspace
             if (e.which == 8) {
@@ -677,7 +677,7 @@
        * This will only be called when debug=true;
        */
       var wysiDebug = function(editorInstance) {
-         // Event examples that will come in handy--taken from source. 
+         // Event examples that will come in handy--taken from source.
          //editor.fire("change_view", "composer");
          //editor.fire("change_view", "textarea");
          //this.editor.observe("change_view", function(view) {
@@ -743,40 +743,40 @@
       };
 
       /**
-       * Initialize editor on every .BodyBox (or other element passed to this 
+       * Initialize editor on every .BodyBox (or other element passed to this
        * jQuery plugin) on the page.
-       * 
-       * Was originallt built for latest mutation observers, but far too 
-       * limited in support and VERY temperamental, so had to move to livequery. 
-       * The params checks are there in case in future want to use mutation 
-       * observers again. For livequery functionality, just pass empty string as 
-       * first param, and the textarea object to the second. 
+       *
+       * Was originallt built for latest mutation observers, but far too
+       * limited in support and VERY temperamental, so had to move to livequery.
+       * The params checks are there in case in future want to use mutation
+       * observers again. For livequery functionality, just pass empty string as
+       * first param, and the textarea object to the second.
        */
-      var editorInit = function(obj, textareaObj) { 
-         var t = $(obj);
+      var editorInit = function(obj, textareaObj) {
+         var $t = $(obj);
 
          // if using mutation events, use this, and send mutation
          if (typeof obj.target != 'undefined') {
-            t = $(obj.target);
+            $t = $(obj.target);
          }
 
          // if using livequery, use this, and send blank string
          if (obj == '') {
-            t = $(textareaObj).closest('form');
+            $t = $(textareaObj).closest('form');
          }
 
          //var currentEditorFormat     = t.find('#Form_Format');
-         var currentEditorFormat     = t.find('input[name="Format"]');
-         var currentEditorToolbar    = '';
-         var currentEditableTextarea = '';
+         var currentEditorFormat     = $t.find('input[name="Format"]');
+         var $currentEditorToolbar    = '';
+         var $currentEditableTextarea = '';
          var currentTextBoxWrapper   = '';
 
-         // When previewing text in standard reply discussion controller, 
-         // the mutation will cause the iframe to be inserted AGAIN, thus 
-         // having multiple iframes with identical properties, which, upon 
+         // When previewing text in standard reply discussion controller,
+         // the mutation will cause the iframe to be inserted AGAIN, thus
+         // having multiple iframes with identical properties, which, upon
          // reverting back to editing mode, will break everything, so kill
          // mutation callback immediately, so check if iframe already exists.
-         if ($(t).find('iframe').hasClass('vanilla-editor-text')) {
+         if ($t.find('iframe').hasClass('vanilla-editor-text')) {
             return false;
          }
 
@@ -785,22 +785,22 @@
              formatOriginal          = currentEditorFormat[0].value;
              currentEditorFormat     = currentEditorFormat[0].value.toLowerCase();
              format                  = currentEditorFormat + '';
-             currentEditorToolbar    = t.find('.editor-format-'+ format);
+             $currentEditorToolbar    = $t.find('.editor-format-'+ format);
              //currentEditableTextarea = t.find('#Form_Body');
-             currentEditableTextarea = t.find('.BodyBox');
- 
+             $currentEditableTextarea = $t.find('.BodyBox');
+
             if (textareaObj) {
-                currentEditableTextarea = textareaObj;
+                $currentEditableTextarea = textareaObj;
              }
 
-             currentTextBoxWrapper   = currentEditableTextarea.parent('.TextBoxWrapper');   
-             
-             // If singleInstance is false, then odds are the editor is being 
+             currentTextBoxWrapper   = $currentEditableTextarea.parent('.TextBoxWrapper');
+
+             // If singleInstance is false, then odds are the editor is being
              // loaded inline and there are other instances on page.
              var singleInstance = true;
-          
-             // Determine if editing a comment, or not. When editing a comment, 
-             // it has a comment id, while adding a new comment has an empty 
+
+             // Determine if editing a comment, or not. When editing a comment,
+             // it has a comment id, while adding a new comment has an empty
              // comment id. The value is a hidden input.
              var commentId = $(currentTextBoxWrapper).parent().find('#Form_CommentID').val();
              if (typeof commentId != 'undefined' && commentId != '') {
@@ -809,19 +809,11 @@
          }
 
          // if found, perform operation
-         if (currentEditorToolbar.length 
-         && currentEditableTextarea.length) {
+         if ($currentEditorToolbar.length
+         && $currentEditableTextarea.length) {
 
-            var currentEditableCommentId = (new Date()).getTime(),
-                editorTextareaId         = currentEditableTextarea[0].id +'-'+ currentEditableCommentId,
-                editorToolbarId          = 'editor-format-'+ format +'-'+ currentEditableCommentId;
-
+            var currentEditableCommentId = (new Date()).getTime();
             var editorName               = 'vanilla-editor-text-'+ currentEditableCommentId;
-
-            // change ids to bind new editor functionality to particular edit
-            $(currentEditorToolbar).attr('id', editorToolbarId);
-
-            $(currentEditableTextarea).attr('id', editorTextareaId); 
 
             switch (format) {
                case 'wysiwyg':
@@ -837,12 +829,12 @@
                    ).done(function(){
 
                       var editorRules = {
-                         // Give the editor a name, the name will also be set as class name on the iframe and on the iframe's body 
+                         // Give the editor a name, the name will also be set as class name on the iframe and on the iframe's body
                          name:                 editorName,
                          // Whether the editor should look like the textarea (by adopting styles)
                          style:                true,
                          // Id of the toolbar element or DOM node, pass false value if you don't want any toolbar logic
-                         toolbar:              editorToolbarId,
+                         toolbar:              $currentEditorToolbar.get(0),
                          // Whether urls, entered by the user should automatically become clickable-links
                          autoLink:             false,
                          // Object which includes parser rules to apply when html gets inserted via copy & paste
@@ -865,32 +857,36 @@
                          // Whether the rich text editor should be rendered on touch devices (wysihtml5 >= 0.3.0 comes with basic support for iOS 5)
                          supportTouchDevices:  true,
                          // Whether senseless <span> elements (empty or without attributes) should be removed/replaced with their content
-                         cleanUp:              true   
+                         cleanUp:              true
                       };
 
                       // instantiate new editor
-                      var editor = new wysihtml5.Editor($(currentEditableTextarea)[0], editorRules);
+                      var editor = new wysihtml5.Editor($currentEditableTextarea[0], editorRules);
 
                       editor.on('load', function(e) {
+                          if (!editor.composer) {
+                              $currentEditorToolbar.hide();
+                              return;
+                          }
 
                          // enable auto-resize
                          $(editor.composer.iframe).wysihtml5_size_matters();
                          editorHandleQuotesPlugin(editor);
-                         
-                         // Clear textarea/iframe content on submit. 
-                         // This is not actually necessary here because 
+
+                         // Clear textarea/iframe content on submit.
+                         // This is not actually necessary here because
                          // the whole editor is removed from the page on post.
-                         $(currentEditableTextarea.closest('form')).on('clearCommentForm', function() {
+                         $currentEditableTextarea.closest('form').on('clearCommentForm', function() {
                             editor.fire('clear');
                             editor.composer.clear();
-                            this.reset();           
-                            $(currentEditableTextarea).val('');
+                            this.reset();
+                            $currentEditableTextarea.val('');
                             //$('iframe').contents().find('body').empty();
                             $(editor.composer.iframe).css({"min-height": "inherit"});
                          });
-                         
-                         // Fix problem of editor losing its default p tag 
-                         // when loading another instance on the same page. 
+
+                         // Fix problem of editor losing its default p tag
+                         // when loading another instance on the same page.
                          nullFix(editor);
 
                         // iOS
@@ -899,7 +895,7 @@
                          //wysiPasteFix(editor);
                          fullPageInit(editor);
                          editorSetupDropdowns(editor);
-                         
+
                          // If editor is being loaded inline, then focus it.
                          if (!singleInstance) {
                            //scrollToEditorContainer(editor.textarea.element);
@@ -922,10 +918,10 @@
                             //return wysihtml5.commands.formatInline.exec(composer, command, "div", "Spoiler", REG_EXP);
                             wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "div", "Spoiler", REG_EXP);
 
-                            // If block element chosen from last string in editor, there is no way to 
-                            // click out of it and continue typing below it, so set the selection 
-                            // after the insertion, and insert a break, because that will set the 
-                            // caret to after the latest insertion.                   
+                            // If block element chosen from last string in editor, there is no way to
+                            // click out of it and continue typing below it, so set the selection
+                            // after the insertion, and insert a break, because that will set the
+                            // caret to after the latest insertion.
                             if ($(composer.element.lastChild).hasClass('Spoiler')) {
                                composer.selection.setAfter(composer.element.lastChild);
                                composer.commands.exec("insertHTML", "<p><br></p>");
@@ -988,27 +984,32 @@
                             return undef;
                           }
                         };
-                      })(wysihtml5);                        
+                      })(wysihtml5);
                   });
                 break;
 
                 case 'html':
                 case 'bbcode':
-                case 'markdown': 
+                case 'markdown':
                    // Lazyloading scripts, then run single callback
                    $.when(
                       loadScript(assets + '/js/buttonbarplus.js?v=' + editorVersion),
                       loadScript(assets + '/js/jquery.hotkeys.js?v=' + editorVersion),
                       loadScript(assets + '/js/rangy.js?v=' + editorVersion)
                    ).done(function() {
-                      ButtonBar.AttachTo($(currentEditableTextarea)[0], formatOriginal);
+                      ButtonBar.AttachTo($($currentEditableTextarea)[0], formatOriginal);
                       fullPageInit();
                       editorSetupDropdowns();
                       if (!singleInstance) {
                          //scrollToEditorContainer($(currentEditableTextarea)[0]);
-                         editorSetCaretFocusEnd(currentEditableTextarea[0]);
+                         editorSetCaretFocusEnd($currentEditableTextarea[0]);
                       }
-                   });                  
+                   });
+                   break;
+
+               case 'text':
+               case 'textex':
+
                    break;
             }
 
@@ -1022,7 +1023,7 @@
 
       // Deprecated livequery.
       if(jQuery().livequery) {
-         this.livequery(function() {    
+         this.livequery(function() {
             editorInit('', $(this));
          });
       }
