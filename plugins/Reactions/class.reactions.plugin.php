@@ -298,7 +298,7 @@ class ReactionsPlugin extends Gdn_Plugin {
          ->GetWhere('UserTag', array('RecordID' => $Sender->Data('Profile.UserID'), 'RecordType' => 'User', 'UserID' => ReactionModel::USERID_OTHER))->ResultArray();
       $Data = Gdn_DataSet::Index($Data, array('TagID'));
 
-      $Counts = $Sender->Data('Counts');
+      $Counts = $Sender->Data('Counts', array());
       foreach (ReactionModel::ReactionTypes() as $Code => $Type) {
          if (!$Type['Active'])
             continue;
