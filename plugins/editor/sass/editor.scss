@@ -1,10 +1,10 @@
 @import "compass";
 @import "compass/css3";
-@import "_iconfonts";
+//@import "_iconfonts";
 @import "_jquery.atwho";
 
 /**
- *  Define some mixins 
+ *  Define some mixins
  */
 
 @mixin border-box-important {
@@ -15,7 +15,7 @@
 
 
 /**
- * Editor toolbar 
+ * Editor toolbar
  */
 
 /* By default, when JS not enabled, do not display editor. */
@@ -31,9 +31,11 @@
 .editor {
    padding: 5px 0;
    font-size: 14px;
-   -webkit-user-select: none;  
-   -moz-user-select: none;    
+   -webkit-user-select: none;
+   -moz-user-select: none;
    user-select: none;
+
+   line-height: 1.5;
 }
 
 .editor-help-text {
@@ -42,7 +44,7 @@
 
 .editor .icon {
    display: inline-block;
-   padding: 5px 8px;
+   padding: 2px 6px;
    margin: 0 1px;
    border: 1px solid transparent;
    cursor: pointer;
@@ -73,14 +75,16 @@
 .editor .icon-caret-down {
    font-size: 75%;
    pointer-events: none;
-   margin-left: 6px;
    position: relative;
    top: -2px;
+   right: -2px;
+   min-width: 0 !important;
+   padding: 0 0 0 5px;
 }
 
 
 /**
- * Dropdowns 
+ * Dropdowns
  */
 
 .editor-insert-dialog {
@@ -99,7 +103,7 @@
 .MenuButtons {
    margin-top: 5px;
    text-align: right;
-   
+
    .Button {
       min-width: 55px;
    }
@@ -160,11 +164,15 @@
  */
 
 .editor-dd-emoji + .editor-insert-dialog {
-   width: 120px;
+   @include box-sizing(border-box);
+   width: 132px;
 }
 
+/* Since making emoji pluggable, the .emoji tag is wrapped in a span, with its
+   .emoji class name removed and just added to the child, being the img tag.
+   The parent span tag has the .emoji-$name and .editor-action. */
 .editor-dd-emoji + .editor-insert-dialog .emoji {
-   box-sizing: content-box !important;
+   @include box-sizing(content-box);
    display: inline-block;
    padding: 5px;
    background-repeat: no-repeat;
@@ -178,22 +186,22 @@
 }
 
 /**
- * Going full page 
+ * Going full page
  */
 
 .editor-toggle-fullpage-button {
    float: right;
 }
 
-/* Added to body class with JS, so force specificity for everything 
+/* Added to body class with JS, so force specificity for everything
    below; this makes editing very easy */
 
 .js-editor-fullpage {
    overflow: hidden !important;
 }
 
-/* For some reason this element has right padding in core that does nothing, 
-except offset the textarea in fullpage. Removing it in regular view has no 
+/* For some reason this element has right padding in core that does nothing,
+except offset the textarea in fullpage. Removing it in regular view has no
 affect, so it's not doing anything */
 
 .js-editor-fullpage .TextBoxWrapper {
@@ -236,7 +244,7 @@ affect, so it's not doing anything */
 .js-editor-fullpage #editor-fullpage-candidate .editor,
 .js-editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
    max-width: 800px;
-   
+
    -webkit-animation-duration: 0.8s;
    -webkit-animation-name: editor-anim-editor;
    animation-duration: 0.8s;
@@ -251,7 +259,7 @@ affect, so it's not doing anything */
 }
 
 /* Fix some content boxes */
-.js-editor-fullpage #editor-fullpage-candidate input, 
+.js-editor-fullpage #editor-fullpage-candidate input,
 .js-editor-fullpage .TextBoxWrapper .BodyBox,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
    @include border-box-important;
@@ -261,8 +269,8 @@ affect, so it's not doing anything */
    display: none;
 }
 
-/* Set default heights for each editor view. Regular (markdown, html, bbcode) 
-all require min-height to be set to not interfere with autogrow, while 
+/* Set default heights for each editor view. Regular (markdown, html, bbcode)
+all require min-height to be set to not interfere with autogrow, while
 wysiwgy requires height to not interfere with autogrow. */
 
 .js-editor-fullpage .TextBoxWrapper .BodyBox {
@@ -290,7 +298,7 @@ wysiwgy requires height to not interfere with autogrow. */
 
 .js-editor-fullpage #editor-fullpage-candidate.editor-lights-candidate {
    background-color: #000;
-   
+
    .editor {
       background-color: rgba(0,0,0,0.80);
       color: #fff;
@@ -315,7 +323,7 @@ wysiwgy requires height to not interfere with autogrow. */
       border-color: #222222 !important;
       color: #999999 !important;
    }
-   
+
 }
 
 /* Animation definition for fade in editor on fullpage */
@@ -333,12 +341,12 @@ wysiwgy requires height to not interfere with autogrow. */
 /**
  * Hide some actions per editor view.
  *
- * Html, BBCode, and Markdown views have slight differences than the Wysiwyg, 
+ * Html, BBCode, and Markdown views have slight differences than the Wysiwyg,
  * so hide the particular ones.
  */
 .editor-format-html .editor-toggle-source,
 .editor-format-bbcode .editor-toggle-source,
-.editor-format-markdown .editor-toggle-source, 
+.editor-format-markdown .editor-toggle-source,
 .editor-format-html .sep-switches,
 .editor-format-bbcode .sep-switches,
 .editor-format-markdown .sep-switches,
@@ -346,7 +354,7 @@ wysiwgy requires height to not interfere with autogrow. */
 .editor-format-markdown .sep-align,
 .editor-format-markdown .icon-align-left,
 .editor-format-markdown .icon-align-center,
-.editor-format-markdown .icon-align-right, 
+.editor-format-markdown .icon-align-right,
 
 .editor-format-html .editor-image-align,
 .editor-format-bbcode .editor-image-align,
@@ -360,35 +368,35 @@ wysiwgy requires height to not interfere with autogrow. */
 }
 
 /**
- * When wysiwyg editor switches to code view, disable functionality and visibly 
+ * When wysiwyg editor switches to code view, disable functionality and visibly
  * disable the common action buttons, which should no longer have any affect.
- * The class, wysihtml5-commands-disabled, is added to editor bar when 
- * the code switch button is clicked, so tie into it. 
+ * The class, wysihtml5-commands-disabled, is added to editor bar when
+ * the code switch button is clicked, so tie into it.
  */
 
 .wysihtml5-commands-disabled {
-   
+
    .editor-action {
       opacity: 0.25;
       pointer-events: none;
    }
-   
+
    .editor-toggle-source,
    .editor-toggle-fullpage-button {
       opacity: 1;
       pointer-events: auto;
 
-   } 
+   }
 }
 
 
 /**
  * Brute force hide other editors enabled after this one.
  *
- * In case some of the other editors were enabled after this one, just have 
- * them hidden from page, essentially making this editor the veto. This is 
- * a last ditch effort to at least make sure editor is usable when others 
- * are enabled. 
+ * In case some of the other editors were enabled after this one, just have
+ * them hidden from page, essentially making this editor the veto. This is
+ * a last ditch effort to at least make sure editor is usable when others
+ * are enabled.
  */
 
 .js-editor-active .cleditorMain iframe {
@@ -400,7 +408,7 @@ wysiwgy requires height to not interfere with autogrow. */
 }
 
 .js-editor-active .cleditorToolbar,
-.js-editor-active .ButtonBar, 
+.js-editor-active .ButtonBar,
 .js-editor-active .ButtonBarMarkupHint {
    display: none !important;
 }
@@ -417,7 +425,7 @@ wysiwgy requires height to not interfere with autogrow. */
       height: auto !important;
    }
 
-   /* This is not necessary or very specific, but on mobile, apple products 
+   /* This is not necessary or very specific, but on mobile, apple products
       add rounded corners */
    textarea {
       border-radius: 0;
@@ -425,13 +433,13 @@ wysiwgy requires height to not interfere with autogrow. */
 }
 
 /**
- * Modify this file to change the styling of the content 
- * in the Wysiwyg editor. 
+ * Modify this file to change the styling of the content
+ * in the Wysiwyg editor.
  */
 
 @import "wysiwyg";
 
-/* Keep here to address iframe/body padding text creep issue, see autogrow js 
+/* Keep here to address iframe/body padding text creep issue, see autogrow js
 for more information about the issue */
 .wysihtml5-sandbox {
    padding: 0 !important;

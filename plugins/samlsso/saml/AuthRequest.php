@@ -5,13 +5,19 @@ require_once('Settings.php');
  */
 class OneLogin_Saml_AuthRequest
 {
-    const ID_PREFIX = 'ONELOGIN';
+    const ID_PREFIX = 'VANILLA';
 
     /**
      * A SamlResponse class provided to the constructor.
      * @var OneLogin_Saml_Settings
      */
     protected $_settings;
+
+    /**
+     * Whether or not this is a passive request.
+     * @var bool
+     */
+    public $isPassive = true;
 
     /**
      * Construct the response object.
@@ -34,7 +40,8 @@ class OneLogin_Saml_AuthRequest
     {
         $id = $this->_generateUniqueID();
         $issueInstant = $this->_getTimestamp();
-        
+        $isPassive = $this->isPassive ? 'true' : 'false';
+
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -42,6 +49,7 @@ class OneLogin_Saml_AuthRequest
     ID="$id"
     Version="2.0"
     IssueInstant="$issueInstant"
+    IsPassive="$isPassive"
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
     AssertionConsumerServiceURL="{$this->_settings->spReturnUrl}">
     <saml:Issuer>{$this->_settings->spIssuer}</saml:Issuer>
@@ -57,22 +65,22 @@ AUTHNREQUEST;
         $deflatedRequest = gzdeflate($request);
         $base64Request = base64_encode($deflatedRequest);
         $get = array('SAMLRequest' => $base64Request);
-       
+
         try {
             $this->signRequest($get);
         } catch (Exception $ex) {
            // do nothing.
         }
-        
+
         return $this->_settings->idpSingleSignOnUrl.
            (strpos($this->_settings->idpSingleSignOnUrl, '?') === false ? '?' : '&').
            http_build_query($get);
     }
-    
+
     public function signRequest(&$get) {
        if (!$this->_settings->spPrivateKey)
           return;
-       
+
        // Construct the string.
        $get['SigAlg'] = XMLSecurityKey::RSA_SHA1;
        $msg = http_build_query($get);

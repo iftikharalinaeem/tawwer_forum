@@ -3,9 +3,12 @@ require_once('Settings.php');
 /**
  * Create a SAML authorization request.
  */
-class OneLogin_Saml_LogoutRequest
-{
+class OneLogin_Saml_LogoutResponse {
     const ID_PREFIX = 'VANILLA';
+
+    public $inResponseTo;
+
+    public $get = array();
 
     /**
      * A SamlResponse class provided to the constructor.
@@ -20,9 +23,10 @@ class OneLogin_Saml_LogoutRequest
      *   A SamlResponse settings object containing the necessary
      *   x509 certicate to decode the XML.
      */
-    public function __construct(OneLogin_Saml_Settings $settings)
-    {
+    public function __construct(OneLogin_Saml_Settings $settings, $in_response_to, $get) {
         $this->_settings = $settings;
+        $this->inResponseTo = $in_response_to;
+        $this->get = $get;
     }
 
     /**
@@ -30,28 +34,33 @@ class OneLogin_Saml_LogoutRequest
      *
      * @return string A fully qualified URL that can be redirected to in order to process the authorization request.
      */
-    public function getRedirectUrl()
-    {
+    public function getRedirectUrl() {
         $id = $this->_generateUniqueID();
         $issueInstant = $this->_getTimestamp();
 
         $request = <<<AUTHNREQUEST
-<samlp:LogoutRequest
+<samlp:LogoutResponse
     xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
     ID="$id"
     Version="2.0"
     IssueInstant="$issueInstant"
-    Destination="{$this->_settings->spSignoutReturnUrl}">
+    Destination="{$this->_settings->idpSingleSignOutUrl}"
+    InResponseTo="{$this->inResponseTo}">
     <saml:Issuer>{$this->_settings->spIssuer}</saml:Issuer>
-    <saml:NameID
-        Format="{$this->_settings->requestedNameIdFormat}"></saml:NameID>
-</samlp:LogoutRequest>
+    <samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status>
+</samlp:LogoutResponse>
 AUTHNREQUEST;
 
       $deflatedRequest = gzdeflate($request);
       $base64Request = base64_encode($deflatedRequest);
-      $get = array('SAMLRequest' => $base64Request);
+      $get = array('SAMLResponse' => $base64Request);
+
+      foreach ($this->get as $k => $v) {
+         if ($v) {
+            $get[$k] = $v;
+         }
+      }
 
       try {
          $this->signRequest($get);

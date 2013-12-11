@@ -365,7 +365,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
       Gdn::SQL()->Update('ConversationMessage')->Set('OldID', NULL)->Put();
       Gdn::SQL()->Update('Discussion')->Set('OldID', NULL)->Put();
       Gdn::SQL()->Update('Media')->Set('OldID', NULL)->Put();
-      Gdn::SQL()->Update('Media')->Set('OldID', NULL)->Put();
+      Gdn::SQL()->Update('Role')->Set('OldID', NULL)->Put();
       Gdn::SQL()->Update('User')->Set('OldID', NULL)->Put();
    }
 

@@ -224,6 +224,12 @@ class SearchModel extends Gdn_Model {
       $Query = '';
       $Terms = array();
 
+      // Skip search if no parameters were set
+      if (!isset($Search['search']) && !isset($Search['timestamp-from']) && !isset($Search['title'])
+         && !isset($Search['users']) && !isset($Search['discussionid'])) {
+         $DoSearch = FALSE;
+      }
+
       if (isset($Search['search'])) {
          list($Query, $Terms) = $this->splitTags($Search['search']);
       }

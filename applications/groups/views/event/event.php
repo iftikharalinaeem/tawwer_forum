@@ -85,7 +85,7 @@
       <?php endif; ?>
       
       <li>
-         <span class="Label"><?php echo T('Where'); ?></span> <?php echo $this->Data('Event.Location'); ?> 
+         <span class="Label"><?php echo T('Where'); ?></span> <?php echo htmlspecialchars($this->Data('Event.Location')); ?> 
          <span class="Tip">( <?php echo Wrap($TimezoneAbbr, 'span', array('class' => 'Timezone', 'title' => $TimezoneLabel)); ?> )</span>
       </li>
       
@@ -96,7 +96,7 @@
       <li><span class="Label"><?php echo T('Organizer'); ?></span> <?php echo UserAnchor($this->Data('Event.Organizer')); ?></li>
    </ul>
    
-   <div class="Body"><?php echo $this->Data('Event.Body'); ?></div>
+   <div class="Body"><?php echo Gdn_Format::To($this->Data('Event.Body'), $this->Data('Event.Format')); ?></div>
 </div>
 
 <div class="FormTitleWrapper">
