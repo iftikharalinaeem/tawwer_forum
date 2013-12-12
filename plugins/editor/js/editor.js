@@ -143,8 +143,8 @@
             } else {
                editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
             }
-            
-            // Toggle lights while in fullpage (lights off essentially makes 
+
+            // Toggle lights while in fullpage (lights off essentially makes
             // the background black and the buttons lighter.
             toggleLights();
          };
@@ -222,15 +222,15 @@
           */
          var toggleLights = function() {
             // Just do it for chrome right now. Very experimental.
-            var toggleLights = $('.editor-toggle-lights-button');     
+            var toggleLights = $('.editor-toggle-lights-button');
             var fullPageCandidate = $('#editor-fullpage-candidate');
             var ifr = {};
 
             if (fullPageCandidate.length) {
                $(toggleLights).attr('style', 'display:inline-block !important');
-               
-               // Due to wysiwyg styles embedded inline and states changed 
-               // using JavaScript, all the styles have to be duplicated from 
+
+               // Due to wysiwyg styles embedded inline and states changed
+               // using JavaScript, all the styles have to be duplicated from
                // the external stylesheet and override the iframe inlines.
                ifr = $(fullPageCandidate).find('.wysihtml5-sandbox');
                if (ifr.length) {
@@ -246,7 +246,7 @@
             $(toggleLights).off('click').on('click', function() {
                if (!$(fullPageCandidate).hasClass('editor-lights-candidate')) {
                   $(fullPageCandidate).addClass('editor-lights-candidate');
-                  
+
                   // Again, for Wysiwyg, override styles
                   if (ifr.length) {
                      // if wysiwyg, need to manipulate content in iframe
@@ -264,7 +264,7 @@
                   }
                } else {
                   $(fullPageCandidate).removeClass('editor-lights-candidate');
-                  
+
                   // Wysiwyg override styles
                   if (ifr.length) {
                      iframeBodyBox.off('focus blur');
@@ -314,7 +314,7 @@
         * Helper function to select whole text of an input or textarea on focus
         */
        var editorSelectAllInput = function(obj) {
-          // Check if can access selection, as programmatically triggering the 
+          // Check if can access selection, as programmatically triggering the
           // dd close event throws an error here.
           if (obj.selectionEnd) {
             // selectionStart is implied 0
@@ -340,7 +340,7 @@
                }, 0);
             });
 
-            if (parentEl.hasClass('editor-dropdown') 
+            if (parentEl.hasClass('editor-dropdown')
             && parentEl.hasClass('editor-dropdown-open')) {
                parentEl.removeClass('editor-dropdown-open');
                //$(parentEl).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
@@ -350,14 +350,14 @@
                   $(el).removeClass('editor-dropdown-open');
                   $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
                });
-               
-               // If the editor action buttons have been disabled (by switching 
+
+               // If the editor action buttons have been disabled (by switching
                // to HTML code view, then do not allow dropdowns. CSS pointer-
-               // events should have taken care of this, but JS still fires the 
+               // events should have taken care of this, but JS still fires the
                // event regardless, so disable them here as well.
                if (!parentEl.hasClass('wysihtml5-commands-disabled')) {
                   parentEl.addClass('editor-dropdown-open');
-                  
+
                   // if has input, focus and move caret to end of text
                   var inputBox = parentEl.find('.InputBox');
                   if (inputBox.length) {
@@ -371,18 +371,18 @@
          $('.editor-dropdown').find('.InputBox').on('keydown', function(e) {
             if (e.which == 13) {
                // Cancel enter key submissions on these values.
-               if (this.value == '' 
-               || this.value == 'http://' 
+               if (this.value == ''
+               || this.value == 'http://'
                || this.value == 'https://') {
                   e.stopPropagation();
                   e.preventDefault();
                   return false;
                }
-               
-               // Make exception for non-wysiwyg, as wysihtml5 has custom 
+
+               // Make exception for non-wysiwyg, as wysihtml5 has custom
                // key handler.
                if (!$(this).closest('.editor').hasClass('editor-format-wysiwyg')) {
-                  // Fire event programmatically to do what needs to be done in 
+                  // Fire event programmatically to do what needs to be done in
                   // ButtonBar code.
                   $(this).parent().find('.Button').trigger('click.insertData');
 
@@ -398,7 +398,7 @@
          $('.TextBoxWrapper').add($('.wysihtml5-sandbox').contents().find('html')).each(function(i, el) {
             $(el).addClass('editor-dialog-fire-close');
          });
-         
+
          // Target all elements in the document that fire the dropdown close
          // (some are written directly as class in view), then add the matches
          // from within the iframe, and attach the relevant callbacks to events.
@@ -464,9 +464,9 @@
             // quoted string, which upsets wysihtml5 paragraphing, so replace
             // it with proper block ending to make sure paragraphs continue.
             data = data.replace(/<br\s?\/?>$/, '<p><br></p>');
-            
-            // Read nullFix function for full explanation. Essentially, 
-            // placeholder does not get removed, so remove it manually if 
+
+            // Read nullFix function for full explanation. Essentially,
+            // placeholder does not get removed, so remove it manually if
             // one is set.
             if (editor.composer.placeholderSet) {
                // Just clear it on Firefox, then insert null fix.
@@ -601,15 +601,15 @@
          // paragraphs should follow.
          var insertNull = function() {
             if (!window.chrome) {
-               // When placeholder attribute set, Firefox does not clear it, and this 
-               // is due to this nullfix. Chrome handles it okay, though this 
-               // whole function (nullFix) is just a mess of flimflam. 
+               // When placeholder attribute set, Firefox does not clear it, and this
+               // is due to this nullfix. Chrome handles it okay, though this
+               // whole function (nullFix) is just a mess of flimflam.
                // Paragraphing in Wysihtml5 added many exceptions.
                if (editor.composer.placeholderSet) {
                   // Just clear it on Firefox, then insert null fix.
                   editor.composer.setValue('');
                }
-               
+
                editor.composer.commands.exec("insertHTML", "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
             } else {
                editor.composer.setValue(editor.composer.getValue() + "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
@@ -639,12 +639,12 @@
             }
          });
       };
-      
-      
+
+
       /**
-       * Using aj.js library.
-       * 
-       * This allows @mentions and :emoji: autocomplete, as well as any other 
+       * Using at.js library.
+       *
+       * This allows @mentions and :emoji: autocomplete, as well as any other
        * character key autocompletion.
        */
       var atCompleteInit = function(editorElement) {
@@ -667,15 +667,20 @@
          $(editorElement)
            .atwho({
              at: "@",
-             data: names
+             data: names,
+             callbacks: {
+                before_insert: function(value, $li) {
+                   console.log(value, $li);
+                }
+             }
            })
            .atwho({
-             at: "#", 
+             at: "#",
              tpl: '<li data-value="#${name}">${name} <small>${content}</small></li>',
              data: issues
            })
            .atwho({
-             at: ":", 
+             at: ":",
              tpl: "<li data-value=':${name}:'><img src='http://a248.e.akamai.net/assets.github.com/images/icons/emoji/${name}.png' height='20' width='20'/> ${name} </li>",
              data: emojis_list
            });
@@ -690,7 +695,7 @@
          // iOS keyboard does not push content up initially,
          // thus blocking the actual content. Typing (spaces, newlines) also
          // jump the page up, so keep it in view.
-         if (window.parent.location != window.location 
+         if (window.parent.location != window.location
          && (/ipad|iphone|ipod/i).test(navigator.userAgent)) {
 
             var contentEditable = $(editor.composer.iframe).contents().find('body');
@@ -1025,14 +1030,36 @@
                             return undef;
                           }
                         };
-                      })(wysihtml5);   
-                      
-                      
+                      })(wysihtml5);
+
+
                       /* DO ATWHO here.
-                       * 
+                       *
                        * ifr = $('body').find('.wysihtml5-sandbox');
                   var iframeBodyBox = ifr.contents().find('.BodyBox');
                        */
+
+
+                     // console.log(editor);
+
+                      $composer = $(editor.composer.iframe);
+                      //console.log($composer.contents().find('body'));
+
+
+                      $composer.on('load', function(e) {
+                         console.log('iframe-loaded');
+
+                         $composerBody = $composer.contents().find('body');
+
+                         //$composerBody.html('heyyoooooo');
+
+                         atCompleteInit($composerBody);
+                         //console.log();
+                      });
+
+                      //atCompleteInit($currentEditableTextarea);
+
+
                   });
                 break;
 
@@ -1052,9 +1079,9 @@
                          //scrollToEditorContainer($(currentEditableTextarea)[0]);
                          editorSetCaretFocusEnd($currentEditableTextarea[0]);
                       }
-                      
-                      // Enable at mentions 
-                      atCompleteInit(currentEditableTextarea);
+
+                      // Enable at mentions
+                      atCompleteInit($currentEditableTextarea);
                    });
                    break;
 

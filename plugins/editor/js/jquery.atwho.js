@@ -1020,7 +1020,12 @@
       _args = arguments;
       $('body').append($CONTAINER);
       result = null;
+
       this.filter('textarea, input, [contenteditable=true]').each(function() {
+
+         //console.log('at inloop');
+         //console.log(this);
+
         var app;
         if (typeof method === 'object' || !method) {
           return Atwho.init.apply(this, _args);
