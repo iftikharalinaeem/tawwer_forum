@@ -343,7 +343,35 @@ class ForumMergePlugin implements Gdn_IPlugin {
             from '.$NewPrefix.'User u, '.$NewPrefix.'Conversation c, `'.$OldDatabase.'`.'.$OldPrefix.'UserConversation uc
             where u.OldID = (uc.UserID) and c.OldID = (uc.ConversationID)');
       }
-      
+
+
+      // POLLS //
+      if ($this->OldTableExists('Poll')) {
+         $PollColumns = $this->GetColumns('Poll', $OldDatabase, $OldPrefix);
+         $PollOptionColumns = $this->GetColumns('PollOption', $OldDatabase, $OldPrefix);
+
+         // Copy over all polls & options
+         Gdn::SQL()->Query('insert into '.$NewPrefix.'Poll ('.$DiscussionColumns.', OldID)
+            select '.$PollColumns.', PollID
+            from `'.$OldDatabase.'`.'.$OldPrefix.'Poll');
+         Gdn::SQL()->Query('insert into '.$NewPrefix.'PollOption ('.$PollOptionColumns.', OldID)
+            select '.$PollOptionColumns.', PollOptionID
+            from `'.$OldDatabase.'`.'.$OldPrefix.'PollOption');
+
+         // Convert imported options to use new PollIDs
+         Gdn::SQL()->Query('update '.$NewPrefix.'PollOption o
+           set o.PollID = (SELECT p.DiscussionID from '.$NewPrefix.'Poll p where p.OldID = o.PollID)
+           where o.OldID > 0');
+
+         // Convert imported polls & options to use new UserIDs
+         Gdn::SQL()->Query('update '.$NewPrefix.'Poll p
+           set p.InsertUserID = (SELECT u.UserID from '.$NewPrefix.'User u where u.OldID = p.InsertUserID)
+           where p.OldID > 0');
+         Gdn::SQL()->Query('update '.$NewPrefix.'PollOption o
+           set o.InsertUserID = (SELECT u.UserID from '.$NewPrefix.'User u where u.OldID = o.InsertUserID)
+           where o.OldID > 0');
+      }
+
 		////
 		
 		// Draft - new UserIDs
@@ -367,6 +395,11 @@ class ForumMergePlugin implements Gdn_IPlugin {
       Gdn::SQL()->Update('Media')->Set('OldID', NULL)->Put();
       Gdn::SQL()->Update('Role')->Set('OldID', NULL)->Put();
       Gdn::SQL()->Update('User')->Set('OldID', NULL)->Put();
+
+      $Construct = Gdn::Database()->Structure();
+      $Construct->Table('Poll');
+      if ($Construct->TableExists())
+         Gdn::SQL()->Update('Poll')->Set('OldID', NULL)->Put();
    }
 
    public function Setup() {
@@ -380,10 +413,13 @@ class ForumMergePlugin implements Gdn_IPlugin {
       Gdn::Structure()->Table('Conversation')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('ConversationMessage')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('Discussion')->Column('OldID', 'int', TRUE, 'key')->Set();
-      //Gdn::Structure()->Table('Draft')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('Media')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('Role')->Column('OldID', 'int', TRUE, 'key')->Set();
-      //Gdn::Structure()->Table('Tag')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('User')->Column('OldID', 'int', TRUE, 'key')->Set();
+
+      $Construct = Gdn::Database()->Structure();
+      $Construct->Table('Poll');
+      if ($Construct->TableExists())
+         Gdn::Structure()->Table('Poll')->Column('OldID', 'int', TRUE, 'key')->Set();
    }
 }
