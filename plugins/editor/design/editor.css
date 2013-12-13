@@ -151,6 +151,9 @@
   width: 132px;
 }
 
+/* Since making emoji pluggable, the .emoji tag is wrapped in a span, with its
+   .emoji class name removed and just added to the child, being the img tag.
+   The parent span tag has the .emoji-$name and .editor-action. */
 .editor-dd-emoji + .editor-insert-dialog .emoji {
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;

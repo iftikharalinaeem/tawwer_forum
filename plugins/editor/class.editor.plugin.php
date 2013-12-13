@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.0.47',
+   'Version' => '1.0.48',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -190,11 +190,10 @@ class EditorPlugin extends Gdn_Plugin {
       $emoji = Emoji::instance();
       $emojiAliasList       = $emoji->getEmojiEditorList();
       foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
-         $emojiFilePath          = $emoji->getEmojiCanonicalList($emojiCanonical);
+         $emojiFilePath          = $emoji->getEmoji($emojiCanonical);
          //$editorDataAttr         = '{"action":"emoji","value":"'. htmlentities($emojiAlias) .'"}';
          $editorDataAttr         = '{"action":"emoji","value":"'. addslashes($emojiAlias) .'"}';
          //$emojiStyle           = 'background-image: url('. $emojiFilePath .'); background-size: '. $emojiDimension .'px; width: '.$emojiDimension .'px; height:'. $emojiDimension .'px;';
-//         $emojiStyle             = '';
 
          // In case user creates an alias that does not match a canonical
          // emoji, let them know.
@@ -202,10 +201,14 @@ class EditorPlugin extends Gdn_Plugin {
                                       ? $emojiAlias
                                       : "Alias '$emojiCanonical' not found in canonical list.";
 
-         $toolbarDropdownEmoji[] = array('edit' => 'media', 'action'=> 'emoji', 'type' => 'button', 'html_tag' => 'span',
+         $toolbarDropdownEmoji[] = array(
+            'edit' => 'media',
+            'action'=> 'emoji',
+            'type' => 'button',
+            'html_tag' => 'span',
             'text' => $emoji->img($emojiFilePath, $emojiAlias),
             'attr' => array(
-               'class' => 'editor-action emoji emoji-'. $emojiCanonical. ' editor-dialog-fire-close',
+               'class' => 'editor-action emoji-'. $emojiCanonical. ' editor-dialog-fire-close',
                'data-wysihtml5-command' => 'insertHTML',
                'data-wysihtml5-command-value' => ' '.$emojiAlias .' ',
                'title' => $emojiTitle,
@@ -277,8 +280,8 @@ class EditorPlugin extends Gdn_Plugin {
 	 * Replace emoticons in comment preview.
 	 */
 	public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
-		if (Emoji::instance()->emojiInterpretAllow) {
-         $Sender->Comment->Body = Emoji::instance()->translateEmojiAliasesToHtml($Sender->Comment->Body);
+		if (Emoji::instance()->enabled) {
+         $Sender->Comment->Body = Emoji::instance()->translateToHtml($Sender->Comment->Body);
       }
 	}
 
@@ -286,9 +289,9 @@ class EditorPlugin extends Gdn_Plugin {
 	 * Replace emoticons in comments.
 	 */
 	public function Base_AfterCommentFormat_Handler($Sender) {
-		if (Emoji::instance()->emojiInterpretAllow) {
+		if (Emoji::instance()->enabled) {
          $Object = $Sender->EventArguments['Object'];
-         $Object->FormatBody = Emoji::instance()->translateEmojiAliasesToHtml($Object->FormatBody);
+         $Object->FormatBody = Emoji::instance()->translateToHtml($Object->FormatBody);
          $Sender->EventArguments['Object'] = $Object;
       }
 	}
