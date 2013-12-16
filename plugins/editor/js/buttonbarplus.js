@@ -667,10 +667,6 @@ jQuery(document).ready(function($) {
             closeslice: ''
          };
 
-         console.log(TextArea);
-         console.log(Operation);
-         console.log(Value);
-
          switch (Operation) {
             case 'bold':
                $(TextArea).insertRoundTag('**',markdownOpts);
