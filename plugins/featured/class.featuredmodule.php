@@ -15,6 +15,12 @@ class FeaturedModule extends Gdn_Module {
    }
 
    public function GetData() {
+
+      $SQL = Gdn::SQL();
+		$Session = Gdn::Session();
+
+
+
    }
 
    public function AssetTarget() {
