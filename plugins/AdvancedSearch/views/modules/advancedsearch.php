@@ -5,9 +5,9 @@
    $Form = $this->Form;
    echo $Form->Open(array('action' => Url('/search'))),
       $Form->Hidden('adv');
-   
+
 //   decho(Gdn::Controller()->Data('CalculatedSearch'), 'calc search');
-   
+
    ?>
    <div class="KeywordsWrap InputAndButton">
       <?php
@@ -21,7 +21,7 @@
       <?php if ($Discussion = Gdn::Controller()->Data('Discussion')): ?>
          <div class="P">
             <?php
-            echo 
+            echo
                $Form->Label('Discussion', 'discussionid', array('class' => 'Heading')).
                $Form->CheckBox('discussionid', Gdn_Format::Text(GetValue('Name', $Discussion)), array('nohidden' => TRUE, 'value' => GetValue('DiscussionID', $Discussion)));
             ?>
@@ -56,7 +56,7 @@
       <div class="P">
          <?php
          echo $Form->Label('Tags', 'tags', array('class' => 'Heading')).
-            $Form->TextBox('tags', array('class' => 'InputBox BigInput'));
+            $Form->TextBox('tags', array('class' => 'InputBox BigInput', 'data-tags' => json_encode($this->Data('Tags', ''))));
          ?>
       </div>
       <?php endif; ?>
