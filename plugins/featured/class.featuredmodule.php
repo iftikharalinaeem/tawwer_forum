@@ -68,12 +68,7 @@ class FeaturedModule extends Gdn_Module {
       $ViewPath = $this->FetchViewLocation('featured_list');
       $String = '';
       ob_start();
-      if(is_object($this->_Sender) && isset($this->_Sender->Data)) {
-         $Data = $this->_Sender->Data;
-      } else {
-         $Data = array();
-      }
-      include ($ViewPath);
+      include $ViewPath;
       $String = ob_get_contents();
       @ob_end_clean();
       return $String;
