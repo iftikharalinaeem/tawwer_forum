@@ -1,7 +1,7 @@
 <?php if(!defined('APPLICATION')) die();
 
 $PluginInfo['featured'] = array(
-   'Name' => 'Featured',
+   'Name' => 'Featured Discussions',
    'Description' => 'Feature discussions.',
    'Version' => '1.0.0',
    'Author' => "Dane MacMillan",

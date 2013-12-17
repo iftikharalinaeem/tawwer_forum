@@ -10,8 +10,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class FeaturedModule extends Gdn_Module {
 
-   public function __construct($Sender = '') {
+   public $count = 5;
 
+   public function __construct($Sender = '') {
+      $this->_ApplicationFolder = 'plugins/featured';
+      $this->ClassName = get_class();
    }
 
    public function GetData() {
@@ -20,18 +23,41 @@ class FeaturedModule extends Gdn_Module {
 		$Session = Gdn::Session();
 
 
-
+      $DiscussionModel = new DiscussionModel();
+      $Discussions = $DiscussionModel->GetWhere(array(), 0, $this->count);
+      $this->SetData('Discussions', $Discussions);
    }
 
    public function AssetTarget() {
       //return 'Panel';
+      return 'Content';
    }
 
-   public function InlineDisplay() {
+   /**
+    * Returns the xhtml for this module as a fully parsed and rendered string.
+    *
+    * @return string
+    */
+   public function FetchView($View = '') {
+      require_once Gdn::Controller()->FetchViewLocation('helper_functions', 'discussions', 'Vanilla');
+      $this->CountCommentsPerPage = 50;
 
+      $ViewPath = $this->FetchViewLocation('featured_list');
+      $String = '';
+      ob_start();
+      if(is_object($this->_Sender) && isset($this->_Sender->Data)) {
+         $Data = $this->_Sender->Data;
+      } else {
+         $Data = array();
+      }
+      include ($ViewPath);
+      $String = ob_get_contents();
+      @ob_end_clean();
+      return $String;
    }
 
    public function ToString() {
-
+      $this->GetData();
+      return parent::ToString();
    }
 }
