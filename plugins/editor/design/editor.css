@@ -300,6 +300,13 @@ wysiwgy requires height to not interfere with autogrow. */
   color: #999999 !important;
 }
 
+/* This should match the above values, and needs to be added as a class name
+directly on the iframe's bodybox contenteditable. */
+.iframe-bodybox {
+  background-color: #000 !important;
+  color: #999999 !important;
+}
+
 /* Animation definition for fade in editor on fullpage */
 @keyframes editor-anim-editor {
   0% {

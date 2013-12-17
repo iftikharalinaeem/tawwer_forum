@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.0.48',
+   'Version' => '1.0.50',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -206,7 +206,7 @@ class EditorPlugin extends Gdn_Plugin {
             'action'=> 'emoji',
             'type' => 'button',
             'html_tag' => 'span',
-            'text' => $emoji->img($emojiFilePath, $emojiAlias),
+            'text' => $emoji->img($emojiFilePath, $emojiAlias, $editorDataAttr),
             'attr' => array(
                'class' => 'editor-action emoji-'. $emojiCanonical. ' editor-dialog-fire-close',
                'data-wysihtml5-command' => 'insertHTML',
@@ -237,7 +237,7 @@ class EditorPlugin extends Gdn_Plugin {
          ), 'attr' => array('class' => 'editor-action icon icon-paragraph editor-dd-format', 'title' => 'Format', 'data-editor' => '{"action":"format","value":""}'));
 
       $editorToolbarAll['sep-media'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-media hidden-xs'));
-      $editorToolbarAll['emoji'] = array('edit' => 'media', 'action'=> 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => 'Emoji'));
+      $editorToolbarAll['emoji'] = array('edit' => 'media', 'action'=> 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => 'Emoji', 'data-editor' => '{"action":"emoji","value":""}'));
       $editorToolbarAll['links'] = array('edit' => 'media', 'action'=> 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link', 'data-wysihtml5-command' => 'createLink', 'title' => 'Url', 'data-editor' => '{"action":"url","value":""}'));
       $editorToolbarAll['images'] = array('edit' => 'media', 'action'=> 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => 'Image', 'data-editor' => '{"action":"image","value":""}'));
 
