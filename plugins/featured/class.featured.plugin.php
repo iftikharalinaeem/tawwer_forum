@@ -32,21 +32,4 @@ class Featured extends Gdn_Plugin {
          'Description' => 'Feature a discussion.', 'Permission' => 'Garden.Curation.Manage', 'RecordTypes' => array('discussion')));
       }
    }
-
-   public function Base_Render_Before($Sender) {
-      // Only display this info to signed in members.
-      /*
-      include_once(PATH_PLUGINS . DS .'featured'. DS .'class.featuredmodule.php');
-
-      $FeaturedModule = new FeaturedModule($Sender);
-      $Sender->AddModule($FeaturedModule);
-       *
-       */
-   }
-
-   public function OnDisable() {
-	}
-
-   public function CleanUp() {
-	}
 }
