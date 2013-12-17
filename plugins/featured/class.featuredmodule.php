@@ -29,7 +29,8 @@ class FeaturedModule extends Gdn_Module {
             // Get the IDs of the discussions that have been featured.
             $DiscussionIDs = Gdn::SQL()->GetWhere('UserTag', array(
                'RecordType' => 'Discussion-Total',
-               'TagID' => $TagID
+               'TagID' => $TagID,
+               'Total >' => 0
                ), 'DateInserted', 'desc', $this->count)->ResultArray();
             $DiscussionIDs = ConsolidateArrayValuesByKey($DiscussionIDs, 'RecordID');
             if (!empty($DiscussionIDs)) {
