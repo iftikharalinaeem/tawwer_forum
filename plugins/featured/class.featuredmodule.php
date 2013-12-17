@@ -10,7 +10,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class FeaturedModule extends Gdn_Module {
 
-   public $count = 5;
+   public $count = 6;
 
    public function __construct($Sender = '') {
       $this->_ApplicationFolder = 'plugins/featured';
@@ -18,18 +18,12 @@ class FeaturedModule extends Gdn_Module {
    }
 
    public function GetData() {
-
-      $SQL = Gdn::SQL();
-		$Session = Gdn::Session();
-
-
       $DiscussionModel = new DiscussionModel();
       $Discussions = $DiscussionModel->GetWhere(array(), 0, $this->count);
       $this->SetData('Discussions', $Discussions);
    }
 
    public function AssetTarget() {
-      //return 'Panel';
       return 'Content';
    }
 
