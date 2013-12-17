@@ -28,7 +28,7 @@ class Featured extends Gdn_Plugin {
    public function Structure() {
       if (class_exists('ReactionModel')) {
          $Rm = new ReactionModel();
-         $Rm->DefineReactionType(array('UrlCode' => 'Feature', 'Name' => 'Feature Discussion', 'Sort' => 'pol0', 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
+         $Rm->DefineReactionType(array('UrlCode' => 'Featured', 'Name' => 'Feature Discussion', 'Sort' => 'pol0', 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
          'Description' => 'Feature a discussion.', 'Permission' => 'Garden.Curation.Manage', 'RecordTypes' => array('discussion')));
       }
    }
