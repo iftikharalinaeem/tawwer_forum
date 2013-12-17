@@ -9,8 +9,8 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
 class FeaturedModule extends Gdn_Module {
-
    public $count = 6;
+   public $reactionType = 'Feature';
 
    public function __construct($Sender = '') {
       $this->_ApplicationFolder = 'plugins/featured';
@@ -19,7 +19,35 @@ class FeaturedModule extends Gdn_Module {
 
    public function GetData() {
       $DiscussionModel = new DiscussionModel();
-      $Discussions = $DiscussionModel->GetWhere(array(), 0, $this->count);
+      $Discussions = new Gdn_DataSet(array(), DATASET_TYPE_ARRAY);
+
+      if (class_exists('ReactionModel')) {
+         $ReactionType = ReactionModel::ReactionTypes($this->reactionType);;
+         if ($ReactionType) {
+            $TagID = $ReactionType['TagID'];
+
+            // Get the IDs of the discussions that have been featured.
+            $DiscussionIDs = Gdn::SQL()->GetWhere('UserTag', array(
+               'RecordType' => 'Discussion-Total',
+               'TagID' => $TagID
+               ), 'DateInserted', 'desc', $this->count)->ResultArray();
+            $DiscussionIDs = ConsolidateArrayValuesByKey($DiscussionIDs, 'RecordID');
+            if (!empty($DiscussionIDs)) {
+               $DiscussionData = $DiscussionModel->GetWhere(array('d.DiscussionID' => $DiscussionIDs, 'Announce' => 'all'))->ResultArray();
+               $DiscussionData = Gdn_DataSet::Index($DiscussionData, 'DiscussionID');
+
+               // Make sure the result is ordered by the date they were featured.
+               $Result = array();
+               foreach ($DiscussionIDs as $ID) {
+                  if (isset($DiscussionData[$ID]))
+                     $Result[] = $DiscussionData[$ID];
+               }
+               $Discussions = new Gdn_DataSet($Result, DATASET_TYPE_ARRAY);
+            }
+         }
+      } else {
+         $Discussions = $DiscussionModel->GetWhere(array(), 0, $this->count);
+      }
       $this->SetData('Discussions', $Discussions);
    }
 

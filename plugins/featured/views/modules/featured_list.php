@@ -21,22 +21,29 @@ if (is_array($discussions)
 
       <div class="featured-first">
          <a class="featured-first-title" href="<?php echo $first_discussion['Url']; ?>">
-            <?php echo $first_discussion['Name']; ?>
+            <?php echo htmlspecialchars($first_discussion['Name']); ?>
          </a>
 
          <div class="featured-first-meta">
-            <a class="PhotoWrap" href="<?php echo $user_url; ?>" title="<?php echo $first_discussion['FirstName']; ?>">
+            <?php
+            echo UserPhoto($user);
+            ?>
+
+<!--            <a class="PhotoWrap" href="<?php echo $user_url; ?>" title="<?php echo $first_discussion['FirstName']; ?>">
                <img class="ProfilePhoto ProfilePhotoMedium" alt="<?php echo $first_discussion['FirstName']; ?>" src="<?php echo $first_discussion['LastPhoto']; ?>">
-            </a>
+            </a>-->
 
             <div class="featured-first-name-date">
-               <a class="featured-first-username" href="<?php echo $user_url; ?>">
+               <?php
+               echo UserAnchor($user, 'featured-first-username');
+               ?>
+<!--               <a class="featured-first-username" href="<?php echo $user_url; ?>">
                   <?php echo $first_discussion['FirstName']; ?>
-               </a>
+               </a>-->
 
-               <time class="featured-first-post-date" datetime="<?php echo $first_discussion['DateInserted']; ?>">
-                  <?php echo Gdn_Format::Date($first_discussion['DateInserted']); ?>
-               </time>
+<!--               <time class="featured-first-post-date" datetime="<?php echo $first_discussion['DateInserted']; ?>">-->
+                  <?php echo Gdn_Format::Date($first_discussion['DateInserted'], 'html'); ?>
+<!--               </time>-->
             </div>
 
             <a class="featured-first-cat" href="<?php echo $category_url; ?>">
@@ -49,7 +56,7 @@ if (is_array($discussions)
          </div>
       </div>
 
-      <h3 class="H">Other Featured Discussions</h3>
+      <h3 class="H"><?php echo T('More Featured Discussions'); ?></h3>
       <ol class="featured-other DataList">
 
          <?php foreach ($discussions as $discussion): ?>
