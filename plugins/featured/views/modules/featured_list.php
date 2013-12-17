@@ -25,25 +25,18 @@ if (is_array($discussions)
          </a>
 
          <div class="featured-first-meta">
+
             <?php
-            echo UserPhoto($user);
+               echo UserPhoto($user);
             ?>
 
-<!--            <a class="PhotoWrap" href="<?php echo $user_url; ?>" title="<?php echo $first_discussion['FirstName']; ?>">
-               <img class="ProfilePhoto ProfilePhotoMedium" alt="<?php echo $first_discussion['FirstName']; ?>" src="<?php echo $first_discussion['LastPhoto']; ?>">
-            </a>-->
-
             <div class="featured-first-name-date">
-               <?php
-               echo UserAnchor($user, 'featured-first-username');
-               ?>
-<!--               <a class="featured-first-username" href="<?php echo $user_url; ?>">
-                  <?php echo $first_discussion['FirstName']; ?>
-               </a>-->
 
-<!--               <time class="featured-first-post-date" datetime="<?php echo $first_discussion['DateInserted']; ?>">-->
-                  <?php echo Gdn_Format::Date($first_discussion['DateInserted'], 'html'); ?>
-<!--               </time>-->
+               <?php
+                  echo UserAnchor($user, 'featured-first-username');
+                  echo Gdn_Format::Date($first_discussion['DateInserted'], 'html');
+               ?>
+
             </div>
 
             <a class="featured-first-cat" href="<?php echo $category_url; ?>">
@@ -56,8 +49,13 @@ if (is_array($discussions)
          </div>
       </div>
 
-      <h3 class="H"><?php echo T('More Featured Discussions'); ?></h3>
-      <ol class="featured-other DataList">
+      <?php if (count($discussions)): ?>
+
+         <h3 class="H"><?php echo T('More Featured Discussions'); ?></h3>
+
+      <?php endif; ?>
+
+         <ol class="featured-other DataList">
 
          <?php foreach ($discussions as $discussion): ?>
 
