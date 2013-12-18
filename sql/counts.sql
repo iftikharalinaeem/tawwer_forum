@@ -49,3 +49,6 @@ set CountDiscussions = (select count(d.InsertUserID) from GDN_Discussion d where
 
 update GDN_User u
 set CountComments = (select count(d.InsertUserID) from GDN_Comment d where d.InsertUserID = u.UserID);
+
+update GDN_Tag t
+set CountDiscussions = (select count(td.DiscussionID) from GDN_TagDiscussion td where t.TagID = td.TagID);

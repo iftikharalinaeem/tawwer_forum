@@ -78,13 +78,14 @@
                formWrapper = $(toggleButton).parent().parent();
             }
 
+            var fullPageCandidate = $('#editor-fullpage-candidate');
+
             // If no fullpage, enable it
             if (!bodyEl.hasClass('js-editor-fullpage')) {
                $(formWrapper).attr('id', 'editor-fullpage-candidate');
                bodyEl.addClass('js-editor-fullpage');
                $(toggleButton).addClass('icon-resize-small');
 
-               var fullPageCandidate = $('#editor-fullpage-candidate');
                var editorToolbar = $(fullPageCandidate).find('.editor');
 
                // When textarea pushes beyond viewport of its container, a
@@ -96,7 +97,8 @@
 
                // Only Firefox seems to have this issue (unless this is
                // mac-specific. Chrome & Safari on mac do not shift content over.
-               if (typeof InstallTrigger !== 'undefined' && 1===3) {
+               /*
+               if (typeof InstallTrigger !== 'undefined') {
                   toolbarInterval = setInterval(function() {
                      if ($(fullPageCandidate)[0].clientHeight < $(fullPageCandidate)[0].scrollHeight) {
                         // console.log('scrollbar');
@@ -107,6 +109,7 @@
                      }
                   }, 10);
                }
+               */
             } else {
                clearInterval(toolbarInterval);
 
@@ -120,8 +123,17 @@
                bodyEl.removeClass('js-editor-fullpage');
                $(toggleButton).removeClass('icon-resize-small');
 
-               // for experimental chrome lights toggle
-               //$('.editor-toggle-lights-button').attr('style', '');
+               // If in wysiwyg fullpage mode with lights toggled off, then
+               // exit, the lights off remains.
+               // TODO move into own function
+               var ifr = $(fullPageCandidate).find('.wysihtml5-sandbox');
+               if (ifr.length) {
+                  var iframeBodyBox = ifr.contents().find('.BodyBox');
+                  //$(iframeBodyBox).addClass('addiframe-bodybox');
+                  iframeBodyBox.off('focus blur');
+                  $(fullPageCandidate).removeClass('editor-lights-candidate');
+                  $(iframeBodyBox).removeClass('iframe-bodybox');
+               }
 
                // Auto scroll to correct location upon exiting fullpage.
                var scrollto = $(toggleButton).closest('.Comment');
@@ -221,7 +233,6 @@
           * override the Wysihtml5 inline style events.
           */
          var toggleLights = function() {
-            // Just do it for chrome right now. Very experimental.
             var toggleLights = $('.editor-toggle-lights-button');
             var fullPageCandidate = $('#editor-fullpage-candidate');
             var ifr = {};
@@ -250,16 +261,10 @@
                   // Again, for Wysiwyg, override styles
                   if (ifr.length) {
                      // if wysiwyg, need to manipulate content in iframe
-                     iframeBodyBox.css({
-                        "background-color": "#000 !important",
-                        "color": "#999999 !important"
-                     });
+                     iframeBodyBox.addClass('iframe-bodybox');
 
                      iframeBodyBox.on('focus blur', function(e) {
-                        $(this).css({
-                           "background-color": "#000 !important",
-                           "color": "#999999 !important"
-                        });
+                        $(this).addClass('iframe-bodybox');
                      });
                   }
                } else {
@@ -270,10 +275,7 @@
                      iframeBodyBox.off('focus blur');
 
                      // if wysiwyg, need to manipulate content in iframe
-                     iframeBodyBox.css({
-                        "background-color": "",
-                        "color": ""
-                     });
+                     iframeBodyBox.removeClass('iframe-bodybox');
                   }
                }
             });

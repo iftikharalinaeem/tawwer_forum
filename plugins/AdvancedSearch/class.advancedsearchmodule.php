@@ -7,23 +7,23 @@
 class AdvancedSearchModule extends Gdn_Module {
    /**
     *
-    * @var Gdn_Form 
+    * @var Gdn_Form
     */
    public $Form;
-   
+
    public $DateWithinOptions;
-   
-   public $IncludeTags = NULL;
-   
+
+   public $IncludeTags = TRUE;
+
    public $Results = FALSE; // whether or not to show results in the form.
-   
+
    public $Types = array();
-   
+
    public $value = null;
-   
+
    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
       $this->_ApplicationFolder = 'plugins/AdvancedSearch';
-      
+
       $this->DateWithinOptions = array(
          '1 day' => Plural(1, '%s day', '%s days'),
          '3 days' => Plural(3, '%s day', '%s days'),
@@ -34,7 +34,7 @@ class AdvancedSearchModule extends Gdn_Module {
          '6 months' => Plural(6, '%s month', '%s months'),
          '1 year' => Plural(1, '%s year', '%s years')
       );
-      
+
       // Set the initial types.
       foreach (AdvancedSearchPlugin::$Types as $table => $types) {
          foreach ($types as $type => $label) {
@@ -43,7 +43,7 @@ class AdvancedSearchModule extends Gdn_Module {
          }
       }
    }
-   
+
    public static function AddAssets() {
       Gdn::Controller()->AddJsFile('jquery.tokeninput.js');
       Gdn::Controller()->AddJsFile('jquery-ui.js');
@@ -51,24 +51,34 @@ class AdvancedSearchModule extends Gdn_Module {
       Gdn::Controller()->AddDefinition('TagHint', "Start to type...");
       Gdn::Controller()->AddDefinition('TagSearching', "Searching...");
    }
-   
+
    public function ToString() {
       if ($this->IncludeTags === NULL) {
          $this->IncludeTags = Gdn::PluginManager()->IsEnabled('Tagging') && Gdn::PluginManager()->IsEnabled('Sphinx');
       }
-      
+
       // We want the advanced search form to populate from the get and have lowercase fields.
       $Form = $this->Form = new Gdn_Form();
       $Form->Method = 'get';
       $Get = array_change_key_case(Gdn::Request()->Get());
-      
+
       if ($this->Results) {
          $Form->FormValues($Get);
       } else {
          if ($this->value !== null && !isset($Get['search']))
             $Form->SetFormValue('search', $value);
       }
-      
+
+      // Add the tags as data.
+      if (isset($Get['tags'])) {
+         $tags = explode(',', $Get['tags']);
+         $tags = array_filter($tags);
+         $tags = Gdn::SQL()->GetWhere('Tag', array('Name' => $tags))->ResultArray();
+         if (count($tags) > 0 && isset($tags[0]['FullName'])) {
+            $this->SetData('Tags', ConsolidateArrayValuesByKey($tags, 'Name', 'FullName'));
+         }
+      }
+
       // See whether or not to check all of the  types.
       $onechecked = false;
       foreach ($this->Types as $name => $label) {
@@ -82,7 +92,7 @@ class AdvancedSearchModule extends Gdn_Module {
             $Form->SetFormValue($name, true);
          }
       }
-      
+
       return parent::ToString();
    }
 }

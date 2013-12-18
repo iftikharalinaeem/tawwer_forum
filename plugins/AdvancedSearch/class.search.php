@@ -7,13 +7,13 @@
 class Search {
    /// Properties ///
    protected static $types;
-   
-   
+
+
    /// Methods ///
-   
+
    /**
     * Massage an advanced style search query for correctness.
-    * 
+    *
     * @param array $search
     * @return array
     */
@@ -22,7 +22,7 @@ class Search {
      $search = array_map(function($v) { return is_string($v) ? trim($v) : $v; }, $search);
      $search = array_filter($search, function($v) { return $v !== ''; });
      TouchValue('dosearch', $search, true);
-     
+
      /// Author ///
      if (isset($search['author'])) {
         $Usernames = explode(',', $search['author']);
@@ -119,9 +119,14 @@ class Search {
 
         $TagData = Gdn::SQL()->Select('TagID, Name')->From('Tag')->Where('Name', $Tags)->Get()->ResultArray();
         if (count($Tags) == 1 && empty($TagData)) {
-           // Searching for one author that doesn't exist.
+           // Searching for one tag that doesn't exist.
            $search['dosearch'] = FALSE;
            unset($search['tags']);
+        }
+
+        if (GetValue('tags-op', $Tags) === 'and' && count($Tags) > count($TagData)) {
+           // We are searching for all tags, but some of the tags don't exist.
+           $search['dosearch'] = FALSE;
         }
 
         if (!empty($TagData)) {
@@ -188,20 +193,20 @@ class Search {
      Trace($search, 'calc search');
      return $search;
    }
-   
+
    public static function youtube($id) {
       return <<<EOT
 <span class="Video YouTube" id="youtube-$id"><span class="VideoPreview"><a href="http://youtube.com/watch?v=$id"><img src="http://img.youtube.com/vi/$id/0.jpg" /></a></span><span class="VideoPlayer"></span></span>
 EOT;
    }
-   
+
    public static function vimeo($id) {
       // width="500" height="281"
       return <<<EOT
 <iframe src="http://player.vimeo.com/video/$id?badge=0" frameborder="0" class="Video Vimeo" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
 EOT;
    }
-   
+
    public static function extractMedia($html) {
       $result = array();
       if (preg_match_all('`src="([^"]+)"`', $html, $matches)) {
@@ -212,9 +217,9 @@ EOT;
                'href' => $src,
                'preview' => Img($src)
                );
-            
+
             $parts = parse_url($src);
-            
+
             if (isset($parts['host'])) {
                switch($parts['host']) {
                   case 'img.youtube.com':
@@ -245,7 +250,7 @@ EOT;
                         if (isset($get['clip_id']))
                            $id = $get['clip_id'];
                      }
-                     
+
                      if ($id) {
                         $row['type'] = 'video';
                         $row['subtype'] = 'vimeo';
@@ -255,14 +260,14 @@ EOT;
                      break;
                }
             }
-            
-            
+
+
             $result[] = $row;
          }
       }
       return $result;
    }
-   
+
    /**
     * Return an array of all of the valid search types.
     */
@@ -272,7 +277,7 @@ EOT;
             'discussion' => array('d' => 'discussions'),
             'comment' => array('c' => 'comments')
          );
-         
+
          if (Gdn::PluginManager()->IsEnabled('QnA')) {
             $types['discussion']['question'] = 'questions';
             $types['comment']['answer'] = 'answers';
@@ -281,14 +286,14 @@ EOT;
          if (Gdn::PluginManager()->IsEnabled('Polls')) {
             $types['discussion']['poll'] = 'polls';
          }
-         
+
          if (Gdn::ApplicationManager()->CheckApplication('Pages')) {
             $types['page']['p'] = 'docs';
          }
-         
+
          self::$types = $types;
       }
-      
+
       return self::$types;
    }
 }

@@ -144,8 +144,17 @@ jQuery(document).ready(function($) {
     /// Tag token input.
     var $tags = $('.AdvancedSearch input[name="tags"]');
 
+    var data_tags = $tags.data('tags');
     var tags = $tags.val();
-    if (tags && tags.length) {
+   
+    if (data_tags) {
+       tags = [];
+       if (jQuery.isPlainObject(data_tags)) {
+          for (id in data_tags) {
+             tags.push({id: id, name: data_tags[id]});
+          }
+       }
+    } else if (tags && tags.length) {
         tags = tags.split(",");
         for (i = 0; i < tags.length; i++) {
             tags[i] = { id: i, name: tags[i] };
@@ -154,9 +163,9 @@ jQuery(document).ready(function($) {
         tags = [];
     }
 
-    $tags.tokenInput(gdn.url('/plugin/tagsearch?id=1'), {
+    $tags.tokenInput(gdn.url('/plugin/tagsearch?id=0&type=0'), {
       hintText: gdn.definition("TagHint", "Start to type..."),
-      tokenValue: 'name',
+//      tokenValue: 'name',
       searchingText: '',
       searchDelay: 300,
       minChars: 1,
