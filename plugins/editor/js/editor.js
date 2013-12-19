@@ -953,6 +953,86 @@
                          if (debug) {
                             wysiDebug(editor);
                          }
+
+
+
+
+
+
+                           // Because iframe makes atwho very difficult to work,
+                           // include it directly in the iframe, and call the
+                           // proxy script to run the custom code.
+
+                           var addIframeScript = function(iframe_head, src) {
+                              var script = document.createElement("script");
+                              script.type = "text/javascript";
+                              script.src = src + '?'+ (new Date()).getTime();
+                              iframe_head.appendChild(script);
+                           };
+
+                           var iframe_head = $(editor.composer.iframe).contents().find('head')[0];
+                           var script_path = assets + '/js';
+
+                           var iframe_body = $(editor.composer.iframe).contents().find('body')[0]
+
+
+                           $composer = $(editor.composer.iframe);
+
+                           atCompleteInit(iframe_body);
+
+                           //$composer.on('load', function(e) {
+                              console.log('iframe-loaded');
+
+                              $composerBody = $(this).contents().find('body')[0];
+
+                              //$composerBody.html('heyyoooooo');
+
+                              //atCompleteInit($composerBody);
+                              //console.log();
+                           //});
+
+
+                           /*
+
+                           addIframeScript(iframe_head, 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js');
+
+
+                           setTimeout(function() {
+                              addIframeScript(iframe_head, script_path + '/jquery.atwho.js');
+                              addIframeScript(iframe_head, script_path + '/at_proxy.js');
+                           }, 2000);
+
+                         */
+
+
+                                              /* DO ATWHO here.
+                       *
+                       * ifr = $('body').find('.wysihtml5-sandbox');
+                  var iframeBodyBox = ifr.contents().find('.BodyBox');
+                       */
+
+
+                     // console.log(editor);
+
+/*
+                      $composer = $(editor.composer.iframe);
+                      //console.log($composer.contents().find('body'));
+
+
+                      $composer.on('load', function(e) {
+                         console.log('iframe-loaded');
+
+                         $composerBody = $composer.contents().find('body');
+
+                         //$composerBody.html('heyyoooooo');
+
+                         atCompleteInit($composerBody);
+                         //console.log();
+                      });
+*/
+                      //atCompleteInit($currentEditableTextarea);
+
+
                       });
 
 
@@ -1033,35 +1113,6 @@
                           }
                         };
                       })(wysihtml5);
-
-
-                      /* DO ATWHO here.
-                       *
-                       * ifr = $('body').find('.wysihtml5-sandbox');
-                  var iframeBodyBox = ifr.contents().find('.BodyBox');
-                       */
-
-
-                     // console.log(editor);
-
-                      $composer = $(editor.composer.iframe);
-                      //console.log($composer.contents().find('body'));
-
-
-                      $composer.on('load', function(e) {
-                         console.log('iframe-loaded');
-
-                         $composerBody = $composer.contents().find('body');
-
-                         //$composerBody.html('heyyoooooo');
-
-                         atCompleteInit($composerBody);
-                         //console.log();
-                      });
-
-                      //atCompleteInit($currentEditableTextarea);
-
-
                   });
                 break;
 
