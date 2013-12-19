@@ -253,6 +253,7 @@ affect, so it's not doing anything */
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
 .js-editor-fullpage .TextBoxWrapper .BodyBox,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+   color: #000; // Will only be used by non-wysiwyg when in fullpage mode.
    width: 100% !important;
    transition: background-color 0.4s ease, color 0.4s ease;
 }
@@ -326,9 +327,14 @@ wysiwgy requires height to not interfere with autogrow. */
 
 /* This should match the above values, and needs to be added as a class name
 directly on the iframe's bodybox contenteditable. */
-.iframe-bodybox {
-   background-color: #000 !important;
+.iframe-bodybox-lightsoff {
+   background-color: transparent !important;
    color: #999999 !important;
+}
+
+.iframe-bodybox-lightson {
+   background-color: transparent !important;
+   color: #000 !important;
 }
 
 /* Animation definition for fade in editor on fullpage */

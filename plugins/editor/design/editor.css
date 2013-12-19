@@ -235,6 +235,7 @@ affect, so it's not doing anything */
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
 .js-editor-fullpage .TextBoxWrapper .BodyBox,
 .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+  color: #000;
   width: 100% !important;
   transition: background-color 0.4s ease, color 0.4s ease;
 }
@@ -302,9 +303,14 @@ wysiwgy requires height to not interfere with autogrow. */
 
 /* This should match the above values, and needs to be added as a class name
 directly on the iframe's bodybox contenteditable. */
-.iframe-bodybox {
-  background-color: #000 !important;
+.iframe-bodybox-lightsoff {
+  background-color: transparent !important;
   color: #999999 !important;
+}
+
+.iframe-bodybox-lightson {
+  background-color: transparent !important;
+  color: #000 !important;
 }
 
 /* Animation definition for fade in editor on fullpage */
@@ -599,11 +605,11 @@ pre.CodeBlock {
 }
 
 /**
- * Target iframe and actual body within editor iframe. Do not use body to set 
- * background color of composer. By default it will be inherited from 
- * textarea automatically, but if for some reason you want to override the 
- * styles directly, use .editor-composer (body) for fonts and padding, and use 
- * .wysihtml5-sandbox (iframe) to modify the iframe (do background-color on 
+ * Target iframe and actual body within editor iframe. Do not use body to set
+ * background color of composer. By default it will be inherited from
+ * textarea automatically, but if for some reason you want to override the
+ * styles directly, use .editor-composer (body) for fonts and padding, and use
+ * .wysihtml5-sandbox (iframe) to modify the iframe (do background-color on
  * this).
  */
 /* iframe */

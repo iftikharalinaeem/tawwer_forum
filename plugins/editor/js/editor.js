@@ -48,6 +48,9 @@
 
       /**
        * Fullpage actions--available to all editor views on page load.
+       *
+       * TODO: add fullpage class to iframe bodybox if in wysiwyg, for easier
+       * style overwriting.
        */
       var fullPageInit = function(wysiwygInstance) {
 
@@ -129,10 +132,11 @@
                var ifr = $(fullPageCandidate).find('.wysihtml5-sandbox');
                if (ifr.length) {
                   var iframeBodyBox = ifr.contents().find('.BodyBox');
-                  //$(iframeBodyBox).addClass('addiframe-bodybox');
+                  //$(iframeBodyBox).addClass('iframe-bodybox-lightsoff');
                   iframeBodyBox.off('focus blur');
                   $(fullPageCandidate).removeClass('editor-lights-candidate');
-                  $(iframeBodyBox).removeClass('iframe-bodybox');
+                  $(iframeBodyBox).removeClass('iframe-bodybox-lightsoff');
+                  $(iframeBodyBox).removeClass('iframe-bodybox-lightson');
                }
 
                // Auto scroll to correct location upon exiting fullpage.
@@ -249,6 +253,10 @@
                   iframeBodyBox.css({
                      "transition": "background-color 0.4s ease, color 0.4s ease"
                   });
+
+                  // By default, black text on white background. Some themes
+                  // prevent text from being readable, so make sure it can.
+                  iframeBodyBox.addClass('iframe-bodybox-lightson');
                }
             } else {
                $(toggleLights).attr('style', '');
@@ -261,10 +269,11 @@
                   // Again, for Wysiwyg, override styles
                   if (ifr.length) {
                      // if wysiwyg, need to manipulate content in iframe
-                     iframeBodyBox.addClass('iframe-bodybox');
+                     iframeBodyBox.removeClass('iframe-bodybox-lightson');
+                     iframeBodyBox.addClass('iframe-bodybox-lightsoff');
 
                      iframeBodyBox.on('focus blur', function(e) {
-                        $(this).addClass('iframe-bodybox');
+                        $(this).addClass('iframe-bodybox-lightsoff');
                      });
                   }
                } else {
@@ -275,7 +284,8 @@
                      iframeBodyBox.off('focus blur');
 
                      // if wysiwyg, need to manipulate content in iframe
-                     iframeBodyBox.removeClass('iframe-bodybox');
+                     iframeBodyBox.removeClass('iframe-bodybox-lightsoff');
+                     iframeBodyBox.addClass('iframe-bodybox-lightson');
                   }
                }
             });
