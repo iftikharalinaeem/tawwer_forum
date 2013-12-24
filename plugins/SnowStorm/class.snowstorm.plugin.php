@@ -55,11 +55,11 @@ class SnowStormPlugin extends Gdn_Plugin
 		<script type="text/javascript">
 			snowStorm.followMouse = false;
 			snowStorm.snowColor = "#FFF";
-			snowStorm.vMaxX = 0;
-			snowStorm.vMaxY = 2;
+			snowStorm.vMaxX = 2;
+			snowStorm.vMaxY = 4;
 			snowStorm.animationInterval = 33;
-			snowStorm.flakesMax = 128;
-			snowStorm.flakesMaxActive = 64;
+			snowStorm.flakesMax = 240;
+			snowStorm.flakesMaxActive = 120;
 		</script>
 		';
 		
