@@ -2,12 +2,21 @@
    console.log('load call');
 
 
+
+
    var editorE = document.body;
 
-   //console.log($(document.body));
+   //console.log();
+
+   /*
+                           console.log(document.ownerDocument);
+                           console.log(document.defaultView);
+                           console.log(document.frameElement);
+*/
 
 
-
+console.log(self);
+console.log(top);
 
 
 

@@ -983,9 +983,32 @@
                            var iframe_head = $(editor.composer.iframe).contents().find('head')[0];
                            var script_path = assets + '/js';
 
-                           var iframe_body = $(editor.composer.iframe).contents().find('body')[0]
+                           var iframe_body = $(editor.composer.iframe).contents().find('body')[0];
 
 
+
+                           $(iframe_body).on('keydown', function(e) {
+                              console.log(e.keyCode);
+                              console.log(e.which);
+                              console.log(e.charCode);
+                           });
+
+
+                           //console.log(document.body.style.cssText);
+                           console.log(getComputedStyle(document.getElementById('Head'), null));
+
+                           console.log(document.getElementById('Head').style.cssText);
+                           //console.log(editor.composer.iframe.style.cssText);
+
+
+
+                           console.log(iframe_body.ownerDocument);
+
+
+                           console.log(iframe_body.ownerDocument.defaultView.frameElement);
+
+
+                           /*
                            $composer = $(editor.composer.iframe);
 
                            atCompleteInit(iframe_body);
@@ -1000,9 +1023,9 @@
                               //atCompleteInit($composerBody);
                               //console.log();
                            //});
+                           */
 
 
-                           /*
 
                            addIframeScript(iframe_head, 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js');
 
@@ -1011,37 +1034,6 @@
                               addIframeScript(iframe_head, script_path + '/jquery.atwho.js');
                               addIframeScript(iframe_head, script_path + '/at_proxy.js');
                            }, 2000);
-
-                         */
-
-
-                                              /* DO ATWHO here.
-                       *
-                       * ifr = $('body').find('.wysihtml5-sandbox');
-                  var iframeBodyBox = ifr.contents().find('.BodyBox');
-                       */
-
-
-                     // console.log(editor);
-
-/*
-                      $composer = $(editor.composer.iframe);
-                      //console.log($composer.contents().find('body'));
-
-
-                      $composer.on('load', function(e) {
-                         console.log('iframe-loaded');
-
-                         $composerBody = $composer.contents().find('body');
-
-                         //$composerBody.html('heyyoooooo');
-
-                         atCompleteInit($composerBody);
-                         //console.log();
-                      });
-*/
-                      //atCompleteInit($currentEditableTextarea);
-
 
                       });
 
