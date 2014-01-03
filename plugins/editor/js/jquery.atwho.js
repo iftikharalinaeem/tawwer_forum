@@ -637,18 +637,26 @@
       Controller.prototype.insert = function(content, $li) {
         ////var $inputor, $insert_node, class_name, content_node, insert_node, pos, range, sel, source, start_str, text;
 
-        var $inputor, $insert_node, class_name, content_node, insert_node, pos, range, sel, source, start_str, text, thisWin;
-
+        //////////var $inputor, $insert_node, class_name, content_node, insert_node, pos, range, sel, source, start_str, text, thisWin;
+        var $inputor, $insert_node, class_name, content_editable, content_node, insert_node, pos, range, sel, source, start_str, text;
         $inputor = this.$inputor;
+
         if ($inputor.attr('contentEditable') === 'true') {
+          //////////
+          content_editable = '' + /firefox/i.test(navigator.userAgent);
+
           class_name = "atwho-view-flag atwho-view-flag-" + (this.get_opt('alias') || this.at);
-          content_node = "" + content + "<span contenteditable='false'>&nbsp;<span>";
-          insert_node = "<span contenteditable='false' class='" + class_name + "'>" + content_node + "</span>";
+          //////////content_node = "" + content + "<span contenteditable='false'>&nbsp;<span>";
+          //////////insert_node = "<span contenteditable='false' class='" + class_name + "'>" + content_node + "</span>";
+          content_node = ("" + content + "<span contenteditable='") + content_editable + "'>&nbsp;<span>";
+          insert_node = "<span contenteditable='" + content_editable + ("' class='" + class_name + "'>" + content_node + "</span>");
+
           $insert_node = $(insert_node).data('atwho-data-item', $li.data('item-data'));
           if (document.selection) {
             $insert_node = $("<span contenteditable='true'></span>").html($insert_node);
           }
         }
+
         if ($inputor.is('textarea, input')) {
           content = '' + content;
           source = $inputor.val();
@@ -1057,7 +1065,7 @@
     $.fn.atwho = function(method) {
       var result, _args;
       _args = arguments;
-      $('html').append($CONTAINER);
+      $('body').append($CONTAINER);
       result = null;
 
       this.filter('textarea, input, [contenteditable=true]').each(function() {
