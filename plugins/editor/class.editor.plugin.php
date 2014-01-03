@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.0.52',
+   'Version' => '1.1.0a',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -311,7 +311,7 @@ class EditorPlugin extends Gdn_Plugin {
         $CssPath = Asset($CssInfo[1]);
       }
 
-      // Load JavaScript
+      // Load JavaScript used by every editor view.
       $c->AddJsFile('editor.js', 'plugins/editor');
       $c->AddJsFile('jquery.atwho.js', 'plugins/editor');
 
@@ -325,6 +325,22 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddDefinition('markdownHelpText',   T('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
       $c->AddDefinition('textHelpText',       T('editor.TextHelpText', 'You are using plain text in your post.'));
       $c->AddDefinition('editorWysiwygCSS',   $CssPath);
+
+
+      // Add active emoji so autosuggest works
+      $Emoji = Emoji::instance();
+      $emojis = $Emoji->getEmoji();
+      $emojiAssetPath = $Emoji->getAssetPath();
+      $emoji = array();
+
+      foreach ($emojis as $name => $data) {
+         $emoji[] = array(
+             "name" => "". $name ."",
+             "url" =>  $emojiAssetPath . '/' . reset($data)
+         );
+      }
+
+      $c->AddDefinition('emoji', json_encode($emoji));
    }
 
    /**

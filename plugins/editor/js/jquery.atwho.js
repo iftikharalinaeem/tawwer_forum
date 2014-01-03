@@ -24,7 +24,8 @@
     }
   })(function($) {
     "use strict";
-    var EditableCaret, InputCaret, Mirror, Utils, methods, pluginName;
+    ////var EditableCaret, InputCaret, Mirror, Utils, methods, pluginName;
+    var EditableCaret, InputCaret, Mirror, Utils, methods, pluginName, cWin;
 
     pluginName = 'caret';
     EditableCaret = (function() {
@@ -87,7 +88,8 @@
         var clonedRange, offset, range, rect;
 
         offset = null;
-        if (window.getSelection && (range = this.range())) {
+        ////if (window.getSelection && (range = this.range())) {
+        if (cWin.getSelection && (range = this.range())) {
           if (range.endOffset - 1 < 0) {
             return null;
           }
@@ -111,10 +113,12 @@
       EditableCaret.prototype.range = function() {
         var sel;
 
-        if (!window.getSelection) {
+        ////if (!window.getSelection) {
+        if (!cWin.getSelection) {
           return;
         }
-        sel = window.getSelection();
+        ////sel = window.getSelection();
+        sel = cWin.getSelection();
         if (sel.rangeCount > 0) {
           return sel.getRangeAt(0);
         } else {
@@ -328,12 +332,18 @@
         return this.getOffset(pos);
       }
     };
-    $.fn.caret = function(method) {
+    ////$.fn.caret = function(method) {
+    $.fn.caret = function(method, aWin) {
       var caret;
+
+      ////
+      cWin = aWin;
 
       caret = Utils.contentEditable(this) ? new EditableCaret(this) : new InputCaret(this);
       if (methods[method]) {
-        return methods[method].apply(caret, Array.prototype.slice.call(arguments, 1));
+        ////return methods[method].apply(caret, Array.prototype.slice.call(arguments, 1));
+        ///////return methods[method].apply(caret, Array.prototype.slice.call(arguments, method == 'pos' ? 2 : 1));
+        return methods[method].apply(caret, Array.prototype.slice.call(arguments, 2));
       } else {
         return $.error("Method " + method + " does not exist on jQuery.caret");
       }
@@ -545,7 +555,8 @@
       Controller.prototype.catch_query = function() {
         var caret_pos, content, end, query, start, subtext;
         content = this.content();
-        caret_pos = this.$inputor.caret('pos');
+        ////caret_pos = this.$inputor.caret('pos');
+        caret_pos = this.$inputor.caret('pos', this.setting.cWindow);
         subtext = content.slice(0, caret_pos);
         query = this.callbacks("matcher").call(this, this.at, subtext, this.get_opt('start_with_space'));
         if (typeof query === "string" && query.length <= this.get_opt('max_len', 20)) {
@@ -566,7 +577,8 @@
 
       Controller.prototype.rect = function() {
         var c, scale_bottom;
-        if (!(c = this.$inputor.caret('offset', this.pos - 1))) {
+        /////if (!(c = this.$inputor.caret('offset', this.pos - 1))) {
+        if (!(c = this.$inputor.caret('offset', this.setting.cWindow, this.pos - 1))) {
           return;
         }
         if (this.$inputor.attr('contentEditable') === 'true') {
@@ -595,7 +607,13 @@
       };
 
       Controller.prototype.get_range = function() {
-        return this.range || (window.getSelection ? window.getSelection().getRangeAt(0) : void 0);
+        ////return this.range || (window.getSelection ? window.getSelection().getRangeAt(0) : void 0);
+
+
+         var thisWin = this.setting.cWindow;
+         //////return this.range || (thisWin.getSelection ? thisWin.getSelection().getRangeAt(0) : void 0);
+         return thisWin.getSelection ? thisWin.getSelection().getRangeAt(0) : (this.range || void 0);
+
       };
 
       Controller.prototype.get_ie_range = function() {
@@ -617,7 +635,10 @@
       };
 
       Controller.prototype.insert = function(content, $li) {
-        var $inputor, $insert_node, class_name, content_node, insert_node, pos, range, sel, source, start_str, text;
+        ////var $inputor, $insert_node, class_name, content_node, insert_node, pos, range, sel, source, start_str, text;
+
+        var $inputor, $insert_node, class_name, content_node, insert_node, pos, range, sel, source, start_str, text, thisWin;
+
         $inputor = this.$inputor;
         if ($inputor.attr('contentEditable') === 'true') {
           class_name = "atwho-view-flag atwho-view-flag-" + (this.get_opt('alias') || this.at);
@@ -634,19 +655,27 @@
           start_str = source.slice(0, Math.max(this.query.head_pos - this.at.length, 0));
           text = "" + start_str + content + " " + (source.slice(this.query['end_pos'] || 0));
           $inputor.val(text);
-          $inputor.caret('pos', start_str.length + content.length + 1);
+          ////$inputor.caret('pos', start_str.length + content.length + 1);
+          $inputor.caret('pos', this.setting.cWindow, start_str.length + content.length + 1);
         } else if (range = this.get_range()) {
+          ////
+          thisWin = this.setting.cWindow;
+
           pos = range.startOffset - (this.query.end_pos - this.query.head_pos) - this.at.length;
           range.setStart(range.endContainer, Math.max(pos, 0));
           range.setEnd(range.endContainer, range.endOffset);
           range.deleteContents();
           range.insertNode($insert_node[0]);
           range.collapse(false);
-          sel = window.getSelection();
+
+          ////sel = window.getSelection();
+          sel = thisWin.getSelection();
+
           sel.removeAllRanges();
           sel.addRange(range);
         } else if (range = this.get_ie_range()) {
           range.moveStart('character', this.query.end_pos - this.query.head_pos - this.at.length);
+          ///////
           range.pasteHTML($insert_node[0]);
           range.collapse(false);
           range.select();
@@ -789,8 +818,18 @@
       };
 
       View.prototype.reposition = function(rect) {
+        ////var offset;
+        ////if (rect.bottom + this.$el.height() - $(window).scrollTop() > $(window).height()) {
+
         var offset;
-        if (rect.bottom + this.$el.height() - $(window).scrollTop() > $(window).height()) {
+
+        ////
+        // Make sure the non-iframe version still references window.
+        var thisWin = (this.context.setting.cWindow)
+          ? null
+          : window;
+
+        if (rect.bottom + this.$el.height() - $(thisWin).scrollTop() > $(thisWin).height()) {
           rect.bottom = rect.top - this.$el.height();
         }
         offset = {
@@ -1018,7 +1057,7 @@
     $.fn.atwho = function(method) {
       var result, _args;
       _args = arguments;
-      $('body').append($CONTAINER);
+      $('html').append($CONTAINER);
       result = null;
 
       this.filter('textarea, input, [contenteditable=true]').each(function() {
@@ -1050,7 +1089,9 @@
       start_with_space: true,
       limit: 5,
       max_len: 20,
-      display_timeout: 300
+      display_timeout: 300,
+      ////
+      cWindow: window
     };
   });
 

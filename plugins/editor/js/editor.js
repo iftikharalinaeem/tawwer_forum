@@ -659,43 +659,102 @@
        * This allows @mentions and :emoji: autocomplete, as well as any other
        * character key autocompletion.
        */
-      var atCompleteInit = function(editorElement) {
+      var atCompleteInit = function(editorElement, iframe) {
 
-         var emojis = ["smile", "iphone", "girl", "smiley", "heart", "kiss", "copyright", "coffee"];
-         var names = ["Jacob", "Isabella", "Ethan", "Emma", "Michael", "Olivia", "Alexander", "Sophia", "William", "Ava", "Joshua", "Emily", "Daniel", "Madison", "Jayden", "Abigail", "Noah", "Chloe", "你好", "你你你"];
+         // Storing server requests
+         var cache = {};
 
-         var emojis_list = $.map(emojis, function(value, i) {
-           return {'id':i, 'name':value};
-         });
+         // Emoji
+         var emoji = $.parseJSON(gdn.definition('emoji', []));
 
-         var issues = [
-           { name: "1", content: "stay foolish"},
-           { name: "2", content: "stay hungry"},
-           { name: "3", content: "stay heathly"},
-           { name: "4", content: "this happiess"},
-         ];
+         // Handle iframe situation
+         var iframe_window = (iframe)
+            ? iframe.contentWindow
+            : '';
 
-         //http://a248.e.akamai.net/assets.github.com/images/icons/emoji/8.png
          $(editorElement)
-           .atwho({
-             at: "@",
-             data: names,
-             callbacks: {
-                before_insert: function(value, $li) {
-                   console.log(value, $li);
-                }
-             }
-           })
-           .atwho({
-             at: "#",
-             tpl: '<li data-value="#${name}">${name} <small>${content}</small></li>',
-             data: issues
-           })
-           .atwho({
-             at: ":",
-             tpl: "<li data-value=':${name}:'><img src='http://a248.e.akamai.net/assets.github.com/images/icons/emoji/${name}.png' height='20' width='20'/> ${name} </li>",
-             data: emojis_list
-           });
+            .atwho({
+               at: "@",
+               tpl: '<li data-value="@${name}" data-id="${id}">${name}</li>',
+               limit: 5,
+               callbacks: {
+                  remote_filter: function(query, callback) {
+                     if (query.length >= 2) {
+                        if (!cache[query]) {
+                           $.getJSON("http://www.vanilla.dev/user/tagsearch", {q: query}, function(data) {
+                              callback(data);
+                              cache[query] = data;
+                           });
+                        } else {
+                           callback(cache[query]);
+                        }
+                     }
+                  }
+               },
+               display_timeout: 0,
+               cWindow: iframe_window
+            })
+            .atwho({
+               at: ":",
+               tpl: '<li data-value=":${name}:" class="at-suggest-emoji"><img src="${url}" width="20" height="20" alt=":${name}:" class="emoji-img" /> <span class="emoji-name">${name}</span></li>',
+               limit: 5,
+               data: emoji,
+               cWindow: iframe_window
+            });
+
+         // Only necessary for iframe.
+         // Based on work here: https://github.com/ichord/At.js/issues/124
+         if (iframe_window) {
+            // This hook is triggered when atWho places a selection list in the
+            // window. The context is passed implicitly when triggered by at.js.
+            $(iframe_window).on("reposition.atwho", function(e, offset, context) {
+
+               // Actual suggestion box that will appear.
+               var suggest_el = context.view.$el;
+
+               // The area where text will be typed (contenteditable body).
+               var $inputor = context.$inputor;
+
+               // Display it below the text.
+               var line_height = parseInt($inputor.css('line-height'));
+
+               // offset contains the top left values of the offset to the iframe
+               // we need to convert that to main window coordinates
+               var oIframe = $(iframe).offset(),
+                  iLeft = oIframe.left + offset.left,
+                  iTop = oIframe.top,
+                  select_height = 0;
+
+               // atWho adds 3 select areas, presumably for differnet positing on screen (above below etc)
+               // This finds the active one and gets the container height
+               $(suggest_el).each(function(i, el) {
+                  if ($(this).outerHeight() > 0) {
+                     select_height += $(this).height() + line_height;
+                  }
+               });
+
+               // Now should we show the selection box above or below?
+               var iWindowHeight = $(window).height(),
+                  iDocViewTop = $(window).scrollTop(),
+                  iSelectionPosition = iTop + offset.top - $(window).scrollTop(),
+                  iAvailableSpace = iWindowHeight - (iSelectionPosition - iDocViewTop);
+
+               if (iAvailableSpace >= select_height) {
+                  // Enough space below
+                  iTop = iTop + offset.top + select_height - $(window).scrollTop();
+               }
+               else {
+                  // Place it above instead
+                  // @todo should check if this is more space than below
+                  iTop= iTop + offset.top - $(window).scrollTop();
+               }
+
+               // Move the select box
+               offset = {left: iLeft, top: iTop};
+               $(suggest_el).offset(offset);
+            });
+         }
+
       };
 
       /**
@@ -964,77 +1023,10 @@
                             wysiDebug(editor);
                          }
 
-
-
-
-
-
-                           // Because iframe makes atwho very difficult to work,
-                           // include it directly in the iframe, and call the
-                           // proxy script to run the custom code.
-
-                           var addIframeScript = function(iframe_head, src) {
-                              var script = document.createElement("script");
-                              script.type = "text/javascript";
-                              script.src = src + '?'+ (new Date()).getTime();
-                              iframe_head.appendChild(script);
-                           };
-
-                           var iframe_head = $(editor.composer.iframe).contents().find('head')[0];
-                           var script_path = assets + '/js';
-
-                           var iframe_body = $(editor.composer.iframe).contents().find('body')[0];
-
-
-
-                           $(iframe_body).on('keydown', function(e) {
-                              console.log(e.keyCode);
-                              console.log(e.which);
-                              console.log(e.charCode);
-                           });
-
-
-                           //console.log(document.body.style.cssText);
-                           console.log(getComputedStyle(document.getElementById('Head'), null));
-
-                           console.log(document.getElementById('Head').style.cssText);
-                           //console.log(editor.composer.iframe.style.cssText);
-
-
-
-                           console.log(iframe_body.ownerDocument);
-
-
-                           console.log(iframe_body.ownerDocument.defaultView.frameElement);
-
-
-                           /*
-                           $composer = $(editor.composer.iframe);
-
-                           atCompleteInit(iframe_body);
-
-                           //$composer.on('load', function(e) {
-                              console.log('iframe-loaded');
-
-                              $composerBody = $(this).contents().find('body')[0];
-
-                              //$composerBody.html('heyyoooooo');
-
-                              //atCompleteInit($composerBody);
-                              //console.log();
-                           //});
-                           */
-
-
-
-                           addIframeScript(iframe_head, 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js');
-
-
-                           setTimeout(function() {
-                              addIframeScript(iframe_head, script_path + '/jquery.atwho.js');
-                              addIframeScript(iframe_head, script_path + '/at_proxy.js');
-                           }, 2000);
-
+                         // Enable at-suggestions
+                         var iframe = $(editor.composer.iframe);
+                         var iframe_body = iframe.contents().find('body')[0];
+                         atCompleteInit(iframe_body, iframe[0]);
                       });
 
 
@@ -1135,8 +1127,8 @@
                          editorSetCaretFocusEnd($currentEditableTextarea[0]);
                       }
 
-                      // Enable at mentions
-                      atCompleteInit($currentEditableTextarea);
+                      // Enable at-suggestions
+                      atCompleteInit($currentEditableTextarea, '');
                    });
                    break;
 
