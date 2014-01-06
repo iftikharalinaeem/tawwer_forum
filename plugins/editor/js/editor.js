@@ -668,6 +668,13 @@
          // from being sent.
          var empty = {};
 
+         // Set minimum characters to type for @mentions to fire
+         var min_characters = 2;
+
+         // Server response limit. This should match the limit set in
+         // UserModel->TagSearch
+         var server_limit = 5;
+
          // Emoji
          var emoji = $.parseJSON(gdn.definition('emoji', []));
 
@@ -678,12 +685,48 @@
 
          $(editorElement)
             .atwho({
-               at: "@",
+               at: '@',
                tpl: '<li data-value="@${name}" data-id="${id}">${name}</li>',
                limit: 5,
                callbacks: {
                   remote_filter: function(query, callback) {
-                     if (query.length >= 2) {
+                     // Only all query strings greater than min_characters
+                     if (query.length >= min_characters) {
+
+                        // If the cache array contains less than LIMIT 30
+                        // (according to server logic), then there's no
+                        // point sending another request to server, as there
+                        // won't be any more results, as this is the maximum.
+                        var filter_more = true;
+
+                        // Remove last character so that the string can be
+                        // found in the cache, if exists, then check if its
+                        // matching array has less than the server limit of
+                        // matches, which means there are no more, so save the
+                        // additional server request from being sent.
+                        var filter_string = '';
+
+                        // Loop through string and find first closest match in
+                        // the cache, and if a match, check if more filtering
+                        // is required.
+                        for (var i = 0, l = query.length; i < l; i++) {
+                           filter_string = query.slice(0, -i);
+
+                           if (cache[filter_string]
+                           && cache[filter_string].length < server_limit) {
+                              //console.log('no more filtering for "'+ query + '" as its parent filter array, "'+ filter_string +'" is not maxed out.');
+
+                              // Add this other query to empty array, so that it
+                              // will not fire off another request.
+                              empty[query] = query;
+
+                              // Do not filter more, meaning, do not send
+                              // another server request, as all the necessary
+                              // data is already in memory.
+                              filter_more = false;
+                              break;
+                           }
+                        }
 
                         // Check if query would be empty, based on previously
                         // cached empty results. Compare against the start of
@@ -696,15 +739,17 @@
                               // See if cached empty results match the start
                               // of the latest query. If so, then no point
                               // sending new request, as it will return empty.
-                              if (query.match(new RegExp("^"+ key +"+")) !== null) {
+                              if (query.match(new RegExp('^'+ key +'+')) !== null) {
                                  empty_query = true;
                                  break;
                               }
                            }
                         }
 
-                        if (!empty_query && !cache[query]) {
-                           $.getJSON("/user/tagsearch", {q: query}, function(data) {
+                        // Produce the suggestions based on data either
+                        // cached or retrieved.
+                        if (filter_more && !empty_query  && !cache[query]) {
+                           $.getJSON('/user/tagsearch', {q: query}, function(data) {
                               callback(data);
 
                               // If data is empty, cache the results to prevent
@@ -717,7 +762,15 @@
                               }
                            });
                         } else {
-                           callback(cache[query]);
+                           // If no point filtering more as the parent filter
+                           // has not been maxed out with responses, use the
+                           // closest parent filter instead of the latest
+                           // query string.
+                           if (!filter_more) {
+                              callback(cache[filter_string]);
+                           } else {
+                              callback(cache[query]);
+                           }
                         }
                      }
                   }
@@ -726,7 +779,7 @@
                cWindow: iframe_window
             })
             .atwho({
-               at: ":",
+               at: ':',
                tpl: '<li data-value=":${name}:" class="at-suggest-emoji"><img src="${url}" width="20" height="20" alt=":${name}:" class="emoji-img" /> <span class="emoji-name">${name}</span></li>',
                limit: 5,
                data: emoji,
