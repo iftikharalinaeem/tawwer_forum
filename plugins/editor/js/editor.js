@@ -704,7 +704,7 @@
                         }
 
                         if (!empty_query && !cache[query]) {
-                           $.getJSON("http://www.vanilla.dev/user/tagsearch", {q: query}, function(data) {
+                           $.getJSON("/user/tagsearch", {q: query}, function(data) {
                               callback(data);
 
                               // If data is empty, cache the results to prevent
@@ -733,6 +733,17 @@
                cWindow: iframe_window
             });
 
+         // http://stackoverflow.com/questions/118241/calculate-text-width-with-javascript
+         String.prototype.width = function(font) {
+            var f = font || "15px 'lucida grande','Lucida Sans Unicode',tahoma,sans-serif'";
+            o = $('<div>' + this + '</div>')
+               .css({'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 'font': f})
+               .appendTo($('body')),
+            w = o.width();
+            o.remove();
+            return w;
+         }
+
          // Only necessary for iframe.
          // Based on work here: https://github.com/ichord/At.js/issues/124
          if (iframe_window) {
@@ -755,6 +766,25 @@
                   iLeft = oIframe.left + offset.left,
                   iTop = oIframe.top,
                   select_height = 0;
+
+               // In wysiwyg mode, the suggestbox follows the typing, which
+               // does not happen in regular mode, so adjust it.
+               // Either @ or : for now.
+               var at = context.at;
+               var text = context.query.text;
+               var font_mirror = $('.BodyBox')
+               var font = font_mirror.css('font-size') + ' ' + font_mirror.css('font-family');
+
+               // Get font width
+               var font_width = (at+text).width(font) - 2;
+
+               if (at == '@') {
+                  iLeft -= font_width;
+               }
+
+               if (at == ':') {
+                  iLeft -= 2;
+               }
 
                // atWho adds 3 select areas, presumably for differnet positing on screen (above below etc)
                // This finds the active one and gets the container height
