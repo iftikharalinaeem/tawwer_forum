@@ -671,8 +671,11 @@
          // Set minimum characters to type for @mentions to fire
          var min_characters = 2;
 
+         // Max suggestions to show in dropdown.
+         var max_suggestions = 5;
+
          // Server response limit. This should match the limit set in
-         // UserModel->TagSearch
+         // *UserController->TagSearch* and UserModel->TagSearch
          var server_limit = 30;
 
          // Emoji
@@ -687,7 +690,7 @@
             .atwho({
                at: '@',
                tpl: '<li data-value="@${name}" data-id="${id}">${name}</li>',
-               limit: 5,
+               limit: max_suggestions,
                callbacks: {
                   remote_filter: function(query, callback) {
                      // Only all query strings greater than min_characters
@@ -781,7 +784,7 @@
             .atwho({
                at: ':',
                tpl: '<li data-value=":${name}:" class="at-suggest-emoji"><img src="${url}" width="20" height="20" alt=":${name}:" class="emoji-img" /> <span class="emoji-name">${name}</span></li>',
-               limit: 5,
+               limit: max_suggestions,
                data: emoji,
                cWindow: iframe_window
             });
