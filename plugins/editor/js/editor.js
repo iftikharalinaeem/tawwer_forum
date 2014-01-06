@@ -661,8 +661,12 @@
        */
       var atCompleteInit = function(editorElement, iframe) {
 
-         // Storing server requests
+         // Cache non-empty server requests
          var cache = {};
+
+         // Cache empty server requests to prevent similarly-started requests
+         // from being sent.
+         var empty = {};
 
          // Emoji
          var emoji = $.parseJSON(gdn.definition('emoji', []));
@@ -680,10 +684,37 @@
                callbacks: {
                   remote_filter: function(query, callback) {
                      if (query.length >= 2) {
-                        if (!cache[query]) {
+
+                        // Check if query would be empty, based on previously
+                        // cached empty results. Compare against the start of
+                        // the latest query string.
+                        var empty_query = false;
+
+                        // Loop through cache of empty query strings.
+                        for (key in empty) {
+                           if (empty.hasOwnProperty(key)) {
+                              // See if cached empty results match the start
+                              // of the latest query. If so, then no point
+                              // sending new request, as it will return empty.
+                              if (query.match(new RegExp("^"+ key +"+")) !== null) {
+                                 empty_query = true;
+                                 break;
+                              }
+                           }
+                        }
+
+                        if (!empty_query && !cache[query]) {
                            $.getJSON("http://www.vanilla.dev/user/tagsearch", {q: query}, function(data) {
                               callback(data);
-                              cache[query] = data;
+
+                              // If data is empty, cache the results to prevent
+                              // other requests against similarly-started
+                              // query strings.
+                              if (data.length) {
+                                 cache[query] = data;
+                              } else {
+                                 empty[query] = query;
+                              }
                            });
                         } else {
                            callback(cache[query]);
