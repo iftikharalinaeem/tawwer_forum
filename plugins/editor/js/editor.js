@@ -673,7 +673,7 @@
 
          // Server response limit. This should match the limit set in
          // UserModel->TagSearch
-         var server_limit = 5;
+         var server_limit = 30;
 
          // Emoji
          var emoji = $.parseJSON(gdn.definition('emoji', []));
@@ -749,7 +749,7 @@
                         // Produce the suggestions based on data either
                         // cached or retrieved.
                         if (filter_more && !empty_query  && !cache[query]) {
-                           $.getJSON('/user/tagsearch', {q: query}, function(data) {
+                           $.getJSON('/user/tagsearch', {"q": query, "limit": server_limit}, function(data) {
                               callback(data);
 
                               // If data is empty, cache the results to prevent
