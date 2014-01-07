@@ -692,6 +692,8 @@
                tpl: '<li data-value="@${name}" data-id="${id}">${name}</li>',
                limit: max_suggestions,
                callbacks: {
+
+                  // Custom data source.
                   remote_filter: function(query, callback) {
                      // Only all query strings greater than min_characters
                      if (query.length >= min_characters) {
@@ -776,6 +778,40 @@
                            }
                         }
                      }
+                  },
+
+                  // Note, in contenteditable mode (iframe for us), the value
+                  // is surrounded by span tags.
+                  before_insert: function(value, $li) {
+
+                     // It's better to use the value provided, as it may have
+                     // html tags around it, depending on mode. Using the
+                     // regular expression avoids the need to check what mode
+                     // the suggestion is made in, and then constructing
+                     // it based on that. Keep this here for reference.
+                     //var plain_string_name = $li.data('value');
+
+                     // Regex can be very open, as the suggestions themselves
+                     // will be fairly limited anyway. Use period to catch
+                     // most characters, just in case Vanilla begins allowing
+                     // more exotic usernames.
+                     var quoted_name = value.replace(/(\>?)@(.+\s?.*?\s?.*?)(\<?)/, '$1@"$2"$3');
+                     return quoted_name;
+                  },
+
+                  // Custom highlighting to accept spaces in names. This is
+                  // almost a copy of the default in the library, with tweaks
+                  // in the regex.
+                  highlighter: function(li, query) {
+                     var regexp;
+                     if (!query) {
+                        return li;
+                     }
+                     regexp = new RegExp(">\\s*(\\w*)(" + query.replace("+", "\\+") + ")(\\w*)\\s*(\\s+.+)?<", 'ig');
+                     // Capture group 4 for possible spaces
+                     return li.replace(regexp, function(str, $1, $2, $3, $4) {
+                        return '> ' + $1 + '<strong>' + $2 + '</strong>' + $3 + $4 + ' <';
+                     });
                   }
                },
                display_timeout: 0,

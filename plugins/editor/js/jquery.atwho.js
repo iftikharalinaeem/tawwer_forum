@@ -14,6 +14,11 @@
 插入符的位置.
 */
 
+/**
+ * Note: This file has been highly modified to work with iframes. Do not just
+ * replace with a more current version.
+ */
+
 
 (function() {
   (function(factory) {

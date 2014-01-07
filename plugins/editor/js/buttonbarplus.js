@@ -880,7 +880,13 @@ function autoBulletTextarea(textarea, bullet) {
       ) {
          var lines = lastWord.split('\n');
          var currentLine = lines[lines.length - 1];
-         var lastLine = lines[lines.length - 2];
+
+         // lastLine can be 'undefined' in some situations, and though it
+         // doesn't break anything, it produces an error in the console. The
+         // issue that prompted the optional assignment was @mentions with
+         // usernames that have spaces, but in particular, characters that
+         // are used as list starters, such as - + and *.
+         var lastLine = lines[lines.length - 2] || '';
 
          if (e.which == 13) {
             lastBullet = (new RegExp("^\\n?("+ RegExp.escape(bullet) +"|\\d+\\.|[\\*\\+\\-])([\\s\\w\\W]+)\\n?")).exec(lastLine);
@@ -942,7 +948,6 @@ function autoBulletTextarea(textarea, bullet) {
                      $(this).insertText(reflowedItemList, initialCaretPosition, 'collapseToStart');
                   }
                }
-
             }
          }
       }
