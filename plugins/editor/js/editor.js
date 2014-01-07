@@ -789,14 +789,27 @@
                      // regular expression avoids the need to check what mode
                      // the suggestion is made in, and then constructing
                      // it based on that. Keep this here for reference.
-                     //var plain_string_name = $li.data('value');
+                     var username = $li.data('value');
+                     // Pop off the flag--usually @ or :
+                     username = username.slice(1, username.length);
 
-                     // Regex can be very open, as the suggestions themselves
-                     // will be fairly limited anyway. Use period to catch
-                     // most characters, just in case Vanilla begins allowing
-                     // more exotic usernames.
-                     var quoted_name = value.replace(/(\>?)@(.+\s?.*?\s?.*?)(\<?)/, '$1@"$2"$3');
-                     return quoted_name;
+                     // Check if there are any whitespaces, and if so, add
+                     // quotation marks around the whole name.
+                     var requires_quotation = (/\s/g.test(username))
+                        ? true
+                        : false;
+
+                     // Check if there are already quotation marks around
+                     // the string--double or single.
+                     var has_quotation = (/(\"|\')(.+)(\"|\')/g.test(username))
+                        ? true
+                        : false;
+
+                     if (requires_quotation && !has_quotation) {
+                        value = value.replace(/(\>?)@(.+)(\<?)/, '$1@"$2"$3');
+                     }
+
+                     return value;
                   },
 
                   // Custom highlighting to accept spaces in names. This is
@@ -812,6 +825,23 @@
                      return li.replace(regexp, function(str, $1, $2, $3, $4) {
                         return '> ' + $1 + '<strong>' + $2 + '</strong>' + $3 + $4 + ' <';
                      });
+                  },
+
+                  // Copied from default, modified to allow quotation marks
+                  // in the matching string.
+                  matcher: function(flag, subtext, should_start_with_space) {
+                     var match, regexp;
+                     flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+                     if (should_start_with_space) {
+                     flag = '(?:^|\\s)' + flag;
+                     }
+                     regexp = new RegExp(flag + '\"?([A-Za-z0-9_\+\-]*)\"?$|' + flag + '\"?([^\\x00-\\xff]*)\"?$', 'gi');
+                     match = regexp.exec(subtext);
+                     if (match) {
+                     return match[2] || match[1];
+                     } else {
+                     return null;
+                     }
                   }
                },
                display_timeout: 0,
