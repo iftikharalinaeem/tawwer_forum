@@ -695,6 +695,10 @@
 
                   // Custom data source.
                   remote_filter: function(query, callback) {
+                     // Do this because of undefined when adding spaces to
+                     // matcher callback, as it will be monitoring changes.
+                     var query = query || '';
+
                      // Only all query strings greater than min_characters
                      if (query.length >= min_characters) {
 
@@ -788,8 +792,9 @@
                      // html tags around it, depending on mode. Using the
                      // regular expression avoids the need to check what mode
                      // the suggestion is made in, and then constructing
-                     // it based on that. Keep this here for reference.
-                     var username = $li.data('value');
+                     // it based on that. Optional assignment for undefined
+                     // matcher callback results.
+                     var username = $li.data('value') || '';
                      // Pop off the flag--usually @ or :
                      username = username.slice(1, username.length);
 
@@ -827,20 +832,32 @@
                      });
                   },
 
-                  // Copied from default, modified to allow quotation marks
-                  // in the matching string.
+                  // Custom matching to allow quotation marks in the matching
+                  // string as well as spaces. Spaces make things more
+                  // complicated.
                   matcher: function(flag, subtext, should_start_with_space) {
                      var match, regexp;
                      flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+
                      if (should_start_with_space) {
-                     flag = '(?:^|\\s)' + flag;
+                        flag = '(?:^|\\s)' + flag;
                      }
-                     regexp = new RegExp(flag + '\"?([A-Za-z0-9_\+\-]*)\"?$|' + flag + '\"?([^\\x00-\\xff]*)\"?$', 'gi');
+
+                     // Note: adding whitespace to regex makes the query in
+                     // remote_filter and before_insert callbacks throw
+                     // undefined when not accounted for, so optional
+                     // assigments added to each.
+                     //regexp = new RegExp(flag + '([A-Za-z0-9_\+\-]*)$|' + flag + '([^\\x00-\\xff]*)$', 'gi');
+                     // Note: this does make the searching a bit more loose,
+                     // but it's the only way, as spaces make searching
+                     // more ambiguous.
+                     regexp = new RegExp(flag + '\"?([\\sA-Za-z0-9_\+\-]*)\"?$|' + flag + '\"?([^\\x00-\\xff]*)\"?$', 'gi');
+
                      match = regexp.exec(subtext);
                      if (match) {
-                     return match[2] || match[1];
+                        return match[2] || match[1];
                      } else {
-                     return null;
+                        return null;
                      }
                   }
                },
