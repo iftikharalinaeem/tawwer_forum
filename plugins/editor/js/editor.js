@@ -822,9 +822,9 @@
                      // This is needed for checking quotation mark directly
                      // after at character, and preventing another at character
                      // from being inserted into the page.
-                     var raw_at_match = this.raw_at_match || '';
+                     var raw_at_match = this.raw_at_match;
 
-                     var at_quote = (/.?@\"\'/.test(raw_at_match))
+                     var at_quote = (/.?@(\"|\')/.test(raw_at_match))
                         ? true
                         : false;
 
