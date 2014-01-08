@@ -798,7 +798,6 @@
                      // Pop off the flag--usually @ or :
                      username = username.slice(1, username.length);
 
-
                      // Check if there are any whitespaces, and if so, add
                      // quotation marks around the whole name.
                      var requires_quotation = (/\s/g.test(username))
@@ -820,6 +819,25 @@
                         insert = '"' + username + '"';
                      }
 
+                     // This is needed for checking quotation mark directly
+                     // after at character, and preventing another at character
+                     // from being inserted into the page.
+                     var raw_at_match = this.raw_at_match || '';
+
+                     var at_quote = (/.?@\"\'/.test(raw_at_match))
+                        ? true
+                        : false;
+
+                     // If at_quote is false, then insert the at character,
+                     // otherwise it means the user typed a quotation mark
+                     // directly after the at character, which, would get
+                     // inserted again if not checked. at_quote would
+                     // be false most of the time; the exception is when
+                     // it's true.
+                     if (!at_quote) {
+                        insert = this.at + insert;
+                     }
+
                      // Keep for reference, but also, spaces add complexity,
                      // so use zero-width non-joiner delimiting those advanced
                      // username mentions.
@@ -831,7 +849,7 @@
 
                      // The last character prevents the matcher from trigger
                      // on nearly everything.
-                     return this.at + insert + hidden_unicode_chars.zwnj;
+                     return insert + hidden_unicode_chars.zwnj;
                   },
 
                   // Custom highlighting to accept spaces in names. This is
@@ -868,12 +886,17 @@
                      // Note: this does make the searching a bit more loose,
                      // but it's the only way, as spaces make searching
                      // more ambiguous.
-                     regexp = new RegExp(flag + '\"?([\\sA-Za-z0-9_\+\-]*)\"?$|' + flag + '\"?([^\\x00-\\xff]*)\"?$', 'gi');
-
                      // \xA0 non-breaking space
+                     regexp = new RegExp(flag + '\"?([\\sA-Za-z0-9_\+\-]*)\"?$|' + flag + '\"?([^\\x00-\\xff]*)\"?$', 'gi');
 
                      match = regexp.exec(subtext);
                      if (match) {
+                        // Store the original matching string to check against
+                        // quotation marks after the at symbol, to prevent
+                        // double insertions of the at symbol. This will be
+                        // used in the before_insert callback.
+                        this.raw_at_match = match[0];
+
                         return match[2] || match[1];
                      } else {
                         return null;
