@@ -14,8 +14,9 @@
 */
 
 /**
- * Note: This file has been highly modified to work with iframes. Do not just
- * replace with a more current version.
+ * Note: This file has been highly modified to work with iframes, as well
+ * as custom username handling with quotation marks and spaces for Vanilla.
+ * Do not just replace with a more current version.
  */
 
 
