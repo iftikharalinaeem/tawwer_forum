@@ -1,4 +1,3 @@
-//@ sourceMappingURL=jquery.caret.map
 /*
   Implement Github like autocomplete mentions
   http://ichord.github.com/At.js
@@ -654,6 +653,7 @@
           //////////content_node = "" + content + "<span contenteditable='false'>&nbsp;<span>";
           //////////insert_node = "<span contenteditable='false' class='" + class_name + "'>" + content_node + "</span>";
           content_node = ("" + content + "<span contenteditable='") + content_editable + "'>&nbsp;<span>";
+          //content_node = "" + content;
           insert_node = "<span contenteditable='" + content_editable + ("' class='" + class_name + "'>" + content_node + "</span>");
 
           $insert_node = $(insert_node).data('atwho-data-item', $li.data('item-data'));

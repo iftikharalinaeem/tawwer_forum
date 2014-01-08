@@ -798,6 +798,7 @@
                      // Pop off the flag--usually @ or :
                      username = username.slice(1, username.length);
 
+
                      // Check if there are any whitespaces, and if so, add
                      // quotation marks around the whole name.
                      var requires_quotation = (/\s/g.test(username))
@@ -810,11 +811,27 @@
                         ? true
                         : false;
 
+                     var insert = username;
+
                      if (requires_quotation && !has_quotation) {
-                        value = value.replace(/(\>?)@(.+)(\<?)/, '$1@"$2"$3');
+                        // Do not even need to have value wrapped in
+                        // any tags at all. It will be done automatically.
+                        //insert = value.replace(/(.*\>?)@([\w\d\s\-\+\_]+)(\<?.*)/, '$1@"$2"$3');
+                        insert = '"' + username + '"';
                      }
 
-                     return value;
+                     // Keep for reference, but also, spaces add complexity,
+                     // so use zero-width non-joiner delimiting those advanced
+                     // username mentions.
+                     var hidden_unicode_chars = {
+                        zws:  '\u200b',
+                        zwnj: '\u200C',
+                        nbsp: '\u00A0' // \xA0
+                     };
+
+                     // The last character prevents the matcher from trigger
+                     // on nearly everything.
+                     return this.at + insert + hidden_unicode_chars.zwnj;
                   },
 
                   // Custom highlighting to accept spaces in names. This is
@@ -852,6 +869,8 @@
                      // but it's the only way, as spaces make searching
                      // more ambiguous.
                      regexp = new RegExp(flag + '\"?([\\sA-Za-z0-9_\+\-]*)\"?$|' + flag + '\"?([^\\x00-\\xff]*)\"?$', 'gi');
+
+                     // \xA0 non-breaking space
 
                      match = regexp.exec(subtext);
                      if (match) {
@@ -911,7 +930,7 @@
                // Either @ or : for now.
                var at = context.at;
                var text = context.query.text;
-               var font_mirror = $('.BodyBox')
+               var font_mirror = $('.BodyBox');
                var font = font_mirror.css('font-size') + ' ' + font_mirror.css('font-family');
 
                // Get font width
