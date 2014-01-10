@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<style class="text/css">
+<style class="text-css">
    .ApiEndpoint {
       padding: 10px !important;
       background: #f1f1f1;
