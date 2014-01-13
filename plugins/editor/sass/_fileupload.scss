@@ -1,0 +1,61 @@
+.bodybox-wrap {
+   position: relative;
+}
+
+.editor-upload-progress {
+   position: absolute;
+   width: 0%;
+   overflow: hidden;
+   background-color: red;
+   margin: -1px 0 0 0;
+   width: 0;
+   height: 3px;
+   opacity: 1;
+}
+
+.editor-upload-progress.fade-out {
+   opacity: 0;
+   transition: opacity 0.7s ease;
+}
+
+.editor-drop-cue {
+   .BodyBox,
+   iframe {
+      border: 2px dashed rgba(0,0,0,0.25) !important;
+      border-radius: 2px !important;
+   }
+}
+
+.editor-upload-attention {
+   display: none;
+   position: absolute;
+   top: 15px;
+   width: 120px;
+   left: 50%;
+   margin-left: -60px;
+   text-align: center;
+   font-size: 18px;
+   color: #fff;
+   text-shadow: 0 0 1px rgba(0,0,0,0.4);
+   padding: 10px 0;
+   background-color: rgba(0,0,0,0.60);
+   border-radius: 2px;
+   box-shadow: 0 0 5px 0 rgba(0,0,0,0.20);
+   pointer-events: none;
+}
+
+.editor-drop-cue .editor-upload-attention {
+   display: block;
+}
+
+/* If editor is fullpage */
+#editor-fullpage-candidate {
+
+   .editor-upload-progress {
+      margin: 0;
+   }
+
+   .editor-upload-attention {
+      top: 60px;
+   }
+}

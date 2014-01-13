@@ -996,6 +996,89 @@
                $(suggest_el).offset(offset);
             });
          }
+      };
+
+      var fileUploadsInit = function(dropElement) {
+
+         // Disable default browser behaviour of file drops
+         $(document).on('drop dragover', function(e) {
+            e.preventDefault();
+         });
+
+         // Add CSS class to this element to style children on dragover
+         var $dndCueWrapper = $(dropElement).closest('.bodybox-wrap');
+
+         // Determine if element passed is an iframe or local element.
+         var handleIframe = false;
+         if ($(dropElement)[0].contentWindow) {
+            dropElement = $(dropElement)[0].contentWindow;
+            handleIframe = true;
+         }
+
+         // Handle drop effect as UX cue
+         $(dropElement).on('dragenter dragover', function(e) {
+            $dndCueWrapper.addClass('editor-drop-cue');
+         }).on('drop dragend dragleave', function(e) {
+            $dndCueWrapper.removeClass('editor-drop-cue');
+         });
+
+         // Initialize file uploads.
+         $('.bodybox-wrap').fileupload({
+
+            url: '/utility/editorupload',
+            dropZone: $(dropElement),
+            forceIframeTransport: false,
+            dataType: 'json',
+
+            done: function (e, data) {
+
+               console.log(data);
+
+               $.each(data.result.files, function (index, file) {
+                  $('<p/>').text(file.name).appendTo(document.body);
+               });
+            },
+
+            progressall: function (e, data) {
+               var progress = parseInt(data.loaded / data.total * 100, 10);
+
+               var $progressMeter = $('.editor-upload-progress');
+
+               $progressMeter.css({
+                  'width': progress + '%'
+               });
+
+               if (progress == 100) {
+                  $progressMeter.addClass('fade-out');
+
+                  // Transition inserted above is 400ms, so remove it shortly
+                  // after.
+                  setTimeout(function() {
+                     // Remove transition class
+                     $progressMeter.removeClass('fade-out');
+
+                     // Reset width
+                     $progressMeter.css({
+                        'width': 0
+                     });
+                  }, 710);
+               }
+            },
+
+            send: function(e, data) {
+
+            },
+
+            always: function(e, data) {
+
+            },
+
+            fail: function(e, data) {
+
+            }
+
+         });
+
 
       };
 
@@ -1269,6 +1352,13 @@
                          var iframe = $(editor.composer.iframe);
                          var iframe_body = iframe.contents().find('body')[0];
                          atCompleteInit(iframe_body, iframe[0]);
+
+
+                         // Enable file uploads. Pass the iframe as the
+                         // drop target in wysiwyg, while the regular editor
+                         // modes will just require the standard textarea
+                         // element.
+                         fileUploadsInit(iframe);
                       });
 
 
@@ -1371,6 +1461,9 @@
 
                       // Enable at-suggestions
                       atCompleteInit($currentEditableTextarea, '');
+
+                      // Enable file uploads
+                      fileUploadsInit($currentEditableTextarea);
                    });
                    break;
 

@@ -94,6 +94,7 @@ class EditorPlugin extends Gdn_Plugin {
           'emoji' => true,
           'links' => true,
           'images' => true,
+          'uploads' => true,
 
           'sep-align' => true, // separator
           'alignleft' => true,
@@ -240,6 +241,7 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['emoji'] = array('edit' => 'media', 'action'=> 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => T('Emoji'), 'data-editor' => '{"action":"emoji","value":""}'));
       $editorToolbarAll['links'] = array('edit' => 'media', 'action'=> 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link', 'data-wysihtml5-command' => 'createLink', 'title' => T('Url'), 'data-editor' => '{"action":"url","value":""}'));
       $editorToolbarAll['images'] = array('edit' => 'media', 'action'=> 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => T('Image'), 'data-editor' => '{"action":"image","value":""}'));
+      $editorToolbarAll['uploads'] = array('edit' => 'media', 'action'=> 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-paper-clip editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => T('Upload'), 'data-editor' => '{"action":"upload","value":""}'));
 
       $editorToolbarAll['sep-align'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-align hidden-xs'));
       $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action'=> 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyLeft', 'title' => T('Align left'), 'data-editor' => '{"action":"alignleft","value":""}'));
@@ -314,6 +316,11 @@ class EditorPlugin extends Gdn_Plugin {
       // Load JavaScript used by every editor view.
       $c->AddJsFile('editor.js', 'plugins/editor');
       $c->AddJsFile('jquery.atwho.js', 'plugins/editor');
+
+      // Fileuploads
+      $c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
+      $c->AddJsFile('jquery.iframe-transport.js', 'plugins/editor');
+      $c->AddJsFile('jquery.fileupload.js', 'plugins/editor');
 
       // Set definitions for JavaScript to read
       $c->AddDefinition('editorVersion',      $this->pluginInfo['Version']);
@@ -398,6 +405,28 @@ class EditorPlugin extends Gdn_Plugin {
 
          $Args['BodyBox'] .= $View;
       }
+   }
+
+   /**
+    *
+    * @param UtilityController $Sender
+    * @param array $Args
+    */
+   public function UtilityController_EditorUpload_Create($Sender, $Args = array()) {
+
+      //echo 'UtilityController_EditorUpload_Create';
+
+      //decho($Args);
+
+      //decho ($Sender);
+
+list($FieldName) = $Sender->RequestArgs;
+      $FileData = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, $FieldName, FALSE);
+
+
+      decho($FileData);
+
+      echo json_encode(array('success'=>true));
    }
 
    /**
