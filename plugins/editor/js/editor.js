@@ -1000,6 +1000,9 @@
 
       var fileUploadsInit = function(dropElement) {
 
+         var maxUploadSize = gdn.definition('maxUploadSize');
+
+
          // Disable default browser behaviour of file drops
          $(document).on('drop dragover', function(e) {
             e.preventDefault();
@@ -1022,59 +1025,75 @@
             $dndCueWrapper.removeClass('editor-drop-cue');
          });
 
+         // Abstract away progress meter removal, so it can be called in
+         // progress event, and always event.
+         var $progressMeter = $('.editor-upload-progress');
+         var clearProgressMeter = function() {
+
+            // Just in case progress meter didn't reach end (rare), fill it up,
+            // then get rid of it.
+            $progressMeter.css({
+               'width': 100 + '%'
+            });
+
+            $progressMeter.addClass('fade-out');
+
+            // Transition inserted above is 400ms, so remove it shortly
+            // after.
+            setTimeout(function() {
+               // Remove transition class
+               $progressMeter.removeClass('fade-out');
+
+               // Reset width
+               $progressMeter.css({
+                  'width': 0
+               });
+            }, 710);
+         };
+
          // Initialize file uploads.
          $('.bodybox-wrap').fileupload({
 
-            url: '/utility/editorupload',
+            url: '/post/editorupload',
             dropZone: $(dropElement),
             forceIframeTransport: false,
             dataType: 'json',
 
             done: function (e, data) {
 
-               console.log(data);
+               console.log('DONE');
+               console.log(data.result.files);
 
+               /*
                $.each(data.result.files, function (index, file) {
                   $('<p/>').text(file.name).appendTo(document.body);
-               });
+               });*/
             },
 
             progressall: function (e, data) {
                var progress = parseInt(data.loaded / data.total * 100, 10);
 
-               var $progressMeter = $('.editor-upload-progress');
-
                $progressMeter.css({
                   'width': progress + '%'
                });
 
-               if (progress == 100) {
-                  $progressMeter.addClass('fade-out');
-
-                  // Transition inserted above is 400ms, so remove it shortly
-                  // after.
-                  setTimeout(function() {
-                     // Remove transition class
-                     $progressMeter.removeClass('fade-out');
-
-                     // Reset width
-                     $progressMeter.css({
-                        'width': 0
-                     });
-                  }, 710);
-               }
+               // The progress meter is cleared in the `always` event, to
+               // handle rare case when meter fails to reach end.
             },
 
             send: function(e, data) {
-
+               console.log('SEND');
             },
 
+            // Note, sometimes the upload progress meter never reaches the
+            // end, so this would be a good place to clear it as a backup.
             always: function(e, data) {
-
+               clearProgressMeter();
             },
 
             fail: function(e, data) {
-
+               console.log('FAILLLLLHOUSE');
+               console.log(e, data);
             }
 
          });

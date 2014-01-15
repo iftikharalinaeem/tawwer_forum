@@ -333,6 +333,12 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddDefinition('textHelpText',       T('editor.TextHelpText', 'You are using plain text in your post.'));
       $c->AddDefinition('editorWysiwygCSS',   $CssPath);
 
+      // Set variables for file uploads
+      $PostMaxSize = Gdn_Upload::UnformatFileSize(ini_get('post_max_size'));
+      $FileMaxSize = Gdn_Upload::UnformatFileSize(ini_get('upload_max_filesize'));
+      $ConfigMaxSize = Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize', '1MB'));
+      $MaxSize = min($PostMaxSize, $FileMaxSize, $ConfigMaxSize);
+      $c->AddDefinition('maxUploadSize', $MaxSize);
 
       // Add active emoji so autosuggest works
       $Emoji = Emoji::instance();
@@ -409,10 +415,29 @@ class EditorPlugin extends Gdn_Plugin {
 
    /**
     *
-    * @param UtilityController $Sender
+    * @param PostController $Sender
     * @param array $Args
     */
-   public function UtilityController_EditorUpload_Create($Sender, $Args = array()) {
+   public function PostController_EditorUpload_Create($Sender, $Args = array()) {
+
+      echo json_encode(array('success'=>true));
+      return;
+      // Require new image thumbnail generator function. Currently it's
+      // being symlinked from my vhosts/tests directory. When it makes it
+      // into core, it will be available in functions.general.php
+      require 'generate_thumbnail.php';
+
+      // Input from form for files is `files[]`
+      $inputName = 'files';
+
+      $Upload = new Gdn_Upload();
+
+      echo $Upload->ValidateUpload($inputName);
+
+      exit;
+
+      echo Gdn_Upload::CanUpload();
+      exit;
 
       //echo 'UtilityController_EditorUpload_Create';
 
@@ -420,13 +445,15 @@ class EditorPlugin extends Gdn_Plugin {
 
       //decho ($Sender);
 
-list($FieldName) = $Sender->RequestArgs;
-      $FileData = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, $FieldName, FALSE);
-
+      //decho($Sender);
+      $FileData = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, 'files', FALSE);
 
       decho($FileData);
 
-      echo json_encode(array('success'=>true));
+
+      //decho($FileData);
+
+
    }
 
    /**
