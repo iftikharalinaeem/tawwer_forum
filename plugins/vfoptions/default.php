@@ -16,18 +16,6 @@ class VFOptionsPlugin implements Gdn_IPlugin {
    
    public $WhitelistDomain = 'vanillaforums.com';
 
-   public function __construct() {
-      $ForumName = Gdn::Request()->Host();
-
-      $HostingDomain = C('VanillaForums.Hostname', 'vanillaforums.com');
-      $RegexHostingDomain = str_replace('.','\.', $HostingDomain);
-      $HasCluster = preg_match("/\.cl[0-9]+\.{$RegexHostingDomain}\$/i", $ForumName);
-      if ($HasCluster) {
-         $ForumName = preg_replace("/\.cl[0-9]+\.{$RegexHostingDomain}\$/i", ".{$HostingDomain}", $ForumName);
-         SaveToConfig('Garden.AutoDomainSwitch', FALSE);
-      }
-   }
-   
    public function HasInfPermission() {
       if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
          return FALSE;
