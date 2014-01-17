@@ -46,9 +46,27 @@ class EditorPlugin extends Gdn_Plugin {
    /**
     *
     * @var string Asset path for this plugin, set in Gdn_Form_BeforeBodyBox_Handler.
-    *      TODO check how to set it at runtime in constructor.
+    *             TODO check how to set it at runtime in constructor.
     */
    protected $AssetPath;
+
+   /**
+    *
+    * @var string This is used as the input name for file uploads. It will be
+    *             passed to JS as well. Note that it can be defined as an
+    *             array, by adding square brackets, e.g., `editorupload[]`,
+    *             but that will make all the Vanilla upload classes
+    *             incompatible because they are hardcoded to handle only
+    *             single files at a time, not an array of files. Perhaps in
+    *             future make core upload classes more flexible.
+    */
+   protected $editorFileInputName = 'editorupload';
+
+   /**
+    *
+    * @var string
+    */
+   protected $editorBaseUploadDestinationDir = '';
 
    /**
     *
@@ -321,6 +339,8 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
       $c->AddJsFile('jquery.iframe-transport.js', 'plugins/editor');
       $c->AddJsFile('jquery.fileupload.js', 'plugins/editor');
+      //$c->AddJsFile('jquery.fileupload-process.js', 'plugins/editor');
+      //$c->AddJsFile('jquery.fileupload-validate.js', 'plugins/editor');
 
       // Set definitions for JavaScript to read
       $c->AddDefinition('editorVersion',      $this->pluginInfo['Version']);
@@ -339,6 +359,8 @@ class EditorPlugin extends Gdn_Plugin {
       $ConfigMaxSize = Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize', '1MB'));
       $MaxSize = min($PostMaxSize, $FileMaxSize, $ConfigMaxSize);
       $c->AddDefinition('maxUploadSize', $MaxSize);
+      // Set file input name
+      $c->AddDefinition('editorFileInputName', $this->editorFileInputName);
 
       // Add active emoji so autosuggest works
       $Emoji = Emoji::instance();
@@ -420,40 +442,215 @@ class EditorPlugin extends Gdn_Plugin {
     */
    public function PostController_EditorUpload_Create($Sender, $Args = array()) {
 
-      echo json_encode(array('success'=>true));
-      return;
       // Require new image thumbnail generator function. Currently it's
       // being symlinked from my vhosts/tests directory. When it makes it
       // into core, it will be available in functions.general.php
       require 'generate_thumbnail.php';
 
-      // Input from form for files is `files[]`
-      $inputName = 'files';
+      // Grab raw upload data ($_FILES), essentially. It's only needed
+      // because the methods on the Upload class do not expose all variables.
+      $fileData = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, $this->editorFileInputName, FALSE);
 
+      // JSON payload of media info will get sent back to the client.
+      $json = array(
+         'error' => 1,
+         'feedback' => 'There was a problem.',
+         'errors' => array(),
+         'payload' => array()
+      );
+
+      // New upload instance
       $Upload = new Gdn_Upload();
 
-      echo $Upload->ValidateUpload($inputName);
+      // This will validate, such as size maxes, file extensions. Upon doing
+      // this, $_FILES is set as a protected property, so all the other
+      // Gdn_Upload methods work on it.
+      $tmpFilePath = $Upload->ValidateUpload($this->editorFileInputName);
 
-      exit;
+      // Get base destination path for editor uploads
+      $this->editorBaseUploadDestinationDir = $this->getBaseUploadDestinationDir();
 
-      echo Gdn_Upload::CanUpload();
-      exit;
+      // Pass path, if doesn't exist, will create, and determine if valid.
+      $canUpload = Gdn_Upload::CanUpload($this->editorBaseUploadDestinationDir);
 
-      //echo 'UtilityController_EditorUpload_Create';
+      if ($tmpFilePath && $canUpload) {
 
-      //decho($Args);
+         $fileExtension = $Upload->GetUploadedFileExtension();
+         $fileName = $Upload->GetUploadedFileName();
 
-      //decho ($Sender);
+         // This will return the absolute destination path, including generated
+         // filename based on md5_file, and the full path. It
+         // will create a filename, with extension, and check if its dir can
+         // be writable.
+         $absoluteFileDestination = $this->getAbsoluteDestinationFilePath($tmpFilePath, $fileExtension);
 
-      //decho($Sender);
-      $FileData = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, 'files', FALSE);
+         // This is returned by SaveAs
+         //$filePathparsed = Gdn_Upload::Parse($absoluteFileDestination);
 
-      decho($FileData);
+         // Save original file to uploads, then manipulate from this location if
+         // it's a photo. This will also call events in Vanilla so other
+         // plugins can tie into this.
+         $filePathParsed = $Upload->SaveAs($tmpFilePath, $absoluteFileDestination);
 
+         // Determine if image, and thus requires thumbnail generation, or
+         // simply saving the file.
 
-      //decho($FileData);
+         // Not all files will be images.
+         $thumbHeight = '';
+         $thumbWidth = '';
+         $imageHeight = '';
+         $imageWidth = '';
+         $thumbDestinationPath = '';
+         $thumbPathParsed = array('SaveName' => '');
 
+         // This is a redundant check, because it's in the thumbnail function,
+         // but there's no point calling it blindly on every file, so just
+         // check here before calling it.
+         if (in_array($fileExtension, array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico'))) {
 
+            // Generate new path for thumbnail
+            $thumbPath = $this->editorBaseUploadDestinationDir . '/' . 'thumb';
+
+            // Grab full path with filename, and validate it.
+            $thumbDestinationPath = $this->getAbsoluteDestinationFilePath($absoluteFileDestination, $fileExtension, $thumbPath);
+
+            // Create thumbnail, and grab debug data from whole process.
+            $thumb_payload = generate_thumbnail($absoluteFileDestination, $thumbDestinationPath, array(
+                // Give preference to height for thumbnail, so height controls.
+                'height' => C('Plugins.FileUpload.ThumbnailHeight', 128)
+            ));
+
+            if ($thumb_payload['success']) {
+               // Thumbnail dimensions
+               $thumbHeight = round($thumb_payload['result_height']);
+               $thumbWidth = round($thumb_payload['result_width']);
+               // Original dimensions
+               $imageHeight = round($thumb_payload['height']);
+               $imageWidth = round($thumb_payload['width']);
+
+               $thumbPathParsed = Gdn_Upload::Parse($thumbDestinationPath);
+            }
+         }
+
+         // Save data to database using model with media table
+         $Model = new Gdn_Model('Media');
+
+         // Will be passed to model for database insertion/update.
+         $Media = array(
+            'Name'            => $fileName,
+            'Type'            => $fileData['type'],
+            'Size'            => $fileData['size'],
+            'ImageWidth'      => $imageWidth,
+            'ImageHeight'     => $imageHeight,
+            'ThumbWidth'      => $thumbWidth,
+            'ThumbHeight'     => $thumbHeight,
+            'InsertUserID'    => Gdn::Session()->UserID,
+            'DateInserted'    => date('Y-m-d H:i:s'),
+            'StorageMethod'   => 'local',
+            'Path'            => $filePathParsed['SaveName'],
+            'ThumbPath'       => $thumbPathParsed['SaveName']
+         );
+
+         // Get MediaID and pass it to client in payload
+         $MediaID = $Model->Save($Media);
+         $Media['MediaID'] = $MediaID;
+
+         $payload = array(
+            'MediaID'            => $MediaID,
+            'Filename'           => $fileName,
+            'Filesize'           => $fileData['size'],
+            'FormatFilesize'     => Gdn_Format::Bytes($fileData['size'], 1),
+            'Thumbnail' => '',
+            'FinalImageLocation' => '',
+            'Parsed' => $filePathParsed,
+            'Media' => $Media,
+            'original_url' => $Upload->Url($filePathParsed['SaveName']),
+            'thumbnail_url' => $Upload->Url($thumbPathParsed['SaveName'])
+         );
+
+         $json = array(
+            'error' => 0,
+            'feedback' => 'Editor received file successfully.',
+            'payload' => $payload
+         );
+      }
+
+      // Return JSON payload
+      echo json_encode($json);
+   }
+
+   /**
+    * Specific to editor upload paths
+    */
+   public function getBaseUploadDestinationDir($subdir = false) {
+      // Set path
+      $basePath = PATH_UPLOADS . '/editor';
+
+      $uploadTargetPath = ($subdir)
+         ? $basePath . '/' . $subdir
+         : $basePath;
+
+      return $uploadTargetPath;
+   }
+
+   /**
+    * Instead of using Gdn_Upload->GenerateTargetName, create one that
+    * depends on MD5s, to reduce space for duplicates, and use smarter
+    * folder sorting based off the MD5s.
+    *
+    * @param type $file
+    */
+   public function getAbsoluteDestinationFilePath($tmpFilePath, $fileExtension, $uploadDestinationDir = '') {
+
+      $absolutePath = '';
+
+      $basePath = $this->editorBaseUploadDestinationDir;
+
+      if ($basePath != '') {
+         $basePath = $this->getBaseUploadDestinationDir();
+      }
+
+      if ($uploadDestinationDir) {
+         $basePath = $uploadDestinationDir;
+      }
+
+      // MD5 of the tmp file
+      $fileMD5 = md5_file($tmpFilePath);
+
+      // Use first two characters from fileMD5 as subdirectory,
+      // and use the rest as the file name.
+      $dirlen = 2;
+      $subdir = substr($fileMD5, 0, $dirlen);
+      $filename = substr($fileMD5, $dirlen);
+      $fileDirPath = $basePath . '/' . $subdir;
+
+      if ($this->validateUploadDestinationPath($fileDirPath)) {
+         $absolutePath = $fileDirPath . '/' . $filename;
+         if ($fileExtension) {
+            $absolutePath .= '.' . $fileExtension;
+         }
+      }
+
+      return $absolutePath;
+   }
+
+   /**
+    * Check if provided path is valid, creates it if it does not exist, and
+    * verifies that it is writable.
+    *
+    * @param string $path Path to validate
+    */
+   public function validateUploadDestinationPath($path) {
+      $validDestination = true;
+
+      // Check if path exists, and if not, create it.
+      if (!file_exists($path)
+      && !mkdir($path, 0777, true)
+      && !is_writable($path)) {
+         $validDestination = false;
+      }
+
+      return $validDestination;
    }
 
    /**

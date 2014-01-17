@@ -1001,7 +1001,7 @@
       var fileUploadsInit = function(dropElement) {
 
          var maxUploadSize = gdn.definition('maxUploadSize');
-
+         var editorFileInputName = gdn.definition('editorFileInputName');
 
          // Disable default browser behaviour of file drops
          $(document).on('drop dragover', function(e) {
@@ -1010,6 +1010,11 @@
 
          // Add CSS class to this element to style children on dragover
          var $dndCueWrapper = $(dropElement).closest('.bodybox-wrap');
+
+         // Insert container for displaying all uploads. All successful
+         // uploads will be inserted here.
+         $dndCueWrapper.find('.TextBoxWrapper').after('<div class="editor-upload-previews"></div>');
+         $editorUploadPreviews = $('.editor-upload-previews');
 
          // Determine if element passed is an iframe or local element.
          var handleIframe = false;
@@ -1055,19 +1060,40 @@
          $('.bodybox-wrap').fileupload({
 
             url: '/post/editorupload',
+            paramName: editorFileInputName,
             dropZone: $(dropElement),
             forceIframeTransport: false,
             dataType: 'json',
+            /*maxFileSize: maxUploadSize,
+            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+            processQueue: [{
+               action: 'validate',
+               acceptFileTypes: '@',
+               disabled: '@disableValidation'
+            }],*/
 
             done: function (e, data) {
 
                console.log('DONE');
-               console.log(data.result.files);
+               console.log(data.result);
 
-               /*
-               $.each(data.result.files, function (index, file) {
-                  $('<p/>').text(file.name).appendTo(document.body);
-               });*/
+               var result = data.result;
+
+               if (!result.error) {
+
+                  var payload = result.payload;
+
+                  var html = ''
+                  + '<span class="editor-file-preview">'
+                  + '<input type="hidden" name="MediaID" value="'+ payload.MediaID +'" />'
+                  + payload.Filename
+                  + '</span>';
+
+
+                  $editorUploadPreviews.append(html);
+
+
+               }
             },
 
             progressall: function (e, data) {
@@ -1079,6 +1105,9 @@
 
                // The progress meter is cleared in the `always` event, to
                // handle rare case when meter fails to reach end.
+               if (progress == 100) {
+                  clearProgressMeter();
+               }
             },
 
             send: function(e, data) {
@@ -1088,7 +1117,8 @@
             // Note, sometimes the upload progress meter never reaches the
             // end, so this would be a good place to clear it as a backup.
             always: function(e, data) {
-               clearProgressMeter();
+               console.log('always');
+               //clearProgressMeter();
             },
 
             fail: function(e, data) {

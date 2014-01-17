@@ -77,7 +77,7 @@
 
                         <label class="editor-image-align">
                         Browse to select files, or drag and drop files.
-                        <input class="editor-fileupload" type="file" name="files[]" multiple="multiple" />
+                        <input class="editor-fileupload" type="file" multiple="multiple" />
                         </label>
 
                         <div>
