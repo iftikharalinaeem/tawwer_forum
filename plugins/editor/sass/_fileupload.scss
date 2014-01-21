@@ -64,8 +64,10 @@
 .editor-upload-saved {
    overflow: hidden;
    padding: 10px 5px 5px 5px;
-   margin: -10px;
+   margin: 0 -10px 0 -10px;
    box-sizing: border-box;
+   position: relative;
+   z-index: 10;
 }
 
 .editor-file-preview {
@@ -152,7 +154,7 @@
       cursor: pointer;
       font-size: 10px;
       text-align: center;
-      width: 24px;
+      width: 22px;
       height: 28px;
       padding: 4px 0 0 1px;
       background-color: #fff;

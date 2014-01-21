@@ -998,7 +998,12 @@
          }
       };
 
-      var fileUploadsInit = function(dropElement) {
+      var fileUploadsInit = function(dropElement, editorInstance) {
+
+         // Pass editor instance to uploader, to access methods
+         var editor = (editorInstance)
+            ? editorInstance
+            : dropElement;
 
          var maxUploadSize = gdn.definition('maxUploadSize');
          var editorFileInputName = gdn.definition('editorFileInputName');
@@ -1018,7 +1023,9 @@
 
          // Determine if element passed is an iframe or local element.
          var handleIframe = false;
+         var iframeElement = '';
          if ($(dropElement)[0].contentWindow) {
+            iframeElement = dropElement;
             dropElement = $(dropElement)[0].contentWindow;
             handleIframe = true;
          }
@@ -1083,6 +1090,25 @@
             // Disable the hidden input so it's not submitted by form.
             //$editorFilePreview.find('input').attr('disabled', 'disabled');
             $editorFilePreview.find('input').attr('name','RemoveMediaIDs[]');
+
+
+            // Find wysihtml5 added image, if exists, and remove it from body
+            //editor-file-id-
+
+            var mediaId = $editorFilePreview.find('input').val();
+            var iframeBody = $(iframeElement).contents().find('body');
+            var insertedImage = $(iframeBody).find('#editor-file-id-'+ mediaId);
+            /*$(insertedImage).css({
+               'display': 'none'
+            }).addClass('file-image-delete');*/
+
+
+            var newHeight = parseInt($(iframeElement).css('min-height')) - insertedImage.height() + 'px';
+            $(iframeElement).css('min-height', newHeight);
+
+            $(insertedImage).remove();
+
+
          });
 
          // Reattache files
@@ -1093,7 +1119,49 @@
             // Enable the hidden input so it's submitted by form.
             //$editorFilePreview.find('input').removeAttr('disabled');
             $editorFilePreview.find('input').attr('name','MediaIDs[]');
+
+            var mediaId = $editorFilePreview.find('input').val();
+            var iframeBody = $(iframeElement).contents().find('body');
+
+
+            /*
+            $(insertedImage).css({
+               'display': 'block'
+            }).removeClass('file-image-delete');*/
+
+            var link = $editorFilePreview.find('a.filename').attr('href');
+            console.log(link);
+
+            var imgTag = '<img alt="" src="'+ link +'" id="editor-file-id-'+ mediaId +'" />';
+
+            editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
+
+var insertedImage = $(iframeBody).find('#editor-file-id-'+ mediaId);
+            var newHeight = parseInt($(iframeElement).css('min-height')) + insertedImage.height() + 'px';
+            $(iframeElement).css('min-height', newHeight);
          });
+
+         // Remove any deleted images from body
+         /*if (handleIframe) {
+
+            $(editorForm).find('input[type=submit].Primary').on('mousedown keydown keypress', function(e) {
+
+              // console.log('mousedown');
+
+
+               var iframeBody = $(iframeElement).contents().find('body');
+               var remove = $(iframeBody).find('.file-image-delete');
+
+               $(remove).each(function(i, el) {
+
+                  //console.log($(el));
+
+                  $(el).remove();
+               });
+
+               //return false;
+            });
+         }*/
 
          // Remove files from a saved session--typically from editing.
          if (savedUploadsContainer) {
@@ -1195,12 +1263,6 @@
 
             done: function (e, data) {
 
-               if (handleIframe) {
-                  console.log('iframe');
-               } else {
-                  console.log('not iframe');
-               }
-
                console.log('DONE');
                console.log(data.result);
 
@@ -1232,7 +1294,32 @@
                   + '<span class="editor-file-reattach" title="Click to re-attach \''+ payload.Filename +'\'"></span>'
                   + '</div>';
 
+                  // Add file blocksjust below editor area for easy removal
+                  // and preview.
                   $editorUploadPreviews.append(html);
+
+                  // If photo, insert directly into editor area.
+                  if (payload.type.toLowerCase().indexOf('image') > -1) {
+
+                     // Determine max height for sample. They can resize it
+                     // afterwards.
+                     var maxHeight = (payload.original_height >= 400)
+                        ? 400
+                        : payload.original_height;
+                     // height="'+ maxHeight +'"
+
+                     var imgTag = '<img alt="" src="'+ payload.original_url +'" id="editor-file-id-'+ payload.MediaID +'" />';
+
+                     if (handleIframe) {
+                        editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
+                        var newHeight = parseInt($(iframeElement).css('min-height')) + payload.original_height + 'px';
+                        $(iframeElement).css('min-height', newHeight);
+                        editor.fire("blur", "composer");
+                        editor.focus();
+                     } else {
+                        $(editor).replaceSelectedText(imgTag + '\n\n');
+                     }
+                  }
                }
             },
 
@@ -1557,7 +1644,7 @@
                          // drop target in wysiwyg, while the regular editor
                          // modes will just require the standard textarea
                          // element.
-                         fileUploadsInit(iframe);
+                         fileUploadsInit(iframe, editor);
                       });
 
 

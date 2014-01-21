@@ -568,12 +568,15 @@ class EditorPlugin extends Gdn_Plugin {
             'Filename'           => $fileName,
             'Filesize'           => $fileData['size'],
             'FormatFilesize'     => Gdn_Format::Bytes($fileData['size'], 1),
+            'type' => $fileData['type'],
             'Thumbnail' => '',
             'FinalImageLocation' => '',
             'Parsed' => $filePathParsed,
             'Media' => $Media,
             'original_url' => $Upload->Url($filePathParsed['SaveName']),
-            'thumbnail_url' => $thumbUrl
+            'thumbnail_url' => $thumbUrl,
+            'original_width' => $imageWidth,
+            'original_height' => $imageHeight
          );
 
          $json = array(
