@@ -119,6 +119,162 @@
   top: 60px;
 }
 
+.editor-upload-previews,
+.editor-upload-saved {
+  overflow: hidden;
+  padding: 10px 5px 5px 5px;
+  margin: -10px;
+  box-sizing: border-box;
+}
+
+.editor-file-preview {
+  box-sizing: border-box;
+  border-radius: 2px;
+  border: 1px solid #fff;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0;
+  margin: 5px;
+  float: left;
+  overflow: hidden;
+  width: 220px;
+  font-size: 12px;
+  position: relative;
+  color: #999;
+  text-shadow: 0 0 1px #fff;
+  /* This is for the transition when removing/reattaching files. Height
+  is necessary due to floated elements and width, which cause them to
+  occupy space under image until width is full. */
+  transition: all 0.1s ease;
+  height: 32px;
+  -webkit-animation-duration: 0.8s;
+  -webkit-animation-name: editor-file-preview;
+  -webkit-animation-fill-mode: both;
+  -webkit-animation-duration: 0.4s;
+  animation-duration: 0.8s;
+  animation-name: editor-file-preview;
+  animation-fill-mode: both;
+  animation-duration: 0.4s;
+  /* File permissions */
+}
+.editor-file-preview .file-preview {
+  display: block;
+  float: left;
+  height: 32px;
+  width: 32px;
+}
+.editor-file-preview .file-preview.img {
+  padding: 0;
+  background-position: center;
+  background-size: 50px auto;
+}
+.editor-file-preview .file-preview.icon-file {
+  padding: 4px 0 0 0;
+  text-align: center;
+  font-size: 18px;
+}
+.editor-file-preview .file-data {
+  float: left;
+  margin: 0 0 0 5px;
+  padding: 0;
+  width: 158px;
+}
+.editor-file-preview .file-data .filename {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: -2px 0 -8px 0;
+  color: rgba(0, 0, 0, 0.75);
+}
+.editor-file-preview .file-data .meta {
+  display: block;
+  font-size: 10px;
+  margin: 0;
+}
+.editor-file-preview .file-data .meta em {
+  font-style: italic;
+}
+.editor-file-preview .editor-file-remove:after {
+  display: block;
+  content: '\00D7';
+  float: right;
+  cursor: pointer;
+  font-size: 10px;
+  text-align: center;
+  width: 24px;
+  height: 28px;
+  padding: 4px 0 0 1px;
+  background-color: #fff;
+  box-shadow: inset 2px 0 2px -3px #000;
+}
+.editor-file-preview .editor-file-remove:hover:after {
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-weight: bold;
+  font-size: 12px;
+}
+.editor-file-preview .editor-file-reattach {
+  display: none;
+}
+.editor-file-preview.file-readonly .file-data {
+  width: 182px;
+}
+.editor-file-preview.file-readonly .editor-file-remove,
+.editor-file-preview.file-readonly .editor-file-reattach {
+  display: none;
+}
+
+/* Any files in this wrapper have no delete options. Only when moved into
+.editor-upload-previews will the options be activated */
+.editor-upload-readonly .file-data {
+  width: 182px;
+}
+.editor-upload-readonly .editor-file-remove,
+.editor-upload-readonly .editor-file-reattach {
+  display: none;
+}
+
+.editor-file-removed {
+  width: 32px;
+  height: 32px;
+  opacity: 0.25 !important;
+}
+.editor-file-removed .editor-file-reattach {
+  display: block;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+}
+
+@keyframes editor-file-preview {
+  0% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@-webkit-keyframes editor-file-preview {
+  0% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /**
  *  Define some mixins
  */

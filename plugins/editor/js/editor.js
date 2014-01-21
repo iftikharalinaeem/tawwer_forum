@@ -1014,7 +1014,7 @@
          // Insert container for displaying all uploads. All successful
          // uploads will be inserted here.
          $dndCueWrapper.find('.TextBoxWrapper').after('<div class="editor-upload-previews"></div>');
-         $editorUploadPreviews = $('.editor-upload-previews');
+         $editorUploadPreviews = $dndCueWrapper.find('.editor-upload-previews');
 
          // Determine if element passed is an iframe or local element.
          var handleIframe = false;
@@ -1029,6 +1029,117 @@
          }).on('drop dragend dragleave', function(e) {
             $dndCueWrapper.removeClass('editor-drop-cue');
          });
+
+         // Get current comment or discussion post box
+
+         // This is the key that finds .editor-upload-saved
+         var editorKey = 'editor-uploads-';
+         var editorForm = $dndCueWrapper.closest('form');
+         var savedUploadsContainer = '';
+         var mainCommentForm = '';
+         if (editorForm) {
+            var formCommentId = $(editorForm).find('#Form_CommentID');
+            var formDiscussionId = $(editorForm).find('#Form_DiscussionID');
+
+            // Determine if bodybox loaded is the main comment one. This one
+            // will never have any saved uploads, so make sure it never grabs
+            // saved ones when switching.
+            var mainCommentBox = false;
+            if (formCommentId.length
+            && formCommentId[0].value == ''
+            && formDiscussionId.length
+            && parseInt(formDiscussionId[0].value) > 0) {
+               mainCommentBox = true;
+               mainCommentForm = editorForm;
+               mainCommentPreviews = $editorUploadPreviews;
+            }
+
+            // Build editorKey
+            if (formCommentId.length
+            && parseInt(formCommentId[0].value) > 0) {
+               editorKey += 'commentid' + formCommentId[0].value;
+            } else if (formDiscussionId.length
+            && parseInt(formDiscussionId[0].value) > 0) {
+               editorKey += 'discussionid' + formDiscussionId[0].value;
+            }
+
+            // Make saved files editable
+            if (!mainCommentBox && editorKey != 'editor-uploads-') {
+               var savedContainer = $('#' + editorKey);
+               if (savedContainer.length && savedContainer.html().trim() != '') {
+                  savedUploadsContainer = savedContainer;
+               }
+            }
+         }
+
+
+         // Remove and reattach files in a live upload session
+
+         // Remove files
+         $editorUploadPreviews.on('click', '.editor-file-remove', function(e) {
+            var $editorFilePreview = $(this).closest('.editor-file-preview');
+            $editorFilePreview.addClass('editor-file-removed');
+
+            // Disable the hidden input so it's not submitted by form.
+            //$editorFilePreview.find('input').attr('disabled', 'disabled');
+            $editorFilePreview.find('input').attr('name','RemoveMediaIDs[]');
+         });
+
+         // Reattache files
+         $editorUploadPreviews.on('click', '.editor-file-reattach', function(e) {
+            var $editorFilePreview = $(this).closest('.editor-file-preview');
+            $editorFilePreview.removeClass('editor-file-removed');
+
+            // Enable the hidden input so it's submitted by form.
+            //$editorFilePreview.find('input').removeAttr('disabled');
+            $editorFilePreview.find('input').attr('name','MediaIDs[]');
+         });
+
+         // Remove files from a saved session--typically from editing.
+         if (savedUploadsContainer) {
+            // Turn edit mode on for saved files
+            $(savedUploadsContainer).removeClass('editor-upload-readonly');
+
+            // When closing editor, make sure to update saved container
+            $(editorForm).on('clearCommentForm', function(e) {
+               // Make readonly again
+               $(savedUploadsContainer).addClass('editor-upload-readonly');
+            });
+
+            // Remove saved file. This will add hidden input to form
+            $(savedUploadsContainer).off('click.remove').on('click.remove', '.editor-file-remove', function(e) {
+               var $editorFilePreview = $(this).closest('.editor-file-preview');
+               $editorFilePreview.addClass('editor-file-removed');
+               var mediaId = $editorFilePreview.find('input').val();
+               // Add hidden input to form so it knows to remove files.
+               $('<input>').attr({
+                  type: 'hidden',
+                  id: 'file-remove-' + mediaId,
+                  name: 'RemoveMediaIDs[]',
+                  value: mediaId
+               }).appendTo($(editorForm));
+            });
+
+            // Reattach saved file. This will remove the newly added hidden input
+            $(savedUploadsContainer).off('click.reattach').on('click.reattach', '.editor-file-reattach', function(e) {
+               var $editorFilePreview = $(this).closest('.editor-file-preview');
+               $editorFilePreview.removeClass('editor-file-removed');
+               var mediaId = $editorFilePreview.find('input').val();
+               $('#file-remove-' + mediaId).remove();
+            });
+         }
+
+         // Clear session preview files--this for main comment box.
+         if (mainCommentBox) {
+            // When closing editor with new uploads in session, typically
+            // commentbox at bottom of discussion, remove the uploads
+            $(editorForm).on('clearCommentForm', function(e) {
+               // Empty out the session previews.
+               $(mainCommentPreviews).empty();
+            });
+         }
+
+
 
          // Abstract away progress meter removal, so it can be called in
          // progress event, and always event.
@@ -1056,6 +1167,16 @@
             }, 710);
          };
 
+        // console.log($('.bodybox-wrap'));
+        // console.log($dndCueWrapper);
+
+         //console.log(dropElement.length);
+
+         // see link about multiple uploads, as little buggy:
+         // https://github.com/blueimp/jQuery-File-Upload/wiki/Multiple-File-Upload-Widgets-on-the-same-page
+         // No, it completely falls overs, so look into handling multiple
+         // upload dropzones.
+
          // Initialize file uploads.
          $('.bodybox-wrap').fileupload({
 
@@ -1074,25 +1195,44 @@
 
             done: function (e, data) {
 
+               if (handleIframe) {
+                  console.log('iframe');
+               } else {
+                  console.log('not iframe');
+               }
+
                console.log('DONE');
                console.log(data.result);
 
                var result = data.result;
 
                if (!result.error) {
-
                   var payload = result.payload;
 
-                  var html = ''
-                  + '<span class="editor-file-preview">'
-                  + '<input type="hidden" name="MediaID" value="'+ payload.MediaID +'" />'
-                  + payload.Filename
-                  + '</span>';
+                  // If has thumbnail, display it instead of generic file icon.
+                  var filePreviewCss = (payload.thumbnail_url)
+                     ? '<i class="file-preview img" style="background-image: url('+ payload.thumbnail_url +')"></i>'
+                     : '<i class="file-preview icon icon-file"></i>';
 
+                  // If it's an image, then indicate that it's been embedded
+                  // in the post
+                  var imageEmbeddedText = (payload.thumbnail_url)
+                     ? ' &middot; <em title="This image has been inserted into the body of text.">inserted</em>'
+                     : '';
+
+                  var html = ''
+                  + '<div class="editor-file-preview" id="media-id-'+ payload.MediaID +'" title="'+ payload.Filename +'">'
+                  + '<input type="hidden" name="MediaIDs[]" value="'+ payload.MediaID +'" />'
+                  + filePreviewCss
+                  + '<div class="file-data">'
+                  + '<a class="filename" href="'+ payload.original_url +'" target="_blank">'+ payload.Filename + '</a>'
+                  + '<span class="meta">' + payload.FormatFilesize + imageEmbeddedText + '</span>'
+                  + '</div>'
+                  + '<span class="editor-file-remove" title="Remove file"></span>'
+                  + '<span class="editor-file-reattach" title="Click to re-attach \''+ payload.Filename +'\'"></span>'
+                  + '</div>';
 
                   $editorUploadPreviews.append(html);
-
-
                }
             },
 
@@ -1112,7 +1252,17 @@
 
             send: function(e, data) {
                console.log('SEND');
+               console.log(data);
             },
+
+            drop: function (e, data) {
+
+
+
+               $.each(data.files, function (index, file) {
+                   console.log('Dropped file: ' + file.name);
+               });
+           },
 
             // Note, sometimes the upload progress meter never reaches the
             // end, so this would be a good place to clear it as a backup.

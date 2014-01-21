@@ -503,6 +503,10 @@ class EditorPlugin extends Gdn_Plugin {
          $thumbDestinationPath = '';
          $thumbPathParsed = array('SaveName' => '');
 
+         // TODO in future, because of how files are stored, if they exist,
+         // no need to create another thumbnail. They are checked against
+         // MD5 file value.
+
          // This is a redundant check, because it's in the thumbnail function,
          // but there's no point calling it blindly on every file, so just
          // check here before calling it.
@@ -555,6 +559,10 @@ class EditorPlugin extends Gdn_Plugin {
          $MediaID = $Model->Save($Media);
          $Media['MediaID'] = $MediaID;
 
+         $thumbUrl = ($thumbPathParsed['SaveName'])
+            ? $Upload->Url($thumbPathParsed['SaveName'])
+            : '';
+
          $payload = array(
             'MediaID'            => $MediaID,
             'Filename'           => $fileName,
@@ -565,7 +573,7 @@ class EditorPlugin extends Gdn_Plugin {
             'Parsed' => $filePathParsed,
             'Media' => $Media,
             'original_url' => $Upload->Url($filePathParsed['SaveName']),
-            'thumbnail_url' => $Upload->Url($thumbPathParsed['SaveName'])
+            'thumbnail_url' => $thumbUrl
          );
 
          $json = array(
@@ -578,6 +586,195 @@ class EditorPlugin extends Gdn_Plugin {
       // Return JSON payload
       echo json_encode($json);
    }
+
+
+
+
+
+
+
+
+   /**
+    * Attach a file to a foreign table and ID.
+    *
+    * @access protected
+    * @param int $FileID
+    * @param int $ForeignID
+    * @param string $ForeignType Lowercase.
+    * @return bool Whether attach was successful.
+    */
+   protected function attachEditorUploads($FileID, $ForeignID, $ForeignType) {
+
+      // Save data to database using model with media table
+      $Model = new Gdn_Model('Media');
+
+      $Media = $Model->GetID($FileID);
+      if ($Media) {
+         $Media->ForeignID = $ForeignID;
+         $Media->ForeignTable = $ForeignType;
+
+         try {
+            $Model->Save($Media);
+         } catch (Exception $e) {
+            die($e->getMessage());
+            return FALSE;
+         }
+         return TRUE;
+      }
+      return FALSE;
+   }
+
+   /**
+    * Remove file from filesystem, and clear db entry.
+    *
+    * @param type $FileID
+    * @param type $ForeignID
+    * @param type $ForeignType
+    * @return boolean
+    */
+   protected function deleteEditorUploads($MediaID, $ForeignID = '', $ForeignType = '') {
+
+      // Save data to database using model with media table
+      $Model = new Gdn_Model('Media');
+
+      $Media = (array) $Model->GetID($MediaID);
+
+      if ($Media
+      && Gdn::Session()->UserID == $Media['InsertUserID']
+      // These two are only available when a comment/discussion has already
+      // been saved. If removing them from a live session (ie, deciding not
+      // to use them), then they will not be filled, so remove checks.
+      //&& $Media['ForeignID'] == $ForeignID
+      //&& $Media['ForeignTable'] == $ForeignType
+      ) {
+         try {
+            $Model->Delete($MediaID);
+         } catch (Exception $e) {
+            die($e->getMessage());
+            return FALSE;
+         }
+         return TRUE;
+      }
+      return FALSE;
+   }
+
+      /**
+    * Attach files to a comment during save.
+    *
+    * @access public
+    * @param object $Sender
+    * @param array $Args
+    */
+   public function PostController_AfterCommentSave_Handler($Sender, $Args) {
+      if (!$Args['Comment']) return;
+
+      $CommentID = $Args['Comment']->CommentID;
+      if (!$CommentID) return;
+
+      // Array of Media IDs, as input is MediaIDs[]
+      $mediaIds = (array) Gdn::Request()->GetValue('MediaIDs');
+
+      if (count($mediaIds)) {
+         foreach ($mediaIds as $mediaId) {
+            $this->attachEditorUploads($mediaId, $CommentID, 'comment');
+         }
+      }
+
+      // Array of Media IDs to remove, if any.
+      $removeMediaIds = (array) Gdn::Request()->GetValue('RemoveMediaIDs');
+
+      if (count($removeMediaIds)) {
+         foreach ($removeMediaIds as $mediaId) {
+            $this->deleteEditorUploads($mediaId, $CommentID, 'comment');
+         }
+      }
+   }
+
+   /**
+    * Attach files to a discussion during save.
+    *
+    * @access public
+    * @param object $Sender
+    * @param array $Args
+    */
+   public function PostController_AfterDiscussionSave_Handler($Sender, $Args) {
+      if (!$Args['Discussion']) return;
+
+      $DiscussionID = $Args['Discussion']->DiscussionID;
+      if (!$DiscussionID) return;
+
+      // Array of Media IDs, as input is MediaIDs[]
+      $mediaIds = (array) Gdn::Request()->GetValue('MediaIDs');
+
+      if (count($mediaIds)) {
+         foreach ($mediaIds as $mediaId) {
+            $this->attachEditorUploads($mediaId, $DiscussionID, 'discussion');
+         }
+      }
+
+      // Array of Media IDs to remove, if any.
+      $removeMediaIds = (array) Gdn::Request()->GetValue('RemoveMediaIDs');
+
+      if (count($removeMediaIds)) {
+         foreach ($removeMediaIds as $mediaId) {
+            $this->deleteEditorUploads($mediaId, $DiscussionID, 'discussion');
+         }
+      }
+   }
+
+   protected function AttachUploadsToComment($Controller, $Type = 'comment') {
+
+      $param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
+      $foreignId = GetValue($param, GetValue(ucfirst($Type), $Controller->EventArguments));
+
+      $Model = new Gdn_Model('Media');
+      $attachments = $Model
+              ->GetWhere(array(
+                  'ForeignID' => $foreignId,
+                  'ForeignTable' => $Type)
+              )->ResultArray();
+
+      $Controller->SetData('attachments', $attachments);
+      $Controller->SetData('editorkey', strtolower($param.$foreignId));
+
+      echo $Controller->FetchView($this->GetView('attachments.php'));
+   }
+
+   public function PostController_DiscussionFormOptions_Handler($Sender, $Args) {
+      if (!is_null($Discussion = GetValue('Discussion',$Sender, NULL))) {
+         $Sender->EventArguments['Type'] = 'Discussion';
+         $Sender->EventArguments['Discussion'] = $Discussion;
+         $this->AttachUploadsToComment($Sender, 'discussion');
+      }
+
+      //decho($Args);
+   }
+
+   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
+      $this->AttachUploadsToComment($Sender);
+
+            //decho($Args);
+
+   }
+
+   public function DiscussionController_AfterDiscussionBody_Handler($Sender, $Args) {
+      $this->AttachUploadsToComment($Sender, 'discussion');
+
+            //decho($Args);
+
+   }
+
+   public function PostController_AfterCommentBody_Handler($Sender, $Args) {
+      $this->AttachUploadsToComment($Sender);
+
+            //decho($Args);
+
+   }
+
+
+
+
+
 
    /**
     * Specific to editor upload paths
