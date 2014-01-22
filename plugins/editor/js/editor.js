@@ -1081,20 +1081,38 @@
          }
 
 
-         // Help methods
+         /**
+          * Help methods
+          */
          var buildImgTag = function(href) {
             return '<img src="'+ href +'" alt="" />';
          };
 
+         // Used in two places below
+         var insertImageIntoBody = function(filePreviewContainer) {
+            $(filePreviewContainer).removeClass('editor-file-removed');
+            var file = $(filePreviewContainer).find('a.filename');
+            var type = $(file).data('type');
+            var href = file.attr('href');
 
-         /**
-          * Remove and reattach files in a live upload session
-          */
-         $editorUploadPreviews.on('click.live-file-remove', '.editor-file-remove', function(e) {
-            var $editorFilePreview = $(this).closest('.editor-file-preview');
-            $editorFilePreview.addClass('editor-file-removed');
-            $editorFilePreview.find('input').attr('name','RemoveMediaIDs[]');
-            var file = $editorFilePreview.find('a.filename');
+            if (type.indexOf('image') > -1) {
+               if (handleIframe) {
+                  var iframeBody = $(iframeElement).contents().find('body');
+                  var imgTag = buildImgTag(href);
+                  editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
+                  var insertedImage = $(iframeBody).find('img[src="'+href+'"]');
+                  var newHeight = parseInt($(iframeElement).css('min-height')) + insertedImage.height() + 'px';
+                  $(iframeElement).css('min-height', newHeight);
+               } else {
+                  $(editor).replaceSelectedText(buildImgTag(href) + '\n');
+               }
+            }
+         };
+
+         // Used in two places below.
+         var removeImageFromBody = function(filePreviewContainer) {
+            $(filePreviewContainer).addClass('editor-file-removed');
+            var file = $(filePreviewContainer).find('a.filename');
             var type = $(file).data('type');
             var href = file.attr('href');
 
@@ -1115,26 +1133,25 @@
                   $(editor).val(text.replace(reg, ''));
                }
             }
-         }).on('click.live-file-reattach', '.editor-file-reattach', function(e) {
-            var $editorFilePreview = $(this).closest('.editor-file-preview');
-            $editorFilePreview.removeClass('editor-file-removed');
-            $editorFilePreview.find('input').attr('name','MediaIDs[]');
-            var file = $editorFilePreview.find('a.filename');
-            var type = $(file).data('type');
-            var href = file.attr('href');
+         };
 
-            if (type.indexOf('image') > -1) {
-               if (handleIframe) {
-                  var iframeBody = $(iframeElement).contents().find('body');
-                  var imgTag = buildImgTag(href);
-                  editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
-                  var insertedImage = $(iframeBody).find('img[src="'+href+'"]');
-                  var newHeight = parseInt($(iframeElement).css('min-height')) + insertedImage.height() + 'px';
-                  $(iframeElement).css('min-height', newHeight);
-               } else {
-                  $(editor).replaceSelectedText(buildImgTag(href) + '\n');
-               }
-            }
+         /**
+          * Remove and reattach files in a live upload session
+          */
+         $editorUploadPreviews
+         .on('click.live-file-remove', '.editor-file-remove', function(e) {
+            var $editorFilePreview = $(this).closest('.editor-file-preview');
+            $editorFilePreview.find('input').attr('name','RemoveMediaIDs[]');
+
+            // Remove element from editor body
+            removeImageFromBody($editorFilePreview);
+         })
+         .on('click.live-file-reattach', '.editor-file-reattach', function(e) {
+            var $editorFilePreview = $(this).closest('.editor-file-preview');
+            $editorFilePreview.find('input').attr('name','MediaIDs[]');
+
+            // Re-attach
+            insertImageIntoBody($editorFilePreview);
          });
 
          /**
@@ -1154,11 +1171,7 @@
             // Remove saved file. This will add hidden input to form
             .on('click.saved-file-remove', '.editor-file-remove', function(e) {
                var $editorFilePreview = $(this).closest('.editor-file-preview');
-               $editorFilePreview.addClass('editor-file-removed');
                var mediaId = $editorFilePreview.find('input').val();
-               var file = $editorFilePreview.find('a.filename');
-               var type = $(file).data('type');
-               var href = file.attr('href');
 
                // Add hidden input to form so it knows to remove files.
                $('<input>').attr({
@@ -1168,49 +1181,19 @@
                   value: mediaId
                }).appendTo($(editorForm));
 
-               // If images, remove insert from body as well
-               if (type.indexOf('image') > -1) {
-                  if (handleIframe) {
-                     var iframeBody = $(iframeElement).contents().find('body');
-                     var insertedImage = $(iframeBody).find('img[src="'+href+'"]');
-                     var newHeight = parseInt($(iframeElement).css('min-height')) - insertedImage.height() + 'px';
-                     $(iframeElement).css('min-height', newHeight);
-                     $(insertedImage).remove();
-                  } else {
-                     var text = $(editor).val();
-                     // A shame that JavaScript does not have this built-in.
-                     // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions
-                     var imgTagEscaped = buildImgTag(href).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-                     var reg = new RegExp(imgTagEscaped + '\n?', 'gi');
-                     $(editor).val(text.replace(reg, ''));
-                  }
-               }
+               // Remove element from body.
+               removeImageFromBody($editorFilePreview);
             })
             // This will remove the hidden input
             .on('click.saved-file-reattach', '.editor-file-reattach', function(e) {
                var $editorFilePreview = $(this).closest('.editor-file-preview');
-               $editorFilePreview.removeClass('editor-file-removed');
                var mediaId = $editorFilePreview.find('input').val();
-               var file = $editorFilePreview.find('a.filename');
-               var type = $(file).data('type');
-               var href = file.attr('href');
 
                // Remove hidden input from form
                $('#file-remove-' + mediaId).remove();
 
-               // Remove from body as well
-               if (type.indexOf('image') > -1) {
-                  if (handleIframe) {
-                     var iframeBody = $(iframeElement).contents().find('body');
-                     var imgTag = buildImgTag(href);
-                     editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
-                     var insertedImage = $(iframeBody).find('img[src="'+href+'"]');
-                     var newHeight = parseInt($(iframeElement).css('min-height')) + insertedImage.height() + 'px';
-                     $(iframeElement).css('min-height', newHeight);
-                  } else {
-                     $(editor).replaceSelectedText(buildImgTag(href) + '\n');
-                  }
-               }
+               // Re-attach
+               insertImageIntoBody($editorFilePreview);
             });
          }
 
