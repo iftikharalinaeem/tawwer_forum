@@ -10,7 +10,7 @@ if (!defined('APPLICATION'))
 $PluginInfo['SEOLinks'] = array(
     'Name' => 'SEO Links',
     'Description' => "Changes the links to discussions and categories for forums that were using the vbSEO plugin on an old forum.",
-    'Version' => '1.0.10',
+    'Version' => '1.0.11',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'MobileFriendly' => TRUE,
     'Author' => 'Todd Burry',
@@ -21,23 +21,23 @@ $PluginInfo['SEOLinks'] = array(
 );
 
 class SEOLinksPlugin extends Gdn_Plugin {
-   
-   
+
+
    public static function Prefix() {
       return C('Plugins.SEOLinks.Prefix', '');
    }
-   
+
    /// Event Handlers ///
 
    /**
     *
     * @param Gdn_Router $Sender
-    * @param type $Args 
+    * @param type $Args
     */
    public function Gdn_Router_AfterLoadRoutes_Handler($Sender, $Args) {
       $Px = self::Prefix();
       $PxEsc = preg_quote($Px);
-      
+
       $Routes = & $Args['Routes'];
       $Route = '/?'.$PxEsc.'[^/]+/(\d+)-(.*?)(?:-(p\d+))?.html';
       $Sender->Routes[$Route] = array(
@@ -48,26 +48,26 @@ class SEOLinksPlugin extends Gdn_Plugin {
           'Type' => 'Internal'
       );
 
-      // Add all of the category routes.
-      $Categories = CategoryModel::Categories();
-      foreach ($Categories as $Category) {
-         if (!$Category['UrlCode'])
-            continue;
-         
-         $Route = '/?'.$PxEsc.'(' . preg_quote($Category['UrlCode']) . ')(?:/(p\d+))?/?(\?.*)?$';
-         $Sender->Routes[$Route] = array(
-             'Route' => $Route,
-             'Key' => base64_encode($Route),
-             'Destination' => '/categories/$1/$2',
-             'Reserved' => FALSE,
-             'Type' => 'Internal'
-         );
-      }
+      $Path = trim(Gdn::Request()->Path(), '/');
 
-//      decho($Sender->Routes);
-//      die();
+      if (preg_match('`^([^/]+)(?:/(p\d+))?$`', $Path, $Matches)) {
+         $UrlCode = $Matches[1];
+         $Page = GetValue(2, $Matches);
+
+         $Category = CategoryModel::Categories($UrlCode);
+         if ($Category) {
+            $Route = '/?'.$PxEsc.'(' . preg_quote($Category['UrlCode']) . ')(?:/(p\d+))?/?(\?.*)?$';
+            $Sender->Routes[$Route] = array(
+                'Route' => $Route,
+                'Key' => base64_encode($Route),
+                'Destination' => '/categories/$1/$2',
+                'Reserved' => FALSE,
+                'Type' => 'Internal'
+            );
+         }
+      }
    }
-   
+
    public function SettingsController_SEOLinks_Create($Sender, $Args) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->SetData('Title', sprintf(T('%s Settings'), 'SEO Links'));
@@ -76,15 +76,15 @@ class SEOLinksPlugin extends Gdn_Plugin {
       $Cf->Initialize(array(
           'Plugins.SEOLinks.Prefix' => array('Description' => 'A prefix to put before every link (ex. forum/). The prefix should almost always be empty.'),
           ));
-      
+
       if (Gdn::Request()->IsPostBack()) {
          CategoryModel::ClearCache();
       }
-      
+
       $Sender->AddSideMenu('dashboard/settings/plugins');
       $Cf->RenderAll();
   }
-   
+
    public function Setup() {
       if (class_exists('CategoryModel')) {
          CategoryModel::ClearCache();
@@ -107,7 +107,7 @@ if (!function_exists('CategoryUrl')):
       static $Px;
       if (!isset($Px))
          $Px = SEOLinksPlugin::Prefix();
-   
+
       if (is_string($Category))
          $Category = CategoryModel::Categories($Category);
       $Category = (array) $Category;
@@ -127,7 +127,7 @@ if (!function_exists('DiscussionUrl')):
       static $Px;
       if (!isset($Px))
          $Px = SEOLinksPlugin::Prefix();
-   
+
       $Discussion = (object) $Discussion;
       $Cat = FALSE;
 
@@ -172,7 +172,7 @@ endif;
 //      static $NameUnique = NULL;
 //      if ($NameUnique === NULL)
 //         $NameUnique = C('Garden.Registration.NameUnique');
-//      
+//
 //      if ($Method)
 //         $Method .= '/';
 //
