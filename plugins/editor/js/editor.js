@@ -1001,6 +1001,17 @@
       // Note, this depends on rangyinputs, loaded for buttonbarplus
       var fileUploadsInit = function(dropElement, editorInstance) {
 
+         // Disable default browser behaviour of file drops
+         $(document).on('drop dragover', function(e) {
+            e.preventDefault();
+         });
+
+         // Multi upload element. If an iframe, it will need to be checked
+         // in the loop far below. Redundant, but let's see.
+         var dropZone = dropElement;
+
+         console.log(dropElement);
+
          // Pass editor instance to uploader, to access methods
          var editor = (editorInstance)
             ? editorInstance
@@ -1009,18 +1020,8 @@
          var maxUploadSize = gdn.definition('maxUploadSize');
          var editorFileInputName = gdn.definition('editorFileInputName');
 
-         // Disable default browser behaviour of file drops
-         $(document).on('drop dragover', function(e) {
-            e.preventDefault();
-         });
-
          // Add CSS class to this element to style children on dragover
          var $dndCueWrapper = $(dropElement).closest('.bodybox-wrap');
-
-         // Insert container for displaying all uploads. All successful
-         // uploads will be inserted here.
-         $dndCueWrapper.find('.TextBoxWrapper').after('<div class="editor-upload-previews"></div>');
-         $editorUploadPreviews = $dndCueWrapper.find('.editor-upload-previews');
 
          // Determine if element passed is an iframe or local element.
          var handleIframe = false;
@@ -1031,6 +1032,14 @@
             handleIframe = true;
          }
 
+         console.log('dndcuewrapper');
+         console.log($dndCueWrapper);
+
+         // Insert container for displaying all uploads. All successful
+         // uploads will be inserted here.
+         $dndCueWrapper.find('.TextBoxWrapper').after('<div class="editor-upload-previews"></div>');
+         $editorUploadPreviews = $dndCueWrapper.find('.editor-upload-previews');
+
          // Handle drop effect as UX cue
          $(dropElement).on('dragenter dragover', function(e) {
             $dndCueWrapper.addClass('editor-drop-cue');
@@ -1038,11 +1047,15 @@
             $dndCueWrapper.removeClass('editor-drop-cue');
          });
 
+
          // Get current comment or discussion post box
 
          // This is the key that finds .editor-upload-saved
          var editorKey = 'editor-uploads-';
          var editorForm = $dndCueWrapper.closest('form');
+         console.log('editorform');
+                  console.log(editorForm);
+
          var savedUploadsContainer = '';
          var mainCommentForm = '';
          if (editorForm) {
@@ -1128,8 +1141,11 @@
                   var text = $(editor).val();
                   // A shame that JavaScript does not have this built-in.
                   // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions
-                  var imgTagEscaped = buildImgTag(href).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-                  var reg = new RegExp(imgTagEscaped + '\n?', 'gi');
+                  //var imgTagEscaped = buildImgTag(href).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+                  // Make it more loose, so it doesn't matter what the user
+                  // may have done to the markup, it will be removed.
+                  var imgTagEscaped = '<img(\s+|.*)src\="'+ href.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1") +'"(\s+|.*)\/?>\n?';
+                  var reg = new RegExp(imgTagEscaped, 'gi');
                   $(editor).val(text.replace(reg, ''));
                }
             }
@@ -1159,6 +1175,7 @@
           * through editing.
           */
          if (savedUploadsContainer) {
+            console.log('some saved');
             // Turn read-only mode on. Event is fired from conversations.js
             // and discussion.js.
             $(editorForm).on('clearCommentForm', function(e) {
@@ -1197,9 +1214,6 @@
             });
          }
 
-
-
-
          // Clear session preview files--this for main comment box.
          if (mainCommentBox) {
             // When closing editor with new uploads in session, typically
@@ -1211,160 +1225,211 @@
          }
 
 
-
-         // Abstract away progress meter removal, so it can be called in
-         // progress event, and always event.
-         var $progressMeter = $('.editor-upload-progress');
-         var clearProgressMeter = function() {
-
-            // Just in case progress meter didn't reach end (rare), fill it up,
-            // then get rid of it.
-            $progressMeter.css({
-               'width': 100 + '%'
-            });
-
-            $progressMeter.addClass('fade-out');
-
-            // Transition inserted above is 400ms, so remove it shortly
-            // after.
-            setTimeout(function() {
-               // Remove transition class
-               $progressMeter.removeClass('fade-out');
-
-               // Reset width
-               $progressMeter.css({
-                  'width': 0
-               });
-            }, 710);
-         };
-
-        // console.log($('.bodybox-wrap'));
-        // console.log($dndCueWrapper);
-
-         //console.log(dropElement.length);
-
          // see link about multiple uploads, as little buggy:
          // https://github.com/blueimp/jQuery-File-Upload/wiki/Multiple-File-Upload-Widgets-on-the-same-page
          // No, it completely falls overs, so look into handling multiple
          // upload dropzones.
 
+
+
          // Initialize file uploads.
-         $('.bodybox-wrap').fileupload({
+         //$('.bodybox-wrap').fileupload({
 
-            url: '/post/editorupload',
-            paramName: editorFileInputName,
-            dropZone: $(dropElement),
-            forceIframeTransport: false,
-            dataType: 'json',
-            /*maxFileSize: maxUploadSize,
-            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
-            processQueue: [{
-               action: 'validate',
-               acceptFileTypes: '@',
-               disabled: '@disableValidation'
-            }],*/
+         $(dropZone).each(function(i, el) {
 
-            done: function (e, data) {
+            console.log('dropzone:');
+            console.log(this);
 
-               console.log('DONE');
-               console.log(data.result);
+            console.log('handle iframe:');
+            console.log(handleIframe);
 
-               var result = data.result;
+         console.log(this.contentWindow);
+         console.log(el);
+            var cssDropInitClass = 'editor-dropzone-init';
 
-               if (!result.error) {
-                  var payload = result.payload;
+            var $init = $(this);
 
-                  // If has thumbnail, display it instead of generic file icon.
-                  var filePreviewCss = (payload.thumbnail_url)
-                     ? '<i class="file-preview img" style="background-image: url('+ payload.thumbnail_url +')"></i>'
-                     : '<i class="file-preview icon icon-file"></i>';
+            if (!$(this).hasClass(cssDropInitClass)) {
+               $(this).addClass(cssDropInitClass);
 
-                  // If it's an image, then indicate that it's been embedded
-                  // in the post
-                  var imageEmbeddedText = (payload.thumbnail_url)
-                     ? ' &middot; <em title="This image has been inserted into the body of text.">inserted</em>'
-                     : '';
+               if ($init[0].contentWindow) {
+                  $init = $init[0].contentWindow;
+               }
 
-                  var html = ''
-                  + '<div class="editor-file-preview" id="media-id-'+ payload.MediaID +'" title="'+ payload.Filename +'">'
-                  + '<input type="hidden" name="MediaIDs[]" value="'+ payload.MediaID +'" />'
-                  + filePreviewCss
-                  + '<div class="file-data">'
-                  + '<a class="filename" data-type="'+payload.type+'" data-width="'+payload.original_width+'" data-height="'+payload.original_height+'" href="'+ payload.original_url +'" target="_blank">'+ payload.Filename + '</a>'
-                  + '<span class="meta">' + payload.FormatFilesize + imageEmbeddedText + '</span>'
-                  + '</div>'
-                  + '<span class="editor-file-remove" title="Remove file"></span>'
-                  + '<span class="editor-file-reattach" title="Click to re-attach \''+ payload.Filename +'\'"></span>'
-                  + '</div>';
+               console.log('fuuuu');
 
-                  // Add file blocksjust below editor area for easy removal
-                  // and preview.
-                  $editorUploadPreviews.append(html);
+            } else {
+               console.log('doubling up:');
+               console.log($(this));
+            }
 
-                  // If photo, insert directly into editor area.
-                  if (payload.type.toLowerCase().indexOf('image') > -1) {
+            console.log(dropZone);
 
-                     // Determine max height for sample. They can resize it
-                     // afterwards.
-                     var maxHeight = (payload.original_height >= 400)
-                        ? 400
-                        : payload.original_height;
-                     // height="'+ maxHeight +'"
+            //$init = $init[0].contentWindow;
 
-                     var imgTag = buildImgTag(payload.original_url);
+            $(this).fileupload({
+               url: '/post/editorupload',
+               paramName: editorFileInputName,
+               dropZone: $init,
+               forceIframeTransport: false,
+               dataType: 'json',
+               /*maxFileSize: maxUploadSize,
+               acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+               processQueue: [{
+                  action: 'validate',
+                  acceptFileTypes: '@',
+                  disabled: '@disableValidation'
+               }],*/
 
-                     if (handleIframe) {
-                        editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
-                        var newHeight = parseInt($(iframeElement).css('min-height')) + payload.original_height + 'px';
-                        $(iframeElement).css('min-height', newHeight);
-                        editor.fire("blur", "composer");
-                        editor.focus();
-                     } else {
-                        $(editor).replaceSelectedText(imgTag + '\n');
+               done: function (e, data) {
+
+                  console.log('DONE');
+                  console.log(data.result);
+                  console.log(this);
+                  console.log(cssDropInitClass);
+
+                  var result = data.result;
+
+                  if (!result.error) {
+                     var payload = result.payload;
+
+                     // If has thumbnail, display it instead of generic file icon.
+                     var filePreviewCss = (payload.thumbnail_url)
+                        ? '<i class="file-preview img" style="background-image: url('+ payload.thumbnail_url +')"></i>'
+                        : '<i class="file-preview icon icon-file"></i>';
+
+                     // If it's an image, then indicate that it's been embedded
+                     // in the post
+                     var imageEmbeddedText = (payload.thumbnail_url)
+                        ? ' &middot; <em title="This image has been inserted into the body of text.">inserted</em>'
+                        : '';
+
+                     var html = ''
+                     + '<div class="editor-file-preview" id="media-id-'+ payload.MediaID +'" title="'+ payload.Filename +'">'
+                     + '<input type="hidden" name="MediaIDs[]" value="'+ payload.MediaID +'" />'
+                     + filePreviewCss
+                     + '<div class="file-data">'
+                     + '<a class="filename" data-type="'+payload.type+'" data-width="'+payload.original_width+'" data-height="'+payload.original_height+'" href="'+ payload.original_url +'" target="_blank">'+ payload.Filename + '</a>'
+                     + '<span class="meta">' + payload.FormatFilesize + imageEmbeddedText + '</span>'
+                     + '</div>'
+                     + '<span class="editor-file-remove" title="Remove file"></span>'
+                     + '<span class="editor-file-reattach" title="Click to re-attach \''+ payload.Filename +'\'"></span>'
+                     + '</div>';
+
+
+                     // Editor upload previews is getting found above, and
+                     // does not change per upload dropzone, which causes
+                     // files to preview on the last found preview zone.
+                     $editorUploadPreviews = $(this).closest('form').find('.editor-upload-previews');
+
+                     // Add file blocksjust below editor area for easy removal
+                     // and preview.
+                     // Find it here.
+                     $editorUploadPreviews.append(html);
+
+                     console.log('editoruploadpreviews');
+                     console.log($editorUploadPreviews);
+                     console.log($dndCueWrapper);
+                     console.log(this);
+
+
+                     // If photo, insert directly into editor area.
+                     if (payload.type.toLowerCase().indexOf('image') > -1) {
+
+                        // Determine max height for sample. They can resize it
+                        // afterwards.
+                        var maxHeight = (payload.original_height >= 400)
+                           ? 400
+                           : payload.original_height;
+                        // height="'+ maxHeight +'"
+
+                        var imgTag = buildImgTag(payload.original_url);
+
+                        console.log(imgTag);
+
+                        if (handleIframe) {
+                           setTimeout(function() {
+                           //editor.fire("blur", "composer");
+
+                           console.log(editor);
+
+                           editor.focus();
+                           console.log('handling insert iframe image');
+                           editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
+                           var newHeight = parseInt($(iframeElement).css('min-height')) + payload.original_height + 'px';
+                           $(iframeElement).css('min-height', newHeight);
+
+
+                           }, 1000);
+                        } else {
+                           $(editor).replaceSelectedText(imgTag + '\n');
+                        }
                      }
                   }
+               },
+
+               progressall: function (e, data) {
+                  var progress = parseInt(data.loaded / data.total * 100, 10);
+
+                  var $progressMeter = $dndCueWrapper.find('.editor-upload-progress');
+
+
+                  $progressMeter.css({
+                     'width': progress + '%'
+                  });
+
+                  // The progress meter is cleared in the `always` event, to
+                  // handle rare case when meter fails to reach end.
+                  if (progress == 100) {
+                     // Just in case progress meter didn't reach end (rare), fill it up,
+                     // then get rid of it.
+                     $progressMeter.css({
+                        'width': 100 + '%'
+                     });
+
+                     $progressMeter.addClass('fade-out');
+
+                     // Transition inserted above is 400ms, so remove it shortly
+                     // after.
+                     setTimeout(function() {
+                        // Remove transition class
+                        $progressMeter.removeClass('fade-out');
+
+                        // Reset width
+                        $progressMeter.css({
+                           'width': 0
+                        });
+                     }, 710);
+                  }
+               },
+
+               send: function(e, data) {
+                  console.log('SEND');
+                  console.log(data);
+               },
+
+               drop: function (e, data) {
+
+
+
+                  $.each(data.files, function (index, file) {
+                      console.log('Dropped file: ' + file.name);
+                  });
+              },
+
+               // Note, sometimes the upload progress meter never reaches the
+               // end, so this would be a good place to clear it as a backup.
+               always: function(e, data) {
+                  console.log('always');
+                  //clearProgressMeter();
+               },
+
+               fail: function(e, data) {
+                  console.log('FAILLLLLHOUSE');
+                  console.log(e, data);
                }
-            },
 
-            progressall: function (e, data) {
-               var progress = parseInt(data.loaded / data.total * 100, 10);
-
-               $progressMeter.css({
-                  'width': progress + '%'
-               });
-
-               // The progress meter is cleared in the `always` event, to
-               // handle rare case when meter fails to reach end.
-               if (progress == 100) {
-                  clearProgressMeter();
-               }
-            },
-
-            send: function(e, data) {
-               console.log('SEND');
-               console.log(data);
-            },
-
-            drop: function (e, data) {
-
-
-
-               $.each(data.files, function (index, file) {
-                   console.log('Dropped file: ' + file.name);
-               });
-           },
-
-            // Note, sometimes the upload progress meter never reaches the
-            // end, so this would be a good place to clear it as a backup.
-            always: function(e, data) {
-               console.log('always');
-               //clearProgressMeter();
-            },
-
-            fail: function(e, data) {
-               console.log('FAILLLLLHOUSE');
-               console.log(e, data);
-            }
+            });
 
          });
 

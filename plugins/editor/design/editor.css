@@ -134,7 +134,8 @@
   border-radius: 2px;
   border: 1px solid #fff;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: #eaeaea;
+  /*rgba(0,0,0,0.05);*/
   padding: 0;
   margin: 5px;
   float: left;
@@ -503,7 +504,8 @@ affect, so it's not doing anything */
 }
 
 .js-editor-fullpage #editor-fullpage-candidate .editor,
-.js-editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
+.js-editor-fullpage #editor-fullpage-candidate .TextBoxWrapper,
+.js-editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
   max-width: 800px;
   -webkit-animation-duration: 0.8s;
   -webkit-animation-name: editor-anim-editor;
@@ -530,6 +532,10 @@ affect, so it's not doing anything */
 
 .js-editor-fullpage #editor-fullpage-candidate .editor-help-text {
   display: none;
+}
+
+.js-editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
+  margin: 0 auto;
 }
 
 /* Set default heights for each editor view. Regular (markdown, html, bbcode)
