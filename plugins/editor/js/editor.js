@@ -998,6 +998,7 @@
          }
       };
 
+      // Note, this depends on rangyinputs, loaded for buttonbarplus
       var fileUploadsInit = function(dropElement, editorInstance) {
 
          // Pass editor instance to uploader, to access methods
@@ -1080,105 +1081,85 @@
          }
 
 
-         // Remove and reattach files in a live upload session
+         // Help methods
+         var buildImgTag = function(href) {
+            return '<img src="'+ href +'" alt="" />';
+         };
 
-         // Remove files
-         $editorUploadPreviews.on('click', '.editor-file-remove', function(e) {
+
+         /**
+          * Remove and reattach files in a live upload session
+          */
+         $editorUploadPreviews.on('click.live-file-remove', '.editor-file-remove', function(e) {
             var $editorFilePreview = $(this).closest('.editor-file-preview');
             $editorFilePreview.addClass('editor-file-removed');
-
-            // Disable the hidden input so it's not submitted by form.
-            //$editorFilePreview.find('input').attr('disabled', 'disabled');
             $editorFilePreview.find('input').attr('name','RemoveMediaIDs[]');
+            var file = $editorFilePreview.find('a.filename');
+            var type = $(file).data('type');
+            var href = file.attr('href');
 
-
-            // Find wysihtml5 added image, if exists, and remove it from body
-            //editor-file-id-
-
-            var mediaId = $editorFilePreview.find('input').val();
-            var iframeBody = $(iframeElement).contents().find('body');
-            var insertedImage = $(iframeBody).find('#editor-file-id-'+ mediaId);
-            /*$(insertedImage).css({
-               'display': 'none'
-            }).addClass('file-image-delete');*/
-
-
-            var newHeight = parseInt($(iframeElement).css('min-height')) - insertedImage.height() + 'px';
-            $(iframeElement).css('min-height', newHeight);
-
-            $(insertedImage).remove();
-
-
-         });
-
-         // Reattache files
-         $editorUploadPreviews.on('click', '.editor-file-reattach', function(e) {
+            // If images, remove insert from body as well
+            if (type.indexOf('image') > -1) {
+               if (handleIframe) {
+                  var iframeBody = $(iframeElement).contents().find('body');
+                  var insertedImage = $(iframeBody).find('img[src="'+href+'"]');
+                  var newHeight = parseInt($(iframeElement).css('min-height')) - insertedImage.height() + 'px';
+                  $(iframeElement).css('min-height', newHeight);
+                  $(insertedImage).remove();
+               } else {
+                  var text = $(editor).val();
+                  // A shame that JavaScript does not have this built-in.
+                  // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions
+                  var imgTagEscaped = buildImgTag(href).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+                  var reg = new RegExp(imgTagEscaped + '\n?', 'gi');
+                  $(editor).val(text.replace(reg, ''));
+               }
+            }
+         }).on('click.live-file-reattach', '.editor-file-reattach', function(e) {
             var $editorFilePreview = $(this).closest('.editor-file-preview');
             $editorFilePreview.removeClass('editor-file-removed');
-
-            // Enable the hidden input so it's submitted by form.
-            //$editorFilePreview.find('input').removeAttr('disabled');
             $editorFilePreview.find('input').attr('name','MediaIDs[]');
+            var file = $editorFilePreview.find('a.filename');
+            var type = $(file).data('type');
+            var href = file.attr('href');
 
-            var mediaId = $editorFilePreview.find('input').val();
-            var iframeBody = $(iframeElement).contents().find('body');
-
-
-            /*
-            $(insertedImage).css({
-               'display': 'block'
-            }).removeClass('file-image-delete');*/
-
-            var link = $editorFilePreview.find('a.filename').attr('href');
-            console.log(link);
-
-            var imgTag = '<img alt="" src="'+ link +'" id="editor-file-id-'+ mediaId +'" />';
-
-            editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
-
-var insertedImage = $(iframeBody).find('#editor-file-id-'+ mediaId);
-            var newHeight = parseInt($(iframeElement).css('min-height')) + insertedImage.height() + 'px';
-            $(iframeElement).css('min-height', newHeight);
+            if (type.indexOf('image') > -1) {
+               if (handleIframe) {
+                  var iframeBody = $(iframeElement).contents().find('body');
+                  var imgTag = buildImgTag(href);
+                  editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
+                  var insertedImage = $(iframeBody).find('img[src="'+href+'"]');
+                  var newHeight = parseInt($(iframeElement).css('min-height')) + insertedImage.height() + 'px';
+                  $(iframeElement).css('min-height', newHeight);
+               } else {
+                  $(editor).replaceSelectedText(buildImgTag(href) + '\n');
+               }
+            }
          });
 
-         // Remove any deleted images from body
-         /*if (handleIframe) {
-
-            $(editorForm).find('input[type=submit].Primary').on('mousedown keydown keypress', function(e) {
-
-              // console.log('mousedown');
-
-
-               var iframeBody = $(iframeElement).contents().find('body');
-               var remove = $(iframeBody).find('.file-image-delete');
-
-               $(remove).each(function(i, el) {
-
-                  //console.log($(el));
-
-                  $(el).remove();
-               });
-
-               //return false;
-            });
-         }*/
-
-         // Remove files from a saved session--typically from editing.
+         /**
+          * Remove and reattach files in a saved upload session, typically
+          * through editing.
+          */
          if (savedUploadsContainer) {
-            // Turn edit mode on for saved files
-            $(savedUploadsContainer).removeClass('editor-upload-readonly');
-
-            // When closing editor, make sure to update saved container
+            // Turn read-only mode on. Event is fired from conversations.js
+            // and discussion.js.
             $(editorForm).on('clearCommentForm', function(e) {
-               // Make readonly again
                $(savedUploadsContainer).addClass('editor-upload-readonly');
             });
 
+            $(savedUploadsContainer)
+            // Turn read-only mode off.
+            .removeClass('editor-upload-readonly')
             // Remove saved file. This will add hidden input to form
-            $(savedUploadsContainer).off('click.remove').on('click.remove', '.editor-file-remove', function(e) {
+            .on('click.saved-file-remove', '.editor-file-remove', function(e) {
                var $editorFilePreview = $(this).closest('.editor-file-preview');
                $editorFilePreview.addClass('editor-file-removed');
                var mediaId = $editorFilePreview.find('input').val();
+               var file = $editorFilePreview.find('a.filename');
+               var type = $(file).data('type');
+               var href = file.attr('href');
+
                // Add hidden input to form so it knows to remove files.
                $('<input>').attr({
                   type: 'hidden',
@@ -1186,16 +1167,55 @@ var insertedImage = $(iframeBody).find('#editor-file-id-'+ mediaId);
                   name: 'RemoveMediaIDs[]',
                   value: mediaId
                }).appendTo($(editorForm));
-            });
 
-            // Reattach saved file. This will remove the newly added hidden input
-            $(savedUploadsContainer).off('click.reattach').on('click.reattach', '.editor-file-reattach', function(e) {
+               // If images, remove insert from body as well
+               if (type.indexOf('image') > -1) {
+                  if (handleIframe) {
+                     var iframeBody = $(iframeElement).contents().find('body');
+                     var insertedImage = $(iframeBody).find('img[src="'+href+'"]');
+                     var newHeight = parseInt($(iframeElement).css('min-height')) - insertedImage.height() + 'px';
+                     $(iframeElement).css('min-height', newHeight);
+                     $(insertedImage).remove();
+                  } else {
+                     var text = $(editor).val();
+                     // A shame that JavaScript does not have this built-in.
+                     // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions
+                     var imgTagEscaped = buildImgTag(href).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+                     var reg = new RegExp(imgTagEscaped + '\n?', 'gi');
+                     $(editor).val(text.replace(reg, ''));
+                  }
+               }
+            })
+            // This will remove the hidden input
+            .on('click.saved-file-reattach', '.editor-file-reattach', function(e) {
                var $editorFilePreview = $(this).closest('.editor-file-preview');
                $editorFilePreview.removeClass('editor-file-removed');
                var mediaId = $editorFilePreview.find('input').val();
+               var file = $editorFilePreview.find('a.filename');
+               var type = $(file).data('type');
+               var href = file.attr('href');
+
+               // Remove hidden input from form
                $('#file-remove-' + mediaId).remove();
+
+               // Remove from body as well
+               if (type.indexOf('image') > -1) {
+                  if (handleIframe) {
+                     var iframeBody = $(iframeElement).contents().find('body');
+                     var imgTag = buildImgTag(href);
+                     editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
+                     var insertedImage = $(iframeBody).find('img[src="'+href+'"]');
+                     var newHeight = parseInt($(iframeElement).css('min-height')) + insertedImage.height() + 'px';
+                     $(iframeElement).css('min-height', newHeight);
+                  } else {
+                     $(editor).replaceSelectedText(buildImgTag(href) + '\n');
+                  }
+               }
             });
          }
+
+
+
 
          // Clear session preview files--this for main comment box.
          if (mainCommentBox) {
@@ -1287,7 +1307,7 @@ var insertedImage = $(iframeBody).find('#editor-file-id-'+ mediaId);
                   + '<input type="hidden" name="MediaIDs[]" value="'+ payload.MediaID +'" />'
                   + filePreviewCss
                   + '<div class="file-data">'
-                  + '<a class="filename" href="'+ payload.original_url +'" target="_blank">'+ payload.Filename + '</a>'
+                  + '<a class="filename" data-type="'+payload.type+'" data-width="'+payload.original_width+'" data-height="'+payload.original_height+'" href="'+ payload.original_url +'" target="_blank">'+ payload.Filename + '</a>'
                   + '<span class="meta">' + payload.FormatFilesize + imageEmbeddedText + '</span>'
                   + '</div>'
                   + '<span class="editor-file-remove" title="Remove file"></span>'
@@ -1308,7 +1328,7 @@ var insertedImage = $(iframeBody).find('#editor-file-id-'+ mediaId);
                         : payload.original_height;
                      // height="'+ maxHeight +'"
 
-                     var imgTag = '<img alt="" src="'+ payload.original_url +'" id="editor-file-id-'+ payload.MediaID +'" />';
+                     var imgTag = buildImgTag(payload.original_url);
 
                      if (handleIframe) {
                         editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
@@ -1317,7 +1337,7 @@ var insertedImage = $(iframeBody).find('#editor-file-id-'+ mediaId);
                         editor.fire("blur", "composer");
                         editor.focus();
                      } else {
-                        $(editor).replaceSelectedText(imgTag + '\n\n');
+                        $(editor).replaceSelectedText(imgTag + '\n');
                      }
                   }
                }
