@@ -1173,7 +1173,6 @@
           * through editing.
           */
          if (savedUploadsContainer) {
-            console.log('some saved');
             // Turn read-only mode on. Event is fired from conversations.js
             // and discussion.js.
             $(editorForm).on('clearCommentForm', function(e) {
@@ -1221,6 +1220,24 @@
                $(mainCommentPreviews).empty();
             });
          }
+
+         // This will grab all the files--saved and session--currently
+         // attached to a discussion. This is useful to
+         // prevent the same files being uploaded multiple times to the
+         // same discussion. It's better to constrain check to whole
+         // discussion instead of on a per-comment basis, as it's not
+         // useful to have the same file uploaded by multiple users in
+         // a discussion as a whole.
+         var getAllFileNamesInDiscussion = function() {
+            var filesInDiscussion = $('.editor-file-preview');
+            var fileNames = [];
+
+            filesInDiscussion.each(function(i, el) {
+               fileNames.push($(el).find('.filename').text().trim());
+            });
+
+            return fileNames;
+         };
 
          // Initialize file uploads.
          //$('.bodybox-wrap').fileupload({
@@ -1275,7 +1292,8 @@
                         // going to be an array of 1.
                         var file = data.files[0];
                         var type = file.type.split('/').pop();
-                        var extension = file.name.split('.').pop();
+                        var filename = file.name;
+                        var extension = filename.split('.').pop();
                         var allowedExtensions = JSON.parse(allowedFileExtensions);
 
                         var validSize = (file.size <= maxUploadSize)
@@ -1287,11 +1305,18 @@
                            ? true
                            : false;
 
-                        if (validSize && validFile) {
+                        // Check if the file is already a part of the
+                        // discussion--that is, already uploaded to the
+                        // current discussion.
+                        var fileAlreadyExists = ($.inArray(filename, getAllFileNamesInDiscussion()) > -1)
+                           ? true
+                           : false;
+
+                        if (validSize && validFile && !fileAlreadyExists) {
                            data.submit();
                         } else {
                            // File dropped is not allowed!
-                           var message = '"'+ file.name +'" ';
+                           var message = '"'+ filename +'" ';
 
                            if (!validFile) {
                               message += 'is not allowed';
@@ -1302,6 +1327,10 @@
                                  message += ' and ';
                               }
                               message += 'is too large (max '+ maxUploadSize +' bytes)';
+                           }
+
+                           if (fileAlreadyExists) {
+                              message += 'is already in this discussion';
                            }
 
                            gdn.informMessage(message +'.');
