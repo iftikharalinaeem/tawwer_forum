@@ -1330,7 +1330,7 @@
                            }
 
                            if (fileAlreadyExists) {
-                              message += 'is already in this discussion';
+                              message += 'is already in this discussion. It will not be uploaded again';
                            }
 
                            gdn.informMessage(message +'.');
