@@ -998,7 +998,8 @@
          }
       };
 
-      // Note, this depends on rangyinputs, loaded for buttonbarplus
+      // Note, this depends heavily on blueimp's file upload, and just a bit
+      // on Tim Down's rangyinputs (originally loaded for buttonbarplus).
       var fileUploadsInit = function(dropElement, editorInstance) {
 
          // Disable default browser behaviour of file drops
@@ -1010,8 +1011,6 @@
          // in the loop far below. Redundant, but let's see.
          var dropZone = dropElement;
 
-         console.log(dropElement);
-
          // Pass editor instance to uploader, to access methods
          var editor = (editorInstance)
             ? editorInstance
@@ -1019,6 +1018,8 @@
 
          var maxUploadSize = gdn.definition('maxUploadSize');
          var editorFileInputName = gdn.definition('editorFileInputName');
+         var allowedFileExtensions = gdn.definition('allowedFileExtensions');
+         var maxFileUploads = gdn.definition('maxFileUploads');
 
          // Add CSS class to this element to style children on dragover
          var $dndCueWrapper = $(dropElement).closest('.bodybox-wrap');
@@ -1031,9 +1032,6 @@
             dropElement = $(dropElement)[0].contentWindow;
             handleIframe = true;
          }
-
-         console.log('dndcuewrapper');
-         console.log($dndCueWrapper);
 
          // Insert container for displaying all uploads. All successful
          // uploads will be inserted here.
@@ -1053,8 +1051,6 @@
          // This is the key that finds .editor-upload-saved
          var editorKey = 'editor-uploads-';
          var editorForm = $dndCueWrapper.closest('form');
-         console.log('editorform');
-                  console.log(editorForm);
 
          var savedUploadsContainer = '';
          var mainCommentForm = '';
@@ -1107,7 +1103,7 @@
             var file = $(filePreviewContainer).find('a.filename');
             var type = $(file).data('type');
             var href = file.attr('href');
-
+try{
             if (type.indexOf('image') > -1) {
                if (handleIframe) {
                   var iframeBody = $(iframeElement).contents().find('body');
@@ -1120,6 +1116,9 @@
                   $(editor).replaceSelectedText(buildImgTag(href) + '\n');
                }
             }
+   }catch(ex) {
+      console.log('YOU GOOOOFED BRAH');
+   }
          };
 
          // Used in two places below.
@@ -1224,30 +1223,12 @@
             });
          }
 
-
-         // see link about multiple uploads, as little buggy:
-         // https://github.com/blueimp/jQuery-File-Upload/wiki/Multiple-File-Upload-Widgets-on-the-same-page
-         // No, it completely falls overs, so look into handling multiple
-         // upload dropzones.
-
-
-
          // Initialize file uploads.
          //$('.bodybox-wrap').fileupload({
 
          $(dropZone).each(function(i, el) {
-
-            console.log('dropzone:');
-            console.log(this);
-
-            console.log('handle iframe:');
-            console.log(handleIframe);
-
-         console.log(this.contentWindow);
-         console.log(el);
-            var cssDropInitClass = 'editor-dropzone-init';
-
             var $init = $(this);
+            var cssDropInitClass = 'editor-dropzone-init';
 
             if (!$(this).hasClass(cssDropInitClass)) {
                $(this).addClass(cssDropInitClass);
@@ -1255,35 +1236,97 @@
                if ($init[0].contentWindow) {
                   $init = $init[0].contentWindow;
                }
-
-               console.log('fuuuu');
-
             } else {
                console.log('doubling up:');
                console.log($(this));
             }
 
-            console.log(dropZone);
-
-            //$init = $init[0].contentWindow;
-
+            // Attach voodoo to dropzone.
             $(this).fileupload({
+
+               // Options
                url: '/post/editorupload',
                paramName: editorFileInputName,
                dropZone: $init,
                forceIframeTransport: false,
                dataType: 'json',
-               /*maxFileSize: maxUploadSize,
-               acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
-               processQueue: [{
-                  action: 'validate',
-                  acceptFileTypes: '@',
-                  disabled: '@disableValidation'
-               }],*/
+               progressInterval: 25,
+               autoUpload: true,
 
+               // Fired on entire drop, and contains entire batch.
+               drop: function (e, data) {
+                  // Save original title for progress meter title percentages.
+                  documentTitle = document.title;
+
+                  // This is from PHP's max_file_uploads setting
+                  if (data.files.length > maxFileUploads) {
+                     var message = 'You cannot upload more than '+ maxFileUploads +' files at once.';
+                     gdn.informMessage(message);
+                     return false;
+                  }
+               },
+
+               // Where to process and validate files.
+               add: function(e, data) {
+                  if (data.autoUpload
+                  || (data.autoUpload !== false
+                  && $(this).fileupload('option', 'autoUpload'))) {
+                     data.process().done(function () {
+                        // Single upload per request, files[] is always
+                        // going to be an array of 1.
+                        var file = data.files[0];
+                        var type = file.type.split('/').pop();
+                        var extension = file.name.split('.').pop();
+                        var allowedExtensions = JSON.parse(allowedFileExtensions);
+
+                        var validSize = (file.size <= maxUploadSize)
+                           ? true
+                           : false;
+
+                        // Check against provided file type and file extension.
+                        var validFile = ($.inArray(type, allowedExtensions) > -1 && $.inArray(extension, allowedExtensions) > -1)
+                           ? true
+                           : false;
+
+                        if (validSize && validFile) {
+                           data.submit();
+                        } else {
+                           // File dropped is not allowed!
+                           var message = '"'+ file.name +'" ';
+
+                           if (!validFile) {
+                              message += 'is not allowed';
+                           }
+
+                           if (!validSize) {
+                              if (!validFile) {
+                                 message += ' and '
+                              }
+                              message += 'is too large (max '+ maxUploadSize +' bytes)';
+                           }
+
+                           gdn.informMessage(message +'.');
+                        }
+                     });
+                  }
+               },
+
+               // Fired on every file.
+               //send: function(e, data) {},
+
+               // There is also `progress` per file upload.
+               progressall: function (e, data) {
+                  var progress = parseInt(data.loaded / data.total * 100, 10);
+                  var $progressMeter = $(this).closest('form').find('.editor-upload-progress');
+                  document.title = '('+ progress + '%) ' + documentTitle;
+                  $progressMeter.css({
+                     'width': progress + '%'
+                  });
+               },
+
+               // Fired on successful upload
                done: function (e, data) {
 
-                  console.log('DONE');
                   console.log(data.result);
                   console.log(this);
                   console.log(cssDropInitClass);
@@ -1336,6 +1379,7 @@
                      // If photo, insert directly into editor area.
                      if (payload.type.toLowerCase().indexOf('image') > -1) {
 
+
                         // Determine max height for sample. They can resize it
                         // afterwards.
                         var maxHeight = (payload.original_height >= 400)
@@ -1348,19 +1392,18 @@
                         console.log(imgTag);
 
                         if (handleIframe) {
-                           setTimeout(function() {
-                           //editor.fire("blur", "composer");
+                           //setTimeout(function() {
+                           editor.fire("blur", "composer");
 
                            console.log(editor);
 
-                           editor.focus();
+                           //editor.focus();
                            console.log('handling insert iframe image');
                            editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
                            var newHeight = parseInt($(iframeElement).css('min-height')) + payload.original_height + 'px';
                            $(iframeElement).css('min-height', newHeight);
 
-
-                           }, 1000);
+                           //}, 1000);
                         } else {
                            $(editor).replaceSelectedText(imgTag + '\n');
                         }
@@ -1368,72 +1411,47 @@
                   }
                },
 
-               progressall: function (e, data) {
-                  var progress = parseInt(data.loaded / data.total * 100, 10);
-
-                  var $progressMeter = $dndCueWrapper.find('.editor-upload-progress');
-
-
-                  $progressMeter.css({
-                     'width': progress + '%'
-                  });
-
-                  // The progress meter is cleared in the `always` event, to
-                  // handle rare case when meter fails to reach end.
-                  if (progress == 100) {
-                     // Just in case progress meter didn't reach end (rare), fill it up,
-                     // then get rid of it.
-                     $progressMeter.css({
-                        'width': 100 + '%'
-                     });
-
-                     $progressMeter.addClass('fade-out');
-
-                     // Transition inserted above is 400ms, so remove it shortly
-                     // after.
-                     setTimeout(function() {
-                        // Remove transition class
-                        $progressMeter.removeClass('fade-out');
-
-                        // Reset width
-                        $progressMeter.css({
-                           'width': 0
-                        });
-                     }, 710);
-                  }
+               // Called after every file upload in a session
+               // Typically this is fired due to 400 bad request, because
+               // the file was probably not allowed, but passed client checks.
+               // That would tend to mean the client checks need to be updated.
+               fail: function(e, data) {
+                  var filename = data.files[0].name;
+                  var message = '"'+ filename +'" could not be uploaded.'
+                  gdn.informMessage(message);
                },
 
-               send: function(e, data) {
-                  console.log('SEND');
-                  console.log(data);
-               },
+               // Called regardless of success or failure.
+               //always: function(e, data) {},
 
-               drop: function (e, data) {
-
-
-
-                  $.each(data.files, function (index, file) {
-                      console.log('Dropped file: ' + file.name);
-                  });
-              },
-
+               // This is the last event that fires, and it's only fired once.
                // Note, sometimes the upload progress meter never reaches the
                // end, so this would be a good place to clear it as a backup.
-               always: function(e, data) {
-                  console.log('always');
-                  //clearProgressMeter();
-               },
+               stop: function(e) {
+                  var $progressMeter = $(this).closest('form').find('.editor-upload-progress');
 
-               fail: function(e, data) {
-                  console.log('FAILLLLLHOUSE');
-                  console.log(e, data);
+                  // If progress meter didn't reach the end, force it.
+                  $progressMeter.css({
+                     'width': '100%'
+                  });
+
+                  $progressMeter.addClass('fade-out');
+
+                  // Transition inserted above is 400ms, so remove it shortly
+                  // after.
+                  setTimeout(function() {
+                     // Restore original document title
+                     document.title = documentTitle;
+                     // Remove transition class
+                     $progressMeter.removeClass('fade-out');
+                     // Reset width
+                     $progressMeter.css({
+                        'width': 0
+                     });
+                  }, 710);
                }
-
             });
-
          });
-
-
       };
 
       /**

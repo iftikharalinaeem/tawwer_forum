@@ -361,6 +361,10 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddDefinition('maxUploadSize', $MaxSize);
       // Set file input name
       $c->AddDefinition('editorFileInputName', $this->editorFileInputName);
+      // Save allowed file types
+      $c->AddDefinition('allowedFileExtensions', json_encode(C('Garden.Upload.AllowedFileExtensions')));
+      // Get max file uploads, to be used for max drops at once.
+      $c->AddDefinition('maxFileUploads', ini_get('max_file_uploads'));
 
       // Add active emoji so autosuggest works
       $Emoji = Emoji::instance();
