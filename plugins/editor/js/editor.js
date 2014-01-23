@@ -1089,7 +1089,6 @@
             }
          }
 
-
          /**
           * Help methods
           */
@@ -1103,22 +1102,22 @@
             var file = $(filePreviewContainer).find('a.filename');
             var type = $(file).data('type');
             var href = file.attr('href');
-try{
+
             if (type.indexOf('image') > -1) {
                if (handleIframe) {
                   var iframeBody = $(iframeElement).contents().find('body');
                   var imgTag = buildImgTag(href);
+                  editor.focus();
                   editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
                   var insertedImage = $(iframeBody).find('img[src="'+href+'"]');
                   var newHeight = parseInt($(iframeElement).css('min-height')) + insertedImage.height() + 'px';
                   $(iframeElement).css('min-height', newHeight);
                } else {
-                  $(editor).replaceSelectedText(buildImgTag(href) + '\n');
+                  try {
+                     $(editor).replaceSelectedText(buildImgTag(href) + '\n');
+                  } catch(ex) {}
                }
             }
-   }catch(ex) {
-      console.log('YOU GOOOOFED BRAH');
-   }
          };
 
          // Used in two places below.
@@ -1300,7 +1299,7 @@ try{
 
                            if (!validSize) {
                               if (!validFile) {
-                                 message += ' and '
+                                 message += ' and ';
                               }
                               message += 'is too large (max '+ maxUploadSize +' bytes)';
                            }
@@ -1326,10 +1325,6 @@ try{
 
                // Fired on successful upload
                done: function (e, data) {
-
-                  console.log(data.result);
-                  console.log(this);
-                  console.log(cssDropInitClass);
 
                   var result = data.result;
 
@@ -1370,42 +1365,27 @@ try{
                      // Find it here.
                      $editorUploadPreviews.append(html);
 
-                     console.log('editoruploadpreviews');
-                     console.log($editorUploadPreviews);
-                     console.log($dndCueWrapper);
-                     console.log(this);
-
-
                      // If photo, insert directly into editor area.
                      if (payload.type.toLowerCase().indexOf('image') > -1) {
-
-
                         // Determine max height for sample. They can resize it
                         // afterwards.
                         var maxHeight = (payload.original_height >= 400)
                            ? 400
                            : payload.original_height;
-                        // height="'+ maxHeight +'"
 
                         var imgTag = buildImgTag(payload.original_url);
 
-                        console.log(imgTag);
-
                         if (handleIframe) {
-                           //setTimeout(function() {
-                           editor.fire("blur", "composer");
-
-                           console.log(editor);
-
-                           //editor.focus();
-                           console.log('handling insert iframe image');
+                           editor.focus();
                            editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
                            var newHeight = parseInt($(iframeElement).css('min-height')) + payload.original_height + 'px';
                            $(iframeElement).css('min-height', newHeight);
-
-                           //}, 1000);
                         } else {
+                           try {
+                              // i don't know why adding [0] to this when iframe
+                              // matters, and clear up part of t problem.
                            $(editor).replaceSelectedText(imgTag + '\n');
+                           } catch(ex){}
                         }
                      }
                   }
@@ -1835,7 +1815,7 @@ try{
                       atCompleteInit($currentEditableTextarea, '');
 
                       // Enable file uploads
-                      fileUploadsInit($currentEditableTextarea);
+                      fileUploadsInit($currentEditableTextarea, '');
                    });
                    break;
 
