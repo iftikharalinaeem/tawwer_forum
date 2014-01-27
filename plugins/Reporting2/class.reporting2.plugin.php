@@ -194,7 +194,7 @@ class Reporting2Plugin extends Gdn_Plugin {
          $Category = ReportModel::GetReportCategory();
          $ReportCount = ReportModel::GetUnreadReportCount();
          $CReport = $ReportCount > 0 ? ' '.Wrap($ReportCount, 'span class="Alert"') : '';
-         echo Wrap(Sprite('SpReport').' '.Anchor($Category['Name'].$CReport, CategoryUrl($Category)), 'li', array('class' => 'ReportCategory'));
+         echo Wrap(Anchor(Sprite('SpReport').' '.htmlspecialchars($Category['Name']).$CReport, CategoryUrl($Category)), 'li', array('class' => 'ReportCategory'));
       }
    }
 
