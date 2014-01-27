@@ -59,6 +59,7 @@
          var toolbarInterval;
 
          var toggleFullpage = function(e) {
+
             // either user clicks on fullpage toggler button, or escapes out with key
             var toggleButton = (typeof e != 'undefined')
                ? e.target
@@ -153,16 +154,16 @@
                 }
             }
 
+            // Toggle lights while in fullpage (lights off essentially makes
+            // the background black and the buttons lighter.
+            toggleLights();
+
             // Set focus to composer when going fullpage and exiting.
             if (typeof wysiwygInstance != 'undefined') {
                wysiwygInstance.focus();
             } else {
                editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
             }
-
-            // Toggle lights while in fullpage (lights off essentially makes
-            // the background black and the buttons lighter.
-            toggleLights();
          };
 
          /**
@@ -237,6 +238,13 @@
           * override the Wysihtml5 inline style events.
           */
          var toggleLights = function() {
+
+            // Set initial lights settings on/off. This setting is defined
+            // in global scope, so that plugins can define an initial state
+            var initialLightState = (typeof editorLights != 'undefined')
+               ? editorLights // should be off, typically
+               : 'on';
+
             var toggleLights = $('.editor-toggle-lights-button');
             var fullPageCandidate = $('#editor-fullpage-candidate');
             var ifr = {};
@@ -257,6 +265,20 @@
                   // By default, black text on white background. Some themes
                   // prevent text from being readable, so make sure it can.
                   iframeBodyBox.addClass('iframe-bodybox-lightson');
+               }
+
+               // Set initial state.
+               if (initialLightState == 'off') {
+                  $(fullPageCandidate).addClass('editor-lights-candidate');
+                  if (ifr.length) {
+                     // if wysiwyg, need to manipulate content in iframe
+                     iframeBodyBox.removeClass('iframe-bodybox-lightson');
+                     iframeBodyBox.addClass('iframe-bodybox-lightsoff');
+
+                     iframeBodyBox.on('focus blur', function(e) {
+                        $(this).addClass('iframe-bodybox-lightsoff');
+                     });
+                  }
                }
             } else {
                $(toggleLights).attr('style', '');
