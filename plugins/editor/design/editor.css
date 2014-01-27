@@ -199,6 +199,9 @@
 .editor-file-preview .file-data .meta em {
   font-style: italic;
 }
+.editor-file-preview .editor-file-remove {
+  cursor: pointer;
+}
 .editor-file-preview .editor-file-remove:after {
   display: block;
   content: '\00D7';
@@ -222,7 +225,7 @@
   display: none;
 }
 .editor-file-preview.file-readonly .file-data {
-  width: 182px;
+  width: 178px;
 }
 .editor-file-preview.file-readonly .editor-file-remove,
 .editor-file-preview.file-readonly .editor-file-reattach {
@@ -232,7 +235,7 @@
 /* Any files in this wrapper have no delete options. Only when moved into
 .editor-upload-previews will the options be activated */
 .editor-upload-readonly .file-data {
-  width: 182px;
+  width: 178px;
 }
 .editor-upload-readonly .editor-file-remove,
 .editor-upload-readonly .editor-file-reattach {

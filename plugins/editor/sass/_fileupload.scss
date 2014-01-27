@@ -147,6 +147,10 @@
       }
    }
 
+   .editor-file-remove {
+      cursor: pointer;
+   }
+
    .editor-file-remove:after {
       display: block;
       content: '\00D7';
@@ -177,7 +181,7 @@
    &.file-readonly {
 
       .file-data {
-         width: 182px;
+         width: 178px;
       }
 
       .editor-file-remove,
@@ -191,7 +195,7 @@
 .editor-upload-previews will the options be activated */
 .editor-upload-readonly {
    .file-data {
-      width: 182px;
+      width: 178px;
    }
 
    .editor-file-remove,
