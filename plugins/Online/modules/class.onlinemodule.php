@@ -213,7 +213,7 @@ class OnlineModule extends Gdn_Module {
       <div id="WhosOnline" class="WhosOnline Box">
          <h4><?php echo $title; ?> <span class="Count"><?php echo Gdn_Format::bigNumber($trackCount, 'html') ?></span></h4>
          <?php
-         
+
             if ($this->style == 'pictures') {
                $listClass = 'PhotoGrid';
                if (count($this->onlineUsers) > 10)
@@ -264,7 +264,8 @@ EOT;
                         if (val($this->contextField, $user, NULL) == $this->contextID)
                            $wrapClass .= ' InContext';
 
-                     $wrapClass = implode(' ', $wrapClass);
+                     if (is_array($wrapClass))
+                        $wrapClass = implode(' ', $wrapClass);
                      echo "<li class=\"{$wrapClass}\">".userAnchor($user)."</li>\n";
                   }
                }
@@ -284,7 +285,7 @@ EOT;
       <?php
 
       }
-      
+
       $outputString = ob_get_contents();
       @ob_end_clean();
 

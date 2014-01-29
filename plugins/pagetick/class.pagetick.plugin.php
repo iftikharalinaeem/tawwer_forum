@@ -3,7 +3,7 @@
 $PluginInfo['pagetick'] = array(
     'Name' => 'Pagetick',
     'Description' => 'Testing alternate pageview tracking.',
-    'Version' => '1.0.0-beta',
+    'Version' => '1.0.0-beta2',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,

@@ -339,6 +339,8 @@ class ReactionsPlugin extends Gdn_Plugin {
          throw PermissionException('Javascript');
 
       $ReactionType = ReactionModel::ReactionTypes($Reaction);
+      $Sender->EventArguments['ReactionType'] = &$ReactionType;
+      $Sender->FireAs('ReactionModel')->FireEvent('GetReaction');
 
       // Only allow enabled reactions
       if (!GetValue('Active', $ReactionType)) {

@@ -20,7 +20,7 @@ class DiscussionExcerptPlugin extends Gdn_Plugin {
 	public function DiscussionsController_AfterDiscussionTitle_Handler($Sender) {
 		$Discussion = GetValue('Discussion', $Sender->EventArguments);
 		if (is_object($Discussion))
-			echo '<div class="Excerpt">'.SliceString(Gdn_Format::Text($Discussion->Body, FALSE), 100).'</div>';
+			echo '<div class="Excerpt">'.SliceString(Gdn_Format::PlainText($Discussion->Body, $Discussion->Format), C('Vanilla.DiscussionExcerpt.Length', 100)).'</div>';
 	}
 
    public function Setup() {

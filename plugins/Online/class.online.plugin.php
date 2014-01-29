@@ -284,7 +284,7 @@ class OnlinePlugin extends Gdn_Plugin {
     * @return int
     */
    protected static function incrementCache($name, $expiry) {
-      
+
       $value = Gdn::cache()->increment($name, 1);
 
       if (!$value) {
@@ -900,7 +900,7 @@ class OnlinePlugin extends Gdn_Plugin {
          $newPrivateMode = $sender->Form->getValue('PrivateMode', false);
          if ($newPrivateMode != $privateMode) {
             Gdn::userModel()->saveAttribute($userID, 'Online/PrivateMode', $newPrivateMode);
-            $sender->iInformMessage(T("Your changes have been saved."));
+            $sender->InformMessage(T("Your changes have been saved."));
          }
       }
 
