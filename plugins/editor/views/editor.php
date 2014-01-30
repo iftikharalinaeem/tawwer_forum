@@ -70,6 +70,23 @@
                    , 'div', array('class' => 'editor-dropdown'));
                   break;
 
+               case 'upload':
+                  $html_toolbar .= Wrap(
+                     Wrap($html_arrow_down, 'span', $button['attr']) .''.
+                     '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="">
+
+                        <label class="editor-image-align">
+                        Browse to select files, or drag and drop files.
+                        <input class="editor-fileupload" type="file" multiple="multiple" />
+                        </label>
+
+                        <div>
+                        <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="Cancel"/>
+                        </div>
+                     </div>'
+                   , 'div', array('class' => 'editor-dropdown'));
+                  break;
+
                // All other dropdowns (color, format, emoji)
                default:
                   $html_toolbar .= Wrap(
@@ -84,6 +101,13 @@
       $html_toolbar .= '</div>';
 
    }
+
+   // Add progress meter for file uploads.
+   $html_toolbar .= '<div class="editor-upload-progress"></div>';
+
+   // Add drop message when dragging over dropzone. Only display when
+   // dragging over element.
+   $html_toolbar .= '<div class="editor-upload-attention">'. T('drop file(s)') .'</div>';
 
    // Generate output for view
    echo $html_toolbar;

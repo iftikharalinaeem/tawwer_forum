@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.1.4a',
+   'Version' => '1.2.10a',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -46,9 +46,27 @@ class EditorPlugin extends Gdn_Plugin {
    /**
     *
     * @var string Asset path for this plugin, set in Gdn_Form_BeforeBodyBox_Handler.
-    *      TODO check how to set it at runtime in constructor.
+    *             TODO check how to set it at runtime in constructor.
     */
    protected $AssetPath;
+
+   /**
+    *
+    * @var string This is used as the input name for file uploads. It will be
+    *             passed to JS as well. Note that it can be defined as an
+    *             array, by adding square brackets, e.g., `editorupload[]`,
+    *             but that will make all the Vanilla upload classes
+    *             incompatible because they are hardcoded to handle only
+    *             single files at a time, not an array of files. Perhaps in
+    *             future make core upload classes more flexible.
+    */
+   protected $editorFileInputName = 'editorupload';
+
+   /**
+    *
+    * @var string
+    */
+   protected $editorBaseUploadDestinationDir = '';
 
    /**
     *
@@ -94,6 +112,7 @@ class EditorPlugin extends Gdn_Plugin {
           'emoji' => true,
           'links' => true,
           'images' => true,
+          'uploads' => true,
 
           'sep-align' => true, // separator
           'alignleft' => true,
@@ -240,6 +259,7 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['emoji'] = array('edit' => 'media', 'action'=> 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => T('Emoji'), 'data-editor' => '{"action":"emoji","value":""}'));
       $editorToolbarAll['links'] = array('edit' => 'media', 'action'=> 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link', 'data-wysihtml5-command' => 'createLink', 'title' => T('Url'), 'data-editor' => '{"action":"url","value":""}'));
       $editorToolbarAll['images'] = array('edit' => 'media', 'action'=> 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => T('Image'), 'data-editor' => '{"action":"image","value":""}'));
+      $editorToolbarAll['uploads'] = array('edit' => 'media', 'action'=> 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-paper-clip editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => T('Upload'), 'data-editor' => '{"action":"upload","value":""}'));
 
       $editorToolbarAll['sep-align'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-align hidden-xs'));
       $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action'=> 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyLeft', 'title' => T('Align left'), 'data-editor' => '{"action":"alignleft","value":""}'));
@@ -315,6 +335,13 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddJsFile('editor.js', 'plugins/editor');
       $c->AddJsFile('jquery.atwho.js', 'plugins/editor');
 
+      // Fileuploads
+      $c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
+      $c->AddJsFile('jquery.iframe-transport.js', 'plugins/editor');
+      $c->AddJsFile('jquery.fileupload.js', 'plugins/editor');
+      //$c->AddJsFile('jquery.fileupload-process.js', 'plugins/editor');
+      //$c->AddJsFile('jquery.fileupload-validate.js', 'plugins/editor');
+
       // Set definitions for JavaScript to read
       $c->AddDefinition('editorVersion',      $this->pluginInfo['Version']);
       $c->AddDefinition('editorInputFormat',  $this->Format);
@@ -326,6 +353,18 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddDefinition('textHelpText',       T('editor.TextHelpText', 'You are using plain text in your post.'));
       $c->AddDefinition('editorWysiwygCSS',   $CssPath);
 
+      // Set variables for file uploads
+      $PostMaxSize = Gdn_Upload::UnformatFileSize(ini_get('post_max_size'));
+      $FileMaxSize = Gdn_Upload::UnformatFileSize(ini_get('upload_max_filesize'));
+      $ConfigMaxSize = Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize', '1MB'));
+      $MaxSize = min($PostMaxSize, $FileMaxSize, $ConfigMaxSize);
+      $c->AddDefinition('maxUploadSize', $MaxSize);
+      // Set file input name
+      $c->AddDefinition('editorFileInputName', $this->editorFileInputName);
+      // Save allowed file types
+      $c->AddDefinition('allowedFileExtensions', json_encode(C('Garden.Upload.AllowedFileExtensions')));
+      // Get max file uploads, to be used for max drops at once.
+      $c->AddDefinition('maxFileUploads', ini_get('max_file_uploads'));
 
       // Add active emoji so autosuggest works
       $Emoji = Emoji::instance();
@@ -398,6 +437,424 @@ class EditorPlugin extends Gdn_Plugin {
 
          $Args['BodyBox'] .= $View;
       }
+   }
+
+   /**
+    *
+    * @param PostController $Sender
+    * @param array $Args
+    */
+   public function PostController_EditorUpload_Create($Sender, $Args = array()) {
+
+      // Require new image thumbnail generator function. Currently it's
+      // being symlinked from my vhosts/tests directory. When it makes it
+      // into core, it will be available in functions.general.php
+      require 'generate_thumbnail.php';
+
+      // Grab raw upload data ($_FILES), essentially. It's only needed
+      // because the methods on the Upload class do not expose all variables.
+      $fileData = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, $this->editorFileInputName, FALSE);
+
+      // JSON payload of media info will get sent back to the client.
+      $json = array(
+         'error' => 1,
+         'feedback' => 'There was a problem.',
+         'errors' => array(),
+         'payload' => array()
+      );
+
+      // New upload instance
+      $Upload = new Gdn_Upload();
+
+      // This will validate, such as size maxes, file extensions. Upon doing
+      // this, $_FILES is set as a protected property, so all the other
+      // Gdn_Upload methods work on it.
+      $tmpFilePath = $Upload->ValidateUpload($this->editorFileInputName);
+
+      // Get base destination path for editor uploads
+      $this->editorBaseUploadDestinationDir = $this->getBaseUploadDestinationDir();
+
+      // Pass path, if doesn't exist, will create, and determine if valid.
+      $canUpload = Gdn_Upload::CanUpload($this->editorBaseUploadDestinationDir);
+
+      if ($tmpFilePath && $canUpload) {
+
+         $fileExtension = $Upload->GetUploadedFileExtension();
+         $fileName = $Upload->GetUploadedFileName();
+
+         // This will return the absolute destination path, including generated
+         // filename based on md5_file, and the full path. It
+         // will create a filename, with extension, and check if its dir can
+         // be writable.
+         $absoluteFileDestination = $this->getAbsoluteDestinationFilePath($tmpFilePath, $fileExtension);
+
+         // This is returned by SaveAs
+         //$filePathparsed = Gdn_Upload::Parse($absoluteFileDestination);
+
+         // Save original file to uploads, then manipulate from this location if
+         // it's a photo. This will also call events in Vanilla so other
+         // plugins can tie into this.
+         $filePathParsed = $Upload->SaveAs($tmpFilePath, $absoluteFileDestination);
+
+         // Determine if image, and thus requires thumbnail generation, or
+         // simply saving the file.
+
+         // Not all files will be images.
+         $thumbHeight = '';
+         $thumbWidth = '';
+         $imageHeight = '';
+         $imageWidth = '';
+         $thumbDestinationPath = '';
+         $thumbPathParsed = array('SaveName' => '');
+
+         // TODO in future, because of how files are stored, if they exist,
+         // no need to create another thumbnail. They are checked against
+         // MD5 file value.
+
+         // This is a redundant check, because it's in the thumbnail function,
+         // but there's no point calling it blindly on every file, so just
+         // check here before calling it.
+         if (in_array($fileExtension, array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico'))) {
+
+            // Generate new path for thumbnail
+            $thumbPath = $this->editorBaseUploadDestinationDir . '/' . 'thumb';
+
+            // Grab full path with filename, and validate it.
+            $thumbDestinationPath = $this->getAbsoluteDestinationFilePath($absoluteFileDestination, $fileExtension, $thumbPath);
+
+            // Create thumbnail, and grab debug data from whole process.
+            $thumb_payload = generate_thumbnail($absoluteFileDestination, $thumbDestinationPath, array(
+                // Give preference to height for thumbnail, so height controls.
+                'height' => C('Plugins.FileUpload.ThumbnailHeight', 128)
+            ));
+
+            if ($thumb_payload['success']) {
+               // Thumbnail dimensions
+               $thumbHeight = round($thumb_payload['result_height']);
+               $thumbWidth = round($thumb_payload['result_width']);
+               // Original dimensions
+               $imageHeight = round($thumb_payload['height']);
+               $imageWidth = round($thumb_payload['width']);
+
+               $thumbPathParsed = Gdn_Upload::Parse($thumbDestinationPath);
+            }
+         }
+
+         // Save data to database using model with media table
+         $Model = new Gdn_Model('Media');
+
+         // Will be passed to model for database insertion/update.
+         $Media = array(
+            'Name'            => $fileName,
+            'Type'            => $fileData['type'],
+            'Size'            => $fileData['size'],
+            'ImageWidth'      => $imageWidth,
+            'ImageHeight'     => $imageHeight,
+            'ThumbWidth'      => $thumbWidth,
+            'ThumbHeight'     => $thumbHeight,
+            'InsertUserID'    => Gdn::Session()->UserID,
+            'DateInserted'    => date('Y-m-d H:i:s'),
+            'StorageMethod'   => 'local',
+            'Path'            => $filePathParsed['SaveName'],
+            'ThumbPath'       => $thumbPathParsed['SaveName']
+         );
+
+         // Get MediaID and pass it to client in payload
+         $MediaID = $Model->Save($Media);
+         $Media['MediaID'] = $MediaID;
+
+         $thumbUrl = ($thumbPathParsed['SaveName'])
+            ? $Upload->Url($thumbPathParsed['SaveName'])
+            : '';
+
+         $payload = array(
+            'MediaID'            => $MediaID,
+            'Filename'           => $fileName,
+            'Filesize'           => $fileData['size'],
+            'FormatFilesize'     => Gdn_Format::Bytes($fileData['size'], 1),
+            'type' => $fileData['type'],
+            'Thumbnail' => '',
+            'FinalImageLocation' => '',
+            'Parsed' => $filePathParsed,
+            'Media' => $Media,
+            'original_url' => $Upload->Url($filePathParsed['SaveName']),
+            'thumbnail_url' => $thumbUrl,
+            'original_width' => $imageWidth,
+            'original_height' => $imageHeight
+         );
+
+         $json = array(
+            'error' => 0,
+            'feedback' => 'Editor received file successfully.',
+            'payload' => $payload
+         );
+      }
+
+      // Return JSON payload
+      echo json_encode($json);
+   }
+
+
+
+
+
+
+
+
+   /**
+    * Attach a file to a foreign table and ID.
+    *
+    * @access protected
+    * @param int $FileID
+    * @param int $ForeignID
+    * @param string $ForeignType Lowercase.
+    * @return bool Whether attach was successful.
+    */
+   protected function attachEditorUploads($FileID, $ForeignID, $ForeignType) {
+
+      // Save data to database using model with media table
+      $Model = new Gdn_Model('Media');
+
+      $Media = $Model->GetID($FileID);
+      if ($Media) {
+         $Media->ForeignID = $ForeignID;
+         $Media->ForeignTable = $ForeignType;
+
+         try {
+            $Model->Save($Media);
+         } catch (Exception $e) {
+            die($e->getMessage());
+            return FALSE;
+         }
+         return TRUE;
+      }
+      return FALSE;
+   }
+
+   /**
+    * Remove file from filesystem, and clear db entry.
+    *
+    * @param type $FileID
+    * @param type $ForeignID
+    * @param type $ForeignType
+    * @return boolean
+    */
+   protected function deleteEditorUploads($MediaID, $ForeignID = '', $ForeignType = '') {
+
+      // Save data to database using model with media table
+      $Model = new Gdn_Model('Media');
+
+      $Media = (array) $Model->GetID($MediaID);
+
+      if ($Media
+      && Gdn::Session()->UserID == $Media['InsertUserID']
+      // These two are only available when a comment/discussion has already
+      // been saved. If removing them from a live session (ie, deciding not
+      // to use them), then they will not be filled, so remove checks.
+      //&& $Media['ForeignID'] == $ForeignID
+      //&& $Media['ForeignTable'] == $ForeignType
+      ) {
+         try {
+            $Model->Delete($MediaID);
+         } catch (Exception $e) {
+            die($e->getMessage());
+            return FALSE;
+         }
+         return TRUE;
+      }
+      return FALSE;
+   }
+
+      /**
+    * Attach files to a comment during save.
+    *
+    * @access public
+    * @param object $Sender
+    * @param array $Args
+    */
+   public function PostController_AfterCommentSave_Handler($Sender, $Args) {
+      if (!$Args['Comment']) return;
+
+      $CommentID = $Args['Comment']->CommentID;
+      if (!$CommentID) return;
+
+      // Array of Media IDs, as input is MediaIDs[]
+      $mediaIds = (array) Gdn::Request()->GetValue('MediaIDs');
+
+      if (count($mediaIds)) {
+         foreach ($mediaIds as $mediaId) {
+            $this->attachEditorUploads($mediaId, $CommentID, 'comment');
+         }
+      }
+
+      // Array of Media IDs to remove, if any.
+      $removeMediaIds = (array) Gdn::Request()->GetValue('RemoveMediaIDs');
+
+      if (count($removeMediaIds)) {
+         foreach ($removeMediaIds as $mediaId) {
+            $this->deleteEditorUploads($mediaId, $CommentID, 'comment');
+         }
+      }
+   }
+
+   /**
+    * Attach files to a discussion during save.
+    *
+    * @access public
+    * @param object $Sender
+    * @param array $Args
+    */
+   public function PostController_AfterDiscussionSave_Handler($Sender, $Args) {
+      if (!$Args['Discussion']) return;
+
+      $DiscussionID = $Args['Discussion']->DiscussionID;
+      if (!$DiscussionID) return;
+
+      // Array of Media IDs, as input is MediaIDs[]
+      $mediaIds = (array) Gdn::Request()->GetValue('MediaIDs');
+
+      if (count($mediaIds)) {
+         foreach ($mediaIds as $mediaId) {
+            $this->attachEditorUploads($mediaId, $DiscussionID, 'discussion');
+         }
+      }
+
+      // Array of Media IDs to remove, if any.
+      $removeMediaIds = (array) Gdn::Request()->GetValue('RemoveMediaIDs');
+
+      if (count($removeMediaIds)) {
+         foreach ($removeMediaIds as $mediaId) {
+            $this->deleteEditorUploads($mediaId, $DiscussionID, 'discussion');
+         }
+      }
+   }
+
+   protected function AttachUploadsToComment($Controller, $Type = 'comment') {
+
+      $param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
+      $foreignId = GetValue($param, GetValue(ucfirst($Type), $Controller->EventArguments));
+
+      $Model = new Gdn_Model('Media');
+      $attachments = $Model
+              ->GetWhere(array(
+                  'ForeignID' => $foreignId,
+                  'ForeignTable' => $Type)
+              )->ResultArray();
+
+      $Controller->SetData('attachments', $attachments);
+      $Controller->SetData('editorkey', strtolower($param.$foreignId));
+
+      echo $Controller->FetchView($this->GetView('attachments.php'));
+   }
+
+   public function PostController_DiscussionFormOptions_Handler($Sender, $Args) {
+      if (!is_null($Discussion = GetValue('Discussion',$Sender, NULL))) {
+         $Sender->EventArguments['Type'] = 'Discussion';
+         $Sender->EventArguments['Discussion'] = $Discussion;
+         $this->AttachUploadsToComment($Sender, 'discussion');
+      }
+
+      //decho($Args);
+   }
+
+   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
+      $this->AttachUploadsToComment($Sender);
+
+            //decho($Args);
+
+   }
+
+   public function DiscussionController_AfterDiscussionBody_Handler($Sender, $Args) {
+      $this->AttachUploadsToComment($Sender, 'discussion');
+
+            //decho($Args);
+
+   }
+
+   public function PostController_AfterCommentBody_Handler($Sender, $Args) {
+      $this->AttachUploadsToComment($Sender);
+
+            //decho($Args);
+
+   }
+
+
+
+
+
+
+   /**
+    * Specific to editor upload paths
+    */
+   public function getBaseUploadDestinationDir($subdir = false) {
+      // Set path
+      $basePath = PATH_UPLOADS . '/editor';
+
+      $uploadTargetPath = ($subdir)
+         ? $basePath . '/' . $subdir
+         : $basePath;
+
+      return $uploadTargetPath;
+   }
+
+   /**
+    * Instead of using Gdn_Upload->GenerateTargetName, create one that
+    * depends on MD5s, to reduce space for duplicates, and use smarter
+    * folder sorting based off the MD5s.
+    *
+    * @param type $file
+    */
+   public function getAbsoluteDestinationFilePath($tmpFilePath, $fileExtension, $uploadDestinationDir = '') {
+
+      $absolutePath = '';
+
+      $basePath = $this->editorBaseUploadDestinationDir;
+
+      if ($basePath != '') {
+         $basePath = $this->getBaseUploadDestinationDir();
+      }
+
+      if ($uploadDestinationDir) {
+         $basePath = $uploadDestinationDir;
+      }
+
+      // MD5 of the tmp file
+      $fileMD5 = md5_file($tmpFilePath);
+
+      // Use first two characters from fileMD5 as subdirectory,
+      // and use the rest as the file name.
+      $dirlen = 2;
+      $subdir = substr($fileMD5, 0, $dirlen);
+      $filename = substr($fileMD5, $dirlen);
+      $fileDirPath = $basePath . '/' . $subdir;
+
+      if ($this->validateUploadDestinationPath($fileDirPath)) {
+         $absolutePath = $fileDirPath . '/' . $filename;
+         if ($fileExtension) {
+            $absolutePath .= '.' . $fileExtension;
+         }
+      }
+
+      return $absolutePath;
+   }
+
+   /**
+    * Check if provided path is valid, creates it if it does not exist, and
+    * verifies that it is writable.
+    *
+    * @param string $path Path to validate
+    */
+   public function validateUploadDestinationPath($path) {
+      $validDestination = true;
+
+      // Check if path exists, and if not, create it.
+      if (!file_exists($path)
+      && !mkdir($path, 0777, true)
+      && !is_writable($path)) {
+         $validDestination = false;
+      }
+
+      return $validDestination;
    }
 
    /**

@@ -10,12 +10,12 @@ if ("postMessage" in parent) {
     containerPostMessage = function(message, target) {
         messages.push(message);
     }
-    
+
     function messageUrl(message) {
         var id = Math.floor(Math.random() * 10000);
         return "http://vanillaforums.com" + "#poll:" + id + ":" + message;
     }
-    
+
     function setMessage() {
         if (messages.length == 0)
             return;
@@ -23,7 +23,7 @@ if ("postMessage" in parent) {
         var message = messages.splice(0, 1)[0];
         document.getElementById('messageFrame').src = messageUrl(message);
     }
-    
+
     $(function() {
         var body = document.getElementsByTagName("body")[0],
             messageIframe = document.createElement("iframe");
@@ -49,16 +49,16 @@ function setHeight() {
 $(function() {
     setHeight();
     setInterval(setHeight, 300);
-    
+
     // Define the webroot & path without domain
     var webroot = gdn.definition('WebRoot'),
         pathroot = gdn.definition('UrlFormat').replace('/{Path}', '').replace('{Path}', '');
-    
+
     // hijack all anchors to see if they should go to "top" or be within the embed (ie. are they in Vanilla or not?)
     $('a').livequery(function() {
         var href = $(this).attr('href'),
             isHttp = href.substr(0, 7) == 'http://';
-            
+
         if (isHttp && href.substr(0, webroot.length) != webroot) {
             $(this).attr('target', '_blank');
         } else {
@@ -69,12 +69,12 @@ $(function() {
             if (hashIndex > -1) {
                 hash = path.substr(hashIndex);
                 path = path.substr(0, hashIndex);
-            }        
+            }
             var concat = path.indexOf('?') > -1 ? '&' : '?';
             $(this).attr('href', pathroot + path + concat + 'DeliveryType=EMBED' + hash);
         }
     });
-    $('a').live('click', function() {
+    $(document).on('click', 'a', function() {
         var path = $(this).attr('href');
         var isHttp = path.substr(0, 7) == 'http://';
         if (!isHttp) {

@@ -1,5 +1,5 @@
 jQuery(document).ready(function() {
-   
+
    // Define the webroot & path without domain
    var webroot = gdn.definition('WebRoot');
    var pathroot = gdn.definition('UrlFormat').replace('/{Path}', '').replace('{Path}', '');
@@ -19,9 +19,9 @@ jQuery(document).ready(function() {
    $(window).resize(function() {
       setHeight();
    });
-   
+
    // hijack all anchors to see if they should go to "top" or be within the embed (ie. are they in Vanilla or not?)
-   $('a').live('click', function() {
+   $(document).on('click', 'a', function() {
       var href = $(this).attr('href');
       var isHttp = href.substr(0, 7) == 'http://';
       if (isHttp && href.substr(0, webroot.length) != webroot) {
@@ -32,5 +32,5 @@ jQuery(document).ready(function() {
       }
       return false;
    });
-   
+
 });

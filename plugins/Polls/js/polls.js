@@ -1,12 +1,12 @@
 jQuery(document).ready(function($) {
-   
-   $('.PollForm form :submit').live('click', function() {
+
+   $(document).on('click', '.PollForm form :submit', function() {
       var btn = this,
          frm = $(this).parents('form');
-         
+
       var postValues = $(frm).serialize()+'&DeliveryType=VIEW&DeliveryMethod=JSON',
          action = $(frm).attr('action');
-         
+
       $(btn).addClass('InProgress'); // Replace the button with a spinner
       $.ajax({
          type: "POST",
@@ -27,5 +27,5 @@ jQuery(document).ready(function($) {
          }
       });
       return false;
-   });   
+   });
 });

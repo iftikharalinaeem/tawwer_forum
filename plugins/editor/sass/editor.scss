@@ -1,6 +1,7 @@
 @import "compass";
 @import "compass/css3";
 @import "at";
+@import "fileupload";
 
 /**
  *  Define some mixins
@@ -241,7 +242,8 @@ affect, so it's not doing anything */
 }
 
 .js-editor-fullpage #editor-fullpage-candidate .editor,
-.js-editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
+.js-editor-fullpage #editor-fullpage-candidate .TextBoxWrapper,
+.js-editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
    max-width: 800px;
 
    -webkit-animation-duration: 0.8s;
@@ -267,6 +269,10 @@ affect, so it's not doing anything */
 
 .js-editor-fullpage #editor-fullpage-candidate .editor-help-text {
    display: none;
+}
+
+.js-editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
+   margin: 0 auto;
 }
 
 /* Set default heights for each editor view. Regular (markdown, html, bbcode)
