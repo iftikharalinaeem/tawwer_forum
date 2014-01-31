@@ -1,5 +1,5 @@
 jQuery(document).ready(function($) {
-    
+
    var tokenRegex = /\{([^\}]+)\}/g,
    objNotationRegex = /(?:(?:^|\.)(.+?)(?=\[|\.|$|\()|\[('|")(.+?)\2\])(\(\))?/g, // matches .xxxxx or ["xxxxx"] to run over object properties
    replacer = function (all, key, obj) {
@@ -92,7 +92,7 @@ jQuery(document).ready(function($) {
             h: h,
             gap: gap
          }][pos[1] == "middle" ? 1 : (pos[1] == "top" || pos[1] == "left") * 2];
-         
+
          var dx = 0,
             dy = 0,
             out = this.path(fill(shapes[pos[0]], mask)).insertBefore(set);
@@ -154,7 +154,7 @@ jQuery(document).ready(function($) {
          y2: p2y + dy2
       };
     }
-    
+
    function getColor(graphContainer, row, forLine) {
       var index = row;
       if (forLine) {
@@ -170,7 +170,7 @@ jQuery(document).ready(function($) {
       }
       return $('#'+graphContainer+' span.Metric'+(index+1)).css('color');
     }
-    
+
    function getRowController(rowIndex) {
       return $('input:hidden[name="graphLabel_'+rowIndex+'"]');
    }
@@ -179,7 +179,7 @@ jQuery(document).ready(function($) {
       var inp = getRowController(rowIndex);
       return inp.length > 0 ? inp.val() : "off";
    }
-    
+
    Raphael.fn.drawGrid = function (x, y, w, h, wv, hv, color) {
       color = color || "#000";
       var path = [
@@ -208,7 +208,7 @@ jQuery(document).ready(function($) {
           increment++;
           colsToDisplay = Math.round(wv / increment);
       }
-  
+
       for (i = 0; i <= wv; i += increment) {
       */
       for (i = 0; i <= wv; i++) {
@@ -216,7 +216,7 @@ jQuery(document).ready(function($) {
       }
       return this.path(path.join(",")).attr(dashed);
     }
-    
+
    Raphael.fn.drawFoot = function(labels, height, leftgutter, r, footText, X, bottomgutter) {
       var maxLabels = 12;
       var labelsToDisplay = labels.length;
@@ -238,9 +238,9 @@ jQuery(document).ready(function($) {
          }
          var t = r.text(x, height - bottomgutter + 10, labels[i]).attr(footText).attr(attr).toBack(); // This adds the text along the bottom of the grid
       }
-      return;    
+      return;
    }
-    
+
    Raphael.fn.drawLegend = function(graphContainer, raphael, rows, height, leftgutter, X) {
       var legend = raphael.set();
       var xPos = Math.round(leftgutter + 16);
@@ -278,7 +278,7 @@ jQuery(document).ready(function($) {
             });
          })(box, inp, white, color);
          xPos = xPos + Math.round(box.getBBox().width) + 6;
-            
+
          // Draw a label for the box
          var text = raphael.text(xPos, height - 8, rows[i]).attr({
             'font-size': $('#'+graphContainer+' span.Legend').css('fontSize'),
@@ -292,7 +292,7 @@ jQuery(document).ready(function($) {
       }
       return;
    }
-    
+
    drawGraph = function(graphContainer, dataSource) {
       // initialize the chart area
       var graphHolder = $("#" + graphContainer);
@@ -305,18 +305,18 @@ jQuery(document).ready(function($) {
          rows = [],
          data = [],
          i = -1;
-         
+
       $.each(dataSource, function(Key, Value) {
          if (Key == 'Dates') {
             footLabels = Value;
          } else {
             rowLabels.push(Key);
-            
+
             // Don't include unchecked rows
             i++;
             if (getRowController(i).val() == "off")
                return;
-                 
+
             visibleRowLabels.push(Key);
             rows.push(Value);
             $.each(Value, function(k, v) {
@@ -324,7 +324,7 @@ jQuery(document).ready(function($) {
             });
          }
       });
-         
+
       // I realize this identifies the rows being graph'd (Users,
       // Discussions, Comments), but I can't think of a better place to
       // put it right now:
@@ -332,7 +332,7 @@ jQuery(document).ready(function($) {
       setSummary(dataSource, 'Users', 'li.NewUsers strong');
       setSummary(dataSource, 'Discussions', 'li.NewDiscussions strong');
       setSummary(dataSource, 'Comments', 'li.NewComments strong');
-        
+
       //create the Raphael object
       var width = graphHolder.width(),
          height = graphHolder.height(),
@@ -347,7 +347,7 @@ jQuery(document).ready(function($) {
          X = (width - leftgutter) / footLabels.length,
          max = Math.max.apply(Math, data),
          Y = (height - bottomgutter - topgutter) / max;
-      
+
       r.clear();
       r.drawGrid(leftgutter + X * .5 - 1, topgutter + .5, width - leftgutter - X, height - topgutter - bottomgutter, footLabels.length - 1, 10, graphHolder.css('border-bottom-color'));
       r.drawFoot(footLabels, height, leftgutter, r, footText, X, bottomgutter);
@@ -355,7 +355,7 @@ jQuery(document).ready(function($) {
 
       // Draw the "max" number on the top left
       var text = r.text(leftgutter + 12, topgutter - 2, max.formatThousands()).attr({'text-anchor': 'start'}).attr(footText);
-            
+
       var dots = [];
       var coordinates = [];
       for (var j = 0; j < rows.length; j++) {
@@ -389,13 +389,13 @@ jQuery(document).ready(function($) {
                   // Defines the radius of the curve of the line paths
                   X0 = Math.round(leftgutter + X * (i + .1)),
                   X2 = Math.round(leftgutter + X * (i + 1.1));
-    
+
                var a = getAnchors(X0, Y0, x, y, X2, Y2);
                p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
             }
             var dot = r.circle(x, y, 4).attr({fill: color, stroke: graphHolder.css('background-color')});
             blanket.push(r.rect(leftgutter + X * i, 0, X, height - bottomgutter).attr({stroke: "none", fill: "#fff", opacity: 0}));
-                
+
             dots[j].push(dot);
             coordinates[j].push([x, y]);
          }
@@ -418,20 +418,20 @@ jQuery(document).ready(function($) {
                   var side = "top-middle";
                   if (x + frame.getBBox().width > width)
                      side = "left";
-                        
+
                      if (x < frame.getBBox().width)
                         side = "right";
-                            
+
                      if (yLevel - frame.getBBox().height - 8 < 0)
                         side = "bottom-middle";
 
                      if (x < frame.getBBox().width && side == "bottom-middle")
                         side = "bottom-left";
-                            
+
                      var ppp = r.popup(x, yLevel, label, side, 1);
                      frame.show().animate({path: ppp.path}, 200 * is_label_visible);
                      for (a = 0; a < rows.length; a++) {
-                        label[a].attr({text: (rows[a][i] * 1).formatThousands() + " " + visibleRowLabels[a]}).show().animateWith(frame, {translation: [ppp.dx, ppp.dy]}, 200 * is_label_visible);                            
+                        label[a].attr({text: (rows[a][i] * 1).formatThousands() + " " + visibleRowLabels[a]}).show().animateWith(frame, {translation: [ppp.dx, ppp.dy]}, 200 * is_label_visible);
                      }
                      label[rows.length].attr({text: lbl}).show().animateWith(frame, {translation: [ppp.dx, ppp.dy]}, 200 * is_label_visible);
                      is_label_visible = true;
@@ -452,10 +452,10 @@ jQuery(document).ready(function($) {
             path.attr({path: p}); // This adds the line connecting the dots
             frame.toFront();
             label.toFront();
-            blanket.toFront();   
+            blanket.toFront();
       }
    }
-   
+
    // Sum and format data for the summary rows
    Number.prototype.formatThousands = function() {
       var n = this,
@@ -473,18 +473,18 @@ jQuery(document).ready(function($) {
       });
       $(selector).html((sum).formatThousands());
    }
-    
+
    function getData() {
       // Add spinners
       if ($('#Content h1 span').length == 0)
          $('<span class="TinyProgress"></span>').appendTo('#Content h1:last');
-            
+
       if ($('div.DashboardSummaries div.Loading').length == 0)
          $('div.DashboardSummaries').html('<div class="Loading"></div>');
-            
+
       // Load the graph data
       var dataUrl = gdn.url('/dashboard/settings/loadstats');
-      
+
       $.ajax({
          type: "GET",
          url: dataUrl,
@@ -504,7 +504,7 @@ jQuery(document).ready(function($) {
             drawGraph('GraphHolder', data);
          }
       });
-        
+
       $.get(gdn.url('/dashboard/settings/dashboardsummaries&DeliveryType=VIEW&Range='+$('input.Range').val()+'&DateRange='+$('input.DateRange').val()), function(data) {
             $('div.DashboardSummaries').html(data);
       });
@@ -521,7 +521,7 @@ jQuery(document).ready(function($) {
    });
 
    // Redraw the graph if the date range changes
-   $('input.DateRange').live('change', function() {
+   $(document).on('change', 'input.DateRange', function() {
       getData();
    });
 

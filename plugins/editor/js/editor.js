@@ -1018,7 +1018,471 @@
                $(suggest_el).offset(offset);
             });
          }
+      };
 
+      // Note, this depends heavily on blueimp's file upload, and just a bit
+      // on Tim Down's rangyinputs (originally loaded for buttonbarplus).
+      var fileUploadsInit = function(dropElement, editorInstance) {
+
+         // Disable default browser behaviour of file drops
+         $(document).on('drop dragover', function(e) {
+            e.preventDefault();
+         });
+
+         // Multi upload element. If an iframe, it will need to be checked
+         // in the loop far below. Redundant, but let's see.
+         var dropZone = dropElement;
+
+         // Pass editor instance to uploader, to access methods
+         var editor = (editorInstance)
+            ? editorInstance
+            : dropElement;
+
+         var maxUploadSize = gdn.definition('maxUploadSize');
+         var editorFileInputName = gdn.definition('editorFileInputName');
+         var allowedFileExtensions = gdn.definition('allowedFileExtensions');
+         var maxFileUploads = gdn.definition('maxFileUploads');
+
+         // Add CSS class to this element to style children on dragover
+         var $dndCueWrapper = $(dropElement).closest('.bodybox-wrap');
+
+         // Determine if element passed is an iframe or local element.
+         var handleIframe = false;
+         var iframeElement = '';
+         if ($(dropElement)[0].contentWindow) {
+            iframeElement = dropElement;
+            dropElement = $(dropElement)[0].contentWindow;
+            handleIframe = true;
+         }
+
+         // Insert container for displaying all uploads. All successful
+         // uploads will be inserted here.
+         $dndCueWrapper.find('.TextBoxWrapper').after('<div class="editor-upload-previews"></div>');
+         $editorUploadPreviews = $dndCueWrapper.find('.editor-upload-previews');
+
+         // Handle drop effect as UX cue
+         $(dropElement).on('dragenter dragover', function(e) {
+            $dndCueWrapper.addClass('editor-drop-cue');
+         }).on('drop dragend dragleave', function(e) {
+            $dndCueWrapper.removeClass('editor-drop-cue');
+         });
+
+
+         // Get current comment or discussion post box
+
+         // This is the key that finds .editor-upload-saved
+         var editorKey = 'editor-uploads-';
+         var editorForm = $dndCueWrapper.closest('form');
+
+         var savedUploadsContainer = '';
+         var mainCommentForm = '';
+         if (editorForm) {
+            var formCommentId = $(editorForm).find('#Form_CommentID');
+            var formDiscussionId = $(editorForm).find('#Form_DiscussionID');
+
+            // Determine if bodybox loaded is the main comment one. This one
+            // will never have any saved uploads, so make sure it never grabs
+            // saved ones when switching.
+            var mainCommentBox = false;
+            if (formCommentId.length
+            && formCommentId[0].value == ''
+            && formDiscussionId.length
+            && parseInt(formDiscussionId[0].value) > 0) {
+               mainCommentBox = true;
+               mainCommentForm = editorForm;
+               mainCommentPreviews = $editorUploadPreviews;
+            }
+
+            // Build editorKey
+            if (formCommentId.length
+            && parseInt(formCommentId[0].value) > 0) {
+               editorKey += 'commentid' + formCommentId[0].value;
+            } else if (formDiscussionId.length
+            && parseInt(formDiscussionId[0].value) > 0) {
+               editorKey += 'discussionid' + formDiscussionId[0].value;
+            }
+
+            // Make saved files editable
+            if (!mainCommentBox && editorKey != 'editor-uploads-') {
+               var savedContainer = $('#' + editorKey);
+               if (savedContainer.length && savedContainer.html().trim() != '') {
+                  savedUploadsContainer = savedContainer;
+               }
+            }
+         }
+
+         /**
+          * Help methods
+          */
+         var buildImgTag = function(href) {
+            return '<img src="'+ href +'" alt="" />';
+         };
+
+         // Used in two places below
+         var insertImageIntoBody = function(filePreviewContainer) {
+            $(filePreviewContainer).removeClass('editor-file-removed');
+            var file = $(filePreviewContainer).find('a.filename');
+            var type = $(file).data('type');
+            var href = file.attr('href');
+
+            if (type.indexOf('image') > -1) {
+               if (handleIframe) {
+                  var iframeBody = $(iframeElement).contents().find('body');
+                  var imgTag = buildImgTag(href);
+                  editor.focus();
+                  editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
+                  var insertedImage = $(iframeBody).find('img[src="'+href+'"]');
+                  var newHeight = parseInt($(iframeElement).css('min-height')) + insertedImage.height() + 'px';
+                  $(iframeElement).css('min-height', newHeight);
+               } else {
+                  try {
+                     $(editor).replaceSelectedText(buildImgTag(href) + '\n');
+                  } catch(ex) {}
+               }
+            }
+         };
+
+         // Used in two places below.
+         var removeImageFromBody = function(filePreviewContainer) {
+            $(filePreviewContainer).addClass('editor-file-removed');
+            var file = $(filePreviewContainer).find('a.filename');
+            var type = $(file).data('type');
+            var href = file.attr('href');
+
+            // If images, remove insert from body as well
+            if (type.indexOf('image') > -1) {
+               if (handleIframe) {
+                  var iframeBody = $(iframeElement).contents().find('body');
+                  var insertedImage = $(iframeBody).find('img[src="'+href+'"]');
+                  var newHeight = parseInt($(iframeElement).css('min-height')) - insertedImage.height() + 'px';
+                  $(iframeElement).css('min-height', newHeight);
+                  $(insertedImage).remove();
+               } else {
+                  var text = $(editor).val();
+                  // A shame that JavaScript does not have this built-in.
+                  // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions
+                  //var imgTagEscaped = buildImgTag(href).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+                  // Make it more loose, so it doesn't matter what the user
+                  // may have done to the markup, it will be removed.
+                  var imgTagEscaped = '<img(\s+|.*)src\="'+ href.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1") +'"(\s+|.*)\/?>\n?';
+                  var reg = new RegExp(imgTagEscaped, 'gi');
+                  $(editor).val(text.replace(reg, ''));
+               }
+            }
+         };
+
+         /**
+          * Remove and reattach files in a live upload session
+          */
+         $editorUploadPreviews
+         .on('click.live-file-remove', '.editor-file-remove', function(e) {
+            var $editorFilePreview = $(this).closest('.editor-file-preview');
+            $editorFilePreview.find('input').attr('name','RemoveMediaIDs[]');
+
+            // Remove element from editor body
+            removeImageFromBody($editorFilePreview);
+         })
+         .on('click.live-file-reattach', '.editor-file-reattach', function(e) {
+            var $editorFilePreview = $(this).closest('.editor-file-preview');
+            $editorFilePreview.find('input').attr('name','MediaIDs[]');
+
+            // Re-attach
+            insertImageIntoBody($editorFilePreview);
+         });
+
+         /**
+          * Remove and reattach files in a saved upload session, typically
+          * through editing.
+          */
+         if (savedUploadsContainer) {
+            // Turn read-only mode on. Event is fired from conversations.js
+            // and discussion.js.
+            $(editorForm).on('clearCommentForm', function(e) {
+               $(savedUploadsContainer).addClass('editor-upload-readonly');
+            });
+
+            $(savedUploadsContainer)
+            // Turn read-only mode off.
+            .removeClass('editor-upload-readonly')
+            // Remove saved file. This will add hidden input to form
+            .on('click.saved-file-remove', '.editor-file-remove', function(e) {
+               var $editorFilePreview = $(this).closest('.editor-file-preview');
+               var mediaId = $editorFilePreview.find('input').val();
+
+               // Add hidden input to form so it knows to remove files.
+               $('<input>').attr({
+                  type: 'hidden',
+                  id: 'file-remove-' + mediaId,
+                  name: 'RemoveMediaIDs[]',
+                  value: mediaId
+               }).appendTo($(editorForm));
+
+               // Remove element from body.
+               removeImageFromBody($editorFilePreview);
+            })
+            // This will remove the hidden input
+            .on('click.saved-file-reattach', '.editor-file-reattach', function(e) {
+               var $editorFilePreview = $(this).closest('.editor-file-preview');
+               var mediaId = $editorFilePreview.find('input').val();
+
+               // Remove hidden input from form
+               $('#file-remove-' + mediaId).remove();
+
+               // Re-attach
+               insertImageIntoBody($editorFilePreview);
+            });
+         }
+
+         // Clear session preview files--this for main comment box.
+         if (mainCommentBox) {
+            // When closing editor with new uploads in session, typically
+            // commentbox at bottom of discussion, remove the uploads
+            $(editorForm).on('clearCommentForm', function(e) {
+               // Empty out the session previews.
+               $(mainCommentPreviews).empty();
+            });
+         }
+
+         // This will grab all the files--saved and session--currently
+         // attached to a discussion. This is useful to
+         // prevent the same files being uploaded multiple times to the
+         // same discussion. It's better to constrain check to whole
+         // discussion instead of on a per-comment basis, as it's not
+         // useful to have the same file uploaded by multiple users in
+         // a discussion as a whole.
+         var getAllFileNamesInDiscussion = function() {
+            var filesInDiscussion = $('.editor-file-preview');
+            var fileNames = [];
+
+            filesInDiscussion.each(function(i, el) {
+               fileNames.push($(el).find('.filename').text().trim());
+            });
+
+            return fileNames;
+         };
+
+         // Initialize file uploads.
+         //$('.bodybox-wrap').fileupload({
+
+         $(dropZone).each(function(i, el) {
+            var $init = $(this);
+            var cssDropInitClass = 'editor-dropzone-init';
+
+            if (!$(this).hasClass(cssDropInitClass)) {
+               $(this).addClass(cssDropInitClass);
+
+               if ($init[0].contentWindow) {
+                  $init = $init[0].contentWindow;
+               }
+            } else {
+               console.log('doubling up:');
+               console.log($(this));
+            }
+
+            // Attach voodoo to dropzone.
+            $(this).fileupload({
+
+               // Options
+               url: '/post/editorupload',
+               paramName: editorFileInputName,
+               dropZone: $init,
+               forceIframeTransport: false,
+               dataType: 'json',
+               progressInterval: 25,
+               autoUpload: true,
+
+               // Fired on entire drop, and contains entire batch.
+               drop: function (e, data) {
+                  // Save original title for progress meter title percentages.
+                  documentTitle = document.title;
+
+                  // This is from PHP's max_file_uploads setting
+                  if (data.files.length > maxFileUploads) {
+                     var message = 'You cannot upload more than '+ maxFileUploads +' files at once.';
+                     gdn.informMessage(message);
+                     return false;
+                  }
+               },
+
+               // Where to process and validate files.
+               add: function(e, data) {
+                  if (data.autoUpload
+                  || (data.autoUpload !== false
+                  && $(this).fileupload('option', 'autoUpload'))) {
+                     data.process().done(function () {
+                        // Single upload per request, files[] is always
+                        // going to be an array of 1.
+                        var file = data.files[0];
+                        var type = file.type.split('/').pop();
+                        var filename = file.name;
+                        var extension = filename.split('.').pop();
+                        var allowedExtensions = JSON.parse(allowedFileExtensions);
+
+                        var validSize = (file.size <= maxUploadSize)
+                           ? true
+                           : false;
+
+                        // Check against provided file type and file extension.
+                        var validFile = ($.inArray(type, allowedExtensions) > -1 && $.inArray(extension, allowedExtensions) > -1)
+                           ? true
+                           : false;
+
+                        // Check if the file is already a part of the
+                        // discussion--that is, already uploaded to the
+                        // current discussion.
+                        var fileAlreadyExists = ($.inArray(filename, getAllFileNamesInDiscussion()) > -1)
+                           ? true
+                           : false;
+
+                        if (validSize && validFile && !fileAlreadyExists) {
+                           data.submit();
+                        } else {
+                           // File dropped is not allowed!
+                           var message = '"'+ filename +'" ';
+
+                           if (!validFile) {
+                              message += 'is not allowed';
+                           }
+
+                           if (!validSize) {
+                              if (!validFile) {
+                                 message += ' and ';
+                              }
+                              message += 'is too large (max '+ maxUploadSize +' bytes)';
+                           }
+
+                           if (fileAlreadyExists) {
+                              message += 'is already in this discussion. It will not be uploaded again';
+                           }
+
+                           gdn.informMessage(message +'.');
+                        }
+                     });
+                  }
+               },
+
+               // Fired on every file.
+               //send: function(e, data) {},
+
+               // There is also `progress` per file upload.
+               progressall: function (e, data) {
+                  var progress = parseInt(data.loaded / data.total * 100, 10);
+                  var $progressMeter = $(this).closest('form').find('.editor-upload-progress');
+                  document.title = '('+ progress + '%) ' + documentTitle;
+                  $progressMeter.css({
+                     'width': progress + '%'
+                  });
+               },
+
+               // Fired on successful upload
+               done: function (e, data) {
+
+                  var result = data.result;
+
+                  if (!result.error) {
+                     var payload = result.payload;
+
+                     // If has thumbnail, display it instead of generic file icon.
+                     var filePreviewCss = (payload.thumbnail_url)
+                        ? '<i class="file-preview img" style="background-image: url('+ payload.thumbnail_url +')"></i>'
+                        : '<i class="file-preview icon icon-file"></i>';
+
+                     // If it's an image, then indicate that it's been embedded
+                     // in the post
+                     var imageEmbeddedText = (payload.thumbnail_url)
+                        ? ' &middot; <em title="This image has been inserted into the body of text.">inserted</em>'
+                        : '';
+
+                     var html = ''
+                     + '<div class="editor-file-preview" id="media-id-'+ payload.MediaID +'" title="'+ payload.Filename +'">'
+                     + '<input type="hidden" name="MediaIDs[]" value="'+ payload.MediaID +'" />'
+                     + filePreviewCss
+                     + '<div class="file-data">'
+                     + '<a class="filename" data-type="'+payload.type+'" data-width="'+payload.original_width+'" data-height="'+payload.original_height+'" href="'+ payload.original_url +'" target="_blank">'+ payload.Filename + '</a>'
+                     + '<span class="meta">' + payload.FormatFilesize + imageEmbeddedText + '</span>'
+                     + '</div>'
+                     + '<span class="editor-file-remove" title="Remove file"></span>'
+                     + '<span class="editor-file-reattach" title="Click to re-attach \''+ payload.Filename +'\'"></span>'
+                     + '</div>';
+
+
+                     // Editor upload previews is getting found above, and
+                     // does not change per upload dropzone, which causes
+                     // files to preview on the last found preview zone.
+                     $editorUploadPreviews = $(this).closest('form').find('.editor-upload-previews');
+
+                     // Add file blocksjust below editor area for easy removal
+                     // and preview.
+                     // Find it here.
+                     $editorUploadPreviews.append(html);
+
+                     // If photo, insert directly into editor area.
+                     if (payload.type.toLowerCase().indexOf('image') > -1) {
+                        // Determine max height for sample. They can resize it
+                        // afterwards.
+                        var maxHeight = (payload.original_height >= 400)
+                           ? 400
+                           : payload.original_height;
+
+                        var imgTag = buildImgTag(payload.original_url);
+
+                        if (handleIframe) {
+                           editor.focus();
+                           editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
+                           var newHeight = parseInt($(iframeElement).css('min-height')) + payload.original_height + 'px';
+                           $(iframeElement).css('min-height', newHeight);
+                        } else {
+                           try {
+                              // i don't know why adding [0] to this when iframe
+                              // matters, and clear up part of t problem.
+                           $(editor).replaceSelectedText(imgTag + '\n');
+                           } catch(ex){}
+                        }
+                     }
+                  }
+               },
+
+               // Called after every file upload in a session
+               // Typically this is fired due to 400 bad request, because
+               // the file was probably not allowed, but passed client checks.
+               // That would tend to mean the client checks need to be updated.
+               fail: function(e, data) {
+                  var filename = data.files[0].name;
+                  var message = '"'+ filename +'" could not be uploaded.'
+                  gdn.informMessage(message);
+               },
+
+               // Called regardless of success or failure.
+               //always: function(e, data) {},
+
+               // This is the last event that fires, and it's only fired once.
+               // Note, sometimes the upload progress meter never reaches the
+               // end, so this would be a good place to clear it as a backup.
+               stop: function(e) {
+                  var $progressMeter = $(this).closest('form').find('.editor-upload-progress');
+
+                  // If progress meter didn't reach the end, force it.
+                  $progressMeter.css({
+                     'width': '100%'
+                  });
+
+                  $progressMeter.addClass('fade-out');
+
+                  // Transition inserted above is 400ms, so remove it shortly
+                  // after.
+                  setTimeout(function() {
+                     // Restore original document title
+                     document.title = documentTitle;
+                     // Remove transition class
+                     $progressMeter.removeClass('fade-out');
+                     // Reset width
+                     $progressMeter.css({
+                        'width': 0
+                     });
+                  }, 710);
+               }
+            });
+         });
       };
 
       /**
@@ -1291,6 +1755,13 @@
                          var iframe = $(editor.composer.iframe);
                          var iframe_body = iframe.contents().find('body')[0];
                          atCompleteInit(iframe_body, iframe[0]);
+
+
+                         // Enable file uploads. Pass the iframe as the
+                         // drop target in wysiwyg, while the regular editor
+                         // modes will just require the standard textarea
+                         // element.
+                         fileUploadsInit(iframe, editor);
                       });
 
 
@@ -1393,6 +1864,9 @@
 
                       // Enable at-suggestions
                       atCompleteInit($currentEditableTextarea, '');
+
+                      // Enable file uploads
+                      fileUploadsInit($currentEditableTextarea, '');
                    });
                    break;
 

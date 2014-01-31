@@ -1,0 +1,246 @@
+.bodybox-wrap {
+   position: relative;
+}
+
+.editor-upload-progress {
+   position: absolute;
+   width: 0%;
+   overflow: hidden;
+   background-color: red;
+   margin: -1px 0 0 0;
+   width: 0;
+   height: 3px;
+   opacity: 1;
+}
+
+.editor-upload-progress.fade-out {
+   opacity: 0;
+   transition: opacity 0.7s ease;
+}
+
+.editor-drop-cue {
+   .BodyBox,
+   iframe {
+      border: 2px dashed rgba(0,0,0,0.25) !important;
+      border-radius: 2px !important;
+   }
+}
+
+.editor-upload-attention {
+   display: none;
+   position: absolute;
+   top: 15px;
+   width: 120px;
+   left: 50%;
+   margin-left: -60px;
+   text-align: center;
+   font-size: 18px;
+   color: #fff;
+   text-shadow: 0 0 1px rgba(0,0,0,0.4);
+   padding: 10px 0;
+   background-color: rgba(0,0,0,0.60);
+   border-radius: 2px;
+   box-shadow: 0 0 5px 0 rgba(0,0,0,0.20);
+   pointer-events: none;
+}
+
+.editor-drop-cue .editor-upload-attention {
+   display: block;
+}
+
+/* If editor is fullpage */
+#editor-fullpage-candidate {
+
+   .editor-upload-progress {
+      margin: 0;
+   }
+
+   .editor-upload-attention {
+      top: 60px;
+   }
+}
+
+.editor-upload-previews,
+.editor-upload-saved {
+   overflow: hidden;
+   padding: 5px;
+   margin: 0 -10px;
+   box-sizing: border-box;
+   position: relative;
+   z-index: 10;
+}
+
+.editor-file-preview {
+   box-sizing: border-box;
+   border-radius: 2px;
+   border: 1px solid #fff;
+   box-shadow: 0 0 2px 0 rgba(0,0,0,0.20);
+   background-color: #eaeaea; /*rgba(0,0,0,0.05);*/
+   padding: 0;
+   margin: 5px;
+   float: left;
+   overflow: hidden;
+   width: 220px;
+   font-size: 12px;
+   position: relative;
+   color: #999;
+   text-shadow: 0 0 1px #fff;
+
+   /* This is for the transition when removing/reattaching files. Height
+   is necessary due to floated elements and width, which cause them to
+   occupy space under image until width is full. */
+   transition: all 0.1s ease;
+   height: 32px;
+
+   -webkit-animation-duration: 0.8s;
+   -webkit-animation-name: editor-file-preview;
+   -webkit-animation-fill-mode: both;
+   -webkit-animation-duration: 0.4s;
+   animation-duration: 0.8s;
+   animation-name: editor-file-preview;
+   animation-fill-mode: both;
+   animation-duration: 0.4s;
+
+   .file-preview {
+      display: block;
+      float: left;
+      height: 32px;
+      width: 32px;
+
+      &.img {
+         padding: 0;
+         background-position: center;
+         background-size: 50px auto;
+      }
+
+      &.icon-file {
+         padding: 4px 0 0 0;
+         text-align: center;
+         font-size: 18px;
+      }
+   }
+
+   .file-data {
+      float: left;
+      margin: 0 0 0 5px;
+      padding: 0;
+      width: 158px;
+
+      .filename {
+         display: block;
+         width: 100%;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         white-space: nowrap;
+         margin: -2px 0 -8px 0;
+         color: rgba(0,0,0,0.75);
+      }
+
+      .meta {
+         display: block;
+         font-size: 10px;
+         margin: 0;
+
+         em {
+            font-style: italic;
+         }
+      }
+   }
+
+   .editor-file-remove {
+      cursor: pointer;
+   }
+
+   .editor-file-remove:after {
+      display: block;
+      content: '\00D7';
+      float: right;
+      cursor: pointer;
+      font-size: 10px;
+      text-align: center;
+      width: 22px;
+      height: 28px;
+      padding: 4px 0 0 1px;
+      background-color: #fff;
+      box-shadow: inset 2px 0 2px -3px #000;
+   }
+
+   .editor-file-remove:hover:after {
+      text-shadow: 0 0 1px rgba(0,0,0,0.60);
+      color: #fff;
+      font-weight: bold;
+      font-size: 12px;
+   }
+
+   .editor-file-reattach {
+      display: none;
+   }
+
+   /* File permissions */
+
+   &.file-readonly {
+
+      .file-data {
+         width: 178px;
+      }
+
+      .editor-file-remove,
+      .editor-file-reattach {
+         display: none;
+      }
+   }
+}
+
+/* Any files in this wrapper have no delete options. Only when moved into
+.editor-upload-previews will the options be activated */
+.editor-upload-readonly {
+   .file-data {
+      width: 178px;
+   }
+
+   .editor-file-remove,
+   .editor-file-reattach {
+      display: none;
+   }
+}
+
+
+
+
+.editor-file-removed {
+   width: 32px;
+   height: 32px;
+   opacity: 0.25 !important;
+
+   .editor-file-reattach {
+      display: block;
+      height: 100%;
+      width: 100%;
+      opacity: 0;
+      position: relative;
+      z-index: 10;
+      cursor: pointer;
+   }
+}
+
+@keyframes editor-file-preview {
+   0% {
+     opacity: 0;
+     transform: scale(1.10);
+   }
+   100% {
+      opacity: 1;
+      transform: scale(1);
+   }
+}
+
+@-webkit-keyframes editor-file-preview {
+   0% {
+     opacity: 0;
+     transform: scale(1.10);
+   }
+   100% {
+      opacity: 1;
+      transform: scale(1);
+   }
+}
