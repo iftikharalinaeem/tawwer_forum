@@ -3,7 +3,7 @@
 $PluginInfo['pagetick'] = array(
     'Name' => 'Pagetick',
     'Description' => 'Testing alternate pageview tracking.',
-    'Version' => '1.0.0-beta2',
+    'Version' => '1.0.0-beta3',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -67,7 +67,7 @@ class PageTickPlugin extends Gdn_Plugin {
 <script type="text/javascript">
   (function() {
     var a = document.createElement('script'); a.type = 'text/javascript'; a.async = true;
-    a.src = '/plugins/pagetick/js/imgtick.js';
+    a.src = '/plugins/pagetick/js/track.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(a, s);
   })();
 
@@ -80,14 +80,14 @@ EOT;
    /**
     * @param Gdn_Controller $sender
     */
-   public function Base_Render_Before($sender) {
+   public function Base_render_before($sender) {
       $sender->AddJsFile('pagetick.js', 'plugins/pagetick', array('hint' => 'inline', 'sort' => 1000));
    }
 
    /**
     * @param Gdn_Controller $sender
     */
-   public function RootController_Pagetick_Create($sender) {
+   public function RootController_pagetick_create($sender) {
       if (!$sender->Request->IsPostBack()) {
          throw ForbiddenException('POST');
       }
@@ -97,7 +97,7 @@ EOT;
       $sender->render();
    }
 
-   public function RootController_Pagetickimg_Create($sender) {
+   public function UtilityController_bb_create($sender) {
       $this->tickColumn('CountImgViews');
 
       if (!headers_sent()) {
