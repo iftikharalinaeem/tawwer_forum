@@ -273,7 +273,7 @@ class EditorPlugin extends Gdn_Plugin {
 
       // Filter out disallowed editor actions
       foreach ($allowedEditorActions as $editorAction => $allowed) {
-         if ($allowed) {
+         if ($allowed && isset($editorToolbarAll[$editorAction])) {
             $editorToolbar[$editorAction] = $editorToolbarAll[$editorAction];
          }
       }
@@ -336,11 +336,9 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddJsFile('jquery.atwho.js', 'plugins/editor');
 
       // Fileuploads
-      $c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
+      //$c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
       $c->AddJsFile('jquery.iframe-transport.js', 'plugins/editor');
       $c->AddJsFile('jquery.fileupload.js', 'plugins/editor');
-      //$c->AddJsFile('jquery.fileupload-process.js', 'plugins/editor');
-      //$c->AddJsFile('jquery.fileupload-validate.js', 'plugins/editor');
 
       // Set definitions for JavaScript to read
       $c->AddDefinition('editorVersion',      $this->pluginInfo['Version']);
