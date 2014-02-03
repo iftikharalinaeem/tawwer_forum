@@ -733,6 +733,9 @@ class EditorPlugin extends Gdn_Plugin {
 
    protected function AttachUploadsToComment($Controller, $Type = 'comment') {
 
+      // Uploads branch merged into stage by accident, so remove for now.
+      return;
+
       $param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
       $foreignId = GetValue($param, GetValue(ucfirst($Type), $Controller->EventArguments));
 
