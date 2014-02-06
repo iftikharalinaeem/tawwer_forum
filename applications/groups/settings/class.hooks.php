@@ -109,6 +109,10 @@ class GroupsHooks extends Gdn_Plugin {
       $this->OverridePermissions($Sender);
    }
 
+   public function DiscussionController_Index_Before($Sender) {
+      $this->OverridePermissions($Sender);
+   }
+
    public function DiscussionController_Close_Before($Sender) {
       $this->OverridePermissions($Sender);
    }
@@ -145,6 +149,30 @@ class GroupsHooks extends Gdn_Plugin {
    public function PostController_Discussion_Before($Sender) {
       $GroupID = $Sender->Request->Get('groupid');
 
+      if (!$GroupID)
+         return;
+
+      $Model = new GroupModel();
+      $Group = $Model->GetID($GroupID);
+      if (!$Group)
+         return;
+
+      $Sender->SetData('Group', $Group);
+
+      $Model->OverridePermissions($Group);
+   }
+
+   /**
+    *
+    * @param PostController $Sender
+    * @return type
+    */
+   public function PostController_Comment_Before($Sender) {
+      $DiscussionID = $Sender->Request->Get('discussionid');
+      if (!$DiscussionID)
+         return;
+      $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
+      $GroupID = GetValue('GroupID', $Discussion);
       if (!$GroupID)
          return;
 
