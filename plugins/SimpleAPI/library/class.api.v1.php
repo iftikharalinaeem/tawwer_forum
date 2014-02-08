@@ -45,6 +45,7 @@ class ApiMapper extends SimpleApiMapper {
          'users/notifications'   => 'dashboard/profile/preferences',
          'users/get'             => 'dashboard/profile',
          'users/save'            => 'dashboard/user/save',
+         'users/add'             => 'dashboard/user/save',
          'users/sso'             => 'dashboard/user/sso',
          'users/delete'          => 'dashboard/user/delete2',
          'users/merge'           => 'dashboard/user/merge',

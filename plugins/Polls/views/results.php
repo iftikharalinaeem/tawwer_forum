@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit(); 
+<?php if (!defined('APPLICATION')) exit();
 $Poll = $this->Data('Poll');
 $Anonymous = GetValue('Anonymous', $Poll) || C('Plugins.Polls.AnonymousPolls');
 $CountPollVotes = GetValue('CountVotes', $Poll);
@@ -9,8 +9,8 @@ else:
    // Display the poll
    ?>
    <div class="Poll PollResults Hero">
-      <h2 class="PollQuestion"><?php 
-//         echo Sprite('SpPoll'); 
+      <h2 class="PollQuestion"><?php
+//         echo Sprite('SpPoll');
          echo Gdn_Format::PlainText(GetValue('Name', $Poll, ''));
          echo ' '.Wrap(Plural(GetValue('CountVotes', $Poll), '%s vote', '%s votes'), 'span class="TotalVotes Gloss"');
       ?></h2>
@@ -37,11 +37,16 @@ else:
             <?php if (!$Anonymous && is_array($Votes) && $CountVotes > 0): ?>
             <div class="VoteUsers">
                <span class="PhotoGrid PhotoGridSmall">
-                  <?php 
+                  <?php
                   $MaxLimit = C('Plugins.Polls.MaxShowVotes', 20);
-                  $Max = ($CountVotes > $MaxLimit && $MaxLimit) ? $MaxLimit : $CountVotes;
-                  for ($i = 0; $i < $Max; $i++)
-                     echo UserPhoto($Votes[$i], array('Size' => 'Small'));
+                  $i = 0;
+                  foreach ($Votes as $Vote) {
+                     if ($i >= $MaxLimit)
+                        break;
+
+                     echo UserPhoto($Vote, array('Size' => 'Small'));
+                     $i++;
+                  }
                   ?>
                </span>
                <span class="VoteCount"><?php echo Plural($CountVotes, '%s vote', '%s votes'); ?></span>
