@@ -7,7 +7,13 @@
 
    <div class="Info">
       Use this importer to bulk import CSV files. There is a max filesize of <?php echo C('Garden.Upload.MaxFileSize'); ?>.
+   </div>
 
+   <div class="Info"><strong>Note:</strong> The format of a CSV file should be
+      email,username,status per line, in that order. There should be exactly one comma
+      between each, no trailing comma, with a maximum of three values. Each
+      grouping of three are on their own line. If the CSV file has a header
+      line, check the option below to let the bulk users importer skip it.
    </div>
 
    <?php

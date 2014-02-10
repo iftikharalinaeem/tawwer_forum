@@ -259,7 +259,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          }
 
          // If username is invalid, generate random one and continue processing.
-         if (ValidateUsername($user['username'])) {
+         if (!ValidateUsername($user['username'])) {
             $user['username'] = 'user' . mt_rand(9000,90000);
          }
 
