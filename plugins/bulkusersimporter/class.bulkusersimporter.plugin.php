@@ -258,6 +258,11 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             break;
          }
 
+         // If username is invalid, generate random one and continue processing.
+         if (ValidateUsername($user['username'])) {
+            $user['username'] = 'user' . mt_rand(9000,90000);
+         }
+
          // Check if email in use.
          $check_email = $user_model->GetWhere(array(
              'Email' => $user['email']
