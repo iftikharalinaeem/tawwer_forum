@@ -253,6 +253,11 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
       foreach($imported_users as $user) {
 
+         if (!ValidateEmail($user['email'])) {
+            $fail[] = $user['email'];
+            break;
+         }
+
          // Check if email in use.
          $check_email = $user_model->GetWhere(array(
              'Email' => $user['email']
