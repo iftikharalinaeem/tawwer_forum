@@ -19,7 +19,10 @@ $PluginInfo['bulkusersimporter'] = array(
 class BulkUsersImporterPlugin extends Gdn_Plugin {
 
    private $database_prefix;
-   private $table_name = 'bulk_users_importer';
+   private $table_name = 'BulkUsersImporter';
+
+   public $limit = 2;
+   public $timeout = 1;
 
    public function __construct() {
       $this->database_prefix = Gdn::Database()->DatabasePrefix;
@@ -32,11 +35,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    public function Structure() {
       Gdn::Structure()
          ->Table($this->table_name)
-         ->PrimaryKey('import_id')
-         ->Column('email', 'varchar(200)', true, 'index')
-         ->Column('username', 'varchar(50)', true)
-         ->Column('status', 'varchar(50)', true)
-         ->Column('completed', 'tinyint(1)', 0, 'index')
+         ->PrimaryKey('ImportID')
+         ->Column('Email', 'varchar(200)', true, 'index')
+         ->Column('Username', 'varchar(50)', true)
+         ->Column('Status', 'varchar(50)', true)
+         ->Column('Completed', 'tinyint(1)', 0, 'index')
+         ->Column('Error', 'text', true)
          ->Set();
    }
 
@@ -170,7 +174,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                ESCAPED BY '\\\\'
                LINES TERMINATED BY '$line_termination'
                IGNORE $ignore_line LINES
-                  (email, username, status)
+                  (Email, Username, Status)
                SET completed = 0
          ";
 
@@ -184,6 +188,9 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          } else {
             $results['fail'][$filename] = 'Improperly formatted CSV file';
          }
+
+         // Delete the file
+         unlink($file);
       }
 
       return $results;
@@ -243,29 +250,45 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    public function processUploadedData($sender) {
       $sender->SetData('status', 'Incomplete');
 
+      //$limit = $this->limit;
+
       $bulk_user_importer_model = new Gdn_Model($this->table_name);
-      $imported_users = $bulk_user_importer_model->GetWhere(array('completed' => 0))->ResultArray();
+      $imported_users = $bulk_user_importer_model->GetWhere(array('completed' => 0), '', 'asc', $limit)->ResultArray();
 
       // Will contain array of added user ids.
       $success = array();
       $fail = array();
       $user_model = new UserModel();
 
+
+      /*$result = array(
+          'Count' => 0,
+
+//          'Percent' => 0
+      );
+
+      $complete = 0;
+
+      $count = 0;
+
+      $start_time = time();
+*/
+
       foreach($imported_users as $user) {
 
-         if (!ValidateEmail($user['email'])) {
-            $fail[] = $user['email'];
+         if (!ValidateEmail($user['Email'])) {
+            $fail[] = $user['Email'];
             break;
          }
 
          // If username is invalid, generate random one and continue processing.
-         if (!ValidateUsername($user['username'])) {
-            $user['username'] = 'user' . mt_rand(9000,90000);
+         if (!ValidateUsername($user['Username'])) {
+            $user['Username'] = 'user' . mt_rand(9000,90000);
          }
 
          // Check if email in use.
          $check_email = $user_model->GetWhere(array(
-             'Email' => $user['email']
+             'Email' => $user['Email']
          ))->FirstRow('array');
 
          $unique_email = (count($check_email['Email']))
@@ -274,7 +297,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          // Check if username in use.
          $check_name = $user_model->GetWhere(array(
-             'Name' => $user['username']
+             'Name' => $user['Username']
          ))->FirstRow('array');
 
          $unique_name = (count($check_name['Name']))
@@ -284,7 +307,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          // Add random string to end of name, if not unique. User can log in
          // and change it afterwards.
          if (!$unique_name) {
-            $user['username'] .= '_' . mt_rand(1,500);
+            $user['Username'] .= '_' . mt_rand(1,500);
          }
 
          // If email is already in DB, get the UserID
@@ -292,33 +315,47 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             $user_id = $check_email['UserID'];
          }
 
-         $temp_password = sha1($user['email'] . time());
+         $temp_password = sha1($user['Email'] . time());
 
          // If email is unique, definitely add them, otherwise they just get
          // the welcome email and password reset email.
          if ($unique_email) {
             // Create new user.
             $user_id = $user_model->Save(array(
-                'Name' => $user['username'],
+                'Name' => $user['Username'],
                 'Password' => $temp_password, // This will get reset
-                'Email' => $user['email']
+                'Email' => $user['Email']
             ));
 
             if ($user_id) {
-               $success[$user_id] = $user['email'];
+               $success[$user_id] = $user['Email'];
             } else {
-               $fail[] = $user['email'];
+               //$error_string = $user_model->Validation->ResultsText();
+
+               $fail[] = $user['Email'];
             }
+
+            //$user_model->Validation->Results(true);
          } else {
             // email already exists
-            $success[$user_id] = $user['email'];
+            $success[$user_id] = $user['Email'];
          }
 
          // Email successfully added users, and users who were in the CSV file
          // but already had an account (according to email) with forum.
-         $user_model->SendWelcomeEmail($user_id, ''); // Don't send temp password
-         $user_model->PasswordRequest($user['email']); // Reset current temp password
+         //$user_model->SendWelcomeEmail($user_id, ''); // Don't send temp password
+         $user_model->PasswordRequest($user['Email']); // Reset current temp password
+
+         //$count++;
+
+         /*$current_time = time();
+         if ($current_time - $start_time >= $this->timeout) {
+            $sender->SetData('Partial', true);
+            break;
+         }*/
       }
+
+      //$complete = $count < $limit;
 
       $total_success = count($success);
       $total_fail = count($fail);
@@ -330,5 +367,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       } else {
          $sender->InformMessage('There was a problem processing the data.');
       }
+
+      $sender->Render('Blank', 'Utility', 'Dashboard');
    }
 }
