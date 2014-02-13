@@ -9,11 +9,12 @@
       Use this importer to bulk import CSV files.
    </div>
 
-   <div class="Info"><strong>Note:</strong> The format of a CSV file should be
-      <code>Email,Username,Status</code> per line, in that order. There should be exactly one comma
+   <div class="Info"><strong>Note:</strong> The format of a CSV file must be
+      <code>Email,Username,Status</code> per line, in that order. There must be exactly one comma
       between each, no trailing comma, with a maximum of three values. Each
       grouping of three are on their own line. If the CSV file has a header
-      line, check the option below to let the bulk users importer skip it.
+      line, check the option below to let the importer skip it. <strong>All
+      three parameters are required.</strong>
    </div>
 
    <div class="Info">The third parameter, <code>Status</code>, can have
@@ -79,7 +80,4 @@
    </ul>
 
    <?php echo $this->Form->Close('Start'); ?>
-
-
-   <?php //$this->Cf->Render(); ?>
 </div>
