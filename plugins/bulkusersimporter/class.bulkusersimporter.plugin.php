@@ -16,13 +16,22 @@ $PluginInfo['bulkusersimporter'] = array(
    'SettingsPermission' => 'Garden.Setttings.Manage'
 );
 
+/**
+ * TODO:
+ * - approximate number of jobs necessary to complete an import.
+ * - estimate time per job to process.
+ */
 class BulkUsersImporterPlugin extends Gdn_Plugin {
 
    private $database_prefix;
    private $table_name = 'BulkUsersImporter';
 
-   public $limit = 2;
-   public $timeout = 1;
+   // Grab maximum of 2000 rows, timeout after 20 seconds
+   // It will be asynchronously iterated over until there are no more records.
+   // Modify these values to change how many requests will be sent to server
+   // until job is complete.
+   public $limit = 2000;
+   public $timeout = 20;
 
    public function __construct() {
       $this->database_prefix = Gdn::Database()->DatabasePrefix;
@@ -54,7 +63,6 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
       // Load some assets
       $c = Gdn::Controller();
-      //$c->AddDefinition('readlessMaxHeight', $this->max_height);
       $sender->AddCssFile('bulkusersimporter.css', 'plugins/bulkusersimporter');
       $c->AddJsFile('bulkusersimporter.js', 'plugins/bulkusersimporter');
 
@@ -78,6 +86,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             break;
 
          default:
+            $sender->AddDefinition('maxfilesizebytes', Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize')));
             $sender->Render('settings', '', 'plugins/bulkusersimporter');
             break;
       }
@@ -115,9 +124,27 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          'fail' => array()
       );
 
+      // Create destination path
+      $destination_dir = PATH_UPLOADS . '/csv';
+      TouchFolder($destination_dir);
+
       // Get request data
       $import_files = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, 'import_files', FALSE);
       $post = Gdn::Request()->Post();
+
+      // Validate files
+      $allowed_files = array('csv');
+      $files = array();
+
+      // File that is included by URL, so download.
+      if (!count(array_filter($import_files['size']))) {
+         $url = $post['import_url'];
+         if (in_array(pathinfo($url, PATHINFO_EXTENSION), $allowed_files)) {
+            $path = $destination_dir . '/bulkimport' . time() . '.csv';
+            file_put_contents($path, fopen($url, 'r'));
+            $files[0] = $path;
+         }
+      }
 
       // Determine if CSV has headers by getting state of checkbox
       $ignore_line = (in_array('has_headers', $post['Checkboxes']) && isset($post['has_headers']))
@@ -126,20 +153,13 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
       $maxfilesize_bytes = Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize'));
 
-      // Validate files
-      $allowed_files = array('csv');
-      $files = array();
       // Clean up file array, because PHP sends multiples files in a strange
       // array, also, filter out bad files.
-      for ($i = 0, $l = count($import_files['error']); $i < $l; $i++) {
+      for ($i = 0, $l = count(array_filter($import_files['size'])); $i < $l; $i++) {
          if (!$import_files['error'][$i]
          && $import_files['size'][$i] > 0
          && $import_files['size'][$i] <= $maxfilesize_bytes
          && in_array(pathinfo($import_files['name'][$i], PATHINFO_EXTENSION), $allowed_files)) {
-
-            // Create destination path
-            $destination_dir = PATH_UPLOADS . '/csv';
-            TouchFolder($destination_dir);
             $path = $destination_dir . '/' . $import_files['name'][$i];
             if (move_uploaded_file($import_files['tmp_name'][$i], $path)) {
                // All good, so add to definitive file list.
@@ -150,52 +170,192 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          }
       }
 
-      $db_table = $this->database_prefix . $this->table_name;
-      $pdo = Gdn::Database()->Connection();
+      if (count($files)) {
 
-      // Truncate table before using it.
-      Gdn::Database()->Query("TRUNCATE TABLE $db_table;");
+         $db_table = $this->database_prefix . $this->table_name;
+         $pdo = Gdn::Database()->Connection();
 
-      foreach ($files as $file) {
-         // Get escaped EOL sequence to break on. No need to preg_quote, or
-         // quote string with pdo, as already quoted.
-         $line_termination = $this->getEOLFormat($file);
+         // Truncate table before using it.
+         Gdn::Database()->Query("TRUNCATE TABLE $db_table;");
 
-         // Quote strings for SQL
-         $file_quoted = $pdo->quote($file);
+         foreach ($files as $file) {
+            // Get escaped EOL sequence to break on. No need to preg_quote, or
+            // quote string with pdo, as already quoted.
+            $line_termination = $this->getEOLFormat($file);
 
-         // Determine if file has standard or non-standard line endings
-         $sql = "
-            LOAD DATA INFILE $file_quoted
-               INTO TABLE
-                  $db_table
-               FIELDS TERMINATED BY ','
-               ENCLOSED BY '\"'
-               ESCAPED BY '\\\\'
-               LINES TERMINATED BY '$line_termination'
-               IGNORE $ignore_line LINES
-                  (Email, Username, Status)
-               SET completed = 0
-         ";
+            // Quote strings for SQL
+            $file_quoted = $pdo->quote($file);
 
-         // Use filename for results key
-         $filename = pathinfo($file, PATHINFO_BASENAME);
+            // Determine if file has standard or non-standard line endings
+            $sql = "
+               LOAD DATA INFILE $file_quoted
+                  INTO TABLE
+                     $db_table
+                  FIELDS TERMINATED BY ','
+                  ENCLOSED BY '\"'
+                  ESCAPED BY '\\\\'
+                  LINES TERMINATED BY '$line_termination'
+                  IGNORE $ignore_line LINES
+                     (Email, Username, Status)
+                  SET completed = 0
+            ";
 
-         // Result will contain number of affected rows.
-         $rows_affected = $pdo->exec($sql);
-         if ($rows_affected > 0) {
-            $results['success'][$filename] = $rows_affected;
-         } else {
-            $results['fail'][$filename] = 'Improperly formatted CSV file';
+            // Use filename for results key
+            $filename = pathinfo($file, PATHINFO_BASENAME);
+
+            // There would only be one, so loop is inconsequential.
+            if (isset($url) && $url != '') {
+               $filename = $url;
+            }
+
+            // Result will contain number of affected rows.
+            $rows_affected = $pdo->exec($sql);
+            if ($rows_affected > 0) {
+               $results['success'][$filename] = $rows_affected;
+            } else {
+               $results['fail'][$filename] = 'Improperly formatted CSV file';
+            }
+
+            // Delete the file
+            unlink($file);
          }
-
-         // Delete the file
-         unlink($file);
       }
 
       return $results;
    }
 
+   /**
+    * Loop through the bulk_users_import table and create the members and send
+    * out emails.
+    *
+    * @param SettingsController $sender
+    */
+   public function processUploadedData($sender) {
+      $sender->SetData('status', 'Incomplete');
+
+      $bulk_user_importer_model = new Gdn_Model($this->table_name);
+      $imported_users = $bulk_user_importer_model->GetWhere(array('completed' => 0), '', 'asc', $this->limit)->ResultArray();
+
+      // Will contain array of added user ids.
+      $success = array();
+      $fail = array();
+      $user_model = new UserModel();
+
+      // For byte-size processing
+      $start_time = time();
+      foreach($imported_users as $user) {
+
+         if (!ValidateEmail($user['Email'])) {
+            $fail[$user['Email']] = 'Invalid email';
+            break;
+         }
+
+         // If username is invalid, generate random one and continue processing.
+         if (!ValidateUsername($user['Username'])) {
+            $user['Username'] = 'user' . mt_rand(9000,90000);
+         }
+
+         // Check if username in use.
+         $check_name = $user_model->GetWhere(array(
+             'Name' => $user['Username']
+         ))->FirstRow('array');
+
+         $unique_name = (count($check_name['Name']))
+            ? false
+            : true;
+
+         // Get role ids based off of their name
+         $status = $this->roleNamesToInts($user['Status']);
+
+         if ($status) {
+            $role_ids = $status['role_ids'];
+            $banned = $status['banned'];
+            $user_id = false;
+         } else {
+            // No roles, so bail out.
+            $sender->SetJson('import_id', 0);
+            break;
+         }
+
+         // Username controls, so if it exists, update the info, including
+         // email, otherwise create new user.
+         if (!$unique_name) {
+            // Update the user.
+            $user_id = $user_model->Save(
+               array(
+                'UserID' => $check_name['UserID'],
+                'Email' => $user['Email'],
+                'RoleID' => $role_ids,
+                'Banned' => $banned
+            ), array(
+                'SaveRoles' => true
+            ));
+         } else {
+            // Create new user. The method seems to rely on Captcha keys, so
+            // this may error out due to none being passed to it.
+            $temp_password = sha1($user['Email'] . time());
+
+            // Create new user
+            $user_id = $user_model->Register(
+               array(
+                'Name' => $user['Username'],
+                'Password' => $temp_password, // This will get reset
+                'Email' => $user['Email'],
+                'RoleID' => $role_ids,
+                'Banned' => $banned
+            ), array(
+                'SaveRoles' => true,
+                'CheckCaptcha' => false
+            ));
+         }
+
+         $complete_code = 0; // Error code
+         $error_string = $user_model->Validation->ResultsText();
+
+         if ($user_id) {
+            $success[$user_id] = $user['Email'];
+            $complete_code = 1;
+         } else {
+            $fail[$user['Username']] = $error_string;
+            $complete_code = 2;
+         }
+
+         // Log errors in DB--will be cleared on next import.
+         $bulk_user_importer_model->Update(
+            array(
+               'Completed' => $complete_code,
+               'Error' => $error_string
+            ),
+            array(
+               'ImportID' => $user['ImportID']
+            )
+         );
+         $user_model->Validation->Results(true);
+
+         // Email successfully added users, and users who were in the CSV file
+         // but already had an account (according to email) with forum.
+         //$user_model->SendWelcomeEmail($user_id, ''); // Don't send temp password
+         $user_model->PasswordRequest($user['Email']); // Reset current temp password
+
+         $sender->SetJson('import_id', $user['ImportID']);
+         // If timeout reached, end current operation. It will be called
+         // again immediately to continue processing.
+         if (time() - $start_time >= $this->timeout) {
+            break;
+         }
+      }
+
+      $total_success = count($success);
+      $total_fail = count($fail);
+
+      if ($total_success || $total_fail) {
+         $sender->SetJson('feedback', 'Latest job processed up to row ' . $user['ImportID']);
+      } else {
+         $sender->InformMessage('There was a problem processing the data.');
+      }
+
+      $sender->Render('Blank', 'Utility', 'Dashboard');
+   }
 
    /**
     * Provide function with a file pointer or file path, determine whether
@@ -207,7 +367,6 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
     * @return non-expandable character sequence
     */
    public function getEOLFormat($file_path = '') {
-
       $fp = '';
       // If file pointer passed, use it, otherwise get it.
       if (is_resource($file_path)) {
@@ -242,132 +401,83 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    }
 
    /**
-    * Loop through the bulk_users_import table and create the members and send
-    * out emails.
+    * Converts role names to their corresponding integers.
     *
-    * @param SettingsController $sender
+    * Valid roles: Guest, Unconfirmed, Applicant, Member, Administrator,
+    * Moderator
+    *
+    * Other valid: Banned
+    *
+    * @param string $role_names
+    * @return mixed Will return array of valid role IDs or false if none.
     */
-   public function processUploadedData($sender) {
-      $sender->SetData('status', 'Incomplete');
+   public function roleNamesToInts($role_names) {
+      if (!$role_names) {
+         return false;
+      }
 
-      //$limit = $this->limit;
-
-      $bulk_user_importer_model = new Gdn_Model($this->table_name);
-      $imported_users = $bulk_user_importer_model->GetWhere(array('completed' => 0), '', 'asc', $limit)->ResultArray();
-
-      // Will contain array of added user ids.
-      $success = array();
-      $fail = array();
-      $user_model = new UserModel();
-
-
-      /*$result = array(
-          'Count' => 0,
-
-//          'Percent' => 0
+      $allowed_roles = array(
+         'Guest',
+         'Unconfirmed',
+         'Applicant',
+         'Member',
+         'Administrator',
+         'Moderator',
+         'Banned',
+         'Verified',
+         'Confirmed'
       );
 
-      $complete = 0;
+      $status = array(
+          'role_ids' => array(),
+          'banned' => 0,
+          // These are not coded yet.
+          'confirmed' => 1,
+          'verified' => 1
+      );
 
-      $count = 0;
+      $role_ids = array();
 
-      $start_time = time();
-*/
+      if (is_string($role_names) && !is_numeric($role_names)) {
+         // The $role_names are a colon-delimited list of role names.
+         $role_names = array_map('trim', explode(':', $role_names));
 
-      foreach($imported_users as $user) {
+         // Normalize the roles given, so lowercase all, then capitalize
+         // first letter. If there is no match, it's because the role
+         // provided does not exist.
+         $role_names = array_map('strtolower', $role_names);
+         $role_names = array_map('ucfirst', $role_names);
 
-         if (!ValidateEmail($user['Email'])) {
-            $fail[] = $user['Email'];
-            break;
-         }
-
-         // If username is invalid, generate random one and continue processing.
-         if (!ValidateUsername($user['Username'])) {
-            $user['Username'] = 'user' . mt_rand(9000,90000);
-         }
-
-         // Check if email in use.
-         $check_email = $user_model->GetWhere(array(
-             'Email' => $user['Email']
-         ))->FirstRow('array');
-
-         $unique_email = (count($check_email['Email']))
-            ? false
-            : true;
-
-         // Check if username in use.
-         $check_name = $user_model->GetWhere(array(
-             'Name' => $user['Username']
-         ))->FirstRow('array');
-
-         $unique_name = (count($check_name['Name']))
-            ? false
-            : true;
-
-         // Add random string to end of name, if not unique. User can log in
-         // and change it afterwards.
-         if (!$unique_name) {
-            $user['Username'] .= '_' . mt_rand(1,500);
-         }
-
-         // If email is already in DB, get the UserID
-         if (!$unique_email) {
-            $user_id = $check_email['UserID'];
-         }
-
-         $temp_password = sha1($user['Email'] . time());
-
-         // If email is unique, definitely add them, otherwise they just get
-         // the welcome email and password reset email.
-         if ($unique_email) {
-            // Create new user.
-            $user_id = $user_model->Save(array(
-                'Name' => $user['Username'],
-                'Password' => $temp_password, // This will get reset
-                'Email' => $user['Email']
-            ));
-
-            if ($user_id) {
-               $success[$user_id] = $user['Email'];
-            } else {
-               //$error_string = $user_model->Validation->ResultsText();
-
-               $fail[] = $user['Email'];
+         foreach($role_names as $i => $role_name) {
+            if (!in_array($role_name, $allowed_roles)) {
+               unset($role_names[$i]);
             }
-
-            //$user_model->Validation->Results(true);
-         } else {
-            // email already exists
-            $success[$user_id] = $user['Email'];
          }
 
-         // Email successfully added users, and users who were in the CSV file
-         // but already had an account (according to email) with forum.
-         //$user_model->SendWelcomeEmail($user_id, ''); // Don't send temp password
-         $user_model->PasswordRequest($user['Email']); // Reset current temp password
+         if (!count($role_names)) {
+            return false;
+         }
 
-         //$count++;
-
-         /*$current_time = time();
-         if ($current_time - $start_time >= $this->timeout) {
-            $sender->SetData('Partial', true);
-            break;
-         }*/
+         $role_model = new Gdn_Model('Role');
+         $role_ids = $role_model->SQL
+            ->Select('r.RoleID')
+            ->From('Role r')
+            ->WhereIn('r.Name', $role_names)
+            ->Get()->ResultArray();
+         $role_ids = ConsolidateArrayValuesByKey($role_ids, 'RoleID');
       }
 
-      //$complete = $count < $limit;
-
-      $total_success = count($success);
-      $total_fail = count($fail);
-
-      if ($total_success || $total_fail) {
-         $feedback = 'Processing complete: ' . $total_success . ' users added, ' . $total_fail . ' users skipped (may already exist, or data was corrupt).';
-         $sender->SetData('status', 'Complete');
-         $sender->JsonTarget('#process-csvs', $feedback, 'ReplaceWith');
-      } else {
-         $sender->InformMessage('There was a problem processing the data.');
+      if (!is_array($role_ids)) {
+         $role_ids = array($role_ids);
       }
 
-      $sender->Render('Blank', 'Utility', 'Dashboard');
+      $status['role_ids'] = $role_ids;
+
+      // Check if user is banned
+      if (in_array('Banned', $role_names)) {
+         $status['banned'] = 1;
+      }
+
+      return $status;
    }
 }

@@ -6,26 +6,68 @@
    </h1>
 
    <div class="Info">
-      Use this importer to bulk import CSV files. There is a max filesize of <?php echo C('Garden.Upload.MaxFileSize'); ?>.
+      Use this importer to bulk import CSV files.
    </div>
 
    <div class="Info"><strong>Note:</strong> The format of a CSV file should be
-      email,username,status per line, in that order. There should be exactly one comma
+      <code>Email,Username,Status</code> per line, in that order. There should be exactly one comma
       between each, no trailing comma, with a maximum of three values. Each
       grouping of three are on their own line. If the CSV file has a header
       line, check the option below to let the bulk users importer skip it.
    </div>
 
+   <div class="Info">The third parameter, <code>Status</code>, can have
+      multiple items. These items must be separated by a colon <code>:</code>. Valid
+      statuses are: Guest, Unconfirmed, Applicant, Member, Administrator,
+      Moderator, Banned.
+   </div>
+
+   <h3>Example contents of CSV file:</h3>
+
+   <div class="Info">
+      This example contains five lines. The first line has headers. Headers
+      do not need to be present. If they are, check the option below so the
+      importer can skip that line. The importer will fail if the syntax of the
+      CSV file does not match the syntax in the example.
+
+   <pre>
+   Email,Username,Status
+   john@example.com,johnny,Member
+   paul@example2.com,paul,Member:Moderator
+   kenny@example3.com,ken,Member:Banned
+   tywin@example4.com,lanman,Member:Administrator:Moderator</pre>
+   </div>
+
+
+   <h3>Upload CSV file or link to CSV file:</h3>
+
    <?php
-      echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => '/settings/bulkusersimporter/upload'));
+      echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => '/settings/bulkusersimporter/upload', 'id' => 'bulk-importer-form'));
       echo $this->Form->Errors();
    ?>
 
+   <div class="Info">
+      Upload a CSV file or provide the URL to a CSV file. If both inputs are filled, the
+      uploaded file takes precedence. There is a max filesize of
+      <?php echo C('Garden.Upload.MaxFileSize'); ?> for the upload component.
+      The file size limit for a URL is higher.
+   </div>
 
-   <ul>
-      <li>
+   <ul id="bulk-importer-list">
+      <li id="bulk-importer-validation-feedback">
+         yoooo
+      </li>
+      <li id="bulk-importer-file-download">
          <?php
+            echo $this->Form->Label('Upload CSV:', 'import_files');
             echo $this->Form->Input('import_files[]', 'file', array('multiple' => 'multiple'));
+         ?>
+      </li>
+
+      <li id="bulk-importer-file-url">
+         <?php
+            echo $this->Form->Label('Or download CSV from URL:', 'import_url');
+            echo $this->Form->Input('import_url', 'text');
          ?>
       </li>
 
