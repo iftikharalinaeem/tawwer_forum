@@ -772,7 +772,7 @@ class ValentinesPlugin extends Gdn_Plugin {
       $TimeFormat = implode(', ', $TimeFormat);
 
       $InstructionMessage = <<<VALENTINES
-User [b]@"{Player.Name}"[/b], welcome to the {Year} Valentines Day Empathy Chip Calibration Exercise. Your actions will be monitored and disected, and the results will be added to our knowledgebase of organic behaviour.
+User [b]@"{Player.Name}"[/b], welcome to the {Year} Valentines Day Empathy Chip Calibration Exercise. Your actions will be monitored and dissected, and the results will be added to our knowledgebase of organic behaviour.
 
 Your partner is [b]@"{Desired.Name}"[/b]. Your task is to reply to this PM with an affectionate Valentines Day message intended for your partner.
 
