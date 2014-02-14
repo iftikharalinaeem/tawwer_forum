@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.1.11',
+   'Version' => '1.2.10a',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -261,9 +261,7 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['emoji'] = array('edit' => 'media', 'action'=> 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => T('Emoji'), 'data-editor' => '{"action":"emoji","value":""}'));
       $editorToolbarAll['links'] = array('edit' => 'media', 'action'=> 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link', 'data-wysihtml5-command' => 'createLink', 'title' => T('Url'), 'data-editor' => '{"action":"url","value":""}'));
       $editorToolbarAll['images'] = array('edit' => 'media', 'action'=> 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => T('Image'), 'data-editor' => '{"action":"image","value":""}'));
-
-      // Temp hide for stage, as it shouldn't be in stage yet.
-      //$editorToolbarAll['uploads'] = array('edit' => 'media', 'action'=> 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-paper-clip editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => T('Upload'), 'data-editor' => '{"action":"upload","value":""}'));
+      $editorToolbarAll['uploads'] = array('edit' => 'media', 'action'=> 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-paper-clip editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => T('Upload'), 'data-editor' => '{"action":"upload","value":""}'));
 
       $editorToolbarAll['sep-align'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-align hidden-xs'));
       $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action'=> 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyLeft', 'title' => T('Align left'), 'data-editor' => '{"action":"alignleft","value":""}'));
@@ -301,24 +299,24 @@ class EditorPlugin extends Gdn_Plugin {
    }
 
    /**
-	 * Replace emoticons in comment preview.
-	 */
-	public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
-		if (Emoji::instance()->enabled) {
+   * Replace emoticons in comment preview.
+   */
+  public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
+    if (Emoji::instance()->enabled) {
          $Sender->Comment->Body = Emoji::instance()->translateToHtml($Sender->Comment->Body);
       }
-	}
+  }
 
    /**
-	 * Replace emoticons in comments.
-	 */
-	public function Base_AfterCommentFormat_Handler($Sender) {
-		if (Emoji::instance()->enabled) {
+   * Replace emoticons in comments.
+   */
+  public function Base_AfterCommentFormat_Handler($Sender) {
+    if (Emoji::instance()->enabled) {
          $Object = $Sender->EventArguments['Object'];
          $Object->FormatBody = Emoji::instance()->translateToHtml($Object->FormatBody);
          $Sender->EventArguments['Object'] = $Object;
       }
-	}
+  }
 
 
    /**
@@ -340,11 +338,9 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddJsFile('jquery.atwho.js', 'plugins/editor');
 
       // Fileuploads
-      $c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
+      //$c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
       $c->AddJsFile('jquery.iframe-transport.js', 'plugins/editor');
       $c->AddJsFile('jquery.fileupload.js', 'plugins/editor');
-      //$c->AddJsFile('jquery.fileupload-process.js', 'plugins/editor');
-      //$c->AddJsFile('jquery.fileupload-validate.js', 'plugins/editor');
 
       // Set definitions for JavaScript to read
       $c->AddDefinition('editorVersion',      $this->pluginInfo['Version']);
@@ -735,9 +731,6 @@ class EditorPlugin extends Gdn_Plugin {
 
    protected function AttachUploadsToComment($Controller, $Type = 'comment') {
 
-      // Uploads branch merged into stage by accident, so remove for now.
-      return;
-
       $param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
       $foreignId = GetValue($param, GetValue(ucfirst($Type), $Controller->EventArguments));
 
@@ -903,12 +896,12 @@ class EditorPlugin extends Gdn_Plugin {
 
 
    /**
-	 * Every time editor plugin is enabled, disable other known editors that
+   * Every time editor plugin is enabled, disable other known editors that
     * may clash with this one. If editor is loaded, then thes other
     * editors loaded after, there are CSS rules that hide them. This way,
     * the editor plugin always takes precedence.
-	 */
-	public function Setup() {
+   */
+  public function Setup() {
       $pluginEditors = array(
           'cleditor',
           'ButtonBar',
@@ -922,13 +915,13 @@ class EditorPlugin extends Gdn_Plugin {
       SaveToConfig(array(
          'Plugins.editor.ForceWysiwyg' => false
       ));
-	}
+  }
 
    public function OnDisable() {
-		//RemoveFromConfig('Plugin.editor.DefaultView');
-	}
+    //RemoveFromConfig('Plugin.editor.DefaultView');
+  }
 
    public function CleanUp() {
-		//RemoveFromConfig('Plugin.editor.DefaultView');
-	}
+    //RemoveFromConfig('Plugin.editor.DefaultView');
+  }
 }

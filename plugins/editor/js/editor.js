@@ -1024,15 +1024,6 @@
       // on Tim Down's rangyinputs (originally loaded for buttonbarplus).
       var fileUploadsInit = function(dropElement, editorInstance) {
 
-         // For some reason, feature/editor2-fileuploads got merged into stage,
-         // and the fileuploads are not completely done. They work, but the
-         // generate_thumbnail.php is not added yet, and there are a couple
-         // minor bugs that should be fixed. I'm removing file uploads from
-         // stage for now. Maybe I merged it, but I don't remember. It
-         // probably got accidentally squash merged during the jquery-upgrade
-         // merges.
-         return;
-
          // Disable default browser behaviour of file drops
          $(document).on('drop dragover', function(e) {
             e.preventDefault();
