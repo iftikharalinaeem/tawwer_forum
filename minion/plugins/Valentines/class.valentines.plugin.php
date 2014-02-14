@@ -934,8 +934,6 @@ VALENTINES;
     * @param interger $DesiredUserID
     */
    public function Expire(&$User, $DesiredUserID) {
-      $Valentines = $this->Minion->Monitoring($User, 'Valentines');
-      $DesiredUserID = GetValue('DesiredUserID', $Valentines);
       $DesiredUser = Gdn::UserModel()->GetID($DesiredUserID);
 
       // Punish
