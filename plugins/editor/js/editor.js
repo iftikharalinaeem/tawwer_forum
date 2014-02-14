@@ -885,6 +885,15 @@
                      regexp = new RegExp(">\\s*(\\w*)(" + query.replace("+", "\\+") + ")(\\w*)\\s*(\\s+.+)?<", 'ig');
                      // Capture group 4 for possible spaces
                      return li.replace(regexp, function(str, $1, $2, $3, $4) {
+                        // Weird Chrome behaviour, so check for undefined, then
+                        // set to empty string if so.
+                        if (typeof $3 == 'undefined') {
+                           $3 = '';
+                        }
+                        if (typeof $4 == 'undefined') {
+                           $4 = '';
+                        }
+
                         return '> ' + $1 + '<strong>' + $2 + '</strong>' + $3 + $4 + ' <';
                      });
                   },
