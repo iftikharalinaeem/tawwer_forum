@@ -1850,6 +1850,13 @@ STATISTICS;
     * INTERCEPT REACTIONS
     */
 
+
+   public function ReactionModel_GetReaction_Handler($sender, $args) {
+      $reactionType = &$args['ReactionType'];
+      if (!in_array($reactionType['UrlCode'], array('ShootArrow', 'Affectionate', 'Unimpressive'))) return;
+      $reactionType['Active'] = true;
+   }
+
    /**
     * Handle Valentines reactions
     *
