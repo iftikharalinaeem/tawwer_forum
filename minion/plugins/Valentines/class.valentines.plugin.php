@@ -1059,7 +1059,7 @@ EXTENDEDVALENTINES;
          $EndVoteMessage = FormatString(T($EndVoteMessage), array(
             'Player'    => $Author,
             'Badge'     => $Badge,
-            'BadgeWord' => T('badge'),
+            'BadgeWord' => strtolower(T('Badge')),
             'BadgeUrl'  => Anchor($Badge['Name'], CombinePaths(array('badge',$Badge['BadgeID'])))
          ));
       } elseif ($Voting['Score'] < 0) {
@@ -1075,7 +1075,7 @@ EXTENDEDVALENTINES;
          $EndVoteMessage = FormatString(T($EndVoteMessage), array(
             'Player'    => $Author,
             'Badge'     => $Badge,
-            'BadgeWord' => T('badge'),
+            'BadgeWord' => strtolower(T('Badge')),
             'BadgeUrl'  => Anchor($Badge['Name'], CombinePaths(array('badge',$Badge['BadgeID'])))
          ));
       } else {
@@ -1476,7 +1476,9 @@ STATISTICS;
 
          if (sizeof($ShotArrows)) {
             $Targets = array();
+            $ArrowLimit = strtotime('February 13th');
             foreach ($ShotArrows as $Arrow => $ArrowValue) {
+               if ($ArrowValue < $ArrowLimit) continue;
                $Matched = preg_match('`([\d]+)\.([\d]+)\.([\d]+)`i', $Arrow, $ArrowInfo);
                if (!$Matched) continue;
 
@@ -1520,6 +1522,7 @@ STATISTICS;
          // Extended list
          if (preg_match('`(extended)`i', $MessageBody)) {
 
+            $ArrowLimit = strtotime('February 13th');
             $WildShotByArrowKey = FormatString(self::ARROW_RECORD, array(
                'UserID'    => $AuthorID,
                'Count'     => '%',
@@ -1528,6 +1531,7 @@ STATISTICS;
             $ShotByArrows = Gdn::SQL()->Select('*')
                ->From('UserMeta')
                ->Like('Name', $WildShotByArrowKey)
+               ->Where('Value>', $ArrowLimit)
                ->Get()->ResultArray();
 
             $Shooters = array();
