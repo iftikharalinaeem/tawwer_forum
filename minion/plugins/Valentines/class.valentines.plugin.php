@@ -731,18 +731,21 @@ class ValentinesPlugin extends Gdn_Plugin {
          ->Like('Name', $ArrowMetaKey)
          ->Get()->ResultArray();
 
-      $NumArrows = sizeof($Arrows);
       $PairedUser = NULL;
-      if ($NumArrows) {
-         $ArrowNumber = mt_rand(0, $NumArrows-1);
-         $Arrow = $Arrows[$ArrowNumber];
+      while (!$PairedUser && sizeof($Arrows)) {
+         shuffle($Arrows);
+         $Arrow = array_pop($Arrows);
 
          $PairedUserID = GetValue('UserID', $Arrow);
-         $PairedUser = Gdn::UserModel()->GetID($PairedUserID, DATASET_TYPE_ARRAY);
-         $PairedValentines = $this->Minion->Monitoring($PairedUser, 'Valentines', array());
-      } else {
-         return;
+         $TestUser = Gdn::UserModel()->GetID($PairedUserID, DATASET_TYPE_ARRAY);
+         if ($TestUser['Banned'] || $TestUser['Jailed']) continue;
+         $PairedUser = $TestUser;
       }
+
+      if (!$PairedUser && !sizeof($Arrows))
+         return;
+
+      $PairedValentines = $this->Minion->Monitoring($PairedUser, 'Valentines', array());
 
       // Desired Badge
       $DesiredBadge = $this->BadgeModel->GetID('desirable');
