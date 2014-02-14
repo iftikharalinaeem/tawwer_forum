@@ -79,5 +79,9 @@
       </li>
    </ul>
 
+   <div class="Info">
+      <strong>Note:</strong> All valid imported users will receive an email with instructions on signing in.
+   </div>
+
    <?php echo $this->Form->Close('Start'); ?>
 </div>
