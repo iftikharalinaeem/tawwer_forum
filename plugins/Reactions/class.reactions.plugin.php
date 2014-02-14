@@ -16,7 +16,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.2.11',
+   'Version' => '1.2.12',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -339,6 +339,8 @@ class ReactionsPlugin extends Gdn_Plugin {
          throw PermissionException('Javascript');
 
       $ReactionType = ReactionModel::ReactionTypes($Reaction);
+      $Sender->EventArguments['ReactionType'] = &$ReactionType;
+      $Sender->FireAs('ReactionModel')->FireEvent('GetReaction');
 
       // Only allow enabled reactions
       if (!GetValue('Active', $ReactionType)) {

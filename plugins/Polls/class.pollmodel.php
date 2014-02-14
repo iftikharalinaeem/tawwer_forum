@@ -12,36 +12,36 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  *
  * @package Vanilla
  */
- 
+
 /**
  * Manages poll discussions.
  */
 class PollModel extends Gdn_Model {
-   
+
    /**
     * Class constructor. Defines the related database table name.
-    * 
+    *
     * @since 2.0.0
     * @access public
     */
    public function __construct() {
       parent::__construct('Poll');
    }
-   
+
    /**
     * Get the poll info based on the associated discussion id.
     * @param int $DiscussionID
-    * @return array 
+    * @return array
     */
    public function GetByDiscussionID($DiscussionID) {
       return $this->GetWhere(array('DiscussionID' => $DiscussionID))->FirstRow();
    }
-   
+
    /**
-    * Returns an array of UserID => PollVote/PollOption info. Used to display a 
+    * Returns an array of UserID => PollVote/PollOption info. Used to display a
     * users vote on their comment in a discussion.
     * @param int $PollID
-    * @param array $UserIDs 
+    * @param array $UserIDs
     * @return array array of UserID => PollVote/PollOptions.
     */
    public function GetVotesByUserID($PollID, $UserIDs) {
@@ -52,7 +52,7 @@ class PollModel extends Gdn_Model {
          ->WhereIn('pv.UserID', $UserIDs)
          ->Where('po.PollID', $PollID)
          ->Get();
-      
+
       $Return = array();
       foreach ($Data as $Row) {
          $Return[GetValue('UserID', $Row)] = array(
@@ -64,7 +64,7 @@ class PollModel extends Gdn_Model {
       }
       return $Return;
    }
-   
+
    /**
     * Inserts a new poll returns the discussion id.
     */
@@ -78,24 +78,24 @@ class PollModel extends Gdn_Model {
       $FormPostValues['Type'] = 'poll'; // Force the "poll" discussion type.
       $DiscussionID = 0;
       $DiscussionModel = new DiscussionModel();
-      
+
       // Make the discussion body not required while creating a new poll.
       // This saves in memory, but not to the file:
-      SaveToConfig('Vanilla.DiscussionBody.Required', FALSE, array('Save' => FALSE)); 
-      
+      SaveToConfig('Vanilla.DiscussionBody.Required', FALSE, array('Save' => FALSE));
+
       // Define the primary key in this model's table.
       $this->DefineSchema();
-      
-      // Add & apply any extra validation rules:    
-      
+
+      // Add & apply any extra validation rules:
+
       // New poll? Set default category ID if none is defined.
       if (!ArrayValue('DiscussionID', $FormPostValues, '')) {
          if (!GetValue('CategoryID', $FormPostValues) && !C('Vanilla.Categories.Use')) {
             $FormPostValues['CategoryID'] = GetValue('CategoryID', CategoryModel::DefaultCategory(), -1);
          }
       }
-      
-      // This should have been done in discussion model: 
+
+      // This should have been done in discussion model:
       // Validate category permissions.
       $CategoryID = GetValue('CategoryID', $FormPostValues);
       if ($CategoryID > 0) {
@@ -103,7 +103,7 @@ class PollModel extends Gdn_Model {
          if ($Category && !$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', GetValue('PermissionCategoryID', $Category)))
             $this->Validation->AddValidationResult('CategoryID', 'You do not have permission to create polls in this category');
       }
-      
+
       // This should have been done in discussion model:
       // Make sure that the title will not be invisible after rendering
       $Name = trim(GetValue('Name', $FormPostValues, ''));
@@ -113,22 +113,22 @@ class PollModel extends Gdn_Model {
          // Trim the name.
          $FormPostValues['Name'] = $Name;
       }
-      
+
       $this->EventArguments['FormPostValues'] = &$FormPostValues;
 		$this->EventArguments['DiscussionID'] = $DiscussionID;
 		$this->FireAs('DiscussionModel')->FireEvent('BeforeSaveDiscussion');
 
       // Validate the discussion model's form fields
       $DiscussionModel->Validate($FormPostValues, TRUE);
-      
+
       // Unset the body validation results (they're not required).
       $DiscussionValidationResults = $DiscussionModel->Validation->Results();
       if (array_key_exists('Body', $DiscussionValidationResults))
          unset($DiscussionValidationResults['Body']);
-      
+
       // And add the results to this validation object so they bubble up to the form.
-      $this->Validation->AddValidationResult($DiscussionValidationResults); 
-      
+      $this->Validation->AddValidationResult($DiscussionValidationResults);
+
       // Are there enough non-empty poll options?
       $PollOptions = GetValue('PollOption', $FormPostValues);
       $ValidPollOptions = array();
@@ -138,13 +138,13 @@ class PollModel extends Gdn_Model {
             if ($PollOption != '')
                $ValidPollOptions[] = $PollOption;
          }
-      
+
       $CountValidOptions = count($ValidPollOptions);
       if ($CountValidOptions < 2)
          $this->Validation->AddValidationResult('PollOption', 'You must provide at least 2 valid poll options.');
       if ($CountValidOptions > 10)
          $this->Validation->AddValidationResult('PollOption', 'You can not specify more than 10 poll options.');
-      
+
       // If all validation passed, create the discussion with discmodel, and then insert all of the poll data.
       if (count($this->Validation->Results()) == 0) {
          $DiscussionID = $DiscussionModel->Save($FormPostValues);
@@ -159,7 +159,7 @@ class PollModel extends Gdn_Model {
                'CountVotes' => 0
             );
             $PollID = $this->Insert($Poll);
-            
+
             // Save the poll options.
             $PollOptionModel = new Gdn_Model('PollOption');
             $i = 0;
@@ -173,25 +173,27 @@ class PollModel extends Gdn_Model {
                );
                $PollOptionModel->Save($PollOption);
             }
-            
-            // Update the discussion attributes with info 
+
+            // Update the discussion attributes with info
          }
       }
-      
+
       return $DiscussionID;
    }
-   
+
    public function Vote($PollOptionID) {
       // Get objects from the database.
       $Session = Gdn::Session();
       $PollOptionModel = new Gdn_Model('PollOption');
       $PollOption = $PollOptionModel->GetID($PollOptionID);
-      
+
       // If this is a valid poll option and user session, record the vote.
       if ($PollOption && $Session->IsValid()) {
          // Has this user voted on this poll before?
          $HasVoted = $this->SQL->Select()->From('PollVote')->Where(array('UserID' => $Session->UserID, 'PollOptionID' => $PollOptionID))->Get()->NumRows() > 0;
          if (!$HasVoted) {
+            $Poll = $this->GetID(GetValue('PollID', $PollOption));
+
             // Insert the vote
             $PollVoteModel = new Gdn_Model('PollVote');
             $PollVoteModel->Insert(array('UserID' => $Session->UserID, 'PollOptionID' => $PollOptionID));
@@ -200,6 +202,11 @@ class PollModel extends Gdn_Model {
             $PollOptionModel->Update(array('CountVotes' => GetValue('CountVotes', $PollOption, 0)+1), array('PollOptionID' => $PollOptionID));
             $Poll = $this->GetID(GetValue('PollID', $PollOption));
             $this->Update(array('CountVotes' => GetValue('CountVotes', $Poll, 0)+1), array('PollID' => GetValue('PollID', $PollOption)));
+
+            $this->EventArguments['Poll'] = (array)$Poll;
+            $this->EventArguments['PollOption'] = (array)$PollOption;
+            $this->FireEvent('Vote');
+
             return $PollOptionID;
          }
       }

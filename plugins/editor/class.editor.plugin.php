@@ -299,24 +299,24 @@ class EditorPlugin extends Gdn_Plugin {
    }
 
    /**
-	 * Replace emoticons in comment preview.
-	 */
-	public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
-		if (Emoji::instance()->enabled) {
+   * Replace emoticons in comment preview.
+   */
+  public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
+    if (Emoji::instance()->enabled) {
          $Sender->Comment->Body = Emoji::instance()->translateToHtml($Sender->Comment->Body);
       }
-	}
+  }
 
    /**
-	 * Replace emoticons in comments.
-	 */
-	public function Base_AfterCommentFormat_Handler($Sender) {
-		if (Emoji::instance()->enabled) {
+   * Replace emoticons in comments.
+   */
+  public function Base_AfterCommentFormat_Handler($Sender) {
+    if (Emoji::instance()->enabled) {
          $Object = $Sender->EventArguments['Object'];
          $Object->FormatBody = Emoji::instance()->translateToHtml($Object->FormatBody);
          $Sender->EventArguments['Object'] = $Object;
       }
-	}
+  }
 
 
    /**
@@ -896,12 +896,12 @@ class EditorPlugin extends Gdn_Plugin {
 
 
    /**
-	 * Every time editor plugin is enabled, disable other known editors that
+   * Every time editor plugin is enabled, disable other known editors that
     * may clash with this one. If editor is loaded, then thes other
     * editors loaded after, there are CSS rules that hide them. This way,
     * the editor plugin always takes precedence.
-	 */
-	public function Setup() {
+   */
+  public function Setup() {
       $pluginEditors = array(
           'cleditor',
           'ButtonBar',
@@ -915,13 +915,13 @@ class EditorPlugin extends Gdn_Plugin {
       SaveToConfig(array(
          'Plugins.editor.ForceWysiwyg' => false
       ));
-	}
+  }
 
    public function OnDisable() {
-		//RemoveFromConfig('Plugin.editor.DefaultView');
-	}
+    //RemoveFromConfig('Plugin.editor.DefaultView');
+  }
 
    public function CleanUp() {
-		//RemoveFromConfig('Plugin.editor.DefaultView');
-	}
+    //RemoveFromConfig('Plugin.editor.DefaultView');
+  }
 }

@@ -1,0 +1,31 @@
+#bulk-importer {
+
+   #bulk-importer-validation-feedback {
+      display: none;
+   }
+
+   #bulk-importer-validation-feedback.import-errors {
+      display: block;
+      background-color: #d50a0a;
+      color: #fff;
+      padding: 10px 20px;
+   }
+
+   .disable-option {
+      opacity: 0.50;
+      pointer-events: none;
+   }
+
+   .removed {
+      display: none !important;
+   }
+
+   #import-progress-container {
+      display: none;
+   }
+
+   #import-progress-container.working {
+      display: inline-block;
+   }
+
+}

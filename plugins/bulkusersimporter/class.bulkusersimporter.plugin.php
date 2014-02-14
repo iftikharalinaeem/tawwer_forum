@@ -1,0 +1,483 @@
+<?php if(!defined('APPLICATION')) die();
+
+$PluginInfo['bulkusersimporter'] = array(
+   'Name' => 'Bulk Users Importer',
+   'Description' => 'Bulk users import with standardized CSV files.',
+   'Version' => '1.0.0',
+   'Author' => "Dane MacMillan",
+   'AuthorEmail' => 'dane@vanillaforums.com',
+   'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
+   'RequiredApplications' => array('Vanilla' => '>=2.2'),
+   'RequiredTheme' => false,
+   'RequiredPlugins' => false,
+   'HasLocale' => false,
+   'RegisterPermissions' => false,
+   'SettingsUrl' => '/settings/bulkusersimporter',
+   'SettingsPermission' => 'Garden.Setttings.Manage'
+);
+
+/**
+ * TODO:
+ * - approximate number of jobs necessary to complete an import.
+ * - estimate time per job to process.
+ */
+class BulkUsersImporterPlugin extends Gdn_Plugin {
+
+   private $database_prefix;
+   private $table_name = 'BulkUsersImporter';
+
+   // Grab maximum of 2000 rows, timeout after 20 seconds
+   // It will be asynchronously iterated over until there are no more records.
+   // Modify these values to change how many requests will be sent to server
+   // until job is complete.
+   public $limit = 2000;
+   public $timeout = 20;
+
+   public function __construct() {
+      $this->database_prefix = Gdn::Database()->DatabasePrefix;
+   }
+
+   public function Setup() {
+      $this->Structure();
+   }
+
+   public function Structure() {
+      Gdn::Structure()
+         ->Table($this->table_name)
+         ->PrimaryKey('ImportID')
+         ->Column('Email', 'varchar(200)', true, 'index')
+         ->Column('Username', 'varchar(50)', true)
+         ->Column('Status', 'varchar(50)', true)
+         ->Column('Completed', 'tinyint(1)', 0, 'index')
+         ->Column('Error', 'text', true)
+         ->Set();
+   }
+
+   /**
+    *
+    * @param SettingsController $sender
+    * @param array $args
+    */
+   public function SettingsController_BulkUsersImporter_Create($sender, $args) {
+      $sender->Permission('Garden.Settings.Manage');
+
+      // Load some assets
+      $c = Gdn::Controller();
+      $sender->AddCssFile('bulkusersimporter.css', 'plugins/bulkusersimporter');
+      $c->AddJsFile('bulkusersimporter.js', 'plugins/bulkusersimporter');
+
+      // Render components pertinent to all views.
+      $sender->SetData('Title', T('Bulk Users Importer'));
+      $sender->AddSideMenu();
+
+      // Render specific component views.
+      switch (true) {
+         case in_array('upload', $args):
+            // Handle upload and quickly parse file into DB.
+            $results = $this->handleUploadInsert($sender);
+            $sender->SetData('results', $results);
+            $sender->Render('upload', '', 'plugins/bulkusersimporter');
+            break;
+
+         case in_array('process', $args):
+            // Process inserted CSV data and create and email new users.
+            $this->processUploadedData($sender);
+            $sender->Render('process', '', 'plugins/bulkusersimporter');
+            break;
+
+         default:
+            $sender->AddDefinition('maxfilesizebytes', Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize')));
+            $sender->Render('settings', '', 'plugins/bulkusersimporter');
+            break;
+      }
+   }
+
+   /**
+    * Adds menu option to the left in dashboard.
+    */
+   public function Base_GetAppSettingsMenuItems_Handler(&$sender) {
+      $menu = $sender->EventArguments['SideMenu'];
+      $menu->AddItem('Import', T('Import'));
+      $menu->AddLink('Import', T('Bulk Users Importer'), '/settings/bulkusersimporter', 'Garden.Settings.Manage');
+   }
+
+   /**
+    * Controller to handle upload and bulk import files and options.
+    *
+    * @param SettingsController $sender
+    */
+   public function handleUploadInsert($sender) {
+      $sender->Permission('Garden.Settings.Manage');
+
+      if (!$sender->Request->IsAuthenticatedPostBack()) {
+         throw ForbiddenException('GET');
+      }
+
+      $upload = new Gdn_Upload();
+      if (!$upload->CanUpload()) {
+         return;
+      }
+
+      // Returned by function
+      $results = array(
+         'success' => array(),
+         'fail' => array()
+      );
+
+      // Create destination path
+      $destination_dir = PATH_UPLOADS . '/csv';
+      TouchFolder($destination_dir);
+
+      // Get request data
+      $import_files = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, 'import_files', FALSE);
+      $post = Gdn::Request()->Post();
+
+      // Validate files
+      $allowed_files = array('csv');
+      $files = array();
+
+      // File that is included by URL, so download.
+      if (!count(array_filter($import_files['size']))) {
+         $url = $post['import_url'];
+         if (in_array(pathinfo($url, PATHINFO_EXTENSION), $allowed_files)) {
+            $path = $destination_dir . '/bulkimport' . time() . '.csv';
+            file_put_contents($path, fopen($url, 'r'));
+            $files[0] = $path;
+         }
+      }
+
+      // Determine if CSV has headers by getting state of checkbox
+      $ignore_line = (in_array('has_headers', $post['Checkboxes']) && isset($post['has_headers']))
+         ? 1
+         : 0;
+
+      $maxfilesize_bytes = Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize'));
+
+      // Clean up file array, because PHP sends multiples files in a strange
+      // array, also, filter out bad files.
+      for ($i = 0, $l = count(array_filter($import_files['size'])); $i < $l; $i++) {
+         if (!$import_files['error'][$i]
+         && $import_files['size'][$i] > 0
+         && $import_files['size'][$i] <= $maxfilesize_bytes
+         && in_array(pathinfo($import_files['name'][$i], PATHINFO_EXTENSION), $allowed_files)) {
+            $path = $destination_dir . '/' . $import_files['name'][$i];
+            if (move_uploaded_file($import_files['tmp_name'][$i], $path)) {
+               // All good, so add to definitive file list.
+               $files[$i] = $path;
+            }
+         } else {
+            $results['fail'][$import_files['name'][$i]] = "Invalid file (too large or not a CSV)";
+         }
+      }
+
+      if (count($files)) {
+
+         $db_table = $this->database_prefix . $this->table_name;
+         $pdo = Gdn::Database()->Connection();
+
+         // Truncate table before using it.
+         Gdn::Database()->Query("TRUNCATE TABLE $db_table;");
+
+         foreach ($files as $file) {
+            // Get escaped EOL sequence to break on. No need to preg_quote, or
+            // quote string with pdo, as already quoted.
+            $line_termination = $this->getEOLFormat($file);
+
+            // Quote strings for SQL
+            $file_quoted = $pdo->quote($file);
+
+            // Determine if file has standard or non-standard line endings
+            $sql = "
+               LOAD DATA INFILE $file_quoted
+                  INTO TABLE
+                     $db_table
+                  FIELDS TERMINATED BY ','
+                  ENCLOSED BY '\"'
+                  ESCAPED BY '\\\\'
+                  LINES TERMINATED BY '$line_termination'
+                  IGNORE $ignore_line LINES
+                     (Email, Username, Status)
+                  SET completed = 0
+            ";
+
+            // Use filename for results key
+            $filename = pathinfo($file, PATHINFO_BASENAME);
+
+            // There would only be one, so loop is inconsequential.
+            if (isset($url) && $url != '') {
+               $filename = $url;
+            }
+
+            // Result will contain number of affected rows.
+            $rows_affected = $pdo->exec($sql);
+            if ($rows_affected > 0) {
+               $results['success'][$filename] = $rows_affected;
+            } else {
+               $results['fail'][$filename] = 'Improperly formatted CSV file';
+            }
+
+            // Delete the file
+            unlink($file);
+         }
+      }
+
+      return $results;
+   }
+
+   /**
+    * Loop through the bulk_users_import table and create the members and send
+    * out emails.
+    *
+    * @param SettingsController $sender
+    */
+   public function processUploadedData($sender) {
+      $sender->SetData('status', 'Incomplete');
+
+      $bulk_user_importer_model = new Gdn_Model($this->table_name);
+      $imported_users = $bulk_user_importer_model->GetWhere(array('completed' => 0), '', 'asc', $this->limit)->ResultArray();
+
+      // Will contain array of added user ids.
+      $success = array();
+      $fail = array();
+      $user_model = new UserModel();
+
+      // For byte-size processing
+      $start_time = time();
+      foreach($imported_users as $user) {
+
+         if (!ValidateEmail($user['Email'])) {
+            $fail[$user['Email']] = 'Invalid email';
+            break;
+         }
+
+         // If username is invalid, generate random one and continue processing.
+         if (!ValidateUsername($user['Username'])) {
+            $user['Username'] = 'user' . mt_rand(9000,90000);
+         }
+
+         // Check if username in use.
+         $check_name = $user_model->GetWhere(array(
+             'Name' => $user['Username']
+         ))->FirstRow('array');
+
+         $unique_name = (count($check_name['Name']))
+            ? false
+            : true;
+
+         // Get role ids based off of their name
+         $status = $this->roleNamesToInts($user['Status']);
+
+         if ($status) {
+            $role_ids = $status['role_ids'];
+            $banned = $status['banned'];
+            $user_id = false;
+         } else {
+            // No roles, so bail out.
+            $sender->SetJson('import_id', 0);
+            break;
+         }
+
+         // Username controls, so if it exists, update the info, including
+         // email, otherwise create new user.
+         if (!$unique_name) {
+            // Update the user.
+            $user_id = $user_model->Save(
+               array(
+                'UserID' => $check_name['UserID'],
+                'Email' => $user['Email'],
+                'RoleID' => $role_ids,
+                'Banned' => $banned
+            ), array(
+                'SaveRoles' => true
+            ));
+         } else {
+            // Create new user. The method seems to rely on Captcha keys, so
+            // this may error out due to none being passed to it.
+            $temp_password = sha1($user['Email'] . time());
+
+            // Create new user
+            $user_id = $user_model->Register(
+               array(
+                'Name' => $user['Username'],
+                'Password' => $temp_password, // This will get reset
+                'Email' => $user['Email'],
+                'RoleID' => $role_ids,
+                'Banned' => $banned
+            ), array(
+                'SaveRoles' => true,
+                'CheckCaptcha' => false
+            ));
+         }
+
+         $complete_code = 0; // Error code
+         $error_string = $user_model->Validation->ResultsText();
+
+         if ($user_id) {
+            $success[$user_id] = $user['Email'];
+            $complete_code = 1;
+         } else {
+            $fail[$user['Username']] = $error_string;
+            $complete_code = 2;
+         }
+
+         // Log errors in DB--will be cleared on next import.
+         $bulk_user_importer_model->Update(
+            array(
+               'Completed' => $complete_code,
+               'Error' => $error_string
+            ),
+            array(
+               'ImportID' => $user['ImportID']
+            )
+         );
+         $user_model->Validation->Results(true);
+
+         // Email successfully added users, and users who were in the CSV file
+         // but already had an account (according to email) with forum.
+         //$user_model->SendWelcomeEmail($user_id, ''); // Don't send temp password
+         $user_model->PasswordRequest($user['Email']); // Reset current temp password
+
+         $sender->SetJson('import_id', $user['ImportID']);
+         // If timeout reached, end current operation. It will be called
+         // again immediately to continue processing.
+         if (time() - $start_time >= $this->timeout) {
+            break;
+         }
+      }
+
+      $total_success = count($success);
+      $total_fail = count($fail);
+
+      if ($total_success || $total_fail) {
+         $sender->SetJson('feedback', 'Latest job processed up to row ' . $user['ImportID']);
+      } else {
+         $sender->InformMessage('There was a problem processing the data.');
+      }
+
+      $sender->Render('Blank', 'Utility', 'Dashboard');
+   }
+
+   /**
+    * Provide function with a file pointer or file path, determine whether
+    * it has nix, mac, or win line endings, and then return the line
+    * ending type. Note that it returns a non-expandable (single-quotes)
+    * version of the EOL character sequence.
+    *
+    * @param mixed $file_path Either a file pointer or path
+    * @return non-expandable character sequence
+    */
+   public function getEOLFormat($file_path = '') {
+      $fp = '';
+      // If file pointer passed, use it, otherwise get it.
+      if (is_resource($file_path)) {
+         $fp = $file_path;
+      } elseif (is_readable($file_path)) {
+         $fp = fopen($file_path, 'r');
+      }
+
+      $line = '';
+      if (is_resource($fp)) {
+         $line = fgets($fp);
+         fclose($fp);
+         unset($fp);
+      }
+
+      // Non-expandable EOL sequences.
+      $eol_win = '\r\n';
+      $eol_mac = '\r'; // Lagacy Mac, probably won't be used much.
+      $eol_nix = $eol = '\n'; // And set default
+
+      // Would be nice if could dynamically expand single-quoted strings, so
+      // the EOL sequences don't have to be repeated.
+      if (strpos($line, "\r\n") !== false) {
+         $eol = $eol_win;
+      } elseif (strpos($line, "\r") !== false) {
+         $eol = $eol_mac;
+      } elseif (strpos($line, "\n") !== false) {
+         $eol = $eol_nix;
+      }
+
+      return $eol;
+   }
+
+   /**
+    * Converts role names to their corresponding integers.
+    *
+    * Valid roles: Guest, Unconfirmed, Applicant, Member, Administrator,
+    * Moderator
+    *
+    * Other valid: Banned
+    *
+    * @param string $role_names
+    * @return mixed Will return array of valid role IDs or false if none.
+    */
+   public function roleNamesToInts($role_names) {
+      if (!$role_names) {
+         return false;
+      }
+
+      $allowed_roles = array(
+         'Guest',
+         'Unconfirmed',
+         'Applicant',
+         'Member',
+         'Administrator',
+         'Moderator',
+         'Banned',
+         'Verified',
+         'Confirmed'
+      );
+
+      $status = array(
+          'role_ids' => array(),
+          'banned' => 0,
+          // These are not coded yet.
+          'confirmed' => 1,
+          'verified' => 1
+      );
+
+      $role_ids = array();
+
+      if (is_string($role_names) && !is_numeric($role_names)) {
+         // The $role_names are a colon-delimited list of role names.
+         $role_names = array_map('trim', explode(':', $role_names));
+
+         // Normalize the roles given, so lowercase all, then capitalize
+         // first letter. If there is no match, it's because the role
+         // provided does not exist.
+         $role_names = array_map('strtolower', $role_names);
+         $role_names = array_map('ucfirst', $role_names);
+
+         foreach($role_names as $i => $role_name) {
+            if (!in_array($role_name, $allowed_roles)) {
+               unset($role_names[$i]);
+            }
+         }
+
+         if (!count($role_names)) {
+            return false;
+         }
+
+         $role_model = new Gdn_Model('Role');
+         $role_ids = $role_model->SQL
+            ->Select('r.RoleID')
+            ->From('Role r')
+            ->WhereIn('r.Name', $role_names)
+            ->Get()->ResultArray();
+         $role_ids = ConsolidateArrayValuesByKey($role_ids, 'RoleID');
+      }
+
+      if (!is_array($role_ids)) {
+         $role_ids = array($role_ids);
+      }
+
+      $status['role_ids'] = $role_ids;
+
+      // Check if user is banned
+      if (in_array('Banned', $role_names)) {
+         $status['banned'] = 1;
+      }
+
+      return $status;
+   }
+}
