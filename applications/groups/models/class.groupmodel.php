@@ -346,7 +346,7 @@ class GroupModel extends Gdn_Model {
       }
 
 //      print_r($Category);
-//      $CategoryID = $Category['PermissionCategoryID'];
+      $CategoryID = GetValue('PermissionCategoryID', $Category);
 
       if ($this->CheckPermission('Moderate', $Group)) {
          Gdn::Session()->SetPermission('Vanilla.Discussions.Announce', array($CategoryID));
