@@ -204,7 +204,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
             // Determine if file has standard or non-standard line endings
             $sql = "
-               LOAD DATA INFILE $file_quoted
+               LOAD DATA LOCAL INFILE $file_quoted
                   INTO TABLE
                      $db_table
                   FIELDS TERMINATED BY ','
