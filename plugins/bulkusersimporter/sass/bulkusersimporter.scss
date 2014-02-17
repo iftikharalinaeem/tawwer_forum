@@ -1,5 +1,9 @@
 #bulk-importer {
 
+   .valid-statuses {
+      font-style: italic;
+   }
+
    #bulk-importer-validation-feedback {
       display: none;
    }
@@ -27,5 +31,4 @@
    #import-progress-container.working {
       display: inline-block;
    }
-
 }

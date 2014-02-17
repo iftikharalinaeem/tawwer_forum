@@ -26,15 +26,30 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    private $database_prefix;
    private $table_name = 'BulkUsersImporter';
 
-   // Grab maximum of 2000 rows, timeout after 20 seconds
+   // Will contain whitelist of allowed roles.
+   private $allowed_roles = array();
+
+   // Grab maximum of 1000 rows, timeout after 20 seconds
    // It will be asynchronously iterated over until there are no more records.
    // Modify these values to change how many requests will be sent to server
    // until job is complete.
-   public $limit = 2000;
+   public $limit = 1000;
    public $timeout = 20;
 
    public function __construct() {
       $this->database_prefix = Gdn::Database()->DatabasePrefix;
+
+      // Create whitelist of allowed roles.
+      // Will be 'Guest', 'Unconfirmed', 'Applicant', 'Member', 'Administrator',
+      // 'Moderator', and any custom roles.
+      $role_model = new Gdn_Model('Role');
+      $allowed_roles = $role_model->Get('Name')->ResultArray();
+      if ($allowed_roles) {
+         $this->allowed_roles = array_column($allowed_roles, 'Name', 'RoleID');
+      }
+
+      // Add Banned to list (in future add Verified and Confirmed).
+      array_push($this->allowed_roles, 'Banned');
    }
 
    public function Setup() {
@@ -87,6 +102,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          default:
             $sender->AddDefinition('maxfilesizebytes', Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize')));
+            $sender->SetData('allowed_roles', $this->allowed_roles);
             $sender->Render('settings', '', 'plugins/bulkusersimporter');
             break;
       }
@@ -247,12 +263,18 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          if (!ValidateEmail($user['Email'])) {
             $fail[$user['Email']] = 'Invalid email';
+            $sender->SetJson('import_id', 0);
+            $sender->SetJson('error_message', 'Invalid email on line '. $user['ImportID'] .': <strong>'. $user['Email'] .'</strong>. Please correct this and try again.');
             break;
          }
 
          // If username is invalid, generate random one and continue processing.
          if (!ValidateUsername($user['Username'])) {
-            $user['Username'] = 'user' . mt_rand(9000,90000);
+            // Nevermind, just cancel whole operation and let them know.
+            //$user['Username'] = 'user' . mt_rand(9000,90000);
+            $sender->SetJson('import_id', 0);
+            $sender->SetJson('error_message', 'Invalid username on line '. $user['ImportID'] .': <strong>'. $user['Username'] .'</strong>. Please correct this and try again.');
+            break;
          }
 
          // Check if username in use.
@@ -264,16 +286,20 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             ? false
             : true;
 
-         // Get role ids based off of their name
+         // Get role ids based off of their name, and check if any invalid
+         // roles were passed.
          $status = $this->roleNamesToInts($user['Status']);
 
-         if ($status) {
+         // If even single invalid role used, bail out.
+         if (!count($status['invalid_roles'])) {
             $role_ids = $status['role_ids'];
             $banned = $status['banned'];
             $user_id = false;
          } else {
             // No roles, so bail out.
+            $plural_status = PluralTranslate(count($status['invalid_roles']), 'status', 'statuses');
             $sender->SetJson('import_id', 0);
+            $sender->SetJson('error_message', "Invalid $plural_status on line ". $user['ImportID'] .': <strong>' . implode(', ', $status['invalid_roles']) . '</strong>. Please correct this and try again.');
             break;
          }
 
@@ -416,20 +442,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          return false;
       }
 
-      $allowed_roles = array(
-         'Guest',
-         'Unconfirmed',
-         'Applicant',
-         'Member',
-         'Administrator',
-         'Moderator',
-         'Banned',
-         'Verified',
-         'Confirmed'
-      );
+      // Whitelist from DB.
+      $allowed_roles = array_map('strtolower', $this->allowed_roles);
 
       $status = array(
           'role_ids' => array(),
+          'invalid_roles' => array(),
           'banned' => 0,
           // These are not coded yet.
           'confirmed' => 1,
@@ -442,33 +460,26 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          // The $role_names are a colon-delimited list of role names.
          $role_names = array_map('trim', explode(':', $role_names));
 
-         // Normalize the roles given, so lowercase all, then capitalize
-         // first letter. If there is no match, it's because the role
-         // provided does not exist.
+         // Normalize the roles given, so lowercase all, and make sure the
+         // DB query does the same.
          $role_names = array_map('strtolower', $role_names);
-         $role_names = array_map('ucfirst', $role_names);
 
          foreach($role_names as $i => $role_name) {
             if (!in_array($role_name, $allowed_roles)) {
+               $status['invalid_roles'][] = $role_names[$i];
                unset($role_names[$i]);
             }
          }
 
-         if (!count($role_names)) {
-            return false;
+         if (count($role_names)) {
+            $role_model = new Gdn_Model('Role');
+            $role_ids = $role_model->SQL
+               ->Select('r.RoleID')
+               ->From('Role r')
+               ->WhereIn('LOWER(r.Name)', $role_names)
+               ->Get()->ResultArray();
+            $role_ids = ConsolidateArrayValuesByKey($role_ids, 'RoleID');
          }
-
-         $role_model = new Gdn_Model('Role');
-         $role_ids = $role_model->SQL
-            ->Select('r.RoleID')
-            ->From('Role r')
-            ->WhereIn('r.Name', $role_names)
-            ->Get()->ResultArray();
-         $role_ids = ConsolidateArrayValuesByKey($role_ids, 'RoleID');
-      }
-
-      if (!is_array($role_ids)) {
-         $role_ids = array($role_ids);
       }
 
       $status['role_ids'] = $role_ids;

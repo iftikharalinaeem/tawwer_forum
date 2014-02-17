@@ -19,8 +19,7 @@
 
    <div class="Info">The third parameter, <code>Status</code>, can have
       multiple items. These items must be separated by a colon <code>:</code>. Valid
-      statuses are: Guest, Unconfirmed, Applicant, Member, Administrator,
-      Moderator, Banned.
+      statuses are: <em class="valid-statuses"><?php echo implode(', ', $this->Data('allowed_roles')); ?></em>.
    </div>
 
    <h3>Example contents of CSV file:</h3>
@@ -78,10 +77,6 @@
          ?>
       </li>
    </ul>
-
-   <div class="Info">
-      <strong>Note:</strong> All valid imported users will receive an email with instructions on signing in.
-   </div>
 
    <?php echo $this->Form->Close('Start'); ?>
 </div>

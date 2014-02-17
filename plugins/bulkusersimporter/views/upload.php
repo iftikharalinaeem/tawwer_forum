@@ -78,7 +78,8 @@
 
       <div class="Info">
          Click the button below to process the uploaded data. All successfully
-         processed records will create a new user account.
+         processed records will create a new user account, and all successfully
+         created users will receive an email with instructions on signing in.
       </div>
 
       <div class="FilterMenu">

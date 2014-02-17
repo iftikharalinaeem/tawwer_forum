@@ -144,7 +144,7 @@ jQuery(document).ready(function($) {
          // If import_id is 0, then there was no role.
          if (rows_completed_job == 0) {
             cancel_import = true;
-            progress_fail_message = 'CSV file is missing valid statuses.';
+            progress_fail_message = data.error_message;
          }
 
          // If done, call again and continue the process.

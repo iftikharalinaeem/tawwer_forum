@@ -1,3 +1,6 @@
+#bulk-importer .valid-statuses {
+  font-style: italic;
+}
 #bulk-importer #bulk-importer-validation-feedback {
   display: none;
 }
