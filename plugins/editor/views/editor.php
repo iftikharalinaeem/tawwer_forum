@@ -76,9 +76,15 @@
                      Wrap($html_arrow_down, 'span', $button['attr']) .''.
                      '<div class="editor-insert-dialog Flyout MenuItems editor-file-image">
 
-                        <div class="drop-section file-input">
+                        <div class="drop-section file-drop">
                            Drop file(s)
                         </div>
+
+                        <div class="drop-section file-input">
+                           or <input type="file" name="'. $editor_file_input_name .'[]" multiple directory webkitdirectory mozdirectory />
+                        </div>
+
+
 
                         <div class="drop-section image-input">
                            <input class="InputBox editor-input-image" placeholder="Image URL" />

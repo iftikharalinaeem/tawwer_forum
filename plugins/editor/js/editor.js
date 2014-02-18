@@ -359,6 +359,17 @@
        };
 
       /**
+       * Call to quickly close all open dropdowns. Refactor this into some of
+       * the areas below that are performing this function.
+       */
+      var editorDropdownsClose = function() {
+         $('.editor-dropdown').each(function(i, el) {
+            $(el).removeClass('editor-dropdown-open');
+            $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
+         });
+      }
+
+      /**
        * Deal with clashing JS for opening dialogs on click, and do not let
        * more than one dialog/dropdown appear at once.
        */
@@ -1284,9 +1295,6 @@
             return fileNames;
          };
 
-         // Initialize file uploads.
-         //$('.bodybox-wrap').fileupload({
-
          $(dropZone).each(function(i, el) {
             var $init = $(this);
             var cssDropInitClass = 'editor-dropzone-init';
@@ -1299,8 +1307,14 @@
                }
             }
 
+            // Save original title for progress meter title percentages.
+            documentTitle = document.title;
+
             // Attach voodoo to dropzone.
-            $(this).fileupload({
+            // Originally was just bodybox-wrap, but that was causing multiple
+            // dropzone issues, then was just 'this', but that was preventing
+            // any file input from working in the form, so this is best.
+            $(this).closest('.bodybox-wrap').fileupload({
 
                // Options
                url: '/post/editorupload',
@@ -1308,13 +1322,11 @@
                dropZone: $init,
                forceIframeTransport: false,
                dataType: 'json',
-               progressInterval: 25,
+               progressInterval: 5,
                autoUpload: true,
 
                // Fired on entire drop, and contains entire batch.
                drop: function (e, data) {
-                  // Save original title for progress meter title percentages.
-                  documentTitle = document.title;
 
                   // This is from PHP's max_file_uploads setting
                   if (data.files.length > maxFileUploads) {
@@ -1356,6 +1368,10 @@
 
                         if (validSize && validFile && !fileAlreadyExists) {
                            data.submit();
+
+                           // If selecting a file through traditional file
+                           // input, close the dropdown.
+                           editorDropdownsClose();
                         } else {
                            // File dropped is not allowed!
                            var message = '"'+ filename +'" ';
@@ -1517,7 +1533,6 @@
             $(this).addClass('drag-passthrough');
             var that = this;
             setTimeout(function() {
-               //console.log(this);
                $(that).removeClass('drag-passthrough');
             }, 500);
          });

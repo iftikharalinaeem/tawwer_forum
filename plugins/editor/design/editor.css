@@ -463,12 +463,16 @@
 .editor-file-image .drop-section {
   padding: 10px;
 }
-.editor-file-image .file-input {
+.editor-file-image .file-drop {
   border: 2px dashed rgba(0, 0, 0, 0.25);
   border-radius: 2px;
   margin: 10px;
   text-align: center;
   padding: 30px;
+}
+.editor-file-image .file-input {
+  overflow: hidden;
+  white-space: nowrap;
 }
 .editor-file-image .image-input {
   margin-top: 5px;
