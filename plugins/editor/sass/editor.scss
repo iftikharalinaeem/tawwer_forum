@@ -186,6 +186,44 @@
 }
 
 /**
+ * File and image dropdown
+ */
+
+.editor-file-image {
+
+   padding: 0;
+
+   .drop-section {
+      padding: 10px;
+   }
+
+   .file-input {
+      border: 2px dashed rgba(0,0,0,0.25);
+      border-radius: 2px;
+      margin: 10px;
+      text-align: center;
+      padding: 30px;
+   }
+
+   .image-input {
+      margin-top: 5px;
+      border-top: 1px solid #da8f8f;
+
+      input {
+         margin: 0;
+      }
+   }
+
+   &.drag-passthrough {
+      transition: all 0.2s ease;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0);
+
+   }
+}
+
+/**
  * Going full page
  */
 

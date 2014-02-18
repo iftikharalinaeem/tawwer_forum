@@ -350,6 +350,7 @@
        var editorSelectAllInput = function(obj) {
           // Check if can access selection, as programmatically triggering the
           // dd close event throws an error here.
+          obj.focus();
           if (obj.selectionEnd) {
             // selectionStart is implied 0
             obj.selectionEnd = obj.value.length;
@@ -437,8 +438,8 @@
          // (some are written directly as class in view), then add the matches
          // from within the iframe, and attach the relevant callbacks to events.
          $('.editor-dialog-fire-close').add($('.wysihtml5-sandbox').contents().find('.editor-dialog-fire-close'))
-         .off('mouseup.fireclose')
-         .on('mouseup.fireclose', function(e) {
+         .off('mouseup.fireclose dragover.fireclose')
+         .on('mouseup.fireclose dragover.fireclose', function(e) {
             $('.editor-dropdown').each(function(i, el) {
                $(el).removeClass('editor-dropdown-open');
                $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
@@ -546,6 +547,19 @@
                scrollTop: $(scrollto).offset().top
             }, 400);
          }
+      };
+
+      /**
+       * Inserting images into the wysi editor does not automatically adjust
+       * the height. It tends to require a hover over, so call this function
+       * to auto-adjust it. This will add the extra height onto the current
+       * height.
+       */
+      var wysiInsertAdjustHeight = function(editorInstance, addHeight) {
+         editorInstance.focus();
+         var iframeElement = $(editorInstance.composer.iframe);
+         var newHeight = parseInt($(iframeElement).css('min-height')) + addHeight + 'px';
+         $(iframeElement).css('min-height', newHeight);
       };
 
       /**
@@ -1283,9 +1297,6 @@
                if ($init[0].contentWindow) {
                   $init = $init[0].contentWindow;
                }
-            } else {
-               console.log('doubling up:');
-               console.log($(this));
             }
 
             // Attach voodoo to dropzone.
@@ -1438,8 +1449,8 @@
                         if (handleIframe) {
                            editor.focus();
                            editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
-                           var newHeight = parseInt($(iframeElement).css('min-height')) + payload.original_height + 'px';
-                           $(iframeElement).css('min-height', newHeight);
+                           wysiInsertAdjustHeight(editor, payload.original_height);
+
                         } else {
                            try {
                               // i don't know why adding [0] to this when iframe
@@ -1491,6 +1502,59 @@
                   }, 710);
                }
             });
+         });
+      };
+
+      /**
+       * Combine the image URL input box with the file uploader dropdown, so
+       * handle the event differently for wysi and non-wysi mode.
+       */
+      var insertImageUrl = function(editorInstance) {
+         $('.editor-file-image').on('dragover', function(e) {
+            // Allow passthrough of dragover so main body can accept drop
+            // event. Only need to flash the passthrough for a moment, then
+            // remove the passthrough class.
+            $(this).addClass('drag-passthrough');
+            var that = this;
+            setTimeout(function() {
+               //console.log(this);
+               $(that).removeClass('drag-passthrough');
+            }, 500);
+         });
+
+         $('.editor-input-image').on('keyup', function(e) {
+            // Match image URLs
+            var imageUrl = e.target.value;
+            // Doesn't have to be perfect, because URL can still not exist.
+            var imageUrlRegex = /(?:\/\/)(?:.+)(\/)(.*\.(?:jpe?g|gif|png))(?:\?([^#]*))?(?:#(.*))?/i;
+            if (imageUrlRegex.test(imageUrl)) {
+
+               editorInstance.focus();
+
+               // Working with wysihtml5
+               if (editorInstance.composer) {
+                  editorInstance.composer.commands.exec("insertImage", { src: imageUrl, alt: '' });
+                  // Consider autogrowing body when insert, as iframe doesn't
+                  // grow until after hover over. This is done with the file
+                  // uploader, but we know the height, so use JS and insert
+                  // only on load.
+                  var img = new Image();
+                  img.src = imageUrl;
+                  $(img).on('load', function(e) {
+                     naturalHeight = this.height;
+                     wysiInsertAdjustHeight(editorInstance, naturalHeight);
+                  });
+               }
+               // Standard insert
+               else {
+                  var imgTag = '<img src="'+ imageUrl +'" alt="" />';
+                  $(editorInstance).replaceSelectedText(imgTag + '\n');
+               }
+
+               // Now clear input and close dropdown
+               $(this).closest('.editor-dropdown-open').removeClass('editor-dropdown-open');
+               $(this).val('');
+            }
          });
       };
 
@@ -1765,12 +1829,13 @@
                          var iframe_body = iframe.contents().find('body')[0];
                          atCompleteInit(iframe_body, iframe[0]);
 
-
                          // Enable file uploads. Pass the iframe as the
                          // drop target in wysiwyg, while the regular editor
                          // modes will just require the standard textarea
                          // element.
                          fileUploadsInit(iframe, editor);
+
+                         insertImageUrl(editor);
                       });
 
 
@@ -1876,6 +1941,8 @@
 
                       // Enable file uploads
                       fileUploadsInit($currentEditableTextarea, '');
+
+                      insertImageUrl($currentEditableTextarea);
                    });
                    break;
 

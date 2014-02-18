@@ -6,6 +6,7 @@
    if ($format != 'text' && $format != 'textex') {
       $html_toolbar    = '<div class="editor editor-format-'. $format .'">';
       $html_arrow_down = '<span class="icon icon-caret-down"></span>';
+      $editor_file_input_name = $this->Data('editorFileInputName');
 
       foreach($this->Data('_EditorToolbar') as $button) {
 
@@ -73,16 +74,16 @@
                case 'upload':
                   $html_toolbar .= Wrap(
                      Wrap($html_arrow_down, 'span', $button['attr']) .''.
-                     '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="">
+                     '<div class="editor-insert-dialog Flyout MenuItems editor-file-image">
 
-                        <label class="editor-image-align">
-                        Browse to select files, or drag and drop files.
-                        <input class="editor-fileupload" type="file" multiple="multiple" />
-                        </label>
-
-                        <div>
-                        <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="Cancel"/>
+                        <div class="drop-section file-input">
+                           Drop file(s)
                         </div>
+
+                        <div class="drop-section image-input">
+                           <input class="InputBox editor-input-image" placeholder="Image URL" />
+                        </div>
+
                      </div>'
                    , 'div', array('class' => 'editor-dropdown'));
                   break;

@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.2.12',
+   'Version' => '1.2.13',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -111,7 +111,7 @@ class EditorPlugin extends Gdn_Plugin {
           'sep-media' => true, // separator
           'emoji' => true,
           'links' => true,
-          'images' => true,
+          'images' => false,
           'uploads' => true,
 
           'sep-align' => true, // separator
@@ -361,6 +361,7 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddDefinition('maxUploadSize', $MaxSize);
       // Set file input name
       $c->AddDefinition('editorFileInputName', $this->editorFileInputName);
+      $Sender->SetData('editorFileInputName', $this->editorFileInputName);
       // Save allowed file types
       $c->AddDefinition('allowedFileExtensions', json_encode(C('Garden.Upload.AllowedFileExtensions')));
       // Get max file uploads, to be used for max drops at once.

@@ -105,6 +105,7 @@
   border-radius: 2px;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
   pointer-events: none;
+  z-index: 500;
 }
 
 .editor-drop-cue .editor-upload-attention {
@@ -451,6 +452,36 @@
   cursor: pointer;
   border-radius: 2px;
   background-color: rgba(0, 0, 0, 0.1);
+}
+
+/**
+ * File and image dropdown
+ */
+.editor-file-image {
+  padding: 0;
+}
+.editor-file-image .drop-section {
+  padding: 10px;
+}
+.editor-file-image .file-input {
+  border: 2px dashed rgba(0, 0, 0, 0.25);
+  border-radius: 2px;
+  margin: 10px;
+  text-align: center;
+  padding: 30px;
+}
+.editor-file-image .image-input {
+  margin-top: 5px;
+  border-top: 1px solid #da8f8f;
+}
+.editor-file-image .image-input input {
+  margin: 0;
+}
+.editor-file-image.drag-passthrough {
+  transition: all 0.2s ease;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0);
 }
 
 /**
