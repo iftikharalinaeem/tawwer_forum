@@ -203,19 +203,29 @@
       margin: 10px;
       text-align: center;
       padding: 30px;
+      display: none;
+
+      &.can-drop {
+         display: block !important;
+      }
    }
 
    .file-input {
       overflow: hidden;
       white-space: nowrap;
+      padding-top: 0;
    }
 
    .image-input {
-      margin-top: 5px;
+      padding: 0;
       border-top: 1px solid #da8f8f;
 
       input {
          margin: 0;
+         border: 0;
+         padding: 10px;
+         border-bottom-left-radius: 2px;
+         border-bottom-right-radius: 2px;
       }
    }
 

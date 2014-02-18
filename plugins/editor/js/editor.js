@@ -1063,6 +1063,12 @@
             e.preventDefault();
          });
 
+         // If drag and drop unavailable, remove its cue from the attachment
+         // dropdown menu, so it will just have the file input and URL input.
+         if (!!window.FileReader) {
+            $('#drop-cue-dropdown').addClass('can-drop');
+         }
+
          // Multi upload element. If an iframe, it will need to be checked
          // in the loop far below. Redundant, but let's see.
          var dropZone = dropElement;
@@ -1534,7 +1540,7 @@
             var that = this;
             setTimeout(function() {
                $(that).removeClass('drag-passthrough');
-            }, 500);
+            }, 400);
          });
 
          $('.editor-input-image').on('keyup', function(e) {

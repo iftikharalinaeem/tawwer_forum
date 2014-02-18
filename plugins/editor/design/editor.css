@@ -469,17 +469,26 @@
   margin: 10px;
   text-align: center;
   padding: 30px;
+  display: none;
+}
+.editor-file-image .file-drop.can-drop {
+  display: block !important;
 }
 .editor-file-image .file-input {
   overflow: hidden;
   white-space: nowrap;
+  padding-top: 0;
 }
 .editor-file-image .image-input {
-  margin-top: 5px;
+  padding: 0;
   border-top: 1px solid #da8f8f;
 }
 .editor-file-image .image-input input {
   margin: 0;
+  border: 0;
+  padding: 10px;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
 }
 .editor-file-image.drag-passthrough {
   transition: all 0.2s ease;
