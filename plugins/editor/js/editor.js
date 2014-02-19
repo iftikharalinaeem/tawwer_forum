@@ -1470,9 +1470,9 @@
 
                         if (handleIframe) {
                            editor.focus();
-                           editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
+                           editor.composer.commands.exec("insertImage", { src: payload.original_url, alt: ''});
+                           //editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
                            wysiInsertAdjustHeight(editor, payload.original_height);
-
                         } else {
                            try {
                               // i don't know why adding [0] to this when iframe
