@@ -1539,8 +1539,9 @@
             $(this).addClass('drag-passthrough');
             var that = this;
             setTimeout(function() {
+               editorDropdownsClose();
                $(that).removeClass('drag-passthrough');
-            }, 400);
+            }, 250);
          });
 
          $('.editor-input-image').on('keyup', function(e) {

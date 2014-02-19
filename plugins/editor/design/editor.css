@@ -323,7 +323,8 @@
 .editor .icon:hover,
 .wysihtml5-command-active,
 .wysihtml5-action-active,
-.wysihtml5-command-dialog-opened {
+.wysihtml5-command-dialog-opened,
+.editor-dropdown-open > .editor-action {
   border-radius: 2px;
   background-color: #999999;
   background-color: rgba(0, 0, 0, 0.1);
