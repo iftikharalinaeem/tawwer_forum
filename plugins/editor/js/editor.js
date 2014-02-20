@@ -1108,8 +1108,20 @@
          // Handle drop effect as UX cue
          $(dropElement).on('dragenter dragover', function(e) {
             $dndCueWrapper.addClass('editor-drop-cue');
+
+            // Chrome cannot handle the influx of events and adding the CSS
+            // class, which causes the border to become very buggy, so just
+            // force it for now. Also, this is only on Wysiwyg format.
+            if (handleIframe) {
+               $(editor).focus();
+               $(this).css({
+                  'border': '2px dashed rgba(0,0,0,0.25)',
+                  'border-radius': '2px'
+               });
+            }
          }).on('drop dragend dragleave', function(e) {
             $dndCueWrapper.removeClass('editor-drop-cue');
+            $(editor).blur();
          });
 
 
