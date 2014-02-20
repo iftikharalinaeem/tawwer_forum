@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.2.17',
+   'Version' => '1.2.18',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -674,7 +674,19 @@ class EditorPlugin extends Gdn_Plugin {
       //&& $Media['ForeignTable'] == $ForeignType
       ) {
          try {
-            $Model->Delete($MediaID);
+            if ($Model->Delete($MediaID)) {
+               // unlink the images.
+               $path = PATH_UPLOADS . '/' . $Media['Path'];
+               $thumbPath = PATH_UPLOADS . '/' . $Media['ThumbPath'];
+
+               if (file_exists($path)) {
+                  unlink($path);
+               }
+
+               if (file_exists($thumbPath)) {
+                  unlink($thumbPath);
+               }
+            }
          } catch (Exception $e) {
             die($e->getMessage());
             return FALSE;
