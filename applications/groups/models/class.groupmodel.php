@@ -11,6 +11,23 @@ class GroupModel extends Gdn_Model {
    }
 
    /**
+    * Calculate the rows in a groups dataset.
+    * @param Gdn_DataSet $Result
+    */
+   public function Calc(&$Result) {
+      foreach ($Result->ResultArray() as &$Row) {
+         $Row['DescriptionHtml'] = Gdn_Format::To($Row['Description'], $Row['Format']);
+
+         if ($Row['Icon']) {
+            $Row['IconUrl'] = Gdn_Upload::Url($Row['Icon']);
+         }
+         if ($Row['Banner']) {
+            $Row['BannerUrl'] = Gdn_Upload::Url($Row['Banner']);
+         }
+      }
+   }
+
+   /**
     * Check permission on a group.
     *
     * @param string $Permission The permission to check. Valid values are:
