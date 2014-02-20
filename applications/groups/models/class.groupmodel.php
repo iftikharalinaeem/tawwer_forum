@@ -11,6 +11,24 @@ class GroupModel extends Gdn_Model {
    }
 
    /**
+    * Calculate the rows in a groups dataset.
+    * @param Gdn_DataSet $Result
+    */
+   public function Calc(&$Result) {
+      foreach ($Result as &$Row) {
+         $Row['Url'] = GroupUrl($Row, NULL, '//');
+         $Row['DescriptionHtml'] = Gdn_Format::To($Row['Description'], $Row['Format']);
+
+         if ($Row['Icon']) {
+            $Row['IconUrl'] = Gdn_Upload::Url($Row['Icon']);
+         }
+         if ($Row['Banner']) {
+            $Row['BannerUrl'] = Gdn_Upload::Url($Row['Banner']);
+         }
+      }
+   }
+
+   /**
     * Check permission on a group.
     *
     * @param string $Permission The permission to check. Valid values are:
@@ -159,11 +177,19 @@ class GroupModel extends Gdn_Model {
       return $Result;
    }
 
-   public function GetByUser($UserID) {
+   public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $PageNumber = FALSE) {
+      $Result = parent::Get($OrderFields, $OrderDirection, $Limit, $PageNumber);
+      $Result->DatasetType(DATASET_TYPE_ARRAY);
+      $this->Calc($Result->Result());
+      return $Result;
+   }
+
+   public function GetByUser($UserID, $Limit = 9) {
       $UserGroups = $this->SQL->GetWhere('UserGroup', array('UserID' => $UserID))->ResultArray();
       $IDs = ConsolidateArrayValuesByKey($UserGroups, 'GroupID');
 
-      $Result = $this->GetWhere(array('GroupID' => $IDs), 'Name')->ResultArray();
+      $Result = $this->GetWhere(array('GroupID' => $IDs), 'Name', 'asc', $Limit)->ResultArray();
+      $this->Calc($Result);
       return $Result;
    }
 

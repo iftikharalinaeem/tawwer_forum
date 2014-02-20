@@ -42,27 +42,36 @@ class GroupsController extends Gdn_Controller {
       parent::Initialize();
    }
 
-   public function Index() {
+   public function Index($Limit = 9) {
       Gdn_Theme::Section('GroupList');
 
+      if (!is_numeric($Limit))
+          $Limit = 9;
+      elseif ($Limit > 30)
+          $Limit = 30;
+      elseif ($Limit < 0)
+          $Limit = 9;
+
       // Get popular groups.
-      $Groups = $this->GroupModel->Get('CountMembers', 'desc', 9)->ResultArray();
+      $Groups = $this->GroupModel->Get('CountMembers', 'desc', $Limit)->ResultArray();
       $this->SetData('Groups', $Groups);
 
       // Get new groups.
-      $NewGroups = $this->GroupModel->Get('DateInserted', 'desc', 9)->ResultArray();
+      $NewGroups = $this->GroupModel->Get('DateInserted', 'desc', $Limit)->ResultArray();
       $this->SetData('NewGroups', $NewGroups);
 
       // Get my groups.
       if (Gdn::Session()->IsValid()) {
-         $MyGroups = $this->GroupModel->GetByUser(Gdn::Session()->UserID);
+         $MyGroups = $this->GroupModel->GetByUser(Gdn::Session()->UserID, $Limit);
          $this->SetData('MyGroups', $MyGroups);
       }
 
-      $this->Title(T('Groups'));
+      if ($this->DeliveryType() !== DELIVERY_TYPE_DATA) {
+         $this->Title(T('Groups'));
 
-      require_once $this->FetchViewLocation('group_functions', 'Group');
-      $this->CssClass .= ' NoPanel';
+         require_once $this->FetchViewLocation('group_functions', 'Group');
+         $this->CssClass .= ' NoPanel';
+      }
       $this->Render('Groups');
    }
    
