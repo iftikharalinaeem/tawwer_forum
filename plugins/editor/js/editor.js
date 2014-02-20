@@ -1121,7 +1121,6 @@
             }
          }).on('drop dragend dragleave', function(e) {
             $dndCueWrapper.removeClass('editor-drop-cue');
-            $(editor).blur();
          });
 
 
