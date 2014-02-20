@@ -15,7 +15,7 @@ class GroupModel extends Gdn_Model {
     * @param Gdn_DataSet $Result
     */
    public function Calc(&$Result) {
-      foreach ($Result->ResultArray() as &$Row) {
+      foreach ($Result as &$Row) {
          $Row['DescriptionHtml'] = Gdn_Format::To($Row['Description'], $Row['Format']);
 
          if ($Row['Icon']) {
@@ -176,13 +176,20 @@ class GroupModel extends Gdn_Model {
       return $Result;
    }
 
+   public function Get($OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $PageNumber = FALSE) {
+      $Result = parent::Get($OrderFields, $OrderDirection, $Limit, $PageNumber);
+      $Result->DatasetType(DATASET_TYPE_ARRAY);
+      $this->Calc($Result->Result());
+      return $Result;
+   }
+
    public function GetByUser($UserID, $Limit = 9) {
       $UserGroups = $this->SQL->GetWhere('UserGroup', array('UserID' => $UserID))->ResultArray();
       $IDs = ConsolidateArrayValuesByKey($UserGroups, 'GroupID');
 
-      $Result = $this->GetWhere(array('GroupID' => $IDs), 'Name', 'asc', $Limit);
+      $Result = $this->GetWhere(array('GroupID' => $IDs), 'Name', 'asc', $Limit)->ResultArray();
       $this->Calc($Result);
-      return $Result->ResultArray();
+      return $Result;
    }
 
    public function GetCount($Wheres = '') {
