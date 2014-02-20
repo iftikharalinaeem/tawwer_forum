@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.2.16',
+   'Version' => '1.2.17',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -11,7 +11,9 @@ $PluginInfo['editor'] = array(
    'RequiredTheme' => false,
    'RequiredPlugins' => false,
    'HasLocale' => false,
-   'RegisterPermissions' => false,
+   'RegisterPermissions' => array(
+      'Plugins.Attachments.Upload.Allow' => 'Garden.Profiles.Edit'
+   ),
    'SettingsUrl' => '/settings/editor',
    'SettingsPermission' => 'Garden.Setttings.Manage'
 );
@@ -23,6 +25,8 @@ class EditorPlugin extends Gdn_Plugin {
     * Properties
     *
     */
+
+   protected $canUpload = false;
 
    /**
     *
@@ -87,6 +91,16 @@ class EditorPlugin extends Gdn_Plugin {
       $this->AssetPath = Asset('/plugins/editor');
       $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
       $this->ForceWysiwyg = C('Plugins.editor.ForceWysiwyg', false);
+
+      // Check upload permissions
+      $this->canUpload = Gdn::Session()->CheckPermission('Plugins.Attachments.Upload.Allow', false);
+
+      if ($this->canUpload) {
+         $PermissionCategory = CategoryModel::PermissionCategory(Gdn::Controller()->Data('Category'));
+         if (!GetValue('AllowFileUploads', $PermissionCategory, true)) {
+            $this->canUpload = false;
+         }
+      }
    }
 
    /**
@@ -261,7 +275,10 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['emoji'] = array('edit' => 'media', 'action'=> 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => T('Emoji'), 'data-editor' => '{"action":"emoji","value":""}'));
       $editorToolbarAll['links'] = array('edit' => 'media', 'action'=> 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link', 'data-wysihtml5-command' => 'createLink', 'title' => T('Url'), 'data-editor' => '{"action":"url","value":""}'));
       $editorToolbarAll['images'] = array('edit' => 'media', 'action'=> 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => T('Image'), 'data-editor' => '{"action":"image","value":""}'));
-      $editorToolbarAll['uploads'] = array('edit' => 'media', 'action'=> 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-paper-clip editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => T('Attach'), 'data-editor' => '{"action":"upload","value":""}'));
+
+      if ($this->canUpload) {
+         $editorToolbarAll['uploads'] = array('edit' => 'media', 'action'=> 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-paper-clip editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => T('Attach'), 'data-editor' => '{"action":"upload","value":""}'));
+      }
 
       $editorToolbarAll['sep-align'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-align hidden-xs'));
       $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action'=> 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyLeft', 'title' => T('Align left'), 'data-editor' => '{"action":"alignleft","value":""}'));
@@ -328,7 +345,7 @@ class EditorPlugin extends Gdn_Plugin {
 
       // If user wants to modify styling of Wysiwyg content in editor,
       // they can override the styles with this file.
-      $CssInfo = AssetModel::CssPath('wysiwyg.css', 'plugins/editor');
+      $CssInfo = AssetModel::CssPath(false, 'wysiwyg.css', 'plugins/editor');
       if ($CssInfo) {
         $CssPath = Asset($CssInfo[1]);
       }
@@ -366,6 +383,7 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddDefinition('allowedFileExtensions', json_encode(C('Garden.Upload.AllowedFileExtensions')));
       // Get max file uploads, to be used for max drops at once.
       $c->AddDefinition('maxFileUploads', ini_get('max_file_uploads'));
+      $c->AddDefinition('canUpload', $this->canUpload);
 
       // Add active emoji so autosuggest works
       $Emoji = Emoji::instance();

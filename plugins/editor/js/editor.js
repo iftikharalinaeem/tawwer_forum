@@ -1058,6 +1058,11 @@
       // on Tim Down's rangyinputs (originally loaded for buttonbarplus).
       var fileUploadsInit = function(dropElement, editorInstance) {
 
+         var canUpload = parseInt(gdn.definition('canUpload', false));
+         if (canUpload != 1) {
+            return false;
+         }
+
          // Disable default browser behaviour of file drops
          $(document).on('drop dragover', function(e) {
             e.preventDefault();
