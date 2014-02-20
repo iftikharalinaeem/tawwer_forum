@@ -807,13 +807,12 @@ class EditorPlugin extends Gdn_Plugin {
 
    /**
     * Instead of using Gdn_Upload->GenerateTargetName, create one that
-    * depends on MD5s, to reduce space for duplicates, and use smarter
-    * folder sorting based off the MD5s.
+    * depends on SHA1s, to reduce space for duplicates, and use smarter
+    * folder sorting based off the SHA1s.
     *
     * @param type $file
     */
    public function getAbsoluteDestinationFilePath($tmpFilePath, $fileExtension, $uploadDestinationDir = '') {
-
       $absolutePath = '';
 
       $basePath = $this->editorBaseUploadDestinationDir;
@@ -826,14 +825,17 @@ class EditorPlugin extends Gdn_Plugin {
          $basePath = $uploadDestinationDir;
       }
 
-      // MD5 of the tmp file
-      $fileMD5 = md5_file($tmpFilePath);
+      // SHA1 of the tmp file
+      //$fileSHA1 = sha1_file($tmpFilePath);
+      // Instead just use the RandomString function that
+      // Gdn_Upload->GenerateTargetName is using.
+      $fileRandomString = RandomString(14);
 
       // Use first two characters from fileMD5 as subdirectory,
       // and use the rest as the file name.
       $dirlen = 2;
-      $subdir = substr($fileMD5, 0, $dirlen);
-      $filename = substr($fileMD5, $dirlen);
+      $subdir = substr($fileRandomString, 0, $dirlen);
+      $filename = substr($fileRandomString, $dirlen);
       $fileDirPath = $basePath . '/' . $subdir;
 
       if ($this->validateUploadDestinationPath($fileDirPath)) {
