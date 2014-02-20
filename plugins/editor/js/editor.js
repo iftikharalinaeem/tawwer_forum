@@ -1115,8 +1115,8 @@
             if (handleIframe) {
                $(editor).focus();
                $(this).css({
-                  'border': '2px dashed rgba(0,0,0,0.25)',
-                  'border-radius': '2px'
+                  'border': '2px dashed rgba(0,0,0,0.25) !important',
+                  'border-radius': '2px !important'
                });
             }
          }).on('drop dragend dragleave', function(e) {
