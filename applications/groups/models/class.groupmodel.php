@@ -16,6 +16,7 @@ class GroupModel extends Gdn_Model {
     */
    public function Calc(&$Result) {
       foreach ($Result as &$Row) {
+         $Row['Url'] = GroupUrl($Row, NULL, '//');
          $Row['DescriptionHtml'] = Gdn_Format::To($Row['Description'], $Row['Format']);
 
          if ($Row['Icon']) {

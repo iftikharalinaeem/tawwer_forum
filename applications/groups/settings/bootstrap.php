@@ -4,11 +4,11 @@ function GroupSlug($Group) {
    return $Group['GroupID'].'-'.Gdn_Format::Url($Group['Name']);
 }
 
-function GroupUrl($Group, $Method = NULL) {
+function GroupUrl($Group, $Method = NULL, $WithDomain = '//') {
    if ($Method) {
-      return Url("/group/$Method/".GroupSlug($Group), '//');
+      return Url("/group/$Method/".GroupSlug($Group), $WithDomain);
    } else {
-      return Url('/group/'.GroupSlug($Group), '//');
+      return Url('/group/'.GroupSlug($Group), $WithDomain);
    }
 }
 function EventSlug($Event) {
