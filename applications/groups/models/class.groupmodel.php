@@ -159,12 +159,13 @@ class GroupModel extends Gdn_Model {
       return $Result;
    }
 
-   public function GetByUser($UserID) {
+   public function GetByUser($UserID, $Limit = 9) {
       $UserGroups = $this->SQL->GetWhere('UserGroup', array('UserID' => $UserID))->ResultArray();
       $IDs = ConsolidateArrayValuesByKey($UserGroups, 'GroupID');
 
-      $Result = $this->GetWhere(array('GroupID' => $IDs), 'Name')->ResultArray();
-      return $Result;
+      $Result = $this->GetWhere(array('GroupID' => $IDs), 'Name', 'asc', $Limit);
+      $this->Calc($Result);
+      return $Result->ResultArray();
    }
 
    public function GetCount($Wheres = '') {
