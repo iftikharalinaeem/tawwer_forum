@@ -6,11 +6,13 @@
    position: absolute;
    width: 0%;
    overflow: hidden;
-   background-color: red;
-   margin: -1px 0 0 0;
+   background: #38ABE3 url(/applications/dashboard/design/images/upload-progress-back.gif) repeat;
+   margin: -2px 0 0 0;
    width: 0;
    height: 3px;
+   border: 1px solid #38ABE3;
    opacity: 1;
+   box-shadow: 0 1px 2px -1px #fff;
 }
 
 .editor-upload-progress.fade-out {

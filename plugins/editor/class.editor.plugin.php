@@ -500,6 +500,7 @@ class EditorPlugin extends Gdn_Plugin {
 
          $fileExtension = $Upload->GetUploadedFileExtension();
          $fileName = $Upload->GetUploadedFileName();
+         list($tmpwidth, $tmpheight) = getimagesize($tmpFilePath);
 
          // This will return the absolute destination path, including generated
          // filename based on md5_file, and the full path. It
@@ -525,44 +526,23 @@ class EditorPlugin extends Gdn_Plugin {
          $imageWidth = '';
          $thumbDestinationPath = '';
          $thumbPathParsed = array('SaveName' => '');
-
-         // TODO in future, because of how files are stored, if they exist,
-         // no need to create another thumbnail. They are checked against
-         // MD5 file value.
+         $thumbUrl = '';
 
          // This is a redundant check, because it's in the thumbnail function,
          // but there's no point calling it blindly on every file, so just
          // check here before calling it.
+         $generate_thumbnail = false;
          if (in_array($fileExtension, array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico'))) {
-
-            // Generate new path for thumbnail
-            $thumbPath = $this->editorBaseUploadDestinationDir . '/' . 'thumb';
-
-            // Grab full path with filename, and validate it.
-            $thumbDestinationPath = $this->getAbsoluteDestinationFilePath($absoluteFileDestination, $fileExtension, $thumbPath);
-
-            // Create thumbnail, and grab debug data from whole process.
-            $thumb_payload = generate_thumbnail($absoluteFileDestination, $thumbDestinationPath, array(
-                // Give preference to height for thumbnail, so height controls.
-                'height' => C('Plugins.FileUpload.ThumbnailHeight', 128)
-            ));
-
-            if ($thumb_payload['success']) {
-               // Thumbnail dimensions
-               $thumbHeight = round($thumb_payload['result_height']);
-               $thumbWidth = round($thumb_payload['result_width']);
-               // Original dimensions
-               $imageHeight = round($thumb_payload['height']);
-               $imageWidth = round($thumb_payload['width']);
-
-               $thumbPathParsed = Gdn_Upload::Parse($thumbDestinationPath);
-            }
+            $imageHeight = $tmpheight;
+            $imageWidth = $tmpwidth;
+            $generate_thumbnail = true;
          }
 
          // Save data to database using model with media table
          $Model = new Gdn_Model('Media');
 
          // Will be passed to model for database insertion/update.
+         // All thumb vars will be empty.
          $Media = array(
             'Name'            => $fileName,
             'Type'            => $fileData['type'],
@@ -582,9 +562,9 @@ class EditorPlugin extends Gdn_Plugin {
          $MediaID = $Model->Save($Media);
          $Media['MediaID'] = $MediaID;
 
-         $thumbUrl = ($thumbPathParsed['SaveName'])
-            ? $Upload->Url($thumbPathParsed['SaveName'])
-            : '';
+         if ($generate_thumbnail) {
+            $thumbUrl = Url('/utility/mediathumbnail/' . $MediaID, true);
+         }
 
          $payload = array(
             'MediaID'            => $MediaID,
@@ -595,7 +575,7 @@ class EditorPlugin extends Gdn_Plugin {
             'Thumbnail' => '',
             'FinalImageLocation' => '',
             'Parsed' => $filePathParsed,
-            'Media' => $Media,
+            'Media' => (array) $Media,
             'original_url' => $Upload->Url($filePathParsed['SaveName']),
             'thumbnail_url' => $thumbUrl,
             'original_width' => $imageWidth,
@@ -946,4 +926,77 @@ class EditorPlugin extends Gdn_Plugin {
    public function CleanUp() {
     //RemoveFromConfig('Plugin.editor.DefaultView');
   }
+
+   /**
+    * Create and display a thumbnail of an uploaded file.
+    */
+   public function UtilityController_MediaThumbnail_Create($sender, $media_id) {
+      // When it makes it into core, it will be available in
+      // functions.general.php
+      require 'generate_thumbnail.php';
+
+      $model = new Gdn_Model('Media');
+      $media = (array) $model->GetID($media_id);
+
+      // Get actual path to the file.
+      $local_path = Gdn_Upload::CopyLocal($media['Path']);
+      if (!file_exists($local_path)) {
+         throw NotFoundException('File');
+      }
+
+      $file_extension = pathinfo($local_path, PATHINFO_EXTENSION);
+
+      // Generate new path for thumbnail
+      $thumb_path = $this->getBaseUploadDestinationDir() . '/' . 'thumb';
+
+      // Grab full path with filename, and validate it.
+      $thumb_destination_path = $this->getAbsoluteDestinationFilePath($local_path, $file_extension, $thumb_path);
+
+      // Create thumbnail, and grab debug data from whole process.
+      $thumb_payload = generate_thumbnail($local_path, $thumb_destination_path, array(
+          // Give preference to height for thumbnail, so height controls.
+          'height' => C('Plugins.FileUpload.ThumbnailHeight', 128)
+      ));
+
+      if ($thumb_payload['success'] === true) {
+         // Thumbnail dimensions
+         $thumb_height = round($thumb_payload['result_height']);
+         $thumb_width = round($thumb_payload['result_width']);
+
+         // Move the thumbnail to its proper location. Calling SaveAs with
+         // cloudfiles enabled will trigger the move to cloudfiles, so use
+         // same path for each arg in SaveAs. The file will be removed from
+         // the local filesystem.
+         $Upload = new Gdn_Upload();
+         $filepath_parsed = $Upload->SaveAs($thumb_destination_path, $thumb_destination_path);
+
+         // Save thumbnail information to DB.
+         $model->Save(array(
+             'MediaID' => $media_id,
+             'StorageMethod' => $filepath_parsed['Type'],
+             'ThumbWidth' => $thumb_width,
+             'ThumbHeight' => $thumb_height,
+             'ThumbPath' => $filepath_parsed['SaveName']
+          ));
+
+         // Remove cf scratch copy, typically in cftemp.
+         if (!unlink($local_path)) {
+            // Maybe add logging for local cf copies not deleted.
+         }
+
+         $url = $filepath_parsed['Url'];
+      } else {
+         // Fix the thumbnail information so this isn't requested again and again.
+         $model->Save(array(
+             'MediaID' => $media_id,
+             'ImageWidth' => 0,
+             'ImageHeight' => 0,
+             'ThumbPath' => ''
+          ));
+
+         $url = Asset('/plugins/FileUpload/images/file.png');
+      }
+
+      Redirect($url, 301);
+   }
 }

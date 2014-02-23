@@ -146,7 +146,12 @@ function generate_thumbnail($src, $dst = '', $opts = array())
        // returned $data array.
        'exif'               => false,
        // Do not allow thumbnails to exceed dimensions of original photo.
-       'allow_bigger'       => false
+       'allow_bigger'       => false,
+       // If debug is true, all $data calculations will happen, but the image
+       // creation and processing will not happen (so save major memory). This
+       // is useful if you just want to know how much memory a photo will
+       // require, or what the result dimensions will be.
+       'debug'              => false
    );
 
    // Combine user-provided options with defaults, remove any non-valid options.
@@ -246,7 +251,7 @@ function generate_thumbnail($src, $dst = '', $opts = array())
 
    // Set destination path. If empty, then saves to the current working dir.
    // Optionally, let it save to actual location of included script with __DIR__
-   $data['dst_directory'] = ($dst_path_data['dirname'])
+   $data['dst_directory'] = (isset($dst_path_data['dirname']))
       ? $dst_path_data['dirname']
       : getcwd();
 
@@ -286,13 +291,13 @@ function generate_thumbnail($src, $dst = '', $opts = array())
 
    // If no dst is provided, use the path set above, but use original file
    // name, and add timestamp and quality percentage.
-   $data['dst_filename'] = ($dst_path_data['filename'])
+   $data['dst_filename'] = (isset($dst_path_data['filename']))
       ? $dst_path_data['filename']
       : $src_path_data['filename'] . '.' . time() . '-' . $data['options']['quality'];
 
-   // This will receive a final check below, when concatenating the final
-   // and full destination.
-   $data['dst_extension'] = ($dst_path_data['extension'])
+   // This will receive a final check further down, after the mime_subtype is
+   // extracted from the file.
+   $data['dst_extension'] = (isset($dst_path_data['extension']))
       ? $dst_path_data['extension']
       : $src_path_data['extension'];
 
@@ -347,6 +352,16 @@ function generate_thumbnail($src, $dst = '', $opts = array())
       && in_array($data['mime_subtype'], $data['allowed_files'])) {
 
          // Safe to continue working with image.
+
+         // Determine for sure the correct filename extension, and make sure it's
+         // allowed, same with the source extension. If unavailable, use the
+         // mime_subtype. In the case of jpg, it will always be jpeg, but this
+         // will just indicate that the src and/or dst file had no file extension.
+         // The second is only used if the extension was not provided by the
+         // dst in dst_extension.
+         $data['dst_extension'] = ($data['dst_extension'] && in_array($data['dst_extension'], $data['allowed_files']))
+            ? $data['dst_extension']
+            : $data['mime_subtype'];
 
          // Get bytes per pixel by checking the channels of image. If there are
          // none default to 4, just in case. getimagesize does not always
@@ -481,19 +496,12 @@ function generate_thumbnail($src, $dst = '', $opts = array())
          // are already defined, they will get overwritten here.
          //$data['options']['crop']
       } else {
-
          if ($data['width'] > $data['options']['max_width']) {
-
-
 
          } elseif ($data['height'] > $data['options']['max_height']) {
 
          }
-
-
       }
-
-
 
       // Handle cropping coordinates and position, if any, allow for words to
       // position the crop area. Note, strict X Y order must be observed if
@@ -605,7 +613,7 @@ function generate_thumbnail($src, $dst = '', $opts = array())
     * will increase dramatically.
     */
 
-   if ($data['image_start_processing']) {
+   if ($data['image_start_processing'] && !$data['options']['debug']) {
 
       // Before processing image, grab the memory being used up to now, then
       // subtract it from the check below, which will provide the actual memory
@@ -704,8 +712,13 @@ function generate_thumbnail($src, $dst = '', $opts = array())
       $data['success'] = true;
    }
 
+   if ($data['options']['debug']) {
+      $data['success'] = 'debug';
+   }
+
    // This will contain a lot of debugging information. Check that `success`
-   // is true.
+   // is true, but use type comparison (===), because if this function is
+   // run in debug mode, the value of `success` will be `debug`.
    return $data;
 }
 endif;
