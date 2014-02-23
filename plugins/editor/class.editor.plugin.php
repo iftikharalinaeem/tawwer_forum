@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.2.25',
+   'Version' => '1.2.26',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -967,8 +967,10 @@ class EditorPlugin extends Gdn_Plugin {
          // cloudfiles enabled will trigger the move to cloudfiles, so use
          // same path for each arg in SaveAs. The file will be removed from
          // the local filesystem.
+         $parsed = Gdn_Upload::Parse($thumb_destination_path);
+         $target = $parsed['Name']; // $thumb_destination_path
          $Upload = new Gdn_Upload();
-         $filepath_parsed = $Upload->SaveAs($thumb_destination_path, $thumb_destination_path);
+         $filepath_parsed = $Upload->SaveAs($thumb_destination_path, $target);
 
          // Save thumbnail information to DB.
          $model->Save(array(
