@@ -77,13 +77,16 @@ function generate_thumbnail($src, $dst = '', $opts = array())
       return $size;
    };
 
-   // Notice: Undefined offset: -9223372036854775808 in /var/www/frontend/plugins/editor/generate_thumbnail.php on line 85 
+   // Notice: Undefined offset: -9223372036854775808 in /var/www/frontend/plugins/editor/generate_thumbnail.php on line 85
    // Translate bytes to human readable format. Use for php.ini values.
    // Based off of Chris Jester-Young's implementation.
-   $bytes_to = function($human_readable_size, $precision = 0) {
-      $base = log($human_readable_size) / log(1024);
-      $suffixes = array('', 'k', 'M', 'G', 'T');
-      return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
+   $bytes_to = function($byte_size, $precision = 0) {
+      $base = log($byte_size) / log(1024);
+      $suffixes = array('B', 'k', 'M', 'G', 'T');
+      $floorbase = (floor($base) >= 0)
+         ? floor($base)
+         : 0;
+      return round(pow(1024, $base - $floorbase), $precision) . $suffixes[$floorbase];
    };
 
    // Set some hard limits, so function will not process image if the
