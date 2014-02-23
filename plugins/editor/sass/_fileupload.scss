@@ -9,14 +9,15 @@
    background: #38ABE3 url(/applications/dashboard/design/images/upload-progress-back.gif) repeat;
    margin: -2px 0 0 0;
    width: 0;
-   height: 3px;
+   height: 5px;
    border: 1px solid #38ABE3;
-   opacity: 1;
+   opacity: 0;
    box-shadow: 0 1px 2px -1px #fff;
+   box-sizing: border-box;
 }
 
 .editor-upload-progress.fade-out {
-   opacity: 0;
+   opacity: 0 !important;
    transition: opacity 0.7s ease;
 }
 

@@ -77,6 +77,7 @@ function generate_thumbnail($src, $dst = '', $opts = array())
       return $size;
    };
 
+   // Notice: Undefined offset: -9223372036854775808 in /var/www/frontend/plugins/editor/generate_thumbnail.php on line 85 
    // Translate bytes to human readable format. Use for php.ini values.
    // Based off of Chris Jester-Young's implementation.
    $bytes_to = function($human_readable_size, $precision = 0) {
