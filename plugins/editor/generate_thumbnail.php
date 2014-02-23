@@ -234,7 +234,7 @@ function generate_thumbnail($src, $dst = '', $opts = array())
    // a temporary file name with no extension, so allow that through. It will
    // get caught later if it's not an image.
    $data['allowed_files'] = array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico', '');
-   $data['file'] = strtolower($src);
+   $data['file'] = $src;
 
    // Get path info for source
    $src_path_data = pathinfo($data['file']);
