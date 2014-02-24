@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.1',
+   'Version' => '1.3.2',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -920,7 +920,11 @@ class EditorPlugin extends Gdn_Plugin {
       require 'generate_thumbnail.php';
 
       $model = new Gdn_Model('Media');
-      $media = (array) $model->GetID($media_id);
+      $media = $model->GetID($media_id, DATASET_TYPE_ARRAY);
+
+      if (!$media) {
+         throw NotFoundException('File');
+      }
 
       // Get actual path to the file.
       $local_path = Gdn_Upload::CopyLocal($media['Path']);
