@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.2.26',
+   'Version' => '1.2.27',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -968,7 +968,7 @@ class EditorPlugin extends Gdn_Plugin {
          // same path for each arg in SaveAs. The file will be removed from
          // the local filesystem.
          $parsed = Gdn_Upload::Parse($thumb_destination_path);
-         $target = $parsed['Name']; // $thumb_destination_path
+         $target = $thumb_destination_path; // $parsed['Name'];
          $Upload = new Gdn_Upload();
          $filepath_parsed = $Upload->SaveAs($thumb_destination_path, $target);
 

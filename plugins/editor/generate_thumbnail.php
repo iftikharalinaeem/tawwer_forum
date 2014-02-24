@@ -295,7 +295,7 @@ function generate_thumbnail($src, $dst = '', $opts = array())
 
    // If no dst is provided, use the path set above, but use original file
    // name, and add timestamp and quality percentage.
-   $data['dst_filename'] = (isset($dst_path_data['filename']))
+   $data['dst_filename'] = ($dst_path_data['filename'] != '')
       ? $dst_path_data['filename']
       : $src_path_data['filename'] . '.' . time() . '-' . $data['options']['quality'];
 
@@ -629,16 +629,6 @@ function generate_thumbnail($src, $dst = '', $opts = array())
       // Use dynamic function call.
       $imagecreatefrom = "imagecreatefrom{$data['mime_subtype']}";
       $image = $imagecreatefrom($data['file']);
-
-      // Determine for sure the correct filename extension, and make sure it's
-      // allowed, same with the source extension. If unavailable, use the
-      // mime_subtype. In the case of jpg, it will always be jpeg, but this
-      // will just indicate that the src and or dst file had no file extension.
-      // The second is only used if the extension was not provided by the
-      // dst in dst_extension.
-      $data['dst_extension'] = ($data['dst_extension'] && in_array($data['dst_extension'], $data['allowed_files']))
-         ? $data['dst_extension']
-         : $data['mime_subtype'];
 
       // Now that the extension is absolutely known, adjust quality level for
       // PNGs, as they have a compression level of 0-9, not a percentage of
