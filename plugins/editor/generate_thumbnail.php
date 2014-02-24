@@ -77,12 +77,16 @@ function generate_thumbnail($src, $dst = '', $opts = array())
       return $size;
    };
 
+   // Notice: Undefined offset: -9223372036854775808 in /var/www/frontend/plugins/editor/generate_thumbnail.php on line 85
    // Translate bytes to human readable format. Use for php.ini values.
    // Based off of Chris Jester-Young's implementation.
-   $bytes_to = function($human_readable_size, $precision = 0) {
-      $base = log($human_readable_size) / log(1024);
-      $suffixes = array('', 'k', 'M', 'G', 'T');
-      return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
+   $bytes_to = function($byte_size, $precision = 0) {
+      $base = log($byte_size) / log(1024);
+      $suffixes = array('B', 'k', 'M', 'G', 'T');
+      $floorbase = (floor($base) >= 0)
+         ? floor($base)
+         : 0;
+      return round(pow(1024, $base - $floorbase), $precision) . $suffixes[$floorbase];
    };
 
    // Set some hard limits, so function will not process image if the
@@ -146,7 +150,12 @@ function generate_thumbnail($src, $dst = '', $opts = array())
        // returned $data array.
        'exif'               => false,
        // Do not allow thumbnails to exceed dimensions of original photo.
-       'allow_bigger'       => false
+       'allow_bigger'       => false,
+       // If debug is true, all $data calculations will happen, but the image
+       // creation and processing will not happen (so save major memory). This
+       // is useful if you just want to know how much memory a photo will
+       // require, or what the result dimensions will be.
+       'debug'              => false
    );
 
    // Combine user-provided options with defaults, remove any non-valid options.
@@ -229,7 +238,7 @@ function generate_thumbnail($src, $dst = '', $opts = array())
    // a temporary file name with no extension, so allow that through. It will
    // get caught later if it's not an image.
    $data['allowed_files'] = array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico', '');
-   $data['file'] = strtolower($src);
+   $data['file'] = $src;
 
    // Get path info for source
    $src_path_data = pathinfo($data['file']);
@@ -246,7 +255,7 @@ function generate_thumbnail($src, $dst = '', $opts = array())
 
    // Set destination path. If empty, then saves to the current working dir.
    // Optionally, let it save to actual location of included script with __DIR__
-   $data['dst_directory'] = ($dst_path_data['dirname'])
+   $data['dst_directory'] = (isset($dst_path_data['dirname']))
       ? $dst_path_data['dirname']
       : getcwd();
 
@@ -286,13 +295,13 @@ function generate_thumbnail($src, $dst = '', $opts = array())
 
    // If no dst is provided, use the path set above, but use original file
    // name, and add timestamp and quality percentage.
-   $data['dst_filename'] = ($dst_path_data['filename'])
+   $data['dst_filename'] = ($dst_path_data['filename'] != '')
       ? $dst_path_data['filename']
       : $src_path_data['filename'] . '.' . time() . '-' . $data['options']['quality'];
 
-   // This will receive a final check below, when concatenating the final
-   // and full destination.
-   $data['dst_extension'] = ($dst_path_data['extension'])
+   // This will receive a final check further down, after the mime_subtype is
+   // extracted from the file.
+   $data['dst_extension'] = (isset($dst_path_data['extension']))
       ? $dst_path_data['extension']
       : $src_path_data['extension'];
 
@@ -347,6 +356,16 @@ function generate_thumbnail($src, $dst = '', $opts = array())
       && in_array($data['mime_subtype'], $data['allowed_files'])) {
 
          // Safe to continue working with image.
+
+         // Determine for sure the correct filename extension, and make sure it's
+         // allowed, same with the source extension. If unavailable, use the
+         // mime_subtype. In the case of jpg, it will always be jpeg, but this
+         // will just indicate that the src and/or dst file had no file extension.
+         // The second is only used if the extension was not provided by the
+         // dst in dst_extension.
+         $data['dst_extension'] = ($data['dst_extension'] && in_array($data['dst_extension'], $data['allowed_files']))
+            ? $data['dst_extension']
+            : $data['mime_subtype'];
 
          // Get bytes per pixel by checking the channels of image. If there are
          // none default to 4, just in case. getimagesize does not always
@@ -481,19 +500,12 @@ function generate_thumbnail($src, $dst = '', $opts = array())
          // are already defined, they will get overwritten here.
          //$data['options']['crop']
       } else {
-
          if ($data['width'] > $data['options']['max_width']) {
-
-
 
          } elseif ($data['height'] > $data['options']['max_height']) {
 
          }
-
-
       }
-
-
 
       // Handle cropping coordinates and position, if any, allow for words to
       // position the crop area. Note, strict X Y order must be observed if
@@ -605,7 +617,7 @@ function generate_thumbnail($src, $dst = '', $opts = array())
     * will increase dramatically.
     */
 
-   if ($data['image_start_processing']) {
+   if ($data['image_start_processing'] && !$data['options']['debug']) {
 
       // Before processing image, grab the memory being used up to now, then
       // subtract it from the check below, which will provide the actual memory
@@ -617,16 +629,6 @@ function generate_thumbnail($src, $dst = '', $opts = array())
       // Use dynamic function call.
       $imagecreatefrom = "imagecreatefrom{$data['mime_subtype']}";
       $image = $imagecreatefrom($data['file']);
-
-      // Determine for sure the correct filename extension, and make sure it's
-      // allowed, same with the source extension. If unavailable, use the
-      // mime_subtype. In the case of jpg, it will always be jpeg, but this
-      // will just indicate that the src and or dst file had no file extension.
-      // The second is only used if the extension was not provided by the
-      // dst in dst_extension.
-      $data['dst_extension'] = ($data['dst_extension'] && in_array($data['dst_extension'], $data['allowed_files']))
-         ? $data['dst_extension']
-         : $data['mime_subtype'];
 
       // Now that the extension is absolutely known, adjust quality level for
       // PNGs, as they have a compression level of 0-9, not a percentage of
@@ -704,8 +706,13 @@ function generate_thumbnail($src, $dst = '', $opts = array())
       $data['success'] = true;
    }
 
+   if ($data['options']['debug']) {
+      $data['success'] = 'debug';
+   }
+
    // This will contain a lot of debugging information. Check that `success`
-   // is true.
+   // is true, but use type comparison (===), because if this function is
+   // run in debug mode, the value of `success` will be `debug`.
    return $data;
 }
 endif;

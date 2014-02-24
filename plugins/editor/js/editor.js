@@ -1428,6 +1428,7 @@
                   var $progressMeter = $(this).closest('form').find('.editor-upload-progress');
                   document.title = '('+ progress + '%) ' + documentTitle;
                   $progressMeter.css({
+                     'opacity': 1,
                      'width': progress + '%'
                   });
                },
@@ -1535,6 +1536,7 @@
                      $progressMeter.removeClass('fade-out');
                      // Reset width
                      $progressMeter.css({
+                        'opacity': 0,
                         'width': 0
                      });
                   }, 710);
