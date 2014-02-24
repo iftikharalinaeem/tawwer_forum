@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.2',
+   'Version' => '1.3.3',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -805,7 +805,7 @@ class EditorPlugin extends Gdn_Plugin {
       //$fileSHA1 = sha1_file($tmpFilePath);
       // Instead just use the RandomString function that
       // Gdn_Upload->GenerateTargetName is using.
-      $fileRandomString = RandomString(14);
+      $fileRandomString = strtolower(RandomString(14));
 
       // Use first two characters from fileMD5 as subdirectory,
       // and use the rest as the file name.
