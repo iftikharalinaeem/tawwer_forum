@@ -323,6 +323,7 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
+  margin: 0;
 }
 
 .editor-dd-color + .editor-insert-dialog {
@@ -405,7 +406,7 @@
 .editor-file-image .file-drop {
   border: 2px dashed rgba(0, 0, 0, 0.25);
   border-radius: 2px;
-  margin: 10px;
+  margin: 10px 10px 0 10px;
   text-align: center;
   padding: 30px;
   display: none;
@@ -416,7 +417,7 @@
 .editor-file-image .file-input {
   overflow: hidden;
   white-space: nowrap;
-  padding-top: 0;
+  padding-top: 10px;
 }
 .editor-file-image .image-input {
   padding: 0;
@@ -434,6 +435,15 @@
   opacity: 0;
   pointer-events: none;
   transform: scale(0);
+}
+
+/* If uploads disabled entirely, hide some options in the dropdown */
+.editor-uploads-disabled .file-drop,
+.editor-uploads-disabled .file-input {
+  display: none;
+}
+.editor-uploads-disabled .image-input {
+  border: 0;
 }
 
 /**

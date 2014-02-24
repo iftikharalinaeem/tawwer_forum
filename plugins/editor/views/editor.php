@@ -4,7 +4,12 @@
    $html_toolbar    = ''; // for regular text
 
    if ($format != 'text' && $format != 'textex') {
-      $html_toolbar    = '<div class="editor editor-format-'. $format .'">';
+
+      $css_upload_class = ($this->Data('canUpload'))
+         ? 'editor-uploads'
+         : 'editor-uploads-disabled';
+
+      $html_toolbar    = '<div class="editor editor-format-'. $format .' '. $css_upload_class .'">';
       $html_arrow_down = '<span class="icon icon-caret-down"></span>';
       $editor_file_input_name = $this->Data('editorFileInputName');
 
