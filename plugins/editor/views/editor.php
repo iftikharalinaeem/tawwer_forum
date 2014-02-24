@@ -76,7 +76,7 @@
                      Wrap($html_arrow_down, 'span', $button['attr']) .''.
                      '<div class="editor-insert-dialog Flyout MenuItems editor-file-image">
                         <div id="drop-cue-dropdown" class="drop-section file-drop">
-                           '. T('Drop file(s)') .'
+                           '. T('Drop image/file') .'
                         </div>
                         <div class="drop-section file-input">
                            or <input type="file" name="'. $editor_file_input_name .'[]" multiple directory webkitdirectory mozdirectory />
@@ -108,7 +108,7 @@
 
    // Add drop message when dragging over dropzone. Only display when
    // dragging over element.
-   $html_toolbar .= '<div class="editor-upload-attention">'. T('Drop file(s)') .'</div>';
+   $html_toolbar .= '<div class="editor-upload-attention">'. T('Drop image/file') .'</div>';
 
    // Generate output for view
    echo $html_toolbar;

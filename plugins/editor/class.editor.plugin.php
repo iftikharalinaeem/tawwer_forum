@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.2.27',
+   'Version' => '1.2.28',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -277,7 +277,7 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['images'] = array('edit' => 'media', 'action'=> 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => T('Image'), 'data-editor' => '{"action":"image","value":""}'));
 
       if ($this->canUpload) {
-         $editorToolbarAll['uploads'] = array('edit' => 'media', 'action'=> 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-paper-clip editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => T('Attach'), 'data-editor' => '{"action":"upload","value":""}'));
+         $editorToolbarAll['uploads'] = array('edit' => 'media', 'action'=> 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-file editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => T('Attach image/file'), 'data-editor' => '{"action":"upload","value":""}'));
       }
 
       $editorToolbarAll['sep-align'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-align hidden-xs'));
