@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.2.29',
+   'Version' => '1.3.0',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -352,7 +352,6 @@ class EditorPlugin extends Gdn_Plugin {
 
       // Load JavaScript used by every editor view.
       $c->AddJsFile('editor.js', 'plugins/editor');
-      $c->AddJsFile('jquery.atwho.js', 'plugins/editor');
 
       // Fileuploads
       //$c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
@@ -384,21 +383,6 @@ class EditorPlugin extends Gdn_Plugin {
       // Get max file uploads, to be used for max drops at once.
       $c->AddDefinition('maxFileUploads', ini_get('max_file_uploads'));
       $c->AddDefinition('canUpload', $this->canUpload);
-
-      // Add active emoji so autosuggest works
-      $Emoji = Emoji::instance();
-      $emojis = $Emoji->getEmoji();
-      $emojiAssetPath = $Emoji->getAssetPath();
-      $emoji = array();
-
-      foreach ($emojis as $name => $data) {
-         $emoji[] = array(
-             "name" => "". $name ."",
-             "url" =>  $emojiAssetPath . '/' . reset($data)
-         );
-      }
-
-      $c->AddDefinition('emoji', json_encode($emoji));
    }
 
    /**
