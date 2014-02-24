@@ -79,7 +79,7 @@
                            '. T('Drop image/file') .'
                         </div>
                         <div class="drop-section file-input">
-                           or <input type="file" name="'. $editor_file_input_name .'[]" multiple directory webkitdirectory mozdirectory />
+                           or <input type="file" name="'. $editor_file_input_name .'[]" multiple />
                         </div>
                         <div class="drop-section image-input" title="'. T('Paste the URL of an image to quickly embed it.') .'">
                            <input class="InputBox editor-input-image" placeholder="'. T('Image URL') .'" />
