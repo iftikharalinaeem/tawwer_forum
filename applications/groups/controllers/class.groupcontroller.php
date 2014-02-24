@@ -54,6 +54,7 @@ class GroupController extends Gdn_Controller {
     */
    public function Index($ID) {
       Gdn_Theme::Section('Group');
+      $this->AllowJSONP(TRUE);
 
       $Group = $this->GroupModel->GetID($ID);
       if (!$Group)
