@@ -251,7 +251,7 @@ function generate_thumbnail($src, $dst = '', $opts = array())
       : false;
 
    // Get path info for destination, if any.
-   $dst_path_data = pathinfo(strtolower($dst));
+   $dst_path_data = pathinfo($dst);
 
    // Set destination path. If empty, then saves to the current working dir.
    // Optionally, let it save to actual location of included script with __DIR__
