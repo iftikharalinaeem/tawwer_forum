@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.2.27',
+   'Version' => '1.3.5',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -100,6 +100,11 @@ class EditorPlugin extends Gdn_Plugin {
          if (!GetValue('AllowFileUploads', $PermissionCategory, true)) {
             $this->canUpload = false;
          }
+      }
+
+      // Check against config, too
+      if (!C('Garden.AllowFileUploads', false)) {
+         $this->canUpload = false;
       }
    }
 
@@ -276,9 +281,7 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['links'] = array('edit' => 'media', 'action'=> 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link', 'data-wysihtml5-command' => 'createLink', 'title' => T('Url'), 'data-editor' => '{"action":"url","value":""}'));
       $editorToolbarAll['images'] = array('edit' => 'media', 'action'=> 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => T('Image'), 'data-editor' => '{"action":"image","value":""}'));
 
-      if ($this->canUpload) {
-         $editorToolbarAll['uploads'] = array('edit' => 'media', 'action'=> 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-paper-clip editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => T('Attach'), 'data-editor' => '{"action":"upload","value":""}'));
-      }
+      $editorToolbarAll['uploads'] = array('edit' => 'media', 'action'=> 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-file editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => T('Attach image/file'), 'data-editor' => '{"action":"upload","value":""}'));
 
       $editorToolbarAll['sep-align'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-align hidden-xs'));
       $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action'=> 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'justifyLeft', 'title' => T('Align left'), 'data-editor' => '{"action":"alignleft","value":""}'));
@@ -352,7 +355,6 @@ class EditorPlugin extends Gdn_Plugin {
 
       // Load JavaScript used by every editor view.
       $c->AddJsFile('editor.js', 'plugins/editor');
-      $c->AddJsFile('jquery.atwho.js', 'plugins/editor');
 
       // Fileuploads
       //$c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
@@ -384,21 +386,7 @@ class EditorPlugin extends Gdn_Plugin {
       // Get max file uploads, to be used for max drops at once.
       $c->AddDefinition('maxFileUploads', ini_get('max_file_uploads'));
       $c->AddDefinition('canUpload', $this->canUpload);
-
-      // Add active emoji so autosuggest works
-      $Emoji = Emoji::instance();
-      $emojis = $Emoji->getEmoji();
-      $emojiAssetPath = $Emoji->getAssetPath();
-      $emoji = array();
-
-      foreach ($emojis as $name => $data) {
-         $emoji[] = array(
-             "name" => "". $name ."",
-             "url" =>  $emojiAssetPath . '/' . reset($data)
-         );
-      }
-
-      $c->AddDefinition('emoji', json_encode($emoji));
+      $c->SetData('canUpload', $this->canUpload);
    }
 
    /**
@@ -821,7 +809,7 @@ class EditorPlugin extends Gdn_Plugin {
       //$fileSHA1 = sha1_file($tmpFilePath);
       // Instead just use the RandomString function that
       // Gdn_Upload->GenerateTargetName is using.
-      $fileRandomString = RandomString(14);
+      $fileRandomString = strtolower(RandomString(14));
 
       // Use first two characters from fileMD5 as subdirectory,
       // and use the rest as the file name.
@@ -896,7 +884,6 @@ class EditorPlugin extends Gdn_Plugin {
    }
    */
 
-
    /**
    * Every time editor plugin is enabled, disable other known editors that
     * may clash with this one. If editor is loaded, then thes other
@@ -917,6 +904,13 @@ class EditorPlugin extends Gdn_Plugin {
       SaveToConfig(array(
          'Plugins.editor.ForceWysiwyg' => false
       ));
+
+      $this->Structure();
+  }
+
+  public function Structure() {
+      // Set to false by default, so change in config if uploads allowed.
+      TouchConfig('Garden.AllowFileUploads', false);
   }
 
    public function OnDisable() {
@@ -936,7 +930,11 @@ class EditorPlugin extends Gdn_Plugin {
       require 'generate_thumbnail.php';
 
       $model = new Gdn_Model('Media');
-      $media = (array) $model->GetID($media_id);
+      $media = $model->GetID($media_id, DATASET_TYPE_ARRAY);
+
+      if (!$media) {
+         throw NotFoundException('File');
+      }
 
       // Get actual path to the file.
       $local_path = Gdn_Upload::CopyLocal($media['Path']);

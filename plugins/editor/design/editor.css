@@ -1,68 +1,3 @@
-.atwho-view {
-  font: normal 14px/1.7em 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: none;
-  margin-top: 18px;
-  background: #fff;
-  min-width: 120px;
-  z-index: 10000;
-  border-radius: 2px;
-  overflow: hidden;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-}
-
-.atwho-view .cur {
-  background: #1E79A7;
-  color: #fff;
-}
-
-.atwho-view .cur small {
-  color: #fff;
-}
-
-.atwho-view strong {
-  color: #1E79A7;
-}
-
-.atwho-view .cur strong {
-  color: #fff;
-  font: bold;
-}
-
-.atwho-view ul {
-  list-style: none;
-  padding: 0;
-  margin: auto;
-}
-
-.atwho-view ul li {
-  display: block;
-  padding: 5px 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-}
-.atwho-view ul li:last-child {
-  border: 0;
-}
-
-.atwho-view small {
-  font-size: smaller;
-  color: #777;
-  font-weight: 400;
-}
-
-.at-suggest-emoji .emoji-img {
-  position: relative;
-  top: 3px;
-}
-.at-suggest-emoji .emoji-name {
-  position: relative;
-  top: -2px;
-  padding: 0 0 0 2px;
-}
-
 .bodybox-wrap {
   position: relative;
 }
@@ -96,9 +31,9 @@
   display: none;
   position: absolute;
   top: 15px;
-  width: 120px;
+  width: 160px;
   left: 50%;
-  margin-left: -60px;
+  margin-left: -80px;
   text-align: center;
   font-size: 18px;
   color: #fff;
@@ -388,6 +323,7 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
+  margin: 0;
 }
 
 .editor-dd-color + .editor-insert-dialog {
@@ -470,7 +406,7 @@
 .editor-file-image .file-drop {
   border: 2px dashed rgba(0, 0, 0, 0.25);
   border-radius: 2px;
-  margin: 10px;
+  margin: 10px 10px 0 10px;
   text-align: center;
   padding: 30px;
   display: none;
@@ -481,7 +417,7 @@
 .editor-file-image .file-input {
   overflow: hidden;
   white-space: nowrap;
-  padding-top: 0;
+  padding-top: 10px;
 }
 .editor-file-image .image-input {
   padding: 0;
@@ -499,6 +435,15 @@
   opacity: 0;
   pointer-events: none;
   transform: scale(0);
+}
+
+/* If uploads disabled entirely, hide some options in the dropdown */
+.editor-uploads-disabled .file-drop,
+.editor-uploads-disabled .file-input {
+  display: none;
+}
+.editor-uploads-disabled .image-input {
+  border: 0;
 }
 
 /**

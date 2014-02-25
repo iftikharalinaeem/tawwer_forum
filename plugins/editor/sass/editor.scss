@@ -1,6 +1,5 @@
 @import "compass";
 @import "compass/css3";
-@import "at";
 @import "fileupload";
 
 /**
@@ -117,6 +116,7 @@
 .editor-insert-dialog input.InputBox {
    @include box-sizing(border-box);
    width: 100%;
+   margin: 0;
 }
 
 .editor-dd-color + .editor-insert-dialog {
@@ -200,7 +200,7 @@
    .file-drop {
       border: 2px dashed rgba(0,0,0,0.25);
       border-radius: 2px;
-      margin: 10px;
+      margin: 10px 10px 0 10px;
       text-align: center;
       padding: 30px;
       display: none;
@@ -213,7 +213,7 @@
    .file-input {
       overflow: hidden;
       white-space: nowrap;
-      padding-top: 0;
+      padding-top: 10px;
    }
 
    .image-input {
@@ -234,6 +234,17 @@
       opacity: 0;
       pointer-events: none;
       transform: scale(0);
+   }
+}
+/* If uploads disabled entirely, hide some options in the dropdown */
+.editor-uploads-disabled {
+   .file-drop,
+   .file-input {
+      display: none;
+   }
+
+   .image-input {
+      border: 0;
    }
 }
 

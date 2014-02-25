@@ -14,9 +14,17 @@
 */
 
 /**
- * Note: This file has been highly modified to work with iframes, as well
+ * --------------------
+ * Vanilla Forums NOTE:
+ * --------------------
+ *
+ * This file has been highly modified to work with iframes, as well
  * as custom username handling with quotation marks and spaces for Vanilla.
- * Do not just replace with a more current version.
+ * Do not just replace with a more current version. At the time of
+ * development there was no support for iframes, or spaces in names.
+ * This may have changed, so if you do decide to upgrade this library,
+ * you're going to have to update the code that uses this library as well.
+ * It's all wrapped up in a function called `atCompleteInit`.
  */
 
 
