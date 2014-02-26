@@ -165,6 +165,9 @@ class GroupModel extends Gdn_Model {
    public function Counts($Column, $From = FALSE, $To = FALSE, $Max = FALSE) {
       $Result = array('Complete' => TRUE);
       switch ($Column) {
+         case 'CountDiscussions':
+            $this->Database->Query(DBAModel::GetCountSQL('count', 'Group', 'Discussion', $Column, 'GroupID'));
+            break;
          case 'CountMembers':
             $this->Database->Query(DBAModel::GetCountSQL('count', 'Group', 'UserGroup', $Column, 'UserGroupID'));
             break;
@@ -257,6 +260,16 @@ class GroupModel extends Gdn_Model {
    public static function ParseID($ID) {
       $Parts = explode('-', $ID, 2);
       return $Parts[0];
+   }
+
+   public function IncrementDiscussionCount($GroupID, $Inc) {
+      $Group = $this->GetID($GroupID);
+
+      $this->SQL
+         ->Update('Group')
+         ->Set('CountDiscussions', "CountDiscussions + $Inc", FALSE, FALSE)
+         ->Where('GroupID', $GroupID)
+         ->Put();
    }
 
    /**
