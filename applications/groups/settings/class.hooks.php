@@ -41,7 +41,7 @@ class GroupsHooks extends Gdn_Plugin {
     */
    public function DbaController_CountJobs_Handler($Sender) {
       $Counts = array(
-          'Group' => array('CountMembers', 'DateLastComment')
+          'Group' => array('CountDiscussions', 'CountMembers', 'DateLastComment')
       );
 
       foreach ($Counts as $Table => $Columns) {
@@ -57,7 +57,8 @@ class GroupsHooks extends Gdn_Plugin {
    /**
     * Make sure the user has permission to view the group
     * @param DiscussionController $Sender
-    * @param type $Args
+    * @param array $Args
+    * @throws Exception Throws an exception if the user doesn't have proper access to the group.
     */
    public function DiscussionController_Index_Render($Sender, $Args) {
       $GroupID = $Sender->Data('Discussion.GroupID');
