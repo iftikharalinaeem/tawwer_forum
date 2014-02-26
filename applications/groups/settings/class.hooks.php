@@ -81,14 +81,26 @@ class GroupsHooks extends Gdn_Plugin {
             $Args['FormPostValues']['CategoryID'] = $Group['CategoryID'];
             $Args['FormPostValues']['GroupID'] = $GroupID;
 
+            if (GetValue('Insert', $Args)) {
+               $Model->IncrementDiscussionCount($GroupID, 1);
+            }
+
             Trace($Args, 'Group set');
          }
       }
    }
 
+   public function DiscussionModel_DeleteDiscussion_Handler($Sender, $Args) {
+      $GroupID = GetValueR('Discussion.GroupID', $Args);
+      if ($GroupID) {
+         $Model = new GroupModel();
+         $Model->IncrementDiscussionCount($GroupID, -1);
+      }
+   }
+
    protected function OverridePermissions($Sender) {
-      $Dicussion = $Sender->DiscussionModel->GetID($Sender->ReflectArgs['DiscussionID']);
-      $GroupID = GetValue('GroupID', $Dicussion);
+      $Discussion = $Sender->DiscussionModel->GetID($Sender->ReflectArgs['DiscussionID']);
+      $GroupID = GetValue('GroupID', $Discussion);
       if (!$GroupID)
          return;
 
