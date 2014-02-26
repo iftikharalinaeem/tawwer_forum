@@ -8,7 +8,7 @@
 $PluginInfo['Polls'] = array(
    'Name' => 'Polls',
    'Description' => "Allow users to create and vote on polls.",
-   'Version' => '1.1.1',
+   'Version' => '1.1.3',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
@@ -209,7 +209,16 @@ class PollsPlugin extends Gdn_Plugin {
 
       // Set up the page and render
       $Sender->Title(T('New Poll'));
-		$Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/poll')));
+
+      // New poll page should show category in breadcrumb, just like new
+      // discussion form.
+      $crumb = array();
+      if ($Sender->Category) {
+         $crumb[] = array('Name' => $Sender->Category->Name, 'Url' => CategoryUrl($Sender->Category));
+      }
+      $crumb[] = array('Name' => $Sender->Data('Title'), 'Url' => '/post/poll');
+
+		$Sender->SetData('Breadcrumbs', $crumb);
       $Sender->SetData('_AnonymousPolls', C('Plugins.Polls.AnonymousPolls'));
       $Sender->AddJsFile('jquery.duplicate.js');
       $this->_AddCss($Sender);
