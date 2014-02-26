@@ -41,7 +41,7 @@ class GroupsHooks extends Gdn_Plugin {
     */
    public function DbaController_CountJobs_Handler($Sender) {
       $Counts = array(
-          'Group' => array('CountMembers', 'DateLastComment')
+          'Group' => array('CountDiscussions', 'CountMembers', 'DateLastComment')
       );
 
       foreach ($Counts as $Table => $Columns) {
@@ -57,7 +57,8 @@ class GroupsHooks extends Gdn_Plugin {
    /**
     * Make sure the user has permission to view the group
     * @param DiscussionController $Sender
-    * @param type $Args
+    * @param array $Args
+    * @throws Exception Throws an exception if the user doesn't have proper access to the group.
     */
    public function DiscussionController_Index_Render($Sender, $Args) {
       $GroupID = $Sender->Data('Discussion.GroupID');
@@ -81,14 +82,26 @@ class GroupsHooks extends Gdn_Plugin {
             $Args['FormPostValues']['CategoryID'] = $Group['CategoryID'];
             $Args['FormPostValues']['GroupID'] = $GroupID;
 
+            if (GetValue('Insert', $Args)) {
+               $Model->IncrementDiscussionCount($GroupID, 1);
+            }
+
             Trace($Args, 'Group set');
          }
       }
    }
 
+   public function DiscussionModel_DeleteDiscussion_Handler($Sender, $Args) {
+      $GroupID = GetValueR('Discussion.GroupID', $Args);
+      if ($GroupID) {
+         $Model = new GroupModel();
+         $Model->IncrementDiscussionCount($GroupID, -1);
+      }
+   }
+
    protected function OverridePermissions($Sender) {
-      $Dicussion = $Sender->DiscussionModel->GetID($Sender->ReflectArgs['DiscussionID']);
-      $GroupID = GetValue('GroupID', $Dicussion);
+      $Discussion = $Sender->DiscussionModel->GetID($Sender->ReflectArgs['DiscussionID']);
+      $GroupID = GetValue('GroupID', $Discussion);
       if (!$GroupID)
          return;
 

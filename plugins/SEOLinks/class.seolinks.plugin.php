@@ -50,7 +50,7 @@ class SEOLinksPlugin extends Gdn_Plugin {
 
       $Path = trim(Gdn::Request()->Path(), '/');
 
-      if (preg_match('`^([^/]+)(?:/(p\d+))?$`', $Path, $Matches)) {
+      if (preg_match('`^'.$PxEsc.'([^/]+)(?:/(p\d+))?$`', $Path, $Matches)) {
          $UrlCode = $Matches[1];
          $Page = GetValue(2, $Matches);
 

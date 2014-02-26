@@ -17,7 +17,11 @@ Gdn::PermissionModel()->Define(array(
    'Groups.Group.Add' => 'Garden.Profiles.Edit'));
 
 // Define the groups table.
-$St->Table('Group')
+$St->Table('Group');
+$GroupExists = $St->TableExists();
+$CountDiscussionsExists = $St->ColumnExists('CountDiscussions');
+
+$St
    ->PrimaryKey('GroupID')
    ->Column('Name', 'varchar(255)', FALSE, 'unique')
    ->Column('Description', 'text')
@@ -36,6 +40,11 @@ $St->Table('Group')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('Attributes', 'text', TRUE)
    ->Set($Explicit, $Drop);
+
+if (!$CountDiscussionsExists) {
+   $GroupModel = new GroupModel();
+   $GroupModel->Counts('CountDiscussions');
+}
 
 $St->Table('UserGroup')
    ->PrimaryKey('UserGroupID')
