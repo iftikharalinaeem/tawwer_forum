@@ -402,6 +402,46 @@ function WriteGroupList($Groups) {
 }
 endif;
 
+if (!function_exists('WriteGroupsTable')) :
+
+function WriteGroupsTable($Groups, $Title) {
+   ?>
+   <div class="DataTableWrap">
+      <table class="DataTable GroupsTable">
+         <thead>
+            <td class="GroupName"><div class="Wrap"><?php echo $Title; ?></div></td>
+            <td class="BigCount CountMembers"><div class="Wrap"><?php echo T('Members'); ?></div></td>
+            <td class="BigCount CountDiscussions>"><div class="Wrap"><?php echo T('Discussions'); ?></div></td>
+         </thead>
+         <tbody>
+         <?php foreach ($Groups as $Group): ?>
+         <tr>
+            <td><div class="Wrap">
+               <?php
+               echo '<h3 class="Group-Name">'.
+                  Anchor(htmlspecialchars($Group['Name']), $Group['Url']).
+                  '</h3>';
+               ?>
+            </div></td>
+            <td class="BigCount CountMembers"><div class="Wrap">
+               <?php
+               echo BigPlural($Group['CountMembers'], '%s member');
+               ?>
+            </div></td>
+            <td class="BigCount CountDiscussions"><div class="Wrap">
+               <?php
+               echo BigPlural($Group['CountDiscussions'], '%s discussion');
+               ?>
+            </div></td>
+         </tr>
+         <?php endforeach; ?>
+         </tbody>
+      </table>
+   </div>
+   <?php
+}
+endif;
+
 
 if (!function_exists('WriteMemberCards')) :
 /**

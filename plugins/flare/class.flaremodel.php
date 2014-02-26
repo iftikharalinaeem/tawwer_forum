@@ -42,6 +42,9 @@ class FlareModel extends Gdn_Pluggable {
     * @return type
     */
    public function fetchUsers($data, $column) {
+      if (!is_array($data)) {
+         return;
+      }
       $user_ids = array();
       
       foreach ($data as $row) {

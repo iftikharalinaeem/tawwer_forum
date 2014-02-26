@@ -445,6 +445,9 @@ class GroupModel extends Gdn_Model {
 
    public function UpdateCount($GroupID, $Column) {
       switch ($Column) {
+         case 'CountDiscussions':
+            $Sql = DBAModel::GetCountSQL('count', 'Group', 'Discussion', $Column, 'GroupID');
+            break;
          case 'CountMembers':
             $Sql = DBAModel::GetCountSQL('count', 'Group', 'UserGroup', $Column, 'UserGroupID');
             break;
