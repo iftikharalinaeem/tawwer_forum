@@ -23,11 +23,6 @@ class GroupController extends Gdn_Controller {
    public $ShowOptions = TRUE;
 
    /**
-    * @var int
-    */
-   public $HomepageDiscussionCount = 10;
-
-   /**
     * Include JS, CSS, and modules used by all methods.
     *
     * Always called by dispatcher before controller's requested method.
@@ -40,12 +35,10 @@ class GroupController extends Gdn_Controller {
       $this->AddJsFile('jquery.js');
       $this->AddJsFile('jquery.livequery.js');
       $this->AddJsFile('jquery-ui.js');
-      $this->AddJsFile('jquery.tokeninput.js');
       $this->AddJsFile('jquery.form.js');
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
-      $this->AddJsFile('group.js');
       $this->AddCssFile('style.css');
 
       $this->AddBreadcrumb(T('Groups'), '/groups');
@@ -82,7 +75,7 @@ class GroupController extends Gdn_Controller {
 
       // Get Discussions
       $DiscussionModel = new DiscussionModel();
-      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, $this->HomepageDiscussionCount)->ResultArray();
+      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, 10)->ResultArray();
       $this->SetData('Discussions', $Discussions);
 
       $Discussions = $DiscussionModel->GetAnnouncements(array('d.GroupID' => $GroupID), 0, 10)->ResultArray();
@@ -191,40 +184,6 @@ class GroupController extends Gdn_Controller {
       }
 
       $this->Render('Blank', 'Utility', 'Dashboard');
-   }
-
-   public function Invite($ID) {
-      $Group = $this->GroupModel->GetID($ID);
-      if (!$Group) {
-         throw NotFoundException('Group');
-      }
-
-      // Check invite permission.
-      if (!$this->GroupModel->CheckPermission('Leader', $Group)) {
-         throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Join.Reason', $Group));
-      }
-
-      $this->Title('Invite');
-
-      $Form = new Gdn_Form();
-      $this->Form = $Form;
-
-      if ($Form->AuthenticatedPostBack()) {
-         // If the user posted back then we are going to add them.
-         $Data = $Form->FormValues();
-         $Data['GroupID'] = $Group['GroupID'];
-         $Recipients = explode(',', $Data['Recipients']);
-         $Saved = TRUE;
-         foreach ($Recipients as $Recipient) {
-            $Data['UserID'] = GetValue('UserID', Gdn::UserModel()->GetByUsername($Recipient));
-            $Saved &= $this->GroupModel->Invite($Data);
-         }
-         $Form->SetValidationResults($this->GroupModel->ValidationResults());
-      }
-
-      $this->SetData('Group', $Group);
-      $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
-      $this->Render();
    }
 
    public function Join($ID) {

@@ -48,7 +48,6 @@
          echo '<div><b>'.T('How can people join this group?').'</b></div>';
          echo $this->Form->RadioList('Registration', array(
             'Public' => 'Public. Anyone can join.',
-            'Invite' => 'Invite. People have to be invited to join.',
             'Approval' => 'Approval. People have to apply and be approved.'),
             array('list' => TRUE));
          ?>

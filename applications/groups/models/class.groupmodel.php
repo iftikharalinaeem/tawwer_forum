@@ -108,11 +108,6 @@ class GroupModel extends Gdn_Model {
             }
          }
 
-         if (strtolower($Group['Registration']) === 'invite') {
-            $Perms['Join'] = FALSE;
-            $Perms['Join.Reason'] = T('You have to be invited to the group.');
-         }
-
          if ($GroupApplicant) {
             $Perms['Join'] = FALSE; // Already applied or banned.
             switch (strtolower($GroupApplicant['Type'])) {
@@ -124,10 +119,6 @@ class GroupModel extends Gdn_Model {
                   break;
                case 'ban':
                   $Perms['Join.Reason'] = T("You're banned from joining this group.");
-                  break;
-               case 'invitation':
-                  $Perms['Join'] = TRUE;
-                  unset($Perms['Join.Reason']);
                   break;
             }
          }
@@ -293,51 +284,6 @@ class GroupModel extends Gdn_Model {
          'GroupID'   => $GroupID
       ));
       return $IsMember > 0;
-   }
-
-   public function Invite($Data) {
-      $Valid = $this->ValidateJoin($Data);
-      if (!$Valid) {
-         return FALSE;
-      }
-
-      $Group = $this->GetID(GetValue('GroupID', $Data));
-      Trace($Group, 'Group');
-
-      // Make sure the user hasn't already been invited.
-      $Application = $this->SQL->GetWhere('GroupApplicant', array(
-         'GroupID' => $Group['GroupID'],
-         'UserID' => $Data['UserID']
-      ))->FirstRow(DATASET_TYPE_ARRAY);
-      if ($Application) {
-         $User = Gdn::UserModel()->GetID($Data['UserID']);
-         $this->Validation->AddValidationResult('UserID', '@'.sprintf(T('%s has already been invited.'), GetValue('Name', $User)));
-         return FALSE;
-      }
-
-      $Data['Type'] = 'Invitation';
-      $Model = new Gdn_Model('GroupApplicant');
-      $Model->Options('Ignore', TRUE)->Insert($Data);
-      $this->Validation = $Model->Validation;
-
-      // Send a message for the invite.
-      if (class_exists('ConversationModel')) {
-         $Model = new ConversationModel();
-         $MessageModel = new ConversationMessageModel();
-
-         $Row = array(
-            'Subject' => T("You've been invited to join a group"),
-            'Body' => sprintf(T("You've been invited to join the following group: "), htmlspecialchars()),
-            'Format' => 'Markdown',
-            'RecipientUserID' => $Data['UserID'],
-            'Type' => 'group_invite',
-         );
-         if (!$Model->Save($Row, $MessageModel)) {
-            throw new Gdn_UserException($Model->Validation->ResultsText());
-         }
-      }
-
-      return count($this->ValidationResults()) == 0;
    }
 
    public function Join($Data) {
