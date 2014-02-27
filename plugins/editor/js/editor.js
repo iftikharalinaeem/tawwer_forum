@@ -222,7 +222,8 @@
                // If the user selects some text, don't close the spoiler, and
                // if there is an anchor in spoiler, do not close spoiler.
                if (!document.getSelection().toString().length
-               && e.target.nodeName.toLowerCase() != 'a') {
+               && e.target.nodeName.toLowerCase() != 'a'
+               && !$(e.target).parent('.Spoiled')) {
                   $(this).removeClass('Spoiled');
                   $(this).addClass('Spoiler');
                }
@@ -699,8 +700,33 @@
          });
       };
 
-      // Note, this depends heavily on blueimp's file upload, and just a bit
-      // on Tim Down's rangyinputs (originally loaded for buttonbarplus).
+      /**
+       * Generic helper to generate correct image code based on format.
+       */
+      var buildImgTag = function(href, editorFormat) {
+         // Defualt for text and textex. If in future they require special
+         // handling, then add them to switch statement.
+         var imgTag = href;
+
+         switch (editorFormat.toLowerCase()) {
+            case 'wysiwyg':
+            case 'html':
+               imgTag = '<img src="'+ href +'" alt="" />';
+               break;
+            case 'bbcode':
+               imgTag = '[img]' + href + '[/img]';
+               break;
+            case 'markdown':
+               imgTag = '![](' + href + ' "")';
+               break;
+         }
+
+         return imgTag;
+      };
+
+      /* Note, this depends heavily on blueimp's file upload, and just a bit
+       * on Tim Down's rangyinputs (originally loaded for buttonbarplus).
+       */
       var fileUploadsInit = function(dropElement, editorInstance) {
 
          var canUpload = parseInt(gdn.definition('canUpload', false));
@@ -812,13 +838,6 @@
             }
          }
 
-         /**
-          * Help methods
-          */
-         var buildImgTag = function(href) {
-            return '<img src="'+ href +'" alt="" />';
-         };
-
          // Used in two places below
          var insertImageIntoBody = function(filePreviewContainer) {
             $(filePreviewContainer).removeClass('editor-file-removed');
@@ -829,7 +848,7 @@
             if (type.indexOf('image') > -1) {
                if (handleIframe) {
                   var iframeBody = $(iframeElement).contents().find('body');
-                  var imgTag = buildImgTag(href);
+                  var imgTag = buildImgTag(href, format);
                   editor.focus();
                   editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
                   var insertedImage = $(iframeBody).find('img[src="'+href+'"]');
@@ -837,7 +856,7 @@
                   $(iframeElement).css('min-height', newHeight);
                } else {
                   try {
-                     $(editor).replaceSelectedText(buildImgTag(href) + '\n');
+                     $(editor).replaceSelectedText(buildImgTag(href, format) + '\n');
                   } catch(ex) {}
                }
             }
@@ -862,11 +881,14 @@
                   var text = $(editor).val();
                   // A shame that JavaScript does not have this built-in.
                   // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions
-                  //var imgTagEscaped = buildImgTag(href).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+                  var imgTagEscaped = buildImgTag(href, format).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
                   // Make it more loose, so it doesn't matter what the user
                   // may have done to the markup, it will be removed.
-                  var imgTagEscaped = '<img(\s+|.*)src\="'+ href.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1") +'"(\s+|.*)\/?>\n?';
-                  var reg = new RegExp(imgTagEscaped, 'gi');
+                  //var imgTagEscaped = '<img(\s+|.*)src\="'+ href.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1") +'"(\s+|.*)\/?>\n?';
+                  // On second thought, if they modify it, don't touch it. Also,
+                  // having to deal with mutltiple formats makes the regex more
+                  // complex.
+                  var reg = new RegExp(imgTagEscaped +'(\s+|.*)\n?', 'gi');
                   $(editor).val(text.replace(reg, ''));
                }
             }
@@ -1128,7 +1150,7 @@
                            ? 400
                            : payload.original_height;
 
-                        var imgTag = buildImgTag(payload.original_url);
+                        var imgTag = buildImgTag(payload.original_url, format);
 
                         if (handleIframe) {
                            editor.focus();
@@ -1195,6 +1217,7 @@
        * handle the event differently for wysi and non-wysi mode.
        */
       var insertImageUrl = function(editorInstance) {
+
          $('.editor-file-image').on('dragover', function(e) {
             // Allow passthrough of dragover so main body can accept drop
             // event. Only need to flash the passthrough for a moment, then
@@ -1232,7 +1255,7 @@
                }
                // Standard insert
                else {
-                  var imgTag = '<img src="'+ imageUrl +'" alt="" />';
+                  var imgTag = buildImgTag(imageUrl, format);
                   $(editorInstance).replaceSelectedText(imgTag + '\n');
                }
 
