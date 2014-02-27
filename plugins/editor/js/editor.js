@@ -222,7 +222,8 @@
                // If the user selects some text, don't close the spoiler, and
                // if there is an anchor in spoiler, do not close spoiler.
                if (!document.getSelection().toString().length
-               && e.target.nodeName.toLowerCase() != 'a') {
+               && e.target.nodeName.toLowerCase() != 'a'
+               && !$(e.target).parent('.Spoiled')) {
                   $(this).removeClass('Spoiled');
                   $(this).addClass('Spoiler');
                }
