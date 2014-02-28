@@ -2,7 +2,7 @@
    $.fn.setAsEditor = function() {
 
       // If editor can be loaded, add class to body
-      $('body').addClass('js-editor-active');
+      $('body').addClass('editor-active');
 
       /**
        * Determine editor format to load, and asset path, default to Wysiwyg
@@ -85,9 +85,9 @@
             var fullPageCandidate = $('#editor-fullpage-candidate');
 
             // If no fullpage, enable it
-            if (!bodyEl.hasClass('js-editor-fullpage')) {
+            if (!bodyEl.hasClass('editor-fullpage')) {
                $(formWrapper).attr('id', 'editor-fullpage-candidate');
-               bodyEl.addClass('js-editor-fullpage');
+               bodyEl.addClass('editor-fullpage');
                $(toggleButton).addClass('icon-resize-small');
 
                var editorToolbar = $(fullPageCandidate).find('.editor');
@@ -124,7 +124,7 @@
 
                // else disable fullpage
                $(formWrapper).attr('id', '');
-               bodyEl.removeClass('js-editor-fullpage');
+               bodyEl.removeClass('editor-fullpage');
                $(toggleButton).removeClass('icon-resize-small');
 
                // If in wysiwyg fullpage mode with lights toggled off, then
@@ -182,7 +182,7 @@
             $(document)
             .off('keyup')
             .on('keyup', function(e) {
-               if ($('body').hasClass('js-editor-fullpage') && e.which == 27) {
+               if ($('body').hasClass('editor-fullpage') && e.which == 27) {
                   toggleFullpage();
                }
             });
@@ -200,7 +200,7 @@
             .on('click.closefullpage', function() {
                // Prevent auto-saving drafts from exiting fullpage
                if (!$(this).hasClass('DraftButton')) {
-                  if ($('body').hasClass('js-editor-fullpage')) {
+                  if ($('body').hasClass('editor-fullpage')) {
                      toggleFullpage();
                   }
                }
@@ -1471,7 +1471,7 @@
                          // Class name which should be set on the contentEditable element in the created sandbox iframe, can be styled via the 'stylesheets' option
                          composerClassName:    "editor-composer",
                          // Class name to add to the body when the wysihtml5 editor is supported
-                         bodyClassName:        "js-editor-active",
+                         bodyClassName:        "editor-active",
                          // By default wysihtml5 will insert a <br> for line breaks, set this to false to use <p>
                          useLineBreaks:        false,
                          // Array (or single string) of stylesheet urls to be loaded in the editor's iframe
