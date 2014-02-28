@@ -210,7 +210,7 @@ function WriteGroupApplicants($Applicants) {
       return;
    
    echo '<div class="Group-Box Group-Applicants">'.
-      '<h2>'.T('Applicants').'</h2>'.
+      '<h2>'.T('Applicants & Invitations').'</h2>'.
       '<ul class="NarrowList Applicants">';
    
    
@@ -218,10 +218,17 @@ function WriteGroupApplicants($Applicants) {
       echo '<li id="GroupApplicant_'.$Row['GroupApplicantID'].'" class="Item">';
          echo UserAnchor($Row);
          echo ' <span class="Aside">';
-         
-         echo Anchor(T('Approve Applicant', 'Approve'), GroupUrl($Group, 'approve')."?id={$Row['GroupApplicantID']}", 'Button SmallButton Hijack Button-Approve').
-            ' '.
-            Anchor(T('Deny Applicant', 'Deny'), GroupUrl($Group, 'approve')."?id={$Row['GroupApplicantID']}&value=denied", 'Button SmallButton Hijack Button-Deny');
+
+         switch (strtolower($Row['Type'])) {
+            case 'application':
+               echo Anchor(T('Approve Applicant', 'Approve'), GroupUrl($Group, 'approve')."?id={$Row['GroupApplicantID']}", 'Button SmallButton Hijack Button-Approve').
+               ' '.
+               Anchor(T('Deny Applicant', 'Deny'), GroupUrl($Group, 'approve')."?id={$Row['GroupApplicantID']}&value=denied", 'Button SmallButton Hijack Button-Deny');
+               break;
+            case 'invitation':
+               echo Anchor(T('Remove Invitation', 'Remove'), GroupUrl($Group, 'approve')."?id={$Row['GroupApplicantID']}&value=denied", 'Button SmallButton Hijack Button-Deny');
+               break;
+         }
          
          echo '</span> ';
          
@@ -403,6 +410,12 @@ function WriteGroupList($Groups) {
       }
       echo '</ul>';
    }
+}
+endif;
+
+if (!function_exists('WriteGroupUserHeader')):
+function WriteGroupUserHeader($Group) {
+
 }
 endif;
 

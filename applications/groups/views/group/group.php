@@ -9,6 +9,9 @@
    <div class="Group-Description">
       <?php echo Gdn_Format::To($this->Data('Group.Description'), $this->Data('Group.Format')); ?>
    </div>
+   <?php
+   echo Gdn_Theme::Module('GroupUserHeaderModule');
+   ?>
 </div>
 
 <?php if (GroupPermission('View')): ?>

@@ -99,7 +99,7 @@ class GroupController extends Gdn_Controller {
       $this->SetData('Events', $Events);
 
       // Get applicants.
-      $Applicants = $this->GroupModel->GetApplicants($GroupID, array('Type' => 'Application'), 20);
+      $Applicants = $this->GroupModel->GetApplicants($GroupID, array('Type' => array('Application', 'Invitation')), 20);
       $this->SetData('Applicants', $Applicants);
 
       // Get Leaders
@@ -214,17 +214,47 @@ class GroupController extends Gdn_Controller {
          $Data = $Form->FormValues();
          $Data['GroupID'] = $Group['GroupID'];
          $Recipients = explode(',', $Data['Recipients']);
-         $Saved = TRUE;
+         $UserIDs = array();
          foreach ($Recipients as $Recipient) {
-            $Data['UserID'] = GetValue('UserID', Gdn::UserModel()->GetByUsername($Recipient));
-            $Saved &= $this->GroupModel->Invite($Data);
+            $UserIDs[] = GetValue('UserID', Gdn::UserModel()->GetByUsername($Recipient));
          }
+         $Data['UserID'] = $UserIDs;
+         $Saved = $this->GroupModel->Invite($Data);
+
          $Form->SetValidationResults($this->GroupModel->ValidationResults());
       }
 
       $this->SetData('Group', $Group);
       $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       $this->Render();
+   }
+
+   public function InviteAccept($ID) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+
+      if (!$this->Request->IsPostBack())
+         throw ForbiddenException('GET');
+
+      $Result = $this->GroupModel->JoinInvite($Group['GroupID'], Gdn::Session()->UserID, TRUE);
+      $this->SetData('Result', $Result);
+      $this->RedirectUrl = GroupUrl($Group);
+      $this->Render('Blank', 'Utility', 'Dashboard');
+   }
+
+   public function InviteDecline($ID) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+
+      if (!$this->Request->IsPostBack())
+         throw ForbiddenException('GET');
+
+      $Result = $this->GroupModel->JoinInvite($Group['GroupID'], Gdn::Session()->UserID, FALSE);
+      $this->SetData('Result', $Result);
+      $this->JsonTarget('.GroupUserHeaderModule', '', 'SlideUp');
+      $this->Render('Blank', 'Utility', 'Dashboard');
    }
 
    public function Join($ID) {
