@@ -23,7 +23,7 @@
 }
 
 /* If JS enabled */
-.js-editor-active .editor {
+.editor-active .editor {
    display: block;
 }
 
@@ -259,7 +259,7 @@
 /* Added to body class with JS, so force specificity for everything
    below; this makes editing very easy */
 
-.js-editor-fullpage {
+.editor-fullpage {
    overflow: hidden !important;
 }
 
@@ -267,12 +267,12 @@
 except offset the textarea in fullpage. Removing it in regular view has no
 affect, so it's not doing anything */
 
-.js-editor-fullpage .TextBoxWrapper {
+.editor-fullpage .TextBoxWrapper {
    padding: 0;
 }
 
 /* .FormWrapper */
-.js-editor-fullpage #editor-fullpage-candidate {
+.editor-fullpage #editor-fullpage-candidate {
    position: fixed;
    z-index: 9001;
    overflow-y: auto;
@@ -287,7 +287,7 @@ affect, so it's not doing anything */
    transition: background-color 0.4s ease;
 }
 
-.js-editor-fullpage #editor-fullpage-candidate .editor {
+.editor-fullpage #editor-fullpage-candidate .editor {
    border: 1px solid transparent;
    position: fixed;
    top: 0;
@@ -299,14 +299,14 @@ affect, so it's not doing anything */
    transition: all 0.4s ease;
 }
 
-.js-editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
+.editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
    margin: 0 auto;
    padding: 50px 0 10px 0;
 }
 
-.js-editor-fullpage #editor-fullpage-candidate .editor,
-.js-editor-fullpage #editor-fullpage-candidate .TextBoxWrapper,
-.js-editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
+.editor-fullpage #editor-fullpage-candidate .editor,
+.editor-fullpage #editor-fullpage-candidate .TextBoxWrapper,
+.editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
    max-width: 800px;
 
    -webkit-animation-duration: 0.8s;
@@ -316,25 +316,25 @@ affect, so it's not doing anything */
 }
 
 /* have to be a bit rough here, because styles defined inline by wysihtml5 */
-.js-editor-fullpage .TextBoxWrapper .BodyBox,
-.js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+.editor-fullpage .TextBoxWrapper .BodyBox,
+.editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
    color: #000; // Will only be used by non-wysiwyg when in fullpage mode.
    width: 100% !important;
    transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 /* Fix some content boxes */
-.js-editor-fullpage #editor-fullpage-candidate input,
-.js-editor-fullpage .TextBoxWrapper .BodyBox,
-.js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+.editor-fullpage #editor-fullpage-candidate input,
+.editor-fullpage .TextBoxWrapper .BodyBox,
+.editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
    @include border-box-important;
 }
 
-.js-editor-fullpage #editor-fullpage-candidate .editor-help-text {
+.editor-fullpage #editor-fullpage-candidate .editor-help-text {
    display: none;
 }
 
-.js-editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
+.editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
    margin: 0 auto;
 }
 
@@ -342,11 +342,11 @@ affect, so it's not doing anything */
 all require min-height to be set to not interfere with autogrow, while
 wysiwgy requires height to not interfere with autogrow. */
 
-.js-editor-fullpage .TextBoxWrapper .BodyBox {
+.editor-fullpage .TextBoxWrapper .BodyBox {
    min-height: 400px;
 }
 
-.js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+.editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
    height: 400px !important;
 }
 
@@ -360,12 +360,12 @@ wysiwgy requires height to not interfere with autogrow. */
    display: none !important;
 }
 
-.js-editor-fullpage .editor-toggle-lights-button {
+.editor-fullpage .editor-toggle-lights-button {
    float: right;
    /*display: inline-block !important;*/
 }
 
-.js-editor-fullpage #editor-fullpage-candidate.editor-lights-candidate {
+.editor-fullpage #editor-fullpage-candidate.editor-lights-candidate {
    background-color: #000;
 
    .editor {
@@ -479,17 +479,17 @@ directly on the iframe's bodybox contenteditable. */
  * are enabled.
  */
 
-.js-editor-active .cleditorMain iframe {
+.editor-active .cleditorMain iframe {
    display: none !important;
 }
 
-.js-editor-active .cleditorMain .wysihtml5-sandbox {
+.editor-active .cleditorMain .wysihtml5-sandbox {
    display: block !important;
 }
 
-.js-editor-active .cleditorToolbar,
-.js-editor-active .ButtonBar,
-.js-editor-active .ButtonBarMarkupHint {
+.editor-active .cleditorToolbar,
+.editor-active .ButtonBar,
+.editor-active .ButtonBarMarkupHint {
    display: none !important;
 }
 
@@ -500,8 +500,8 @@ directly on the iframe's bodybox contenteditable. */
       display: none !important;
    }
 
-   .js-editor-fullpage .TextBoxWrapper .BodyBox,
-   .js-editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
+   .editor-fullpage .TextBoxWrapper .BodyBox,
+   .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
       height: auto !important;
    }
 
