@@ -265,6 +265,10 @@ function WriteGroupButtons($Group = NULL) {
          echo ' '.Wrap(T('Join this Group'), 'span', array('class' => 'Button Primary Group-JoinButton Disabled', 'title' => GroupPermission('Join.Reason', $Group))).' ';
       }
    }
+
+   if (GroupPermission('Leader', $Group)) {
+      echo ' '.Anchor(T('Invite'), GroupUrl($Group, 'invite'), 'Button Primary Group-InviteButton Popup').' ';
+   }
       
    $Options = array();
    
