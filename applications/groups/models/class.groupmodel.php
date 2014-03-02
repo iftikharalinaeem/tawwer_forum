@@ -108,6 +108,11 @@ class GroupModel extends Gdn_Model {
             }
          }
 
+         if (strtolower($Group['Registration']) === 'invite') {
+            $Perms['Join'] = FALSE;
+            $Perms['Join.Reason'] = T('You have to be invited to the group.');
+         }
+
          if ($GroupApplicant) {
             $Perms['Join'] = FALSE; // Already applied or banned.
             switch (strtolower($GroupApplicant['Type'])) {
@@ -119,6 +124,10 @@ class GroupModel extends Gdn_Model {
                   break;
                case 'ban':
                   $Perms['Join.Reason'] = T("You're banned from joining this group.");
+                  break;
+               case 'invitation':
+                  $Perms['Join'] = TRUE;
+                  unset($Perms['Join.Reason']);
                   break;
             }
          }
@@ -286,6 +295,67 @@ class GroupModel extends Gdn_Model {
       return $IsMember > 0;
    }
 
+   public function Invite($Data) {
+      $Valid = $this->ValidateJoin($Data);
+      if (!$Valid) {
+         return FALSE;
+      }
+
+      $Group = $this->GetID(GetValue('GroupID', $Data));
+      Trace($Group, 'Group');
+
+      $UserIDs = (array)$Data['UserID'];
+      $ValidUserIDs = array();
+
+      foreach ($UserIDs as $UserID) {
+         // Make sure the user hasn't already been invited.
+         $Application = $this->SQL->GetWhere('GroupApplicant', array(
+            'GroupID' => $Group['GroupID'],
+            'UserID' => $UserID
+         ))->FirstRow(DATASET_TYPE_ARRAY);
+
+         if ($Application) {
+            if ($Application['Type'] == 'Invitation') {
+               continue;
+            } else {
+               $this->SQL->Put('GroupApplicant',
+                  array('Type' => 'Invitation'),
+                  array(
+                     'GroupID' => $Group['GroupID'],
+                     'UserID' => $UserID
+                  ));
+            }
+         } else {
+            $Data['Type'] = 'Invitation';
+            $Data['UserID'] = $UserID;
+            $Model = new Gdn_Model('GroupApplicant');
+            $Model->Options('Ignore', TRUE)->Insert($Data);
+            $this->Validation = $Model->Validation;
+         }
+         $ValidUserIDs[] = $UserID;
+      }
+
+      // Send a message for the invite.
+      if (class_exists('ConversationModel') && count($ValidUserIDs) > 0) {
+         $Model = new ConversationModel();
+         $MessageModel = new ConversationMessageModel();
+
+         $Row = array(
+            'Subject' => T("Please join my group."),
+            'Body' => sprintf(T("You've been invited to join %s."), htmlspecialchars($Group['Name'])),
+            'Format' => 'Html',
+            'RecipientUserID' => $ValidUserIDs,
+            'Type' => 'ginvite',
+            'RegardingID' => $Group['GroupID'],
+         );
+         if (!$Model->Save($Row, $MessageModel)) {
+            throw new Gdn_UserException($Model->Validation->ResultsText());
+         }
+      }
+
+      return count($this->ValidationResults()) == 0;
+   }
+
    public function Join($Data) {
       $Valid = $this->ValidateJoin($Data);
       if (!$Valid) {
@@ -321,10 +391,25 @@ class GroupModel extends Gdn_Model {
       }
    }
 
+   public function JoinInvite($GroupID, $UserID, $Accept = true) {
+      // Grab the application.
+      $Row = $this->SQL->GetWhere('GroupApplicant', array('GroupID' => $GroupID, 'UserID' => $UserID))->FirstRow(DATASET_TYPE_ARRAY);
+      if (!$Row || $Row['Type'] != 'Invitation') {
+         throw NotFoundException('Invitation');
+      }
+
+      $Data = array(
+         'GroupApplicantID' => $Row['GroupApplicantID'],
+         'Type' => $Accept ? 'Approved' : 'Denied'
+      );
+      return $this->JoinApprove($Data);
+   }
+
    /**
     * Approve a membership application.
     *
     * @param array $Data
+    * @return bool
     */
    public function JoinApprove($Data) {
       // Grab the applicant row.
@@ -357,10 +442,16 @@ class GroupModel extends Gdn_Model {
          return $Inserted;
       } else {
          $Model = new Gdn_Model('GroupApplicant');
-         $Saved = $Model->Save(array(
-            'GroupApplicantID' => $ID,
-            'Type' => $Value
-            ));
+
+         if ($Row['Type'] == 'Invitation') {
+            $Model->Delete(array('GroupApplicantID' => $ID));
+            $Saved = TRUE;
+         } else {
+            $Saved = $Model->Save(array(
+               'GroupApplicantID' => $ID,
+               'Type' => $Value
+               ));
+         }
 
          return $Saved;
       }

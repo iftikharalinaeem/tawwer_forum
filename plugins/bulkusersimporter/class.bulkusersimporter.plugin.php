@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -303,9 +303,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             break;
          }
 
+         $send_email = false;
+
          // Username controls, so if it exists, update the info, including
          // email, otherwise create new user.
          if (!$unique_name) {
+            $send_email = false;
             // Update the user.
             $user_id = $user_model->Save(
                array(
@@ -317,6 +320,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                 'SaveRoles' => true
             ));
          } else {
+            $send_email = true;
             // Create new user. The method seems to rely on Captcha keys, so
             // this may error out due to none being passed to it.
             $temp_password = sha1($user['Email'] . time());
@@ -358,10 +362,11 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          );
          $user_model->Validation->Results(true);
 
-         // Email successfully added users, and users who were in the CSV file
-         // but already had an account (according to email) with forum.
-         //$user_model->SendWelcomeEmail($user_id, ''); // Don't send temp password
-         $user_model->PasswordRequest($user['Email']); // Reset current temp password
+         // Email successfully added users, but not users who already had an
+         // account (according to username) with forum.
+         if ($send_email && $complete_code == 1) {
+            $this->PasswordRequest($user['Email']); // Reset current temp password
+         }
 
          $sender->SetJson('import_id', $user['ImportID']);
          // If timeout reached, end current operation. It will be called
@@ -381,6 +386,63 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       }
 
       $sender->Render('Blank', 'Utility', 'Dashboard');
+   }
+
+   // Send custom email reset, copied from method in usermodel, with slight
+   // mod--changing the email message.
+   public function PasswordRequest($Email) {
+      if (!$Email) {
+         return FALSE;
+      }
+
+      $user_model = new UserModel();
+
+      $Users = $user_model->GetWhere(array('Email' => $Email))->ResultObject();
+      if (count($Users) == 0) {
+         // Check for the username.
+         $Users = $user_model->GetWhere(array('Name' => $Email))->ResultObject();
+      }
+
+      if (count($Users) == 0) {
+         $user_model->Validation->AddValidationResult('Name', "Couldn't find an account associated with that email/username.");
+         return FALSE;
+      }
+
+      $NoEmail = TRUE;
+
+      foreach ($Users as $User) {
+         if (!$User->Email) {
+            continue;
+         }
+         $Email = new Gdn_Email(); // Instantiate in loop to clear previous settings
+         $PasswordResetKey = BetterRandomString(20, 'Aa0');
+         $PasswordResetExpires = strtotime('+1 hour');
+         $user_model->SaveAttribute($User->UserID, 'PasswordResetKey', $PasswordResetKey);
+         $user_model->SaveAttribute($User->UserID, 'PasswordResetExpires', $PasswordResetExpires);
+         $AppTitle = C('Garden.Title');
+         $Email->Subject(sprintf(T('[%s] Forum Account Creation'), $AppTitle));
+         $Email->To($User->Email);
+
+         // Custom mesage for bulk importer.
+         $message = '';
+         $message .= "Hello,\n\n";
+         $message .= "An account has been created for you at the $AppTitle forum.\n\n";
+         $message .= "To activate your account, please follow this link:\n";
+         $message .= ExternalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey) . "\n\n";
+         $message .= "Please contact us if you have questions regarding this email.\n\n";
+         $message .= "Sincerely,\n";
+         $message .= $AppTitle;
+
+         $Email->Message($message);
+         $Email->Send();
+         $NoEmail = FALSE;
+      }
+
+      if ($NoEmail) {
+         $this->Validation->AddValidationResult('Name', 'There is no email address associated with that account.');
+         return FALSE;
+      }
+      return TRUE;
    }
 
    /**
