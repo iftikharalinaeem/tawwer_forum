@@ -275,7 +275,7 @@ affect, so it's not doing anything */
 /* .FormWrapper */
 .editor-fullpage #editor-fullpage-candidate {
    position: fixed;
-   z-index: 9001;
+   z-index: 100000; /* So high because a client actually had 99999 in a theme */
    overflow-y: auto;
    top: 0;
    right: 0;
