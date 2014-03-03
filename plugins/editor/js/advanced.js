@@ -72,7 +72,7 @@ var wysihtml5ParserRules = {
         "post-text-align-justify": 1,
         "post-text-align-left": 1,
         "post-text-align-right": 1,
-        
+
         "Spoiler": 1,
         "Quote": 1,
         "CodeBlock": 1

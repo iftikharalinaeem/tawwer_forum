@@ -2,7 +2,7 @@
    $.fn.setAsEditor = function() {
 
       // If editor can be loaded, add class to body
-      $('body').addClass('js-editor-active');
+      $('body').addClass('editor-active');
 
       /**
        * Determine editor format to load, and asset path, default to Wysiwyg
@@ -85,9 +85,9 @@
             var fullPageCandidate = $('#editor-fullpage-candidate');
 
             // If no fullpage, enable it
-            if (!bodyEl.hasClass('js-editor-fullpage')) {
+            if (!bodyEl.hasClass('editor-fullpage')) {
                $(formWrapper).attr('id', 'editor-fullpage-candidate');
-               bodyEl.addClass('js-editor-fullpage');
+               bodyEl.addClass('editor-fullpage');
                $(toggleButton).addClass('icon-resize-small');
 
                var editorToolbar = $(fullPageCandidate).find('.editor');
@@ -124,7 +124,7 @@
 
                // else disable fullpage
                $(formWrapper).attr('id', '');
-               bodyEl.removeClass('js-editor-fullpage');
+               bodyEl.removeClass('editor-fullpage');
                $(toggleButton).removeClass('icon-resize-small');
 
                // If in wysiwyg fullpage mode with lights toggled off, then
@@ -182,7 +182,7 @@
             $(document)
             .off('keyup')
             .on('keyup', function(e) {
-               if ($('body').hasClass('js-editor-fullpage') && e.which == 27) {
+               if ($('body').hasClass('editor-fullpage') && e.which == 27) {
                   toggleFullpage();
                }
             });
@@ -200,7 +200,7 @@
             .on('click.closefullpage', function() {
                // Prevent auto-saving drafts from exiting fullpage
                if (!$(this).hasClass('DraftButton')) {
-                  if ($('body').hasClass('js-editor-fullpage')) {
+                  if ($('body').hasClass('editor-fullpage')) {
                      toggleFullpage();
                   }
                }
@@ -1447,12 +1447,24 @@
                case 'bbhtml':
                case 'bbwysiwyg':
 
-                   // Lazyloading scripts, then run single callback
-                   $.when(
-                      loadScript(assets + '/js/wysihtml5-0.4.0pre.js?v=' + editorVersion),
-                      loadScript(assets + '/js/advanced.js?v=' + editorVersion),
-                      loadScript(assets + '/js/jquery.wysihtml5_size_matters.js?v=' + editorVersion)
-                   ).done(function(){
+                  // Lazyloading scripts, then run single callback
+                  $.when(
+                     loadScript(assets + '/js/wysihtml5-0.4.0pre.js?v=' + editorVersion),
+                     loadScript(assets + '/js/advanced.js?v=' + editorVersion),
+                     loadScript(assets + '/js/jquery.wysihtml5_size_matters.js?v=' + editorVersion)
+                  ).done(function(){
+
+                     // Throw event for parsing rules, so external plugins
+                     // can modify the parsing rules of the editor. This was
+                     // made for one case where a forum's older posts had
+                     // very heavy inline formatting, using style attributes and
+                     // deprecated tags like font. This will merge and replace
+                     // any parsing rules passed.
+                     $.event.trigger({
+                        type:    "editorParseRules",
+                        message: "Customize parsing rules by merging into e.rules.",
+                        rules: wysihtml5ParserRules
+                     });
 
                       var editorRules = {
                          // Give the editor a name, the name will also be set as class name on the iframe and on the iframe's body
@@ -1471,7 +1483,7 @@
                          // Class name which should be set on the contentEditable element in the created sandbox iframe, can be styled via the 'stylesheets' option
                          composerClassName:    "editor-composer",
                          // Class name to add to the body when the wysihtml5 editor is supported
-                         bodyClassName:        "js-editor-active",
+                         bodyClassName:        "editor-active",
                          // By default wysihtml5 will insert a <br> for line breaks, set this to false to use <p>
                          useLineBreaks:        false,
                          // Array (or single string) of stylesheet urls to be loaded in the editor's iframe
@@ -1685,3 +1697,74 @@
 jQuery(document).ready(function($) {
    $('.BodyBox').setAsEditor();
 });
+
+
+
+
+/*
+ * This is an example of hooking into the custom parse event, to enable
+ * passing custom parsing rules to the Advanced Editor's Wysiwyg format.
+// This is getting merged into Advanced Editor's
+// custom parsing rules in advanced.js.
+$(document).on('editorParseRules', function(e) {
+   // Merge custom parsing object for Soompi's old posts.
+   var newTagRules = {
+      "a": {
+         "check_attributes": {
+             "href": "url",
+             "style": "allow"
+         },
+         "set_attributes": {
+             "rel": "nofollow",
+             "target": "_blank"
+         }
+      },
+      "img": {
+         "check_attributes": {
+             "width": "numbers",
+             "alt": "alt",
+             "src": "url", // if you compiled master manually then change this from 'url' to 'src'
+             "height": "numbers",
+             "style": "allow"
+         },
+         "add_class": {
+             "align": "align_img"
+         }
+      },
+      "div": {
+         "add_class": {
+             "align": "align_text"
+         },
+
+         "check_attributes": {
+           "style":"allow"
+         }
+      },
+      "span": {
+         "check_attributes": {
+            "style":"allow"
+          }
+      },
+      "font": {
+         "add_class": {
+             "size": "size_font"
+         },
+         "check_attributes": {
+           "style":"allow",
+           "face":"allow",
+           "color":"allow",
+           "size":"allow"
+         }
+      },
+      "b": {
+         "check_attributes": {
+           "style":"allow"
+         }
+      }
+   };
+
+   // Merge new tag rules with current ones, so advanced
+   // editor can obey latest parse rules.
+   e.rules['tags'] = $.extend(e.rules.tags, newTagRules);
+});
+*/
