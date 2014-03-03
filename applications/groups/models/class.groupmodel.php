@@ -102,15 +102,10 @@ class GroupModel extends Gdn_Model {
                $Perms['Leave.Reason'] = T("You can't leave the group you started.");
             }
          } else {
-            if ($Group['Visibility'] != 'Public') {
+            if ($Group['Privacy'] != 'Public') {
                $Perms['View'] = FALSE;
                $Perms['View.Reason'] = T('Join this group to view its content.');
             }
-         }
-
-         if (strtolower($Group['Registration']) === 'invite') {
-            $Perms['Join'] = FALSE;
-            $Perms['Join.Reason'] = T('You have to be invited to the group.');
          }
 
          if ($GroupApplicant) {
@@ -500,6 +495,21 @@ class GroupModel extends Gdn_Model {
    }
 
    public function Save($Data, $Settings = FALSE) {
+      $this->EventArguments['Fields'] =& $Data;
+      $this->FireEvent('BeforeSave');
+
+      // Set the visibility and registration based on the privacy.
+      switch (strtolower(GetValue('Privacy', $Data))) {
+         case 'private':
+            $Data['Visibility'] = 'Members';
+            $Data['Registration'] = 'Approval';
+            break;
+         case 'public':
+            $Data['Visibility'] = 'Public';
+            $Data['Registration'] = 'Public';
+            break;
+      }
+
       $GroupID = parent::Save($Data, $Settings);
 
       if ($GroupID) {
