@@ -23,3 +23,9 @@
 #bulk-importer #import-progress-container.working {
   display: inline-block;
 }
+#bulk-importer #bulk-error-header:empty {
+  display: none;
+}
+#bulk-importer #bulk-error-dump:empty {
+  display: none;
+}
