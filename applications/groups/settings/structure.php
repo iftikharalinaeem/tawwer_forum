@@ -20,6 +20,7 @@ Gdn::PermissionModel()->Define(array(
 $St->Table('Group');
 $GroupExists = $St->TableExists();
 $CountDiscussionsExists = $St->ColumnExists('CountDiscussions');
+$GroupTypeExists = $St->ColumnExists('Type');
 
 $St
    ->PrimaryKey('GroupID')
@@ -29,8 +30,9 @@ $St
    ->Column('CategoryID', 'int', FALSE, 'key')
    ->Column('Icon', 'varchar(255)', TRUE)
    ->Column('Banner', 'varchar(255)', TRUE)
-   ->Column('Registration', array('Public', 'Approval', 'Invite'), 'Public')
-   ->Column('Visibility', array('Public', 'Members'))
+   ->Column('Privacy', array('Public', 'Private'), 'Public') // add secret later.
+   ->Column('Registration', array('Public', 'Approval', 'Invite'), TRUE) // deprecated
+   ->Column('Visibility', array('Public', 'Members'), TRUE) // deprecated
    ->Column('CountMembers', 'uint', '0')
    ->Column('CountDiscussions', 'uint', '0')
    ->Column('DateLastComment', 'datetime', TRUE)
@@ -44,6 +46,11 @@ $St
 if (!$CountDiscussionsExists) {
    $GroupModel = new GroupModel();
    $GroupModel->Counts('CountDiscussions');
+}
+
+if ($GroupExists && !$GroupTypeExists) {
+   $Sql->Put('Group', array('Privacy' => 'Private'));
+   $Sql->Put('Group', array('Privacy' => 'Public'), array('Registration' => 'Public', 'Visibility' => 'Public'));
 }
 
 $St->Table('UserGroup')

@@ -43,22 +43,13 @@
          ?>
       </div>
       <hr />
-      <div class="P P-Registration">
+      <div class="P P-Privacy">
          <?php
-         echo '<div><b>'.T('How can people join this group?').'</b></div>';
-         echo $this->Form->RadioList('Registration', array(
-            'Public' => 'Public. Anyone can join.',
-            'Invite' => 'Invitation. People must be invited to the group.',
-            'Approval' => 'Approval. People have to apply and be approved.'),
-            array('list' => TRUE));
-         ?>
-      </div>
-      <div class="P P-Visibility">
-         <?php
-         echo '<div><b>'.T('Content Visibility').'</b></div>';
-         echo $this->Form->RadioList('Visibility', array(
-            'Public' => "Anyone can view this group's content.",
-            'Members' => 'Users must join this group to view its content.'),
+         echo '<div><b>'.T('Privacy').'</b></div>';
+         echo $this->Form->RadioList('Privacy', array(
+            'Public' => '@'.T('Public').'. <span class="Gloss">'.T('Public group.', 'Anyone can see the group and its content. Anyone can join.').'</span>',
+            'Private' => '@'.T('Private').'. <span class="Gloss">'.T('Private group.', 'Anyone can see the group, but only members can see its content. People must apply or be invited to join.').'</span>',
+            ),
             array('list' => TRUE));
          ?>
       </div>

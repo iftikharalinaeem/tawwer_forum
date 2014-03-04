@@ -156,6 +156,8 @@ class GroupsHooks extends Gdn_Plugin {
             $Sender->AddBreadcrumb(T('Groups'), '/groups');
             $Sender->AddBreadcrumb($Group['Name'], GroupUrl($Group));
          }
+
+         Gdn_Theme::Section('Group');
       }
    }
 
