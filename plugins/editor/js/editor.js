@@ -1459,7 +1459,8 @@
                      // made for one case where a forum's older posts had
                      // very heavy inline formatting, using style attributes and
                      // deprecated tags like font. This will merge and replace
-                     // any parsing rules passed.
+                     // any parsing rules passed. There is an example of how to
+                     // do this at the bottom of this script.
                      $.event.trigger({
                         type:    "editorParseRules",
                         message: "Customize parsing rules by merging into e.rules.",
