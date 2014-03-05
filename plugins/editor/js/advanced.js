@@ -75,7 +75,8 @@ var wysihtml5ParserRules = {
 
         "Spoiler": 1,
         "Quote": 1,
-        "CodeBlock": 1
+        "CodeBlock": 1,
+        "post-text-decoration-line-through": 1
     },
     /**
 * Tag list
@@ -112,9 +113,6 @@ var wysihtml5ParserRules = {
             }
         },
         "strike": {
-            //"remove": 1
-            "rename_tag": "del",
-            "set_class": "post-text-decoration-line-through"
         },
         "form": {
             "rename_tag": "div"
@@ -393,7 +391,6 @@ var wysihtml5ParserRules = {
             "rename_tag": "span"
         },
         "del": {
-            //"remove": 1
         },
         "blockquote": {
             "check_attributes": {
