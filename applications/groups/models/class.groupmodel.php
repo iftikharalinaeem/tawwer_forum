@@ -633,9 +633,12 @@ class GroupModel extends Gdn_Model {
       if ($GroupID) {
          $Group = $this->GetID($GroupID);
 
-         switch (strtolower($Group['Registration'])) {
-            case 'approval':
-               $this->ValidateRule('Reason', $Data, 'ValidateRequired', 'Why do you want to join?');
+         switch (strtolower($Group['Privacy'])) {
+            case 'private':
+               if (!$this->CheckPermission('Leader', $Group)) {
+                  $this->ValidateRule('Reason', $Data, 'ValidateRequired', 'Why do you want to join?');
+               }
+               break;
          }
       }
 
