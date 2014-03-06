@@ -1,6 +1,17 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div id="GroupForm" class="FormTitleWrapper">
    <h1><?php echo $this->Data('Title'); ?></h1>
+
+   <?php if ($this->Data('MaxUserGroups')): ?>
+      <div class="DismissMessage InfoMessage">
+         <?php
+         echo sprintf(T('You are allowed to create %s groups.'), $this->Data('MaxUserGroups')),
+            ' ',
+            Plural($this->Data('CountRemainingGroups'), 'You have %s group remaining.', 'You have %s groups remaining.');
+         ?>
+      </div>
+   <?php endif; ?>
+
    <div class="FormWrapper StructuredForm">
       <?php
       echo $this->Form->Open(array('enctype' => 'multipart/form-data'));

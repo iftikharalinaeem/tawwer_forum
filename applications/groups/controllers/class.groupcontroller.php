@@ -127,6 +127,22 @@ class GroupController extends Gdn_Controller {
 
    public function Add() {
       $this->Title(sprintf(T('New %s'), T('Group')));
+
+      // Check the max groups.
+      if ($this->GroupModel->MaxUserGroups > 0 && Gdn::Session()->IsValid()) {
+         $this->SetData('MaxUserGroups', $this->GroupModel->MaxUserGroups);
+         $this->SetData('CountUserGroups', $this->GroupModel->GetUserCount(Gdn::Session()->UserID));
+         $CountRemaining = max(0, $this->Data('MaxUserGroups') - $this->Data('CountUserGroups'));
+
+         $this->SetData('CountRemainingGroups', $CountRemaining);
+
+         if ($CountRemaining <= 0) {
+            $this->Form = new Gdn_Form();
+            $this->Form->AddError("You've already created the maximum number of groups.");
+            $this->Render('AddEditError');
+         }
+      }
+
       return $this->AddEdit();
    }
 

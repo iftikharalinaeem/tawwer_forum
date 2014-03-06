@@ -1,6 +1,13 @@
 <?php
 
 class GroupModel extends Gdn_Model {
+
+   /**
+    * @var int The maximum number of groups a regular user is allowed to create.
+    */
+   public $MaxUserGroups = 0;
+
+
    /**
     * Class constructor. Defines the related database table name.
     *
@@ -8,6 +15,7 @@ class GroupModel extends Gdn_Model {
     */
    public function __construct() {
       parent::__construct('Group');
+      $this->FireEvent('Init');
    }
 
    /**
@@ -261,6 +269,15 @@ class GroupModel extends Gdn_Model {
       return $Users;
    }
 
+   public function GetUserCount($UserID) {
+      $Count = $this->SQL
+         ->Select('InsertUserID', 'count', 'CountGroups')
+         ->From('Group')
+         ->Where('InsertUserID', $UserID)
+         ->Get()->Value('CountGroups');
+      return $Count;
+   }
+
    public static function ParseID($ID) {
       $Parts = explode('-', $ID, 2);
       return $Parts[0];
@@ -497,6 +514,14 @@ class GroupModel extends Gdn_Model {
    public function Save($Data, $Settings = FALSE) {
       $this->EventArguments['Fields'] =& $Data;
       $this->FireEvent('BeforeSave');
+
+      if ($this->MaxUserGroups && !GetValue('GroupID', $Data)) {
+         $CountUserGroups = $this->GetUserCount(Gdn::Session()->UserID);
+         if ($CountUserGroups >= $this->MaxUserGroups) {
+            $this->Validation->AddValidationResult('Count', "You've already created the maximum number of groups.");
+            return FALSE;
+         }
+      }
 
       // Set the visibility and registration based on the privacy.
       switch (strtolower(GetValue('Privacy', $Data))) {
