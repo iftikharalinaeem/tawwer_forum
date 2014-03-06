@@ -31,4 +31,13 @@
    #import-progress-container.working {
       display: inline-block;
    }
+
+   #bulk-error-header:empty {
+      display: none;
+   }
+
+   #bulk-error-dump:empty {
+      display: none;
+   }
+
 }

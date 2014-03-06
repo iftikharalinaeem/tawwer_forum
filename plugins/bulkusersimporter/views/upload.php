@@ -90,6 +90,11 @@
          </span>
       </div>
 
+      <div class="Info">
+         <strong id="bulk-error-header"></strong>
+         <pre id="bulk-error-dump"></pre>
+      </div>
+
    <?php endif; ?>
 
 </div>
