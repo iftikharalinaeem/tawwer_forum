@@ -57,9 +57,13 @@ class Warnings2Plugin extends Gdn_Plugin {
    /// Event Handlers ///
 
    /**
-    * Show if this post triggered a warning to give everyone context.
+    * Show if this post triggered a warning to give moderators context.
     */
    public function Base_BeforeCommentBody_Handler($Sender, $Args) {
+      // Only show warnings to moderators
+      if (!Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), FALSE))
+         return;
+
       if (isset($Args['Comment']))
          $Row = $Args['Comment'];
       else

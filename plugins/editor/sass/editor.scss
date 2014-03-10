@@ -303,6 +303,7 @@ affect, so it's not doing anything */
    background-color: rgba(255,255,255,0.95);
    box-shadow: 0 2px 5px -5px #000;
    transition: all 0.4s ease;
+   z-index: 100001; /* So high because a client actually had 99999 in a theme */
 }
 
 .editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {

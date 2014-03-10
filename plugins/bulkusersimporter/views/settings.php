@@ -9,7 +9,7 @@
       Use this importer to bulk import CSV files.
    </div>
 
-   <div class="Info"><strong>Note:</strong> The format of a CSV file must be
+   <div class="Info">The format of a CSV file must be
       <code>Email,Username,Status</code> per line, in that order. There must be exactly one comma
       between each, no trailing comma, with a maximum of three values. Each
       grouping of three are on their own line. If the CSV file has a header
@@ -20,6 +20,12 @@
    <div class="Info">The third parameter, <code>Status</code>, can have
       multiple items. These items must be separated by a colon <code>:</code>. Valid
       statuses are: <em class="valid-statuses"><?php echo implode(', ', $this->Data('allowed_roles')); ?></em>.
+   </div>
+
+   <div class="Info">
+      <strong>Note:</strong> If the CSV file will contain usernames with
+      non-Latin characters, it is important that its default encoding
+      be UTF-8. Not doing this can result in corrupted characters in usernames.
    </div>
 
    <h3>Example contents of CSV file:</h3>
