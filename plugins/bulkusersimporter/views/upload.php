@@ -83,11 +83,18 @@
       </div>
 
       <div class="FilterMenu">
+         <p class="P"><label for="bulk_importer_debug" title="Regardless of this setting, users who already exist do not receive an email, as they're just getting updated."><input type="checkbox" id="bulk_importer_debug" /> Do not send an email to newly created users.</label></p>
+
          <a id="process-csvs" class="SmallButton" href="<?php echo Url('/settings/bulkusersimporter/process'); ?>">Begin processing</a>
          <span id="import-progress-container">
             <i id="progress-animation" class="TinyProgress"></i>
             <span id="import-progress-meter" data-total-rows="<?php echo $total_rows; ?>" data-completed-rows="0">0%</span>
          </span>
+      </div>
+
+      <div class="Info">
+         <strong id="bulk-error-header"></strong>
+         <pre id="bulk-error-dump"></pre>
       </div>
 
    <?php endif; ?>

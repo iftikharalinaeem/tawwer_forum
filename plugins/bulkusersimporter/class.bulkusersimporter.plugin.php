@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.2',
+   'Version' => '1.0.6',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -29,7 +29,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    // Will contain whitelist of allowed roles.
    private $allowed_roles = array();
 
-   // Grab maximum of 1000 rows, timeout after 20 seconds
+   // Grab maximum of 1000 rows, or timeout after 20 seconds--whichever
+   // happens first.
    // It will be asynchronously iterated over until there are no more records.
    // Modify these values to change how many requests will be sent to server
    // until job is complete.
@@ -229,7 +230,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             if ($rows_affected > 0) {
                $results['success'][$filename] = $rows_affected;
             } else {
-               $results['fail'][$filename] = 'Improperly formatted CSV file';
+               $results['fail'][$filename] = 'Improperly formatted CSV file, or the server has not been configured for LOCAL INFILE use';
             }
 
             // Delete the file
@@ -249,106 +250,132 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    public function processUploadedData($sender) {
       $sender->SetData('status', 'Incomplete');
 
+      // Get POST 'debug' value, because if it's
+      // in debug, it will not send emails. Called it 'debug' in case in future
+      // I want to expand on the functionality of debug mode. The actual
+      // label for the checkbox states, "Do not send an email to successfully
+      // imported users." It's either 1 or 0.
+      $debug_mode = $sender->Request->Post('debug');
+      $debug_mode = (isset($debug_mode))
+         ? (int) $sender->Request->Post('debug')
+         : 0;
+
       $bulk_user_importer_model = new Gdn_Model($this->table_name);
       $imported_users = $bulk_user_importer_model->GetWhere(array('completed' => 0), '', 'asc', $this->limit)->ResultArray();
-
-      // Will contain array of added user ids.
-      $success = array();
-      $fail = array();
       $user_model = new UserModel();
+
+      // Collect error messages, concatenate them at end.
+      $error_messages = array();
 
       // For byte-size processing
       $start_time = time();
+      $processed = 0;
+
       foreach($imported_users as $user) {
+         $processed++;
+         $send_email = false; // Default
+         $user_id = false; // Default
+         $user['Username'] = trim($user['Username']);
+         $user['Email'] = trim($user['Email']);
+
+         // Grab first import id in job.
+         if (!isset($first_import_id)) {
+            $first_import_id = $user['ImportID'];
+         }
+
+         // Zenimax mentioned that usernames will contain all
+         // variety of characters, so be very loose with the validation.
+         $regex_length = C("Garden.User.ValidationLength","{3,20}");
+         $regex_username = "/^(.)$regex_length$/";
+
+         // Originally had ValidateUsername, but often the regex it was
+         // validating with was too strict.
+         // C("Garden.User.ValidationRegex","\d\w_");
+         if (!isset($user['Username']) && !preg_match($regex_username, $user['Username'])) {
+            $error_messages[$processed]['username'] = 'Invalid username on line ' . $user['ImportID'] . ': ' . $user['Username'] . '.';
+            //$sender->SetJson('import_id', 0);
+            //$sender->SetJson('error_message', $error_messages[$processed]['username']);
+            //break;
+         }
 
          if (!ValidateEmail($user['Email'])) {
-            $fail[$user['Email']] = 'Invalid email';
-            $sender->SetJson('import_id', 0);
-            $sender->SetJson('error_message', 'Invalid email on line '. $user['ImportID'] .': <strong>'. $user['Email'] .'</strong>. Please correct this and try again.');
-            break;
+            $error_messages[$processed]['email'] = 'Invalid email on line '. $user['ImportID'] .': '. $user['Email'] .'.';
+            //$sender->SetJson('import_id', 0);
+            //$sender->SetJson('error_message', $error_messages[$processed]['email']);
+            //break;
          }
-
-         // If username is invalid, generate random one and continue processing.
-         if (!ValidateUsername($user['Username'])) {
-            // Nevermind, just cancel whole operation and let them know.
-            //$user['Username'] = 'user' . mt_rand(9000,90000);
-            $sender->SetJson('import_id', 0);
-            $sender->SetJson('error_message', 'Invalid username on line '. $user['ImportID'] .': <strong>'. $user['Username'] .'</strong>. Please correct this and try again.');
-            break;
-         }
-
-         // Check if username in use.
-         $check_name = $user_model->GetWhere(array(
-             'Name' => $user['Username']
-         ))->FirstRow('array');
-
-         $unique_name = (count($check_name['Name']))
-            ? false
-            : true;
 
          // Get role ids based off of their name, and check if any invalid
          // roles were passed.
          $status = $this->roleNamesToInts($user['Status']);
-
-         // If even single invalid role used, bail out.
          if (!count($status['invalid_roles'])) {
             $role_ids = $status['role_ids'];
             $banned = $status['banned'];
-            $user_id = false;
          } else {
-            // No roles, so bail out.
+            // No roles
             $plural_status = PluralTranslate(count($status['invalid_roles']), 'status', 'statuses');
-            $sender->SetJson('import_id', 0);
-            $sender->SetJson('error_message', "Invalid $plural_status on line ". $user['ImportID'] .': <strong>' . implode(', ', $status['invalid_roles']) . '</strong>. Please correct this and try again.');
-            break;
+            $error_messages[$processed]['role'] = "Invalid $plural_status on line " . $user['ImportID'] . ': ' . implode(', ', $status['invalid_roles']) . '.';
+            //$sender->SetJson('import_id', 0);
+            //$sender->SetJson('error_message', $error_messages[$processed]['role']);
+            //break;
          }
 
-         $send_email = false;
+         if (!isset($error_messages[$processed]['username'])) {
+            // Check if username in use.
+            $check_name = $user_model->GetWhere(array(
+                'Name' => $user['Username']
+            ))->FirstRow('array');
 
-         // Username controls, so if it exists, update the info, including
-         // email, otherwise create new user.
-         if (!$unique_name) {
-            $send_email = false;
-            // Update the user.
-            $user_id = $user_model->Save(
-               array(
-                'UserID' => $check_name['UserID'],
-                'Email' => $user['Email'],
-                'RoleID' => $role_ids,
-                'Banned' => $banned
-            ), array(
-                'SaveRoles' => true
-            ));
-         } else {
-            $send_email = true;
-            // Create new user. The method seems to rely on Captcha keys, so
-            // this may error out due to none being passed to it.
-            $temp_password = sha1($user['Email'] . time());
+            // Username controls, so if it exists, update the info, including
+            // email, otherwise create new user.
+            if (count($check_name['Name'])) {
+               $send_email = false;
+               // Update the user.
+               $user_id = $user_model->Save(
+                  array(
+                   'UserID' => $check_name['UserID'],
+                   'Email' => $user['Email'],
+                   'RoleID' => $role_ids,
+                   'Banned' => $banned
+               ), array(
+                   'SaveRoles' => true
+               ));
+            } else {
+               $send_email = true;
+               // Create new user. The method seems to rely on Captcha keys, so
+               // this may error out due to none being passed to it.
+               $temp_password = sha1($user['Email'] . time());
 
-            // Create new user
-            $user_id = $user_model->Register(
-               array(
-                'Name' => $user['Username'],
-                'Password' => $temp_password, // This will get reset
-                'Email' => $user['Email'],
-                'RoleID' => $role_ids,
-                'Banned' => $banned
-            ), array(
-                'SaveRoles' => true,
-                'CheckCaptcha' => false
-            ));
+               // Create new user
+               $user_id = $user_model->Register(
+                  array(
+                   'Name' => $user['Username'],
+                   'Password' => $temp_password, // This will get reset
+                   'Email' => $user['Email'],
+                   'RoleID' => $role_ids,
+                   'Banned' => $banned
+               ), array(
+                   'SaveRoles' => true,
+                   'CheckCaptcha' => false
+               ));
+            }
          }
 
          $complete_code = 0; // Error code
-         $error_string = $user_model->Validation->ResultsText();
-
          if ($user_id) {
-            $success[$user_id] = $user['Email'];
             $complete_code = 1;
+            if (isset($error_messages[$processed]['role'])) {
+               $complete_code = 2;
+            }
          } else {
-            $fail[$user['Username']] = $error_string;
             $complete_code = 2;
+            $error_messages[$processed]['db'] = $user_model->Validation->ResultsText();
          }
+
+         // Error message to get logged in DB, if any.
+         $error_string = (isset($error_messages[$processed]))
+            ? implode(' ', $error_messages[$processed])
+            : '';
 
          // Log errors in DB--will be cleared on next import.
          $bulk_user_importer_model->Update(
@@ -365,10 +392,13 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          // Email successfully added users, but not users who already had an
          // account (according to username) with forum.
          if ($send_email && $complete_code == 1) {
-            $this->PasswordRequest($user['Email']); // Reset current temp password
+            if ($debug_mode == 0) {
+               $this->PasswordRequest($user['Email']); // Reset current temp password
+            }
          }
 
          $sender->SetJson('import_id', $user['ImportID']);
+         $sender->SetJson('first_import_id', $first_import_id);
          // If timeout reached, end current operation. It will be called
          // again immediately to continue processing.
          if (time() - $start_time >= $this->timeout) {
@@ -376,13 +406,33 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          }
       }
 
-      $total_success = count($success);
-      $total_fail = count($fail);
+      $total_fail = count($error_messages);
+      $total_success = $processed - $total_fail;
+
+      if ($total_success < 0) {
+         $total_success = 0;
+      }
 
       if ($total_success || $total_fail) {
          $sender->SetJson('feedback', 'Latest job processed up to row ' . $user['ImportID']);
       } else {
          $sender->InformMessage('There was a problem processing the data.');
+      }
+
+      // Send error dumps.
+      if ($total_fail) {
+         // Get dumps from DB relevant to this job.
+         $bulk_error_dump = $bulk_user_importer_model->GetWhere(
+            array(
+             'ImportID >=' => $first_import_id,
+             'Completed' => 2
+            ),
+            '',
+            'asc',
+            $this->limit
+         )->ResultArray();
+         $errors = array_column($bulk_error_dump, 'Error');
+         $sender->SetJson('bulk_error_dump', json_encode($errors));
       }
 
       $sender->Render('Blank', 'Utility', 'Dashboard');

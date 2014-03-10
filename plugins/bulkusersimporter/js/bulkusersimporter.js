@@ -115,13 +115,24 @@ jQuery(document).ready(function($) {
       }
    });
 
+   // Running the bulk importer in debug mode
+   bulk_importer_debug = 0;
+   $('#bulk_importer_debug').on('change', function(e) {
+      bulk_importer_debug = parseInt(+e.target.checked);
+   });
 
+   bulk_importer_errors = 0;
    var incremental_job = function(url) {
       var $progress_meter = $('#import-progress-meter');
       var total_rows = parseInt($progress_meter.attr('data-total-rows'));
       var $progress_container = $('#import-progress-container');
       var $progress_animation = $('#progress-animation');
+      var $bulk_error_header = $('#bulk-error-header');
+      var $bulk_error_dump = $('#bulk-error-dump');
       var progress_fail_message = 'Import could not be completed.';
+
+      // Max errors before importer stops.
+      var max_errors = 1000;
 
       // Set work in progress
       $progress_container.addClass('working');
@@ -129,7 +140,8 @@ jQuery(document).ready(function($) {
       $.post(url, {
          DeliveryMethod: 'JSON',
          DeliveryType: 'View',
-         TransientKey: gdn.definition('TransientKey', '')
+         TransientKey: gdn.definition('TransientKey', ''),
+         debug: bulk_importer_debug
       }, null, 'json')
       .done(function(data) {
          var rows_completed_job = parseInt(data.import_id);
@@ -138,8 +150,24 @@ jQuery(document).ready(function($) {
             progress = 100;
          }
          $progress_meter.attr('data-completed-rows', rows_completed_job);
-         var progress_message = '<span title="'+ data.feedback +'">'+ progress + '% processed</span>'
+         var progress_message = '<span title="'+ data.feedback +'">'+ progress + '% processed.</span>'
          $progress_meter.html(progress_message);
+
+         // If there were errors in the processing, output them.
+         if (data.bulk_error_dump) {
+            var error_messages = $.parseJSON(data.bulk_error_dump);
+            bulk_importer_errors = bulk_importer_errors + error_messages.length;
+            $bulk_error_header.html('Errors (' + bulk_importer_errors + ')');
+            for (var i = 0, l = error_messages.length; i < l; i++) {
+               $bulk_error_dump.append(error_messages[i] +'\n');
+            }
+         }
+
+         // Cancel import if received n number of errors.
+         if (bulk_importer_errors >= max_errors) {
+            cancel_import = true;
+            progress_fail_message = '<div>Import cancelled after <strong>'+ progress +'% progress</strong> because there have already been <strong>'+ max_errors + ' errors</strong>. Clean up the CSV file before trying again. Odds are the errors listed below are duplicated in the remaining data set.</div>';
+         }
 
          // If import_id is 0, then there was no role.
          if (rows_completed_job == 0) {
