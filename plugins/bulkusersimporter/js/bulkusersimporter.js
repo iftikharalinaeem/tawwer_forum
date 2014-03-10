@@ -115,6 +115,12 @@ jQuery(document).ready(function($) {
       }
    });
 
+   // Running the bulk importer in debug mode
+   bulk_importer_debug = 0;
+   $('#bulk_importer_debug').on('change', function(e) {
+      bulk_importer_debug = parseInt(+e.target.checked);
+   });
+
    bulk_importer_errors = 0;
    var incremental_job = function(url) {
       var $progress_meter = $('#import-progress-meter');
@@ -134,7 +140,8 @@ jQuery(document).ready(function($) {
       $.post(url, {
          DeliveryMethod: 'JSON',
          DeliveryType: 'View',
-         TransientKey: gdn.definition('TransientKey', '')
+         TransientKey: gdn.definition('TransientKey', ''),
+         debug: bulk_importer_debug
       }, null, 'json')
       .done(function(data) {
          var rows_completed_job = parseInt(data.import_id);

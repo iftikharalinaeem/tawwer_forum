@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.3',
+   'Version' => '1.0.4',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -29,7 +29,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    // Will contain whitelist of allowed roles.
    private $allowed_roles = array();
 
-   // Grab maximum of 1000 rows, timeout after 20 seconds
+   // Grab maximum of 1000 rows, or timeout after 20 seconds--whichever
+   // happens first.
    // It will be asynchronously iterated over until there are no more records.
    // Modify these values to change how many requests will be sent to server
    // until job is complete.
@@ -249,6 +250,16 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    public function processUploadedData($sender) {
       $sender->SetData('status', 'Incomplete');
 
+      // Get POST 'debug' value, because if it's
+      // in debug, it will not send emails. Called it 'debug' in case in future
+      // I want to expand on the functionality of debug mode. The actual
+      // label for the checkbox states, "Do not send an email to successfully
+      // imported users." It's either 1 or 0.
+      $debug_mode = $sender->Request->Post('debug');
+      $debug_mode = (isset($debug_mode))
+         ? (int) $sender->Request->Post('debug')
+         : 0;
+
       $bulk_user_importer_model = new Gdn_Model($this->table_name);
       $imported_users = $bulk_user_importer_model->GetWhere(array('completed' => 0), '', 'asc', $this->limit)->ResultArray();
       $user_model = new UserModel();
@@ -264,23 +275,33 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          $processed++;
          $send_email = false; // Default
          $user_id = false; // Default
+         $user['Username'] = trim($user['Username']);
+         $user['Email'] = trim($user['Email']);
 
          // Grab first import id in job.
          if (!isset($first_import_id)) {
             $first_import_id = $user['ImportID'];
          }
 
-         if (!ValidateEmail($user['Email'])) {
-            $error_messages[$processed]['email'] = 'Invalid email on line '. $user['ImportID'] .': '. $user['Email'] .'.';
+         // Zenimax mentioned that usernames will contain all
+         // variety of characters, so be very loose with the validation.
+         $regex_length = C("Garden.User.ValidationLength","{3,20}");
+         $regex_username = "/^(.)$regex_length$/";
+
+         // Originally had ValidateUsername, but often the regex it was
+         // validating with was too strict.
+         // C("Garden.User.ValidationRegex","\d\w_");
+         if (!isset($user['Username']) && !preg_match($regex_username, $user['Username'])) {
+            $error_messages[$processed]['username'] = 'Invalid username on line ' . $user['ImportID'] . ': ' . $user['Username'] . '.';
             //$sender->SetJson('import_id', 0);
-            //$sender->SetJson('error_message', 'Invalid email on line '. $user['ImportID'] .': <strong>'. $user['Email'] .'</strong>. Please correct this and try again.');
+            //$sender->SetJson('error_message', $error_messages[$processed]['username']);
             //break;
          }
 
-         if (!ValidateUsername($user['Username'])) {
-            $error_messages[$processed]['username'] = 'Invalid username on line ' . $user['ImportID'] . ': ' . $user['Username'] . '.';
+         if (!ValidateEmail($user['Email'])) {
+            $error_messages[$processed]['email'] = 'Invalid email on line '. $user['ImportID'] .': '. $user['Email'] .'.';
             //$sender->SetJson('import_id', 0);
-            //$sender->SetJson('error_message', 'Invalid username on line '. $user['ImportID'] .': <strong>'. $user['Username'] .'</strong>. Please correct this and try again.');
+            //$sender->SetJson('error_message', $error_messages[$processed]['email']);
             //break;
          }
 
@@ -295,7 +316,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             $plural_status = PluralTranslate(count($status['invalid_roles']), 'status', 'statuses');
             $error_messages[$processed]['role'] = "Invalid $plural_status on line " . $user['ImportID'] . ': ' . implode(', ', $status['invalid_roles']) . '.';
             //$sender->SetJson('import_id', 0);
-            //$sender->SetJson('error_message', "Invalid $plural_status on line ". $user['ImportID'] .': <strong>' . implode(', ', $status['invalid_roles']) . '</strong>. Please correct this and try again.');
+            //$sender->SetJson('error_message', $error_messages[$processed]['role']);
             //break;
          }
 
@@ -371,7 +392,9 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          // Email successfully added users, but not users who already had an
          // account (according to username) with forum.
          if ($send_email && $complete_code == 1) {
-            $this->PasswordRequest($user['Email']); // Reset current temp password
+            if ($debug_mode == 0) {
+               $this->PasswordRequest($user['Email']); // Reset current temp password
+            }
          }
 
          $sender->SetJson('import_id', $user['ImportID']);
