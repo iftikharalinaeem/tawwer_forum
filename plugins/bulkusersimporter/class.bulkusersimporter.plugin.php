@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.4',
+   'Version' => '1.0.5',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -230,7 +230,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             if ($rows_affected > 0) {
                $results['success'][$filename] = $rows_affected;
             } else {
-               $results['fail'][$filename] = 'Improperly formatted CSV file';
+               $results['fail'][$filename] = 'Improperly formatted CSV file, or the server has not been configured for LOCAL INFILE use';
             }
 
             // Delete the file
