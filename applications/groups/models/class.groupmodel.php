@@ -352,9 +352,14 @@ class GroupModel extends Gdn_Model {
          $Model = new ConversationModel();
          $MessageModel = new ConversationMessageModel();
 
+         $Args = array(
+            'Name' => htmlspecialchars($Group['Name']),
+            'Url' => GroupUrl($Group, '/')
+         );
+
          $Row = array(
-            'Subject' => T("Please join my group."),
-            'Body' => sprintf(T("You've been invited to join %s."), htmlspecialchars($Group['Name'])),
+            'Subject' => FormatString(T("Please join my group."), $Args),
+            'Body' => FormatString(T("You've been invited to join {Name}."), $Args),
             'Format' => 'Html',
             'RecipientUserID' => $ValidUserIDs,
             'Type' => 'ginvite',
