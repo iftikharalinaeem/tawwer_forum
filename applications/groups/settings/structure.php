@@ -20,7 +20,7 @@ Gdn::PermissionModel()->Define(array(
 $St->Table('Group');
 $GroupExists = $St->TableExists();
 $CountDiscussionsExists = $St->ColumnExists('CountDiscussions');
-$GroupTypeExists = $St->ColumnExists('Type');
+$GroupPrivacyExists = $St->ColumnExists('Privacy');
 
 $St
    ->PrimaryKey('GroupID')
@@ -48,7 +48,7 @@ if (!$CountDiscussionsExists) {
    $GroupModel->Counts('CountDiscussions');
 }
 
-if ($GroupExists && !$GroupTypeExists) {
+if ($GroupExists && !$GroupPrivacyExists) {
    $Sql->Put('Group', array('Privacy' => 'Private'));
    $Sql->Put('Group', array('Privacy' => 'Public'), array('Registration' => 'Public', 'Visibility' => 'Public'));
 }
@@ -93,6 +93,7 @@ if ($St->TableExists('Category')) {
             'UrlCode' => 'social-groups',
             'HideAllDiscussions' => 1,
             'DisplayAs' => 'Discussions',
+            'AllowDiscussions' => 1,
             'AllowGroups' => 1,
             'Sort' => 1000);
          $Model->Save($Row);
