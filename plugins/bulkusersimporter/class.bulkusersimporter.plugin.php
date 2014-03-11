@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.8',
+   'Version' => '1.0.9',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -36,6 +36,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    // until job is complete.
    public $limit = 1000;
    public $timeout = 20;
+
+   // Username min and max lengths
+   public $username_limits = array(
+       'min' => 3,
+       'max' => 40
+   );
 
    public function __construct() {
       $this->database_prefix = Gdn::Database()->DatabasePrefix;
@@ -104,6 +110,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          default:
             $sender->AddDefinition('maxfilesizebytes', Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize')));
             $sender->SetData('allowed_roles', $this->allowed_roles);
+            $sender->SetData('username_limits', $this->username_limits);
             $sender->Render('settings', '', 'plugins/bulkusersimporter');
             break;
       }
@@ -285,7 +292,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          // Zenimax mentioned that usernames will contain all
          // variety of characters, so be very loose with the validation.
-         $regex_length = C("Garden.User.ValidationLength","{3,20}");
+         //$regex_length = C("Garden.User.ValidationLength","{3,20}");
+         $regex_length = '{'. $this->username_limits['min'] . ',' . $this->username_limits['max'] . '}';
          $regex_username = "/^(.)$regex_length$/";
 
          // Originally had ValidateUsername, but often the regex it was
@@ -295,6 +303,17 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          || $user['Username'] == '' // trimming down space names
          || !preg_match($regex_username, $user['Username'])) {
             $error_messages[$processed]['username'] = 'Invalid username on line ' . $user['ImportID'] . ': ' . $user['Username'] . '.';
+
+            // Display more accurate error message for the length of usernames.
+            $username_length = strlen($user['Username']);
+            if ($username_length < $this->username_limits['min']) {
+               $error_messages[$processed]['username'] .= ' Username is too short (min '. $this->username_limits['min'] . ' characters).';
+            }
+
+            if ($username_length > $this->username_limits['max']) {
+               $error_messages[$processed]['username'] .= ' Username is too long (max '. $this->username_limits['max'] . ' characters).';
+            }
+
             //$sender->SetJson('import_id', 0);
             //$sender->SetJson('error_message', $error_messages[$processed]['username']);
             //break;

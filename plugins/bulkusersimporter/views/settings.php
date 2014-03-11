@@ -1,5 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
+<?php
+   $username_limits = $this->Data('username_limits');
+?>
+
 <div id="bulk-importer">
    <h1>
       <?php echo $this->Data('Title'); ?>
@@ -17,8 +21,17 @@
       three parameters are required.</strong>
    </div>
 
+   <div class="Info">The second parameter, <code>Username</code>, must be at
+      minimum <code><?php echo $username_limits['min']; ?></code> characters and at
+      most <code><?php echo $username_limits['max']; ?></code> characters.
+   </div>
+
    <div class="Info">The third parameter, <code>Status</code>, can have
-      multiple items. These items must be separated by a colon <code>:</code>. Valid
+      multiple items. These items must be separated by a colon <code>:</code>.
+      Statuses with spaces in them can be wrapped with single or double
+      quotation marks, but this is optional; spaces in statuses work just fine
+      without being wrapped in quotation marks. Statuses are not
+      case-sensitive, so "member" and "Member" are identical. Valid
       statuses are: <em class="valid-statuses"><?php echo implode(', ', $this->Data('allowed_roles')); ?></em>.
    </div>
 
@@ -31,7 +44,7 @@
    <h3>Example contents of CSV file:</h3>
 
    <div class="Info">
-      This example contains five lines. The first line has headers. Headers
+      This example contains eight lines. The first line has headers. Headers
       do not need to be present. If they are, check the option below so the
       importer can skip that line. The importer will fail if the syntax of the
       CSV file does not match the syntax in the example.
@@ -41,7 +54,10 @@
    john@example.com,johnny,Member
    paul@example2.com,paul,Member:Moderator
    kenny@example3.com,ken,Member:Banned
-   tywin@example4.com,lanman,Member:Administrator:Moderator</pre>
+   tywin@example4.com,lanman,Member:Administrator:Moderator:"World's Best"
+   rust@example5.com,carcosaguy,Member:World's Best:Moderator:Nice Ones
+   foo+bar@example6.com,foo,World's Best:Member
+   bar@example7.com,bar,"Nice Ones":Member</pre>
    </div>
 
 
