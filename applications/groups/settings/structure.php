@@ -14,7 +14,8 @@ $Sql = Gdn::SQL();
 $St = Gdn::Structure();
 
 Gdn::PermissionModel()->Define(array(
-   'Groups.Group.Add' => 'Garden.Profiles.Edit'));
+   'Groups.Group.Add' => 'Garden.Profiles.Edit',
+   'Groups.Moderation.Manage' => 'Garden.Moderation.Manage'));
 
 // Define the groups table.
 $St->Table('Group');
