@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.7',
+   'Version' => '1.0.8',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -291,7 +291,9 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          // Originally had ValidateUsername, but often the regex it was
          // validating with was too strict.
          // C("Garden.User.ValidationRegex","\d\w_");
-         if (!isset($user['Username']) && !preg_match($regex_username, $user['Username'])) {
+         if (!isset($user['Username'])
+         || $user['Username'] == '' // trimming down space names
+         || !preg_match($regex_username, $user['Username'])) {
             $error_messages[$processed]['username'] = 'Invalid username on line ' . $user['ImportID'] . ': ' . $user['Username'] . '.';
             //$sender->SetJson('import_id', 0);
             //$sender->SetJson('error_message', $error_messages[$processed]['username']);
@@ -346,18 +348,33 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                // this may error out due to none being passed to it.
                $temp_password = sha1($user['Email'] . time());
 
-               // Create new user
-               $user_id = $user_model->Register(
-                  array(
-                   'Name' => $user['Username'],
-                   'Password' => $temp_password, // This will get reset
-                   'Email' => $user['Email'],
-                   'RoleID' => $role_ids,
-                   'Banned' => $banned
-               ), array(
-                   'SaveRoles' => true,
-                   'CheckCaptcha' => false
-               ));
+               $form_post_values = array(
+                  'Name' => $user['Username'],
+                  'Password' => $temp_password, // This will get reset
+                  'Email' => $user['Email'],
+                  'RoleID' => $role_ids,
+                  'Banned' => $banned
+               );
+
+               $form_post_options = array(
+                  'SaveRoles' => true,
+                  'CheckCaptcha' => false
+               );
+
+               // This additional check is here to check if forum is in
+               // a registration mode that would require additional information
+               // not currently included in the import data, so for those
+               // instances just treat them as InsertForBasic, instead of
+               // calling Register, which will then use another method.
+               switch (strtolower(C('Garden.Registration.Method'))) {
+                  case 'approval':
+                  case 'invitation':
+                     $user_id = $user_model->InsertForBasic($form_post_values, GetValue('CheckCaptcha', $form_post_options, FALSE), $form_post_options);
+                     break;
+                  default:
+                     $user_id = $user_model->Register($form_post_values, $form_post_options);
+                     break;
+               }
             }
          }
 
