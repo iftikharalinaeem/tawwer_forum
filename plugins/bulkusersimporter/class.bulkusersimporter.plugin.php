@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.6',
+   'Version' => '1.0.7',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -575,6 +575,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          // Normalize the roles given, so lowercase all, and make sure the
          // DB query does the same.
          $role_names = array_map('strtolower', $role_names);
+
+         // If roles have spaces in them, they will have quotation marks
+         // around them, so strip those.
+         $role_names = array_map(function($role){
+            return trim(trim($role, "'"), '"');
+         }, $role_names);
 
          foreach($role_names as $i => $role_name) {
             if (!in_array($role_name, $allowed_roles)) {
