@@ -321,7 +321,7 @@ function generate_thumbnail($src, $dst = '', $opts = array())
    if ($data['gd']
    && $data['dst_writable']
    && $data['hard_limits_respected']
-   && in_array($data['extension'], $data['allowed_files'])
+   && in_array(strtolower($data['extension']), $data['allowed_files'])
    && is_array($img = getimagesize($data['file']))) {
 
       // Get type (e.g., image) and subtype (e.g., png)
@@ -353,7 +353,7 @@ function generate_thumbnail($src, $dst = '', $opts = array())
 
       // Perform more accurate check against the image's validity.
       if ($data['mime_type'] == 'image'
-      && in_array($data['mime_subtype'], $data['allowed_files'])) {
+      && in_array(strtolower($data['mime_subtype']), $data['allowed_files'])) {
 
          // Safe to continue working with image.
 
@@ -363,7 +363,7 @@ function generate_thumbnail($src, $dst = '', $opts = array())
          // will just indicate that the src and/or dst file had no file extension.
          // The second is only used if the extension was not provided by the
          // dst in dst_extension.
-         $data['dst_extension'] = ($data['dst_extension'] && in_array($data['dst_extension'], $data['allowed_files']))
+         $data['dst_extension'] = ($data['dst_extension'] && in_array(strtolower($data['dst_extension']), $data['allowed_files']))
             ? $data['dst_extension']
             : $data['mime_subtype'];
 

@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.13',
+   'Version' => '1.3.14',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -325,11 +325,13 @@ class EditorPlugin extends Gdn_Plugin {
    * Replace emoticons in comments.
    */
   public function Base_AfterCommentFormat_Handler($Sender) {
-    if (Emoji::instance()->enabled) {
-         $Object = $Sender->EventArguments['Object'];
-         $Object->FormatBody = Emoji::instance()->translateToHtml($Object->FormatBody);
-         $Sender->EventArguments['Object'] = $Object;
-      }
+     // Spoilers plugin compatibility.
+     //$this->RenderSpoilers($Sender);
+     if (Emoji::instance()->enabled) {
+        $Object = $Sender->EventArguments['Object'];
+        $Object->FormatBody = Emoji::instance()->translateToHtml($Object->FormatBody);
+        $Sender->EventArguments['Object'] = $Object;
+     }
   }
 
 
@@ -992,5 +994,32 @@ class EditorPlugin extends Gdn_Plugin {
       }
 
       Redirect($url, 301);
+   }
+
+   // Copy the Spoilers plugin functionality into the editor so that plugin
+   // can be deprecated without introducing compatibility issues on forums
+   // that make heavy use of the spoilers plugin, as well as users who have
+   // become accustom to its [spoiler][/spoiler] syntax. This will also allow
+   // the spoiler styling and experience to standardize, instead of using
+   // two distinct styles and experiences.
+   protected function RenderSpoilers(&$Sender) {
+      $FormatBody = &$Sender->EventArguments['Object']->FormatBody;
+      // Fix a wysiwyg but where spoilers
+      $FormatBody = preg_replace('`<.+>\s*(\[/?spoiler\])\s*</.+>`', '$1', $FormatBody);
+
+      $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
+      $FormatBody = str_ireplace('[/spoiler]','</div>',$FormatBody);
+   }
+
+   protected function SpoilerCallback($Matches) {
+      $SpoilerText = (count($Matches) > 2)
+         ? $Matches[2]
+         : null;
+
+      $SpoilerText = (is_null($SpoilerText))
+         ? ''
+         : $SpoilerText;
+
+      return '<div class="Spoiler">' . $SpoilerText . '</div>';
    }
 }

@@ -136,7 +136,7 @@ class GroupModel extends Gdn_Model {
          }
 
          // Moderators can view and edit all groups.
-         if ($UserID == Gdn::Session()->UserID && Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         if ($UserID == Gdn::Session()->UserID && Gdn::Session()->CheckPermission('Groups.Moderation.Manage')) {
             $Perms['Edit'] = TRUE;
             $Perms['Delete'] = TRUE;
             $Perms['View'] = TRUE;
@@ -352,9 +352,14 @@ class GroupModel extends Gdn_Model {
          $Model = new ConversationModel();
          $MessageModel = new ConversationMessageModel();
 
+         $Args = array(
+            'Name' => htmlspecialchars($Group['Name']),
+            'Url' => GroupUrl($Group, '/')
+         );
+
          $Row = array(
-            'Subject' => T("Please join my group."),
-            'Body' => sprintf(T("You've been invited to join %s."), htmlspecialchars($Group['Name'])),
+            'Subject' => FormatString(T("Please join my group."), $Args),
+            'Body' => FormatString(T("You've been invited to join {Name}."), $Args),
             'Format' => 'Html',
             'RecipientUserID' => $ValidUserIDs,
             'Type' => 'ginvite',

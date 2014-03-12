@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.5',
+   'Version' => '1.0.9',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -36,6 +36,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    // until job is complete.
    public $limit = 1000;
    public $timeout = 20;
+
+   // Username min and max lengths
+   public $username_limits = array(
+       'min' => 3,
+       'max' => 40
+   );
 
    public function __construct() {
       $this->database_prefix = Gdn::Database()->DatabasePrefix;
@@ -78,9 +84,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $sender->Permission('Garden.Settings.Manage');
 
       // Load some assets
-      $c = Gdn::Controller();
       $sender->AddCssFile('bulkusersimporter.css', 'plugins/bulkusersimporter');
-      $c->AddJsFile('bulkusersimporter.js', 'plugins/bulkusersimporter');
+      $sender->AddJsFile('bulkusersimporter.js', 'plugins/bulkusersimporter');
 
       // Render components pertinent to all views.
       $sender->SetData('Title', T('Bulk Users Importer'));
@@ -104,6 +109,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          default:
             $sender->AddDefinition('maxfilesizebytes', Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize')));
             $sender->SetData('allowed_roles', $this->allowed_roles);
+            $sender->SetData('username_limits', $this->username_limits);
             $sender->Render('settings', '', 'plugins/bulkusersimporter');
             break;
       }
@@ -285,14 +291,28 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          // Zenimax mentioned that usernames will contain all
          // variety of characters, so be very loose with the validation.
-         $regex_length = C("Garden.User.ValidationLength","{3,20}");
+         //$regex_length = C("Garden.User.ValidationLength","{3,20}");
+         $regex_length = '{'. $this->username_limits['min'] . ',' . $this->username_limits['max'] . '}';
          $regex_username = "/^(.)$regex_length$/";
 
          // Originally had ValidateUsername, but often the regex it was
          // validating with was too strict.
          // C("Garden.User.ValidationRegex","\d\w_");
-         if (!isset($user['Username']) && !preg_match($regex_username, $user['Username'])) {
+         if (!isset($user['Username'])
+         || $user['Username'] == '' // trimming down space names
+         || !preg_match($regex_username, $user['Username'])) {
             $error_messages[$processed]['username'] = 'Invalid username on line ' . $user['ImportID'] . ': ' . $user['Username'] . '.';
+
+            // Display more accurate error message for the length of usernames.
+            $username_length = strlen($user['Username']);
+            if ($username_length < $this->username_limits['min']) {
+               $error_messages[$processed]['username'] .= ' Username is too short (min '. $this->username_limits['min'] . ' characters).';
+            }
+
+            if ($username_length > $this->username_limits['max']) {
+               $error_messages[$processed]['username'] .= ' Username is too long (max '. $this->username_limits['max'] . ' characters).';
+            }
+
             //$sender->SetJson('import_id', 0);
             //$sender->SetJson('error_message', $error_messages[$processed]['username']);
             //break;
@@ -346,18 +366,33 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                // this may error out due to none being passed to it.
                $temp_password = sha1($user['Email'] . time());
 
-               // Create new user
-               $user_id = $user_model->Register(
-                  array(
-                   'Name' => $user['Username'],
-                   'Password' => $temp_password, // This will get reset
-                   'Email' => $user['Email'],
-                   'RoleID' => $role_ids,
-                   'Banned' => $banned
-               ), array(
-                   'SaveRoles' => true,
-                   'CheckCaptcha' => false
-               ));
+               $form_post_values = array(
+                  'Name' => $user['Username'],
+                  'Password' => $temp_password, // This will get reset
+                  'Email' => $user['Email'],
+                  'RoleID' => $role_ids,
+                  'Banned' => $banned
+               );
+
+               $form_post_options = array(
+                  'SaveRoles' => true,
+                  'CheckCaptcha' => false
+               );
+
+               // This additional check is here to check if forum is in
+               // a registration mode that would require additional information
+               // not currently included in the import data, so for those
+               // instances just treat them as InsertForBasic, instead of
+               // calling Register, which will then use another method.
+               switch (strtolower(C('Garden.Registration.Method'))) {
+                  case 'approval':
+                  case 'invitation':
+                     $user_id = $user_model->InsertForBasic($form_post_values, GetValue('CheckCaptcha', $form_post_options, FALSE), $form_post_options);
+                     break;
+                  default:
+                     $user_id = $user_model->Register($form_post_values, $form_post_options);
+                     break;
+               }
             }
          }
 
@@ -575,6 +610,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          // Normalize the roles given, so lowercase all, and make sure the
          // DB query does the same.
          $role_names = array_map('strtolower', $role_names);
+
+         // If roles have spaces in them, they will have quotation marks
+         // around them, so strip those.
+         $role_names = array_map(function($role){
+            return trim(trim($role, "'"), '"');
+         }, $role_names);
 
          foreach($role_names as $i => $role_name) {
             if (!in_array($role_name, $allowed_roles)) {
