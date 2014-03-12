@@ -94,6 +94,7 @@
 
       <div class="Info">
          <strong id="bulk-error-header"></strong>
+         <span id="bulk-error-many-errors"></span>
          <pre id="bulk-error-dump"></pre>
       </div>
 

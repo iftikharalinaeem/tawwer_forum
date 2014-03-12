@@ -36,6 +36,14 @@
       display: none;
    }
 
+   #bulk-error-many-errors {
+      color: #AAA;
+
+      &:empty {
+         display: none;
+      }
+   }
+
    #bulk-error-dump:empty {
       display: none;
    }
