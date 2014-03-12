@@ -26,6 +26,12 @@
 #bulk-importer #bulk-error-header:empty {
   display: none;
 }
+#bulk-importer #bulk-error-many-errors {
+  color: #AAA;
+}
+#bulk-importer #bulk-error-many-errors:empty {
+  display: none;
+}
 #bulk-importer #bulk-error-dump:empty {
   display: none;
 }

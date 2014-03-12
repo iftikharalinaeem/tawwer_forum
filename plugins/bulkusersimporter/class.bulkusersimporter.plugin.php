@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.9',
+   'Version' => '1.0.10',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -18,8 +18,7 @@ $PluginInfo['bulkusersimporter'] = array(
 
 /**
  * TODO:
- * - approximate number of jobs necessary to complete an import.
- * - estimate time per job to process.
+ * - estimate time remaining for entire import
  */
 class BulkUsersImporterPlugin extends Gdn_Plugin {
 
@@ -34,6 +33,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    // It will be asynchronously iterated over until there are no more records.
    // Modify these values to change how many requests will be sent to server
    // until job is complete.
+   // On my local machine, the timeout is reached with an average of 600
+   // records processed per unit of time.
    public $limit = 1000;
    public $timeout = 20;
 
@@ -239,7 +240,6 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                $results['fail'][$filename] = 'Improperly formatted CSV file, or the server has not been configured for LOCAL INFILE use';
             }
 
-            // Delete the file
             unlink($file);
          }
       }
@@ -376,7 +376,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
                $form_post_options = array(
                   'SaveRoles' => true,
-                  'CheckCaptcha' => false
+                  'CheckCaptcha' => false,
+                  'ValidateSpam' => false
                );
 
                // This additional check is here to check if forum is in
@@ -384,13 +385,15 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                // not currently included in the import data, so for those
                // instances just treat them as InsertForBasic, instead of
                // calling Register, which will then use another method.
+               // Keep the logic here for now, even though InsertForBasic
+               // will be only method called. It was causing problems with
+               // spam filters when calling Register.
                switch (strtolower(C('Garden.Registration.Method'))) {
                   case 'approval':
                   case 'invitation':
-                     $user_id = $user_model->InsertForBasic($form_post_values, GetValue('CheckCaptcha', $form_post_options, FALSE), $form_post_options);
-                     break;
                   default:
-                     $user_id = $user_model->Register($form_post_values, $form_post_options);
+                     $user_id = $user_model->InsertForBasic($form_post_values, GetValue('CheckCaptcha', $form_post_options, FALSE), $form_post_options);
+                     //$user_id = $user_model->Register($form_post_values, $form_post_options);
                      break;
                }
             }
@@ -611,8 +614,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          // DB query does the same.
          $role_names = array_map('strtolower', $role_names);
 
-         // If roles have spaces in them, they will have quotation marks
-         // around them, so strip those.
+         // If roles have spaces in them, they can have quotation marks
+         // around them, so strip those, if any.
          $role_names = array_map(function($role){
             return trim(trim($role, "'"), '"');
          }, $role_names);

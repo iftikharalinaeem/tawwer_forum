@@ -128,11 +128,16 @@ jQuery(document).ready(function($) {
       var $progress_container = $('#import-progress-container');
       var $progress_animation = $('#progress-animation');
       var $bulk_error_header = $('#bulk-error-header');
+      var $bulk_error_many_errors = $('#bulk-error-many-errors');
       var $bulk_error_dump = $('#bulk-error-dump');
       var progress_fail_message = 'Import could not be completed.';
 
-      // Max errors before importer stops.
-      var max_errors = 1000;
+      // Max errors before importer stops. If there is no ceiling to this, the
+      // browser may crash trying to display this many errors. Optionally,
+      // consider suppressing the display of error messages after this point,
+      // while continuing to process the import silently, but still displaying
+      // the progress.
+      var max_errors = 10000;
 
       // Set work in progress
       $progress_container.addClass('working');
@@ -156,17 +161,29 @@ jQuery(document).ready(function($) {
          // If there were errors in the processing, output them.
          if (data.bulk_error_dump) {
             var error_messages = $.parseJSON(data.bulk_error_dump);
-            bulk_importer_errors = bulk_importer_errors + error_messages.length;
+            var previous_error_count = bulk_importer_errors;
+            bulk_importer_errors = parseInt(bulk_importer_errors + error_messages.length);
+
+            // Always show the number of errors.
             $bulk_error_header.html('Errors (' + bulk_importer_errors + ')');
-            for (var i = 0, l = error_messages.length; i < l; i++) {
-               $bulk_error_dump.append(error_messages[i] +'\n');
+
+            // If there were more than max_errors, stop outputting the specific
+            // errors, as there can be tens of thousands, so cap it, while
+            // continuing to show import progress. Need to check against
+            // previous error count so the latest dump of errors can be
+            // displayed, in the likely chance that this pushes the error
+            // count above the max, and suppresses entirely the latest dump.
+            if (previous_error_count <= max_errors) {
+               for (var i = 0, l = error_messages.length; i < l; i++) {
+                  $bulk_error_dump.append(error_messages[i] +'\n');
+               }
             }
          }
 
-         // Cancel import if received n number of errors.
+         // Let user know that after n number of errors, any future errors
+         // will be suppressed, but the error count will continue to keep track.
          if (bulk_importer_errors >= max_errors) {
-            cancel_import = true;
-            progress_fail_message = '<div>Import cancelled after <strong>'+ progress +'% progress</strong> because there have already been <strong>'+ max_errors + ' errors</strong>. Clean up the CSV file before trying again. Odds are the errors listed below are duplicated in the remaining data set.</div>';
+            $bulk_error_many_errors.html('The importer has reached its reporting cap of <strong>'+ max_errors + ' errors</strong>. The importer will continue to import users, and the error count will continue to record, but the display of any other error messages will be suppressed from this moment. This limit has been placed so that browsers do not become unstable if there happen to be a very large number of errors. Odds are the errors listed below are duplicated in the remaining data set, and are the likely cause of any further errors counted.');
          }
 
          // If import_id is 0, then there was no role.
