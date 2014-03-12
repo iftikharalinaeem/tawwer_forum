@@ -5113,6 +5113,14 @@ wysihtml5.dom.parse = (function() {
         attributeValue = (attributeValue || "").replace(REG_EXP, "");
         return attributeValue || null;
       };
+    })(),
+
+    // Dane added March 3, 2014. This essentially gives a free pass to any
+    // attribute you're checking against.
+    allow: (function() {
+      return function(attributeValue) {
+        return attributeValue;
+      };
     })()
   };
 

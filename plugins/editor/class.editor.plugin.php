@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.9',
+   'Version' => '1.3.15',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -150,7 +150,7 @@ class EditorPlugin extends Gdn_Plugin {
          } elseif ($value !== null) {
             $allowedEditorActions[$name] = $value;
          } else {
-            return getValue($name, $allowedEditorActions, null);
+            return GetValue($name, $allowedEditorActions, null);
          }
       } else {
          return $allowedEditorActions;
@@ -210,13 +210,7 @@ class EditorPlugin extends Gdn_Plugin {
       $fontColorList            = $this->getFontColorList();
       foreach ($fontColorList as $fontColor) {
          $editorDataAttr             = '{"action":"color","value":"'. $fontColor .'"}';
-         // Use inline style so that list can be modified without having
-         // to touch external CSS files. Nevertheless, color class has
-         // been added in case users want granular customizations.
-         // However, the post-color-* class will still need to be defined
-         // when posting these color changes.
-         $editorStyleInline          = 'background-color: ' . $fontColor;
-         $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, 'title' => T($fontColor), 'data-editor' => $editorDataAttr, 'style' => $editorStyleInline));
+         $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, 'title' => T($fontColor), 'data-editor' => $editorDataAttr));
       }
 
       /**
@@ -263,7 +257,7 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => T('Bold'), 'data-editor' => '{"action":"bold","value":""}'));
       $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => T('Italic'), 'data-editor' => '{"action":"italic","value":""}'));
       $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'strikethrough', 'title' => T('Strike'), 'data-editor' => '{"action":"strike","value":""}'));
-      $editorToolbarAll['color'] = array('edit' => 'basic', 'action'=> 'color', 'type' => $toolbarDropdownFontColor, 'attr' => array('class' => 'icon icon-font editor-dd-color hidden-xs', 'data-wysihtml5-command-group' => 'foreColor', 'title' => T('Color'), 'data-editor' => '{"action":"color","value":""}'));
+      $editorToolbarAll['color'] = array('edit' => 'basic', 'action'=> 'color', 'type' => $toolbarDropdownFontColor, 'attr' => array('class' => 'editor-action icon icon-font editor-dd-color hidden-xs', 'data-wysihtml5-command-group' => 'foreColor', 'title' => T('Color'), 'data-editor' => '{"action":"color","value":""}'));
       $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => T('Ordered list'), 'data-editor' => '{"action":"orderedlist","value":""}'));
       $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close hidden-xs', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => T('Unordered list'), 'data-editor' => '{"action":"unorderedlist","value":""}'));
 
@@ -331,11 +325,13 @@ class EditorPlugin extends Gdn_Plugin {
    * Replace emoticons in comments.
    */
   public function Base_AfterCommentFormat_Handler($Sender) {
-    if (Emoji::instance()->enabled) {
-         $Object = $Sender->EventArguments['Object'];
-         $Object->FormatBody = Emoji::instance()->translateToHtml($Object->FormatBody);
-         $Sender->EventArguments['Object'] = $Object;
-      }
+     // Spoilers plugin compatibility.
+     //$this->RenderSpoilers($Sender);
+     if (Emoji::instance()->enabled) {
+        $Object = $Sender->EventArguments['Object'];
+        $Object->FormatBody = Emoji::instance()->translateToHtml($Object->FormatBody);
+        $Sender->EventArguments['Object'] = $Object;
+     }
   }
 
 
@@ -486,7 +482,7 @@ class EditorPlugin extends Gdn_Plugin {
 
       if ($tmpFilePath && $canUpload) {
 
-         $fileExtension = $Upload->GetUploadedFileExtension();
+         $fileExtension = strtolower($Upload->GetUploadedFileExtension());
          $fileName = $Upload->GetUploadedFileName();
          list($tmpwidth, $tmpheight) = getimagesize($tmpFilePath);
 
@@ -816,6 +812,7 @@ class EditorPlugin extends Gdn_Plugin {
       $dirlen = 2;
       $subdir = substr($fileRandomString, 0, $dirlen);
       $filename = substr($fileRandomString, $dirlen);
+      $fileExtension = strtolower($fileExtension);
       $fileDirPath = $basePath . '/' . $subdir;
 
       if ($this->validateUploadDestinationPath($fileDirPath)) {
@@ -998,5 +995,32 @@ class EditorPlugin extends Gdn_Plugin {
       }
 
       Redirect($url, 301);
+   }
+
+   // Copy the Spoilers plugin functionality into the editor so that plugin
+   // can be deprecated without introducing compatibility issues on forums
+   // that make heavy use of the spoilers plugin, as well as users who have
+   // become accustom to its [spoiler][/spoiler] syntax. This will also allow
+   // the spoiler styling and experience to standardize, instead of using
+   // two distinct styles and experiences.
+   protected function RenderSpoilers(&$Sender) {
+      $FormatBody = &$Sender->EventArguments['Object']->FormatBody;
+      // Fix a wysiwyg but where spoilers
+      $FormatBody = preg_replace('`<.+>\s*(\[/?spoiler\])\s*</.+>`', '$1', $FormatBody);
+
+      $FormatBody = preg_replace_callback("/(\[spoiler(?:=(?:&quot;)?([\d\w_',.? ]+)(?:&quot;)?)?\])/siu", array($this, 'SpoilerCallback'), $FormatBody);
+      $FormatBody = str_ireplace('[/spoiler]','</div>',$FormatBody);
+   }
+
+   protected function SpoilerCallback($Matches) {
+      $SpoilerText = (count($Matches) > 2)
+         ? $Matches[2]
+         : null;
+
+      $SpoilerText = (is_null($SpoilerText))
+         ? ''
+         : $SpoilerText;
+
+      return '<div class="Spoiler">' . $SpoilerText . '</div>';
    }
 }
