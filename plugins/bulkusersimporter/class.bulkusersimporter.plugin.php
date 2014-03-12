@@ -84,9 +84,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $sender->Permission('Garden.Settings.Manage');
 
       // Load some assets
-      $c = Gdn::Controller();
       $sender->AddCssFile('bulkusersimporter.css', 'plugins/bulkusersimporter');
-      $c->AddJsFile('bulkusersimporter.js', 'plugins/bulkusersimporter');
+      $sender->AddJsFile('bulkusersimporter.js', 'plugins/bulkusersimporter');
 
       // Render components pertinent to all views.
       $sender->SetData('Title', T('Bulk Users Importer'));
