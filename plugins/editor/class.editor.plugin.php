@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.14',
+   'Version' => '1.3.15',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -482,7 +482,7 @@ class EditorPlugin extends Gdn_Plugin {
 
       if ($tmpFilePath && $canUpload) {
 
-         $fileExtension = $Upload->GetUploadedFileExtension();
+         $fileExtension = strtolower($Upload->GetUploadedFileExtension());
          $fileName = $Upload->GetUploadedFileName();
          list($tmpwidth, $tmpheight) = getimagesize($tmpFilePath);
 
@@ -812,6 +812,7 @@ class EditorPlugin extends Gdn_Plugin {
       $dirlen = 2;
       $subdir = substr($fileRandomString, 0, $dirlen);
       $filename = substr($fileRandomString, $dirlen);
+      $fileExtension = strtolower($fileExtension);
       $fileDirPath = $basePath . '/' . $subdir;
 
       if ($this->validateUploadDestinationPath($fileDirPath)) {

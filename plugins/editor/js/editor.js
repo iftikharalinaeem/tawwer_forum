@@ -1034,10 +1034,16 @@
                         // Single upload per request, files[] is always
                         // going to be an array of 1.
                         var file = data.files[0];
-                        var type = file.type.split('/').pop();
+                        var type = file.type.split('/').pop().toLowerCase();
                         var filename = file.name;
-                        var extension = filename.split('.').pop();
+                        var extension = filename.split('.').pop().toLowerCase();
                         var allowedExtensions = JSON.parse(allowedFileExtensions);
+
+                        // Make absolutely sure that the file extensions
+                        // provided are all lowercase.
+                        $.each(allowedExtensions, function(index, item) {
+                           allowedExtensions[index] = item.toLowerCase();
+                        });
 
                         var validSize = (file.size <= maxUploadSize)
                            ? true
