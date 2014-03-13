@@ -125,8 +125,15 @@ jQuery(document).ready(function($) {
    // Save original title for progress meter title percentages.
    documentTitle = document.title;
 
+   // To calculate time remaining
+   bulk_start_time = 0;
+   var bulk_rows_after_job = []; // Collect how many jobs done.
+   var bulk_time_after_job = []; // Collect average time per job.
+
+   // Call job every n.
    bulk_importer_errors = 0;
    var incremental_job = function(url) {
+      var bulk_job_start = Math.ceil(+new Date / 1000);
       var $progress_meter = $('#import-progress-meter');
       var total_rows = parseInt($progress_meter.attr('data-total-rows'));
       var $progress_container = $('#import-progress-container');
@@ -153,15 +160,46 @@ jQuery(document).ready(function($) {
          debug: bulk_importer_debug
       }, null, 'json')
       .done(function(data) {
+         var bulk_job_end = Math.ceil(+new Date / 1000);
          var rows_completed_job = parseInt(data.import_id);
          var progress = Math.ceil((rows_completed_job / total_rows) * 100);
          if (progress > 100) {
             progress = 100;
          }
+
+         // Calculate average rows processed per job.
+         var rows_remaining = total_rows - rows_completed_job;
+         bulk_rows_after_job.push(rows_completed_job);
+         var average_rows_per_job = Math.ceil(rows_completed_job / bulk_rows_after_job.length);
+
+         // Calculate average time per job.
+         var total_elapsed_time = Math.round((bulk_job_end - bulk_start_time) / 60);
+         var job_elapsed_time = bulk_job_end - bulk_job_start;
+         bulk_time_after_job.push(job_elapsed_time);
+         var average_time_per_job = 0;
+         for (var i = 0, l = bulk_time_after_job.length; i < l; i++) {
+            average_time_per_job += bulk_time_after_job[i];
+         }
+         average_time_per_job = Math.ceil(average_time_per_job / l);
+
+         // Calculate average time per row, in seconds
+         var average_time_per_row = average_time_per_job / average_rows_per_job;
+
+         // Calculate average time remaining in whole import. In minutes.
+         var import_time_remaining = Math.round((rows_remaining * average_time_per_row) / 60);
+
+         // TODO consider smarter time handling, to adjust for hours
+         // and seconds.
+         var time_estimation_string =  '&middot; '+ total_elapsed_time +' minute(s) elapsed';
+         if (progress != 100) {
+            time_estimation_string += ' &middot; about <strong>'+ import_time_remaining +' minute(s) left</strong>';
+         }
+
+         // Insert data for display.
          $progress_meter.attr('data-completed-rows', rows_completed_job);
-         var progress_message = '<span title="'+ data.feedback +'">'+ progress + '% processed (' + rows_completed_job + ' rows).</span>';
+         var progress_message = '<span title="'+ data.feedback +'">'+ progress + '% processed (' + rows_completed_job + ' rows) ' + time_estimation_string + '</span>';
          $progress_meter.html(progress_message);
-         document.title = '('+ progress + '%) ' + documentTitle;
+         document.title = '('+ progress + '%) · ' + import_time_remaining + ' minute(s) left - ' + documentTitle;
 
          // If there were errors in the processing, output them.
          if (data.bulk_error_dump) {
@@ -229,6 +267,7 @@ jQuery(document).ready(function($) {
       $('#bulk-importer-checkbox-email').addClass('disable-option');
       cancel_import = false;
       incremental_job(e.target.href);
+      bulk_start_time = Math.ceil(+new Date / 1000);
    });
 
 });
