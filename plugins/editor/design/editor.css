@@ -906,8 +906,8 @@ cell-* are used for the dropdown */
 blockquote.Quote {
   background: rgba(0, 0, 0, 0.05);
   border-left: 4px solid rgba(0, 0, 0, 0.1);
-  margin: 1em 2em;
-  padding: 16px 16px 8px 16px;
+  margin: 1em;
+  padding: 10px;
 }
 
 pre.CodeBlock {
