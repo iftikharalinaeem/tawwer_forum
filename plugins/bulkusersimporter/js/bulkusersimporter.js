@@ -159,7 +159,7 @@ jQuery(document).ready(function($) {
             progress = 100;
          }
          $progress_meter.attr('data-completed-rows', rows_completed_job);
-         var progress_message = '<span title="'+ data.feedback +'">'+ progress + '% processed.</span>'
+         var progress_message = '<span title="'+ data.feedback +'">'+ progress + '% processed (' + rows_completed_job + ' rows).</span>';
          $progress_meter.html(progress_message);
          document.title = '('+ progress + '%) ' + documentTitle;
 

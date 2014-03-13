@@ -407,7 +407,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             }
          } else {
             $complete_code = 2;
-            $error_messages[$processed]['db'] = $user_model->Validation->ResultsText();
+            $error_messages[$processed]['db'] = 'Error on line ' . $user['ImportID'] . ': ' . $user_model->Validation->ResultsText() . ' ';
          }
 
          // Error message to get logged in DB, if any.
