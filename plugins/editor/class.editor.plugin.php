@@ -508,7 +508,6 @@ class EditorPlugin extends Gdn_Plugin {
          $thumbWidth = '';
          $imageHeight = '';
          $imageWidth = '';
-         $thumbDestinationPath = '';
          $thumbPathParsed = array('SaveName' => '');
          $thumbUrl = '';
 
