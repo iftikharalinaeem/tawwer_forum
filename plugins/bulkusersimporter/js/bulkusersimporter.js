@@ -115,11 +115,15 @@ jQuery(document).ready(function($) {
       }
    });
 
-   // Running the bulk importer in debug mode
+   // Running the bulk importer in debug mode. This is actually just for
+   // disabling email, so the checkbox will ask about that.
    bulk_importer_debug = 0;
    $('#bulk_importer_debug').on('change', function(e) {
       bulk_importer_debug = parseInt(+e.target.checked);
    });
+
+   // Save original title for progress meter title percentages.
+   documentTitle = document.title;
 
    bulk_importer_errors = 0;
    var incremental_job = function(url) {
@@ -157,6 +161,7 @@ jQuery(document).ready(function($) {
          $progress_meter.attr('data-completed-rows', rows_completed_job);
          var progress_message = '<span title="'+ data.feedback +'">'+ progress + '% processed.</span>'
          $progress_meter.html(progress_message);
+         document.title = '('+ progress + '%) ' + documentTitle;
 
          // If there were errors in the processing, output them.
          if (data.bulk_error_dump) {
@@ -219,8 +224,9 @@ jQuery(document).ready(function($) {
    $('#process-csvs').on('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
-      // Disable button after click
+      // Disable button and checkbox after click
       $(this).addClass('disable-option');
+      $('#bulk-importer-checkbox-email').addClass('disable-option');
       cancel_import = false;
       incremental_job(e.target.href);
    });
