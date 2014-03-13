@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.11',
+   'Version' => '1.0.12',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -16,10 +16,6 @@ $PluginInfo['bulkusersimporter'] = array(
    'SettingsPermission' => 'Garden.Setttings.Manage'
 );
 
-/**
- * TODO:
- * - estimate time remaining for entire import
- */
 class BulkUsersImporterPlugin extends Gdn_Plugin {
 
    private $database_prefix;
@@ -301,7 +297,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          if (!isset($user['Username'])
          || $user['Username'] == '' // trimming down space names
          || !preg_match($regex_username, $user['Username'])) {
-            $error_messages[$processed]['username'] = 'Invalid username on line ' . $user['ImportID'] . ': ' . $user['Username'] . '.';
+            $error_messages[$processed]['username'] = 'Invalid username: "' . $user['Username'] . '".';
 
             // Display more accurate error message for the length of usernames.
             $username_length = strlen($user['Username']);
@@ -319,7 +315,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          }
 
          if (!ValidateEmail($user['Email'])) {
-            $error_messages[$processed]['email'] = 'Invalid email on line '. $user['ImportID'] .': '. $user['Email'] .'.';
+            $error_messages[$processed]['email'] = 'Invalid email: "'. $user['Email'] .'".';
             //$sender->SetJson('import_id', 0);
             //$sender->SetJson('error_message', $error_messages[$processed]['email']);
             //break;
@@ -334,7 +330,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          } else {
             // No roles
             $plural_status = PluralTranslate(count($status['invalid_roles']), 'status', 'statuses');
-            $error_messages[$processed]['role'] = "Invalid $plural_status on line " . $user['ImportID'] . ': ' . implode(', ', $status['invalid_roles']) . '.';
+            $error_messages[$processed]['role'] = "Invalid $plural_status: " . implode(', ', $status['invalid_roles']) . '.';
             //$sender->SetJson('import_id', 0);
             //$sender->SetJson('error_message', $error_messages[$processed]['role']);
             //break;
@@ -411,9 +407,19 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          }
 
          // Error message to get logged in DB, if any.
-         $error_string = (isset($error_messages[$processed]))
-            ? implode(' ', $error_messages[$processed])
-            : '';
+         $error_string = '';
+         if (isset($error_messages[$processed])) {
+            $error_string = '[Line ' . $user['ImportID'] . '] - ';
+            foreach ($error_messages[$processed] as $error_message) {
+               // Some of the error messages from ResultsText contain short
+               // strings of gibberish, mainly " ." when there are no errors,
+               // so strip those out.
+               if (strlen($error_message) > 2) {
+                  $error_string .= $error_message . ' ';
+               }
+            }
+            $error_string = trim($error_string);
+         }
 
          // Log errors in DB--will be cleared on next import.
          $bulk_user_importer_model->Update(
