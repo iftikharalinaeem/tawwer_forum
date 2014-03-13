@@ -507,6 +507,7 @@
          });
 
          $(editor.textarea.element).on('appendHtml', function(e, data) {
+
             // The quotes plugin tends to add line breaks to the end of the
             // quoted string, which upsets wysihtml5 paragraphing, so replace
             // it with proper block ending to make sure paragraphs continue.
@@ -525,7 +526,11 @@
             // Reported bug: Chrome does not handle wysihtml5's insertHTML
             // command properly. The downside to this workaround is that the
             // caret will be placed at the beginning of the text box.
-            if (window.chrome) {
+            // Safari also does not handle this command properly, so check
+            // for that as well. Can just check for the safari or webkit
+            // strings, but there's no telling when Chrome will change their
+            // user agent string to reflect Blink and other changes.
+            if (window.chrome || navigator.userAgent.toLowerCase().indexOf('safari') > -1) {
                var initial_value = editor.composer.getValue();
 
                if (!initial_value.length
