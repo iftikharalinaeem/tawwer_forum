@@ -1,8 +1,7 @@
 <?php
 
-$attachments = $this->Data('attachments');
-$editorkey = $this->Data('editorkey');
-//
+$attachments = $this->Data('_attachments');
+$editorkey = $this->Data('_editorkey');
 
 ?>
 
