@@ -117,21 +117,21 @@ jQuery(document).ready(function($) {
 
    // Running the bulk importer in debug mode. This is actually just for
    // disabling email, so the checkbox will ask about that.
-   bulk_importer_debug = 0;
+   var bulk_importer_debug = 0;
    $('#bulk_importer_debug').on('change', function(e) {
       bulk_importer_debug = parseInt(+e.target.checked);
    });
 
    // Save original title for progress meter title percentages.
-   documentTitle = document.title;
+   var documentTitle = document.title;
 
    // To calculate time remaining
-   bulk_start_time = 0;
+   var bulk_start_time = 0;
    var bulk_rows_after_job = []; // Collect how many jobs done.
    var bulk_time_after_job = []; // Collect average time per job.
 
    // Call job every n.
-   bulk_importer_errors = 0;
+   var bulk_importer_errors = 0;
    var incremental_job = function(url) {
       var bulk_job_start = Math.ceil(+new Date / 1000);
       var $progress_meter = $('#import-progress-meter');
@@ -143,11 +143,9 @@ jQuery(document).ready(function($) {
       var $bulk_error_dump = $('#bulk-error-dump');
       var progress_fail_message = 'Import could not be completed.';
 
-      // Max errors before importer stops. If there is no ceiling to this, the
-      // browser may crash trying to display this many errors. Optionally,
-      // consider suppressing the display of error messages after this point,
-      // while continuing to process the import silently, but still displaying
-      // the progress.
+      // Max errors before importer suppresses any further error messages.
+      // If there is no ceiling to this, the browser may crash trying to
+      // display this many errors.
       var max_errors = 10000;
 
       // Set work in progress
@@ -191,15 +189,17 @@ jQuery(document).ready(function($) {
          // TODO consider smarter time handling, to adjust for hours
          // and seconds.
          var time_estimation_string =  '&middot; '+ total_elapsed_time +' minute(s) elapsed';
+         var new_page_title = '('+ progress + '%) ' + documentTitle;
          if (progress != 100) {
             time_estimation_string += ' &middot; about <strong>'+ import_time_remaining +' minute(s) left</strong>';
+            new_page_title = '('+ progress + '%) · ' + import_time_remaining + ' minute(s) left - ' + documentTitle;
          }
 
          // Insert data for display.
          $progress_meter.attr('data-completed-rows', rows_completed_job);
          var progress_message = '<span title="'+ data.feedback +'">'+ progress + '% processed (' + rows_completed_job + ' rows) ' + time_estimation_string + '</span>';
          $progress_meter.html(progress_message);
-         document.title = '('+ progress + '%) · ' + import_time_remaining + ' minute(s) left - ' + documentTitle;
+         document.title = new_page_title;
 
          // If there were errors in the processing, output them.
          if (data.bulk_error_dump) {
