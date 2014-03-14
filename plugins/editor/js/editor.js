@@ -734,6 +734,11 @@
        */
       var fileUploadsInit = function(dropElement, editorInstance) {
 
+         if (!jQuery.fn.fileupload) {
+            //console.warn('Editor missing fileupload dependency.');
+            return false;
+         }
+
          var canUpload = parseInt(gdn.definition('canUpload', false));
          if (canUpload != 1) {
             return false;

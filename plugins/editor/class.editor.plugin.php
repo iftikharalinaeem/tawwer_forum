@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.20',
+   'Version' => '1.3.21',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -353,7 +353,7 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddJsFile('editor.js', 'plugins/editor');
 
       // Fileuploads
-      //$c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
+      $c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
       $c->AddJsFile('jquery.iframe-transport.js', 'plugins/editor');
       $c->AddJsFile('jquery.fileupload.js', 'plugins/editor');
 
@@ -376,13 +376,13 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddDefinition('maxUploadSize', $MaxSize);
       // Set file input name
       $c->AddDefinition('editorFileInputName', $this->editorFileInputName);
-      $Sender->SetData('editorFileInputName', $this->editorFileInputName);
+      $Sender->SetData('_editorFileInputName', $this->editorFileInputName);
       // Save allowed file types
       $c->AddDefinition('allowedFileExtensions', json_encode(C('Garden.Upload.AllowedFileExtensions')));
       // Get max file uploads, to be used for max drops at once.
       $c->AddDefinition('maxFileUploads', ini_get('max_file_uploads'));
       $c->AddDefinition('canUpload', $this->canUpload);
-      $c->SetData('canUpload', $this->canUpload);
+      $c->SetData('_canUpload', $this->canUpload);
    }
 
    /**
@@ -508,7 +508,6 @@ class EditorPlugin extends Gdn_Plugin {
          $thumbWidth = '';
          $imageHeight = '';
          $imageWidth = '';
-         $thumbDestinationPath = '';
          $thumbPathParsed = array('SaveName' => '');
          $thumbUrl = '';
 
@@ -736,8 +735,8 @@ class EditorPlugin extends Gdn_Plugin {
                   'ForeignTable' => $Type)
               )->ResultArray();
 
-      $Controller->SetData('attachments', $attachments);
-      $Controller->SetData('editorkey', strtolower($param.$foreignId));
+      $Controller->SetData('_attachments', $attachments);
+      $Controller->SetData('_editorkey', strtolower($param.$foreignId));
 
       echo $Controller->FetchView($this->GetView('attachments.php'));
    }
