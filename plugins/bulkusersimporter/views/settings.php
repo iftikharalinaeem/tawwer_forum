@@ -23,7 +23,11 @@
 
    <div class="Info">The second parameter, <code>Username</code>, must be at
       minimum <code><?php echo $username_limits['min']; ?></code> characters and at
-      most <code><?php echo $username_limits['max']; ?></code> characters.
+      most <code><?php echo $username_limits['max']; ?></code> characters. If a
+      duplicate username is found, the entire row of that
+      duplicated username will be purged from the import, as usernames are the
+      controlling value and must be unique. This means that only the first
+      instance of a row with that given username will be imported.
    </div>
 
    <div class="Info">The third parameter, <code>Status</code>, can have

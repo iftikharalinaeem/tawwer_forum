@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.12',
+   'Version' => '1.0.13',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -65,7 +65,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          ->Table($this->table_name)
          ->PrimaryKey('ImportID')
          ->Column('Email', 'varchar(200)', true, 'index')
-         ->Column('Username', 'varchar(50)', true)
+         ->Column('Username', 'varchar(50)', true, 'unique')
          ->Column('Status', 'varchar(50)', true)
          ->Column('Completed', 'tinyint(1)', 0, 'index')
          ->Column('Error', 'text', true)
@@ -336,6 +336,19 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             //break;
          }
 
+         // TODO: look into these inconsistent error messages. They do not
+         // always appear.
+         //
+         // [Line 62387] - The email you entered is in use by another member. (cheri.white@bethsoftasia.com,cheri.whitenub19_ESO2,Sanguine's Tester)
+         // ^ This is fine, but it triggers some kind of cascade effect where
+         // the next several rows are suddenly invalidated. THIS is what needs
+         // to be resolved. I believe the comment below explains the solution.
+         // [Line 62388] - Password is required. DateInserted is required.
+         // ...
+         // [Line 62709] - Password is required. DateInserted is required.
+         // for the next n rows, directly after the email use error.
+         // This happened on a Save. Not sure why those values would be
+         // required on a Save. That information is already in the row.
          if (!isset($error_messages[$processed]['username'])) {
             // Check if username in use.
             $check_name = $user_model->GetWhere(array(
@@ -345,16 +358,36 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             // Username controls, so if it exists, update the info, including
             // email, otherwise create new user.
             if (count($check_name['Name'])) {
+
+               // It's in this scope that the above errors happen, though
+               // inconsistently. If there happened to be a duplicate username
+               // attempting to get saved, $user_id would be false, because
+               // of UserModel:1584 $this->Validate($FormPostValues, $Insert)
+               // check, which returns false. By makign the username column
+               // unique in the table, this will prevent that from happening.
+               // It will also clean up a lot of redundancies. Still not sure
+               // why the error seems to cascade down and affect users for
+               // several iterations afterwards, then clears up. When that
+               // happens, the errors reported together are the Password
+               // and DateInserted rules. I've unapplied them for now, just
+               // to handle those exceptions. Though I'm certain they won't
+               // come up again after modifying the table column. Rows are
+               // still inserted correctly, just without the check.
+               $user_model->Validation->UnapplyRule('Password', 'Required');
+               $user_model->Validation->UnapplyRule('DateInserted', 'Required');
+
                $send_email = false;
                // Update the user.
                $user_id = $user_model->Save(
                   array(
                    'UserID' => $check_name['UserID'],
+                   'Name' => $check_name['Name'],
                    'Email' => $user['Email'],
                    'RoleID' => $role_ids,
                    'Banned' => $banned
                ), array(
-                   'SaveRoles' => true
+                   'SaveRoles' => true,
+                   'FixUnique' => false // No, do not create a new user.
                ));
             } else {
                $send_email = true;
@@ -367,7 +400,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                   'Password' => $temp_password, // This will get reset
                   'Email' => $user['Email'],
                   'RoleID' => $role_ids,
-                  'Banned' => $banned
+                  'Banned' => $banned,
+                  'DateInserted' => Gdn_Format::ToDateTime()
                );
 
                $form_post_options = array(
@@ -405,6 +439,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             $complete_code = 2;
             $error_messages[$processed]['db'] = $user_model->Validation->ResultsText();
          }
+         $user_model->Validation->Results(true);
 
          // Error message to get logged in DB, if any.
          $error_string = '';
@@ -431,7 +466,6 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                'ImportID' => $user['ImportID']
             )
          );
-         $user_model->Validation->Results(true);
 
          // Email successfully added users, but not users who already had an
          // account (according to username) with forum.
