@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.13',
+   'Version' => '1.0.14',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -20,6 +20,8 @@ $PluginInfo['bulkusersimporter'] = array(
  * TODO:
  * - In addition to the new time estimates, include the start and end times.
  * - Allow downloading the full error dump from table.
+ * - Consider multiple users operating the bulk importer. Do not just truncate
+ *   the BulkUsersImporter table on every new upload.
  */
 
 class BulkUsersImporterPlugin extends Gdn_Plugin {
@@ -268,9 +270,26 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          ? (int) $sender->Request->Post('debug')
          : 0;
 
+      // Determine if user will be sent an invitation, or inserted directly.
+      // If no value provided, default is to send an invite.
+      // Values: invite (default), insert
+      $userin_modes = array('invite', 'insert');
+      $userin_mode = $sender->Request->Post('userin');
+      $userin_mode = (isset($userin_mode) && in_array($userin_mode, $userin_modes))
+         ? $sender->Request->Post('userin')
+         : 'invite';
+
       $bulk_user_importer_model = new Gdn_Model($this->table_name);
       $imported_users = $bulk_user_importer_model->GetWhere(array('completed' => 0), '', 'asc', $this->limit)->ResultArray();
-      $user_model = new UserModel();
+
+      // Decide what model to use based on $userin_mode
+      // Options are either invite or insert
+      $userin_model = ($userin_mode == 'insert')
+         ? new UserModel()
+         : new InvitationModel();
+      // For debugging, choose model
+      //$userin_model = new UserModel();
+      //$userin_model = new InvitationModel();
 
       // Collect error messages, concatenate them at end.
       $error_messages = array();
@@ -342,99 +361,118 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             //break;
          }
 
-         // TODO: look into these inconsistent error messages. They do not
-         // always appear.
-         //
-         // [Line 62387] - The email you entered is in use by another member. (cheri.white@bethsoftasia.com,cheri.whitenub19_ESO2,Sanguine's Tester)
-         // ^ This is fine, but it triggers some kind of cascade effect where
-         // the next several rows are suddenly invalidated. THIS is what needs
-         // to be resolved. I believe the comment below explains the solution.
-         // [Line 62388] - Password is required. DateInserted is required.
-         // ...
-         // [Line 62709] - Password is required. DateInserted is required.
-         // for the next n rows, directly after the email use error.
-         // This happened on a Save. Not sure why those values would be
-         // required on a Save. That information is already in the row.
-         if (!isset($error_messages[$processed]['username'])) {
-            // Check if username in use.
-            $check_name = $user_model->GetWhere(array(
-                'Name' => $user['Username']
-            ))->FirstRow('array');
+         // Depending on value of $userin_mode, either insert the user directly
+         // in the database, or send them an invite.
+         switch ($userin_mode) {
+            case 'insert':
+               // TODO: look into these inconsistent error messages. They do not
+               // always appear.
+               //
+               // [Line 62387] - The email you entered is in use by another member. (cheri.white@bethsoftasia.com,cheri.whitenub19_ESO2,Sanguine's Tester)
+               // ^ This is fine, but it triggers some kind of cascade effect where
+               // the next several rows are suddenly invalidated. THIS is what needs
+               // to be resolved. I believe the comment below explains the solution.
+               // [Line 62388] - Password is required. DateInserted is required.
+               // ...
+               // [Line 62709] - Password is required. DateInserted is required.
+               // for the next n rows, directly after the email use error.
+               // This happened on a Save. Not sure why those values would be
+               // required on a Save. That information is already in the row.
+               if (!isset($error_messages[$processed]['username'])) {
+                  // Check if username in use.
+                  $check_name = $userin_model->GetWhere(array(
+                      'Name' => $user['Username']
+                  ))->FirstRow('array');
 
-            // Username controls, so if it exists, update the info, including
-            // email, otherwise create new user.
-            if (count($check_name['Name'])) {
+                  // Username controls, so if it exists, update the info, including
+                  // email, otherwise create new user.
+                  if (count($check_name['Name'])) {
 
-               // It's in this scope that the above errors happen, though
-               // inconsistently. If there happened to be a duplicate username
-               // attempting to get saved, $user_id would be false, because
-               // of UserModel:1584 $this->Validate($FormPostValues, $Insert)
-               // check, which returns false. By makign the username column
-               // unique in the table, this will prevent that from happening.
-               // It will also clean up a lot of redundancies. Still not sure
-               // why the error seems to cascade down and affect users for
-               // several iterations afterwards, then clears up. When that
-               // happens, the errors reported together are the Password
-               // and DateInserted rules. I've unapplied them for now, just
-               // to handle those exceptions. Though I'm certain they won't
-               // come up again after modifying the table column. Rows are
-               // still inserted correctly, just without the check.
-               $user_model->Validation->UnapplyRule('Password', 'Required');
-               $user_model->Validation->UnapplyRule('DateInserted', 'Required');
+                     // It's in this scope that the above errors happen, though
+                     // inconsistently. If there happened to be a duplicate username
+                     // attempting to get saved, $user_id would be false, because
+                     // of UserModel:1584 $this->Validate($FormPostValues, $Insert)
+                     // check, which returns false. By makign the username column
+                     // unique in the table, this will prevent that from happening.
+                     // It will also clean up a lot of redundancies. Still not sure
+                     // why the error seems to cascade down and affect users for
+                     // several iterations afterwards, then clears up. When that
+                     // happens, the errors reported together are the Password
+                     // and DateInserted rules. I've unapplied them for now, just
+                     // to handle those exceptions. Though I'm certain they won't
+                     // come up again after modifying the table column. Rows are
+                     // still inserted correctly, just without the check.
+                     $userin_model->Validation->UnapplyRule('Password', 'Required');
+                     $userin_model->Validation->UnapplyRule('DateInserted', 'Required');
 
-               $send_email = false;
-               // Update the user.
-               $user_id = $user_model->Save(
-                  array(
-                   'UserID' => $check_name['UserID'],
-                   'Name' => $check_name['Name'],
-                   'Email' => $user['Email'],
-                   'RoleID' => $role_ids,
-                   'Banned' => $banned
-               ), array(
-                   'SaveRoles' => true,
-                   'FixUnique' => false // No, do not create a new user.
-               ));
-            } else {
-               $send_email = true;
-               // Create new user. The method seems to rely on Captcha keys, so
-               // this may error out due to none being passed to it.
-               $temp_password = sha1($user['Email'] . time());
+                     $send_email = false;
 
-               $form_post_values = array(
-                  'Name' => $user['Username'],
-                  'Password' => $temp_password, // This will get reset
-                  'Email' => $user['Email'],
-                  'RoleID' => $role_ids,
-                  'Banned' => $banned,
-                  'DateInserted' => Gdn_Format::ToDateTime()
-               );
+                     // Update the user.
+                     $user_id = $userin_model->Save(
+                        array(
+                         'UserID' => $check_name['UserID'],
+                         'Name' => $check_name['Name'],
+                         'Email' => $user['Email'],
+                         'RoleID' => $role_ids,
+                         'Banned' => $banned
+                     ), array(
+                         'SaveRoles' => true,
+                         'FixUnique' => false // No, do not create a new user.
+                     ));
+                  } else {
+                     $send_email = true;
+                     // Create new user. The method seems to rely on Captcha keys, so
+                     // this may error out due to none being passed to it.
+                     $temp_password = sha1($user['Email'] . time());
 
-               $form_post_options = array(
-                  'SaveRoles' => true,
-                  'CheckCaptcha' => false,
-                  'ValidateSpam' => false
-               );
+                     $form_post_values = array(
+                        'Name' => $user['Username'],
+                        'Password' => $temp_password, // This will get reset
+                        'Email' => $user['Email'],
+                        'RoleID' => $role_ids,
+                        'Banned' => $banned,
+                        'DateInserted' => Gdn_Format::ToDateTime()
+                     );
 
-               // This additional check is here to check if forum is in
-               // a registration mode that would require additional information
-               // not currently included in the import data, so for those
-               // instances just treat them as InsertForBasic, instead of
-               // calling Register, which will then use another method.
-               // Keep the logic here for now, even though InsertForBasic
-               // will be only method called. It was causing problems with
-               // spam filters when calling Register.
-               switch (strtolower(C('Garden.Registration.Method'))) {
-                  case 'approval':
-                  case 'invitation':
-                  default:
-                     $user_id = $user_model->InsertForBasic($form_post_values, GetValue('CheckCaptcha', $form_post_options, FALSE), $form_post_options);
-                     //$user_id = $user_model->Register($form_post_values, $form_post_options);
-                     break;
+                     $form_post_options = array(
+                        'SaveRoles' => true,
+                        'CheckCaptcha' => false,
+                        'ValidateSpam' => false
+                     );
+
+                     // This additional check is here to check if forum is in
+                     // a registration mode that would require additional information
+                     // not currently included in the import data, so for those
+                     // instances just treat them as InsertForBasic, instead of
+                     // calling Register, which will then use another method.
+                     // Keep the logic here for now, even though InsertForBasic
+                     // will be only method called. It was causing problems with
+                     // spam filters when calling Register.
+                     switch (strtolower(C('Garden.Registration.Method'))) {
+                        case 'approval':
+                        case 'invitation':
+                        default:
+                           $user_id = $userin_model->InsertForBasic($form_post_values, GetValue('CheckCaptcha', $form_post_options, FALSE), $form_post_options);
+                           //$user_id = $userin_model->Register($form_post_values, $form_post_options);
+                           break;
+                     }
+                  }
                }
-            }
+               break;
+
+            case 'invite':
+            default:
+
+
+
+
+
+               break;
          }
 
+
+         // TODO this is all error logging code relevant to the insert
+         // $userin_mode, which will differ from the invite mode.
          $complete_code = 0; // Error code
          if ($user_id) {
             $complete_code = 1;
@@ -443,9 +481,11 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             }
          } else {
             $complete_code = 2;
-            $error_messages[$processed]['db'] = $user_model->Validation->ResultsText();
+            // TODO now that invites are introduced, this will only be
+            // valid if $userin_mode is insert.
+            $error_messages[$processed]['db'] = $userin_model->Validation->ResultsText();
          }
-         $user_model->Validation->Results(true);
+         $userin_model->Validation->Results(true);
 
          // Error message to get logged in DB, if any.
          $error_string = '';

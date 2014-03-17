@@ -122,6 +122,24 @@ jQuery(document).ready(function($) {
       bulk_importer_debug = parseInt(+e.target.checked);
    });
 
+
+
+   // Handle radio options for invite/insert
+   var $bulk_radio_input = $('#bulk-radio-options input[name=userin]');
+   var bulk_radio_userin = $bulk_radio_input.filter(':checked').val();
+   var display_expires_input = function(userin) {
+      $bulk_expires = $('#bulk-expires');
+      $bulk_expires.removeClass('show');
+      if (userin == 'invite') {
+         $bulk_expires.addClass('show');
+      }
+   };
+   display_expires_input(bulk_radio_userin);
+   $bulk_radio_input.on('change', function(e) {
+      bulk_radio_userin = $(e.target).val();
+      display_expires_input(bulk_radio_userin);
+   });
+
    // Save original title for progress meter title percentages.
    var documentTitle = document.title;
 
@@ -155,7 +173,8 @@ jQuery(document).ready(function($) {
          DeliveryMethod: 'JSON',
          DeliveryType: 'View',
          TransientKey: gdn.definition('TransientKey', ''),
-         debug: bulk_importer_debug
+         debug: bulk_importer_debug,
+         userin: bulk_radio_userin
       }, null, 'json')
       .done(function(data) {
          var bulk_job_end = Math.ceil(+new Date / 1000);
@@ -265,6 +284,7 @@ jQuery(document).ready(function($) {
       // Disable button and checkbox after click
       $(this).addClass('disable-option');
       $('#bulk-importer-checkbox-email').addClass('disable-option');
+      $('#bulk-radio-options').addClass('disable-option');
       cancel_import = false;
       incremental_job(e.target.href);
       bulk_start_time = Math.ceil(+new Date / 1000);

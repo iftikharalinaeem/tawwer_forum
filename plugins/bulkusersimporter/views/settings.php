@@ -99,7 +99,7 @@
 
       <li>
          <?php
-            echo $this->Form->CheckBox('has_headers', "Check this option if the CSV file's first line contains headers.");
+            echo $this->Form->CheckBox('has_headers', "First line has headers.", array('class' => 'bulk-note'));
          ?>
       </li>
    </ul>
