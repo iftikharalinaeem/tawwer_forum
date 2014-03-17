@@ -16,6 +16,12 @@ $PluginInfo['bulkusersimporter'] = array(
    'SettingsPermission' => 'Garden.Setttings.Manage'
 );
 
+/**
+ * TODO:
+ * - In addition to the new time estimates, include the start and end times.
+ * - Allow downloading the full error dump from table.
+ */
+
 class BulkUsersImporterPlugin extends Gdn_Plugin {
 
    private $database_prefix;
