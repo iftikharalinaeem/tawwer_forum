@@ -213,7 +213,7 @@ class SearchModel extends Gdn_Model {
    public function AdvancedSearch($Search, $Offset = 0, $Limit = 10, $clean = true) {
       $Sphinx = $this->SphinxClient();
       $Sphinx->setLimits($Offset, $Limit, self::$MaxResults);
-      $Sphinx->setMatchMode(SPH_MATCH_EXTENDED); // Default match mode.
+      $Sphinx->setMatchMode(SPH_MATCH_EXTENDED2); // Default match mode.
 
       // Filter the search into proper terms.
       if ($clean)
@@ -377,6 +377,9 @@ class SearchModel extends Gdn_Model {
       else
          $SearchTerms = array();
 
+      unset($Search['matches']);
+      trace($Search, 'sphinx');
+
       return array(
          'SearchResults' => $Results,
          'RecordCount' => $Total,
@@ -418,7 +421,7 @@ class SearchModel extends Gdn_Model {
          $Sphinx->setServer($SphinxHost, $SphinxPort);
 
          // Set some defaults.
-         $Sphinx->setMatchMode(SPH_MATCH_EXTENDED);
+         $Sphinx->setMatchMode(SPH_MATCH_EXTENDED2);
          $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
 //         $Sphinx->setRankingMode(SPH_RANK_SPH04);
 //         $Sphinx->setRankingMode(SPH_RANK_PROXIMITY_BM25);
@@ -461,7 +464,7 @@ class SearchModel extends Gdn_Model {
       // Get the raw results from sphinx.
       $Sphinx = new SphinxClient();
       $Sphinx->setServer($SphinxHost, $SphinxPort);
-      $Sphinx->setMatchMode(SPH_MATCH_EXTENDED);
+      $Sphinx->setMatchMode(SPH_MATCH_EXTENDED2);
 //      $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
       $Sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'DateInserted');
       $Sphinx->setLimits($Offset, $Limit, self::$MaxResults);
@@ -607,6 +610,7 @@ class SearchModel extends Gdn_Model {
       $tokens = preg_split('`([\s"+=-])`', $search, -1, PREG_SPLIT_DELIM_CAPTURE);
       $tokens = array_filter($tokens);
       $inquote = false;
+      $inword = false;
 
       $queries = array();
       $terms = array();
@@ -620,7 +624,7 @@ class SearchModel extends Gdn_Model {
             case '+':
             case '-':
             case '=':
-               if ($inquote) {
+               if ($inquote || $inword) {
                   $query[1] .= $c;
                } elseif(!$query[0]) {
                   $query[0] .= $c;
@@ -633,6 +637,7 @@ class SearchModel extends Gdn_Model {
                if ($inquote) {
                   $query[2] = $c;
                   $inquote = false;
+                  $inword = false;
                } else {
                   $query[0] .= $c;
                   $inquote = true;
@@ -642,15 +647,18 @@ class SearchModel extends Gdn_Model {
             case ' ':
                if ($inquote) {
                   $query[1] .= $c;
+               } else {
+                  $inword = false;
                }
                break;
             default:
                $query[1] .= $c;
+               $inword = true;
                break;
          }
 
          // Now split the query into terms and move on.
-         if ($query[2] || ($query[1] && !$inquote)) {
+         if ($query[2] || ($query[1] && !$inquote && !$inword)) {
             $queries[] = $query[0].$sphinx->escapeString($query[1]).$query[2];
             $terms[] = $query[1];
             $query = array('', '', '');
@@ -659,6 +667,9 @@ class SearchModel extends Gdn_Model {
       // Account for someone missing their last quote.
       if ($inquote && $query[1]) {
          $queries[] = $query[0].$sphinx->escapeString($query[1]).'"';
+         $terms[] = $query[1];
+      } elseif ($inword && $query[1]) {
+         $queries[] = $query[0].$sphinx->escapeString($query[1]);
          $terms[] = $query[1];
       }
 
@@ -695,6 +706,5 @@ class SearchModel extends Gdn_Model {
 
 //      return array($search, array_unique($terms));
       return array($finalquery, array_unique($terms));
-
    }
 }
