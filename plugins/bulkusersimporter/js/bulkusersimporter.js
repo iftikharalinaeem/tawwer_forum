@@ -122,6 +122,25 @@ jQuery(document).ready(function($) {
       bulk_importer_debug = parseInt(+e.target.checked);
    });
 
+
+
+   // Handle radio options for invite/insert
+   var $bulk_radio_input = $('#bulk-radio-options input[name=userin]');
+   var bulk_radio_userin = $bulk_radio_input.filter(':checked').val();
+   var display_expires_input = function(userin) {
+      $bulk_expires = $('#bulk-expires');
+      $bulk_expires.removeClass('show');
+      if (userin == 'invite') {
+         $bulk_expires.addClass('show');
+         $bulk_expires.find('input').focus();
+      }
+   };
+   display_expires_input(bulk_radio_userin);
+   $bulk_radio_input.on('change', function(e) {
+      bulk_radio_userin = $(e.target).val();
+      display_expires_input(bulk_radio_userin);
+   });
+
    // Save original title for progress meter title percentages.
    var documentTitle = document.title;
 
@@ -143,6 +162,13 @@ jQuery(document).ready(function($) {
       var $bulk_error_dump = $('#bulk-error-dump');
       var progress_fail_message = 'Import could not be completed.';
 
+      // Get expires for invitation mode
+      var bulk_invite_expires = '';
+      var bulk_invite_expires_value = $('#bulk-expires').find('input').val().trim();
+      if (bulk_radio_userin == 'invite' && bulk_invite_expires_value != '') {
+         bulk_invite_expires = bulk_invite_expires_value;
+      }
+
       // Max errors before importer suppresses any further error messages.
       // If there is no ceiling to this, the browser may crash trying to
       // display this many errors.
@@ -155,9 +181,17 @@ jQuery(document).ready(function($) {
          DeliveryMethod: 'JSON',
          DeliveryType: 'View',
          TransientKey: gdn.definition('TransientKey', ''),
-         debug: bulk_importer_debug
+         debug: bulk_importer_debug,
+         userin: bulk_radio_userin,
+         expires: bulk_invite_expires
       }, null, 'json')
       .done(function(data) {
+
+         // If expiry provided, but not parseable.
+         if (data.bad_expires) {
+            cancel_import = true;
+         }
+
          var bulk_job_end = Math.ceil(+new Date / 1000);
          var rows_completed_job = parseInt(data.import_id);
          var progress = Math.ceil((rows_completed_job / total_rows) * 100);
@@ -185,6 +219,16 @@ jQuery(document).ready(function($) {
 
          // Calculate average time remaining in whole import. In minutes.
          var import_time_remaining = Math.round((rows_remaining * average_time_per_row) / 60);
+
+         // If job was cancelled unexpectedly--typically due to an invalid
+         // expiry date on invitations, make sure resulting numbers are not
+         // NaN, but are 0 instead.
+         if (isNaN(progress)) {
+            progress = 0;
+         }
+         if (isNaN(import_time_remaining)) {
+            import_time_remaining = 0;
+         }
 
          // TODO consider smarter time handling, to adjust for hours
          // and seconds.
@@ -229,7 +273,7 @@ jQuery(document).ready(function($) {
             $bulk_error_many_errors.html('The importer has reached its reporting cap of <strong>'+ max_errors + ' errors</strong>. The importer will continue to import users, and the error count will continue to record, but the display of any other error messages will be suppressed from this moment. This limit has been placed so that browsers do not become unstable if there happen to be a very large number of errors. Odds are the errors listed below are duplicated in the remaining data set, and are the likely cause of any further errors counted.');
          }
 
-         // If import_id is 0, then there was no role.
+         // If import_id is 0.
          if (rows_completed_job == 0) {
             cancel_import = true;
             progress_fail_message = data.error_message;
@@ -265,6 +309,7 @@ jQuery(document).ready(function($) {
       // Disable button and checkbox after click
       $(this).addClass('disable-option');
       $('#bulk-importer-checkbox-email').addClass('disable-option');
+      $('#bulk-radio-options').addClass('disable-option');
       cancel_import = false;
       incremental_job(e.target.href);
       bulk_start_time = Math.ceil(+new Date / 1000);

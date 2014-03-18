@@ -81,7 +81,6 @@
 
    <ul id="bulk-importer-list">
       <li id="bulk-importer-validation-feedback">
-         yoooo
       </li>
       <li id="bulk-importer-file-download">
          <?php
@@ -99,7 +98,7 @@
 
       <li>
          <?php
-            echo $this->Form->CheckBox('has_headers', "Check this option if the CSV file's first line contains headers.");
+            echo $this->Form->CheckBox('has_headers', "First line has headers.", array('class' => 'bulk-note'));
          ?>
       </li>
    </ul>
