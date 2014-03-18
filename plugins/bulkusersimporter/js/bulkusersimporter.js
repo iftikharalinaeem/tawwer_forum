@@ -132,6 +132,7 @@ jQuery(document).ready(function($) {
       $bulk_expires.removeClass('show');
       if (userin == 'invite') {
          $bulk_expires.addClass('show');
+         $bulk_expires.find('input').focus();
       }
    };
    display_expires_input(bulk_radio_userin);
@@ -161,6 +162,13 @@ jQuery(document).ready(function($) {
       var $bulk_error_dump = $('#bulk-error-dump');
       var progress_fail_message = 'Import could not be completed.';
 
+      // Get expires for invitation mode
+      var bulk_invite_expires = '';
+      var bulk_invite_expires_value = $('#bulk-expires').find('input').val().trim();
+      if (bulk_radio_userin == 'invite' && bulk_invite_expires_value != '') {
+         bulk_invite_expires = bulk_invite_expires_value;
+      }
+
       // Max errors before importer suppresses any further error messages.
       // If there is no ceiling to this, the browser may crash trying to
       // display this many errors.
@@ -174,7 +182,8 @@ jQuery(document).ready(function($) {
          DeliveryType: 'View',
          TransientKey: gdn.definition('TransientKey', ''),
          debug: bulk_importer_debug,
-         userin: bulk_radio_userin
+         userin: bulk_radio_userin,
+         expires: bulk_invite_expires
       }, null, 'json')
       .done(function(data) {
          var bulk_job_end = Math.ceil(+new Date / 1000);

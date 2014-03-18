@@ -81,7 +81,6 @@
 
    <ul id="bulk-importer-list">
       <li id="bulk-importer-validation-feedback">
-         yoooo
       </li>
       <li id="bulk-importer-file-download">
          <?php

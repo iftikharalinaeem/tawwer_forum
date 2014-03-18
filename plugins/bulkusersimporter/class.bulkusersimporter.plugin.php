@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.14',
+   'Version' => '1.0.15',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -225,7 +225,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                   LINES TERMINATED BY '$line_termination'
                   IGNORE $ignore_line LINES
                      (Email, Username, Status)
-                  SET completed = 0
+                  SET
+                     completed = 0
             ";
 
             // Use filename for results key
@@ -267,7 +268,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       // imported users." It's either 1 or 0.
       $debug_mode = $sender->Request->Post('debug');
       $debug_mode = (isset($debug_mode))
-         ? (int) $sender->Request->Post('debug')
+         ? (int) $debug_mode
          : 0;
 
       // Determine if user will be sent an invitation, or inserted directly.
@@ -276,20 +277,25 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $userin_modes = array('invite', 'insert');
       $userin_mode = $sender->Request->Post('userin');
       $userin_mode = (isset($userin_mode) && in_array($userin_mode, $userin_modes))
-         ? $sender->Request->Post('userin')
+         ? $userin_mode
          : 'invite';
+
+      // Get expiration of invite, if set.
+      $invitation_expiration = 0; // No expiry
+      $invite_expires = $sender->Request->Post('expires');
+      if (isset($invite_expires)
+      && strlen(trim($invite_expires)) > 0
+      && ($expires_timestamp = strtotime($invite_expires)) !== false) {
+         $invitation_expiration = $expires_timestamp;
+      }
 
       $bulk_user_importer_model = new Gdn_Model($this->table_name);
       $imported_users = $bulk_user_importer_model->GetWhere(array('completed' => 0), '', 'asc', $this->limit)->ResultArray();
 
       // Decide what model to use based on $userin_mode
       // Options are either invite or insert
-      $userin_model = ($userin_mode == 'insert')
-         ? new UserModel()
-         : new InvitationModel();
-      // For debugging, choose model
-      //$userin_model = new UserModel();
-      //$userin_model = new InvitationModel();
+      $user_model = new UserModel();
+      $invitation_model = new InvitationModel();
 
       // Collect error messages, concatenate them at end.
       $error_messages = array();
@@ -302,6 +308,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          $processed++;
          $send_email = false; // Default
          $user_id = false; // Default
+         $invite_success = false; // For invitation model
          $user['Username'] = trim($user['Username']);
          $user['Email'] = trim($user['Email']);
 
@@ -380,7 +387,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                // required on a Save. That information is already in the row.
                if (!isset($error_messages[$processed]['username'])) {
                   // Check if username in use.
-                  $check_name = $userin_model->GetWhere(array(
+                  $check_name = $user_model->GetWhere(array(
                       'Name' => $user['Username']
                   ))->FirstRow('array');
 
@@ -402,13 +409,13 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                      // to handle those exceptions. Though I'm certain they won't
                      // come up again after modifying the table column. Rows are
                      // still inserted correctly, just without the check.
-                     $userin_model->Validation->UnapplyRule('Password', 'Required');
-                     $userin_model->Validation->UnapplyRule('DateInserted', 'Required');
+                     $user_model->Validation->UnapplyRule('Password', 'Required');
+                     $user_model->Validation->UnapplyRule('DateInserted', 'Required');
 
                      $send_email = false;
 
                      // Update the user.
-                     $user_id = $userin_model->Save(
+                     $user_id = $user_model->Save(
                         array(
                          'UserID' => $check_name['UserID'],
                          'Name' => $check_name['Name'],
@@ -452,8 +459,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                         case 'approval':
                         case 'invitation':
                         default:
-                           $user_id = $userin_model->InsertForBasic($form_post_values, GetValue('CheckCaptcha', $form_post_options, FALSE), $form_post_options);
-                           //$user_id = $userin_model->Register($form_post_values, $form_post_options);
+                           $user_id = $user_model->InsertForBasic($form_post_values, GetValue('CheckCaptcha', $form_post_options, FALSE), $form_post_options);
+                           //$user_id = $user_model->Register($form_post_values, $form_post_options);
                            break;
                      }
                   }
@@ -463,26 +470,56 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             case 'invite':
             default:
 
+               // Email controls for invites
+               //
+               // Invites do not require a valid username, so if there was an
+               // error reported, no need to log it, so clear it.
+               // For now usernames provided do not matter. They might in the
+               // future, which is why I want to keep the username logic
+               // above intact and simply clear the error here.
+               $username = $user['Username'];
+               if (isset($error_messages[$processed]['username'])) {
+                  $username = '';
+                  unset($error_messages[$processed]['username']);
+               }
 
+               if ($invitation_expiration === 0) {
+                  $invitation_expiration = '';
+               }
 
+               // Determine if in can send email.
+               $send_invite_email = ($debug_mode == 0)
+                  ? true
+                  : false;
 
+               $form_post_values = array(
+                  'Name' => $username,
+                  'Email' => $user['Email'],
+                  'RoleIDs' => serialize($role_ids),
+                  'Banned' => $banned,
+                  'DateExpires' => Gdn_Format::ToDateTime($invitation_expiration)
+               );
+
+               $invite_success = $invitation_model->Save($form_post_values, $user_model, $send_invite_email);
 
                break;
          }
 
+         // Handle both insert and invite $userin_mode
+         // This is so error handling is the same.
+         $userin_model = ($userin_mode == 'insert')
+            ? $user_model
+            : $invitation_model;
 
-         // TODO this is all error logging code relevant to the insert
-         // $userin_mode, which will differ from the invite mode.
          $complete_code = 0; // Error code
-         if ($user_id) {
+         if (($userin_mode == 'insert' && $user_id)
+         || ($userin_mode == 'invite' && $invite_success)) {
             $complete_code = 1;
             if (isset($error_messages[$processed]['role'])) {
                $complete_code = 2;
             }
          } else {
             $complete_code = 2;
-            // TODO now that invites are introduced, this will only be
-            // valid if $userin_mode is insert.
             $error_messages[$processed]['db'] = $userin_model->Validation->ResultsText();
          }
          $userin_model->Validation->Results(true);
@@ -515,7 +552,10 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          // Email successfully added users, but not users who already had an
          // account (according to username) with forum.
-         if ($send_email && $complete_code == 1) {
+         // This is only for 'insert' $userin_mode
+         if ($userin_mode == 'invite'
+         && $send_email
+         && $complete_code == 1) {
             if ($debug_mode == 0) {
                $this->PasswordRequest($user['Email']); // Reset current temp password
             }
