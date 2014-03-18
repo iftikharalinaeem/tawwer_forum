@@ -261,6 +261,9 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    public function processUploadedData($sender) {
       $sender->SetData('status', 'Incomplete');
 
+      // Collect error messages, concatenate them at end.
+      $error_messages = array();
+
       // Get POST 'debug' value, because if it's
       // in debug, it will not send emails. Called it 'debug' in case in future
       // I want to expand on the functionality of debug mode. The actual
@@ -284,9 +287,16 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $invitation_expiration = 0; // No expiry
       $invite_expires = $sender->Request->Post('expires');
       if (isset($invite_expires)
-      && strlen(trim($invite_expires)) > 0
-      && ($expires_timestamp = strtotime($invite_expires)) !== false) {
-         $invitation_expiration = $expires_timestamp;
+      && strlen(trim($invite_expires)) > 0) {
+         if (($expires_timestamp = strtotime($invite_expires)) !== false) {
+            $invitation_expiration = $expires_timestamp;
+         } else {
+            // Value was provided, but it was not parseable by strtotime.
+            $sender->SetJson('bad_expires', 1);
+            $error_messages[] = Gdn_Format::PlainText('Expiry date of "'. $invite_expires . '" is invalid. Import cancelled.');
+            $sender->SetJson('bulk_error_dump', json_encode($error_messages));
+            return false;
+         }
       }
 
       $bulk_user_importer_model = new Gdn_Model($this->table_name);
@@ -296,9 +306,6 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       // Options are either invite or insert
       $user_model = new UserModel();
       $invitation_model = new InvitationModel();
-
-      // Collect error messages, concatenate them at end.
-      $error_messages = array();
 
       // For byte-size processing
       $start_time = time();
@@ -595,7 +602,15 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             'asc',
             $this->limit
          )->ResultArray();
+
          $errors = array_column($bulk_error_dump, 'Error');
+
+         // Just to be extra sure, make sure anything being output is clean.
+         // I do let them know invalid emails, usernames, and roles, so they
+         // could insert some nonsense strings, but even so, it would
+         // only affect themselves.
+         $errors = array_map(array('Gdn_Format', 'PlainText'), $errors);
+
          $sender->SetJson('bulk_error_dump', json_encode($errors));
       }
 

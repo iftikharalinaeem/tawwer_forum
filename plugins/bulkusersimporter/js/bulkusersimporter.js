@@ -186,6 +186,12 @@ jQuery(document).ready(function($) {
          expires: bulk_invite_expires
       }, null, 'json')
       .done(function(data) {
+
+         // If expiry provided, but not parseable.
+         if (data.bad_expires) {
+            cancel_import = true;
+         }
+
          var bulk_job_end = Math.ceil(+new Date / 1000);
          var rows_completed_job = parseInt(data.import_id);
          var progress = Math.ceil((rows_completed_job / total_rows) * 100);
@@ -213,6 +219,16 @@ jQuery(document).ready(function($) {
 
          // Calculate average time remaining in whole import. In minutes.
          var import_time_remaining = Math.round((rows_remaining * average_time_per_row) / 60);
+
+         // If job was cancelled unexpectedly--typically due to an invalid
+         // expiry date on invitations, make sure resulting numbers are not
+         // NaN, but are 0 instead.
+         if (isNaN(progress)) {
+            progress = 0;
+         }
+         if (isNaN(import_time_remaining)) {
+            import_time_remaining = 0;
+         }
 
          // TODO consider smarter time handling, to adjust for hours
          // and seconds.
@@ -257,7 +273,7 @@ jQuery(document).ready(function($) {
             $bulk_error_many_errors.html('The importer has reached its reporting cap of <strong>'+ max_errors + ' errors</strong>. The importer will continue to import users, and the error count will continue to record, but the display of any other error messages will be suppressed from this moment. This limit has been placed so that browsers do not become unstable if there happen to be a very large number of errors. Odds are the errors listed below are duplicated in the remaining data set, and are the likely cause of any further errors counted.');
          }
 
-         // If import_id is 0, then there was no role.
+         // If import_id is 0.
          if (rows_completed_job == 0) {
             cancel_import = true;
             progress_fail_message = data.error_message;
