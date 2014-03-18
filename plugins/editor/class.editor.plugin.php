@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.21',
+   'Version' => '1.3.22',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -906,7 +906,7 @@ class EditorPlugin extends Gdn_Plugin {
 
   public function Structure() {
       // Set to false by default, so change in config if uploads allowed.
-      TouchConfig('Garden.AllowFileUploads', false);
+      TouchConfig('Garden.AllowFileUploads', true);
   }
 
    public function OnDisable() {
