@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.16',
+   'Version' => '1.0.17',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -293,7 +293,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          } else {
             // Value was provided, but it was not parseable by strtotime.
             $sender->SetJson('bad_expires', 1);
-            $error_messages[] = Gdn_Format::PlainText('Expiry date of "'. $invite_expires . '" is invalid. Import cancelled.');
+            $error_messages[] = Gdn_Format::PlainText('Expiry date of "'. $invite_expires . '" is invalid. Import will not begin.');
             $sender->SetJson('bulk_error_dump', json_encode($error_messages));
             return false;
          }
@@ -366,6 +366,13 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          if (!count($status['invalid_roles'])) {
             $role_ids = $status['role_ids'];
             $banned = $status['banned'];
+
+            // For 'invite' userin_mode, a status of banned means the user does
+            // not get invited. I'm not really sure why they would mark someone
+            // as banned, but it's there. If they are banned, generate an error.
+            if ($userin_mode == 'invite' && $banned == 1) {
+               $error_messages[$processed]['role'] = 'User marked as banned. Invite will not be sent.';
+            }
          } else {
             // No roles
             $plural_status = PluralTranslate(count($status['invalid_roles']), 'status', 'statuses');
@@ -499,7 +506,6 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                   'Name' => $username,
                   'Email' => $user['Email'],
                   'RoleIDs' => serialize($role_ids),
-                  'Banned' => $banned,
                   // For some reason this is only way for null to be set.
                   // If trying to assign variable to null, it ends up with
                   // first unix datetime possible (1970).
@@ -508,7 +514,9 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                      : Gdn_Format::ToDateTime($invitation_expiration)
                );
 
-               $invite_success = $invitation_model->Save($form_post_values, $user_model, $send_invite_email);
+               if (!$banned) {
+                  $invite_success = $invitation_model->Save($form_post_values, $user_model, $send_invite_email);
+               }
 
                break;
          }
@@ -783,7 +791,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $status['role_ids'] = $role_ids;
 
       // Check if user is banned
-      if (in_array('Banned', $role_names)) {
+      if (in_array('banned', $role_names)) {
          $status['banned'] = 1;
       }
 
