@@ -1,0 +1,42 @@
+#avatarstock {
+
+   .display-avatars {
+      overflow: hidden;
+      padding: 5px;
+
+      .avatar-wrap {
+         margin: 5px;
+         float: left;
+         position: relative;
+         overflow: hidden;
+
+         img {
+            display: block;
+            height: 150px;
+         }
+
+         .avatar-caption {
+            opacity: 0;
+            background-color: rgba(0,0,0,0.40);
+            padding: 5px;
+            position: absolute;
+            color: #fff;
+            bottom: -50px;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            transition: all 0.4s ease;
+         }
+
+         .avatar-caption:empty {
+            display: none;
+         }
+
+         &:hover .avatar-caption {
+            opacity: 1;
+            bottom: 0;
+         }
+      }
+   }
+
+}

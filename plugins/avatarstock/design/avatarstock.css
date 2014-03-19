@@ -1,0 +1,33 @@
+#avatarstock .display-avatars {
+  overflow: hidden;
+  padding: 5px;
+}
+#avatarstock .display-avatars .avatar-wrap {
+  margin: 5px;
+  float: left;
+  position: relative;
+  overflow: hidden;
+}
+#avatarstock .display-avatars .avatar-wrap img {
+  display: block;
+  height: 150px;
+}
+#avatarstock .display-avatars .avatar-wrap .avatar-caption {
+  opacity: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 5px;
+  position: absolute;
+  color: #fff;
+  bottom: -50px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  transition: all 0.4s ease;
+}
+#avatarstock .display-avatars .avatar-wrap .avatar-caption:empty {
+  display: none;
+}
+#avatarstock .display-avatars .avatar-wrap:hover .avatar-caption {
+  opacity: 1;
+  bottom: 0;
+}
