@@ -11,6 +11,9 @@
 
    $total_rows = 0;
 
+   // Default expiry date for invitations
+   $default_invite_expiration = C('Garden.Registration.InviteExpiration', '1 week');
+
 ?>
 
 <div id="bulk-importer">
@@ -88,7 +91,7 @@
             What do you want to do if a user does not exist?
             <ul id="bulk-radio-options">
                <li><label><input type="radio" name="userin" id="bulk-invite" value="invite" checked="checked" /> Invite new users <span class="bulk-note">(new users will be emailed with a link to register their username and other account information)</span></label></li>
-               <li id="bulk-expires" class="shlide" title="Regular English like the examples, or a date like YYYY/MM/DD"><label><span class="bulk-note">Expires:</span> <input type="text" name="expires" value="" placeholder="Examples: tomorrow, 5 days, next week, 2 weeks, YYYY/MM/DD" /></label></li>
+               <li id="bulk-expires" class="shlide" title="Regular English like 'tomorrow', '5 days', 'next week', '2 weeks', or a date like YYYY/MM/DD"><label><span class="bulk-note">Expires:</span> <input type="text" name="expires" value="<?php echo $default_invite_expiration; ?>" placeholder="Examples: tomorrow, 5 days, next week, 2 weeks, YYYY/MM/DD" /></label> <span class="bulk-note">If no expiry specified, the invite will expire in <?php echo $default_invite_expiration; ?>.</span></li>
                <li><label><input type="radio" name="userin" id="bulk-insert" value="insert" /> Insert new users <span class="bulk-note">(new user accounts will be created immediately; an email will be sent out to those users with instructions on logging in)</span></label></li>
             </ul>
          </p>

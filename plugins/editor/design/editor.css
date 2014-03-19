@@ -637,7 +637,9 @@ directly on the iframe's bodybox contenteditable. */
 .editor-format-markdown .editor-image-align,
 .editor-format-bbcode .editor-action-h1,
 .editor-format-bbcode .editor-action-h2 {
-  display: none;
+  /* Defined as important, because some themes have overriden with their own
+     !important values. */
+  display: none !important;
 }
 
 /**
