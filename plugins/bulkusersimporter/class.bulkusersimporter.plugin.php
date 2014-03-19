@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.15',
+   'Version' => '1.0.16',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -490,10 +490,6 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                   unset($error_messages[$processed]['username']);
                }
 
-               if ($invitation_expiration === 0) {
-                  $invitation_expiration = '';
-               }
-
                // Determine if in can send email.
                $send_invite_email = ($debug_mode == 0)
                   ? true
@@ -504,7 +500,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                   'Email' => $user['Email'],
                   'RoleIDs' => serialize($role_ids),
                   'Banned' => $banned,
-                  'DateExpires' => Gdn_Format::ToDateTime($invitation_expiration)
+                  // For some reason this is only way for null to be set.
+                  // If trying to assign variable to null, it ends up with
+                  // first unix datetime possible (1970).
+                  'DateExpires' => ($invitation_expiration === 0)
+                     ? null
+                     : Gdn_Format::ToDateTime($invitation_expiration)
                );
 
                $invite_success = $invitation_model->Save($form_post_values, $user_model, $send_invite_email);
