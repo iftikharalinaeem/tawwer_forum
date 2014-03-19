@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.17',
+   'Version' => '1.0.18',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -347,23 +347,16 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             if ($username_length > $this->username_limits['max']) {
                $error_messages[$processed]['username'] .= ' Username is too long (max '. $this->username_limits['max'] . ' characters).';
             }
-
-            //$sender->SetJson('import_id', 0);
-            //$sender->SetJson('error_message', $error_messages[$processed]['username']);
-            //break;
          }
 
          if (!ValidateEmail($user['Email'])) {
             $error_messages[$processed]['email'] = 'Invalid email: "'. $user['Email'] .'".';
-            //$sender->SetJson('import_id', 0);
-            //$sender->SetJson('error_message', $error_messages[$processed]['email']);
-            //break;
          }
 
          // Get role ids based off of their name, and check if any invalid
          // roles were passed.
          $status = $this->roleNamesToInts($user['Status']);
-         if (!count($status['invalid_roles'])) {
+         if (count($status['role_ids']) && !count($status['invalid_roles'])) {
             $role_ids = $status['role_ids'];
             $banned = $status['banned'];
 
@@ -374,12 +367,17 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                $error_messages[$processed]['role'] = 'User marked as banned. Invite will not be sent.';
             }
          } else {
-            // No roles
+            // No roles or invalid roles provided.
+
+            $status_list = 'no status provided';
+            if (count($status['invalid_roles'])) {
+               $status_list = implode(', ', $status['invalid_roles']);
+            } else {
+               $status['invalid_roles'] = array();
+            }
             $plural_status = PluralTranslate(count($status['invalid_roles']), 'status', 'statuses');
-            $error_messages[$processed]['role'] = "Invalid $plural_status: " . implode(', ', $status['invalid_roles']) . '.';
-            //$sender->SetJson('import_id', 0);
-            //$sender->SetJson('error_message', $error_messages[$processed]['role']);
-            //break;
+
+            $error_messages[$processed]['role'] = "Invalid $plural_status: " . $status_list . '.';
          }
 
          // Depending on value of $userin_mode, either insert the user directly
