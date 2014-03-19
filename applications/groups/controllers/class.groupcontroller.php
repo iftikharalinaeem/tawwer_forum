@@ -103,7 +103,11 @@ class GroupController extends Gdn_Controller {
       $this->SetData('Applicants', $Applicants);
 
       // Get Leaders
-      $Users = $this->GroupModel->GetMembers($GroupID, array('Role' => 'Leader'));
+      $Users = $this->GroupModel->GetMembers($GroupID, array('Role' => 'Leader'), 10);
+      foreach ($Users as &$User) {
+         if ($User['UserID'] == $Group['InsertUserID'])
+            $User['Role'] = 'Owner';
+      }
       $this->SetData('Leaders', $Users);
 
       // Get Members
