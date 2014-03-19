@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.18',
+   'Version' => '1.0.19',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -495,25 +495,30 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                   unset($error_messages[$processed]['username']);
                }
 
-               // Determine if in can send email.
-               $send_invite_email = ($debug_mode == 0)
-                  ? true
-                  : false;
+               // If there is a valid email, continue processing.
+               if (!isset($error_messages[$processed]['email'])) {
 
-               $form_post_values = array(
-                  'Name' => $username,
-                  'Email' => $user['Email'],
-                  'RoleIDs' => serialize($role_ids),
-                  // For some reason this is only way for null to be set.
-                  // If trying to assign variable to null, it ends up with
-                  // first unix datetime possible (1970).
-                  'DateExpires' => ($invitation_expiration === 0)
-                     ? null
-                     : Gdn_Format::ToDateTime($invitation_expiration)
-               );
+                  // Determine if in can send email.
+                  $send_invite_email = ($debug_mode == 0)
+                     ? true
+                     : false;
 
-               if (!$banned) {
-                  $invite_success = $invitation_model->Save($form_post_values, $user_model, $send_invite_email);
+                  $form_post_values = array(
+                     'Name' => $username,
+                     'Email' => $user['Email'],
+                     'RoleIDs' => serialize($role_ids),
+                     // For some reason this is only way for null to be set.
+                     // If trying to assign variable to null, it ends up with
+                     // first unix datetime possible (1970).
+                     'DateExpires' => ($invitation_expiration === 0)
+                        ? null
+                        : Gdn_Format::ToDateTime($invitation_expiration)
+                  );
+
+                  // No point saving banned users to invitation table.
+                  if (!$banned) {
+                     $invite_success = $invitation_model->Save($form_post_values, $user_model, $send_invite_email);
+                  }
                }
 
                break;
