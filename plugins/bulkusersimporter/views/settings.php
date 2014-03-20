@@ -49,7 +49,9 @@
       duplicate username is found, the entire row of that
       duplicated username will be purged from the import, as usernames are the
       controlling value and must be unique. This means that only the first
-      instance of a row with that given username will be imported.
+      instance of a row with that given username will be imported. <strong>If
+      invitation mode is selected, the constraints just described do
+      not apply, as username is optional in this mode</strong>.
    </div>
 
    <div class="Info">The third parameter, <code>Status</code>, can have
@@ -74,8 +76,10 @@
       do not need to be present. If they are, check the option below so the
       importer can skip that line. The importer will fail if the syntax of the
       CSV file does not match the syntax in the example. The last line shows
-      what a row would look like if sending out invites, with the username
-      not included.
+      the optional syntax for a row if sending out invites,
+      with the username excluded; in invite mode, the usernames in the
+      previous rows will be used to pre-populate the registration form users
+      will be linked to from the invitation email.
 
    <pre>
    Email,Username,Status

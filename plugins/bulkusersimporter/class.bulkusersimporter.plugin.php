@@ -18,6 +18,7 @@ $PluginInfo['bulkusersimporter'] = array(
 
 /**
  * TODO:
+ * - Prepend underscore to data set for view.
  * - In addition to the new time estimates, include the start and end times.
  * - Allow downloading the full error dump from table.
  * - Consider multiple users operating the bulk importer. Do not just truncate
@@ -209,7 +210,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          $pdo = $db->Connection();
 
-         // Truncate table before using it.
+         // Truncate table before using it. In future, add .
          $db->Query("TRUNCATE TABLE $db_table;");
 
          foreach ($files as $file) {
