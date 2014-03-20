@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.20',
+   'Version' => '1.0.21',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -29,6 +29,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
    private $database_prefix;
    private $table_name = 'BulkUsersImporter';
+   private $plugin_title = 'Bulk User Import';
 
    // Will contain whitelist of allowed roles.
    private $allowed_roles = array();
@@ -94,7 +95,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $sender->AddJsFile('bulkusersimporter.js', 'plugins/bulkusersimporter');
 
       // Render components pertinent to all views.
-      $sender->SetData('Title', T('Bulk Users Importer'));
+      $sender->SetData('Title', T($this->plugin_title));
       $sender->AddSideMenu();
 
       // Render specific component views.
@@ -127,7 +128,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$sender) {
       $menu = $sender->EventArguments['SideMenu'];
       $menu->AddItem('Import', T('Import'));
-      $menu->AddLink('Import', T('Bulk Users Importer'), '/settings/bulkusersimporter', 'Garden.Settings.Manage');
+      $menu->AddLink('Import', T($this->plugin_title), '/settings/bulkusersimporter', 'Garden.Settings.Manage');
    }
 
    /**
