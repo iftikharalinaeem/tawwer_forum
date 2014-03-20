@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.22',
+   'Version' => '1.0.23',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -104,6 +104,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             // Handle upload and quickly parse file into DB.
             $results = $this->handleUploadInsert($sender);
             $sender->SetData('results', $results);
+            $sender->SetData('_available_invites', $this->calculateAvailableInvites());
             $sender->Render('upload', '', 'plugins/bulkusersimporter');
             break;
 
@@ -262,6 +263,18 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       }
 
       return $results;
+   }
+
+   public function calculateAvailableInvites() {
+      $available_invites = 0;
+      $user_id = Gdn::Session()->UserID;
+
+      if ($user_id) {
+         $user_model = new UserModel();
+         $available_invites = $user_model->GetInvitationCount($user_id);
+      }
+
+      return $available_invites;
    }
 
    /**
