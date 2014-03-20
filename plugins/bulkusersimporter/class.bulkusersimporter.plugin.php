@@ -201,10 +201,16 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       if (count($files)) {
 
          $db_table = $this->database_prefix . $this->table_name;
-         $pdo = Gdn::Database()->Connection();
+
+         // We need to allow local infile so we'll create a new db connection.
+         $db_config = C('Database');
+         $db_config['ConnectionOptions'][PDO::MYSQL_ATTR_LOCAL_INFILE] = TRUE;
+         $db = new Gdn_Database($db_config);
+
+         $pdo = $db->Connection();
 
          // Truncate table before using it.
-         Gdn::Database()->Query("TRUNCATE TABLE $db_table;");
+         $db->Query("TRUNCATE TABLE $db_table;");
 
          foreach ($files as $file) {
             // Get escaped EOL sequence to break on. No need to preg_quote, or
