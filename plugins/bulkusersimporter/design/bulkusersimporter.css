@@ -62,3 +62,9 @@
 #bulk-importer .userin-options-list li {
   padding: 20px 200px 0 10px;
 }
+#bulk-importer .bulk-invite-notice {
+  background-color: #FEEFB3;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 10px;
+  margin: 0 20px;
+}
