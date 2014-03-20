@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk Users Importer',
    'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.16',
+   'Version' => '1.0.19',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -293,7 +293,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          } else {
             // Value was provided, but it was not parseable by strtotime.
             $sender->SetJson('bad_expires', 1);
-            $error_messages[] = Gdn_Format::PlainText('Expiry date of "'. $invite_expires . '" is invalid. Import cancelled.');
+            $error_messages[] = Gdn_Format::PlainText('Expiry date of "'. $invite_expires . '" is invalid. Import will not begin.');
             $sender->SetJson('bulk_error_dump', json_encode($error_messages));
             return false;
          }
@@ -347,32 +347,37 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             if ($username_length > $this->username_limits['max']) {
                $error_messages[$processed]['username'] .= ' Username is too long (max '. $this->username_limits['max'] . ' characters).';
             }
-
-            //$sender->SetJson('import_id', 0);
-            //$sender->SetJson('error_message', $error_messages[$processed]['username']);
-            //break;
          }
 
          if (!ValidateEmail($user['Email'])) {
             $error_messages[$processed]['email'] = 'Invalid email: "'. $user['Email'] .'".';
-            //$sender->SetJson('import_id', 0);
-            //$sender->SetJson('error_message', $error_messages[$processed]['email']);
-            //break;
          }
 
          // Get role ids based off of their name, and check if any invalid
          // roles were passed.
          $status = $this->roleNamesToInts($user['Status']);
-         if (!count($status['invalid_roles'])) {
+         if (count($status['role_ids']) && !count($status['invalid_roles'])) {
             $role_ids = $status['role_ids'];
             $banned = $status['banned'];
+
+            // For 'invite' userin_mode, a status of banned means the user does
+            // not get invited. I'm not really sure why they would mark someone
+            // as banned, but it's there. If they are banned, generate an error.
+            if ($userin_mode == 'invite' && $banned == 1) {
+               $error_messages[$processed]['role'] = 'User marked as banned. Invite will not be sent.';
+            }
          } else {
-            // No roles
+            // No roles or invalid roles provided.
+
+            $status_list = 'no status provided';
+            if (count($status['invalid_roles'])) {
+               $status_list = implode(', ', $status['invalid_roles']);
+            } else {
+               $status['invalid_roles'] = array();
+            }
             $plural_status = PluralTranslate(count($status['invalid_roles']), 'status', 'statuses');
-            $error_messages[$processed]['role'] = "Invalid $plural_status: " . implode(', ', $status['invalid_roles']) . '.';
-            //$sender->SetJson('import_id', 0);
-            //$sender->SetJson('error_message', $error_messages[$processed]['role']);
-            //break;
+
+            $error_messages[$processed]['role'] = "Invalid $plural_status: " . $status_list . '.';
          }
 
          // Depending on value of $userin_mode, either insert the user directly
@@ -490,25 +495,31 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                   unset($error_messages[$processed]['username']);
                }
 
-               // Determine if in can send email.
-               $send_invite_email = ($debug_mode == 0)
-                  ? true
-                  : false;
+               // If there is a valid email, continue processing.
+               if (!isset($error_messages[$processed]['email'])) {
 
-               $form_post_values = array(
-                  'Name' => $username,
-                  'Email' => $user['Email'],
-                  'RoleIDs' => serialize($role_ids),
-                  'Banned' => $banned,
-                  // For some reason this is only way for null to be set.
-                  // If trying to assign variable to null, it ends up with
-                  // first unix datetime possible (1970).
-                  'DateExpires' => ($invitation_expiration === 0)
-                     ? null
-                     : Gdn_Format::ToDateTime($invitation_expiration)
-               );
+                  // Determine if in can send email.
+                  $send_invite_email = ($debug_mode == 0)
+                     ? true
+                     : false;
 
-               $invite_success = $invitation_model->Save($form_post_values, $user_model, $send_invite_email);
+                  $form_post_values = array(
+                     'Name' => $username,
+                     'Email' => $user['Email'],
+                     'RoleIDs' => serialize($role_ids),
+                     // For some reason this is only way for null to be set.
+                     // If trying to assign variable to null, it ends up with
+                     // first unix datetime possible (1970).
+                     'DateExpires' => ($invitation_expiration === 0)
+                        ? null
+                        : Gdn_Format::ToDateTime($invitation_expiration)
+                  );
+
+                  // No point saving banned users to invitation table.
+                  if (!$banned) {
+                     $invite_success = $invitation_model->Save($form_post_values, $user_model, $send_invite_email);
+                  }
+               }
 
                break;
          }
@@ -783,7 +794,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $status['role_ids'] = $role_ids;
 
       // Check if user is banned
-      if (in_array('Banned', $role_names)) {
+      if (in_array('banned', $role_names)) {
          $status['banned'] = 1;
       }
 

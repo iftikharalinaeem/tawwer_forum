@@ -18,7 +18,29 @@
       between each, no trailing comma, with a maximum of three values. Each
       grouping of three are on their own line. If the CSV file has a header
       line, check the option below to let the importer skip it. <strong>All
-      three parameters are required.</strong>
+      three parameters are required</strong>, unless indicated otherwise.
+   </div>
+
+   <div class="Info userin-options-list">
+      There are two options to import users into your community:
+      <ul>
+         <li>
+            Send an <strong>email invitation</strong> to all users. This allows them to follow
+            the provided URL and choose their own username and password. Of the
+            three parameters, <strong>username is optional for invitation mode</strong>.
+            An example row for this would look like:
+            <code>johndoes@example.com,,member:administrator</code>. Notice
+            the double comma, indicating that the username has been left out.
+            If a username is provided, it will be used to pre-populate the
+            username field in the registration form, but can be easily changed.
+         </li>
+         <li>
+            <strong>Directly insert</strong> users into the community. Users
+            who already exist in the community will have their information
+            updated, based on the username, while new users will be created
+            and emailed. <strong>All three parameters are required</strong>.
+         </li>
+      </ul>
    </div>
 
    <div class="Info">The second parameter, <code>Username</code>, must be at
@@ -48,10 +70,12 @@
    <h3>Example contents of CSV file:</h3>
 
    <div class="Info">
-      This example contains eight lines. The first line has headers. Headers
+      This example contains nine lines. The first line has headers. Headers
       do not need to be present. If they are, check the option below so the
       importer can skip that line. The importer will fail if the syntax of the
-      CSV file does not match the syntax in the example.
+      CSV file does not match the syntax in the example. The last line shows
+      what a row would look like if sending out invites, with the username
+      not included.
 
    <pre>
    Email,Username,Status
@@ -61,7 +85,8 @@
    tywin@example4.com,lanman,Member:Administrator:Moderator:"World's Best"
    rust@example5.com,carcosaguy,Member:World's Best:Moderator:Nice Ones
    foo+bar@example6.com,foo,World's Best:Member
-   bar@example7.com,bar,"Nice Ones":Member</pre>
+   bar@example7.com,bar,"Nice Ones":Member
+   johndoes@example.com,,member:administrator</pre>
    </div>
 
 
