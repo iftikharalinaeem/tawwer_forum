@@ -1,9 +1,9 @@
 <?php if(!defined('APPLICATION')) die();
 
 $PluginInfo['bulkusersimporter'] = array(
-   'Name' => 'Bulk Users Importer',
-   'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.23',
+   'Name' => 'Bulk User Import',
+   'Description' => 'Bulk user import with standardized CSV files. Send invites or directly insert new members.',
+   'Version' => '1.0.24',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
