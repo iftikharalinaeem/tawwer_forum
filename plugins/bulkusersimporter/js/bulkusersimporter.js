@@ -115,24 +115,64 @@ jQuery(document).ready(function($) {
       }
    });
 
-   // Running the bulk importer in debug mode
-   bulk_importer_debug = 0;
+   // Running the bulk importer in debug mode. This is actually just for
+   // disabling email, so the checkbox will ask about that.
+   var bulk_importer_debug = 0;
    $('#bulk_importer_debug').on('change', function(e) {
       bulk_importer_debug = parseInt(+e.target.checked);
    });
 
-   bulk_importer_errors = 0;
+
+
+   // Handle radio options for invite/insert
+   var $bulk_radio_input = $('#bulk-radio-options input[name=userin]');
+   var bulk_radio_userin = $bulk_radio_input.filter(':checked').val();
+   var display_expires_input = function(userin) {
+      $bulk_expires = $('#bulk-expires');
+      $bulk_expires.removeClass('show');
+      if (userin == 'invite') {
+         $bulk_expires.addClass('show');
+         $bulk_expires.find('input').focus();
+      }
+   };
+   display_expires_input(bulk_radio_userin);
+   $bulk_radio_input.on('change', function(e) {
+      bulk_radio_userin = $(e.target).val();
+      display_expires_input(bulk_radio_userin);
+   });
+
+   // Save original title for progress meter title percentages.
+   var documentTitle = document.title;
+
+   // To calculate time remaining
+   var bulk_start_time = 0;
+   var bulk_rows_after_job = []; // Collect how many jobs done.
+   var bulk_time_after_job = []; // Collect average time per job.
+
+   // Call job every n.
+   var bulk_importer_errors = 0;
    var incremental_job = function(url) {
+      var bulk_job_start = Math.ceil(+new Date / 1000);
       var $progress_meter = $('#import-progress-meter');
       var total_rows = parseInt($progress_meter.attr('data-total-rows'));
       var $progress_container = $('#import-progress-container');
       var $progress_animation = $('#progress-animation');
       var $bulk_error_header = $('#bulk-error-header');
+      var $bulk_error_many_errors = $('#bulk-error-many-errors');
       var $bulk_error_dump = $('#bulk-error-dump');
       var progress_fail_message = 'Import could not be completed.';
 
-      // Max errors before importer stops.
-      var max_errors = 1000;
+      // Get expires for invitation mode
+      var bulk_invite_expires = '';
+      var bulk_invite_expires_value = $('#bulk-expires').find('input').val().trim();
+      if (bulk_radio_userin == 'invite' && bulk_invite_expires_value != '') {
+         bulk_invite_expires = bulk_invite_expires_value;
+      }
+
+      // Max errors before importer suppresses any further error messages.
+      // If there is no ceiling to this, the browser may crash trying to
+      // display this many errors.
+      var max_errors = 10000;
 
       // Set work in progress
       $progress_container.addClass('working');
@@ -141,35 +181,102 @@ jQuery(document).ready(function($) {
          DeliveryMethod: 'JSON',
          DeliveryType: 'View',
          TransientKey: gdn.definition('TransientKey', ''),
-         debug: bulk_importer_debug
+         debug: bulk_importer_debug,
+         userin: bulk_radio_userin,
+         expires: bulk_invite_expires
       }, null, 'json')
       .done(function(data) {
+
+         // If expiry provided, but not parseable.
+         if (data.bad_expires) {
+            cancel_import = true;
+         }
+
+         var bulk_job_end = Math.ceil(+new Date / 1000);
          var rows_completed_job = parseInt(data.import_id);
          var progress = Math.ceil((rows_completed_job / total_rows) * 100);
          if (progress > 100) {
             progress = 100;
          }
+
+         // Calculate average rows processed per job.
+         var rows_remaining = total_rows - rows_completed_job;
+         bulk_rows_after_job.push(rows_completed_job);
+         var average_rows_per_job = Math.ceil(rows_completed_job / bulk_rows_after_job.length);
+
+         // Calculate average time per job.
+         var total_elapsed_time = Math.round((bulk_job_end - bulk_start_time) / 60);
+         var job_elapsed_time = bulk_job_end - bulk_job_start;
+         bulk_time_after_job.push(job_elapsed_time);
+         var average_time_per_job = 0;
+         for (var i = 0, l = bulk_time_after_job.length; i < l; i++) {
+            average_time_per_job += bulk_time_after_job[i];
+         }
+         average_time_per_job = Math.ceil(average_time_per_job / l);
+
+         // Calculate average time per row, in seconds
+         var average_time_per_row = average_time_per_job / average_rows_per_job;
+
+         // Calculate average time remaining in whole import. In minutes.
+         var import_time_remaining = Math.round((rows_remaining * average_time_per_row) / 60);
+
+         // If job was cancelled unexpectedly--typically due to an invalid
+         // expiry date on invitations, make sure resulting numbers are not
+         // NaN, but are 0 instead.
+         if (isNaN(progress)) {
+            progress = 0;
+         }
+         if (isNaN(import_time_remaining)) {
+            import_time_remaining = 0;
+         }
+
+         // TODO consider smarter time handling, to adjust for hours
+         // and seconds.
+         var time_estimation_string =  '&middot; '+ total_elapsed_time +' minute(s) elapsed';
+         var new_page_title = '('+ progress + '%) ' + documentTitle;
+         if (progress != 100) {
+            time_estimation_string += ' &middot; about <strong>'+ import_time_remaining +' minute(s) left</strong>';
+            new_page_title = '('+ progress + '%) · ' + import_time_remaining + ' minute(s) left - ' + documentTitle;
+         }
+
+         // Insert data for display.
          $progress_meter.attr('data-completed-rows', rows_completed_job);
-         var progress_message = '<span title="'+ data.feedback +'">'+ progress + '% processed.</span>'
+         var progress_message = '<span title="'+ data.feedback +'">'+ progress + '% processed (' + rows_completed_job + ' rows) ' + time_estimation_string + '</span>';
          $progress_meter.html(progress_message);
+         document.title = new_page_title;
 
          // If there were errors in the processing, output them.
          if (data.bulk_error_dump) {
             var error_messages = $.parseJSON(data.bulk_error_dump);
-            bulk_importer_errors = bulk_importer_errors + error_messages.length;
-            $bulk_error_header.html('Errors (' + bulk_importer_errors + ')');
-            for (var i = 0, l = error_messages.length; i < l; i++) {
-               $bulk_error_dump.append(error_messages[i] +'\n');
+
+            if (error_messages && error_messages.length > 0) {
+               var previous_error_count = bulk_importer_errors;
+               bulk_importer_errors = parseInt(bulk_importer_errors + error_messages.length);
+
+               // Always show the number of errors.
+               $bulk_error_header.html('Errors (' + bulk_importer_errors + ')');
+
+               // If there were more than max_errors, stop outputting the specific
+               // errors, as there can be tens of thousands, so cap it, while
+               // continuing to show import progress. Need to check against
+               // previous error count so the latest dump of errors can be
+               // displayed, in the likely chance that this pushes the error
+               // count above the max, and suppresses entirely the latest dump.
+               if (previous_error_count <= max_errors) {
+                  for (var i = 0, l = error_messages.length; i < l; i++) {
+                     $bulk_error_dump.append(error_messages[i] +'\n');
+                  }
+               }
             }
          }
 
-         // Cancel import if received n number of errors.
+         // Let user know that after n number of errors, any future errors
+         // will be suppressed, but the error count will continue to keep track.
          if (bulk_importer_errors >= max_errors) {
-            cancel_import = true;
-            progress_fail_message = '<div>Import cancelled after <strong>'+ progress +'% progress</strong> because there have already been <strong>'+ max_errors + ' errors</strong>. Clean up the CSV file before trying again. Odds are the errors listed below are duplicated in the remaining data set.</div>';
+            $bulk_error_many_errors.html('The importer has reached its reporting cap of <strong>'+ max_errors + ' errors</strong>. The importer will continue to import users, and the error count will continue to record, but the display of any other error messages will be suppressed from this moment. This limit has been placed so that browsers do not become unstable if there happen to be a very large number of errors. Odds are the errors listed below are duplicated in the remaining data set, and are the likely cause of any further errors counted.');
          }
 
-         // If import_id is 0, then there was no role.
+         // If import_id is 0.
          if (rows_completed_job == 0) {
             cancel_import = true;
             progress_fail_message = data.error_message;
@@ -202,10 +309,13 @@ jQuery(document).ready(function($) {
    $('#process-csvs').on('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
-      // Disable button after click
+      // Disable button and checkbox after click
       $(this).addClass('disable-option');
+      $('#bulk-importer-checkbox-email').addClass('disable-option');
+      $('#bulk-radio-options').addClass('disable-option');
       cancel_import = false;
       incremental_job(e.target.href);
+      bulk_start_time = Math.ceil(+new Date / 1000);
    });
 
 });

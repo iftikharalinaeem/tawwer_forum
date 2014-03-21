@@ -437,21 +437,19 @@ directly on the iframe's bodybox contenteditable. */
 .editor-format-html .sep-switches,
 .editor-format-bbcode .sep-switches,
 .editor-format-markdown .sep-switches,
-
 .editor-format-markdown .sep-align,
 .editor-format-markdown .icon-align-left,
 .editor-format-markdown .icon-align-center,
 .editor-format-markdown .icon-align-right,
-
 .editor-format-html .editor-image-align,
 .editor-format-bbcode .editor-image-align,
 .editor-format-markdown .editor-image-align,
-
 .editor-format-bbcode .editor-action-h1,
 .editor-format-bbcode .editor-action-h2
-
 {
-   display: none;
+   /* Defined as important, because some themes have overriden with their own
+      !important values. */
+   display: none !important;
 }
 
 /**

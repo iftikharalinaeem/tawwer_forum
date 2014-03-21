@@ -14,25 +14,53 @@
    </div>
 
    <div class="Info">The format of a CSV file must be
-      <code>Email,Username,Status</code> per line, in that order. There must be exactly one comma
+      <code>Email,Username,Role</code> per line, in that order. There must be exactly one comma
       between each, no trailing comma, with a maximum of three values. Each
       grouping of three are on their own line. If the CSV file has a header
       line, check the option below to let the importer skip it. <strong>All
-      three parameters are required.</strong>
+      three parameters are required</strong>, unless indicated otherwise.
+   </div>
+
+   <div class="Info userin-options-list">
+      There are two options to import users into your community:
+      <ul>
+         <li>
+            Send an <strong>email invitation</strong> to all users. This allows them to follow
+            the provided URL and choose their own username and password. Of the
+            three parameters, <strong>username is optional for invitation mode</strong>.
+            An example row for this would look like:
+            <code>johndoes@example.com,,member:administrator</code>. Notice
+            the double comma, indicating that the username has been left out.
+            If a username is provided, it will be used to pre-populate the
+            username field in the registration form, but can be easily changed.
+         </li>
+         <li>
+            <strong>Directly insert</strong> users into the community. Users
+            who already exist in the community will have their information
+            updated, based on the username, while new users will be created
+            and emailed. <strong>All three parameters are required</strong>.
+         </li>
+      </ul>
    </div>
 
    <div class="Info">The second parameter, <code>Username</code>, must be at
       minimum <code><?php echo $username_limits['min']; ?></code> characters and at
-      most <code><?php echo $username_limits['max']; ?></code> characters.
+      most <code><?php echo $username_limits['max']; ?></code> characters. If a
+      duplicate username is found, the entire row of that
+      duplicated username will be purged from the import, as usernames are the
+      controlling value and must be unique. This means that only the first
+      instance of a row with that given username will be imported. <strong>If
+      invitation mode is selected, the constraints just described do
+      not apply, as username is optional in this mode</strong>.
    </div>
 
-   <div class="Info">The third parameter, <code>Status</code>, can have
+   <div class="Info">The third parameter, <code>Role</code>, can have
       multiple items. These items must be separated by a colon <code>:</code>.
-      Statuses with spaces in them can be wrapped with single or double
-      quotation marks, but this is optional; spaces in statuses work just fine
-      without being wrapped in quotation marks. Statuses are not
+      Roles with spaces in them can be wrapped with single or double
+      quotation marks, but this is optional; spaces in roles work just fine
+      without being wrapped in quotation marks. Roles are not
       case-sensitive, so "member" and "Member" are identical. Valid
-      statuses are: <em class="valid-statuses"><?php echo implode(', ', $this->Data('allowed_roles')); ?></em>.
+      roles are: <em class="valid-statuses"><?php echo implode(', ', $this->Data('allowed_roles')); ?></em>.
    </div>
 
    <div class="Info">
@@ -44,20 +72,25 @@
    <h3>Example contents of CSV file:</h3>
 
    <div class="Info">
-      This example contains eight lines. The first line has headers. Headers
+      This example contains nine lines. The first line has headers. Headers
       do not need to be present. If they are, check the option below so the
       importer can skip that line. The importer will fail if the syntax of the
-      CSV file does not match the syntax in the example.
+      CSV file does not match the syntax in the example. The last line shows
+      the optional syntax for a row if sending out invites,
+      with the username excluded; in invite mode, the usernames in the
+      previous rows will be used to pre-populate the registration form users
+      will be linked to from the invitation email.
 
    <pre>
-   Email,Username,Status
+   Email,Username,Role
    john@example.com,johnny,Member
    paul@example2.com,paul,Member:Moderator
    kenny@example3.com,ken,Member:Banned
    tywin@example4.com,lanman,Member:Administrator:Moderator:"World's Best"
    rust@example5.com,carcosaguy,Member:World's Best:Moderator:Nice Ones
    foo+bar@example6.com,foo,World's Best:Member
-   bar@example7.com,bar,"Nice Ones":Member</pre>
+   bar@example7.com,bar,"Nice Ones":Member
+   johndoes@example.com,,member:administrator</pre>
    </div>
 
 
@@ -77,7 +110,6 @@
 
    <ul id="bulk-importer-list">
       <li id="bulk-importer-validation-feedback">
-         yoooo
       </li>
       <li id="bulk-importer-file-download">
          <?php
@@ -95,7 +127,7 @@
 
       <li>
          <?php
-            echo $this->Form->CheckBox('has_headers', "Check this option if the CSV file's first line contains headers.");
+            echo $this->Form->CheckBox('has_headers', "First line has headers.", array('class' => 'bulk-note'));
          ?>
       </li>
    </ul>

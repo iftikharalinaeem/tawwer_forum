@@ -5,13 +5,13 @@
 
    if ($format != 'text' && $format != 'textex') {
 
-      $css_upload_class = ($this->Data('canUpload'))
+      $css_upload_class = ($this->Data('_canUpload'))
          ? 'editor-uploads'
          : 'editor-uploads-disabled';
 
       $html_toolbar    = '<div class="editor editor-format-'. $format .' '. $css_upload_class .'">';
       $html_arrow_down = '<span class="icon icon-caret-down"></span>';
-      $editor_file_input_name = $this->Data('editorFileInputName');
+      $editor_file_input_name = $this->Data('_editorFileInputName');
 
       foreach($this->Data('_EditorToolbar') as $button) {
 

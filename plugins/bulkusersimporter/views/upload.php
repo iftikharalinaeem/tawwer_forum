@@ -11,6 +11,35 @@
 
    $total_rows = 0;
 
+   // Default expiry date for invitations
+   $default_invite_expiration = C('Garden.Registration.InviteExpiration', '1 week');
+
+   // Available invites
+   $bulk_invite_notice = 'Invites available: ';
+   $available_invites = $this->Data('_available_invites');
+
+   if ($available_invites == -1) {
+      $bulk_invite_notice .= '<strong>unlimited</strong>.';
+      $enough_invites = true;
+   } else {
+      $bulk_invite_notice .= '<strong>' . $available_invites . '</strong>.';
+   }
+
+   // Get total records
+   $total_records = 0;
+   foreach ($results['success'] as $file => $records) {
+      $total_records += $records;
+   }
+   
+   // If total records are less than available invites, let them know.
+   if ($available_invites != -1
+   && $total_records > $available_invites) {
+      $enough_invites = false;
+      $bulk_invite_notice .= " You do not have enough invites to send to every user in the import. It is not recommended you choose the invitation import mode. If you are an administrator, you can set the invitation limit yourself.";
+   } else {
+      $enough_invites = true;
+   }
+
 ?>
 
 <div id="bulk-importer">
@@ -82,8 +111,26 @@
          created users will receive an email with instructions on signing in.
       </div>
 
-      <div class="FilterMenu">
-         <p class="P"><label for="bulk_importer_debug" title="Regardless of this setting, users who already exist do not receive an email, as they're just getting updated."><input type="checkbox" id="bulk_importer_debug" /> Do not send an email to newly created users.</label></p>
+      <div class="Info bulk-invite-notice">
+         <?php echo $bulk_invite_notice; ?>
+      </div>
+
+      <div class="Info">
+
+         <p class="P">
+            What do you want to do if a user does not exist?
+            <ul id="bulk-radio-options">
+               <li><label><input type="radio" name="userin" id="bulk-invite" value="invite" <?php if ($enough_invites): echo 'checked="checked"'; endif; ?> /> Invite new users <span class="bulk-note">(new users will be emailed with a link to register their username and other account information)</span></label></li>
+               <li id="bulk-expires" class="shlide" title="Regular English like 'tomorrow', '5 days', 'next week', '2 weeks', or a date like YYYY/MM/DD"><label>Expires: <input type="text" name="expires" value="<?php echo $default_invite_expiration; ?>" placeholder="Examples: tomorrow, 5 days, next week, 2 weeks, YYYY/MM/DD" /></label> <span class="bulk-note">If no expiry specified, the invite will expire in <?php echo $default_invite_expiration; ?>.</span></li>
+               <li><label><input type="radio" name="userin" id="bulk-insert" value="insert" <?php if (!$enough_invites): echo 'checked="checked"'; endif; ?> /> Insert new users <span class="bulk-note">(new user accounts will be created immediately; an email will be sent out to those users with instructions on logging in)</span></label></li>
+            </ul>
+         </p>
+
+         <p class="P">
+            <label id="bulk-importer-checkbox-email" for="bulk_importer_debug" title="Regardless of this setting, users who already exist do not receive an email, as they're just getting updated.">
+               <input type="checkbox" id="bulk_importer_debug" /> Do not send an email to newly created users <span class="bulk-note">(this is mostly for debugging purposes)</span>
+            </label>
+         </p>
 
          <a id="process-csvs" class="SmallButton" href="<?php echo Url('/settings/bulkusersimporter/process'); ?>">Begin processing</a>
          <span id="import-progress-container">
@@ -94,6 +141,7 @@
 
       <div class="Info">
          <strong id="bulk-error-header"></strong>
+         <span id="bulk-error-many-errors"></span>
          <pre id="bulk-error-dump"></pre>
       </div>
 

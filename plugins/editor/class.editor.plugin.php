@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.14',
+   'Version' => '1.3.22',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -272,7 +272,7 @@ class EditorPlugin extends Gdn_Plugin {
 
       $editorToolbarAll['sep-media'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-media hidden-xs'));
       $editorToolbarAll['emoji'] = array('edit' => 'media', 'action'=> 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => T('Emoji'), 'data-editor' => '{"action":"emoji","value":""}'));
-      $editorToolbarAll['links'] = array('edit' => 'media', 'action'=> 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link', 'data-wysihtml5-command' => 'createLink', 'title' => T('Url'), 'data-editor' => '{"action":"url","value":""}'));
+      $editorToolbarAll['links'] = array('edit' => 'media', 'action'=> 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link hidden-xs', 'data-wysihtml5-command' => 'createLink', 'title' => T('Url'), 'data-editor' => '{"action":"url","value":""}'));
       $editorToolbarAll['images'] = array('edit' => 'media', 'action'=> 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => T('Image'), 'data-editor' => '{"action":"image","value":""}'));
 
       $editorToolbarAll['uploads'] = array('edit' => 'media', 'action'=> 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-file editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => T('Attach image/file'), 'data-editor' => '{"action":"upload","value":""}'));
@@ -284,7 +284,7 @@ class EditorPlugin extends Gdn_Plugin {
 
       $editorToolbarAll['sep-switches'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-switches hidden-xs'));
       $editorToolbarAll['togglehtml'] = array('edit' => 'switches', 'action'=> 'togglehtml', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-source editor-toggle-source editor-dialog-fire-close hidden-xs', 'data-wysihtml5-action' => 'change_view', 'title' => T('Toggle HTML view'), 'data-editor' => '{"action":"togglehtml","value":""}'));
-      $editorToolbarAll['fullpage'] = array('edit' => 'switches', 'action'=> 'fullpage', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button editor-dialog-fire-close', 'title' => T('Toggle full page'), 'data-editor' => '{"action":"fullpage","value":""}'));
+      $editorToolbarAll['fullpage'] = array('edit' => 'switches', 'action'=> 'fullpage', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button editor-dialog-fire-close hidden-xs', 'title' => T('Toggle full page'), 'data-editor' => '{"action":"fullpage","value":""}'));
       $editorToolbarAll['lights'] = array('edit' => 'switches', 'action'=> 'lights', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-adjust editor-toggle-lights-button editor-dialog-fire-close hidden-xs', 'title' => T('Toggle lights'), 'data-editor' => '{"action":"lights","value":""}'));
 
       // Filter out disallowed editor actions
@@ -353,7 +353,7 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddJsFile('editor.js', 'plugins/editor');
 
       // Fileuploads
-      //$c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
+      $c->AddJsFile('jquery.ui.widget.js', 'plugins/editor');
       $c->AddJsFile('jquery.iframe-transport.js', 'plugins/editor');
       $c->AddJsFile('jquery.fileupload.js', 'plugins/editor');
 
@@ -376,13 +376,13 @@ class EditorPlugin extends Gdn_Plugin {
       $c->AddDefinition('maxUploadSize', $MaxSize);
       // Set file input name
       $c->AddDefinition('editorFileInputName', $this->editorFileInputName);
-      $Sender->SetData('editorFileInputName', $this->editorFileInputName);
+      $Sender->SetData('_editorFileInputName', $this->editorFileInputName);
       // Save allowed file types
       $c->AddDefinition('allowedFileExtensions', json_encode(C('Garden.Upload.AllowedFileExtensions')));
       // Get max file uploads, to be used for max drops at once.
       $c->AddDefinition('maxFileUploads', ini_get('max_file_uploads'));
       $c->AddDefinition('canUpload', $this->canUpload);
-      $c->SetData('canUpload', $this->canUpload);
+      $c->SetData('_canUpload', $this->canUpload);
    }
 
    /**
@@ -482,7 +482,7 @@ class EditorPlugin extends Gdn_Plugin {
 
       if ($tmpFilePath && $canUpload) {
 
-         $fileExtension = $Upload->GetUploadedFileExtension();
+         $fileExtension = strtolower($Upload->GetUploadedFileExtension());
          $fileName = $Upload->GetUploadedFileName();
          list($tmpwidth, $tmpheight) = getimagesize($tmpFilePath);
 
@@ -508,7 +508,6 @@ class EditorPlugin extends Gdn_Plugin {
          $thumbWidth = '';
          $imageHeight = '';
          $imageWidth = '';
-         $thumbDestinationPath = '';
          $thumbPathParsed = array('SaveName' => '');
          $thumbUrl = '';
 
@@ -736,8 +735,8 @@ class EditorPlugin extends Gdn_Plugin {
                   'ForeignTable' => $Type)
               )->ResultArray();
 
-      $Controller->SetData('attachments', $attachments);
-      $Controller->SetData('editorkey', strtolower($param.$foreignId));
+      $Controller->SetData('_attachments', $attachments);
+      $Controller->SetData('_editorkey', strtolower($param.$foreignId));
 
       echo $Controller->FetchView($this->GetView('attachments.php'));
    }
@@ -812,6 +811,7 @@ class EditorPlugin extends Gdn_Plugin {
       $dirlen = 2;
       $subdir = substr($fileRandomString, 0, $dirlen);
       $filename = substr($fileRandomString, $dirlen);
+      $fileExtension = strtolower($fileExtension);
       $fileDirPath = $basePath . '/' . $subdir;
 
       if ($this->validateUploadDestinationPath($fileDirPath)) {
@@ -906,7 +906,7 @@ class EditorPlugin extends Gdn_Plugin {
 
   public function Structure() {
       // Set to false by default, so change in config if uploads allowed.
-      TouchConfig('Garden.AllowFileUploads', false);
+      TouchConfig('Garden.AllowFileUploads', true);
   }
 
    public function OnDisable() {
