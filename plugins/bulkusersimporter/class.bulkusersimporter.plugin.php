@@ -1,9 +1,9 @@
 <?php if(!defined('APPLICATION')) die();
 
 $PluginInfo['bulkusersimporter'] = array(
-   'Name' => 'Bulk Users Importer',
-   'Description' => 'Bulk users import with standardized CSV files.',
-   'Version' => '1.0.19',
+   'Name' => 'Bulk User Import',
+   'Description' => 'Bulk user import with standardized CSV files. Send invites or directly insert new members.',
+   'Version' => '1.0.25',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -29,6 +29,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
    private $database_prefix;
    private $table_name = 'BulkUsersImporter';
+   private $plugin_title = 'Bulk User Import';
 
    // Will contain whitelist of allowed roles.
    private $allowed_roles = array();
@@ -74,7 +75,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          ->Table($this->table_name)
          ->PrimaryKey('ImportID')
          ->Column('Email', 'varchar(200)', true, 'index')
-         ->Column('Username', 'varchar(50)', true, 'unique')
+         ->Column('Username', 'varchar(50)', true, 'index')
          ->Column('Status', 'varchar(50)', true)
          ->Column('Completed', 'tinyint(1)', 0, 'index')
          ->Column('Error', 'text', true)
@@ -94,7 +95,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $sender->AddJsFile('bulkusersimporter.js', 'plugins/bulkusersimporter');
 
       // Render components pertinent to all views.
-      $sender->SetData('Title', T('Bulk Users Importer'));
+      $sender->SetData('Title', T($this->plugin_title));
       $sender->AddSideMenu();
 
       // Render specific component views.
@@ -103,6 +104,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             // Handle upload and quickly parse file into DB.
             $results = $this->handleUploadInsert($sender);
             $sender->SetData('results', $results);
+            $sender->SetData('_available_invites', $this->calculateAvailableInvites());
             $sender->Render('upload', '', 'plugins/bulkusersimporter');
             break;
 
@@ -127,7 +129,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$sender) {
       $menu = $sender->EventArguments['SideMenu'];
       $menu->AddItem('Import', T('Import'));
-      $menu->AddLink('Import', T('Bulk Users Importer'), '/settings/bulkusersimporter', 'Garden.Settings.Manage');
+      $menu->AddLink('Import', T($this->plugin_title), '/settings/bulkusersimporter', 'Garden.Settings.Manage');
    }
 
    /**
@@ -210,7 +212,11 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          $pdo = $db->Connection();
 
-         // Truncate table before using it. In future, add .
+         // Truncate table before using it.
+         // TODO: In future, delete rows based on
+         // current user performing import, as there could be multiple users
+         // importing data simultaneously, which will cause the latest user
+         // import to whipe out the previous one that is still active.
          $db->Query("TRUNCATE TABLE $db_table;");
 
          foreach ($files as $file) {
@@ -257,6 +263,18 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       }
 
       return $results;
+   }
+
+   public function calculateAvailableInvites() {
+      $available_invites = 0;
+      $user_id = Gdn::Session()->UserID;
+
+      if ($user_id) {
+         $user_model = new UserModel();
+         $available_invites = $user_model->GetInvitationCount($user_id);
+      }
+
+      return $available_invites;
    }
 
    /**
@@ -314,6 +332,10 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $user_model = new UserModel();
       $invitation_model = new InvitationModel();
 
+      // Grab default roles just in case a blank provided. Not providing any
+      // roles is not the same as providing an invalid role.
+      $default_role_ids = C('Garden.Registration.DefaultRoles');
+
       // For byte-size processing
       $start_time = time();
       $processed = 0;
@@ -325,6 +347,11 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          $invite_success = false; // For invitation model
          $user['Username'] = trim($user['Username']);
          $user['Email'] = trim($user['Email']);
+
+         // Make sure these are reset on every iteration.
+         $status = array();
+         $role_ids = array();
+         $banned = 0;
 
          // Grab first import id in job.
          if (!isset($first_import_id)) {
@@ -376,15 +403,31 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          } else {
             // No roles or invalid roles provided.
 
-            $status_list = 'no status provided';
+            $show_role_error = true;
+            $status_list = 'no role provided';
             if (count($status['invalid_roles'])) {
                $status_list = implode(', ', $status['invalid_roles']);
             } else {
                $status['invalid_roles'] = array();
+               $show_role_error = false;
             }
-            $plural_status = PluralTranslate(count($status['invalid_roles']), 'status', 'statuses');
 
-            $error_messages[$processed]['role'] = "Invalid $plural_status: " . $status_list . '.';
+            // If invalid roles provided alongside valid roles, clear the
+            // valid roles just to be safe.
+            if (count($status['role_ids'])) {
+               $role_ids = $status['role_ids'] = array();
+            }
+
+            // If there are no invalid roles, that means no roles were provided
+            // at all. Assign the defaults.
+            if (!$show_role_error
+            && is_array($default_role_ids)
+            && count($default_role_ids)) {
+               $role_ids = $status['role_ids'] = $default_role_ids;
+            } else {
+               $plural_status = PluralTranslate(count($status['invalid_roles']), 'role', 'roles');
+               $error_messages[$processed]['role'] = "Invalid $plural_status: " . $status_list . '.';
+            }
          }
 
          // Depending on value of $userin_mode, either insert the user directly
@@ -404,7 +447,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                // for the next n rows, directly after the email use error.
                // This happened on a Save. Not sure why those values would be
                // required on a Save. That information is already in the row.
-               if (!isset($error_messages[$processed]['username'])) {
+               if (!isset($error_messages[$processed]['username'])
+               && !isset($error_messages[$processed]['role'])) {
                   // Check if username in use.
                   $check_name = $user_model->GetWhere(array(
                       'Name' => $user['Username']
@@ -503,7 +547,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                }
 
                // If there is a valid email, continue processing.
-               if (!isset($error_messages[$processed]['email'])) {
+               if (!isset($error_messages[$processed]['email'])
+               && !isset($error_messages[$processed]['role'])) {
 
                   // Determine if in can send email.
                   $send_invite_email = ($debug_mode == 0)
@@ -524,7 +569,9 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
                   // No point saving banned users to invitation table.
                   if (!$banned) {
-                     $invite_success = $invitation_model->Save($form_post_values, $user_model, $send_invite_email);
+                     $invite_success = $invitation_model->Save($form_post_values, $user_model, array(
+                         'SendEmail' => $send_invite_email
+                     ));
                   }
                }
 
@@ -552,7 +599,9 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          // Error message to get logged in DB, if any.
          $error_string = '';
-         if (isset($error_messages[$processed])) {
+         if (isset($error_messages[$processed])
+         && is_array($error_messages[$processed])
+         && count($error_messages[$processed])) {
             $error_string = '[Line ' . $user['ImportID'] . '] - ';
             foreach ($error_messages[$processed] as $error_message) {
                // Some of the error messages from ResultsText contain short

@@ -10,11 +10,11 @@
    </h1>
 
    <div class="Info">
-      Use this importer to bulk import CSV files.
+      Use this tool to bulk import users from standardized CSV files.
    </div>
 
    <div class="Info">The format of a CSV file must be
-      <code>Email,Username,Status</code> per line, in that order. There must be exactly one comma
+      <code>Email,Username,Role</code> per line, in that order. There must be exactly one comma
       between each, no trailing comma, with a maximum of three values. Each
       grouping of three are on their own line. If the CSV file has a header
       line, check the option below to let the importer skip it. <strong>All
@@ -54,13 +54,13 @@
       not apply, as username is optional in this mode</strong>.
    </div>
 
-   <div class="Info">The third parameter, <code>Status</code>, can have
+   <div class="Info">The third parameter, <code>Role</code>, can have
       multiple items. These items must be separated by a colon <code>:</code>.
-      Statuses with spaces in them can be wrapped with single or double
-      quotation marks, but this is optional; spaces in statuses work just fine
-      without being wrapped in quotation marks. Statuses are not
+      Roles with spaces in them can be wrapped with single or double
+      quotation marks, but this is optional; spaces in roles work just fine
+      without being wrapped in quotation marks. Roles are not
       case-sensitive, so "member" and "Member" are identical. Valid
-      statuses are: <em class="valid-statuses"><?php echo implode(', ', $this->Data('allowed_roles')); ?></em>.
+      roles are: <em class="valid-statuses"><?php echo implode(', ', $this->Data('allowed_roles')); ?></em>.
    </div>
 
    <div class="Info">
@@ -82,7 +82,7 @@
       will be linked to from the invitation email.
 
    <pre>
-   Email,Username,Status
+   Email,Username,Role
    john@example.com,johnny,Member
    paul@example2.com,paul,Member:Moderator
    kenny@example3.com,ken,Member:Banned

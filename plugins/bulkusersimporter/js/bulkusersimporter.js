@@ -248,21 +248,24 @@ jQuery(document).ready(function($) {
          // If there were errors in the processing, output them.
          if (data.bulk_error_dump) {
             var error_messages = $.parseJSON(data.bulk_error_dump);
-            var previous_error_count = bulk_importer_errors;
-            bulk_importer_errors = parseInt(bulk_importer_errors + error_messages.length);
 
-            // Always show the number of errors.
-            $bulk_error_header.html('Errors (' + bulk_importer_errors + ')');
+            if (error_messages && error_messages.length > 0) {
+               var previous_error_count = bulk_importer_errors;
+               bulk_importer_errors = parseInt(bulk_importer_errors + error_messages.length);
 
-            // If there were more than max_errors, stop outputting the specific
-            // errors, as there can be tens of thousands, so cap it, while
-            // continuing to show import progress. Need to check against
-            // previous error count so the latest dump of errors can be
-            // displayed, in the likely chance that this pushes the error
-            // count above the max, and suppresses entirely the latest dump.
-            if (previous_error_count <= max_errors) {
-               for (var i = 0, l = error_messages.length; i < l; i++) {
-                  $bulk_error_dump.append(error_messages[i] +'\n');
+               // Always show the number of errors.
+               $bulk_error_header.html('Errors (' + bulk_importer_errors + ')');
+
+               // If there were more than max_errors, stop outputting the specific
+               // errors, as there can be tens of thousands, so cap it, while
+               // continuing to show import progress. Need to check against
+               // previous error count so the latest dump of errors can be
+               // displayed, in the likely chance that this pushes the error
+               // count above the max, and suppresses entirely the latest dump.
+               if (previous_error_count <= max_errors) {
+                  for (var i = 0, l = error_messages.length; i < l; i++) {
+                     $bulk_error_dump.append(error_messages[i] +'\n');
+                  }
                }
             }
          }
