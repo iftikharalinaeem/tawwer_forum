@@ -10,7 +10,7 @@
    </h1>
 
    <div class="Info">
-      Use this importer to bulk import CSV files.
+      Use this tool to bulk import users from standardized CSV files.
    </div>
 
    <div class="Info">The format of a CSV file must be
