@@ -31,3 +31,66 @@
   opacity: 1;
   bottom: 0;
 }
+
+.stockavatar-wrap h1 {
+  display: block !important;
+  margin-left: 10px;
+}
+
+#stockavatar-picker {
+  overflow: hidden;
+  padding: 3px;
+}
+#stockavatar-picker .avatar-option {
+  display: block;
+  float: left;
+  padding: 2px;
+}
+#stockavatar-picker .avatar-option label {
+  display: block;
+  margin: 0;
+  padding: 2px;
+  cursor: pointer;
+  opacity: 0.40;
+  transform: scale(0.9);
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+#stockavatar-picker .avatar-option label:hover, #stockavatar-picker .avatar-option label.current-stock-avatar {
+  opacity: 1;
+  transform: scale(1);
+  box-shadow: 0 0 5px 0 #aaa;
+}
+#stockavatar-picker .avatar-option img {
+  display: block;
+  height: 100px;
+}
+#stockavatar-picker .avatar-option .avatar-caption {
+  opacity: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 0 4px;
+  position: absolute;
+  color: #fff;
+  bottom: -25px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  transition: all 0.2s ease;
+  font-size: 10px;
+  font-weight: normal;
+  margin: 2px;
+}
+#stockavatar-picker .avatar-option .avatar-caption:empty {
+  display: none;
+}
+#stockavatar-picker .avatar-option:hover .avatar-caption {
+  opacity: 1;
+  bottom: 0;
+}
+#stockavatar-picker .avatar-option input {
+  position: fixed;
+  left: 0;
+  pointer-events: none;
+  opacity: 0;
+  visbility: hidden;
+}
