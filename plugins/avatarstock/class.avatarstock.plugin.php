@@ -333,6 +333,11 @@ class AvatarStockPlugin extends Gdn_Plugin {
       $user_stockavatar_id = false; // none
 
       $current_user_id = $UserID;
+      // What is a better way to get the PAGE user id?
+      if (!$current_user_id) {
+         $current_user_id = $session->UserID;
+      }
+
       if (ValidateInteger($current_user_id)) {
          $current_user_data = $user_model->GetWhere(array(
             'UserID' => $current_user_id
