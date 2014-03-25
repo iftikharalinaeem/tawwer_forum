@@ -3,7 +3,7 @@
 $PluginInfo['avatarstock'] = array(
    'Name' => 'Avatars',
    'Description' => 'Create a limited stock of default avatars that members can choose between.',
-   'Version' => '1.0.0',
+   'Version' => '1.0.1',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -39,10 +39,9 @@ class AvatarStockPlugin extends Gdn_Plugin {
          ->Table($this->table_name)
          ->PrimaryKey('AvatarID')
          ->Column('OriginalFileName', 'varchar(255)', true)
-         ->Column('Caption', 'varchar(50)', true)
          ->Column('Path', 'varchar(255)', false, 'index')
          ->Column('SaveFormat', 'varchar(24)', true)
-         ->Column('InsertUserID', 'int', true, 'index')
+         ->Column('InsertUserID', 'int', true)
          ->Column('TimestampAdded', 'int(10)', true)
          ->Column('Deleted', 'tinyint(1)', 1, 'index')
          ->Set();
@@ -79,7 +78,12 @@ class AvatarStockPlugin extends Gdn_Plugin {
             break;
 
          case in_array('modify', $args):
-               $this->deleteSelectedAvatars($sender);
+               $results = $this->deleteSelectedAvatars($sender);
+               if ($results) {
+                  Redirect(Url('/settings/avatarstock'));
+               } else {
+                  $sender->Render('upload', '', 'plugins/avatarstock');
+               }
             break;
 
          default:
@@ -101,10 +105,25 @@ class AvatarStockPlugin extends Gdn_Plugin {
    }
 
    public function deleteSelectedAvatars($sender) {
+      $sender->Permission('Garden.Settings.Manage');
+
+      if (!$sender->Request->IsAuthenticatedPostBack()) {
+         throw ForbiddenException('GET');
+      }
+
       $post = Gdn::Request()->Post();
+      $avatar_ids = $post['avatar_delete'];
 
-      decho($post);
+      $avatarstock_model = new Gdn_Model('AvatarStock');
 
+      $update_delete = $avatarstock_model->Update(array(
+          'Deleted' => 1
+      ), array(
+          'AvatarID' => $avatar_ids,
+          'Deleted' => 0
+      ))->ResultArray();
+
+      return $update_delete;
    }
 
    /**

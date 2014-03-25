@@ -35,7 +35,7 @@
 
             <div class="avatar-wrap">
                <img src="<?php echo $avatar['_path_crop']; ?>" alt="" <?php echo $style_dimensions; ?> />
-               <?php echo $this->Form->Input('avatar_delete', 'checkbox', array('class'=>'avatar-delete-input', 'value'=>$avatar['AvatarID'])); ?>
+               <?php echo $this->Form->Input('avatar_delete[]', 'checkbox', array('class'=>'avatar-delete-input', 'value'=>$avatar['AvatarID'])); ?>
             </div>
 
          <?php endforeach; ?>
