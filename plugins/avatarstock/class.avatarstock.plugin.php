@@ -240,8 +240,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
     * @param type $sender
     * @throws type
     */
-   public function ProfileController_Picture_Create($sender, $args) {
-
+   public function ProfileController_Picture_Create($sender, $UserReference = '', $Username = '', $UserID = '') {
       if (!C('Garden.Profile.EditPhotos', true)) {
          throw ForbiddenException('@Editing user photos has been disabled.');
       }
@@ -252,6 +251,8 @@ class AvatarStockPlugin extends Gdn_Plugin {
       if (!$session->IsValid()) {
          $sender->Form->AddError('You must be authenticated in order to use this form.');
       }
+
+      $sender->GetUserInfo($UserReference, $Username, $UserID, TRUE);
 
       $user_model = new UserModel();
       $avatarstock_model = new Gdn_Model('AvatarStock');
@@ -311,11 +312,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
       // Current avatar URL
       $user_stockavatar_id = false; // none
 
-      // Don't like this at all. Bad.
-      $current_user_id = (isset($args[0]))
-         ? $args[0]
-         : $get['userid'];
-
+      $current_user_id = $UserID;
       if (ValidateInteger($current_user_id)) {
          $current_user_data = $user_model->GetWhere(array(
             'UserID' => $current_user_id
@@ -345,14 +342,13 @@ class AvatarStockPlugin extends Gdn_Plugin {
       $sender->Title(T('Choose Avatar'));
       $sender->_SetBreadcrumbs(T('Choose Avatar'), UserUrl($sender->User, '', 'picture'));
 
-      //$this->AddSideMenu('', $sender);
       $sender->Render('picture', '', 'plugins/avatarstock');
    }
 
 
 
-   public function AddSideMenu($CurrentUrl = '', $sender) {
-/*
+/*   public function AddSideMenu($CurrentUrl = '', $sender) {
+
       $session = Gdn::Session();
 
       if (!$session->User)
@@ -380,8 +376,6 @@ class AvatarStockPlugin extends Gdn_Plugin {
          $c->FireEvent('AfterAddSideMenu');
          $c->AddModule('ProfileFilterModule');
       }
- *
- */
-   }
+   }*/
 
 }
