@@ -8,16 +8,22 @@
    $total_fail = count($results['fail']);
    $total_files = $total_success + $total_fail;
    $great_success = ($total_files == $total_success);
-
    $total_rows = 0;
+
+   // Get total records (for all files).
+   $total_records = 0;
+   foreach ($results['success'] as $file => $records) {
+      $total_records += $records;
+   }
 
    // Default expiry date for invitations
    $default_invite_expiration = C('Garden.Registration.InviteExpiration', '1 week');
 
    // Available invites
-   $bulk_invite_notice = 'Invites available: ';
    $available_invites = $this->Data('_available_invites');
 
+   // Generate proper notice.
+   $bulk_invite_notice = 'Invites available: ';
    if ($available_invites == -1) {
       $bulk_invite_notice .= '<strong>unlimited</strong>.';
       $enough_invites = true;
@@ -25,12 +31,6 @@
       $bulk_invite_notice .= '<strong>' . $available_invites . '</strong>.';
    }
 
-   // Get total records
-   $total_records = 0;
-   foreach ($results['success'] as $file => $records) {
-      $total_records += $records;
-   }
-   
    // If total records are less than available invites, let them know.
    if ($available_invites != -1
    && $total_records > $available_invites) {

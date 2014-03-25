@@ -36,6 +36,101 @@
             opacity: 1;
             bottom: 0;
          }
+
+         input {
+            position: absolute;
+            top: 0;
+            left: 0;
+         }
+      }
+   }
+
+   .Buttons {
+      clear: both;
+
+      input {
+         margin: 5px;
+      }
+   }
+
+   /* Deleting avatars has not been implemented yet, so hide the UI */
+   .Buttons,
+   input {
+      display: none;
+   }
+}
+
+
+.stockavatar-wrap {
+   h1 {
+      display: block !important;
+      margin-left: 10px;
+   }
+}
+
+#stockavatar-picker {
+   overflow: hidden;
+   padding: 3px;
+
+   .avatar-option {
+      display: block;
+      float: left;
+      padding: 2px;
+
+      label {
+         display: block;
+         margin: 0;
+         padding: 2px;
+         cursor: pointer;
+         opacity: 0.40;
+         transform: scale(0.90);
+         transition: all 0.2s ease;
+         overflow: hidden;
+
+         &:hover,
+         &.current-stock-avatar {
+            opacity: 1;
+            transform: scale(1);
+            box-shadow: 0 0 5px 0 #aaa;
+         }
+      }
+
+      img {
+         display: block;
+         height: 100px;
+      }
+
+      .avatar-caption {
+         opacity: 0;
+         background-color: rgba(0,0,0,0.40);
+         padding: 0 4px;
+         position: absolute;
+         color: #fff;
+         bottom: -25px;
+         left: 0;
+         right: 0;
+         z-index: 10;
+         transition: all 0.2s ease;
+         font-size: 10px;
+         font-weight: normal;
+         margin: 2px;
+      }
+
+      .avatar-caption:empty {
+         display: none;
+      }
+
+      &:hover .avatar-caption {
+         opacity: 1;
+         bottom: 0;
+      }
+
+      input {
+         position: fixed;
+         left: 0;
+         pointer-events: none;
+         opacity: 0;
+         visbility: hidden;
       }
    }
 
