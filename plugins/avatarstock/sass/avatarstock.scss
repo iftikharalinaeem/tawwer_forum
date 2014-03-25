@@ -9,32 +9,11 @@
          float: left;
          position: relative;
          overflow: hidden;
+         display: block;
 
          img {
             display: block;
-            height: 150px;
-         }
-
-         .avatar-caption {
-            opacity: 0;
-            background-color: rgba(0,0,0,0.40);
-            padding: 5px;
-            position: absolute;
-            color: #fff;
-            bottom: -50px;
-            left: 0;
-            right: 0;
-            z-index: 10;
-            transition: all 0.4s ease;
-         }
-
-         .avatar-caption:empty {
-            display: none;
-         }
-
-         &:hover .avatar-caption {
-            opacity: 1;
-            bottom: 0;
+            height: auto;
          }
 
          input {
@@ -43,20 +22,31 @@
             left: 0;
          }
       }
-   }
 
-   .Buttons {
-      clear: both;
+      // Upload input
+      .upload-new-avatar {
+         display: block;
+         width: 40px;
+         height: 40px;
+         border: 1px dashed #aaa;
+         cursor: pointer;
+         box-sizing: border-box;
 
-      input {
-         margin: 5px;
+         input {
+            cursor: pointer;
+            opacity: 0;
+         }
       }
    }
 
-   /* Deleting avatars has not been implemented yet, so hide the UI */
-   .Buttons,
-   input {
+   .delete-selected-avatars {
+      clear: both;
+      margin: 5px;
       display: none;
+
+      &.show-delete-button {
+         display: block !important;
+      }
    }
 }
 
@@ -93,41 +83,21 @@
             transform: scale(1);
             box-shadow: 0 0 5px 0 #aaa;
          }
+
+         &.current-stock-avatar {
+            pointer-events: none;
+         }
       }
 
       img {
          display: block;
-         height: 100px;
-      }
-
-      .avatar-caption {
-         opacity: 0;
-         background-color: rgba(0,0,0,0.40);
-         padding: 0 4px;
-         position: absolute;
-         color: #fff;
-         bottom: -25px;
-         left: 0;
-         right: 0;
-         z-index: 10;
-         transition: all 0.2s ease;
-         font-size: 10px;
-         font-weight: normal;
-         margin: 2px;
-      }
-
-      .avatar-caption:empty {
-         display: none;
-      }
-
-      &:hover .avatar-caption {
-         opacity: 1;
-         bottom: 0;
+         height: auto;
       }
 
       input {
          position: fixed;
          left: 0;
+         top: 0;
          pointer-events: none;
          opacity: 0;
          visbility: hidden;

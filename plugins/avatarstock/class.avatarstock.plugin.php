@@ -1,7 +1,7 @@
 <?php if(!defined('APPLICATION')) die();
 
 $PluginInfo['avatarstock'] = array(
-   'Name' => 'Avatar Stock',
+   'Name' => 'Avatars',
    'Description' => 'Create a limited stock of default avatars that members can choose between.',
    'Version' => '1.0.0',
    'Author' => 'Dane MacMillan',
@@ -61,7 +61,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
       $sender->AddJsFile('avatarstock.js', 'plugins/avatarstock');
 
       // Render components pertinent to all views.
-      $sender->SetData('Title', T('Avatar Stock'));
+      $sender->SetData('Title', T('Avatars'));
       $sender->AddSideMenu();
 
       // Render specific component views.
@@ -97,12 +97,14 @@ class AvatarStockPlugin extends Gdn_Plugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$sender) {
       $menu = $sender->EventArguments['SideMenu'];
       $menu->AddItem('Users', T('Users'));
-      $menu->AddLink('Users', T('Avatar Stock'), '/settings/avatarstock', 'Garden.Settings.Manage');
+      $menu->AddLink('Users', T('Avatars'), '/settings/avatarstock', 'Garden.Settings.Manage');
    }
 
    public function deleteSelectedAvatars($sender) {
-      echo 'This has not been implemented yet.';
-      exit;
+      $post = Gdn::Request()->Post();
+
+      decho($post);
+
    }
 
    /**
@@ -256,7 +258,6 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
       $user_model = new UserModel();
       $avatarstock_model = new Gdn_Model('AvatarStock');
-      $get = Gdn::Request()->Get();
 
       $sender->Form->SetModel('User');
       $sender->Form->AddHidden('UserID', $session->User->UserID);
@@ -278,7 +279,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
                $sender->Form->AddError('Invalid Avatar ID.');
             }
 
-            if (!ValidateInteger($user_id) && $user_id != $session->User->UserID) {
+            if (!ValidateInteger($user_id) && $user_id != $sender->User->UserID) {
                $sender->Form->AddError('You cannot modify this users avatar.');
             }
 
@@ -293,7 +294,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
                if (!$user_model->Save(array('UserID' => $user_id, 'Photo' => $user_photo), array('CheckExisting' => true))) {
                   $sender->Form->SetValidationResults($user_model->ValidationResults());
                } else {
-                  $session->User->Photo = $user_photo;
+                  $sender->User->Photo = $user_photo;
                }
             }
          }
@@ -344,38 +345,5 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
       $sender->Render('picture', '', 'plugins/avatarstock');
    }
-
-
-
-/*   public function AddSideMenu($CurrentUrl = '', $sender) {
-
-      $session = Gdn::Session();
-
-      if (!$session->User)
-         return;
-
-      $c = new Gdn_Controller();
-
-      // Make sure to add the "Edit Profile" buttons.
-      $c->AddModule('ProfileOptionsModule');
-
-      // Show edit menu if in edit mode
-      // Show profile pic & filter menu otherwise
-      $SideMenu = new SideMenuModule($c);
-      $sender->EventArguments['SideMenu'] = &$SideMenu; // Doing this out here for backwards compatibility.
-      if ($c->EditMode) {
-         $c->AddModule('UserBoxModule');
-         $c->BuildEditMenu($SideMenu, $CurrentUrl);
-         $c->FireEvent('AfterAddSideMenu');
-         $c->AddModule($SideMenu, 'Panel');
-      } else {
-         // Make sure the userphoto module gets added to the page
-         $c->AddModule('UserPhotoModule');
-
-         // And add the filter menu module
-         $c->FireEvent('AfterAddSideMenu');
-         $c->AddModule('ProfileFilterModule');
-      }
-   }*/
 
 }

@@ -1,6 +1,3 @@
-#avatarstock {
-  /* Deleting avatars has not been implemented yet, so hide the UI */
-}
 #avatarstock .display-avatars {
   overflow: hidden;
   padding: 5px;
@@ -10,44 +7,36 @@
   float: left;
   position: relative;
   overflow: hidden;
+  display: block;
 }
 #avatarstock .display-avatars .avatar-wrap img {
   display: block;
-  height: 150px;
-}
-#avatarstock .display-avatars .avatar-wrap .avatar-caption {
-  opacity: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  padding: 5px;
-  position: absolute;
-  color: #fff;
-  bottom: -50px;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  transition: all 0.4s ease;
-}
-#avatarstock .display-avatars .avatar-wrap .avatar-caption:empty {
-  display: none;
-}
-#avatarstock .display-avatars .avatar-wrap:hover .avatar-caption {
-  opacity: 1;
-  bottom: 0;
+  height: auto;
 }
 #avatarstock .display-avatars .avatar-wrap input {
   position: absolute;
   top: 0;
   left: 0;
 }
-#avatarstock .Buttons {
+#avatarstock .display-avatars .upload-new-avatar {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border: 1px dashed #aaa;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+#avatarstock .display-avatars .upload-new-avatar input {
+  cursor: pointer;
+  opacity: 0;
+}
+#avatarstock .delete-selected-avatars {
   clear: both;
-}
-#avatarstock .Buttons input {
   margin: 5px;
-}
-#avatarstock .Buttons,
-#avatarstock input {
   display: none;
+}
+#avatarstock .delete-selected-avatars.show-delete-button {
+  display: block !important;
 }
 
 .stockavatar-wrap h1 {
@@ -79,35 +68,17 @@
   transform: scale(1);
   box-shadow: 0 0 5px 0 #aaa;
 }
+#stockavatar-picker .avatar-option label.current-stock-avatar {
+  pointer-events: none;
+}
 #stockavatar-picker .avatar-option img {
   display: block;
-  height: 100px;
-}
-#stockavatar-picker .avatar-option .avatar-caption {
-  opacity: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  padding: 0 4px;
-  position: absolute;
-  color: #fff;
-  bottom: -25px;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  transition: all 0.2s ease;
-  font-size: 10px;
-  font-weight: normal;
-  margin: 2px;
-}
-#stockavatar-picker .avatar-option .avatar-caption:empty {
-  display: none;
-}
-#stockavatar-picker .avatar-option:hover .avatar-caption {
-  opacity: 1;
-  bottom: 0;
+  height: auto;
 }
 #stockavatar-picker .avatar-option input {
   position: fixed;
   left: 0;
+  top: 0;
   pointer-events: none;
   opacity: 0;
   visbility: hidden;
