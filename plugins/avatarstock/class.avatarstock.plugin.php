@@ -251,6 +251,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
    public function Base_Render_Before($sender) {
       $sender->AddCssFile('avatarstock.css', 'plugins/avatarstock');
+      $sender->AddJsFile('avatarstock.js', 'plugins/avatarstock');
    }
 
    /**
