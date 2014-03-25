@@ -22,14 +22,24 @@
    <div class="display-avatars">
 
       <?php if ($total_stock_avatars): ?>
+
+         <?php
+            echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => '/settings/avatarstock/modify', 'id' => 'avatarstock-form-modify'));
+            echo $this->Form->Errors();
+         ?>
+
          <?php foreach($stock_avatar_payload as $avatar): ?>
 
             <div class="avatar-wrap">
                <img src="<?php echo $avatar['_path']; ?>" alt="" title="<?php echo $avatar['Caption']; ?>" />
                <div class="avatar-caption"><?php echo $avatar['Caption']; ?></div>
+               <?php echo $this->Form->Input('avatar_delete', 'checkbox'); ?>
             </div>
 
          <?php endforeach; ?>
+
+         <?php echo $this->Form->Close('Delete Selected'); ?>
+
       <?php else: ?>
 
          <div class="Info">
@@ -37,7 +47,6 @@
          </div>
 
       <?php endif; ?>
-
 
    </div>
 

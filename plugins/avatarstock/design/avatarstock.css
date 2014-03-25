@@ -1,3 +1,6 @@
+#avatarstock {
+  /* Deleting avatars has not been implemented yet, so hide the UI */
+}
 #avatarstock .display-avatars {
   overflow: hidden;
   padding: 5px;
@@ -30,6 +33,21 @@
 #avatarstock .display-avatars .avatar-wrap:hover .avatar-caption {
   opacity: 1;
   bottom: 0;
+}
+#avatarstock .display-avatars .avatar-wrap input {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#avatarstock .Buttons {
+  clear: both;
+}
+#avatarstock .Buttons input {
+  margin: 5px;
+}
+#avatarstock .Buttons,
+#avatarstock input {
+  display: none;
 }
 
 .stockavatar-wrap h1 {

@@ -78,8 +78,8 @@ class AvatarStockPlugin extends Gdn_Plugin {
             }
             break;
 
-         case in_array('pick', $args):
-               $this->handleAvatarPick($sender);
+         case in_array('modify', $args):
+               $this->deleteSelectedAvatars($sender);
             break;
 
          default:
@@ -98,6 +98,11 @@ class AvatarStockPlugin extends Gdn_Plugin {
       $menu = $sender->EventArguments['SideMenu'];
       $menu->AddItem('Users', T('Users'));
       $menu->AddLink('Users', T('Avatar Stock'), '/settings/avatarstock', 'Garden.Settings.Manage');
+   }
+
+   public function deleteSelectedAvatars($sender) {
+      echo 'This has not been implemented yet.';
+      exit;
    }
 
    /**
@@ -252,15 +257,6 @@ class AvatarStockPlugin extends Gdn_Plugin {
       $avatarstock_model = new Gdn_Model('AvatarStock');
       $get = Gdn::Request()->Get();
 
-
-      //$profile_controller = new ProfileController();
-
-      //$profile_controller->AddSideMenu();
-
-
-
-      //$current = $profile_controller->GetUserInfo();
-
       $sender->Form->SetModel('User');
       $sender->Form->AddHidden('UserID', $session->User->UserID);
 
@@ -349,8 +345,43 @@ class AvatarStockPlugin extends Gdn_Plugin {
       $sender->Title(T('Choose Avatar'));
       $sender->_SetBreadcrumbs(T('Choose Avatar'), UserUrl($sender->User, '', 'picture'));
 
-      $sender->AddSideMenu();
+      //$this->AddSideMenu('', $sender);
       $sender->Render('picture', '', 'plugins/avatarstock');
+   }
+
+
+
+   public function AddSideMenu($CurrentUrl = '', $sender) {
+/*
+      $session = Gdn::Session();
+
+      if (!$session->User)
+         return;
+
+      $c = new Gdn_Controller();
+
+      // Make sure to add the "Edit Profile" buttons.
+      $c->AddModule('ProfileOptionsModule');
+
+      // Show edit menu if in edit mode
+      // Show profile pic & filter menu otherwise
+      $SideMenu = new SideMenuModule($c);
+      $sender->EventArguments['SideMenu'] = &$SideMenu; // Doing this out here for backwards compatibility.
+      if ($c->EditMode) {
+         $c->AddModule('UserBoxModule');
+         $c->BuildEditMenu($SideMenu, $CurrentUrl);
+         $c->FireEvent('AfterAddSideMenu');
+         $c->AddModule($SideMenu, 'Panel');
+      } else {
+         // Make sure the userphoto module gets added to the page
+         $c->AddModule('UserPhotoModule');
+
+         // And add the filter menu module
+         $c->FireEvent('AfterAddSideMenu');
+         $c->AddModule('ProfileFilterModule');
+      }
+ *
+ */
    }
 
 }

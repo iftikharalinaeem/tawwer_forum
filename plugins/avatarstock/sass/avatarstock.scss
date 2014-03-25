@@ -36,9 +36,28 @@
             opacity: 1;
             bottom: 0;
          }
+
+         input {
+            position: absolute;
+            top: 0;
+            left: 0;
+         }
       }
    }
 
+   .Buttons {
+      clear: both;
+
+      input {
+         margin: 5px;
+      }
+   }
+
+   /* Deleting avatars has not been implemented yet, so hide the UI */
+   .Buttons,
+   input {
+      display: none;
+   }
 }
 
 
