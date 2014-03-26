@@ -3,7 +3,7 @@
 $PluginInfo['avatarstock'] = array(
    'Name' => 'Avatars',
    'Description' => 'Create a limited stock of default avatars that members can choose between.',
-   'Version' => '1.0.1',
+   'Version' => '1.0.2',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -40,7 +40,6 @@ class AvatarStockPlugin extends Gdn_Plugin {
          ->PrimaryKey('AvatarID')
          ->Column('OriginalFileName', 'varchar(255)', true)
          ->Column('Path', 'varchar(255)', false, 'index')
-         ->Column('SaveFormat', 'varchar(24)', true)
          ->Column('InsertUserID', 'int', true)
          ->Column('TimestampAdded', 'int(10)', true)
          ->Column('Deleted', 'tinyint(1)', 1, 'index')
@@ -146,9 +145,6 @@ class AvatarStockPlugin extends Gdn_Plugin {
             // Load array with real URL paths for each thumbnail.
             $payload[$i]['_path'] = $upload->Url(ChangeBasename($payload[$i]['Path'], $this->prefix_thumbnails . '%s'));
             $payload[$i]['_path_crop'] = $upload->Url(ChangeBasename($payload[$i]['Path'], $this->prefix_thumbnails_cropped . '%s'));
-
-            // Make sure caption is clean.
-            $payload[$i]['Caption'] = Gdn_Format::PlainText($payload[$i]['Caption']);
          }
 
          $stock_avatar_payload = $payload;
@@ -173,13 +169,6 @@ class AvatarStockPlugin extends Gdn_Plugin {
       $destination_dir = PATH_UPLOADS . '/' . $this->file_destination_dir;
       TouchFolder($destination_dir);
       $upload_image = new Gdn_UploadImage();
-      $avatar_caption = Gdn::Request()->Post('avatar_caption');
-
-      if (strlen($avatar_caption)) {
-         $avatar_caption = substr($avatar_caption, 0, 50);
-      } else {
-         $avatar_caption = '';
-      }
 
       if ($upload_image->CanUploadImages()
       && $upload_image->CanUpload($destination_dir)) {
@@ -204,9 +193,9 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
          // Database and filesystem paths are not the same.
          // ChangeBasename takes care of adding prefixes.
-         $path_thumb_db = $target_parsed['SaveName'];
-         $path_thumb_p = ChangeBasename($path_thumb_db, $this->prefix_thumbnails . '%s');
-         $path_thumb_n = ChangeBasename($path_thumb_db, $this->prefix_thumbnails_cropped . '%s');
+         $path_thumb = $target_parsed['SaveName'];
+         $path_thumb_p = ChangeBasename($path_thumb, $this->prefix_thumbnails . '%s');
+         $path_thumb_n = ChangeBasename($path_thumb, $this->prefix_thumbnails_cropped . '%s');
 
          // Create p thumbnail
          $thumb_parsed = $upload_image->SaveImageAs(
@@ -229,13 +218,14 @@ class AvatarStockPlugin extends Gdn_Plugin {
             array('Crop' => TRUE, 'SaveGif' => C('Garden.Thumbnail.SaveGif'))
          );
 
+         // Generate correct save path for db
+         $path_thumb_db = sprintf($thumb_parsed['SaveFormat'], $path_thumb);
+
          // Insert into DB
          $avatarstock_model = new Gdn_Model('AvatarStock');
          $avatar_id = $avatarstock_model->Save(array(
             'OriginalFileName' => $original_filename,
-            'Caption' => $avatar_caption,
             'Path' => $path_thumb_db,
-            'SaveFormat' => $target_parsed['SaveFormat'],
             'InsertUserID' => Gdn::Session()->UserID,
             'TimestampAdded' => time(),
             'Deleted' => 0 // Change default to 0 to make active.
