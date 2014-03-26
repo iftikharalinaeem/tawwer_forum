@@ -19,7 +19,7 @@
   left: 0;
 }
 #avatarstock .display-avatars .upload-new-avatar {
-  display: block;
+  display: table;
   width: 40px;
   height: 40px;
   border: 1px dashed #aaa;
@@ -29,6 +29,9 @@
 #avatarstock .display-avatars .upload-new-avatar input {
   cursor: pointer;
   opacity: 0;
+}
+#avatarstock .display-avatars .upload-new-avatar.has-progress {
+  background: url("/applications/dashboard/design/images/progress_sm.gif") no-repeat center center transparent !important;
 }
 #avatarstock .delete-selected-avatars {
   clear: both;

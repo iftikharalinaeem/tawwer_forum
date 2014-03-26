@@ -3,7 +3,7 @@
 $PluginInfo['avatarstock'] = array(
    'Name' => 'Avatars',
    'Description' => 'Create a limited stock of default avatars that members can choose between.',
-   'Version' => '1.0.2',
+   'Version' => '1.0.3',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',

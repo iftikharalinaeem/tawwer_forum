@@ -6,10 +6,13 @@ jQuery(document).ready(function($) {
       var filename = e.target.value.toLowerCase();
       if (filename != '') {
          var extension = filename.split('.').pop();
-      }
 
-      var $form = $(this).closest('form');
-      $form.submit();
+         var $form = $(this).closest('form');
+         $form.submit();
+
+         // Add tiny progress animation
+         $(this).closest('.upload-new-avatar').addClass('has-progress');
+      }
    });
 
    // Showing the delete selected avatars button.
