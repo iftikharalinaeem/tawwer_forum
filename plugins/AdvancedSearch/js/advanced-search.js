@@ -54,7 +54,7 @@ $.fn.searchAutocomplete = function(options) {
               return false;
             },
             select: function( event, ui ) { 
-                window.location.replace(gdn.url(ui.item.Url));
+                window.location = gdn.url(ui.item.Url);
             }
         }, options, $this.data());
         
