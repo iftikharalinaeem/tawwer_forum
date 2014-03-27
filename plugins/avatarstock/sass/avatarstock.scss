@@ -25,7 +25,7 @@
 
       // Upload input
       .upload-new-avatar {
-         display: block;
+         display: table;
          width: 40px;
          height: 40px;
          border: 1px dashed #aaa;
@@ -35,6 +35,10 @@
          input {
             cursor: pointer;
             opacity: 0;
+         }
+
+         &.has-progress {
+            background: url('/applications/dashboard/design/images/progress_sm.gif') no-repeat center center transparent !important;
          }
       }
    }
