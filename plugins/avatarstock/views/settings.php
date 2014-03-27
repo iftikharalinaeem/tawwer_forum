@@ -1,9 +1,12 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
 <?php
-   //$username_limits = $this->Data('username_limits');
 
    $stock_avatar_payload = $this->Data('_payload');
+   $total_stock_avatars = count($stock_avatar_payload);
+
+   $crop_dimension_px = C('Garden.Thumbnail.Size') . 'px';
+   $style_dimensions = ' style="width:' . $crop_dimension_px .'; height:' . $crop_dimension_px .';" ';
 
 ?>
 
@@ -13,46 +16,50 @@
    </h1>
 
    <div class="Info">
-      Upload a limited stock of photos that members must choose between for
+      Upload a stock of photos that members must choose between for
       their avatar.
    </div>
 
-   <h3>Current stock of avatars</h3>
+   <h3>Basic avatars</h3>
 
    <div class="display-avatars">
-      <?php foreach($stock_avatar_payload as $avatar): ?>
 
-         <div class="avatar-wrap">
-            <img src="<?php echo $avatar['Path']; ?>" alt="" title="<?php echo $avatar['Caption']; ?>" />
-            <div class="avatar-caption"><?php echo $avatar['Caption']; ?></div>
-         </div>
+      <?php
+         echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => '/settings/avatarstock/modify', 'id' => 'avatarstock-form-modify'));
+         echo $this->Form->Errors();
+      ?>
 
-      <?php endforeach; ?>
+      <?php if ($total_stock_avatars): ?>
 
+         <?php foreach($stock_avatar_payload as $avatar): ?>
+
+            <div class="avatar-wrap">
+               <img src="<?php echo $avatar['_path_crop']; ?>" alt="" <?php echo $style_dimensions; ?> />
+               <?php echo $this->Form->Input('avatar_delete[]', 'checkbox', array('class'=>'avatar-delete-input', 'value'=>$avatar['AvatarID'])); ?>
+            </div>
+
+         <?php endforeach; ?>
+
+      <?php endif; ?>
+
+      <?php echo $this->Form->Close(); ?>
+
+      <?php
+         echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => '/settings/avatarstock/upload', 'id' => 'avatarstock-form'));
+         echo $this->Form->Errors();
+      ?>
+
+         <label class="avatar-wrap upload-new-avatar" <?php echo $style_dimensions; ?> title="<?php echo T('Upload an avatar'); ?>">
+            <?php
+               echo $this->Form->Input($this->Data('_file_input_name'), 'file', array('class' => 'avatar-upload-input'));
+            ?>
+         </label>
+
+      <?php echo $this->Form->Close(); ?>
+
+      <input type="button" class="Button delete-selected-avatars" value="Delete selected" />
 
    </div>
 
-   <h3>Add photos to the stock</h3>
 
-   <?php
-      echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => '/settings/avatarstock/upload', 'id' => 'avatarstock-form'));
-      echo $this->Form->Errors();
-   ?>
-
-   <ul id="bulk-importer-list">
-      <li id="avatar-file-upload">
-         <?php
-            echo $this->Form->Label('Upload image:', $this->Data('_file_input_name'));
-            echo $this->Form->Input($this->Data('_file_input_name'), 'file');
-         ?>
-      </li>
-      <li id="avatar-caption" title="A short (50 chars.) name of the stock avatar.">
-         <?php
-            echo $this->Form->Label('Avatar caption:', 'avatar_caption');
-            echo $this->Form->Input('avatar_caption', 'text', array('maxlength' => 50));
-         ?>
-      </li>
-   </ul>
-
-   <?php echo $this->Form->Close('Start'); ?>
 </div>

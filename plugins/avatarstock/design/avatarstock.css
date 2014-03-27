@@ -7,27 +7,82 @@
   float: left;
   position: relative;
   overflow: hidden;
+  display: block;
 }
 #avatarstock .display-avatars .avatar-wrap img {
   display: block;
-  height: 150px;
+  height: auto;
 }
-#avatarstock .display-avatars .avatar-wrap .avatar-caption {
-  opacity: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  padding: 5px;
+#avatarstock .display-avatars .avatar-wrap input {
   position: absolute;
-  color: #fff;
-  bottom: -50px;
+  top: 0;
   left: 0;
-  right: 0;
-  z-index: 10;
-  transition: all 0.4s ease;
 }
-#avatarstock .display-avatars .avatar-wrap .avatar-caption:empty {
+#avatarstock .display-avatars .upload-new-avatar {
+  display: table;
+  width: 40px;
+  height: 40px;
+  border: 1px dashed #aaa;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+#avatarstock .display-avatars .upload-new-avatar input {
+  cursor: pointer;
+  opacity: 0;
+}
+#avatarstock .display-avatars .upload-new-avatar.has-progress {
+  background: url("/applications/dashboard/design/images/progress_sm.gif") no-repeat center center transparent !important;
+}
+#avatarstock .delete-selected-avatars {
+  clear: both;
+  margin: 5px;
   display: none;
 }
-#avatarstock .display-avatars .avatar-wrap:hover .avatar-caption {
+#avatarstock .delete-selected-avatars.show-delete-button {
+  display: block !important;
+}
+
+.stockavatar-wrap h1 {
+  display: block !important;
+  margin-left: 10px;
+}
+
+#stockavatar-picker {
+  overflow: hidden;
+  padding: 3px;
+}
+#stockavatar-picker .avatar-option {
+  display: block;
+  float: left;
+  padding: 2px;
+}
+#stockavatar-picker .avatar-option label {
+  display: block;
+  margin: 0;
+  padding: 2px;
+  cursor: pointer;
+  opacity: 0.40;
+  transform: scale(0.9);
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+#stockavatar-picker .avatar-option label:hover, #stockavatar-picker .avatar-option label.current-stock-avatar {
   opacity: 1;
-  bottom: 0;
+  transform: scale(1);
+  box-shadow: 0 0 5px 0 #aaa;
+}
+#stockavatar-picker .avatar-option label.current-stock-avatar {
+  pointer-events: none;
+}
+#stockavatar-picker .avatar-option img {
+  display: block;
+  height: auto;
+}
+#stockavatar-picker .avatar-option input {
+  position: fixed;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  opacity: 0;
+  visbility: hidden;
 }

@@ -139,3 +139,25 @@ do {
 // Donezo
 curl_close($ch);
 mysqli_close($c);
+
+
+/**
+insert into GDN_User (UserID, Name, Email, DateInserted, DateUpdated, DateFirstVisit, DateLastActive, Admin, HashMethod)
+select id, name, email, created_at, updated_at, created_at, updated_at, if(role='admin',1,0), 'Reset' from zendesk_users;
+
+insert into GDN_UserRole (UserID, RoleID) select id, 8 from zendesk_users where role = 'end-user';
+insert into GDN_UserRole (UserID, RoleID) select id, 16 from zendesk_users where role = 'admin';
+insert into GDN_UserRole (UserID, RoleID) select id, 32 from zendesk_users where role = 'agent';
+
+insert into GDN_Discussion (DiscussionID, Name, Body, InsertUserID, QnA, DateInserted, DateUpdated, Format, `Type`, CategoryID)
+select id, title, details, author_id, IF(accepted_answer_id>0,'Accepted','Answered'), created_at, updated_at, 'Markdown', 'Question', 1 from zendesk_questions;
+
+insert into GDN_Comment (CommentID, Body, InsertUserID, DiscussionID, DateInserted, DateUpdated, Format)
+select id, body, author_id, question_id, created_at, updated_at, 'Markdown' from zendesk_answers;
+
+update GDN_Comment set QnA = 'Accepted' where CommentID in (select accepted_answer_id from zendesk_questions);
+
+# Run /dba/counts (increase chunksize to 10000000 or skip Discussion.LastCommentUserID)
+
+update GDN_Discussion set QnA = 'Unanswered' where CountComments = 0;
+ */

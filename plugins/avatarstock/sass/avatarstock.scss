@@ -9,34 +9,102 @@
          float: left;
          position: relative;
          overflow: hidden;
+         display: block;
 
          img {
             display: block;
-            height: 150px;
+            height: auto;
          }
 
-         .avatar-caption {
-            opacity: 0;
-            background-color: rgba(0,0,0,0.40);
-            padding: 5px;
+         input {
             position: absolute;
-            color: #fff;
-            bottom: -50px;
+            top: 0;
             left: 0;
-            right: 0;
-            z-index: 10;
-            transition: all 0.4s ease;
+         }
+      }
+
+      // Upload input
+      .upload-new-avatar {
+         display: table;
+         width: 40px;
+         height: 40px;
+         border: 1px dashed #aaa;
+         cursor: pointer;
+         box-sizing: border-box;
+
+         input {
+            cursor: pointer;
+            opacity: 0;
          }
 
-         .avatar-caption:empty {
-            display: none;
-         }
-
-         &:hover .avatar-caption {
-            opacity: 1;
-            bottom: 0;
+         &.has-progress {
+            background: url('/applications/dashboard/design/images/progress_sm.gif') no-repeat center center transparent !important;
          }
       }
    }
 
+   .delete-selected-avatars {
+      clear: both;
+      margin: 5px;
+      display: none;
+
+      &.show-delete-button {
+         display: block !important;
+      }
+   }
+}
+
+
+.stockavatar-wrap {
+   h1 {
+      display: block !important;
+      margin-left: 10px;
+   }
+}
+
+#stockavatar-picker {
+   overflow: hidden;
+   padding: 3px;
+
+   .avatar-option {
+      display: block;
+      float: left;
+      padding: 2px;
+
+      label {
+         display: block;
+         margin: 0;
+         padding: 2px;
+         cursor: pointer;
+         opacity: 0.40;
+         transform: scale(0.90);
+         transition: all 0.2s ease;
+         overflow: hidden;
+
+         &:hover,
+         &.current-stock-avatar {
+            opacity: 1;
+            transform: scale(1);
+            box-shadow: 0 0 5px 0 #aaa;
+         }
+
+         &.current-stock-avatar {
+            pointer-events: none;
+         }
+      }
+
+      img {
+         display: block;
+         height: auto;
+      }
+
+      input {
+         position: fixed;
+         left: 0;
+         top: 0;
+         pointer-events: none;
+         opacity: 0;
+         visbility: hidden;
+      }
+   }
 }
