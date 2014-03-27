@@ -8,7 +8,7 @@
 $PluginInfo['AdvancedSearch'] = array(
    'Name' => 'Advanced Search',
    'Description' => "Enables advanced search on sites.",
-   'Version' => '1.0.2',
+   'Version' => '1.0.3',
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -91,9 +91,28 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
       }
    }
 
+   /**
+    * Add the quick search the discussions list.
+    * @param DiscussionsController $Sender
+    * @param array $Args
+    */
    public function DiscussionsController_PagerInit_Handler($Sender, $Args) {
-      $quickserch = $this->quickSearch(T('SearchBoxPlaceHolder', 'Search'));
+      $name = T('SearchBoxPlaceHolder', 'Search');
+      $args = array();
 
+      // See if there are any tags on the page.
+      $tags = $Sender->Data('Tags');
+      if (is_array($tags) && class_exists('TagModel')) {
+         $tags = TagModel::instance()->unpivot($tags);
+         $tags = ConsolidateArrayValuesByKey($tags, 'Name');
+         $args['tags'] = implode(',', $tags);
+         $args['tags-op'] = 'and';
+         $args['adv'] = 1;
+
+         $name = sprintf(T('Search %s'), $Sender->Title());
+      }
+
+      $quickserch = $this->quickSearch($name, $args);
       $Pager = $Args['Pager'];
       $Pager->HtmlAfter = $quickserch;
    }
@@ -107,7 +126,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             $name = T('category');
          }
 
-         $quickserch = $this->quickSearch(sprintf(T('Search %s'), $name), array('cat' => $categoryid));
+         $quickserch = $this->quickSearch(sprintf(T('Search %s'), $name), array('cat' => $categoryid, 'adv' => 1));
 
          $Pager = $Args['Pager'];
          $Pager->HtmlAfter = $quickserch;
