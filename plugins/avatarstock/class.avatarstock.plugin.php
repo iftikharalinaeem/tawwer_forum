@@ -1,9 +1,9 @@
 <?php if(!defined('APPLICATION')) die();
 
 $PluginInfo['avatarstock'] = array(
-   'Name' => 'Avatars',
+   'Name' => 'Avatar Pool',
    'Description' => 'Create a limited stock of default avatars that members can choose between.',
-   'Version' => '1.0.3',
+   'Version' => '1.0.4',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -59,7 +59,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
       $sender->AddJsFile('avatarstock.js', 'plugins/avatarstock');
 
       // Render components pertinent to all views.
-      $sender->SetData('Title', T('Avatars'));
+      $sender->SetData('Title', T('Avatar Pool'));
       $sender->AddSideMenu();
 
       // Render specific component views.
@@ -100,7 +100,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
    public function Base_GetAppSettingsMenuItems_Handler(&$sender) {
       $menu = $sender->EventArguments['SideMenu'];
       $menu->AddItem('Users', T('Users'));
-      $menu->AddLink('Users', T('Avatars'), '/settings/avatarstock', 'Garden.Settings.Manage');
+      $menu->AddLink('Users', T('Avatar Pool'), '/settings/avatarstock', 'Garden.Settings.Manage');
    }
 
    public function deleteSelectedAvatars($sender) {
