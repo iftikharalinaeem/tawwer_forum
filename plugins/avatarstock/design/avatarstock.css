@@ -78,7 +78,6 @@
 }
 #stockavatar-picker .avatar-option img {
   display: block;
-  height: auto;
 }
 #stockavatar-picker .avatar-option input {
   position: fixed;

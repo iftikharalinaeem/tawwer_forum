@@ -32,6 +32,9 @@ $Thumbnail = Img($Thumbnail, array('alt' => T('Thumbnail')));
 $stock_avatar_payload = $this->Data('_stock_avatar_payload');
 $current_stockavatar_id = $this->Data('_current_stockavatar_id');
 
+$crop_dimension_px = C('Garden.Thumbnail.Size') . 'px';
+$style_dimensions = 'width:' . $crop_dimension_px .'; height:' . $crop_dimension_px .';';
+
 ?>
 <div class="SmallPopup FormTitleWrapper stockavatar-wrap">
 <h1 class="H"><?php echo $this->Data('Title'); ?></h1>
@@ -47,7 +50,7 @@ $current_stockavatar_id = $this->Data('_current_stockavatar_id');
 
          <li class="avatar-option">
             <label <?php if ($current_stockavatar_id == $avatar['AvatarID']) echo 'class="current-stock-avatar"'; ?>>
-               <?php echo Img($avatar['_path_crop']); ?>
+               <?php echo Img($avatar['_path_crop'], array('style' => $style_dimensions)); ?>
                <input type="radio" name="AvatarID" value="<?php echo $avatar['AvatarID']; ?>" />
             </label>
          </li>
