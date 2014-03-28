@@ -6,28 +6,7 @@ $Session = Gdn::Session();
 $AllowImages = Gdn_UploadImage::CanUploadImages();
 
 // Is the photo hosted remotely?
-/*$RemotePhoto = IsUrl($this->User->Photo, 0, 7);
-
-// Define the current profile picture
-$Picture = '';
-if ($this->User->Photo != '') {
-   if (IsUrl($this->User->Photo))
-      $Picture = Img($this->User->Photo, array('class' => 'ProfilePhotoLarge'));
-   else
-      $Picture = Img(Gdn_Upload::Url(ChangeBasename($this->User->Photo, 'p%s')), array('class' => 'ProfilePhotoLarge'));
-}
-
-// Define the current thumbnail icon
-$Thumbnail = $this->User->Photo;
-if (!$Thumbnail && function_exists('UserPhotoDefaultUrl'))
-   $Thumbnail = UserPhotoDefaultUrl($this->User);
-
-if ($Thumbnail && !IsUrl($Thumbnail))
-   $Thumbnail = Gdn_Upload::Url(ChangeBasename($Thumbnail, 'n%s'));
-
-$Thumbnail = Img($Thumbnail, array('alt' => T('Thumbnail')));
- *
- */
+$RemotePhoto = IsUrl($this->User->Photo, 0, 7);
 
 $stock_avatar_payload = $this->Data('_stock_avatar_payload');
 $current_stockavatar_id = $this->Data('_current_stockavatar_id');
@@ -61,6 +40,10 @@ $style_dimensions = 'width:' . $crop_dimension_px .'; height:' . $crop_dimension
 
    <?php
       echo $this->Form->Close('Save Selection', '', array('class' => 'Button Primary'));
+
+      if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
+         echo Wrap(Anchor(T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'), $Session->TransientKey())), 'Button Danger PopConfirm'), 'p');
+      }
    ?>
 
 </div>
