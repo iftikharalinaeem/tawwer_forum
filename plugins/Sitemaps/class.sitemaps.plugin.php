@@ -12,7 +12,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 $PluginInfo['Sitemaps'] = array(
    'Name' => 'Sitemaps',
    'Description' => "Creates an XML sitemap based on http://www.sitemaps.org.",
-   'Version' => '2.0',
+   'Version' => '2.0.1',
    'MobileFriendly' => TRUE,
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
@@ -72,6 +72,17 @@ class SitemapsPlugin extends Gdn_Plugin {
 
          $Urls[] = $Url;
       }
+
+      // If there are no links then just link to the category.
+      if (count($Urls) === 0) {
+         $Url = array(
+            'Loc' => CategoryUrl($Category),
+            'LastMode' => '',
+            'ChangeFreq' => ''
+         );
+         $Urls[] = $Url;
+
+      }
    }
    
    public function Setup() {
@@ -124,7 +135,7 @@ class SitemapsPlugin extends Gdn_Plugin {
       if (class_exists('CategoryModel')) {
          $Categories = CategoryModel::Categories();
          foreach ($Categories as $Category) {
-            if (!$Category['PermsDiscussionsView'] || $Category['CategoryID'] < 0)
+            if (!$Category['PermsDiscussionsView'] || $Category['CategoryID'] < 0 || $Category['CountDiscussions'] == 0)
                continue;
             
             $SiteMap = array(

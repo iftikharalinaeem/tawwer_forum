@@ -1,6 +1,13 @@
 <?php
 
 class GroupModel extends Gdn_Model {
+
+   /**
+    * @var int The maximum number of groups a regular user is allowed to create.
+    */
+   public $MaxUserGroups = 0;
+
+
    /**
     * Class constructor. Defines the related database table name.
     *
@@ -8,6 +15,7 @@ class GroupModel extends Gdn_Model {
     */
    public function __construct() {
       parent::__construct('Group');
+      $this->FireEvent('Init');
    }
 
    /**
@@ -102,7 +110,7 @@ class GroupModel extends Gdn_Model {
                $Perms['Leave.Reason'] = T("You can't leave the group you started.");
             }
          } else {
-            if ($Group['Visibility'] != 'Public') {
+            if ($Group['Privacy'] != 'Public') {
                $Perms['View'] = FALSE;
                $Perms['View.Reason'] = T('Join this group to view its content.');
             }
@@ -120,11 +128,15 @@ class GroupModel extends Gdn_Model {
                case 'ban':
                   $Perms['Join.Reason'] = T("You're banned from joining this group.");
                   break;
+               case 'invitation':
+                  $Perms['Join'] = TRUE;
+                  unset($Perms['Join.Reason']);
+                  break;
             }
          }
 
          // Moderators can view and edit all groups.
-         if ($UserID == Gdn::Session()->UserID && Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+         if ($UserID == Gdn::Session()->UserID && Gdn::Session()->CheckPermission('Groups.Moderation.Manage')) {
             $Perms['Edit'] = TRUE;
             $Perms['Delete'] = TRUE;
             $Perms['View'] = TRUE;
@@ -257,6 +269,15 @@ class GroupModel extends Gdn_Model {
       return $Users;
    }
 
+   public function GetUserCount($UserID) {
+      $Count = $this->SQL
+         ->Select('InsertUserID', 'count', 'CountGroups')
+         ->From('Group')
+         ->Where('InsertUserID', $UserID)
+         ->Get()->Value('CountGroups');
+      return $Count;
+   }
+
    public static function ParseID($ID) {
       $Parts = explode('-', $ID, 2);
       return $Parts[0];
@@ -284,6 +305,72 @@ class GroupModel extends Gdn_Model {
          'GroupID'   => $GroupID
       ));
       return $IsMember > 0;
+   }
+
+   public function Invite($Data) {
+      $Valid = $this->ValidateJoin($Data);
+      if (!$Valid) {
+         return FALSE;
+      }
+
+      $Group = $this->GetID(GetValue('GroupID', $Data));
+      Trace($Group, 'Group');
+
+      $UserIDs = (array)$Data['UserID'];
+      $ValidUserIDs = array();
+
+      foreach ($UserIDs as $UserID) {
+         // Make sure the user hasn't already been invited.
+         $Application = $this->SQL->GetWhere('GroupApplicant', array(
+            'GroupID' => $Group['GroupID'],
+            'UserID' => $UserID
+         ))->FirstRow(DATASET_TYPE_ARRAY);
+
+         if ($Application) {
+            if ($Application['Type'] == 'Invitation') {
+               continue;
+            } else {
+               $this->SQL->Put('GroupApplicant',
+                  array('Type' => 'Invitation'),
+                  array(
+                     'GroupID' => $Group['GroupID'],
+                     'UserID' => $UserID
+                  ));
+            }
+         } else {
+            $Data['Type'] = 'Invitation';
+            $Data['UserID'] = $UserID;
+            $Model = new Gdn_Model('GroupApplicant');
+            $Model->Options('Ignore', TRUE)->Insert($Data);
+            $this->Validation = $Model->Validation;
+         }
+         $ValidUserIDs[] = $UserID;
+      }
+
+      // Send a message for the invite.
+      if (class_exists('ConversationModel') && count($ValidUserIDs) > 0) {
+         $Model = new ConversationModel();
+         $MessageModel = new ConversationMessageModel();
+
+         $Args = array(
+            'Name' => htmlspecialchars($Group['Name']),
+            'Url' => GroupUrl($Group, '/')
+         );
+
+         $Row = array(
+            'Subject' => FormatString(T("Please join my group."), $Args),
+            'Body' => FormatString(T("You've been invited to join {Name}."), $Args),
+            'Format' => 'Html',
+            'RecipientUserID' => $ValidUserIDs,
+            'Type' => 'ginvite',
+            'RegardingID' => $Group['GroupID'],
+         );
+         if (!$Model->Save($Row, $MessageModel)) {
+            throw new Gdn_UserException($Model->Validation->ResultsText());
+         }
+      }
+
+      return count($this->ValidationResults()) == 0;
    }
 
    public function Join($Data) {
@@ -321,10 +408,25 @@ class GroupModel extends Gdn_Model {
       }
    }
 
+   public function JoinInvite($GroupID, $UserID, $Accept = true) {
+      // Grab the application.
+      $Row = $this->SQL->GetWhere('GroupApplicant', array('GroupID' => $GroupID, 'UserID' => $UserID))->FirstRow(DATASET_TYPE_ARRAY);
+      if (!$Row || $Row['Type'] != 'Invitation') {
+         throw NotFoundException('Invitation');
+      }
+
+      $Data = array(
+         'GroupApplicantID' => $Row['GroupApplicantID'],
+         'Type' => $Accept ? 'Approved' : 'Denied'
+      );
+      return $this->JoinApprove($Data);
+   }
+
    /**
     * Approve a membership application.
     *
     * @param array $Data
+    * @return bool
     */
    public function JoinApprove($Data) {
       // Grab the applicant row.
@@ -357,10 +459,16 @@ class GroupModel extends Gdn_Model {
          return $Inserted;
       } else {
          $Model = new Gdn_Model('GroupApplicant');
-         $Saved = $Model->Save(array(
-            'GroupApplicantID' => $ID,
-            'Type' => $Value
-            ));
+
+         if ($Row['Type'] == 'Invitation') {
+            $Model->Delete(array('GroupApplicantID' => $ID));
+            $Saved = TRUE;
+         } else {
+            $Saved = $Model->Save(array(
+               'GroupApplicantID' => $ID,
+               'Type' => $Value
+               ));
+         }
 
          return $Saved;
       }
@@ -409,6 +517,29 @@ class GroupModel extends Gdn_Model {
    }
 
    public function Save($Data, $Settings = FALSE) {
+      $this->EventArguments['Fields'] =& $Data;
+      $this->FireEvent('BeforeSave');
+
+      if ($this->MaxUserGroups && !GetValue('GroupID', $Data)) {
+         $CountUserGroups = $this->GetUserCount(Gdn::Session()->UserID);
+         if ($CountUserGroups >= $this->MaxUserGroups) {
+            $this->Validation->AddValidationResult('Count', "You've already created the maximum number of groups.");
+            return FALSE;
+         }
+      }
+
+      // Set the visibility and registration based on the privacy.
+      switch (strtolower(GetValue('Privacy', $Data))) {
+         case 'private':
+            $Data['Visibility'] = 'Members';
+            $Data['Registration'] = 'Approval';
+            break;
+         case 'public':
+            $Data['Visibility'] = 'Public';
+            $Data['Registration'] = 'Public';
+            break;
+      }
+
       $GroupID = parent::Save($Data, $Settings);
 
       if ($GroupID) {
@@ -507,9 +638,12 @@ class GroupModel extends Gdn_Model {
       if ($GroupID) {
          $Group = $this->GetID($GroupID);
 
-         switch (strtolower($Group['Registration'])) {
-            case 'approval':
-               $this->ValidateRule('Reason', $Data, 'ValidateRequired', 'Why do you want to join?');
+         switch (strtolower($Group['Privacy'])) {
+            case 'private':
+               if (!$this->CheckPermission('Leader', $Group)) {
+                  $this->ValidateRule('Reason', $Data, 'ValidateRequired', 'Why do you want to join?');
+               }
+               break;
          }
       }
 

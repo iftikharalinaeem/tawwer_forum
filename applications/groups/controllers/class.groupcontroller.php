@@ -23,6 +23,11 @@ class GroupController extends Gdn_Controller {
    public $ShowOptions = TRUE;
 
    /**
+    * @var int
+    */
+   public $HomepageDiscussionCount = 10;
+
+   /**
     * Include JS, CSS, and modules used by all methods.
     *
     * Always called by dispatcher before controller's requested method.
@@ -35,10 +40,12 @@ class GroupController extends Gdn_Controller {
       $this->AddJsFile('jquery.js');
       $this->AddJsFile('jquery.livequery.js');
       $this->AddJsFile('jquery-ui.js');
+      $this->AddJsFile('jquery.tokeninput.js');
       $this->AddJsFile('jquery.form.js');
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
+      $this->AddJsFile('group.js');
       $this->AddCssFile('style.css');
 
       $this->AddBreadcrumb(T('Groups'), '/groups');
@@ -75,7 +82,7 @@ class GroupController extends Gdn_Controller {
 
       // Get Discussions
       $DiscussionModel = new DiscussionModel();
-      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, 10)->ResultArray();
+      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, $this->HomepageDiscussionCount)->ResultArray();
       $this->SetData('Discussions', $Discussions);
 
       $Discussions = $DiscussionModel->GetAnnouncements(array('d.GroupID' => $GroupID), 0, 10)->ResultArray();
@@ -92,11 +99,15 @@ class GroupController extends Gdn_Controller {
       $this->SetData('Events', $Events);
 
       // Get applicants.
-      $Applicants = $this->GroupModel->GetApplicants($GroupID, array('Type' => 'Application'), 20);
+      $Applicants = $this->GroupModel->GetApplicants($GroupID, array('Type' => array('Application', 'Invitation')), 20);
       $this->SetData('Applicants', $Applicants);
 
       // Get Leaders
-      $Users = $this->GroupModel->GetMembers($GroupID, array('Role' => 'Leader'));
+      $Users = $this->GroupModel->GetMembers($GroupID, array('Role' => 'Leader'), 10);
+      foreach ($Users as &$User) {
+         if ($User['UserID'] == $Group['InsertUserID'])
+            $User['Role'] = 'Owner';
+      }
       $this->SetData('Leaders', $Users);
 
       // Get Members
@@ -120,6 +131,22 @@ class GroupController extends Gdn_Controller {
 
    public function Add() {
       $this->Title(sprintf(T('New %s'), T('Group')));
+
+      // Check the max groups.
+      if ($this->GroupModel->MaxUserGroups > 0 && Gdn::Session()->IsValid()) {
+         $this->SetData('MaxUserGroups', $this->GroupModel->MaxUserGroups);
+         $this->SetData('CountUserGroups', $this->GroupModel->GetUserCount(Gdn::Session()->UserID));
+         $CountRemaining = max(0, $this->Data('MaxUserGroups') - $this->Data('CountUserGroups'));
+
+         $this->SetData('CountRemainingGroups', $CountRemaining);
+
+         if ($CountRemaining <= 0) {
+            $this->Form = new Gdn_Form();
+            $this->Form->AddError("You've already created the maximum number of groups.");
+            $this->Render('AddEditError');
+         }
+      }
+
       return $this->AddEdit();
    }
 
@@ -183,6 +210,70 @@ class GroupController extends Gdn_Controller {
          $this->JsonTarget("#GroupApplicant_$ID", "Read Join-Denied", 'AddClass');
       }
 
+      $this->Render('Blank', 'Utility', 'Dashboard');
+   }
+
+   public function Invite($ID) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group) {
+         throw NotFoundException('Group');
+      }
+
+      // Check invite permission.
+      if (!$this->GroupModel->CheckPermission('Leader', $Group)) {
+         throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Join.Reason', $Group));
+      }
+
+      $this->Title('Invite');
+
+      $Form = new Gdn_Form();
+      $this->Form = $Form;
+
+      if ($Form->AuthenticatedPostBack()) {
+         // If the user posted back then we are going to add them.
+         $Data = $Form->FormValues();
+         $Data['GroupID'] = $Group['GroupID'];
+         $Recipients = explode(',', $Data['Recipients']);
+         $UserIDs = array();
+         foreach ($Recipients as $Recipient) {
+            $UserIDs[] = GetValue('UserID', Gdn::UserModel()->GetByUsername($Recipient));
+         }
+         $Data['UserID'] = $UserIDs;
+         $Saved = $this->GroupModel->Invite($Data);
+
+         $Form->SetValidationResults($this->GroupModel->ValidationResults());
+      }
+
+      $this->SetData('Group', $Group);
+      $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+      $this->Render();
+   }
+
+   public function InviteAccept($ID) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+
+      if (!$this->Request->IsPostBack())
+         throw ForbiddenException('GET');
+
+      $Result = $this->GroupModel->JoinInvite($Group['GroupID'], Gdn::Session()->UserID, TRUE);
+      $this->SetData('Result', $Result);
+      $this->RedirectUrl = GroupUrl($Group);
+      $this->Render('Blank', 'Utility', 'Dashboard');
+   }
+
+   public function InviteDecline($ID) {
+      $Group = $this->GroupModel->GetID($ID);
+      if (!$Group)
+         throw NotFoundException('Group');
+
+      if (!$this->Request->IsPostBack())
+         throw ForbiddenException('GET');
+
+      $Result = $this->GroupModel->JoinInvite($Group['GroupID'], Gdn::Session()->UserID, FALSE);
+      $this->SetData('Result', $Result);
+      $this->JsonTarget('.GroupUserHeaderModule', '', 'SlideUp');
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
 

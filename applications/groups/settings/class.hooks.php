@@ -35,6 +35,13 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
 
+   public function Base_ConversationGInvite_Handler($Sender, $Args) {
+      $GroupID = $Sender->Data('Conversation.RegardingID');
+      if ($GroupID) {
+         echo Gdn_Theme::Module('GroupUserHeaderModule', array('GroupID' => $GroupID));
+      }
+   }
+
    /**
     *
     * @param DbaController $Sender
@@ -149,6 +156,8 @@ class GroupsHooks extends Gdn_Plugin {
             $Sender->AddBreadcrumb(T('Groups'), '/groups');
             $Sender->AddBreadcrumb($Group['Name'], GroupUrl($Group));
          }
+
+         Gdn_Theme::Section('Group');
       }
    }
 

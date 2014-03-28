@@ -16,6 +16,11 @@ class GroupsController extends Gdn_Controller {
     * @var GroupModel
     */
    public $GroupModel;
+
+   /**
+    * @var int The page size of groups when browsing.
+    */
+   public $PageSize = 24;
    
 
    /**
@@ -89,7 +94,7 @@ class GroupsController extends Gdn_Controller {
       }
       
       $SortRow = $Sorts[$Sort];
-      $PageSize = 24; // good size for 4, 3, 2 columns.
+      $PageSize = $this->PageSize; // good size for 4, 3, 2 columns.
       list($Offset, $Limit) = OffsetLimit($Page, $PageSize);
       $PageNumber = PageNumber($Offset, $Limit);
       

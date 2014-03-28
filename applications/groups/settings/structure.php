@@ -14,12 +14,14 @@ $Sql = Gdn::SQL();
 $St = Gdn::Structure();
 
 Gdn::PermissionModel()->Define(array(
-   'Groups.Group.Add' => 'Garden.Profiles.Edit'));
+   'Groups.Group.Add' => 'Garden.Profiles.Edit',
+   'Groups.Moderation.Manage' => 'Garden.Moderation.Manage'));
 
 // Define the groups table.
 $St->Table('Group');
 $GroupExists = $St->TableExists();
 $CountDiscussionsExists = $St->ColumnExists('CountDiscussions');
+$GroupPrivacyExists = $St->ColumnExists('Privacy');
 
 $St
    ->PrimaryKey('GroupID')
@@ -29,8 +31,9 @@ $St
    ->Column('CategoryID', 'int', FALSE, 'key')
    ->Column('Icon', 'varchar(255)', TRUE)
    ->Column('Banner', 'varchar(255)', TRUE)
-   ->Column('Registration', array('Public', 'Approval', 'Invite'), 'Public')
-   ->Column('Visibility', array('Public', 'Members'))
+   ->Column('Privacy', array('Public', 'Private'), 'Public') // add secret later.
+   ->Column('Registration', array('Public', 'Approval', 'Invite'), TRUE) // deprecated
+   ->Column('Visibility', array('Public', 'Members'), TRUE) // deprecated
    ->Column('CountMembers', 'uint', '0')
    ->Column('CountDiscussions', 'uint', '0')
    ->Column('DateLastComment', 'datetime', TRUE)
@@ -44,6 +47,11 @@ $St
 if (!$CountDiscussionsExists) {
    $GroupModel = new GroupModel();
    $GroupModel->Counts('CountDiscussions');
+}
+
+if ($GroupExists && !$GroupPrivacyExists) {
+   $Sql->Put('Group', array('Privacy' => 'Private'));
+   $Sql->Put('Group', array('Privacy' => 'Public'), array('Registration' => 'Public', 'Visibility' => 'Public'));
 }
 
 $St->Table('UserGroup')
@@ -86,6 +94,7 @@ if ($St->TableExists('Category')) {
             'UrlCode' => 'social-groups',
             'HideAllDiscussions' => 1,
             'DisplayAs' => 'Discussions',
+            'AllowDiscussions' => 1,
             'AllowGroups' => 1,
             'Sort' => 1000);
          $Model->Save($Row);

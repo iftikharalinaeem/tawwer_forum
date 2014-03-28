@@ -1,6 +1,17 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div id="GroupForm" class="FormTitleWrapper">
    <h1><?php echo $this->Data('Title'); ?></h1>
+
+   <?php if ($this->Data('MaxUserGroups')): ?>
+      <div class="DismissMessage InfoMessage">
+         <?php
+         echo sprintf(T('You are allowed to create %s groups.'), $this->Data('MaxUserGroups')),
+            ' ',
+            Plural($this->Data('CountRemainingGroups'), 'You have %s group remaining.', 'You have %s groups remaining.');
+         ?>
+      </div>
+   <?php endif; ?>
+
    <div class="FormWrapper StructuredForm">
       <?php
       echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
@@ -43,21 +54,13 @@
          ?>
       </div>
       <hr />
-      <div class="P P-Registration">
+      <div class="P P-Privacy">
          <?php
-         echo '<div><b>'.T('How can people join this group?').'</b></div>';
-         echo $this->Form->RadioList('Registration', array(
-            'Public' => 'Public. Anyone can join.',
-            'Approval' => 'Approval. People have to apply and be approved.'),
-            array('list' => TRUE));
-         ?>
-      </div>
-      <div class="P P-Visibility">
-         <?php
-         echo '<div><b>'.T('Content Visibility').'</b></div>';
-         echo $this->Form->RadioList('Visibility', array(
-            'Public' => "Anyone can view this group's content.",
-            'Members' => 'Users must join this group to view its content.'),
+         echo '<div><b>'.T('Privacy').'</b></div>';
+         echo $this->Form->RadioList('Privacy', array(
+            'Public' => '@'.T('Public').'. <span class="Gloss">'.T('Public group.', 'Anyone can see the group and its content. Anyone can join.').'</span>',
+            'Private' => '@'.T('Private').'. <span class="Gloss">'.T('Private group.', 'Anyone can see the group, but only members can see its content. People must apply or be invited to join.').'</span>',
+            ),
             array('list' => TRUE));
          ?>
       </div>
