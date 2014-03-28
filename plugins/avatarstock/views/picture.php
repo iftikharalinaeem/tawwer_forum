@@ -48,7 +48,6 @@ $current_stockavatar_id = $this->Data('_current_stockavatar_id');
          <li class="avatar-option">
             <label <?php if ($current_stockavatar_id == $avatar['AvatarID']) echo 'class="current-stock-avatar"'; ?>>
                <?php echo Img($avatar['_path_crop']); ?>
-               <div class="avatar-caption"><?php echo $avatar['Caption']; ?></div>
                <input type="radio" name="AvatarID" value="<?php echo $avatar['AvatarID']; ?>" />
             </label>
          </li>

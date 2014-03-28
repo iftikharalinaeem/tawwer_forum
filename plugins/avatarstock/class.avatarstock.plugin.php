@@ -3,7 +3,7 @@
 $PluginInfo['avatarstock'] = array(
    'Name' => 'Avatar Pool',
    'Description' => 'Create a limited stock of default avatars that members can choose between.',
-   'Version' => '1.0.4',
+   'Version' => '1.0.5',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
