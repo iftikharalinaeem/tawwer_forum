@@ -3,7 +3,7 @@
 $PluginInfo['avatarstock'] = array(
    'Name' => 'Avatar Pool',
    'Description' => 'Create a limited stock of default avatars that members can choose between.',
-   'Version' => '1.0.5',
+   'Version' => '1.0.8',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -361,4 +361,12 @@ class AvatarStockPlugin extends Gdn_Plugin {
       $sender->Render('picture', '', 'plugins/avatarstock');
    }
 
+   public function ProfileController_Thumbnail_Create($UserReference = '', $Username = '') {
+      throw ForbiddenException('@Editing user photos has been disabled.');
+   }
+
+   public function ProfileController_AfterAddSideMenu_Handler(&$sender) {
+      $menu = $sender->EventArguments['SideMenu'];
+      $menu->RemoveLink('Options', '/profile/thumbnail');
+   }
 }
