@@ -1,6 +1,7 @@
 jQuery(document).ready(function($) {
 
    var max_file_size = parseInt(gdn.definition('maxfilesizebytes', 52428800));
+   var threads = parseInt(gdn.definition('threads', 5));
    var $file_download_option = $('#bulk-importer-file-download');
    var $file_url_option = $('#bulk-importer-file-url');
    var $feedback_placeholder = $('#bulk-importer-validation-feedback');
@@ -122,8 +123,6 @@ jQuery(document).ready(function($) {
       bulk_importer_debug = parseInt(+e.target.checked);
    });
 
-
-
    // Handle radio options for invite/insert
    var $bulk_radio_input = $('#bulk-radio-options input[name=userin]');
    var bulk_radio_userin = $bulk_radio_input.filter(':checked').val();
@@ -149,6 +148,9 @@ jQuery(document).ready(function($) {
    var bulk_rows_after_job = []; // Collect how many jobs done.
    var bulk_time_after_job = []; // Collect average time per job.
 
+   // Keep track of total rows processed.
+   var total_rows_processed = 0;
+
    // Call job every n.
    var bulk_importer_errors = 0;
    var incremental_job = function(url, mod) {
@@ -162,8 +164,9 @@ jQuery(document).ready(function($) {
       var $bulk_error_dump = $('#bulk-error-dump');
       var progress_fail_message = 'Import could not be completed.';
 
-      if (mod === undefined)
+      if (typeof mod == 'undefined') {
         mod = '';
+      }
 
       // Get expires for invitation mode
       var bulk_invite_expires = '';
@@ -197,16 +200,29 @@ jQuery(document).ready(function($) {
          }
 
          var bulk_job_end = Math.ceil(+new Date / 1000);
-         var rows_completed_job = parseInt(data.import_id);
-         var progress = Math.ceil((rows_completed_job / total_rows) * 100);
-         if (progress > 100) {
+         var import_id = parseInt(data.import_id);
+
+         // Get number of rows processed in the last job. If it's empty,
+         // due to the import being complete, parsing the empty value will
+         // return NaN. Check if it's NaN, and if true, assign it the total_rows
+         // so that the progress and all other calculations work with an
+         // actual number, and then quits.
+         var job_rows_processed = parseInt(data.job_rows_processed);
+         if (isNaN(job_rows_processed)) {
+            total_rows_processed = total_rows;
+         } else {
+            total_rows_processed += job_rows_processed;
+         }
+
+         var progress = Math.ceil((total_rows_processed / total_rows) * 100);
+         if (progress > 100 || isNaN(progress)) {
             progress = 100;
          }
 
          // Calculate average rows processed per job.
-         var rows_remaining = total_rows - rows_completed_job;
-         bulk_rows_after_job.push(rows_completed_job);
-         var average_rows_per_job = Math.ceil(rows_completed_job / bulk_rows_after_job.length);
+         var rows_remaining = total_rows - total_rows_processed;
+         bulk_rows_after_job.push(total_rows_processed);
+         var average_rows_per_job = Math.ceil(total_rows_processed / bulk_rows_after_job.length);
 
          // Calculate average time per job.
          var total_elapsed_time = Math.round((bulk_job_end - bulk_start_time) / 60);
@@ -223,13 +239,6 @@ jQuery(document).ready(function($) {
 
          // Calculate average time remaining in whole import. In minutes.
          var import_time_remaining = Math.round((rows_remaining * average_time_per_row) / 60);
-
-         // If job was cancelled unexpectedly--typically due to an invalid
-         // expiry date on invitations, make sure resulting numbers are not
-         // NaN, but are 0 instead.
-         if (isNaN(progress)) {
-            progress = 0;
-         }
          if (isNaN(import_time_remaining)) {
             import_time_remaining = 0;
          }
@@ -244,8 +253,8 @@ jQuery(document).ready(function($) {
          }
 
          // Insert data for display.
-         $progress_meter.attr('data-completed-rows', rows_completed_job);
-         var progress_message = '<span title="'+ data.feedback +'">'+ progress + '% processed (' + rows_completed_job + ' rows) ' + time_estimation_string + '</span>';
+         $progress_meter.attr('data-completed-rows', total_rows_processed);
+         var progress_message = '<span>'+ progress + '% processed (' + total_rows_processed + ' rows) ' + time_estimation_string + '</span>';
          $progress_meter.html(progress_message);
          document.title = new_page_title;
 
@@ -280,18 +289,13 @@ jQuery(document).ready(function($) {
             $bulk_error_many_errors.html('The importer has reached its reporting cap of <strong>'+ max_errors + ' errors</strong>. The importer will continue to import users, and the error count will continue to record, but the display of any other error messages will be suppressed from this moment. This limit has been placed so that browsers do not become unstable if there happen to be a very large number of errors. Odds are the errors listed below are duplicated in the remaining data set, and are the likely cause of any further errors counted.');
          }
 
-         // If import_id is 0.
-         if (rows_completed_job == 0) {
-            cancel_import = true;
-            progress_fail_message = data.error_message;
-         }
-
          // If done, call again and continue the process.
-         if (rows_completed_job != total_rows) {
+         if (total_rows_processed != total_rows) {
             if (!cancel_import) {
                incremental_job(url, mod);
             }
-         } else if (rows_completed_job == total_rows) {
+         } else if (total_rows_processed == total_rows) {
+            // All rows were processed, so make sure no more calls are sent out.
             $progress_animation.addClass('removed');
          }
       })
@@ -317,10 +321,12 @@ jQuery(document).ready(function($) {
       $(this).addClass('disable-option');
       $('#bulk-importer-checkbox-email').addClass('disable-option');
       $('#bulk-radio-options').addClass('disable-option');
+
       cancel_import = false;
-      for (var i = 0; i < 5; i++) {
+      for (var i = 0; i < threads; i++) {
         incremental_job(e.target.href, i);
       }
+
       bulk_start_time = Math.ceil(+new Date / 1000);
    });
 
