@@ -3,7 +3,7 @@
 $PluginInfo['avatarstock'] = array(
    'Name' => 'Avatar Pool',
    'Description' => 'Create a limited stock of default avatars that members can choose between.',
-   'Version' => '1.0.9',
+   'Version' => '1.0.10',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -265,41 +265,30 @@ class AvatarStockPlugin extends Gdn_Plugin {
       }
 
       $sender->GetUserInfo($UserReference, $Username, $UserID, TRUE);
-
-      $user_model = new UserModel();
+      $user_model = Gdn::UserModel();
       $avatarstock_model = new Gdn_Model('AvatarStock');
-
-      $page_user_id = $sender->User->UserID;
+      $user_id = $sender->User->UserID;
 
       $sender->Form->SetModel('User');
-      $sender->Form->AddHidden('UserID', $page_user_id);
-
       // When posted to self
       if ($sender->Form->AuthenticatedPostBack() === true) {
 
         // If there were no errors, associate the image with the user
          if ($sender->Form->ErrorCount() == 0) {
-            //$user_id = $session->User->UserID;
             $post = Gdn::Request()->Post();
             $avatar_id = $post['AvatarID'];
-            // Obviously not good, as users can change this, but need to make
-            // sure mods and other admins can change this as well, unless it's
-            // okay to check against session.
-            $user_id = $post['UserID'];
 
             if (!ValidateInteger($avatar_id)) {
                $sender->Form->AddError('Invalid Avatar ID.');
             }
 
-            if (!ValidateInteger($user_id) && $user_id != $page_user_id) {
-               $sender->Form->AddError('You cannot modify this users avatar.');
-            }
-
             if ($sender->Form->ErrorCount() == 0) {
+
                // Get avatar stock data
                $avatarstock_row = $avatarstock_model->GetWhere(array(
                    'AvatarID' => $avatar_id
                ))->FirstRow(DATASET_TYPE_ARRAY);
+
                $user_photo = $avatarstock_row['Path'];
 
                // Save it to User table
@@ -313,7 +302,6 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
          // If there were no problems, redirect back to the user account
          if ($sender->Form->ErrorCount() == 0) {
-
             $sender->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
             Redirect($sender->DeliveryType() == DELIVERY_TYPE_VIEW ? UserUrl($sender->User) : UserUrl($sender->User, '', 'picture'));
          }
@@ -326,12 +314,10 @@ class AvatarStockPlugin extends Gdn_Plugin {
       // Current avatar URL
       $user_stockavatar_id = false; // none
 
-      if (ValidateInteger($page_user_id)) {
-         $current_user_data = $user_model->GetWhere(array(
-            'UserID' => $page_user_id
-         ))->FirstRow(DATASET_TYPE_ARRAY);
-
+      if (ValidateInteger($user_id)) {
+         $current_user_data = $user_model->GetID($user_id, DATASET_TYPE_ARRAY);
          $current_user_photo = $current_user_data['Photo'];
+
          if (strlen($current_user_photo)) {
             // If in future you decide to add a second table to keep track of
             // AvatarID and UserID relationships, change this. For now, because
@@ -341,7 +327,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
                 'Path' => $current_user_photo
             ))->FirstRow(DATASET_TYPE_ARRAY);
 
-            if (isset($relevant_stockavatar_row['AvatarID'])) {
+            if (!empty($relevant_stockavatar_row['AvatarID'])) {
                $user_stockavatar_id = $relevant_stockavatar_row['AvatarID'];
             }
          }
@@ -354,7 +340,6 @@ class AvatarStockPlugin extends Gdn_Plugin {
       $sender->SetData('_stock_avatar_payload', $stock_avatar_payload);
       $sender->Title(T('Choose Avatar'));
       $sender->_SetBreadcrumbs(T('Choose Avatar'), UserUrl($sender->User, '', 'picture'));
-
       $sender->Render('picture', '', 'plugins/avatarstock');
    }
 
