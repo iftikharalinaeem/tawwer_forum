@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk User Import',
    'Description' => 'Bulk user import with standardized CSV files. Send invites or directly insert new members.',
-   'Version' => '1.0.28',
+   'Version' => '1.0.29',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',

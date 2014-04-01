@@ -230,6 +230,12 @@ jQuery(document).ready(function($) {
 
             // Calculate average time per job.
             var total_elapsed_time = Math.round((bulk_job_end - bulk_start_time) / 60);
+
+
+            console.log(bulk_job_end);
+            console.log(bulk_start_time);
+            console.log(total_elapsed_time);
+
             var job_elapsed_time = bulk_job_end - bulk_job_start;
             bulk_time_after_job.push(job_elapsed_time);
             var average_time_per_job = 0;
@@ -332,12 +338,12 @@ jQuery(document).ready(function($) {
       $('#bulk-importer-checkbox-email').addClass('disable-option');
       $('#bulk-radio-options').addClass('disable-option');
 
+      bulk_start_time = Math.ceil(+new Date / 1000);
+
       cancel_import = false;
-      for (var thread_id = 1; thread_id <= threads; i++) {
+      for (var thread_id = 1; thread_id <= threads; thread_id++) {
          incremental_job(e.target.href, thread_id);
       }
-
-      bulk_start_time = Math.ceil(+new Date / 1000);
    });
 
 });
