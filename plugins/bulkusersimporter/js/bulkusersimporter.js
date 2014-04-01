@@ -231,11 +231,6 @@ jQuery(document).ready(function($) {
             // Calculate average time per job.
             var total_elapsed_time = Math.round((bulk_job_end - bulk_start_time) / 60);
 
-
-            console.log(bulk_job_end);
-            console.log(bulk_start_time);
-            console.log(total_elapsed_time);
-
             var job_elapsed_time = bulk_job_end - bulk_job_start;
             bulk_time_after_job.push(job_elapsed_time);
             var average_time_per_job = 0;
