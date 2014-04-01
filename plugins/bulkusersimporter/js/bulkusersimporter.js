@@ -210,7 +210,6 @@ jQuery(document).ready(function($) {
          var job_rows_processed = parseInt(data.job_rows_processed);
          if (isNaN(job_rows_processed)) {
             job_rows_processed = 0;
-            total_rows_processed = total_rows;
          } else {
             total_rows_processed += job_rows_processed;
          }
@@ -298,8 +297,10 @@ jQuery(document).ready(function($) {
 
          // If done, call again and continue the process.
          if (total_rows_processed != total_rows) {
-            // If cancel has not been imported, or if the last job had some rows
-            // processed, send out another job.
+            // If import has not been cancelled, or if the last job had some rows
+            // processed, send out another job. If the last thread_id returned
+            // 0 processed rows, any further requests from this thread can
+            // be stopped, as there no more left for that thread.
             if (!cancel_import && job_rows_processed) {
                incremental_job(url, thread_id);
             }
