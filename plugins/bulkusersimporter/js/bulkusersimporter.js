@@ -305,8 +305,7 @@ jQuery(document).ready(function($) {
             if (!cancel_import && job_rows_processed) {
                incremental_job(url, thread_id);
             }
-         } else if (total_rows_processed == total_rows) {
-            // All rows were processed, so make sure no more calls are sent out.
+         } else if (total_rows_processed == total_rows || progress == 100) {
             $progress_animation.addClass('removed');
          }
       })
