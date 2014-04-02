@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk User Import',
    'Description' => 'Bulk user import with standardized CSV files. Send invites or directly insert new members.',
-   'Version' => '1.0.26',
+   'Version' => '1.0.31',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -21,6 +21,8 @@ $PluginInfo['bulkusersimporter'] = array(
  * - Prepend underscore to data set for view.
  * - In addition to the new time estimates, include the start and end times.
  * - Allow downloading the full error dump from table.
+ *   - Instead of reporting line numbers, simply provide a dump of errors
+ *     in a CSV file that can be be easily amended and uploaded.
  * - Consider multiple users operating the bulk importer. Do not just truncate
  *   the BulkUsersImporter table on every new upload.
  */
@@ -34,16 +36,14 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    // Will contain whitelist of allowed roles.
    private $allowed_roles = array();
 
-   // Grab maximum of 1000 rows, or timeout after 20 seconds--whichever
-   // happens first.
-   // It will be asynchronously iterated over until there are no more records.
-   // Modify these values to change how many requests will be sent to server
-   // until job is complete.
-   // On my local machine, the timeout is reached with an average of 600
-   // records processed per unit of time.
-   public $limit = 1000;
-   public $timeout = 20;
-   public $threads = 5;
+   // Grab maximum of 1000 rows, or timeout after 10 seconds--whichever
+   // happens first. Setting threads means that the processing will be
+   // additionally split up into parallel threads each working on their
+   // own chunk of rows.
+   // Note: read comment in construct about threads and the limit.
+   public $limit = 2000;
+   public $timeout = 10; // Setting higher can result in server timeout.
+   public $threads = 5; // Note: more does not always mean faster.
 
    // Username min and max lengths
    public $username_limits = array(
@@ -53,6 +53,17 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
    public function __construct() {
       $this->database_prefix = Gdn::Database()->DatabasePrefix;
+
+      // Adjust limit for threads. From what I've seen, having threads does not
+      // really speed up the processing, aside from providing more real-time
+      // progress updates. The processing power of the machine still determines
+      // how many rows actually get processed, so if 1 thread can process
+      // 1000 rows, 5 running in parallel will roughly process about 200 rows.
+      // each. This is why the limit is being divided: most of it is never even
+      // touched in the loop, so pull fewer rows into memory, which does has
+      // performance benefits.
+      // Adjust the above limit and threads variables accordingly.
+      $this->limit = ceil($this->limit / $this->threads);
 
       // Create whitelist of allowed roles.
       // Will be 'Guest', 'Unconfirmed', 'Applicant', 'Member', 'Administrator',
@@ -75,8 +86,9 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       Gdn::Structure()
          ->Table($this->table_name)
          ->PrimaryKey('ImportID')
-         ->Column('Email', 'varchar(200)', true, 'index')
-         ->Column('Username', 'varchar(50)', true, 'index')
+         ->Column('ThreadID', 'tinyint(1)', true, 'index')
+         ->Column('Email', 'varchar(200)', true)
+         ->Column('Username', 'varchar(50)', true)
          ->Column('Status', 'varchar(50)', true)
          ->Column('Completed', 'tinyint(1)', 0, 'index')
          ->Column('Error', 'text', true)
@@ -106,12 +118,14 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             $results = $this->handleUploadInsert($sender);
             $sender->SetData('results', $results);
             $sender->SetData('_available_invites', $this->calculateAvailableInvites());
+            $sender->AddDefinition('threads', $this->threads);
             $sender->Render('upload', '', 'plugins/bulkusersimporter');
             break;
 
          case in_array('process', $args):
             // Process inserted CSV data and create and email new users.
-            $this->processUploadedData($sender, Gdn::Request()->Post('mod', ''));
+            $thread_id = Gdn::Request()->Post('thread_id', '');
+            $this->processUploadedData($sender, $thread_id);
             $sender->Render('process', '', 'plugins/bulkusersimporter');
             break;
 
@@ -228,7 +242,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             // Quote strings for SQL
             $file_quoted = $pdo->quote($file);
 
-            // Determine if file has standard or non-standard line endings
+            // Determine if file has standard or non-standard line endings.
+            //
+            // Added ThreadID with random number assigned between 1 and
+            // n threads, to prevent race conditions, whereby multiple threads
+            // will frequently select dupe rows that have not finished
+            // processing.
             $sql = "
                LOAD DATA LOCAL INFILE $file_quoted
                   INTO TABLE
@@ -240,7 +259,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                   IGNORE $ignore_line LINES
                      (Email, Username, Status)
                   SET
-                     completed = 0
+                     ThreadID = FLOOR(RAND() * ($this->threads - 1 + 1)) + 1,
+                     Completed = 0
             ";
 
             // Use filename for results key
@@ -271,7 +291,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $user_id = Gdn::Session()->UserID;
 
       if ($user_id) {
-         $user_model = new UserModel();
+         $user_model = Gdn::UserModel();
          $available_invites = $user_model->GetInvitationCount($user_id);
       }
 
@@ -284,7 +304,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
     *
     * @param SettingsController $sender
     */
-   public function processUploadedData($sender, $mod = '') {
+   public function processUploadedData($sender, $thread_id = '') {
       $sender->SetData('status', 'Incomplete');
 
       // Collect error messages, concatenate them at end.
@@ -326,11 +346,13 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       }
 
       $bulk_user_importer_model = new Gdn_Model($this->table_name);
-      $imported_users = $bulk_user_importer_model->GetWhere(array('completed' => 0), '', 'asc', $this->limit)->ResultArray();
+      $imported_users = $bulk_user_importer_model->GetWhere(array('ThreadID' => $thread_id, 'Completed' => 0), '', 'asc', $this->limit)->ResultArray();
+
+      // Immediately block off the selection
 
       // Decide what model to use based on $userin_mode
       // Options are either invite or insert
-      $user_model = new UserModel();
+      $user_model = Gdn::UserModel();
       $invitation_model = new InvitationModel();
 
       // Grab default roles just in case a blank provided. Not providing any
@@ -341,10 +363,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $start_time = time();
       $processed = 0;
 
+      // Begin processing each record.
       foreach($imported_users as $user) {
-         // Check to see if the thread works.
-         if ($mod !== '' && ($user['ImportID'] % $this->threads) != $mod)
-            continue;
 
          $processed++;
          $send_email = false; // Default
@@ -419,7 +439,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
             // If invalid roles provided alongside valid roles, clear the
             // valid roles just to be safe.
-            if (count($status['role_ids'])) {
+            if (!empty($status['role_ids']) && count($status['role_ids'])) {
                $role_ids = $status['role_ids'] = array();
             }
 
@@ -641,8 +661,6 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             }
          }
 
-         $sender->SetJson('import_id', $user['ImportID']);
-         $sender->SetJson('first_import_id', $first_import_id);
          // If timeout reached, end current operation. It will be called
          // again immediately to continue processing.
          if (time() - $start_time >= $this->timeout) {
@@ -650,6 +668,17 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          }
       }
 
+
+      // Build content to send back to client. Determine success, etc.
+      //
+      // If multiple threads are in operation, but only a few rows are left,
+      // the loop above will be skipped entirely, so handle situation.
+
+      // If $processed is 0 by this point, it means there were no more rows
+      // found for the given ThreadID, so make sure no requests for that
+      // ThreadID are sent.
+
+      $error_messages = array_filter($error_messages);
       $total_fail = count($error_messages);
       $total_success = $processed - $total_fail;
 
@@ -657,17 +686,18 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          $total_success = 0;
       }
 
-      if ($total_success || $total_fail) {
-         $sender->SetJson('feedback', 'Latest job processed up to row ' . $user['ImportID']);
-      } else {
-         $sender->InformMessage('There was a problem processing the data.');
-      }
+      $sender->SetJson('threadid-success-fail', $thread_id .'-'. $total_success .'-'. $total_fail);
+
+      // Optionally just query the table for the number of processed rows,
+      // but this should be just as accurate. JS will keep track of the rows.
+      $sender->SetJson('job_rows_processed', $processed);
 
       // Send error dumps.
       if ($total_fail) {
          // Get dumps from DB relevant to this job.
          $bulk_error_dump = $bulk_user_importer_model->GetWhere(
             array(
+             'ThreadID' => $thread_id,
              'ImportID >=' => $first_import_id,
              'Completed' => 2
             ),
@@ -697,7 +727,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          return FALSE;
       }
 
-      $user_model = new UserModel();
+      $user_model = Gdn::UserModel();
 
       $Users = $user_model->GetWhere(array('Email' => $Email))->ResultObject();
       if (count($Users) == 0) {
