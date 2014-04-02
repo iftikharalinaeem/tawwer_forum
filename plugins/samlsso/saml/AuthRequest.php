@@ -20,6 +20,11 @@ class OneLogin_Saml_AuthRequest
     public $isPassive = true;
 
     /**
+     * @var string A
+     */
+    public $relayState = '';
+
+    /**
      * Construct the response object.
      *
      * @param OneLogin_Saml_Settings $settings
@@ -67,6 +72,10 @@ AUTHNREQUEST;
         $deflatedRequest = gzdeflate($request);
         $base64Request = base64_encode($deflatedRequest);
         $get = array('SAMLRequest' => $base64Request);
+
+        if ($this->relayState) {
+           $get['RelayState'] = $this->relayState;
+        }
 
         try {
             $this->signRequest($get);

@@ -22,8 +22,9 @@ class SamlSSOPlugin extends Gdn_Plugin {
    /**
     * Force a saml authentication to the identity provider.
     * @param bool $passive Whether or not to make a passive request.
+    * @param string $target The target url to redirect to after the signin.
     */
-   public function authenticate($passive = false) {
+   public function authenticate($passive = false, $target = false) {
       $settings = $this->GetSettings();
       $request = new OneLogin_Saml_AuthRequest($settings);
       $request->isPassive = $passive;
@@ -164,10 +165,17 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $this->EntryController_Saml_Create($Sender);
    }
 
+   /**
+    * @param EntryController $Sender
+    */
    public function EntryController_Saml_Create($Sender) {
       $settings = $this->GetSettings();
       $request = new OneLogin_Saml_AuthRequest($settings);
       $request->isPassive = (bool)$Sender->Request->Get('ispassive');
+
+      if ($target = Gdn::Request()->Get('Target'))
+         $request->relayState = $target;
+
       $url = $request->getRedirectUrl();
       Gdn::Session()->Stash('samlsso', NULL, TRUE);
       Redirect($url);
@@ -254,6 +262,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
       Trace($id, 'id');
       Trace($profile, 'profile');
+      Trace($response->getNameId(), 'nameid');
 
       $Form = $Sender->Form; //new Gdn_Form();
       $Form->SetFormValue('UniqueID', $this->rval('eduPersonTargetedID', $profile));
@@ -265,9 +274,9 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $Form->SetFormValue('Email', $this->rval('mail', $profile));
       $Form->SetFormValue('Photo', $this->rval('photo', $profile));
 
-      // Set the target from a common items.
+      // Set the target from common items.
       if ($relay_state = $Sender->Request->Post('RelayState')) {
-         if (IsUrl($relay_state))
+         if (IsUrl($relay_state) || preg_match('`^[/a-z]`i', $relay_state))
             $Form->SetFormValue('Target', $relay_state);
       }
 
