@@ -3,7 +3,7 @@
 $PluginInfo['avatarstock'] = array(
    'Name' => 'Avatar Pool',
    'Description' => 'Create a limited stock of default avatars that members can choose between.',
-   'Version' => '1.0.5',
+   'Version' => '1.0.9',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -269,8 +269,10 @@ class AvatarStockPlugin extends Gdn_Plugin {
       $user_model = new UserModel();
       $avatarstock_model = new Gdn_Model('AvatarStock');
 
+      $page_user_id = $sender->User->UserID;
+
       $sender->Form->SetModel('User');
-      $sender->Form->AddHidden('UserID', $session->User->UserID);
+      $sender->Form->AddHidden('UserID', $page_user_id);
 
       // When posted to self
       if ($sender->Form->AuthenticatedPostBack() === true) {
@@ -289,7 +291,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
                $sender->Form->AddError('Invalid Avatar ID.');
             }
 
-            if (!ValidateInteger($user_id) && $user_id != $sender->User->UserID) {
+            if (!ValidateInteger($user_id) && $user_id != $page_user_id) {
                $sender->Form->AddError('You cannot modify this users avatar.');
             }
 
@@ -311,8 +313,9 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
          // If there were no problems, redirect back to the user account
          if ($sender->Form->ErrorCount() == 0) {
+
             $sender->InformMessage(Sprite('Check', 'InformSprite').T('Your changes have been saved.'), 'Dismissable AutoDismiss HasSprite');
-            Redirect($sender->DeliveryType() == DELIVERY_TYPE_VIEW ? UserUrl($session->User) : UserUrl($session->User, '', 'picture'));
+            Redirect($sender->DeliveryType() == DELIVERY_TYPE_VIEW ? UserUrl($sender->User) : UserUrl($sender->User, '', 'picture'));
          }
       }
 
@@ -323,15 +326,9 @@ class AvatarStockPlugin extends Gdn_Plugin {
       // Current avatar URL
       $user_stockavatar_id = false; // none
 
-      $current_user_id = $UserID;
-      // What is a better way to get the PAGE user id?
-      if (!$current_user_id) {
-         $current_user_id = $session->UserID;
-      }
-
-      if (ValidateInteger($current_user_id)) {
+      if (ValidateInteger($page_user_id)) {
          $current_user_data = $user_model->GetWhere(array(
-            'UserID' => $current_user_id
+            'UserID' => $page_user_id
          ))->FirstRow(DATASET_TYPE_ARRAY);
 
          $current_user_photo = $current_user_data['Photo'];
@@ -361,4 +358,12 @@ class AvatarStockPlugin extends Gdn_Plugin {
       $sender->Render('picture', '', 'plugins/avatarstock');
    }
 
+   public function ProfileController_Thumbnail_Create($UserReference = '', $Username = '') {
+      throw ForbiddenException('@Editing user photos has been disabled.');
+   }
+
+   public function ProfileController_AfterAddSideMenu_Handler(&$sender) {
+      $menu = $sender->EventArguments['SideMenu'];
+      $menu->RemoveLink('Options', '/profile/thumbnail');
+   }
 }

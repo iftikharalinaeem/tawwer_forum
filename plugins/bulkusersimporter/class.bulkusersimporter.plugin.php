@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk User Import',
    'Description' => 'Bulk user import with standardized CSV files. Send invites or directly insert new members.',
-   'Version' => '1.0.25',
+   'Version' => '1.0.26',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -43,6 +43,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    // records processed per unit of time.
    public $limit = 1000;
    public $timeout = 20;
+   public $threads = 5;
 
    // Username min and max lengths
    public $username_limits = array(
@@ -110,7 +111,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          case in_array('process', $args):
             // Process inserted CSV data and create and email new users.
-            $this->processUploadedData($sender);
+            $this->processUploadedData($sender, Gdn::Request()->Post('mod', ''));
             $sender->Render('process', '', 'plugins/bulkusersimporter');
             break;
 
@@ -283,7 +284,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
     *
     * @param SettingsController $sender
     */
-   public function processUploadedData($sender) {
+   public function processUploadedData($sender, $mod = '') {
       $sender->SetData('status', 'Incomplete');
 
       // Collect error messages, concatenate them at end.
@@ -341,6 +342,10 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $processed = 0;
 
       foreach($imported_users as $user) {
+         // Check to see if the thread works.
+         if ($mod !== '' && ($user['ImportID'] % $this->threads) != $mod)
+            continue;
+
          $processed++;
          $send_email = false; // Default
          $user_id = false; // Default

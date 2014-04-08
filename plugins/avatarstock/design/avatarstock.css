@@ -62,12 +62,14 @@
   padding: 2px;
   cursor: pointer;
   opacity: 0.40;
+  -webkit-transform: scale(0.9);
   transform: scale(0.9);
   transition: all 0.2s ease;
   overflow: hidden;
 }
 #stockavatar-picker .avatar-option label:hover, #stockavatar-picker .avatar-option label.current-stock-avatar {
   opacity: 1;
+  -webkit-transform: scale(1);
   transform: scale(1);
   box-shadow: 0 0 5px 0 #aaa;
 }
@@ -76,7 +78,6 @@
 }
 #stockavatar-picker .avatar-option img {
   display: block;
-  height: auto;
 }
 #stockavatar-picker .avatar-option input {
   position: fixed;

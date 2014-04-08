@@ -151,7 +151,7 @@ jQuery(document).ready(function($) {
 
    // Call job every n.
    var bulk_importer_errors = 0;
-   var incremental_job = function(url) {
+   var incremental_job = function(url, mod) {
       var bulk_job_start = Math.ceil(+new Date / 1000);
       var $progress_meter = $('#import-progress-meter');
       var total_rows = parseInt($progress_meter.attr('data-total-rows'));
@@ -161,6 +161,9 @@ jQuery(document).ready(function($) {
       var $bulk_error_many_errors = $('#bulk-error-many-errors');
       var $bulk_error_dump = $('#bulk-error-dump');
       var progress_fail_message = 'Import could not be completed.';
+
+      if (mod === undefined)
+        mod = '';
 
       // Get expires for invitation mode
       var bulk_invite_expires = '';
@@ -183,7 +186,8 @@ jQuery(document).ready(function($) {
          TransientKey: gdn.definition('TransientKey', ''),
          debug: bulk_importer_debug,
          userin: bulk_radio_userin,
-         expires: bulk_invite_expires
+         expires: bulk_invite_expires,
+         mod: mod
       }, null, 'json')
       .done(function(data) {
 
@@ -285,7 +289,7 @@ jQuery(document).ready(function($) {
          // If done, call again and continue the process.
          if (rows_completed_job != total_rows) {
             if (!cancel_import) {
-               incremental_job(url);
+               incremental_job(url, mod);
             }
          } else if (rows_completed_job == total_rows) {
             $progress_animation.addClass('removed');
@@ -314,7 +318,9 @@ jQuery(document).ready(function($) {
       $('#bulk-importer-checkbox-email').addClass('disable-option');
       $('#bulk-radio-options').addClass('disable-option');
       cancel_import = false;
-      incremental_job(e.target.href);
+      for (var i = 0; i < 5; i++) {
+        incremental_job(e.target.href, i);
+      }
       bulk_start_time = Math.ceil(+new Date / 1000);
    });
 
