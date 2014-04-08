@@ -215,7 +215,7 @@ insert into GDN_UserRole (UserID, RoleID) select id, 16 from zendesk_users where
 insert into GDN_UserRole (UserID, RoleID) select id, 32 from zendesk_users where role = 'agent';
 
 insert into GDN_Category (CategoryID, Name, UrlCode, Description, DateInserted, DateUpdated)
-select id, name, html_url, description, created_at, updated_at from zendesk_topics;
+select id, name, lower(replace(name,' ','-')), description, created_at, updated_at from zendesk_topics;
 
 insert into GDN_Discussion (DiscussionID, Name, Body, InsertUserID, QnA, DateInserted, DateUpdated, Format, `Type`, CategoryID)
 select id, title, details, author_id, IF(accepted_answer_id>0,'Accepted','Answered'), created_at, updated_at, 'Markdown', 'Question', topic_id from zendesk_questions;
