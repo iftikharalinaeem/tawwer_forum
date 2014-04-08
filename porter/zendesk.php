@@ -64,8 +64,8 @@ $DbPass = '';
 
 // API creds
 $Site = 'kinvey';
-$User = 'caroline@kinvey.com';
-$Pass = 'changeme123';
+$User = 'some@one.com';
+$Pass = 'pass';
 
 // Setup API call
 $ch = curl_init();
