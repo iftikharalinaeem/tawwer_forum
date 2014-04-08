@@ -21,7 +21,7 @@
   display: none;
 }
 #bulk-importer #import-progress-container.working {
-  display: inline-block;
+  display: inline;
 }
 #bulk-importer #bulk-error-header:empty {
   display: none;
