@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.24',
+   'Version' => '1.3.25',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -629,6 +629,7 @@ class EditorPlugin extends Gdn_Plugin {
       $Media = (array) $Model->GetID($MediaID);
 
       if ($Media
+      && !empty($Media['InsertUserID'])
       && Gdn::Session()->UserID == $Media['InsertUserID']
       // These two are only available when a comment/discussion has already
       // been saved. If removing them from a live session (ie, deciding not
@@ -683,6 +684,8 @@ class EditorPlugin extends Gdn_Plugin {
 
       // Array of Media IDs to remove, if any.
       $removeMediaIds = (array) Gdn::Request()->GetValue('RemoveMediaIDs');
+      // Clean it if it's empty.
+      $removeMediaIds = array_filter($removeMediaIds);
 
       if (count($removeMediaIds)) {
          foreach ($removeMediaIds as $mediaId) {
