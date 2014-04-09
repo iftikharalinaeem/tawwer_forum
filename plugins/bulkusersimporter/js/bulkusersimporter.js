@@ -161,6 +161,9 @@ jQuery(document).ready(function($) {
    var bulk_rows_after_job = []; // Collect how many jobs done.
    var bulk_time_after_job = []; // Collect average time per job.
 
+   // Readable time
+   var start_time_real = 0;
+
    // Keep track of total rows processed.
    var total_rows_processed = 0;
 
@@ -291,11 +294,9 @@ jQuery(document).ready(function($) {
                import_time_remaining = 0;
             }
 
-            // TODO consider smarter time handling, to adjust for hours
-            // and seconds.
-            var time_estimation_string =  '&middot; '+ total_elapsed_time +' minute(s) elapsed';
+            var time_estimation_string =  '&middot; <span title=" Started at '+ start_time_real +'">'+ total_elapsed_time +' minute(s) elapsed</span>';
             var new_page_title = '('+ progress + '%) ' + documentTitle;
-            if (progress != 100) {
+            if (total_rows_completed != total_rows) {
                time_estimation_string += ' &middot; about <strong>'+ import_time_remaining +' minute(s) left</strong>';
                new_page_title = '('+ progress + '%) · ' + import_time_remaining + ' minute(s) left - ' + documentTitle;
             }
@@ -308,7 +309,7 @@ jQuery(document).ready(function($) {
          }
 
          // If done, call again and continue the process.
-         if (total_rows_completed != total_rows || total_rows_completed < total_rows) {
+         if (total_rows_completed != total_rows) {
             // If import has not been cancelled, or if the last job had some rows
             // processed, send out another job. If the last thread_id returned
             // 0 processed rows, any further requests from this thread can
@@ -433,6 +434,8 @@ jQuery(document).ready(function($) {
       $('#bulk-radio-options').addClass('disable-option');
 
       bulk_start_time = Math.ceil(+new Date / 1000);
+      start_time_real = new Date(bulk_start_time * 1000);
+      start_time_real = start_time_real.getHours() + ':' + start_time_real.getMinutes();
 
       cancel_import = false;
       for (var thread_id = 1; thread_id <= threads; thread_id++) {

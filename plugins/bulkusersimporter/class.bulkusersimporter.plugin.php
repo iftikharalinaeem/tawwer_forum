@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk User Import',
    'Description' => 'Bulk user import with standardized CSV files. Send invites or directly insert new members.',
-   'Version' => '1.1.0',
+   'Version' => '1.1.1',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -18,7 +18,6 @@ $PluginInfo['bulkusersimporter'] = array(
 
 /**
  * TODO:
- * - In addition to the new time estimates, include the start and end times.
  * - Allow downloading the full error dump from table.
  *   - Instead of reporting line numbers, simply provide a dump of errors
  *     in a CSV file that can be be easily amended and uploaded.
