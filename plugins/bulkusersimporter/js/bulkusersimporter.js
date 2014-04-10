@@ -265,7 +265,7 @@ jQuery(document).ready(function($) {
          if (total_rows_completed <= total_rows || job_rows_processed) {
 
             var progress = Math.ceil((total_rows_completed / total_rows) * 100);
-            if (progress > 100 || isNaN(progress)) {
+            if (progress > 100 || isNaN(progress) || !isFinite(progress)) {
                progress = 100;
             }
 
@@ -290,7 +290,7 @@ jQuery(document).ready(function($) {
 
             // Calculate average time remaining in whole import. In minutes.
             var import_time_remaining = Math.ceil((rows_remaining * average_time_per_row) / 60);
-            if (isNaN(import_time_remaining)) {
+            if (isNaN(import_time_remaining) || !isFinite(import_time_remaining)) {
                import_time_remaining = 0;
             }
 
@@ -435,7 +435,7 @@ jQuery(document).ready(function($) {
 
       bulk_start_time = Math.ceil(+new Date / 1000);
       start_time_real = new Date(bulk_start_time * 1000);
-      start_time_real = start_time_real.getHours() + ':' + start_time_real.getMinutes();
+      start_time_real = start_time_real.getHours() + ':' + ((start_time_real.getMinutes() < 10) ? '0' : '') + start_time_real.getMinutes();
 
       cancel_import = false;
       for (var thread_id = 1; thread_id <= threads; thread_id++) {
