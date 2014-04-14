@@ -337,6 +337,16 @@ class SearchModel extends Gdn_Model {
          $indexes = $this->Indexes(array('Discussion', 'Comment'));
          $sphinx->setFilter('DiscussionID', (array)$search['discussionid']);
       }
+      if (isset($search['tags'])) {
+         if (GetValue('tags-op', $search) == 'and') {
+            foreach ($search['tags'] as $trow) {
+               $sphinx->setFilter('Tags', (array)$trow['TagID']);
+            }
+         } else {
+            $sphinx->setFilter('Tags', ConsolidateArrayValuesByKey($search['tags'], 'TagID'));
+         }
+
+      }
 
       $this->setSort($sphinx, $terms, $search);
       $results = $this->DoSearch($sphinx, $query, $indexes);
@@ -523,7 +533,7 @@ class SearchModel extends Gdn_Model {
 
    public function setSort($sphinx, $terms, $search) {
       // If there is just one search term then we really want to just sort by date.
-      if (count($terms) < 2) {
+      if (GetValue('sort', $search) === 'date' || (count($terms) < 2 && GetValue('sort', $search) !== 'relevance')) {
          $sphinx->setSelect('*, (dateinserted + 1) as sort');
          $sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'sort');
       } else {
