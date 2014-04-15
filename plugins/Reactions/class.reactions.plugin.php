@@ -6,7 +6,8 @@
  *  1.0     Release
  *  1.2.3   Allow ReactionModel() to react from any source user.
  *  1.2.4   Allow some reactions to be protected so that users can't flag moderator posts.
- *
+ *  1.2.12  ?
+ *  1.3     Add class permissions; fix GetReactionTypes attributes; fix descriptions.
  *
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary
@@ -16,8 +17,13 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.2.12',
+   'Version' => '1.3',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RegisterPermissions' => array(
+      'Reactions.Good.Add' => 'Conversations.Conversations.Add',
+      'Reactions.Bad.Add' => 'Conversations.Conversations.Add',
+      'Reactions.Flag.Add' => 'Conversations.Conversations.Add'
+   ),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
@@ -347,7 +353,12 @@ class ReactionsPlugin extends Gdn_Plugin {
          throw ForbiddenException("@You may not use that Reaction.");
       }
 
-      // Check reaction's permission if one is applied
+      // Check reaction's permission based on class
+      if ($PermissionClass = GetValue('Class', $ReactionType)) {
+         $Sender->Permission('Reactions.'.$PermissionClass.'.Add');
+      }
+
+      // Check reaction's permission if a custom/specific one is applied
       if ($Permission = GetValue('Permission', $ReactionType)) {
          $Sender->Permission($Permission);
       }
