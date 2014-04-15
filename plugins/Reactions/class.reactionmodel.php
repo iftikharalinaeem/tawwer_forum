@@ -160,8 +160,16 @@ class ReactionModel {
       $Types = self::ReactionTypes();
       $Result = array();
       foreach ($Types as $Index => $Type) {
-         if (self::Filter($Type, $Where))
+         if (self::Filter($Type, $Where)) {
+            // Set Attributes as fields
+            $Attributes = GetValue('Attributes', $Type);
+            if (is_string($Attributes)) {
+               $Attributes = @unserialize($Attributes);
+               SetValue('Attributes', $Type, $Attributes);
+            }
+            // Add the result
             $Result[$Index] = $Type;
+         }
       }
       return $Result;
    }
