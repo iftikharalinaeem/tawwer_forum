@@ -45,10 +45,14 @@
    }
    
    tbody .AutoDescription {
-      font-size: 11px;
+      width: 300px;
       margin: 10px 0 0;
       border-top: solid 1px #ddd;
-      padding: 5px 0 0 0;
+      padding: 5px 0 0 35px;
+   }
+
+   tbody .AutoDescription ul {
+      list-style-type: disc;
    }
 </style>
 <div class="Help Aside">
@@ -76,7 +80,7 @@
 </div>
 <div class="Wrap">
    <?php
-   echo Anchor(T('Advanced Settings'), '/reactions/advanced');
+   echo Anchor(T('Advanced Settings'), '/reactions/advanced', 'Button');
    ?>
 </div>
 <table id="Badges" class="AltColumns ManageBadges">
@@ -84,7 +88,7 @@
       <tr>
          <th class="NameColumn"><?php echo T('Reaction'); ?></th>
          <th><?php echo T('Description'); ?></th>
-         <th><?php echo T('Actions Based on Votes'); ?></th>
+         <th><?php echo T('Actions Based on Votes', "Actions and Permissions"); ?></th>
          <th class="Options"><?php echo T('Active'); ?></th>
       </tr>
    </thead>
@@ -103,11 +107,11 @@
             ?></div>
          </td>
          <td><?php echo $ReactionType['Description']; ?></td>
-         <td>
+         <td class="AutoDescription">
             <?php            
-            $AutoDescription = implode(' ', AutoDescription($ReactionType));
+            $AutoDescription = implode('</li><li>', AutoDescription($ReactionType));
             if ($AutoDescription) 
-               echo $AutoDescription;
+               echo Wrap('<li>'.$AutoDescription.'</li>', 'ul');
             ?>
          </td>
          <td>

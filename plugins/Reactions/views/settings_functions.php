@@ -3,27 +3,20 @@
 function AutoDescription($ReactionType) {
    $Result = array();
    
-   if ($Permission = GetValue('Permission', $ReactionType)) {
-      switch ($Permission) {
-         case 'Garden.Moderation.Manage':
-            $Result[] = '<b>Only moderators can use this reaction.</b>';
-            break;
-         case 'Garden.Settings.Manage':
-            $Result[] = '<b>Only administrators can use this reaction.</b>';
-            break;
-      }
-   }
-   
    if ($IncrementColumn = GetValue('IncrementColumn', $ReactionType)) {
       $IncrementValue = GetValue('IncrementValue', $ReactionType, 1);
-      $IncrementString = $IncrementValue > 0 ? "adds $IncrementValue to" : "subtracts ".abs($IncrementValue)." from";
-      $IncrementString = '<b>'.$IncrementString.'</b>';
-      
-      $Result[] = sprintf("This reaction %s a post's %s.", $IncrementString, strtolower($IncrementColumn));
+      $IncrementString = $IncrementValue > 0 ? "<b>Adds $IncrementValue</b> to" : "<b>Subtracts ".abs($IncrementValue)."</b> from";
+
+      $Result[] = sprintf("%s a <b>post</b>'s %s.", $IncrementString, strtolower($IncrementColumn));
    }
    
    if ($Points = GetValue('Points', $ReactionType)) {
-      $Result[] = Plural($Points, 'Users that get this reaction get %+d point.', 'Users that get this reaction get %+d points.');
+      if ($Points > 0)
+         $IncrementString = "<b>Gives $Points</b> ".Plural($Points,'point','points')." to";
+      else
+         $IncrementString = "<b>Removes ".abs($Points)."</b> ".Plural($Points,'point','points')." from";
+
+      $Result[] = sprintf("%s the <b>user</b>.", $IncrementString);
    }
    
    if ($LogThreshold = GetValue('LogThreshold', $ReactionType)) {
@@ -37,6 +30,14 @@ function AutoDescription($ReactionType) {
       if ($RemoveThreshold != $LogThreshold) {
          $Result[] = sprintf("Posts will be removed when they get %s reactions.", $RemoveThreshold);
       }
+   }
+
+   if ($Class = GetValue('Class', $ReactionType)) {
+      $Result[] = sprintf(T('ReactionClassRestriction', 'Requires &ldquo;%s&rdquo; reaction permission.'), $Class);
+   }
+
+   if ($Permission = GetValue('Permission', $ReactionType)) {
+      $Result[] = sprintf(T('ReactionPermissionRestriction', '<b>Special restriction:</b> Only users with permission %s may use this reaction.'),$Permission);
    }
    
    return $Result;
