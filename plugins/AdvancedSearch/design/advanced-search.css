@@ -85,9 +85,6 @@ button .SpSearch, .QuickSearch .SpSearch {
 }
 .AdvancedSearch .AdvancedWrap {
   display: none;
-  /*      .P:first-child {
-           margin-top: 0px;;   
-        }*/
 }
 .AdvancedSearch.Open .InputAndButton .Handle {
   /*@include transform-origin( 5px, 5px);*/
@@ -188,6 +185,7 @@ button .SpSearch, .QuickSearch .SpSearch {
   display: none;
   position: absolute;
   right: 0;
+  left: auto;
   top: 105%;
   z-index: 1000;
 }
