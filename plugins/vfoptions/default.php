@@ -391,12 +391,12 @@ pageTracker._trackPageview();
       $LockedPlugins = C('VFCom.Plugins.Locked', array('jsConnect', 'Multilingual', 'Pockets', 'Sphinx', 'TrackingCodes', 'VanillaPop', 'Whispers'));
       
       // Addons to hide even when enabled
-      $HiddenPlugins = C('VFCom.Plugins.Hidden', array('CustomTheme', 'CustomDomain', 'CustomizeText', 'HtmLawed', 'cloudfiles', 'rackmonkey'));
+      $HiddenPlugins = C('VFCom.Plugins.Hidden', array('CustomTheme', 'CustomDomain', 'CustomizeText', 'HtmLawed', 'cloudfiles'));
       
-      // Exclude hidden and vf* from enabled plugins
+      // Exclude hidden, vf*, and *monkey from enabled plugins
       foreach($EnabledPlugins as $Key => $Name) {
          // Skip all vf* plugins
-         if (in_array($Key, $HiddenPlugins) || strpos($Key, 'vf') === 0)
+         if (in_array($Key, $HiddenPlugins) || strpos($Key, 'vf') === 0 || substr_compare($str,'monkey',-6,6) === 0 )
             unset($EnabledPlugins[$Key]);
       }
       
