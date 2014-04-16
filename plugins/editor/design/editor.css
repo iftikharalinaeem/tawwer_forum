@@ -682,7 +682,7 @@ directly on the iframe's bodybox contenteditable. */
 
 /* Media query: Hiding non-essential buttons */
 @media (max-width: 767px) {
-  .hidden-xs {
+  .editor-optional-button {
     display: none !important;
   }
 

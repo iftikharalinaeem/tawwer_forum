@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk User Import',
    'Description' => 'Bulk user import with standardized CSV files. Send invites or directly insert new members.',
-   'Version' => '1.0.31',
+   'Version' => '1.1.2',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -18,13 +18,14 @@ $PluginInfo['bulkusersimporter'] = array(
 
 /**
  * TODO:
- * - Prepend underscore to data set for view.
- * - In addition to the new time estimates, include the start and end times.
  * - Allow downloading the full error dump from table.
  *   - Instead of reporting line numbers, simply provide a dump of errors
  *     in a CSV file that can be be easily amended and uploaded.
  * - Consider multiple users operating the bulk importer. Do not just truncate
  *   the BulkUsersImporter table on every new upload.
+ * - Create secondary table that will keep track of import sessions, which
+ *   will be checked before uploading and truncating the main table, with
+ *   option to resume from last aborted import.
  */
 
 class BulkUsersImporterPlugin extends Gdn_Plugin {
@@ -36,16 +37,49 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    // Will contain whitelist of allowed roles.
    private $allowed_roles = array();
 
-   // Grab maximum of 1000 rows, or timeout after 10 seconds--whichever
-   // happens first. Setting threads means that the processing will be
-   // additionally split up into parallel threads each working on their
-   // own chunk of rows.
-   // Note: read comment in construct about threads and the limit.
+   /*
+    * Grab maximum of 1000 rows, or timeout after 10 seconds--whichever
+    * happens first. Setting threads means that the processing will be
+    * additionally split up into parallel threads each working on their
+    * own chunk of rows.
+    * Note: read comment in construct about threads and the limit.
+    *
+    * @var int $limit
+    */
    public $limit = 2000;
-   public $timeout = 10; // Setting higher can result in server timeout.
-   public $threads = 5; // Note: more does not always mean faster.
 
-   // Username min and max lengths
+   /**
+    * How long a job should run. Setting higher can result in server timeout.
+    *
+    * @var int $timeout
+    */
+   public $timeout = 10;
+
+   /**
+    * Note: more does not always mean faster.
+    *
+    * @var int $threads
+    */
+   public $threads = 5;
+
+   /**
+    * Number of times to retry a job before it's finally cancelled. This is
+    * used if the server returns something other than a 200 response.
+    *
+    * @var int $retries
+    */
+   public $retries = 10;
+
+   /**
+    * How long to wait before the thread is retried.
+    */
+   public $retries_timeout_seconds = 10;
+
+   /**
+    * Username min and max lengths.
+    *
+    * @var array $username_limits
+    */
    public $username_limits = array(
        'min' => 3,
        'max' => 40
@@ -119,6 +153,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             $sender->SetData('results', $results);
             $sender->SetData('_available_invites', $this->calculateAvailableInvites());
             $sender->AddDefinition('threads', $this->threads);
+            $sender->AddDefinition('retries', $this->retries);
+            $sender->AddDefinition('retries_timeout_seconds', $this->retries_timeout_seconds);
             $sender->Render('upload', '', 'plugins/bulkusersimporter');
             break;
 
@@ -306,6 +342,10 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
     */
    public function processUploadedData($sender, $thread_id = '') {
       $sender->SetData('status', 'Incomplete');
+
+      // Use these to debug handling of different server responses.
+      //http_response_code(500);
+      //exit;
 
       // Collect error messages, concatenate them at end.
       $error_messages = array();
@@ -691,6 +731,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       // Optionally just query the table for the number of processed rows,
       // but this should be just as accurate. JS will keep track of the rows.
       $sender->SetJson('job_rows_processed', $processed);
+
+      // Send total rows processed so far.
+      $total_rows_completed = $bulk_user_importer_model->GetCount(array(
+          'Completed >' => 0
+      ));
+      $sender->SetJson('total_rows_completed', $total_rows_completed);
 
       // Send error dumps.
       if ($total_fail) {
