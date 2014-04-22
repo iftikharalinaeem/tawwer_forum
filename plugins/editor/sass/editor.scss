@@ -518,6 +518,73 @@ directly on the iframe's bodybox contenteditable. */
 }
 
 /**
+ * Mobile tweaks, specifically for Lithe Mobile
+ */
+.editor-mobile {
+   .editor-dropdown-upload {
+      position: static;
+
+      .editor-insert-dialog {
+         left: 0;
+         right: 0;
+         top: auto;
+         width: auto;
+      }
+   }
+
+   .editor-dropdown-default {
+
+      .editor-dd-emoji + .editor-insert-dialog {
+         min-width: 132px;
+         padding: 5px;
+      }
+
+      .editor-dd-format + .editor-insert-dialog {
+         right: auto;
+         left: 0;
+         a {
+            display: block;
+            padding: 5px 10px;
+            cursor: pointer;
+         }
+      }
+   }
+
+   .editor-dropdown-link {
+      .editor-insert-dialog {
+         padding: 5px;
+      }
+   }
+
+   #drop-cue-dropdown,
+   .file-input .file-or {
+      display: none !important;
+   }
+
+   .FileBox {
+      overflow: hidden;
+
+      label, input {
+         float: left;
+         width: auto;
+      }
+
+      label {
+         padding-top: 5px;
+         padding-bottom: 5px;
+      }
+
+      label .icon:hover {
+         background-color: inherit;
+      }
+
+   }
+}
+
+
+
+
+/**
  * Modify this file to change the styling of the content
  * in the Wysiwyg editor.
  */
