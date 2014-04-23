@@ -5,6 +5,11 @@ include_once dirname(__FILE__).'/class.reactionmodel.php';
 $St = Gdn::Structure();
 $Sql = Gdn::SQL();
 
+Gdn::PermissionModel()->Define(array(
+   'Reactions.Good.Add' => 'Conversations.Conversations.Add',
+   'Reactions.Bad.Add' => 'Conversations.Conversations.Add',
+   'Reactions.Flag.Add' => 'Conversations.Conversations.Add'));
+
 $St->Table('ReactionType');
 $ReactionTypeExists = $St->TableExists();
 
