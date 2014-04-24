@@ -1,7 +1,7 @@
 <?php
 
-   $format          = strtolower($this->Data('_EditorInputFormat'));
-   $html_toolbar    = ''; // for regular text
+   $format = strtolower($this->Data('_EditorInputFormat'));
+   $html_toolbar = ''; // for regular text
 
    if ($format != 'text' && $format != 'textex') {
 
@@ -9,7 +9,11 @@
          ? 'editor-uploads'
          : 'editor-uploads-disabled';
 
-      $html_toolbar    = '<div class="editor editor-format-'. $format .' '. $css_upload_class .'">';
+      $css_ismobile_class = (IsMobile())
+         ? 'editor-mobile'
+         : 'editor-desktop';
+
+      $html_toolbar    = '<div class="editor editor-format-'. $format .' '. $css_upload_class .' '. $css_ismobile_class .'">';
       $html_arrow_down = '<span class="icon icon-caret-down"></span>';
       $editor_file_input_name = $this->Data('_editorFileInputName');
 
@@ -52,7 +56,7 @@
                          <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="Cancel"/>
                          </div>
                       </div>'
-                   , 'div', array('class' => 'editor-dropdown'));
+                   , 'div', array('class' => 'editor-dropdown editor-dropdown-link'));
                   break;
 
                case 'image':
@@ -73,7 +77,7 @@
                         <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="Cancel"/>
                         </div>
                      </div>'
-                   , 'div', array('class' => 'editor-dropdown'));
+                   , 'div', array('class' => 'editor-dropdown editor-dropdown-image'));
                   break;
 
                case 'upload':
@@ -84,13 +88,13 @@
                            '. T('Drop image/file') .'
                         </div>
                         <div class="drop-section file-input">
-                           or <input type="file" name="'. $editor_file_input_name .'[]" multiple />
+                           <span class="file-or">or</span> <input type="file" name="'. $editor_file_input_name .'[]" multiple />
                         </div>
                         <div class="drop-section image-input" title="'. T('Paste the URL of an image to quickly embed it.') .'">
                            <input class="InputBox editor-input-image" placeholder="'. T('Image URL') .'" />
                         </div>
                      </div>'
-                   , 'div', array('class' => 'editor-dropdown'));
+                   , 'div', array('class' => 'editor-dropdown editor-dropdown-upload'));
                   break;
 
                // All other dropdowns (color, format, emoji)
@@ -98,7 +102,7 @@
                   $html_toolbar .= Wrap(
                      Wrap($html_arrow_down, 'span', $button['attr']) .''.
                      Wrap($html_button_dropdown_options, 'div', array('class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''))
-                  , 'div', array('class' => 'editor-dropdown'));
+                  , 'div', array('class' => 'editor-dropdown editor-dropdown-default'));
                   break;
             }
          }

@@ -175,7 +175,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     */
    protected static function TranslateField(&$Data, $Field, $Value) {
       $Errors = array();
-      $SupportedTables = array('Badge', 'Category', 'Rank', 'Role', 'User');
+      $SupportedTables = array('Badge', 'Category', 'Rank', 'Role', 'User', 'Discussion');
 
       try {
 
@@ -209,6 +209,10 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                   }
                }
             }
+
+            // Only allow the ForeignID of the discussion table.
+            if ($SingularTableName === 'Discussion' && !in_array($ColumnLookup, array('DiscussionID', 'ForeignID')))
+               $TableAllowed = FALSE;
 
             if (!$TableAllowed)
                return;

@@ -6,6 +6,8 @@
  *  1.0     Release
  *  1.2.3   Allow ReactionModel() to react from any source user.
  *  1.2.4   Allow some reactions to be protected so that users can't flag moderator posts.
+ *  1.2.13  Added TagModel_Types_Handler.
+ *
  *  1.2.12  ?
  *  1.3     Add class permissions; fix GetReactionTypes attributes; fix descriptions.
  *
@@ -647,6 +649,31 @@ class ReactionsPlugin extends Gdn_Plugin {
          $this->VoteHeaderWritten = TRUE;
 		endif;
 	}
+
+   /**
+    * Add Types to TagModel so that tabs in the dashboard will have more info
+    * to work with.
+    */
+   public function TagModel_Types_Handler($Sender) {
+      $Sender->AddType('BestOf', array(
+          'key' => 'BestOf',
+          'name' => 'BestOf',
+          'plural' => 'BestOf',
+          'addtag' => false,
+          'default' => false
+          ));
+
+      $Sender->AddType('Reaction', array(
+          'key' => 'Reaction',
+          'name' => 'Reaction',
+          'plural' => 'Reactions',
+          'addtag' => false,
+          'default' => false
+      ));
+   }
+
+
+
 }
 
 if (!function_exists('WriteReactions')):
