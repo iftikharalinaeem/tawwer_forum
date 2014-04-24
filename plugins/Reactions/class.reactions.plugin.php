@@ -353,14 +353,13 @@ class ReactionsPlugin extends Gdn_Plugin {
          throw ForbiddenException("@You may not use that Reaction.");
       }
 
-      // Check reaction's permission based on class
-      if ($PermissionClass = GetValue('Class', $ReactionType)) {
-         $Sender->Permission('Reactions.'.$PermissionClass.'.Add');
-      }
-
-      // Check reaction's permission if a custom/specific one is applied
+      // Permission
       if ($Permission = GetValue('Permission', $ReactionType)) {
+         // Check reaction's permission if a custom/specific one is applied
          $Sender->Permission($Permission);
+      } elseif ($PermissionClass = GetValue('Class', $ReactionType)) {
+         // Check reaction's permission based on class
+         $Sender->Permission('Reactions.'.$PermissionClass.'.Add');
       }
 
       $ReactionModel = new ReactionModel();
