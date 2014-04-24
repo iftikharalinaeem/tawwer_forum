@@ -6,9 +6,9 @@ $St = Gdn::Structure();
 $Sql = Gdn::SQL();
 
 Gdn::PermissionModel()->Define(array(
-   'Reactions.Good.Add' => 'Conversations.Conversations.Add',
-   'Reactions.Bad.Add' => 'Conversations.Conversations.Add',
-   'Reactions.Flag.Add' => 'Conversations.Conversations.Add'));
+   'Reactions.Good.Add' => 'Garden.SignIn.Allow',
+   'Reactions.Bad.Add' => 'Garden.SignIn.Allow',
+   'Reactions.Flag.Add' => 'Garden.SignIn.Allow'));
 
 $St->Table('ReactionType');
 $ReactionTypeExists = $St->TableExists();
