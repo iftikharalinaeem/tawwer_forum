@@ -7,8 +7,6 @@
  *  1.2.3   Allow ReactionModel() to react from any source user.
  *  1.2.4   Allow some reactions to be protected so that users can't flag moderator posts.
  *  1.2.13  Added TagModel_Types_Handler.
- *
- *  1.2.12  ?
  *  1.3     Add class permissions; fix GetReactionTypes attributes; fix descriptions.
  *
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
