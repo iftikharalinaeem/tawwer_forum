@@ -156,6 +156,9 @@ class Reporting2Plugin extends Gdn_Plugin {
 
       // Handle form submission / setup
       if ($Sender->Form->AuthenticatedPostBack()) {
+         // Temporarily disable length limit on comments
+         SaveToConfig('Vanilla.Comment.MaxLength', 0, FALSE);
+
          // If optional Reason field is set, prepend it to the Body with labels
          if ($Reason = $Sender->Form->GetFormValue('Reason')) {
             $Body = 'Reason: '.$Reason."\n".'Notes: '.$Sender->Form->GetFormValue('Body');
