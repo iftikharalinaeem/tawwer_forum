@@ -396,7 +396,7 @@ pageTracker._trackPageview();
       // Exclude hidden, vf*, and *monkey from enabled plugins
       foreach($EnabledPlugins as $Key => $Name) {
          // Skip all vf* plugins
-         if (in_array($Key, $HiddenPlugins) || strpos($Key, 'vf') === 0 || substr_compare($str,'monkey',-6,6) === 0 )
+         if (in_array($Key, $HiddenPlugins) || strpos($Key, 'vf') === 0 || StringEndsWith($str,'monkey'))
             unset($EnabledPlugins[$Key]);
       }
       
