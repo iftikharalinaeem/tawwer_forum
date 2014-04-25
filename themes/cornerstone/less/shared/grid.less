@@ -1,0 +1,60 @@
+//
+// # Grid
+//
+// Styleguide 4
+
+.container {
+  min-width: @container-min-width;
+  max-width: @container-max-width;
+  padding-right: @grid-column-padding;
+  padding-left:  @grid-column-padding;
+  .center-block();
+  .clearfix();
+}
+
+// -----------------------------------------------------------------------------
+
+// ## Regular grid
+//
+// Styleguide #.1
+
+.row {
+  .make-row();
+  .clearfix();
+}
+
+.column {
+  min-height: 1px;
+}
+
+// -----------------------------------------------------------------------------
+
+// ## Table grid
+//
+// Styleguide #.2
+
+.table-row {
+  display: table;
+  width: 100%;
+
+  .container & {
+    height: inherit;
+  }
+}
+
+.table-column {
+  display: table-cell;
+  float: none !important; // If applied to an element with a float
+
+  .container & {
+    height: inherit;
+  }
+
+  // Alignment
+  &.top    { vertical-align: top; }
+  &.middle { vertical-align: middle; }
+  &.bottom { vertical-align: bottom; }
+
+  // Dimensions
+  &.fill { width: 100%; }
+}

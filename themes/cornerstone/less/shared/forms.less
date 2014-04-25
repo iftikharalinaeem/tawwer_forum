@@ -1,0 +1,44 @@
+//
+// # Forms
+//
+// Styleguide #
+
+// -----------------------------------------------------------------------------
+
+// ## Form controls
+//
+// Styleguide #.1
+
+.form-control() {
+  display: block;
+  width: 100%;
+  height: @input-height-base;
+  padding: @padding-base-vertical @padding-base-horizontal;
+  font-family: inherit;
+  font-size: @font-size-base;
+  line-height: @line-height-base;
+  border: @input-border solid 1px;
+  border-radius: @border-radius-base;
+  -webkit-font-smoothing: inherit;
+
+  &,
+  &:focus {
+    background-color: @input-background;
+  }
+
+  &:focus {
+    border-color: @input-border-active;
+  }
+
+  .navbar-form & {
+    border-color: transparent;
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+input.InputBox,
+input.SmallInput,
+textarea.TextBox {
+  .form-control();
+}
