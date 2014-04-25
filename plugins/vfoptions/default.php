@@ -246,7 +246,7 @@ pageTracker._trackPageview();
 		}
 
       // Theme pruning
-      if (strcasecmp($Sender->RequestMethod, 'themes') == 0) {
+      if (is_array($Themes = $Sender->Data('AvailableThemes'))) {
          
          $VisibleThemes = strtolower(C('Garden.Themes.Visible', ''));
          $VisibleThemes = explode(',', $VisibleThemes);
