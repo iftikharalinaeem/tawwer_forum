@@ -44,21 +44,19 @@ class Zendesk {
          json_encode(array('ticket' => $Ticket)),
          "POST"
       );
-      return $Response->ticket->id;
+      return $Response['ticket']['id'];
    }
 
    public function GetTicket($TicketID) {
 
       $Response = $this->ZendeskRequest('/tickets/' . $TicketID . '.json');
-      $ZendeskTicket = new ZendeskTicket();
-      $ZendeskTicket->SetFromZendeskResponse($Response);
-      return $ZendeskTicket;
+      return $Response['ticket'];
    }
 
    public function GetLastComment($TicketID) {
       $Response = $this->ZendeskRequest('/tickets/' . $TicketID . '/comments.json');
       //remove the first comment (its the ticket)
-      $Comments = $Response->comments;
+      $Comments = $Response['comments'];
       if (count($Comments) > 1) {
          return array_pop($Comments);
       }
@@ -121,7 +119,7 @@ class Zendesk {
       $Output = $this->curl->execute();
 
       $HttpCode = $this->curl->getInfo(CURLINFO_HTTP_CODE);
-      $Decoded = json_decode($Output);
+      $Decoded = json_decode($Output, true);
 
       if ($this->Logging || $Logging) {
          error_log('Curl Request: ' . $this->ApiUrl . $Url);
@@ -130,21 +128,21 @@ class Zendesk {
          error_log('Decoded Response: ' . var_export($Decoded, true));
       }
       if ($HttpCode == 404) {
-         throw new Exception('Invalid URL: ' . $this->ApiUrl . $Url . "\n");
+         throw new Gdn_UserException('Invalid URL: ' . $this->ApiUrl . $Url . "\n");
       }
       if ($HttpCode == 401 || $HttpCode == 429) {
          //429 - auth error; repeated...
-         throw new Exception('Authentication Error. Check your settings');
+         throw new Gdn_UserException('Authentication Error. Check your settings');
       }
       if ($HttpCode != 200 && $HttpCode != 201) {
-         throw new Exception('Error making request. Try again later ->' . $HttpCode);
+         throw new Gdn_UserException('Error making request. Try again later ->' . $HttpCode);
       }
 
-      if (!is_object($Decoded)) {
-         throw new Exception('Errors in Request:' . $Output . "\n");
+      if (!is_array($Decoded)) {
+         throw new Gdn_UserException('Errors in Request:' . $Output);
       }
-      if (!empty($Decoded->errors)) {
-         throw new Exception('Errors in Request:' . $Decoded->errors . "\n");
+      if (!empty($Decoded['errors'])) {
+         throw new Gdn_UserException('Errors in Request:' . $Output);
       }
 
       return $Decoded;

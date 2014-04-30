@@ -20,6 +20,17 @@ $PluginInfo['Zendesk'] = array(
  */
 class ZendeskPlugin extends Gdn_Plugin {
 
+   /**
+    * If status is set to this we will stop getting updates from Salesforce
+    * @var string
+    */
+   protected $ClosedCaseStatusString = 'Closed';
+
+   /**
+    * If time since last update from Salesforce is less then this; we wont check for update - saving api calls.
+    * @var int
+    */
+   protected $MinimumTimeForUpdate = 600;
 
    //methods
 
@@ -41,9 +52,9 @@ class ZendeskPlugin extends Gdn_Plugin {
 
    /**
     * @param DiscussionController $Sender
-    * @param $Arguments
+    * @param $Args
     */
-   public function DiscussionController_AfterDiscussionBody_Handler($Sender, $Arguments) {
+   public function DiscussionController_AfterDiscussionBody_Handler($Sender, $Args) {
 
       if (!C('Plugins.Zendesk.Enabled')) {
          return;
@@ -57,19 +68,61 @@ class ZendeskPlugin extends Gdn_Plugin {
       if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
          return;
       }
-
-      $Sender->AddCssFile('Zendesk.css', 'plugins/Zendesk');
-
-//      $TicketID = $Arguments['Discussion']->ZendeskTicketID;
-//      if ($Arguments['Discussion']->ZendeskTicketID != NULL) {
-//         $Ticket = $this->Zendesk->GetTicket($TicketID);
-//         $Sender->SetData('Ticket', $Ticket);
-//         echo $Sender->FetchView('ticket-badge', '', 'plugins/Zendesk');
-//      }
-
+      $Attachments = GetValue('Attachments', $Args['Discussion']);
+      if ($Attachments) {
+         foreach ($Attachments as $Attachment) {
+            if ($Attachment['Type'] == 'zendesk-ticket') {
+               $this->UpdateAttachment($Attachment);
+            }
+         }
+      }
 
    }
 
+   /**
+    * @param AssetModel $Sender
+    */
+   public function AssetModel_StyleCss_Handler($Sender) {
+      $Sender->AddCssFile('zendesk.css', 'plugins/Zendesk');
+   }
+
+   /**
+    * @param array $Attachment Attachment Data - see AttachmentModel
+    * @return bool
+    */
+   protected function IsToBeUpdated($Attachment) {
+      if (GetValue('Status', $Attachment) == $this->ClosedCaseStatusString) {
+         return FALSE;
+      }
+      $TimeDiff = time() - strtotime($Attachment['DateUpdated']);
+      if ($TimeDiff < $this->MinimumTimeForUpdate ) {
+         Trace("Not Checking For Update: $TimeDiff seconds since last update");
+         return FALSE;
+      }
+      if (isset($Attachment['LastModifiedDate'])) {
+         $TimeDiff = time() - strtotime($Attachment['LastModifiedDate']);
+         if ($TimeDiff < $this->MinimumTimeForUpdate && $Attachment['Status'] != $this->ClosedCaseStatusString) {
+            Trace("Not Checking For Update: $TimeDiff seconds since last update");
+            return FALSE;
+         }
+      }
+      return TRUE;
+   }
+
+   protected function UpdateAttachment($Attachment) {
+      if ($this->IsToBeUpdated($Attachment)) {
+         $Ticket = $this->Zendesk->GetTicket($Attachment['SourceID']);
+         Trace($Ticket);
+         $Attachment['Status'] = $Ticket['status'];
+         $Attachment['LastModifiedDate'] = $Ticket['updated_at'];
+         $Attachment['DateUpdated'] = Gdn_Format::ToDateTime();
+
+         $AttachmentModel = AttachmentModel::Instance();
+         $AttachmentModel->Save($Attachment);
+         return TRUE;
+      }
+      return FALSE;
+   }
    /**
     * Creates the Virtual Zendesk Controller and adds Link to SideMenu in the dashboard
     *
@@ -155,10 +208,10 @@ class ZendeskPlugin extends Gdn_Plugin {
       $DiscussionID = $Args['Discussion']->DiscussionID;
       $ElementAuthorID = $Args['Discussion']->InsertUserID;
 
-      if ($ElementAuthorID == Gdn::Session()->UserID) {
-         //no need to create support tickets for your self
-         return;
-      }
+//      if ($ElementAuthorID == Gdn::Session()->UserID) {
+//         //no need to create support tickets for your self
+//         return;
+//      }
 
       $LinkText = 'Create Zendesk Ticket';
       $Sender->AddCssFile('Zendesk.css', 'plugins/Zendesk');
@@ -169,8 +222,13 @@ class ZendeskPlugin extends Gdn_Plugin {
             'Class' => 'Popup'
          );
       }
-
-      //@todo check attachments - remove option if zendesk-issue already created.
+      //remove create Create already created
+      $Attachments = GetValue('Attachments', $Args['Discussion'], array());
+      foreach ($Attachments as $Attachment) {
+         if ($Attachment['Type'] == 'zendesk-ticket') {
+            unset($Args['DiscussionOptions']['Zendesk']);
+         }
+      }
    }
 
 
@@ -180,7 +238,6 @@ class ZendeskPlugin extends Gdn_Plugin {
     * @param DiscussionController $Sender
     */
    public function DiscussionController_Zendesk_Create($Sender) {
-
       // Signed in users only.
       if (!($UserID = Gdn::Session()->UserID)) return;
       $UserName = Gdn::Session()->User->Name;
@@ -190,40 +247,54 @@ class ZendeskPlugin extends Gdn_Plugin {
          throw new Exception('Invalid Request Url');
       }
       $DiscussionID = $Arguments[0];
-
       $Sender->Form = new Gdn_Form();
 
+      $Content = $Sender->DiscussionModel->GetId($DiscussionID);
+
+      // Join in attachments
+      $AttachmentModel = AttachmentModel::Instance();
+      $AttachmentModel->JoinAttachments($Content);
+
       if ($Sender->Form->IsPostBack() && $Sender->Form->AuthenticatedPostBack() === TRUE) {
-         $Sender->Form->ValidateRule('Plugin.Zendesk.Title', 'function:ValidateRequired', 'Title is required');
-         $Sender->Form->ValidateRule('Plugin.Zendesk.Body', 'function:ValidateRequired', 'Body is required');
+         $Sender->Form->ValidateRule('Title', 'function:ValidateRequired', 'Title is required');
+         $Sender->Form->ValidateRule('Body', 'function:ValidateRequired', 'Body is required');
 
          if ($Sender->Form->ErrorCount() == 0) {
             $FormValues = $Sender->Form->FormValues();
-
+            $Body = $FormValues['Body'];
+            $Body .= "\n--\n\nThis ticket was generated from: " . DiscussionUrl($Content, 1);
             $TicketID = $this->Zendesk->CreateTicket(
-               $FormValues['Plugin.Zendesk.Title'],
-               $FormValues['Plugin.Zendesk.Body'],
+               $FormValues['Title'],
+               $Body,
                $this->Zendesk->CreateRequester(
-                  $FormValues['Plugin.Zendesk.InsertName'],
-                  $FormValues['Plugin.Zendesk.InsertEmail']),
+                  $FormValues['InsertName'],
+                  $FormValues['InsertEmail']),
                array('custom_fields' => array('DiscussionID' => $DiscussionID))
             );
 
             if ($TicketID > 0) {
-               //@todo save attachment
-               $Sender->InformMessage(T("Message Sent to Zendesk."));
+
+               $ID = $AttachmentModel->Save(array(
+                  'Type' => 'zendesk-ticket',
+                  'ForeignID' => $AttachmentModel->RowID($Content),
+                  'ForeignUserID' => $Content->InsertUserID,
+                  'Source' => 'zendesk',
+                  'SourceID' => $TicketID,
+                  'SourceURL' => 'https://amazinghourse.zendesk.com/agent/#/tickets/' . $TicketID,
+                  'Status' => 'open',
+                  'LastModifiedDate' => Gdn_Format::ToDateTime()
+               ));
+               $Sender->InformMessage('Zendesk Ticket Created');
+               $Sender->JsonTarget('', DiscussionUrl($Content, 1), 'Redirect');
 
             } else {
                $Sender->InformMessage(T("Error creating ticket with Zendesk"));
             }
 
-
          }
 
       }
 
-      $Content = $Sender->DiscussionModel->GetId($DiscussionID);
- 
 
       $Data = array(
          'DiscussionID' => $DiscussionID,
@@ -235,18 +306,17 @@ class ZendeskPlugin extends Gdn_Plugin {
          'Title' => $Content->Name,
       );
 
-      $Sender->Form->SetValue('Plugin.Zendesk.UserId', $UserID);
-      $Sender->Form->SetValue('Plugin.Zendesk.UserName', $UserName);
-      $Sender->Form->SetValue('Plugin.Zendesk.Body', $Content->Body);
-      $Sender->Form->SetValue('Plugin.Zendesk.InsertName', $Content->InsertName);
-      $Sender->Form->SetValue('Plugin.Zendesk.InsertEmail', $Content->InsertEmail);
-      $Sender->Form->SetValue('Plugin.Zendesk.Title', $Content->Name);
+      $Sender->Form->AddHidden('UserId', $UserID);
+      $Sender->Form->AddHidden('UserName', $UserName);
+      $Sender->Form->AddHidden('InsertName', $Content->InsertName);
+      $Sender->Form->AddHidden('InsertEmail', $Content->InsertEmail);
 
-      $Sender->SetData('Plugin.Zendesk.Data', $Data);
+      $Sender->Form->SetValue('Title', $Content->Name);
+      $Sender->Form->SetValue('Body', $Content->Body);
+
+      $Sender->SetData('Data', $Data);
 
       $Sender->Render('createticket', '', 'plugins/Zendesk');
-
-//      $Sender->Render($this->GetView('createticket.php'));
 
 
    }
@@ -536,5 +606,54 @@ class ZendeskPlugin extends Gdn_Plugin {
 
    //end of OAUTH
 
+   /**
+    * Given an instance of the attachment model, parse it into a format that
+    * the attachment view can digest.
+    *
+    * @param array $Attachment
+    * @return array
+    */
+   public static function ParseAttachmentForHtmlView($Attachment) {
+
+      $UserModel = new UserModel();
+      $InsertUser = $UserModel->GetID($Attachment['InsertUserID']);
+
+      $Parsed = array();
+
+      $Parsed['Icon'] = 'ticket';
+
+      $Parsed['Title'] = T($Attachment['Type']).' &middot; '.Anchor(T($Attachment['Source']), $Attachment['SourceURL']);
+      $Parsed['Meta'] = array(
+         Gdn_Format::Date($Attachment['DateInserted'], 'html').' '.T('by').' '.UserAnchor($InsertUser)
+      );
+
+      if (GetValue('Error', $Attachment)) {
+         $Parsed['Type'] = 'danger';
+         $Parsed['Body'] = $Attachment['Error'];
+      } else {
+         $Parsed['Fields'] = array();
+
+//         if ($Attachment['Type'] === 'salesforce-case') {
+//            $Parsed['Fields']['Case Number'] = Anchor(htmlspecialchars($Attachment['CaseNumber']), $Attachment['SourceURL']);
+//         } else {
+//            $Parsed['Fields']['Name'] = Anchor(htmlspecialchars($Attachment['FirstName'].' '.$Attachment['LastName']), $Attachment['SourceURL']);
+//         }
+//
+         $Parsed['Fields']['Status'] = $Attachment['Status'];
+         $Parsed['Fields']['Last Updated'] = Gdn_Format::Date($Attachment['LastModifiedDate'], 'html');
+//
+//         if ($Attachment['Type'] === 'salesforce-case') {
+//            $Parsed['Fields']['Priority'] = htmlspecialchars($Attachment['Priority']);
+//         } else {
+//            $Parsed['Fields']['Company'] = htmlspecialchars(GetValue('Company', $Attachment, ''));
+//            $Title = GetValue('Title', $Attachment);
+//            if ($Title) {
+//               $Parsed['Fields']['Title'] = htmlspecialchars($Title);
+//            }
+//         }
+      }
+
+      return $Parsed;
+   }
 
 }
