@@ -68,7 +68,9 @@
       controlling value and must be unique. This means that only the first
       instance of a row with that given username will be imported. <strong>If
       invitation mode is selected, the constraints just described do
-      not apply, as username is optional in this mode</strong>.
+      not apply, as username is optional in this mode</strong>. If
+      update mode is selected, the username is not required, and the email is
+      the controlling value that will determine the row that gets updated.
    </div>
 
    <div class="Info">The third parameter, <code>Role</code>, can have
