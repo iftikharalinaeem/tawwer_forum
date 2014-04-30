@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk User Import',
    'Description' => 'Bulk user import with standardized CSV files. Send invites or directly insert new members.',
-   'Version' => '1.1.2',
+   'Version' => '1.2.0',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -363,7 +363,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       // Determine if user will be sent an invitation, or inserted directly.
       // If no value provided, default is to send an invite.
       // Values: invite (default), insert
-      $userin_modes = array('invite', 'insert');
+      $userin_modes = array('invite', 'insert', 'update');
       $userin_mode = $sender->Request->Post('userin');
       $userin_mode = (isset($userin_mode) && in_array($userin_mode, $userin_modes))
          ? $userin_mode
@@ -449,7 +449,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          }
 
          if (!ValidateEmail($user['Email'])) {
-            $error_messages[$processed]['email'] = 'Invalid email: "'. $user['Email'] .'".';
+            $error_messages[$processed]['email'] = 'Invalid email: "'. $user['Email'] .'". ';
          }
 
          // Get role ids based off of their name, and check if any invalid
@@ -481,6 +481,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             // valid roles just to be safe.
             if (!empty($status['role_ids']) && count($status['role_ids'])) {
                $role_ids = $status['role_ids'] = array();
+            }
+
+            // If userin_mode is update--roles are required, so do not suppress
+            // the error and assign a default--list the error.
+            if ($userin_mode == 'update') {
+               $show_role_error = true;
             }
 
             // If there are no invalid roles, that means no roles were provided
@@ -595,6 +601,58 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                }
                break;
 
+            case 'update':
+
+               $update_sucess = 0;
+
+               // Email controls in the update, so invalidate a missing
+               // username error, if exists.
+               if (isset($error_messages[$processed]['username'])) {
+                  unset($error_messages[$processed]['username']);
+                  array_filter($error_messages[$processed]);
+               }
+
+               $user_row = array();
+               // Check if email exists in user table.
+               if (!isset($error_messages[$processed]['email'])) {
+                  $user_row = (array) $user_model->GetByEmail($user['Email']);
+
+                  if (!count(array_filter($user_row))) {
+                     $error_messages[$processed]['email'] = 'Email does not exist: "'. $user['Email'] .'".';
+                  }
+               }
+
+               // If they want to update the username, go ahead. If it's left
+               // blank then just use the username already in the table.
+               $username = $user['Username'];
+               if (trim($username) == ''
+               || !preg_match($regex_username, $username)) {
+                  $username = $user_row['Name'];
+               }
+
+               // If there is a valid email and role(s), continue processing.
+               if (!isset($error_messages[$processed]['email'])
+               && !isset($error_messages[$processed]['role'])) {
+                  $form_post_values = array(
+                     'UserID' => $user_row['UserID'],
+                     'Name' => $username,
+                     'RoleID' => $role_ids,
+                     'Banned' => $banned
+                  );
+
+                  $form_post_options = array(
+                     'SaveRoles' => true,
+                     'CheckCaptcha' => false,
+                     'ValidateSpam' => false
+                  );
+
+                  $user_model->Validation->UnapplyRule('Email', 'Required');
+                  $user_model->Validation->UnapplyRule('Password', 'Required');
+                  $update_sucess = $user_model->Save($form_post_values, $form_post_options);
+               }
+
+               break;
+
             case 'invite':
             default:
 
@@ -645,12 +703,13 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          // Handle both insert and invite $userin_mode
          // This is so error handling is the same.
-         $userin_model = ($userin_mode == 'insert')
+         $userin_model = (in_array($userin_mode, array('insert', 'update')))
             ? $user_model
             : $invitation_model;
 
          $complete_code = 0; // Error code
          if (($userin_mode == 'insert' && $user_id)
+         || ($userin_mode == 'update' && $update_sucess)
          || ($userin_mode == 'invite' && $invite_success)) {
             $complete_code = 1;
             if (isset($error_messages[$processed]['role'])) {
@@ -658,7 +717,11 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             }
          } else {
             $complete_code = 2;
-            $error_messages[$processed]['db'] = $userin_model->Validation->ResultsText();
+
+            $db_error_string = $userin_model->Validation->ResultsText();
+            if (strlen($db_error_string) > 2) {
+               $error_messages[$processed]['db'] = $userin_model->Validation->ResultsText();
+            }
          }
          $userin_model->Validation->Results(true);
 
@@ -707,7 +770,6 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             break;
          }
       }
-
 
       // Build content to send back to client. Determine success, etc.
       //

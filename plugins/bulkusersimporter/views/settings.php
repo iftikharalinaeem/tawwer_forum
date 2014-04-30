@@ -38,7 +38,24 @@
             <strong>Directly insert</strong> users into the community. Users
             who already exist in the community will have their information
             updated, based on the username, while new users will be created
-            and emailed. <strong>All three parameters are required</strong>.
+            and emailed. <strong>All three parameters are required</strong>. An
+            example of this: <code>jd@anon.com,anon44,member</code>.
+         </li>
+         <li>
+            <strong>Update users</strong> in the community, based on their
+            email. Users who already exist in the community will have
+            their role(s) updated, and their username will also be updated if
+            a new one is provided. <strong>The email and role(s) are
+            required</strong>, but the username is optional. New roles specified
+            for an email will replace the roles previously associated with the
+            email. Likewise, if a username is provided, it will replace the
+            previous username associated with the email. Minimal requirements:
+            <code>existing@email.com,,administrator:moderator</code>. Notice
+            the <strong>double comma</strong> between the email and roles. This
+            informs the importer that the username will not be changed. If the
+            role is placed directly after the email, the importer will cease
+            functioning, as the roles will be interpreted as usernames, and the
+            roles column will be considered empty.
          </li>
       </ul>
    </div>

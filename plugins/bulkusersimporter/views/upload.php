@@ -118,11 +118,12 @@
       <div class="Info">
 
          <p class="P">
-            What do you want to do if a user does not exist?
+            What do you want to do with the user import data?
             <ul id="bulk-radio-options">
                <li><label><input type="radio" name="userin" id="bulk-invite" value="invite" <?php if ($enough_invites): echo 'checked="checked"'; endif; ?> /> Invite new users <span class="bulk-note">(new users will be emailed with a link to register their username and other account information)</span></label></li>
                <li id="bulk-expires" class="shlide" title="Regular English like 'tomorrow', '5 days', 'next week', '2 weeks', or a date like YYYY/MM/DD"><label>Expires: <input type="text" name="expires" value="<?php echo $default_invite_expiration; ?>" placeholder="Examples: tomorrow, 5 days, next week, 2 weeks, YYYY/MM/DD" /></label> <span class="bulk-note">If no expiry specified, the invite will expire in <?php echo $default_invite_expiration; ?>.</span></li>
                <li><label><input type="radio" name="userin" id="bulk-insert" value="insert" <?php if (!$enough_invites): echo 'checked="checked"'; endif; ?> /> Insert new users <span class="bulk-note">(new user accounts will be created immediately; an email will be sent out to those users with instructions on logging in)</span></label></li>
+               <li><label><input type="radio" name="userin" id="bulk-insert" value="update" /> Update current users <span class="bulk-note">(email must already exist in database)</span></label></li>
             </ul>
          </p>
 
