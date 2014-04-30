@@ -129,7 +129,7 @@ class GigyaPlugin extends Gdn_Plugin {
     */
    public function Base_Render_Before($Sender) {
       if (!Gdn::Session()->IsValid() && $Sender->Head) {
-         $js = val('HeaderTemplate', $this->Provider());
+         $js = val('HeadTemplate', $this->Provider());
          $Sender->Head->AddString($js);
 
          // We need to add the gigya js file as a string so it goes after the header template.
@@ -174,7 +174,7 @@ class GigyaPlugin extends Gdn_Plugin {
       }
 
       if ($Sender->Form->AuthenticatedPostBack()) {
-         $Data = ArrayTranslate($Sender->Form->FormValues(), array('ClientID', 'AssociationSecret', 'HeaderTemplate', 'BodyTemplate', 'IsDefault'));
+         $Data = ArrayTranslate($Sender->Form->FormValues(), array('ClientID', 'AssociationSecret', 'HeadTemplate', 'BodyTemplate', 'IsDefault'));
          $Data['AuthenticationKey'] = self::PROVIDER_KEY;
          $Model = new Gdn_AuthenticationProviderModel();
          if ($Model->Save($Data)) {
