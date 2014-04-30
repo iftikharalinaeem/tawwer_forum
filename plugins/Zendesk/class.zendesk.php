@@ -165,5 +165,4 @@ class Zendesk
         return $Decoded;
 
     }
-
 }

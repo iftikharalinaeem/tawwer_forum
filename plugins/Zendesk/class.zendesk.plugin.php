@@ -86,6 +86,30 @@ class ZendeskPlugin extends Gdn_Plugin
 
     }
 
+    public function DiscussionController_AfterCommentBody_Handler($Sender, $Args)
+    {
+        if (!C('Plugins.Zendesk.Enabled')) {
+            return;
+        }
+
+        // Signed in users only. No guest reporting!
+        if (!Gdn::Session()->UserID) {
+            return;
+        }
+
+        if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+            return;
+        }
+        $Attachments = GetValue('Attachments', $Args['Comment']);
+        if ($Attachments) {
+            foreach ($Attachments as $Attachment) {
+                if ($Attachment['Type'] == 'zendesk-ticket') {
+                    $this->UpdateAttachment($Attachment);
+                }
+            }
+        }
+    }
+
     /**
      * @param AssetModel $Sender
      */
@@ -254,6 +278,42 @@ class ZendeskPlugin extends Gdn_Plugin
         }
     }
 
+    public function DiscussionController_CommentOptions_Handler($Sender, $Args)
+    {
+
+        if (!C('Plugins.Zendesk.Enabled')) {
+            return;
+        }
+
+        // Signed in users only. No guest reporting!
+        if (!Gdn::Session()->UserID) {
+            return;
+        }
+
+        $ElementAuthorID = $Args['Comment']->InsertUserID;
+        $CommentID = $Args['Comment']->CommentID;
+
+//      if ($ElementAuthorID == Gdn::Session()->UserID) {
+//         //no need to create support tickets for your self
+//         return;
+//      }
+
+        $LinkText = 'Create Zendesk Ticket';
+        if (isset($Args['CommentOptions'])) {
+            $Args['CommentOptions']['Zendesk'] = array(
+                'Label' => T($LinkText),
+                'Url' => "/discussion/Zendesk/Comment/$CommentID",
+                'Class' => 'Popup'
+            );
+        }
+        //remove create Create already created
+        $Attachments = GetValue('Attachments', $Args['Comment'], array());
+        foreach ($Attachments as $Attachment) {
+            if ($Attachment['Type'] == 'zendesk-ticket') {
+                unset($Args['CommentOptions']['Zendesk']);
+            }
+        }
+    }
 
     /**
      * Handle Zendesk popup in discussions
@@ -269,13 +329,28 @@ class ZendeskPlugin extends Gdn_Plugin
         $UserName = Gdn::Session()->User->Name;
 
         $Arguments = $Sender->RequestArgs;
-        if (sizeof($Arguments) != 1) {
+        if (sizeof($Arguments) != 2) {
             throw new Exception('Invalid Request Url');
         }
-        $DiscussionID = $Arguments[0];
+        $Context = $Arguments[0];
+        $ContentID = $Arguments[1];
         $Sender->Form = new Gdn_Form();
 
-        $Content = $Sender->DiscussionModel->GetId($DiscussionID);
+        if ($Context == 'Comment') {
+            $CommentModel = new CommentModel();
+            $Content = $CommentModel->GetID($ContentID);
+            $DiscussionID = $Content->DiscussionID;
+            $Url = CommentUrl($Content);
+
+            $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
+            $TicketTitle = $Discussion->Name;
+
+        } else {
+            $Content = $Sender->DiscussionModel->GetID($ContentID);
+            $TicketTitle = $Content->Name;
+            $Url = DiscussionUrl($Content, 1);
+
+        }
 
         // Join in attachments
         $AttachmentModel = AttachmentModel::Instance();
@@ -288,7 +363,9 @@ class ZendeskPlugin extends Gdn_Plugin
             if ($Sender->Form->ErrorCount() == 0) {
                 $FormValues = $Sender->Form->FormValues();
                 $Body = $FormValues['Body'];
-                $Body .= "\n--\n\nThis ticket was generated from: " . DiscussionUrl($Content, 1);
+
+                $Body .= "\n--\n\nThis ticket was generated from: " . $Url . "\n\n";
+
                 $TicketID = $this->zendesk->createTicket(
                     $FormValues['Title'],
                     $Body,
@@ -296,7 +373,8 @@ class ZendeskPlugin extends Gdn_Plugin
                         $FormValues['InsertName'],
                         $FormValues['InsertEmail']
                     ),
-                    array('custom_fields' => array('DiscussionID' => $DiscussionID))
+                    array('custom_fields' =>
+                        array('DiscussionID' => $DiscussionID))
                 );
 
                 if ($TicketID > 0) {
@@ -314,7 +392,7 @@ class ZendeskPlugin extends Gdn_Plugin
                         )
                     );
                     $Sender->InformMessage('Zendesk Ticket Created');
-                    $Sender->JsonTarget('', DiscussionUrl($Content, 1), 'Redirect');
+                    $Sender->JsonTarget('', $Url, 'Redirect');
 
                 } else {
                     $Sender->InformMessage(T("Error creating ticket with Zendesk"));
@@ -332,15 +410,16 @@ class ZendeskPlugin extends Gdn_Plugin
             'Body' => $Content->Body,
             'InsertName' => $Content->InsertName,
             'InsertEmail' => $Content->InsertEmail,
-            'Title' => $Content->Name,
+            'Title' => $TicketTitle,
         );
 
+        $Sender->Form->AddHidden('Url', $Url);
         $Sender->Form->AddHidden('UserId', $UserID);
         $Sender->Form->AddHidden('UserName', $UserName);
         $Sender->Form->AddHidden('InsertName', $Content->InsertName);
         $Sender->Form->AddHidden('InsertEmail', $Content->InsertEmail);
 
-        $Sender->Form->SetValue('Title', $Content->Name);
+        $Sender->Form->SetValue('Title', $TicketTitle);
         $Sender->Form->SetValue('Body', $Content->Body);
 
         $Sender->SetData('Data', $Data);
@@ -705,5 +784,4 @@ class ZendeskPlugin extends Gdn_Plugin
 
         return $Parsed;
     }
-
 }

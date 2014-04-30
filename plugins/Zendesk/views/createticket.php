@@ -18,10 +18,10 @@ echo $this->Form->Errors();
     <ul>
         <li>Contact Name: <?php echo htmlspecialchars($ZendeskName); ?></li>
         <li>Email: <?php echo htmlspecialchars($ZendeskEmail); ?></li>
-        <?php
-        echo $this->Form->Label('Subject Title', 'Title');
-        echo $this->Form->TextBox('Title');
-        ?>
+
+        <li><?php echo $this->Form->Label('Subject Title', 'Title'); ?></li>
+        <li><?php echo $this->Form->TextBox('Title'); ?></li>
+
         <li>
             <?php
             echo $this->Form->Label('Body', 'Body');
