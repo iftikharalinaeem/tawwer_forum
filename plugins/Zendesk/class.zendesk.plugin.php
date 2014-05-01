@@ -742,6 +742,51 @@ class ZendeskPlugin extends Gdn_Plugin
     //end of OAUTH
 
     /**
+     *
+     * Handler to Parse Attachments for Staff Users
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function SalesforcePlugin_BeforeWriteAttachments_Handler($Sender, &$Args) {
+
+        foreach($Args['Attachments'] as &$Attachment) {
+            if ($Attachment['Source'] == 'zendesk') {
+                $ParsedAttachment = $this->ParseAttachmentForHtmlView($Attachment);
+                $Attachment = $Attachment + $ParsedAttachment;
+            }
+        }
+    }
+
+    /**
+     *
+     * Handler to Parse Attachment for the Owner of the Attachment
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function SalesforcePlugin_BeforeWriteAttachmentForOwner_Handler($Sender, &$Args) {
+        if ($Args['Attachment']['Source'] == 'zendesk') {
+            $Args['Attachment'] = $this->ParseAttachmentForHtmlView($Args['Attachment']);
+        }
+    }
+
+    /**
+     *
+     * Handler to Parse Attachments for All Other (Not staff or Owner) Users
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function SalesforcePlugin_BeforeWriteAttachmentForOther_Handler($Sender, &$Args) {
+        if ($Args['Attachment']['Source'] == 'zendesk') {
+            $Args['Attachment'] = $this->ParseAttachmentForHtmlView($Args['Attachment']);
+        }
+    }
+
+
+
+    /**
      * Given an instance of the attachment model, parse it into a format that
      * the attachment view can digest.
      *
