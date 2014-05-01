@@ -3,7 +3,7 @@
 $PluginInfo['gigya'] = array(
    'Name' => 'Gigya Sign In',
    'Description' => 'Adds single sign-on (SSO) to Gigya connect platform.',
-   'Version' => '1.0-beta',
+   'Version' => '1.0',
    'SettingsUrl' => '/settings/gigya',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Todd Burry",
@@ -108,7 +108,7 @@ class GigyaPlugin extends Gdn_Plugin {
       self::validateUserSignature($User['UID'], $User['signatureTimestamp'], $secret, $User['UIDSignature'], true);
 
       // Map all of the standard jsConnect data.
-      $Map = array('UID' => 'UniqueID', 'email' => 'Email', 'thumbnailURL' => 'Photo');
+      $Map = array('UID' => 'UniqueID', 'email' => 'Email', 'photoURL' => 'Photo');
       foreach ($Map as $Key => $Value) {
          $Form->SetFormValue($Value, GetValue($Key, $User, ''));
       }
