@@ -3,10 +3,7 @@
 } ?>
 <h1><?php echo T($this->Data['Title']); ?></h1>
 <div class="Info">
-<?php echo T(
-    'ZendeskDashboard',
-    'This plugin allows you to submit user discussion and comments to your hosted Zend Desk'
-); ?>
+<?php echo T('This plugin allows you to submit user discussion and comments to your hosted Zendesk'); ?>
 </div>
 
 <div class="Description">
@@ -14,7 +11,7 @@
         If you already have an account you need to enable API Access for this plugin to work
 
     <ul style="list-style-type: circle; margin: 5px 20px; padding: 10px;">
-        <li>Login to your Zen Desk Site</li>
+        <li>Login to your Zendesk Site</li>
         <li>Go to the <strong>Admin</strong> Setting</li>
         <li>Under <strong>Channels</strong> Select API</li>
         <li>Enable <strong>Token Access</strong> and <strong>Password Access</strong></li>
@@ -29,54 +26,58 @@
     </p>
 </div>
 
-<h3><?php echo T('Zen Desk Settings'); ?></h3>
+<h3><?php echo T('Zendesk Settings'); ?></h3>
 
 <?php
 // Settings
 echo $this->Form->Open();
 echo $this->Form->Errors();
 ?>
-
 <ul>
 
     <li>
         <?php
-        echo $this->Form->Label('Zen Desk URL', 'Plugin.Zendesk.Url');
-        echo $this->Form->TextBox('Plugin.Zendesk.Url');
+        echo $this->Form->Label('Zendesk URL', 'Url');
+        echo $this->Form->TextBox('Url');
         ?>
     </li>
 
     <li>
         <?php
-        echo $this->Form->Label('API User', 'Plugin.Zendesk.User');
-        echo $this->Form->TextBox('Plugin.Zendesk.User');
+        echo $this->Form->Label('API User', 'User');
+        echo $this->Form->TextBox('User');
         ?>
     </li>
 
     <li>
         <?php
-        echo $this->Form->Label('API Token', 'Plugin.Zendesk.ApiKey');
-        echo $this->Form->TextBox('Plugin.Zendesk.ApiKey');
+        echo $this->Form->Label('API Token', 'ApiKey');
+        echo $this->Form->TextBox('ApiKey');
         ?>
     </li>
 
 
     <li>
         <?php
-        echo $this->Form->Label('API URL', 'Plugin.Zendesk.ApiUrl');
-        echo $this->Form->TextBox('Plugin.Zendesk.ApiUrl');
+        echo $this->Form->Label('API URL', 'ApiUrl');
+        echo $this->Form->TextBox('ApiUrl');
         ?>
         https://XXXXX.zendesk.com/api/v2
     </li>
 
+
 </ul>
+
+
 <?php
 echo $this->Form->Close('Save');
 ?>
 
-<h3><?php echo T('Enable in discussions '); ?></h3>
+
+
+<h3><?php echo T('Enable in discussions'); ?></h3>
 <div class="Info">
-    <?php echo T('ZendeskHeading', 'Configure the settings above before enabling the Plugin.'); ?>
+    <?php echo T('Configure the settings above before enabling the Plugin.'); ?>
 </div>
 
 

@@ -32,12 +32,10 @@ class ZendeskPlugin extends Gdn_Plugin
     protected $closedCaseStatusString = 'solved';
 
     /**
-     * If time since last update from Salesforce is less then this; we wont check for update - saving api calls.
+     * If time since last update from Zendesk is less then this; we wont check for update - saving api calls.
      * @var int
      */
     protected $minimumTimeForUpdate = 600;
-
-    //methods
 
     /** @var \Zendesk Zendesk */
     protected $zendesk;
@@ -52,7 +50,6 @@ class ZendeskPlugin extends Gdn_Plugin
             C('Plugins.Zendesk.User'),
             C('Plugins.Zendesk.ApiKey')
         );
-
 
     }
 
@@ -86,6 +83,10 @@ class ZendeskPlugin extends Gdn_Plugin
 
     }
 
+    /**
+     * @param DiscussionController $Sender
+     * @param array $Args
+     */
     public function DiscussionController_AfterCommentBody_Handler($Sender, $Args)
     {
         if (!C('Plugins.Zendesk.Enabled')) {
@@ -119,6 +120,7 @@ class ZendeskPlugin extends Gdn_Plugin
     }
 
     /**
+     * @see AttachmentModel
      * @param array $Attachment Attachment Data - see AttachmentModel
      * @return bool
      */
@@ -143,13 +145,20 @@ class ZendeskPlugin extends Gdn_Plugin
         return true;
     }
 
+    /**
+     * Update the Attachment
+     *
+     * @see AttachmentModel
+     * @param array $Attachment
+     * @return bool
+     */
     protected function updateAttachment($Attachment)
     {
         if ($this->IsToBeUpdated($Attachment)) {
             try {
-               $Ticket = $this->zendesk->getTicket($Attachment['SourceID']);
+                $Ticket = $this->zendesk->getTicket($Attachment['SourceID']);
             } catch (Gdn_UserException $e) {
-                if ($e->getCode() == 404)  {
+                if ($e->getCode() == 404) {
                     $Attachment['Error'] = 'This task has been deleted from Zendesk';
                     $AttachmentModel = AttachmentModel::Instance();
                     $AttachmentModel->Save($Attachment);
@@ -171,7 +180,7 @@ class ZendeskPlugin extends Gdn_Plugin
     /**
      * Creates the Virtual Zendesk Controller and adds Link to SideMenu in the dashboard
      *
-     * @param Controller $Sender
+     * @param PluginController $Sender
      */
     public function PluginController_Zendesk_Create($Sender)
     {
@@ -197,10 +206,10 @@ class ZendeskPlugin extends Gdn_Plugin
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
         $ConfigurationModel->SetField(
             array(
-                'Plugin.Zendesk.ApiKey',
-                'Plugin.Zendesk.User',
-                'Plugin.Zendesk.Url',
-                'Plugin.Zendesk.ApiUrl',
+                'ApiKey',
+                'User',
+                'Url',
+                'ApiUrl',
             )
         );
 
@@ -216,23 +225,23 @@ class ZendeskPlugin extends Gdn_Plugin
             $FormValues = $Sender->Form->FormValues();
             if ($Sender->Form->IsPostBack()) {
                 $Sender->Form->ValidateRule(
-                    'Plugin.Zendesk.ApiKey',
+                    'ApiKey',
                     'function:ValidateRequired',
                     'API Key is required'
                 );
-                $Sender->Form->ValidateRule('Plugin.Zendesk.User', 'function:ValidateRequired', 'User is required');
-                $Sender->Form->ValidateRule('Plugin.Zendesk.Url', 'function:ValidateRequired', 'Url is required');
+                $Sender->Form->ValidateRule('User', 'function:ValidateRequired', 'User is required');
+                $Sender->Form->ValidateRule('Url', 'function:ValidateRequired', 'Url is required');
                 $Sender->Form->ValidateRule(
-                    'Plugin.Zendesk.ApiUrl',
+                    'ApiUrl',
                     'function:ValidateRequired',
                     'API Url is required'
                 );
 
                 if ($Sender->Form->ErrorCount() == 0) {
-                    SaveToConfig('Plugins.Zendesk.ApiKey', trim($FormValues['Plugin.Zendesk.ApiKey']));
-                    SaveToConfig('Plugins.Zendesk.User', trim($FormValues['Plugin.Zendesk.User']));
-                    SaveToConfig('Plugins.Zendesk.Url', trim($FormValues['Plugin.Zendesk.Url']));
-                    SaveToConfig('Plugins.Zendesk.ApiUrl', trim($FormValues['Plugin.Zendesk.ApiUrl']));
+                    SaveToConfig('Plugins.Zendesk.ApiKey', trim($FormValues['ApiKey']));
+                    SaveToConfig('Plugins.Zendesk.User', trim($FormValues['User']));
+                    SaveToConfig('Plugins.Zendesk.Url', trim($FormValues['Url']));
+                    SaveToConfig('Plugins.Zendesk.ApiUrl', trim($FormValues['ApiUrl']));
                     $Sender->InformMessage(T("Your changes have been saved."));
                 } else {
                     $Sender->InformMessage(T("Error saving settings to config."));
@@ -243,14 +252,22 @@ class ZendeskPlugin extends Gdn_Plugin
         }
 
 
-        $Sender->Form->SetValue('Plugin.Zendesk.Url', C('Plugins.Zendesk.Url'));
-        $Sender->Form->SetValue('Plugin.Zendesk.ApiKey', C('Plugins.Zendesk.ApiKey'));
-        $Sender->Form->SetValue('Plugin.Zendesk.User', C('Plugins.Zendesk.User'));
-        $Sender->Form->SetValue('Plugin.Zendesk.ApiUrl', C('Plugins.Zendesk.ApiUrl'));
+        $Sender->Form->SetValue('Url', C('Plugins.Zendesk.Url'));
+        $Sender->Form->SetValue('ApiKey', C('Plugins.Zendesk.ApiKey'));
+        $Sender->Form->SetValue('User', C('Plugins.Zendesk.User'));
+        $Sender->Form->SetValue('ApiUrl', C('Plugins.Zendesk.ApiUrl'));
 
         $Sender->Render($this->GetView('dashboard.php'));
     }
 
+    /**
+     * Adds Option to Create Ticket to Discussion Gear.  Will be removed if Discussion has
+     * already been submitted as a Ticket
+     *
+     * @param DiscussionController $Sender
+     * @param array $Args
+     *
+     */
     public function DiscussionController_DiscussionOptions_Handler($Sender, $Args)
     {
 
@@ -288,6 +305,13 @@ class ZendeskPlugin extends Gdn_Plugin
         }
     }
 
+    /**
+     * Adds Option to Create Ticket to Comment Gear.  Will be removed if comment has
+     * already been submitted as a Ticket
+     *
+     * @param CommentController $Sender
+     * @param array $Args
+     */
     public function DiscussionController_CommentOptions_Handler($Sender, $Args)
     {
 
@@ -303,10 +327,11 @@ class ZendeskPlugin extends Gdn_Plugin
         $ElementAuthorID = $Args['Comment']->InsertUserID;
         $CommentID = $Args['Comment']->CommentID;
 
-//      if ($ElementAuthorID == Gdn::Session()->UserID) {
-//         //no need to create support tickets for your self
-//         return;
-//      }
+
+        if (!C('Plugins.Zendesk.AllowTicketForSelf', false) && $ElementAuthorID == Gdn::Session()->UserID) {
+            //no need to create support tickets for your self
+            return;
+        }
 
         $LinkText = 'Create Zendesk Ticket';
         if (isset($Args['CommentOptions'])) {
@@ -326,7 +351,7 @@ class ZendeskPlugin extends Gdn_Plugin
     }
 
     /**
-     * Handle Zendesk popup in discussions
+     * Handle Zendesk popup to create ticket in discussions
      * @throws Exception
      * @param DiscussionController $Sender
      */
@@ -383,12 +408,15 @@ class ZendeskPlugin extends Gdn_Plugin
                         $FormValues['InsertName'],
                         $FormValues['InsertEmail']
                     ),
-                    array('custom_fields' =>
-                        array('DiscussionID' => $DiscussionID))
+                    array(
+                        'custom_fields' =>
+                            array('DiscussionID' => $DiscussionID)
+                    )
                 );
 
                 if ($TicketID > 0) {
 
+                    //Save to Attachments
                     $AttachmentModel->Save(
                         array(
                             'Type' => 'zendesk-ticket',
@@ -478,25 +506,27 @@ class ZendeskPlugin extends Gdn_Plugin
         SaveToConfig('Plugins.Zendesk.Enabled', true);
     }
 
+    /**
+     * Disable Zendesk Plugin
+     */
     protected function disable()
     {
         RemoveFromConfig('Plugins.Zendesk.Enabled');
     }
 
+    /**
+     * Setup to plugin.
+     */
     public function setup()
     {
 
         $this->setupConfig();
-        $this->structure();
 
     }
 
-    public function structure()
-    {
-
-
-    }
-
+    /**
+     * Setup Config Settings
+     */
     private function setupConfig()
     {
         SaveToConfig('Plugins.Zendesk.Enabled', false);
@@ -742,6 +772,53 @@ class ZendeskPlugin extends Gdn_Plugin
     //end of OAUTH
 
     /**
+     *
+     * Handler to Parse Attachments for Staff Users
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function SalesforcePlugin_BeforeWriteAttachments_Handler($Sender, &$Args)
+    {
+
+        foreach ($Args['Attachments'] as &$Attachment) {
+            if ($Attachment['Source'] == 'zendesk') {
+                $ParsedAttachment = $this->ParseAttachmentForHtmlView($Attachment);
+                $Attachment = $ParsedAttachment + $Attachment;
+            }
+        }
+    }
+
+    /**
+     *
+     * Handler to Parse Attachment for the Owner of the Attachment
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function SalesforcePlugin_BeforeWriteAttachmentForOwner_Handler($Sender, &$Args)
+    {
+        if ($Args['Attachment']['Source'] == 'zendesk') {
+            $Args['Attachment'] = $this->ParseAttachmentForHtmlView($Args['Attachment']);
+        }
+    }
+
+    /**
+     *
+     * Handler to Parse Attachments for All Other (Not staff or Owner) Users
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function SalesforcePlugin_BeforeWriteAttachmentForOther_Handler($Sender, &$Args)
+    {
+        if ($Args['Attachment']['Source'] == 'zendesk') {
+            $Args['Attachment'] = $this->ParseAttachmentForHtmlView($Args['Attachment']);
+        }
+    }
+
+
+    /**
      * Given an instance of the attachment model, parse it into a format that
      * the attachment view can digest.
      *
@@ -758,7 +835,7 @@ class ZendeskPlugin extends Gdn_Plugin
 
         $Parsed['Icon'] = 'ticket';
 
-        $Parsed['Title'] = T($Attachment['Type']) . ' &middot; ' . Anchor(
+        $Parsed['Title'] = T('Ticket') . ' &middot; ' . Anchor(
             T($Attachment['Source']),
             $Attachment['SourceURL']
         );
@@ -772,24 +849,9 @@ class ZendeskPlugin extends Gdn_Plugin
         } else {
             $Parsed['Fields'] = array();
 
-//         if ($Attachment['Type'] === 'salesforce-case') {
-//            $Parsed['Fields']['Case Number'] = Anchor(htmlspecialchars($Attachment['CaseNumber']), $Attachment['SourceURL']);
-//         } else {
-//            $Parsed['Fields']['Name'] = Anchor(htmlspecialchars($Attachment['FirstName'].' '.$Attachment['LastName']), $Attachment['SourceURL']);
-//         }
-//
             $Parsed['Fields']['Status'] = $Attachment['Status'];
             $Parsed['Fields']['Last Updated'] = Gdn_Format::Date($Attachment['LastModifiedDate'], 'html');
-//
-//         if ($Attachment['Type'] === 'salesforce-case') {
-//            $Parsed['Fields']['Priority'] = htmlspecialchars($Attachment['Priority']);
-//         } else {
-//            $Parsed['Fields']['Company'] = htmlspecialchars(GetValue('Company', $Attachment, ''));
-//            $Title = GetValue('Title', $Attachment);
-//            if ($Title) {
-//               $Parsed['Fields']['Title'] = htmlspecialchars($Title);
-//            }
-//         }
+
         }
 
         return $Parsed;
