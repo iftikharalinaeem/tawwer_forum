@@ -147,9 +147,9 @@ class ZendeskPlugin extends Gdn_Plugin
     {
         if ($this->IsToBeUpdated($Attachment)) {
             try {
-               $Ticket = $this->zendesk->getTicket($Attachment['SourceID']);
+                $Ticket = $this->zendesk->getTicket($Attachment['SourceID']);
             } catch (Gdn_UserException $e) {
-                if ($e->getCode() == 404)  {
+                if ($e->getCode() == 404) {
                     $Attachment['Error'] = 'This task has been deleted from Zendesk';
                     $AttachmentModel = AttachmentModel::Instance();
                     $AttachmentModel->Save($Attachment);
@@ -383,8 +383,10 @@ class ZendeskPlugin extends Gdn_Plugin
                         $FormValues['InsertName'],
                         $FormValues['InsertEmail']
                     ),
-                    array('custom_fields' =>
-                        array('DiscussionID' => $DiscussionID))
+                    array(
+                        'custom_fields' =>
+                            array('DiscussionID' => $DiscussionID)
+                    )
                 );
 
                 if ($TicketID > 0) {
@@ -748,9 +750,10 @@ class ZendeskPlugin extends Gdn_Plugin
      * @param $Sender
      * @param $Args
      */
-    public function SalesforcePlugin_BeforeWriteAttachments_Handler($Sender, &$Args) {
+    public function SalesforcePlugin_BeforeWriteAttachments_Handler($Sender, &$Args)
+    {
 
-        foreach($Args['Attachments'] as &$Attachment) {
+        foreach ($Args['Attachments'] as &$Attachment) {
             if ($Attachment['Source'] == 'zendesk') {
                 $ParsedAttachment = $this->ParseAttachmentForHtmlView($Attachment);
                 $Attachment = $Attachment + $ParsedAttachment;
@@ -765,7 +768,8 @@ class ZendeskPlugin extends Gdn_Plugin
      * @param $Sender
      * @param $Args
      */
-    public function SalesforcePlugin_BeforeWriteAttachmentForOwner_Handler($Sender, &$Args) {
+    public function SalesforcePlugin_BeforeWriteAttachmentForOwner_Handler($Sender, &$Args)
+    {
         if ($Args['Attachment']['Source'] == 'zendesk') {
             $Args['Attachment'] = $this->ParseAttachmentForHtmlView($Args['Attachment']);
         }
@@ -778,12 +782,12 @@ class ZendeskPlugin extends Gdn_Plugin
      * @param $Sender
      * @param $Args
      */
-    public function SalesforcePlugin_BeforeWriteAttachmentForOther_Handler($Sender, &$Args) {
+    public function SalesforcePlugin_BeforeWriteAttachmentForOther_Handler($Sender, &$Args)
+    {
         if ($Args['Attachment']['Source'] == 'zendesk') {
             $Args['Attachment'] = $this->ParseAttachmentForHtmlView($Args['Attachment']);
         }
     }
-
 
 
     /**
