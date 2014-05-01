@@ -142,6 +142,23 @@ class GigyaPlugin extends Gdn_Plugin {
    }
 
    /**
+    * @param EntryController $Sender
+    * @param array $Args
+    * @return mixed
+    */
+   public function EntryController_SignIn_Create($Sender, $Method = FALSE, $Arg1 = FALSE) {
+      if (!val('IsDefault', $this->Provider())) {
+         return $Sender->SignIn($Method, $Arg1);
+      } else {
+         $Template = val('BodyTemplate', $this->Provider());
+         $Sender->SetData('BodyTemplate', $Template);
+
+         $Sender->Title(T('Sign In'));
+         $Sender->Render('SignIn', '', 'plugins/gigya');
+      }
+   }
+
+   /**
     *
     * @param Gdn_Controller $Sender
     */
