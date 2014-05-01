@@ -60,7 +60,6 @@ class Zendesk
 
     public function getTicket($TicketID)
     {
-
         $Response = $this->zendeskRequest('/tickets/' . $TicketID . '.json');
         return $Response['ticket'];
     }
@@ -145,7 +144,8 @@ class Zendesk
             error_log('Decoded Response: ' . var_export($Decoded, true));
         }
         if ($HttpCode == 404) {
-            throw new Gdn_UserException('Invalid URL: ' . $this->apiUrl . $Url . "\n");
+            //throw not found
+            throw new Gdn_UserException('Invalid URL: ' . $this->apiUrl . $Url . "\n", 404);
         }
         if ($HttpCode == 401 || $HttpCode == 429) {
             //429 - auth error; repeated...
