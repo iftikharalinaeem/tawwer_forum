@@ -146,7 +146,17 @@ class ZendeskPlugin extends Gdn_Plugin
     protected function updateAttachment($Attachment)
     {
         if ($this->IsToBeUpdated($Attachment)) {
-            $Ticket = $this->zendesk->getTicket($Attachment['SourceID']);
+            try {
+               $Ticket = $this->zendesk->getTicket($Attachment['SourceID']);
+            } catch (Gdn_UserException $e) {
+                if ($e->getCode() == 404)  {
+                    $Attachment['Error'] = 'This task has been deleted from Zendesk';
+                    $AttachmentModel = AttachmentModel::Instance();
+                    $AttachmentModel->Save($Attachment);
+                    return false;
+                }
+            }
+
             $Attachment['Status'] = $Ticket['status'];
             $Attachment['LastModifiedDate'] = $Ticket['updated_at'];
             $Attachment['DateUpdated'] = Gdn_Format::ToDateTime();
@@ -757,7 +767,7 @@ class ZendeskPlugin extends Gdn_Plugin
         );
 
         if (GetValue('Error', $Attachment)) {
-            $Parsed['Type'] = 'danger';
+            $Parsed['Type'] = 'info';
             $Parsed['Body'] = $Attachment['Error'];
         } else {
             $Parsed['Fields'] = array();
