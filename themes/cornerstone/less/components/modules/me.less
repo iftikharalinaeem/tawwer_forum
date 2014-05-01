@@ -37,6 +37,21 @@
       height: @line-height-base;
     }
   }
+
+  .Flyout {
+    right: -4px;
+    left: auto;
+
+    &:before,
+    &:after {
+      left: auto;
+      right: 6px;
+    }
+
+    a {
+      color: @link-color;
+    }
+  }
 }
 
 .MeBox-SignIn {
