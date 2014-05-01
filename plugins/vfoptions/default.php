@@ -246,7 +246,7 @@ pageTracker._trackPageview();
 		}
 
       // Theme pruning
-      if (strcasecmp($Sender->RequestMethod, 'themes') == 0) {
+      if (is_array($Themes = $Sender->Data('AvailableThemes'))) {
          
          $VisibleThemes = strtolower(C('Garden.Themes.Visible', ''));
          $VisibleThemes = explode(',', $VisibleThemes);
@@ -396,7 +396,7 @@ pageTracker._trackPageview();
       // Exclude hidden, vf*, and *monkey from enabled plugins
       foreach($EnabledPlugins as $Key => $Name) {
          // Skip all vf* plugins
-         if (in_array($Key, $HiddenPlugins) || strpos($Key, 'vf') === 0 || substr_compare($str,'monkey',-6,6) === 0 )
+         if (in_array($Key, $HiddenPlugins) || strpos($Key, 'vf') === 0 || StringEndsWith($Key, 'monkey', TRUE))
             unset($EnabledPlugins[$Key]);
       }
       

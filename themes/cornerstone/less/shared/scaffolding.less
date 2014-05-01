@@ -1,0 +1,60 @@
+//
+// # Scaffolding
+//
+// Styleguide 1
+
+* {
+  box-sizing: border-box;
+
+  &:before,
+  &:after {
+    box-sizing: border-box;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  font-family: @font-family-base;
+  font-size: @font-size-base;
+  line-height: @line-height-ratio;
+  color: @text-color;
+  background-color: @body-background;
+}
+
+// -----------------------------------------------------------------------------
+
+// ## Links
+//
+// Styleguide 1.1
+
+a {
+  color: @link-color;
+  text-decoration: none;
+  transition: color 150ms, background-color 150ms, border-color 150ms;
+
+  &:hover,
+  &:focus {
+    color: @link-color-hover;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+// ## Browse Happy
+//
+// No styleguide reference.
+
+.browsehappy {
+  padding: @line-height-base;
+  margin: 0;
+  text-align: center;
+  background-color: #fcf8e9;
+}

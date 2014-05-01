@@ -3,7 +3,7 @@
 $PluginInfo['samlsso'] = array(
     'Name' => 'SAML SSO',
     'Description' => 'SAML SSO for Vanilla',
-    'Version' => '1.0.2b',
+    'Version' => '1.0.3b',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'RequiredTheme' => FALSE,
     'RequiredPlugins' => FALSE,
@@ -107,7 +107,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
             'AuthenticationKey' => 'saml',
             'AuthenticationSchemeAlias' => 'saml',
             'Name' => C('Garden.Title'),
-            'IdentifierFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+            'IdentifierFormat' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified'
             );
 
          $Model->Save($Provider);
@@ -266,7 +266,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
       Trace($response->getNameId(), 'nameid');
 
       $Form = $Sender->Form; //new Gdn_Form();
-      $Form->SetFormValue('UniqueID', $this->rval('eduPersonTargetedID', $profile));
+      $Form->SetFormValue('UniqueID', $response->getNameId());
       $Form->SetFormValue('Provider', self::ProviderKey);
       $Form->SetFormValue('ProviderName', $provider['Name']);
       $Form->SetFormValue('ConnectName', $this->rval('uid', $profile));
