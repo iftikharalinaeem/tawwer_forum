@@ -32,7 +32,7 @@ class ZendeskPlugin extends Gdn_Plugin
     protected $closedCaseStatusString = 'solved';
 
     /**
-     * If time since last update from Salesforce is less then this; we wont check for update - saving api calls.
+     * If time since last update from Zendesk is less then this; we wont check for update - saving api calls.
      * @var int
      */
     protected $minimumTimeForUpdate = 600;
@@ -784,7 +784,7 @@ class ZendeskPlugin extends Gdn_Plugin
         foreach ($Args['Attachments'] as &$Attachment) {
             if ($Attachment['Source'] == 'zendesk') {
                 $ParsedAttachment = $this->ParseAttachmentForHtmlView($Attachment);
-                $Attachment = $Attachment + $ParsedAttachment;
+                $Attachment = $ParsedAttachment + $Attachment;
             }
         }
     }
@@ -835,7 +835,7 @@ class ZendeskPlugin extends Gdn_Plugin
 
         $Parsed['Icon'] = 'ticket';
 
-        $Parsed['Title'] = T($Attachment['Type']) . ' &middot; ' . Anchor(
+        $Parsed['Title'] = T('Ticket') . ' &middot; ' . Anchor(
             T($Attachment['Source']),
             $Attachment['SourceURL']
         );
@@ -849,24 +849,9 @@ class ZendeskPlugin extends Gdn_Plugin
         } else {
             $Parsed['Fields'] = array();
 
-//         if ($Attachment['Type'] === 'salesforce-case') {
-//            $Parsed['Fields']['Case Number'] = Anchor(htmlspecialchars($Attachment['CaseNumber']), $Attachment['SourceURL']);
-//         } else {
-//            $Parsed['Fields']['Name'] = Anchor(htmlspecialchars($Attachment['FirstName'].' '.$Attachment['LastName']), $Attachment['SourceURL']);
-//         }
-//
             $Parsed['Fields']['Status'] = $Attachment['Status'];
             $Parsed['Fields']['Last Updated'] = Gdn_Format::Date($Attachment['LastModifiedDate'], 'html');
-//
-//         if ($Attachment['Type'] === 'salesforce-case') {
-//            $Parsed['Fields']['Priority'] = htmlspecialchars($Attachment['Priority']);
-//         } else {
-//            $Parsed['Fields']['Company'] = htmlspecialchars(GetValue('Company', $Attachment, ''));
-//            $Title = GetValue('Title', $Attachment);
-//            if ($Title) {
-//               $Parsed['Fields']['Title'] = htmlspecialchars($Title);
-//            }
-//         }
+
         }
 
         return $Parsed;
