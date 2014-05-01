@@ -197,10 +197,10 @@ class ZendeskPlugin extends Gdn_Plugin
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
         $ConfigurationModel->SetField(
             array(
-                'Plugin.Zendesk.ApiKey',
-                'Plugin.Zendesk.User',
-                'Plugin.Zendesk.Url',
-                'Plugin.Zendesk.ApiUrl',
+                'ApiKey',
+                'User',
+                'Url',
+                'ApiUrl',
             )
         );
 
@@ -216,23 +216,23 @@ class ZendeskPlugin extends Gdn_Plugin
             $FormValues = $Sender->Form->FormValues();
             if ($Sender->Form->IsPostBack()) {
                 $Sender->Form->ValidateRule(
-                    'Plugin.Zendesk.ApiKey',
+                    'ApiKey',
                     'function:ValidateRequired',
                     'API Key is required'
                 );
-                $Sender->Form->ValidateRule('Plugin.Zendesk.User', 'function:ValidateRequired', 'User is required');
-                $Sender->Form->ValidateRule('Plugin.Zendesk.Url', 'function:ValidateRequired', 'Url is required');
+                $Sender->Form->ValidateRule('User', 'function:ValidateRequired', 'User is required');
+                $Sender->Form->ValidateRule('Url', 'function:ValidateRequired', 'Url is required');
                 $Sender->Form->ValidateRule(
-                    'Plugin.Zendesk.ApiUrl',
+                    'ApiUrl',
                     'function:ValidateRequired',
                     'API Url is required'
                 );
 
                 if ($Sender->Form->ErrorCount() == 0) {
-                    SaveToConfig('Plugins.Zendesk.ApiKey', trim($FormValues['Plugin.Zendesk.ApiKey']));
-                    SaveToConfig('Plugins.Zendesk.User', trim($FormValues['Plugin.Zendesk.User']));
-                    SaveToConfig('Plugins.Zendesk.Url', trim($FormValues['Plugin.Zendesk.Url']));
-                    SaveToConfig('Plugins.Zendesk.ApiUrl', trim($FormValues['Plugin.Zendesk.ApiUrl']));
+                    SaveToConfig('Plugins.Zendesk.ApiKey', trim($FormValues['ApiKey']));
+                    SaveToConfig('Plugins.Zendesk.User', trim($FormValues['User']));
+                    SaveToConfig('Plugins.Zendesk.Url', trim($FormValues['Url']));
+                    SaveToConfig('Plugins.Zendesk.ApiUrl', trim($FormValues['ApiUrl']));
                     $Sender->InformMessage(T("Your changes have been saved."));
                 } else {
                     $Sender->InformMessage(T("Error saving settings to config."));
@@ -243,10 +243,10 @@ class ZendeskPlugin extends Gdn_Plugin
         }
 
 
-        $Sender->Form->SetValue('Plugin.Zendesk.Url', C('Plugins.Zendesk.Url'));
-        $Sender->Form->SetValue('Plugin.Zendesk.ApiKey', C('Plugins.Zendesk.ApiKey'));
-        $Sender->Form->SetValue('Plugin.Zendesk.User', C('Plugins.Zendesk.User'));
-        $Sender->Form->SetValue('Plugin.Zendesk.ApiUrl', C('Plugins.Zendesk.ApiUrl'));
+        $Sender->Form->SetValue('Url', C('Plugins.Zendesk.Url'));
+        $Sender->Form->SetValue('ApiKey', C('Plugins.Zendesk.ApiKey'));
+        $Sender->Form->SetValue('User', C('Plugins.Zendesk.User'));
+        $Sender->Form->SetValue('ApiUrl', C('Plugins.Zendesk.ApiUrl'));
 
         $Sender->Render($this->GetView('dashboard.php'));
     }
