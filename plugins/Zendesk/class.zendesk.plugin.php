@@ -37,8 +37,6 @@ class ZendeskPlugin extends Gdn_Plugin
      */
     protected $minimumTimeForUpdate = 600;
 
-    //methods
-
     /** @var \Zendesk Zendesk */
     protected $zendesk;
 
@@ -52,7 +50,6 @@ class ZendeskPlugin extends Gdn_Plugin
             C('Plugins.Zendesk.User'),
             C('Plugins.Zendesk.ApiKey')
         );
-
 
     }
 
@@ -86,6 +83,10 @@ class ZendeskPlugin extends Gdn_Plugin
 
     }
 
+    /**
+     * @param DiscussionController $Sender
+     * @param array $Args
+     */
     public function DiscussionController_AfterCommentBody_Handler($Sender, $Args)
     {
         if (!C('Plugins.Zendesk.Enabled')) {
@@ -119,6 +120,7 @@ class ZendeskPlugin extends Gdn_Plugin
     }
 
     /**
+     * @see AttachmentModel
      * @param array $Attachment Attachment Data - see AttachmentModel
      * @return bool
      */
@@ -143,6 +145,13 @@ class ZendeskPlugin extends Gdn_Plugin
         return true;
     }
 
+    /**
+     * Update the Attachment
+     *
+     * @see AttachmentModel
+     * @param array $Attachment
+     * @return bool
+     */
     protected function updateAttachment($Attachment)
     {
         if ($this->IsToBeUpdated($Attachment)) {
@@ -171,7 +180,7 @@ class ZendeskPlugin extends Gdn_Plugin
     /**
      * Creates the Virtual Zendesk Controller and adds Link to SideMenu in the dashboard
      *
-     * @param Controller $Sender
+     * @param PluginController $Sender
      */
     public function PluginController_Zendesk_Create($Sender)
     {
@@ -251,6 +260,14 @@ class ZendeskPlugin extends Gdn_Plugin
         $Sender->Render($this->GetView('dashboard.php'));
     }
 
+    /**
+     * Adds Option to Create Ticket to Discussion Gear.  Will be removed if Discussion has
+     * already been submitted as a Ticket
+     *
+     * @param DiscussionController $Sender
+     * @param array $Args
+     *
+     */
     public function DiscussionController_DiscussionOptions_Handler($Sender, $Args)
     {
 
@@ -288,6 +305,13 @@ class ZendeskPlugin extends Gdn_Plugin
         }
     }
 
+    /**
+     * Adds Option to Create Ticket to Comment Gear.  Will be removed if comment has
+     * already been submitted as a Ticket
+     *
+     * @param CommentController $Sender
+     * @param array $Args
+     */
     public function DiscussionController_CommentOptions_Handler($Sender, $Args)
     {
 
@@ -303,10 +327,11 @@ class ZendeskPlugin extends Gdn_Plugin
         $ElementAuthorID = $Args['Comment']->InsertUserID;
         $CommentID = $Args['Comment']->CommentID;
 
-//      if ($ElementAuthorID == Gdn::Session()->UserID) {
-//         //no need to create support tickets for your self
-//         return;
-//      }
+
+        if (!C('Plugins.Zendesk.AllowTicketForSelf', false) && $ElementAuthorID == Gdn::Session()->UserID) {
+            //no need to create support tickets for your self
+            return;
+        }
 
         $LinkText = 'Create Zendesk Ticket';
         if (isset($Args['CommentOptions'])) {
@@ -326,7 +351,7 @@ class ZendeskPlugin extends Gdn_Plugin
     }
 
     /**
-     * Handle Zendesk popup in discussions
+     * Handle Zendesk popup to create ticket in discussions
      * @throws Exception
      * @param DiscussionController $Sender
      */
@@ -391,6 +416,7 @@ class ZendeskPlugin extends Gdn_Plugin
 
                 if ($TicketID > 0) {
 
+                    //Save to Attachments
                     $AttachmentModel->Save(
                         array(
                             'Type' => 'zendesk-ticket',
@@ -480,25 +506,27 @@ class ZendeskPlugin extends Gdn_Plugin
         SaveToConfig('Plugins.Zendesk.Enabled', true);
     }
 
+    /**
+     * Disable Zendesk Plugin
+     */
     protected function disable()
     {
         RemoveFromConfig('Plugins.Zendesk.Enabled');
     }
 
+    /**
+     * Setup to plugin.
+     */
     public function setup()
     {
 
         $this->setupConfig();
-        $this->structure();
 
     }
 
-    public function structure()
-    {
-
-
-    }
-
+    /**
+     * Setup Config Settings
+     */
     private function setupConfig()
     {
         SaveToConfig('Plugins.Zendesk.Enabled', false);
