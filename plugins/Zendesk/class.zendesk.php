@@ -15,21 +15,18 @@ class Zendesk
     protected $apiToken;
     protected $logging = false;
 
-    public function __construct(IZendeskHttpRequest $curlRequest, $apiUrl, $apiUser, $apiToken)
-    {
+    public function __construct(IZendeskHttpRequest $curlRequest, $apiUrl, $apiUser, $apiToken) {
         $this->curl = $curlRequest;
         $this->apiUrl = $apiUrl;
         $this->apiUser = $apiUser;
         $this->apiToken = $apiToken;
     }
 
-    public function enableLogging()
-    {
+    public function enableLogging() {
         $this->logging = true;
     }
 
-    public function disableLogging()
-    {
+    public function disableLogging() {
         $this->logging = true;
     }
 
@@ -42,8 +39,7 @@ class Zendesk
      * @param array $AdditionalTicketFields ; Will be added to the json
      * @return int
      */
-    public function createTicket($Subject, $Body, $Requester, $AdditionalTicketFields = array())
-    {
+    public function createTicket($Subject, $Body, $Requester, $AdditionalTicketFields = array()) {
         $TicketFields = array(
             'requester' => $Requester,
             'subject' => $Subject,
@@ -58,14 +54,12 @@ class Zendesk
         return $Response['ticket']['id'];
     }
 
-    public function getTicket($TicketID)
-    {
+    public function getTicket($TicketID) {
         $Response = $this->zendeskRequest('/tickets/' . $TicketID . '.json');
         return $Response['ticket'];
     }
 
-    public function getLastComment($TicketID)
-    {
+    public function getLastComment($TicketID) {
         $Response = $this->zendeskRequest('/tickets/' . $TicketID . '/comments.json');
         //remove the first comment (its the ticket)
         $Comments = $Response['comments'];
@@ -75,8 +69,7 @@ class Zendesk
         return array();
     }
 
-    public function getUser($UserID)
-    {
+    public function getUser($UserID) {
         if (!is_int($UserID)) {
             throw new Exception('Invalid User ID');
         }
@@ -84,8 +77,7 @@ class Zendesk
         return $Response;
     }
 
-    public function createRequester($name, $email)
-    {
+    public function createRequester($name, $email) {
         return array(
             'name' => $name,
             'email' => $email
@@ -100,8 +92,7 @@ class Zendesk
      * @throws Exception
      * @return mixed json
      */
-    public function zendeskRequest($Url, $Json = null, $Action = 'GET', $Logging = false)
-    {
+    public function zendeskRequest($Url, $Json = null, $Action = 'GET', $Logging = false) {
 
         $this->curl->setOption(CURLOPT_URL, $this->apiUrl . $Url);
         $this->curl->setOption(CURLOPT_FOLLOWLOCATION, true);

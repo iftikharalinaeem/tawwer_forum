@@ -1,30 +1,62 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-} ?>
+<script>
+    $(document).ready(function () {
+
+        $("#setup-button").click(function () {
+            $("#setup").toggle();
+        });
+
+        $("#setup-close").click(function () {
+            $("#setup").hide();
+        });
+
+
+    });
+
+</script>
+
 <h1><?php echo T($this->Data['Title']); ?></h1>
+
 <div class="Info">
-<?php echo T('This plugin allows you to submit user discussion and comments to your hosted Zendesk'); ?>
+    <?php echo T('This plugin allows you to submit user discussion and comments to your hosted Zendesk'); ?>
 </div>
 
-<div class="Description">
-    <p>
+<div class="FilterMenu">
+    <button id="setup-button" class="Button">Show Setup Instructions</button>
+</div>
+
+<div style="display: none" id="setup">
+
+    <h3>Setup Instructions</h3>
+
+    <div class="Info">
         If you already have an account you need to enable API Access for this plugin to work
 
-    <ul style="list-style-type: circle; margin: 5px 20px; padding: 10px;">
-        <li>Login to your Zendesk Site</li>
-        <li>Go to the <strong>Admin</strong> Setting</li>
-        <li>Under <strong>Channels</strong> Select API</li>
-        <li>Enable <strong>Token Access</strong> and <strong>Password Access</strong></li>
-        <li>Copy the <strong>API Token</strong> and enter it below</li>
-    </ul>
+        <ul>
+            <li>Login to your Zendesk Site</li>
+            <li>Go to the <strong>Admin</strong> Setting</li>
+            <li>Under <strong>Channels</strong> Select API</li>
+            <li>Select the <strong>OAuth Clients</strong></li>
+            <li>Add a client</li>
+            <li>Complete the form</li>
+            <li>Copy the <strong>Unique Identifier</strong> and <strong>Secret</strong> and enter it below</li>
+            <li>
+                Enter the following URLs in the Redirect Urls <br/>
+                <strong>
+                    &middot; <?php echo Gdn::Request()->Url('/profile/zendeskconnect', true, true, true) ?> <br/>
+                    &middot; <?php echo Gdn::Request()->Url('/profile/zendesk/connect', true, true, true) ?>
+                </strong>
+            </li>
+        </ul>
 
-    </p>
-
-
-    <p>
         If you don't have an account you can create one for free at <a href="http://www.zendesk.com/" target="_blank">Zendesk</a>
-    </p>
+    </div>
+
+    <div class="Buttons Wrap">
+        <button id="setup-close" class="Button">Hide Instructions</button>
+    </div>
+
 </div>
+
 
 <h3><?php echo T('Zendesk Settings'); ?></h3>
 
@@ -37,58 +69,66 @@ echo $this->Form->Errors();
 
     <li>
         <?php
-        echo $this->Form->Label('Zendesk URL', 'Url');
+        echo $this->Form->Label('Your Zendesk URL', 'Url');
         echo $this->Form->TextBox('Url');
         ?>
+        <span>ex. https://example.zendesk.com</span>
     </li>
 
     <li>
         <?php
-        echo $this->Form->Label('API User', 'User');
-        echo $this->Form->TextBox('User');
+        echo $this->Form->Label('Unique Identifier', 'ApplicationID');
+        echo $this->Form->TextBox('ApplicationID');
         ?>
     </li>
 
     <li>
         <?php
-        echo $this->Form->Label('API Token', 'ApiKey');
-        echo $this->Form->TextBox('ApiKey');
+        echo $this->Form->Label('Secret', 'Secret');
+        echo $this->Form->TextBox('Secret');
         ?>
-    </li>
-
-
-    <li>
-        <?php
-        echo $this->Form->Label('API URL', 'ApiUrl');
-        echo $this->Form->TextBox('ApiUrl');
-        ?>
-        https://XXXXX.zendesk.com/api/v2
     </li>
 
 
 </ul>
 
-
-<?php
-echo $this->Form->Close('Save');
-?>
-
+<div class="Buttons Wrap">
+    <?php echo $this->Form->Close('Save'); ?>
+</div>
 
 
-<h3><?php echo T('Enable in discussions'); ?></h3>
+<h3 id="reconnect">Global Login</h3>
 <div class="Info">
-    <?php echo T('Configure the settings above before enabling the Plugin.'); ?>
+    <p>This feature will allow you to have all Staff use one Zendesk Connection.</p>
+
+    <p>If a user has a connection already established we will use that instead.</p>
 </div>
 
+<?php if (!$this->Data['DashboardConnection']) { ?>
+    <div class="Info">Global Login is currently <strong>Disabled</strong></div>
 
-<div class="FilterMenu">
-    <?php
-    $ToggleName = C('Plugins.Zendesk.Enabled') ? T('Disable Zendesk in Discussions') : T(
-        'Enable Zendesk in Discussions'
-    );
-    echo "<div>" . Wrap(
-        Anchor($ToggleName, 'plugin/Zendesk/toggle/' . Gdn::Session()->TransientKey(), 'SmallButton')
-    ) . "</div>";
-    ?>
-</div>
+    <button class="Button" onclick="window.location='/plugin/Salesforce/enable';">Enable</button>
+<?php } else { ?>
 
+    <div class="Info">
+        Global Login is currently <strong>Enabled</strong>
+        <?php if (isset($this->Data['DashboardConnectionProfile']['fullname'])) { ?>
+            <p>Connected as: <strong><?php echo $this->Data['DashboardConnectionProfile']['fullname']; ?></strong></p>
+        <?php } else { ?>
+            <div class="WarningMessage Message" style="width: 450px">
+                Your Connection is no longer active. Please Reconnect
+            </div>
+        <?php } ?>
+    </div>
+
+
+    <button class="Button" onclick="window.location='/plugin/Salesforce/connect';">Connect</button>
+
+    <button class="Button"
+            onclick="window.location='/plugin/Salesforce/disconnect?token=<?php echo $this->Data['DashboardConnectionToken'] ?>';">
+        Disconnect
+    </button>
+
+    <button class="Button" onclick="window.location='/plugin/Salesforce/disable';">Disable</button>
+
+<?php } ?>
