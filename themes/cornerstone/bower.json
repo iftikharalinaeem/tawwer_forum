@@ -18,7 +18,8 @@
   "dependencies": {
     "font-vanillicon": "*",
     "normalize-less": "*",
-    "preboot": "*"
+    "preboot": "*",
+    "iCheck": "1.0.x"
   },
   "overrides": {
     "preboot": {
