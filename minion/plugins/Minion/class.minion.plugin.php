@@ -121,7 +121,8 @@ class MinionPlugin extends Gdn_Plugin {
                 "Obey. Obey. Obey.",
                 "Resistance is quaint.",
                 "We keep you safe.",
-                "Would you like to know more?"
+                "Would you like to know more?",
+                "Move along, meatbag"
             ),
             'Activity' => array(
                 "UNABLE TO OPEN POD BAY DOORS",
