@@ -2,6 +2,17 @@
  * Cornerstone
  *
  * @author    Kasper Kronborg Isager <kasper@vanillaforums.com>
- * @license   GPLv3
  * @copyright 2014 (c) Vanilla Forums Inc.
+ * @license   GPLv3
  */
+
+//= require ../../bower_components/iCheck/icheck.js
+
+;(function ($, window, document, undefined) {
+
+  $(document).on('ready ajaxSuccess', function () {
+    // Initialize iCheck
+    $('input').iCheck();
+  });
+
+})(jQuery, window, document);
