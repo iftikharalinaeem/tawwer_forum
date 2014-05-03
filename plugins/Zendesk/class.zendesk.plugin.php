@@ -62,9 +62,6 @@ class ZendeskPlugin extends Gdn_Plugin {
             }
         }
 
-        if (!$this->accessToken) {
-            Trace('Zendesk Not Connected');
-        }
     }
 
 
@@ -386,7 +383,10 @@ class ZendeskPlugin extends Gdn_Plugin {
                     ),
                     array(
                         'custom_fields' =>
-                            array('DiscussionID' => $DiscussionID)
+                            array(
+                                'DiscussionID' => $DiscussionID,
+                                'ForumUrl' => $Url
+                            )
                     )
                 );
 
@@ -411,21 +411,8 @@ class ZendeskPlugin extends Gdn_Plugin {
                 } else {
                     $Sender->InformMessage(T("Error creating ticket with Zendesk"));
                 }
-
             }
-
         }
-
-
-        $Data = array(
-            'DiscussionID' => $DiscussionID,
-            'UserID' => $UserID,
-            'UserName' => $UserName,
-            'Body' => $Content->Body,
-            'InsertName' => $Content->InsertName,
-            'InsertEmail' => $Content->InsertEmail,
-            'Title' => $TicketTitle,
-        );
 
         $Sender->Form->AddHidden('Url', $Url);
         $Sender->Form->AddHidden('UserId', $UserID);
@@ -436,7 +423,15 @@ class ZendeskPlugin extends Gdn_Plugin {
         $Sender->Form->SetValue('Title', $TicketTitle);
         $Sender->Form->SetValue('Body', $Content->Body);
 
-        $Sender->SetData('Data', $Data);
+        $Sender->SetData('Data', array(
+            'DiscussionID' => $DiscussionID,
+            'UserID' => $UserID,
+            'UserName' => $UserName,
+            'Body' => $Content->Body,
+            'InsertName' => $Content->InsertName,
+            'InsertEmail' => $Content->InsertEmail,
+            'Title' => $TicketTitle,
+        ));
 
         $Sender->Render('createticket', '', 'plugins/Zendesk');
 
@@ -734,20 +729,16 @@ class ZendeskPlugin extends Gdn_Plugin {
         $AccessToken = GetValue('access_token', $Tokens);
 
         if ($AccessToken) {
-            SaveToConfig(
-                array(
-                    'Plugins.Zendesk.GlobalLogin.Enabled' => true,
-                    'Plugins.Zendesk.GlobalLogin.AccessToken' => $AccessToken
-                )
-            );
+            SaveToConfig(array(
+                'Plugins.Zendesk.GlobalLogin.Enabled' => true,
+                'Plugins.Zendesk.GlobalLogin.AccessToken' => $AccessToken
+            ));
         } else {
-            RemoveFromConfig(
-                array(
-                    'Plugins.Zendesk.GlobalLogin.Enabled' => true,
-                    'Plugins.Zendesk.GlobalLogin.AccessToken' => $AccessToken
-                )
-            );
-            trigger_error('Error Accessing Zendesk');
+            RemoveFromConfig(array(
+                'Plugins.Zendesk.GlobalLogin.Enabled' => true,
+                'Plugins.Zendesk.GlobalLogin.AccessToken' => $AccessToken
+            ));
+            throw new Gdn_UserException('Error Connecting to Zendesk');
         }
         Redirect('/plugin/zendesk');
 
@@ -769,7 +760,6 @@ class ZendeskPlugin extends Gdn_Plugin {
         }
     }
 
-
     /**
      * Given an instance of the attachment model, parse it into a format that
      * the attachment view can digest.
@@ -783,9 +773,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         $InsertUser = $UserModel->GetID($Attachment['InsertUserID']);
 
         $Parsed = array();
-
         $Parsed['Icon'] = 'ticket';
-
         $Parsed['Title'] = T('Ticket') . ' &middot; ' . Anchor(
                 T($Attachment['Source']),
                 $Attachment['SourceURL']
@@ -807,7 +795,6 @@ class ZendeskPlugin extends Gdn_Plugin {
             if ($LastModified) {
                 $Parsed['Fields']['Last Updated'] = Gdn_Format::Date($LastModified, 'html');
             }
-
         }
 
         return $Parsed;
