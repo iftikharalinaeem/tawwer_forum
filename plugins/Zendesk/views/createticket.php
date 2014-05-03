@@ -25,7 +25,7 @@ echo $this->Form->Errors();
         <li>
             <?php
             echo $this->Form->Label('Body', 'Body');
-            echo $this->Form->TextBox('Body', array('MultiLne' => true));
+            echo $this->Form->TextBox('Body', array('MultiLine' => true));
             ?>
         </li>
     </ul>

@@ -7,19 +7,17 @@
 /**
  * Class Zendesk
  */
-class Zendesk
-{
+class Zendesk {
 
     protected $apiUrl;
     protected $apiUser;
     protected $apiToken;
     protected $logging = false;
 
-    public function __construct(IZendeskHttpRequest $curlRequest, $apiUrl, $apiUser, $apiToken) {
+    public function __construct(IZendeskHttpRequest $curlRequest, $Url, $AccessToken) {
         $this->curl = $curlRequest;
-        $this->apiUrl = $apiUrl;
-        $this->apiUser = $apiUser;
-        $this->apiToken = $apiToken;
+        $this->apiUrl = $Url . '/api/v2';
+        $this->AccessToken = $AccessToken;
     }
 
     public function enableLogging() {
@@ -98,7 +96,9 @@ class Zendesk
         $this->curl->setOption(CURLOPT_FOLLOWLOCATION, true);
         $this->curl->setOption(CURLOPT_MAXREDIRS, 10);
         $this->curl->setOption(CURLOPT_FOLLOWLOCATION, true);
-        $this->curl->setOption(CURLOPT_USERPWD, $this->apiUser . "/token:" . $this->apiToken);
+
+        //$this->curl->setOption(CURLOPT_USERPWD, $this->apiUser . "/token:" . $this->apiToken);
+
         switch ($Action) {
             case "POST":
                 $this->curl->setOption(CURLOPT_CUSTOMREQUEST, "POST");
@@ -117,14 +117,13 @@ class Zendesk
             default:
                 break;
         }
-        $this->curl->setOption(CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+        $this->curl->setOption(CURLOPT_HTTPHEADER, array('Content-type: application/json', 'Authorization: Bearer '. $this->AccessToken));
         $this->curl->setOption(CURLOPT_USERAGENT, "MozillaXYZ/1.0");
         $this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
         $this->curl->setOption(CURLOPT_TIMEOUT, 10);
 
         Trace($Action . ' ' . $this->apiUrl . $Url);
         $Output = $this->curl->execute();
-
         $HttpCode = $this->curl->getInfo(CURLINFO_HTTP_CODE);
         $Decoded = json_decode($Output, true);
 

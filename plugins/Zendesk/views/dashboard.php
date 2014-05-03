@@ -103,32 +103,22 @@ echo $this->Form->Errors();
 
     <p>If a user has a connection already established we will use that instead.</p>
 </div>
-
-<?php if (!$this->Data['DashboardConnection']) { ?>
+<?php if (!$this->Data['GlobalLoginEnabled']) { ?>
     <div class="Info">Global Login is currently <strong>Disabled</strong></div>
 
-    <button class="Button" onclick="window.location='/plugin/Salesforce/enable';">Enable</button>
+    <button class="Button" onclick="window.location='<?php echo $this->Data['ToggleUrl']; ?>';">Enable</button>
 <?php } else { ?>
 
     <div class="Info">
         Global Login is currently <strong>Enabled</strong>
-        <?php if (isset($this->Data['DashboardConnectionProfile']['fullname'])) { ?>
-            <p>Connected as: <strong><?php echo $this->Data['DashboardConnectionProfile']['fullname']; ?></strong></p>
-        <?php } else { ?>
-            <div class="WarningMessage Message" style="width: 450px">
-                Your Connection is no longer active. Please Reconnect
-            </div>
-        <?php } ?>
     </div>
 
+    <?php if (!$this->Data['GlobalLoginConnected']) { ?>
 
-    <button class="Button" onclick="window.location='/plugin/Salesforce/connect';">Connect</button>
+        <button class="Button" onclick="window.location='/plugin/zendesk/authorize';">Connect</button>
 
-    <button class="Button"
-            onclick="window.location='/plugin/Salesforce/disconnect?token=<?php echo $this->Data['DashboardConnectionToken'] ?>';">
-        Disconnect
-    </button>
+    <?php } ?>
 
-    <button class="Button" onclick="window.location='/plugin/Salesforce/disable';">Disable</button>
+    <button class="Button" onclick="window.location='<?php echo $this->Data['ToggleUrl']; ?>';">Disable</button>
 
 <?php } ?>
