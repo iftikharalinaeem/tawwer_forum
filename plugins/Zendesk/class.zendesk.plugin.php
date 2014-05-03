@@ -69,6 +69,8 @@ class ZendeskPlugin extends Gdn_Plugin {
         }
     }
 
+
+
     /**
      * @param DiscussionController $Sender
      * @param $Args
@@ -297,7 +299,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (isset($Args['DiscussionOptions'])) {
             $Args['DiscussionOptions']['Zendesk'] = array(
                 'Label' => T($LinkText),
-                'Url' => "/discussion/zendesk/$DiscussionID",
+                'Url' => "/discussion/zendesk/discussion/$DiscussionID",
                 'Class' => 'Popup'
             );
         }
@@ -386,6 +388,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             $TicketTitle = $Discussion->Name;
 
         } else {
+            $DiscussionID = $ContentID;
             $Content = $Sender->DiscussionModel->GetID($ContentID);
             $TicketTitle = $Content->Name;
             $Url = DiscussionUrl($Content, 1);
@@ -788,46 +791,13 @@ class ZendeskPlugin extends Gdn_Plugin {
 
     //end of OAUTH
 
-    /**
-     *
-     * Handler to Parse Attachments for Staff Users
-     *
-     * @param $Sender
-     * @param $Args
-     */
-    public function SalesforcePlugin_BeforeWriteAttachments_Handler($Sender, &$Args) {
-
-        foreach ($Args['Attachments'] as &$Attachment) {
-            if ($Attachment['Source'] == 'zendesk') {
-                $ParsedAttachment = $this->ParseAttachmentForHtmlView($Attachment);
-                $Attachment = $ParsedAttachment + $Attachment;
+    public function SalesforcePlugin_ParseAttachments_Handler($Sender, $Args) {
+        if (GetValue('Attachments', $Args['Content'])) {
+            foreach ($Args['Content']->Attachments as $Key => $Attachment) {
+                if ($Attachment['Source'] == 'zendesk') {
+                    $Args['Content']->ParsedAttachments[$Key] = self::ParseAttachmentForHtmlView($Attachment);
+                }
             }
-        }
-    }
-
-    /**
-     *
-     * Handler to Parse Attachment for the Owner of the Attachment
-     *
-     * @param $Sender
-     * @param $Args
-     */
-    public function SalesforcePlugin_BeforeWriteAttachmentForOwner_Handler($Sender, &$Args) {
-        if (GetValueR('Attachment.Source', $Args) == 'zendesk') {
-            $Args['Attachment'] = $this->ParseAttachmentForHtmlView($Args['Attachment']);
-        }
-    }
-
-    /**
-     *
-     * Handler to Parse Attachments for All Other (Not staff or Owner) Users
-     *
-     * @param $Sender
-     * @param $Args
-     */
-    public function SalesforcePlugin_BeforeWriteAttachmentForOther_Handler($Sender, &$Args) {
-        if ($Args['Attachment']['Source'] == 'zendesk') {
-            $Args['Attachment'] = $this->ParseAttachmentForHtmlView($Args['Attachment']);
         }
     }
 
