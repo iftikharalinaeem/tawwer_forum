@@ -51,8 +51,6 @@ class ZendeskPlugin extends Gdn_Plugin {
     /** @var \Zendesk Zendesk */
     protected $zendesk;
 
-
-
     public function __construct() {
         parent::__construct();
 
@@ -70,14 +68,38 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
 
+    /**
+     * @param AssetModel $Sender
+     */
+    public function AssetModel_StyleCss_Handler($Sender) {
+        $Sender->AddCssFile('zendesk.css', 'plugins/Zendesk');
+    }
 
     /**
      * @param DiscussionController $Sender
      * @param $Args
      */
     public function DiscussionController_AfterDiscussionBody_Handler($Sender, $Args) {
+        $this->writeAndUpdateAttachments($Sender, $Args);
+    }
 
+    /**
+     * @param DiscussionController $Sender
+     * @param array $Args
+     */
+    public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
+        $this->writeAndUpdateAttachments($Sender, $Args);
+    }
 
+    protected function writeAndUpdateAttachments($Sender, $Args) {
+
+        if ($Args['Type'] == 'Discussion') {
+            $Content = 'Discussion';
+        } elseif ($Args['Type'] == 'Comment') {
+            $Content = 'Comment';
+        } else {
+            throw new Gdn_UserException('Invalid Content');
+        }
         // Signed in users only.
         if (!Gdn::Session()->UserID) {
             return;
@@ -86,7 +108,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
             return;
         }
-        $Attachments = GetValue('Attachments', $Args['Discussion']);
+        $Attachments = GetValue('Attachments', $Args[$Content]);
         if ($Attachments) {
             foreach ($Attachments as $Attachment) {
                 if ($Attachment['Type'] == 'zendesk-ticket') {
@@ -94,39 +116,6 @@ class ZendeskPlugin extends Gdn_Plugin {
                 }
             }
         }
-
-    }
-
-    /**
-     * @param DiscussionController $Sender
-     * @param array $Args
-     */
-    public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
-
-
-        // Signed in users only. No guest reporting!
-        if (!Gdn::Session()->UserID) {
-            return;
-        }
-
-        if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
-            return;
-        }
-        $Attachments = GetValue('Attachments', $Args['Comment']);
-        if ($Attachments) {
-            foreach ($Attachments as $Attachment) {
-                if ($Attachment['Type'] == 'zendesk-ticket') {
-                    $this->UpdateAttachment($Attachment);
-                }
-            }
-        }
-    }
-
-    /**
-     * @param AssetModel $Sender
-     */
-    public function AssetModel_StyleCss_Handler($Sender) {
-        $Sender->AddCssFile('zendesk.css', 'plugins/Zendesk');
     }
 
     /**
@@ -277,39 +266,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @rodo login prompts
      */
     public function DiscussionController_DiscussionOptions_Handler($Sender, $Args) {
-
-        if (!$this->isConfigured() || !$this->isConnected()) {
-            return;
-        }
-
-        // Signed in users only. No guest reporting!
-        if (!Gdn::Session()->UserID) {
-            return;
-        }
-
-        $DiscussionID = $Args['Discussion']->DiscussionID;
-        $ElementAuthorID = $Args['Discussion']->InsertUserID;
-
-        if (!C('Plugins.Zendesk.AllowTicketForSelf', false) && $ElementAuthorID == Gdn::Session()->UserID) {
-            //no need to create support tickets for your self
-            return;
-        }
-
-        $LinkText = 'Create Zendesk Ticket';
-        if (isset($Args['DiscussionOptions'])) {
-            $Args['DiscussionOptions']['Zendesk'] = array(
-                'Label' => T($LinkText),
-                'Url' => "/discussion/zendesk/discussion/$DiscussionID",
-                'Class' => 'Popup'
-            );
-        }
-        //remove create Create already created
-        $Attachments = GetValue('Attachments', $Args['Discussion'], array());
-        foreach ($Attachments as $Attachment) {
-            if ($Attachment['Type'] == 'zendesk-ticket') {
-                unset($Args['DiscussionOptions']['Zendesk']);
-            }
-        }
+        $this->addOptions($Sender, $Args);
     }
 
     /**
@@ -321,6 +278,10 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @todo login prompts
      */
     public function DiscussionController_CommentOptions_Handler($Sender, $Args) {
+        $this->addOptions($Sender, $Args);
+    }
+
+    protected function addOptions($Sender, $Args) {
 
         if (!$this->isConfigured() || !$this->isConnected()) {
             return;
@@ -330,9 +291,16 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (!Gdn::Session()->UserID) {
             return;
         }
-
-        $ElementAuthorID = $Args['Comment']->InsertUserID;
-        $CommentID = $Args['Comment']->CommentID;
+        if ($Args['Type'] == 'Discussion') {
+            $Content = 'Discussion';
+            $ContentID = $Args[$Content]->DiscussionID;
+        } elseif ($Args['Type'] == 'Comment') {
+            $Content = 'Comment';
+            $ContentID = $Args[$Content]->CommentID;
+        } else {
+            throw new Gdn_UserException('Invalid Content Type');
+        }
+        $ElementAuthorID = $Args[$Content]->InsertUserID;
 
 
         if (!C('Plugins.Zendesk.AllowTicketForSelf', false) && $ElementAuthorID == Gdn::Session()->UserID) {
@@ -341,18 +309,18 @@ class ZendeskPlugin extends Gdn_Plugin {
         }
 
         $LinkText = 'Create Zendesk Ticket';
-        if (isset($Args['CommentOptions'])) {
-            $Args['CommentOptions']['Zendesk'] = array(
+        if (isset($Args[$Content . 'Options'])) {
+            $Args[$Content . 'Options']['Zendesk'] = array(
                 'Label' => T($LinkText),
-                'Url' => "/discussion/zendesk/Comment/$CommentID",
+                'Url' => "/discussion/zendesk/" . strtolower($Content) . "/$ContentID",
                 'Class' => 'Popup'
             );
         }
         //remove create Create already created
-        $Attachments = GetValue('Attachments', $Args['Comment'], array());
+        $Attachments = GetValue('Attachments', $Args[$Content], array());
         foreach ($Attachments as $Attachment) {
             if ($Attachment['Type'] == 'zendesk-ticket') {
-                unset($Args['CommentOptions']['Zendesk']);
+                unset($Args[$Content . 'Options']['Zendesk']);
             }
         }
     }
