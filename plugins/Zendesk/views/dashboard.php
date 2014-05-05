@@ -107,11 +107,23 @@ echo $this->Form->Errors();
     <div class="Info">Global Login is currently <strong>Disabled</strong></div>
 
     <button class="Button" onclick="window.location='<?php echo $this->Data['ToggleUrl']; ?>';">Enable</button>
+
 <?php } else { ?>
 
     <div class="Info">
         Global Login is currently <strong>Enabled</strong>
+
+        <?php if ($this->Data['GlobalLoginConnected']) { ?>
+
+        <div>
+        You are connected as
+            <strong><?php echo Gdn_Format::Html($this->Data['GlobalLoginProfile']['fullname']); ?></strong>
+        </div>
+
+        <?php } ?>
+
     </div>
+
 
     <?php if (!$this->Data['GlobalLoginConnected']) { ?>
 

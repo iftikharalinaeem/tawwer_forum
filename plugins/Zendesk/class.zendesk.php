@@ -180,4 +180,28 @@ class Zendesk {
         return $Decoded;
 
     }
+
+    /**
+     * Get user profile from zendesk
+     *
+     * @param bool|int $userId defaults to authenticated user
+     *
+     * @return array Profile
+     *      [id]
+     *      [fullname]
+     *      [email]
+     *      [photo]
+     */
+    public function getProfile($userId = false) {
+        if (!$userId) {
+            $userId = 'me';
+        }
+        $fullProfile = $this->zendeskRequest('/users/' . $userId . '.json');
+        return array(
+            'id' => $fullProfile['user']['id'],
+            'email' => $fullProfile['user']['email'],
+            'fullname' => $fullProfile['user']['name'],
+            'photo' => $fullProfile['user']['photo'],
+        );
+    }
 }

@@ -90,7 +90,6 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     protected function writeAndUpdateAttachments($Sender, $Args) {
-
         if ($Args['Type'] == 'Discussion') {
             $Content = 'Discussion';
         } elseif ($Args['Type'] == 'Comment') {
@@ -248,6 +247,11 @@ class ZendeskPlugin extends Gdn_Plugin {
             'GlobalLoginConnected' => C('Plugins.Zendesk.GlobalLogin.AccessToken'),
             'ToggleUrl' => '/plugin/zendesk/toggle/' . Gdn::Session()->TransientKey()
         ));
+        if (C('Plugins.Zendesk.GlobalLogin.Enabled')) {
+            $this->setZendesk();
+            $globalLoginProfile = $this->zendesk->getProfile();
+            $Sender->SetData('GlobalLoginProfile', $globalLoginProfile);
+        }
 
         $Sender->Render($this->GetView('dashboard.php'));
     }
@@ -698,18 +702,20 @@ class ZendeskPlugin extends Gdn_Plugin {
             return;
         }
         $AccessToken = GetValue('access_token', $Tokens);
-        //@todo profile
-        $Profile = array();
+
+        $this->setZendesk();
+        $profile = $this->zendesk->getProfile();
+
         Gdn::UserModel()->SaveAuthentication(
             array(
                 'UserID' => $Sender->User->UserID,
                 'Provider' => self::PROVIDER_KEY,
-                'UniqueID' => $Profile['id']
+                'UniqueID' => $profile['id']
             )
         );
         $Attributes = array(
             'AccessToken' => $AccessToken,
-            'Profile' => $Profile,
+            'Profile' => $profile,
         );
         Gdn::UserModel()->SaveAttribute($Sender->User->UserID, self::PROVIDER_KEY, $Attributes);
         $this->EventArguments['Provider'] = self::PROVIDER_KEY;
