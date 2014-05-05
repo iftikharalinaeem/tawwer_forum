@@ -107,12 +107,16 @@ class ZendeskPlugin extends Gdn_Plugin {
         }
         $Attachments = GetValue('Attachments', $Args[$Content]);
         if ($Attachments) {
-            foreach ($Attachments as $Attachment) {
+            $ParsedAttachments = array();
+            foreach ($Args[$Content]->Attachments as $Key => $Attachment) {
                 if ($Attachment['Type'] == 'zendesk-ticket') {
+                    $ParsedAttachments[$Key] = $Args[$Content]->ParsedAttachments[$Key];
                     $this->UpdateAttachment($Attachment);
                 }
             }
+            WriteAttachments($ParsedAttachments);
         }
+
     }
 
     /**
