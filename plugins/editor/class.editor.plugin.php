@@ -21,6 +21,11 @@ $PluginInfo['editor'] = array(
 class EditorPlugin extends Gdn_Plugin {
 
    /**
+    * Base string to be used for generating a memcached key.
+    */
+   const DISCUSSION_MEDIA_CACHE_KEY = 'media.discussion.%d';
+
+   /**
     *
     * Properties
     *
@@ -86,6 +91,11 @@ class EditorPlugin extends Gdn_Plugin {
    protected $mediaCache;
 
    /**
+    * How long memcached holds data until it expires.
+    */
+   protected $mediaCacheExpire;
+
+   /**
     *
     * Methods
     *
@@ -97,6 +107,7 @@ class EditorPlugin extends Gdn_Plugin {
    public function __construct() {
       parent::__construct();
       $this->mediaCache = null;
+      $this->mediaCacheExpire = 60 * 60 * 6;
       $this->AssetPath = Asset('/plugins/editor');
       $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
       $this->ForceWysiwyg = C('Plugins.editor.ForceWysiwyg', false);
@@ -560,7 +571,7 @@ class EditorPlugin extends Gdn_Plugin {
 
          // Clear Media cache for discussion, if any.
          if ($discussionID) {
-            $cacheKey = md5('Media' . $discussionID);
+            $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
             Gdn::Cache()->Remove($cacheKey);
          }
 
@@ -682,7 +693,7 @@ class EditorPlugin extends Gdn_Plugin {
                   }
                }
                if ($discussionID) {
-                  $cacheKey = md5('Media' . $discussionID);
+                  $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
                   Gdn::Cache()->Remove($cacheKey);
                }
             }
@@ -860,14 +871,9 @@ class EditorPlugin extends Gdn_Plugin {
       // new is added, or any attachments are deleted, the cache entry will
       // be removed, so this could be even higher than 6 hours, as it's
       // fairly safe.
-      $cacheExpire = 60 * 60 * 6;
-      $cacheKey = 'Media';
-      if ($discussionID) {
-         $cacheKey .= $discussionID;
-      }
-      $cacheKey = md5($cacheKey);
-
+      $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
       $cacheResponse = Gdn::Cache()->Get($cacheKey);
+
       if ($cacheResponse === Gdn_Cache::CACHEOP_FAILURE) {
          $model = new Gdn_Model();
          $discussionMedia = $model->SQL
@@ -885,7 +891,7 @@ class EditorPlugin extends Gdn_Plugin {
             ->Get()->ResultArray();
 
          Gdn::Cache()->Store($cacheKey, $discussionMedia, array(
-                Gdn_Cache::FEATURE_EXPIRY => $cacheExpire
+                Gdn_Cache::FEATURE_EXPIRY => $this->mediaCacheExpire
          ));
       } else {
          $discussionMedia = $cacheResponse;
