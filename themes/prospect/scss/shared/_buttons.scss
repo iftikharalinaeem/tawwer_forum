@@ -1,0 +1,64 @@
+//
+// # Buttons
+//
+// Styleguide Buttons
+
+@mixin button {
+  display: inline-block;
+  padding: 6px 12px;
+  vertical-align: middle;
+  font-size: ($font-size-base - 2px);
+  font-weight: 700;
+  line-height: $line-height-base;
+  text-transform: uppercase;
+  border: transparent solid 1px;
+  border-radius: $border-radius-base;
+  transition: background-color 100ms, box-shadow 100ms;
+  -webkit-font-smoothing: inherit;
+
+  &,
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+
+  &:active {
+    border-top-color: rgba($black,.15);
+    box-shadow: 0 1px 2px rgba($black,.15) inset;
+  }
+}
+
+@mixin button-style($color, $bg) {
+  color: $color;
+  background-color: $bg;
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: $color;
+    background-color: darken($bg, 10%);
+  }
+}
+
+.button,
+.Button {
+  @include button;
+  @include button-style($button-default-color, $button-default-bg);
+}
+
+.Button {
+  &,
+  &:hover,
+  &:focus,
+  &:active {
+    text-shadow: none;
+    background-image: none;
+    border-color: transparent;
+  }
+
+  &,
+  &:hover,
+  &:focus {
+    box-shadow: none;
+  }
+}

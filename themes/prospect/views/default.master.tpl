@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    {asset name="Head"}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic">
+  </head>
+  <body id="{$BodyID}" class="{$BodyClass}">
+    <!--[if lt IE 8]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <nav class="navbar" role="navigation">
+      <div class="container">
+        <a class="navbar-brand" href="{link path="home"}">{logo}</a>
+
+        <div class="navbar-right">
+          <a class="button" href="{link path="entry/signin"}">{t c="Sign In"}</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="masthead" data-geopattern="{$Title}">
+      <div class="container">
+
+        <h1 class="text-center">{t c="How can we help you?"}</h1>
+
+        {searchbox}
+
+      </div>
+    </div>
+
+    <nav class="trail">
+      <div class="container">
+        {breadcrumbs}
+      </div>
+    </nav>
+
+    <main class="container" role="main">
+
+      <aside class="site-sidebar column column-sidebar" role="complementary">
+        {asset name="Panel"}
+      </aside>
+
+      <section class="site-content column column-content">
+        {asset name="Content"}
+      </section>
+
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+      <div class="container">
+        <p>{t c="Copyright"} &copy; {$smarty.now|date:"%Y"} <a href="{link path="home"}">{logo}</a>. {t c="All rights reserved"}.</p>
+      </div>
+    </footer>
+
+    {asset name="Foot"}
+    {event name="AfterBody"}
+  </body>
+</html>

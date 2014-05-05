@@ -1,0 +1,36 @@
+/*!
+ * Prospect - A minimal Vanilla theme focused on customer support communities
+ *
+ * @author    Kasper Kronborg Isager <kasper@vanillaforums.com>
+ * @copyright 2014 (c) Vanilla Forums Inc.
+ * @license   GPLv3
+ */
+
+// ## Vendors
+//
+// Library dependencies installed using Bower are automagically wired up when
+// running the `gulp/grunt wiredep` command. Don't manually edit this section!
+//
+// bower:scss
+@import "../bower_components/bourbon/dist/_bourbon.scss";
+@import "../bower_components/neat/app/assets/stylesheets/_neat.scss";
+@import "../bower_components/normalize-scss/_normalize.scss";
+// endbower
+// bower:sass
+// endbower
+
+// ## Globals
+@import "globals/variables";
+
+// ## Shared
+@import "shared/scaffolding";
+@import "shared/typography";
+@import "shared/forms";
+@import "shared/buttons";
+@import "shared/grid";
+
+// ## Components
+@import "components/navigation";
+@import "components/masthead";
+@import "components/trail";
+@import "components/footer";
