@@ -7,8 +7,7 @@
 /**
  * Class ZendeskCurlRequest
  */
-class ZendeskCurlRequest implements IZendeskHttpRequest
-{
+class ZendeskCurlRequest implements IZendeskHttpRequest {
     private $handle = null;
 
     public function __construct($url = '') {

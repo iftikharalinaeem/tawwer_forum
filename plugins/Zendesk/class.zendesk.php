@@ -86,11 +86,25 @@ class Zendesk {
      * @param string $Url ie /tickets.json
      * @param null|string $Json JSON encoded data to be used Required for POST and PUT actions
      * @param string $Action POST, GET, PUT, DELETE
-     * @param bool $Logging - enable logging to error log
+     * @param bool $Logging enable logging to error log
+     * @param bool $Cache cache result. Only if http code 200 and method GET
      * @throws Exception
      * @return mixed json
      */
-    public function zendeskRequest($Url, $Json = null, $Action = 'GET', $Logging = false) {
+    public function zendeskRequest($Url, $Json = null, $Action = 'GET', $Logging = false, $Cache = false) {
+
+        Trace($Action . ' ' . $this->apiUrl . $Url);
+
+        $CacheKey = 'Zendesk.Request.' . md5($this->apiUrl . $Url);
+
+        if ($Cache && $Action == 'GET') {
+            $Output = Gdn::Cache()->Get($CacheKey, array(Gdn_Cache::FEATURE_COMPRESS => true));
+            if ($Output) {
+                Trace('Cached Response');
+                return json_decode($Output, true);
+            }
+        }
+
 
         $this->curl->setOption(CURLOPT_URL, $this->apiUrl . $Url);
         $this->curl->setOption(CURLOPT_FOLLOWLOCATION, true);
@@ -117,15 +131,25 @@ class Zendesk {
             default:
                 break;
         }
-        $this->curl->setOption(CURLOPT_HTTPHEADER, array('Content-type: application/json', 'Authorization: Bearer '. $this->AccessToken));
+        $this->curl->setOption(
+            CURLOPT_HTTPHEADER,
+            array('Content-type: application/json', 'Authorization: Bearer '. $this->AccessToken)
+        );
         $this->curl->setOption(CURLOPT_USERAGENT, "MozillaXYZ/1.0");
         $this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
         $this->curl->setOption(CURLOPT_TIMEOUT, 10);
 
-        Trace($Action . ' ' . $this->apiUrl . $Url);
         $Output = $this->curl->execute();
         $HttpCode = $this->curl->getInfo(CURLINFO_HTTP_CODE);
         $Decoded = json_decode($Output, true);
+
+        if ($Cache && $HttpCode == 200 && $Action == 'GET') {
+            $CacheTTL = $this->CacheTTL + rand(0, 30);
+            Gdn::Cache()->Store($CacheKey, $Output, array(
+                Gdn_Cache::FEATURE_EXPIRY  => $CacheTTL,
+                Gdn_Cache::FEATURE_COMPRESS => true
+            ));
+        }
 
         if ($this->logging || $Logging) {
             error_log('Curl Request: ' . $this->apiUrl . $Url);
@@ -133,6 +157,7 @@ class Zendesk {
             error_log('Output: ' . $Output);
             error_log('Decoded Response: ' . var_export($Decoded, true));
         }
+
         if ($HttpCode == 404) {
             //throw not found
             throw new Gdn_UserException('Invalid URL: ' . $this->apiUrl . $Url . "\n", 404);
