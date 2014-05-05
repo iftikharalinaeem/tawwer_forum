@@ -97,7 +97,7 @@ echo $this->Form->Errors();
 </div>
 
 
-<h3 id="reconnect">Global Login</h3>
+<h3 id="global-login">Global Login</h3>
 <div class="Info">
     <p>This feature will allow you to have all Staff use one Zendesk Connection.</p>
 
