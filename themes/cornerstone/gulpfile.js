@@ -29,7 +29,7 @@ gulp.task('scripts', function () {
     .pipe($.jshint('js/.jshintrc'))
     .pipe($.jshint.reporter('default'))
     .pipe(source.restore())
-    .pipe($.rename('custom.js'))
+    .pipe($.concat('custom.js'))
     .pipe(gulp.dest('js'))
     .pipe($.size({showFiles: true}));
 });
@@ -82,3 +82,6 @@ gulp.task('watch', function () {
   gulp.watch('design/images/**/*', ['images']);
   gulp.watch('bower.json', ['wiredep']);
 });
+
+// Expose Gulp to external tools
+module.exports = gulp;
