@@ -13,48 +13,48 @@
 
     <header class="site-header" role="banner">
       <nav class="topbar" role="navigation">
-	<div class="container">
-	  {module name="MeModule"}
-	</div>
+        <div class="container">
+          {module name="MeModule"}
+        </div>
       </nav>
       <nav class="navbar" role="navigation">
-	<div class="container">
-	  <a class="navbar-brand" href="{link path="home"}">{logo}</a>
+        <div class="container">
+          <a class="navbar-brand" href="{link path="home"}">{logo}</a>
 
-	  <div class="navbar-right">
+          <div class="navbar-right">
 
-	    <ul class="nav navbar-nav pull-left">
-	      {categories_link}
-	      {discussions_link}
-	      {activity_link}
-	      {custom_menu}
-	    </ul>
+            <ul class="nav navbar-nav pull-left">
+              {categories_link}
+              {discussions_link}
+              {activity_link}
+              {custom_menu}
+            </ul>
 
-	    <div class="navbar-form navbar-search pull-left">
-	      {searchbox}
-	    </div>
+            <div class="navbar-form navbar-search pull-left">
+              {searchbox}
+            </div>
 
-	  </div>
+          </div>
 
-	</div>
+        </div>
       </nav>
     </header>
 
     <main class="container site-container" role="main">
 
       <nav class="trail">
-	{breadcrumbs}
+        {breadcrumbs}
       </nav>
 
       <div class="row">
 
-	<section class="site-content">
-	  {asset name="Content"}
-	</section>
+        <section class="site-content">
+          {asset name="Content"}
+        </section>
 
-	<aside class="site-sidebar">
-	  {asset name="Panel"}
-	</aside>
+        <aside class="site-sidebar">
+          {asset name="Panel"}
+        </aside>
 
       </div>
 
@@ -62,7 +62,7 @@
 
     <footer class="site-footer" role="contentinfo">
       <div class="container">
-	<p>{t c="Copyright"} &copy; {$smarty.now|date:"%Y"} <a href="{link path="home"}">{logo}</a>. {t c="All rights reserved"}.</p>
+        <p>{t c="Copyright"} &copy; {$smarty.now|date:"%Y"} <a href="{link path="home"}">{logo}</a>. {t c="All rights reserved"}.</p>
       </div>
     </footer>
 
