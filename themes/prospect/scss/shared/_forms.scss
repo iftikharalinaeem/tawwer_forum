@@ -16,3 +16,35 @@ input.SmallInput,
 textarea.TextBox {
   @include form-control;
 }
+
+// ## Checkbox and radio input
+//
+// Styleguide Forms.Inputs
+
+.icheckbox,
+.iradio {
+  display: inline-block;
+  line-height: $line-height-base;
+  cursor: pointer;
+
+  &:before {
+    @include icon;
+    min-width: 1em;
+    font-size: $line-height-base;
+    color: lighten($text-color, 25%);
+    content: $icon-circle-blank;
+    vertical-align: middle;
+  }
+
+  &.checked:before {
+    color: $brand-primary;
+  }
+}
+
+.icheckbox.checked:before {
+  content: $icon-ok-circle;
+}
+
+.iradio.checked:before {
+  content: $icon-dot-circle;
+}

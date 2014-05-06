@@ -15,6 +15,7 @@
 @import "../bower_components/bourbon/dist/_bourbon.scss";
 @import "../bower_components/neat/app/assets/stylesheets/_neat.scss";
 @import "../bower_components/normalize-scss/_normalize.scss";
+@import "../bower_components/font-vanillicon/scss/_vanillicon.scss";
 // endbower
 // bower:sass
 // endbower
@@ -28,9 +29,14 @@
 @import "shared/forms";
 @import "shared/buttons";
 @import "shared/grid";
+@import "shared/icons";
 
 // ## Components
 @import "components/navigation";
+@import "components/pagination";
 @import "components/masthead";
 @import "components/trail";
+@import "components/discussion";
+@import "components/listings";
+@import "components/avatars";
 @import "components/footer";

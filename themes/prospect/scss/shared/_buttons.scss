@@ -13,7 +13,7 @@
   text-transform: uppercase;
   border: transparent solid 1px;
   border-radius: $border-radius-base;
-  transition: background-color 100ms, box-shadow 100ms;
+  transition: box-shadow 50ms;
   -webkit-font-smoothing: inherit;
 
   &,
@@ -31,12 +31,15 @@
 @mixin button-style($color, $bg) {
   color: $color;
   background-color: $bg;
+  background-repeat: repeat-x;
+  @include linear-gradient(lighten($bg, 2%), darken($bg, 2%));
 
   &:hover,
   &:focus,
   &:active {
     color: $color;
-    background-color: darken($bg, 10%);
+    background-color: darken($bg, 2%);
+    background-position: 0 -15px;
   }
 }
 
@@ -47,18 +50,13 @@
 }
 
 .Button {
+  box-shadow: none;
+
   &,
   &:hover,
   &:focus,
   &:active {
     text-shadow: none;
-    background-image: none;
     border-color: transparent;
-  }
-
-  &,
-  &:hover,
-  &:focus {
-    box-shadow: none;
   }
 }

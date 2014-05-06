@@ -8,7 +8,14 @@
 
 ;(function ($, window, document, undefined) {
 
+  // $(document).on('ifChanged', '.AdminCheck :checkbox', function (e) {
+  //   $(e.currentTarget).trigger('click');
+  // });
+
   $(function () {
+
+    // Initialize iCheck
+    $('input').icheck();
 
     $('[data-geopattern]').each(function () {
       var $this = $(this)

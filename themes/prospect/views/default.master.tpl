@@ -18,19 +18,22 @@
 
         <div class="navbar-right">
           <a class="button" href="{link path="entry/signin"}">{t c="Sign In"}</a>
+          <a class="button" href="{link path="entry/register"}">{t c="Register"}</a>
         </div>
       </div>
     </nav>
 
-    <div class="masthead" data-geopattern="{$Title}">
-      <div class="container">
+    {if InSection(array("CategoryList", "DiscussionList"))}
+      <div class="masthead" data-geopattern="{$Title}">
+        <div class="container">
 
-        <h1 class="text-center">{t c="How can we help you?"}</h1>
+          <h1 class="text-center">{t c="How can we help you?"}</h1>
 
-        {searchbox}
+          {searchbox}
 
+        </div>
       </div>
-    </div>
+    {/if}
 
     <nav class="trail">
       <div class="container">
@@ -40,13 +43,13 @@
 
     <main class="container" role="main">
 
-      <aside class="site-sidebar column column-sidebar" role="complementary">
-        {asset name="Panel"}
-      </aside>
-
       <section class="site-content column column-content">
         {asset name="Content"}
       </section>
+
+      {*<aside class="site-sidebar column column-sidebar" role="complementary">
+        {asset name="Panel"}
+      </aside>*}
 
     </main>
 

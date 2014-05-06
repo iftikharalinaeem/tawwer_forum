@@ -19,6 +19,9 @@ $brand-primary: #2e9df7;
 $body-bg    : $white !default;
 $text-color : #444 !default;
 
+$link-color       : $brand-primary;
+$link-hover-color : darken($link-color, 15%);
+
 $border-radius-base: 3px;
 
 // ## Typography

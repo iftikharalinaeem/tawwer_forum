@@ -1,0 +1,10 @@
+//
+// # Pagination
+//
+// Styleguide Pagination
+
+.PageControls {
+  min-height: 0;
+  margin: $line-height-base 0;
+  @include clearfix;
+}
