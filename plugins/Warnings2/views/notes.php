@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) return; 
+<?php if (!defined('APPLICATION')) return;
 require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings2');
 ?>
 <div class="DataListWrap">
@@ -26,7 +26,7 @@ require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings
             echo '<span class="NoteType NoteType-'.$Row['Type'].'">'.T(ucfirst($Row['Type'])).'</span> ';
             ?>
          </div>
-         <div class="Post">
+         <div class="Warning-Body">
             <?php echo $Row['Body']; ?>
          </div>
       </div>
@@ -34,7 +34,7 @@ require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings
          <div class="Media">
             <?php echo UserPhoto($Row, array('LinkClass' => 'Img', 'Px' => 'Insert')); ?>
             <div class="Media-Body">
-               <?php 
+               <?php
                echo '<div>'.UserAnchor($Row, '', array('Px' => 'Insert')).'</div> ';
                echo '<div class="Meta">'.Gdn_Format::Date($Row['DateInserted'], 'html').'</div>';
                ?>
@@ -52,5 +52,5 @@ require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings
    </li>
    <?php endif; ?>
 </ul>
-   
+
 </div>
