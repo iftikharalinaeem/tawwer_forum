@@ -6,8 +6,8 @@ $St = Gdn::Structure();
 $Sql = Gdn::SQL();
 
 Gdn::PermissionModel()->Define(array(
-   'Reactions.Good.Add' => 'Garden.SignIn.Allow',
-   'Reactions.Bad.Add' => 'Garden.SignIn.Allow',
+   'Reactions.Positive.Add' => 'Garden.SignIn.Allow',
+   'Reactions.Negative.Add' => 'Garden.SignIn.Allow',
    'Reactions.Flag.Add' => 'Garden.SignIn.Allow'));
 
 $St->Table('ReactionType');
@@ -45,34 +45,34 @@ $Rm->DefineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Sort' =>
 //$Rm->DefineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Sort' => 102, 'Class' => 'Flag', 'ModeratorInc' => 5, 'Protected' => TRUE, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
 //   'Description' => "Troll posts are typically trying to elicit a heated argument from other people. Trolls are community poison, making your community a scary place for new members. Troll posts will be buried."));
 
-$Rm->DefineReactionType(array('UrlCode' => 'Promote', 'Name' => 'Promote', 'Sort' => 0, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 5, 'Permission' => 'Garden.Curation.Manage',
+$Rm->DefineReactionType(array('UrlCode' => 'Promote', 'Name' => 'Promote', 'Sort' => 0, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'IncrementValue' => 5, 'Points' => 5, 'Permission' => 'Garden.Curation.Manage',
    'Description' => "Moderators have the ability to promote the best posts in the community. This way they can be featured for new visitors."));
 
-$Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic', 'Sort' => 1, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
+$Rm->DefineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic', 'Sort' => 1, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
    'Description' => "Off topic posts are not releveant to the topic being discussed. If a post gets enough off-topic votes then it will be buried so it won't derail the discussion."));
-$Rm->DefineReactionType(array('UrlCode' => 'Insightful', 'Name' => 'Insightful', 'Sort' => 2, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
+$Rm->DefineReactionType(array('UrlCode' => 'Insightful', 'Name' => 'Insightful', 'Sort' => 2, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => "Insightful comments bring new information or perspective to the discussion and increase the value of the conversation as a whole."));
 
-$Rm->DefineReactionType(array('UrlCode' => 'Disagree', 'Name' => 'Disagree', 'Sort' => 3, 'Class' => 'Bad', 
+$Rm->DefineReactionType(array('UrlCode' => 'Disagree', 'Name' => 'Disagree', 'Sort' => 3, 'Class' => 'Negative',
    'Description' => "Users that disagree with a post can give their opinion with this reaction. Since a disagreement is highly subjective, this reaction desn't promote or bury the post or give any points."));
-$Rm->DefineReactionType(array('UrlCode' => 'Agree', 'Name' => 'Agree', 'Sort' => 4, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
+$Rm->DefineReactionType(array('UrlCode' => 'Agree', 'Name' => 'Agree', 'Sort' => 4, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => "Users that agree with a post can give their option with this reaction."));
 
-$Rm->DefineReactionType(array('UrlCode' => 'Dislike', 'Name' => 'Dislike', 'Sort' => 5, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
+$Rm->DefineReactionType(array('UrlCode' => 'Dislike', 'Name' => 'Dislike', 'Sort' => 5, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
    'Description' => "A dislike is a general disapproval of a post. Enough dislikes will bury a post."));
-$Rm->DefineReactionType(array('UrlCode' => 'Like', 'Name' => 'Like', 'Sort' => 6, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
+$Rm->DefineReactionType(array('UrlCode' => 'Like', 'Name' => 'Like', 'Sort' => 6, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => "A like is a general approval of a post. Enough likes will promote a post."));
 
-$Rm->DefineReactionType(array('UrlCode' => 'Down', 'Name' => 'Vote Down', 'Sort' => 7, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
+$Rm->DefineReactionType(array('UrlCode' => 'Down', 'Name' => 'Vote Down', 'Sort' => 7, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
    'Description' => "A down vote is a general disapproval of a post. Enough down votes will bury a post."));
-$Rm->DefineReactionType(array('UrlCode' => 'Up', 'Name' => 'Vote Up', 'Sort' => 8, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
+$Rm->DefineReactionType(array('UrlCode' => 'Up', 'Name' => 'Vote Up', 'Sort' => 8, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => "An up vote is a general approval of a post. Enough up votes will promote a post."));
 
-$Rm->DefineReactionType(array('UrlCode' => 'WTF', 'Name' => 'WTF', 'Sort' => 9, 'Class' => 'Bad', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
+$Rm->DefineReactionType(array('UrlCode' => 'WTF', 'Name' => 'WTF', 'Sort' => 9, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
    'Description' => 'WTF stands for "What the Fuh?" You usually react this way when a post makes absolutely no sense.'));
-$Rm->DefineReactionType(array('UrlCode' => 'Awesome', 'Name' => 'Awesome', 'Sort' => 10, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 1,
+$Rm->DefineReactionType(array('UrlCode' => 'Awesome', 'Name' => 'Awesome', 'Sort' => 10, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'Points' => 1,
    'Description' => 'Awesome posts amaze you. You want to repeat them to your friends and remember them later.'));
-$Rm->DefineReactionType(array('UrlCode' => 'LOL', 'Name' => 'LOL', 'Sort' => 11, 'Class' => 'Good', 'IncrementColumn' => 'Score', 'Points' => 0,
+$Rm->DefineReactionType(array('UrlCode' => 'LOL', 'Name' => 'LOL', 'Sort' => 11, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'Points' => 0,
    'Description' => 'For posts that make you "laugh out loud." Funny content is almost always good and is rewarded with points and promotion.'));
 
 if (!$ReactionTypeExists) {

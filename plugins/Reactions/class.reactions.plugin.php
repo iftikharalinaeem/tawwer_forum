@@ -20,8 +20,8 @@ $PluginInfo['Reactions'] = array(
    'Version' => '1.3',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'RegisterPermissions' => array(
-      'Reactions.Good.Add' => 'Garden.SignIn.Allow',
-      'Reactions.Bad.Add' => 'Garden.SignIn.Allow',
+      'Reactions.Positive.Add' => 'Garden.SignIn.Allow',
+      'Reactions.Negative.Add' => 'Garden.SignIn.Allow',
       'Reactions.Flag.Add' => 'Garden.SignIn.Allow'
    ),
    'Author' => 'Todd Burry',
@@ -391,7 +391,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       // Load all of the reaction types.
       try {
          $ReactionModel = new ReactionModel();
-         $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Good', 'Active' => 1));
+         $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Positive', 'Active' => 1));
 
          $Sender->SetData('ReactionTypes', $ReactionTypes);
 //         $ReactionTypes = array_merge($ReactionTypes, ConsolidateArrayValuesByKey($ReactionTypeData, 'UrlCode'));
@@ -485,7 +485,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       // Load all of the reaction types.
       try {
          $ReactionModel = new ReactionModel();
-         $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Good', 'Active' => 1));
+         $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Positive', 'Active' => 1));
 
          $Sender->SetData('ReactionTypes', $ReactionTypes);
 //         $ReactionTypes = array_merge($ReactionTypes, ConsolidateArrayValuesByKey($ReactionTypeData, 'UrlCode'));
@@ -683,7 +683,7 @@ if (!function_exists('WriteReactions')):
 
       static $Types = NULL;
       if ($Types === NULL)
-         $Types = ReactionModel::GetReactionTypes(array('Class' => array('Good', 'Bad'), 'Active' => 1));
+         $Types = ReactionModel::GetReactionTypes(array('Class' => array('Positive', 'Negative'), 'Active' => 1));
       Gdn::Controller()->EventArguments['ReactionTypes'] = $Types;
 
       if ($ID = GetValue('CommentID', $Row)) {
