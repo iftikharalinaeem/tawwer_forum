@@ -6,6 +6,21 @@
 .Item {
   position: relative;
   padding: $line-height-base;
+  border: 0;
+
+  .Meta {
+    color: #999;
+
+    a {
+      font-weight: 700;
+      color: #999;
+
+      &:hover,
+      &:focus {
+        text-decoration: underline;
+      }
+    }
+  }
 
   .Message {
     font-size: $font-size-base;
@@ -56,7 +71,6 @@
     float: right;
     font-size: $font-size-base;
     line-height: $line-height-base;
-    color: #999;
 
     a {
       font-weight: 700;
