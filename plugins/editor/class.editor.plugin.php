@@ -815,13 +815,14 @@ class EditorPlugin extends Gdn_Plugin {
 
       $Comments = $Sender->Data('Comments');
       $CommentIDList = array();
+      $MediaData = array();
 
       if ($Comments instanceof Gdn_DataSet && $Comments->NumRows()) {
          $Comments->DataSeek(-1);
          while ($Comment = $Comments->NextRow()) {
             $CommentIDList[] = $Comment->CommentID;
          }
-      } elseif (isset($Sender->Discussion) && $Sender->Discussion) {
+      } elseif (!empty($Sender->Discussion)) {
          $CommentIDList[] = $Sender->DiscussionID = $Sender->Discussion->DiscussionID;
       }
 
@@ -831,18 +832,10 @@ class EditorPlugin extends Gdn_Plugin {
 
       if (count($CommentIDList)) {
          $DiscussionID = $Sender->Data('Discussion.DiscussionID');
-
          $MediaData = $this->PreloadDiscussionMedia($DiscussionID, $CommentIDList);
-      } else {
-         $MediaData = FALSE;
       }
 
-      $MediaArray = array();
-      if ($MediaData !== FALSE) {
-         $MediaArray = $MediaData;
-      }
-
-      $this->mediaCache = $MediaArray;
+      $this->mediaCache = $MediaData;
    }
 
    /**
