@@ -81,6 +81,7 @@
   font-family: @data-group-header-font-family;
   font-size: @data-group-header-font-size;
   font-weight: @data-group-header-font-weight;
+  line-height: @line-height-base;
   color: @data-group-header-color;
   background-color: @data-group-header-background;
   border: darken(@data-group-header-background, 7.5%) solid 1px;
@@ -133,9 +134,33 @@
       margin: 0;
     }
 
-    .PageTitle h1 {
-      .data-group-header();
-      margin-bottom: -1px;
+    .PageTitle {
+      &,
+      a {
+	color: @data-group-header-color;
+      }
+
+      h1 {
+	.data-group-header();
+	margin-bottom: -1px;
+      }
+
+      .Bookmark:before {
+	color: @data-group-header-color;
+      }
+
+      .Options {
+	padding: @data-group-header-padding-vertical @data-group-header-padding-horizontal;
+      }
+
+      .AdminCheck {
+	margin-left: 5px;
+
+	.icheckbox:before,
+	.iradio:before {
+	  color: #fff;
+	}
+      }
     }
   }
 }
@@ -174,7 +199,7 @@
   }
 }
 
-.CategoryListWithHeadings {
+.CategoryList {
   .data-group();
 
   .Depth1,

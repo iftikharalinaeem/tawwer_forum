@@ -378,7 +378,7 @@ pageTracker._trackPageview();
          $PlanPlugins = C('VFCom.Plugins.Default', array("ButtonBar","Emotify","Facebook",
             "GoogleSignIn","Gravatar","OpenID","StopForumSpam","Twitter","vanillicon",
             "AllViewed","Disqus","GooglePrettify","IndexPhotos","Liked","Participated","PostCount","PrivateCommunity",
-            "QnA","Quotes","Reactions","RoleTitle","ShareThis","Signatures","Spinx","Tagging","Voting")
+            "QnA","Quotes","Reactions","RoleTitle","ShareThis","Signatures","Spinx","Tagging")
          );
       }
       $AllowedPlugins = array();
@@ -388,7 +388,7 @@ pageTracker._trackPageview();
       }
       
       // Addons to show 'Contact Us' instead of 'Enable'
-      $LockedPlugins = C('VFCom.Plugins.Locked', array('jsConnect', 'Multilingual', 'Pockets', 'Sphinx', 'TrackingCodes', 'VanillaPop', 'Whispers'));
+      $LockedPlugins = C('VFCom.Plugins.Locked', array('jsConnect', 'Multilingual', 'Pockets', 'Salesforce', 'Sphinx', 'TrackingCodes', 'VanillaPop', 'Whispers'));
       
       // Addons to hide even when enabled
       $HiddenPlugins = C('VFCom.Plugins.Hidden', array('CustomTheme', 'CustomDomain', 'CustomizeText', 'HtmLawed', 'cloudfiles'));

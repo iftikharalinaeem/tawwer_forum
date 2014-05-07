@@ -38,6 +38,59 @@
 
 // -----------------------------------------------------------------------------
 
+// ## Button groups
+//
+// Styleguide #.1
+
+.button-group() {
+  position: relative;
+  display: inline-block;
+}
+
+.button-group-button() {
+  position: relative;
+
+  &:hover,
+  &:focus,
+  &:active {
+    z-index: 2;
+  }
+
+  &:first-child,
+  &:first-of-type {
+    margin-left: 0;
+
+    &:not(:last-child) {
+      .border-right-radius(0);
+    }
+  }
+
+  &:last-child,
+  &:last-of-type {
+    &:not(:first-child) {
+      .border-left-radius(0);
+    }
+  }
+
+  &:not(:first-child):not(:last-child):not(:first-of-type):not(:last-of-type) {
+    border-radius: 0;
+  }
+}
+
+.button-group-justified() {
+  display: table;
+  width: 100%;
+  border-collapse: separate;
+}
+
+.button-group-justified-button() {
+  display: table-cell;
+  float: none;
+  width: 1%;
+}
+
+// -----------------------------------------------------------------------------
+
 .Button,
 .NavButton {
   .button();
@@ -58,4 +111,39 @@
 
 .BigButton {
   .button-block();
+}
+
+.ButtonGroup {
+  .button-group();
+
+  > .Button {
+    .button-group-button();
+
+    ~ .Button {
+      margin-left: -1px;
+    }
+  }
+
+  &.Multi > .Button.Handle {
+    border: solid 1px;
+    .button-variant();
+  }
+
+  &.Multi > .Button.Primary.Handle {
+    .button-variant('primary');
+  }
+
+  &.Big {
+    > .Button {
+      width: 80%;
+
+      &.Handle {
+	width: 20%;
+      }
+    }
+  }
+}
+
+.BoxButtons {
+  margin-bottom: @line-height-base;
 }
