@@ -705,8 +705,8 @@ if (!function_exists('WriteReactions')):
       Gdn_Theme::BulletRow();
 
       // Write the flags.
-      static $Flags = NULL, $FlagCodes = NULL;
-      if ($Flags === NULL) {
+      static $Flags = NULL;
+      if ($Flags === NULL && CheckPermission('Reactions.Flag.Add')) {
          $Flags = ReactionModel::GetReactionTypes(array('Class' => 'Flag', 'Active' => 1));
          $FlagCodes = array();
          foreach ($Flags as $Flag) {
