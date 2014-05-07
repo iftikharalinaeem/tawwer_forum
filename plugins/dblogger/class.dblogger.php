@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright 2014 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2009-2014 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 /**
  * Database Logger
@@ -30,6 +30,8 @@ class DbLogger extends BaseLogger {
             'Message' => true,
             'LogLevel' => true,
             'Event' => true,
+            'Domain' => true,
+            'Path' => true
         );
         $attributes = array_diff_key($context, $columns);
         $insert = array_diff_key($context, $attributes);
