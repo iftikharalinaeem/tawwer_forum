@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.27',
+   'Version' => '1.3.28',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -19,6 +19,11 @@ $PluginInfo['editor'] = array(
 );
 
 class EditorPlugin extends Gdn_Plugin {
+
+   /**
+    * Base string to be used for generating a memcached key.
+    */
+   const DISCUSSION_MEDIA_CACHE_KEY = 'media.discussion.%d';
 
    /**
     *
@@ -78,6 +83,19 @@ class EditorPlugin extends Gdn_Plugin {
    public $ForceWysiwyg = 0;
 
    /**
+    * This will cache the discussion media results for the page request. It
+    * gets populated from either the db or memcached.
+    *
+    * @var array
+    */
+   protected $mediaCache;
+
+   /**
+    * How long memcached holds data until it expires.
+    */
+   protected $mediaCacheExpire;
+
+   /**
     *
     * Methods
     *
@@ -88,6 +106,8 @@ class EditorPlugin extends Gdn_Plugin {
     */
    public function __construct() {
       parent::__construct();
+      $this->mediaCache = null;
+      $this->mediaCacheExpire = 60 * 60 * 6;
       $this->AssetPath = Asset('/plugins/editor');
       $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
       $this->ForceWysiwyg = C('Plugins.editor.ForceWysiwyg', false);
@@ -458,6 +478,10 @@ class EditorPlugin extends Gdn_Plugin {
       // because the methods on the Upload class do not expose all variables.
       $fileData = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, $this->editorFileInputName, FALSE);
 
+      $discussionID = ($Sender->Request->Post('DiscussionID'))
+         ? $Sender->Request->Post('DiscussionID')
+         : '';
+
       // JSON payload of media info will get sent back to the client.
       $json = array(
          'error' => 1,
@@ -544,6 +568,12 @@ class EditorPlugin extends Gdn_Plugin {
          // Get MediaID and pass it to client in payload
          $MediaID = $Model->Save($Media);
          $Media['MediaID'] = $MediaID;
+
+         // Clear Media cache for discussion, if any.
+         if ($discussionID) {
+            $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
+            Gdn::Cache()->Remove($cacheKey);
+         }
 
          if ($generate_thumbnail) {
             $thumbUrl = Url('/utility/mediathumbnail/' . $MediaID, true);
@@ -650,6 +680,22 @@ class EditorPlugin extends Gdn_Plugin {
                if (file_exists($thumbPath)) {
                   unlink($thumbPath);
                }
+
+               // Clear the cache, if exists.
+               $discussionID = '';
+               if ($Media['ForeignTable'] == 'discussion') {
+                  $discussionID = $Media['ForeignID'];
+               } elseif ($Media['ForeignTable'] == 'comment') {
+                  $commentModel = new CommentModel();
+                  $commentRow = $commentModel->GetID($Media['ForeignID'], DATASET_TYPE_ARRAY);
+                  if ($commentRow) {
+                     $discussionID = $commentRow['DiscussionID'];
+                  }
+               }
+               if ($discussionID) {
+                  $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
+                  Gdn::Cache()->Remove($cacheKey);
+               }
             }
          } catch (Exception $e) {
             die($e->getMessage());
@@ -726,22 +772,145 @@ class EditorPlugin extends Gdn_Plugin {
       }
    }
 
-   protected function AttachUploadsToComment($Controller, $Type = 'comment') {
+   /**
+    * Attach image to each discussion or comment. It will first perform a
+    * single request against the Media table, then filter out the ones that
+    * exist per discussion or comment.
+    *
+    * @param multiple $Controller
+    * @param string $Type
+    */
+   protected function AttachUploadsToComment($Sender, $Type = 'comment') {
 
       $param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
-      $foreignId = GetValue($param, GetValue(ucfirst($Type), $Controller->EventArguments));
+      $foreignId = GetValue($param, GetValue(ucfirst($Type), $Sender->EventArguments));
 
-      $Model = new Gdn_Model('Media');
-      $attachments = $Model
-              ->GetWhere(array(
-                  'ForeignID' => $foreignId,
-                  'ForeignTable' => $Type)
-              )->ResultArray();
+      // Get all media for the page.
+      $mediaList = $this->MediaCache();
+      if (is_array($mediaList)) {
+         // Filter out the ones that don't match.
+         $attachments = array_filter($mediaList, function($attachment) use ($foreignId, $Type) {
+            if ($attachment['ForeignID'] == $foreignId
+            && $attachment['ForeignTable'] == $Type) {
+               return true;
+            }
+         });
 
-      $Controller->SetData('_attachments', $attachments);
-      $Controller->SetData('_editorkey', strtolower($param.$foreignId));
+         if (count($attachments)) {
+            $Sender->SetData('_attachments', $attachments);
+            $Sender->SetData('_editorkey', strtolower($param.$foreignId));
+            echo $Sender->FetchView($this->GetView('attachments.php'));
+         }
+      }
+   }
 
-      echo $Controller->FetchView($this->GetView('attachments.php'));
+   /**
+    * Called to prepare data grab, and then cache the results on the software
+    * level for the request. This will call PreloadDiscussionMedia, which
+    * will either query the db, or query memcached.
+    *
+    * @param mixed $Sender
+    */
+   protected function CacheAttachedMedia($Sender) {
+
+      $Comments = $Sender->Data('Comments');
+      $CommentIDList = array();
+      $MediaData = array();
+
+      if ($Comments instanceof Gdn_DataSet && $Comments->NumRows()) {
+         $Comments->DataSeek(-1);
+         while ($Comment = $Comments->NextRow()) {
+            $CommentIDList[] = $Comment->CommentID;
+         }
+      } elseif (!empty($Sender->Discussion)) {
+         $CommentIDList[] = $Sender->DiscussionID = $Sender->Discussion->DiscussionID;
+      }
+
+      if (isset($Sender->Comment) && isset($Sender->Comment->CommentID)) {
+         $CommentIDList[] = $Sender->Comment->CommentID;
+      }
+
+      if (count($CommentIDList)) {
+         $DiscussionID = $Sender->Data('Discussion.DiscussionID');
+         $MediaData = $this->PreloadDiscussionMedia($DiscussionID, $CommentIDList);
+      }
+
+      $this->mediaCache = $MediaData;
+   }
+
+   /**
+    * Get media list for inserting into discussion and comments.
+    */
+   public function MediaCache() {
+      if ($this->mediaCache === null) {
+         $this->CacheAttachedMedia(Gdn::Controller());
+      }
+
+      return $this->mediaCache;
+   }
+
+   /**
+    * Query the Media table for any media related to the current discussion,
+    * including all the comments. This will be cached per discussion.
+    *
+    * @param int $discussionID
+    * @param array $commentIDList
+    * @return array
+    */
+   public function PreloadDiscussionMedia($discussionID, $commentIDList) {
+      $mediaData = array();
+      $mediaDataDiscussion = array();
+      $mediaDataComment = array();
+
+      $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
+      $cacheResponse = Gdn::Cache()->Get($cacheKey);
+
+      if ($cacheResponse === Gdn_Cache::CACHEOP_FAILURE) {
+
+         $mediaModel = new Gdn_Model('Media');
+
+         // Query the Media table for discussion media.
+
+         if (is_numeric($discussionID)) {
+            $sqlWhere = array(
+                'ForeignTable' => 'discussion',
+                'ForeignID' => $discussionID
+            );
+
+            $mediaDataDiscussion = $mediaModel->GetWhere(
+                $sqlWhere
+            )->ResultArray();
+         }
+
+         // Query the Media table for comment media.
+
+         if (is_numeric($commentIDList)) {
+            $commentIDList[] = $commentIDList;
+         }
+
+         if (is_array($commentIDList) && count($commentIDList)) {
+            $commentIDList = array_filter($commentIDList);
+
+            $sqlWhere = array(
+                'ForeignTable' => 'comment',
+                'ForeignID' => $commentIDList
+            );
+
+            $mediaDataComment = $mediaModel->GetWhere(
+                $sqlWhere
+            )->ResultArray();
+         }
+
+         $mediaData = array_merge($mediaDataDiscussion, $mediaDataComment);
+
+         Gdn::Cache()->Store($cacheKey, $mediaData, array(
+                Gdn_Cache::FEATURE_EXPIRY => $this->mediaCacheExpire
+         ));
+      } else {
+         $mediaData = $cacheResponse;
+      }
+
+		return $mediaData;
    }
 
    public function PostController_DiscussionFormOptions_Handler($Sender, $Args) {
