@@ -851,46 +851,68 @@ class EditorPlugin extends Gdn_Plugin {
 
    /**
     * Query the Media table for any media related to the current discussion,
-    * including all the comments. This will be cached per page.
+    * including all the comments. This will be cached per discussion.
     *
-    * @param int $DiscussionID
-    * @param array $CommentIDList
+    * @param int $discussionID
+    * @param array $commentIDList
     * @return array
     */
    public function PreloadDiscussionMedia($discussionID, $commentIDList) {
-      $discussionMedia = array();
+      $mediaData = array();
+      $mediaDataDiscussion = array();
+      $mediaDataComment = array();
 
-      // Caching on the server level. Cache for 6 hours. Whenever anything
-      // new is added, or any attachments are deleted, the cache entry will
-      // be removed, so this could be even higher than 6 hours, as it's
-      // fairly safe.
       $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
       $cacheResponse = Gdn::Cache()->Get($cacheKey);
 
       if ($cacheResponse === Gdn_Cache::CACHEOP_FAILURE) {
-         $model = new Gdn_Model();
-         $discussionMedia = $model->SQL
-            ->Select('m.*')
-            ->From('Media m')
-            ->BeginWhereGroup()
-               ->Where('m.ForeignID', $discussionID)
-               ->Where('m.ForeignTable', 'discussion')
-            ->EndWhereGroup()
-            ->OrOp()
-            ->BeginWhereGroup()
-               ->WhereIn('m.ForeignID', $commentIDList)
-               ->Where('m.ForeignTable', 'comment')
-            ->EndWhereGroup()
-            ->Get()->ResultArray();
 
-         Gdn::Cache()->Store($cacheKey, $discussionMedia, array(
+         $mediaModel = new Gdn_Model('Media');
+
+         // Query the Media table for discussion media.
+
+         if (is_numeric($discussionID)) {
+            $sqlWhere = array(
+                'ForeignTable' => 'discussion',
+                'ForeignID' => $discussionID
+            );
+
+            $mediaDataDiscussion = $mediaModel->GetWhere(
+                $sqlWhere
+            )->ResultArray();
+         }
+
+         // Query the Media table for comment media.
+
+         if (is_numeric($commentIDList)) {
+            $commentIDList[] = $commentIDList;
+         }
+
+         if (is_array($commentIDList)) {
+            $commentIDList = array_filter($commentIDList);
+         }
+
+         if (!empty($commentIDList)) {
+            $sqlWhere = array(
+                'ForeignTable' => 'comment',
+                'ForeignID' => $commentIDList
+            );
+
+            $mediaDataComment = $mediaModel->GetWhere(
+                $sqlWhere
+            )->ResultArray();
+         }
+
+         $mediaData = array_merge($mediaDataDiscussion, $mediaDataComment);
+
+         Gdn::Cache()->Store($cacheKey, $mediaData, array(
                 Gdn_Cache::FEATURE_EXPIRY => $this->mediaCacheExpire
          ));
       } else {
-         $discussionMedia = $cacheResponse;
+         $mediaData = $cacheResponse;
       }
 
-		return $discussionMedia;
+		return $mediaData;
    }
 
    public function PostController_DiscussionFormOptions_Handler($Sender, $Args) {
