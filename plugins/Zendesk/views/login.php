@@ -7,5 +7,5 @@
 <h2>
     Zendesk
 </h2>
-<p>You need to login to your Zendesk Account to continue.</p>
-<button id="ZendeskLogin" class="Button BigButton">Login</button>
+<p><?php echo T('You need to login to your Zendesk Account to continue'); ?>.</p>
+<button id="ZendeskLogin" class="Button BigButton"><?php echo T('Login'); ?></button>

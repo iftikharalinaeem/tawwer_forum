@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright 2014 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2009-2014 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
 // Define the plugin:
@@ -20,25 +20,25 @@ $PluginInfo['Zendesk'] = array(
 );
 
 /**
- * Class ZendeskPlugin
- *
+ * Class ZendeskPlugin.
  */
 class ZendeskPlugin extends Gdn_Plugin {
 
     /**
-     * Used for OAuth
+     * Used for OAuth.
+     *
      * @var string
      */
     const PROVIDER_KEY = 'Zendesk';
 
     /**
-     * Used for OAuth
      * @var string
      */
     protected $accessToken;
 
     /**
-     * If status is set to this we will stop getting updates from Salesforce
+     * If status is set to this we will stop getting updates from Salesforce.
+     *
      * @var string
      */
     protected $closedCaseStatusString = 'solved';
@@ -49,9 +49,12 @@ class ZendeskPlugin extends Gdn_Plugin {
      */
     protected $minimumTimeForUpdate = 600;
 
-    /** @var \Zendesk Zendesk */
+    /* @var Zendesk Zendesk Zendesk Object. */
     protected $zendesk;
 
+    /**
+     * Set AccessToken to be used.
+     */
     public function __construct() {
         parent::__construct();
 
@@ -65,30 +68,43 @@ class ZendeskPlugin extends Gdn_Plugin {
 
     }
 
-
     /**
-     * @param AssetModel $Sender
+     * Adds CSS To page.
+     *
+     * @param AssetModel $Sender Sending controller.
      */
-    public function AssetModel_StyleCss_Handler($Sender) {
+    public function assetModel_styleCss_handler($Sender) {
         $Sender->AddCssFile('zendesk.css', 'plugins/Zendesk');
     }
 
     /**
-     * @param DiscussionController $Sender
-     * @param $Args
+     * Writes and updates discussion attachments.
+     *
+     * @param DiscussionController $Sender Sending controller.
+     * @param array $Args Event Arguments.
      */
-    public function DiscussionController_AfterDiscussionBody_Handler($Sender, $Args) {
+    public function discussioncontroller_afterDiscussionBody_handler($Sender, $Args) {
         $this->writeAndUpdateAttachments($Sender, $Args);
     }
 
     /**
-     * @param DiscussionController $Sender
-     * @param array $Args
+     * Writes and updates discussion attachments.
+     *
+     * @param DiscussionController $Sender Sending controller.
+     * @param array $Args Event Arguments.
      */
-    public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
+    public function discussionController_afterCommentBody_handler($Sender, $Args) {
         $this->writeAndUpdateAttachments($Sender, $Args);
     }
 
+    /**
+     * Writes and updates attachments for comments and discussions.
+     *
+     * @param DiscussionController|Commentocntroller $Sender Sending controller.
+     * @param array $Args Event arguments.
+     *
+     * @throws Gdn_UserException If Errors.
+     */
     protected function writeAndUpdateAttachments($Sender, $Args) {
         if ($Args['Type'] == 'Discussion') {
             $Content = 'Discussion';
@@ -120,8 +136,12 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @see AttachmentModel
-     * @param array $Attachment Attachment Data - see AttachmentModel
+     * Check to see if attachment needs to be updated.
+     *
+     * @param array $Attachment Attachment Data - see AttachmentModel.
+     *
+     * @see    AttachmentModel
+     *
      * @return bool
      */
     protected function isToBeUpdated($Attachment) {
@@ -145,10 +165,12 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Update the Attachment
+     * Update the Attachment.
      *
-     * @see AttachmentModel
-     * @param array $Attachment
+     * @param array $Attachment Attachment.
+     *
+     * @see    AttachmentModel
+     *
      * @return bool
      */
     protected function updateAttachment($Attachment) {
@@ -181,11 +203,11 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Creates the Virtual Zendesk Controller and adds Link to SideMenu in the dashboard
+     * Creates the Virtual Zendesk Controller and adds Link to SideMenu in the dashboard.
      *
-     * @param PluginController $Sender
+     * @param PluginController $Sender Sending controller.
      */
-    public function PluginController_Zendesk_Create($Sender) {
+    public function pluginController_zendesk_create($Sender) {
 
         $Sender->Permission('Garden.Settings.Manage');
         $Sender->Title('Zendesk');
@@ -195,12 +217,13 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Dashboard Settings
+     * Dashboard Settings.
      *
      * Default method of virtual Zendesk controller.
-     * @param Gdn_Controller $Sender
+     *
+     * @param Gdn_Controller $Sender Sending controller.
      */
-    public function Controller_Index($Sender) {
+    public function controller_index($Sender) {
 
         $Sender->AddCssFile('admin.css');
 
@@ -249,7 +272,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         $Sender->SetData(array(
             'GlobalLoginEnabled' => C('Plugins.Zendesk.GlobalLogin.Enabled'),
             'GlobalLoginConnected' => C('Plugins.Zendesk.GlobalLogin.AccessToken'),
-            'ToggleUrl' => '/plugin/zendesk/toggle/' . Gdn::Session()->TransientKey()
+            'ToggleUrl' => Url('/plugin/zendesk/toggle/' . Gdn::Session()->TransientKey())
         ));
         if (C('Plugins.Zendesk.GlobalLogin.Enabled')) {
             $this->setZendesk();
@@ -262,27 +285,37 @@ class ZendeskPlugin extends Gdn_Plugin {
 
 
     /**
-     * Adds Option to Create Ticket to Discussion Gear.  Will be removed if Discussion has
-     * already been submitted as a Ticket
+     * Adds Option to Create Ticket to Discussion Gear.
      *
-     * @param DiscussionController $Sender
-     * @param array $Args
+     * Options will be removed if Discussion has already been submitted as a Ticket
+     *
+     * @param DiscussionController $Sender Sending controller.
+     * @param array $Args Event arguments.
      */
-    public function DiscussionController_DiscussionOptions_Handler($Sender, $Args) {
+    public function discussionController_discussionOptions_handler($Sender, $Args) {
         $this->addOptions($Sender, $Args);
     }
 
     /**
-     * Adds Option to Create Ticket to Comment Gear.  Will be removed if comment has
-     * already been submitted as a Ticket
+     * Adds Option to Create Ticket to Comment Gear.
      *
-     * @param CommentController $Sender
-     * @param array $Args
+     * Option Will be removed if comment has already been submitted as a Ticket
+     *
+     * @param CommentController $Sender Sending controller.
+     * @param array $Args Event arguments.
      */
-    public function DiscussionController_CommentOptions_Handler($Sender, $Args) {
+    public function discussionController_commentOptions_handler($Sender, $Args) {
         $this->addOptions($Sender, $Args);
     }
 
+    /**
+     * Adds options to comments and discussions.
+     *
+     * @param DiscussionConoller|CommentContrller $Sender Sending controller.
+     * @param array $Args Event arguments.
+     *
+     * @throws Gdn_UserException If Error.
+     */
     protected function addOptions($Sender, $Args) {
 
         if (!$this->isConfigured()) {
@@ -328,21 +361,22 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Handle Zendesk popup to create ticket in discussions
+     * Handle Zendesk popup to create ticket in discussions.
+     * 
+     * @param DiscussionController $Sender Sending controller.
      *
-     * @throws Exception
-     * @param DiscussionController $Sender
+     * @throws Exception If Errors.
      */
-    public function DiscussionController_Zendesk_Create($Sender) {
+    public function discussionController_zendesk_create($Sender) {
         // Signed in users only.
         if (!($UserID = Gdn::Session()->UserID)) {
             return;
         }
 
         if (!$this->isConnected()) {
-            $LoginUrl = '/profile/connections';
+            $LoginUrl = Url('/profile/connections');
             if (C('Plugins.Zendesk.GlobalLogin.Enabled')) {
-                $LoginUrl = '/plugin/zendesk#global-login';
+                $LoginUrl = Url('/plugin/zendesk#global-login');
             }
             $Sender->SetData('LoginUrl', $LoginUrl);
             $Sender->Render('login', '', 'plugins/Zendesk');
@@ -449,23 +483,23 @@ class ZendeskPlugin extends Gdn_Plugin {
 
     /**
      * Enable/Disable Global Login.
-     * @param Controller $Sender
+     * 
+     * @param Controller $Sender Sending controller.
      */
-    public function Controller_Toggle($Sender) {
+    public function controller_toggle($Sender) {
         // Enable/Disable
         if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
             if (C('Plugins.Zendesk.GlobalLogin.Enabled')) {
                 $this->disable();
-                Redirect('plugin/zendesk');
+                Redirect(Url('/plugin/zendesk'));
             }
             Redirect(Url('/plugin/zendesk/authorize'));
 
         }
     }
 
-
     /**
-     * Disable Zendesk Plugin
+     * Disable Global Login.
      */
     protected function disable() {
         RemoveFromConfig('Plugins.Zendesk.GlobalLogin.Enabled');
@@ -474,10 +508,11 @@ class ZendeskPlugin extends Gdn_Plugin {
 
     /**
      * Add Zendesk to Dashboard menu.
-     * @param Controller $Sender
-     * @param array $Arguments
+     * 
+     * @param Controller $Sender Sending controller.
+     * @param array $Arguments Event arguments.
      */
-    public function Base_GetAppSettingsMenuItems_Handler($Sender, $Arguments) {
+    public function base_getAppSettingsMenuItems_handler($Sender, $Arguments) {
         $LinkText = T('Zendesk');
         $Menu = $Arguments['SideMenu'];
         $Menu->AddItem('Forum', T('Forum'));
@@ -513,7 +548,7 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Setup Config Settings
+     * Setup Config Settings.
      */
     protected function setupConfig() {
         $ConfigSettings = array(
@@ -532,11 +567,12 @@ class ZendeskPlugin extends Gdn_Plugin {
     //OAuth Methods
 
     /**
-     * OAuth Method.  Gets the authorize Uri
+     * OAuth Method.  Gets the authorize Uri.
      *
-     * @param bool|string $RedirectUri
-     * @return string Authorize URL
-     * @throws Gdn_UserException
+     * @param bool|string $RedirectUri Redirect Url.
+     *
+     * @throws Gdn_UserException If Errors.
+     * @return string Authorize URL Authorize Url.
      */
     public static function authorizeUri($RedirectUri = false) {
         if (!self::isConfigured()) {
@@ -557,9 +593,11 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Used in the OAuth Process
-     * @param null $NewValue a different redirect url
-     * @return null|string
+     * Used in the OAuth Process.
+     *
+     * @param null|string $NewValue A different redirect url.
+     *
+     * @return string Redirect Url.
      */
     public static function redirectUri($NewValue = null) {
         if ($NewValue !== null) {
@@ -571,12 +609,13 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * OAuth Method.  Sends request to zendesk to validate tokens
+     * OAuth Method.  Sends request to zendesk to validate tokens.
      *
-     * @param $Code - OAuth Code
-     * @param $RedirectUri - Redirect Uri
+     * @param string $Code OAuth Code.
+     * @param string $RedirectUri Redirect Uri.
+     *
      * @return string Response
-     * @throws Gdn_UserException
+     * @throws Gdn_UserException If error.
      */
     public static function getTokens($Code, $RedirectUri) {
         if (!self::isConfigured()) {
@@ -647,10 +686,12 @@ class ZendeskPlugin extends Gdn_Plugin {
 
 
     /**
-     * @param Controller $Sender
-     * @param array $Args
+     * Profile Social Connections.
+     *
+     * @param Controller $Sender Sending controller.
+     * @param array $Args Event arguments.
      */
-    public function Base_GetConnections_Handler($Sender, $Args) {
+    public function base_getConnections_handler($Sender, $Args) {
         if (!$this->isConfigured()) {
             return;
         }
@@ -658,7 +699,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         Trace($Sf);
         $Profile = GetValueR('User.Attributes.' . self::PROVIDER_KEY . '.Profile', $Args);
         $Sender->Data["Connections"][self::PROVIDER_KEY] = array(
-            'Icon' => $this->GetWebResource('icon.png', '/'),
+            'Icon' => $this->GetWebResource('zendesk.svg', '/'),
             'Name' => self::PROVIDER_KEY,
             'ProviderKey' => self::PROVIDER_KEY,
             'ConnectUrl' => self::authorizeUri(self::profileConnectUrl()),
@@ -670,19 +711,16 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * OAUth Method.  Code is Exchanged for Token
+     * OAUth Method.  Code is Exchanged for Token.
      *
      * Token is stored for later use.  Token does not expire.  It can be revoked from Zendesk
      *
-     * @todo test revoking.
-     *
-     * @param ProfileController $Sender
-     * @param string $UserReference
-     * @param string $Username
-     * @param bool $Code
-     *
+     * @param ProfileController $Sender Sending controller.
+     * @param string $UserReference User Reference.
+     * @param string $Username Username.
+     * @param bool|string $Code Authorize Code.
      */
-    public function ProfileController_ZendeskConnect_Create(
+    public function profileController_zendeskConnect_create(
         $Sender,
         $UserReference = '',
         $Username = '',
@@ -730,17 +768,18 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * OAuth Method. Redirects user to request access
+     * OAuth Method. Redirects user to request access.
      */
-    public function Controller_Authorize() {
+    public function controller_authorize() {
         Redirect(self::authorizeUri(self::globalConnectUrl()));
     }
 
     /**
-     * OAuth Method. Handles the redirect from Zendesk and stores AccessToken
-     * @throws Gdn_UserException
+     * OAuth Method. Handles the redirect from Zendesk and stores AccessToken.
+     *
+     * @throws Gdn_UserException If Error.
      */
-    public function Controller_Connect() {
+    public function controller_connect() {
         $Code = Gdn::Request()->Get('code');
         $Tokens = $this->getTokens($Code, self::globalConnectUrl());
         $AccessToken = GetValue('access_token', $Tokens);
@@ -757,12 +796,13 @@ class ZendeskPlugin extends Gdn_Plugin {
             ));
             throw new Gdn_UserException('Error Connecting to Zendesk');
         }
-        Redirect('/plugin/zendesk');
+        Redirect(Url('/plugin/zendesk'));
 
     }
 
     /**
-     * OAuth Method
+     * OAuth Method.
+     *
      * @return string
      */
     public static function globalConnectUrl() {
@@ -771,7 +811,13 @@ class ZendeskPlugin extends Gdn_Plugin {
 
     //end of OAUTH
 
-    public function SalesforcePlugin_ParseAttachments_Handler($Sender, $Args) {
+    /**
+     * Parse Attachmetns for view.
+     *
+     * @param salesforcePlugin $Sender Sending controller.
+     * @param array $Args Event Arguments.
+     */
+    public function salesforcePlugin_parseAttachments_handler($Sender, $Args) {
         if (GetValue('Attachments', $Args['Content'])) {
             foreach ($Args['Content']->Attachments as $Key => $Attachment) {
                 if ($Attachment['Source'] == 'zendesk') {
@@ -782,10 +828,10 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Given an instance of the attachment model, parse it into a format that
-     * the attachment view can digest.
+     * Given an instance of the attachment model, parse it into a format that the attachment view can digest.
      *
-     * @param array $Attachment
+     * @param array $Attachment Attachment.
+     *
      * @return array
      */
     public static function parseAttachmentForHtmlView($Attachment) {
@@ -821,6 +867,9 @@ class ZendeskPlugin extends Gdn_Plugin {
         return $Parsed;
     }
 
+    /**
+     * Lazy Load Zendesk object.
+     */
     protected function setZendesk() {
         if (!$this->zendesk) {
             $this->zendesk = new Zendesk(

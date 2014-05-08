@@ -1,11 +1,11 @@
 <?php
 /**
- * @copyright 2014 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2009-2014 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
 /**
- * Class Zendesk
+ * Class Zendesk.
  */
 class Zendesk {
 
@@ -14,27 +14,41 @@ class Zendesk {
     protected $apiToken;
     protected $logging = false;
 
+    /**
+     * Setup Properties.
+     *
+     * @param IZendeskHttpRequest $curlRequest Curl Request Object.
+     * @param string $Url Url to API.
+     * @param string $AccessToken OAuth AccessToken.
+     */
     public function __construct(IZendeskHttpRequest $curlRequest, $Url, $AccessToken) {
         $this->curl = $curlRequest;
         $this->apiUrl = $Url . '/api/v2';
         $this->AccessToken = $AccessToken;
     }
 
+    /**
+     * Enable Logging.
+     */
     public function enableLogging() {
         $this->logging = true;
     }
 
+    /**
+     * Disable Logging.
+     */
     public function disableLogging() {
         $this->logging = true;
     }
 
     /**
-     * Create Ticket using the Zendesk API
+     * Create Ticket using the Zendesk API.
      *
-     * @param string $Subject
-     * @param string $Body
-     * @param array $Requester
-     * @param array $AdditionalTicketFields ; Will be added to the json
+     * @param string $Subject Subject Line.
+     * @param string $Body Message Body.
+     * @param array $Requester Requester Array.
+     * @param array $AdditionalTicketFields Additional fields to the json.
+     *
      * @return int
      */
     public function createTicket($Subject, $Body, $Requester, $AdditionalTicketFields = array()) {
@@ -52,11 +66,25 @@ class Zendesk {
         return $Response['ticket']['id'];
     }
 
+    /**
+     * Get Ticket.
+     *
+     * @param string $TicketID Ticket Identified.
+     *
+     * @return mixed
+     */
     public function getTicket($TicketID) {
         $Response = $this->zendeskRequest('/tickets/' . $TicketID . '.json');
         return $Response['ticket'];
     }
 
+    /**
+     * Get last comment made on ticket.
+     *
+     * @param string $TicketID Ticket ID.
+     *
+     * @return array
+     */
     public function getLastComment($TicketID) {
         $Response = $this->zendeskRequest('/tickets/' . $TicketID . '/comments.json');
         //remove the first comment (its the ticket)
@@ -67,6 +95,14 @@ class Zendesk {
         return array();
     }
 
+    /**
+     * Get user details.
+     *
+     * @param string $UserID User ID.
+     *
+     * @return mixed
+     * @throws Exception If errors.
+     */
     public function getUser($UserID) {
         if (!is_int($UserID)) {
             throw new Exception('Invalid User ID');
@@ -75,6 +111,14 @@ class Zendesk {
         return $Response;
     }
 
+    /**
+     * Create Requester Array.
+     *
+     * @param string $name Name.
+     * @param string $email Email.
+     *
+     * @return array
+     */
     public function createRequester($name, $email) {
         return array(
             'name' => $name,
@@ -83,12 +127,15 @@ class Zendesk {
     }
 
     /**
-     * @param string $Url ie /tickets.json
-     * @param null|string $Json JSON encoded data to be used Required for POST and PUT actions
-     * @param string $Action POST, GET, PUT, DELETE
-     * @param bool $Logging enable logging to error log
-     * @param bool $Cache cache result. Only if http code 200 and method GET
-     * @throws Exception
+     * Send request to zendesk API.
+     *
+     * @param string $Url URL ie /tickets.json.
+     * @param null|string $Json JSON encoded data to be used Required for POST and PUT actions.
+     * @param string $Action POST, GET, PUT, DELETE.
+     * @param bool $Logging Enable logging to error log.
+     * @param bool $Cache Cache result. Only if http code 200 and method GET.
+     *
+     * @throws Exception If errors.
      * @return mixed json
      */
     public function zendeskRequest($Url, $Json = null, $Action = 'GET', $Logging = false, $Cache = false) {
@@ -105,13 +152,10 @@ class Zendesk {
             }
         }
 
-
         $this->curl->setOption(CURLOPT_URL, $this->apiUrl . $Url);
         $this->curl->setOption(CURLOPT_FOLLOWLOCATION, true);
         $this->curl->setOption(CURLOPT_MAXREDIRS, 10);
         $this->curl->setOption(CURLOPT_FOLLOWLOCATION, true);
-
-        //$this->curl->setOption(CURLOPT_USERPWD, $this->apiUser . "/token:" . $this->apiToken);
 
         switch ($Action) {
             case "POST":
@@ -152,10 +196,11 @@ class Zendesk {
         }
 
         if ($this->logging || $Logging) {
-            error_log('Curl Request: ' . $this->apiUrl . $Url);
-            error_log('Curl JSON: ' . var_export(json_decode($Json), true));
-            error_log('Output: ' . $Output);
-            error_log('Decoded Response: ' . var_export($Decoded, true));
+//@todo Update to use Logger when its been added to core.
+//            error_log('Curl Request: ' . $this->apiUrl . $Url);
+//            error_log('Curl JSON: ' . var_export(json_decode($Json), true));
+//            error_log('Output: ' . $Output);
+//            error_log('Decoded Response: ' . var_export($Decoded, true));
         }
 
         if ($HttpCode == 404) {
@@ -182,11 +227,11 @@ class Zendesk {
     }
 
     /**
-     * Get user profile from zendesk
+     * Get user profile from zendesk.
      *
-     * @param bool|int $userId defaults to authenticated user
+     * @param bool|int $userId Defaults to authenticated user.
      *
-     * @return array Profile
+     * @return array Profile User Profile. Array with the following keys:
      *      [id]
      *      [fullname]
      *      [email]
