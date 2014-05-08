@@ -888,11 +888,9 @@ class EditorPlugin extends Gdn_Plugin {
             $commentIDList[] = $commentIDList;
          }
 
-         if (is_array($commentIDList)) {
+         if (is_array($commentIDList) && count($commentIDList)) {
             $commentIDList = array_filter($commentIDList);
-         }
 
-         if (!empty($commentIDList)) {
             $sqlWhere = array(
                 'ForeignTable' => 'comment',
                 'ForeignID' => $commentIDList
