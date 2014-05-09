@@ -9,13 +9,13 @@ $PluginInfo['Zendesk'] = array(
     'Name' => 'Zendesk',
     'Description' => "Users may designate a discussion as a Support Issue and the message will be submitted to Zendesk."
         . "Reply will be added to thread",
-    'Version' => '0.0.4',
+    'Version' => '0.0.4-beta',
     'RequiredApplications' => array('Vanilla' => '2.1.18'),
     'SettingsUrl' => '/dashboard/plugin/zendesk',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true,
     'Author' => 'John Ashton',
-    'AuthorEmail' => 'johnashton@vanillaforums.com',
+    'AuthorEmail' => 'john@vanillaforums.com',
     'AuthorUrl' => 'http://www.github.com/John0x00'
 );
 
@@ -61,9 +61,6 @@ class ZendeskPlugin extends Gdn_Plugin {
         $this->accessToken = GetValueR('Attributes.' . self::PROVIDER_KEY . '.AccessToken', Gdn::Session()->User);
         if (!$this->accessToken) {
             $this->accessToken = C('Plugins.Zendesk.GlobalLogin.AccessToken');
-            if ($this->accessToken) {
-                Trace('Zendesk Using Global Login');
-            }
         }
 
     }

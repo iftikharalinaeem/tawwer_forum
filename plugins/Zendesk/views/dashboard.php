@@ -9,7 +9,7 @@
             $("#setup").hide();
         });
 
-        $("enable-button").click(function () {
+        $("#enable-button").click(function () {
             window.location='<?php echo $this->Data['ToggleUrl']; ?>';
         });
 
