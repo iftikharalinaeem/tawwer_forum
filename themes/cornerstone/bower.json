@@ -5,7 +5,7 @@
     "font-vanillicon": "*",
     "normalize-less": "*",
     "preboot": "*",
-    "iCheck": "1.0.x"
+    "iCheck": "2.x-beta"
   },
   "overrides": {
     "preboot": {
