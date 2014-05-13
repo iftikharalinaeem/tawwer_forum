@@ -383,18 +383,23 @@ class GithubPlugin extends Gdn_Plugin {
      * Make request to the API.
      *
      * @param string $endPoint Path of the API endpoint.  ie: /users.
+     * @param array $Post Post values.
      *
      * @return string JSON response from Github.
      * @throws Gdn_UserException If response != 200.
      */
-    public function apiRequest($endPoint) {
+    public function apiRequest($endPoint, $post = null) {
+        if ($this->accessToken === null) {
+            $this->setAccessToken();
+        }
         $Proxy = new ProxyRequest();
         $Response = $Proxy->Request(
             array(
                 'URL' => self::API_BASE_URL . $endPoint,
-                'Method' => 'GET',
+                'Method' => ($post === null) ? 'GET' : 'POST',
+                'PreEncodePost' => ($post === null) ? false : true,
             ),
-            null,
+            $post,
             null,
             array(
                 'Authorization' => ' token ' . $this->accessToken,
@@ -402,11 +407,12 @@ class GithubPlugin extends Gdn_Plugin {
             )
         );
         Trace('Github API Request: ' . self::API_BASE_URL . $endPoint);
-        if ($Proxy->ResponseStatus != 200) {
-            throw new Gdn_UserException('Invalid apiRequest', $Proxy->ResponseStatus);
-        }
+        $DecodedResponse = json_decode($Response, true);
+//        if (!GetValue('errors', $DecodedResponse) && $Proxy->ResponseStatus != 200) {
+//            throw new Gdn_UserException('Invalid apiRequest', $Proxy->ResponseStatus);
+//        }
 
-        return json_decode($Response, true);
+        return $DecodedResponse;
     }
 
     /**
@@ -497,47 +503,120 @@ class GithubPlugin extends Gdn_Plugin {
         $Sender->Render($this->GetView('dashboard.php'));
     }
 
-    protected function createIssue() {
+    //API Methods
 
-        $repo = array(
-            'owner' => 'John0x00',
-            'name' => 'VanillaPlugins'
-        );
+    /**
+     * Create an Issue using the github API.
+     *
+     * @param string $repo Full repo name.  Example John/MyRepo.
+     * @param array $issue Issue details.
+     *
+     * @link https://developer.github.com/v3/repos/#create
+     *
+     * @return array
+     */
+    protected function createIssue($repo, $issue) {
 
-        $issue = array(
-            'title' => 'title',
-            'body' => 'body',
-            'assignee' => '',
-            'milestone' => '',
-            'labels' => array('label1', 'label2')
-        );
-        var_dump(json_encode($issue));
-        $repo['fullpath'] = '/repos/' . $repo['owner'] . '/' . $repo['name'] . '/issues';
-        $response = $this->apiRequest($repo['fullpath'], json_encode($issue));
-        var_dump($response);
+        $response = $this->apiRequest('/repos/' . $repo . '/issues', json_encode($issue));
+
+        return $response;
     }
 
-    public function controller_test() {
+    /**
+     * Check to see if repo provided exists on github.com.
+     *
+     * @param string $repo Full repo name. ie: John/MyRepo.
+     *
+     * @return bool
+     * @throws Gdn_UserException If repo name is invalid format.
+     */
+    public function isValidRepo($repo) {
 
-
-
-
-        require_once(PATH_LIBRARY . '/vendors/knplabs/github-api/lib/Github/Client.php');
-
-        $client = new \Github\Client();
-        $repositories = $client->api('user')->repositories('John0x00');
-        var_dump($repositories);
-
-        return;
-
-        try {
-            $this->createIssue();
-        } catch (Gdn_UserException $e) {
-            if ($e->getCode() == 401) {
-                //no access...
-                var_dump('Permission Denied');
-            }
+        if (substr_count($repo, '/') != 1) {
+            throw new Gdn_UserException('Invalid repo name: ' . $repo);
         }
-        var_dump('Issue Created');
+
+        $response = $this->apiRequest('/repos/' . $repo);
+        if (GetValue('id', $response, 0) > 0) {
+            return true;
+        }
+        return false;
     }
+
+    /**
+     * Test controller.
+     *
+     * @param PlugginController $Sender Sending controller.
+     */
+    public function controller_test($Sender) {
+
+        $args = $Sender->RequestArgs;
+        if (count($args) == 1) {
+            ?>
+            <ul>
+                <li><a href="test/createIssue">createIssue</a></li>
+                <li><a href="test/isValidRepo">isValidRepo</a></li>
+                <li><a href="test/getReposFromConfig">getReposFromConfig</a></li>
+            </ul>
+            <?php
+            return;
+        }
+        $test = $args[1];
+
+        switch ($test) {
+
+            case 'getReposFromConfig':
+                $repos = array_keys(C('Plugins.Github.Repos', array()));
+                var_dump('Repos from config: ');
+                var_dump($repos);
+
+                break;
+            case 'isValidRepo':
+
+                $repos = array(
+                    'John0x00/test' => true,
+                    'John0x00/VanillaPlugins' => true
+                );
+                foreach (array_keys($repos) as $repo) {
+                    echo "Repo $repo =====> " . var_export($this->isValidRepo($repo), true) . '<br/>';
+                }
+                break;
+
+            case 'createIssue':
+
+                $issue = $this->createIssue(
+                    'John0x00/VanillaPlugins',
+                    array(
+                        'title' => 'title',
+                        'body' => 'body',
+//                'assignee' => '',
+//                'milestone' => '',
+//                'labels' => array('label1', 'label2')
+                    )
+                );
+
+                if (GetValue('errors', $issue)) {
+                    $errorMessage = '';
+                    var_dump($issue['errors']);
+                    foreach ($issue['errors'] as $error) {
+                        $errorMessage .= $error['code'] . ' ' . $error['field'] . "<br/>";
+                    }
+                    var_dump("Failed creating issue: \n" . $errorMessage);
+                } else {
+                    $issueID = $issue['id'];
+                    var_dump("Issue created: $issueID");
+                    var_dump($issue);
+                }
+
+                break;
+
+            default:
+                echo 'Test not configured';
+
+        }
+
+
+    }
+
+
 }
