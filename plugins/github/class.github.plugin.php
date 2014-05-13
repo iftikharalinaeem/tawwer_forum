@@ -72,7 +72,7 @@ class GithubPlugin extends Gdn_Plugin {
             'redirect_uri' => $RedirectUri,
             'client_id' => $AppID,
             'response_type' => 'code',
-            'scope' => '',
+            'scope' => 'repo',
 
         );
         return self::OAUTH_BASE_URL . '/login/oauth/authorize?' . http_build_query($Query);
@@ -413,7 +413,6 @@ class GithubPlugin extends Gdn_Plugin {
      * Get Profile of current authenticated user.
      */
     public function getProfile() {
-        $this->setAccessToken();
         $fullProfile = $this->apiRequest('/user');
         return array(
             'id' => $fullProfile['id'],
@@ -483,7 +482,7 @@ class GithubPlugin extends Gdn_Plugin {
 
         }
 
-        $Sender->Form->SetValue('ApplicationID', C('Plugins.Githib.ApplicationID'));
+        $Sender->Form->SetValue('ApplicationID', C('Plugins.Github.ApplicationID'));
         $Sender->Form->SetValue('Secret', C('Plugins.Github.Secret'));
         $Sender->SetData(array(
                 'GlobalLoginEnabled' => C('Plugins.Github.GlobalLogin.Enabled'),
@@ -496,5 +495,49 @@ class GithubPlugin extends Gdn_Plugin {
         }
 
         $Sender->Render($this->GetView('dashboard.php'));
+    }
+
+    protected function createIssue() {
+
+        $repo = array(
+            'owner' => 'John0x00',
+            'name' => 'VanillaPlugins'
+        );
+
+        $issue = array(
+            'title' => 'title',
+            'body' => 'body',
+            'assignee' => '',
+            'milestone' => '',
+            'labels' => array('label1', 'label2')
+        );
+        var_dump(json_encode($issue));
+        $repo['fullpath'] = '/repos/' . $repo['owner'] . '/' . $repo['name'] . '/issues';
+        $response = $this->apiRequest($repo['fullpath'], json_encode($issue));
+        var_dump($response);
+    }
+
+    public function controller_test() {
+
+
+
+
+        require_once(PATH_LIBRARY . '/vendors/knplabs/github-api/lib/Github/Client.php');
+
+        $client = new \Github\Client();
+        $repositories = $client->api('user')->repositories('John0x00');
+        var_dump($repositories);
+
+        return;
+
+        try {
+            $this->createIssue();
+        } catch (Gdn_UserException $e) {
+            if ($e->getCode() == 401) {
+                //no access...
+                var_dump('Permission Denied');
+            }
+        }
+        var_dump('Issue Created');
     }
 }
