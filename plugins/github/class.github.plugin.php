@@ -190,7 +190,7 @@ class GithubPlugin extends Gdn_Plugin {
         $Profile = GetValueR('User.Attributes.' . self::PROVIDER_KEY . '.Profile', $Args);
         $Sender->Data["Connections"][self::PROVIDER_KEY] = array(
             'Icon' => $this->GetWebResource('github.png', '/'),
-            'Name' => self::PROVIDER_KEY,
+            'Name' => ucfirst(self::PROVIDER_KEY),
             'ProviderKey' => self::PROVIDER_KEY,
             'ConnectUrl' => self::authorizeUri(self::profileConnectUrl()),
             'Profile' => array(
@@ -449,48 +449,42 @@ class GithubPlugin extends Gdn_Plugin {
     public function controller_index($Sender) {
 
         $Sender->AddCssFile('admin.css');
-//
-//        $Validation = new Gdn_Validation();
-//        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-//        $ConfigurationModel->SetField(array('Url', 'ApplicationID', 'Secret'));
-//
-//        // Set the model on the form.
-//        $Sender->Form->SetModel($ConfigurationModel);
-//
-//        // If seeing the form for the first time...
-//        if ($Sender->Form->AuthenticatedPostBack() === false) {
-//            // Apply the config settings to the form.
-//            $Sender->Form->SetData($ConfigurationModel->Data);
-//        } else {
-//            $FormValues = $Sender->Form->FormValues();
-//            if ($Sender->Form->IsPostBack()) {
-//                $Sender->Form->ValidateRule(
-//                    'Url',
-//                    'function:ValidateRequired',
-//                    'Url is required'
-//                );
-//                $Sender->Form->ValidateRule(
-//                    'ApplicationID',
-//                    'function:ValidateRequired',
-//                    'Unique Identifier is required'
-//                );
-//                $Sender->Form->ValidateRule('Secret', 'function:ValidateRequired', 'Secret is required');
-//
-//
-//                if ($Sender->Form->ErrorCount() == 0) {
-//                    SaveToConfig('Plugins.Zendesk.ApplicationID', trim($FormValues['ApplicationID']));
-//                    SaveToConfig('Plugins.Zendesk.Secret', trim($FormValues['Secret']));
-//                    SaveToConfig('Plugins.Zendesk.Url', trim($FormValues['Url']));
-//                    $Sender->InformMessage(T("Your changes have been saved."));
-//                } else {
-//                    $Sender->InformMessage(T("Error saving settings to config."));
-//                }
-//            }
-//
-//        }
-//
-        $Sender->Form->SetValue('ApplicationID', C('Plugins.Zendesk.ApplicationID'));
-        $Sender->Form->SetValue('Secret', C('Plugins.Zendesk.Secret'));
+
+        $Validation = new Gdn_Validation();
+        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+        $ConfigurationModel->SetField(array('ApplicationID', 'Secret'));
+
+        // Set the model on the form.
+        $Sender->Form->SetModel($ConfigurationModel);
+
+        // If seeing the form for the first time...
+        if ($Sender->Form->AuthenticatedPostBack() === false) {
+            // Apply the config settings to the form.
+            $Sender->Form->SetData($ConfigurationModel->Data);
+        } else {
+            $FormValues = $Sender->Form->FormValues();
+            if ($Sender->Form->IsPostBack()) {
+                $Sender->Form->ValidateRule(
+                    'ApplicationID',
+                    'function:ValidateRequired',
+                    'Unique Identifier is required'
+                );
+                $Sender->Form->ValidateRule('Secret', 'function:ValidateRequired', 'Secret is required');
+
+
+                if ($Sender->Form->ErrorCount() == 0) {
+                    SaveToConfig('Plugins.Github.ApplicationID', trim($FormValues['ApplicationID']));
+                    SaveToConfig('Plugins.Github.Secret', trim($FormValues['Secret']));
+                    $Sender->InformMessage(T("Your changes have been saved."));
+                } else {
+                    $Sender->InformMessage(T("Error saving settings to config."));
+                }
+            }
+
+        }
+
+        $Sender->Form->SetValue('ApplicationID', C('Plugins.Githib.ApplicationID'));
+        $Sender->Form->SetValue('Secret', C('Plugins.Github.Secret'));
         $Sender->SetData(array(
                 'GlobalLoginEnabled' => C('Plugins.Github.GlobalLogin.Enabled'),
                 'GlobalLoginConnected' => C('Plugins.Github.GlobalLogin.AccessToken'),
