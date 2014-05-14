@@ -474,10 +474,32 @@ class GithubPlugin extends Gdn_Plugin {
                     'function:ValidateRequired',
                     'Unique Identifier is required'
                 );
+
+                //repo validation.
+                $repos = explode("\n", trim($FormValues['Repositories']));
+                if ($repos[0] == '') {
+                    $Sender->Form->AddError('Please enter a valid repo name', 'Repositories');
+                } else {
+                    foreach ($repos as $repo) {
+                        try {
+                            if (!$this->isValidRepo(trim($repo))) {
+                                $Sender->Form->AddError('Repository not found: ' . $repo, 'Repositories');
+                            }
+                        } catch (Gdn_UserException $e) {
+                            $Sender->Form->AddError('Invalid Repository: ' . $repo, 'Repositories');
+                        }
+                    }
+                }
+
+
+
                 $Sender->Form->ValidateRule('Secret', 'function:ValidateRequired', 'Secret is required');
 
 
                 if ($Sender->Form->ErrorCount() == 0) {
+                    foreach ($repos as $repo) {
+                        SaveToConfig('Plugins.Github.Repos.' . trim($repo), true);
+                    }
                     SaveToConfig('Plugins.Github.ApplicationID', trim($FormValues['ApplicationID']));
                     SaveToConfig('Plugins.Github.Secret', trim($FormValues['Secret']));
                     $Sender->InformMessage(T("Your changes have been saved."));
@@ -490,6 +512,16 @@ class GithubPlugin extends Gdn_Plugin {
 
         $Sender->Form->SetValue('ApplicationID', C('Plugins.Github.ApplicationID'));
         $Sender->Form->SetValue('Secret', C('Plugins.Github.Secret'));
+
+        $Repositories = C('Plugins.Github.Repos', array());
+        $ReposForForm = '';
+        foreach (array_keys($Repositories) as $Repo) {
+            $ReposForForm .= $Repo . "\n";
+        }
+        $ReposForForm = trim($ReposForForm);
+        $Sender->Form->SetValue('Repositories', $ReposForForm);
+
+
         $Sender->SetData(array(
                 'GlobalLoginEnabled' => C('Plugins.Github.GlobalLogin.Enabled'),
                 'GlobalLoginConnected' => C('Plugins.Github.GlobalLogin.AccessToken'),
@@ -501,6 +533,104 @@ class GithubPlugin extends Gdn_Plugin {
         }
 
         $Sender->Render($this->GetView('dashboard.php'));
+    }
+
+    /**
+     * Popup to Add Issue.
+     *
+     * @param DiscussionController $Sender Sending controller.
+     * @param array $Args Sender Arguments.
+     *
+     * @throws Gdn_UserException Permission Denied.
+     * @throws Exception Permission Denied.
+     */
+    public function discussionController_githubIssue_create($Sender, $Args) {
+
+        // Signed in users only.
+        if (!(Gdn::Session()->IsValid())) {
+            throw PermissionException('Garden.Signin.Allow');
+        }
+        //Permissions
+        $Sender->Permission('Garden.Staff.Allow');
+
+        //get arguments
+        if (count($Sender->RequestArgs) != 3) {
+            throw new Gdn_UserException('Bad Request', 400);
+        }
+        list($context, $contextID, $userId) = $Sender->RequestArgs;
+
+        // Get Content
+        if ($context == 'discussion') {
+            $Content = $Sender->DiscussionModel->GetID($contextID);
+            $Url = DiscussionUrl($Content, 1);
+        } elseif ($context == 'comment') {
+            $CommentModel = new CommentModel();
+            $Content = $CommentModel->GetID($contextID);
+            $Url = CommentUrl($Content);
+
+        } else {
+            throw new Gdn_UserException('Content Type not supported');
+        }
+
+        $Repositories = C('Plugins.Github.Repos', array());
+        $RepositoryOptions = '';
+        foreach (array_keys($Repositories) as $Repo) {
+            $RepositoryOptions .= '<option>' . Gdn_Format::Text($Repo) . '</option>';
+        }
+
+        // If form is being submitted
+        if ($Sender->Form->IsPostBack() && $Sender->Form->AuthenticatedPostBack() === true) {
+            // Form Validation
+            $Sender->Form->ValidateRule('Title', 'function:ValidateRequired', 'Title is required');
+            $Sender->Form->ValidateRule('Body', 'function:ValidateRequired', 'Body is required');
+            $Sender->Form->ValidateRule('Repository', 'function:ValidateRequired', 'Repository is required');
+            // If no errors
+            if ($Sender->Form->ErrorCount() == 0) {
+                $FormValues = $Sender->Form->FormValues();
+
+                //@todo save attachment....
+                $AttachmentModel = AttachmentModel::Instance();
+
+                $Sender->JsonTarget('', $Url, 'Redirect');
+                $Sender->InformMessage(T('Github Lead Created'));
+
+            }
+        }
+
+        $Data = array(
+            'RepositoryOptions' => $RepositoryOptions,
+            'Body' => $Content->Body
+        );
+        $Sender->SetData($Data);
+        $Sender->Form->SetData($Data);
+
+
+        $Sender->Render('createissue', '', 'plugins/github');
+
+
+    }
+
+    /**
+     * Add option to create issue to Cog.
+     *
+     * @param DiscussionController $Sender Sending controller.
+     * @param array $Args Sender Arguments.
+     */
+    public function discussionController_discussionOptions_handler($Sender, $Args) {
+        //Staff Only
+        $Session = Gdn::Session();
+        if (!$Session->CheckPermission('Garden.Staff.Allow')) {
+            return;
+        }
+        $UserID = $Args['Discussion']->InsertUserID;
+        $DiscussionID = $Args['Discussion']->DiscussionID;
+        if (isset($Args['DiscussionOptions'])) {
+            $Args['DiscussionOptions']['GithubIssue'] = array(
+                'Label' => T('Github - Create Issue'),
+                'Url' => "/discussion/githubissue/discussion/$DiscussionID/$UserID",
+                'Class' => 'Popup'
+            );
+        }
     }
 
     //API Methods
@@ -615,8 +745,8 @@ class GithubPlugin extends Gdn_Plugin {
 
         }
 
-
     }
 
 
 }
+
