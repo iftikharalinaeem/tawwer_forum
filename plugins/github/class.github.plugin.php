@@ -29,6 +29,14 @@ class GithubPlugin extends Gdn_Plugin {
      */
     protected $accessToken;
 
+    protected $closedIssueString = 'closed';
+
+    /**
+     * If time since last update from Github is less then this; we wont check for update - saving api calls.
+     * @var int
+     */
+    protected $minimumTimeForUpdate = 600;
+
     const API_BASE_URL = 'https://api.github.com';
 
     const PROVIDER_KEY = 'github';
@@ -365,6 +373,15 @@ class GithubPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Writes and updates discussion attachments.
+     *
+     * @param DiscussionController $Sender Sending controller.
+     * @param array $Args Event Arguments.
+     */
+    public function discussionController_afterDiscussionBody_handler($Sender, $Args) {
+        $this->writeAndUpdateAttachments($Sender, $Args);
+    }
 
     /**
      * Writes and updates discussion attachments.
@@ -372,63 +389,119 @@ class GithubPlugin extends Gdn_Plugin {
      * @param DiscussionController $Sender Sending controller.
      * @param array $Args Event Arguments.
      */
-    public function discussioncontroller_afterDiscussionBody_handler($Sender, $Args) {
-       // var_export($this->getProfile(), true);
+    public function discussionController_afterCommentBody_handler($Sender, $Args) {
+        $this->writeAndUpdateAttachments($Sender, $Args);
     }
 
-
-    //API Calls
-
     /**
-     * Make request to the API.
+     * Writes and updates attachments for comments and discussions.
      *
-     * @param string $endPoint Path of the API endpoint.  ie: /users.
-     * @param array $Post Post values.
+     * @param DiscussionController|Commentocntroller $Sender Sending controller.
+     * @param array $Args Event arguments.
      *
-     * @return string JSON response from Github.
-     * @throws Gdn_UserException If response != 200.
+     * @throws Gdn_UserException If Errors.
      */
-    public function apiRequest($endPoint, $post = null) {
-        if ($this->accessToken === null) {
-            $this->setAccessToken();
+    protected function writeAndUpdateAttachments($Sender, $Args) {
+        if ($Args['Type'] == 'Discussion') {
+            $Content = 'Discussion';
+        } elseif ($Args['Type'] == 'Comment') {
+            $Content = 'Comment';
+        } else {
+            throw new Gdn_UserException('Invalid Content');
         }
-        $Proxy = new ProxyRequest();
-        $Response = $Proxy->Request(
-            array(
-                'URL' => self::API_BASE_URL . $endPoint,
-                'Method' => ($post === null) ? 'GET' : 'POST',
-                'PreEncodePost' => ($post === null) ? false : true,
-            ),
-            $post,
-            null,
-            array(
-                'Authorization' => ' token ' . $this->accessToken,
-                'Accept' => 'application/json'
-            )
-        );
-        Trace('Github API Request: ' . self::API_BASE_URL . $endPoint);
-        $DecodedResponse = json_decode($Response, true);
-//        if (!GetValue('errors', $DecodedResponse) && $Proxy->ResponseStatus != 200) {
-//            throw new Gdn_UserException('Invalid apiRequest', $Proxy->ResponseStatus);
-//        }
+        // Signed in users only.
+        if (!Gdn::Session()->UserID) {
+            return;
+        }
 
-        return $DecodedResponse;
+        if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+            return;
+        }
+        $Attachments = GetValue('Attachments', $Args[$Content]);
+        if ($Attachments) {
+            foreach ($Args[$Content]->Attachments as $Attachment) {
+                if ($Attachment['Type'] == 'github-issue') {
+                    $this->UpdateAttachment($Attachment);
+                }
+            }
+        }
+
     }
 
     /**
-     * Get Profile of current authenticated user.
+     * Check to see if attachment needs to be updated.
+     *
+     * @param array $Attachment Attachment Data - see AttachmentModel.
+     *
+     * @see    AttachmentModel
+     *
+     * @return bool
      */
-    public function getProfile() {
-        $fullProfile = $this->apiRequest('/user');
-        return array(
-            'id' => $fullProfile['id'],
-            'fullname' => $fullProfile['name'],
-            'photo' => $fullProfile['avatar_url'],
-        );
+    protected function isToBeUpdated($Attachment) {
+        if (GetValue('State', $Attachment) == $this->closedIssueString) {
+            Trace("Issue {$this->closedIssueString}.  Not checking for update.");
+            return false;
+        }
+        $TimeDiff = time() - strtotime($Attachment['DateUpdated']);
+        if ($TimeDiff < $this->minimumTimeForUpdate) {
+            Trace("Not Checking For Update: $TimeDiff seconds since last update");
+            return false;
+        }
+        if (isset($Attachment['LastModifiedDate'])) {
+            $TimeDiff = time() - strtotime($Attachment['LastModifiedDate']);
+            if ($TimeDiff < $this->minimumTimeForUpdate) {
+                Trace("Not Checking For Update: $TimeDiff seconds since last update");
+                return false;
+            }
+        }
+        return true;
     }
 
-    //End of API Calls
+    /**
+     * Update the Attachment.
+     *
+     * @param array $Attachment Attachment.
+     *
+     * @see    AttachmentModel
+     *
+     * @return bool
+     */
+    protected function updateAttachment($Attachment) {
+        if (!$this->isConfigured()) {
+            return;
+        }
 
+        if ($this->IsToBeUpdated($Attachment)) {
+            $issue = $this->getIssue($Attachment['Repository'], $Attachment['SourceID']);
+
+            if (!$issue) {
+                Trace(
+                    'getIssue returned false for: ' .  $Attachment['Repository'] . ' Issue: ' . $Attachment['SourceID']
+                );
+                return false;
+            }
+            $Attachment['State'] = $issue['state'];
+            $Attachment['Assignee'] = $issue['assignee'];
+            $Attachment['Milestone'] = $issue['milestone'];
+            $Attachment['LastModifiedDate'] = $issue['updated_at'];
+            $Attachment['DateUpdated'] = Gdn_Format::ToDateTime();
+            $Attachment['ClosedBy'] = $issue['closed_by']['login'];
+
+            $AttachmentModel = AttachmentModel::Instance();
+            $AttachmentModel->Save($Attachment);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Add attachment views.
+     *
+     * @param DiscussionController $Sender Sending Controller.
+     */
+    public function discussionController_fetchAttachmentViews_handler($Sender) {
+        require_once $Sender->FetchViewLocation('attachment', '', 'plugins/github');
+    }
 
     /**
      * Creates the Virtual Github Controller and adds Link to SideMenu in the dashboard.
@@ -563,10 +636,13 @@ class GithubPlugin extends Gdn_Plugin {
         if ($context == 'discussion') {
             $Content = $Sender->DiscussionModel->GetID($contextID);
             $Url = DiscussionUrl($Content, 1);
+            $Title = $Content->Name;
         } elseif ($context == 'comment') {
             $CommentModel = new CommentModel();
             $Content = $CommentModel->GetID($contextID);
+            $Discussion = $Sender->DiscussionModel->GetID($Content->DiscussionID);
             $Url = CommentUrl($Content);
+            $Title = $Discussion->Name;
 
         } else {
             throw new Gdn_UserException('Content Type not supported');
@@ -588,18 +664,48 @@ class GithubPlugin extends Gdn_Plugin {
             if ($Sender->Form->ErrorCount() == 0) {
                 $FormValues = $Sender->Form->FormValues();
 
-                //@todo save attachment....
-                $AttachmentModel = AttachmentModel::Instance();
+                $bodyAppend = "\n\n" . T("This Issue was generated from your [forums] \n");
+                $bodyAppend .= "[forums]: $Url\n";
 
-                $Sender->JsonTarget('', $Url, 'Redirect');
-                $Sender->InformMessage(T('Github Lead Created'));
+                $issue = $this->createIssue(
+                    $FormValues['Repository'],
+                    array(
+                        'title' => $FormValues['Title'],
+                        'body' => Gdn_Format::TextEx($FormValues['Body']) . $bodyAppend,
+                        'labels' => array('Vanilla')
+                    )
+                );
+                if ($issue != false) {
+                    $AttachmentModel = AttachmentModel::Instance();
+                    $AttachmentModel->Save(array(
+                        'Type' => 'github-issue',
+                        'ForeignID' => AttachmentModel::RowID($Content),
+                        'ForeignUserID' => $Content->InsertUserID,
+                        'Source' => 'github',
+                        'SourceID' => $issue['number'],
+                        'SourceURL' => 'https://github.com/' . $FormValues['Repository'] . '/issues/' . $issue['number'],
+                        'LastModifiedDate' => Gdn_Format::ToDateTime(),
+                        'State' => $issue['state'],
+                        'Assignee' => $issue['assignee'],
+                        'MileStone' => $issue['milestone'],
+                        'Repository' => $FormValues['Repository']
+                    ));
+
+
+
+                    $Sender->JsonTarget('', $Url, 'Redirect');
+                    $Sender->InformMessage(T('Github Issue created'));
+                } else {
+                    $Sender->InformMessage(T('Error creating Github Issue'));
+                }
 
             }
         }
 
         $Data = array(
             'RepositoryOptions' => $RepositoryOptions,
-            'Body' => $Content->Body
+            'Body' => Gdn_Format::TextEx($Content->Body),
+            'Title' => $Title
         );
         $Sender->SetData($Data);
         $Sender->Form->SetData($Data);
@@ -615,6 +721,8 @@ class GithubPlugin extends Gdn_Plugin {
      *
      * @param DiscussionController $Sender Sending controller.
      * @param array $Args Sender Arguments.
+     *
+     * @todo remove option if issue has been created.
      */
     public function discussionController_discussionOptions_handler($Sender, $Args) {
         //Staff Only
@@ -633,13 +741,104 @@ class GithubPlugin extends Gdn_Plugin {
         }
     }
 
-    //API Methods
+    /**
+     * Add option to create issue to Cog.
+     *
+     * @param DiscussionController $Sender Sending controller.
+     * @param array $Args Sender Arguments.
+     *
+     * @todo remove option if issue has been created.
+     */
+    public function discussionController_commentOptions_handler($Sender, $Args) {
+        //Staff Only
+        $Session = Gdn::Session();
+        if (!$Session->CheckPermission('Garden.Staff.Allow')) {
+            return;
+        }
+        $UserID = $Args['Comment']->InsertUserID;
+        $CommentID = $Args['Comment']->CommentID;
+        if (isset($Args['CommentOptions'])) {
+            $Args['CommentOptions']['GithubIssue'] = array(
+                'Label' => T('Github - Create Issue'),
+                'Url' => "/discussion/githubissue/comment/$CommentID/$UserID",
+                'Class' => 'Popup'
+            );
+        }
+    }
+
+    /**
+     * Add needed CSS.
+     *
+     * @param AssetModel $Sender Sending Controller.
+     *
+     * @todo Remove this after css has been added to core.
+     */
+    public function assetModel_styleCss_handler($Sender) {
+        $Sender->AddCssFile('github.css', 'plugins/github');
+    }
+
+    //API Calls
+
+    /**
+     * Make request to the API.
+     *
+     * @param string $endPoint Path of the API endpoint.  ie: /users.
+     * @param null|array $post Post values.
+     *
+     * @todo add cache for GET
+     *
+     * @return string JSON response from Github.
+     */
+    public function apiRequest($endPoint, $post = null) {
+        if ($this->accessToken === null) {
+            $this->setAccessToken();
+        }
+        $Proxy = new ProxyRequest();
+        $Response = $Proxy->Request(
+            array(
+                'URL' => self::API_BASE_URL . $endPoint,
+                'Method' => ($post === null) ? 'GET' : 'POST',
+                'PreEncodePost' => ($post === null) ? false : true,
+            ),
+            $post,
+            null,
+            array(
+                'Authorization' => ' token ' . $this->accessToken,
+                'Accept' => 'application/json'
+            )
+        );
+        Trace('Github API Request: ' . self::API_BASE_URL . $endPoint);
+        $DecodedResponse = json_decode($Response, true);
+//        if ($Proxy->ResponseStatus == 500) {
+//            throw new Gdn_UserException('Invalid apiRequest', $Proxy->ResponseStatus);
+//        }
+
+        return $DecodedResponse;
+    }
+
+    /**
+     * Get Profile of current authenticated user.
+     */
+    public function getProfile() {
+        $fullProfile = $this->apiRequest('/user');
+        return array(
+            'id' => $fullProfile['id'],
+            'fullname' => $fullProfile['name'],
+            'photo' => $fullProfile['avatar_url'],
+        );
+    }
 
     /**
      * Create an Issue using the github API.
      *
      * @param string $repo Full repo name.  Example John/MyRepo.
-     * @param array $issue Issue details.
+     * @param array $issue Issue details
+     *    * [title]     - string
+     *    * [body]      - string
+     *      [assignee]  - string
+     *      [milestone] - string
+     *      [labels]    - array
+     * Keys prefixed with a * are required.
      *
      * @link https://developer.github.com/v3/repos/#create
      *
@@ -648,8 +847,36 @@ class GithubPlugin extends Gdn_Plugin {
     protected function createIssue($repo, $issue) {
 
         $response = $this->apiRequest('/repos/' . $repo . '/issues', json_encode($issue));
+        if (GetValue('id', $response)) {
+            return $response;
+        }
+        return false;
+    }
 
-        return $response;
+    /**
+     * Get issue details.
+     *
+     * @param string $repo Repository Name.
+     * @param int $issueNumber Issue Number.
+     *
+     * @link https://developer.github.com/v3/issues/#get-a-single-issue
+     * @throws Gdn_UserException Invalid Input.
+     *
+     * @return array Issue Details.
+     */
+    protected function getIssue($repo, $issueNumber) {
+        ///repos/:owner/:repo/issues/:number
+        if (!$this->isValidRepoName($repo)) {
+            throw new Gdn_UserException('Invalid repository name: ' . $repo);
+        }
+        if (!is_numeric($issueNumber)) {
+            throw new Gdn_UserException('Invalid issue number: ' . $issueNumber);
+        }
+        $issue = $this->apiRequest('/repos/' . $repo . '/issues/' . $issueNumber);
+        if (!GetValue('id', $issue)) {
+            return false;
+        }
+        return $issue;
     }
 
     /**
@@ -662,16 +889,31 @@ class GithubPlugin extends Gdn_Plugin {
      */
     public function isValidRepo($repo) {
 
-        if (substr_count($repo, '/') != 1) {
+        if (!$this->isValidRepoName($repo)) {
             throw new Gdn_UserException('Invalid repo name: ' . $repo);
         }
-
         $response = $this->apiRequest('/repos/' . $repo);
         if (GetValue('id', $response, 0) > 0) {
             return true;
         }
         return false;
     }
+
+    /**
+     * Checks format of repo name provided.
+     *
+     * @param string $repo Repository Name.
+     *
+     * @return bool
+     */
+    protected function isValidRepoName($repo) {
+        if (substr_count($repo, '/') != 1) {
+            return false;
+        }
+        return true;
+    }
+
+    //End of API Calls
 
     /**
      * Test controller.
