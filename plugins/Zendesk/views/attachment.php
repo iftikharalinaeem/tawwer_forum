@@ -10,7 +10,6 @@
  * @param array $attachment
  */
 function Write_ZendeskTicket_Attachment($attachment) {
-    var_dump($attachment);
     ?>
     <div class="item-attachment">
         <div class="alert">
