@@ -92,6 +92,7 @@ class RankModel extends Gdn_Model {
       
       self::AbilityString($Abilities, 'DiscussionsAdd', 'Add Discussions', $Result);
       self::AbilityString($Abilities, 'CommentsAdd', 'Add Comments', $Result);
+      self::AbilityString($Abilities, 'ConversationsAdd', 'Start Private Conversations', $Result);
       self::AbilityString($Abilities, 'Verified', 'Verified', $Result);
       
       $V = GetValue('Format', $Abilities);
@@ -161,6 +162,11 @@ class RankModel extends Gdn_Model {
       if ($V = GetValue('CommentsAdd', $Abilities)) {
          if ($V == 'no')
             $Session->SetPermission('Vanilla.Comments.Add', array());
+      }
+
+      // Add conversations.
+      if ($V = GetValue('ConversationsAdd', $Abilities)) {
+         $Session->SetPermission('Conversations.Conversations.Add', $V == 'yes' ? TRUE : FALSE);
       }
       
       // Verified.
