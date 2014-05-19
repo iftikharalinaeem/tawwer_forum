@@ -8,8 +8,7 @@ $PluginInfo['sitehub'] = array(
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
     'License'     => 'Proprietary',
-    'RequiredPlugins' => array('SimpleApi' => '1.0')
-
+    'RequiredPlugins' => array('SimpleApi' => '1.0'),
 );
 
 /**
@@ -45,6 +44,11 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->column('DateUpdated', 'datetime', true)
             ->column('UpdateUserID', 'int', true)
             ->set();
+
+        Gdn::Structure()
+            ->table('Role')
+            ->column('HubSync', ['settings', 'membership'], true)
+            ->set();
     }
 
     /// Event Handlers ///
@@ -77,7 +81,13 @@ class SiteHubPlugin extends Gdn_Plugin {
         }
         $ssoUser = arrayTranslate($user, array('UserID', 'Name', 'Email', 'Banned', 'Photo', 'PhotoUrl'));
         $ssoUser['Photo'] = $ssoUser['PhotoUrl'];
-        $ssoUser['Roles'] = ConsolidateArrayValuesByKey(Gdn::UserModel()->GetRoles($user['UserID'])->ResultArray(), 'Name');
+
+        $roles = Gdn::UserModel()->GetRoles($user['UserID'])->ResultArray();
+        foreach ($roles as $role) {
+            if (val('HubSync', $role)) {
+                $ssoUser['Roles'][] = $role['Name'];
+            }
+        }
 
         $sender->EventArguments['User'] =& $ssoUser;
         $sender->EventArguments['Session'] =& $user;
@@ -86,5 +96,19 @@ class SiteHubPlugin extends Gdn_Plugin {
         $sender->Data = array('User' => $ssoUser);
         SaveToConfig('Api.Clean', false, false);
         $sender->Render('Blank', 'Utility', 'Dashboard');
+    }
+
+    /**
+     * Add hub specific control options to the roles.
+     *
+     * @param RoleController $sender
+     * @param array $args
+     */
+    public function roleController_beforeRolePermissions_handler($sender, $args) {
+        $sender->Data['_ExtendedFields']['HubSync'] = [
+            'Control' => 'RadioList',
+            'Description' => 'Specify how this role synchronizes to the node sites.',
+            'Items' => ['' => 'None', 'settings' => 'Settings', 'membership' => 'Settings & Membership']
+        ];
     }
 }
