@@ -193,6 +193,9 @@ class OnlinePlugin extends Gdn_Plugin {
             $this->trackActiveUser(true);
             break;
       }
+
+      // Cleanup some entries maybe
+      $this->cleanup();
    }
 
    /**
@@ -451,9 +454,6 @@ class OnlinePlugin extends Gdn_Plugin {
 
       // Remember that we've written to the DB
       Gdn::cache()->store($userLastWriteKey, self::$now);
-
-      // Cleanup some entries
-      $this->cleanup();
    }
 
    /*
