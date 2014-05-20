@@ -542,7 +542,7 @@ class OnlinePlugin extends Gdn_Plugin {
          try {
             $allOnlineUsersResult = Gdn::sql()
                ->cache(self::CACHE_ONLINE_LIST_KEY, 'get', array(
-                  Gdn_Cache::FEATURE_EXPIRY => 10
+                  Gdn_Cache::FEATURE_EXPIRY => 30
                ))
                ->select('UserID, Timestamp')
                ->from('Online')
