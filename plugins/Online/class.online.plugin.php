@@ -515,7 +515,7 @@ class OnlinePlugin extends Gdn_Plugin {
    public function cleanup($limit = 0) {
       $lastCleanup = Gdn::cache()->get(self::CACHE_CLEANUP_DELAY_KEY);
       $lastCleanupDelay = time() - $lastCleanup;
-      if ($lastCleanupDelay < $this->cleanDelay)
+      if ($lastCleanup && $lastCleanupDelay < $this->cleanDelay)
          return;
 
       Trace('OnlinePlugin->Cleanup');
