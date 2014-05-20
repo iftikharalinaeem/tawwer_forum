@@ -39,7 +39,7 @@ class DbLogger extends BaseLogger {
         if ($attributes) {
             $insert['Attributes'] = json_encode($attributes);
         }
-        $insert['EventLogID'] = uniqid();
+        $insert['EventLogID'] = uniqid('', true);
 
         return Gdn::SQL()->Insert('EventLog', $insert);
     }

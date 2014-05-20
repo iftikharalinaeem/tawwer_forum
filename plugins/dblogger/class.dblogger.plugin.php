@@ -46,4 +46,87 @@ class DbLoggerPlugin extends Gdn_Plugin {
         Logger::setLogger(new DbLogger());
 
     }
+
+    /**
+     * @param SettingsController $Sender
+     * @param string $Page
+     */
+    public function SettingsController_EventLog_Create($Sender, $Page = '') {
+        $Sender->Permission('Garden.Settings.Manage');
+
+        list($offset, $limit) = OffsetLimit($Page, 30);
+        SaveToConfig('Api.Clean', false, false);
+        $sql = Gdn::SQL();
+
+        $sql->From('EventLog')
+            ->Limit($limit, $offset);
+
+        $get = array_change_key_case($Sender->Request->Get());
+
+        // Look for query parameters to filter the data.
+        // todo: use timezone? on dateto and datefrom
+        if ($v = val('datefrom', $get)) {
+            $v = strtotime($v);
+            if (!$v) {
+                throw new Gdn_UserException('Invalid date time format.');
+            }
+            $sql->Where('TimeInserted >=', $v);
+        }
+
+        if ($v = val('dateto', $get)) {
+            $v = strtotime($v);
+            if (!$v) {
+                throw new Gdn_UserException('Invalid date time format.');
+            }
+            $sql->Where('TimeInserted <=', $v);
+        }
+
+        if ($v = val('severity', $get)) {
+            $validLevels = array(
+                'info' => true,
+                'notice' => true,
+                'warning' => true,
+                'error' => true,
+            );
+            $validLevelString = implode(', ', array_keys(array_slice($validLevels, 0, -1)));
+            $validLevelString .= ' and ' . end(array_keys($validLevels));
+
+            if (!isset($validLevels[$v])) {
+                throw new Gdn_UserException('Invalid severity.  Valid options are: ' . $validLevelString);
+            }
+            $sql->Where('LogLevel =', $v);
+        }
+
+        if ($v = val('event', $get)) {
+            $sql->Where('event =', $v);
+        }
+
+        if ($v = val('sortorder', $get)) {
+            if ($v == 'asc') {
+                $sortOrder = 'asc';
+            } else {
+                $sortOrder = 'desc';
+            }
+        } else {
+            $sortOrder = 'desc';
+        }
+        $sql->OrderBy('TimeInserted', $sortOrder);
+
+
+        $events = $sql->Get();
+
+        // Application calculation.
+        foreach ($events as &$event) {
+            $event->FullPath = $event->Domain . ltrim($event->Path, '/');
+            $event->DateTimeInserted = Gdn_Format::DateFull($event->TimeInserted);
+            unset($event->Domain);
+            unset($event->Path);
+            unset($event->TimeInserted);
+        }
+
+        $Sender->AddSideMenu();
+//        $Sender->SetData('Events', $events);
+//        $Sender->Render('eventlog', '', 'plugins/dblogger');
+    }
+
 }
