@@ -125,8 +125,8 @@ class DbLoggerPlugin extends Gdn_Plugin {
         }
 
         $Sender->AddSideMenu();
-//        $Sender->SetData('Events', $events);
-//        $Sender->Render('eventlog', '', 'plugins/dblogger');
+        $Sender->SetData('Events', $events);
+        $Sender->Render('eventlog', '', 'plugins/dblogger');
     }
 
 }
