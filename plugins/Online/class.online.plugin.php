@@ -110,6 +110,12 @@ class OnlinePlugin extends Gdn_Plugin {
    const CACHE_ONLINE_MODULE_KEY = 'plugin.online.%s.%s.module';
 
    /**
+    * Cache list of online users temporarily to aleviate database
+    * @const string
+    */
+   const CACHE_ONLINE_LIST_KEY = 'plugin.online.users.list';
+
+   /**
     * Names of cookies and cache keys for tracking guests.
     * @const string
     */
