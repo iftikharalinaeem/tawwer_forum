@@ -522,12 +522,9 @@ class OnlinePlugin extends Gdn_Plugin {
       // How old does an entry have to be to get pruned?
       $pruneTimestamp = self::$now - $this->pruneDelay;
 
-      $delete = Gdn::sql()
-         ->from('Online')
-         ->where('Timestamp<', Gdn_Format::toDateTime($pruneTimestamp));
-      if ($limit > 0)
-         $delete->limit($limit);
-      $delete->delete();
+      Gdn::sql()->delete('Online', array(
+         'Timestamp<' => Gdn_Format::toDateTime($pruneTimestamp)
+      ));
 
       // Remember that we've cleaned up the DB
       Gdn::cache()->store(self::CACHE_CLEANUP_DELAY_KEY, self::$now);
