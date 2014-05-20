@@ -141,9 +141,9 @@ class OnlinePlugin extends Gdn_Plugin {
       $this->cacheCountDelay = C('Plugins.Online.CacheCountDelay', 20);
       $this->cacheRenderDelay = C('Plugins.Online.CacheRenderDelay', 30);
 
-      $UTC = new DateTimeZone('UTC');
-      $CurrentDate = new DateTime('now', $UTC);
-      self::$now = $CurrentDate->getTimestamp();
+      $utc = new DateTimeZone('UTC');
+      $now = new DateTime('now', $utc);
+      self::$now = $now->getTimestamp();
    }
 
    /**
@@ -524,7 +524,7 @@ class OnlinePlugin extends Gdn_Plugin {
 
       $delete = Gdn::sql()
          ->from('Online')
-         ->where('Timestamp', Gdn_Format::toDateTime($pruneTimestamp));
+         ->where('Timestamp<', Gdn_Format::toDateTime($pruneTimestamp));
       if ($limit > 0)
          $delete->limit($limit);
       $delete->delete();
