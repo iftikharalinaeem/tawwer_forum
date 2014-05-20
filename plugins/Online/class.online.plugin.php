@@ -386,7 +386,7 @@ class OnlinePlugin extends Gdn_Plugin {
          $location = OnlinePlugin::whereAmI();
 
          // Get the extra data we pushed into the tick with our events
-         $tickExtra = @json_decode(Gdn::request()->getValue('TickExtra'), true);
+         $tickExtra = json_decode(Gdn::request()->getValue('TickExtra'), true);
          if (!is_array($tickExtra)) $tickExtra = array();
 
          // Get the user's cache supplement
@@ -425,10 +425,11 @@ class OnlinePlugin extends Gdn_Plugin {
          // If there are, write the new one to the cache
          $userSupplementHash = md5(serialize($userOnlineSupplement));
          $supplementHash = md5(serialize($onlineSupplement));
-         if ($userSupplementHash != $supplementHash)
+         if ($userSupplementHash != $supplementHash) {
             Gdn::cache()->store($userOnlineSupplementKey, $onlineSupplement, array(
                Gdn_Cache::FEATURE_EXPIRY  => ($this->pruneDelay * 2)
             ));
+         }
       }
 
       // Now check if we need to update the user's status in the Online table
@@ -447,6 +448,9 @@ class OnlinePlugin extends Gdn_Plugin {
       $px = Gdn::database()->DatabasePrefix;
       $sql = "INSERT INTO {$px}Online (UserID, Name, Timestamp) VALUES (:UserID, :Name, :Timestamp) ON DUPLICATE KEY UPDATE Timestamp = :Timestamp1";
       Gdn::database()->query($sql, array(':UserID' => $userID, ':Name' => $userName, ':Timestamp' => $timestamp, ':Timestamp1' => $timestamp));
+
+      // Remember that we've written to the DB
+      Gdn::cache()->store($userLastWriteKey, time());
 
       // Cleanup some entries
       $this->cleanup();
@@ -519,11 +523,12 @@ class OnlinePlugin extends Gdn_Plugin {
       $pruneTimestamp = self::$now - $this->pruneDelay;
 
       $delete = Gdn::sql()->where('Timestamp', Gdn_Format::toDateTime($pruneTimestamp));
-
       if ($limit > 0)
          $delete->limit($limit);
-
       $delete->delete('Online');
+
+      // Remember that we've cleaned up the DB
+      Gdn::cache()->store(self::CACHE_CLEANUP_DELAY_KEY, time());
    }
 
    /**
