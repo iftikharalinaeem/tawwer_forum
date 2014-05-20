@@ -1076,7 +1076,7 @@ class OnlinePlugin extends Gdn_Plugin {
       Gdn::structure()->table('Online')
          ->column('UserID', 'int(11)', false, 'primary')
          ->column('Name', 'varchar(64)', null)
-         ->column('Timestamp', 'datetime')
+         ->column('Timestamp', 'datetime', false, 'index')
          ->set(false, false);
    }
 }
