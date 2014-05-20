@@ -436,7 +436,7 @@ class OnlinePlugin extends Gdn_Plugin {
       $userLastWriteKey = sprintf(self::CACHE_LAST_WRITE_KEY, $userID);
       $userLastWrite = Gdn::cache()->get($userLastWriteKey);
 
-      $lastWriteDelay = time() - $userLastWrite;
+      $lastWriteDelay = self::$now - $userLastWrite;
       if ($lastWriteDelay < $this->writeDelay)
          return;
 
@@ -450,7 +450,7 @@ class OnlinePlugin extends Gdn_Plugin {
       Gdn::database()->query($sql, array(':UserID' => $userID, ':Name' => $userName, ':Timestamp' => $timestamp, ':Timestamp1' => $timestamp));
 
       // Remember that we've written to the DB
-      Gdn::cache()->store($userLastWriteKey, time());
+      Gdn::cache()->store($userLastWriteKey, self::$now);
 
       // Cleanup some entries
       $this->cleanup();
@@ -514,7 +514,7 @@ class OnlinePlugin extends Gdn_Plugin {
     */
    public function cleanup($limit = 0) {
       $lastCleanup = Gdn::cache()->get(self::CACHE_CLEANUP_DELAY_KEY);
-      $lastCleanupDelay = time() - $lastCleanup;
+      $lastCleanupDelay = self::$now - $lastCleanup;
       if ($lastCleanup && $lastCleanupDelay < $this->cleanDelay)
          return;
 
@@ -528,7 +528,7 @@ class OnlinePlugin extends Gdn_Plugin {
       $delete->delete('Online');
 
       // Remember that we've cleaned up the DB
-      Gdn::cache()->store(self::CACHE_CLEANUP_DELAY_KEY, time());
+      Gdn::cache()->store(self::CACHE_CLEANUP_DELAY_KEY, self::$now);
    }
 
    /**
