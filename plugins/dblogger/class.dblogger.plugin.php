@@ -16,6 +16,13 @@ $PluginInfo['dblogger'] = array(
 
 class DbLoggerPlugin extends Gdn_Plugin {
 
+    public $severityOptions = array(
+        'info' => true,
+        'notice' => true,
+        'warning' => true,
+        'error' => true,
+    );
+
     public function setup() {
         $this->structure();
     }
@@ -82,16 +89,10 @@ class DbLoggerPlugin extends Gdn_Plugin {
         }
 
         if ($v = val('severity', $get)) {
-            $validLevels = array(
-                'info' => true,
-                'notice' => true,
-                'warning' => true,
-                'error' => true,
-            );
-            $validLevelString = implode(', ', array_keys(array_slice($validLevels, 0, -1)));
-            $validLevelString .= ' and ' . end(array_keys($validLevels));
+            $validLevelString = implode(', ', array_keys(array_slice($this->severityOptions, 0, -1)));
+            $validLevelString .= ' and ' . end(array_keys($this->severityOptions));
 
-            if (!isset($validLevels[$v])) {
+            if (!isset($this->severityOptions[$v])) {
                 throw new Gdn_UserException('Invalid severity.  Valid options are: ' . $validLevelString);
             }
             $sql->Where('LogLevel =', $v);
@@ -101,14 +102,13 @@ class DbLoggerPlugin extends Gdn_Plugin {
             $sql->Where('event =', $v);
         }
 
+        $sortOrder = 'desc';
         if ($v = val('sortorder', $get)) {
             if ($v == 'asc') {
                 $sortOrder = 'asc';
             } else {
                 $sortOrder = 'desc';
             }
-        } else {
-            $sortOrder = 'desc';
         }
         $sql->OrderBy('TimeInserted', $sortOrder);
 
@@ -119,14 +119,37 @@ class DbLoggerPlugin extends Gdn_Plugin {
         foreach ($events as &$event) {
             $event->FullPath = $event->Domain . ltrim($event->Path, '/');
             $event->DateTimeInserted = Gdn_Format::DateFull($event->TimeInserted);
+            $event->InsertProfileUrl = UserUrl(Gdn::UserModel()->GetID($event->InsertUserID));
             unset($event->Domain);
             unset($event->Path);
             unset($event->TimeInserted);
         }
 
+        $Sender->Form = new Gdn_Form();
         $Sender->AddSideMenu();
-        $Sender->SetData('Events', $events);
+        $SeverityOptions = self::getArrayWithKeysAsValues($this->severityOptions);
+        $SeverityOptions[] = 'All';
+        $Sender->SetData(
+            array(
+                'Events' => $events,
+                'SeverityOptions' => $SeverityOptions,
+                'SortOrder' => $sortOrder
+                )
+        );
+
         $Sender->Render('eventlog', '', 'plugins/dblogger');
+    }
+
+    /**
+     * Takes all of the vales and sets them to that of the key.
+     *
+     * @param array $array Input array.
+     *
+     * @return array Output array.
+     */
+    public static function getArrayWithKeysAsValues($array) {
+        $keys = array_keys($array);
+        return array_combine($keys, $keys);
     }
 
 }
