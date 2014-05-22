@@ -43,6 +43,12 @@
     .blockgrid li.float-left {
         padding: 0 20px;
     }
+    input.Short {
+        width: 165px;
+    }
+    .buttons {
+        margin-top: 15px;
+    }
 </style>
 
 <h1>Event Logs</h1>
@@ -54,15 +60,15 @@ echo $this->Form->Errors();
     <ul class="cf blockgrid">
         <li class="float-left">
             <?php echo $this->Form->Label('Date From', 'datefrom');  ?>
-            <?php echo $this->Form->TextBox('datefrom'); ?>
+            <?php echo $this->Form->TextBox('datefrom', array('class' => 'InputBox Short')); ?>
         </li>
         <li class="float-left">
             <?php echo $this->Form->Label('Date To', 'dateto');  ?>
-            <?php echo $this->Form->TextBox('dateto'); ?>
+            <?php echo $this->Form->TextBox('dateto', array('class' => 'InputBox Short')); ?>
         </li>
         <li class="float-left">
             <?php echo $this->Form->Label('Event Name', 'event');  ?>
-            <?php echo $this->Form->TextBox('event'); ?>
+            <?php echo $this->Form->TextBox('event', array('class' => 'InputBox Short')); ?>
         </li>
         <li class="float-left">
             <?php echo $this->Form->Label('Severity', 'severity');  ?>
@@ -73,11 +79,14 @@ echo $this->Form->Errors();
             <?php echo $this->Form->DropDown('sortorder', array('desc' => 'DESC', 'asc' => 'ASC')); ?>
 
         </li>
+        <li class="float-left buttons">
+            <?php echo $this->Form->Button("Filter"); ?>
+            <?php echo $this->Form->Button("Reset", array('id' => 'filter-reset', 'type' => 'reset')); ?>
+            <?php echo $this->Form->Close(); ?>
+
+        </li>
     </ul>
 </div>
-<?php echo $this->Form->Button("Filter"); ?>
-<?php echo $this->Form->Button("Reset", array('id' => 'filter-reset', 'type' => 'reset')); ?>
-<?php echo $this->Form->Close(); ?>
 <?php PagerModule::Write(array('Sender' => $this)); ?>
 
 <table class="AltColumns">
@@ -108,7 +117,7 @@ echo $this->Form->Errors();
                 </td>
                 <td><?php echo htmlspecialchars($event['LogLevel']); ?></td>
                 <td><?php echo htmlspecialchars($event['Event']); ?></td>
-                <td><?php echo htmlspecialchars($event['InsertIPAddress']); ?></td>
+                <td><?php echo Anchor($event['InsertIPAddress'], Url('/user/browse?Keywords=') . $event['InsertIPAddress']); ?></td>
 
             </tr>
             <?php
