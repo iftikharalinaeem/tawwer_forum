@@ -61,12 +61,14 @@ class DbLoggerPlugin extends Gdn_Plugin {
     public function SettingsController_EventLog_Create($Sender, $Page = '') {
         $Sender->Permission('Garden.Settings.Manage');
 
-        list($offset, $limit) = OffsetLimit($Page, 30);
+        $Sender->Form = new Gdn_Form();
+        $pageSize = 30;
+        list($offset, $limit) = OffsetLimit($Page, $pageSize);
         SaveToConfig('Api.Clean', false, false);
         $sql = Gdn::SQL();
 
         $sql->From('EventLog')
-            ->Limit($limit, $offset);
+            ->Limit($limit + 1, $offset);
 
         $get = array_change_key_case($Sender->Request->Get());
 
@@ -75,31 +77,37 @@ class DbLoggerPlugin extends Gdn_Plugin {
         if ($v = val('datefrom', $get)) {
             $v = strtotime($v);
             if (!$v) {
-                throw new Gdn_UserException('Invalid date time format.');
+                $Sender->Form->AddError('Invalid Date format for From Date.');
             }
             $sql->Where('TimeInserted >=', $v);
+            $Sender->Form->SetFormValue('datefrom', $get['datefrom']);
         }
 
         if ($v = val('dateto', $get)) {
             $v = strtotime($v);
             if (!$v) {
-                throw new Gdn_UserException('Invalid date time format.');
+                $Sender->Form->AddError('Invalid Date format for To Date.');
             }
             $sql->Where('TimeInserted <=', $v);
+            $Sender->Form->SetFormValue('dateto', $get['dateto']);
         }
 
-        if ($v = val('severity', $get)) {
+        $Sender->Form->SetFormValue('severity', 'all');
+        if (($v = val('severity', $get)) && $v != 'all') {
             $validLevelString = implode(', ', array_keys(array_slice($this->severityOptions, 0, -1)));
             $validLevelString .= ' and ' . end(array_keys($this->severityOptions));
 
             if (!isset($this->severityOptions[$v])) {
-                throw new Gdn_UserException('Invalid severity.  Valid options are: ' . $validLevelString);
+                $Sender->Form->AddError('Invalid severity.  Valid options are: ' . $validLevelString);
             }
             $sql->Where('LogLevel =', $v);
+            $Sender->Form->SetFormValue('severity', $v);
+
         }
 
         if ($v = val('event', $get)) {
             $sql->Where('event =', $v);
+            $Sender->Form->SetFormValue('event', $v);
         }
 
         $sortOrder = 'desc';
@@ -111,30 +119,41 @@ class DbLoggerPlugin extends Gdn_Plugin {
             }
         }
         $sql->OrderBy('TimeInserted', $sortOrder);
+        $Sender->Form->SetFormValue('sortorder', $sortOrder);
 
+        $events = $sql->Get()->ResultArray();
+        $events = array_splice($events, 0, $pageSize);
 
-        $events = $sql->Get();
 
         // Application calculation.
         foreach ($events as &$event) {
-            $event->FullPath = $event->Domain . ltrim($event->Path, '/');
-            $event->DateTimeInserted = Gdn_Format::DateFull($event->TimeInserted);
-            $event->InsertProfileUrl = UserUrl(Gdn::UserModel()->GetID($event->InsertUserID));
-            unset($event->Domain);
-            unset($event->Path);
-            unset($event->TimeInserted);
+            $event['FullPath'] = $event['Domain'] . ltrim($event['Path'], '/');
+            $event['DateTimeInserted'] = Gdn_Format::DateFull($event['TimeInserted']);
+            $event['InsertProfileUrl'] = UserUrl(Gdn::UserModel()->GetID($event['InsertUserID']));
+            unset($event['Domain']);
+            unset($event['Path']);
+            unset($event['TimeInserted']);
         }
 
-        $Sender->Form = new Gdn_Form();
+        $Sender->SetData('_CurrentRecords', count($events));
+
         $Sender->AddSideMenu();
         $SeverityOptions = self::getArrayWithKeysAsValues($this->severityOptions);
-        $SeverityOptions[] = 'All';
+        $SeverityOptions['all'] = 'All';
+
+        $filter = Gdn::Request()->Get();
+        unset($filter['TransientKey']);
+        unset($filter['hpt']);
+        unset($filter['Filter']);
+        $CurrentFilter = http_build_query($filter);
+
         $Sender->SetData(
             array(
                 'Events' => $events,
                 'SeverityOptions' => $SeverityOptions,
-                'SortOrder' => $sortOrder
-                )
+                'SortOrder' => $sortOrder,
+                'CurrentFilter' => $CurrentFilter
+            )
         );
 
         $Sender->Render('eventlog', '', 'plugins/dblogger');
