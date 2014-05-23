@@ -106,7 +106,7 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
 
    $UrlCode2 = strtolower($UrlCode);
    if ($IsHeading) {
-      $Url = '';
+      $Url = "#!React-$Label";
       $DataAttr = '';
    } else {
       $Url = Url("/react/$RecordType/$UrlCode2?id=$ID");
