@@ -2,223 +2,173 @@
  * Editor action styles within editor and post
  */
 .post-font-size-smaller {
-  font-size: smaller;
-}
+  font-size: smaller; }
 
 .post-font-size-larger {
-  font-size: larger;
-}
+  font-size: larger; }
 
 .post-font-size-xx-large {
-  font-size: xx-large;
-}
+  font-size: xx-large; }
 
 .post-font-size-x-large {
-  font-size: x-large;
-}
+  font-size: x-large; }
 
 .post-font-size-large {
-  font-size: large;
-}
+  font-size: large; }
 
 .post-font-size-medium {
-  font-size: medium;
-}
+  font-size: medium; }
 
 .post-font-size-small {
-  font-size: small;
-}
+  font-size: small; }
 
 .post-font-size-x-small {
-  font-size: x-small;
-}
+  font-size: x-small; }
 
 .post-font-size-xx-small {
-  font-size: xx-small;
-}
+  font-size: xx-small; }
 
 /* Colours based on http://clrs.cc/
 cell-* are used for the dropdown */
 .post-color-black {
-  color: #111111;
-}
+  color: #111111; }
 
 .cell-color-black {
-  background-color: #111111;
-}
+  background-color: #111111; }
 
 .post-color-silver {
-  color: #dddddd;
-}
+  color: #dddddd; }
 
 .cell-color-silver {
-  background-color: #dddddd;
-}
+  background-color: #dddddd; }
 
 .post-color-gray {
-  color: #aaaaaa;
-}
+  color: #aaaaaa; }
 
 .cell-color-gray {
-  background-color: #aaaaaa;
-}
+  background-color: #aaaaaa; }
 
 .post-color-white {
-  color: #ffffff;
-}
+  color: #ffffff; }
 
 .cell-color-white {
-  background-color: #ffffff;
-}
+  background-color: #ffffff; }
 
 .post-color-maroon {
-  color: #85144b;
-}
+  color: #85144b; }
 
 .cell-color-maroon {
-  background-color: #85144b;
-}
+  background-color: #85144b; }
 
 .post-color-red {
-  color: #ff4136;
-}
+  color: #ff4136; }
 
 .cell-color-red {
-  background-color: #ff4136;
-}
+  background-color: #ff4136; }
 
 .post-color-purple {
-  color: #7b11d0;
-}
+  color: #7b11d0; }
 
 .cell-color-purple {
-  background-color: #7b11d0;
-}
+  background-color: #7b11d0; }
 
 .post-color-fuchsia {
-  color: #f012be;
-}
+  color: #f012be; }
 
 .cell-color-fuchsia {
-  background-color: #f012be;
-}
+  background-color: #f012be; }
 
 .post-color-green {
-  color: #2ecc40;
-}
+  color: #2ecc40; }
 
 .cell-color-green {
-  background-color: #2ecc40;
-}
+  background-color: #2ecc40; }
 
 .post-color-lime {
-  color: #01ff70;
-}
+  color: #01ff70; }
 
 .cell-color-lime {
-  background-color: #01ff70;
-}
+  background-color: #01ff70; }
 
 .post-color-olive {
-  color: #3d9970;
-}
+  color: #3d9970; }
 
 .cell-color-olive {
-  background-color: #3d9970;
-}
+  background-color: #3d9970; }
 
 .post-color-yellow {
-  color: #ffdc00;
-}
+  color: #ffdc00; }
 
 .cell-color-yellow {
-  background-color: #ffdc00;
-}
+  background-color: #ffdc00; }
 
 .post-color-navy {
-  color: #001f3f;
-}
+  color: #001f3f; }
 
 .cell-color-navy {
-  background-color: #001f3f;
-}
+  background-color: #001f3f; }
 
 .post-color-blue {
-  color: #0074d9;
-}
+  color: #0074d9; }
 
 .cell-color-blue {
-  background-color: #0074d9;
-}
+  background-color: #0074d9; }
 
 .post-color-teal {
-  color: #39cccc;
-}
+  color: #39cccc; }
 
 .cell-color-teal {
-  background-color: #39cccc;
-}
+  background-color: #39cccc; }
 
 .post-color-aqua {
-  color: #7fdbff;
-}
+  color: #7fdbff; }
 
 .cell-color-aqua {
-  background-color: #7fdbff;
-}
+  background-color: #7fdbff; }
 
 .post-text-align-right {
-  text-align: right;
-}
+  text-align: right; }
 
 .post-text-align-center {
-  text-align: center;
-}
+  text-align: center; }
 
 .post-text-align-left {
-  text-align: left;
-}
+  text-align: left; }
 
 .post-text-align-justify {
-  text-align: justify;
-}
+  text-align: justify; }
 
 .post-float-left {
   float: left;
-  margin: 0 8px 8px 0;
-}
+  margin: 0 8px 8px 0; }
 
 .post-float-right {
   float: right;
-  margin: 0 0 8px 8px;
-}
+  margin: 0 0 8px 8px; }
 
 .post-clear-right {
-  clear: right;
-}
+  clear: right; }
 
 .post-clear-left {
-  clear: left;
-}
+  clear: left; }
 
 /* Custom classes */
+
 blockquote.Quote {
   background: rgba(0, 0, 0, 0.05);
   border-left: 4px solid rgba(0, 0, 0, 0.1);
   margin: 1em;
-  padding: 1ex 10px;
-}
+  padding: 1ex 10px; }
 
 pre.CodeBlock {
   background-color: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.07);
-}
+  border: 1px solid rgba(0, 0, 0, 0.07); }
+
 
 .Spoiler {
   background-color: rgba(0, 0, 0, 0.05) !important;
   margin: 1em 0;
-  padding: 1ex 16px;
-}
+  padding: 1ex 16px; }
 
 .Message .Spoiler {
   overflow: hidden;
@@ -229,21 +179,18 @@ pre.CodeBlock {
   padding: 8px 16px;
   position: relative;
   cursor: pointer;
-  font-size: 0;
-}
+  font-size: 0; }
 
 .Message .Spoiler:hover {
   border: 1px solid rgba(0, 0, 0, 0.15);
-  background-color: rgba(0, 0, 0, 0.1) !important;
-}
+  background-color: rgba(0, 0, 0, 0.1) !important; }
 
 .Message .Spoiler:before {
   content: '...';
   position: absolute;
   top: -7px;
   left: 9px;
-  font-size: 14px;
-}
+  font-size: 14px; }
 
 .Spoiled {
   background-color: rgba(0, 0, 0, 0.05);
@@ -251,20 +198,17 @@ pre.CodeBlock {
   padding: 20px;
   font-size: inherit;
   margin: 5px 0;
-  transition: padding 0.1s ease;
-}
+  -webkit-transition: padding 0.1s ease;
+  transition: padding 0.1s ease; }
 
 .AlignLeft {
-  text-align: left;
-}
+  text-align: left; }
 
 .AlignCenter {
-  text-align: center;
-}
+  text-align: center; }
 
 .AlignRight {
-  text-align: right;
-}
+  text-align: right; }
 
 /**
  * Target iframe and actual body within editor iframe. Do not use body to set
@@ -275,11 +219,12 @@ pre.CodeBlock {
  * this).
  */
 /* iframe */
+
 /* body within iframe */
 .editor-composer {
   margin: 0;
   border: 0;
   padding: inherit;
   font: inherit;
-  outline: none;
-}
+  outline: none; }
+/*# sourceMappingURL=wysiwyg.css.map */

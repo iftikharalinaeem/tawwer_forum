@@ -54,7 +54,6 @@
 
 /* If editor is fullpage */
 #editor-fullpage-candidate {
-
    .editor-upload-progress {
       margin: 0;
    }
@@ -75,31 +74,26 @@
 }
 
 .editor-file-preview {
-   box-sizing: border-box;
-   border-radius: 2px;
-   border: 1px solid #fff;
-   box-shadow: 0 0 2px 0 rgba(0,0,0,0.20);
-   background-color: #eaeaea; /*rgba(0,0,0,0.05);*/
+   position: relative;
+   float: left;
+   height: $file-preview-height;
+   width: 220px;
    padding: 0;
    margin: 5px;
-   float: left;
    overflow: hidden;
-   width: 220px;
    font-size: 12px;
-   position: relative;
    color: #999;
    text-shadow: 0 0 1px #fff;
+   background-color: #eaeaea; /*rgba(0,0,0,0.05);*/
+   border: $file-preview-border-width solid #fff;
+   border-radius: 2px;
+   box-shadow: 0 0 2px 0 rgba(0,0,0,0.20);
+   box-sizing: border-box;
 
    /* This is for the transition when removing/reattaching files. Height
    is necessary due to floated elements and width, which cause them to
    occupy space under image until width is full. */
    transition: all 0.1s ease;
-   height: 32px;
-
-   -webkit-animation-duration: 0.8s;
-   -webkit-animation-name: editor-file-preview;
-   -webkit-animation-fill-mode: both;
-   -webkit-animation-duration: 0.4s;
    animation-duration: 0.8s;
    animation-name: editor-file-preview;
    animation-fill-mode: both;
@@ -108,8 +102,8 @@
    .file-preview {
       display: block;
       float: left;
-      height: 32px;
-      width: 32px;
+      width: $file-preview-size-inner;
+      height: $file-preview-size-inner;
 
       &.img {
          padding: 0;
@@ -118,32 +112,32 @@
       }
 
       &.icon-file {
-         padding: 4px 0 0 0;
-         text-align: center;
          font-size: 18px;
+         line-height: $file-preview-size-inner;
+         text-align: center;
       }
    }
 
    .file-data {
       float: left;
-      margin: 0 0 0 5px;
-      padding: 0;
       width: 158px;
+      padding: 2px 0;
+      margin: 0 0 0 5px;
+      line-height: (($file-preview-size-inner - (2px * 2)) / 2);
 
       .filename {
          display: block;
          width: 100%;
          overflow: hidden;
-         text-overflow: ellipsis;
-         white-space: nowrap;
-         margin: -2px 0 -8px 0;
          color: rgba(0,0,0,0.75);
+         white-space: nowrap;
+         text-overflow: ellipsis;
       }
 
       .meta {
          display: block;
-         font-size: 10px;
          margin: 0;
+         font-size: 10px;
 
          em {
             font-style: italic;
@@ -152,28 +146,27 @@
    }
 
    .editor-file-remove {
-      cursor: pointer;
-   }
-
-   .editor-file-remove:after {
-      display: block;
-      content: '\00D7';
       float: right;
+      height: $file-preview-size-inner;
       cursor: pointer;
-      font-size: 10px;
-      text-align: center;
-      width: 22px;
-      height: 28px;
-      padding: 4px 0 0 1px;
       background-color: #fff;
       box-shadow: inset 2px 0 2px -3px #000;
    }
 
+   .editor-file-remove:after {
+      display: block;
+      width: 24px;
+      font-family: Arial, sans-serif; // Arial offers more consistent sizing
+      font-size: 14px;
+      line-height: $file-preview-size-inner;
+      text-align: center;
+      content: "\00D7";
+   }
+
    .editor-file-remove:hover:after {
-      text-shadow: 0 0 1px rgba(0,0,0,0.60);
-      color: #fff;
       font-weight: bold;
-      font-size: 12px;
+      color: $white;
+      text-shadow: 0 0 1px rgba($black,.6);
    }
 
    .editor-file-reattach {
@@ -208,9 +201,6 @@
    }
 }
 
-
-
-
 .editor-file-removed {
    width: 32px;
    height: 32px;
@@ -229,19 +219,8 @@
 
 @keyframes editor-file-preview {
    0% {
-     opacity: 0;
-     transform: scale(1.10);
-   }
-   100% {
-      opacity: 1;
-      transform: scale(1);
-   }
-}
-
-@-webkit-keyframes editor-file-preview {
-   0% {
-     opacity: 0;
-     transform: scale(1.10);
+      opacity: 0;
+      transform: scale(1.10);
    }
    100% {
       opacity: 1;
