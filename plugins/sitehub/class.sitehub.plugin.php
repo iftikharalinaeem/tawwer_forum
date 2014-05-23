@@ -8,7 +8,9 @@ $PluginInfo['sitehub'] = array(
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
     'License'     => 'Proprietary',
-    'RequiredPlugins' => array('SimpleApi' => '1.0'),
+    'RequiredPlugins' => array(
+        'SimpleApi' => '1.0',
+    ),
 );
 
 /**
@@ -34,15 +36,18 @@ class SiteHubPlugin extends Gdn_Plugin {
 
     public function structure() {
         gdn::structure()
-            ->table('MultiSite')
-            ->primaryKey('MultiSiteID')
+            ->table('Multisite')
+            ->primaryKey('MultisiteID')
             ->column('Name', 'varchar(255)', false)
+            ->column('Slug', 'varchar(50)', false, 'unique.slug')
             ->column('Url', 'varchar(255)', false, 'unique.url')
-            ->column('Status', ['pending', 'building', 'active'], 'pending')
+            ->column('Status', ['pending', 'building', 'active', 'error'], 'pending')
+            ->column('DateStatus', 'datetime')
             ->column('DateInserted', 'datetime')
             ->column('InsertUserID', 'int')
             ->column('DateUpdated', 'datetime', true)
             ->column('UpdateUserID', 'int', true)
+            ->column('Attributes', 'text', true)
             ->set();
 
         Gdn::Structure()
@@ -52,6 +57,15 @@ class SiteHubPlugin extends Gdn_Plugin {
     }
 
     /// Event Handlers ///
+
+
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        /* @var SideMenuModule */
+        $menu = $sender->EventArguments['SideMenu'];
+
+        $menu->AddItem('sitehub', T('Site Hub'), FALSE, ['After' => 'Forum']);
+        $menu->AddLink('sitehub', T('Sites'), '/multisites', 'Garden.Settings.Manage');
+    }
 
     /**
      * @param Gdn_PluginManager $sender

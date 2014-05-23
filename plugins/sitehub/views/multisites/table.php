@@ -1,0 +1,31 @@
+<?php
+PagerModule::Write(array('Sender' => $this));
+?>
+<table id="multisites" class="AltColumns">
+    <thead>
+    <tr>
+        <th class="Alt UsernameCell"><?php echo T('Name'); ?></th>
+        <th><?php echo T('Url') ?></th>
+        <th><?php echo T('Status') ?></th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php
+    foreach ($this->Data('Sites') as $Row):
+    ?>
+        <tr id="<?php echo "Multisite_{$Row['MultisiteID']}"; ?>">
+            <td><?php echo htmlspecialchars($Row['Name']); ?></td>
+            <td>
+                <?php
+                echo Anchor(htmlspecialchars($Row['Url']), $Row['FullUrl'], '', ['target' => '_blank']);
+                ?>
+            </td>
+            <td><?php echo strtolower($Row['Status']); ?></td>
+        </tr>
+    <?php
+    endforeach;
+    ?>
+    </tbody>
+</table>
+<?php
+PagerModule::Write();
