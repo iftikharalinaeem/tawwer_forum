@@ -124,6 +124,13 @@ echo $this->Form->Open(), $this->Form->Errors();
      ?>
    </li>
    <li>
+      <?php
+      echo $this->Form->Label('Start Private Conversations', 'Abilities_ConversationsAdd'),
+         '<div class="Info2">'."You can limit the ability of members to initiate new private conversations.".'</div>',
+      $this->Form->RadioList('Abilities_ConversationsAdd', array('yes' => 'give', 'no' => 'take away', '' => 'default'));
+      ?>
+   </li>
+   <li>
      <?php
      echo $this->Form->Label('Verified', 'Abilities_Verified'),
      '<div class="Info2">'."You make higher-ranking users bypass the spam checking system.".'</div>',
