@@ -11,7 +11,7 @@ class MultisiteModel extends Gdn_Model {
     /**
      * @var MultisiteModel
      */
-    static $instance;
+    protected static $instance;
 
     /**
      * @var string
@@ -91,6 +91,9 @@ class MultisiteModel extends Gdn_Model {
                 'DateStatus' => Gdn_Format::ToDateTime()
             ]);
             return true;
+        } elseif ($buildQuery->code() == 409) {
+            // The site already existed.
+            $this->status($id, 'active');
         } else {
             // The site has an error.
             $error = $buildQuery->errorMsg();
@@ -99,23 +102,62 @@ class MultisiteModel extends Gdn_Model {
         }
     }
 
+    /**
+     * @param string $slug The site slug.
+     * @return string Returns the url of the site.
+     */
+    public function siteUrl($slug, $withDomain) {
+        if (IsUrl($slug)) {
+            throw new Gdn_UserException("$slug is not a valid slug.", 422);
+        }
+        $result = sprintf($this->siteUrlFormat, $slug);
+        if ($withDomain) {
+            if (!IsUrl($result)) {
+                $result = Gdn::Request()->Domain().'/'.ltrim($result, '/');
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Update the status of the site.
+     *
+     * @param int $id The id of the site.
+     * @param string $status The new status.
+     * @param string $error An error message for an error status.
+     */
     public function status($id, $status, $error = '') {
         $site = $this->getID($id);
-
-        $this->SetField($id, [
+        $attributes = $site['Attributes'];
+        $set = [
             'Status' => $status,
             'DateStatus' => Gdn_Format::ToDateTime()
-        ]);
+        ];
 
         if ($error) {
-            $this->SaveAttribute($id, 'Error', $error);
+            $attributes['Error'] = $error;
+            $set['Attributes'] = $attributes;
+        } elseif (isset($site['Attributes']['Error'])) {
+            unset($attributes['Error']);
+            $set['Attributes'] = $attributes;
         }
+
+        $this->SetField($id, $set);
     }
 
     public function insert($fields) {
         // Sites can only be inserted in the pending status.
         $fields['Status'] = 'pending';
         $fields['DateStatus'] = Gdn_Format::ToDateTime();
+
+        $slug = val('Slug', $fields);
+
+        if ($slug) {
+            TouchValue('Name', $fields, sprintf($this->siteNameFormat, $slug));
+            TouchValue('Url', $fields, $this->siteUrl($slug, false));
+        }
+
+
         $result = parent::Insert($fields);
 
         if ($result) {
@@ -124,6 +166,19 @@ class MultisiteModel extends Gdn_Model {
         }
 
         return $result;
+    }
+
+    public function Update($fields, $where = FALSE, $limit = FALSE) {
+        // Clean out the fields that are in the schema, but not allowed to be updated.
+        unset(
+            $fields['Name'],
+            $fields['Slug'],
+            $fields['Url'],
+            $fields['Status'],
+            $fields['DateStatus']
+        );
+
+        return parent::Update($fields);
     }
 
     public function calculateRow(&$row) {
