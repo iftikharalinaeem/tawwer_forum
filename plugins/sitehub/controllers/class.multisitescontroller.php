@@ -79,14 +79,27 @@ class MultisitesController extends DashboardController {
         $this->Render();
     }
 
+    /**
+     * The callback for when a site has been built.
+     * @throws Gdn_UserException Thrown when the site was not found.
+     */
     public function buildCallback() {
         $this->Permission('Garden.Settings.Manage');
 
         if (!$this->site) {
             throw NotFoundException('Site');
         }
+        $id = $this->site['MultisiteID'];
+        $data = array_change_key_case(Gdn::Request()->Post());
 
+        if (val('build', $data) === 'success') {
+            MultisiteModel::instance()->status($id, 'active');
+            MultisiteModel::instance()->Update(['SiteID' => valr('site.SiteID', $data)]);
+        } else {
+            MultisiteModel::instance()->status($id, 'error', val('status', data));
+        }
 
+        $this->Render('API');
     }
 
     protected function get() {
@@ -141,8 +154,20 @@ class MultisitesController extends DashboardController {
         throw ForbiddenException('DELETE');
     }
 
-    public function syncNodes() {
+    /**
+     * Synchronize a node or nodes with the hub.
+     */
+    public function syncNode() {
+        $this->Permission('Garden.Settings.Manage');
 
+        if ($this->site) {
+            $result = MultisiteModel::instance()->syncNode($this->site);
+            $this->SetData('Result', $result);
+        } else {
+            $result = MultisiteModel::instance()->syncNodes();
+            $this->SetData('Result', $result);
+        }
+        $this->Render('api');
     }
 
     /**

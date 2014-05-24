@@ -76,12 +76,13 @@ class MultisiteModel extends Gdn_Model {
             ->parameter('name', $name)
 //            ->parameter('siteid', $importSite['SiteID'])
             ->parameter('accountid', Infrastructure::site('accountid'))
-            ->parameter('cluster', Infrastructure::cluster())
+            ->parameter('domain', Gdn::Request()->Host())
+//            ->parameter('cluster', Infrastructure::cluster())
 //            ->parameter('planid', $plan['FeatureID'])
 //            ->parameter('adminname', Gdn::Session()->User->Name)
 //            ->parameter('adminpassword', BetterRandomString(16, 'Aa0'))
 //            ->parameter('adminemail', Gdn::Session()->User->Email)
-            ->parameter('callbackurl', Gdn::Request()->Domain()."/hub/multisites/{$site['MultisiteID']}/buildcallback?access_token=".C('Plugins.SimpleAPI.AccessToken'));
+            ->parameter('callbackurl', Gdn::Request()->Domain()."/hub/multisites/{$site['MultisiteID']}/buildcallback?access_token=".urlencode(Infrastructure::clusterConfig('cluster.loader.apikey', '')));
         $build = $buildQuery->send();
 
         if ($buildQuery->responseClass('2xx')) {
@@ -206,9 +207,70 @@ class MultisiteModel extends Gdn_Model {
     }
 
     public function getWhere($where = FALSE, $orderFields = '', $orderDirection = 'asc', $limit = FALSE, $offset = FALSE) {
-        $rows = parent::GetWhere($where, $orderFields, $orderDirection, $limit, $offset);
+        if (!$limit) {
+            $limit = 1000;
+        }
+
+        if (empty($where)) {
+            $rows = parent::Get($orderFields, $orderDirection, $limit, PageNumber($offset, $limit));
+        } else {
+            $rows = parent::GetWhere($where, $orderFields, $orderDirection, $limit, $offset);
+        }
         array_walk($rows->ResultArray(), [$this, 'calculateRow']);
         return $rows;
+    }
+
+    /**
+     * Make an api call out to a node..
+     *
+     * @param string $node The slug of the node to call out to.
+     * @param string $path The path to the api endpoint.
+     * @param string $method The http method to use.
+     * @param array $params The parameters for the request, either get or post.
+     * @return mixed Returns the decoded response from the request.
+     * @throws Gdn_UserException Throws an exception when the api endpoint returns an error response.
+     */
+    public function nodeApi($node, $path, $method = 'GET', $params = []) {
+        $node = trim($node, '/');
+
+        Trace("api: $method /$node$path");
+
+        $headers = [];
+
+        // Kludge for osx that doesn't allow host files.
+        $baseUrl = $this->siteUrl($node, true);
+        $urlParts = parse_url($baseUrl);
+
+        if ($urlParts['host'] === 'localhost' || StringEndsWith($urlParts['host'], '.lc')) {
+            $headers['Host'] = $urlParts['host'];
+            $urlParts['host'] = '127.0.0.1';
+        }
+
+        $url = rtrim(http_build_url($baseUrl, $urlParts), '/').'/api/v1/'.ltrim($path, '/');
+
+        if ($access_token = Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
+//            $params['access_token'] = C('Plugins.SimpleAPI.AccessToken');
+            $headers['Authentication'] = "token $access_token";
+        }
+
+        $request = new ProxyRequest();
+        $response = $request->Request([
+            'URL' => $url,
+            'Cookies' => false,
+            'Timeout' => 100,
+        ], $params, null, $headers);
+
+        if ($request->ContentType === 'application/json') {
+            $response = json_decode($response, true);
+        }
+
+        if ($request->ResponseStatus != 200) {
+            Trace($response, "Error {$request->ResponseStatus}");
+            throw new Gdn_UserException('api: '.val('Exception', $response, 'There was an error performing your request.'), $request->ResponseStatus);
+        }
+
+        Trace($response, "hub api response");
+        return $response;
     }
 
     /**
@@ -247,5 +309,37 @@ class MultisiteModel extends Gdn_Model {
             ->EndWhereGroup();
 
         return $this->getWhere(false, $orderFields, $orderDirection, $limit, $offset);
+    }
+
+    public function syncNode($node) {
+        if (is_array($node)) {
+            $nodeSlug = $node['Slug'];
+        } else {
+            $nodeSlug = $node;
+        }
+
+        $result = $this->nodeApi($nodeSlug, '/utility/syncnode.json', 'POST');
+        return $result;
+    }
+
+    public function syncNodes($where = [], $limit = 0, $offset = 0) {
+        $result = [];
+
+        if (isset($where['search'])) {
+            $nodes = $this->search($where['search'], '', '', $limit, $offset)->ResultArray();
+        } else {
+            $nodes = $this->getWhere($where, '', '', $limit, $offset)->ResultArray();
+        }
+
+        foreach ($nodes as $node) {
+            try {
+                $nodeResult = $this->syncNode($node);
+                $result[$node['Slug']] = $nodeResult;
+            } catch (Exception $ex) {
+                $result[$node['Slug']] = (string)$ex->getCode();
+            }
+        }
+
+        return $result;
     }
 }

@@ -41,6 +41,7 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->column('Name', 'varchar(255)', false)
             ->column('Slug', 'varchar(50)', false, 'unique.slug')
             ->column('Url', 'varchar(255)', false, 'unique.url')
+            ->column('SiteID', 'int', true)
             ->column('Status', ['pending', 'building', 'active', 'error'], 'pending')
             ->column('DateStatus', 'datetime')
             ->column('DateInserted', 'datetime')
@@ -79,59 +80,6 @@ class SiteHubPlugin extends Gdn_Plugin {
                 Gdn::Session()->ValidateTransientKey(true);
             }
         }
-    }
-
-    /**
-     * Make an api call out to a node..
-     *
-     * @param string $node The slug of the node to call out to.
-     * @param string $path The path to the api endpoint.
-     * @param string $method The http method to use.
-     * @param array $params The parameters for the request, either get or post.
-     * @return mixed Returns the decoded response from the request.
-     * @throws Gdn_UserException Throws an exception when the api endpoint returns an error response.
-     */
-    public function nodeApi($node, $path, $method = 'GET', $params = []) {
-        $node = trim($node, '/');
-
-        Trace("api: $method /$node$path");
-
-        $headers = [];
-
-        // Kludge for osx that doesn't allow host files.
-        $baseUrl = MultisiteModel::instance()->siteUrl($node, true);
-        $urlParts = parse_url($baseUrl);
-
-        if ($urlParts['host'] === 'localhost' || StringEndsWith($urlParts['host'], '.lc')) {
-            $headers['Host'] = $urlParts['host'];
-            $urlParts['host'] = '127.0.0.1';
-        }
-
-        $url = rtrim(http_build_url($baseUrl, $urlParts), '/').'/api/v1/'.ltrim($path, '/');
-
-        if ($access_token = Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
-//            $params['access_token'] = C('Plugins.SimpleAPI.AccessToken');
-            $headers['Authentication'] = "token $access_token";
-        }
-
-        $request = new ProxyRequest();
-        $response = $request->Request([
-            'URL' => $url,
-            'Cookies' => !$system,
-            'Timeout' => 100,
-        ], $params, null, $headers);
-
-        if ($request->ContentType === 'application/json') {
-            $response = json_decode($response, true);
-        }
-
-        if ($request->ResponseStatus != 200) {
-            Trace($response, "Error {$request->ResponseStatus}");
-            throw new Gdn_UserException('api: '.val('Exception', $response, 'There was an error performing your request.'), $request->ResponseStatus);
-        }
-
-        Trace($response, "hub api response");
-        return $response;
     }
 
     /// Event Handlers ///

@@ -59,6 +59,17 @@ class SiteNodePlugin extends Gdn_Plugin {
                 'SignOutUrl' => '/hub/entry/signout'
             ),
             array('AuthenticationKey' => self::PROVIDER_KEY), TRUE);
+
+        // Add foreign ID columns specifically for the hub sync. These must not be unique.
+        Gdn::Structure()
+            ->table('Category')
+            ->column('HubID', 'int', true)
+            ->set();
+
+        Gdn::Structure()
+            ->table('Role')
+            ->column('HubID', 'int', true)
+            ->set();
     }
 
     /**
@@ -167,8 +178,10 @@ class SiteNodePlugin extends Gdn_Plugin {
             $currentEnabled = Gdn::PluginManager()->IsEnabled($key);
             if ($enabled && !$currentEnabled) {
                 Gdn::PluginManager()->EnablePlugin($key, $valid);
+                Trace("Plugin $key enabled.");
             } elseif (!$enabled && $currentEnabled) {
                 Gdn::PluginManager()->DisablePlugin($key);
+                Trace("Plugin $key disabled.");
             }
             return;
         }
@@ -179,8 +192,10 @@ class SiteNodePlugin extends Gdn_Plugin {
             $currentEnabled = array_key_exists($info, Gdn::ApplicationManager()->EnabledApplications());
             if ($enabled && !$currentEnabled) {
                 Gdn::ApplicationManager()->EnableApplication($key, $valid);
+                Trace("Application $key enabled.");
             } elseif (!$enabled && $currentEnabled) {
                 Gdn::ApplicationManager()->DisableApplication($key);
+                Trace("Application $key disabled.");
             }
         }
     }
@@ -257,5 +272,6 @@ class SiteNodePlugin extends Gdn_Plugin {
      */
     public function utilityController_syncNode_create($sender) {
         $this->syncNode();
+        $sender->Render('blank');
     }
 }
