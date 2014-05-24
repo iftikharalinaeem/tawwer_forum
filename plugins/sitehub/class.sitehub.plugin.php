@@ -9,7 +9,7 @@ $PluginInfo['sitehub'] = array(
     'AuthorUrl'   => 'http://vanillaforums.com',
     'License'     => 'Proprietary',
     'RequiredPlugins' => array(
-        'SimpleApi' => '1.0',
+        'SimpleAPI' => '1.0',
     ),
 );
 
