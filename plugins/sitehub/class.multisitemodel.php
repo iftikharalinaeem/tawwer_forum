@@ -69,19 +69,13 @@ class MultisiteModel extends Gdn_Model {
             return false;
         }
 
-        $name = sprintf($this->siteNameFormat(), $site['Slug']);
+        $name = sprintf($this->siteNameFormat, $site['Slug']);
 
         $buildQuery = Communication::orchestration('/site/createnode')
             ->method('post')
             ->parameter('name', $name)
-//            ->parameter('siteid', $importSite['SiteID'])
             ->parameter('accountid', Infrastructure::site('accountid'))
             ->parameter('domain', Gdn::Request()->Host())
-//            ->parameter('cluster', Infrastructure::cluster())
-//            ->parameter('planid', $plan['FeatureID'])
-//            ->parameter('adminname', Gdn::Session()->User->Name)
-//            ->parameter('adminpassword', BetterRandomString(16, 'Aa0'))
-//            ->parameter('adminemail', Gdn::Session()->User->Email)
             ->parameter('callbackurl', Gdn::Request()->Domain()."/hub/multisites/{$site['MultisiteID']}/buildcallback?access_token=".urlencode(Infrastructure::clusterConfig('cluster.loader.apikey', '')));
         $build = $buildQuery->send();
 
