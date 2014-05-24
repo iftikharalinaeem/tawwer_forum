@@ -79,6 +79,12 @@ class MultisitesController extends DashboardController {
         $this->Render();
     }
 
+    public function add() {
+        $this->Permission('Garden.Settings.Manage');
+        $this->Title(T('Add Site'));
+        $this->Render();
+    }
+
     /**
      * The callback for when a site has been built.
      * @throws Gdn_UserException Thrown when the site was not found.
@@ -145,6 +151,12 @@ class MultisitesController extends DashboardController {
             $this->SetData('Site', $site);
         } else {
             throw new Gdn_UserException($this->siteModel->Validation->ResultsText());
+        }
+
+        if ($this->DeliveryType() === DELIVERY_TYPE_VIEW) {
+            $this->JsonTarget('', '', 'Refresh');
+        } elseif ($this->DeliveryType() === DELIVERY_TYPE_ALL) {
+            Redirect('/multisites');
         }
 
         $this->Render('api');

@@ -86,7 +86,7 @@ class MultisiteModel extends Gdn_Model {
                 'DateStatus' => Gdn_Format::ToDateTime()
             ]);
             return true;
-        } elseif ($buildQuery->code() == 409) {
+        } elseif ($buildQuery->code() == 409 && val('site', $build)) {
             // The site already existed.
             $this->status($id, 'active');
         } else {
