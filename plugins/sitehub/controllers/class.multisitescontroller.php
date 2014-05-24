@@ -89,7 +89,7 @@ class MultisitesController extends DashboardController {
      * The callback for when a site has been built.
      * @throws Gdn_UserException Thrown when the site was not found.
      */
-    public function buildCallback() {
+    public function buildcallback() {
         $this->Permission('Garden.Settings.Manage');
 
         if (!$this->site) {
@@ -101,8 +101,10 @@ class MultisitesController extends DashboardController {
         if (val('build', $data) === 'success') {
             MultisiteModel::instance()->status($id, 'active');
             MultisiteModel::instance()->Update(['SiteID' => valr('site.SiteID', $data)]);
+            Trace("Status of site $id set to active.");
         } else {
-            MultisiteModel::instance()->status($id, 'error', val('status', data));
+            MultisiteModel::instance()->status($id, 'error', val('status', $data));
+            Trace("Status of site $id set to error.");
         }
 
         $this->Render('API');
@@ -198,8 +200,25 @@ class MultisitesController extends DashboardController {
         // Check for a site.
         $args = Gdn::Dispatcher()->ControllerArguments();
         if (isset($args[0]) && is_numeric($args[0])) {
-            $id = array_pop($args);
+            $id = array_shift($args);
             $this->getSite($id);
+
+            // See if there is a method next.
+            $method = array_shift($args);
+            if ($method) {
+                if (StringEndsWith($method, '.json', TRUE)) {
+                    $method = StringEndsWith($method, '.json', TRUE, TRUE);
+                    $this->DeliveryType(DELIVERY_TYPE_DATA);
+                    $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+                }
+                if (method_exists($this, $method)) {
+                    Gdn::Dispatcher()->EventArguments['ControllerMethod'] = $method;
+                    Gdn::Dispatcher()->ControllerMethod = $method;
+                } else {
+                    array_unshift($args, $method);
+                }
+            }
+
             Gdn::Dispatcher()->ControllerArguments($args);
         }
     }

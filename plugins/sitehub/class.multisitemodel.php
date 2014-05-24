@@ -76,6 +76,7 @@ class MultisiteModel extends Gdn_Model {
             ->parameter('name', $name)
             ->parameter('accountid', Infrastructure::site('accountid'))
             ->parameter('domain', Gdn::Request()->Host())
+            ->parameter('flavor', 'node')
             ->parameter('callbackurl', Gdn::Request()->Domain()."/hub/multisites/{$site['MultisiteID']}/buildcallback?access_token=".urlencode(Infrastructure::clusterConfig('cluster.loader.apikey', '')));
         $build = $buildQuery->send();
 
