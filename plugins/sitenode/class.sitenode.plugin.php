@@ -81,6 +81,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         // First look for a header.
+        $token = '';
         if ($auth = val('HTTP_AUTHENTICATION', $_SERVER, '')) {
             if (preg_match('`^token\s+([^\s]+)`i', $auth, $m)) {
                 $token = $m[1];
