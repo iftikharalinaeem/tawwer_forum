@@ -85,11 +85,6 @@ class SiteNodePlugin extends Gdn_Plugin {
             if (preg_match('`^token\s+([^\s]+)`i', $auth, $m)) {
                 $token = $m[1];
             }
-        } else {
-            $token = Gdn::Request()->Get('hub_token');
-            if (!$token) {
-                $token = Gdn::Request()->Get('hub.token');
-            }
         }
         if ($token && $token === Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
             $userID = Gdn::userModel()->GetSystemUserID();
@@ -159,7 +154,7 @@ class SiteNodePlugin extends Gdn_Plugin {
             try {
                 $this->toggleAddon($addonKey, $enabled);
             } catch (Exception $ex) {
-                Trace("Error enabling addon: $addonKey.", TRACE_ERROR);
+                Logger::event('nodesync_error', LogLevel::ALERT, $ex->getMessage());
             }
         }
 
@@ -167,7 +162,7 @@ class SiteNodePlugin extends Gdn_Plugin {
             try {
                 Gdn::ThemeManager()->EnableTheme($theme);
             } catch (Exception $ex) {
-                Trace("Error enabling theme: $theme.", TRACE_ERROR);
+                Logger::event('nodesync_error', LogLevel::ALERT, $ex->getMessage());
             }
         }
 

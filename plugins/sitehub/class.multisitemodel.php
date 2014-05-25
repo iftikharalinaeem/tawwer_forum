@@ -47,6 +47,20 @@ class MultisiteModel extends Gdn_Model {
         return self::$instance;
     }
 
+    /**
+     * Gets the cluster api key.
+     *
+     * @param bool $header If true the key will be returned in a way suitable to be passed in an Authentication header.
+     * @return string Returns the api key or an empty string if the cluster doesn't have one.
+     */
+    public static function apikey($header = false) {
+        $key = (string)Infrastructure::clusterConfig('cluster.loader.apikey', '');
+        if ($key && $header) {
+            $key = "token $key";
+        }
+        return $key;
+    }
+
     public function build($id) {
         if (!class_exists('Communication')) {
             $this->status($id, 'error', 'Communication with the orchestration server is not enabled.');
@@ -77,7 +91,12 @@ class MultisiteModel extends Gdn_Model {
             ->parameter('accountid', Infrastructure::site('accountid'))
             ->parameter('domain', Gdn::Request()->Host())
             ->parameter('flavor', 'node')
-            ->parameter('callbackurl', Gdn::Request()->Domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/buildcallback.json?hub_token=".urlencode(Infrastructure::clusterConfig('cluster.loader.apikey', '')));
+            ->parameter('callback', [
+                'url' => Gdn::Request()->Domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/buildcallback.json",
+                'headers' => [
+                    'Authentication' => self::apikey(true)
+                ]
+            ]);
         $build = $buildQuery->send();
 
         if ($buildQuery->responseClass('2xx')) {
@@ -251,6 +270,7 @@ class MultisiteModel extends Gdn_Model {
         $request = new ProxyRequest();
         $response = $request->Request([
             'URL' => $url,
+            'Method' => $method,
             'Cookies' => false,
             'Timeout' => 100,
         ], $params, null, $headers);
