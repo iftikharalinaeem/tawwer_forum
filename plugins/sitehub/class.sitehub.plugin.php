@@ -72,6 +72,9 @@ class SiteHubPlugin extends Gdn_Plugin {
             }
         } else {
             $token = Gdn::Request()->Get('hub_token');
+            if (!$token) {
+                $token = Gdn::Request()->Get('hub.token');
+            }
         }
         if ($token && $token === Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
             $userID = Gdn::userModel()->GetSystemUserID();
