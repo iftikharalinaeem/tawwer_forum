@@ -104,6 +104,7 @@ class MultisitesController extends DashboardController {
             Trace("Status of site $id set to active.");
         } else {
             MultisiteModel::instance()->status($id, 'error', val('status', $data));
+            MultisiteModel::instance()->SaveAttribute($id, 'callback', $data);
             Trace("Status of site $id set to error.");
         }
 
