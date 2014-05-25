@@ -102,6 +102,7 @@ class MultisitesController extends DashboardController {
             MultisiteModel::instance()->status($id, 'active');
             MultisiteModel::instance()->Update(['SiteID' => valr('site.SiteID', $data)]);
             Trace("Status of site $id set to active.");
+            MultisiteModel::instance()->syncNode($this->site);
         } else {
             MultisiteModel::instance()->status($id, 'error', val('status', $data));
             MultisiteModel::instance()->SaveAttribute($id, 'callback', $data);
