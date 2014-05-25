@@ -156,11 +156,19 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         // Enable plugins.
         foreach (val('Addons', $config, []) as $addonKey => $enabled) {
-            $this->toggleAddon($addonKey, $enabled);
+            try {
+                $this->toggleAddon($addonKey, $enabled);
+            } catch (Exception $ex) {
+                Trace("Error enabling addon: $addonKey.", TRACE_ERROR);
+            }
         }
 
         if ($theme = val('Theme', $config)) {
-            Gdn::ThemeManager()->EnableTheme($theme);
+            try {
+                Gdn::ThemeManager()->EnableTheme($theme);
+            } catch (Exception $ex) {
+                Trace("Error enabling theme: $theme.", TRACE_ERROR);
+            }
         }
 
         // Synchronize the roles.

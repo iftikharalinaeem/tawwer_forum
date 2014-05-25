@@ -228,8 +228,6 @@ class MultisiteModel extends Gdn_Model {
     public function nodeApi($node, $path, $method = 'GET', $params = []) {
         $node = trim($node, '/');
 
-        Trace("api: $method /$node$path");
-
         $headers = [];
 
         // Kludge for osx that doesn't allow host files.
@@ -247,6 +245,8 @@ class MultisiteModel extends Gdn_Model {
 //            $params['access_token'] = C('Plugins.SimpleAPI.AccessToken');
             $headers['Authentication'] = "token $access_token";
         }
+
+        Trace("api: $method $url");
 
         $request = new ProxyRequest();
         $response = $request->Request([
@@ -313,7 +313,11 @@ class MultisiteModel extends Gdn_Model {
             $nodeSlug = $node;
         }
 
-        $result = $this->nodeApi($nodeSlug, '/utility/syncnode.json', 'POST');
+        try {
+            $result = $this->nodeApi($nodeSlug, '/utility/syncnode.json', 'POST');
+        } catch (Exception $ex) {
+            $result = ['Code' => $ex->getCode(), 'Exception' => $ex->getMessage()];
+        }
         return $result;
     }
 
