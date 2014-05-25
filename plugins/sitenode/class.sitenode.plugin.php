@@ -155,7 +155,7 @@ class SiteNodePlugin extends Gdn_Plugin {
             try {
                 $this->toggleAddon($addonKey, $enabled);
             } catch (Exception $ex) {
-                Logger::event('nodesync_error', LogLevel::ALERT, $ex->getMessage());
+                Logger::event('nodesync_error', LogLevel::ERROR, $ex->getMessage());
             }
         }
 
@@ -163,11 +163,14 @@ class SiteNodePlugin extends Gdn_Plugin {
             try {
                 Gdn::ThemeManager()->EnableTheme($theme);
             } catch (Exception $ex) {
-                Logger::event('nodesync_error', LogLevel::ALERT, $ex->getMessage());
+                Logger::event('nodesync_error', LogLevel::ERROR, $ex->getMessage());
             }
         }
 
         // Synchronize the roles.
+
+
+        Gdn::Config()->Shutdown();
     }
 
     /**
@@ -204,6 +207,7 @@ class SiteNodePlugin extends Gdn_Plugin {
                 Gdn::ApplicationManager()->DisableApplication($key);
                 Trace("Application $key disabled.");
             }
+            return;
         }
     }
 
