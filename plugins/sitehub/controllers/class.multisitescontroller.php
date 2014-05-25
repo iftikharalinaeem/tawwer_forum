@@ -92,6 +92,10 @@ class MultisitesController extends DashboardController {
     public function buildcallback() {
         $this->Permission('Garden.Settings.Manage');
 
+        if (Gdn::Request()->RequestMethod() !== 'POST') {
+            throw new Gdn_UserException("This resource only accepts POST.", 405);
+        }
+
         if (!$this->site) {
             throw NotFoundException('Site');
         }
@@ -175,6 +179,10 @@ class MultisitesController extends DashboardController {
      */
     public function syncNode() {
         $this->Permission('Garden.Settings.Manage');
+
+        if (Gdn::Request()->RequestMethod() !== 'POST') {
+            throw new Gdn_UserException("This resource only accepts POST.", 405);
+        }
 
         if ($this->site) {
             $result = MultisiteModel::instance()->syncNode($this->site);

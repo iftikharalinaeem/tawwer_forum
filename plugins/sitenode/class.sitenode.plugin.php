@@ -278,6 +278,12 @@ class SiteNodePlugin extends Gdn_Plugin {
      * @param UtilityController $sender
      */
     public function utilityController_syncNode_create($sender) {
+        $sender->Permission('Garden.Settings.Manage');
+
+        if (Gdn::Request()->RequestMethod() !== 'POST') {
+            throw new Gdn_UserException("This resource only accepts POST.", 405);
+        }
+
         $this->syncNode();
         $sender->Render('blank');
     }
