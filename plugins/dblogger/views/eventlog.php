@@ -132,8 +132,8 @@ echo $this->Form->Errors();
 
 <p>This report is also available in JSON or XML</p>
 <ul>
-    <li><?php echo Anchor('JSON', Url('/settings/eventlog.json?' . $this->Data['CurrentFilter'])); ?></li>
-    <li><?php echo Anchor('XML', Url('/settings/eventlog.xml?' . $this->Data['CurrentFilter'])); ?></li>
+    <li><?php echo Anchor('JSON', '/settings/eventlog.json?'.$this->Data['CurrentFilter']); ?></li>
+    <li><?php echo Anchor('XML', '/settings/eventlog.xml?'.$this->Data['CurrentFilter']); ?></li>
 </ul>
 
 </div>
