@@ -34,6 +34,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
             ->Column('Event', 'varchar(50)', true, 'index')
             ->Column('LogLevel', 'varchar(50)', true, 'index')
             ->Column('Message', 'text')
+            ->Column('Method', 'varchar(10)', true)
             ->Column('Domain', 'varchar(255)', true)
             ->Column('Path', 'varchar(255)', true)
             ->Column('InsertUserID', 'int', true)

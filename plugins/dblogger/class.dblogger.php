@@ -30,6 +30,7 @@ class DbLogger extends BaseLogger {
             'Message' => true,
             'LogLevel' => true,
             'Event' => true,
+            'Method' => true,
             'Domain' => true,
             'Path' => true
         );
