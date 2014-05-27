@@ -5,13 +5,13 @@
  */
 // Define the plugin:
 $PluginInfo['dblogger'] = array(
-    'Name' => 'Database Logger',
-    'Description' => 'Enabled database logging.',
-    'Version' => '1.0-alpha',
+    'Name' => 'Db Logger',
+    'Description' => 'Enable database logging.',
+    'Version' => '1.0-beta',
     'Author' => "John Ashton",
     'AuthorEmail' => 'john@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
-//    'Hidden' => true
+    'Hidden' => true
 );
 
 class DbLoggerPlugin extends Gdn_Plugin {
