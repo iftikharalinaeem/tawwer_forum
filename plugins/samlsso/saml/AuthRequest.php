@@ -1,10 +1,10 @@
 <?php
 require_once('Settings.php');
+
 /**
  * Create a SAML authorization request.
  */
-class OneLogin_Saml_AuthRequest
-{
+class OneLogin_Saml_AuthRequest {
     const ID_PREFIX = 'VANILLA';
 
     /**
@@ -19,16 +19,10 @@ class OneLogin_Saml_AuthRequest
      */
     public $isPassive = true;
 
-   /**
-    * @var string The last request ID that was generated.
-    */
-   public $lastID;
-
-   /**
-    *
-    * @var string A specific provider ID to transmit in the request.
-    */
-   public $providerID;
+    /**
+     * @var string The last request ID that was generated.
+     */
+    public $lastID;
 
     /**
      * @var string A
@@ -42,8 +36,7 @@ class OneLogin_Saml_AuthRequest
      *   A SamlResponse settings object containing the necessary
      *   x509 certicate to decode the XML.
      */
-    public function __construct(OneLogin_Saml_Settings $settings)
-    {
+    public function __construct(OneLogin_Saml_Settings $settings) {
         $this->_settings = $settings;
     }
 
@@ -52,16 +45,15 @@ class OneLogin_Saml_AuthRequest
      *
      * @return string A fully qualified URL that can be redirected to in order to process the authorization request.
      */
-    public function getRedirectUrl()
-    {
-        $id = $this->lastID = $this->_generateUniqueID();
-        $issueInstant = $this->_getTimestamp();
+    public function getRedirectUrl() {
+        $id = $this->lastID = $this->generateUniqueID();
+        $issueInstant = $this->getTimestamp();
         $isPassive = $this->isPassive ? 'true' : 'false';
         $Destination = htmlspecialchars($this->_settings->idpSingleSignOnUrl);
         $provider = '';
-        if ($this->providerID) {
-           $providerID = htmlspecialchars($this->providerID);
-           $provider = <<<PROVIDER
+        if ($this->_settings->providerID) {
+            $providerID = htmlspecialchars($this->_settings->providerID);
+            $provider = <<<PROVIDER
 <samlp:Scoping>
     <samlp:IDPList>
         <samlp:IDPEntry ProviderID="$providerID"/>
@@ -97,39 +89,38 @@ AUTHNREQUEST;
         $get = array('SAMLRequest' => $base64Request);
 
         if ($this->relayState) {
-           $get['RelayState'] = $this->relayState;
+            $get['RelayState'] = $this->relayState;
         }
 
         try {
             $this->signRequest($get);
         } catch (Exception $ex) {
-           // do nothing.
+            // do nothing.
         }
 
-        return $this->_settings->idpSingleSignOnUrl.
-           (strpos($this->_settings->idpSingleSignOnUrl, '?') === false ? '?' : '&').
-           http_build_query($get);
+        return $this->_settings->idpSingleSignOnUrl .
+        (strpos($this->_settings->idpSingleSignOnUrl, '?') === false ? '?' : '&') .
+        http_build_query($get);
     }
 
     public function signRequest(&$get) {
-       if (!$this->_settings->spPrivateKey)
-          return;
+        if (!$this->_settings->spPrivateKey) {
+            return;
+        }
 
-       // Construct the string.
-       $get['SigAlg'] = XMLSecurityKey::RSA_SHA1;
-       $msg = http_build_query($get);
-       $key = new XMLSecurityKey($get['SigAlg'], array('type' => 'private'));
-       $key->loadKey($this->_settings->spPrivateKey, false, false);
-       $get['Signature'] = base64_encode($key->signData($msg));
+        // Construct the string.
+        $get['SigAlg'] = XMLSecurityKey::RSA_SHA1;
+        $msg = http_build_query($get);
+        $key = new XMLSecurityKey($get['SigAlg'], array('type' => 'private'));
+        $key->loadKey($this->_settings->spPrivateKey, false, false);
+        $get['Signature'] = base64_encode($key->signData($msg));
     }
 
-    protected function _generateUniqueID()
-    {
-        return self::ID_PREFIX . sha1(uniqid(mt_rand(), TRUE));
+    protected function generateUniqueID() {
+        return self::ID_PREFIX . sha1(uniqid(mt_rand(), true));
     }
 
-    protected function _getTimestamp()
-    {
+    protected function getTimestamp() {
         $defaultTimezone = date_default_timezone_get();
         date_default_timezone_set('UTC');
         $timestamp = strftime("%Y-%m-%dT%H:%M:%SZ");

@@ -35,6 +35,12 @@ class OneLogin_Saml_Settings
     public $idpPublicCertificate = '';
 
     /**
+     *
+     * @var string A specific provider ID to transmit in the request.
+     */
+    public $providerID;
+
+    /**
      * The URL where to the SAML Response/SAML Assertion will be posted.
      * @var string
      */
