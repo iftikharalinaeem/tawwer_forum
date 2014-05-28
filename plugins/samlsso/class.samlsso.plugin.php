@@ -51,6 +51,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $settings->spSignoutReturnUrl = Url('/entry/signout', TRUE);
       $settings->spPrivateKey = GetValue('SpPrivateKey', $provider);
       $settings->spCertificate = GetValue('SpCertificate', $provider);
+      $settings->providerID = GetValue('ProviderID', $provider);
 
       return $settings;
    }
@@ -180,6 +181,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
       $url = $request->getRedirectUrl();
       Gdn::Session()->Stash('samlsso', NULL, TRUE);
+      Logger::event('saml_authrequest_sent', LogLevel::DEBUG, 'SAML request {id} sent to {host}.', ['id' => $request->lastID, 'host' => parse_url(''), 'url' => $url]);
       Redirect($url);
    }
 
@@ -356,6 +358,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
          'SignOutUrl' => array('Options' => array('Class' => 'InputBox BigInput')),
          'RegisterUrl' => array('Options' => array('Class' => 'InputBox BigInput')),
          'AssociationSecret' => array('LabelCode' => 'IDP Certificate', 'Options' => array('Multiline' => TRUE, 'Class' => 'TextBox BigInput')),
+         'ProviderID' => array('Description' => 'Sometimes an IDP has several providers and you must specify a provider ID here.'),
          'IdentifierFormat' => array('Options' => array('Class' => 'InputBox BigInput')),
          'IsDefault' => array('Control' => 'CheckBox', 'LabelCode' => 'Make this connection your default signin method.'),
          'SpPrivateKey' => array('LabelCode' => 'SP Private Key', 'Description' => 'If you want to sign your requests then you need this key.', 'Options' => array('Multiline' => TRUE, 'Class' => 'TextBox BigInput')),

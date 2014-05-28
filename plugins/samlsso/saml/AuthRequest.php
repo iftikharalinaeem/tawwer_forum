@@ -24,6 +24,12 @@ class OneLogin_Saml_AuthRequest
     */
    public $lastID;
 
+   /**
+    *
+    * @var string A specific provider ID to transmit in the request.
+    */
+   public $providerID;
+
     /**
      * @var string A
      */
@@ -52,6 +58,17 @@ class OneLogin_Saml_AuthRequest
         $issueInstant = $this->_getTimestamp();
         $isPassive = $this->isPassive ? 'true' : 'false';
         $Destination = htmlspecialchars($this->_settings->idpSingleSignOnUrl);
+        $provider = '';
+        if ($this->providerID) {
+           $providerID = htmlspecialchars($this->providerID);
+           $provider = <<<PROVIDER
+<samlp:Scoping>
+    <samlp:IDPList>
+        <samlp:IDPEntry ProviderID="$providerID"/>
+    </samlp:IDPList>
+</samlp:Scoping>
+PROVIDER;
+        }
 
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
@@ -62,7 +79,7 @@ class OneLogin_Saml_AuthRequest
     IssueInstant="$issueInstant"
     Destination="$Destination"
     IsPassive="$isPassive"
-    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+    ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-REDIRECT"
     AssertionConsumerServiceURL="{$this->_settings->spReturnUrl}">
     <saml:Issuer>{$this->_settings->spIssuer}</saml:Issuer>
     <samlp:NameIDPolicy
@@ -71,6 +88,7 @@ class OneLogin_Saml_AuthRequest
     <samlp:RequestedAuthnContext Comparison="exact">
         <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
     </samlp:RequestedAuthnContext>
+    $provider
 </samlp:AuthnRequest>
 AUTHNREQUEST;
 
