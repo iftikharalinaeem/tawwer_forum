@@ -6,6 +6,16 @@
  * SendUp is threaded. It transfers the contents of entire folders to CloudFiles
  * in a multi-threaded and efficient way.
  *
+ * Environment Variables:
+ *
+ *   required:
+ *    RACKSPACE_USERNAME
+ *    RACKSPACE_APIKEY
+ *
+ *   optional:
+ *    RACKSPACE_FACING (default 'public')
+ *    RACKSPACE_REGION (default 'DFW')
+ *
  * Arguments:
  *
  * --folder
