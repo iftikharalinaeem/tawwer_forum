@@ -33,6 +33,7 @@ class EditorPlugin extends Gdn_Plugin {
 
    protected $canUpload = false;
 
+
    /**
     *
     * @var array Give class access to PluginInfo
@@ -1147,9 +1148,12 @@ class EditorPlugin extends Gdn_Plugin {
              'ThumbPath' => $filepath_parsed['SaveName']
           ));
 
-         // Remove cf scratch copy, typically in cftemp.
-         if (!unlink($local_path)) {
-            // Maybe add logging for local cf copies not deleted.
+         // Remove cf scratch copy, typically in cftemp, if there was actually
+         // a file pulled in from CF.
+         if (strpos($local_path, 'cftemp') !== false) {
+            if (!unlink($local_path)) {
+               // Maybe add logging for local cf copies not deleted.
+            }
          }
 
          $url = $filepath_parsed['Url'];
