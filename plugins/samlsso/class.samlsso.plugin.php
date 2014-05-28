@@ -31,6 +31,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $request->relayState = $target;
       $url = $request->getRedirectUrl();
       Gdn::Session()->Stash('samlsso', NULL, TRUE);
+      Logger::event('saml_authrequest_sent', LogLevel::DEBUG, 'SAML request {id} sent to {host}.', ['id' => $request->lastID, 'host' => parse_url(''), 'url' => $url]);
       Redirect($url);
    }
 
@@ -249,10 +250,17 @@ class SamlSSOPlugin extends Gdn_Plugin {
          // Grab the saml session from the saml response.
          $settings = $this->GetSettings();
          $response = new OneLogin_Saml_Response($settings, $Sender->Request->Post('SAMLResponse'));
-         $xml = $response->document->saveXML();
+//         $xml = $response->document->saveXML();
 
-         if (!$response->isValid()) {
-            throw new Gdn_UserException("The saml response was not valid.");
+         Logger::event('saml_response_received', LogLevel::DEBUG, "SAML response received.", ['samlresponse' => $Sender->Request->Post('SAMLResponse')]);
+
+         try {
+            if (!$response->isValid()) {
+               throw new Gdn_UserException('The saml response was not valid.');
+            }
+         } catch (Exception $ex) {
+            Logger::event('saml_response_invalid', LogLevel::ERROR, $ex->getMessage(), ['code' => $ex->getCode()]);
+            throw $ex;
          }
          $id = $response->getNameId();
          $profile = $response->getAttributes();
@@ -260,10 +268,6 @@ class SamlSSOPlugin extends Gdn_Plugin {
       }
 
       $provider = $this->Provider();
-
-      Trace($id, 'id');
-      Trace($profile, 'profile');
-      Trace($response->getNameId(), 'nameid');
 
       $Form = $Sender->Form; //new Gdn_Form();
       $Form->SetFormValue('UniqueID', $response->getNameId());

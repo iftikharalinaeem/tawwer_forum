@@ -30,6 +30,7 @@ class DbLogger extends BaseLogger {
             'Message' => true,
             'LogLevel' => true,
             'Event' => true,
+            'Method' => true,
             'Domain' => true,
             'Path' => true
         );
@@ -37,9 +38,10 @@ class DbLogger extends BaseLogger {
         $insert = array_diff_key($context, $attributes);
         $insert['Message'] = FormatString($message, $context);
         if ($attributes) {
-            $insert['Attributes'] = json_encode($attributes);
+            $insert['Attributes'] = json_encode($attributes, JSON_UNESCAPED_SLASHES);
         }
         $insert['EventLogID'] = uniqid('', true);
+        $insert['LogLevel'] = $level;
 
         return Gdn::SQL()->Insert('EventLog', $insert);
     }
