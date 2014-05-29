@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.29',
+   'Version' => '1.3.30',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -571,10 +571,10 @@ class EditorPlugin extends Gdn_Plugin {
          $Media['MediaID'] = $MediaID;
 
          // Clear Media cache for discussion, if any.
-         if ($discussionID) {
+         /*if ($discussionID) {
             $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
             Gdn::Cache()->Remove($cacheKey);
-         }
+         }*/
 
          if ($generate_thumbnail) {
             $thumbUrl = Url('/utility/mediathumbnail/' . $MediaID, true);
@@ -683,7 +683,7 @@ class EditorPlugin extends Gdn_Plugin {
                }
 
                // Clear the cache, if exists.
-               $discussionID = '';
+               /*$discussionID = '';
                if ($Media['ForeignTable'] == 'discussion') {
                   $discussionID = $Media['ForeignID'];
                } elseif ($Media['ForeignTable'] == 'comment') {
@@ -696,7 +696,7 @@ class EditorPlugin extends Gdn_Plugin {
                if ($discussionID) {
                   $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
                   Gdn::Cache()->Remove($cacheKey);
-               }
+               }*/
             }
          } catch (Exception $e) {
             die($e->getMessage());
@@ -787,11 +787,13 @@ class EditorPlugin extends Gdn_Plugin {
       $foreignId = GetValue($param, GetValue(ucfirst($Type), $Sender->EventArguments));
 
       // Get all media for the page.
-      $mediaList = $this->MediaCache();
+      $mediaList = $this->MediaCache($Sender);
+
       if (is_array($mediaList)) {
          // Filter out the ones that don't match.
          $attachments = array_filter($mediaList, function($attachment) use ($foreignId, $Type) {
-            if ($attachment['ForeignID'] == $foreignId
+            if (isset($attachment['ForeignID'])
+            && $attachment['ForeignID'] == $foreignId
             && $attachment['ForeignTable'] == $Type) {
                return true;
             }
@@ -813,10 +815,13 @@ class EditorPlugin extends Gdn_Plugin {
     * @param mixed $Sender
     */
    protected function CacheAttachedMedia($Sender) {
-
       $Comments = $Sender->Data('Comments');
       $CommentIDList = array();
       $MediaData = array();
+
+      $DiscussionID = ($Sender->Data('Discussion.DiscussionID'))
+          ? $Sender->Data('Discussion.DiscussionID')
+          : $Comments->FirstRow()->DiscussionID;
 
       if ($Comments instanceof Gdn_DataSet && $Comments->NumRows()) {
          $Comments->DataSeek(-1);
@@ -831,8 +836,21 @@ class EditorPlugin extends Gdn_Plugin {
          $CommentIDList[] = $Sender->Comment->CommentID;
       }
 
+      // TODO
+      // Added note for caching here because it was the CommentIDList that
+      // is the main problem. 
+      // Note about memcaching:
+      // Main problem with this is when a new comment is posted. It will only
+      // have that current comment in the list, which, after calling
+      // PreloadDiscussionMedia, means it will be the only piece of data added
+      // to the cache, which prevents all the rest of the comments from loading
+      // their own attachments. Consider either adding to the cache when a new
+      // file is uploaded, or just getting a list of all comments for a
+      // discussion.
+      // This is why memcaching has been disabled for now. There are a couple
+      // ways to prevent this, but they all seem unnecessary.
+
       if (count($CommentIDList)) {
-         $DiscussionID = $Sender->Data('Discussion.DiscussionID');
          $MediaData = $this->PreloadDiscussionMedia($DiscussionID, $CommentIDList);
       }
 
@@ -842,9 +860,9 @@ class EditorPlugin extends Gdn_Plugin {
    /**
     * Get media list for inserting into discussion and comments.
     */
-   public function MediaCache() {
+   public function MediaCache($Sender) {
       if ($this->mediaCache === null) {
-         $this->CacheAttachedMedia(Gdn::Controller());
+         $this->CacheAttachedMedia($Sender);
       }
 
       return $this->mediaCache;
@@ -863,11 +881,9 @@ class EditorPlugin extends Gdn_Plugin {
       $mediaDataDiscussion = array();
       $mediaDataComment = array();
 
-      $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
+      /*$cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
       $cacheResponse = Gdn::Cache()->Get($cacheKey);
-
-      if ($cacheResponse === Gdn_Cache::CACHEOP_FAILURE) {
-
+      if ($cacheResponse === Gdn_Cache::CACHEOP_FAILURE) {*/
          $mediaModel = new Gdn_Model('Media');
 
          // Query the Media table for discussion media.
@@ -903,13 +919,13 @@ class EditorPlugin extends Gdn_Plugin {
          }
 
          $mediaData = array_merge($mediaDataDiscussion, $mediaDataComment);
-
+      /*
          Gdn::Cache()->Store($cacheKey, $mediaData, array(
                 Gdn_Cache::FEATURE_EXPIRY => $this->mediaCacheExpire
          ));
       } else {
          $mediaData = $cacheResponse;
-      }
+      }*/
 
 		return $mediaData;
    }
