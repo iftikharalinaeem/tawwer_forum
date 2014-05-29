@@ -36,25 +36,31 @@ class OneLogin_Saml_Response
         $this->document->loadXML($this->assertion);
     }
 
+    public function decrypt() {
+        $xmlSec = new OneLogin_Saml_XmlSec($this->_settings, $this);
+        $xmlSec->decrypt();
+        $this->document = $xmlSec->getDocument();
+    }
+
     /**
      * Determine if the SAML Response is valid using the certificate.
      *
      * @throws Exception
      * @return bool Validate the document
      */
-    public function isValid()
-    {
+    public function isValid() {
+        $this->decrypt();
         $xmlSec = new OneLogin_Saml_XmlSec($this->_settings, $this);
+
         return $xmlSec->isValid();
     }
 
     /**
      * Get the NameID provided by the SAML response from the IdP.
      */
-    public function getNameId()
-    {
-        $entries = $this->_queryAssertion('/saml:Subject/saml:NameID');
-        return $entries->item(0)->nodeValue;
+    public function getNameId() {
+        $entries = $this->queryAssertion('/saml:Subject/saml:NameID');
+        return (string)reset($entries);
     }
 
     /**
