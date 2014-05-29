@@ -2,12 +2,12 @@
 
 $PluginInfo['samlsso'] = array(
     'Name' => 'SAML SSO',
-    'Description' => 'SAML SSO for Vanilla',
-    'Version' => '1.0.3b',
+    'Description' => 'Allows Vanilla to SSO to a SAML 2.0 compliant identity provider.',
+    'Version' => '1.1b',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
-    'HasLocale' => FALSE,
+    'RequiredTheme' => false,
+    'RequiredPlugins' => false,
+    'HasLocale' => false,
     'SettingsUrl' => '/settings/samlsso',
     'SettingsPermission' => 'Garden.Settings.Manage'
 );
@@ -272,7 +272,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $provider = $this->Provider();
 
       $Form = $Sender->Form; //new Gdn_Form();
-      $Form->SetFormValue('UniqueID', $response->getNameId());
+      $Form->SetFormValue('UniqueID', $id);
       $Form->SetFormValue('Provider', self::ProviderKey);
       $Form->SetFormValue('ProviderName', $provider['Name']);
       $Form->SetFormValue('ConnectName', $this->rval('uid', $profile));
