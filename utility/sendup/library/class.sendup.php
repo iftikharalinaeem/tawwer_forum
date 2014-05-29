@@ -283,7 +283,9 @@ class SendUp extends Worker {
                         if (is_dir($Job))
                             return;
 
-                        $destFilePath = strtolower($destFilePath);
+                        if (self::$Lower) {
+                            $destFilePath = strtolower($destFilePath);
+                        }
                         $this->CloudFiles->PutObject(self::$Container, $destFilePath, array($Job));
                         $success = TRUE;
                         break;
@@ -291,7 +293,9 @@ class SendUp extends Worker {
                     // Remote to remote
                     case 'xcopy':
 
-                        $destFilePath = strtolower($destFilePath);
+                        if (self::$Lower) {
+                            $destFilePath = strtolower($destFilePath);
+                        }
                         $this->CloudFiles->CopyObject($sourceContainer, $file, self::$Container, $destFilePath);
                         $success = TRUE;
                         break;
