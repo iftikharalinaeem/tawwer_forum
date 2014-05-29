@@ -5,7 +5,7 @@ require_once('Settings.php');
  * Create a SAML authorization request.
  */
 class OneLogin_Saml_AuthRequest {
-    const ID_PREFIX = 'VANILLA';
+    const ID_PREFIX = 'vf-';
 
     /**
      * A SamlResponse class provided to the constructor.

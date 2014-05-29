@@ -31,7 +31,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $request->relayState = $target;
       $url = $request->getRedirectUrl();
       Gdn::Session()->Stash('samlsso', NULL, TRUE);
-      Logger::event('saml_authrequest_sent', LogLevel::DEBUG, 'SAML request {id} sent to {host}.', array('id' => $request->lastID, 'host' => parse_url(''), 'url' => $url));
+      Logger::event('saml_authrequest_sent', LogLevel::DEBUG, 'SAML request {id} sent to {host}.',
+          array('id' => $request->lastID, 'host' => parse_url($url, PHP_URL_HOST), 'url' => $url));
       Redirect($url);
    }
 
