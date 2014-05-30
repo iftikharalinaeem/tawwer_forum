@@ -63,11 +63,12 @@ class Reporting2Plugin extends Gdn_Plugin {
          // Get RoleIDs for roles that can flag
          $AllowedRoles = $RoleModel->GetByPermission('Garden.SignIn.Allow');
          $AllowedRoleIDs = array_column($AllowedRoles->Result(DATASET_TYPE_ARRAY), 'RoleID');
-         if ($ApplicantRoleID = C('Garden.Registration.ApplicantRoleID')) {
-            $AllowedRoleIDs[] = $ApplicantRoleID;
+         // Disallow applicants & unconfirmed by default
+         if(($Key = array_search(C('Garden.Registration.ApplicantRoleID'), $AllowedRoleIDs)) !== false) {
+            unset($AllowedRoleIDs[$Key]);
          }
-         if ($EmailRoleID = C('Garden.Registration.ConfirmEmailRole')) {
-            $AllowedRoleIDs[] = $EmailRoleID;
+         if(($Key = array_search(C('Garden.Registration.ConfirmEmailRole'), $AllowedRoleIDs)) !== false) {
+            unset($AllowedRoleIDs[$Key]);
          }
 
          // Build permissions for the new category
