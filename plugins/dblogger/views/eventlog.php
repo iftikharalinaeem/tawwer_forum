@@ -109,15 +109,22 @@ echo $this->Form->Errors();
             $i++;
 
             ?>
-            <tr class="severity-<?php echo strtolower($event['LogLevel']); echo $i%2 == 0 ? ' odd' : ' even' ;?>">
-                <td><?php echo Gdn_Format::DateFull($event['DateTimeInserted'], 'html'); ?></td>
+            <tr class="severity-<?php echo Logger::priorityLabel($event['Level']); echo $i%2 == 0 ? ' odd' : ' even' ;?>">
+                <td><?php echo Gdn_Format::DateFull($event['Timestamp'], 'html'); ?></td>
                 <td><?php echo htmlspecialchars($event['Message']); ?></td>
                 <td class="UsernameCell">
-                    <?php echo Anchor($event['InsertName'], $event['InsertProfileUrl']); ?>
+                    <?php
+                    $User = Gdn::UserModel()->GetID($event['UserID']);
+                    if ($User) {
+                        echo UserAnchor($User);
+                    } else {
+                        echo htmlspecialchars($event['Username']);
+                    }
+                    ?>
                 </td>
-                <td><?php echo htmlspecialchars(Logger::priorityLabel($event['LogLevel'])); ?></td>
+                <td><?php echo htmlspecialchars(Logger::priorityLabel($event['Level'])); ?></td>
                 <td><?php echo htmlspecialchars($event['Event']); ?></td>
-                <td><?php echo Anchor($event['InsertIPAddress'], Url('/user/browse?Keywords=') . $event['InsertIPAddress']); ?></td>
+                <td><?php echo Anchor($event['IP'], Url('/user/browse?Keywords='.urlencode($event['IP']))); ?></td>
 
             </tr>
             <?php

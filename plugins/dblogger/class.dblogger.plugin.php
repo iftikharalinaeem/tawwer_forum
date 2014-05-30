@@ -28,18 +28,23 @@ class DbLoggerPlugin extends Gdn_Plugin {
     }
 
     public function structure() {
+        Gdn::Structure()->Table('EventLog');
+        if (Gdn::Structure()->ColumnExists('EventLogID')) {
+            Gdn::Structure()->Drop();
+        }
+
         Gdn::Structure()->Table('EventLog')
-            ->Column('EventLogID', 'varchar(13)', false, 'primary')
-            ->Column('TimeInserted', 'uint', true, 'index')
+            ->Column('ID', 'varchar(16)', false, 'primary')
+            ->Column('Timestamp', 'uint', true, 'index')
             ->Column('Event', 'varchar(50)', true, 'index')
-            ->Column('LogLevel', 'tinyint', true, 'index')
+            ->Column('Level', 'tinyint', true, 'index')
             ->Column('Message', 'text')
             ->Column('Method', 'varchar(10)', true)
             ->Column('Domain', 'varchar(255)', true)
             ->Column('Path', 'varchar(255)', true)
-            ->Column('InsertUserID', 'int', true)
-            ->Column('InsertName', 'varchar(50)', true)
-            ->Column('InsertIPAddress', 'varchar(15)', true)
+            ->Column('UserID', 'int', true)
+            ->Column('Username', 'varchar(50)', true)
+            ->Column('IP', 'varchar(15)', true)
             ->Column('Attributes', 'text', true)
             ->Set();
     }
@@ -84,7 +89,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
             if (!$v) {
                 $Sender->Form->AddError('Invalid Date format for From Date.');
             }
-            $sql->Where('TimeInserted >=', $v);
+            $sql->Where('Timestamp >=', $v);
             $Sender->Form->SetFormValue('datefrom', $get['datefrom']);
         }
 
@@ -93,7 +98,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
             if (!$v) {
                 $Sender->Form->AddError('Invalid Date format for To Date.');
             }
-            $sql->Where('TimeInserted <=', $v);
+            $sql->Where('Timestamp <=', $v);
             $Sender->Form->SetFormValue('dateto', $get['dateto']);
         }
 
@@ -105,7 +110,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
             if (!isset($this->severityOptions[$v])) {
                 $Sender->Form->AddError('Invalid severity.  Valid options are: ' . $validLevelString);
             }
-            $sql->Where('LogLevel =', $v);
+            $sql->Where('Level =', $v);
             $Sender->Form->SetFormValue('severity', $v);
 
         }
@@ -123,7 +128,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
                 $sortOrder = 'desc';
             }
         }
-        $sql->OrderBy('TimeInserted', $sortOrder);
+        $sql->OrderBy('Timestamp', $sortOrder);
         $Sender->Form->SetFormValue('sortorder', $sortOrder);
 
         $events = $sql->Get()->ResultArray();
@@ -132,12 +137,10 @@ class DbLoggerPlugin extends Gdn_Plugin {
 
         // Application calculation.
         foreach ($events as &$event) {
-            $event['FullPath'] = $event['Domain'] . ltrim($event['Path'], '/');
-            $event['DateTimeInserted'] = Gdn_Format::DateFull($event['TimeInserted']);
-            $event['InsertProfileUrl'] = UserUrl(Gdn::UserModel()->GetID($event['InsertUserID']));
-            unset($event['Domain']);
-            unset($event['Path']);
-            unset($event['TimeInserted']);
+            $event['Url'] = $event['Domain'] . ltrim($event['Path'], '/');
+//            $event['InsertProfileUrl'] = UserUrl(Gdn::UserModel()->GetID($event['InsertUserID']));
+
+            unset($event['Domain'], $event['Path']);
         }
 
         $Sender->SetData('_CurrentRecords', count($events));
