@@ -115,7 +115,7 @@ echo $this->Form->Errors();
                 <td class="UsernameCell">
                     <?php echo Anchor($event['InsertName'], $event['InsertProfileUrl']); ?>
                 </td>
-                <td><?php echo htmlspecialchars($event['LogLevel']); ?></td>
+                <td><?php echo htmlspecialchars(Logger::priorityLabel($event['LogLevel'])); ?></td>
                 <td><?php echo htmlspecialchars($event['Event']); ?></td>
                 <td><?php echo Anchor($event['InsertIPAddress'], Url('/user/browse?Keywords=') . $event['InsertIPAddress']); ?></td>
 

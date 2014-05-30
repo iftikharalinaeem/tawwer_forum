@@ -32,7 +32,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
             ->Column('EventLogID', 'varchar(13)', false, 'primary')
             ->Column('TimeInserted', 'uint', true, 'index')
             ->Column('Event', 'varchar(50)', true, 'index')
-            ->Column('LogLevel', 'varchar(50)', true, 'index')
+            ->Column('LogLevel', 'tinyint', true, 'index')
             ->Column('Message', 'text')
             ->Column('Method', 'varchar(10)', true)
             ->Column('Domain', 'varchar(255)', true)
@@ -42,6 +42,11 @@ class DbLoggerPlugin extends Gdn_Plugin {
             ->Column('InsertIPAddress', 'varchar(15)', true)
             ->Column('Attributes', 'text', true)
             ->Set();
+    }
+
+    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+        $Menu = &$Sender->EventArguments['SideMenu'];
+        $Menu->AddLink('Dashboard', T('Event Log'), '/settings/eventlog', 'Garden.Settings.Manage');
     }
 
     /**
