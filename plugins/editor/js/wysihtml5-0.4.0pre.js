@@ -5474,7 +5474,8 @@ wysihtml5.dom.replaceWithChildNodes = function(node) {
         "width":              0,
         "height":             0,
         "marginwidth":        0,
-        "marginheight":       0
+        "marginheight":       0,
+        "title":              "WYSIWYG editor"
       }).on(iframe);
 
       // Setting the src like this prevents ssl warnings in IE6
