@@ -99,7 +99,10 @@ class ReportModel extends Gdn_Model {
             $ReportAttributes['CategoryID'] = $ReportDiscussion['CategoryID'];
 
          $NewDiscussion = array(
-            'Name' => $ReportDiscussion['Name'],
+            'Name' => sprintf(T('Report Name Format', "%s"),
+               $ReportDiscussion['Name'],
+               $ReportDiscussion['InsertName'],
+               $ReportDiscussion['Category']),
             'Body' => sprintf(T('Report Body Format', "%s\n\n%s"),
                FormatQuote($Record),
                ReportContext($Record)),
