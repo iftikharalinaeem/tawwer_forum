@@ -186,58 +186,22 @@ class EditorPlugin extends Gdn_Plugin {
    protected function getFontColorList() {
       $fontColorList = array(
          'black',
-         'white',
+         //'white',
          'gray',
-         'silver',
-         'maroon',
          'red',
-         'purple',
          'green',
-         'olive',
-         'navy',
+         'purple',
+         'yellow',
          'blue',
-         'lime'
+         'orange'
+         //'olive',
+         //'navy',
+         //'lime',
+         //'silver',
+         //'maroon'
       );
 
       return $fontColorList;
-   }
-
-   /* THIS IS HERE FOR TESTING NEW ADDITIONS. Move into proper themehooks or
-   plugin later.*/
-   public function EditorPlugin_toolbarConfig_Handler($sender, $args) {
-       $editorActions =& $args['actions'];
-       $colors =& $args['colors'];
-
-       $fontColors = array_merge($colors, array('pinkish'));
-       $editorActions = array_merge($editorActions, array(
-           'bold' => true,
-           'italic' => true,
-           'strike' => true,
-           'orderedlist' => true,
-           'unorderedlist' => true,
-
-           'sep-format' => true, // separator
-           'color' => true,
-           'highlightcolor' => true,
-           'font' => false,
-           'format' => true,
-
-           'sep-media' => true, // separator
-           'emoji' => true,
-           'links' => true,
-           'images' => false,
-           'uploads' => true,
-
-           'sep-align' => true, // separator
-           'alignleft' => true,
-           'aligncenter' => true,
-           'alignright' => true,
-
-           'sep-switches' => true, // separator
-           'togglehtml' => true,
-           'fullpage' => true,
-           'lights' => true
-       ));
    }
 
    /**
@@ -272,6 +236,9 @@ class EditorPlugin extends Gdn_Plugin {
          $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, 'title' => T($fontColor), 'data-editor' => $editorDataAttr));
 
          // Highlight color
+         if ($fontColor == 'black') {
+             $fontColor = 'white';
+         }
          $editorDataAttrHighlight = '{"action":"highlightcolor","value":"'. $fontColor .'"}';
          $toolbarDropdownFontColorHighlight[] = array('edit' => 'basic', 'action'=> 'highlightcolor', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'highlightcolor', 'data-wysihtml5-command-value' => $fontColor, 'title' => T($fontColor), 'data-editor' => $editorDataAttrHighlight));
       }

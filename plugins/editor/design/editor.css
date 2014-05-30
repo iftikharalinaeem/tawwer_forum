@@ -331,21 +331,22 @@
  * Colors dropdown
  */
 .editor-dropdown-color .editor-insert-dialog {
-  width: 88px;
+  width: 56px;
 }
 
 .editor-dropdown-color.color-has-highlight .editor-insert-dialog {
-  width: 198px;
+  width: 134px;
 }
 
 .editor-dropdown-color .editor-insert-dialog .color {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   float: left;
   cursor: pointer;
   border: 1px solid #fff;
   box-shadow: inset 0 0 0 1px #fff;
   transition: transform 0.2s ease;
+  margin: 1px;
 }
 
 .editor-dropdown-color .editor-insert-dialog .color:hover,
@@ -358,15 +359,15 @@
 }
 
 .editor-dropdown-color .editor-insert-dialog .color-group {
-  width: 88px;
+  width: 56px;
   display: inline-block;
 }
 
-.editor-dropdown-color .editor-insert-dialog .color-group strong {
+.editor-dropdown-color .editor-insert-dialog .color-group .icon {
   display: block;
-  padding: 5px 0 10px 0;
-  font-weight: normal;
-  color: #999;
+  padding: 5px 0 5px 2px;
+  background: 0;
+  cursor: default;
 }
 
 .editor-dropdown-color .editor-insert-dialog .highlight-color {
@@ -956,6 +957,15 @@ cell-* are used for the dropdown */
 .cell-color-aqua,
 .post-highlightcolor-aqua {
   background-color: #7fdbff;
+}
+
+.post-color-orange {
+  color: #ffa500;
+}
+
+.cell-color-orange,
+.post-highlightcolor-orange {
+  background-color: #ffa500;
 }
 
 .post-text-align-right {

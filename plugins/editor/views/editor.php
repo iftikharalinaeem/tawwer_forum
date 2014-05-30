@@ -110,7 +110,7 @@
                         }
 
                         if ($textColorOptions) {
-                            $textColorOptions = '<div class="color-group text-color ClearFix"><strong>Text</strong>' . $textColorOptions . '</div>';
+                            $textColorOptions = '<div class="color-group text-color ClearFix"><i class="icon icon-font" title="Text"></i>' . $textColorOptions . '</div>';
                         }
                     }
 
@@ -121,7 +121,7 @@
                         }
 
                         if ($highlightColorOptions) {
-                            $highlightColorOptions = '<div class="color-group highlight-color ClearFix"><strong>Highlight</strong>' . $highlightColorOptions . '</div>';
+                            $highlightColorOptions = '<div class="color-group highlight-color ClearFix"><i class="icon icon-sign-blank" title="Highlight"></i>' . $highlightColorOptions . '</div>';
                         }
                     }
 

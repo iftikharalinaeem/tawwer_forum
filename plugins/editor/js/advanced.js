@@ -73,6 +73,8 @@ var wysihtml5ParserRules = {
         "post-highlightcolor-white": 1,
         "post-color-yellow": 1,
         "post-highlightcolor-yellow": 1,
+        "post-color-orange": 1,
+        "post-highlightcolor-orange": 1,
         "post-float-left": 1,
         "post-float-right": 1,
         "post-font-size-large": 1,
