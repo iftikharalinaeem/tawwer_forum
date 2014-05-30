@@ -39,12 +39,12 @@ class Syslogger extends BaseLogger {
         $realMessage = FormatString($message, $context);
         $priority = Logger::levelPriority($level);
 
-        if ($event = val('Event', $context)) {
+        if ($event = val('event', $context, '!')) {
             $realMessage = "<$event> $realMessage";
         }
         $realMessage = rtrim($realMessage, '.').'.';
 
-        $url = trim(val('Method', $context).' '.val('Domain', $context).val('Path', $context));
+        $url = trim(val('method', $context).' '.val('domain', $context).val('path', $context));
         if ($url)
             $realMessage .= ' '.$url;
 
@@ -53,32 +53,14 @@ class Syslogger extends BaseLogger {
 
     protected function logJson($level, $message, array $context = array()) {
         $msg = FormatString($message, $context);
-        $context = array_change_key_case($context, CASE_LOWER);
 
         // Add the standard fields to the row.
-        $row = [
-            'event' => val('event', $context),
-            'msg' => $msg,
-            'username' => $context['insertname'],
-            'userid' => $context['insertuserid'],
-            'ip' => $context['insertipaddress'],
-            'method' => $context['method'],
-            'domain' => $context['domain'],
-            'path' => $context['path']
-        ];
+        $row = array_merge([
+            'msg' => $message,
+        ], $context);
 
         $tags = array_merge((array)val('tags', $context, []), explode('_', $row['event']));
         $row['tags'] = $tags;
-
-        // Remove the standard fields.
-        unset($context['event'], $context['insertname'], $context['insertuserid'], $context['insertipaddress'],
-            $context['method'], $context['domain'], $context['timeinserted'], $context['path'], $context['tags'], $context['responsebody']);
-
-        foreach ($context as $key => $val) {
-            if (!isset($row[$key])) {
-                $row[$key] = $val;
-            }
-        }
 
         if ($this->extra) {
             $row += $this->extra;
