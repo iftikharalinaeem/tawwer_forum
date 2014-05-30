@@ -103,12 +103,17 @@ class MultisiteModel extends Gdn_Model {
             // The site built.
             $this->SetField($id, [
                 'Status' => 'building',
-                'DateStatus' => Gdn_Format::ToDateTime()
+                'DateStatus' => Gdn_Format::ToDateTime(),
+                'SiteID' => valr('site.SiteID', $build)
             ]);
             return true;
         } elseif ($buildQuery->code() == 409 && val('site', $build)) {
             // The site already existed.
             $this->status($id, 'active');
+            $siteID = valr('site.SiteID', $build);
+            if ($siteID) {
+                $this->SetField($id, 'SiteID', $siteID);
+            }
         } else {
             // The site has an error.
             $error = $buildQuery->errorMsg();
