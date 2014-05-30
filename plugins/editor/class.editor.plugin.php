@@ -136,16 +136,18 @@ class EditorPlugin extends Gdn_Plugin {
     *
     * @return array List of allowed editor actions
     */
-   public function getAllowedEditorActions($name = null, $value = null) {
+   public function getAllowedEditorActions() {
       static $allowedEditorActions = array(
           'bold' => true,
           'italic' => true,
           'strike' => true,
-          'color' => false,
           'orderedlist' => true,
           'unorderedlist' => true,
 
           'sep-format' => true, // separator
+          'color' => false,
+          'highlightcolor' => false, // Dependent on color. TODO add multidim support.
+          'font' => false,
           'format' => true,
 
           'sep-media' => true, // separator
@@ -165,17 +167,7 @@ class EditorPlugin extends Gdn_Plugin {
           'lights' => true
       );
 
-      if ($name !== null) {
-         if (is_array($name)) {
-            $allowedEditorActions = $name;
-         } elseif ($value !== null) {
-            $allowedEditorActions[$name] = $value;
-         } else {
-            return GetValue($name, $allowedEditorActions, null);
-         }
-      } else {
-         return $allowedEditorActions;
-      }
+      return $allowedEditorActions;
    }
 
    /**
@@ -210,6 +202,44 @@ class EditorPlugin extends Gdn_Plugin {
       return $fontColorList;
    }
 
+   /* THIS IS HERE FOR TESTING NEW ADDITIONS. Move into proper themehooks or
+   plugin later.*/
+   public function EditorPlugin_toolbarConfig_Handler($sender, $args) {
+       $editorActions =& $args['actions'];
+       $colors =& $args['colors'];
+
+       $fontColors = array_merge($colors, array('pinkish'));
+       $editorActions = array_merge($editorActions, array(
+           'bold' => true,
+           'italic' => true,
+           'strike' => true,
+           'orderedlist' => true,
+           'unorderedlist' => true,
+
+           'sep-format' => true, // separator
+           'color' => true,
+           'highlightcolor' => true,
+           'font' => false,
+           'format' => true,
+
+           'sep-media' => true, // separator
+           'emoji' => true,
+           'links' => true,
+           'images' => false,
+           'uploads' => true,
+
+           'sep-align' => true, // separator
+           'alignleft' => true,
+           'aligncenter' => true,
+           'alignright' => true,
+
+           'sep-switches' => true, // separator
+           'togglehtml' => true,
+           'fullpage' => true,
+           'lights' => true
+       ));
+   }
+
    /**
     * This method will grab the permissions array from getAllowedEditorActions,
     * build the "kitchen sink" editor toolbar, then filter out the allowed
@@ -223,16 +253,33 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbar        = array();
       $editorToolbarAll     = array();
       $allowedEditorActions = $this->getAllowedEditorActions();
+      $fontColorList        = $this->getFontColorList();
+
+      // Let plugins and themes override the defaults.
+      $this->EventArguments['actions'] =& $allowedEditorActions;
+      $this->EventArguments['colors'] =& $fontColorList;
+      $this->FireEvent('toolbarConfig');
 
       /**
        * Build color dropdown from array
        */
+      $toolbarColorGroups = array();
       $toolbarDropdownFontColor = array();
-      $fontColorList            = $this->getFontColorList();
+      $toolbarDropdownFontColorHighlight = array();
       foreach ($fontColorList as $fontColor) {
+         // Fore color
          $editorDataAttr             = '{"action":"color","value":"'. $fontColor .'"}';
          $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, 'title' => T($fontColor), 'data-editor' => $editorDataAttr));
+
+         // Highlight color
+         $editorDataAttrHighlight = '{"action":"highlightcolor","value":"'. $fontColor .'"}';
+         $toolbarDropdownFontColorHighlight[] = array('edit' => 'basic', 'action'=> 'highlightcolor', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'highlightcolor', 'data-wysihtml5-command-value' => $fontColor, 'title' => T($fontColor), 'data-editor' => $editorDataAttrHighlight));
       }
+
+       $toolbarColorGroups['text'] = $toolbarDropdownFontColor;
+       if ($allowedEditorActions['highlightcolor']) {
+           $toolbarColorGroups['highlight'] = $toolbarDropdownFontColorHighlight;
+       }
 
       /**
        * Build emoji dropdown from array
@@ -278,7 +325,11 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => T('Bold'), 'data-editor' => '{"action":"bold","value":""}'));
       $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => T('Italic'), 'data-editor' => '{"action":"italic","value":""}'));
       $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'strikethrough', 'title' => T('Strike'), 'data-editor' => '{"action":"strike","value":""}'));
-      $editorToolbarAll['color'] = array('edit' => 'basic', 'action'=> 'color', 'type' => $toolbarDropdownFontColor, 'attr' => array('class' => 'editor-action icon icon-font editor-dd-color editor-optional-button', 'data-wysihtml5-command-group' => 'foreColor', 'title' => T('Color'), 'data-editor' => '{"action":"color","value":""}'));
+
+      $editorToolbarAll['color'] = array('edit' => 'basic', 'action'=> 'color', 'type' =>
+          $toolbarColorGroups,
+          'attr' => array('class' => 'editor-action icon icon-font editor-dd-color editor-optional-button', 'data-wysihtml5-command-group' => 'foreColor', 'title' => T('Color'), 'data-editor' => '{"action":"color","value":""}'));
+
       $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => T('Ordered list'), 'data-editor' => '{"action":"orderedlist","value":""}'));
       $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => T('Unordered list'), 'data-editor' => '{"action":"unorderedlist","value":""}'));
 
@@ -838,7 +889,7 @@ class EditorPlugin extends Gdn_Plugin {
 
       // TODO
       // Added note for caching here because it was the CommentIDList that
-      // is the main problem. 
+      // is the main problem.
       // Note about memcaching:
       // Main problem with this is when a new comment is posted. It will only
       // have that current comment in the list, which, after calling

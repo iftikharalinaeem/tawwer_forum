@@ -120,27 +120,53 @@
    margin: 0;
 }
 
-.editor-dd-color + .editor-insert-dialog {
-   width: 88px;
+/**
+ * Colors dropdown
+ */
+
+.editor-dropdown-color .editor-insert-dialog {
+  width: 88px;
 }
 
-.editor-dd-color + .editor-insert-dialog .color {
-   width: 20px;
-   height: 20px;
-   float: left;
-   cursor: pointer;
-   border: 1px solid #fff;
-   box-shadow: inset 0 0 0 1px #fff;
-   transition: transform 0.2s ease;
+.editor-dropdown-color.color-has-highlight .editor-insert-dialog{
+  width: 198px;
 }
 
-.editor-dd-color + .editor-insert-dialog .color:hover,
-.editor-dd-color + .editor-insert-dialog .wysihtml5-command-active {
-   border: 1px solid transparent;
-   transform: scale(1.10);
-   position: relative;
-   z-index: 10;
-   border-radius: 2px;
+.editor-dropdown-color .editor-insert-dialog .color {
+  width: 20px;
+  height: 20px;
+  float: left;
+  cursor: pointer;
+  border: 1px solid #fff;
+  box-shadow: inset 0 0 0 1px #fff;
+  transition: transform 0.2s ease;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color:hover,
+.editor-dropdown-color .editor-insert-dialog .wysihtml5-command-active {
+  border: 1px solid transparent;
+  transform: scale(1.10);
+  position: relative;
+  z-index: 10;
+  border-radius: 2px;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color-group {
+  width: 88px;
+  display: inline-block;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color-group strong {
+  display: block;
+  padding: 5px 0 10px 0;
+  font-weight: normal;
+  color: #999;
+}
+
+.editor-dropdown-color .editor-insert-dialog .highlight-color {
+  border-left: 1px solid #EFEFEF;
+  padding-left: 10px;
+  margin-left: 10px;
 }
 
 /**

@@ -43,7 +43,8 @@ cell-* are used for the dropdown */
   color: #111111;
 }
 
-.cell-color-black {
+.cell-color-black,
+.post-highlightcolor-black {
   background-color: #111111;
 }
 
@@ -51,7 +52,8 @@ cell-* are used for the dropdown */
   color: #dddddd;
 }
 
-.cell-color-silver {
+.cell-color-silver,
+.post-highlightcolor-silver {
   background-color: #dddddd;
 }
 
@@ -59,7 +61,8 @@ cell-* are used for the dropdown */
   color: #aaaaaa;
 }
 
-.cell-color-gray {
+.cell-color-gray,
+.post-highlightcolor-gray {
   background-color: #aaaaaa;
 }
 
@@ -67,7 +70,8 @@ cell-* are used for the dropdown */
   color: #ffffff;
 }
 
-.cell-color-white {
+.cell-color-white,
+.post-highlightcolor-white {
   background-color: #ffffff;
 }
 
@@ -75,7 +79,8 @@ cell-* are used for the dropdown */
   color: #85144b;
 }
 
-.cell-color-maroon {
+.cell-color-maroon,
+.post-highlightcolor-maroon {
   background-color: #85144b;
 }
 
@@ -83,7 +88,8 @@ cell-* are used for the dropdown */
   color: #ff4136;
 }
 
-.cell-color-red {
+.cell-color-red,
+.post-highlightcolor-red {
   background-color: #ff4136;
 }
 
@@ -91,7 +97,8 @@ cell-* are used for the dropdown */
   color: #7b11d0;
 }
 
-.cell-color-purple {
+.cell-color-purple,
+.post-highlightcolor-purple {
   background-color: #7b11d0;
 }
 
@@ -99,7 +106,8 @@ cell-* are used for the dropdown */
   color: #f012be;
 }
 
-.cell-color-fuchsia {
+.cell-color-fuchsia,
+.post-highlightcolor-fuchsia {
   background-color: #f012be;
 }
 
@@ -107,7 +115,8 @@ cell-* are used for the dropdown */
   color: #2ecc40;
 }
 
-.cell-color-green {
+.cell-color-green,
+.post-highlightcolor-green {
   background-color: #2ecc40;
 }
 
@@ -115,7 +124,8 @@ cell-* are used for the dropdown */
   color: #01ff70;
 }
 
-.cell-color-lime {
+.cell-color-lime,
+.post-highlightcolor-lime {
   background-color: #01ff70;
 }
 
@@ -123,7 +133,8 @@ cell-* are used for the dropdown */
   color: #3d9970;
 }
 
-.cell-color-olive {
+.cell-color-olive,
+.post-highlightcolor-olive {
   background-color: #3d9970;
 }
 
@@ -131,7 +142,8 @@ cell-* are used for the dropdown */
   color: #ffdc00;
 }
 
-.cell-color-yellow {
+.cell-color-yellow,
+.post-highlightcolor-yellow {
   background-color: #ffdc00;
 }
 
@@ -139,7 +151,8 @@ cell-* are used for the dropdown */
   color: #001f3f;
 }
 
-.cell-color-navy {
+.cell-color-navy,
+.post-highlightcolor-navy {
   background-color: #001f3f;
 }
 
@@ -147,7 +160,8 @@ cell-* are used for the dropdown */
   color: #0074d9;
 }
 
-.cell-color-blue {
+.cell-color-blue,
+.post-highlightcolor-blue {
   background-color: #0074d9;
 }
 
@@ -155,7 +169,8 @@ cell-* are used for the dropdown */
   color: #39cccc;
 }
 
-.cell-color-teal {
+.cell-color-teal,
+.post-highlightcolor-teal {
   background-color: #39cccc;
 }
 
@@ -163,7 +178,8 @@ cell-* are used for the dropdown */
   color: #7fdbff;
 }
 
-.cell-color-aqua {
+.cell-color-aqua,
+.post-highlightcolor-aqua {
   background-color: #7fdbff;
 }
 
