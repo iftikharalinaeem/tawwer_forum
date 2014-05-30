@@ -167,7 +167,7 @@ function parseMoot($moot) {
 
       // OP is 'seed'
       $discussion['seed']['category'] = $category;
-      $discussion['seed']['body'] = $discussion['seed']['body'][0];
+      $discussion['seed']['body'] = implode("\n\n", $discussion['seed']['body']);
 
       // Channels & discussions have the same data structure basically
       if (!$discussion['seed']['body'] && !$discussion['seed']['key'] && !count($discussion['replies'])) {
@@ -186,7 +186,7 @@ function parseMoot($moot) {
       if (count($discussion['replies'])) {
          foreach ($discussion['replies'] as &$reply) {
             $reply['key'] = $discussion['seed']['key'];
-            $reply['body'] = $reply['body'][0];
+            $reply['body'] = implode("\n\n", $reply['body']);
          }
          writeRows('comment', $discussion['replies']);
       }
