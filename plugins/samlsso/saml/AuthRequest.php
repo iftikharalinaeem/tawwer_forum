@@ -19,6 +19,11 @@ class OneLogin_Saml_AuthRequest
      */
     public $isPassive = true;
 
+   /**
+    * @var string The last request ID that was generated.
+    */
+   public $lastID;
+
     /**
      * @var string A
      */
@@ -43,7 +48,7 @@ class OneLogin_Saml_AuthRequest
      */
     public function getRedirectUrl()
     {
-        $id = $this->_generateUniqueID();
+        $id = $this->lastID = $this->_generateUniqueID();
         $issueInstant = $this->_getTimestamp();
         $isPassive = $this->isPassive ? 'true' : 'false';
         $Destination = htmlspecialchars($this->_settings->idpSingleSignOnUrl);

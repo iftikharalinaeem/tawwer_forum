@@ -2,7 +2,7 @@
 
 $ThemeInfo['prospect'] = array(
     'Name'        => "Prospect",
-    'Description' => "A minimal Vanilla theme focused on customer support communities",
+    'Description' => "A clean Vanilla theme focused on customer support communities",
     'Version'     => '1.0.0',
     'Url'         => 'http://vanillaforums.com',
     'Author'      => "Kasper Kronborg Isager",
