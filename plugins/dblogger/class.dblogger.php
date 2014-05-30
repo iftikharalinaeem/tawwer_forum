@@ -42,7 +42,6 @@ class DbLogger extends BaseLogger {
             $insert['attributes'] = json_encode($attributes, JSON_UNESCAPED_SLASHES);
         }
         $insert['id'] = uniqid('', false).substr(dechex(mt_rand()), 0, 3);
-        $insert['level'] = $level;
 
         return Gdn::SQL()->Insert('EventLog', $insert);
     }
