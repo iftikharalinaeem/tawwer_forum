@@ -60,18 +60,30 @@ class Reporting2Plugin extends Gdn_Plugin {
          $ModeratorRoles = $RoleModel->GetByPermission('Garden.Moderation.Manage');
          $ModeratorRoleIDs = array_column($ModeratorRoles->Result(DATASET_TYPE_ARRAY), 'RoleID');
 
+         // Get RoleIDs for roles that can flag
+         $AllowedRoles = $RoleModel->GetByPermission('Garden.SignIn.Allow');
+         $AllowedRoleIDs = array_column($AllowedRoles->Result(DATASET_TYPE_ARRAY), 'RoleID');
+         if ($ApplicantRoleID = C('Garden.Registration.ApplicantRoleID')) {
+            $AllowedRoleIDs[] = $ApplicantRoleID;
+         }
+         if ($EmailRoleID = C('Garden.Registration.ConfirmEmailRole')) {
+            $AllowedRoleIDs[] = $EmailRoleID;
+         }
+
          // Build permissions for the new category
          $Permissions = array();
          $AllRoles = array_column(RoleModel::Roles(), 'RoleID');
          foreach ($AllRoles as $RoleID) {
             $IsModerator =  (in_array($RoleID, $ModeratorRoleIDs)) ? 1 : 0;
+            $IsAllowed = (in_array($RoleID, $AllowedRoleIDs)) ? 1 : 0;
             $Permissions[] = array(
                'RoleID' => $RoleID,
                'JunctionTable' => 'Category',
                'JunctionColumn' => 'PermissionCategoryID',
                'JunctionID' => $CategoryID,
                'Vanilla.Discussions.View' => $IsModerator,
-               'Vanilla.Comments.Add' => $IsModerator
+               'Vanilla.Discussions.Add' => $IsAllowed,
+               'Vanilla.Comments.Add' => $IsAllowed
             );
          }
 
