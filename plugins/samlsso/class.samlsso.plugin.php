@@ -2,12 +2,12 @@
 
 $PluginInfo['samlsso'] = array(
     'Name' => 'SAML SSO',
-    'Description' => 'SAML SSO for Vanilla',
-    'Version' => '1.0.3b',
+    'Description' => 'Allows Vanilla to SSO to a SAML 2.0 compliant identity provider.',
+    'Version' => '1.1b',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
-    'HasLocale' => FALSE,
+    'RequiredTheme' => false,
+    'RequiredPlugins' => false,
+    'HasLocale' => false,
     'SettingsUrl' => '/settings/samlsso',
     'SettingsPermission' => 'Garden.Settings.Manage'
 );
@@ -31,7 +31,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $request->relayState = $target;
       $url = $request->getRedirectUrl();
       Gdn::Session()->Stash('samlsso', NULL, TRUE);
-      Logger::event('saml_authrequest_sent', LogLevel::DEBUG, 'SAML request {id} sent to {host}.', ['id' => $request->lastID, 'host' => parse_url(''), 'url' => $url]);
+      Logger::event('saml_authrequest_sent', Logger::DEBUG, 'SAML request {requetid} sent to {requesthost}.',
+          array('requestid' => $request->lastID, 'requesthost' => parse_url($url, PHP_URL_HOST), 'requesturl' => $url));
       Redirect($url);
    }
 
@@ -180,6 +181,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
       $url = $request->getRedirectUrl();
       Gdn::Session()->Stash('samlsso', NULL, TRUE);
+      Logger::event('saml_authrequest_sent', Logger::DEBUG, 'SAML request {requestid} sent to {requesthost}.',
+          array('requestid' => $request->lastID, 'requesthost' => parse_url(''), 'requesturl' => $url));
       Redirect($url);
    }
 
@@ -252,14 +255,14 @@ class SamlSSOPlugin extends Gdn_Plugin {
          $response = new OneLogin_Saml_Response($settings, $Sender->Request->Post('SAMLResponse'));
 //         $xml = $response->document->saveXML();
 
-         Logger::event('saml_response_received', LogLevel::DEBUG, "SAML response received.", ['samlresponse' => $Sender->Request->Post('SAMLResponse')]);
+         Logger::event('saml_response_received', Logger::DEBUG, "SAML response received.");
 
          try {
             if (!$response->isValid()) {
                throw new Gdn_UserException('The saml response was not valid.');
             }
          } catch (Exception $ex) {
-            Logger::event('saml_response_invalid', LogLevel::ERROR, $ex->getMessage(), ['code' => $ex->getCode()]);
+            Logger::event('saml_response_invalid', Logger::ERROR, $ex->getMessage(), array('code' => $ex->getCode()));
             throw $ex;
          }
          $id = $response->getNameId();
@@ -270,7 +273,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $provider = $this->Provider();
 
       $Form = $Sender->Form; //new Gdn_Form();
-      $Form->SetFormValue('UniqueID', $response->getNameId());
+      $Form->SetFormValue('UniqueID', $id);
       $Form->SetFormValue('Provider', self::ProviderKey);
       $Form->SetFormValue('ProviderName', $provider['Name']);
       $Form->SetFormValue('ConnectName', $this->rval('uid', $profile));
