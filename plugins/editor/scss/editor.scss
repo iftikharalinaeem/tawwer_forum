@@ -117,6 +117,7 @@
 
 .editor-dropdown-color .editor-insert-dialog {
   width: 56px;
+}
 
 .editor-dropdown-color.color-has-highlight .editor-insert-dialog{
   width: 134px;
@@ -131,7 +132,7 @@
   box-shadow: inset 0 0 0 1px #fff;
   transition: transform 0.2s ease;
   margin: 1px;
-      }
+}
 
 .editor-dropdown-color .editor-insert-dialog .color:hover,
 .editor-dropdown-color .editor-insert-dialog .wysihtml5-command-active {
@@ -139,7 +140,7 @@
   transform: scale(1.10);
   position: relative;
   z-index: 10;
-         border: 1px solid transparent;
+  border: 1px solid transparent;
   border-radius: 2px;
 }
 

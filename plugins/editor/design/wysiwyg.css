@@ -33,219 +33,104 @@ cell-* are used for the dropdown */
 .post-color-black {
   color: #111111; }
 
-<<<<<<< HEAD
-.cell-color-black {
+.cell-color-black, .post-highlightcolor-black {
   background-color: #111111; }
-=======
-.cell-color-black,
-.post-highlightcolor-black {
-  background-color: #111111;
-}
->>>>>>> stage
 
 .post-color-silver {
   color: #dddddd; }
 
-<<<<<<< HEAD
-.cell-color-silver {
+.cell-color-silver, .post-highlightcolor-silver {
   background-color: #dddddd; }
-=======
-.cell-color-silver,
-.post-highlightcolor-silver {
-  background-color: #dddddd;
-}
->>>>>>> stage
 
 .post-color-gray {
   color: #aaaaaa; }
 
-<<<<<<< HEAD
-.cell-color-gray {
+.cell-color-gray, .post-highlightcolor-gray {
   background-color: #aaaaaa; }
-=======
-.cell-color-gray,
-.post-highlightcolor-gray {
-  background-color: #aaaaaa;
-}
->>>>>>> stage
 
 .post-color-white {
   color: #ffffff; }
 
-<<<<<<< HEAD
-.cell-color-white {
+.cell-color-white, .post-highlightcolor-white {
   background-color: #ffffff; }
-=======
-.cell-color-white,
-.post-highlightcolor-white {
-  background-color: #ffffff;
-}
->>>>>>> stage
 
 .post-color-maroon {
   color: #85144b; }
 
-<<<<<<< HEAD
-.cell-color-maroon {
+.cell-color-maroon, .post-highlightcolor-maroon {
   background-color: #85144b; }
-=======
-.cell-color-maroon,
-.post-highlightcolor-maroon {
-  background-color: #85144b;
-}
->>>>>>> stage
 
 .post-color-red {
   color: #ff4136; }
 
-<<<<<<< HEAD
-.cell-color-red {
+.cell-color-red, .post-highlightcolor-red {
   background-color: #ff4136; }
-=======
-.cell-color-red,
-.post-highlightcolor-red {
-  background-color: #ff4136;
-}
->>>>>>> stage
 
 .post-color-purple {
   color: #7b11d0; }
 
-<<<<<<< HEAD
-.cell-color-purple {
+.cell-color-purple, .post-highlightcolor-purple {
   background-color: #7b11d0; }
-=======
-.cell-color-purple,
-.post-highlightcolor-purple {
-  background-color: #7b11d0;
-}
->>>>>>> stage
 
 .post-color-fuchsia {
   color: #f012be; }
 
-<<<<<<< HEAD
-.cell-color-fuchsia {
+.cell-color-fuchsia, .post-highlightcolor-fuchsia {
   background-color: #f012be; }
-=======
-.cell-color-fuchsia,
-.post-highlightcolor-fuchsia {
-  background-color: #f012be;
-}
->>>>>>> stage
 
 .post-color-green {
   color: #2ecc40; }
 
-<<<<<<< HEAD
-.cell-color-green {
+.cell-color-green, .post-highlightcolor-green {
   background-color: #2ecc40; }
-=======
-.cell-color-green,
-.post-highlightcolor-green {
-  background-color: #2ecc40;
-}
->>>>>>> stage
 
 .post-color-lime {
   color: #01ff70; }
 
-<<<<<<< HEAD
-.cell-color-lime {
+.cell-color-lime, .post-highlightcolor-lime {
   background-color: #01ff70; }
-=======
-.cell-color-lime,
-.post-highlightcolor-lime {
-  background-color: #01ff70;
-}
->>>>>>> stage
 
 .post-color-olive {
   color: #3d9970; }
 
-<<<<<<< HEAD
-.cell-color-olive {
+.cell-color-olive, .post-highlightcolor-olive {
   background-color: #3d9970; }
-=======
-.cell-color-olive,
-.post-highlightcolor-olive {
-  background-color: #3d9970;
-}
->>>>>>> stage
 
 .post-color-yellow {
   color: #ffdc00; }
 
-<<<<<<< HEAD
-.cell-color-yellow {
+.cell-color-yellow, .post-highlightcolor-yellow {
   background-color: #ffdc00; }
-=======
-.cell-color-yellow,
-.post-highlightcolor-yellow {
-  background-color: #ffdc00;
-}
->>>>>>> stage
 
 .post-color-navy {
   color: #001f3f; }
 
-<<<<<<< HEAD
-.cell-color-navy {
+.cell-color-navy, .post-highlightcolor-navy {
   background-color: #001f3f; }
-=======
-.cell-color-navy,
-.post-highlightcolor-navy {
-  background-color: #001f3f;
-}
->>>>>>> stage
 
 .post-color-blue {
   color: #0074d9; }
 
-<<<<<<< HEAD
-.cell-color-blue {
+.cell-color-blue, .post-highlightcolor-blue {
   background-color: #0074d9; }
-=======
-.cell-color-blue,
-.post-highlightcolor-blue {
-  background-color: #0074d9;
-}
->>>>>>> stage
 
 .post-color-teal {
   color: #39cccc; }
 
-<<<<<<< HEAD
-.cell-color-teal {
+.cell-color-teal, .post-highlightcolor-teal {
   background-color: #39cccc; }
-=======
-.cell-color-teal,
-.post-highlightcolor-teal {
-  background-color: #39cccc;
-}
->>>>>>> stage
 
 .post-color-aqua {
   color: #7fdbff; }
 
-<<<<<<< HEAD
-.cell-color-aqua {
+.cell-color-aqua, .post-highlightcolor-aqua {
   background-color: #7fdbff; }
-=======
-.cell-color-aqua,
-.post-highlightcolor-aqua {
-  background-color: #7fdbff;
-}
->>>>>>> stage
 
 .post-color-orange {
-  color: #ffa500;
-}
+  color: #ffa500; }
 
-.cell-color-orange,
-.post-highlightcolor-orange {
-  background-color: #ffa500;
-}
+.cell-color-orange, .post-highlightcolor-orange {
+  background-color: #ffa500; }
 
 .post-text-align-right {
   text-align: right; }
