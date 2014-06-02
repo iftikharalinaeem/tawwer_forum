@@ -56,7 +56,7 @@
                 <?php echo T('Enter the following URLs in the Redirect Urls'); ?> <br/>
                 <strong>
                     &middot; <?php echo Gdn::Request()->Url('/profile/zendeskconnect', true, true, true) ?> <br/>
-                    &middot; <?php echo Gdn::Request()->Url('/profile/zendesk/connect', true, true, true) ?>
+                    &middot; <?php echo Gdn::Request()->Url('/plugin/zendesk/connect', true, true, true) ?>
                 </strong>
             </li>
         </ul>

@@ -737,8 +737,7 @@ class ZendeskPlugin extends Gdn_Plugin {
                 ->Dispatch('home/error');
             return;
         }
-        $AccessToken = GetValue('access_token', $Tokens);
-
+        $this->accessToken = GetValue('access_token', $Tokens);
         $this->setZendesk();
         $profile = $this->zendesk->getProfile();
 
@@ -750,7 +749,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             )
         );
         $Attributes = array(
-            'AccessToken' => $AccessToken,
+            'AccessToken' => $this->accessToken,
             'Profile' => $profile,
         );
         Gdn::UserModel()->SaveAttribute($Sender->User->UserID, self::PROVIDER_KEY, $Attributes);
