@@ -1656,6 +1656,26 @@
                           }
                         };
                       })(wysihtml5);
+
+                      // extending whysihtml5 library for color highlights
+                      (function(wysihtml5) {
+                          var undef,
+                              REG_EXP = /post-highlightcolor-[0-9a-z]+/g;
+
+                          wysihtml5.commands.highlightcolor = {
+                              exec: function(composer, command, color) {
+                                  wysihtml5.commands.formatInline.exec(composer, command, "span", "post-highlightcolor-" + color, REG_EXP);
+                              },
+
+                              state: function(composer, command, color) {
+                                  return wysihtml5.commands.formatInline.state(composer, command, "span", "post-highlightcolor-" + color, REG_EXP);
+                              },
+
+                              value: function() {
+                                  return undef;
+                              }
+                          };
+                      })(wysihtml5);
                   });
                 break;
 

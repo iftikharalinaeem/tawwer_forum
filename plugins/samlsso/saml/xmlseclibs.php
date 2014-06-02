@@ -189,6 +189,9 @@ class XMLSecurityKey {
     public $name = NULL;
     public $keyChain = NULL;
     public $isEncrypted = FALSE;
+    /**
+     * @var XMLSecEnc
+     */
     public $encryptedCtx = NULL;
     public $guid = NULL;
 
@@ -1302,7 +1305,7 @@ class XMLSecEnc {
         }
     }
 
-    public function decryptNode($objKey, $replace=TRUE) {
+    public function decryptNode(XMLSecurityKey $objKey, $replace=TRUE) {
         $data = '';
         if (empty($this->rawNode)) {
             throw new Exception('Node to decrypt has not been set');
@@ -1379,7 +1382,7 @@ class XMLSecEnc {
         return;
     }
 
-    public function decryptKey($encKey) {
+    public function decryptKey(XMLSecurityKey $encKey) {
         if (! $encKey->isEncrypted) {
             throw new Exception("Key is not Encrypted");
         }
@@ -1389,6 +1392,10 @@ class XMLSecEnc {
         return $this->decryptNode($encKey, FALSE);
     }
 
+    /**
+     * @param $element
+     * @return DOMElement
+     */
     public function locateEncryptedData($element) {
         if ($element instanceof DOMDocument) {
             $doc = $element;
@@ -1429,6 +1436,12 @@ class XMLSecEnc {
         return NULL;
     }
 
+    /**
+     * @param null $objBaseKey
+     * @param null $node
+     * @return null|XMLSecurityKey
+     * @throws Exception
+     */
     static function staticLocateKeyInfo($objBaseKey=NULL, $node=NULL) {
         if (empty($node) || (! $node instanceof DOMNode)) {
             return NULL;
