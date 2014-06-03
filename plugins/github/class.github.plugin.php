@@ -161,10 +161,9 @@ class GithubPlugin extends Gdn_Plugin {
      * @return bool
      */
     public static function isConfigured() {
-        $Url = C('Plugins.Github.Url');
         $AppID = C('Plugins.Github.ApplicationID');
         $Secret = C('Plugins.Github.Secret');
-        if (!$AppID || !$Secret || !$Url) {
+        if (!$AppID || !$Secret) {
             return false;
         }
         return true;
