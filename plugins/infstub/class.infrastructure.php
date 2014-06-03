@@ -32,4 +32,26 @@ class Infrastructure {
         $result = valr($key, self::$clusterConfig, $default);
         return $result;
     }
+
+    public static function site($key) {
+        switch (strtolower($key)) {
+            case 'accountid':
+                return 8080;
+            case 'siteid':
+                $host = Gdn::Request()->Host();
+                if ($root = Gdn::Request()->WebRoot()) {
+                    $host .= '/'.ltrim($root, '/');
+                }
+                return $host;
+        }
+        return null;
+    }
+
+    public static function serverApiKey() {
+        return static::clusterConfig('apiKey');
+    }
+
+    public static function siteID() {
+        return static::site('siteid');
+    }
 }
