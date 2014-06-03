@@ -13,7 +13,9 @@ $PluginInfo['avatarstock'] = array(
     'RequiredTheme' => false,
     'RequiredPlugins' => false,
     'HasLocale' => false,
-    'RegisterPermissions' => false,
+    'RegisterPermissions' => array(
+        'AvatarStock.CustomUpload.Allow' => false
+    ),
     'SettingsUrl' => '/settings/avatarstock',
     'SettingsPermission' => 'Garden.Setttings.Manage'
 );
@@ -319,6 +321,9 @@ class AvatarStockPlugin extends Gdn_Plugin {
     /**
      * Create endpoint for posting user-selected avatar from pool.
      *
+     * In addition, should a user have the right permissions, they can upload
+     * an avatar of their own.
+     *
      * @param profileController $sender The profile controller.
      * @param string $UserReference The user reference.
      * @param string $Username The username.
@@ -356,42 +361,98 @@ class AvatarStockPlugin extends Gdn_Plugin {
         $user_model = Gdn::UserModel();
         $avatarstock_model = new Gdn_Model('AvatarStock');
         $user_id = $sender->User->UserID;
-
         $sender->Form->SetModel('User');
+
         // When posted to self
         if ($sender->Form->AuthenticatedPostBack() === true) {
+            $sender->Form->SetFormValue('UserID', $sender->User->UserID);
 
-            // If there were no errors, associate the image with the user
-            if ($sender->Form->ErrorCount() == 0) {
-                $post = Gdn::Request()->Post();
-                $avatar_id = $post['AvatarID'];
+            // Determine if image being uploaded. Only privileged users can
+            // do this. Otherwise, choose from avatar pool.
+            $UploadImage = new Gdn_UploadImage();
+            $TmpImage = $UploadImage->ValidateUpload('Picture', false);
 
-                if (!ValidateInteger($avatar_id)) {
-                    $sender->Form->AddError('Invalid Avatar ID.');
-                }
-
+            // Selecting from avatar pool.
+            if (!$TmpImage) {
+                // If there were no errors, associate the image with the user
                 if ($sender->Form->ErrorCount() == 0) {
+                    $post = Gdn::Request()->Post();
+                    $avatar_id = $post['AvatarID'];
 
-                    // Get avatar stock data
-                    $avatarstock_row = $avatarstock_model->GetWhere(
-                        array(
-                            'AvatarID' => $avatar_id
+                    if (!ValidateInteger($avatar_id)) {
+                        $sender->Form->AddError('Invalid Avatar ID.');
+                    }
+
+                    if ($sender->Form->ErrorCount() == 0) {
+
+                        // Get avatar stock data
+                        $avatarstock_row = $avatarstock_model->GetWhere(
+                            array(
+                                'AvatarID' => $avatar_id
+                            )
+                        )->FirstRow(DATASET_TYPE_ARRAY);
+
+                        $user_photo = $avatarstock_row['Path'];
+
+                        // Save it to User table
+                        if (!$user_model->Save(
+                            array('UserID' => $user_id, 'Photo' => $user_photo),
+                            array('CheckExisting' => true)
                         )
-                    )->FirstRow(DATASET_TYPE_ARRAY);
+                        ) {
+                            $sender->Form->SetValidationResults(
+                                $user_model->ValidationResults()
+                            );
+                        } else {
+                            $sender->User->Photo = $user_photo;
+                        }
+                    }
+                }
+            } else {
+                // Handle the image upload like it was originally part of the
+                // profile controller.
 
-                    $user_photo = $avatarstock_row['Path'];
+                // Only admins and users with the custom permission can upload
+                // their own avatars.
+                $sender->Permission(array(
+                    'Garden.Settings.Manage',
+                    'AvatarStock.CustomUpload.Allow'
+                ), false);
 
-                    // Save it to User table
-                    if (!$user_model->Save(
-                        array('UserID' => $user_id, 'Photo' => $user_photo),
-                        array('CheckExisting' => true)
-                    )
-                    ) {
-                        $sender->Form->SetValidationResults(
-                            $user_model->ValidationResults()
-                        );
+                // Generate the target image name.
+                $TargetImage = $UploadImage->GenerateTargetName(PATH_UPLOADS, '', TRUE);
+                $Basename = pathinfo($TargetImage, PATHINFO_BASENAME);
+                $Subdir = StringBeginsWith(dirname($TargetImage), PATH_UPLOADS.'/', FALSE, TRUE);
+
+                // Delete any previously uploaded image.
+                $UploadImage->Delete(ChangeBasename($sender->User->Photo, 'p%s'));
+
+                // Save the uploaded image in profile size.
+                $Props = $UploadImage->SaveImageAs(
+                    $TmpImage,
+                    "userpics/$Subdir/p$Basename",
+                    C('Garden.Profile.MaxHeight', 1000),
+                    C('Garden.Profile.MaxWidth', 250),
+                    array('SaveGif' => C('Garden.Thumbnail.SaveGif'))
+                );
+                $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
+
+                // Save the uploaded image in thumbnail size
+                $ThumbSize = Gdn::Config('Garden.Thumbnail.Size', 40);
+                $UploadImage->SaveImageAs(
+                    $TmpImage,
+                    "userpics/$Subdir/n$Basename",
+                    $ThumbSize,
+                    $ThumbSize,
+                    array('Crop' => TRUE, 'SaveGif' => C('Garden.Thumbnail.SaveGif'))
+                );
+
+                // If there were no errors, associate the image with the user
+                if ($sender->Form->ErrorCount() == 0) {
+                    if (!$user_model->Save(array('UserID' => $sender->User->UserID, 'Photo' => $UserPhoto), array('CheckExisting' => TRUE))) {
+                        $sender->Form->SetValidationResults($user_model->ValidationResults());
                     } else {
-                        $sender->User->Photo = $user_photo;
+                        $sender->User->Photo = $UserPhoto;
                     }
                 }
             }

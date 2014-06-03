@@ -52,6 +52,18 @@
   display: block !important;
   margin-left: 10px;
 }
+.stockavatar-wrap #custom-avatar-upload {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin: 10px 0 20px 0;
+  padding: 10px 0 20px 0;
+}
+.stockavatar-wrap .CurrentPicture {
+  margin: 20px 0 0 0;
+}
+.stockavatar-wrap .remove-picture {
+  margin: 20px 0;
+}
 
 #stockavatar-picker {
   overflow: hidden;
