@@ -725,13 +725,22 @@ class GithubPlugin extends Gdn_Plugin {
      * @todo remove option if issue has been created.
      */
     public function discussionController_discussionOptions_handler($Sender, $Args) {
-        //Staff Only
+        // Staff Only
         $Session = Gdn::Session();
         if (!$Session->CheckPermission('Garden.Staff.Allow')) {
             return;
         }
         $UserID = $Args['Discussion']->InsertUserID;
         $DiscussionID = $Args['Discussion']->DiscussionID;
+
+        // Don not add option if attachment already created.
+        $Attachments = GetValue('Attachments', $Args['Discussion'], array());
+        foreach ($Attachments as $Attachment) {
+            if ($Attachment['Type'] == 'github-issue') {
+                return;
+            }
+        }
+
         if (isset($Args['DiscussionOptions'])) {
             $Args['DiscussionOptions']['GithubIssue'] = array(
                 'Label' => T('Github - Create Issue'),
@@ -739,6 +748,7 @@ class GithubPlugin extends Gdn_Plugin {
                 'Class' => 'Popup'
             );
         }
+
     }
 
     /**
@@ -757,6 +767,13 @@ class GithubPlugin extends Gdn_Plugin {
         }
         $UserID = $Args['Comment']->InsertUserID;
         $CommentID = $Args['Comment']->CommentID;
+        // Don not add option if attachment already created.
+        $Attachments = GetValue('Attachments', $Args['Comment'], array());
+        foreach ($Attachments as $Attachment) {
+            if ($Attachment['Type'] == 'github-issue') {
+                return;
+            }
+        }
         if (isset($Args['CommentOptions'])) {
             $Args['CommentOptions']['GithubIssue'] = array(
                 'Label' => T('Github - Create Issue'),
