@@ -7,7 +7,7 @@
 // Define the plugin:
 $PluginInfo['github'] = array(
     'Name' => 'Github',
-    'Description' => "Github",
+    'Description' => "Allow staff users to create Issues from discussions and comments.",
     'Version' => '0.0.1-alpha',
     'RequiredApplications' => array('Vanilla' => '2.1.18'),
     'SettingsUrl' => '/dashboard/plugin/github',
@@ -15,7 +15,9 @@ $PluginInfo['github'] = array(
     'MobileFriendly' => true,
     'Author' => 'John Ashton',
     'AuthorEmail' => 'john@vanillaforums.com',
-    'AuthorUrl' => 'http://www.github.com/John0x00'
+    'AuthorUrl' => 'http://www.github.com/John0x00',
+    'SocialConnect' => FALSE,
+
 );
 
 /**
