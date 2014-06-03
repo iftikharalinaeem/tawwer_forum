@@ -196,7 +196,7 @@ class GithubPlugin extends Gdn_Plugin {
         Trace($Sf);
         $Profile = GetValueR('User.Attributes.' . self::PROVIDER_KEY . '.Profile', $Args);
         $Sender->Data["Connections"][self::PROVIDER_KEY] = array(
-            'Icon' => $this->GetWebResource('github.png', '/'),
+            'Icon' => $this->GetWebResource('icon.png', '/'),
             'Name' => ucfirst(self::PROVIDER_KEY),
             'ProviderKey' => self::PROVIDER_KEY,
             'ConnectUrl' => self::authorizeUri(self::profileConnectUrl()),
