@@ -37,12 +37,15 @@ function WriteZendeskTicketAttachment($attachment) {
                             <dt><?php echo T('Issue Number'); ?></dt>
                             <dd><a href="<?php echo $attachment['SourceURL']; ?>" target="_blank"><?php echo $attachment['SourceID']; ?></a></dd>
 
-                            <dt><?php echo T('Status'); ?></dt>
-                            <dd><?php echo $attachment['Status']; ?></dd>
+                            <?php if (GetValue('Status', $attachment)) { ?>
+                                <dt><?php echo T('Status'); ?></dt>
+                                <dd><?php echo $attachment['Status']; ?></dd>
+                            <?php } ?>
 
-                            <dt><?php echo T('Last Updated'); ?></dt>
-                            <dd><?php echo Gdn_Format::Date($attachment['LastModifiedDate'], 'html') ?></dd>
-
+                            <?php if (GetValue('Last_Updated', $attachment)) { ?>
+                                <dt><?php echo T('Last Updated'); ?></dt>
+                                <dd><?php echo Gdn_Format::Date($attachment['LastModifiedDate'], 'html') ?></dd>
+                            <?php } ?>
                         </dl>
                     </div>
 
