@@ -346,14 +346,23 @@ class MultisiteModel extends Gdn_Model {
         return $result;
     }
 
-    public function syncNodes($where = [], $limit = 0, $offset = 0) {
-        $result = [];
+    public function syncNodes() {
+        if (class_exists('Communication') && class_exists('Infrastructure')) {
+            $query = Communication::data('/forum/callback')
+                ->method('post')
+                ->parameter('method', 'POST')
+                ->parameter('path', '/utility/syncnode.json')
+                ->parameter('headers', [
+                    'Authentication' => self::apikey(true)
+                ])
+                ->parameter('accountid', Infrastructure::site('accountid'));
 
-        if (isset($where['search'])) {
-            $nodes = $this->search($where['search'], '', '', $limit, $offset)->ResultArray();
-        } else {
-            $nodes = $this->getWhere($where, '', '', $limit, $offset)->ResultArray();
+            $result = $query->send();
+            return $result;
         }
+
+        $result = [];
+        $nodes = $this->get()->resultArray();
 
         foreach ($nodes as $node) {
             try {
