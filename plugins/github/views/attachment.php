@@ -9,7 +9,7 @@
  *
  * @param array $attachment
  */
-function Write_GithubIssue_Attachment($attachment) {
+function WriteGithubIssueAttachment($attachment) {
     ?>
     <div class="item-attachment">
         <div class="alert">
