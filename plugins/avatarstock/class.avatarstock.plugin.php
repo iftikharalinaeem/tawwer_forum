@@ -5,7 +5,7 @@
 $PluginInfo['avatarstock'] = array(
     'Name' => 'Avatar Pool',
     'Description' => 'Create a limited stock of default avatars that members can choose between.',
-    'Version' => '1.1.0',
+    'Version' => '1.1.1',
     'Author' => 'Dane MacMillan',
     'AuthorEmail' => 'dane@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -14,7 +14,7 @@ $PluginInfo['avatarstock'] = array(
     'RequiredPlugins' => false,
     'HasLocale' => false,
     'RegisterPermissions' => array(
-        'AvatarStock.CustomUpload.Allow' => false
+        'AvatarPool.CustomUpload.Allow' => 0
     ),
     'SettingsUrl' => '/settings/avatarstock',
     'SettingsPermission' => 'Garden.Setttings.Manage'
