@@ -10,6 +10,7 @@
          position: relative;
          overflow: hidden;
          display: block;
+         cursor: pointer;
 
          img {
             display: block;
@@ -20,6 +21,13 @@
             position: absolute;
             top: 0;
             left: 0;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+
+            &.avatar-delete-input:hover,
+            &.avatar-delete-input:checked {
+                opacity: 1;
+            }
          }
       }
 
