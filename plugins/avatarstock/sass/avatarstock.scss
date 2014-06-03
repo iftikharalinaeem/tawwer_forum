@@ -10,6 +10,7 @@
          position: relative;
          overflow: hidden;
          display: block;
+         cursor: pointer;
 
          img {
             display: block;
@@ -20,6 +21,13 @@
             position: absolute;
             top: 0;
             left: 0;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+
+            &.avatar-delete-input:hover,
+            &.avatar-delete-input:checked {
+                opacity: 1;
+            }
          }
       }
 
@@ -59,6 +67,21 @@
    h1 {
       display: block !important;
       margin-left: 10px;
+   }
+
+   #custom-avatar-upload {
+       border-top: 1px solid rgba(0, 0, 0, 0.10);
+       border-bottom: 1px solid rgba(0, 0, 0, 0.10);
+       margin: 10px 0 20px 0;
+       padding: 10px 0 20px 0;
+   }
+
+   .CurrentPicture {
+       margin: 20px 0 0 0;
+   }
+
+   .remove-picture {
+       margin: 20px 0;
    }
 }
 
