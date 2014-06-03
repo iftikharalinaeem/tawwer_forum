@@ -1,53 +1,67 @@
-@import "compass";
-@import "compass/css3";
-@import "fileupload";
+// ## Vendors
+//
+// Library dependencies installed using Bower are automagically wired up when
+// running the `npm run build` command. Don't manually edit this section!
+//
+// bower:scss
+@import "../bower_components/bourbon/dist/_bourbon.scss";
+// endbower
+// bower:sass
+// endbower
 
-/**
- *  Define some mixins
- */
-
-@mixin border-box-important {
-   -moz-box-sizing: border-box !important;
-   -webkit-box-sizing: border-box !important;
-   -box-sizing: border-box !important;
-}
-
+@import "globals/variables";
+@import "partials/fileupload";
 
 /**
  * Editor toolbar
  */
 
-/* By default, when JS not enabled, do not display editor. */
 .editor {
-   display: none;
-}
-
-/* If JS enabled */
-.editor-active .editor {
-   display: block;
-}
-
-.editor {
+   display: none; // By default, when JS not enabled, do not display editor.
    padding: 5px 0;
    font-size: 14px;
-   -webkit-user-select: none;
-   -moz-user-select: none;
+   line-height: 1.5;
    user-select: none;
 
-   line-height: 1.5;
+   .editor-active & {
+      display: block; // Show the editor if JS is enabled.
+   }
+
+   .icon {
+      display: inline-block;
+      padding: 2px 6px;
+      margin: 0 1px;
+      cursor: pointer;
+      background-image: none;
+      border: 1px solid transparent;
+   }
+
+   .editor-sep {
+      margin: 0 5px;
+      border-left: 1px solid;
+      border-left-color: #999;
+      border-left-color: rgba($black,.10);
+   }
+
+   .editor-dropdown {
+      display: inline-block;
+      position: relative;
+   }
+
+   // Clicking on down caret does nothing, so let click seep through to parent
+   .icon-caret-down {
+      position: relative;
+      top: -2px;
+      right: -2px;
+      min-width: 0 !important;
+      padding: 0 0 0 5px;
+      font-size: 75%;
+      pointer-events: none;
+   }
 }
 
 .editor-help-text {
    font-size: 11px;
-}
-
-.editor .icon {
-   display: inline-block;
-   padding: 2px 6px;
-   margin: 0 1px;
-   border: 1px solid transparent;
-   cursor: pointer;
-   background-image: none;
 }
 
 /* State of icons */
@@ -56,45 +70,22 @@
 .wysihtml5-action-active,
 .wysihtml5-command-dialog-opened,
 .editor-dropdown-open > .editor-action {
+   background-color: #999;
+   background-color: rgba($black,.10);
    border-radius: 2px;
-   background-color: #999999;
-	background-color: rgba(0, 0, 0, 0.10);
 }
-
-.editor .editor-sep {
-   border-left: 1px solid #999999;
-   border-left: 1px solid rgba(0, 0, 0, 0.10);
-   margin: 0 5px;
-}
-
-.editor .editor-dropdown {
-   display: inline-block;
-   position: relative;
-}
-
-/* Clicking on down caret does nothing, so let click seep through to parent */
-.editor .icon-caret-down {
-   font-size: 75%;
-   pointer-events: none;
-   position: relative;
-   top: -2px;
-   right: -2px;
-   min-width: 0 !important;
-   padding: 0 0 0 5px;
-}
-
 
 /**
  * Dropdowns
  */
 
 .editor-insert-dialog {
-   margin: 5px 0 0 0;
-   padding: 5px;
-   width: 300px;
    position: absolute;
    z-index: 100;
    display: none;
+   padding: 5px;
+   margin: 5px 0 0 0;
+   width: 300px;
 }
 
 .editor-dropdown-open .editor-insert-dialog {
@@ -115,81 +106,113 @@
 }
 
 .editor-insert-dialog input.InputBox {
-   @include box-sizing(border-box);
    width: 100%;
    margin: 0;
+   box-sizing: border-box;
 }
 
-.editor-dd-color + .editor-insert-dialog {
-   width: 88px;
+/**
+ * Colors dropdown
+ */
+
+.editor-dropdown-color .editor-insert-dialog {
+  width: 56px;
 }
 
-.editor-dd-color + .editor-insert-dialog .color {
-   width: 20px;
-   height: 20px;
-   float: left;
-   cursor: pointer;
-   border: 1px solid #fff;
-   box-shadow: inset 0 0 0 1px #fff;
-   transition: transform 0.2s ease;
+.editor-dropdown-color.color-has-highlight .editor-insert-dialog{
+  width: 134px;
 }
 
-.editor-dd-color + .editor-insert-dialog .color:hover,
-.editor-dd-color + .editor-insert-dialog .wysihtml5-command-active {
-   border: 1px solid transparent;
-   transform: scale(1.10);
-   position: relative;
-   z-index: 10;
-   border-radius: 2px;
+.editor-dropdown-color .editor-insert-dialog .color {
+  width: 24px;
+  height: 24px;
+  float: left;
+  cursor: pointer;
+  border: 1px solid #fff;
+  box-shadow: inset 0 0 0 1px #fff;
+  transition: transform 0.2s ease;
+  margin: 1px;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color:hover,
+.editor-dropdown-color .editor-insert-dialog .wysihtml5-command-active {
+  border: 1px solid transparent;
+  transform: scale(1.10);
+  position: relative;
+  z-index: 10;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color-group {
+  width: 56px;
+  display: inline-block;
+}
+
+.editor-dropdown-color .editor-insert-dialog .color-group .icon {
+  display: block;
+  padding: 5px 0 5px 2px;
+  background: 0;
+  cursor: default;
+}
+
+.editor-dropdown-color .editor-insert-dialog .highlight-color {
+  border-left: 1px solid #EFEFEF;
+  padding-left: 10px;
+  margin-left: 10px;
 }
 
 /**
  * Headers dropdown
  */
 
-.editor-dd-format + .editor-insert-dialog {
-   padding: 5px 0;
-   width: auto;
-}
+.editor-dd-format {
+   + .editor-insert-dialog {
+      padding: 5px 0;
+      width: auto;
 
-.editor-dd-format + .editor-insert-dialog .wysihtml5-command-active {
-   border-radius: 0;
-}
+      .wysihtml5-command-active {
+         border-radius: 0;
+      }
 
-.editor-dd-format + .editor-insert-dialog .editor-action-h1 {
-   font-size: 18px;
-   line-height: 28px !important;
-}
+      .editor-action-h1 {
+         font-size: 18px;
+         line-height: 28px !important;
+      }
 
-.editor-dd-format + .editor-insert-dialog .editor-action-h2 {
-   font-size: 16px;
+      .editor-action-h2 {
+         font-size: 16px;
+      }
+   }
 }
-
 
 /**
  * Emoji dropdown
  */
 
-.editor-dd-emoji + .editor-insert-dialog {
-   @include box-sizing(border-box);
-   width: 132px;
-}
+.editor-dd-emoji {
+   + .editor-insert-dialog {
+      width: 132px;
+      box-sizing: border-box;
 
-/* Since making emoji pluggable, the .emoji tag is wrapped in a span, with its
-   .emoji class name removed and just added to the child, being the img tag.
-   The parent span tag has the .emoji-$name and .editor-action. */
-.editor-dd-emoji + .editor-insert-dialog .emoji {
-   @include box-sizing(content-box);
-   display: inline-block;
-   padding: 5px;
-   background-repeat: no-repeat;
-   background-position: center;
-}
+      // Since making emoji pluggable, the .emoji tag is wrapped in a span,
+      // with its .emoji class name removed and just added to the child, being
+      // the img tag. The parent span tag has the .emoji-$name and
+      // .editor-action
+      .emoji {
+         display: inline-block;
+         padding: 5px;
+         background-repeat: no-repeat;
+         background-position: center;
+         box-sizing: content-box;
 
-.editor-dd-emoji + .editor-insert-dialog .emoji:hover {
-   cursor: pointer;
-   border-radius: 2px;
-   background-color: rgba(0, 0, 0, 0.10);
+         &:hover {
+            cursor: pointer;
+            background-color: rgba($black,.10);
+            border-radius: 2px;
+         }
+      }
+   }
 }
 
 /**
@@ -204,12 +227,12 @@
    }
 
    .file-drop {
-      border: 2px dashed rgba(0,0,0,0.25);
-      border-radius: 2px;
+      display: none;
+      padding: 30px;
       margin: 10px 10px 0 10px;
       text-align: center;
-      padding: 30px;
-      display: none;
+      border: 2px dashed rgba($black,.25);
+      border-radius: 2px;
 
       &.can-drop {
          display: block !important;
@@ -227,18 +250,18 @@
       border-top: 1px solid #da8f8f;
 
       input {
-         margin: 0;
-         border: 0;
          padding: 10px;
+         margin: 0;
          border-bottom-left-radius: 2px;
          border-bottom-right-radius: 2px;
+         border: 0;
       }
    }
 
    &.drag-passthrough {
-      transition: all 0.2s ease;
       opacity: 0;
       pointer-events: none;
+      transition: all 200ms ease;
       transform: scale(0);
    }
 }
@@ -267,97 +290,88 @@
 
 .editor-fullpage {
    overflow: hidden !important;
+
+   // For some reason this element has right padding in core that does nothing,
+   // except offset the textarea in fullpage. Removing it in regular view has no
+   // affect, so it's not doing anything
+   .TextBoxWrapper {
+      padding: 0;
+
+      // Have to be a bit rough here, because styles defined inline by wysihtml5
+      .BodyBox,
+      .wysihtml5-sandbox {
+         width: 100% !important;
+         color: #000; // Will only be used by non-wysiwyg when in fullpage mode.
+         box-sizing: border-box !important; // Fix some content boxes
+         transition: background-color 400ms ease, color 400ms ease;
+      }
+
+      // Set default heights for each editor view. Regular (markdown, html,
+      // bbcode) all require min-height to be set to not interfere with
+      // autogrow, while wysiwgy requires height to not interfere with autogrow.
+      .BodyBox {
+         min-height: 400px;
+      }
+
+      .wysihtml5-sandbox {
+         height: 400px !important;
+      }
+   }
+
+   #editor-fullpage-candidate {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100000; /* So high because a client actually had 99999 in a theme */
+      height: 100%;
+      width: 100%;
+      padding: 0;
+      overflow-y: auto;
+      background-color: #fff;
+      transition: background-color 400ms ease;
+
+      // Fix some content boxes
+      input {
+         box-sizing: border-box !important;
+      }
+
+      .editor {
+         position: fixed;
+         top: 0;
+         left: 0;
+         right: 0;
+         z-index: 100001; /* So high because a client actually had 99999 in a theme */
+         margin: 0 auto;
+         background-color: rgba($white,.95);
+         border: 1px solid transparent;
+         box-shadow: 0 2px 5px -5px $black;
+         transition: all 400ms ease;
+      }
+
+      .TextBoxWrapper {
+         padding: 50px 0 10px 0;
+         margin: 0 auto;
+      }
+
+      .editor,
+      .TextBoxWrapper,
+      .editor-upload-previews {
+         max-width: 800px;
+         animation-duration: 800ms;
+         animation-name: editor-anim-editor;
+      }
+
+      .editor-help-text {
+         display: none;
+      }
+
+      .editor-upload-previews {
+         margin: 0 auto;
+      }
+   }
 }
-
-/* For some reason this element has right padding in core that does nothing,
-except offset the textarea in fullpage. Removing it in regular view has no
-affect, so it's not doing anything */
-
-.editor-fullpage .TextBoxWrapper {
-   padding: 0;
-}
-
-/* .FormWrapper */
-.editor-fullpage #editor-fullpage-candidate {
-   position: fixed;
-   z-index: 100000; /* So high because a client actually had 99999 in a theme */
-   overflow-y: auto;
-   top: 0;
-   right: 0;
-   left: 0;
-   bottom: 0;
-   padding: 0;
-   background-color: #fff;
-   height: 100%;
-   width: 100%;
-   transition: background-color 0.4s ease;
-}
-
-.editor-fullpage #editor-fullpage-candidate .editor {
-   border: 1px solid transparent;
-   position: fixed;
-   top: 0;
-   left: 0;
-   right: 0;
-   margin: 0 auto;
-   background-color: rgba(255,255,255,0.95);
-   box-shadow: 0 2px 5px -5px #000;
-   transition: all 0.4s ease;
-   z-index: 100001; /* So high because a client actually had 99999 in a theme */
-}
-
-.editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
-   margin: 0 auto;
-   padding: 50px 0 10px 0;
-}
-
-.editor-fullpage #editor-fullpage-candidate .editor,
-.editor-fullpage #editor-fullpage-candidate .TextBoxWrapper,
-.editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
-   max-width: 800px;
-
-   -webkit-animation-duration: 0.8s;
-   -webkit-animation-name: editor-anim-editor;
-   animation-duration: 0.8s;
-   animation-name: editor-anim-editor;
-}
-
-/* have to be a bit rough here, because styles defined inline by wysihtml5 */
-.editor-fullpage .TextBoxWrapper .BodyBox,
-.editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
-   color: #000; // Will only be used by non-wysiwyg when in fullpage mode.
-   width: 100% !important;
-   transition: background-color 0.4s ease, color 0.4s ease;
-}
-
-/* Fix some content boxes */
-.editor-fullpage #editor-fullpage-candidate input,
-.editor-fullpage .TextBoxWrapper .BodyBox,
-.editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
-   @include border-box-important;
-}
-
-.editor-fullpage #editor-fullpage-candidate .editor-help-text {
-   display: none;
-}
-
-.editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
-   margin: 0 auto;
-}
-
-/* Set default heights for each editor view. Regular (markdown, html, bbcode)
-all require min-height to be set to not interfere with autogrow, while
-wysiwgy requires height to not interfere with autogrow. */
-
-.editor-fullpage .TextBoxWrapper .BodyBox {
-   min-height: 400px;
-}
-
-.editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
-   height: 400px !important;
-}
-
-
 
 /**
  * Experimental toggle lights on/off.
@@ -373,31 +387,31 @@ wysiwgy requires height to not interfere with autogrow. */
 }
 
 .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate {
-   background-color: #000;
+   background-color: $black;
 
    .editor {
-      background-color: rgba(0,0,0,0.80);
-      color: #fff;
-      box-shadow: 0 5px 5px -5px #999999;
+      color: $white;
+      background-color: rgba($black,.80);
+      box-shadow: 0 5px 5px -5px #999;
    }
 
    .editor .icon:hover,
    .wysihtml5-command-active,
    .wysihtml5-action-active,
    .wysihtml5-command-dialog-opened {
-      background-color: rgba(255, 255, 255, 0.25);
+      background-color: rgba($white,.25);
    }
 
    .editor .editor-sep {
-      border-left: 1px solid rgba(255, 255, 255, 0.25);
+      border-left: 1px solid rgba($white,.25);
    }
 
-   /* important due to iframe getting its styles overridden inline by JS */
+   // !important due to iframe getting its styles overridden inline by JS
    .TextBoxWrapper .BodyBox,
    .TextBoxWrapper .wysihtml5-sandbox {
-      background-color: #000 !important;
-      border-color: #222222 !important;
-      color: #999999 !important;
+      color: #999 !important;
+      background-color: $black !important;
+      border-color: #222 !important;
    }
 }
 
@@ -413,16 +427,11 @@ directly on the iframe's bodybox contenteditable. */
    color: #000 !important;
 }
 
-/* Animation definition for fade in editor on fullpage */
+// Animation definition for fade in editor on fullpage
 @keyframes editor-anim-editor {
-  0% {
-    opacity: 0;
-  }
-}
-@-webkit-keyframes editor-anim-editor {
-  0% {
-    opacity: 0;
-  }
+   0% {
+      opacity: 0;
+   }
 }
 
 /**
@@ -445,8 +454,7 @@ directly on the iframe's bodybox contenteditable. */
 .editor-format-bbcode .editor-image-align,
 .editor-format-markdown .editor-image-align,
 .editor-format-bbcode .editor-action-h1,
-.editor-format-bbcode .editor-action-h2
-{
+.editor-format-bbcode .editor-action-h2 {
    /* Defined as important, because some themes have overriden with their own
       !important values. */
    display: none !important;
@@ -460,7 +468,6 @@ directly on the iframe's bodybox contenteditable. */
  */
 
 .wysihtml5-commands-disabled {
-
    .editor-action {
       opacity: 0.25;
       pointer-events: none;
@@ -473,7 +480,6 @@ directly on the iframe's bodybox contenteditable. */
 
    }
 }
-
 
 /**
  * Brute force hide other editors enabled after this one.
@@ -564,7 +570,8 @@ directly on the iframe's bodybox contenteditable. */
    .FileBox {
       overflow: hidden;
 
-      label, input {
+      label,
+      input {
          float: left;
          width: auto;
       }
@@ -580,9 +587,6 @@ directly on the iframe's bodybox contenteditable. */
 
    }
 }
-
-
-
 
 /**
  * Modify this file to change the styling of the content

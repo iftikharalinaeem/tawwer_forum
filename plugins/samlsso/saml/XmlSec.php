@@ -31,6 +31,13 @@ class OneLogin_Saml_XmlSec
     }
 
     /**
+     * @return DomDocument Returns the document that was being checked.
+     */
+    public function getDocument() {
+        return $this->_document;
+    }
+
+    /**
      * Verify that the document only contains a single Assertion
      *
      * @return bool TRUE if the document passes.
@@ -64,12 +71,44 @@ class OneLogin_Saml_XmlSec
         return true;
     }
 
+    public function decrypt() {
+        $enc = new XMLSecEnc();
+        $encrypted = $enc->locateEncryptedData($this->_document);
+
+        if (!$encrypted) {
+            return;
+        }
+        $enc->setNode($encrypted);
+        $enc->type = $encrypted->getAttribute('Type');
+
+
+        $key = $enc->locateKey($encrypted);
+        if (!$key) {
+            throw new Exception('There was no key for the encrypted data.', 400);
+        }
+        $encKey = XMLSecEnc::staticLocateKeyInfo($key, $encrypted);
+        if ($encKey) {
+            $encKey->loadKey($this->_settings->spPrivateKey, false, false);
+            $decKey = $encKey->encryptedCtx->decryptKey($encKey);
+        }
+
+        $key->loadKey($decKey, FALSE, FALSE);
+        $enc->decryptNode($key);
+    }
+
     /**
      * @return bool
      * @throws Exception
      */
     public function isValid()
     {
+        // First decrypt the doc.
+        $this->decrypt();
+
+        $xml = $this->_document->C14N();
+//        echo $xml;
+//        die();
+
         $objXMLSecDSig = new XMLSecurityDSig();
 
         $objDSig = $objXMLSecDSig->locateSignature($this->_document);

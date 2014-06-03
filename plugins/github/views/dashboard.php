@@ -80,6 +80,13 @@ echo $this->Form->Errors();
         ?>
     </li>
 
+    <li>
+        <?php
+        echo $this->Form->Label('Repositories', 'Repositories');
+        ?> <span>List of Repositories separted by newline.</span><?php
+        echo $this->Form->TextBox('Repositories', array('MultiLine' => true));
+        ?>
+    </li>
 
 </ul>
 

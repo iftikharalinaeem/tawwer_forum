@@ -36,25 +36,31 @@ class OneLogin_Saml_Response
         $this->document->loadXML($this->assertion);
     }
 
+    public function decrypt() {
+        $xmlSec = new OneLogin_Saml_XmlSec($this->_settings, $this);
+        $xmlSec->decrypt();
+        $this->document = $xmlSec->getDocument();
+    }
+
     /**
      * Determine if the SAML Response is valid using the certificate.
      *
      * @throws Exception
      * @return bool Validate the document
      */
-    public function isValid()
-    {
+    public function isValid() {
+        $this->decrypt();
         $xmlSec = new OneLogin_Saml_XmlSec($this->_settings, $this);
+
         return $xmlSec->isValid();
     }
 
     /**
      * Get the NameID provided by the SAML response from the IdP.
      */
-    public function getNameId()
-    {
-        $entries = $this->_queryAssertion('/saml:Subject/saml:NameID');
-        return $entries->item(0)->nodeValue;
+    public function getNameId() {
+        $entries = $this->queryAssertion('/saml:Subject/saml:NameID');
+        return (string)reset($entries);
     }
 
     /**
@@ -65,56 +71,74 @@ class OneLogin_Saml_Response
      * 
      * @return The SessionNotOnOrAfter as unix epoc or NULL if not present
      */
-    public function getSessionNotOnOrAfter()
-    {
-        $entries = $this->_queryAssertion('/saml:AuthnStatement[@SessionNotOnOrAfter]');
-        if ($entries->length == 0) {
-            return NULL;
+    public function getSessionNotOnOrAfter() {
+        $entries = $this->queryAssertion('/saml:AuthnStatement[@SessionNotOnOrAfter]');
+        if (count($entries) == 0) {
+            return null;
         }
-        $notOnOrAfter = $entries->item(0)->getAttribute('SessionNotOnOrAfter');
+        $notOnOrAfter = (string)$entries[0]['SessionNotOnOrAfter'];
         return strtotime($notOnOrAfter);
     }
 
-    public function getAttributes()
-    {
-        $entries = $this->_queryAssertion('/saml:AttributeStatement/saml:Attribute');
+    /**
+     * Get the saml attributes from a response.
+     *
+     * @return array Returns an array of attributes indexed by the friendly name and the full name.
+     */
+    public function getAttributes() {
+        $entries = $this->queryAssertion('/saml:AttributeStatement/saml:Attribute');
 
         $attributes = array();
-        /** @var $entry DOMNode */
+        /* @var SimpleXMLElement $entry */
         foreach ($entries as $entry) {
-            $attributeName = $entry->attributes->getNamedItem('Name')->nodeValue;
+            $friendlyName = (string)$entry['FriendlyName'];
+            $attributeName = (string)$entry['Name'];
 
+            // We have to do another xpath to get our desired child nodes here.
+            $entry->registerXPathNamespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
             $attributeValues = array();
-            foreach ($entry->childNodes as $childNode) {
-                if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode->tagName === 'saml:AttributeValue'){
-                    $attributeValues[] = $childNode->nodeValue;
-                }
+
+            /* @var SimpleXMLElement $childNode */
+            foreach ($entry->xpath('saml:AttributeValue') as $childNode) {
+                $attributeValues[] = (string)$childNode;
             }
 
             $attributes[$attributeName] = $attributeValues;
+            if ($friendlyName) {
+                $attributes[$friendlyName] = $attributeValues;
+            }
         }
         return $attributes;
     }
 
     /**
+     * Query a set of nodes under the saml:Assertion part of the response.
+     *
      * @param string $assertionXpath
-     * @return DOMNodeList
+     * @return SimpleXMLElement[]
+     * @throws Exception Throws a 422 exception when there is no signature reference.
      */
-    protected function _queryAssertion($assertionXpath)
-    {
-        $xpath = new DOMXPath($this->document);
-        $xpath->registerNamespace('samlp'   , 'urn:oasis:names:tc:SAML:2.0:protocol');
-        $xpath->registerNamespace('saml'    , 'urn:oasis:names:tc:SAML:2.0:assertion');
-        $xpath->registerNamespace('ds'      , 'http://www.w3.org/2000/09/xmldsig#');
+    protected function queryAssertion($assertionXpath) {
+        // The DOMDocument doesn't xpath namespaces properly if they aren't on the root element.
+        // Use SimpleXML instead.
+        $xmlstr = $this->document->saveXML();
 
-        $signatureQuery = '/samlp:Response/saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference';
-        $assertionReferenceNode = $xpath->query($signatureQuery)->item(0);
-        if (!$assertionReferenceNode) {
-            throw new Exception('Unable to query assertion, no Signature Reference found?');
+        $xml = simplexml_load_string($this->document->saveXML());
+        $xml->registerXPathNamespace('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
+        $xml->registerXPathNamespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
+        $xml->registerXPathNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
+
+        $signatureQuery = '/samlp:Response//saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference';
+
+        /* @var SimpleXMLElement $refNode */
+        $refNode = reset($xml->xpath($signatureQuery));
+        if (!$refNode) {
+            throw new Exception('Unable to query assertion, no Signature Reference found?', 422);
         }
-        $id = substr($assertionReferenceNode->attributes->getNamedItem('URI')->nodeValue, 1);
 
-        $nameQuery = "/samlp:Response/saml:Assertion[@ID='$id']" . $assertionXpath;
-        return $xpath->query($nameQuery);
+        $id = substr((string)$refNode['URI'], 1);
+
+        $nameQuery = "/samlp:Response//saml:Assertion[@ID='$id']".$assertionXpath;
+        return $xml->xpath($nameQuery);
     }
 }
