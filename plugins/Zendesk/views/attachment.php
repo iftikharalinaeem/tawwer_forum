@@ -9,7 +9,7 @@
  *
  * @param array $attachment
  */
-function Write_ZendeskTicket_Attachment($attachment) {
+function WriteZendeskTicketAttachment($attachment) {
     ?>
     <div class="item-attachment">
         <div class="alert">
