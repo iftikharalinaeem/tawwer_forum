@@ -263,10 +263,9 @@ class MultisiteModel extends Gdn_Model {
             $urlParts['host'] = '127.0.0.1';
         }
 
-        $url = rtrim(http_build_url($baseUrl, $urlParts), '/').'/api/v1/'.ltrim($path, '/');
+        $url = rtrim(http_build_url($baseUrl, $urlParts), '/').'/'.ltrim($path, '/');
 
         if ($access_token = Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
-//            $params['access_token'] = C('Plugins.SimpleAPI.AccessToken');
             $headers['Authorization'] = "token $access_token";
         }
 
@@ -347,19 +346,19 @@ class MultisiteModel extends Gdn_Model {
     }
 
     public function syncNodes() {
-//        if (class_exists('Communication') && class_exists('Infrastructure')) {
-//            $query = Communication::data('/forum/callback')
-//                ->method('post')
-//                ->parameter('method', 'POST')
-//                ->parameter('path', '/utility/syncnode.json')
-//                ->parameter('headers', [
-//                    'Authorization' => self::apikey(true)
-//                ])
-//                ->parameter('accountid', Infrastructure::site('accountid'));
-//
-//            $result = $query->send();
-//            return $result;
-//        }
+        if (class_exists('Communication') && class_exists('Infrastructure')) {
+            $query = Communication::data('/forum/callback')
+                ->method('post')
+                ->parameter('method', 'POST')
+                ->parameter('path', '/utility/syncnode.json')
+                ->parameter('headers', [
+                    'Authorization' => self::apikey(true)
+                ])
+                ->parameter('accountid', Infrastructure::site('accountid'));
+
+            $result = $query->send();
+            return $result;
+        }
 
         $result = [];
         $nodes = $this->get()->resultArray();
