@@ -347,19 +347,19 @@ class MultisiteModel extends Gdn_Model {
     }
 
     public function syncNodes() {
-        if (class_exists('Communication') && class_exists('Infrastructure')) {
-            $query = Communication::data('/forum/callback')
-                ->method('post')
-                ->parameter('method', 'POST')
-                ->parameter('path', '/utility/syncnode.json')
-                ->parameter('headers', [
-                    'Authorization' => self::apikey(true)
-                ])
-                ->parameter('accountid', Infrastructure::site('accountid'));
-
-            $result = $query->send();
-            return $result;
-        }
+//        if (class_exists('Communication') && class_exists('Infrastructure')) {
+//            $query = Communication::data('/forum/callback')
+//                ->method('post')
+//                ->parameter('method', 'POST')
+//                ->parameter('path', '/utility/syncnode.json')
+//                ->parameter('headers', [
+//                    'Authorization' => self::apikey(true)
+//                ])
+//                ->parameter('accountid', Infrastructure::site('accountid'));
+//
+//            $result = $query->send();
+//            return $result;
+//        }
 
         $result = [];
         $nodes = $this->get()->resultArray();
