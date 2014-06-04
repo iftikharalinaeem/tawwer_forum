@@ -72,6 +72,7 @@ class SiteNodePlugin extends Gdn_Plugin {
             ->set();
     }
 
+
     /**
      * Check to see if a valid sso token was passed through the header.
      */
@@ -144,6 +145,10 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         Trace($response, "hub api response");
         return $response;
+    }
+
+    public function slug() {
+        return val('NODE_SLUG', $_SERVER);
     }
 
     public function syncNode() {
@@ -227,7 +232,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         if (!Gdn::Session()->IsValid() && val(self::HUB_COOKIE, $_COOKIE)) {
             Trace('Trying hub sso');
             try {
-                $user = val('User', $this->hubApi('/profile/hubsso.json'));
+                $user = val('User', $this->hubApi('/profile/hubsso.json', 'GET', ['from' => $this->slug()]));
 
                 // Hub SSO always synchronizes roles.
                 SaveToConfig('Garden.SSO.SynchRoles', true, false);

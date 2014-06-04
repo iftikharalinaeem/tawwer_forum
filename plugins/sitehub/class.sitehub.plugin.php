@@ -113,30 +113,46 @@ class SiteHubPlugin extends Gdn_Plugin {
      * Gets information about the currently signed in user suitable for hub SSO calls.
      *
      * @param ProfileController $sender
+     * @param string $from The slug of the site that is trying to sso.
      * @throws Gdn_UserException Throws an exception when the user isn't signed in.
      */
-    public function profileController_hubSSO_create($sender) {
+    public function profileController_hubSSO_create($sender, $from) {
         if (!Gdn::Session()->IsValid()) {
             throw NotFoundException('User');
         }
 
+        // Get the site that the user is trying to sign in to.
+        $site = false;
+        if ($from) {
+            $site = MultisiteModel::instance()->getWhere(['slug' => $from])->FirstRow(DATASET_TYPE_ARRAY);
+            $sender->EventArguments['Site'] =& $site;
+        }
+        // Make sure the user is signing in to a valid site within the hub.
+        if (!$site) {
+            throw NotFoundException('Site');
+        }
+
         // Get the currently signed in user.
-        $user = Gdn::UserModel()->GetID(Gdn::Session()->UserID, DATASET_TYPE_ARRAY);
-        if (!$user) {
+        if (!Gdn::Session()->User) {
             throw NotFoundException('User');
         }
-        $ssoUser = arrayTranslate($user, array('UserID', 'Name', 'Email', 'Banned', 'Photo', 'PhotoUrl'));
+        $ssoUser = arrayTranslate((array)Gdn::Session()->User, array('UserID', 'Name', 'Email', 'Banned', 'Photo', 'PhotoUrl'));
         $ssoUser['Photo'] = $ssoUser['PhotoUrl'];
 
-        $roles = Gdn::UserModel()->GetRoles($user['UserID'])->ResultArray();
+        // Get the user's role.
+        $roles = Gdn::UserModel()->GetRoles(Gdn::Session()->UserID)->ResultArray();
+        $allRoles = [];
+        $ssoUser['Roles'] = [];
         foreach ($roles as $role) {
+            $allRoles[] = $role['Name'];
             if (val('HubSync', $role)) {
                 $ssoUser['Roles'][] = $role['Name'];
             }
         }
+        $sender->EventArguments['AllRoles'] = $allRoles;
 
         $sender->EventArguments['User'] =& $ssoUser;
-        $sender->EventArguments['Session'] =& $user;
+        $sender->EventArguments['Session'] =& Gdn::Session();
         $sender->FireEvent('hubSSO');
 
         $sender->Data = array('User' => $ssoUser);
