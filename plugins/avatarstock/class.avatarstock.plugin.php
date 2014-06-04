@@ -5,7 +5,7 @@
 $PluginInfo['avatarstock'] = array(
     'Name' => 'Avatar Pool',
     'Description' => 'Create a limited stock of default avatars that members can choose between.',
-    'Version' => '1.1.1',
+    'Version' => '1.1.2',
     'Author' => 'Dane MacMillan',
     'AuthorEmail' => 'dane@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -161,6 +161,29 @@ class AvatarStockPlugin extends Gdn_Plugin {
         )->ResultArray();
 
         return $update_delete;
+    }
+
+    /**
+     * Handle removing photo action for stock avatars.
+     *
+     * Check for the 'avatarstock' string. Without this, when a user chooses
+     * to remove a picture that is part of the avatar pool, that picture
+     * (its large version) will actually be deleted. Regularly uploaded avatars
+     * can be removed using the core functionality. If there is a match against
+     * the mentioned string, then consider the delete handled, which will
+     * prevent the core logic from calling unlink against the stock avatar file.
+     *
+     * @param gdn_Upload $sender The gdn_Upload controller.
+     * @param array $args The event arguments.
+     */
+    public function gdn_upload_delete_handler($sender, $args) {
+        $parsed =& $args['Parsed'];
+        $handled =& $args['Handled'];
+
+        $userPhoto = $parsed['Name'];
+        if (strpos($userPhoto, $this->file_destination_dir) !== false) {
+            $handled = true;
+        }
     }
 
     /**
