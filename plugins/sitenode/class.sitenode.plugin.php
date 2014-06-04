@@ -247,7 +247,11 @@ class SiteNodePlugin extends Gdn_Plugin {
                     Gdn::Session()->Start($user_id, true);
                 }
             } catch(Exception $ex) {
-                Trace($ex, TRACE_ERROR);
+                if ($ex->getCode() == 403) {
+                    throw new Gdn_UserException($ex->getMessage(), $ex->getCode());
+                } else {
+                    Trace($ex, TRACE_ERROR);
+                }
             }
         }
     }
