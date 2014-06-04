@@ -108,8 +108,6 @@ class SiteNodePlugin extends Gdn_Plugin {
      * @throws Gdn_UserException Throws an exception when the api endpoint returns an error response.
      */
     public function hubApi($path, $method = 'GET', $params = [], $system = false) {
-        Trace("hub api: $method $path");
-
         $headers = [];
 
         // Kludge for osx that doesn't allow host files.
@@ -139,10 +137,9 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         if ($request->ResponseStatus != 200) {
             Trace($response, "Error {$request->ResponseStatus}");
-            throw new Gdn_UserException('api: '.val('Exception', $response, 'There was an error performing your request.'), $request->ResponseStatus);
+            throw new Gdn_UserException(val('Exception', $response, 'There was an error performing your request.'), $request->ResponseStatus);
         }
 
-        Trace($response, "hub api response");
         return $response;
     }
 
@@ -247,7 +244,14 @@ class SiteNodePlugin extends Gdn_Plugin {
                 }
             } catch(Exception $ex) {
                 if ($ex->getCode() == 401) {
-                    throw new Gdn_UserException($ex->getMessage(), $ex->getCode());
+                    Gdn::Dispatcher()
+                        ->PassData('Code', $ex->getCode())
+                        ->PassData('Exception', $ex->getMessage())
+                        ->PassData('Message', $ex->getMessage())
+                        ->PassData('Trace', $ex->getTraceAsString())
+                        ->PassData('Url', Url())
+                        ->Dispatch('/home/error');
+                    exit;
                 } else {
                     Trace($ex, TRACE_ERROR);
                 }
@@ -288,6 +292,7 @@ class SiteNodePlugin extends Gdn_Plugin {
      * Synchronize the settings of this node with the hub.
      *
      * @param UtilityController $sender
+     * @throws Gdn_UserException Throws an exception when any method but post is shown.
      */
     public function utilityController_syncNode_create($sender) {
         $sender->Permission('Garden.Settings.Manage');
