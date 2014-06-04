@@ -83,7 +83,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         // First look for a header.
         $token = '';
-        if ($auth = val('HTTP_AUTHENTICATION', $_SERVER, '')) {
+        if ($auth = val('HTTP_AUTHORIZATION', $_SERVER, '')) {
             if (preg_match('`^token\s+([^\s]+)`i', $auth, $m)) {
                 $token = $m[1];
             }
@@ -123,8 +123,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         $url = rtrim(http_build_url($this->hubUrl, $urlParts), '/').'/api/v1/'.ltrim($path, '/');
 
         if ($system && $access_token = Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
-//            $params['access_token'] = C('Plugins.SimpleAPI.AccessToken');
-            $headers['Authentication'] = "token $access_token";
+            $headers['Authorization'] = "token $access_token";
         }
 
         $request = new ProxyRequest();

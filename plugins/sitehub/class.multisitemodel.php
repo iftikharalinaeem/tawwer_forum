@@ -50,7 +50,7 @@ class MultisiteModel extends Gdn_Model {
     /**
      * Gets the cluster api key.
      *
-     * @param bool $header If true the key will be returned in a way suitable to be passed in an Authentication header.
+     * @param bool $header If true the key will be returned in a way suitable to be passed in an Authorization header.
      * @return string Returns the api key or an empty string if the cluster doesn't have one.
      */
     public static function apikey($header = false) {
@@ -94,7 +94,7 @@ class MultisiteModel extends Gdn_Model {
             ->parameter('callback', [
                 'url' => Gdn::Request()->Domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/buildcallback.json",
                 'headers' => [
-                    'Authentication' => self::apikey(true)
+                    'Authorization' => self::apikey(true)
                 ]
             ]);
         $build = $buildQuery->send();
@@ -267,7 +267,7 @@ class MultisiteModel extends Gdn_Model {
 
         if ($access_token = Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
 //            $params['access_token'] = C('Plugins.SimpleAPI.AccessToken');
-            $headers['Authentication'] = "token $access_token";
+            $headers['Authorization'] = "token $access_token";
         }
 
         Trace("api: $method $url");
@@ -353,7 +353,7 @@ class MultisiteModel extends Gdn_Model {
                 ->parameter('method', 'POST')
                 ->parameter('path', '/utility/syncnode.json')
                 ->parameter('headers', [
-                    'Authentication' => self::apikey(true)
+                    'Authorization' => self::apikey(true)
                 ])
                 ->parameter('accountid', Infrastructure::site('accountid'));
 
