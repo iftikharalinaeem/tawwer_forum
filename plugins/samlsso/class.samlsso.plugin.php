@@ -31,7 +31,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $request->relayState = $target;
       $url = $request->getRedirectUrl();
       Gdn::Session()->Stash('samlsso', NULL, TRUE);
-      Logger::event('saml_authrequest_sent', LogLevel::DEBUG, 'SAML request {id} sent to {host}.', ['id' => $request->lastID, 'host' => parse_url(''), 'url' => $url]);
+      Logger::event('saml_authrequest_sent', Logger::DEBUG, 'SAML request {id} sent to {host}.', array('id' => $request->lastID, 'host' => parse_url(''), 'url' => $url));
       Redirect($url);
    }
 
@@ -180,7 +180,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
       $url = $request->getRedirectUrl();
       Gdn::Session()->Stash('samlsso', NULL, TRUE);
-      Logger::event('saml_authrequest_sent', LogLevel::DEBUG, 'SAML request {id} sent to {host}.', ['id' => $request->lastID, 'host' => parse_url(''), 'url' => $url]);
+      Logger::event('saml_authrequest_sent', Logger::DEBUG, 'SAML request {id} sent to {host}.', array('id' => $request->lastID, 'host' => parse_url(''), 'url' => $url));
       Redirect($url);
    }
 
@@ -253,14 +253,14 @@ class SamlSSOPlugin extends Gdn_Plugin {
          $response = new OneLogin_Saml_Response($settings, $Sender->Request->Post('SAMLResponse'));
 //         $xml = $response->document->saveXML();
 
-         Logger::event('saml_response_received', LogLevel::DEBUG, "SAML response received.", ['samlresponse' => $Sender->Request->Post('SAMLResponse')]);
+         Logger::event('saml_response_received', Logger::DEBUG, "SAML response received.", array('samlresponse' => $Sender->Request->Post('SAMLResponse')));
 
          try {
             if (!$response->isValid()) {
                throw new Gdn_UserException('The saml response was not valid.');
             }
          } catch (Exception $ex) {
-            Logger::event('saml_response_invalid', LogLevel::ERROR, $ex->getMessage(), ['code' => $ex->getCode()]);
+            Logger::event('saml_response_invalid', Logger::ERROR, $ex->getMessage(), array('code' => $ex->getCode()));
             throw $ex;
          }
          $id = $response->getNameId();
