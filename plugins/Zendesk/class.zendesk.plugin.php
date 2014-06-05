@@ -7,8 +7,7 @@
 // Define the plugin:
 $PluginInfo['Zendesk'] = array(
     'Name' => 'Zendesk',
-    'Description' => "Users may designate a discussion as a Support Issue and the message will be submitted to Zendesk."
-        . "Reply will be added to thread",
+    'Description' => "Allow staff users to create tickets and cases from discussions and comments.",
     'Version' => '0.0.4-beta',
     'RequiredApplications' => array('Vanilla' => '2.1.18'),
     'SettingsUrl' => '/dashboard/plugin/zendesk',
@@ -16,7 +15,8 @@ $PluginInfo['Zendesk'] = array(
     'MobileFriendly' => true,
     'Author' => 'John Ashton',
     'AuthorEmail' => 'john@vanillaforums.com',
-    'AuthorUrl' => 'http://www.github.com/John0x00'
+    'AuthorUrl' => 'http://www.github.com/John0x00',
+    'SocialConnect' => false
 );
 
 /**
