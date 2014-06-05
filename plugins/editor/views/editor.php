@@ -26,7 +26,7 @@
             // Else this button has dropdown options, so generate them
             $html_button_dropdown_options = '';
 
-            foreach ($button['type'] as $button_option) {
+            foreach ($button['type'] as $type_key => $button_option) {
 
                // If any text, use it
                $action_text = (isset($button_option['text']))
@@ -41,7 +41,9 @@
                    : 'span';
 
                // Concatenate child elements
-               $html_button_dropdown_options .= Wrap($action_text, $html_tag, $button_option['attr']);
+               if (isset($button_option['attr'])) {
+                  $html_button_dropdown_options .= Wrap($action_text, $html_tag, $button_option['attr']);
+               }
             }
 
             switch ($button['action']) {
@@ -96,6 +98,45 @@
                      </div>'
                    , 'div', array('class' => 'editor-dropdown editor-dropdown-upload'));
                   break;
+
+                case 'color':
+
+                    $colorType = $button['type'];
+
+                    $textColorOptions = '';
+                    if (isset($colorType['text'])) {
+                        foreach($colorType['text'] as $textColor) {
+                            $textColorOptions .= Wrap('', $textColor['html_tag'], $textColor['attr']);
+                        }
+
+                        if ($textColorOptions) {
+                            $textColorOptions = '<div class="color-group text-color ClearFix"><i class="icon icon-font" title="Text"></i>' . $textColorOptions . '</div>';
+                        }
+                    }
+
+                    $highlightColorOptions = '';
+                    if (isset($colorType['highlight'])) {
+                        foreach($colorType['highlight'] as $highlightColor) {
+                            $highlightColorOptions .= Wrap('', $highlightColor['html_tag'], $highlightColor['attr']);
+                        }
+
+                        if ($highlightColorOptions) {
+                            $highlightColorOptions = '<div class="color-group highlight-color ClearFix"><i class="icon icon-sign-blank" title="Highlight"></i>' . $highlightColorOptions . '</div>';
+                        }
+                    }
+
+                    $cssHasHighlight = ($highlightColorOptions)
+                        ? 'color-has-highlight'
+                        : '';
+
+                    $colorOptions = $textColorOptions . $highlightColorOptions;
+
+                    $html_toolbar .= Wrap(
+                        Wrap($html_arrow_down, 'span', $button['attr']) .''.
+                        Wrap($colorOptions, 'div', array('class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''))
+                        , 'div', array('class' => "editor-dropdown editor-dropdown-color $cssHasHighlight")
+                    );
+                    break;
 
                // All other dropdowns (color, format, emoji)
                default:

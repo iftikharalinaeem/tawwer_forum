@@ -60,8 +60,8 @@ EOT;
     <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
         $signingElem
         $encryptionElem
-        <md:NameIDFormat>{$this->_settings->requestedNameIdFormat}</md:NameIDFormat>
         $signoutElem
+        <md:NameIDFormat>{$this->_settings->requestedNameIdFormat}</md:NameIDFormat>
         <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
                                      Location="{$this->_settings->spReturnUrl}"
                                      index="1"/>

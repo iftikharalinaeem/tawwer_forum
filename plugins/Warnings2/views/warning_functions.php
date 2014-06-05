@@ -24,6 +24,10 @@ function WriteUserNoteWarning($Row) {
          <?php
          echo '<span class="NoteType NoteType-'.$Row['Type'].'">'.T(ucfirst($Row['Type'])).'</span> '.Bullet(' ');
 
+         if (val('Banned', $Row)) {
+            echo '<span class="NoteType NoteType-ban">'.T('Ban').'</span> '.Bullet(' ');
+         }
+
          if ($Reversed)
             echo '<del>';
 
