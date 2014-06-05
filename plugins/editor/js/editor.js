@@ -1060,7 +1060,11 @@
                            : false;
 
                         // Check against provided file type and file extension.
-                        var validFile = ($.inArray(type, allowedExtensions) > -1 && $.inArray(extension, allowedExtensions) > -1)
+                        // Note: the file type check was removed. Not all mime
+                        // types are formatted like images (image/jpeg), where
+                        // the subtype (jpeg) can match a file extension.
+                        //var validFile = ($.inArray(type, allowedExtensions) > -1 && $.inArray(extension, allowedExtensions) > -1)
+                        var validFile = ($.inArray(extension, allowedExtensions) > -1)
                            ? true
                            : false;
 
