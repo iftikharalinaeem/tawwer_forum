@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.31',
+   'Version' => '1.3.32',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -833,46 +833,53 @@ class EditorPlugin extends Gdn_Plugin {
     * @param mixed $Sender
     */
    protected function CacheAttachedMedia($Sender) {
+      $DiscussionID = null;
       $Comments = $Sender->Data('Comments');
       $CommentIDList = array();
       $MediaData = array();
 
-      $DiscussionID = ($Sender->Data('Discussion.DiscussionID'))
-          ? $Sender->Data('Discussion.DiscussionID')
-          : $Comments->FirstRow()->DiscussionID;
+      if ($Sender->Data('Discussion.DiscussionID')) {
+         $DiscussionID = $Sender->Data('Discussion.DiscussionID');
+      }
 
-      if ($Comments instanceof Gdn_DataSet && $Comments->NumRows()) {
-         $Comments->DataSeek(-1);
-         while ($Comment = $Comments->NextRow()) {
-            $CommentIDList[] = $Comment->CommentID;
+      if (is_null($DiscussionID) && !empty($Comments)) {
+         $DiscussionID = $Comments->FirstRow()->DiscussionID;
+      }
+
+      if ($DiscussionID) {
+         if ($Comments instanceof Gdn_DataSet && $Comments->NumRows()) {
+            $Comments->DataSeek(-1);
+            while ($Comment = $Comments->NextRow()) {
+               $CommentIDList[] = $Comment->CommentID;
+            }
+         } elseif (!empty($Sender->Discussion)) {
+            $CommentIDList[] = $Sender->DiscussionID = $Sender->Discussion->DiscussionID;
          }
-      } elseif (!empty($Sender->Discussion)) {
-         $CommentIDList[] = $Sender->DiscussionID = $Sender->Discussion->DiscussionID;
+
+         if (isset($Sender->Comment) && isset($Sender->Comment->CommentID)) {
+            $CommentIDList[] = $Sender->Comment->CommentID;
+         }
+
+         // TODO
+         // Added note for caching here because it was the CommentIDList that
+         // is the main problem.
+         // Note about memcaching:
+         // Main problem with this is when a new comment is posted. It will only
+         // have that current comment in the list, which, after calling
+         // PreloadDiscussionMedia, means it will be the only piece of data added
+         // to the cache, which prevents all the rest of the comments from loading
+         // their own attachments. Consider either adding to the cache when a new
+         // file is uploaded, or just getting a list of all comments for a
+         // discussion.
+         // This is why memcaching has been disabled for now. There are a couple
+         // ways to prevent this, but they all seem unnecessary.
+
+         if (count($CommentIDList)) {
+            $MediaData = $this->PreloadDiscussionMedia($DiscussionID, $CommentIDList);
+         }
+
+         $this->mediaCache = $MediaData;
       }
-
-      if (isset($Sender->Comment) && isset($Sender->Comment->CommentID)) {
-         $CommentIDList[] = $Sender->Comment->CommentID;
-      }
-
-      // TODO
-      // Added note for caching here because it was the CommentIDList that
-      // is the main problem.
-      // Note about memcaching:
-      // Main problem with this is when a new comment is posted. It will only
-      // have that current comment in the list, which, after calling
-      // PreloadDiscussionMedia, means it will be the only piece of data added
-      // to the cache, which prevents all the rest of the comments from loading
-      // their own attachments. Consider either adding to the cache when a new
-      // file is uploaded, or just getting a list of all comments for a
-      // discussion.
-      // This is why memcaching has been disabled for now. There are a couple
-      // ways to prevent this, but they all seem unnecessary.
-
-      if (count($CommentIDList)) {
-         $MediaData = $this->PreloadDiscussionMedia($DiscussionID, $CommentIDList);
-      }
-
-      $this->mediaCache = $MediaData;
    }
 
    /**
