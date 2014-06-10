@@ -54,7 +54,7 @@
 
 .NoteType-note { color: #07f; }
 
-.NoteType-warning { color: #d00; }
+.NoteType-warning, .NoteType-ban { color: #d00; }
 
 .Warning-Body > *:first-child { margin-top: 0; }
 .Warning-Body > *:last-child { margin-bottom: 0; }

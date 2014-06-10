@@ -257,7 +257,12 @@ class WarningModel extends UserNoteModel {
       }
 
       // Process this user's warnings.
-      $this->ProcessWarnings($UserID);
+      $Processed = $this->ProcessWarnings($UserID);
+
+      if (valr('Set.Banned', $Processed)) {
+         // Update the user note to indicate the ban.
+         $this->SaveToSerializedColumn('Attributes', $ID, 'Banned', TRUE);
+      }
 
       return $ID;
    }
