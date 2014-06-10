@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.32',
+   'Version' => '1.3.33',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -1071,7 +1071,7 @@ class EditorPlugin extends Gdn_Plugin {
       $Cf->Initialize(array(
           'Garden.InputFormatter' => array('LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p> <p><small><strong>Note:</strong> the editor will auto-detect the format of old posts when editing them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</small></p>', 'Items' => $Formats),
           'Plugins.editor.ForceWysiwyg' => array('LabelCode' => 'Reinterpret All Posts As Wysiwyg', 'Control' => 'Checkbox', 'Description' => '<p>Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.</p> <p><small><strong>Note:</strong> This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.</p>'),
-          'Garden.MobileInputFormatter' => array('LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $Formats, 'DefaultValue' => C('Garden.InputFormatter'))
+          'Garden.MobileInputFormatter' => array('LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $Formats, 'DefaultValue' => C('Garden.MobileInputFormatter'))
       ));
 
       // Add some JS and CSS to blur out option when Wysiwyg not chosen.
@@ -1104,14 +1104,16 @@ class EditorPlugin extends Gdn_Plugin {
       $pluginEditors = array(
           'cleditor',
           'ButtonBar',
-          'Emotify'
+          'Emotify',
+          'FileUpload'
       );
 
       foreach ($pluginEditors as $pluginName) {
          Gdn::PluginManager()->DisablePlugin($pluginName);
       }
 
-      SaveToConfig(array(
+      TouchConfig(array(
+         'Garden.MobileInputFormatter' => 'TextEx',
          'Plugins.editor.ForceWysiwyg' => false
       ));
 
