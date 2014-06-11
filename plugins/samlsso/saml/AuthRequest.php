@@ -5,7 +5,7 @@ require_once('Settings.php');
  * Create a SAML authorization request.
  */
 class OneLogin_Saml_AuthRequest {
-    const ID_PREFIX = 'VANILLA';
+    const ID_PREFIX = 'vf-';
 
     /**
      * A SamlResponse class provided to the constructor.
@@ -50,17 +50,6 @@ class OneLogin_Saml_AuthRequest {
         $issueInstant = $this->getTimestamp();
         $isPassive = $this->isPassive ? 'true' : 'false';
         $Destination = htmlspecialchars($this->_settings->idpSingleSignOnUrl);
-        $provider = '';
-        if ($this->_settings->providerID) {
-            $providerID = htmlspecialchars($this->_settings->providerID);
-            $provider = <<<PROVIDER
-<samlp:Scoping>
-    <samlp:IDPList>
-        <samlp:IDPEntry ProviderID="$providerID"/>
-    </samlp:IDPList>
-</samlp:Scoping>
-PROVIDER;
-        }
 
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
@@ -80,7 +69,6 @@ PROVIDER;
     <samlp:RequestedAuthnContext Comparison="exact">
         <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
     </samlp:RequestedAuthnContext>
-    $provider
 </samlp:AuthnRequest>
 AUTHNREQUEST;
 

@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.28',
+   'Version' => '1.3.33',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -32,6 +32,7 @@ class EditorPlugin extends Gdn_Plugin {
     */
 
    protected $canUpload = false;
+
 
    /**
     *
@@ -135,16 +136,18 @@ class EditorPlugin extends Gdn_Plugin {
     *
     * @return array List of allowed editor actions
     */
-   public function getAllowedEditorActions($name = null, $value = null) {
+   public function getAllowedEditorActions() {
       static $allowedEditorActions = array(
           'bold' => true,
           'italic' => true,
           'strike' => true,
-          'color' => false,
           'orderedlist' => true,
           'unorderedlist' => true,
 
           'sep-format' => true, // separator
+          'color' => false,
+          'highlightcolor' => false, // Dependent on color. TODO add multidim support.
+          'font' => false,
           'format' => true,
 
           'sep-media' => true, // separator
@@ -164,17 +167,7 @@ class EditorPlugin extends Gdn_Plugin {
           'lights' => true
       );
 
-      if ($name !== null) {
-         if (is_array($name)) {
-            $allowedEditorActions = $name;
-         } elseif ($value !== null) {
-            $allowedEditorActions[$name] = $value;
-         } else {
-            return GetValue($name, $allowedEditorActions, null);
-         }
-      } else {
-         return $allowedEditorActions;
-      }
+      return $allowedEditorActions;
    }
 
    /**
@@ -193,17 +186,19 @@ class EditorPlugin extends Gdn_Plugin {
    protected function getFontColorList() {
       $fontColorList = array(
          'black',
-         'white',
+         //'white',
          'gray',
-         'silver',
-         'maroon',
          'red',
-         'purple',
          'green',
-         'olive',
-         'navy',
+         'purple',
+         'yellow',
          'blue',
-         'lime'
+         'orange'
+         //'olive',
+         //'navy',
+         //'lime',
+         //'silver',
+         //'maroon'
       );
 
       return $fontColorList;
@@ -222,16 +217,36 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbar        = array();
       $editorToolbarAll     = array();
       $allowedEditorActions = $this->getAllowedEditorActions();
+      $fontColorList        = $this->getFontColorList();
+
+      // Let plugins and themes override the defaults.
+      $this->EventArguments['actions'] =& $allowedEditorActions;
+      $this->EventArguments['colors'] =& $fontColorList;
+      $this->FireEvent('toolbarConfig');
 
       /**
        * Build color dropdown from array
        */
+      $toolbarColorGroups = array();
       $toolbarDropdownFontColor = array();
-      $fontColorList            = $this->getFontColorList();
+      $toolbarDropdownFontColorHighlight = array();
       foreach ($fontColorList as $fontColor) {
+         // Fore color
          $editorDataAttr             = '{"action":"color","value":"'. $fontColor .'"}';
          $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, 'title' => T($fontColor), 'data-editor' => $editorDataAttr));
+
+         // Highlight color
+         if ($fontColor == 'black') {
+             $fontColor = 'white';
+         }
+         $editorDataAttrHighlight = '{"action":"highlightcolor","value":"'. $fontColor .'"}';
+         $toolbarDropdownFontColorHighlight[] = array('edit' => 'basic', 'action'=> 'highlightcolor', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'highlightcolor', 'data-wysihtml5-command-value' => $fontColor, 'title' => T($fontColor), 'data-editor' => $editorDataAttrHighlight));
       }
+
+       $toolbarColorGroups['text'] = $toolbarDropdownFontColor;
+       if ($allowedEditorActions['highlightcolor']) {
+           $toolbarColorGroups['highlight'] = $toolbarDropdownFontColorHighlight;
+       }
 
       /**
        * Build emoji dropdown from array
@@ -277,7 +292,11 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => T('Bold'), 'data-editor' => '{"action":"bold","value":""}'));
       $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => T('Italic'), 'data-editor' => '{"action":"italic","value":""}'));
       $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'strikethrough', 'title' => T('Strike'), 'data-editor' => '{"action":"strike","value":""}'));
-      $editorToolbarAll['color'] = array('edit' => 'basic', 'action'=> 'color', 'type' => $toolbarDropdownFontColor, 'attr' => array('class' => 'editor-action icon icon-font editor-dd-color editor-optional-button', 'data-wysihtml5-command-group' => 'foreColor', 'title' => T('Color'), 'data-editor' => '{"action":"color","value":""}'));
+
+      $editorToolbarAll['color'] = array('edit' => 'basic', 'action'=> 'color', 'type' =>
+          $toolbarColorGroups,
+          'attr' => array('class' => 'editor-action icon icon-font editor-dd-color editor-optional-button', 'data-wysihtml5-command-group' => 'foreColor', 'title' => T('Color'), 'data-editor' => '{"action":"color","value":""}'));
+
       $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => T('Ordered list'), 'data-editor' => '{"action":"orderedlist","value":""}'));
       $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => T('Unordered list'), 'data-editor' => '{"action":"unorderedlist","value":""}'));
 
@@ -570,10 +589,10 @@ class EditorPlugin extends Gdn_Plugin {
          $Media['MediaID'] = $MediaID;
 
          // Clear Media cache for discussion, if any.
-         if ($discussionID) {
+         /*if ($discussionID) {
             $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
             Gdn::Cache()->Remove($cacheKey);
-         }
+         }*/
 
          if ($generate_thumbnail) {
             $thumbUrl = Url('/utility/mediathumbnail/' . $MediaID, true);
@@ -682,7 +701,7 @@ class EditorPlugin extends Gdn_Plugin {
                }
 
                // Clear the cache, if exists.
-               $discussionID = '';
+               /*$discussionID = '';
                if ($Media['ForeignTable'] == 'discussion') {
                   $discussionID = $Media['ForeignID'];
                } elseif ($Media['ForeignTable'] == 'comment') {
@@ -695,7 +714,7 @@ class EditorPlugin extends Gdn_Plugin {
                if ($discussionID) {
                   $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
                   Gdn::Cache()->Remove($cacheKey);
-               }
+               }*/
             }
          } catch (Exception $e) {
             die($e->getMessage());
@@ -786,11 +805,13 @@ class EditorPlugin extends Gdn_Plugin {
       $foreignId = GetValue($param, GetValue(ucfirst($Type), $Sender->EventArguments));
 
       // Get all media for the page.
-      $mediaList = $this->MediaCache();
+      $mediaList = $this->MediaCache($Sender);
+
       if (is_array($mediaList)) {
          // Filter out the ones that don't match.
          $attachments = array_filter($mediaList, function($attachment) use ($foreignId, $Type) {
-            if ($attachment['ForeignID'] == $foreignId
+            if (isset($attachment['ForeignID'])
+            && $attachment['ForeignID'] == $foreignId
             && $attachment['ForeignTable'] == $Type) {
                return true;
             }
@@ -812,38 +833,61 @@ class EditorPlugin extends Gdn_Plugin {
     * @param mixed $Sender
     */
    protected function CacheAttachedMedia($Sender) {
-
+      $DiscussionID = null;
       $Comments = $Sender->Data('Comments');
       $CommentIDList = array();
       $MediaData = array();
 
-      if ($Comments instanceof Gdn_DataSet && $Comments->NumRows()) {
-         $Comments->DataSeek(-1);
-         while ($Comment = $Comments->NextRow()) {
-            $CommentIDList[] = $Comment->CommentID;
-         }
-      } elseif (!empty($Sender->Discussion)) {
-         $CommentIDList[] = $Sender->DiscussionID = $Sender->Discussion->DiscussionID;
-      }
-
-      if (isset($Sender->Comment) && isset($Sender->Comment->CommentID)) {
-         $CommentIDList[] = $Sender->Comment->CommentID;
-      }
-
-      if (count($CommentIDList)) {
+      if ($Sender->Data('Discussion.DiscussionID')) {
          $DiscussionID = $Sender->Data('Discussion.DiscussionID');
-         $MediaData = $this->PreloadDiscussionMedia($DiscussionID, $CommentIDList);
       }
 
-      $this->mediaCache = $MediaData;
+      if (is_null($DiscussionID) && !empty($Comments)) {
+         $DiscussionID = $Comments->FirstRow()->DiscussionID;
+      }
+
+      if ($DiscussionID) {
+         if ($Comments instanceof Gdn_DataSet && $Comments->NumRows()) {
+            $Comments->DataSeek(-1);
+            while ($Comment = $Comments->NextRow()) {
+               $CommentIDList[] = $Comment->CommentID;
+            }
+         } elseif (!empty($Sender->Discussion)) {
+            $CommentIDList[] = $Sender->DiscussionID = $Sender->Discussion->DiscussionID;
+         }
+
+         if (isset($Sender->Comment) && isset($Sender->Comment->CommentID)) {
+            $CommentIDList[] = $Sender->Comment->CommentID;
+         }
+
+         // TODO
+         // Added note for caching here because it was the CommentIDList that
+         // is the main problem.
+         // Note about memcaching:
+         // Main problem with this is when a new comment is posted. It will only
+         // have that current comment in the list, which, after calling
+         // PreloadDiscussionMedia, means it will be the only piece of data added
+         // to the cache, which prevents all the rest of the comments from loading
+         // their own attachments. Consider either adding to the cache when a new
+         // file is uploaded, or just getting a list of all comments for a
+         // discussion.
+         // This is why memcaching has been disabled for now. There are a couple
+         // ways to prevent this, but they all seem unnecessary.
+
+         if (count($CommentIDList)) {
+            $MediaData = $this->PreloadDiscussionMedia($DiscussionID, $CommentIDList);
+         }
+
+         $this->mediaCache = $MediaData;
+      }
    }
 
    /**
     * Get media list for inserting into discussion and comments.
     */
-   public function MediaCache() {
+   public function MediaCache($Sender) {
       if ($this->mediaCache === null) {
-         $this->CacheAttachedMedia(Gdn::Controller());
+         $this->CacheAttachedMedia($Sender);
       }
 
       return $this->mediaCache;
@@ -862,11 +906,9 @@ class EditorPlugin extends Gdn_Plugin {
       $mediaDataDiscussion = array();
       $mediaDataComment = array();
 
-      $cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
+      /*$cacheKey = sprintf(self::DISCUSSION_MEDIA_CACHE_KEY, $discussionID);
       $cacheResponse = Gdn::Cache()->Get($cacheKey);
-
-      if ($cacheResponse === Gdn_Cache::CACHEOP_FAILURE) {
-
+      if ($cacheResponse === Gdn_Cache::CACHEOP_FAILURE) {*/
          $mediaModel = new Gdn_Model('Media');
 
          // Query the Media table for discussion media.
@@ -902,13 +944,13 @@ class EditorPlugin extends Gdn_Plugin {
          }
 
          $mediaData = array_merge($mediaDataDiscussion, $mediaDataComment);
-
+      /*
          Gdn::Cache()->Store($cacheKey, $mediaData, array(
                 Gdn_Cache::FEATURE_EXPIRY => $this->mediaCacheExpire
          ));
       } else {
          $mediaData = $cacheResponse;
-      }
+      }*/
 
 		return $mediaData;
    }
@@ -1029,7 +1071,7 @@ class EditorPlugin extends Gdn_Plugin {
       $Cf->Initialize(array(
           'Garden.InputFormatter' => array('LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p> <p><small><strong>Note:</strong> the editor will auto-detect the format of old posts when editing them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</small></p>', 'Items' => $Formats),
           'Plugins.editor.ForceWysiwyg' => array('LabelCode' => 'Reinterpret All Posts As Wysiwyg', 'Control' => 'Checkbox', 'Description' => '<p>Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.</p> <p><small><strong>Note:</strong> This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.</p>'),
-          'Garden.MobileInputFormatter' => array('LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $Formats, 'DefaultValue' => C('Garden.InputFormatter'))
+          'Garden.MobileInputFormatter' => array('LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $Formats, 'DefaultValue' => C('Garden.MobileInputFormatter'))
       ));
 
       // Add some JS and CSS to blur out option when Wysiwyg not chosen.
@@ -1062,14 +1104,16 @@ class EditorPlugin extends Gdn_Plugin {
       $pluginEditors = array(
           'cleditor',
           'ButtonBar',
-          'Emotify'
+          'Emotify',
+          'FileUpload'
       );
 
       foreach ($pluginEditors as $pluginName) {
          Gdn::PluginManager()->DisablePlugin($pluginName);
       }
 
-      SaveToConfig(array(
+      TouchConfig(array(
+         'Garden.MobileInputFormatter' => 'TextEx',
          'Plugins.editor.ForceWysiwyg' => false
       ));
 
@@ -1147,9 +1191,12 @@ class EditorPlugin extends Gdn_Plugin {
              'ThumbPath' => $filepath_parsed['SaveName']
           ));
 
-         // Remove cf scratch copy, typically in cftemp.
-         if (!unlink($local_path)) {
-            // Maybe add logging for local cf copies not deleted.
+         // Remove cf scratch copy, typically in cftemp, if there was actually
+         // a file pulled in from CF.
+         if (strpos($local_path, 'cftemp') !== false) {
+            if (!unlink($local_path)) {
+               // Maybe add logging for local cf copies not deleted.
+            }
          }
 
          $url = $filepath_parsed['Url'];

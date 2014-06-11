@@ -4,11 +4,11 @@
       border: 1px solid #ccc;
       height: 28px;
    }
-   
+
    label + .RadioLabel {
       margin-left: 5px;
    }
-   
+
    .SmallLabel {
       font-size: 12px;
       margin: 5px 0 0 3px;
@@ -146,14 +146,19 @@ echo $this->Form->Open(), $this->Form->Errors();
    </li>
    <li>
      <?php
-     echo $this->Form->Label('Post Links', 'Abilities_ActivityLinks'),
+     echo $this->Form->Label('Post Links', ''),
      '<div class="Info2">'."You can take away the ability to post links to help prevent link spammers.".'</div>',
-     
+
       $this->Form->Label('Activities', 'Abilities_ActivityLinks', array('class' => 'SmallLabel')),
-      $this->Form->RadioList('Abilities_ActivityLinks', array('no' => 'take away', '' => 'default'));
-      
-//      $this->Form->Label('@'.T('Discussions').' & '.T('Comments'), 'Abilities_CommentLinks', array('class' => 'SmallLabel')),
-//      $this->Form->RadioList('Abilities_CommentLinks', array('no' => 'take away', '' => 'default'));
+      $this->Form->RadioList('Abilities_ActivityLinks', array('no' => 'take away', '' => 'default')),
+
+      $this->Form->Label('@'.T('Discussions').' & '.T('Comments'), 'Abilities_CommentLinks', array('class' => 'SmallLabel')),
+      $this->Form->RadioList('Abilities_CommentLinks', array('no' => 'take away', '' => 'default')),
+
+      $this->Form->Label('Conversations', 'Abilities_ConversationLinks', array('class' => 'SmallLabel')),
+      $this->Form->RadioList('Abilities_ConversationLinks', array('no' => 'take away', '' => 'default'));
+
+
      ?>
    </li>
    <li>

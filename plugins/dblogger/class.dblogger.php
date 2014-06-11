@@ -19,29 +19,29 @@ class DbLogger extends BaseLogger {
      * @return null|void
      */
     public function log($level, $message, array $context = array()) {
-
         $columns = array(
-            'EventLogID' => true,
-            'InsertUserID' => true,
-            'InsertName' => true,
-            'TimeInserted' => true,
-            'InsertIPAddress' => true,
-            'Attributes' => true,
-            'Message' => true,
-            'LogLevel' => true,
-            'Event' => true,
-            'Method' => true,
-            'Domain' => true,
-            'Path' => true
+            'id' => true,
+            'userid' => true,
+            'username' => true,
+            'timestamp' => true,
+            'ip' => true,
+            'attributes' => true,
+            'message' => true,
+            'level' => true,
+            'event' => true,
+            'method' => true,
+            'domain' => true,
+            'path' => true
         );
+
         $attributes = array_diff_key($context, $columns);
         $insert = array_diff_key($context, $attributes);
-        $insert['Message'] = FormatString($message, $context);
+        $insert['message'] = FormatString($message, $context);
+        $insert['level'] = Logger::levelPriority($level);
         if ($attributes) {
-            $insert['Attributes'] = json_encode($attributes, JSON_UNESCAPED_SLASHES);
+            $insert['attributes'] = json_encode($attributes, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
         }
-        $insert['EventLogID'] = uniqid('', true);
-        $insert['LogLevel'] = $level;
+        $insert['id'] = uniqid('', false).substr(dechex(mt_rand()), 0, 3);
 
         return Gdn::SQL()->Insert('EventLog', $insert);
     }

@@ -41,12 +41,22 @@
     <h3><?php echo T('Setup Instructions'); ?></h3>
 
     <div class="Info">
-        <?php echo T('If you already have an account you need to enable API Access for this plugin to work'); ?>
+        <?php echo T('If you already have an account you need to enable API Access for this plugin to work.'); ?>
 
-        <ul>
-            <li><?php echo T('Setup'); ?></li>
-            <li><a href="https://github.com/settings/applications/new" target="_new"></a></li>
-        </ul>
+        <ol>
+            <li><?php
+                echo Anchor(
+                    'Create a new application in Github',
+                    'https://github.com/settings/applications/new',
+                    '',
+                    array('Target' => '_blank')
+                 );
+                ?>
+            <ul><li>Callback Url: <?php echo Url('/profile/githubconnect', true); ?></li></ul>
+            <li><?php echo T('Enter the Client ID below'); ?></li>
+            <li><?php echo T('Enter the Secret below'); ?></li>
+            <li><?php echo T('Enter the repositories you want to be allowed'); ?></li>
+        </ol>
 
     </div>
 
