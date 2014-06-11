@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.33',
+   'Version' => '1.3.34',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -233,14 +233,14 @@ class EditorPlugin extends Gdn_Plugin {
       foreach ($fontColorList as $fontColor) {
          // Fore color
          $editorDataAttr             = '{"action":"color","value":"'. $fontColor .'"}';
-         $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, 'title' => T($fontColor), 'data-editor' => $editorDataAttr));
+         $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action'=> 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, /*'title' => T($fontColor),*/ 'data-editor' => $editorDataAttr));
 
          // Highlight color
          if ($fontColor == 'black') {
              $fontColor = 'white';
          }
          $editorDataAttrHighlight = '{"action":"highlightcolor","value":"'. $fontColor .'"}';
-         $toolbarDropdownFontColorHighlight[] = array('edit' => 'basic', 'action'=> 'highlightcolor', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'highlightcolor', 'data-wysihtml5-command-value' => $fontColor, 'title' => T($fontColor), 'data-editor' => $editorDataAttrHighlight));
+         $toolbarDropdownFontColorHighlight[] = array('edit' => 'basic', 'action'=> 'highlightcolor', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'. $fontColor .' editor-dialog-fire-close', 'data-wysihtml5-command' => 'highlightcolor', 'data-wysihtml5-command-value' => $fontColor, /*'title' => T($fontColor),*/ 'data-editor' => $editorDataAttrHighlight));
       }
 
        $toolbarColorGroups['text'] = $toolbarDropdownFontColor;
