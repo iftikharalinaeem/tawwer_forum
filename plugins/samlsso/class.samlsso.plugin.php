@@ -188,8 +188,9 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
    public function EntryController_OverrideSignOut_Handler($Sender, $Args) {
       $Provider = $Args['DefaultProvider'];
-      if ($Provider['AuthenticationSchemeAlias'] != 'saml')
+      if ($Provider['AuthenticationSchemeAlias'] != 'saml' || !$Provider['SignOutUrl']) {
          return;
+      }
 
       // Prevent
       SaveToConfig('Garden.SSO.Signout', 'none', FALSE);
