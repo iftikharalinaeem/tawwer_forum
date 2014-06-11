@@ -1060,7 +1060,11 @@
                            : false;
 
                         // Check against provided file type and file extension.
-                        var validFile = ($.inArray(type, allowedExtensions) > -1 && $.inArray(extension, allowedExtensions) > -1)
+                        // Note: the file type check was removed. Not all mime
+                        // types are formatted like images (image/jpeg), where
+                        // the subtype (jpeg) can match a file extension.
+                        //var validFile = ($.inArray(type, allowedExtensions) > -1 && $.inArray(extension, allowedExtensions) > -1)
+                        var validFile = ($.inArray(extension, allowedExtensions) > -1)
                            ? true
                            : false;
 
@@ -1655,6 +1659,26 @@
                             return undef;
                           }
                         };
+                      })(wysihtml5);
+
+                      // extending whysihtml5 library for color highlights
+                      (function(wysihtml5) {
+                          var undef,
+                              REG_EXP = /post-highlightcolor-[0-9a-z]+/g;
+
+                          wysihtml5.commands.highlightcolor = {
+                              exec: function(composer, command, color) {
+                                  wysihtml5.commands.formatInline.exec(composer, command, "span", "post-highlightcolor-" + color, REG_EXP);
+                              },
+
+                              state: function(composer, command, color) {
+                                  return wysihtml5.commands.formatInline.state(composer, command, "span", "post-highlightcolor-" + color, REG_EXP);
+                              },
+
+                              value: function() {
+                                  return undef;
+                              }
+                          };
                       })(wysihtml5);
                   });
                 break;

@@ -8,6 +8,7 @@
   position: relative;
   overflow: hidden;
   display: block;
+  cursor: pointer;
 }
 #avatarstock .display-avatars .avatar-wrap img {
   display: block;
@@ -17,6 +18,11 @@
   position: absolute;
   top: 0;
   left: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+#avatarstock .display-avatars .avatar-wrap input.avatar-delete-input:hover, #avatarstock .display-avatars .avatar-wrap input.avatar-delete-input:checked {
+  opacity: 1;
 }
 #avatarstock .display-avatars .upload-new-avatar {
   display: table;
@@ -45,6 +51,18 @@
 .stockavatar-wrap h1 {
   display: block !important;
   margin-left: 10px;
+}
+.stockavatar-wrap #custom-avatar-upload {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin: 10px 0 20px 0;
+  padding: 10px 0 20px 0;
+}
+.stockavatar-wrap .CurrentPicture {
+  margin: 20px 0 0 0;
+}
+.stockavatar-wrap .remove-picture {
+  margin: 20px 0;
 }
 
 #stockavatar-picker {

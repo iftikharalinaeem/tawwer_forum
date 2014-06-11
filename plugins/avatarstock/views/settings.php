@@ -31,12 +31,19 @@
 
       <?php if ($total_stock_avatars): ?>
 
-         <?php foreach($stock_avatar_payload as $avatar): ?>
+         <?php foreach($stock_avatar_payload as $key => $avatar): ?>
 
-            <div class="avatar-wrap">
+            <?php
+              $avatarDeleteLabelFor = 'Form_avatar_delete';
+              if ($key > 0) {
+                  $avatarDeleteLabelFor .= $key;
+              }
+            ?>
+
+            <label class="avatar-wrap" for="<?php echo $avatarDeleteLabelFor; ?>">
                <img src="<?php echo $avatar['_path_crop']; ?>" alt="" <?php echo $style_dimensions; ?> />
                <?php echo $this->Form->Input('avatar_delete[]', 'checkbox', array('class'=>'avatar-delete-input', 'value'=>$avatar['AvatarID'])); ?>
-            </div>
+            </label>
 
          <?php endforeach; ?>
 
