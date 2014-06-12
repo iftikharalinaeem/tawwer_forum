@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.36',
+   'Version' => '1.3.37',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -507,7 +507,7 @@ class EditorPlugin extends Gdn_Plugin {
           * Get the generated editor toolbar from getEditorToolbar, and assign
           * it data object for view.
           */
-         if ($this->Format != 'Text' && !isset($c->Data['_EditorToolbar'])) {
+         if (!isset($c->Data['_EditorToolbar'])) {
 
             $editorToolbar = $this->getEditorToolbar();
             $this->EventArguments['EditorToolbar'] =& $editorToolbar;

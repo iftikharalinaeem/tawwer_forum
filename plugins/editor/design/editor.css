@@ -527,6 +527,9 @@ directly on the iframe's bodybox contenteditable. */
       !important values. */
   display: none !important; }
 
+.editor-format-text .editor-sep, .editor-format-text .icon-bold, .editor-format-text .icon-italic, .editor-format-text .icon-strikethrough, .editor-format-text .icon-list-ol, .editor-format-text .icon-list-ul, .editor-format-text .editor-dropdown-link, .editor-format-text .editor-action-headers, .editor-format-text .icon-align-left, .editor-format-text .icon-align-center, .editor-format-text .icon-align-right, .editor-format-text .editor-toggle-source, .editor-format-text .editor-toggle-fullpage-button, .editor-format-textex .editor-sep, .editor-format-textex .icon-bold, .editor-format-textex .icon-italic, .editor-format-textex .icon-strikethrough, .editor-format-textex .icon-list-ol, .editor-format-textex .icon-list-ul, .editor-format-textex .editor-dropdown-link, .editor-format-textex .editor-action-headers, .editor-format-textex .icon-align-left, .editor-format-textex .icon-align-center, .editor-format-textex .icon-align-right, .editor-format-textex .editor-toggle-source, .editor-format-textex .editor-toggle-fullpage-button {
+  display: none !important; }
+
 /**
  * When wysiwyg editor switches to code view, disable functionality and visibly
  * disable the common action buttons, which should no longer have any affect.

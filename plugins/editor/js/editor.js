@@ -709,7 +709,7 @@
        * Generic helper to generate correct image code based on format.
        */
       var buildImgTag = function(href, editorFormat) {
-         // Defualt for text and textex. If in future they require special
+         // Default for text and textex. If in future they require special
          // handling, then add them to switch statement.
          var imgTag = href;
 
@@ -1694,6 +1694,8 @@
                 case 'html':
                 case 'bbcode':
                 case 'markdown':
+                case 'text':
+                case 'textex':
                    // Lazyloading scripts, then run single callback
                    $.when(
                       loadScript(assets + '/js/buttonbarplus.js?v=' + editorVersion),
@@ -1713,11 +1715,6 @@
 
                       insertImageUrl($currentEditableTextarea);
                    });
-                   break;
-
-               case 'text':
-               case 'textex':
-
                    break;
             }
 

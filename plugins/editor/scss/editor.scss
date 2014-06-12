@@ -460,6 +460,27 @@ directly on the iframe's bodybox contenteditable. */
    display: none !important;
 }
 
+.editor-format-text,
+.editor-format-textex {
+   .editor-sep,
+   .icon-bold,
+   .icon-italic,
+   .icon-strikethrough,
+   .icon-list-ol,
+   .icon-list-ul,
+   .editor-dropdown-link,
+   .editor-action-headers,
+   .icon-align-left,
+   .icon-align-center,
+   .icon-align-right,
+   .editor-toggle-source,
+   .editor-toggle-fullpage-button {
+      display: none !important;
+   }
+}
+
+
+
 /**
  * When wysiwyg editor switches to code view, disable functionality and visibly
  * disable the common action buttons, which should no longer have any affect.
