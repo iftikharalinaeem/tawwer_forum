@@ -1075,6 +1075,14 @@
                            ? true
                            : false;
 
+                        // Apple devices upload files with very generic names.
+                        // For example, uploading an image will produce a name
+                        // like "image.jpeg" for every jpeg image. Disable
+                        // superficial file duplication check for these cases.
+                        if (/ip(hone|ad|od)/i.test(navigator.userAgent)) {
+                           fileAlreadyExists = false;
+                        }
+
                         if (validSize && validFile && !fileAlreadyExists) {
                            data.submit();
 
