@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.34',
+   'Version' => '1.3.35',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -373,12 +373,53 @@ class EditorPlugin extends Gdn_Plugin {
      }
   }
 
+   /**
+    * Check if comments are embedded.
+    *
+    * When editing embedded comments, the editor will still load its assets and
+    * render. This method will check whether content is embedded or not. This
+    * might not be the best way to do this, but there does not seem to be any
+    * easy way to determine whether content is embedded or not.
+    *
+    * @param Controller $Sender
+    * @return bool
+    */
+   public function isEmbeddedComment($Sender) {
+      $isEmbeddedComment = false;
+      $requestMethod = array();
+
+      if (isset($Sender->RequestMethod)) {
+         $requestMethod[] = strtolower($Sender->RequestMethod);
+      }
+
+      if (isset($Sender->OriginalRequestMethod)) {
+         $requestMethod[] = strtolower($Sender->OriginalRequestMethod);
+      }
+
+      if (count($requestMethod)) {
+         $requestMethod = array_map('strtolower', $requestMethod);
+         if (in_array('embed', $requestMethod)) {
+            $isEmbeddedComment = true;
+         }
+      }
+
+      return $isEmbeddedComment;
+   }
 
    /**
     * Placed these components everywhere due to some Web sites loading the
     * editor in some areas where the values were not yet injected into HTML.
     */
    public function Base_Render_Before(&$Sender) {
+
+      // Don't render any assets for editor if it's embedded. This effectively
+      // disables the editor from embedded comments. Some HTML is still
+      // inserted, because of the BeforeBodyBox handler, which does not contain
+      // any data relating to embedded content.
+      if ($this->isEmbeddedComment($Sender)) {
+         return false;
+      }
+
       $c = Gdn::Controller();
 
       // If user wants to modify styling of Wysiwyg content in editor,
@@ -431,6 +472,10 @@ class EditorPlugin extends Gdn_Plugin {
     * @param Gdn_Form $Sender
     */
    public function Gdn_Form_BeforeBodyBox_Handler($Sender, $Args) {
+      // TODO have some way to prevent this content from getting loaded
+      // when in embedded. The only problem is figuring out how to know when
+      // content is embedded.
+
       // TODO move this property to constructor
       $this->Format = $Sender->GetValue('Format');
 
