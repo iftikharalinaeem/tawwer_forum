@@ -66,15 +66,6 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Adds CSS To page.
-     *
-     * @param AssetModel $Sender Sending controller.
-     */
-    public function assetModel_styleCss_handler($Sender) {
-        $Sender->AddCssFile('zendesk.css', 'plugins/Zendesk');
-    }
-
-    /**
      * Writes and updates discussion attachments.
      *
      * @param DiscussionController $Sender Sending controller.
@@ -545,6 +536,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * Setup Config Settings.
      */
     protected function setupConfig() {
+        SaveToConfig('Garden.AttachmentsEnabled', true);
         $ConfigSettings = array(
             'Url',
             'ApplicationID',
