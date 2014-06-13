@@ -253,7 +253,7 @@ pre.CodeBlock {
  * styles in styles.css. These rules match the font sizes for post-font-size-h*
  */
 .editor-composer h1 {
-  font-size: 140%; }
+  font-size: 21px; }
 .editor-composer h2 {
-  font-size: 120%; }
+  font-size: 18px; }
 /*# sourceMappingURL=wysiwyg.css.map */
