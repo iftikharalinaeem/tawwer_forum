@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.37',
+   'Version' => '1.3.38',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -205,6 +205,90 @@ class EditorPlugin extends Gdn_Plugin {
    }
 
    /**
+    * Default formatting options available in the formatting dropdown.
+    *
+    * Visit https://github.com/xing/wysihtml5/wiki/Supported-Commands for a
+    * list of default commands and their allowed values. The array below has
+    * custom commands that must exist in the JavaScript, whitelist, and CSS to
+    * function.
+    *
+    * Formatting options can be ordered after the default list has been added.
+    * This is done by providing a sort weight to each editor action. If one
+    * weight is greater than another, it will be displayed higher than the
+    * other.
+    *
+    * @return array
+    */
+   protected function getFontFormatOptions() {
+
+      // Stuff like 'heading1' is the editor-action.
+      $fontFormatOptions = array(
+         'heading1' => array(
+            'text' => 'Heading 1',
+            'command' => 'formatBlock',
+            'value' => 'h1',
+            'class' => 'post-font-size-h1',
+            'sort' => 100
+         ),
+         'heading2' => array(
+            'text' => 'Heading 2',
+            'command' => 'formatBlock',
+            'value' => 'h2',
+            'class' => 'post-font-size-h2',
+            'sort' => 99
+         ),
+         'separator' => array(
+            'text' => '',
+            'command' => '',
+            'value' => '',
+            'class' => 'dd-separator',
+            'html_tag' => 'div',
+            'sort' => 98
+         ),
+         'blockquote' => array(
+            'text' => 'Quote',
+            'command' => 'blockquote',
+            'value' => 'blockquote',
+            'class' => '',
+            'sort' => 10
+         ),
+         'code' => array(
+            'text' => 'Code',
+            'command' => 'code',
+            'value' => 'code',
+            'class' => '',
+            'sort' => 9
+         ),
+         'spoiler' => array(
+            'text' => 'Spoiler',
+            'command' => 'spoiler',
+            'value' => 'code',
+            'class' => '',
+            'sort' => 8
+         )
+      );
+
+      return $fontFormatOptions;
+   }
+
+   /**
+    * Sort dropdown options by given weight.
+    *
+    * Currently this is only in use for the formatting options.
+    *
+    * @param array &$options Options to sort.
+    */
+   public function sortWeightedOptions(&$options) {
+      if (is_array($options)) {
+         uasort($options, function ($a, $b) {
+            if (!empty($a['sort']) && !empty($b['sort'])) {
+               return ($a['sort'] < $b['sort']);
+            }
+         });
+      }
+   }
+
+   /**
     * This method will grab the permissions array from getAllowedEditorActions,
     * build the "kitchen sink" editor toolbar, then filter out the allowed
     * ones and return it.
@@ -218,11 +302,16 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll     = array();
       $allowedEditorActions = $this->getAllowedEditorActions();
       $fontColorList        = $this->getFontColorList();
+      $fontFormatOptions = $this->getFontFormatOptions();
 
       // Let plugins and themes override the defaults.
       $this->EventArguments['actions'] =& $allowedEditorActions;
       $this->EventArguments['colors'] =& $fontColorList;
+      $this->EventArguments['format'] =& $fontFormatOptions;
       $this->FireEvent('toolbarConfig');
+
+      // Order the specified dropdowns.
+      $this->sortWeightedOptions($fontFormatOptions);
 
       /**
        * Build color dropdown from array
@@ -247,6 +336,29 @@ class EditorPlugin extends Gdn_Plugin {
        if ($allowedEditorActions['highlightcolor']) {
            $toolbarColorGroups['highlight'] = $toolbarDropdownFontColorHighlight;
        }
+
+      // Build formatting options
+      $toolbarFormatOptions = array();
+      foreach ($fontFormatOptions as $editorAction => $actionValues) {
+         $htmlTag = (!empty($actionValues['html_tag']))
+            ? $actionValues['html_tag']
+            : 'a';
+
+         $toolbarFormatOptions[] = array(
+            'edit' => 'format',
+            'action'=> $editorAction,
+            'type' => 'button',
+            'text' => $actionValues['text'],
+            'html_tag' => $htmlTag,
+            'attr' => array(
+               'class' => "editor-action editor-action-{$editorAction} editor-dialog-fire-close {$actionValues['class']}",
+               'data-wysihtml5-command' => $actionValues['command'],
+               'data-wysihtml5-command-value' => $actionValues['value'],
+               'title' => $actionValues['text'],
+               'data-editor' => '{"action":"' . $editorAction . '","value":"' . $actionValues['value'] . '"}'
+            )
+         );
+      }
 
       /**
        * Build emoji dropdown from array
@@ -288,6 +400,8 @@ class EditorPlugin extends Gdn_Plugin {
        * Compile whole list of editor actions into single $editorToolbarAll
        * array. Once complete, loop through allowedEditorActions and filter
        * out the actions that will not be allowed.
+       *
+       * TODO this is ugly. Pop everything into array, and build this in a loop.
        */
       $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => T('Bold'), 'data-editor' => '{"action":"bold","value":""}'));
       $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => T('Italic'), 'data-editor' => '{"action":"italic","value":""}'));
@@ -301,13 +415,9 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => T('Unordered list'), 'data-editor' => '{"action":"unorderedlist","value":""}'));
 
       $editorToolbarAll['sep-format'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-headers editor-optional-button'));
-      $editorToolbarAll['format'] = array('edit' => 'format', 'action'=> 'headers', 'type' => array(
-             array('edit' => 'format', 'action'=> 'heading1', 'type' => 'button', 'text' => 'Heading 1', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-h1 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h1', 'title' => T('Heading 1'), 'data-editor' => '{"action":"heading1","value":""}')),
-             array('edit' => 'format', 'action'=> 'heading2', 'type' => 'button', 'text' => 'Heading 2', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-h2 editor-dialog-fire-close', 'data-wysihtml5-command' => 'formatBlock', 'data-wysihtml5-command-value' => 'h2', 'title' => T('Heading 2'), 'data-editor' => '{"action":"heading2","value":""}')),
-             array('edit' => 'format', 'action'=> 'quote', 'type' => 'button',    'text' => 'Quote', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-quote editor-dialog-fire-close', 'data-wysihtml5-command' => 'blockquote', 'title' => T('Quote'), 'data-editor' => '{"action":"quote","value":""}')),
-             array('edit' => 'format', 'action'=> 'code', 'type' => 'button',     'text' => 'Code', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-code editor-dialog-fire-close', 'data-wysihtml5-command' => 'code', 'title' => T('Code'), 'data-editor' => '{"action":"code","value":""}')),
-             array('edit' => 'format', 'action'=> 'spoiler', 'type' => 'button', 'text' => 'Spoiler', 'html_tag' => 'a', 'attr' => array('class' => 'editor-action editor-action-spoiler editor-dialog-fire-close', 'data-wysihtml5-command' => 'spoiler', 'title' => T('Spoiler'), 'data-editor' => '{"action":"spoiler","value":""}')),
-         ), 'attr' => array('class' => 'editor-action icon icon-paragraph editor-dd-format', 'title' => T('Format'), 'data-editor' => '{"action":"format","value":""}'));
+      $editorToolbarAll['format'] = array('edit' => 'format', 'action'=> 'headers', 'type' =>
+         $toolbarFormatOptions,
+         'attr' => array('class' => 'editor-action icon icon-paragraph editor-dd-format', 'title' => T('Format'), 'data-editor' => '{"action":"format","value":""}'));
 
       $editorToolbarAll['sep-media'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-media editor-optional-button'));
       $editorToolbarAll['emoji'] = array('edit' => 'media', 'action'=> 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => T('Emoji'), 'data-editor' => '{"action":"emoji","value":""}'));

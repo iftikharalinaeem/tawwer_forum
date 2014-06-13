@@ -94,7 +94,9 @@ var wysihtml5ParserRules = {
         "Spoiler": 1,
         "Quote": 1,
         "CodeBlock": 1,
-        "post-text-decoration-line-through": 1
+        "post-text-decoration-line-through": 1,
+        "post-font-size-h1": 1,
+        "post-font-size-h2": 1
     },
     /**
 * Tag list
@@ -250,6 +252,7 @@ var wysihtml5ParserRules = {
             "rename_tag": "div"
         },
         "h1": {
+            //"set_class": "post-font-size-h1",
             "add_class": {
                 "align": "align_text"
             }
@@ -544,7 +547,8 @@ var wysihtml5ParserRules = {
             "rename_tag": "span"
         },
         "h2": {
-            "add_class": {
+           //"set_class": "post-font-size-h2",
+           "add_class": {
                 "align": "align_text"
             }
         },
