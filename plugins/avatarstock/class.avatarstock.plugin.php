@@ -5,7 +5,7 @@
 $PluginInfo['avatarstock'] = array(
     'Name' => 'Avatar Pool',
     'Description' => 'Create a limited stock of default avatars that members can choose between.',
-    'Version' => '1.1.2',
+    'Version' => '1.1.3',
     'Author' => 'Dane MacMillan',
     'AuthorEmail' => 'dane@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -182,6 +182,12 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
         $userPhoto = $parsed['Name'];
         if (strpos($userPhoto, $this->file_destination_dir) !== false) {
+            // CloudFiles ties into the same event, and cancels out if the
+            // Type is not "cf," so clear this for the request, as CF should
+            // not actually delete the file.
+            $parsed['Type'] = '';
+
+            // Prevent deletion.
             $handled = true;
         }
     }
