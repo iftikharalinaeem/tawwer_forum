@@ -251,6 +251,10 @@
       overflow: hidden;
       white-space: nowrap;
       padding-top: 10px;
+
+      input[type=file] {
+         visibility: visible !important;
+      }
    }
 
    .image-input {

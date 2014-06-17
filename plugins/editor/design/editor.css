@@ -387,6 +387,8 @@
     overflow: hidden;
     white-space: nowrap;
     padding-top: 10px; }
+    .editor-file-image .file-input input[type=file] {
+      visibility: visible !important; }
   .editor-file-image .image-input {
     padding: 0;
     border-top: 1px solid #da8f8f; }
