@@ -1009,6 +1009,12 @@ input.InputBox, input.SmallInput, textarea.TextBox {
 .iradio.checked:before {
   content: "\f138"; }
 
+.Flyout *, .MenuItems * {
+  font-size: 15px; }
+
+.MenuItems a:hover {
+  background-color: #2e9df7 !important; }
+
 .button, .Button {
   display: inline-block;
   padding: 6px 12px;
@@ -1406,6 +1412,9 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
 .ProfilePhotoLarge {
   width: 210px;
   height: 210px; }
+
+.PhotoWrapLarge {
+  width: 210px; }
 
 .site-footer {
   padding: 22px;

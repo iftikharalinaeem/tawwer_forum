@@ -1,0 +1,10 @@
+.Flyout,
+.MenuItems {
+  * {
+    font-size: $font-size-base;
+  }
+}
+
+.MenuItems a:hover {
+  background-color: $link-color !important;
+}

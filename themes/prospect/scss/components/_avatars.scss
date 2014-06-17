@@ -32,3 +32,7 @@
 .ProfilePhotoLarge {
   @include size(210px);
 }
+
+.PhotoWrapLarge {
+  width: 210px;
+}
