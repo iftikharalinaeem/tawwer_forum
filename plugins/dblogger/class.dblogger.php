@@ -39,7 +39,7 @@ class DbLogger extends BaseLogger {
         $insert['message'] = FormatString($message, $context);
         $insert['level'] = Logger::levelPriority($level);
         if ($attributes) {
-            $insert['attributes'] = json_encode($attributes, JSON_UNESCAPED_SLASHES);
+            $insert['attributes'] = json_encode($attributes, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
         }
         $insert['id'] = uniqid('', false).substr(dechex(mt_rand()), 0, 3);
 

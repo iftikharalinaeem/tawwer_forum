@@ -249,7 +249,9 @@
             var inputFormats = {
                'bbcode': 'BBCode',
                'html': 'Html',
-               'markdown': 'Markdown'
+               'markdown': 'Markdown',
+               'textex': 'TextEx',
+               'text': 'Text'
             };
 
             // Run autobulleting functions on load, so user can just naturally
@@ -292,7 +294,6 @@
                if ($(Button).hasClass('emoji')) {
                   Button = $(Button).closest('.editor-action');
                }
-
 
                if ($(Button).data('editor')) {
                   // :\ and :'( break object and return string, while server
@@ -833,6 +834,25 @@
                   $(TextArea).replaceSelectedText(selection, 'collapseToEnd');
                   break;
 
+               case 'emoji':
+                  Value = Value.trim() + ' ';
+                  $(TextArea).insertText(Value, $(TextArea).getSelection().start, "collapseToEnd");
+                  break;
+            }
+         },
+
+         PerformText: function(TextArea, Operation, Value) {
+            switch (Operation) {
+               case 'emoji':
+                  Value = Value.trim() + ' ';
+                  $(TextArea).insertText(Value, $(TextArea).getSelection().start, "collapseToEnd");
+                  break;
+            }
+
+         },
+
+         PerformTextEx: function(TextArea, Operation, Value) {
+            switch (Operation) {
                case 'emoji':
                   Value = Value.trim() + ' ';
                   $(TextArea).insertText(Value, $(TextArea).getSelection().start, "collapseToEnd");

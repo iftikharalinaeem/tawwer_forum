@@ -386,7 +386,7 @@ class Warnings2Plugin extends Gdn_Plugin {
       $Sender->_SetBreadcrumbs(T('Notes'), UserUrl($Sender->User, '', 'notes'));
       $Sender->SetTabView('Notes', 'Notes', '', 'plugins/Warnings2');
       
-      list($Offset, $Limit) = OffsetLimit($Page, 10);
+      list($Offset, $Limit) = OffsetLimit($Page, 30);
       
       $UserNoteModel = new UserNoteModel();
       $Notes = $UserNoteModel->GetWhere(

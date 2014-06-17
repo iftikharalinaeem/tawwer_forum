@@ -28,7 +28,9 @@ class Moot extends ExportController {
          Email varchar(255) DEFAULT NULL,
          UserID int(10) unsigned NOT NULL AUTO_INCREMENT,
          PRIMARY KEY (UserID))");
-      $Ex->Query("insert into MootUsers (Name) select distinct author from (select d.author from :_discussion d union select c.author from :_comment c) a");
+      $Ex->Query("insert into MootUsers (Name) select distinct author
+         from (select d.author from :_discussion d union select c.author from :_comment c) a
+         where author <> ''");
       $Ex->Query("update MootUsers set Email = concat('user',UserID,'@deleted.email')");
 
       $User_Map = array();
@@ -77,7 +79,7 @@ class Moot extends ExportController {
       $Discussion_Map = array();
       $Ex->ExportTable('Discussion', "
          select d.*,
-            'Html' as Format
+            'Markdown' as Format
          from MootDiscussions d", $Discussion_Map);
 
 
@@ -88,7 +90,7 @@ class Moot extends ExportController {
          d.DiscussionID,
          u.UserID as InsertUserID,
          FROM_UNIXTIME(c.date) as DateInserted,
-         'Html' as Format
+         'Markdown' as Format
       from :_comment c
         left join MootDiscussions d on d.MootKey = c.key
         left join MootUsers u on u.Name = c.author", $Comment_Map);
