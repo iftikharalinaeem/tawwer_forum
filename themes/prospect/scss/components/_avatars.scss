@@ -28,3 +28,7 @@
 .ProfilePhotoMedium {
   @include size(64px);
 }
+
+.ProfilePhotoLarge {
+  @include size(210px);
+}

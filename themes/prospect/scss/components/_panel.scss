@@ -6,6 +6,10 @@
 .site-sidebar {
   font-size: 18px;
   line-height: 35px;
+
+  .UserBox {
+    display: none;
+  }
 }
 
 .CategoryFilter {

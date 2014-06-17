@@ -9,12 +9,25 @@
   padding: 6px 12px;
   font-size: $font-size-base;
   line-height: $line-height-base;
+  border-radius: 4px;
 }
 
 input.InputBox,
 input.SmallInput,
 textarea.TextBox {
   @include form-control;
+}
+
+// ## Text area wrapper
+//
+// Styleguide Forms.textarea
+
+.CommentForm
+.FormWrapper {
+  padding-left: 90px;
+  .Buttons {
+    margin-left: -90px;
+  }
 }
 
 // ## Checkbox and radio input

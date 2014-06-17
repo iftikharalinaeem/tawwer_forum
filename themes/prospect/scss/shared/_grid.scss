@@ -8,9 +8,9 @@
 }
 
 .column-sidebar {
-  @include span-columns(2);
+  @include span-columns(5);
 }
 
 .column-content {
-  @include span-columns(10);
+  @include span-columns(11);
 }

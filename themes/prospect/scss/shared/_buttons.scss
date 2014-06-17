@@ -60,3 +60,8 @@
     border-color: transparent;
   }
 }
+
+.BigButton.Primary {
+  width: 100%;
+  font-size: ($font-size-base + 2px);
+}
