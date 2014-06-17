@@ -370,7 +370,6 @@ td, th {
   src: url('/resources/fonts/vanillicon/vanillicon.eot');
   src: url('/resources/fonts/vanillicon/vanillicon.eot?#iefix') format('embedded-opentype'), url('/resources/fonts/vanillicon/vanillicon.woff') format('woff'), url('/resources/fonts/vanillicon/vanillicon.ttf') format('truetype'), url('/resources/fonts/vanillicon/vanillicon.svg#vanillicon') format('svg'); }
 
-
 .icon-adjust:before {
   content: "\f100"; }
 
