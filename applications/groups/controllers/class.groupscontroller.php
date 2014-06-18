@@ -41,6 +41,7 @@ class GroupsController extends Gdn_Controller {
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
+      $this->AddJsFile('group.js');
       $this->AddCssFile('style.css');
 
       $this->AddBreadcrumb(T('Groups'), Url('/groups'));
