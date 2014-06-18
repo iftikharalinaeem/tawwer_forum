@@ -1021,6 +1021,9 @@ p {
 .PopList .ItemContent {
   margin-left: 70px; }
 
+.Popup.SignInPopup {
+  margin-top: 30px; }
+
 .button, .Button {
   display: inline-block;
   padding: 6px 12px;
@@ -1447,9 +1450,13 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
     margin-left: 20px; }
   .site-sidebar .PhotoWrapLarge {
     margin-bottom: 20px; }
+  .site-sidebar .GuestBox p {
+    font-size: 15px;
+    line-height: 22px; }
 
-.CategoryFilter {
-  display: none; }
+.CategoryFilterOptions {
+  margin-top: -5px;
+  font-size: 14px; }
 
 .Profile > .BoxFilter {
   display: none; }

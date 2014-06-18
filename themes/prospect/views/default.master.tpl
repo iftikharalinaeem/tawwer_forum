@@ -16,7 +16,7 @@
       <div class="container">
         <a class="navbar-brand" href="{link path="home"}">{logo}</a>
         <div class="navbar-right">
-          {if $User->SignedIn}
+          {if !$User.SignedIn}
           <a class="button" href="{link path="entry/signin"}">{t c="Sign In"}</a>
           <a class="button" href="{link path="entry/register"}">{t c="Register"}</a>
           {else}
