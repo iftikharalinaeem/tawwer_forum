@@ -966,9 +966,9 @@ p {
 .text-center {
   text-align: center; }
 
-input.InputBox, input.SmallInput, textarea.TextBox {
+.InputBox, .SmallInput, .TextBox, .token-input-list {
   display: block;
-  width: 100%;
+  width: 100% !important;
   padding: 6px 12px;
   font-size: 15px;
   line-height: 22px;
@@ -1011,9 +1011,14 @@ input.InputBox, input.SmallInput, textarea.TextBox {
 
 .Flyout *, .MenuItems * {
   font-size: 15px; }
+.Flyout .Conversations a, .Flyout .Popin a, .MenuItems .Conversations a, .MenuItems .Popin a {
+  color: #2e9df7; }
 
 .MenuItems a:hover {
   background-color: #2e9df7 !important; }
+
+.PopList .ItemContent {
+  margin-left: 70px; }
 
 .button, .Button {
   display: inline-block;
@@ -1038,6 +1043,7 @@ input.InputBox, input.SmallInput, textarea.TextBox {
   .button, .button:hover, .button:focus, .Button, .Button:hover, .Button:focus {
     text-decoration: none; }
   .button:active, .Button:active {
+    border-top-color: #d9d9d9;
     border-top-color: rgba(0, 0, 0, 0.15);
     -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) inset;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) inset; }
@@ -1053,7 +1059,7 @@ input.InputBox, input.SmallInput, textarea.TextBox {
     text-shadow: none;
     border-color: transparent; }
 
-.BigButton.Primary {
+.BigButton.Primary, .BigButton.Danger {
   width: 100%;
   font-size: 17px; }
 
@@ -1428,6 +1434,10 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   line-height: 35px; }
   .site-sidebar .UserBox {
     display: none; }
+  .site-sidebar .Aside {
+    margin-left: 20px; }
+  .site-sidebar .PhotoWrapLarge {
+    margin-bottom: 20px; }
 
 .CategoryFilter {
   display: none; }
