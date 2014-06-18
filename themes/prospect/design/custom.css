@@ -1010,7 +1010,8 @@ p {
   content: "\f138"; }
 
 .Flyout *, .MenuItems * {
-  font-size: 15px; }
+  font-size: 15px;
+  line-height: 22px; }
 .Flyout .Conversations a, .Flyout .Popin a, .MenuItems .Conversations a, .MenuItems .Popin a {
   color: #2e9df7; }
 
@@ -1411,6 +1412,14 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   .PhotoWrap img {
     border-radius: 4px; }
 
+.Conversation-User .ProfilePhotoSmall {
+  vertical-align: middle;
+  margin-right: 5px;
+  border-radius: 4px;
+  border: solid 1px #333;
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); }
+
 .ProfilePhotoMedium {
   width: 64px;
   height: 64px; }
@@ -1440,4 +1449,7 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
     margin-bottom: 20px; }
 
 .CategoryFilter {
+  display: none; }
+
+.Profile > .BoxFilter {
   display: none; }
