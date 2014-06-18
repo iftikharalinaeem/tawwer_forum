@@ -1,0 +1,22 @@
+#Head {
+  position: relative;
+  height: 60px;
+  margin-left: 40px;
+  margin-right: 50px;
+  background:0;
+
+  #Search {
+    float: right;
+  }
+
+  .Title {
+    float: left;
+    color: black;
+  }
+
+  .Breadcrumbs {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+}
