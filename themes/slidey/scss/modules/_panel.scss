@@ -2,10 +2,10 @@
   position: absolute;
   top: 63px;
   left: -10px;
+  z-index: 5;
   width: 0;
   height: 0;
-  z-index: 5;
-  margin-right: 40px;
+  margin-right: $padding-large;
   border-style: solid;
   border-width: 15px;
   border-color: $color-link;
@@ -14,18 +14,17 @@
   border-bottom-color: transparent;
   transition: opacity, 200ms;
 
+  .is-out & {
+    transform: rotate(180deg);
+  }
+
   &:hover {
     opacity: .7;
 
   }
 }
 
-.is-right {
-  transform: rotate(180deg);
-}
-
 #Panel {
-  //@include radial-gradient(darken($bg-panel-light, 10%), $bg-panel 40%);
   padding-top: $padding-medium;
   background-color: $bg-panel;
   border-top-left-radius: 35px;
@@ -38,12 +37,23 @@
     color: $white;
   }
 
+  .Email {
+    color: $white;
+    font-size: $font-size-small;
+  }
+
   .FilterMenu,
-  .PanelCategories {
+  .PanelCategories,
+  .PanelInfo {
     li {
       border-color: $black;
       transition: background-color, 200ms;
 
+      &.Active {
+        font-weight: 400;
+      }
+
+      &.Active,
       &:hover {
         background-color: $black;
       }
@@ -90,4 +100,8 @@
 
 .Box {
   margin-top: $padding-medium;
+}
+
+a.ChangePicture {
+  width: 200px;
 }

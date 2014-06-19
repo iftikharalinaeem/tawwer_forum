@@ -7,22 +7,17 @@
  */
 
 
-
-$(document).on('click', '.panel-arrow', function (e) {
+$(document).on('click', '.js-panel-arrow', function (e) {
     "use strict";
 
     if ($("#Panel").hasClass("is-out")) {
         $("#Panel").removeClass("is-out");
-        $(".panel-arrow").removeClass("is-right");
+        $(e.currentTarget).removeClass("is-right");
     }
 
     else {
         $("#Panel").addClass("is-out");
         $(".panel-arrow").addClass("is-right");
     }
-});
-
-$(document).ready(function () {
-    "use strict";
-    $('.page-title').html($('#Content h1').html());
+    e.preventDefault();
 });

@@ -43,7 +43,7 @@
     box-sizing: border-box; }
 
 body {
-  font-family: sans-serif;
+  font-family: 'Arimo', sans-serif;
   font-size: 16px;
   line-height: 24px;
   color: #000;
@@ -63,6 +63,20 @@ img {
 
 html {
   height: 100%; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Arimo', sans-serif; }
+
+h1, h2, h3 {
+  margin-top: 24px;
+  margin-bottom: 12px; }
+
+h4, h5, h6 {
+  margin-top: 12px;
+  margin-bottom: 12px; }
+
+p {
+  margin: 0 0 12px; }
 
 h1 {
   margin: 0; }
@@ -101,6 +115,56 @@ h1 {
     .head .Title img {
       padding: 20px 0; }
 
+.Button {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-family: 'Arimo', sans-serif;
+  font-weight: 400;
+  color: #fff;
+  text-transform: uppercase;
+  text-shadow: none;
+  background: none;
+  background-color: #254DA9;
+  border: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  -webkit-transition: background-color, 200ms;
+  transition: background-color, 200ms; }
+  .Button:hover, .Button:active {
+    color: #fff;
+    background-color: #1c3b7f; }
+  .Button.Handle {
+    width: 20%; }
+    .Button.Handle .Sprite {
+      top: 2px !important;
+      border-width: 7px;
+      border-color: #fff transparent transparent; }
+
+.BigButton, .NewDiscussion .Button {
+  padding-top: 20px !important;
+  padding-bottom: 20px !important;
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 20px !important;
+  font-weight: 400; }
+
+#Panel .ButtonGroup.Big > .Button:first-child {
+  width: 80%; }
+
+.ButtonGroup.Open .Button.Handle {
+  background-color: #1c3b7f; }
+
+.Buttons {
+  line-height: 36px; }
+
+.FormWrapper-Condensed .Buttons {
+  margin-left: -150px !important; }
+  .FormWrapper-Condensed .Buttons .Back {
+    display: none; }
+
+.PreviewButton {
+  margin: 0 !important; }
+
 #Content {
   background-color: white;
   border-top: solid 2px #131821;
@@ -121,16 +185,52 @@ h1 {
   -webkit-box-shadow: 0 0 50px 30px #131821;
   box-shadow: 0 0 50px 30px #131821; }
 
+.Flyout, .Dropdown {
+  text-align: left; }
+  .Flyout.MenuItems li, .Dropdown.MenuItems li {
+    padding-top: 5px; }
+  .Flyout.MenuItems a, .Dropdown.MenuItems a {
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    -webkit-transition: background-color, 200ms;
+    transition: background-color, 200ms; }
+    .Flyout.MenuItems a:hover, .Dropdown.MenuItems a:hover {
+      color: #333 !important;
+      background-color: #c2d1f2 !important; }
+  .Flyout .Title, .Flyout .Title a, .Dropdown .Title, .Dropdown .Title a {
+    font-size: 16px !important;
+    font-weight: 400 !important; }
+
+.PopList .Item:hover {
+  background: none; }
+
+.InputBox, .SmallInput, .TextBox, .token-input-list {
+  display: block;
+  width: 100% !important;
+  padding: 10px;
+  font-size: 16px;
+  line-height: 24px;
+  border-radius: 5px; }
+  .InputBox:focus, .SmallInput:focus, .TextBox:focus, .token-input-list:focus {
+    background: 0;
+    background-color: #fff; }
+
+.FormWrapper, .FormTitleWrapper form {
+  background: 0 !important; }
+
 .Item.Read {
   background: 0; }
+
+.Message {
+  line-height: 24px; }
 
 .panel-arrow {
   position: absolute;
   top: 63px;
   left: -10px;
+  z-index: 5;
   width: 0;
   height: 0;
-  z-index: 5;
   margin-right: 40px;
   border-style: solid;
   border-width: 15px;
@@ -140,13 +240,12 @@ h1 {
   border-bottom-color: transparent;
   -webkit-transition: opacity, 200ms;
   transition: opacity, 200ms; }
+  .is-out .panel-arrow {
+    -webkit-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg); }
   .panel-arrow:hover {
     opacity: 0.7; }
-
-.is-right {
-  -webkit-transform: rotate(180deg);
-  -ms-transform: rotate(180deg);
-  transform: rotate(180deg); }
 
 #Panel {
   padding-top: 20px;
@@ -158,13 +257,18 @@ h1 {
     color: #fff; }
   #Panel h4 {
     color: #fff; }
-  #Panel .FilterMenu li, #Panel .PanelCategories li {
+  #Panel .Email {
+    color: #fff;
+    font-size: 12px; }
+  #Panel .FilterMenu li, #Panel .PanelCategories li, #Panel .PanelInfo li {
     border-color: #000;
     -webkit-transition: background-color, 200ms;
     transition: background-color, 200ms; }
-    #Panel .FilterMenu li:hover, #Panel .PanelCategories li:hover {
+    #Panel .FilterMenu li.Active, #Panel .PanelCategories li.Active, #Panel .PanelInfo li.Active {
+      font-weight: 400; }
+    #Panel .FilterMenu li.Active, #Panel .FilterMenu li:hover, #Panel .PanelCategories li.Active, #Panel .PanelCategories li:hover, #Panel .PanelInfo li.Active, #Panel .PanelInfo li:hover {
       background-color: #000; }
-    #Panel .FilterMenu li a, #Panel .PanelCategories li a {
+    #Panel .FilterMenu li a, #Panel .PanelCategories li a, #Panel .PanelInfo li a {
       color: #fff; }
 
 .panel-circle {
@@ -196,6 +300,9 @@ h1 {
 
 .Box {
   margin-top: 20px; }
+
+a.ChangePicture {
+  width: 200px; }
 
 .PageControls.Top {
   display: none; }

@@ -15,7 +15,8 @@ $rgba-primary-4: rgba( 37, 77,169,1);
 $white: #fff;
 $black: #000;
 
-$font-family-base: sans-serif;
+$font-family-base: 'Arimo', sans-serif;
+$font-family-button: $font-family-base;
 
 $font-size-base: 16px;
 $font-size-x-small: 8px;
@@ -34,13 +35,16 @@ $line-height-small: 16px;
 $line-height-large: 42px;
 
 $color-base: $black;
+$color-button: $white;
 $color-heading: $color-primary-0;
 $color-link: $color-primary-4;
 $color-link-hover: darken($color-link, 10%);
 
+$bg-button: $color-link;
+$bg-button-hover: $color-link-hover;
 $bg-content: $white;
+$bg-flyout-hover: lighten($color-link, 45%);
 $bg-panel: darken($color-primary-1, 8%);
-$bg-panel-light: $color-primary-2;
 $bg-panel-rgba: darken($rgba-primary-1, 8%);
 
 $box-shadow-content: 0 0 50px 30px $bg-panel-rgba;
