@@ -7,18 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body id="{$BodyID}" class="{$BodyClass}">
-    <div id="Frame">
-      <div id="Head">
-        {breadcrumbs}
+    <div class="frame">
+      <div class="head">
         <h1><a class="Title" href="{link path="/"}"><span>{logo}</span></a></h1>
+        {breadcrumbs}
+        <div class="page-title"></div>
         <!-- <div id="Search">{searchbox}</div> -->
       </div>
-      <div id="Body">
+      <div class="body">
+        <div class="content-container">
         <div id="Panel">
-          <a id="panel-arrow" href="#" onclick="slide();">&nbsp;</a>
-          <div id="panel-circle" href="#">&nbsp;</div>
-          <div id="panel-content">
-            {module name="MeModule"}
+          <a class="js-panel-arrow" href="#">&nbsp;</a>
+          <div class="panel-circle" href="#">&nbsp;</div>
+          <div class="panel-content">
+            {module name="MeModule" CssClass="FlyoutRight"}
             {asset name="Panel"}
           </div>
         </div>
@@ -26,6 +28,7 @@
           {asset name="Content"}
         </div>
       </div>
+    </div>
       {asset name="Foot"}
     </div>
     {event name="AfterBody"}

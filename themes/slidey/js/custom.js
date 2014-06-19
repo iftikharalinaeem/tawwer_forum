@@ -8,20 +8,25 @@
 
 
 
-function slide() {
+$(document).on('click', '.js-panel-arrow', function (e) {
     "use strict";
 
     if ($("#Panel").css("right") == "-260px") {
         $("#Panel").css( "right", "0" );
-        $("#panel-arrow").css({
+        $(".js-panel-arrow").css({
           "transform": "rotate(180deg)"
         })
     }
 
     else {
         $("#Panel").css( "right", "-260px" );
-        $("#panel-arrow").css({
+        $(".js-panel-arrow").css({
             "transform": "none"
         })
     }
-}
+});
+
+$(document).ready(function () {
+  "use strict";
+  $('.page-title').html($('#Content h1').html());
+});

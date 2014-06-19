@@ -6,40 +6,38 @@
  * @license   Proprietary
  */
 #Content {
-  margin-left: 20px;
+  min-height: 600px;
   padding: 10px;
-  padding-right: 50px;
-  background-color: #fff;
-  border-top: solid 1px black;
-  border-left: solid 1px black;
-  border-top-left-radius: 10px; }
+  padding-right: 70px; }
+  @media all and (min-width: 900px) {
+    #Content {
+      min-width: 810px; } }
+
+.head {
+  z-index: 10; }
 
 #Panel {
   position: absolute;
-  top: 60px;
+  top: 0;
   bottom: 0;
   right: -260px;
   z-index: 5;
-  width: 300px;
-  float: right;
-  background-color: #333;
-  background-image: -webkit-radial-gradient(#333 10%, #000000 80%);
-  background-image: radial-gradient(  #333 10%, #000000 80%);
-  border-top-left-radius: 35px;
-  -webkit-transition: all 300ms ease;
-  transition: all 300ms ease; }
+  width: 300px; }
 
-#Frame {
+.frame {
   position: relative;
   max-width: 900px;
   margin-left: auto;
-  margin-right: auto;
-  overflow-x: hidden; }
+  margin-right: auto; }
 
 * {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
+  *:before, *:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; }
 
 body {
   font-family: sans-serif;
@@ -49,12 +47,12 @@ body {
   background-color: #000; }
 
 a {
-  color: red;
+  color: #254DA9;
   text-decoration: none;
-  -webkit-transition: color 150ms;
-  transition: color 150ms; }
+  -webkit-transition: color 200ms;
+  transition: color 200ms; }
   a:hover, a:focus {
-    color: white;
+    color: #1c3b7f;
     text-decoration: none; }
 
 img {
@@ -67,30 +65,63 @@ h1 {
   margin: 0; }
 
 #Content h1 {
-  position: absolute;
-  top: 35px;
-  color: red; }
+  display: none; }
 
-.Meta {
+.Discussion .Title {
+  font-size: 20px;
+  font-weight: 700; }
+
+.MItem, .Meta .Tag, .DataList .Excerpt {
+  color: #000;
   font-size: 16px; }
 
-#Head {
+.head {
   position: relative;
-  height: 60px;
-  margin-left: 40px;
-  margin-right: 50px;
+  min-height: 60px;
   background: 0; }
-  #Head #Search {
+  .head #Search {
     float: right; }
-  #Head .Title {
-    float: left;
-    color: black; }
-  #Head .Breadcrumbs {
-    position: absolute;
-    bottom: 0;
-    right: 0; }
+  .head .Breadcrumbs {
+    float: right;
+    margin-right: 40px; }
+    .head .Breadcrumbs, .head .Breadcrumbs a {
+      color: #fff; }
+  .head .page-title {
+    margin-left: 8%;
+    margin-bottom: 10px;
+    font-size: 24px;
+    font-weight: 400;
+    color: #fff;
+    text-transform: uppercase; }
+  .head .Title {
+    padding-bottom: 20px; }
+    .head .Title img {
+      padding: 20px 0; }
 
-#panel-arrow {
+#Content {
+  background-color: white;
+  border-top: solid 2px #131821;
+  border-left: solid 2px #131821;
+  border-top-left-radius: 10px;
+  -webkit-box-shadow: 0 0 50px 30px #131821;
+  box-shadow: 0 0 50px 30px #131821; }
+
+.body {
+  top: 60px;
+  bottom: 0;
+  margin-left: 8%;
+  margin-right: 15%; }
+
+.content-container {
+  position: absolute;
+  overflow: hidden;
+  -webkit-box-shadow: 0 0 50px 30px #131821;
+  box-shadow: 0 0 50px 30px #131821; }
+
+.Item.Read {
+  background: 0; }
+
+.js-panel-arrow {
   position: absolute;
   top: 63px;
   left: -10px;
@@ -100,21 +131,35 @@ h1 {
   margin-right: 40px;
   border-style: solid;
   border-width: 15px;
-  border-color: red;
+  border-color: #254DA9;
   border-left: 0;
   border-top-color: transparent;
   border-bottom-color: transparent;
-  -webkit-transition: opacity, 500ms;
-  transition: opacity, 500ms; }
-  #panel-arrow:hover {
+  -webkit-transition: opacity, 200ms;
+  transition: opacity, 200ms; }
+  .js-panel-arrow:hover {
     opacity: 0.7; }
 
-#Panel h4 {
-  color: white; }
-#Panel .FilterMenu li, #Panel .PanelCategories li {
-  border-color: #333; }
+#Panel {
+  padding-top: 20px;
+  background-color: #131821;
+  border-top-left-radius: 35px;
+  -webkit-transition: all 300ms ease;
+  transition: all 300ms ease; }
+  #Panel .GuestBox p {
+    color: #fff; }
+  #Panel h4 {
+    color: #fff; }
+  #Panel .FilterMenu li, #Panel .PanelCategories li {
+    border-color: #000;
+    -webkit-transition: background-color, 200ms;
+    transition: background-color, 200ms; }
+    #Panel .FilterMenu li:hover, #Panel .PanelCategories li:hover {
+      background-color: #000; }
+    #Panel .FilterMenu li a, #Panel .PanelCategories li a {
+      color: #fff; }
 
-#panel-circle {
+.panel-circle {
   position: absolute;
   top: 40px;
   left: -25px;
@@ -123,14 +168,26 @@ h1 {
   z-index: 0;
   border-top-left-radius: 40px;
   border-bottom-left-radius: 40px;
-  background-color: black;
+  background-color: #131821;
   content: " "; }
 
-#panel-content {
+.panel-content {
   float: left;
   z-index: 8;
   margin-left: 40px;
   width: 250px; }
+
+.SpNotifications, .SpOptions {
+  background-position-y: -212px; }
+
+.SpInbox {
+  background-position-y: -228px; }
+
+.SpBookmarks {
+  background-position-y: -244px; }
+
+.Box {
+  margin-top: 20px; }
 
 .PageControls.Top {
   display: none; }

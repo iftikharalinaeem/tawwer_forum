@@ -1,23 +1,28 @@
 * {
   box-sizing: border-box;
+  &:before,
+  &:after {
+    box-sizing: border-box;
+  }
 }
 
 body {
   font-family: $font-family-base;
   font-size: $font-size-base;
   line-height: $line-height-base;
-  color: $text-color;
-  background-color: $body-bg;
+  color: $color-base;
+  //background-image: url('images/black_thread.png');
+  background-color: $black;
 }
 
 a {
-  color: $link-color;
+  color: $color-link;
   text-decoration: none;
-  transition: color 150ms;
+  transition: color 200ms;
 
   &:hover,
   &:focus {
-    color: $link-hover-color;
+    color: $color-link-hover;
     text-decoration: none;
   }
 }
