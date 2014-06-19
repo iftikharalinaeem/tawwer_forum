@@ -8,25 +8,21 @@
 
 
 
-$(document).on('click', '.js-panel-arrow', function (e) {
+$(document).on('click', '.panel-arrow', function (e) {
     "use strict";
 
-    if ($("#Panel").css("right") == "-260px") {
-        $("#Panel").css( "right", "0" );
-        $(".js-panel-arrow").css({
-          "transform": "rotate(180deg)"
-        })
+    if ($("#Panel").hasClass("is-out")) {
+        $("#Panel").removeClass("is-out");
+        $(".panel-arrow").removeClass("is-right");
     }
 
     else {
-        $("#Panel").css( "right", "-260px" );
-        $(".js-panel-arrow").css({
-            "transform": "none"
-        })
+        $("#Panel").addClass("is-out");
+        $(".panel-arrow").addClass("is-right");
     }
 });
 
 $(document).ready(function () {
-  "use strict";
-  $('.page-title').html($('#Content h1').html());
+    "use strict";
+    $('.page-title').html($('#Content h1').html());
 });

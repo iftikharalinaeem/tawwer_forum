@@ -17,8 +17,8 @@
       <div class="body">
         <div class="content-container">
         <div id="Panel">
-          <a class="js-panel-arrow" href="#">&nbsp;</a>
-          <div class="panel-circle" href="#">&nbsp;</div>
+          <a class="panel-arrow" href="#">&nbsp;</a>
+          <div class="panel-circle"></div>
           <div class="panel-content">
             {module name="MeModule" CssClass="FlyoutRight"}
             {asset name="Panel"}

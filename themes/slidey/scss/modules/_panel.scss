@@ -1,4 +1,4 @@
-.js-panel-arrow {
+.panel-arrow {
   position: absolute;
   top: 63px;
   left: -10px;
@@ -16,7 +16,12 @@
 
   &:hover {
     opacity: .7;
+
   }
+}
+
+.is-right {
+  transform: rotate(180deg);
 }
 
 #Panel {
@@ -32,6 +37,7 @@
   h4 {
     color: $white;
   }
+
   .FilterMenu,
   .PanelCategories {
     li {
