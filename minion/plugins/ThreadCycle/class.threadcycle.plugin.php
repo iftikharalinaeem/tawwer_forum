@@ -191,12 +191,12 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       }
       
       $Message = FormatString($Message, $Options);
-      MinionPlugin::Instance()->Message($Primary, $Discussion, $Message, FALSE);
+      MinionPlugin::Instance()->message($Primary, $Discussion, $Message, FALSE);
       
       $Acknowledged = FormatString($Acknowledge, $Options);
-      MinionPlugin::Instance()->Log($Acknowledged, $Discussion);
+      MinionPlugin::Instance()->log($Acknowledged, $Discussion);
       
-      MinionPlugin::Instance()->Monitor($Discussion, array(
+      MinionPlugin::Instance()->monitor($Discussion, array(
          'ThreadCycle' => NULL
       ));
    }
@@ -222,11 +222,11 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       $State = &$Sender->EventArguments['State'];
 
       if (!$State['Method'] && in_array($State['CompareToken'], array('recycle')))
-         $Sender->Consume($State, 'Method', 'threadcycle');
+         $Sender->consume($State, 'Method', 'threadcycle');
       
       // Gather 
       if (GetValue('Method', $State) == 'threadcycle' && in_array($State['CompareToken'], array('pages', 'page'))) {
-         $Sender->Consume($State, 'Gather', array(
+         $Sender->consume($State, 'Gather', array(
             'Node'   => 'Page',
             'Delta'  => ''
          ));
@@ -270,18 +270,18 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                return;
             
             $Discussion = $State['Targets']['Discussion'];
-            $ThreadCycle = $Sender->Monitoring($Discussion, 'ThreadCycle', FALSE);
+            $ThreadCycle = $Sender->monitoring($Discussion, 'ThreadCycle', FALSE);
             
             // Trying to call off a threadcycle
             if ($State['Toggle'] == 'off') {
                if (!$ThreadCycle) return;
                
                // Call off the hunt
-               $Sender->Monitor($Discussion, array(
+               $Sender->monitor($Discussion, array(
                   'ThreadCycle'  => NULL
                ));
                
-               $Sender->Acknowledge($State['Sources']['Discussion'], FormatString(T("This thread will not be automatically recycled."), array(
+               $Sender->acknowledge($State['Sources']['Discussion'], FormatString(T("This thread will not be automatically recycled."), array(
                   'Discussion'   => $Discussion
                )));
                
@@ -297,7 +297,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                   $CommentNumber = $MinComments + mt_rand(1,$CommentsPerPage-1);
                   
                   // Monitor the thread
-                  $Sender->Monitor($Discussion, array(
+                  $Sender->monitor($Discussion, array(
                      'ThreadCycle'    => array(
                         'Started'   => time(),
                         'Page'      => $CyclePage,
@@ -311,8 +311,8 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                      'Discussion'   => $State['Targets']['Discussion']
                   ));
 
-                  $Sender->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
-                  $Sender->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
+                  $Sender->acknowledge($State['Sources']['Discussion'], $Acknowledged);
+                  $Sender->log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
                   
                } else {
                   // Cycle immediately
@@ -332,7 +332,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
     */
    public function MinionPlugin_Monitor_Handler($Sender) {
       $Discussion = $Sender->EventArguments['Discussion'];
-      $ThreadCycle = $Sender->Monitoring($Discussion, 'ThreadCycle', FALSE);
+      $ThreadCycle = $Sender->monitoring($Discussion, 'ThreadCycle', FALSE);
       if (!$ThreadCycle) return;
       
       $CycleCommentNumber = GetValue('Comment', $ThreadCycle);
@@ -356,7 +356,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       
       // Show a warning if there are rules in effect
       
-      $ThreadCycle = $Sender->Monitoring($Sender->EventArguments['Discussion'], 'ThreadCycle', NULL);
+      $ThreadCycle = $Sender->monitoring($Sender->EventArguments['Discussion'], 'ThreadCycle', NULL);
       
       // Nothing happening?
       if (!$ThreadCycle)

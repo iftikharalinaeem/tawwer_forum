@@ -112,7 +112,7 @@ class HunterPlugin extends Gdn_Plugin {
          'Fugitive'  => $User,
          'Player'    => $Player
       ));
-      MinionPlugin::Instance()->Message($User, $Record, $Message);
+      MinionPlugin::Instance()->message($User, $Record, $Message);
 
       // Allow external hooks
       $this->EventArguments['Message'] = $Message;
@@ -121,7 +121,7 @@ class HunterPlugin extends Gdn_Plugin {
       $this->EventArguments['Player'] = $Player;
       $this->FireEvent('FugitiveCatch');
 
-      MinionPlugin::Instance()->Monitor($User, array(
+      MinionPlugin::Instance()->monitor($User, array(
          'Hunted' => NULL
       ));
    }
@@ -157,7 +157,7 @@ class HunterPlugin extends Gdn_Plugin {
          'Fugitive'  => $User,
          'Player'    => $Player
       ));
-      MinionPlugin::Instance()->Message($User, $Record, $Message);
+      MinionPlugin::Instance()->message($User, $Record, $Message);
 
       // Allow external hooks
       $this->EventArguments['Message'] = $Message;
@@ -166,7 +166,7 @@ class HunterPlugin extends Gdn_Plugin {
       $this->EventArguments['Player'] = $Player;
       $this->FireEvent('FugitiveEscape');
 
-      MinionPlugin::Instance()->Monitor($User, array(
+      MinionPlugin::Instance()->monitor($User, array(
          'Hunted' => NULL
       ));
    }
@@ -184,10 +184,10 @@ class HunterPlugin extends Gdn_Plugin {
       $State = &$Sender->EventArguments['State'];
 
       if (!$State['Method'] && in_array($State['CompareToken'], array('hunt')))
-         $Sender->Consume($State, 'Method', 'hunt');
+         $Sender->consume($State, 'Method', 'hunt');
 
       if ($State['Method'] == 'hunt' && in_array($State['CompareToken'], array('down')))
-         $Sender->Consume($State, 'Toggle', 'on');
+         $Sender->consume($State, 'Toggle', 'on');
 
    }
 
@@ -233,18 +233,18 @@ class HunterPlugin extends Gdn_Plugin {
                return;
 
             $User = $State['Targets']['User'];
-            $Hunted = $Sender->Monitoring($User, 'Hunted', FALSE);
+            $Hunted = $Sender->monitoring($User, 'Hunted', FALSE);
 
             // Trying to call off a hunt
             if ($State['Toggle'] == 'off') {
                if (!$Hunted) return;
 
                // Call off the hunt
-               $Sender->Monitor($User, array(
+               $Sender->monitor($User, array(
                   'Hunted'    => NULL
                ));
 
-               $Sender->Acknowledge($State['Sources']['Discussion'], FormatString(T("No longer hunting for @\"{User.Name}\"."), array(
+               $Sender->acknowledge($State['Sources']['Discussion'], FormatString(T("No longer hunting for @\"{User.Name}\"."), array(
                   'User'         => $User
                )));
 
@@ -253,7 +253,7 @@ class HunterPlugin extends Gdn_Plugin {
                if ($Hunted) return;
 
                // Start the hunt
-               $Sender->Monitor($User, array(
+               $Sender->monitor($User, array(
                   'Hunted'    => array(
                      'Started'   => time(),
                      'Points'    => C('Plugins.Hunter.StartPoints', 15),
@@ -261,7 +261,7 @@ class HunterPlugin extends Gdn_Plugin {
                   )
                ));
 
-               $Sender->Acknowledge($State['Sources']['Discussion'], FormatString(T("Hunting for @\"{User.Name}\"."), array(
+               $Sender->acknowledge($State['Sources']['Discussion'], FormatString(T("Hunting for @\"{User.Name}\"."), array(
                   'User'         => $User
                )));
             }
@@ -277,7 +277,7 @@ class HunterPlugin extends Gdn_Plugin {
     */
    public function MinionPlugin_Monitor_Handler($Sender) {
       $User = $Sender->EventArguments['User'];
-      $Hunted = $Sender->Monitoring($User, 'Hunted', FALSE);
+      $Hunted = $Sender->monitoring($User, 'Hunted', FALSE);
       if (!$Hunted) return;
 
       if (array_key_exists('Comment', $Sender->EventArguments))
@@ -285,7 +285,7 @@ class HunterPlugin extends Gdn_Plugin {
       else
          $Object = &$Sender->EventArguments['Discussion'];
 
-      $Sender->Monitor($Object, array(
+      $Sender->monitor($Object, array(
          'Hunted'    => TRUE
       ));
    }
@@ -307,12 +307,12 @@ class HunterPlugin extends Gdn_Plugin {
       if (is_null($BaseValue)) return;
 
       $Object = $Sender->EventArguments['Record'];
-      $IsHunted = MinionPlugin::Instance()->Monitoring($Object, 'Hunted', FALSE);
+      $IsHunted = MinionPlugin::Instance()->monitoring($Object, 'Hunted', FALSE);
       if (!$IsHunted) return;
 
       $UserID = GetValue('InsertUserID', $Object);
       $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-      $Hunted = MinionPlugin::Instance()->Monitoring($User, 'Hunted', FALSE);
+      $Hunted = MinionPlugin::Instance()->monitoring($User, 'Hunted', FALSE);
       if (!$Hunted) return;
 
       $Mode = $Sender->EventArguments['Insert'] ? 'set' : 'unset';
@@ -320,7 +320,7 @@ class HunterPlugin extends Gdn_Plugin {
 
       // Effect change
       $Hunted['Points'] += $Change;
-      MinionPlugin::Instance()->Monitor($User, array('Hunted' => $Hunted));
+      MinionPlugin::Instance()->monitor($User, array('Hunted' => $Hunted));
 
       $Player = (array)Gdn::Session()->User;
       if ($Hunted['Points'] == $Hunted['Target'])
@@ -351,14 +351,14 @@ class HunterPlugin extends Gdn_Plugin {
          return;
 
       // Is the object hunted?
-      $IsHunted = MinionPlugin::Instance()->Monitoring($Object, 'Hunted', FALSE);
+      $IsHunted = MinionPlugin::Instance()->monitoring($Object, 'Hunted', FALSE);
       if (!$IsHunted) return;
 
       $User = (array)$Sender->EventArguments['Author'];
       // Don't show it for myself
       if ($User['UserID'] == Gdn::Session()->UserID) return;
 
-      $Hunted = MinionPlugin::Instance()->Monitoring($User, 'Hunted', FALSE);
+      $Hunted = MinionPlugin::Instance()->monitoring($User, 'Hunted', FALSE);
       if (!$Hunted) return;
 
       echo Gdn_Theme::BulletItem('Hunted');
@@ -403,18 +403,18 @@ class HunterPlugin extends Gdn_Plugin {
     */
    protected function AddHunterCSS($Sender, $Object) {
       // Is the object hunted?
-      $IsHunted = MinionPlugin::Instance()->Monitoring($Object, 'Hunted', FALSE);
+      $IsHunted = MinionPlugin::Instance()->monitoring($Object, 'Hunted', FALSE);
       if (!$IsHunted)
          return;
 
       $User = (array)$Sender->EventArguments['Author'];
-      $Hunted = MinionPlugin::Instance()->Monitoring($User, 'Hunted', FALSE);
+      $Hunted = MinionPlugin::Instance()->monitoring($User, 'Hunted', FALSE);
       if (!$Hunted) return;
 
       $HuntStarted = $Hunted['Started'];
       $DateInsertedTime = strtotime($Object['DateInserted']);
       if ($DateInsertedTime < $HuntStarted) {
-         MinionPlugin::Instance()->Monitor($Object, array(
+         MinionPlugin::Instance()->monitor($Object, array(
             'Hunted' => NULL
          ));
          return;
@@ -437,7 +437,7 @@ class HunterPlugin extends Gdn_Plugin {
       if ($Sender->DeliveryType() != DELIVERY_TYPE_ALL) return;
 
       $User = (array)Gdn::Session()->User;
-      $Hunted = MinionPlugin::Instance()->Monitoring($User, 'Hunted', FALSE);
+      $Hunted = MinionPlugin::Instance()->monitoring($User, 'Hunted', FALSE);
       if (!$Hunted) return;
 
       // User is hunted!
@@ -452,7 +452,7 @@ class HunterPlugin extends Gdn_Plugin {
 
       $Message = FormatString($Message, array(
          'Fugitive'  => $User,
-         'Minion'    => MinionPlugin::Instance()->Minion()
+         'Minion'    => MinionPlugin::Instance()->minion()
       ));
       $Sender->InformMessage($Message);
    }

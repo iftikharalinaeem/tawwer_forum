@@ -113,7 +113,7 @@ class ZombiesPlugin extends Gdn_Plugin {
    public function MinionPlugin_Start_Handler($Sender) {
       
       // Register persona
-      $Sender->Persona('Zombies', array(
+      $Sender->persona('Zombies', array(
          'Name'      => 'Red Queen',
          'Photo'     => 'http://cdn.vanillaforums.com/minion/redqueen.png',
          'Title'     => 'Malevolent AI',
@@ -121,7 +121,7 @@ class ZombiesPlugin extends Gdn_Plugin {
       ));
             
       // Change persona
-      $Sender->Persona('Zombies');
+      $Sender->persona('Zombies');
    }
    
    /**
@@ -132,7 +132,7 @@ class ZombiesPlugin extends Gdn_Plugin {
     */
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
       $this->Minion = MinionPlugin::Instance();
-      $this->MinionUser = (array)$this->Minion->Minion();
+      $this->MinionUser = (array)$this->Minion->minion();
    }
    
    /**

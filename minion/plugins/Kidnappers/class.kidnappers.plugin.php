@@ -165,7 +165,7 @@ class KidnappersPlugin extends Gdn_Plugin {
    public function MinionPlugin_Start_Handler($Sender) {
       
       // Register persona
-      $Sender->Persona('Kidnapper', array(
+      $Sender->persona('Kidnapper', array(
          'Name'      => 'Donbot',
          'Photo'     => 'http://cdn.vanillaforums.com/minion/donbot.png',
          'Title'     => 'Doin crimes',
@@ -174,7 +174,7 @@ class KidnappersPlugin extends Gdn_Plugin {
             
       // Change persona
       if ($this->Enabled)
-         $Sender->Persona('Kidnapper');
+         $Sender->persona('Kidnapper');
    }
    
    /**
@@ -185,7 +185,7 @@ class KidnappersPlugin extends Gdn_Plugin {
     */
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
       $this->Minion = MinionPlugin::Instance();
-      $this->MinionUser = (array)$this->Minion->Minion();
+      $this->MinionUser = (array)$this->Minion->minion();
    }
    
    /**
@@ -471,7 +471,7 @@ KIDNAP;
             'User'      => $User,
             'Hint'      => $Hint
          ));
-         $this->Minion->Message($Victim, $DiscussionID, $KidnapMessage);
+         $this->Minion->message($Victim, $DiscussionID, $KidnapMessage);
       }
       
       // Notify
@@ -609,7 +609,7 @@ KIDNAP;
             'Victim'    => $Victim,
             'User'      => $User
          ));
-         $this->Minion->Message($Victim, $DiscussionID, $RescueMessage);
+         $this->Minion->message($Victim, $DiscussionID, $RescueMessage);
       }
       
       // Notify
