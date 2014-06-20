@@ -140,7 +140,11 @@ class MinionWarnings extends Gdn_Plugin {
 
                 $recordComment = val('Comment', $state['Targets'], null);
                 $punished = $sender->punish(
-                    $state['Targets']['User'], $state['Targets']['Discussion'], $recordComment, $force, $options
+                    $state['Targets']['User'],
+                    $state['Targets']['Discussion'],
+                    $recordComment,
+                    $force,
+                    $options
                 );
 
                 $gloatReason = val('GloatReason', MinionPlugin::instance()->EventArguments);

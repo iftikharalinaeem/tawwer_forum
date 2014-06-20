@@ -731,20 +731,19 @@ class MinionPlugin extends Gdn_Plugin {
 
                         case 'Phrase':
 
-                            // If we need to wait for a closing quote
-                            if (!strlen($state['Gather']['Delta']) && substr($state['Token'], 0, 1) == '"') {
+                            // If we need to wait for a closing character
+                            $terminator = val('Terminator', $state['Gather'], false);
+                            if (!strlen($state['Gather']['Delta']) && $terminator && substr($state['Token'], 0, 1) == $terminator) {
                                 $state['Token'] = substr($state['Token'], 1);
                                 $state['Gather']['Terminator'] = '"';
                             }
 
-                            // If we've found our closing quote
+                            // If we've found our closing character
                             $terminator = val('Terminator', $state['Gather'], false);
-                            $explicitlyClosed = null;
                             if ($terminator) {
                                 if (($foundPosition = stripos($state['Token'], $terminator)) !== false) {
                                     $state['Token'] = substr($state['Token'], 0, $foundPosition);
                                     unset($state['Gather']['Terminator']);
-                                    $explicitlyClosed = true;
                                 }
                             }
 
@@ -904,7 +903,8 @@ class MinionPlugin extends Gdn_Plugin {
                     if (in_array($state['CompareToken'], array('user'))) {
                         $this->consume($state, 'Gather', array(
                             'Node' => 'User',
-                            'Delta' => ''
+                            'Delta' => '',
+                            'Terminator' => '"'
                         ));
                     }
 
@@ -913,7 +913,8 @@ class MinionPlugin extends Gdn_Plugin {
                             $state['Token'] = substr($state['Token'], 1);
                             $state['Gather'] = array(
                                 'Node' => 'User',
-                                'Delta' => ''
+                                'Delta' => '',
+                                'Terminator' => '"'
                             );
 
                             // Allow matching autocomplete usernames
