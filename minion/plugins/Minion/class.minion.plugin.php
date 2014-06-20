@@ -212,7 +212,7 @@ class MinionPlugin extends Gdn_Plugin {
         if (is_null($this->minion)) {
             // Currently operating as Minion
             $this->minionUserID = $this->getMinionUserID();
-            $this->minion = Gdn::userModel()->getID($this->minionUserID);
+            $this->minion = Gdn::userModel()->getID($this->minionUserID, DATASET_TYPE_ARRAY);
         }
 
         $this->EventArguments['Messages'] = &$this->messages;
@@ -551,7 +551,7 @@ class MinionPlugin extends Gdn_Plugin {
 {User Target}");
 
                 $minionReportText = formatString($minionReportText, array(
-                    'Minion Name' => $this->minion->Name,
+                    'Minion Name' => $this->minion['Name'],
                     'User Target' => userAnchor(Gdn::session()->User)
                 ));
 
@@ -2296,11 +2296,11 @@ EOT;
         $this->minionUserID = $this->getMinionUserID();
         $this->minion = Gdn::userModel()->GetID($this->minionUserID);
         Gdn::session()->User = $this->minion;
-        Gdn::session()->UserID = $this->minion->UserID;
+        Gdn::session()->UserID = $this->minion['UserID'];
 
         $sender->setData('Run', true);
         $sender->setData('MinionUserID', $this->minionUserID);
-        $sender->setData('Minion', $this->minion->Name);
+        $sender->setData('Minion', $this->minion['Name']);
 
         // Check for fingerprint ban matches
         $this->fingerprintBans($sender);
@@ -2418,7 +2418,7 @@ A house divided will not stand
                     }
 
                     $minionReportText = formatString($minionReportText, array(
-                        'Minion Name' => $this->minion->Name,
+                        'Minion Name' => $this->minion['Name'],
                         'Banned Aliases' => implode(', ', $bannedAliases),
                         'Ban Target' => userAnchor($user)
                     ));

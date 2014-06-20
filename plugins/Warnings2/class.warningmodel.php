@@ -241,7 +241,7 @@ class WarningModel extends UserNoteModel {
 
       // Increment the user's alert level.
       $AlertModel = new UserAlertModel();
-      $Alert = $AlertModel->GetID($UserID, DATASET_TYPE_ARRAY);
+      $Alert = $AlertModel->GetID($UserID);
       if (!$Alert)
          $Alert = array('UserID' => $UserID);
 

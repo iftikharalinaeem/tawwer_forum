@@ -258,7 +258,7 @@ class ValentinesPlugin extends Gdn_Plugin {
     */
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
       $this->Minion = MinionPlugin::Instance();
-      $this->MinionUser = (array)$this->Minion->minion();
+      $this->MinionUser = $this->Minion->minion();
 
       // Has the lounge been opened this year?
       $LoungeOpen = (C('Plugins.Valentines.LoungeOpen', FALSE) == date('Y'));
