@@ -313,7 +313,7 @@ class MinionPlugin extends Gdn_Plugin {
             $minion = array_merge($applyPersona, array('UserID' => $this->minionUserID));
             Gdn::userModel()->save($minion);
             Gdn::userModel()->saveAttribute($this->minionUserID, 'Persona', $this->persona);
-            $this->minion = Gdn::userModel()->getID($this->minionUserID);
+            $this->minion = Gdn::userModel()->getID($this->minionUserID, DATASET_TYPE_ARRAY);
         }
 
         // Apply an existing persona
@@ -1664,7 +1664,7 @@ class MinionPlugin extends Gdn_Plugin {
             if ($comment) {
                 $state['Targets']['Comment'] = $comment;
 
-                $discussion = (array)$discussionModel->getID($comment['DiscussionID']);
+                $discussion = $discussionModel->getID($comment['DiscussionID'], DATASET_TYPE_ARRAY);
                 $state['Targets']['Discussion'] = $discussion;
             }
 
@@ -2153,7 +2153,7 @@ EOT;
         $inputFormat = val('InputFormat', $options, 'Html');
 
         if (is_numeric($user)) {
-            $user = Gdn::userModel()->getID($user);
+            $user = Gdn::userModel()->getID($user, DATASET_TYPE_ARRAY);
             if (!$user) {
                 return false;
             }
@@ -2161,7 +2161,7 @@ EOT;
 
         if (is_numeric($discussion)) {
             $discussionModel = new DiscussionModel();
-            $discussion = $discussionModel->getID($discussion);
+            $discussion = $discussionModel->getID($discussion, DATASET_TYPE_ARRAY);
             if (!$discussion) {
                 return false;
             }
