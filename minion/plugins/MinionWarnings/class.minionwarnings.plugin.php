@@ -6,7 +6,7 @@
  */
 
 $PluginInfo['MinionWarnings'] = array(
-    'Name' => 'MinionWarnings',
+    'Name' => 'Minion: Warnings',
     'Description' => "Allow Minion to issue warnings with Warnings2",
     'Version' => '1.0',
     'RequiredApplications' => array(

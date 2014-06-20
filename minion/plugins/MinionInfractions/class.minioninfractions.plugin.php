@@ -6,7 +6,7 @@
  */
 
 $PluginInfo['MinionInfractions'] = array(
-    'Name' => 'MinionInfractions',
+    'Name' => 'Minion: Infractions',
     'Description' => "Allow Minion to issue infractions with Infractions",
     'Version' => '1.0',
     'RequiredApplications' => array(

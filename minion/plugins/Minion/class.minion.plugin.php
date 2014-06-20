@@ -7,7 +7,7 @@
 
 $PluginInfo['Minion'] = array(
     'Name' => 'Minion',
-    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
+    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically and on command.",
     'Version' => '2.0',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'MobileFriendly' => true,
