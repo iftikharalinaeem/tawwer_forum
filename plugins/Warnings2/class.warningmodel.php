@@ -121,7 +121,7 @@ class WarningModel extends UserNoteModel {
       if (!$Warning)
          throw NotFoundException('Warning');
 
-      if (GetValue('Reversed', $Warning)) {
+      if (val('Reversed', $Warning)) {
          $this->Validation->AddValidationResult('Reversed', 'The warning was already reversed.');
          return FALSE;
       }
@@ -130,8 +130,8 @@ class WarningModel extends UserNoteModel {
       $this->SetField($Warning['UserNoteID'], 'Reversed', TRUE);
 
       // Reverse the amount of time on the warning and its points.
-      $ExpiresTimespan = GetValue('ExpiresTimespan', $Warning, '0');
-      $Points = GetValue('Points', $Warning, 0);
+      $ExpiresTimespan = val('ExpiresTimespan', $Warning, '0');
+      $Points = val('Points', $Warning, 0);
 
       $AlertModel = new UserAlertModel();
       $Alert = $AlertModel->GetID($Warning['UserID']);
@@ -173,7 +173,7 @@ class WarningModel extends UserNoteModel {
     * @return type
     */
    public function Save($Data) {
-      $UserID = GetValue('UserID', $Data);
+      $UserID = val('UserID', $Data);
       unset($Data['AttachRecord']);
 
       // Coerce the data.
@@ -192,16 +192,16 @@ class WarningModel extends UserNoteModel {
          }
       }
 
-      if (!isset($Data['Points']))
+      if (!isset($Data['Points'])) {
          $this->Validation->AddValidationResult('Points', 'ValidateRequired');
-      elseif ($Data['Points']) {
-         if (!ValidateRequired(GetValue('ExpiresString', $Data)) && !ValidateRequired(GetValue('ExpiresTimespan', $Data))) {
+      } elseif ($Data['Points']) {
+         if (!ValidateRequired(val('ExpiresString', $Data)) && !ValidateRequired(val('ExpiresTimespan', $Data))) {
             $this->Validation->AddValidationResult('ExpiresString/ExpiresNumber', 'ValidateRequired');
-         } elseif (!ValidateRequired(GetValue('ExpiresTimespan', $Data))) {
+         } elseif (!ValidateRequired(val('ExpiresTimespan', $Data))) {
             // Calculate the seconds from the string.
-            $Seconds = strtotime(GetValue('ExpiresString', $Data), 0);
+            $Seconds = strtotime(val('ExpiresString', $Data), 0);
             TouchValue('ExpiresTimespan', $Data, $Seconds);
-         } elseif (!ValidateRequired(GetValue('ExpiresString', $Data))) {
+         } elseif (!ValidateRequired(val('ExpiresString', $Data))) {
             $Days = round($Data['ExpiresTimespan'] / strtotime('1 day', 0));
             TouchValue('ExpiresString', $Data, Plural($Days, '%s day', '%s days'));
          }
@@ -212,13 +212,23 @@ class WarningModel extends UserNoteModel {
       if (!$ID)
          return FALSE;
 
-      // Attach the warning to the record.
-      $RecordType = ucfirst(GetValue('RecordType', $Data));
-      $RecordID = GetValue('RecordID', $Data);
-      if (in_array($RecordType, array('Discussion', 'Comment')) && $RecordID) {
+      $event = array(
+          'Warning' => $Data,
+          'WarningID' => $ID
+      );
+
+      // Attach the warning to the source record.
+      $RecordType = ucfirst(val('RecordType', $Data));
+      $RecordID = val('RecordID', $Data);
+      if (in_array($RecordType, array('Discussion', 'Comment', 'Activity')) && $RecordID) {
          $ModelClass = $RecordType.'Model';
          $Model = new $ModelClass;
          $Model->SaveToSerializedColumn('Attributes', $RecordID, 'WarningID', $ID);
+
+         $event = array_merge($event, array(
+             'RecordType' => $RecordType,
+             'RecordID' => $RecordID
+         ));
       }
 
       // Send the private message.
@@ -226,6 +236,7 @@ class WarningModel extends UserNoteModel {
       if ($ConversationID) {
          // Save the conversation link back to the warning.
          $this->SetField($ID, array('ConversationID' => $ConversationID));
+         $event['ConversationID'] = $ConversationID;
       }
 
       // Increment the user's alert level.
@@ -235,11 +246,11 @@ class WarningModel extends UserNoteModel {
          $Alert = array('UserID' => $UserID);
 
       if ($Data['Points']) {
-         $Alert['WarningLevel'] = GetValue('WarningLevel', $Alert, 0) + $Data['Points'];
+         $Alert['WarningLevel'] = val('WarningLevel', $Alert, 0) + $Data['Points'];
 
          $Now = time();
 
-         $Expires = GetValue('TimeWarningExpires', $Alert, 0);
+         $Expires = val('TimeWarningExpires', $Alert, 0);
          if ($Expires < $Now)
             $Expires = $Now;
 
@@ -256,13 +267,19 @@ class WarningModel extends UserNoteModel {
          $AlertModel->Insert($Set);
       }
 
+      $event['Alert'] = $Alert;
+
       // Process this user's warnings.
       $Processed = $this->ProcessWarnings($UserID);
 
       if (valr('Set.Banned', $Processed)) {
          // Update the user note to indicate the ban.
          $this->SaveToSerializedColumn('Attributes', $ID, 'Banned', TRUE);
+         $event['Banned'] = true;
       }
+
+      $this->EventArguments = array_merge($this->EventArguments, $event);
+      $this->FireEvent('WarningAdded');
 
       return $ID;
    }
