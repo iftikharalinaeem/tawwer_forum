@@ -258,7 +258,10 @@ class MinionWarnings extends Gdn_Plugin {
         $warning = $warnings->save($warning);
 
         // Generate a gloat reason
-        $gloatReason = ucfirst($type) . " @\"{User.Name}\" ({$points} " . plural($points, 'point', 'points') . " for {$expires}) for \"{$reason}\"";
+        $gloatReason = ucfirst($type) . " @\"{User.Name}\" ({$points} " . plural($points, 'point', 'points') . " for {$expires})";
+        if (!empty($reason)) {
+            $gloatReason .= " for \"{$reason}\"";
+        }
 
         $sender->EventArguments['Infraction'] = $warning;
         $sender->EventArguments['GloatReason'] = $gloatReason;
