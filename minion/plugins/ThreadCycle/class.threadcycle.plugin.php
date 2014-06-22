@@ -69,38 +69,43 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             'thrusters' => array(
                 'min' => 0,
                 'max' => 0.1,
-                'format' => '{speed} {scale}',
+                'format' => '{verb} at {speed} {scale}',
                 'divisions' => 4,
                 'divtype' => 'fractions',
-                'replace' => ['1/1' => 'full']
+                'replace' => ['1/1' => 'full'],
+                'verbs' => array('moseying by', 'puttering along')
             ),
             'impulse' => array(
                 'min' => 0.1,
                 'max' => 0.4,
-                'format' => '{speed} {scale}',
+                'format' => '{verb} at {speed} {scale}',
                 'divisions' => 4,
                 'divtype' => 'fractions',
-                'replace' => ['1/1' => 'full']
+                'replace' => ['1/1' => 'full'],
+                'verbs' => array('travelling', 'moving', 'scooting past')
             ),
             'warp' => array(
                 'min' => 0.4,
                 'max' => 10,
-                'format' => '{scale} {speed}',
+                'format' => '{verb} at {scale} {speed}',
                 'divisions' => 10,
                 'divtype' => 'decimal',
-                'round' => 1
+                'round' => 1,
+                'verbs' => array('zooming by', 'blasting along', 'careening by', 'speeding through')
             ),
             'transwarp' => array(
                 'min' => 10,
                 'max' => null,
-                'format' => 'transwarp',
+                'format' => '{verb} at transwarp',
                 'divisions' => 1,
-                'divtype' => 'const'
+                'divtype' => 'const',
+                'verbs' => array('hurtling by', 'streaking past')
             )
         );
 
         // Determine which engine was in use, and the speed
         $speed = null;
+        $realSpeed = 0;
         $speedcontext = array(
             'cpm' => $CPM
         );
@@ -126,17 +131,18 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                             $num = $fraction / $gcd;
                             $den = $divisions / $gcd;
                             $speed = "{$num}/{$den}";
+                            $realSpeed = $num/$den;
                             break;
 
                         case 'decimal':
                             $range = $engineMax - $engineMin;
                             $bucketsize = $range / $divisions;
                             $round = val('round', $engineInfo, 1);
-                            $speed = round($rangedCPM / $bucketsize, $round);
+                            $realSpeed = $speed = round($rangedCPM / $bucketsize, $round);
                             break;
 
                         case 'const':
-                            $speed = 1;
+                            $realSpeed = $speed = 1;
                             break;
 
                         default:
@@ -147,6 +153,14 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 if (key_exists('replace', $engineInfo) && key_exists($speed, $engineInfo['replace'])) {
                     $speed = val($speed, $engineInfo['replace']);
                 }
+                if (!$realSpeed) {
+                    $speedcontext['format'] = 'drifing';
+                }
+                if (key_exists('verbs', $engineInfo)) {
+                    $verb = array_rand($engineInfo['verbs']);
+                    $speedcontext['verb'] = $verb;
+                }
+
                 $speedcontext['speed'] = $speed;
                 break;
             }
@@ -206,8 +220,9 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         // Alert everyone
         $message = T("This thread is no longer active, and will be recycled.\n");
         if ($speed) {
-            $message .= sprintf(T("On average, this thread was travelling at %s\n"), formatString($speedcontext['format'], $speedcontext));
+            $message .= sprintf(T("On average, this thread was %s\n"), formatString($speedcontext['format'], $speedcontext));
         }
+        $message .= "\n";
         $acknowledge = T("Thread has been recycled.\n");
 
         $options = array(
