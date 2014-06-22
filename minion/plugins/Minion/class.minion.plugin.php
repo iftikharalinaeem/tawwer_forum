@@ -679,9 +679,10 @@ class MinionPlugin extends Gdn_Plugin {
             }
 
             $this->EventArguments['State'] = &$state;
+            $state['LastToken'] = null;
             $state['Token'] = strtok($command, ' ');
             $state['CompareToken'] = preg_replace('/[^\w]/i', '', strtolower($state['Token']));
-            $state['Parsed'] ++;
+            $state['Parsed']++;
 
             while ($state['Token'] !== false) {
                 if ($state['Gather']) {
@@ -770,11 +771,11 @@ class MinionPlugin extends Gdn_Plugin {
 
                             // If we're closed, close up
                             $currentDelta = trim($state['Gather']['Delta']);
-                            if (strlen($state['Gather']['Delta']) && is_numeric($currentDelta)) {
+                            if (strlen($currentDelta) && is_numeric($currentDelta)) {
                                 $state['Targets']['Page'] = $currentDelta;
-                                $state['Gather'] = false;
                                 break;
                             }
+                            $state['Gather'] = false;
                             break;
                     }
 
@@ -969,7 +970,7 @@ class MinionPlugin extends Gdn_Plugin {
                 $state['Token'] = strtok(' ');
                 $state['CompareToken'] = preg_replace('/[^\w]/i', '', strtolower($state['Token']));
                 if ($state['Token']) {
-                    $state['Parsed'] ++;
+                    $state['Parsed']++;
                 }
 
                 // End token loop
@@ -1098,7 +1099,7 @@ class MinionPlugin extends Gdn_Plugin {
         }
 
         if ($state['Consume'] !== false) {
-            // If Tokens == Parsed, something else already consumed on this run, as we stop
+            // If Tokens == Parsed, something else already consumed on this run, so we stop
             if ($state['Tokens'] == $state['Parsed']) {
                 $state['Consume']['Container'] = trim($state['Consume']['Container']);
                 $state['Consume'] = false;
@@ -1109,7 +1110,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             // Allow skipping tokens
             if ($state['Consume']['Skip']) {
-                $state['Consume']['Skip'] --;
+                $state['Consume']['Skip']--;
                 return;
             }
 
