@@ -244,7 +244,7 @@ function FormatQuote($Body) {
       $Result = '<blockquote class="Quote Media">'.
          '<div class="Img">'.UserPhoto($User).'</div>'.
          '<div class="Media-Body">'.
-            '<div>'.UserAnchor($User).'</div>'.
+            '<div>'.UserAnchor($User).' - '.Gdn_Format::DateFull($Body['DateInserted'],'html').'</div>'.
             Gdn_Format::To($Body['Body'], $Body['Format']).
          '</div>'.
          '</blockquote>';
