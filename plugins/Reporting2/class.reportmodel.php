@@ -77,32 +77,37 @@ class ReportModel extends Gdn_Model {
       // Temporarily verify user so they can always submit reports
       SetValue('Verified', Gdn::Session()->User, TRUE);
 
+      // Create report discussion
+
       // Check to see if there was already a report.
       $DiscussionModel = new DiscussionModel();
       $Discussion = $DiscussionModel->GetForeignID($ForeignID, 'report');
-      //decho($Discussion, 'report discussion');
+
+      // Need to create
       if (!$Discussion) {
          $Category = self::GetReportCategory();
-         if (!$Category)
+         if (!$Category) {
             $this->Validation->AddValidationResult('CategoryID', 'The category used for reporting has not been set up.');
+         }
 
          // Grab the discussion that is being reported.
          if (strcasecmp($Data['RecordType'], 'Comment') == 0) {
-            $ReportDiscussion = (array)$DiscussionModel->GetID(GetValue('DiscussionID', $Record));
+            $ReportedDiscussion = (array)$DiscussionModel->GetID(GetValue('DiscussionID', $Record));
          } else {
-            $ReportDiscussion = $Record;
+            $ReportedDiscussion = $Record;
          }
 
          // Set attributes
          $ReportAttributes = array();
-         if ($CategoryID = GetValue('CategoryID', $ReportDiscussion))
-            $ReportAttributes['CategoryID'] = $ReportDiscussion['CategoryID'];
+         if ($CategoryID = GetValue('CategoryID', $ReportedDiscussion)) {
+            $ReportAttributes['CategoryID'] = $ReportedDiscussion['CategoryID'];
+         }
 
-         $NewDiscussion = array(
+         $Discussion = array(
             'Name' => sprintf(T('[Reported] %s', "%s"),
-               $ReportDiscussion['Name'],
-               $ReportDiscussion['InsertName'],
-               $ReportDiscussion['Category']),
+               $ReportedDiscussion['Name'],
+               $ReportedDiscussion['InsertName'],
+               $ReportedDiscussion['Category']),
             'Body' => sprintf(T('Report Body Format', "%s\n\n%s"),
                FormatQuote($Record),
                ReportContext($Record)),
@@ -111,17 +116,23 @@ class ReportModel extends Gdn_Model {
             'Format' => 'Quote',
             'CategoryID' => $Category['CategoryID'],
             'Attributes' => array('Report' => $ReportAttributes)
-            );
+         );
 
-         $DiscussionID = $DiscussionModel->Save($NewDiscussion);
+         $this->EventArguments['ReportedRecordType'] = strtolower($Data['RecordType']);
+         $this->EventArguments['ReportedRecord'] = $Record;
+         $this->EventArguments['Discussion'] = &$Discussion;
+         $this->fireEvent('BeforeDiscussion');
+
+         $DiscussionID = $DiscussionModel->Save($Discussion);
          if (!$DiscussionID) {
             Trace('Discussion not saved.');
             $this->Validation->AddValidationResult($DiscussionModel->ValidationResults());
             return FALSE;
          }
-      } else {
-         $DiscussionID = GetValue('DiscussionID', $Discussion);
+         $Discussion['DiscussionID'] = $DiscussionID;
       }
+
+      $DiscussionID = GetValue('DiscussionID', $Discussion);
 
       // Now that we have the discussion add the report.
       $NewComment = array(
