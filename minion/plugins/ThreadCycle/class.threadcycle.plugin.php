@@ -154,7 +154,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                     $speed = val($speed, $engineInfo['replace']);
                 }
                 if (!$realSpeed) {
-                    $speedcontext['format'] = 'drifing';
+                    $speedcontext['format'] = 'drifing in space';
                 }
                 if (key_exists('verbs', $engineInfo)) {
                     $verb = array_rand($engineInfo['verbs']);
