@@ -49,7 +49,9 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         $startTime = strtotime(val('DateInserted', $discussion));
         $endTime = time();
         $elapsed = $endTime - $startTime;
-        $CPM = (val('CountComments', $discussion) / $elapsed) * 60;
+        $rate = (val('CountComments', $discussion) / $elapsed) * 60;
+        $speedBoost = C('Minion.ThreadCycle.Boost', 2.5);
+        $rate = $rate * $speedBoost;
 
         // Define known speeds and their characteristics
         $engines = array(
@@ -94,17 +96,18 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         $speed = null;
         $realSpeed = 0;
         $speedcontext = array(
-            'cpm' => $CPM
+            'cpm' => $rate,
+            'rate' => $rate
         );
         foreach ($engines as $engine => $engineInfo) {
             $engineMin = $engineInfo['min'];
             $engineMax = $engineInfo['max'];
 
-            if ($CPM >= $engineMin && $CPM < $engineMax) {
+            if ($rate >= $engineMin && $rate < $engineMax) {
                 $speedcontext['format'] = val('format', $engineInfo, '{scale}');
                 $speedcontext['scale'] = $engine;
 
-                $rangedCPM = $CPM - $engineMin;
+                $rangedRate = $rate - $engineMin;
 
                 $divisions = val('divisions', $engineInfo, null);
                 if ($divisions && $engineMax) {
@@ -113,7 +116,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         case 'fractions':
                             $range = $engineMax - $engineMin;
                             $bucketsize = $range / $divisions;
-                            $fraction = round($rangedCPM / $bucketsize);
+                            $fraction = round($rangedRate / $bucketsize);
                             $gcd = self::gcd($fraction, $divisions);
                             $num = $fraction / $gcd;
                             $den = $divisions / $gcd;
@@ -125,7 +128,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                             $range = $engineMax - $engineMin;
                             $bucketsize = $range / $divisions;
                             $round = val('round', $engineInfo, 1);
-                            $realSpeed = $speed = round($rangedCPM / $bucketsize, $round);
+                            $realSpeed = $speed = round($rangedRate / $bucketsize, $round);
                             break;
 
                         case 'const':
