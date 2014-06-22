@@ -44,12 +44,6 @@ class ThreadCyclePlugin extends Gdn_Plugin {
      * @param array $discussion
      */
     public function cycleThread($discussion) {
-        $commentsPerPage = C('Vanilla.Comments.PerPage', 40);
-        $discussionID = val('DiscussionID', $discussion);
-
-        // Close the thread
-        $discussionModel = new DiscussionModel();
-        $discussionModel->SetField($discussionID, 'Closed', true);
 
         // Determine speed
         $startTime = strtotime(val('DateInserted', $discussion));
@@ -57,15 +51,8 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         $elapsed = $endTime - $startTime;
         $CPM = (val('CountComments', $discussion) / $elapsed) * 60;
 
-        // Rate determination
-//      $TargetWarp = 6.5;
-//      $TargetComments = ;
-//      $CPMPerWarp = ;
-//      $MinWarpCPM = 0.4;
-//      $MaxWarpCPM = ;
-
         // Define known speeds and their characteristics
-        $scales = array(
+        $engines = array(
             'thrusters' => array(
                 'min' => 0,
                 'max' => 0.1,
@@ -109,7 +96,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         $speedcontext = array(
             'cpm' => $CPM
         );
-        foreach ($scales as $engine => $engineInfo) {
+        foreach ($engines as $engine => $engineInfo) {
             $engineMin = $engineInfo['min'];
             $engineMax = $engineInfo['max'];
 
@@ -166,7 +153,14 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             }
         }
 
-        // Find the last page of commenters.
+        $discussionID = val('DiscussionID', $discussion);
+
+        // Close the thread
+        $discussionModel = new DiscussionModel();
+        $discussionModel->setField($discussionID, 'Closed', true);
+
+        // Find the last page of commenters
+        $commentsPerPage = c('Vanilla.Comments.PerPage', 40);
         $commenters = Gdn::SQL()->Select('InsertUserID', 'DISTINCT', 'UserID')
                         ->From('Comment')
                         ->Where('DiscussionID', $discussionID)
@@ -203,21 +197,21 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         unset($commenters);
 
         // Sort by online, ascending
-        usort($eligible, array('ThreadCyclePlugin', 'CompareUsersByLastOnline'));
+        usort($eligible, array('ThreadCyclePlugin', 'compareUsersByLastOnline'));
 
         // Get the top 10 by online, and choose the top 5 by points
         $eligible = array_slice($eligible, 0, 10);
-        usort($eligible, array('ThreadCyclePlugin', 'CompareUsersByPoints'));
+        usort($eligible, array('ThreadCyclePlugin', 'compareUsersByPoints'));
         $eligible = array_slice($eligible, 0, 5);
 
         // Shuffle
         shuffle($eligible);
 
-        // Get the top 2
+        // Get the top 2 users
         $primary = val(0, $eligible, array());
         $secondary = Getvalue(1, $eligible, array());
 
-        // Alert everyone
+        // Build user alert message
         $message = T("This thread is no longer active, and will be recycled.\n");
         if ($speed) {
             $message .= sprintf(T("On average, this thread was %s\n"), formatString($speedcontext['format'], $speedcontext));
@@ -246,17 +240,27 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             $secondary['Anchor'] = userAnchor($secondary);
         }
 
+        // Post in the thread for the users to see
         $message = formatString($message, $options);
         MinionPlugin::instance()->message($primary, $discussion, $message, false);
 
-        $Acknowledged = formatString($acknowledge, $options);
-        MinionPlugin::instance()->log($Acknowledged, $discussion);
+        // Log that this happened
+        $acknowledged = formatString($acknowledge, $options);
+        MinionPlugin::instance()->log($acknowledged, $discussion);
 
+        // Stop caring about posts in here
         MinionPlugin::instance()->monitor($discussion, array(
             'ThreadCycle' => null
         ));
     }
 
+    /**
+     * Calculate GCD
+     *
+     * @param integer $a
+     * @param integer $b
+     * @return integer
+     */
     protected static function gcd($a,$b) {
         $a = abs($a); $b = abs($b);
         if( $a < $b) list($b,$a) = Array($a,$b);
