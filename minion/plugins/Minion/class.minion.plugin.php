@@ -913,12 +913,12 @@ class MinionPlugin extends Gdn_Plugin {
                             $state['Token'] = substr($state['Token'], 1);
                             $state['Gather'] = array(
                                 'Node' => 'User',
-                                'Delta' => '',
-                                'Terminator' => ' '
+                                'Delta' => ''
                             );
 
                             // Allow double quoted username matching
-                            if (stristr($state['Token'], '"')) {
+                            if (substr($state['Token'], 0, 1) == '"') {
+                                $state['Token'] = substr($state['Token'], 1);
                                 $state['Gather']['Terminator'] = '"';
                             }
 
@@ -927,7 +927,7 @@ class MinionPlugin extends Gdn_Plugin {
                                 $state['Gather']['Terminator'] = "\u200C";
                             }
 
-                            // Shortcircuit here so we can put all the user gathering in one place
+                            // Shortcircuit here (without consuming) so we can put all the user gathering in one place
                             continue;
                         }
                     }
