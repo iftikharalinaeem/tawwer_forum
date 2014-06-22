@@ -896,7 +896,7 @@ class MinionPlugin extends Gdn_Plugin {
 
                     // Gather a user
 
-                    if (in_array($state['CompareToken'], array('user'))) {
+                    if (in_array($state['CompareToken'], array('user', 'inmate'))) {
                         $this->consume($state, 'Gather', array(
                             'Node' => 'User',
                             'Delta' => '',
