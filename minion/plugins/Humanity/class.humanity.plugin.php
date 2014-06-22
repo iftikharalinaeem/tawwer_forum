@@ -320,7 +320,7 @@ To join in, click "Play" at the bottom of this post.
 Players:
 HUMANITY;
       $message = T('Plugins.Humanity.JoinMessage', $message);
-      $comment = $this->minion->Message($user, $discussion, $message);
+      $comment = $this->minion->message($user, $discussion, $message);
       $this->minion->monitor($comment, array(
          'humanity'  => array(
             'type'   => 'join'
@@ -562,7 +562,7 @@ HUMANITY;
          echo '<span class="ReactButtons">';
 
          foreach ($types as $type)
-            echo $this->minion->ActionButton($object, $type);
+            echo $this->minion->actionButton($object, $type);
 
          echo '</span>';
       echo '</span>';
@@ -646,25 +646,25 @@ HUMANITY;
       $State = &$sender->EventArguments['State'];
 
       if (!$State['Method'] && in_array($State['CompareToken'], array('play', 'playing'))) {
-         $sender->Consume($State, 'Method', 'play');
+         $sender->consume($State, 'Method', 'play');
 
-         $sender->Consume($State, 'Gather', array(
+         $sender->consume($State, 'Gather', array(
             'Node'   => 'Phrase',
             'Delta'  => ''
          ));
       }
 
       if (!$State['Method'] && in_array($State['CompareToken'], array('rule'))) {
-         $sender->Consume($State, 'Method', 'rule');
+         $sender->consume($State, 'Method', 'rule');
 
-         $sender->Consume($State, 'Gather', array(
+         $sender->consume($State, 'Gather', array(
             'Node'   => 'Phrase',
             'Delta'  => ''
          ));
       }
 
       if (!$State['Method'] && in_array($State['CompareToken'], array('rules'))) {
-         $sender->Consume($State, 'Method', 'rules');
+         $sender->consume($State, 'Method', 'rules');
       }
    }
 
