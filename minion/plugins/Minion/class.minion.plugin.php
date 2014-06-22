@@ -938,10 +938,17 @@ class MinionPlugin extends Gdn_Plugin {
                     // Gather a page
 
                     if (val('Method', $state) == 'thread' && val('Toggle', $state) == 'off' && in_array($state['CompareToken'], array('pages', 'page'))) {
-                        $this->consume($state, 'Gather', array(
-                            'Node' => 'Page',
-                            'Delta' => ''
-                        ));
+
+                        // Do a quick lookbehind
+                        if (is_numeric($state['LastToken'])) {
+                            $state['Targets']['Page'] = $state['LastToken'];
+                            $this->consume($state);
+                        } else {
+                            $this->consume($state, 'Gather', array(
+                                'Node' => 'Page',
+                                'Delta' => ''
+                            ));
+                        }
                     }
 
                     /*
@@ -958,6 +965,7 @@ class MinionPlugin extends Gdn_Plugin {
                 }
 
                 // Get a new token
+                $state['LastToken'] = $state['Token'];
                 $state['Token'] = strtok(' ');
                 $state['CompareToken'] = preg_replace('/[^\w]/i', '', strtolower($state['Token']));
                 if ($state['Token']) {
