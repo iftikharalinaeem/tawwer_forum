@@ -238,7 +238,7 @@ class MinionPlugin extends Gdn_Plugin {
      */
     public function getMinionUserID() {
 
-        $minionUserID = C('Plugins.Minion.UserID');
+        $minionUserID = c('Plugins.Minion.UserID');
         if ($minionUserID) {
             return $minionUserID;
         }
@@ -483,7 +483,7 @@ class MinionPlugin extends Gdn_Plugin {
      * @param PostController $sender
      */
     protected function checkFingerprintBan($sender) {
-        if (!C('Plugins.Minion.Features.Fingerprint', true)) {
+        if (!c('Plugins.Minion.Features.Fingerprint', true)) {
             return;
         }
 
@@ -506,7 +506,7 @@ class MinionPlugin extends Gdn_Plugin {
      * @param PostController $sender
      */
     protected function checkAutoplay($sender) {
-        if (!C('Plugins.Minion.Features.Autoplay', true)) {
+        if (!c('Plugins.Minion.Features.Autoplay', true)) {
             return;
         }
 
@@ -914,11 +914,16 @@ class MinionPlugin extends Gdn_Plugin {
                             $state['Gather'] = array(
                                 'Node' => 'User',
                                 'Delta' => '',
-                                'Terminator' => '"'
+                                'Terminator' => ' '
                             );
 
+                            // Allow double quoted username matching
+                            if (stristr($state['Token'], '"')) {
+                                $state['Gather']['Terminator'] = '"';
+                            }
+
                             // Allow matching autocomplete usernames
-                            if (stristr($command, "\u200C")) {
+                            if (stristr($state['Token'], "\u200C")) {
                                 $state['Gather']['Terminator'] = "\u200C";
                             }
 
@@ -1161,7 +1166,7 @@ class MinionPlugin extends Gdn_Plugin {
      */
     public function parseBody($object) {
 
-        $formatMentions = C('Garden.Format.Mentions', null);
+        $formatMentions = c('Garden.Format.Mentions', null);
         if ($formatMentions) {
             saveToConfig('Garden.Format.Mentions', false, false);
         }
@@ -1254,56 +1259,56 @@ class MinionPlugin extends Gdn_Plugin {
             // Report in
             case 'report in':
                 $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
-                $actions[] = array('report in', C('Minion.Access.Report','Garden.Moderation.Manage'), $state);
+                $actions[] = array('report in', c('Minion.Access.Report','Garden.Moderation.Manage'), $state);
                 break;
 
             // Threads
             case 'thread':
                 $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
-                $actions[] = array('thread', C('Minion.Access.Thread','Garden.Moderation.Manage'), $state);
+                $actions[] = array('thread', c('Minion.Access.Thread','Garden.Moderation.Manage'), $state);
                 break;
 
             // Kick
             case 'kick':
                 $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
-                $actions[] = array('kick', C('Minion.Access.Kick','Garden.Moderation.Manage'), $state);
+                $actions[] = array('kick', c('Minion.Access.Kick','Garden.Moderation.Manage'), $state);
                 break;
 
             // Forgive
             case 'forgive':
                 $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
-                $actions[] = array('forgive', C('Minion.Access.Forgive','Garden.Moderation.Forgive'), $state);
+                $actions[] = array('forgive', c('Minion.Access.Forgive','Garden.Moderation.Forgive'), $state);
                 break;
 
             // Ban/unban the specified phrase from this thread
             case 'phrase':
                 $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
-                $actions[] = array("phrase", C('Minion.Access.Phrase','Garden.Moderation.Manage'), $state);
+                $actions[] = array("phrase", c('Minion.Access.Phrase','Garden.Moderation.Manage'), $state);
                 break;
 
             // Find out what special rules are in place
             case 'status':
                 $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
-                $actions[] = array("status", C('Minion.Access.Status','Garden.Moderation.Manage'), $state);
+                $actions[] = array("status", c('Minion.Access.Status','Garden.Moderation.Manage'), $state);
                 break;
 
             // Allow giving/removing access
             case 'access':
                 $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
-                $actions[] = array("access", C('Minion.Access.Access','Garden.Settings.Manage'), $state);
+                $actions[] = array("access", c('Minion.Access.Access','Garden.Settings.Manage'), $state);
                 break;
 
             // Adjust automated force level
             case 'force':
                 $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
                 if (in_array($state['Force'], self::FORCES))
-                    $actions[] = array("force", C('Minion.Access.Force','Garden.Moderation.Manage'), $state);
+                    $actions[] = array("force", c('Minion.Access.Force','Garden.Moderation.Manage'), $state);
                 break;
 
             // Stop all thread actions
             case 'stop all':
                 $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
-                $actions[] = array("stop all", C('Minion.Access.StopAll','Garden.Moderation.Manage'), $state);
+                $actions[] = array("stop all", c('Minion.Access.StopAll','Garden.Moderation.Manage'), $state);
                 break;
         }
 
@@ -1336,7 +1341,7 @@ class MinionPlugin extends Gdn_Plugin {
                         if ($closePage) {
 
                             // Pick somewhere to end the discussion
-                            $commentsPerPage = C('Vanilla.Comments.PerPage', 40);
+                            $commentsPerPage = c('Vanilla.Comments.PerPage', 40);
                             $minComments = ($closePage - 1) * $commentsPerPage;
                             $commentNumber = $minComments + mt_rand(1, $commentsPerPage - 1);
 
@@ -2285,7 +2290,7 @@ EOT;
         $sender->setData('Run', false);
 
         $elapsed = time() - $lastMinionTime;
-        $elapsedMinimum = C('Plugins.Minion.MinFrequency', 5 * 60);
+        $elapsedMinimum = c('Plugins.Minion.MinFrequency', 5 * 60);
         if ($elapsed < $elapsedMinimum) {
             return $sender->render();
         }
@@ -2319,10 +2324,10 @@ EOT;
      * @return type
      */
     protected function fingerprintBans($sender) {
-        if (!C('Plugins.Minion.Features.Fingerprint', true)) {
+        if (!c('Plugins.Minion.Features.Fingerprint', true)) {
             return;
         }
-        $announceBans = C('Plugins.Minion.Features.BanAnnounce', true);
+        $announceBans = c('Plugins.Minion.Features.BanAnnounce', true);
 
         $sender->setData('FingerprintCheck', true);
 
@@ -2456,7 +2461,7 @@ A house divided will not stand
      * @return type
      */
     protected function activity($sender) {
-        if (!C('Plugins.Minion.Features.Activities', true)) {
+        if (!c('Plugins.Minion.Features.Activities', true)) {
             return;
         }
 
@@ -2495,7 +2500,7 @@ A house divided will not stand
      * @return type
      */
     public function log($message, $targetDiscussion = null, $invokeUser = null) {
-        $logThreadID = C('Plugins.Minion.LogThreadID', false);
+        $logThreadID = c('Plugins.Minion.LogThreadID', false);
         if ($logThreadID === false) {
             return;
         }
