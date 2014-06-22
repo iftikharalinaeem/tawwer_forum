@@ -1277,7 +1277,7 @@ class MinionPlugin extends Gdn_Plugin {
             // Forgive
             case 'forgive':
                 $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
-                $actions[] = array('forgive', c('Minion.Access.Forgive','Garden.Moderation.Forgive'), $state);
+                $actions[] = array('forgive', c('Minion.Access.Forgive','Garden.Moderation.Manage'), $state);
                 break;
 
             // Ban/unban the specified phrase from this thread
