@@ -691,15 +691,15 @@ class MinionPlugin extends Gdn_Plugin {
                     switch (valr('Gather.Node', $state)) {
                         case 'User':
 
-                            // If we need to wait for a closing character
                             $terminator = val('Terminator', $state['Gather'], false);
-                            if (!strlen($state['Gather']['Delta']) && $terminator && substr($state['Token'], 0, 1) == $terminator) {
-                                $state['Token'] = substr($state['Token'], 1);
-                            }
 
-                            // If we've found our closing character
-                            $terminator = val('Terminator', $state['Gather'], false);
                             if ($terminator) {
+                                // If a terminator has been registered, and the first character in the token matches, chop it
+                                if (!strlen($state['Gather']['Delta']) && substr($state['Token'], 0, 1) == $terminator) {
+                                    $state['Token'] = substr($state['Token'], 1);
+                                }
+
+                                // If we've found our closing character
                                 if (($foundPosition = stripos($state['Token'], $terminator)) !== false) {
                                     $state['Token'] = substr($state['Token'], 0, $foundPosition);
                                     unset($state['Gather']['Terminator']);
@@ -707,11 +707,14 @@ class MinionPlugin extends Gdn_Plugin {
                             }
 
                             // Add token
-                            $terminator = val('Terminator', $state['Gather'], false);
-                            $state['Gather']['Delta'] .= " {$state['Token']}";
+                            if (strlen($state['Gather']['Delta'])) {
+                                $state['Gather']['Delta'] .= ' ';
+                            }
+                            $state['Gather']['Delta'] .= "{$state['Token']}";
                             $this->consume($state);
 
                             // Check if this is a real user already
+                            $terminator = val('Terminator', $state['Gather'], false);
                             if (!$terminator && strlen($state['Gather']['Delta'])) {
                                 $checkUser = trim($state['Gather']['Delta']);
                                 $gatherUser = Gdn::userModel()->getByUsername($checkUser);
@@ -721,26 +724,19 @@ class MinionPlugin extends Gdn_Plugin {
                                     break;
                                 }
                             }
-
-                            if (!strlen($state['Token'])) {
-                                $state['Gather'] = false;
-                                continue;
-                            }
-
                             break;
 
                         case 'Phrase':
 
-                            // If we need to wait for a closing character
                             $terminator = val('Terminator', $state['Gather'], false);
-                            if (!strlen($state['Gather']['Delta']) && $terminator && substr($state['Token'], 0, 1) == $terminator) {
-                                $state['Token'] = substr($state['Token'], 1);
-                                $state['Gather']['Terminator'] = '"';
-                            }
 
-                            // If we've found our closing character
-                            $terminator = val('Terminator', $state['Gather'], false);
                             if ($terminator) {
+                                // If a terminator has been registered, and the first character in the token matches, chop it
+                                if (!strlen($state['Gather']['Delta']) && substr($state['Token'], 0, 1) == $terminator) {
+                                    $state['Token'] = substr($state['Token'], 1);
+                                }
+
+                                // If we've found our closing character
                                 if (($foundPosition = stripos($state['Token'], $terminator)) !== false) {
                                     $state['Token'] = substr($state['Token'], 0, $foundPosition);
                                     unset($state['Gather']['Terminator']);
@@ -748,28 +744,28 @@ class MinionPlugin extends Gdn_Plugin {
                             }
 
                             // Add token
-                            $terminator = val('Terminator', $state['Gather'], false);
-                            $state['Gather']['Delta'] .= " {$state['Token']}";
+                            if (strlen($state['Gather']['Delta'])) {
+                                $state['Gather']['Delta'] .= ' ';
+                            }
+                            $state['Gather']['Delta'] .= "{$state['Token']}";
                             $this->consume($state);
 
                             // If we're closed, close up
-                            if ($explicitlyClosed || (!$terminator && strlen($state['Gather']['Delta']))) {
+                            $terminator = val('Terminator', $state['Gather'], false);
+                            if (!$terminator && strlen($state['Gather']['Delta'])) {
                                 $state['Targets']['Phrase'] = trim($state['Gather']['Delta']);
                                 $state['Gather'] = false;
                                 break;
                             }
-
-                            if (!strlen($state['Token'])) {
-                                $state['Gather'] = false;
-                                continue;
-                            }
-
                             break;
 
                         case 'Page':
 
                             // Add token
-                            $state['Gather']['Delta'] .= " {$state['Token']}";
+                            if (strlen($state['Gather']['Delta'])) {
+                                $state['Gather']['Delta'] .= ' ';
+                            }
+                            $state['Gather']['Delta'] .= "{$state['Token']}";
                             $this->consume($state);
 
                             // If we're closed, close up
@@ -779,13 +775,12 @@ class MinionPlugin extends Gdn_Plugin {
                                 $state['Gather'] = false;
                                 break;
                             }
-
-                            if (!strlen($state['Token'])) {
-                                $state['Gather'] = false;
-                                continue;
-                            }
-
                             break;
+                    }
+
+                    if (!strlen($state['Token'])) {
+                        $state['Gather'] = false;
+                        continue;
                     }
                 } else {
 
@@ -918,7 +913,6 @@ class MinionPlugin extends Gdn_Plugin {
 
                             // Allow double quoted username matching
                             if (substr($state['Token'], 0, 1) == '"') {
-                                $state['Token'] = substr($state['Token'], 1);
                                 $state['Gather']['Terminator'] = '"';
                             }
 
