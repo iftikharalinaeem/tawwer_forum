@@ -44,7 +44,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
       $Path = $Args['Request']->Path();
       if (preg_match('`^/?reactions`i', $Path)) {
-         require_once($this->GetResource('class.reactionscontroller.php'));
+         require_once($this->GetResource('controllers/class.reactionscontroller.php'));
       }
    }
 
