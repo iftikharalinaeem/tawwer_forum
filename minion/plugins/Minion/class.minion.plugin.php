@@ -126,6 +126,12 @@ class MinionPlugin extends Gdn_Plugin {
      */
     protected $force_triggers = array();
 
+    /**
+     * User triggers
+     * @var array
+     */
+    protected $user_triggers = array();
+
     public function __construct() {
         parent::__construct();
 
@@ -183,17 +189,20 @@ class MinionPlugin extends Gdn_Plugin {
 
         // Define toggle triggers
         $this->toggle_triggers = array(
-            self::TOGGLE_ON => c('Minion.Toggles.On', array('open', 'enable', 'unlock', 'allow', 'allowed', 'on', 'start')),
-            self::TOGGLE_OFF => c('Minion.Toggles.Off', array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off', 'revoke', 'stop'))
+            self::TOGGLE_ON => t('Minion.Trigger.Toggles.On', array('open', 'enable', 'unlock', 'allow', 'allowed', 'on', 'start')),
+            self::TOGGLE_OFF => t('Minion.Trigger.Toggles.Off', array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off', 'revoke', 'stop'))
         );
 
         // Define force triggers
         $this->force_triggers = array(
-            self::FORCE_LOW => c('Minion.Forces.Low', array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer', 'gently', 'gentle', 'peacekeeper')),
-            self::FORCE_MEDIUM => c('Minion.Forces.Medium', array('power', 'cook', 'simmer', 'stern', 'sternly', 'minor')),
-            self::FORCE_HIGH => c('Minion.Forces.High', array('volts', 'extreme', 'slugs', 'broil', 'sear', 'strong', 'strongly', 'major')),
-            self::FORCE_LETHAL => c('Minion.Forces.Lethal', array('kill', 'lethal', 'nuke', 'nuclear', 'destroy')),
+            self::FORCE_LOW => t('Minion.Trigger.Forces.Low', array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer', 'gently', 'gentle', 'peacekeeper')),
+            self::FORCE_MEDIUM => t('Minion.Trigger.Forces.Medium', array('power', 'cook', 'simmer', 'stern', 'sternly', 'minor')),
+            self::FORCE_HIGH => t('Minion.Trigger.Forces.High', array('volts', 'extreme', 'slugs', 'broil', 'sear', 'strong', 'strongly', 'major')),
+            self::FORCE_LETHAL => t('Minion.Trigger.Forces.Lethal', array('kill', 'lethal', 'nuke', 'nuclear', 'destroy')),
         );
+
+        // Define user triggers
+        $this->user_triggers = c('Minion.Trigger.Users', array('user', 'inmate', 'citizen'));
     }
 
     /**
@@ -896,7 +905,7 @@ class MinionPlugin extends Gdn_Plugin {
 
                     // Gather a user
 
-                    if (in_array($state['CompareToken'], array('user', 'inmate'))) {
+                    if (in_array($state['CompareToken'], $this->user_triggers)) {
                         $this->consume($state, 'Gather', array(
                             'Node' => 'User',
                             'Delta' => '',
