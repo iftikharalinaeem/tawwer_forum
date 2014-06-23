@@ -66,3 +66,14 @@ $navbar-brand-color     : #666 !default;
 
 $masthead-color : $white !default;
 $masthead-bg    : $brand-primary !default;
+
+// ## Grid
+//
+// No styleguide reference.
+
+$grid-columns: 16;
+$max-width: 1020px;
+$column: 50px;
+$gutter: 100px;
+//$visual-grid: true;
+$visual-grid-index: 'front';

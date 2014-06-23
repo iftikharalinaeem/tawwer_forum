@@ -6,6 +6,10 @@
  * @license   GPLv3
  */
 
+
+// ## Globals
+@import "globals/variables";
+
 // ## Vendors
 //
 // Library dependencies installed using Bower are automagically wired up when
@@ -20,13 +24,11 @@
 // bower:sass
 // endbower
 
-// ## Globals
-@import "globals/variables";
-
 // ## Shared
 @import "shared/scaffolding";
 @import "shared/typography";
 @import "shared/forms";
+@import "shared/flyouts";
 @import "shared/buttons";
 @import "shared/grid";
 @import "shared/icons";
@@ -40,3 +42,7 @@
 @import "components/listings";
 @import "components/avatars";
 @import "components/footer";
+@import "components/panel";
+
+// ## Sections
+@import "sections/profile";

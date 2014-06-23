@@ -370,7 +370,6 @@ td, th {
   src: url('/resources/fonts/vanillicon/vanillicon.eot');
   src: url('/resources/fonts/vanillicon/vanillicon.eot?#iefix') format('embedded-opentype'), url('/resources/fonts/vanillicon/vanillicon.woff') format('woff'), url('/resources/fonts/vanillicon/vanillicon.ttf') format('truetype'), url('/resources/fonts/vanillicon/vanillicon.svg#vanillicon') format('svg'); }
 
-
 .icon-adjust:before {
   content: "\f100"; }
 
@@ -967,12 +966,18 @@ p {
 .text-center {
   text-align: center; }
 
-input.InputBox, input.SmallInput, textarea.TextBox {
+.InputBox, .SmallInput, .TextBox, .token-input-list {
   display: block;
-  width: 100%;
+  width: 100% !important;
   padding: 6px 12px;
   font-size: 15px;
-  line-height: 22px; }
+  line-height: 22px;
+  border-radius: 4px; }
+
+.CommentForm .FormWrapper {
+  padding-left: 90px; }
+  .CommentForm .FormWrapper .Buttons {
+    margin-left: -90px; }
 
 .icheckbox, .iradio {
   display: inline-block;
@@ -1004,6 +1009,21 @@ input.InputBox, input.SmallInput, textarea.TextBox {
 .iradio.checked:before {
   content: "\f138"; }
 
+.Flyout *, .MenuItems * {
+  font-size: 15px;
+  line-height: 22px; }
+.Flyout .Conversations a, .Flyout .Popin a, .MenuItems .Conversations a, .MenuItems .Popin a {
+  color: #2e9df7; }
+
+.MenuItems a:hover {
+  background-color: #2e9df7 !important; }
+
+.PopList .ItemContent {
+  margin-left: 70px; }
+
+.Popup.SignInPopup {
+  margin-top: 30px; }
+
 .button, .Button {
   display: inline-block;
   padding: 6px 12px;
@@ -1027,6 +1047,7 @@ input.InputBox, input.SmallInput, textarea.TextBox {
   .button, .button:hover, .button:focus, .Button, .Button:hover, .Button:focus {
     text-decoration: none; }
   .button:active, .Button:active {
+    border-top-color: #d9d9d9;
     border-top-color: rgba(0, 0, 0, 0.15);
     -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) inset;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) inset; }
@@ -1042,8 +1063,12 @@ input.InputBox, input.SmallInput, textarea.TextBox {
     text-shadow: none;
     border-color: transparent; }
 
+.BigButton.Primary, .BigButton.Danger {
+  width: 100%;
+  font-size: 17px; }
+
 .container {
-  max-width: 68em;
+  max-width: 1020px;
   margin-left: auto;
   margin-right: auto; }
   .container:after {
@@ -1054,16 +1079,16 @@ input.InputBox, input.SmallInput, textarea.TextBox {
 .column-sidebar {
   float: left;
   display: block;
-  margin-right: 2.35765%;
-  width: 14.70196%; }
+  margin-right: 4.34783%;
+  width: 28.26087%; }
   .column-sidebar:last-child {
     margin-right: 0; }
 
 .column-content {
   float: left;
   display: block;
-  margin-right: 2.35765%;
-  width: 82.94039%; }
+  margin-right: 4.34783%;
+  width: 67.3913%; }
   .column-content:last-child {
     margin-right: 0; }
 
@@ -1195,12 +1220,16 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   content: "\f199"; }
 
 .navbar {
-  margin-bottom: 22px;
+  margin-bottom: 0;
   color: #444;
   background-color: #fff;
   border-bottom: #e5e5e5 solid 1px; }
   .navbar .button {
     margin: 13px 0; }
+  .navbar .mebox {
+    margin: 18px 0; }
+    .navbar .mebox .PhotoWrap {
+      float: left; }
 
 .navbar-brand {
   float: left;
@@ -1256,7 +1285,8 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
     margin-top: -22px; }
 
 .trail {
-  margin-bottom: 22px; }
+  margin-bottom: 22px;
+  margin-top: 22px; }
 
 .Item {
   position: relative;
@@ -1328,6 +1358,9 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
     font-size: 13px;
     line-height: 22px; }
 
+.MItem {
+  white-space: normal; }
+
 .MessageList .Item {
   padding: 22px;
   margin-left: 86px;
@@ -1382,9 +1415,24 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   .PhotoWrap img {
     border-radius: 4px; }
 
+.Conversation-User .ProfilePhotoSmall {
+  vertical-align: middle;
+  margin-right: 5px;
+  border-radius: 4px;
+  border: solid 1px #333;
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); }
+
 .ProfilePhotoMedium {
   width: 64px;
   height: 64px; }
+
+.ProfilePhotoLarge {
+  width: 210px;
+  height: 210px; }
+
+.PhotoWrapLarge {
+  width: 210px; }
 
 .site-footer {
   padding: 22px;
@@ -1392,3 +1440,23 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   border-top: #eee solid 1px; }
   .site-footer p {
     margin-bottom: 0; }
+
+.site-sidebar {
+  font-size: 18px;
+  line-height: 35px; }
+  .site-sidebar .UserBox {
+    display: none; }
+  .site-sidebar .Aside {
+    margin-left: 20px; }
+  .site-sidebar .PhotoWrapLarge {
+    margin-bottom: 20px; }
+  .site-sidebar .GuestBox p {
+    font-size: 15px;
+    line-height: 22px; }
+
+.CategoryFilterOptions {
+  margin-top: -5px;
+  font-size: 14px; }
+
+.Profile > .BoxFilter {
+  display: none; }

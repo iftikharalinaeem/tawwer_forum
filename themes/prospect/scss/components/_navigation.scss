@@ -4,13 +4,21 @@
 // Styleguide Navigation
 
 .navbar {
-  margin-bottom: $line-height-base;
+  margin-bottom: 0;
   color: $navbar-color;
   background-color: $navbar-bg;
   border-bottom: $navbar-border solid 1px;
 
   .button {
     margin: 13px 0;
+  }
+
+  .mebox {
+    margin: 18px 0;
+
+    .PhotoWrap {
+      float: left;
+    }
   }
 }
 

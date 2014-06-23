@@ -26,6 +26,10 @@
   }
 }
 
+.MItem {
+  white-space: normal;
+}
+
 .MessageList {
   .Item {
     padding: $line-height-base;

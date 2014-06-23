@@ -1,0 +1,33 @@
+//
+// # Panel
+//
+// Styleguide Panel
+
+.site-sidebar {
+  font-size: 18px;
+  line-height: 35px;
+
+  .UserBox {
+    display: none;
+  }
+
+  .Aside {
+    margin-left: 20px;
+  }
+
+  .PhotoWrapLarge {
+    margin-bottom: 20px;
+  }
+
+  .GuestBox {
+    p {
+      font-size: $font-size-base;
+      line-height: $line-height-base;
+    }
+  }
+}
+
+.CategoryFilterOptions {
+  margin-top: -5px;
+  font-size: ($font-size-base - 1px);
+}

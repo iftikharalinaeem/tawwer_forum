@@ -709,7 +709,7 @@
        * Generic helper to generate correct image code based on format.
        */
       var buildImgTag = function(href, editorFormat) {
-         // Defualt for text and textex. If in future they require special
+         // Default for text and textex. If in future they require special
          // handling, then add them to switch statement.
          var imgTag = href;
 
@@ -1074,6 +1074,14 @@
                         var fileAlreadyExists = ($.inArray(filename, getAllFileNamesInDiscussion()) > -1)
                            ? true
                            : false;
+
+                        // Apple devices upload files with very generic names.
+                        // For example, uploading an image will produce a name
+                        // like "image.jpeg" for every jpeg image. Disable
+                        // superficial file duplication check for these cases.
+                        if (/ip(hone|ad|od)/i.test(navigator.userAgent)) {
+                           fileAlreadyExists = false;
+                        }
 
                         if (validSize && validFile && !fileAlreadyExists) {
                            data.submit();
@@ -1686,6 +1694,8 @@
                 case 'html':
                 case 'bbcode':
                 case 'markdown':
+                case 'text':
+                case 'textex':
                    // Lazyloading scripts, then run single callback
                    $.when(
                       loadScript(assets + '/js/buttonbarplus.js?v=' + editorVersion),
@@ -1705,11 +1715,6 @@
 
                       insertImageUrl($currentEditableTextarea);
                    });
-                   break;
-
-               case 'text':
-               case 'textex':
-
                    break;
             }
 

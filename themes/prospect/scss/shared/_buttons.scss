@@ -23,6 +23,7 @@
   }
 
   &:active {
+    border-top-color: lighten($black,85%);
     border-top-color: rgba($black,.15);
     box-shadow: 0 1px 2px rgba($black,.15) inset;
   }
@@ -58,5 +59,13 @@
   &:active {
     text-shadow: none;
     border-color: transparent;
+  }
+}
+
+.BigButton {
+  &.Primary,
+  &.Danger {
+    width: 100%;
+    font-size: ($font-size-base + 2px);
   }
 }

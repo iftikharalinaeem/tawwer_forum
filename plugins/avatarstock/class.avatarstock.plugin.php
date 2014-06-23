@@ -5,7 +5,7 @@
 $PluginInfo['avatarstock'] = array(
     'Name' => 'Avatar Pool',
     'Description' => 'Create a limited stock of default avatars that members can choose between.',
-    'Version' => '1.1.2',
+    'Version' => '1.1.4',
     'Author' => 'Dane MacMillan',
     'AuthorEmail' => 'dane@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -173,16 +173,47 @@ class AvatarStockPlugin extends Gdn_Plugin {
      * the mentioned string, then consider the delete handled, which will
      * prevent the core logic from calling unlink against the stock avatar file.
      *
-     * @param gdn_Upload $sender The gdn_Upload controller.
-     * @param array $args The event arguments.
+     * @param ProfileController $Sender The profile controller.
+     * @param string $UserReference The user reference, if available.
+     * @param string $Username The user's name, if available.
+     * @param string $TransientKey The transient key.
      */
-    public function gdn_upload_delete_handler($sender, $args) {
-        $parsed =& $args['Parsed'];
-        $handled =& $args['Handled'];
+    public function ProfileController_RemovePicture_Create($Sender, $UserReference = '', $Username = '', $TransientKey = '') {
+        $Sender->Permission('Garden.SignIn.Allow');
+        $Session = Gdn::Session();
+        if (!$Session->IsValid())
+            $Sender->Form->AddError('You must be authenticated in order to use this form.');
 
-        $userPhoto = $parsed['Name'];
-        if (strpos($userPhoto, $this->file_destination_dir) !== false) {
-            $handled = true;
+        // Get user data & another permission check
+        $Sender->GetUserInfo($UserReference, $Username, '', TRUE);
+        $RedirectUrl = UserUrl($Sender->User, '', 'picture');
+        if ($Session->ValidateTransientKey($TransientKey) && is_object($Sender->User)) {
+            $HasRemovePermission = CheckPermission('Garden.Users.Edit') || CheckPermission('Moderation.Profiles.Edit');
+            if ($Sender->User->UserID == $Session->UserID || $HasRemovePermission) {
+                if (strpos($Sender->User->Photo, $this->file_destination_dir) === false) {
+                    // Do removal, set message, redirect
+                    Gdn::UserModel()->RemovePicture($Sender->User->UserID);
+                } else {
+                    // "Remove" for avatarstock. This just means the column in
+                    // the User table gets set to the default. The photo itself
+                    // should not be removed.
+                    $UserModel = Gdn::UserModel();
+                    $User = $UserModel->GetID($Sender->User->UserID, DATASET_TYPE_ARRAY);
+                    if ($Photo = $User['Photo']) {
+                        $UserModel->SetField($Sender->User->UserID, 'Photo', NULL);
+                    }
+                }
+                $Sender->InformMessage(T('Your picture has been removed.'));
+            }
+        }
+
+        if (Gdn::Controller()->DeliveryType() == DELIVERY_TYPE_ALL) {
+            Redirect($RedirectUrl);
+        } else {
+            $Sender->ControllerName = 'Home';
+            $Sender->View = 'FileNotFound';
+            $Sender->RedirectUrl = Url($RedirectUrl);
+            $Sender->Render();
         }
     }
 

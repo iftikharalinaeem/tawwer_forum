@@ -276,6 +276,11 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
 
+.dd-separator {
+  background-color: rgba(0, 0, 0, 0.1);
+  height: 1px;
+  margin: 5px 0; }
+
 /**
  * Colors dropdown
  */
@@ -327,14 +332,19 @@
  */
 .editor-dd-format + .editor-insert-dialog {
   padding: 5px 0;
-  width: auto; }
+  width: auto;
+  /*
+      .editor-action-h1 {
+         font-size: 18px;
+         line-height: 28px !important;
+      }
+
+      .editor-action-h2 {
+         font-size: 16px;
+      }
+      */ }
   .editor-dd-format + .editor-insert-dialog .wysihtml5-command-active {
     border-radius: 0; }
-  .editor-dd-format + .editor-insert-dialog .editor-action-h1 {
-    font-size: 18px;
-    line-height: 28px !important; }
-  .editor-dd-format + .editor-insert-dialog .editor-action-h2 {
-    font-size: 16px; }
 
 /**
  * Emoji dropdown
@@ -377,6 +387,8 @@
     overflow: hidden;
     white-space: nowrap;
     padding-top: 10px; }
+    .editor-file-image .file-input input[type=file] {
+      visibility: visible !important; }
   .editor-file-image .image-input {
     padding: 0;
     border-top: 1px solid #da8f8f; }
@@ -527,6 +539,9 @@ directly on the iframe's bodybox contenteditable. */
       !important values. */
   display: none !important; }
 
+.editor-format-text .editor-sep, .editor-format-text .icon-bold, .editor-format-text .icon-italic, .editor-format-text .icon-strikethrough, .editor-format-text .icon-list-ol, .editor-format-text .icon-list-ul, .editor-format-text .editor-dropdown-link, .editor-format-text .editor-action-headers, .editor-format-text .icon-align-left, .editor-format-text .icon-align-center, .editor-format-text .icon-align-right, .editor-format-text .editor-toggle-source, .editor-format-text .editor-toggle-fullpage-button, .editor-format-textex .editor-sep, .editor-format-textex .icon-bold, .editor-format-textex .icon-italic, .editor-format-textex .icon-strikethrough, .editor-format-textex .icon-list-ol, .editor-format-textex .icon-list-ul, .editor-format-textex .editor-dropdown-link, .editor-format-textex .editor-action-headers, .editor-format-textex .icon-align-left, .editor-format-textex .icon-align-center, .editor-format-textex .icon-align-right, .editor-format-textex .editor-toggle-source, .editor-format-textex .editor-toggle-fullpage-button {
+  display: none !important; }
+
 /**
  * When wysiwyg editor switches to code view, disable functionality and visibly
  * disable the common action buttons, which should no longer have any affect.
@@ -623,19 +638,33 @@ directly on the iframe's bodybox contenteditable. */
   font-size: x-large; }
 
 .post-font-size-large {
-  font-size: large; }
+  font-size: 18px; }
 
-.post-font-size-medium {
-  font-size: medium; }
+.post-font-size-medium, .post-font-size-normal, .post-font-size-default {
+  font-size: 13px; }
 
 .post-font-size-small {
-  font-size: small; }
+  font-size: 11px; }
 
 .post-font-size-x-small {
   font-size: x-small; }
 
 .post-font-size-xx-small {
   font-size: xx-small; }
+
+/**
+ * These two are not actually inserted into the editor. They are only used for
+ * the dropdown.
+ */
+.post-font-size-h1 {
+  font-size: 21px;
+  font-weight: bold;
+  line-height: 31px !important; }
+
+.post-font-size-h2 {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 26px !important; }
 
 /* Colours based on http://clrs.cc/
 cell-* are used for the dropdown */
@@ -842,6 +871,15 @@ pre.CodeBlock {
   padding: inherit;
   font: inherit;
   outline: none; }
+
+/**
+ * Adjust some styles explicitly within the editor composer. These match the
+ * styles in styles.css. These rules match the font sizes for post-font-size-h*
+ */
+.editor-composer h1 {
+  font-size: 21px; }
+.editor-composer h2 {
+  font-size: 18px; }
 
 /* Keep here to address iframe/body padding text creep issue, see autogrow js
 for more information about the issue */
