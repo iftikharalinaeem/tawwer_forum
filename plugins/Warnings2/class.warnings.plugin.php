@@ -194,13 +194,14 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         if ($quote) {
-            $content = "{$context}\n\n{$location}";
+            $content = "{$context}<br/><br/>{$location}";
 
             $issuer = Gdn::userModel()->getID($warning['InsertUserID'], DATASET_TYPE_ARRAY);
-            $content .= "\n";
+            $content .= "<br/>";
             $content .= '<strong>By:</strong> '.userAnchor($issuer);
-            $content .= "\n";
+            $content .= "<br/>";
             $content .= '<strong>Points:</strong> '.$warning['Points'];
+            
             echo wrap($content, 'div', array(
                 'class' => 'WarningContext'
             ));
