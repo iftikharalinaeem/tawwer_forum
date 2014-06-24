@@ -136,6 +136,72 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * Show the warning context for this PM
+     *
+     * @param MessagesController $sender
+     */
+    public function MessagesController_ConversationWarning_Handler($sender) {
+        $foreignID = $sender->data('Conversation.ForeignID');
+        if (!stristr($foreignID, '-')) {
+            return;
+        }
+        
+        list($warningKey,$warningID) = explode('-', $foreignID);
+        $warningModel = new WarningModel;
+        $warning = $warningModel->getID($warningID);
+        if (!$warning) {
+            return;
+        }
+
+        $quote = null;
+        switch ($warning['RecordType']) {
+            // comment warning
+            case 'comment':
+                $commentModel = new CommentModel;
+                $comment = (array)$commentModel->getID($recordID, DATASET_TYPE_ARRAY);
+                $discussionModel = new DiscussionModel;
+                $discussion = (array)$discussionModel->getID($comment['DiscussionID'], DATASET_TYPE_ARRAY);
+
+                $quote = true;
+                $context = formatQuote($comment);
+                $location = warningContext($comment, $discussion);
+                break;
+
+            // discussion warning
+            case 'discussion':
+                $discussionModel = new DiscussionModel;
+                $discussion = (array)$discussionModel->getID($recordID, DATASET_TYPE_ARRAY);
+
+                $quote = true;
+                $context = formatQuote($discussion);
+                $location = warningContext($discussion);
+                break;
+
+            // activity warning
+            case 'activity':
+                // Nothing for this
+                break;
+
+            // profile/direct user warning
+            default:
+                // Nothing for this
+                break;
+        }
+
+        if ($quote) {
+            $content = "{$context}\n\n{$location}";
+
+            $content .= "\n";
+            $content .= '<strong>By:</strong> '.userAnchor(Gdn::session()->User);
+            $content .= "\n";
+            $content .= '<strong>Points:</strong> '.$warning['Points'];
+            echo wrap($content, 'div', array(
+                'class' => 'WarningContext'
+            ));
+        }
+    }
+
+    /**
      * Add the warning to the list of flags.
      * @param Gdn_Controller $Sender
      * @param array $Args
@@ -549,3 +615,103 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
 }
+
+/*
+ * Global Functions
+ */
+
+if (!function_exists('FormatQuote')):
+
+    /**
+     * Build our warned content quote for PMs
+     *
+     * @param $content
+     * @param $user
+     * @return string
+     */
+    function FormatQuote($content, $user = null) {
+        if (is_object($content)) {
+            $content = (array)$content;
+        } elseif (is_string($content)) {
+            return $content;
+        }
+
+        if (is_null($user)) {
+            $user = Gdn::userModel()->getID(val('InsertUserID', $content));
+        }
+
+        if ($user) {
+            $result = '<blockquote class="Quote Media">' .
+                '<div class="Img">' . userPhoto($user) . '</div>' .
+                '<div class="Media-Body">' .
+                '<div>'.userAnchor($user).' - '.Gdn_Format::DateFull($content['DateInserted'],'html').'</div>'.
+                Gdn_Format::to($content['Body'], $content['Format']) .
+                '</div>' .
+                '</blockquote>';
+        } else {
+            $result = '<blockquote class="Quote">' .
+                Gdn_Format::To($content['Body'], $content['Format']) .
+                '</blockquote>';
+        }
+
+        return $result;
+    }
+
+endif;
+
+if (!function_exists('WarningContext')):
+
+    /**
+     * Create a linked sentence about the context of the warning
+     *
+     * @param $context array or object being warned.
+     * @return string Html message to direct moderators to the content.
+     */
+    function WarningContext($context, $discussion = null, $category = null) {
+        if (is_object($context)) {
+            $context = (array)$context;
+        }
+
+        if ($activityID = val('ActivityID', $context)) {
+
+            // Point to an activity
+            $type = val('ActivityType', $context);
+            if ($type == 'Status') {
+                // Link to author's wall
+                $contextHtml = sprintf(T('Warning Status Context', '%1$s by <a href="%2$s">%3$s</a>'), T('Activity Status', 'Status'), userUrl($context, 'Activity') . '#Activity_' . $activityID, Gdn_Format::Text($context['ActivityName'])
+                );
+            } elseif ($type == 'WallPost') {
+                // Link to recipient's wall
+                $contextHtml = sprintf(T('Warning WallPost Context', '<a href="%1$s">%2$s</a> from <a href="%3$s">%4$s</a> to <a href="%5$s">%6$s</a>'), userUrl($context, 'Regarding') . '#Activity_' . $activityID, // Post on recipient's wall
+                        T('Activity WallPost', 'Wall Post'), userUrl($context, 'Activity'), // Author's profile
+                        Gdn_Format::Text($context['ActivityName']), userUrl($context, 'Regarding'), // Recipient's profile
+                        Gdn_Format::Text($context['RegardingName'])
+                );
+            }
+        } else if (val('CommentID', $context)) {
+
+            // Point to comment & its discussion
+            if (is_null($discussion)) {
+                $discussionModel = new DiscussionModel();
+                $discussion = (array)$discussionModel->getID(val('DiscussionID', $context));
+            }
+            $contextHtml = sprintf(T('Report Comment Context', '<a href="%1$s">%2$s</a> in %3$s <a href="%4$s">%5$s</a>'), commentUrl($context), T('Comment'), strtolower(T('Discussion')), discussionUrl($discussion), Gdn_Format::Text($discussion['Name'])
+            );
+        } elseif (val('DiscussionID', $context)) {
+
+            // Point to discussion & its category
+            if (is_null($category)) {
+                $discussionModel = new DiscussionModel();
+                $category = CategoryModel::categories($context['CategoryID']);
+            }
+            $contextHtml = sprintf(T('Report Discussion Context', '<a href="%1$s">%2$s</a> in %3$s <a href="%4$s">%5$s</a>'), discussionUrl($context), T('Discussion'), strtolower(T('Category')), categoryUrl($category), Gdn_Format::Text($category['Name']), Gdn_Format::Text($context['Name']) // In case folks want the full discussion name
+            );
+        } else {
+
+            throw new Exception(T("You cannot report this content."));
+        }
+
+        return $contextHtml;
+    }
+
+endif;
