@@ -34,7 +34,7 @@ class WarningModel extends UserNoteModel {
             'RecipientUserID' => (array)$warning['UserID']
         );
 
-        $conversationID = $model->Save($row, $messageModel);
+        $conversationID = $model->save($row, $messageModel);
 
         if (!$conversationID) {
             throw new Gdn_UserException($model->Validation->resultsText());
@@ -222,6 +222,7 @@ class WarningModel extends UserNoteModel {
         if (!$ID) {
             return false;
         }
+        $data['WarningID'] = $ID;
 
         $event = array(
             'Warning' => $data,
