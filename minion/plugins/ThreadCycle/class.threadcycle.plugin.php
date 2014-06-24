@@ -172,14 +172,14 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         ->Get()->ResultArray();
 
         Gdn::UserModel()->JoinUsers($commenters, array('UserID'), array(
-            'Join' => array('UserID', 'Name', 'Email', 'Photo', 'Jailed', 'Banned', 'Points')
+            'Join' => array('UserID', 'Name', 'Email', 'Photo', 'Punished', 'Banned', 'Points')
         ));
 
         // Weed out jailed and offline people
         $eligible = array();
         foreach ($commenters as $commenter) {
             // No jailed users
-            if ($commenter['Jailed'] || $commenter['Punished']) {
+            if ($commenter['Punished']) {
                 continue;
             }
 

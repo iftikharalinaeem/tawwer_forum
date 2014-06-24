@@ -216,9 +216,8 @@ class ValentinesPlugin extends Gdn_Plugin {
       // Remove Discussions.Add permissions
       $Permissions = Gdn_Format::Unserialize($User->Permissions);
 
-      if (Gdn::PluginManager()->CheckPlugin('Infractions')) {
-         $InfractionsCache = InfractionsPlugin::GetInfractionCache($UserID);
-         if (!GetValue('Jailed', $InfractionsCache)) return;
+      if (Gdn::PluginManager()->CheckPlugin('Warnings2')) {
+         if (!GetValue('Punished', $User)) return;
 
          // Remove Discussions.Add permissions
          $Permissions = Gdn_Format::Unserialize($User->Permissions);
