@@ -147,7 +147,8 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                     $speedcontext['format'] = 'drifing in space';
                 }
                 if (key_exists('verbs', $engineInfo)) {
-                    $verb = array_rand($engineInfo['verbs']);
+                    $verbKey = array_rand($engineInfo['verbs']);
+                    $verb = val($verbKey, $engineInfo['verbs']);
                     $speedcontext['verb'] = $verb;
                 }
 
