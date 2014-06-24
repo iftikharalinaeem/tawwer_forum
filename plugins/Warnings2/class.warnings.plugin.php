@@ -244,6 +244,9 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     public function UserModel_SetCalculatedFields_Handler($Sender, $Args) {
+        if (val('Banned', $Args['User'])) {
+            SetValue('Punished', $Args['User'], 0);
+        }
         $Punished = val('Punished', $Args['User']);
         if ($Punished) {
             $CssClass = val('_CssClass', $Args['User']);
