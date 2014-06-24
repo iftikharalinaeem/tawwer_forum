@@ -128,7 +128,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $Row->Attributes = Gdn_Format::Unserialize($Row->Attributes);
         if (isset($Row->Attributes['WarningID']) && $Row->Attributes['WarningID']) {
-            if (isset($Row->Attributes['Reversed']) && $Row->Attributes['Reversed']) {
+            if (!isset($Row->Attributes['Reversed']) || !$Row->Attributes['Reversed']) {
                 echo '<div class="DismissMessage Warning">' .
                 sprintf(T('%s was warned for this post.', '%s was <a href="%s">warned</a> for this post.'), htmlspecialchars(val('InsertName', $Row)), UserUrl($Row, 'Insert', 'notes')),
                 '</div>';
