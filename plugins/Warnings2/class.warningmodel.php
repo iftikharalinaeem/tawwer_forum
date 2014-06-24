@@ -172,7 +172,7 @@ class WarningModel extends UserNoteModel {
     *
     * @return type
     */
-   public function Save($Data) {
+   public function Save($Data, $Settings = false) {
       $UserID = val('UserID', $Data);
       unset($Data['AttachRecord']);
 
@@ -208,7 +208,7 @@ class WarningModel extends UserNoteModel {
       }
 
       // First we save the warning.
-      $ID = parent::Save($Data);
+      $ID = parent::Save($Data, $Settings);
       if (!$ID)
          return FALSE;
 
@@ -278,8 +278,11 @@ class WarningModel extends UserNoteModel {
          $event['Banned'] = true;
       }
 
-      $this->EventArguments = array_merge($this->EventArguments, $event);
-      $this->FireEvent('WarningAdded');
+      // Do we allow hooking for this save?
+      if (val('Event', $Settings, true)) {
+        $this->EventArguments = array_merge($this->EventArguments, $event);
+        $this->FireEvent('WarningAdded');
+      }
 
       return $ID;
    }
