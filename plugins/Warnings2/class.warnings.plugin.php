@@ -376,7 +376,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     public function ProfileController_AddProfileTabs_Handler($Sender) {
         if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false)) {
-            $Sender->AddProfileTab(T('Notes'), UserUrl($Sender->User, '', 'notes'), 'UserNotes');
+            $Sender->AddProfileTab(T('Moderation'), UserUrl($Sender->User, '', 'notes'), 'UserNotes');
         }
     }
 
