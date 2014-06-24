@@ -145,7 +145,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         if (!stristr($foreignID, '-')) {
             return;
         }
-        
+
         list($warningKey,$warningID) = explode('-', $foreignID);
         $warningModel = new WarningModel;
         $warning = $warningModel->getID($warningID);
@@ -158,7 +158,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             // comment warning
             case 'comment':
                 $commentModel = new CommentModel;
-                $comment = (array)$commentModel->getID($recordID, DATASET_TYPE_ARRAY);
+                $comment = (array)$commentModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
                 $discussionModel = new DiscussionModel;
                 $discussion = (array)$discussionModel->getID($comment['DiscussionID'], DATASET_TYPE_ARRAY);
 
@@ -170,7 +170,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             // discussion warning
             case 'discussion':
                 $discussionModel = new DiscussionModel;
-                $discussion = (array)$discussionModel->getID($recordID, DATASET_TYPE_ARRAY);
+                $discussion = (array)$discussionModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
 
                 $quote = true;
                 $context = formatQuote($discussion);
@@ -179,7 +179,12 @@ class Warnings2Plugin extends Gdn_Plugin {
 
             // activity warning
             case 'activity':
-                // Nothing for this
+                $activityModel = new ActivityModel;
+                $activity = $activityModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
+
+                $quote = true;
+                $context = '';
+                $location = warningContext($activity);
                 break;
 
             // profile/direct user warning
@@ -191,8 +196,9 @@ class Warnings2Plugin extends Gdn_Plugin {
         if ($quote) {
             $content = "{$context}\n\n{$location}";
 
+            $issuer = Gdn::userModel()->getID($warning['InsertUserID'], DATASET_TYPE_ARRAY);
             $content .= "\n";
-            $content .= '<strong>By:</strong> '.userAnchor(Gdn::session()->User);
+            $content .= '<strong>By:</strong> '.userAnchor($issuer);
             $content .= "\n";
             $content .= '<strong>Points:</strong> '.$warning['Points'];
             echo wrap($content, 'div', array(
@@ -707,8 +713,7 @@ if (!function_exists('WarningContext')):
             $contextHtml = sprintf(T('Report Discussion Context', '<a href="%1$s">%2$s</a> in %3$s <a href="%4$s">%5$s</a>'), discussionUrl($context), T('Discussion'), strtolower(T('Category')), categoryUrl($category), Gdn_Format::Text($category['Name']), Gdn_Format::Text($context['Name']) // In case folks want the full discussion name
             );
         } else {
-
-            throw new Exception(T("You cannot report this content."));
+            return null;
         }
 
         return $contextHtml;
