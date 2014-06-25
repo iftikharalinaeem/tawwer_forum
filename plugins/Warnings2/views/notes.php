@@ -1,11 +1,17 @@
 <?php if (!defined('APPLICATION')) return;
 require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings2');
+$IsPrivileged = $this->Data('IsPrivileged');
 ?>
 <div class="DataListWrap">
 <h2 class="H"><?php echo T('Notes'); ?></h2>
 
 <ul class="DataList DataList-Notes">
    <?php foreach ($this->Data('Notes', array()) as $Row): ?>
+   <?php
+      if (!$IsPrivileged || $Row['Type'] != 'warning') {
+         continue;
+      }
+   ?>
    <li id="UserNote_<?php echo $Row['UserNoteID']; ?>" class="Item Item-Row <?php echo 'UserNote-'.$Row['Type'] ?>">
       <?php
       $Func = "WriteUserNote{$Row['Type']}";
@@ -17,9 +23,11 @@ require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings
          <div class="Meta">
             <div class="Options">
                <?php
-               echo Anchor(T('edit'), '/profile/note?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => T('Edit'))).
-                  Bullet(' ').
-                  Anchor(T('delete'), '/profile/deletenote?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => T('Delete')));
+               if ($IsPrivileged):
+                  echo Anchor(T('edit'), '/profile/note?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => T('Edit'))).
+                     Bullet(' ').
+                     Anchor(T('delete'), '/profile/deletenote?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => T('Delete')));
+               endif;
                ?>
             </div>
             <?php
@@ -44,7 +52,7 @@ require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings
       <?php endif; ?>
    </li>
    <?php endforeach; ?>
-   <?php if (count($this->Data('Notes')) == 0): ?>
+   <?php if (count($this->Data('Notes')) == 0 && $IsPrivileged): ?>
    <li>
       <div class="Empty">
          <?php echo T('Notes description', 'You can add notes to a user which are only visible to moderators.'); ?>

@@ -7,7 +7,7 @@
 
 $PluginInfo['ThreadCycle'] = array(
     'Name' => 'Minion: ThreadCycle',
-    'Description' => "Provide command to automatically cycle a thread after N pages.",
+    'Description' => "Provide a command to automatically cycle a thread after N pages.",
     'Version' => '1.3',
     'RequiredApplications' => array(
         'Vanilla' => '2.1a'
@@ -835,16 +835,18 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         }
 
                         $newWagerPoints = round($state['Targets']['Wager'], 0);
-                        if ($newWagerPoints < ($wagerMinimum = C('Minion.ThreadCycle.Wager.Minimum', 50))) {
-                            throw new Exception(sprintf(T("Proposed wager is too low, you much risk at least <b>%d %s</b>"), $wagerMinimum, plural($wagerMinimum, 'point', 'points')));
-                        }
 
                         // Don't allow negative points wagering
-                        if ($newWagerPoints <= 0) {
+                        if ($newWagerPoints < 0) {
                             $sender->punish($user, $discussion, $comment, MinionPlugin::FORCE_LOW, array(
                                 'Reason' => 'Trying to abuse Cycle Wagering for profit'
                             ));
                             throw new Exception(T("You must wager a positive number of points!"));
+                        }
+
+                        // Don't allow too low bets
+                        if ($newWagerPoints < ($wagerMinimum = C('Minion.ThreadCycle.Wager.Minimum', 50))) {
+                            throw new Exception(sprintf(T("Proposed wager is too low, you must risk at least <b>%d %s</b>"), $wagerMinimum, plural($wagerMinimum, 'point', 'points')));
                         }
 
                         $wagerPoints = val('Points', $wager, 0);
