@@ -38,12 +38,21 @@ $PluginInfo['ThreadCycle'] = array(
  */
 class ThreadCyclePlugin extends Gdn_Plugin {
 
+    const WAGER_KEY = 'plugin.threadcycle.wager.%d';
+
+    public static $cycling = array();
+
     /**
      * Cycle this thread
      *
      * @param array $discussion
+     * @param boolean $betting optional. honor bets? default true
      */
-    public function cycleThread($discussion) {
+    public function cycleThread($discussion, $betting = true) {
+
+        // Note that we're cycling this thread
+        $discussionID = $discussion['DiscussionID'];
+        self::$cycling[$discussionID] = $discussion;
 
         // Determine speed
         $startTime = strtotime(val('DateInserted', $discussion));
@@ -172,7 +181,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         ->Limit($commentsPerPage)
                         ->Get()->ResultArray();
 
-        Gdn::UserModel()->JoinUsers($commenters, array('UserID'), array(
+        Gdn::userModel()->joinUsers($commenters, array('UserID'), array(
             'Join' => array('UserID', 'Name', 'Email', 'Photo', 'Punished', 'Banned', 'Points')
         ));
 
@@ -254,9 +263,275 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
         // Stop caring about posts in here
         MinionPlugin::instance()->monitor($discussion, array(
-            'ThreadCycle' => null
+            'ThreadCycle' => true
+        ));
+
+        // Handle betting
+        if ($betting) {
+            $this->cycleWager($discussion, 'pay');
+        }
+    }
+
+    /**
+     * Handle saved discussion closure
+     *
+     * @param DiscussionModel $sender
+     */
+    public function DiscussionModel_AfterSaveDiscussion_Handler($sender) {
+        $discussionID = $sender->EventArguments['DiscussionID'];
+        $values = $sender->EventArguments['FormPostValues'];
+        $closed = val('Closed', $values, 0);
+        if (!$closed) {
+            return;
+        }
+
+        $isNew = val('IsNewDiscussion', $sender->EventArguments, false);
+        if ($isNew) {
+            return;
+        }
+
+        // This will be handled by the cycleWager at the end of cycleThread()
+        $isCycling = key_exists($discussionID, self::$cycling);
+        if ($isCycling) {
+            return;
+        }
+
+        $this->cycleWager($discussionID, 'return');
+    }
+
+    /**
+     * Handle explicit discussion closure
+     *
+     * @param DiscussionModel $sender
+     */
+    public function DiscussionModel_SetField_Handler($sender) {
+        $discussionID = $sender->EventArguments['DiscussionID'];
+        $setfield = $sender->EventArguments['SetField'];
+        $closed = $setfield[0] == 'Closed' && $setfield[1] == 1;
+        if (!$closed) {
+            return;
+        }
+
+        // This will be handled by the cycleWager at the end of cycleThread()
+        $isCycling = key_exists($discussionID, self::$cycling);
+        if ($isCycling) {
+            return;
+        }
+
+        $this->cycleWager($discussionID, 'return');
+    }
+
+    /**
+     * Cycle wager logic
+     *
+     * @param integer $discussion
+     * @param string $mode default 'bet', supports 'bet' and 'return'
+     */
+    public function cycleWager($discussion, $mode = 'bet') {
+        if (is_numeric($discussion)) {
+            $discussionID = $discussion;
+            $discussionModel = new DiscussionModel;
+            $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+        }
+
+        if (!is_array($discussion)) {
+            return false;
+        }
+
+        $discussionID = $discussion['DiscussionID'];
+
+        // Betting
+        $wagerKey = sprintf(self::WAGER_KEY, $discussionID);
+        $wagers = Gdn::userMetaModel()->getWhere(array(
+            'Name' => $wagerKey
+        ))->resultArray();
+        if (!count($wagers)) {
+            return false;
+        }
+
+        if ($mode == 'bet') {
+
+            // Determine winner
+            $startTime = strtotime(val('DateInserted', $discussion));
+            $endTime = time();
+            $elapsed = $endTime - $startTime;
+
+            $ordered = array();
+            $potPoints = 0;
+            foreach ($wagers as $wagerRow) {
+                $wager = json_decode($wagerRow['Value'], true);
+                $wager['UserID'] = $wagerRow['UserID'];
+                $absTimeDiff = abs($elapsed - $wager['For']);
+                $wager['Abs'] = $absTimeDiff;
+
+                if (!key_exists($absTimeDiff, $ordered)) {
+                    $ordered[$absTimeDiff] = array();
+                }
+
+                $ordered[$absTimeDiff][] = $wager;
+                $potPoints += $wager['Points'];
+            }
+            unset($wagers);
+            ksort($ordered, SORT_NUMERIC);
+
+            // Check if winner is most prolific
+            // @TODO
+
+            // What percent does the house take?
+            $rakePercent = C('Minion.ThreadCycle.Wager.Rake', 5);
+            $rakeMultiple = 1 - $rakePercent / 100;
+
+            // Award points
+            $winners = array_shift($ordered);
+            $haveRunnersUp = false;
+
+            // Runners Up (only if losers exist)
+            if (count($ordered) > 2) {
+                $haveRunnersUp = true;
+                $runnersUp = array_shift($ordered);
+                foreach ($runnersUp as &$rWager) {
+                    $potPoints -= $rWager['Points'];
+                    $returnPoints = $rWager['Points'] * $rakeMultiple;
+                    $rUser = Gdn::userModel()->getID($rWager['UserID'], DATASET_TYPE_ARRAY);
+                    $rUser['Points'] += $returnPoints;
+                    Gdn::userModel()->save($rUser);
+
+                    $rWager['Winnings'] = $returnPoints;
+                    $rWager['User'] = $rUser;
+                }
+            }
+
+            // Winners
+            $split = (count($winners) > 1);
+            $potPoints *= $rakeMultiple; // Remove house cut
+
+            // If there are multiple winners, determine total points wagered by winning bettors
+
+            $winnerPotPoints = 0;
+            foreach ($winners as $winner) {
+                $winnerPotPoints += $winner['Points'];
+            }
+            foreach ($winners as &$wWager) {
+                // If there are multiple winners, calculate winnings according to betting ratio
+                if ($split) {
+                    $ratio = $wWager['Points'] / $winnerPotPoints;
+                    $winnings = $ratio * $potPoints;
+                } else {
+                    $winnings = $potPoints;
+                }
+                $wUser = Gdn::userModel()->getID($wWager['UserID'], DATASET_TYPE_ARRAY);
+                $wUser['Points'] += $winnings;
+                Gdn::userModel()->save($wUser);
+
+                // Modify for formatting
+                $wWager['Winnings'] = $winnings;
+                $wWager['User'] = $wUser;
+            }
+
+            // Announce
+            $d1 = new DateTime();
+            $d2 = new DateTime();
+            $d2->add(new DateInterval('PT'.$elapsed.'S'));
+            $iv = $d2->diff($d1);
+
+            $out = array();
+            $keys = array('y' => 'year','m' => 'month','d' => 'day','h' => 'hour','i' => 'minute','s' => 'second');
+            foreach ($keys as $key => $keyName) {
+                if ($fieldValue = $iv->format($key)) {
+                    $out[] = sprintf('%d %d', $fieldValue, plural($fieldValue, $keyName, "{$keyName}s"));
+                }
+            }
+            $elapsedStr = implode(', ', $out);
+            $message = sprintf(T("Discussion took <b>%s</b> to recycle."), $elapsedStr)."<br/>";
+            $message .= "<br/>";
+
+            $winnerDiffPoints = $potPoints - $winnerPotPoints;
+            $winnerDiffPerc = round(($winnerDiffPoints / $winnerPotPoints) * 100, 0);
+
+            $winnerCount = count($winners);
+            $message .= sprintf(T("There %s %d %s, earning about %d%% %s points than they wagered."),
+                plural($winnerCount, 'was', 'were'),
+                $winnerCount,
+                plural($winnerCount, 'winner', 'winners'),
+                $winnerDiffPerc,
+                (($winnerDiffPoints > 0) ? 'more' : 'less')
+            )."<br/>";
+            $message .= "<br/>";
+
+            $message .= sprintf("<b>%s</b><br/>", plural($winnerCount, 'Winner', 'Winners'));
+            foreach ($winners as $winningWager) {
+                $message .= formatString(T("{User,Mention} bet {Points} points and received <b>{Winnings}</b>"), $winningWager)."<br/>";
+            }
+
+            if ($haveRunnersUp) {
+                $message .= sprintf("<b>%s</b><br/>", plural($winnerCount, 'Runner-up', 'Runners-up'));
+                foreach ($runnersUp as $ruWager) {
+                    $message .= formatString(T("{User,Mention} bet {Points} points and recovered <b>{Winnings}</b>"), $ruWager)."<br/>";
+                }
+            }
+
+            // Message thread
+            MinionPlugin::instance()->message(null, $discussion, $message, array(
+                'Inform' => false
+            ));
+
+        } else {
+
+            // Return all points
+            foreach ($wagers as $wagerRow) {
+                $wager = json_decode($wagerRow['Value'], true);
+                $lUser = Gdn::userModel()->getID($wagerRow['UserID'], DATASET_TYPE_ARRAY);
+                $lUser['Points'] += $wager['Points'];
+                Gdn::userModel()->save($lUser);
+            }
+
+        }
+
+        // Delete all wagers
+        Gdn::userMetaModel()->delete(array(
+            'Name' => $wagerKey
         ));
     }
+
+   /**
+    * Store a wager in UserMeta
+    *
+    * @param integer $userID
+    * @param integer $discussionID
+    * @param array $wager
+    * @return boolean
+    */
+   protected function storeWager($userID, $discussionID, $wager) {
+      if (is_array($wager)) {
+         $wager = json_encode($wager);
+      }
+
+      $wagerKey = sprintf(self::WAGER_KEY, $discussionID);
+      Gdn::userMetaModel()->setUserMeta($userID, $wagerKey, $wager);
+      return true;
+   }
+
+   /**
+    * Retrieve a wager from UserMeta
+    *
+    * @param integer $userID
+    * @param integer $discussionID
+    * @return array|boolean
+    */
+   protected function retrieveWager($userID, $discussionID) {
+      $wagerKey = sprintf(self::WAGER_KEY, $discussionID);
+      $wager = Gdn::userMetaModel()->getUserMeta($userID, $wagerKey, null);
+      if (is_null($wager)) {
+          return false;
+      }
+
+      $wager = json_decode($wager, true);
+      if (!$wager) {
+          return false;
+      }
+
+      return $wager;
+   }
 
     /**
      * Calculate GCD
@@ -302,7 +577,14 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             $sender->consume($state, 'Method', 'threadcycle');
         }
 
-        // Gather
+        $threadCycle = $sender->monitoring($state['Sources']['Discussion'], 'ThreadCycle');
+        if ($threadCycle) {
+            if (!$state['Method'] && in_array($state['CompareToken'], array('wager', 'bet'))) {
+                $sender->consume($state, 'Method', 'cyclewager');
+            }
+        }
+
+        // Gather page
         if (val('Method', $state) == 'threadcycle' && in_array($state['CompareToken'], array('pages', 'page'))) {
 
             // Do a quick lookbehind
@@ -312,6 +594,22 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             } else {
                 $sender->consume($state, 'Gather', array(
                     'Node' => 'Page',
+                    'Delta' => ''
+                ));
+            }
+        }
+
+        // Gather wager
+        if (val('Method', $state) == 'cyclewager' && in_array($state['CompareToken'], array('point', 'points'))) {
+
+            // Do a quick lookbehind
+            if (is_numeric($state['LastToken'])) {
+                $state['Targets']['Wager'] = $state['LastToken'];
+                $sender->consume($state);
+            } else {
+                $sender->consume($state, 'Gather', array(
+                    'Node' => 'Wager',
+                    'Type' => 'number',
                     'Delta' => ''
                 ));
             }
@@ -332,6 +630,15 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
                 $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
                 $actions[] = array('threadcycle', c('Minion.Access.Recycle','Garden.Moderation.Manage'), $state);
+                break;
+
+            case 'cyclewager':
+
+                if (!C('Minion.ThreadCycle.Wager.Allow', true)) {
+                    return;
+                }
+                $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
+                $actions[] = array('cyclewager', c('Minion.Access.CycleWager','Garden.SignIn.Allow'), $state);
                 break;
         }
     }
@@ -357,7 +664,9 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 $threadCycle = $sender->monitoring($discussion, 'ThreadCycle', false);
 
                 // Trying to call off a threadcycle
-                if ($state['Toggle'] == 'off') {
+                $toggle = val('Toggle', $state, MinionPlugin::TOGGLE_ON);
+                if ($toggle == MinionPlugin::TOGGLE_OFF) {
+
                     if (!$threadCycle) {
                         return;
                     }
@@ -367,11 +676,11 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         'ThreadCycle' => null
                     ));
 
-                    $sender->acknowledge($state['Sources']['Discussion'], FormatString(T("This thread will not be automatically recycled."), array(
+                    $sender->acknowledge($state['Sources']['Discussion'], formatString(T("This thread will not be automatically recycled."), array(
                         'Discussion' => $discussion
                     )));
 
-                    // Trying start a threadcycle
+                // Trying start a threadcycle
                 } else {
 
                     $cyclePage = val('Page', $state['Targets'], false);
@@ -399,12 +708,145 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
                         $sender->acknowledge($state['Sources']['Discussion'], $acknowledged);
                         $sender->log($acknowledged, $state['Targets']['Discussion'], $state['Sources']['User']);
+
                     } else {
                         // Cycle immediately
-                        $this->cycleThread($discussion);
+                        $this->cycleThread($discussion, false);
                     }
                 }
 
+                break;
+
+            case 'cyclewager':
+
+                if (!array_key_exists('Discussion', $state['Targets'])) {
+                    return;
+                }
+
+                // Get discussion
+                $comment = valr('Source.Comment', $state, null);
+                $discussion = $state['Source']['Discussion'];
+                $discussionID = $discussion['DiscussionID'];
+                $threadCycle = $sender->monitoring($discussion, 'ThreadCycle', false);
+
+                try {
+
+                    // Close betting when 75% of the thread has passed
+                    $threadTerminateComment = val('Comment', $threadCycle);
+                    $threadProgress = ($discussion['CountComments'] / $threadTerminateComment) * 100;
+                    if ($threadProgress >= C('Minion.ThreadCycle.Wager.Cutoff', 75)) {
+                        throw new Exception(T("Betting is now closed in this discussion."));
+                    }
+
+                    // Get wager info
+                    //$wagerKey = "plugin.threadcycle.wager.{$discussionID}";
+                    $user = $state['Sources']['User'];
+                    $userID = $user['UserID'];
+                    $wager = $this->retrieveWager($userID, $discussionID);
+
+                    $utc = new DateTimeZone('utc');
+                    $now = new DateTime('now', $utc);
+
+                    $toggle = val('Toggle', $state, MinionPlugin::TOGGLE_ON);
+                    if ($toggle == MinionPlugin::TOGGLE_ON) {
+
+                        // We require a wager!
+                        if (!array_key_exists('Wager', $state['Targets'])) {
+                            throw new Exception(T("You didn't supply a wager amount!"));
+                        }
+
+                        // We require a time!
+                        if (!array_key_exists('Time', $state)) {
+                            throw new Exception(T("You didn't supply a valid time!"));
+                        }
+
+                        // Note that we're modifying an existing wager
+                        $modify = false;
+                        if ($wager) {
+                            $modify = true;
+                        }
+
+                        $newWagerPoints = $state['Targets']['Wager'];
+
+                        // Don't allow negative points wagering
+                        if ($newWagerPoints <= 0) {
+                            $sender->punish($user, $discussion, $comment, MinionPlugin::FORCE_LOW, array(
+                                'Reason' => 'Trying to abuse Cycle Wagering for profit'
+                            ));
+                            throw new Exception(T("You must wager a positive number of points!"));
+                        }
+
+                        $wagerPoints = val('Points', $wager, 0);
+                        $myPoints = $user['Points'] + $wagerPoints;
+
+                        // Check if the user has enough points
+                        if ($newWagerPoints > $myPoints) {
+                            $acknowledge = T("You do not have sufficient points to cover that wager! %d is less than %d");
+                            $acknowledged = sprintf($acknowledge, $myPoints, $newWagerPoints);
+                            throw new Exception($acknowledged);
+                        }
+
+                        // Build the wager
+                        $wagerTimeString = $state['Time'];
+                        $wagerTimeInterval = DateInterval::createFromDateString($wagerTimeString);
+
+                        $wagerDate = clone $now;
+                        $wagerDate->add($wagerTimeInterval);
+                        $newWager = array(
+                            'Points' => $newWagerPoints,
+                            'Date' => date('Y-m-d H:i:s'),
+                            'For' => abs(strtotime($wagerTimeString) - time()),
+                            'ForStr' => $wagerTimeString,
+                            'EndTime' => $wagerDate->getTimestamp()
+                        );
+                        $this->storeWager($userID, $discussionID, $newWager);
+
+                        // Update user points
+                        $newUserPoints = $myPoints - $newWagerPoints;
+                        $user['Points'] = $newUserPoints;
+                        Gdn::userModel()->save($user);
+
+                        // Acknowledge the user
+                        $acknowledge = T("Your wager of <b>%d points</b> for '%s' has been entered!");
+                        $acknowledged = sprintf($acknowledge, $newWagerPoints, $wagerTimeString);
+                        $sender->acknowledge($discussion, $acknowledged, 'positive', array(
+                            'Inform' => true,
+                            'Comment' => false
+                        ));
+
+                    } else {
+
+                        if (!$wager) {
+                            throw new Exception(T("You do not currently have a cycle wager in this discussion."));
+                        }
+
+                        // Cancel wager
+                        $this->storeWager($userID, $discussionID, null);
+                        //Gdn::userMetaModel()->setUserMeta($userID, $wagerKey, null);
+
+                        // Give points back
+                        $wagerPoints = val('Points', $wager, 0);
+                        if ($wagerPoints) {
+                            $user['Points'] += $wagerPoints;
+                            Gdn::userModel()->save($user);
+                        }
+
+                        // Acknowledge the user
+                        $acknowledge = T("Your wager of <b>%d points</b> for '%s' has been <b>cancelled</b>.");
+                        $acknowledged = sprintf($acknowledge, $wagerPoints, $wager['ForStr']);
+                        $sender->acknowledge($discussion, $acknowledged, 'positive', array(
+                            'Inform' => true,
+                            'Comment' => false
+                        ));
+
+                    }
+
+                } catch (Exception $ex) {
+                    $sender->acknowledge($discussion, $ex->getMessage(), 'negative', array(
+                        'Inform' => true,
+                        'Comment' => false
+                    ));
+                }
                 break;
         }
     }
@@ -423,7 +865,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
         $cycleCommentNumber = val('Comment', $threadCycle);
         $comments = val('CountComments', $discussion);
-        if ($comments == $cycleCommentNumber) {
+        if ($comments >= $cycleCommentNumber) {
             $this->cycleThread($discussion);
         }
     }
