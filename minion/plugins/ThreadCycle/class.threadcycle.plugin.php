@@ -604,6 +604,10 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         if ($threadCycle) {
             if (!$state['Method'] && in_array($state['CompareToken'], array('wager', 'bet'))) {
                 $sender->consume($state, 'Method', 'cyclewager');
+
+                if (is_null($state['Toggle'])) {
+                    $state['Toggle'] = MinionPlugin::TOGGLE_ON;
+                }
             }
         }
 
@@ -640,7 +644,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             }
 
             if (in_array($state['CompareToken'], array('for', 'because', 'with', 'on'))) {
-                $this->consumeUntilNextKeyword($state, 'For', false, true);
+                $sender->consumeUntilNextKeyword($state, 'For', false, true);
             }
         }
     }
