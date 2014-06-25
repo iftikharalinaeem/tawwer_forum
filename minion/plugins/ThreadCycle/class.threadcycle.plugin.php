@@ -377,7 +377,6 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 $ordered[$absTimeDiff][] = $wager;
                 $potPoints += $wager['Points'];
             }
-            unset($wagers);
             ksort($ordered, SORT_NUMERIC);
 
             // Check if winner is most prolific
@@ -397,7 +396,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 $runnersUp = array_shift($ordered);
                 foreach ($runnersUp as &$rWager) {
                     $potPoints -= $rWager['Points'];
-                    $returnPoints = $rWager['Points'] * $rakeMultiple;
+                    $returnPoints = floor($rWager['Points'] * $rakeMultiple);
                     $rUser = Gdn::userModel()->getID($rWager['UserID'], DATASET_TYPE_ARRAY);
                     $rUser['Points'] += $returnPoints;
                     Gdn::userModel()->setField($rUser['UserID'], 'Points', $rUser['Points']);
@@ -421,7 +420,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 // If there are multiple winners, calculate winnings according to betting ratio
                 if ($split) {
                     $ratio = $wWager['Points'] / $winnerPotPoints;
-                    $winnings = $ratio * $potPoints;
+                    $winnings = floor($ratio * $potPoints);
                 } else {
                     $winnings = $potPoints;
                 }
@@ -443,16 +442,16 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             $out = array();
             $keys = array('y' => 'year','m' => 'month','d' => 'day','h' => 'hour','i' => 'minute','s' => 'second');
             foreach ($keys as $key => $keyName) {
-                if ($fieldValue = $iv->format($key)) {
-                    $out[] = sprintf('%d %d', $fieldValue, plural($fieldValue, $keyName, "{$keyName}s"));
+                $fieldValue = $iv->format($key);
+                if ($fieldValue != '0' && !empty($fieldValue)) {
+                    $out[] = sprintf('%d %s', $fieldValue, plural($fieldValue, $keyName, "{$keyName}s"));
                 }
             }
             $elapsedStr = implode(', ', $out);
             $message = sprintf(T("Discussion took <b>%s</b> to recycle."), $elapsedStr)."<br/>";
-            $message .= "<br/>";
 
             $winnerDiffPoints = $potPoints - $winnerPotPoints;
-            $winnerDiffPerc = round(($winnerDiffPoints / $winnerPotPoints) * 100, 0);
+            $winnerDiffPerc = abs(round(($winnerDiffPoints / $winnerPotPoints) * 100, 0));
 
             $winnerCount = count($winners);
             $message .= sprintf(T("There %s %d %s, earning about %d%% %s points than they wagered."),
@@ -466,13 +465,13 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
             $message .= sprintf("<b>%s</b><br/>", plural($winnerCount, 'Winner', 'Winners'));
             foreach ($winners as $winningWager) {
-                $message .= formatString(T("{User,Mention} bet {Points} points and received <b>{Winnings}</b>"), $winningWager)."<br/>";
+                $message .= formatString(T("{User.UserID,Mention}, who bet {Points} points and received <b>{Winnings}</b>"), $winningWager)."<br/>";
             }
 
             if ($haveRunnersUp) {
                 $message .= sprintf("<b>%s</b><br/>", plural($winnerCount, 'Runner-up', 'Runners-up'));
                 foreach ($runnersUp as $ruWager) {
-                    $message .= formatString(T("{User,Mention} bet {Points} points and recovered <b>{Winnings}</b>"), $ruWager)."<br/>";
+                    $message .= formatString(T("{User.UserID,Mention}, who bet {Points} points and recovered <b>{Winnings}</b>"), $ruWager)."<br/>";
                 }
             }
 
