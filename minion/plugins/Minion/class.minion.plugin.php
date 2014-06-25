@@ -2088,6 +2088,7 @@ EOT;
                 $messageText = T("Negative {User.Name}");
                 break;
 
+            case 'custom':
             default:
                 $messageText = "{$command}";
                 break;
