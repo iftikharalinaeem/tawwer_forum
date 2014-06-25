@@ -263,7 +263,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
         // Stop caring about posts in here
         MinionPlugin::instance()->monitor($discussion, array(
-            'ThreadCycle' => true
+            'ThreadCycle' => false
         ));
 
         // Handle betting
@@ -351,8 +351,19 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         $wagers = Gdn::userMetaModel()->getWhere(array(
             'Name' => $wagerKey
         ))->resultArray();
-        if (!count($wagers)) {
+        $countWagers = count($wagers);
+        if (!$countWagers) {
             return false;
+        }
+
+        // If only one person bet, don't take their money.
+        if ($countWagers < 2) {
+            $mode = 'return';
+
+            // Message thread
+            MinionPlugin::instance()->message(null, $discussion, T("Not enough bets, returning points."), array(
+                'Inform' => false
+            ));
         }
 
         if ($mode == 'pay') {
@@ -444,7 +455,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             $out = array();
             foreach ($t as $tKey => $tVal) {
                 if (!empty($tVal)) {
-                    $out[] = sprintf('%d %s', $fieldValue, plural($fieldValue, rtrim($tKey,'s'), $tKey));
+                    $out[] = sprintf('%d %s', $tVal, plural($fieldValue, rtrim($tKey,'s'), $tKey));
                 }
             }
             $elapsedStr = implode(', ', $out);
