@@ -642,10 +642,6 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                     ));
                 }
             }
-
-            if (in_array($state['CompareToken'], array('for', 'because', 'with', 'on'))) {
-                $sender->consumeUntilNextKeyword($state, 'For', false, true);
-            }
         }
     }
 
