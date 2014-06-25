@@ -604,6 +604,10 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         if ($threadCycle) {
             if (!$state['Method'] && in_array($state['CompareToken'], array('wager', 'bet'))) {
                 $sender->consume($state, 'Method', 'cyclewager');
+
+                if (is_null($state['Toggle'])) {
+                    $state['Toggle'] = MinionPlugin::TOGGLE_ON;
+                }
             }
         }
 
@@ -623,18 +627,24 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         }
 
         // Gather wager
-        if (val('Method', $state) == 'cyclewager' && in_array($state['CompareToken'], array('point', 'points'))) {
+        if (val('Method', $state) == 'cyclewager') {
+            if (in_array($state['CompareToken'], array('point', 'points'))) {
 
-            // Do a quick lookbehind
-            if (is_numeric($state['LastToken'])) {
-                $state['Targets']['Wager'] = $state['LastToken'];
-                $sender->consume($state);
-            } else {
-                $sender->consume($state, 'Gather', array(
-                    'Node' => 'Wager',
-                    'Type' => 'number',
-                    'Delta' => ''
-                ));
+                // Do a quick lookbehind
+                if (is_numeric($state['LastToken'])) {
+                    $state['Targets']['Wager'] = $state['LastToken'];
+                    $sender->consume($state);
+                } else {
+                    $sender->consume($state, 'Gather', array(
+                        'Node' => 'Wager',
+                        'Type' => 'number',
+                        'Delta' => ''
+                    ));
+                }
+            }
+
+            if (in_array($state['CompareToken'], array('for', 'because', 'with', 'on'))) {
+                $sender->consumeUntilNextKeyword($state, 'For', false, true);
             }
         }
     }
@@ -775,9 +785,6 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                     $userID = $user['UserID'];
                     $wager = $this->retrieveWager($userID, $discussionID);
 
-                    $utc = new DateTimeZone('utc');
-                    $now = new DateTime('now', $utc);
-
                     $toggle = val('Toggle', $state, MinionPlugin::TOGGLE_ON);
                     if (is_null($toggle)) {
                         $toggle = MinionPlugin::TOGGLE_ON;
@@ -819,6 +826,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         if (!array_key_exists('Time', $state)) {
                             throw new Exception(T("You didn't supply a valid time!"));
                         }
+                        $wagerTime = trim($state['Time'], ' .,!?/\\#@');
 
                         // Note that we're modifying an existing wager
                         $modify = false;
@@ -826,7 +834,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                             $modify = true;
                         }
 
-                        $newWagerPoints = $state['Targets']['Wager'];
+                        $newWagerPoints = round($state['Targets']['Wager'], 0);
                         if ($newWagerPoints < ($wagerMinimum = C('Minion.ThreadCycle.Wager.Minimum', 50))) {
                             throw new Exception(sprintf(T("Proposed wager is too low, you much risk at least <b>%d %s</b>"), $wagerMinimum, plural($wagerMinimum, 'point', 'points')));
                         }
@@ -850,17 +858,13 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         }
 
                         // Build the wager
-                        $wagerTimeString = $state['Time'];
-                        $wagerTimeInterval = DateInterval::createFromDateString($wagerTimeString);
+                        $wagerTimeString = $wagerTime;
 
-                        $wagerDate = clone $now;
-                        $wagerDate->add($wagerTimeInterval);
                         $newWager = array(
                             'Points' => $newWagerPoints,
                             'Date' => date('Y-m-d H:i:s'),
                             'For' => abs(strtotime($wagerTimeString) - time()),
-                            'ForStr' => $wagerTimeString,
-                            'EndTime' => $wagerDate->getTimestamp()
+                            'ForStr' => $wagerTimeString
                         );
                         $this->storeWager($userID, $discussionID, $newWager);
 
