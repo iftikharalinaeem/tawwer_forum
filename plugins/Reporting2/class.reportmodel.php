@@ -113,7 +113,7 @@ class ReportModel extends Gdn_Model {
             $discussion = array(
                 'Name' => sprintf(T('[Reported] %s', "%s"),
                     $contextDiscussion['Name'],
-                    $contextDiscussion['InsertName'],
+                    $reportedRecord['InsertName'], // Author Name
                     $contextDiscussion['Category']
                 ),
                 'Body' => sprintf(T('Report Body Format', "%s\n\n%s"),
