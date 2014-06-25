@@ -814,6 +814,9 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         }
 
                         $newWagerPoints = $state['Targets']['Wager'];
+                        if ($newWagerPoints < ($wagerMinimum = C('Minion.ThreadCycle.Wager.Minimum', 50))) {
+                            throw new Exception(sprintf(T("Proposed wager is too low, you much risk at least <b>%d %s</b>"), $wagerMinimum, plural($wagerMinimum, 'point', 'points')));
+                        }
 
                         // Don't allow negative points wagering
                         if ($newWagerPoints <= 0) {
