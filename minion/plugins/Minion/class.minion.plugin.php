@@ -698,8 +698,10 @@ class MinionPlugin extends Gdn_Plugin {
 
                     $this->fireEvent('TokenGather');
 
-                    switch (valr('Gather.Node', $state)) {
-                        case 'User':
+                    $gatherNode = valr('Gather.Node', $state);
+                    $gatherType = strtolower(valr('Gather.Type', $state, $gatherNode));
+                    switch ($gatherType) {
+                        case 'user':
 
                             $terminator = val('Terminator', $state['Gather'], false);
 
@@ -730,13 +732,13 @@ class MinionPlugin extends Gdn_Plugin {
                                 $gatherUser = Gdn::userModel()->getByUsername($checkUser);
                                 if ($gatherUser) {
                                     $state['Gather'] = false;
-                                    $state['Targets']['User'] = (array)$gatherUser;
+                                    $state['Targets'][$gatherNode] = (array)$gatherUser;
                                     break;
                                 }
                             }
                             break;
 
-                        case 'Phrase':
+                        case 'phrase':
 
                             $terminator = val('Terminator', $state['Gather'], false);
 
@@ -763,13 +765,14 @@ class MinionPlugin extends Gdn_Plugin {
                             // If we're closed, close up
                             $terminator = val('Terminator', $state['Gather'], false);
                             if (!$terminator && strlen($state['Gather']['Delta'])) {
-                                $state['Targets']['Phrase'] = trim($state['Gather']['Delta']);
+                                $state['Targets'][$gatherNode] = trim($state['Gather']['Delta']);
                                 $state['Gather'] = false;
                                 break;
                             }
                             break;
 
-                        case 'Page':
+                        case 'page':
+                        case 'number':
 
                             // Add token
                             if (strlen($state['Gather']['Delta'])) {
@@ -781,7 +784,7 @@ class MinionPlugin extends Gdn_Plugin {
                             // If we're closed, close up
                             $currentDelta = trim($state['Gather']['Delta']);
                             if (strlen($currentDelta) && is_numeric($currentDelta)) {
-                                $state['Targets']['Page'] = $currentDelta;
+                                $state['Targets'][$gatherNode] = $currentDelta;
                                 break;
                             }
                             $state['Gather'] = false;
@@ -792,6 +795,7 @@ class MinionPlugin extends Gdn_Plugin {
                         $state['Gather'] = false;
                         continue;
                     }
+
                 } else {
 
                     /*
@@ -908,6 +912,7 @@ class MinionPlugin extends Gdn_Plugin {
                     if (in_array($state['CompareToken'], $this->user_triggers)) {
                         $this->consume($state, 'Gather', array(
                             'Node' => 'User',
+                            'Type' => 'user',
                             'Delta' => '',
                             'Terminator' => '"'
                         ));
@@ -918,6 +923,7 @@ class MinionPlugin extends Gdn_Plugin {
                             $state['Token'] = substr($state['Token'], 1);
                             $state['Gather'] = array(
                                 'Node' => 'User',
+                                'Type' => 'user',
                                 'Delta' => ''
                             );
 
@@ -941,6 +947,7 @@ class MinionPlugin extends Gdn_Plugin {
                     if ($state['Method'] == 'phrase' && !isset($state['Targets']['Phrase'])) {
                         $this->consume($state, 'Gather', array(
                             'Node' => 'Phrase',
+                            'Type' => 'phrase',
                             'Delta' => ''
                         ));
                     }
@@ -956,13 +963,14 @@ class MinionPlugin extends Gdn_Plugin {
                         } else {
                             $this->consume($state, 'Gather', array(
                                 'Node' => 'Page',
+                                'Type' => 'number',
                                 'Delta' => ''
                             ));
                         }
                     }
 
                     /*
-                     * FOR
+                     * FOR, BECAUSE
                      */
 
                     if (in_array($state['CompareToken'], array('for', 'because'))) {
@@ -1133,8 +1141,9 @@ class MinionPlugin extends Gdn_Plugin {
      * @param array $state
      */
     public static function parseFor(&$state) {
-        if (!array_key_exists('For', $state))
+        if (!array_key_exists('For', $state)) {
             return;
+        }
 
         $reasons = array();
         $unset = array();
@@ -2058,10 +2067,15 @@ EOT;
      * @param string $command
      * @param string $type Optional, 'positive' or 'negative'
      * @param array $user Optional, who should we acknowledge?
+     * @param array Optional, options to pass to message()
      */
-    public function acknowledge($discussion, $command, $type = 'positive', $user = null) {
+    public function acknowledge($discussion, $command, $type = 'positive', $user = null, $options = null) {
         if (is_null($user)) {
             $user = (array)Gdn::session()->User;
+        }
+
+        if (!is_array($options)) {
+            $options = array();
         }
 
         $messageText = null;
@@ -2084,7 +2098,7 @@ EOT;
             'Discussion' => $discussion,
             'Command' => $command
         ));
-        $this->message($user, $discussion, $messageText);
+        $this->message($user, $discussion, $messageText, $options);
     }
 
     /**
@@ -2168,6 +2182,7 @@ EOT;
         $format = val('Format', $options, true);
         $postAs = val('PostAs', $options, 'minion');
         $inform = val('Inform', $options, true);
+        $writeComment = val('Comment', $options, true);
         $inputFormat = val('InputFormat', $options, 'Html');
 
         if (is_numeric($user)) {
@@ -2196,49 +2211,52 @@ EOT;
             ));
         }
 
-        $minionCommentID = null;
-        if ($message) {
-
-            // Temporarily become Minion
-            $sessionUser = Gdn::session()->User;
-            $sessionUserID = Gdn::session()->UserID;
-
-            if ($postAs == 'minion') {
-                $postAsUser = (object)$this->minion();
-                $postAsUserID = $this->minionUserID;
-            } else {
-                $postAsUser = (object)$postAs;
-                $postAsUserID = val('UserID', $postAsUser);
-            }
-            Gdn::session()->User = $postAsUser;
-            Gdn::session()->UserID = $postAsUserID;
-
-            $minionCommentID = $commentModel->save($comment = array(
-                'DiscussionID' => $discussionID,
-                'Body' => $message,
-                'Format' => $inputFormat,
-                'InsertUserID' => $postAsUserID
-            ));
-
-            if ($minionCommentID) {
-                $commentModel->Save2($minionCommentID, true);
-                $comment = $commentModel->getID($minionCommentID, DATASET_TYPE_ARRAY);
-            }
-
-            // Become normal again
-            Gdn::session()->User = $sessionUser;
-            Gdn::session()->UserID = $sessionUserID;
-        }
-
-        if ($inform && Gdn::Controller() instanceof Gdn_Controller) {
+        if ($inform && Gdn::controller() instanceof Gdn_Controller) {
             $informMessage = Gdn_Format::To($message, 'Html');
-            Gdn::Controller()->informMessage($informMessage);
+            Gdn::controller()->informMessage($informMessage);
         }
 
-        if ($message && $comment) {
-            return $comment;
+        if ($writeComment) {
+            $minionCommentID = null;
+            if ($message) {
+
+                // Temporarily become Minion
+                $sessionUser = Gdn::session()->User;
+                $sessionUserID = Gdn::session()->UserID;
+
+                if ($postAs == 'minion') {
+                    $postAsUser = (object)$this->minion();
+                    $postAsUserID = $this->minionUserID;
+                } else {
+                    $postAsUser = (object)$postAs;
+                    $postAsUserID = val('UserID', $postAsUser);
+                }
+                Gdn::session()->User = $postAsUser;
+                Gdn::session()->UserID = $postAsUserID;
+
+                $minionCommentID = $commentModel->save($comment = array(
+                    'DiscussionID' => $discussionID,
+                    'Body' => $message,
+                    'Format' => $inputFormat,
+                    'InsertUserID' => $postAsUserID
+                ));
+
+                if ($minionCommentID) {
+                    $commentModel->Save2($minionCommentID, true);
+                    $comment = $commentModel->getID($minionCommentID, DATASET_TYPE_ARRAY);
+                }
+
+                // Become normal again
+                Gdn::session()->User = $sessionUser;
+                Gdn::session()->UserID = $sessionUserID;
+            }
+
+            if ($comment) {
+                return $comment;
+            }
         }
-        return false;
+
+        return true;
     }
 
     /**
