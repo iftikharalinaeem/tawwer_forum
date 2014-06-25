@@ -748,7 +748,36 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                     $now = new DateTime('now', $utc);
 
                     $toggle = val('Toggle', $state, MinionPlugin::TOGGLE_ON);
-                    if ($toggle == MinionPlugin::TOGGLE_ON) {
+                    if (is_null($toggle)) {
+                        $toggle = MinionPlugin::TOGGLE_ON;
+                    }
+                    if ($toggle == MinionPlugin::TOGGLE_OFF) {
+
+                        if (!$wager) {
+                            throw new Exception(T("You do not currently have a cycle wager in this discussion."));
+                        }
+
+                        // Cancel wager
+                        $this->storeWager($userID, $discussionID, null);
+                        //Gdn::userMetaModel()->setUserMeta($userID, $wagerKey, null);
+
+                        // Give points back
+                        $wagerPoints = val('Points', $wager, 0);
+                        if ($wagerPoints) {
+                            $user['Points'] += $wagerPoints;
+                            Gdn::userModel()->save($user);
+                        }
+
+                        // Acknowledge the user
+                        $acknowledge = T("Your wager of <b>%d points</b> for '%s' has been <b>cancelled</b>.");
+                        $acknowledged = sprintf($acknowledge, $wagerPoints, $wager['ForStr']);
+                        $sender->acknowledge($discussion, $acknowledged, 'positive', $user, array(
+                            'Inform' => true,
+                            'Comment' => false
+                        ));
+
+                    } else {
+
 
                         // We require a wager!
                         if (!array_key_exists('Wager', $state['Targets'])) {
@@ -809,31 +838,6 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         // Acknowledge the user
                         $acknowledge = T("Your wager of <b>%d points</b> for '%s' has been entered!");
                         $acknowledged = sprintf($acknowledge, $newWagerPoints, $wagerTimeString);
-                        $sender->acknowledge($discussion, $acknowledged, 'positive', $user, array(
-                            'Inform' => true,
-                            'Comment' => false
-                        ));
-
-                    } else {
-
-                        if (!$wager) {
-                            throw new Exception(T("You do not currently have a cycle wager in this discussion."));
-                        }
-
-                        // Cancel wager
-                        $this->storeWager($userID, $discussionID, null);
-                        //Gdn::userMetaModel()->setUserMeta($userID, $wagerKey, null);
-
-                        // Give points back
-                        $wagerPoints = val('Points', $wager, 0);
-                        if ($wagerPoints) {
-                            $user['Points'] += $wagerPoints;
-                            Gdn::userModel()->save($user);
-                        }
-
-                        // Acknowledge the user
-                        $acknowledge = T("Your wager of <b>%d points</b> for '%s' has been <b>cancelled</b>.");
-                        $acknowledged = sprintf($acknowledge, $wagerPoints, $wager['ForStr']);
                         $sender->acknowledge($discussion, $acknowledged, 'positive', $user, array(
                             'Inform' => true,
                             'Comment' => false

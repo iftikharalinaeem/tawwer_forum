@@ -190,7 +190,7 @@ class MinionPlugin extends Gdn_Plugin {
         // Define toggle triggers
         $this->toggle_triggers = array(
             self::TOGGLE_ON => t('Minion.Trigger.Toggles.On', array('open', 'enable', 'unlock', 'allow', 'allowed', 'on', 'start')),
-            self::TOGGLE_OFF => t('Minion.Trigger.Toggles.Off', array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off', 'revoke', 'stop'))
+            self::TOGGLE_OFF => t('Minion.Trigger.Toggles.Off', array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off', 'revoke', 'stop', 'cancel'))
         );
 
         // Define force triggers
@@ -954,7 +954,7 @@ class MinionPlugin extends Gdn_Plugin {
 
                     // Gather a page
 
-                    if (val('Method', $state) == 'thread' && val('Toggle', $state) == 'off' && in_array($state['CompareToken'], array('pages', 'page'))) {
+                    if (val('Method', $state) == 'thread' && val('Toggle', $state) == MinionPlugin::TOGGLE_OFF && in_array($state['CompareToken'], array('pages', 'page'))) {
 
                         // Do a quick lookbehind
                         if (is_numeric($state['LastToken'])) {
@@ -1354,7 +1354,7 @@ class MinionPlugin extends Gdn_Plugin {
                 $discussionID = $state['Targets']['Discussion']['DiscussionID'];
                 $discussion = $state['Targets']['Discussion'];
 
-                if ($state['Toggle'] == 'off') {
+                if ($state['Toggle'] == MinionPlugin::TOGGLE_OFF) {
 
                     if (!$closed) {
 
@@ -1396,7 +1396,7 @@ class MinionPlugin extends Gdn_Plugin {
                     }
                 }
 
-                if ($state['Toggle'] == 'on') {
+                if ($state['Toggle'] == MinionPlugin::TOGGLE_ON) {
 
                     // Force remove future close
                     $threadClose = $this->monitoring($discussion, 'ThreadClose', false);
@@ -1504,7 +1504,7 @@ class MinionPlugin extends Gdn_Plugin {
                 $bannedPhrases = $this->monitoring($state['Targets']['Discussion'], 'Phrases', array());
 
                 // Ban the phrase
-                if ($state['Toggle'] == 'off') {
+                if ($state['Toggle'] == MinionPlugin::TOGGLE_OFF) {
                     $bannedPhrases[$phrase] = array(
                         'Reason' => $reason,
                         'Expires' => $expires
@@ -1532,7 +1532,7 @@ class MinionPlugin extends Gdn_Plugin {
                 }
 
                 // Allow the phrase
-                if ($state['Toggle'] == 'on') {
+                if ($state['Toggle'] == MinionPlugin::TOGGLE_ON) {
                     if (!array_key_exists($phrase, $bannedPhrases)) {
                         return;
                     }
@@ -1601,7 +1601,7 @@ class MinionPlugin extends Gdn_Plugin {
                 $user = $state['Targets']['User'];
 
                 $force = val('Force', $state, 'normal');
-                if ($state['Toggle'] == 'on') {
+                if ($state['Toggle'] == MinionPlugin::TOGGLE_ON) {
 
                     $accessLevel = null;
                     if ($force == 'unrestricted') {
@@ -1615,7 +1615,7 @@ class MinionPlugin extends Gdn_Plugin {
 
                     $this->setUserMeta($user['UserID'], 'Access', $accessLevel);
                     $acknowledge = T(" @\"{User.Name}\" has been granted {Force} level access to command structures.");
-                } else if ($state['Toggle'] == 'off') {
+                } else if ($state['Toggle'] == MinionPlugin::TOGGLE_OFF) {
                     $this->setUserMeta($user['UserID'], 'Access', false);
                     $acknowledge = T(" @\"{User.Name}\" is forbidden from accessing command structures.");
                 } else {
