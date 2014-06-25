@@ -194,14 +194,14 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         if ($quote) {
-            $content = "{$context}<br/><br/>{$location}";
+            $content = sprintf(T('Re: %s'), "{$location}<br/>{$context}");
 
             $issuer = Gdn::userModel()->getID($warning['InsertUserID'], DATASET_TYPE_ARRAY);
             $content .= "<br/>";
-            $content .= '<strong>By:</strong> '.userAnchor($issuer);
+            $content .= wrap(T('Moderator'), 'strong').' '.userAnchor($issuer);
             $content .= "<br/>";
-            $content .= '<strong>Points:</strong> '.$warning['Points'];
-            
+            $content .= wrap(T('Points'), 'strong').' '.$warning['Points'];
+
             echo wrap($content, 'div', array(
                 'class' => 'WarningContext'
             ));
@@ -345,11 +345,11 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
         echo '</b>';
 
-        echo "<ul>
-   <li>Can't post discussions.</li>
-   <li>Can't post as often.</li>
-   <li>Signature hidden.</li>
-</ul>";
+        echo "<ul>";
+        echo wrap(T("Can't post discussions.")."\n", 'li');
+        echo wrap(T("Can't post as often.")."\n",'li');
+        echo wrap(T("Signature hidden.")."\n",'li');
+        echo "</ul>";
 
         echo '</div>';
     }
