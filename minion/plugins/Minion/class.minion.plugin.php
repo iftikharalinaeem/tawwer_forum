@@ -977,9 +977,15 @@ class MinionPlugin extends Gdn_Plugin {
                         $this->consumeUntilNextKeyword($state, 'For', false, true);
                     }
 
-                    $this->consumeUntilNextKeyword($state);
-
+                    /*
+                     * Allow consume overrides in plugins
+                     */
                     $this->fireEvent('Token');
+
+                    /*
+                     * Consume any standing consumption orders
+                     */
+                    $this->consumeUntilNextKeyword($state);
                 }
 
                 // Get a new token
@@ -1076,6 +1082,7 @@ class MinionPlugin extends Gdn_Plugin {
      *
      * @param array $state
      * @param string $setting Optional. Start new consumption
+     * @param boolean $inclusive Whether to include current token or skip to the next
      * @param boolean $multi Create multiple entries if the same keyword is consumed multiple times?
      */
     public function consumeUntilNextKeyword(&$state, $setting = null, $inclusive = false, $multi = false) {
@@ -1084,8 +1091,10 @@ class MinionPlugin extends Gdn_Plugin {
 
             // Cleanup existing Consume
             if ($state['Consume'] !== false) {
-                $state['Consume']['Container'] = trim($state['Consume']['Container']);
-                $state['Consume'] = false;
+                if ($state['Consume']['Setting'] != $setting) {
+                    $state['Consume']['Container'] = trim($state['Consume']['Container']);
+                    $state['Consume'] = false;
+                }
             }
 
             // What setting are we consuming for?
