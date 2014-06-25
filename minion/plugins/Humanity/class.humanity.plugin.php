@@ -135,7 +135,7 @@ class HumanityPlugin extends Gdn_Plugin {
    public function Gdn_Dispatcher_BeforeDispatch_Handler($sender) {
       $path = $sender->EventArguments['Request']->path();
       if (preg_match('`^/?humanity`i', $path)) {
-         require_once($this->getResource('class.humanitycontroller.php'));
+         require_once($this->getResource('controllers/class.humanitycontroller.php'));
       }
    }
 
