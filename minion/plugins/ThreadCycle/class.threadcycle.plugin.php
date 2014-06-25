@@ -199,7 +199,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             }
 
             // No offline users
-            $userOnline = OnlinePlugin::Instance()->GetUser($commenter['UserID']);
+            $userOnline = OnlinePlugin::instance()->getUser($commenter['UserID']);
             if (!$userOnline) {
                 continue;
             }
@@ -394,7 +394,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                     $returnPoints = $rWager['Points'] * $rakeMultiple;
                     $rUser = Gdn::userModel()->getID($rWager['UserID'], DATASET_TYPE_ARRAY);
                     $rUser['Points'] += $returnPoints;
-                    Gdn::userModel()->save($rUser);
+                    Gdn::userModel()->setField($rUser['UserID'], $rUser['Points']);
 
                     $rWager['Winnings'] = $returnPoints;
                     $rWager['User'] = $rUser;
@@ -421,7 +421,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 }
                 $wUser = Gdn::userModel()->getID($wWager['UserID'], DATASET_TYPE_ARRAY);
                 $wUser['Points'] += $winnings;
-                Gdn::userModel()->save($wUser);
+                Gdn::userModel()->setField($wUser['UserID'], $wUser['Points']);
 
                 // Modify for formatting
                 $wWager['Winnings'] = $winnings;
@@ -482,7 +482,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 $wager = json_decode($wagerRow['Value'], true);
                 $lUser = Gdn::userModel()->getID($wagerRow['UserID'], DATASET_TYPE_ARRAY);
                 $lUser['Points'] += $wager['Points'];
-                Gdn::userModel()->save($lUser);
+                Gdn::userModel()->setField($lUser['UserID'], $lUser['Points']);
             }
 
         }
@@ -765,7 +765,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         $wagerPoints = val('Points', $wager, 0);
                         if ($wagerPoints) {
                             $user['Points'] += $wagerPoints;
-                            Gdn::userModel()->save($user);
+                            Gdn::userModel()->setField($userID, 'Points', $user['Points']);
                         }
 
                         // Acknowledge the user
@@ -833,7 +833,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         // Update user points
                         $newUserPoints = $myPoints - $newWagerPoints;
                         $user['Points'] = $newUserPoints;
-                        Gdn::userModel()->save($user);
+                        Gdn::userModel()->setField($userID, 'Points', $user['Points']);
 
                         // Acknowledge the user
                         $acknowledge = T("Your wager of <b>%d points</b> for '%s' has been entered!");
