@@ -17,7 +17,7 @@
    position: absolute;
    height: 100%;
    width: 100%;
-   
+
    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='.myBackground.jpg', sizingMethod='scale');
    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='myBackground.jpg', sizingMethod='scale')";
    -webkit-background-size: cover;
@@ -51,13 +51,13 @@
 .Item-Row {
    float: left;
    width: 100%;
-   
+
    &:hover {
       .Options {
          visibility: visible;
       }
    }
-   
+
    .DataList & {
       padding-left: 4px;
       padding-right: 4px;
@@ -69,15 +69,15 @@
    @include box-sizing(border-box);
    padding-left: 4px;
    padding-right: 4px;
-   
+
    .Media {
       margin: 0;
    }
-   
+
    .Options {
       visibility: hidden;
       margin-right: 8px;
-      
+
       .Sprite {
          display: inline-block;
          height: 16px;
@@ -91,7 +91,7 @@
       width: 32px;
       height: 32px;
    }
-   
+
    .Media-Body, .Meta {
       line-height: 16px;
       font-size: 11px;
@@ -117,15 +117,16 @@
    color: #07f;
 }
 
-.NoteType-warning {
+.NoteType-warning,
+.NoteType-ban {
    color: #d00;
 }
 
-.Post {
-   :first-child {
+.Warning-Body {
+   > *:first-child {
       margin-top: 0;
    }
-   :last-child {
+   > *:last-child {
       margin-bottom: 0;
    }
 }

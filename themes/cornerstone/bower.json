@@ -1,25 +1,11 @@
 {
-  "name": "cornerstone",
-  "version": "1.0.0",
-  "authors": [
-    "Kasper Kronborg Isager <kasper@vanillaforums.com>"
-  ],
-  "description": "TODO",
-  "license": "GPLv3",
-  "homepage": "https://vanillaforums.com",
+  "name": "vanilla-cornerstone",
   "private": true,
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
   "dependencies": {
     "font-vanillicon": "*",
     "normalize-less": "*",
     "preboot": "*",
-    "iCheck": "1.0.x"
+    "iCheck": "2.x-beta"
   },
   "overrides": {
     "preboot": {

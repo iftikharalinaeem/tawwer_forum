@@ -110,6 +110,12 @@ class OnlinePlugin extends Gdn_Plugin {
    const CACHE_ONLINE_MODULE_KEY = 'plugin.online.%s.%s.module';
 
    /**
+    * Cache list of online users temporarily to aleviate database
+    * @const string
+    */
+   const CACHE_ONLINE_LIST_KEY = 'plugin.online.users.list';
+
+   /**
     * Names of cookies and cache keys for tracking guests.
     * @const string
     */
@@ -135,9 +141,9 @@ class OnlinePlugin extends Gdn_Plugin {
       $this->cacheCountDelay = C('Plugins.Online.CacheCountDelay', 20);
       $this->cacheRenderDelay = C('Plugins.Online.CacheRenderDelay', 30);
 
-      $UTC = new DateTimeZone('UTC');
-      $CurrentDate = new DateTime('now', $UTC);
-      self::$now = $CurrentDate->getTimestamp();
+      $utc = new DateTimeZone('UTC');
+      $now = new DateTime('now', $utc);
+      self::$now = $now->getTimestamp();
    }
 
    /**
@@ -187,6 +193,9 @@ class OnlinePlugin extends Gdn_Plugin {
             $this->trackActiveUser(true);
             break;
       }
+
+      // Cleanup some entries maybe
+      $this->cleanup();
    }
 
    /**
@@ -380,7 +389,7 @@ class OnlinePlugin extends Gdn_Plugin {
          $location = OnlinePlugin::whereAmI();
 
          // Get the extra data we pushed into the tick with our events
-         $tickExtra = @json_decode(Gdn::request()->getValue('TickExtra'), true);
+         $tickExtra = json_decode(Gdn::request()->getValue('TickExtra'), true);
          if (!is_array($tickExtra)) $tickExtra = array();
 
          // Get the user's cache supplement
@@ -419,17 +428,18 @@ class OnlinePlugin extends Gdn_Plugin {
          // If there are, write the new one to the cache
          $userSupplementHash = md5(serialize($userOnlineSupplement));
          $supplementHash = md5(serialize($onlineSupplement));
-         if ($userSupplementHash != $supplementHash)
+         if ($userSupplementHash != $supplementHash) {
             Gdn::cache()->store($userOnlineSupplementKey, $onlineSupplement, array(
                Gdn_Cache::FEATURE_EXPIRY  => ($this->pruneDelay * 2)
             ));
+         }
       }
 
       // Now check if we need to update the user's status in the Online table
       $userLastWriteKey = sprintf(self::CACHE_LAST_WRITE_KEY, $userID);
       $userLastWrite = Gdn::cache()->get($userLastWriteKey);
 
-      $lastWriteDelay = time() - $userLastWrite;
+      $lastWriteDelay = self::$now - $userLastWrite;
       if ($lastWriteDelay < $this->writeDelay)
          return;
 
@@ -442,8 +452,8 @@ class OnlinePlugin extends Gdn_Plugin {
       $sql = "INSERT INTO {$px}Online (UserID, Name, Timestamp) VALUES (:UserID, :Name, :Timestamp) ON DUPLICATE KEY UPDATE Timestamp = :Timestamp1";
       Gdn::database()->query($sql, array(':UserID' => $userID, ':Name' => $userName, ':Timestamp' => $timestamp, ':Timestamp1' => $timestamp));
 
-      // Cleanup some entries
-      $this->cleanup();
+      // Remember that we've written to the DB
+      Gdn::cache()->store($userLastWriteKey, self::$now);
    }
 
    /*
@@ -504,20 +514,20 @@ class OnlinePlugin extends Gdn_Plugin {
     */
    public function cleanup($limit = 0) {
       $lastCleanup = Gdn::cache()->get(self::CACHE_CLEANUP_DELAY_KEY);
-      $lastCleanupDelay = time() - $lastCleanup;
-      if ($lastCleanupDelay < $this->cleanDelay)
+      $lastCleanupDelay = self::$now - $lastCleanup;
+      if ($lastCleanup && $lastCleanupDelay < $this->cleanDelay)
          return;
 
       Trace('OnlinePlugin->Cleanup');
       // How old does an entry have to be to get pruned?
       $pruneTimestamp = self::$now - $this->pruneDelay;
 
-      $px = Gdn::database()->DatabasePrefix;
-      $sql = "DELETE FROM {$px}Online WHERE Timestamp < :Timestamp";
-      if ($limit > 0)
-         $sql .= " LIMIT {$limit}";
+      Gdn::sql()->delete('Online', array(
+         'Timestamp<' => Gdn_Format::toDateTime($pruneTimestamp)
+      ));
 
-      Gdn::database()->query($sql, array(':Timestamp' => Gdn_Format::toDateTime($pruneTimestamp)));
+      // Remember that we've cleaned up the DB
+      Gdn::cache()->store(self::CACHE_CLEANUP_DELAY_KEY, self::$now);
    }
 
    /**
@@ -535,6 +545,9 @@ class OnlinePlugin extends Gdn_Plugin {
          $allOnlineUsers = array();
          try {
             $allOnlineUsersResult = Gdn::sql()
+               ->cache(self::CACHE_ONLINE_LIST_KEY, 'get', array(
+                  Gdn_Cache::FEATURE_EXPIRY => 30
+               ))
                ->select('UserID, Timestamp')
                ->from('Online')
                ->get();
@@ -1076,7 +1089,7 @@ class OnlinePlugin extends Gdn_Plugin {
       Gdn::structure()->table('Online')
          ->column('UserID', 'int(11)', false, 'primary')
          ->column('Name', 'varchar(64)', null)
-         ->column('Timestamp', 'datetime')
+         ->column('Timestamp', 'datetime', false, 'index')
          ->set(false, false);
    }
 }

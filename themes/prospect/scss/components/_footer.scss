@@ -1,0 +1,14 @@
+//
+// # Footer
+//
+// No styleguide reference.
+
+.site-footer {
+  padding: $line-height-base;
+  margin-top: ($line-height-base * 2);
+  border-top: #eee solid 1px;
+
+  p {
+    margin-bottom: 0;
+  }
+}

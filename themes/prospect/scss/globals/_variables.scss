@@ -1,0 +1,79 @@
+//
+// # Variables
+//
+// No styleguide reference.
+
+// ## Colors
+//
+// No styleguide reference.
+
+$black: #000;
+$white: #fff;
+
+$brand-primary: #2e9df7;
+
+// ## Scaffolding
+//
+// No styleguide reference.
+
+$body-bg    : $white !default;
+$text-color : #444 !default;
+
+$link-color       : $brand-primary;
+$link-hover-color : darken($link-color, 15%);
+
+$border-radius-base: 3px;
+
+// ## Typography
+//
+// No styleguide reference.
+
+$font-family-sans-serif : Lato, Helvetica, Arial, sans-serif !default;
+$font-family-base       : $font-family-sans-serif !default;
+
+$font-size-base    : 15px !default;
+$line-height-base  : 22px !default;
+$line-height-ratio : ($line-height-base / $font-size-base) !default;
+
+$heading-font-family : inherit !default;
+$heading-font-weight : 700 !default;
+$heading-color       : #222 !default;
+
+// ## Buttons
+//
+// No styleguide reference.
+
+$button-default-color : $white;
+$button-default-bg    : $brand-primary;
+
+// ## Navigation
+//
+// No styleguide reference.
+
+$navbar-color  : #444 !default;
+$navbar-bg     : $white !default;
+$navbar-border : #e5e5e5 !default;
+
+$navbar-link-color       : $white !default;
+$navbar-link-hover-color : #fafafa !default;
+
+$navbar-brand-font-size : 18px !default;
+$navbar-brand-color     : #666 !default;
+
+// ## Masthead
+//
+// No styleguide reference.
+
+$masthead-color : $white !default;
+$masthead-bg    : $brand-primary !default;
+
+// ## Grid
+//
+// No styleguide reference.
+
+$grid-columns: 16;
+$max-width: 1020px;
+$column: 50px;
+$gutter: 100px;
+//$visual-grid: true;
+$visual-grid-index: 'front';

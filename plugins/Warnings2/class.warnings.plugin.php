@@ -8,7 +8,7 @@
 $PluginInfo['Warnings2'] = array(
    'Name' => 'Warnings & Notes',
    'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-   'Version' => '2.0a',
+   'Version' => '2.1b',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -55,6 +55,58 @@ class Warnings2Plugin extends Gdn_Plugin {
    }
    
    /// Event Handlers ///
+
+   /**
+    *
+    * Hijack ban notifications and add a note instead.
+    *
+    * @param ActivityModel $Sender
+    * @param array $Args
+    */
+   public function ActivityModel_BeforeSave_Handler($Sender, $Args) {
+      if (!isset($Args['Activity']))
+         return;
+
+      $Activity =& $Args['Activity'];
+      if (!is_array($Activity))
+         return;
+
+      $ActivityType = strtolower(GetValue('ActivityType', $Activity));
+      if (strcasecmp($ActivityType, 'ban') !== 0) {
+         return;
+      }
+
+      $Data = $Activity['Data'];
+      if (is_string($Data)) {
+         $Data = @unserialize($Data);
+      }
+
+      $body = val('Story', $Activity);
+      if (val('Unban', $Data)) {
+         $type = 'unban';
+         if (!$body) {
+            $body = T('User was unbanned.');
+         }
+      } else {
+         $type = 'ban';
+         if (!$body) {
+            $body = T('User was banned.');
+         }
+      }
+
+      $model = new UserNoteModel();
+      $row = array(
+         'Type' => $type,
+         'UserID' => val('ActivityUserID', $Activity),
+         'Body' => $body,
+         'Format' => val('Format', $Activity, 'text'),
+         'InsertUserID' => val('RegardingUserID', $Activity, Gdn::Session()->UserID),
+      );
+      $id = $model->Save($row);
+
+      // Don't save the activity.
+      $Args['Handled'] = true;
+   }
 
    /**
     * Show if this post triggered a warning to give moderators context.
@@ -334,7 +386,7 @@ class Warnings2Plugin extends Gdn_Plugin {
       $Sender->_SetBreadcrumbs(T('Notes'), UserUrl($Sender->User, '', 'notes'));
       $Sender->SetTabView('Notes', 'Notes', '', 'plugins/Warnings2');
       
-      list($Offset, $Limit) = OffsetLimit($Page, 10);
+      list($Offset, $Limit) = OffsetLimit($Page, 30);
       
       $UserNoteModel = new UserNoteModel();
       $Notes = $UserNoteModel->GetWhere(

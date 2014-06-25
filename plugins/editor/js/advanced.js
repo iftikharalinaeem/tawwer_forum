@@ -42,21 +42,39 @@ var wysihtml5ParserRules = {
         "post-clear-left": 1,
         "post-clear-right": 1,
         "post-color-aqua": 1,
+        "post-highlightcolor-aqua": 1,
         "post-color-black": 1,
+        "post-highlightcolor-black": 1,
         "post-color-blue": 1,
+        "post-highlightcolor-blue": 1,
         "post-color-fuchsia": 1,
+        "post-highlightcolor-fuchsia": 1,
         "post-color-gray": 1,
+        "post-highlightcolor-gray": 1,
         "post-color-green": 1,
+        "post-highlightcolor-green": 1,
         "post-color-lime": 1,
+        "post-highlightcolor-lime": 1,
         "post-color-maroon": 1,
+        "post-highlightcolor-maroon": 1,
         "post-color-navy": 1,
+        "post-highlightcolor-navy": 1,
         "post-color-olive": 1,
+        "post-highlightcolor-olive": 1,
         "post-color-purple": 1,
+        "post-highlightcolor-purple": 1,
         "post-color-red": 1,
+        "post-highlightcolor-red": 1,
         "post-color-silver": 1,
+        "post-highlightcolor-silver": 1,
         "post-color-teal": 1,
+        "post-highlightcolor-teal": 1,
         "post-color-white": 1,
+        "post-highlightcolor-white": 1,
         "post-color-yellow": 1,
+        "post-highlightcolor-yellow": 1,
+        "post-color-orange": 1,
+        "post-highlightcolor-orange": 1,
         "post-float-left": 1,
         "post-float-right": 1,
         "post-font-size-large": 1,
@@ -76,7 +94,9 @@ var wysihtml5ParserRules = {
         "Spoiler": 1,
         "Quote": 1,
         "CodeBlock": 1,
-        "post-text-decoration-line-through": 1
+        "post-text-decoration-line-through": 1,
+        "post-font-size-h1": 1,
+        "post-font-size-h2": 1
     },
     /**
 * Tag list
@@ -232,6 +252,7 @@ var wysihtml5ParserRules = {
             "rename_tag": "div"
         },
         "h1": {
+            //"set_class": "post-font-size-h1",
             "add_class": {
                 "align": "align_text"
             }
@@ -526,7 +547,8 @@ var wysihtml5ParserRules = {
             "rename_tag": "span"
         },
         "h2": {
-            "add_class": {
+           //"set_class": "post-font-size-h2",
+           "add_class": {
                 "align": "align_text"
             }
         },

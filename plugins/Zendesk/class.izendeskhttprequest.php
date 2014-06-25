@@ -1,33 +1,35 @@
 <?php
 /**
- * @copyright 2014 Vanilla Forums Inc.
- * @license Proprietary
+ * @copyright 2009-2014 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
 /**
  * Interface IZendeskHttpRequest
  */
-interface IZendeskHttpRequest
-{
+interface IZendeskHttpRequest {
     /**
-     * @param string $name
-     * @param string $value
+     * Set Option.
+     *
+     * @param string $name Name.
+     * @param string $value Value.
      */
     public function setOption($name, $value);
 
     /**
-     * execute
+     * Execute Request.
      */
     public function execute();
 
     /**
-     * GetInfo
-     * @param string $name
+     * GetInfo.
+     *
+     * @param string $name Name.
      */
     public function getInfo($name);
 
     /**
-     * close
+     * Close.
      */
     public function close();
 }
