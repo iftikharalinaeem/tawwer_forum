@@ -529,7 +529,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
       if (!$wager) {
           return false;
       }
-      
+
       $wager = json_decode($wager, true);
       if (!$wager) {
           return false;
@@ -681,6 +681,9 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         'ThreadCycle' => null
                     ));
 
+                    // Return any bets
+                    $this->cycleWager($discussion, 'return');
+
                     $sender->acknowledge($state['Sources']['Discussion'], formatString(T("This thread will not be automatically recycled."), array(
                         'Discussion' => $discussion
                     )));
@@ -735,6 +738,11 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 $threadCycle = $sender->monitoring($discussion, 'ThreadCycle', false);
 
                 try {
+
+                    // Don't allow bets outside of recycling
+                    if (!$threadCycle) {
+                        throw new Exception(T("This thread is not currently scheduled for recyling, unable to bet."));
+                    }
 
                     // Close betting when 75% of the thread has passed
                     $threadTerminateComment = val('Comment', $threadCycle);
