@@ -52,7 +52,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
         // Note that we're cycling this thread
         $discussionID = $discussion['DiscussionID'];
-        self::$cycling[$discussionID] = $discussion;
+        self::$cycling[$discussionID] = (array)$discussion;
 
         // Determine speed
         $startTime = strtotime(val('DateInserted', $discussion));
@@ -341,11 +341,10 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             }
         }
 
-        if (!is_array($discussion)) {
+        $discussionID = val('DiscussionID', $discussion, null);
+        if (is_null($discussionID)) {
             return false;
         }
-
-        $discussionID = $discussion['DiscussionID'];
 
         // Betting
         $wagerKey = sprintf(self::WAGER_KEY, $discussionID);
@@ -495,9 +494,9 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         }
 
         // Delete all wagers
-        Gdn::userMetaModel()->delete(array(
-            'Name' => $wagerKey
-        ));
+        foreach ($wagers as $wagerRow) {
+            Gdn::userMetaModel()->setUserMeta($wagerRow['UserID'], $wagerRow['Name'], null);
+        }
     }
 
    /**
