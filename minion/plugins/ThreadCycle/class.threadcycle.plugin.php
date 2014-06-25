@@ -280,17 +280,20 @@ class ThreadCyclePlugin extends Gdn_Plugin {
     public function DiscussionModel_AfterSaveDiscussion_Handler($sender) {
         $discussionID = $sender->EventArguments['DiscussionID'];
         $values = $sender->EventArguments['FormPostValues'];
+
+        // We only care if this save closes the discussion
         $closed = val('Closed', $values, 0);
         if (!$closed) {
             return;
         }
 
+        // We don't care if this is a new discussion
         $isNew = val('IsNewDiscussion', $sender->EventArguments, false);
         if ($isNew) {
             return;
         }
 
-        // This will be handled by the cycleWager at the end of cycleThread()
+        // Don't execute anything if we're in the middle of cycling this thread
         $isCycling = key_exists($discussionID, self::$cycling);
         if ($isCycling) {
             return;
@@ -304,15 +307,17 @@ class ThreadCyclePlugin extends Gdn_Plugin {
      *
      * @param DiscussionModel $sender
      */
-    public function DiscussionModel_SetField_Handler($sender) {
+    public function DiscussionModel_AfterSetField_Handler($sender) {
         $discussionID = $sender->EventArguments['DiscussionID'];
         $setfield = $sender->EventArguments['SetField'];
-        $closed = $setfield[0] == 'Closed' && $setfield[1] == 1;
+
+        // We only care if this save closes the discussion
+        $closed = $setfield[0] == 'Closed' && $setfield[1];
         if (!$closed) {
             return;
         }
 
-        // This will be handled by the cycleWager at the end of cycleThread()
+        // Don't execute anything if we're in the middle of cycling this thread
         $isCycling = key_exists($discussionID, self::$cycling);
         if ($isCycling) {
             return;
@@ -325,13 +330,16 @@ class ThreadCyclePlugin extends Gdn_Plugin {
      * Cycle wager logic
      *
      * @param integer $discussion
-     * @param string $mode default 'bet', supports 'bet' and 'return'
+     * @param string $mode default 'pay', supports 'pay' and 'return'
      */
-    public function cycleWager($discussion, $mode = 'bet') {
+    public function cycleWager($discussion, $mode = 'pay') {
         if (is_numeric($discussion)) {
             $discussionID = $discussion;
-            $discussionModel = new DiscussionModel;
-            $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+            $discussion = val($discussionID, self::$cycling, null);
+            if (!$discussion) {
+                $discussionModel = new DiscussionModel;
+                $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+            }
         }
 
         if (!is_array($discussion)) {
@@ -349,7 +357,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             return false;
         }
 
-        if ($mode == 'bet') {
+        if ($mode == 'pay') {
 
             // Determine winner
             $startTime = strtotime(val('DateInserted', $discussion));
