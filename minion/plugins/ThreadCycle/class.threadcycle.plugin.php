@@ -312,8 +312,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         $setfield = $sender->EventArguments['SetField'];
 
         // We only care if this save closes the discussion
-        $closed = $setfield[0] == 'Closed' && $setfield[1];
-        if (!$closed) {
+        if (!key_exists('Closed', $setfield) || !$setfield['Closed']) {
             return;
         }
 
