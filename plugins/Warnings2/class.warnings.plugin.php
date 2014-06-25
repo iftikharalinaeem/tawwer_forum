@@ -41,6 +41,14 @@ class Warnings2Plugin extends Gdn_Plugin {
         Gdn::PluginManager()->DisablePlugin('Warnings');
     }
 
+    /**
+     * Render warning reaction button
+     *
+     * @param array $Row
+     * @param string $RecordType
+     * @param integer $RecordID
+     * @return string
+     */
     public function WarnButton($Row, $RecordType, $RecordID) {
         $Args = array(
             'userid' => val('InsertUserID', $Row),
@@ -55,6 +63,30 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     /// Event Handlers ///
+
+    /**
+     * Process warning expiries on sign in
+     *
+     * @param EntryController $Sender
+     * @param array $Args
+     */
+    public function EntryController_AfterSignIn_Handler($Sender, $Args) {
+        if (Gdn::Session()->UserID) {
+            $WarningModel = new WarningModel();
+            $WarningModel->ProcessWarnings(Gdn::Session()->UserID);
+        }
+    }
+
+    /**
+     *
+     * @param UserModel $Sender
+     */
+    public function UserModel_Visit_Handler($Sender, $Args) {
+        if (Gdn::Session()->UserID) {
+            $WarningModel = new WarningModel();
+            $WarningModel->ProcessWarnings(Gdn::Session()->UserID);
+        }
+    }
 
     /**
      *
@@ -112,11 +144,16 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     /**
      * Show if this post triggered a warning to give moderators context.
+     *
+     * @param mixed $Sender
+     * @param array $Args
      */
     public function Base_BeforeCommentBody_Handler($Sender, $Args) {
-        // Only show warnings to moderators
-        if (!Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false)) {
-            return;
+        if (C('Warnings.View.Restricted', true)) {
+            // Only show warnings to moderators
+            if (!Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false)) {
+                return;
+            }
         }
 
         if (isset($Args['Comment'])) {
@@ -136,7 +173,7 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     /**
-     * Show the warning context for this PM
+     * Show the warning context for PMs
      *
      * @param MessagesController $sender
      */
@@ -210,6 +247,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     /**
      * Add the warning to the list of flags.
+     *
      * @param Gdn_Controller $Sender
      * @param array $Args
      */
@@ -220,20 +258,10 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     /**
-     *
-     * @param EntryController $Sender
-     */
-    public function EntryController_AfterSignIn_Handler($Sender, $Args) {
-        if (Gdn::Session()->UserID) {
-            $WarningModel = new WarningModel();
-            $WarningModel->ProcessWarnings(Gdn::Session()->UserID);
-        }
-    }
-
-    /**
      * Add Warn option to profile options.
      *
-     * @param Gdn_Controller $Sender
+     * @param ProfileController $Sender
+     * @param array $Args
      */
     public function ProfileController_BeforeProfileOptions_Handler($Sender, $Args) {
         if (!val('EditMode', Gdn::Controller())) {
@@ -294,6 +322,8 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * Create note delete endpoint
+     *
      * @param ProfileController $Sender
      * @param int $NoteID
      */
@@ -315,6 +345,12 @@ class Warnings2Plugin extends Gdn_Plugin {
         $Sender->Render('deletenote', '', 'plugins/Warnings2');
     }
 
+    /**
+     * Add punishment CSS to users who are punished
+     *
+     * @param UserModel $Sender
+     * @param array $Args
+     */
     public function UserModel_SetCalculatedFields_Handler($Sender, $Args) {
         if (val('Banned', $Args['User'])) {
             SetValue('Punished', $Args['User'], 0);
@@ -327,6 +363,12 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     *
+     * @param ProfileController $Sender
+     * @param array $Args
+     * @return void
+     */
     public function ProfileController_BeforeUserInfo_Handler($Sender, $Args) {
         echo Gdn_Theme::Module('UserWarningModule');
         return;
@@ -355,9 +397,11 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * Create endpoint for writing notes
      *
      * @param ProfileController $Sender
-     * @param int $UserID
+     * @param integer $UserID
+     * @param integer $NoteID
      */
     public function ProfileController_Note_Create($Sender, $UserID = false, $NoteID = false) {
         $Sender->Permission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.Add'), false);
@@ -452,9 +496,11 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     public function ProfileController_AddProfileTabs_Handler($Sender) {
-        if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false)) {
-            $Sender->AddProfileTab(T('Moderation'), UserUrl($Sender->User, '', 'notes'), 'UserNotes');
+        $IsPrivileged = Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false);
+        if (C('Warnings.View.Restricted', true) && !$IsPrivileged) {
+            return;
         }
+        $Sender->AddProfileTab(T('Moderation'), UserUrl($Sender->User, '', 'notes'), 'UserNotes');
     }
 
     /**
@@ -469,11 +515,13 @@ class Warnings2Plugin extends Gdn_Plugin {
         $Sender->GetUserInfo($UserReference, $Username);
 
         $IsPrivileged = Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false);
+        if (!$IsPrivileged && C('Warnings.View.Restricted', true)) {
+            throw ForbiddenException('Warnings');
+        }
+
         $Sender->SetData('IsPrivileged', $IsPrivileged);
-        if (Gdn::Session()->UserID != val('UserID', $Sender->User)) {
-            if (!$IsPrivileged) {
-                throw PermissionException('Garden.Moderation.Manage');
-            }
+        if (Gdn::Session()->UserID != val('UserID', $Sender->User) && !$IsPrivileged) {
+            throw PermissionException('Garden.Moderation.Manage');
         }
 
         $Sender->_SetBreadcrumbs(T('Notes'), UserUrl($Sender->User, '', 'notes'));
@@ -487,12 +535,10 @@ class Warnings2Plugin extends Gdn_Plugin {
         )->ResultArray();
         $UserNoteModel->Calculate($Notes);
 
-        // Join the records.
+        // Join the user records into the warnings
         JoinRecords($Notes, 'Record');
 
         $Sender->SetData('Notes', $Notes);
-
-//      $Sender->Render('notes', '', 'plugins/Warnings2');
 
         $Sender->Render();
     }
@@ -563,39 +609,6 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     /**
-     *
-     * @param ProfileController $Sender
-     * @param string|int $UserReference
-     * @param string $Username
-     */
-    public function ProfileController_Warnings_Create($Sender, $UserReference, $Username = '') {
-        $Sender->EditMode(false);
-        $Sender->GetUserInfo($UserReference, $Username);
-        $Sender->_SetBreadcrumbs(T('Warnings'), UserUrl($Sender->User, '', 'warnings'));
-        $Sender->SetTabView('Warnings', 'Warnings', '', 'plugins/Warnings2');
-        $Sender->EditMode = false;
-
-        $WarningModel = new WarningModel();
-        $Warnings = $WarningModel->GetWhere(array('WarnUserID' => $Sender->User->UserID))->ResultArray();
-        $Sender->SetData('Warnings', $Warnings);
-
-        $Sender->Render();
-    }
-
-    /**
-     * Not currently used settings page.
-     *
-     * @param SettingsController $Sender
-     */
-    public function SettingsController_Warnings_Create($Sender) {
-        $WarningTypes = Gdn::SQL()->GetWhere('WarningType', array(), 'points', 'desc')->ResultArray();
-        $Sender->SetData('WarningTypes', $WarningTypes);
-
-        $Sender->Title(sprintf(T('%s Settings'), T('Warning')));
-        $Sender->Render('settings', '', 'plugins/Warnings2');
-    }
-
-    /**
      * Hide signatures for people in the pokey
      *
      * @param SignaturesPlugin $Sender
@@ -607,17 +620,6 @@ class Warnings2Plugin extends Gdn_Plugin {
             return;
         }
         $Sender->EventArguments['Signature'] = null;
-    }
-
-    /**
-     *
-     * @param UserModel $Sender
-     */
-    public function UserModel_Visit_Handler($Sender, $Args) {
-        if (Gdn::Session()->UserID) {
-            $WarningModel = new WarningModel();
-            $WarningModel->ProcessWarnings(Gdn::Session()->UserID);
-        }
     }
 
     public function UtilityController_ProcessWarnings_Create($Sender) {
