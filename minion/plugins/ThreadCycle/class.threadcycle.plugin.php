@@ -521,10 +521,15 @@ class ThreadCyclePlugin extends Gdn_Plugin {
    protected function retrieveWager($userID, $discussionID) {
       $wagerKey = sprintf(self::WAGER_KEY, $discussionID);
       $wager = Gdn::userMetaModel()->getUserMeta($userID, $wagerKey, null);
-      if (is_null($wager)) {
+      if (!is_array($wager) || !count($wager)) {
           return false;
       }
 
+      $wager = val($wagerKey, $wager);
+      if (!$wager) {
+          return false;
+      }
+      
       $wager = json_decode($wager, true);
       if (!$wager) {
           return false;
@@ -769,7 +774,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         }
 
                         // Acknowledge the user
-                        $acknowledge = T("Your wager of <b>%d points</b> for '%s' has been <b>cancelled</b>.");
+                        $acknowledge = T("Your wager of <b>%d points</b> has been <b>cancelled</b>.");
                         $acknowledged = sprintf($acknowledge, $wagerPoints, $wager['ForStr']);
                         $sender->acknowledge($discussion, $acknowledged, 'positive', $user, array(
                             'Inform' => true,
@@ -836,8 +841,9 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         Gdn::userModel()->setField($userID, 'Points', $user['Points']);
 
                         // Acknowledge the user
-                        $acknowledge = T("Your wager of <b>%d points</b> for '%s' has been entered!");
-                        $acknowledged = sprintf($acknowledge, $newWagerPoints, $wagerTimeString);
+                        $isNew = $modify ? 'new ' : '';
+                        $acknowledge = T("Your %swager of <b>%d points</b> for <b>%s</b> has been entered!");
+                        $acknowledged = sprintf($acknowledge, $isNew, $newWagerPoints, $wagerTimeString);
                         $sender->acknowledge($discussion, $acknowledged, 'positive', $user, array(
                             'Inform' => true,
                             'Comment' => false
