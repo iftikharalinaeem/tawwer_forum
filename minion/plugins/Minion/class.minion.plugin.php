@@ -730,7 +730,7 @@ class MinionPlugin extends Gdn_Plugin {
                             $terminator = val('Terminator', $state['Gather'], false);
                             if (!$terminator && strlen($state['Gather']['Delta'])) {
                                 $checkUser = trim($state['Gather']['Delta']);
-                                $gatherUser = Gdn::userModel()->getByUsername($checkUser);
+                                $gatherUser = (array)Gdn::userModel()->getByUsername($checkUser);
                                 if ($gatherUser) {
                                     $state['Gather'] = false;
                                     $state['Targets'][$gatherNode] = (array)$gatherUser;
@@ -1932,11 +1932,11 @@ class MinionPlugin extends Gdn_Plugin {
         $minion['Monitor'] = true;
 
         if (is_array($options)) {
-            foreach ($options as $Option => $OpVal) {
-                if ($OpVal == null) {
-                    unset($minion[$Option]);
+            foreach ($options as $option => $opVal) {
+                if ($opVal == null) {
+                    unset($minion[$option]);
                 } else {
-                    $minion[$Option] = $OpVal;
+                    $minion[$option] = $opVal;
                 }
             }
         }
