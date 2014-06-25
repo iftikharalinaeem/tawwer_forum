@@ -400,7 +400,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                     $returnPoints = $rWager['Points'] * $rakeMultiple;
                     $rUser = Gdn::userModel()->getID($rWager['UserID'], DATASET_TYPE_ARRAY);
                     $rUser['Points'] += $returnPoints;
-                    Gdn::userModel()->setField($rUser['UserID'], $rUser['Points']);
+                    Gdn::userModel()->setField($rUser['UserID'], 'Points', $rUser['Points']);
 
                     $rWager['Winnings'] = $returnPoints;
                     $rWager['User'] = $rUser;
@@ -427,7 +427,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 }
                 $wUser = Gdn::userModel()->getID($wWager['UserID'], DATASET_TYPE_ARRAY);
                 $wUser['Points'] += $winnings;
-                Gdn::userModel()->setField($wUser['UserID'], $wUser['Points']);
+                Gdn::userModel()->setField($wUser['UserID'], 'Points', $wUser['Points']);
 
                 // Modify for formatting
                 $wWager['Winnings'] = $winnings;
@@ -488,7 +488,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 $wager = json_decode($wagerRow['Value'], true);
                 $lUser = Gdn::userModel()->getID($wagerRow['UserID'], DATASET_TYPE_ARRAY);
                 $lUser['Points'] += $wager['Points'];
-                Gdn::userModel()->setField($lUser['UserID'], $lUser['Points']);
+                Gdn::userModel()->setField($lUser['UserID'], 'Points', $lUser['Points']);
             }
 
         }
