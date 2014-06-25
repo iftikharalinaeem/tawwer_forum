@@ -189,8 +189,8 @@ class MinionPlugin extends Gdn_Plugin {
 
         // Define toggle triggers
         $this->toggle_triggers = array(
-            self::TOGGLE_ON => t('Minion.Trigger.Toggles.On', array('open', 'enable', 'unlock', 'allow', 'allowed', 'on', 'start')),
-            self::TOGGLE_OFF => t('Minion.Trigger.Toggles.Off', array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off', 'revoke', 'stop', 'cancel'))
+            self::TOGGLE_ON => t('Minion.Trigger.Toggles.On', array('open', 'enable', 'unlock', 'allow', 'allowed', 'on', 'start', 'activate')),
+            self::TOGGLE_OFF => t('Minion.Trigger.Toggles.Off', array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off', 'revoke', 'stop', 'cancel', 'rescind'))
         );
 
         // Define force triggers

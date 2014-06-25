@@ -7,7 +7,7 @@
 
 $PluginInfo['ThreadCycle'] = array(
     'Name' => 'Minion: ThreadCycle',
-    'Description' => "Provide command to automatically cycle a thread after N pages.",
+    'Description' => "Provide a command to automatically cycle a thread after N pages.",
     'Version' => '1.3',
     'RequiredApplications' => array(
         'Vanilla' => '2.1a'
