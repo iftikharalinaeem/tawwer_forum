@@ -725,7 +725,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
                 // Get discussion
                 $comment = valr('Source.Comment', $state, null);
-                $discussion = $state['Source']['Discussion'];
+                $discussion = $state['Sources']['Discussion'];
                 $discussionID = $discussion['DiscussionID'];
                 $threadCycle = $sender->monitoring($discussion, 'ThreadCycle', false);
 
