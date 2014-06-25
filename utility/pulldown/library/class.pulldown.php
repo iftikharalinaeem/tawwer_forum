@@ -57,11 +57,13 @@ class PullDown extends Worker {
         $args = getopt('', array('folder:'));
 
         $folder = GetValue('folder', $args, false);
-        if (!$folder)
+        if (!$folder) {
             throw new Exception("Required argument --folder not provided");
+        }
 
-        if (!file_exists($folder))
+        if (!file_exists($folder)) {
             throw new Exception("No such file or folder");
+        }
         self::$folder = $folder;
 
         self::$workAddress = "tcp://127.0.01:7878";
@@ -76,7 +78,6 @@ class PullDown extends Worker {
     public function prepare() {
         $this->zeromq = new ZMQContext();
         $this->pid = getmypid();
-
 
         switch ($this->type) {
 
@@ -95,6 +96,9 @@ class PullDown extends Worker {
 
                 $this->datasource = false;
                 switch ($this->dsn) {
+                    case 'sftp':
+                        break;
+
                     case 'stdin':
                         $this->datasource = fopen('php://stdin', 'r');
                         break;
@@ -460,21 +464,22 @@ class PullDown extends Worker {
                         $end = null;
                         $bytes = 0;
                         foreach ($this->transfers['recent'] as $xfer) {
-                            if (is_null($start) || $xfer['start'] < $start)
-                                ;
-                            $start = $xfer['start'];
+                            if (is_null($start) || $xfer['start'] < $start) {
+                                $start = $xfer['start'];
+                            }
 
-                            if (is_null($end) || $xfer['end'] > $end)
-                                ;
-                            $end = $xfer['end'];
+                            if (is_null($end) || $xfer['end'] > $end) {
+                                $end = $xfer['end'];
+                            }
 
                             $bytes += $xfer['size'];
                         }
                         $dur = $end - $start;
-                        if ($dur)
+                        if ($dur) {
                             $speed = $bytes / $dur;
-                        else
+                        } else {
                             $speed = 0;
+                        }
 
                         $rxkBps = round(($speed / 1024), 2);
                         $this->transfers['rxkBps'] = $rxkBps;
@@ -588,7 +593,7 @@ class PullDown extends Worker {
                     $messages[] = $socket->recv();
                 }
 
-                // No event
+            // No event
             } catch (ZMQException $ex) {
                 Workers::log(Workers::LOG_L_QUEUE, " worker received no events", Workers::LOG_O_SHOWPID);
             }
@@ -635,8 +640,9 @@ class PullDown extends Worker {
                 $exit = true;
             }
 
-            if ($suicide)
+            if ($suicide) {
                 $exit = true;
+            }
 
             if ($exit) {
                 $this->exited = true;
@@ -678,8 +684,9 @@ class PullDown extends Worker {
             $localDir = dirname($local);
             @mkdir($localDir, 0755, true);
             $fh = @fopen($local, 'w');
-            if (!$fh)
+            if (!$fh) {
                 throw new Exception('failed to create file');
+            }
             curl_setopt($this->curl, CURLOPT_FILE, $fh);
 
             // Download
@@ -692,8 +699,9 @@ class PullDown extends Worker {
             ));
 
             $status = ($code == 200) ? 'success' : 'failed';
-            if ($code != 200)
+            if ($code != 200) {
                 $response['error'] = curl_error($this->curl);
+            }
         } catch (Exception $ex) {
 
             $status = 'failed';
@@ -724,8 +732,9 @@ class PullDown extends Worker {
             )
         );
 
-        if ($payload)
+        if ($payload) {
             $message['payload'] = $payload;
+        }
 
         return json_encode($message);
     }

@@ -20,6 +20,43 @@
  *
  *   How many jobs should a worker do before restarting. Default '30'
  *
+ * --dsn
+ *
+ *   DSN Driver,.   mysql or stdin
+ *
+ * --host
+ *
+ *   DSN Host
+ *
+ * --username
+ *
+ *   DSN Username
+ *
+ * --password
+ *
+ *   DSN Username
+ *
+ * --db
+ *
+ *   DSN database name
+ *
+ * --table
+ *
+ *   DSN Table name
+ *
+ *
+ * Table Structure:
+ *
+ *  CREATE TABLE `GDN_Pulldown` (
+ *      `jobid` int(11) unsigned NOT NULL AUTO_INCREMENT,
+ *      `downloaded` int(11) DEFAULT '0',
+ *      `allocated` varchar(20) DEFAULT NULL,
+ *      `url` varchar(255) DEFAULT NULL,
+ *      `responsecode` int(11) DEFAULT NULL,
+ *      PRIMARY KEY (`jobid`)
+ *  ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+ *
+ *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @license Proprietary
  * @copyright 2012, Tim Gunter

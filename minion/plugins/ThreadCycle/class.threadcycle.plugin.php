@@ -1,373 +1,903 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 
 /**
- * ThreadCycle Plugin
- * 
- * This plugin uses Minion to automatically close threads after N pages.
- * 
- * Changes: 
- *  1.0     Release
- *  1.1     Improve new thread creator choices
- *  1.2     Further improve new thread creator choices
- * 
- * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
- * @package Addons
+ * @license Proprietary
  */
 
 $PluginInfo['ThreadCycle'] = array(
-   'Name' => 'Minion: ThreadCycle',
-   'Description' => "Provide command to automatically cycle a thread after N pages.",
-   'Version' => '1.2.1',
-   'RequiredApplications' => array(
-      'Vanilla' => '2.1a'
+    'Name' => 'Minion: ThreadCycle',
+    'Description' => "Provide command to automatically cycle a thread after N pages.",
+    'Version' => '1.3',
+    'RequiredApplications' => array(
+        'Vanilla' => '2.1a'
     ),
-   'RequiredPlugins' => array(
-      'Minion' => '1.16',
-      'Online' => '1.6.3'
-   ),
-   'MobileFriendly' => TRUE,
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
+    'RequiredPlugins' => array(
+        'Minion' => '1.16',
+        'Online' => '1.6.3'
+    ),
+    'MobileFriendly' => true,
+    'Author' => "Tim Gunter",
+    'AuthorEmail' => 'tim@vanillaforums.com',
+    'AuthorUrl' => 'http://vanillaforums.com'
 );
 
+/**
+ * ThreadCycle Plugin
+ *
+ * This plugin uses Minion to automatically close threads after N pages.
+ *
+ * Changes:
+ *  1.0     Release
+ *  1.1     Improve new thread creator choices
+ *  1.2     Further improve new thread creator choices
+ *  1.3     Add speeds!
+ *
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @package internal
+ */
 class ThreadCyclePlugin extends Gdn_Plugin {
-   
-   /**
-    * Cycle this thread
-    * 
-    * @param array $Discussion
-    */
-   public function CycleThread($Discussion) {
-      $CommentsPerPage = C('Vanilla.Comments.PerPage', 40);
-      $DiscussionID = GetValue('DiscussionID', $Discussion);
-      
-      // Close the thread
-      $DiscussionModel = new DiscussionModel();
-      $DiscussionModel->SetField($DiscussionID, 'Closed', TRUE);
-      
-      // Determine speed
-      $StartTime = strtotime(GetValue('DateInserted', $Discussion));
-      $EndTime = time();
-      $Elapsed = $EndTime - $StartTime;
-      $CPM = (GetValue('CountComments', $Discussion) / $Elapsed) * 60;
-      
-      $MinWarp = 1;
-      $MaxWarp = 11;
-      
-      // Rate determination
-//      $TargetWarp = 6.5;
-//      $TargetComments = ;
-//      $CPMPerWarp = ;
-//      $MinWarpCPM = 0.4;
-//      $MaxWarpCPM = ;
-      
-      $Scales = array(
-          array(
-             'min'         => 0,
-             'max'         => 0.1,
-             'name'        => 'thrusters'
-          ),
-          array(
-             'min'         => 0.1,
-             'max'         => $MinWarpCPM,
-             'name'        => 'impulse',
-             'format'      => '{speed} {scale}',
-             'divisions'   => 4,
-             'divtype'     => 'fractions'
-          ),
-          array(
-             'min'         => 0.4,
-             'max'         => $MaxWarpCPM,
-             'name'        => 'warp',
-             'format'      => '{scale} {speed}',
-             'divisions'   => 10
-          ),
-          array(
-             'min'         => $MaxWarpCPM,
-             'max'         => null,
-             'name'        => 'transwarp'
-          )
-      );
-      
-      $Scale = null;
-      foreach ($Scales as $ScaleInfo) {
-         $Max = $ScaleInfo['max'];
-         $Min = $ScaleInfo['min'];
-         if ($CPM >= $Min && $CPM < $Max) {
-            $Scale = $ScaleInfo['name'];
-            $Format = GetValue('format', $ScaleInfo, '{scale}');
-            $Speed = 1;
-            
-            $Divisions = GetValue('divisions', $ScaleInfo, null);
-            if ($Divisions && $Max) {
-               $DivType = GetValue('divtype', $ScaleInfo, 'whole');
-               switch ($DivType) {
-                  case 'fractions':
-                     //$Range = 
-                     break;
-                  
-                  case 'whole':
-                  default:
-                     break;
-               }
-            }
-            break;
-         }
-      }
-      
-      // Find the last page of commenters.
-      $Commenters = Gdn::SQL()->Select('InsertUserID', 'DISTINCT', 'UserID')
-         ->From('Comment')
-         ->Where('DiscussionID', $DiscussionID)
-         ->OrderBy('DateInserted', 'desc')
-         ->Limit($CommentsPerPage)
-         ->Get()->ResultArray();
-      
-      Gdn::UserModel()->JoinUsers($Commenters, array('UserID'), array(
-         'Join'   => array('UserID', 'Name', 'Email', 'Photo', 'Jailed', 'Banned', 'Points')
-      ));
-      
-      // Weed out jailed and offline people
-      $Eligible = array();
-      foreach ($Commenters as $Commenter) {
-         // No jailed users
-         if ($Commenter['Jailed'])
-            continue;
-         
-         // No banned users
-         if ($Commenter['Banned'])
-            continue;
-         
-         $UserOnline = OnlinePlugin::Instance()->GetUser($Commenter['UserID']);
-         if (!$UserOnline) 
-            continue;
-         
-         $Commenter['LastOnline'] = time() - strtotime($UserOnline['Timestamp']);
-         $Eligible[] = $Commenter;
-      }
-      unset($Commenters);
-      
-      // Sort by online, ascending
-      usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByLastOnline'));
-      
-      // Get the top 10 by online, and choose the top 5 by points
-      $Eligible = array_slice($Eligible, 0, 10);
-      usort($Eligible, array('ThreadCyclePlugin', 'CompareUsersByPoints'));
-      $Eligible = array_slice($Eligible, 0, 5);
-      
-      // Shuffle
-      shuffle($Eligible);
-      
-      // Get the top 2
-      $Primary = GetValue(0, $Eligible, array());
-      $Secondary = Getvalue(1, $Eligible, array());
-      
-      // Alert everyone
-      $Message = T("This thread is no longer active, and will be recycled.\n");
-      $Acknowledge = T("Thread has been recycled.\n");
-      
-      $Options = array(
-         'Primary'   => &$Primary,
-         'Secondary' => &$Secondary
-      );
-      
-      if (sizeof($Primary)) {
-         $Message .= $PrimaryMessage = T(" {Primary.Mention} will create the new thread\n");
-         $Acknowledge .= str_replace('.Mention', '.Anchor', $PrimaryMessage);
-         
-         $Primary['Mention'] = "@\"{$Primary['Name']}\"";
-         $Primary['Anchor'] = UserAnchor($Primary);
-      }
-      
-      if (sizeof($Secondary)) {
-         $Message .= $SecondaryMessage = T(" {Secondary.Mention} is backup\n");
-         $Acknowledge .= str_replace('.Mention', '.Anchor', $SecondaryMessage);
-         
-         $Secondary['Mention'] = "@\"{$Secondary['Name']}\"";
-         $Secondary['Anchor'] = UserAnchor($Secondary);
-      }
-      
-      $Message = FormatString($Message, $Options);
-      MinionPlugin::Instance()->Message($Primary, $Discussion, $Message, FALSE);
-      
-      $Acknowledged = FormatString($Acknowledge, $Options);
-      MinionPlugin::Instance()->Log($Acknowledged, $Discussion);
-      
-      MinionPlugin::Instance()->Monitor($Discussion, array(
-         'ThreadCycle' => NULL
-      ));
-   }
-   
-   public static function CompareUsersByPoints($a, $b) {
-      return $b['Points'] - $a['Points'];
-   }
-   
-   public static function CompareUsersByLastOnline($a, $b) {
-      return $a['LastOnline'] - $b['LastOnline'];
-   }
-   
-   /*
-    * MINION INTERFACE
-    */
-   
-   /**
-    * Parse a token from the current state
-    * 
-    * @param MinionPlugin $Sender
-    */
-   public function MinionPlugin_Token_Handler($Sender) {
-      $State = &$Sender->EventArguments['State'];
 
-      if (!$State['Method'] && in_array($State['CompareToken'], array('recycle')))
-         $Sender->Consume($State, 'Method', 'threadcycle');
-      
-      // Gather 
-      if (GetValue('Method', $State) == 'threadcycle' && in_array($State['CompareToken'], array('pages', 'page'))) {
-         $Sender->Consume($State, 'Gather', array(
-            'Node'   => 'Page',
-            'Delta'  => ''
-         ));
-      }
-      
-   }
-   
+    const WAGER_KEY = 'plugin.threadcycle.wager.%d';
+
+    public static $cycling = array();
+
+    /**
+     * Cycle this thread
+     *
+     * @param array $discussion
+     * @param boolean $betting optional. honor bets? default true
+     */
+    public function cycleThread($discussion, $betting = true) {
+
+        // Note that we're cycling this thread
+        $discussionID = $discussion['DiscussionID'];
+        self::$cycling[$discussionID] = $discussion;
+
+        // Determine speed
+        $startTime = strtotime(val('DateInserted', $discussion));
+        $endTime = time();
+        $elapsed = $endTime - $startTime;
+        $rate = (val('CountComments', $discussion) / $elapsed) * 60;
+        $speedBoost = C('Minion.ThreadCycle.Boost', 2.5);
+        $rate = $rate * $speedBoost;
+
+        // Define known speeds and their characteristics
+        $engines = array(
+            'thrusters' => array(
+                'min' => 0,
+                'max' => 0.1,
+                'format' => '{verb} at {speed} {scale}',
+                'divisions' => 4,
+                'divtype' => 'fractions',
+                'replace' => ['1/1' => 'full'],
+                'verbs' => array('moseying by', 'puttering along')
+            ),
+            'impulse' => array(
+                'min' => 0.1,
+                'max' => 0.4,
+                'format' => '{verb} at {speed} {scale}',
+                'divisions' => 4,
+                'divtype' => 'fractions',
+                'replace' => ['1/1' => 'full'],
+                'verbs' => array('travelling', 'moving', 'scooting past')
+            ),
+            'warp' => array(
+                'min' => 0.4,
+                'max' => 10,
+                'format' => '{verb} at {scale} {speed}',
+                'divisions' => 10,
+                'divtype' => 'decimal',
+                'round' => 1,
+                'verbs' => array('zooming by', 'blasting along', 'careening by', 'speeding through')
+            ),
+            'transwarp' => array(
+                'min' => 10,
+                'max' => null,
+                'format' => '{verb} at transwarp',
+                'divisions' => 1,
+                'divtype' => 'const',
+                'verbs' => array('hurtling by', 'streaking past')
+            )
+        );
+
+        // Determine which engine was in use, and the speed
+        $speed = null;
+        $realSpeed = 0;
+        $speedcontext = array(
+            'cpm' => $rate,
+            'rate' => $rate
+        );
+        foreach ($engines as $engine => $engineInfo) {
+            $engineMin = $engineInfo['min'];
+            $engineMax = $engineInfo['max'];
+
+            if ($rate >= $engineMin && $rate < $engineMax) {
+                $speedcontext['format'] = val('format', $engineInfo, '{scale}');
+                $speedcontext['scale'] = $engine;
+
+                $rangedRate = $rate - $engineMin;
+
+                $divisions = val('divisions', $engineInfo, null);
+                if ($divisions && $engineMax) {
+                    $divType = val('divtype', $engineInfo, 'decimal');
+                    switch ($divType) {
+                        case 'fractions':
+                            $range = $engineMax - $engineMin;
+                            $bucketsize = $range / $divisions;
+                            $fraction = round($rangedRate / $bucketsize);
+                            $gcd = self::gcd($fraction, $divisions);
+                            $num = $fraction / $gcd;
+                            $den = $divisions / $gcd;
+                            $speed = "{$num}/{$den}";
+                            $realSpeed = $num/$den;
+                            break;
+
+                        case 'decimal':
+                            $range = $engineMax - $engineMin;
+                            $bucketsize = $range / $divisions;
+                            $round = val('round', $engineInfo, 1);
+                            $realSpeed = $speed = round($rangedRate / $bucketsize, $round);
+                            break;
+
+                        case 'const':
+                            $realSpeed = $speed = 1;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                if (key_exists('replace', $engineInfo) && key_exists($speed, $engineInfo['replace'])) {
+                    $speed = val($speed, $engineInfo['replace']);
+                }
+                if (!$realSpeed) {
+                    $speedcontext['format'] = 'drifing in space';
+                }
+                if (key_exists('verbs', $engineInfo)) {
+                    $verbKey = array_rand($engineInfo['verbs']);
+                    $verb = val($verbKey, $engineInfo['verbs']);
+                    $speedcontext['verb'] = $verb;
+                }
+
+                $speedcontext['speed'] = $speed;
+                break;
+            }
+        }
+
+        $discussionID = val('DiscussionID', $discussion);
+
+        // Close the thread
+        $discussionModel = new DiscussionModel();
+        $discussionModel->setField($discussionID, 'Closed', true);
+
+        // Find the last page of commenters
+        $commentsPerPage = c('Vanilla.Comments.PerPage', 40);
+        $commenters = Gdn::SQL()->Select('InsertUserID', 'DISTINCT', 'UserID')
+                        ->From('Comment')
+                        ->Where('DiscussionID', $discussionID)
+                        ->OrderBy('DateInserted', 'desc')
+                        ->Limit($commentsPerPage)
+                        ->Get()->ResultArray();
+
+        Gdn::userModel()->joinUsers($commenters, array('UserID'), array(
+            'Join' => array('UserID', 'Name', 'Email', 'Photo', 'Punished', 'Banned', 'Points')
+        ));
+
+        // Weed out jailed and offline people
+        $eligible = array();
+        foreach ($commenters as $commenter) {
+            // No jailed users
+            if ($commenter['Punished']) {
+                continue;
+            }
+
+            // No banned users
+            if ($commenter['Banned']) {
+                continue;
+            }
+
+            // No offline users
+            $userOnline = OnlinePlugin::Instance()->GetUser($commenter['UserID']);
+            if (!$userOnline) {
+                continue;
+            }
+
+            $commenter['LastOnline'] = time() - strtotime($userOnline['Timestamp']);
+            $eligible[] = $commenter;
+        }
+        unset($commenters);
+
+        // Sort by online, ascending
+        usort($eligible, array('ThreadCyclePlugin', 'compareUsersByLastOnline'));
+
+        // Get the top 10 by online, and choose the top 5 by points
+        $eligible = array_slice($eligible, 0, 10);
+        usort($eligible, array('ThreadCyclePlugin', 'compareUsersByPoints'));
+        $eligible = array_slice($eligible, 0, 5);
+
+        // Shuffle
+        shuffle($eligible);
+
+        // Get the top 2 users
+        $primary = val(0, $eligible, array());
+        $secondary = Getvalue(1, $eligible, array());
+
+        // Build user alert message
+        $message = T("This thread is no longer active, and will be recycled.\n");
+        if ($speed) {
+            $message .= sprintf(T("On average, this thread was %s\n"), formatString($speedcontext['format'], $speedcontext));
+        }
+        $message .= "\n";
+        $acknowledge = T("Thread has been recycled.\n");
+
+        $options = array(
+            'Primary' => &$primary,
+            'Secondary' => &$secondary
+        );
+
+        if (sizeof($primary)) {
+            $message .= $primaryMessage = T(" {Primary.Mention} will create the new thread\n");
+            $acknowledge .= str_replace('.Mention', '.Anchor', $primaryMessage);
+
+            $primary['Mention'] = "@\"{$primary['Name']}\"";
+            $primary['Anchor'] = userAnchor($primary);
+        }
+
+        if (sizeof($secondary)) {
+            $message .= $secondaryMessage = T(" {Secondary.Mention} is backup\n");
+            $acknowledge .= str_replace('.Mention', '.Anchor', $secondaryMessage);
+
+            $secondary['Mention'] = "@\"{$secondary['Name']}\"";
+            $secondary['Anchor'] = userAnchor($secondary);
+        }
+
+        // Post in the thread for the users to see
+        $message = formatString($message, $options);
+        MinionPlugin::instance()->message($primary, $discussion, $message, false);
+
+        // Log that this happened
+        $acknowledged = formatString($acknowledge, $options);
+        MinionPlugin::instance()->log($acknowledged, $discussion);
+
+        // Stop caring about posts in here
+        MinionPlugin::instance()->monitor($discussion, array(
+            'ThreadCycle' => true
+        ));
+
+        // Handle betting
+        if ($betting) {
+            $this->cycleWager($discussion, 'pay');
+        }
+    }
+
+    /**
+     * Handle saved discussion closure
+     *
+     * @param DiscussionModel $sender
+     */
+    public function DiscussionModel_AfterSaveDiscussion_Handler($sender) {
+        $discussionID = $sender->EventArguments['DiscussionID'];
+        $values = $sender->EventArguments['FormPostValues'];
+        $closed = val('Closed', $values, 0);
+        if (!$closed) {
+            return;
+        }
+
+        $isNew = val('IsNewDiscussion', $sender->EventArguments, false);
+        if ($isNew) {
+            return;
+        }
+
+        // This will be handled by the cycleWager at the end of cycleThread()
+        $isCycling = key_exists($discussionID, self::$cycling);
+        if ($isCycling) {
+            return;
+        }
+
+        $this->cycleWager($discussionID, 'return');
+    }
+
+    /**
+     * Handle explicit discussion closure
+     *
+     * @param DiscussionModel $sender
+     */
+    public function DiscussionModel_SetField_Handler($sender) {
+        $discussionID = $sender->EventArguments['DiscussionID'];
+        $setfield = $sender->EventArguments['SetField'];
+        $closed = $setfield[0] == 'Closed' && $setfield[1] == 1;
+        if (!$closed) {
+            return;
+        }
+
+        // This will be handled by the cycleWager at the end of cycleThread()
+        $isCycling = key_exists($discussionID, self::$cycling);
+        if ($isCycling) {
+            return;
+        }
+
+        $this->cycleWager($discussionID, 'return');
+    }
+
+    /**
+     * Cycle wager logic
+     *
+     * @param integer $discussion
+     * @param string $mode default 'bet', supports 'bet' and 'return'
+     */
+    public function cycleWager($discussion, $mode = 'bet') {
+        if (is_numeric($discussion)) {
+            $discussionID = $discussion;
+            $discussionModel = new DiscussionModel;
+            $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+        }
+
+        if (!is_array($discussion)) {
+            return false;
+        }
+
+        $discussionID = $discussion['DiscussionID'];
+
+        // Betting
+        $wagerKey = sprintf(self::WAGER_KEY, $discussionID);
+        $wagers = Gdn::userMetaModel()->getWhere(array(
+            'Name' => $wagerKey
+        ))->resultArray();
+        if (!count($wagers)) {
+            return false;
+        }
+
+        if ($mode == 'bet') {
+
+            // Determine winner
+            $startTime = strtotime(val('DateInserted', $discussion));
+            $endTime = time();
+            $elapsed = $endTime - $startTime;
+
+            $ordered = array();
+            $potPoints = 0;
+            foreach ($wagers as $wagerRow) {
+                $wager = json_decode($wagerRow['Value'], true);
+                $wager['UserID'] = $wagerRow['UserID'];
+                $absTimeDiff = abs($elapsed - $wager['For']);
+                $wager['Abs'] = $absTimeDiff;
+
+                if (!key_exists($absTimeDiff, $ordered)) {
+                    $ordered[$absTimeDiff] = array();
+                }
+
+                $ordered[$absTimeDiff][] = $wager;
+                $potPoints += $wager['Points'];
+            }
+            unset($wagers);
+            ksort($ordered, SORT_NUMERIC);
+
+            // Check if winner is most prolific
+            // @TODO
+
+            // What percent does the house take?
+            $rakePercent = C('Minion.ThreadCycle.Wager.Rake', 5);
+            $rakeMultiple = 1 - $rakePercent / 100;
+
+            // Award points
+            $winners = array_shift($ordered);
+            $haveRunnersUp = false;
+
+            // Runners Up (only if losers exist)
+            if (count($ordered) > 2) {
+                $haveRunnersUp = true;
+                $runnersUp = array_shift($ordered);
+                foreach ($runnersUp as &$rWager) {
+                    $potPoints -= $rWager['Points'];
+                    $returnPoints = $rWager['Points'] * $rakeMultiple;
+                    $rUser = Gdn::userModel()->getID($rWager['UserID'], DATASET_TYPE_ARRAY);
+                    $rUser['Points'] += $returnPoints;
+                    Gdn::userModel()->save($rUser);
+
+                    $rWager['Winnings'] = $returnPoints;
+                    $rWager['User'] = $rUser;
+                }
+            }
+
+            // Winners
+            $split = (count($winners) > 1);
+            $potPoints *= $rakeMultiple; // Remove house cut
+
+            // If there are multiple winners, determine total points wagered by winning bettors
+
+            $winnerPotPoints = 0;
+            foreach ($winners as $winner) {
+                $winnerPotPoints += $winner['Points'];
+            }
+            foreach ($winners as &$wWager) {
+                // If there are multiple winners, calculate winnings according to betting ratio
+                if ($split) {
+                    $ratio = $wWager['Points'] / $winnerPotPoints;
+                    $winnings = $ratio * $potPoints;
+                } else {
+                    $winnings = $potPoints;
+                }
+                $wUser = Gdn::userModel()->getID($wWager['UserID'], DATASET_TYPE_ARRAY);
+                $wUser['Points'] += $winnings;
+                Gdn::userModel()->save($wUser);
+
+                // Modify for formatting
+                $wWager['Winnings'] = $winnings;
+                $wWager['User'] = $wUser;
+            }
+
+            // Announce
+            $d1 = new DateTime();
+            $d2 = new DateTime();
+            $d2->add(new DateInterval('PT'.$elapsed.'S'));
+            $iv = $d2->diff($d1);
+
+            $out = array();
+            $keys = array('y' => 'year','m' => 'month','d' => 'day','h' => 'hour','i' => 'minute','s' => 'second');
+            foreach ($keys as $key => $keyName) {
+                if ($fieldValue = $iv->format($key)) {
+                    $out[] = sprintf('%d %d', $fieldValue, plural($fieldValue, $keyName, "{$keyName}s"));
+                }
+            }
+            $elapsedStr = implode(', ', $out);
+            $message = sprintf(T("Discussion took <b>%s</b> to recycle."), $elapsedStr)."<br/>";
+            $message .= "<br/>";
+
+            $winnerDiffPoints = $potPoints - $winnerPotPoints;
+            $winnerDiffPerc = round(($winnerDiffPoints / $winnerPotPoints) * 100, 0);
+
+            $winnerCount = count($winners);
+            $message .= sprintf(T("There %s %d %s, earning about %d%% %s points than they wagered."),
+                plural($winnerCount, 'was', 'were'),
+                $winnerCount,
+                plural($winnerCount, 'winner', 'winners'),
+                $winnerDiffPerc,
+                (($winnerDiffPoints > 0) ? 'more' : 'less')
+            )."<br/>";
+            $message .= "<br/>";
+
+            $message .= sprintf("<b>%s</b><br/>", plural($winnerCount, 'Winner', 'Winners'));
+            foreach ($winners as $winningWager) {
+                $message .= formatString(T("{User,Mention} bet {Points} points and received <b>{Winnings}</b>"), $winningWager)."<br/>";
+            }
+
+            if ($haveRunnersUp) {
+                $message .= sprintf("<b>%s</b><br/>", plural($winnerCount, 'Runner-up', 'Runners-up'));
+                foreach ($runnersUp as $ruWager) {
+                    $message .= formatString(T("{User,Mention} bet {Points} points and recovered <b>{Winnings}</b>"), $ruWager)."<br/>";
+                }
+            }
+
+            // Message thread
+            MinionPlugin::instance()->message(null, $discussion, $message, array(
+                'Inform' => false
+            ));
+
+        } else {
+
+            // Return all points
+            foreach ($wagers as $wagerRow) {
+                $wager = json_decode($wagerRow['Value'], true);
+                $lUser = Gdn::userModel()->getID($wagerRow['UserID'], DATASET_TYPE_ARRAY);
+                $lUser['Points'] += $wager['Points'];
+                Gdn::userModel()->save($lUser);
+            }
+
+        }
+
+        // Delete all wagers
+        Gdn::userMetaModel()->delete(array(
+            'Name' => $wagerKey
+        ));
+    }
+
    /**
-    * Parse custom minion commands
-    * 
-    * @param MinionPlugin $Sender
+    * Store a wager in UserMeta
+    *
+    * @param integer $userID
+    * @param integer $discussionID
+    * @param array $wager
+    * @return boolean
     */
-   public function MinionPlugin_Command_Handler($Sender) {
-      $Actions = &$Sender->EventArguments['Actions'];
-      $State = &$Sender->EventArguments['State'];
-      
-      switch ($State['Method']) {
-         case 'threadcycle':
-            
-            $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-            $Actions[] = array('threadcycle', 'Garden.Moderation.Manage', $State);
-            break;
+   protected function storeWager($userID, $discussionID, $wager) {
+      if (is_array($wager)) {
+         $wager = json_encode($wager);
       }
-      
+
+      $wagerKey = sprintf(self::WAGER_KEY, $discussionID);
+      Gdn::userMetaModel()->setUserMeta($userID, $wagerKey, $wager);
+      return true;
    }
-   
+
    /**
-    * Perform custom minion actions
-    * 
-    * @param MinionPlugin $Sender
+    * Retrieve a wager from UserMeta
+    *
+    * @param integer $userID
+    * @param integer $discussionID
+    * @return array|boolean
     */
-   public function MinionPlugin_Action_Handler($Sender) {
-      $Action = $Sender->EventArguments['Action'];
-      $State = $Sender->EventArguments['State'];
-      
-      switch ($Action) {
-         
-         case 'threadcycle':
-            
-            if (!array_key_exists('Discussion', $State['Targets']))
-               return;
-            
-            $Discussion = $State['Targets']['Discussion'];
-            $ThreadCycle = $Sender->Monitoring($Discussion, 'ThreadCycle', FALSE);
-            
-            // Trying to call off a threadcycle
-            if ($State['Toggle'] == 'off') {
-               if (!$ThreadCycle) return;
-               
-               // Call off the hunt
-               $Sender->Monitor($Discussion, array(
-                  'ThreadCycle'  => NULL
-               ));
-               
-               $Sender->Acknowledge($State['Sources']['Discussion'], FormatString(T("This thread will not be automatically recycled."), array(
-                  'Discussion'   => $Discussion
-               )));
-               
-            // Trying start a threadcycle
+   protected function retrieveWager($userID, $discussionID) {
+      $wagerKey = sprintf(self::WAGER_KEY, $discussionID);
+      $wager = Gdn::userMetaModel()->getUserMeta($userID, $wagerKey, null);
+      if (is_null($wager)) {
+          return false;
+      }
+
+      $wager = json_decode($wager, true);
+      if (!$wager) {
+          return false;
+      }
+
+      return $wager;
+   }
+
+    /**
+     * Calculate GCD
+     *
+     * @param integer $a
+     * @param integer $b
+     * @return integer
+     */
+    protected static function gcd($a,$b) {
+        $a = abs($a); $b = abs($b);
+        if( $a < $b) list($b,$a) = Array($a,$b);
+        if( $b == 0) return $a;
+        $r = $a % $b;
+        while($r > 0) {
+            $a = $b;
+            $b = $r;
+            $r = $a % $b;
+        }
+        return $b;
+    }
+
+    public static function compareUsersByPoints($a, $b) {
+        return $b['Points'] - $a['Points'];
+    }
+
+    public static function compareUsersByLastOnline($a, $b) {
+        return $a['LastOnline'] - $b['LastOnline'];
+    }
+
+    /*
+     * MINION INTERFACE
+     */
+
+    /**
+     * Parse a token from the current state
+     *
+     * @param MinionPlugin $sender
+     */
+    public function MinionPlugin_Token_Handler($sender) {
+        $state = &$sender->EventArguments['State'];
+
+        if (!$state['Method'] && in_array($state['CompareToken'], array('recycle'))) {
+            $sender->consume($state, 'Method', 'threadcycle');
+        }
+
+        $threadCycle = $sender->monitoring($state['Sources']['Discussion'], 'ThreadCycle');
+        if ($threadCycle) {
+            if (!$state['Method'] && in_array($state['CompareToken'], array('wager', 'bet'))) {
+                $sender->consume($state, 'Method', 'cyclewager');
+            }
+        }
+
+        // Gather page
+        if (val('Method', $state) == 'threadcycle' && in_array($state['CompareToken'], array('pages', 'page'))) {
+
+            // Do a quick lookbehind
+            if (is_numeric($state['LastToken'])) {
+                $state['Targets']['Page'] = $state['LastToken'];
+                $sender->consume($state);
             } else {
-               
-               $CyclePage = GetValue('Page', $State['Targets'], FALSE);
-               if ($CyclePage) {
-                  
-                  // Pick somewhere to end the discussion
-                  $CommentsPerPage = C('Vanilla.Comments.PerPage', 40);
-                  $MinComments = ($CyclePage - 1) * $CommentsPerPage;
-                  $CommentNumber = $MinComments + mt_rand(1,$CommentsPerPage-1);
-                  
-                  // Monitor the thread
-                  $Sender->Monitor($Discussion, array(
-                     'ThreadCycle'    => array(
-                        'Started'   => time(),
-                        'Page'      => $CyclePage,
-                        'Comment'   => $CommentNumber
-                     )
-                  ));
-                  
-                  $Acknowledge = T("Thread will be recycled after {Page}.");
-                  $Acknowledged = FormatString($Acknowledge, array(
-                     'Page'         => sprintf(Plural($CyclePage, '%d page', '%d pages'), $CyclePage),
-                     'Discussion'   => $State['Targets']['Discussion']
-                  ));
-
-                  $Sender->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
-                  $Sender->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
-                  
-               } else {
-                  // Cycle immediately
-                  $this->CycleThread($Discussion);
-               }
-
+                $sender->consume($state, 'Gather', array(
+                    'Node' => 'Page',
+                    'Delta' => ''
+                ));
             }
-            
-            break;
-      }
-   }
-   
-   /**
-    * Determine if we're at the comment that should trigger recycling
-    * 
-    * @param MinionPlugin $Sender
-    */
-   public function MinionPlugin_Monitor_Handler($Sender) {
-      $Discussion = $Sender->EventArguments['Discussion'];
-      $ThreadCycle = $Sender->Monitoring($Discussion, 'ThreadCycle', FALSE);
-      if (!$ThreadCycle) return;
-      
-      $CycleCommentNumber = GetValue('Comment', $ThreadCycle);
-      $Comments = GetValue('CountComments', $Discussion);
-      if ($Comments == $CycleCommentNumber) {
-         $this->CycleThread($Discussion);
-      }
-   }
-   
-   /**
-    * Add to rules
-    * 
-    * @param MinionPlugin $Sender
-    */
-   public function MinionPlugin_Sanctions_Handler($Sender) {
-      
-      // Don't care about the rule bar
-      
-      $Type = GetValue('Type', $Sender->EventArguments, 'rules');
-      if ($Type == 'bar') return;
-      
-      // Show a warning if there are rules in effect
-      
-      $ThreadCycle = $Sender->Monitoring($Sender->EventArguments['Discussion'], 'ThreadCycle', NULL);
-      
-      // Nothing happening?
-      if (!$ThreadCycle)
-         return;
+        }
 
-      $Rules = &$Sender->EventArguments['Rules'];
-      
-      // Thread is queued for recycled
-      $Page = GetValue('Page', $ThreadCycle);
-      $Rules[] = Wrap("<b>Thread Recycle</b>: page {$Page}", 'span', array('class' => 'MinionRule'));
-      
-   }
-   
+        // Gather wager
+        if (val('Method', $state) == 'cyclewager' && in_array($state['CompareToken'], array('point', 'points'))) {
+
+            // Do a quick lookbehind
+            if (is_numeric($state['LastToken'])) {
+                $state['Targets']['Wager'] = $state['LastToken'];
+                $sender->consume($state);
+            } else {
+                $sender->consume($state, 'Gather', array(
+                    'Node' => 'Wager',
+                    'Type' => 'number',
+                    'Delta' => ''
+                ));
+            }
+        }
+    }
+
+    /**
+     * Parse custom minion commands
+     *
+     * @param MinionPlugin $sender
+     */
+    public function MinionPlugin_Command_Handler($sender) {
+        $actions = &$sender->EventArguments['Actions'];
+        $state = &$sender->EventArguments['State'];
+
+        switch ($state['Method']) {
+            case 'threadcycle':
+
+                $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
+                $actions[] = array('threadcycle', c('Minion.Access.Recycle','Garden.Moderation.Manage'), $state);
+                break;
+
+            case 'cyclewager':
+
+                if (!C('Minion.ThreadCycle.Wager.Allow', true)) {
+                    return;
+                }
+                $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
+                $actions[] = array('cyclewager', c('Minion.Access.CycleWager','Garden.SignIn.Allow'), $state);
+                break;
+        }
+    }
+
+    /**
+     * Perform custom minion actions
+     *
+     * @param MinionPlugin $sender
+     */
+    public function MinionPlugin_Action_Handler($sender) {
+        $action = $sender->EventArguments['Action'];
+        $state = $sender->EventArguments['State'];
+
+        switch ($action) {
+
+            case 'threadcycle':
+
+                if (!array_key_exists('Discussion', $state['Targets'])) {
+                    return;
+                }
+
+                $discussion = $state['Targets']['Discussion'];
+                $threadCycle = $sender->monitoring($discussion, 'ThreadCycle', false);
+
+                // Trying to call off a threadcycle
+                $toggle = val('Toggle', $state, MinionPlugin::TOGGLE_ON);
+                if ($toggle == MinionPlugin::TOGGLE_OFF) {
+
+                    if (!$threadCycle) {
+                        return;
+                    }
+
+                    // Call off the hunt
+                    $sender->monitor($discussion, array(
+                        'ThreadCycle' => null
+                    ));
+
+                    $sender->acknowledge($state['Sources']['Discussion'], formatString(T("This thread will not be automatically recycled."), array(
+                        'Discussion' => $discussion
+                    )));
+
+                // Trying start a threadcycle
+                } else {
+
+                    $cyclePage = val('Page', $state['Targets'], false);
+                    if ($cyclePage) {
+
+                        // Pick somewhere to end the discussion
+                        $commentsPerPage = C('Vanilla.Comments.PerPage', 40);
+                        $minComments = ($cyclePage - 1) * $commentsPerPage;
+                        $commentNumber = $minComments + mt_rand(1, $commentsPerPage - 1);
+
+                        // Monitor the thread
+                        $sender->monitor($discussion, array(
+                            'ThreadCycle' => array(
+                                'Started' => time(),
+                                'Page' => $cyclePage,
+                                'Comment' => $commentNumber
+                            )
+                        ));
+
+                        $acknowledge = T("Thread will be recycled after {Page}.");
+                        $acknowledged = formatString($acknowledge, array(
+                            'Page' => sprintf(Plural($cyclePage, '%d page', '%d pages'), $cyclePage),
+                            'Discussion' => $state['Targets']['Discussion']
+                        ));
+
+                        $sender->acknowledge($state['Sources']['Discussion'], $acknowledged);
+                        $sender->log($acknowledged, $state['Targets']['Discussion'], $state['Sources']['User']);
+
+                    } else {
+                        // Cycle immediately
+                        $this->cycleThread($discussion, false);
+                    }
+                }
+
+                break;
+
+            case 'cyclewager':
+
+                if (!array_key_exists('Discussion', $state['Targets'])) {
+                    return;
+                }
+
+                // Get discussion
+                $comment = valr('Source.Comment', $state, null);
+                $discussion = $state['Source']['Discussion'];
+                $discussionID = $discussion['DiscussionID'];
+                $threadCycle = $sender->monitoring($discussion, 'ThreadCycle', false);
+
+                try {
+
+                    // Close betting when 75% of the thread has passed
+                    $threadTerminateComment = val('Comment', $threadCycle);
+                    $threadProgress = ($discussion['CountComments'] / $threadTerminateComment) * 100;
+                    if ($threadProgress >= C('Minion.ThreadCycle.Wager.Cutoff', 75)) {
+                        throw new Exception(T("Betting is now closed in this discussion."));
+                    }
+
+                    // Get wager info
+                    //$wagerKey = "plugin.threadcycle.wager.{$discussionID}";
+                    $user = $state['Sources']['User'];
+                    $userID = $user['UserID'];
+                    $wager = $this->retrieveWager($userID, $discussionID);
+
+                    $utc = new DateTimeZone('utc');
+                    $now = new DateTime('now', $utc);
+
+                    $toggle = val('Toggle', $state, MinionPlugin::TOGGLE_ON);
+                    if ($toggle == MinionPlugin::TOGGLE_ON) {
+
+                        // We require a wager!
+                        if (!array_key_exists('Wager', $state['Targets'])) {
+                            throw new Exception(T("You didn't supply a wager amount!"));
+                        }
+
+                        // We require a time!
+                        if (!array_key_exists('Time', $state)) {
+                            throw new Exception(T("You didn't supply a valid time!"));
+                        }
+
+                        // Note that we're modifying an existing wager
+                        $modify = false;
+                        if ($wager) {
+                            $modify = true;
+                        }
+
+                        $newWagerPoints = $state['Targets']['Wager'];
+
+                        // Don't allow negative points wagering
+                        if ($newWagerPoints <= 0) {
+                            $sender->punish($user, $discussion, $comment, MinionPlugin::FORCE_LOW, array(
+                                'Reason' => 'Trying to abuse Cycle Wagering for profit'
+                            ));
+                            throw new Exception(T("You must wager a positive number of points!"));
+                        }
+
+                        $wagerPoints = val('Points', $wager, 0);
+                        $myPoints = $user['Points'] + $wagerPoints;
+
+                        // Check if the user has enough points
+                        if ($newWagerPoints > $myPoints) {
+                            $acknowledge = T("You do not have sufficient points to cover that wager! %d is less than %d");
+                            $acknowledged = sprintf($acknowledge, $myPoints, $newWagerPoints);
+                            throw new Exception($acknowledged);
+                        }
+
+                        // Build the wager
+                        $wagerTimeString = $state['Time'];
+                        $wagerTimeInterval = DateInterval::createFromDateString($wagerTimeString);
+
+                        $wagerDate = clone $now;
+                        $wagerDate->add($wagerTimeInterval);
+                        $newWager = array(
+                            'Points' => $newWagerPoints,
+                            'Date' => date('Y-m-d H:i:s'),
+                            'For' => abs(strtotime($wagerTimeString) - time()),
+                            'ForStr' => $wagerTimeString,
+                            'EndTime' => $wagerDate->getTimestamp()
+                        );
+                        $this->storeWager($userID, $discussionID, $newWager);
+
+                        // Update user points
+                        $newUserPoints = $myPoints - $newWagerPoints;
+                        $user['Points'] = $newUserPoints;
+                        Gdn::userModel()->save($user);
+
+                        // Acknowledge the user
+                        $acknowledge = T("Your wager of <b>%d points</b> for '%s' has been entered!");
+                        $acknowledged = sprintf($acknowledge, $newWagerPoints, $wagerTimeString);
+                        $sender->acknowledge($discussion, $acknowledged, 'positive', array(
+                            'Inform' => true,
+                            'Comment' => false
+                        ));
+
+                    } else {
+
+                        if (!$wager) {
+                            throw new Exception(T("You do not currently have a cycle wager in this discussion."));
+                        }
+
+                        // Cancel wager
+                        $this->storeWager($userID, $discussionID, null);
+                        //Gdn::userMetaModel()->setUserMeta($userID, $wagerKey, null);
+
+                        // Give points back
+                        $wagerPoints = val('Points', $wager, 0);
+                        if ($wagerPoints) {
+                            $user['Points'] += $wagerPoints;
+                            Gdn::userModel()->save($user);
+                        }
+
+                        // Acknowledge the user
+                        $acknowledge = T("Your wager of <b>%d points</b> for '%s' has been <b>cancelled</b>.");
+                        $acknowledged = sprintf($acknowledge, $wagerPoints, $wager['ForStr']);
+                        $sender->acknowledge($discussion, $acknowledged, 'positive', array(
+                            'Inform' => true,
+                            'Comment' => false
+                        ));
+
+                    }
+
+                } catch (Exception $ex) {
+                    $sender->acknowledge($discussion, $ex->getMessage(), 'negative', array(
+                        'Inform' => true,
+                        'Comment' => false
+                    ));
+                }
+                break;
+        }
+    }
+
+    /**
+     * Determine if we're at the comment that should trigger recycling
+     *
+     * @param MinionPlugin $sender
+     */
+    public function MinionPlugin_Monitor_Handler($sender) {
+        $discussion = $sender->EventArguments['Discussion'];
+        $threadCycle = $sender->monitoring($discussion, 'ThreadCycle', false);
+        if (!$threadCycle) {
+            return;
+        }
+
+        $cycleCommentNumber = val('Comment', $threadCycle);
+        $comments = val('CountComments', $discussion);
+        if ($comments >= $cycleCommentNumber) {
+            $this->cycleThread($discussion);
+        }
+    }
+
+    /**
+     * Add to rules
+     *
+     * @param MinionPlugin $sender
+     */
+    public function MinionPlugin_Sanctions_Handler($sender) {
+
+        // Don't care about the rule bar
+
+        $type = val('Type', $sender->EventArguments, 'rules');
+        if ($type == 'bar') {
+            return;
+        }
+
+        // Show a warning if there are rules in effect
+
+        $threadCycle = $sender->monitoring($sender->EventArguments['Discussion'], 'ThreadCycle', null);
+
+        // Nothing happening?
+        if (!$threadCycle) {
+            return;
+        }
+
+        $rules = &$sender->EventArguments['Rules'];
+
+        // Thread is queued for recycled
+        $page = val('Page', $threadCycle);
+        $rules[] = Wrap("<b>Thread Recycle</b>: page {$page}", 'span', array('class' => 'MinionRule'));
+    }
+
 }

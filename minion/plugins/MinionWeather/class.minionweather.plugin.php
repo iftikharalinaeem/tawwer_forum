@@ -47,7 +47,7 @@ class MinionWeatherPlugin extends Gdn_Plugin {
       $state = &$sender->EventArguments['State'];
 
       if (!$state['Method'] && in_array($state['CompareToken'], array('weather')))
-         $sender->Consume($state, 'Method', 'weather');
+         $sender->consume($state, 'Method', 'weather');
 
    }
 

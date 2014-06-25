@@ -1,280 +1,314 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @copyright 2010-2014 Vanilla Forums Inc
  * @license Proprietary
  */
-
 class WarningModel extends UserNoteModel {
-   /// Properties ///
-   protected static $_Special;
 
-   /// Methods ///
+    /// Properties ///
+    protected static $_Special;
 
-   protected function _Notify($Warning) {
-      if (!is_array($Warning))
-         $Warning = $this->GetID($Warning);
+    /// Methods ///
 
-      if (!class_exists('ConversationModel')) {
-         return FALSE;
-      }
+    protected function _notify($warning) {
+        if (!is_array($warning)) {
+            $warning = $this->getID($warning);
+        }
 
-      // Send a message from the moderator to the person being warned.
-      $Model = new ConversationModel();
-      $MessageModel = new ConversationMessageModel();
+        if (!class_exists('ConversationModel')) {
+            return false;
+        }
 
-      $Row = array(
-         'Subject' => T('HeadlineFormat.Warning.ToUser', "You've been warned."),
-         'Type' => 'warning',
-         'Body' => $Warning['Body'],
-         'Format' => $Warning['Format'],
-         'RecipientUserID' => (array)$Warning['UserID']
-         );
+        // Send a message from the moderator to the person being warned.
+        $model = new ConversationModel();
+        $messageModel = new ConversationMessageModel();
 
-      $ConversationID = $Model->Save($Row, $MessageModel);
+        $warningID = $warning['WarningID'];
+        $row = array(
+            'Subject' => T('HeadlineFormat.Warning.ToUser', "You've been warned."),
+            'Type' => 'warning',
+            'ForeignID' => "warning-{$warningID}",
+            'Body' => $warning['Body'],
+            'Format' => $warning['Format'],
+            'RecipientUserID' => (array)$warning['UserID']
+        );
 
-      if (!$ConversationID) {
-         throw new Gdn_UserException($Model->Validation->ResultsText());
-      }
-      return $ConversationID;
-   }
+        $conversationID = $model->save($row, $messageModel);
 
-   public function ProcessAllWarnings() {
-      $Alerts = $this->SQL->GetWhere('UserAlert', array('TimeExpires <' => time()))->ResultArray();
+        if (!$conversationID) {
+            throw new Gdn_UserException($model->Validation->resultsText());
+        }
+        return $conversationID;
+    }
 
-      $Result = array();
-      foreach ($Alerts as $Alert) {
-         $UserID = $Alert['UserID'];
-         $Processed = $this->ProcessWarnings($Alert);
-         $Result[$UserID] = $Processed;
-      }
-      return $Result;
-   }
+    public function ProcessAllWarnings() {
+        $alerts = $this->SQL->GetWhere('UserAlert', array('TimeExpires <' => time()))->resultArray();
 
-   public function ProcessWarnings($UserID) {
-      $AlertModel = new UserAlertModel();
+        $result = array();
+        foreach ($alerts as $alert) {
+            $userID = $alert['UserID'];
+            $processed = $this->processWarnings($alert);
+            $result[$userID] = $processed;
+        }
+        return $result;
+    }
 
-      if (is_array($UserID)) {
-         if (array_key_exists('WarningLevel', $UserID)) {
-            $Alert = $UserID;
-         }
-         $UserID = $Alert['UserID'];
-      }
+    public function processWarnings($userID) {
+        $alertModel = new UserAlertModel();
 
-      // Grab the user's current alert level.
-      if (!isset($Alert))
-         $Alert = $AlertModel->GetID($UserID);
-
-      if (!$Alert)
-         return;
-
-      $Now = time();
-
-      // See if the warnings have expired.
-      if ($Alert['TimeWarningExpires'] < $Now) {
-         $Alert['WarningLevel'] = 0;
-         $Alert['TimeWarningExpires'] = NULL;
-
-         $AlertModel->SetTimeExpires($Alert);
-         $AlertModel->Save($Alert);
-      }
-
-      $WarningLevel = $Alert['WarningLevel'];
-
-      // See if there's something special to do.
-      $Punished = 0;
-      if ($WarningLevel >= 3) {
-         // The user is punished (jailed).
-         $Punished = 1;
-      }
-      $Banned = 0;
-      if ($WarningLevel >= 5) {
-         // The user is banned.
-         $Banned = 1;
-      }
-
-      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-
-      $Set = array();
-      if ($User['Banned'] != $Banned)
-         $Set['Banned'] = $Banned;
-      if ($User['Punished'] != $Punished)
-         $Set['Punished'] = $Punished;
-
-      if (!empty($Set)) {
-         Gdn::UserModel()->SetField($UserID, $Set);
-      }
-
-      return array('WarnLevel' => $WarningLevel, 'Set' => $Set);
-   }
-
-   /**
-    * Reverse a warning.
-    *
-    * @param array|int $Warning The warning to reverse.
-    * @return boolean Whether the warning was reversed.
-    */
-   public function Reverse($Warning) {
-      if (!is_array($Warning)) {
-         $Warning = $this->GetID($Warning);
-      }
-
-      if (!$Warning)
-         throw NotFoundException('Warning');
-
-      if (GetValue('Reversed', $Warning)) {
-         $this->Validation->AddValidationResult('Reversed', 'The warning was already reversed.');
-         return FALSE;
-      }
-
-      // First, reverse the warning.
-      $this->SetField($Warning['UserNoteID'], 'Reversed', TRUE);
-
-      // Reverse the amount of time on the warning and its points.
-      $ExpiresTimespan = GetValue('ExpiresTimespan', $Warning, '0');
-      $Points = GetValue('Points', $Warning, 0);
-
-      $AlertModel = new UserAlertModel();
-      $Alert = $AlertModel->GetID($Warning['UserID']);
-      if ($Alert) {
-         $NewWarningLevel = $Alert['WarningLevel'] - $Points;
-         if ($NewWarningLevel < 0)
-            $NewWarningLevel = 0;
-         $Alert['WarningLevel'] = $NewWarningLevel;
-
-
-         $NewTimeWarningExpires = $Alert['TimeWarningExpires'] - $ExpiresTimespan;
-         if ($NewTimeWarningExpires <= time())
-            $NewTimeWarningExpires = NULL;
-         $Alert['TimeWarningExpires'] = $NewTimeWarningExpires;
-         $AlertModel->SetTimeExpires($Alert);
-         if (!$AlertModel->Save($Alert)) {
-            $this->Validation->AddValidationResult($AlertModel->ValidationResults());
-         } else {
-            $this->ProcessWarnings($Alert);
-         }
-      }
-      return TRUE;
-   }
-
-   /**
-    * @param array $Data The warning data to save.
-    *  - UserID: The user being warned.
-    *  - Body: A private message to the user being warned.
-    *  - Format: The format of the body.
-    *
-    *  **The following**
-    *  - Points: The number of warning points.
-    *  - ExpiresString: A string used for the expiry. (ex. 1 week, 3 days, etc)
-    *  - ExpiresTimespan: The number of seconds until expiry.
-    *
-    *  **Or**
-    *  - WarningTypeID: The type of warning given.
-    *
-    * @return type
-    */
-   public function Save($Data) {
-      $UserID = GetValue('UserID', $Data);
-      unset($Data['AttachRecord']);
-
-      // Coerce the data.
-      $Data['Type'] = 'warning';
-      if (isset($Data['WarningTypeID'])) {
-         $WarningType = $this->SQL->GetWhere('WarningType', array('WarningTypeID' => $Data['WarningTypeID']))->FirstRow(DATASET_TYPE_ARRAY);
-         if (!$WarningType) {
-            $this->Validation->AddValidationResult('WarningTypeID', 'Invalid warning type');
-         } else {
-            TouchValue('Points', $Data, $WarningType['Points']);
-            if ($WarningType['ExpireNumber'] > 0) {
-               TouchValue('ExpiresString', $Data, Plural($WarningType['ExpireNumber'], '%s '.rtrim($WarningType['ExpireType'], 's'), '%s '.$WarningType['ExpireType']));
-               $Seconds = strtotime($WarningType['ExpireNumber'].' '.$WarningType['ExpireType'], 0);
-               TouchValue('ExpiresTimespan', $Data, $Seconds);
+        if (is_array($userID)) {
+            if (array_key_exists('WarningLevel', $userID)) {
+                $alert = $userID;
             }
-         }
-      }
+            $userID = $alert['UserID'];
+        }
 
-      if (!isset($Data['Points']))
-         $this->Validation->AddValidationResult('Points', 'ValidateRequired');
-      elseif ($Data['Points']) {
-         if (!ValidateRequired(GetValue('ExpiresString', $Data)) && !ValidateRequired(GetValue('ExpiresTimespan', $Data))) {
-            $this->Validation->AddValidationResult('ExpiresString/ExpiresNumber', 'ValidateRequired');
-         } elseif (!ValidateRequired(GetValue('ExpiresTimespan', $Data))) {
-            // Calculate the seconds from the string.
-            $Seconds = strtotime(GetValue('ExpiresString', $Data), 0);
-            TouchValue('ExpiresTimespan', $Data, $Seconds);
-         } elseif (!ValidateRequired(GetValue('ExpiresString', $Data))) {
-            $Days = round($Data['ExpiresTimespan'] / strtotime('1 day', 0));
-            TouchValue('ExpiresString', $Data, Plural($Days, '%s day', '%s days'));
-         }
-      }
+        // Grab the user's current alert level.
+        if (!isset($alert)) {
+            $alert = $alertModel->getID($userID);
+        }
 
-      // First we save the warning.
-      $ID = parent::Save($Data);
-      if (!$ID)
-         return FALSE;
+        if (!$alert) {
+            return;
+        }
 
-      // Attach the warning to the record.
-      $RecordType = ucfirst(GetValue('RecordType', $Data));
-      $RecordID = GetValue('RecordID', $Data);
-      if (in_array($RecordType, array('Discussion', 'Comment')) && $RecordID) {
-         $ModelClass = $RecordType.'Model';
-         $Model = new $ModelClass;
-         $Model->SaveToSerializedColumn('Attributes', $RecordID, 'WarningID', $ID);
-      }
+        $now = time();
 
-      // Send the private message.
-      $ConversationID = $this->_Notify($Data);
-      if ($ConversationID) {
-         // Save the conversation link back to the warning.
-         $this->SetField($ID, array('ConversationID' => $ConversationID));
-      }
+        // See if the warnings have expired.
+        if ($alert['TimeWarningExpires'] < $now) {
+            $alert['WarningLevel'] = 0;
+            $alert['TimeWarningExpires'] = null;
 
-      // Increment the user's alert level.
-      $AlertModel = new UserAlertModel();
-      $Alert = $AlertModel->GetID($UserID, DATASET_TYPE_ARRAY);
-      if (!$Alert)
-         $Alert = array('UserID' => $UserID);
+            $alertModel->setTimeExpires($alert);
+            $alertModel->save($alert);
+        }
 
-      if ($Data['Points']) {
-         $Alert['WarningLevel'] = GetValue('WarningLevel', $Alert, 0) + $Data['Points'];
+        $warningLevel = $alert['WarningLevel'];
 
-         $Now = time();
+        // See if there's something special to do.
+        $punished = 0;
+        if ($warningLevel >= 3) {
+            // The user is punished (jailed).
+            $punished = 1;
+        }
+        $banned = 0;
+        if ($warningLevel >= 5) {
+            // The user is banned.
+            $banned = 1;
+        }
 
-         $Expires = GetValue('TimeWarningExpires', $Alert, 0);
-         if ($Expires < $Now)
-            $Expires = $Now;
+        $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
 
-         $Expires += $Data['ExpiresTimespan'];
-         $Alert['TimeWarningExpires'] = $Expires;
+        $set = array();
+        if ($user['Banned'] != $banned) {
+            $set['Banned'] = $banned;
+        }
+        if ($user['Punished'] != $punished) {
+            $set['Punished'] = $punished;
+        }
 
-         $AlertModel->SetTimeExpires($Alert);
-      }
+        if (!empty($set)) {
+            Gdn::userModel()->setField($userID, $set);
+        }
 
-      if ($Alert)
-         $AlertModel->Save($Alert);
-      else {
-         $Set['UserID'] = $Data['UserID'];
-         $AlertModel->Insert($Set);
-      }
+        return array('WarnLevel' => $warningLevel, 'Set' => $set);
+    }
 
-      // Process this user's warnings.
-      $Processed = $this->ProcessWarnings($UserID);
+    /**
+     * Reverse a warning.
+     *
+     * @param array|int $warning The warning to reverse.
+     * @return boolean Whether the warning was reversed.
+     */
+    public function reverse($warning) {
+        if (!is_array($warning)) {
+            $warning = $this->getID($warning);
+        }
 
-      if (valr('Set.Banned', $Processed)) {
-         // Update the user note to indicate the ban.
-         $this->SaveToSerializedColumn('Attributes', $ID, 'Banned', TRUE);
-      }
+        if (!$warning) {
+            throw NotFoundException('Warning');
+        }
 
-      return $ID;
-   }
+        if (val('Reversed', $warning)) {
+            $this->Validation->addValidationResult('Reversed', 'The warning was already reversed.');
+            return false;
+        }
 
-   public static function Special() {
-      if (self::$_Special === NULL) {
-         self::$_Special = array(
-            3 => array('Label' => T('Jail'), 'Title' => T('Jailed users have reduced abilities.')),
-            5 => array('Label' => T('Ban'), 'Title' => T("Banned users can no longer access the site."))
-         );
-      }
-      return self::$_Special;
-   }
+        // First, reverse the warning.
+        $this->setField($warning['UserNoteID'], 'Reversed', true);
+
+        // Reverse the amount of time on the warning and its points.
+        $expiresTimespan = val('ExpiresTimespan', $warning, '0');
+        $points = val('Points', $warning, 0);
+
+        $alertModel = new UserAlertModel();
+        $alert = $alertModel->getID($warning['UserID']);
+        if ($alert) {
+            $newWarningLevel = $alert['WarningLevel'] - $points;
+            if ($newWarningLevel < 0) {
+                $newWarningLevel = 0;
+            }
+            $alert['WarningLevel'] = $newWarningLevel;
+
+            $newTimeWarningExpires = $alert['TimeWarningExpires'] - $expiresTimespan;
+            if ($newTimeWarningExpires <= time()) {
+                $newTimeWarningExpires = null;
+            }
+            $alert['TimeWarningExpires'] = $newTimeWarningExpires;
+            $alertModel->setTimeExpires($alert);
+            if (!$alertModel->save($alert)) {
+                $this->Validation->addValidationResult($alertModel->balidationResults());
+            } else {
+                $this->processWarnings($alert);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param array $data The warning data to save.
+     *  - UserID: The user being warned.
+     *  - Body: A private message to the user being warned.
+     *  - Format: The format of the body.
+     *
+     *  **The following**
+     *  - Points: The number of warning points.
+     *  - ExpiresString: A string used for the expiry. (ex. 1 week, 3 days, etc)
+     *  - ExpiresTimespan: The number of seconds until expiry.
+     *
+     *  **Or**
+     *  - WarningTypeID: The type of warning given.
+     *
+     * @return type
+     */
+    public function save($data, $settings = false) {
+        $userID = val('UserID', $data);
+        unset($data['AttachRecord']);
+
+        // Coerce the data.
+        $data['Type'] = 'warning';
+        if (isset($data['WarningTypeID'])) {
+            $warningType = $this->SQL->getWhere('WarningType', array('WarningTypeID' => $data['WarningTypeID']))->firstRow(DATASET_TYPE_ARRAY);
+            if (!$warningType) {
+                $this->Validation->addValidationResult('WarningTypeID', 'Invalid warning type');
+            } else {
+                touchValue('Points', $data, $warningType['Points']);
+                if ($warningType['ExpireNumber'] > 0) {
+                    touchValue('ExpiresString', $data, Plural($warningType['ExpireNumber'], '%s ' . rtrim($warningType['ExpireType'], 's'), '%s ' . $warningType['ExpireType']));
+                    $seconds = strtotime($warningType['ExpireNumber'] . ' ' . $warningType['ExpireType'], 0);
+                    touchValue('ExpiresTimespan', $data, $seconds);
+                }
+            }
+        }
+
+        if (!isset($data['Points'])) {
+            $this->Validation->addValidationResult('Points', 'ValidateRequired');
+        } elseif ($data['Points']) {
+            if (!validateRequired(val('ExpiresString', $data)) && !validateRequired(val('ExpiresTimespan', $data))) {
+                $this->Validation->addValidationResult('ExpiresString/ExpiresNumber', 'ValidateRequired');
+            } elseif (!validateRequired(val('ExpiresTimespan', $data))) {
+                // Calculate the seconds from the string.
+                $seconds = strtotime(val('ExpiresString', $data), 0);
+                touchValue('ExpiresTimespan', $data, $seconds);
+            } elseif (!ValidateRequired(val('ExpiresString', $data))) {
+                $days = round($data['ExpiresTimespan'] / strtotime('1 day', 0));
+                touchValue('ExpiresString', $data, plural($days, '%s day', '%s days'));
+            }
+        }
+
+        // First we save the warning.
+        $ID = parent::save($data, $settings);
+        if (!$ID) {
+            return false;
+        }
+        $data['WarningID'] = $ID;
+
+        $event = array(
+            'Warning' => $data,
+            'WarningID' => $ID
+        );
+
+        // Attach the warning to the source record.
+        $recordType = ucfirst(val('RecordType', $data));
+        $recordID = val('RecordID', $data);
+        if (in_array($recordType, array('Discussion', 'Comment', 'Activity')) && $recordID) {
+            $modelClass = $recordType . 'Model';
+            $model = new $modelClass;
+            $model->saveToSerializedColumn('Attributes', $recordID, 'WarningID', $ID);
+
+            $event = array_merge($event, array(
+                'RecordType' => $recordType,
+                'RecordID' => $recordID
+            ));
+        }
+
+        // Send the private message.
+        $conversationID = $this->_Notify($data);
+        if ($conversationID) {
+            // Save the conversation link back to the warning.
+            $this->setField($ID, array('ConversationID' => $conversationID));
+            $event['ConversationID'] = $conversationID;
+        }
+
+        // Increment the user's alert level.
+        $alertModel = new UserAlertModel();
+        $alert = $alertModel->getID($userID);
+        if (!$alert) {
+            $alert = array('UserID' => $userID);
+        }
+
+        if ($data['Points']) {
+            $alert['WarningLevel'] = val('WarningLevel', $alert, 0) + $data['Points'];
+
+            $now = time();
+
+            $expires = val('TimeWarningExpires', $alert, 0);
+            if ($expires < $now) {
+                $expires = $now;
+            }
+
+            $expires += $data['ExpiresTimespan'];
+            $alert['TimeWarningExpires'] = $expires;
+
+            $alertModel->setTimeExpires($alert);
+        }
+
+        if ($alert) {
+            $alertModel->save($alert);
+        } else {
+            $set['UserID'] = $data['UserID'];
+            $alertModel->Insert($set);
+        }
+
+        $event['Alert'] = $alert;
+
+        // Process this user's warnings.
+        $processed = $this->ProcessWarnings($userID);
+
+        if (valr('Set.Banned', $processed)) {
+            // Update the user note to indicate the ban.
+            $this->saveToSerializedColumn('Attributes', $ID, 'Banned', true);
+            $event['Banned'] = true;
+        }
+
+        // Do we allow hooking for this save?
+        if (val('Event', $settings, true)) {
+            $this->EventArguments = array_merge($this->EventArguments, $event);
+            $this->fireEvent('WarningAdded');
+        }
+
+        return $ID;
+    }
+
+    public static function special() {
+        if (self::$_Special === null) {
+            self::$_Special = array(
+                3 => array('Label' => T('Jail'), 'Title' => T('Jailed users have reduced abilities.')),
+                5 => array('Label' => T('Ban'), 'Title' => T("Banned users can no longer access the site."))
+            );
+        }
+        return self::$_Special;
+    }
 
 }

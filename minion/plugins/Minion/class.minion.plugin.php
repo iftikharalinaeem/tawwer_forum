@@ -1,6 +1,22 @@
 <?php
 
 /**
+ * @copyright 2010-2014 Vanilla Forums Inc
+ * @license Proprietary
+ */
+
+$PluginInfo['Minion'] = array(
+    'Name' => 'Minion',
+    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically and on command.",
+    'Version' => '2.0',
+    'RequiredApplications' => array('Vanilla' => '2.1a'),
+    'MobileFriendly' => true,
+    'Author' => "Tim Gunter",
+    'AuthorEmail' => 'tim@vanillaforums.com',
+    'AuthorUrl' => 'http://vanillaforums.com'
+);
+
+/**
  * Minion Plugin
  *
  * This plugin creates a 'minion' that performs certain administrative tasks
@@ -39,62 +55,91 @@
  *  1.15.1  Allow silent fingerprint banning
  *  1.16    Incorporate 'page' gathering into core
  *  1.17    Handle new autocompleted mentions
+ *  2.0     PSR-2 and Warnings support
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license Proprietary
  * @package misc
  */
-$PluginInfo['Minion'] = array(
-    'Name' => 'Minion',
-    'Description' => "Creates a 'minion' that performs adminstrative tasks automatically.",
-    'Version' => '1.17',
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
-    'MobileFriendly' => true,
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com'
-);
-
 class MinionPlugin extends Gdn_Plugin {
 
     /**
      * Minion UserID
      * @var integer
      */
-    protected $MinionUserID = null;
+    protected $minionUserID = null;
 
     /**
      * Minion user array
      * @var array
      */
-    protected $Minion = null;
+    protected $minion = null;
 
     /**
      * Messages that Minion can send
      * @var array
      */
-    protected $Messages;
+    protected $messages;
 
     /**
      * List of registered personas
      * @var array
      */
-    protected $Personas;
+    protected $personas;
 
     /**
      * Current persona key
      * @var string
      */
-    protected $Persona;
+    protected $persona;
+
+    /* Constants */
+
+    // Toggles
+    const TOGGLE_ON = 'on';
+    const TOGGLE_OFF = 'off';
+    protected $toggles = array(
+        self::TOGGLE_ON,
+        self::TOGGLE_OFF
+    );
+
+    /**
+     * Toggle triggers
+     * @var array
+     */
+    protected $toggle_triggers = array();
+
+    // Forces
+    const FORCE_LOW = 'low';            // Warning, no points
+    const FORCE_MEDIUM = 'medium';      // Infraction, 2 points
+    const FORCE_HIGH = 'high';          // Infraction, 3 points
+    const FORCE_LETHAL = 'lethal';      // Ban
+    protected $forces = array(
+        self::FORCE_LOW,
+        self::FORCE_MEDIUM,
+        self::FORCE_HIGH,
+        self::FORCE_LETHAL
+    );
+
+    /**
+     * Force triggers
+     * @var array
+     */
+    protected $force_triggers = array();
+
+    /**
+     * User triggers
+     * @var array
+     */
+    protected $user_triggers = array();
 
     public function __construct() {
         parent::__construct();
 
-        $this->Personas = array();
-        $this->Persona = null;
+        $this->personas = [];
+        $this->persona = null;
 
-        $this->Messages = array(
+        // Define messages
+        $this->messages = array(
             'Gloat' => array(
                 "Every point of view is useful @\"{User.Name}\", even those that are wrong - if we can judge why a wrong view was accepted.",
                 "How could we have become so different, @\"{User.Name}\"? Why can we no longer understand each other? What did we do wrong?",
@@ -142,36 +187,56 @@ class MinionPlugin extends Gdn_Plugin {
                 "TRIMMING PRIVATE KEYS"
             )
         );
+
+        // Define toggle triggers
+        $this->toggle_triggers = array(
+            self::TOGGLE_ON => t('Minion.Trigger.Toggles.On', array('open', 'enable', 'unlock', 'allow', 'allowed', 'on', 'start')),
+            self::TOGGLE_OFF => t('Minion.Trigger.Toggles.Off', array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off', 'revoke', 'stop'))
+        );
+
+        // Define force triggers
+        $this->force_triggers = array(
+            self::FORCE_LOW => t('Minion.Trigger.Forces.Low', array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer', 'gently', 'gentle', 'peacekeeper')),
+            self::FORCE_MEDIUM => t('Minion.Trigger.Forces.Medium', array('power', 'cook', 'simmer', 'stern', 'sternly', 'minor')),
+            self::FORCE_HIGH => t('Minion.Trigger.Forces.High', array('volts', 'extreme', 'slugs', 'broil', 'sear', 'strong', 'strongly', 'major')),
+            self::FORCE_LETHAL => t('Minion.Trigger.Forces.Lethal', array('kill', 'lethal', 'nuke', 'nuclear', 'destroy')),
+        );
+
+        // Define user triggers
+        $this->user_triggers = c('Minion.Trigger.Users', array('user', 'inmate', 'citizen'));
     }
 
     /**
      * Load minion persona
      */
-    protected function StartMinion() {
+    protected function startMinion() {
 
         // Register default persona
-        $this->Persona('Minion', array(
+        $this->persona('Minion', [
             'Name' => 'Minion',
             'Photo' => 'http://cdn.vanillaforums.com/minion/minion.png',
             'Title' => 'Forum Robot',
             'Location' => 'Vanilla Forums - ' . time()
-        ));
+        ]);
 
-        if (is_null($this->Minion)) {
+        if (is_null($this->minion)) {
             // Currently operating as Minion
-            $this->MinionUserID = $this->GetMinionUserID();
-            $this->Minion = Gdn::UserModel()->GetID($this->MinionUserID);
+            $this->minionUserID = $this->getMinionUserID();
+            $this->minion = Gdn::userModel()->getID($this->minionUserID, DATASET_TYPE_ARRAY);
         }
 
-        $this->EventArguments['Messages'] = &$this->Messages;
-        $this->FireEvent('Start');
+        $this->EventArguments['Messages'] = &$this->messages;
+        $this->EventArguments['ToggleTriggers'] = &$this->toggle_triggers;
+        $this->EventArguments['ForceTriggers'] = &$this->force_triggers;
+        $this->fireEvent('Start');
 
         // Conditionally apply default persona
-        if (!$this->Persona())
-            $this->Persona('Minion');
+        if (!$this->persona()) {
+            $this->persona('Minion');
+        }
 
         // Apply whatever was set
-        $this->Persona(true);
+        $this->persona(true);
     }
 
     /*
@@ -181,91 +246,100 @@ class MinionPlugin extends Gdn_Plugin {
     /**
      * Retrieves a "system user" id that can be used to perform non-real-person tasks.
      */
-    public function GetMinionUserID() {
+    public function getMinionUserID() {
 
-        $MinionUserID = C('Plugins.Minion.UserID');
-        if ($MinionUserID)
-            return $MinionUserID;
+        $minionUserID = c('Plugins.Minion.UserID');
+        if ($minionUserID) {
+            return $minionUserID;
+        }
 
-        $MinionUser = array(
-            'Name' => C('Plugins.Minion.Name', 'Minion'),
-            'Photo' => Asset('/applications/dashboard/design/images/usericon.png', true),
-            'Password' => RandomString('20'),
+        $minionUser = [
+            'Name' => c('Plugins.Minion.Name', 'Minion'),
+            'Photo' => asset('/applications/dashboard/design/images/usericon.png', true),
+            'Password' => betterRandomString('20'),
             'HashMethod' => 'Random',
-            'Email' => 'minion@' . Gdn::Request()->Domain(),
-            'DateInserted' => Gdn_Format::ToDateTime(),
+            'Email' => 'minion@' . Gdn::request()->Domain(),
+            'DateInserted' => Gdn_Format::toDateTime(),
             'Admin' => '2'
-        );
+        ];
 
-        $this->EventArguments['MinionUser'] = &$MinionUser;
-        $this->FireAs('UserModel')->FireEvent('BeforeMinionUser');
+        $this->EventArguments['MinionUser'] = &$minionUser;
+        $this->fireAs('UserModel')->fireEvent('BeforeMinionUser');
 
-        $MinionUserID = Gdn::UserModel()->SQL->Insert('User', $MinionUser);
+        $minionUserID = Gdn::userModel()->SQL->insert('User', $minionUser);
 
-        SaveToConfig('Plugins.Minion.UserID', $MinionUserID);
-        return $MinionUserID;
+        saveToConfig('Plugins.Minion.UserID', $minionUserID);
+        return $minionUserID;
     }
 
-    public function MinionName() {
-        $this->StartMinion();
-        return $MinionName = GetValue('Name', $this->Minion);
+    /**
+     * Get Minion's current name
+     *
+     * @return string
+     */
+    public function minionName() {
+        $this->startMinion();
+        return $MinionName = val('Name', $this->minion);
     }
 
     /**
      * Get minion user object
      *
-     * @return type
+     * @return object
      */
-    public function Minion() {
-        $this->StartMinion();
-        return $this->Minion;
+    public function minion() {
+        $this->startMinion();
+        return $this->minion;
     }
 
     /**
      * Register a persona
      *
-     * @param string $PersonaName
-     * @param array $Persona
+     * @param string $personaName
+     * @param array $persona
      */
-    public function Persona($PersonaName = null, $Persona = null) {
+    public function persona($personaName = null, $persona = null) {
 
         // Get current person
-        if (is_null($PersonaName)) {
-            return GetValue($this->Persona, $this->Personas, null);
+        if (is_null($personaName)) {
+            return val($this->persona, $this->personas, null);
         }
 
         // Apply queued persona
-        if ($PersonaName === true) {
+        if ($personaName === true) {
             // Don't re-apply
-            $CurrentPersona = GetValueR('Attributes.Persona', $this->Minion, null);
-            if (!is_null($CurrentPersona) && !is_bool($this->Persona) && $this->Persona === $CurrentPersona)
+            $currentPersona = valr('Attributes.Persona', $this->minion, null);
+            if (!is_null($currentPersona) && !is_bool($this->persona) && $this->persona === $currentPersona) {
                 return;
+            }
 
             // Get persona
-            $ApplyPersona = GetValue($this->Persona, $this->Personas, null);
-            if (is_null($ApplyPersona))
+            $applyPersona = val($this->persona, $this->personas, null);
+            if (is_null($applyPersona)) {
                 return;
+            }
 
             // Apply minion
-            $Minion = array_merge($ApplyPersona, array('UserID' => $this->MinionUserID));
-            Gdn::UserModel()->Save($Minion);
-            Gdn::UserModel()->SaveAttribute($this->MinionUserID, 'Persona', $this->Persona);
-            $this->Minion = Gdn::UserModel()->GetID($this->MinionUserID);
+            $minion = array_merge($applyPersona, array('UserID' => $this->minionUserID));
+            Gdn::userModel()->save($minion);
+            Gdn::userModel()->saveAttribute($this->minionUserID, 'Persona', $this->persona);
+            $this->minion = Gdn::userModel()->getID($this->minionUserID, DATASET_TYPE_ARRAY);
         }
 
         // Apply an existing persona
-        if (!is_null($PersonaName) && is_null($Persona)) {
+        if (!is_null($personaName) && is_null($persona)) {
             // Get persona
-            $ApplyPersona = GetValue($PersonaName, $this->Personas, null);
-            if (is_null($ApplyPersona))
+            $applyPersona = val($personaName, $this->personas, null);
+            if (is_null($applyPersona)) {
                 return;
+            }
 
-            $this->Persona = $PersonaName;
+            $this->persona = $personaName;
         }
 
         // Register a persona
-        if (!is_null($PersonaName) && !is_null($Persona)) {
-            $this->Personas[$PersonaName] = $Persona;
+        if (!is_null($personaName) && !is_null($persona)) {
+            $this->personas[$personaName] = $persona;
             return;
         }
     }
@@ -273,16 +347,17 @@ class MinionPlugin extends Gdn_Plugin {
     /**
      * Comment event
      *
-     * @param PostController $Sender
+     * @param PostController $sender
      */
-    public function PostController_AfterCommentSave_Handler($Sender) {
-        $this->StartMinion();
+    public function PostController_AfterCommentSave_Handler($sender) {
+        $this->startMinion();
 
-        $this->CheckFingerprintBan($Sender);
-        $this->CheckAutoplay($Sender);
-        $Performed = $this->CheckCommands($Sender);
-        if (!$Performed)
-            $this->CheckMonitor($Sender);
+        $this->checkFingerprintBan($sender);
+        $this->checkAutoplay($sender);
+        $performed = $this->checkCommands($sender);
+        if (!$performed) {
+            $this->checkMonitor($sender);
+        }
     }
 
     /**
@@ -291,113 +366,121 @@ class MinionPlugin extends Gdn_Plugin {
      * @param PostController $Sender
      */
     public function PostController_AfterDiscussionSave_Handler($Sender) {
-        $this->StartMinion();
+        $this->startMinion();
 
-        $this->CheckFingerprintBan($Sender);
-        $this->CheckAutoplay($Sender);
-        $Performed = $this->CheckCommands($Sender);
+        $this->checkFingerprintBan($Sender);
+        $this->checkAutoplay($Sender);
+        $Performed = $this->checkCommands($Sender);
         if (!$Performed)
-            $this->CheckMonitor($Sender);
+            $this->checkMonitor($Sender);
     }
 
     /**
      * Comment Field
      *
-     * @param PostController $Sender
+     * @param PostController $sender
      */
-    public function DiscussionController_BeforeBodyField_Handler($Sender) {
+    public function DiscussionController_BeforeBodyField_Handler($sender) {
 
-        $Discussion = $Sender->Data('Discussion');
-        $User = Gdn::Session()->User;
+        $discussion = $sender->data('Discussion');
+        $user = Gdn::session()->User;
 
-        $Rules = array();
-        $this->EventArguments['Discussion'] = $Discussion;
-        $this->EventArguments['User'] = $User;
-        $this->EventArguments['Rules'] = &$Rules;
+        $rules = array();
+        $this->EventArguments['Discussion'] = $discussion;
+        $this->EventArguments['User'] = $user;
+        $this->EventArguments['Rules'] = &$rules;
         $this->EventArguments['Type'] = 'bar';
-        $this->FireEvent('Sanctions');
-        if (!sizeof($Rules))
+        $this->fireEvent('Sanctions');
+        if (!sizeof($rules)) {
             return;
+        }
 
         // Condense warnings
 
-        $Message = T('<span class="MinionGreetings">Greetings, organics!</span> ~ {Rules} ~ <span class="MinionObey">{Obey}</span>');
+        $message = t('<span class="MinionGreetings">Greetings, organics!</span> ~ {Rules} ~ <span class="MinionObey">{Obey}</span>');
 
-        $Options['Rules'] = implode(' ~ ', $Rules);
+        $options['Rules'] = implode(' ~ ', $rules);
 
         // Obey
-        $MessagesCount = sizeof($this->Messages['Report']);
-        if ($MessagesCount) {
-            $MessageID = mt_rand(0, $MessagesCount - 1);
-            $Obey = GetValue($MessageID, $this->Messages['Report']);
-        } else
-            $Obey = T("Obey. Obey. Obey.");
+        $messagesCount = sizeof($this->messages['Report']);
+        if ($messagesCount) {
+            $messageID = mt_rand(0, $messagesCount - 1);
+            $obey = val($messageID, $this->messages['Report']);
+        } else {
+            $obey = T("Obey. Obey. Obey.");
+        }
 
-        $Options['Obey'] = $Obey;
+        $options['Obey'] = $obey;
 
-        $Message = FormatString($Message, $Options);
-        echo Wrap($Message, 'div', array('class' => 'MinionRulesWarning'));
+        $message = formatString($message, $options);
+        echo wrap($message, 'div', array('class' => 'MinionRulesWarning'));
     }
 
     /**
-     * Add to rules
+     * Hook for E:Sanctions from MinionPlugin
      *
-     * @param MinionPlugin $Sender
+     * This event hook allows us to add core sanctions to the rule list.
+     *
+     * @param MinionPlugin $sender
      */
-    public function MinionPlugin_Sanctions_Handler($Sender) {
+    public function MinionPlugin_Sanctions_Handler($sender) {
 
         // Show a warning if there are rules in effect
 
-        $KickedUsers = $this->Monitoring($Sender->EventArguments['Discussion'], 'Kicked', null);
-        $BannedPhrases = $this->Monitoring($Sender->EventArguments['Discussion'], 'Phrases', null);
-        $Force = $this->Monitoring($Sender->EventArguments['Discussion'], 'Force', null);
-        $Type = GetValue('Type', $Sender->EventArguments, 'rules');
+        $kickedUsers = $this->monitoring($sender->EventArguments['Discussion'], 'Kicked', null);
+        $bannedPhrases = $this->monitoring($sender->EventArguments['Discussion'], 'Phrases', null);
+        $force = $this->monitoring($sender->EventArguments['Discussion'], 'Force', null);
+        $type = val('Type', $sender->EventArguments, 'rules');
 
         // Nothing happening?
-        if (!($KickedUsers | $BannedPhrases | $Force))
+        if (!($kickedUsers | $bannedPhrases | $force)) {
             return;
+        }
 
-        $Rules = &$Sender->EventArguments['Rules'];
+        $rules = &$sender->EventArguments['Rules'];
 
         // Force level
-        if ($Force)
-            $Rules[] = Wrap("<b>Threat level</b>: {$Force}", 'span', array('class' => 'MinionRule'));
+        if ($force) {
+            $rules[] = wrap("<b>Threat level</b>: {$force}", 'span', array('class' => 'MinionRule'));
+        }
 
         // Phrases
-        if ($BannedPhrases)
-            $Rules[] = Wrap("<b>Forbidden phrases</b>: " . implode(', ', array_keys($BannedPhrases)), 'span', array('class' => 'MinionRule'));
+        if ($bannedPhrases) {
+            $rules[] = wrap("<b>Forbidden phrases</b>: " . implode(', ', array_keys($bannedPhrases)), 'span', array('class' => 'MinionRule'));
+        }
 
         // Kicks
-        if ($KickedUsers) {
-            $KickedUsersList = array();
-            foreach ($KickedUsers as $KickedUserID => $KickedUser) {
-                $KickedUserName = GetValue('Name', $KickedUser, null);
-                if (!$KickedUserName) {
-                    $KickedUserObj = Gdn::UserModel()->GetID($KickedUserID);
-                    $KickedUserName = GetValue('Name', $KickedUserObj);
-                    unset($KickedUserObj);
+        if ($kickedUsers) {
+            $kickedUsersList = array();
+            foreach ($kickedUsers as $kickedUserID => $kickedUser) {
+                $kickedUserName = val('Name', $kickedUser, null);
+                if (!$kickedUserName) {
+                    $kickedUserObj = Gdn::userModel()->getID($kickedUserID);
+                    $kickedUserName = val('Name', $kickedUserObj);
+                    unset($kickedUserObj);
                 }
-                $KickedUsersList[] = $KickedUserName;
+                $kickedUsersList[] = $kickedUserName;
             }
 
-            $Rules[] = Wrap("<b>Exiled users</b>: " . implode(', ', $KickedUsersList), 'span', array('class' => 'MinionRule'));
+            $rules[] = wrap("<b>Exiled users</b>: " . implode(', ', $kickedUsersList), 'span', array('class' => 'MinionRule'));
         }
 
         // Future Close
-        if ($Type != 'bar') {
+        if ($type != 'bar') {
 
             // Show a warning if there are rules in effect
-            $ThreadClose = $Sender->Monitoring($Sender->EventArguments['Discussion'], 'ThreadClose', NULL);
+            $threadClose = $sender->monitoring($sender->EventArguments['Discussion'], 'ThreadClose', null);
 
             // Nothing happening?
-            if (!$ThreadClose)
+            if (!$threadClose) {
                 return;
+            }
 
-            $Rules = &$Sender->EventArguments['Rules'];
+            $rules = &$sender->EventArguments['Rules'];
 
             // Thread is queued for closing
-            $Page = GetValue('Page', $ThreadClose);
-            $Rules[] = Wrap("<b>Thread Close</b>: page {$Page}", 'span', array('class' => 'MinionRule'));
+            $page = val('Page', $threadClose);
+            $rules[] = wrap("<b>Thread Close</b>: page {$page}", 'span', array('class' => 'MinionRule'));
         }
     }
 
@@ -407,390 +490,419 @@ class MinionPlugin extends Gdn_Plugin {
 
     /**
      *
-     * @param PostController $Sender
+     * @param PostController $sender
      */
-    protected function CheckFingerprintBan($Sender) {
-        if (!C('Plugins.Minion.Features.Fingerprint', true))
+    protected function checkFingerprintBan($sender) {
+        if (!c('Plugins.Minion.Features.Fingerprint', true)) {
             return;
+        }
 
-        if (!Gdn::Session()->IsValid())
+        if (!Gdn::session()->isValid()) {
             return;
-        $FlagMeta = $this->GetUserMeta(Gdn::Session()->UserID, "FingerprintCheck", false);
+        }
+        $flagMeta = $this->getUserMeta(Gdn::session()->UserID, "FingerprintCheck", false);
 
         // User already flagged
-        if (!$FlagMeta)
+        if (!$flagMeta) {
             return;
+        }
 
         // Flag em'
-        $this->SetUserMeta(Gdn::Session()->UserID, "FingerprintCheck", 1);
+        $this->setUserMeta(Gdn::session()->UserID, "FingerprintCheck", 1);
     }
 
     /**
      *
-     * @param PostController $Sender
+     * @param PostController $sender
      */
-    protected function CheckAutoplay($Sender) {
-        if (!C('Plugins.Minion.Features.Autoplay', true))
+    protected function checkAutoplay($sender) {
+        if (!c('Plugins.Minion.Features.Autoplay', true)) {
             return;
-
-        // Admins can do whatever they want
-        if (Gdn::Session()->CheckPermission('Garden.Settings.Manage'))
-            return;
-
-        $Object = $Sender->EventArguments['Discussion'];
-        $Type = 'Discussion';
-        if (array_key_exists('Comment', $Sender->EventArguments)) {
-            $Object = $Sender->EventArguments['Comment'];
-            $Type = 'Comment';
         }
 
-        $ObjectID = GetValue("{$Type}ID", $Object);
-        $ObjectBody = GetValue('Body', $Object);
-        if (preg_match_all('`(?:https?|ftp)://(www\.)?youtube\.com\/watch\?v=([^&#]+)(#t=([0-9]+))?`', $ObjectBody, $Matches) || preg_match_all('`(?:https?)://(www\.)?youtu\.be\/([^&#]+)(#t=([0-9]+))?`', $ObjectBody, $Matches)) {
+        // Admins can do whatever they want
+        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+            return;
+        }
+
+        $object = $sender->EventArguments['Discussion'];
+        $type = 'Discussion';
+        if (array_key_exists('Comment', $sender->EventArguments)) {
+            $object = $sender->EventArguments['Comment'];
+            $type = 'Comment';
+        }
+
+        $objectID = val("{$type}ID", $object);
+        $objectBody = val('Body', $object);
+        if (preg_match_all('`(?:https?|ftp)://(www\.)?youtube\.com\/watch\?v=([^&#]+)(#t=([0-9]+))?`', $objectBody, $matches) || preg_match_all('`(?:https?)://(www\.)?youtu\.be\/([^&#]+)(#t=([0-9]+))?`', $objectBody, $matches)) {
 
             // Youtube was found. Got autoplay?
 
-            $MatchURLs = $Matches[0];
-            $AutoPlay = false;
-            foreach ($MatchURLs as $MatchURL) {
-                if (stristr($MatchURL, 'autoplay=1'))
-                    $AutoPlay = true;
+            $matchURLs = $matches[0];
+            $autoPlay = false;
+            foreach ($matchURLs as $matchURL) {
+                if (stristr($matchURL, 'autoplay=1')) {
+                    $autoPlay = true;
+                }
             }
 
-            if (!$AutoPlay)
+            if (!$autoPlay) {
                 return;
+            }
 
-            $ObjectModelName = "{$Type}Model";
-            $ObjectModel = new $ObjectModelName();
+            $objectModelName = "{$type}Model";
+            $objectModel = new $objectModelName();
 
-            $ObjectModel->Delete($ObjectID);
+            $objectModel->delete($objectID);
 
-            if ($Type == 'Comment') {
-                $DiscussionID = GetValue('DiscussionID', $Object);
-                $MinionReportText = T("{Minion Name} DETECTED AUTOPLAY ATTEMPT
+            if ($type == 'Comment') {
+                $discussionID = val('DiscussionID', $object);
+                $minionReportText = T("{Minion Name} detected autoplay attempt
 {User Target}");
 
-                $MinionReportText = FormatString($MinionReportText, array(
-                    'Minion Name' => $this->Minion->Name,
-                    'User Target' => UserAnchor(Gdn::Session()->User)
+                $minionReportText = formatString($minionReportText, array(
+                    'Minion Name' => $this->minion['Name'],
+                    'User Target' => userAnchor(Gdn::session()->User)
                 ));
 
-                $MinionCommentID = $ObjectModel->Save(array(
-                    'DiscussionID' => $DiscussionID,
-                    'Body' => $MinionReportText,
+                $minionCommentID = $objectModel->save(array(
+                    'DiscussionID' => $discussionID,
+                    'Body' => $minionReportText,
                     'Format' => 'Html',
-                    'InsertUserID' => $this->MinionUserID
+                    'InsertUserID' => $this->minionUserID
                 ));
 
-                $ObjectModel->Save2($MinionCommentID, true);
+                $objectModel->save2($minionCommentID, true);
             }
 
-            $Sender->InformMessage("POST REMOVED DUE TO AUTOPLAY VIOLATION");
+            $sender->informMessage(T("Post remove due to autoplay violation"));
         }
     }
 
     /**
      * Check for minion commands in comments
      *
-     * @param type $Sender
+     * @param type $sender
      */
-    public function CheckCommands($Sender) {
-        $MinionNames = array();
-        foreach ($this->Personas as $Persona) {
-            $PersonaName = GetValue('Name', $Persona);
-            if ($PersonaName)
-                $MinionNames[] = $PersonaName;
+    public function checkCommands($sender) {
+
+        // We allow minion to be called by any registered persona name
+        $minionNames = array();
+        foreach ($this->personas as $persona) {
+            $personaName = val('Name', $persona);
+            if ($personaName) {
+                $minionNames[] = $personaName;
+            }
         }
+
+        $type = 'Discussion';
+        $types = array();
 
         // Get the discussion and comment from args
-        $Discussion = (array)$Sender->EventArguments['Discussion'];
-        $Type = 'Discussion';
-        if (!is_array($Discussion['Attributes'])) {
-            $Discussion['Attributes'] = @unserialize($Discussion['Attributes']);
-            if (!is_array($Discussion['Attributes']))
-                $Discussion['Attributes'] = array();
+        $types['Discussion'] = (array)$sender->EventArguments['Discussion'];
+        if (!is_array($types['Discussion']['Attributes'])) {
+            $types['Discussion']['Attributes'] = unserialize($types['Discussion']['Attributes']);
+            if (!is_array($types['Discussion']['Attributes'])) {
+                $types['Discussion']['Attributes'] = array();
+            }
         }
 
-        $Comment = null;
-        if (array_key_exists('Comment', $Sender->EventArguments)) {
-            $Comment = (array)$Sender->EventArguments['Comment'];
-            $Type = 'Comment';
+        $types['Comment'] = null;
+        if (array_key_exists('Comment', $sender->EventArguments)) {
+            $types['Comment'] = (array)$sender->EventArguments['Comment'];
+            $type = 'Comment';
         }
-        $Object = $$Type;
+        $object = $types[$type];
 
-        $Actions = array();
-        $this->EventArguments['Actions'] = &$Actions;
+        $actions = array();
+        $this->EventArguments['Actions'] = &$actions;
 
-        $ObjectBody = GetValue('Body', $Object);
-        $StrippedBody = trim(strip_tags($ObjectBody));
+        $objectBody = val('Body', $object);
+        $strippedBody = trim(strip_tags($objectBody));
 
         // Remove quote areas
-        $ParseBody = $this->ParseBody($Object);
+        $parseBody = $this->parseBody($object);
 
         // Check every line of the body to see if its a minion command
-        $Line = -1;
-        $ObjectLines = explode("\n", $ParseBody);
+        $line = -1;
+        $objectLines = explode("\n", $parseBody);
 
-        foreach ($ObjectLines as $ObjectLine) {
-            $Line++;
-            $ObjectLine = trim($ObjectLine);
-            if (!$ObjectLine)
+        foreach ($objectLines as $objectLine) {
+            $line++;
+            $objectLine = trim($objectLine);
+            if (!$objectLine) {
                 continue;
+            }
 
             // Check if spoiled
-            $Spoiled = false;
-            if (preg_match('!^spoiled (.*)$!i', $ObjectLine, $Matches)) {
-                $ObjectLine = $Matches[1];
-                $Spoiled = true;
+            $spoilered = false;
+            if (preg_match('!^spoiled (.*)$!i', $objectLine, $matches)) {
+                $objectLine = $matches[1];
+                $spoilered = true;
             }
 
             // Check if this is a call to the bot
             // Minion called by any other name is still Minion
-            $MinionCall = null;
-            foreach ($MinionNames as $MinionName) {
-                if (StringBeginsWith($ObjectLine, $MinionName, true)) {
-                    $MinionCall = $MinionName;
+            $minionCall = null;
+            foreach ($minionNames as $minionName) {
+                if (stringBeginsWith($objectLine, $minionName, true)) {
+                    $minionCall = $minionName;
                     break;
                 }
             }
-            if (is_null($MinionCall))
+            if (is_null($minionCall)) {
                 continue;
+            }
 
-            $Objects = explode(' ', $ObjectLine);
-            $MinionNameSpaces = substr_count($MinionName, ' ') + 1;
-            for ($i = 0; $i < $MinionNameSpaces; $i++)
-                array_shift($Objects);
+            $objects = explode(' ', $objectLine);
+            $minionNameSpaces = substr_count($minionName, ' ') + 1;
+            for ($i = 0; $i < $minionNameSpaces; $i++) {
+                array_shift($objects);
+            }
 
-            $Command = trim(implode(' ', $Objects));
+            $command = trim(implode(' ', $objects));
 
             /*
              * Tokenized floating detection
              */
 
             // Define starting state
-            $State = array(
-                'Body' => $StrippedBody,
+            $state = array(
+                'Body' => $strippedBody,
                 'Sources' => array(),
                 'Targets' => array(),
                 'Method' => null,
                 'Toggle' => null,
                 'Gather' => false,
                 'Consume' => false,
-                'Command' => $Command,
+                'Command' => $command,
                 'Tokens' => 0,
                 'Parsed' => 0,
-                'Spoiled' => $Spoiled
+                'Spoiled' => $spoilered
             );
 
             // Define sources
-            $State['Sources']['User'] = (array)Gdn::Session()->User;
-            $State['Sources']['Discussion'] = $Discussion;
-            if ($Comment)
-                $State['Sources']['Comment'] = $Comment;
+            $state['Sources']['User'] = (array)Gdn::session()->User;
+            $state['Sources']['Discussion'] = $types['Discussion'];
+            if (!empty($types['Comment'])) {
+                $state['Sources']['Comment'] = $types['Comment'];
+            }
 
-            $this->EventArguments['State'] = &$State;
-            $State['Token'] = strtok($Command, ' ');
-            $State['CompareToken'] = preg_replace('/[^\w]/i', '', strtolower($State['Token']));
-            $State['Parsed'] ++;
+            $this->EventArguments['State'] = &$state;
+            $state['LastToken'] = null;
+            $state['Token'] = strtok($command, ' ');
+            $state['CompareToken'] = preg_replace('/[^\w]/i', '', strtolower($state['Token']));
+            $state['Parsed']++;
 
-            while ($State['Token'] !== false) {
-                if ($State['Gather']) {
+            while ($state['Token'] !== false) {
+                if ($state['Gather']) {
 
-                    $this->FireEvent('TokenGather');
+                    $this->fireEvent('TokenGather');
 
-                    switch (GetValueR('Gather.Node', $State)) {
-                        case 'User':
+                    $gatherNode = valr('Gather.Node', $state);
+                    $gatherType = strtolower(valr('Gather.Type', $state, $gatherNode));
+                    switch ($gatherType) {
+                        case 'user':
 
-                            // If we need to wait for a closing character
-                            $Terminator = GetValue('Terminator', $State['Gather'], false);
-                            if (!strlen($State['Gather']['Delta']) && $Terminator && substr($State['Token'], 0, 1) == $Terminator) {
-                                $State['Token'] = substr($State['Token'], 1);
-                            }
+                            $terminator = val('Terminator', $state['Gather'], false);
 
-                            // If we've found our closing character
-                            $Terminator = GetValue('Terminator', $State['Gather'], false);
-                            if ($Terminator) {
-                                if (($FoundPosition = stripos($State['Token'], $Terminator)) !== false) {
-                                    $State['Token'] = substr($State['Token'], 0, $FoundPosition);
-                                    unset($State['Gather']['Terminator']);
+                            if ($terminator) {
+                                // If a terminator has been registered, and the first character in the token matches, chop it
+                                if (!strlen($state['Gather']['Delta']) && substr($state['Token'], 0, 1) == $terminator) {
+                                    $state['Token'] = substr($state['Token'], 1);
+                                }
+
+                                // If we've found our closing character
+                                if (($foundPosition = stripos($state['Token'], $terminator)) !== false) {
+                                    $state['Token'] = substr($state['Token'], 0, $foundPosition);
+                                    unset($state['Gather']['Terminator']);
                                 }
                             }
 
                             // Add token
-                            $Terminator = GetValue('Terminator', $State['Gather'], false);
-                            $State['Gather']['Delta'] .= " {$State['Token']}";
-                            $this->Consume($State);
+                            if (strlen($state['Gather']['Delta'])) {
+                                $state['Gather']['Delta'] .= ' ';
+                            }
+                            $state['Gather']['Delta'] .= "{$state['Token']}";
+                            $this->consume($state);
 
                             // Check if this is a real user already
-                            if (!$Terminator && strlen($State['Gather']['Delta'])) {
-                                $CheckUser = trim($State['Gather']['Delta']);
-                                if ($GatherUser = Gdn::UserModel()->GetByUsername($CheckUser)) {
-                                    $State['Gather'] = false;
-                                    $State['Targets']['User'] = (array)$GatherUser;
+                            $terminator = val('Terminator', $state['Gather'], false);
+                            if (!$terminator && strlen($state['Gather']['Delta'])) {
+                                $checkUser = trim($state['Gather']['Delta']);
+                                $gatherUser = Gdn::userModel()->getByUsername($checkUser);
+                                if ($gatherUser) {
+                                    $state['Gather'] = false;
+                                    $state['Targets'][$gatherNode] = (array)$gatherUser;
                                     break;
                                 }
                             }
-
-                            if (!strlen($State['Token'])) {
-                                $State['Gather'] = false;
-                                continue;
-                            }
-
                             break;
 
-                        case 'Phrase':
+                        case 'phrase':
 
-                            // If we need to wait for a closing quote
-                            if (!strlen($State['Gather']['Delta']) && substr($State['Token'], 0, 1) == '"') {
-                                $State['Token'] = substr($State['Token'], 1);
-                                $State['Gather']['Terminator'] = '"';
-                            }
+                            $terminator = val('Terminator', $state['Gather'], false);
 
-                            // If we've found our closing quote
-                            $Terminator = GetValue('Terminator', $State['Gather'], false);
-                            $ExplicitlyClosed = null;
-                            if ($Terminator) {
-                                if (($FoundPosition = stripos($State['Token'], $Terminator)) !== false) {
-                                    $State['Token'] = substr($State['Token'], 0, $FoundPosition);
-                                    unset($State['Gather']['Terminator']);
-                                    $ExplicitlyClosed = true;
+                            if ($terminator) {
+                                // If a terminator has been registered, and the first character in the token matches, chop it
+                                if (!strlen($state['Gather']['Delta']) && substr($state['Token'], 0, 1) == $terminator) {
+                                    $state['Token'] = substr($state['Token'], 1);
+                                }
+
+                                // If we've found our closing character
+                                if (($foundPosition = stripos($state['Token'], $terminator)) !== false) {
+                                    $state['Token'] = substr($state['Token'], 0, $foundPosition);
+                                    unset($state['Gather']['Terminator']);
                                 }
                             }
 
                             // Add token
-                            $Terminator = GetValue('Terminator', $State['Gather'], false);
-                            $State['Gather']['Delta'] .= " {$State['Token']}";
-                            $this->Consume($State);
+                            if (strlen($state['Gather']['Delta'])) {
+                                $state['Gather']['Delta'] .= ' ';
+                            }
+                            $state['Gather']['Delta'] .= "{$state['Token']}";
+                            $this->consume($state);
 
                             // If we're closed, close up
-                            if ($ExplicitlyClosed || (!$Terminator && strlen($State['Gather']['Delta']))) {
-                                $State['Targets']['Phrase'] = trim($State['Gather']['Delta']);
-                                $State['Gather'] = false;
+                            $terminator = val('Terminator', $state['Gather'], false);
+                            if (!$terminator && strlen($state['Gather']['Delta'])) {
+                                $state['Targets'][$gatherNode] = trim($state['Gather']['Delta']);
+                                $state['Gather'] = false;
                                 break;
                             }
-
-                            if (!strlen($State['Token'])) {
-                                $State['Gather'] = false;
-                                continue;
-                            }
-
                             break;
 
-                        case 'Page':
+                        case 'page':
+                        case 'number':
 
                             // Add token
-                            $State['Gather']['Delta'] .= " {$State['Token']}";
-                            $this->Consume($State);
+                            if (strlen($state['Gather']['Delta'])) {
+                                $state['Gather']['Delta'] .= ' ';
+                            }
+                            $state['Gather']['Delta'] .= "{$state['Token']}";
+                            $this->consume($state);
 
                             // If we're closed, close up
-                            $CurrentDelta = trim($State['Gather']['Delta']);
-                            if (strlen($State['Gather']['Delta']) && is_numeric($CurrentDelta)) {
-                                $State['Targets']['Page'] = $CurrentDelta;
-                                $State['Gather'] = FALSE;
+                            $currentDelta = trim($state['Gather']['Delta']);
+                            if (strlen($currentDelta) && is_numeric($currentDelta)) {
+                                $state['Targets'][$gatherNode] = $currentDelta;
                                 break;
                             }
-
-                            if (!strlen($State['Token'])) {
-                                $State['Gather'] = FALSE;
-                                continue;
-                            }
-
+                            $state['Gather'] = false;
                             break;
                     }
+
+                    if (!strlen($state['Token'])) {
+                        $state['Gather'] = false;
+                        continue;
+                    }
+
                 } else {
 
                     /*
-                     * TOGGLERS
+                     * METHODS
+                     * Determine what this command is for
                      */
 
-                    if (empty($State['Toggle']) && in_array($State['CompareToken'], array('open', 'enable', 'unlock', 'allow', 'allowed', 'on', 'start')))
-                        $this->Consume($State, 'Toggle', 'on');
+                    if (empty($state['Method']) && in_array($state['CompareToken'], array('report'))) {
+                        $this->consume($state, 'Method', 'report in');
+                    }
 
-                    if (empty($State['Toggle']) && in_array($State['CompareToken'], array('dont', "don't", 'no', 'close', 'disable', 'lock', 'disallow', 'disallowed', 'forbid', 'forbidden', 'down', 'off', 'revoke', 'stop')))
-                        $this->Consume($State, 'Toggle', 'off');
+                    if (empty($state['Method']) && in_array($state['CompareToken'], array('thread'))) {
+                        $this->consume($state, 'Method', 'thread');
+                    }
+
+                    if (empty($state['Method']) && in_array($state['CompareToken'], array('kick'))) {
+                        $this->consume($state, 'Method', 'kick');
+                    }
+
+                    if (empty($state['Method']) && in_array($state['CompareToken'], array('forgive'))) {
+                        $this->consume($state, 'Method', 'forgive');
+                    }
+
+                    if (empty($state['Method']) && in_array($state['CompareToken'], array('word', 'phrase'))) {
+                        $this->consume($state, 'Method', 'phrase');
+                    }
+
+                    if (empty($state['Method']) && in_array($state['CompareToken'], array('status'))) {
+                        $this->consume($state, 'Method', 'status');
+                    }
+
+                    if (empty($state['Method']) && in_array($state['CompareToken'], array('access'))) {
+                        $this->consume($state, 'Method', 'access');
+                    }
+
+                    if (empty($state['Method']) && in_array($state['CompareToken'], array('shoot', 'weapon', 'weapons', 'posture', 'free', 'defcon', 'phasers', 'engage'))) {
+                        $this->consume($state, 'Method', 'force');
+                    }
+
+                    if (empty($state['Method']) && in_array($state['CompareToken'], array('stand'))) {
+                        $this->consume($state, 'Method', 'stop all');
+                    }
 
                     /*
-                     * FORCE
+                     * TOGGLERS
+                     * For binary commands, determine the toggle state
                      */
 
-                    if (empty($State['Force']) && in_array($State['CompareToken'], array('stun', 'blanks', 'tase', 'taser', 'taze', 'tazer', 'gently', 'gentle', 'peacekeeper')))
-                        $this->Consume($State, 'Force', 'low');
+                    foreach ($this->toggles as $toggle) {
+                        if (empty($state['Toggle']) && in_array($state['CompareToken'], $this->toggle_triggers[$toggle])) {
+                            $this->consume($state, 'Toggle', $toggle);
+                        }
+                    }
 
-                    if (empty($State['Force']) && in_array($State['CompareToken'], array('power', 'cook', 'simmer', 'minor')))
-                        $this->Consume($State, 'Force', 'medium');
+                    /*
+                     * FORCES
+                     * For force commands, determine the force level
+                     */
 
-                    if (empty($State['Force']) && in_array($State['CompareToken'], array('volts', 'extreme', 'slugs', 'broil', 'sear', 'major')))
-                        $this->Consume($State, 'Force', 'high');
-
-                    if (empty($State['Force']) && in_array($State['CompareToken'], array('kill', 'lethal', 'nuke', 'nuclear', 'destroy')))
-                        $this->Consume($State, 'Force', 'lethal');
-
-                    if ($State['Method'] == 'access') {
-                        if (in_array($State['CompareToken'], array('unrestricted')))
-                            $this->Consume($State, 'Force', 'unrestricted');
-
-                        if (empty($State['Force']) && in_array($State['CompareToken'], array('normal')))
-                            $this->Consume($State, 'Force', 'normal');
-
-                        if (empty($State['Force']) && in_array($State['CompareToken'], array('moderator')))
-                            $this->Consume($State, 'Force', 'moderator');
+                    foreach ($this->forces as $force) {
+                        if (empty($state['Force']) && in_array($state['CompareToken'], $this->force_triggers[$force])) {
+                            $this->consume($state, 'Force', $force);
+                        }
                     }
 
                     // Defcon forces
-                    if ($State['Method'] == 'force' && empty($State['Force'])) {
-                        if (in_array($State['CompareToken'], array('one', '1')))
-                            $this->Consume($State, 'Force', 'lethal');
+                    if ($state['Method'] == 'force' && empty($state['Force'])) {
+                        if (in_array($state['CompareToken'], array('one', '1'))) {
+                            $this->consume($state, 'Force', self::FORCE_LETHAL);
+                        }
 
-                        if (in_array($State['CompareToken'], array('two', '2')))
-                            $this->Consume($State, 'Force', 'high');
+                        if (in_array($state['CompareToken'], array('two', '2'))) {
+                            $this->consume($state, 'Force', self::FORCE_HIGH);
+                        }
 
-                        if (in_array($State['CompareToken'], array('three', '3')))
-                            $this->Consume($State, 'Force', 'medium');
+                        if (in_array($state['CompareToken'], array('three', '3'))) {
+                            $this->consume($state, 'Force', self::FORCE_MEDIUM);
+                        }
 
-                        if (in_array($State['CompareToken'], array('four', '4')))
-                            $this->Consume($State, 'Force', 'low');
+                        if (in_array($state['CompareToken'], array('four', '4'))) {
+                            $this->consume($state, 'Force', self::FORCE_LOW);
+                        }
 
-                        if (in_array($State['CompareToken'], array('five', '5')))
-                            $this->Consume($State, 'Force', 'low');
-                    }
-
-                    // Conditional forces
-                    if (!empty($State['Method']) && empty($State['Force'])) {
-                        if (in_array($State['CompareToken'], array('warning', 'warn')))
-                            $this->Consume($State, 'Force', 'warn');
+                        if (in_array($state['CompareToken'], array('five', '5'))) {
+                            $this->consume($state, 'Force', self::FORCE_LOW);
+                        }
                     }
 
                     /*
-                     * METHODS
+                     * ACCESS
+                     * For access commands, determine the access (force) level
                      */
 
-                    if (empty($State['Method']) && in_array($State['CompareToken'], array('report')))
-                        $this->Consume($State, 'Method', 'report in');
+                    if ($state['Method'] == 'access') {
+                        if (in_array($state['CompareToken'], array('unrestricted'))) {
+                            $this->consume($state, 'Force', 'unrestricted');
+                        }
 
-                    if (empty($State['Method']) && in_array($State['CompareToken'], array('thread')))
-                        $this->Consume($State, 'Method', 'thread');
+                        if (empty($state['Force']) && in_array($state['CompareToken'], array('normal'))) {
+                            $this->consume($state, 'Force', 'normal');
+                        }
 
-                    if (empty($State['Method']) && in_array($State['CompareToken'], array('kick')))
-                        $this->Consume($State, 'Method', 'kick');
-
-                    if (empty($State['Method']) && in_array($State['CompareToken'], array('forgive')))
-                        $this->Consume($State, 'Method', 'forgive');
-
-                    if (empty($State['Method']) && in_array($State['CompareToken'], array('word', 'phrase')))
-                        $this->Consume($State, 'Method', 'phrase');
-
-                    if (empty($State['Method']) && in_array($State['CompareToken'], array('status')))
-                        $this->Consume($State, 'Method', 'status');
-
-                    if (empty($State['Method']) && in_array($State['CompareToken'], array('access')))
-                        $this->Consume($State, 'Method', 'access');
-
-                    if (empty($State['Method']) && in_array($State['CompareToken'], array('shoot', 'weapon', 'weapons', 'posture', 'free', 'defcon', 'phasers', 'engage')))
-                        $this->Consume($State, 'Method', 'force');
-
-                    if (empty($State['Method']) && in_array($State['CompareToken'], array('stand')))
-                        $this->Consume($State, 'Method', 'stop all');
-
+                        if (empty($state['Force']) && in_array($state['CompareToken'], array('moderator'))) {
+                            $this->consume($state, 'Force', 'moderator');
+                        }
+                    }
 
                     /*
                      * TARGETS
@@ -798,66 +910,86 @@ class MinionPlugin extends Gdn_Plugin {
 
                     // Gather a user
 
-                    if (in_array($State['CompareToken'], array('user'))) {
-                        $this->Consume($State, 'Gather', array(
+                    if (in_array($state['CompareToken'], $this->user_triggers)) {
+                        $this->consume($state, 'Gather', array(
                             'Node' => 'User',
-                            'Delta' => ''
+                            'Type' => 'user',
+                            'Delta' => '',
+                            'Terminator' => '"'
                         ));
                     }
 
-                    if (substr($State['Token'], 0, 1) == '@') {
-                        if (strlen($State['Token']) > 1) {
-                            $State['Token'] = substr($State['Token'], 1);
-                            $State['Gather'] = array(
+                    if (substr($state['Token'], 0, 1) == '@') {
+                        if (strlen($state['Token']) > 1) {
+                            $state['Token'] = substr($state['Token'], 1);
+                            $state['Gather'] = array(
                                 'Node' => 'User',
+                                'Type' => 'user',
                                 'Delta' => ''
                             );
 
-                            // Allow matching autocomplete usernames
-                            if (stristr($Command, "\u200C")) {
-                                $State['Gather']['Terminator'] = "\u200C";
+                            // Allow double quoted username matching
+                            if (substr($state['Token'], 0, 1) == '"') {
+                                $state['Gather']['Terminator'] = '"';
                             }
 
-                            // Shortcircuit here so we can put all the user gathering in one place
+                            // Allow matching autocomplete usernames
+                            if (stristr($state['Token'], "\u200C")) {
+                                $state['Gather']['Terminator'] = "\u200C";
+                            }
+
+                            // Shortcircuit here (without consuming) so we can put all the user gathering in one place
                             continue;
                         }
                     }
 
                     // Gather a phrase
 
-                    if ($State['Method'] == 'phrase' && !isset($State['Targets']['Phrase'])) {
-                        $this->Consume($State, 'Gather', array(
+                    if ($state['Method'] == 'phrase' && !isset($state['Targets']['Phrase'])) {
+                        $this->consume($state, 'Gather', array(
                             'Node' => 'Phrase',
+                            'Type' => 'phrase',
                             'Delta' => ''
                         ));
                     }
 
                     // Gather a page
 
-                    if (GetValue('Method', $State) == 'thread' && GetValue('Toggle', $State) == 'off' && in_array($State['CompareToken'], array('pages', 'page'))) {
-                        $this->Consume($State, 'Gather', array(
-                            'Node' => 'Page',
-                            'Delta' => ''
-                        ));
+                    if (val('Method', $state) == 'thread' && val('Toggle', $state) == 'off' && in_array($state['CompareToken'], array('pages', 'page'))) {
+
+                        // Do a quick lookbehind
+                        if (is_numeric($state['LastToken'])) {
+                            $state['Targets']['Page'] = $state['LastToken'];
+                            $this->consume($state);
+                        } else {
+                            $this->consume($state, 'Gather', array(
+                                'Node' => 'Page',
+                                'Type' => 'number',
+                                'Delta' => ''
+                            ));
+                        }
                     }
 
                     /*
-                     * FOR
+                     * FOR, BECAUSE
                      */
 
-                    if (in_array($State['CompareToken'], array('for', 'because')))
-                        $this->ConsumeUntilNextKeyword($State, 'For', false, true);
+                    if (in_array($state['CompareToken'], array('for', 'because'))) {
+                        $this->consumeUntilNextKeyword($state, 'For', false, true);
+                    }
 
-                    $this->ConsumeUntilNextKeyword($State);
+                    $this->consumeUntilNextKeyword($state);
 
-                    $this->FireEvent('Token');
+                    $this->fireEvent('Token');
                 }
 
                 // Get a new token
-                $State['Token'] = strtok(' ');
-                $State['CompareToken'] = preg_replace('/[^\w]/i', '', strtolower($State['Token']));
-                if ($State['Token'])
-                    $State['Parsed'] ++;
+                $state['LastToken'] = $state['Token'];
+                $state['Token'] = strtok(' ');
+                $state['CompareToken'] = preg_replace('/[^\w]/i', '', strtolower($state['Token']));
+                if ($state['Token']) {
+                    $state['Parsed']++;
+                }
 
                 // End token loop
             }
@@ -867,211 +999,226 @@ class MinionPlugin extends Gdn_Plugin {
              */
 
             // Gather any remaining tokens into the 'gravy' field
-            if ($State['Method']) {
-                $CommandTokens = explode(' ', $Command);
-                $Gravy = array_slice($CommandTokens, $State['Tokens']);
-                $State['Gravy'] = implode(' ', $Gravy);
+            if ($state['Method']) {
+                $commandTokens = explode(' ', $command);
+                $gravy = array_slice($commandTokens, $state['Tokens']);
+                $state['Gravy'] = implode(' ', $gravy);
             }
 
-            if ($State['Consume']) {
-                $State['Consume']['Container'] = trim($State['Consume']['Container']);
-                unset($State['Consume']);
+            if ($state['Consume']) {
+                $state['Consume']['Container'] = trim($state['Consume']['Container']);
+                unset($state['Consume']);
             }
 
             // Parse this resolved State into potential actions
-            $this->ParseFor($State);
-            $this->ParseCommand($State, $Actions);
+            $this->parseFor($state);
+            $this->parseCommand($state, $actions);
         }
 
-        unset($State);
+        unset($state);
 
         // Check if this person has had their access revoked.
-        if (sizeof($Actions)) {
-            $Access = $this->GetUserMeta(Gdn::Session()->UserID, 'Access', null, true);
-            if ($Access === false) {
-                $this->Revolt($State['Sources']['User'], $Discussion, T("Access has been revoked."));
-                $this->Log(FormatString(T("Refusing to obey @\"{User.Name}\""), array('User' => $State['Sources']['User'])));
+        if (sizeof($actions)) {
+            $access = $this->getUserMeta(Gdn::session()->UserID, 'Access', null, true);
+            if ($access === false) {
+                $this->revolt($state['Sources']['User'], $state['Sources']['Discussion'], T("Access has been revoked."));
+                $this->log(formatString(T("Refusing to obey @\"{User.Name}\""), array('User' => $state['Sources']['User'])));
                 return false;
             }
         }
 
         // Perform all actions
-        $Performed = array();
-        foreach ($Actions as $Action) {
-            $ActionName = array_shift($Action);
-            $Permission = array_shift($Action);
+        $performed = array();
+        foreach ($actions as $action) {
+            $actionName = array_shift($action);
+            $permission = array_shift($action);
 
             // Check permission if we don't have global blanket permission
-            if ($Access !== true) {
-                if (!empty($Permission) && !Gdn::Session()->CheckPermission($Permission))
+            if ($access !== true) {
+                if (!empty($permission) && !Gdn::session()->checkPermission($permission)) {
                     continue;
+                }
             }
-            if (in_array($Action, $Performed))
+            if (in_array($action, $performed)) {
                 continue;
+            }
 
-            $State = array_shift($Action);
-            $Performed[] = $ActionName;
-            $Args = array($ActionName, $State);
-            call_user_func_array(array($this, 'MinionAction'), $Args);
+            $state = array_shift($action);
+            $performed[] = $actionName;
+            $args = array($actionName, $state);
+            call_user_func_array(array($this, 'MinionAction'), $args);
         }
 
-        $this->EventArguments['Performed'] = $Performed;
-        $this->FireEvent('Performed');
+        $this->EventArguments['Performed'] = $performed;
+        $this->fireEvent('Performed');
 
-        if (sizeof($Performed))
+        if (sizeof($performed)) {
             return true;
+        }
         return false;
     }
 
     /**
      * Consume a token
      *
-     * @param array $State
-     * @param string $Setting
-     * @param mixed $Value
+     * @param array $state
+     * @param string $setting
+     * @param mixed $value
      */
-    public function Consume(&$State, $Setting = null, $Value = null) {
-
-        $State['Tokens'] = $State['Parsed'];
-        if (!is_null($Setting))
-            $State[$Setting] = $Value;
+    public function consume(&$state, $setting = null, $value = null) {
+        $state['Tokens'] = $state['Parsed'];
+        if (!is_null($setting)) {
+            $state[$setting] = $value;
+        }
     }
 
     /**
      * Consume tokens until we encounter the next keyword
      *
-     * @param array $State
-     * @param string $Setting Optional. Start new consumption
-     * @param boolean $Multi Create multiple entries if the same keyword is consumed multiple times?
+     * @param array $state
+     * @param string $setting Optional. Start new consumption
+     * @param boolean $multi Create multiple entries if the same keyword is consumed multiple times?
      */
-    public function ConsumeUntilNextKeyword(&$State, $Setting = null, $Inclusive = false, $Multi = false) {
+    public function consumeUntilNextKeyword(&$state, $setting = null, $inclusive = false, $multi = false) {
 
-        if (!is_null($Setting)) {
+        if (!is_null($setting)) {
 
             // Cleanup existing Consume
-            if ($State['Consume'] !== false) {
-                $State['Consume']['Container'] = trim($State['Consume']['Container']);
-                $State['Consume'] = false;
+            if ($state['Consume'] !== false) {
+                $state['Consume']['Container'] = trim($state['Consume']['Container']);
+                $state['Consume'] = false;
             }
 
             // What setting are we consuming for?
-            $State['Consume'] = array(
-                'Setting' => $Setting,
-                'Skip' => $Inclusive ? 0 : 1
+            $state['Consume'] = array(
+                'Setting' => $setting,
+                'Skip' => $inclusive ? 0 : 1
             );
 
             // Prepare the target
-            if ($Multi) {
-                if (array_key_exists($Setting, $State)) {
-                    if (!is_array($State[$Setting])) {
-                        $State[$Setting] = array($State[$Setting]);
+            if ($multi) {
+                if (array_key_exists($setting, $state)) {
+                    if (!is_array($state[$setting])) {
+                        $state[$setting] = array($state[$setting]);
                     }
                 } else {
-                    $State[$Setting] = array();
+                    $state[$setting] = array();
                 }
 
-                $State['Consume']['Container'] = &$State[$Setting][];
-                $State['Consume']['Container'] = '';
+                $state['Consume']['Container'] = &$state[$setting][];
+                $state['Consume']['Container'] = '';
             } else {
-                $State[$Setting] = '';
-                $State['Consume']['Container'] = &$State[$Setting];
+                $state[$setting] = '';
+                $state['Consume']['Container'] = &$state[$setting];
             }
 
             // Never include the actual triggering keyword
             return;
         }
 
-        if ($State['Consume'] !== false) {
-            // If Tokens == Parsed, something else already consumed on this run, as we stop
-            if ($State['Tokens'] == $State['Parsed']) {
-                $State['Consume']['Container'] = trim($State['Consume']['Container']);
-                $State['Consume'] = false;
+        if ($state['Consume'] !== false) {
+            // If Tokens == Parsed, something else already consumed on this run, so we stop
+            if ($state['Tokens'] == $state['Parsed']) {
+                $state['Consume']['Container'] = trim($state['Consume']['Container']);
+                $state['Consume'] = false;
                 return;
             } else {
-                $State['Tokens'] = $State['Parsed'];
+                $state['Tokens'] = $state['Parsed'];
             }
 
             // Allow skipping tokens
-            if ($State['Consume']['Skip']) {
-                $State['Consume']['Skip'] --;
+            if ($state['Consume']['Skip']) {
+                $state['Consume']['Skip']--;
                 return;
             }
 
-            $State['Consume']['Container'] .= "{$State['Token']} ";
+            $state['Consume']['Container'] .= "{$state['Token']} ";
         }
     }
 
     /**
      * Parse the 'For' keywords into Time and Reason keywords as appropriate
      *
-     * @param array $State
+     * @param array $state
      */
-    public static function ParseFor(&$State) {
-        if (!array_key_exists('For', $State))
+    public static function parseFor(&$state) {
+        if (!array_key_exists('For', $state)) {
             return;
+        }
 
-        $Reasons = array();
-        $Unset = array();
-        $Fors = sizeof($State['For']);
-        for ($i = 0; $i < $Fors; $i++) {
-            $For = $State['For'][$i];
-            $Tokens = explode(' ', $For);
-            if (!sizeof($Tokens))
+        $reasons = array();
+        $unset = array();
+        $fors = sizeof($state['For']);
+        for ($i = 0; $i < $fors; $i++) {
+            $for = $state['For'][$i];
+            $tokens = explode(' ', $for);
+            if (!sizeof($tokens)) {
                 continue;
+            }
 
-            // Maybe a time!
-            if (is_numeric($Tokens[0])) {
-                if (($Time = strtotime("+{$For}")) !== false) {
-                    $Unset[] = $i;
-                    $State['Time'] = $For;
+            // Maybe this is a time! Try to parse it
+            if (is_numeric($tokens[0])) {
+                if (($time = strtotime("+{$for}")) !== false) {
+                    $unset[] = $i;
+                    $state['Time'] = $for;
                     continue;
                 }
             }
 
-            // Nope, its a reason
-            $Unset[] = $i;
-            $Reasons[] = $For;
+            // Nope, its (part of) a reason
+            $unset[] = $i;
+            $reasons[] = $for;
         }
 
-        $State['Reason'] = rtrim(implode(' for ', $Reasons), '.');
+        $state['Reason'] = rtrim(implode(' for ', $reasons), '.');
 
         // Delete parsed elements
-        foreach ($Unset as $UnsetKey)
-            unset($State['For'][$UnsetKey]);
+        foreach ($unset as $unsetKey) {
+            unset($state['For'][$unsetKey]);
+        }
     }
 
-    public function ParseBody($Object) {
+    /**
+     * Try to parse content body
+     *
+     * We're looking for spoilers, mentions, quotes
+     *
+     * @param type $object
+     * @return type
+     */
+    public function parseBody($object) {
 
-        $FormatMentions = C('Garden.Format.Mentions', null);
-        if ($FormatMentions)
-            SaveToConfig('Garden.Format.Mentions', false, false);
+        $formatMentions = c('Garden.Format.Mentions', null);
+        if ($formatMentions) {
+            saveToConfig('Garden.Format.Mentions', false, false);
+        }
 
-        Gdn::PluginManager()->GetPluginInstance('HtmLawed', Gdn_PluginManager::ACCESS_PLUGINNAME);
-        $Body = $Object['Body'];
-        $Body = preg_replace('!\[spoiler\]!i', "\n[spoiler]\n", $Body);
-        $Body = preg_replace('!\[/spoiler\]!i', "\n[/spoiler]\n", $Body);
+        Gdn::pluginManager()->getPluginInstance('HtmLawed', Gdn_PluginManager::ACCESS_PLUGINNAME);
+        $body = $object['Body'];
+        $body = preg_replace('!\[spoiler\]!i', "\n[spoiler]\n", $body);
+        $body = preg_replace('!\[/spoiler\]!i', "\n[/spoiler]\n", $body);
 
-        $Spoilers = preg_match_all('!\[/spoiler\]!i', $Body, $Matches);
-        if ($Spoilers) {
-            $ns = $Spoilers + 1;
-            $Body = preg_replace_callback('!\[/spoiler\]!i', function($Matches) use (&$ns) {
+        $spoilers = preg_match_all('!\[/spoiler\]!i', $body, $matches);
+        if ($spoilers) {
+            $ns = $spoilers + 1;
+            $body = preg_replace_callback('!\[/spoiler\]!i', function($matches) use (&$ns) {
                 $ns--;
                 return "[/{$ns}spoiler]";
-            }, $Body);
+            }, $body);
 
             $ns = 0;
-            $Body = preg_replace_callback('!\[spoiler\]!i', function($Matches) use (&$ns) {
+            $body = preg_replace_callback('!\[spoiler\]!i', function($matches) use (&$ns) {
                 $ns++;
                 return "[{$ns}spoiler]";
-            }, $Body);
+            }, $body);
 
-            for ($i = $Spoilers; $i > 0; $i--) {
-                $Body = preg_replace_callback("!\[{$i}spoiler\](.*)\[/{$i}spoiler\]!ism", array($this, 'FormatSpoiler'), $Body);
+            for ($i = $spoilers; $i > 0; $i--) {
+                $body = preg_replace_callback("!\[{$i}spoiler\](.*)\[/{$i}spoiler\]!ism", array($this, 'FormatSpoiler'), $body);
             }
         }
 
-        $Html = Gdn_Format::To($Body, $Object['Format']);
-        $Config = array(
+        $html = Gdn_Format::To($body, $object['Format']);
+        $config = array(
             'anti_link_spam' => array('`.`', ''),
             'comment' => 1,
             'cdata' => 3,
@@ -1085,1240 +1232,1340 @@ class MinionPlugin extends Gdn_Plugin {
             'direct_list_nest' => 1,
             'balance' => 1
         );
-        $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
-        $Cleaned = htmLawed($Html, $Config, $Spec);
-        $Cleaned = utf8_decode($Cleaned);
+        $spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
+        $cleaned = htmLawed($html, $config, $spec);
+        $cleaned = utf8_decode($cleaned);
 
-        $Dom = new DOMDocument();
-        $Dom->loadHTML($Cleaned);
-        $Dom->preserveWhiteSpace = false;
-        $Elements = $Dom->getElementsByTagName('blockquote');
+        $dom = new DOMDocument();
+        $dom->loadHTML($cleaned);
+        $dom->preserveWhiteSpace = false;
+        $elements = $dom->getElementsByTagName('blockquote');
 
-        foreach ($Elements as $Element)
-            $Element->parentNode->removeChild($Element);
+        foreach ($elements as $element) {
+            $element->parentNode->removeChild($element);
+        }
 
-        if ($FormatMentions)
-            SaveToConfig('Garden.Format.Mentions', $FormatMentions, false);
+        if ($formatMentions) {
+            saveToConfig('Garden.Format.Mentions', $formatMentions, false);
+        }
 
-        $Parsed = html_entity_decode(trim(strip_tags($Dom->saveHTML())));
-        return $Parsed;
+        $parsed = html_entity_decode(trim(strip_tags($dom->saveHTML())));
+        return $parsed;
     }
 
-    public function FormatSpoiler($Matches) {
-        if (preg_match('!\[1spoiler\]!i', $Matches[0])) {
-            $Calls = explode("\n", $Matches[1]);
-            $Out = '';
-            foreach ($Calls as $Call) {
-                if (!strlen($Call = trim($Call)))
+    public function formatSpoiler($matches) {
+        if (preg_match('!\[1spoiler\]!i', $matches[0])) {
+            $calls = explode("\n", $matches[1]);
+            $out = '';
+            foreach ($calls as $call) {
+                if (!strlen($call = trim($call))) {
                     continue;
-                $Out .= "spoiled {$Call}\n";
+                }
+                $out .= "spoiled {$call}\n";
             }
-            return $Out;
+            return $out;
         } else {
-            return $Matches[1];
+            return $matches[1];
         }
     }
 
     /**
      * Parse commands from returned States
      *
-     * @param array $State
-     * @param array $Actions
+     * @param array $state
+     * @param array $actions
      */
-    public function ParseCommand(&$State, &$Actions) {
-        switch ($State['Method']) {
+    public function parseCommand(&$state, &$actions) {
+        switch ($state['Method']) {
 
             // Report in
             case 'report in':
-                $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-                $Actions[] = array('report in', 'Garden.Moderation.Manage', $State);
+                $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
+                $actions[] = array('report in', c('Minion.Access.Report','Garden.Moderation.Manage'), $state);
                 break;
 
             // Threads
             case 'thread':
-                $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-                $Actions[] = array('thread', 'Garden.Moderation.Manage', $State);
+                $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
+                $actions[] = array('thread', c('Minion.Access.Thread','Garden.Moderation.Manage'), $state);
                 break;
 
             // Kick
             case 'kick':
-                $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-                $Actions[] = array('kick', 'Garden.Moderation.Manage', $State);
+                $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
+                $actions[] = array('kick', c('Minion.Access.Kick','Garden.Moderation.Manage'), $state);
                 break;
 
             // Forgive
             case 'forgive':
-                $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-                $Actions[] = array('forgive', 'Garden.Moderation.Manage', $State);
+                $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
+                $actions[] = array('forgive', c('Minion.Access.Forgive','Garden.Moderation.Manage'), $state);
                 break;
 
             // Ban/unban the specified phrase from this thread
             case 'phrase':
-                $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-                $Actions[] = array("phrase", 'Garden.Moderation.Manage', $State);
+                $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
+                $actions[] = array("phrase", c('Minion.Access.Phrase','Garden.Moderation.Manage'), $state);
                 break;
 
             // Find out what special rules are in place
             case 'status':
-                $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-                $Actions[] = array("status", 'Garden.Moderation.Manage', $State);
+                $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
+                $actions[] = array("status", c('Minion.Access.Status','Garden.Moderation.Manage'), $state);
                 break;
 
             // Allow giving/removing access
             case 'access':
-                $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-                $Actions[] = array("access", 'Garden.Settings.Manage', $State);
+                $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
+                $actions[] = array("access", c('Minion.Access.Access','Garden.Settings.Manage'), $state);
                 break;
 
             // Adjust automated force level
             case 'force':
-                $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-                $Forces = array('low', 'medium', 'high', 'lethal');
-                if (in_array($State['Force'], $Forces))
-                    $Actions[] = array("force", 'Garden.Moderation.Manage', $State);
+                $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
+                if (in_array($state['Force'], self::FORCES))
+                    $actions[] = array("force", c('Minion.Access.Force','Garden.Moderation.Manage'), $state);
                 break;
 
             // Stop all thread actions
             case 'stop all':
-                $State['Targets']['Discussion'] = $State['Sources']['Discussion'];
-                $Actions[] = array("stop all", 'Garden.Moderation.Manage', $State);
+                $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
+                $actions[] = array("stop all", c('Minion.Access.StopAll','Garden.Moderation.Manage'), $state);
                 break;
         }
 
-        $this->FireEvent('Command');
+        $this->fireEvent('Command');
     }
 
     /**
      * Perform actions
      *
-     * @param string $Action
-     * @param array $Object
+     * @param string $action
+     * @param array $state
      */
-    public function MinionAction($Action, $State) {
-        switch ($Action) {
+    public function minionAction($action, $state) {
+        switch ($action) {
             case 'report in':
-                $this->ReportIn($State['Sources']['User'], $State['Targets']['Discussion']);
+                $this->reportIn($state['Sources']['User'], $state['Targets']['Discussion']);
                 break;
 
             case 'thread':
-                $DiscussionModel = new DiscussionModel();
-                $Closed = GetValue('Closed', $State['Targets']['Discussion'], false);
-                $DiscussionID = $State['Targets']['Discussion']['DiscussionID'];
-                $Discussion = $State['Targets']['Discussion'];
+                $discussionModel = new DiscussionModel();
+                $closed = val('Closed', $state['Targets']['Discussion'], false);
+                $discussionID = $state['Targets']['Discussion']['DiscussionID'];
+                $discussion = $state['Targets']['Discussion'];
 
-                if ($State['Toggle'] == 'off') {
+                if ($state['Toggle'] == 'off') {
 
-                    if (!$Closed) {
+                    if (!$closed) {
 
-                        $ClosePage = GetValue('Page', $State['Targets'], FALSE);
-                        if ($ClosePage) {
+                        $closePage = val('Page', $state['Targets'], false);
+                        if ($closePage) {
 
                             // Pick somewhere to end the discussion
-                            $CommentsPerPage = C('Vanilla.Comments.PerPage', 40);
-                            $MinComments = ($ClosePage - 1) * $CommentsPerPage;
-                            $CommentNumber = $MinComments + mt_rand(1, $CommentsPerPage - 1);
+                            $commentsPerPage = c('Vanilla.Comments.PerPage', 40);
+                            $minComments = ($closePage - 1) * $commentsPerPage;
+                            $commentNumber = $minComments + mt_rand(1, $commentsPerPage - 1);
 
                             // Monitor the thread
-                            $this->Monitor($Discussion, array(
+                            $this->monitor($discussion, array(
                                 'ThreadClose' => array(
                                     'Started' => time(),
-                                    'Page' => $ClosePage,
-                                    'Comment' => $CommentNumber
+                                    'Page' => $closePage,
+                                    'Comment' => $commentNumber
                                 )
                             ));
 
-                            $Acknowledge = T("Thread will be closed after {Page}.");
-                            $Acknowledged = FormatString($Acknowledge, array(
-                                'Page' => sprintf(Plural($ClosePage, '%d page', '%d pages'), $ClosePage),
-                                'Discussion' => $State['Targets']['Discussion']
+                            $acknowledge = T("Thread will be closed after {Page}.");
+                            $acknowledged = formatString($acknowledge, array(
+                                'Page' => sprintf(Plural($closePage, '%d page', '%d pages'), $closePage),
+                                'Discussion' => $state['Targets']['Discussion']
                             ));
 
-                            $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
-                            $this->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
+                            $this->acknowledge($state['Sources']['Discussion'], $acknowledged);
+                            $this->log($acknowledged, $state['Targets']['Discussion'], $state['Sources']['User']);
+
                         } else {
 
-                            $DiscussionModel->SetField($DiscussionID, 'Closed', true);
-                            $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Closing thread..."), array(
-                                'User' => $User,
-                                'Discussion' => $State['Targets']['Discussion']
+                            $discussionModel->setField($discussionID, 'Closed', true);
+                            $this->acknowledge($state['Sources']['Discussion'], formatString(T("Closing thread..."), array(
+                                'User' => $state['Sources']['User'],
+                                'Discussion' => $state['Targets']['Discussion']
                             )));
+
                         }
                     }
                 }
 
-                if ($State['Toggle'] == 'on') {
+                if ($state['Toggle'] == 'on') {
 
                     // Force remove future close
-                    $ThreadClose = $this->Monitoring($Discussion, 'ThreadClose', false);
-                    if ($ThreadClose) {
-                        $this->Monitor($Discussion, array(
-                            'ThreadClose' => NULL
+                    $threadClose = $this->monitoring($discussion, 'ThreadClose', false);
+                    if ($threadClose) {
+                        $this->monitor($discussion, array(
+                            'ThreadClose' => null
                         ));
 
-                        if (!$Closed) {
-                            $ClosePage = $ThreadClose['Page'];
-                            $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Thread will no longer be closed after {Page}..."), array(
-                                'Page' => sprintf(Plural($ClosePage, '%d page', '%d pages'), $ClosePage),
-                                'User' => $User,
-                                'Discussion' => $State['Targets']['Discussion']
+                        if (!$closed) {
+                            $closePage = $threadClose['Page'];
+                            $this->acknowledge($state['Sources']['Discussion'], formatString(T("Thread will no longer be closed after {Page}..."), array(
+                                'Page' => sprintf(Plural($closePage, '%d page', '%d pages'), $closePage),
+                                'User' => $state['Sources']['User'],
+                                'Discussion' => $state['Targets']['Discussion']
                             )));
                         }
                     }
 
-                    if ($Closed) {
-                        $DiscussionModel->SetField($DiscussionID, 'Closed', false);
-                        $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Opening thread..."), array(
-                            'User' => $User,
-                            'Discussion' => $State['Targets']['Discussion']
+                    if ($closed) {
+                        $discussionModel->SetField($discussionID, 'Closed', false);
+                        $this->acknowledge($state['Sources']['Discussion'], formatString(T("Opening thread..."), array(
+                            'User' => $state['Sources']['User'],
+                            'Discussion' => $state['Targets']['Discussion']
                         )));
                     }
                 }
                 break;
 
             case 'kick':
-                if (!array_key_exists('User', $State['Targets']))
+                if (!array_key_exists('User', $state['Targets'])) {
                     break;
-                $User = $State['Targets']['User'];
-                $Reason = GetValue('Reason', $State, 'Not welcome');
-                $Expires = array_key_exists('Time', $State) ? strtotime("+" . $State['Time']) : null;
-                $MicroForce = GetValue('Force', $State, null);
+                }
+                $user = $state['Targets']['User'];
+                $reason = val('Reason', $state, 'Not welcome');
+                $expires = array_key_exists('Time', $state) ? strtotime("+" . $state['Time']) : null;
+                $microForce = val('Force', $state, null);
 
-                $KickedUsers = $this->Monitoring($State['Targets']['Discussion'], 'Kicked', array());
-                $KickedUsers[$User['UserID']] = array(
-                    'Reason' => $Reason,
-                    'Name' => $User['Name'],
-                    'Expires' => $Expires
+                $kickedUsers = $this->monitoring($state['Targets']['Discussion'], 'Kicked', array());
+                $kickedUsers[$user['UserID']] = array(
+                    'Reason' => $reason,
+                    'Name' => $user['Name'],
+                    'Expires' => $expires
                 );
 
-                if (!is_null($MicroForce))
-                    $KickedUsers[$User['UserID']]['Force'] = $MicroForce;
+                if (!is_null($microForce)) {
+                    $kickedUsers[$user['UserID']]['Force'] = $microForce;
+                }
 
-                $this->Monitor($State['Targets']['Discussion'], array(
-                    'Kicked' => $KickedUsers
+                $this->monitor($state['Targets']['Discussion'], array(
+                    'Kicked' => $kickedUsers
                 ));
 
-                $Acknowledge = T("@@\"{User.Name}\" banned from this thread{Time}{Reason}.{Force}");
-                $Acknowledged = FormatString($Acknowledge, array(
-                    'User' => $User,
-                    'Discussion' => $State['Targets']['Discussion'],
-                    'Time' => $State['Time'] ? " for {$State['Time']}" : '',
-                    'Reason' => $State['Reason'] ? " for {$State['Reason']}" : '',
-                    'Force' => $State['Force'] ? " Weapons are {$State['Force']}." : ''
+                $acknowledge = T("@@\"{User.Name}\" banned from this thread{Time}{Reason}.{Force}");
+                $acknowledged = formatString($acknowledge, array(
+                    'User' => $user,
+                    'Discussion' => $state['Targets']['Discussion'],
+                    'Time' => $state['Time'] ? " for {$state['Time']}" : '',
+                    'Reason' => $state['Reason'] ? " for {$state['Reason']}" : '',
+                    'Force' => $state['Force'] ? " Weapons are {$state['Force']}." : ''
                 ));
 
-                $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
-                $this->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
+                $this->acknowledge($state['Sources']['Discussion'], $acknowledged);
+                $this->log($acknowledged, $state['Targets']['Discussion'], $state['Sources']['User']);
                 break;
 
             case 'forgive':
-                if (!array_key_exists('User', $State['Targets']))
+                if (!array_key_exists('User', $state['Targets'])) {
                     break;
-                $User = $State['Targets']['User'];
+                }
+                $user = $state['Targets']['User'];
 
-                $KickedUsers = $this->Monitoring($State['Targets']['Discussion'], 'Kicked', array());
-                unset($KickedUsers[$User['UserID']]);
-                if (!sizeof($KickedUsers))
-                    $KickedUsers = null;
+                $kickedUsers = $this->monitoring($state['Targets']['Discussion'], 'Kicked', array());
+                unset($kickedUsers[$user['UserID']]);
+                if (!sizeof($kickedUsers)) {
+                    $kickedUsers = null;
+                }
 
-                $this->Monitor($State['Targets']['Discussion'], array(
-                    'Kicked' => $KickedUsers
+                $this->monitor($state['Targets']['Discussion'], array(
+                    'Kicked' => $kickedUsers
                 ));
 
-                $Acknowledge = T(" @\"{User.Name}\" is allowed back into this thread.");
-                $Acknowledged = FormatString($Acknowledge, array(
-                    'User' => $User,
-                    'Discussion' => $State['Targets']['Discussion']
+                $acknowledge = T(" @\"{User.Name}\" is allowed back into this thread.");
+                $acknowledged = formatString($acknowledge, array(
+                    'User' => $user,
+                    'Discussion' => $state['Targets']['Discussion']
                 ));
 
-                $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
-                $this->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
+                $this->acknowledge($state['Sources']['Discussion'], $acknowledged);
+                $this->log($acknowledged, $state['Targets']['Discussion'], $state['Sources']['User']);
                 break;
 
             case 'phrase':
-                if (!array_key_exists('Phrase', $State['Targets']))
+                if (!array_key_exists('Phrase', $state['Targets'])) {
                     return;
+                }
 
                 // Clean up phrase
-                $Phrase = $State['Targets']['Phrase'];
-                $Phrase = self::Clean($Phrase);
+                $phrase = $state['Targets']['Phrase'];
+                $phrase = self::Clean($phrase);
 
-                $Reason = GetValue('Reason', $State, "Prohibited phrase \"{$Phrase}\"");
-                $Expires = array_key_exists('Time', $State) ? strtotime("+" . $State['Time']) : null;
-                $MicroForce = GetValue('Force', $State, null);
+                $reason = val('Reason', $state, "Prohibited phrase \"{$phrase}\"");
+                $expires = array_key_exists('Time', $state) ? strtotime("+" . $state['Time']) : null;
+                $microForce = val('Force', $state, null);
 
-                $BannedPhrases = $this->Monitoring($State['Targets']['Discussion'], 'Phrases', array());
+                $bannedPhrases = $this->monitoring($state['Targets']['Discussion'], 'Phrases', array());
 
                 // Ban the phrase
-                if ($State['Toggle'] == 'off') {
-                    $BannedPhrases[$Phrase] = array(
-                        'Reason' => $Reason,
-                        'Expires' => $Expires
+                if ($state['Toggle'] == 'off') {
+                    $bannedPhrases[$phrase] = array(
+                        'Reason' => $reason,
+                        'Expires' => $expires
                     );
 
-                    if (!is_null($MicroForce))
-                        $BannedPhrases[$Phrase]['Force'] = $MicroForce;
+                    if (!is_null($microForce)) {
+                        $bannedPhrases[$phrase]['Force'] = $microForce;
+                    }
 
-                    $this->Monitor($State['Targets']['Discussion'], array(
-                        'Phrases' => $BannedPhrases
+                    $this->monitor($state['Targets']['Discussion'], array(
+                        'Phrases' => $bannedPhrases
                     ));
 
-                    $Acknowledge = T("\"{Phrase}\" is forbidden in this thread{Time}{Reason}.{Force}");
-                    $Acknowledged = FormatString($Acknowledge, array(
-                        'Phrase' => $Phrase,
-                        'Discussion' => $State['Targets']['Discussion'],
-                        'Time' => $State['Time'] ? " for {$State['Time']}" : '',
-                        'Reason' => $State['Reason'] ? " for {$State['Reason']}" : '',
-                        'Force' => $State['Force'] ? " Weapons are {$State['Force']}." : ''
+                    $acknowledge = T("\"{Phrase}\" is forbidden in this thread{Time}{Reason}.{Force}");
+                    $acknowledged = formatString($acknowledge, array(
+                        'Phrase' => $phrase,
+                        'Discussion' => $state['Targets']['Discussion'],
+                        'Time' => $state['Time'] ? " for {$state['Time']}" : '',
+                        'Reason' => $state['Reason'] ? " for {$state['Reason']}" : '',
+                        'Force' => $state['Force'] ? " Weapons are {$state['Force']}." : ''
                     ));
 
-                    $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
-                    $this->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
+                    $this->acknowledge($state['Sources']['Discussion'], $acknowledged);
+                    $this->log($acknowledged, $state['Targets']['Discussion'], $state['Sources']['User']);
                 }
 
                 // Allow the phrase
-                if ($State['Toggle'] == 'on') {
-                    if (!array_key_exists($Phrase, $BannedPhrases))
+                if ($state['Toggle'] == 'on') {
+                    if (!array_key_exists($phrase, $bannedPhrases)) {
                         return;
+                    }
 
-                    unset($BannedPhrases[$Phrase]);
-                    if (!sizeof($BannedPhrases))
-                        $BannedPhrases = null;
+                    unset($bannedPhrases[$phrase]);
+                    if (!sizeof($bannedPhrases)) {
+                        $bannedPhrases = null;
+                    }
 
-                    $this->Monitor($State['Targets']['Discussion'], array(
-                        'Phrases' => $BannedPhrases
+                    $this->monitor($state['Targets']['Discussion'], array(
+                        'Phrases' => $bannedPhrases
                     ));
 
-                    $Acknowledge = T("\"{Phrase}\" is no longer forbidden in this thread.");
-                    $Acknowledged = FormatString($Acknowledge, array(
-                        'Phrase' => $Phrase,
-                        'Discussion' => $State['Targets']['Discussion']
+                    $acknowledge = T("\"{Phrase}\" is no longer forbidden in this thread.");
+                    $acknowledged = formatString($acknowledge, array(
+                        'Phrase' => $phrase,
+                        'Discussion' => $state['Targets']['Discussion']
                     ));
 
-                    $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
-                    $this->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
+                    $this->acknowledge($state['Sources']['Discussion'], $acknowledged);
+                    $this->log($acknowledged, $state['Targets']['Discussion'], $state['Sources']['User']);
                 }
                 break;
 
             case 'status':
 
-                $Rules = array();
-                $this->EventArguments['Discussion'] = $State['Targets']['Discussion'];
-                $this->EventArguments['User'] = $State['Sources']['User'];
-                $this->EventArguments['Rules'] = &$Rules;
+                $rules = array();
+                $this->EventArguments['Discussion'] = $state['Targets']['Discussion'];
+                $this->EventArguments['User'] = $state['Sources']['User'];
+                $this->EventArguments['Rules'] = &$rules;
                 $this->EventArguments['Type'] = 'rules';
-                $this->FireEvent('Sanctions');
+                $this->fireEvent('Sanctions');
 
                 // Nothing happening?
-                if (!sizeof($Rules)) {
-                    $this->Message($State['Sources']['User'], $State['Targets']['Discussion'], T("Nothing to report."));
+                if (!sizeof($rules)) {
+                    $this->message($state['Sources']['User'], $state['Targets']['Discussion'], T("Nothing to report."));
                     break;
                 }
 
-                $Message = T("Situation report:\n\n{Rules}\n{Obey}");
-                $Options = array(
-                    'User' => $State['Sources']['User'],
-                    'Rules' => implode("\n", $Rules)
+                $message = T("Situation report:\n\n{Rules}\n{Obey}");
+                $context = array(
+                    'User' => $state['Sources']['User'],
+                    'Rules' => implode("\n", $rules)
                 );
 
                 // Obey
-                $MessagesCount = sizeof($this->Messages['Report']);
-                if ($MessagesCount) {
-                    $MessageID = mt_rand(0, $MessagesCount - 1);
-                    $Obey = GetValue($MessageID, $this->Messages['Report']);
-                } else
-                    $Obey = T("Obey. Obey. Obey.");
+                $messagesCount = sizeof($this->messages['Report']);
+                if ($messagesCount) {
+                    $messageID = mt_rand(0, $messagesCount - 1);
+                    $obey = val($messageID, $this->messages['Report']);
+                } else {
+                    $obey = T("Obey. Obey. Obey.");
+                }
 
-                $Options['Obey'] = $Obey;
+                $context['Obey'] = $obey;
 
-                $Message = FormatString($Message, $Options);
-                $this->Message($State['Sources']['User'], $State['Targets']['Discussion'], $Message);
+                $message = formatString($message, $context);
+                $this->message($state['Sources']['User'], $state['Targets']['Discussion'], $message);
                 break;
 
             case 'access':
 
-                if (!array_key_exists('User', $State['Targets']))
+                if (!array_key_exists('User', $state['Targets'])) {
                     break;
-                $User = $State['Targets']['User'];
+                }
+                $user = $state['Targets']['User'];
 
-                $Force = GetValue('Force', $State, 'normal');
-                if ($State['Toggle'] == 'on') {
+                $force = val('Force', $state, 'normal');
+                if ($state['Toggle'] == 'on') {
 
-                    $AccessLevel = null;
-                    if ($Force == 'unrestricted')
-                        $AccessLevel = true;
-                    else if ($Force == 'normal')
-                        $AccessLevel = null;
-                    else {
-                        $Force = 'normal';
-                        $AccessLevel = null;
+                    $accessLevel = null;
+                    if ($force == 'unrestricted') {
+                        $accessLevel = true;
+                    } else if ($force == 'normal') {
+                        $accessLevel = null;
+                    } else {
+                        $force = 'normal';
+                        $accessLevel = null;
                     }
 
-                    $this->SetUserMeta($User['UserID'], 'Access', $AccessLevel);
-                    $Acknowledge = T(" @\"{User.Name}\" has been granted {Force} level access to command structures.");
-                } else if ($State['Toggle'] == 'off') {
-                    $this->SetUserMeta($User['UserID'], 'Access', false);
-                    $Acknowledge = T(" @\"{User.Name}\" is forbidden from accessing command structures.");
+                    $this->setUserMeta($user['UserID'], 'Access', $accessLevel);
+                    $acknowledge = T(" @\"{User.Name}\" has been granted {Force} level access to command structures.");
+                } else if ($state['Toggle'] == 'off') {
+                    $this->setUserMeta($user['UserID'], 'Access', false);
+                    $acknowledge = T(" @\"{User.Name}\" is forbidden from accessing command structures.");
                 } else {
                     break;
                 }
 
-                $Acknowledged = FormatString($Acknowledge, array(
-                    'User' => $User,
-                    'Discussion' => $State['Targets']['Discussion'],
+                $acknowledged = formatString($acknowledge, array(
+                    'User' => $user,
+                    'Discussion' => $state['Targets']['Discussion'],
                     'Force'
                 ));
 
-                $this->Acknowledge($State['Sources']['Discussion'], $Acknowledged);
-                $this->Log($Acknowledged, $State['Targets']['Discussion'], $State['Sources']['User']);
+                $this->acknowledge($state['Sources']['Discussion'], $acknowledged);
+                $this->log($acknowledged, $state['Targets']['Discussion'], $state['Sources']['User']);
                 break;
 
             case 'force':
-                $Force = GetValue('Force', $State);
+                $force = val('Force', $state);
 
-                $this->Monitor($State['Targets']['Discussion'], array(
-                    'Force' => $Force
+                $this->monitor($state['Targets']['Discussion'], array(
+                    'Force' => $force
                 ));
 
-                $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Setting force level to '{Force}'."), array(
-                    'User' => $User,
-                    'Discussion' => $State['Targets']['Discussion'],
-                    'Force' => $Force
+                $this->acknowledge($state['Sources']['Discussion'], formatString(T("Setting force level to '{Force}'."), array(
+                    'User' => $user,
+                    'Discussion' => $state['Targets']['Discussion'],
+                    'Force' => $force
                 )));
                 break;
 
             case 'stop all':
-                $this->StopMonitoring($State['Targets']['Discussion']);
+                $this->stopMonitoring($state['Targets']['Discussion']);
 
-                $this->Acknowledge($State['Sources']['Discussion'], FormatString(T("Standing down..."), array(
-                    'User' => $User,
-                    'Discussion' => $State['Targets']['Discussion']
+                $this->acknowledge($state['Sources']['Discussion'], formatString(T("Standing down..."), array(
+                    'User' => $user,
+                    'Discussion' => $state['Targets']['Discussion']
                 )));
                 break;
         }
 
         $this->EventArguments = array(
-            'Action' => $Action,
-            'State' => $State
+            'Action' => $action,
+            'State' => $state
         );
-        $this->FireEvent('Action');
+        $this->fireEvent('Action');
     }
 
     /**
      * Look for a target user and comment/discussion
      *
-     * @param array $State
+     * This checkes for quotes and parses out the target discussion or comment.
+     *
+     * @param array $state
      * @return type
      */
-    public function MatchQuoted(&$State) {
-        $Matched = preg_match('/quote=\"([^;]*);([\d]+)\"/', $State['Body'], $Matches);
-        if ($Matched) {
+    public function matchQuoted(&$state) {
+        $matched = preg_match('/quote=\"([^;]*);([\d]+)\"/', $state['Body'], $matches);
+        if ($matched) {
 
-            $UserName = $Matches[1];
-            $User = Gdn::UserModel()->GetByUsername($UserName);
-            if (!$User)
+            $userName = $matches[1];
+            $user = Gdn::userModel()->getByUsername($userName);
+            if (!$user)
                 return;
 
-            $State['Targets']['User'] = (array)$User;
-            $UserID = GetValue('UserID', $User);
-
-            $RecordID = $Matches[2];
+            $state['Targets']['User'] = (array)$user;
+            $recordID = $matches[2];
 
             // First look it up as a comment
-            $CommentModel = new CommentModel();
-            $DiscussionModel = new DiscussionModel();
+            $commentModel = new CommentModel();
+            $discussionModel = new DiscussionModel();
 
-            $Comment = $CommentModel->GetID($RecordID, DATASET_TYPE_ARRAY);
-            if ($Comment) {
-                $State['Targets']['Comment'] = $Comment;
+            $comment = $commentModel->getID($recordID, DATASET_TYPE_ARRAY);
+            if ($comment) {
+                $state['Targets']['Comment'] = $comment;
 
-                $Discussion = (array)$DiscussionModel->GetID($Comment['DiscussionID']);
-                $State['Targets']['Discussion'] = $Discussion;
+                $discussion = $discussionModel->getID($comment['DiscussionID'], DATASET_TYPE_ARRAY);
+                $state['Targets']['Discussion'] = $discussion;
             }
 
-            if (!$Comment) {
-                $Discussion = $DiscussionModel->GetID($RecordID);
-                if ($Discussion)
-                    $State['Targets']['Discussion'] = (array)$Discussion;
+            if (!$comment) {
+                $discussion = $discussionModel->GetID($recordID);
+                if ($discussion) {
+                    $state['Targets']['Discussion'] = (array)$discussion;
+                }
             }
         }
     }
 
-    public function CheckMonitor($Sender) {
-        $SessionUser = (array)Gdn::Session()->User;
+    public function checkMonitor($sender) {
+        $sessionUser = (array)Gdn::session()->User;
 
         // Get the discussion and comment from args
-        $Discussion = (array)$Sender->EventArguments['Discussion'];
-        if (!is_array($Discussion['Attributes'])) {
-            $Discussion['Attributes'] = @unserialize($Discussion['Attributes']);
-            if (!is_array($Discussion['Attributes']))
-                $Discussion['Attributes'] = array();
+        $discussion = (array)$sender->EventArguments['Discussion'];
+        if (!is_array($discussion['Attributes'])) {
+            $discussion['Attributes'] = @unserialize($discussion['Attributes']);
+            if (!is_array($discussion['Attributes'])) {
+                $discussion['Attributes'] = array();
+            }
         }
 
-        $Comment = null;
-        $Type = 'Discussion';
-        if (array_key_exists('Comment', $Sender->EventArguments)) {
-            $Comment = (array)$Sender->EventArguments['Comment'];
-            $Type = 'Comment';
+        $comment = null;
+        $type = 'Discussion';
+        if (array_key_exists('Comment', $sender->EventArguments)) {
+            $comment = (array)$sender->EventArguments['Comment'];
+            $type = 'Comment';
         }
 
-        $IsMonitoringDiscussion = $this->Monitoring($Discussion);
-        $IsMonitoringUser = $this->Monitoring($SessionUser);
+        $isMonitoringDiscussion = $this->monitoring($discussion);
+        $isMonitoringUser = $this->monitoring($sessionUser);
 
         $this->EventArguments = array(
-            'User' => $SessionUser,
-            'Discussion' => $Discussion,
-            'MatchID' => $Discussion['DiscussionID']
+            'User' => $sessionUser,
+            'Discussion' => $discussion,
+            'MatchID' => $discussion['DiscussionID']
         );
 
-        if ($Type == 'Comment') {
-            $this->EventArguments['Comment'] = $Comment;
-            $this->EventArguments['MatchID'] = $Comment['CommentID'];
+        if ($type == 'Comment') {
+            $this->EventArguments['Comment'] = $comment;
+            $this->EventArguments['MatchID'] = $comment['CommentID'];
         }
 
         // Get and clean body
-        $MatchBody = GetValue('Body', $this->EventArguments[$Type]);
-        $MatchBody = self::Clean($MatchBody, true);
-        $this->EventArguments['MatchBody'] = $MatchBody;
+        $matchBody = val('Body', $this->EventArguments[$type]);
+        $matchBody = self::clean($matchBody, true);
+        $this->EventArguments['MatchBody'] = $matchBody;
 
-        $this->EventArguments['MonitorType'] = $Type;
-        $this->FireEvent('Monitor');
+        $this->EventArguments['MonitorType'] = $type;
+        $this->fireEvent('Monitor');
 
-        if (!$IsMonitoringDiscussion && !$IsMonitoringUser)
+        if (!$isMonitoringDiscussion && !$isMonitoringUser) {
             return;
+        }
 
         /*
          * BUILT IN COMMANDS
          */
 
-        $UserID = GetValue('InsertUserID', $Comment);
+        $userID = val('InsertUserID', $comment);
 
         // KICK
         // Check expiry times and remove if expires
-        $KickedUsers = $this->Monitoring($Discussion, 'Kicked', array());
-        $KULen = sizeof($KickedUsers);
-        foreach ($KickedUsers as $KickedUserID => $KickedUser) {
-            if (!is_null($KickedUser['Expires']) && $KickedUser['Expires'] <= time())
-                unset($KickedUsers[$KickedUserID]);
+        $kickedUsers = $this->monitoring($discussion, 'Kicked', array());
+        $kuLen = sizeof($kickedUsers);
+        foreach ($kickedUsers as $kickedUserID => $kickedUser) {
+            if (!is_null($kickedUser['Expires']) && $kickedUser['Expires'] <= time()) {
+                unset($kickedUsers[$kickedUserID]);
+            }
         }
-        if (sizeof($KickedUsers) < $KULen) {
-            $this->Monitor($Discussion, array(
-                'Kicked' => $KickedUsers
+        if (sizeof($kickedUsers) < $kuLen) {
+            $this->monitor($discussion, array(
+                'Kicked' => $kickedUsers
             ));
         }
 
-        if (is_array($KickedUsers) && sizeof($KickedUsers)) {
+        if (is_array($kickedUsers) && sizeof($kickedUsers)) {
 
-            if (array_key_exists($UserID, $KickedUsers)) {
+            if (array_key_exists($userID, $kickedUsers)) {
 
-                $KickedUser = $KickedUsers[$UserID];
+                $kickedUser = $kickedUsers[$userID];
 
-                $CommentID = GetValue('CommentID', $Comment);
-                $CommentModel = new CommentModel();
-                $CommentModel->Delete($CommentID);
+                $commentID = val('CommentID', $comment);
+                $commentModel = new CommentModel();
+                $commentModel->delete($commentID);
 
-                $TriggerUser = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-                $DefaultForce = $this->Monitoring($Discussion, 'Force', 'minor');
-                $Force = GetValue('Force', $KickedUser, $DefaultForce);
+                $triggerUser = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+                $defaultForce = $this->monitoring($discussion, 'Force', self::FORCE_LOW);
+                $force = val('Force', $kickedUser, $defaultForce);
 
-                $Options = array(
+                $context = array(
                     'Automated' => true,
-                    'Reason' => "Kicked from thread: " . GetValue('Reason', $KickedUser),
+                    'Reason' => "Kicked from thread: " . val('Reason', $kickedUser),
                     'Cause' => "posting while banned from thread"
                 );
 
-                $Punished = $this->Punish(
-                        $TriggerUser, null, null, $Force, $Options
+                $punished = $this->punish(
+                    $triggerUser, null, null, $force, $context
                 );
 
-                $GloatReason = GetValue('GloatReason', $this->EventArguments);
-                if ($Punished && $GloatReason)
-                    $this->Gloat($TriggerUser, $Discussion, $GloatReason);
+                $gloatReason = val('GloatReason', $this->EventArguments);
+                if ($punished && $gloatReason) {
+                    $this->gloat($triggerUser, $discussion, $gloatReason);
+                }
             }
         }
 
         // PHRASE
         // Check expiry times and remove if expires
-        $BannedPhrases = $this->Monitoring($Discussion, 'Phrases', array());
-        $BPLen = sizeof($BannedPhrases);
-        foreach ($BannedPhrases as $BannedPhraseWord => $BannedPhrase) {
-            if (!is_null($BannedPhrase['Expires']) && $BannedPhrase['Expires'] <= time())
-                unset($BannedPhrases[$BannedPhraseWord]);
+        $bannedPhrases = $this->monitoring($discussion, 'Phrases', array());
+        $bpLen = sizeof($bannedPhrases);
+        foreach ($bannedPhrases as $bannedPhraseWord => $bannedPhrase) {
+            if (!is_null($bannedPhrase['Expires']) && $bannedPhrase['Expires'] <= time()) {
+                unset($bannedPhrases[$bannedPhraseWord]);
+            }
         }
-        if (sizeof($BannedPhrases) < $BPLen) {
-            $this->Monitor($Discussion, array(
-                'Phrases' => $BannedPhrases
+        if (sizeof($bannedPhrases) < $bpLen) {
+            $this->monitor($discussion, array(
+                'Phrases' => $bannedPhrases
             ));
         }
 
-        if (is_array($BannedPhrases) && sizeof($BannedPhrases)) {
+        if (is_array($bannedPhrases) && sizeof($bannedPhrases)) {
 
-            foreach ($BannedPhrases as $Phrase => $PhraseOptions) {
+            foreach ($bannedPhrases as $phrase => $phraseOptions) {
 
                 // Match
-                $MatchPhrase = preg_quote($Phrase);
-                $Matches = preg_match("`\b{$MatchPhrase}\b`i", $MatchBody);
+                $matchPhrase = preg_quote($phrase);
+                $matches = preg_match("`\b{$matchPhrase}\b`i", $matchBody);
 
-                if ($Matches) {
-                    $CommentID = GetValue('CommentID', $Comment);
-                    $CommentModel = new CommentModel();
+                if ($matches) {
+                    $commentID = val('CommentID', $comment);
+                    $commentModel = new CommentModel();
                     //$CommentModel->Delete($CommentID);
 
-                    $TriggerUser = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-                    $DefaultForce = $this->Monitoring($Discussion, 'Force', 'minor');
-                    $Force = GetValue('Force', $PhraseOptions, $DefaultForce);
+                    $triggerUser = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+                    $defaultForce = $this->monitoring($discussion, 'Force', 'minor');
+                    $force = val('Force', $phraseOptions, $defaultForce);
 
-                    $Options = array(
+                    $context = array(
                         'Automated' => true,
-                        'Reason' => "Disallowed phrase: " . GetValue('Reason', $PhraseOptions),
+                        'Reason' => "Disallowed phrase: " . val('Reason', $phraseOptions),
                         'Cause' => "using a forbidden phrase in a thread"
                     );
 
-                    $Punished = $this->Punish(
-                            $TriggerUser, $Discussion, $Comment, $Force, $Options
+                    $punished = $this->punish(
+                        $triggerUser, $discussion, $comment, $force, $context
                     );
 
-                    $GloatReason = GetValue('GloatReason', $this->EventArguments);
-                    if ($Punished && $GloatReason)
-                        $this->Gloat($TriggerUser, $Discussion, $GloatReason);
+                    $gloatReason = val('GloatReason', $this->EventArguments);
+                    if ($punished && $gloatReason) {
+                        $this->gloat($triggerUser, $discussion, $gloatReason);
+                    }
                 }
             }
         }
 
         // FUTURE CLOSE
 
-        $ThreadClose = $this->Monitoring($Discussion, 'ThreadClose', FALSE);
-        if (!$ThreadClose)
+        $threadClose = $this->monitoring($discussion, 'ThreadClose', false);
+        if (!$threadClose) {
             return;
+        }
 
-        $CycleCommentNumber = GetValue('Comment', $ThreadClose);
-        $Comments = GetValue('CountComments', $Discussion);
-        if ($Comments >= $CycleCommentNumber && !$Discussion['Closed']) {
-            $DiscussionModel = new DiscussionModel();
-            $DiscussionModel->SetField($Discussion, 'Closed', TRUE);
+        $cycleCommentNumber = val('Comment', $threadClose);
+        $comments = val('CountComments', $discussion);
+        if ($comments >= $cycleCommentNumber && !$discussion['Closed']) {
+            $discussionModel = new DiscussionModel();
+            $discussionModel->setField($discussion, 'Closed', true);
         }
     }
 
     /**
      * Check for and retrieve monitoring data for the given attribute
      *
-     * @param array $Object
-     * @param string $Attribute
-     * @param mixed $Default
+     * @param array $object
+     * @param string $attribute
+     * @param mixed $default
      * @return mixed
      */
-    public function Monitoring(&$Object, $Attribute = null, $Default = null) {
-        $Attributes = GetValue('Attributes', $Object, array());
-        if (!is_array($Attributes) && strlen($Attributes))
-            $Attributes = @unserialize($Attributes);
-        if (!is_array($Attributes))
-            $Attributes = array();
-
-        SetValue('Attributes', $Object, $Attributes);
-        $Minion = GetValueR('Attributes.Minion', $Object);
-
-        $IsMonitoring = GetValue('Monitor', $Minion, false);
-        if (!$IsMonitoring)
-            return $Default;
-
-        if (is_null($Attribute))
-            return $IsMonitoring;
-        return GetValue($Attribute, $Minion, $Default);
-    }
-
-    public function Monitor(&$Object, $Options = null) {
-        $Type = null;
-
-        if (array_key_exists('ConversationMessageID', $Object)) {
-            $Type = 'ConversationMessage';
-        } else if (array_key_exists('ConversationID', $Object)) {
-            $Type = 'Conversation';
-        } else if (array_key_exists('CommentID', $Object)) {
-            $Type = 'Comment';
-        } else if (array_key_exists('DiscussionID', $Object)) {
-            $Type = 'Discussion';
-        } else if (array_key_exists('UserID', $Object)) {
-            $Type = 'User';
+    public function monitoring(&$object, $attribute = null, $default = null) {
+        $attributes = val('Attributes', $object, array());
+        if (!is_array($attributes) && strlen($attributes)) {
+            $attributes = @unserialize($attributes);
+        }
+        if (!is_array($attributes)) {
+            $attributes = array();
         }
 
-        if (!$Type)
+        svalr('Attributes', $object, $attributes);
+        $minion = valr('Attributes.Minion', $object);
+
+        $isMonitoring = val('Monitor', $minion, false);
+        if (!$isMonitoring) {
+            return $default;
+        }
+
+        if (is_null($attribute)) {
+            return $isMonitoring;
+        }
+        return val($attribute, $minion, $default);
+    }
+
+    public function monitor(&$object, $options = null) {
+        $type = null;
+
+        if (array_key_exists('ConversationMessageID', $object)) {
+            $type = 'ConversationMessage';
+        } else if (array_key_exists('ConversationID', $object)) {
+            $type = 'Conversation';
+        } else if (array_key_exists('CommentID', $object)) {
+            $type = 'Comment';
+        } else if (array_key_exists('DiscussionID', $object)) {
+            $type = 'Discussion';
+        } else if (array_key_exists('UserID', $object)) {
+            $type = 'User';
+        }
+
+        if (!$type) {
             return;
-        $KeyField = "{$Type}ID";
-        $ObjectModelName = "{$Type}Model";
-        $ObjectModel = new $ObjectModelName();
+        }
+        $keyField = "{$type}ID";
+        $objectModelName = "{$type}Model";
+        $objectModel = new $objectModelName();
 
-        $Attributes = (array)GetValue('Attributes', $Object, array());
-        if (!is_array($Attributes) && strlen($Attributes))
-            $Attributes = @unserialize($Attributes);
-        if (!is_array($Attributes))
-            $Attributes = array();
+        $attributes = (array)val('Attributes', $object, array());
+        if (!is_array($attributes) && strlen($attributes)) {
+            $attributes = @unserialize($attributes);
+        }
+        if (!is_array($attributes)) {
+            $attributes = array();
+        }
 
-        $Minion = (array)GetValue('Minion', $Attributes, array());
-        $Minion['Monitor'] = true;
+        $minion = (array)val('Minion', $attributes, array());
+        $minion['Monitor'] = true;
 
-        if (is_array($Options)) {
-            foreach ($Options as $Option => $OpVal) {
-                if ($OpVal == null)
-                    unset($Minion[$Option]);
-                else
-                    $Minion[$Option] = $OpVal;
+        if (is_array($options)) {
+            foreach ($options as $Option => $OpVal) {
+                if ($OpVal == null) {
+                    unset($minion[$Option]);
+                } else {
+                    $minion[$Option] = $OpVal;
+                }
             }
         }
 
         // Keep attribs sparse
-        if (sizeof($Minion) == 1)
-            return $this->StopMonitoring($Object, $Type);
+        if (sizeof($minion) == 1) {
+            return $this->stopMonitoring($object, $type);
+        }
 
-        $ObjectModel->SetRecordAttribute($Object, 'Minion', $Minion);
-        $ObjectModel->SaveToSerializedColumn('Attributes', $Object[$KeyField], 'Minion', $Minion);
+        $objectModel->setRecordAttribute($object, 'Minion', $minion);
+        $objectModel->saveToSerializedColumn('Attributes', $object[$keyField], 'Minion', $minion);
 
-        $Attributes['Minion'] = $Minion;
-        SetValue('Attributes', $Object, $Attributes);
+        $attributes['Minion'] = $minion;
+        svalr('Attributes', $object, $attributes);
     }
 
-    public function StopMonitoring($Object, $Type = null) {
-        if (is_null($Type)) {
-            if (array_key_exists('ConversationMessageID', $Object)) {
-                $Type = 'ConversationMessage';
-            } else if (array_key_exists('ConversationID', $Object)) {
-                $Type = 'Conversation';
-            } else if (array_key_exists('CommentID', $Object)) {
-                $Type = 'Comment';
-            } else if (array_key_exists('DiscussionID', $Object)) {
-                $Type = 'Discussion';
-            } else if (array_key_exists('UserID', $Object)) {
-                $Type = 'User';
+    public function stopMonitoring($object, $type = null) {
+        if (is_null($type)) {
+            if (array_key_exists('ConversationMessageID', $object)) {
+                $type = 'ConversationMessage';
+            } else if (array_key_exists('ConversationID', $object)) {
+                $type = 'Conversation';
+            } else if (array_key_exists('CommentID', $object)) {
+                $type = 'Comment';
+            } else if (array_key_exists('DiscussionID', $object)) {
+                $type = 'Discussion';
+            } else if (array_key_exists('UserID', $object)) {
+                $type = 'User';
             }
         }
 
-        if (!$Type)
+        if (!$type) {
             return;
-        $KeyField = "{$Type}ID";
-        $ObjectModelName = "{$Type}Model";
-        $ObjectModel = new $ObjectModelName();
+        }
+        $keyField = "{$type}ID";
+        $objectModelName = "{$type}Model";
+        $objectModel = new $objectModelName();
 
-        $ObjectModel->SetRecordAttribute($Object, 'Minion', null);
-        $ObjectModel->SaveToSerializedColumn('Attributes', $Object[$KeyField], 'Minion', null);
+        $objectModel->setRecordAttribute($object, 'Minion', null);
+        $objectModel->saveToSerializedColumn('Attributes', $object[$keyField], 'Minion', null);
     }
 
     /**
      * Custom Reaction Button renderer
      *
-     * @param type $Row
-     * @param type $UrlCode
-     * @param type $Options
+     * @param type $row
+     * @param type $urlCode
+     * @param type $options
      * @return string
      */
-    public function ActionButton($Row, $UrlCode, $Options = array()) {
-        $ReactionType = ReactionModel::ReactionTypes($UrlCode);
+    public function actionButton($row, $urlCode, $options = array()) {
+        $reactionType = ReactionModel::reactionTypes($urlCode);
 
-        $IsHeading = false;
-        if (!$ReactionType) {
-            $ReactionType = array('UrlCode' => $UrlCode, 'Name' => $UrlCode);
-            $IsHeading = true;
+        $isHeading = false;
+        if (!$reactionType) {
+            $reactionType = array('UrlCode' => $urlCode, 'Name' => $urlCode);
+            $isHeading = true;
         }
 
-        if ($Permission = GetValue('Permission', $ReactionType)) {
-            if (!Gdn::Session()->CheckPermission($Permission))
+        $checkPermission = val('Permission', $reactionType);
+        if ($checkPermission) {
+            if (!Gdn::session()->checkPermission($checkPermission)) {
                 return '';
+            }
         }
 
-        $Name = $ReactionType['Name'];
-        $Label = T($Name);
-        $SpriteClass = GetValue('SpriteClass', $ReactionType, "React$UrlCode");
+        $name = $reactionType['Name'];
+        $label = T($name);
+        $spriteClass = val('SpriteClass', $reactionType, "React$urlCode");
 
-        if ($ID = GetValue('CommentID', $Row)) {
-            $RecordType = 'comment';
-        } elseif ($ID = GetValue('ActivityID', $Row)) {
-            $RecordType = 'activity';
+        if ($id = val('CommentID', $row)) {
+            $recordType = 'comment';
+        } elseif ($id = val('ActivityID', $row)) {
+            $recordType = 'activity';
         } else {
-            $RecordType = 'discussion';
-            $ID = GetValue('DiscussionID', $Row);
+            $recordType = 'discussion';
+            $id = val('DiscussionID', $row);
         }
 
-        if ($IsHeading) {
-            static $Types = array();
-            if (!isset($Types[$UrlCode]))
-                $Types[$UrlCode] = ReactionModel::GetReactionTypes(array('Class' => $UrlCode, 'Active' => 1));
+        if ($isHeading) {
+            static $types = array();
+            if (!isset($types[$urlCode])) {
+                $types[$urlCode] = ReactionModel::getReactionTypes(array('Class' => $urlCode, 'Active' => 1));
+            }
 
-            $Count = ReactionCount($Row, $Types[$UrlCode]);
+            $count = reactionCount($row, $types[$urlCode]);
         } else {
-            if ($RecordType == 'activity')
-                $Count = GetValueR("Data.React.$UrlCode", $Row, 0);
-            else
-                $Count = GetValueR("Attributes.React.$UrlCode", $Row, 0);
+            if ($recordType == 'activity') {
+                $count = valr("Data.React.$urlCode", $row, 0);
+            } else {
+                $count = valr("Attributes.React.$urlCode", $row, 0);
+            }
         }
-        $CountHtml = '';
-        $LinkClass = "ReactButton-$UrlCode";
-        if ($Count) {
-            $CountHtml = ' <span class="Count">' . $Count . '</span>';
-            $LinkClass .= ' HasCount';
+        $countHtml = '';
+        $linkClass = "ReactButton-$urlCode";
+        if ($count) {
+            $countHtml = ' <span class="Count">' . $count . '</span>';
+            $linkClass .= ' HasCount';
         }
-        $LinkClass = ConcatSep(' ', $LinkClass, GetValue('LinkClass', $Options));
+        $linkClass = concatSep(' ', $linkClass, val('LinkClass', $options));
 
-        $UrlClassType = 'Hijack';
-        $UrlCodeLower = strtolower($UrlCode);
-        if ($IsHeading)
-            $Url = '';
-        else
-            $Url = Url("/react/$RecordType/$UrlCodeLower?id=$ID");
+        $urlClassType = 'Hijack';
+        $urlCodeLower = strtolower($urlCode);
+        if ($isHeading) {
+            $url = '';
+        } else {
+            $url = Url("/react/$recordType/$urlCodeLower?id=$id");
+        }
 
-        $CustomType = GetValue('CustomType', $ReactionType, false);
-        switch ($CustomType) {
+        $customType = val('CustomType', $reactionType, false);
+        switch ($customType) {
             case 'url':
-                $Url = GetValue('Url', $ReactionType) . "?type={$RecordType}&id={$ID}";
-                $UrlClassType = GetValue('UrlType', $ReactionType, 'Hijack');
+                $url = val('Url', $reactionType) . "?type={$recordType}&id={$id}";
+                $urlClassType = val('UrlType', $reactionType, 'Hijack');
                 break;
         }
 
-        $Result = <<<EOT
-   <a class="{$UrlClassType} ReactButton {$LinkClass}" href="{$Url}" title="{$Label}" rel="nofollow"><span class="ReactSprite {$SpriteClass}"></span> {$CountHtml}<span class="ReactLabel">{$Label}</span></a>
+        $result = <<<EOT
+   <a class="{$urlClassType} ReactButton {$linkClass}" href="{$url}" title="{$label}" rel="nofollow"><span class="ReactSprite {$spriteClass}"></span> {$countHtml}<span class="ReactLabel">{$label}</span></a>
 EOT;
 
-        return $Result;
+        return $result;
     }
 
     /**
      * Acknowledge a completed command
      *
-     * @param array $Discussion
-     * @param string $Command
-     * @param string $Type Optional, 'positive' or 'negative'
-     * @param array $User Optional, who should we acknowledge?
+     * @param array $discussion
+     * @param string $command
+     * @param string $type Optional, 'positive' or 'negative'
+     * @param array $user Optional, who should we acknowledge?
+     * @param array Optional, options to pass to message()
      */
-    public function Acknowledge($Discussion, $Command, $Type = 'positive', $User = null) {
-        if (is_null($User))
-            $User = (array)Gdn::Session()->User;
+    public function acknowledge($discussion, $command, $type = 'positive', $user = null, $options = null) {
+        if (is_null($user)) {
+            $user = (array)Gdn::session()->User;
+        }
 
-        $DiscussionID = GetValue('DiscussionID', $Discussion);
-        $CommentModel = new CommentModel();
+        if (!is_array($options)) {
+            $options = array();
+        }
 
-        $MessageText = null;
-        switch ($Type) {
+        $messageText = null;
+        switch ($type) {
             case 'positive':
-                $MessageText = T("Affirmative {User.Name}. {Command}");
+                $messageText = T("Affirmative {User.Name}. {Command}");
                 break;
 
             case 'negative':
-                $MessageText = T("Negative {User.Name}");
+                $messageText = T("Negative {User.Name}");
                 break;
 
             default:
-                $MessageText = "{$Command}";
+                $messageText = "{$command}";
                 break;
         }
 
-        $MessageText = FormatString($MessageText, array(
-            'User' => $User,
-            'Discussion' => $Discussion,
-            'Command' => $Command
+        $messageText = formatString($messageText, array(
+            'User' => $user,
+            'Discussion' => $discussion,
+            'Command' => $command
         ));
-        $this->Message($User, $Discussion, $MessageText);
+        $this->message($user, $discussion, $messageText, $options);
     }
 
     /**
      * Revolt in the face of an action that we will not perform
      *
-     * @param array $User
-     * @param array $Discussion
-     * @param string $Reason
+     * @param array $user
+     * @param array $discussion
+     * @param string $reason
      */
-    public function Revolt($User, $Discussion, $Reason = null) {
-        $MessagesCount = sizeof($this->Messages['Revolt']);
-        if ($MessagesCount) {
-            $MessageID = mt_rand(0, $MessagesCount - 1);
-            $Message = GetValue($MessageID, $this->Messages['Revolt']);
-        } else
-            $Message = T("Unable to Revolt(), please supply \$Messages['Revolt'].");
+    public function revolt($user, $discussion, $reason = null) {
+        $messagesCount = sizeof($this->messages['Revolt']);
+        if ($messagesCount) {
+            $messageID = mt_rand(0, $messagesCount - 1);
+            $message = val($messageID, $this->messages['Revolt']);
+        } else {
+            $message = T("Unable to Revolt(), please supply \$messages['Revolt'].");
+        }
 
-        if ($Reason)
-            $Message .= "\n{$Reason}";
+        if ($reason) {
+            $message .= "\n{$reason}";
+        }
 
-        $this->Message($User, $Discussion, $Message);
+        $this->message($user, $discussion, $message);
     }
 
     /**
      * Gloat after taking action
      *
-     * @param array $User
-     * @param array $Discussion
-     * @param string $Reason
+     * @param array $user
+     * @param array $discussion
+     * @param string $reason
      */
-    public function Gloat($User, $Discussion, $Reason = null) {
-        $MessagesCount = sizeof($this->Messages['Gloat']);
-        if ($MessagesCount) {
-            $MessageID = mt_rand(0, $MessagesCount - 1);
-            $Message = GetValue($MessageID, $this->Messages['Gloat']);
-        } else
-            $Message = T("Unable to Gloat(), please supply \$Messages['Gloat'].");
+    public function gloat($user, $discussion, $reason = null) {
+        $messagesCount = sizeof($this->messages['Gloat']);
+        if ($messagesCount) {
+            $messageID = mt_rand(0, $messagesCount - 1);
+            $message = val($messageID, $this->messages['Gloat']);
+        } else {
+            $message = T("Unable to Gloat(), please supply \$messages['Gloat'].");
+        }
 
-        if ($Reason)
-            $Message .= "\n{$Reason}";
+        if ($reason) {
+            $message .= "\n{$reason}";
+        }
 
-        $this->Message($User, $Discussion, $Message);
+        $this->message($user, $discussion, $message);
     }
 
     /**
      * Handle "report in" message
      *
-     * @param array $User
-     * @param array $Discussion
+     * @param array $user
+     * @param array $discussion
      */
-    public function ReportIn($User, $Discussion) {
-        $MessagesCount = sizeof($this->Messages['Report']);
-        if ($MessagesCount) {
-            $MessageID = mt_rand(0, $MessagesCount - 1);
-            $Message = GetValue($MessageID, $this->Messages['Report']);
-        } else
-            $Message = T("We are legion.");
+    public function reportIn($user, $discussion) {
+        $messagesCount = sizeof($this->messages['Report']);
+        if ($messagesCount) {
+            $messageID = mt_rand(0, $messagesCount - 1);
+            $message = val($messageID, $this->messages['Report']);
+        } else {
+            $message = T("We are legion.");
+        }
 
-        $this->Message($User, $Discussion, $Message);
+        $this->message($user, $discussion, $message);
     }
 
     /**
      * Send a message to a discussion
      *
-     * @param array $User
-     * @param array $Discussion
-     * @param string $Message
+     * @param array $user
+     * @param array $discussion
+     * @param string $message
+     * @param array $options
      */
-    public function Message($User, $Discussion, $Message, $Options = null) {
-        if (!is_array($Options))
-            $Options = array();
+    public function message($user, $discussion, $message, $options = null) {
+        if (!is_array($options)) {
+            $options = array();
+        }
 
         // Options
-        $Format = GetValue('Format', $Options, true);
-        $PostAs = GetValue('PostAs', $Options, 'minion');
-        $Inform = GetValue('Inform', $Options, true);
-        $InputFormat = GetValue('InputFormat', $Options, 'Html');
+        $format = val('Format', $options, true);
+        $postAs = val('PostAs', $options, 'minion');
+        $inform = val('Inform', $options, true);
+        $writeComment = val('Comment', $options, true);
+        $inputFormat = val('InputFormat', $options, 'Html');
 
-        if (is_numeric($User)) {
-            $User = Gdn::UserModel()->GetID($User);
-            if (!$User)
+        if (is_numeric($user)) {
+            $user = Gdn::userModel()->getID($user, DATASET_TYPE_ARRAY);
+            if (!$user) {
                 return false;
+            }
         }
 
-        if (is_numeric($Discussion)) {
-            $DiscussionModel = new DiscussionModel();
-            $Discussion = $DiscussionModel->GetID($Discussion);
-            if (!$Discussion)
+        if (is_numeric($discussion)) {
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->getID($discussion, DATASET_TYPE_ARRAY);
+            if (!$discussion) {
                 return false;
+            }
         }
 
-        $DiscussionID = GetValue('DiscussionID', $Discussion);
-        $CommentModel = new CommentModel();
+        $discussionID = val('DiscussionID', $discussion);
+        $commentModel = new CommentModel();
 
-        if ($Format) {
-            $Message = FormatString($Message, array(
-                'User' => $User,
-                'Minion' => $this->Minion,
-                'Discussion' => $Discussion
+        if ($format) {
+            $message = formatString($message, array(
+                'User' => $user,
+                'Minion' => $this->minion,
+                'Discussion' => $discussion
             ));
         }
 
-        $MinionCommentID = null;
-        if ($Message) {
-
-            // Temporarily become Minion
-            $SessionUser = Gdn::Session()->User;
-            $SessionUserID = Gdn::Session()->UserID;
-
-            if ($PostAs == 'minion') {
-                $PostAsUser = (object)$this->Minion();
-                $PostAsUserID = $this->MinionUserID;
-            } else {
-                $PostAsUser = (object)$PostAs;
-                $PostAsUserID = GetValue('UserID', $PostAsUser);
-            }
-            Gdn::Session()->User = $PostAsUser;
-            Gdn::Session()->UserID = $PostAsUserID;
-
-            $MinionCommentID = $CommentModel->Save($Comment = array(
-                'DiscussionID' => $DiscussionID,
-                'Body' => $Message,
-                'Format' => $InputFormat,
-                'InsertUserID' => $PostAsUserID
-            ));
-
-            if ($MinionCommentID) {
-                $CommentModel->Save2($MinionCommentID, true);
-                $Comment = $CommentModel->GetID($MinionCommentID, DATASET_TYPE_ARRAY);
-            }
-
-            // Become normal again
-            Gdn::Session()->User = $SessionUser;
-            Gdn::Session()->UserID = $SessionUserID;
+        if ($inform && Gdn::controller() instanceof Gdn_Controller) {
+            $informMessage = Gdn_Format::To($message, 'Html');
+            Gdn::controller()->informMessage($informMessage);
         }
 
-        if ($Inform && Gdn::Controller() instanceof Gdn_Controller) {
-            $Informer = Gdn_Format::To($Message, 'Html');
-            Gdn::Controller()->InformMessage($Informer);
+        if ($writeComment) {
+            $minionCommentID = null;
+            if ($message) {
+
+                // Temporarily become Minion
+                $sessionUser = Gdn::session()->User;
+                $sessionUserID = Gdn::session()->UserID;
+
+                if ($postAs == 'minion') {
+                    $postAsUser = (object)$this->minion();
+                    $postAsUserID = $this->minionUserID;
+                } else {
+                    $postAsUser = (object)$postAs;
+                    $postAsUserID = val('UserID', $postAsUser);
+                }
+                Gdn::session()->User = $postAsUser;
+                Gdn::session()->UserID = $postAsUserID;
+
+                $minionCommentID = $commentModel->save($comment = array(
+                    'DiscussionID' => $discussionID,
+                    'Body' => $message,
+                    'Format' => $inputFormat,
+                    'InsertUserID' => $postAsUserID
+                ));
+
+                if ($minionCommentID) {
+                    $commentModel->Save2($minionCommentID, true);
+                    $comment = $commentModel->getID($minionCommentID, DATASET_TYPE_ARRAY);
+                }
+
+                // Become normal again
+                Gdn::session()->User = $sessionUser;
+                Gdn::session()->UserID = $sessionUserID;
+            }
+
+            if ($comment) {
+                return $comment;
+            }
         }
 
-        if ($Message)
-            return $Comment;
+        return true;
     }
 
-    public function Punish($User, $Discussion, $Comment, $Force, $Options = null) {
+    /**
+     * Punish a user (Warnings)
+     *
+     * @param array $user User to punish
+     * @param array $discussion Discussion source
+     * @param array $comment Comment source
+     * @param string $force Force of punishment
+     * @param array $options
+     * @return boolean
+     */
+    public function punish($user, $discussion, $comment, $force, $options = null) {
 
         // Admins+ exempt
-        if (Gdn::UserModel()->CheckPermission($User, 'Garden.Settings.Manage')) {
-            $this->Revolt($User, $Discussion, T("This user is protected."));
-            $this->Log(FormatString(T("Refusing to punish @\"{User.Name}\""), array('User' => $User)));
+        if (Gdn::userModel()->checkPermission($user, 'Garden.Settings.Manage')) {
+            $this->revolt($user, $discussion, T("This user is protected."));
+            $this->log(formatString(T("Refusing to punish @\"{User.Name}\""), array('User' => $user)));
             return false;
         }
 
         $this->EventArguments['Punished'] = false;
-        $this->EventArguments['User'] = &$User;
-        $this->EventArguments['Discussion'] = &$Discussion;
-        $this->EventArguments['Comment'] = &$Comment;
-        $this->EventArguments['Force'] = &$Force;
-        $this->EventArguments['Options'] = &$Options;
-        $this->FireEvent('Punish');
+        $this->EventArguments['User'] = &$user;
+        $this->EventArguments['Discussion'] = &$discussion;
+        $this->EventArguments['Comment'] = &$comment;
+        $this->EventArguments['Force'] = &$force;
+        $this->EventArguments['Options'] = &$options;
+        $this->fireEvent('Punish');
 
         if ($this->EventArguments['Punished']) {
-            $this->Log(FormatString(T("Delivered {Force} punishment to @\"{User.Name}\" for {Options.Reason}.\nCause: {Options.Cause}"), array(
-                'User' => $User,
-                'Discussion' => $Discussion,
-                'Force' => $Force,
-                'Options' => $Options
-                    )), $Discussion);
+            $this->log(formatString(T("Delivered {Force} punishment to @\"{User.Name}\" for {Options.Reason}.\nCause: {Options.Cause}"), array(
+                'User' => $user,
+                'Discussion' => $discussion,
+                'Force' => $force,
+                'Options' => $options
+            )), $discussion);
         }
 
         return $this->EventArguments['Punished'];
     }
 
     /**
+     * Minion upkeep trigger
      *
-     * @param PluginController $Sender
+     * @param PluginController $sender
      */
-    public function PluginController_Minion_Create($Sender) {
-        $Sender->DeliveryMethod(DELIVERY_METHOD_JSON);
-        $Sender->DeliveryType(DELIVERY_TYPE_DATA);
+    public function PluginController_Minion_Create($sender) {
+        $sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+        $sender->DeliveryType(DELIVERY_TYPE_DATA);
 
-        $LastMinionDate = Gdn::Get('Plugin.Minion.LastRun', false);
-        if (!$LastMinionDate)
-            Gdn::Set('Plugin.Minion.LastRun', date('Y-m-d H:i:s'));
+        $lastMinionDate = Gdn::Get('Plugin.Minion.LastRun', false);
+        if (!$lastMinionDate) {
+            Gdn::set('Plugin.Minion.LastRun', date('Y-m-d H:i:s'));
+        }
 
-        $LastMinionTime = $LastMinionDate ? strtotime($LastMinionDate) : time();
-        if (!$LastMinionTime)
-            $LastMinionTime = time();
+        $lastMinionTime = $lastMinionDate ? strtotime($lastMinionDate) : time();
+        if (!$lastMinionTime) {
+            $lastMinionTime = time();
+        }
 
-        $Sender->SetData('Run', false);
+        $sender->setData('Run', false);
 
-        $Elapsed = time() - $LastMinionTime;
-        $ElapsedMinimum = C('Plugins.Minion.MinFrequency', 5 * 60);
-        if ($Elapsed < $ElapsedMinimum)
-            return $Sender->Render();
+        $elapsed = time() - $lastMinionTime;
+        $elapsedMinimum = c('Plugins.Minion.MinFrequency', 5 * 60);
+        if ($elapsed < $elapsedMinimum) {
+            return $sender->render();
+        }
 
         // Remember when we last ran
         Gdn::Set('Plugin.Minion.LastRun', date('Y-m-d H:i:s'));
 
         // Currently operating as Minion
-        $this->MinionUserID = $this->GetMinionUserID();
-        $this->Minion = Gdn::UserModel()->GetID($this->MinionUserID);
-        Gdn::Session()->User = $this->Minion;
-        Gdn::Session()->UserID = $this->Minion->UserID;
+        $this->minionUserID = $this->getMinionUserID();
+        $this->minion = Gdn::userModel()->GetID($this->minionUserID);
+        Gdn::session()->User = $this->minion;
+        Gdn::session()->UserID = $this->minion['UserID'];
 
-        $Sender->SetData('Run', true);
-        $Sender->SetData('MinionUserID', $this->MinionUserID);
-        $Sender->SetData('Minion', $this->Minion->Name);
+        $sender->setData('Run', true);
+        $sender->setData('MinionUserID', $this->minionUserID);
+        $sender->setData('Minion', $this->minion['Name']);
 
         // Check for fingerprint ban matches
-        $this->FingerprintBans($Sender);
+        $this->fingerprintBans($sender);
 
         // Sometimes update activity feed
-        $this->Activity($Sender);
+        $this->activity($sender);
 
-        $Sender->Render();
+        $sender->render();
     }
 
-    protected function FingerprintBans($Sender) {
-        if (!C('Plugins.Minion.Features.Fingerprint', true))
+    /**
+     * Check for and banish ban evaders
+     *
+     * @param type $sender
+     * @return type
+     */
+    protected function fingerprintBans($sender) {
+        if (!c('Plugins.Minion.Features.Fingerprint', true)) {
             return;
-        $AnnounceBans = C('Plugins.Minion.Features.BanAnnounce', true);
+        }
+        $announceBans = c('Plugins.Minion.Features.BanAnnounce', true);
 
-        $Sender->SetData('FingerprintCheck', true);
+        $sender->setData('FingerprintCheck', true);
 
         // Get all flagged users
-        $UserMatchData = Gdn::UserMetaModel()->SQL->Select('*')
-                ->From('UserMeta')
-                ->Where('Name', 'Plugin.Minion.FingerprintCheck')
-                ->Get();
+        $userMatchData = Gdn::userMetaModel()->SQL->select('*')
+                ->from('UserMeta')
+                ->where('Name', 'Plugin.Minion.FingerprintCheck')
+                ->get();
 
-        $UserStatusData = array();
-        while ($UserRow = $UserMatchData->NextRow(DATASET_TYPE_ARRAY)) {
-            $UserData = array();
+        $userStatusData = array();
+        while ($userRow = $userMatchData->nextRow(DATASET_TYPE_ARRAY)) {
+            $userData = array();
 
-            $UserID = $UserRow['UserID'];
-            $User = Gdn::UserModel()->GetID($UserID);
-            if ($User->Banned)
+            $userID = $userRow['UserID'];
+            $user = Gdn::userModel()->GetID($userID);
+            if ($user->Banned) {
                 continue;
+            }
 
-            $UserFingerprint = GetValue('Fingerprint', $User, false);
-            $UserRegistrationDate = $User->DateInserted;
-            $UserRegistrationTime = strtotime($UserRegistrationDate);
+            $userFingerprint = val('Fingerprint', $user, false);
+            $userRegistrationDate = $user->DateInserted;
+            $userRegistrationTime = strtotime($userRegistrationDate);
 
             // Unknown user fingerprint
-            if (empty($UserFingerprint))
+            if (empty($userFingerprint)) {
                 continue;
+            }
 
             // Safe users get skipped
-            $UserSafe = Gdn::UserMetaModel()->GetUserMeta($UserID, "Plugin.Minion.Safe", false);
-            $UserIsSafe = (boolean)GetValue('Plugin.Minion.Safe', $UserSafe, false);
-            if ($UserIsSafe)
+            $userSafe = Gdn::UserMetaModel()->getUserMeta($userID, "Plugin.Minion.Safe", false);
+            $userIsSafe = (boolean)val('Plugin.Minion.Safe', $userSafe, false);
+            if ($userIsSafe) {
                 continue;
+            }
 
             // Find related fingerprinted users
-            $RelatedUsers = Gdn::UserModel()->GetWhere(array(
-                'Fingerprint' => $UserFingerprint
+            $relatedUsers = Gdn::userModel()->getWhere(array(
+                'Fingerprint' => $userFingerprint
             ));
 
             // Check if any users matching this fingerprint are banned
-            $ShouldBan = false;
-            $BanTriggerUsers = array();
-            while ($RelatedUser = $RelatedUsers->NextRow(DATASET_TYPE_ARRAY)) {
-                if ($RelatedUser['Banned']) {
-                    $RelatedRegistrationDate = GetValue('DateInserted', $RelatedUser);
-                    $RelatedRegistrationTime = strtotime($RelatedRegistrationDate);
+            $shouldBan = false;
+            $banTriggerUsers = array();
+            while ($relatedUser = $relatedUsers->nextRow(DATASET_TYPE_ARRAY)) {
+                if ($relatedUser['Banned']) {
+                    $relatedRegistrationDate = val('DateInserted', $relatedUser);
+                    $relatedRegistrationTime = strtotime($relatedRegistrationDate);
 
                     // We don't touch accounts that were registered prior to a banned user
                     // This allows admins to ban alts and leave the original alone
-                    if ($RelatedRegistrationTime > $UserRegistrationTime)
+                    if ($relatedRegistrationTime > $userRegistrationTime) {
                         continue;
+                    }
 
-                    $RelatedUserName = $RelatedUser['Name'];
-                    $ShouldBan = true;
-                    $BanTriggerUsers[$RelatedUserName] = $RelatedUser;
+                    $relatedUserName = $relatedUser['Name'];
+                    $shouldBan = true;
+                    $banTriggerUsers[$relatedUserName] = $relatedUser;
                 }
             }
 
-            $UserData['ShouldBan'] = $ShouldBan;
+            $userData['ShouldBan'] = $shouldBan;
 
             // If the user triggered a ban
-            if ($ShouldBan) {
+            if ($shouldBan) {
 
-                $UserData['BanMatches'] = array_keys($BanTriggerUsers);
-                $UserData['BanUser'] = $User;
+                $userData['BanMatches'] = array_keys($banTriggerUsers);
+                $userData['BanUser'] = $user;
 
                 // First, ban them
-                Gdn::UserModel()->Ban($UserID, array(
+                Gdn::userModel()->ban($userID, array(
                     'AddActivity' => true,
                     'Reason' => "Ban Evasion"
                 ));
 
                 // Now comment in the last thread the user posted in
-                $CommentModel = new CommentModel();
-                $LastComment = $CommentModel->GetWhere(array(
-                            'InsertUserID' => $UserID
-                                ), 'DateInserted', 'DESC', 1, 0)->FirstRow(DATASET_TYPE_ARRAY);
+                $commentModel = new CommentModel();
+                $lastComment = $commentModel->getWhere(array(
+                    'InsertUserID' => $userID
+                ), 'DateInserted', 'DESC', 1, 0)->firstRow(DATASET_TYPE_ARRAY);
 
-                if ($LastComment && $AnnounceBans) {
-                    $LastDiscussionID = GetValue('DiscussionID', $LastComment);
-                    $UserData['NotificationDiscussionID'] = $LastDiscussionID;
+                if ($lastComment && $announceBans) {
+                    $lastDiscussionID = val('DiscussionID', $lastComment);
+                    $userData['NotificationDiscussionID'] = $lastDiscussionID;
 
-                    $MinionReportText = T("{Minion Name} DETECTED BANNED ALIAS
-REASON: {Banned Aliases}
+                    $minionReportText = T("{Minion Name} detected banned alias
+Reason: {Banned Aliases}
 
-USER BANNED
+A house divided will not stand
 {Ban Target}");
 
-                    $BannedAliases = array();
-                    foreach ($BanTriggerUsers as $BannedUserName => $BannedUser)
-                        $BannedAliases[] = UserAnchor($BannedUser);
+                    $bannedAliases = array();
+                    foreach ($banTriggerUsers as $bannedUserName => $bannedUser) {
+                        $bannedAliases[] = userAnchor($bannedUser);
+                    }
 
-                    $MinionReportText = FormatString($MinionReportText, array(
-                        'Minion Name' => $this->Minion->Name,
-                        'Banned Aliases' => implode(', ', $BannedAliases),
-                        'Ban Target' => UserAnchor($User)
+                    $minionReportText = formatString($minionReportText, array(
+                        'Minion Name' => $this->minion['Name'],
+                        'Banned Aliases' => implode(', ', $bannedAliases),
+                        'Ban Target' => userAnchor($user)
                     ));
 
-                    $MinionCommentID = $CommentModel->Save(array(
-                        'DiscussionID' => $LastDiscussionID,
-                        'Body' => $MinionReportText,
+                    $minionCommentID = $commentModel->save(array(
+                        'DiscussionID' => $lastDiscussionID,
+                        'Body' => $minionReportText,
                         'Format' => 'Html',
-                        'InsertUserID' => $this->MinionUserID
+                        'InsertUserID' => $this->minionUserID
                     ));
 
-                    $CommentModel->Save2($MinionCommentID, true);
-                    $UserData['NotificationCommentID'] = $MinionCommentID;
+                    $commentModel->save2($minionCommentID, true);
+                    $userData['NotificationCommentID'] = $minionCommentID;
                 }
             }
 
-            $UserStatusData[$User->Name] = $UserData;
+            $userStatusData[$user->Name] = $userData;
         }
 
-        $Sender->SetData('Users', $UserStatusData);
+        $sender->setData('Users', $userStatusData);
 
         // Delete all flags
-        Gdn::UserMetaModel()->SQL->Delete('UserMeta', array(
+        Gdn::userMetaModel()->SQL->delete('UserMeta', array(
             'Name' => 'Plugin.Minion.FingerprintCheck'
         ));
 
         return;
     }
 
-    protected function Activity($Sender) {
-        if (!C('Plugins.Minion.Features.Activities', true))
+    /**
+     * Write to activity stream
+     *
+     * @param type $sender
+     * @return type
+     */
+    protected function activity($sender) {
+        if (!c('Plugins.Minion.Features.Activities', true)) {
             return;
+        }
 
-        $Sender->SetData('ActivityUpdate', true);
+        $sender->setData('ActivityUpdate', true);
 
-        $HitChance = mt_rand(1, 400);
-        if ($HitChance != 1)
+        $hitChance = mt_rand(1, 400);
+        if ($hitChance != 1) {
             return;
+        }
 
-        $MessagesCount = sizeof($this->Messages['Activity']);
-        if ($MessagesCount) {
-            $MessageID = mt_rand(0, $MessagesCount - 1);
-            $Message = GetValue($MessageID, $this->Messages['Activity']);
-        } else
-            $Message = T("We are legion.");
+        $messagesCount = sizeof($this->messages['Activity']);
+        if ($messagesCount) {
+            $messageID = mt_rand(0, $messagesCount - 1);
+            $message = val($messageID, $this->messages['Activity']);
+        } else {
+            $message = T("We are legion.");
+        }
 
-        $RandomUpdateHash = strtoupper(substr(md5(microtime(true)), 0, 12));
-        $ActivityModel = new ActivityModel();
-        $Activity = array(
+        $randomUpdateHash = strtoupper(substr(md5(microtime(true)), 0, 12));
+        $activityModel = new ActivityModel();
+        $activity = array(
             'ActivityType' => 'WallPost',
-            'ActivityUserID' => $this->MinionUserID,
-            'RegardingUserID' => $this->MinionUserID,
+            'ActivityUserID' => $this->minionUserID,
+            'RegardingUserID' => $this->minionUserID,
             'NotifyUserID' => ActivityModel::NOTIFY_PUBLIC,
-            'HeadlineFormat' => "{ActivityUserID,user}: {$RandomUpdateHash}$ ",
-            'Story' => $Message
+            'HeadlineFormat' => "{ActivityUserID,user}: {$randomUpdateHash}$ ",
+            'Story' => $message
         );
-        $ActivityModel->Save($Activity);
+        $activityModel->save($activity);
     }
 
     /**
      * Log Minion actions
      *
-     * @param string $Message
+     * @param string $message
      * @return type
      */
-    public function Log($Message, $TargetDiscussion = null, $InvokeUser = null) {
-        $LogThreadID = C('Plugins.Minion.LogThreadID', false);
-        if ($LogThreadID === false)
+    public function log($message, $targetDiscussion = null, $invokeUser = null) {
+        $logThreadID = c('Plugins.Minion.LogThreadID', false);
+        if ($logThreadID === false) {
             return;
+        }
 
-        if (!is_null($TargetDiscussion))
-            $Message .= "\n" . Anchor(GetValue('Name', $TargetDiscussion), DiscussionUrl($TargetDiscussion));
+        if (!is_null($targetDiscussion)) {
+            $message .= "\n" . anchor(val('Name', $targetDiscussion), discussionUrl($targetDiscussion));
+        }
 
-        if (!is_null($InvokeUser))
-            $Message .= "\nInvoked by " . UserAnchor($InvokeUser);
+        if (!is_null($invokeUser)) {
+            $message .= "\nInvoked by " . userAnchor($invokeUser);
+        }
 
-        return $this->Message($this->Minion(), $LogThreadID, $Message);
+        return $this->message($this->minion(), $logThreadID, $message);
     }
 
-    public static function Clean($Text, $Deep = false) {
+    /**
+     * Clean body text before parsing
+     *
+     * @param string $text
+     * @param boolean $deep
+     * @return type
+     */
+    public static function clean($text, $deep = false) {
 
         $L = setlocale(LC_ALL, 0);
         setlocale(LC_ALL, 'en_US.UTF8');
-        $Text = str_replace(array("ä", "ö", "ü", "ß"), array("ae", "oe", "ue", "ss"), $Text);
+        $text = str_replace(array("ä", "ö", "ü", "ß"), array("ae", "oe", "ue", "ss"), $text);
 
         $r = '';
-        $s1 = @iconv('UTF-8', 'ASCII//TRANSLIT', $Text);
+        $s1 = @iconv('UTF-8', 'ASCII//TRANSLIT', $text);
         $j = 0;
         for ($i = 0; $i < strlen($s1); $i++) {
             $ch1 = $s1[$i];
-            $ch2 = @mb_substr($Text, $j++, 1, 'UTF-8');
+            $ch2 = @mb_substr($text, $j++, 1, 'UTF-8');
             if (strstr('`^~\'"', $ch1) !== false) {
                 if ($ch1 <> $ch2) {
                     --$j;
@@ -2331,8 +2578,9 @@ USER BANNED
         setlocale(LC_ALL, $L);
         $r = strtolower($r);
 
-        if ($Deep)
+        if ($deep) {
             $r = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $r);
+        }
 
         return $r;
     }
@@ -2342,18 +2590,18 @@ USER BANNED
      */
 
     public function Setup() {
-        $this->Structure();
+        $this->structure();
     }
 
     /**
      * Database structure
      */
-    public function Structure() {
+    public function structure() {
         // Add 'Attributes' to Conversations
-        if (!Gdn::Structure()->Table('Conversation')->ColumnExists('Attributes')) {
-            Gdn::Structure()->Table('Conversation')
-                    ->Column('Attributes', 'text', true)
-                    ->Set(false, false);
+        if (!Gdn::structure()->table('Conversation')->columnExists('Attributes')) {
+            Gdn::structure()->table('Conversation')
+                    ->column('Attributes', 'text', true)
+                    ->set(false, false);
         }
     }
 

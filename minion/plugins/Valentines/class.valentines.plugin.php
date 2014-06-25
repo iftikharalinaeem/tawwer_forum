@@ -216,9 +216,8 @@ class ValentinesPlugin extends Gdn_Plugin {
       // Remove Discussions.Add permissions
       $Permissions = Gdn_Format::Unserialize($User->Permissions);
 
-      if (Gdn::PluginManager()->CheckPlugin('Infractions')) {
-         $InfractionsCache = InfractionsPlugin::GetInfractionCache($UserID);
-         if (!GetValue('Jailed', $InfractionsCache)) return;
+      if (Gdn::PluginManager()->CheckPlugin('Warnings2')) {
+         if (!GetValue('Punished', $User)) return;
 
          // Remove Discussions.Add permissions
          $Permissions = Gdn_Format::Unserialize($User->Permissions);
@@ -238,7 +237,7 @@ class ValentinesPlugin extends Gdn_Plugin {
    public function MinionPlugin_Start_Handler($Sender) {
 
       // Register persona
-      $Sender->Persona('Valentines', array(
+      $Sender->persona('Valentines', array(
          'Name'      => 'Robot Cupid',
          'Photo'     => 'http://cdn.vanillaforums.com/minion/valentines.jpg',
          'Title'     => 'Happiness Droid',
@@ -247,7 +246,7 @@ class ValentinesPlugin extends Gdn_Plugin {
 
       // Change persona
       if ($this->Enabled || $this->DayAfter)
-         $Sender->Persona('Valentines');
+         $Sender->persona('Valentines');
    }
 
    /**
@@ -258,7 +257,7 @@ class ValentinesPlugin extends Gdn_Plugin {
     */
    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
       $this->Minion = MinionPlugin::Instance();
-      $this->MinionUser = (array)$this->Minion->Minion();
+      $this->MinionUser = $this->Minion->minion();
 
       // Has the lounge been opened this year?
       $LoungeOpen = (C('Plugins.Valentines.LoungeOpen', FALSE) == date('Y'));
@@ -419,7 +418,7 @@ class ValentinesPlugin extends Gdn_Plugin {
       if (Gdn::Session()->User->Admin == 2) return;
 
       // Already participating this year?
-      $Participating = $this->Minion->Monitoring(Gdn::Session()->User, 'Valentines', FALSE);
+      $Participating = $this->Minion->monitoring(Gdn::Session()->User, 'Valentines', FALSE);
       $ParticipatingYear = GetValue('Year', $Participating, FALSE);
       if ($Participating && $ParticipatingYear == date('Y')) return;
 
@@ -435,7 +434,7 @@ class ValentinesPlugin extends Gdn_Plugin {
 
       // Award starting arrows
       $User = (array)Gdn::Session()->User;
-      $this->Minion->Monitor($User, array('Valentines' => array(
+      $this->Minion->monitor($User, array('Valentines' => array(
          'Year'      => date('Y'),
          'Started'   => time(),
          'Quiver'    => $this->StartArrows,
@@ -484,12 +483,12 @@ class ValentinesPlugin extends Gdn_Plugin {
       $Sender->DeliveryType(DELIVERY_TYPE_DATA);
 
       $User = (array)Gdn::Session()->User;
-      $UserValentines = $this->Minion->Monitoring($User, 'Valentines', FALSE);
+      $UserValentines = $this->Minion->monitoring($User, 'Valentines', FALSE);
       $UserDesired = GetValue('Desired', $UserValentines, FALSE);
       if ($UserDesired) {
          $UserDesired = &$UserValentines['Desired'];
          $UserDesired['Dismissed'] = TRUE;
-         $this->Minion->Monitor($User, array('Valentines' => $UserValentines));
+         $this->Minion->monitor($User, array('Valentines' => $UserValentines));
       }
 
       $Sender->Render();
@@ -530,10 +529,10 @@ class ValentinesPlugin extends Gdn_Plugin {
 
             // Award arrows to player
             $Player = (array)Gdn::Session()->User;
-            $Valentines = $this->Minion->Monitoring($Player, 'Valentines', array());
+            $Valentines = $this->Minion->monitoring($Player, 'Valentines', array());
             $Valentines['Quiver'] += $Arrows;
             $this->ArrowPool($Arrows);
-            $this->Minion->Monitor($Player, array('Valentines' => $Valentines));
+            $this->Minion->monitor($Player, array('Valentines' => $Valentines));
             $Sender->InformMessage(FormatString(T("You found <b>{Arrows} {ArrowsStr}</b> in the fallen cherub's quiver."), array(
                'User'      => $Player,
                'Arrows'    => $Arrows,
@@ -588,7 +587,7 @@ class ValentinesPlugin extends Gdn_Plugin {
             $DiscussionIDs[] = $DiscussionID;
 
             $CountDiscussions++;
-            $Valentines = $this->Minion->Monitoring($Discussion, 'Valentines', array());
+            $Valentines = $this->Minion->monitoring($Discussion, 'Valentines', array());
             TouchValue('Voting', $Valentines, FALSE);
             $Voting = &$Valentines['Voting'];
             if (!$Voting) {
@@ -614,7 +613,7 @@ class ValentinesPlugin extends Gdn_Plugin {
 
             // Save before judgement
             if ($Perform)
-               $this->Minion->Monitor($Discussion, array('Valentines' => $Valentines));
+               $this->Minion->monitor($Discussion, array('Valentines' => $Valentines));
 
             $Match = array(
                'DiscussionID' => $Discussion['DiscussionID'],
@@ -688,7 +687,7 @@ class ValentinesPlugin extends Gdn_Plugin {
          $NumResults = $Users->NumRows();
 
          while ($User = $Users->NextRow(DATASET_TYPE_ARRAY)) {
-            $Playing = $this->Minion->Monitoring($User, 'Valentines', FALSE);
+            $Playing = $this->Minion->monitoring($User, 'Valentines', FALSE);
             if (!$Playing || $Playing['Year'] != date('Y')) {
                $NonParticipants++;
                continue;
@@ -716,7 +715,7 @@ class ValentinesPlugin extends Gdn_Plugin {
     */
    public function Desired(&$DesiredUser) {
       $DesiredUserID = $DesiredUser['UserID'];
-      $DesiredValentines = $this->Minion->Monitoring($DesiredUser, 'Valentines');
+      $DesiredValentines = $this->Minion->monitoring($DesiredUser, 'Valentines');
 
       // Choose partner
       $ArrowRecord = FormatString(self::ARROW_RECORD, array(
@@ -745,7 +744,7 @@ class ValentinesPlugin extends Gdn_Plugin {
       if (!$PairedUser && !sizeof($Arrows))
          return;
 
-      $PairedValentines = $this->Minion->Monitoring($PairedUser, 'Valentines', array());
+      $PairedValentines = $this->Minion->monitoring($PairedUser, 'Valentines', array());
 
       // Desired Badge
       $DesiredBadge = $this->BadgeModel->GetID('desirable');
@@ -833,7 +832,7 @@ VALENTINES;
             'AuthorUserID'    => $AuthorUserID,
             'TargetUserID'    => $TargetUserID
          );
-         $this->Minion->Monitor($Conversation, array('Valentines' => $ConversationValentines));
+         $this->Minion->monitor($Conversation, array('Valentines' => $ConversationValentines));
 
          // Expiry reminder
          $ExpiryKey = FormatString(self::EXPIRY_RECORD, array(
@@ -867,7 +866,7 @@ VALENTINES;
          'Route' => CombinePaths(array('messages',$DesiredValentines['ConversationID'])),
          'Data' => array(
             'Shooter'   => $PairedUser,
-            'Minion'    => $this->Minion->Minion(),
+            'Minion'    => $this->Minion->minion(),
             'Arrows'    => $this->StartArrows
          )
       );
@@ -882,7 +881,7 @@ VALENTINES;
          'Route' => CombinePaths(array('messages',$PairedValentines['ConversationID'])),
          'Data' => array(
              'Target'   => $DesiredUser,
-             'Minion'   => $this->Minion->Minion(),
+             'Minion'   => $this->Minion->minion(),
              'Arrows'    => $this->StartArrows
           )
       );
@@ -891,10 +890,10 @@ VALENTINES;
       // Save
 
       $this->ArrowPool($this->StartArrows);
-      $this->Minion->Monitor($DesiredUser, array('Valentines' => $DesiredValentines));
+      $this->Minion->monitor($DesiredUser, array('Valentines' => $DesiredValentines));
 
       $this->ArrowPool($this->StartArrows);
-      $this->Minion->Monitor($PairedUser, array('Valentines' => $PairedValentines));
+      $this->Minion->monitor($PairedUser, array('Valentines' => $PairedValentines));
    }
 
    /**
@@ -923,9 +922,9 @@ VALENTINES;
 
       // Save
       if (!$NumTargets) {
-         $Valentines = $this->Minion->Monitoring($User, 'Valentines');
+         $Valentines = $this->Minion->monitoring($User, 'Valentines');
          $Valentines['Desired'] = FALSE;
-         $this->Minion->Monitor($User, array('Valentines' => $Valentines));
+         $this->Minion->monitor($User, array('Valentines' => $Valentines));
       }
    }
 
@@ -971,13 +970,13 @@ COMPLIANCEVALENTINES;
          'Expiry'    => $TimeFormat
       ));
       $Discussion = $this->LoungeDiscussion($ComplianceTitle, $ComplianceMessage);
-      $Comment = $this->Minion->Message($User, $Discussion, 'I am a tremendous goose and I feel the most profound shame.', array(
+      $Comment = $this->Minion->message($User, $Discussion, 'I am a tremendous goose and I feel the most profound shame.', array(
          'Format' => FALSE,
          'PostAs' => $User
       ));
 
       // Now punish this comment
-      $this->Minion->Punish($User, $Discussion, $Comment, 'major', array(
+      $this->Minion->punish($User, $Discussion, $Comment, 'major', array(
          'Reason'       => T('Insufficient Valentines Day commitment'),
          'Expires'      => "2 days"
       ));
@@ -1014,7 +1013,7 @@ VOTEVALENTINES;
       $Discussion = $this->LoungeDiscussion($VoteTitle, $VoteMessage);
 
       // Save
-      $this->Minion->Monitor($Discussion, array('Valentines' => array(
+      $this->Minion->monitor($Discussion, array('Valentines' => array(
          'Voting' => array(
             'Voting'       => TRUE,
             'AuthorUserID' => $Author['UserID'],
@@ -1038,7 +1037,7 @@ VOTEVALENTINES;
     * @param array $Discussion
     */
    public function EndVote(&$Discussion) {
-      $Valentines = $this->Minion->Monitoring($Discussion, 'Valentines', FALSE);
+      $Valentines = $this->Minion->monitoring($Discussion, 'Valentines', FALSE);
       TouchValue('Voting', $Valentines, array());
       $Voting = &$Valentines['Voting'];
       $IsVoting = (bool)GetValue('Voting', $Voting, FALSE);
@@ -1097,10 +1096,10 @@ EXTENDEDVALENTINES;
          $this->UserBadgeModel->Give($Voting['AuthorUserID'], $Badge['BadgeID']);
 
       // Comment on thread
-      $this->Minion->Message(NULL, $Discussion, $EndVoteMessage);
+      $this->Minion->message(NULL, $Discussion, $EndVoteMessage);
 
       // Save
-      $this->Minion->Monitor($Discussion, array('Valentines' => $Valentines));
+      $this->Minion->monitor($Discussion, array('Valentines' => $Valentines));
 
       // Move done posts to retirement village
       if ($Badge) {
@@ -1182,12 +1181,12 @@ CACHEVALENTINES;
             'CacheUrl'     => Url("/plugin/valentines/cache/{$CacheID}"),
             'CacheID'      => $CacheID
          ));
-         $Comment = $this->Minion->Message(NULL, $Discussion, $CacheMessage, array(
+         $Comment = $this->Minion->message(NULL, $Discussion, $CacheMessage, array(
             'Format' => FALSE,
             'Inform' => FALSE
          ));
 
-         $this->Minion->Monitor($Comment, array('Valentines' => array(
+         $this->Minion->monitor($Comment, array('Valentines' => array(
             'Cache'  => $CacheID
          )));
          break;
@@ -1224,7 +1223,7 @@ CACHEVALENTINES;
          'CategoryID'   => $this->LoungeID,
          'Body'         => $Message,
          'Format'       => 'BBCode',
-         'InsertUserID' => $this->Minion->Minion()->UserID,
+         'InsertUserID' => $this->Minion->minion()->UserID,
          'Announce'     => 0,
          'Close'        => 0
       ));
@@ -1343,13 +1342,13 @@ CACHEVALENTINES;
       $ConversationID = $Conversation['ConversationID'];
       $AuthorID = $Message['InsertUserID'];
 
-      $Valentines = $this->Minion->Monitoring($Conversation, 'Valentines', FALSE);
+      $Valentines = $this->Minion->monitoring($Conversation, 'Valentines', FALSE);
 
       // Fallback, check player
       if (!$Valentines) {
 
          // Is this person playing the game?
-         $Playing = $this->Minion->Monitoring($AuthorUser, 'Valentines', FALSE);
+         $Playing = $this->Minion->monitoring($AuthorUser, 'Valentines', FALSE);
          if (!$Playing) return;
 
          // Only care about people who are playing this year
@@ -1413,7 +1412,7 @@ FORWARDVALENTINES;
          // Save conversation as 'done'
          $Valentines['Pending'] = FALSE;
          $Valentines['FinalConversationID'] = $ForwardedConversationID;
-         $this->Minion->Monitor($Conversation, array('Valentines' => $Valentines));
+         $this->Minion->monitor($Conversation, array('Valentines' => $Valentines));
 
          return FALSE;
       }
@@ -1442,7 +1441,7 @@ FORWARDVALENTINES;
 
       $MessageBody = strtolower($Message['Body']);
 
-      $Playing = $this->Minion->Monitoring($AuthorUser, 'Valentines');
+      $Playing = $this->Minion->monitoring($AuthorUser, 'Valentines');
       $Response = NULL;
       if (preg_match('`(statistics)`i', $MessageBody)) {
 
@@ -1583,7 +1582,7 @@ STATISTICS;
       $JavascriptRequired = FALSE;
 
       // Timer deployment
-      $UserValentines = $this->Minion->Monitoring($User, 'Valentines', FALSE);
+      $UserValentines = $this->Minion->monitoring($User, 'Valentines', FALSE);
       $UserDesired = GetValue('Desired', $UserValentines, FALSE);
       if ($UserDesired) {
 
@@ -1717,7 +1716,7 @@ STATISTICS;
       if ($Author['UserID'] == Gdn::Session()->UserID) return;
 
       // Two paths: normal post, or vote post
-      $Valentines = $this->Minion->Monitoring($Discussion, 'Valentines', FALSE);
+      $Valentines = $this->Minion->monitoring($Discussion, 'Valentines', FALSE);
       TouchValue('Voting', $Valentines, array());
       $Voting = &$Valentines['Voting'];
       $IsVotingDiscussion = (bool)$Voting;
@@ -1744,7 +1743,7 @@ STATISTICS;
          if (GetValue('Admin', $Author) == 2) return;
 
          // People who are desired cannot shoot
-         $UserValentines = $this->Minion->Monitoring($User, 'Valentines', FALSE);
+         $UserValentines = $this->Minion->monitoring($User, 'Valentines', FALSE);
          $UserDesired = GetValue('Desired', $UserValentines, FALSE);
          if ($UserDesired) return;
 
@@ -1752,7 +1751,7 @@ STATISTICS;
          if (!$UserValentines['Quiver']) return;
 
          // Is this person playing the game?
-         $AuthorValentines = $this->Minion->Monitoring($Author, 'Valentines', FALSE);
+         $AuthorValentines = $this->Minion->monitoring($Author, 'Valentines', FALSE);
          if (!$AuthorValentines) return;
 
          // Only target people who are playing this year
@@ -1830,14 +1829,14 @@ STATISTICS;
       $User = (array)$Sender->EventArguments['Author'];
 
       // Check for Cache
-      $Post = $this->Minion->Monitoring($Object, 'Valentines', FALSE);
+      $Post = $this->Minion->monitoring($Object, 'Valentines', FALSE);
       if ($CacheID = GetValue('Cache', $Post, FALSE)) {
          $Sender->EventArguments['CssClass'] .= ' ArrowCache';
          $Sender->AddJsFile('valentines.js', 'plugins/Valentines');
       }
 
       // Is this person playing the game?
-      $Playing = $this->Minion->Monitoring($User, 'Valentines', FALSE);
+      $Playing = $this->Minion->monitoring($User, 'Valentines', FALSE);
       if (!$Playing) return;
 
       // Only target people who are playing this year
@@ -1884,7 +1883,7 @@ STATISTICS;
       $ObjectID = GetValue("{$ObjectType}ID", $Object);
 
       // Check state of clicked object
-      $Valentines = $this->Minion->Monitoring($Object, 'Valentines', FALSE);
+      $Valentines = $this->Minion->monitoring($Object, 'Valentines', FALSE);
       TouchValue('Voting', $Valentines, array());
       $Voting = &$Valentines['Voting'];
       $IsVotingDiscussion = (bool)$Voting;
@@ -1902,7 +1901,7 @@ STATISTICS;
 
       $PlayerID = Gdn::Session()->UserID;
       $PlayerUser = (array)Gdn::Session()->User;
-      $Player = $this->Minion->Monitoring($PlayerUser, 'Valentines', FALSE);
+      $Player = $this->Minion->monitoring($PlayerUser, 'Valentines', FALSE);
       if (!$Player) return;
 
       $Mode = $Sender->EventArguments['Insert'] ? 'set' : 'unset';
@@ -1939,8 +1938,8 @@ STATISTICS;
          $Voting['Score'] = $Score;
 
          // Save
-         $this->Minion->Monitor($PlayerUser, array('Valentines' => $Player));
-         $this->Minion->Monitor($Object, array('Valentines' => $Valentines));
+         $this->Minion->monitor($PlayerUser, array('Valentines' => $Player));
+         $this->Minion->monitor($Object, array('Valentines' => $Valentines));
 
          // Check if threshold reached
          if ($Voting['Votes'] >= $Voting['MaxVotes'])
@@ -1956,7 +1955,7 @@ STATISTICS;
          $TargetUser = Gdn::UserModel()->GetID($TargetID, DATASET_TYPE_ARRAY);
 
          // Is this person playing the game?
-         $Target = $this->Minion->Monitoring($TargetUser, 'Valentines', FALSE);
+         $Target = $this->Minion->monitoring($TargetUser, 'Valentines', FALSE);
          if (!$Target) return;
 
          // Only deal with people who are playing this year
@@ -2054,8 +2053,8 @@ STATISTICS;
          }
 
          // Save
-         $this->Minion->Monitor($PlayerUser, array('Valentines' => $Player));
-         $this->Minion->Monitor($TargetUser, array('Valentines' => $Target));
+         $this->Minion->monitor($PlayerUser, array('Valentines' => $Player));
+         $this->Minion->monitor($TargetUser, array('Valentines' => $Target));
 
          // Check if threshold reached
 
