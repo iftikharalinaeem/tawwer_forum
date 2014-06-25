@@ -497,7 +497,9 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     public function ProfileController_AddProfileTabs_Handler($Sender) {
         $IsPrivileged = Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false);
-        if (C('Warnings.View.Restricted', true) && !$IsPrivileged) {
+
+        // We can choose to allow regular users to see warnings or not. Default not.
+        if (!$IsPrivileged && C('Warnings.View.Restricted', true)) {
             return;
         }
         $Sender->AddProfileTab(T('Moderation'), UserUrl($Sender->User, '', 'notes'), 'UserNotes');
@@ -515,12 +517,16 @@ class Warnings2Plugin extends Gdn_Plugin {
         $Sender->GetUserInfo($UserReference, $Username);
 
         $IsPrivileged = Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false);
+
+        // We can choose to allow regular users to see warnings or not. Default not.
         if (!$IsPrivileged && C('Warnings.View.Restricted', true)) {
             throw ForbiddenException('Warnings');
         }
 
         $Sender->SetData('IsPrivileged', $IsPrivileged);
-        if (Gdn::Session()->UserID != val('UserID', $Sender->User) && !$IsPrivileged) {
+
+        // Users should only be able to see their own warnings
+        if (!$IsPrivileged && Gdn::Session()->UserID != val('UserID', $Sender->User)) {
             throw PermissionException('Garden.Moderation.Manage');
         }
 
