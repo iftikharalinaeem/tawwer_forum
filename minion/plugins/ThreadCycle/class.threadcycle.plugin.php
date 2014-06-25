@@ -809,7 +809,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         // Acknowledge the user
                         $acknowledge = T("Your wager of <b>%d points</b> for '%s' has been entered!");
                         $acknowledged = sprintf($acknowledge, $newWagerPoints, $wagerTimeString);
-                        $sender->acknowledge($discussion, $acknowledged, 'positive', array(
+                        $sender->acknowledge($discussion, $acknowledged, 'positive', $user, array(
                             'Inform' => true,
                             'Comment' => false
                         ));
@@ -834,7 +834,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                         // Acknowledge the user
                         $acknowledge = T("Your wager of <b>%d points</b> for '%s' has been <b>cancelled</b>.");
                         $acknowledged = sprintf($acknowledge, $wagerPoints, $wager['ForStr']);
-                        $sender->acknowledge($discussion, $acknowledged, 'positive', array(
+                        $sender->acknowledge($discussion, $acknowledged, 'positive', $user, array(
                             'Inform' => true,
                             'Comment' => false
                         ));
@@ -842,7 +842,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                     }
 
                 } catch (Exception $ex) {
-                    $sender->acknowledge($discussion, $ex->getMessage(), 'negative', array(
+                    $sender->acknowledge($discussion, $ex->getMessage(), 'custom', Gdn::session()->User, array(
                         'Inform' => true,
                         'Comment' => false
                     ));
