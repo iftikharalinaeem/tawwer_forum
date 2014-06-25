@@ -465,10 +465,17 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param string $Page
      */
     public function ProfileController_Notes_Create($Sender, $UserReference, $Username = '', $Page = '') {
-        $Sender->Permission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false);
-
         $Sender->EditMode(false);
         $Sender->GetUserInfo($UserReference, $Username);
+
+        $IsPrivileged = Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false);
+        $Sender->SetData('IsPrivileged', $IsPrivileged);
+        if (Gdn::Session()->UserID != val('UserID', $Sender->User)) {
+            if (!$IsPrivileged) {
+                throw PermissionException('Garden.Moderation.Manage');
+            }
+        }
+
         $Sender->_SetBreadcrumbs(T('Notes'), UserUrl($Sender->User, '', 'notes'));
         $Sender->SetTabView('Notes', 'Notes', '', 'plugins/Warnings2');
 
