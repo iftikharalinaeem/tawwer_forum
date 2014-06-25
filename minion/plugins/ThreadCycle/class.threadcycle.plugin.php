@@ -434,17 +434,17 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             }
 
             // Announce
-            $d1 = new DateTime();
-            $d2 = new DateTime();
-            $d2->add(new DateInterval('PT'.$elapsed.'S'));
-            $iv = $d2->diff($d1);
+            $counter = $elapsed;
+            $t = [];
+            $t['days'] = floor($counter / 84600); $counter %= 84600;
+            $t['hours'] = floor($counter / 3600); $counter %= 3600;
+            $t['mins'] = floor($counter / 60);    $counter %= 60;
+            $t['secs'] = $counter;
 
             $out = array();
-            $keys = array('y' => 'year','m' => 'month','d' => 'day','h' => 'hour','i' => 'minute','s' => 'second');
-            foreach ($keys as $key => $keyName) {
-                $fieldValue = $iv->format($key);
-                if ($fieldValue != '0' && !empty($fieldValue)) {
-                    $out[] = sprintf('%d %s', $fieldValue, plural($fieldValue, $keyName, "{$keyName}s"));
+            foreach ($t as $tKey => $tVal) {
+                if (!empty($tVal)) {
+                    $out[] = sprintf('%d %s', $fieldValue, plural($fieldValue, rtrim($tKey,'s'), $tKey));
                 }
             }
             $elapsedStr = implode(', ', $out);
@@ -465,13 +465,15 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
             $message .= sprintf("<b>%s</b><br/>", plural($winnerCount, 'Winner', 'Winners'));
             foreach ($winners as $winningWager) {
-                $message .= formatString(T("{User.UserID,Mention}, who bet {Points} points and received <b>{Winnings}</b>"), $winningWager)."<br/>";
+                svalr('Mention', $winningWager['User'], "@\"{$winningWager['User']['Name']}\"");
+                $message .= formatString(T("{User.Mention}, who bet {ForStr} with {Points} points and received <b>{Winnings}</b>"), $winningWager)."<br/>";
             }
 
             if ($haveRunnersUp) {
                 $message .= sprintf("<b>%s</b><br/>", plural($winnerCount, 'Runner-up', 'Runners-up'));
                 foreach ($runnersUp as $ruWager) {
-                    $message .= formatString(T("{User.UserID,Mention}, who bet {Points} points and recovered <b>{Winnings}</b>"), $ruWager)."<br/>";
+                    svalr('Mention', $ruWager['User'], "@\"{$ruWager['User']['Name']}\"");
+                    $message .= formatString(T("{User.Mention}, who bet {ForStr} with {Points} points and recovered <b>{Winnings}</b>"), $ruWager)."<br/>";
                 }
             }
 
