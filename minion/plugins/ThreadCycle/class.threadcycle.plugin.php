@@ -420,6 +420,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             // Winners
             $split = (count($winners) > 1);
             $potPoints *= $rakeMultiple; // Remove house cut
+            $potPoints = floor($potPoints);
 
             // If there are multiple winners, determine total points wagered by winning bettors
 
@@ -455,7 +456,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             $out = array();
             foreach ($t as $tKey => $tVal) {
                 if (!empty($tVal)) {
-                    $out[] = sprintf('%d %s', $tVal, plural($fieldValue, rtrim($tKey,'s'), $tKey));
+                    $out[] = sprintf('%d %s', $tVal, plural($tVal, rtrim($tKey,'s'), $tKey));
                 }
             }
             $elapsedStr = implode(', ', $out);
@@ -827,6 +828,10 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                             throw new Exception(T("You didn't supply a valid time!"));
                         }
                         $wagerTime = trim($state['Time'], ' .,!?/\\#@');
+
+                        if (preg_match('`\d\.\d`i', $wagerTime)) {
+                            throw new Exception(T("You're trying to use decimal points in your time. Instead, use multiple unit groups like <b>5 hours, 20 minutes</b>"));
+                        }
 
                         // Note that we're modifying an existing wager
                         $modify = false;
