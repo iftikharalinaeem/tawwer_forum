@@ -255,6 +255,9 @@ class MultisitesController extends DashboardController {
             case 'contentDelete':
                 $errors = $this->cleanspeakContentDelete($post);
                 break;
+            case 'userAction':
+                $errors = $this->cleanspeakUserAction($post);
+                break;
             default:
                 throw new Gdn_UserException('Cleanspeak proxy does not support type:' . $post['type']);
 
@@ -288,7 +291,7 @@ class MultisitesController extends DashboardController {
     /**
      * Handle ContentDelete post back notification.
      *
-     * @param array $post
+     * @param array $post Post data.
      * @return array Errors. Empty if none.
      * @throws Gdn_UserException
      */
@@ -304,7 +307,6 @@ class MultisitesController extends DashboardController {
 
         try {
             $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $post);
-            var_dump($response); exit;
         } catch (Gdn_UserException $e) {
             Logger::log(Logger::ERROR, 'Error communicating with node.', array($e->getMessage()));
         }
@@ -320,8 +322,9 @@ class MultisitesController extends DashboardController {
     /**
      * Handle ContentApproval post back notification.
      *
-     * @param $post
+     * @param array $post Post data.
      * @return array Errors. Empty if none.
+     * @throws Gdn_UserException
      */
     protected function cleanspeakContentApproval($post) {
         $siteApprovals = array();
@@ -355,6 +358,38 @@ class MultisitesController extends DashboardController {
                 $errors[$siteID] = $response['Errors'];
             }
         }
+        return $errors;
+
+    }
+
+    /**
+     * Handle userAction post back notification.
+     *
+     * @param array $post Post data.
+     * @return array Errors. Empty if none.
+     * @throws Gdn_UserException
+     */
+    protected function cleanspeakUserAction($post) {
+
+        $siteID = $this->getSiteIDFromUUID($post['userId']);
+        $errors = array();
+
+        $multiSiteModel = new MultisiteModel();
+        $site = $multiSiteModel->getWhere(array('SiteID' => $siteID))->FirstRow(DATASET_TYPE_ARRAY);
+        if (!$site) {
+            throw new Gdn_UserException("Site not found. UUID: {$post['userId']} SiteID: $siteID", 500);
+        }
+
+        try {
+            $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $post);
+        } catch (Gdn_UserException $e) {
+            Logger::log(Logger::ERROR, 'Error communicating with node.', array($e->getMessage()));
+        }
+
+        if (GetValue('Errors', $response)) {
+            $errors[$siteID] = $response['Errors'];
+        }
+
         return $errors;
 
     }
