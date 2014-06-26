@@ -8,7 +8,7 @@ $IsPrivileged = $this->Data('IsPrivileged');
 <ul class="DataList DataList-Notes">
    <?php foreach ($this->Data('Notes', array()) as $Row): ?>
    <?php
-      if (!$IsPrivileged || $Row['Type'] != 'warning') {
+      if (!$IsPrivileged && $Row['Type'] != 'warning') {
          continue;
       }
    ?>
