@@ -248,17 +248,87 @@ class MultisitesController extends DashboardController {
         }
 
 
-        if ($post['type'] == 'contentApproval') {
-            foreach ($post['approvals'] as $UUID => $action) {
-                $ints = self::getIntsFromUUID($UUID);
-                $siteID = $ints[0];
-                $siteApprovals[$siteID][$UUID] = $action;
-            }
+        switch ($post['type']) {
+            case 'contentApproval':
+                $errors = $this->cleanspeakContentApproval($post);
+                break;
+            case 'contentDelete':
+                $errors = $this->cleanspeakContentDelete($post);
+                break;
+            default:
+                throw new Gdn_UserException('Cleanspeak proxy does not support type:' . $post['type']);
 
+        }
+        if (sizeof($errors) > 0) {
+            $this->SetData('Errors', $errors);
         } else {
-            throw new Gdn_UserException('cleanspeak proxy does not support type:' . $post['type']);
+            $this->SetData('Success', true);
         }
 
+        $this->Render();
+
+    }
+
+    /**
+     * Get SiteID from a UUID.
+     *
+     * @param string $UUID Unique User Identification.
+     * @return int mixed SiteID.
+     * @throws Gdn_UserException
+     */
+    protected function getSiteIDFromUUID($UUID) {
+        $ints = self::getIntsFromUUID($UUID);
+        $siteID = $ints[0];
+        if ($siteID == 0) {
+            throw new Gdn_UserException('Invalid UUID: ' . $UUID);
+        }
+        return $siteID;
+    }
+
+    /**
+     * Handle ContentDelete post back notification.
+     *
+     * @param array $post
+     * @return array Errors. Empty if none.
+     * @throws Gdn_UserException
+     */
+    protected function cleanspeakContentDelete($post) {
+        $siteID = $this->getSiteIDFromUUID($post['id']);
+        $errors = array();
+
+        $multiSiteModel = new MultisiteModel();
+        $site = $multiSiteModel->getWhere(array('SiteID' => $siteID))->FirstRow(DATASET_TYPE_ARRAY);
+        if (!$site) {
+            throw new Gdn_UserException("Site not found. UUID: {$post['id']} SiteID: $siteID", 500);
+        }
+
+        try {
+            $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $post);
+            var_dump($response); exit;
+        } catch (Gdn_UserException $e) {
+            Logger::log(Logger::ERROR, 'Error communicating with node.', array($e->getMessage()));
+        }
+
+        if (GetValue('Errors', $response)) {
+            $errors[$siteID] = $response['Errors'];
+        }
+
+        return $errors;
+
+    }
+
+    /**
+     * Handle ContentApproval post back notification.
+     *
+     * @param $post
+     * @return array Errors. Empty if none.
+     */
+    protected function cleanspeakContentApproval($post) {
+        $siteApprovals = array();
+        foreach ($post['approvals'] as $UUID => $action) {
+            $siteID = $this->getSiteIDFromUUID($UUID);
+            $siteApprovals[$siteID][$UUID] = $action;
+        }
         $errors = array();
         foreach ($siteApprovals as $siteID => $siteApproval) {
 
@@ -285,9 +355,7 @@ class MultisitesController extends DashboardController {
                 $errors[$siteID] = $response['Errors'];
             }
         }
-        $this->SetData('Errors', $errors);
-
-        $this->Render();
+        return $errors;
 
     }
 
