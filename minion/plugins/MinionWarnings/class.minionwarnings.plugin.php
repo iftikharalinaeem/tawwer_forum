@@ -216,11 +216,14 @@ class MinionWarnings extends Gdn_Plugin {
                 return;
         }
 
+        $mod = array();
+
         $note = $automated ? formatString(T('Automated warning assigned by {Minion.Name}. '), array(
             'Minion' => $sender->minion()
         )) : '';
         if (array_key_exists('Invoker', $options)) {
             $note .= sprintf(T('Invoked by %s. '), valr('Invoker.Name', $options));
+            $mod['InsertUserID'] = MinionPlugin::instance()->getMinionUserID();
         }
 
         if ($expires) {
@@ -237,10 +240,12 @@ class MinionWarnings extends Gdn_Plugin {
             'UserID' => $userID,
             'Body' => $message,
             'Format' => 'TextEx',
-
             'Points' => $points,
             'ExpiresString' => $expires == null ? null : "+ {$expires}"
         );
+
+        // Locally modify before saving
+        $warning = array_merge($warning, $mod);
 
         if ($commentID) {
             $warning = array_merge($warning, array(
