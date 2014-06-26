@@ -88,6 +88,16 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $token = $m[1];
             }
         }
+
+        if (empty($token)) {
+            $allHeaders = getallheaders();
+            if (GetValue('Authorization', $allHeaders)) {
+                if (preg_match('`^token\s+([^\s]+)`i', $allHeaders['Authorization'], $m)) {
+                    $token = $m[1];
+                }
+            }
+        }
+
         if ($token && $token === Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
             $userID = Gdn::userModel()->GetSystemUserID();
             if ($userID) {
@@ -299,4 +309,13 @@ class SiteNodePlugin extends Gdn_Plugin {
         $this->syncNode();
         $sender->Render('blank');
     }
+
+    public function cleanspeak_init_handler($sender) {
+        $siteID = Infrastructure::site('siteid');
+        if (!$siteID) {
+            throw new Gdn_UserException('Error getting Site ID for cleanspeak plugin.');
+        }
+        $sender->uuidSeed = array($siteID, 0, 0, 0);
+    }
+
 }

@@ -232,4 +232,74 @@ class MultisitesController extends DashboardController {
             Gdn::Dispatcher()->ControllerArguments($args);
         }
     }
+
+    /**
+     * Proxy postback notifications to nodes.
+     *
+     * @throws Gdn_UserException
+     */
+    public function cleanspeakProxy() {
+
+        $this->Permission('Garden.Settings.Manage');
+
+        $post = Gdn::Request()->Post();
+        if (!$post) {
+            throw new Gdn_UserException('Missing post data.');
+        }
+
+
+        if ($post['type'] == 'contentApproval') {
+            foreach ($post['approvals'] as $UUID => $action) {
+                $ints = self::getIntsFromUUID($UUID);
+                $siteID = $ints[0];
+                $siteApprovals[$siteID][$UUID] = $action;
+            }
+
+        } else {
+            throw new Gdn_UserException('cleanspeak proxy does not support type:' . $post['type']);
+        }
+
+        $errors = array();
+        foreach ($siteApprovals as $siteID => $siteApproval) {
+
+            $multiSiteModel = new MultisiteModel();
+            $site = $multiSiteModel->getWhere(array('SiteID' => $siteID))->FirstRow(DATASET_TYPE_ARRAY);
+            if (!$site) {
+                $errors[] = 'Site not found: ' . $siteID;
+                continue;
+            }
+
+            $sitePost = array();
+            $sitePost['type'] = $post['type'];
+            $sitePost['approvals'] = $siteApproval;
+            $sitePost['moderatorId'] = $post['moderatorId'];
+            $sitePost['moderatorEmail'] = $post['moderatorEmail'];
+            $sitePost['moderatorExternalId'] = $post['moderatorExternalId'];
+
+            try {
+                $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $sitePost);
+            } catch (Gdn_UserException $e) {
+                Logger::log(Logger::ERROR, 'Error communicating with node.', array($e->getMessage()));
+            }
+            if (GetValue('Errors', $response)) {
+                $errors[$siteID] = $response['Errors'];
+            }
+        }
+        $this->SetData('Errors', $errors);
+
+        $this->Render();
+
+    }
+
+    /**
+     * @param string $UUID Universal Unique Identifier.
+     * @return array Containing the 4 numbers used to generate generateUUIDFromInts
+     */
+    public static function getIntsFromUUID($UUID) {
+        $parts = str_split(str_replace('-', '', $UUID), 8);
+        $parts = array_map('hexdec', $parts);
+        return $parts;
+    }
+
+
 }
