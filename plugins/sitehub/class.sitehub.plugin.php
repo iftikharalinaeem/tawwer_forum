@@ -48,6 +48,8 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->column('InsertUserID', 'int')
             ->column('DateUpdated', 'datetime', true)
             ->column('UpdateUserID', 'int', true)
+            ->column('Sync', 'tinyint', '1')
+            ->column('DateLastSync', 'datetime', true)
             ->column('Attributes', 'text', true)
             ->set();
 

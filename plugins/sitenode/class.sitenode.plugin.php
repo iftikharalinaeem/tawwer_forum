@@ -63,15 +63,16 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Add foreign ID columns specifically for the hub sync. These must not be unique.
         Gdn::Structure()
             ->table('Category')
-            ->column('HubID', 'int', true)
+            ->column('HubID', 'varchar(20)', true, 'unique.hubid')
+            ->column('OverrideHub', 'tinyint', '0')
             ->set();
 
         Gdn::Structure()
             ->table('Role')
-            ->column('HubID', 'int', true)
+            ->column('HubID', 'varchar(20)', true, 'unique.hubid')
+            ->column('OverrideHub', 'tinyint', '0')
             ->set();
     }
-
 
     /**
      * Check to see if a valid sso token was passed through the header.
@@ -150,13 +151,16 @@ class SiteNodePlugin extends Gdn_Plugin {
     public function syncNode() {
         // Get the config from the hub.
         $config = $this->hubApi('/multisites/nodeconfig.json', 'GET', ['nodeUrl' => Url('/', '//')], true);
+        if (!val('Sync', $config)) {
+            return;
+        }
 
         // Enable plugins.
         foreach (val('Addons', $config, []) as $addonKey => $enabled) {
             try {
                 $this->toggleAddon($addonKey, $enabled);
             } catch (Exception $ex) {
-                Logger::event('nodesync_error', LogLevel::ERROR, $ex->getMessage());
+                Logger::event('nodesync_error', Logger::ERROR, $ex->getMessage());
             }
         }
 
@@ -164,14 +168,66 @@ class SiteNodePlugin extends Gdn_Plugin {
             try {
                 Gdn::ThemeManager()->EnableTheme($theme);
             } catch (Exception $ex) {
-                Logger::event('nodesync_error', LogLevel::ERROR, $ex->getMessage());
+                Logger::event('nodesync_error', Logger::ERROR, $ex->getMessage());
             }
         }
 
+        // Synchronize some config.
+        $saveConfig = (array)val('Config', $config, []);
+        TouchValue('Garden.Title', $saveConfig, valr('Multisite.Name', $config));
+        SaveToConfig($saveConfig);
+
         // Synchronize the roles.
+        $this->syncRoles(val('Roles', $config, []));
+
+        // Synchronize the categories.
+
+
+        // Tell the hub that we've synchronized.
 
 
         Gdn::Config()->Shutdown();
+    }
+
+    public function syncRoles(array $roles) {
+        $roleModel = new RoleModel();
+        $roles = Gdn_DataSet::Index($roles, 'HubID');
+
+        foreach ($roles as &$role) {
+            $permissions = $role['Permissions'];
+            unset($role['RoleID'], $role['Permissions']);
+
+            $hubID = $role['HubID'];
+            if (!$hubID) {
+                Logger::event('nodesync_error', Logger::ERROR, "Node tried to sync a role with no hubID.");
+                continue;
+            }
+
+            // Grab the current role.
+            $currentRole = $roleModel->GetWhere(['HubID' => $hubID])->FirstRow(DATASET_TYPE_ARRAY);
+            if (!$currentRole) {
+                // Try and grab the role by name.
+                $currentRole = $roleModel->GetWhere(['Name' => $role['Name']])->FirstRow(DATASET_TYPE_ARRAY);
+                if ($currentRole && $currentRole['HubID'] && isset($roles['HubID'])) {
+                    $currentRole = false;
+                }
+            }
+            if ($currentRole) {
+                $roleID = $currentRole['RoleID'];
+                $fields = array_diff_assoc($role, $currentRole);
+                if (!empty($fields)) {
+                    $roleModel->Update($fields, ['RoleID' => $roleID]);
+                }
+            } else {
+                // Insert the role.
+                $roleID = $roleModel->Insert($role);
+            }
+
+            if ($roleID) {
+                $permissions['RoleID'] = $roleID;
+                $globalPermissions = Gdn::PermissionModel()->Save($permissions, true);
+            }
+        }
     }
 
     /**

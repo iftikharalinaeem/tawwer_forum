@@ -123,6 +123,8 @@ class MultisiteModel extends Gdn_Model {
     }
 
     /**
+     * Format a node slug into a url.
+     *
      * @param string $slug The site slug.
      * @return string Returns the url of the site.
      */
@@ -225,6 +227,25 @@ class MultisiteModel extends Gdn_Model {
         return $row;
     }
 
+    public function getFromUrl($url) {
+        $slug = $this->slugFromUrl($url);
+        $row = $this->getWhere(['Slug' => $slug])->FirstRow(DATASET_TYPE_ARRAY);
+        return $row;
+    }
+
+    public function slugFromUrl($url) {
+        $format = $this->siteUrlFormat;
+
+        if (!IsUrl($format)) {
+            $slug = trim(parse_url($url, PHP_URL_PATH), '/');
+        } else {
+            $domain = parse_url($url, PHP_URL_HOST);
+            $slug = trim(strstr($domain, '.', true). '.');
+        }
+
+        return $slug;
+    }
+
     public function getWhere($where = FALSE, $orderFields = '', $orderDirection = 'asc', $limit = FALSE, $offset = FALSE) {
         if (!$limit) {
             $limit = 1000;
@@ -237,6 +258,37 @@ class MultisiteModel extends Gdn_Model {
         }
         array_walk($rows->ResultArray(), [$this, 'calculateRow']);
         return $rows;
+    }
+
+    /**
+     * Get a list of roles to sync with a node.
+     * @param array|int $site The site id.
+     * @return array A dataset containing the nodes.
+     */
+    public function getSyncRoles($site) {
+        if (is_numeric($site)) {
+            $site = $this->getID($site);
+        }
+
+        // Get the roles.
+        $roles = $this->SQL
+            ->Select('RoleID,Name')
+            ->Select('RoleID', '', 'HubID')
+            ->GetWhere('Role', ['HubSync' => ['settings', 'membership']])
+            ->ResultArray();
+
+        // Get the global permissions on the roles.
+        $permissions = Gdn::PermissionModel()->GetGlobalPermissions(ConsolidateArrayValuesByKey($roles, 'RoleID'));
+        foreach ($roles as &$role) {
+            $role['Permissions'] = $permissions[$role['RoleID']];
+            unset($role['Permissions']['PermissionID']);
+        }
+
+        $this->EventArguments['Multisite'] = $site;
+        $this->EventArguments['Roles'] =& $roles;
+        $this->FireEvent('SyncRoles');
+
+        return $roles;
     }
 
     /**
@@ -364,6 +416,10 @@ class MultisiteModel extends Gdn_Model {
         $nodes = $this->get()->resultArray();
 
         foreach ($nodes as $node) {
+            if (!val('Sync', $node, 1)) {
+                continue;
+            }
+
             try {
                 $nodeResult = $this->syncNode($node);
                 $result[$node['Slug']] = $nodeResult;

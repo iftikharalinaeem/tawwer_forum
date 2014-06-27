@@ -125,21 +125,43 @@ class MultisitesController extends DashboardController {
         $this->Render('api');
     }
 
-    public function nodeConfig() {
-//        $this->Permission('Garden.Settings.Manage');
+    public function nodeConfig($nodeUrl) {
+        //        $this->Permission('Garden.Settings.Manage');
+        if (!$nodeUrl) {
+            throw NotFoundException('Site');
+        }
+        $this->site = $this->siteModel->getFromUrl($nodeUrl);
+        if (!$this->site) {
+            throw NotFoundException('Site');
+        }
+
+        // See if we even should sync.
+        $this->SetData('Sync', val('Sync', $this->site));
+        if (!$this->Data('Sync')) {
+            $this->Render('api');
+            return;
+        }
+        $this->SetData('Multisite', $this->site);
 
         // Get the base config.
         $config = C('NodeConfig', []);
         $this->SetData($config);
 
         // Get the roles.
-        $roles = Gdn::SQL()->Select('RoleID,Name')->GetWhere('Role', ['HubSync' => ['settings', 'membership']])->ResultArray();
+        $roles = $this->siteModel->getSyncRoles($this->site);
         $this->SetData('Roles', $roles);
 
         // Get the categories.
 
 
+        SaveToConfig('Api.Clean', FALSE, FALSE);
         $this->Render('api');
+    }
+
+    public function notifySync() {
+        if (!$this->site) {
+            throw NotFoundException('Site');
+        }
     }
 
     protected function patch() {
