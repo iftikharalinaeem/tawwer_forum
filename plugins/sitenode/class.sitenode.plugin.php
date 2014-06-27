@@ -160,7 +160,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
     public function syncNode() {
         // Get the config from the hub.
-        $config = $this->hubApi('/multisites/nodeconfig.json', 'GET', ['nodeUrl' => Url('/', '//')], true);
+        $config = $this->hubApi('/multisites/nodeconfig.json', 'GET', ['from' => $this->slug()], true);
         if (!val('Sync', $config)) {
             return;
         }
@@ -203,11 +203,10 @@ class SiteNodePlugin extends Gdn_Plugin {
         $roleModel = new RoleModel();
         $roles = Gdn_DataSet::Index($roles, 'HubID');
 
-        foreach ($roles as &$role) {
+        foreach ($roles as $hubID => &$role) {
             $permissions = $role['Permissions'];
             unset($role['RoleID'], $role['Permissions']);
 
-            $hubID = $role['HubID'];
             if (!$hubID) {
                 Logger::event('nodesync_error', Logger::ERROR, "Node tried to sync a role with no hubID.");
                 continue;
@@ -237,6 +236,18 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $permissions['RoleID'] = $roleID;
                 $globalPermissions = Gdn::PermissionModel()->Save($permissions, true);
             }
+        }
+
+        // Get a list of roles that need to be deleted.
+        $missingHubIDs = Gdn::SQL()
+            ->Select('RoleID')
+            ->From('Role')
+            ->WhereNotIn('HubID', array_keys($roles))
+            ->Get()->ResultArray();
+
+        foreach ($missingHubIDs as $missingRow) {
+            $missingRoleID = $missingRow['RoleID'];
+            $roleModel->Delete($missingRoleID, 0);
         }
     }
 
@@ -299,13 +310,34 @@ class SiteNodePlugin extends Gdn_Plugin {
                 // Hub SSO always synchronizes roles.
                 SaveToConfig('Garden.SSO.SynchRoles', true, false);
 
+                // Translate the roles.
+                $roles = val('Roles', $user);
+                if (is_array($roles)) {
+                    $roleModel = new RoleModel();
+                    $roleHubIDs = ConsolidateArrayValuesByKey($roles, 'HubID');
+                    $roles = $roleModel->GetWhere(['HubID' => $roleHubIDs])->ResultArray();
+                    $user['Roles'] = ConsolidateArrayValuesByKey($roles, 'RoleID');
+                }
+
                 // Fire an event so that plugins can determine access etc.
                 $this->EventArguments['User'] =& $user;
                 $this->FireEvent('hubSSO');
 
-                $user_id = Gdn::UserModel()->Connect($user['UserID'], self::PROVIDER_KEY, $user);
+                $user_id = Gdn::UserModel()->Connect($user['UniqueID'], self::PROVIDER_KEY, $user);
                 Trace($user_id, 'user ID');
                 if ($user_id) {
+                    // Add additional authentication.
+                    $authentication = val('Authentication', $user);
+                    if (is_array($authentication)) {
+                        foreach ($authentication as $provider => $authKey) {
+                            Gdn::UserModel()->SaveAuthentication([
+                                'UserID' => $user_id,
+                                'Provider' => $provider,
+                                'UniqueID' => $authKey
+                            ]);
+                        }
+                    }
+
                     Gdn::Session()->Start($user_id, true);
                 }
             } catch(Exception $ex) {

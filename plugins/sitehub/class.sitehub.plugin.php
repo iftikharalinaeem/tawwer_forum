@@ -138,7 +138,7 @@ class SiteHubPlugin extends Gdn_Plugin {
         if (!Gdn::Session()->User) {
             throw NotFoundException('User');
         }
-        $ssoUser = arrayTranslate((array)Gdn::Session()->User, array('UserID', 'Name', 'Email', 'Banned', 'Photo', 'PhotoUrl'));
+        $ssoUser = arrayTranslate((array)Gdn::Session()->User, array('UserID' => 'UniqueID', 'Name', 'Email', 'Banned', 'Photo', 'PhotoUrl'));
         $ssoUser['Photo'] = $ssoUser['PhotoUrl'];
 
         // Get the user's role.
@@ -148,7 +148,10 @@ class SiteHubPlugin extends Gdn_Plugin {
         foreach ($roles as $role) {
             $allRoles[] = $role['Name'];
             if (val('HubSync', $role)) {
-                $ssoUser['Roles'][] = $role['Name'];
+                $ssoUser['Roles'][] = [
+                    'HubID' => $role['RoleID'],
+                    'Name' => $role['Name']
+                ];
             }
         }
         $sender->EventArguments['AllRoles'] = $allRoles;

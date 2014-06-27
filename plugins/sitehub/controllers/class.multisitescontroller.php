@@ -125,12 +125,12 @@ class MultisitesController extends DashboardController {
         $this->Render('api');
     }
 
-    public function nodeConfig($nodeUrl) {
+    public function nodeConfig($from) {
         //        $this->Permission('Garden.Settings.Manage');
-        if (!$nodeUrl) {
+        if (!$from) {
             throw NotFoundException('Site');
         }
-        $this->site = $this->siteModel->getFromUrl($nodeUrl);
+        $this->site = $this->siteModel->getWhere(['slug' => $from])->FirstRow(DATASET_TYPE_ARRAY);
         if (!$this->site) {
             throw NotFoundException('Site');
         }

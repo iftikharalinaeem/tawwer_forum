@@ -286,7 +286,7 @@ class MultisiteModel extends Gdn_Model {
 
         $this->EventArguments['Multisite'] = $site;
         $this->EventArguments['Roles'] =& $roles;
-        $this->FireEvent('SyncRoles');
+        $this->FireEvent('getSyncRoles');
 
         return $roles;
     }
