@@ -254,4 +254,177 @@ class MultisitesController extends DashboardController {
             Gdn::Dispatcher()->ControllerArguments($args);
         }
     }
+
+    /**
+     * Proxy postback notifications to nodes.
+     *
+     * @throws Gdn_UserException
+     */
+    public function cleanspeakProxy() {
+
+        $this->Permission('Garden.Settings.Manage');
+
+        $post = Gdn::Request()->Post();
+        if (!$post) {
+            throw new Gdn_UserException('Missing post data.');
+        }
+
+
+        switch ($post['type']) {
+            case 'contentApproval':
+                $errors = $this->cleanspeakContentApproval($post);
+                break;
+            case 'contentDelete':
+                $errors = $this->cleanspeakContentDelete($post);
+                break;
+            case 'userAction':
+                $errors = $this->cleanspeakUserAction($post);
+                break;
+            default:
+                throw new Gdn_UserException('Cleanspeak proxy does not support type:' . $post['type']);
+
+        }
+        if (sizeof($errors) > 0) {
+            $this->SetData('Errors', $errors);
+        } else {
+            $this->SetData('Success', true);
+        }
+
+        $this->Render();
+
+    }
+
+    /**
+     * Get SiteID from a UUID.
+     *
+     * @param string $UUID Unique User Identification.
+     * @return int mixed SiteID.
+     * @throws Gdn_UserException
+     */
+    protected function getSiteIDFromUUID($UUID) {
+        $ints = self::getIntsFromUUID($UUID);
+        $siteID = $ints[0];
+        if ($siteID == 0) {
+            throw new Gdn_UserException('Invalid UUID: ' . $UUID);
+        }
+        return $siteID;
+    }
+
+    /**
+     * Handle ContentDelete post back notification.
+     *
+     * @param array $post Post data.
+     * @return array Errors. Empty if none.
+     * @throws Gdn_UserException
+     */
+    protected function cleanspeakContentDelete($post) {
+        $siteID = $this->getSiteIDFromUUID($post['id']);
+        $errors = array();
+
+        $multiSiteModel = new MultisiteModel();
+        $site = $multiSiteModel->getWhere(array('SiteID' => $siteID))->FirstRow(DATASET_TYPE_ARRAY);
+        if (!$site) {
+            throw new Gdn_UserException("Site not found. UUID: {$post['id']} SiteID: $siteID", 500);
+        }
+
+        try {
+            $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $post);
+        } catch (Gdn_UserException $e) {
+            Logger::log(Logger::ERROR, 'Error communicating with node.', array($e->getMessage()));
+        }
+
+        if (GetValue('Errors', $response)) {
+            $errors[$siteID] = $response['Errors'];
+        }
+
+        return $errors;
+
+    }
+
+    /**
+     * Handle ContentApproval post back notification.
+     *
+     * @param array $post Post data.
+     * @return array Errors. Empty if none.
+     * @throws Gdn_UserException
+     */
+    protected function cleanspeakContentApproval($post) {
+        $siteApprovals = array();
+        foreach ($post['approvals'] as $UUID => $action) {
+            $siteID = $this->getSiteIDFromUUID($UUID);
+            $siteApprovals[$siteID][$UUID] = $action;
+        }
+        $errors = array();
+        foreach ($siteApprovals as $siteID => $siteApproval) {
+
+            $multiSiteModel = new MultisiteModel();
+            $site = $multiSiteModel->getWhere(array('SiteID' => $siteID))->FirstRow(DATASET_TYPE_ARRAY);
+            if (!$site) {
+                $errors[] = 'Site not found: ' . $siteID;
+                continue;
+            }
+
+            $sitePost = array();
+            $sitePost['type'] = $post['type'];
+            $sitePost['approvals'] = $siteApproval;
+            $sitePost['moderatorId'] = $post['moderatorId'];
+            $sitePost['moderatorEmail'] = $post['moderatorEmail'];
+            $sitePost['moderatorExternalId'] = $post['moderatorExternalId'];
+
+            try {
+                $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $sitePost);
+            } catch (Gdn_UserException $e) {
+                Logger::log(Logger::ERROR, 'Error communicating with node.', array($e->getMessage()));
+            }
+            if (GetValue('Errors', $response)) {
+                $errors[$siteID] = $response['Errors'];
+            }
+        }
+        return $errors;
+
+    }
+
+    /**
+     * Handle userAction post back notification.
+     *
+     * @param array $post Post data.
+     * @return array Errors. Empty if none.
+     * @throws Gdn_UserException
+     */
+    protected function cleanspeakUserAction($post) {
+
+        $siteID = $this->getSiteIDFromUUID($post['userId']);
+        $errors = array();
+
+        $multiSiteModel = new MultisiteModel();
+        $site = $multiSiteModel->getWhere(array('SiteID' => $siteID))->FirstRow(DATASET_TYPE_ARRAY);
+        if (!$site) {
+            throw new Gdn_UserException("Site not found. UUID: {$post['userId']} SiteID: $siteID", 500);
+        }
+
+        try {
+            $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $post);
+        } catch (Gdn_UserException $e) {
+            Logger::log(Logger::ERROR, 'Error communicating with node.', array($e->getMessage()));
+        }
+
+        if (GetValue('Errors', $response)) {
+            $errors[$siteID] = $response['Errors'];
+        }
+
+        return $errors;
+
+    }
+
+    /**
+     * @param string $UUID Universal Unique Identifier.
+     * @return array Containing the 4 numbers used to generate generateUUIDFromInts
+     */
+    public static function getIntsFromUUID($UUID) {
+        $parts = str_split(str_replace('-', '', $UUID), 8);
+        $parts = array_map('hexdec', $parts);
+        return $parts;
+    }
+
+
 }

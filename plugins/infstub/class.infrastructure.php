@@ -38,11 +38,7 @@ class Infrastructure {
             case 'accountid':
                 return 8080;
             case 'siteid':
-                $host = Gdn::Request()->Host();
-                if ($root = Gdn::Request()->WebRoot()) {
-                    $host .= '/'.ltrim($root, '/');
-                }
-                return $host;
+                return 123;
         }
         return null;
     }
