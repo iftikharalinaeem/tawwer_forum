@@ -152,7 +152,8 @@ class MultisitesController extends DashboardController {
         $this->SetData('Roles', $roles);
 
         // Get the categories.
-
+        $categories = $this->siteModel->getSyncCategories($this->site);
+        $this->SetData('Categories', $categories);
 
         SaveToConfig('Api.Clean', FALSE, FALSE);
         $this->Render('api');

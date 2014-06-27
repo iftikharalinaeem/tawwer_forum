@@ -272,15 +272,15 @@ class MultisiteModel extends Gdn_Model {
 
         // Get the roles.
         $roles = $this->SQL
-            ->Select('RoleID,Name')
             ->Select('RoleID', '', 'HubID')
+            ->Select('Name')
             ->GetWhere('Role', ['HubSync' => ['settings', 'membership']])
             ->ResultArray();
 
         // Get the global permissions on the roles.
-        $permissions = Gdn::PermissionModel()->GetGlobalPermissions(ConsolidateArrayValuesByKey($roles, 'RoleID'));
+        $permissions = Gdn::PermissionModel()->GetGlobalPermissions(ConsolidateArrayValuesByKey($roles, 'HubID'));
         foreach ($roles as &$role) {
-            $role['Permissions'] = $permissions[$role['RoleID']];
+            $role['Permissions'] = $permissions[$role['HubID']];
             unset($role['Permissions']['PermissionID']);
         }
 
@@ -289,6 +289,66 @@ class MultisiteModel extends Gdn_Model {
         $this->FireEvent('getSyncRoles');
 
         return $roles;
+    }
+
+    public function getSyncCategories($site) {
+        if (is_numeric($site)) {
+            $site = $this->getID($site);
+        }
+
+        $categories = $this->SQL
+            ->Select('CategoryID', '', 'HubID')
+            ->Select('UrlCode,Name,Description')
+            ->OrderBy('TreeLeft')
+            ->GetWhere('Category', ['CategoryID >' => 0])
+            ->ResultArray();
+        $categories = array_column($categories, null, 'HubID');
+
+        // Add a psuedo root category to get permissions.
+        $categories['-1'] = [
+            'HubID' => '-1',
+            'Name' => 'Root'
+        ];
+
+        // Get the RoleIDs for permissions.
+        $roles = $this->SQL
+            ->Select('RoleID', '', 'HubID')
+            ->GetWhere('Role', ['HubSync' => ['settings', 'membership']])
+            ->ResultArray();
+        $roleIDs = array_column($roles, 'HubID');
+
+        // Get the default row for junction permissions.
+        $defaultRow = $this->SQL->GetWhere('Permission', [
+            'RoleID' => 0,
+            'JunctionID' => null,
+            'JunctionTable' => 'Category'
+        ])->FirstRow(DATASET_TYPE_ARRAY);
+        unset($defaultRow['PermissionID']);
+        $defaultRow['RoleID'] = 2; // make sure in the array
+        $defaultRow = array_Filter($defaultRow, function($v) {
+            return in_array($v, [2, 3]);
+        });
+
+        // Now we need to grab the permissions for each role-category combination.
+        $permissions = $this->SQL
+            ->OrderBy('RoleID, JunctionID')
+            ->GetWhere('Permission', [
+                'RoleID' => $roleIDs,
+                'JunctionID' => array_keys($categories)
+            ])->ResultArray();
+
+        // Walk through the permissions and nest them under the correct category.
+        foreach ($permissions as $permissionRow) {
+            $categoryID = $permissionRow['JunctionID'];
+            $perms = array_intersect_key($permissionRow, $defaultRow);
+            $categories[$categoryID]['Permissions'][] = $perms;
+        }
+
+        $this->EventArguments['Multisite'] = $site;
+        $this->EventArguments['Categories'] =& $categories;
+        $this->FireEvent('getSyncCategories');
+
+        return $categories;
     }
 
     /**

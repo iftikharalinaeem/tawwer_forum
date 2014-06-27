@@ -72,6 +72,11 @@ class SiteNodePlugin extends Gdn_Plugin {
             ->column('HubID', 'varchar(20)', true, 'unique.hubid')
             ->column('OverrideHub', 'tinyint', '0')
             ->set();
+
+        Gdn::Structure()
+            ->table('Discussion')
+            ->column('HubID', 'varchar(20)', true, 'unique.hubid')
+            ->set();
     }
 
     /**
