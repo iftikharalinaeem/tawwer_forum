@@ -335,7 +335,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Try the key as an application.
         $info = Gdn::ApplicationManager()->GetApplicationInfo($key);
         if ($info) {
-            $currentEnabled = array_key_exists($info, Gdn::ApplicationManager()->EnabledApplications());
+            $currentEnabled = array_key_exists($key, Gdn::ApplicationManager()->EnabledApplications());
             if ($enabled && !$currentEnabled) {
                 Gdn::ApplicationManager()->EnableApplication($key, $valid);
                 Trace("Application $key enabled.");
