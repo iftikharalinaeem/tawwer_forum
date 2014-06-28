@@ -193,10 +193,10 @@ class SiteNodePlugin extends Gdn_Plugin {
         SaveToConfig($saveConfig);
 
         // Synchronize the roles.
-        $this->syncRoles(val('Roles', $config, []));
+        $roleMap = $this->syncRoles(val('Roles', $config, []));
 
         // Synchronize the categories.
-
+        $this->syncCategories(val('Categories', $config, []), $roleMap);
 
         // Tell the hub that we've synchronized.
 
@@ -204,9 +204,59 @@ class SiteNodePlugin extends Gdn_Plugin {
         Gdn::Config()->Shutdown();
     }
 
+    public function syncCategories(array $categories, array $roleMap) {
+        $categoryModel = new CategoryModel();
+        $categoryMap = [];
+
+        foreach ($categories as $category) {
+            $hubID = $category['HubID'];
+            $parentID = val('ParentHubID', $category);
+            if (!$parentID || !isset($categoryMap[$parentID])) {
+                $category['ParentCategoryID'] = -1;
+            } else {
+                $category['ParentCategoryID'] = $categoryMap[$parentID];
+            }
+            $category['AllowDiscussions'] = true;
+
+            // See if there is an existing category.
+            $existingCategory = $categoryModel->GetWhereCache(['HubID' => $hubID]);
+            if (!$existingCategory) {
+                // Try linking by url code.
+                $existingCategory = $categoryModel->GetWhereCache(['UrlCode' => $category['UrlCode']]);
+                if ($existingCategory) {
+                    $existingCategory = array_shift($existingCategory);
+                }
+            } else {
+                $existingCategory = array_shift($existingCategory);
+            }
+
+            if ($existingCategory) {
+                $category['CategoryID'] = $existingCategory['CategoryID'];
+                $categoryMap[$hubID] = $existingCategory['CategoryID'];
+            }
+
+            $permissions = val('Permissions', $category, []);
+            unset($category['Permissions']);
+            if (!empty($permissions)) {
+                $category['CustomPermissions'] = true;
+                foreach ($permissions as &$permissionRow) {
+                    $permissionRow['RoleID'] = $roleMap[$permissionRow['RoleID']];
+                }
+                $category['Permissions'] = $permissions;
+            }
+
+
+            $categoryID = $categoryModel->Save($category);
+            if ($categoryID) {
+                $categoryMap[$hubID] = $categoryID;
+            }
+        }
+    }
+
     public function syncRoles(array $roles) {
         $roleModel = new RoleModel();
         $roles = Gdn_DataSet::Index($roles, 'HubID');
+        $roleMap = [];
 
         foreach ($roles as $hubID => &$role) {
             $permissions = $role['Permissions'];
@@ -240,6 +290,7 @@ class SiteNodePlugin extends Gdn_Plugin {
             if ($roleID) {
                 $permissions['RoleID'] = $roleID;
                 $globalPermissions = Gdn::PermissionModel()->Save($permissions, true);
+                $roleMap[$hubID] = $roleID;
             }
         }
 
@@ -254,6 +305,8 @@ class SiteNodePlugin extends Gdn_Plugin {
             $missingRoleID = $missingRow['RoleID'];
             $roleModel->Delete($missingRoleID, 0);
         }
+
+        return $roleMap;
     }
 
     /**
