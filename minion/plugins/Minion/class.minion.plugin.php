@@ -1359,8 +1359,7 @@ class MinionPlugin extends Gdn_Plugin {
             // Adjust automated force level
             case 'force':
                 $state['Targets']['Discussion'] = $state['Sources']['Discussion'];
-                if (in_array($state['Force'], self::FORCES))
-                    $actions[] = array("force", c('Minion.Access.Force','Garden.Moderation.Manage'), $state);
+                $actions[] = array("force", c('Minion.Access.Force','Garden.Moderation.Manage'), $state);
                 break;
 
             // Stop all thread actions
@@ -1386,6 +1385,7 @@ class MinionPlugin extends Gdn_Plugin {
                 break;
 
             case 'thread':
+
                 $discussionModel = new DiscussionModel();
                 $closed = val('Closed', $state['Targets']['Discussion'], false);
                 $discussionID = $state['Targets']['Discussion']['DiscussionID'];
@@ -1463,9 +1463,14 @@ class MinionPlugin extends Gdn_Plugin {
                 break;
 
             case 'kick':
-                if (!array_key_exists('User', $state['Targets'])) {
+
+                if (!key_exists('Discussion', $state['Targets'])) {
+                    $this->acknowledge(null, T('You must supply a valid target user.'), 'custom', $state['Sources']['User'], array(
+                        'Comment' => false
+                    ));
                     break;
                 }
+
                 $user = $state['Targets']['User'];
                 $reason = val('Reason', $state, 'Not welcome');
                 $expires = array_key_exists('Time', $state) ? strtotime("+" . $state['Time']) : null;
@@ -1500,7 +1505,11 @@ class MinionPlugin extends Gdn_Plugin {
                 break;
 
             case 'forgive':
-                if (!array_key_exists('User', $state['Targets'])) {
+
+                if (!key_exists('Discussion', $state['Targets'])) {
+                    $this->acknowledge(null, T('You must supply a valid target user.'), 'custom', $state['Sources']['User'], array(
+                        'Comment' => false
+                    ));
                     break;
                 }
                 $user = $state['Targets']['User'];
@@ -1526,8 +1535,12 @@ class MinionPlugin extends Gdn_Plugin {
                 break;
 
             case 'phrase':
-                if (!array_key_exists('Phrase', $state['Targets'])) {
-                    return;
+
+                if (!key_exists('Phrase', $state['Targets'])) {
+                    $this->acknowledge(null, T('You must supply a valid phrase.'), 'custom', $state['Sources']['User'], array(
+                        'Comment' => false
+                    ));
+                    break;
                 }
 
                 // Clean up phrase
@@ -1632,7 +1645,10 @@ class MinionPlugin extends Gdn_Plugin {
 
             case 'access':
 
-                if (!array_key_exists('User', $state['Targets'])) {
+                if (!key_exists('User', $state['Targets'])) {
+                    $this->acknowledge(null, T('You must supply a valid target user.'), 'custom', $state['Sources']['User'], array(
+                        'Comment' => false
+                    ));
                     break;
                 }
                 $user = $state['Targets']['User'];
@@ -1670,8 +1686,14 @@ class MinionPlugin extends Gdn_Plugin {
                 break;
 
             case 'force':
-                $force = val('Force', $state);
 
+                if (in_array($state['Force'], self::FORCES)) {
+                    $this->acknowledge(null, T('You must supply a valid force level.'), 'custom', $state['Sources']['User'], array(
+                        'Comment' => false
+                    ));
+                }
+
+                $force = val('Force', $state);
                 $this->monitor($state['Targets']['Discussion'], array(
                     'Force' => $force
                 ));
@@ -1684,8 +1706,8 @@ class MinionPlugin extends Gdn_Plugin {
                 break;
 
             case 'stop all':
-                $this->stopMonitoring($state['Targets']['Discussion']);
 
+                $this->stopMonitoring($state['Targets']['Discussion']);
                 $this->acknowledge($state['Sources']['Discussion'], formatString(T("Standing down..."), array(
                     'User' => $user,
                     'Discussion' => $state['Targets']['Discussion']

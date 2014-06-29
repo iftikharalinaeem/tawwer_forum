@@ -690,10 +690,6 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
             case 'threadcycle':
 
-                if (!key_exists('Discussion', $state['Targets'])) {
-                    return;
-                }
-
                 $discussion = $state['Targets']['Discussion'];
                 $threadCycle = $sender->monitoring($discussion, 'ThreadCycle', false);
 
@@ -755,10 +751,6 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 break;
 
             case 'cyclewager':
-
-                if (!key_exists('Discussion', $state['Targets'])) {
-                    return;
-                }
 
                 // Get discussion
                 $comment = valr('Source.Comment', $state, null);
