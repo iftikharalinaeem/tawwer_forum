@@ -8,7 +8,7 @@
 $PluginInfo['Minion'] = array(
     'Name' => 'Minion',
     'Description' => "Creates a 'minion' that performs adminstrative tasks automatically and on command.",
-    'Version' => '2.0',
+    'Version' => '2.1',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'MobileFriendly' => true,
     'Author' => "Tim Gunter",
@@ -396,7 +396,10 @@ class MinionPlugin extends Gdn_Plugin {
 
         // Condense warnings
 
-        $message = t('<span class="MinionGreetings">Greetings, organics!</span> ~ {Rules} ~ <span class="MinionObey">{Obey}</span>');
+        $greetings = T('Greetings, organics!');
+        $options['Greetings'] = $greetings;
+
+        $message = T('<span class="MinionGreetings">{Greetings}</span> ~ {Rules} ~ <span class="MinionObey">{Obey}</span>');
 
         $options['Rules'] = implode(' ~ ', $rules);
 
@@ -440,12 +443,12 @@ class MinionPlugin extends Gdn_Plugin {
 
         // Force level
         if ($force) {
-            $rules[] = wrap("<b>Threat level</b>: {$force}", 'span', array('class' => 'MinionRule'));
+            $rules[] = wrap("<span class=\"icon icon-eye-open\" title=\"".T('Force level')."\"></span> {$force}", 'span', array('class' => 'MinionRule'));
         }
 
         // Phrases
         if ($bannedPhrases) {
-            $rules[] = wrap("<b>Forbidden phrases</b>: " . implode(', ', array_keys($bannedPhrases)), 'span', array('class' => 'MinionRule'));
+            $rules[] = wrap("<span class=\"icon icon-ban\" title=\"".T('Forbidden phrases')."\"></span>  " . implode(', ', array_keys($bannedPhrases)), 'span', array('class' => 'MinionRule'));
         }
 
         // Kicks
@@ -461,7 +464,7 @@ class MinionPlugin extends Gdn_Plugin {
                 $kickedUsersList[] = $kickedUserName;
             }
 
-            $rules[] = wrap("<b>Exiled users</b>: " . implode(', ', $kickedUsersList), 'span', array('class' => 'MinionRule'));
+            $rules[] = wrap("<span class=\"icon icon-skull\" title=\"".T('Kicked users')."\"></span> " . implode(', ', $kickedUsersList), 'span', array('class' => 'MinionRule'));
         }
 
         // Future Close
@@ -479,7 +482,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             // Thread is queued for closing
             $page = val('Page', $threadClose);
-            $rules[] = wrap("<b>Thread Close</b>: page {$page}", 'span', array('class' => 'MinionRule'));
+            $rules[] = wrap("<span class=\"icon icon-time\" title=\"".T('Auto-close')."\"></span> Page {$page}", 'span', array('class' => 'MinionRule'));
         }
     }
 
@@ -616,17 +619,22 @@ class MinionPlugin extends Gdn_Plugin {
         $actions = array();
         $this->EventArguments['Actions'] = &$actions;
 
-        $objectBody = val('Body', $object);
-        $strippedBody = trim(strip_tags($objectBody));
+        // Get body text, and remove bad bytes
+        $objectBody = preg_replace('/[^(\x20-\x7F)]*/','', val('Body', $object));
+        $object['Body'] = $objectBody;
 
         // Remove quote areas
         $parseBody = $this->parseBody($object);
 
+        // Strip out HTML
+        $strippedBody = trim(strip_tags($parseBody));
+
         // Check every line of the body to see if its a minion command
         $line = -1;
-        $objectLines = explode("\n", $parseBody);
+        $objectLines = explode("\n", $strippedBody);
 
         foreach ($objectLines as $objectLine) {
+
             $line++;
             $objectLine = trim($objectLine);
             if (!$objectLine) {
@@ -698,27 +706,20 @@ class MinionPlugin extends Gdn_Plugin {
 
                     $this->fireEvent('TokenGather');
 
+                    $firstPass = val('FirstPass', $state['Gather'], true);
+                    $state['Gather']['FirstPass'] = false;
+
                     $gatherNode = valr('Gather.Node', $state);
                     $gatherType = strtolower(valr('Gather.Type', $state, $gatherNode));
                     switch ($gatherType) {
                         case 'user':
 
-                            $terminator = val('Terminator', $state['Gather'], false);
-
-                            if ($terminator) {
-                                // If a terminator has been registered, and the first character in the token matches, chop it
-                                if (!strlen($state['Gather']['Delta']) && substr($state['Token'], 0, 1) == $terminator) {
-                                    $state['Token'] = substr($state['Token'], 1);
-                                }
-
-                                // If we've found our closing character
-                                if (($foundPosition = stripos($state['Token'], $terminator)) !== false) {
-                                    $state['Token'] = substr($state['Token'], 0, $foundPosition);
-                                    unset($state['Gather']['Terminator']);
-                                }
-                            }
+                            $terminators = array('"' => true, '@' => false);
+                            $terminator = $this->checkTerminator($state, (($firstPass) ? $terminators : null));
 
                             // Add token
+
+                            // Add space if there's something in Delta already
                             if (strlen($state['Gather']['Delta'])) {
                                 $state['Gather']['Delta'] .= ' ';
                             }
@@ -913,29 +914,17 @@ class MinionPlugin extends Gdn_Plugin {
                         $this->consume($state, 'Gather', array(
                             'Node' => 'User',
                             'Type' => 'user',
-                            'Delta' => '',
-                            'Terminator' => '"'
+                            'Delta' => ''
                         ));
                     }
 
                     if (substr($state['Token'], 0, 1) == '@') {
                         if (strlen($state['Token']) > 1) {
-                            $state['Token'] = substr($state['Token'], 1);
                             $state['Gather'] = array(
                                 'Node' => 'User',
                                 'Type' => 'user',
                                 'Delta' => ''
                             );
-
-                            // Allow double quoted username matching
-                            if (substr($state['Token'], 0, 1) == '"') {
-                                $state['Gather']['Terminator'] = '"';
-                            }
-
-                            // Allow matching autocomplete usernames
-                            if (stristr($state['Token'], "\u200C")) {
-                                $state['Gather']['Terminator'] = "\u200C";
-                            }
 
                             // Shortcircuit here (without consuming) so we can put all the user gathering in one place
                             continue;
@@ -1061,6 +1050,45 @@ class MinionPlugin extends Gdn_Plugin {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Check for and handle terminators
+     *
+     * @param array $state
+     * @param array $terminators
+     */
+    public function checkTerminator(&$state, $terminators = null) {
+
+        // Detect termination
+        $terminator = val('Terminator', $state['Gather'], false);
+
+        if (!$terminator && is_array($terminators)) {
+            $testTerminator = substr($state['Token'], 0, 1);
+            if (key_exists($testTerminator, $terminators)) {
+                $terminator = $testTerminator;
+                $state['Token'] = substr($state['Token'], 1);
+                $double = $terminators[$testTerminator];
+                if ($double) {
+                    $state['Gather']['Terminator'] = $testTerminator;
+                }
+            }
+        }
+
+        if ($terminator) {
+            // If a terminator has been registered, and the first character in the token matches, chop it
+            if (!strlen($state['Gather']['Delta']) && substr($state['Token'], 0, 1) == $terminator) {
+                $state['Token'] = substr($state['Token'], 1);
+            }
+
+            // If we've found our closing character
+            if (($foundPosition = stripos($state['Token'], $terminator)) !== false) {
+                $state['Token'] = substr($state['Token'], 0, $foundPosition);
+                unset($state['Gather']['Terminator']);
+            }
+        }
+
+        return val('Terminator', $state['Gather'], false);
     }
 
     /**
@@ -1191,10 +1219,10 @@ class MinionPlugin extends Gdn_Plugin {
      *
      * We're looking for spoilers, mentions, quotes
      *
-     * @param type $object
+     * @param array $item
      * @return type
      */
-    public function parseBody($object) {
+    public function parseBody($item) {
 
         $formatMentions = c('Garden.Format.Mentions', null);
         if ($formatMentions) {
@@ -1202,7 +1230,7 @@ class MinionPlugin extends Gdn_Plugin {
         }
 
         Gdn::pluginManager()->getPluginInstance('HtmLawed', Gdn_PluginManager::ACCESS_PLUGINNAME);
-        $body = $object['Body'];
+        $body = $item['Body'];
         $body = preg_replace('!\[spoiler\]!i', "\n[spoiler]\n", $body);
         $body = preg_replace('!\[/spoiler\]!i', "\n[/spoiler]\n", $body);
 
@@ -1225,7 +1253,7 @@ class MinionPlugin extends Gdn_Plugin {
             }
         }
 
-        $html = Gdn_Format::To($body, $object['Format']);
+        $html = Gdn_Format::To($body, $item['Format']);
         $config = array(
             'anti_link_spam' => array('`.`', ''),
             'comment' => 1,
