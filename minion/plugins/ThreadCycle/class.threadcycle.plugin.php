@@ -690,7 +690,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
             case 'threadcycle':
 
-                if (!array_key_exists('Discussion', $state['Targets'])) {
+                if (!key_exists('Discussion', $state['Targets'])) {
                     return;
                 }
 
@@ -756,7 +756,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
             case 'cyclewager':
 
-                if (!array_key_exists('Discussion', $state['Targets'])) {
+                if (!key_exists('Discussion', $state['Targets'])) {
                     return;
                 }
 
@@ -819,12 +819,12 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
 
                         // We require a wager!
-                        if (!array_key_exists('Wager', $state['Targets'])) {
+                        if (!key_exists('Wager', $state['Targets'])) {
                             throw new Exception(T("You didn't supply a wager amount!"));
                         }
 
                         // We require a time!
-                        if (!array_key_exists('Time', $state)) {
+                        if (!key_exists('Time', $state)) {
                             throw new Exception(T("You didn't supply a valid time!"));
                         }
                         $wagerTime = trim($state['Time'], ' .,!?/\\#@');
@@ -921,18 +921,13 @@ class ThreadCyclePlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add to rules
+     * Hook for E:Sanctions from MinionPlugin
+     *
+     * This event hook allows us to add core sanctions to the rule list.
      *
      * @param MinionPlugin $sender
      */
     public function MinionPlugin_Sanctions_Handler($sender) {
-
-        // Don't care about the rule bar
-
-        $type = val('Type', $sender->EventArguments, 'rules');
-        if ($type == 'bar') {
-            return;
-        }
 
         // Show a warning if there are rules in effect
 
@@ -943,11 +938,10 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             return;
         }
 
-        $rules = &$sender->EventArguments['Rules'];
-
-        // Thread is queued for recycled
         $page = val('Page', $threadCycle);
-        $rules[] = Wrap("<b>Thread Recycle</b>: page {$page}", 'span', array('class' => 'MinionRule'));
+
+        $rules = &$sender->EventArguments['Rules'];
+        $rules[] = wrap("<span class=\"icon icon-refresh\" title=\"".T('Auto recycle')."\"></span> Page {$page}", 'span', array('class' => 'MinionRule'));
     }
 
 }
