@@ -39,6 +39,7 @@ $PluginInfo['ThreadCycle'] = array(
 class ThreadCyclePlugin extends Gdn_Plugin {
 
     const WAGER_KEY = 'plugin.threadcycle.wager.%d';
+    const RECORD_KEY = 'plugin.threadcycle.record';
 
     public static $cycling = array();
 
@@ -356,6 +357,9 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             return false;
         }
 
+        // Re-index by userid
+        $wagers = array_column($wagers, null, 'UserID');
+
         // If only one person bet, don't take their money.
         if ($countWagers < 2) {
             $mode = 'return';
@@ -366,6 +370,8 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             ));
         }
 
+        $records = array();
+
         if ($mode == 'pay') {
 
             // Determine winner
@@ -375,11 +381,16 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
             $ordered = array();
             $potPoints = 0;
-            foreach ($wagers as $wagerRow) {
+            foreach ($wagers as $wagerUserID => $wagerRow) {
                 $wager = json_decode($wagerRow['Value'], true);
-                $wager['UserID'] = $wagerRow['UserID'];
+                $wager['UserID'] = $wagerUserID;
                 $absTimeDiff = abs($elapsed - $wager['For']);
                 $wager['Abs'] = $absTimeDiff;
+
+                $records[$wagerUserID] = array(
+                    'Points' => $wager['Points'],
+                    'Reward' => 0
+                );
 
                 if (!key_exists($absTimeDiff, $ordered)) {
                     $ordered[$absTimeDiff] = array();
@@ -406,11 +417,15 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 $haveRunnersUp = true;
                 $runnersUp = array_shift($ordered);
                 foreach ($runnersUp as &$rWager) {
+                    $rUserID = $rWager['UserID'];
                     $potPoints -= $rWager['Points'];
                     $returnPoints = floor($rWager['Points'] * $rakeMultiple);
-                    $rUser = Gdn::userModel()->getID($rWager['UserID'], DATASET_TYPE_ARRAY);
+                    $rUser = Gdn::userModel()->getID($rUserID, DATASET_TYPE_ARRAY);
                     $rUser['Points'] += $returnPoints;
-                    Gdn::userModel()->setField($rUser['UserID'], 'Points', $rUser['Points']);
+                    Gdn::userModel()->setField($rUserID, 'Points', $rUser['Points']);
+
+                    // Record returned points
+                    $records[$rUserID]['Reward'] = $returnPoints;
 
                     $rWager['Winnings'] = $returnPoints;
                     $rWager['User'] = $rUser;
@@ -429,6 +444,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 $winnerPotPoints += $winner['Points'];
             }
             foreach ($winners as &$wWager) {
+                $wUserID = $wWager['UserID'];
                 // If there are multiple winners, calculate winnings according to betting ratio
                 if ($split) {
                     $ratio = $wWager['Points'] / $winnerPotPoints;
@@ -436,9 +452,12 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 } else {
                     $winnings = $potPoints;
                 }
-                $wUser = Gdn::userModel()->getID($wWager['UserID'], DATASET_TYPE_ARRAY);
+                $wUser = Gdn::userModel()->getID($wUserID, DATASET_TYPE_ARRAY);
                 $wUser['Points'] += $winnings;
-                Gdn::userModel()->setField($wUser['UserID'], 'Points', $wUser['Points']);
+                Gdn::userModel()->setField($wUserID, 'Points', $wUser['Points']);
+
+                // Record won points
+                $records[$wUserID]['Reward'] = $winnings;
 
                 // Modify for formatting
                 $wWager['Winnings'] = $winnings;
@@ -497,7 +516,7 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         } else {
 
             // Return all points
-            foreach ($wagers as $wagerRow) {
+            foreach ($wagers as &$wagerRow) {
                 $wager = json_decode($wagerRow['Value'], true);
                 $lUser = Gdn::userModel()->getID($wagerRow['UserID'], DATASET_TYPE_ARRAY);
                 $lUser['Points'] += $wager['Points'];
@@ -509,6 +528,31 @@ class ThreadCyclePlugin extends Gdn_Plugin {
         // Delete all wagers
         foreach ($wagers as $wagerRow) {
             Gdn::userMetaModel()->setUserMeta($wagerRow['UserID'], $wagerRow['Name'], null);
+        }
+
+        // Update users' permanent records
+        foreach ($records as $recordUserID => $record) {
+            $wagerRecord = Gdn::userMetaModel()->getUserMeta($recordUserID, self::RECORD_KEY, null);
+            $wagerRecord = val(self::RECORD_KEY, $wagerRecord);
+
+            if (!is_array($wagerRecord)) {
+                $wagerRecord = array(
+                    'Wagers' => 0,
+                    'Points' => array(
+                        'Bet' => 0,
+                        'Won' => 0
+                    )
+                );
+            }
+
+            if (is_array($wagerRecord) && key_exists('Wagers', $wagerRecord)) {
+                $wagerRecord['Wagers']++;
+                $wagerRecord['Points']['Bet'] += $record['Points'];
+                $wagerRecord['Points']['Won'] += $record['Reward'];
+
+                $wagerSave = json_encode($wagerRecord);
+                Gdn::userMetaModel()->setUserMeta($recordUserID, self::RECORD_KEY, $wagerSave);
+            }
         }
     }
 
