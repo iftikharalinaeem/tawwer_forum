@@ -8,7 +8,7 @@
 $PluginInfo['ThreadCycle'] = array(
     'Name' => 'Minion: ThreadCycle',
     'Description' => "Provide a command to automatically cycle a thread after N pages.",
-    'Version' => '1.3',
+    'Version' => '1.4',
     'RequiredApplications' => array(
         'Vanilla' => '2.1a'
     ),
@@ -32,6 +32,7 @@ $PluginInfo['ThreadCycle'] = array(
  *  1.1     Improve new thread creator choices
  *  1.2     Further improve new thread creator choices
  *  1.3     Add speeds!
+ *  1.4     Add early bet bonus
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @package internal
@@ -439,6 +440,11 @@ class ThreadCyclePlugin extends Gdn_Plugin {
 
             // If there are multiple winners, determine total points wagered by winning bettors
 
+            $boost = C('Minion.ThreadCycle.Wager.Boost', 10);
+            $earlyWager = C('Minion.ThreadCycle.Wager.Early', 15);
+            $startTime = strtotime($discussion['DateInserted']);
+            $threadDuration = time() - $startTime;
+
             $winnerPotPoints = 0;
             foreach ($winners as $winner) {
                 $winnerPotPoints += $winner['Points'];
@@ -448,10 +454,20 @@ class ThreadCyclePlugin extends Gdn_Plugin {
                 // If there are multiple winners, calculate winnings according to betting ratio
                 if ($split) {
                     $ratio = $wWager['Points'] / $winnerPotPoints;
-                    $winnings = floor($ratio * $potPoints);
+                    $winnings = $ratio * $potPoints;
                 } else {
                     $winnings = $potPoints;
                 }
+
+                // Boost winnings for early bets
+                $wagerAt = strtotime($wWager['Date']) - $startTime;
+                $wagerAtPerc = round(($wagerAt / $threadDuration) * 100, 0);
+                if ($wagerAtPerc <= $earlyWager) {
+                    $wWager['Boost'] = $boost;
+                    $winnings *= (1 + ($boost / 100));
+                }
+
+                $winnings = floor($winnings);
                 $wUser = Gdn::userModel()->getID($wUserID, DATASET_TYPE_ARRAY);
                 $wUser['Points'] += $winnings;
                 Gdn::userModel()->setField($wUserID, 'Points', $wUser['Points']);
@@ -497,14 +513,18 @@ class ThreadCyclePlugin extends Gdn_Plugin {
             $message .= sprintf("<b>%s</b><br/>", plural($winnerCount, 'Winner', 'Winners'));
             foreach ($winners as $winningWager) {
                 svalr('Mention', $winningWager['User'], "@\"{$winningWager['User']['Name']}\"");
-                $message .= formatString(T("{User.Mention}, who bet {ForStr} with {Points} points and received <b>{Winnings}</b>"), $winningWager)."<br/>";
+                $message .= formatString(T("{User.Mention}, who bet <b>{ForStr}</b> with {Points} points and received <b>{Winnings}</b>"), $winningWager);
+                if (key_exists('Boost', $winningWager) && $winningWager['Boost']) {
+                    $message .= sprintf(T(" (%d%% early bet bonus)"), $winningWager['Boost']);
+                }
+                $message .= "<br/>";
             }
 
             if ($haveRunnersUp) {
                 $message .= sprintf("<b>%s</b><br/>", plural($winnerCount, 'Runner-up', 'Runners-up'));
                 foreach ($runnersUp as $ruWager) {
                     svalr('Mention', $ruWager['User'], "@\"{$ruWager['User']['Name']}\"");
-                    $message .= formatString(T("{User.Mention}, who bet {ForStr} with {Points} points and recovered <b>{Winnings}</b>"), $ruWager)."<br/>";
+                    $message .= formatString(T("{User.Mention}, who bet <b>{ForStr}</b> with {Points} points and recovered <b>{Winnings}</b>"), $ruWager)."<br/>";
                 }
             }
 
