@@ -37,7 +37,6 @@
         width: 100%
     }
     .blockgrid {
-        margin-right: -20px;
         margin-left: -20px;
     }
     .blockgrid li.float-left {
@@ -49,6 +48,38 @@
     .buttons {
         margin-top: 15px;
     }
+    .table-el {
+        table-layout: fixed;
+    }
+
+    .table-el th,
+    .table-el td {
+        padding: 5px 8px;
+        word-wrap: break-word;
+    }
+
+    .el-date {
+        width: 100px;
+    }
+    .el-user {
+        width: 100px;
+    }
+    .el-severity {
+        width: 75px;
+    }
+    .el-event {
+        width: 150px;
+    }
+    .el-ip {
+        width: 100px;
+    }
+
+/*<th class="el-date">Date</th>*/
+/*<th class="el-message">Message</th>*/
+/*<th class="el-user">User</th>*/
+/*<th class="el-severity">Severity</th>*/
+/*<th class="el-event">Event</th>*/
+/*<th class="el-ip">IP Address</th>*/
 </style>
 
 <h1>Event Logs</h1>
@@ -89,16 +120,15 @@ echo $this->Form->Errors();
 </div>
 <?php PagerModule::Write(array('Sender' => $this)); ?>
 
-<table class="AltColumns">
-
+<table class="AltColumns table-el">
     <thead>
         <tr>
-            <th>Date</th>
-            <th>Message</th>
-            <th>User</th>
-            <th>Severity</th>
-            <th>Event</th>
-            <th>IP Address</th>
+            <th class="el-date">Date</th>
+            <th class="el-message">Message</th>
+            <th class="el-user">User</th>
+            <th class="el-severity">Severity</th>
+            <th class="el-event">Event</th>
+            <th class="el-ip">IP Address</th>
         </tr>
     </thead>
 
