@@ -217,38 +217,48 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $category['ParentCategoryID'] = $categoryMap[$parentID];
             }
             $category['AllowDiscussions'] = true;
-
-            // See if there is an existing category.
-            $existingCategory = $categoryModel->GetWhereCache(['HubID' => $hubID]);
-            if (!$existingCategory) {
-                // Try linking by url code.
-                $existingCategory = $categoryModel->GetWhereCache(['UrlCode' => $category['UrlCode']]);
-                if ($existingCategory) {
-                    $existingCategory = array_shift($existingCategory);
-                }
-            } else {
-                $existingCategory = array_shift($existingCategory);
-            }
-
-            if ($existingCategory) {
-                $category['CategoryID'] = $existingCategory['CategoryID'];
-                $categoryMap[$hubID] = $existingCategory['CategoryID'];
-            }
-
             $permissions = val('Permissions', $category, []);
             unset($category['Permissions']);
+
             if (!empty($permissions)) {
                 $category['CustomPermissions'] = true;
-                foreach ($permissions as &$permissionRow) {
-                    $permissionRow['RoleID'] = $roleMap[$permissionRow['RoleID']];
+                foreach ($permissions as $i => $permissionRow) {
+                    $permissions[$i]['JunctionTable'] = 'Category';
+                    $permissions[$i]['JunctionColumn'] = 'PermissionCategoryID';
+                    $permissions[$i]['RoleID'] = $roleMap[$permissionRow['RoleID']];
+                    if ($hubID < 0) {
+                        $permissions[$i]['JunctionID'] = $hubID;
+                    }
                 }
                 $category['Permissions'] = $permissions;
             }
 
+            if ($hubID > 0) {
+                // See if there is an existing category.
+                $existingCategory = $categoryModel->GetWhereCache(['HubID' => $hubID]);
+                if (!$existingCategory) {
+                    // Try linking by url code.
+                    $existingCategory = $categoryModel->GetWhereCache(['UrlCode' => $category['UrlCode']]);
+                    if ($existingCategory) {
+                        $existingCategory = array_shift($existingCategory);
+                    }
+                } else {
+                    $existingCategory = array_shift($existingCategory);
+                }
 
-            $categoryID = $categoryModel->Save($category);
-            if ($categoryID) {
-                $categoryMap[$hubID] = $categoryID;
+                if ($existingCategory) {
+                    $category['CategoryID'] = $existingCategory['CategoryID'];
+                    $categoryMap[$hubID] = $existingCategory['CategoryID'];
+                }
+
+                $categoryID = $categoryModel->Save($category);
+                if ($categoryID) {
+                    $categoryMap[$hubID] = $categoryID;
+                }
+            } else {
+                foreach ($permissions as $permissionRow) {
+                    Gdn::PermissionModel()->Save($permissionRow);
+                }
             }
         }
     }
