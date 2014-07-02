@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.41',
+   'Version' => '1.3.42',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -143,8 +143,10 @@ class EditorPlugin extends Gdn_Plugin {
           'strike' => true,
           'orderedlist' => true,
           'unorderedlist' => true,
+          'indent' => false,
+          'outdent' => false,
 
-          'sep-format' => true, // separator
+         'sep-format' => true, // separator
           'color' => false,
           'highlightcolor' => false, // Dependent on color. TODO add multidim support.
           'font' => false,
@@ -403,6 +405,11 @@ class EditorPlugin extends Gdn_Plugin {
        *
        * TODO this is ugly. Pop everything into array, and build this in a loop.
        */
+
+//      <a data-wysihtml5-command="indent" title="Indent">
+//    <i class="icon-indent-left"></i>
+//</a>
+
       $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => T('Bold'), 'data-editor' => '{"action":"bold","value":""}'));
       $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => T('Italic'), 'data-editor' => '{"action":"italic","value":""}'));
       $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'strikethrough', 'title' => T('Strike'), 'data-editor' => '{"action":"strike","value":""}'));
@@ -413,6 +420,10 @@ class EditorPlugin extends Gdn_Plugin {
 
       $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => T('Ordered list'), 'data-editor' => '{"action":"orderedlist","value":""}'));
       $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => T('Unordered list'), 'data-editor' => '{"action":"unorderedlist","value":""}'));
+
+      $editorToolbarAll['indent'] = array('edit' => 'basic', 'action'=> 'indent', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-indent-right editor-dialog-fire-close', 'data-wysihtml5-command' => 'indent', 'title' => T('Indent'), 'data-editor' => '{"action":"indent","value":""}'));
+      $editorToolbarAll['outdent'] = array('edit' => 'basic', 'action'=> 'outdent', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-indent-left editor-dialog-fire-close', 'data-wysihtml5-command' => 'outdent', 'title' => T('Outdent'), 'data-editor' => '{"action":"outdent","value":""}'));
+
 
       $editorToolbarAll['sep-format'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-headers editor-optional-button'));
       $editorToolbarAll['format'] = array('edit' => 'format', 'action'=> 'headers', 'type' =>
