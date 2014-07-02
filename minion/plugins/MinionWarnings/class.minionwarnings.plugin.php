@@ -69,25 +69,17 @@ class MinionWarnings extends Gdn_Plugin {
         $state = &$sender->EventArguments['State'];
 
         // If we don't know the originating user, try to detect by a quote
-        if (!array_key_exists('User', $state['Targets'])) {
+        if (!key_exists('User', $state['Targets'])) {
             $sender->matchQuoted($state);
         }
 
         switch ($state['Method']) {
             case 'warn':
-
-                if (array_key_exists('User', $state['Targets'])) {
-                    $actions[] = array('warn', C('Minion.Access.Warn', 'Garden.Moderation.Manage'), $state);
-                }
-
+                $actions[] = array('warn', C('Minion.Access.Warn', 'Garden.Moderation.Manage'), $state);
                 break;
 
             case 'ban':
-
-                if (array_key_exists('User', $state['Targets'])) {
-                    $actions[] = array('ban', C('Minion.Access.Ban', 'Garden.Moderation.Manage'), $state);
-                }
-
+                $actions[] = array('ban', C('Minion.Access.Ban', 'Garden.Moderation.Manage'), $state);
                 break;
         }
     }
@@ -109,8 +101,11 @@ class MinionWarnings extends Gdn_Plugin {
             case 'warn':
             case 'ban':
 
-                if (!array_key_exists('User', $state['Targets'])) {
-                    return;
+                if (!key_exists('User', $state['Targets'])) {
+                    $this->acknowledge(null, T('You must supply a valid target user.'), 'custom', $state['Sources']['User'], array(
+                        'Comment' => false
+                    ));
+                    break;
                 }
 
                 $force = val('Force', $state, MinionPlugin::FORCE_MEDIUM);
@@ -147,7 +142,7 @@ class MinionWarnings extends Gdn_Plugin {
                     $options
                 );
 
-                $gloatReason = val('GloatReason', MinionPlugin::instance()->EventArguments);
+                $gloatReason = val('GloatReason', $sender->EventArguments);
                 if ($punished && $gloatReason) {
                     $sender->gloat($state['Targets']['User'], $state['Sources']['Discussion'], $gloatReason);
                 }
@@ -216,11 +211,14 @@ class MinionWarnings extends Gdn_Plugin {
                 return;
         }
 
+        $mod = array();
+
         $note = $automated ? formatString(T('Automated warning assigned by {Minion.Name}. '), array(
             'Minion' => $sender->minion()
         )) : '';
-        if (array_key_exists('Invoker', $options)) {
+        if (key_exists('Invoker', $options)) {
             $note .= sprintf(T('Invoked by %s. '), valr('Invoker.Name', $options));
+            $mod['InsertUserID'] = $sender->getMinionUserID();
         }
 
         if ($expires) {
@@ -237,10 +235,12 @@ class MinionWarnings extends Gdn_Plugin {
             'UserID' => $userID,
             'Body' => $message,
             'Format' => 'TextEx',
-
             'Points' => $points,
             'ExpiresString' => $expires == null ? null : "+ {$expires}"
         );
+
+        // Locally modify before saving
+        $warning = array_merge($warning, $mod);
 
         if ($commentID) {
             $warning = array_merge($warning, array(
