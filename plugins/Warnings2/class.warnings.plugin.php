@@ -9,7 +9,7 @@
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.1b',
+    'Version' => '2.1.1',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -29,7 +29,18 @@ $PluginInfo['Warnings2'] = array(
 class Warnings2Plugin extends Gdn_Plugin {
 
     /// Propeties ///
+
+    /**
+     * @var bool Whether or not to restrict the viewing of warnings on posts.
+     */
+    public $PublicPostWarnings = false;
+
     /// Methods ///
+
+    public function __construct() {
+        parent::__construct();
+        $this->FireEvent('Init');
+    }
 
     public function Setup() {
         $this->Structure();
@@ -149,24 +160,24 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param array $Args
      */
     public function Base_BeforeCommentBody_Handler($Sender, $Args) {
-        if (C('Warnings.View.Restricted', true)) {
-            // Only show warnings to moderators
-            if (!Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false)) {
-                return;
-            }
-        }
-
         if (isset($Args['Comment'])) {
             $Row = $Args['Comment'];
         } else {
             $Row = $Args['Discussion'];
         }
 
+        if (!$this->PublicPostWarnings) {
+            // Only show warnings to moderators
+            if (val('InsertUserID', $Row) != Gdn::Session()->UserID && !Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false)) {
+                return;
+            }
+        }
+
         $Row->Attributes = Gdn_Format::Unserialize($Row->Attributes);
         if (isset($Row->Attributes['WarningID']) && $Row->Attributes['WarningID']) {
             if (!isset($Row->Attributes['Reversed']) || !$Row->Attributes['Reversed']) {
-                echo '<div class="DismissMessage Warning">' .
-                sprintf(T('%s was warned for this post.', '%s was <a href="%s">warned</a> for this post.'), htmlspecialchars(val('InsertName', $Row)), UserUrl($Row, 'Insert', 'notes')),
+                echo '<div class="DismissMessage Warning">'.
+                sprintf(T('%s was warned for this post.'), htmlspecialchars(val('InsertName', $Row))).
                 '</div>';
             }
         }
@@ -499,7 +510,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         $IsPrivileged = Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false);
 
         // We can choose to allow regular users to see warnings or not. Default not.
-        if (!$IsPrivileged && C('Warnings.View.Restricted', true)) {
+        if (!$IsPrivileged && Gdn::Session()->UserID != valr('User.UserID', $Sender)) {
             return;
         }
         $Sender->AddProfileTab(T('Moderation'), UserUrl($Sender->User, '', 'notes'), 'UserNotes');
@@ -518,11 +529,6 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $IsPrivileged = Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false);
 
-        // We can choose to allow regular users to see warnings or not. Default not.
-        if (!$IsPrivileged && C('Warnings.View.Restricted', true)) {
-            throw ForbiddenException('Warnings');
-        }
-
         $Sender->SetData('IsPrivileged', $IsPrivileged);
 
         // Users should only be able to see their own warnings
@@ -536,8 +542,12 @@ class Warnings2Plugin extends Gdn_Plugin {
         list($Offset, $Limit) = OffsetLimit($Page, 30);
 
         $UserNoteModel = new UserNoteModel();
+        $Where = array('UserID' => $Sender->User->UserID);
+        if (!$IsPrivileged) {
+           $Where['Type'] = 'warning';
+        }
         $Notes = $UserNoteModel->GetWhere(
-            array('UserID' => $Sender->User->UserID), 'DateInserted', 'desc', $Limit, $Offset
+            $Where, 'DateInserted', 'desc', $Limit, $Offset
         )->ResultArray();
         $UserNoteModel->Calculate($Notes);
 

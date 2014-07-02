@@ -7,11 +7,6 @@ $IsPrivileged = $this->Data('IsPrivileged');
 
 <ul class="DataList DataList-Notes">
    <?php foreach ($this->Data('Notes', array()) as $Row): ?>
-   <?php
-      if (!$IsPrivileged && $Row['Type'] != 'warning') {
-         continue;
-      }
-   ?>
    <li id="UserNote_<?php echo $Row['UserNoteID']; ?>" class="Item Item-Row <?php echo 'UserNote-'.$Row['Type'] ?>">
       <?php
       $Func = "WriteUserNote{$Row['Type']}";
