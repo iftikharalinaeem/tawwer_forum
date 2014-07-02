@@ -118,7 +118,9 @@ class SecurityWordsPlugin extends Gdn_Plugin {
             'Plugins.securitywords.words' => array(
                 'LabelCode' => 'Security Words',
                 'Control' => 'TextBox',
-                'Description' => 'Provide a semicolon-separated list of words that will trigger the need for moderation against a post with those security words.',
+                'Description' => 'Provide a semicolon-separated list of words
+                                  that will trigger the need for moderation
+                                  against a post with those security words.',
                 'Options' => array(
                     'MultiLine' => true
                 )
