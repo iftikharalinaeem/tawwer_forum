@@ -545,4 +545,11 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
     }
 
+    /**
+     * @param MultisitesController $sender
+     */
+    public function multisitesController_nodeConfig_render($sender) {
+        TouchValue('Plugins.Cleanspeak.ApplicationID', $sender->Data['Config'], C('Plugins.Cleanspeak.ApplicationID'));
+        TouchValue('Plugins.Cleanspeak.ApiUrl', $sender->Data['Config'], C('Plugins.Cleanspeak.ApiUrl'));
+    }
 }
