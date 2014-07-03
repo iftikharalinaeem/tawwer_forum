@@ -145,6 +145,15 @@ class MultisitesController extends DashboardController {
 
         // Get the base config.
         $config = C('NodeConfig', []);
+
+        // Parse out the node config into a version that is
+        $configSettings = val('Config', $config, []);
+        $realConfigSettings = [];
+        foreach ($configSettings as $key => $value) {
+            $realConfigSettings[str_replace('-', '.', $key)] = $value;
+        }
+        $config['Config'] = $realConfigSettings;
+
         $this->SetData($config);
 
         // Get the roles.
