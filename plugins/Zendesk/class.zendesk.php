@@ -184,12 +184,18 @@ class Zendesk {
             //throw not found
             throw new Gdn_UserException('Invalid URL: ' . $this->apiUrl . $Url . "\n", 404);
         }
+
+        if ($HttpCode == 422) {
+            //throw not found
+            throw new Gdn_UserException('Error: Zendesk Account is expired.', 422);
+        }
+
         if ($HttpCode == 401 || $HttpCode == 429) {
             //429 - auth error; repeated...
             throw new Gdn_UserException('Authentication Error. Check your settings');
         }
         if ($HttpCode != 200 && $HttpCode != 201) {
-            throw new Gdn_UserException('Error making request. Try again later ->' . $HttpCode);
+            throw new Gdn_UserException('Error making request. Try again later -> ' . $HttpCode);
         }
 
         if (!is_array($Decoded)) {
