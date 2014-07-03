@@ -146,13 +146,14 @@ class EditorPlugin extends Gdn_Plugin {
           'indent' => false,
           'outdent' => false,
 
-         'sep-format' => true, // separator
+          'sep-format' => true, // separator
           'color' => false,
           'highlightcolor' => false, // Dependent on color. TODO add multidim support.
-          'font' => false,
           'format' => true,
+          'fontfamily' => false,
 
-          'sep-media' => true, // separator
+
+         'sep-media' => true, // separator
           'emoji' => true,
           'links' => true,
           'images' => false,
@@ -204,6 +205,91 @@ class EditorPlugin extends Gdn_Plugin {
       );
 
       return $fontColorList;
+   }
+
+   /**
+    * Generate list of font families. Remember to create corresponding CSS.
+    *
+    * @return array
+    */
+   public function getFontFamilyOptions() {
+      $fontFamilyOptions = array(
+
+         'separator' => array(
+            'text' => '',
+            'command' => '',
+            'value' => '',
+            'class' => 'dd-separator',
+            'html_tag' => 'div'
+         ),
+
+         'default' => array(
+            'text' => 'Default font',
+            'font-family' => "",
+            'command' => 'fontfamily',
+            'value' => 'default',
+            'class' => 'post-fontfamily-default'
+         ),
+
+         'arial' => array(
+            'text' => 'Arial',
+            'font-family' => "Arial, 'Helvetica Neue', Helvetica, sans-serif",
+            'command' => 'fontfamily',
+            'value' => 'arial',
+            'class' => 'post-fontfamily-arial'
+         ),
+         'comicsansms' => array(
+            'text' => 'Comic Sans MS',
+            'font-family' => "'Comic Sans MS', cursive",
+            'command' => 'fontfamily',
+            'value' => 'comicsansms',
+            'class' => 'post-fontfamily-comicsansms'
+         ),
+         'couriernew' => array(
+            'text' => 'Courier New',
+            'font-family' => "'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace",
+            'command' => 'fontfamily',
+            'value' => 'couriernew',
+            'class' => 'post-fontfamily-couriernew'
+         ),
+         'georgia' => array(
+            'text' => 'Georgia',
+            'font-family' => "Georgia, Times, 'Times New Roman', serif",
+            'command' => 'fontfamily',
+            'value' => 'georgia',
+            'class' => 'post-fontfamily-georgia'
+         ),
+         'impact' => array(
+            'text' => 'Impact',
+            'font-family' => "Impact, Haettenschweiler, 'Franklin Gothic Bold', Charcoal, 'Helvetica Inserat', 'Bitstream Vera Sans Bold', 'Arial Black', sans-serif",
+            'command' => 'fontfamily',
+            'value' => 'impact',
+            'class' => 'post-fontfamily-impact'
+         ),
+         'timesnewroman' => array(
+            'text' => 'Times New Roman',
+            'font-family' => "'Times New Roman', Times, Baskerville, Georgia, serif",
+            'command' => 'fontfamily',
+            'value' => 'timesnewroman',
+            'class' => 'post-fontfamily-timesnewroman'
+         ),
+         'trebuchetms' => array(
+            'text' => 'Trebuchet MS',
+            'font-family' => "'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif",
+            'command' => 'fontfamily',
+            'value' => 'trebuchetms',
+            'class' => 'post-fontfamily-trebuchetms'
+         ),
+         'verdana' => array(
+            'text' => 'Verdana',
+            'font-family' => "Verdana, Geneva, sans-serif",
+            'command' => 'fontfamily',
+            'value' => 'verdana',
+            'class' => 'post-fontfamily-verdana'
+         )
+      );
+
+      return $fontFamilyOptions;
    }
 
    /**
@@ -305,11 +391,13 @@ class EditorPlugin extends Gdn_Plugin {
       $allowedEditorActions = $this->getAllowedEditorActions();
       $fontColorList        = $this->getFontColorList();
       $fontFormatOptions = $this->getFontFormatOptions();
+      $fontFamilyOptions = $this->getFontFamilyOptions();
 
       // Let plugins and themes override the defaults.
       $this->EventArguments['actions'] =& $allowedEditorActions;
       $this->EventArguments['colors'] =& $fontColorList;
       $this->EventArguments['format'] =& $fontFormatOptions;
+      $this->EventArguments['font'] =& $fontFamilyOptions;
       $this->FireEvent('toolbarConfig');
 
       // Order the specified dropdowns.
@@ -397,6 +485,37 @@ class EditorPlugin extends Gdn_Plugin {
                'title' => T($emojiTitle),
                'data-editor' => $editorDataAttr));
       }
+
+      // Font family options.
+      $toolbarFontFamilyOptions = array();
+      foreach ($fontFamilyOptions as $editorAction => $actionValues) {
+         $htmlTag = (!empty($actionValues['html_tag']))
+            ? $actionValues['html_tag']
+            : 'a';
+
+         $toolbarFontFamilyOptions[] = array(
+            'edit' => 'fontfamily',
+            'action'=> $editorAction,
+            'type' => 'button',
+            'text' => $actionValues['text'],
+            'html_tag' => $htmlTag,
+            'attr' => array(
+               'class' => "editor-action editor-action-{$editorAction} editor-dialog-fire-close {$actionValues['class']}",
+               'data-wysihtml5-command' => $actionValues['command'],
+               'data-wysihtml5-command-value' => $actionValues['value'],
+               'title' => $actionValues['text'],
+               'data-editor' => '{"action":"' . $actionValues['command'] . '","value":"' . $actionValues['value'] . '"}'
+            )
+         );
+      }
+
+      // If enabled, just merge with current formatting dropdown.
+      if ($allowedEditorActions['fontfamily']) {
+         $toolbarFormatOptions = array_merge($toolbarFormatOptions, $toolbarFontFamilyOptions);
+      }
+
+
+
 
       /**
        * Compile whole list of editor actions into single $editorToolbarAll
