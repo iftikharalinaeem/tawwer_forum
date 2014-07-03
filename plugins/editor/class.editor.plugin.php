@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.42',
+   'Version' => '1.3.43',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -264,7 +264,7 @@ class EditorPlugin extends Gdn_Plugin {
          'spoiler' => array(
             'text' => 'Spoiler',
             'command' => 'spoiler',
-            'value' => 'code',
+            'value' => 'spoiler',
             'class' => '',
             'sort' => 8
          )
@@ -405,10 +405,6 @@ class EditorPlugin extends Gdn_Plugin {
        *
        * TODO this is ugly. Pop everything into array, and build this in a loop.
        */
-
-//      <a data-wysihtml5-command="indent" title="Indent">
-//    <i class="icon-indent-left"></i>
-//</a>
 
       $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => T('Bold'), 'data-editor' => '{"action":"bold","value":""}'));
       $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => T('Italic'), 'data-editor' => '{"action":"italic","value":""}'));

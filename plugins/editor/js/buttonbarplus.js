@@ -335,7 +335,7 @@
             ButtonBar.BindShortcut(TextArea, 'strike', 'ctrl+S');
             ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+L');
             ButtonBar.BindShortcut(TextArea, 'code', 'ctrl+O');
-            ButtonBar.BindShortcut(TextArea, 'quote', 'ctrl+Q');
+            ButtonBar.BindShortcut(TextArea, 'blockquote', 'ctrl+Q');
             ButtonBar.BindShortcut(TextArea, 'post', 'tab');
          },
 
@@ -404,7 +404,7 @@
                   $(TextArea).insertRoundTag('code',bbcodeOpts);
                   break;
 
-               case 'quote':
+               case 'blockquote':
                   $(TextArea).insertRoundTag('quote',bbcodeOpts);
                   break;
 
@@ -548,7 +548,7 @@
                   }
                   break;
 
-               case 'quote':
+               case 'blockquote':
                   $(TextArea).insertRoundTag('blockquote',htmlOpts, {'class':'Quote'});
                   break;
 
@@ -700,7 +700,7 @@
                   }
                   break;
 
-               case 'quote':
+               case 'blockquote':
                   var thisOpts = $.extend(markdownOpts, {
                      prefix:'> ',
                      opentag:'',
