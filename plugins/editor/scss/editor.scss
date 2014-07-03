@@ -465,8 +465,9 @@ directly on the iframe's bodybox contenteditable. */
 .editor-format-html .editor-image-align,
 .editor-format-bbcode .editor-image-align,
 .editor-format-markdown .editor-image-align,
-.editor-format-bbcode .editor-action-h1,
-.editor-format-bbcode .editor-action-h2 {
+.editor-format-bbcode .editor-action-heading1,
+.editor-format-bbcode .editor-action-heading2,
+.editor-format-bbcode .editor-action-separator {
    /* Defined as important, because some themes have overriden with their own
       !important values. */
    display: none !important;
