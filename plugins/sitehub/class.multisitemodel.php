@@ -28,7 +28,7 @@ class MultisiteModel extends Gdn_Model {
     public function __construct($name = '') {
         parent::__construct('Multisite');
 
-        $this->Validation->AddRule('Slug', 'regex:`[a-z0-9-]`');
+        $this->Validation->AddRule('Slug', 'func:validate_slug');
         $this->Validation->ApplyRule('Slug', 'Slug', 'The slug must consist of numbers, lowercase letters or a slash.');
 
         $this->siteNameFormat = C('SiteHub.SiteNameFormat', '%s.vanillaforums.com');
@@ -193,14 +193,14 @@ class MultisiteModel extends Gdn_Model {
     public function Update($fields, $where = FALSE, $limit = FALSE) {
         // Clean out the fields that are in the schema, but not allowed to be updated.
         unset(
-            $fields['Name'],
-            $fields['Slug'],
+//            $fields['Name'],
+//            $fields['Slug'],
             $fields['Url'],
             $fields['Status'],
             $fields['DateStatus']
         );
 
-        return parent::Update($fields);
+        return parent::Update($fields, $where, $limit);
     }
 
     public function calculateRow(&$row) {
@@ -490,4 +490,11 @@ class MultisiteModel extends Gdn_Model {
 
         return $result;
     }
+}
+
+function validate_slug($value) {
+    if (!ValidateRequired($value)) {
+        return true;
+    }
+    return preg_match('`^[a-z0-9-]+$`', $value);
 }
