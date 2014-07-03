@@ -34,11 +34,7 @@ class MyFitnessPal extends ExportController {
             "select f.id, f.position, f.name, f.description, f.category_id, language, 'Default' as DisplayAs, 0 as AllowGroups
                 from forums f where language= 'en' and group_id is null
                 union all
-                select 1001, 0, 'Category 1', '', -1, 'en', 'Default', 0
-                union all
-                select 1002, 0, 'Category 2', '', -1, 'en', 'Default', 0
-                union all
-                select 1003, 0, 'Category 3', '', -1, 'en', 'Default', 0
+                select 1003, 0, 'Customer Support', '', -1, 'en', 'Default', 0
                 union all
                 select 1004, 0, 'Social Groups', '', -1, 'en', 'Discussions', 1
             "
@@ -53,7 +49,8 @@ class MyFitnessPal extends ExportController {
             'user_id' => 'InsertUserID',
             'created_at' => 'DateInserted',
             'update_at' =>  'DataUpdated',
-            'group_id' =>  'GroupID'
+            'group_id' =>  'GroupID',
+            'Format' => 'Format'
         );
 
         //1004 = social groups category id.
@@ -61,12 +58,26 @@ class MyFitnessPal extends ExportController {
             'Discussion',
             "select
                 t.*, p.body, locked as closed, f.group_id,
-                if (group_id is not null, '1004', p.forum_id) as CategoryID
+                'BBCode' as Format,
+                if (sticky>0, 1, 0) as Announce,
+
+                case
+                 when group_id is not null
+                 then 1004
+                 when group_id is null
+                 then p.forum_id
+                 when category_id = 2
+                 then 1003
+                 else null
+ 				end as CategoryID
+
                 from topics t
                 left join posts p on (t.id = p.topic_id and t.user_id = p.user_id )
                 left join forums f on (t.forum_id = f.id)
-				where language = '$lang'
-                group by t.id order by t.id",
+				where language = 'en'
+				and t.deleted = 0
+                group by t.id order by t.id
+                ",
             $Discussion_Map
         );
 
@@ -79,12 +90,15 @@ class MyFitnessPal extends ExportController {
             'body' => 'Body',
             'user_id' => 'InsertUserID',
             'created_at' => 'DateInserted',
-            'update_at' => 'DateUpdated'
+            'update_at' => 'DateUpdated',
+            'Format' => 'Format'
         );
 
         $Ex->ExportTable(
             'Comment',
-            "select p.* from posts p left join forums f on (forum_id = f.id) where language = '$lang'
+            "select p.*, 'BBCode' as Format from posts p
+              left join forums f on (forum_id = f.id) where
+              language = '$lang' and deleted = 0 and subject is null
             ",
             $Comment_Map
         );
@@ -117,7 +131,8 @@ class MyFitnessPal extends ExportController {
         $Ex->ExportTable(
             'Group',
             "select g.*,
-
+              1004 as CategoryID,
+              'BBCode' as Format,
               if (private=1, 'Private', 'Public') as Privacy,
               if (private=1, 'Approval', 'Public') as Registration,
               if (private=1, 'Members', 'Public') as Visibility
@@ -146,18 +161,28 @@ class MyFitnessPal extends ExportController {
         // Conversations
         $this->ExportConversations();
 
-        // Signatures
-        $Group_Member_Map = array(
+        // UserMeta // Signatures
+        $User_Meta_Map = array(
             'user_id' => 'UserID',
-            'group_id' => 'GroupID'
+            'group_id' => 'GroupID',
         );
         $Ex->ExportTable(
-            'UserGroup',
+            'UserMeta',
             "select
-                *
-                from forum_signatures
+                fs.user_id,
+                'Plugin.Signatures.Format' as Name,
+                'BBCode' as Value
+                from forum_signatures fs
+
+            union all
+
+            select
+                fs.user_id,
+                'Plugin.Signatures.Sig' as Name,
+                body as Value
+                from forum_signatures fs
             ",
-            $Group_Member_Map
+            $User_Meta_Map
         );
 
     }
