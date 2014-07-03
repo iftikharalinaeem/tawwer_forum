@@ -91,6 +91,16 @@ var wysihtml5ParserRules = {
         "post-text-align-left": 1,
         "post-text-align-right": 1,
 
+        "post-fontfamily-default": 1,
+        "post-fontfamily-arial": 1,
+        "post-fontfamily-comicsansms": 1,
+        "post-fontfamily-couriernew": 1,
+        "post-fontfamily-georgia": 1,
+        "post-fontfamily-impact": 1,
+        "post-fontfamily-timesnewroman": 1,
+        "post-fontfamily-trebuchetms": 1,
+        "post-fontfamily-verdana": 1,
+
         "Spoiler": 1,
         "Quote": 1,
         "CodeBlock": 1,
