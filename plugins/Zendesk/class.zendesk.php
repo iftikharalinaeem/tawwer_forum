@@ -12,7 +12,6 @@ class Zendesk {
     protected $apiUrl;
     protected $apiUser;
     protected $apiToken;
-    protected $logging = false;
 
     /**
      * Setup Properties.
@@ -27,19 +26,6 @@ class Zendesk {
         $this->AccessToken = $AccessToken;
     }
 
-    /**
-     * Enable Logging.
-     */
-    public function enableLogging() {
-        $this->logging = true;
-    }
-
-    /**
-     * Disable Logging.
-     */
-    public function disableLogging() {
-        $this->logging = true;
-    }
 
     /**
      * Create Ticket using the Zendesk API.
@@ -132,13 +118,12 @@ class Zendesk {
      * @param string $Url URL ie /tickets.json.
      * @param null|string $Json JSON encoded data to be used Required for POST and PUT actions.
      * @param string $Action POST, GET, PUT, DELETE.
-     * @param bool $Logging Enable logging to error log.
      * @param bool $Cache Cache result. Only if http code 200 and method GET.
      *
      * @throws Exception If errors.
      * @return mixed json
      */
-    public function zendeskRequest($Url, $Json = null, $Action = 'GET', $Logging = false, $Cache = false) {
+    public function zendeskRequest($Url, $Json = null, $Action = 'GET', $Cache = false) {
 
         Trace($Action . ' ' . $this->apiUrl . $Url);
 
@@ -195,24 +180,22 @@ class Zendesk {
             ));
         }
 
-        if ($this->logging || $Logging) {
-//@todo Update to use Logger when its been added to core.
-//            error_log('Curl Request: ' . $this->apiUrl . $Url);
-//            error_log('Curl JSON: ' . var_export(json_decode($Json), true));
-//            error_log('Output: ' . $Output);
-//            error_log('Decoded Response: ' . var_export($Decoded, true));
-        }
-
         if ($HttpCode == 404) {
             //throw not found
             throw new Gdn_UserException('Invalid URL: ' . $this->apiUrl . $Url . "\n", 404);
         }
+
+        if ($HttpCode == 422) {
+            //throw not found
+            throw new Gdn_UserException('Error: Zendesk Account is expired.', 422);
+        }
+
         if ($HttpCode == 401 || $HttpCode == 429) {
             //429 - auth error; repeated...
             throw new Gdn_UserException('Authentication Error. Check your settings');
         }
         if ($HttpCode != 200 && $HttpCode != 201) {
-            throw new Gdn_UserException('Error making request. Try again later ->' . $HttpCode);
+            throw new Gdn_UserException('Error making request. Try again later -> ' . $HttpCode);
         }
 
         if (!is_array($Decoded)) {
