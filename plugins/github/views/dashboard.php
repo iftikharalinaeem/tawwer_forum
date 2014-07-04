@@ -107,9 +107,9 @@ echo $this->Form->Errors();
 
 <h3 id="global-login">Global Login</h3>
 <div class="Info">
-    <p><?php echo T('This feature will allow you to have all Staff use one Github Connection.'); ?></p>
+    <p><?php echo T('This feature will allow you to have all Staff use one Github connection.'); ?></p>
 
-    <p><?php echo T('If a user has a connection already established we will use that instead.'); ?>'</p>
+    <p><?php echo T('If a user has a connection already established we will use that instead.'); ?></p>
 </div>
 
 <?php if (!$this->Data['GlobalLoginEnabled']) { ?>
@@ -121,7 +121,7 @@ echo $this->Form->Errors();
 <?php } else { ?>
 
     <div class="Info">
-        <?php echo T('Global Login is currently'); ?> <strong><?php echo T('Enabled'); ?></strong>
+        <?php echo T('Global login is currently'); ?> <strong><?php echo T('Enabled'); ?></strong>
 
         <?php if ($this->Data['GlobalLoginConnected']) { ?>
 
