@@ -65,10 +65,10 @@ set ud.Participated = 1;
 
 # These updates for sites that have the groups application enabled.
 update GDN_Group g
-    set DateLastComment = (select max(c.DateInserted) from GDN_Comment c join GDN_Discussion d on (c.DiscussionID = d.DiscussionID) where d.GroupID = g.GroupID)
+    set DateLastComment = (select max(c.DateInserted) from GDN_Comment c join GDN_Discussion d on (c.DiscussionID = d.DiscussionID) where d.GroupID = g.GroupID);
 
 update GDN_Group g
-    set CountMembers = (select count(ug.UserGroupID) from GDN_UserGroup ug where ug.GroupID = g.GroupID and g.GroupID = ug.GroupID)
+    set CountMembers = (select count(ug.UserGroupID) from GDN_UserGroup ug where ug.GroupID = g.GroupID and g.GroupID = ug.GroupID);
 
 update GDN_Group g
-    set CountDiscussions = (select count(d.DiscussionID) from GDN_Discussion d where d.GroupID = g.GroupID)
+    set CountDiscussions = (select count(d.DiscussionID) from GDN_Discussion d where d.GroupID = g.GroupID);
