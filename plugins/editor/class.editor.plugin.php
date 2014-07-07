@@ -180,7 +180,8 @@ class EditorPlugin extends Gdn_Plugin {
     * Note: in building the dropdown, each color is styled inline, but it will
     * still be required to add the appropriate post-color-* CSS class selectors
     * in the external stylesheet, so that when viewing a posted comment, the
-    * color will appear.
+    * color will appear. In addition, the class names must be whitelisted in
+    * advanced.js. Not all colors in the CSS stylesheet are included here.
     *
     * Note: use these http://clrs.cc/ and purple: #7b11d0
     *
