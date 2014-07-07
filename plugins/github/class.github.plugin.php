@@ -620,6 +620,18 @@ class GithubPlugin extends Gdn_Plugin {
      */
     public function discussionController_githubIssue_create($Sender, $Args) {
 
+        if ($this->accessToken === null) {
+            $this->setAccessToken();
+        }
+
+
+        if (!$this->isConnected()) {
+
+            $Sender->SetData('LoginURL', Url('/profile/connections'));
+            $Sender->Render('reconnect', '', 'plugins/github');
+            return;
+        }
+
         // Signed in users only.
         if (!(Gdn::Session()->IsValid())) {
             throw PermissionException('Garden.Signin.Allow');

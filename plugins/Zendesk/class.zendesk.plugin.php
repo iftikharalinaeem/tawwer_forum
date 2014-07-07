@@ -7,8 +7,7 @@
 // Define the plugin:
 $PluginInfo['Zendesk'] = array(
     'Name' => 'Zendesk',
-    'Description' => "Users may designate a discussion as a Support Issue and the message will be submitted to Zendesk."
-        . "Reply will be added to thread",
+    'Description' => "Allow staff users to create tickets and cases from discussions and comments.",
     'Version' => '0.0.4-beta',
     'RequiredApplications' => array('Vanilla' => '2.1.18'),
     'SettingsUrl' => '/dashboard/plugin/zendesk',
@@ -16,7 +15,8 @@ $PluginInfo['Zendesk'] = array(
     'MobileFriendly' => true,
     'Author' => 'John Ashton',
     'AuthorEmail' => 'john@vanillaforums.com',
-    'AuthorUrl' => 'http://www.github.com/John0x00'
+    'AuthorUrl' => 'http://www.github.com/John0x00',
+    'SocialConnect' => false
 );
 
 /**
@@ -66,15 +66,6 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Adds CSS To page.
-     *
-     * @param AssetModel $Sender Sending controller.
-     */
-    public function assetModel_styleCss_handler($Sender) {
-        $Sender->AddCssFile('zendesk.css', 'plugins/Zendesk');
-    }
-
-    /**
      * Writes and updates discussion attachments.
      *
      * @param DiscussionController $Sender Sending controller.
@@ -120,14 +111,11 @@ class ZendeskPlugin extends Gdn_Plugin {
         }
         $Attachments = GetValue('Attachments', $Args[$Content]);
         if ($Attachments) {
-            $ParsedAttachments = array();
-            foreach ($Args[$Content]->Attachments as $Key => $Attachment) {
+            foreach ($Args[$Content]->Attachments as $Attachment) {
                 if ($Attachment['Type'] == 'zendesk-ticket') {
-                    $ParsedAttachments[$Key] = $Args[$Content]->ParsedAttachments[$Key];
                     $this->UpdateAttachment($Attachment);
                 }
             }
-            WriteAttachments($ParsedAttachments);
         }
 
     }
@@ -548,6 +536,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * Setup Config Settings.
      */
     protected function setupConfig() {
+        SaveToConfig('Garden.AttachmentsEnabled', true);
         $ConfigSettings = array(
             'Url',
             'ApplicationID',
@@ -740,8 +729,7 @@ class ZendeskPlugin extends Gdn_Plugin {
                 ->Dispatch('home/error');
             return;
         }
-        $AccessToken = GetValue('access_token', $Tokens);
-
+        $this->accessToken = GetValue('access_token', $Tokens);
         $this->setZendesk();
         $profile = $this->zendesk->getProfile();
 
@@ -753,7 +741,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             )
         );
         $Attributes = array(
-            'AccessToken' => $AccessToken,
+            'AccessToken' => $this->accessToken,
             'Profile' => $profile,
         );
         Gdn::UserModel()->SaveAttribute($Sender->User->UserID, self::PROVIDER_KEY, $Attributes);
@@ -808,61 +796,6 @@ class ZendeskPlugin extends Gdn_Plugin {
 
     //end of OAUTH
 
-    /**
-     * Parse Attachmetns for view.
-     *
-     * @param salesforcePlugin $Sender Sending controller.
-     * @param array $Args Event Arguments.
-     */
-    public function salesforcePlugin_parseAttachments_handler($Sender, $Args) {
-        if (GetValue('Attachments', $Args['Content'])) {
-            foreach ($Args['Content']->Attachments as $Key => $Attachment) {
-                if ($Attachment['Source'] == 'zendesk') {
-                    $Args['Content']->ParsedAttachments[$Key] = self::ParseAttachmentForHtmlView($Attachment);
-                }
-            }
-        }
-    }
-
-    /**
-     * Given an instance of the attachment model, parse it into a format that the attachment view can digest.
-     *
-     * @param array $Attachment Attachment.
-     *
-     * @return array
-     */
-    public static function parseAttachmentForHtmlView($Attachment) {
-
-        $UserModel = new UserModel();
-        $InsertUser = $UserModel->GetID($Attachment['InsertUserID']);
-
-        $Parsed = array();
-        $Parsed['Icon'] = 'ticket';
-        $Parsed['Title'] = T('Ticket') . ' &middot; ' . Anchor(
-            T($Attachment['Source']),
-            $Attachment['SourceURL']
-        );
-        $Parsed['Meta'] = array(
-            Gdn_Format::Date($Attachment['DateInserted'], 'html') . ' ' . T('by') . ' ' . UserAnchor($InsertUser)
-        );
-
-        if (GetValue('Error', $Attachment)) {
-            $Parsed['Type'] = 'info';
-            $Parsed['Body'] = $Attachment['Error'];
-        } else {
-            $Parsed['Fields'] = array();
-            $Status = GetValue('Status', $Attachment);
-            $LastModified = GetValue('Status', $Attachment);
-            if ($Status) {
-                $Parsed['Fields']['Status'] = $Status;
-            }
-            if ($LastModified) {
-                $Parsed['Fields']['Last Updated'] = Gdn_Format::Date($LastModified, 'html');
-            }
-        }
-
-        return $Parsed;
-    }
 
     /**
      * Lazy Load Zendesk object.
@@ -875,5 +808,14 @@ class ZendeskPlugin extends Gdn_Plugin {
                 $this->accessToken
             );
         }
+    }
+
+    /**
+     * Add attachment views.
+     *
+     * @param DiscussionController $Sender Sending Controller.
+     */
+    public function DiscussionController_FetchAttachmentViews_Handler($Sender) {
+        require_once $Sender->FetchViewLocation('attachment', '', 'plugins/Zendesk');
     }
 }
