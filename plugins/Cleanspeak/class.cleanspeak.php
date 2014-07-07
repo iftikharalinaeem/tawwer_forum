@@ -147,25 +147,23 @@ class Cleanspeak extends Gdn_Pluggable {
 
         $response = $proxyRequest->Request($options, $queryParams, null, $headers);
 
-        Logger::log(Logger::DEBUG, 'Cleanspeak API Response.', array($response));
-
         if ($proxyRequest->ResponseStatus == 400) {
+            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', json_decode($response, true));
             throw new CleanspeakException('Error in cleanspeak request.');
-        }
-
-        // check for timeouts.
-        if ($proxyRequest->ResponseStatus == 0) {
+        } elseif ($proxyRequest->ResponseStatus == 0) {
+            Logger::log(Logger::ERROR, 'Cleanspeak Error in API. No Response.');
             throw new CleanspeakException('Error communicating with the cleanspeak server.', 500);
-            //throw new Gdn_UserException('Error communicating with the cleanspeak server.', 500);
-        }
-
-        if ($proxyRequest->ResponseStatus != 200) {
+        } elseif ($proxyRequest->ResponseStatus != 200) {
+            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', json_decode($response, true));
             throw new CleanspeakException('Error communicating with the cleanspeak server.');
+        } else {
+            Logger::log(Logger::DEBUG, 'Cleanspeak API Response.', array($response));
         }
 
         if (stristr($proxyRequest->ResponseHeaders['Content-Type'], 'application/json') != false) {
             $response = json_decode($response, true);
         }
+
 
         return $response;
 

@@ -1688,6 +1688,26 @@
                               }
                           };
                       })(wysihtml5);
+
+                     // extending whysihtml5 library for font families
+                     (function(wysihtml5) {
+                        var undef,
+                           REG_EXP = /post-fontfamily-[0-9a-z-]+/g;
+
+                        wysihtml5.commands.fontfamily = {
+                           exec: function(composer, command, fontfamily) {
+                              wysihtml5.commands.formatInline.exec(composer, command, "span", "post-fontfamily-" + fontfamily, REG_EXP);
+                           },
+
+                           state: function(composer, command, fontfamily) {
+                              return wysihtml5.commands.formatInline.state(composer, command, "span", "post-fontfamily-" + fontfamily, REG_EXP);
+                           },
+
+                           value: function() {
+                              return undef;
+                           }
+                        };
+                     })(wysihtml5);
                   });
                 break;
 
