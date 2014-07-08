@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.3.47',
+   'Version' => '1.3.48',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -1337,6 +1337,15 @@ class EditorPlugin extends Gdn_Plugin {
       return $validDestination;
    }
 
+  /**
+   * Add upload option checkbox to custom permissions for categories.
+   *
+   * @param Gdn_Controller $Sender
+   */
+   public function SettingsController_AddEditCategory_Handler($Sender) {
+      $Sender->Data['_PermissionFields']['AllowFileUploads'] = array('Control' => 'CheckBox');
+   }
+
    /**
     *
     * @param SettingsController $Sender
@@ -1403,6 +1412,12 @@ class EditorPlugin extends Gdn_Plugin {
   public function Structure() {
       // Set to false by default, so change in config if uploads allowed.
       TouchConfig('Garden.AllowFileUploads', true);
+
+     $Structure = Gdn::Structure();
+     $Structure
+        ->Table('Category')
+        ->Column('AllowFileUploads', 'tinyint(1)', '1')
+        ->Set();
   }
 
    public function OnDisable() {
