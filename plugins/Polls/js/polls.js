@@ -1,5 +1,14 @@
 jQuery(document).ready(function($) {
 
+    // Composing a new poll, let poll options duplicate. This used to be inline,
+    // which generated a race condition between jQuery being defined, and this
+    // code running.
+    if ($.fn.duplicate) {
+        $('.PollOption').duplicate({
+            addButton: '.AddPollOption'
+        });
+    }
+
    $(document).on('click', '.PollForm form :submit', function() {
       var btn = this,
          frm = $(this).parents('form');
