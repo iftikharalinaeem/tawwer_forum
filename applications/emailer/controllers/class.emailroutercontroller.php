@@ -156,7 +156,7 @@ class EmailRouterController extends Gdn_Controller {
 
             if ($this->isOutOfOffice($Headers, $Data)) {
                $Data['Response'] = 202;
-               $Data['ResponseText'] = ['Out of office'];
+               $Data['ResponseText'] = 'Out of office';
                $LogID = $LogModel->Insert($Data);
                return;
             }
