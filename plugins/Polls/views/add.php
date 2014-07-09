@@ -9,12 +9,7 @@ if (!$CancelUrl) {
    $CancelUrl = '/vanilla/categories/' . urlencode($this->Category->UrlCode);
 }
 ?>
-<script type="text/javascript">
-   jQuery(document).ready(function($){
-      if ($.fn.duplicate)
-         $('.PollOption').duplicate({addButton:'.AddPollOption'});
-   });
-</script>
+
 <div id="NewPollForm" class="NewPollForm DiscussionForm FormTitleWrapper">
    <?php
    if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
@@ -57,7 +52,7 @@ if (!$CancelUrl) {
             if (is_array($PollOptions)) {
                foreach ($PollOptions as $PollOption) {
                   $PollOption = trim(Gdn_Format::PlainText($PollOption));
-                  if ($PollOption != '') 
+                  if ($PollOption != '')
                      echo '<li class="PollOption">' . $this->Form->TextBox('PollOption[]', array('value' => $PollOption, 'class' => 'InputBox BigInput')) . '</li>';
                }
             }
