@@ -221,6 +221,7 @@ class PollsPlugin extends Gdn_Plugin {
 		$Sender->SetData('Breadcrumbs', $crumb);
       $Sender->SetData('_AnonymousPolls', C('Plugins.Polls.AnonymousPolls'));
       $Sender->AddJsFile('jquery.duplicate.js');
+      $Sender->AddJsFile('polls.js', 'plugins/Polls');
       $this->_AddCss($Sender);
       $Sender->Render('add', '', 'plugins/Polls');
    }
