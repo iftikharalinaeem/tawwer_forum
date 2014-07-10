@@ -341,6 +341,8 @@ class GithubPlugin extends Gdn_Plugin {
      * Setup the plugin.
      */
     public function setup() {
+
+        SaveToConfig('Garden.AttachmentsEnabled', true);
         // Save the provider type.
         Gdn::SQL()->Replace(
             'UserAuthenticationProvider',
