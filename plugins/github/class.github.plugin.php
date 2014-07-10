@@ -557,11 +557,7 @@ class GithubPlugin extends Gdn_Plugin {
                     $Sender->Form->AddError('Please enter a valid repo name', 'Repositories');
                 } else {
                     foreach ($repos as $repo) {
-                        try {
-                            if (!$this->isValidRepo(trim($repo))) {
-                                $Sender->Form->AddError('Repository not found: ' . $repo, 'Repositories');
-                            }
-                        } catch (Gdn_UserException $e) {
+                        if (!$this->isValidRepoName($repo)) {
                             $Sender->Form->AddError('Invalid Repository: ' . $repo, 'Repositories');
                         }
                     }
@@ -881,6 +877,9 @@ class GithubPlugin extends Gdn_Plugin {
         $response = $this->apiRequest('/repos/' . $repo . '/issues', json_encode($issue));
         if (GetValue('id', $response)) {
             return $response;
+        }
+        if (GetValue('message', $response)) {
+            throw new Gdn_UserException('Error creating issue: ' . $response['message']);
         }
         return false;
     }
