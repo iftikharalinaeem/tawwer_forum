@@ -8,7 +8,7 @@
 $PluginInfo['Polls'] = array(
    'Name' => 'Polls',
    'Description' => "Allow users to create and vote on polls.",
-   'Version' => '1.1.3',
+   'Version' => '1.1.4',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
@@ -221,6 +221,7 @@ class PollsPlugin extends Gdn_Plugin {
 		$Sender->SetData('Breadcrumbs', $crumb);
       $Sender->SetData('_AnonymousPolls', C('Plugins.Polls.AnonymousPolls'));
       $Sender->AddJsFile('jquery.duplicate.js');
+      $Sender->AddJsFile('polls.js', 'plugins/Polls');
       $this->_AddCss($Sender);
       $Sender->Render('add', '', 'plugins/Polls');
    }
