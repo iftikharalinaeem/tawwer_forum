@@ -508,6 +508,9 @@ class ZendeskPlugin extends Gdn_Plugin {
      * Setup to plugin.
      */
     public function setup() {
+
+        SaveToConfig('Garden.AttachmentsEnabled', true);
+
         $Error = '';
         if (!function_exists('curl_init')) {
             $Error = ConcatSep("\n", $Error, 'This plugin requires curl.');
