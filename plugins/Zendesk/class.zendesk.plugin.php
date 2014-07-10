@@ -259,8 +259,8 @@ class ZendeskPlugin extends Gdn_Plugin {
             'GlobalLoginConnected' => C('Plugins.Zendesk.GlobalLogin.AccessToken'),
             'ToggleUrl' => Url('/plugin/zendesk/toggle/' . Gdn::Session()->TransientKey())
         ));
-        if (C('Plugins.Zendesk.GlobalLogin.Enabled')) {
-            $this->setZendesk();
+        if (C('Plugins.Zendesk.GlobalLogin.Enabled') && C('Plugins.Zendesk.GlobalLogin.AccessToken')) {
+            $this->setZendesk(C('Plugins.Zendesk.GlobalLogin.AccessToken'));
             $globalLoginProfile = $this->zendesk->getProfile();
             $Sender->SetData('GlobalLoginProfile', $globalLoginProfile);
         }
@@ -730,7 +730,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             return;
         }
         $this->accessToken = GetValue('access_token', $Tokens);
-        $this->setZendesk();
+        $this->setZendesk($this->accessToken);
         $profile = $this->zendesk->getProfile();
 
         Gdn::UserModel()->SaveAuthentication(
@@ -800,12 +800,15 @@ class ZendeskPlugin extends Gdn_Plugin {
     /**
      * Lazy Load Zendesk object.
      */
-    protected function setZendesk() {
+    protected function setZendesk($accessToken = null) {
+        if ($accessToken == null) {
+            $accessToken = $this->accessToken;
+        }
         if (!$this->zendesk) {
             $this->zendesk = new Zendesk(
                 new ZendeskCurlRequest(),
                 C('Plugins.Zendesk.Url'),
-                $this->accessToken
+                $accessToken
             );
         }
     }
