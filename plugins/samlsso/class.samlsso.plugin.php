@@ -295,6 +295,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
       // Throw an event so that other plugins can add/remove stuff from the basic sso.
       $this->FireEvent('SamlData');
 
+      SpamModel::Disabled(TRUE);
       $Sender->SetData('Verified', TRUE);
    }
 
