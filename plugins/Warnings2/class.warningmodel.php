@@ -7,11 +7,68 @@
 class WarningModel extends UserNoteModel {
 
     /// Properties ///
+
     protected static $_Special;
+
+    /**
+     * Let the warned user know who warned them.
+     *
+     * @var bool
+     */
+    public $HideWarnerIdentity = FALSE;
+
+    /**
+     * Send the warning to the user's inbox.
+     *
+     * @var bool
+     */
+    public $NotifyWithMessage = TRUE;
 
     /// Methods ///
 
-    protected function _notify($warning) {
+    public function __construct() {
+        parent::__construct();
+
+        $this->FireEvent('Init');
+    }
+
+    protected function notifyWithActivity($warning) {
+        if (!is_array($warning)) {
+            $warning = $this->getID($warning);
+        }
+
+        $Session = Gdn::Session();
+
+        // Let the warned user know who warned them, or not.
+        $warnerIdentity = ($this->HideWarnerIdentity)
+            ? NULL
+            : $Session->UserID;
+
+        $Activity = array(
+            'ActivityType' => 'Warning',
+            'ActivityUserID' => $warnerIdentity,
+            'HeadlineFormat' => T('HeadlineFormat.Warning.ToUser', 'You\'ve been <a href="{Url,html}">warned</a>.'),
+            'RecordType' => $warning['RecordType'],
+            'RecordID' => $warning['RecordID'],
+            'Story' => $warning['Body'],
+            'Format' => $warning['Format'],
+            'Route' => '', //"/profile/notes/{$warning['UserID']}/",
+            'NotifyUserID' => $warning['UserID'],
+            'Notified' => TRUE
+        );
+
+        $ActivityModel = new ActivityModel();
+        $Result = $ActivityModel->Save($Activity, FALSE, array('Force' => TRUE));
+
+        $SavedActivityID = null;
+        if (isset($Result['ActivityID'])) {
+            $SavedActivityID = $Result['ActivityID'];
+        }
+
+        return $SavedActivityID;
+    }
+
+    protected function notifyWithMessage($warning) {
         if (!is_array($warning)) {
             $warning = $this->getID($warning);
         }
@@ -238,17 +295,25 @@ class WarningModel extends UserNoteModel {
             $model->saveToSerializedColumn('Attributes', $recordID, 'WarningID', $ID);
 
             $event = array_merge($event, array(
-                'RecordType' => $recordType,
-                'RecordID' => $recordID
-            ));
+                    'RecordType' => $recordType,
+                    'RecordID' => $recordID
+                ));
         }
 
-        // Send the private message.
-        $conversationID = $this->_Notify($data);
-        if ($conversationID) {
-            // Save the conversation link back to the warning.
-            $this->setField($ID, array('ConversationID' => $conversationID));
-            $event['ConversationID'] = $conversationID;
+        if ($this->NotifyWithMessage) {
+            // Send the private message.
+            $conversationID = $this->notifyWithMessage($data);
+            if ($conversationID) {
+                // Save the conversation link back to the warning.
+                $this->setField($ID, array('ConversationID' => $conversationID));
+                $event['ConversationID'] = $conversationID;
+            }
+        } else {
+            $activityID = $this->notifyWithActivity($data);
+            if ($activityID) {
+                $this->setField($ID, array('ActivityID' => $activityID));
+                $event['ActivityID'] = $activityID;
+            }
         }
 
         // Increment the user's alert level.
