@@ -377,6 +377,9 @@ class MultisiteModel extends Gdn_Model {
 
         $url = rtrim(http_build_url($baseUrl, $urlParts), '/').'/'.ltrim($path, '/');
 
+        Trace("baseUrl: $baseUrl");
+        Trace("node api url: $url");
+
         if ($access_token = Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
             $headers['Authorization'] = "token $access_token";
         }
