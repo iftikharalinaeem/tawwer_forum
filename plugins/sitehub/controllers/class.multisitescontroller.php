@@ -296,6 +296,14 @@ class MultisitesController extends DashboardController {
         }
         if (sizeof($errors) > 0) {
             $this->SetData('Errors', $errors);
+            if (sizeof($errors) > 0) {
+                $errorMessage = '';
+                foreach ($errors as $error) {
+                    $errorMessage .= $error . PHP_EOL;
+                }
+                throw new Gdn_UserException('Error(s) approving content: ' . $errorMessage);
+            }
+
         } else {
             $this->SetData('Success', true);
         }
