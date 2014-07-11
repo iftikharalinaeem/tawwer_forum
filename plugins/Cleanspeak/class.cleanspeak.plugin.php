@@ -145,9 +145,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         $post = Gdn::Request()->Post();
         if (!$post) {
-            if (Debug()) {
-                Logger::event('post_error', Logger::ERROR, 'Error in POST', $post);
-            }
+            Logger::event('post_error', Logger::ERROR, 'Error in POST', $post);
             throw new Gdn_UserException('Invalid Request Type');
         }
 
