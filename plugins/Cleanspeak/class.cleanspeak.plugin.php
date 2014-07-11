@@ -195,7 +195,9 @@ class CleanspeakPlugin extends Gdn_Plugin {
             )
         );
         if (!$moderatorUserID) {
-            throw new Gdn_UserException('Unknown Moderator');
+            // Not able to relate moderator to vanilla user id.
+            // User Cleanspeak user id instead.
+            return $this->getUserID();
         }
         $sender->SetData('ModeratorUserID', $moderatorUserID);
         $queueModel->setModerator($moderatorUserID);
