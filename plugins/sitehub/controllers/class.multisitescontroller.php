@@ -392,6 +392,7 @@ class MultisitesController extends DashboardController {
             try {
                 $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $sitePost);
             } catch (Gdn_UserException $e) {
+                $errors[$siteID] = 'Error communicating with node.';
                 Logger::log(Logger::ERROR, 'Error communicating with node.', array($e->getMessage()));
             }
             if (GetValue('Errors', $response)) {
