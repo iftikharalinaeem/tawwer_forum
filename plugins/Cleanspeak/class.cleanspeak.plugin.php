@@ -143,9 +143,11 @@ class CleanspeakPlugin extends Gdn_Plugin {
         // Minimum Permissions needed
         $sender->Permission('Garden.Moderation.Manage');
 
+        Logger::event('debug', Logger::ERROR, 'API Request Method:' . Gdn::Request()->RequestMethod());
+
         $post = Gdn::Request()->Post();
         if (!$post) {
-            Logger::event('post_error', Logger::ERROR, 'Error in POST', $post);
+            Logger::event('postback_error', Logger::ERROR, 'Error in POST', $post);
             throw new Gdn_UserException('Invalid Request Type');
         }
 
