@@ -143,7 +143,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         // Minimum Permissions needed
         $sender->Permission('Garden.Moderation.Manage');
 
-        if (false == false || Gdn::Request()->RequestMethod() != 'POST') {
+        if (Gdn::Request()->RequestMethod() != 'POST') {
             Logger::event(
                 'postback_error',
                 Logger::ERROR,
