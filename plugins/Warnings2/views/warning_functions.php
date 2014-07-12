@@ -51,7 +51,7 @@ function WriteUserNoteWarning($Row) {
          <?php
          echo $Row['Body'];
 
-         if (GetValue('ModeratorNote', $Row)) {
+         if (GetValue('ModeratorNote', $Row) && GetValue('Privileged', $Row, FALSE)) {
             echo '<div class="P">'.
                '<b>'.T('Private note for moderators').'</b>: '.
                Gdn_Format::Text($Row['ModeratorNote']).
