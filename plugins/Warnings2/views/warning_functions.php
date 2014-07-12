@@ -4,6 +4,7 @@ if (!function_exists('WriteUserNoteWarning')):
 
 function WriteUserNoteWarning($Row) {
   $Reversed = GetValue('Reversed', $Row);
+  $IsPrivileged = GetValue('Privileged', $Row, FALSE);
   ?>
    <div class="Item-Col Item-Col9">
       <div class="Meta">
@@ -15,7 +16,7 @@ function WriteUserNoteWarning($Row) {
                   Anchor(T('message'), '/messages/'.GetValue('ConversationID', $Row).'#latest', 'OptionsLink', array('title' => T('The private message between the user and moderator.')));
             }
 
-            if (!$Reversed) {
+            if (!$Reversed && $IsPrivileged) {
                echo Gdn_Theme::BulletItem('Reverse').
                   Anchor(T('reverse'), '/profile/reversewarning?id='.$Row['UserNoteID'], 'Popup OptionsLink', array('title' => T('Reverse this warning')));
             }
@@ -51,7 +52,7 @@ function WriteUserNoteWarning($Row) {
          <?php
          echo $Row['Body'];
 
-         if (GetValue('ModeratorNote', $Row) && GetValue('Privileged', $Row, FALSE)) {
+         if (GetValue('ModeratorNote', $Row) && $IsPrivileged) {
             echo '<div class="P">'.
                '<b>'.T('Private note for moderators').'</b>: '.
                Gdn_Format::Text($Row['ModeratorNote']).
