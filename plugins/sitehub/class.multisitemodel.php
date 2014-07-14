@@ -377,15 +377,9 @@ class MultisiteModel extends Gdn_Model {
 
         $url = rtrim(http_build_url($baseUrl, $urlParts), '/').'/'.ltrim($path, '/');
 
-        Trace("url format: ". $this->siteUrlFormat);
-        Trace("baseUrl: $baseUrl");
-        Trace("node api url: $url");
-
         if ($access_token = Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
             $headers['Authorization'] = "token $access_token";
         }
-
-        Trace("api: $method $url");
 
         $request = new ProxyRequest();
         $response = $request->Request([
