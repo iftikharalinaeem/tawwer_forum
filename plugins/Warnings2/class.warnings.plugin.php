@@ -572,10 +572,13 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ProfileController $Sender
      * @param $NoteID
      */
-    public function ProfileController_ViewNote_Create($Sender, $UserReference, $NoteID) {
+    public function ProfileController_ViewNote_Create($Sender, $NoteID) {
         $Sender->EditMode(false);
 
-        $Sender->GetUserInfo($UserReference, '', $UserReference);
+        $UserNoteModel = new UserNoteModel();
+        $Note = $UserNoteModel->GetID($NoteID);
+
+        $Sender->GetUserInfo($Note['UserID'], '', $Note['UserID']);
         $IsPrivileged = Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false);
         $Sender->SetData('IsPrivileged', $IsPrivileged);
 
@@ -597,9 +600,6 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         // Add side menu.
         $Sender->SetTabView('ViewNote', 'ViewNote', '', 'plugins/Warnings2');
-
-        $UserNoteModel = new UserNoteModel();
-        $Note = $UserNoteModel->GetID($NoteID);
 
         // If HideWarnerIdentity is true, do not let view render that data.
         $WarningModel = new WarningModel();
