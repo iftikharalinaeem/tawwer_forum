@@ -171,7 +171,8 @@ class CleanspeakPlugin extends Gdn_Plugin {
                 $this->userAction($sender);
                 break;
             default:
-                throw new Gdn_UserException('Unknown moderation type: ' . $type);
+                $context['Post'] = $post;
+                Logger::event('cleanspeak_error', Logger::ERROR, 'Unknown Type.', $context);
         }
 
         $sender->Render('blank', 'utility', 'dashboard');
