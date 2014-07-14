@@ -10,17 +10,24 @@ class UserNoteModel extends Gdn_Model {
       Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'));
       $IsModerator = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
       foreach ($Data as &$Row) {
-         $Row['Body'] = Gdn_Format::To($Row['Body'], $Row['Format']);
+         $this->CalculateRow($Row);
+      }
+   }
 
-         if (!$IsModerator) {
-            unset($Row['ModeratorNote']);
-         }
+   protected function CalculateRow(&$Row) {
+      $IsModerator = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
+      $Row['Body'] = Gdn_Format::To($Row['Body'], $Row['Format']);
+
+      if (!$IsModerator) {
+         unset($Row['ModeratorNote']);
       }
    }
    
    public function GetID($ID) {
       $Row = parent::GetID($ID, DATASET_TYPE_ARRAY);
       $Row = $this->ExpandAttributes($Row);
+      $this->CalculateRow($Row);
+
       return $Row;
    }
    
