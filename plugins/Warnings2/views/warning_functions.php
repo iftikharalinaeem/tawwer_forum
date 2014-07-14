@@ -4,6 +4,7 @@ if (!function_exists('WriteUserNoteWarning')):
 
 function WriteUserNoteWarning($Row) {
   $Reversed = GetValue('Reversed', $Row);
+  $ViewNoteUrl = Url("/profile/viewnote/{$Row['UserID']}/{$Row['UserNoteID']}");
   ?>
    <div class="Item-Col Item-Col9">
       <div class="Meta">
@@ -49,6 +50,18 @@ function WriteUserNoteWarning($Row) {
       </div>
       <div class="Warning-Body">
          <?php
+
+         if (GetValue('Record', $Row)) {
+             $Record = $Row['Record'];
+
+             echo '<div class="P">'.
+                 '<b>'.T('Warned for').'</b>: '.
+                 Anchor(htmlspecialchars($Record['Name']), $Record['Url']).
+                 '</div>';
+
+             echo '<blockquote class="Quote">' . Gdn_Format::Text($Record['Body']) . '</blockquote>';
+         }
+
          echo $Row['Body'];
 
          if (GetValue('ModeratorNote', $Row)) {
@@ -57,25 +70,20 @@ function WriteUserNoteWarning($Row) {
                Gdn_Format::Text($Row['ModeratorNote']).
                '</div>';
          }
-
-         if (GetValue('Record', $Row)) {
-            $Record = $Row['Record'];
-
-            echo '<div class="P">'.
-               '<b>'.T('Warned for').'</b>: '.
-               Anchor(htmlspecialchars($Record['Name']), $Record['Url']).
-               '</div>';
-         }
          ?>
       </div>
    </div>
    <div class="Item-Col Item-Col3 User-Col">
       <div class="Media">
-         <?php echo UserPhoto($Row, array('LinkClass' => 'Img', 'Px' => 'Insert')); ?>
-         <div class="Media-Body">
+          <?php if (!isset($Row['HideWarnerIdentity']) || !$Row['HideWarnerIdentity']): ?>
+             <?php echo UserPhoto($Row, array('LinkClass' => 'Img', 'Px' => 'Insert')); ?>
+          <?php endif; ?>
+          <div class="Media-Body">
             <?php
-            echo '<div>'.UserAnchor($Row, '', array('Px' => 'Insert')).'</div> ';
-            echo '<div class="Meta">'.Gdn_Format::Date($Row['DateInserted'], 'html').'</div>';
+            if (!isset($Row['HideWarnerIdentity']) || !$Row['HideWarnerIdentity']) {
+                echo '<div>'.UserAnchor($Row, '', array('Px' => 'Insert')).'</div> ';
+            }
+            echo '<div class="Meta"><a href="' . $ViewNoteUrl . '">'.Gdn_Format::Date($Row['DateInserted'], 'html').'</a></div>';
             ?>
          </div>
       </div>
