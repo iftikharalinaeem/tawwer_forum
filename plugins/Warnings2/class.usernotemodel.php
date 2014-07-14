@@ -8,8 +8,13 @@ class UserNoteModel extends Gdn_Model {
    
    public function Calculate(&$Data) {
       Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'));
+      $IsModerator = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
       foreach ($Data as &$Row) {
          $Row['Body'] = Gdn_Format::To($Row['Body'], $Row['Format']);
+
+         if (!$IsModerator) {
+            unset($Row['ModeratorNote']);
+         }
       }
    }
    
