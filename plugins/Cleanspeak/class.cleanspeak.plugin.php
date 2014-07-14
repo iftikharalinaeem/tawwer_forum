@@ -512,18 +512,20 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
     /**
      * @param SettingsController $sender Sending controller.
+     * @param array $args Sending arguments.
      */
-    public function settingsController_cleanspeakToggle_create($sender) {
-
+    public function settingsController_cleanspeakToggle_create($sender, $args) {
 
         if (C('Plugins.Cleanspeak.Enabled')) {
             SaveToConfig('Plugins.Cleanspeak.Enabled', false);
+            $buttonText = T('Enable');
         } else {
             SaveToConfig('Plugins.Cleanspeak.Enabled', true);
+            $buttonText = T('Disable');
         }
         $sender->InformMessage(T('Changes Saved'));
-        Redirect(Url('/settings/cleanspeak'));
-
+        $sender->JsonTarget("#cstoggle", $buttonText);
+        $sender->Render('Blank', 'Utility', 'Dashboard');
     }
 
     /**

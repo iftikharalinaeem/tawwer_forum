@@ -1,12 +1,5 @@
 <h1>Cleanspeak</h1>
 
-<script>
-    $(document).ready(function(){
-        $("#toggle").click(function(){
-            window.location = '<?php echo Url('/settings/cleanspeaktoggle'); ?>';
-        });
-    });
-</script>
 
 <?php if (!$this->Data['Enabled'] && !$this->Data['IsConfigured']) { ?>
 
@@ -18,7 +11,7 @@ been configured will force all new content to go into the premoderation queue.')
 
 
 <div class="Wrap">
-    <button id="toggle" class="Button">
+    <a id="cstoggle" class="Button Hijack" href="<?php echo Url('/settings/cleanspeaktoggle'); ?>">
         <?php
         if($this->Data['Enabled']) {
             echo T('Disable');
@@ -26,7 +19,7 @@ been configured will force all new content to go into the premoderation queue.')
             echo T('Enable');
         }
         ?>
-    </button>
+    </a>
     <span class="Wrap"><?php echo T('Send new discussions, comments, activity posts and comments to Cleanspeak for premoderation.'); ?></span>
 
 </div>
