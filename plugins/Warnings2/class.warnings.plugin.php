@@ -9,7 +9,7 @@
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.1.1',
+    'Version' => '2.1.2',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -554,9 +554,64 @@ class Warnings2Plugin extends Gdn_Plugin {
         // Join the user records into the warnings
         JoinRecords($Notes, 'Record');
 
+        // If HideWarnerIdentity is true, do not let view render that data.
+        $WarningModel = new WarningModel();
+        $HideWarnerIdentity = $WarningModel->HideWarnerIdentity;
+        array_walk($Notes, function (&$value, $key) use ($HideWarnerIdentity) {
+            $value['HideWarnerIdentity'] = $HideWarnerIdentity;
+        });
+
         $Sender->SetData('Notes', $Notes);
 
         $Sender->Render();
+    }
+
+    /**
+     * View individual note for given user.
+     *
+     * @param ProfileController $Sender
+     * @param $NoteID
+     */
+    public function ProfileController_ViewNote_Create($Sender, $UserReference, $NoteID) {
+        $Sender->EditMode(false);
+
+        $Sender->GetUserInfo($UserReference, '', $UserReference);
+        $IsPrivileged = Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false);
+        $Sender->SetData('IsPrivileged', $IsPrivileged);
+
+        // Users should only be able to see their own warnings
+        if (!$IsPrivileged && Gdn::Session()->UserID != val('UserID', $Sender->User)) {
+            throw PermissionException('Garden.Moderation.Manage');
+        }
+
+        // Build breadcrumbs.
+        $Sender->_SetBreadcrumbs();
+        $Breadcrumbs = $Sender->Data('Breadcrumbs');
+        $NotesUrl = UserUrl($Sender->User, '', 'notes');
+        $NoteUrl = Url("/profile/viewnote/{$Sender->User->UserID}/$NoteID");
+        $Breadcrumbs = array_merge($Breadcrumbs, array(
+            array('Name' => 'Notes', 'Url' => $NotesUrl),
+            array('Name' => 'Note', 'Url' => $NoteUrl)
+        ));
+        $Sender->SetData('Breadcrumbs', $Breadcrumbs);
+
+        // Add side menu.
+        $Sender->SetTabView('ViewNote', 'ViewNote', '', 'plugins/Warnings2');
+
+        $UserNoteModel = new UserNoteModel();
+        $Note = $UserNoteModel->GetID($NoteID);
+
+        // If HideWarnerIdentity is true, do not let view render that data.
+        $WarningModel = new WarningModel();
+        $Note['HideWarnerIdentity'] = $WarningModel->HideWarnerIdentity;
+
+        // Join record in question with note.
+        $Notes = array();
+        $Notes[] = $Note;
+        JoinRecords($Notes, 'Record');
+
+        $Sender->SetData('Notes', $Notes);
+        $Sender->Render('viewnote', '', 'plugins/Warnings2');
     }
 
     /**

@@ -40,19 +40,17 @@ class WarningModel extends UserNoteModel {
         $Session = Gdn::Session();
 
         // Let the warned user know who warned them, or not.
-        $warnerIdentity = ($this->HideWarnerIdentity)
-            ? NULL
-            : $Session->UserID;
+        $WarnerIdentity = $Session->UserID;
 
         $Activity = array(
             'ActivityType' => 'Warning',
-            'ActivityUserID' => $warnerIdentity,
-            'HeadlineFormat' => T('HeadlineFormat.Warning.ToUser', 'You\'ve been <a href="{Url,html}">warned</a>.'),
+            'ActivityUserID' => $WarnerIdentity,
+            'HeadlineFormat' => T('HeadlineFormat.Warning.ToUser', 'You\'ve been <a href="{Url,html}" class="Popup">warned</a>.'),
             'RecordType' => $warning['RecordType'],
             'RecordID' => $warning['RecordID'],
             'Story' => $warning['Body'],
             'Format' => $warning['Format'],
-            'Route' => '', //"/profile/notes/{$warning['UserID']}/",
+            'Route' => "/profile/viewnote/{$warning['UserID']}/{$warning['WarningID']}",
             'NotifyUserID' => $warning['UserID'],
             'Notified' => TRUE
         );
