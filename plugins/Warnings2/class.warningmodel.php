@@ -300,7 +300,7 @@ class WarningModel extends UserNoteModel {
                 ));
         }
 
-        if ($this->NotifyWithMessage) {
+        if ($this->NotifyWithMessage && class_exists('ConversationModel')) {
             // Send the private message.
             $conversationID = $this->notifyWithMessage($data);
             if ($conversationID) {
