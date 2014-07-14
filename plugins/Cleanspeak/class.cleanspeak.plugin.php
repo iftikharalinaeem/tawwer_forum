@@ -505,9 +505,37 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         $sender->SetData('Enabled', C('Plugins.Cleanspeak.Enabled'));
         $sender->SetData('IsConfigured', $this->isConfigured());
+
+        $sender->SetData('PostBackURL', $this->getPostBackURL());
+        if (Gdn::PluginManager()->CheckPlugin('sitenode')) {
+
+            $sender->SetData('PostBackURL', $this->getPostBackURL(true));
+        }
         $sender->Render($this->GetView('settings.php'));
 
 
+    }
+
+    public function getPostBackURL($multiSite = false) {
+        if (!Gdn::PluginManager()->CheckPlugin('SimpleAPI')) {
+            return false;
+        }
+
+        $URL = Url('/mod/cleanspeakpostback.json', true);
+
+        if ($multiSite) {
+            $URL = C('Hub.Url', Gdn::Request()->Domain().'/hub') . '/multisites/cleanspeakproxy.json';
+        }
+
+
+        if (strstr($URL, '?')) {
+            $URL .= '&';
+        } else {
+            $URL .= '?';
+        }
+        $URL .= 'access_token=' . C('Plugins.SimpleAPI.AccessToken');
+
+        return $URL;
     }
 
     /**
