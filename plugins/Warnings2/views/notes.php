@@ -10,6 +10,7 @@ $IsPrivileged = $this->Data('IsPrivileged');
    <li id="UserNote_<?php echo $Row['UserNoteID']; ?>" class="Item Item-Row <?php echo 'UserNote-'.$Row['Type'] ?>">
       <?php
       $Func = "WriteUserNote{$Row['Type']}";
+      $Row['Privileged'] = $IsPrivileged;
       if (function_exists($Func)):
          $Func($Row);
       else:
