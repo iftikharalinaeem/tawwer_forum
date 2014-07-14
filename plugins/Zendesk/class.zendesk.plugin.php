@@ -311,6 +311,11 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (!Gdn::Session()->UserID) {
             return;
         }
+
+        if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+            return;
+        }
+
         if ($Args['Type'] == 'Discussion') {
             $Content = 'Discussion';
             $ContentID = $Args[$Content]->DiscussionID;
