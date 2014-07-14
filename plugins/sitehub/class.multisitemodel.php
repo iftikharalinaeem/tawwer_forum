@@ -381,8 +381,6 @@ class MultisiteModel extends Gdn_Model {
             $headers['Authorization'] = "token $access_token";
         }
 
-        Trace("api: $method $url");
-
         $request = new ProxyRequest();
         $response = $request->Request([
             'URL' => $url,

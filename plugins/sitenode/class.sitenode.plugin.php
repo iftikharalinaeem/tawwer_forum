@@ -226,14 +226,14 @@ class SiteNodePlugin extends Gdn_Plugin {
                     $permissions[$i]['JunctionTable'] = 'Category';
                     $permissions[$i]['JunctionColumn'] = 'PermissionCategoryID';
                     $permissions[$i]['RoleID'] = $roleMap[$permissionRow['RoleID']];
-                    if ($hubID < 0) {
+                    if ($hubID == '-1') {
                         $permissions[$i]['JunctionID'] = $hubID;
                     }
                 }
                 $category['Permissions'] = $permissions;
             }
 
-            if ($hubID > 0) {
+            if ($hubID != '-1') {
                 // See if there is an existing category.
                 $existingCategory = $categoryModel->GetWhereCache(['HubID' => $hubID]);
                 if (!$existingCategory) {
