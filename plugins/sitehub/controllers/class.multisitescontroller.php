@@ -301,7 +301,8 @@ class MultisitesController extends DashboardController {
                 foreach ($errors as $error) {
                     $errorMessage .= $error . PHP_EOL;
                 }
-                throw new Gdn_UserException('Error(s) approving content: ' . $errorMessage);
+                $context['Errors'] = $errors;
+                Logger::event('cleanspeak_error', Logger::ERROR, 'Error(s) approving content: ' . $errorMessage, $context);
             }
 
         } else {
