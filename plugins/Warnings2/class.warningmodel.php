@@ -50,7 +50,7 @@ class WarningModel extends UserNoteModel {
             'RecordID' => $warning['RecordID'],
             'Story' => $warning['Body'],
             'Format' => $warning['Format'],
-            'Route' => "/profile/viewnote/{$warning['UserID']}/{$warning['WarningID']}",
+            'Route' => "/profile/viewnote/{$warning['WarningID']}",
             'NotifyUserID' => $warning['UserID'],
             'Notified' => TRUE
         );

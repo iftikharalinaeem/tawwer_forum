@@ -4,7 +4,7 @@ if (!function_exists('WriteUserNoteWarning')):
 
 function WriteUserNoteWarning($Row) {
   $Reversed = GetValue('Reversed', $Row);
-  $ViewNoteUrl = Url("/profile/viewnote/{$Row['UserID']}/{$Row['UserNoteID']}");
+  $ViewNoteUrl = Url("/profile/viewnote/{$Row['UserNoteID']}");
   ?>
    <div class="Item-Col Item-Col9">
       <div class="Meta">

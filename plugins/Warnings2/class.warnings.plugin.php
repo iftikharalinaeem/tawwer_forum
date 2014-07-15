@@ -9,7 +9,7 @@
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.1.2',
+    'Version' => '2.1.3',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -572,11 +572,27 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ProfileController $Sender
      * @param $NoteID
      */
-    public function ProfileController_ViewNote_Create($Sender, $UserReference, $NoteID) {
+    public function ProfileController_ViewNote_Create($Sender, $NoteID) {
+        $UserNoteModel = new UserNoteModel();
+        $Note = $UserNoteModel->GetID($NoteID);
+
+        $UserID = (count($Note) && !empty($Note['UserID']))
+            ? $Note['UserID']
+            : NULL;
+
+        if (!$UserID || !count($Note)) {
+            throw NotFoundException('Warning');
+        }
+
         $Sender->EditMode(false);
 
-        $Sender->GetUserInfo($UserReference, '', $UserReference);
-        $IsPrivileged = Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false);
+        $Sender->GetUserInfo($UserID, '', $UserID);
+
+        $IsPrivileged = Gdn::Session()->CheckPermission(array(
+            'Garden.Moderation.Manage',
+            'Moderation.UserNotes.View'),
+        false);
+
         $Sender->SetData('IsPrivileged', $IsPrivileged);
 
         // Users should only be able to see their own warnings
@@ -597,9 +613,6 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         // Add side menu.
         $Sender->SetTabView('ViewNote', 'ViewNote', '', 'plugins/Warnings2');
-
-        $UserNoteModel = new UserNoteModel();
-        $Note = $UserNoteModel->GetID($NoteID);
 
         // If HideWarnerIdentity is true, do not let view render that data.
         $WarningModel = new WarningModel();
