@@ -62,3 +62,4 @@
 
 .Warning-Body > *:first-child { margin-top: 0; }
 .Warning-Body > *:last-child { margin-bottom: 0; }
+.Warning-Body .Quote { margin-top: 15px; margin-bottom: 15px; }
