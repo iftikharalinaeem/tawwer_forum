@@ -192,7 +192,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
             array(
                 "moderatorId" => $post['moderatorId'],
                 "moderatorEmail" => $post['moderatorEmail'],
-                "moderatorExternalId" => $post['moderatorExternalId']
+                "moderatorExternalId" => GetValue('moderatorExternalId', $post)
             )
         );
         if (!$moderatorUserID) {
