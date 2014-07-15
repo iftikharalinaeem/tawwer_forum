@@ -42,6 +42,9 @@ class WarningModel extends UserNoteModel {
         // Let the warned user know who warned them, or not.
         $WarnerIdentity = $Session->UserID;
 
+        // Use plugin icon as photo.
+        $Warnings2IconPath = preg_replace('/https?\:/i', '', Asset('/plugins/Warnings2/icon.png', true));
+
         $Activity = array(
             'ActivityType' => 'Warning',
             'ActivityUserID' => $WarnerIdentity,
@@ -52,7 +55,8 @@ class WarningModel extends UserNoteModel {
             'Format' => $warning['Format'],
             'Route' => "/profile/viewnote/{$warning['WarningID']}",
             'NotifyUserID' => $warning['UserID'],
-            'Notified' => TRUE
+            'Notified' => TRUE,
+            'Photo' => $Warnings2IconPath
         );
 
         $ActivityModel = new ActivityModel();
