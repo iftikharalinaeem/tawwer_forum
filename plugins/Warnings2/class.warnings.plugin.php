@@ -689,7 +689,10 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $Sender->SetData('Profile', $User);
         $Sender->SetData('Title', sprintf(T('Warn %s'), htmlspecialchars(val('Name', $User))));
-        $Sender->Render('Warn', '', 'plugins/Warnings2');
+
+        $Sender->View = 'Warn';
+        $Sender->ApplicationFolder = 'plugins/Warnings2';
+        $Sender->Render('', '');
     }
 
     /**
