@@ -388,7 +388,7 @@ class MultisitesController extends DashboardController {
             $sitePost['approvals'] = $siteApproval;
             $sitePost['moderatorId'] = $post['moderatorId'];
             $sitePost['moderatorEmail'] = $post['moderatorEmail'];
-            $sitePost['moderatorExternalId'] = $post['moderatorExternalId'];
+            $sitePost['moderatorExternalId'] = GetValue('moderatorExternalId', $post, NULL);
 
             try {
                 $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $sitePost);
