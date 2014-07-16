@@ -419,7 +419,7 @@ class MultisitesController extends DashboardController {
         $multiSiteModel = new MultisiteModel();
         $site = $multiSiteModel->getWhere(array('SiteID' => $siteID))->FirstRow(DATASET_TYPE_ARRAY);
         if (!$site) {
-            throw new Gdn_UserException("Site not found. UUID: {$post['userId']} SiteID: $siteID", 500);
+            return;
         }
 
         try {
