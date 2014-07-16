@@ -276,7 +276,7 @@ class MultisitesController extends DashboardController {
 
         $post = Gdn::Request()->Post();
         if (!$post) {
-            throw new Gdn_UserException('Missing post data.');
+            return;
         }
 
 
@@ -287,11 +287,13 @@ class MultisitesController extends DashboardController {
             case 'contentDelete':
                 $errors = $this->cleanspeakContentDelete($post);
                 break;
-            case 'userAction':
-                $errors = $this->cleanspeakUserAction($post);
-                break;
+//            case 'userAction':
+//                $errors = $this->cleanspeakUserAction($post);
+//                break;
             default:
-                throw new Gdn_UserException('Cleanspeak proxy does not support type:' . $post['type']);
+                $context = array('type' => $post['type']);
+                Logger::event('cleanspeak_proxy', Logger::DEBUG, 'Cleanspeak proxy does not support type {type}', $context);
+                return;
 
         }
         if (sizeof($errors) > 0) {
