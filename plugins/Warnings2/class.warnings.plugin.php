@@ -9,7 +9,7 @@
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.1.6',
+    'Version' => '2.1.7',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -182,7 +182,7 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $WordWarn = 'warned';
                 if (!empty($Row->Attributes['WarningID'])) {
                     $WarningID = $Row->Attributes['WarningID'];
-                    $WordWarn = '<a href="' . Url("profile/viewnote/$WarningID") . '">' . $WordWarn . '</a>';
+                    $WordWarn = '<a href="' . Url("profile/viewnote/$WarningID") . '" class="Popup">' . $WordWarn . '</a>';
                 }
 
                 echo '<div class="DismissMessage Warning">'.
