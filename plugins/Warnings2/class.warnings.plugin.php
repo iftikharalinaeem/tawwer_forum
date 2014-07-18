@@ -9,7 +9,7 @@
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.1.5',
+    'Version' => '2.1.6',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -176,8 +176,17 @@ class Warnings2Plugin extends Gdn_Plugin {
         $Row->Attributes = Gdn_Format::Unserialize($Row->Attributes);
         if (isset($Row->Attributes['WarningID']) && $Row->Attributes['WarningID']) {
             if (!isset($Row->Attributes['Reversed']) || !$Row->Attributes['Reversed']) {
+
+                // Make inline warning message link to specific warning text.
+                // It will only be readable by the warned user or moderators.
+                $WordWarn = 'warned';
+                if (!empty($Row->Attributes['WarningID'])) {
+                    $WarningID = $Row->Attributes['WarningID'];
+                    $WordWarn = '<a href="' . Url("profile/viewnote/$WarningID") . '">' . $WordWarn . '</a>';
+                }
+
                 echo '<div class="DismissMessage Warning">'.
-                sprintf(T('%s was warned for this post.'), htmlspecialchars(val('InsertName', $Row))).
+                sprintf(T('%s was %s for this post.'), htmlspecialchars(val('InsertName', $Row)), $WordWarn).
                 '</div>';
             }
         }
