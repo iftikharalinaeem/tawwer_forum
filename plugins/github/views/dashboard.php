@@ -93,7 +93,7 @@ echo $this->Form->Errors();
     <li>
         <?php
         echo $this->Form->Label('Repositories', 'Repositories');
-        ?> <span>List of Repositories separted by newline.</span><?php
+        ?><span><?php echo T('List of Repositories separted by newline.  Enter the GitHub username and repo, E.g. \'username/reponame\''); ?></span><?php
         echo $this->Form->TextBox('Repositories', array('MultiLine' => true));
         ?>
     </li>
