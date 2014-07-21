@@ -1020,6 +1020,17 @@ class GithubPlugin extends Gdn_Plugin {
 
     }
 
+    /**
+     * Add Github to Dashboard menu.
+     *
+     * @param Controller $Sender
+     * @param array $Arguments
+     */
+    public function Base_GetAppSettingsMenuItems_Handler($Sender, $Arguments) {
+        $Menu = $Arguments['SideMenu'];
+        $Menu->AddItem('Forum', T('Forum'));
+        $Menu->AddLink('Forum', 'Github', 'plugin/github', 'Garden.Settings.Manage');
+    }
 
 }
 
