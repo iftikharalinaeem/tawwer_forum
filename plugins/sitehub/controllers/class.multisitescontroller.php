@@ -276,7 +276,7 @@ class MultisitesController extends DashboardController {
 
         $post = Gdn::Request()->Post();
         if (!$post) {
-            throw new Gdn_UserException('Missing post data.');
+            return;
         }
 
 
@@ -287,11 +287,13 @@ class MultisitesController extends DashboardController {
             case 'contentDelete':
                 $errors = $this->cleanspeakContentDelete($post);
                 break;
-            case 'userAction':
-                $errors = $this->cleanspeakUserAction($post);
-                break;
+//            case 'userAction':
+//                $errors = $this->cleanspeakUserAction($post);
+//                break;
             default:
-                throw new Gdn_UserException('Cleanspeak proxy does not support type:' . $post['type']);
+                $context = array('type' => $post['type']);
+                Logger::event('cleanspeak_proxy', Logger::DEBUG, 'Cleanspeak proxy does not support type {type}', $context);
+                return;
 
         }
         if (sizeof($errors) > 0) {
@@ -301,7 +303,8 @@ class MultisitesController extends DashboardController {
                 foreach ($errors as $error) {
                     $errorMessage .= $error . PHP_EOL;
                 }
-                throw new Gdn_UserException('Error(s) approving content: ' . $errorMessage);
+                $context['Errors'] = $errors;
+                Logger::event('cleanspeak_error', Logger::ERROR, 'Error(s) approving content: ' . $errorMessage, $context);
             }
 
         } else {
@@ -387,7 +390,7 @@ class MultisitesController extends DashboardController {
             $sitePost['approvals'] = $siteApproval;
             $sitePost['moderatorId'] = $post['moderatorId'];
             $sitePost['moderatorEmail'] = $post['moderatorEmail'];
-            $sitePost['moderatorExternalId'] = $post['moderatorExternalId'];
+            $sitePost['moderatorExternalId'] = GetValue('moderatorExternalId', $post, NULL);
 
             try {
                 $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $sitePost);
@@ -418,7 +421,7 @@ class MultisitesController extends DashboardController {
         $multiSiteModel = new MultisiteModel();
         $site = $multiSiteModel->getWhere(array('SiteID' => $siteID))->FirstRow(DATASET_TYPE_ARRAY);
         if (!$site) {
-            throw new Gdn_UserException("Site not found. UUID: {$post['userId']} SiteID: $siteID", 500);
+            return;
         }
 
         try {
