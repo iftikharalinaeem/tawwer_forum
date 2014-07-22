@@ -451,6 +451,7 @@ class SiteNodePlugin extends Gdn_Plugin {
     }
 
     public function setupController_installed_handler($sender) {
+        $this->structure();
         $this->syncNode();
     }
 
