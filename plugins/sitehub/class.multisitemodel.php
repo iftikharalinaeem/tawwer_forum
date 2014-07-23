@@ -440,7 +440,7 @@ class MultisiteModel extends Gdn_Model {
         return $this->getWhere(false, $orderFields, $orderDirection, $limit, $offset);
     }
 
-    public function syncNode($node) {
+    public function syncNode($node, $url = '/utility/syncnode.json') {
         if (is_array($node)) {
             $nodeSlug = $node['Slug'];
         } else {
@@ -448,7 +448,7 @@ class MultisiteModel extends Gdn_Model {
         }
 
         try {
-            $result = $this->nodeApi($nodeSlug, '/utility/syncnode.json', 'POST');
+            $result = $this->nodeApi($nodeSlug, $url, 'POST');
         } catch (Exception $ex) {
             $result = ['Code' => $ex->getCode(), 'Exception' => $ex->getMessage()];
         }
@@ -456,17 +456,26 @@ class MultisiteModel extends Gdn_Model {
     }
 
     public function syncNodes() {
-        if (class_exists('Communication') && class_exists('Infrastructure')) {
-            $query = Communication::data('/forum/callback')
-                ->method('post')
-                ->parameter('method', 'POST')
-                ->parameter('path', '/utility/syncnode.json')
-                ->parameter('headers', [
-                    'Authorization' => self::apikey(true)
-                ])
-                ->parameter('accountid', Infrastructure::site('accountid'));
+        $urls = [
+            '/utility/syncnode.json',
+        ];
 
-            $result = $query->send();
+        $this->EventArguments['urls'] =& $urls;
+        $this->FireEvent('SyncNodes');
+
+        if (class_exists('Communication') && class_exists('Infrastructure')) {
+            foreach ($urls as $url) {
+                $query = Communication::data('/forum/callback')
+                    ->method('post')
+                    ->parameter('method', 'POST')
+                    ->parameter('path', $url)
+                    ->parameter('headers', [
+                        'Authorization' => self::apikey(true)
+                    ])
+                    ->parameter('accountid', Infrastructure::site('accountid'));
+
+                $result[$url] = $query->send();
+            }
             return $result;
         }
 
@@ -478,11 +487,13 @@ class MultisiteModel extends Gdn_Model {
                 continue;
             }
 
-            try {
-                $nodeResult = $this->syncNode($node);
-                $result[$node['Slug']] = $nodeResult;
-            } catch (Exception $ex) {
-                $result[$node['Slug']] = (string)$ex->getCode();
+            foreach ($urls as $url) {
+                try {
+                    $nodeResult = $this->syncNode($node, $url);
+                    $result[$node['Slug']][$url] = $nodeResult;
+                } catch (Exception $ex) {
+                    $result[$node['Slug']][$url] = (string)$ex->getCode();
+                }
             }
         }
 
