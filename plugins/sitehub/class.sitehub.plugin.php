@@ -57,6 +57,8 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->table('Role')
             ->column('HubSync', ['settings', 'membership'], true)
             ->set();
+
+        TouchConfig('Badges.Disabled', true);
     }
 
     /**
