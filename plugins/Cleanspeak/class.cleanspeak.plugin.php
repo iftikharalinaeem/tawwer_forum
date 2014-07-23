@@ -53,8 +53,10 @@ class CleanspeakPlugin extends Gdn_Plugin {
                 'senderId' => $cleanSpeak->getUserUUID($args['Data']['InsertUserID'])
             )
         );
-        if (GetValue('DiscussionID', $args['Data']) && GetValue('Name', $args['Data'])) {
-            $content['content']['location'] = DiscussionUrl($args['Data']);
+        if (GetValue('DiscussionID', $args['Data'])) {
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->GetID($args['Data']['DiscussionID']);
+            $content['content']['location'] = DiscussionUrl($discussion);
         }
         $UUID = $cleanSpeak->getRandomUUID($args['Data']);
 
