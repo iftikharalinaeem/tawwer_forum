@@ -200,6 +200,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         // Tell the hub that we've synchronized.
 
+        $this->FireEvent('AfterSync');
 
         Gdn::Config()->Shutdown();
     }
