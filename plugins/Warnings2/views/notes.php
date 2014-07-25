@@ -6,33 +6,38 @@ $IsPrivileged = $this->Data('IsPrivileged');
 <h2 class="H"><?php echo T('Notes'); ?></h2>
 
 <ul class="DataList DataList-Notes">
-   <?php foreach ($this->Data('Notes', array()) as $Row): ?>
-   <li id="UserNote_<?php echo $Row['UserNoteID']; ?>" class="Item Item-Row <?php echo 'UserNote-'.$Row['Type'] ?>">
-      <?php
-      $Func = "WriteUserNote{$Row['Type']}";
+   <?php
+   foreach ($this->Data('Notes', array()) as $Row):
       $Row['Privileged'] = $IsPrivileged;
-      if (function_exists($Func)):
-         $Func($Row);
-      else:
-      ?>
+   ?>
+   <li id="UserNote_<?php echo $Row['UserNoteID']; ?>" class="Item Item-Row <?php echo 'UserNote-'.$Row['Type'] ?>">
       <div class="Item-Col Item-Col9">
-         <div class="Meta">
-            <div class="Options">
-               <?php
-               if ($IsPrivileged):
-                  echo Anchor(T('edit'), '/profile/note?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => T('Edit'))).
-                     Bullet(' ').
-                     Anchor(T('delete'), '/profile/deletenote?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => T('Delete')));
-               endif;
-               ?>
-            </div>
-            <?php
-            echo '<span class="NoteType NoteType-'.$Row['Type'].'">'.T(ucfirst($Row['Type'])).'</span> ';
-            ?>
-         </div>
-         <div class="Warning-Body">
-            <?php echo $Row['Body']; ?>
-         </div>
+         <?php
+         $Func = "WriteUserNote{$Row['Type']}";
+         if (function_exists($Func)) {
+             $Func($Row);
+         } else {
+         ?>
+             <div class="Meta">
+                <div class="Options">
+                   <?php
+                   if ($IsPrivileged):
+                      echo Anchor(T('edit'), '/profile/note?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => T('Edit'))).
+                         Bullet(' ').
+                         Anchor(T('delete'), '/profile/deletenote?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => T('Delete')));
+                   endif;
+                   ?>
+                </div>
+                <?php
+                echo '<span class="NoteType NoteType-'.$Row['Type'].'">'.T(ucfirst($Row['Type'])).'</span> ';
+                ?>
+             </div>
+             <div class="Note-Body">
+                <?php echo $Row['Body']; ?>
+             </div>
+         <?php
+         }
+         ?>
       </div>
       <div class="Item-Col Item-Col3 User-Col">
          <div class="Media">
@@ -45,9 +50,10 @@ $IsPrivileged = $this->Data('IsPrivileged');
             </div>
          </div>
       </div>
-      <?php endif; ?>
    </li>
-   <?php endforeach; ?>
+   <?php
+   endforeach;
+   ?>
    <?php if (count($this->Data('Notes')) == 0 && $IsPrivileged): ?>
    <li>
       <div class="Empty">

@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) return;
 
-if (!function_exists('WriteUserNoteWarning')):
+if (!function_exists('WriteUserNoteWarningUser')):
 
-function WriteUserNoteWarning($Row) {
+function WriteUserNoteWarningUser($Row) {
   $ViewNoteUrl = Url("/profile/viewnote/{$Row['UserNoteID']}");
   ?>
    <div class="Item-Col item-col-fullwidth">
@@ -30,8 +30,8 @@ function WriteUserNoteWarning($Row) {
 endif;
 
 
-if (!function_exists('WriteUserNoteBody')):
-function WriteUserNoteBody($Row) {
+if (!function_exists('WriteUserNoteWarning')):
+function WriteUserNoteWarning($Row) {
   $Reversed = GetValue('Reversed', $Row);
   $IsPrivileged = GetValue('Privileged', $Row, FALSE);
 
