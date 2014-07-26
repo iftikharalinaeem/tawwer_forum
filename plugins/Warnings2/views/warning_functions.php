@@ -84,14 +84,23 @@ function WriteUserNoteWarning($Row) {
 
         if (GetValue('Record', $Row)) {
             $Record = $Row['Record'];
-
             echo '<div class="P">'.
                 '<b>'.T('Warned for').'</b>: '.
                 Anchor(htmlspecialchars($Record['Name']), $Record['Url']).
-               '</div>';
+                '</div>';
+        } else {
+            echo '<div class="P">'.
+                '<b>'.T('Warned for your post') . '</b>: ' . '</div>';
+        }
 
+        if (GetValue('RecordBody', $Row)) {
+            echo '<blockquote class="Quote">' . Gdn_Format::Text($Row['RecordBody']) . '</blockquote>';
+        } elseif (GetValue('Record', $Row)) {
             echo '<blockquote class="Quote">' . Gdn_Format::Text($Record['Body']) . '</blockquote>';
-         }
+        }
+
+
+
 
         echo $Row['Body'];
 

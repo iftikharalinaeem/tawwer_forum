@@ -9,7 +9,7 @@
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.1.7',
+    'Version' => '2.1.8',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -672,6 +672,11 @@ class Warnings2Plugin extends Gdn_Plugin {
             $Row = GetRecord($RecordType, $RecordID);
             $Sender->SetData('RecordType', $RecordType);
             $Sender->SetData('Record', $Row);
+
+            $Form->AddHidden('RecordBody', $Row['Body']);
+            $Form->AddHidden('RecordFormat', $Row['Format']);
+            $Form->AddHidden('RecordInsertTime', $Row['DateInserted']);
+
         }
 
         if ($Form->AuthenticatedPostBack()) {
