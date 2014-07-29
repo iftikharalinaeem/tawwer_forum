@@ -184,9 +184,8 @@ class Warnings2Plugin extends Gdn_Plugin {
                     $WarningID = $Row->Attributes['WarningID'];
                     $WordWarn = '<a href="' . Url("profile/viewnote/$WarningID") . '" class="Popup">' . $WordWarn . '</a>';
                 }
-
                 echo '<div class="DismissMessage Warning">'.
-                sprintf(T('%s was %s for this post.'), htmlspecialchars(val('InsertName', $Row)), $WordWarn).
+                sprintf(T('%s was %s for this.'), htmlspecialchars(val('InsertName', $Row)), $WordWarn).
                 '</div>';
             }
         }
