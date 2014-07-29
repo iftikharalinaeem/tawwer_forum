@@ -19,6 +19,10 @@
   @include form-control;
 }
 
+.DateBox {
+  display: inline-block;
+}
+
 // ## Text area wrapper
 //
 // Styleguide Forms.textarea
@@ -62,4 +66,16 @@
 
 .iradio.checked:before {
   content: $icon-dot-circle;
+}
+
+// # Misc. forms
+//
+// Styleguide Forms.Misc
+
+.PostOptions {
+  .ReactSprite {
+    margin: 5px;
+    width: 14px;
+    height: 14px;
+  }
 }

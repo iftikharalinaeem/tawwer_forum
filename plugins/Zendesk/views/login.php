@@ -1,8 +1,9 @@
 <script>
-    $( "#ZendeskLogin" ).click(function() {
-        window.location.replace('<?php echo $this->Data['LoginUrl']; ?>');
+    $( document ).ready(function() {
+        $( "#ZendeskLogin" ).click(function() {
+            window.location.replace('<?php echo $this->Data['LoginUrl']; ?>');
+        });
     });
-
 </script>
 <h2>
     Zendesk

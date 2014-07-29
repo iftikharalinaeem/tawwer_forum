@@ -334,14 +334,8 @@
   padding: 5px 0;
   width: auto;
   /*
-      .editor-action-h1 {
-         font-size: 18px;
-         line-height: 28px !important;
-      }
-
-      .editor-action-h2 {
-         font-size: 16px;
-      }
+      max-height: 230px;
+      overflow-y: auto;
       */ }
   .editor-dd-format + .editor-insert-dialog .wysihtml5-command-active {
     border-radius: 0; }
@@ -795,6 +789,36 @@ cell-* are used for the dropdown */
 
 .post-clear-left {
   clear: left; }
+
+/**
+ * Font families
+ */
+.post-fontfamily-default {
+  font-family: inherit; }
+
+.post-fontfamily-arial {
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; }
+
+.post-fontfamily-comicsansms {
+  font-family: 'Comic Sans MS', cursive !important; }
+
+.post-fontfamily-couriernew {
+  font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace; }
+
+.post-fontfamily-georgia {
+  font-family: Georgia, Times, 'Times New Roman', serif; }
+
+.post-fontfamily-impact {
+  font-family: Impact, Haettenschweiler, 'Franklin Gothic Bold', Charcoal, 'Helvetica Inserat', 'Bitstream Vera Sans Bold', 'Arial Black', sans-serif; }
+
+.post-fontfamily-timesnewroman {
+  font-family: 'Times New Roman', Times, Baskerville, Georgia, serif; }
+
+.post-fontfamily-trebuchetms {
+  font-family: 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; }
+
+.post-fontfamily-verdana {
+  font-family: Verdana, Geneva, sans-serif; }
 
 /* Custom classes */
 

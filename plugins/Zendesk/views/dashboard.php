@@ -56,7 +56,7 @@
                 <?php echo T('Enter the following URLs in the Redirect Urls'); ?> <br/>
                 <strong>
                     &middot; <?php echo Gdn::Request()->Url('/profile/zendeskconnect', true, true, true) ?> <br/>
-                    &middot; <?php echo Gdn::Request()->Url('/profile/zendesk/connect', true, true, true) ?>
+                    &middot; <?php echo Gdn::Request()->Url('/plugin/zendesk/connect', true, true, true) ?>
                 </strong>
             </li>
         </ul>
@@ -114,7 +114,7 @@ echo $this->Form->Errors();
 <div class="Info">
     <p><?php echo T('This feature will allow you to have all Staff use one Zendesk Connection.'); ?></p>
 
-    <p><?php echo T('If a user has a connection already established we will use that instead.'); ?>'</p>
+    <p><?php echo T('If a user has a connection already established we will use that instead.'); ?></p>
 </div>
 <?php if (!$this->Data['GlobalLoginEnabled']) { ?>
     <div class="Info"><?php echo T('Global Login is currently'); ?> <strong><?php echo T('Disabled'); ?></strong></div>

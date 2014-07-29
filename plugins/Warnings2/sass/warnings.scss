@@ -64,6 +64,10 @@
    }
 }
 
+.Popup .DataList .Item {
+  border: 0;
+}
+
 .Item-Col {
    float: left;
    @include box-sizing(border-box);
@@ -71,7 +75,7 @@
    padding-right: 4px;
 
    .Media {
-      margin: 0;
+      margin: 0 0 10px 0;
    }
 
    .Options {
@@ -84,6 +88,11 @@
          width: 16px;
       }
    }
+}
+
+.item-col-fullwidth {
+  min-width: 400px;
+  width: 100%;
 }
 
 .User-Col {
@@ -129,4 +138,9 @@
    > *:last-child {
       margin-bottom: 0;
    }
+
+  .Quote {
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
 }

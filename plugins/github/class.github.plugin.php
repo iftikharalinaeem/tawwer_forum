@@ -341,6 +341,8 @@ class GithubPlugin extends Gdn_Plugin {
      * Setup the plugin.
      */
     public function setup() {
+
+        SaveToConfig('Garden.AttachmentsEnabled', true);
         // Save the provider type.
         Gdn::SQL()->Replace(
             'UserAuthenticationProvider',
@@ -555,11 +557,7 @@ class GithubPlugin extends Gdn_Plugin {
                     $Sender->Form->AddError('Please enter a valid repo name', 'Repositories');
                 } else {
                     foreach ($repos as $repo) {
-                        try {
-                            if (!$this->isValidRepo(trim($repo))) {
-                                $Sender->Form->AddError('Repository not found: ' . $repo, 'Repositories');
-                            }
-                        } catch (Gdn_UserException $e) {
+                        if (!$this->isValidRepoName($repo)) {
                             $Sender->Form->AddError('Invalid Repository: ' . $repo, 'Repositories');
                         }
                     }
@@ -619,6 +617,18 @@ class GithubPlugin extends Gdn_Plugin {
      * @throws Exception Permission Denied.
      */
     public function discussionController_githubIssue_create($Sender, $Args) {
+
+        if ($this->accessToken === null) {
+            $this->setAccessToken();
+        }
+
+
+        if (!$this->isConnected()) {
+
+            $Sender->SetData('LoginURL', Url('/profile/connections'));
+            $Sender->Render('reconnect', '', 'plugins/github');
+            return;
+        }
 
         // Signed in users only.
         if (!(Gdn::Session()->IsValid())) {
@@ -868,6 +878,9 @@ class GithubPlugin extends Gdn_Plugin {
         if (GetValue('id', $response)) {
             return $response;
         }
+        if (GetValue('message', $response)) {
+            throw new Gdn_UserException('Error creating issue: ' . $response['message']);
+        }
         return false;
     }
 
@@ -1007,6 +1020,17 @@ class GithubPlugin extends Gdn_Plugin {
 
     }
 
+    /**
+     * Add Github to Dashboard menu.
+     *
+     * @param Controller $Sender
+     * @param array $Arguments
+     */
+    public function Base_GetAppSettingsMenuItems_Handler($Sender, $Arguments) {
+        $Menu = $Arguments['SideMenu'];
+        $Menu->AddItem('Forum', T('Forum'));
+        $Menu->AddLink('Forum', 'Github', 'plugin/github', 'Garden.Settings.Manage');
+    }
 
 }
 
