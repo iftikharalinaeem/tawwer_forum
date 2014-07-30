@@ -739,7 +739,7 @@
             return false;
          }
 
-         var canUpload = (gdn.definition('canUpload', false)) ? 1 : 0;;
+         var canUpload = (gdn.definition('canUpload', false)) ? 1 : 0;
          if (canUpload != 1) {
             return false;
          }
