@@ -1,5 +1,10 @@
 <?php
 /**
+ *
+ * * Changes:
+ *  0.0.1alpha  Initial release
+ *  1.0         Add Cleanspeak API Key
+ *
  * @copyright 2009-2014 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
@@ -7,7 +12,7 @@
 $PluginInfo['Cleanspeak'] = array(
     'Name' => 'Cleanspeak',
     'Description' => 'Cleanspeak integration for Vanilla.',
-    'Version' => '0.0.1alpha',
+    'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'SettingsUrl' => '/settings/cleanspeak',
     'SettingsPermission' => 'Garden.Settings.Manage',

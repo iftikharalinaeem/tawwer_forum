@@ -143,7 +143,7 @@ class Cleanspeak extends Gdn_Pluggable {
         }
         $headers['Content-Type'] = 'application/json';
 
-        $apiKey = C('Plugins.Cleanspeak.AccessToken', '');
+        $apiKey = C('Plugins.Cleanspeak.AccessToken', null);
         if (!empty($apiKey)) {
             $headers['Authentication'] = $apiKey;
         }
